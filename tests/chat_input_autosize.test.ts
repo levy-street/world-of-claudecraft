@@ -1,7 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import { chatInputSize } from '../src/ui/chat_input_autosize';
+import { chatInputSize, chatInputVisibleHeight } from '../src/ui/chat_input_autosize';
 
 const LIMITS = { minHeight: 32, maxHeight: 110 };
+
+describe('chatInputVisibleHeight', () => {
+  it('uses typed content height once the user has entered text', () => {
+    expect(chatInputVisibleHeight(44, 72, true, 4)).toBe(48);
+  });
+
+  it('uses the taller placeholder while the input is empty', () => {
+    expect(chatInputVisibleHeight(28, 52, false, 4)).toBe(56);
+  });
+
+  it('falls back to the value height for an empty input with a short placeholder', () => {
+    expect(chatInputVisibleHeight(28, 0, false, 4)).toBe(32);
+  });
+
+  it('ignores non-finite measurements and clamps negative borders', () => {
+    expect(chatInputVisibleHeight(Number.NaN, 40, false, -4)).toBe(40);
+    expect(chatInputVisibleHeight(40, Number.NaN, true, Number.NaN)).toBe(40);
+  });
+});
 
 describe('chatInputSize', () => {
   it('keeps the floor for an empty / single-line input', () => {

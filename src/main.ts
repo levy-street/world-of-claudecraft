@@ -105,7 +105,7 @@ import {
 } from './ui/auth_utils';
 import { assembleBugReportMeta } from './ui/bug_report';
 import { ChatCommandMenu } from './ui/chat_command_menu';
-import { chatInputSize } from './ui/chat_input_autosize';
+import { chatInputSize, chatInputVisibleHeight } from './ui/chat_input_autosize';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
@@ -951,17 +951,49 @@ async function startGame(
   // edge, the extra height extends upward, away from the chat log beneath it.
   const CHAT_INPUT_MIN_H = 36;
   const CHAT_INPUT_MAX_H = 110;
-  const autosizeChatInput = (): void => {
-    // Empty: pin to one line. (A long placeholder otherwise inflates a textarea's
-    // scrollHeight in Chromium, making the bar tall when empty and snapping to one
-    // line on the first keystroke.)
-    if (chatInput.value === '') {
-      chatInput.style.height = `${CHAT_INPUT_MIN_H}px`;
-      chatInput.style.overflowY = 'hidden';
-      return;
+  let chatInputMeasure: HTMLTextAreaElement | null = null;
+  const measureChatInputPlaceholder = (): number => {
+    if (chatInput.placeholder === '') return 0;
+    if (!chatInputMeasure) {
+      chatInputMeasure = document.createElement('textarea');
+      chatInputMeasure.setAttribute('aria-hidden', 'true');
+      chatInputMeasure.tabIndex = -1;
+      chatInputMeasure.style.position = 'absolute';
+      chatInputMeasure.style.visibility = 'hidden';
+      chatInputMeasure.style.pointerEvents = 'none';
+      chatInputMeasure.style.left = '-9999px';
+      chatInputMeasure.style.top = '0';
+      chatInputMeasure.style.height = 'auto';
+      chatInputMeasure.style.minHeight = '0';
+      chatInputMeasure.style.maxHeight = 'none';
+      chatInputMeasure.style.overflow = 'hidden';
+      chatInputMeasure.style.resize = 'none';
+      document.body.appendChild(chatInputMeasure);
     }
+    const style = getComputedStyle(chatInput);
+    chatInputMeasure.style.boxSizing = style.boxSizing;
+    chatInputMeasure.style.width = `${chatInput.getBoundingClientRect().width}px`;
+    chatInputMeasure.style.padding = style.padding;
+    chatInputMeasure.style.border = style.border;
+    chatInputMeasure.style.font = style.font;
+    chatInputMeasure.style.lineHeight = style.lineHeight;
+    chatInputMeasure.style.letterSpacing = style.letterSpacing;
+    chatInputMeasure.style.whiteSpace = style.whiteSpace;
+    chatInputMeasure.style.wordBreak = style.wordBreak;
+    chatInputMeasure.value = chatInput.placeholder;
+    return chatInputMeasure.scrollHeight;
+  };
+  const autosizeChatInput = (): void => {
     chatInput.style.height = 'auto';
-    const size = chatInputSize(chatInput.scrollHeight, {
+    const hasValue = chatInput.value !== '';
+    const borderBlockSize = chatInput.offsetHeight - chatInput.clientHeight;
+    const visibleHeight = chatInputVisibleHeight(
+      chatInput.scrollHeight,
+      hasValue ? 0 : measureChatInputPlaceholder(),
+      hasValue,
+      borderBlockSize,
+    );
+    const size = chatInputSize(visibleHeight, {
       minHeight: CHAT_INPUT_MIN_H,
       maxHeight: CHAT_INPUT_MAX_H,
     });
