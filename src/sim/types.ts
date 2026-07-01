@@ -376,6 +376,10 @@ export interface InvSlot {
   count: number;
 }
 
+export interface SavedGearSet {
+  name: string;
+  equipment: Partial<Record<EquipSlot, string>>;
+}
 export interface LootSlot extends InvSlot {
   // Quest corpse loot can be personal: each listed player can take one copy.
   personalFor?: number[];

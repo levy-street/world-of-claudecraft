@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { type Entity, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import { type Entity, POTION_COOLDOWN, type SavedGearSet, type SimEvent } from '../src/sim/types';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -28,6 +28,7 @@ function vendorPlayer(sim: Sim, name = 'Aleph') {
       {
         copper: number;
         equipment: Record<string, string>;
+        gearSets: SavedGearSet[];
         vendorBuyback: { itemId: string; count: number }[];
         inventory: { itemId: string; count: number }[];
         pendingSkinRank: number | null;
@@ -87,6 +88,87 @@ describe('items.equipItem / unequipItem', () => {
     expect(meta.equipment.helmet).toBeUndefined();
     expect(sim.countItem('cryptbone_helm', pid)).toBe(1);
     expect(items.unequipItem(ctx, 'legs', pid)).toBe(false);
+  });
+});
+describe('items gear sets', () => {
+  it('saves equipped pieces and restores them from bags', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('cryptbone_helm', 1, pid);
+    sim.addItem('roadwardens_helm', 1, pid);
+
+    items.equipItem(ctx, 'cryptbone_helm', pid);
+    expect(items.saveGearSet(ctx, '  Tank  ', pid)).toBe(0);
+    expect(meta.gearSets[0].name).toBe('Tank');
+    expect(meta.gearSets[0].equipment.helmet).toBe('cryptbone_helm');
+
+    items.equipItem(ctx, 'roadwardens_helm', pid);
+    expect(meta.equipment.helmet).toBe('roadwardens_helm');
+    expect(sim.countItem('cryptbone_helm', pid)).toBe(1);
+
+    expect(items.equipGearSet(ctx, 0, pid)).toBe(true);
+    expect(meta.equipment.helmet).toBe('cryptbone_helm');
+    expect(sim.countItem('cryptbone_helm', pid)).toBe(0);
+    expect(sim.countItem('roadwardens_helm', pid)).toBe(1);
+  });
+
+  it('restores empty slots captured in a gear set', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    const empty = items.saveGearSet(ctx, 'No Helmet', pid);
+    sim.addItem('cryptbone_helm', 1, pid);
+    items.equipItem(ctx, 'cryptbone_helm', pid);
+
+    expect(items.equipGearSet(ctx, empty, pid)).toBe(true);
+    expect(meta.equipment.helmet).toBeUndefined();
+    expect(sim.countItem('cryptbone_helm', pid)).toBe(1);
+  });
+
+  it('leaves the current slot alone when a saved piece is missing', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('cryptbone_helm', 1, pid);
+    sim.addItem('roadwardens_helm', 1, pid);
+    items.equipItem(ctx, 'cryptbone_helm', pid);
+    const tank = items.saveGearSet(ctx, 'Tank', pid);
+    items.unequipItem(ctx, 'helmet', pid);
+    sim.removeItem('cryptbone_helm', 1, pid);
+    items.equipItem(ctx, 'roadwardens_helm', pid);
+
+    expect(items.equipGearSet(ctx, tank, pid)).toBe(false);
+    expect(meta.equipment.helmet).toBe('roadwardens_helm');
+  });
+
+  it('caps new gear sets but lets an existing name update in place', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    for (let i = 0; i < items.MAX_GEAR_SETS; i++) {
+      expect(items.saveGearSet(ctx, `Set ${i}`, pid)).toBe(i);
+    }
+    expect(items.saveGearSet(ctx, 'Overflow', pid)).toBe(-1);
+
+    sim.addItem('cryptbone_helm', 1, pid);
+    items.equipItem(ctx, 'cryptbone_helm', pid);
+    expect(items.saveGearSet(ctx, 'Set 0', pid)).toBe(0);
+    expect(meta.gearSets).toHaveLength(items.MAX_GEAR_SETS);
+    expect(meta.gearSets[0].equipment.helmet).toBe('cryptbone_helm');
+  });
+
+  it('deletes a saved gear set by index', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    items.saveGearSet(ctx, 'One', pid);
+    items.saveGearSet(ctx, 'Two', pid);
+
+    expect(items.deleteGearSet(ctx, 0, pid)).toBe(true);
+    expect(meta.gearSets.map((set) => set.name)).toEqual(['Two']);
+    expect(items.deleteGearSet(ctx, Number.NaN, pid)).toBe(false);
+    expect(items.deleteGearSet(ctx, 4, pid)).toBe(false);
   });
 });
 

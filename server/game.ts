@@ -250,6 +250,9 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'unequip_item',
+  'saveGearSet',
+  'equipGearSet',
+  'deleteGearSet',
   'use',
   'discard',
   'buy',
@@ -2278,6 +2281,15 @@ export class GameServer {
           sim.unequipItem(msg.slot as EquipSlot, pid);
         }
         break;
+      case 'saveGearSet':
+        if (typeof msg.name === 'string') sim.saveGearSet(msg.name, pid);
+        break;
+      case 'equipGearSet':
+        if (typeof msg.index === 'number') sim.equipGearSet(Math.floor(msg.index), pid);
+        break;
+      case 'deleteGearSet':
+        if (typeof msg.index === 'number') sim.deleteGearSet(Math.floor(msg.index), pid);
+        break;
       case 'use':
         if (typeof msg.item === 'string') {
           const result = sim.useItem(msg.item, pid);
@@ -3118,6 +3130,7 @@ export class GameServer {
       maybe('inv', meta.inventory);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
+      maybe('gsets', meta.gearSets);
       maybe('cosmetics', anchorSession.accountCosmetics);
       maybe('qlog', [...meta.questLog.values()]);
       maybe('qdone', [...meta.questsDone]);

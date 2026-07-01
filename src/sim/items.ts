@@ -28,6 +28,7 @@ import {
   CONSUME_TICKS,
   dist2d,
   type Entity,
+  EQUIP_SLOTS,
   type EquipSlot,
   FISHING_CAST_ID,
   INTERACT_RANGE,
@@ -35,6 +36,8 @@ import {
 } from './types';
 import { vendorStackSize } from './vendor_stack';
 
+export const MAX_GEAR_SETS = 8;
+const GEAR_SET_NAME_MAX = 24;
 const VENDOR_BUYBACK_LIMIT = 12;
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
@@ -109,6 +112,69 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   return true;
 }
 
+function cleanGearSetName(name: string): string {
+  const clean = String(name || '')
+    .trim()
+    .slice(0, GEAR_SET_NAME_MAX);
+  return clean || 'Gear Set';
+}
+
+function cloneGearEquipment(
+  equipment: Partial<Record<EquipSlot, string>>,
+): Partial<Record<EquipSlot, string>> {
+  const out: Partial<Record<EquipSlot, string>> = {};
+  for (const slot of EQUIP_SLOTS) {
+    const itemId = equipment[slot];
+    if (typeof itemId === 'string' && ITEMS[itemId]) out[slot] = itemId;
+  }
+  return out;
+}
+
+export function saveGearSet(ctx: SimContext, name: string, pid?: number): number {
+  const r = ctx.resolve(pid);
+  if (!r) return -1;
+  const clean = cleanGearSetName(name);
+  const saved = { name: clean, equipment: cloneGearEquipment(r.meta.equipment) };
+  const existing = r.meta.gearSets.findIndex((set) => set.name === clean);
+  if (existing >= 0) {
+    r.meta.gearSets[existing] = saved;
+    return existing;
+  }
+  if (r.meta.gearSets.length >= MAX_GEAR_SETS) return -1;
+  r.meta.gearSets.push(saved);
+  return r.meta.gearSets.length - 1;
+}
+
+export function equipGearSet(ctx: SimContext, index: number, pid?: number): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  if (!Number.isInteger(index)) return false;
+  const set = r.meta.gearSets[index];
+  if (!set) return false;
+
+  let changed = false;
+  for (const slot of EQUIP_SLOTS) {
+    const desired = set.equipment[slot];
+    const current = r.meta.equipment[slot];
+    if (desired === current) continue;
+    if (!desired) {
+      changed = unequipItem(ctx, slot, pid) || changed;
+      continue;
+    }
+    if (ctx.countItem(desired, r.meta.entityId) <= 0) continue;
+    const before = r.meta.equipment[slot];
+    equipItem(ctx, desired, pid);
+    changed = changed || r.meta.equipment[slot] !== before;
+  }
+  return changed;
+}
+
+export function deleteGearSet(ctx: SimContext, index: number, pid?: number): boolean {
+  const r = ctx.resolve(pid);
+  if (!r || !Number.isInteger(index) || index < 0 || index >= r.meta.gearSets.length) return false;
+  r.meta.gearSets.splice(index, 1);
+  return true;
+}
 export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;

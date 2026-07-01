@@ -34,6 +34,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     meta.skin = 3;
     meta.skinCatalog = 'mech';
     meta.pendingSkinRank = 'rare';
+    meta.gearSets = [{ name: 'Tank', equipment: { mainhand: 'worn_sword' } }];
     meta.loadouts = [{ name: 'PvP', alloc: meta.talents, bar: [] }];
     meta.activeLoadout = 0;
     meta.delveMarks = 17;
@@ -50,6 +51,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     // spot-check that the rich fields actually survived (not all defaulted to empty).
     expect(s2.arena2v2Rating).toBe(1880);
     expect(s2.delveMarks).toBe(17);
+    expect(s2.gearSets).toEqual([{ name: 'Tank', equipment: { mainhand: 'worn_sword' } }]);
     expect(s2.loadouts?.length).toBe(1);
     expect(s2.skinCatalog).toBe('mech');
   });

@@ -271,6 +271,7 @@ import {
   DUNGEON_LEASH_DISTANCE,
   dist2d,
   type Entity,
+  EQUIP_SLOTS,
   type EquipSlot,
   type ErrorReason,
   emptyMoveInput,
@@ -296,6 +297,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type SavedGearSet,
   RUN_SPEED,
   type SimConfig,
   type SimEvent,
@@ -632,6 +634,7 @@ export interface PlayerMeta {
   vendorBuyback: InvSlot[];
   copper: number;
   equipment: PlayerEquipment;
+  gearSets: SavedGearSet[];
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
   // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
@@ -736,6 +739,7 @@ export interface CharacterState {
   pos: { x: number; z: number };
   facing: number;
   equipment: PlayerEquipment;
+  gearSets?: SavedGearSet[];
   inventory: InvSlot[];
   vendorBuyback?: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
@@ -1163,6 +1167,7 @@ export class Sim {
       vendorBuyback: [],
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
+      gearSets: [],
       xp: 0,
       lifetimeXp: 0,
       prestigeRank: 0,
@@ -1219,6 +1224,15 @@ export class Sim {
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
+      meta.gearSets = (s.gearSets ?? []).map((set) => ({
+        name: String(set.name || 'Gear Set').slice(0, 24),
+        equipment: Object.fromEntries(
+          EQUIP_SLOTS.flatMap((slot) => {
+            const itemId = set.equipment?.[slot];
+            return typeof itemId === 'string' && ITEMS[itemId] ? [[slot, itemId]] : [];
+          }),
+        ),
+      }));
       meta.inventory = s.inventory.map((i) => ({ ...i }));
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((i) => ({ ...i }));
       for (const q of s.questLog) {
@@ -1400,6 +1414,7 @@ export class Sim {
       pos: { x: e.pos.x, z: e.pos.z },
       facing: e.facing,
       equipment: { ...meta.equipment },
+      gearSets: meta.gearSets.map((set) => ({ name: set.name, equipment: { ...set.equipment } })),
       inventory: meta.inventory.map((i) => ({ ...i })),
       vendorBuyback: meta.vendorBuyback.map((i) => ({ ...i })),
       questLog: [...meta.questLog.values()].map((q) => ({
@@ -1597,6 +1612,9 @@ export class Sim {
   }
   get equipment(): PlayerEquipment {
     return this.primary.equipment;
+  }
+  get gearSets(): SavedGearSet[] {
+    return this.primary.gearSets;
   }
   get copper(): number {
     return this.primary.copper;
@@ -4247,6 +4265,15 @@ export class Sim {
 
   unequipItem(slot: EquipSlot, pid?: number): boolean {
     return items.unequipItem(this.ctx, slot, pid);
+  }
+  saveGearSet(name: string, pid?: number): number {
+    return items.saveGearSet(this.ctx, name, pid);
+  }
+  equipGearSet(index: number, pid?: number): boolean {
+    return items.equipGearSet(this.ctx, index, pid);
+  }
+  deleteGearSet(index: number, pid?: number): boolean {
+    return items.deleteGearSet(this.ctx, index, pid);
   }
 
   private hasFishableWaterAhead(p: Entity): boolean {

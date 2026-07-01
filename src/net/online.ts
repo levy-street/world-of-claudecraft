@@ -30,6 +30,7 @@ import {
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
+  type SavedGearSet,
   type QuestProgress,
   type QuestState,
   type SimEvent,
@@ -810,6 +811,7 @@ export class ClientWorld implements IWorld {
   inventory: InvSlot[] = [];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  gearSets: SavedGearSet[] = [];
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
@@ -1432,6 +1434,7 @@ export class ClientWorld implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
+      if (s.gsets !== undefined) this.gearSets = s.gsets;
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
       // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
@@ -1673,6 +1676,15 @@ export class ClientWorld implements IWorld {
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
+  }
+  saveGearSet(name: string): void {
+    this.cmd({ cmd: 'saveGearSet', name });
+  }
+  equipGearSet(index: number): void {
+    this.cmd({ cmd: 'equipGearSet', index });
+  }
+  deleteGearSet(index: number): void {
+    this.cmd({ cmd: 'deleteGearSet', index });
   }
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });

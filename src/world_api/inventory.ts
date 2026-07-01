@@ -1,12 +1,16 @@
-import type { EquipSlot, InvSlot } from '../sim/types';
+import type { EquipSlot, InvSlot, SavedGearSet } from '../sim/types';
 
 export interface IWorldInventory {
   inventory: InvSlot[];
   vendorBuyback: InvSlot[];
   equipment: Partial<Record<EquipSlot, string>>;
+  gearSets: SavedGearSet[];
   copper: number;
   equipItem(itemId: string): void;
   unequipItem(slot: EquipSlot): void;
+  saveGearSet(name: string): void;
+  equipGearSet(index: number): void;
+  deleteGearSet(index: number): void;
   useItem(itemId: string): void;
   discardItem(itemId: string, count?: number): void;
   buyItem(npcId: number, itemId: string): void;
