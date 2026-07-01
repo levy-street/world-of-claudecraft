@@ -9,24 +9,81 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "es_ES": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "fr_FR": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "fr_CA": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "de_DE": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "zh_CN": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "zh_TW": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "ko_KR": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "ja_JP": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "pt_BR": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "ru_RU": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "nl_NL": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "pl_PL": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "id_ID": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "tr_TR": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "sv_SE": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "vi_VN": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ],
+  "da_DK": [
+    "hudChrome.options.showOwnNameplate",
+    "hudChrome.options.showOwnNameplateTooltip"
+  ]
 };

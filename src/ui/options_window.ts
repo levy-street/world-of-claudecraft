@@ -462,13 +462,17 @@ export class OptionsWindow {
   private settingToggle(parent: HTMLElement, c: ToggleControl, hooks: OptionsHooks): void {
     const key = c.key as NumericSettingKey;
     const label = t(c.labelKey);
+    const tooltip = c.tooltipKey ? t(c.tooltipKey) : '';
     const row = document.createElement('div');
     row.className = 'set-row';
+    if (tooltip) row.title = tooltip;
     const name = document.createElement('span');
     name.className = 'set-name';
     name.textContent = label;
+    if (tooltip) name.title = tooltip;
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
+    if (tooltip) toggle.title = tooltip;
     const sync = () => {
       const on = toggleIsOn(hooks.settings.get(key));
       toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
@@ -490,13 +494,17 @@ export class OptionsWindow {
   private settingBoolToggle(parent: HTMLElement, c: BoolToggleControl, hooks: OptionsHooks): void {
     const key = c.key as BoolSettingKey;
     const label = t(c.labelKey);
+    const tooltip = c.tooltipKey ? t(c.tooltipKey) : '';
     const row = document.createElement('div');
     row.className = 'set-row';
+    if (tooltip) row.title = tooltip;
     const name = document.createElement('span');
     name.className = 'set-name';
     name.textContent = label;
+    if (tooltip) name.title = tooltip;
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
+    if (tooltip) toggle.title = tooltip;
     const sync = () => {
       const on = hooks.settings.get(key);
       toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');

@@ -47,6 +47,7 @@ export interface ToggleControl {
   /** A numeric 0/1 setting key (on when the stored value is >= 0.5). */
   key: string;
   labelKey: TranslationKey;
+  tooltipKey?: TranslationKey;
   on: boolean;
 }
 
@@ -55,6 +56,7 @@ export interface BoolToggleControl {
   /** A BOOL_SETTINGS key (true/false stored directly). */
   key: string;
   labelKey: TranslationKey;
+  tooltipKey?: TranslationKey;
   on: boolean;
 }
 
@@ -164,7 +166,8 @@ const boolToggle = (
   s: OptionsSettingsSource,
   key: string,
   labelKey: TranslationKey,
-): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key) });
+  tooltipKey?: TranslationKey,
+): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, tooltipKey, on: s.bool(key) });
 
 const choice = (
   s: OptionsSettingsSource,
@@ -364,6 +367,12 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
     boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
     boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
+    boolToggle(
+      s,
+      'showOwnNameplate',
+      'hudChrome.options.showOwnNameplate',
+      'hudChrome.options.showOwnNameplateTooltip',
+    ),
     boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
     boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
     boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),

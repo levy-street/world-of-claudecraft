@@ -337,6 +337,8 @@ export const ja_JP: EnTranslations = {
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
       "showDevBadges": "開発者バッジを表示",
+      "showOwnNameplate": "Show Own Nameplate",
+      "showOwnNameplateTooltip": "Shows your character name above your own head. Cosmetic only; targeting and combat are unchanged.",
       "uiScale": "UIスケール",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",

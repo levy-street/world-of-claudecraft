@@ -88,6 +88,7 @@ export function nameplatePlanInto(
   player: Entity,
   viewHeight: number,
   showNameplates: boolean,
+  showOwnNameplate = false,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
@@ -102,7 +103,7 @@ export function nameplatePlanInto(
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
-    (isSelf && !hasOverheadEmote) ||
+    (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
     d2 > NAMEPLATE_RANGE_SQ ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
@@ -110,7 +111,9 @@ export function nameplatePlanInto(
     (!showNameplates && e.kind === 'mob' && !e.dead);
   out.anchorYOffset =
     viewHeight * e.scale +
-    (isSelf && hasOverheadEmote ? NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT : NAMEPLATE_ANCHOR_LIFT);
+    (isSelf && hasOverheadEmote && !showOwnNameplate
+      ? NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT
+      : NAMEPLATE_ANCHOR_LIFT);
   out.urgent =
     e.id === player.targetId || d2 < NAMEPLATE_URGENT_RANGE_SQ || e.castingAbility !== null;
   out.hasOverheadEmote = hasOverheadEmote;

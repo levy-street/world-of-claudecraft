@@ -241,6 +241,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'showWalletOnCharacterScreen',
       'showWalletOnPlayerCard',
       'showDevBadges',
+      'showOwnNameplate',
       'landingHighContrast',
       'invertLookY',
       'startAttackOnAbilityUse',
@@ -248,6 +249,11 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'showSecondaryActionBar',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
+    expect(find(controls, 'showOwnNameplate')).toMatchObject({
+      control: 'boolToggle',
+      labelKey: 'hudChrome.options.showOwnNameplate',
+      tooltipKey: 'hudChrome.options.showOwnNameplateTooltip',
+    });
   });
 });
 

@@ -176,6 +176,10 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
+  // off by default: keep the classic uncluttered self view, but let players opt
+  // into seeing their own overhead name label for screenshots, streams, and
+  // crowd orientation. Purely local display; no targeting/combat impact.
+  showOwnNameplate: { def: false },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },

@@ -337,6 +337,8 @@ export const ru_RU: EnTranslations = {
       "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
       "showDevBadges": "Показывать значки разработчика",
+      "showOwnNameplate": "Show Own Nameplate",
+      "showOwnNameplateTooltip": "Shows your character name above your own head. Cosmetic only; targeting and combat are unchanged.",
       "uiScale": "Масштаб интерфейса",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",

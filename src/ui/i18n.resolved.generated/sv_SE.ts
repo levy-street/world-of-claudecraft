@@ -337,6 +337,8 @@ export const sv_SE: EnTranslations = {
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showDevBadges": "Visa utvecklarmärken",
+      "showOwnNameplate": "Show Own Nameplate",
+      "showOwnNameplateTooltip": "Shows your character name above your own head. Cosmetic only; targeting and combat are unchanged.",
       "uiScale": "Gränssnittsskala",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",

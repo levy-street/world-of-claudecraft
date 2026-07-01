@@ -66,6 +66,23 @@ describe('nameplate_view - visibility', () => {
     expect(plan(meEmote, viewer({ id: PLAYER_ID })).hidden).toBe(false);
   });
 
+  it('shows the local player when the own-nameplate preference is enabled', () => {
+    const me = ent({ id: PLAYER_ID, kind: 'player' });
+    const hidden = nameplatePlanInto(newNameplatePlan(), me, viewer({ id: PLAYER_ID }), 2, true);
+    const visible = nameplatePlanInto(
+      newNameplatePlan(),
+      me,
+      viewer({ id: PLAYER_ID }),
+      2,
+      true,
+      true,
+    );
+
+    expect(hidden.hidden).toBe(true);
+    expect(visible.hidden).toBe(false);
+    expect(visible.anchorYOffset).toBe(2 + NAMEPLATE_ANCHOR_LIFT);
+  });
+
   it('hides any entity beyond NAMEPLATE_RANGE and shows it just inside', () => {
     // NAMEPLATE_RANGE is the radius; just past it on z is hidden, just inside shows.
     expect(plan(ent({ pos: { x: 0, y: 0, z: NAMEPLATE_RANGE + 1 } })).hidden).toBe(true);

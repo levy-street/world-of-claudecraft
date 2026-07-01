@@ -304,6 +304,10 @@ export const hudChromeStrings = {
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',
+    // Interface panel toggle: local-only self overhead name label (off by default).
+    showOwnNameplate: 'Show Own Nameplate',
+    showOwnNameplateTooltip:
+      'Shows your character name above your own head. Cosmetic only; targeting and combat are unchanged.',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',

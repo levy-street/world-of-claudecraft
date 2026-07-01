@@ -72,6 +72,8 @@ export interface NameplatePainterDeps {
   showNameplates: () => boolean;
   /** the player's developer-badge display toggle (glyph + name outline) */
   showDevBadges: () => boolean;
+  /** the player's own overhead-name display toggle */
+  showOwnNameplate: () => boolean;
   /** PvP reaction check, owned by the renderer (duel/arena state) */
   isHostilePlayer: (e: Entity) => boolean;
 }
@@ -83,6 +85,7 @@ export class NameplatePainter {
   private readonly getViewport: () => { width: number; height: number };
   private readonly showNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
+  private readonly showOwnNameplate: () => boolean;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   // scratch reused every frame (no per-frame alloc); was renderer.tmpV/tmpV2.
   private readonly tmpV = new THREE.Vector3();
@@ -97,6 +100,7 @@ export class NameplatePainter {
     this.getViewport = deps.getViewport;
     this.showNameplates = deps.showNameplates;
     this.showDevBadges = deps.showDevBadges;
+    this.showOwnNameplate = deps.showOwnNameplate;
     this.isHostilePlayer = deps.isHostilePlayer;
   }
 
@@ -109,10 +113,11 @@ export class NameplatePainter {
     const { width: w, height: h } = this.getViewport();
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
+    const showOwnNameplate = this.showOwnNameplate();
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
-      const plan = nameplatePlanInto(this.plan, e, p, v.height, showNameplates);
+      const plan = nameplatePlanInto(this.plan, e, p, v.height, showNameplates, showOwnNameplate);
       if (plan.hidden) {
         this.hideNameplate(v);
         continue;
@@ -184,10 +189,11 @@ export class NameplatePainter {
           '1',
         );
       } else if (e.kind === 'player') {
-        // other players: friendly blue with an hp bar; <Guild> tag under the name.
-        // Self has no overhead nameplate, so its guild line stays hidden too.
+        // Other players: friendly blue with an hp bar; <Guild> tag under the name.
+        // The opt-in self nameplate shows only the name/flair, not a duplicate HP bar.
         const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
-        const nameDisplay = isSelf ? 'none' : '';
+        const showSelfName = isSelf && showOwnNameplate;
+        const nameDisplay = isSelf && !showSelfName ? 'none' : '';
         const hpDisplay = e.dead || isSelf ? 'none' : '';
         const guild = isSelf ? '' : e.guild;
         // Staff/special Discord role: tint the name + prefix a tag (others only).
@@ -197,10 +203,12 @@ export class NameplatePainter {
         const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
         // Significant-contributor outline: a glowing outline drawn on top of the
         // existing name color (Discord staff or default) for a high dev tier, so
-        // both read at once. Null for non-significant tiers, for self, and when
+        // both read at once. Null for non-significant tiers and when
         // the player has turned developer badges off.
         const devOutline =
-          isSelf || !showDevBadges ? null : devTierNameOutlineColor(e.devTier ?? 0);
+          (isSelf && !showSelfName) || !showDevBadges
+            ? null
+            : devTierNameOutlineColor(e.devTier ?? 0);
         this.setNameplateStatic(
           v,
           `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
@@ -217,8 +225,11 @@ export class NameplatePainter {
         v.nameEl.style.display = nameDisplay;
         // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
         this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
-        // Developer-badge flair, also OTHER players only.
-        this.setNameplateDevTier(v, isSelf || !showDevBadges ? 0 : (e.devTier ?? 0));
+        // Developer-badge flair follows visible player name labels, including opt-in self.
+        this.setNameplateDevTier(
+          v,
+          (isSelf && !showSelfName) || !showDevBadges ? 0 : (e.devTier ?? 0),
+        );
         // Linked-Discord PFP indicator, also OTHER players only.
         this.setNameplateDiscord(v, isSelf ? undefined : e.discordAvatar, e.discordName);
         this.setNameplateHp(v, e);

@@ -727,6 +727,9 @@ export class Renderer {
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
   showDevBadges = true;
+  // settings-backed local-player overhead name toggle; off preserves the classic
+  // uncluttered self view.
+  showOwnNameplate = false;
   // settings-menu graphics knobs (applied live)
   private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
@@ -977,6 +980,7 @@ export class Renderer {
       getViewport: () => this.viewport,
       showNameplates: () => this.showNameplates,
       showDevBadges: () => this.showDevBadges,
+      showOwnNameplate: () => this.showOwnNameplate,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 

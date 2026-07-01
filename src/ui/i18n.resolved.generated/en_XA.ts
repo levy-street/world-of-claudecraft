@@ -337,6 +337,8 @@ export const en_XA: EnTranslations = {
       "showWalletOnCharacterScreen": "[Šĥóŵ Ŵáļļéţ óñ Çĥáŕáçţéŕ Šçŕééñ]",
       "showWalletOnPlayerCard": "[Šĥóŵ Ŵáļļéţ óñ Þļáýéŕ Çáŕð]",
       "showDevBadges": "[Šĥóŵ Ðéʋéļóþéŕ Ɓáðĝéš]",
+      "showOwnNameplate": "[Šĥóŵ Óŵñ Ñáɱéþļáţé]",
+      "showOwnNameplateTooltip": "[Šĥóŵš ýóúŕ çĥáŕáçţéŕ ñáɱé áƀóʋé ýóúŕ óŵñ ĥéáð. Çóšɱéţíç óñļý; ţáŕĝéţíñĝ áñð çóɱƀáţ áŕé úñçĥáñĝéð.]",
       "uiScale": "[ÚÍ Šçáļé]",
       "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
       "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
