@@ -1961,9 +1961,12 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
   cracked_fetish: {
     id: 'cracked_fetish',
     name: 'Cracked Fetish',
-    kind: 'junk',
-    quality: 'poor',
-    sellValue: 14,
+    kind: 'trinket',
+    slot: 'trinket',
+    quality: 'uncommon',
+    stats: { sta: 1 },
+    onUse: { type: 'heal', amount: 120, cooldown: 120 },
+    sellValue: 140,
   },
   chipped_tusk: {
     id: 'chipped_tusk',

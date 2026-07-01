@@ -4128,6 +4128,26 @@
   /* Per-slot Unequip affordance in the character window (paperdoll): a corner ×
      glyph revealed on hover/focus (always shown on touch). Also right-click the
      slot, or drag the piece onto the bags window. */
+  .equip-slot .equip-use-btn {
+    flex: none;
+    min-width: 38px;
+    height: 26px;
+    padding: 0 9px;
+    border-radius: 4px;
+    border: 1px solid rgba(202, 164, 114, 0.5);
+    background: rgba(88, 62, 32, 0.72);
+    color: var(--color-text-primary, #f5e7c8);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: var(--cursor-point);
+  }
+  .equip-slot .equip-use-btn:hover,
+  .equip-slot .equip-use-btn:focus-visible {
+    border-color: rgba(255, 218, 160, 0.86);
+    color: #fff;
+    box-shadow: 0 0 7px rgba(202, 164, 114, 0.35);
+  }
   .equip-slot .equip-unequip-btn {
     margin-inline-start: auto;
     flex: none;

@@ -4935,4 +4935,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Yardım Lazım',
   'hudChrome.discord.relay.help.hint': 'Topluluktan yardım iste',
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
+  'itemUi.slots.trinket': 'Tilsim',
+  'itemUi.kind.trinket': 'Tilsim',
+  'itemUi.tooltip.useTrinketAura': 'Kullan: {seconds} sn boyunca {aura} kazandirir. ({cooldown} sn bekleme s�resi)',
+  'itemUi.tooltip.useTrinketHeal': 'Kullan: En fazla {amount} can yeniler. ({cooldown} sn bekleme s�resi)',
+  'hudChrome.paperdoll.use': 'Kullan',
+  'hudChrome.paperdoll.useAria': '{item} kullan',
 };

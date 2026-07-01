@@ -4973,4 +4973,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Potrzebuję pomocy',
   'hudChrome.discord.relay.help.hint': 'Poproś społeczność o pomoc',
   'hudChrome.options.showSecondaryActionBar': 'Pokaż dodatkowy pasek akcji',
+  'itemUi.slots.trinket': 'Talizman',
+  'itemUi.kind.trinket': 'Talizman',
+  'itemUi.tooltip.useTrinketAura': 'U\u017cyj: zapewnia {aura} na {seconds} s. ({cooldown} s odnowienia)',
+  'itemUi.tooltip.useTrinketHeal': 'U\u017cyj: przywraca do {amount} zdrowia. ({cooldown} s odnowienia)',
+  'hudChrome.paperdoll.use': 'U\u017cyj',
+  'hudChrome.paperdoll.useAria': 'U\u017cyj {item}',
 };

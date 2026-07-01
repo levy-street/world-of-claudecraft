@@ -539,7 +539,9 @@ export const nl_NL: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item} afdoen",
-      "unequipHint": "Klik op ×, klik met rechts, of sleep naar tassen om af te doen"
+      "unequipHint": "Klik op ×, klik met rechts, of sleep naar tassen om af te doen",
+      "use": "Gebruiken",
+      "useAria": "{item} gebruiken"
     },
     "account": {
       "title": "Account",
@@ -3424,7 +3426,8 @@ export const nl_NL: EnTranslations = {
       "waist": "Middel",
       "legs": "Benen",
       "gloves": "Handschoenen",
-      "feet": "Voeten"
+      "feet": "Voeten",
+      "trinket": "Sieraad"
     },
     "quality": {
       "poor": "Waardeloos",
@@ -3441,6 +3444,7 @@ export const nl_NL: EnTranslations = {
       "junk": "Rommel",
       "food": "Voedsel",
       "drink": "Drank",
+      "trinket": "Sieraad",
       "tool": "Gereedschap",
       "potion": "Toverdrank",
       "elixir": "Elixer"
@@ -3468,6 +3472,8 @@ export const nl_NL: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Gebruik: Herstelt {amount} levenskracht over {seconds} sec. Je moet blijven zitten tijdens het eten.",
       "useDrink": "Gebruik: Herstelt {amount} mana over {seconds} sec. Je moet blijven zitten tijdens het drinken.",
+      "useTrinketAura": "Gebruik: Geeft {aura} gedurende {seconds} sec. ({cooldown} sec afkoeling)",
+      "useTrinketHeal": "Gebruik: Herstelt tot {amount} gezondheid. ({cooldown} sec afkoeling)",
       "questItem": "Questvoorwerp",
       "classes": "Klassen: {classes}",
       "sellPrice": "Verkoopprijs: {money}",

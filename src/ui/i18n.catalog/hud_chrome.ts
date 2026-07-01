@@ -552,6 +552,8 @@ export const hudChromeStrings = {
   paperdoll: {
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
+    use: 'Use',
+    useAria: 'Use {item}',
   },
   // Home-page account portal (the logged-in "Account" nav tab). Lives here in the
   // English-only hud_chrome domain so an English-only PR compiles; translations

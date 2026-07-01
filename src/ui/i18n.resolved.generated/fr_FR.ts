@@ -539,7 +539,9 @@ export const fr_FR: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Déséquiper {item}",
-      "unequipHint": "Cliquez sur ×, faites un clic droit ou glissez vers les sacs pour déséquiper"
+      "unequipHint": "Cliquez sur ×, faites un clic droit ou glissez vers les sacs pour déséquiper",
+      "use": "Utiliser",
+      "useAria": "Utiliser {item}"
     },
     "account": {
       "title": "Compte",
@@ -3424,7 +3426,8 @@ export const fr_FR: EnTranslations = {
       "waist": "Taille",
       "legs": "Jambes",
       "gloves": "Mains",
-      "feet": "Pieds"
+      "feet": "Pieds",
+      "trinket": "Bijou"
     },
     "quality": {
       "poor": "Médiocre",
@@ -3441,6 +3444,7 @@ export const fr_FR: EnTranslations = {
       "junk": "Camelote",
       "food": "Nourriture",
       "drink": "Boisson",
+      "trinket": "Bijou",
       "tool": "Outil",
       "potion": "Potion",
       "elixir": "Élixir"
@@ -3468,6 +3472,8 @@ export const fr_FR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Utiliser : rend {amount} points de vie en {seconds} s. Vous devez rester assis en mangeant.",
       "useDrink": "Utiliser : rend {amount} points de mana en {seconds} s. Vous devez rester assis en buvant.",
+      "useTrinketAura": "Utiliser : confère {aura} pendant {seconds} s. ({cooldown} s de recharge)",
+      "useTrinketHeal": "Utiliser : rend au plus {amount} points de vie. ({cooldown} s de recharge)",
       "questItem": "Objet de quête",
       "classes": "Classes : {classes}",
       "sellPrice": "Prix de vente : {money}",

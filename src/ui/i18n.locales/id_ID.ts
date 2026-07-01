@@ -5004,4 +5004,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Butuh Bantuan',
   'hudChrome.discord.relay.help.hint': 'Minta bantuan dari komunitas',
   'hudChrome.options.showSecondaryActionBar': 'Tampilkan Bilah Aksi Sekunder',
+  'itemUi.slots.trinket': 'Perhiasan',
+  'itemUi.kind.trinket': 'Perhiasan',
+  'itemUi.tooltip.useTrinketAura': 'Gunakan: Memberikan {aura} selama {seconds} dtk. ({cooldown} dtk cooldown)',
+  'itemUi.tooltip.useTrinketHeal': 'Gunakan: Memulihkan hingga {amount} kesehatan. ({cooldown} dtk cooldown)',
+  'hudChrome.paperdoll.use': 'Gunakan',
+  'hudChrome.paperdoll.useAria': 'Gunakan {item}',
 };

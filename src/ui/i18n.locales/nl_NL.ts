@@ -4997,4 +4997,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Hulp nodig',
   'hudChrome.discord.relay.help.hint': 'Vraag de gemeenschap om hulp',
   'hudChrome.options.showSecondaryActionBar': 'Secundaire actiebalk tonen',
+  'itemUi.slots.trinket': 'Sieraad',
+  'itemUi.kind.trinket': 'Sieraad',
+  'itemUi.tooltip.useTrinketAura': 'Gebruik: Geeft {aura} gedurende {seconds} sec. ({cooldown} sec afkoeling)',
+  'itemUi.tooltip.useTrinketHeal': 'Gebruik: Herstelt tot {amount} gezondheid. ({cooldown} sec afkoeling)',
+  'hudChrome.paperdoll.use': 'Gebruiken',
+  'hudChrome.paperdoll.useAria': '{item} gebruiken',
 };

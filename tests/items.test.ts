@@ -166,6 +166,49 @@ describe('items.useItem', () => {
     expect(sim.countItem('elixir_of_the_bear', pid)).toBe(0);
   });
 
+  it('bag use equips an on-use trinket before equipped use activates its aura cooldown', () => {
+    const sim = makeWorld();
+    const { pid, meta, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('maldrecs_soulbinder', 1, pid);
+    sim.drainEvents();
+
+    items.useItem(ctx, 'maldrecs_soulbinder', pid);
+    expect(meta.equipment.trinket).toBe('maldrecs_soulbinder');
+    expect(sim.countItem('maldrecs_soulbinder', pid)).toBe(0);
+    expect(p.auras.some((a) => a.id === 'item_maldrecs_soulbinder')).toBe(false);
+    expect(p.cooldowns.has('item:maldrecs_soulbinder')).toBe(false);
+
+    items.useItem(ctx, 'maldrecs_soulbinder', pid);
+    expect(p.auras.some((a) => a.id === 'item_maldrecs_soulbinder')).toBe(true);
+    expect(p.cooldowns.get('item:maldrecs_soulbinder')).toBe(120);
+
+    sim.drainEvents();
+    items.useItem(ctx, 'maldrecs_soulbinder', pid);
+    expect(errorTexts(sim.drainEvents())).toContain("Maldrec's Soulbinder is not ready yet.");
+  });
+
+  it('healing trinkets heal up to the deficit and refuse at full health without arming cooldown', () => {
+    const sim = makeWorld();
+    const { pid, meta, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('cracked_fetish', 1, pid);
+    items.useItem(ctx, 'cracked_fetish', pid);
+    expect(meta.equipment.trinket).toBe('cracked_fetish');
+
+    p.hp = p.maxHp - 50;
+    items.useItem(ctx, 'cracked_fetish', pid);
+    expect(p.hp).toBe(p.maxHp);
+    expect(p.cooldowns.get('item:cracked_fetish')).toBe(120);
+    expect(sim.countItem('cracked_fetish', pid)).toBe(0);
+
+    p.cooldowns.delete('item:cracked_fetish');
+    sim.drainEvents();
+    items.useItem(ctx, 'cracked_fetish', pid);
+    expect(errorTexts(sim.drainEvents())).toContain('You are already at full health.');
+    expect(p.cooldowns.has('item:cracked_fetish')).toBe(false);
+  });
+
   it('skinSelect rolls a rank and emits the skin event (dispatch to ctx.openSkinSelect)', () => {
     const sim = makeWorld();
     const { pid, meta } = vendorPlayer(sim);

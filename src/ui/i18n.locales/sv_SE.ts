@@ -4946,4 +4946,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Beh√∂ver hj√§lp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hj√§lp',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekund√§rt handlingsf√§lt',
+  'itemUi.slots.trinket': 'Smycke',
+  'itemUi.kind.trinket': 'Smycke',
+  'itemUi.tooltip.useTrinketAura': 'Anv‰nd: Ger {aura} i {seconds} sek. ({cooldown} sek. nedkylning)',
+  'itemUi.tooltip.useTrinketHeal': 'Anv‰nd: Âterst‰ller upp till {amount} h‰lsa. ({cooldown} sek. nedkylning)',
+  'hudChrome.paperdoll.use': 'Anv‰nd',
+  'hudChrome.paperdoll.useAria': 'Anv‰nd {item}',
 };

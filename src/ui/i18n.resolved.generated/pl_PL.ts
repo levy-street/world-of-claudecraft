@@ -539,7 +539,9 @@ export const pl_PL: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Zdejmij {item}",
-      "unequipHint": "Kliknij ×, kliknij prawym przyciskiem lub przeciągnij do toreb, aby zdjąć"
+      "unequipHint": "Kliknij ×, kliknij prawym przyciskiem lub przeciągnij do toreb, aby zdjąć",
+      "use": "Użyj",
+      "useAria": "Użyj {item}"
     },
     "account": {
       "title": "Konto",
@@ -3424,7 +3426,8 @@ export const pl_PL: EnTranslations = {
       "waist": "Pas",
       "legs": "Nogi",
       "gloves": "Rękawice",
-      "feet": "Stopy"
+      "feet": "Stopy",
+      "trinket": "Talizman"
     },
     "quality": {
       "poor": "Nędzny",
@@ -3441,6 +3444,7 @@ export const pl_PL: EnTranslations = {
       "junk": "Tandeta",
       "food": "Jedzenie",
       "drink": "Napój",
+      "trinket": "Talizman",
       "tool": "Narzędzie",
       "potion": "Mikstura",
       "elixir": "Eliksir"
@@ -3468,6 +3472,8 @@ export const pl_PL: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Użycie: Przywraca {amount} zdrowia w ciągu {seconds} s. Podczas jedzenia musisz pozostać w pozycji siedzącej.",
       "useDrink": "Użycie: Przywraca {amount} many w ciągu {seconds} s. Podczas picia musisz pozostać w pozycji siedzącej.",
+      "useTrinketAura": "Użyj: zapewnia {aura} na {seconds} s. ({cooldown} s odnowienia)",
+      "useTrinketHeal": "Użyj: przywraca do {amount} zdrowia. ({cooldown} s odnowienia)",
       "questItem": "Przedmiot zadania",
       "classes": "Klasy: {classes}",
       "sellPrice": "Cena sprzedaży: {money}",

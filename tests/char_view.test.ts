@@ -17,21 +17,23 @@ const FULL: Partial<Record<EquipSlot, string>> = {
   waist: 'mistveil_cord',
   legs: 'quilted_trousers',
   feet: 'oiled_boots',
+  trinket: 'maldrecs_soulbinder',
 };
 
 describe('char_view: paperdoll data model', () => {
-  it('lays the classic two columns: head/shoulder/chest/weapon, then hands/waist/legs/feet', () => {
+  it('lays the classic two columns: head/shoulder/chest/weapon, then hands/waist/legs/feet/trinket', () => {
     expect(PAPERDOLL_LEFT_SLOTS).toEqual(['helmet', 'shoulder', 'chest', 'mainhand']);
-    expect(PAPERDOLL_RIGHT_SLOTS).toEqual(['gloves', 'waist', 'legs', 'feet']);
+    expect(PAPERDOLL_RIGHT_SLOTS).toEqual(['gloves', 'waist', 'legs', 'feet', 'trinket']);
   });
 
   it('resolves every equipped slot to its item, in column order', () => {
     const view = buildPaperdollView(FULL, ITEMS);
     expect(view.left.map((c) => c.slot)).toEqual(['helmet', 'shoulder', 'chest', 'mainhand']);
-    expect(view.right.map((c) => c.slot)).toEqual(['gloves', 'waist', 'legs', 'feet']);
+    expect(view.right.map((c) => c.slot)).toEqual(['gloves', 'waist', 'legs', 'feet', 'trinket']);
     expect(view.left[0].item).toBe(ITEMS.cryptbone_helm);
     expect(view.left[3].item).toBe(ITEMS.worn_sword);
     expect(view.right[3].item).toBe(ITEMS.oiled_boots);
+    expect(view.right[4].item).toBe(ITEMS.maldrecs_soulbinder);
   });
 
   it('renders an empty cell for an unequipped slot or an unknown item id', () => {

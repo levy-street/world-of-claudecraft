@@ -4932,4 +4932,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Brug for hjælp',
   'hudChrome.discord.relay.help.hint': 'Bed fællesskabet om hjælp',
   'hudChrome.options.showSecondaryActionBar': 'Vis sekundær handlingslinje',
+  'itemUi.slots.trinket': 'Smykke',
+  'itemUi.kind.trinket': 'Smykke',
+  'itemUi.tooltip.useTrinketAura': 'Brug: Giver {aura} i {seconds} sek. ({cooldown} sek. nedk�ling)',
+  'itemUi.tooltip.useTrinketHeal': 'Brug: Gendanner op til {amount} helbred. ({cooldown} sek. nedk�ling)',
+  'hudChrome.paperdoll.use': 'Brug',
+  'hudChrome.paperdoll.useAria': 'Brug {item}',
 };

@@ -5020,4 +5020,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Preciso de Ajuda',
   'hudChrome.discord.relay.help.hint': 'Peça ajuda à comunidade',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar Barra de Ação Secundária',
+  'itemUi.slots.trinket': 'Berloque',
+  'itemUi.kind.trinket': 'Berloque',
+  'itemUi.tooltip.useTrinketAura': 'Usar: concede {aura} por {seconds} s. ({cooldown} s de recarga)',
+  'itemUi.tooltip.useTrinketHeal': 'Usar: restaura at� {amount} de vida. ({cooldown} s de recarga)',
+  'hudChrome.paperdoll.use': 'Usar',
+  'hudChrome.paperdoll.useAria': 'Usar {item}',
 };

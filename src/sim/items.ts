@@ -28,6 +28,7 @@ import {
   dist2d,
   type Entity,
   type EquipSlot,
+  type ItemDef,
   FISHING_CAST_ID,
   INTERACT_RANGE,
   POTION_COOLDOWN,
@@ -35,6 +36,11 @@ import {
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+const ITEM_COOLDOWN_PREFIX = 'item:';
+
+function itemCooldownKey(itemId: string): string {
+  return `${ITEM_COOLDOWN_PREFIX}${itemId}`;
+}
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -64,7 +70,8 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
+  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'trinket'))
+    return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
   if (!canEquipItem(meta.cls, def)) {
     ctx.error(meta.entityId, 'You cannot equip that.');
@@ -110,7 +117,9 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   if (!def) return;
-  if (ctx.countItem(itemId, meta.entityId) <= 0) {
+  const equippedSlot = def.slot && meta.equipment[def.slot] === itemId ? def.slot : null;
+  const inBags = ctx.countItem(itemId, meta.entityId) > 0;
+  if (!inBags && !equippedSlot) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
@@ -130,6 +139,11 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     return;
   }
   if (p.dead) return;
+  const onUse = def.onUse;
+  if (onUse && equippedSlot === 'trinket') {
+    activateEquippedItemOnUse(ctx, itemId, def, onUse, meta, p);
+    return;
+  }
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");
@@ -203,9 +217,46 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       school: 'nature',
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-  } else if (def.kind === 'weapon' || def.kind === 'armor') {
+  } else if (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'trinket') {
     equipItem(ctx, itemId, meta.entityId);
   }
+}
+
+function activateEquippedItemOnUse(
+  ctx: SimContext,
+  itemId: string,
+  def: ItemDef,
+  onUse: NonNullable<ItemDef['onUse']>,
+  meta: PlayerMeta,
+  p: Entity,
+): void {
+  const cooldownKey = itemCooldownKey(itemId);
+  if ((p.cooldowns.get(cooldownKey) ?? 0) > 0) {
+    ctx.error(meta.entityId, `${def.name} is not ready yet.`);
+    return;
+  }
+  if (onUse.type === 'heal') {
+    if (p.hp >= p.maxHp) {
+      ctx.error(meta.entityId, 'You are already at full health.');
+      return;
+    }
+    const heal = Math.min(Math.round(onUse.amount * ctx.healingTakenMult(p)), p.maxHp - p.hp);
+    p.hp += heal;
+    ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+  } else {
+    ctx.applyAura(p, {
+      id: `item_${itemId}`,
+      name: onUse.aura,
+      kind: onUse.kind,
+      remaining: onUse.duration,
+      duration: onUse.duration,
+      value: onUse.value,
+      sourceId: p.id,
+      school: onUse.school ?? 'arcane',
+    });
+  }
+  p.cooldowns.set(cooldownKey, onUse.cooldown);
+  ctx.emit({ type: 'log', text: `You activate ${def.name}.`, color: '#c9f', pid: meta.entityId });
 }
 
 export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: number): void {

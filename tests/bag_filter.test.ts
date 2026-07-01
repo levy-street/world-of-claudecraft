@@ -11,9 +11,29 @@ import {
 
 // A tiny synthetic item table so the test never depends on live content balance.
 const ITEMS: Record<string, ItemDef> = {
-  blade: { id: 'blade', name: 'Redbrook Blade', kind: 'weapon', slot: 'mainhand', quality: 'uncommon' },
-  dagger: { id: 'dagger', name: 'Rusty Dirk', kind: 'weapon', slot: 'mainhand', quality: 'common', weapon: { min: 1, max: 2, speed: 1.5, dagger: true } },
+  blade: {
+    id: 'blade',
+    name: 'Redbrook Blade',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'uncommon',
+  },
+  dagger: {
+    id: 'dagger',
+    name: 'Rusty Dirk',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'common',
+    weapon: { min: 1, max: 2, speed: 1.5, dagger: true },
+  },
   helm: { id: 'helm', name: 'Iron Helm', kind: 'armor', slot: 'helmet', quality: 'rare' },
+  charm: {
+    id: 'charm',
+    name: 'Lucky Charm',
+    kind: 'trinket',
+    slot: 'trinket',
+    quality: 'uncommon',
+  },
   potion: { id: 'potion', name: 'Minor Healing Potion', kind: 'potion', quality: 'common' },
   bread: { id: 'bread', name: 'Crusty Bread', kind: 'food', quality: 'common' },
   pelt: { id: 'pelt', name: 'Wolf Pelt', kind: 'junk', quality: 'poor' },
@@ -32,6 +52,7 @@ const INV: InvSlot[] = [
   { itemId: 'pelt', count: 5 },
   { itemId: 'relic', count: 1 },
   { itemId: 'helm', count: 1 },
+  { itemId: 'charm', count: 1 },
   { itemId: 'bread', count: 2 },
   { itemId: 'dagger', count: 1 },
   { itemId: 'rod', count: 1 },
@@ -54,7 +75,7 @@ describe('applyBagFilter — category filtering', () => {
 
   it('keeps only armor', () => {
     const out = applyBagFilter(INV, lookup, { category: 'armor', sort: 'recent', search: '' });
-    expect(ids(out)).toEqual(['relic', 'helm']);
+    expect(ids(out)).toEqual(['relic', 'helm', 'charm']);
   });
 
   it('keeps food, drink, potions and elixirs as consumables', () => {
@@ -86,7 +107,11 @@ describe('applyBagFilter — search', () => {
   });
 
   it('combines search with a category', () => {
-    const out = applyBagFilter(INV, lookup, { category: 'consumable', sort: 'recent', search: 'potion' });
+    const out = applyBagFilter(INV, lookup, {
+      category: 'consumable',
+      sort: 'recent',
+      search: 'potion',
+    });
     expect(ids(out)).toEqual(['potion']);
   });
 
@@ -99,12 +124,34 @@ describe('applyBagFilter — search', () => {
 describe('applyBagFilter — sorting', () => {
   it('sorts by quality descending (legendary first, poor last), ties keep insertion order', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'quality', search: '' });
-    expect(ids(out)).toEqual(['relic', 'helm', 'blade', 'potion', 'keystone', 'bread', 'dagger', 'rod', 'pelt']);
+    expect(ids(out)).toEqual([
+      'relic',
+      'helm',
+      'blade',
+      'charm',
+      'potion',
+      'keystone',
+      'bread',
+      'dagger',
+      'rod',
+      'pelt',
+    ]);
   });
 
   it('sorts by name A to Z', () => {
     const out = applyBagFilter(INV, lookup, { category: 'all', sort: 'name', search: '' });
-    expect(ids(out)).toEqual(['relic', 'bread', 'keystone', 'rod', 'helm', 'potion', 'blade', 'dagger', 'pelt']);
+    expect(ids(out)).toEqual([
+      'relic',
+      'bread',
+      'keystone',
+      'rod',
+      'helm',
+      'charm',
+      'potion',
+      'blade',
+      'dagger',
+      'pelt',
+    ]);
   });
 
   it('does not mutate the input array', () => {
@@ -123,7 +170,9 @@ describe('serialize / parse round-trip', () => {
   it('falls back to defaults on garbage input', () => {
     expect(parseBagFilter('not json')).toEqual(DEFAULT_BAG_FILTER);
     expect(parseBagFilter(null)).toEqual(DEFAULT_BAG_FILTER);
-    expect(parseBagFilter('{"category":"bogus","sort":"nope","search":42}')).toEqual(DEFAULT_BAG_FILTER);
+    expect(parseBagFilter('{"category":"bogus","sort":"nope","search":42}')).toEqual(
+      DEFAULT_BAG_FILTER,
+    );
   });
 
   it('coerces a non-string search to empty and keeps valid enum fields', () => {

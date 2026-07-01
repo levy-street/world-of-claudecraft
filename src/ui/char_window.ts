@@ -79,6 +79,8 @@ export interface CharWindowDeps extends PainterHostPresentation {
   progressionHtml(level: number): string;
   /** Remove the equipped piece in `slot` to bags and repaint bags + the sheet. */
   unequip(slot: EquipSlot): void;
+  /** Activate an equipped usable item such as an on-use trinket. */
+  useItem(itemId: string): void;
   /** Stage a drag-to-unequip: record the slot HUD-side and reveal the bags drop. */
   beginUnequipDrag(slot: EquipSlot): void;
   /** End a drag-to-unequip: clear the HUD slot and the bags drop-target hint. */
@@ -213,6 +215,22 @@ export class CharWindow {
         this.doUnequip(slot, true);
       });
       row.appendChild(unequip);
+      if (item.onUse) {
+        const use = document.createElement('button');
+        use.type = 'button';
+        use.className = 'equip-use-btn';
+        use.textContent = t('hudChrome.paperdoll.use');
+        use.setAttribute(
+          'aria-label',
+          t('hudChrome.paperdoll.useAria', { item: itemDisplayName(item) }),
+        );
+        use.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          this.deps.hideTooltip();
+          this.deps.useItem(item.id);
+        });
+        row.appendChild(use);
+      }
       // Right-click the slot (classic-MMO muscle memory; matches the bags grid).
       row.addEventListener('contextmenu', (ev) => {
         ev.preventDefault();

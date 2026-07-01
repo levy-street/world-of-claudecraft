@@ -539,7 +539,9 @@ export const vi_VN: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Tháo {item}",
-      "unequipHint": "Nhấp ×, nhấp chuột phải, hoặc kéo vào túi để tháo trang bị"
+      "unequipHint": "Nhấp ×, nhấp chuột phải, hoặc kéo vào túi để tháo trang bị",
+      "use": "Dùng",
+      "useAria": "Dùng {item}"
     },
     "account": {
       "title": "Tài Khoản",
@@ -3424,7 +3426,8 @@ export const vi_VN: EnTranslations = {
       "waist": "Thắt Lưng",
       "legs": "Quần Giáp",
       "gloves": "Găng Tay",
-      "feet": "Giày"
+      "feet": "Giày",
+      "trinket": "Phụ Kiện"
     },
     "quality": {
       "poor": "Kém",
@@ -3441,6 +3444,7 @@ export const vi_VN: EnTranslations = {
       "junk": "Đồ Vụn",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
+      "trinket": "Phụ Kiện",
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược"
@@ -3468,6 +3472,8 @@ export const vi_VN: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Dùng: Hồi {amount} sinh lực trong {seconds} giây. Phải ngồi yên khi ăn.",
       "useDrink": "Dùng: Hồi {amount} mana trong {seconds} giây. Phải ngồi yên khi uống.",
+      "useTrinketAura": "Dùng: Nhận {aura} trong {seconds} giây. ({cooldown} giây hồi chiêu)",
+      "useTrinketHeal": "Dùng: Hồi tối đa {amount} máu. ({cooldown} giây hồi chiêu)",
       "questItem": "Vật Phẩm Nhiệm Vụ",
       "classes": "Lớp nhân vật: {classes}",
       "sellPrice": "Giá bán: {money}",

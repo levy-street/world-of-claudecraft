@@ -431,6 +431,7 @@ const ITEM_SLOT_LABEL_KEYS: Record<EquipSlot, TranslationKey> = {
   legs: 'itemUi.slots.legs',
   gloves: 'itemUi.slots.gloves',
   feet: 'itemUi.slots.feet',
+  trinket: 'itemUi.slots.trinket',
 };
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
@@ -450,6 +451,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   tool: 'itemUi.kind.tool',
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
+  trinket: 'itemUi.kind.trinket',
 };
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
@@ -2696,6 +2698,13 @@ export class Hud {
       this.renderBags();
       this.renderCharIfOpen();
     },
+    useItem: (itemId) => {
+      this.sim.useItem(itemId);
+      audio.click();
+      this.hideTooltip();
+      this.renderBags();
+      this.renderCharIfOpen();
+    },
     beginUnequipDrag: (slot) => {
       this.dragUnequipSlot = slot;
       // Open the bags window if it's closed so there's a visible drop target,
@@ -3038,6 +3047,10 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
+    if (item.onUse?.type === 'aura')
+      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useTrinketAura', { aura: item.onUse.aura, seconds: itemNumber(item.onUse.duration), cooldown: itemNumber(item.onUse.cooldown) }))}</div>`;
+    if (item.onUse?.type === 'heal')
+      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useTrinketHeal', { amount: itemNumber(item.onUse.amount), cooldown: itemNumber(item.onUse.cooldown) }))}</div>`;
     if (item.kind === 'quest')
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
@@ -9276,7 +9289,7 @@ export class Hud {
     if (sim.prestigeRank > 0)
       combatStats.push({ label: t('game.prestige.rank'), value: num(sim.prestigeRank) });
 
-    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
+    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet', 'trinket'];
     const gear = slots.map((slot) => {
       const id = sim.equipment[slot];
       const item = id ? ITEMS[id] : null;

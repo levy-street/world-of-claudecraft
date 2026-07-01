@@ -539,7 +539,9 @@ export const id_ID: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Lepas {item}",
-      "unequipHint": "Klik ×, klik kanan, atau seret ke tas untuk melepas"
+      "unequipHint": "Klik ×, klik kanan, atau seret ke tas untuk melepas",
+      "use": "Gunakan",
+      "useAria": "Gunakan {item}"
     },
     "account": {
       "title": "Akun",
@@ -3424,7 +3426,8 @@ export const id_ID: EnTranslations = {
       "waist": "Pinggang",
       "legs": "Tungkai",
       "gloves": "Sarung Tangan",
-      "feet": "Kaki"
+      "feet": "Kaki",
+      "trinket": "Perhiasan"
     },
     "quality": {
       "poor": "Buruk",
@@ -3441,6 +3444,7 @@ export const id_ID: EnTranslations = {
       "junk": "Rongsokan",
       "food": "Makanan",
       "drink": "Minuman",
+      "trinket": "Perhiasan",
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir"
@@ -3468,6 +3472,8 @@ export const id_ID: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
+      "useTrinketAura": "Gunakan: Memberikan {aura} selama {seconds} dtk. ({cooldown} dtk cooldown)",
+      "useTrinketHeal": "Gunakan: Memulihkan hingga {amount} kesehatan. ({cooldown} dtk cooldown)",
       "questItem": "Barang Misi",
       "classes": "Kelas: {classes}",
       "sellPrice": "Harga jual: {money}",

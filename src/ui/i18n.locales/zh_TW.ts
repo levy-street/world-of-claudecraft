@@ -4654,4 +4654,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wts.label': '想要出售',
   'hudChrome.discord.relay.wtb.label': '想要購買',
   'hudChrome.discord.relay.help.label': '需要協助',
+  'itemUi.slots.trinket': '\u98fe\u54c1',
+  'itemUi.kind.trinket': '\u98fe\u54c1',
+  'itemUi.tooltip.useTrinketAura': '\u4f7f\u7528\uff1a\u7372\u5f97 {aura}\uff0c\u6301\u7e8c {seconds} \u79d2\uff08{cooldown} \u79d2\u51b7\u537b\uff09',
+  'itemUi.tooltip.useTrinketHeal': '\u4f7f\u7528\uff1a\u6700\u591a\u6062\u5fa9 {amount} \u9ede\u751f\u547d\u503c\uff08{cooldown} \u79d2\u51b7\u537b\uff09',
+  'hudChrome.paperdoll.use': '\u4f7f\u7528',
+  'hudChrome.paperdoll.useAria': '\u4f7f\u7528 {item}',
 };

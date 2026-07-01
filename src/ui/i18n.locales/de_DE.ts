@@ -5062,4 +5062,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Hilfe benÃ¶tigt',
   'hudChrome.discord.relay.help.hint': 'Bitte die Gemeinschaft um Hilfe',
   'hudChrome.options.showSecondaryActionBar': 'Zweite Aktionsleiste anzeigen',
+  'itemUi.slots.trinket': 'Schmuckstück',
+  'itemUi.kind.trinket': 'Schmuckstück',
+  'itemUi.tooltip.useTrinketAura': 'Benutzen: Gewährt {aura} für {seconds} Sek. ({cooldown} Sek. Abklingzeit)',
+  'itemUi.tooltip.useTrinketHeal': 'Benutzen: Stellt bis zu {amount} Gesundheit wieder her. ({cooldown} Sek. Abklingzeit)',
+  'hudChrome.paperdoll.use': 'Benutzen',
+  'hudChrome.paperdoll.useAria': '{item} benutzen',
 };

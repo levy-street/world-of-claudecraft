@@ -539,7 +539,9 @@ export const en_CA: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Unequip {item}",
-      "unequipHint": "Click ×, right-click, or drag to bags to unequip"
+      "unequipHint": "Click ×, right-click, or drag to bags to unequip",
+      "use": "Use",
+      "useAria": "Use {item}"
     },
     "account": {
       "title": "Account",
@@ -3424,7 +3426,8 @@ export const en_CA: EnTranslations = {
       "waist": "Waist",
       "legs": "Legs",
       "gloves": "Gloves",
-      "feet": "Feet"
+      "feet": "Feet",
+      "trinket": "Trinket"
     },
     "quality": {
       "poor": "Poor",
@@ -3441,6 +3444,7 @@ export const en_CA: EnTranslations = {
       "junk": "Junk",
       "food": "Food",
       "drink": "Drink",
+      "trinket": "Trinket",
       "tool": "Tool",
       "potion": "Potion",
       "elixir": "Elixir"
@@ -3468,6 +3472,8 @@ export const en_CA: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
+      "useTrinketAura": "Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)",
+      "useTrinketHeal": "Use: Restores up to {amount} health. ({cooldown} sec cooldown)",
       "questItem": "Quest Item",
       "classes": "Classes: {classes}",
       "sellPrice": "Sell price: {money}",

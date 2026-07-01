@@ -539,7 +539,9 @@ export const ru_RU: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Снять {item}",
-      "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять"
+      "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять",
+      "use": "Использовать",
+      "useAria": "Использовать {item}"
     },
     "account": {
       "title": "Аккаунт",
@@ -3424,7 +3426,8 @@ export const ru_RU: EnTranslations = {
       "waist": "Пояс",
       "legs": "Ноги",
       "gloves": "Кисти рук",
-      "feet": "Ступни"
+      "feet": "Ступни",
+      "trinket": "Аксессуар"
     },
     "quality": {
       "poor": "Низкое",
@@ -3441,6 +3444,7 @@ export const ru_RU: EnTranslations = {
       "junk": "Хлам",
       "food": "Еда",
       "drink": "Напиток",
+      "trinket": "Аксессуар",
       "tool": "Инструмент",
       "potion": "Зелье",
       "elixir": "Эликсир"
@@ -3468,6 +3472,8 @@ export const ru_RU: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Использование: восстанавливает {amount} здоровья за {seconds} сек. Нужно оставаться сидя во время еды.",
       "useDrink": "Использование: восстанавливает {amount} маны за {seconds} сек. Нужно оставаться сидя во время питья.",
+      "useTrinketAura": "Использование: дает {aura} на {seconds} сек. ({cooldown} сек. восстановления)",
+      "useTrinketHeal": "Использование: восстанавливает до {amount} здоровья. ({cooldown} сек. восстановления)",
       "questItem": "Предмет задания",
       "classes": "Классы: {classes}",
       "sellPrice": "Цена продажи: {money}",

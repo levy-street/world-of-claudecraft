@@ -539,7 +539,9 @@ export const ko_KR: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item} 장착 해제",
-      "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제"
+      "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제",
+      "use": "사용",
+      "useAria": "{item} 사용"
     },
     "account": {
       "title": "계정",
@@ -3424,7 +3426,8 @@ export const ko_KR: EnTranslations = {
       "waist": "허리",
       "legs": "다리",
       "gloves": "손",
-      "feet": "발"
+      "feet": "발",
+      "trinket": "장신구"
     },
     "quality": {
       "poor": "하급",
@@ -3441,6 +3444,7 @@ export const ko_KR: EnTranslations = {
       "junk": "잡동사니",
       "food": "음식",
       "drink": "음료",
+      "trinket": "장신구",
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약"
@@ -3468,6 +3472,8 @@ export const ko_KR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "사용 효과: {seconds}초에 걸쳐 생명력 {amount} 회복. 먹는 동안 앉아 있어야 합니다.",
       "useDrink": "사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.",
+      "useTrinketAura": "사용: {seconds}초 동안 {aura}을(를) 부여합니다. ({cooldown}초 재사용 대기시간)",
+      "useTrinketHeal": "사용: 최대 {amount} 생명력을 회복합니다. ({cooldown}초 재사용 대기시간)",
       "questItem": "퀘스트 아이템",
       "classes": "직업: {classes}",
       "sellPrice": "판매 가격: {money}",

@@ -539,7 +539,9 @@ export const zh_TW: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
-      "unequipHint": "點擊 ×、右鍵點擊或拖曳至背包以卸下"
+      "unequipHint": "點擊 ×、右鍵點擊或拖曳至背包以卸下",
+      "use": "使用",
+      "useAria": "使用 {item}"
     },
     "account": {
       "title": "帳號",
@@ -3424,7 +3426,8 @@ export const zh_TW: EnTranslations = {
       "waist": "腰部",
       "legs": "腿部",
       "gloves": "手部",
-      "feet": "腳部"
+      "feet": "腳部",
+      "trinket": "飾品"
     },
     "quality": {
       "poor": "粗糙",
@@ -3441,6 +3444,7 @@ export const zh_TW: EnTranslations = {
       "junk": "雜物",
       "food": "食物",
       "drink": "飲料",
+      "trinket": "飾品",
       "tool": "工具",
       "potion": "藥水",
       "elixir": "藥劑"
@@ -3468,6 +3472,8 @@ export const zh_TW: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。",
       "useDrink": "使用：在 {seconds} 秒內恢復 {amount} 點法力值。飲水時必須保持坐下。",
+      "useTrinketAura": "使用：獲得 {aura}，持續 {seconds} 秒（{cooldown} 秒冷卻）",
+      "useTrinketHeal": "使用：最多恢復 {amount} 點生命值（{cooldown} 秒冷卻）",
       "questItem": "任務物品",
       "classes": "職業：{classes}",
       "sellPrice": "出售價格：{money}",

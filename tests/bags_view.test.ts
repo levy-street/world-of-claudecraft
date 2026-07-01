@@ -20,6 +20,7 @@ const NO_MODE: BagMode = { tradeOpen: false, marketSell: false, vendorOpen: fals
 
 const ITEMS: Record<string, ItemDef> = {
   sword: { kind: 'weapon', name: 'Sword', quality: 'rare' } as ItemDef,
+  trinket: { kind: 'trinket', name: 'Charm', quality: 'uncommon' } as ItemDef,
   potion: { kind: 'potion', name: 'Potion', quality: 'common' } as ItemDef,
   bread: { kind: 'food', name: 'Bread', quality: 'common' } as ItemDef,
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
@@ -75,6 +76,7 @@ describe('bagTooltipHintKey', () => {
     );
     expect(bagTooltipHintKey(ITEMS.questItem, NO_MODE)).toBe('itemUi.tooltip.clickDestroy');
     expect(bagTooltipHintKey(ITEMS.sword, NO_MODE)).toBe('itemUi.tooltip.clickEquip');
+    expect(bagTooltipHintKey(ITEMS.trinket, NO_MODE)).toBe('itemUi.tooltip.clickEquip');
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');

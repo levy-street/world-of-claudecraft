@@ -4965,4 +4965,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Cần Trợ Giúp',
   'hudChrome.discord.relay.help.hint': 'Nhờ cộng đồng giúp đỡ',
   'hudChrome.options.showSecondaryActionBar': 'Hiện Thanh Hành Động Phụ',
+  'itemUi.slots.trinket': 'Ph\u1ee5 Ki\u1ec7n',
+  'itemUi.kind.trinket': 'Ph\u1ee5 Ki\u1ec7n',
+  'itemUi.tooltip.useTrinketAura': 'D\u00f9ng: Nh\u1eadn {aura} trong {seconds} gi\u00e2y. ({cooldown} gi\u00e2y h\u1ed3i chi\u00eau)',
+  'itemUi.tooltip.useTrinketHeal': 'D\u00f9ng: H\u1ed3i t\u1ed1i \u0111a {amount} m\u00e1u. ({cooldown} gi\u00e2y h\u1ed3i chi\u00eau)',
+  'hudChrome.paperdoll.use': 'D\u00f9ng',
+  'hudChrome.paperdoll.useAria': 'D\u00f9ng {item}',
 };

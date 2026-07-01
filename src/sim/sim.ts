@@ -4207,7 +4207,10 @@ export class Sim {
       pid: meta.entityId,
     });
     this.ctx.onInventoryChangedForQuests(meta);
-    if (meta.autoEquip && (def?.kind === 'weapon' || def?.kind === 'armor')) {
+    if (
+      meta.autoEquip &&
+      (def?.kind === 'weapon' || def?.kind === 'armor' || def?.kind === 'trinket')
+    ) {
       this.maybeAutoEquip(itemId, meta);
     }
   }
@@ -4360,6 +4363,8 @@ export class Sim {
       const next = def.weapon;
       if (next && (!cur || next.min + next.max > cur.min + cur.max))
         this.equipItem(itemId, meta.entityId);
+    } else if (def.kind === 'trinket') {
+      if (!meta.equipment.trinket) this.equipItem(itemId, meta.entityId);
     } else {
       const cur = meta.equipment[def.slot] ? ITEMS[meta.equipment[def.slot]!] : null;
       if (!cur || (def.stats?.armor ?? 0) > (cur.stats?.armor ?? 0))

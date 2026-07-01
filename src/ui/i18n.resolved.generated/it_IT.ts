@@ -539,7 +539,9 @@ export const it_IT: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Rimuovi {item}",
-      "unequipHint": "Clicca su ×, clic destro o trascina nelle borse per rimuovere"
+      "unequipHint": "Clicca su ×, clic destro o trascina nelle borse per rimuovere",
+      "use": "Usa",
+      "useAria": "Usa {item}"
     },
     "account": {
       "title": "Account",
@@ -3424,7 +3426,8 @@ export const it_IT: EnTranslations = {
       "waist": "Vita",
       "legs": "Gambe",
       "gloves": "Mani",
-      "feet": "Piedi"
+      "feet": "Piedi",
+      "trinket": "Monile"
     },
     "quality": {
       "poor": "Scadente",
@@ -3441,6 +3444,7 @@ export const it_IT: EnTranslations = {
       "junk": "Cianfrusaglia",
       "food": "Cibo",
       "drink": "Bevanda",
+      "trinket": "Monile",
       "tool": "Strumento",
       "potion": "Pozione",
       "elixir": "Elisir"
@@ -3468,6 +3472,8 @@ export const it_IT: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Usa: ripristina {amount} salute in {seconds} s. Devi restare seduto mentre mangi.",
       "useDrink": "Usa: ripristina {amount} mana in {seconds} s. Devi restare seduto mentre bevi.",
+      "useTrinketAura": "Usa: conferisce {aura} per {seconds} s. ({cooldown} s di recupero)",
+      "useTrinketHeal": "Usa: ripristina fino a {amount} salute. ({cooldown} s di recupero)",
       "questItem": "Oggetto missione",
       "classes": "Classi: {classes}",
       "sellPrice": "Prezzo di vendita: {money}",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
+import type { SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -15,12 +15,12 @@ describe('/gear command', () => {
   it('lists equipped slots in a fixed order and marks empty ones', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
-    // A fresh warrior starts with a main hand and a chest piece, no legs/feet.
+    // A fresh warrior starts with a main hand and a chest piece, no legs/feet/trinket.
     sim.tick();
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
-    expect(text).toBeDefined();
-    expect(text).toMatch(/^Equipped \(2\/8\):/);
+    if (!text) throw new Error('Expected /gear to emit an equipment readout.');
+    expect(text).toMatch(/^Equipped \(2\/9\):/);
     expect(text).toContain('Main Hand:');
     expect(text).toContain('Chest:');
     expect(text).toContain('Helmet: (empty)');
@@ -29,34 +29,43 @@ describe('/gear command', () => {
     expect(text).toContain('Legs: (empty)');
     expect(text).toContain('Gloves: (empty)');
     expect(text).toContain('Feet: (empty)');
+    expect(text).toContain('Trinket: (empty)');
     // fixed slot order: main hand before chest before legs before feet
-    expect(text!.indexOf('Main Hand')).toBeLessThan(text!.indexOf('Chest'));
-    expect(text!.indexOf('Chest')).toBeLessThan(text!.indexOf('Legs'));
-    expect(text!.indexOf('Legs')).toBeLessThan(text!.indexOf('Feet'));
+    expect(text.indexOf('Main Hand')).toBeLessThan(text.indexOf('Chest'));
+    expect(text.indexOf('Chest')).toBeLessThan(text.indexOf('Legs'));
+    expect(text.indexOf('Legs')).toBeLessThan(text.indexOf('Feet'));
+    expect(text.indexOf('Feet')).toBeLessThan(text.indexOf('Trinket'));
   });
 
   it('reflects newly equipped gear and resolves item names', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
-    const meta = sim.players.get(a)!;
+    const meta = sim.players.get(a);
+    if (!meta) throw new Error('Expected player metadata.');
     meta.equipment = {
-      mainhand: 'worn_sword', helmet: 'cryptbone_helm', shoulder: 'cryptbone_pauldrons',
-      chest: 'recruit_tunic', waist: 'mistveil_cord', legs: 'quilted_trousers',
-      gloves: 'mistveil_grips', feet: 'oiled_boots',
+      mainhand: 'worn_sword',
+      helmet: 'cryptbone_helm',
+      shoulder: 'cryptbone_pauldrons',
+      chest: 'recruit_tunic',
+      waist: 'mistveil_cord',
+      legs: 'quilted_trousers',
+      gloves: 'mistveil_grips',
+      feet: 'oiled_boots',
     };
     sim.tick();
     sim.chat('/gear', a);
     const text = errorText(sim.tick());
-    expect(text).toMatch(/^Equipped \(8\/8\):/);
+    expect(text).toMatch(/^Equipped \(8\/9\):/);
     expect(text).toContain('Worn Shortsword');
     expect(text).toContain('Quilted Trousers');
-    expect(text).not.toContain('(empty)');
+    expect(text).toContain('Trinket: (empty)');
   });
 
   it('reports nothing equipped when every slot is empty', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
-    const meta = sim.players.get(a)!;
+    const meta = sim.players.get(a);
+    if (!meta) throw new Error('Expected player metadata.');
     meta.equipment = {};
     sim.tick();
     sim.chat('/gear', a);

@@ -4896,4 +4896,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wts.label': '売却希望',
   'hudChrome.discord.relay.wtb.label': '購入希望',
   'hudChrome.discord.relay.help.label': 'ヘルプが必要',
+  'itemUi.slots.trinket': '\u30c8\u30ea\u30f3\u30b1\u30c3\u30c8',
+  'itemUi.kind.trinket': '\u30c8\u30ea\u30f3\u30b1\u30c3\u30c8',
+  'itemUi.tooltip.useTrinketAura': '\u4f7f\u7528: {seconds}\u79d2\u9593{aura}\u3092\u4ed8\u4e0e\u3002({cooldown}\u79d2\u306e\u30af\u30fc\u30eb\u30c0\u30a6\u30f3)',
+  'itemUi.tooltip.useTrinketHeal': '\u4f7f\u7528: \u6700\u5927{amount}\u306e\u4f53\u529b\u3092\u56de\u5fa9\u3002({cooldown}\u79d2\u306e\u30af\u30fc\u30eb\u30c0\u30a6\u30f3)',
+  'hudChrome.paperdoll.use': '\u4f7f\u7528',
+  'hudChrome.paperdoll.useAria': '{item}\u3092\u4f7f\u7528',
 };

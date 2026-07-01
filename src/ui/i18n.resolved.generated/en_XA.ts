@@ -539,7 +539,9 @@ export const en_XA: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "[Úñéɋúíþ {item}]",
-      "unequipHint": "[Çļíçķ ×, ŕíĝĥţ-çļíçķ, óŕ ðŕáĝ ţó ƀáĝš ţó úñéɋúíþ]"
+      "unequipHint": "[Çļíçķ ×, ŕíĝĥţ-çļíçķ, óŕ ðŕáĝ ţó ƀáĝš ţó úñéɋúíþ]",
+      "use": "[Úšé]",
+      "useAria": "[Úšé {item}]"
     },
     "account": {
       "title": "[Áççóúñţ]",
@@ -3424,7 +3426,8 @@ export const en_XA: EnTranslations = {
       "waist": "[Ŵáíšţ]",
       "legs": "[Ļéĝš]",
       "gloves": "[Ĝļóʋéš]",
-      "feet": "[Ƒééţ]"
+      "feet": "[Ƒééţ]",
+      "trinket": "[Ţŕíñķéţ]"
     },
     "quality": {
       "poor": "[Þóóŕ]",
@@ -3441,6 +3444,7 @@ export const en_XA: EnTranslations = {
       "junk": "[Ĵúñķ]",
       "food": "[Ƒóóð]",
       "drink": "[Ðŕíñķ]",
+      "trinket": "[Ţŕíñķéţ]",
       "tool": "[Ţóóļ]",
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]"
@@ -3468,6 +3472,8 @@ export const en_XA: EnTranslations = {
       "stat": "[+{value} {stat}]",
       "useFood": "[Úšé: Ŕéšţóŕéš {amount} ĥéáļţĥ óʋéŕ {seconds} šéç. Ɱúšţ ŕéɱáíñ šéáţéð ŵĥíļé éáţíñĝ.]",
       "useDrink": "[Úšé: Ŕéšţóŕéš {amount} ɱáñá óʋéŕ {seconds} šéç. Ɱúšţ ŕéɱáíñ šéáţéð ŵĥíļé ðŕíñķíñĝ.]",
+      "useTrinketAura": "[Úšé: Ĝŕáñţš {aura} ƒóŕ {seconds} šéç. ({cooldown} šéç çóóļðóŵñ)]",
+      "useTrinketHeal": "[Úšé: Ŕéšţóŕéš úþ ţó {amount} ĥéáļţĥ. ({cooldown} šéç çóóļðóŵñ)]",
       "questItem": "[Ɋúéšţ Íţéɱ]",
       "classes": "[Çļáššéš: {classes}]",
       "sellPrice": "[Šéļļ þŕíçé: {money}]",

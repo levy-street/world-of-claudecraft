@@ -539,7 +539,9 @@ export const tr_TR: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item} eşyasını çıkar",
-      "unequipHint": "Çıkarmak için ×'e tıklayın, sağ tıklayın ya da çantalara sürükleyin"
+      "unequipHint": "Çıkarmak için ×'e tıklayın, sağ tıklayın ya da çantalara sürükleyin",
+      "use": "Kullan",
+      "useAria": "{item} kullan"
     },
     "account": {
       "title": "Hesap",
@@ -3424,7 +3426,8 @@ export const tr_TR: EnTranslations = {
       "waist": "Bel",
       "legs": "Bacaklar",
       "gloves": "Eldivenler",
-      "feet": "Ayaklar"
+      "feet": "Ayaklar",
+      "trinket": "Tilsim"
     },
     "quality": {
       "poor": "Değersiz",
@@ -3441,6 +3444,7 @@ export const tr_TR: EnTranslations = {
       "junk": "Döküntü",
       "food": "Yiyecek",
       "drink": "İçecek",
+      "trinket": "Tilsim",
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir"
@@ -3468,6 +3472,8 @@ export const tr_TR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Kullanım: {seconds} saniyede {amount} can yeniler. Yerken oturur kalmalısın.",
       "useDrink": "Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.",
+      "useTrinketAura": "Kullan: {seconds} sn boyunca {aura} kazandirir. ({cooldown} sn bekleme s�resi)",
+      "useTrinketHeal": "Kullan: En fazla {amount} can yeniler. ({cooldown} sn bekleme s�resi)",
       "questItem": "Görev Eşyası",
       "classes": "Sınıflar: {classes}",
       "sellPrice": "Satış fiyatı: {money}",

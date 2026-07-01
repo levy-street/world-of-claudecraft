@@ -891,11 +891,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   maldrecs_soulbinder: {
     id: 'maldrecs_soulbinder',
     name: "Maldrec's Soulbinder",
-    kind: 'weapon',
-    slot: 'mainhand',
+    kind: 'trinket',
+    slot: 'trinket',
     quality: 'rare',
-    weapon: { min: 11, max: 18, speed: 3.0 },
-    stats: { int: 4, spi: 3 },
+    stats: { int: 3, spi: 2 },
+    onUse: {
+      type: 'aura',
+      aura: 'Grave Focus',
+      kind: 'buff_int',
+      value: 8,
+      duration: 15,
+      cooldown: 120,
+      school: 'shadow',
+    },
     sellValue: 850,
   },
   // --- quest items ---

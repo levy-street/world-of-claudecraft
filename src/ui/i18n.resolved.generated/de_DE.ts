@@ -539,7 +539,9 @@ export const de_DE: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item} ablegen",
-      "unequipHint": "Klicke auf ×, Rechtsklick oder in die Taschen ziehen zum Ablegen"
+      "unequipHint": "Klicke auf ×, Rechtsklick oder in die Taschen ziehen zum Ablegen",
+      "use": "Benutzen",
+      "useAria": "{item} benutzen"
     },
     "account": {
       "title": "Konto",
@@ -3424,7 +3426,8 @@ export const de_DE: EnTranslations = {
       "waist": "Taille",
       "legs": "Beine",
       "gloves": "Hände",
-      "feet": "Füße"
+      "feet": "Füße",
+      "trinket": "Schmuckst�ck"
     },
     "quality": {
       "poor": "Schlecht",
@@ -3441,6 +3444,7 @@ export const de_DE: EnTranslations = {
       "junk": "Plunder",
       "food": "Essen",
       "drink": "Getränk",
+      "trinket": "Schmuckst�ck",
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier"
@@ -3468,6 +3472,8 @@ export const de_DE: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Benutzen: Stellt über {seconds} Sek. {amount} Gesundheit wieder her. Ihr müsst beim Essen sitzen bleiben.",
       "useDrink": "Benutzen: Stellt über {seconds} Sek. {amount} Mana wieder her. Ihr müsst beim Trinken sitzen bleiben.",
+      "useTrinketAura": "Benutzen: Gew�hrt {aura} f�r {seconds} Sek. ({cooldown} Sek. Abklingzeit)",
+      "useTrinketHeal": "Benutzen: Stellt bis zu {amount} Gesundheit wieder her. ({cooldown} Sek. Abklingzeit)",
       "questItem": "Questgegenstand",
       "classes": "Klassen: {classes}",
       "sellPrice": "Verkaufspreis: {money}",

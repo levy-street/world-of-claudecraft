@@ -4904,4 +4904,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wts.label': '판매 희망',
   'hudChrome.discord.relay.wtb.label': '구매 희망',
   'hudChrome.discord.relay.help.label': '도움 요청',
+  'itemUi.slots.trinket': '\uc7a5\uc2e0\uad6c',
+  'itemUi.kind.trinket': '\uc7a5\uc2e0\uad6c',
+  'itemUi.tooltip.useTrinketAura': '\uc0ac\uc6a9: {seconds}\ucd08 \ub3d9\uc548 {aura}\uc744(\ub97c) \ubd80\uc5ec\ud569\ub2c8\ub2e4. ({cooldown}\ucd08 \uc7ac\uc0ac\uc6a9 \ub300\uae30\uc2dc\uac04)',
+  'itemUi.tooltip.useTrinketHeal': '\uc0ac\uc6a9: \ucd5c\ub300 {amount} \uc0dd\uba85\ub825\uc744 \ud68c\ubcf5\ud569\ub2c8\ub2e4. ({cooldown}\ucd08 \uc7ac\uc0ac\uc6a9 \ub300\uae30\uc2dc\uac04)',
+  'hudChrome.paperdoll.use': '\uc0ac\uc6a9',
+  'hudChrome.paperdoll.useAria': '{item} \uc0ac\uc6a9',
 };

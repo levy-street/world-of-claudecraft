@@ -539,7 +539,9 @@ export const ja_JP: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item}を外す",
-      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す"
+      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す",
+      "use": "使用",
+      "useAria": "{item}を使用"
     },
     "account": {
       "title": "アカウント",
@@ -3424,7 +3426,8 @@ export const ja_JP: EnTranslations = {
       "waist": "腰",
       "legs": "脚",
       "gloves": "手",
-      "feet": "足"
+      "feet": "足",
+      "trinket": "トリンケット"
     },
     "quality": {
       "poor": "粗悪",
@@ -3441,6 +3444,7 @@ export const ja_JP: EnTranslations = {
       "junk": "雑貨",
       "food": "食べ物",
       "drink": "飲み物",
+      "trinket": "トリンケット",
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー"
@@ -3468,6 +3472,8 @@ export const ja_JP: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。",
       "useDrink": "使用: {seconds}秒かけてマナを{amount}回復します。飲んでいる間は座ったままでいる必要があります。",
+      "useTrinketAura": "使用: {seconds}秒間{aura}を付与。({cooldown}秒のクールダウン)",
+      "useTrinketHeal": "使用: 最大{amount}の体力を回復。({cooldown}秒のクールダウン)",
       "questItem": "クエストアイテム",
       "classes": "クラス: {classes}",
       "sellPrice": "売却価格: {money}",

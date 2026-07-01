@@ -539,7 +539,9 @@ export const pt_BR: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Desequipar {item}",
-      "unequipHint": "Clique em ×, clique direito ou arraste para as bolsas para desequipar"
+      "unequipHint": "Clique em ×, clique direito ou arraste para as bolsas para desequipar",
+      "use": "Usar",
+      "useAria": "Usar {item}"
     },
     "account": {
       "title": "Conta",
@@ -3424,7 +3426,8 @@ export const pt_BR: EnTranslations = {
       "waist": "Cintura",
       "legs": "Pernas",
       "gloves": "Mãos",
-      "feet": "Pés"
+      "feet": "Pés",
+      "trinket": "Berloque"
     },
     "quality": {
       "poor": "Ruim",
@@ -3441,6 +3444,7 @@ export const pt_BR: EnTranslations = {
       "junk": "Sucata",
       "food": "Comida",
       "drink": "Bebida",
+      "trinket": "Berloque",
       "tool": "Ferramenta",
       "potion": "Poção",
       "elixir": "Elixir"
@@ -3468,6 +3472,8 @@ export const pt_BR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Usar: restaura {amount} de vida ao longo de {seconds} s. É preciso permanecer sentado enquanto come.",
       "useDrink": "Usar: restaura {amount} de mana ao longo de {seconds} s. É preciso permanecer sentado enquanto bebe.",
+      "useTrinketAura": "Usar: concede {aura} por {seconds} s. ({cooldown} s de recarga)",
+      "useTrinketHeal": "Usar: restaura at� {amount} de vida. ({cooldown} s de recarga)",
       "questItem": "Item de missão",
       "classes": "Classes: {classes}",
       "sellPrice": "Preço de venda: {money}",

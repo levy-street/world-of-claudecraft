@@ -2665,6 +2665,10 @@ function itemFallback(id: string): IconRecipe | null {
     const pal: PaletteName = isCloth ? 'cloth' : isMetal ? 'steel' : 'leather';
     return r(isCloth ? 'cloth' : isMetal ? 'steel' : 'leather', pal, [{ p: prim, pal }], fx);
   }
+  if (it.kind === 'trinket') {
+    const t = trinketPrimitive(name);
+    return r('junk', t.pal, [{ p: t.p, pal: t.pal }], fx);
+  }
   if (it.kind === 'food') {
     const prim: PrimitiveName = has(name, ['bread', 'loaf', 'bun', 'cake', 'biscuit', 'pie'])
       ? 'bread'

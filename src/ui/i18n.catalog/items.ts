@@ -23,6 +23,7 @@ const itemStringsEn = {
       legs: 'Legs',
       gloves: 'Gloves',
       feet: 'Feet',
+      trinket: 'Trinket',
     },
     quality: {
       poor: 'Poor',
@@ -39,6 +40,7 @@ const itemStringsEn = {
       junk: 'Junk',
       food: 'Food',
       drink: 'Drink',
+      trinket: 'Trinket',
     },
     stats: {
       armor: 'Armor',
@@ -64,6 +66,8 @@ const itemStringsEn = {
       useFood: 'Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.',
       useDrink:
         'Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.',
+      useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+      useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       questItem: 'Quest Item',
       classes: 'Classes: {classes}',
       sellPrice: 'Sell price: {money}',
@@ -214,6 +218,7 @@ export const itemStrings = {
         legs: 'Piernas',
         gloves: 'Manos',
         feet: 'Pies',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Pobre',
@@ -230,6 +235,7 @@ export const itemStrings = {
         junk: 'Chatarra',
         food: 'Comida',
         drink: 'Bebida',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armadura',
@@ -268,6 +274,8 @@ export const itemStrings = {
         cannotMarket: 'No se puede vender en el mercado',
         cannotVendor: 'No se puede vender a comerciantes',
         clickDestroy: 'Haz clic para destruir',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: 'Bolsas',
@@ -372,6 +380,7 @@ export const itemStrings = {
         legs: 'Jambes',
         gloves: 'Mains',
         feet: 'Pieds',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Médiocre',
@@ -388,6 +397,7 @@ export const itemStrings = {
         junk: 'Camelote',
         food: 'Nourriture',
         drink: 'Boisson',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armure',
@@ -426,6 +436,8 @@ export const itemStrings = {
         cannotMarket: 'Ne peut pas être vendu au marché',
         cannotVendor: 'Ne peut pas être vendu aux marchands',
         clickDestroy: 'Cliquer pour détruire',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: 'Sacs',
@@ -531,6 +543,7 @@ export const itemStrings = {
         legs: 'Gambe',
         gloves: 'Mani',
         feet: 'Piedi',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Scadente',
@@ -547,6 +560,7 @@ export const itemStrings = {
         junk: 'Cianfrusaglia',
         food: 'Cibo',
         drink: 'Bevanda',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armatura',
@@ -584,6 +598,8 @@ export const itemStrings = {
         cannotMarket: 'Non può essere venduto al mercato',
         cannotVendor: 'Non può essere venduto ai mercanti',
         clickDestroy: 'Clicca per distruggere',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: 'Borse',
@@ -686,6 +702,7 @@ export const itemStrings = {
         legs: 'Beine',
         gloves: 'Hände',
         feet: 'Füße',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Schlecht',
@@ -702,6 +719,7 @@ export const itemStrings = {
         junk: 'Plunder',
         food: 'Essen',
         drink: 'Getränk',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Rüstung',
@@ -740,6 +758,8 @@ export const itemStrings = {
         cannotMarket: 'Kann nicht auf dem Markt verkauft werden',
         cannotVendor: 'Kann nicht an Händler verkauft werden',
         clickDestroy: 'Zum Zerstören klicken',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: 'Taschen',
@@ -843,6 +863,7 @@ export const itemStrings = {
         legs: '腿部',
         gloves: '手部',
         feet: '脚部',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '粗糙',
@@ -859,6 +880,7 @@ export const itemStrings = {
         junk: '杂物',
         food: '食物',
         drink: '饮料',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '护甲',
@@ -895,6 +917,8 @@ export const itemStrings = {
         cannotMarket: '不能在市场出售',
         cannotVendor: '不能卖给商人',
         clickDestroy: '点击摧毁',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: '背包',
@@ -993,6 +1017,7 @@ export const itemStrings = {
         legs: '腿部',
         gloves: '手部',
         feet: '腳部',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '粗糙',
@@ -1009,6 +1034,7 @@ export const itemStrings = {
         junk: '雜物',
         food: '食物',
         drink: '飲料',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '護甲',
@@ -1045,6 +1071,8 @@ export const itemStrings = {
         cannotMarket: '不能在市場出售',
         cannotVendor: '不能賣給商人',
         clickDestroy: '點擊摧毀',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: '背包',
@@ -1143,6 +1171,7 @@ export const itemStrings = {
         legs: '다리',
         gloves: '손',
         feet: '발',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '하급',
@@ -1159,6 +1188,7 @@ export const itemStrings = {
         junk: '잡동사니',
         food: '음식',
         drink: '음료',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '방어도',
@@ -1197,6 +1227,8 @@ export const itemStrings = {
         cannotMarket: '시장에서 판매할 수 없음',
         cannotVendor: '상인에게 판매할 수 없음',
         clickDestroy: '클릭하여 파괴',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: '가방',
@@ -1297,6 +1329,7 @@ export const itemStrings = {
         legs: '脚',
         gloves: '手',
         feet: '足',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '粗悪',
@@ -1313,6 +1346,7 @@ export const itemStrings = {
         junk: '雑貨',
         food: '食べ物',
         drink: '飲み物',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '防御力',
@@ -1351,6 +1385,8 @@ export const itemStrings = {
         cannotMarket: '市場では売却できません',
         cannotVendor: '商人には売却できません',
         clickDestroy: 'クリックして破棄',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: 'バッグ',
@@ -1451,6 +1487,7 @@ export const itemStrings = {
         legs: 'Pernas',
         gloves: 'Mãos',
         feet: 'Pés',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Ruim',
@@ -1467,6 +1504,7 @@ export const itemStrings = {
         junk: 'Sucata',
         food: 'Comida',
         drink: 'Bebida',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armadura',
@@ -1505,6 +1543,8 @@ export const itemStrings = {
         cannotMarket: 'Não pode ser vendido no mercado',
         cannotVendor: 'Não pode ser vendido a mercadores',
         clickDestroy: 'Clique para destruir',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: 'Bolsas',
@@ -1605,6 +1645,7 @@ export const itemStrings = {
         legs: 'Ноги',
         gloves: 'Кисти рук',
         feet: 'Ступни',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Низкое',
@@ -1621,6 +1662,7 @@ export const itemStrings = {
         junk: 'Хлам',
         food: 'Еда',
         drink: 'Напиток',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Броня',
@@ -1659,6 +1701,8 @@ export const itemStrings = {
         cannotMarket: 'Нельзя продать на рынке',
         cannotVendor: 'Нельзя продать торговцам',
         clickDestroy: 'Нажмите, чтобы уничтожить',
+        useTrinketAura: 'Use: Grants {aura} for {seconds} sec. ({cooldown} sec cooldown)',
+        useTrinketHeal: 'Use: Restores up to {amount} health. ({cooldown} sec cooldown)',
       },
       bags: {
         title: 'Сумки',

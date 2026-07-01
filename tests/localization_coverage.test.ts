@@ -328,6 +328,7 @@ describe('i18n Localization Key Coverage', () => {
   const interpolationValues: Record<string, string | number> = {
     active: 3,
     ability: 'Fireball',
+    aura: 'Grave Focus',
     action: 'Open Chat',
     amount: 42,
     base: 14,
@@ -339,6 +340,7 @@ describe('i18n Localization Key Coverage', () => {
     command: '/dance',
     completed: 12,
     count: 5,
+    cooldown: 120,
     cost: 30,
     current: 120,
     cut: 5,

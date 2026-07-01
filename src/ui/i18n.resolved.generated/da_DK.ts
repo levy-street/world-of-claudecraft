@@ -539,7 +539,9 @@ export const da_DK: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Fjern {item}",
-      "unequipHint": "Klik ×, højreklik, eller træk til tasker for at fjerne udstyr"
+      "unequipHint": "Klik ×, højreklik, eller træk til tasker for at fjerne udstyr",
+      "use": "Brug",
+      "useAria": "Brug {item}"
     },
     "account": {
       "title": "Konto",
@@ -3424,7 +3426,8 @@ export const da_DK: EnTranslations = {
       "waist": "Talje",
       "legs": "Ben",
       "gloves": "Handsker",
-      "feet": "Fødder"
+      "feet": "Fødder",
+      "trinket": "Smykke"
     },
     "quality": {
       "poor": "Ringe",
@@ -3441,6 +3444,7 @@ export const da_DK: EnTranslations = {
       "junk": "Skrammel",
       "food": "Mad",
       "drink": "Drikke",
+      "trinket": "Smykke",
       "tool": "Værktøj",
       "potion": "Eliksir",
       "elixir": "Eliksir"
@@ -3468,6 +3472,8 @@ export const da_DK: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Brug: Genopretter {amount} helbred over {seconds} sek. Skal forblive siddende mens du spiser.",
       "useDrink": "Brug: Genopretter {amount} mana over {seconds} sek. Skal forblive siddende mens du drikker.",
+      "useTrinketAura": "Brug: Giver {aura} i {seconds} sek. ({cooldown} sek. nedk�ling)",
+      "useTrinketHeal": "Brug: Gendanner op til {amount} helbred. ({cooldown} sek. nedk�ling)",
       "questItem": "Questgenstand",
       "classes": "Klasser: {classes}",
       "sellPrice": "Salgspris: {money}",

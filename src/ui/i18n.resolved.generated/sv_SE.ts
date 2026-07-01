@@ -539,7 +539,9 @@ export const sv_SE: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Ta av {item}",
-      "unequipHint": "Klicka på ×, högerklicka, eller dra till väskor för att ta av"
+      "unequipHint": "Klicka på ×, högerklicka, eller dra till väskor för att ta av",
+      "use": "Anv�nd",
+      "useAria": "Anv�nd {item}"
     },
     "account": {
       "title": "Konto",
@@ -3424,7 +3426,8 @@ export const sv_SE: EnTranslations = {
       "waist": "Midja",
       "legs": "Ben",
       "gloves": "Handskar",
-      "feet": "Fötter"
+      "feet": "Fötter",
+      "trinket": "Smycke"
     },
     "quality": {
       "poor": "Skräp",
@@ -3441,6 +3444,7 @@ export const sv_SE: EnTranslations = {
       "junk": "Skräp",
       "food": "Mat",
       "drink": "Dryck",
+      "trinket": "Smycke",
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir"
@@ -3468,6 +3472,8 @@ export const sv_SE: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Använd: Återställer {amount} hälsa under {seconds} sek. Du måste förbli sittande medan du äter.",
       "useDrink": "Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.",
+      "useTrinketAura": "Anv�nd: Ger {aura} i {seconds} sek. ({cooldown} sek. nedkylning)",
+      "useTrinketHeal": "Anv�nd: �terst�ller upp till {amount} h�lsa. ({cooldown} sek. nedkylning)",
       "questItem": "Uppdragsföremål",
       "classes": "Klasser: {classes}",
       "sellPrice": "Försäljningspris: {money}",

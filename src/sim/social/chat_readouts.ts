@@ -439,6 +439,7 @@ export function gearReadout(meta: PlayerMeta): string {
     ['legs', 'Legs'],
     ['gloves', 'Gloves'],
     ['feet', 'Feet'],
+    ['trinket', 'Trinket'],
   ];
   let worn = 0;
   const parts = slots.map(([slot, label]) => {
