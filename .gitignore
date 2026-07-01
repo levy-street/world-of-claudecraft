@@ -81,3 +81,4 @@ dist-bot/
 # raw samples must never be committed (player-submitted audio).
 data/voice_npc_samples/
 public/audio/voice_npc/
+.gstack/

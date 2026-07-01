@@ -112,6 +112,76 @@ const MAX_RECORD_MS = 30_000;
 const POLL_INTERVAL_MS = 4000;
 const POLL_MAX_CONSECUTIVE_ERRORS = 5;
 
+// This panel is explicitly WIP (see the file banner) and does not go through the
+// PainterHost/token system a real HUD window would use. Without ANY positioning,
+// both the launcher button and the panel render as normal-flow, position:static
+// elements, which paint BELOW the fixed, full-viewport game canvas regardless of
+// DOM order, making the whole feature invisible and unusable (caught by actually
+// running the client in a browser, not by reading the DOM). z-index 100000 matches
+// the existing top-overlay precedent (src/styles/base.css:73/597); this is a
+// self-contained scoped stylesheet, injected once, rather than wiring into the
+// src/styles/ @layer system, since a polished token-based treatment is the
+// tracked HUD-window follow-up (docs/prd/woc/voice-npc.md), not this draft.
+const STYLE_ID = 'voice-npc-panel-styles';
+function ensureStyles(): void {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement('style');
+  style.id = STYLE_ID;
+  style.textContent = `
+    .voice-npc-launcher {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 100000;
+      padding: 8px 14px;
+      background: #2a2118;
+      color: #e8d9b5;
+      border: 1px solid #7a5c2e;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .voice-npc-panel {
+      position: fixed;
+      right: 16px;
+      bottom: 64px;
+      z-index: 100000;
+      width: 320px;
+      max-height: 70vh;
+      overflow-y: auto;
+      background: #1a140d;
+      color: #e8d9b5;
+      border: 1px solid #7a5c2e;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+    }
+    .voice-npc-panel-inner label {
+      display: block;
+      margin: 8px 0;
+    }
+    .voice-npc-panel-inner input[type='text'] {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      font-size: 16px;
+      padding: 6px;
+    }
+    .voice-npc-panel-inner button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      min-height: 40px;
+      cursor: pointer;
+    }
+    .voice-npc-wip {
+      font-style: italic;
+      opacity: 0.8;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 export class VoiceNpcPanel {
   private root: HTMLElement | null = null;
   private launcher: HTMLElement | null = null;
@@ -133,6 +203,7 @@ export class VoiceNpcPanel {
   /** Mount the floating launcher button. Safe to call once per world session. */
   mount(container: HTMLElement = document.body): void {
     if (this.launcher) return;
+    ensureStyles();
     const btn = document.createElement('button');
     btn.id = 'voice-npc-launcher';
     btn.type = 'button';
