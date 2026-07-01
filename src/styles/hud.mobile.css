@@ -559,13 +559,15 @@
     flex-wrap: nowrap;
     gap: 4px;
     padding: 4px;
-    /* Compensate the action-bar zoom (actionBarScale) on this fixed-width mobile
-       band: divide the box back so the scroll strip keeps the band width and the
-       bar stays centered between the thumb clusters, mirroring the #ui ui-scale
-       rule in hud.css. Without this, >100% spills over the jump/attack controls
-       and <100% under-fills and left-aligns. Landscape inherits this (its rule
-       overrides only gap/padding/background, not width). */
-    width: calc(100% / var(--action-bar-scale, 1));
+    /* Hug the buttons and center within the fixed band between the thumb clusters,
+       and never render wider than that band. max-content sizes the strip to the
+       buttons (no empty space, and align-self centers it); the max-width cap is
+       divided by the zoom so a >100% actionBarScale renders at most band-wide (it
+       scrolls instead of spilling over the jump/attack controls), while <100% just
+       hugs and stays centered. Landscape inherits this (its rule overrides only
+       gap/padding/background, not width). */
+    align-self: center;
+    width: max-content;
     max-width: calc(100% / var(--action-bar-scale, 1));
     min-height: 50px;
     box-sizing: border-box;

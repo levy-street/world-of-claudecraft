@@ -1276,6 +1276,12 @@
     display: flex;
     gap: 4px;
     padding: 6px;
+    /* Hug the buttons and center under the xp bar. #actionbar-stack is a column,
+       so the default align-items:stretch would stretch each bar to the fixed 612px
+       xp bar width, leaving empty space to the right of the buttons and, once
+       zoomed, anchoring the shrunk bar to the left. Content-sizing + center keeps
+       the bar tight and centered at any actionBarScale. */
+    align-self: center;
     /* Action bar size (--action-bar-scale, actionBarScale setting): zoom both bars
        so buttons, gaps and keycaps scale together and the box shrinks/grows with
        them (desktop + mobile). Default 1 leaves the base size unchanged. */
