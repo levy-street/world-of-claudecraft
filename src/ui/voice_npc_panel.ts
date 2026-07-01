@@ -109,6 +109,8 @@ interface PanelState {
 }
 
 const MAX_RECORD_MS = 30_000;
+const POLL_INTERVAL_MS = 4000;
+const POLL_MAX_CONSECUTIVE_ERRORS = 5;
 
 export class VoiceNpcPanel {
   private root: HTMLElement | null = null;
@@ -116,6 +118,7 @@ export class VoiceNpcPanel {
   private mediaRecorder: MediaRecorder | null = null;
   private recordedChunks: Blob[] = [];
   private pollTimer: number | null = null;
+  private pollErrorCount = 0;
   private state: PanelState = {
     displayName: '',
     consent: false,
@@ -209,7 +212,7 @@ export class VoiceNpcPanel {
         </button>
         ${s.recording ? `<p>${esc(t('hudChrome.voiceNpc.recordingHint'))}</p>` : ''}
         <button id="voice-npc-burn" type="button" ${s.busy ? 'disabled' : ''}>
-          ${esc(t('hudChrome.voiceNpc.recordStart'))}
+          ${esc(t('hudChrome.voiceNpc.burnLabel'))}
         </button>
         ${s.statusLine ? `<p class="voice-npc-status">${esc(s.statusLine)}</p>` : ''}
       </div>
@@ -334,20 +337,28 @@ export class VoiceNpcPanel {
 
   private startPolling(): void {
     this.stopPolling();
-    this.pollTimer = window.setInterval(() => void this.pollStatus(), 4000);
+    this.pollErrorCount = 0;
     void this.pollStatus();
   }
 
   private stopPolling(): void {
     if (this.pollTimer !== null) {
-      window.clearInterval(this.pollTimer);
+      window.clearTimeout(this.pollTimer);
       this.pollTimer = null;
     }
+  }
+
+  private schedulePoll(): void {
+    // Linear backoff: wait one extra interval per consecutive error, so a
+    // persistently failing status endpoint doesn't hammer the server every 4s.
+    const delay = POLL_INTERVAL_MS * (1 + this.pollErrorCount);
+    this.pollTimer = window.setTimeout(() => void this.pollStatus(), delay);
   }
 
   private async pollStatus(): Promise<void> {
     try {
       const status = await getJson<StatusResponse>(this.deps, '/api/voice-npc/status');
+      this.pollErrorCount = 0;
       this.state.statusLine = this.statusLineFor(status);
       this.render();
       if (status.status === 'ready') {
@@ -356,9 +367,21 @@ export class VoiceNpcPanel {
         if (greeting) voice.playUrl(greeting);
       } else if (status.status === 'failed') {
         this.stopPolling();
+      } else {
+        this.schedulePoll();
       }
     } catch {
-      // transient: keep polling, do not surface a status flap to the player
+      // transient: keep polling with backoff, do not surface a status flap to
+      // the player on the first few misses. Once the cap is hit, stop polling
+      // and tell the player to retry rather than looping forever.
+      this.pollErrorCount++;
+      if (this.pollErrorCount >= POLL_MAX_CONSECUTIVE_ERRORS) {
+        this.stopPolling();
+        this.state.statusLine = t('hudChrome.voiceNpc.statusPollFailed');
+        this.render();
+        return;
+      }
+      this.schedulePoll();
     }
   }
 

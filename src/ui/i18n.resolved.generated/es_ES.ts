@@ -886,6 +886,7 @@ export const es_ES: EnTranslations = {
       "consentLabel": "I consent to my recorded voice being cloned by a third-party AI voice service.",
       "recordStart": "Record sample",
       "recordStop": "Stop recording",
+      "burnLabel": "Burn $WOC & Confirm",
       "recordingHint": "Recording... speak naturally for up to 30 seconds.",
       "micError": "Could not access your microphone.",
       "uploadError": "Could not upload the voice sample.",
@@ -900,7 +901,8 @@ export const es_ES: EnTranslations = {
       "statusCloning": "Cloning your voice...",
       "statusGenerating": "Generating dialogue lines...",
       "statusReady": "Your voice NPC is ready!",
-      "statusFailed": "Something went wrong: {error}"
+      "statusFailed": "Something went wrong: {error}",
+      "statusPollFailed": "Couldn't check status. Please reopen this panel."
     }
   },
   "guide": {

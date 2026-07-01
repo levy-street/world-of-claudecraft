@@ -886,6 +886,7 @@ export const en_XA: EnTranslations = {
       "consentLabel": "[Í çóñšéñţ ţó ɱý ŕéçóŕðéð ʋóíçé ƀéíñĝ çļóñéð ƀý á ţĥíŕð-þáŕţý ÁÍ ʋóíçé šéŕʋíçé.]",
       "recordStart": "[Ŕéçóŕð šáɱþļé]",
       "recordStop": "[Šţóþ ŕéçóŕðíñĝ]",
+      "burnLabel": "[Ɓúŕñ $ŴÓÇ & Çóñƒíŕɱ]",
       "recordingHint": "[Ŕéçóŕðíñĝ... šþéáķ ñáţúŕáļļý ƒóŕ úþ ţó 30 šéçóñðš.]",
       "micError": "[Çóúļð ñóţ áççéšš ýóúŕ ɱíçŕóþĥóñé.]",
       "uploadError": "[Çóúļð ñóţ úþļóáð ţĥé ʋóíçé šáɱþļé.]",
@@ -900,7 +901,8 @@ export const en_XA: EnTranslations = {
       "statusCloning": "[Çļóñíñĝ ýóúŕ ʋóíçé...]",
       "statusGenerating": "[Ĝéñéŕáţíñĝ ðíáļóĝúé ļíñéš...]",
       "statusReady": "[Ýóúŕ ʋóíçé ÑÞÇ íš ŕéáðý!]",
-      "statusFailed": "[Šóɱéţĥíñĝ ŵéñţ ŵŕóñĝ: {error}]"
+      "statusFailed": "[Šóɱéţĥíñĝ ŵéñţ ŵŕóñĝ: {error}]",
+      "statusPollFailed": "[Çóúļðñ'ţ çĥéçķ šţáţúš. Þļéášé ŕéóþéñ ţĥíš þáñéļ.]"
     }
   },
   "guide": {
