@@ -635,10 +635,26 @@ export const ru_RU: EnTranslations = {
       "methodGroup": "Способ добычи изменён на групповой.",
       "assigned": "{looter} передал предмет {item} игроку {target}.",
       "unassigned": "Предмет {item} не был назначен и доступен всем.",
-      "leaderOnly": "Только лидер группы может менять способ добычи."
+      "leaderOnly": "Только лидер группы может менять способ добычи.",
+      "rollingFor": "Бросок на {item}.",
+      "looterChanged": "Теперь мастер добычи: {name}.",
+      "thresholdSet": "Порог качества установлен: {threshold}.",
+      "summaryMaster": "Настройки добычи: мастер добычи, мастер добычи {name}, порог качества {threshold}.",
+      "summaryGroup": "Настройки добычи: групповая добыча."
     },
     "party": {
       "promoteLeader": "Назначить лидером"
+    },
+    "lootSettings": {
+      "title": "Настройки добычи",
+      "close": "Закрыть настройки добычи",
+      "menuItem": "Настройки добычи",
+      "method": "Способ добычи",
+      "rollThreshold": "Порог броска",
+      "groupLoot": "Групповая добыча",
+      "valueMaster": "Мастер добычи",
+      "leaderOption": "Мастер добычи: лидер группы (вы)",
+      "masterOption": "Мастер добычи: {name}"
     },
     "bags": {
       "filterGroupAria": "Фильтровать сумки по категории",

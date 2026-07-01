@@ -635,10 +635,26 @@ export const de_DE: EnTranslations = {
       "methodGroup": "Beutemethode auf Gruppenbeute gesetzt.",
       "assigned": "{looter} hat {item} an {target} zugewiesen.",
       "unassigned": "{item} wurde nicht zugewiesen und ist fuer alle frei.",
-      "leaderOnly": "Nur der Gruppenleiter kann die Beutemethode aendern."
+      "leaderOnly": "Nur der Gruppenleiter kann die Beutemethode aendern.",
+      "rollingFor": "Rolling for {item}.",
+      "looterChanged": "Master Looter is now {name}.",
+      "thresholdSet": "Loot threshold set to {threshold}.",
+      "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
+      "summaryGroup": "Loot Settings: Group Loot."
     },
     "party": {
       "promoteLeader": "Promote to Leader"
+    },
+    "lootSettings": {
+      "title": "Loot Settings",
+      "close": "Close loot settings",
+      "menuItem": "Loot Settings",
+      "method": "Loot Method",
+      "rollThreshold": "Roll Threshold",
+      "groupLoot": "Group Loot",
+      "valueMaster": "Master Loot",
+      "leaderOption": "Master Looter: Leader (You)",
+      "masterOption": "Master Looter: {name}"
     },
     "bags": {
       "filterGroupAria": "Taschen nach Kategorie filtern",

@@ -635,10 +635,26 @@ export const ja_JP: EnTranslations = {
       "methodGroup": "分配方式をグループルートに設定しました。",
       "assigned": "{looter}が{item}を{target}に分配しました。",
       "unassigned": "{item}は分配されず、誰でも入手できます。",
-      "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。"
+      "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。",
+      "rollingFor": "{item}にロールしています。",
+      "looterChanged": "分配担当は{name}になりました。",
+      "thresholdSet": "品質しきい値を{threshold}に設定しました。",
+      "summaryMaster": "分配設定：マスタールート、分配担当{name}、品質しきい値{threshold}。",
+      "summaryGroup": "分配設定：グループルート。"
     },
     "party": {
       "promoteLeader": "パーティリーダーに指定"
+    },
+    "lootSettings": {
+      "title": "分配設定",
+      "close": "分配設定を閉じる",
+      "menuItem": "分配設定",
+      "method": "分配方式",
+      "rollThreshold": "ロールしきい値",
+      "groupLoot": "グループルート",
+      "valueMaster": "マスタールート",
+      "leaderOption": "分配担当：パーティリーダー（あなた）",
+      "masterOption": "分配担当：{name}"
     },
     "bags": {
       "filterGroupAria": "バッグをカテゴリーで絞り込む",

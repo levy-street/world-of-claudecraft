@@ -742,7 +742,7 @@ describe('boss loot and encounter resets', () => {
     expect(sim.countItem('greyjaw_hide_boots', a)).toBe(1);
     expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
     expect(
-      sim.events.some((e) => e.type === 'loot' && e.text.includes('wins Greyjaw Hide Boots')),
+      sim.events.some((e) => e.type === 'loot' && e.text.includes('wins [[i:greyjaw_hide_boots]]')),
     ).toBe(true);
   });
 
@@ -795,7 +795,9 @@ describe('boss loot and encounter resets', () => {
     expect(sim.countItem('greyjaw_hide_boots', a)).toBe(0);
     expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
     expect(
-      events.some((e) => e.type === 'loot' && e.text === 'Everyone passed on Greyjaw Hide Boots.'),
+      events.some(
+        (e) => e.type === 'loot' && e.text === 'Everyone passed on [[i:greyjaw_hide_boots]].',
+      ),
     ).toBe(true);
   });
 

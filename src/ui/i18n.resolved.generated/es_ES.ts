@@ -635,10 +635,26 @@ export const es_ES: EnTranslations = {
       "methodGroup": "Metodo de botin cambiado a botin de grupo.",
       "assigned": "{looter} asigno {item} a {target}.",
       "unassigned": "{item} no fue asignado y queda libre para todos.",
-      "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin."
+      "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin.",
+      "rollingFor": "Rolling for {item}.",
+      "looterChanged": "Master Looter is now {name}.",
+      "thresholdSet": "Loot threshold set to {threshold}.",
+      "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
+      "summaryGroup": "Loot Settings: Group Loot."
     },
     "party": {
       "promoteLeader": "Promote to Leader"
+    },
+    "lootSettings": {
+      "title": "Loot Settings",
+      "close": "Close loot settings",
+      "menuItem": "Loot Settings",
+      "method": "Loot Method",
+      "rollThreshold": "Roll Threshold",
+      "groupLoot": "Group Loot",
+      "valueMaster": "Master Loot",
+      "leaderOption": "Master Looter: Leader (You)",
+      "masterOption": "Master Looter: {name}"
     },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoría",

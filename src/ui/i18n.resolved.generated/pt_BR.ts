@@ -635,10 +635,26 @@ export const pt_BR: EnTranslations = {
       "methodGroup": "Metodo de saque definido como saque em grupo.",
       "assigned": "{looter} atribuiu {item} a {target}.",
       "unassigned": "{item} nao foi atribuido e esta livre para todos.",
-      "leaderOnly": "Somente o lider do grupo pode alterar o metodo de saque."
+      "leaderOnly": "Somente o lider do grupo pode alterar o metodo de saque.",
+      "rollingFor": "Rolling for {item}.",
+      "looterChanged": "Master Looter is now {name}.",
+      "thresholdSet": "Loot threshold set to {threshold}.",
+      "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
+      "summaryGroup": "Loot Settings: Group Loot."
     },
     "party": {
       "promoteLeader": "Promote to Leader"
+    },
+    "lootSettings": {
+      "title": "Loot Settings",
+      "close": "Close loot settings",
+      "menuItem": "Loot Settings",
+      "method": "Loot Method",
+      "rollThreshold": "Roll Threshold",
+      "groupLoot": "Group Loot",
+      "valueMaster": "Master Loot",
+      "leaderOption": "Master Looter: Leader (You)",
+      "masterOption": "Master Looter: {name}"
     },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoria",

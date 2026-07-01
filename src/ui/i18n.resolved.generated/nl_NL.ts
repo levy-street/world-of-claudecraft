@@ -635,10 +635,26 @@ export const nl_NL: EnTranslations = {
       "methodGroup": "Buitmethode ingesteld op groepsbuit.",
       "assigned": "{looter} heeft {item} toegewezen aan {target}.",
       "unassigned": "{item} is niet toegewezen en is vrij voor iedereen.",
-      "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen."
+      "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen.",
+      "rollingFor": "Rolling for {item}.",
+      "looterChanged": "Master Looter is now {name}.",
+      "thresholdSet": "Loot threshold set to {threshold}.",
+      "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
+      "summaryGroup": "Loot Settings: Group Loot."
     },
     "party": {
       "promoteLeader": "Promote to Leader"
+    },
+    "lootSettings": {
+      "title": "Loot Settings",
+      "close": "Close loot settings",
+      "menuItem": "Loot Settings",
+      "method": "Loot Method",
+      "rollThreshold": "Roll Threshold",
+      "groupLoot": "Group Loot",
+      "valueMaster": "Master Loot",
+      "leaderOption": "Master Looter: Leader (You)",
+      "masterOption": "Master Looter: {name}"
     },
     "bags": {
       "filterGroupAria": "Tassen filteren op categorie",

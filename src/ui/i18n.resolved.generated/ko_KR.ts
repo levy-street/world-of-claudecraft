@@ -635,10 +635,26 @@ export const ko_KR: EnTranslations = {
       "methodGroup": "전리품 방식이 파티 분배로 설정되었습니다.",
       "assigned": "{looter}님이 {item}을(를) {target}에게 분배했습니다.",
       "unassigned": "{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.",
-      "leaderOnly": "파티장만 전리품 방식을 변경할 수 있습니다."
+      "leaderOnly": "파티장만 전리품 방식을 변경할 수 있습니다.",
+      "rollingFor": "{item} 주사위를 굴리는 중입니다.",
+      "looterChanged": "분배 담당자가 {name}(으)로 변경되었습니다.",
+      "thresholdSet": "품질 기준이 {threshold}(으)로 설정되었습니다.",
+      "summaryMaster": "전리품 설정: 분배 담당, 분배 담당자 {name}, 품질 기준 {threshold}.",
+      "summaryGroup": "전리품 설정: 파티 분배."
     },
     "party": {
       "promoteLeader": "파티장으로 지정"
+    },
+    "lootSettings": {
+      "title": "전리품 설정",
+      "close": "전리품 설정 닫기",
+      "menuItem": "전리품 설정",
+      "method": "전리품 방식",
+      "rollThreshold": "주사위 기준",
+      "groupLoot": "파티 분배",
+      "valueMaster": "분배 담당",
+      "leaderOption": "분배 담당자: 파티장(나)",
+      "masterOption": "분배 담당자: {name}"
     },
     "bags": {
       "filterGroupAria": "가방을 분류별로 필터링",

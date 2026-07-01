@@ -3347,6 +3347,44 @@
     align-items: center;
     gap: 6px;
   }
+  #loot-settings-window {
+    min-width: 220px;
+    z-index: 30;
+  }
+  /* Position is set in JS (Hud.positionLootSettingsPanel): docked below the party
+     frames on the left, or to their right if the left column would overflow the HUD
+     height. On mobile-touch it keeps the centered .window placement. */
+  #loot-settings-window .ls-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-family: var(--title-font);
+    font-size: 12px;
+  }
+  #loot-settings-window .ls-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  #loot-settings-window .ls-row.ls-ro {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+  }
+  #loot-settings-window .ls-lbl {
+    color: var(--gold);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  #loot-settings-window .ls-val {
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+  }
+  #loot-settings-window select {
+    width: 100%;
+    box-sizing: border-box;
+  }
   .party-frame .pfm-id {
     color: var(--cls);
     letter-spacing: 0.3px;

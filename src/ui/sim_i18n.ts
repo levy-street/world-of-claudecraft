@@ -4051,7 +4051,7 @@ const RULES: Rule[] = [
   { re: /^You quaff (.+)\.$/, build: (m) => tSim('log.quaff', { item: locItem(m[1]) }) },
   {
     re: /^(.+) wins (.+) \((\d+)\)$/,
-    build: (m) => tSim('loot.rollWin', { winner: m[1], item: locItem(m[2]), roll: m[3] }),
+    build: (m) => tSim('loot.rollWin', { winner: m[1], item: m[2], roll: m[3] }),
   },
   {
     re: /^(.+) bought your (.+) for (.+) [—-] collect (.+) from the Merchant\.$/,

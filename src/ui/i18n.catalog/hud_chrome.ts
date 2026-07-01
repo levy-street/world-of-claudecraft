@@ -666,11 +666,16 @@ export const hudChromeStrings = {
     assignAria: 'Assign {item} to {name}',
     rollButton: 'Roll',
     selectAll: 'Select all',
-    methodMaster: 'Loot method set to master loot. Master looter: {name}.',
-    methodGroup: 'Loot method set to group loot.',
+    methodMaster: 'Loot method set to Master Loot. Master Looter: {name}.',
+    methodGroup: 'Loot method set to Group Loot.',
     assigned: '{looter} assigned {item} to {target}.',
     unassigned: '{item} was not assigned and is free for all.',
     leaderOnly: 'Only the party leader can change the loot method.',
+    rollingFor: 'Rolling for {item}.',
+    looterChanged: 'Master Looter is now {name}.',
+    thresholdSet: 'Loot threshold set to {threshold}.',
+    summaryMaster: 'Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.',
+    summaryGroup: 'Loot Settings: Group Loot.',
   },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
@@ -678,6 +683,17 @@ export const hudChromeStrings = {
   // itself is a sim emit re-localized through localizeSystemText (hud.logs.partyLeader).
   party: {
     promoteLeader: 'Promote to Leader',
+  },
+  lootSettings: {
+    title: 'Loot Settings',
+    close: 'Close loot settings',
+    menuItem: 'Loot Settings',
+    method: 'Loot Method',
+    rollThreshold: 'Roll Threshold',
+    groupLoot: 'Group Loot',
+    valueMaster: 'Master Loot',
+    leaderOption: 'Master Looter: Leader (You)',
+    masterOption: 'Master Looter: {name}',
   },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.

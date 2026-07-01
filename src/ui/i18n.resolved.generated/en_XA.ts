@@ -631,14 +631,30 @@ export const en_XA: EnTranslations = {
       "assignAria": "[Áššíĝñ {item} ţó {name}]",
       "rollButton": "[Ŕóļļ]",
       "selectAll": "[Šéļéçţ áļļ]",
-      "methodMaster": "[Ļóóţ ɱéţĥóð šéţ ţó ɱášţéŕ ļóóţ. Ɱášţéŕ ļóóţéŕ: {name}.]",
-      "methodGroup": "[Ļóóţ ɱéţĥóð šéţ ţó ĝŕóúþ ļóóţ.]",
+      "methodMaster": "[Ļóóţ ɱéţĥóð šéţ ţó Ɱášţéŕ Ļóóţ. Ɱášţéŕ Ļóóţéŕ: {name}.]",
+      "methodGroup": "[Ļóóţ ɱéţĥóð šéţ ţó Ĝŕóúþ Ļóóţ.]",
       "assigned": "[{looter} áššíĝñéð {item} ţó {target}.]",
       "unassigned": "[{item} ŵáš ñóţ áššíĝñéð áñð íš ƒŕéé ƒóŕ áļļ.]",
-      "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ çáñ çĥáñĝé ţĥé ļóóţ ɱéţĥóð.]"
+      "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ çáñ çĥáñĝé ţĥé ļóóţ ɱéţĥóð.]",
+      "rollingFor": "[Ŕóļļíñĝ ƒóŕ {item}.]",
+      "looterChanged": "[Ɱášţéŕ Ļóóţéŕ íš ñóŵ {name}.]",
+      "thresholdSet": "[Ļóóţ ţĥŕéšĥóļð šéţ ţó {threshold}.]",
+      "summaryMaster": "[Ļóóţ Šéţţíñĝš: Ɱášţéŕ Ļóóţ, Ɱášţéŕ Ļóóţéŕ {name}, ţĥŕéšĥóļð {threshold}.]",
+      "summaryGroup": "[Ļóóţ Šéţţíñĝš: Ĝŕóúþ Ļóóţ.]"
     },
     "party": {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]"
+    },
+    "lootSettings": {
+      "title": "[Ļóóţ Šéţţíñĝš]",
+      "close": "[Çļóšé ļóóţ šéţţíñĝš]",
+      "menuItem": "[Ļóóţ Šéţţíñĝš]",
+      "method": "[Ļóóţ Ɱéţĥóð]",
+      "rollThreshold": "[Ŕóļļ Ţĥŕéšĥóļð]",
+      "groupLoot": "[Ĝŕóúþ Ļóóţ]",
+      "valueMaster": "[Ɱášţéŕ Ļóóţ]",
+      "leaderOption": "[Ɱášţéŕ Ļóóţéŕ: Ļéáðéŕ (Ýóú)]",
+      "masterOption": "[Ɱášţéŕ Ļóóţéŕ: {name}]"
     },
     "bags": {
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",

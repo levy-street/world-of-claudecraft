@@ -68,7 +68,6 @@ import type {
   EquipSlot,
   InvSlot,
   LootRollChoice,
-  MasterLootThreshold,
   PetMode,
   PlayerClass,
   ResourceType,
@@ -202,6 +201,8 @@ import { ReannounceMarker } from './live_region_reannounce';
 import { PICK_ACTION_HOTKEYS } from './lockpick_panel';
 import { LockpickWindow } from './lockpick_window';
 import { reconcileLootRolls as computeLootRollReconcile } from './loot_roll_reconcile';
+import { lootSettingsView } from './loot_settings_view';
+import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
@@ -875,9 +876,23 @@ export class Hud {
   private tradeWasOpen = false;
   private lastTradeSig = '';
   private lastPartySig = '';
-  // Separate, LOW-frequency signature for the leader-only master-loot footer control
-  // (loot settings + membership, no hp/res), so it is not churned every combat tick.
-  private lastPartyFooterSig = '';
+  // Loot Settings window (opened on demand from the right-click menu): whether it is
+  // open, and a separate LOW-frequency signature (loot settings + leadership +
+  // membership, no hp/res) so it repaints from authoritative state without churning
+  // on every combat tick.
+  private lootSettingsOpen = false;
+  private lastLootSettingsSig = '';
+  private lootSettingsTrap: FocusTrapHandle | null = null;
+  // Loot Settings window docks below the party frames; these track when to re-measure
+  // (party row count / raid grouping changed) and the last auto-placed position so a
+  // manual drag is respected (we stop auto-docking once the player moves it).
+  private lastLootGeomSig = '';
+  private lootSettingsAutoLeft = '';
+  private lootSettingsAutoTop = '';
+  // Tracks whether the local player was the party leader last frame, so we can
+  // auto-open the Loot Settings panel the moment they BECOME leader: on forming a
+  // group (creator is leader), on being promoted, or on succeeding a leader who left.
+  private wasLeaderOfParty = false;
   private lastArenaStatusSig = '';
   private arenaMatchSeen = false; // closes the queue panel once a bout starts
   // 2v2 Fiesta UI state (all transient)
@@ -1600,6 +1615,9 @@ export class Hud {
         break;
       case 'delve-board':
         this.closeDelveBoard();
+        break;
+      case 'loot-settings-window':
+        this.closeLootSettings();
         break;
       case 'bags':
         if (this.vendorOpen && document.body.classList.contains('mobile-touch')) this.closeVendor();
@@ -6984,7 +7002,8 @@ export class Hud {
       'Trade window opened.': 'hud.logs.tradeOpened',
       'Trade complete.': 'hud.logs.tradeComplete',
       'Trade cancelled.': 'hud.logs.tradeCancelled',
-      'Loot method set to group loot.': 'hudChrome.masterLoot.methodGroup',
+      'Loot method set to Group Loot.': 'hudChrome.masterLoot.methodGroup',
+      'Loot Settings: Group Loot.': 'hudChrome.masterLoot.summaryGroup',
     };
     const key = exact[text];
     if (key) return t(key);
@@ -6997,8 +7016,28 @@ export class Hud {
       if (text === delve.leaveText) return delveText(delve.id, 'leaveText');
     }
 
-    let match = /^Loot method set to master loot\. Master looter: (.+)\.$/.exec(text);
+    let match = /^Loot method set to Master Loot\. Master Looter: (.+)\.$/.exec(text);
     if (match) return t('hudChrome.masterLoot.methodMaster', { name: match[1] });
+    match = /^Master Looter is now (.+)\.$/.exec(text);
+    if (match) return t('hudChrome.masterLoot.looterChanged', { name: match[1] });
+    match = /^Loot threshold set to (uncommon|rare|epic)\.$/.exec(text);
+    if (match)
+      return t('hudChrome.masterLoot.thresholdSet', {
+        threshold: t(
+          `hudChrome.masterLoot.threshold${match[1][0].toUpperCase()}${match[1].slice(1)}` as TranslationKey,
+        ),
+      });
+    match =
+      /^Loot Settings: Master Loot, Master Looter (.+), threshold (uncommon|rare|epic)\.$/.exec(
+        text,
+      );
+    if (match)
+      return t('hudChrome.masterLoot.summaryMaster', {
+        name: match[1],
+        threshold: t(
+          `hudChrome.masterLoot.threshold${match[2][0].toUpperCase()}${match[2].slice(1)}` as TranslationKey,
+        ),
+      });
     match = /^You have invited (.+) to your party\.$/.exec(text);
     if (match) return t('hud.logs.partyInviteSent', { name: match[1] });
     match = /^(.+) joins the party\.$/.exec(text);
@@ -7075,9 +7114,10 @@ export class Hud {
     if (match) return t('hud.logs.lootReceiveMoney', { money: this.localizeSimMoney(match[1]) });
     match = /^You loot (.+)\.$/.exec(text);
     if (match) return t('hud.logs.lootMoney', { money: this.localizeSimMoney(match[1]) });
+    match = /^Rolling for (\[\[i:[A-Za-z0-9_]+\]\])\.$/.exec(text);
+    if (match) return t('hudChrome.masterLoot.rollingFor', { item: match[1] });
     match = /^Everyone passed on (.+)\.$/.exec(text);
-    if (match)
-      return t('itemUi.lootRoll.everyonePassed', { item: itemDisplayNameFromSource(match[1]) });
+    if (match) return t('itemUi.lootRoll.everyonePassed', { item: match[1] });
     match = /^Sold (\d+) junk items? for (.+)\.$/.exec(text);
     if (match) {
       const n = Number(match[1]);
@@ -7090,7 +7130,7 @@ export class Hud {
     if (match)
       return t('hudChrome.masterLoot.assigned', {
         looter: match[1],
-        item: itemDisplayNameFromSource(match[2]),
+        item: match[2],
         target: match[3],
       });
     match = /^(.+) was not assigned and is free for all\.$/.exec(text);
@@ -7186,7 +7226,21 @@ export class Hud {
       div.dataset.chan = chan;
       this.hideIfFiltered(div, chan);
     }
-    div.append(document.createTextNode(text));
+    // Loot lines carry name-free item tokens ([[i:id]]); render those as clickable
+    // links via the shared chat item-link renderer. Plain system/combat lines keep
+    // the fast text-node path (the substring test never fires for tokenless lines).
+    if (el === this.chatLogEl && text.includes('[[i:')) {
+      for (const seg of parseChatSegments(text)) {
+        if (seg.kind === 'item') this.appendChatItemLink(div, seg.itemId);
+        else if (seg.kind === 'quest')
+          div.append(
+            document.createTextNode(`[${QUESTS[seg.questId] ? questTitle(seg.questId) : '?'}]`),
+          );
+        else div.append(document.createTextNode(seg.value));
+      }
+    } else {
+      div.append(document.createTextNode(text));
+    }
     el.appendChild(div);
     // Announce chat-pane lines through #chat-live (the combat pane has its own announcer).
     if (el === this.chatLogEl) this.announceChatLine(div);
@@ -7971,16 +8025,19 @@ export class Hud {
 
   private closeLootRollsForItem(text: string): void {
     const match =
-      /^.+ wins (.+) \(\d+\)$/.exec(text) ??
-      /^Everyone passed on (.+)\.$/.exec(text) ??
-      /^.+ assigned (.+) to .+\.$/.exec(text) ??
+      /^.+ wins \[\[i:([A-Za-z0-9_]+)\]\] \(\d+\)$/.exec(text) ??
+      /^Everyone passed on \[\[i:([A-Za-z0-9_]+)\]\]\.$/.exec(text) ??
+      /^.+ assigned \[\[i:([A-Za-z0-9_]+)\]\] to .+\.$/.exec(text) ??
       /^(.+) was not assigned and is free for all\.$/.exec(text);
     if (!match) return;
+    const id = match[1];
     for (const [rollId, roll] of this.activeLootRolls) {
-      if (roll.event.itemName === match[1]) this.activeLootRolls.delete(rollId);
+      if (roll.event.itemId === id || roll.event.itemName === id)
+        this.activeLootRolls.delete(rollId);
     }
     for (const [rollId, roll] of this.activeMasterRolls) {
-      if (roll.event.itemName === match[1]) this.activeMasterRolls.delete(rollId);
+      if (roll.event.itemId === id || roll.event.itemName === id)
+        this.activeMasterRolls.delete(rollId);
     }
     this.renderLootRolls();
   }
@@ -9741,22 +9798,32 @@ export class Hud {
         this.partyFramesPainter.clear();
         this.lastPartySig = '';
       }
-      this.lastPartyFooterSig = '';
+      if (this.lootSettingsOpen) this.closeLootSettings();
+      this.lastLootSettingsSig = '';
+      this.wasLeaderOfParty = false;
       return;
     }
-    // Leader-only master-loot control. Its signature is deliberately LOW frequency
-    // (loot settings + membership + leadership, NO hp/res), so the checkbox and
-    // dropdowns are not destroyed and rebuilt under the cursor on every combat tick
-    // (the desync/churn the master-loot control is prone to). The painter keeps the
-    // built node positioned just before the leave button across member rebuilds.
-    const isLeader = info.leader === this.sim.playerId;
-    const footerSig = isLeader
-      ? `lead:M${info.master.enabled ? 1 : 0}/${info.master.looter}/${info.master.threshold}:${info.members.map((m) => `${m.pid}:${m.name}`).join(',')}`
-      : 'member';
-    if (footerSig !== this.lastPartyFooterSig) {
-      this.lastPartyFooterSig = footerSig;
-      this.partyFramesPainter.setMasterControl(isLeader ? this.buildMasterLootControl(info) : null);
+    // The Loot Settings window (opened on demand from the right-click menu) is
+    // repainted from authoritative state while open. The signature is low frequency
+    // (loot settings + leadership + membership, NO hp/res) so it is not rebuilt every
+    // combat tick. The leader's controls and a member's read-only view both track it.
+    if (this.lootSettingsOpen) {
+      const sig = `${info.master.enabled ? 1 : 0}/${info.master.looter}/${info.master.threshold}/${info.leader}:${info.members.map((m) => `${m.pid}:${m.name}`).join(',')}`;
+      if (sig !== this.lastLootSettingsSig) {
+        this.lastLootSettingsSig = sig;
+        this.paintLootSettings(info);
+      }
     }
+    // Auto-open the Loot Settings panel the moment the local player BECOMES the party
+    // leader (leader last frame -> not, or rather not -> is): forming a group as its
+    // creator, being promoted, or succeeding a leader who left. That is when the loot
+    // rules become yours to set, so surface them. A non-explicit open: it shows without
+    // stealing keyboard focus or closing other windows mid-game. A plain member (never
+    // the leader) never triggers it.
+    const isLeaderNow = info.leader === this.sim.playerId;
+    const becameLeader = isLeaderNow && !this.wasLeaderOfParty;
+    this.wasLeaderOfParty = isLeaderNow;
+    if (becameLeader && !this.lootSettingsOpen) this.openLootSettings(false);
     // Hoist the cheap signature (a single string pass, no intermediate arrays) AHEAD
     // of the selector so an unchanged party short-circuits before selectPartyFrameMembers
     // allocates its sorted / filtered / mapped arrays.
@@ -9765,76 +9832,16 @@ export class Hud {
     this.lastPartySig = sig;
     const others = selectPartyFrameMembers(info, this.sim.playerId, this.sim.player.pos);
     this.partyFramesPainter.sync(others, info.leader, info.raid);
-  }
-
-  // Leader-only loot-method control: enable master loot, choose the master looter
-  // (the leader by default), and the quality threshold for assigned drops. Returns
-  // the built node; the party-frames painter owns its placement + lifetime.
-  private buildMasterLootControl(info: PartyInfo): HTMLElement {
-    const m = info.master;
-    const box = document.createElement('div');
-    box.className = 'party-loot panel';
-    // A label-wrapped checkbox toggles on a primary click, but the browser also
-    // toggles it on right/middle-click here, which spuriously flips the setting.
-    // Suppress non-primary activation (and the context menu) on the whole panel.
-    box.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) e.preventDefault();
-    });
-    box.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-    const memberOptions = info.members
-      .map(
-        (mem) =>
-          `<option value="${mem.pid}" ${m.looter === mem.pid ? 'selected' : ''}>${esc(mem.name)}</option>`,
-      )
-      .join('');
-    const thr = (v: string, label: string) =>
-      `<option value="${v}" ${m.threshold === v ? 'selected' : ''}>${esc(label)}</option>`;
-    box.innerHTML = `
-      <label class="party-loot-row toggle">
-        <input type="checkbox" id="ml-enable" ${m.enabled ? 'checked' : ''} aria-label="${esc(t('hudChrome.masterLoot.enableAria'))}">
-        <span>${esc(t('hudChrome.masterLoot.enableLabel'))}</span>
-      </label>
-      <label class="party-loot-row">
-        <span>${esc(t('hudChrome.masterLoot.looterLabel'))}</span>
-        <select id="ml-looter" ${m.enabled ? '' : 'disabled'}>
-          <option value="0" ${m.looter === 0 ? 'selected' : ''}>${esc(t('hudChrome.masterLoot.leaderOption'))}</option>
-          ${memberOptions}
-        </select>
-      </label>
-      <label class="party-loot-row">
-        <span>${esc(t('hudChrome.masterLoot.thresholdLabel'))}</span>
-        <select id="ml-threshold" ${m.enabled ? '' : 'disabled'}>
-          ${thr('uncommon', t('hudChrome.masterLoot.thresholdUncommon'))}
-          ${thr('rare', t('hudChrome.masterLoot.thresholdRare'))}
-          ${thr('epic', t('hudChrome.masterLoot.thresholdEpic'))}
-        </select>
-      </label>`;
-    const enable = box.querySelector<HTMLInputElement>('#ml-enable')!;
-    const looter = box.querySelector<HTMLSelectElement>('#ml-looter')!;
-    const threshold = box.querySelector<HTMLSelectElement>('#ml-threshold')!;
-    const applyMaster = (enabled: boolean) =>
-      this.sim.setPartyLootMaster(
-        enabled,
-        Number(looter.value),
-        threshold.value as MasterLootThreshold,
-      );
-    // Controlled checkbox: suppress the browser's optimistic toggle and derive the
-    // next value from authoritative party state. The DOM checkbox is only updated by
-    // a server-confirmed rebuild, so it can never desync from the server (a checked
-    // box left over disabled dropdowns) or send a value read from a half-toggled DOM
-    // input.
-    enable.addEventListener('click', (e) => {
-      e.preventDefault();
-      applyMaster(!m.enabled);
-    });
-    // The selects are only enabled while master loot is on, so m.enabled is true
-    // here; keep it and update the looter / threshold.
-    looter.addEventListener('change', () => applyMaster(m.enabled));
-    threshold.addEventListener('change', () => applyMaster(m.enabled));
-    return box;
+    // Re-dock the Loot Settings panel below the (just re-synced) party frames when their
+    // size changes (row count / raid grouping). Gated so the layout measure runs on a real
+    // geometry change, not every combat tick; positionLootSettingsPanel honors a manual drag.
+    if (this.lootSettingsOpen) {
+      const geomSig = `${others.length}/${info.raid ? 1 : 0}`;
+      if (geomSig !== this.lastLootGeomSig) {
+        this.lastLootGeomSig = geomSig;
+        this.positionLootSettingsPanel();
+      }
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -9853,6 +9860,8 @@ export class Hud {
       html += `<div class="ctx-item" data-act="convert-raid">${esc(t('hud.chat.context.convertToRaid'))}</div>`;
     if (canUnconvert)
       html += `<div class="ctx-item" data-act="convert-party">${esc(t('hud.chat.context.convertToParty'))}</div>`;
+    if (party)
+      html += `<div class="ctx-item" data-act="loot-settings">${esc(t('hudChrome.lootSettings.menuItem'))}</div>`;
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -9866,7 +9875,7 @@ export class Hud {
       } else if (act === 'convert-party') {
         this.sim.convertRaidToParty();
         this.socialWindow.selectRaidTab();
-      }
+      } else if (act === 'loot-settings') this.openLootSettings();
     });
   }
 
@@ -9915,6 +9924,8 @@ export class Hud {
       html += `<div class="ctx-item" data-act="promote">${esc(t('hudChrome.party.promoteLeader'))}</div>`;
       html += `<div class="ctx-item" data-act="kick">${esc(t('hud.chat.context.removeParty'))}</div>`;
     }
+    if (isMember || pid === this.sim.playerId)
+      html += `<div class="ctx-item" data-act="loot-settings">${esc(t('hudChrome.lootSettings.menuItem'))}</div>`;
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -9935,6 +9946,7 @@ export class Hud {
       } else if (act === 'report') this.openReportWindow({ pid, name });
       else if (act === 'promote') this.sim.partyPromote(pid);
       else if (act === 'kick') this.sim.partyKick(pid);
+      else if (act === 'loot-settings') this.openLootSettings();
     });
   }
 
@@ -10098,6 +10110,78 @@ export class Hud {
       el.style.display = 'none';
     });
     el.style.display = 'block';
+  }
+
+  /** Open the Loot Settings window: the leader gets the editable master-loot
+   *  method/threshold controls, a member a read-only view of the same state. */
+  // explicit = a user-initiated open (right-click): close other windows and trap /
+  // move keyboard focus into the panel. Auto-open on forming a group passes false:
+  // it just shows the panel, leaving the player's other windows and keyboard focus
+  // (movement, chat) untouched.
+  openLootSettings(explicit = true): void {
+    const info = this.sim.partyInfo;
+    if (!info) return;
+    if (explicit) this.closeOtherWindows('#loot-settings-window');
+    this.lootSettingsOpen = true;
+    this.lastLootSettingsSig = '';
+    // A fresh open re-docks below the party frames, even if a prior open was dragged away.
+    this.lastLootGeomSig = '';
+    this.lootSettingsAutoLeft = '';
+    this.lootSettingsAutoTop = '';
+    this.paintLootSettings(info);
+    const el = $('#loot-settings-window');
+    const wasHidden = el.style.display !== 'block';
+    el.style.display = 'block';
+    this.positionLootSettingsPanel();
+    if (explicit) {
+      if (wasHidden)
+        this.lootSettingsTrap = this.focusManager.open({ root: () => $('#loot-settings-window') });
+      this.lootSettingsTrap?.focusFirst();
+    }
+  }
+
+  closeLootSettings(restoreFocus = true): void {
+    this.lootSettingsOpen = false;
+    this.lastLootGeomSig = '';
+    $('#loot-settings-window').style.display = 'none';
+    this.lootSettingsTrap?.release(restoreFocus);
+    this.lootSettingsTrap = null;
+  }
+
+  // Dock the Loot Settings window below the party frames on the left. If the left column
+  // would overflow the HUD height (a large raid pushes the panel off the bottom), fall
+  // back to docking it to the right of the party frames. Desktop only (mobile keeps the
+  // centered .window placement); honors a manual drag (stops auto-docking once moved).
+  private positionLootSettingsPanel(): void {
+    if (document.body.classList.contains('mobile-touch')) return;
+    const el = $('#loot-settings-window');
+    if (
+      this.lootSettingsAutoLeft &&
+      (el.style.left !== this.lootSettingsAutoLeft || el.style.top !== this.lootSettingsAutoTop)
+    )
+      return; // the player dragged it; leave it where they put it
+    const pf = $('#party-frames');
+    const gap = 8;
+    const belowTop = pf.offsetTop + pf.offsetHeight + gap;
+    const avail = (el.offsetParent as HTMLElement | null)?.clientHeight ?? window.innerHeight;
+    const fitsBelow = belowTop + el.offsetHeight <= avail - gap;
+    el.style.left = `${fitsBelow ? pf.offsetLeft : pf.offsetLeft + pf.offsetWidth + gap}px`;
+    el.style.top = `${fitsBelow ? belowTop : pf.offsetTop}px`;
+    el.style.transform = 'none';
+    this.lootSettingsAutoLeft = el.style.left;
+    this.lootSettingsAutoTop = el.style.top;
+  }
+
+  private paintLootSettings(info: PartyInfo): void {
+    renderLootSettingsWindow(
+      $('#loot-settings-window'),
+      lootSettingsView(info, this.sim.playerId),
+      {
+        onChange: (enabled, looter, threshold) =>
+          this.sim.setPartyLootMaster(enabled, looter, threshold),
+        onClose: () => this.closeLootSettings(),
+      },
+    );
   }
 
   // One read-only equipment row for the inspect window: icon, slot name, and the

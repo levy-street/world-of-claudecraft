@@ -635,10 +635,26 @@ export const tr_TR: EnTranslations = {
       "methodGroup": "Ganimet yontemi grup ganimeti olarak ayarlandi.",
       "assigned": "{looter}, {item} esyasini {target} oyuncusuna atadi.",
       "unassigned": "{item} atanmadi ve herkes icin serbest.",
-      "leaderOnly": "Ganimet yontemini yalnizca grup lideri degistirebilir."
+      "leaderOnly": "Ganimet yontemini yalnizca grup lideri degistirebilir.",
+      "rollingFor": "Rolling for {item}.",
+      "looterChanged": "Master Looter is now {name}.",
+      "thresholdSet": "Loot threshold set to {threshold}.",
+      "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
+      "summaryGroup": "Loot Settings: Group Loot."
     },
     "party": {
       "promoteLeader": "Promote to Leader"
+    },
+    "lootSettings": {
+      "title": "Loot Settings",
+      "close": "Close loot settings",
+      "menuItem": "Loot Settings",
+      "method": "Loot Method",
+      "rollThreshold": "Roll Threshold",
+      "groupLoot": "Group Loot",
+      "valueMaster": "Master Loot",
+      "leaderOption": "Master Looter: Leader (You)",
+      "masterOption": "Master Looter: {name}"
     },
     "bags": {
       "filterGroupAria": "Çantaları kategoriye göre filtrele",

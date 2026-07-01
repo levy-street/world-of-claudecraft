@@ -16,6 +16,7 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
@@ -40,6 +41,37 @@ export class PartyMachine {
   partyOf(pid: number): Party | null {
     const partyId = this.partyByPid.get(pid);
     return partyId !== undefined ? (this.parties.get(partyId) ?? null) : null;
+  }
+
+  // English Loot Settings summary line for a party (re-localized client-side). Sent
+  // to a joiner (private) and to the whole group on party/raid conversion. A single
+  // ternary return (rather than an early-return branch) keeps this recognized by the
+  // localizeSystemText summaryMaster/summaryGroup arms without a second, spurious
+  // literal-return candidate for the S3 drift guard's static scan.
+  private lootSettingsSummary(party: Party): string {
+    const m = party.lootStrategies.master;
+    const looterPid = m.looter === 0 ? party.leader : m.looter;
+    const looterName = this.ctx.players.get(looterPid)?.name ?? 'the leader';
+    return m.enabled
+      ? `Loot Settings: Master Loot, Master Looter ${looterName}, threshold ${m.threshold}.`
+      : 'Loot Settings: Group Loot.';
+  }
+
+  // Announce a shifted effective master looter to the whole group. `before` is the
+  // effective looter captured before a leadership change; call after the change.
+  private announceLooterShift(party: Party, before: number | null): void {
+    if (party.members.length <= 1) return;
+    if (!party.lootStrategies.master.enabled) return;
+    const after = effectiveMasterLooter(party.lootStrategies.master, party.leader, party.members);
+    if (after === null || after === before) return;
+    const name = this.ctx.players.get(after)?.name ?? 'the leader';
+    for (const mPid of party.members)
+      this.ctx.emit({
+        type: 'log',
+        text: `Master Looter is now ${name}.`,
+        color: '#aaf',
+        pid: mPid,
+      });
   }
 
   private hasActiveInvite(
@@ -152,6 +184,12 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+    this.ctx.emit({
+      type: 'log',
+      text: this.lootSettingsSummary(party),
+      color: '#aaf',
+      pid: r.meta.entityId,
+    });
   }
 
   partyDecline(pid?: number): void {
@@ -199,6 +237,11 @@ export class PartyMachine {
       return;
     }
     if (!party.members.includes(targetPid) || targetPid === party.leader) return;
+    const beforeLooter = effectiveMasterLooter(
+      party.lootStrategies.master,
+      party.leader,
+      party.members,
+    );
     party.leader = targetPid;
     const newLeader = this.ctx.players.get(targetPid);
     for (const mPid of party.members) {
@@ -209,6 +252,7 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+    this.announceLooterShift(party, beforeLooter);
   }
 
   convertPartyToRaid(pid?: number): void {
@@ -241,6 +285,13 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+    for (const mPid of party.members)
+      this.ctx.emit({
+        type: 'log',
+        text: this.lootSettingsSummary(party),
+        color: '#aaf',
+        pid: mPid,
+      });
   }
 
   convertRaidToParty(pid?: number): void {
@@ -277,6 +328,13 @@ export class PartyMachine {
         pid: mPid,
       });
     }
+    for (const mPid of party.members)
+      this.ctx.emit({
+        type: 'log',
+        text: this.lootSettingsSummary(party),
+        color: '#aaf',
+        pid: mPid,
+      });
   }
 
   moveRaidMember(targetPid: number, group: 1 | 2, pid?: number): void {
@@ -328,6 +386,11 @@ export class PartyMachine {
   removeFromParty(pid: number, verb: string): void {
     const party = this.partyOf(pid);
     if (!party) return;
+    const beforeLooter = effectiveMasterLooter(
+      party.lootStrategies.master,
+      party.leader,
+      party.members,
+    );
     const meta = this.ctx.players.get(pid);
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
@@ -359,6 +422,7 @@ export class PartyMachine {
         });
       }
     }
+    this.announceLooterShift(party, beforeLooter);
     if (party.raid) this.normalizeRaidGroups(party);
   }
 }

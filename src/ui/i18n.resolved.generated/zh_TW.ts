@@ -635,10 +635,26 @@ export const zh_TW: EnTranslations = {
       "methodGroup": "拾取方式已設為小隊拾取。",
       "assigned": "{looter}將{item}分配給了{target}。",
       "unassigned": "{item}未被分配，現可自由拾取。",
-      "leaderOnly": "只有隊長才能更改拾取方式。"
+      "leaderOnly": "只有隊長才能更改拾取方式。",
+      "rollingFor": "正在為{item}擲骰。",
+      "looterChanged": "分配者現為{name}。",
+      "thresholdSet": "品質門檻已設為{threshold}。",
+      "summaryMaster": "拾取設定：隊長分配，分配者{name}，品質門檻{threshold}。",
+      "summaryGroup": "拾取設定：小隊拾取。"
     },
     "party": {
       "promoteLeader": "提升為隊長"
+    },
+    "lootSettings": {
+      "title": "拾取設定",
+      "close": "關閉拾取設定",
+      "menuItem": "拾取設定",
+      "method": "拾取方式",
+      "rollThreshold": "擲骰門檻",
+      "groupLoot": "小隊拾取",
+      "valueMaster": "隊長分配",
+      "leaderOption": "分配者：隊長（你）",
+      "masterOption": "分配者：{name}"
     },
     "bags": {
       "filterGroupAria": "依類別篩選背包",

@@ -635,10 +635,26 @@ export const vi_VN: EnTranslations = {
       "methodGroup": "Phuong thuc chien loi pham da dat thanh loot nhom.",
       "assigned": "{looter} da gan {item} cho {target}.",
       "unassigned": "{item} chua duoc gan va moi nguoi deu co the nhat.",
-      "leaderOnly": "Chi truong nhom co the doi phuong thuc chien loi pham."
+      "leaderOnly": "Chi truong nhom co the doi phuong thuc chien loi pham.",
+      "rollingFor": "Rolling for {item}.",
+      "looterChanged": "Master Looter is now {name}.",
+      "thresholdSet": "Loot threshold set to {threshold}.",
+      "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
+      "summaryGroup": "Loot Settings: Group Loot."
     },
     "party": {
       "promoteLeader": "Promote to Leader"
+    },
+    "lootSettings": {
+      "title": "Loot Settings",
+      "close": "Close loot settings",
+      "menuItem": "Loot Settings",
+      "method": "Loot Method",
+      "rollThreshold": "Roll Threshold",
+      "groupLoot": "Group Loot",
+      "valueMaster": "Master Loot",
+      "leaderOption": "Master Looter: Leader (You)",
+      "masterOption": "Master Looter: {name}"
     },
     "bags": {
       "filterGroupAria": "Lọc túi đồ theo danh mục",
