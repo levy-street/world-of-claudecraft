@@ -49,7 +49,17 @@ type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
 
 export interface TalentLocaleText {
-  statLabels: Record<StatKey | GlobalKey | 'damage' | 'cost' | 'cooldown' | 'castTime', string>;
+  // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
+  // label ("+10% Agility"), so locales don't repeat them here.
+  statLabels: Record<
+    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct'>
+    | GlobalKey
+    | 'damage'
+    | 'cost'
+    | 'cooldown'
+    | 'castTime',
+    string
+  >;
   roleLabels: Record<'tank' | 'healer' | 'dps', string>;
   perRank: string;
   noEffect: string;
@@ -6751,9 +6761,15 @@ function effectDescription(
   if (effect.grant) parts.push(text.grant(abilityName(effect.grant.ability)));
 
   const stats = effect.stats ?? {};
+  const PRIMARY_PCT: Partial<Record<StatKey, 'str' | 'agi' | 'int' | 'spi'>> = {
+    strPct: 'str',
+    agiPct: 'agi',
+    intPct: 'int',
+    spiPct: 'spi',
+  };
   for (const [key, value] of Object.entries(stats) as [StatKey, number][]) {
     if (value === undefined || value === 0) continue;
-    const label = text.statLabels[key];
+    const label = text.statLabels[PRIMARY_PCT[key] ?? (key as keyof typeof text.statLabels)];
     parts.push(text.increase(label, statAmount(key, value, lang), perRank));
   }
 
@@ -6805,6 +6821,8 @@ function effectDescription(
           perRank,
         ),
       );
+    // buffPct strengthens the named buff itself (e.g. "Increases Devotion Aura by 20%").
+    if (mod.buffPct) parts.push(text.increase(name, formatPercent(mod.buffPct, lang), perRank));
   }
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
@@ -6816,6 +6834,10 @@ function className(id: PlayerClass): string {
 
 export function tTalent(request: TalentTranslationRequest): string {
   const lang = getLanguage();
+  // English is the authored source of truth: the hand-written `description` strings carry
+  // the real numbers (kept honest against the effect by tests/talent_tooltip_accuracy.ts).
+  // The other 12 locales GENERATE from the effect data (effectDescription), so they cannot
+  // drift and need no per-string translation.
   if (lang === 'en' || lang === 'en_CA') {
     if (request.kind === 'talentMastery') {
       return request.field === 'name'

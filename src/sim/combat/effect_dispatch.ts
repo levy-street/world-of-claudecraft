@@ -20,7 +20,13 @@ import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
-import { abilityScalingPower, directHitBonus, dotTickBonus } from '../spell_scaling';
+import {
+  abilityScalingPower,
+  directHealBonus,
+  directHitBonus,
+  dotTickBonus,
+  hotTickBonus,
+} from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
@@ -162,18 +168,28 @@ export function runEffects(
         break;
       case 'heal': {
         const healTarget = target ?? p;
-        ctx.applyHeal(p, healTarget, ctx.rng.range(eff.min, eff.max), ability.name);
+        // Heals scale with Spell Power at the direct cast-time coefficient, the
+        // healing mirror of the direct-nuke rider (applyHeal fires the crit).
+        const healAmount =
+          ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
+        ctx.applyHeal(p, healTarget, healAmount, ability.name);
         break;
       }
       case 'hot': {
         const hotTarget = target ?? p;
+        // A HoT that RIDES a direct heal (Regrowth-style) does NOT also scale here:
+        // the direct component already took the cast-time coefficient, so scaling the
+        // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
+        const hybridHeal = res.effects.some((e) => e.type === 'heal');
+        const hotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
+        const hotSp = hybridHeal ? 0 : hotTickBonus(p.spellPower, eff.duration, eff.interval);
         ctx.applyAura(hotTarget, {
           id: ability.id,
           name: ability.name,
           kind: 'hot',
           remaining: eff.duration,
           duration: eff.duration,
-          value: Math.max(1, Math.round(eff.total / (eff.duration / eff.interval))),
+          value: hotBase + hotSp,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,

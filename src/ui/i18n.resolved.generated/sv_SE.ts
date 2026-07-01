@@ -436,6 +436,9 @@ export const sv_SE: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "Från dina {value} {stat}:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Ökar din attackstyrka, så att dina vapenslag landar hårdare.",
         "agi": "Skärper dina reflexer och din sikte, vilket förbättrar flera av dina stridsattribut.",
@@ -444,6 +447,7 @@ export const sv_SE: EnTranslations = {
         "spi": "Snabbar på hur fort en besvärjares mana återkommer under vila, utanför strid.",
         "armor": "Mildrar inkommande fysiska slag. Minskningen är större mot anfallare på lägre nivå och har ett tak på 75 %.",
         "attackPower": "Driver dina vapenattacker. Var 14:e attackstyrka ger 1 skada per sekund.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Din uppskattade vapenskada per sekund, som kombinerar ditt vapens skada och hastighet med din attackstyrka.",
         "critChance": "Din chans att en attack träffar kritiskt och orsakar dubbel skada.",
         "dodge": "Din chans att helt undvika en inkommande närstridsattack utan att ta skada."
@@ -466,6 +470,15 @@ export const sv_SE: EnTranslations = {
         "minorForClass": "Till föga nytta för din klass.",
         "baseChance": "Inkluderar en grundchans på 5 % som delas av alla äventyrare.",
         "dpsApprox": "En uppskattning, den utesluter kritiska träffar och förmågeskada."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

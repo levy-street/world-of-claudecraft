@@ -10,8 +10,16 @@
 // `recalcPlayerStats` in src/sim/entity.ts (armor reduction is imported outright).
 // tests/stat_tooltip.test.ts cross-checks this module against real
 // recalcPlayerStats output so the numbers cannot silently drift.
-import { armorReduction, type PlayerClass, type Stats, type WeaponInfo } from '../sim/types';
+
 import { CLASSES } from '../sim/data';
+import {
+  type AuraKind,
+  armorReduction,
+  type PlayerClass,
+  SPELL_POWER_PER_INT,
+  type Stats,
+  type WeaponInfo,
+} from '../sim/types';
 
 // The unarmed default weapon the sim falls back to (src/sim/entity.ts recalcPlayerStats),
 // so an unarmed character still reads its real fist damage instead of a flat 0.
@@ -26,10 +34,19 @@ export function weaponDps(weapon: WeaponInfo | null | undefined, attackPower: nu
   return ((w.min + w.max) / 2 + (attackPower / AP_PER_DPS) * w.speed) / w.speed;
 }
 
-/** The ten cells on the character sheet, in their itemUi.stats.* id form. */
+/** The cells on the character sheet, in their itemUi.stats.* id form. */
 export type StatId =
-  | 'str' | 'agi' | 'sta' | 'int' | 'spi'
-  | 'armor' | 'attackPower' | 'dps' | 'critChance' | 'dodge';
+  | 'str'
+  | 'agi'
+  | 'sta'
+  | 'int'
+  | 'spi'
+  | 'armor'
+  | 'attackPower'
+  | 'spellPower'
+  | 'dps'
+  | 'critChance'
+  | 'dodge';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -54,6 +71,43 @@ export interface StatEffect {
   level?: number;
 }
 
+// --- upstream source breakdown ("what FEEDS this stat") ---------------------
+// The complement of StatEffect (which is "what this stat feeds DOWNSTREAM"): one
+// line per origin of the stat's value, so a hover answers "where did my 358
+// Attack Power come from?". The lines are built to RECONCILE - they always sum
+// to the displayed cell value - by computing the nameable origins (base, the
+// attribute conversion, gear total, each active buff by name) and folding
+// everything else (talent flats + percents, item-set bonuses, druid forms) into
+// a single `talents` remainder. That keeps the sum exact without the model
+// needing the talent-modifier internals, the same reconcile-by-remainder trick
+// the existing effect lines use against recalcPlayerStats.
+export type StatSourceKind = 'base' | 'attributes' | 'gear' | 'buff' | 'talents';
+
+export interface StatSource {
+  kind: StatSourceKind;
+  /** Signed contribution in the stat's displayed unit (integer for stats / AP /
+   *  Spell Power, a percent number like 1.5 for crit / dodge). */
+  value: number;
+  /** `buff` lines carry the localized aura name the HUD resolved; `attributes`
+   *  lines may carry the primary stat they derive from (renders "From Agility"). */
+  name?: string;
+  fromStat?: StatId;
+}
+
+/** One equipped item's stat contribution, as the HUD reads it from ITEMS. */
+export interface GearStatSource {
+  name: string;
+  stats?: Partial<Pick<Stats, 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor'>>;
+  spellPower?: number;
+}
+
+/** One active aura's stat contribution, with the localized buff name. */
+export interface BuffStatSource {
+  kind: AuraKind;
+  value: number;
+  name: string;
+}
+
 export interface StatTooltipModel {
   stat: StatId;
   /** Left-column primary stats (str/agi/sta/int/spi) get a "From your N {stat}:"
@@ -68,6 +122,9 @@ export interface StatTooltipModel {
   baseChanceNote: boolean;
   /** Show the "estimate, excludes crits/abilities" note (the dps cell). */
   dpsApproxNote: boolean;
+  /** Upstream "what feeds this stat" lines (base / attributes / gear / each buff
+   *  by name / talents remainder). Sums to `statValue`. Empty for the dps cell. */
+  sources: StatSource[];
 }
 
 export interface StatTooltipInput {
@@ -77,12 +134,20 @@ export interface StatTooltipInput {
   level: number;
   /** entity.attackPower (already folds in buffs / talents). */
   attackPower: number;
+  /** entity.spellPower (Intellect conversion + flat gear / buff Spell Power). */
+  spellPower: number;
   /** entity.critChance, 0..1. */
   critChance: number;
   /** entity.dodgeChance, 0..1. */
   dodgeChance: number;
   /** Weapon damage-per-second exactly as the panel computes it. */
   dps: number;
+  /** Equipped items contributing stats, for the gear source line (HUD maps from
+   *  the equipment slots through ITEMS). */
+  gear?: GearStatSource[];
+  /** Active auras contributing stats, for the per-buff source lines (HUD maps
+   *  from the player's live auras, resolving each name). */
+  buffs?: BuffStatSource[];
 }
 
 // --- coefficients, mirroring src/sim/entity.ts recalcPlayerStats ------------
@@ -145,7 +210,9 @@ export function restingHealthPer5s(sta: number): number {
  *  mana gains round(spi / 3 + 4 + floor(level / 5)) every 2s). Per-tick rounded
  *  first to match the engine, then scaled by 2.5 ticks. */
 export function restingManaPer5s(spi: number, level: number): number {
-  return Math.round(Math.round(Math.max(0, spi) / 3 + 4 + Math.floor(level / 5)) * REGEN_TICKS_PER_5S);
+  return Math.round(
+    Math.round(Math.max(0, spi) / 3 + 4 + Math.floor(level / 5)) * REGEN_TICKS_PER_5S,
+  );
 }
 
 /** Build the structured breakdown for one stat cell. Pure: no DOM, no i18n.
@@ -214,13 +281,25 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
     case 'armor': {
       isPrimary = false;
       statValue = stats.armor;
-      effects.push({ kind: 'damageReduction', value: armorReduction(stats.armor, level) * 100, level });
+      effects.push({
+        kind: 'damageReduction',
+        value: armorReduction(stats.armor, level) * 100,
+        level,
+      });
       break;
     }
     case 'attackPower': {
       isPrimary = false;
       statValue = input.attackPower;
       effects.push({ kind: 'dpsFromAp', value: input.attackPower / AP_PER_DPS });
+      break;
+    }
+    case 'spellPower': {
+      isPrimary = false;
+      statValue = input.spellPower;
+      // Spell Power matters only to the mana classes that cast; melee/energy
+      // classes still see the cell but get the "minor benefit" note.
+      if (!mana) minorForClass = true;
       break;
     }
     case 'dps': {
@@ -243,5 +322,146 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
     }
   }
 
-  return { stat, isPrimary, statValue, effects, minorForClass, baseChanceNote, dpsApproxNote };
+  return {
+    stat,
+    isPrimary,
+    statValue,
+    effects,
+    minorForClass,
+    baseChanceNote,
+    dpsApproxNote,
+    sources: buildStatSources(stat, input),
+  };
+}
+
+// --- upstream source attribution --------------------------------------------
+// Primary attributes (str/agi/sta/int/spi) have no flat per-class buff aura except
+// agi/sta/int/spi/armor and the all-stats buff; Strength is only ever raised by the
+// all-stats buff. This maps each primary to the aura kinds that feed it directly.
+const PRIMARY_BUFF_KINDS: Record<'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor', AuraKind[]> = {
+  str: ['buff_allstats'],
+  agi: ['buff_agi', 'buff_allstats'],
+  sta: ['buff_sta', 'buff_allstats'],
+  int: ['buff_int', 'buff_allstats'],
+  spi: ['buff_spi', 'buff_allstats'],
+  armor: ['buff_armor'],
+};
+
+/** Base value of a primary attribute (or armor) from class + level, before any
+ *  gear / buff / talent layer. Mirrors recalcPlayerStats' opening derivation. */
+function basePrimary(cls: PlayerClass, key: keyof Stats, level: number): number {
+  const def = CLASSES[cls];
+  return def.baseStats[key] + def.statsPerLevel[key] * (level - 1);
+}
+
+/** Sum the contribution of one attribute (or spellPower) across equipped gear. */
+function gearTotal(gear: GearStatSource[], key: keyof Stats | 'spellPower'): number {
+  let total = 0;
+  for (const g of gear) {
+    if (key === 'spellPower') total += g.spellPower ?? 0;
+    else total += g.stats?.[key] ?? 0;
+  }
+  return total;
+}
+
+/** Per-buff source lines for the auras whose kind feeds `key`, each with its
+ *  resolved name so the tooltip can read "Mark of the Wild: +12". */
+function buffLines(buffs: BuffStatSource[], kinds: AuraKind[]): StatSource[] {
+  return buffs
+    .filter((b) => kinds.includes(b.kind) && b.value !== 0)
+    .map((b) => ({ kind: 'buff' as const, value: b.value, name: b.name }));
+}
+
+/** Build the upstream "what feeds this stat" lines so they sum to `final`. The
+ *  nameable origins (base, the attribute conversion, gear total, each buff) are
+ *  computed explicitly; whatever remains (talent flats + percent multipliers,
+ *  item-set bonuses, druid form bonuses) folds into one `talents` line so the
+ *  breakdown always reconciles to the displayed cell value. */
+export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSource[] {
+  const { cls, stats, level } = input;
+  const gear = input.gear ?? [];
+  const buffs = input.buffs ?? [];
+  const sources: StatSource[] = [];
+
+  // Append the reconciling remainder (label it talents/effects) unless it rounds
+  // away. `eps` is the smallest meaningful unit: 1 point for whole stats, 0.1 for
+  // the crit/dodge percents.
+  const finish = (final: number, eps: number): StatSource[] => {
+    const explained = sources.reduce((sum, s) => sum + s.value, 0);
+    const remainder = final - explained;
+    if (Math.abs(remainder) >= eps) sources.push({ kind: 'talents', value: remainder });
+    return sources;
+  };
+
+  switch (stat) {
+    case 'str':
+    case 'agi':
+    case 'sta':
+    case 'int':
+    case 'spi': {
+      sources.push({ kind: 'base', value: basePrimary(cls, stat, level) });
+      const g = gearTotal(gear, stat);
+      if (g !== 0) sources.push({ kind: 'gear', value: g });
+      sources.push(...buffLines(buffs, PRIMARY_BUFF_KINDS[stat]));
+      return finish(stats[stat], 1);
+    }
+    case 'armor': {
+      sources.push({ kind: 'base', value: basePrimary(cls, 'armor', level) });
+      // recalcPlayerStats adds armor from Agility (agi * 2) BEFORE druid Cat Form raises
+      // Agility, so the Agility that actually feeds armor excludes the Cat Form bonus
+      // (entity.ts). Subtract it when shifted so the "From Agility" line is honest; the Cat
+      // Form bonus still shows in the remainder of the Agility cell's own breakdown. (Crit
+      // and dodge read Agility AFTER the form bonus, so they need no such adjustment.)
+      const catAgiBonus = buffs.some((b) => b.kind === 'form_cat')
+        ? Math.max(2, Math.floor(level / 2))
+        : 0;
+      const fromAgi = (stats.agi - catAgiBonus) * AGI_ARMOR_PER_POINT;
+      if (fromAgi !== 0) sources.push({ kind: 'attributes', value: fromAgi, fromStat: 'agi' });
+      const g = gearTotal(gear, 'armor');
+      if (g !== 0) sources.push({ kind: 'gear', value: g });
+      sources.push(...buffLines(buffs, PRIMARY_BUFF_KINDS.armor));
+      return finish(stats.armor, 1);
+    }
+    case 'attackPower': {
+      // Attack power comes from the str/agi conversion (which already folds in
+      // gear / buff stats), the flat attack-power buffs by name, then talents /
+      // forms / the apPct multiplier in the remainder.
+      const meleeAp = stats.str * strApPerPoint(cls) + stats.agi * agiMeleeApPerPoint(cls);
+      sources.push({ kind: 'attributes', value: meleeAp });
+      sources.push(...buffLines(buffs, ['buff_ap']));
+      for (const b of buffs) {
+        if (b.kind === 'debuff_ap' && b.value !== 0) {
+          sources.push({ kind: 'buff', value: -b.value, name: b.name });
+        }
+      }
+      return finish(input.attackPower, 1);
+    }
+    case 'spellPower': {
+      const fromInt = Math.round(stats.int * SPELL_POWER_PER_INT);
+      sources.push({ kind: 'attributes', value: fromInt, fromStat: 'int' });
+      const g = gearTotal(gear, 'spellPower');
+      if (g !== 0) sources.push({ kind: 'gear', value: g });
+      sources.push(...buffLines(buffs, ['buff_spellpower']));
+      return finish(input.spellPower, 1);
+    }
+    case 'critChance': {
+      sources.push({ kind: 'base', value: 5 });
+      const fromAgi = stats.agi * AGI_CRIT_PER_POINT * 100;
+      if (fromAgi !== 0) sources.push({ kind: 'attributes', value: fromAgi, fromStat: 'agi' });
+      return finish(input.critChance * 100, 0.1);
+    }
+    case 'dodge': {
+      sources.push({ kind: 'base', value: 5 });
+      const fromAgi = stats.agi * AGI_DODGE_PER_POINT * 100;
+      if (fromAgi !== 0) sources.push({ kind: 'attributes', value: fromAgi, fromStat: 'agi' });
+      for (const b of buffLines(buffs, ['buff_dodge'])) {
+        sources.push({ ...b, value: b.value * 100 });
+      }
+      return finish(input.dodgeChance * 100, 0.1);
+    }
+    // The dps cell is an estimate the panel computes from weapon + AP; it has no
+    // clean per-source attribution, so it shows none (just its approximate note).
+    case 'dps':
+      return sources;
+  }
 }

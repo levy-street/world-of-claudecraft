@@ -436,6 +436,9 @@ export const pl_PL: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Zwiększa twoją moc ataku, więc twoje ciosy bronią są mocniejsze.",
         "agi": "Wyostrza twój refleks i celność, poprawiając kilka twoich statystyk bojowych.",
@@ -444,6 +447,7 @@ export const pl_PL: EnTranslations = {
         "spi": "Przyspiesza tempo regeneracji many rzucającego zaklęcia podczas odpoczynku, poza walką.",
         "armor": "Łagodzi nadchodzące ciosy fizyczne. Redukcja jest większa wobec atakujących o niższym poziomie i jest ograniczona do 75%.",
         "attackPower": "Zasila twoje ataki bronią. Każde 14 punktów mocy ataku dodaje 1 obrażenie na sekundę.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Twoje szacowane obrażenia bronią na sekundę, łączące obrażenia i szybkość twojej broni z mocą ataku.",
         "critChance": "Twoja szansa na zadanie ataku krytycznego, zadającego podwójne obrażenia.",
         "dodge": "Twoja szansa na całkowite uniknięcie nadchodzącego ataku wręcz, bez otrzymania obrażeń."
@@ -466,6 +470,15 @@ export const pl_PL: EnTranslations = {
         "minorForClass": "Niewielka korzyść dla twojej klasy.",
         "baseChance": "Obejmuje 5% szansy bazowej wspólnej dla wszystkich poszukiwaczy przygód.",
         "dpsApprox": "To szacunek, pomija trafienia krytyczne i obrażenia zdolności."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

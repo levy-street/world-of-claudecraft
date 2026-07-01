@@ -433,6 +433,13 @@ export const hudChromeStrings = {
   statInfo: {
     // Header above a primary stat's live breakdown, e.g. "From your 22 Agility:".
     fromYour: 'From your {value} {stat}:',
+    // Stat NAMES otherwise reuse itemUi.stats.*; Spell Power is a character-sheet
+    // only stat (no item carries a labeled Spell Power line), so its label lives
+    // here in the English-only HUD-chrome domain rather than the fully-translated
+    // item-stats catalog.
+    names: {
+      spellPower: 'Spell Power',
+    },
     desc: {
       str: 'Increases your attack power, so your weapon strikes land harder.',
       agi: 'Sharpens your reflexes and aim, improving several of your combat stats.',
@@ -442,6 +449,8 @@ export const hudChromeStrings = {
       armor:
         'Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.',
       attackPower: 'Powers your weapon attacks. Every 14 attack power adds 1 damage per second.',
+      spellPower:
+        'Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.',
       dps: "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
@@ -465,6 +474,20 @@ export const hudChromeStrings = {
       minorForClass: 'Of little benefit to your class.',
       baseChance: 'Includes a 5% base chance shared by all adventurers.',
       dpsApprox: 'An estimate, it excludes critical strikes and ability damage.',
+    },
+    // The upstream "where this stat comes from" breakdown: a header plus one line
+    // per origin. Every {value} is a live number; buff lines splice in the active
+    // aura's localized name. The talents line gathers everything not itemized
+    // above (talent bonuses, item-set bonuses, druid form bonuses) so the lines
+    // always add up to the stat shown on the sheet.
+    sources: {
+      header: 'Made up of:',
+      base: 'Base: {value}',
+      attributes: 'From your attributes: {value}',
+      fromAttribute: 'From {stat}: {value}',
+      gear: 'Equipped gear: {value}',
+      buff: '{name}: {value}',
+      talents: 'Talents and effects: {value}',
     },
   },
   // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".

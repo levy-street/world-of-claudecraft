@@ -129,6 +129,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自動では、デバイスに応じてデスクトップ操作かタッチ操作を選びます。デスクトップを選ぶとキーボードとマウスに固定され（キーボード付きタブレットなどに便利）、タッチを選ぶと画面上の操作になります。',
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': 'あなたの{stat}{value}による効果:',
+  'hudChrome.statInfo.names.spellPower': '呪文威力',
+  'hudChrome.statInfo.desc.spellPower':
+    '呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。',
+  'hudChrome.statInfo.sources.header': '内訳:',
+  'hudChrome.statInfo.sources.base': '基本: {value}',
+  'hudChrome.statInfo.sources.attributes': '能力値から: {value}',
+  'hudChrome.statInfo.sources.fromAttribute': '{stat}から: {value}',
+  'hudChrome.statInfo.sources.gear': '装備: {value}',
+  'hudChrome.statInfo.sources.buff': '{name}: {value}',
+  'hudChrome.statInfo.sources.talents': 'タレントと効果: {value}',
   'hudChrome.statInfo.desc.str': '攻撃力を上昇させ、武器による攻撃の威力を高めます。',
   'hudChrome.statInfo.desc.agi': '反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。',
   'hudChrome.statInfo.desc.sta': '肉体を強化し、最大体力と休憩中の体力回復速度を高めます。',

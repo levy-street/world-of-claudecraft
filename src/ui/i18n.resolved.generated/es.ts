@@ -436,6 +436,9 @@ export const es: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "De tu {value} de {stat}:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Aumenta tu poder de ataque, así que tus golpes con el arma impactan con más fuerza.",
         "agi": "Agudiza tus reflejos y tu puntería, mejorando varias de tus estadísticas de combate.",
@@ -444,6 +447,7 @@ export const es: EnTranslations = {
         "spi": "Acelera la rapidez con la que regresa el maná de un lanzador de hechizos al descansar, fuera de combate.",
         "armor": "Amortigua los golpes físicos que recibes. La reducción es mayor contra atacantes de menor nivel y tiene un tope del 75%.",
         "attackPower": "Potencia tus ataques con el arma. Cada 14 de poder de ataque añade 1 de daño por segundo.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "El daño por segundo estimado de tu arma, combinando el daño y la velocidad de tu arma con tu poder de ataque.",
         "critChance": "Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.",
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño."
@@ -466,6 +470,15 @@ export const es: EnTranslations = {
         "minorForClass": "De poco beneficio para tu clase.",
         "baseChance": "Incluye un 5% de probabilidad base que comparten todos los aventureros.",
         "dpsApprox": "Es una estimación, no incluye los golpes críticos ni el daño de habilidades."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

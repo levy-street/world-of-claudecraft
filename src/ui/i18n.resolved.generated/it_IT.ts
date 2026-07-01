@@ -436,6 +436,9 @@ export const it_IT: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "Dai tuoi {value} punti {stat}:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Aumenta la tua potenza d'attacco, così i colpi della tua arma sono più potenti.",
         "agi": "Affina i tuoi riflessi e la tua mira, migliorando diverse delle tue statistiche di combattimento.",
@@ -444,6 +447,7 @@ export const it_IT: EnTranslations = {
         "spi": "Accelera la velocità con cui il mana di un incantatore si rigenera mentre riposa, fuori dal combattimento.",
         "armor": "Attutisce i colpi fisici in arrivo. La riduzione è maggiore contro avversari di livello inferiore ed è limitata al 75%.",
         "attackPower": "Potenzia gli attacchi della tua arma. Ogni 14 punti di potenza d'attacco aggiungono 1 punto di danni al secondo.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "I danni al secondo stimati della tua arma, combinando i danni e la velocità della tua arma con la tua potenza d'attacco.",
         "critChance": "La tua probabilità che un attacco colpisca in modo critico, infliggendo danni doppi.",
         "dodge": "La tua probabilità di evitare completamente un attacco in mischia in arrivo, senza subire danni."
@@ -466,6 +470,15 @@ export const it_IT: EnTranslations = {
         "minorForClass": "Di scarso beneficio per la tua classe.",
         "baseChance": "Include una probabilità di base del 5% condivisa da tutti gli avventurieri.",
         "dpsApprox": "Una stima, esclude i colpi critici e i danni delle abilità."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

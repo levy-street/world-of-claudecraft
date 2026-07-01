@@ -131,6 +131,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'В режиме «Авто» управление для компьютера или сенсорное выбирается по вашему устройству. Выберите «Компьютер», чтобы включить клавиатуру и мышь (удобно на планшете с клавиатурой), или «Сенсорный» для экранного управления.',
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': 'От вашей характеристики ({value} {stat}):',
+  'hudChrome.statInfo.names.spellPower': 'Сила заклинаний',
+  'hudChrome.statInfo.desc.spellPower':
+    'Увеличивает урон ваших заклинаний и силу исцелений. Каждая единица интеллекта дает немного силы заклинаний, вдобавок к получаемой от снаряжения и усилений.',
+  'hudChrome.statInfo.sources.header': 'Складывается из:',
+  'hudChrome.statInfo.sources.base': 'База: {value}',
+  'hudChrome.statInfo.sources.attributes': 'От характеристик: {value}',
+  'hudChrome.statInfo.sources.fromAttribute': 'От характеристики {stat}: {value}',
+  'hudChrome.statInfo.sources.gear': 'Снаряжение: {value}',
+  'hudChrome.statInfo.sources.buff': '{name}: {value}',
+  'hudChrome.statInfo.sources.talents': 'Таланты и эффекты: {value}',
   'hudChrome.statInfo.desc.str':
     'Увеличивает силу атаки, благодаря чему удары вашим оружием бьют сильнее.',
   'hudChrome.statInfo.desc.agi':

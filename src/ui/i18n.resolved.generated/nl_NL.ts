@@ -436,6 +436,9 @@ export const nl_NL: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "Van je {value} {stat}:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Verhoogt je aanvalskracht, zodat je wapenslagen harder aankomen.",
         "agi": "Scherpt je reflexen en mikken, wat meerdere van je gevechtsstatistieken verbetert.",
@@ -444,6 +447,7 @@ export const nl_NL: EnTranslations = {
         "spi": "Versnelt hoe snel de mana van een spreukenwever terugkeert tijdens het rusten, buiten gevecht.",
         "armor": "Verzacht inkomende fysieke klappen. De vermindering is groter tegen aanvallers van een lager niveau en is gemaximeerd op 75%.",
         "attackPower": "Voedt je wapenaanvallen. Elke 14 aanvalskracht voegt 1 schade per seconde toe.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Je geschatte wapenschade per seconde, een combinatie van de schade en snelheid van je wapen met je aanvalskracht.",
         "critChance": "Je kans dat een aanval kritiek raakt en dubbele schade aanricht.",
         "dodge": "Je kans om een inkomende slagaanval volledig te ontwijken, zonder schade op te lopen."
@@ -466,6 +470,15 @@ export const nl_NL: EnTranslations = {
         "minorForClass": "Van weinig nut voor jouw klasse.",
         "baseChance": "Bevat een basiskans van 5% die door alle avonturiers gedeeld wordt.",
         "dpsApprox": "Een schatting, het sluit kritieke treffers en vaardigheidsschade uit."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

@@ -1,21 +1,22 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, armorReduction, type PlayerClass } from '../src/sim/types';
 import { CLASSES } from '../src/sim/content/classes';
 import { ITEMS } from '../src/sim/data';
+import { recalcPlayerStats } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
+import { ALL_CLASSES, armorReduction, type PlayerClass } from '../src/sim/types';
 import {
+  agiMeleeApPerPoint,
   buildStatTooltip,
   healthFromStamina,
+  isManaClass,
   manaFromIntellect,
   restingHealthPer5s,
   restingManaPer5s,
-  isManaClass,
-  strApPerPoint,
-  agiMeleeApPerPoint,
-  weaponDps,
   type StatEffect,
   type StatId,
   type StatTooltipInput,
+  strApPerPoint,
+  weaponDps,
 } from '../src/ui/stat_tooltip';
 
 // A gear-free, buff-free, talent-free player: autoEquip defaults to false, so the
@@ -34,15 +35,21 @@ function inputFor(cls: PlayerClass, p: ReturnType<typeof freshPlayer>): StatTool
     stats: p.stats,
     level: p.level,
     attackPower: p.attackPower,
+    spellPower: p.spellPower,
     critChance: p.critChance,
     dodgeChance: p.dodgeChance,
     dps: 0,
   };
 }
 
-const effect = (effects: StatEffect[], kind: StatEffect['kind']) => effects.find((e) => e.kind === kind);
-const valueOf = (cls: PlayerClass, p: ReturnType<typeof freshPlayer>, stat: StatId, kind: StatEffect['kind']) =>
-  effect(buildStatTooltip(stat, inputFor(cls, p)).effects, kind)?.value;
+const effect = (effects: StatEffect[], kind: StatEffect['kind']) =>
+  effects.find((e) => e.kind === kind);
+const statEffectVal = (
+  cls: PlayerClass,
+  p: ReturnType<typeof freshPlayer>,
+  stat: StatId,
+  kind: StatEffect['kind'],
+) => effect(buildStatTooltip(stat, inputFor(cls, p)).effects, kind)?.value;
 
 const LEVELS = [1, 10, 20];
 
@@ -51,15 +58,15 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
     for (const level of LEVELS) {
       it(`${cls} L${level}: attack power breakdown sums to entity.attackPower`, () => {
         const p = freshPlayer(cls, level);
-        const strAp = valueOf(cls, p, 'str', 'attackPower') ?? 0;
-        const agiAp = valueOf(cls, p, 'agi', 'attackPower') ?? 0; // present for rogue/hunter only
+        const strAp = statEffectVal(cls, p, 'str', 'attackPower') ?? 0;
+        const agiAp = statEffectVal(cls, p, 'agi', 'attackPower') ?? 0; // present for rogue/hunter only
         expect(strAp + agiAp).toBe(p.attackPower);
       });
 
       it(`${cls} L${level}: agility crit/dodge match the 5% base + 0.05%/agi curve`, () => {
         const p = freshPlayer(cls, level);
-        const critPct = valueOf(cls, p, 'agi', 'critPct') ?? 0;
-        const dodgePct = valueOf(cls, p, 'agi', 'dodgePct') ?? 0;
+        const critPct = statEffectVal(cls, p, 'agi', 'critPct') ?? 0;
+        const dodgePct = statEffectVal(cls, p, 'agi', 'dodgePct') ?? 0;
         expect(0.05 + critPct / 100).toBeCloseTo(p.critChance, 6);
         expect(0.05 + dodgePct / 100).toBeCloseTo(p.dodgeChance, 6);
       });
@@ -72,9 +79,10 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
         // Players keep their class starting chest even with autoEquip off, so total
         // armor = class growth + that gear's armor + agility*2. Isolate the agi part.
         let gearArmor = 0;
-        for (const id of Object.values(sim.equipment)) gearArmor += (id && ITEMS[id]?.stats?.armor) || 0;
+        for (const id of Object.values(sim.equipment))
+          gearArmor += (id && ITEMS[id]?.stats?.armor) || 0;
         const baseArmor = def.baseStats.armor + def.statsPerLevel.armor * (level - 1);
-        const agiArmor = valueOf(cls, p, 'agi', 'armor') ?? 0;
+        const agiArmor = statEffectVal(cls, p, 'agi', 'armor') ?? 0;
         expect(agiArmor).toBe(p.stats.armor - baseArmor - gearArmor); // proves the sim adds agi*2
         expect(agiArmor).toBe(p.stats.agi * 2); // proves the tooltip matches
       });
@@ -83,7 +91,7 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
         const p = freshPlayer(cls, level);
         const def = CLASSES[cls];
         const base = def.baseHp + def.hpPerLevel * (level - 1);
-        const maxHealth = valueOf(cls, p, 'sta', 'maxHealth') ?? 0;
+        const maxHealth = statEffectVal(cls, p, 'sta', 'maxHealth') ?? 0;
         expect(maxHealth).toBe(p.maxHp - base);
         expect(maxHealth).toBe(healthFromStamina(p.stats.sta));
       });
@@ -103,7 +111,7 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
       const p = freshPlayer(cls, 20);
       const def = CLASSES[cls];
       const base = def.baseMana + def.manaPerLevel * (20 - 1);
-      const maxMana = valueOf(cls, p, 'int', 'maxMana') ?? 0;
+      const maxMana = statEffectVal(cls, p, 'int', 'maxMana') ?? 0;
       expect(maxMana).toBe(p.maxResource - base);
       expect(maxMana).toBe(manaFromIntellect(p.stats.int));
     }
@@ -126,17 +134,30 @@ describe('class-aware effect selection', () => {
   it('Agility melee AP applies only to rogue and hunter', () => {
     expect(agiMeleeApPerPoint('rogue')).toBe(1);
     expect(agiMeleeApPerPoint('hunter')).toBe(1);
-    for (const cls of ['warrior', 'paladin', 'shaman', 'druid', 'mage', 'priest', 'warlock'] as PlayerClass[]) {
+    for (const cls of [
+      'warrior',
+      'paladin',
+      'shaman',
+      'druid',
+      'mage',
+      'priest',
+      'warlock',
+    ] as PlayerClass[]) {
       expect(agiMeleeApPerPoint(cls)).toBe(0);
     }
   });
 
   it('only hunters get a ranged attack power line from Agility', () => {
     const hunter = freshPlayer('hunter', 20);
-    const ranged = effect(buildStatTooltip('agi', inputFor('hunter', hunter)).effects, 'rangedAttackPower');
+    const ranged = effect(
+      buildStatTooltip('agi', inputFor('hunter', hunter)).effects,
+      'rangedAttackPower',
+    );
     expect(ranged?.value).toBe(hunter.stats.agi * 2);
     const warrior = freshPlayer('warrior', 20);
-    expect(effect(buildStatTooltip('agi', inputFor('warrior', warrior)).effects, 'rangedAttackPower')).toBeUndefined();
+    expect(
+      effect(buildStatTooltip('agi', inputFor('warrior', warrior)).effects, 'rangedAttackPower'),
+    ).toBeUndefined();
   });
 
   it('Intellect and Spirit show the minor-benefit note for non-mana classes only', () => {
@@ -229,8 +250,12 @@ describe('weaponDps', () => {
 });
 
 describe('effect wiring reconciles each effect kind with its source', () => {
-  const effVal = (cls: PlayerClass, p: ReturnType<typeof freshPlayer>, stat: StatId, kind: StatEffect['kind']) =>
-    valueOf(cls, p, stat, kind);
+  const effVal = (
+    cls: PlayerClass,
+    p: ReturnType<typeof freshPlayer>,
+    stat: StatId,
+    kind: StatEffect['kind'],
+  ) => statEffectVal(cls, p, stat, kind);
 
   it('attackPower cell emits dpsFromAp = attackPower / 14', () => {
     const p = freshPlayer('warrior', 20);
@@ -247,5 +272,134 @@ describe('effect wiring reconciles each effect kind with its source', () => {
     expect(effVal('mage', p, 'spi', 'manaRegen')).toBe(restingManaPer5s(p.stats.spi, p.level));
     // spell crit = 0.05 + int*0.0008 (sim.ts spellCrit); the line shows the int*0.0008 portion as a percent
     expect(effVal('mage', p, 'int', 'spellCritPct')).toBeCloseTo(p.stats.int * 0.0008 * 100, 6);
+  });
+});
+
+describe('upstream source breakdown reconciles to the displayed stat', () => {
+  // Builds the input WITH the live equipped gear + active auras, mirroring the HUD,
+  // so the source lines (base / attributes / gear / each buff / talents) must add
+  // up to the value the cell shows for every stat. The point of the model is that
+  // the lines always reconcile; if recalc grows a source we don't itemize, it lands
+  // in the talents remainder and this stays green (proving the sum, not each label).
+  function inputWithGear(sim: Sim, cls: PlayerClass): StatTooltipInput {
+    const p = sim.player;
+    const gear = [];
+    for (const id of Object.values(sim.equipment)) {
+      const item = id ? ITEMS[id] : null;
+      if (!item || (!item.stats && !item.spellPower)) continue;
+      gear.push({ name: item.id, stats: item.stats, spellPower: item.spellPower });
+    }
+    const buffs = p.auras.map((a) => ({ kind: a.kind, value: a.value, name: a.name }));
+    return {
+      cls,
+      stats: p.stats,
+      level: p.level,
+      attackPower: p.attackPower,
+      spellPower: p.spellPower,
+      critChance: p.critChance,
+      dodgeChance: p.dodgeChance,
+      dps: 0,
+      gear,
+      buffs,
+    };
+  }
+
+  const STATS: StatId[] = [
+    'str',
+    'agi',
+    'sta',
+    'int',
+    'spi',
+    'armor',
+    'attackPower',
+    'spellPower',
+    'critChance',
+    'dodge',
+  ];
+
+  for (const cls of ALL_CLASSES) {
+    for (const level of [1, 20]) {
+      it(`${cls} L${level}: every cell's sources sum to its displayed value`, () => {
+        const sim = new Sim({ seed: 1, playerClass: cls });
+        sim.setPlayerLevel(level);
+        const input = inputWithGear(sim, cls);
+        for (const stat of STATS) {
+          const model = buildStatTooltip(stat, input);
+          const sum = model.sources.reduce((acc, s) => acc + s.value, 0);
+          // Whole-number stats reconcile exactly; the crit/dodge percents carry the
+          // 0.05%/agi curve so allow a hair of float slack.
+          const eps = stat === 'critChance' || stat === 'dodge' ? 1e-6 : 0.5;
+          expect(Math.abs(sum - model.statValue)).toBeLessThan(eps);
+        }
+      });
+    }
+  }
+
+  it('itemizes a flat buff by name and folds talents into the remainder', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior' });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    // A flat +20 Stamina buff (e.g. Power Word: Fortitude) must appear as its own
+    // named line, and the whole breakdown must still reconcile.
+    p.auras.push({
+      id: 'power_word_fortitude',
+      name: 'Power Word: Fortitude',
+      kind: 'buff_sta',
+      remaining: 1800,
+      duration: 1800,
+      value: 20,
+      sourceId: p.id,
+      school: 'holy',
+    });
+    recalcPlayerStats(p, 'warrior', sim.equipment);
+    const input = inputWithGear(sim, 'warrior');
+    const sta = buildStatTooltip('sta', input);
+    const buffLine = sta.sources.find((s) => s.kind === 'buff');
+    expect(buffLine?.name).toBe('Power Word: Fortitude');
+    expect(buffLine?.value).toBe(20);
+    const sum = sta.sources.reduce((acc, s) => acc + s.value, 0);
+    expect(sum).toBe(sta.statValue);
+  });
+
+  it('spellPower breaks down into Intellect + flat gear/buff Spell Power', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'mage' });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    const model = buildStatTooltip('spellPower', inputWithGear(sim, 'mage'));
+    const fromInt = model.sources.find((s) => s.kind === 'attributes');
+    expect(fromInt?.fromStat).toBe('int');
+    expect(fromInt?.value).toBe(Math.round(p.stats.int * 0.5));
+    const sum = model.sources.reduce((acc, s) => acc + s.value, 0);
+    expect(sum).toBe(p.spellPower);
+    // non-casters get the minor-benefit note on the spell power cell
+    const warriorSim = new Sim({ seed: 1, playerClass: 'warrior' });
+    warriorSim.setPlayerLevel(20);
+    expect(buildStatTooltip('spellPower', inputWithGear(warriorSim, 'warrior')).minorForClass).toBe(
+      true,
+    );
+  });
+
+  it('cat-form druid attributes armor to the Agility that fed it (before the form bonus)', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'druid' });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    p.auras.push({
+      id: 'cat_form',
+      name: 'Cat Form',
+      kind: 'form_cat',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: p.id,
+      school: 'physical',
+    });
+    recalcPlayerStats(p, 'druid', sim.equipment);
+    const armor = buildStatTooltip('armor', inputWithGear(sim, 'druid'));
+    // recalc adds armor from Agility BEFORE Cat Form raises Agility (max(2, floor(lvl/2))),
+    // so the "From Agility" line must exclude that bonus - and the lines still reconcile.
+    const catBonus = Math.max(2, Math.floor(20 / 2));
+    const fromAgi = armor.sources.find((s) => s.kind === 'attributes');
+    expect(fromAgi?.value).toBe((p.stats.agi - catBonus) * 2);
+    expect(armor.sources.reduce((acc, s) => acc + s.value, 0)).toBe(armor.statValue);
   });
 });

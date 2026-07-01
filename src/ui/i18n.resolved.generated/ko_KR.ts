@@ -436,6 +436,9 @@ export const ko_KR: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
+      "names": {
+        "spellPower": "주문력"
+      },
       "desc": {
         "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
         "agi": "반사 신경과 조준 능력을 예리하게 하여 여러 전투 능력치를 향상시킵니다.",
@@ -444,6 +447,7 @@ export const ko_KR: EnTranslations = {
         "spi": "비전투 중 휴식할 때 시전자의 마나가 회복되는 속도를 빠르게 합니다.",
         "armor": "들어오는 물리 공격을 완화합니다. 낮은 레벨의 공격자에게 더 큰 효과를 발휘하며, 최대 75%까지 적용됩니다.",
         "attackPower": "무기 공격을 강화합니다. 전투력 14당 초당 피해 1이 추가됩니다.",
+        "spellPower": "주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.",
         "dps": "무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.",
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다."
@@ -466,6 +470,15 @@ export const ko_KR: EnTranslations = {
         "minorForClass": "당신의 직업에는 거의 도움이 되지 않습니다.",
         "baseChance": "모든 모험가가 공유하는 5%의 기본 확률이 포함되어 있습니다.",
         "dpsApprox": "추정치이며, 치명타와 기술 피해는 제외됩니다."
+      },
+      "sources": {
+        "header": "구성:",
+        "base": "기본: {value}",
+        "attributes": "능력치에서: {value}",
+        "fromAttribute": "{stat}에서: {value}",
+        "gear": "장비: {value}",
+        "buff": "{name}: {value}",
+        "talents": "특성 및 효과: {value}"
       }
     },
     "talents": {

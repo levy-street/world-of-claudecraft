@@ -436,6 +436,9 @@ export const ja_JP: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "あなたの{stat}{value}による効果:",
+      "names": {
+        "spellPower": "呪文威力"
+      },
       "desc": {
         "str": "攻撃力を上昇させ、武器による攻撃の威力を高めます。",
         "agi": "反射神経と狙いを鋭くし、複数の戦闘ステータスを向上させます。",
@@ -444,6 +447,7 @@ export const ja_JP: EnTranslations = {
         "spi": "戦闘外で休憩している間の、術者のマナ回復速度を速めます。",
         "armor": "物理攻撃のダメージを軽減します。軽減量は格下の攻撃者に対してより大きくなり、上限は75%です。",
         "attackPower": "武器による攻撃を強化します。攻撃力14ごとに秒間ダメージが1上昇します。",
+        "spellPower": "呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。",
         "dps": "武器のダメージと速度に攻撃力を組み合わせて算出した、推定の秒間ダメージです。",
         "critChance": "攻撃がクリティカルとなり、ダメージが2倍になる確率です。",
         "dodge": "迫り来る近接攻撃を完全に回避し、ダメージを受けない確率です。"
@@ -466,6 +470,15 @@ export const ja_JP: EnTranslations = {
         "minorForClass": "あなたのクラスにはほとんど効果がありません。",
         "baseChance": "全ての冒険者が共有する5%の基本確率を含みます。",
         "dpsApprox": "推定値であり、クリティカルやアビリティによるダメージは含みません。"
+      },
+      "sources": {
+        "header": "内訳:",
+        "base": "基本: {value}",
+        "attributes": "能力値から: {value}",
+        "fromAttribute": "{stat}から: {value}",
+        "gear": "装備: {value}",
+        "buff": "{name}: {value}",
+        "talents": "タレントと効果: {value}"
       }
     },
     "talents": {

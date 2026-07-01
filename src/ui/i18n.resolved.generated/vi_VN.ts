@@ -436,6 +436,9 @@ export const vi_VN: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "Từ {value} {stat} của bạn:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Tăng sức công kích, giúp đòn vũ khí của bạn đánh mạnh hơn.",
         "agi": "Mài giũa phản xạ và độ chính xác của bạn, cải thiện một số chỉ số chiến đấu.",
@@ -444,6 +447,7 @@ export const vi_VN: EnTranslations = {
         "spi": "Tăng tốc độ hồi mana của pháp sư khi nghỉ ngơi, ngoài chiến đấu.",
         "armor": "Giảm nhẹ các đòn tấn công vật lý nhận vào. Mức giảm lớn hơn khi đối đầu kẻ tấn công cấp thấp hơn và bị giới hạn ở 75%.",
         "attackPower": "Tăng sức mạnh cho các đòn tấn công vũ khí. Cứ 14 công kích sẽ thêm 1 sát thương mỗi giây.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Sát thương vũ khí ước tính mỗi giây của bạn, kết hợp sát thương và tốc độ vũ khí với sức công kích.",
         "critChance": "Tỉ lệ một đòn tấn công đánh chí mạng, gây sát thương gấp đôi.",
         "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương."
@@ -466,6 +470,15 @@ export const vi_VN: EnTranslations = {
         "minorForClass": "Ít lợi ích cho lớp nhân vật của bạn.",
         "baseChance": "Bao gồm 5% cơ hội nền tảng chung cho mọi nhà thám hiểm.",
         "dpsApprox": "Đây là con số ước tính, không tính đòn chí mạng và sát thương kỹ năng."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

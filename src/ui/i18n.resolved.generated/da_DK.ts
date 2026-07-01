@@ -436,6 +436,9 @@ export const da_DK: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "Fra din {value} {stat}:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Øger din angrebsstyrke, så dine våbenslag rammer hårdere.",
         "agi": "Skærper dine reflekser og dit sigte og forbedrer flere af dine kampegenskaber.",
@@ -444,6 +447,7 @@ export const da_DK: EnTranslations = {
         "spi": "Fremskynder hvor hurtigt en troldkasters mana vender tilbage under hvile, uden for kamp.",
         "armor": "Dæmper indkommende fysiske slag. Reduktionen er større mod angribere af lavere niveau og er begrænset til 75%.",
         "attackPower": "Driver dine våbenangreb. For hver 14 angrebsstyrke tilføjes 1 skade pr. sekund.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Din anslåede våbenskade pr. sekund, der kombinerer dit våbens skade og hastighed med din angrebsstyrke.",
         "critChance": "Din chance for at et angreb rammer kritisk og gør dobbelt skade.",
         "dodge": "Din chance for helt at undgå et indkommende nærkampsangreb og tage ingen skade."
@@ -466,6 +470,15 @@ export const da_DK: EnTranslations = {
         "minorForClass": "Af ringe gavn for din klasse.",
         "baseChance": "Inkluderer en 5% basischance, som deles af alle eventyrere.",
         "dpsApprox": "Et skøn, det udelader kritiske slag og evneskade."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

@@ -436,6 +436,9 @@ export const en_CA: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
+      "names": {
+        "spellPower": "Spell Power"
+      },
       "desc": {
         "str": "Increases your attack power, so your weapon strikes land harder.",
         "agi": "Sharpens your reflexes and aim, improving several of your combat stats.",
@@ -444,6 +447,7 @@ export const en_CA: EnTranslations = {
         "spi": "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
         "armor": "Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.",
         "attackPower": "Powers your weapon attacks. Every 14 attack power adds 1 damage per second.",
+        "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
@@ -466,6 +470,15 @@ export const en_CA: EnTranslations = {
         "minorForClass": "Of little benefit to your class.",
         "baseChance": "Includes a 5% base chance shared by all adventurers.",
         "dpsApprox": "An estimate, it excludes critical strikes and ability damage."
+      },
+      "sources": {
+        "header": "Made up of:",
+        "base": "Base: {value}",
+        "attributes": "From your attributes: {value}",
+        "fromAttribute": "From {stat}: {value}",
+        "gear": "Equipped gear: {value}",
+        "buff": "{name}: {value}",
+        "talents": "Talents and effects: {value}"
       }
     },
     "talents": {

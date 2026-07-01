@@ -130,6 +130,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자동은 기기에 따라 데스크톱 또는 터치 조작을 선택합니다. 데스크톱을 선택하면 키보드와 마우스로 고정되며(키보드가 있는 태블릿 등에 유용), 터치를 선택하면 화면 조작이 됩니다.',
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
+  'hudChrome.statInfo.names.spellPower': '주문력',
+  'hudChrome.statInfo.desc.spellPower':
+    '주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.',
+  'hudChrome.statInfo.sources.header': '구성:',
+  'hudChrome.statInfo.sources.base': '기본: {value}',
+  'hudChrome.statInfo.sources.attributes': '능력치에서: {value}',
+  'hudChrome.statInfo.sources.fromAttribute': '{stat}에서: {value}',
+  'hudChrome.statInfo.sources.gear': '장비: {value}',
+  'hudChrome.statInfo.sources.buff': '{name}: {value}',
+  'hudChrome.statInfo.sources.talents': '특성 및 효과: {value}',
   'hudChrome.statInfo.desc.str': '전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.',
   'hudChrome.statInfo.desc.agi':
     '반사 신경과 조준 능력을 예리하게 하여 여러 전투 능력치를 향상시킵니다.',

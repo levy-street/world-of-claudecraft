@@ -57,7 +57,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.masterLoot.thresholdSet",
     "hudChrome.options.showDevBadges",
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "es_ES": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -107,7 +116,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.masterLoot.thresholdSet",
     "hudChrome.options.showDevBadges",
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "fr_FR": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -157,7 +175,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.masterLoot.thresholdSet",
     "hudChrome.options.showDevBadges",
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "fr_CA": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -207,7 +234,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.masterLoot.thresholdSet",
     "hudChrome.options.showDevBadges",
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "en_CA": [],
   "it_IT": [
@@ -258,7 +294,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.masterLoot.thresholdSet",
     "hudChrome.options.showDevBadges",
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "de_DE": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -308,7 +353,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.masterLoot.thresholdSet",
     "hudChrome.options.showDevBadges",
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "zh_CN": [
     "hudChrome.keybinds.discord"
@@ -370,7 +424,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.masterLoot.thresholdSet",
     "hudChrome.options.showDevBadges",
     "hudChrome.options.startAttackOnAbility",
-    "hudChrome.party.promoteLeader"
+    "hudChrome.party.promoteLeader",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "ru_RU": [
     "hudChrome.keybinds.discord"
@@ -427,7 +490,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.few",
     "hudChrome.plurals.playersMatching.many",
     "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "hudChrome.plurals.playersMatching.other",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "pl_PL": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -481,7 +553,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.few",
     "hudChrome.plurals.playersMatching.many",
     "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "hudChrome.plurals.playersMatching.other",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "id_ID": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -535,7 +616,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.few",
     "hudChrome.plurals.playersMatching.many",
     "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "hudChrome.plurals.playersMatching.other",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "tr_TR": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -589,7 +679,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.few",
     "hudChrome.plurals.playersMatching.many",
     "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "hudChrome.plurals.playersMatching.other",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "sv_SE": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -643,7 +742,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.few",
     "hudChrome.plurals.playersMatching.many",
     "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "hudChrome.plurals.playersMatching.other",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "vi_VN": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -697,7 +805,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.few",
     "hudChrome.plurals.playersMatching.many",
     "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "hudChrome.plurals.playersMatching.other",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ],
   "da_DK": [
     "entities.npcs.auctioneer_voss.greeting",
@@ -751,6 +868,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.few",
     "hudChrome.plurals.playersMatching.many",
     "hudChrome.plurals.playersMatching.one",
-    "hudChrome.plurals.playersMatching.other"
+    "hudChrome.plurals.playersMatching.other",
+    "hudChrome.statInfo.desc.spellPower",
+    "hudChrome.statInfo.names.spellPower",
+    "hudChrome.statInfo.sources.attributes",
+    "hudChrome.statInfo.sources.base",
+    "hudChrome.statInfo.sources.buff",
+    "hudChrome.statInfo.sources.fromAttribute",
+    "hudChrome.statInfo.sources.gear",
+    "hudChrome.statInfo.sources.header",
+    "hudChrome.statInfo.sources.talents"
   ]
 };

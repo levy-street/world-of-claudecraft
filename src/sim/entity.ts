@@ -245,6 +245,12 @@ export function recalcPlayerStats(
     bonusAp += m.ap;
     bonusDodge += m.dodge;
     if (m.staPct) s.sta = Math.round(s.sta * (1 + m.staPct));
+    // Primary-attribute multipliers, applied to the fully-summed attribute. agiPct lands
+    // before the agi-derived armor/dodge below so the percentage flows into them.
+    if (m.strPct) s.str = Math.round(s.str * (1 + m.strPct));
+    if (m.agiPct) s.agi = Math.round(s.agi * (1 + m.agiPct));
+    if (m.intPct) s.int = Math.round(s.int * (1 + m.intPct));
+    if (m.spiPct) s.spi = Math.round(s.spi * (1 + m.spiPct));
   }
   // Floor Agility at 0 so a draining debuff (negative buff_agi) can never push the
   // derived armor/dodge below what zero Agility would give.

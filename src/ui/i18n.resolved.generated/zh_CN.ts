@@ -436,6 +436,9 @@ export const zh_CN: EnTranslations = {
     },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
+      "names": {
+        "spellPower": "法术强度"
+      },
       "desc": {
         "str": "提高你的攻击强度，使你的武器攻击造成更高的伤害。",
         "agi": "提高你的反应和准度，强化你的多项战斗属性。",
@@ -444,6 +447,7 @@ export const zh_CN: EnTranslations = {
         "spi": "加快施法者在脱离战斗、休息时恢复法力值的速度。",
         "armor": "减轻受到的物理打击。对等级较低的攻击者减伤效果更强，最高减伤上限为75%。",
         "attackPower": "强化你的武器攻击。每14点攻击强度可提高1点每秒伤害。",
+        "spellPower": "提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。",
         "dps": "你的预估武器每秒伤害，由武器的伤害与速度以及你的攻击强度共同计算得出。",
         "critChance": "你的攻击造成暴击的几率，暴击将造成双倍伤害。",
         "dodge": "你完全躲开来袭近战攻击、不受任何伤害的几率。"
@@ -466,6 +470,15 @@ export const zh_CN: EnTranslations = {
         "minorForClass": "对你的职业益处不大。",
         "baseChance": "包含所有冒险者共享的5%基础几率。",
         "dpsApprox": "此为预估值，不计入暴击和技能伤害。"
+      },
+      "sources": {
+        "header": "构成：",
+        "base": "基础：{value}",
+        "attributes": "来自属性：{value}",
+        "fromAttribute": "来自{stat}：{value}",
+        "gear": "装备：{value}",
+        "buff": "{name}：{value}",
+        "talents": "天赋与效果：{value}"
       }
     },
     "talents": {
