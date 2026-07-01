@@ -296,6 +296,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiteIntensity,
   RUN_SPEED,
   type SimConfig,
   type SimEvent,
@@ -2974,7 +2975,12 @@ export class Sim {
   }
 
   private hasLineOfSight(source: Entity, target: Entity): boolean {
-    return lineOfSightClear(this.cfg.seed, source.pos, target.pos);
+    const run =
+      this.delveRunForMob(source.id) ??
+      this.delveRunForMob(target.id) ??
+      this.delveRunForPlayer(source.id) ??
+      this.delveRunForPlayer(target.id);
+    return lineOfSightClear(this.cfg.seed, source.pos, target.pos, 0.05, run?.modules);
   }
 
   private lineOfSightBlocked(source: Entity, target: Entity, ability: AbilityDef): boolean {
@@ -5627,6 +5633,11 @@ export class Sim {
   /** Claim item loot from an opened delve chest (shown on the loot overlay). */
   collectDelveChestLoot(chestId: number, pid?: number): void {
     runsMod.collectDelveChestLoot(this.ctx, chestId, pid);
+  }
+
+  /** The Drowned Litany finale: lock in the chosen rite difficulty (offline). */
+  delveRiteChoose(intensity: RiteIntensity, pid?: number): void {
+    runsMod.delveRiteChoose(this.ctx, intensity, pid);
   }
 
   /** Read-only projection of the active lockpick attempt for IWorld (offline). */

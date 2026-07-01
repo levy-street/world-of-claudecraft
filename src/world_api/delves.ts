@@ -1,5 +1,5 @@
 import type { Ante, LootTier, PickAction, VisibleCell } from '../sim/lockpick';
-import type { DelveObjectiveState } from '../sim/types';
+import type { DelveObjectiveState, RiteIntensity } from '../sim/types';
 
 export interface DelveRunInfo {
   delveId: string;
@@ -79,6 +79,9 @@ export interface IWorldDelves {
   lockpickAction(action: PickAction): void;
   lockpickAbort(): void;
   collectDelveChestLoot(chestId: number): void;
+  /** The Drowned Litany finale: pick the rite difficulty (Easy/Medium/Hard) at
+   * the risen reliquary, which starts the shrine-sequence playback. */
+  delveRiteChoose(intensity: RiteIntensity): void;
   delveRun: DelveRunInfo | null;
   companionState: DelveCompanionInfo | null;
   delveMarks: number;

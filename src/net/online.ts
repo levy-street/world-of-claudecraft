@@ -38,6 +38,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiteIntensity,
   type SimEvent,
 } from '../sim/types';
 import {
@@ -2021,6 +2022,9 @@ export class ClientWorld implements IWorld {
   }
   collectDelveChestLoot(chestId: number): void {
     this.cmd({ cmd: 'collect_delve_chest_loot', objectId: chestId });
+  }
+  delveRiteChoose(intensity: RiteIntensity): void {
+    this.cmd({ cmd: 'delve_rite_choose', intensity });
   }
   // Mirror the authoritative lockpick lifecycle into lockpickState. The events
   // still flow to the HUD (drainEvents) for transient feedback (juice/sounds).

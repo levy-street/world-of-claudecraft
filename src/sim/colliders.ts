@@ -12,6 +12,7 @@ import {
   PROPS,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
+import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
@@ -453,8 +454,9 @@ export function isBlocked(
   z: number,
   r = 0.5,
   ignoreFences = false,
+  delveModules?: readonly string[],
 ): boolean {
-  const res = resolvePosition(seed, x, z, r, ignoreFences);
+  const res = resolvePosition(seed, x, z, r, ignoreFences, delveModules);
   return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
 }
 
@@ -655,17 +657,36 @@ export function lineOfSightClear(
   from: { x: number; z: number },
   to: { x: number; z: number },
   r = 0.05,
+  delveModules?: readonly string[],
 ): boolean {
   const dx = to.x - from.x;
   const dz = to.z - from.z;
   const d = Math.hypot(dx, dz);
   if (d < 1e-6) return true;
   const steps = Math.max(2, Math.ceil(d / 0.5));
+  if (isDelvePos(from.x)) {
+    const delve = delveAt(from.x);
+    const mods = delveModules?.length ? delveModules : delve ? defaultDelveModules(delve.id) : [];
+    const loc = delveModuleLocal(from.x, from.z, mods);
+    const moduleId = loc.moduleId as DelveModuleId;
+    const los = isLitanyModuleId(moduleId)
+      ? litanyModuleLosColliders(moduleId)
+      : delveModuleColliders(moduleId);
+    const toLocal = { x: to.x - loc.ox, z: to.z - loc.oz };
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const x = loc.localX + (toLocal.x - loc.localX) * t;
+      const z = loc.localZ + (toLocal.z - loc.localZ) * t;
+      const resolved = resolveAgainst(los, x, z, r);
+      if (Math.abs(resolved.x - x) > 1e-4 || Math.abs(resolved.z - z) > 1e-4) return false;
+    }
+    return true;
+  }
   for (let i = 1; i < steps; i++) {
     const t = i / steps;
     const x = from.x + dx * t;
     const z = from.z + dz * t;
-    if (isBlocked(seed, x, z, r)) return false;
+    if (isBlocked(seed, x, z, r, false, delveModules)) return false;
   }
   return true;
 }

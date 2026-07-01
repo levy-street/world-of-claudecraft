@@ -841,10 +841,16 @@ const MOB_KEYS: Record<string, string> = {
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
   bog_bloat: 'mob_murloc',
+  // The Drowned Litany (Mirefen Marsh): give marsh enemies the right silhouette
+  // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
+  mirefen_widowling: 'mob_spider',
+  sump_troll_devourer: 'mob_troll',
+  grave_silt_bulwark: 'mob_ogre',
+  drowned_cantor: 'delve_mob_acolyte',
   // gravecaller cult + necromancers: dark-robed casters
   gravecaller_cultist: 'mob_dark_caster',
   gravecaller_summoner: 'mob_dark_caster',
-  sister_nhalia: 'mob_dark_caster',
+  sister_nhalia_drowned_canticle: 'mob_dark_caster',
   deacon_voss: 'mob_dark_caster',
   wyrmcult_necromancer: 'mob_dark_caster',
   vael_the_mistcaller: 'mob_dark_caster',

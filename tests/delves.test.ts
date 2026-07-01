@@ -19,9 +19,16 @@ import {
   MOBS,
 } from '../src/sim/data';
 import { DELVE_MODULE_LAYOUTS, delveModuleColliders } from '../src/sim/delve_layout';
+import {
+  LITANY_MODULE_IDS,
+  litanyModuleGeometry,
+  litanyModuleIsNonRectangular,
+} from '../src/sim/delve_litany_layout';
+import { isLitanyPuzzleKind, LITANY_PUZZLE_KINDS } from '../src/sim/delves/drowned_litany_rooms';
 
 import { createMob } from '../src/sim/entity';
 import { solveLockActions } from '../src/sim/lockpick';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Rng } from '../src/sim/rng';
 import { DELVE_IMPLEMENTED_AFFIXES, Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
@@ -1223,7 +1230,7 @@ describe('The Drowned Litany (Phase 1 skeleton)', () => {
     expect(ok.delveRunForPlayer(ok.playerId)?.tierId).toBe('heroic');
   });
 
-  it('killing Sister Nhalia in the apse completes the objective and spawns the reward chest', () => {
+  it('killing Sister Nhalia in the apse completes the objective and spawns the Drowned Reliquary rite', () => {
     const sim = makeSim('warrior');
     enterLitany(sim);
     const run = sim.delveRunForPlayer(sim.playerId)!;
@@ -1239,20 +1246,15 @@ describe('The Drowned Litany (Phase 1 skeleton)', () => {
     sim.tick();
     expect(run.objective.complete).toBe(true);
     expect(run.rewardChestId).not.toBeNull();
+    expect(run.objectState[run.rewardChestId!]?.kind).toBe('drowned_reliquary');
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(true); // rite waits for difficulty choice
+    expect(run.objectIds.some((id) => run.objectState[id]?.kind === 'locked_chest')).toBe(false);
     expect(isDelvePos(sim.player.pos.x)).toBe(true); // not ejected
   });
 });
 
 describe('The Drowned Litany (Phase 2 marsh layouts: navigable, distinct)', () => {
-  const LITANY_MODULES = [
-    'litany_sluice',
-    'litany_ledger',
-    'litany_ring',
-    'litany_baptistry',
-    'litany_choir_loft',
-    'litany_causeway',
-    'litany_apse',
-  ] as const;
+  const LITANY_MODULES = LITANY_MODULE_IDS;
   // A generous player-body margin: the choke constraint is passages >= ~4u, i.e.
   // comfortably more than 2 * BODY_R. A* (findPlayerPath) uses a similar radius.
   const BODY_R = 0.9;
@@ -1341,6 +1343,23 @@ describe('The Drowned Litany (Phase 2 marsh layouts: navigable, distinct)', () =
     for (const l of litany) expect(reliquary).not.toContain(l);
   });
 
+  it('all seven Litany rooms have explicit non-rectangular geometry profiles', () => {
+    const profiles = new Set<string>();
+    for (const moduleId of LITANY_MODULES) {
+      const geo = litanyModuleGeometry(moduleId)!;
+      profiles.add(geo.profile);
+      expect(geo.islands.length, `${moduleId} walkable islands`).toBeGreaterThan(0);
+      expect(litanyModuleIsNonRectangular(moduleId), `${moduleId} non-rectangular footprint`).toBe(
+        true,
+      );
+      expect(
+        geo.hazards.some((h) => h.r >= 7),
+        `${moduleId} larger Blackwater`,
+      ).toBe(true);
+    }
+    expect(profiles.size).toBe(LITANY_MODULES.length);
+  });
+
   it('the boss apse keeps a clear stomp ring of interior cover around the dais', () => {
     const layout = DELVE_MODULE_LAYOUTS.litany_apse;
     expect(layout.dais.r).toBeGreaterThanOrEqual(12);
@@ -1348,8 +1367,15 @@ describe('The Drowned Litany (Phase 2 marsh layouts: navigable, distinct)', () =
     // |x|=wallX or an end wall z=zMin/zMax) so we test placed obstacles, not the
     // shell the dais legitimately abuts.
     const wallX = layout.wallX ?? 25;
+    const hazardSet = new Set(
+      litanyModuleGeometry('litany_apse')!.hazards.map((h) => `${h.x},${h.z}`),
+    );
     const interior = delveModuleColliders('litany_apse').filter(
-      (c) => Math.abs(c.x) < wallX - 2 && c.z > layout.zMin + 2 && c.z < layout.zMax - 2,
+      (c) =>
+        Math.abs(c.x) < wallX - 2 &&
+        c.z > layout.zMin + 2 &&
+        c.z < layout.zMax - 2 &&
+        !hazardSet.has(`${c.x},${c.z}`),
     );
     // No interior obstacle may intrude on the dais radius.
     for (let r = 0; r <= layout.dais.r; r += 2) {
@@ -1367,15 +1393,20 @@ describe('The Drowned Litany (Phase 2 marsh layouts: navigable, distinct)', () =
 });
 
 describe('The Drowned Litany (Phase 4 enemy kits)', () => {
-  it('the Drowned Cantor is a priority caster (Litany Pulse aoePulse)', () => {
-    expect(MOBS.drowned_cantor.aoePulse?.name).toBe('Litany Pulse');
+  it('the Drowned Cantor is a ranged priority caster that heals allies', () => {
+    // Stands off casting Drowned Dirge (petSpell) and heals wounded drowned (mendAlly).
+    expect(MOBS.drowned_cantor.petSpell?.name).toBe('Drowned Dirge');
+    expect(MOBS.drowned_cantor.petSpell?.range ?? 0).toBeGreaterThan(12); // true ranged, not melee
+    expect(MOBS.drowned_cantor.mendAlly?.name).toBe('Litany Pulse');
+    expect(MOBS.drowned_cantor.aoePulse).toBeUndefined();
   });
 
-  it('the Reedbound Acolyte lobs ranged Rotwater Vials (nature projectile pulse)', () => {
+  it('the Reedbound Acolyte is a ranged attacker lobbing Rotwater Vials', () => {
     const m = MOBS.reedbound_acolyte;
-    expect(m.aoePulse?.name).toBe('Rotwater Vials');
-    expect(m.aoePulse?.school).toBe('nature');
-    expect(m.aoePulse?.fx).toBe('projectile');
+    expect(m.petSpell?.name).toBe('Rotwater Vial');
+    expect(m.petSpell?.school).toBe('nature');
+    expect(m.petSpell?.range ?? 0).toBeGreaterThan(12); // holds at range, does not melee
+    expect(m.aoePulse).toBeUndefined();
   });
 
   it('the Deepfen Spearjaw is a frenzying skirmisher (fast + frenzyOnHit)', () => {
@@ -1391,26 +1422,53 @@ describe('The Drowned Litany (Phase 4 enemy kits)', () => {
     expect(m.chillOnHit?.mult ?? 1).toBeLessThan(1); // slows movement
   });
 
-  it('the Grave-Silt Bulwark cleaves and is a CC-immune elite', () => {
+  it('the Grave-Silt Bulwark cleaves, wards allies, and is a CC-immune elite', () => {
     const m = MOBS.grave_silt_bulwark;
     expect(m.cleave?.name).toBe('Silt Cleave');
+    expect(m.wardAllies?.name).toBe('Silt Ward');
     expect(m.elite).toBe(true);
     expect(m.ccImmune).toBe(true);
   });
 
-  it('the Sump Troll Devourer is a self-shielding elite (Silt Hide stoneskin)', () => {
+  it('the Sump Troll Devourer is a self-shielding elite with a stomp (Silt Hide + Sump Stomp)', () => {
     const m = MOBS.sump_troll_devourer;
     expect(m.elite).toBe(true);
     expect(m.stoneskin?.name).toBe('Silt Hide');
     expect(m.stoneskin?.amount ?? 0).toBeGreaterThan(0);
+    expect(m.stomp?.name).toBe('Sump Stomp');
   });
 
-  it('the Choir Thrall is a fragile basic-melee swarm add', () => {
+  it('the Choir Thrall is a fragile swarm add with pack frenzy', () => {
     const m = MOBS.choir_thrall;
     expect(m.hpBase).toBeLessThan(MOBS.drowned_cantor.hpBase);
+    expect(m.packFrenzy?.hasteMult ?? 1).toBeGreaterThan(1);
     expect(m.aoePulse).toBeUndefined();
     expect(m.cleave).toBeUndefined();
     expect(m.elite).toBeUndefined();
+  });
+
+  it('the Reedbound Acolyte fires Rotwater Vials from range and never closes to melee', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const p = sim.player;
+    // A lone acolyte 14 yards ahead: inside its 15y aggro + 22y cast range, well
+    // beyond melee. A true ranged caster stands and casts; a melee mob would close.
+    const acolyte = createMob(990301, MOBS.reedbound_acolyte, 13, {
+      x: p.pos.x,
+      y: 0,
+      z: p.pos.z + 14,
+    });
+    (sim as any).addEntity(acolyte);
+    run.mobIds.push(acolyte.id);
+    const hp0 = p.hp;
+    let minDist = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < 20 * 12 && !acolyte.dead; i++) {
+      sim.tick();
+      minDist = Math.min(minDist, Math.hypot(acolyte.pos.x - p.pos.x, acolyte.pos.z - p.pos.z));
+    }
+    expect(p.hp, 'acolyte should land ranged Rotwater Vials').toBeLessThan(hp0);
+    expect(minDist, 'acolyte should hold at range, never melee').toBeGreaterThan(8);
   });
 });
 
@@ -1523,22 +1581,42 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     litany_causeway: 0, // no puzzle
   };
 
-  function plateSlots(moduleId: string) {
+  function puzzleSlots(moduleId: string) {
     return DELVE_MODULES[moduleId].interactableSlots.filter((s) =>
-      s.variants.includes('pressure_plate'),
+      s.variants.some((v) => isLitanyPuzzleKind(v) || v === 'pressure_plate'),
     );
+  }
+
+  function enterModule(sim: Sim, moduleId: string) {
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = [moduleId];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    return run;
   }
 
   it('each puzzle room defines the handoff plate count (causeway has none)', () => {
     for (const [m, count] of Object.entries(PLATE_COUNTS)) {
-      expect(plateSlots(m).length, `${m} plate count`).toBe(count);
+      expect(puzzleSlots(m).length, `${m} plate count`).toBe(count);
+    }
+  });
+
+  it('litany puzzle slots use semantic object kinds, not pressure_plate', () => {
+    for (const kind of LITANY_PUZZLE_KINDS) {
+      expect(kind).not.toBe('pressure_plate');
+    }
+    for (const m of Object.keys(PLATE_COUNTS)) {
+      if (PLATE_COUNTS[m] === 0) continue;
+      for (const slot of puzzleSlots(m)) {
+        expect(slot.variants.some((v) => isLitanyPuzzleKind(v))).toBe(true);
+      }
     }
   });
 
   it('every puzzle plate sits on walkable floor, clear of obstacles and hazards', () => {
     for (const m of Object.keys(PLATE_COUNTS)) {
       const hazards = DELVE_MODULES[m].hazards ?? [];
-      for (const slot of plateSlots(m)) {
+      for (const slot of puzzleSlots(m)) {
         expect(plateBlocked(m, slot.x, slot.z), `${m} plate (${slot.x},${slot.z}) blocked`).toBe(
           false,
         );
@@ -1573,24 +1651,154 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     }
     sim.tick();
     expect(run.exitPortalOpen).toBe(false);
-    const plates = run.objectIds
+    const puzzles = run.objectIds
       .map((id) => ({ id, state: run.objectState[id] }))
-      .filter((o) => o.state?.kind === 'pressure_plate');
-    expect(plates.length).toBe(PLATE_COUNTS.litany_sluice);
-    for (let i = 0; i < plates.length; i++) {
-      const plateEnt = sim.entities.get(plates[i].id)!;
-      sim.player.pos = { ...plateEnt.pos };
-      sim.player.prevPos = { ...plateEnt.pos };
+      .filter((o) => o.state && isLitanyPuzzleKind(o.state.kind));
+    expect(puzzles.length).toBe(PLATE_COUNTS.litany_sluice);
+    for (let i = 0; i < puzzles.length; i++) {
+      const puzzleEnt = sim.entities.get(puzzles[i].id)!;
+      sim.player.pos = { ...puzzleEnt.pos };
+      sim.player.prevPos = { ...puzzleEnt.pos };
       sim.tick();
-      expect(run.exitPortalOpen, `after plate ${i + 1}/${plates.length}`).toBe(
-        i === plates.length - 1,
+      expect(run.exitPortalOpen, `after puzzle ${i + 1}/${puzzles.length}`).toBe(
+        i === puzzles.length - 1,
       );
     }
+  });
+
+  it('bell ropes deal 18 damage to all living Drowned Cantors in combat', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['litany_choir_loft'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const origin = run.origin;
+    const zBase = delveModuleZOffset(run.modules, 0);
+    const cantor = createMob(880001, MOBS.drowned_cantor, 12, {
+      x: origin.x,
+      y: 0,
+      z: origin.z + zBase + 40,
+    });
+    cantor.inCombat = true;
+    (sim as any).addEntity(cantor);
+    run.mobIds.push(cantor.id);
+    const hp0 = cantor.hp;
+    const ropeId = run.objectIds.find((id) => run.objectState[id]?.kind === 'bell_rope');
+    expect(ropeId).toBeDefined();
+    const rope = sim.entities.get(ropeId!)!;
+    sim.player.pos = { ...rope.pos };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(run.objectState[ropeId!].triggered).toBe(true);
+    expect(hp0 - cantor.hp).toBe(18);
+  });
+
+  it('baptistry spawns three waves before egg-sacs appear', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = enterModule(sim, 'litany_baptistry');
+    expect(run.litanyBaptistry?.wave).toBe(0);
+    expect(run.litanyBaptistry?.eggsEnabled).toBe(false);
+    expect(run.mobIds.length).toBe(6); // PRD wave 1: 4 widowlings + 2 spearjaws
+    const eggSacs = () =>
+      run.objectIds.filter((id) => run.objectState[id]?.kind === 'widow_egg_sac').length;
+    expect(eggSacs()).toBe(0);
+    const killAll = () => {
+      for (const id of [...run.mobIds]) {
+        const mob = sim.entities.get(id);
+        if (mob && !mob.dead)
+          (sim as any).dealDamage(
+            sim.player,
+            mob,
+            mob.maxHp + 1,
+            false,
+            'physical',
+            null,
+            'hit',
+            true,
+          );
+      }
+      sim.tick();
+    };
+    killAll();
+    expect(run.mobIds.length).toBeGreaterThan(2);
+    killAll();
+    expect(run.mobIds.length).toBeGreaterThan(4);
+    killAll();
+    expect(run.litanyBaptistry?.eggsEnabled).toBe(true);
+    expect(eggSacs()).toBe(3);
+  });
+});
+
+describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
+  function enterModule(sim: Sim, moduleId: string) {
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = [moduleId];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    return run;
+  }
+
+  it('high_water increases Blackwater pulse damage by 35%', () => {
+    const pulse = (affixes: string[]) => {
+      const sim = makeSim('warrior');
+      enterLitany(sim, 'normal');
+      const run = enterModule(sim, 'litany_baptistry');
+      run.affixes = affixes;
+      run.blackwaterTimer = 0;
+      const h = DELVE_MODULES.litany_baptistry.hazards![0];
+      const zBase = delveModuleZOffset(run.modules, 0);
+      const p = sim.player;
+      p.pos.x = run.origin.x + h.x;
+      p.pos.z = run.origin.z + zBase + h.z;
+      p.prevPos = { ...p.pos };
+      const hp0 = p.hp;
+      for (let i = 0; i < 20; i++) sim.tick();
+      return hp0 - p.hp;
+    };
+    const base = pulse([]);
+    const flooded = pulse(['high_water']);
+    expect(flooded).toBeGreaterThan(base);
+    expect(flooded / base).toBeCloseTo(1.35, 1);
+  });
+
+  it('belligerent_dead gives Grave-Silt Bulwark +10% maxHp on spawn', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim, 'heroic');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.affixes = ['belligerent_dead'];
+    run.modules = ['litany_choir_loft'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const bulwark = [...sim.entities.values()].find((e) => e.templateId === 'grave_silt_bulwark')!;
+    const heroicTier = DELVES.drowned_litany.tiers.find((t) => t.id === 'heroic')!;
+    const spawnLevel = MOBS.grave_silt_bulwark.minLevel + heroicTier.enemyLevelBonus;
+    const base = createMob(880002, MOBS.grave_silt_bulwark, spawnLevel, { x: 0, y: 0, z: 0 });
+    expect(bulwark.maxHp).toBe(Math.round(base.maxHp * 1.1));
+  });
+
+  it('lively_choir adds two Choir Thralls on cantor boss phases', () => {
+    const sim = makeSim();
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.affixes = ['lively_choir'];
+    run.modules = ['litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const boss = [...sim.entities.values()].find(
+      (e) => e.templateId === 'sister_nhalia_drowned_canticle',
+    )!;
+    boss.inCombat = true;
+    boss.hp = Math.ceil(boss.maxHp * 0.69);
+    (sim as any).updateDelveRuns();
+    const thralls = [...sim.entities.values()].filter((e) => e.templateId === 'choir_thrall');
+    expect(thralls.length).toBeGreaterThanOrEqual(2);
   });
 });
 
 describe('delve module containment (no backtrack / no out-of-map escape)', () => {
-  const R = 0.5;
+  const R = PLAYER_BODY_RADIUS;
 
   function activeModuleBounds(sim: Sim) {
     const run = sim.delveRunForPlayer(sim.playerId)!;
@@ -1643,5 +1851,319 @@ describe('delve module containment (no backtrack / no out-of-map escape)', () =>
     // or the gap between them.
     const res = (sim as any).resolveMove(p.pos.x, p.pos.z, p.pos.x, b.oz - 300, R, p);
     expect(res.z).toBeGreaterThanOrEqual(b.oz + b.layout.zMin + 1 + R - 1e-6);
+  });
+});
+
+describe('The Drowned Litany Hunter LOS uses active module order', () => {
+  it('blocks LOS with the active Litany module instead of default module order', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['litany_ring', 'litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const mob = createMob((sim as any).nextId++, MOBS.choir_thrall, 12, {
+      x: run.origin.x,
+      y: 0,
+      z: run.origin.z + 72,
+    });
+    (sim as any).addEntity(mob);
+    run.mobIds.push(mob.id);
+    sim.player.pos.x = run.origin.x;
+    sim.player.pos.z = run.origin.z + 12;
+    mob.pos.x = run.origin.x;
+    mob.pos.z = run.origin.z + 72;
+    expect((sim as any).hasLineOfSight(sim.player, mob)).toBe(false);
+    mob.pos.x = run.origin.x + 18;
+    mob.pos.z = run.origin.z + 42;
+    expect((sim as any).hasLineOfSight(sim.player, mob)).toBe(true);
+  });
+});
+
+describe('The Drowned Litany (Phase 6 boss mechanics)', () => {
+  function enterLitanyApse(sim: Sim) {
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    return run;
+  }
+
+  function nhalia(sim: Sim) {
+    return [...sim.entities.values()].find(
+      (e) => e.templateId === 'sister_nhalia_drowned_canticle',
+    )!;
+  }
+
+  it('Sister Nhalia has no generic stomp/summonAdds/enrage placeholder traits', () => {
+    const m = MOBS.sister_nhalia_drowned_canticle;
+    expect(m.stomp).toBeUndefined();
+    expect(m.summonAdds).toBeUndefined();
+    expect(m.enrage).toBeUndefined();
+  });
+
+  it('spawns 2 Drowned Cantors at 70% and 35% HP with a shield until both die', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    const boss = nhalia(sim);
+    boss.inCombat = true;
+
+    boss.hp = Math.ceil(boss.maxHp * 0.69);
+    (sim as any).updateDelveRuns();
+    let cantors = [...sim.entities.values()].filter((e) => e.templateId === 'drowned_cantor');
+    expect(cantors.length).toBe(2);
+    expect(boss.auras.some((a) => a.id === 'nhalia_cantor_shield')).toBe(true);
+    expect(run.nhaliaBoss?.firedCantorPhases).toBe(1);
+
+    for (const c of cantors)
+      (sim as any).dealDamage(sim.player, c, c.maxHp + 1, false, 'physical', null, 'hit', true);
+    (sim as any).updateDelveRuns();
+    expect(boss.auras.some((a) => a.id === 'nhalia_cantor_shield')).toBe(false);
+
+    boss.hp = Math.ceil(boss.maxHp * 0.34);
+    (sim as any).updateDelveRuns();
+    cantors = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'drowned_cantor' && !e.dead,
+    );
+    expect(cantors.length).toBe(2);
+    expect(run.nhaliaBoss?.firedCantorPhases).toBe(2);
+    expect(boss.auras.some((a) => a.id === 'nhalia_cantor_shield')).toBe(true);
+  });
+
+  it('Final Bell at 10% HP spawns Choir Thralls and hits the party once', () => {
+    const sim = makeSim();
+    enterLitanyApse(sim);
+    const boss = nhalia(sim);
+    boss.inCombat = true;
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.nhaliaBoss!.firedCantorPhases = 2;
+    const hp0 = sim.player.hp;
+    boss.hp = Math.max(1, Math.round(boss.maxHp * 0.08));
+    (sim as any).updateDelveRuns();
+    expect(sim.delveRunForPlayer(sim.playerId)!.nhaliaBoss?.finalBellFired).toBe(true);
+    const thralls = [...sim.entities.values()].filter((e) => e.templateId === 'choir_thrall');
+    expect(thralls.length).toBeGreaterThanOrEqual(4);
+    expect(hp0 - sim.player.hp).toBeGreaterThan(0);
+    boss.hp = Math.max(1, Math.round(boss.maxHp * 0.05));
+    (sim as any).updateDelveRuns();
+    const thrallsAfter = [...sim.entities.values()].filter((e) => e.templateId === 'choir_thrall');
+    expect(thrallsAfter.length).toBe(thralls.length);
+  });
+
+  it('Blackwater Mark puddles damage a standing player (driver path, not static hazard)', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    const boss = nhalia(sim);
+    boss.inCombat = true;
+    run.nhaliaBoss!.markTimer = 0.001;
+    (sim as any).updateDelveRuns();
+    expect(run.nhaliaBoss!.marks.length).toBe(1);
+    const mark = run.nhaliaBoss!.marks[0]!;
+    sim.player.pos = { x: mark.x, y: sim.player.pos.y, z: mark.z };
+    sim.player.prevPos = { ...sim.player.pos };
+    const hp0 = sim.player.hp;
+    for (let i = 0; i < 25; i++) (sim as any).updateDelveRuns();
+    expect(sim.player.hp).toBeLessThan(hp0);
+  });
+
+  it('Blackwater Mark timing is deterministic for a fixed seed', () => {
+    const runMark = (seed: number) => {
+      const sim = makeSim('warrior', seed);
+      const run = enterLitanyApse(sim);
+      const boss = nhalia(sim);
+      boss.inCombat = true;
+      run.nhaliaBoss!.markTimer = 0.001;
+      (sim as any).updateDelveRuns();
+      return run.nhaliaBoss!.marks.map((m) => [Math.round(m.x * 10), Math.round(m.z * 10)]);
+    };
+    expect(runMark(42)).toEqual(runMark(42));
+  });
+});
+
+describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
+  function enterLitanyApse(sim: Sim) {
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.bountiful = false;
+    run.modules = ['litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    return run;
+  }
+
+  function killNhalia(sim: Sim) {
+    const boss = [...sim.entities.values()].find(
+      (e) => e.templateId === 'sister_nhalia_drowned_canticle',
+    )!;
+    (sim as any).dealDamage(sim.player, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+  }
+
+  function waitForRitePlayback(sim: Sim, run: ReturnType<typeof enterLitanyApse>) {
+    let guard = 0;
+    while (run.drownedLitanyRite?.sequencePlaying && guard++ < 200) sim.tick();
+    expect(run.drownedLitanyRite?.sequencePlaying).toBe(false);
+  }
+
+  function clickShrine(sim: Sim, run: ReturnType<typeof enterLitanyApse>, kind: string) {
+    const rite = run.drownedLitanyRite!;
+    const id = rite.shrineEntityIds[kind as keyof typeof rite.shrineEntityIds];
+    const ent = sim.entities.get(id)!;
+    sim.player.pos = { ...ent.pos };
+    sim.player.prevPos = { ...ent.pos };
+    sim.delveInteract(id);
+  }
+
+  function clickWrongShrine(sim: Sim, run: ReturnType<typeof enterLitanyApse>) {
+    const expected = run.drownedLitanyRite!.sequence[run.drownedLitanyRite!.currentIndex]!;
+    const wrong = (
+      ['rite_shrine_bell', 'rite_shrine_candle', 'rite_shrine_reed', 'rite_shrine_skull'] as const
+    ).find((k) => k !== expected)!;
+    clickShrine(sim, run, wrong);
+  }
+
+  function replaySequence(sim: Sim, run: ReturnType<typeof enterLitanyApse>) {
+    for (const kind of run.drownedLitanyRite!.sequence) clickShrine(sim, run, kind);
+  }
+
+  function chooseRite(sim: Sim, intensity: 'easy' | 'medium' | 'hard') {
+    (sim as Sim).delveRiteChoose(intensity);
+  }
+
+  it('awaits a difficulty choice after the boss dies (no playback yet)', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(true);
+    expect(run.drownedLitanyRite?.sequence.length).toBe(0);
+    expect(run.drownedLitanyRite?.sequencePlaying).toBe(false);
+  });
+
+  it('each intensity sets its sequence length, tries, and playback count', () => {
+    const cfg = (intensity: 'easy' | 'medium' | 'hard') => {
+      const sim = makeSim();
+      const run = enterLitanyApse(sim);
+      killNhalia(sim);
+      chooseRite(sim, intensity);
+      const st = run.drownedLitanyRite!;
+      return {
+        len: st.sequence.length,
+        tries: st.tries,
+        mistakes: st.mistakesAllowed,
+        playbacks: st.playbacks,
+      };
+    };
+    // tries = full attempts; mistakesAllowed (tries - 1) is the tolerated wrong touches.
+    expect(cfg('easy')).toEqual({ len: 4, tries: 3, mistakes: 2, playbacks: 3 });
+    expect(cfg('medium')).toEqual({ len: 5, tries: 2, mistakes: 1, playbacks: 2 });
+    expect(cfg('hard')).toEqual({ len: 6, tries: 1, mistakes: 0, playbacks: 1 });
+  });
+
+  it('shows the sequence the chosen number of times before accepting input', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    chooseRite(sim, 'easy'); // 3 playbacks
+    let pulses = 0;
+    let guard = 0;
+    while (run.drownedLitanyRite?.sequencePlaying && guard++ < 600) {
+      for (const ev of sim.tick()) if (ev.type === 'delveRitePulse') pulses++;
+    }
+    expect(run.drownedLitanyRite?.sequencePlaying).toBe(false);
+    expect(run.drownedLitanyRite?.playbackLoop).toBe(3);
+    expect(pulses).toBe(4 * 3); // 4 symbols shown 3 times
+  });
+
+  it('generates the same sequence for the same seed + intensity', () => {
+    const seqFor = (seed: number) => {
+      const sim = makeSim('warrior', seed);
+      const run = enterLitanyApse(sim);
+      killNhalia(sim);
+      chooseRite(sim, 'hard');
+      return run.drownedLitanyRite!.sequence;
+    };
+    expect(seqFor(42)).toEqual(seqFor(42));
+    expect(seqFor(99)).not.toEqual(seqFor(100));
+  });
+
+  it('spawns four shrines and no lockpick chest', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    const kinds = run.objectIds.map((id) => run.objectState[id]?.kind);
+    expect(kinds.filter((k) => k?.startsWith('rite_shrine_')).length).toBe(4);
+    expect(kinds.includes('locked_chest')).toBe(false);
+    expect(kinds.includes('drowned_reliquary')).toBe(true);
+  });
+
+  it('Hard flawless grants premium loot and completes the run', () => {
+    const sim = makeSim('warrior');
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    chooseRite(sim, 'hard');
+    waitForRitePlayback(sim, run);
+    replaySequence(sim, run);
+    const chestId = run.rewardChestId!;
+    expect(run.completed).toBe(true);
+    expect(run.objectState[chestId].lootedTier).toBe('premium');
+    expect(run.surfaceExitId).not.toBeNull();
+    const loot = run.objectState[chestId].pendingLoot!;
+    // Premium: guaranteed uncommon + 20% rare. At least 1 item, first is always uncommon.
+    expect(loot.length).toBeGreaterThanOrEqual(1);
+    expect(['siltguard_helm', 'bulwark_rusted_pauldrons']).toContain(loot[0].itemId);
+    if (loot.length > 1) expect(loot[1].itemId).toBe('nhalias_bell_maul');
+  });
+
+  it('Easy caps loot at low even with a flawless replay', () => {
+    const sim = makeSim('warrior');
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    chooseRite(sim, 'easy');
+    waitForRitePlayback(sim, run);
+    replaySequence(sim, run);
+    expect(run.objectState[run.rewardChestId!].lootedTier).toBe('low');
+  });
+
+  it('a wrong touch on Hard exhausts the single try and opens on low loot', () => {
+    const sim = makeSim('warrior');
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    chooseRite(sim, 'hard'); // 1 try, no slack
+    waitForRitePlayback(sim, run);
+    clickWrongShrine(sim, run);
+    expect(run.drownedLitanyRite?.opened).toBe(true);
+    expect(run.objectState[run.rewardChestId!].lootedTier).toBe('low');
+    expect(run.completed).toBe(true);
+  });
+
+  it('a wrong touch on Medium replays the sequence and a flawless retry still earns medium', () => {
+    const sim = makeSim('warrior');
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    chooseRite(sim, 'medium'); // 2 tries
+    waitForRitePlayback(sim, run);
+    clickWrongShrine(sim, run);
+    // The failed attempt replays the sequence and restarts input from the top.
+    expect(run.drownedLitanyRite?.opened).toBe(false);
+    expect(run.drownedLitanyRite?.sequencePlaying).toBe(true);
+    expect(run.drownedLitanyRite?.currentIndex).toBe(0);
+    waitForRitePlayback(sim, run);
+    replaySequence(sim, run);
+    expect(run.objectState[run.rewardChestId!].lootedTier).toBe('medium');
+  });
+
+  it('using up every try on Medium opens on consolation low-tier loot', () => {
+    const sim = makeSim('warrior');
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    chooseRite(sim, 'medium'); // 2 tries
+    waitForRitePlayback(sim, run);
+    clickWrongShrine(sim, run); // try 1 failed
+    waitForRitePlayback(sim, run);
+    clickWrongShrine(sim, run); // try 2 failed: out of tries
+    expect(run.drownedLitanyRite?.opened).toBe(true);
+    expect(run.objectState[run.rewardChestId!].lootedTier).toBe('low');
+    expect(run.completed).toBe(true);
   });
 });

@@ -1,6 +1,7 @@
 // Unit tests for src/ui/delve_map.ts: pure logic, no DOM/canvas.
 import { describe, expect, it } from 'vitest';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../src/sim/delve_layout';
+import { isLitanyModuleId, litanyModuleGeometry } from '../src/sim/delve_litany_layout';
 import {
   delveAreaLabel,
   delveSchematicPlayer,
@@ -52,7 +53,14 @@ describe('delveSchematicStatic', () => {
       const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
       expect(prims.length).toBeGreaterThan(0);
       for (const prim of prims) {
-        if (prim.kind === 'circle') {
+        if (prim.kind === 'polygon') {
+          for (const point of prim.points) {
+            expect(point.cx).toBeGreaterThanOrEqual(-1);
+            expect(point.cx).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(point.cy).toBeGreaterThanOrEqual(-1);
+            expect(point.cy).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+          }
+        } else if (prim.kind === 'circle') {
           expect(prim.cx + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
           expect(prim.cx - prim.r).toBeGreaterThanOrEqual(-1);
           expect(prim.cy + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
@@ -73,13 +81,42 @@ describe('delveSchematicStatic', () => {
       const layout = DELVE_MODULE_LAYOUTS[moduleId];
       const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
       const rects = prims.filter((p) => p.kind === 'rect');
+      const islandRects = prims.filter((p) => p.kind === 'rect' && p.fill === '#203026');
       const circles = prims.filter((p) => p.kind === 'circle');
       const texts = prims.filter((p) => p.kind === 'text');
-      expect(rects.length).toBeGreaterThanOrEqual(1); // floor
+      if (isLitanyModuleId(moduleId)) expect(islandRects.length).toBeGreaterThanOrEqual(1);
+      else expect(rects.length).toBeGreaterThanOrEqual(1); // floor
       expect(circles.length).toBeGreaterThanOrEqual(2); // dais + exit
       expect(texts.length).toBeGreaterThanOrEqual(1); // 'N' exit label
     });
   }
+
+  it('litany_sluice draws irregular walkable geometry instead of one full room rectangle', () => {
+    const layout = DELVE_MODULE_LAYOUTS.litany_sluice;
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const islandRects = prims.filter((prim) => prim.kind === 'rect' && prim.fill === '#203026');
+    const fullRoomRects = prims.filter(
+      (prim) =>
+        prim.kind === 'rect' &&
+        prim.w > CANVAS_SIZE - PAD * 2 - 2 &&
+        prim.h > CANVAS_SIZE - PAD * 2 - 2,
+    );
+    expect(islandRects.length).toBeGreaterThan(0);
+    expect(fullRoomRects).toHaveLength(0);
+  });
+
+  it('Litany map primitives include the larger Blackwater hazards', () => {
+    const layout = DELVE_MODULE_LAYOUTS.litany_baptistry;
+    const geo = litanyModuleGeometry('litany_baptistry');
+    expect(geo).toBeDefined();
+    if (!geo) return;
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const blackwater = prims.filter(
+      (prim) => prim.kind === 'circle' && prim.fill === '#071512' && prim.stroke === '#65a765',
+    );
+    expect(blackwater.length).toBeGreaterThanOrEqual(geo.hazards.length);
+    expect(geo.hazards[0].r).toBeGreaterThanOrEqual(10);
+  });
 });
 
 // ---- Player arrow -----------------------------------------------------------

@@ -2724,6 +2724,27 @@ export class Renderer {
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
         break;
+      case 'delveRitePulse': {
+        // The Drowned Reliquary Rite plays its sequence by pulsing each shrine
+        // in turn; a school-coloured nova on the shrine entity shows which one
+        // (colour matches the shrine's accent so the sequence is readable).
+        const school =
+          ev.shrineKind === 'rite_shrine_candle'
+            ? 'fire'
+            : ev.shrineKind === 'rite_shrine_reed'
+              ? 'nature'
+              : ev.shrineKind === 'rite_shrine_skull'
+                ? 'shadow'
+                : 'holy';
+        this.vfx.nova(ev.shrineId, school);
+        break;
+      }
+      case 'delveRiteFeedback':
+        // A correct touch answers with a green up-glow; a wrong one with a dark
+        // shadow burst on the shrine the player pressed.
+        if (ev.correct) this.vfx.healGlow(ev.shrineId);
+        else this.vfx.nova(ev.shrineId, 'shadow');
+        break;
       case 'fiestaPowerup':
         // Big celebratory pop on grab, plus a lingering coloured glow.
         this.vfx.levelUpPillar(ev.entityId);
@@ -3035,6 +3056,11 @@ export class Renderer {
       if (
         e.templateId !== 'delve_pressure_plate' &&
         e.templateId !== 'delve_pressure_plate_triggered' &&
+        !e.templateId.startsWith('delve_sluice_valve') &&
+        !e.templateId.startsWith('delve_grave_tablet') &&
+        !e.templateId.startsWith('delve_corpse_candle') &&
+        !e.templateId.startsWith('delve_widow_egg_sac') &&
+        !e.templateId.startsWith('delve_bell_rope') &&
         e.templateId !== 'delve_locked_door' &&
         e.templateId !== 'delve_destructible_wall'
       ) {

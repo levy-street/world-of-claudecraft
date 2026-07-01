@@ -652,6 +652,200 @@ function buildFallbackCrate(entityId: number): { group: THREE.Group; height: num
 }
 
 // ---------------------------------------------------------------------------
+// Drowned Reliquary Rite shrines (The Drowned Litany finale). Four shrines the
+// puzzle lights in sequence; shape AND accent colour identify each one so the
+// playback (a transient nova VFX per pulse, driven from renderer.handleEvent)
+// is readable. Emissive accents only, no per-shrine dynamic lights (cosmetic,
+// perf-friendly, gameplay-neutral).
+// ---------------------------------------------------------------------------
+type RiteShrineKind = 'bell' | 'candle' | 'reed' | 'skull';
+
+const RITE_SHRINE_ACCENT: Record<RiteShrineKind, number> = {
+  bell: 0xc9a24b,
+  candle: 0xff8030,
+  reed: 0x6fae5a,
+  skull: 0x9fb8c8,
+};
+
+function buildRiteShrine(
+  templateId: string,
+  entityId: number,
+): { group: THREE.Group; height: number } {
+  const kind = (templateId.replace('delve_rite_shrine_', '') as RiteShrineKind) ?? 'bell';
+  const accent = RITE_SHRINE_ACCENT[kind] ?? RITE_SHRINE_ACCENT.bell;
+  const group = new THREE.Group();
+  group.rotation.y = ((entityId * 13) % 6) * 0.12 - 0.36;
+
+  const stone = stoneMat(0x3b4a44);
+  const accentGlow = surfaceMat({
+    color: accent,
+    emissive: accent,
+    emissiveIntensity: 1.0,
+    roughness: 0.4,
+    metalness: 0.1,
+    flatShading: !GFX.standardMaterials,
+  });
+
+  // Shared wet-stone pedestal.
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.78, 0.5, 8), stone);
+  base.position.y = 0.25;
+  base.castShadow = true;
+  base.receiveShadow = true;
+  group.add(base);
+  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.7, 8), stone);
+  column.position.y = 0.85;
+  column.castShadow = true;
+  group.add(column);
+
+  // Accent rune disc on the pedestal top, identifies the shrine at rest.
+  const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.05, 12), accentGlow);
+  disc.position.y = 1.22;
+  group.add(disc);
+
+  if (kind === 'bell') {
+    const brass = ironMat(accent, accent, 0.25);
+    const bell = new THREE.Mesh(new THREE.ConeGeometry(0.34, 0.5, 10, 1, true), brass);
+    bell.position.y = 1.62;
+    bell.castShadow = true;
+    group.add(bell);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.06, 6, 12), brass);
+    rim.rotation.x = Math.PI / 2;
+    rim.position.y = 1.4;
+    group.add(rim);
+    const clapper = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), brass);
+    clapper.position.y = 1.42;
+    group.add(clapper);
+  } else if (kind === 'candle') {
+    const wax = stoneMat(0xe8e0c8);
+    const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.7, 8), wax);
+    candle.position.y = 1.6;
+    candle.castShadow = true;
+    group.add(candle);
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.28, 6), glowMat(accent, 0.9));
+    flame.position.y = 2.05;
+    group.add(flame);
+  } else if (kind === 'reed') {
+    const reedMat = stoneMat(accent);
+    for (let i = 0; i < 5; i++) {
+      const h = 0.9 + (i % 3) * 0.25;
+      const a = (i / 5) * Math.PI * 2;
+      const reed = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.05, h, 5), reedMat);
+      reed.position.set(Math.sin(a) * 0.16, 1.3 + h / 2, Math.cos(a) * 0.16);
+      reed.rotation.z = Math.sin(a) * 0.18;
+      reed.rotation.x = Math.cos(a) * 0.18;
+      group.add(reed);
+    }
+  } else {
+    const bone = stoneMat(0xdfe0d0);
+    const skull = new THREE.Mesh(new THREE.SphereGeometry(0.26, 10, 8), bone);
+    skull.position.y = 1.62;
+    skull.castShadow = true;
+    group.add(skull);
+    const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.14, 0.26), bone);
+    jaw.position.y = 1.42;
+    group.add(jaw);
+    const socketMat = surfaceMat({
+      color: 0x0a0e10,
+      roughness: 0.9,
+      metalness: 0,
+      flatShading: !GFX.standardMaterials,
+    });
+    for (const sx of [-0.1, 0.1]) {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), socketMat);
+      eye.position.set(sx, 1.66, 0.2);
+      group.add(eye);
+    }
+  }
+
+  return { group, height: 2.2 };
+}
+
+// ---------------------------------------------------------------------------
+// delve_drowned_reliquary, the Drowned Litany finale reward. A marsh reliquary
+// that rises from the blackwater; closed shows a cyan rite ward, opened drops
+// it and reveals an inner glow. Replaces the lockpick chest for this delve.
+// ---------------------------------------------------------------------------
+function buildDrownedReliquary(
+  open: boolean,
+  entityId: number,
+): { group: THREE.Group; height: number } {
+  const group = new THREE.Group();
+  group.rotation.y = ((entityId * 11) % 5) * 0.06 - 0.12;
+
+  const wetStone = stoneMat(0x35463f);
+  const darkStone = stoneMat(0x26332e);
+  const brass = ironMat(0x8f7a3a, 0x3a2e10, 0.2);
+  const cyan = 0x3fd9d0;
+
+  const plinth = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.25, 1.5), darkStone);
+  plinth.position.y = 0.125;
+  plinth.receiveShadow = true;
+  group.add(plinth);
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.9, 1.0, 1.2), wetStone);
+  body.position.y = 0.5;
+  body.castShadow = true;
+  body.receiveShadow = true;
+  group.add(body);
+
+  // Blackwater waterline streaks.
+  for (const sy of [0.35, 0.6]) {
+    const streak = new THREE.Mesh(new THREE.BoxGeometry(1.94, 0.05, 1.24), glowMat(cyan, 0.12));
+    streak.position.y = sy;
+    group.add(streak);
+  }
+
+  const lid = new THREE.Mesh(new THREE.BoxGeometry(1.96, 0.28, 1.26), wetStone);
+  if (open) {
+    lid.position.set(0, 1.18, -0.5);
+    lid.rotation.x = -0.5;
+    const inner = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.95), glowMat(cyan, 0.5));
+    inner.rotation.x = -Math.PI / 2;
+    inner.position.set(0, 1.02, 0.05);
+    group.add(inner);
+  } else {
+    lid.position.y = 1.14;
+  }
+  lid.castShadow = true;
+  group.add(lid);
+
+  if (!open) {
+    // Drowned bell motif on the sealed lid.
+    const bell = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.42, 10, 1, true), brass);
+    bell.position.set(0, 1.5, 0);
+    bell.castShadow = true;
+    group.add(bell);
+
+    // Cyan rite ward on the front face.
+    const wardMat = surfaceMat({
+      color: cyan,
+      emissive: cyan,
+      emissiveIntensity: 1.5,
+      roughness: 0.3,
+      metalness: 0.0,
+      flatShading: !GFX.standardMaterials,
+    });
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.055, 6, 18), wardMat);
+    ring.position.set(0, 0.62, 0.61);
+    group.add(ring);
+    const seal = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5), glowMat(cyan, 0.32));
+    seal.position.set(0, 0.62, 0.62);
+    group.add(seal);
+    for (let wi = 0; wi < 3; wi++) {
+      const wline = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.04, 0.04), wardMat);
+      wline.rotation.z = (wi / 3) * Math.PI;
+      wline.position.set(0, 0.62, 0.6);
+      group.add(wline);
+    }
+    const light = new THREE.PointLight(cyan, 1.0, 5, 2);
+    light.position.set(0, 1.2, 0.6);
+    group.add(light);
+  }
+
+  return { group, height: 1.9 };
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -684,6 +878,30 @@ export function buildDelveInteractable(
       return buildSurfaceExit();
     case 'delve_destructible_wall':
       return buildDestructibleWall(entityId);
+    case 'delve_sluice_valve':
+    case 'delve_sluice_valve_open':
+      return buildPressurePlate(templateId.endsWith('_open'), entityId);
+    case 'delve_grave_tablet':
+    case 'delve_grave_tablet_lit':
+      return buildPressurePlate(templateId.endsWith('_lit'), entityId);
+    case 'delve_corpse_candle':
+    case 'delve_corpse_candle_lit':
+      return buildPressurePlate(templateId.endsWith('_lit'), entityId);
+    case 'delve_widow_egg_sac':
+    case 'delve_widow_egg_sac_burst':
+      return buildPressurePlate(templateId.endsWith('_burst'), entityId);
+    case 'delve_bell_rope':
+    case 'delve_bell_rope_pulled':
+      return buildPressurePlate(templateId.endsWith('_pulled'), entityId);
+    case 'delve_rite_shrine_bell':
+    case 'delve_rite_shrine_candle':
+    case 'delve_rite_shrine_reed':
+    case 'delve_rite_shrine_skull':
+      return buildRiteShrine(templateId, entityId);
+    case 'delve_drowned_reliquary':
+      return buildDrownedReliquary(false, entityId);
+    case 'delve_drowned_reliquary_open':
+      return buildDrownedReliquary(true, entityId);
     default:
       return buildFallbackCrate(entityId);
   }

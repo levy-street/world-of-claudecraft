@@ -251,6 +251,21 @@ export class DelveMapPainter {
           ctx.lineWidth = prim.strokeWidth ?? DEFAULT_STROKE_WIDTH;
           ctx.stroke();
         }
+      } else if (prim.kind === 'polygon') {
+        if (prim.points.length) {
+          ctx.beginPath();
+          ctx.moveTo(prim.points[0].cx, prim.points[0].cy);
+          for (let i = 1; i < prim.points.length; i++)
+            ctx.lineTo(prim.points[i].cx, prim.points[i].cy);
+          ctx.closePath();
+          ctx.fillStyle = prim.fill;
+          ctx.fill();
+          if (prim.stroke) {
+            ctx.strokeStyle = prim.stroke;
+            ctx.lineWidth = prim.strokeWidth ?? DEFAULT_STROKE_WIDTH;
+            ctx.stroke();
+          }
+        }
       } else if (prim.kind === 'rect') {
         ctx.fillStyle = prim.fill;
         ctx.fillRect(prim.x, prim.y, prim.w, prim.h);

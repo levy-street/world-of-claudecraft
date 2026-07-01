@@ -2,6 +2,11 @@
 // takes plain data in, returns draw primitives or strings.
 // Imported by hud.ts; tested by tests/delve_map.test.ts.
 
+import {
+  isLitanyModuleId,
+  litanyModuleGeometry,
+  litanyModuleMapPrimitives,
+} from '../sim/delve_litany_layout';
 import type { DungeonLayout } from '../sim/dungeon_layout';
 
 /** Compose the area label shown on the minimap / world-map zone title. The
@@ -39,6 +44,15 @@ export interface SchematicRect {
   strokeWidth?: number;
 }
 
+/** A filled polygon (irregular Litany walkable islands and Blackwater). */
+export interface SchematicPolygon {
+  kind: 'polygon';
+  points: Array<{ cx: number; cy: number }>;
+  fill: string;
+  stroke?: string;
+  strokeWidth?: number;
+}
+
 /** A text label (north exit marker). */
 export interface SchematicText {
   kind: 'text';
@@ -61,7 +75,12 @@ export interface SchematicArrow {
   stroke: string;
 }
 
-export type SchematicPrimitive = SchematicCircle | SchematicRect | SchematicText | SchematicArrow;
+export type SchematicPrimitive =
+  | SchematicCircle
+  | SchematicRect
+  | SchematicPolygon
+  | SchematicText
+  | SchematicArrow;
 
 // Canvas coordinate space for the schematic:
 // - localX / localZ are instance-local (relative to delveRun.origin)
@@ -81,12 +100,17 @@ export function delveLocalToCanvas(
   canvasSize: number,
   pad: number,
 ): { cx: number; cy: number } {
-  const roomW = 46; // ±23
+  const rawModuleId = (layout as { litanyModuleId?: string }).litanyModuleId;
+  const litany =
+    rawModuleId && isLitanyModuleId(rawModuleId) ? litanyModuleGeometry(rawModuleId) : null;
+  const xMin = -(litany?.wallX ?? 23);
+  const xMax = litany?.wallX ?? 23;
+  const roomW = xMax - xMin;
   const roomD = layout.zMax - layout.zMin;
   const drawW = canvasSize - pad * 2;
   const drawH = canvasSize - pad * 2;
-  // localX: -23 → right edge, +23 → left edge (mirror X for map-left convention)
-  const cx = pad + ((23 - localX) / roomW) * drawW;
+  // Mirror X for map-left convention.
+  const cx = pad + ((xMax - localX) / roomW) * drawW;
   // localZ: zMin → top, zMax → bottom
   const cy = pad + ((localZ - layout.zMin) / roomD) * drawH;
   return { cx, cy };
@@ -103,6 +127,83 @@ export function delveSchematicStatic(
   northLabel = 'N',
 ): SchematicPrimitive[] {
   const prims: SchematicPrimitive[] = [];
+
+  const litanyModuleIdRaw = (layout as { litanyModuleId?: string }).litanyModuleId;
+  const litanyModuleId =
+    litanyModuleIdRaw && isLitanyModuleId(litanyModuleIdRaw) ? litanyModuleIdRaw : undefined;
+  const litanyPrims =
+    litanyModuleId !== undefined ? litanyModuleMapPrimitives(litanyModuleId) : undefined;
+  if (litanyPrims && litanyModuleId !== undefined) {
+    const litany = litanyModuleGeometry(litanyModuleId);
+    const scale = Math.min(
+      (canvasSize - pad * 2) / ((litany?.wallX ?? 23) * 2),
+      (canvasSize - pad * 2) / (layout.zMax - layout.zMin),
+    );
+    for (const prim of litanyPrims) {
+      if (prim.kind === 'polygon') {
+        const points = prim.points.map((pt) => {
+          const { cx, cy } = delveLocalToCanvas(pt.x, pt.z, layout, canvasSize, pad);
+          return { cx, cy };
+        });
+        prims.push({
+          kind: 'polygon',
+          points,
+          fill: '#203026',
+          stroke: '#58704c',
+          strokeWidth: 1,
+        });
+      } else if (prim.kind === 'circle') {
+        const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad);
+        if (prim.role === 'exit') {
+          prims.push({
+            kind: 'circle',
+            cx,
+            cy,
+            r: Math.max(3, canvasSize * 0.025),
+            fill: '#7a50c8',
+            stroke: '#b090e8',
+            strokeWidth: 1,
+          });
+        } else {
+          prims.push({
+            kind: 'circle',
+            cx,
+            cy,
+            r: Math.max(2, prim.r * scale),
+            fill:
+              prim.role === 'blackwater' ? '#071512' : prim.role === 'dais' ? '#2a2016' : '#2e2820',
+            stroke: prim.role === 'blackwater' ? '#65a765' : '#4a4030',
+            strokeWidth: prim.role === 'blackwater' ? 1.4 : 0.8,
+          });
+        }
+      } else {
+        const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad);
+        const sw = prim.hw * 2 * scale;
+        const sh = ((prim.hd * 2) / (layout.zMax - layout.zMin)) * (canvasSize - pad * 2);
+        const isIsland = prim.role === 'island';
+        prims.push({
+          kind: 'rect',
+          x: cx - sw / 2,
+          y: cy - sh / 2,
+          w: sw,
+          h: sh,
+          fill: isIsland ? '#203026' : '#2e2820',
+          stroke: isIsland ? '#58704c' : '#4a4030',
+          strokeWidth: isIsland ? 1 : 0.5,
+        });
+      }
+    }
+    const { cx: exCx, cy: exCy } = delveLocalToCanvas(0, layout.zMax - 2, layout, canvasSize, pad);
+    prims.push({
+      kind: 'text',
+      cx: exCx,
+      cy: exCy - Math.max(5, canvasSize * 0.05),
+      text: northLabel,
+      fill: '#b090e8',
+      font: `bold ${Math.max(8, Math.round(canvasSize * 0.08))}px Georgia`,
+    });
+    return prims;
+  }
 
   // Floor background rect (the full room footprint)
   const topLeft = delveLocalToCanvas(-23, layout.zMin, layout, canvasSize, pad);
