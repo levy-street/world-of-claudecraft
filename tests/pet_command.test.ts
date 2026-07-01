@@ -88,6 +88,9 @@ describe('/pet command', () => {
     const pet = givePet(sim, a);
     sim.tick();
 
+    const hp = pet.hp;
+    const maxHp = pet.maxHp;
+    const pct = Math.round((hp / maxHp) * 100);
     sim.chat('/pet', a);
     const events = sim.tick();
     // self-only readout: never reaches the chat channel
@@ -95,8 +98,8 @@ describe('/pet command', () => {
     const text = errorText(events)!;
     expect(text).toContain(`Your pet: ${pet.name}`);
     expect(text).toContain(`level ${pet.level}`);
-    expect(text).toContain(`HP ${pet.hp}/${pet.maxHp}`);
-    expect(text).toContain('(100%)');
+    expect(text).toContain(`HP ${hp}/${maxHp}`);
+    expect(text).toContain(`(${pct}%)`);
   });
 
   it('rounds the health percentage from live pet HP', () => {

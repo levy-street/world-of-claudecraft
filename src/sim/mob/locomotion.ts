@@ -190,9 +190,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const template = MOBS[mob.templateId];
       let detected: Entity | null = null;
       let detectedD = Infinity;
-      ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
+      const considerPlayerSideTarget = (e: Entity, d2: number): void => {
         if (e.dead) return;
-        if (isTrivialTo(mob, e)) return;
+        if (e.kind === 'player' && isTrivialTo(mob, e)) return;
         let radius = Math.max(4, Math.min(20, template.aggroRadius + (mob.level - e.level) * 1.5));
         radius *= ctx.delveDetectMult(e);
         // stealthed rogues are harder to detect, relative to observer level
@@ -203,6 +203,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           detected = e;
           detectedD = d;
         }
+      };
+      ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, 25, considerPlayerSideTarget);
+      ctx.grid.forEachInRadius(mob.pos.x, mob.pos.z, 25, (e, d2) => {
+        if (e.kind !== 'mob' || e.ownerId === null || ctx.isDelveCompanionMob(e)) return;
+        const owner = ctx.entities.get(e.ownerId);
+        if (owner?.kind !== 'player') return;
+        considerPlayerSideTarget(e, d2);
       });
       if (detected) {
         ctx.aggroMob(mob, detected, true);
