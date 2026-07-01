@@ -171,6 +171,11 @@ export const BOOL_SETTINGS = {
   // on by default: include verified wallet holder/balance details in newly
   // rendered player cards. The player-card modal can toggle this per device.
   showWalletOnPlayerCard: { def: true },
+  // on by default: show the developer badge (nameplate glyph + name outline,
+  // inspect-window block, player card, and the Developers leaderboard tab).
+  // Purely a local display preference: the badge is still earned and broadcast
+  // either way, this only controls whether THIS client renders it.
+  showDevBadges: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },

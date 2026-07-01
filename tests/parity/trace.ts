@@ -195,7 +195,7 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'lastActiveTick', // session-only
   'away', // session-only presence
   'lastWhisperFrom', // session-only
-  'marketFilter', // session-only browse filter
+  'marketQuery', // session-only browse query (search + filters + page)
   'known', // derived from class/level/talents
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments

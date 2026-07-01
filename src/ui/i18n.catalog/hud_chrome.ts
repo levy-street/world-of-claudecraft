@@ -206,12 +206,20 @@ export const hudChromeStrings = {
     tabsLabel: 'High-score boards',
     tabPlayers: 'Players',
     tabGuilds: 'Guilds',
+    tabDevs: 'Developers',
     // Guild-board column headers + the guild-tab empty state.
     guildName: 'Guild',
     members: 'Members',
     topLevel: 'Top',
     guildXp: 'Total XP',
     guildEmpty: 'No ranked guilds yet.',
+    // Developer-board column headers + the dev-tab empty state. Contributors are
+    // ranked by how many pull requests they have had merged into the open-source
+    // repo (not raw commits: see hudChrome.devBadge.flavors.* for why).
+    devName: 'Contributor',
+    devTierCol: 'Badge',
+    mergedPrs: 'Merged PRs',
+    devEmpty: 'No ranked contributors yet.',
   },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
@@ -293,6 +301,9 @@ export const hudChromeStrings = {
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
+    // Interface panel toggle: nameplate glyph/outline, inspect block, player
+    // card, and the Developers leaderboard tab (on by default).
+    showDevBadges: 'Show Developer Badges',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
@@ -833,6 +844,12 @@ export const hudChromeStrings = {
     mob: '[{level}] {name}',
     mobElite: '[{level}+] {name}',
   },
+  // Item tooltip: the minimum character level needed to equip a piece (classic
+  // "Requires Level N"). Shown red when the viewer is below it. {level} runs
+  // through formatNumber.
+  itemTooltip: {
+    requiresLevel: 'Requires Level {level}',
+  },
   discord: {
     title: 'Discord',
     panelTitle: 'World of ClaudeCraft',
@@ -966,5 +983,44 @@ export const hudChromeStrings = {
       event: { label: 'Event / Raid', hint: 'Announce a raid, meetup or event' },
       help: { label: 'Need Help', hint: 'Ask the community for help' },
     },
+  },
+  // Developer badge: a cosmetic honor for contributors by landed-commit count
+  // (the ladder lives in src/sim/dev_tier.ts; the data is sourced from a verified
+  // GitHub-OAuth link plus the repo's contributor stats). Shown on the player
+  // card, the overhead nameplate, and the inspect screen.
+  devBadge: {
+    title: 'Developer',
+    // Tier display names (the ladder lives in src/sim/dev_tier.ts).
+    tiers: {
+      tinkerer: 'Tinkerer',
+      artificer: 'Artificer',
+      runesmith: 'Runesmith',
+      architect: 'Architect',
+      worldwright: 'Worldwright',
+    },
+    // Flavor lines per rung (shown on the inspect screen and the player card).
+    // Rungs count MERGED pull requests, not raw commits: it is the unit that
+    // resists commit-spamming a single reviewed contribution.
+    flavors: {
+      tinkerer: 'Your first pull request landed in the realm.',
+      artificer: 'Five pull requests in, and the world bends to your code.',
+      runesmith: 'Fifteen pull requests forged into the running game.',
+      architect: 'An architect of the realm: 30 pull requests merged.',
+      worldwright: 'A wright of worlds: 70 pull requests shape the game.',
+    },
+    // Nameplate badge tooltip + inspect/card readouts.
+    badgeTitle: 'Developer: {tier}',
+    prsLanded: '{count} pull requests merged',
+    contributor: 'Open-source contributor',
+    // GitHub link control (mirrors the wallet link beside it on character select).
+    link: {
+      cta: 'Link GitHub',
+      relink: 'Relink GitHub',
+      benefits:
+        'Link your GitHub to earn a developer badge for the pull requests you have had merged into the open-source repo.',
+      error: 'Could not link GitHub. Please try again.',
+    },
+    linkedAs: 'Linked as {login}',
+    unlink: 'Unlink GitHub',
   },
 };

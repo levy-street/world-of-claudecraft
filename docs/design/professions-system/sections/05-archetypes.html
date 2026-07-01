@@ -1,0 +1,28 @@
+  <h3>Archetypes: your two majors and a hobby</h3>
+  <p>Because the active specialty empowers only two adjacent crafts, every specialist ends up defined by a <strong>pair of adjacent crafts</strong>, their two <strong>majors</strong>. Each of the ten adjacent pairs around the ring is a recognizable identity, so there are ten named <strong>archetypes</strong> (Smith, Outfitter, Apothecary, Arcanist, and so on).</p>
+  <ul>
+    <li>On top of the two majors you also get a <strong>hobby</strong>: one craft from the pair sitting directly opposite your majors, worked up to the <strong>rare</strong> tier. This is the carve-out from the at-most-two rule: the opposite side is otherwise unempowered, but the single opposite craft you take as a hobby is empowered up to rare. Like the majors, the hobby is part of your attunement: it emerges from what you craft, and you switch it to the other opposite when you re-attune, not by grinding the first away. The rare cap is what keeps a dabbler from ever matching a real specialist, and keeps high-tier crafting interdependent.</li>
+    <li>The opposite-as-hobby doubles as a self-supply line, because opposite crafts are complements: a Smith (Armorcrafting plus Weaponcrafting) takes Tailoring or Leatherworking as a hobby, exactly the cloth padding and leather straps a full set of gear needs.</li>
+  </ul>
+  <p>You do not pick any of this from a menu; it emerges from what you craft (explained in How it's experienced, below). The explorer below lets you tour the ten outcomes: click an archetype on the ring to see its majors fill to legendary and its hobby cap at rare.</p>
+
+  <div class="figure">
+    <div class="row">
+      <div class="col" style="flex:0 0 190px;">
+        <p class="muted" style="font-size:13px;margin:0 0 8px;">Click an archetype name on the ring to select it.</p>
+        <label>Preview hobby (either opposite)</label>
+        <div id="hobbyBtns"></div>
+        <p id="liveCap" class="muted" style="font-size:13px;margin-top:12px;"></p>
+      </div>
+      <div class="col" style="flex:1 1 400px;"><svg id="liveRadar" viewBox="-120 -40 644 476" role="img" aria-label="Interactive archetype radar; click an archetype name to select"></svg></div>
+      <div class="col" style="flex:0 0 150px;">
+        <div class="legend" style="margin-top:0;flex-direction:column;gap:8px;">
+          <span><span class="swatch" style="background:var(--gold)"></span>Majors (legendary)</span>
+          <span><span class="swatch" style="background:var(--rare)"></span>Hobby (rare cap)</span>
+          <span><span class="swatch" style="background:var(--red)"></span>Archetype names (click)</span>
+          <span><span class="swatch" style="background:#fff"></span>Selected archetype</span>
+          <span><span class="swatch" style="background:var(--line)"></span>Tier rings</span>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -22,6 +22,8 @@ import { DELVES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { absorbTotal } from '../src/ui/absorb_bar';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 
 const DELTA_KEYS = [
@@ -192,6 +194,38 @@ describe('spectate client POV', () => {
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+  });
+});
+
+describe('per-session isolation in the broadcast loop', () => {
+  it('keeps broadcasting to healthy sessions when one session throws', () => {
+    // Regression: the broadcast loop iterated every session unguarded, so a throw
+    // while building one player's snapshot unwound the whole call and starved every
+    // other session of its snapshot that tick (server/CLAUDE.md: one socket must
+    // not crash the loop). forEachGuarded must isolate the bad session.
+    const server = new GameServer();
+    const before = fakeWs();
+    const bad = fakeWs();
+    const after = fakeWs();
+    joinServer(server, before, 1, 'Before');
+    const badSession = joinServer(server, bad, 2, 'Broken');
+    // 'After' joins last, so it is iterated AFTER the throwing session: the real
+    // regression is that this one used to be starved when 'Broken' threw.
+    joinServer(server, after, 3, 'After');
+
+    // Force a throw only while serializing the bad session's self payload.
+    const original = (server as any).selfWireJson.bind(server);
+    vi.spyOn(server as any, 'selfWireJson').mockImplementation((session: any, ...rest: any[]) => {
+      if (session.pid === badSession.pid) throw new Error('corrupt self state');
+      return original(session, ...rest);
+    });
+
+    expect(() => broadcast(server)).not.toThrow();
+    // Both healthy sessions, on either side of the throw, still got a snapshot;
+    // only the broken one was skipped.
+    expect(lastSnap(before.sent)).not.toBeNull();
+    expect(lastSnap(after.sent)).not.toBeNull();
+    expect(lastSnap(bad.sent)).toBeNull();
   });
 });
 
@@ -1910,7 +1944,7 @@ function dirtyEveryDeltaField(): {
   run.companion = { companionId: 'companion_tessa', entityId: mp };
   const party = (sim as any).partyOf(lp);
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
-  const merchant = sim.entities.get(sim.market.merchantId);
+  const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
 
   // Direct PlayerMeta fields.
@@ -2130,18 +2164,16 @@ describe('delta-key contract pins (anti-drift)', () => {
   });
 });
 
-// The serializer sends aura `value` SPARSELY, for two cases the client UI reads it:
-//  1. a negative-value buff_* aura (a stat-sap) - reads as a DEBUFF via auras_view.isAuraDebuff's
-//     `value < 0` branch, which can only fire online if the wire carries the value; and
-//  2. any STAT_SOURCE_AURA_KIND (buff_ap/armor/int/agi/spi/sta/allstats/spellpower/dodge,
-//     debuff_ap) at ANY sign - so the character-sheet source breakdown (buildStatSources) can
-//     name the buff ("Battle Shout: +N") online instead of folding it into the talents remainder.
-// Everything else (a non-stat positive buff like haste, the positive absorb shield, a fear's
-// negative facing angle) stays off the wire and decodes to 0 exactly as before (no absorb-overlay
-// regression; see target_frame.test.ts). The client decode reads `a.value ?? 0`, so an old server
-// that never sends it still decodes to 0 (backward compatible). This drives a real Sim aura through
-// the real serializer (wireEntity) and the real client decode (ClientWorld.applySnapshot).
-describe('aura value over the wire (stat-sap debuff parity)', () => {
+// Buff/debuff hover tooltips read an aura's magnitude (src/ui/aura_effect.ts: flat stat amount,
+// slow/haste multiplier, dot/hot per-tick, absorb remaining, imbue range, ...), so the wire must
+// carry it or the tooltip reads 0 online (the reported "Increases attack power by 0" bug). The
+// serializer now sends `value` whenever it is nonzero (raw, so a negative stat-sap's sign and its
+// isAuraDebuff classification survive), plus value2/value3 (imbue), tickInterval (dot/hot), and a
+// non-physical school. The client decode reads `a.value ?? 0` and `a.school ?? 'physical'`, so a
+// value-0 aura or an old server still decodes to the defaults (backward compatible). This drives a
+// real Sim aura through the real serializer (wireEntity) and the real client decode
+// (ClientWorld.applySnapshot).
+describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   function roundTrip(aura: Aura): { wire: Record<string, unknown>; mirror: Aura } {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Sapped');
@@ -2189,41 +2221,16 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
     expect(isAuraDebuff(mirror)).toBe(true);
   });
 
-  it('DOES send a POSITIVE stat-buff value now: the character-sheet source breakdown can name it', () => {
-    // buff_int is a STAT_SOURCE_AURA_KIND (server/game.ts), so its value rides the wire at
-    // any sign - an online player's Intellect tooltip attributes "Arcane Intellect: +40"
-    // instead of folding it into the talents remainder. It still classifies as a buff (value
-    // is positive), so no debuff-classification regression.
+  it('sends a POSITIVE buff value so its tooltip shows the real magnitude, still a buff in both worlds', () => {
     const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Arcane Intellect' };
     const { wire, mirror } = roundTrip(buff);
-    expect(wireAura(wire, 'arcane_intellect').value).toBe(40); // carried on the wire
-    expect(mirror.value).toBe(40); // decoded online, so buildStatSources can itemize it
-    expect(isAuraDebuff(buff)).toBe(false);
+    expect(wireAura(wire, 'arcane_intellect').value).toBe(40); // rides the wire now (was omitted)
+    expect(mirror.value).toBe(40); // client mirrors the real magnitude (not the old hardcoded 0)
+    expect(isAuraDebuff(buff)).toBe(false); // positive value -> still a buff, online and off
     expect(isAuraDebuff(mirror)).toBe(false);
   });
 
-  it('does NOT send a POSITIVE non-stat buff value (still sparse): buff_haste stays off the wire', () => {
-    // A positive buff_* aura that is NOT a character-sheet stat source (a haste multiplier)
-    // has no source-breakdown line to feed, so it keeps the sparse-wire behavior: value omitted,
-    // decodes to 0, classifies as a buff in both worlds.
-    const haste: Aura = {
-      id: 'blood_fury',
-      name: 'Blood Fury',
-      kind: 'buff_haste',
-      remaining: 15,
-      duration: 15,
-      value: 1.2,
-      sourceId: 0,
-      school: 'physical',
-    };
-    const { wire, mirror } = roundTrip(haste);
-    expect('value' in wireAura(wire, 'blood_fury')).toBe(false); // not a stat source -> omitted
-    expect(mirror.value).toBe(0);
-    expect(isAuraDebuff(haste)).toBe(false);
-    expect(isAuraDebuff(mirror)).toBe(false);
-  });
-
-  it('does NOT send a POSITIVE absorb value: the shield overlay stays offline-only (no regression)', () => {
+  it('sends a POSITIVE absorb value so the shield overlay and tooltip work online too', () => {
     const shield: Aura = {
       id: 'power_word_shield',
       name: 'Power Word: Shield',
@@ -2235,16 +2242,18 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
       school: 'holy',
     };
     const { wire, mirror } = roundTrip(shield);
-    expect('value' in wireAura(wire, 'power_word_shield')).toBe(false);
-    // online absorb is still 0, so the shield overlay remains offline-only (target_frame parity).
-    expect(mirror.value).toBe(0);
+    expect(wireAura(wire, 'power_word_shield').value).toBe(250);
+    expect(wireAura(wire, 'power_word_shield').school).toBe('holy'); // non-physical school rides
+    expect(mirror.value).toBe(250); // client mirrors the remaining absorb...
+    expect(mirror.school).toBe('holy');
+    // ...so the unit-frame shield overlay now derives online exactly as offline.
+    expect(absorbTotal([mirror])).toBe(250);
   });
 
-  it('does NOT send a NEGATIVE value for a non-buff_ aura (kind-gated): fear keeps its kind classification', () => {
-    // The emit mirrors isAuraDebuff's value branch (buff_* only), so a negative-value
-    // non-buff aura -- e.g. an incapacitate (fear) carrying a random facing angle that is
-    // negative about half the time -- never ships its value. It stays a debuff via its KIND,
-    // identically in both worlds, and no inert value rides the wire.
+  it('classifies a non-buff_ aura (fear) as a debuff by KIND, not value, across the wire', () => {
+    // An incapacitate (fear) stores a random facing angle in value; it now rides the wire like
+    // any nonzero value, but the incapacitate tooltip reads NO number, so the inert angle is
+    // harmless. Classification stays KIND-based (DEBUFF_AURA_KINDS), identical in both worlds.
     const fear: Aura = {
       id: 'fear',
       name: 'Fear',
@@ -2256,10 +2265,84 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
       school: 'shadow',
     };
     const { wire, mirror } = roundTrip(fear);
-    expect('value' in wireAura(wire, 'fear')).toBe(false); // negative, but not buff_ -> omitted
-    expect(mirror.value).toBe(0);
+    expect(wireAura(wire, 'fear').value).toBe(-1.5); // nonzero value rides raw (sign preserved)
+    expect(mirror.value).toBe(-1.5);
+    expect(auraEffectDescriptor(fear)?.nums).toBeUndefined(); // incapacitate shows no number
     expect(isAuraDebuff(fear)).toBe(true); // debuff via kind, in both worlds
     expect(isAuraDebuff(mirror)).toBe(true);
+  });
+
+  it('round-trips Aspect of the Hawk so its tooltip shows the real attack power, not 0 (the bug)', () => {
+    // The reported bug: online, Aspect of the Hawk read "Increases attack power by 0" because the
+    // positive buff_ap magnitude never rode the wire. It now does, so offline == online.
+    const hawk: Aura = {
+      id: 'aspect_of_the_hawk',
+      name: 'Aspect of the Hawk',
+      kind: 'buff_ap',
+      remaining: 1800,
+      duration: 1800,
+      value: 20,
+      sourceId: 0,
+      school: 'physical',
+    };
+    const { wire, mirror } = roundTrip(hawk);
+    expect(wireAura(wire, 'aspect_of_the_hawk').value).toBe(20);
+    expect(mirror.value).toBe(20);
+    // end to end: the mirrored aura drives the tooltip descriptor to the real number.
+    const desc = auraEffectDescriptor(mirror);
+    expect(desc?.key).toBe('hudChrome.auraEffect.increase.ap');
+    expect(desc?.nums?.value).toBe(20); // "Increases attack power by 20", never 0
+  });
+
+  it('round-trips a dot magnitude, tick cadence, and non-physical school for its tooltip', () => {
+    const dot: Aura = {
+      id: 'corruption',
+      name: 'Corruption',
+      kind: 'dot',
+      remaining: 12,
+      duration: 12,
+      value: 15,
+      tickInterval: 3,
+      sourceId: 0,
+      school: 'shadow',
+    };
+    const { wire, mirror } = roundTrip(dot);
+    expect(wireAura(wire, 'corruption').value).toBe(15);
+    expect(wireAura(wire, 'corruption').tickInterval).toBe(3);
+    expect(wireAura(wire, 'corruption').school).toBe('shadow');
+    expect(mirror.value).toBe(15);
+    expect(mirror.tickInterval).toBe(3);
+    expect(mirror.school).toBe('shadow');
+    const desc = auraEffectDescriptor(mirror);
+    expect(desc?.key).toBe('hudChrome.auraEffect.dot');
+    expect(desc?.nums?.value).toBe(15);
+    expect(desc?.nums?.interval).toBe(3);
+    expect(desc?.school).toBe('shadow');
+  });
+
+  it('round-trips the imbue judgement range (value2/value3), value omitted when 0', () => {
+    const imbue: Aura = {
+      id: 'holy_might',
+      name: 'Holy Might',
+      kind: 'imbue',
+      remaining: 300,
+      duration: 300,
+      value: 0, // imbue carries its numbers in value2/value3, so value stays 0...
+      value2: 8,
+      value3: 12,
+      sourceId: 0,
+      school: 'holy',
+    };
+    const { wire, mirror } = roundTrip(imbue);
+    expect('value' in wireAura(wire, 'holy_might')).toBe(false); // ...and is omitted (decodes 0)
+    expect(wireAura(wire, 'holy_might').value2).toBe(8);
+    expect(wireAura(wire, 'holy_might').value3).toBe(12);
+    expect(mirror.value2).toBe(8);
+    expect(mirror.value3).toBe(12);
+    const desc = auraEffectDescriptor(mirror);
+    expect(desc?.key).toBe('hudChrome.auraEffect.imbueRange');
+    expect(desc?.nums?.min).toBe(8);
+    expect(desc?.nums?.max).toBe(12);
   });
 
   it('tolerates an old-server wire aura with no value (backward compatible -> 0)', () => {

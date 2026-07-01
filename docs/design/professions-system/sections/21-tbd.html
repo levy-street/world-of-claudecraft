@@ -1,0 +1,27 @@
+  <h2 id="tbd">Open questions / TBD</h2>
+  <ul>
+    <li>Production wheel: confirm the exact ring order, the per-slot tier ceilings (majors, hobby, others) that realize the at-most-two-adjacent rule, and the attunement cost curve.</li>
+    <li>Tiered mastery: crafts-per-tier counts (the example uses about 20), the diminishing-returns curve below capability (zero at a two-tier delta), and which recipes each tier unlocks. Decided: the at-most-two cap applies at uncommon and up, common is a free floor.</li>
+    <li>Hobby cap: confirm the ceiling tier (rare, possibly epic per itemization). Switching is decided: the hobby switches as part of re-attuning, with no skill loss.</li>
+    <li>Tier distribution (itemization tuning): a specialist's working spend is 2 majors legendary, 1 hobby rare, 7 crafts common, which may shift to legendary / epic / uncommon (2 / 1 / 7). The Jack of All Trades ceiling (uncommon vs rare across all ten) and whether it gets a higher combined ceiling to afford that breadth are open.</li>
+    <li>Attunement quests: the design of the per-tier quest ladder (the first-time lore quest and each deeper tier quest) and the repeatable make-amends switch quest, and how the make-amends cost escalates with repeat switches (time, coin, materials, lore) while staying cheap enough early to let a player try a couple of archetypes; whether the hobby's cap is a hard cap. Decided: escalation is tuning, carried through quest flavor text.</li>
+    <li>Leveling and the tier ladder. Decided: crafts climb through a per-tier quest ladder; crafting above your current tier ceiling loses the excess xp; the ceiling is set either by attunement (a craft outside your active archetype) or by an incomplete tier quest, both identically; and learned skill is retained and re-empowered on re-attune, never re-earned. Open: the exact tier-quest designs, and whether a non-active craft still produces at the floor while capped.</li>
+    <li>Jack of All Trades perks: the magnitude of the better/worse output variance and the material-saving bonus.</li>
+    <li>Attunement legibility: the in-craft trend nudges, and the wording of the attunement quest's what-changes summary.</li>
+    <li>Binding: the per-recipe bind-to-recipient policy (which output classes bind via <code>equipBoundTo</code>, which tier threshold triggers it, and which required materials tie to the recipient). Decided: the recipient is set from the commission order, not typed by the crafter. Open: the commission/order UX (order scope to open, guild, friends, or a specific crafter; cancel-before-accept; the crafter orders list; the multi-step accept, craft, deliver flow).</li>
+    <li>Per-item-instance model: instance id + payload (signer, charges, rolled stats, the <code>equipBoundTo</code> recipient); how two rolled crafted items stack, list, and persist; and its slice sequencing before the higher-tier crafts (tools, harvesting, crafted gear), which is what carries item identity.</li>
+    <li>Economy: an output throttle for a maxed specialist, and a real gold sink in proportion to the new material faucet (the 5 percent market cut is the only sink today).</li>
+    <li>Alts. Decided: specialization stays per-character, and exclusivity is anchored by the adventuring gate (the crafting ceiling needs Monster Harvesting materials and Battlefield Experience, which cap a combat level 1 crafting alt below an adventurer-crafter), backed by contested corpses and recipient-signed materials, not by character slots. A fully rewarding pure-skiller route is an explicit non-goal for now; revisit only with its own brainstorm.</li>
+    <li>Gathering-first sequencing: whether to accept material stockpiling before crafting ships, or add a soft mitigation.</li>
+    <li>Battlefield Experience (exploratory): separate channel scoped to the active archetype only (no skirting the at-most-two rule via breadth or alts), observation radius (the 90-yard player scope, and whether group credit should reach farther than stranger credit), per-item attribution, and the tier floor (uncommon or rare and above) tuning.</li>
+    <li>Battlefield Experience and Jack of All Trades: whether a Jack (who has no active archetype) benefits from Battlefield Experience at all, and if so for which crafts (all ten, none, or only their highest few), so the active-archetype gate has a defined answer for the breadth build.</li>
+    <li>Gathering focus: skill tree vs additive radar, focus granularity, and the re-spec cost curves.</li>
+    <li>Output quality and ilvl budget: how the rarity-tier roll maps to stat rolls, and the exact curve over concentration, material tier, and skill.</li>
+    <li>Crafting-only effects: the design space and how they are balanced against item level.</li>
+    <li>Specialization perks: the exact perk set and the thresholds that unlock them.</li>
+    <li>Monster-tier to item-tier mapping: the shared rarity scale that the rarity-scaled effect consumption and tool gating read from.</li>
+    <li>Tool effects: the effect catalog, depletion rates, the rarity-scaled consumption curve, and recharge material costs (base tool durability is decided: infinite).</li>
+    <li>Signed materials: confirm rare+ monster materials sign, and the size of the self-gathered craft bonus.</li>
+    <li>Node density and dynamic / location-based respawn (explicitly future); persistence scope for respawn state across restarts.</li>
+    <li>Whether and when to build the off-wheel cosmetic/housing system.</li>
+  </ul>

@@ -1,0 +1,38 @@
+  <h2 id="arch">Architecture (how it lands in this repo)</h2>
+  <p>The system follows the repo's existing seams. Nothing below invents a new one.</p>
+
+  <h3>Determinism and authority (hard invariants)</h3>
+  <ul>
+    <li>All gathering and crafting logic lives in <code>src/sim/</code> and obeys the sim invariants: no DOM/Three imports, all randomness through <code>Rng</code>, fixed 20 Hz tick, no <code>Math.random</code> / <code>Date.now</code> / <code>performance.now</code>. Per-player node respawn timers, corpse-harvest state, effect durability/recharge, mobile crafting stations, and re-spec timers advance on the sim clock.</li>
+    <li>The server is authoritative. Harvest rolls, quality rolls, recipe resolution, material consumption, the self-gathered bonus, signed-material stamping, effect-durability consumption rolls, effect recharge, focus re-spec, and skill changes resolve server-side. The client streams intent and renders results.</li>
+  </ul>
+
+  <h3>Content-as-code (<code>src/sim/content/</code>, merged by <code>data.ts</code>)</h3>
+  <ul>
+    <li><code>professions.ts</code>: the ten-craft wheel (the ring order and the per-slot tier ceilings), the archetype names, craft outputs (permanent / consumable / weapon lines), gathering profession definitions, focus and component-type configuration, specialization perks, base tool tiers, and the effect catalog.</li>
+    <li><code>recipes.ts</code>: recipe records (inputs, craft + skill requirement, output, base ilvl budget, crafting-only effects, per-recipe binding policy).</li>
+    <li><code>gather_nodes.ts</code>: world-node definitions and placements; monster component-type tags live on mob records.</li>
+    <li>Attunement quests (the per-archetype lore quest and the repeatable make-amends switch quest) are quest content; new <code>craft</code> and <code>gather</code> quest objective types let quests credit crafting and gathering.</li>
+    <li>Fungible materials and base tools are item records, so they flow through the existing inventory, vendor, and market systems unchanged.</li>
+  </ul>
+
+  <h3>Per-item-instance model (a foundation, built early)</h3>
+  <p>Inventory today is <code>itemId + count</code> and items carry no identity. Signed materials, charged tools, rolled-quality crafted gear, and bind-to-recipient gear all need per-item identity: an instance id plus a payload (gatherer signature, per-effect charges, rolled quality/stats, the <code>equipBoundTo</code> recipient). This is cross-cutting (inventory, equipment, trade, market, vendor, the interest-scoped snapshot, the wire encoder, and JSONB load/save) and is spec'd as its own early slice before tools, monster harvesting, and crafted gear. Fungible stacks (raw materials, infinite-durability base tools) keep flowing as <code>itemId + count</code> and do not need it.</p>
+
+  <h3>New sim system behind the <code>SimContext</code> seam (<code>src/sim/professions/</code>)</h3>
+  <ul>
+    <li><code>gathering.ts</code>: node harvest, per-player respawn state, corpse harvest, proficiency gain and rarity rolls.</li>
+    <li><code>crafting.ts</code>: recipe resolution, material consumption, quality roll, ilvl budget computation, crafting-only effect application.</li>
+    <li><code>wheel.ts</code>: the conserved-mass mastery model (additive skill gain, the at-most-two active cap, the active archetype and attunement, the adjacent-pair majors and capped opposite hobby, specialization-concentration readout). Attunement switching is quest-driven (see Production core), not decay.</li>
+    <li><code>focus.ts</code>: the additive gathering focus allocation plus the time/coin/material re-spec.</li>
+    <li><code>tools.ts</code>: base-tool tier gating plus effect application, depletion, and recharge.</li>
+  </ul>
+  <p class="muted">Per the seam rules, these modules hold functions; backing state (per-player craft skills, the active archetype and attunement history, the current hobby, focus allocations, respawn timers, corpse flags, re-spec timers) lives on <code>Sim</code> as live <code>ctx</code> views, with thin same-named delegates where a foreign caller resolves a method.</p>
+
+  <h3>The <code>IWorld</code> seam, client, persistence</h3>
+  <ul>
+    <li><strong>IWorld</strong> (<code>src/world_api.ts</code>): extend first, implement in both <code>Sim</code> and <code>ClientWorld</code>, then consume from render/ui. New surface: read craft skills and the wheel, current majors/hobby, specialization perks, focus allocation, node availability, corpse component options, recipe lists and craft results, tool tier and effect charges.</li>
+    <li><strong>Client (render / ui):</strong> a professions/wheel HUD window following the module-first UI rules. All player-visible strings are <code>t()</code> keys; numbers/money through the formatters. Sim/server emit stable keys plus values re-localized by the matcher.</li>
+    <li><strong>Guide / wiki:</strong> player-facing professions, gathering, and recipe content feeds <code>/wiki</code>; add <code>guide.*</code> prose keys and run <code>npm run wiki:content</code>.</li>
+    <li><strong>Persistence (<code>server/</code>):</strong> per-player craft skills, the active archetype, attunement history (which archetypes have been entered and the make-amends count per archetype), current hobby, focus allocations, and learned recipes persist (JSONB on the character) with additive back-compat load. Signed-material gatherer names, per-effect charges, rolled quality/stats, and the <code>equipBoundTo</code> recipient persist on item instances. Respawn timers and mobile stations are sim runtime state.</li>
+  </ul>

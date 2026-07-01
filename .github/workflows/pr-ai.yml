@@ -1,0 +1,148 @@
+name: PR AI assist
+
+# Two INFORMATIONAL, NON-BLOCKING jobs that help review a pull request. Neither is a
+# required check; they assist review, they do not gate merge. They live in their own
+# workflow so they never interfere with the CI gate in ci.yml.
+#
+#   screenshots  boots the Vite dev client headless, runs a fixed offline tour
+#                (character select, desktop HUD, mobile HUD), uploads the PNGs as an
+#                artifact, and links them in a sticky PR comment.
+#   ai-review    sends the PR diff to an OpenRouter model (free openrouter/owl-alpha by
+#                default) and posts the review as a sticky PR comment. No-ops without the
+#                OPENROUTER_API_KEY secret (for example on a fork PR), so it never blocks.
+#
+# Setup (one time): add an OPENROUTER_API_KEY repo secret to enable ai-review. Optionally
+# set an OPENROUTER_MODEL repo variable to swap the model (owl-alpha is free but ephemeral).
+# See docs/ai-pr-bot.md, including the privacy note on the free owl-alpha tier logging prompts.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+# Needed to post the sticky review/screenshot comments. Fork PRs get a read-only token,
+# so the comment steps degrade to a no-op there (handled in the scripts).
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-ai-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Screenshots of changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          # Full history so the diff against the PR base drives change-aware capture.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The client imports committed-but-derived i18n tables at boot; regenerate to be safe.
+      - name: Generate i18n artifacts
+        run: npm run i18n:gen
+
+      - name: Resolve a Chrome binary
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium-browser || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            echo "No system Chrome on PATH; installing a Chrome for Testing build."
+            CHROME="$(npx --yes puppeteer browsers install chrome | awk '{print $NF}')"
+          fi
+          echo "BROWSER_PATH=$CHROME" >> "$GITHUB_ENV"
+          echo "Using browser: $CHROME"
+
+      - name: Start the dev client
+        run: |
+          # strictPort: bind exactly 5173 or fail loudly, never silently bump the port.
+          npm run dev -- --host 127.0.0.1 --port 5173 --strictPort &
+          echo $! > .devpid
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:5173 >/dev/null && { echo "dev client up"; break; }
+            sleep 2
+          done
+
+      # Change-aware capture: map the diff to the screens it implies (inventory, world
+      # map, ...). Only on pull_request; otherwise pr_screenshots falls back to the fixed
+      # tour. pr.diff is gitignored.
+      - name: Compute PR diff (for change-aware capture)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: git diff --no-color "$BASE_SHA" "$HEAD_SHA" > pr.diff || true
+
+      - name: Capture screenshots
+        env:
+          GAME_URL: http://127.0.0.1:5173
+          SHOTS_DIR: pr-shots
+          DIFF_FILE: pr.diff
+        run: node scripts/pr_screenshots.mjs
+
+      - name: Stop the dev client
+        if: always()
+        run: kill "$(cat .devpid)" 2>/dev/null || true
+
+      - name: Upload screenshots
+        id: upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-screenshots
+          path: pr-shots/
+          if-no-files-found: warn
+
+      - name: Comment with screenshot link
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SHOTS_DIR: pr-shots
+        run: node scripts/pr_comment_shots.mjs
+
+  ai-review:
+    name: AI review (OpenRouter)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Compute PR diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git diff --no-color "$BASE_SHA" "$HEAD_SHA" > pr.diff || true
+          echo "diff bytes: $(wc -c < pr.diff)"
+
+      - name: Review with OpenRouter
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'openrouter/owl-alpha' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DIFF_FILE: pr.diff
+        run: node scripts/ai_review.mjs

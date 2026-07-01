@@ -16,6 +16,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.loot.chestTitle': '宝箱',
+  'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
   'hudChrome.nameplate.mob': '[{level}] {name}',
@@ -251,6 +252,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。',
   'hudChrome.options.showWalletOnCharacterScreen': 'キャラクター画面にウォレットを表示',
   'hudChrome.options.showWalletOnPlayerCard': 'プレイヤーカードにウォレットを表示',
+  'hudChrome.options.showDevBadges': '開発者バッジを表示',
   'hudChrome.playerCard.showWalletBadge': 'ウォレットバッジを表示',
   'hudChrome.options.uiScale': 'UIスケール',
   'hudChrome.options.highContrastBackground': '高コントラスト背景',
@@ -2446,6 +2448,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremaster_caddis.title': '博識者',
   'entities.npcs.loremaster_caddis.greeting':
     '崩れやすい頁岩に気をつけてください、{className}。山は近ごろ落ち着きがなく、その理由を知りたいのです。',
+  'entities.npcs.auctioneer_voss.name': '競売人ヴォス',
+  'entities.npcs.auctioneer_voss.title': '世界市場の守り手',
+  'entities.npcs.auctioneer_voss.greeting':
+    '世界市場はここでも利用できます、{className}。王国中の冒険者から買うことも、自分の品を売ることもできます。',
   'entities.npcs.tidewatcher_ondrel.name': 'オンドレル・ヴェイン',
   'entities.npcs.tidewatcher_ondrel.title': '潮見の番人',
   'entities.npcs.tidewatcher_ondrel.greeting':
@@ -3293,6 +3299,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.topLevel': '最高',
   'hudChrome.leaderboard.guildXp': '累計経験値',
   'hudChrome.leaderboard.guildEmpty': 'ランク入りのギルドはまだありません。',
+  'hudChrome.leaderboard.tabDevs': '開発者',
+  'hudChrome.leaderboard.devName': 'コントリビューター',
+  'hudChrome.leaderboard.devTierCol': 'バッジ',
+  'hudChrome.leaderboard.mergedPrs': 'マージ済みPR',
+  'hudChrome.leaderboard.devEmpty': 'ランク入りのコントリビューターはまだいません。',
   'hudChrome.widgets.worldCoordinates': 'ワールド座標',
   'hudChrome.plurals.guildMembers.one': 'あなたは{rank}、{count}人のメンバー',
   'hudChrome.plurals.guildMembers.few': 'あなたは{rank}、{count}人のメンバー',
@@ -4906,4 +4917,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wts.label': '売却希望',
   'hudChrome.discord.relay.wtb.label': '購入希望',
   'hudChrome.discord.relay.help.label': 'ヘルプが必要',
+  // Developer badge (M16 non-Latin fills).
+  'hudChrome.devBadge.title': '開発者',
+  'hudChrome.devBadge.tiers.tinkerer': '修繕屋',
+  'hudChrome.devBadge.tiers.artificer': '工匠',
+  'hudChrome.devBadge.tiers.runesmith': 'ルーン鍛冶',
+  'hudChrome.devBadge.tiers.architect': '設計者',
+  'hudChrome.devBadge.tiers.worldwright': '世界の造り手',
+  'hudChrome.devBadge.flavors.tinkerer': '最初のプルリクエストがこの世界にマージされた。',
+  'hudChrome.devBadge.flavors.artificer':
+    '5 件のプルリクエストを経て、世界はあなたのコードに従い始める。',
+  'hudChrome.devBadge.flavors.runesmith': '15 件のプルリクエストが、稼働中のゲームに鍛え込まれた。',
+  'hudChrome.devBadge.flavors.architect': 'この世界の設計者：30 件のプルリクエストがマージされた。',
+  'hudChrome.devBadge.flavors.worldwright':
+    '世界の造り手：70 件のプルリクエストがこのゲームを形づくる。',
+  'hudChrome.devBadge.badgeTitle': '開発者：{tier}',
+  'hudChrome.devBadge.prsLanded': '{count} 件のプルリクエストがマージ済み',
+  'hudChrome.devBadge.contributor': 'オープンソース貢献者',
+  'hudChrome.devBadge.link.cta': 'GitHub を連携',
+  'hudChrome.devBadge.link.relink': 'GitHub を再連携',
+  'hudChrome.devBadge.link.benefits':
+    'GitHub を連携すると、オープンソースリポジトリにマージされたプルリクエストに応じて開発者バッジを獲得できます。',
+  'hudChrome.devBadge.link.error': 'GitHub を連携できませんでした。もう一度お試しください。',
+  'hudChrome.devBadge.linkedAs': '{login} として連携済み',
+  'hudChrome.devBadge.unlink': 'GitHub の連携を解除',
 };

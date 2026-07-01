@@ -94,12 +94,10 @@ cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
 - `scripts/perf_tour.mjs` per-tier run: `hudHotDomWrites` pinned across tiers (byte-equivalence)
   and the FCT cap engaging per tier.
 - `tests/snapshots.test.ts`: a real Sim aura to `wireEntity` to `ClientWorld` round trip pins that
-  a negative-value `buff_*` stat-sap AND any stat-source buff (the `STAT_SOURCE_AURA_KINDS` the
-  character sheet names) carry their value over the wire (so `isAuraDebuff` agrees online and
-  offline and the stat breakdown can attribute the buff by name), while non-stat positive buffs
-  (a haste multiplier), absorb shields, and negative-value non-buff auras (a fear angle) stay
-  sparse and decode to 0 (no other online behavior changes); an old-server wire with no value
-  decodes to 0 (backward compatible).
+  a negative-value `buff_*` stat-sap carries its value over the wire (so `isAuraDebuff` agrees
+  online and offline), while positive buffs, absorb shields, and negative-value non-buff auras
+  (a fear angle) stay sparse and decode to 0 (no other online behavior changes); an old-server
+  wire with no value decodes to 0 (backward compatible).
 - `tests/auras_painter.test.ts`: a wire-faithful negative-value `buff_*` sap, driven through the
   real `createAurasView` into the low painter, renders past the buff budget (the view to painter
   cap path for the sap).
@@ -122,10 +120,7 @@ carries the data):
 - `server/game.ts`: `WireAura` gained an optional `value`, emitted SPARSELY by the aura serializer
   for exactly the case the classification reads it, `a.value < 0 && a.kind.startsWith('buff_')`,
   sent raw so the sign survives the wire. Positive buffs, absorb shields, and negative-value
-  non-buff auras (a fear's random facing angle) stay off the wire. (Later widened: any stat-source
-  buff kind in `STAT_SOURCE_AURA_KINDS` also rides the wire at any sign, so the character-sheet
-  source breakdown can name it online; the fairness invariant is unaffected, because adding data
-  to the wire cannot hide actionable information.)
+  non-buff auras (a fear's random facing angle) stay off the wire.
 - `src/net/online.ts`: the aura decode reads `a.value ?? 0` (was hardcoded `0`), so a missing
   value still decodes to `0` (an old server, or any sparse case) and the field is backward
   compatible in both directions.

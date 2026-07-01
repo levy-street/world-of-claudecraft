@@ -11,6 +11,12 @@
 
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
+import {
+  MARKET_PAGE_SIZE,
+  type MarketQuery,
+  marketItemMatches,
+  sanitizeMarketQuery,
+} from './market_query';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
@@ -68,8 +74,11 @@ export class Market {
   marketListings: MarketListing[] = [];
   private marketCollections = new Map<string, MarketCollection>();
   private nextListingId = 1;
-  // assigned by the Sim ctor during NPC placement (the NPC loop stays on Sim).
-  merchantId = -1;
+  // Entity ids of every NPC with `market: true`, assigned by the Sim ctor during NPC
+  // placement (the NPC loop stays on Sim). The World Market is a single shared book;
+  // any of these merchants is a valid place to stand and deal, so a player can use the
+  // auction house at whichever auctioneer is closest.
+  merchantIds: number[] = [];
 
   constructor(private readonly ctx: SimContext) {}
 
@@ -85,14 +94,12 @@ export class Market {
     this.updateMarket();
   }
 
-  private merchantEntity(): Entity | null {
-    const e = this.ctx.entities.get(this.merchantId);
-    return e && e.kind === 'npc' ? e : null;
-  }
-
   private nearMerchant(e: Entity): boolean {
-    const m = this.merchantEntity();
-    return !!m && dist2d(e.pos, m.pos) <= MARKET_RANGE;
+    for (const id of this.merchantIds) {
+      const m = this.ctx.entities.get(id);
+      if (m && m.kind === 'npc' && dist2d(e.pos, m.pos) <= MARKET_RANGE) return true;
+    }
+    return false;
   }
 
   private marketSellerKey(meta: PlayerMeta): string {
@@ -203,13 +210,13 @@ export class Market {
 
   // List a stack from your bags for sale. The goods are escrowed (pulled from
   // your bags immediately) and held by the Merchant until bought or reclaimed.
-  // Set the player's session-only World Market browse filter. Purely a
-  // display/query narrowing — no gameplay effect — so it needs no proximity or
-  // liveness gate; the next marketInfoFor snapshot reflects it.
-  marketSearch(query: string, pid?: number): void {
+  // Set the player's session-only World Market browse query (search + type/subtype/
+  // rarity filters + page). Purely a display/query narrowing — no gameplay effect — so
+  // it needs no proximity or liveness gate; the next marketInfoFor snapshot reflects it.
+  marketSearch(query: MarketQuery, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    r.meta.marketFilter = (query ?? '').slice(0, 40);
+    r.meta.marketQuery = sanitizeMarketQuery(query);
   }
 
   marketList(itemId: string, count: number, price: number, pid?: number): void {
@@ -299,7 +306,10 @@ export class Market {
     const listing = this.marketListings[idx];
     const def = ITEMS[listing.itemId];
     if (!def) {
-      this.marketListings.splice(idx, 1);
+      // The item id is no longer known (a content edit). Do not silently delete
+      // the listing: that destroys the seller's escrowed goods with no refund.
+      // Leave it intact so the owner can cancel/reclaim it; just refuse the buy.
+      this.ctx.error(meta.entityId, 'That listing is no longer available.');
       return;
     }
     if (this.marketListingBelongsTo(listing, meta)) {
@@ -415,33 +425,31 @@ export class Market {
     // the World Market is a place you visit — only stream it while standing by
     // the Merchant, which also bounds the per-snapshot wire cost
     if (!this.nearMerchant(e)) return null;
-    // Server-side browse filter: a substring match on item name (and id) lets a
-    // player reach goods past MARKET_WIRE_LIMIT without lifting the wire cap.
-    const filter = meta.marketFilter.trim().toLowerCase();
-    const matched = filter
-      ? this.marketListings.filter((l) => {
-          const name = (ITEMS[l.itemId]?.name ?? l.itemId).toLowerCase();
-          return name.includes(filter) || l.itemId.toLowerCase().includes(filter);
-        })
-      : this.marketListings;
+    // Server-side browse: filter the WHOLE book by the player's query (search
+    // substring + type/subtype/rarity), sort, then paginate. Doing this here (not on
+    // the client over a single wire window) is what lets a player page through and
+    // filter every listing, not just the first MARKET_WIRE_LIMIT.
+    const query: MarketQuery = meta.marketQuery;
+    const matched = this.marketListings.filter((l) => marketItemMatches(l.itemId, query));
     const sorted = [...matched].sort((a, b) => {
       const na = ITEMS[a.itemId]?.name ?? a.itemId;
       const nb = ITEMS[b.itemId]?.name ?? b.itemId;
       return na.localeCompare(nb) || a.price - b.price;
     });
-    // Always wire the seller their own listings first, then fill the rest of the
-    // wire budget with everyone else's. Without this, on a busy shared market a
-    // seller's goods can sort past MARKET_WIRE_LIMIT and never reach them — the
-    // SELL tab would then read "12/12" while only a handful of their listings
-    // are visible. MARKET_MAX_LISTINGS (12) ≪ MARKET_WIRE_LIMIT (120), so a
-    // seller's own goods always fit alongside a healthy slice of the market.
+    // The viewer's own listings are always wired (so they can reclaim from the Browse
+    // tab without hunting for the right page); other sellers' listings are paged. Own
+    // count (<= MARKET_MAX_LISTINGS = 12) plus one page (MARKET_PAGE_SIZE = 50) stays
+    // well under MARKET_WIRE_LIMIT, which remains a hard safety bound on wire size.
     const isMine = (l: MarketListing) => this.marketListingBelongsTo(l, meta);
     const mineSorted = sorted.filter(isMine);
     const others = sorted.filter((l) => !isMine(l));
-    const wired = [
-      ...mineSorted,
-      ...others.slice(0, Math.max(0, MARKET_WIRE_LIMIT - mineSorted.length)),
-    ];
+    const pageCount = Math.max(1, Math.ceil(others.length / MARKET_PAGE_SIZE));
+    const page = Math.max(0, Math.min(pageCount - 1, query.page));
+    const othersPage = others.slice(
+      page * MARKET_PAGE_SIZE,
+      page * MARKET_PAGE_SIZE + MARKET_PAGE_SIZE,
+    );
+    const wired = [...mineSorted, ...othersPage].slice(0, MARKET_WIRE_LIMIT);
     const listings = wired.map((l) => ({
       id: l.id,
       sellerName: isMine(l) ? meta.name : l.sellerName,
@@ -458,8 +466,12 @@ export class Market {
     );
     return {
       listings,
+      // Every listing matching the filter (the viewer's own plus all others), so the
+      // SELL/notes read true counts; `pageCount` below paginates the others.
       totalCount: matched.length,
-      filter: meta.marketFilter,
+      filter: query.search,
+      page,
+      pageCount,
       collectionCopper: col?.copper ?? 0,
       collectionItems: col ? col.items.map((s) => ({ ...s })) : [],
       cutPct: Math.round(MARKET_CUT * 100),
@@ -497,7 +509,15 @@ export class Market {
   loadMarket(save: MarketSave | null | undefined): void {
     if (!save) return;
     for (const l of save.listings ?? []) {
-      if (!l || typeof l.itemId !== 'string' || !ITEMS[l.itemId]) continue;
+      // Keep a listing whose item id is no longer in ITEMS (a content rename,
+      // retirement, or typo). Dropping it would silently destroy every escrowed
+      // copy on the next restart and never refund the seller. An unknown id is
+      // dormant, recoverable data (the owner can reclaim it into bags, exactly
+      // as the character load path keeps unknown ids verbatim); a re-added or
+      // corrected id rehydrates it. Display/buy paths already guard on ITEMS[id].
+      if (!l || typeof l.itemId !== 'string') continue;
+      if (!ITEMS[l.itemId])
+        console.warn(`market: keeping listing with unknown item id ${l.itemId}`);
       this.marketListings.push({
         id: l.id,
         sellerKey: String(l.sellerKey ?? ''),
@@ -518,8 +538,11 @@ export class Market {
       if (!c || typeof c.key !== 'string') continue;
       this.marketCollections.set(c.key, {
         copper: Math.max(0, Math.floor(c.copper) || 0),
+        // Keep returned/expired-listing items even when their id is unknown, for
+        // the same reason as listings above: a content edit must not silently
+        // empty a player's pending pickups. The id stays dormant until corrected.
         items: (c.items ?? [])
-          .filter((s) => s && ITEMS[s.itemId])
+          .filter((s) => s && typeof s.itemId === 'string')
           .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
       });
     }

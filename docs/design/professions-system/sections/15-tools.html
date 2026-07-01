@@ -1,0 +1,19 @@
+  <h2 id="tools">Tools</h2>
+  <p>A gathering tool is two layers: a durable base tool plus consumable effects slotted onto it.</p>
+  <h3>Base tool: tier, infinite durability</h3>
+  <ul>
+    <li>Each base tool has a <strong>tier</strong>. Your gathering skill gates which tier you can use; the tool's tier in turn gates which <strong>nodes</strong> (and which monster materials) you can gather at all.</li>
+    <li>The base tool has <strong>infinite durability</strong>, so you are never stranded in the wild unable to gather. Basic base tools are sold by vendors; higher tiers are crafted.</li>
+    <li>A base tool also carries a <strong>rarity</strong> on the standard item tiers. Rarity does not change tier gating; it drives how often effects spend durability (see below).</li>
+  </ul>
+  <h3>Effects: durable, rechargeable bonuses</h3>
+  <ul>
+    <li><strong>Effects</strong> are the bonuses (quantity, quality, respawn speed), slotted onto a base tool and produced by a production craft. Effects have their own <strong>durability</strong> and deplete with use; when an effect runs out the base tool keeps working at tier, just without that bonus.</li>
+    <li>Effects are <strong>rechargeable</strong>. Two ways: the production craft that created the effect, or an Enchanter / Scribe. Recharging through the <strong>original crafter of the tool</strong> is cheaper and faster.</li>
+    <li>The recharge cost is <strong>materials aligned with the craft</strong> used, so effects are a recurring materials sink.</li>
+    <li><strong>Always or Prompt on Use:</strong> each high-value effect can be configured in the UI to fire <strong>Always</strong> or to <strong>Prompt on Use</strong>, so you do not burn a precious charge on a target you did not mean to spend it on.</li>
+    <li><strong>Rarity-scaled consumption:</strong> the chance to spend a unit of effect durability depends on the tool's rarity versus the target's rarity. Against an equal-or-higher-rarity target the tool spends a charge every use; against lower-rarity targets it often spends nothing. Example: an epic Monster Scalpel with +3 quantity spends 1 durability on an epic-equivalent monster, roughly 60 percent on a rare-equivalent, roughly 10 percent on a common-equivalent.</li>
+  </ul>
+  <div class="callout">
+    Tuning guardrail: effect costs should be meaningful but never so high that they discourage use or cost more than the materials being gathered are worth. The rarity-scaled consumption is part of that, so a high-end tool sips charges on trivial targets and saves them for valuable ones.
+  </div>

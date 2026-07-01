@@ -274,11 +274,16 @@ export const ru_RU: EnTranslations = {
       "tabsLabel": "Таблицы рекордов",
       "tabPlayers": "Игроки",
       "tabGuilds": "Гильдии",
+      "tabDevs": "Разработчики",
       "guildName": "Гильдия",
       "members": "Состав",
       "topLevel": "Макс",
       "guildXp": "Всего опыта",
-      "guildEmpty": "Пока нет гильдий в рейтинге."
+      "guildEmpty": "Пока нет гильдий в рейтинге.",
+      "devName": "Участник",
+      "devTierCol": "Значок",
+      "mergedPrs": "Слито PR",
+      "devEmpty": "Пока нет участников в рейтинге."
     },
     "raidLockout": {
       "title": "Блокировки рейдов",
@@ -331,6 +336,7 @@ export const ru_RU: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Удерживает курсор мыши внутри окна, пока вы вращаете камеру перетаскиванием, чтобы он не достигал края экрана и не переходил на другой монитор. Отключите, если предпочитаете свободный курсор.",
       "showWalletOnCharacterScreen": "Показывать кошелек на экране персонажей",
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
+      "showDevBadges": "Показывать значки разработчика",
       "uiScale": "Масштаб интерфейса",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
@@ -760,6 +766,9 @@ export const ru_RU: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Требуется уровень {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -902,6 +911,34 @@ export const ru_RU: EnTranslations = {
           "hint": "Попросите сообщество о помощи"
         }
       }
+    },
+    "devBadge": {
+      "title": "Разработчик",
+      "tiers": {
+        "tinkerer": "Мастеровой",
+        "artificer": "Искусник",
+        "runesmith": "Рунный кузнец",
+        "architect": "Архитектор",
+        "worldwright": "Творец мира"
+      },
+      "flavors": {
+        "tinkerer": "Ваш первый пул-реквест слился с этим миром.",
+        "artificer": "Пять пул-реквестов спустя мир подчиняется вашему коду.",
+        "runesmith": "Пятнадцать пул-реквестов вкованы в работающую игру.",
+        "architect": "Архитектор этого мира: слито 30 пул-реквестов.",
+        "worldwright": "Творец миров: 70 пул-реквестов формируют игру."
+      },
+      "badgeTitle": "Разработчик: {tier}",
+      "prsLanded": "Слито пул-реквестов: {count}",
+      "contributor": "Контрибьютор открытого кода",
+      "link": {
+        "cta": "Привязать GitHub",
+        "relink": "Перепривязать GitHub",
+        "benefits": "Привяжите GitHub, чтобы получить значок разработчика за пул-реквесты, слитые в открытом репозитории.",
+        "error": "Не удалось привязать GitHub. Пожалуйста, попробуйте снова."
+      },
+      "linkedAs": "Привязан как {login}",
+      "unlink": "Отвязать GitHub"
     }
   },
   "guide": {
@@ -5658,6 +5695,11 @@ export const ru_RU: EnTranslations = {
         "name": "Хранитель знаний Каддис",
         "title": "Хранитель знаний",
         "greeting": "Осторожнее с рыхлым сланцем, {className}. Гора стала беспокойной, и я намерен узнать почему."
+      },
+      "auctioneer_voss": {
+        "name": "Аукционист Восс",
+        "title": "Хранитель мирового рынка",
+        "greeting": "Мировой рынок доступен и здесь, {className}. Покупайте у искателей приключений всего королевства или выставляйте свои товары."
       },
       "brother_aldric_raid": {
         "name": "Брат Алдрик",

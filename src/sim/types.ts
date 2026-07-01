@@ -314,6 +314,10 @@ interface BaseItemDef {
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
+  // Minimum character level needed to equip this piece. When omitted, the level
+  // is DERIVED from `quality` (see src/sim/item_level_req.ts); set this only to
+  // override the per-quality default for a specific item.
+  requiredLevel?: number;
   /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
   set?: string;
 }
@@ -1465,6 +1469,14 @@ export interface Entity {
   discordName?: string;
   discordJoined?: number;
   discordRole?: string;
+  // Developer-badge flair (cosmetic, server-set from a verified GitHub link plus
+  // the repo's merged-PR stats; the sim never reads any of it): the tier index
+  // (0/undefined = none, 1-5 = Tinkerer…Worldwright), the count of merged pull
+  // requests backing it (for the inspect/card readout), and the GitHub login
+  // (for the inspect readout and the public profile link).
+  devTier?: number;
+  devMergedPrs?: number;
+  githubLogin?: string;
 }
 
 export interface NythraxisWardChannel {

@@ -103,6 +103,7 @@ const NPC_IDS = [
   'quartermaster_bree',
   'armorer_hode',
   'loremaster_caddis',
+  'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
 ] as const;

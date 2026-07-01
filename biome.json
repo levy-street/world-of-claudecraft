@@ -19,7 +19,9 @@
       "!src/ui/i18n.status.summary.json",
       "!tests/parity/golden",
       "!**/*.svelte",
-      "!**/*.min.js"
+      "!**/*.min.js",
+      "!docs/design/professions-system",
+      "!docs/design/professions-system.html"
     ]
   },
   "formatter": {

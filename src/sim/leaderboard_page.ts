@@ -1,10 +1,10 @@
-import type { GuildLeaderboardEntry, LeaderboardEntry } from '../world_api';
+import type { DevLeaderboardEntry, GuildLeaderboardEntry, LeaderboardEntry } from '../world_api';
 
 // Host-agnostic pagination for the high-score boards. Lives in src/sim/
 // (no DOM, no randomness) so BOTH the authoritative server and the offline Sim
 // can share one slicing rule; the client only renders the page the server
-// already decided. Mirrors paginateMarketListings (src/ui/market_filters.ts) but
-// is reachable from server/ (which may import sim/ but never ui/).
+// already decided. Same shape as the World Market's server-side pagination
+// (src/sim/market.ts) and reachable from server/ (which may import sim/ but never ui/).
 
 // 50 ranks per page: 10 pages cover the 500 deepest, 20 cover the 1000-cap.
 export const LEADERBOARD_PAGE_SIZE = 50;
@@ -25,6 +25,7 @@ export interface RankedPage<T> {
 
 export type LeaderboardPage = RankedPage<LeaderboardEntry>;
 export type GuildLeaderboardPage = RankedPage<GuildLeaderboardEntry>;
+export type DevLeaderboardPage = RankedPage<DevLeaderboardEntry>;
 
 // Slice `entries` (already sorted, rank ascending) into a single page. The
 // requested page is clamped into range so a stale page index never yields an
@@ -70,5 +71,15 @@ export function paginateGuildLeaderboard(
   requestedPage: number,
   requestedPageSize: number = LEADERBOARD_PAGE_SIZE,
 ): GuildLeaderboardPage {
+  return paginateRanked(entries, requestedPage, requestedPageSize);
+}
+
+// The developer board (contributors ranked by landed commits). Thin typed
+// wrapper over paginateRanked.
+export function paginateDevLeaderboard(
+  entries: readonly DevLeaderboardEntry[],
+  requestedPage: number,
+  requestedPageSize: number = LEADERBOARD_PAGE_SIZE,
+): DevLeaderboardPage {
   return paginateRanked(entries, requestedPage, requestedPageSize);
 }
