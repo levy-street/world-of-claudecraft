@@ -753,6 +753,7 @@ function blankEntity(id: number): Entity {
     wanderTarget: null,
     wanderTimer: 0,
     aggroTargetId: null,
+    chaseStall: 0,
     respawnTimer: 0,
     corpseTimer: 0,
     lootFfaTimer: Infinity,

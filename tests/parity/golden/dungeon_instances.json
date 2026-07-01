@@ -789,7 +789,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 404,
-      "state": "7ff6e5a9",
+      "state": "8879a234",
       "events": "3d5bfffa",
       "rng": {
         "draws": 49,
@@ -942,7 +942,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.554837,
+          "facing": -0.211093,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
@@ -956,8 +956,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 896.896885,
-            "z": -1232.04154
+            "x": 897,
+            "z": -1232
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -968,7 +968,7 @@
             "armor": 126
           },
           "templateId": "crypt_shambler",
-          "wanderTimer": 4.424821,
+          "wanderTimer": 3.761964,
           "weapon": {
             "max": 42,
             "min": 27,
@@ -981,7 +981,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.558388,
+          "facing": 0.197396,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
@@ -995,8 +995,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 902.764071,
-            "z": -1231.043053
+            "x": 903,
+            "z": -1231
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1007,7 +1007,7 @@
             "armor": 108
           },
           "templateId": "crypt_shambler",
-          "wanderTimer": 4.745525,
+          "wanderTimer": 2.564145,
           "weapon": {
             "max": 38,
             "min": 24,
@@ -1529,7 +1529,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 404,
-      "state": "4fdde2cd",
+      "state": "acf683b4",
       "events": "50e64c00",
       "rng": {
         "draws": 49,
@@ -1540,7 +1540,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 404,
-      "state": "85f16aeb",
+      "state": "78efaec0",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1551,7 +1551,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 404,
-      "state": "c2004137",
+      "state": "f6185193",
       "events": "741638a5",
       "rng": {
         "draws": 49,

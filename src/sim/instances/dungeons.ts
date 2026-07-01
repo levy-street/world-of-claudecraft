@@ -180,6 +180,20 @@ export function leaveDungeon(ctx: SimContext, pid?: number): void {
       return;
     }
   }
+  // Drop the departing player from every mob in this instance so they stop targeting
+  // someone who has left: each switches to whoever else is on its threat table, or
+  // de-aggros and returns home if no one remains (retargetMob) (#565).
+  const inst = ctx.instances.find(
+    (i) => i.dungeonId === dungeon.id && i.partyKey === instanceKeyFor(ctx, p.id),
+  );
+  if (inst) {
+    for (const id of inst.mobIds) {
+      const m = ctx.entities.get(id);
+      if (!m || m.dead) continue;
+      m.threat.delete(p.id);
+      if (m.aggroTargetId === p.id) ctx.retargetMob(m);
+    }
+  }
   p.pos = ctx.groundPos(dungeon.doorPos.x, dungeon.doorPos.z - 4);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

@@ -444,6 +444,11 @@ const FOLLOW_MAX_RANGE = 60; // give up follow once the leader is this far away
 // past this window, so the owner's out-of-combat health regen resumes. Matches the
 // 5s combat-linger used for the owner's own inCombat flag.
 const PET_COMBAT_LINGER = 5;
+// A mob only keeps a player flagged in combat while it is engaging a target within
+// this range. Beyond it (a mob stuck out of reach, chased far off, or leashing home)
+// the player falls back to the combat timer and drops combat, instead of being pinned
+// in combat indefinitely by a mob that can never actually hit them (#563).
+const COMBAT_LEASH_RADIUS = 35;
 // PET_TAUNT_RANGE / PET_FEED_DURATION / PET_FEED_TICK / DEMON_HEAL_MANA_COST /
 // DEMON_HEAL_DURATION / DEMON_HEAL_TICK / TAMED_TARGET_RESPAWN_SECONDS moved with the
 // slice to src/sim/pet/pet_commands.ts (P1b); DEMON_HEAL_CAST_ID -> ./types (read by the
@@ -2396,9 +2401,15 @@ export class Sim {
         (e.aiState === 'chase' || e.aiState === 'attack' || e.aiState === 'flee') &&
         e.aggroTargetId !== null
       ) {
-        this.engagedPids.add(e.aggroTargetId);
+        // Only count it while the mob is ACTUALLY engaging: a live target within
+        // COMBAT_LEASH_RADIUS. A mob that can't reach its target (pinned/leashing) or
+        // has run far off no longer pins the player in combat, otherwise a stuck mob
+        // keeps you flagged forever even though nothing is hitting you (#563).
         const tgt = this.entities.get(e.aggroTargetId);
-        if (tgt && tgt.ownerId !== null) this.engagedPids.add(tgt.ownerId);
+        if (tgt && !tgt.dead && dist2d(e.pos, tgt.pos) <= COMBAT_LEASH_RADIUS) {
+          this.engagedPids.add(e.aggroTargetId);
+          if (tgt.ownerId !== null) this.engagedPids.add(tgt.ownerId);
+        }
       }
       // a player's pet that is actively fighting an enemy keeps its owner in
       // combat. A pet merely holding a target it is not trading blows with (out of

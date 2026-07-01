@@ -101,6 +101,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     wanderTarget: null,
     wanderTimer: 0,
     aggroTargetId: null,
+    chaseStall: 0,
     respawnTimer: 0,
     corpseTimer: 0,
     lootFfaTimer: Infinity, // no FFA countdown until rollLoot starts it at death

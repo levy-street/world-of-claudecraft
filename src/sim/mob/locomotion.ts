@@ -51,6 +51,9 @@ const EVADE_SPEED_MULT = 1.6;
 // can't get closer to home for this long, it starts phasing through the blocker.
 const EVADE_STALL_TIMEOUT = 3;
 const FLEE_RETURN_GRACE = 8;
+// Seconds a chasing mob may fail to advance toward its target before giving it up: a
+// mob pinned out of reach (terrain/water/a prop) otherwise chases forever (#564).
+const CHASE_STALL_TIMEOUT = 5;
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 
@@ -267,11 +270,31 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         break;
       }
       mob.swingTimer = Math.max(0, mob.swingTimer - DT);
-      if (ctx.tryMobMeleeSwingInRange(mob, target)) break;
-      if (!ctx.isRooted(mob))
+      if (ctx.tryMobMeleeSwingInRange(mob, target)) {
+        mob.chaseStall = 0;
+        break;
+      }
+      if (!ctx.isRooted(mob)) {
+        const px = mob.pos.x;
+        const pz = mob.pos.z;
         ctx.moveToward(mob, target.pos, mob.moveSpeed * ctx.moveSpeedMult(mob));
-      else mob.facing = angleTo(mob.pos, target.pos);
-      if (ctx.tryMobMeleeSwingInRange(mob, target)) break;
+        // Give-up: a mob pinned out of reach of its target (terrain/water/a prop)
+        // would otherwise chase forever and never leash. After CHASE_STALL_TIMEOUT of
+        // no forward progress, drop this target and take the next on the threat table,
+        // or evade home if there is no one else (retargetMob) (#564).
+        const moved = Math.hypot(mob.pos.x - px, mob.pos.z - pz);
+        if (moved < mob.moveSpeed * DT * 0.25) mob.chaseStall += DT;
+        else mob.chaseStall = 0;
+        if (mob.chaseStall >= CHASE_STALL_TIMEOUT) {
+          mob.threat.delete(target.id);
+          retargetMob(ctx, mob);
+          break;
+        }
+      } else mob.facing = angleTo(mob.pos, target.pos);
+      if (ctx.tryMobMeleeSwingInRange(mob, target)) {
+        mob.chaseStall = 0;
+        break;
+      }
       break;
     }
     case 'attack': {
