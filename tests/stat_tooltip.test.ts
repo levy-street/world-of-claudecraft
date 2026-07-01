@@ -384,8 +384,14 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     sim.setPlayerLevel(20);
     const p = sim.player;
     p.auras.push({
-      id: 'cat_form', name: 'Cat Form', kind: 'form_cat',
-      remaining: 3600, duration: 3600, value: 1, sourceId: p.id, school: 'physical',
+      id: 'cat_form',
+      name: 'Cat Form',
+      kind: 'form_cat',
+      remaining: 3600,
+      duration: 3600,
+      value: 1,
+      sourceId: p.id,
+      school: 'physical',
     });
     recalcPlayerStats(p, 'druid', sim.equipment);
     const armor = buildStatTooltip('armor', inputWithGear(sim, 'druid'));

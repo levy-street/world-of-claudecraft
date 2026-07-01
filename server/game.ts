@@ -457,10 +457,12 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
-  // Sent SPARSELY: only a negative-value buff_* aura (a stat-sap) rides the wire (see the
-  // serializer below), the exact case auras_view.isAuraDebuff reads value for. Everything
-  // else (positive buffs, absorb shields, and negative-value non-buff auras like the random
-  // fear angle on an incapacitate) stays off the wire and decodes to 0, exactly as before.
+  // Sent SPARSELY, for the two cases the client UI reads it (see the serializer below):
+  // a negative-value buff_* aura (a stat-sap, the case auras_view.isAuraDebuff reads value
+  // for), and any STAT_SOURCE_AURA_KINDS aura at any sign (so the character-sheet source
+  // breakdown can name the buff). Everything else (non-stat positive buffs like haste,
+  // absorb shields, negative-value non-buff auras like the random fear angle on an
+  // incapacitate) stays off the wire and decodes to 0, exactly as before.
   value?: number;
   stacks?: number;
   // Remaining charges on a charge-limited aura (Lightning Shield's reflect count). Sent only

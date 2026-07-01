@@ -1,6 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { TALENTS } from '../src/sim/content/talents';
-import { ABILITIES } from '../src/sim/data';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { tTalent } from '../src/ui/talent_i18n';
 
@@ -89,7 +88,8 @@ function descriptionNumbers(text: string): { pcts: number[]; bare: number[] } {
   const bare: number[] = [];
   for (const m of text.matchAll(/\b(\d+(?:\.\d+)?)\b/g)) {
     const n = parseFloat(m[1]);
-    const after = text.slice(m.index! + m[0].length, m.index! + m[0].length + 8).toLowerCase();
+    const end = (m.index ?? 0) + m[0].length;
+    const after = text.slice(end, end + 8).toLowerCase();
     if (/^\s*%/.test(after)) continue; // already counted as a percent
     if (/^\s*(sec|second|yard|yd|min|meter|m\b)/.test(after)) continue; // duration/range
     bare.push(n);
@@ -219,8 +219,11 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
 
   it('regression locks: vague tooltips now read real numbers; egregious effects honor their promise', () => {
     setLanguage('en');
-    const render = (cls: string, finder: (e: Entry) => boolean) =>
-      entries.find((e) => e.cls === cls && finder(e))!.render();
+    const render = (cls: string, finder: (e: Entry) => boolean) => {
+      const entry = entries.find((e) => e.cls === cls && finder(e));
+      if (!entry) throw new Error(`no talent entry matched for ${cls}`);
+      return entry.render();
+    };
     // Barrage was "Improves instant shots per rank." (vague) -> now the real per-rank
     // numbers. Concussive Shot is a utility slow, so the talent cuts its cooldown (more
     // frequent slows) rather than buffing its negligible damage.
