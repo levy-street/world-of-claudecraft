@@ -140,6 +140,16 @@ export function validateGuildName(name: string): string | null {
 
 const RANK_LABEL: Record<GuildRank, string> = { leader: 'Guild Master', officer: 'Officer', member: 'Member' };
 
+function sortGuildMembers(members: GuildMemberEntry[]): GuildMemberEntry[] {
+  return members.slice().sort(
+    (a, b) =>
+      Number(b.online) - Number(a.online) ||
+      rankOrder(a.rank) - rankOrder(b.rank) ||
+      b.level - a.level ||
+      a.name.localeCompare(b.name),
+  );
+}
+
 export class SocialService {
   private pendingGuildInvites = new Map<number, { guildId: number; guildName: string; fromName: string; expiresAt: number }>();
 
@@ -166,9 +176,7 @@ export class SocialService {
         id: membership.guildId,
         name: membership.guildName,
         rank: membership.rank,
-        members: members
-          .map((m) => ({ ...m, ...this.presence(m.id) }))
-          .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
+        members: sortGuildMembers(members.map((m) => ({ ...m, ...this.presence(m.id) }))),
       };
     }
     return {

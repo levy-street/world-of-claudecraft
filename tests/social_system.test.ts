@@ -302,6 +302,40 @@ describe('guilds', () => {
     expect(snap.guild?.members.map((m) => m.name)).toEqual(['Aleph']);
   });
 
+  it('sorts guild members by online status, rank, level, and name', async () => {
+    h.add(3, 'Gimel', { level: 60 });
+    h.add(4, 'Cora', { level: 50 });
+    h.add(5, 'Dalet', { level: 70 });
+    h.add(6, 'Fenn', { level: 20 });
+    h.add(7, 'Eon', { level: 70 });
+    h.tx.setOnline(4);
+    h.tx.setOnline(5);
+    h.tx.setOnline(6);
+    h.tx.setOnline(7);
+
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    for (const id of [2, 3, 4, 5, 6, 7]) {
+      await h.svc.guildInvite(h.actor(1), h.actor(id).name);
+      await h.svc.guildAccept(h.actor(id));
+    }
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    await h.svc.guildSetRank(h.actor(1), 'Cora', 'officer');
+    h.tx.setOffline(4);
+    h.tx.setOffline(5);
+    h.tx.setOffline(7);
+
+    const snap = await h.svc.snapshot(1);
+    expect(snap.guild?.members.map((m) => m.name)).toEqual([
+      'Aleph',
+      'Bet',
+      'Gimel',
+      'Fenn',
+      'Cora',
+      'Dalet',
+      'Eon',
+    ]);
+  });
+
   it('refreshes guildmates\' panels when a member comes online, even non-friends (#100)', async () => {
     await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
     await h.svc.guildInvite(h.actor(1), 'Bet');
