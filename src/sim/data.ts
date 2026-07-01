@@ -22,7 +22,7 @@ import type {
 } from './types';
 
 export type { FishingEntry } from './content/items';
-export { FISHING_RARE_ID, FISHING_TABLES };
+export { FISHING_RARE_ID, FISHING_TABLES, GATHER_NODE_PLACEMENTS, GATHER_NODE_TYPES };
 
 import {
   BROTHER_HALVEN,
@@ -31,6 +31,7 @@ import {
   DELVE_MOBS,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { GATHER_NODE_PLACEMENTS, GATHER_NODE_TYPES } from './content/gather_nodes';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
   TEMPLE_CAMPS,
@@ -221,6 +222,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
     delveMarkers: sets.flatMap((s) => s.delveMarkers ?? []),
+    gatherNodes: [...sets.flatMap((s) => s.gatherNodes ?? []), ...GATHER_NODE_PLACEMENTS],
   };
 }
 

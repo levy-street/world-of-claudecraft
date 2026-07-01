@@ -1164,6 +1164,26 @@ export interface DungeonDef {
 
 export type BiomeId = 'vale' | 'marsh' | 'peaks';
 
+export type GatherNodeProfession = 'mining' | 'logging' | 'herbalism';
+export type GatherNodeVisual = 'ore' | 'wood' | 'herb';
+
+export interface GatherNodeDef {
+  id: string;
+  name: string;
+  profession: GatherNodeProfession;
+  tier: number;
+  visual: GatherNodeVisual;
+}
+
+export interface GatherNodePlacement {
+  id: string;
+  nodeId: string;
+  zoneId: string;
+  x: number;
+  z: number;
+  rot?: number;
+  scale?: number;
+}
 export interface ZoneDef {
   id: string;
   name: string;
@@ -1211,6 +1231,7 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  gatherNodes?: GatherNodePlacement[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { PROPS, WORLD_MIN_Z } from '../sim/data';
+import { GATHER_NODE_TYPES, PROPS, WORLD_MIN_Z } from '../sim/data';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -102,6 +102,8 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   anvil: { url: '/models/props/anvil.glb', kit: 'qprops' },
   weaponStand: { url: '/models/props/weapon_stand.glb', kit: 'qprops' },
   lanternWall: { url: '/models/props/lantern_wall.glb', kit: 'qprops' },
+  resourceWoodStack: { url: '/models/resources/wood_log_stack.glb', kit: 'resource' },
+  resourceHerb: { url: '/models/foliage/bush_flowers.glb', kit: 'resource' },
   // Meshy-generated portal door used as the overworld Reliquary Hill marker;
   // has its own backing slab so the animated shader plane sits on the front face.
   // yaw: Math.PI if the model loads backwards after inspecting in-game.
@@ -132,6 +134,8 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'fence',
   'bonfire',
   'oreRocks',
+  'resourceWoodStack',
+  'resourceHerb',
   'tentOpen',
   'tentSmall',
   'rockLargeD',
@@ -217,6 +221,8 @@ const MAT_OVERRIDES: Record<
   'minerock:dirt': { color: 0x82868a },
   'minerock:grass': { color: 0x77846a },
   'minerock:_defaultMat': { color: 0x6f7376 },
+  'resource:leafDark': { color: 0x4f7f36 },
+  'resource:leaf': { color: 0x6f9c45 },
   // graveyard colormap is near-white; knock it toward weathered stone
   'grave:colormap': { color: 0xd2d2c8 },
 };
@@ -433,6 +439,17 @@ function keyRand(key: number, n: number): number {
 }
 
 type Scale = number | [number, number, number];
+
+const GATHER_NODE_PROP_BY_VISUAL: Record<string, { key: PropKey; scale: Scale; yOffset: number }> =
+  {
+    ore: { key: 'oreRocks', scale: 2.2, yOffset: -0.02 },
+    wood: { key: 'resourceWoodStack', scale: 2.1, yOffset: -0.04 },
+    herb: { key: 'resourceHerb', scale: 1.65, yOffset: -0.03 },
+  };
+
+function multiplyScale(s: Scale, mult: number): Scale {
+  return typeof s === 'number' ? s * mult : [s[0] * mult, s[1] * mult, s[2] * mult];
+}
 
 function setScale(o: THREE.Object3D, s: Scale): void {
   if (typeof s === 'number') o.scale.setScalar(s);
@@ -1038,6 +1055,21 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     });
     g.position.set(r.x - 2, fy, r.z - 3);
     group.add(shadowed(g));
+  }
+
+  // ---- gatherable resource nodes: authored in content/gather_nodes.ts ------
+  for (const node of PROPS.gatherNodes ?? []) {
+    const def = GATHER_NODE_TYPES[node.nodeId];
+    const visual = def ? GATHER_NODE_PROP_BY_VISUAL[def.visual] : undefined;
+    if (!visual) continue;
+    addInstance(
+      visual.key,
+      node.x,
+      ground(node.x, node.z) + visual.yOffset,
+      node.z,
+      node.rot ?? propRand(node.x, node.z, 23) * Math.PI * 2,
+      node.scale ? multiplyScale(visual.scale, node.scale) : visual.scale,
+    );
   }
 
   // ---- mine entrances: timber portal, rock mound, ore cart, lantern --------
