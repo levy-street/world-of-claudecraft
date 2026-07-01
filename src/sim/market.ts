@@ -13,7 +13,14 @@ import { ITEMS } from './data';
 import { formatMoney } from './format_money';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
+import {
+  cloneInvSlot,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  isInstancedInvSlot,
+} from './types';
 
 const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to deal
 // the /listings readout (still on Sim) reports the seller's count against this cap,
@@ -121,13 +128,39 @@ export class Market {
     return c;
   }
 
+  private marketCollectionSlot(slot: InvSlot): InvSlot {
+    const clone = cloneInvSlot(slot);
+    clone.count = isInstancedInvSlot(clone) ? 1 : Math.max(1, Math.floor(clone.count) || 1);
+    return clone;
+  }
+
+  private fungibleItemCount(meta: PlayerMeta, itemId: string): number {
+    let total = 0;
+    for (const slot of meta.inventory) {
+      if (slot.itemId === itemId && !isInstancedInvSlot(slot)) total += slot.count;
+    }
+    return total;
+  }
+
+  private removeFungibleItem(meta: PlayerMeta, itemId: string, count: number): void {
+    for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
+      const slot = meta.inventory[i];
+      if (slot.itemId !== itemId || isInstancedInvSlot(slot)) continue;
+      const take = Math.min(slot.count, count);
+      slot.count -= take;
+      count -= take;
+      if (slot.count <= 0) meta.inventory.splice(i, 1);
+    }
+    this.ctx.onInventoryChangedForQuests(meta);
+  }
+
   private mergeMarketCollections(fromKey: string, toKey: string): boolean {
     if (!fromKey || fromKey === toKey) return false;
     const from = this.marketCollections.get(fromKey);
     if (!from) return false;
     const to = this.collectionFor(toKey);
     to.copper += from.copper;
-    to.items.push(...from.items.map((s) => ({ ...s })));
+    to.items.push(...from.items.map(cloneInvSlot));
     this.marketCollections.delete(fromKey);
     return true;
   }
@@ -236,8 +269,15 @@ export class Market {
       return;
     }
     const want = Math.max(1, Math.floor(count));
-    if (this.ctx.countItem(itemId, meta.entityId) < want) {
-      this.ctx.error(meta.entityId, 'You do not have that many to sell.');
+    const marketableCount = this.fungibleItemCount(meta, itemId);
+    if (marketableCount < want) {
+      const totalCount = this.ctx.countItem(itemId, meta.entityId);
+      this.ctx.error(
+        meta.entityId,
+        totalCount >= want
+          ? 'Instanced items cannot be listed on the World Market yet.'
+          : 'You do not have that many to sell.',
+      );
       return;
     }
     const ask = Math.floor(price);
@@ -261,7 +301,7 @@ export class Market {
       );
       return;
     }
-    this.ctx.removeItem(itemId, want, meta.entityId); // escrow
+    this.removeFungibleItem(meta, itemId, want); // escrow
     this.marketListings.push({
       id: this.nextListingId++,
       sellerKey,
@@ -383,7 +423,16 @@ export class Market {
         pid: meta.entityId,
       });
     }
-    for (const s of col.items) this.ctx.addItem(s.itemId, s.count, meta.entityId);
+    let restoredInstancedItem = false;
+    for (const s of col.items) {
+      if (isInstancedInvSlot(s)) {
+        meta.inventory.push(cloneInvSlot(s));
+        restoredInstancedItem = true;
+      } else {
+        this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      }
+    }
+    if (restoredInstancedItem) this.ctx.onInventoryChangedForQuests(meta);
     this.marketCollections.delete(this.marketSellerKey(meta));
   }
 
@@ -461,7 +510,7 @@ export class Market {
       totalCount: matched.length,
       filter: meta.marketFilter,
       collectionCopper: col?.copper ?? 0,
-      collectionItems: col ? col.items.map((s) => ({ ...s })) : [],
+      collectionItems: col ? col.items.map(cloneInvSlot) : [],
       cutPct: Math.round(MARKET_CUT * 100),
       maxListings: MARKET_MAX_LISTINGS,
       myListingCount,
@@ -488,7 +537,7 @@ export class Market {
       collections: [...this.marketCollections.entries()].map(([key, c]) => ({
         key,
         copper: c.copper,
-        items: c.items.map((s) => ({ ...s })),
+        items: c.items.map(cloneInvSlot),
       })),
       nextListingId: this.nextListingId,
     };
@@ -520,7 +569,7 @@ export class Market {
         copper: Math.max(0, Math.floor(c.copper) || 0),
         items: (c.items ?? [])
           .filter((s) => s && ITEMS[s.itemId])
-          .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
+          .map((s) => this.marketCollectionSlot(s)),
       });
     }
     const maxId = this.marketListings.reduce((m, l) => Math.max(m, l.id + 1), 1);

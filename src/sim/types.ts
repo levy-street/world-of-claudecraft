@@ -367,11 +367,50 @@ export interface OtherItemDef extends BaseItemDef {
 
 export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
+export type ItemQuality = NonNullable<BaseItemDef['quality']>;
+
+export interface ItemOwnerRef {
+  characterId?: number;
+  name?: string;
+}
+
+export interface ItemInstancePayload {
+  signer?: ItemOwnerRef;
+  effectCharges?: Record<string, number>;
+  rolledQuality?: ItemQuality;
+  rolledStats?: Partial<Stats>;
+  boundTo?: ItemOwnerRef;
+}
+
 export interface InvSlot {
   itemId: string;
   count: number;
+  instance?: ItemInstancePayload;
 }
 
+export function isInstancedInvSlot(slot: InvSlot): boolean {
+  return slot.instance !== undefined;
+}
+
+export function cloneItemInstancePayload(
+  instance: ItemInstancePayload | undefined,
+): ItemInstancePayload | undefined {
+  if (!instance) return undefined;
+  const clone: ItemInstancePayload = {};
+  if (instance.signer) clone.signer = { ...instance.signer };
+  if (instance.effectCharges) clone.effectCharges = { ...instance.effectCharges };
+  if (instance.rolledQuality) clone.rolledQuality = instance.rolledQuality;
+  if (instance.rolledStats) clone.rolledStats = { ...instance.rolledStats };
+  if (instance.boundTo) clone.boundTo = { ...instance.boundTo };
+  return clone;
+}
+
+export function cloneInvSlot(slot: InvSlot): InvSlot {
+  const clone: InvSlot = { itemId: slot.itemId, count: slot.count };
+  const instance = cloneItemInstancePayload(slot.instance);
+  if (instance) clone.instance = instance;
+  return clone;
+}
 export interface LootSlot extends InvSlot {
   // Quest corpse loot can be personal: each listed player can take one copy.
   personalFor?: number[];

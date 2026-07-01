@@ -106,6 +106,26 @@ describe('buildBagGrid', () => {
     expect(model.visible.map((s) => s.itemId)).toEqual(['sword', 'potion', 'questItem']);
   });
 
+  it('keeps instanced slots visible in the bag grid', () => {
+    const instanced: InvSlot[] = [
+      {
+        itemId: 'sword',
+        count: 1,
+        instance: {
+          signer: { characterId: 7, name: 'Crafter' },
+          effectCharges: { polish: 2 },
+          rolledQuality: 'rare',
+          rolledStats: { str: 1 },
+          boundTo: { characterId: 9, name: 'Owner' },
+        },
+      },
+    ];
+
+    const model = buildBagGrid(instanced, lookup, DEFAULT_BAG_FILTER);
+
+    expect(model.state).toBe('items');
+    expect(model.visible).toEqual(instanced);
+  });
   it('reuses bag_filter: a category filter narrows the visible rows', () => {
     const weaponsOnly = buildBagGrid(inv, lookup, { ...DEFAULT_BAG_FILTER, category: 'weapon' });
     expect(weaponsOnly.state).toBe('items');
