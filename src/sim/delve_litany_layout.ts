@@ -300,12 +300,14 @@ const LITANY_RING = litanyRoom({
   pillars: [
     { x: -8, z: 40 },
     { x: 8, z: 40 },
+    { x: 0, z: 30 },
   ],
   tombs: [],
   clutter: [],
   dressing: [
     { kind: 'dead_tree', x: -8, z: 40 },
     { kind: 'dead_tree', x: 8, z: 40 },
+    { kind: 'dead_tree', x: 0, z: 30 },
   ],
 });
 
@@ -461,7 +463,7 @@ const LITANY_APSE = litanyRoom({
     { x: -10, z: 30, hw: 4, hd: 4 },
     { x: 10, z: 32, hw: 4, hd: 4 },
     { x: 0, z: 44, hw: 5, hd: 4 },
-    { x: 0, z: 58, hw: 3, hd: 8 },
+    { x: 0, z: 60, hw: 9, hd: 9 },
     { x: 0, z: 72, hw: 11, hd: 11 },
   ],
   stubs: [],

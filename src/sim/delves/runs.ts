@@ -44,6 +44,7 @@ import {
   type DelveModuleId,
   delveModuleEntry as delveLayoutEntry,
 } from '../delve_layout';
+import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
@@ -1079,6 +1080,20 @@ export function tickDelveBadAir(ctx: SimContext, run: DelveRun): void {
 // Airborne players (jumping) take no damage. For zones with tier: shallow applies
 // 0.35x base damage; deep applies 2.0x. Only the worst tier zone a player is in
 // counts (no stacking shallow+deep).
+// Islands/the dais are documented as visual dry ground (not colliders), so a
+// standing player on one must be exempt from the tick below or "safe stepping
+// stone" and "fully dry route" are just cosmetic claims.
+function standingOnLitanyDryGround(moduleId: string, localX: number, localZ: number): boolean {
+  if (!isLitanyModuleId(moduleId)) return false;
+  const geo = litanyModuleGeometry(moduleId);
+  if (!geo) return false;
+  if (Math.hypot(localX - geo.dais.x, localZ - geo.dais.z) <= geo.dais.r) return true;
+  for (const isl of geo.islands) {
+    if (Math.abs(localX - isl.x) <= isl.hw && Math.abs(localZ - isl.z) <= isl.hd) return true;
+  }
+  return false;
+}
+
 export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
   const mod = DELVE_MODULES[run.modules[run.moduleIndex]];
   const zones = mod?.hazards;
@@ -1102,6 +1117,11 @@ export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
     if (!p || p.dead) continue;
     // Airborne players dodge water damage.
     if (p.jumping) continue;
+    // Standing on an island or the dais is dry ground, regardless of which
+    // hazard zone's radius it geometrically falls inside.
+    if (standingOnLitanyDryGround(run.modules[run.moduleIndex], p.pos.x - ox, p.pos.z - oz)) {
+      continue;
+    }
     // Find the worst-tier zone the player is standing in.
     let worstTier: 'shallow' | 'deep' | null = null;
     for (const z of zones) {

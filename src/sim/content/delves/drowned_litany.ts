@@ -113,7 +113,7 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     // Puzzle: turn 2 sluice valves (Primitive A, Click Objects). Both sit on the
     // open arc, clear of the stub bank, the hazard pools, and the entry aisle.
     interactableSlots: [
-      { x: -12, z: 30, variants: ['sluice_valve'] },
+      { x: -12, z: 8, variants: ['sluice_valve'] },
       { x: 12, z: 54, variants: ['sluice_valve'] },
     ],
     hazards: litanyModuleHazards('litany_sluice'),
@@ -124,12 +124,13 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'litany_ledger',
     length: 110,
     spawnSets: [LEDGER_SPAWNS],
-    // Puzzle: activate 4 grave tablets in any order (Primitive A). One per channel
-    // between the ledger islands, all clear of the flooded channels and obstacles.
+    // Puzzle: activate 4 grave tablets in any order (Primitive A). The center pool
+    // spans nearly the full room width, so all four sit in the dry south/north
+    // bands clear of the flood and the wall/island/pillar obstacles.
     interactableSlots: [
-      { x: -16, z: 30, variants: ['grave_tablet'] },
-      { x: -16, z: 40, variants: ['grave_tablet'] },
-      { x: 16, z: 44, variants: ['grave_tablet'] },
+      { x: -18, z: 14, variants: ['grave_tablet'] },
+      { x: 16, z: 12, variants: ['grave_tablet'] },
+      { x: -16, z: 68, variants: ['grave_tablet'] },
       { x: 10, z: 76, variants: ['grave_tablet'] },
     ],
     hazards: litanyModuleHazards('litany_ledger'),
@@ -158,8 +159,8 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     // Click primitive). Spaced around the pit-rim walkway, clear of the central
     // Blackwater font and the pit pillars.
     interactableSlots: [
-      { x: 16, z: 24, variants: ['widow_egg_sac'] },
-      { x: -16, z: 24, variants: ['widow_egg_sac'] },
+      { x: 15, z: 10, variants: ['widow_egg_sac'] },
+      { x: -15, z: 6, variants: ['widow_egg_sac'] },
       { x: 0, z: 58, variants: ['widow_egg_sac'] },
     ],
     hazards: litanyModuleHazards('litany_baptistry'),
