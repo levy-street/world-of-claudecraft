@@ -390,7 +390,7 @@ export interface CorpseLoot {
 
 export type CurrencyLootStrategy = 'looter-takes-all' | 'fair-split';
 export type LootRollChoice = 'need' | 'greed' | 'pass';
-export type ItemLootStrategy = 'looter-takes-all' | 'need-greed';
+export type ItemLootStrategy = 'looter-takes-all' | 'need-greed' | 'round-robin';
 
 // An open need-greed roll a player may still answer. Carried both on the
 // transient `lootRoll` SimEvent and (for reliable re-delivery) on the self
@@ -422,7 +422,7 @@ export interface LootStrategies {
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
-  commonItems: 'looter-takes-all',
+  commonItems: 'round-robin',
   premiumItems: 'need-greed',
   master: { enabled: false, looter: 0, threshold: 'uncommon' },
 };

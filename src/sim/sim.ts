@@ -461,6 +461,7 @@ export interface Party {
   raid: boolean;
   raidGroups: Map<number, 1 | 2>; // pid -> raid subgroup
   lootStrategies: LootStrategies;
+  lootRoundRobinCursor?: number;
 }
 
 export interface TradeSession {

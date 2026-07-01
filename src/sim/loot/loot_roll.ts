@@ -265,6 +265,27 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
   return true;
 }
 
+function tryAwardRoundRobinItem(ctx: SimContext, itemId: string, mob: Entity): boolean {
+  if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'round-robin') return false;
+  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  if (!party) return false;
+  const candidates = partyLootCandidatesForMob(ctx, mob);
+  if (candidates.length <= 1) return false;
+  const eligible = new Set(candidates.map((candidate) => candidate.entityId));
+  const ordered = party.members.filter((pid) => eligible.has(pid));
+  if (ordered.length <= 1) return false;
+  const cursor = party.lootRoundRobinCursor ?? 0;
+  const winnerPid = ordered[cursor % ordered.length];
+  party.lootRoundRobinCursor = (cursor + 1) % ordered.length;
+  const itemName = ITEMS[itemId]?.name ?? itemId;
+  const winnerName = ctx.players.get(winnerPid)?.name ?? 'Unknown';
+  for (const pid of ordered) {
+    ctx.emit({ type: 'loot', text: `${winnerName} receives ${itemName} (round robin).`, pid });
+  }
+  ctx.addItem(itemId, 1, winnerPid);
+  return true;
+}
+
 // Opens a master-loot assignment when the tapping party uses master loot and
 // the drop is at/above the configured threshold. Returns false (so the caller
 // falls through to need/greed or looter-takes-all) when master loot does not
@@ -316,6 +337,7 @@ export function awardSharedLootItem(
   looter: PlayerMeta,
 ): void {
   if (startMasterLootRoll(ctx, itemId, mob)) return;
+  if (tryAwardRoundRobinItem(ctx, itemId, mob)) return;
   if (!startNeedGreedRoll(ctx, itemId, mob)) ctx.addItem(itemId, 1, looter.entityId);
 }
 

@@ -250,6 +250,54 @@ describe('loot_roll: fair-split copper (module entry)', () => {
   });
 });
 
+describe('loot_roll: round-robin common items (module entry)', () => {
+  const commonItem = 'baked_bread';
+
+  it('defaults party common-item drops to a deterministic round-robin rotation', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: commonItem, count: 3 }],
+    });
+
+    awardSharedLootItem(sim.ctx, commonItem, mob, playerMeta(sim, a));
+    awardSharedLootItem(sim.ctx, commonItem, mob, playerMeta(sim, a));
+    awardSharedLootItem(sim.ctx, commonItem, mob, playerMeta(sim, a));
+
+    expect([a, b, c].map((pid) => sim.countItem(commonItem, pid))).toEqual([1, 1, 1]);
+    expect(sim.events.filter((e) => e.type === 'lootRoll')).toHaveLength(0);
+    expect(sim.partyOf(a)?.lootRoundRobinCursor).toBe(0);
+  });
+
+  it('honors a party that keeps common items as looter-takes-all', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: commonItem, count: 2 }],
+    });
+    const party = sim.partyOf(a);
+    if (!party) throw new Error('expected party');
+    party.lootStrategies.commonItems = 'looter-takes-all';
+
+    awardSharedLootItem(sim.ctx, commonItem, mob, playerMeta(sim, a));
+    awardSharedLootItem(sim.ctx, commonItem, mob, playerMeta(sim, a));
+
+    expect(sim.countItem(commonItem, a)).toBe(2);
+    expect(sim.countItem(commonItem, b)).toBe(0);
+    expect(sim.countItem(commonItem, c)).toBe(0);
+    expect(party.lootRoundRobinCursor).toBeUndefined();
+  });
+
+  it('falls back to the looter when there is no party rotation candidate', () => {
+    const sim = makeSim(7);
+    const a = sim.addPlayer('warrior', 'Solo');
+    const mob = deadCorpse(sim, a, [a], { copper: 0, items: [{ itemId: commonItem, count: 1 }] });
+
+    awardSharedLootItem(sim.ctx, commonItem, mob, playerMeta(sim, a));
+
+    expect(sim.countItem(commonItem, a)).toBe(1);
+  });
+});
 describe('loot_roll: corpse-loot helpers (module entry)', () => {
   it('lootSlotVisibleTo honors openToAll / personalFor / unrestricted slots', () => {
     expect(lootSlotVisibleTo({ itemId: 'x', count: 1, openToAll: true }, 5)).toBe(true);
