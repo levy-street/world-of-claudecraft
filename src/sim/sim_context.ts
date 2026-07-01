@@ -289,6 +289,8 @@ export interface SimContextCallbacks {
   // delegate; partyOf stays on Sim (A1's thin delegate -> social/party).
   clearEntityMarker(entityId: number): void;
   partyOf(pid: number): Party | null;
+  partyReadyCheck(pid?: number): void;
+  partyReadyCheckRespond(ready: boolean, pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
@@ -764,6 +766,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     removeItem: host.removeItem,
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
+    partyReadyCheck: host.partyReadyCheck,
+    partyReadyCheckRespond: host.partyReadyCheckRespond,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
     onMobKilledForQuests: host.onMobKilledForQuests,

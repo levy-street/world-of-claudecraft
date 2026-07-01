@@ -167,6 +167,8 @@ function makeCtx() {
     spendResource: vi.fn(),
     removeItem: vi.fn(),
     partyOf: vi.fn(() => null),
+    partyReadyCheck: vi.fn(),
+    partyReadyCheckRespond: vi.fn(),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
     onMobKilledForQuests: vi.fn(),

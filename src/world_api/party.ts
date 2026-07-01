@@ -2,9 +2,16 @@ import type {
   MasterLootSettings,
   MasterLootThreshold,
   PlayerClass,
+  ReadyCheckStatus,
   ResourceType,
 } from '../sim/types';
 
+export interface ReadyCheckInfo {
+  id: number;
+  startedBy: number;
+  expires: number;
+  statuses: { pid: number; status: ReadyCheckStatus }[];
+}
 export interface PartyMemberInfo {
   pid: number;
   name: string;
@@ -27,6 +34,7 @@ export interface PartyInfo {
   raid: boolean;
   master: MasterLootSettings;
   members: PartyMemberInfo[];
+  readyCheck?: ReadyCheckInfo | null;
 }
 
 export interface IWorldParty {
@@ -39,6 +47,8 @@ export interface IWorldParty {
   partyKick(targetPid: number): void;
   // Leader-only handoff: pass leadership to another member (roster unchanged).
   partyPromote(targetPid: number): void;
+  partyReadyCheck(): void;
+  partyReadyCheckRespond(ready: boolean): void;
   convertPartyToRaid(): void;
   convertRaidToParty(): void;
   moveRaidMember(targetPid: number, group: 1 | 2): void;

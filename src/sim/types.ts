@@ -1524,6 +1524,8 @@ export type ErrorReason = 'target_dead';
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
+export type ReadyCheckStatus = 'pending' | 'ready' | 'notReady';
+
 export type SimEvent = { pid?: number } & (
   | {
       type: 'damage';

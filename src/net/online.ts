@@ -1804,6 +1804,12 @@ export class ClientWorld implements IWorld {
   partyPromote(targetPid: number): void {
     this.cmd({ cmd: 'ppromote', id: targetPid });
   }
+  partyReadyCheck(): void {
+    this.cmd({ cmd: 'preadycheck' });
+  }
+  partyReadyCheckRespond(ready: boolean): void {
+    this.cmd({ cmd: 'pready', ready });
+  }
   convertPartyToRaid(): void {
     this.cmd({ cmd: 'praid' });
   }

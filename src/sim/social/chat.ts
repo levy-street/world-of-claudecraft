@@ -364,6 +364,18 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  if (/^\/readycheck(?:\s|$)/i.test(raw)) {
+    ctx.partyReadyCheck(r.meta.entityId);
+    return null;
+  }
+  if (/^\/ready(?:\s|$)/i.test(raw)) {
+    ctx.partyReadyCheckRespond(true, r.meta.entityId);
+    return null;
+  }
+  if (/^\/(?:notready|unready)(?:\s|$)/i.test(raw)) {
+    ctx.partyReadyCheckRespond(false, r.meta.entityId);
+    return null;
+  }
   // "/played" — report how long this character has been in the world this
   // session. Self-only informational line, like /who's reply.
   if (/^\/played(?:\s|$)/i.test(raw)) {

@@ -304,6 +304,8 @@ function makeFakeHost() {
     removeItem: vi.fn(),
     clearEntityMarker: vi.fn(),
     partyOf: vi.fn(() => null),
+    partyReadyCheck: vi.fn(),
+    partyReadyCheckRespond: vi.fn(),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
     onMobKilledForQuests: vi.fn(),

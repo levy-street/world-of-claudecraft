@@ -35,6 +35,7 @@ export class PartyMachine {
   partyByPid = new Map<number, number>(); // pid -> party id
   partyInvites = new Map<number, { fromPid: number; expires: number }>(); // invitee pid -> invite
   nextPartyId = 1;
+  private nextReadyCheckId = 1;
 
   constructor(private readonly ctx: SimContext) {}
 
@@ -253,6 +254,85 @@ export class PartyMachine {
       });
     }
     this.announceLooterShift(party, beforeLooter);
+  }
+
+  private activeReadyCheck(party: Party): NonNullable<Party['readyCheck']> | null {
+    if (!party.readyCheck) return null;
+    if (party.readyCheck.expires <= this.ctx.time) {
+      for (const mPid of party.members) {
+        if (party.readyCheck.statuses.get(mPid) === 'pending') {
+          party.readyCheck.statuses.set(mPid, 'notReady');
+        }
+      }
+      this.finishReadyCheck(party);
+      return null;
+    }
+    return party.readyCheck;
+  }
+
+  private finishReadyCheck(party: Party): void {
+    const readyCheck = party.readyCheck;
+    if (!readyCheck) return;
+    const notReady = party.members.filter((mPid) => readyCheck.statuses.get(mPid) !== 'ready');
+    const text =
+      notReady.length === 0
+        ? 'Ready check complete: everyone is ready.'
+        : `Ready check complete: not ready: ${notReady
+            .map((mPid) => this.ctx.players.get(mPid)?.name ?? 'Unknown')
+            .join(', ')}.`;
+    for (const mPid of party.members)
+      this.ctx.emit({ type: 'log', text, color: '#aaf', pid: mPid });
+    delete party.readyCheck;
+  }
+
+  updateReadyChecks(): void {
+    for (const party of this.parties.values()) this.activeReadyCheck(party);
+  }
+
+  partyReadyCheck(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party) {
+      this.ctx.error(r.meta.entityId, 'You are not in a party.');
+      return;
+    }
+    if (party.leader !== r.meta.entityId) {
+      this.ctx.error(r.meta.entityId, 'You are not the party leader.');
+      return;
+    }
+    if (this.activeReadyCheck(party)) {
+      this.ctx.error(r.meta.entityId, 'You are busy.');
+      return;
+    }
+    party.readyCheck = {
+      id: this.nextReadyCheckId++,
+      startedBy: r.meta.entityId,
+      expires: this.ctx.time + 30,
+      statuses: new Map(party.members.map((mPid) => [mPid, 'pending'])),
+    };
+    const text = `${r.meta.name} started a ready check. Type /ready or /notready.`;
+    for (const mPid of party.members)
+      this.ctx.emit({ type: 'log', text, color: '#aaf', pid: mPid });
+  }
+
+  partyReadyCheckRespond(ready: boolean, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party) {
+      this.ctx.error(r.meta.entityId, 'You are not in a party.');
+      return;
+    }
+    const readyCheck = this.activeReadyCheck(party);
+    if (!readyCheck) return;
+    readyCheck.statuses.set(r.meta.entityId, ready ? 'ready' : 'notReady');
+    const text = ready ? `${r.meta.name} is ready.` : `${r.meta.name} is not ready.`;
+    for (const mPid of party.members)
+      this.ctx.emit({ type: 'log', text, color: '#aaf', pid: mPid });
+    if (party.members.every((mPid) => readyCheck.statuses.get(mPid) !== 'pending')) {
+      this.finishReadyCheck(party);
+    }
   }
 
   convertPartyToRaid(pid?: number): void {

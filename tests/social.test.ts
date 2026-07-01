@@ -438,6 +438,60 @@ describe('parties', () => {
     expect(info.z).toBeCloseTo(-23, 3);
   });
 
+  it('starts a leader-only ready check and mirrors pending statuses in partyInfo', () => {
+    const { sim, a, b } = makeDuo();
+
+    sim.partyReadyCheck(b);
+    expect(sim.partyInfo?.readyCheck).toBeNull();
+
+    sim.partyReadyCheck(a);
+    expect(sim.partyInfo?.readyCheck).toMatchObject({ startedBy: a });
+    expect(sim.partyInfo?.readyCheck?.statuses).toEqual([
+      { pid: a, status: 'pending' },
+      { pid: b, status: 'pending' },
+    ]);
+  });
+
+  it('records ready-check responses and clears the check when everyone answers', () => {
+    const { sim, a, b } = makeDuo();
+    sim.partyReadyCheck(a);
+
+    sim.partyReadyCheckRespond(true, a);
+    expect(sim.partyInfo?.readyCheck?.statuses).toEqual([
+      { pid: a, status: 'ready' },
+      { pid: b, status: 'pending' },
+    ]);
+
+    sim.partyReadyCheckRespond(false, b);
+    expect(sim.partyInfo?.readyCheck).toBeNull();
+    const logs = sim.events.filter((e) => e.type === 'log').map((e) => e.text);
+    expect(logs).toContain('Ready check complete: not ready: Bet.');
+  });
+
+  it('marks pending ready-check members not-ready when the timer expires', () => {
+    const { sim, a } = makeDuo();
+    sim.partyReadyCheck(a);
+    sim.partyReadyCheckRespond(true, a);
+
+    const events = [];
+    for (let i = 0; i < 20 * 31; i++) events.push(...sim.tick());
+
+    expect(sim.partyInfo?.readyCheck).toBeNull();
+    const logs = events.filter((e) => e.type === 'log').map((e) => e.text);
+    expect(logs).toContain('Ready check complete: not ready: Bet.');
+  });
+
+  it('routes /readycheck, /ready, and /notready through party ready-check commands', () => {
+    const { sim, a, b } = makeDuo();
+
+    sim.chat('/readycheck', a);
+    expect(sim.partyInfo?.readyCheck?.startedBy).toBe(a);
+    sim.chat('/ready', a);
+    expect(sim.partyInfo?.readyCheck?.statuses.find((s) => s.pid === a)?.status).toBe('ready');
+    sim.chat('/notready', b);
+    expect(sim.partyInfo?.readyCheck).toBeNull();
+  });
+
   it('converts a party to a two-group raid with a ten player cap', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');

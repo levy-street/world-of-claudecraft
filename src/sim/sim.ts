@@ -296,6 +296,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type ReadyCheckStatus,
   RUN_SPEED,
   type SimConfig,
   type SimEvent,
@@ -461,6 +462,12 @@ export interface Party {
   raid: boolean;
   raidGroups: Map<number, 1 | 2>; // pid -> raid subgroup
   lootStrategies: LootStrategies;
+  readyCheck?: {
+    id: number;
+    startedBy: number;
+    expires: number;
+    statuses: Map<number, ReadyCheckStatus>;
+  };
 }
 
 export interface TradeSession {
@@ -1975,6 +1982,8 @@ export class Sim {
       spendResource: sim.spendResource.bind(sim),
       removeItem: sim.removeItem.bind(sim),
       partyOf: sim.partyOf.bind(sim),
+      partyReadyCheck: sim.partyReadyCheck.bind(sim),
+      partyReadyCheckRespond: sim.partyReadyCheckRespond.bind(sim),
       removeFromParty: (pid: number, verb: string) => sim.party.removeFromParty(pid, verb),
       // dropPartyMarkers flips to the T1 marker store (targeting); lazy arrow since
       // sim.targeting is built after ctx. The T1 selectors consume isHostileTo/
@@ -4639,6 +4648,14 @@ export class Sim {
     this.party.partyPromote(targetPid, pid);
   }
 
+  partyReadyCheck(pid?: number): void {
+    this.party.partyReadyCheck(pid);
+  }
+
+  partyReadyCheckRespond(ready: boolean, pid?: number): void {
+    this.party.partyReadyCheckRespond(ready, pid);
+  }
+
   convertPartyToRaid(pid?: number): void {
     this.party.convertPartyToRaid(pid);
   }
@@ -5117,6 +5134,7 @@ export class Sim {
   // verbatim to social/trade.ts; partyInvites/duelInvites route through ctx.
   private updateTradesAndInvites(): void {
     tradeMod.updateTradesAndInvites(this.ctx);
+    this.party.updateReadyChecks();
   }
 
   // -------------------------------------------------------------------------
@@ -5227,6 +5245,17 @@ export class Sim {
       leader: party.leader,
       raid: party.raid,
       master: { ...party.lootStrategies.master },
+      readyCheck: party.readyCheck
+        ? {
+            id: party.readyCheck.id,
+            startedBy: party.readyCheck.startedBy,
+            expires: party.readyCheck.expires,
+            statuses: party.members.map((pid) => ({
+              pid,
+              status: party.readyCheck?.statuses.get(pid) ?? 'pending',
+            })),
+          }
+        : null,
       members: party.members.flatMap((mPid) => {
         const meta = this.players.get(mPid);
         const e = this.entities.get(mPid);

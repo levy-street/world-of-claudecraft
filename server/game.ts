@@ -2434,6 +2434,12 @@ export class GameServer {
       case 'ppromote':
         if (typeof msg.id === 'number') sim.partyPromote(msg.id, pid);
         break;
+      case 'preadycheck':
+        sim.partyReadyCheck(pid);
+        break;
+      case 'pready':
+        if (typeof msg.ready === 'boolean') sim.partyReadyCheckRespond(msg.ready, pid);
+        break;
       case 'praid':
         sim.convertPartyToRaid(pid);
         break;
