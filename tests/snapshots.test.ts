@@ -2130,15 +2130,17 @@ describe('delta-key contract pins (anti-drift)', () => {
   });
 });
 
-// A negative-value buff_* aura (a stat-sap: an intellect-draining curse on buff_int, an
-// attack-power drain on buff_ap) reads as a DEBUFF via auras_view.isAuraDebuff's
-// `value < 0` branch. That branch can only fire online if the wire carries the value. The
-// serializer sends `value` SPARSELY: only when it is negative (the sole case that flips the
-// classification), so an ordinary buff and the positive absorb shield stay off the wire and
-// decode to 0 exactly as before (no absorb-overlay regression; see target_frame.test.ts).
-// The client decode reads `a.value ?? 0`, so an old server that never sends it still decodes
-// to 0 (backward compatible). This drives a real Sim aura through the real serializer
-// (wireEntity) and the real client decode (ClientWorld.applySnapshot).
+// The serializer sends aura `value` SPARSELY, for two cases the client UI reads it:
+//  1. a negative-value buff_* aura (a stat-sap) - reads as a DEBUFF via auras_view.isAuraDebuff's
+//     `value < 0` branch, which can only fire online if the wire carries the value; and
+//  2. any STAT_SOURCE_AURA_KIND (buff_ap/armor/int/agi/spi/sta/allstats/spellpower/dodge,
+//     debuff_ap) at ANY sign - so the character-sheet source breakdown (buildStatSources) can
+//     name the buff ("Battle Shout: +N") online instead of folding it into the talents remainder.
+// Everything else (a non-stat positive buff like haste, the positive absorb shield, a fear's
+// negative facing angle) stays off the wire and decodes to 0 exactly as before (no absorb-overlay
+// regression; see target_frame.test.ts). The client decode reads `a.value ?? 0`, so an old server
+// that never sends it still decodes to 0 (backward compatible). This drives a real Sim aura through
+// the real serializer (wireEntity) and the real client decode (ClientWorld.applySnapshot).
 describe('aura value over the wire (stat-sap debuff parity)', () => {
   function roundTrip(aura: Aura): { wire: Record<string, unknown>; mirror: Aura } {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
@@ -2187,12 +2189,37 @@ describe('aura value over the wire (stat-sap debuff parity)', () => {
     expect(isAuraDebuff(mirror)).toBe(true);
   });
 
-  it('does NOT send a POSITIVE buff value (sparse): a real buff stays a buff in both worlds', () => {
+  it('DOES send a POSITIVE stat-buff value now: the character-sheet source breakdown can name it', () => {
+    // buff_int is a STAT_SOURCE_AURA_KIND (server/game.ts), so its value rides the wire at
+    // any sign - an online player's Intellect tooltip attributes "Arcane Intellect: +40"
+    // instead of folding it into the talents remainder. It still classifies as a buff (value
+    // is positive), so no debuff-classification regression.
     const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Arcane Intellect' };
     const { wire, mirror } = roundTrip(buff);
-    expect('value' in wireAura(wire, 'arcane_intellect')).toBe(false); // omitted on the wire
-    expect(mirror.value).toBe(0); // decodes to 0 (?? 0)
+    expect(wireAura(wire, 'arcane_intellect').value).toBe(40); // carried on the wire
+    expect(mirror.value).toBe(40); // decoded online, so buildStatSources can itemize it
     expect(isAuraDebuff(buff)).toBe(false);
+    expect(isAuraDebuff(mirror)).toBe(false);
+  });
+
+  it('does NOT send a POSITIVE non-stat buff value (still sparse): buff_haste stays off the wire', () => {
+    // A positive buff_* aura that is NOT a character-sheet stat source (a haste multiplier)
+    // has no source-breakdown line to feed, so it keeps the sparse-wire behavior: value omitted,
+    // decodes to 0, classifies as a buff in both worlds.
+    const haste: Aura = {
+      id: 'blood_fury',
+      name: 'Blood Fury',
+      kind: 'buff_haste',
+      remaining: 15,
+      duration: 15,
+      value: 1.2,
+      sourceId: 0,
+      school: 'physical',
+    };
+    const { wire, mirror } = roundTrip(haste);
+    expect('value' in wireAura(wire, 'blood_fury')).toBe(false); // not a stat source -> omitted
+    expect(mirror.value).toBe(0);
+    expect(isAuraDebuff(haste)).toBe(false);
     expect(isAuraDebuff(mirror)).toBe(false);
   });
 

@@ -515,6 +515,25 @@ function identityFields(e: Entity): Record<string, unknown> {
   return out;
 }
 
+// Stat-affecting auras the character-sheet source breakdown attributes BY NAME
+// (src/ui/stat_tooltip.ts buildStatSources): their value must ride the wire at any
+// sign so an online player sees "Battle Shout: +N" on the stat tooltip instead of
+// the buff folding into the "Talents and effects" remainder. The negative-buff arm
+// below already carried stat-saps (for the debuff classification); this is the same
+// set recalcPlayerStats reads, so positive buffs now attribute correctly too.
+const STAT_SOURCE_AURA_KINDS: ReadonlySet<string> = new Set([
+  'buff_ap',
+  'debuff_ap',
+  'buff_armor',
+  'buff_int',
+  'buff_agi',
+  'buff_spi',
+  'buff_sta',
+  'buff_allstats',
+  'buff_spellpower',
+  'buff_dodge',
+]);
+
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity): Record<string, unknown> {
@@ -559,15 +578,18 @@ function dynamicFields(e: Entity): Record<string, unknown> {
         kind: a.kind,
         rem: round2(a.remaining),
         dur: a.duration,
-        // Carry the value ONLY for the exact case the client UI reads it: a negative-value
+        // Carry the value for two cases the client UI reads it: (1) a negative-value
         // buff_* aura (a stat-sap), which auras_view.isAuraDebuff classifies as a debuff via
-        // `kind.startsWith('buff_') && value < 0`. Mirroring that predicate keeps the wire in
-        // lockstep with the classification, so a graphics preset can never hide such a debuff
-        // and nothing else (positive buffs, absorb shields, a fear's random facing angle, any
-        // other negative-value non-buff aura) rides the wire or changes online behavior. Sent
-        // RAW (like `dur`, not round2) so the sign the classification keys on survives the
-        // wire exactly: round2 could round a tiny negative to -0, which JSON writes as 0.
-        ...(a.value < 0 && a.kind.startsWith('buff_') ? { value: a.value } : {}),
+        // `kind.startsWith('buff_') && value < 0`; and (2) any stat-affecting aura the
+        // character-sheet source breakdown names (STAT_SOURCE_AURA_KINDS), so an online
+        // player's stat tooltip attributes "Battle Shout: +N" instead of folding the buff
+        // into the talents remainder. Everything else (absorb shields, a fear's random
+        // facing angle, movement/haste multipliers) still omits value. Sent RAW (like `dur`,
+        // not round2) so the sign survives the wire: round2 could round a tiny negative to
+        // -0, which JSON writes as 0.
+        ...((a.value < 0 && a.kind.startsWith('buff_')) || STAT_SOURCE_AURA_KINDS.has(a.kind)
+          ? { value: a.value }
+          : {}),
         ...(a.stacks && a.stacks > 1 ? { stacks: a.stacks } : {}),
         // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
         // buff icon can badge the count online exactly as offline; undefined for every other aura.
