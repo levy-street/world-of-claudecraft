@@ -30,6 +30,7 @@ export const guideStrings = {
     models: '3D Models',
     gear: 'Gear & Items',
     economy: 'Economy & Trade',
+    professions: 'Professions',
     social: 'Social & Groups',
     stats: 'Character & Stats',
     progression: 'Leveling & Progression',
@@ -1051,6 +1052,136 @@ export const guideStrings = {
       'Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post.',
   },
 
+  // Professions guide. Player-facing, spoiler-safe overview of gathering, the ten
+  // production crafts, and the emergent adjacent-pair archetypes from the public design.
+  professions: {
+    heading: 'Professions',
+    intro:
+      'Professions are the long craft of making the world useful: gathering materials, turning them into gear and supplies, and slowly becoming known for the work you do most.',
+    glanceTitle: 'The short version',
+    glanceBody:
+      'Gathering and production work differently. Gathering is broad and additive: everyone can mine, log, and gather herbs without weakening the other skills. Production is where specialization lives: the more you craft in one part of the wheel, the more your identity gathers around that cluster.',
+    specialistBody:
+      'You do not choose a crafting class at the start. You craft, the wheel reads what you keep making, and your strongest adjacent pair becomes your profession identity.',
+
+    gatheringTitle: 'Gathering professions',
+    gatheringBody:
+      'Gathering is universal. You can collect every basic material type as you travel, then improve the kinds of harvesting you care about without closing off the rest.',
+    gathering: {
+      miningTitle: 'Mining',
+      miningBody:
+        'Mining covers ore and stone from mineral nodes, the backbone of weapons, armor, gems, tools, and sturdy construction parts.',
+      loggingTitle: 'Logging',
+      loggingBody:
+        'Logging covers timber from trees and fallen wood, feeding shafts, handles, frames, fires, stations, and practical field gear.',
+      herbalismTitle: 'Herbalism',
+      herbalismBody:
+        'Herbalism covers plants, fungi, and natural reagents used for potions, cooking, inscriptions, and other prepared supplies.',
+    },
+
+    craftsTitle: 'The ten production crafts',
+    craftsBody:
+      'Production turns materials into finished items. The ten crafts sit on a ring, so each craft has two neighbors it naturally pairs with and one opposite craft that pulls against it.',
+    crafts: {
+      weaponcraftingTitle: 'Weaponcrafting',
+      weaponcraftingBody:
+        'Makes blades, hafted weapons, and other direct combat tools for characters who want their power in hand.',
+      armorcraftingTitle: 'Armorcrafting',
+      armorcraftingBody:
+        'Shapes hard defensive pieces and reinforcements for characters who want gear that stands up to punishment.',
+      engineeringTitle: 'Engineering',
+      engineeringBody:
+        'Builds gadgets, mechanisms, and practical devices that solve problems with moving parts and daring ideas.',
+      alchemyTitle: 'Alchemy',
+      alchemyBody:
+        'Brews potions, elixirs, and reactions that turn gathered ingredients into quick help or lasting preparation.',
+      cookingTitle: 'Cooking',
+      cookingBody:
+        'Prepares food, field supplies, and creature-based recipes that keep adventurers ready between dangerous pulls.',
+      leatherworkingTitle: 'Leatherworking',
+      leatherworkingBody:
+        'Works hides, straps, padding, and flexible pieces used in gear, packs, field kits, and hunter-minded equipment.',
+      tailoringTitle: 'Tailoring',
+      tailoringBody:
+        'Turns cloth and thread into garments, wraps, linings, bags, and soft pieces that support many other crafts.',
+      inscriptionTitle: 'Inscription',
+      inscriptionBody:
+        'Writes glyphs, scrollwork, patterns, marks, and formal plans that make knowledge part of the finished item.',
+      enchantingTitle: 'Enchanting',
+      enchantingBody:
+        'Binds magical effects into gear and supplies, adding the strange extra edge that ordinary materials cannot hold.',
+      jewelcraftingTitle: 'Jewelcrafting',
+      jewelcraftingBody:
+        'Cuts gems and settings into focused components, from decorative fittings to precise sources of power.',
+    },
+
+    wheelTitle: 'How specialization emerges',
+    wheelBody:
+      'The production wheel rewards focus. Common work stays broadly available, but higher craft progress concentrates around what you keep making. Two adjacent crafts can become your majors, while distant crafts become harder to keep at the same height.',
+    commonFloorBody:
+      'That means a specialist matters without trapping a new player. Everyone can make basic things, but the best high-tier work belongs to players who have built a real identity around a small part of the wheel.',
+    hobbyTitle: 'Majors and a hobby',
+    hobbyBody:
+      'Each archetype has two major crafts and can keep one opposite craft as a hobby at a lower ceiling. The hobby helps with self-supply, but it never replaces a true specialist.',
+
+    archetypesTitle: 'The ten archetypes',
+    archetypesBody:
+      'An archetype is the name for an adjacent-pair specialty. It is not a class you pick from a menu; it is what the game can call you once your crafting pattern is clear.',
+    archetypes: {
+      majorsLabel: 'Majors:',
+      hobbiesLabel: 'Possible hobbies:',
+      smithTitle: 'Smith',
+      smithMajors: 'Weaponcrafting and Armorcrafting',
+      smithHobbies: 'Leatherworking or Tailoring',
+      smithBody:
+        'The classic arms-and-armor specialist, building the core metal kit other adventurers trust in hard fights.',
+      cogsmithTitle: 'Cogsmith',
+      cogsmithMajors: 'Armorcrafting and Engineering',
+      cogsmithHobbies: 'Tailoring or Inscription',
+      cogsmithBody:
+        'A maker of reinforced gear, clever fittings, and protective mechanisms where sturdy craft meets invention.',
+      bombardierTitle: 'Bombardier',
+      bombardierMajors: 'Engineering and Alchemy',
+      bombardierHobbies: 'Inscription or Enchanting',
+      bombardierBody:
+        'A volatile experimenter who combines devices and mixtures into tools that feel clever, risky, and explosive.',
+      apothecaryTitle: 'Apothecary',
+      apothecaryMajors: 'Alchemy and Cooking',
+      apothecaryHobbies: 'Enchanting or Jewelcrafting',
+      apothecaryBody:
+        'A preparer of brews, meals, and practical remedies for players who keep a pack stocked before trouble starts.',
+      trapperTitle: 'Trapper',
+      trapperMajors: 'Cooking and Leatherworking',
+      trapperHobbies: 'Jewelcrafting or Weaponcrafting',
+      trapperBody:
+        'A field-minded crafter who turns creature knowledge, leather, and prepared bait into rugged survival tools.',
+      outfitterTitle: 'Outfitter',
+      outfitterMajors: 'Leatherworking and Tailoring',
+      outfitterHobbies: 'Weaponcrafting or Armorcrafting',
+      outfitterBody:
+        'A maker of wearable soft goods, bags, straps, linings, and flexible gear for travelers and fighters alike.',
+      mageweaverTitle: 'Mageweaver',
+      mageweaverMajors: 'Tailoring and Inscription',
+      mageweaverHobbies: 'Armorcrafting or Engineering',
+      mageweaverBody:
+        'A textile-and-symbol specialist, stitching cloth and written power into equipment with a learned feel.',
+      arcanistTitle: 'Arcanist',
+      arcanistMajors: 'Inscription and Enchanting',
+      arcanistHobbies: 'Engineering or Alchemy',
+      arcanistBody:
+        'A formal magic worker who turns scrollwork, formulas, and enchantments into precise crafted power.',
+      gembinderTitle: 'Gembinder',
+      gembinderMajors: 'Enchanting and Jewelcrafting',
+      gembinderHobbies: 'Alchemy or Cooking',
+      gembinderBody:
+        'A focused maker of set gems, bound effects, and delicate pieces where cut stone and magic meet.',
+      bladewrightTitle: 'Bladewright',
+      bladewrightMajors: 'Jewelcrafting and Weaponcrafting',
+      bladewrightHobbies: 'Cooking or Leatherworking',
+      bladewrightBody:
+        'A fine weapon maker who pairs sharp edges with settings, balance, and polished power.',
+    },
+  },
   // Social and Groups: chat channels, parties, party loot, friends, ignore, guilds.
   social: {
     intro:

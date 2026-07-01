@@ -58,6 +58,7 @@ describe('Guide routes', () => {
   it('matches static section routes exactly', () => {
     expect(matchRoute('/wiki/classes')?.route.id).toBe('classes');
     expect(matchRoute('/wiki/how-to-play')?.route.id).toBe('how-to-play');
+    expect(matchRoute('/wiki/professions')?.route.id).toBe('professions');
     expect(matchRoute('/wiki/reference/controls')?.route.id).toBe('controls');
   });
 
@@ -205,6 +206,12 @@ describe('Guide generated class content', () => {
       'guide.classPage.petsHeading',
       'guide.nav.talents',
       'guide.nav.arena',
+      'guide.nav.professions',
+      'guide.professions.heading',
+      'guide.professions.gathering.miningTitle',
+      'guide.professions.crafts.weaponcraftingTitle',
+      'guide.professions.archetypes.smithTitle',
+      'guide.professions.archetypes.bladewrightHobbies',
       'guide.nav.wishIKnew',
       'guide.related',
       'guide.talentsPage.heading',
@@ -227,6 +234,21 @@ describe('Guide generated class content', () => {
     }
   });
 
+  it('renders the professions guide with gathering, craft, and archetype coverage', () => {
+    setLanguage('en');
+    const page = pageFor('professions');
+    const html = page?.render({
+      params: [],
+      sub: 'professions',
+      titleKey: 'guide.nav.professions',
+    });
+    expect(html).toContain('Mining');
+    expect(html).toContain('Weaponcrafting');
+    expect(html).toContain('Jewelcrafting');
+    expect(html).toContain('Smith');
+    expect(html).toContain('Bladewright');
+    expect((html?.match(/class="guide-basic"/g) ?? []).length).toBeGreaterThanOrEqual(23);
+  });
   it('matches the sim (regenerating leaves the committed file unchanged)', () => {
     execFileSync('node', ['scripts/wiki/build_content.mjs'], {
       cwd: new URL('..', import.meta.url),
