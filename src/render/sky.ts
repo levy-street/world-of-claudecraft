@@ -32,22 +32,41 @@ const DOME_RADIUS = 560;
 // did. The dawn HDRI carries a huge horizon-level sun glow, so the peaks get
 // reined in harder or half the sky white-outs. The renderer's PMREM capture
 // samples the same shader, so IBL stays in step.
+// The five Valdris biomes reuse the closest existing sky set (no new HDRI art
+// ships with the continent; the asset loader parses each unique URL once):
+// sunny vale for desert/highlands/salt, overcast marsh for the twilight
+// shadowwood, ember dawn peaks for scorched.
 const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   vale: { gain: 0.6, clamp: 2.6 },
   marsh: { gain: 0.6, clamp: 2.2 },
   peaks: { gain: 0.48, clamp: 1.7 },
+  desert: { gain: 0.6, clamp: 2.6 },
+  shadowwood: { gain: 0.6, clamp: 2.2 },
+  highlands: { gain: 0.6, clamp: 2.6 },
+  scorched: { gain: 0.48, clamp: 1.7 },
+  salt: { gain: 0.6, clamp: 2.6 },
 };
 
 const BIOME_HDRI_2K: Record<BiomeId, string> = {
   vale: '/env/vale_day_2k.hdr',
   marsh: '/env/marsh_overcast_2k.hdr',
   peaks: '/env/peaks_dawn_2k.hdr',
+  desert: '/env/vale_day_2k.hdr',
+  shadowwood: '/env/marsh_overcast_2k.hdr',
+  highlands: '/env/vale_day_2k.hdr',
+  scorched: '/env/peaks_dawn_2k.hdr',
+  salt: '/env/vale_day_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
   vale: '/env/vale_day_1k.hdr',
   marsh: '/env/marsh_overcast_1k.hdr',
   peaks: '/env/peaks_dawn_1k.hdr',
+  desert: '/env/vale_day_1k.hdr',
+  shadowwood: '/env/marsh_overcast_1k.hdr',
+  highlands: '/env/vale_day_1k.hdr',
+  scorched: '/env/peaks_dawn_1k.hdr',
+  salt: '/env/vale_day_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -73,18 +92,33 @@ const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
   vale: '/env/vale_backdrop.webp',
   marsh: '/env/marsh_backdrop.webp',
   peaks: '/env/peaks_backdrop.webp',
+  desert: '/env/vale_backdrop.webp',
+  shadowwood: '/env/marsh_backdrop.webp',
+  highlands: '/env/vale_backdrop.webp',
+  scorched: '/env/peaks_backdrop.webp',
+  salt: '/env/vale_backdrop.webp',
 };
 
 const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
   vale: '/env/vale_backdrop_4k.webp',
   marsh: '/env/marsh_backdrop_4k.webp',
   peaks: '/env/peaks_backdrop_4k.webp',
+  desert: '/env/vale_backdrop_4k.webp',
+  shadowwood: '/env/marsh_backdrop_4k.webp',
+  highlands: '/env/vale_backdrop_4k.webp',
+  scorched: '/env/peaks_backdrop_4k.webp',
+  salt: '/env/vale_backdrop_4k.webp',
 };
 
 const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   vale: 0,
   marsh: 0,
   peaks: 0,
+  desert: 0,
+  shadowwood: 0,
+  highlands: 0,
+  scorched: 0,
+  salt: 0,
 };
 
 interface NetworkInformationLike {
@@ -131,7 +165,17 @@ const BIOME_BACKDROP = shouldUseLiteBackdrop() ? BIOME_BACKDROP_4K : BIOME_BACKD
 
 // Measured brightest-texel u (sun azimuth in equirect space) per HDRI — see
 // tmp/analyze_hdr.mjs. Used to rotate each map so its sun matches SUN_ANCHOR.
-const HDRI_SUN_U: Record<BiomeId, number> = { vale: 0.595, marsh: 0.657, peaks: 0.631 };
+const HDRI_SUN_U: Record<BiomeId, number> = {
+  vale: 0.595,
+  marsh: 0.657,
+  peaks: 0.631,
+  // reused maps keep their measured sun azimuth
+  desert: 0.595,
+  shadowwood: 0.657,
+  highlands: 0.595,
+  scorched: 0.631,
+  salt: 0.595,
+};
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};

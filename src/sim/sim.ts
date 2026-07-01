@@ -294,6 +294,7 @@ import {
   type OverheadEmoteId,
   type PetMode,
   type PlayerClass,
+  type PlayerRace,
   type QuestProgress,
   type QuestState,
   RUN_SPEED,
@@ -307,6 +308,8 @@ import {
   virtualLevel,
   xpToReachLevel,
 } from './types';
+import { isPlayerRace } from './content/races';
+import { warZonePvpHostile } from './war_zone';
 import { groundHeight, WATER_LEVEL } from './world';
 
 // TRIVIAL_LEVEL_GAP moved to mob/targeting.ts (used only by isTrivialTo).
@@ -614,6 +617,9 @@ export interface PlayerMeta {
   characterId?: number;
   cls: PlayerClass;
   name: string;
+  // Playable race: identity + faction source + cosmetic body scale, never
+  // stats (see content/races.ts). Persisted; pre-race saves default to human.
+  race: PlayerRace;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
@@ -764,6 +770,8 @@ export interface CharacterState {
   pet?: PetState | null;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
+  // Playable race (JSONB; optional so pre-race saves load as 'human'/Kael).
+  race?: PlayerRace;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
@@ -1113,7 +1121,7 @@ export class Sim {
   addPlayer(
     cls: PlayerClass,
     name: string,
-    opts?: { autoEquip?: boolean; state?: CharacterState; characterId?: number },
+    opts?: { autoEquip?: boolean; state?: CharacterState; characterId?: number; race?: PlayerRace },
   ): number {
     const savedState = opts?.state ? sanitizeRemovedZone1Content(opts.state).state : undefined;
     // Characters saved inside a dungeon instance rejoin at its entrance —
@@ -1147,11 +1155,22 @@ export class Sim {
     const player = createPlayer(this.nextId++, cls, startPos, name);
     this.addEntity(player);
     const classDef = CLASSES[cls];
+    // Saved race wins (it is the character's identity); a creation-time race
+    // applies to new characters only; anything else (pre-race saves, junk
+    // values from a tampered payload) falls back to Human (Kael).
+    const savedRace = savedState?.race;
+    const optRace = opts?.race;
+    const race: PlayerRace = isPlayerRace(savedRace)
+      ? savedRace
+      : isPlayerRace(optRace)
+        ? optRace
+        : 'human';
     const meta: PlayerMeta = {
       entityId: player.id,
       characterId: opts?.characterId,
       cls,
       name,
+      race,
       skin: savedState?.skin ?? 0,
       skinCatalog: savedState?.skinCatalog === 'mech' ? 'mech' : 'class',
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
@@ -1201,6 +1220,7 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    player.race = meta.race; // mirrored likewise (identity wire field + race body scale)
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -1431,6 +1451,7 @@ export class Sim {
       cooldowns: serializeCooldowns(e.cooldowns, e.potionCooldownUntil, this.time),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
+      race: meta.race,
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
@@ -1445,6 +1466,19 @@ export class Sim {
       },
     };
     return sanitizeRemovedZone1Content(state).state;
+  }
+
+  /** Set a player's race (meta + entity). Creation-time only: race is the
+   *  character's identity (faction source) and never changes in play; the
+   *  server calls this while building a new character's initial state. The
+   *  cosmetic race body scale lands on the next recalcPlayerStats. */
+  setPlayerRace(pid: number, race: PlayerRace): boolean {
+    const meta = this.players.get(pid);
+    const e = this.entities.get(pid);
+    if (!meta || !e || !isPlayerRace(race)) return false;
+    meta.race = race;
+    e.race = race;
+    return true;
   }
 
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer
@@ -4575,12 +4609,17 @@ export class Sim {
       )
         return true;
       const match = this.arenaMatches.get(attackerPlayer.id);
-      return (
-        !!match &&
+      if (
+        match &&
         match.state === 'active' &&
         !match.defeated.has(attackerPlayer.id) &&
         this.isArenaCrossTeam(match, attackerPlayer.id, target.id)
-      );
+      )
+        return true;
+      // The Breach, eternal war zone: cross-faction players are hostile while
+      // both stand in the open band (src/sim/war_zone.ts). Everywhere else in
+      // the open world players stay non-hostile exactly as before.
+      return warZonePvpHostile(attackerPlayer, target);
     }
     return false;
   }

@@ -49,10 +49,19 @@ export function paintTerrainRows(
       let r = 58, g = 105, b = 48;
       if (biome === 'marsh') { r = 64; g = 86; b = 48; }
       else if (biome === 'peaks') { r = 92; g = 100; b = 82; }
+      else if (biome === 'desert') { r = 168; g = 142; b = 92; }
+      else if (biome === 'shadowwood') { r = 44; g = 66; b = 54; }
+      else if (biome === 'highlands') { r = 74; g = 108; b = 58; }
+      else if (biome === 'scorched') { r = 96; g = 74; b = 60; }
+      else if (biome === 'salt') { r = 196; g = 192; b = 176; }
+      // dry/arid biomes keep their ground color at rolling heights; only the
+      // ridge band goes rock+snow (the mid-height rocky/dry-grass overrides
+      // are green-biome shading and would repaint dunes and salt as grass)
+      const arid = biome === 'desert' || biome === 'salt' || biome === 'scorched';
       if (h < WATER_LEVEL) { r = 38; g = 84; b = 138; }
       else if (h > 26) { r = 168; g = 172; b = 178; } // ridge / peak rock+snow
-      else if (h > 11) { r = 112; g = 110; b = 102; }
-      else if (h > 6) { r = 88; g = 102; b = 62; }
+      else if (h > 11 && !arid) { r = 112; g = 110; b = 102; }
+      else if (h > 6 && !arid) { r = 88; g = 102; b = 62; }
       let nearHub = false;
       for (const zn of ZONES) {
         if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 14) { nearHub = true; break; }

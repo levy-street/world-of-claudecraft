@@ -110,13 +110,67 @@ for (const urls of Object.values(MODEL_URLS)) {
 // Desaturated biome tints riding instanceColor. The textured models carry
 // their own hue, so tints are lerped most of the way to white before use
 // (raw tints multiply into the albedo and read as grime).
-const PINE_TINT: Record<BiomeId, number> = { vale: 0x9bb48d, marsh: 0x87966b, peaks: 0x6f8a7a };
-const OAK_TINT: Record<BiomeId, number> = { vale: 0xa7b886, marsh: 0x8d9865, peaks: 0x92a37f };
-const ROCK_TINT: Record<BiomeId, number> = { vale: 0x8d8d85, marsh: 0x565c4e, peaks: 0x878e99 };
-const TRUNK_TINT: Record<BiomeId, number> = { vale: 0xffffff, marsh: 0xd2d8bc, peaks: 0xd9dde4 };
-const GRASS_TINT: Record<BiomeId, number> = { vale: 0xdde4c0, marsh: 0xbfc492, peaks: 0xc2cec8 };
+const PINE_TINT: Record<BiomeId, number> = {
+  vale: 0x9bb48d,
+  marsh: 0x87966b,
+  peaks: 0x6f8a7a,
+  desert: 0xb3a878,
+  shadowwood: 0x5d7263,
+  highlands: 0x8fae84,
+  scorched: 0x6e6154,
+  salt: 0xb8b4a0,
+};
+const OAK_TINT: Record<BiomeId, number> = {
+  vale: 0xa7b886,
+  marsh: 0x8d9865,
+  peaks: 0x92a37f,
+  desert: 0xbfa974,
+  shadowwood: 0x66755f,
+  highlands: 0x9cae7c,
+  scorched: 0x7a6a56,
+  salt: 0xbdb89f,
+};
+const ROCK_TINT: Record<BiomeId, number> = {
+  vale: 0x8d8d85,
+  marsh: 0x565c4e,
+  peaks: 0x878e99,
+  desert: 0xb09a72,
+  shadowwood: 0x4e564c,
+  highlands: 0x8d8d85,
+  scorched: 0x6b5a50,
+  salt: 0xcfcaba,
+};
+const TRUNK_TINT: Record<BiomeId, number> = {
+  vale: 0xffffff,
+  marsh: 0xd2d8bc,
+  peaks: 0xd9dde4,
+  desert: 0xe3d6b4,
+  shadowwood: 0xb9c2b2,
+  highlands: 0xffffff,
+  scorched: 0xb8a698,
+  salt: 0xe6e2d2,
+};
+const GRASS_TINT: Record<BiomeId, number> = {
+  vale: 0xdde4c0,
+  marsh: 0xbfc492,
+  peaks: 0xc2cec8,
+  desert: 0xdcc998,
+  shadowwood: 0xa9b89e,
+  highlands: 0xd4dfb4,
+  scorched: 0xb3a48c,
+  salt: 0xe4e0cc,
+};
 const SWAMP_CANOPY_TINT = 0x7e8b58;
-const DRESS_TINT: Record<BiomeId, number> = { vale: 0xaebf8e, marsh: 0x8d9865, peaks: 0x93a78f };
+const DRESS_TINT: Record<BiomeId, number> = {
+  vale: 0xaebf8e,
+  marsh: 0x8d9865,
+  peaks: 0x93a78f,
+  desert: 0xc4b287,
+  shadowwood: 0x7d8c72,
+  highlands: 0xa5ba86,
+  scorched: 0x8f7d68,
+  salt: 0xd0ccb8,
+};
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
 const BARK_TINT_SOFTEN = 0.85;
@@ -1045,7 +1099,16 @@ interface DressingSpot {
 
 const DRESS_STEP_HIGH = 12;
 const DRESS_STEP_LOW = 10;
-const DRESS_DENSITY: Record<BiomeId, number> = { vale: 0.26, marsh: 0.26, peaks: 0.15 };
+const DRESS_DENSITY: Record<BiomeId, number> = {
+  vale: 0.26,
+  marsh: 0.26,
+  peaks: 0.15,
+  desert: 0.08,
+  shadowwood: 0.3,
+  highlands: 0.24,
+  scorched: 0.1,
+  salt: 0.05,
+};
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
 const DRESS_TINT_SOFTEN_LOW = 0.56;
@@ -1064,6 +1127,12 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
   if (biome === 'marsh') {
     if (r < 0.3) return 'bush';
     if (r < 0.62) return 'fern';
+    return 'mushroom';
+  }
+  if (biome === 'shadowwood') {
+    // twilight forest floor: ferns and mushrooms under the too-close canopy
+    if (r < 0.25) return 'bush';
+    if (r < 0.55) return 'fern';
     return 'mushroom';
   }
   return r < 0.62 ? 'bush' : 'fern';

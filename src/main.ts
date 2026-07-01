@@ -87,7 +87,15 @@ import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
-import { DT, dist2d, INTERACT_RANGE, MELEE_RANGE, type PlayerClass, RUN_SPEED } from './sim/types';
+import {
+  DT,
+  dist2d,
+  INTERACT_RANGE,
+  MELEE_RANGE,
+  type PlayerClass,
+  type PlayerRace,
+  RUN_SPEED,
+} from './sim/types';
 import { zoneBiomeAt } from './sim/world';
 import { startSitePresence } from './site_presence';
 import {
@@ -2495,6 +2503,7 @@ let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
+let onlineRace: PlayerRace = 'human'; // chosen race for new online characters (faction source)
 
 function releaseStartScreenPreview(): void {
   if (!characterPreview) return;
@@ -6445,6 +6454,22 @@ function wireStartScreens(): void {
     if (sortDropdownOpen && e.key === 'Escape') closeSortDropdown();
   });
 
+  // character creation: race picker (faction + race). Selection is pure UI
+  // state; the server re-validates the race id on create.
+  document.querySelectorAll('#charcreate-panel .mini-race').forEach((el) => {
+    const selectRace = () => {
+      document.querySelectorAll('#charcreate-panel .mini-race').forEach((x) => {
+        x.classList.remove('sel');
+        x.setAttribute('aria-pressed', 'false');
+      });
+      el.classList.add('sel');
+      el.setAttribute('aria-pressed', 'true');
+      onlineRace = ((el as HTMLElement).dataset.race as PlayerRace) ?? 'human';
+    };
+    el.addEventListener('click', selectRace);
+    el.addEventListener('keydown', (e) => handleKeyboardActivation(e as KeyboardEvent, selectRace));
+  });
+
   // character creation
   document.querySelectorAll('#charcreate-panel .mini-class').forEach((el) => {
     const handleMiniClassSelect = () => {
@@ -6634,6 +6659,7 @@ function wireStartScreens(): void {
         name,
         clsEl.dataset.class as PlayerClass,
         selectedSkin('#online-skin-row', onlineSkin),
+        onlineRace,
       );
       newCharNameInput.value = '';
       charselectError.textContent = '';

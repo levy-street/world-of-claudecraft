@@ -2475,6 +2475,71 @@
     box-shadow: 0 0 10px var(--class-color);
   }
 
+  /* ---------- Race picker (faction + race, character creation) ---------- */
+  .race-picker {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: var(--spacing-md);
+  }
+  .race-faction[data-faction="kael"] {
+    --faction-color: #e0b34a;
+  }
+  .race-faction[data-faction="veth"] {
+    --faction-color: #60a5fa;
+  }
+  .race-faction[data-faction="ossara"] {
+    --faction-color: #fb923c;
+  }
+  .race-faction-label {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--faction-color);
+    margin-bottom: 4px;
+    text-align: left;
+  }
+  .mini-race-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .mini-race {
+    text-align: center;
+    padding: 8px 4px;
+    min-height: 40px;
+    border: 2px solid var(--color-border-default);
+    border-radius: 5px;
+    cursor: var(--cursor-point);
+    font-size: 11px;
+    color: var(--color-text-muted);
+    background: #15151f;
+    font-family: var(--font-heading);
+    transition:
+      border-color var(--transition-speed),
+      color var(--transition-speed),
+      box-shadow var(--transition-speed);
+  }
+  .mini-race:hover,
+  .mini-race:focus-visible {
+    border-color: var(--faction-color);
+    color: var(--color-text-light);
+    box-shadow: 0 0 8px var(--color-primary-glow);
+    outline: none;
+  }
+  .mini-race.sel {
+    border-color: var(--faction-color);
+    color: #fff;
+    box-shadow: 0 0 10px var(--faction-color);
+  }
+  @media (max-width: 560px) {
+    .mini-race-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   /* ---------- Skin picker (alternate body textures) ---------- */
   .skin-row {
     display: flex;

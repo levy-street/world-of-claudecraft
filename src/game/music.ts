@@ -5,6 +5,8 @@
 // Each theme is a composed multi-track loop scheduled with a lookahead
 // timer; zone changes crossfade.
 
+import type { BiomeId } from '../sim/types';
+
 export type MusicZone =
   | 'town_eastbrook' | 'town_fenbridge' | 'town_highwatch'
   | 'vale' | 'vale_legacy' | 'marsh' | 'peaks'
@@ -34,17 +36,31 @@ export function shouldResetMusicForDungeonEntry(previousDungeonId: string | null
   return nextDungeonId !== null && previousDungeonId !== nextDungeonId;
 }
 
+// The Valdris biomes reuse the closest composed theme until they get their
+// own: sunny vale for desert/highlands/salt, the marsh theme for the twilight
+// shadowwood, the peaks theme for the war-scarred scorched ring.
+const BIOME_THEME: Record<BiomeId, MusicZone> = {
+  vale: 'vale',
+  marsh: 'marsh',
+  peaks: 'peaks',
+  desert: 'vale',
+  shadowwood: 'marsh',
+  highlands: 'vale',
+  scorched: 'peaks',
+  salt: 'vale',
+};
+
 /** Pick the soundtrack layer from world position context. */
 export function musicZoneForLocation(
   zoneId: string,
-  biome: 'vale' | 'marsh' | 'peaks',
+  biome: BiomeId,
   inHub: boolean,
   inDungeon: boolean,
   dungeonId: string | null = null,
 ): MusicZone {
   if (inDungeon) return dungeonId ? dungeonMusicZoneForDungeon(dungeonId) : 'dungeon_hollow_crypt';
-  if (inHub) return TOWN_MUSIC[zoneId] ?? biome;
-  return ZONE_MUSIC[zoneId] ?? biome;
+  if (inHub) return TOWN_MUSIC[zoneId] ?? BIOME_THEME[biome];
+  return ZONE_MUSIC[zoneId] ?? BIOME_THEME[biome];
 }
 
 type Inst = 'strings' | 'flute' | 'harp' | 'horn' | 'choir' | 'bell' | 'timpani' | 'bass' | 'stacc' | 'pad'

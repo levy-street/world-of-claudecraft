@@ -106,10 +106,26 @@ const BIOME_PALETTE: Record<BiomeId, { grass: number; grassDark: number; grassYe
   vale: { grass: 0x548545, grassDark: 0x3e6635, grassYellow: 0x768c44, dirt: 0x8a6f47, sand: 0xc2b283 },
   marsh: { grass: 0x596d36, grassDark: 0x41522b, grassYellow: 0x71764a, dirt: 0x6e5a3e, sand: 0x8f7f5c },
   peaks: { grass: 0x687a55, grassDark: 0x4d5c45, grassYellow: 0x8d9168, dirt: 0x7d6a50, sand: 0xb0a486 },
+  // Valdris biomes: Ossara dunes, Veth twilight forest, Kael highlands, the
+  // war-scarred Breach ring, and the blinding Saltbone pan.
+  desert: { grass: 0xc4a468, grassDark: 0xa8874f, grassYellow: 0xd6bb7e, dirt: 0x9a7b4d, sand: 0xd8c493 },
+  shadowwood: { grass: 0x3d5540, grassDark: 0x2b3f31, grassYellow: 0x4f6350, dirt: 0x5c4a38, sand: 0x7d7358 },
+  highlands: { grass: 0x5c8348, grassDark: 0x446238, grassYellow: 0x8f9a52, dirt: 0x8a6f47, sand: 0xc2b283 },
+  scorched: { grass: 0x6b5a4a, grassDark: 0x4a3c31, grassYellow: 0x7d6a52, dirt: 0x5f4636, sand: 0x8f7a62 },
+  salt: { grass: 0xd8d5c8, grassDark: 0xbdb9a8, grassYellow: 0xe4e0d0, dirt: 0xb8ab90, sand: 0xe8e4d6 },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
-const ROCK_SLOPE_START: Record<BiomeId, number> = { vale: 0.55, marsh: 0.62, peaks: 0.45 };
+const ROCK_SLOPE_START: Record<BiomeId, number> = {
+  vale: 0.55,
+  marsh: 0.62,
+  peaks: 0.45,
+  desert: 0.6,
+  shadowwood: 0.58,
+  highlands: 0.5,
+  scorched: 0.48,
+  salt: 0.65,
+};
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 

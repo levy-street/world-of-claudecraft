@@ -30,6 +30,7 @@ import {
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
+  type PlayerRace,
   type QuestProgress,
   type QuestState,
   type SimEvent,
@@ -71,6 +72,8 @@ export interface CharacterSummary {
   class: PlayerClass;
   level: number;
   skin: number;
+  // Playable race; servers predating races omit it (treated as 'human').
+  race?: PlayerRace;
   online: boolean;
   forceRename: boolean;
   lastPlayed?: string | null;
@@ -408,8 +411,13 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(
+    name: string,
+    cls: PlayerClass,
+    skin = 0,
+    race: PlayerRace = 'human',
+  ): Promise<void> {
+    await this.post('/api/characters', { name, class: cls, skin, race });
   }
 
   async renameCharacter(characterId: number, name: string): Promise<void> {
@@ -1222,6 +1230,9 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        // playable race (players only; pre-race servers omit it -> undefined,
+        // which every consumer treats as Human/Kael)
+        e.race = typeof w.rc === 'string' ? (w.rc as Entity['race']) : undefined;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';

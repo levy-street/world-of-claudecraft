@@ -9,8 +9,9 @@ import {
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
+import { isPlayerRace } from '../src/sim/content/races';
 import { Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { PlayerClass, PlayerRace } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
 import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
 import {
@@ -211,9 +212,11 @@ function initialCharacterState(
   cls: PlayerClass,
   name: string,
   skin: number,
+  race: PlayerRace,
 ): import('../src/sim/sim').CharacterState {
   const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
+  sim.setPlayerRace(sim.playerId, race);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');
   return character;
@@ -405,6 +408,7 @@ function characterListPayload(chars: CharacterRow[]): {
     class: PlayerClass;
     level: number;
     skin: number;
+    race: PlayerRace;
     online: boolean;
     forceRename: boolean;
     lastPlayed: string | null;
@@ -419,6 +423,7 @@ function characterListPayload(chars: CharacterRow[]): {
       class: c.class,
       level: c.level,
       skin: c.state?.skin ?? 0,
+      race: isPlayerRace(c.state?.race) ? c.state.race : 'human',
       online: [...game.clients.values()].some((s) => s.characterId === c.id),
       forceRename: c.force_rename,
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
@@ -818,13 +823,19 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           0,
           Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
         );
+        // Race is optional (older clients omit it and get Human/Kael), but a
+        // present value must be a real playable race: reject junk instead of
+        // silently coercing a tampered payload.
+        if (body.race !== undefined && !isPlayerRace(body.race))
+          return json(res, 400, { error: 'invalid race' });
+        const race: PlayerRace = isPlayerRace(body.race) ? body.race : 'human';
         const create = () =>
           createCharacterCapped(
             accountId,
             name,
             body.class,
             10,
-            initialCharacterState(body.class, name, skin),
+            initialCharacterState(body.class, name, skin, race),
           );
         const created = (c: NonNullable<Awaited<ReturnType<typeof createCharacterCapped>>>) =>
           json(res, 200, {
@@ -833,6 +844,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
             class: c.class,
             level: c.level,
             skin: c.state?.skin ?? skin,
+            race: isPlayerRace(c.state?.race) ? c.state.race : race,
             forceRename: c.force_rename,
           });
         try {

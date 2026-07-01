@@ -29,6 +29,7 @@ import {
 import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
+import { warZonePvpHostile } from '../sim/war_zone';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
@@ -1395,8 +1396,9 @@ export class Renderer {
     if (groundHeight(x, z, this.sim.cfg.seed) < WATER_LEVEL && y <= WATER_LEVEL + 0.3)
       return 'water';
     const biome = zoneBiomeAt(z);
-    if (biome === 'vale') return 'grass';
-    if (biome === 'marsh') return 'dirt';
+    if (biome === 'vale' || biome === 'highlands' || biome === 'shadowwood') return 'grass';
+    if (biome === 'marsh' || biome === 'desert' || biome === 'salt') return 'dirt';
+    if (biome === 'scorched') return 'stone';
     return this.weatherOn ? 'snow' : 'stone'; // peaks: snowy when weather is on
   }
 
@@ -3383,10 +3385,16 @@ export class Renderer {
     if (this.sim.duelInfo?.state === 'active' && this.sim.duelInfo.otherPid === target.id)
       return true;
     const match = this.sim.arenaInfo?.match;
-    return (
+    if (
       match?.state === 'active' &&
       (match.oppPid === target.id || match.enemies.some((e) => e.pid === target.id))
-    );
+    )
+      return true;
+    // The Breach, eternal war zone: cross-faction players read hostile while
+    // both stand in the open band. Same pure verdict the sim's isHostileTo
+    // uses (war_zone.ts), so nameplates match what the server will allow.
+    const self = this.sim.entities.get(this.sim.playerId);
+    return !!self && warZonePvpHostile(self, target);
   }
 
   // -------------------------------------------------------------------------
@@ -3417,8 +3425,27 @@ export class Renderer {
     vale: { color: 0xa6c6e0, near: 130, far: 470 },
     marsh: { color: 0xa3b294, near: 80, far: 330 },
     peaks: { color: 0xbdd3ec, near: 160, far: 560 },
+    desert: { color: 0xd8cba6, near: 150, far: 520 }, // heat haze over the dunes
+    shadowwood: { color: 0x76889a, near: 70, far: 300 }, // perpetual twilight
+    highlands: { color: 0xa6c6e0, near: 140, far: 500 },
+    scorched: { color: 0xbfa08a, near: 90, far: 340 }, // war-smoke and ember dust
+    salt: { color: 0xe6e3d4, near: 150, far: 560 }, // blinding white glare
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
+
+  // The ambience loop set only ships the three original biome beds; the
+  // Valdris biomes map onto the closest one (sink.ambience keeps the narrow
+  // union so game/sfx.ts stays decoupled from the sim's BiomeId).
+  private static AMBIENCE_BASE: Record<BiomeId, 'vale' | 'marsh' | 'peaks'> = {
+    vale: 'vale',
+    marsh: 'marsh',
+    peaks: 'peaks',
+    desert: 'vale',
+    shadowwood: 'marsh',
+    highlands: 'vale',
+    scorched: 'peaks',
+    salt: 'vale',
+  };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
@@ -4687,13 +4714,13 @@ export class Renderer {
           ? null
           : biome === 'peaks'
             ? 'snow'
-            : biome === 'marsh'
+            : biome === 'marsh' || biome === 'shadowwood'
               ? 'rain'
               : null;
       // Only at the water's edge / in it — sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < WATER_LEVEL + 0.4;
-      sink.ambience(biome, inDungeon, precip, nearWater);
+      sink.ambience(Renderer.AMBIENCE_BASE[biome], inDungeon, precip, nearWater);
     }
   }
 

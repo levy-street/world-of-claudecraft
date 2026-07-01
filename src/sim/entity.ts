@@ -1,4 +1,5 @@
 import type { TalentModifiers } from './content/talents';
+import { RACES } from './content/races';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
@@ -323,8 +324,10 @@ export function recalcPlayerStats(
   if (scaleMul > 1) e.maxHp = Math.round(e.maxHp * scaleMul);
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));
   if (e.dead) e.hp = 0;
-  // Body size: players default to 1; a buff_scale aura grows/shrinks them live.
-  if (e.kind === 'player') e.scale = scaleMul;
+  // Body size: players default to their race's cosmetic scale (1 for pre-race
+  // saves/Human); a buff_scale aura grows/shrinks them live on top of it. The
+  // race factor is pure presentation: it never feeds hp/reach/speed math.
+  if (e.kind === 'player') e.scale = scaleMul * (e.race ? RACES[e.race].scale : 1);
 
   // Druid forms swap the resource bar, classic-style: bear runs on rage
   // (starts empty, fills from combat), cat on energy (starts full — friendlier
