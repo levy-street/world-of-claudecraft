@@ -17,6 +17,7 @@ import { abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/
 import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
+import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
@@ -42,6 +43,7 @@ import {
   type DelveDailyInfo,
   type DelveRunInfo,
   type DelveShopOfferView,
+  type DevLeaderboardPage,
   type DuelInfo,
   type FriendInfo,
   type GuildLeaderboardPage,
@@ -564,6 +566,23 @@ export class Api {
   // 'password_required' otherwise. A normal account passes nothing.
   async unlinkDiscord(password?: string): Promise<void> {
     await this.delete('/api/discord', password ? { password } : {});
+  }
+
+  // ── GitHub link + developer-badge status ───────────────────────────────────
+  // Returns the github.com authorize URL the browser navigates to (link-only:
+  // attaches the verified GitHub identity to the current account).
+  async githubStart(): Promise<{ url: string }> {
+    return this.post('/api/auth/github/start', {});
+  }
+
+  // Current account's GitHub link status + landed-commit count + dev tier.
+  async githubStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/github');
+  }
+
+  // Unlink GitHub from the current account.
+  async unlinkGithub(): Promise<void> {
+    await this.delete('/api/github', {});
   }
 
   // ── Shareable player card + referrals ──────────────────────────────────────
@@ -1213,6 +1232,9 @@ export class ClientWorld implements IWorld {
         e.discordName = typeof w.dnm === 'string' ? w.dnm : undefined; // Discord handle/nickname
         e.discordJoined = typeof w.dj === 'number' ? w.dj : undefined; // Discord join epoch ms
         e.discordRole = typeof w.dr === 'string' ? w.dr : undefined; // top staff/special role key
+        e.devTier = w.dvt ?? 0; // developer-badge tier (cosmetic, server-set)
+        e.devMergedPrs = typeof w.dvc === 'number' ? w.dvc : undefined; // merged-PR count
+        e.githubLogin = typeof w.dgl === 'string' ? w.dgl : undefined; // GitHub login
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -1304,14 +1326,18 @@ export class ClientWorld implements IWorld {
         kind: a.kind,
         remaining: a.rem,
         duration: a.dur,
-        // The wire carries value only for negative-value buff_* stat-saps (sparse,
-        // server/game.ts), so the UI classifies them as debuffs identically to offline; a
-        // missing value (ordinary buffs, absorb, non-buff auras, an old server) decodes to 0
-        // as before. sourceId/school stay simplified (separate pre-existing wire reductions,
-        // not part of this change).
+        // The wire carries the aura magnitude (and imbue range / tick cadence / school) so buff
+        // and debuff hover tooltips show the real numbers online exactly as offline (aura_effect
+        // reads these). A 0/absent value decodes to 0 (value-less auras and an old server are
+        // unchanged), a missing school falls back to the physical default, and imbue range /
+        // tick cadence stay undefined when not sent. sourceId stays simplified (a separate
+        // pre-existing wire reduction, not read by the tooltip).
         value: a.value ?? 0,
+        value2: a.value2,
+        value3: a.value3,
+        tickInterval: a.tickInterval,
         sourceId: 0,
-        school: 'physical' as const,
+        school: a.school ?? 'physical',
         stacks: a.stacks,
         // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire sends it
         // only when defined (server/game.ts), so an ordinary aura or an old server decodes to
@@ -1899,8 +1925,15 @@ export class ClientWorld implements IWorld {
   }
   // --- IWorldMarket: World Market browse/list/buy/cancel/collect command sends
   // (snake_case wire strings). marketInfo is a snapshot read (mirror field above). ---
-  marketSearch(query: string): void {
-    this.cmd({ cmd: 'market_search', q: query });
+  marketSearch(query: MarketQuery): void {
+    this.cmd({
+      cmd: 'market_search',
+      q: query.search,
+      itemType: query.itemType,
+      subtype: query.subtype,
+      rarity: query.rarity,
+      page: query.page,
+    });
   }
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });
@@ -2046,6 +2079,34 @@ export class ClientWorld implements IWorld {
     try {
       const res = await fetch(
         apiUrl(`/api/leaderboard?board=guilds&page=${page}&pageSize=${pageSize}`, this.base),
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+      };
+    } catch {
+      return empty;
+    }
+  }
+  // Developer high-score board (REST GET, no wire command): ?board=devs ranks
+  // contributors by landed commits. The same data for every realm, paged exactly
+  // like the player + guild boards above.
+  async devLeaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<DevLeaderboardPage> {
+    const empty: DevLeaderboardPage = {
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/leaderboard?board=devs&page=${page}&pageSize=${pageSize}`, this.base),
       );
       if (!res.ok) return empty;
       const data = await res.json();

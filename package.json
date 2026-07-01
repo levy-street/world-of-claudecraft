@@ -111,5 +111,8 @@
     "typescript": "^5.5.0",
     "vite": "^8.0.16",
     "vitest": "4.1.8"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true
   }
 }

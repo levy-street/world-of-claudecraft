@@ -18,7 +18,14 @@
 // hud.update()'s per-frame path.
 
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
-import type { GuildLeaderboardPage, IWorld, LeaderboardPage } from '../world_api';
+import type {
+  DevLeaderboardPage,
+  GuildLeaderboardPage,
+  IWorld,
+  LeaderboardPage,
+} from '../world_api';
+import { buildDevLeaderboardView, type DevLeaderboardRow } from './dev_leaderboard_view';
+import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -35,7 +42,7 @@ import { svgIcon } from './ui_icons';
 import { formatXp } from './xp_bar';
 
 /** Which high-score board the window is showing. */
-type LeaderboardBoard = 'players' | 'guilds';
+type LeaderboardBoard = 'players' | 'guilds' | 'devs';
 
 /**
  * Hud-supplied glue. The leaderboard window renders entirely from IWorld + these
@@ -48,6 +55,8 @@ export interface LeaderboardWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** The viewer's developer-badge display preference; also hides the Developers tab. */
+  showDevBadges(): boolean;
 }
 
 /** Where focus should land after a (re)render: into the window on open, back onto
@@ -62,16 +71,20 @@ export class LeaderboardWindow {
   private board: LeaderboardBoard = 'players';
   private playerPage = 0;
   private guildPage = 0;
+  private devPage = 0;
   private openerFocus: HTMLElement | null = null;
 
   constructor(private readonly deps: LeaderboardWindowDeps) {}
 
   private get page(): number {
-    return this.board === 'guilds' ? this.guildPage : this.playerPage;
+    if (this.board === 'guilds') return this.guildPage;
+    if (this.board === 'devs') return this.devPage;
+    return this.playerPage;
   }
 
   private set page(value: number) {
     if (this.board === 'guilds') this.guildPage = value;
+    else if (this.board === 'devs') this.devPage = value;
     else this.playerPage = value;
   }
 
@@ -92,6 +105,7 @@ export class LeaderboardWindow {
     this.board = 'players';
     this.playerPage = 0;
     this.guildPage = 0;
+    this.devPage = 0;
     this.deps.root().style.display = 'block';
     void this.render('open');
   }
@@ -113,6 +127,10 @@ export class LeaderboardWindow {
   // leaderboard() maps to the error state (a localized retry message), instead of
   // silently masquerading as an empty board.
   async render(focus: FocusTarget = null): Promise<void> {
+    // The setting may have been turned off after the devs tab was selected (a
+    // prior session, or a live Options change while this window is open): fall
+    // back to the players board rather than rendering an un-tabbed orphan board.
+    if (this.board === 'devs' && !this.deps.showDevBadges()) this.board = 'players';
     const el = this.deps.root();
     const world = this.deps.world();
     markDialogRoot(el, { labelledBy: 'leaderboard-title' });
@@ -127,6 +145,10 @@ export class LeaderboardWindow {
 
     if (this.board === 'guilds') {
       await this.renderGuildBoard(el, world, focus);
+      return;
+    }
+    if (this.board === 'devs') {
+      await this.renderDevBoard(el, world, focus);
       return;
     }
 
@@ -219,6 +241,47 @@ export class LeaderboardWindow {
     this.wirePager(body as HTMLElement, focus);
   }
 
+  // The developers tab: same async + page-control shape as the player/guild paths,
+  // but it awaits the contributor board (the same data for every realm, sourced
+  // from GitHub's public stats) and renders contributor rows with their dev badge.
+  // Offline / GitHub-unconfigured resolves the empty state; a rejection is the
+  // error state.
+  private async renderDevBoard(el: HTMLElement, world: IWorld, focus: FocusTarget): Promise<void> {
+    let result: DevLeaderboardPage | null = null;
+    try {
+      result = await world.devLeaderboard(this.page, LEADERBOARD_PAGE_SIZE);
+    } catch {
+      result = null;
+    }
+    if (el.style.display !== 'block') return;
+    const body = el.querySelector('.lb-body');
+    if (!body) return;
+
+    const view = buildDevLeaderboardView(
+      result === null
+        ? { kind: 'error' }
+        : { kind: 'page', page: result, viewerLogin: world.player.githubLogin ?? null },
+    );
+
+    if (view.kind === 'error') {
+      body.innerHTML = `<div class="lb-empty lb-error" role="alert">${esc(t('game.leaderboard.retry'))}</div>`;
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    if (view.kind === 'empty') {
+      body.innerHTML = `<div class="lb-empty">${esc(t('hudChrome.leaderboard.devEmpty'))}</div>`;
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    if (view.kind !== 'ranked') return;
+    this.page = view.page;
+    body.innerHTML =
+      this.devHeaderHtml() +
+      view.rows.map((r) => this.devRowHtml(r)).join('') +
+      this.pagerHtml(view.pager);
+    this.wirePager(body as HTMLElement, focus);
+  }
+
   // ---- HTML builders (the localized DOM the pure view-model drives) ----------
 
   private titleHtml(realm: string): string {
@@ -253,6 +316,7 @@ export class LeaderboardWindow {
       `<div class="lb-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
       tab('players', t('hudChrome.leaderboard.tabPlayers')) +
       tab('guilds', t('hudChrome.leaderboard.tabGuilds')) +
+      (this.deps.showDevBadges() ? tab('devs', t('hudChrome.leaderboard.tabDevs')) : '') +
       `</div>`
     );
   }
@@ -319,6 +383,35 @@ export class LeaderboardWindow {
       `<span class="lb-members">${formatNumber(r.memberCount, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-vlvl">${r.topLevel}</span>` +
       `<span class="lb-xp">${formatXp(r.totalLifetimeXp)}</span></div>`
+    );
+  }
+
+  // Developer-board header: rank, contributor (GitHub login), earned tier,
+  // merged PRs. Reuses the shared rank/name columns; the dev-specific columns
+  // get their own classes so the grid stays aligned with the other tabs.
+  private devHeaderHtml(): string {
+    return (
+      `<div class="lb-row lb-row-dev lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
+      `<span class="lb-name">${esc(t('hudChrome.leaderboard.devName'))}</span>` +
+      `<span class="lb-dev-tier">${esc(t('hudChrome.leaderboard.devTierCol'))}</span>` +
+      `<span class="lb-commits">${esc(t('hudChrome.leaderboard.mergedPrs'))}</span></div>`
+    );
+  }
+
+  private devRowHtml(r: DevLeaderboardRow): string {
+    const def = devTierByIndex(r.devTier);
+    // The dev-tier badge glyph makes the board "visual": the rung's procedural
+    // SVG sits left of the contributor's GitHub handle.
+    const badge = def
+      ? `<img class="lb-dev-badge" src="${devTierBadgeDataUrl(def, 32)}" alt="" draggable="false">`
+      : '';
+    const tierName = def ? devTierDisplayName(def) : '';
+    const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
+    return (
+      `<div class="lb-row lb-row-dev${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
+      `<span class="lb-name">${badge}@${esc(r.login)}${you}</span>` +
+      `<span class="lb-dev-tier">${esc(tierName)}</span>` +
+      `<span class="lb-commits">${formatNumber(r.mergedPrs, { maximumFractionDigits: 0 })}</span></div>`
     );
   }
 

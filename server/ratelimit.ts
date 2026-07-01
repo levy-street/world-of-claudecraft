@@ -272,6 +272,32 @@ export function resetDiscordRateLimits(): void {
   discordAccountAttempts.clear();
 }
 
+// GitHub link/status endpoints share one dedicated bucket (per IP AND per
+// account), separate from login so an OAuth-link flood can't lock a user out of
+// logging in. accountId 0 keys the unauthenticated callback leg on IP only.
+export const GITHUB_MAX_PER_MINUTE = 15;
+const githubIpAttempts = new Map<string, number[]>();
+const githubAccountAttempts = new Map<number, number[]>();
+
+export function githubRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    githubIpAttempts,
+    requestIp(req),
+    GITHUB_MAX_PER_MINUTE,
+  );
+  const accountLimited =
+    accountId > 0
+      ? recordSlidingWindowAttempt(githubAccountAttempts, accountId, GITHUB_MAX_PER_MINUTE)
+      : false;
+  return ipLimited || accountLimited;
+}
+
+/** Reset GitHub throttles. Test-only: keeps scoped buckets isolated. */
+export function resetGithubRateLimits(): void {
+  githubIpAttempts.clear();
+  githubAccountAttempts.clear();
+}
+
 export const WOC_BALANCE_MAX_PER_MINUTE = 20;
 const wocBalanceIpAttempts = new Map<string, number[]>();
 

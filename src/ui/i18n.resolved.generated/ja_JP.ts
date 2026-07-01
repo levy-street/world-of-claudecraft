@@ -274,11 +274,16 @@ export const ja_JP: EnTranslations = {
       "tabsLabel": "ハイスコアボード",
       "tabPlayers": "プレイヤー",
       "tabGuilds": "ギルド",
+      "tabDevs": "開発者",
       "guildName": "ギルド",
       "members": "メンバー",
       "topLevel": "最高",
       "guildXp": "累計経験値",
-      "guildEmpty": "ランク入りのギルドはまだありません。"
+      "guildEmpty": "ランク入りのギルドはまだありません。",
+      "devName": "コントリビューター",
+      "devTierCol": "バッジ",
+      "mergedPrs": "マージ済みPR",
+      "devEmpty": "ランク入りのコントリビューターはまだいません。"
     },
     "raidLockout": {
       "title": "レイドロックアウト",
@@ -331,6 +336,7 @@ export const ja_JP: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。",
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
+      "showDevBadges": "開発者バッジを表示",
       "uiScale": "UIスケール",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
@@ -763,6 +769,9 @@ export const ja_JP: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "必要レベル {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -905,6 +914,34 @@ export const ja_JP: EnTranslations = {
           "hint": "コミュニティに助けを求める"
         }
       }
+    },
+    "devBadge": {
+      "title": "開発者",
+      "tiers": {
+        "tinkerer": "修繕屋",
+        "artificer": "工匠",
+        "runesmith": "ルーン鍛冶",
+        "architect": "設計者",
+        "worldwright": "世界の造り手"
+      },
+      "flavors": {
+        "tinkerer": "最初のプルリクエストがこの世界にマージされた。",
+        "artificer": "5 件のプルリクエストを経て、世界はあなたのコードに従い始める。",
+        "runesmith": "15 件のプルリクエストが、稼働中のゲームに鍛え込まれた。",
+        "architect": "この世界の設計者：30 件のプルリクエストがマージされた。",
+        "worldwright": "世界の造り手：70 件のプルリクエストがこのゲームを形づくる。"
+      },
+      "badgeTitle": "開発者：{tier}",
+      "prsLanded": "{count} 件のプルリクエストがマージ済み",
+      "contributor": "オープンソース貢献者",
+      "link": {
+        "cta": "GitHub を連携",
+        "relink": "GitHub を再連携",
+        "benefits": "GitHub を連携すると、オープンソースリポジトリにマージされたプルリクエストに応じて開発者バッジを獲得できます。",
+        "error": "GitHub を連携できませんでした。もう一度お試しください。"
+      },
+      "linkedAs": "{login} として連携済み",
+      "unlink": "GitHub の連携を解除"
     }
   },
   "guide": {
@@ -5661,6 +5698,11 @@ export const ja_JP: EnTranslations = {
         "name": "博識者キャディス",
         "title": "博識者",
         "greeting": "崩れやすい頁岩に気をつけてください、{className}。山は近ごろ落ち着きがなく、その理由を知りたいのです。"
+      },
+      "auctioneer_voss": {
+        "name": "競売人ヴォス",
+        "title": "世界市場の守り手",
+        "greeting": "世界市場はここでも利用できます、{className}。王国中の冒険者から買うことも、自分の品を売ることもできます。"
       },
       "brother_aldric_raid": {
         "name": "アルドリック修道士",

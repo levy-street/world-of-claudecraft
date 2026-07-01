@@ -47,7 +47,7 @@ Postgres and serves the built client from `dist/`.
 - Character level + full state (gear/bags/quests/position/money/talents/arena/lifetimeXp)
   stored as **JSONB** in `characters.state`; `serializeCharacter` converts to and from the `Sim`.
 - Save cadence: autosave every **30 s** (`AUTOSAVE_SECONDS`), on `leave`, and on
-  `SIGINT`/`SIGTERM` shutdown (`saveAll`). World Market is one global JSONB row (`world_state` key `'market'`).
+  `SIGINT`/`SIGTERM` shutdown (`saveAll`). World Market is a per-realm JSONB row (`world_state` key `market:<realm>`), realm-scoped like everything else; a pre-scoping bare `'market'` row is migrated into the realm key on first boot.
 - **Character names are globally `UNIQUE`** (catch `23505`, return 409 "name taken").
 - Leaderboards (`topLifetimeXp`, `topArenaRatings`) sort on JSONB expressions and
   are read through the **in-memory cache in main.ts**, never per-request under load.

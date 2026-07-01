@@ -274,11 +274,16 @@ export const zh_TW: EnTranslations = {
       "tabsLabel": "高分榜",
       "tabPlayers": "玩家",
       "tabGuilds": "公會",
+      "tabDevs": "開發者",
       "guildName": "公會",
       "members": "成員",
       "topLevel": "最高",
       "guildXp": "總經驗",
-      "guildEmpty": "還沒有上榜的公會。"
+      "guildEmpty": "還沒有上榜的公會。",
+      "devName": "貢獻者",
+      "devTierCol": "徽章",
+      "mergedPrs": "已合併 PR",
+      "devEmpty": "還沒有上榜的貢獻者。"
     },
     "raidLockout": {
       "title": "團隊副本鎖定",
@@ -331,6 +336,7 @@ export const zh_TW: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "拖曳旋轉鏡頭時將滑鼠游標保持在視窗內，使其無法到達螢幕邊緣或移動到另一台顯示器。若你偏好自由游標，請關閉此選項。",
       "showWalletOnCharacterScreen": "在角色畫面顯示錢包",
       "showWalletOnPlayerCard": "在玩家卡片顯示錢包",
+      "showDevBadges": "顯示開發者徽章",
       "uiScale": "介面縮放",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
@@ -763,6 +769,9 @@ export const zh_TW: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "需要等級 {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -905,6 +914,34 @@ export const zh_TW: EnTranslations = {
           "hint": "向社群尋求協助"
         }
       }
+    },
+    "devBadge": {
+      "title": "開發者",
+      "tiers": {
+        "tinkerer": "修補匠",
+        "artificer": "工巧師",
+        "runesmith": "符文匠",
+        "architect": "架構師",
+        "worldwright": "世界鑄造者"
+      },
+      "flavors": {
+        "tinkerer": "你的第一個拉取請求已合併到這片大陸。",
+        "artificer": "五次拉取請求合併後，世界開始順從你的程式碼。",
+        "runesmith": "十五次拉取請求，已熔鑄進執行中的遊戲。",
+        "architect": "這片大陸的架構師：已合併 30 次拉取請求。",
+        "worldwright": "世界的鑄造者：70 次拉取請求塑造了這款遊戲。"
+      },
+      "badgeTitle": "開發者：{tier}",
+      "prsLanded": "已合併 {count} 次拉取請求",
+      "contributor": "開源貢獻者",
+      "link": {
+        "cta": "連結 GitHub",
+        "relink": "重新連結 GitHub",
+        "benefits": "連結你的 GitHub，即可憑你在開源儲存庫中已合併的拉取請求獲得開發者徽章。",
+        "error": "無法連結 GitHub。請再試一次。"
+      },
+      "linkedAs": "已連結為 {login}",
+      "unlink": "取消連結 GitHub"
     }
   },
   "guide": {
@@ -5661,6 +5698,11 @@ export const zh_TW: EnTranslations = {
         "name": "凱迪斯博學者",
         "title": "博學者",
         "greeting": "小心鬆動的頁岩，{className}。這座山近來不安，我想知道原因。"
+      },
+      "auctioneer_voss": {
+        "name": "拍賣師沃斯",
+        "title": "世界市場守護者",
+        "greeting": "世界市場在此亦可使用，{className}。從王國各地的冒險者手中購買，或出售你自己的貨物。"
       },
       "brother_aldric_raid": {
         "name": "奧德里克修士",

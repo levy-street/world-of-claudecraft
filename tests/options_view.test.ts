@@ -240,6 +240,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'reduceMotion',
       'showWalletOnCharacterScreen',
       'showWalletOnPlayerCard',
+      'showDevBadges',
       'landingHighContrast',
       'invertLookY',
       'startAttackOnAbilityUse',

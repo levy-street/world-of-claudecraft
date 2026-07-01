@@ -274,11 +274,16 @@ export const vi_VN: EnTranslations = {
       "tabsLabel": "Bảng điểm cao",
       "tabPlayers": "Người Chơi",
       "tabGuilds": "Bang Hội",
+      "tabDevs": "Developers",
       "guildName": "Bang Hội",
       "members": "Thành Viên",
       "topLevel": "Hàng Đầu",
       "guildXp": "Tổng XP",
-      "guildEmpty": "Chưa có bang hội nào được xếp hạng."
+      "guildEmpty": "Chưa có bang hội nào được xếp hạng.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "mergedPrs": "Merged PRs",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Khóa Raid",
@@ -331,6 +336,7 @@ export const vi_VN: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Giữ con trỏ chuột bên trong cửa sổ khi bạn kéo để xoay camera, để nó không thể chạm tới mép màn hình hoặc di chuyển sang màn hình khác. Hãy tắt nếu bạn thích con trỏ tự do.",
       "showWalletOnCharacterScreen": "Hiện Ví Tiền Ở Màn Hình Nhân Vật",
       "showWalletOnPlayerCard": "Hiện Ví Tiền Trên Thẻ Người Chơi",
+      "showDevBadges": "Show Developer Badges",
       "uiScale": "Tỷ Lệ Giao Diện",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
@@ -763,6 +769,9 @@ export const vi_VN: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -905,6 +914,34 @@ export const vi_VN: EnTranslations = {
           "hint": "Nhờ cộng đồng giúp đỡ"
         }
       }
+    },
+    "devBadge": {
+      "title": "Developer",
+      "tiers": {
+        "tinkerer": "Tinkerer",
+        "artificer": "Artificer",
+        "runesmith": "Runesmith",
+        "architect": "Architect",
+        "worldwright": "Worldwright"
+      },
+      "flavors": {
+        "tinkerer": "Your first pull request landed in the realm.",
+        "artificer": "Five pull requests in, and the world bends to your code.",
+        "runesmith": "Fifteen pull requests forged into the running game.",
+        "architect": "An architect of the realm: 30 pull requests merged.",
+        "worldwright": "A wright of worlds: 70 pull requests shape the game."
+      },
+      "badgeTitle": "Developer: {tier}",
+      "prsLanded": "{count} pull requests merged",
+      "contributor": "Open-source contributor",
+      "link": {
+        "cta": "Link GitHub",
+        "relink": "Relink GitHub",
+        "benefits": "Link your GitHub to earn a developer badge for the pull requests you have had merged into the open-source repo.",
+        "error": "Could not link GitHub. Please try again."
+      },
+      "linkedAs": "Linked as {login}",
+      "unlink": "Unlink GitHub"
     }
   },
   "guide": {
@@ -5661,6 +5698,11 @@ export const vi_VN: EnTranslations = {
         "name": "Sử Gia Caddis",
         "title": "Sử Gia",
         "greeting": "Coi chừng đá phiến lỏng lẻo, {className}. Ngọn núi gần đây... bất an. Ta định tìm hiểu lý do."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Tu Huynh Aldric",

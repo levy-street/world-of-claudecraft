@@ -7,12 +7,20 @@
 //
 // The caller (the HUD) assembles PlayerCardData from IWorld; this module only
 // knows how to draw it.
+import { type DevTier, devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
 import {
-  holderTierForBalance, holderTierBadgeDataUrl, holderTierDisplayName,
-  holderTierFlavorText, type HolderTier,
+  type HolderTier,
+  holderTierBadgeDataUrl,
+  holderTierDisplayName,
+  holderTierFlavorText,
+  holderTierForBalance,
 } from './holder_tier';
-import { percentileTierForPercent, percentileTierBadgeDataUrl, type PercentileTier } from './percentile_tier';
-import { formatNumber, getLanguage, languageTag, t, type TranslationKey } from './i18n';
+import { formatNumber, getLanguage, languageTag, type TranslationKey, t } from './i18n';
+import {
+  type PercentileTier,
+  percentileTierBadgeDataUrl,
+  percentileTierForPercent,
+} from './percentile_tier';
 
 export interface PlayerCardStat {
   label: string;
@@ -45,6 +53,10 @@ export interface PlayerCardData {
   topPercent: number | null;
   /** Verified linked wallet's $WOC balance (null when unlinked). Drives the badge. */
   balance: number | null;
+  /** Developer-badge tier index (0/null = none, 1-5). Drives the dev badge. */
+  devTier: number | null;
+  /** Merged-PR count behind the dev tier (null when unknown). */
+  devMergedPrs: number | null;
   /** Handle shown in the footer referral line (the card slug, or the name). */
   referralHandle: string;
   /** Recruited-friends count, when known. */
@@ -82,11 +94,34 @@ export interface CardPose {
 
 export const CARD_POSES: readonly CardPose[] = [
   // Heroic raised weapon: epic across warrior/mage/hunter/etc. The default.
-  { id: 'hero', labelKey: 'playerCard.poseHero', clips: ['Spellcast_Raise', 'Spellcasting', 'Idle'], fraction: 0.5 },
+  {
+    id: 'hero',
+    labelKey: 'playerCard.poseHero',
+    clips: ['Spellcast_Raise', 'Spellcasting', 'Idle'],
+    fraction: 0.5,
+  },
   // Class-appropriate combat action (melee swing / drawn bow / cast).
-  { id: 'battle', labelKey: 'playerCard.poseBattle', clips: ['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal', 'Dualwield_Melee_Attack_Chop', '2H_Ranged_Shoot', 'Spellcast_Shoot', 'Idle'], fraction: 0.4 },
+  {
+    id: 'battle',
+    labelKey: 'playerCard.poseBattle',
+    clips: [
+      '2H_Melee_Attack_Chop',
+      '1H_Melee_Attack_Chop',
+      '1H_Melee_Attack_Slice_Diagonal',
+      'Dualwield_Melee_Attack_Chop',
+      '2H_Ranged_Shoot',
+      'Spellcast_Shoot',
+      'Idle',
+    ],
+    fraction: 0.4,
+  },
   // Arm-up celebration.
-  { id: 'victory', labelKey: 'playerCard.poseVictory', clips: ['Cheer', 'Jump_Idle', 'Idle'], fraction: 0.5 },
+  {
+    id: 'victory',
+    labelKey: 'playerCard.poseVictory',
+    clips: ['Cheer', 'Jump_Idle', 'Idle'],
+    fraction: 0.5,
+  },
 ];
 
 /** Human-readable $WOC amount in the player's current locale. */
@@ -103,7 +138,14 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number): void {
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
   const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + rr, y);
@@ -115,7 +157,13 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 }
 
 /** Draw `text` truncated with an ellipsis if it would exceed `maxW`. */
-function fillTextClamped(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxW: number): void {
+function fillTextClamped(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxW: number,
+): void {
   if (ctx.measureText(text).width <= maxW) {
     ctx.fillText(text, x, y);
     return;
@@ -136,9 +184,10 @@ const LOGO_URL = '/woc-logo-hero.webp';
 
 /** Format a realm percentile as a card chip label. */
 function formatTopPercent(pct: number): string {
-  const percent = pct < 1
-    ? formatNumber(pct, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-    : formatNumber(Math.ceil(pct), { maximumFractionDigits: 0 });
+  const percent =
+    pct < 1
+      ? formatNumber(pct, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+      : formatNumber(Math.ceil(pct), { maximumFractionDigits: 0 });
   return t('playerCard.topPercent', { percent });
 }
 
@@ -160,11 +209,17 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
 
   const tier = holderTierForBalance(data.balance);
   const pctTier = percentileTierForPercent(data.topPercent);
-  const [charImg, badgeImg, logoImg, pctBadgeImg] = await Promise.all([
+  const devTier = devTierByIndex(data.devTier ?? 0);
+  const [charImg, badgeImg, logoImg, pctBadgeImg, devBadgeImg] = await Promise.all([
     loadImage(data.characterImage),
     tier ? loadImage(holderTierBadgeDataUrl(tier, 256)) : Promise.resolve(null),
     loadImage(LOGO_URL).catch(() => null), // best-effort brand mark
-    pctTier ? loadImage(percentileTierBadgeDataUrl(pctTier, 128)).catch(() => null) : Promise.resolve(null), // best-effort; drawHeader falls back to the plain chip
+    pctTier
+      ? loadImage(percentileTierBadgeDataUrl(pctTier, 128)).catch(() => null)
+      : Promise.resolve(null), // best-effort; drawHeader falls back to the plain chip
+    devTier
+      ? loadImage(devTierBadgeDataUrl(devTier, 128)).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const canvas = document.createElement('canvas');
@@ -177,6 +232,7 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   drawBackdrop(ctx, data.classColor);
   drawCharacter(ctx, charImg);
   drawHeader(ctx, data, pctBadgeImg, pctTier);
+  if (devTier && devBadgeImg) drawDevBadge(ctx, devTier, devBadgeImg, data.devMergedPrs);
   if (tier && badgeImg) drawBadge(ctx, tier, badgeImg, data.balance);
   drawStats(ctx, data);
   drawGear(ctx, data);
@@ -223,7 +279,12 @@ function drawCharacter(ctx: CanvasRenderingContext2D, img: HTMLImageElement): vo
   ctx.drawImage(img, x, y, w, h);
 }
 
-function drawHeader(ctx: CanvasRenderingContext2D, data: PlayerCardData, pctBadge: HTMLImageElement | null, pctTier: PercentileTier | null): void {
+function drawHeader(
+  ctx: CanvasRenderingContext2D,
+  data: PlayerCardData,
+  pctBadge: HTMLImageElement | null,
+  pctTier: PercentileTier | null,
+): void {
   const x = 478;
   ctx.save();
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
@@ -265,7 +326,13 @@ function drawHeader(ctx: CanvasRenderingContext2D, data: PlayerCardData, pctBadg
     // The tier medal sits just left of the tile, against the dark card so its
     // ring→glow + laurel read clearly.
     if (medalW) {
-      ctx.drawImage(pctBadge as HTMLImageElement, cursorX, chipY + chipH / 2 - medalW / 2, medalW, medalW);
+      ctx.drawImage(
+        pctBadge as HTMLImageElement,
+        cursorX,
+        chipY + chipH / 2 - medalW / 2,
+        medalW,
+        medalW,
+      );
       cursorX += medalW; // the medal box's transparent margin spaces it from the tile
     }
     ctx.fillStyle = pctTier ? pctTier.ring : COL.gold;
@@ -278,10 +345,21 @@ function drawHeader(ctx: CanvasRenderingContext2D, data: PlayerCardData, pctBadg
 
   ctx.fillStyle = COL.muted;
   ctx.font = `400 19px ${BODY_FONT}`;
-  ctx.fillText(data.realm ? t('playerCard.realmSubtitle', { realm: data.realm }) : t('playerCard.defaultRealm'), x, 158);
+  ctx.fillText(
+    data.realm
+      ? t('playerCard.realmSubtitle', { realm: data.realm })
+      : t('playerCard.defaultRealm'),
+    x,
+    158,
+  );
 }
 
-function drawBadge(ctx: CanvasRenderingContext2D, tier: HolderTier, badge: HTMLImageElement, balance: number | null): void {
+function drawBadge(
+  ctx: CanvasRenderingContext2D,
+  tier: HolderTier,
+  badge: HTMLImageElement,
+  balance: number | null,
+): void {
   // Bottom-left of the right column (the footer band), swapped with the brand
   // mark, which now sits top-right. Badge on the left, tier + balance to its right.
   // Compact badge with a tight glow so it sits inside the footer band without
@@ -300,17 +378,70 @@ function drawBadge(ctx: CanvasRenderingContext2D, tier: HolderTier, badge: HTMLI
   // Tier name.
   ctx.fillStyle = tier.ring;
   ctx.font = `700 18px ${TITLE_FONT}`;
-  ctx.fillText(holderTierDisplayName(tier).toLocaleUpperCase(languageTag(getLanguage())), left, cy - 13);
+  ctx.fillText(
+    holderTierDisplayName(tier).toLocaleUpperCase(languageTag(getLanguage())),
+    left,
+    cy - 13,
+  );
   // The actual on-chain bag: the flex.
   if (balance !== null) {
     ctx.fillStyle = COL.gold;
     ctx.font = `700 20px ${BODY_FONT}`;
-    fillTextClamped(ctx, t('wallet.balanceAmount', { amount: formatWoc(balance) }), left, cy + 10, 210);
+    fillTextClamped(
+      ctx,
+      t('wallet.balanceAmount', { amount: formatWoc(balance) }),
+      left,
+      cy + 10,
+      210,
+    );
   }
   // Flavour line.
   ctx.fillStyle = COL.muted;
   ctx.font = `400 12px ${BODY_FONT}`;
   fillTextClamped(ctx, holderTierFlavorText(tier), left, cy + 28, 220);
+}
+
+// The developer badge sits in the free band between the realm subtitle (whose
+// glyphs end around y=162) and the stats panel (y=196), in the right column: a
+// compact badge with the rung name and the merged-PR count, reading as an
+// earned honor like the percentile medal above it. Sized + centred (r=11,
+// cy=179) to keep clearance on both sides even for a tall non-Latin glyph (the
+// rung name is short by design: see hudChrome.devBadge.tiers.*).
+function drawDevBadge(
+  ctx: CanvasRenderingContext2D,
+  tier: DevTier,
+  badge: HTMLImageElement,
+  mergedPrs: number | null,
+): void {
+  const r = 11;
+  const cx = 478 + r;
+  const cy = 179;
+  ctx.save();
+  ctx.shadowColor = hexWithAlpha(tier.glow, 0.9);
+  ctx.shadowBlur = 6;
+  ctx.drawImage(badge, cx - r, cy - r, r * 2, r * 2);
+  ctx.restore();
+
+  const left = cx + r + 9;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = tier.ring;
+  ctx.font = `700 14px ${TITLE_FONT}`;
+  const name = devTierDisplayName(tier).toLocaleUpperCase(languageTag(getLanguage()));
+  ctx.fillText(name, left, cy + 4);
+  if (mergedPrs !== null) {
+    const nameW = ctx.measureText(name).width;
+    ctx.fillStyle = COL.muted;
+    ctx.font = `400 12px ${BODY_FONT}`;
+    fillTextClamped(
+      ctx,
+      t('hudChrome.devBadge.prsLanded', {
+        count: formatNumber(mergedPrs, { maximumFractionDigits: 0 }),
+      }),
+      left + nameW + 10,
+      cy + 4,
+      250,
+    );
+  }
 }
 
 function drawStats(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
@@ -333,7 +464,13 @@ function drawStats(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
   drawStatColumn(ctx, data.combatStats, x + padX + colW + 8, y + 22, colW - 20);
 }
 
-function drawStatColumn(ctx: CanvasRenderingContext2D, stats: PlayerCardStat[], x: number, y: number, w: number): void {
+function drawStatColumn(
+  ctx: CanvasRenderingContext2D,
+  stats: PlayerCardStat[],
+  x: number,
+  y: number,
+  w: number,
+): void {
   const rowH = 27;
   ctx.font = `600 20px ${BODY_FONT}`;
   for (let i = 0; i < stats.length; i++) {
@@ -377,7 +514,11 @@ function drawGear(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
   }
 }
 
-function drawFooter(ctx: CanvasRenderingContext2D, data: PlayerCardData, logo: HTMLImageElement | null): void {
+function drawFooter(
+  ctx: CanvasRenderingContext2D,
+  data: PlayerCardData,
+  logo: HTMLImageElement | null,
+): void {
   const y = CARD_H - 26;
   // Brand mark: the full logo lockup, else a plain text wordmark, top-right now
   // (swapped with the holder badge, which moved to the bottom-left). Right-aligned
@@ -401,9 +542,11 @@ function drawFooter(ctx: CanvasRenderingContext2D, data: PlayerCardData, logo: H
   ctx.font = `600 19px ${BODY_FONT}`;
   const referralLine = data.referralCount
     ? t('playerCard.footerHandleWithRecruits', {
-      handle: data.referralHandle,
-      recruited: t('playerCard.recruited', { count: formatNumber(data.referralCount, { maximumFractionDigits: 0 }) }),
-    })
+        handle: data.referralHandle,
+        recruited: t('playerCard.recruited', {
+          count: formatNumber(data.referralCount, { maximumFractionDigits: 0 }),
+        }),
+      })
     : t('playerCard.footerHandle', { handle: data.referralHandle });
   ctx.fillText(referralLine, 1168, y - 22);
   ctx.fillStyle = COL.goldDim;

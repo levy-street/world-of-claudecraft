@@ -274,11 +274,16 @@ export const nl_NL: EnTranslations = {
       "tabsLabel": "Topscorelijsten",
       "tabPlayers": "Spelers",
       "tabGuilds": "Gildes",
+      "tabDevs": "Developers",
       "guildName": "Gilde",
       "members": "Leden",
       "topLevel": "Top",
       "guildXp": "Totaal XP",
-      "guildEmpty": "Nog geen gerangschikte gildes."
+      "guildEmpty": "Nog geen gerangschikte gildes.",
+      "devName": "Contributor",
+      "devTierCol": "Badge",
+      "mergedPrs": "Merged PRs",
+      "devEmpty": "No ranked contributors yet."
     },
     "raidLockout": {
       "title": "Raidvergrendelingen",
@@ -331,6 +336,7 @@ export const nl_NL: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Houdt de muisaanwijzer binnen het venster terwijl je sleept om de camera te draaien, zodat deze de schermrand niet kan bereiken of naar een ander beeldscherm kan gaan. Schakel uit als je liever een vrije aanwijzer hebt.",
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
+      "showDevBadges": "Show Developer Badges",
       "uiScale": "UI-schaal",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
@@ -763,6 +769,9 @@ export const nl_NL: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -905,6 +914,34 @@ export const nl_NL: EnTranslations = {
           "hint": "Vraag de gemeenschap om hulp"
         }
       }
+    },
+    "devBadge": {
+      "title": "Developer",
+      "tiers": {
+        "tinkerer": "Tinkerer",
+        "artificer": "Artificer",
+        "runesmith": "Runesmith",
+        "architect": "Architect",
+        "worldwright": "Worldwright"
+      },
+      "flavors": {
+        "tinkerer": "Your first pull request landed in the realm.",
+        "artificer": "Five pull requests in, and the world bends to your code.",
+        "runesmith": "Fifteen pull requests forged into the running game.",
+        "architect": "An architect of the realm: 30 pull requests merged.",
+        "worldwright": "A wright of worlds: 70 pull requests shape the game."
+      },
+      "badgeTitle": "Developer: {tier}",
+      "prsLanded": "{count} pull requests merged",
+      "contributor": "Open-source contributor",
+      "link": {
+        "cta": "Link GitHub",
+        "relink": "Relink GitHub",
+        "benefits": "Link your GitHub to earn a developer badge for the pull requests you have had merged into the open-source repo.",
+        "error": "Could not link GitHub. Please try again."
+      },
+      "linkedAs": "Linked as {login}",
+      "unlink": "Unlink GitHub"
     }
   },
   "guide": {
@@ -5661,6 +5698,11 @@ export const nl_NL: EnTranslations = {
         "name": "Verhalenmeester Caddis",
         "title": "Verhalenmeester",
         "greeting": "Pas op voor de losse leisteen, {className}. De berg is... rusteloos geweest de laatste tijd. Ik ben van plan uit te zoeken waarom."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Broeder Aldric",

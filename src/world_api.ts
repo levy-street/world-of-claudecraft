@@ -66,7 +66,11 @@ import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
-export type { GuildLeaderboardPage, LeaderboardPage } from './sim/leaderboard_page';
+export type {
+  DevLeaderboardPage,
+  GuildLeaderboardPage,
+  LeaderboardPage,
+} from './sim/leaderboard_page';
 export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
@@ -91,7 +95,11 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberInfo } from './world_api/party';
-export type { GuildLeaderboardEntry, LeaderboardEntry } from './world_api/progression_xp';
+export type {
+  DevLeaderboardEntry,
+  GuildLeaderboardEntry,
+  LeaderboardEntry,
+} from './world_api/progression_xp';
 export type {
   CharacterSearchResult,
   FriendInfo,

@@ -1,5 +1,6 @@
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { meetsLevelRequirement } from './item_level_req';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
 import { EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
 
@@ -177,6 +178,12 @@ export function recalcPlayerStats(
     if (!itemId) continue;
     const item = ITEMS[itemId];
     if (!item) continue;
+    // Gear above the wearer's level is inert: it stays equipped (still rendered
+    // and occupying the slot, see the render mirrors below) but grants no stats,
+    // armor, spell power, or set pieces until the character reaches its required
+    // level. This only arises for a character loaded wearing gear equipped before
+    // the level gate existed; the equip path blocks equipping over-level gear.
+    if (!meetsLevelRequirement(lvl, item)) continue;
     if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
     bonusSp += item.spellPower ?? 0;
     if (!item.stats) continue;
@@ -257,11 +264,15 @@ export function recalcPlayerStats(
   s.spi = Math.max(0, s.spi);
 
   e.stats = s;
-  const weapon = (equipment.mainhand && ITEMS[equipment.mainhand]?.weapon) || {
-    min: 1,
-    max: 2,
-    speed: 2,
-  };
+  // An over-level mainhand is inert like any other gear: fall back to unarmed
+  // damage (and drop the weapon-type flags, e.g. dagger, that gate abilities)
+  // until the wearer is high enough level. The mainhand still stays worn (see
+  // e.mainhandItemId below) so the weapon model keeps rendering.
+  const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const weapon =
+    mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
+      ? mainhand.weapon
+      : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
   // Render-only: the equipped mainhand item id drives the held weapon model on
   // the client (mapped via ITEM_WEAPON_VARIANTS). Gated on the item actually being

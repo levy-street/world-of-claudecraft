@@ -117,9 +117,10 @@ For off-box safety, sync the directory to S3 occasionally:
   set by `REALM_NAME` (default `Claudemoon`). To add a realm, run another
   process against the **same** `DATABASE_URL` with a different `REALM_NAME`
   and `PORT` (e.g. behind its own vhost or compose service). Characters,
-  friends, guilds, and presence are realm-scoped, so the worlds are fully
-  isolated — players on different realms can't see, whisper, friend, or
-  guild each other. Concurrent boots serialize their schema setup behind a
+  friends, guilds, presence, and the World Market are realm-scoped, so the
+  worlds are fully isolated: players on different realms can't see, whisper,
+  friend, guild, or share an auction house with each other. Concurrent boots
+  serialize their schema setup behind a
   Postgres advisory lock, so starting several at once is safe. Character and
   guild names remain globally unique across realms.
 - **Raid reset time zone**: raid lockouts end at the next 3 AM (03:00, the classic daily

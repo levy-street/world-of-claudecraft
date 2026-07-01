@@ -3440,9 +3440,15 @@ function marketRoundTrip(): Scenario {
       rec.snapshot('listed');
 
       // 2) browse filter narrows to the wolf_fang listing, then clears.
-      sim.marketSearch('wolf', seller);
+      sim.marketSearch(
+        { search: 'wolf', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        seller,
+      );
       rec.snapshot('searched');
-      sim.marketSearch('', seller);
+      sim.marketSearch(
+        { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        seller,
+      );
       rec.snapshot('search-cleared');
 
       // 3) the buyer buys it: coin leaves the buyer, goods enter their bags, the

@@ -4,17 +4,14 @@
 // castBarState for the cast bar) plus the inline combo-pip selection with BOTH a
 // Sim-shaped and a faithfully ClientWorld-mirror-shaped target entity.
 //
-// The mirror is NOT a byte copy of the Sim entity: the wire (server/game.ts WireAura)
-// omits the absorb VALUE, and src/net/online.ts reconstructs every aura with
-// `value: 0`. So the absorb SHIELD overlay is an OFFLINE-ONLY visual (online there is
-// no shield data, so the bar is just hp/maxHp). The fields that are
-// divergence-sensitive (the target cast remaining + the combo points) ARE wired and
-// must match. This test models the mirror's value-zeroing faithfully and asserts:
+// The mirror is faithful to src/net/online.ts: the wire (server/game.ts WireAura) now
+// carries the aura magnitude and school, so ClientWorld reconstructs the absorb aura with
+// its real `value` (and non-physical school). The absorb SHIELD overlay therefore derives
+// ONLINE exactly as offline; there is no longer a target-frame divergence. This test asserts:
 //   - the wire-carried frame fields (hp/level/name/resource) render identically,
+//   - the absorb shield fraction matches across hosts (the value is wired now),
 //   - the cast bar (remaining/fill/label) and the combo-pip count match across hosts,
-//   - the absorb shield is the ONE intended divergence (offline shield vs online none),
-// so an offline-only assumption on a wired field cannot ship broken online, and the
-// absorb limitation is documented rather than falsely asserted as identical.
+// so a field the target frame reads renders identically online and offline.
 
 import { describe, expect, it } from 'vitest';
 import { castBarState } from '../src/render/cast_bar';
@@ -84,14 +81,13 @@ function simTarget(over: Partial<TargetState> = {}): Entity {
   } as unknown as Entity;
 }
 
-// Build a ClientWorld-mirror-shaped entity, FAITHFUL to src/net/online.ts: same
-// gameplay fields, but every aura's absorb value is zeroed (the wire omits it) and the
-// mirror carries its own net-bookkeeping extras the derivations must ignore.
+// Build a ClientWorld-mirror-shaped entity, FAITHFUL to src/net/online.ts: same gameplay
+// fields, the aura magnitude/school now survive the wire (so the absorb value is preserved,
+// not zeroed), and the mirror carries its own net-bookkeeping extras the derivations ignore.
 function clientTarget(over: Partial<TargetState> = {}): Entity {
   const s = { ...GAMEPLAY, ...over };
   return {
     ...s,
-    auras: s.auras.map((a) => ({ ...a, value: 0 })),
     netUpdatedAtTick: 9821,
     interpAlpha: 0.5,
     lastWireSeq: 77,
@@ -134,25 +130,23 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
   it('renders the wire-carried frame fields identically across hosts', () => {
     const fromSim = unitFrameView(targetDescriptor(simTarget()));
     const fromClient = unitFrameView(targetDescriptor(clientTarget()));
-    // Every field that survives the wire is identical; only the absorb overlay (below)
-    // differs, so compare the frame minus its absorb fraction.
-    const { absorbFrac: simAbsorb, absorbOvershield: simOver, ...simRest } = fromSim;
-    const { absorbFrac: cliAbsorb, absorbOvershield: cliOver, ...cliRest } = fromClient;
-    expect(simRest).toEqual(cliRest);
-    expect(simRest.levelText).toBe(BOSS_SKULL_GLYPH); // boss skull, not a number
-    expect(simRest.resClass).toBe('none'); // a target has no resource bar
+    // Every field the frame reads survives the wire now (including the absorb overlay), so
+    // the whole view is identical across hosts.
+    expect(fromClient).toEqual(fromSim);
+    expect(fromSim.levelText).toBe(BOSS_SKULL_GLYPH); // boss skull, not a number
+    expect(fromSim.resClass).toBe('none'); // a target has no resource bar
     // the hostile name color is a pure function of the mirrored `hostile` field:
     expect(targetNameColor(simTarget())).toBe(targetNameColor(clientTarget()));
     expect(targetNameColor(simTarget())).toBe('var(--color-hostile)');
   });
 
-  it('treats the absorb shield as the ONE intended offline-only divergence', () => {
-    // The wire never sends the absorb value (online.ts forces aura.value=0), so the
-    // shield segment shows offline only; this is pre-existing and intended, NOT a bug.
+  it('renders the absorb shield identically across hosts (the value is wired now)', () => {
+    // The wire carries the absorb value (server/game.ts) and online.ts decodes it, so the
+    // shield segment derives online exactly as offline: no target-frame divergence.
     const fromSim = unitFrameView(targetDescriptor(simTarget()));
     const fromClient = unitFrameView(targetDescriptor(clientTarget()));
-    expect(fromSim.absorbFrac).toBeCloseTo((420 + 90) / 600); // 0.85, the offline shield
-    expect(fromClient.absorbFrac).toBeCloseTo(420 / 600); // 0.70, no shield online
+    expect(fromSim.absorbFrac).toBeCloseTo((420 + 90) / 600); // 0.85, the shield...
+    expect(fromClient.absorbFrac).toBeCloseTo((420 + 90) / 600); // ...identical online
   });
 
   it('a dead target renders identically across hosts (no shield, hidden cast)', () => {
@@ -170,7 +164,7 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
 
   it('the target cast bar (remaining + fill + label) matches across hosts', () => {
     // castingAbility/castTotal/castRemaining/channeling ARE wired, so the cast bar is
-    // identical (the aura-value zeroing does not touch the cast path).
+    // identical across hosts (the cast path is independent of the aura magnitude).
     const fromSim = castBarState(simTarget());
     const fromClient = castBarState(clientTarget());
     expect(fromSim).toEqual(fromClient);

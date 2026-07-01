@@ -12,8 +12,10 @@ import {
   isDelvePos,
   zoneAt,
 } from '../src/sim/data';
+import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
 import type { PickAction } from '../src/sim/lockpick';
+import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -60,6 +62,8 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+import { mergedPrsForLogin } from './github_contributors';
+import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
@@ -459,11 +463,21 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
-  // Sent SPARSELY: only a negative-value buff_* aura (a stat-sap) rides the wire (see the
-  // serializer below), the exact case auras_view.isAuraDebuff reads value for. Everything
-  // else (positive buffs, absorb shields, and negative-value non-buff auras like the random
-  // fear angle on an incapacitate) stays off the wire and decodes to 0, exactly as before.
+  // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
+  // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
+  // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
+  // round2) so the exact number and its sign survive JSON: round2 could turn a tiny negative
+  // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
+  // which decodes back to 0, so value-less auras and an old server are unchanged.
   value?: number;
+  // imbue judgement min/max bonus-damage range (aura_effect imbueRange); only imbue sets these.
+  value2?: number;
+  value3?: number;
+  // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
+  tickInterval?: number;
+  // damage/heal school for dot/absorb/thorns tooltips. Physical is the client's decode default,
+  // so only a non-physical school needs to ride the wire.
+  school?: string;
   stacks?: number;
   // Remaining charges on a charge-limited aura (Lightning Shield's reflect count). Sent only
   // when defined, so ordinary auras stay off the wire and decode to undefined as before; the
@@ -509,6 +523,9 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.discordName) out.dnm = e.discordName; // Discord handle / nickname (nameplate)
   if (e.discordJoined) out.dj = e.discordJoined; // Discord join epoch ms (member since)
   if (e.discordRole) out.dr = e.discordRole; // top staff/special role key (name color + tag)
+  if (e.devTier) out.dvt = e.devTier; // developer-badge tier (cosmetic)
+  if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
+  if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
   if (e.guild) out.gd = e.guild;
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
@@ -561,15 +578,20 @@ function dynamicFields(e: Entity): Record<string, unknown> {
         kind: a.kind,
         rem: round2(a.remaining),
         dur: a.duration,
-        // Carry the value ONLY for the exact case the client UI reads it: a negative-value
-        // buff_* aura (a stat-sap), which auras_view.isAuraDebuff classifies as a debuff via
-        // `kind.startsWith('buff_') && value < 0`. Mirroring that predicate keeps the wire in
-        // lockstep with the classification, so a graphics preset can never hide such a debuff
-        // and nothing else (positive buffs, absorb shields, a fear's random facing angle, any
-        // other negative-value non-buff aura) rides the wire or changes online behavior. Sent
-        // RAW (like `dur`, not round2) so the sign the classification keys on survives the
-        // wire exactly: round2 could round a tiny negative to -0, which JSON writes as 0.
-        ...(a.value < 0 && a.kind.startsWith('buff_') ? { value: a.value } : {}),
+        // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
+        // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
+        // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
+        // stat-sap's isAuraDebuff classification intact (round2 could turn a tiny negative into
+        // -0 -> 0). Omitted only when exactly 0, which decodes back to 0, so value-less auras and
+        // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
+        // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
+        ...(a.value !== 0 ? { value: a.value } : {}),
+        // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
+        // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
+        ...(a.value2 !== undefined ? { value2: a.value2 } : {}),
+        ...(a.value3 !== undefined ? { value3: a.value3 } : {}),
+        ...(a.tickInterval !== undefined ? { tickInterval: a.tickInterval } : {}),
+        ...(a.school !== 'physical' ? { school: a.school } : {}),
         ...(a.stacks && a.stacks > 1 ? { stacks: a.stacks } : {}),
         // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
         // buff icon can badge the count online exactly as offline; undefined for every other aura.
@@ -1156,6 +1178,39 @@ export class GameServer {
     }
   }
 
+  // Update one player's developer-badge flair from their linked GitHub login and
+  // the cached repo merged-PR stats. Best-effort and guarded against the player
+  // leaving mid-fetch. Only an actual contributor (tier > 0, so >= 1 merged PR)
+  // carries the flair on the wire; a linked non-contributor reads as no badge.
+  private async refreshDevBadge(session: ClientSession): Promise<void> {
+    const link = await githubForAccount(pool, session.accountId);
+    const login = link?.github_login ?? null;
+    const mergedPrs = login ? await mergedPrsForLogin(login) : 0;
+    const tier = devTierIndexForMergedPrs(mergedPrs);
+    // The player may have left during the await; only apply if still the live
+    // session for this pid.
+    if (this.clients.get(session.pid) !== session) return;
+    const e = this.sim.entities.get(session.pid);
+    if (!e) return;
+    const githubLogin = tier > 0 ? (login ?? undefined) : undefined;
+    const devMergedPrs = tier > 0 ? mergedPrs : undefined;
+    if (
+      (e.devTier ?? 0) !== tier ||
+      (e.devMergedPrs ?? 0) !== (devMergedPrs ?? 0) ||
+      e.githubLogin !== githubLogin
+    ) {
+      // identity diff re-broadcasts the developer-badge flair to nearby players
+      e.devTier = tier;
+      e.devMergedPrs = devMergedPrs;
+      e.githubLogin = githubLogin;
+      if (tier > 0) {
+        console.log(
+          `[dev] ${session.name} dev tier → ${tier} (${mergedPrs} merged PRs, @${login})`,
+        );
+      }
+    }
+  }
+
   private async refreshAllHolderTiers(): Promise<void> {
     if (this.holderTierRefreshing) return; // a slow cycle (RPC) must not pile up
     this.holderTierRefreshing = true;
@@ -1168,6 +1223,9 @@ export class GameServer {
             ),
             this.refreshDiscordFlair(session).catch((err) =>
               console.error('discord flair refresh failed:', err),
+            ),
+            this.refreshDevBadge(session).catch((err) =>
+              console.error('dev badge refresh failed:', err),
             ),
           ]),
         ),
@@ -1476,6 +1534,11 @@ export class GameServer {
     );
     void this.refreshDiscordFlair(session).catch((err) =>
       console.error('discord flair refresh failed:', err),
+    );
+    // Stamp the developer-badge flair from the linked GitHub login (best-effort:
+    // a contributor-stats read must never affect joining the world).
+    void this.refreshDevBadge(session).catch((err) =>
+      console.error('dev badge refresh failed:', err),
     );
     return session;
   }
@@ -2576,7 +2639,16 @@ export class GameServer {
         break;
       // World Market (the Merchant's auction house)
       case 'market_search':
-        if (typeof msg.q === 'string') sim.marketSearch(msg.q, pid);
+        sim.marketSearch(
+          sanitizeMarketQuery({
+            search: typeof msg.q === 'string' ? msg.q : '',
+            itemType: msg.itemType,
+            subtype: msg.subtype,
+            rarity: msg.rarity,
+            page: typeof msg.page === 'number' ? msg.page : 0,
+          }),
+          pid,
+        );
         break;
       case 'market_list':
         if (

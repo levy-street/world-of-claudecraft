@@ -1194,6 +1194,28 @@
     text-align: center;
     color: var(--color-text-muted);
   }
+  /* Developer board: rank, contributor (badge + handle), earned tier, commits. */
+  .lb-row-dev {
+    grid-template-columns: 44px 1fr 110px 80px;
+  }
+  .lb-dev-badge {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 5px;
+    filter: drop-shadow(0 1px 1px #000);
+  }
+  .lb-dev-tier {
+    text-align: center;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lb-commits {
+    text-align: right;
+    color: #ffe27a;
+  }
   /* Players / Guilds tab bar above the board. */
   .lb-tabs {
     display: flex;
@@ -3215,6 +3237,14 @@
       0 10px 24px #000c,
       inset 0 1px 0 #ffffff12;
     z-index: 20;
+  }
+  /* Flipped by market_window.ts (positionFilterMenu) when there is more clip-box
+     room above the trigger than below it, e.g. a filter near the bottom of
+     #market-window on mobile: the menu would otherwise render past the window's
+     overflow: hidden clip with no way to scroll to the rest of it. */
+  .mkt-select.open-up .mkt-select-menu {
+    top: auto;
+    bottom: calc(100% + 4px);
   }
   .mkt-select-option {
     width: 100%;

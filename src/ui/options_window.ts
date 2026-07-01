@@ -19,6 +19,7 @@
 // setting value only: it never reads the FPS governor and never defines the
 // effects-quality cutoff (that resolver and per-element tiering live elsewhere).
 
+import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { GAMEPAD_BUTTON_LABELS, GAMEPAD_NONE } from '../game/gamepad_map';
 import {
@@ -232,6 +233,12 @@ export class OptionsWindow {
       this.close();
       return;
     }
+    // Re-sync --app-vh/--app-vw right before opening: #ui is a fixed,
+    // overflow:hidden box sized from those custom properties, and this window
+    // is one of its children, so a stale value from just before a fullscreen
+    // toggle or resize settles would hard-clip the panel with no visible
+    // scrollbar (the panel's own overflow-y:auto never gets a chance to run).
+    syncAppViewport();
     this.returnFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.view = 'main';

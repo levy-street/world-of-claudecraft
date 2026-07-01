@@ -165,7 +165,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'known',
       'lastActiveTick',
       'lastWhisperFrom',
-      'marketFilter',
+      'marketQuery',
       'moveInput',
       'name',
       'pendingSkinCatalog',

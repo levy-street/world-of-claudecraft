@@ -113,12 +113,13 @@ describe('leaderboard_window: no magic values (DOM painter)', () => {
 });
 
 describe('leaderboard_window: guild board tab (Players / Guilds)', () => {
-  it('renders a role=tablist with both board tabs', () => {
+  it('renders a role=tablist with all three board tabs', () => {
     expect(code).toContain('role="tablist"');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
     expect(code).toContain('data-leaderboard-tab="${board}"');
     expect(code).toContain("tab('players', t('hudChrome.leaderboard.tabPlayers'))");
     expect(code).toContain("tab('guilds', t('hudChrome.leaderboard.tabGuilds'))");
+    expect(code).toContain("tab('devs', t('hudChrome.leaderboard.tabDevs'))");
   });
 
   it('marks the active tab with aria-selected for screen readers', () => {
@@ -158,5 +159,45 @@ describe('leaderboard_window: guild board tab (Players / Guilds)', () => {
     // Guilds are server-only; offline guildLeaderboard() resolves an empty page,
     // and a rejection maps to the shared error state (result === null).
     expect(code).toContain("result === null ? { kind: 'error' }");
+  });
+});
+
+describe('leaderboard_window: developers board tab', () => {
+  it('drives the dev board from the pure view core', () => {
+    expect(code).toContain('buildDevLeaderboardView(');
+  });
+
+  it('awaits the dev board through the IWorld seam, not a concrete world', () => {
+    expect(code).toContain('world.devLeaderboard(this.page, LEADERBOARD_PAGE_SIZE)');
+  });
+
+  it('passes the viewer linked GitHub login so their own row can be flagged', () => {
+    expect(code).toContain('viewerLogin: world.player.githubLogin ?? null');
+  });
+
+  it('renders the dev-tier badge image and escapes the contributor login', () => {
+    expect(code).toContain('devTierBadgeDataUrl(def, 32)');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${badge}@${esc(r.login)}');
+  });
+
+  it('renders the localized dev-tab empty state', () => {
+    expect(code).toContain("t('hudChrome.leaderboard.devEmpty')");
+  });
+
+  it('guards against painting the dev board into a window closed mid-fetch', () => {
+    expect(code).toMatch(
+      /renderDevBoard[\s\S]{0,400}if \(el\.style\.display !== 'block'\) return;/,
+    );
+  });
+
+  it('hides the tab itself (not just the rows) behind the showDevBadges display preference', () => {
+    expect(code).toContain("this.deps.showDevBadges() ? tab('devs'");
+  });
+
+  it('falls back off the devs board if the preference turns off while it is selected', () => {
+    expect(code).toContain(
+      "if (this.board === 'devs' && !this.deps.showDevBadges()) this.board = 'players';",
+    );
   });
 });

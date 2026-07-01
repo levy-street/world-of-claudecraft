@@ -274,11 +274,16 @@ export const ko_KR: EnTranslations = {
       "tabsLabel": "최고 점수 순위표",
       "tabPlayers": "플레이어",
       "tabGuilds": "길드",
+      "tabDevs": "개발자",
       "guildName": "길드",
       "members": "인원",
       "topLevel": "최고",
       "guildXp": "누적 경험치",
-      "guildEmpty": "아직 순위에 오른 길드가 없습니다."
+      "guildEmpty": "아직 순위에 오른 길드가 없습니다.",
+      "devName": "기여자",
+      "devTierCol": "배지",
+      "mergedPrs": "병합된 PR",
+      "devEmpty": "아직 순위에 오른 기여자가 없습니다."
     },
     "raidLockout": {
       "title": "공격대 잠금",
@@ -331,6 +336,7 @@ export const ko_KR: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.",
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
+      "showDevBadges": "개발자 배지 표시",
       "uiScale": "UI 배율",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
@@ -763,6 +769,9 @@ export const ko_KR: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "필요 레벨 {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -905,6 +914,34 @@ export const ko_KR: EnTranslations = {
           "hint": "커뮤니티에 도움 요청"
         }
       }
+    },
+    "devBadge": {
+      "title": "개발자",
+      "tiers": {
+        "tinkerer": "수선공",
+        "artificer": "장인",
+        "runesmith": "룬 대장장이",
+        "architect": "설계자",
+        "worldwright": "세계 창조자"
+      },
+      "flavors": {
+        "tinkerer": "당신의 첫 풀 리퀘스트가 이 세계에 병합되었습니다.",
+        "artificer": "다섯 번의 풀 리퀘스트 끝에, 세계가 당신의 코드를 따르기 시작합니다.",
+        "runesmith": "열다섯 번의 풀 리퀘스트가 구동 중인 게임에 벼려졌습니다.",
+        "architect": "이 세계의 설계자: 30번의 풀 리퀘스트가 병합되었습니다.",
+        "worldwright": "세계의 창조자: 70번의 풀 리퀘스트가 이 게임을 빚어냅니다."
+      },
+      "badgeTitle": "개발자: {tier}",
+      "prsLanded": "{count}번의 풀 리퀘스트 병합됨",
+      "contributor": "오픈 소스 기여자",
+      "link": {
+        "cta": "GitHub 연결",
+        "relink": "GitHub 다시 연결",
+        "benefits": "GitHub를 연결하면 오픈 소스 저장소에 병합된 풀 리퀘스트로 개발자 배지를 받을 수 있습니다.",
+        "error": "GitHub를 연결할 수 없습니다. 다시 시도해 주세요."
+      },
+      "linkedAs": "{login}(으)로 연결됨",
+      "unlink": "GitHub 연결 해제"
     }
   },
   "guide": {
@@ -5661,6 +5698,11 @@ export const ko_KR: EnTranslations = {
         "name": "현자 캐디스",
         "title": "현자",
         "greeting": "느슨한 혈암을 조심하십시오, {className}. 산이 요즘 불안정해졌고, 나는 그 이유를 알고 싶습니다."
+      },
+      "auctioneer_voss": {
+        "name": "경매인 보스",
+        "title": "세계 시장 관리자",
+        "greeting": "세계 시장은 이곳에서도 이용할 수 있습니다, {className}. 왕국의 모험가들에게서 물건을 사거나 자신의 물건을 내놓으십시오."
       },
       "brother_aldric_raid": {
         "name": "알드릭 수사",
