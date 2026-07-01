@@ -865,7 +865,7 @@ describe('food, drink, vendor', () => {
     sim.setPlayerLevel(10);
     sim.player.resource = 0;
     sim.player.inCombat = false;
-    sim.player.combatTimer = 0;
+    sim.player.combatTimer = 99;
     sim.player.fiveSecondRule = 99; // out of combat, past the 5s rule
     const spi = sim.player.stats.spi;
     const oldRatePer2s = spi / 4 + 2;

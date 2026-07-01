@@ -61,7 +61,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   if (p.resourceType === 'mana') {
-    if (p.fiveSecondRule >= 5) {
+    if (!p.inCombat && p.fiveSecondRule >= 5) {
       // out-of-combat mana regen: faster than before and scales with spirit
       // (gear/level) plus a small flat per-level floor so low-spirit casters
       // still recover at a reasonable pace (#103)

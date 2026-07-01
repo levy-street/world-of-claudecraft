@@ -37,7 +37,6 @@ import { threatEntries } from '../threat';
 import {
   type ArenaFormat,
   type Aura,
-  type AuraKind,
   dist2d,
   type Entity,
   type EquipSlot,
@@ -306,6 +305,9 @@ export function manaRegenReadout(e: Entity): string {
   const FSR_THRESHOLD = 5; // matches the `fiveSecondRule >= 5` gate in updateRegen
   if (e.resourceType !== 'mana') {
     return 'Mana regeneration does not apply to your class.';
+  }
+  if (e.inCombat) {
+    return 'Mana regen is paused — leave combat to resume.';
   }
   if (e.fiveSecondRule >= FSR_THRESHOLD) {
     return 'Your mana is regenerating (out of combat for 5s+).';

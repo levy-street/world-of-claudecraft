@@ -135,6 +135,19 @@ describe('auras: updateAuras expiry / HoT / top guard', () => {
 });
 
 describe('auras: updateRegen', () => {
+  it('keeps natural mana regen paused while in combat', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('mage', 'Aleph');
+    const p = sim.entities.get(pid) as AnyEntity;
+    const meta = sim.players.get(pid) as PlayerMeta;
+    p.resource = 0;
+    p.inCombat = true;
+    p.fiveSecondRule = 99;
+    sim.tickCount = 40; // a multiple of 40 so the regen body runs
+    updateRegen(sim.ctx, p, meta);
+    expect(p.resource).toBe(0);
+  });
+
   it('eat heals an out-of-combat player on the 40-tick boundary, decrementing the food', () => {
     const sim = makeSim();
     const p = sim.player as AnyEntity;
