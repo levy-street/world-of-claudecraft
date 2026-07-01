@@ -309,7 +309,8 @@ export const zh_CN: EnTranslations = {
       "emoteWheel": "表情轮盘",
       "targetFriendly": "选中最近友方",
       "targetFriendlyNext": "切换友方目标",
-      "discord": "Discord"
+      "discord": "Discord",
+      "assist": "协助（目标的目标）"
     },
     "options": {
       "clickMoveLeft": "左键",

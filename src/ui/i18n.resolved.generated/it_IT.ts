@@ -309,7 +309,8 @@ export const it_IT: EnTranslations = {
       "emoteWheel": "Ruota emote",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "targetFriendlyNext": "Scorri i bersagli amici",
-      "discord": "Discord"
+      "discord": "Discord",
+      "assist": "Assist (Target of Target)"
     },
     "options": {
       "clickMoveLeft": "Clic sinistro",

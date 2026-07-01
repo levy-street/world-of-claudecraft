@@ -1083,6 +1083,7 @@ async function startGame(
     canvas,
     {
       onTab: () => world.tabTarget(),
+      onAssist: () => world.assistTarget(),
       onTargetFriendly: () => world.targetNearestFriendly(),
       onCycleFriendly: () => world.friendlyTabTarget(),
       // slot 0 (key 1) is Attack for every class — auto-attack without needing

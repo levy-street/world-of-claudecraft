@@ -309,7 +309,8 @@ export const id_ID: EnTranslations = {
       "emoteWheel": "Roda Emote",
       "targetFriendly": "Bidik Sekutu Terdekat",
       "targetFriendlyNext": "Putar Bidikan Sekutu",
-      "discord": "Discord"
+      "discord": "Discord",
+      "assist": "Assist (Target of Target)"
     },
     "options": {
       "clickMoveLeft": "Klik Kiri",

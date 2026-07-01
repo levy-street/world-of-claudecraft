@@ -309,7 +309,8 @@ export const sv_SE: EnTranslations = {
       "emoteWheel": "Gesthjul",
       "targetFriendly": "Måltavla närmaste vänlig",
       "targetFriendlyNext": "Växla vänligt mål",
-      "discord": "Discord"
+      "discord": "Discord",
+      "assist": "Assist (Target of Target)"
     },
     "options": {
       "clickMoveLeft": "Vänsterklick",

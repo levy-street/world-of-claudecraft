@@ -36,6 +36,7 @@ type ContextMenuTarget = {
 
 export interface InputCallbacks {
   onTab(): void;
+  onAssist(): void;
   onTargetFriendly(): void;
   onCycleFriendly(): void;
   onAbility(slot: number): void;
@@ -704,6 +705,9 @@ export class Input {
         return;
       case 'targetFriendlyNext':
         this.cb.onCycleFriendly();
+        return;
+      case 'assist':
+        this.cb.onAssist();
         return;
       case 'interact':
         this.cb.onUiKey('interact');

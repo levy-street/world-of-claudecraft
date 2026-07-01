@@ -309,7 +309,8 @@ export const ru_RU: EnTranslations = {
       "emoteWheel": "Колесо эмоций",
       "targetFriendly": "Ближайший союзник",
       "targetFriendlyNext": "Следующий союзник",
-      "discord": "Discord"
+      "discord": "Discord",
+      "assist": "Помощь (цель цели)"
     },
     "options": {
       "clickMoveLeft": "Левая кнопка",

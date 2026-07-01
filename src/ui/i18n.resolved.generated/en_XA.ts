@@ -309,7 +309,8 @@ export const en_XA: EnTranslations = {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
       "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]",
-      "discord": "[Ðíšçóŕð]"
+      "discord": "[Ðíšçóŕð]",
+      "assist": "[Áššíšţ (Ţáŕĝéţ óƒ Ţáŕĝéţ)]"
     },
     "options": {
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",

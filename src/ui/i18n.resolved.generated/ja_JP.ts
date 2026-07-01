@@ -309,7 +309,8 @@ export const ja_JP: EnTranslations = {
       "emoteWheel": "エモートホイール",
       "targetFriendly": "最も近い味方をターゲット",
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
-      "discord": "Discord"
+      "discord": "Discord",
+      "assist": "アシスト（対象の対象）"
     },
     "options": {
       "clickMoveLeft": "左クリック",

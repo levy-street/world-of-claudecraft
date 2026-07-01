@@ -4164,6 +4164,19 @@ export class Sim {
     this.targeting.targetEntity(id, pid);
   }
 
+  // "Assist" / target-of-target: adopt whatever the player's CURRENT target is
+  // targeting (the classic F-key assist, aim at a healer or ally and pick up what
+  // they are on). Silent no-op with no target or nothing valid to adopt;
+  // targetEntity does the dead/hostility checks (#948).
+  assistTarget(pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const cur = r.e.targetId !== null ? this.entities.get(r.e.targetId) : null;
+    const totId = cur?.targetId ?? null;
+    if (totId === null || !this.entities.get(totId)) return;
+    this.targetEntity(totId, pid);
+  }
+
   tabTarget(pid?: number): void {
     this.targeting.tabTarget(pid);
   }

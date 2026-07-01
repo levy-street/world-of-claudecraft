@@ -55,6 +55,7 @@ function makeInput() {
   };
   const cb = {
     onTab: vi.fn(),
+    onAssist: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onAbility: vi.fn(),

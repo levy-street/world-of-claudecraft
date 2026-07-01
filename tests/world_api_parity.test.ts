@@ -9,7 +9,7 @@
 // IWORLD_MEMBERS below is the hand-maintained member list, the W0c analog of the
 // append-only CALLBACK_KEYS in tests/sim_context.test.ts. It is APPEND-ONLY WITH THE
 // INTERFACE: whenever a future slice adds (or removes/renames) a member on `IWorld`,
-// it lands the matching edit here in the SAME commit. The count pins (147 / 36 / 111)
+// it lands the matching edit here in the SAME commit. The count pins (148 / 36 / 112)
 // plus the sorted-name `toEqual` snapshots (modeled on the anti-loosening exclude-set
 // pin in tests/parity/harness.test.ts:131-162) are what force that: a dropped or
 // renamed member reddens deliberately, never silently.
@@ -93,6 +93,7 @@ export const IWORLD_MEMBERS = [
   { name: 'castAbilityBySlot', kind: 'method' },
   { name: 'cancelAura', kind: 'method' },
   { name: 'targetEntity', kind: 'method' },
+  { name: 'assistTarget', kind: 'method' },
   { name: 'tabTarget', kind: 'method' },
   { name: 'targetNearestFriendly', kind: 'method' },
   { name: 'friendlyTabTarget', kind: 'method' },
@@ -324,9 +325,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(147);
+    expect(IWORLD_MEMBERS.length).toBe(148);
     expect(DATA_MEMBERS.length).toBe(36);
-    expect(METHOD_MEMBERS.length).toBe(111);
+    expect(METHOD_MEMBERS.length).toBe(112);
   });
 
   it('has no duplicate member names', () => {
@@ -351,6 +352,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'assistTarget',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
@@ -541,6 +543,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'arenaQueueJoin',
       'arenaQueueLeave',
       'assignMasterLoot',
+      'assistTarget',
       'blockAdd',
       'blockRemove',
       'buyBackItem',
@@ -722,6 +725,7 @@ const FACET_COMBAT = [
 type _ExhaustCombat = AssertNever<Exclude<keyof IWorldCombat, (typeof FACET_COMBAT)[number]>>;
 
 const FACET_TARGETING = [
+  'assistTarget',
   'targetEntity',
   'tabTarget',
   'targetNearestFriendly',
@@ -992,8 +996,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 20 fa
 
   it('the union of the 20 facets equals the pinned 147-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(147);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(147);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(148);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(148);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

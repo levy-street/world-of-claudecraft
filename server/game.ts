@@ -2133,6 +2133,9 @@ export class GameServer {
       case 'tab':
         sim.tabTarget(pid);
         break;
+      case 'assist':
+        sim.assistTarget(pid);
+        break;
       case 'targetNearest':
         sim.targetNearestEnemy(pid);
         break;
