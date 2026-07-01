@@ -156,6 +156,7 @@ export function eventDigest(events: readonly unknown[]): string {
 export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'name', // display/identity
   'guild', // server-set display only
+  'title', // cosmetic player title shown on nameplates
   'prevPos', // render interpolation
   'prevFacing',
   'netUpdatedAt', // online wire cadence
@@ -190,6 +191,8 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'pendingSkinRank', // cosmetic skin-select (pending*)
   'pendingSkinCatalog',
   'pendingSkinItemId',
+  'earnedTitles', // cosmetic title collection
+  'activeTitle', // cosmetic selected title
   'moveInput', // input, not state
   'joinedAt', // session-only clock
   'lastActiveTick', // session-only

@@ -192,6 +192,7 @@ import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
+import { refreshPlayerTitles } from './titles';
 
 // Re-export so server/db.ts's `import type { MarketSave } from '../src/sim/sim'`
 // stays valid now that the type lives in market.ts.
@@ -640,6 +641,8 @@ export interface PlayerMeta {
   lifetimeXp: number;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
+  earnedTitles: Set<string>;
+  activeTitle: string | null;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
   // inn, spent to double kill XP. Persisted in CharacterState.
   restedXp: number;
@@ -728,6 +731,8 @@ export interface CharacterState {
   lifetimeXp?: number;
   prestigeRank?: number;
   unlockedMilestones?: string[];
+  earnedTitles?: string[];
+  activeTitle?: string | null;
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
   copper: number;
@@ -1167,6 +1172,8 @@ export class Sim {
       lifetimeXp: 0,
       prestigeRank: 0,
       unlockedMilestones: new Set(),
+      earnedTitles: new Set(),
+      activeTitle: null,
       restedXp: 0,
       known: [],
       questLog: new Map(),
@@ -1217,6 +1224,8 @@ export class Sim {
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
+      if (s.earnedTitles) for (const id of s.earnedTitles) meta.earnedTitles.add(id);
+      meta.activeTitle = s.activeTitle ?? null;
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
@@ -1276,6 +1285,9 @@ export class Sim {
     meta.talentMods = computeTalentModifiers(cls, meta.talents);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods);
+    refreshPlayerTitles(meta, player, {
+      autoSelectDefault: !savedState || savedState.activeTitle === undefined,
+    });
     if (savedState) {
       player.hp = Math.max(1, Math.min(player.maxHp, savedState.hp));
       player.resource =
@@ -1385,6 +1397,8 @@ export class Sim {
       lifetimeXp: meta.lifetimeXp,
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
+      earnedTitles: [...meta.earnedTitles],
+      activeTitle: meta.activeTitle,
       restedXp: meta.restedXp,
       copper: meta.copper,
       hp: e.hp,
@@ -2244,6 +2258,7 @@ export class Sim {
     // ever raises it — lifetimeXp is monotonic.
     r.meta.lifetimeXp = Math.max(r.meta.lifetimeXp, xpToReachLevel(r.e.level));
     recalcPlayerStats(r.e, r.meta.cls, r.meta.equipment, this.playerMods(r.meta));
+    refreshPlayerTitles(r.meta, r.e);
     r.e.hp = r.e.maxHp;
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);

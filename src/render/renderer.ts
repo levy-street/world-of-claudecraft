@@ -469,7 +469,7 @@ export interface EntityView {
   clickTarget: THREE.Object3D;
   nameplate: HTMLDivElement;
   nameEl: HTMLDivElement;
-  guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
+  guildEl: HTMLDivElement; // secondary title/guild line under the name (players only)
   hpBar: HTMLDivElement;
   hpFill: HTMLDivElement;
   emoteEl: HTMLDivElement;
@@ -3174,7 +3174,7 @@ export class Renderer {
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;
-    // guild tag under the name (players in a guild); hidden until set
+    // secondary title/guild line under the name; hidden until set
     const guildEl = document.createElement('div');
     guildEl.className = 'np-guild';
     guildEl.style.display = 'none';

@@ -26,6 +26,7 @@ import {
   type SentChat,
 } from '../sim';
 import type { SimContext } from '../sim_context';
+import { selectPlayerTitle, titleName, titleReadout } from '../titles';
 import { dist2d, type Entity, MAX_LEVEL, type OverheadEmoteId, YELL_RANGE } from '../types';
 import * as readouts from './chat_readouts';
 
@@ -154,6 +155,27 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   // null (unlogged); no server interceptor, so it works online for free.
   if (/^\/(?:talents|talent|spec)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.talentsReadout(r.meta, r.e));
+    return null;
+  }
+
+  // "/title" lists earned cosmetic titles; "/title <id>" selects one.
+  const titlem = /^\/title(?:\s+(.+))?$/i.exec(raw);
+  if (titlem) {
+    const arg = titlem[1]?.trim();
+    if (!arg) {
+      ctx.error(r.meta.entityId, titleReadout(r.meta));
+      return null;
+    }
+    const result = selectPlayerTitle(r.meta, r.e, arg);
+    if (result === 'selected') {
+      ctx.error(r.meta.entityId, `Title selected: ${r.e.title}.`);
+    } else if (result === 'cleared') {
+      ctx.error(r.meta.entityId, 'Title cleared.');
+    } else if (result === 'locked') {
+      ctx.error(r.meta.entityId, `You have not earned ${titleName(arg)}.`);
+    } else {
+      ctx.error(r.meta.entityId, `Unknown title '${arg}'. Type /title for earned titles.`);
+    }
     return null;
   }
 
@@ -926,7 +948,7 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
+    'Other commands: /join <world|lfg>, /roll, /title [id|clear], /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
     'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',

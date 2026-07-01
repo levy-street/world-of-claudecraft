@@ -1561,6 +1561,45 @@ describe('guild nameplate wire', () => {
   });
 });
 
+// Player title rides the identity wire (terse key `ti`) so nearby players'
+// nameplates can show the selected cosmetic title under the name.
+describe('player title nameplate wire', () => {
+  it('carries the selected title through wireEntity only when set', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+
+    expect(wireEntity(e).ti).toBe('the Adventurer');
+
+    e.title = '';
+    expect(wireEntity(e).ti).toBeUndefined();
+  });
+
+  it('restores entity.title on the client from a full record', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+
+    (client as any).applySnapshot({ t: 'snap', ents: [{ ...base, ti: 'the Adventurer' }] });
+    expect(client.entities.get(7)?.title).toBe('the Adventurer');
+
+    // a later full record without `ti` means "no title" -> reset to ''
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.title).toBe('');
+  });
+});
+
 // Equipped mainhand item id rides the identity wire (terse key `mh`) so the
 // renderer can show each player's held weapon model. Recomputed in
 // recalcPlayerStats; the renderer maps it to a GLB (ITEM_WEAPON_VARIANTS).

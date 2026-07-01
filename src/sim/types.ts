@@ -1307,6 +1307,7 @@ export interface Entity {
   name: string;
   level: number;
   guild: string;
+  title: string;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z

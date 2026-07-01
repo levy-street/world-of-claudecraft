@@ -184,12 +184,14 @@ export class NameplatePainter {
           '1',
         );
       } else if (e.kind === 'player') {
-        // other players: friendly blue with an hp bar; <Guild> tag under the name.
-        // Self has no overhead nameplate, so its guild line stays hidden too.
+        // other players: friendly blue with an hp bar; title/guild line under the name.
+        // Self has no overhead nameplate, so its secondary line stays hidden too.
         const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
         const nameDisplay = isSelf ? 'none' : '';
         const hpDisplay = e.dead || isSelf ? 'none' : '';
-        const guild = isSelf ? '' : e.guild;
+        const title = isSelf ? '' : e.title;
+        const guild = isSelf || !e.guild ? '' : `<${e.guild}>`;
+        const secondary = [title, guild].filter(Boolean).join(' - ');
         // Staff/special Discord role: tint the name + prefix a tag (others only).
         const roleKey = isSelf ? undefined : e.discordRole;
         const roleColor = specialRoleColor(roleKey);
@@ -203,7 +205,7 @@ export class NameplatePainter {
           isSelf || !showDevBadges ? null : devTierNameOutlineColor(e.devTier ?? 0);
         this.setNameplateStatic(
           v,
-          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
+          `player|${displayName}|${roleColor ?? ''}|${secondary}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
           displayName,
           roleColor ?? '#7fb8ff',
           hpDisplay,
@@ -211,7 +213,7 @@ export class NameplatePainter {
           'np-marker',
           opacity,
           '',
-          guild,
+          secondary,
           devOutline,
         );
         v.nameEl.style.display = nameDisplay;
@@ -316,7 +318,7 @@ export class NameplatePainter {
     markerClass: string,
     opacity: string,
     frame = '',
-    guild = '',
+    secondary = '',
     devOutline: string | null = null,
   ): void {
     if (sig === v.nameplateSig) return;
@@ -329,9 +331,9 @@ export class NameplatePainter {
     v.markerEl.textContent = marker;
     v.markerEl.className = markerClass;
     v.nameplate.style.opacity = opacity;
-    // guild tag rides in the sig (players only); empty for every other kind
-    if (guild) {
-      v.guildEl.textContent = `<${guild}>`;
+    // secondary tag rides in the sig (players only); empty for every other kind
+    if (secondary) {
+      v.guildEl.textContent = secondary;
       v.guildEl.style.display = '';
     } else {
       v.guildEl.style.display = 'none';

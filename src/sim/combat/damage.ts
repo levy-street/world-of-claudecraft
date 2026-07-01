@@ -28,6 +28,7 @@ import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../ent
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
+import { refreshPlayerTitles } from '../titles';
 import type { Entity } from '../types';
 import {
   dist2d,
@@ -649,6 +650,7 @@ export function grantXp(
     p.level++;
     meta.counters.levelUps++;
     recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
+    refreshPlayerTitles(meta, p);
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;
     ctx.emit({ type: 'levelup', level: p.level, pid: p.id });
