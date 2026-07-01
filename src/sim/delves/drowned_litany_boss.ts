@@ -284,7 +284,7 @@ function spawnBellEntity(
   const template = MOBS[BELL_TEMPLATE_ID];
   const id = ctx.nextId++;
   const bell = createMob(id, template, template.minLevel, {
-    x: spawnX,
+    x: spawnX + run.origin.x,
     y: 0,
     z: spawnZ + zBase,
   });
@@ -385,7 +385,7 @@ function tickBells(
       // Knockback: push radially outward from altar center.
       // Build a fake "source" position at the altar center so applyKnockback
       // computes the outward direction correctly.
-      const altarPos = { x: ALTAR_X, y: 0, z: ALTAR_Z + zBase };
+      const altarPos = { x: run.origin.x + ALTAR_X, y: 0, z: ALTAR_Z + zBase };
       const fakeSource = { ...boss, pos: altarPos } as Entity;
       ctx.applyKnockback(fakeSource, p, BELL_KNOCKBACK_DIST);
       ctx.emit({
