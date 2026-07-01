@@ -271,6 +271,30 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.emptyFor = 0;
 }
 
+// Any player currently standing inside this claimed instance's bounds (same
+// occupancy bands as updateInstances).
+function instanceOccupied(ctx: SimContext, inst: InstanceSlot): boolean {
+  const origin = instanceOriginOf(inst);
+  for (const meta of ctx.players.values()) {
+    const e = ctx.entities.get(meta.entityId);
+    if (e && Math.abs(e.pos.x - origin.x) < 120 && Math.abs(e.pos.z - origin.z) < 250) return true;
+  }
+  return false;
+}
+
+// Manual instance reset (no group reform needed): wipe every dungeon instance bound
+// to your party/solo key so a fresh run starts clean. Refuses while any player is
+// still inside one of them (#569).
+export function resetInstances(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const key = instanceKeyFor(ctx, r.meta.entityId);
+  const claimed = ctx.instances.filter((i) => i.partyKey === key);
+  if (claimed.length === 0) return;
+  if (claimed.some((inst) => instanceOccupied(ctx, inst))) return;
+  for (const inst of claimed) freeInstance(ctx, inst);
+}
+
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.instances) {

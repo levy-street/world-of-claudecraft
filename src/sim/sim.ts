@@ -202,6 +202,7 @@ import {
   instanceSlotAt as instanceSlotAtImpl,
   leaveCrypt as leaveCryptImpl,
   leaveDungeon as leaveDungeonImpl,
+  resetInstances as resetInstancesImpl,
   updateDoorTriggers as updateDoorTriggersImpl,
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
@@ -5189,6 +5190,10 @@ export class Sim {
 
   leaveDungeon(pid?: number): void {
     leaveDungeonImpl(this.ctx, pid);
+  }
+
+  resetInstances(pid?: number): void {
+    resetInstancesImpl(this.ctx, pid);
   }
 
   // Legacy single-dungeon entry points (tests + scripts use these).

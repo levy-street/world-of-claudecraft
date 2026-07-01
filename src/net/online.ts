@@ -1925,6 +1925,9 @@ export class ClientWorld implements IWorld {
   leaveDungeon(): void {
     this.cmd({ cmd: 'leave_dungeon' });
   }
+  resetInstances(): void {
+    this.cmd({ cmd: 'reset_instances' });
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};

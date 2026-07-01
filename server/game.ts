@@ -2669,6 +2669,9 @@ export class GameServer {
         if (exit) sim.leaveDungeon(pid);
         break;
       }
+      case 'reset_instances':
+        sim.resetInstances(pid);
+        break;
       case 'enter_delve': {
         if (typeof msg.delveId !== 'string' || typeof msg.tierId !== 'string') break;
         const e = sim.entities.get(pid);

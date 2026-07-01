@@ -8,6 +8,9 @@ export interface RaidLockout {
 export interface IWorldDungeons {
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
+  // Manually reset every dungeon instance bound to your party/solo key (no group
+  // reform needed). No-op while any player is still inside one of them.
+  resetInstances(): void;
   // Still-locked raids for the local player (unlock countdown in ms), driving the
   // minimap raid-lockout badge + panel. Empty when nothing is locked.
   raidLockouts(): RaidLockout[];
