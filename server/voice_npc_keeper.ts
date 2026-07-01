@@ -14,6 +14,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
+  appendGeneratedLine,
   cloningGrants,
   markCloning,
   markFailed,
@@ -59,18 +60,26 @@ export interface VoiceCloneExecutor {
   synthesize(voiceId: string, text: string): Promise<Buffer>;
 }
 
+// The mark* transitions return whether the row was actually updated: each is
+// an atomic compare-and-set guarded on the row still being in the expected
+// prior status (see voice_npc_db.ts). A `false` means the grant was reset out
+// from under this cycle (e.g. a concurrent re-upload) or a duplicate keeper
+// pass raced this one; the keeper treats that as "abandon this cycle for this
+// account", never a throw.
 export interface VoiceCloneStore {
   pendingClone(): Promise<VoiceNpcGrantRow[]>;
   pendingGenerate(): Promise<VoiceNpcGrantRow[]>;
   stuckCloning(): Promise<VoiceNpcGrantRow[]>;
-  markCloning(accountId: number): Promise<void>;
-  markGenerating(accountId: number, voiceId: string): Promise<void>;
-  markReady(accountId: number, lines: Record<string, string>): Promise<void>;
-  markFailed(accountId: number, reason: string): Promise<void>;
+  markCloning(accountId: number): Promise<boolean>;
+  markGenerating(accountId: number, voiceId: string): Promise<boolean>;
+  markReady(accountId: number, lines: Record<string, string>): Promise<boolean>;
+  markFailed(accountId: number, reason: string): Promise<boolean>;
   /** Read the sample bytes + mime for a grant awaiting cloning. */
   readSample(grant: VoiceNpcGrantRow): Promise<{ buffer: Buffer; mimeType: string } | null>;
   /** Persist one synthesized clip; returns its public URL. */
   writeClip(accountId: number, lineKey: string, mp3: Buffer): Promise<string>;
+  /** Persist one synthesized line's URL incrementally, merged into `lines`. */
+  appendLine(accountId: number, lineKey: string, url: string): Promise<boolean>;
 }
 
 export class VoiceNpcKeeper {
@@ -103,7 +112,13 @@ export class VoiceNpcKeeper {
   }
 
   private async cloneOne(grant: VoiceNpcGrantRow): Promise<void> {
-    await this.store.markCloning(grant.account_id);
+    const claimed = await this.store.markCloning(grant.account_id);
+    if (!claimed) {
+      // Row is no longer 'pending_clone' (e.g. a re-upload reset it to
+      // 'pending_sample' underneath us, or another cycle already claimed it).
+      // Abandon this cycle for this account rather than clobbering fresh state.
+      return;
+    }
     try {
       const sample = await this.store.readSample(grant);
       if (!sample) {
@@ -118,17 +133,30 @@ export class VoiceNpcKeeper {
     }
   }
 
+  // Crash recovery: a grant stuck in 'generating' after a restart is picked
+  // up again by pendingGenerateGrants(). Lines already present in the grant's
+  // `lines` JSONB (persisted incrementally, one write per successful line
+  // rather than one batched write at the end) are skipped, so a resume only
+  // synthesizes what's actually missing.
   private async generateOne(grant: VoiceNpcGrantRow): Promise<void> {
     if (!grant.eleven_voice_id) {
       await this.store.markFailed(grant.account_id, 'no cloned voice id to synthesize from');
       return;
     }
     try {
-      const lines: Record<string, string> = {};
+      const lines: Record<string, string> = { ...grant.lines };
       for (const key of VOICE_NPC_LINE_KEYS) {
+        if (lines[key]) continue; // already synthesized in a prior (possibly crashed) cycle
         const text = VOICE_NPC_LINE_TEXT[key];
         const mp3 = await this.exec.synthesize(grant.eleven_voice_id, text);
-        lines[key] = await this.store.writeClip(grant.account_id, key, mp3);
+        const url = await this.store.writeClip(grant.account_id, key, mp3);
+        const persisted = await this.store.appendLine(grant.account_id, key, url);
+        if (!persisted) {
+          // Grant was reset out from under us mid-cycle (e.g. a re-upload);
+          // abandon this cycle for this account rather than pressing on.
+          return;
+        }
+        lines[key] = url;
       }
       await this.store.markReady(grant.account_id, lines);
     } catch (err) {
@@ -156,7 +184,7 @@ export function keeperConfigured(): boolean {
   return VOICE_NPC_ENABLED && (process.env.ELEVENLABS_API_KEY ?? '').trim().length > 0;
 }
 
-function buildHttpExecutor(apiKey: string): VoiceCloneExecutor {
+export function buildHttpExecutor(apiKey: string): VoiceCloneExecutor {
   return {
     async cloneVoice(name, sampleBuffer, mimeType) {
       const form = new FormData();
@@ -232,6 +260,7 @@ function buildStore(): VoiceCloneStore {
     markGenerating,
     markReady,
     markFailed,
+    appendLine: appendGeneratedLine,
     async readSample(grant) {
       if (!grant.sample_path) return null;
       try {

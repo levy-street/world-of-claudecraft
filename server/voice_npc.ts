@@ -96,6 +96,11 @@ export async function handleVoiceNpcSample(
   const dest = samplePathFor(accountId);
   await writeFile(dest, sample);
   const grant = await recordConsentAndSample(accountId, dest, displayName);
+  if (!grant) {
+    return json(res, 409, {
+      error: 'a previous voice grant is still processing, please wait for it to finish',
+    });
+  }
   return json(res, 200, { status: grant.status, npcDisplayName: grant.npc_display_name });
 }
 
@@ -192,7 +197,9 @@ export async function handleVoiceNpcConfirm(
   if (!rec) return json(res, 409, { error: 'this payment was already used' });
 
   await markPendingClone(accountId);
-  await deleteWocQuote(quoteId).catch(() => {});
+  await deleteWocQuote(quoteId).catch((err) =>
+    console.error('voice npc quote cleanup failed:', err),
+  );
   const grant = await grantForAccount(accountId);
   return json(res, 200, { status: grant?.status ?? 'pending_clone' });
 }
