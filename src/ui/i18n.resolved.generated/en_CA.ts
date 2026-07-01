@@ -410,6 +410,7 @@ export const en_CA: EnTranslations = {
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
       "aurasOnPlayerFrame": "Buffs on the Player Frame",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
       "walkByAutoloot": "Walk-by Autoloot",

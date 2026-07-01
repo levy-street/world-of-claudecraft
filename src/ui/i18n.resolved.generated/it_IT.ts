@@ -410,6 +410,7 @@ export const it_IT: EnTranslations = {
       "playerFrameScale": "Scala del riquadro del giocatore",
       "targetFrameScale": "Scala del riquadro del bersaglio",
       "aurasOnPlayerFrame": "Buff sul riquadro del giocatore",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
       "walkByAutoloot": "Raccolta automatica al passaggio",

@@ -1602,6 +1602,9 @@ async function startGame(
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
         break;
+      case 'actionBarScale':
+        document.documentElement.style.setProperty('--action-bar-scale', String(v));
+        break;
       // Graphics-tier HUD effects follow the STATIC preset + the advanced
       // effectsQuality slider. The 3D renderer tier is resolved at renderer
       // construction (a reload); here we only re-publish the HUD effect profile

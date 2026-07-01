@@ -1276,6 +1276,10 @@
     display: flex;
     gap: 4px;
     padding: 6px;
+    /* Action bar size (--action-bar-scale, actionBarScale setting): zoom both bars
+       so buttons, gaps and keycaps scale together and the box shrinks/grows with
+       them (desktop + mobile). Default 1 leaves the base size unchanged. */
+    zoom: var(--action-bar-scale, 1);
   }
   /* The optional second action bar (second-action-bar feature) sits just under the
      primary one; a tighter bottom pad keeps the pair compact. It is OFF by default

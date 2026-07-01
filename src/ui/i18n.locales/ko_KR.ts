@@ -361,6 +361,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showOwnNameplate': '내 이름표 표시',
   'hudChrome.playerCard.showWalletBadge': '지갑 배지 표시',
   'hudChrome.options.uiScale': 'UI 배율',
+  'hudChrome.options.actionBarScale': '행동 단축바 크기',
   'hudChrome.options.highContrastBackground': '고대비 배경',
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',

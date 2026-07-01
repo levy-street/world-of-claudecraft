@@ -410,6 +410,7 @@ export const es_ES: EnTranslations = {
       "playerFrameScale": "Escala del marco del jugador",
       "targetFrameScale": "Escala del marco del objetivo",
       "aurasOnPlayerFrame": "Beneficios en el marco del jugador",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
       "walkByAutoloot": "Saqueo automático al pasar",

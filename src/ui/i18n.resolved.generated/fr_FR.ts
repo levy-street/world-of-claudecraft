@@ -410,6 +410,7 @@ export const fr_FR: EnTranslations = {
       "playerFrameScale": "Échelle du cadre du joueur",
       "targetFrameScale": "Échelle du cadre de la cible",
       "aurasOnPlayerFrame": "Améliorations sur le cadre du joueur",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "walkByAutoloot": "Ramassage auto au passage",

@@ -410,6 +410,7 @@ export const id_ID: EnTranslations = {
       "playerFrameScale": "Skala Bingkai Pemain",
       "targetFrameScale": "Skala Bingkai Sasaran",
       "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Latar Kontras Tinggi",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
       "walkByAutoloot": "Jarah Otomatis Sambil Lewat",

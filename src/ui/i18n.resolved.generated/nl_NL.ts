@@ -410,6 +410,7 @@ export const nl_NL: EnTranslations = {
       "playerFrameScale": "Schaal spelerframe",
       "targetFrameScale": "Schaal doelwitframe",
       "aurasOnPlayerFrame": "Buffs op het spelerframe",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",

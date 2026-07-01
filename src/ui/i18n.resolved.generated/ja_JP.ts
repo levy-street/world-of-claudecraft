@@ -410,6 +410,7 @@ export const ja_JP: EnTranslations = {
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
+      "actionBarScale": "アクションバーのサイズ",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "walkByAutoloot": "通りがかり自動ルート",

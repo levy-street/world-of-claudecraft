@@ -410,6 +410,7 @@ export const de_DE: EnTranslations = {
       "playerFrameScale": "Skalierung des Spielerfensters",
       "targetFrameScale": "Skalierung des Zielfensters",
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "walkByAutoloot": "Plündern im Vorbeigehen",
