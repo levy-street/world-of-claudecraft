@@ -231,6 +231,7 @@ export const tr_TR: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Kahramanın",
       "targetLabel": "Hedefin",
+      "targetOfTargetLabel": "Hedefin hedefi",
       "targetAnnounce": "{name} hedefini işaretle",
       "partyLabel": "Takımın",
       "partyGroup": "Grup {n}",

@@ -231,6 +231,7 @@ export const it_IT: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Il tuo personaggio",
       "targetLabel": "Il tuo bersaglio",
+      "targetOfTargetLabel": "Bersaglio del bersaglio",
       "targetAnnounce": "Bersaglio: {name}",
       "partyLabel": "Il tuo gruppo",
       "partyGroup": "Gruppo {n}",

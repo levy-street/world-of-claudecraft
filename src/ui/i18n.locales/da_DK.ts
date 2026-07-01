@@ -4082,6 +4082,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Din helt',
   'hudChrome.unitFrame.targetAnnounce': 'Markér {name}',
   'hudChrome.unitFrame.targetLabel': 'Dit mål',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
   'hudChrome.widgets.clockTitle': 'Lokal tid - klik for at skifte mellem 12/24-timers',
   'hudChrome.widgets.coordinates': 'Koordinater',
   'hudChrome.widgets.heading': 'Retning',

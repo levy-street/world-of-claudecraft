@@ -231,6 +231,7 @@ export const nl_NL: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Je Held",
       "targetLabel": "Je Doelwit",
+      "targetOfTargetLabel": "Doel van doelwit",
       "targetAnnounce": "Markeer {name}",
       "partyLabel": "Je Bende",
       "partyGroup": "Groep {n}",

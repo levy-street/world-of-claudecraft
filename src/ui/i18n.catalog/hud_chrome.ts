@@ -104,6 +104,7 @@ export const hudChromeStrings = {
   unitFrame: {
     playerLabel: 'Your Hero',
     targetLabel: 'Your Mark',
+    targetOfTargetLabel: 'Target of target',
     // targetAnnounce is the polite #target-live announcement spoken once when the player's
     // target CHANGES; {name} is the new target's display name. Kept NON-WORDY
     // (no run of four-plus lowercase after stripping {name}) so an English-filled non-Latin

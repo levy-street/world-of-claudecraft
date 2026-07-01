@@ -4108,6 +4108,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Twój bohater',
   'hudChrome.unitFrame.targetAnnounce': 'Oznacz {name}',
   'hudChrome.unitFrame.targetLabel': 'Twój cel',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Cel celu',
   'hudChrome.widgets.clockTitle': 'Czas lokalny - kliknij, aby przełączyć format 12/24-godzinny',
   'hudChrome.widgets.coordinates': 'Współrzędne',
   'hudChrome.widgets.heading': 'Kierunek',

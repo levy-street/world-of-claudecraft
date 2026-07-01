@@ -33,6 +33,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': '你的角色',
   'hudChrome.unitFrame.targetAnnounce': '目標：{name}',
   'hudChrome.unitFrame.targetLabel': '你的目標',
+  'hudChrome.unitFrame.targetOfTargetLabel': '目標的目標',
   'seo.officialLabel': 'World of ClaudeCraft 官方網站',
   'seo.officialBody':
     'worldofclaudecraft.com 是 Claudemoon 伺服器的官方免費瀏覽器 MMO。你可以用持久角色線上遊玩，也可以離線單人探索、閱讀 wiki，並從本站前往已驗證的社群連結。',

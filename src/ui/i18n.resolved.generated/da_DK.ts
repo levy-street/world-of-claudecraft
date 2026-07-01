@@ -231,6 +231,7 @@ export const da_DK: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Din helt",
       "targetLabel": "Dit mål",
+      "targetOfTargetLabel": "Målets mål",
       "targetAnnounce": "Markér {name}",
       "partyLabel": "Dit følge",
       "partyGroup": "Gruppe {n}",

@@ -4114,6 +4114,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Anh Hùng Của Bạn',
   'hudChrome.unitFrame.targetAnnounce': 'Đánh Dấu {name}',
   'hudChrome.unitFrame.targetLabel': 'Mục Tiêu Của Bạn',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Mục tiêu của mục tiêu',
   'hudChrome.widgets.clockTitle': 'Giờ địa phương - nhấp để chuyển 12/24 giờ',
   'hudChrome.widgets.coordinates': 'Tọa Độ',
   'hudChrome.widgets.heading': 'Hướng',

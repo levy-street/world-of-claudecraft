@@ -737,6 +737,10 @@ export class Hud {
   private targetHpEl = $('#tf-hp');
   private targetHpTextEl = $('#tf-hp-text');
   private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
+  private targetOfTargetFrameEl = $('#target-of-target-frame') as HTMLButtonElement;
+  private targetOfTargetNameEl = $('#tot-name');
+  private targetOfTargetHpEl = $('#tot-hp');
+  private targetOfTargetPortraitEl = $('#tot-portrait') as unknown as HTMLCanvasElement;
   // The target absorb-shield overlay node, resolved ONCE here instead of the old
   // per-frame updateAbsorb document query by hardcoded selector (per-frame
   // discipline). The unit_frame painter drives it through the elided
@@ -968,6 +972,7 @@ export class Hud {
   private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
+  private lastTargetOfTargetId: number | null = null;
   private charPreview: CharacterPreview | null = null;
   private charPreviewCanvas: HTMLCanvasElement | null = null;
   // Cosmetic skin-select event overlay (opened by the skinEvent cue). The shared
@@ -1125,6 +1130,12 @@ export class Hud {
       this.updateClock();
     });
     this.updateClock();
+    this.targetOfTargetFrameEl.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const id = Number(this.targetOfTargetFrameEl.dataset.entityId ?? NaN);
+      if (Number.isFinite(id)) this.sim.targetEntity(id);
+    });
     // classic MMOs: the player interaction menu opens from the target portrait
     $('#target-frame').addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
@@ -2873,6 +2884,62 @@ export class Hud {
     }
   }
 
+  private drawTargetOfTargetPortrait(target: Entity): void {
+    if (target.kind === 'player') {
+      this.portraits.drawClass(
+        this.targetOfTargetPortraitEl,
+        target.templateId as PlayerClass,
+        target.skin ?? 0,
+      );
+    } else {
+      this.portraits.drawCrest(
+        this.targetOfTargetPortraitEl,
+        crestIdForEntity(target.kind, MOBS[target.templateId]?.family),
+      );
+    }
+  }
+
+  private hideTargetOfTargetFrame(): void {
+    if (!this.targetOfTargetFrameEl.hidden) this.targetOfTargetFrameEl.hidden = true;
+    if (this.targetOfTargetFrameEl.dataset.entityId !== '') {
+      this.targetOfTargetFrameEl.dataset.entityId = '';
+    }
+    this.lastTargetOfTargetId = null;
+  }
+
+  private updateTargetOfTargetFrame(target: Entity): void {
+    const targetOfTarget =
+      target.targetId !== null ? (this.sim.entities.get(target.targetId) ?? null) : null;
+    if (!targetOfTarget || targetOfTarget.dead || targetOfTarget.kind === 'object') {
+      this.hideTargetOfTargetFrame();
+      return;
+    }
+
+    const id = String(targetOfTarget.id);
+    const name = entityDisplayName(targetOfTarget);
+    const label = `${t('hudChrome.unitFrame.targetOfTargetLabel')}: ${name}`;
+    const title = t('hudChrome.unitFrame.targetOfTargetLabel');
+    if (this.targetOfTargetFrameEl.hidden) this.targetOfTargetFrameEl.hidden = false;
+    if (this.targetOfTargetFrameEl.dataset.entityId !== id) {
+      this.targetOfTargetFrameEl.dataset.entityId = id;
+    }
+    if (this.targetOfTargetFrameEl.title !== title) this.targetOfTargetFrameEl.title = title;
+    if (this.targetOfTargetFrameEl.getAttribute('aria-label') !== label) {
+      this.targetOfTargetFrameEl.setAttribute('aria-label', label);
+    }
+    this.setText(this.targetOfTargetNameEl, name);
+    this.toggleClass(this.targetOfTargetNameEl, 'hostile', targetOfTarget.hostile);
+    this.setStyleProp(
+      this.targetOfTargetHpEl,
+      '--tot-hp-frac',
+      String(Math.max(0, Math.min(1, targetOfTarget.hp / Math.max(1, targetOfTarget.maxHp)))),
+    );
+    if (targetOfTarget.id !== this.lastTargetOfTargetId) {
+      this.lastTargetOfTargetId = targetOfTarget.id;
+      this.drawTargetOfTargetPortrait(targetOfTarget);
+    }
+  }
+
   private itemIcon(item: ItemDef): string {
     const q = item.quality ?? 'common';
     return `<img class="item-icon q-${q}" src="${iconDataUrl('item', item.id)}" alt="" draggable="false">`;
@@ -4519,6 +4586,7 @@ export class Hud {
         cast: castBarState(target),
         castRemaining: target.castRemaining,
       });
+      this.updateTargetOfTargetFrame(target);
       // combo points: the row of pips is lazy-built ONCE (then only the `on` class is
       // toggled per frame, through the elided writer), never rebuilt per frame.
       if (p.resourceType === 'energy') {
@@ -4544,6 +4612,7 @@ export class Hud {
       // the tier cadence id too, so re-acquiring a target bypasses the low-tier throttle
       // and paints immediately (targetChanged becomes true on the next frame with a target).
       this.lastTargetFrameId = null;
+      this.hideTargetOfTargetFrame();
       // Clear the target-name live region on the transition to no-target, and reset BOTH the
       // tracker and the re-announce marker so re-acquiring the SAME target re-announces cleanly
       // GATED on the tracker so it fires only on the clear EDGE, never per frame:

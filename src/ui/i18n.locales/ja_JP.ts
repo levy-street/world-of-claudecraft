@@ -33,6 +33,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'あなたのキャラクター',
   'hudChrome.unitFrame.targetAnnounce': 'ターゲット：{name}',
   'hudChrome.unitFrame.targetLabel': 'あなたのターゲット',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',
   'seo.officialLabel': 'World of ClaudeCraft 公式サイト',
   'seo.officialBody':
     'worldofclaudecraft.com は Claudemoon レルムの公式無料ブラウザMMOです。永続キャラクターでオンラインプレイし、オフラインでソロ探索し、wikiを読み、このサイトから確認済みのコミュニティリンクをたどれます。',

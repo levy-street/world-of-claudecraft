@@ -231,6 +231,7 @@ export const pl_PL: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Twój bohater",
       "targetLabel": "Twój cel",
+      "targetOfTargetLabel": "Cel celu",
       "targetAnnounce": "Oznacz {name}",
       "partyLabel": "Twoja drużyna",
       "partyGroup": "Grupa {n}",

@@ -96,6 +96,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Votre personnage',
   'hudChrome.unitFrame.targetAnnounce': 'Cible : {name}',
   'hudChrome.unitFrame.targetLabel': 'Votre cible',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Cible de la cible',
   'seo.officialLabel': 'Site officiel de World of ClaudeCraft',
   'seo.officialBody':
     'worldofclaudecraft.com est le MMO gratuit officiel sur navigateur du royaume Claudemoon. Jouez en ligne avec un personnage persistant, explorez en solo hors ligne, lisez le wiki et suivez les liens communautaires vérifiés depuis ce site.',

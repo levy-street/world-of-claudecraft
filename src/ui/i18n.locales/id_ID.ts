@@ -4144,6 +4144,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Pahlawan Anda',
   'hudChrome.unitFrame.targetAnnounce': 'Tandai {name}',
   'hudChrome.unitFrame.targetLabel': 'Sasaran Anda',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Target dari target',
   'hudChrome.widgets.clockTitle': 'Waktu lokal - klik untuk beralih 12/24 jam',
   'hudChrome.widgets.coordinates': 'Koordinat',
   'hudChrome.widgets.heading': 'Arah',

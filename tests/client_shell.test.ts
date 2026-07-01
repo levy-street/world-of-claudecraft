@@ -330,6 +330,18 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('ships the target-of-target frame with localized chrome in BOTH entries', () => {
+    // #target-of-target-frame is nested in the target frame and named by its visible
+    // target text plus a localized title. index.html and play.html ship the same HUD,
+    // so both entries need the frame or one entry loses the Classic ToT affordance.
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain(
+        'id="target-of-target-frame" class="tot-frame" data-i18n-title="hudChrome.unitFrame.targetOfTargetLabel"',
+      );
+      expect(entry).toContain('id="tot-portrait"');
+      expect(entry).toContain('id="tot-hp"');
+    }
+  });
   it('labels the party-frames region as a role=group with a localized name in BOTH entries', () => {
     // Each party member is a focusable role="button" named by its visible
     // member text, and labels the #party-frames container as a role="group" via
@@ -409,6 +421,13 @@ describe('client HTML shell', () => {
     expect(cvBody).toContain('.inert = false;');
   });
 
+  it('drives the target-of-target frame from cached nodes and the existing target seam', () => {
+    expect(hudTs).toContain("private targetOfTargetFrameEl = $('#target-of-target-frame')");
+    expect(hudTs).toContain('private updateTargetOfTargetFrame(target: Entity): void');
+    expect(hudTs).toContain('this.updateTargetOfTargetFrame(target);');
+    expect(hudTs).toContain('this.sim.targetEntity(id);');
+    expect(hudTs.match(/\$\('#target-of-target-frame'\)/g)).toHaveLength(1);
+  });
   it('drives the target frame as a unit_frame instance with a cached absorb node', () => {
     // The target absorb overlay is resolved ONCE (no per-frame updateAbsorb document
     // query), and the family painter drives the frame, so the old hardcoded

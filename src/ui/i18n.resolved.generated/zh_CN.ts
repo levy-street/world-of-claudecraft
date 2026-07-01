@@ -231,6 +231,7 @@ export const zh_CN: EnTranslations = {
     "unitFrame": {
       "playerLabel": "你的角色",
       "targetLabel": "你的目标",
+      "targetOfTargetLabel": "目标的目标",
       "targetAnnounce": "目标：{name}",
       "partyLabel": "你的队伍",
       "partyGroup": "小队 {n}",

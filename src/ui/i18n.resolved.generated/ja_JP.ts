@@ -231,6 +231,7 @@ export const ja_JP: EnTranslations = {
     "unitFrame": {
       "playerLabel": "あなたのキャラクター",
       "targetLabel": "あなたのターゲット",
+      "targetOfTargetLabel": "ターゲットのターゲット",
       "targetAnnounce": "ターゲット：{name}",
       "partyLabel": "あなたのパーティ",
       "partyGroup": "グループ {n}",

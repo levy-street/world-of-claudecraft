@@ -4091,6 +4091,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Din hjälte',
   'hudChrome.unitFrame.targetAnnounce': 'Markera {name}',
   'hudChrome.unitFrame.targetLabel': 'Ditt mål',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
   'hudChrome.widgets.clockTitle': 'Lokal tid - klicka för att växla mellan 12/24-timmar',
   'hudChrome.widgets.coordinates': 'Koordinater',
   'hudChrome.widgets.heading': 'Riktning',

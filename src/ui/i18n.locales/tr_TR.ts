@@ -4083,6 +4083,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Kahramanın',
   'hudChrome.unitFrame.targetAnnounce': '{name} hedefini işaretle',
   'hudChrome.unitFrame.targetLabel': 'Hedefin',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Hedefin hedefi',
   'hudChrome.widgets.clockTitle': 'Yerel saat - 12/24 saat biçimi arasında geçiş için tıkla',
   'hudChrome.widgets.coordinates': 'Koordinatlar',
   'hudChrome.widgets.heading': 'Yön',

@@ -231,6 +231,7 @@ export const id_ID: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Pahlawan Anda",
       "targetLabel": "Sasaran Anda",
+      "targetOfTargetLabel": "Target dari target",
       "targetAnnounce": "Tandai {name}",
       "partyLabel": "Kelompok Anda",
       "partyGroup": "Grup {n}",

@@ -231,6 +231,7 @@ export const vi_VN: EnTranslations = {
     "unitFrame": {
       "playerLabel": "Anh Hùng Của Bạn",
       "targetLabel": "Mục Tiêu Của Bạn",
+      "targetOfTargetLabel": "Mục tiêu của mục tiêu",
       "targetAnnounce": "Đánh Dấu {name}",
       "partyLabel": "Đội Của Bạn",
       "partyGroup": "Nhóm {n}",

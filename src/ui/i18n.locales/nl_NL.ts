@@ -4139,6 +4139,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.playerLabel': 'Je Held',
   'hudChrome.unitFrame.targetAnnounce': 'Markeer {name}',
   'hudChrome.unitFrame.targetLabel': 'Je Doelwit',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Doel van doelwit',
   'hudChrome.widgets.clockTitle': 'Lokale tijd - klik om te wisselen tussen 12/24-uurs',
   'hudChrome.widgets.coordinates': 'Coördinaten',
   'hudChrome.widgets.heading': 'Richting',

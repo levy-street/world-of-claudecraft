@@ -231,6 +231,7 @@ export const ko_KR: EnTranslations = {
     "unitFrame": {
       "playerLabel": "내 캐릭터",
       "targetLabel": "내 대상",
+      "targetOfTargetLabel": "대상의 대상",
       "targetAnnounce": "대상: {name}",
       "partyLabel": "내 파티",
       "partyGroup": "{n}번 그룹",
