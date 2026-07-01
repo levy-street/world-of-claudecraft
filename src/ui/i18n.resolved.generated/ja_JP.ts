@@ -5483,8 +5483,20 @@ export const ja_JP: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "蘇った王家の衛兵"
       },
+      "nythraxis_heroic_fallen_captain_aldren": {
+        "name": "英雄の堕ちた隊長アルドレン"
+      },
+      "nythraxis_heroic_corrupted_priest_malric": {
+        "name": "英雄の腐敗司祭マルリック"
+      },
+      "nythraxis_heroic_deathstalker_voss": {
+        "name": "英雄のデスストーカー・ヴォス"
+      },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
+      },
+      "nythraxis_scourge_of_thornpeak_heroic": {
+        "name": "ソーンピークの災厄ナイスラクシス（英雄）"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
@@ -6476,6 +6488,16 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_nythraxis_heroic_unlock": {
+        "title": "王冠、ふたたび砕ける",
+        "text": "ナイスラクシスは倒れましたが、その名が語られると墓所はいまも応えます。王家の扉の奥に、すでに一度王冠を砕いた勇士のための第二の封印を見つけました。準備ができたら私に話しかけてください。より苛烈な道へ進めるよう、あなたの印章にしるしを刻みます。",
+        "completion": "しるしは刻まれました。英雄の王家の扉はあなたを認めるでしょう。ですが、その下にいる王は記憶のようには戦いません。敷居を越える前に、完全なレイドを集めてください。",
+        "objectives": {
+          "0": {
+            "label": "英雄ナイスラクシスについてブラザー・アルドリックと話す"
+          }
+        }
+      },
       "q_mogger": {
         "title": "モガーを倒せ",
         "text": "モガーは荷車を裂き、柵を潰し、谷の半分を空にするほど家畜を殺しました。ひとりで挑んではいけません。強い仲間を二人連れ、東の草地であの巨獣を完全に倒してください。",
@@ -6678,6 +6700,11 @@ export const ja_JP: EnTranslations = {
       "nythraxis_boss_arena": {
         "name": "ナイスラクシスのレイドアリーナ",
         "enterText": "封印された王家の扉を通り抜けます。",
+        "leaveText": "ソーンピークの冷たい空気へ戻ります。"
+      },
+      "nythraxis_heroic_boss_arena": {
+        "name": "ナイスラクシス英雄レイドアリーナ",
+        "enterText": "英雄の王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
       "drowned_temple": {

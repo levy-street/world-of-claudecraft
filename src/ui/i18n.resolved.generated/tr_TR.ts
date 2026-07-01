@@ -5483,8 +5483,20 @@ export const tr_TR: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Dirilen Kraliyet Muhafızı"
       },
+      "nythraxis_heroic_fallen_captain_aldren": {
+        "name": "Heroic Fallen Captain Aldren"
+      },
+      "nythraxis_heroic_corrupted_priest_malric": {
+        "name": "Heroic Corrupted Priest Malric"
+      },
+      "nythraxis_heroic_deathstalker_voss": {
+        "name": "Heroic Deathstalker Voss"
+      },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Dikenzirve Belası"
+      },
+      "nythraxis_scourge_of_thornpeak_heroic": {
+        "name": "Nythraxis, Scourge of Thornpeak (Heroic)"
       },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"
@@ -6476,6 +6488,16 @@ export const tr_TR: EnTranslations = {
           }
         }
       },
+      "q_nythraxis_heroic_unlock": {
+        "title": "A Crown Twice Broken",
+        "text": "Nythraxis fell, but the crypt still answers when his name is spoken. I have found a second seal behind the royal door, one meant for champions who have already broken his crown once. Speak with me when you are ready, and I will mark your signet for the harder path.",
+        "completion": "The mark is set. The heroic royal door will know you now, but the king beneath it will not fight as a memory. Gather a full raid before you cross that threshold.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Brother Aldric about Heroic Nythraxis"
+          }
+        }
+      },
       "q_mogger": {
         "title": "Mogger Düşmeli",
         "text": "Mogger arabaları parçaladı, çitleri yerle bir etti ve Vadi'nin yarısını boşaltacak kadar çiftlik hayvanı öldürdü. Onunla yalnız yüzleşme. İki güçlü yoldaşı yanına alıp doğudaki çayıra git ve o canavarı temelli yere ser.",
@@ -6679,6 +6701,11 @@ export const tr_TR: EnTranslations = {
         "name": "Nythraxis Akın Arenası",
         "enterText": "Mühürlü kraliyet kapısından geçersin.",
         "leaveText": "Dikenzirve'nin soğuk havasına geri dönersin."
+      },
+      "nythraxis_heroic_boss_arena": {
+        "name": "Nythraxis Heroic Raid Arena",
+        "enterText": "You pass through the heroic royal door.",
+        "leaveText": "You return to the cold air of Thornpeak."
       },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",

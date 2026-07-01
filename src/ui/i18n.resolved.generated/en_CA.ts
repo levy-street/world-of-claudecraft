@@ -5483,8 +5483,20 @@ export const en_CA: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Risen Royal Guard"
       },
+      "nythraxis_heroic_fallen_captain_aldren": {
+        "name": "Heroic Fallen Captain Aldren"
+      },
+      "nythraxis_heroic_corrupted_priest_malric": {
+        "name": "Heroic Corrupted Priest Malric"
+      },
+      "nythraxis_heroic_deathstalker_voss": {
+        "name": "Heroic Deathstalker Voss"
+      },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Scourge of Thornpeak"
+      },
+      "nythraxis_scourge_of_thornpeak_heroic": {
+        "name": "Nythraxis, Scourge of Thornpeak (Heroic)"
       },
       "reliquary_ledger_wraith": {
         "name": "Ledger Wraith"
@@ -6476,6 +6488,16 @@ export const en_CA: EnTranslations = {
           }
         }
       },
+      "q_nythraxis_heroic_unlock": {
+        "title": "A Crown Twice Broken",
+        "text": "Nythraxis fell, but the crypt still answers when his name is spoken. I have found a second seal behind the royal door, one meant for champions who have already broken his crown once. Speak with me when you are ready, and I will mark your signet for the harder path.",
+        "completion": "The mark is set. The heroic royal door will know you now, but the king beneath it will not fight as a memory. Gather a full raid before you cross that threshold.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Brother Aldric about Heroic Nythraxis"
+          }
+        }
+      },
       "q_mogger": {
         "title": "Mogger Must Fall",
         "text": "Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the eastern meadow and put the brute down for good.",
@@ -6678,6 +6700,11 @@ export const en_CA: EnTranslations = {
       "nythraxis_boss_arena": {
         "name": "Nythraxis Raid Arena",
         "enterText": "You pass through the sealed royal door.",
+        "leaveText": "You return to the cold air of Thornpeak."
+      },
+      "nythraxis_heroic_boss_arena": {
+        "name": "Nythraxis Heroic Raid Arena",
+        "enterText": "You pass through the heroic royal door.",
         "leaveText": "You return to the cold air of Thornpeak."
       },
       "drowned_temple": {

@@ -9,7 +9,13 @@ import { describe, expect, it } from 'vitest';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { dist2d, type Entity, NYTHRAXIS_ADD_ID, NYTHRAXIS_BOSS_ID } from '../src/sim/types';
+import {
+  dist2d,
+  type Entity,
+  NYTHRAXIS_ADD_ID,
+  NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_HEROIC_BOSS_ID,
+} from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 type AnySim = Sim & Record<string, any>;
@@ -28,22 +34,30 @@ function teleport(sim: AnySim, e: AnyEntity, x: number, z: number, y?: number): 
 // Enter the Nythraxis arena with a full attuned raid, then pull the tank + four mages
 // into the throne room so playersInNythraxisRoom sees them (enterDungeon only places
 // the entering tank, at the door).
-function setup() {
+function setup(dungeonId = 'nythraxis_boss_arena', dpsCount = 4) {
   const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true }) as AnySim;
   const tankPid = sim.addPlayer('warrior', 'Tank') as number;
   sim.players.get(tankPid)!.questsDone.add('q_nythraxis_bound_guardian');
+  if (dungeonId === 'nythraxis_heroic_boss_arena')
+    sim.players.get(tankPid)!.questsDone.add('q_nythraxis_heroic_unlock');
   const dpsPids: number[] = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < dpsCount; i++) {
     const pid = sim.addPlayer('mage', `Dps${i}`) as number;
+    sim.players.get(pid)!.questsDone.add('q_nythraxis_bound_guardian');
+    if (dungeonId === 'nythraxis_heroic_boss_arena')
+      sim.players.get(pid)!.questsDone.add('q_nythraxis_heroic_unlock');
     sim.partyInvite(pid, tankPid);
     sim.partyAccept(pid);
     dpsPids.push(pid);
   }
   sim.convertPartyToRaid(tankPid);
-  sim.enterDungeon('nythraxis_boss_arena', tankPid);
+  sim.enterDungeon(dungeonId, tankPid);
   const tank = sim.entities.get(tankPid) as AnyEntity;
+  const bossId = dungeonId === 'nythraxis_heroic_boss_arena'
+    ? NYTHRAXIS_HEROIC_BOSS_ID
+    : NYTHRAXIS_BOSS_ID;
   const boss = [...sim.entities.values()].find(
-    (e: AnyEntity) => e.kind === 'mob' && e.templateId === NYTHRAXIS_BOSS_ID && !e.dead,
+    (e: AnyEntity) => e.kind === 'mob' && e.templateId === bossId && !e.dead,
   ) as AnyEntity;
   teleport(sim, tank, boss.pos.x, boss.pos.z - 6, boss.pos.y);
   const dps = dpsPids.map((pid) => sim.entities.get(pid) as AnyEntity);
@@ -143,6 +157,50 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(boss.auras.some((a) => a.id === 'nythraxis_deathless_stun')).toBe(true);
   });
 
+  it('Heroic Nythraxis lights eight wardstones and marks five Soul Rend targets', () => {
+    const { ctx, boss, tank, dps } = setup('nythraxis_heroic_boss_arena', 5);
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    const wards = [...ctx.entities.values()].filter(
+      (e) =>
+        e.kind === 'object' &&
+        e.objectItemId === 'bastion_ward_stone' &&
+        dist2d(e.pos, boss.spawnPos) < 100,
+    );
+    expect(wards.length).toBe(8);
+    expect(wards.every((w) => w.auras.some((a) => a.id === 'nythraxis_wardstone_lit'))).toBe(true);
+
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    st.soulRendMarks = [];
+    nythraxis.castNythraxisSoulRend(ctx, boss, st);
+    expect(st.soulRendMarks.length).toBe(5);
+    const markedIds = st.soulRendMarks.map((m) => m.playerId);
+    expect(new Set(markedIds).size).toBe(5);
+    expect(markedIds).not.toContain(tank.id);
+    for (const id of markedIds) expect(dps.some((d) => d.id === id)).toBe(true);
+  });
+
+  it('Heroic Raise Fallen summons the three crypt ghosts during phase two', () => {
+    const { ctx, boss } = setup('nythraxis_heroic_boss_arena', 5);
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    st.raiseFallenTimer = 0;
+
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+
+    const liveAddIds = [...ctx.entities.values()]
+      .filter((e) => e.kind === 'mob' && !e.dead)
+      .map((e) => e.templateId);
+    expect(liveAddIds).toEqual(
+      expect.arrayContaining([
+        'nythraxis_heroic_fallen_captain_aldren',
+        'nythraxis_heroic_corrupted_priest_malric',
+        'nythraxis_heroic_deathstalker_voss',
+      ]),
+    );
+  });
+
   it('a wardstone with no boss in range falls through (overworld Sunken Bastion stone)', () => {
     const { ctx, dps } = setup();
     // A lone ward stone far from any Nythraxis boss: tryStart must return false so the
@@ -165,6 +223,19 @@ describe('Nythraxis encounter module (N1)', () => {
       const meta = sim.players.get(e.id);
       expect(meta?.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
       expect(meta?.raidLockouts.get('nythraxis_boss_arena')).toBeGreaterThan(ctx.lockoutNowMs());
+    }
+  });
+
+  it('grants a 150h Heroic lockout under the Heroic arena id', () => {
+    const { sim, ctx, boss, tank, dps } = setup('nythraxis_heroic_boss_arena', 5);
+    nythraxis.grantNythraxisLockout(ctx, boss);
+    for (const e of [tank, ...dps]) {
+      const meta = sim.players.get(e.id);
+      expect(meta?.raidLockouts.has('nythraxis_heroic_boss_arena')).toBe(true);
+      expect(meta?.raidLockouts.has('nythraxis_boss_arena')).toBe(false);
+      const remaining = (meta?.raidLockouts.get('nythraxis_heroic_boss_arena') ?? 0) - ctx.lockoutNowMs();
+      expect(remaining).toBeGreaterThanOrEqual(149 * 60 * 60 * 1000);
+      expect(remaining).toBeLessThanOrEqual(150 * 60 * 60 * 1000);
     }
   });
 });

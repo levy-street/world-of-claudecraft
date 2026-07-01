@@ -6,6 +6,7 @@ import { dist2d, type Entity, type QuestDef } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 const FINAL_QUEST_ID = 'q_nythraxis_scourges_end';
+const HEROIC_UNLOCK_QUEST_ID = 'q_nythraxis_heroic_unlock';
 const ATTUNEMENT_QUEST_ID = 'q_nythraxis_bound_guardian';
 const HIGHWATCH_ALDRIC_ID = 'brother_aldric_highwatch';
 const RAID_ALDRIC_ID = 'brother_aldric_raid';
@@ -16,6 +17,12 @@ type MultiTurnInQuest = QuestDef & { turnInNpcIds?: string[] };
 function finalQuest(): MultiTurnInQuest {
   const quest = QUESTS[FINAL_QUEST_ID] as MultiTurnInQuest | undefined;
   expect(quest, 'Scourge\'s End should be registered in QUESTS').toBeTruthy();
+  return quest!;
+}
+
+function heroicUnlockQuest(): QuestDef {
+  const quest = QUESTS[HEROIC_UNLOCK_QUEST_ID] as QuestDef | undefined;
+  expect(quest, 'Heroic Nythraxis unlock quest should be registered in QUESTS').toBeTruthy();
   return quest!;
 }
 
@@ -159,6 +166,44 @@ describe('Nythraxis final quest', () => {
     const attunementIndex = ZONE3_QUEST_ORDER.indexOf(ATTUNEMENT_QUEST_ID);
     expect(attunementIndex).toBeGreaterThanOrEqual(0);
     expect(ZONE3_QUEST_ORDER[attunementIndex + 1]).toBe(FINAL_QUEST_ID);
+    expect(ZONE3_QUEST_ORDER[attunementIndex + 2]).toBe(HEROIC_UNLOCK_QUEST_ID);
+  });
+
+  it('defines the Heroic unlock as a short Aldric attunement after Scourge\'s End', () => {
+    const quest = heroicUnlockQuest();
+
+    expect(quest.id).toBe(HEROIC_UNLOCK_QUEST_ID);
+    expect(quest.name).toBe('A Crown Twice Broken');
+    expect(quest.giverNpcId).toBe(HIGHWATCH_ALDRIC_ID);
+    expect(quest.turnInNpcId).toBe(HIGHWATCH_ALDRIC_ID);
+    expect(quest.requiresQuest).toBe(FINAL_QUEST_ID);
+    expect(quest.objectives).toEqual([
+      {
+        type: 'interact',
+        targetNpcId: HIGHWATCH_ALDRIC_ID,
+        count: 1,
+        label: 'Speak with Brother Aldric about Heroic Nythraxis',
+      },
+    ]);
+    expect(quest.suggestedPlayers).toBe(10);
+  });
+
+  it('unlocks Heroic Nythraxis after speaking with Aldric post-clear', () => {
+    heroicUnlockQuest();
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'HeroicAttuned');
+    sim.setPlayerLevel(20, pid);
+    playerMeta(sim, pid).questsDone.add(FINAL_QUEST_ID);
+
+    moveToHighwatchAldric(sim, pid);
+    sim.acceptQuest(HEROIC_UNLOCK_QUEST_ID, pid);
+    expect(playerMeta(sim, pid).questLog.get(HEROIC_UNLOCK_QUEST_ID)?.state).toBe('active');
+
+    interactWith(sim, pid, npc(sim, HIGHWATCH_ALDRIC_ID));
+    expect(playerMeta(sim, pid).questLog.get(HEROIC_UNLOCK_QUEST_ID)?.state).toBe('ready');
+
+    sim.turnInQuest(HEROIC_UNLOCK_QUEST_ID, pid);
+    expect(playerMeta(sim, pid).questsDone.has(HEROIC_UNLOCK_QUEST_ID)).toBe(true);
   });
 
   it('is unavailable before attunement and acceptable from Brother Aldric after attunement', () => {

@@ -5483,8 +5483,20 @@ export const da_DK: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Genopstanden Kongelig Garder"
       },
+      "nythraxis_heroic_fallen_captain_aldren": {
+        "name": "Heroic Fallen Captain Aldren"
+      },
+      "nythraxis_heroic_corrupted_priest_malric": {
+        "name": "Heroic Corrupted Priest Malric"
+      },
+      "nythraxis_heroic_deathstalker_voss": {
+        "name": "Heroic Deathstalker Voss"
+      },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Tornetops Svøbe"
+      },
+      "nythraxis_scourge_of_thornpeak_heroic": {
+        "name": "Nythraxis, Scourge of Thornpeak (Heroic)"
       },
       "reliquary_ledger_wraith": {
         "name": "Regnskabsgenfærd"
@@ -6476,6 +6488,16 @@ export const da_DK: EnTranslations = {
           }
         }
       },
+      "q_nythraxis_heroic_unlock": {
+        "title": "A Crown Twice Broken",
+        "text": "Nythraxis fell, but the crypt still answers when his name is spoken. I have found a second seal behind the royal door, one meant for champions who have already broken his crown once. Speak with me when you are ready, and I will mark your signet for the harder path.",
+        "completion": "The mark is set. The heroic royal door will know you now, but the king beneath it will not fight as a memory. Gather a full raid before you cross that threshold.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Brother Aldric about Heroic Nythraxis"
+          }
+        }
+      },
       "q_mogger": {
         "title": "Mogger Skal Falde",
         "text": "Mogger har kløvet vogne, jævnet hegn og dræbt nok kvæg til at tømme halvdelen af Dalen. Mød ham ikke alene. Tag to stærke ledsagere med ud på den østlige eng og læg det udyr ned for stedse.",
@@ -6679,6 +6701,11 @@ export const da_DK: EnTranslations = {
         "name": "Nythraxis Raidarena",
         "enterText": "Du passerer gennem den forseglede kongelige dør.",
         "leaveText": "Du vender tilbage til Tornetops kolde luft."
+      },
+      "nythraxis_heroic_boss_arena": {
+        "name": "Nythraxis Heroic Raid Arena",
+        "enterText": "You pass through the heroic royal door.",
+        "leaveText": "You return to the cold air of Thornpeak."
       },
       "drowned_temple": {
         "name": "Det Druknede Tempel",

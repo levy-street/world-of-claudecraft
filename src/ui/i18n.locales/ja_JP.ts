@@ -4957,4 +4957,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': 'GitHub を連携できませんでした。もう一度お試しください。',
   'hudChrome.devBadge.linkedAs': '{login} として連携済み',
   'hudChrome.devBadge.unlink': 'GitHub の連携を解除',
+  'entities.mobs.nythraxis_heroic_fallen_captain_aldren.name': '英雄の堕ちた隊長アルドレン',
+  'entities.mobs.nythraxis_heroic_corrupted_priest_malric.name': '英雄の腐敗司祭マルリック',
+  'entities.mobs.nythraxis_heroic_deathstalker_voss.name': '英雄のデスストーカー・ヴォス',
+  'entities.mobs.nythraxis_scourge_of_thornpeak_heroic.name': 'ソーンピークの災厄ナイスラクシス（英雄）',
+  'entities.dungeons.nythraxis_heroic_boss_arena.name': 'ナイスラクシス英雄レイドアリーナ',
+  'entities.dungeons.nythraxis_heroic_boss_arena.enterText': '英雄の王家の扉を通り抜けます。',
+  'entities.dungeons.nythraxis_heroic_boss_arena.leaveText': 'ソーンピークの冷たい空気へ戻ります。',
+  'entities.quests.q_nythraxis_heroic_unlock.title': '王冠、ふたたび砕ける',
+  'entities.quests.q_nythraxis_heroic_unlock.text':
+    'ナイスラクシスは倒れましたが、その名が語られると墓所はいまも応えます。王家の扉の奥に、すでに一度王冠を砕いた勇士のための第二の封印を見つけました。準備ができたら私に話しかけてください。より苛烈な道へ進めるよう、あなたの印章にしるしを刻みます。',
+  'entities.quests.q_nythraxis_heroic_unlock.completion':
+    'しるしは刻まれました。英雄の王家の扉はあなたを認めるでしょう。ですが、その下にいる王は記憶のようには戦いません。敷居を越える前に、完全なレイドを集めてください。',
+  'entities.quests.q_nythraxis_heroic_unlock.objectives.0.label': '英雄ナイスラクシスについてブラザー・アルドリックと話す',
 };

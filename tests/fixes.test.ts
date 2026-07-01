@@ -458,6 +458,10 @@ describe('dungeon instance placement and targetability', () => {
         sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
         formRaid(sim);
       }
+      if (dungeon.id === 'nythraxis_heroic_boss_arena') {
+        sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_heroic_unlock');
+        formRaid(sim);
+      }
       sim.enterDungeon(dungeon.id);
       const p = sim.player;
       expect(p.pos.x, `${dungeon.id} entry is not inside an instance`).toBeGreaterThan(

@@ -42,6 +42,8 @@ import {
   INTERACT_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_HEROIC_ADD_IDS,
+  NYTHRAXIS_HEROIC_BOSS_ID,
   normAngle,
   OBJECT_RESPAWN,
   type SimEvent,
@@ -80,6 +82,7 @@ const NYTHRAXIS_DEATHLESS_CHANNEL = 5;
 const NYTHRAXIS_DEATHLESS_STUN = 5;
 const NYTHRAXIS_DEATHLESS_SOUL_REND_LOCKOUT = 15;
 const NYTHRAXIS_PHASE_TWO_SETTLE_DELAY = 5;
+const NYTHRAXIS_HEROIC_LOCKOUT_MS = 150 * 60 * 60 * 1000;
 const NYTHRAXIS_TRANSITION_DURATION = 21;
 const NYTHRAXIS_TRANSITION_STUN = 21.5;
 const NYTHRAXIS_FINAL_STAND_HP = 0.05;
@@ -91,6 +94,27 @@ const NYTHRAXIS_ALDRIC_SPAWN_DIST = 50;
 const NYTHRAXIS_ALDRIC_WALK_DIST = 30;
 const NYTHRAXIS_PARTY_INTERACT_RANGE = 30;
 const NYTHRAXIS_VISION_LINE_DELAY = 5;
+const NYTHRAXIS_NORMAL_SOUL_REND_TARGETS = 3;
+const NYTHRAXIS_HEROIC_SOUL_REND_TARGETS = 5;
+const NYTHRAXIS_HEROIC_ADD_IDS_SET = new Set<string>(NYTHRAXIS_HEROIC_ADD_IDS);
+
+function isNythraxisBossId(templateId: string | null | undefined): boolean {
+  return templateId === NYTHRAXIS_BOSS_ID || templateId === NYTHRAXIS_HEROIC_BOSS_ID;
+}
+
+function isNythraxisHeroicBoss(boss: Entity): boolean {
+  return boss.templateId === NYTHRAXIS_HEROIC_BOSS_ID;
+}
+
+function isNythraxisAddId(templateId: string | null | undefined): boolean {
+  return templateId === NYTHRAXIS_ADD_ID || NYTHRAXIS_HEROIC_ADD_IDS_SET.has(templateId ?? '');
+}
+
+function nythraxisSoulRendTargetCount(boss: Entity): number {
+  return isNythraxisHeroicBoss(boss)
+    ? NYTHRAXIS_HEROIC_SOUL_REND_TARGETS
+    : NYTHRAXIS_NORMAL_SOUL_REND_TARGETS;
+}
 
 // ----- CC-immunity predicates (consumed by the hot applyAura path on Sim) ---------
 
@@ -101,14 +125,14 @@ export function isNythraxisControlAura(ctx: SimContext, kind: AuraKind): boolean
 export function isNythraxisRaidEnemy(target: Entity): boolean {
   return (
     target.kind === 'mob' &&
-    (target.templateId === NYTHRAXIS_BOSS_ID || target.templateId === NYTHRAXIS_ADD_ID)
+    (isNythraxisBossId(target.templateId) || isNythraxisAddId(target.templateId))
   );
 }
 
 export function isNythraxisScriptedControl(target: Entity, aura: Aura): boolean {
   return (
     target.kind === 'mob' &&
-    (target.templateId === NYTHRAXIS_ADD_ID || target.ownerId !== null) &&
+    (isNythraxisAddId(target.templateId) || target.ownerId !== null) &&
     aura.id === 'nythraxis_transition_stun'
   );
 }
@@ -116,9 +140,9 @@ export function isNythraxisScriptedControl(target: Entity, aura: Aura): boolean 
 // ----- skeleton-warrior add AI (consumed by mob retarget on Sim) ------------------
 
 export function findNythraxisBossForAdd(ctx: SimContext, add: Entity): Entity | null {
-  if (add.kind !== 'mob' || add.templateId !== NYTHRAXIS_ADD_ID) return null;
+  if (add.kind !== 'mob' || !isNythraxisAddId(add.templateId)) return null;
   for (const e of ctx.entities.values()) {
-    if (e.kind !== 'mob' || e.templateId !== NYTHRAXIS_BOSS_ID || e.dead) continue;
+    if (e.kind !== 'mob' || !isNythraxisBossId(e.templateId) || e.dead) continue;
     if (e.summonedIds.includes(add.id) || dist2d(e.spawnPos, add.spawnPos) < 1) return e;
   }
   return null;
@@ -146,7 +170,7 @@ export function scheduleNythraxisAddDespawnIfBossReset(ctx: SimContext, add: Ent
 // ----- boss-death dialogue hook (fired from updateMob's dead-branch via ctx) -------
 
 export function onBossDeath(ctx: SimContext, mob: Entity): void {
-  if (mob.templateId === NYTHRAXIS_BOSS_ID && mob.nythraxis && !mob.nythraxis.deathSpoken) {
+  if (isNythraxisBossId(mob.templateId) && mob.nythraxis && !mob.nythraxis.deathSpoken) {
     mob.nythraxis.deathSpoken = true;
     mob.nythraxis.phase = 'dead';
     nythraxisDialogueSet(ctx, mob, [
@@ -317,7 +341,8 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   }
 
   updateNythraxisGravebreaker(ctx, boss, st);
-  if (st.phase === 1) updateNythraxisRaiseFallen(ctx, boss, st);
+  if (st.phase === 1 || (st.phase === 2 && isNythraxisHeroicBoss(boss)))
+    updateNythraxisRaiseFallen(ctx, boss, st);
   if (st.phase === 2) {
     st.soulRendTimer -= DT;
     if (st.soulRendTimer <= 0) {
@@ -455,7 +480,7 @@ export function nythraxisTransitionStunTargets(ctx: SimContext, boss: Entity): E
       !e.dead &&
       dist2d(e.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS &&
       (e.kind === 'player' ||
-        (e.kind === 'mob' && (e.templateId === NYTHRAXIS_ADD_ID || e.ownerId !== null))),
+        (e.kind === 'mob' && (isNythraxisAddId(e.templateId) || e.ownerId !== null))),
   );
 }
 
@@ -473,9 +498,12 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
   // Daily raid reset: lock until the next reset boundary the host supplies through the
   // lockout seam (the authoritative server uses its realm-local 3 AM daily reset, so a
   // realm's raids share one boundary; offline/headless fall back to a flat 24h day).
-  const until = ctx.raidResetMs(ctx.lockoutNowMs());
+  const now = ctx.lockoutNowMs();
+  const heroic = isNythraxisHeroicBoss(boss);
+  const dungeonId = heroic ? 'nythraxis_heroic_boss_arena' : 'nythraxis_boss_arena';
+  const until = heroic ? now + NYTHRAXIS_HEROIC_LOCKOUT_MS : ctx.raidResetMs(now);
   for (const meta of nythraxisRoomMetas(ctx, boss)) {
-    meta.raidLockouts.set('nythraxis_boss_arena', until);
+    meta.raidLockouts.set(dungeonId, until);
   }
 }
 
@@ -536,19 +564,28 @@ export function updateNythraxisRaiseFallen(
 }
 
 export function spawnNythraxisAdds(ctx: SimContext, boss: Entity): void {
-  const template = MOBS[NYTHRAXIS_ADD_ID];
-  if (!template) return;
   // Raise the guards from BEHIND the boss (toward the back wall), so they rise
   // up behind him and march out around him, not between the boss and the raid.
   const back = boss.spawnPos.z + 16;
-  const spawnPoints = [
-    ctx.groundPos(boss.spawnPos.x - 12, back),
-    ctx.groundPos(boss.spawnPos.x + 12, back),
-  ];
+  const heroic = isNythraxisHeroicBoss(boss);
+  const addIds = heroic ? [...NYTHRAXIS_HEROIC_ADD_IDS] : [NYTHRAXIS_ADD_ID, NYTHRAXIS_ADD_ID];
+  const spawnPoints = heroic
+    ? [
+        ctx.groundPos(boss.spawnPos.x - 16, back),
+        ctx.groundPos(boss.spawnPos.x, back + 4),
+        ctx.groundPos(boss.spawnPos.x + 16, back),
+      ]
+    : [
+        ctx.groundPos(boss.spawnPos.x - 12, back),
+        ctx.groundPos(boss.spawnPos.x + 12, back),
+      ];
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   const victimId = boss.aggroTargetId ?? threatEntries(boss, 1)[0]?.[0] ?? null;
   const victim = victimId !== null ? ctx.entities.get(victimId) : null;
-  for (const pos of spawnPoints) {
+  for (let i = 0; i < addIds.length; i++) {
+    const template = MOBS[addIds[i]];
+    if (!template) continue;
+    const pos = spawnPoints[i];
     const add = createMob(ctx.nextId++, template, template.maxLevel, pos);
     add.spawnPos = { ...boss.spawnPos };
     add.tappedById = boss.tappedById;
@@ -711,7 +748,8 @@ export function castNythraxisSoulRend(
     return;
   }
   const picked: Entity[] = [];
-  while (picked.length < 3 && candidates.length > 0) {
+  const targetCount = nythraxisSoulRendTargetCount(boss);
+  while (picked.length < targetCount && candidates.length > 0) {
     const idx = ctx.rng.int(0, candidates.length - 1);
     picked.push(candidates.splice(idx, 1)[0]);
   }
@@ -852,7 +890,7 @@ export function updateNythraxisDeathlessRage(
     ctx.dealDamage(
       boss,
       p,
-      Math.ceil(p.maxHp * 0.82),
+      isNythraxisHeroicBoss(boss) ? Math.ceil(p.maxHp * 10) : Math.ceil(p.maxHp * 0.82),
       false,
       'shadow',
       'Deathless Rage',
@@ -944,7 +982,7 @@ export function tryStartNythraxisWardChannel(
   const boss = [...ctx.entities.values()].find(
     (e) =>
       e.kind === 'mob' &&
-      e.templateId === NYTHRAXIS_BOSS_ID &&
+      isNythraxisBossId(e.templateId) &&
       !e.dead &&
       dist2d(e.spawnPos, ward.pos) < NYTHRAXIS_WARDSTONE_RANGE,
   );

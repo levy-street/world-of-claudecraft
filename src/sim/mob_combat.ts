@@ -45,8 +45,15 @@ export function scaledDefaultMobMeleeRange(scale: number): number {
 }
 
 export function combatProfileForMob(templateId: string, scale: number): MobCombatProfile {
-  if (templateId === 'nythraxis_scourge_of_thornpeak') return NYTHRAXIS_BOSS_COMBAT_PROFILE;
-  if (templateId === 'nythraxis_skeleton_warrior') return NYTHRAXIS_ADD_COMBAT_PROFILE;
+  if (templateId === 'nythraxis_scourge_of_thornpeak' || templateId === 'nythraxis_scourge_of_thornpeak_heroic')
+    return NYTHRAXIS_BOSS_COMBAT_PROFILE;
+  if (
+    templateId === 'nythraxis_skeleton_warrior' ||
+    templateId === 'nythraxis_heroic_fallen_captain_aldren' ||
+    templateId === 'nythraxis_heroic_corrupted_priest_malric' ||
+    templateId === 'nythraxis_heroic_deathstalker_voss'
+  )
+    return NYTHRAXIS_ADD_COMBAT_PROFILE;
   return {
     ...DEFAULT_MOB_COMBAT_PROFILE,
     meleeRange: scaledDefaultMobMeleeRange(scale),

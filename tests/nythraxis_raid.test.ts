@@ -156,11 +156,20 @@ describe('Nythraxis raid encounter', () => {
   it('registers the Abandoned Crypt as a 10-player dark raid instance', () => {
     const crypt = DUNGEONS.nythraxis_crypt;
     const dungeon = DUNGEONS.nythraxis_boss_arena;
+    const heroic = DUNGEONS.nythraxis_heroic_boss_arena;
     expect(crypt.interior).toBe('crypt');
     expect(
       crypt.objects?.some(
         (o) =>
           o.templateId === 'dungeon_door' && o.dungeonId === 'nythraxis_boss_arena' && o.z >= 109,
+      ),
+    ).toBe(true);
+    expect(
+      crypt.objects?.some(
+        (o) =>
+          o.templateId === 'dungeon_door' &&
+          o.dungeonId === 'nythraxis_heroic_boss_arena' &&
+          o.z >= 109,
       ),
     ).toBe(true);
     // The crypt's interactables are the three attunement relics that summon the
@@ -173,12 +182,36 @@ describe('Nythraxis raid encounter', () => {
     expect(dungeon.interior).toBe('nythraxis');
     expect(dungeon.suggestedPlayers).toBe(10);
     expect(dungeon.spawns).toEqual([{ mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 }]);
+    expect(heroic.interior).toBe('nythraxis');
+    expect(heroic.suggestedPlayers).toBe(10);
+    expect(heroic.spawns).toEqual([{ mobId: 'nythraxis_scourge_of_thornpeak_heroic', x: 0, z: 96 }]);
+    expect(heroic.objects?.filter((o) => o.itemId === 'bastion_ward_stone')).toHaveLength(8);
+    expect(
+      heroic.objects
+        ?.filter((o) => o.itemId === 'bastion_ward_stone')
+        .map((o) => [o.x, o.z])
+        .sort(([ax, az], [bx, bz]) => az - bz || ax - bx),
+    ).toEqual([
+      [0, 68],
+      [-23, 73],
+      [23, 73],
+      [-32, 96],
+      [32, 96],
+      [-23, 119],
+      [23, 119],
+      [0, 124],
+    ]);
     expect(NYTHRAXIS_LAYOUT.wallX).toBeGreaterThanOrEqual(230);
     expect(MOBS.nythraxis_scourge_of_thornpeak.boss).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.ccImmune).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.moveSpeed).toBe(10.5);
     expect(MOBS.nythraxis_scourge_of_thornpeak.dmgBase).toBeCloseTo(54);
     expect(MOBS.nythraxis_scourge_of_thornpeak.dmgPerLevel).toBeCloseTo(11.4);
+    expect(MOBS.nythraxis_scourge_of_thornpeak_heroic.hpBase).toBeCloseTo(
+      MOBS.nythraxis_scourge_of_thornpeak.hpBase * 3,
+    );
+    expect(MOBS.nythraxis_scourge_of_thornpeak_heroic.dmgBase).toBeCloseTo(108);
+    expect(MOBS.nythraxis_scourge_of_thornpeak_heroic.dmgPerLevel).toBeCloseTo(22.8);
     expect(MOBS.nythraxis_skeleton_warrior.dmgBase).toBeCloseTo(26);
     expect(MOBS.nythraxis_skeleton_warrior.dmgPerLevel).toBeCloseTo(5.6);
 

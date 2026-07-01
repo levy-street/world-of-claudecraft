@@ -4966,4 +4966,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': 'GitHub를 연결할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.devBadge.linkedAs': '{login}(으)로 연결됨',
   'hudChrome.devBadge.unlink': 'GitHub 연결 해제',
+  'entities.mobs.nythraxis_heroic_fallen_captain_aldren.name': '영웅 타락한 대장 알드렌',
+  'entities.mobs.nythraxis_heroic_corrupted_priest_malric.name': '영웅 타락한 사제 말릭',
+  'entities.mobs.nythraxis_heroic_deathstalker_voss.name': '영웅 죽음추적자 보스',
+  'entities.mobs.nythraxis_scourge_of_thornpeak_heroic.name': '쏜피크의 재앙 니트락시스(영웅)',
+  'entities.dungeons.nythraxis_heroic_boss_arena.name': '니트락시스 영웅 공격대 투기장',
+  'entities.dungeons.nythraxis_heroic_boss_arena.enterText': '영웅 왕실 문을 지나갑니다.',
+  'entities.dungeons.nythraxis_heroic_boss_arena.leaveText': '쏜피크의 차가운 공기 속으로 돌아옵니다.',
+  'entities.quests.q_nythraxis_heroic_unlock.title': '다시 부서진 왕관',
+  'entities.quests.q_nythraxis_heroic_unlock.text':
+    '니트락시스는 쓰러졌지만, 누군가 그의 이름을 말하면 묘지는 아직도 응답합니다. 왕실 문 뒤에서 두 번째 봉인을 찾았습니다. 이미 한 번 왕관을 부순 용사들을 위한 봉인입니다. 준비되면 제게 말하십시오. 더 험한 길을 열도록 당신의 인장에 표식을 새기겠습니다.',
+  'entities.quests.q_nythraxis_heroic_unlock.completion':
+    '표식이 새겨졌습니다. 영웅 왕실 문은 이제 당신을 알아볼 것입니다. 하지만 그 아래의 왕은 기억처럼 싸우지 않을 것입니다. 문턱을 넘기 전에 완전한 공격대를 모으십시오.',
+  'entities.quests.q_nythraxis_heroic_unlock.objectives.0.label': '영웅 니트락시스에 대해 알드릭 수사와 대화',
 };

@@ -5067,4 +5067,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': 'Не удалось привязать GitHub. Пожалуйста, попробуйте снова.',
   'hudChrome.devBadge.linkedAs': 'Привязан как {login}',
   'hudChrome.devBadge.unlink': 'Отвязать GitHub',
+  'entities.mobs.nythraxis_heroic_fallen_captain_aldren.name': 'Героический павший капитан Алдрен',
+  'entities.mobs.nythraxis_heroic_corrupted_priest_malric.name': 'Героический оскверненный жрец Малрик',
+  'entities.mobs.nythraxis_heroic_deathstalker_voss.name': 'Героический ловчий смерти Восс',
+  'entities.mobs.nythraxis_scourge_of_thornpeak_heroic.name': 'Нитраксис, Бич Тернового пика (героический)',
+  'entities.dungeons.nythraxis_heroic_boss_arena.name': 'Героическая рейдовая арена Нитраксиса',
+  'entities.dungeons.nythraxis_heroic_boss_arena.enterText': 'Вы проходите через героическую королевскую дверь.',
+  'entities.dungeons.nythraxis_heroic_boss_arena.leaveText': 'Вы возвращаетесь в холодный воздух Тернового пика.',
+  'entities.quests.q_nythraxis_heroic_unlock.title': 'Корона разбита вновь',
+  'entities.quests.q_nythraxis_heroic_unlock.text':
+    'Нитраксис пал, но склеп все еще отвечает, когда произносят его имя. За королевской дверью я нашел вторую печать, предназначенную для героев, которые уже однажды сломали его корону. Поговорите со мной, когда будете готовы, и я отмечу ваш перстень для более трудного пути.',
+  'entities.quests.q_nythraxis_heroic_unlock.completion':
+    'Метка поставлена. Героическая королевская дверь теперь узнает вас, но король под ней не будет сражаться как воспоминание. Соберите полный рейд, прежде чем перейти этот порог.',
+  'entities.quests.q_nythraxis_heroic_unlock.objectives.0.label': 'Поговорите с братом Олдриком о героическом Нитраксисе',
 };

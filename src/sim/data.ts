@@ -329,7 +329,7 @@ export function dungeonAt(x: number): DungeonDef | null {
 // the band split below keeps arena positions from being read as a dungeon.
 // ---------------------------------------------------------------------------
 
-export const ARENA_X = 4200; // arena instances share this x; slots stack along z
+export const ARENA_X = 4800; // arena instances share this x; slots stack along z
 export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
@@ -368,20 +368,20 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------
 // Delves, private party instances past the arena x-band (see docs/prd/delves.md).
-// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// DELVE_X_MIN must stay above ARENA_X_MIN and ARENA_X.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
-// the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
-// west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
-export const DELVE_X_MIN = 4800;
+// 5400 sits clear of the current dungeon and arena layout. The arena pit is
+// centred at ARENA_X (4800), and the delve band's west edge
+// (DELVE_BAND_X_MIN = 5373) leaves a comfortable margin past the arena.
+export const DELVE_X_MIN = 5400;
 // Each delve room is centred at DELVE_X_MIN + index*600. Delve modules use wider
 // side walls than the base crypt kit: the side-wall centre is at instance-local
 // |x| = DELVE_WALL_X (25, mirror of delve_layout.ts WALL_X) and the collider's
 // outer face sits 1u beyond that (|x| = 26), i.e. world-x = DELVE_X_MIN - 26 =
-// 4774 for slot 0. We set the band edge 1u further west again (4773) so
+// 5374 for slot 0. We set the band edge 1u further west again (5373) so
 // isDelvePos covers the ENTIRE room footprint, including the west wall face,
-// and the west half is never misclassified as arena. Still >500u clear of ARENA_X.
+// and the west half is never misclassified as arena.
 const DELVE_WALL_X = 25; // mirror of delve_layout.ts WALL_X (delve side-wall centre)
 export const DELVE_BAND_X_MIN = DELVE_X_MIN - (DELVE_WALL_X + DUNGEON_WALL_HW + 1);
 // Concurrent copies a single delve can host (mirrors INSTANCE_SLOT_COUNT).

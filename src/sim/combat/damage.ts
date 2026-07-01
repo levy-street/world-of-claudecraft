@@ -37,6 +37,7 @@ import {
   MILESTONES,
   mobXpValue,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_HEROIC_BOSS_ID,
   PARTY_XP_RANGE,
   rageFromDealing,
   rageFromTaking,
@@ -543,7 +544,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         mobId: 'reliquary_bonewalker',
       });
     }
-    if (e.templateId === NYTHRAXIS_BOSS_ID) ctx.grantNythraxisLockout(e);
+    if (e.templateId === NYTHRAXIS_BOSS_ID || e.templateId === NYTHRAXIS_HEROIC_BOSS_ID)
+      ctx.grantNythraxisLockout(e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer = ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));

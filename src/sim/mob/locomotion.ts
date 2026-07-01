@@ -38,6 +38,8 @@ import {
   MELEE_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_HEROIC_ADD_IDS,
+  NYTHRAXIS_HEROIC_BOSS_ID,
   type Vec3,
 } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
@@ -53,6 +55,15 @@ const EVADE_STALL_TIMEOUT = 3;
 const FLEE_RETURN_GRACE = 8;
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
+const NYTHRAXIS_HEROIC_ADD_IDS_SET = new Set<string>(NYTHRAXIS_HEROIC_ADD_IDS);
+
+function isNythraxisBossId(templateId: string | null | undefined): boolean {
+  return templateId === NYTHRAXIS_BOSS_ID || templateId === NYTHRAXIS_HEROIC_BOSS_ID;
+}
+
+function isNythraxisAddId(templateId: string | null | undefined): boolean {
+  return templateId === NYTHRAXIS_ADD_ID || NYTHRAXIS_HEROIC_ADD_IDS_SET.has(templateId ?? '');
+}
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -108,7 +119,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // non-hostile mob is therefore a leak — exactly the "immortal, invalid
   // target" wolves players hit. Restore hostility so no mob can ever be left
   // permanently untargetable, whatever path corrupted it.
-  if (mob.templateId === NYTHRAXIS_ADD_ID && mob.despawnTimer !== undefined) {
+  if (isNythraxisAddId(mob.templateId) && mob.despawnTimer !== undefined) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -118,7 +129,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   if (!mob.hostile) mob.hostile = true;
 
-  const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
+  const isNythraxis = isNythraxisBossId(mob.templateId);
   if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
     const nythraxisScriptLocked =
       isNythraxis &&
@@ -162,7 +173,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   switch (mob.aiState) {
     case 'idle': {
-      if (mob.templateId === NYTHRAXIS_BOSS_ID && !mob.inCombat) {
+      if (isNythraxisBossId(mob.templateId) && !mob.inCombat) {
         mob.wanderTarget = null;
         mob.wanderTimer = 3;
         mob.pos = { ...mob.spawnPos };
@@ -532,7 +543,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
   mob.wanderTimer = ctx.rng.range(2, 8);
-  if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (isNythraxisBossId(mob.templateId)) ctx.resetNythraxisEncounter(mob);
 }
 
 // Cowardly mobs panic once per pull at low HP, then recover their nerve and turn to

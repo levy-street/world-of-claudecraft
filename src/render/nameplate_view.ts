@@ -41,9 +41,12 @@ const NAMEPLATE_URGENT_RANGE_SQ = NAMEPLATE_URGENT_RANGE * NAMEPLATE_URGENT_RANG
 export const NAMEPLATE_ANCHOR_LIFT = 0.8;
 export const NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT = 0.2;
 
-// The crypt's sealed royal door carries no floating label (it reads as back wall,
-// not a portal billboard).
-const UNLABELED_DOOR_DUNGEON_ID = 'nythraxis_boss_arena';
+// The crypt's sealed royal doors carry no floating label (they read as back wall,
+// not portal billboards).
+const UNLABELED_DOOR_DUNGEON_IDS = new Set([
+  'nythraxis_boss_arena',
+  'nythraxis_heroic_boss_arena',
+]);
 
 /** Per-entity nameplate decisions the painter consumes. Mutated in place by
  *  nameplatePlanInto so the painter can reuse one instance across all entities. */
@@ -106,7 +109,7 @@ export function nameplatePlanInto(
     d2 > NAMEPLATE_RANGE_SQ ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
-    (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
+    (isDoor && UNLABELED_DOOR_DUNGEON_IDS.has(e.dungeonId ?? '')) ||
     (!showNameplates && e.kind === 'mob' && !e.dead);
   out.anchorYOffset =
     viewHeight * e.scale +

@@ -30,10 +30,14 @@
 import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
-import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../types';
+import { dist2d, type Entity, NYTHRAXIS_BOSS_ID, NYTHRAXIS_HEROIC_BOSS_ID } from '../types';
 import { groundHeight } from '../world';
 
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
+
+function isNythraxisBossId(templateId: string | null | undefined): boolean {
+  return templateId === NYTHRAXIS_BOSS_ID || templateId === NYTHRAXIS_HEROIC_BOSS_ID;
+}
 
 export function respawnMob(ctx: SimContext, mob: Entity): void {
   if (mob.ownerId !== null) {
@@ -57,7 +61,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.aiState = 'idle';
   mob.aggroTargetId = null;
   mob.inCombat = false;
-  if (mob.templateId === NYTHRAXIS_BOSS_ID) {
+  if (isNythraxisBossId(mob.templateId)) {
     mob.facing = Math.PI;
     mob.prevFacing = Math.PI;
   }
@@ -79,7 +83,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
   mob.wanderTimer = ctx.rng.range(2, 8);
-  if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (isNythraxisBossId(mob.templateId)) ctx.resetNythraxisEncounter(mob);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (e && e.targetId === mob.id) e.targetId = null;

@@ -4,7 +4,7 @@
 // the party-shared instance, the claim -> free empty-reset, and the raid-lockout gate.
 
 import { describe, expect, it } from 'vitest';
-import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { DUNGEONS, dungeonAt, instanceOrigin } from '../src/sim/data';
 import {
   enterDungeon,
   instanceKeyFor,
@@ -173,6 +173,12 @@ describe('dungeons: raid lockout gate', () => {
     return leader;
   }
 
+  function heroicUnlockedRaid(sim: AnySim): number {
+    const leader = attunedRaid(sim);
+    sim.players.get(leader)!.questsDone.add('q_nythraxis_heroic_unlock');
+    return leader;
+  }
+
   it('an active lockout blocks entry and emits the locked-to-arena error', () => {
     const sim = makeSim();
     const leader = attunedRaid(sim);
@@ -220,6 +226,54 @@ describe('dungeons: raid lockout gate', () => {
           e.type === 'error' && e.text === 'You must convert your party to a raid group first.',
       ),
     ).toBe(true);
+  });
+
+  it('blocks Heroic Nythraxis until the heroic unlock quest is complete', () => {
+    const sim = makeSim();
+    const leader = attunedRaid(sim);
+    sim.drainEvents();
+
+    enterDungeon(sim.ctx, 'nythraxis_heroic_boss_arena', leader);
+
+    const events = sim.drainEvents() as any[];
+    expect(
+      events.some((e) => e.type === 'error' && e.text === 'The royal door is sealed to you.'),
+    ).toBe(true);
+    expect(sim.instanceSlotAt(sim.entities.get(leader)!.pos)).toBeNull();
+  });
+
+  it('lets an unlocked raid enter the Heroic Nythraxis arena', () => {
+    const sim = makeSim();
+    const leader = heroicUnlockedRaid(sim);
+    sim.drainEvents();
+
+    enterDungeon(sim.ctx, 'nythraxis_heroic_boss_arena', leader);
+
+    expect(sim.instanceSlotAt(sim.entities.get(leader)!.pos)).not.toBeNull();
+    expect(
+      [...sim.entities.values()].some(
+        (e: AnyEntity) =>
+          e.kind === 'mob' && e.templateId === 'nythraxis_scourge_of_thornpeak_heroic' && !e.dead,
+      ),
+    ).toBe(true);
+  });
+
+  it('resolves the Heroic Nythraxis instance band as a dungeon, not arena space', () => {
+    const origin = instanceOrigin(DUNGEONS.nythraxis_heroic_boss_arena.index, 0);
+
+    expect(dungeonAt(origin.x)?.id).toBe('nythraxis_heroic_boss_arena');
+  });
+
+  it('lets players leave the Heroic Nythraxis room through its exit', () => {
+    const sim = makeSim();
+    const pid = heroicUnlockedRaid(sim);
+    enterDungeon(sim.ctx, 'nythraxis_heroic_boss_arena', pid);
+    expect(sim.instanceSlotAt(sim.entities.get(pid)!.pos)).not.toBeNull();
+
+    leaveDungeon(sim.ctx, pid);
+
+    expect(sim.instanceSlotAt(sim.entities.get(pid)!.pos)).toBeNull();
+    expect(sim.entities.get(pid)!.pos.x).toBe(DUNGEONS.nythraxis_heroic_boss_arena.doorPos.x);
   });
 });
 

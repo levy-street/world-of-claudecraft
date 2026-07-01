@@ -12,10 +12,17 @@
 
 import type { DuelState } from '../sim';
 import type { SimContext } from '../sim_context';
-import { DT, dist2d } from '../types';
+import { DT, dist2d, type Entity } from '../types';
 
 const DUEL_COUNTDOWN = 3;
 const DUEL_FORFEIT_DISTANCE = 60;
+
+function isNythraxisRaidArena(ctx: SimContext, e: Entity): boolean {
+  return (
+    ctx.entityInDungeon(e, 'nythraxis_boss_arena') ||
+    ctx.entityInDungeon(e, 'nythraxis_heroic_boss_arena')
+  );
+}
 
 export function duelRequest(ctx: SimContext, targetPid: number, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -24,8 +31,8 @@ export function duelRequest(ctx: SimContext, targetPid: number, pid?: number): v
   if (!r || !target || !targetE) return;
   if (targetPid === r.meta.entityId) return;
   if (
-    ctx.entityInDungeon(r.e, 'nythraxis_boss_arena') ||
-    ctx.entityInDungeon(targetE, 'nythraxis_boss_arena')
+    isNythraxisRaidArena(ctx, r.e) ||
+    isNythraxisRaidArena(ctx, targetE)
   ) {
     ctx.error(r.meta.entityId, 'You cannot duel in Nythraxis Raid Arena.');
     return;
@@ -71,8 +78,8 @@ export function duelAccept(ctx: SimContext, pid?: number): void {
   const otherE = ctx.entities.get(invite.fromPid);
   if (
     !otherE ||
-    ctx.entityInDungeon(r.e, 'nythraxis_boss_arena') ||
-    ctx.entityInDungeon(otherE, 'nythraxis_boss_arena')
+    isNythraxisRaidArena(ctx, r.e) ||
+    isNythraxisRaidArena(ctx, otherE)
   ) {
     ctx.error(r.meta.entityId, 'You cannot duel in Nythraxis Raid Arena.');
     return;

@@ -72,7 +72,11 @@ const MOB_IDS = [
   'vision_deathstalker_voss',
   'bound_guardian',
   'nythraxis_skeleton_warrior',
+  'nythraxis_heroic_fallen_captain_aldren',
+  'nythraxis_heroic_corrupted_priest_malric',
+  'nythraxis_heroic_deathstalker_voss',
   'nythraxis_scourge_of_thornpeak',
+  'nythraxis_scourge_of_thornpeak_heroic',
   // Collapsed Reliquary delve mobs
   'reliquary_ledger_wraith',
   'reliquary_funeral_ringer',
@@ -179,6 +183,7 @@ const QUEST_IDS = [
   'q_nythraxis_sealed_crypt',
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
+  'q_nythraxis_heroic_unlock',
   'q_mogger',
 ] as const;
 
@@ -189,6 +194,7 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
+  'nythraxis_heroic_boss_arena',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary'] as const;
 

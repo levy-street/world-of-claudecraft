@@ -29,6 +29,11 @@ export const DUNGEON_LEASH_DISTANCE = 70;
 // Nythraxis add template id. Used by the mob-locomotion slice (the add branch of
 // updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
 export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
+export const NYTHRAXIS_HEROIC_ADD_IDS = [
+  'nythraxis_heroic_fallen_captain_aldren',
+  'nythraxis_heroic_corrupted_priest_malric',
+  'nythraxis_heroic_deathstalker_voss',
+] as const;
 export const GCD = 1.5; // seconds
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
 // potion locks every other potion for this long (#103). 2 minutes, vanilla value.
@@ -1798,6 +1803,7 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 // boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
 // the encounter. Kept here as the neutral shared seam in the meantime.
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+export const NYTHRAXIS_HEROIC_BOSS_ID = 'nythraxis_scourge_of_thornpeak_heroic';
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];

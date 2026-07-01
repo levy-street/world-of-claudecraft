@@ -4712,4 +4712,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': '無法連結 GitHub。請再試一次。',
   'hudChrome.devBadge.linkedAs': '已連結為 {login}',
   'hudChrome.devBadge.unlink': '取消連結 GitHub',
+  'entities.mobs.nythraxis_heroic_fallen_captain_aldren.name': '英雄墮落隊長奧德倫',
+  'entities.mobs.nythraxis_heroic_corrupted_priest_malric.name': '英雄腐化祭司馬爾里克',
+  'entities.mobs.nythraxis_heroic_deathstalker_voss.name': '英雄死亡潛獵者沃斯',
+  'entities.mobs.nythraxis_scourge_of_thornpeak_heroic.name': '尼思拉克西斯，荊峰災禍（英雄）',
+  'entities.dungeons.nythraxis_heroic_boss_arena.name': '尼思拉克西斯英雄團隊競技場',
+  'entities.dungeons.nythraxis_heroic_boss_arena.enterText': '你穿過英雄王室之門。',
+  'entities.dungeons.nythraxis_heroic_boss_arena.leaveText': '你回到荊峰的寒冷空氣中。',
+  'entities.quests.q_nythraxis_heroic_unlock.title': '王冠再碎',
+  'entities.quests.q_nythraxis_heroic_unlock.text':
+    '尼思拉克西斯已經倒下，但墓穴在有人說出他的名字時仍會回應。我在王室之門後發現了第二道封印，它只為已經擊碎過王冠的勇士而設。準備好時與我交談，我會為你的印戒刻下通往更艱險道路的標記。',
+  'entities.quests.q_nythraxis_heroic_unlock.completion':
+    '標記已經完成。英雄王室之門會認得你，但門下的王不會像記憶那樣作戰。跨過門檻前，先集結完整的團隊。',
+  'entities.quests.q_nythraxis_heroic_unlock.objectives.0.label': '與奧德里克修士談論英雄尼思拉克西斯',
 };

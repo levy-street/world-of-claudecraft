@@ -858,6 +858,7 @@ const MOB_KEYS: Record<string, string> = {
   knight_commander_olen: 'skel_warrior',
   sanctum_boneguard: 'skel_warrior',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
+  nythraxis_scourge_of_thornpeak_heroic: 'skel_golem',
   nythraxis_skeleton_warrior: 'skel_warrior',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',

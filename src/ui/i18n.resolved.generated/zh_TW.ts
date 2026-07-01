@@ -5483,8 +5483,20 @@ export const zh_TW: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "復甦王室衛兵"
       },
+      "nythraxis_heroic_fallen_captain_aldren": {
+        "name": "英雄墮落隊長奧德倫"
+      },
+      "nythraxis_heroic_corrupted_priest_malric": {
+        "name": "英雄腐化祭司馬爾里克"
+      },
+      "nythraxis_heroic_deathstalker_voss": {
+        "name": "英雄死亡潛獵者沃斯"
+      },
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荊峰之災"
+      },
+      "nythraxis_scourge_of_thornpeak_heroic": {
+        "name": "尼思拉克西斯，荊峰災禍（英雄）"
       },
       "reliquary_ledger_wraith": {
         "name": "名冊幽靈"
@@ -6476,6 +6488,16 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_nythraxis_heroic_unlock": {
+        "title": "王冠再碎",
+        "text": "尼思拉克西斯已經倒下，但墓穴在有人說出他的名字時仍會回應。我在王室之門後發現了第二道封印，它只為已經擊碎過王冠的勇士而設。準備好時與我交談，我會為你的印戒刻下通往更艱險道路的標記。",
+        "completion": "標記已經完成。英雄王室之門會認得你，但門下的王不會像記憶那樣作戰。跨過門檻前，先集結完整的團隊。",
+        "objectives": {
+          "0": {
+            "label": "與奧德里克修士談論英雄尼思拉克西斯"
+          }
+        }
+      },
       "q_mogger": {
         "title": "莫格必須倒下",
         "text": "莫格劈裂貨車，踏平柵欄，殺死的牲口足以讓半個谷地空掉。不要獨自面對牠。帶兩名強壯同伴去東邊草地，把那蠻獸徹底放倒。",
@@ -6678,6 +6700,11 @@ export const zh_TW: EnTranslations = {
       "nythraxis_boss_arena": {
         "name": "尼思拉克西斯團隊競技場",
         "enterText": "你穿過封印的王室之門。",
+        "leaveText": "你回到荊峰的寒冷空氣中。"
+      },
+      "nythraxis_heroic_boss_arena": {
+        "name": "尼思拉克西斯英雄團隊競技場",
+        "enterText": "你穿過英雄王室之門。",
         "leaveText": "你回到荊峰的寒冷空氣中。"
       },
       "drowned_temple": {

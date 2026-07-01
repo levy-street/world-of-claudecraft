@@ -24,12 +24,17 @@ import {
   type Entity,
   INSTANCE_EMPTY_TIMEOUT,
   NYTHRAXIS_BOSS_ID,
+  NYTHRAXIS_HEROIC_BOSS_ID,
   type Vec3,
 } from '../types';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
-const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', 'nythraxis_boss_arena']);
-const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
+const NYTHRAXIS_RAID_DUNGEON_IDS = new Set([
+  'nythraxis_boss_arena',
+  'nythraxis_heroic_boss_arena',
+]);
+const RAID_ALLOWED_DUNGEON_IDS = new Set(['nythraxis_crypt', ...NYTHRAXIS_RAID_DUNGEON_IDS]);
+const RAID_REQUIRED_DUNGEON_IDS = NYTHRAXIS_RAID_DUNGEON_IDS;
 
 export function instanceKeyFor(ctx: SimContext, pid: number): string {
   const party = ctx.partyOf(pid);
@@ -89,11 +94,18 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
     ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
     return;
   }
-  if (dungeonId === 'nythraxis_boss_arena' && isRaidLocked(ctx, r.meta, dungeonId)) {
+  if (
+    dungeonId === 'nythraxis_heroic_boss_arena' &&
+    !canEnterHeroicNythraxisRaid(r.meta)
+  ) {
+    ctx.error(r.meta.entityId, 'The royal door is sealed to you.');
+    return;
+  }
+  if (NYTHRAXIS_RAID_DUNGEON_IDS.has(dungeonId) && isRaidLocked(ctx, r.meta, dungeonId)) {
     ctx.error(r.meta.entityId, 'You are locked to Nythraxis Raid Arena.');
     return;
   }
-  if (dungeonId === 'nythraxis_boss_arena') {
+  if (NYTHRAXIS_RAID_DUNGEON_IDS.has(dungeonId)) {
     const engaged = ctx.instances.find(
       (i) => i.dungeonId === dungeonId && i.partyKey === instanceKeyFor(ctx, r.meta.entityId),
     );
@@ -136,6 +148,10 @@ function canEnterNythraxisRaid(meta: PlayerMeta): boolean {
   return meta.questsDone.has('q_nythraxis_bound_guardian');
 }
 
+function canEnterHeroicNythraxisRaid(meta: PlayerMeta): boolean {
+  return meta.questsDone.has('q_nythraxis_heroic_unlock');
+}
+
 function isRaidLocked(ctx: SimContext, meta: PlayerMeta, dungeonId: string): boolean {
   const until = meta.raidLockouts.get(dungeonId) ?? 0;
   if (until <= ctx.lockoutNowMs()) {
@@ -152,7 +168,7 @@ function nythraxisInstanceSealed(ctx: SimContext, inst: InstanceSlot): boolean {
     const e = ctx.entities.get(id);
     if (
       e &&
-      e.templateId === NYTHRAXIS_BOSS_ID &&
+      (e.templateId === NYTHRAXIS_BOSS_ID || e.templateId === NYTHRAXIS_HEROIC_BOSS_ID) &&
       !e.dead &&
       e.inCombat &&
       e.nythraxis &&
@@ -171,7 +187,7 @@ export function leaveDungeon(ctx: SimContext, pid?: number): void {
   // that silently teleported outdoor callers to the Hollow Crypt door)
   const dungeon = dungeonAt(p.pos.x);
   if (!dungeon) return;
-  if (dungeon.id === 'nythraxis_boss_arena') {
+  if (NYTHRAXIS_RAID_DUNGEON_IDS.has(dungeon.id)) {
     const inst = ctx.instances.find(
       (i) => i.dungeonId === dungeon.id && i.partyKey === instanceKeyFor(ctx, p.id),
     );

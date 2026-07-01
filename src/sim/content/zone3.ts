@@ -835,6 +835,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'q_nythraxis_sealed_crypt',
       'q_nythraxis_bound_guardian',
       'q_nythraxis_scourges_end',
+      'q_nythraxis_heroic_unlock',
     ],
     greeting:
       'From a chapel yard in the Vale to the roof of the world... the trail we have followed ends here. I can feel the mountain listening.',
@@ -1533,6 +1534,29 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     minLevel: 20,
     suggestedPlayers: 10,
   },
+  q_nythraxis_heroic_unlock: {
+    id: 'q_nythraxis_heroic_unlock',
+    name: 'A Crown Twice Broken',
+    giverNpcId: 'brother_aldric_highwatch',
+    turnInNpcId: 'brother_aldric_highwatch',
+    text: 'Nythraxis fell, but the crypt still answers when his name is spoken. I have found a second seal behind the royal door, one meant for champions who have already broken his crown once. Speak with me when you are ready, and I will mark your signet for the harder path.',
+    completionText:
+      'The mark is set. The heroic royal door will know you now, but the king beneath it will not fight as a memory. Gather a full raid before you cross that threshold.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'brother_aldric_highwatch',
+        count: 1,
+        label: 'Speak with Brother Aldric about Heroic Nythraxis',
+      },
+    ],
+    xpReward: 0,
+    copperReward: 5000,
+    itemRewards: {},
+    requiresQuest: 'q_nythraxis_scourges_end',
+    minLevel: 20,
+    suggestedPlayers: 10,
+  },
 };
 
 export const ZONE3_QUEST_ORDER = [
@@ -1566,6 +1590,7 @@ export const ZONE3_QUEST_ORDER = [
   'q_nythraxis_sealed_crypt',
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
+  'q_nythraxis_heroic_unlock',
 ];
 
 // ---------------------------------------------------------------------------
