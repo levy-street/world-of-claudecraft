@@ -21,6 +21,16 @@ guard fail) - predates this work, not fixed here.
 Known follow-up: the Tolling Bell renders as a generic mob mesh (Stage 3 was sim-only);
 a custom rolling-bell visual + telegraph-lane decal is a nice-to-have render pass.
 
+Post-Stage-4 manual verification (in-game, via new scripts/drowned_litany_shots.mjs and
+scripts/drowned_litany_boss_shot.mjs): screenshotted all 7 rooms (size curve and
+shallow/deep water tiers visually confirmed) and drove a live Tolling Bells volley.
+Found and fixed a real bug this way (commit 78341724): spawnBellEntity and the
+knockback altarPos both used the room-local ALTAR_X directly instead of
+run.origin.x + ALTAR_X (every other spawn site in this delve adds run.origin.x).
+Drowned Litany's world-X origin is a large nonzero constant, so bells were spawning
+thousands of yards from the fight and the knockback direction was nonsensical before
+the fix. This is why running the actual game, not just unit tests, was worth doing.
+
 Stage 0 note: `src/render/props.ts` already recolors the Drowned Litany entrance to a
 blue "water" palette (portal shader `uRim` uniform, `drownVeilMaterial` red->blue veil
 recolor, blue backsplash/mouth-light/embers) and `src/sim/content/zone3.ts` registers
