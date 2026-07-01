@@ -64,6 +64,7 @@ import {
   parseTokenResponse,
   pkceChallengeFromVerifier,
 } from './discord_oauth';
+import type { DiscordRichPresencePayload } from './discord_rich_presence';
 import { isUniqueViolation, json } from './http_util';
 import {
   authThrottled,
@@ -647,11 +648,15 @@ export async function handleDiscordStatus(
   _req: http.IncomingMessage,
   res: http.ServerResponse,
   accountId: number,
+  richPresence: DiscordRichPresencePayload | null = null,
 ): Promise<void> {
-  return json(res, 200, await discordStatusPayload(accountId));
+  return json(res, 200, await discordStatusPayload(accountId, richPresence));
 }
 
-export async function discordStatusPayload(accountId: number): Promise<Record<string, unknown>> {
+export async function discordStatusPayload(
+  accountId: number,
+  richPresence: DiscordRichPresencePayload | null = null,
+): Promise<Record<string, unknown>> {
   const [link, reward, claimedSwagIds, acct] = await Promise.all([
     discordForAccount(pool, accountId),
     loadRewardState(pool, accountId),
@@ -683,6 +688,7 @@ export async function discordStatusPayload(accountId: number): Promise<Record<st
     statusTier: link ? discordStatusIndexForPoints(reward.lifetimePoints) : 0,
     claimedSwagIds,
     inviteUrl: discordInviteUrl(),
+    richPresence: richPresence ?? null,
     presence: {
       onlineCount: presence.onlineCount,
       memberTotal: presence.memberTotal,

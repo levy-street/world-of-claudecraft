@@ -1379,7 +1379,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
-      return handleDiscordStatus(req, res, accountId);
+      return handleDiscordStatus(
+        req,
+        res,
+        accountId,
+        game.discordRichPresenceForAccount(accountId),
+      );
     }
     if (req.method === 'DELETE' && url === '/api/discord') {
       const accountId = await bearerActiveAccount(req, res);

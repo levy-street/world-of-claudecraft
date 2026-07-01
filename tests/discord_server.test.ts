@@ -214,6 +214,33 @@ describe('GET /api/discord (status)', () => {
     expect(data.points).toBe(0);
     expect(data.statusTier).toBe(0);
     expect(data.inviteUrl).toContain('discord.gg');
+    expect(data.richPresence).toBeNull();
+  });
+
+  it('includes a supplied game rich presence snapshot', async () => {
+    const richPresence = {
+      details: 'Maelin - Level 17 Mage',
+      state: 'In a dungeon in The Hollow Crypt',
+      largeImageKey: 'world_of_claudecraft',
+      largeImageText: 'World of ClaudeCraft',
+      smallImageKey: 'class_mage',
+      smallImageText: 'Mage',
+      startTimestamp: 1720000123,
+      instance: false,
+      metadata: {
+        characterName: 'Maelin',
+        className: 'Mage',
+        level: 17,
+        zone: 'The Hollow Crypt',
+        status: 'dungeon',
+        realm: 'Claudemoon',
+        profileUrl: 'https://worldofclaudecraft.com/c/Maelin',
+      },
+    } as const;
+
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 1, richPresence);
+    expect(parse(res).data.richPresence).toEqual(richPresence);
   });
 
   it('reports linked status, points and derived tier', async () => {

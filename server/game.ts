@@ -61,6 +61,7 @@ import {
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
+import { buildDiscordRichPresence, type DiscordRichPresencePayload } from './discord_rich_presence';
 import { formatDuration } from './duration';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
@@ -1896,6 +1897,29 @@ export class GameServer {
 
   liveAccountIds(): Set<number> {
     return new Set([...this.clients.values()].map((s) => s.accountId));
+  }
+
+  discordRichPresenceForAccount(accountId: number): DiscordRichPresencePayload | null {
+    let chosen: ClientSession | null = null;
+    for (const session of this.clients.values()) {
+      if (session.accountId !== accountId) continue;
+      if (!chosen || session.joinedAt > chosen.joinedAt) chosen = session;
+    }
+    if (!chosen) return null;
+    const e = this.sim.entities.get(chosen.pid);
+    const meta = this.sim.meta(chosen.pid);
+    if (!e || !meta) return null;
+    const presence = this.presenceOf(chosen);
+    return buildDiscordRichPresence({
+      characterName: chosen.name,
+      className: meta.cls,
+      level: e.level,
+      zone: presence.zone,
+      status: presence.status,
+      joinedAt: chosen.joinedAt,
+      realm: REALM,
+      profileUrl: this.profileUrlFor(chosen.name),
+    });
   }
 
   liveSharedIps(): LiveSharedIp[] {

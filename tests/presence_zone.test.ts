@@ -33,6 +33,25 @@ describe('presenceOf zone resolution', () => {
     expect(presence.status).toBe('online');
   });
 
+  it('builds Discord rich presence from the active account session', () => {
+    const { server, entity } = makeServerWithPlayer();
+    entity.level = 12;
+    const rich = server.discordRichPresenceForAccount(1);
+    expect(rich).toMatchObject({
+      details: 'Tester - Level 12 Warrior',
+      state: 'Exploring in Eastbrook Vale',
+      smallImageKey: 'class_warrior',
+      metadata: {
+        characterName: 'Tester',
+        className: 'Warrior',
+        level: 12,
+        zone: 'Eastbrook Vale',
+        status: 'online',
+      },
+    });
+    expect(rich?.startTimestamp).toBeGreaterThan(0);
+  });
+
   it('names the dungeon and reports "dungeon" status when dungeonId is set', () => {
     const { server, session, entity } = makeServerWithPlayer();
     entity.dungeonId = 'hollow_crypt';
