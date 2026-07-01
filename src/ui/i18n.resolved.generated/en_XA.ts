@@ -637,6 +637,14 @@ export const en_XA: EnTranslations = {
       "unassigned": "[{item} ŵáš ñóţ áššíĝñéð áñð íš ƒŕéé ƒóŕ áļļ.]",
       "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ çáñ çĥáñĝé ţĥé ļóóţ ɱéţĥóð.]"
     },
+    "readyCheck": {
+      "start": "[Ŕéáðý Çĥéçķ]",
+      "startAria": "[Šţáŕţ ŕéáðý çĥéçķ]",
+      "ready": "[Ŕéáðý]",
+      "notReady": "[Ñóţ Ŕéáðý]",
+      "waiting": "[Ŵáíţíñĝ]",
+      "status": "[{ready}/{total} ŕéáðý]"
+    },
     "party": {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]"
     },

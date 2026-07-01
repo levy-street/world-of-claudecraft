@@ -637,6 +637,14 @@ export const id_ID: EnTranslations = {
       "unassigned": "{item} tidak diberikan dan bebas untuk semua.",
       "leaderOnly": "Hanya pemimpin grup yang dapat mengubah metode loot."
     },
+    "readyCheck": {
+      "start": "Cek siap",
+      "startAria": "Mulai cek siap",
+      "ready": "Siap",
+      "notReady": "Belum siap",
+      "waiting": "Menunggu",
+      "status": "{ready}/{total} siap"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

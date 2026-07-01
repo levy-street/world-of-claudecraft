@@ -3305,6 +3305,47 @@
       opacity 0.2s ease,
       box-shadow 0.2s ease;
   }
+  .party-footer {
+    width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .party-ready {
+    width: 170px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 11px;
+    font-family: var(--title-font);
+  }
+  .party-ready-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .party-ready-head span {
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  .party-ready-head b,
+  .party-ready-state {
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+  .party-ready-start,
+  .party-ready-actions button {
+    width: 100%;
+    min-height: 28px;
+    box-sizing: border-box;
+  }
+  .party-ready-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
   .party-loot {
     width: 170px;
     padding: 5px 8px 6px;

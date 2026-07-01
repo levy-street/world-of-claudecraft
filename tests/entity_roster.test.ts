@@ -298,6 +298,7 @@ function makeCtx() {
     // W5 chat router/readouts reach-backs.
     targetEntity: vi.fn(),
     partyCapacity: vi.fn(() => 5),
+    readyCheckStart: vi.fn(),
     marketListingBelongsTo: vi.fn(() => false),
   };
   const ctx = createSimContext(host);

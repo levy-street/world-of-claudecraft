@@ -107,6 +107,7 @@ export const ALL_CLASSES: PlayerClass[] = [
   'druid',
 ];
 export type ResourceType = 'rage' | 'mana' | 'energy';
+export type ReadyCheckStatus = 'pending' | 'ready' | 'not_ready';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',

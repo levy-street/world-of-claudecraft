@@ -637,6 +637,14 @@ export const pt_BR: EnTranslations = {
       "unassigned": "{item} nao foi atribuido e esta livre para todos.",
       "leaderOnly": "Somente o lider do grupo pode alterar o metodo de saque."
     },
+    "readyCheck": {
+      "start": "Verificacao de prontidao",
+      "startAria": "Iniciar verificacao de prontidao",
+      "ready": "Pronto",
+      "notReady": "Nao pronto",
+      "waiting": "Aguardando",
+      "status": "{ready}/{total} prontos"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

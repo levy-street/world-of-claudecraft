@@ -637,6 +637,14 @@ export const ko_KR: EnTranslations = {
       "unassigned": "{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.",
       "leaderOnly": "파티장만 전리품 방식을 변경할 수 있습니다."
     },
+    "readyCheck": {
+      "start": "준비 확인",
+      "startAria": "준비 확인 시작",
+      "ready": "준비 완료",
+      "notReady": "준비 안 됨",
+      "waiting": "대기 중",
+      "status": "{ready}/{total} 준비 완료"
+    },
     "party": {
       "promoteLeader": "파티장으로 지정"
     },

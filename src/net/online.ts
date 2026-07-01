@@ -1787,6 +1787,12 @@ export class ClientWorld implements IWorld {
   moveRaidMember(targetPid: number, group: 1 | 2): void {
     this.cmd({ cmd: 'pmoveRaid', id: targetPid, group });
   }
+  readyCheckStart(): void {
+    this.cmd({ cmd: 'ready_check' });
+  }
+  readyCheckRespond(ready: boolean): void {
+    this.cmd({ cmd: 'ready_check_response', ready });
+  }
   setPartyLootMaster(enabled: boolean, looter: number, threshold: MasterLootThreshold): void {
     this.cmd({ cmd: 'setLootMaster', enabled, looter, threshold });
   }

@@ -637,6 +637,14 @@ export const nl_NL: EnTranslations = {
       "unassigned": "{item} is niet toegewezen en is vrij voor iedereen.",
       "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen."
     },
+    "readyCheck": {
+      "start": "Gereedheidscheck",
+      "startAria": "Gereedheidscheck starten",
+      "ready": "Gereed",
+      "notReady": "Niet gereed",
+      "waiting": "Wachten",
+      "status": "{ready}/{total} gereed"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

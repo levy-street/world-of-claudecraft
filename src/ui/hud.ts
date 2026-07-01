@@ -8072,9 +8072,10 @@ export class Hud {
     // Curate-then-roll: the looter checks a subset and presses Roll. One checked
     // member is granted directly server-side; two or more open a need/greed roll for
     // just that subset. The select-all header mirrors / drives the per-member boxes.
-    const all = row.querySelector<HTMLInputElement>('.ml-all')!;
+    const all = row.querySelector<HTMLInputElement>('.ml-all');
     const pickEls = [...row.querySelectorAll<HTMLInputElement>('.ml-pick')];
-    const rollBtn = row.querySelector<HTMLButtonElement>('.ml-roll')!;
+    const rollBtn = row.querySelector<HTMLButtonElement>('.ml-roll');
+    if (!all || !rollBtn) return;
     const syncRoll = (): void => {
       const checked = pickEls.filter((p) => p.checked).length;
       rollBtn.disabled = checked === 0;
@@ -9750,12 +9751,14 @@ export class Hud {
     // (the desync/churn the master-loot control is prone to). The painter keeps the
     // built node positioned just before the leave button across member rebuilds.
     const isLeader = info.leader === this.sim.playerId;
-    const footerSig = isLeader
-      ? `lead:M${info.master.enabled ? 1 : 0}/${info.master.looter}/${info.master.threshold}:${info.members.map((m) => `${m.pid}:${m.name}`).join(',')}`
-      : 'member';
+    const ready = info.readyCheck ?? null;
+    const readySig = ready
+      ? `R:${ready.initiator}:${ready.expiresAt}:${info.members.map((m) => `${m.pid}=${ready.responses[m.pid] ?? 'pending'}`).join(',')}`
+      : 'R:none';
+    const footerSig = `${isLeader ? `lead:M${info.master.enabled ? 1 : 0}/${info.master.looter}/${info.master.threshold}:${info.members.map((m) => `${m.pid}:${m.name}`).join(',')}` : 'member'}|${readySig}`;
     if (footerSig !== this.lastPartyFooterSig) {
       this.lastPartyFooterSig = footerSig;
-      this.partyFramesPainter.setMasterControl(isLeader ? this.buildMasterLootControl(info) : null);
+      this.partyFramesPainter.setMasterControl(this.buildPartyFooter(info, isLeader));
     }
     // Hoist the cheap signature (a single string pass, no intermediate arrays) AHEAD
     // of the selector so an unchanged party short-circuits before selectPartyFrameMembers
@@ -9767,6 +9770,69 @@ export class Hud {
     this.partyFramesPainter.sync(others, info.leader, info.raid);
   }
 
+  private buildPartyFooter(info: PartyInfo, isLeader: boolean): HTMLElement | null {
+    const box = document.createElement('div');
+    box.className = 'party-footer';
+    const ready = this.buildReadyCheckControl(info, isLeader);
+    if (ready) box.appendChild(ready);
+    if (isLeader) box.appendChild(this.buildMasterLootControl(info));
+    return box.childElementCount > 0 ? box : null;
+  }
+
+  private buildReadyCheckControl(info: PartyInfo, isLeader: boolean): HTMLElement | null {
+    const ready = info.readyCheck ?? null;
+    if (!ready && !isLeader) return null;
+    const box = document.createElement('div');
+    box.className = 'party-ready panel';
+    box.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) e.preventDefault();
+    });
+    box.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    if (!ready) {
+      box.innerHTML = `<button type="button" class="party-ready-start" aria-label="${esc(t('hudChrome.readyCheck.startAria'))}">${esc(t('hudChrome.readyCheck.start'))}</button>`;
+      box.querySelector<HTMLButtonElement>('button')?.addEventListener('click', () =>
+        this.sim.readyCheckStart(),
+      );
+      return box;
+    }
+    const myStatus = ready.responses[this.sim.playerId] ?? 'pending';
+    const statuses = info.members.map((m) => ready.responses[m.pid] ?? 'pending');
+    const readyCount = statuses.filter((s) => s === 'ready').length;
+    const total = info.members.length;
+    const statusLabel =
+      myStatus === 'ready'
+        ? t('hudChrome.readyCheck.ready')
+        : myStatus === 'not_ready'
+          ? t('hudChrome.readyCheck.notReady')
+          : t('hudChrome.readyCheck.waiting');
+    box.innerHTML = `
+      <div class="party-ready-head">
+        <span>${esc(t('hudChrome.readyCheck.start'))}</span>
+        <b>${esc(
+          t('hudChrome.readyCheck.status', {
+            ready: formatNumber(readyCount, { maximumFractionDigits: 0 }),
+            total: formatNumber(total, { maximumFractionDigits: 0 }),
+          }),
+        )}</b>
+      </div>
+      <div class="party-ready-state">${esc(statusLabel)}</div>
+      ${
+        myStatus === 'pending'
+          ? `<div class="party-ready-actions">
+              <button type="button" data-ready="1">${esc(t('hudChrome.readyCheck.ready'))}</button>
+              <button type="button" data-ready="0">${esc(t('hudChrome.readyCheck.notReady'))}</button>
+            </div>`
+          : ''
+      }
+    `;
+    for (const btn of box.querySelectorAll<HTMLButtonElement>('[data-ready]')) {
+      btn.addEventListener('click', () => this.sim.readyCheckRespond(btn.dataset.ready === '1'));
+    }
+    return box;
+  }
   // Leader-only loot-method control: enable master loot, choose the master looter
   // (the leader by default), and the quality threshold for assigned drops. Returns
   // the built node; the party-frames painter owns its placement + lifetime.
@@ -9812,9 +9878,10 @@ export class Hud {
           ${thr('epic', t('hudChrome.masterLoot.thresholdEpic'))}
         </select>
       </label>`;
-    const enable = box.querySelector<HTMLInputElement>('#ml-enable')!;
-    const looter = box.querySelector<HTMLSelectElement>('#ml-looter')!;
-    const threshold = box.querySelector<HTMLSelectElement>('#ml-threshold')!;
+    const enable = box.querySelector<HTMLInputElement>('#ml-enable');
+    const looter = box.querySelector<HTMLSelectElement>('#ml-looter');
+    const threshold = box.querySelector<HTMLSelectElement>('#ml-threshold');
+    if (!enable || !looter || !threshold) return box;
     const applyMaster = (enabled: boolean) =>
       this.sim.setPartyLootMaster(
         enabled,

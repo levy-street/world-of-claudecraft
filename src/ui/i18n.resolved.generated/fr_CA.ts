@@ -637,6 +637,14 @@ export const fr_CA: EnTranslations = {
       "unassigned": "{item} n a pas ete attribue et devient libre pour tous.",
       "leaderOnly": "Seul le chef de groupe peut changer le mode de butin."
     },
+    "readyCheck": {
+      "start": "Verification de preparation",
+      "startAria": "Lancer la verification de preparation",
+      "ready": "Pret",
+      "notReady": "Pas pret",
+      "waiting": "En attente",
+      "status": "{ready}/{total} prets"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

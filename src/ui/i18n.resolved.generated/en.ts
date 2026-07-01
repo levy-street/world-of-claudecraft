@@ -637,6 +637,14 @@ export const en: EnTranslations = {
       "unassigned": "{item} was not assigned and is free for all.",
       "leaderOnly": "Only the party leader can change the loot method."
     },
+    "readyCheck": {
+      "start": "Ready Check",
+      "startAria": "Start ready check",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "waiting": "Waiting",
+      "status": "{ready}/{total} ready"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

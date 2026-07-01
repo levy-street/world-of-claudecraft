@@ -18,7 +18,7 @@
 
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
-import { DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
+import { DEFAULT_PARTY_LOOT_STRATEGIES, type ReadyCheckStatus } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
 // from sim.ts with the only code that reads them; do NOT inline new numbers.
@@ -26,6 +26,7 @@ const PARTY_MAX = 5;
 const RAID_MIN = 5;
 const RAID_MAX = 10;
 const RAID_GROUP_MAX = 5;
+const READY_CHECK_DURATION = 30;
 
 export class PartyMachine {
   // The party machine's private state (moved off Sim). Public so Sim's teardown and
@@ -132,6 +133,7 @@ export class PartyMachine {
         raid: false,
         raidGroups: new Map([[invite.fromPid, 1]]),
         lootStrategies: { ...DEFAULT_PARTY_LOOT_STRATEGIES },
+        readyCheck: null,
       };
       this.parties.set(party.id, party);
       this.partyByPid.set(invite.fromPid, party.id);
@@ -141,6 +143,7 @@ export class PartyMachine {
       return;
     }
     const raidGroup = this.nextRaidGroupFor(party);
+    party.readyCheck = null;
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
     this.partyByPid.set(r.meta.entityId, party.id);
@@ -200,6 +203,7 @@ export class PartyMachine {
     }
     if (!party.members.includes(targetPid) || targetPid === party.leader) return;
     party.leader = targetPid;
+    party.readyCheck = null;
     const newLeader = this.ctx.players.get(targetPid);
     for (const mPid of party.members) {
       this.ctx.emit({
@@ -313,6 +317,61 @@ export class PartyMachine {
     }
   }
 
+  readyCheckStart(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party) {
+      this.ctx.error(r.meta.entityId, 'You are not in a party.');
+      return;
+    }
+    if (party.leader !== r.meta.entityId) {
+      this.ctx.error(r.meta.entityId, 'You are not the party leader.');
+      return;
+    }
+    const responses = new Map<number, ReadyCheckStatus>();
+    for (const mPid of party.members) responses.set(mPid, 'pending');
+    responses.set(r.meta.entityId, 'ready');
+    party.readyCheck = {
+      initiator: r.meta.entityId,
+      expires: this.ctx.time + READY_CHECK_DURATION,
+      responses,
+    };
+  }
+
+  readyCheckRespond(ready: boolean, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party) return;
+    const check = this.activeReadyCheck(party);
+    if (!check?.responses.has(r.meta.entityId)) return;
+    check.responses.set(r.meta.entityId, ready ? 'ready' : 'not_ready');
+  }
+
+  readyCheckInfo(party: Party): {
+    initiator: number;
+    expiresAt: number;
+    responses: Record<number, ReadyCheckStatus>;
+  } | null {
+    const check = this.activeReadyCheck(party);
+    if (!check) return null;
+    return {
+      initiator: check.initiator,
+      expiresAt: check.expires,
+      responses: Object.fromEntries(check.responses),
+    };
+  }
+
+  private activeReadyCheck(party: Party): NonNullable<Party['readyCheck']> | null {
+    if (!party.readyCheck) return null;
+    if (party.readyCheck.expires <= this.ctx.time) {
+      party.readyCheck = null;
+      return null;
+    }
+    return party.readyCheck;
+  }
+
   private nextRaidGroupFor(party: Party): 1 | 2 {
     const g1 = party.members.filter((mPid) => (party.raidGroups.get(mPid) ?? 1) === 1).length;
     return g1 < RAID_GROUP_MAX ? 1 : 2;
@@ -329,6 +388,7 @@ export class PartyMachine {
     const party = this.partyOf(pid);
     if (!party) return;
     const meta = this.ctx.players.get(pid);
+    party.readyCheck = null;
     party.members = party.members.filter((m) => m !== pid);
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);

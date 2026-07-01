@@ -555,6 +555,7 @@ export interface SimContextCallbacks {
   // ownership test the /listings readout filters with. All append-only, late-bound to Sim.
   targetEntity(id: number | null, pid?: number): void;
   partyCapacity(party: Party | null): number;
+  readyCheckStart(pid?: number): void;
   marketListingBelongsTo(listing: MarketListing, meta: PlayerMeta): boolean;
 }
 
@@ -887,6 +888,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // W5 chat router/readouts reach-backs (targetEntity/partyCapacity/marketListingBelongsTo).
     targetEntity: host.targetEntity,
     partyCapacity: host.partyCapacity,
+    readyCheckStart: host.readyCheckStart,
     marketListingBelongsTo: host.marketListingBelongsTo,
   };
 }

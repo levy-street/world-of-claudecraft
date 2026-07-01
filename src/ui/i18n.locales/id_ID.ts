@@ -4843,6 +4843,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.assigned': '{looter} memberikan {item} kepada {target}.',
   'hudChrome.masterLoot.unassigned': '{item} tidak diberikan dan bebas untuk semua.',
   'hudChrome.masterLoot.leaderOnly': 'Hanya pemimpin grup yang dapat mengubah metode loot.',
+  'hudChrome.readyCheck.start': "Cek siap",
+  'hudChrome.readyCheck.startAria': "Mulai cek siap",
+  'hudChrome.readyCheck.ready': "Siap",
+  'hudChrome.readyCheck.notReady': "Belum siap",
+  'hudChrome.readyCheck.waiting': "Menunggu",
+  'hudChrome.readyCheck.status': "{ready}/{total} siap",
   'entities.itemSets.crownforged.name': 'Perlengkapan tempur Tempa Mahkota',
   'entities.itemSets.crownforged.bonus2': 'Meningkatkan daya serang sebesar 40.',
   'entities.itemSets.crownforged.bonus3':

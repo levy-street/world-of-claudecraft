@@ -201,6 +201,7 @@ const CALLBACK_KEYS = [
   // W5 chat router/readouts reach-backs.
   'targetEntity',
   'partyCapacity',
+  'readyCheckStart',
   'marketListingBelongsTo',
 ] as const;
 
@@ -431,6 +432,7 @@ function makeFakeHost() {
     // W5 chat router/readouts reach-backs.
     targetEntity: vi.fn(),
     partyCapacity: vi.fn(() => 5),
+    readyCheckStart: vi.fn(),
     marketListingBelongsTo: vi.fn(() => false),
   };
   return { host, rng, entities, clock };

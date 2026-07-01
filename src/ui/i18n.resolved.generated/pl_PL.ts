@@ -637,6 +637,14 @@ export const pl_PL: EnTranslations = {
       "unassigned": "{item} nie zostal przydzielony i jest wolny dla wszystkich.",
       "leaderOnly": "Tylko przywodca grupy moze zmienic metode lupow."
     },
+    "readyCheck": {
+      "start": "Sprawdzenie gotowosci",
+      "startAria": "Rozpocznij sprawdzenie gotowosci",
+      "ready": "Gotowy",
+      "notReady": "Nie gotowy",
+      "waiting": "Czeka",
+      "status": "{ready}/{total} gotowych"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

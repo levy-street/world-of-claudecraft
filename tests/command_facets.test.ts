@@ -123,6 +123,8 @@ const W8_TAGS: Readonly<Record<string, string>> = {
   praid: 'IWorldParty',
   punraid: 'IWorldParty',
   pmoveRaid: 'IWorldParty',
+  ready_check: 'IWorldParty',
+  ready_check_response: 'IWorldParty',
   setMarker: 'IWorldParty',
   clearMarker: 'IWorldParty',
 };

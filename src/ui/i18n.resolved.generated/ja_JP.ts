@@ -637,6 +637,14 @@ export const ja_JP: EnTranslations = {
       "unassigned": "{item}は分配されず、誰でも入手できます。",
       "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。"
     },
+    "readyCheck": {
+      "start": "レディチェック",
+      "startAria": "レディチェック開始",
+      "ready": "準備完了",
+      "notReady": "未準備",
+      "waiting": "待機中",
+      "status": "{ready}/{total} 準備完了"
+    },
     "party": {
       "promoteLeader": "パーティリーダーに指定"
     },

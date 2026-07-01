@@ -672,6 +672,15 @@ export const hudChromeStrings = {
     unassigned: '{item} was not assigned and is free for all.',
     leaderOnly: 'Only the party leader can change the loot method.',
   },
+  // Ready check: the leader-triggered group readiness prompt in the party panel.
+  readyCheck: {
+    start: 'Ready Check',
+    startAria: 'Start ready check',
+    ready: 'Ready',
+    notReady: 'Not Ready',
+    waiting: 'Waiting',
+    status: '{ready}/{total} ready',
+  },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
   // hud_chrome domain so an English-only PR compiles; the new-leader announcement

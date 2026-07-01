@@ -2381,6 +2381,12 @@ export class GameServer {
         if (typeof msg.id === 'number' && (msg.group === 1 || msg.group === 2))
           sim.moveRaidMember(msg.id, msg.group, pid);
         break;
+      case 'ready_check':
+        sim.readyCheckStart(pid);
+        break;
+      case 'ready_check_response':
+        if (typeof msg.ready === 'boolean') sim.readyCheckRespond(msg.ready, pid);
+        break;
       case 'setLootMaster':
         if (
           typeof msg.enabled === 'boolean' &&

@@ -2,6 +2,7 @@ import type {
   MasterLootSettings,
   MasterLootThreshold,
   PlayerClass,
+  ReadyCheckStatus,
   ResourceType,
 } from '../sim/types';
 
@@ -22,10 +23,17 @@ export interface PartyMemberInfo {
   group: 1 | 2;
 }
 
+export interface ReadyCheckInfo {
+  initiator: number;
+  expiresAt: number;
+  responses: Record<number, ReadyCheckStatus>;
+}
+
 export interface PartyInfo {
   leader: number;
   raid: boolean;
   master: MasterLootSettings;
+  readyCheck?: ReadyCheckInfo | null;
   members: PartyMemberInfo[];
 }
 
@@ -42,6 +50,8 @@ export interface IWorldParty {
   convertPartyToRaid(): void;
   convertRaidToParty(): void;
   moveRaidMember(targetPid: number, group: 1 | 2): void;
+  readyCheckStart(): void;
+  readyCheckRespond(ready: boolean): void;
   // master loot (leader-only setter; master looter assigns threshold drops)
   setPartyLootMaster(enabled: boolean, looter: number, threshold: MasterLootThreshold): void;
   // The master looter's checked subset: 1 pid grants directly, 2+ opens a roll.

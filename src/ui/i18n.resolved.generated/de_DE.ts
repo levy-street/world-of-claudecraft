@@ -637,6 +637,14 @@ export const de_DE: EnTranslations = {
       "unassigned": "{item} wurde nicht zugewiesen und ist fuer alle frei.",
       "leaderOnly": "Nur der Gruppenleiter kann die Beutemethode aendern."
     },
+    "readyCheck": {
+      "start": "Bereitschaftscheck",
+      "startAria": "Bereitschaftscheck starten",
+      "ready": "Bereit",
+      "notReady": "Nicht bereit",
+      "waiting": "Wartet",
+      "status": "{ready}/{total} bereit"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

@@ -637,6 +637,14 @@ export const zh_CN: EnTranslations = {
       "unassigned": "{item}未被分配，现可自由拾取。",
       "leaderOnly": "只有队长才能更改拾取方式。"
     },
+    "readyCheck": {
+      "start": "准备确认",
+      "startAria": "开始准备确认",
+      "ready": "已准备",
+      "notReady": "未准备",
+      "waiting": "等待中",
+      "status": "{ready}/{total} 已准备"
+    },
     "party": {
       "promoteLeader": "提升为队长"
     },

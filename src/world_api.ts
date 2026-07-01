@@ -90,7 +90,7 @@ export type {
 } from './world_api/duel_arena';
 export type { RaidLockout } from './world_api/dungeons';
 export type { MarketInfo, MarketListingView } from './world_api/market';
-export type { PartyInfo, PartyMemberInfo } from './world_api/party';
+export type { PartyInfo, PartyMemberInfo, ReadyCheckInfo } from './world_api/party';
 export type { GuildLeaderboardEntry, LeaderboardEntry } from './world_api/progression_xp';
 export type {
   CharacterSearchResult,
@@ -259,6 +259,8 @@ export const COMMAND_NAMES = [
   'lockpick_abort',
   'collect_delve_chest_loot',
   'telemetry',
+  'ready_check',
+  'ready_check_response',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -381,6 +383,8 @@ export const COMMAND_FACETS = {
   masterAssign: 'IWorldParty',
   setMarker: 'IWorldParty',
   clearMarker: 'IWorldParty',
+  ready_check: 'IWorldParty',
+  ready_check_response: 'IWorldParty',
   // IWorldTrade: peer-to-peer trade-window commands (tradeInfo is a snapshot read,
   // no send).
   trade_req: 'IWorldTrade',

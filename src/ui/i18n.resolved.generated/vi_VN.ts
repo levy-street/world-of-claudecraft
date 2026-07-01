@@ -637,6 +637,14 @@ export const vi_VN: EnTranslations = {
       "unassigned": "{item} chua duoc gan va moi nguoi deu co the nhat.",
       "leaderOnly": "Chi truong nhom co the doi phuong thuc chien loi pham."
     },
+    "readyCheck": {
+      "start": "Kiem tra san sang",
+      "startAria": "Bat dau kiem tra san sang",
+      "ready": "San sang",
+      "notReady": "Chua san sang",
+      "waiting": "Dang cho",
+      "status": "{ready}/{total} san sang"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

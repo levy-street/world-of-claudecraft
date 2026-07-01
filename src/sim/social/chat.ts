@@ -139,6 +139,11 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  if (/^\/readycheck(?:\s|$)/i.test(raw)) {
+    ctx.readyCheckStart(r.meta.entityId);
+    return null;
+  }
+
   if (ctx.devCommands) {
     const devHandled = handleDevChat(ctx, raw, r.meta.entityId);
     if (devHandled !== undefined && devHandled !== null) return devHandled;
@@ -926,7 +931,7 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
+    'Other commands: /join <world|lfg>, /roll, /readycheck, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
     'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',

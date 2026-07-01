@@ -637,6 +637,14 @@ export const sv_SE: EnTranslations = {
       "unassigned": "{item} tilldelades inte och ar fritt for alla.",
       "leaderOnly": "Endast gruppledaren kan andra lootmetoden."
     },
+    "readyCheck": {
+      "start": "Redokontroll",
+      "startAria": "Starta redokontroll",
+      "ready": "Redo",
+      "notReady": "Inte redo",
+      "waiting": "Vantar",
+      "status": "{ready}/{total} redo"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

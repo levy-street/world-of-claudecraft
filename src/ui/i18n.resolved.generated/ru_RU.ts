@@ -637,6 +637,14 @@ export const ru_RU: EnTranslations = {
       "unassigned": "Предмет {item} не был назначен и доступен всем.",
       "leaderOnly": "Только лидер группы может менять способ добычи."
     },
+    "readyCheck": {
+      "start": "Проверка готовности",
+      "startAria": "Начать проверку готовности",
+      "ready": "Готов",
+      "notReady": "Не готов",
+      "waiting": "Ожидание",
+      "status": "{ready}/{total} готовы"
+    },
     "party": {
       "promoteLeader": "Назначить лидером"
     },

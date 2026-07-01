@@ -637,6 +637,14 @@ export const da_DK: EnTranslations = {
       "unassigned": "{item} blev ikke tildelt og er frit for alle.",
       "leaderOnly": "Kun gruppelederen kan aendre lootmetoden."
     },
+    "readyCheck": {
+      "start": "Klarhedstjek",
+      "startAria": "Start klarhedstjek",
+      "ready": "Klar",
+      "notReady": "Ikke klar",
+      "waiting": "Venter",
+      "status": "{ready}/{total} klar"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

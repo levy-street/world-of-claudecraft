@@ -637,6 +637,14 @@ export const es: EnTranslations = {
       "unassigned": "{item} no fue asignado y queda libre para todos.",
       "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin."
     },
+    "readyCheck": {
+      "start": "Comprobacion de listos",
+      "startAria": "Iniciar comprobacion de listos",
+      "ready": "Listo",
+      "notReady": "No listo",
+      "waiting": "Esperando",
+      "status": "{ready}/{total} listos"
+    },
     "party": {
       "promoteLeader": "Promote to Leader"
     },

@@ -281,6 +281,7 @@ import {
   type LootRollChoice,
   type LootRollPrompt,
   type LootStrategies,
+  type ReadyCheckStatus,
   MAX_LEVEL,
   type MasterLootThreshold,
   MELEE_RANGE,
@@ -457,6 +458,13 @@ export interface Party {
   raid: boolean;
   raidGroups: Map<number, 1 | 2>; // pid -> raid subgroup
   lootStrategies: LootStrategies;
+  readyCheck?: PartyReadyCheck | null;
+}
+
+export interface PartyReadyCheck {
+  initiator: number;
+  expires: number;
+  responses: Map<number, ReadyCheckStatus>;
 }
 
 export interface TradeSession {
@@ -2183,6 +2191,7 @@ export class Sim {
       // Market instance (constructed after this literal) for listing ownership.
       targetEntity: (id, pid) => sim.targetEntity(id, pid),
       partyCapacity: (party) => sim.party.partyCapacity(party),
+      readyCheckStart: sim.readyCheckStart.bind(sim),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
     };
     return createSimContext(host);
@@ -4635,6 +4644,14 @@ export class Sim {
   moveRaidMember(targetPid: number, group: 1 | 2, pid?: number): void {
     this.party.moveRaidMember(targetPid, group, pid);
   }
+
+  readyCheckStart(pid?: number): void {
+    this.party.readyCheckStart(pid);
+  }
+
+  readyCheckRespond(ready: boolean, pid?: number): void {
+    this.party.readyCheckRespond(ready, pid);
+  }
   // nextRaidGroupFor / normalizeRaidGroups / removeFromParty moved to the
   // PartyMachine (src/sim/social/party.ts, A1). removeFromParty is reachable by
   // removePlayer through `this.ctx.removeFromParty` (the SimContext seam).
@@ -5212,6 +5229,7 @@ export class Sim {
       leader: party.leader,
       raid: party.raid,
       master: { ...party.lootStrategies.master },
+      readyCheck: this.party.readyCheckInfo(party),
       members: party.members.flatMap((mPid) => {
         const meta = this.players.get(mPid);
         const e = this.entities.get(mPid);
