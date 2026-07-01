@@ -29,6 +29,7 @@ const entrySource = `
   export { ZONE2_MOBS } from './src/sim/content/zone2.ts';
   export { ZONE3_MOBS } from './src/sim/content/zone3.ts';
   export { TEMPLE_MOBS } from './src/sim/content/temple.ts';
+  export { VALDRIS_MOBS } from './src/sim/content/valdris/index.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
 `;
@@ -61,6 +62,7 @@ const {
   ZONE2_MOBS,
   ZONE3_MOBS,
   TEMPLE_MOBS,
+  VALDRIS_MOBS,
   DELVE_LIST,
   NPCS,
   DELVE_COMPANIONS,
@@ -223,6 +225,7 @@ const FAMILY_ORDER = [
   'undead',
   'elemental',
   'dragonkin',
+  'demon', // wild demons first appear in The Breach (Valdris)
 ];
 // A creature only belongs in the public bestiary if it actually spawns in the open world,
 // i.e. it appears in a camp spawn list (CAMPS merges every zone's camps plus the temple's).
@@ -235,6 +238,7 @@ for (const [id, m] of Object.entries({
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
   ...TEMPLE_MOBS,
+  ...VALDRIS_MOBS,
 })) {
   if (m.elite || m.boss) continue;
   if (id.startsWith('warlock_')) continue; // summoned pets, not wild creatures

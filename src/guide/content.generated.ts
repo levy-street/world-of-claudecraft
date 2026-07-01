@@ -1264,6 +1264,252 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Gravewyrm Sanctum"
     ],
     "welcome": "Captain Thessaly holds the wall at Highwatch — barely."
+  },
+  {
+    "id": "ossara_domain",
+    "name": "Ossara Domain",
+    "min": 20,
+    "max": 28,
+    "biome": "desert",
+    "hub": "Qesh Aram",
+    "pois": [
+      "Qesh Aram",
+      "The Caravan Road",
+      "Prowler Dunes",
+      "Glasswind Flats",
+      "Sunken Aqueduct",
+      "Tombs of the Nameless",
+      "Mirage Oasis",
+      "Duststorm Rise",
+      "Judges' Terrace",
+      "Bonewind Barrens"
+    ],
+    "welcome": "Judge Saphira keeps the caravan road open from Qesh Aram, barely."
+  },
+  {
+    "id": "veth_confederation",
+    "name": "Veth Confederation",
+    "min": 27,
+    "max": 34,
+    "biome": "shadowwood",
+    "hub": "Nighthollow",
+    "pois": [
+      "Nighthollow",
+      "Duskmane Run",
+      "Palewidow Hollows",
+      "Blackwater Quays",
+      "The Whisper Market",
+      "The Blackmere",
+      "Wispwood",
+      "The Silent Court",
+      "Frostpine Terraces",
+      "The Last Lodge"
+    ],
+    "welcome": "Veth is not a nation, it is an agreement, and Nighthollow keeps its ledger."
+  },
+  {
+    "id": "kael_empire",
+    "name": "Kael Empire",
+    "min": 33,
+    "max": 40,
+    "biome": "highlands",
+    "hub": "Kaelspire",
+    "pois": [
+      "Kaelspire",
+      "The Tithe Road",
+      "The Imperial Granaries",
+      "Wolfsward Pines",
+      "The Tithe House",
+      "Silverbrook Millpond",
+      "Ironhold Mine",
+      "The Broken Legion Camp",
+      "Frosthelm Ascent"
+    ],
+    "welcome": "Marshal Corvin keeps the Tithe Road open from Kaelspire; the Empire expects it kept."
+  },
+  {
+    "id": "grey_hollows",
+    "name": "Grey Hollows",
+    "min": 28,
+    "max": 45,
+    "biome": "highlands",
+    "hub": "The Underway Rest",
+    "pois": [
+      "The Underway Rest",
+      "The Old South Road",
+      "Sunken Mouths",
+      "The Gnaw Warrens",
+      "Shale Gallery",
+      "Smugglers Spoil"
+    ],
+    "welcome": "Half of the Grey Hollows is underfoot, and none of it is empty."
+  },
+  {
+    "id": "thornfen_border",
+    "name": "Thornfen Border",
+    "min": 30,
+    "max": 46,
+    "biome": "shadowwood",
+    "hub": "Wardens Palisade",
+    "pois": [
+      "Wardens Palisade",
+      "Creeper Hollows",
+      "The Moving Wood",
+      "Troll Fen",
+      "Briarheart Thicket"
+    ],
+    "welcome": "The wardens mark the trees every night; by morning the marks have moved."
+  },
+  {
+    "id": "ironpass_crossing",
+    "name": "Ironpass Crossing",
+    "min": 30,
+    "max": 50,
+    "biome": "peaks",
+    "hub": "The Tollhouse",
+    "pois": [
+      "The Tollhouse",
+      "The Banner Road",
+      "Raider Bluffs",
+      "The Ogre Toll",
+      "Cragfall Slopes",
+      "Wyvern Eyries"
+    ],
+    "welcome": "Every banner on the pass claims the road; the Tollhouse just charges them all."
+  },
+  {
+    "id": "emberveil_marshes",
+    "name": "Emberveil Marshes",
+    "min": 32,
+    "max": 48,
+    "biome": "marsh",
+    "hub": "Lanternfen Stilts",
+    "pois": [
+      "Lanternfen Stilts",
+      "Bloatwater Shallows",
+      "The Steaming Pools",
+      "Silkstrand Mire",
+      "The Fogwall"
+    ],
+    "welcome": "The fog over Emberveil has never lifted; bring your own light."
+  },
+  {
+    "id": "pale_crossing",
+    "name": "Pale Crossing",
+    "min": 34,
+    "max": 50,
+    "biome": "vale",
+    "hub": "Bridgewatch",
+    "pois": [
+      "Bridgewatch",
+      "The Kneeling Stones",
+      "The Pale Bridge",
+      "Drowned Banks",
+      "Gullwatch Rise"
+    ],
+    "welcome": "Every faction claims it built the Pale Bridge; the bridge has never agreed."
+  },
+  {
+    "id": "the_breach",
+    "name": "The Breach",
+    "min": 45,
+    "max": 60,
+    "biome": "scorched",
+    "hub": "Last Bastion",
+    "pois": [
+      "Last Bastion",
+      "The Sundered Field",
+      "The Ember Scar",
+      "The Ashen Saps",
+      "The Broken Siege Line",
+      "Wreck of the Third Offensive",
+      "The Shattered Vanguard",
+      "The First Crater",
+      "The Molten Gate",
+      "Khorvax's Redoubt"
+    ],
+    "welcome": "No banner holds The Breach. The truce ends at the Last Bastion palisade; beyond it there is only the war."
+  },
+  {
+    "id": "ashveil_wastes",
+    "name": "Ashveil Wastes",
+    "min": 35,
+    "max": 45,
+    "biome": "scorched",
+    "hub": "Cinderrest",
+    "pois": [
+      "Cinderrest",
+      "The Charred Furrows",
+      "Bonewhite Tor",
+      "The Smolder Line",
+      "Ashfall Reach"
+    ],
+    "welcome": "These fields fed half a kingdom once. One battle burned them for years; Cinderrest is what grew back."
+  },
+  {
+    "id": "saltbone_flats",
+    "name": "Saltbone Flats",
+    "min": 36,
+    "max": 48,
+    "biome": "salt",
+    "hub": "Brinehollow",
+    "pois": [
+      "Brinehollow",
+      "The Glare Flats",
+      "The Great Ribcage",
+      "Bonepicker Trails",
+      "The Sunken Vertebrae"
+    ],
+    "welcome": "A white glare, colossal bones, and no two stories about them that agree. Brinehollow trades with all of them."
+  },
+  {
+    "id": "duskwall_ruins",
+    "name": "Duskwall Ruins",
+    "min": 35,
+    "max": 50,
+    "biome": "scorched",
+    "hub": "the Exile Market",
+    "pois": [
+      "The Exile Market",
+      "The Broken Gate",
+      "The Old Boulevard",
+      "The Collapsed Quarter",
+      "Old Duskwall Sewers",
+      "The King's Midden"
+    ],
+    "welcome": "Duskwall died in the war thirty years ago. Everything picking through it now claims to be a scavenger."
+  },
+  {
+    "id": "cindral_ridge",
+    "name": "Cindral Ridge",
+    "min": 38,
+    "max": 52,
+    "biome": "scorched",
+    "hub": "Forgefall Camp",
+    "pois": [
+      "Forgefall Camp",
+      "The Slag Steps",
+      "The Abandoned Diggings",
+      "Magmavein Gulch",
+      "The Smeltheart Vent"
+    ],
+    "welcome": "The ridge is full of forge-metal, and the dwarves of Forgefall Camp have spent decades failing to hold it."
+  },
+  {
+    "id": "redspire_pass",
+    "name": "Redspire Pass",
+    "min": 40,
+    "max": 55,
+    "biome": "scorched",
+    "hub": "the Last Waymeet",
+    "pois": [
+      "The Last Waymeet",
+      "The Broken Teeth",
+      "Deserter Hollows",
+      "The Silent Muster",
+      "The Rim of the World"
+    ],
+    "welcome": "Past the Last Waymeet there is only red rock, the old deserters, and the rim of the known world."
   }
 ];
 
@@ -1424,6 +1670,156 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_wolf",
         "tint": "#8c8270",
         "still": "/guide-stills/mob_wolf__8c8270.webp"
+      },
+      {
+        "name": "Dune Prowler",
+        "min": 20,
+        "max": 22,
+        "rare": false,
+        "templateId": "dune_prowler",
+        "model": "mob_wolf",
+        "tint": "#c9a86a",
+        "still": "/guide-stills/mob_wolf__c9a86a.webp"
+      },
+      {
+        "name": "Mirage Stalker",
+        "min": 23,
+        "max": 25,
+        "rare": false,
+        "templateId": "mirage_stalker",
+        "model": "mob_wolf",
+        "tint": "#d8c9a3",
+        "still": "/guide-stills/mob_wolf__d8c9a3.webp"
+      },
+      {
+        "name": "Bonewind Ravager",
+        "min": 26,
+        "max": 28,
+        "rare": false,
+        "templateId": "bonewind_ravager",
+        "model": "mob_wolf",
+        "tint": "#b99a66",
+        "still": "/guide-stills/mob_wolf__b99a66.webp"
+      },
+      {
+        "name": "Duskmane Stalker",
+        "min": 27,
+        "max": 29,
+        "rare": false,
+        "templateId": "duskmane_stalker",
+        "model": "mob_wolf",
+        "tint": "#4a4a5e",
+        "still": "/guide-stills/mob_wolf__4a4a5e.webp"
+      },
+      {
+        "name": "Hollow Lurker",
+        "min": 28,
+        "max": 31,
+        "rare": false,
+        "templateId": "hollow_lurker",
+        "model": "mob_wolf",
+        "tint": "#4a4a58",
+        "still": "/guide-stills/mob_wolf__4a4a58.webp"
+      },
+      {
+        "name": "Rimeclaw Prowler",
+        "min": 32,
+        "max": 34,
+        "rare": false,
+        "templateId": "rimeclaw_prowler",
+        "model": "mob_wolf",
+        "tint": "#b9c8d2",
+        "still": "/guide-stills/mob_wolf__b9c8d2.webp"
+      },
+      {
+        "name": "Thorn-Warped Stag",
+        "min": 33,
+        "max": 36,
+        "rare": false,
+        "templateId": "thornwarped_stag",
+        "model": "mob_stag",
+        "tint": "#7a5f43",
+        "still": "/guide-stills/mob_stag__7a5f43.webp"
+      },
+      {
+        "name": "Wolfsward Packwolf",
+        "min": 33,
+        "max": 35,
+        "rare": false,
+        "templateId": "wolfsward_packwolf",
+        "model": "mob_wolf",
+        "tint": "#9aa3ad",
+        "still": "/guide-stills/mob_wolf__9aa3ad.webp"
+      },
+      {
+        "name": "Reagent-Fat Leech",
+        "min": 35,
+        "max": 38,
+        "rare": false,
+        "templateId": "emberveil_leech",
+        "model": "mob_wolf",
+        "tint": "#6a4b52",
+        "still": "/guide-stills/mob_wolf__6a4b52.webp"
+      },
+      {
+        "name": "Cinder Hound",
+        "min": 36,
+        "max": 38,
+        "rare": false,
+        "templateId": "cinder_hound",
+        "model": "mob_wolf",
+        "tint": "#8a4a2e",
+        "still": "/guide-stills/mob_wolf__8a4a2e.webp"
+      },
+      {
+        "name": "Frosthelm Icehowler",
+        "min": 37,
+        "max": 39,
+        "rare": false,
+        "templateId": "frosthelm_icehowler",
+        "model": "mob_wolf",
+        "tint": "#d7e4ec",
+        "still": "/guide-stills/mob_wolf__d7e4ec.webp"
+      },
+      {
+        "name": "Frosthelm Wendigo",
+        "min": 38,
+        "max": 40,
+        "rare": false,
+        "templateId": "frosthelm_wendigo",
+        "model": "mob_bear",
+        "tint": "#5a4030",
+        "still": "/guide-stills/mob_bear__5a4030.webp"
+      },
+      {
+        "name": "Warped Warhound",
+        "min": 45,
+        "max": 47,
+        "rare": false,
+        "templateId": "warped_warhound",
+        "model": "mob_wolf",
+        "tint": "#6e5a4a",
+        "still": "/guide-stills/mob_wolf__6e5a4a.webp"
+      },
+      {
+        "name": "Gutter Hound",
+        "min": 46,
+        "max": 49,
+        "rare": false,
+        "templateId": "gutter_hound",
+        "model": "mob_wolf",
+        "tint": "#6e5b43",
+        "still": "/guide-stills/mob_wolf__6e5b43.webp"
+      },
+      {
+        "name": "Spire Stalker",
+        "min": 47,
+        "max": 51,
+        "rare": false,
+        "templateId": "spire_stalker",
+        "model": "mob_wolf",
+        "tint": "#7d4f3a",
+        "still": "/guide-stills/mob_wolf__7d4f3a.webp"
       }
     ]
   },
@@ -1449,6 +1845,66 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_spider",
         "tint": "#283747",
         "still": "/guide-stills/mob_spider__283747.webp"
+      },
+      {
+        "name": "Glasswind Scorpion",
+        "min": 21,
+        "max": 23,
+        "rare": false,
+        "templateId": "glasswind_scorpion",
+        "model": "mob_spider",
+        "tint": "#d9c48b",
+        "still": "/guide-stills/mob_spider__d9c48b.webp"
+      },
+      {
+        "name": "Palewidow Weaver",
+        "min": 27,
+        "max": 29,
+        "rare": false,
+        "templateId": "palewidow_weaver",
+        "model": "mob_spider",
+        "tint": "#d8d4e0",
+        "still": "/guide-stills/mob_spider__d8d4e0.webp"
+      },
+      {
+        "name": "Thornfen Creeper",
+        "min": 30,
+        "max": 33,
+        "rare": false,
+        "templateId": "thornfen_creeper",
+        "model": "mob_spider",
+        "tint": "#3f5a3a",
+        "still": "/guide-stills/mob_spider__3f5a3a.webp"
+      },
+      {
+        "name": "Brine Scuttler",
+        "min": 38,
+        "max": 41,
+        "rare": false,
+        "templateId": "brine_scuttler",
+        "model": "mob_spider",
+        "tint": "#bfd8d8",
+        "still": "/guide-stills/mob_spider__bfd8d8.webp"
+      },
+      {
+        "name": "Mire Strider",
+        "min": 39,
+        "max": 43,
+        "rare": false,
+        "templateId": "mire_strider",
+        "model": "mob_spider",
+        "tint": "#556655",
+        "still": "/guide-stills/mob_spider__556655.webp"
+      },
+      {
+        "name": "Sewer Broodspider",
+        "min": 43,
+        "max": 46,
+        "rare": false,
+        "templateId": "sewer_broodspider",
+        "model": "mob_spider",
+        "tint": "#4a5a3d",
+        "still": "/guide-stills/mob_spider__4a5a3d.webp"
       }
     ]
   },
@@ -1484,6 +1940,26 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_murloc",
         "tint": "#8fb6c4",
         "still": "/guide-stills/mob_murloc__8fb6c4.webp"
+      },
+      {
+        "name": "Blackriver Skulker",
+        "min": 28,
+        "max": 30,
+        "rare": false,
+        "templateId": "blackriver_skulker",
+        "model": "mob_murloc",
+        "tint": "#3d5a66",
+        "still": "/guide-stills/mob_murloc__3d5a66.webp"
+      },
+      {
+        "name": "Emberveil Bloat",
+        "min": 32,
+        "max": 35,
+        "rare": false,
+        "templateId": "emberveil_bloat",
+        "model": "mob_murloc",
+        "tint": "#86a05a",
+        "still": "/guide-stills/mob_murloc__86a05a.webp"
       }
     ]
   },
@@ -1509,6 +1985,46 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_kobold",
         "tint": "#9c7a3c",
         "still": "/guide-stills/mob_kobold__9c7a3c.webp"
+      },
+      {
+        "name": "Ironhold Digger",
+        "min": 34,
+        "max": 36,
+        "rare": false,
+        "templateId": "ironhold_digger",
+        "model": "mob_kobold",
+        "tint": "#8a6b4a",
+        "still": "/guide-stills/mob_kobold__8a6b4a.webp"
+      },
+      {
+        "name": "Ironhold Geomancer",
+        "min": 35,
+        "max": 37,
+        "rare": false,
+        "templateId": "ironhold_geomancer",
+        "model": "mob_kobold",
+        "tint": "#9a7d52",
+        "still": "/guide-stills/mob_kobold__9a7d52.webp"
+      },
+      {
+        "name": "Pale Gnawer",
+        "min": 35,
+        "max": 39,
+        "rare": false,
+        "templateId": "pale_gnawer",
+        "model": "mob_kobold",
+        "tint": "#cabfa8",
+        "still": "/guide-stills/mob_kobold__cabfa8.webp"
+      },
+      {
+        "name": "Claim-Jumper Sapper",
+        "min": 45,
+        "max": 48,
+        "rare": false,
+        "templateId": "claimjumper_sapper",
+        "model": "mob_kobold",
+        "tint": "#8a6a3a",
+        "still": "/guide-stills/mob_kobold__8a6a3a.webp"
       }
     ]
   },
@@ -1574,6 +2090,126 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_dark_caster",
         "tint": "#533566",
         "still": "/guide-stills/mob_dark_caster__533566.webp"
+      },
+      {
+        "name": "Tombrobber Scavenger",
+        "min": 22,
+        "max": 24,
+        "rare": false,
+        "templateId": "tombrobber_scavenger",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Guildless Cutthroat",
+        "min": 30,
+        "max": 32,
+        "rare": false,
+        "templateId": "guildless_cutthroat",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Pass Raider",
+        "min": 30,
+        "max": 34,
+        "rare": false,
+        "templateId": "pass_raider",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Underway Renegade",
+        "min": 30,
+        "max": 34,
+        "rare": false,
+        "templateId": "underway_renegade",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Bridge Cultist",
+        "min": 34,
+        "max": 37,
+        "rare": false,
+        "templateId": "bridge_cultist",
+        "model": "mob_dark_caster",
+        "tint": "#776688",
+        "still": "/guide-stills/mob_dark_caster__776688.webp"
+      },
+      {
+        "name": "Broken Legion Deserter",
+        "min": 35,
+        "max": 37,
+        "rare": false,
+        "templateId": "broken_legion_deserter",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Duskwall Scavenger",
+        "min": 35,
+        "max": 38,
+        "rare": false,
+        "templateId": "duskwall_scavenger",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Broken Legion Arbalist",
+        "min": 36,
+        "max": 38,
+        "rare": false,
+        "templateId": "broken_legion_arbalist",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Veilstalker",
+        "min": 38,
+        "max": 40,
+        "rare": false,
+        "templateId": "veilstalker",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Bonepicker Renegade",
+        "min": 41,
+        "max": 44,
+        "rare": false,
+        "templateId": "bonepicker_renegade",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Not-Quite-Man",
+        "min": 51,
+        "max": 54,
+        "rare": false,
+        "templateId": "not_quite_man",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+      },
+      {
+        "name": "Breachsworn Deserter",
+        "min": 54,
+        "max": 56,
+        "rare": false,
+        "templateId": "breachsworn_deserter",
+        "model": "mob_bandit",
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
       }
     ]
   },
@@ -1599,6 +2235,26 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_troll",
         "tint": "#145a32",
         "still": "/guide-stills/mob_troll__145a32.webp"
+      },
+      {
+        "name": "Frostpine Headhunter",
+        "min": 32,
+        "max": 34,
+        "rare": false,
+        "templateId": "frostpine_headhunter",
+        "model": "mob_troll",
+        "tint": "#6e8a94",
+        "still": "/guide-stills/mob_troll__6e8a94.webp"
+      },
+      {
+        "name": "Thornfen Troll",
+        "min": 37,
+        "max": 41,
+        "rare": false,
+        "templateId": "thornfen_troll",
+        "model": "mob_troll",
+        "tint": "#5d7a4e",
+        "still": "/guide-stills/mob_troll__5d7a4e.webp"
       }
     ]
   },
@@ -1614,6 +2270,46 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_ogre",
         "tint": "#9e7b53",
         "still": "/guide-stills/mob_ogre__9e7b53.webp"
+      },
+      {
+        "name": "Crag Ogre Toller",
+        "min": 36,
+        "max": 40,
+        "rare": false,
+        "templateId": "crag_toller",
+        "model": "mob_ogre",
+        "tint": "#9c8b70",
+        "still": "/guide-stills/mob_ogre__9c8b70.webp"
+      },
+      {
+        "name": "Sellsword Ogre",
+        "min": 37,
+        "max": 39,
+        "rare": false,
+        "templateId": "sellsword_ogre",
+        "model": "mob_ogre",
+        "tint": "#b9975b",
+        "still": "/guide-stills/mob_ogre__b9975b.webp"
+      },
+      {
+        "name": "Slag Ogre",
+        "min": 48,
+        "max": 51,
+        "rare": false,
+        "templateId": "slag_ogre",
+        "model": "mob_ogre",
+        "tint": "#5f5a52",
+        "still": "/guide-stills/mob_ogre__5f5a52.webp"
+      },
+      {
+        "name": "Breach Scavenger Ogre",
+        "min": 55,
+        "max": 57,
+        "rare": false,
+        "templateId": "breach_scavenger_ogre",
+        "model": "mob_bruiser",
+        "tint": "#8a7a5c",
+        "still": "/guide-stills/mob_bruiser__8a7a5c.webp"
       }
     ]
   },
@@ -1659,6 +2355,136 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "skel_warrior",
         "tint": "#cacfd2",
         "still": "/guide-stills/skel_warrior__cacfd2.webp"
+      },
+      {
+        "name": "Sandbound Shade",
+        "min": 23,
+        "max": 25,
+        "rare": false,
+        "templateId": "sandbound_shade",
+        "model": "skel_minion",
+        "tint": "#d8cdb0",
+        "still": "/guide-stills/skel_minion__d8cdb0.webp"
+      },
+      {
+        "name": "Forsaken Judge",
+        "min": 26,
+        "max": 28,
+        "rare": false,
+        "templateId": "forsaken_judge",
+        "model": "skel_minion",
+        "tint": "#bfae8e",
+        "still": "/guide-stills/skel_minion__bfae8e.webp"
+      },
+      {
+        "name": "Blackmere Drowned",
+        "min": 29,
+        "max": 31,
+        "rare": false,
+        "templateId": "blackmere_drowned",
+        "model": "skel_minion",
+        "tint": "#46605a",
+        "still": "/guide-stills/skel_minion__46605a.webp"
+      },
+      {
+        "name": "Hollow Revenant",
+        "min": 31,
+        "max": 33,
+        "rare": false,
+        "templateId": "hollow_revenant",
+        "model": "mob_dark_caster",
+        "tint": "#b8c4d0",
+        "still": "/guide-stills/mob_dark_caster__b8c4d0.webp"
+      },
+      {
+        "name": "Ash Ghoul",
+        "min": 35,
+        "max": 37,
+        "rare": false,
+        "templateId": "ash_ghoul",
+        "model": "skel_rogue",
+        "tint": "#9a9187",
+        "still": "/guide-stills/skel_rogue__9a9187.webp"
+      },
+      {
+        "name": "Gull-Picked Skeleton",
+        "min": 38,
+        "max": 41,
+        "rare": false,
+        "templateId": "gullpicked_skeleton",
+        "model": "skel_warrior",
+        "tint": "#d6d0bd",
+        "still": "/guide-stills/skel_warrior__d6d0bd.webp"
+      },
+      {
+        "name": "Rubble Haunt",
+        "min": 39,
+        "max": 42,
+        "rare": false,
+        "templateId": "rubble_haunt",
+        "model": "skel_mage",
+        "tint": "#8d8a93",
+        "still": "/guide-stills/skel_mage__8d8a93.webp"
+      },
+      {
+        "name": "Deserter Wraith",
+        "min": 40,
+        "max": 44,
+        "rare": false,
+        "templateId": "deserter_wraith",
+        "model": "mob_dark_caster",
+        "tint": "#8f9bb0",
+        "still": "/guide-stills/mob_dark_caster__8f9bb0.webp"
+      },
+      {
+        "name": "Riverbank Revenant",
+        "min": 42,
+        "max": 46,
+        "rare": false,
+        "templateId": "riverbank_revenant",
+        "model": "skel_warrior",
+        "tint": "#7c95a0",
+        "still": "/guide-stills/skel_warrior__7c95a0.webp"
+      },
+      {
+        "name": "Fog Wraith",
+        "min": 44,
+        "max": 48,
+        "rare": false,
+        "templateId": "fog_wraith",
+        "model": "mob_dark_caster",
+        "tint": "#b8c4c8",
+        "still": "/guide-stills/mob_dark_caster__b8c4c8.webp"
+      },
+      {
+        "name": "Salt Wraith",
+        "min": 44,
+        "max": 47,
+        "rare": false,
+        "templateId": "salt_wraith",
+        "model": "mob_dark_caster",
+        "tint": "#dfe8e6",
+        "still": "/guide-stills/mob_dark_caster__dfe8e6.webp"
+      },
+      {
+        "name": "Ember Revenant",
+        "min": 48,
+        "max": 50,
+        "rare": false,
+        "templateId": "ember_revenant",
+        "model": "skel_warrior",
+        "tint": "#d06a3c",
+        "still": "/guide-stills/skel_warrior__d06a3c.webp"
+      },
+      {
+        "name": "Ash Wraith",
+        "min": 52,
+        "max": 54,
+        "rare": false,
+        "templateId": "ash_wraith",
+        "model": "skel_minion",
+        "tint": "#9a9aa8",
+        "still": "/guide-stills/skel_minion__9a9aa8.webp"
       }
     ]
   },
@@ -1684,6 +2510,116 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_elemental",
         "tint": "#aed6f1",
         "still": "/guide-stills/mob_elemental__aed6f1.webp"
+      },
+      {
+        "name": "Duststorm Elemental",
+        "min": 24,
+        "max": 26,
+        "rare": false,
+        "templateId": "duststorm_elemental",
+        "model": "mob_elemental",
+        "tint": "#cbb27a",
+        "still": "/guide-stills/mob_elemental__cbb27a.webp"
+      },
+      {
+        "name": "Feral Wisp",
+        "min": 29,
+        "max": 31,
+        "rare": false,
+        "templateId": "feral_wisp",
+        "model": "mob_elemental",
+        "tint": "#9fd4e8",
+        "still": "/guide-stills/mob_elemental__9fd4e8.webp"
+      },
+      {
+        "name": "Colossid Fragment",
+        "min": 36,
+        "max": 39,
+        "rare": false,
+        "templateId": "colossid_fragment",
+        "model": "mob_elemental",
+        "tint": "#e8e3d5",
+        "still": "/guide-stills/mob_elemental__e8e3d5.webp"
+      },
+      {
+        "name": "Granite Churn Elemental",
+        "min": 36,
+        "max": 38,
+        "rare": false,
+        "templateId": "granite_churn_elemental",
+        "model": "mob_elemental",
+        "tint": "#8d8d8d",
+        "still": "/guide-stills/mob_elemental__8d8d8d.webp"
+      },
+      {
+        "name": "Deep Shale Elemental",
+        "min": 40,
+        "max": 44,
+        "rare": false,
+        "templateId": "deep_shale_elemental",
+        "model": "mob_elemental",
+        "tint": "#5c6670",
+        "still": "/guide-stills/mob_elemental__5c6670.webp"
+      },
+      {
+        "name": "Ash Elemental",
+        "min": 41,
+        "max": 44,
+        "rare": false,
+        "templateId": "ash_elemental",
+        "model": "mob_elemental",
+        "tint": "#cf7a3a",
+        "still": "/guide-stills/mob_elemental__cf7a3a.webp"
+      },
+      {
+        "name": "Cragheart Elemental",
+        "min": 41,
+        "max": 45,
+        "rare": false,
+        "templateId": "ironpass_crag_elemental",
+        "model": "mob_elemental",
+        "tint": "#77706a",
+        "still": "/guide-stills/mob_elemental__77706a.webp"
+      },
+      {
+        "name": "Magma Serpent",
+        "min": 41,
+        "max": 45,
+        "rare": false,
+        "templateId": "magma_serpent",
+        "model": "mob_elemental",
+        "tint": "#d8542a",
+        "still": "/guide-stills/mob_elemental__d8542a.webp"
+      },
+      {
+        "name": "Briar Horror",
+        "min": 42,
+        "max": 46,
+        "rare": false,
+        "templateId": "briar_horror",
+        "model": "mob_elemental",
+        "tint": "#4c6b35",
+        "still": "/guide-stills/mob_elemental__4c6b35.webp"
+      },
+      {
+        "name": "Pale Watcher",
+        "min": 46,
+        "max": 50,
+        "rare": false,
+        "templateId": "pale_watcher",
+        "model": "mob_elemental",
+        "tint": "#dfe4e8",
+        "still": "/guide-stills/mob_elemental__dfe4e8.webp"
+      },
+      {
+        "name": "Magma Elemental",
+        "min": 50,
+        "max": 52,
+        "rare": false,
+        "templateId": "magma_elemental",
+        "model": "mob_elemental",
+        "tint": "#e0662e",
+        "still": "/guide-stills/mob_elemental__e0662e.webp"
       }
     ]
   },
@@ -1699,6 +2635,61 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_dragonkin",
         "tint": "#bcd2e6",
         "still": "/guide-stills/mob_dragonkin__bcd2e6.webp"
+      },
+      {
+        "name": "Forgefall Salamander",
+        "min": 38,
+        "max": 41,
+        "rare": false,
+        "templateId": "forgefall_salamander",
+        "model": "mob_dragonkin",
+        "tint": "#c2622f",
+        "still": "/guide-stills/mob_dragonkin__c2622f.webp"
+      },
+      {
+        "name": "Ridge Shrieker",
+        "min": 43,
+        "max": 47,
+        "rare": false,
+        "templateId": "ridge_shrieker",
+        "model": "mob_demon_flying",
+        "tint": "#a5442f",
+        "still": "/guide-stills/mob_demon_flying__a5442f.webp"
+      },
+      {
+        "name": "Ridge Wyvern",
+        "min": 46,
+        "max": 50,
+        "rare": false,
+        "templateId": "ridge_wyvern",
+        "model": "mob_dragonkin",
+        "tint": "#8c4a3a",
+        "still": "/guide-stills/mob_dragonkin__8c4a3a.webp"
+      },
+      {
+        "name": "Ashwing Drake",
+        "min": 58,
+        "max": 60,
+        "rare": false,
+        "templateId": "ashwing_drake",
+        "model": "mob_demon_flying",
+        "tint": "#5c5250",
+        "still": "/guide-stills/mob_demon_flying__5c5250.webp"
+      }
+    ]
+  },
+  {
+    "family": "demon",
+    "creatures": [
+      {
+        "name": "Breach Horror",
+        "min": 46,
+        "max": 48,
+        "rare": false,
+        "templateId": "breach_horror",
+        "model": "mob_demon",
+        "tint": "#8a3a3a",
+        "still": "/guide-stills/mob_demon__8a3a3a.webp"
       }
     ]
   }
@@ -1971,5 +2962,57 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.4,
     "hover": 0.25,
     "tintStrength": 0.2
+  },
+  "mob_bear": {
+    "url": "models/creatures/yetialt.glb",
+    "idle": "Idle",
+    "height": 2.2,
+    "tintStrength": 0.5
+  },
+  "mob_stag": {
+    "url": "models/creatures/stag.glb",
+    "idle": "Idle",
+    "height": 1.9,
+    "tintStrength": 0.35
+  },
+  "mob_bruiser": {
+    "url": "models/chars/players/barbarian.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "show": [
+      "Barbarian_BearHat"
+    ],
+    "attach": [
+      {
+        "url": "models/weapons/axe_2handed.glb",
+        "bone": "handslot.r"
+      }
+    ],
+    "tintStrength": 0.3
+  },
+  "mob_demon_flying": {
+    "url": "models/creatures/demon.glb",
+    "idle": "Flying_Idle",
+    "height": 1.7,
+    "hover": 0.35,
+    "tintStrength": 0.25
+  },
+  "skel_rogue": {
+    "url": "models/chars/enemies/skeleton_rogue.glb",
+    "idle": "Idle_Combat",
+    "height": 2.5,
+    "tintStrength": 0.25
+  },
+  "skel_mage": {
+    "url": "models/chars/enemies/skeleton_mage.glb",
+    "idle": "Idle_Combat",
+    "height": 2.5,
+    "attach": [
+      {
+        "url": "models/weapons/skeleton_staff.glb",
+        "bone": "handslot.r"
+      }
+    ],
+    "tintStrength": 0.25
   }
 };
