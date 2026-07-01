@@ -1618,6 +1618,19 @@ export class ClientWorld implements IWorld {
   pickUpObject(id: number): void {
     this.cmd({ cmd: 'pickup', id });
   }
+  // --- IWorldWorldBuilder: admin in-world prop placement (server-authoritative) ---
+  placeProp(propKey: string, x: number, z: number, facing: number, scale: number): void {
+    this.cmd({ cmd: 'placeProp', propKey, x, z, facing, scale });
+  }
+  moveProp(dbId: number, x: number, z: number, facing: number, scale: number): void {
+    this.cmd({ cmd: 'moveProp', dbId, x, z, facing, scale });
+  }
+  removeProp(dbId: number): void {
+    this.cmd({ cmd: 'removeProp', dbId });
+  }
+  setPropMeta(dbId: number, meta: Record<string, string>): void {
+    this.cmd({ cmd: 'setPropMeta', dbId, meta });
+  }
   acceptQuest(questId: string): void {
     if (!this.canSendCommand()) return;
     this.pendingQuestCommands.set(questId, 'accept');

@@ -540,6 +540,9 @@ export interface SimContextCallbacks {
   // (append-only). talkToNpc MUST stay a resolvable Sim delegate (external test call sites).
   talkToNpc(npcId: number, pid?: number): void;
   isQuestInteractionEntity(e: Entity): boolean;
+  // In-world Builder: the dialogue/music/voice meta a placed prop carries, or null
+  // when the entity is not a prop or has no meta. Late-bound delegate to the Sim.
+  propMetaForEnt(entId: number): { dialogue?: string; music?: string; voice?: string } | null;
 
   // W5 chat router/readouts (src/sim/social/chat.ts + chat_readouts.ts): the three
   // reach-backs the moved code CONSUMES that stay on Sim / a sibling machine.
@@ -875,6 +878,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: host.talkToNpc,
     isQuestInteractionEntity: host.isQuestInteractionEntity,
+    propMetaForEnt: host.propMetaForEnt,
     // W5 chat router/readouts reach-backs (targetEntity/partyCapacity/marketListingBelongsTo).
     targetEntity: host.targetEntity,
     partyCapacity: host.partyCapacity,

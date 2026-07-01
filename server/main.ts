@@ -1435,6 +1435,7 @@ async function main(): Promise<void> {
       `pruned ${prunedPerfReports} client perf report row(s) older than ${PERF_REPORT_RETENTION_DAYS} days`,
     );
   await game.loadMarket();
+  await game.loadProps();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();

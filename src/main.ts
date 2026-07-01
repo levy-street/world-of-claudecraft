@@ -105,6 +105,7 @@ import {
 import { assembleBugReportMeta } from './ui/bug_report';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { chatInputSize } from './ui/chat_input_autosize';
+import { mountWorldBuilder } from './ui/world_builder';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import {
   type DiscordAccountStatus,
@@ -949,6 +950,12 @@ async function startGame(
     perf.setRenderer(renderer);
     hud = new Hud(world, renderer, keybinds);
     perf.setHud(hud);
+    // In-world Builder dock (admin tool). Server-authoritative: every command is
+    // admin-gated server-side, so this client surface is gated only as a dev/admin
+    // convenience behind ?builder. Client-side role gating is a follow-up.
+    if (import.meta.env.DEV && new URLSearchParams(location.search).has('builder')) {
+      mountWorldBuilder(world, document.body, { propCatalogUrl: '/api/props' });
+    }
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the

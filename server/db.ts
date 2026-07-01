@@ -423,6 +423,24 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+
+-- Admin/moderator-placed decorative props (in-world Builder). Realm-scoped like
+-- characters: each process-per-realm server loads only its own realm's props and
+-- replays them to every client, so a placement is visible to all players. The
+-- meta column is a small open string map (dialogue/music/voice) the dispatch
+-- layer sanitizes and caps before write.
+CREATE TABLE IF NOT EXISTS world_props (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  prop_key TEXT NOT NULL,
+  x DOUBLE PRECISION NOT NULL,
+  z DOUBLE PRECISION NOT NULL,
+  facing DOUBLE PRECISION NOT NULL DEFAULT 0,
+  scale DOUBLE PRECISION NOT NULL DEFAULT 1,
+  meta JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS world_props_realm ON world_props(realm);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -2166,4 +2184,75 @@ export async function pruneChatLogs(retentionDays: number): Promise<number> {
     [String(Math.floor(retentionDays))],
   );
   return res.rowCount ?? 0;
+}
+
+// --- In-world Builder: world_props accessors (realm-scoped) ------------------
+
+export interface WorldProp {
+  id: number;
+  propKey: string;
+  x: number;
+  z: number;
+  facing: number;
+  scale: number;
+  meta: Record<string, string>;
+}
+
+/** Load this realm's placed props for replay to every connecting client. */
+export async function loadWorldProps(): Promise<WorldProp[]> {
+  const res = await pool.query(
+    `SELECT id, prop_key, x, z, facing, scale, meta
+       FROM world_props WHERE realm = $1 ORDER BY id`,
+    [REALM],
+  );
+  return res.rows.map((r) => ({
+    id: Number(r.id),
+    propKey: String(r.prop_key),
+    x: Number(r.x),
+    z: Number(r.z),
+    facing: Number(r.facing),
+    scale: Number(r.scale),
+    meta: (r.meta ?? {}) as Record<string, string>,
+  }));
+}
+
+/** Insert a new prop for this realm; returns its generated id. */
+export async function insertWorldProp(p: Omit<WorldProp, 'id'>): Promise<number> {
+  const res = await pool.query(
+    `INSERT INTO world_props (realm, prop_key, x, z, facing, scale, meta)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb) RETURNING id`,
+    [REALM, p.propKey, p.x, p.z, p.facing, p.scale, JSON.stringify(p.meta ?? {})],
+  );
+  return Number(res.rows[0].id);
+}
+
+/** Update a placed prop's pose (realm-scoped so a stray id can't cross realms). */
+export async function updateWorldProp(
+  id: number,
+  x: number,
+  z: number,
+  facing: number,
+  scale: number,
+): Promise<void> {
+  await pool.query(
+    `UPDATE world_props SET x = $2, z = $3, facing = $4, scale = $5
+       WHERE id = $1 AND realm = $6`,
+    [id, x, z, facing, scale, REALM],
+  );
+}
+
+/** Replace a placed prop's open meta map (dialogue/music/voice). */
+export async function updateWorldPropMeta(
+  id: number,
+  meta: Record<string, string>,
+): Promise<void> {
+  await pool.query(
+    `UPDATE world_props SET meta = $2::jsonb WHERE id = $1 AND realm = $3`,
+    [id, JSON.stringify(meta ?? {}), REALM],
+  );
+}
+
+/** Remove a placed prop by id (realm-scoped). */
+export async function deleteWorldProp(id: number): Promise<void> {
+  await pool.query(`DELETE FROM world_props WHERE id = $1 AND realm = $2`, [id, REALM]);
 }

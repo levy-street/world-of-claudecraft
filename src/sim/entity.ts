@@ -436,4 +436,31 @@ export function createGroundObject(id: number, itemId: string, name: string, pos
   return e;
 }
 
+// A decorative prop placed by the in-world Builder. Modeled as an `object` entity
+// (so it rides the entity-roster snapshot like any other world object — no new
+// wire field) with templateId `prop:<key>`, which the renderer keys on to load
+// the matching mesh. Non-lootable and inert; its only interaction is the optional
+// dialogue/audio carried in the sim's per-entity prop-meta map.
+export function createProp(
+  id: number,
+  propKey: string,
+  pos: Vec3,
+  facing: number,
+  scale: number,
+): Entity {
+  const e = baseEntity(id, pos);
+  e.kind = 'object';
+  e.templateId = `prop:${propKey}`;
+  e.name = '';
+  e.level = 1;
+  e.hostile = false;
+  e.maxHp = 1;
+  e.hp = 1;
+  e.facing = facing;
+  e.prevFacing = facing;
+  e.scale = scale > 0 ? scale : 1;
+  e.lootable = false;
+  return e;
+}
+
 export { MOBS };

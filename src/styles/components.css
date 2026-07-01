@@ -4173,4 +4173,235 @@
     outline-offset: -4px;
     box-shadow: 0 0 14px rgba(202, 164, 114, 0.5);
   }
+
+  /* ---------- in-world Builder dock ---------- */
+  /* A fixed right-side admin tool, not a centred .window. Dark panel + gold accents
+     to match the window chrome above; uses the same tokens (--gold, --gold-dim,
+     --title-font) so it reads as part of the same UI. */
+  .wb-dock {
+    position: fixed;
+    top: 64px;
+    right: 12px;
+    z-index: 40;
+    width: 260px;
+    max-height: calc(100vh - 96px);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 0 0 10px;
+    font-size: 12px;
+    color: #e8e0c8;
+    background: linear-gradient(180deg, #1d1711 0%, #15110c 100%);
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    box-shadow:
+      0 6px 22px rgba(0, 0, 0, 0.55),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+  }
+  .wb-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 12px;
+    font-family: var(--title-font);
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    color: var(--gold);
+    background: linear-gradient(180deg, #2a2010 0%, #1d1711 100%);
+    border-bottom: 1px solid var(--gold-dim);
+    cursor: default;
+    user-select: none;
+  }
+  .wb-collapse {
+    width: 22px;
+    height: 22px;
+    line-height: 1;
+    padding: 0;
+    font-size: 14px;
+    color: #c9b27a;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .wb-collapse:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: #2a2010;
+  }
+  .wb-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    overflow-y: auto;
+  }
+  .wb-dock.wb-collapsed .wb-body {
+    display: none;
+  }
+  .wb-section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #8f7d52;
+    margin: 0 0 -4px;
+  }
+  /* Palette: a thumbnail grid of placeable props, grouped by source. */
+  .wb-palette {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 230px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .wb-group {
+    font-size: 11px;
+    color: #c9b27a;
+    margin: 4px 0 2px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #2c2415;
+  }
+  .wb-group-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .wb-prop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 6px 5px;
+    font-size: 10px;
+    line-height: 1.2;
+    text-align: center;
+    color: #d8cba6;
+    background: #1a1410;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    word-break: break-word;
+    transition:
+      border-color 0.12s ease,
+      background 0.12s ease,
+      transform 0.06s ease;
+  }
+  .wb-prop:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: #2a2010;
+  }
+  .wb-prop:active {
+    transform: translateY(1px);
+  }
+  /* Sliders + their live value readout. */
+  .wb-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+    color: #c9b27a;
+  }
+  .wb-row-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .wb-row-val {
+    font-variant-numeric: tabular-nums;
+    color: var(--gold);
+  }
+  .wb-dock input[type='range'] {
+    width: 100%;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .wb-dock input[type='text'] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 12px;
+    color: #e8e0c8;
+    background: #120e09;
+    border: 1px solid #463a1c;
+    border-radius: 3px;
+  }
+  .wb-dock input[type='text']:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold-dim);
+  }
+  .wb-dock input[type='text']::placeholder {
+    color: #6f6243;
+  }
+  /* Buttons: a primary (gold) action plus secondary outlines. */
+  .wb-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .wb-dock button.wb-btn {
+    flex: 1;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 12px;
+    color: #d8cba6;
+    background: #1a1410;
+    border: 1px solid #463a1c;
+    border-radius: 3px;
+    cursor: pointer;
+    transition:
+      border-color 0.12s ease,
+      color 0.12s ease,
+      background 0.12s ease;
+  }
+  .wb-dock button.wb-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: #2a2010;
+  }
+  .wb-dock button.wb-btn.wb-primary {
+    color: #1a1206;
+    font-weight: 600;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dim) 100%);
+    border-color: var(--gold);
+  }
+  .wb-dock button.wb-btn.wb-primary:hover {
+    filter: brightness(1.08);
+  }
+  .wb-dock button.wb-btn.wb-danger:hover {
+    color: #f0a0a0;
+    border-color: #b5524a;
+    background: #2a1512;
+  }
+  .wb-dock button.wb-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    color: #8f7d52;
+    border-color: #2c2415;
+    background: #15110c;
+    filter: none;
+  }
+  /* Selection status line — what move/delete/meta will act on. */
+  .wb-selinfo {
+    padding: 6px 8px;
+    font-size: 11px;
+    color: #8f7d52;
+    background: #15110c;
+    border: 1px dashed #2c2415;
+    border-radius: 3px;
+  }
+  .wb-selinfo.wb-has-sel {
+    color: var(--gold);
+    border-style: solid;
+    border-color: var(--gold-dim);
+  }
+  .wb-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
 }
