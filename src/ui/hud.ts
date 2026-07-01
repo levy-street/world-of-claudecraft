@@ -6156,6 +6156,9 @@ export class Hud {
           if ($('#bags').style.display !== 'none') this.renderBags();
           break;
         }
+        case 'inspect':
+          this.openInspect(ev.targetId);
+          break;
         case 'lootRoll': {
           this.showLootRoll(ev);
           break;

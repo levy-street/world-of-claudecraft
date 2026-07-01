@@ -1545,6 +1545,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'milestoneUnlocked'; milestoneId: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
+  | { type: 'inspect'; targetId: number }
   | {
       type: 'lootRoll';
       rollId: number;

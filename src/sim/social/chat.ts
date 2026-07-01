@@ -270,6 +270,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       return null;
     }
     ctx.error(r.meta.entityId, inspectReadout(target, te));
+    ctx.emit({ type: 'inspect', targetId: te.id, pid: r.meta.entityId });
     return null;
   }
 
