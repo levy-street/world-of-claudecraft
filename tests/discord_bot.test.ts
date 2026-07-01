@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { classifyBugIntakeMessage, type IntakeMessage } from '../bot/intake';
 import {
   type ActivityItem,
   allTierRoleNames,
@@ -22,6 +23,14 @@ import {
   voiceMembersForChannel,
 } from '../bot/logic';
 
+const bugMessage = (overrides: Partial<IntakeMessage> = {}): IntakeMessage => ({
+  id: 'm1',
+  channelId: 'bugs',
+  authorId: 'u1',
+  content: 'When I open bags the item tooltip is clipped at the bottom',
+  attachments: [],
+  ...overrides,
+});
 describe('gateway protocol helpers', () => {
   it('requests the privileged member + presence intents', () => {
     // GUILDS(1) | GUILD_MEMBERS(2) | GUILD_VOICE_STATES(128) | GUILD_PRESENCES(256)
@@ -291,5 +300,88 @@ describe('significant-activity cards', () => {
     }) as { allowed_mentions: { users: string[] }; embeds: Array<Record<string, any>> };
     expect(msg.embeds[0].description).toContain('Ghost'); // plain, no mention
     expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+});
+describe('Discord bug intake classifier', () => {
+  const monitored = new Set(['bugs']);
+
+  it('ignores messages outside monitored bug channels and bot/webhook messages', () => {
+    expect(
+      classifyBugIntakeMessage(bugMessage({ channelId: 'general' }), {
+        monitoredChannelIds: monitored,
+      }),
+    ).toEqual({ action: 'ignore', reason: 'unmonitored-channel' });
+    expect(
+      classifyBugIntakeMessage(bugMessage({ authorIsBot: true }), {
+        monitoredChannelIds: monitored,
+      }),
+    ).toEqual({ action: 'ignore', reason: 'bot' });
+    expect(
+      classifyBugIntakeMessage(bugMessage({ webhookId: 'relay' }), {
+        monitoredChannelIds: monitored,
+      }),
+    ).toEqual({ action: 'ignore', reason: 'webhook' });
+  });
+
+  it('ignores plain chat and feature requests without bug language', () => {
+    expect(
+      classifyBugIntakeMessage(bugMessage({ content: 'anyone running Cragmaw tonight?' }), {
+        monitoredChannelIds: monitored,
+      }),
+    ).toEqual({ action: 'ignore', reason: 'low-confidence' });
+    expect(
+      classifyBugIntakeMessage(bugMessage({ content: 'Feature request: please add mounts' }), {
+        monitoredChannelIds: monitored,
+      }),
+    ).toEqual({ action: 'ignore', reason: 'feature-request' });
+  });
+
+  it('promotes repro-like bug reports with screenshots as high-confidence candidates', () => {
+    const decision = classifyBugIntakeMessage(
+      bugMessage({
+        content:
+          'Every time I queue arena after zoning, the client disconnects with a console error',
+        attachments: [{ id: 'a1', filename: 'disconnect.png', contentType: 'image/png' }],
+      }),
+      { monitoredChannelIds: monitored },
+    );
+    expect(decision).toMatchObject({
+      action: 'candidate',
+      confidence: 'high',
+      evidence: {
+        attachments: 1,
+        hasImage: true,
+        hasVideo: false,
+        hasReproLanguage: true,
+        hasErrorLanguage: true,
+      },
+      needsMoreInfo: false,
+    });
+  });
+
+  it('marks vague bug reports as candidates that need more information', () => {
+    const decision = classifyBugIntakeMessage(
+      bugMessage({ content: 'the market window is broken today' }),
+      { monitoredChannelIds: monitored },
+    );
+    expect(decision).toMatchObject({
+      action: 'candidate',
+      confidence: 'medium',
+      needsMoreInfo: true,
+    });
+  });
+
+  it('keeps summaries short and strips URLs before retention', () => {
+    const decision = classifyBugIntakeMessage(
+      bugMessage({
+        content: `Bug ${'very '.repeat(40)}broken https://example.invalid/private-log`,
+      }),
+      { monitoredChannelIds: monitored },
+    );
+    expect(decision.action).toBe('candidate');
+    if (decision.action === 'candidate') {
+      expect(decision.summary.length).toBeLessThanOrEqual(120);
+      expect(decision.summary).not.toContain('https://');
+    }
   });
 });
