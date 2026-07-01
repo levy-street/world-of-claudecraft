@@ -2313,7 +2313,7 @@ export class GameServer {
               sim.setPlayerSkin(pid, idx, 'mech');
             }
           } else {
-            sim.setPlayerSkin(pid, msg.skin, 'class');
+            sim.changeSkin(msg.skin, 'class', pid);
           }
         }
         break;

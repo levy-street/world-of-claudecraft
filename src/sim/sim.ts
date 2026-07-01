@@ -50,6 +50,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import {
+  BARBER_APPEARANCE_CHANGE_COST,
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
@@ -1448,8 +1449,9 @@ export class Sim {
   }
 
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer
-   *  falls back to the default for an unknown index. Used by creation, the
-   *  in-game changer, and the server's changeSkin command. */
+   *  falls back to the default for an unknown index. Used by creation and
+   *  cosmetic unlock rewards; post-creation class changes go through
+   *  changeSkin so the barber fee stays server-authoritative. */
   setPlayerSkin(pid: number, skin: number, catalog: SkinCatalog = 'class'): boolean {
     const meta = this.players.get(pid);
     const e = this.entities.get(pid);
@@ -1463,8 +1465,21 @@ export class Sim {
     return true;
   }
 
-  changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
-    this.setPlayerSkin(this.primaryId, skin, catalog);
+  changeSkin(skin: number, catalog: SkinCatalog = 'class', pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    const { meta, e } = r;
+    const maxSkin = catalog === 'mech' ? MECH_CHROMAS.length - 1 : 7;
+    const idx = Math.max(0, Math.min(maxSkin, Math.floor(skin)));
+    if (e.skin === idx && (e.skinCatalog ?? 'class') === catalog) return;
+    if (catalog === 'class') {
+      if (meta.copper < BARBER_APPEARANCE_CHANGE_COST) {
+        this.error(meta.entityId, 'Not enough money.');
+        return;
+      }
+      meta.copper -= BARBER_APPEARANCE_CHANGE_COST;
+    }
+    this.setPlayerSkin(meta.entityId, idx, catalog);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and

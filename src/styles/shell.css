@@ -2514,6 +2514,10 @@
     color: #fff;
     box-shadow: 0 0 9px var(--class-color, #69ccf0);
   }
+  .skin-swatch.locked {
+    opacity: 0.48;
+    cursor: not-allowed;
+  }
   .skin-unequip-btn {
     min-height: 34px;
     min-width: 40px;

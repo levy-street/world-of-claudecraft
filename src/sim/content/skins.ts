@@ -48,6 +48,9 @@ export const EVENT_SKIN_TIERS: readonly SkinTier[] = [
   { rank: 'epic', skin: 3 },
 ] as const;
 
+/** Gold cost for post-creation class appearance changes through the barber path. */
+export const BARBER_APPEARANCE_CHANGE_COST = 10000;
+
 export interface MechChroma {
   /** stable id, unique across all tiers; also the i18n name-key leaf */
   id: string;
@@ -98,7 +101,7 @@ export function rankAllowsSkin(granted: SkinRank, skin: number): boolean {
 }
 
 export function mechChromaForSkin(skin: number): MechChroma | null {
-  return Number.isInteger(skin) ? MECH_CHROMAS[skin] ?? null : null;
+  return Number.isInteger(skin) ? (MECH_CHROMAS[skin] ?? null) : null;
 }
 
 export function mechChromaSkinIndex(chromaId: string): number {
@@ -119,8 +122,15 @@ export function rankAllowsMechChroma(granted: SkinRank, skin: number): boolean {
 // host-agnostic sim can validate a chosen skin index without importing render/.
 // tests/skin_event.test.ts asserts this stays in lockstep with SKINS.
 export const SKIN_COUNTS: Record<PlayerClass, number> = {
-  warrior: 4, paladin: 2, hunter: 4, rogue: 4, priest: 4,
-  mage: 4, warlock: 4, shaman: 4, druid: 4,
+  warrior: 4,
+  paladin: 2,
+  hunter: 4,
+  rogue: 4,
+  priest: 4,
+  mage: 4,
+  warlock: 4,
+  shaman: 4,
+  druid: 4,
 };
 
 /** Whether `skin` is a valid appearance index for `cls` (0 = default). */

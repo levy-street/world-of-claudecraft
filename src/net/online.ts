@@ -1,7 +1,11 @@
 // Online play: REST auth client + WebSocket world mirror.
 
 import { signChallenge } from '../sim/client_challenge';
-import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
+import {
+  BARBER_APPEARANCE_CHANGE_COST,
+  mechChromaItemId,
+  mechChromaSkinIndex,
+} from '../sim/content/skins';
 import {
   cloneAllocation,
   computeTalentModifiers,
@@ -1701,6 +1705,14 @@ export class ClientWorld implements IWorld {
         ? Math.max(0, Math.floor(skin))
         : Math.max(0, Math.min(7, Math.floor(skin)));
     const p = this.entities.get(this.playerId);
+    if (p?.skin === idx && (p.skinCatalog ?? 'class') === catalog) return;
+    if (catalog === 'class') {
+      if (this.copper < BARBER_APPEARANCE_CHANGE_COST) {
+        this.cmd({ cmd: 'change_skin', skin: idx, catalog });
+        return;
+      }
+      this.copper -= BARBER_APPEARANCE_CHANGE_COST;
+    }
     if (p) {
       p.skin = idx;
       p.skinCatalog = catalog;

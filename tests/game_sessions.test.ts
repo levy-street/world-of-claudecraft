@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { MECH_CHROMAS } from '../src/sim/content/skins';
+import { BARBER_APPEARANCE_CHANGE_COST, MECH_CHROMAS } from '../src/sim/content/skins';
 
 const openPlaySession = vi.fn(async () => 1);
 const closePlaySession = vi.fn(async () => {});
@@ -187,6 +187,38 @@ describe('GameServer sessions', () => {
 
     expect(server.sim.entities.get(allowed.pid)?.skinCatalog).toBe('mech');
     expect(server.sim.entities.get(blocked.pid)?.skinCatalog).not.toBe('mech');
+  });
+
+  it('charges live class appearance changes through the server command', () => {
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 11, 101, 'Barberpay', 'shaman', null));
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('expected live player meta');
+    meta.copper = BARBER_APPEARANCE_CHANGE_COST + 25;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 2, catalog: 'class' }),
+    );
+
+    expect(server.sim.entities.get(session.pid)?.skin).toBe(2);
+    expect(server.sim.meta(session.pid)?.copper).toBe(25);
+  });
+
+  it('rejects live class appearance changes when the server-side fee cannot be paid', () => {
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 11, 101, 'Barberbroke', 'shaman', null));
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('expected live player meta');
+    meta.copper = BARBER_APPEARANCE_CHANGE_COST - 1;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 2, catalog: 'class' }),
+    );
+
+    expect(server.sim.entities.get(session.pid)?.skin).toBe(0);
+    expect(server.sim.meta(session.pid)?.copper).toBe(BARBER_APPEARANCE_CHANGE_COST - 1);
   });
 
   it('unequips a mech chroma from every live character on the account and returns its item', () => {

@@ -25,6 +25,7 @@ import {
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import {
+  BARBER_APPEARANCE_CHANGE_COST,
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
   SKIN_RANKS,
@@ -8494,12 +8495,16 @@ export class Hud {
     }
     const current = Math.max(0, this.sim.player.skin ?? 0);
     const currentCatalog = this.sim.player.skinCatalog ?? 'class';
+    const canAffordBarber = this.sim.copper >= BARBER_APPEARANCE_CHANGE_COST;
     for (const option of options) {
       const labelNumber = formatNumber(option.label, { maximumFractionDigits: 0 });
+      const selected = option.kind === currentCatalog && option.skin === current;
+      const disabledForFee = option.kind === 'class' && !selected && !canAffordBarber;
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = `skin-swatch${option.kind === currentCatalog && option.skin === current ? ' sel' : ''}`;
+      b.className = `skin-swatch${selected ? ' sel' : ''}${disabledForFee ? ' locked' : ''}`;
       b.textContent = labelNumber;
+      b.setAttribute('aria-disabled', disabledForFee ? 'true' : 'false');
       b.setAttribute('role', 'listitem');
       b.setAttribute(
         'aria-label',
@@ -8508,11 +8513,12 @@ export class Hud {
           : this.mechChromaName(option.chromaId),
       );
       b.addEventListener('click', () => {
+        if (disabledForFee) return;
         row.querySelectorAll('.skin-swatch').forEach((x) => {
           x.classList.remove('sel');
         });
         b.classList.add('sel');
-        if (option.kind === 'class') {
+        if (option.kind === 'class' && !selected) {
           this.sim.changeSkin(option.skin, 'class');
           const preview = activeCharacterAppearancePreview(
             this.sim.cfg.playerClass,
@@ -8552,7 +8558,13 @@ export class Hud {
           .catch((err) => console.error('failed to load mech cosmetic preview:', err));
         audio.click();
       });
-      if (option.kind === 'mech') {
+      if (option.kind === 'class' && !selected) {
+        this.attachTooltip(
+          b,
+          () =>
+            `<div class="tt-name">${esc(t('auth.chromaOption', { n: labelNumber }))}</div><div class="tt-sub">${this.moneyHtml(BARBER_APPEARANCE_CHANGE_COST)}</div>`,
+        );
+      } else if (option.kind === 'mech') {
         this.attachTooltip(
           b,
           () =>
