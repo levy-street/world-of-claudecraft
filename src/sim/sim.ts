@@ -170,6 +170,7 @@ import {
 } from './pathfind';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
+import { EMPTY_PROFESSIONS_INFO, type ProfessionsInfo } from './professions/types';
 import {
   applyTalentAllocation,
   deleteTalentLoadout,
@@ -5684,6 +5685,10 @@ export class Sim {
 
   delveShopOffers(delveId: string): DelveShopOffer[] {
     return this.delveShopOffersFor(delveId, this.primaryId);
+  }
+
+  professionsInfo(): ProfessionsInfo {
+    return EMPTY_PROFESSIONS_INFO;
   }
 
   get delveDaily(): { date: string; firstClearXp: string[]; markClears: number } {

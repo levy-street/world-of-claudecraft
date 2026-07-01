@@ -18,6 +18,7 @@ import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { EMPTY_PROFESSIONS_INFO } from '../sim/professions/types';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
   type Entity,
@@ -54,6 +55,7 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
   type PresenceStatus,
+  type ProfessionsInfo,
   type RaidLockout,
   type SocialInfo,
   type TradeInfo,
@@ -1959,6 +1961,9 @@ export class ClientWorld implements IWorld {
   }
   delveShopOffers(delveId: string): DelveShopOfferView[] {
     return resolveDelveShopOffers(delveId, this.delveClears);
+  }
+  professionsInfo(): ProfessionsInfo {
+    return EMPTY_PROFESSIONS_INFO;
   }
   lockpickEngage(objectId: number, ante: Ante): void {
     this.cmd({ cmd: 'lockpick_engage', objectId, ante });

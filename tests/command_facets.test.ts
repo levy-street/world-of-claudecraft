@@ -266,7 +266,7 @@ describe('command facet tags (W10)', () => {
     expect('leave_crypt' in tags).toBe(false);
   });
 
-  it('does not tag the command-less reads (marketInfo/raidLockouts/delveShopOffers/lockpickState/delveRun/companionState/delveMarks/companionUpgrades/delveDaily)', () => {
+  it('does not tag the command-less reads (marketInfo/raidLockouts/delveShopOffers/lockpickState/delveRun/companionState/delveMarks/companionUpgrades/delveDaily/professionsInfo)', () => {
     for (const read of [
       'marketInfo',
       'raidLockouts',
@@ -277,6 +277,7 @@ describe('command facet tags (W10)', () => {
       'delveMarks',
       'companionUpgrades',
       'delveDaily',
+      'professionsInfo',
     ]) {
       expect(read in tags, `${read} should be untagged (no wire command)`).toBe(false);
     }
