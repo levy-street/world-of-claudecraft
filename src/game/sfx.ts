@@ -10,6 +10,7 @@
 // and sustained spell casts (cross-faded by gain, never restarted).
 
 import { SFX_CLIPS } from './sfx_manifest.generated';
+import { publicAssetUrl } from '../asset_url';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
 const MAX_VOICES = 24;     // concurrent one-shot sources (frame-budget guard)
@@ -87,7 +88,7 @@ class Sfx {
     if (!ctx) return;
     await Promise.all(Object.entries(SFX_CLIPS).map(async ([key, entry]) => {
       try {
-        const res = await fetch(entry.url);
+        const res = await fetch(publicAssetUrl(entry.url));
         if (!res.ok) return;
         const buf = await ctx.decodeAudioData(await res.arrayBuffer());
         this.buffers.set(key, buf);

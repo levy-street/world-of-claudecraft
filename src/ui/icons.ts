@@ -9,6 +9,7 @@
 // has a proper icon. Results are cached as data URLs.
 
 import { ABILITIES, ITEMS } from '../sim/data';
+import { publicAssetUrl } from '../asset_url';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export type IconKind = 'ability' | 'item' | 'aura' | 'crest';
@@ -2802,7 +2803,7 @@ const ITEM_ICON_IMAGES = ITEM_WEAPON_VARIANTS;
 /** Static URL of a weapon's rendered thumbnail, or null if it uses a recipe. */
 function weaponIconUrl(id: string): string | null {
   const model = ITEM_ICON_IMAGES[id];
-  return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
+  return model ? publicAssetUrl(`${WEAPON_ICON_DIR}/${model}.jpg`) : null;
 }
 
 // Hand-picked image icons for class abilities, committed as 128px WebP under
@@ -2998,7 +2999,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
   const cls = ABILITIES[id]?.class;
-  return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
+  return cls ? publicAssetUrl(`${SKILL_ICON_DIR}/${cls}/${id}.webp`) : null;
 }
 
 const urlCache = new Map<string, string>();

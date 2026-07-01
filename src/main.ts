@@ -2,6 +2,7 @@
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
+import { publicAssetUrl } from './asset_url';
 import { syncAppViewport as syncAppViewportShared } from './game/app_viewport';
 import { audio } from './game/audio';
 import {
@@ -7112,7 +7113,7 @@ function wireStartScreens(): void {
 // playing through the loading screen and fades out once the game is on screen.
 function initHomepageMusic(): void {
   if (homepageMusic) return;
-  const el = new Audio('/audio/main-theme.mp3');
+  const el = new Audio(publicAssetUrl('/audio/main-theme.mp3'));
   el.loop = true;
   el.muted = homepageMusicMuted;
   el.preload = 'auto';

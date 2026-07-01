@@ -1,3 +1,5 @@
+import { publicAssetUrl } from '../asset_url';
+
 // Procedural adventure soundtrack — no audio files, pure WebAudio synthesis.
 // Eastbrook keeps the original town theme intact. Every other zone pushes
 // harder toward original old-school medieval MMO colors: lute/dulcimer loops,
@@ -25,6 +27,7 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
 };
+const BOSS_TRACK_URL = '/audio/dungeon-boss-fight.mp3';
 
 export function dungeonMusicZoneForDungeon(dungeonId: string): MusicZone {
   return DUNGEON_MUSIC[dungeonId] ?? 'dungeon_hollow_crypt';
@@ -122,7 +125,9 @@ function composeTownEastbrook(): Theme {
     pushNote(ev, b0 + 2, c.root - 24, 1.8, 0.42, 'bass');
     // harp: flowing eighth arpeggio root-3rd-5th-octave and back
     const arp = [t[0], t[1], t[2], t[0] + 12, t[2], t[1], t[0], t[1]];
-    arp.forEach((n, i) => pushNote(ev, b0 + i * 0.5, n, 0.5, 0.34, 'harp'));
+    arp.forEach((n, i) => {
+      pushNote(ev, b0 + i * 0.5, n, 0.5, 0.34, 'harp');
+    });
     // horn counterline in the back half of each section
     if (bar % 8 >= 4) {
       pushNote(ev, b0, c.root - 12, 2, 0.16, 'horn');
@@ -157,11 +162,15 @@ function composeTownEastbrook(): Theme {
 }
 
 function pushRepeated(out: NoteEvent[], startBeat: number, notes: number[], step: number, dur: number, vel: number, inst: Inst): void {
-  notes.forEach((m, i) => pushNote(out, startBeat + i * step, m, dur, vel, inst));
+  notes.forEach((m, i) => {
+    pushNote(out, startBeat + i * step, m, dur, vel, inst);
+  });
 }
 
 function pushDrumHits(out: NoteEvent[], startBeat: number, offsets: number[], inst: Inst, vel: number, midi = 42): void {
-  offsets.forEach((b, i) => pushNote(out, startBeat + b, midi, 0.22, vel * (i % 2 === 0 ? 1 : 0.78), inst));
+  offsets.forEach((b, i) => {
+    pushNote(out, startBeat + b, midi, 0.22, vel * (i % 2 === 0 ? 1 : 0.78), inst);
+  });
 }
 
 function pushPedal(out: NoteEvent[], beat: number, root: number, inst: Inst, vel: number): void {
@@ -323,7 +332,9 @@ function composeLegacyVale(): Theme {
     if (bar % 4 === 1) pushNote(ev, b0 + 2, c.root - 5, 1.8, 0.24, 'bass');
     if (bar % 4 === 3) pushNote(ev, b0 + 2.5, c.root - 10, 1.4, 0.22, 'bass');
     if (bar % 4 === 2) {
-      [t[2], t[0] + 12, t[1] + 12].forEach((n, i) => pushNote(ev, b0 + 1 + i * 0.5, n, 0.5, 0.2, 'harp'));
+      [t[2], t[0] + 12, t[1] + 12].forEach((n, i) => {
+        pushNote(ev, b0 + 1 + i * 0.5, n, 0.5, 0.2, 'harp');
+      });
     }
   });
 
@@ -456,7 +467,9 @@ function composeDungeonFight(
     const ost = opts.doubleTime
       ? [0, 1, 0, 3, 0, 6, 5, 3, 0, 1, 0, 3, 7, 6, 5, 3]
       : [0, 1, 0, 3, 0, 6, 5, 3];
-    ost.forEach((s, i) => pushNote(ev, b0 + i * (opts.doubleTime ? 0.25 : 0.5), figureRoot + s, opts.doubleTime ? 0.18 : 0.28, 0.20, i % 2 === 0 ? 'stacc' : opts.lead));
+    ost.forEach((s, i) => {
+      pushNote(ev, b0 + i * (opts.doubleTime ? 0.25 : 0.5), figureRoot + s, opts.doubleTime ? 0.18 : 0.28, 0.20, i % 2 === 0 ? 'stacc' : opts.lead);
+    });
 
     pushDrumHits(ev, b0, opts.mode === 'crypt' ? [0, 1.5, 2.5, 3.5] : [0, 0.75, 1.5, 2, 2.75, 3.5], 'warDrum', opts.mode === 'wyrm' ? 0.34 : 0.26, 38);
     pushDrumHits(ev, b0, [0.5, 1.25, 2.25, 3.25], 'woodBlock', 0.11, 70);
@@ -521,7 +534,9 @@ function composeCombat(): Theme {
     pushNote(ev, b0 + 3.5, 38, 0.5, 0.3, 'timpani');
     // driving staccato eighths: 1-1-b3-1-5-1-b3-4 in semitones from D3
     const steps = [0, 0, 3, 0, 7, 0, 3, 5];
-    steps.forEach((s, i) => pushNote(ev, b0 + i * 0.5, 50 + s, 0.4, 0.26, 'stacc'));
+    steps.forEach((s, i) => {
+      pushNote(ev, b0 + i * 0.5, 50 + s, 0.4, 0.26, 'stacc');
+    });
     if (bar % 2 === 1) {
       pushNote(ev, b0, 50, 1.6, 0.2, 'horn');
       pushNote(ev, b0 + 0.02, 57, 1.6, 0.16, 'horn');
@@ -1143,7 +1158,7 @@ export class MusicDirector {
   private ensureBossElement(): HTMLAudioElement | null {
     if (this.bossElement) return this.bossElement;
     if (typeof Audio !== 'function') return null;
-    const el = new Audio('/audio/dungeon-boss-fight.mp3');
+    const el = new Audio(publicAssetUrl(BOSS_TRACK_URL));
     el.loop = true;
     el.preload = 'auto';
     this.bossElement = el;
@@ -1154,7 +1169,7 @@ export class MusicDirector {
     const ctx = this.ctx;
     if (!ctx || this.bossBuffer || this.bossLoading || typeof fetch !== 'function') return;
     this.bossLoading = true;
-    void fetch('/audio/dungeon-boss-fight.mp3')
+    void fetch(publicAssetUrl(BOSS_TRACK_URL))
       .then((res) => res.arrayBuffer())
       .then((bytes) => ctx.decodeAudioData(bytes))
       .then((buffer) => {

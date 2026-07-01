@@ -8,6 +8,7 @@
 // missing files are silent no-ops, so the game runs fine before any audio exists.
 
 import { VOICE_LINES } from './voice_manifest.generated';
+import { publicAssetUrl } from '../asset_url';
 
 // Voices sit slightly under their slider value so NPC dialogue doesn't overpower
 // the SFX/ambience mix.
@@ -45,11 +46,13 @@ class GameVoice {
     if (!src) return;
     this.stop();
     if (!this.el) this.el = new Audio();
-    this.el.src = src;
+    this.el.src = publicAssetUrl(src);
     this.el.volume = Math.min(1, this.vol * VOICE_BASE_GAIN * (opts?.gain ?? 1));
     // Autoplay restrictions / a missing file reject the promise — ignore, the
     // dialogue text is the source of truth and audio is an enhancement.
-    void this.el.play().catch(() => { /* no-op */ });
+    void this.el.play().catch(() => {
+      /* no-op */
+    });
   }
 }
 

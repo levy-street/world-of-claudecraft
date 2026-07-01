@@ -17,6 +17,7 @@
 // ui_tier_knobs.nameplateIntervalSec), which the renderer reads, not the painter.
 
 import * as THREE from 'three';
+import { publicAssetUrl } from '../asset_url';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
@@ -59,7 +60,7 @@ import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './namep
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
-const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
+const emoteIconUrl = (id: string): string => publicAssetUrl(`/ui/emotes/emote-${id}.png`);
 
 export interface NameplatePainterDeps {
   /** the per-entity view pool the renderer owns (keyed by entity id) */
