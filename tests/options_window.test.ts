@@ -7,8 +7,14 @@ import { describe, expect, it } from 'vitest';
 // the changeLanguage hardening (PR #730), the WCAG 2.2 AA focus-return +
 // roles/aria, the bug-report + keybind dispatch, and that the window stays cold
 // (never wired into the per-frame Hud.update path).
-const painter = readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8');
-const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const normalizeNewlines = (s: string): string => s.replace(/\r\n/g, '\n');
+const painter = normalizeNewlines(
+  readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8'),
+);
+const hudTs = normalizeNewlines(readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8'));
+const componentsCss = normalizeNewlines(
+  readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8'),
+);
 
 describe('options_window: no magic values', () => {
   it('carries no literal color in TS (colors live in the extracted stylesheet)', () => {
@@ -154,6 +160,18 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
   });
 });
 
+describe('options_window: keybindings viewport fit', () => {
+  it('clamps the wide keybindings panel to the scaled app viewport and keeps it scrollable', () => {
+    const kbWide = componentsCss.slice(
+      componentsCss.indexOf('#options-menu.kb-wide'),
+      componentsCss.indexOf('.kb-cols'),
+    );
+    expect(kbWide).toContain('top: 16px');
+    expect(kbWide).toContain('box-sizing: border-box');
+    expect(kbWide).toContain('max-height: calc((var(--app-vh) / var(--ui-scale, 1)) - 32px)');
+    expect(kbWide).toContain('overflow-y: auto');
+  });
+});
 describe('options_window: viewport resync on open (PR #1118)', () => {
   it('calls syncAppViewport() before the panel flips to display: block', () => {
     expect(painter).toContain("import { syncAppViewport } from '../game/app_viewport'");

@@ -3484,11 +3484,15 @@
   }
   /* Wide, multi-column key-binding layout (desktop). Cap at two columns so each
      category block stays wide enough for the longest action label (e.g. the
-     Movement rows) instead of clipping; the panel scrolls vertically when the
-     two columns run taller than the window (.window already sets overflow-y).
+     Movement rows) instead of clipping; the panel clamps to the scaled app
+     viewport and scrolls vertically when the rows are taller than that space.
      --kb-btn-w gives every key/toggle button one shared width. */
   #options-menu.kb-wide {
     width: min(880px, calc(100vw - 32px));
+    top: 16px;
+    box-sizing: border-box;
+    max-height: calc((var(--app-vh) / var(--ui-scale, 1)) - 32px);
+    overflow-y: auto;
     --kb-btn-w: 96px;
   }
   .kb-cols {
