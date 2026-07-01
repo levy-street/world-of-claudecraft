@@ -37,6 +37,48 @@ import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
 
+const AUTOSORT_KIND_RANK: Record<string, number> = {
+  weapon: 0,
+  armor: 1,
+  potion: 2,
+  food: 3,
+  drink: 4,
+  elixir: 5,
+  tool: 6,
+  quest: 7,
+  junk: 8,
+};
+
+const AUTOSORT_QUALITY_RANK: Record<string, number> = {
+  legendary: 0,
+  epic: 1,
+  rare: 2,
+  uncommon: 3,
+  common: 4,
+  poor: 5,
+};
+
+function autosortKindRank(itemId: string): number {
+  const def = ITEMS[itemId];
+  return def ? (AUTOSORT_KIND_RANK[def.kind] ?? 9) : 10;
+}
+
+function autosortQualityRank(itemId: string): number {
+  const def = ITEMS[itemId];
+  return AUTOSORT_QUALITY_RANK[def?.quality ?? 'common'] ?? AUTOSORT_QUALITY_RANK.common;
+}
+
+export function compareInventorySlots(a: { itemId: string }, b: { itemId: string }): number {
+  const kind = autosortKindRank(a.itemId) - autosortKindRank(b.itemId);
+  if (kind !== 0) return kind;
+  const quality = autosortQualityRank(a.itemId) - autosortQualityRank(b.itemId);
+  if (quality !== 0) return quality;
+  const value = (ITEMS[b.itemId]?.sellValue ?? 0) - (ITEMS[a.itemId]?.sellValue ?? 0);
+  if (value !== 0) return value;
+  const name = (ITEMS[a.itemId]?.name ?? a.itemId).localeCompare(ITEMS[b.itemId]?.name ?? b.itemId);
+  if (name !== 0) return name;
+  return a.itemId.localeCompare(b.itemId);
+}
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -309,6 +351,11 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
   });
 }
 
+export function autosortBags(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  r.meta.inventory.sort(compareInventorySlots);
+}
 // Bulk-sell every gray (poor-quality) item in the bags in one action, applying the
 // same rules as the per-item sellItem path: quest items and noVendorSell items are
 // left untouched and each sold stack is recorded for buyback. One summary loot line

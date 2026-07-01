@@ -2437,6 +2437,26 @@
     color: inherit;
     cursor: var(--cursor-point);
   }
+  .bag-autosort {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+    border: 1px solid #5a4a2e;
+    background: #14110b;
+    color: inherit;
+    cursor: var(--cursor-point);
+  }
+  .bag-autosort:hover {
+    background: #21190e;
+  }
+  .bag-autosort:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
   .money {
     margin-top: 8px;
     font-size: 12px;

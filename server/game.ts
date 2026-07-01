@@ -254,6 +254,7 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'discard',
   'buy',
   'sell',
+  'autosort_bags',
   'buyback',
   'loot',
   'pickup',
@@ -2297,6 +2298,9 @@ export class GameServer {
         if (typeof msg.item === 'string') {
           sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
         }
+        break;
+      case 'autosort_bags':
+        sim.autosortBags(pid);
         break;
       case 'buyback':
         if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);

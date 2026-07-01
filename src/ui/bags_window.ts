@@ -275,6 +275,21 @@ export class BagsWindow {
     });
     tools.appendChild(sort);
 
+    const autosort = document.createElement('button');
+    autosort.type = 'button';
+    autosort.className = 'bag-autosort';
+    autosort.setAttribute('aria-label', t('hudChrome.bags.sortAria'));
+    autosort.title = t('hudChrome.bags.sortAria');
+    autosort.innerHTML = svgIcon('meters');
+    autosort.addEventListener('click', () => {
+      this.deps.world().autosortBags();
+      this.filter.sort = 'recent';
+      this.persistFilter();
+      audio.click();
+      this.render();
+    });
+    tools.appendChild(autosort);
+
     bar.appendChild(tools);
     return bar;
   }

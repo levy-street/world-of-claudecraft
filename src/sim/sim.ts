@@ -4353,6 +4353,10 @@ export class Sim {
     items.sellItem(this.ctx, itemId, count, pid);
   }
 
+  autosortBags(pid?: number): void {
+    items.autosortBags(this.ctx, pid);
+  }
+
   sellAllJunk(pid?: number): void {
     items.sellAllJunk(this.ctx, pid);
   }

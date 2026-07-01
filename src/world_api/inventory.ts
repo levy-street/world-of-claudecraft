@@ -11,6 +11,7 @@ export interface IWorldInventory {
   discardItem(itemId: string, count?: number): void;
   buyItem(npcId: number, itemId: string): void;
   sellItem(itemId: string, count?: number): void;
+  autosortBags(): void;
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;

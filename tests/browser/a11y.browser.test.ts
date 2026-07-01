@@ -584,6 +584,43 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
 // ---------------------------------------------------------------------------
 
 describe('axe: bags discard prompt', () => {
+  it('renders the autosort control as an accessible world command', () => {
+    localStorage.setItem(
+      'woc_bag_filter',
+      JSON.stringify({ category: 'all', sort: 'quality', search: '' }),
+    );
+    const root = host('bags-window');
+    root.style.display = 'flex';
+    const autosortBags = vi.fn();
+    const win = new BagsWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            inventory: [
+              { itemId: 'wolf_fang', count: 4 },
+              { itemId: 'minor_healing_potion', count: 2 },
+              { itemId: 'worn_sword', count: 1 },
+            ],
+            copper: 0,
+            autosortBags,
+          }) as never,
+        itemIcon: () => '<span class="ico itemico" aria-hidden="true"></span>',
+        moneyHtml: () => '',
+        wocBalanceHtml: () => '',
+      }),
+    );
+
+    win.render();
+    const autosort = root.querySelector<HTMLButtonElement>('.bag-autosort');
+    expect(autosort?.getAttribute('aria-label')).toBe(t('hudChrome.bags.sortAria'));
+    expect(root.querySelector<HTMLSelectElement>('.bag-sort')?.value).toBe('quality');
+
+    autosort?.click();
+
+    expect(autosortBags).toHaveBeenCalledOnce();
+    expect(root.querySelector<HTMLSelectElement>('.bag-sort')?.value).toBe('recent');
+  });
   it('is a clean, named modal dialog with a resolving label', async () => {
     const root = host('bags-window');
     root.style.display = 'none';

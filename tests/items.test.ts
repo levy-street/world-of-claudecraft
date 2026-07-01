@@ -277,6 +277,30 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(summary).toHaveLength(1);
   });
 
+  it('autosortBags reorders carried inventory by useful groups and preserves stacks', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.inventory = [
+      { itemId: 'wolf_fang', count: 4 },
+      { itemId: 'minor_healing_potion', count: 2 },
+      { itemId: 'cryptbone_helm', count: 1 },
+      { itemId: 'spring_water', count: 5 },
+      { itemId: 'worn_sword', count: 1 },
+      { itemId: 'missing_future_item', count: 1 },
+    ];
+
+    items.autosortBags(ctx, pid);
+
+    expect(meta.inventory).toEqual([
+      { itemId: 'worn_sword', count: 1 },
+      { itemId: 'cryptbone_helm', count: 1 },
+      { itemId: 'minor_healing_potion', count: 2 },
+      { itemId: 'spring_water', count: 5 },
+      { itemId: 'wolf_fang', count: 4 },
+      { itemId: 'missing_future_item', count: 1 },
+    ]);
+  });
   it('buyBackItem repurchases via the silent add, spends copper, and clears the buyback slot', () => {
     const sim = makeWorld();
     const { pid, meta } = vendorPlayer(sim);
@@ -308,6 +332,7 @@ describe('items module determinism', () => {
       sim.addItem('wolf_fang', 3, pid);
       items.discardItem(ctx, 'wolf_fang', 1, pid);
       items.sellItem(ctx, 'wolf_fang', 1, pid);
+      items.autosortBags(ctx, pid);
       sim.addItem('bandit_bandana', 1, pid);
       items.sellAllJunk(ctx, pid);
       items.buyBackItem(ctx, 'wolf_fang', pid);

@@ -1686,6 +1686,9 @@ export class ClientWorld implements IWorld {
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });
   }
+  autosortBags(): void {
+    this.cmd({ cmd: 'autosort_bags' });
+  }
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }

@@ -179,6 +179,7 @@ export const COMMAND_NAMES = [
   'discard',
   'buy',
   'sell',
+  'autosort_bags',
   'buyback',
   'sell_all_junk',
   'change_skin',
