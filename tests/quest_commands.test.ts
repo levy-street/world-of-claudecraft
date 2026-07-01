@@ -178,6 +178,7 @@ describe('quest_commands: turnInQuest', () => {
     const ev = sim.drainEvents();
     expect(ev.some((e) => e.type === 'questDone' && (e as any).questId === 'q_wolves')).toBe(true);
     expect(logsTo(ev, pid)).toContain('Quest completed: Wolves at the Door');
+    expect(logsTo(ev, pid)).toContain('Reputation increased with Eastbrook by 250.');
     expect(ev.some((e) => e.type === 'loot' && /^You receive /.test(String((e as any).text)))).toBe(
       true,
     );
@@ -185,6 +186,7 @@ describe('quest_commands: turnInQuest', () => {
     expect(meta.questsDone.has('q_wolves')).toBe(true);
     expect(meta.questLog.has('q_wolves')).toBe(false);
     expect(meta.copper - copperBefore).toBe(QUESTS.q_wolves.copperReward);
+    expect(meta.reputation.eastbrook).toBe(250);
     expect(meta.lifetimeXp).toBeGreaterThan(lifetimeXpBefore);
     expect(meta.counters.questsCompleted).toBe(completedBefore + 1);
   });

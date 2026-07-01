@@ -1256,6 +1256,7 @@ export interface QuestDef {
   xpReward: number;
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
+  reputationReward?: { factionId: string; amount: number };
   requiresQuest?: string; // prerequisite quest id (must be turned in)
   requiredItems?: string[]; // quest items obtained earlier (e.g. a prerequisite reward) that this
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block

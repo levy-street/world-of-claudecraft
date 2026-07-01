@@ -637,6 +637,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     xpReward: 250,
     copperReward: 75,
     itemRewards: {},
+    reputationReward: { factionId: 'eastbrook', amount: 250 },
   },
   q_greyjaw: {
     id: 'q_greyjaw',

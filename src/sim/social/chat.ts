@@ -408,6 +408,10 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     ctx.error(r.meta.entityId, readouts.statsReadout(r.meta, r.e));
     return null;
   }
+  if (/^\/(?:reputation|rep|factions?)(?:\s|$)/i.test(raw)) {
+    ctx.error(r.meta.entityId, readouts.reputationReadout(r.meta));
+    return null;
+  }
   if (/^\/(?:buffs?|auras)(?:\s|$)/i.test(raw)) {
     ctx.error(r.meta.entityId, readouts.buffsReadout(r.e));
     return null;
@@ -927,7 +931,7 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
-    'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
+    'Character readouts: /played, /xp, /gold, /stats, /reputation, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',
     'State readouts: /pet, /pettaunt, /speed, /consumable, /potion, /form, /manaregen, /falling, /queued, /savedmana.',

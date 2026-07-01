@@ -26,6 +26,7 @@
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { questFallbackGrants } from '../quest_fallback';
+import { grantReputation } from '../reputation';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -231,6 +232,21 @@ export function turnInQuestCore(
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
   ctx.grantXp(quest.xpReward, meta);
+  if (quest.reputationReward) {
+    const rep = grantReputation(
+      meta,
+      quest.reputationReward.factionId,
+      quest.reputationReward.amount,
+    );
+    if (rep) {
+      ctx.emit({
+        type: 'log',
+        text: `Reputation increased with ${rep.factionName} by ${rep.amount}.`,
+        color: '#9ad67a',
+        pid: meta.entityId,
+      });
+    }
+  }
   ctx.emit({ type: 'questDone', questId, pid: meta.entityId });
   ctx.emit({
     type: 'log',

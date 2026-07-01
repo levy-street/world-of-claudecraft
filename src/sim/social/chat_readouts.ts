@@ -12,6 +12,7 @@
 
 import { isDebuffAura } from '../aura_classify';
 import { isRooted } from '../combat/cc';
+import { FACTION_ORDER, FACTIONS, reputationStanding } from '../content/factions';
 import {
   FIRST_TALENT_LEVEL,
   pointsSpent,
@@ -113,6 +114,14 @@ export function zonesReadout(currentZ: number): string {
     return z.id === here.id ? `${line} [you are here]` : line;
   });
   return `Zones (${ZONES.length}): ${parts.join(', ')}.`;
+}
+export function reputationReadout(meta: PlayerMeta): string {
+  const parts = FACTION_ORDER.map((id) => {
+    const faction = FACTIONS[id];
+    const points = meta.reputation[id] ?? 0;
+    return `${faction.name} ${reputationStanding(points)} (${points})`;
+  });
+  return `Reputation: ${parts.join(', ')}.`;
 }
 // Self-only readout of a character's Ashen Coliseum standing. Reads only the
 // persisted PlayerMeta arena fields (no new state). Draws count as neither a
