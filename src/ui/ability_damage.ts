@@ -11,8 +11,10 @@ import type { ResolvedAbility } from '../sim/sim';
 import {
   abilityScalingPower,
   channelTickBonus,
+  directHealBonus,
   directHitBonus,
   dotTickBonus,
+  hotTickBonus,
 } from '../sim/spell_scaling';
 import type { AbilityEffect } from '../sim/types';
 
@@ -23,8 +25,9 @@ export interface AbilityScaling {
   attackPower: number;
 }
 
-/** Flat bonus this character adds to ONE displayed hit of `eff` (or, for a DoT, to
- *  its whole `total`), matching combat. 0 when the effect does not scale. */
+/** Flat bonus this character adds to ONE displayed hit of `eff` (or, for a DoT/HoT,
+ *  to its whole `total`), matching combat. Covers damage AND healing (direct heals
+ *  and HoTs scale off Spell Power). 0 when the effect does not scale. */
 export function abilityDamageBonus(
   res: ResolvedAbility,
   eff: AbilityEffect,
@@ -66,6 +69,22 @@ export function abilityDamageBonus(
       // tick, so the total gains per-tick-bonus * tick-count.
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
       return dotTickBonus(power, def, eff.duration, eff.interval) * ticks;
+    }
+    case 'heal':
+      // Heals scale with Spell Power at the direct cast-time coefficient (the
+      // healing mirror of directHitBonus), never the school-dependent `power`.
+      // Match effect_dispatch.ts 'heal'.
+      return directHealBonus(scaling.spellPower, res.castTime);
+    case 'hot': {
+      // A HoT that RIDES a direct heal (Regrowth) does NOT scale its rider: the
+      // direct heal already took the coefficient, so scaling the rider too would
+      // double-dip. Only pure HoTs (Rejuvenation) take it. Match effect_dispatch.ts.
+      const hybridHeal = res.effects.some((e) => e.type === 'heal');
+      if (hybridHeal) return 0;
+      // The tooltip shows the HoT's TOTAL; the sim adds the per-tick bonus to each
+      // tick, so the total gains per-tick-bonus * tick-count.
+      const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
+      return hotTickBonus(scaling.spellPower, eff.duration, eff.interval) * ticks;
     }
     default:
       return 0;

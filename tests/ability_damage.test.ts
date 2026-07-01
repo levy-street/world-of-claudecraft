@@ -3,8 +3,10 @@ import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   abilityScalingPower,
   channelTickBonus,
+  directHealBonus,
   directHitBonus,
   dotTickBonus,
+  hotTickBonus,
 } from '../src/sim/spell_scaling';
 import { MAX_LEVEL } from '../src/sim/types';
 import { type AbilityScaling, abilityDamageBonus } from '../src/ui/ability_damage';
@@ -78,11 +80,32 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     expect(abilityDamageBonus(ev, eff, SC)).toBe(Math.round(SC.attackPower / 14));
   });
 
-  it('returns 0 for a heal (heals do not scale in this PR)', () => {
-    const heal = abilitiesKnownAt('priest', MAX_LEVEL).find((k) =>
-      k.effects.some((e) => e.type === 'heal'),
-    )!;
-    const eff = heal.effects.find((e) => e.type === 'heal')!;
-    expect(abilityDamageBonus(heal, eff, SC)).toBe(0);
+  it('a direct heal folds Spell Power at the direct cast-time coefficient', () => {
+    const fh = known('priest', 'flash_heal');
+    const eff = fh.effects.find((e) => e.type === 'heal')!;
+    expect(abilityDamageBonus(fh, eff, SC)).toBe(directHealBonus(SC.spellPower, fh.castTime));
+    expect(abilityDamageBonus(fh, eff, SC)).toBeGreaterThan(0);
+  });
+
+  it('a pure HoT (Rejuvenation) folds Spell Power across all its ticks (the total)', () => {
+    const rej = known('druid', 'rejuvenation');
+    const eff = rej.effects.find((e) => e.type === 'hot')!;
+    if (eff.type !== 'hot') throw new Error('expected hot');
+    const ticks = eff.duration / eff.interval;
+    expect(abilityDamageBonus(rej, eff, SC)).toBe(
+      hotTickBonus(SC.spellPower, eff.duration, eff.interval) * ticks,
+    );
+    expect(abilityDamageBonus(rej, eff, SC)).toBeGreaterThan(0);
+  });
+
+  it('a HoT that rides a direct heal (Regrowth) does not double-scale its rider', () => {
+    const rg = known('druid', 'regrowth');
+    const hot = rg.effects.find((e) => e.type === 'hot')!;
+    // The direct-heal component already took the cast-time coefficient, so the HoT
+    // rider adds no further Spell Power (matches effect_dispatch.ts hybridHeal).
+    expect(abilityDamageBonus(rg, hot, SC)).toBe(0);
+    // ...but the direct-heal component itself still scales.
+    const heal = rg.effects.find((e) => e.type === 'heal')!;
+    expect(abilityDamageBonus(rg, heal, SC)).toBe(directHealBonus(SC.spellPower, rg.castTime));
   });
 });

@@ -2909,7 +2909,7 @@ export class Hud {
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
   // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
   // descriptor. Injected into the auras view so the i18n-free core never calls t().
-  private auraEffectTooltipHtml(a: AuraEffectInput): string {
+  private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
     const effect = auraEffectDescriptor(a);
     if (!effect) return '';
     const values: Record<string, string> = {};
@@ -2918,8 +2918,15 @@ export class Hud {
         values[k] = formatNumber(n, { maximumFractionDigits: 0 });
       }
     }
-    if (effect.school) {
-      values.school = t(`hudChrome.auraEffect.school.${effect.school}` as TranslationKey);
+    // Resolve the {school} placeholder in the dot/absorb/thorns summaries. Prefer
+    // the SOURCE ability's school: it is authoritative and always present
+    // client-side, unlike the aura's own school, which the ability-tooltip call
+    // site omits (only kind+value) and the online wire mirror drops. Without this
+    // a magic reflect like Lightning Shield read a raw "{school}" (ability tooltip)
+    // or the wrong "Physical" (online buff frame) instead of its real school.
+    const school = (a.id ? ABILITIES[a.id]?.school : undefined) ?? effect.school;
+    if (school) {
+      values.school = t(`hudChrome.auraEffect.school.${school}` as TranslationKey);
     }
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
@@ -3283,7 +3290,9 @@ export class Hud {
     // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
     for (const eff of res.effects) {
       if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
-        html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value });
+        // Pass the ability id so the effect line can resolve its damage school
+        // (the {school} placeholder in the thorns/dot/absorb summaries).
+        html += this.auraEffectTooltipHtml({ kind: eff.kind, value: eff.value, id: a.id });
       }
     }
     const requirements = abilityRequirementLines(a);
@@ -11076,11 +11085,12 @@ function abilityRequirementLines(def: AbilityDef): string[] {
   return lines;
 }
 
-// Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
-// character's Spell Power / Ranged AP / Attack Power) is given, the BASE damage is
-// shown with the scaling contribution called out as a "(+N)" suffix, e.g.
-// "66 to 74 (+29)", so a caster sees both the base and exactly what their Spell
-// Power adds, and watches it climb as gear changes.
+// Builds the `$d` amount string for an ability tooltip (damage OR healing). When
+// `scaling` (the live character's Spell Power / Ranged AP / Attack Power) is given,
+// the BASE amount is shown with the scaling contribution called out as a "(+N)"
+// suffix, e.g. "66 to 74 (+29)", so a caster or healer sees both the base and
+// exactly what their Spell Power adds, and watches it climb as gear changes.
+// Heals (direct and HoT) scale off Spell Power via abilityDamageBonus.
 function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
   const effects = res.effects;
   // " (+N)" callout for the scaling contribution (Spell Power / Attack Power),
@@ -11132,7 +11142,7 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
     case 'dot':
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
-      return formatAbilityNumber(secondary.total);
+      return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'absorb':
       return formatAbilityNumber(secondary.amount);
     case 'imbue':
