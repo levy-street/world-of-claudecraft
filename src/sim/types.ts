@@ -430,6 +430,24 @@ export interface LootEntry {
   rollGroup?: string;
 }
 
+export type MobComponentType =
+  | 'bone'
+  | 'candlewax'
+  | 'chitin'
+  | 'claw'
+  | 'crystal'
+  | 'ectoplasm'
+  | 'elemental_core'
+  | 'fang'
+  | 'fin'
+  | 'gills'
+  | 'hide'
+  | 'meat'
+  | 'scale'
+  | 'silk'
+  | 'tusk'
+  | 'venom_sac';
+
 export type MobFamily =
   | 'beast'
   | 'humanoid'
@@ -451,6 +469,7 @@ export interface MobTemplate {
   minLevel: number;
   maxLevel: number;
   family: MobFamily;
+  componentTypes?: MobComponentType[];
   hpPerLevel: number;
   hpBase: number;
   dmgBase: number; // min dmg at level 1
