@@ -509,6 +509,35 @@ describe('delta snapshots', () => {
     expect(lastSnap(fc.sent).self.ack).toBe(7);
   });
 
+  it('rate limits inbound message floods before processing more input', () => {
+    const now = new Date('2026-01-01T00:00:00Z');
+    vi.useFakeTimers();
+    vi.setSystemTime(now);
+    session.inboundMessageLastRefill = now.getTime() / 1000;
+    session.inboundMessageLastRateError = 0;
+    fc.sent.length = 0;
+
+    try {
+      for (let seq = 1; seq <= 200; seq++) {
+        server.handleMessage(session, JSON.stringify({ t: 'input', seq, mi: { f: 1 } }));
+      }
+
+      const lastProcessedSeq = session.lastInputSeq;
+      expect(lastProcessedSeq).toBeGreaterThan(0);
+      expect(lastProcessedSeq).toBeLessThan(200);
+
+      server.handleMessage(session, JSON.stringify({ t: 'input', seq: 999, mi: { f: 0 } }));
+      expect(session.lastInputSeq).toBe(lastProcessedSeq);
+      expect(fc.sent).toContainEqual({ t: 'error', error: 'rate limited' });
+
+      vi.advanceTimersByTime(1000);
+      server.handleMessage(session, JSON.stringify({ t: 'input', seq: 1000, mi: { f: 0 } }));
+      expect(session.lastInputSeq).toBe(1000);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('turns echoed input acks into client latency samples', () => {
     const client = bareClient(1);
     const first = {

@@ -116,6 +116,9 @@ const LEAVE_SAVE_RETRY_MAX_MS = 4000;
 const CHAT_RATE_BURST = 5;
 const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
 const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
+const INBOUND_MESSAGE_RATE_BURST = 120;
+const INBOUND_MESSAGE_RATE_REFILL_PER_SECOND = 40;
+const INBOUND_MESSAGE_RATE_ERROR_COOLDOWN_SECONDS = 5;
 const CHAT_COOLDOWN_SECONDS = 20;
 const CHAT_RATE_VIOLATIONS_FOR_COOLDOWN = 3;
 const WHO_RESULT_LIMIT = 50;
@@ -319,6 +322,9 @@ export interface ClientSession {
   joinedAt: number;
   dbSessionId: number | null; // play_sessions row, set once the insert lands
   left: boolean; // set in leave(); guards against the open-session insert landing after disconnect
+  inboundMessageTokens: number;
+  inboundMessageLastRefill: number;
+  inboundMessageLastRateError: number;
   chatTokens: number;
   chatLastRefill: number;
   chatLastRateError: number;
@@ -1394,6 +1400,9 @@ export class GameServer {
       joinedAt: Date.now(),
       dbSessionId: null,
       left: false,
+      inboundMessageTokens: INBOUND_MESSAGE_RATE_BURST,
+      inboundMessageLastRefill: Date.now() / 1000,
+      inboundMessageLastRateError: 0,
       chatTokens: CHAT_RATE_BURST,
       chatLastRefill: Date.now() / 1000,
       chatLastRateError: 0,
@@ -2018,6 +2027,7 @@ export class GameServer {
 
   handleMessage(session: ClientSession, raw: string): void {
     const receivedAtMs = Date.now();
+    if (!this.consumeInboundMessageToken(session, receivedAtMs)) return;
     let msg: unknown;
     try {
       msg = JSON.parse(raw);
@@ -2039,6 +2049,30 @@ export class GameServer {
     }
   }
 
+  private consumeInboundMessageToken(session: ClientSession, receivedAtMs: number): boolean {
+    const now = receivedAtMs / 1000;
+    if (now < session.inboundMessageLastRefill) {
+      session.inboundMessageTokens = INBOUND_MESSAGE_RATE_BURST;
+      session.inboundMessageLastRefill = now;
+    }
+    const elapsed = Math.max(0, now - session.inboundMessageLastRefill);
+    if (elapsed > 0) {
+      session.inboundMessageTokens = Math.min(
+        INBOUND_MESSAGE_RATE_BURST,
+        session.inboundMessageTokens + elapsed * INBOUND_MESSAGE_RATE_REFILL_PER_SECOND,
+      );
+      session.inboundMessageLastRefill = now;
+    }
+    if (session.inboundMessageTokens >= 1) {
+      session.inboundMessageTokens -= 1;
+      return true;
+    }
+    if (now - session.inboundMessageLastRateError >= INBOUND_MESSAGE_RATE_ERROR_COOLDOWN_SECONDS) {
+      this.send(session, { t: 'error', error: 'rate limited' });
+      session.inboundMessageLastRateError = now;
+    }
+    return false;
+  }
   private messageCommand(msg: unknown): string {
     if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return 'unknown';
     const record = msg as Record<string, unknown>;
