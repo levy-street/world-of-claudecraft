@@ -21,6 +21,52 @@ guard fail) - predates this work, not fixed here.
 Known follow-up: the Tolling Bell renders as a generic mob mesh (Stage 3 was sim-only);
 a custom rolling-bell visual + telegraph-lane decal is a nice-to-have render pass.
 
+## Asset generation backlog (nice-to-have, none blocking release)
+
+Everything below currently renders via a generic fallback (family model or the
+procedural item-icon fallback) and functions correctly; none of this blocks release.
+Priority order if picked up:
+
+1. **Tolling Bell** (`src/sim/content/delves/mobs.ts` `tolling_bell`, `family: 'undead'`)
+   - Renders as `skel_minion` (a generic skeleton) via the undead family fallback in
+     `src/render/characters/manifest.ts` (`FAMILY_KEYS.undead`) - no dedicated `MOB_KEYS`
+     entry. A rolling bell projectile currently looks like a skeleton. HIGHEST priority:
+     the visual mismatch is the most jarring of this list.
+   - Asset need: a small bell/orb-shaped rolling mesh (GLB) registered in `MOB_KEYS`, or a
+     purely procedural geometry builder in `src/render/props.ts` if a full model feels
+     like overkill for a short-lived projectile.
+2. **Deepfen Spearjaw** (`mirefen` marsh mob, `family: 'beast'`)
+   - No `MOB_KEYS` entry -> falls back to the generic wolf beast model. A swamp
+     "spearjaw" reads as more aquatic/reptilian than wolf-shaped.
+3. **Edda Reedhand** (the delve companion NPC, `family: 'humanoid'`)
+   - No `MOB_KEYS` entry -> generic humanoid fallback. She's a recurring ally the
+     player sees for the whole run, unlike a one-off trash mob, so a distinct look
+     (lantern, reeds) pays off more than most of this list.
+4. **Reedbound Acolyte** (`family: 'humanoid'`) - generic humanoid fallback; lower
+   priority than Edda since it's disposable trash.
+5. **Choir Thrall** (`family: 'undead'`) - same `skel_minion` fallback as the Tolling
+   Bell; thematically passable (an undead swarm add) so lowest priority of the mob list.
+6. **12 new Reliquary Rite loot items** (`src/sim/content/delves/items.ts`, e.g.
+   `siltguard_helm`, `nhalias_bell_maul`, `blackwater_vanguard_chest`...) have no
+   `ITEM_RECIPES` entry in `src/ui/icons.ts`; they render via the procedural
+   `itemFallback` (works, generic slot/school icon). Bespoke recipes are pure polish.
+
+Reused-and-fine, no action needed: Sump Troll Devourer -> `mob_troll` (literal name
+match), Mirefen Widowling -> `mob_spider` (spider/widow theme fits), Grave-Silt Bulwark
+-> `mob_ogre` (hulking-brute silhouette fits), Drowned Cantor -> `delve_mob_acolyte`,
+Sister Nhalia -> `mob_dark_caster` (shared with every other dark-caster boss, already
+the established convention for humanoid casters in this codebase).
+The room/water/dressing visuals (blue entrance, shallow/deep water materials, dead
+trees, the Reliquary + 4 shrine props) are already fully custom and procedural
+(`src/render/props.ts`, `delve_marsh_dressing.ts`, `delve_props.ts`) - nothing to
+generate there.
+
+Generating a 3D model needs the `meshy` MCP tools (text-to-3d costs 5-20 credits per
+generation, confirm cost before running); a mob needs its GLB registered in
+`src/render/dungeon.ts` `KIT_MODELS`/preloads and wired into `manifest.ts` `MOB_KEYS`.
+An icon just needs a new `ITEM_RECIPES` entry in `src/ui/icons.ts` (no external
+generation, procedural, free).
+
 Post-Stage-4 manual verification (in-game, via new scripts/drowned_litany_shots.mjs and
 scripts/drowned_litany_boss_shot.mjs): screenshotted all 7 rooms (size curve and
 shallow/deep water tiers visually confirmed) and drove a live Tolling Bells volley.
