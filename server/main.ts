@@ -1018,6 +1018,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const results = q.trim().length >= 1 ? await searchCharacters(q, 8) : [];
       return json(res, 200, { results });
     }
+    if (req.method === 'GET' && url === '/api/guilds') {
+      if (publicReadRateLimited(req)) return json(res, 429, { error: 'rate limited' });
+      const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
+      const limit = Number(params.get('limit') ?? 50);
+      return json(res, 200, {
+        realm: REALM,
+        guilds: await game.social.guildDirectory(limit),
+      });
+    }
     if (req.method === 'POST' && url === '/api/reports') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;

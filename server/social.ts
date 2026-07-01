@@ -58,6 +58,14 @@ export interface GuildView {
   members: GuildMemberEntry[];
 }
 
+export interface GuildDirectoryEntry {
+  id: number;
+  name: string;
+  realm: string;
+  memberCount: number;
+  leader: CharInfo | null;
+}
+
 export interface SocialSnapshot {
   friends: FriendEntry[];
   blocks: CharRef[];
@@ -90,6 +98,7 @@ export interface SocialDb {
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
   guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]>;
+  listGuildDirectory(limit: number): Promise<GuildDirectoryEntry[]>;
 }
 
 export interface SocialActor {
@@ -188,6 +197,12 @@ export class SocialService {
 
   private push(charId: number): void {
     this.tx.pushSnapshot(charId);
+  }
+
+  async guildDirectory(limit = 50): Promise<GuildDirectoryEntry[]> {
+    const fallbackLimit = 50;
+    const n = Number.isFinite(limit) ? Math.trunc(limit) : fallbackLimit;
+    return this.db.listGuildDirectory(Math.max(1, Math.min(100, n || fallbackLimit)));
   }
 
   private err(charId: number, text: string): void {

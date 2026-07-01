@@ -4,7 +4,7 @@
 // stored now so cross-realm friends/guilds need no migration later).
 
 import type { Pool } from 'pg';
-import type { CharInfo, CharRef, GuildRank, SocialDb } from './social';
+import type { CharInfo, CharRef, GuildDirectoryEntry, GuildRank, SocialDb } from './social';
 import { REALM } from './realm';
 
 // kept as an alias for the schema's column default; the live realm is REALM
@@ -269,5 +269,42 @@ export class PgSocialDb implements SocialDb {
       [guildId],
     );
     return res.rows;
+  }
+  async listGuildDirectory(limit: number): Promise<GuildDirectoryEntry[]> {
+    const res = await this.pool.query(
+      `SELECT g.id,
+              g.name,
+              g.realm,
+              count(gm.character_id)::int AS member_count,
+              lc.id AS leader_id,
+              lc.name AS leader_name,
+              lc.class AS leader_cls,
+              lc.level AS leader_level,
+              lc.realm AS leader_realm
+         FROM guilds g
+         LEFT JOIN guild_members gm ON gm.guild_id = g.id
+         LEFT JOIN guild_members lgm ON lgm.guild_id = g.id AND lgm.rank = 'leader'
+         LEFT JOIN characters lc ON lc.id = lgm.character_id
+        WHERE g.realm = $1
+        GROUP BY g.id, g.name, g.realm, lc.id, lc.name, lc.class, lc.level, lc.realm
+        ORDER BY count(gm.character_id) DESC, lower(g.name), g.id
+        LIMIT $2`,
+      [REALM, limit],
+    );
+    return res.rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      realm: row.realm,
+      memberCount: row.member_count,
+      leader: row.leader_id === null
+        ? null
+        : {
+            id: row.leader_id,
+            name: row.leader_name,
+            cls: row.leader_cls,
+            level: row.leader_level,
+            realm: row.leader_realm,
+          },
+    }));
   }
 }

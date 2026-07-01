@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   SocialService, validateGuildName,
   type CharInfo, type CharRef, type GuildRank, type Presence,
+  type GuildDirectoryEntry,
   type SocialDb, type SocialEvent, type SocialTransport,
 } from '../server/social';
 import { resolveRealm } from '../server/realm';
@@ -78,6 +79,23 @@ class FakeDb implements SocialDb {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
       .map(([cid, m]) => ({ ...this.chars.get(cid)!, rank: m.rank }));
+  }
+  async listGuildDirectory(limit: number): Promise<GuildDirectoryEntry[]> {
+    return [...this.guilds.entries()]
+      .map(([id, name]) => {
+        const members = [...this.members.entries()].filter(([, m]) => m.guildId === id);
+        const leaderId = members.find(([, m]) => m.rank === 'leader')?.[0];
+        const leader = leaderId === undefined ? null : this.chars.get(leaderId) ?? null;
+        return {
+          id,
+          name,
+          realm: 'Claudemoon',
+          memberCount: members.length,
+          leader,
+        };
+      })
+      .sort((a, b) => b.memberCount - a.memberCount || a.name.localeCompare(b.name) || a.id - b.id)
+      .slice(0, limit);
   }
   guildCount(): number { return this.guilds.size; } // test helper: detect orphaned guilds
 }
@@ -300,6 +318,25 @@ describe('guilds', () => {
     expect(snap.guild?.name).toBe('Iron Vanguard');
     expect(snap.guild?.rank).toBe('leader');
     expect(snap.guild?.members.map((m) => m.name)).toEqual(['Aleph']);
+  });
+
+  it('lists public guild directory entries by size with leader metadata (#110)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildCreate(h.actor(3), 'Azure Wardens');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+
+    const entries = await h.svc.guildDirectory(1);
+
+    expect(entries).toEqual([
+      {
+        id: 1,
+        name: 'Iron Vanguard',
+        realm: 'Claudemoon',
+        memberCount: 2,
+        leader: { id: 1, name: 'Aleph', cls: 'warrior', level: 10, realm: 'Claudemoon' },
+      },
+    ]);
   });
 
   it('refreshes guildmates\' panels when a member comes online, even non-friends (#100)', async () => {
