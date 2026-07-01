@@ -27,8 +27,10 @@ function vendorPlayer(sim: Sim, name = 'Aleph') {
       number,
       {
         copper: number;
+        bankCopper: number;
         equipment: Record<string, string>;
         vendorBuyback: { itemId: string; count: number }[];
+        bank: { itemId: string; count: number }[];
         inventory: { itemId: string; count: number }[];
         pendingSkinRank: number | null;
       }
@@ -87,6 +89,60 @@ describe('items.equipItem / unequipItem', () => {
     expect(meta.equipment.helmet).toBeUndefined();
     expect(sim.countItem('cryptbone_helm', pid)).toBe(1);
     expect(items.unequipItem(ctx, 'legs', pid)).toBe(false);
+  });
+});
+describe('items personal bank', () => {
+  it('moves item stacks between bags and bank without creating quest credit on deposit', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('wolf_fang', 5, pid);
+    sim.drainEvents();
+
+    expect(items.depositBankItem(ctx, 'wolf_fang', 3, pid)).toBe(true);
+    expect(sim.countItem('wolf_fang', pid)).toBe(2);
+    expect(meta.bank).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
+
+    expect(items.withdrawBankItem(ctx, 'wolf_fang', 2, pid)).toBe(true);
+    expect(sim.countItem('wolf_fang', pid)).toBe(4);
+    expect(meta.bank).toEqual([{ itemId: 'wolf_fang', count: 1 }]);
+
+    expect(items.withdrawBankItem(ctx, 'wolf_fang', 99, pid)).toBe(true);
+    expect(sim.countItem('wolf_fang', pid)).toBe(5);
+    expect(meta.bank).toEqual([]);
+  });
+
+  it('refuses invalid item bank transfers without mutating bags or bank', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('wolf_fang', 2, pid);
+
+    expect(items.depositBankItem(ctx, 'wolf_fang', Number.NaN, pid)).toBe(false);
+    expect(items.depositBankItem(ctx, 'missing_item', 1, pid)).toBe(false);
+    expect(items.withdrawBankItem(ctx, 'wolf_fang', 1, pid)).toBe(false);
+    expect(sim.countItem('wolf_fang', pid)).toBe(2);
+    expect(meta.bank).toEqual([]);
+  });
+
+  it('moves copper between purse and bank with integer clamping', () => {
+    const sim = makeWorld();
+    const { pid, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    meta.copper = 125;
+
+    expect(items.depositBankCopper(ctx, 50.8, pid)).toBe(true);
+    expect(meta.copper).toBe(75);
+    expect(meta.bankCopper).toBe(50);
+
+    expect(items.withdrawBankCopper(ctx, 20.2, pid)).toBe(true);
+    expect(meta.copper).toBe(95);
+    expect(meta.bankCopper).toBe(30);
+
+    expect(items.withdrawBankCopper(ctx, 99, pid)).toBe(true);
+    expect(meta.copper).toBe(125);
+    expect(meta.bankCopper).toBe(0);
+    expect(items.depositBankCopper(ctx, Number.NaN, pid)).toBe(false);
   });
 });
 

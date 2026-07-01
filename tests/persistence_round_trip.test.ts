@@ -20,6 +20,8 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     sim.setPlayerLevel(12, pid);
     const meta = sim.meta(pid)!;
     meta.copper = 4242;
+    meta.bankCopper = 777;
+    meta.bank = [{ itemId: 'apprentice_staff', count: 1 }];
     sim.addItem('wolf_fang', 5, pid);
     sim.addItem('baked_bread', 2, pid);
     meta.arenaRating = 1650;
@@ -50,6 +52,8 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     // spot-check that the rich fields actually survived (not all defaulted to empty).
     expect(s2.arena2v2Rating).toBe(1880);
     expect(s2.delveMarks).toBe(17);
+    expect(s2.bankCopper).toBe(777);
+    expect(s2.bank).toEqual([{ itemId: 'apprentice_staff', count: 1 }]);
     expect(s2.loadouts?.length).toBe(1);
     expect(s2.skinCatalog).toBe('mech');
   });

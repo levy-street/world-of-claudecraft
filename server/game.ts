@@ -250,6 +250,10 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'unequip_item',
+  'bank_deposit_item',
+  'bank_withdraw_item',
+  'bank_deposit_copper',
+  'bank_withdraw_copper',
   'use',
   'discard',
   'buy',
@@ -2278,6 +2282,26 @@ export class GameServer {
           sim.unequipItem(msg.slot as EquipSlot, pid);
         }
         break;
+      case 'bank_deposit_item':
+        if (typeof msg.item === 'string') {
+          sim.depositBankItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+        }
+        break;
+      case 'bank_withdraw_item':
+        if (typeof msg.item === 'string') {
+          sim.withdrawBankItem(
+            msg.item,
+            typeof msg.count === 'number' ? msg.count : undefined,
+            pid,
+          );
+        }
+        break;
+      case 'bank_deposit_copper':
+        if (typeof msg.amount === 'number') sim.depositBankCopper(msg.amount, pid);
+        break;
+      case 'bank_withdraw_copper':
+        if (typeof msg.amount === 'number') sim.withdrawBankCopper(msg.amount, pid);
+        break;
       case 'use':
         if (typeof msg.item === 'string') {
           const result = sim.useItem(msg.item, pid);
@@ -3116,6 +3140,8 @@ export class GameServer {
       session.selfHeavyDirty = false;
       session.lastWireRev = meta.wireRev;
       maybe('inv', meta.inventory);
+      maybe('bank', meta.bank);
+      maybe('bankc', meta.bankCopper);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('cosmetics', anchorSession.accountCosmetics);

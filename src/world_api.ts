@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 20 domain facets (each IWorld member assigned exactly once; 142
+// FACET MAP: the 20 domain facets (each IWorld member assigned exactly once; 154
 // total). One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
@@ -36,10 +36,10 @@
 //
 // THREE GATES pin this seam (run before any facet edit):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
-//                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
+//                                          ALL_DELTA_KEYS (27) + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
 //                                          subset-of dispatch-set; DISPATCH_ONLY (7).
-//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (142) present + same-kind on
+//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (154) present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
 //                                          union of the 20 facets.
 // ---------------------------------------------------------------------------
@@ -267,6 +267,10 @@ export const COMMAND_NAMES = [
   'lockpick_abort',
   'collect_delve_chest_loot',
   'telemetry',
+  'bank_deposit_item',
+  'bank_withdraw_item',
+  'bank_deposit_copper',
+  'bank_withdraw_copper',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -358,6 +362,11 @@ export const COMMAND_FACETS = {
   saveLoadout: 'IWorldTalents',
   switchLoadout: 'IWorldTalents',
   deleteLoadout: 'IWorldTalents',
+  // IWorldInventory: item, vendor, and personal-bank commands.
+  bank_deposit_item: 'IWorldInventory',
+  bank_withdraw_item: 'IWorldInventory',
+  bank_deposit_copper: 'IWorldInventory',
+  bank_withdraw_copper: 'IWorldInventory',
   // IWorldCosmetics: skin + mech-chroma equips (snake_case wire strings, by design).
   change_skin: 'IWorldCosmetics',
   claim_event_skin: 'IWorldCosmetics',

@@ -2,11 +2,17 @@ import type { EquipSlot, InvSlot } from '../sim/types';
 
 export interface IWorldInventory {
   inventory: InvSlot[];
+  bank: InvSlot[];
   vendorBuyback: InvSlot[];
   equipment: Partial<Record<EquipSlot, string>>;
   copper: number;
+  bankCopper: number;
   equipItem(itemId: string): void;
   unequipItem(slot: EquipSlot): void;
+  depositBankItem(itemId: string, count?: number): void;
+  withdrawBankItem(itemId: string, count?: number): void;
+  depositBankCopper(amount: number): void;
+  withdrawBankCopper(amount: number): void;
   useItem(itemId: string): void;
   discardItem(itemId: string, count?: number): void;
   buyItem(npcId: number, itemId: string): void;

@@ -59,7 +59,6 @@ export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: nu
     pid: meta.entityId,
   });
 }
-
 export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -109,6 +108,86 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   return true;
 }
 
+function addBankItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
+  const existing = meta.bank.find((s) => s.itemId === itemId);
+  if (existing) existing.count += count;
+  else meta.bank.push({ itemId, count });
+}
+
+function bankAvailable(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return false;
+  }
+  if (!vendorInRange(ctx, p)) {
+    ctx.error(meta.entityId, 'There is no merchant nearby.');
+    return false;
+  }
+  return true;
+}
+
+export function depositBankItem(ctx: SimContext, itemId: string, count = 1, pid?: number): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const { meta, e: p } = r;
+  if (!bankAvailable(ctx, meta, p)) return false;
+  const def = ITEMS[itemId];
+  const available = ctx.countItem(itemId, meta.entityId);
+  if (!def || available <= 0) {
+    ctx.error(meta.entityId, "You don't have that item.");
+    return false;
+  }
+  const depositCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
+  if (depositCount <= 0) return false;
+  ctx.removeItem(itemId, depositCount, meta.entityId);
+  addBankItemSilent(itemId, depositCount, meta);
+  return true;
+}
+
+export function withdrawBankItem(
+  ctx: SimContext,
+  itemId: string,
+  count = 1,
+  pid?: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const { meta, e: p } = r;
+  if (!bankAvailable(ctx, meta, p)) return false;
+  const slot = meta.bank.find((s) => s.itemId === itemId);
+  if (!ITEMS[itemId] || !slot || slot.count <= 0) return false;
+  const withdrawCount = Number.isFinite(count) ? Math.min(Math.floor(count), slot.count) : 0;
+  if (withdrawCount <= 0) return false;
+  slot.count -= withdrawCount;
+  if (slot.count <= 0) meta.bank = meta.bank.filter((s) => s !== slot);
+  addItemSilent(itemId, withdrawCount, meta);
+  ctx.onInventoryChangedForQuests(meta);
+  return true;
+}
+
+export function depositBankCopper(ctx: SimContext, amount: number, pid?: number): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const { meta, e: p } = r;
+  if (!bankAvailable(ctx, meta, p)) return false;
+  const deposit = Number.isFinite(amount) ? Math.min(Math.floor(amount), meta.copper) : 0;
+  if (deposit <= 0) return false;
+  meta.copper -= deposit;
+  meta.bankCopper += deposit;
+  return true;
+}
+
+export function withdrawBankCopper(ctx: SimContext, amount: number, pid?: number): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const { meta, e: p } = r;
+  if (!bankAvailable(ctx, meta, p)) return false;
+  const withdraw = Number.isFinite(amount) ? Math.min(Math.floor(amount), meta.bankCopper) : 0;
+  if (withdraw <= 0) return false;
+  meta.bankCopper -= withdraw;
+  meta.copper += withdraw;
+  return true;
+}
 export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;

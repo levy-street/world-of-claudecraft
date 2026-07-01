@@ -808,9 +808,11 @@ export class ClientWorld implements IWorld {
   known: ResolvedAbility[] = [];
   realm = '';
   inventory: InvSlot[] = [];
+  bank: InvSlot[] = [];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
   copper = 0;
+  bankCopper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
   accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
@@ -1423,12 +1425,17 @@ export class ClientWorld implements IWorld {
       // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
       // the move; the offline counterpart is src/sim/items.ts.
       this.copper = s.copper ?? 0;
+      this.bankCopper = s.bankc ?? this.bankCopper;
       if (s.inv !== undefined) {
         this.inventory = s.inv;
         this.invChanged = true;
       }
       if (s.buyback !== undefined) {
         this.vendorBuyback = s.buyback;
+        this.invChanged = true;
+      }
+      if (s.bank !== undefined) {
+        this.bank = s.bank;
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
@@ -1673,6 +1680,18 @@ export class ClientWorld implements IWorld {
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
+  }
+  depositBankItem(itemId: string, count?: number): void {
+    this.cmd({ cmd: 'bank_deposit_item', item: itemId, count });
+  }
+  withdrawBankItem(itemId: string, count?: number): void {
+    this.cmd({ cmd: 'bank_withdraw_item', item: itemId, count });
+  }
+  depositBankCopper(amount: number): void {
+    this.cmd({ cmd: 'bank_deposit_copper', amount });
+  }
+  withdrawBankCopper(amount: number): void {
+    this.cmd({ cmd: 'bank_withdraw_copper', amount });
   }
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });

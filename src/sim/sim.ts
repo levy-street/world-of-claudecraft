@@ -629,8 +629,10 @@ export interface PlayerMeta {
   // it every frame. Runtime-only signal, never serialized/persisted.
   wireRev: number;
   inventory: InvSlot[];
+  bank: InvSlot[];
   vendorBuyback: InvSlot[];
   copper: number;
+  bankCopper: number;
   equipment: PlayerEquipment;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
@@ -731,12 +733,14 @@ export interface CharacterState {
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
   copper: number;
+  bankCopper?: number;
   hp: number;
   resource: number;
   pos: { x: number; z: number };
   facing: number;
   equipment: PlayerEquipment;
   inventory: InvSlot[];
+  bank?: InvSlot[];
   vendorBuyback?: InvSlot[];
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
@@ -1160,8 +1164,10 @@ export class Sim {
       moveInput: emptyMoveInput(),
       wireRev: 0,
       inventory: [],
+      bank: [],
       vendorBuyback: [],
       copper: 0,
+      bankCopper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
       xp: 0,
       lifetimeXp: 0,
@@ -1218,8 +1224,10 @@ export class Sim {
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
+      meta.bankCopper = Math.max(0, Math.floor(s.bankCopper ?? 0));
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
+      meta.bank = (s.bank ?? []).map((i) => ({ ...i }));
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((i) => ({ ...i }));
       for (const q of s.questLog) {
         if (q.state !== 'done')
@@ -1387,6 +1395,7 @@ export class Sim {
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
       copper: meta.copper,
+      bankCopper: meta.bankCopper,
       hp: e.hp,
       // A druid saved while shifted runs on rage/energy with its mana parked in
       // savedMana; persist the parked mana so reload (always caster form) restores
@@ -1401,6 +1410,7 @@ export class Sim {
       facing: e.facing,
       equipment: { ...meta.equipment },
       inventory: meta.inventory.map((i) => ({ ...i })),
+      bank: meta.bank.map((i) => ({ ...i })),
       vendorBuyback: meta.vendorBuyback.map((i) => ({ ...i })),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -1592,6 +1602,9 @@ export class Sim {
   get inventory(): InvSlot[] {
     return this.primary.inventory;
   }
+  get bank(): InvSlot[] {
+    return this.primary.bank;
+  }
   get vendorBuyback(): InvSlot[] {
     return this.primary.vendorBuyback;
   }
@@ -1600,6 +1613,9 @@ export class Sim {
   }
   get copper(): number {
     return this.primary.copper;
+  }
+  get bankCopper(): number {
+    return this.primary.bankCopper;
   }
   set copper(v: number) {
     this.primary.copper = v;
@@ -4247,6 +4263,22 @@ export class Sim {
 
   unequipItem(slot: EquipSlot, pid?: number): boolean {
     return items.unequipItem(this.ctx, slot, pid);
+  }
+
+  depositBankItem(itemId: string, count = 1, pid?: number): boolean {
+    return items.depositBankItem(this.ctx, itemId, count, pid);
+  }
+
+  withdrawBankItem(itemId: string, count = 1, pid?: number): boolean {
+    return items.withdrawBankItem(this.ctx, itemId, count, pid);
+  }
+
+  depositBankCopper(amount: number, pid?: number): boolean {
+    return items.depositBankCopper(this.ctx, amount, pid);
+  }
+
+  withdrawBankCopper(amount: number, pid?: number): boolean {
+    return items.withdrawBankCopper(this.ctx, amount, pid);
   }
 
   private hasFishableWaterAhead(p: Entity): boolean {
