@@ -38,19 +38,34 @@ describe('World Builder dock', () => {
     expect(world.placeProp).toHaveBeenCalledWith('barrel', 10, 22, 0, 1);
   });
 
-  it('saves capped dialogue/music/voice to the selected prop', () => {
+  it('save is disabled until a prop is selected, then saves capped fields', () => {
     const world = stubWorld();
-    mountWorldBuilder(world, root);
-    // Place to establish a selection path is not wired in this unit; drive save
-    // through the internal handle by simulating a selection via placeProp call is
-    // out of scope — instead assert the field caps are honored when a prop is set.
-    const dialogue = root.querySelector<HTMLInputElement>('[data-wb-dialogue]')!;
-    const music = root.querySelector<HTMLInputElement>('[data-wb-music]')!;
-    dialogue.value = 'x'.repeat(300);
-    music.value = '/props/town.mp3';
-    // No selection => save is a no-op (selectedDbId null). The button must not throw.
-    root.querySelector<HTMLButtonElement>('[data-wb-savemeta]')!.click();
+    const handle = mountWorldBuilder(world, root);
+    const saveBtn = root.querySelector<HTMLButtonElement>('[data-wb-savemeta]')!;
+    // No selection: button is disabled and clicking is a no-op.
+    expect(saveBtn.disabled).toBe(true);
+    saveBtn.click();
     expect(world.setPropMeta).not.toHaveBeenCalled();
+
+    // Select a prop, then save caps dialogue/music/voice.
+    handle.select(42);
+    expect(saveBtn.disabled).toBe(false);
+    root.querySelector<HTMLInputElement>('[data-wb-dialogue]')!.value = 'x'.repeat(300);
+    root.querySelector<HTMLInputElement>('[data-wb-music]')!.value = '/props/town.mp3';
+    saveBtn.click();
+    expect(world.setPropMeta).toHaveBeenCalledWith(42, {
+      dialogue: 'x'.repeat(240),
+      music: '/props/town.mp3',
+      voice: '',
+    });
+  });
+
+  it('collapse toggle hides the body', () => {
+    mountWorldBuilder(stubWorld(), root);
+    const dock = root.querySelector('.wb-dock')!;
+    expect(dock.classList.contains('wb-collapsed')).toBe(false);
+    root.querySelector<HTMLButtonElement>('[data-wb-collapse]')!.click();
+    expect(dock.classList.contains('wb-collapsed')).toBe(true);
   });
 
   it('destroy() removes the dock from the DOM', () => {
