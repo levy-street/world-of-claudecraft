@@ -94,7 +94,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.rollingFor': '{item}にロールしています。',
   'hudChrome.masterLoot.looterChanged': '分配担当は{name}になりました。',
   'hudChrome.masterLoot.thresholdSet': '品質しきい値を{threshold}に設定しました。',
-  'hudChrome.masterLoot.summaryMaster': '分配設定：マスタールート、分配担当{name}、品質しきい値{threshold}。',
+  'hudChrome.masterLoot.summaryMaster':
+    '分配設定：マスタールート、分配担当{name}、品質しきい値{threshold}。',
   'hudChrome.masterLoot.summaryGroup': '分配設定：グループルート。',
   'hudChrome.lootSettings.title': '分配設定',
   'hudChrome.lootSettings.close': '分配設定を閉じる',
