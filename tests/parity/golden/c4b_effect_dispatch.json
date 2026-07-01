@@ -807,8 +807,8 @@
       "state": "db3ff93c",
       "events": "741638a5",
       "rng": {
-        "draws": 406,
-        "digest": "900dc1d3"
+        "draws": 407,
+        "digest": "ead701dc"
       }
     },
     {
@@ -818,8 +818,8 @@
       "state": "0a674d19",
       "events": "741638a5",
       "rng": {
-        "draws": 433,
-        "digest": "6fb23cce"
+        "draws": 434,
+        "digest": "1760a481"
       }
     },
     {
