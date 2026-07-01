@@ -305,11 +305,32 @@ export const vi_VN: EnTranslations = {
       "minutesSeconds": "{m}p {s}g",
       "seconds": "{s}g"
     },
+    "bossmods": {
+      "title": "Boss Warnings",
+      "close": "Close boss warnings",
+      "idle": "No raid mechanics active.",
+      "secs": "{n}s",
+      "mech": {
+        "stomp": "Ground Slam",
+        "aoe": "AoE Pulse",
+        "stoneskin": "Shield Up",
+        "terrify": "Fear",
+        "mend": "Mending",
+        "enrage": "ENRAGED",
+        "adds": "Adds incoming",
+        "deathThroes": "Corpse bursting, get clear",
+        "gravebreaker": "Gravebreaker cone",
+        "raiseFallen": "Raising the fallen",
+        "soulRend": "Soul Rend",
+        "deathlessRage": "Deathless Rage, wardstone, press F!"
+      }
+    },
     "keybinds": {
       "emoteWheel": "Vòng Biểu Cảm",
       "targetFriendly": "Chọn Đồng Minh Gần Nhất",
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
-      "discord": "Discord"
+      "discord": "Discord",
+      "bossmods": "Boss Warnings"
     },
     "options": {
       "clickMoveLeft": "Nhấp Trái",

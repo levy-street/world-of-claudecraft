@@ -115,6 +115,7 @@ import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
 import { BagsWindow } from './bags_window';
+import { BossMods } from './bossmods';
 import { CastBarPainter } from './cast_bar_painter';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
@@ -969,6 +970,7 @@ export class Hud {
   // card's canvas) is reflected. Cleared when the modal closes.
   private recomposeOpenCard: (() => void) | null = null;
   private meters: Meters;
+  private bossmods: BossMods;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
   private pendingPetFeed = false;
@@ -984,6 +986,7 @@ export class Hud {
   ) {
     this.ignoredChatNames = this.loadIgnoredChatNames();
     this.meters = new Meters(sim);
+    this.bossmods = new BossMods(sim);
     this.initChatTabs();
     this.initChatBoxGeometry();
     this.initWindowManagement();
@@ -4299,6 +4302,7 @@ export class Hud {
     if (fastHud) this.chatAnnouncer.flush(now);
 
     this.meters.update();
+    this.bossmods.update();
     this.lockpickWindow.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
@@ -5561,6 +5565,10 @@ export class Hud {
     this.meters.toggle();
   }
 
+  toggleBossMods(): void {
+    this.bossmods.toggle();
+  }
+
   // -------------------------------------------------------------------------
   // The Ashen Coliseum - 1v1 arena panel + in-match banner
   // -------------------------------------------------------------------------
@@ -5883,6 +5891,7 @@ export class Hud {
       this.renderer.handleEvent(ev);
       this.playEventSfx(ev); // positional sound for nearby combat/creatures
       this.meters.onEvent(ev);
+      this.bossmods.onEvent(ev);
       if (this.isNythraxisEvent(ev)) this.lastNythraxisCombatEventAt = performance.now();
       switch (ev.type) {
         case 'damage': {

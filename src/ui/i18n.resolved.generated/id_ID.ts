@@ -305,11 +305,32 @@ export const id_ID: EnTranslations = {
       "minutesSeconds": "{m}m {s}d",
       "seconds": "{s}d"
     },
+    "bossmods": {
+      "title": "Boss Warnings",
+      "close": "Close boss warnings",
+      "idle": "No raid mechanics active.",
+      "secs": "{n}s",
+      "mech": {
+        "stomp": "Ground Slam",
+        "aoe": "AoE Pulse",
+        "stoneskin": "Shield Up",
+        "terrify": "Fear",
+        "mend": "Mending",
+        "enrage": "ENRAGED",
+        "adds": "Adds incoming",
+        "deathThroes": "Corpse bursting, get clear",
+        "gravebreaker": "Gravebreaker cone",
+        "raiseFallen": "Raising the fallen",
+        "soulRend": "Soul Rend",
+        "deathlessRage": "Deathless Rage, wardstone, press F!"
+      }
+    },
     "keybinds": {
       "emoteWheel": "Roda Emote",
       "targetFriendly": "Bidik Sekutu Terdekat",
       "targetFriendlyNext": "Putar Bidikan Sekutu",
-      "discord": "Discord"
+      "discord": "Discord",
+      "bossmods": "Boss Warnings"
     },
     "options": {
       "clickMoveLeft": "Klik Kiri",

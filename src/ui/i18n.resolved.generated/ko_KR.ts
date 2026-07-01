@@ -305,11 +305,32 @@ export const ko_KR: EnTranslations = {
       "minutesSeconds": "{m}분 {s}초",
       "seconds": "{s}초"
     },
+    "bossmods": {
+      "title": "보스 경고",
+      "close": "보스 경고 닫기",
+      "idle": "활성화된 공격대 메커니즘이 없습니다.",
+      "secs": "{n}s",
+      "mech": {
+        "stomp": "대지 강타",
+        "aoe": "광역 파동",
+        "stoneskin": "보호막 전개",
+        "terrify": "공포",
+        "mend": "치유 중",
+        "enrage": "격노",
+        "adds": "쫄 등장",
+        "deathThroes": "시체 폭발, 피하세요",
+        "gravebreaker": "무덤파괴 (원뿔)",
+        "raiseFallen": "쓰러진 자 소생",
+        "soulRend": "영혼 분쇄",
+        "deathlessRage": "불멸의 분노, 수호석에서 F!"
+      }
+    },
     "keybinds": {
       "emoteWheel": "감정 표현 휠",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환",
-      "discord": "Discord"
+      "discord": "Discord",
+      "bossmods": "보스 경고"
     },
     "options": {
       "clickMoveLeft": "왼쪽 클릭",

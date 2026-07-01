@@ -41,6 +41,7 @@ import {
   type Vec3,
 } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
+import { telegraph } from './boss_warn';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget, updateMobTarget } from './targeting';
 
@@ -310,6 +311,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const pulse = MOBS[mob.templateId]?.aoePulse;
       if (pulse) {
         mob.pulseTimer -= DT;
+        telegraph(ctx, mob, mob.pulseTimer, 'aoe');
         if (mob.pulseTimer <= 0) {
           mob.pulseTimer = pulse.every;
           const school = pulse.school ?? 'shadow';
@@ -336,6 +338,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const stomp = MOBS[mob.templateId]?.stomp;
       if (stomp) {
         mob.stompTimer -= DT;
+        telegraph(ctx, mob, mob.stompTimer, 'stomp');
         if (mob.stompTimer <= 0) {
           mob.stompTimer = stomp.every;
           const school = stomp.school ?? 'physical';
@@ -374,6 +377,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const stoneskin = MOBS[mob.templateId]?.stoneskin;
       if (stoneskin) {
         mob.stoneskinTimer -= DT;
+        telegraph(ctx, mob, mob.stoneskinTimer, 'stoneskin');
         if (mob.stoneskinTimer <= 0) {
           mob.stoneskinTimer = stoneskin.every;
           const school = (stoneskin.school ?? 'physical') as Aura['school'];
@@ -405,6 +409,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const terrify = MOBS[mob.templateId]?.terrify;
       if (terrify) {
         mob.terrifyTimer -= DT;
+        telegraph(ctx, mob, mob.terrifyTimer, 'terrify');
         if (mob.terrifyTimer <= 0) {
           mob.terrifyTimer = terrify.every;
           const school = terrify.school ?? 'shadow';

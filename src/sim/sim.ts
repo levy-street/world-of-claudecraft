@@ -154,6 +154,7 @@ import {
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
 import { Market, type MarketListing, type MarketSave } from './market';
+import { telegraph } from './mob/boss_warn';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -3898,6 +3899,7 @@ export class Sim {
     if (tmpl.enrage && enrageAllowed && !mob.enraged && hpFrac <= tmpl.enrage.belowHpPct) {
       mob.enraged = true;
       this.emit({ type: 'aura', targetId: mob.id, name: 'Enrage', gained: true });
+      this.emit({ type: 'bossWarn', entityId: mob.id, mechanic: 'enrage', eta: 0 });
       this.emit({
         type: 'log',
         text: `${mob.name} becomes enraged!`,
@@ -3938,6 +3940,7 @@ export class Sim {
     // full interval, so the first cast never lands the instant combat opens.
     if (tmpl.mendAlly) {
       mob.mendTimer -= DT;
+      telegraph(this.ctx, mob, mob.mendTimer, 'mend');
       if (mob.mendTimer <= 0) {
         mob.mendTimer = tmpl.mendAlly.every;
         const wounded: Entity[] = [];
@@ -4105,6 +4108,7 @@ export class Sim {
   private spawnBossAdds(boss: Entity, mobId: string, count: number): void {
     const template = MOBS[mobId];
     if (!template) return;
+    this.emit({ type: 'bossWarn', entityId: boss.id, mechanic: 'adds', eta: 0 });
     this.emit({
       type: 'log',
       text: `${boss.name} calls for aid!`,

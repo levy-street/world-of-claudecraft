@@ -1800,6 +1800,102 @@
     padding: 1px 5px;
   }
 
+  /* ---------- boss warnings (DBM-style) ---------- */
+  #bossmods-window {
+    width: 240px;
+    padding: 8px 10px;
+    display: none;
+    align-self: flex-end;
+    margin-bottom: 6px;
+    text-align: left;
+  }
+  #bossmods-window .panel-title {
+    margin-bottom: 4px;
+  }
+  .bm-title {
+    font-size: 12px;
+    color: var(--gold);
+    font-family: var(--title-font);
+    text-shadow: 1px 1px 1px #000;
+  }
+  .bm-idle {
+    font-size: 10px;
+    color: #9c8f6e;
+  }
+  .bm-bar {
+    position: relative;
+    height: 18px;
+    margin-bottom: 3px;
+    background: #14100c;
+    border: 1px solid #000;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bm-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 1px;
+    transition: width 0.1s linear;
+  }
+  .bm-label {
+    position: absolute;
+    left: 6px;
+    top: 0;
+    line-height: 18px;
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    font-weight: bold;
+  }
+  .bm-num {
+    position: absolute;
+    right: 6px;
+    top: 0;
+    line-height: 18px;
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    font-variant-numeric: tabular-nums;
+  }
+  #bm-alert {
+    position: absolute;
+    left: 50%;
+    top: 22%;
+    transform: translateX(-50%);
+    display: none;
+    font-family: var(--title-font);
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-shadow:
+      0 2px 6px #000,
+      0 0 14px #000;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 40;
+    animation: bm-alert-pop 0.28s ease-out;
+  }
+  @keyframes bm-alert-pop {
+    from {
+      transform: translateX(-50%) scale(0.7);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(-50%) scale(1);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bm-alert {
+      animation: none;
+    }
+    .bm-fill {
+      transition: none;
+    }
+  }
+
   /* ---------- minimap ---------- */
   #minimap-wrap {
     position: absolute;

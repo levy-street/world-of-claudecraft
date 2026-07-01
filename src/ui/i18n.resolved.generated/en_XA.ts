@@ -305,11 +305,32 @@ export const en_XA: EnTranslations = {
       "minutesSeconds": "[{m}ɱ {s}š]",
       "seconds": "[{s}š]"
     },
+    "bossmods": {
+      "title": "[Ɓóšš Ŵáŕñíñĝš]",
+      "close": "[Çļóšé ƀóšš ŵáŕñíñĝš]",
+      "idle": "[Ñó ŕáíð ɱéçĥáñíçš áçţíʋé.]",
+      "secs": "[{n}š]",
+      "mech": {
+        "stomp": "[Ĝŕóúñð Šļáɱ]",
+        "aoe": "[ÁóÉ Þúļšé]",
+        "stoneskin": "[Šĥíéļð Úþ]",
+        "terrify": "[Ƒéáŕ]",
+        "mend": "[Ɱéñðíñĝ]",
+        "enrage": "[ÉÑŔÁĜÉÐ]",
+        "adds": "[Áððš íñçóɱíñĝ]",
+        "deathThroes": "[Çóŕþšé ƀúŕšţíñĝ, ĝéţ çļéáŕ]",
+        "gravebreaker": "[Ĝŕáʋéƀŕéáķéŕ çóñé]",
+        "raiseFallen": "[Ŕáíšíñĝ ţĥé ƒáļļéñ]",
+        "soulRend": "[Šóúļ Ŕéñð]",
+        "deathlessRage": "[Ðéáţĥļéšš Ŕáĝé, ŵáŕðšţóñé, þŕéšš Ƒ!]"
+      }
+    },
     "keybinds": {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
       "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]",
-      "discord": "[Ðíšçóŕð]"
+      "discord": "[Ðíšçóŕð]",
+      "bossmods": "[Ɓóšš Ŵáŕñíñĝš]"
     },
     "options": {
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",

@@ -52,6 +52,7 @@ export interface InputCallbacks {
       | 'escape'
       | 'chat'
       | 'meters'
+      | 'bossmods'
       | 'social'
       | 'arena'
       | 'leaderboard'
@@ -731,6 +732,9 @@ export class Input {
         return;
       case 'meters':
         this.cb.onUiKey('meters');
+        return;
+      case 'bossmods':
+        this.cb.onUiKey('bossmods');
         return;
       case 'social':
         this.cb.onUiKey('social');

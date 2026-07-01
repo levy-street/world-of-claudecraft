@@ -166,6 +166,13 @@ export const BIND_ACTIONS: BindAction[] = [
   { id: 'talents', label: 'Talents', category: 'Interface', kind: 'edge', defaults: ['KeyN'] },
   { id: 'meters', label: 'Damage Meters', category: 'Interface', kind: 'edge', defaults: ['KeyH'] },
   {
+    id: 'bossmods',
+    label: 'Boss Warnings',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyI'],
+  },
+  {
     id: 'social',
     label: 'Friends & Guild',
     category: 'Interface',

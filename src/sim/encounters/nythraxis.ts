@@ -28,6 +28,7 @@
 import { isStunned } from '../combat/cc';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import { createMob, createNpc } from '../entity';
+import { telegraph } from '../mob/boss_warn';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { clearThreat, threatEntries } from '../threat';
@@ -487,6 +488,7 @@ export function updateNythraxisGravebreaker(
   st: NonNullable<Entity['nythraxis']>,
 ): void {
   st.gravebreakerTimer -= DT;
+  telegraph(ctx, boss, st.gravebreakerTimer, 'gravebreaker');
   if (st.gravebreakerTimer > 0) return;
   st.gravebreakerTimer = NYTHRAXIS_GRAVEBREAKER_EVERY;
   st.gravebreakerCasts = (st.gravebreakerCasts ?? 0) + 1;
@@ -522,6 +524,7 @@ export function updateNythraxisRaiseFallen(
   st: NonNullable<Entity['nythraxis']>,
 ): void {
   st.raiseFallenTimer -= DT;
+  telegraph(ctx, boss, st.raiseFallenTimer, 'raise_fallen');
   if (st.raiseFallenTimer > 0) return;
   st.raiseFallenTimer = NYTHRAXIS_RAISE_FALLEN_EVERY;
   nythraxisDialogueSet(ctx, boss, [
@@ -715,6 +718,12 @@ export function castNythraxisSoulRend(
     const idx = ctx.rng.int(0, candidates.length - 1);
     picked.push(candidates.splice(idx, 1)[0]);
   }
+  ctx.emit({
+    type: 'bossWarn',
+    entityId: boss.id,
+    mechanic: 'soul_rend',
+    eta: NYTHRAXIS_SOUL_REND_DURATION,
+  });
   st.soulRendMarks = picked.map((p) => ({
     playerId: p.id,
     remaining: NYTHRAXIS_SOUL_REND_DURATION,
@@ -790,6 +799,12 @@ export function startNythraxisDeathlessRage(
   boss.castingAbility = 'nythraxis_deathless_rage';
   boss.castTotal = NYTHRAXIS_DEATHLESS_CAST;
   boss.castRemaining = NYTHRAXIS_DEATHLESS_CAST;
+  ctx.emit({
+    type: 'bossWarn',
+    entityId: boss.id,
+    mechanic: 'deathless_rage',
+    eta: NYTHRAXIS_DEATHLESS_CAST,
+  });
   boss.channeling = false;
   nythraxisSay(ctx, boss, 'nythraxis', 'Witness true eternity!', true);
   ctx.emit({

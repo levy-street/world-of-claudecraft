@@ -14,6 +14,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bossmods.title': 'Предупреждения о боссе',
+  'hudChrome.bossmods.close': 'Закрыть предупреждения о боссе',
+  'hudChrome.bossmods.idle': 'Нет активных рейдовых механик.',
+  'hudChrome.bossmods.mech.stomp': 'Удар оземь',
+  'hudChrome.bossmods.mech.aoe': 'Волна по площади',
+  'hudChrome.bossmods.mech.stoneskin': 'Щит активирован',
+  'hudChrome.bossmods.mech.terrify': 'Страх',
+  'hudChrome.bossmods.mech.mend': 'Лечение',
+  'hudChrome.bossmods.mech.enrage': 'Ярость',
+  'hudChrome.bossmods.mech.adds': 'Появляются добавления',
+  'hudChrome.bossmods.mech.deathThroes': 'Труп взрывается, отойдите',
+  'hudChrome.bossmods.mech.gravebreaker': 'Могилолом (конус)',
+  'hudChrome.bossmods.mech.raiseFallen': 'Поднятие павших',
+  'hudChrome.bossmods.mech.soulRend': 'Разрыв души',
+  'hudChrome.bossmods.mech.deathlessRage': 'Неумирающая ярость, к камню, нажмите F!',
+  'hudChrome.keybinds.bossmods': 'Предупреждения о боссе',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
   'hudChrome.loot.chestTitle': 'Сундук',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',

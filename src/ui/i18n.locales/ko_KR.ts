@@ -14,6 +14,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bossmods.title': '보스 경고',
+  'hudChrome.bossmods.close': '보스 경고 닫기',
+  'hudChrome.bossmods.idle': '활성화된 공격대 메커니즘이 없습니다.',
+  'hudChrome.bossmods.mech.stomp': '대지 강타',
+  'hudChrome.bossmods.mech.aoe': '광역 파동',
+  'hudChrome.bossmods.mech.stoneskin': '보호막 전개',
+  'hudChrome.bossmods.mech.terrify': '공포',
+  'hudChrome.bossmods.mech.mend': '치유 중',
+  'hudChrome.bossmods.mech.enrage': '격노',
+  'hudChrome.bossmods.mech.adds': '쫄 등장',
+  'hudChrome.bossmods.mech.deathThroes': '시체 폭발, 피하세요',
+  'hudChrome.bossmods.mech.gravebreaker': '무덤파괴 (원뿔)',
+  'hudChrome.bossmods.mech.raiseFallen': '쓰러진 자 소생',
+  'hudChrome.bossmods.mech.soulRend': '영혼 분쇄',
+  'hudChrome.bossmods.mech.deathlessRage': '불멸의 분노, 수호석에서 F!',
+  'hudChrome.keybinds.bossmods': '보스 경고',
   'hudChrome.spectate.banner': '{name} 관전 중',
   'hudChrome.loot.chestTitle': '상자',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',

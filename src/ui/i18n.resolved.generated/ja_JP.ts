@@ -305,11 +305,32 @@ export const ja_JP: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒"
     },
+    "bossmods": {
+      "title": "ボス警告",
+      "close": "ボス警告を閉じる",
+      "idle": "現在アクティブなレイドギミックはありません。",
+      "secs": "{n}s",
+      "mech": {
+        "stomp": "グラウンドスラム",
+        "aoe": "範囲パルス",
+        "stoneskin": "シールド展開",
+        "terrify": "恐怖",
+        "mend": "回復中",
+        "enrage": "狂化",
+        "adds": "増援出現",
+        "deathThroes": "死体が爆発、離れろ",
+        "gravebreaker": "墓砕き（扇形）",
+        "raiseFallen": "死者を蘇らせる",
+        "soulRend": "ソウルレンド",
+        "deathlessRage": "不死の怒り、守石でFキー！"
+      }
+    },
     "keybinds": {
       "emoteWheel": "エモートホイール",
       "targetFriendly": "最も近い味方をターゲット",
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
-      "discord": "Discord"
+      "discord": "Discord",
+      "bossmods": "ボス警告"
     },
     "options": {
       "clickMoveLeft": "左クリック",

@@ -1558,6 +1558,9 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questDone'; questId: string }
   | { type: 'aura'; targetId: number; name: string; gained: boolean }
   | { type: 'castStart'; entityId: number; ability: string; time: number }
+  // Raid-warning telegraph: boss mechanic `mechanic` (a stable key) will resolve
+  // in ~`eta` seconds. Informational only, the client DBM panel times it.
+  | { type: 'bossWarn'; entityId: number; mechanic: string; eta: number }
   | { type: 'castStop'; entityId: number; success: boolean }
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }

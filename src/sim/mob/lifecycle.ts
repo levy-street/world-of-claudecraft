@@ -159,6 +159,7 @@ export function armDeathThroes(ctx: SimContext, dead: Entity): void {
   if (!dt) return;
   dead.detonateTimer = dt.delay;
   const school = dt.school ?? 'nature';
+  ctx.emit({ type: 'bossWarn', entityId: dead.id, mechanic: 'death_throes', eta: dt.delay });
   ctx.emit({ type: 'spellfx', sourceId: dead.id, targetId: dead.id, school, fx: 'nova' });
   ctx.emit({
     type: 'log',

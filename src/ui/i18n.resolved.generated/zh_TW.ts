@@ -305,11 +305,32 @@ export const zh_TW: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒"
     },
+    "bossmods": {
+      "title": "首領警報",
+      "close": "關閉首領警報",
+      "idle": "目前無團隊機制。",
+      "secs": "{n}s",
+      "mech": {
+        "stomp": "震地猛擊",
+        "aoe": "範圍脈衝",
+        "stoneskin": "護盾開啟",
+        "terrify": "恐懼",
+        "mend": "正在治療",
+        "enrage": "狂暴",
+        "adds": "增援來襲",
+        "deathThroes": "屍體即將爆炸，快躲開",
+        "gravebreaker": "碎墓擊（扇形）",
+        "raiseFallen": "復活亡者",
+        "soulRend": "撕魂",
+        "deathlessRage": "不死之怒，前往守石按F！"
+      }
+    },
     "keybinds": {
       "emoteWheel": "表情輪盤",
       "targetFriendly": "選取最近友方",
       "targetFriendlyNext": "切換友方目標",
-      "discord": "Discord"
+      "discord": "Discord",
+      "bossmods": "首領警報"
     },
     "options": {
       "clickMoveLeft": "左鍵",

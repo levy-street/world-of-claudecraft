@@ -305,11 +305,32 @@ export const ru_RU: EnTranslations = {
       "minutesSeconds": "{m} мин {s} сек.",
       "seconds": "{s} сек."
     },
+    "bossmods": {
+      "title": "Предупреждения о боссе",
+      "close": "Закрыть предупреждения о боссе",
+      "idle": "Нет активных рейдовых механик.",
+      "secs": "{n}s",
+      "mech": {
+        "stomp": "Удар оземь",
+        "aoe": "Волна по площади",
+        "stoneskin": "Щит активирован",
+        "terrify": "Страх",
+        "mend": "Лечение",
+        "enrage": "Ярость",
+        "adds": "Появляются добавления",
+        "deathThroes": "Труп взрывается, отойдите",
+        "gravebreaker": "Могилолом (конус)",
+        "raiseFallen": "Поднятие павших",
+        "soulRend": "Разрыв души",
+        "deathlessRage": "Неумирающая ярость, к камню, нажмите F!"
+      }
+    },
     "keybinds": {
       "emoteWheel": "Колесо эмоций",
       "targetFriendly": "Ближайший союзник",
       "targetFriendlyNext": "Следующий союзник",
-      "discord": "Discord"
+      "discord": "Discord",
+      "bossmods": "Предупреждения о боссе"
     },
     "options": {
       "clickMoveLeft": "Левая кнопка",

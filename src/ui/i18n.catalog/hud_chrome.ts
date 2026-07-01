@@ -248,6 +248,28 @@ export const hudChromeStrings = {
     minutesSeconds: '{m}m {s}s',
     seconds: '{s}s',
   },
+  // Raid-warnings ("boss mods") panel: title/aria + the depleting-bar second
+  // suffix + per-mechanic warning labels keyed off the sim `bossWarn` event.
+  bossmods: {
+    title: 'Boss Warnings',
+    close: 'Close boss warnings',
+    idle: 'No raid mechanics active.',
+    secs: '{n}s',
+    mech: {
+      stomp: 'Ground Slam',
+      aoe: 'AoE Pulse',
+      stoneskin: 'Shield Up',
+      terrify: 'Fear',
+      mend: 'Mending',
+      enrage: 'ENRAGED',
+      adds: 'Adds incoming',
+      deathThroes: 'Corpse bursting, get clear',
+      gravebreaker: 'Gravebreaker cone',
+      raiseFallen: 'Raising the fallen',
+      soulRend: 'Soul Rend',
+      deathlessRage: 'Deathless Rage, wardstone, press F!',
+    },
+  },
   // Key Bindings panel action labels that the in-file BIND_ACTION_LABEL_KEYS map
   // (hud.ts) routes through t(). Kept here (not the constrained `hud` catalog
   // domain) so they are an English-only add.
@@ -257,6 +279,7 @@ export const hudChromeStrings = {
     targetFriendlyNext: 'Cycle Friendly Target',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
+    bossmods: 'Boss Warnings',
   },
   // Click-to-move mouse-button toggle labels (Key Bindings panel). The button id
   // 0/2 maps to these at the HUD render boundary.

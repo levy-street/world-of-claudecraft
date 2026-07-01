@@ -14,6 +14,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bossmods.title': '首領警報',
+  'hudChrome.bossmods.close': '關閉首領警報',
+  'hudChrome.bossmods.idle': '目前無團隊機制。',
+  'hudChrome.bossmods.mech.stomp': '震地猛擊',
+  'hudChrome.bossmods.mech.aoe': '範圍脈衝',
+  'hudChrome.bossmods.mech.stoneskin': '護盾開啟',
+  'hudChrome.bossmods.mech.terrify': '恐懼',
+  'hudChrome.bossmods.mech.mend': '正在治療',
+  'hudChrome.bossmods.mech.enrage': '狂暴',
+  'hudChrome.bossmods.mech.adds': '增援來襲',
+  'hudChrome.bossmods.mech.deathThroes': '屍體即將爆炸，快躲開',
+  'hudChrome.bossmods.mech.gravebreaker': '碎墓擊（扇形）',
+  'hudChrome.bossmods.mech.raiseFallen': '復活亡者',
+  'hudChrome.bossmods.mech.soulRend': '撕魂',
+  'hudChrome.bossmods.mech.deathlessRage': '不死之怒，前往守石按F！',
+  'hudChrome.keybinds.bossmods': '首領警報',
   'hudChrome.spectate.banner': '正在觀察 {name}',
   'hudChrome.loot.chestTitle': '寶箱',
   'hudChrome.spellbook.addToBarAria': '將 {name} 加入動作列',

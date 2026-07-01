@@ -14,6 +14,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bossmods.title': 'ボス警告',
+  'hudChrome.bossmods.close': 'ボス警告を閉じる',
+  'hudChrome.bossmods.idle': '現在アクティブなレイドギミックはありません。',
+  'hudChrome.bossmods.mech.stomp': 'グラウンドスラム',
+  'hudChrome.bossmods.mech.aoe': '範囲パルス',
+  'hudChrome.bossmods.mech.stoneskin': 'シールド展開',
+  'hudChrome.bossmods.mech.terrify': '恐怖',
+  'hudChrome.bossmods.mech.mend': '回復中',
+  'hudChrome.bossmods.mech.enrage': '狂化',
+  'hudChrome.bossmods.mech.adds': '増援出現',
+  'hudChrome.bossmods.mech.deathThroes': '死体が爆発、離れろ',
+  'hudChrome.bossmods.mech.gravebreaker': '墓砕き（扇形）',
+  'hudChrome.bossmods.mech.raiseFallen': '死者を蘇らせる',
+  'hudChrome.bossmods.mech.soulRend': 'ソウルレンド',
+  'hudChrome.bossmods.mech.deathlessRage': '不死の怒り、守石でFキー！',
+  'hudChrome.keybinds.bossmods': 'ボス警告',
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
