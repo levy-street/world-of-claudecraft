@@ -91,6 +91,7 @@ export const BASE_NEW = {
     'error.whoOnline': '/who-listen er tilgængelig i onlinespil.',
     'log.abilityRankUp': 'Din {name} er forbedret til Rang {rank}.',
     'log.bossUnleashes': '{name} udløser {mechanic}!',
+    'log.mobChannels': '{name} kanaliserer {mechanic}.',
     'log.boutDecided': 'Dysten er afgjort. Vender tilbage til verden…',
     'log.callsForAid': '{name} kalder på hjælp!',
     'log.channelJoined':
@@ -232,6 +233,7 @@ export const BASE_NEW = {
     'error.whoOnline': 'Daftar /who tersedia dalam permainan daring.',
     'log.abilityRankUp': '{name}-mu telah meningkat ke Peringkat {rank}.',
     'log.bossUnleashes': '{name} melepaskan {mechanic}!',
+    'log.mobChannels': '{name} menyalurkan {mechanic}.',
     'log.boutDecided': 'Pertarungan telah usai. Kembali ke dunia…',
     'log.callsForAid': '{name} meminta bantuan!',
     'log.channelJoined':
@@ -373,6 +375,7 @@ export const BASE_NEW = {
     'error.whoOnline': 'De /who-lijst is beschikbaar in online spel.',
     'log.abilityRankUp': 'Je {name} is verbeterd naar Rang {rank}.',
     'log.bossUnleashes': '{name} ontketent {mechanic}!',
+    'log.mobChannels': '{name} kanaliseert {mechanic}.',
     'log.boutDecided': 'Het gevecht is beslist. Terugkeren naar de wereld…',
     'log.callsForAid': '{name} roept om hulp!',
     'log.channelJoined':
@@ -514,6 +517,7 @@ export const BASE_NEW = {
     'error.whoOnline': 'Lista /who jest dostępna w grze sieciowej.',
     'log.abilityRankUp': 'Twoja umiejętność {name} osiągnęła Rangę {rank}.',
     'log.bossUnleashes': '{name} uwalnia {mechanic}!',
+    'log.mobChannels': '{name} kieruje {mechanic}.',
     'log.boutDecided': 'Pojedynek rozstrzygnięty. Powrót do świata…',
     'log.callsForAid': '{name} wzywa pomocy!',
     'log.channelJoined':
@@ -655,6 +659,7 @@ export const BASE_NEW = {
     'error.whoOnline': 'Listan /who är tillgänglig i onlinespel.',
     'log.abilityRankUp': 'Din {name} har förbättrats till rang {rank}.',
     'log.bossUnleashes': '{name} släpper lös {mechanic}!',
+    'log.mobChannels': '{name} kanaliserar {mechanic}.',
     'log.boutDecided': 'Drabbningen är avgjord. Återvänder till världen…',
     'log.callsForAid': '{name} ropar på hjälp!',
     'log.channelJoined':
@@ -796,6 +801,7 @@ export const BASE_NEW = {
     'error.whoOnline': '/who listesi çevrimiçi oyunda kullanılabilir.',
     'log.abilityRankUp': '{name} yeteneğin Rank {rank} seviyesine yükseldi.',
     'log.bossUnleashes': '{name}, {mechanic} salıyor!',
+    'log.mobChannels': '{name}, {mechanic} yönlendiriyor.',
     'log.boutDecided': 'Karşılaşma sonuçlandı. Dünyaya dönülüyor…',
     'log.callsForAid': '{name} yardım çağırıyor!',
     'log.channelJoined': '{channel} kanalına katıldın. Konuşmak için /{channel} <mesaj> yaz.',
@@ -936,6 +942,7 @@ export const BASE_NEW = {
     'error.whoOnline': 'Danh sách /who chỉ có trong chế độ chơi trực tuyến.',
     'log.abilityRankUp': '{name} của bạn đã nâng lên Cấp {rank}.',
     'log.bossUnleashes': '{name} tung ra {mechanic}!',
+    'log.mobChannels': '{name} dẫn {mechanic}.',
     'log.boutDecided': 'Trận đấu đã ngã ngũ. Đang trở về thế giới…',
     'log.callsForAid': '{name} kêu gọi viện trợ!',
     'log.channelJoined': 'Đã tham gia kênh {channel}. Gõ /{channel} <message> để trò chuyện.',

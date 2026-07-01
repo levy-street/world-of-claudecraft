@@ -2177,12 +2177,21 @@ export const ja_JP: EnTranslations = {
       "instancesBusy": "{name}のすべてのインスタンスが使用中だ。しばらくしてからもう一度試せ。",
       "runFailed": "{name}の攻略に失敗した。",
       "complete": "{name}を踏破した。",
+      "mobChannels": "{name}が{mechanic}を発動している。",
       "mechanismOpen": "近くで機構がカチリと開く。北へ通路が開いた。先にある出口のポータルを探せ。",
       "raiseDead": "{name}が死者蘇生を唱え始める。",
       "graveFalters": "墓の儀式が乱れる。",
       "doorAlreadyOpen": "扉はすでに開いている。",
       "companionRankUp": "{name}がランク{rank}に達した。",
       "bossChest": "ボスが倒れる。守りの聖遺物庫の宝箱が祭壇にせり上がる。錠を開けて戦利品を手に入れろ。",
+      "drownedLitanyReliquaryRise": "修道女ナリアが沈黙する。溺れし聖遺物匣が黒水から浮かび上がる。近づいて儀式を始めよ。",
+      "riteSequenceReady": "祠が闇に沈む。順序を繰り返せ。",
+      "riteSequencePlaying": "祠が儀式を再生している。待て。",
+      "riteCorrect": "柔らかな鐘の音がお前の手に応える。",
+      "riteWrong": "耳障りな鐘の破裂音。黒水が足元で跳ねる。",
+      "riteReliquaryOpen": "溺れし聖遺物匣が開く。",
+      "riteReliquaryLocked": "聖遺物匣を開くには祠の儀式を完了せよ。",
+      "riteReliquaryEmpty": "聖遺物匣は空だ。",
       "surfaceStairs": "地上への階段が開く。階段でFを押して出よ。",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "部屋を制圧せよ。",
@@ -2190,6 +2199,10 @@ export const ja_JP: EnTranslations = {
       "tombstoneHint": "部屋を制圧すると、北へ墓石の通路が開く。",
       "tombstoneOpen": "封じられた墓石の通路が北へきしみながら開く。中へ歩み入って進め。",
       "tombstoneInto": "あなたは墓石を抜けて{name}へ入る。",
+      "bellRopeShock": "鐘の縄がピンと張り詰める。溺れし詠唱者たちが衝撃によろめく。",
+      "eggSacBurst": "卵嚢が破裂する。黒水が洗礼堂の縁に飛び散る。",
+      "baptistryEggs": "洗礼堂が静まり返る。未亡人の卵嚢が縁に沿って膨らむ。",
+      "baptistryWave": "洗礼堂の黒い水の中で何かが蠢く。",
       "chestEmpty": "宝箱は空だ。",
       "notInDelve": "あなたはデルヴの中にいない。",
       "cannotInteract": "それとは関われない。",
@@ -2210,7 +2223,9 @@ export const ja_JP: EnTranslations = {
       "moveCloserChest": "宝箱にもっと近づけ。",
       "nothingToTake": "もう取れるものは何も残っていない。",
       "wayOutNotOpen": "出口はまだ開いていない。",
-      "moveCloserStairs": "階段にもっと近づけ。"
+      "moveCloserStairs": "階段にもっと近づけ。",
+      "nhaliaCantorShield": "詠唱者たちよ、音を保て！",
+      "nhaliaBlackwaterMark": "{name}が{player}に黒水の刻印を刻む！"
     },
     "lockpick": {
       "lockYields": "錠が開いた! {tier}の戦利品だ。",
@@ -2273,12 +2288,31 @@ export const ja_JP: EnTranslations = {
       "abandoned": "あなたはピックをそっと引き抜く。錠は待っている。"
     }
   },
+  "delveRiteUi": {
+    "title": "溺れし聖遺物の儀式",
+    "blurb": "祠は順番に光る。各祠を順に起動して順序を繰り返せ。誤った接触は試みを失敗させ順序を再生する。完璧な試みは最も豊かな戦利品を得て、試行回数を使い果たすと聖遺物匣は最も貧しい形で開く。儀式がお前をどう試すか選べ。",
+    "easy": "Easy",
+    "medium": "普通",
+    "hard": "Hard",
+    "showsTimes": "順序を{count}回表示",
+    "showsOnce": "順序は一度だけ表示",
+    "symbols": "{count}個の記号",
+    "mistakes": "{count}回の失敗が許容される",
+    "tries": "{count}回の試行",
+    "reward": {
+      "easy": "控えめな戦利品",
+      "medium": "豊かな戦利品",
+      "hard": "極上の戦利品"
+    },
+    "closeAria": "閉じる"
+  },
   "delveUi": {
     "board": {
       "title": "デルヴボード",
       "enter": "デルヴに入る",
       "enterAria": "{tier}難易度で{delve}に入る",
       "openDelve": "崩れた聖遺物庫",
+      "openDelveLitany": "溺れし連祷",
       "openDelveAria": "{name}からデルヴボードを開く",
       "marks": "デルヴの刻印: {count}",
       "minLevel": "必要レベル{level}",
@@ -2289,6 +2323,7 @@ export const ja_JP: EnTranslations = {
       "companion": {
         "pick": "仲間を選ぶ",
         "tessa": "侍祭テッサ",
+        "edda": "エッダ・リードハンド",
         "rank": "ランク{rank}",
         "boon": "戦闘の合間にパーティを回復する。ランク3ではデルヴごとに一度、倒れた仲間を蘇生する。",
         "upgrade": "ランク{rank}に強化（刻印{marks}個）",
@@ -2335,23 +2370,49 @@ export const ja_JP: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "下の聖遺物庫がまた動いた。真夜中を過ぎると床越しに詠唱が聞こえ、侍祭テッサは埋葬台帳が自らインクを書き換えていると言って譲らぬ。勇気があるなら、{playerName}、蝋燭を持って下りてくれ。そこで聞こえる声をすべて信じるな。その中には、お前が生まれる前からお前の名を知っていた者もいる。"
+      },
+      "aldric": {
+        "greeting": "フェンブリッジは今、水の底で鐘の音を聞く、{playerName}。墓呼びたちは溺れし者に歌を教えている。難易度を選べ、お前が戻るまで縄を握っていよう。"
       }
     },
     "intro": {
       "normal": "階段は冷たく暗い。砕けた聖人の石が下りの道に散らばり、湿った空気にかすかな鐘の音が漂う。侍祭テッサがささやく。「聖遺物庫がこんな下まで開いているはずがありません。離れずに、{playerName}。」",
-      "heroic": "扉があなたの背後でうめきながら閉じる。名前が爪のように石を引っかいていく。テッサの蝋燭が青く燃える。「今、彼らが呼んでいるのは死者ではありません、{playerName}。何かに応えているのです。」"
+      "heroic": "扉があなたの背後でうめきながら閉じる。名前が爪のように石を引っかいていく。テッサの蝋燭が青く燃える。「今、彼らが呼んでいるのは死者ではありません、{playerName}。何かに応えているのです。」",
+      "litanyNormal": "葦に埋もれた階段がフェンブリッジの下へと落ちていく。エッダ・リードハンドがランタンを掲げる。「沼は溺れさせた者たちの名をすべて覚えている、{playerName}。光の中にいなさい。」",
+      "litanyHeroic": "黒水が土手道の石を舐める。エッダの炎が緑色に揺らめく。「奴らはまた下で歌っている、{playerName}。聖歌隊に応えるな。」"
     },
     "module": {
       "reliquary_sunken_ossuary": "水が埋葬棚から染み出し、古い灰を銀黒の流れとなって運んでいく。",
       "reliquary_bell_niche": "数十の手鐘が静寂の中に吊られ、それぞれに葬儀の布が結ばれている。",
       "reliquary_saintless_hall": "丹念な憎しみで顔を削り取られた像の数々。",
-      "reliquary_finale": "埋もれた鐘が、あなたのブーツの下で一度だけ鳴る。"
+      "reliquary_finale": "埋もれた鐘が、あなたのブーツの下で一度だけ鳴る。",
+      "litany_sluice": "苔むした水門から黒水が滴り、古き聖歌隊の納骨堂へと落ちる。",
+      "litany_ledger": "記帳の島々が水没した水路から浮かび上がり、インクが沼へと滲み出す。",
+      "litany_ring": "聖遺物の環が、封じられた黒水の中央泉を取り囲む。",
+      "litany_baptistry": "陥没した洗礼堂が、ひび割れた聖者石と卵嚢の下で口を開ける。",
+      "litany_choir_loft": "扇状に広がる聖歌隊席に、縄で吊るされた鐘の音が響き、決して止まることはない。",
+      "litany_causeway": "Y字に分かれた土手道が、腰まで浸かる沼水の上で分岐する。",
+      "litany_apse": "溺れし後陣が、修道女ナリアの祭壇の島へと開ける。"
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "沈んだ納骨堂",
       "reliquary_bell_niche": "鐘の壁龕",
       "reliquary_saintless_hall": "聖人なき広間",
-      "reliquary_finale": "鐘を埋めし聖堂"
+      "reliquary_finale": "鐘を埋めし聖堂",
+      "litany_sluice": "三日月水門",
+      "litany_ledger": "島の記帳簿",
+      "litany_ring": "聖遺物の環",
+      "litany_baptistry": "陥没洗礼堂",
+      "litany_choir_loft": "扇形聖歌隊席",
+      "litany_causeway": "Y字分岐の土手道",
+      "litany_apse": "溺れし後陣"
+    },
+    "object": {
+      "sluice_valve": "水門弁",
+      "grave_tablet": "墓碑板",
+      "corpse_candle": "死体蝋燭",
+      "widow_egg_sac": "未亡人の卵嚢",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
@@ -2367,6 +2428,18 @@ export const ja_JP: EnTranslations = {
           "3": "聖遺物庫の侍祭",
           "4": "墓呼びの証人",
           "5": "礼拝堂の守護者"
+        }
+      },
+      "edda": {
+        "combat_start": "黒水に気をつけろ、{playerName}。沼が聞いている。",
+        "low_hp": "落ち着け。私のランタンはまだ消えていない。",
+        "trap_spotted": "待て。ここの葦がおかしい。",
+        "boss_pull": "あの聖歌はお前の名を知っている、{playerName}。歌い返すな。",
+        "completion": "沼はもう一晩、その秘密を飲み込んでいられる。",
+        "rank": {
+          "1": "ランタン持ち",
+          "2": "葦の見張り",
+          "3": "フェンブリッジの信徒"
         }
       }
     },
@@ -2410,7 +2483,10 @@ export const ja_JP: EnTranslations = {
       "flooded_paths": "水没した通路",
       "grave_tax": "墓の徴収",
       "unstable_roof": "崩れかけた天井",
-      "cult_remnants": "カルトの残党"
+      "cult_remnants": "カルトの残党",
+      "high_water": "増水",
+      "lively_choir": "活発な聖歌隊",
+      "belligerent_dead": "好戦的な死者"
     },
     "blessing": {
       "chapel_candle": "礼拝堂の蝋燭。より安全な攻略になるが、踏破時の刻印が1つ減る。"
@@ -5219,6 +5295,42 @@ export const ja_JP: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "ヴァリックの影のフード"
       },
+      "siltguard_helm": {
+        "name": "泥衛の兜"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "防壁の錆びた肩当て"
+      },
+      "nhalias_bell_maul": {
+        "name": "ナリアの鐘槌"
+      },
+      "reedstalker_jerkin": {
+        "name": "葦忍びの上着"
+      },
+      "mirejaw_fang_knife": {
+        "name": "泥顎の牙ナイフ"
+      },
+      "widow_silk_hood": {
+        "name": "未亡人絹のフード"
+      },
+      "cantors_drowned_sash": {
+        "name": "詠唱者の溺れし飾り帯"
+      },
+      "corpse_candle_focus": {
+        "name": "死体蝋燭の集中具"
+      },
+      "nhalias_litany_rod": {
+        "name": "ナリアの連祷の杖"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "黒水先鋒の胸当て"
+      },
+      "siltstep_leggings": {
+        "name": "泥歩の脚甲"
+      },
+      "sunken_reliquary_hood": {
+        "name": "沈める聖遺物のフード"
+      },
       "the_codfather": {
         "name": "タラのゴッドファーザー"
       },
@@ -5531,31 +5643,34 @@ export const ja_JP: EnTranslations = {
         "name": "侍祭テッサ"
       },
       "drowned_cantor": {
-        "name": "Drowned Cantor"
+        "name": "溺れた聖歌者"
       },
       "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
+        "name": "葦縛りの信徒"
       },
       "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
+        "name": "深淵沼の槍顎"
       },
       "mirefen_widowling": {
-        "name": "Mirefen Widowling"
+        "name": "泥沼の未亡人蜘蛛"
       },
       "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
+        "name": "墓泥の防壁"
       },
       "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
+        "name": "汚水トロールの貪り屋"
       },
       "choir_thrall": {
-        "name": "Choir Thrall"
+        "name": "聖歌隊の隷属者"
       },
       "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
+        "name": "修道女ナリア、溺れし聖歌"
       },
       "edda_reedhand": {
-        "name": "Edda Reedhand"
+        "name": "エッダ・リードハンド"
+      },
+      "tolling_bell": {
+        "name": "鳴り響く鐘"
       },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
@@ -5778,9 +5893,9 @@ export const ja_JP: EnTranslations = {
         "greeting": "下の聖遺物庫がまた動いた。"
       },
       "brother_aldric_watch": {
-        "name": "Brother Aldric",
-        "title": "Fenbridge Watch",
-        "greeting": "Fenbridge hears bells under the water now. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
+        "name": "修道士アルドリック",
+        "title": "フェンブリッジ番人",
+        "greeting": "フェンブリッジは今、水の底で鐘の音を聞く。墓呼びたちは溺れし者に歌を教えている。難易度を選べ、お前が戻るまで縄を握っていよう。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -6748,9 +6863,9 @@ export const ja_JP: EnTranslations = {
         "leaveText": "あなたは聖遺物庫の廃墟にいるハルヴェン修道士のもとへ登り戻る。"
       },
       "drowned_litany": {
-        "name": "The Drowned Litany",
-        "enterText": "You descend beneath Fenbridge into the drowned shrine.",
-        "leaveText": "You climb back to Brother Aldric on the Fenbridge causeway."
+        "name": "溺れし連祷",
+        "enterText": "あなたはフェンブリッジの下へ、溺れし神殿へと降りていく。",
+        "leaveText": "あなたはフェンブリッジの土手道を登り、アルドリック修道士のもとへ戻る。"
       }
     },
     "itemSets": {

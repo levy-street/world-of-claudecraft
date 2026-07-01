@@ -2177,12 +2177,21 @@ export const zh_CN: EnTranslations = {
       "instancesBusy": "{name}的所有副本都已占用。请稍后再试。",
       "runFailed": "{name}探秘失败。",
       "complete": "{name}已完成。",
+      "mobChannels": "{name}正在引导{mechanic}。",
       "mechanismOpen": "附近一处机关咔哒一声开启。一条通道向北敞开，前去寻找前方的出口传送门。",
       "raiseDead": "{name}开始施放亡者复生。",
       "graveFalters": "墓葬仪式被打断了。",
       "doorAlreadyOpen": "门已经开着了。",
       "companionRankUp": "{name}晋升至 {rank} 级。",
       "bossChest": "首领倒下了。一只设有结界的圣物库宝箱在祭坛上升起，撬开它的锁来取得你的战利品。",
+      "drownedLitanyReliquaryRise": "娜哈莉亚修女陷入沉默。溺亡圣髑匣从黑水中升起。靠近它以开始仪式。",
+      "riteSequenceReady": "神龛陷入黑暗。重复顺序。",
+      "riteSequencePlaying": "神龛正在重演仪式。请等待。",
+      "riteCorrect": "一声轻柔的钟鸣回应了你的触碰。",
+      "riteWrong": "刺耳的钟裂声。黑水在你脚边溅起。",
+      "riteReliquaryOpen": "溺亡圣髑匣打开了。",
+      "riteReliquaryLocked": "完成神龛仪式以打开圣髑匣。",
+      "riteReliquaryEmpty": "圣髑匣是空的。",
       "surfaceStairs": "一道通往地面的楼梯开启了。在楼梯处按 F 即可离开。",
       "moduleEnter": "{name}：{objective}",
       "objectiveClearRoom": "清空房间。",
@@ -2190,6 +2199,10 @@ export const zh_CN: EnTranslations = {
       "tombstoneHint": "房间清空后，一条墓碑通道将向北敞开。",
       "tombstoneOpen": "一条封闭的墓碑通道向北轰然开启。走进去即可继续前行。",
       "tombstoneInto": "你穿过墓碑进入{name}。",
+      "bellRopeShock": "钟绳猛然绷紧。溺亡诵经者们因震荡而踉跄。",
+      "eggSacBurst": "卵囊破裂了。黑水泼溅过洗礼堂的边缘。",
+      "baptistryEggs": "洗礼堂归于寂静。寡妇卵囊沿着边缘膨胀。",
+      "baptistryWave": "洗礼堂的黑水中有什么东西在搅动。",
       "chestEmpty": "宝箱是空的。",
       "notInDelve": "你不在探秘之中。",
       "cannotInteract": "你无法与之互动。",
@@ -2210,7 +2223,9 @@ export const zh_CN: EnTranslations = {
       "moveCloserChest": "靠近宝箱一些。",
       "nothingToTake": "这里已经没有可拿的东西了。",
       "wayOutNotOpen": "出路尚未开启。",
-      "moveCloserStairs": "靠近楼梯一些。"
+      "moveCloserStairs": "靠近楼梯一些。",
+      "nhaliaCantorShield": "诵经者们，稳住音符！",
+      "nhaliaBlackwaterMark": "{name}用黑水标记了{player}！"
     },
     "lockpick": {
       "lockYields": "锁开了！{tier}战利品。",
@@ -2273,12 +2288,31 @@ export const zh_CN: EnTranslations = {
       "abandoned": "你将撬锁器轻轻抽了出来。锁还在等着。"
     }
   },
+  "delveRiteUi": {
+    "title": "溺亡圣髑仪式",
+    "blurb": "神龛将依序亮起。依次激活每一座神龛以重复顺序。触碰错误会导致本次尝试失败并重演顺序，完美无误的尝试将赢得最丰厚的战利品，而用尽尝试次数则会以最寒酸的方式打开圣髑匣。选择仪式将如何考验你。",
+    "easy": "Easy",
+    "medium": "中等",
+    "hard": "Hard",
+    "showsTimes": "顺序展示{count}次",
+    "showsOnce": "顺序仅展示一次",
+    "symbols": "{count}个符号",
+    "mistakes": "允许{count}次错误",
+    "tries": "{count}次尝试",
+    "reward": {
+      "easy": "普通战利品",
+      "medium": "丰厚战利品",
+      "hard": "顶级战利品"
+    },
+    "closeAria": "关闭"
+  },
   "delveUi": {
     "board": {
       "title": "探秘面板",
       "enter": "进入探秘",
       "enterAria": "以{tier}难度进入{delve}",
       "openDelve": "坍塌的圣物库",
+      "openDelveLitany": "溺亡连祷",
       "openDelveAria": "从{name}打开探秘面板",
       "marks": "探秘印记：{count}",
       "minLevel": "需要等级 {level}",
@@ -2289,6 +2323,7 @@ export const zh_CN: EnTranslations = {
       "companion": {
         "pick": "选择一名同伴",
         "tessa": "侍僧泰莎",
+        "edda": "艾达·芦手",
         "rank": "等级 {rank}",
         "boon": "在战斗间隙治疗队伍。3级时每次探秘可复活一名倒下的队友一次。",
         "upgrade": "升级到 {rank} 级（{marks} 印记）",
@@ -2335,23 +2370,49 @@ export const zh_CN: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "下方的圣物库又移位了。每到午夜过后，我们便能透过地板听见诵唱，侍僧泰莎更发誓说葬礼名册正在自行改写墨迹。若你有足够的勇气，{playerName}，就拿上一支蜡烛下去吧。别相信下面听到的每一个声音。它们中有些，早在你出生之前就知道你的名字了。"
+      },
+      "aldric": {
+        "greeting": "芬桥如今能听见水下的钟声，{playerName}。唤墓者正在教溺亡者歌唱。选择你的难度，我会握紧绳索，直到你归来。"
       }
     },
     "intro": {
       "normal": "楼梯井又冷又暗。破碎的圣徒石散落在下行的台阶上，潮湿的空气中悬着一缕轻柔的钟音。侍僧泰莎低声道：“圣物库不该开到这么深的地方。靠紧些，{playerName}。”",
-      "heroic": "门在你身后呻吟着合上。一个个名字像指甲般刮过石面。泰莎的烛火燃成幽蓝。“他们如今召唤的已不是亡者了，{playerName}。他们是在回应某种东西。”"
+      "heroic": "门在你身后呻吟着合上。一个个名字像指甲般刮过石面。泰莎的烛火燃成幽蓝。“他们如今召唤的已不是亡者了，{playerName}。他们是在回应某种东西。”",
+      "litanyNormal": "芦苇堵塞的阶梯没入芬桥之下。艾达·芦手举起她的提灯。\"沼泽记得每一个被淹死之人的名字，{playerName}。留在光中。\"",
+      "litanyHeroic": "黑水拍打着堤道的石头。艾达的火焰闪烁成绿色。\"他们又在下面歌唱了，{playerName}。不要回应那唱诗队。\""
     },
     "module": {
       "reliquary_sunken_ossuary": "水从葬架间渗出，挟着陈年灰烬汇成银黑色的细流。",
       "reliquary_bell_niche": "数十口手钟静默地悬着，每一口都系着丧葬布。",
       "reliquary_saintless_hall": "一座座雕像的脸面被人以审慎的仇恨凿去。",
-      "reliquary_finale": "埋藏的钟在你脚下鸣响了一声。"
+      "reliquary_finale": "埋藏的钟在你脚下鸣响了一声。",
+      "litany_sluice": "长满苔藓的水闸滴落着黑水，落入古老的唱诗队墓室。",
+      "litany_ledger": "账簿岛屿从被淹没的水道中浮现，墨迹渗入沼泽。",
+      "litany_ring": "一圈圣髑环绕着一处被封印的黑水中央圣泉。",
+      "litany_baptistry": "一处天坑洗礼堂在破裂的圣者石与卵囊之下张开大口。",
+      "litany_choir_loft": "展开的唱诗楼回响着绳索悬挂的钟声，从未真正停歇。",
+      "litany_causeway": "一条Y形分岔的堤道横跨齐腰深的沼泽水。",
+      "litany_apse": "溺亡的后殿通向娜哈莉亚修女的祭坛岛。"
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "沉没的藏骨堂",
       "reliquary_bell_niche": "鸣钟壁龛",
       "reliquary_saintless_hall": "无圣之厅",
-      "reliquary_finale": "埋钟之厅"
+      "reliquary_finale": "埋钟之厅",
+      "litany_sluice": "新月水闸",
+      "litany_ledger": "岛屿账簿",
+      "litany_ring": "圣髑之环",
+      "litany_baptistry": "天坑洗礼堂",
+      "litany_choir_loft": "扇形唱诗楼",
+      "litany_causeway": "Y形分岔堤道",
+      "litany_apse": "溺亡后殿"
+    },
+    "object": {
+      "sluice_valve": "水闸阀门",
+      "grave_tablet": "墓碑石板",
+      "corpse_candle": "尸烛",
+      "widow_egg_sac": "寡妇卵囊",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}：{line}",
@@ -2367,6 +2428,18 @@ export const zh_CN: EnTranslations = {
           "3": "圣物库侍僧",
           "4": "唤墓见证者",
           "5": "礼拜堂守护者"
+        }
+      },
+      "edda": {
+        "combat_start": "小心黑水，{playerName}。沼泽在倾听。",
+        "low_hp": "稳住。我的提灯还没熄灭。",
+        "trap_spotted": "等等。这里的芦苇不对劲。",
+        "boss_pull": "那圣歌知道你的名字，{playerName}。不要回唱。",
+        "completion": "沼泽还能再吞下它的秘密一晚。",
+        "rank": {
+          "1": "提灯者",
+          "2": "芦苇守望者",
+          "3": "芬桥信徒"
         }
       }
     },
@@ -2410,7 +2483,10 @@ export const zh_CN: EnTranslations = {
       "flooded_paths": "水淹通道",
       "grave_tax": "墓葬税",
       "unstable_roof": "不稳的顶棚",
-      "cult_remnants": "教派残党"
+      "cult_remnants": "教派残党",
+      "high_water": "水位高涨",
+      "lively_choir": "活跃唱诗队",
+      "belligerent_dead": "好战亡者"
     },
     "blessing": {
       "chapel_candle": "礼拜堂烛火：旅程更安全，但通关时少得一枚印记。"
@@ -5219,6 +5295,42 @@ export const zh_CN: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "瓦里克的暗影兜帽"
       },
+      "siltguard_helm": {
+        "name": "淤卫头盔"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "壁垒锈蚀肩甲"
+      },
+      "nhalias_bell_maul": {
+        "name": "娜哈莉亚的钟槌"
+      },
+      "reedstalker_jerkin": {
+        "name": "芦丛潜行皮甲"
+      },
+      "mirejaw_fang_knife": {
+        "name": "泥颚獠牙匕首"
+      },
+      "widow_silk_hood": {
+        "name": "寡妇丝兜帽"
+      },
+      "cantors_drowned_sash": {
+        "name": "诵经者的溺水腰带"
+      },
+      "corpse_candle_focus": {
+        "name": "尸烛法器"
+      },
+      "nhalias_litany_rod": {
+        "name": "娜哈莉亚的连祷杖"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "黑水先锋胸甲"
+      },
+      "siltstep_leggings": {
+        "name": "淤步护腿"
+      },
+      "sunken_reliquary_hood": {
+        "name": "沉没圣髑兜帽"
+      },
       "the_codfather": {
         "name": "鳕鱼教父"
       },
@@ -5531,31 +5643,34 @@ export const zh_CN: EnTranslations = {
         "name": "侍僧泰莎"
       },
       "drowned_cantor": {
-        "name": "Drowned Cantor"
+        "name": "溺亡诵经者"
       },
       "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
+        "name": "芦苇缚信徒"
       },
       "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
+        "name": "深沼枪颚兽"
       },
       "mirefen_widowling": {
-        "name": "Mirefen Widowling"
+        "name": "泥沼寡妇蛛"
       },
       "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
+        "name": "墓淤壁垒"
       },
       "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
+        "name": "污水巨魔吞噬者"
       },
       "choir_thrall": {
-        "name": "Choir Thrall"
+        "name": "唱诗奴仆"
       },
       "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
+        "name": "娜哈莉亚修女，溺亡的圣歌"
       },
       "edda_reedhand": {
-        "name": "Edda Reedhand"
+        "name": "艾达·芦手"
+      },
+      "tolling_bell": {
+        "name": "鸣钟"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -5778,9 +5893,9 @@ export const zh_CN: EnTranslations = {
         "greeting": "下方的圣物库又移位了。"
       },
       "brother_aldric_watch": {
-        "name": "Brother Aldric",
-        "title": "Fenbridge Watch",
-        "greeting": "Fenbridge hears bells under the water now. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
+        "name": "阿尔德里克修士",
+        "title": "芬桥守卫",
+        "greeting": "芬桥如今能听见水下的钟声。唤墓者正在教溺亡者歌唱。选择你的难度，我会握紧绳索，直到你归来。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -6748,9 +6863,9 @@ export const zh_CN: EnTranslations = {
         "leaveText": "你攀回圣物库废墟旁的哈尔文修士身边。"
       },
       "drowned_litany": {
-        "name": "The Drowned Litany",
-        "enterText": "You descend beneath Fenbridge into the drowned shrine.",
-        "leaveText": "You climb back to Brother Aldric on the Fenbridge causeway."
+        "name": "溺亡连祷",
+        "enterText": "你潜入芬桥之下，进入那座溺亡的神殿。",
+        "leaveText": "你爬回芬桥堤道，回到阿尔德里克修士身边。"
       }
     },
     "itemSets": {

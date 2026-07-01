@@ -2177,12 +2177,21 @@ export const sv_SE: EnTranslations = {
       "instancesBusy": "Alla instanser av {name} är upptagna. Försök igen snart.",
       "runFailed": "{name}-körningen misslyckades.",
       "complete": "{name} slutförd.",
+      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "En mekanism klickar upp i närheten. En passage öppnas mot norr. Hitta utgångsportalen längre fram.",
       "raiseDead": "{name} börjar Väck de döda.",
       "graveFalters": "Gravriten sviktar.",
       "doorAlreadyOpen": "Dörren är redan öppen.",
       "companionRankUp": "{name} når rang {rank}.",
       "bossChest": "Bossen faller. En spärrad relikkista reser sig på podiet. Dyrka upp dess lås för att göra anspråk på ditt byte.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
+      "riteSequencePlaying": "The shrines replay the rite. Wait.",
+      "riteCorrect": "A soft chime answers your touch.",
+      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
+      "riteReliquaryOpen": "The Drowned Reliquary opens.",
+      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
+      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "En trappa till ytan öppnas. Tryck F vid trappan för att lämna.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Rensa rummet.",
@@ -2190,6 +2199,10 @@ export const sv_SE: EnTranslations = {
       "tombstoneHint": "En gravstenspassage öppnas mot norr när rummet är rensat.",
       "tombstoneOpen": "En förseglad gravstenspassage gnisslar upp mot norr. Gå in i den för att fortsätta.",
       "tombstoneInto": "Du passerar genom gravstenen in i {name}.",
+      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
+      "eggSacBurst": "The egg-sac bursts. Blackwater slops across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Widow egg-sacs swell along the rim.",
+      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Kistan är tom.",
       "notInDelve": "Du befinner dig inte i en fördjupning.",
       "cannotInteract": "Du kan inte interagera med det.",
@@ -2210,7 +2223,9 @@ export const sv_SE: EnTranslations = {
       "moveCloserChest": "Gå närmare kistan.",
       "nothingToTake": "Det finns inget kvar att ta.",
       "wayOutNotOpen": "Vägen ut är inte öppen ännu.",
-      "moveCloserStairs": "Gå närmare trappan."
+      "moveCloserStairs": "Gå närmare trappan.",
+      "nhaliaCantorShield": "Cantors, hold the note!",
+      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
     "lockpick": {
       "lockYields": "Låset ger vika! {tier} byte.",
@@ -2273,12 +2288,31 @@ export const sv_SE: EnTranslations = {
       "abandoned": "Du drar försiktigt ut dyrkarna igen. Låset väntar."
     }
   },
+  "delveRiteUi": {
+    "title": "The Drowned Reliquary Rite",
+    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "showsTimes": "Sequence shown {count} times",
+    "showsOnce": "Sequence shown once",
+    "symbols": "{count} symbols",
+    "mistakes": "{count} mistakes allowed",
+    "tries": "{count} tries",
+    "reward": {
+      "easy": "Modest spoils",
+      "medium": "Rich spoils",
+      "hard": "Premium spoils"
+    },
+    "closeAria": "Close"
+  },
   "delveUi": {
     "board": {
       "title": "Delve-tavla",
       "enter": "Gå in i delven",
       "enterAria": "Gå in i {delve} på svårighetsgraden {tier}",
       "openDelve": "Det rasade relikvariet",
+      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Öppna delve-tavlan från {name}",
       "marks": "Delve-märken: {count}",
       "minLevel": "Kräver nivå {level}",
@@ -2289,6 +2323,7 @@ export const sv_SE: EnTranslations = {
       "companion": {
         "pick": "Välj en följeslagare",
         "tessa": "Akolyten Tessa",
+        "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Läker gruppen mellan strider. Rang 3 återupplivar en fallen allierad en gång per runda.",
         "upgrade": "Uppgradera till rang {rank} ({marks} Märken)",
@@ -2335,23 +2370,49 @@ export const sv_SE: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Relikvariet där nere har förskjutits igen. Vi hör mässande genom golvet efter midnatt, och Akolyten Tessa svär på att begravningsliggarna ändrar sitt eget bläck. Om du har mod nog, {playerName}, ta ett ljus och gå ner. Lita inte på varje röst du hör där nere. Några av dem kände ditt namn innan du föddes."
+      },
+      "aldric": {
+        "greeting": "Fenbridge hears bells under the water now, {playerName}. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "Trappuppgången är kall och mörk. Krossade helgonstenar täcker nedstigningen, och en mjuk klockton hänger i den fuktiga luften. Akolyten Tessa viskar: \"Relikvariet borde inte vara öppet så här långt ner. Håll dig nära, {playerName}.\"",
-      "heroic": "Dörrarna gnisslar igen bakom dig. Namn skrapar mot stenen som naglar. Tessas ljus brinner blått. \"De kallar inte på de döda nu, {playerName}. De svarar på något.\""
+      "heroic": "Dörrarna gnisslar igen bakom dig. Namn skrapar mot stenen som naglar. Tessas ljus brinner blått. \"De kallar inte på de döda nu, {playerName}. De svarar på något.\"",
+      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
+      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Vatten sipprar genom gravhyllorna och bär gammal aska i silversvarta strömmar.",
       "reliquary_bell_niche": "Dussintals handklockor hänger i tystnad, var och en knuten med begravningstyg.",
       "reliquary_saintless_hall": "Statyer med ansikten bortmejslade med omsorgsfullt hat.",
-      "reliquary_finale": "Den begravda klockan ringer en gång under dina stövlar."
+      "reliquary_finale": "Den begravda klockan ringer en gång under dina stövlar.",
+      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
+      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
+      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
+      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
+      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
+      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Det sjunkna benhuset",
       "reliquary_bell_niche": "Klocknischen",
       "reliquary_saintless_hall": "Den helgonlösa hallen",
-      "reliquary_finale": "Den klockbegravda kammaren"
+      "reliquary_finale": "Den klockbegravda kammaren",
+      "litany_sluice": "The Crescent Sluice",
+      "litany_ledger": "The Island Ledger",
+      "litany_ring": "The Ring Reliquary",
+      "litany_baptistry": "The Sinkhole Baptistry",
+      "litany_choir_loft": "The Fan Choir Loft",
+      "litany_causeway": "The Y-Split Causeway",
+      "litany_apse": "The Drowned Apse"
+    },
+    "object": {
+      "sluice_valve": "Sluice Valve",
+      "grave_tablet": "Grave Tablet",
+      "corpse_candle": "Corpse-Candle",
+      "widow_egg_sac": "Widow Egg-Sac",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
@@ -2367,6 +2428,18 @@ export const sv_SE: EnTranslations = {
           "3": "Relikvarieakolyt",
           "4": "Gravropsvittne",
           "5": "Kapellväktare"
+        }
+      },
+      "edda": {
+        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "low_hp": "Steady. My lantern is not out yet.",
+        "trap_spotted": "Wait. The reeds are wrong here.",
+        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
+        "completion": "The fen can swallow its secrets for one more night.",
+        "rank": {
+          "1": "Lantern-Bearer",
+          "2": "Reed-Watcher",
+          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2410,7 +2483,10 @@ export const sv_SE: EnTranslations = {
       "flooded_paths": "Översvämmade gångar",
       "grave_tax": "Gravskatt",
       "unstable_roof": "Instabilt tak",
-      "cult_remnants": "Kultlämningar"
+      "cult_remnants": "Kultlämningar",
+      "high_water": "High Water",
+      "lively_choir": "Lively Choir",
+      "belligerent_dead": "Belligerent Dead"
     },
     "blessing": {
       "chapel_candle": "Kapelljus: säkrare runda, ett märke mindre vid slutförande."
@@ -5219,6 +5295,42 @@ export const sv_SE: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics skugghuva"
       },
+      "siltguard_helm": {
+        "name": "Siltguard Helm"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "Bulwark-Rusted Pauldrons"
+      },
+      "nhalias_bell_maul": {
+        "name": "Nhalia's Bell-Maul"
+      },
+      "reedstalker_jerkin": {
+        "name": "Reedstalker Jerkin"
+      },
+      "mirejaw_fang_knife": {
+        "name": "Mirejaw Fang-Knife"
+      },
+      "widow_silk_hood": {
+        "name": "Widow-Silk Hood"
+      },
+      "cantors_drowned_sash": {
+        "name": "Cantor's Drowned Sash"
+      },
+      "corpse_candle_focus": {
+        "name": "Corpse-Candle Focus"
+      },
+      "nhalias_litany_rod": {
+        "name": "Nhalia's Litany Rod"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      "siltstep_leggings": {
+        "name": "Siltstep Leggings"
+      },
+      "sunken_reliquary_hood": {
+        "name": "Sunken Reliquary Hood"
+      },
       "the_codfather": {
         "name": "Torskfadern"
       },
@@ -5556,6 +5668,9 @@ export const sv_SE: EnTranslations = {
       },
       "edda_reedhand": {
         "name": "Edda Reedhand"
+      },
+      "tolling_bell": {
+        "name": "Tolling Bell"
       },
       "ironvein_foreman": {
         "name": "Järnådersförman"

@@ -2177,12 +2177,21 @@ export const id_ID: EnTranslations = {
       "instancesBusy": "Semua instansi {name} sedang sibuk. Coba lagi sebentar lagi.",
       "runFailed": "Penjelajahan {name} gagal.",
       "complete": "{name} selesai.",
+      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Sebuah mekanisme berbunyi terbuka di dekatmu. Sebuah lorong terbuka ke utara. Temukan portal keluar di depan.",
       "raiseDead": "{name} mulai membangkitkan yang mati.",
       "graveFalters": "Ritual kubur tersendat.",
       "doorAlreadyOpen": "Pintu itu sudah terbuka.",
       "companionRankUp": "{name} mencapai peringkat {rank}.",
       "bossChest": "Bos tumbang. Sebuah peti relikui berpengaman muncul di mimbar. Bobol kuncinya untuk merebut rampasanmu.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
+      "riteSequencePlaying": "The shrines replay the rite. Wait.",
+      "riteCorrect": "A soft chime answers your touch.",
+      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
+      "riteReliquaryOpen": "The Drowned Reliquary opens.",
+      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
+      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Sebuah tangga menuju permukaan terbuka. Tekan F di tangga untuk pergi.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Bersihkan ruangan.",
@@ -2190,6 +2199,10 @@ export const id_ID: EnTranslations = {
       "tombstoneHint": "Sebuah lorong batu nisan terbuka ke utara saat ruangan dibersihkan.",
       "tombstoneOpen": "Sebuah lorong batu nisan tersegel berderak terbuka ke utara. Masuklah ke dalamnya untuk melanjutkan.",
       "tombstoneInto": "Kamu menembus batu nisan menuju {name}.",
+      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
+      "eggSacBurst": "The egg-sac bursts. Blackwater slops across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Widow egg-sacs swell along the rim.",
+      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Peti itu kosong.",
       "notInDelve": "Kamu tidak berada di dalam delve.",
       "cannotInteract": "Kamu tidak dapat berinteraksi dengan itu.",
@@ -2210,7 +2223,9 @@ export const id_ID: EnTranslations = {
       "moveCloserChest": "Mendekatlah ke peti.",
       "nothingToTake": "Tidak ada lagi yang bisa diambil.",
       "wayOutNotOpen": "Jalan keluar belum terbuka.",
-      "moveCloserStairs": "Mendekatlah ke tangga."
+      "moveCloserStairs": "Mendekatlah ke tangga.",
+      "nhaliaCantorShield": "Cantors, hold the note!",
+      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
     "lockpick": {
       "lockYields": "Kunci terbuka! Rampasan {tier}.",
@@ -2273,12 +2288,31 @@ export const id_ID: EnTranslations = {
       "abandoned": "Anda menarik pengait keluar perlahan. Kunci pun menanti."
     }
   },
+  "delveRiteUi": {
+    "title": "The Drowned Reliquary Rite",
+    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "showsTimes": "Sequence shown {count} times",
+    "showsOnce": "Sequence shown once",
+    "symbols": "{count} symbols",
+    "mistakes": "{count} mistakes allowed",
+    "tries": "{count} tries",
+    "reward": {
+      "easy": "Modest spoils",
+      "medium": "Rich spoils",
+      "hard": "Premium spoils"
+    },
+    "closeAria": "Close"
+  },
   "delveUi": {
     "board": {
       "title": "Papan Delve",
       "enter": "Masuki Delve",
       "enterAria": "Masuki {delve} pada tingkat kesulitan {tier}",
       "openDelve": "Relikuari Runtuh",
+      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Buka Papan Delve dari {name}",
       "marks": "Tanda Delve: {count}",
       "minLevel": "Membutuhkan Level {level}",
@@ -2289,6 +2323,7 @@ export const id_ID: EnTranslations = {
       "companion": {
         "pick": "Pilih seorang pendamping",
         "tessa": "Akolit Tessa",
+        "edda": "Edda Reedhand",
         "rank": "Tingkat {rank}",
         "boon": "Menyembuhkan party di antara pertarungan. Peringkat 3 menghidupkan kembali sekutu yang tumbang sekali per penjelajahan.",
         "upgrade": "Tingkatkan ke Tingkat {rank} ({marks} Tanda)",
@@ -2335,23 +2370,49 @@ export const id_ID: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Relikuari di bawah telah bergeser lagi. Kami mendengar nyanyian melalui lantai sesudah tengah malam, dan Akolit Tessa bersumpah buku catatan pemakaman mengubah tintanya sendiri. Jika kau cukup berani, {playerName}, ambillah sebuah lilin dan turunlah ke bawah. Jangan percaya setiap suara yang kau dengar di bawah sana. Sebagian dari mereka mengetahui namamu sebelum kau lahir."
+      },
+      "aldric": {
+        "greeting": "Fenbridge hears bells under the water now, {playerName}. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "Tangga itu dingin dan gelap. Pecahan batu santo berserakan di sepanjang turunan, dan nada lonceng yang lembut menggantung di udara lembap. Akolit Tessa berbisik, \"Relikuari ini seharusnya tidak terbuka sejauh ini. Tetaplah dekat, {playerName}.\"",
-      "heroic": "Pintu-pintu mengerang menutup di belakangmu. Nama-nama tergores di batu bagai kuku jari. Lilin Tessa menyala biru. \"Mereka tidak memanggil para mati sekarang, {playerName}. Mereka sedang menjawab sesuatu.\""
+      "heroic": "Pintu-pintu mengerang menutup di belakangmu. Nama-nama tergores di batu bagai kuku jari. Lilin Tessa menyala biru. \"Mereka tidak memanggil para mati sekarang, {playerName}. Mereka sedang menjawab sesuatu.\"",
+      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
+      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Air merembes melalui rak pemakaman, membawa abu tua dalam aliran perak kehitaman.",
       "reliquary_bell_niche": "Puluhan lonceng tangan tergantung dalam sunyi, masing-masing diikat dengan kain pemakaman.",
       "reliquary_saintless_hall": "Patung-patung dengan wajah yang dipahat hilang dengan kebencian yang cermat.",
-      "reliquary_finale": "Lonceng terkubur berdentang sekali di bawah sepatu botmu."
+      "reliquary_finale": "Lonceng terkubur berdentang sekali di bawah sepatu botmu.",
+      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
+      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
+      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
+      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
+      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
+      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Osuarium Tenggelam",
       "reliquary_bell_niche": "Relung Lonceng",
       "reliquary_saintless_hall": "Aula Tanpa Santo",
-      "reliquary_finale": "Ruang Terkubur Lonceng"
+      "reliquary_finale": "Ruang Terkubur Lonceng",
+      "litany_sluice": "The Crescent Sluice",
+      "litany_ledger": "The Island Ledger",
+      "litany_ring": "The Ring Reliquary",
+      "litany_baptistry": "The Sinkhole Baptistry",
+      "litany_choir_loft": "The Fan Choir Loft",
+      "litany_causeway": "The Y-Split Causeway",
+      "litany_apse": "The Drowned Apse"
+    },
+    "object": {
+      "sluice_valve": "Sluice Valve",
+      "grave_tablet": "Grave Tablet",
+      "corpse_candle": "Corpse-Candle",
+      "widow_egg_sac": "Widow Egg-Sac",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
@@ -2367,6 +2428,18 @@ export const id_ID: EnTranslations = {
           "3": "Akolit Relikuari",
           "4": "Saksi Panggilan Kubur",
           "5": "Penjaga Kapel"
+        }
+      },
+      "edda": {
+        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "low_hp": "Steady. My lantern is not out yet.",
+        "trap_spotted": "Wait. The reeds are wrong here.",
+        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
+        "completion": "The fen can swallow its secrets for one more night.",
+        "rank": {
+          "1": "Lantern-Bearer",
+          "2": "Reed-Watcher",
+          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2410,7 +2483,10 @@ export const id_ID: EnTranslations = {
       "flooded_paths": "Jalur Tergenang",
       "grave_tax": "Pajak Kubur",
       "unstable_roof": "Atap Rapuh",
-      "cult_remnants": "Sisa-sisa Kultus"
+      "cult_remnants": "Sisa-sisa Kultus",
+      "high_water": "High Water",
+      "lively_choir": "Lively Choir",
+      "belligerent_dead": "Belligerent Dead"
     },
     "blessing": {
       "chapel_candle": "Lilin Kapel: penjelajahan lebih aman, satu Tanda lebih sedikit saat tuntas."
@@ -5219,6 +5295,42 @@ export const id_ID: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Tudung Bayangan Varric"
       },
+      "siltguard_helm": {
+        "name": "Siltguard Helm"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "Bulwark-Rusted Pauldrons"
+      },
+      "nhalias_bell_maul": {
+        "name": "Nhalia's Bell-Maul"
+      },
+      "reedstalker_jerkin": {
+        "name": "Reedstalker Jerkin"
+      },
+      "mirejaw_fang_knife": {
+        "name": "Mirejaw Fang-Knife"
+      },
+      "widow_silk_hood": {
+        "name": "Widow-Silk Hood"
+      },
+      "cantors_drowned_sash": {
+        "name": "Cantor's Drowned Sash"
+      },
+      "corpse_candle_focus": {
+        "name": "Corpse-Candle Focus"
+      },
+      "nhalias_litany_rod": {
+        "name": "Nhalia's Litany Rod"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      "siltstep_leggings": {
+        "name": "Siltstep Leggings"
+      },
+      "sunken_reliquary_hood": {
+        "name": "Sunken Reliquary Hood"
+      },
       "the_codfather": {
         "name": "Sang Bapak Kod"
       },
@@ -5556,6 +5668,9 @@ export const id_ID: EnTranslations = {
       },
       "edda_reedhand": {
         "name": "Edda Reedhand"
+      },
+      "tolling_bell": {
+        "name": "Tolling Bell"
       },
       "ironvein_foreman": {
         "name": "Mandor Ironvein"

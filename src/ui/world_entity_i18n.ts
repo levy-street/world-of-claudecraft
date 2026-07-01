@@ -91,6 +91,7 @@ const MOB_IDS = [
   'choir_thrall',
   'sister_nhalia_drowned_canticle',
   'edda_reedhand',
+  'tolling_bell',
 ] as const;
 
 const NPC_IDS = [

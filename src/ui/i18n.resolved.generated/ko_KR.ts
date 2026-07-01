@@ -2177,12 +2177,21 @@ export const ko_KR: EnTranslations = {
       "instancesBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하세요.",
       "runFailed": "{name} 진행에 실패했습니다.",
       "complete": "{name} 완료.",
+      "mobChannels": "{name}이(가) {mechanic}을(를) 시전 중이다.",
       "mechanismOpen": "근처에서 기계 장치가 철컥 열립니다. 북쪽으로 통로가 열립니다. 앞쪽의 출구 차원문을 찾으세요.",
       "raiseDead": "{name}이(가) 죽음의 부활을 시전하기 시작합니다.",
       "graveFalters": "무덤의 의식이 흔들립니다.",
       "doorAlreadyOpen": "문이 이미 열려 있습니다.",
       "companionRankUp": "{name}이(가) {rank}등급에 도달했습니다.",
       "bossChest": "우두머리가 쓰러집니다. 봉인된 성물실 상자가 단상 위로 솟아오릅니다. 자물쇠를 따서 전리품을 차지하세요.",
+      "drownedLitanyReliquaryRise": "나할리아 수녀가 침묵한다. 익사한 유물함이 흑수에서 떠오른다. 다가가 의식을 시작하라.",
+      "riteSequenceReady": "성소들이 어둠에 잠긴다. 순서를 반복하라.",
+      "riteSequencePlaying": "성소들이 의식을 재생하고 있다. 기다려라.",
+      "riteCorrect": "부드러운 종소리가 그대의 손길에 응답한다.",
+      "riteWrong": "귀에 거슬리는 종의 균열음. 흑수가 발치에서 튄다.",
+      "riteReliquaryOpen": "익사한 유물함이 열린다.",
+      "riteReliquaryLocked": "유물함을 열려면 성소 의식을 완료하라.",
+      "riteReliquaryEmpty": "유물함이 비어 있다.",
       "surfaceStairs": "지상으로 향하는 계단이 열립니다. 계단에서 F 키를 눌러 나가세요.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "방을 정리하세요.",
@@ -2190,6 +2199,10 @@ export const ko_KR: EnTranslations = {
       "tombstoneHint": "방을 정리하면 북쪽으로 묘비 통로가 열립니다.",
       "tombstoneOpen": "봉인된 묘비 통로가 북쪽으로 갈리며 열립니다. 그 안으로 걸어 들어가 계속 진행하세요.",
       "tombstoneInto": "묘비를 통과해 {name}(으)로 들어갑니다.",
+      "bellRopeShock": "종줄이 팽팽하게 당겨진다. 익사한 영창자들이 충격에 비틀거린다.",
+      "eggSacBurst": "알주머니가 터진다. 흑수가 세례당 가장자리로 튄다.",
+      "baptistryEggs": "세례당이 고요해진다. 과부 알주머니가 가장자리를 따라 부풀어 오른다.",
+      "baptistryWave": "세례당의 검은 물속에서 무언가가 꿈틀거린다.",
       "chestEmpty": "상자가 비어 있습니다.",
       "notInDelve": "탐굴 중이 아닙니다.",
       "cannotInteract": "그것과는 상호작용할 수 없습니다.",
@@ -2210,7 +2223,9 @@ export const ko_KR: EnTranslations = {
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
       "nothingToTake": "이제 가져갈 것이 없습니다.",
       "wayOutNotOpen": "나가는 길이 아직 열리지 않았습니다.",
-      "moveCloserStairs": "계단에 더 가까이 다가가세요."
+      "moveCloserStairs": "계단에 더 가까이 다가가세요.",
+      "nhaliaCantorShield": "영창자들이여, 음을 유지하라!",
+      "nhaliaBlackwaterMark": "{name}이(가) {player}에게 흑수 표식을 남긴다!"
     },
     "lockpick": {
       "lockYields": "자물쇠가 열립니다! {tier} 전리품.",
@@ -2273,12 +2288,31 @@ export const ko_KR: EnTranslations = {
       "abandoned": "도구를 도로 빼냅니다. 자물쇠가 기다립니다."
     }
   },
+  "delveRiteUi": {
+    "title": "익사한 유물 의식",
+    "blurb": "성소들이 순서대로 빛난다. 각 성소를 차례로 활성화하여 순서를 반복하라. 잘못된 접촉은 시도를 실패시키고 순서를 다시 재생한다. 완벽한 시도는 가장 풍성한 전리품을 얻고, 시도 횟수를 모두 소진하면 유물함이 가장 초라한 상태로 열린다. 의식이 그대를 어떻게 시험할지 선택하라.",
+    "easy": "Easy",
+    "medium": "보통",
+    "hard": "Hard",
+    "showsTimes": "순서를 {count}회 표시",
+    "showsOnce": "순서를 한 번만 표시",
+    "symbols": "기호 {count}개",
+    "mistakes": "{count}회의 실수 허용",
+    "tries": "시도 {count}회",
+    "reward": {
+      "easy": "소박한 전리품",
+      "medium": "풍성한 전리품",
+      "hard": "최상급 전리품"
+    },
+    "closeAria": "닫기"
+  },
   "delveUi": {
     "board": {
       "title": "탐굴 게시판",
       "enter": "탐굴 진입",
       "enterAria": "{tier} 난이도로 {delve} 진입",
       "openDelve": "무너진 성물실",
+      "openDelveLitany": "익사한 연도",
       "openDelveAria": "{name}에서 탐굴 게시판 열기",
       "marks": "탐굴 증표: {count}",
       "minLevel": "필요 레벨 {level}",
@@ -2289,6 +2323,7 @@ export const ko_KR: EnTranslations = {
       "companion": {
         "pick": "동료 선택",
         "tessa": "수련사제 테사",
+        "edda": "에다 리드핸드",
         "rank": "{rank}등급",
         "boon": "전투 사이에 파티를 치유합니다. 3랭크에서는 탐굴마다 한 번 쓰러진 아군을 부활시킵니다.",
         "upgrade": "{rank}랭크로 강화 (증표 {marks}개)",
@@ -2335,23 +2370,49 @@ export const ko_KR: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "아래의 성물실이 또 움직였소. 자정이 지나면 바닥 너머로 영창 소리가 들리고, 수련사제 테사는 매장 명부가 스스로 잉크를 바꾼다고 단언하오. 용기가 있다면, {playerName}, 촛불을 들고 아래로 내려가시오. 거기서 들리는 모든 목소리를 믿지는 마시오. 그중 몇은 그대가 태어나기도 전에 그대의 이름을 알고 있었으니."
+      },
+      "aldric": {
+        "greeting": "이제 펜브릿지에는 물 아래서 종소리가 들린다, {playerName}. 무덤부름꾼들이 익사자들에게 노래를 가르치고 있다. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
       }
     },
     "intro": {
       "normal": "계단은 차갑고 어둡습니다. 부서진 성인석이 내려가는 길에 흩어져 있고, 부드러운 종소리가 축축한 공기 속에 맴돕니다. 수련사제 테사가 속삭입니다. \"성물실이 이렇게까지 열려 있어선 안 돼요. 가까이 붙어 있어요, {playerName}.\"",
-      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\""
+      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\"",
+      "litanyNormal": "갈대로 막힌 계단이 펜브릿지 아래로 떨어진다. 에다 리드핸드가 등불을 들어올린다. \"늪은 익사시킨 모든 자의 이름을 기억한다, {playerName}. 빛 속에 머물러라.\"",
+      "litanyHeroic": "흑수가 둑길의 돌을 핥는다. 에다의 불꽃이 녹색으로 일렁인다. \"그들이 아래서 다시 노래하고 있다, {playerName}. 성가대에 응답하지 마라.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "물이 매장 선반 사이로 스며들며 은빛 검은 줄기로 오래된 재를 실어 나릅니다.",
       "reliquary_bell_niche": "수십 개의 손종이 침묵 속에 매달려 있고, 저마다 장례 천으로 묶여 있습니다.",
       "reliquary_saintless_hall": "정성스러운 증오로 얼굴이 깎여 나간 조각상들.",
-      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다."
+      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다.",
+      "litany_sluice": "이끼로 뒤덮인 수문에서 흑수가 방울져 떨어져 오래된 성가대 지하실로 흘러든다.",
+      "litany_ledger": "장부의 섬들이 물에 잠긴 수로에서 솟아오르고, 잉크가 늪으로 번져 나간다.",
+      "litany_ring": "유물의 고리가 봉인된 흑수의 중앙 성수반을 둘러싼다.",
+      "litany_baptistry": "싱크홀 세례당이 갈라진 성자석과 알주머니 아래로 아가리를 벌리고 있다.",
+      "litany_choir_loft": "부채꼴로 펼쳐진 성가대석에 밧줄에 매달린 종소리가 결코 멈추지 않고 울려 퍼진다.",
+      "litany_causeway": "Y자로 갈라진 둑길이 허리 깊이의 늪물 위로 갈라진다.",
+      "litany_apse": "익사한 후진이 나할리아 수녀의 제단 섬으로 열린다."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "물에 잠긴 납골당",
       "reliquary_bell_niche": "종의 감실",
       "reliquary_saintless_hall": "성인 없는 회랑",
-      "reliquary_finale": "종이 묻힌 방"
+      "reliquary_finale": "종이 묻힌 방",
+      "litany_sluice": "초승달 수문",
+      "litany_ledger": "섬의 장부",
+      "litany_ring": "유물의 고리",
+      "litany_baptistry": "싱크홀 세례당",
+      "litany_choir_loft": "부채꼴 성가대석",
+      "litany_causeway": "Y자 갈림길 둑길",
+      "litany_apse": "익사한 후진"
+    },
+    "object": {
+      "sluice_valve": "수문 밸브",
+      "grave_tablet": "무덤 석판",
+      "corpse_candle": "시체양초",
+      "widow_egg_sac": "과부 알주머니",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
@@ -2367,6 +2428,18 @@ export const ko_KR: EnTranslations = {
           "3": "성물실 수련사제",
           "4": "무덤부름의 목격자",
           "5": "예배당 수호자"
+        }
+      },
+      "edda": {
+        "combat_start": "흑수를 조심해라, {playerName}. 늪이 듣고 있다.",
+        "low_hp": "침착해라. 내 등불은 아직 꺼지지 않았다.",
+        "trap_spotted": "잠깐. 여기 갈대가 이상하다.",
+        "boss_pull": "저 성가가 그대의 이름을 알고 있다, {playerName}. 노래로 답하지 마라.",
+        "completion": "늪은 하룻밤 더 그 비밀을 삼킬 수 있다.",
+        "rank": {
+          "1": "등불지기",
+          "2": "갈대 감시자",
+          "3": "펜브릿지 신도"
         }
       }
     },
@@ -2410,7 +2483,10 @@ export const ko_KR: EnTranslations = {
       "flooded_paths": "침수된 길",
       "grave_tax": "무덤의 대가",
       "unstable_roof": "불안정한 천장",
-      "cult_remnants": "교단의 잔당"
+      "cult_remnants": "교단의 잔당",
+      "high_water": "불어난 물",
+      "lively_choir": "활기찬 성가대",
+      "belligerent_dead": "호전적인 사자"
     },
     "blessing": {
       "chapel_candle": "예배당 촛불: 더 안전한 진행, 완료 시 탐굴 증표 1개 감소."
@@ -5219,6 +5295,42 @@ export const ko_KR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "바릭의 그림자 두건"
       },
+      "siltguard_helm": {
+        "name": "진흙수호 투구"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "방벽의 녹슨 어깨보호구"
+      },
+      "nhalias_bell_maul": {
+        "name": "나할리아의 종메"
+      },
+      "reedstalker_jerkin": {
+        "name": "갈대추적자 조끼"
+      },
+      "mirejaw_fang_knife": {
+        "name": "진흙턱 송곳니검"
+      },
+      "widow_silk_hood": {
+        "name": "과부실 후드"
+      },
+      "cantors_drowned_sash": {
+        "name": "영창자의 익사한 허리띠"
+      },
+      "corpse_candle_focus": {
+        "name": "시체양초 집중구"
+      },
+      "nhalias_litany_rod": {
+        "name": "나할리아의 연도 지팡이"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "흑수 선봉대 흉갑"
+      },
+      "siltstep_leggings": {
+        "name": "진흙보 각반"
+      },
+      "sunken_reliquary_hood": {
+        "name": "침몰한 유물함 후드"
+      },
       "the_codfather": {
         "name": "대구 대부"
       },
@@ -5531,31 +5643,34 @@ export const ko_KR: EnTranslations = {
         "name": "수련사제 테사"
       },
       "drowned_cantor": {
-        "name": "Drowned Cantor"
+        "name": "익사한 영창자"
       },
       "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
+        "name": "갈대에 묶인 신도"
       },
       "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
+        "name": "깊은늪 창턱"
       },
       "mirefen_widowling": {
-        "name": "Mirefen Widowling"
+        "name": "진창늪 과부거미"
       },
       "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
+        "name": "무덤진흙 방벽"
       },
       "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
+        "name": "오물트롤 포식자"
       },
       "choir_thrall": {
-        "name": "Choir Thrall"
+        "name": "성가대 노예"
       },
       "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
+        "name": "나할리아 수녀, 익사한 성가"
       },
       "edda_reedhand": {
-        "name": "Edda Reedhand"
+        "name": "에다 리드핸드"
+      },
+      "tolling_bell": {
+        "name": "울리는 종"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -5778,9 +5893,9 @@ export const ko_KR: EnTranslations = {
         "greeting": "아래의 성물실이 또 움직였소."
       },
       "brother_aldric_watch": {
-        "name": "Brother Aldric",
-        "title": "Fenbridge Watch",
-        "greeting": "Fenbridge hears bells under the water now. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
+        "name": "알드릭 수사",
+        "title": "펜브릿지 파수꾼",
+        "greeting": "이제 펜브릿지에는 물 아래서 종소리가 들린다. 무덤부름꾼들이 익사자들에게 노래를 가르치고 있다. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -6748,9 +6863,9 @@ export const ko_KR: EnTranslations = {
         "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
       },
       "drowned_litany": {
-        "name": "The Drowned Litany",
-        "enterText": "You descend beneath Fenbridge into the drowned shrine.",
-        "leaveText": "You climb back to Brother Aldric on the Fenbridge causeway."
+        "name": "익사한 연도",
+        "enterText": "그대는 펜브릿지 아래로 내려가 익사한 신전으로 들어간다.",
+        "leaveText": "그대는 펜브릿지 둑길로 다시 올라가 알드릭 수사에게 돌아간다."
       }
     },
     "itemSets": {

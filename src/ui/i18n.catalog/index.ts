@@ -432,6 +432,7 @@ export const en = {
       instancesBusy: 'All instances of {name} are busy. Try again soon.',
       runFailed: '{name} run failed.',
       complete: '{name} complete.',
+      mobChannels: '{name} channels {mechanic}.',
       mechanismOpen:
         'A mechanism clicks open nearby. A passage opens to the north. Find the exit portal ahead.',
       raiseDead: '{name} begins Raise Dead.',
@@ -440,6 +441,15 @@ export const en = {
       companionRankUp: '{name} reaches rank {rank}.',
       bossChest:
         'The boss falls. A warded reliquary chest rises on the dais. Pick its lock to claim your spoils.',
+      drownedLitanyReliquaryRise:
+        'Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.',
+      riteSequenceReady: 'The shrines fall dark. Repeat the sequence.',
+      riteSequencePlaying: 'The shrines replay the rite. Wait.',
+      riteCorrect: 'A soft chime answers your touch.',
+      riteWrong: 'A harsh bell crack. Black water splashes at your feet.',
+      riteReliquaryOpen: 'The Drowned Reliquary opens.',
+      riteReliquaryLocked: 'Complete the shrine rite to open the reliquary.',
+      riteReliquaryEmpty: 'The reliquary is empty.',
       surfaceStairs: 'A stairway to the surface opens. Press F at the stairs to leave.',
       moduleEnter: '{name}: {objective}',
       objectiveClearRoom: 'Clear the room.',
@@ -448,6 +458,10 @@ export const en = {
       tombstoneOpen:
         'A sealed tombstone passage grinds open to the north. Walk into it to continue.',
       tombstoneInto: 'You pass through the tombstone into {name}.',
+      bellRopeShock: 'The bell rope snaps taut. Drowned Cantors reel from the shock.',
+      eggSacBurst: 'The egg-sac bursts. Blackwater slops across the baptistry rim.',
+      baptistryEggs: 'The baptistry falls quiet. Widow egg-sacs swell along the rim.',
+      baptistryWave: 'Something stirs in the black baptistry water.',
       chestEmpty: 'The chest is empty.',
       notInDelve: 'You are not in a delve.',
       cannotInteract: 'You cannot interact with that.',
@@ -470,6 +484,8 @@ export const en = {
       nothingToTake: 'There is nothing left to take.',
       wayOutNotOpen: 'The way out is not yet open.',
       moveCloserStairs: 'Move closer to the stairs.',
+      nhaliaCantorShield: 'Cantors, hold the note!',
+      nhaliaBlackwaterMark: '{name} marks {player} with Blackwater!',
     },
     lockpick: {
       lockYields: 'The lock yields! {tier} spoils.',
@@ -538,6 +554,27 @@ export const en = {
       abandoned: 'You ease the picks back out. The lock waits.',
     },
   },
+  // The Drowned Reliquary Rite difficulty popup (rite_window.ts), shown when a
+  // player approaches the risen reliquary. Rendered through t() keys.
+  delveRiteUi: {
+    title: 'The Drowned Reliquary Rite',
+    blurb:
+      'The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.',
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard',
+    showsTimes: 'Sequence shown {count} times',
+    showsOnce: 'Sequence shown once',
+    symbols: '{count} symbols',
+    mistakes: '{count} mistakes allowed',
+    tries: '{count} tries',
+    reward: {
+      easy: 'Modest spoils',
+      medium: 'Rich spoils',
+      hard: 'Premium spoils',
+    },
+    closeAria: 'Close',
+  },
   // Delve UI chrome + companion/boss/lore flavor (board, run tracker, completion
   // summary, affixes, module/objective labels). Rendered through t() from hud.ts.
   // {playerName} / {className} interpolate at render time.
@@ -547,6 +584,7 @@ export const en = {
       enter: 'Enter Delve',
       enterAria: 'Enter {delve} on {tier} difficulty',
       openDelve: 'Collapsed Reliquary',
+      openDelveLitany: 'The Drowned Litany',
       openDelveAria: 'Open Delve Board from {name}',
       marks: 'Delve Marks: {count}',
       minLevel: 'Requires Level {level}',
@@ -557,6 +595,7 @@ export const en = {
       companion: {
         pick: 'Choose a companion',
         tessa: 'Acolyte Tessa',
+        edda: 'Edda Reedhand',
         rank: 'Rank {rank}',
         boon: 'Heals the party between fights. Rank 3 revives a fallen ally once per run.',
         upgrade: 'Upgrade to Rank {rank} ({marks} Marks)',
@@ -605,12 +644,20 @@ export const en = {
         greeting:
           'The reliquary below has shifted again. We hear chanting through the floor after midnight, and Acolyte Tessa swears the burial ledgers are changing their own ink. If you have courage enough, {playerName}, take a candle and go below. Do not trust every voice you hear down there. Some of them knew your name before you were born.',
       },
+      aldric: {
+        greeting:
+          'Fenbridge hears bells under the water now, {playerName}. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return.',
+      },
     },
     intro: {
       normal:
         'The stairwell is cold and dark. Broken saint-stones litter the descent, and a soft bell note hangs in the damp air. Acolyte Tessa whispers, "The reliquary should not be open this far. Stay close, {playerName}."',
       heroic:
         'The doors groan shut behind you. Names scrape across the stone like fingernails. Tessa\'s candle burns blue. "They are not calling the dead now, {playerName}. They are answering something."',
+      litanyNormal:
+        'Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. "The marsh remembers every name they drowned, {playerName}. Stay in the light."',
+      litanyHeroic:
+        'Blackwater laps the causeway stones. Edda\'s flame gutters green. "They are singing again below, {playerName}. Do not answer the choir."',
     },
     module: {
       reliquary_sunken_ossuary:
@@ -618,12 +665,33 @@ export const en = {
       reliquary_bell_niche: 'Dozens of handbells hang in silence, each tied with funeral cloth.',
       reliquary_saintless_hall: 'Statues with faces chiseled away with careful hatred.',
       reliquary_finale: 'The buried bell tolls once beneath your boots.',
+      litany_sluice: 'Moss-choked sluice gates drip blackwater into the old choir crypt.',
+      litany_ledger: 'Ledger islands rise from flooded channels, ink bleeding into the marsh.',
+      litany_ring: 'A reliquary ring loops around a sealed central font of black water.',
+      litany_baptistry: 'A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.',
+      litany_choir_loft: 'Fanning choir lofts echo with rope-hung bells that never quite stop.',
+      litany_causeway: 'A Y-split causeway forks over waist-deep fen water.',
+      litany_apse: "The drowned apse opens onto Sister Nhalia's altar island.",
     },
     moduleName: {
       reliquary_sunken_ossuary: 'The Sunken Ossuary',
       reliquary_bell_niche: 'The Bell Niche',
       reliquary_saintless_hall: 'The Saintless Hall',
       reliquary_finale: 'The Bell-Buried Chamber',
+      litany_sluice: 'The Crescent Sluice',
+      litany_ledger: 'The Island Ledger',
+      litany_ring: 'The Ring Reliquary',
+      litany_baptistry: 'The Sinkhole Baptistry',
+      litany_choir_loft: 'The Fan Choir Loft',
+      litany_causeway: 'The Y-Split Causeway',
+      litany_apse: 'The Drowned Apse',
+    },
+    object: {
+      sluice_valve: 'Sluice Valve',
+      grave_tablet: 'Grave Tablet',
+      corpse_candle: 'Corpse-Candle',
+      widow_egg_sac: 'Widow Egg-Sac',
+      bell_rope: 'Bell Rope',
     },
     companion: {
       barkLine: '{name}: {line}',
@@ -639,6 +707,18 @@ export const en = {
           3: 'Reliquary Acolyte',
           4: 'Gravecall Witness',
           5: 'Chapel Warden',
+        },
+      },
+      edda: {
+        combat_start: 'Mind the blackwater, {playerName}. The marsh listens.',
+        low_hp: 'Steady. My lantern is not out yet.',
+        trap_spotted: 'Wait. The reeds are wrong here.',
+        boss_pull: 'That canticle knows your name, {playerName}. Do not sing back.',
+        completion: 'The fen can swallow its secrets for one more night.',
+        rank: {
+          1: 'Lantern-Bearer',
+          2: 'Reed-Watcher',
+          3: 'Fenbridge Acolyte',
         },
       },
     },
@@ -688,6 +768,9 @@ export const en = {
       grave_tax: 'Grave Tax',
       unstable_roof: 'Unstable Roof',
       cult_remnants: 'Cult Remnants',
+      high_water: 'High Water',
+      lively_choir: 'Lively Choir',
+      belligerent_dead: 'Belligerent Dead',
     },
     blessing: {
       chapel_candle: 'Chapel Candle: safer run, one fewer Mark on completion.',
@@ -862,6 +945,18 @@ export const en = {
       reliquary_gloves_rog: { name: 'Bonewarden Grips' },
       deacon_reliquary_helm: { name: "Deacon's Reliquary Helm" },
       varric_shadow_cowl: { name: "Varric's Shadow Cowl" },
+      siltguard_helm: { name: 'Siltguard Helm' },
+      bulwark_rusted_pauldrons: { name: 'Bulwark-Rusted Pauldrons' },
+      nhalias_bell_maul: { name: "Nhalia's Bell-Maul" },
+      reedstalker_jerkin: { name: 'Reedstalker Jerkin' },
+      mirejaw_fang_knife: { name: 'Mirejaw Fang-Knife' },
+      widow_silk_hood: { name: 'Widow-Silk Hood' },
+      cantors_drowned_sash: { name: "Cantor's Drowned Sash" },
+      corpse_candle_focus: { name: 'Corpse-Candle Focus' },
+      nhalias_litany_rod: { name: "Nhalia's Litany Rod" },
+      blackwater_vanguard_chest: { name: 'Blackwater Vanguard Chestguard' },
+      siltstep_leggings: { name: 'Siltstep Leggings' },
+      sunken_reliquary_hood: { name: 'Sunken Reliquary Hood' },
       the_codfather: { name: 'The Codfather' },
       runed_bone_shard: { name: 'Runed Bone Shard' },
       grave_sir_aldren: { name: 'Grave of Captain Aldren' },

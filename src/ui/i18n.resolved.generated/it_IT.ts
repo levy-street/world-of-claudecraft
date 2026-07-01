@@ -2177,12 +2177,21 @@ export const it_IT: EnTranslations = {
       "instancesBusy": "Tutte le istanze di {name} sono occupate. Riprova tra poco.",
       "runFailed": "Incursione di {name} fallita.",
       "complete": "{name} completata.",
+      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Un meccanismo scatta aprendosi nelle vicinanze. Un passaggio si apre a nord: trova il portale d'uscita più avanti.",
       "raiseDead": "{name} inizia a evocare i morti.",
       "graveFalters": "Il rito sepolcrale vacilla.",
       "doorAlreadyOpen": "La porta è già aperta.",
       "companionRankUp": "{name} raggiunge il grado {rank}.",
       "bossChest": "Il boss cade. Sul piedistallo si leva uno scrigno reliquiario protetto da incantesimi: scassinane la serratura per reclamare il bottino.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
+      "riteSequencePlaying": "The shrines replay the rite. Wait.",
+      "riteCorrect": "A soft chime answers your touch.",
+      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
+      "riteReliquaryOpen": "The Drowned Reliquary opens.",
+      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
+      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Si apre una scalinata verso la superficie. Premi F alle scale per uscire.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Ripulisci la stanza.",
@@ -2190,6 +2199,10 @@ export const it_IT: EnTranslations = {
       "tombstoneHint": "Un passaggio attraverso una lapide si apre a nord quando la stanza è ripulita.",
       "tombstoneOpen": "Un passaggio sigillato attraverso una lapide si apre stridendo a nord. Entraci per proseguire.",
       "tombstoneInto": "Attraversi la lapide ed entri in {name}.",
+      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
+      "eggSacBurst": "The egg-sac bursts. Blackwater slops across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Widow egg-sacs swell along the rim.",
+      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Lo scrigno è vuoto.",
       "notInDelve": "Non sei in un'incursione.",
       "cannotInteract": "Non puoi interagire con questo.",
@@ -2210,7 +2223,9 @@ export const it_IT: EnTranslations = {
       "moveCloserChest": "Avvicinati allo scrigno.",
       "nothingToTake": "Non è rimasto nulla da prendere.",
       "wayOutNotOpen": "La via d'uscita non è ancora aperta.",
-      "moveCloserStairs": "Avvicinati alle scale."
+      "moveCloserStairs": "Avvicinati alle scale.",
+      "nhaliaCantorShield": "Cantors, hold the note!",
+      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
     "lockpick": {
       "lockYields": "La serratura cede! Bottino {tier}.",
@@ -2273,12 +2288,31 @@ export const it_IT: EnTranslations = {
       "abandoned": "Sfili di nuovo i grimaldelli. La serratura attende."
     }
   },
+  "delveRiteUi": {
+    "title": "The Drowned Reliquary Rite",
+    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "showsTimes": "Sequence shown {count} times",
+    "showsOnce": "Sequence shown once",
+    "symbols": "{count} symbols",
+    "mistakes": "{count} mistakes allowed",
+    "tries": "{count} tries",
+    "reward": {
+      "easy": "Modest spoils",
+      "medium": "Rich spoils",
+      "hard": "Premium spoils"
+    },
+    "closeAria": "Close"
+  },
   "delveUi": {
     "board": {
       "title": "Tabellone delle Incursioni",
       "enter": "Entra nell'Incursione",
       "enterAria": "Entra in {delve} a difficoltà {tier}",
       "openDelve": "Reliquiario Crollato",
+      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Apri il Tabellone delle Incursioni da {name}",
       "marks": "Sigilli d'Incursione: {count}",
       "minLevel": "Richiede il livello {level}",
@@ -2289,6 +2323,7 @@ export const it_IT: EnTranslations = {
       "companion": {
         "pick": "Scegli un compagno",
         "tessa": "Accolita Tessa",
+        "edda": "Edda Reedhand",
         "rank": "Grado {rank}",
         "boon": "Cura il gruppo tra uno scontro e l'altro. Il grado 3 rianima un alleato caduto una volta per incursione.",
         "upgrade": "Potenzia al grado {rank} ({marks} Sigilli)",
@@ -2335,23 +2370,49 @@ export const it_IT: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Il reliquiario sottostante si è spostato di nuovo. Sentiamo nenie attraverso il pavimento dopo mezzanotte, e l'Accolita Tessa giura che i registri funebri stanno cambiando il proprio inchiostro. Se hai abbastanza coraggio, {playerName}, prendi una candela e scendi laggiù. Non fidarti di ogni voce che sentirai là sotto. Alcune di esse conoscevano il tuo nome prima che tu nascessi."
+      },
+      "aldric": {
+        "greeting": "Fenbridge hears bells under the water now, {playerName}. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "La tromba delle scale è fredda e buia. Pietre dei santi spezzate cospargono la discesa, e una lieve nota di campana indugia nell'aria umida. L'Accolita Tessa sussurra: \"Il reliquiario non dovrebbe essere aperto fin quaggiù. Resta vicino, {playerName}.\"",
-      "heroic": "Le porte si chiudono cigolando dietro di te. I nomi raschiano sulla pietra come unghie. La candela di Tessa arde azzurra. \"Adesso non stanno chiamando i morti, {playerName}. Stanno rispondendo a qualcosa.\""
+      "heroic": "Le porte si chiudono cigolando dietro di te. I nomi raschiano sulla pietra come unghie. La candela di Tessa arde azzurra. \"Adesso non stanno chiamando i morti, {playerName}. Stanno rispondendo a qualcosa.\"",
+      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
+      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "L'acqua filtra attraverso gli scaffali sepolcrali, trascinando cenere antica in rivoli argento-neri.",
       "reliquary_bell_niche": "Decine di campanelli pendono nel silenzio, ciascuno legato con un drappo funebre.",
       "reliquary_saintless_hall": "Statue con i volti scalpellati via con accurato odio.",
-      "reliquary_finale": "La campana sepolta rintocca una volta sotto i tuoi stivali."
+      "reliquary_finale": "La campana sepolta rintocca una volta sotto i tuoi stivali.",
+      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
+      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
+      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
+      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
+      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
+      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "L'Ossario Sommerso",
       "reliquary_bell_niche": "La Nicchia della Campana",
       "reliquary_saintless_hall": "La Sala senza Santi",
-      "reliquary_finale": "La Stanza della Campana Sepolta"
+      "reliquary_finale": "La Stanza della Campana Sepolta",
+      "litany_sluice": "The Crescent Sluice",
+      "litany_ledger": "The Island Ledger",
+      "litany_ring": "The Ring Reliquary",
+      "litany_baptistry": "The Sinkhole Baptistry",
+      "litany_choir_loft": "The Fan Choir Loft",
+      "litany_causeway": "The Y-Split Causeway",
+      "litany_apse": "The Drowned Apse"
+    },
+    "object": {
+      "sluice_valve": "Sluice Valve",
+      "grave_tablet": "Grave Tablet",
+      "corpse_candle": "Corpse-Candle",
+      "widow_egg_sac": "Widow Egg-Sac",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
@@ -2367,6 +2428,18 @@ export const it_IT: EnTranslations = {
           "3": "Accolita del Reliquiario",
           "4": "Testimone del Richiamo Sepolcrale",
           "5": "Custode della Cappella"
+        }
+      },
+      "edda": {
+        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "low_hp": "Steady. My lantern is not out yet.",
+        "trap_spotted": "Wait. The reeds are wrong here.",
+        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
+        "completion": "The fen can swallow its secrets for one more night.",
+        "rank": {
+          "1": "Lantern-Bearer",
+          "2": "Reed-Watcher",
+          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2410,7 +2483,10 @@ export const it_IT: EnTranslations = {
       "flooded_paths": "Vie Allagate",
       "grave_tax": "Tributo delle Tombe",
       "unstable_roof": "Volta Instabile",
-      "cult_remnants": "Resti del Culto"
+      "cult_remnants": "Resti del Culto",
+      "high_water": "High Water",
+      "lively_choir": "Lively Choir",
+      "belligerent_dead": "Belligerent Dead"
     },
     "blessing": {
       "chapel_candle": "Candela della Cappella: incursione più sicura, un Sigillo d'Incursione in meno al completamento."
@@ -5219,6 +5295,42 @@ export const it_IT: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Cappuccio d'ombra di Varric"
       },
+      "siltguard_helm": {
+        "name": "Siltguard Helm"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "Bulwark-Rusted Pauldrons"
+      },
+      "nhalias_bell_maul": {
+        "name": "Nhalia's Bell-Maul"
+      },
+      "reedstalker_jerkin": {
+        "name": "Reedstalker Jerkin"
+      },
+      "mirejaw_fang_knife": {
+        "name": "Mirejaw Fang-Knife"
+      },
+      "widow_silk_hood": {
+        "name": "Widow-Silk Hood"
+      },
+      "cantors_drowned_sash": {
+        "name": "Cantor's Drowned Sash"
+      },
+      "corpse_candle_focus": {
+        "name": "Corpse-Candle Focus"
+      },
+      "nhalias_litany_rod": {
+        "name": "Nhalia's Litany Rod"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      "siltstep_leggings": {
+        "name": "Siltstep Leggings"
+      },
+      "sunken_reliquary_hood": {
+        "name": "Sunken Reliquary Hood"
+      },
       "the_codfather": {
         "name": "Il Pescadrino"
       },
@@ -5556,6 +5668,9 @@ export const it_IT: EnTranslations = {
       },
       "edda_reedhand": {
         "name": "Edda Reedhand"
+      },
+      "tolling_bell": {
+        "name": "Tolling Bell"
       },
       "ironvein_foreman": {
         "name": "Caposquadra Venaferrata"

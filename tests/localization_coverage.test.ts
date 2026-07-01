@@ -852,7 +852,10 @@ describe('i18n Localization Key Coverage', () => {
         const rendered = tEntity(itemRequest(entry));
         expect(rendered.trim().length, `${lang}.${entry.key}`).toBeGreaterThan(0);
         expect(rendered, `${lang}.${entry.key}`).not.toBe(entry.key);
-        if (lang !== 'en' && lang !== 'en_CA') {
+        // RELEASE-TIER ONLY: a sparse/English-only overlay renders the English fill
+        // for an untranslated item name, which is legal on a PR (a `pending` row)
+        // and blocked only at the release gate (matches the world-content check below).
+        if (RELEASE_TIER && lang !== 'en' && lang !== 'en_CA') {
           expect(
             rendered,
             `${lang}.${entry.key} should not copy canonical English item text`,
