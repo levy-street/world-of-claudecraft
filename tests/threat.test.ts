@@ -301,6 +301,28 @@ describe('classic pull-over rules (110% melee / 130% ranged)', () => {
     expect(wolf.aggroTargetId).toBe(b.id);
   });
 
+  it('a normal-sized mob keeps the classic 6yd melee boundary (challenger at 5.5yd is melee)', () => {
+    // The size-scaled reach for a scale-1 mob is only MELEE_RANGE (5yd), but the
+    // melee/ranged pull-over boundary is floored at the classic MELEE_RANGE * 1.2
+    // (6yd), so a challenger at 5.5yd (past 5, inside 6) still counts as melee and
+    // needs only 110% (not 130%) to pull.
+    const { sim, a, b, wolf } = aggroSetup();
+    wolf.scale = 1; // a normal-sized creature
+    teleport(sim, b, wolf.pos.x - 5.5, wolf.pos.z);
+    const d = dist2d(wolf.pos, b.pos);
+    expect(d).toBeGreaterThan(5); // beyond the raw scale-1 reach
+    expect(d).toBeLessThanOrEqual(6); // within the classic 6yd floor
+    // just under 110% does not switch
+    wolf.threat.set(b.id, 109);
+    sim.tick();
+    expect(wolf.aggroTargetId).toBe(a.id);
+    // 115 is over 110% but under 130%: the 6yd floor counts b as melee and rips
+    // aggro (a size-scaled-only reach of 5yd would misclassify b as ranged).
+    wolf.threat.set(b.id, 115);
+    sim.tick();
+    expect(wolf.aggroTargetId).toBe(b.id);
+  });
+
   it('identical setup yields an identical target choice (determinism)', () => {
     function run(): number | null {
       const { sim, b, wolf } = aggroSetup();

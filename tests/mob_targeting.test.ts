@@ -27,6 +27,7 @@ function ent(id: number, over: Partial<Entity> = {}): Entity {
     pos: { x: 0, y: 0, z: 0 },
     level: 1,
     templateId: 'forest_wolf',
+    scale: 1, // updateMobTarget reads scale for the size-scaled melee reach
     aiState: 'idle',
     inCombat: false,
     despawnTimer: undefined,
