@@ -653,8 +653,8 @@ export const it_IT: EnTranslations = {
       "methodMaster": "Metodo bottino impostato su bottino maestro. Maestro del bottino: {name}.",
       "methodGroup": "Metodo bottino impostato su bottino di gruppo.",
       "assigned": "{looter} ha assegnato {item} a {target}.",
-      "unassigned": "{item} non e stato assegnato ed e libero per tutti.",
-      "leaderOnly": "Solo il capogruppo puo cambiare il metodo bottino.",
+      "unassigned": "{item} non è stato assegnato ed è libero per tutti.",
+      "leaderOnly": "Solo il capogruppo può cambiare il metodo bottino.",
       "rollingFor": "Si tira per {item}.",
       "looterChanged": "Il Distributore del Bottino ora e {name}.",
       "thresholdSet": "Soglia del bottino impostata su {threshold}.",
@@ -808,7 +808,7 @@ export const it_IT: EnTranslations = {
       "cta": {
         "title": "Collega il tuo Discord per ottenere punti e salire di grado",
         "stats": "{online} online · {total} membri nel server",
-        "statsLoading": "Unisciti alla comunita e ottieni ricompense",
+        "statsLoading": "Unisciti alla comunità e ottieni ricompense",
         "button": "Collega con un clic",
         "dismiss": "Ignora"
       },
@@ -816,7 +816,7 @@ export const it_IT: EnTranslations = {
         "cta": "Collega Discord",
         "relink": "Ricollega Discord",
         "connecting": "Apertura di Discord...",
-        "benefits": "Collega il tuo Discord per ottenere punti dal gioco e dall'attivita nella comunita, e scalare i gradi di stato.",
+        "benefits": "Collega il tuo Discord per ottenere punti dal gioco e dall'attività nella comunità, e scalare i gradi di stato.",
         "error": "Impossibile collegare Discord. Riprova.",
         "success": "Discord collegato."
       },
@@ -889,7 +889,7 @@ export const it_IT: EnTranslations = {
         "locked": "Bloccato",
         "free": "Gratis",
         "cost": "{points} pti",
-        "needTier": "Raggiungi un grado piu alto per riscattarlo.",
+        "needTier": "Raggiungi un grado più alto per riscattarlo.",
         "needPoints": "Punti insufficienti.",
         "claimError": "Impossibile riscattare questa ricompensa. Riprova.",
         "claimedToast": "Riscattato: {name}",
@@ -924,7 +924,7 @@ export const it_IT: EnTranslations = {
         },
         "help": {
           "label": "Serve aiuto",
-          "hint": "Chiedi aiuto alla comunita"
+          "hint": "Chiedi aiuto alla comunità"
         }
       }
     },

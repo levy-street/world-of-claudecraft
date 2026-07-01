@@ -248,6 +248,36 @@ describe('H2: game.* values keep required diacritics', () => {
   });
 });
 
+// --- H2b: Italian quest/HUD strings keep issue-reported accents and agreement ---
+describe('H2b: Italian issue #738 strings keep required accents and agreement', () => {
+  it('keeps Nythraxis/Mirefen quest text orthographic and gender-agreed', () => {
+    const quests = it_IT.entities.quests;
+
+    expect(quests.q_bones.objectives[0].label).toBe('Ossa irrequiete restituite al riposo');
+    expect(quests.q_silence_the_call.objectives[0].label).toBe('Ossa irrequiete messe a tacere');
+    expect(quests.q_widows.objectives[0].label).toBe('Vedova di Mirefen uccisa');
+    expect(quests.q_broodmother.objectives[0].label).toBe('Vedova di Mirefen uccisa');
+    expect(quests.q_broodmother.objectives[1].label).toBe('Madre della covata uccisa');
+
+    const nythraxis = JSON.stringify({
+      warning: it_IT.questUi.dialog.nythraxisDeathlessKingWarning,
+      restless: quests.q_nythraxis_restless_dead,
+      graves: quests.q_nythraxis_graves,
+      crypt: quests.q_nythraxis_sealed_crypt,
+      guardian: quests.q_nythraxis_bound_guardian,
+    });
+    expect(nythraxis).not.toMatch(
+      /\b(combatte|spezzo|tento|cio|segui|piu|gia|cosi)\b|d ossa|l anello|l Anello|sull altura|l alto|l assassino/,
+    );
+    expect(nythraxis).toMatch(/(combatté|spezzò|tentò|ciò|seguì|più|già|lì|metà|così)/);
+  });
+
+  it('keeps remaining Italian player-facing strings from losing required accents', () => {
+    const flat = JSON.stringify(it_IT);
+    expect(flat).not.toMatch(/\b(puo|piu|attivita|comunita|non e stato|ed e libero)\b/);
+  });
+});
+
 // --- M1: quest narratives preserve {playerName} ---
 describe('M1: quest narratives preserve {playerName}', () => {
   it('every locale keeps {playerName} wherever English uses it', () => {
