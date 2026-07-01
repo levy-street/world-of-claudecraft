@@ -10,6 +10,10 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -21,6 +25,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "es_ES": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -32,6 +40,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "fr_FR": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -43,6 +55,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "fr_CA": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -55,6 +71,10 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -66,6 +86,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "de_DE": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -76,11 +100,23 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.header",
     "hudChrome.statInfo.sources.talents"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.keybinds.discord"
+  ],
+  "zh_TW": [
+    "hudChrome.keybinds.discord"
+  ],
+  "ko_KR": [
+    "hudChrome.keybinds.discord"
+  ],
+  "ja_JP": [
+    "hudChrome.keybinds.discord"
+  ],
   "pt_BR": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -91,8 +127,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.header",
     "hudChrome.statInfo.sources.talents"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.keybinds.discord"
+  ],
   "nl_NL": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -104,6 +150,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "pl_PL": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -115,6 +169,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "id_ID": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -126,6 +188,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "tr_TR": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -137,6 +207,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "sv_SE": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -148,6 +226,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "vi_VN": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
@@ -159,6 +245,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.statInfo.sources.talents"
   ],
   "da_DK": [
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other",
     "hudChrome.statInfo.desc.spellPower",
     "hudChrome.statInfo.names.spellPower",
     "hudChrome.statInfo.sources.attributes",
