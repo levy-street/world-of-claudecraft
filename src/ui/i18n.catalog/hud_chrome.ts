@@ -311,6 +311,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
     startAttackOnAbility: 'Auto-Attack on Ability Use',
+    // Interface panel toggle: click a lootable corpse to take all visible loot
+    // immediately; hold Shift to inspect the loot window instead.
+    autoLootCorpses: 'Auto-Loot Corpses',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',

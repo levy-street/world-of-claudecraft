@@ -236,6 +236,102 @@ describe('handlePickedEntity', () => {
     expect(attacks).toBe(1);
   });
 
+  it('auto-loots a clicked corpse when the setting is enabled', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const corpse = stubEntity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    let targetId: number | null = null;
+    let looted = 0;
+    let opened = 0;
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, corpse],
+      ]),
+      duelInfo: null,
+      arenaInfo: null,
+      targetEntity: (id: number | null) => {
+        targetId = id;
+      },
+      enterDungeon: () => {},
+      leaveDungeon: () => {},
+      lootCorpse: () => {
+        looted++;
+      },
+      pickUpObject: () => {},
+      startAutoAttack: () => {},
+    };
+    const hud = {
+      openLoot: () => {
+        opened++;
+      },
+      openQuestDialog: () => {},
+      openDelveBoard: () => {},
+      showError: () => {},
+      closeContextMenu: () => {},
+    };
+
+    handlePickedEntity(world, hud, 2, 0, 10, 20, { autoLootCorpses: true });
+
+    expect(targetId).toBe(2);
+    expect(looted).toBe(1);
+    expect(opened).toBe(0);
+  });
+
+  it('opens the loot window instead of auto-looting while the override is held', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const corpse = stubEntity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    let looted = 0;
+    let openedAt: { id: number; x: number; y: number } | null = null;
+    const world = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [2, corpse],
+      ]),
+      duelInfo: null,
+      arenaInfo: null,
+      targetEntity: () => {},
+      enterDungeon: () => {},
+      leaveDungeon: () => {},
+      lootCorpse: () => {
+        looted++;
+      },
+      pickUpObject: () => {},
+      startAutoAttack: () => {},
+    };
+    const hud = {
+      openLoot: (id: number, x: number, y: number) => {
+        openedAt = { id, x, y };
+      },
+      openQuestDialog: () => {},
+      openDelveBoard: () => {},
+      showError: () => {},
+      closeContextMenu: () => {},
+    };
+
+    handlePickedEntity(world, hud, 2, 2, 10, 20, {
+      autoLootCorpses: true,
+      forceLootWindow: true,
+    });
+
+    expect(looted).toBe(0);
+    expect(openedAt).toEqual({ id: 2, x: 10, y: 20 });
+  });
   it('starts auto-attack when right-clicking an active duel opponent', () => {
     const player = stubEntity({ id: 1, kind: 'player' });
     const opponent = stubEntity({ id: 2, kind: 'player', pos: { x: 3, y: 0, z: 0 } });

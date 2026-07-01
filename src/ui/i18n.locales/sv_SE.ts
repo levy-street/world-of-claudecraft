@@ -56,6 +56,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Bytest. tröskel satt till {threshold}.',
   'hudChrome.options.showDevBadges': 'Visa utvecklarmärken',
   'hudChrome.options.startAttackOnAbility': 'Automatisk attack vid förmågeanvändning',
+  'hudChrome.options.autoLootCorpses': 'Plundra lik automatiskt',
   'hudChrome.party.promoteLeader': 'Befordra till ledare',
   'hudChrome.plurals.playersMatching.few': 'Vilka: {count} spelare matchar "{query}" på {realm}.',
   'hudChrome.plurals.playersMatching.many': 'Vilka: {count} spelare matchar "{query}" på {realm}.',

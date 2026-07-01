@@ -54,6 +54,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Ganimet eşiği {threshold} olarak ayarlandı.',
   'hudChrome.options.showDevBadges': 'Geliştirici Rozetlerini Göster',
   'hudChrome.options.startAttackOnAbility': 'Yetenek Kullanımında Otomatik Saldırı',
+  'hudChrome.options.autoLootCorpses': 'Cesetleri otomatik yağmala',
   'hudChrome.party.promoteLeader': 'Lider Yap',
   'hudChrome.plurals.playersMatching.few':
     'Kim: {realm} sunucusunda "{query}" ile eşleşen {count} oyuncu.',

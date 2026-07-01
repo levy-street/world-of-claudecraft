@@ -65,6 +65,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Soglia del bottino impostata su {threshold}.',
   'hudChrome.options.showDevBadges': 'Mostra distintivi sviluppatore',
   'hudChrome.options.startAttackOnAbility': "Attacco automatico all'uso dell'abilita",
+  'hudChrome.options.autoLootCorpses': 'Depreda cadaveri automaticamente',
   'hudChrome.party.promoteLeader': 'Promuovi a Capo',
   'hudChrome.statInfo.desc.spellPower':
     "Aumenta il danno dei tuoi incantesimi e la potenza delle tue cure. Ogni punto di Intelletto conferisce un po' di Potere Magico, in aggiunta a quello dell'equipaggiamento o dei potenziamenti.",

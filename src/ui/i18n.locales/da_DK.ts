@@ -53,6 +53,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Byttetærskel sat til {threshold}.',
   'hudChrome.options.showDevBadges': 'Vis udviklermærker',
   'hudChrome.options.startAttackOnAbility': 'Autoangreb ved brug af evne',
+  'hudChrome.options.autoLootCorpses': 'Plyndr lig automatisk',
   'hudChrome.party.promoteLeader': 'Forfrem til leder',
   'hudChrome.plurals.playersMatching.few':
     'Hvem: {count} spillere, der matcher "{query}" på {realm}.',

@@ -55,6 +55,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Buitdrempel ingesteld op {threshold}.',
   'hudChrome.options.showDevBadges': 'Ontwikkelaarsinsignes tonen',
   'hudChrome.options.startAttackOnAbility': 'Auto-aanval bij gebruik van vaardigheid',
+  'hudChrome.options.autoLootCorpses': 'Lijken automatisch plunderen',
   'hudChrome.party.promoteLeader': 'Bevorderen tot leider',
   'hudChrome.plurals.playersMatching.few':
     'Wie: {count} spelers die overeenkomen met "{query}" op {realm}.',

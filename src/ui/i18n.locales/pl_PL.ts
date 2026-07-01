@@ -52,6 +52,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Próg łupów ustawiony na {threshold}.',
   'hudChrome.options.showDevBadges': 'Pokaż odznaki deweloperów',
   'hudChrome.options.startAttackOnAbility': 'Automatyczny atak przy użyciu umiejętności',
+  'hudChrome.options.autoLootCorpses': 'Automatycznie łup ciała',
   'hudChrome.party.promoteLeader': 'Mianuj przywódcą',
   'hudChrome.plurals.playersMatching.few':
     'Kto: {count} graczy pasujących do "{query}" na {realm}.',

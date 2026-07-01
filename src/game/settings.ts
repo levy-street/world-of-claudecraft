@@ -145,6 +145,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default: when enabled, clicking a lootable corpse takes all visible
+  // loot immediately through the same server-authoritative loot command as the
+  // Take All button. Holding Shift still opens the loot window for inspection.
+  autoLootCorpses: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players

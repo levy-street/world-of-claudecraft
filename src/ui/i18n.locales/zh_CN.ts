@@ -253,6 +253,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.footstepSounds': '脚步声',
   'hudChrome.options.clickFeedback': '点击标记',
   'hudChrome.options.startAttackOnAbility': '使用技能时自动攻击',
+  'hudChrome.options.autoLootCorpses': '自动拾取尸体',
   'hudChrome.options.lockCursorOnRotate': '旋转时锁定光标',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     '拖动旋转镜头时将鼠标光标保持在窗口内，使其无法到达屏幕边缘或移动到另一台显示器。如果你喜欢自由光标，请关闭此选项。',

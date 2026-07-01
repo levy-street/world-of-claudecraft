@@ -56,6 +56,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Ambang jarahan diatur ke {threshold}.',
   'hudChrome.options.showDevBadges': 'Tampilkan Lencana Pengembang',
   'hudChrome.options.startAttackOnAbility': 'Serangan Otomatis Saat Memakai Kemampuan',
+  'hudChrome.options.autoLootCorpses': 'Otomatis jarah mayat',
   'hudChrome.party.promoteLeader': 'Angkat jadi Pemimpin',
   'hudChrome.plurals.playersMatching.few':
     'Siapa: {count} pemain yang cocok dengan "{query}" di {realm}.',

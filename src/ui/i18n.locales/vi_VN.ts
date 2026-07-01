@@ -55,6 +55,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Ngưỡng chiến lợi phẩm được đặt thành {threshold}.',
   'hudChrome.options.showDevBadges': 'Hiện Huy Hiệu Nhà Phát Triển',
   'hudChrome.options.startAttackOnAbility': 'Tự Đánh Khi Dùng Kỹ Năng',
+  'hudChrome.options.autoLootCorpses': 'Tự động nhặt chiến lợi phẩm từ xác',
   'hudChrome.party.promoteLeader': 'Thăng Làm Đội Trưởng',
   'hudChrome.plurals.playersMatching.few': 'Ai: {count} người chơi khớp "{query}" trên {realm}.',
   'hudChrome.plurals.playersMatching.many': 'Ai: {count} người chơi khớp "{query}" trên {realm}.',

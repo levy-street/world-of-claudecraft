@@ -1751,7 +1751,10 @@ async function startGame(
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
       }
     }
-    handlePickedEntity(world, hud, id, button, x, y);
+    handlePickedEntity(world, hud, id, button, x, y, {
+      autoLootCorpses: settings.get('autoLootCorpses'),
+      forceLootWindow: input.keys.has('ShiftLeft') || input.keys.has('ShiftRight'),
+    });
   }
 
   // Attack Move (MOBA-style): the Attack Move key walks the player toward the

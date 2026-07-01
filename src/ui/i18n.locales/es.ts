@@ -66,6 +66,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.thresholdSet': 'Umbral de botín fijado en {threshold}.',
   'hudChrome.options.showDevBadges': 'Mostrar insignias de desarrollador',
   'hudChrome.options.startAttackOnAbility': 'Ataque automático al usar habilidad',
+  'hudChrome.options.autoLootCorpses': 'Despojar cadáveres automáticamente',
   'hudChrome.party.promoteLeader': 'Promover a líder',
   'hudChrome.statInfo.desc.spellPower':
     'Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.',

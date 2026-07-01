@@ -234,6 +234,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
     expect(s.get('showDevBadges')).toBe(true);
     expect(s.get('invertLookY')).toBe(false);
+    expect(s.get('autoLootCorpses')).toBe(false);
   });
 
   it('clamps the comfort sliders to their documented bounds', () => {
@@ -268,6 +269,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
     expect(s.get('showDevBadges')).toBe(true);
     expect(s.get('invertLookY')).toBe(false);
+    expect(s.get('autoLootCorpses')).toBe(false);
     expect(s.get('frostedPanels')).toBe(false);
   });
 
