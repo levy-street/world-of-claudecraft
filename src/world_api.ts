@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 20 domain facets (each IWorld member assigned exactly once; 142
+// FACET MAP: the 21 domain facets (each IWorld member assigned exactly once; 148
 // total). One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
@@ -22,6 +22,7 @@
 //   cosmetics.ts        IWorldCosmetics      account skins + mech chroma
 //   quests.ts           IWorldQuests         quest log + accept/turn-in/abandon
 //   progression_xp.ts   IWorldProgressionXp  xp/lifetimeXp/prestige/rested/leaderboard
+//   professions.ts      IWorldProfessions    gathering proficiency reads
 //   talents.ts          IWorldTalents        talents, specs, loadouts
 //   pet.ts              IWorldPet            hunter-pet command surface
 //   party.ts            IWorldParty          party/raid + raid-target markers
@@ -36,12 +37,12 @@
 //
 // THREE GATES pin this seam (run before any facet edit):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
-//                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
+//                                          ALL_DELTA_KEYS (26) + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
 //                                          subset-of dispatch-set; DISPATCH_ONLY (7).
-//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (142) present + same-kind on
+//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (148) present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
-//                                          union of the 20 facets.
+//                                          union of the 21 facets.
 // ---------------------------------------------------------------------------
 
 import type { IWorldChat } from './world_api/chat';
@@ -57,6 +58,7 @@ import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMarket } from './world_api/market';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
+import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
 import type { IWorldSocialGraph } from './world_api/social_graph';
@@ -91,6 +93,7 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberInfo } from './world_api/party';
+export type { GatheringProficiencies } from './world_api/professions';
 export type { GuildLeaderboardEntry, LeaderboardEntry } from './world_api/progression_xp';
 export type {
   CharacterSearchResult,
@@ -116,6 +119,7 @@ export interface IWorld
     IWorldCosmetics,
     IWorldQuests,
     IWorldProgressionXp,
+    IWorldProfessions,
     IWorldTalents,
     IWorldPet,
     IWorldParty,
@@ -310,6 +314,7 @@ export type WorldFacet =
   | 'IWorldCosmetics'
   | 'IWorldQuests'
   | 'IWorldProgressionXp'
+  | 'IWorldProfessions'
   | 'IWorldTalents'
   | 'IWorldPet'
   | 'IWorldParty'

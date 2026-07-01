@@ -12,6 +12,7 @@
 // game/net/DOM/Three, no `Math.random`/`Date.now`), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import type { GatheringProfessionId } from './content/professions';
 import type { TalentModifiers } from './content/talents';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
@@ -294,6 +295,11 @@ export interface SimContextCallbacks {
   countItem(itemId: string, pid?: number): number;
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
+  gainGatheringProficiency(
+    professionId: GatheringProfessionId,
+    amount: number,
+    pid?: number,
+  ): boolean;
 
   // T1 player target selection consumes isHostileTo/isFriendlyTo/pvpController/stopFollow;
   // all already on the seam (C4a added the first two + stopFollow, C1 added pvpController)
@@ -767,6 +773,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     countItem: host.countItem,
     completeQuestForDev: host.completeQuestForDev,
     completeCurrentQuestsForDev: host.completeCurrentQuestsForDev,
+    gainGatheringProficiency: host.gainGatheringProficiency,
     addEntity: host.addEntity,
     dropEntity: host.dropEntity,
     rebucket: host.rebucket,

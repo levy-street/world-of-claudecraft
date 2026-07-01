@@ -49,6 +49,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import type { GatheringProfessionId } from './content/professions';
 import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
@@ -170,6 +171,13 @@ import {
 } from './pathfind';
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
+import {
+  cloneGatheringProficiencies,
+  emptyGatheringProficiencies,
+  type GatheringProficiencies,
+  gainGatheringProficiency as gainGatheringProficiencyImpl,
+  normalizeGatheringProficiencies,
+} from './professions/gathering';
 import {
   applyTalentAllocation,
   deleteTalentLoadout,
@@ -635,6 +643,7 @@ export interface PlayerMeta {
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
   // inn, spent to double kill XP. Persisted in CharacterState.
   restedXp: number;
+  gatheringProficiencies: GatheringProficiencies;
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
@@ -722,6 +731,8 @@ export interface CharacterState {
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
+  // Gathering profession proficiency. Optional so pre-professions saves load cleanly.
+  gatheringProficiencies?: Partial<Record<GatheringProfessionId, number>>;
   copper: number;
   hp: number;
   resource: number;
@@ -1153,6 +1164,7 @@ export class Sim {
       prestigeRank: 0,
       unlockedMilestones: new Set(),
       restedXp: 0,
+      gatheringProficiencies: emptyGatheringProficiencies(),
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
@@ -1200,6 +1212,7 @@ export class Sim {
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
+      meta.gatheringProficiencies = normalizeGatheringProficiencies(s.gatheringProficiencies);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
@@ -1367,6 +1380,7 @@ export class Sim {
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
+      gatheringProficiencies: cloneGatheringProficiencies(meta.gatheringProficiencies),
       copper: meta.copper,
       hp: e.hp,
       // A druid saved while shifted runs on rage/energy with its mana parked in
@@ -1596,6 +1610,9 @@ export class Sim {
   }
   get restedXp(): number {
     return this.primary.restedXp;
+  }
+  get gatheringProficiencies(): GatheringProficiencies {
+    return this.gatheringProficienciesFor(this.primaryId);
   }
   get prestigeRank(): number {
     return this.primary.prestigeRank;
@@ -1965,6 +1982,8 @@ export class Sim {
       countItem: sim.countItem.bind(sim),
       completeQuestForDev: (questId, pid) => completeQuestForDev(sim.ctx, questId, pid),
       completeCurrentQuestsForDev: (pid) => completeCurrentQuestsForDev(sim.ctx, pid),
+      gainGatheringProficiency: (professionId, amount, pid) =>
+        sim.gainGatheringProficiency(professionId, amount, pid),
       // I1 dungeon instancing now lives in instances/dungeons.ts; these route through
       // the same-named Sim delegates (foreign callers use this.X). lockoutNowMs is the
       // shared raid-lockout clock that stays on Sim (N1 also writes through it).
@@ -4467,6 +4486,21 @@ export class Sim {
 
   completeCurrentQuestsForDev(pid?: number): number {
     return completeCurrentQuestsForDev(this.ctx, pid);
+  }
+
+  gainGatheringProficiency(
+    professionId: GatheringProfessionId,
+    amount: number,
+    pid = this.primaryId,
+  ): boolean {
+    return gainGatheringProficiencyImpl(this.ctx, professionId, amount, pid);
+  }
+
+  gatheringProficienciesFor(pid = this.primaryId): GatheringProficiencies {
+    const r = this.resolve(pid);
+    return r
+      ? cloneGatheringProficiencies(r.meta.gatheringProficiencies)
+      : emptyGatheringProficiencies();
   }
 
   // No-op in offline mode

@@ -18,6 +18,11 @@ import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import {
+  emptyGatheringProficiencies,
+  type GatheringProficiencies,
+  normalizeGatheringProficiencies,
+} from '../sim/professions/gathering';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
   type Entity,
@@ -802,6 +807,7 @@ export class ClientWorld implements IWorld {
   prestigeRank = 0;
   // Rested XP pool, mirrored from snapshot self.
   restedXp = 0;
+  gatheringProficiencies: GatheringProficiencies = emptyGatheringProficiencies();
   unlockedMilestones: string[] = [];
   // --- IWorldTalents: talents + spec/role + saved loadouts, mirrored from
   // snapshot self (display + staging). ---
@@ -1389,6 +1395,8 @@ export class ClientWorld implements IWorld {
       this.lifetimeXp = s.lxp ?? 0;
       this.restedXp = s.rxp ?? 0;
       this.prestigeRank = s.prk ?? 0;
+      if (s.gprof !== undefined)
+        this.gatheringProficiencies = normalizeGatheringProficiencies(s.gprof);
       if (s.milestones !== undefined) this.unlockedMilestones = s.milestones;
       // IWorldInventory facet (W2) self-decode: copper rides every self-frame (?? 0);
       // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
