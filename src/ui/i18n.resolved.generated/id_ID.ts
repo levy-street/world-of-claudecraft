@@ -4028,6 +4028,10 @@ export const id_ID: EnTranslations = {
         "name": "Ledakan Pikiran",
         "description": "Meledakkan pikiran target sebesar {damage} kerusakan Bayangan."
       },
+      "inner_fire": {
+        "name": "Api Batin",
+        "description": "Ledakan energi suci meningkatkan armor kamu sebesar 25 selama 30 menit."
+      },
       "heal": {
         "name": "Penyembuhan",
         "description": "Doa yang lambat namun ampuh yang menyembuhkan target sekutu sebesar {damage}."
@@ -4040,6 +4044,10 @@ export const id_ID: EnTranslations = {
         "name": "Sembuh Kilat",
         "description": "Doa cepat yang menyembuhkan target sekutu sebesar {damage}."
       },
+      "holy_fire": {
+        "name": "Api Suci",
+        "description": "Membakar musuh dengan api suci sebesar {damage} kerusakan Suci plus luka bakar selama 8 detik."
+      },
       "lightning_bolt": {
         "name": "Sambaran Petir",
         "description": "Melontarkan sambaran petir sebesar {damage} kerusakan Alam."
@@ -4051,6 +4059,10 @@ export const id_ID: EnTranslations = {
       "healing_wave": {
         "name": "Gelombang Penyembuh",
         "description": "Menyembuhkan target sekutu sebesar {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Gelombang Penyembuhan Kecil",
+        "description": "Gelombang air cepat yang menyembuhkan target sekutu sebesar {damage}."
       },
       "earth_shock": {
         "name": "Kejut Bumi",

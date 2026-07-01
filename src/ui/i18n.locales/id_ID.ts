@@ -547,6 +547,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Sedot Nyawa',
   'entities.abilities.earth_shock.description':
     'Seketika mengejutkan target dengan kekuatan pengguncang sebesar {damage} kerusakan Alam.',
+  'entities.abilities.lesser_healing_wave.name': 'Gelombang Penyembuhan Kecil',
+  'entities.abilities.lesser_healing_wave.description':
+    'Gelombang air cepat yang menyembuhkan target sekutu sebesar {damage}.',
   'entities.abilities.earth_shock.name': 'Kejut Bumi',
   'entities.abilities.enrage.description':
     'Menghasilkan 20 amarah seketika. Hanya dalam Wujud Beruang.',
@@ -630,6 +633,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Lumpuh Kaki',
   'entities.abilities.heal.description':
     'Doa yang lambat namun ampuh yang menyembuhkan target sekutu sebesar {damage}.',
+  'entities.abilities.inner_fire.name': 'Api Batin',
+  'entities.abilities.inner_fire.description':
+    'Ledakan energi suci meningkatkan armor kamu sebesar 25 selama 30 menit.',
   'entities.abilities.heal.name': 'Penyembuhan',
   'entities.abilities.healing_touch.description': 'Menyembuhkan target sekutu sebesar {damage}.',
   'entities.abilities.healing_touch.name': 'Sentuhan Penyembuh',
@@ -670,6 +676,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.life_tap.name': 'Sadap Nyawa',
   'entities.abilities.lightning_bolt.description':
     'Melontarkan sambaran petir sebesar {damage} kerusakan Alam.',
+  'entities.abilities.holy_fire.name': 'Api Suci',
+  'entities.abilities.holy_fire.description':
+    'Membakar musuh dengan api suci sebesar {damage} kerusakan Suci plus luka bakar selama 8 detik.',
   'entities.abilities.lightning_bolt.name': 'Sambaran Petir',
   'entities.abilities.lightning_shield.description':
     'Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima 13 kerusakan Alam.',

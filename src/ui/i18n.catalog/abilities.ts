@@ -889,6 +889,7 @@ const classAbilityNamesEn = {
       ],
       ['renew', 'Renew', 'Heals the target for {damage} over 15 sec.'],
       ['mind_blast', 'Mind Blast', "Blasts the target's mind for {damage} Shadow damage."],
+      ['inner_fire', 'Inner Fire', 'A burst of holy energy increases your armor by 25 for 30 min.'],
       ['heal', 'Heal', 'A slow but powerful prayer that heals a friendly target for {damage}.'],
       [
         'mind_flay',
@@ -896,6 +897,11 @@ const classAbilityNamesEn = {
         "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec.",
       ],
       ['flash_heal', 'Flash Heal', 'A fast prayer that heals a friendly target for {damage}.'],
+      [
+        'holy_fire',
+        'Holy Fire',
+        'Consumes the enemy in holy flame for {damage} Holy damage plus a burn over 8 sec.',
+      ],
       ['lightning_bolt', 'Lightning Bolt', 'Hurls a bolt of lightning for {damage} Nature damage.'],
       [
         'rockbiter_weapon',
@@ -903,6 +909,11 @@ const classAbilityNamesEn = {
         'Imbues your weapon with the fury of stone: each swing deals 5 additional damage for 5 min.',
       ],
       ['healing_wave', 'Healing Wave', 'Heals a friendly target for {damage}.'],
+      [
+        'lesser_healing_wave',
+        'Lesser Healing Wave',
+        'A quick surge of water that heals a friendly target for {damage}.',
+      ],
       [
         'earth_shock',
         'Earth Shock',
@@ -1506,6 +1517,11 @@ export const classAbilityNames = {
           'Ataca la mente del objetivo por {damage} de daño de las Sombras.',
         ],
         [
+          'inner_fire',
+          'Fuego interno',
+          'Una explosion de energia sagrada aumenta tu armadura en 25 durante 30 min.',
+        ],
+        [
           'heal',
           'Sanar',
           'Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}.',
@@ -1521,6 +1537,11 @@ export const classAbilityNames = {
           'Una plegaria rápida que sana a un objetivo amistoso por {damage}.',
         ],
         [
+          'holy_fire',
+          'Fuego Sagrado',
+          'Consume al enemigo en fuego sagrado e inflige {damage} de dano Sagrado mas una quemadura durante 8 s.',
+        ],
+        [
           'lightning_bolt',
           'Relámpago',
           'Lanza un rayo que inflige {damage} de daño de Naturaleza.',
@@ -1531,6 +1552,11 @@ export const classAbilityNames = {
           'Imbuye tu arma con la furia de la piedra: cada golpe inflige 5 de daño adicional durante 5 min.',
         ],
         ['healing_wave', 'Ola de sanación', 'Sana a un objetivo amistoso por {damage}.'],
+        [
+          'lesser_healing_wave',
+          'Ola de sanacion inferior',
+          'Una rapida oleada de agua que sana a un objetivo amistoso por {damage}.',
+        ],
         [
           'earth_shock',
           'Choque de tierra',
@@ -2194,6 +2220,11 @@ export const classAbilityNames = {
           "Frappe l'esprit de la cible pour {damage} points de dégâts d'Ombre.",
         ],
         [
+          'inner_fire',
+          'Feu interieur',
+          'Une poussee d energie sacree augmente votre armure de 25 pendant 30 min.',
+        ],
+        [
           'heal',
           'Soins',
           'Une prière lente mais puissante qui rend {damage} points de vie à une cible alliée.',
@@ -2209,6 +2240,11 @@ export const classAbilityNames = {
           'Une prière rapide qui rend {damage} points de vie à une cible alliée.',
         ],
         [
+          'holy_fire',
+          'Feu sacre',
+          'Consume l ennemi dans une flamme sacree et inflige {damage} points de degats Sacres plus une brulure pendant 8 s.',
+        ],
+        [
           'lightning_bolt',
           'Éclair',
           'Lance un éclair qui inflige {damage} points de dégâts de Nature.',
@@ -2219,6 +2255,11 @@ export const classAbilityNames = {
           'Imprègne votre arme de la fureur de la pierre: chaque frappe inflige 5 points de dégâts supplémentaires pendant 5 min.',
         ],
         ['healing_wave', 'Vague de soins', 'Rend {damage} points de vie à une cible alliée.'],
+        [
+          'lesser_healing_wave',
+          'Vague de soins inferieure',
+          'Une vague d eau rapide rend {damage} points de vie a une cible alliee.',
+        ],
         [
           'earth_shock',
           'Horion de terre',
@@ -2801,6 +2842,11 @@ export const classAbilityNames = {
           'Colpisce la mente del bersaglio per {damage} danni da Ombra.',
         ],
         [
+          'inner_fire',
+          'Fuoco Interiore',
+          'Un impulso di energia sacra aumenta la tua armatura di 25 per 30 min.',
+        ],
+        [
           'heal',
           'Cura',
           'Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}.',
@@ -2815,6 +2861,11 @@ export const classAbilityNames = {
           'Cura Rapida',
           'Una preghiera veloce che cura un bersaglio alleato di {damage}.',
         ],
+        [
+          'holy_fire',
+          'Fuoco Sacro',
+          'Consuma il nemico con fiamme sacre infliggendo {damage} danni Sacri piu una bruciatura per 8 s.',
+        ],
         ['lightning_bolt', 'Dardo Fulminante', 'Scaglia un fulmine per {damage} danni da Natura.'],
         [
           'rockbiter_weapon',
@@ -2822,6 +2873,11 @@ export const classAbilityNames = {
           'Imbeve la tua arma con la furia della pietra: ogni colpo infligge 5 danni aggiuntivi per 5 min.',
         ],
         ['healing_wave', 'Ondata di Cura', 'Cura un bersaglio alleato di {damage}.'],
+        [
+          'lesser_healing_wave',
+          'Ondata di Cura Inferiore',
+          'Una rapida ondata d acqua che cura un bersaglio alleato di {damage}.',
+        ],
         [
           'earth_shock',
           'Folgore della Terra',
@@ -3422,6 +3478,11 @@ export const classAbilityNames = {
           'Trifft den Geist des Ziels für {damage} Schattenschaden.',
         ],
         [
+          'inner_fire',
+          'Inneres Feuer',
+          'Ein Schub heiliger Energie erhoht Eure Ruestung 30 Min. lang um 25.',
+        ],
+        [
           'heal',
           'Heilung',
           'Ein langsames, aber mächtiges Gebet, das ein freundliches Ziel um {damage} heilt.',
@@ -3436,6 +3497,11 @@ export const classAbilityNames = {
           'Blitzheilung',
           'Ein schnelles Gebet, das ein freundliches Ziel um {damage} heilt.',
         ],
+        [
+          'holy_fire',
+          'Heiliges Feuer',
+          'Verzehrt den Gegner in heiligem Feuer und verursacht {damage} Heiligschaden plus einen Brand ueber 8 Sek.',
+        ],
         ['lightning_bolt', 'Blitzschlag', 'Schleudert einen Blitz für {damage} Naturschaden.'],
         [
           'rockbiter_weapon',
@@ -3443,6 +3509,11 @@ export const classAbilityNames = {
           'Erfüllt eure Waffe mit der Wut des Steins: Jeder Schlag verursacht 5 zusätzlichen Schaden für 5 Min.',
         ],
         ['healing_wave', 'Welle der Heilung', 'Heilt ein freundliches Ziel um {damage}.'],
+        [
+          'lesser_healing_wave',
+          'Geringe Welle der Heilung',
+          'Eine schnelle Wasserwoge, die ein freundliches Ziel um {damage} heilt.',
+        ],
         [
           'earth_shock',
           'Erdschock',
@@ -3862,9 +3933,15 @@ export const classAbilityNames = {
         ['power_word_shield', '真言术：盾', '保护目标，吸收 48 点伤害，持续 30 秒。'],
         ['renew', '恢复', '在 15 秒内为目标恢复 {damage} 点生命值。'],
         ['mind_blast', '心灵震爆', '震击目标的心灵，造成 {damage} 点暗影伤害。'],
+        ['inner_fire', '心灵之火', '一股神圣能量使你的护甲提高 25，持续 30 分钟。'],
         ['heal', '治疗术', '缓慢但强大的祈祷，为一个友方目标恢复 {damage} 点生命值。'],
         ['mind_flay', '精神鞭笞', '用暗影能量攻击目标的心灵，持续 3 秒，每秒造成 12 点伤害。'],
         ['flash_heal', '快速治疗', '快速祈祷，为一个友方目标恢复 {damage} 点生命值。'],
+        [
+          'holy_fire',
+          '神圣之火',
+          '以神圣火焰吞噬敌人，造成 {damage} 点神圣伤害，并在 8 秒内继续灼烧。',
+        ],
         ['lightning_bolt', '闪电箭', '投掷一道闪电，造成 {damage} 点自然伤害。'],
         [
           'rockbiter_weapon',
@@ -3872,6 +3949,7 @@ export const classAbilityNames = {
           '以大地之怒灌注你的武器：每次挥击额外造成 5 点伤害，持续 5 分钟。',
         ],
         ['healing_wave', '治疗波', '为一个友方目标恢复 {damage} 点生命值。'],
+        ['lesser_healing_wave', '次级治疗波', '一股迅捷的水流，为友方目标恢复 {damage} 点生命值。'],
         ['earth_shock', '地震术', '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。'],
         ['lightning_shield', '闪电之盾', '以爆裂闪电环绕自身：近战攻击者会受到 13 点自然伤害。'],
         [
@@ -4179,9 +4257,15 @@ export const classAbilityNames = {
         ['power_word_shield', '真言術：盾', '保護目標，吸收 48 點傷害，持續 30 秒。'],
         ['renew', '恢復', '在 15 秒內為目標恢復 {damage} 點生命值。'],
         ['mind_blast', '心靈震爆', '震擊目標的心靈，造成 {damage} 點暗影傷害。'],
+        ['inner_fire', '心靈之火', '一股神聖能量使你的護甲提高 25，持續 30 分鐘。'],
         ['heal', '治療術', '緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。'],
         ['mind_flay', '精神鞭笞', '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 12 點傷害。'],
         ['flash_heal', '快速治療', '快速祈禱，為一個友方目標恢復 {damage} 點生命值。'],
+        [
+          'holy_fire',
+          '神聖之火',
+          '以神聖火焰吞噬敵人，造成 {damage} 點神聖傷害，並在 8 秒內持續灼燒。',
+        ],
         ['lightning_bolt', '閃電箭', '投擲一道閃電，造成 {damage} 點自然傷害。'],
         [
           'rockbiter_weapon',
@@ -4189,6 +4273,7 @@ export const classAbilityNames = {
           '以大地之怒灌注你的武器：每次揮擊額外造成 5 點傷害，持續 5 分鐘。',
         ],
         ['healing_wave', '治療波', '為一個友方目標恢復 {damage} 點生命值。'],
+        ['lesser_healing_wave', '次級治療波', '一股迅捷的水流，為友方目標恢復 {damage} 點生命值。'],
         ['earth_shock', '地震術', '立即以震盪之力衝擊目標，造成 {damage} 點自然傷害。'],
         ['lightning_shield', '閃電之盾', '以爆裂閃電環繞自身：近戰攻擊者會受到 13 點自然傷害。'],
         [
@@ -4600,6 +4685,7 @@ export const classAbilityNames = {
         ],
         ['renew', '소생', '15초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.'],
         ['mind_blast', '정신 분열', '대상의 정신을 강타해 {damage}의 암흑 피해를 입힙니다.'],
+        ['inner_fire', '내면의 열정', '성스러운 기운이 30분 동안 방어도를 25만큼 증가시킵니다.'],
         ['heal', '치유', '느리지만 강력한 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.'],
         [
           'mind_flay',
@@ -4607,6 +4693,11 @@ export const classAbilityNames = {
           '암흑 에너지로 대상의 정신을 공격해 3초 동안 매초 12의 피해를 입힙니다.',
         ],
         ['flash_heal', '순간 치유', '빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.'],
+        [
+          'holy_fire',
+          '신성한 불꽃',
+          '적을 신성한 불꽃으로 태워 {damage}의 신성 피해를 주고 8초 동안 불태웁니다.',
+        ],
         ['lightning_bolt', '번개 화살', '번개 화살을 던져 {damage}의 자연 피해를 입힙니다.'],
         [
           'rockbiter_weapon',
@@ -4614,6 +4705,11 @@ export const classAbilityNames = {
           '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 5의 추가 피해를 입힙니다.',
         ],
         ['healing_wave', '치유의 물결', '아군 대상의 생명력을 {damage}만큼 회복시킵니다.'],
+        [
+          'lesser_healing_wave',
+          '하급 치유의 물결',
+          '빠른 물의 파동으로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
+        ],
         ['earth_shock', '대지 충격', '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.'],
         [
           'lightning_shield',
@@ -5133,6 +5229,7 @@ export const classAbilityNames = {
         ],
         ['renew', 'リニュー', '15秒間で対象の体力を {damage} 回復します。'],
         ['mind_blast', 'マインドブラスト', '対象の精神を打ち、{damage} の暗黒ダメージを与えます。'],
+        ['inner_fire', 'インナーファイア', '聖なる力が30分間、防御力を25上昇させます。'],
         ['heal', 'ヒール', '遅いが強力な祈りで、味方対象の体力を {damage} 回復します。'],
         [
           'mind_flay',
@@ -5140,6 +5237,11 @@ export const classAbilityNames = {
           '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒12ダメージを与えます。',
         ],
         ['flash_heal', 'フラッシュヒール', '素早い祈りで味方対象の体力を {damage} 回復します。'],
+        [
+          'holy_fire',
+          'ホーリーファイア',
+          '敵を聖なる炎で包み、{damage} の神聖ダメージを与え、8秒間燃やします。',
+        ],
         [
           'lightning_bolt',
           'ライトニングボルト',
@@ -5151,6 +5253,11 @@ export const classAbilityNames = {
           '石の怒りを武器に込めます。5分間、各スイングが5の追加ダメージを与えます。',
         ],
         ['healing_wave', 'ヒーリングウェーブ', '味方対象の体力を {damage} 回復します。'],
+        [
+          'lesser_healing_wave',
+          '下級ヒーリングウェーブ',
+          '素早い水の波で味方対象の体力を {damage} 回復します。',
+        ],
         [
           'earth_shock',
           'アースショック',
@@ -5706,6 +5813,11 @@ export const classAbilityNames = {
         ],
         ['renew', 'Renovar', 'Cura o alvo em {damage} ao longo de 15 s.'],
         ['mind_blast', 'Impacto Mental', 'Atinge a mente do alvo com {damage} de dano de Sombra.'],
+        [
+          'inner_fire',
+          'Fogo Interior',
+          'Um surto de energia sagrada aumenta sua armadura em 25 por 30 min.',
+        ],
         ['heal', 'Curar', 'Uma prece lenta, mas poderosa, que cura um alvo aliado em {damage}.'],
         [
           'mind_flay',
@@ -5713,6 +5825,11 @@ export const classAbilityNames = {
           'Assalta a mente do alvo com energia de Sombra, causando 12 de dano por segundo durante 3 s.',
         ],
         ['flash_heal', 'Cura Rápida', 'Uma prece rápida que cura um alvo aliado em {damage}.'],
+        [
+          'holy_fire',
+          'Fogo Sagrado',
+          'Consome o inimigo em chamas sagradas, causando {damage} de dano Sagrado e queimando por 8 s.',
+        ],
         ['lightning_bolt', 'Raio', 'Arremessa um raio que causa {damage} de dano de Natureza.'],
         [
           'rockbiter_weapon',
@@ -5720,6 +5837,11 @@ export const classAbilityNames = {
           'Imbui sua arma com a fúria da pedra: cada golpe causa 5 de dano adicional por 5 min.',
         ],
         ['healing_wave', 'Onda de Cura', 'Cura um alvo aliado em {damage}.'],
+        [
+          'lesser_healing_wave',
+          'Onda Curativa Inferior',
+          'Um rapido surto de agua que cura um alvo aliado em {damage}.',
+        ],
         [
           'earth_shock',
           'Choque Terreno',
@@ -6308,6 +6430,11 @@ export const classAbilityNames = {
           'Поражает разум цели на {damage} ед. урона от темной магии.',
         ],
         [
+          'inner_fire',
+          'Внутренний огонь',
+          'Всплеск священной энергии повышает вашу броню на 25 на 30 мин.',
+        ],
+        [
           'heal',
           'Исцеление',
           'Медленная, но мощная молитва, исцеляющая дружественную цель на {damage}.',
@@ -6323,6 +6450,11 @@ export const classAbilityNames = {
           'Быстрая молитва, исцеляющая дружественную цель на {damage}.',
         ],
         [
+          'holy_fire',
+          'Священный огонь',
+          'Охватывает врага священным пламенем, нанося {damage} ед. урона от Света и ожог на 8 сек.',
+        ],
+        [
           'lightning_bolt',
           'Молния',
           'Метает разряд молнии, нанося {damage} ед. урона от сил природы.',
@@ -6333,6 +6465,11 @@ export const classAbilityNames = {
           'Насыщает ваше оружие яростью камня: каждый удар наносит 5 ед. дополнительного урона в течение 5 мин.',
         ],
         ['healing_wave', 'Волна исцеления', 'Исцеляет дружественную цель на {damage}.'],
+        [
+          'lesser_healing_wave',
+          'Малая волна исцеления',
+          'Быстрая волна воды исцеляет дружественную цель на {damage}.',
+        ],
         [
           'earth_shock',
           'Земной шок',

@@ -1892,6 +1892,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': 'Gedankenschlag',
   'entities.abilities.mind_blast.description':
     'Trifft den Geist des Ziels für {damage} Schattenschaden.',
+  'entities.abilities.inner_fire.name': 'Inneres Feuer',
+  'entities.abilities.inner_fire.description':
+    'Ein Schub heiliger Energie erhoht Eure Ruestung 30 Min. lang um 25.',
   'entities.abilities.heal.name': 'Heilung',
   'entities.abilities.heal.description':
     'Ein langsames, aber mächtiges Gebet, das ein freundliches Ziel um {damage} heilt.',
@@ -1901,6 +1904,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flash_heal.name': 'Blitzheilung',
   'entities.abilities.flash_heal.description':
     'Ein schnelles Gebet, das ein freundliches Ziel um {damage} heilt.',
+  'entities.abilities.holy_fire.name': 'Heiliges Feuer',
+  'entities.abilities.holy_fire.description':
+    'Verzehrt den Gegner in heiligem Feuer und verursacht {damage} Heiligschaden plus einen Brand ueber 8 Sek.',
   'entities.abilities.lightning_bolt.name': 'Blitzschlag',
   'entities.abilities.lightning_bolt.description':
     'Schleudert einen Blitz für {damage} Naturschaden.',
@@ -1909,6 +1915,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erfüllt eure Waffe mit der Wut des Steins: Jeder Schlag verursacht 5 zusätzlichen Schaden für 5 Min.',
   'entities.abilities.healing_wave.name': 'Welle der Heilung',
   'entities.abilities.healing_wave.description': 'Heilt ein freundliches Ziel um {damage}.',
+  'entities.abilities.lesser_healing_wave.name': 'Geringe Welle der Heilung',
+  'entities.abilities.lesser_healing_wave.description':
+    'Eine schnelle Wasserwoge, die ein freundliches Ziel um {damage} heilt.',
   'entities.abilities.earth_shock.name': 'Erdschock',
   'entities.abilities.earth_shock.description':
     'Schockt das Ziel sofort mit erschütternder Kraft für {damage} Naturschaden.',

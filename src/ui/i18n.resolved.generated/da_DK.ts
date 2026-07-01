@@ -4028,6 +4028,10 @@ export const da_DK: EnTranslations = {
         "name": "Sindsstød",
         "description": "Sprænger målets sind for {damage} skyggeskade."
       },
+      "inner_fire": {
+        "name": "Indre ild",
+        "description": "Et udbrud af hellig energi oger din rustning med 25 i 30 min."
+      },
       "heal": {
         "name": "Helbredelse",
         "description": "En langsom, men kraftfuld bøn, der helbreder et venligt mål for {damage}."
@@ -4040,6 +4044,10 @@ export const da_DK: EnTranslations = {
         "name": "Lynhelbredelse",
         "description": "En hurtig bøn, der helbreder et venligt mål for {damage}."
       },
+      "holy_fire": {
+        "name": "Hellig ild",
+        "description": "Fortaerer fjenden i hellig ild for {damage} hellig skade plus en forbraending i 8 sek."
+      },
       "lightning_bolt": {
         "name": "Lynnedslag",
         "description": "Slynger et lyn for {damage} naturskade."
@@ -4051,6 +4059,10 @@ export const da_DK: EnTranslations = {
       "healing_wave": {
         "name": "Helbredende Bølge",
         "description": "Helbreder et venligt mål for {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Mindre helbredende bolge",
+        "description": "En hurtig bolge vand, der helbreder et venligt mal for {damage}."
       },
       "earth_shock": {
         "name": "Jordchok",

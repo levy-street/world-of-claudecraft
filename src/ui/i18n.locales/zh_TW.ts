@@ -1771,6 +1771,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': '在 15 秒內為目標恢復 {damage} 點生命值。',
   'entities.abilities.mind_blast.name': '心靈震爆',
   'entities.abilities.mind_blast.description': '震擊目標的心靈，造成 {damage} 點暗影傷害。',
+  'entities.abilities.inner_fire.name': '心靈之火',
+  'entities.abilities.inner_fire.description': '一股神聖能量使你的護甲提高 25，持續 30 分鐘。',
   'entities.abilities.heal.name': '治療術',
   'entities.abilities.heal.description': '緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.mind_flay.name': '精神鞭笞',
@@ -1778,6 +1780,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '用暗影能量攻擊目標的心靈，持續 3 秒，每秒造成 {damage} 點傷害。',
   'entities.abilities.flash_heal.name': '快速治療',
   'entities.abilities.flash_heal.description': '快速祈禱，為一個友方目標恢復 {damage} 點生命值。',
+  'entities.abilities.holy_fire.name': '神聖之火',
+  'entities.abilities.holy_fire.description':
+    '以神聖火焰吞噬敵人，造成 {damage} 點神聖傷害，並在 8 秒內持續灼燒。',
   'entities.abilities.lightning_bolt.name': '閃電箭',
   'entities.abilities.lightning_bolt.description': '投擲一道閃電，造成 {damage} 點自然傷害。',
   'entities.abilities.rockbiter_weapon.name': '石化武器',
@@ -1785,6 +1790,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '以大地之怒灌注你的武器：每次揮擊額外造成 5 點傷害，持續 5 分鐘。',
   'entities.abilities.healing_wave.name': '治療波',
   'entities.abilities.healing_wave.description': '為一個友方目標恢復 {damage} 點生命值。',
+  'entities.abilities.lesser_healing_wave.name': '次級治療波',
+  'entities.abilities.lesser_healing_wave.description':
+    '一股迅捷的水流，為友方目標恢復 {damage} 點生命值。',
   'entities.abilities.earth_shock.name': '地震術',
   'entities.abilities.earth_shock.description':
     '立即以震盪之力衝擊目標，造成 {damage} 點自然傷害。',

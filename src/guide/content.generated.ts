@@ -656,6 +656,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Mind Blast"
       },
       {
+        "id": "inner_fire",
+        "name": "Inner Fire"
+      },
+      {
         "id": "heal",
         "name": "Heal"
       },
@@ -666,6 +670,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "flash_heal",
         "name": "Flash Heal"
+      },
+      {
+        "id": "holy_fire",
+        "name": "Holy Fire"
       }
     ],
     "model": "player_priest",
@@ -756,16 +764,20 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Flametongue Weapon"
       },
       {
-        "id": "frost_shock",
-        "name": "Frost Shock"
-      },
-      {
         "id": "frostbrand_weapon",
         "name": "Frostbrand Weapon"
       },
       {
+        "id": "frost_shock",
+        "name": "Frost Shock"
+      },
+      {
         "id": "ghost_wolf",
         "name": "Ghost Wolf"
+      },
+      {
+        "id": "lesser_healing_wave",
+        "name": "Lesser Healing Wave"
       },
       {
         "id": "stormstrike",

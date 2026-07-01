@@ -4028,6 +4028,10 @@ export const tr_TR: EnTranslations = {
         "name": "Zihin Patlaması",
         "description": "Hedefin zihnini {damage} Gölge hasarıyla patlatır."
       },
+      "inner_fire": {
+        "name": "Ic Ates",
+        "description": "Kutsal enerji patlamasi zirhini 30 dk boyunca 25 artirir."
+      },
       "heal": {
         "name": "İyileştirme",
         "description": "Dost bir hedefi {damage} iyileştiren yavaş ama güçlü bir dua."
@@ -4040,6 +4044,10 @@ export const tr_TR: EnTranslations = {
         "name": "Hızlı İyileştirme",
         "description": "Dost bir hedefi {damage} iyileştiren hızlı bir dua."
       },
+      "holy_fire": {
+        "name": "Kutsal Ates",
+        "description": "Dusmani kutsal alevle sarar, {damage} Kutsal hasar verir ve 8 sn boyunca yakar."
+      },
       "lightning_bolt": {
         "name": "Yıldırım Oku",
         "description": "Bir yıldırım oku fırlatarak {damage} Doğa hasarı verir."
@@ -4051,6 +4059,10 @@ export const tr_TR: EnTranslations = {
       "healing_wave": {
         "name": "İyileştirici Dalga",
         "description": "Dost bir hedefi {damage} iyileştirir."
+      },
+      "lesser_healing_wave": {
+        "name": "Kucuk Sifa Dalgasi",
+        "description": "Dost bir hedefi {damage} iyilestiren hizli bir su dalgasi."
       },
       "earth_shock": {
         "name": "Toprak Şoku",

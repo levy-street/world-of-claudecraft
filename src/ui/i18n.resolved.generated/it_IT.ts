@@ -4028,6 +4028,10 @@ export const it_IT: EnTranslations = {
         "name": "Detonazione Mentale",
         "description": "Colpisce la mente del bersaglio per {damage} danni da Ombra."
       },
+      "inner_fire": {
+        "name": "Fuoco Interiore",
+        "description": "Un impulso di energia sacra aumenta la tua armatura di 25 per 30 min."
+      },
       "heal": {
         "name": "Cura",
         "description": "Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}."
@@ -4040,6 +4044,10 @@ export const it_IT: EnTranslations = {
         "name": "Cura Rapida",
         "description": "Una preghiera veloce che cura un bersaglio alleato di {damage}."
       },
+      "holy_fire": {
+        "name": "Fuoco Sacro",
+        "description": "Consuma il nemico con fiamme sacre infliggendo {damage} danni Sacri piu una bruciatura per 8 s."
+      },
       "lightning_bolt": {
         "name": "Dardo Fulminante",
         "description": "Scaglia un fulmine per {damage} danni da Natura."
@@ -4051,6 +4059,10 @@ export const it_IT: EnTranslations = {
       "healing_wave": {
         "name": "Ondata di Cura",
         "description": "Cura un bersaglio alleato di {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Ondata di Cura Inferiore",
+        "description": "Una rapida ondata d acqua che cura un bersaglio alleato di {damage}."
       },
       "earth_shock": {
         "name": "Folgore della Terra",

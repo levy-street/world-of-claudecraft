@@ -4028,6 +4028,10 @@ export const de_DE: EnTranslations = {
         "name": "Gedankenschlag",
         "description": "Trifft den Geist des Ziels für {damage} Schattenschaden."
       },
+      "inner_fire": {
+        "name": "Inneres Feuer",
+        "description": "Ein Schub heiliger Energie erhoht Eure Ruestung 30 Min. lang um 25."
+      },
       "heal": {
         "name": "Heilung",
         "description": "Ein langsames, aber mächtiges Gebet, das ein freundliches Ziel um {damage} heilt."
@@ -4040,6 +4044,10 @@ export const de_DE: EnTranslations = {
         "name": "Blitzheilung",
         "description": "Ein schnelles Gebet, das ein freundliches Ziel um {damage} heilt."
       },
+      "holy_fire": {
+        "name": "Heiliges Feuer",
+        "description": "Verzehrt den Gegner in heiligem Feuer und verursacht {damage} Heiligschaden plus einen Brand ueber 8 Sek."
+      },
       "lightning_bolt": {
         "name": "Blitzschlag",
         "description": "Schleudert einen Blitz für {damage} Naturschaden."
@@ -4051,6 +4059,10 @@ export const de_DE: EnTranslations = {
       "healing_wave": {
         "name": "Welle der Heilung",
         "description": "Heilt ein freundliches Ziel um {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Geringe Welle der Heilung",
+        "description": "Eine schnelle Wasserwoge, die ein freundliches Ziel um {damage} heilt."
       },
       "earth_shock": {
         "name": "Erdschock",

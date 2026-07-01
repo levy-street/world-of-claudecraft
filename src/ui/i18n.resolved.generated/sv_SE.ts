@@ -4028,6 +4028,10 @@ export const sv_SE: EnTranslations = {
         "name": "Sinnesstöt",
         "description": "Spränger målets sinne för {damage} skuggskada."
       },
+      "inner_fire": {
+        "name": "Inre eld",
+        "description": "En stot av helig energi okar din rustning med 25 i 30 min."
+      },
       "heal": {
         "name": "Läka",
         "description": "En långsam men kraftfull bön som läker ett vänligt mål för {damage}."
@@ -4040,6 +4044,10 @@ export const sv_SE: EnTranslations = {
         "name": "Snabbläkning",
         "description": "En snabb bön som läker ett vänligt mål för {damage}."
       },
+      "holy_fire": {
+        "name": "Helig eld",
+        "description": "Fortar fienden i helig eld for {damage} helig skada plus en brannskada under 8 sek."
+      },
       "lightning_bolt": {
         "name": "Blixt",
         "description": "Slungar en blixt för {damage} naturskada."
@@ -4051,6 +4059,10 @@ export const sv_SE: EnTranslations = {
       "healing_wave": {
         "name": "Läkande våg",
         "description": "Läker ett vänligt mål för {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Mindre helande vag",
+        "description": "En snabb vattenvag som helar ett vanligt mal for {damage}."
       },
       "earth_shock": {
         "name": "Jordchock",

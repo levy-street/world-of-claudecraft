@@ -1844,6 +1844,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': '정신의 일격',
   'entities.abilities.mind_blast.description':
     '대상의 정신을 강타해 {damage}의 암흑 피해를 입힙니다.',
+  'entities.abilities.inner_fire.name': '내면의 열정',
+  'entities.abilities.inner_fire.description':
+    '성스러운 기운이 30분 동안 방어도를 25만큼 증가시킵니다.',
   'entities.abilities.heal.name': '치유',
   'entities.abilities.heal.description':
     '느리지만 강력한 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
@@ -1853,6 +1856,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flash_heal.name': '순간 치유',
   'entities.abilities.flash_heal.description':
     '빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
+  'entities.abilities.holy_fire.name': '신성한 불꽃',
+  'entities.abilities.holy_fire.description':
+    '적을 신성한 불꽃으로 태워 {damage}의 신성 피해를 주고 8초 동안 불태웁니다.',
   'entities.abilities.lightning_bolt.name': '번개 화살',
   'entities.abilities.lightning_bolt.description':
     '번개 화살을 던져 {damage}의 자연 피해를 입힙니다.',
@@ -1861,6 +1867,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 5의 추가 피해를 입힙니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
+  'entities.abilities.lesser_healing_wave.name': '하급 치유의 물결',
+  'entities.abilities.lesser_healing_wave.description':
+    '빠른 물의 파동으로 아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.earth_shock.name': '대지 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',

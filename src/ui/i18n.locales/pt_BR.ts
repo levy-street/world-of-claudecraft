@@ -1882,6 +1882,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': 'Impacto Mental',
   'entities.abilities.mind_blast.description':
     'Atinge a mente do alvo com {damage} de dano de Sombra.',
+  'entities.abilities.inner_fire.name': 'Fogo Interior',
+  'entities.abilities.inner_fire.description':
+    'Um surto de energia sagrada aumenta sua armadura em 25 por 30 min.',
   'entities.abilities.heal.name': 'Curar',
   'entities.abilities.heal.description':
     'Uma prece lenta, mas poderosa, que cura um alvo aliado em {damage}.',
@@ -1891,6 +1894,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flash_heal.name': 'Cura Rápida',
   'entities.abilities.flash_heal.description':
     'Uma prece rápida que cura um alvo aliado em {damage}.',
+  'entities.abilities.holy_fire.name': 'Fogo Sagrado',
+  'entities.abilities.holy_fire.description':
+    'Consome o inimigo em chamas sagradas, causando {damage} de dano Sagrado e queimando por 8 s.',
   'entities.abilities.lightning_bolt.name': 'Raio',
   'entities.abilities.lightning_bolt.description':
     'Arremessa um raio que causa {damage} de dano de Natureza.',
@@ -1899,6 +1905,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Imbui sua arma com a fúria da pedra: cada golpe causa 5 de dano adicional por 5 min.',
   'entities.abilities.healing_wave.name': 'Onda de Cura',
   'entities.abilities.healing_wave.description': 'Cura um alvo aliado em {damage}.',
+  'entities.abilities.lesser_healing_wave.name': 'Onda Curativa Inferior',
+  'entities.abilities.lesser_healing_wave.description':
+    'Um rapido surto de agua que cura um alvo aliado em {damage}.',
   'entities.abilities.earth_shock.name': 'Choque Terreno',
   'entities.abilities.earth_shock.description':
     'Choca o alvo instantaneamente com força concussiva, causando {damage} de dano de Natureza.',

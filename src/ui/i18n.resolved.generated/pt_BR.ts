@@ -4028,6 +4028,10 @@ export const pt_BR: EnTranslations = {
         "name": "Impacto Mental",
         "description": "Atinge a mente do alvo com {damage} de dano de Sombra."
       },
+      "inner_fire": {
+        "name": "Fogo Interior",
+        "description": "Um surto de energia sagrada aumenta sua armadura em 25 por 30 min."
+      },
       "heal": {
         "name": "Curar",
         "description": "Uma prece lenta, mas poderosa, que cura um alvo aliado em {damage}."
@@ -4040,6 +4044,10 @@ export const pt_BR: EnTranslations = {
         "name": "Cura Rápida",
         "description": "Uma prece rápida que cura um alvo aliado em {damage}."
       },
+      "holy_fire": {
+        "name": "Fogo Sagrado",
+        "description": "Consome o inimigo em chamas sagradas, causando {damage} de dano Sagrado e queimando por 8 s."
+      },
       "lightning_bolt": {
         "name": "Raio",
         "description": "Arremessa um raio que causa {damage} de dano de Natureza."
@@ -4051,6 +4059,10 @@ export const pt_BR: EnTranslations = {
       "healing_wave": {
         "name": "Onda de Cura",
         "description": "Cura um alvo aliado em {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Onda Curativa Inferior",
+        "description": "Um rapido surto de agua que cura um alvo aliado em {damage}."
       },
       "earth_shock": {
         "name": "Choque Terreno",

@@ -2179,10 +2179,13 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   power_word_shield: r('holy', 'silverWhite', ['shield'], ['sparkle', 'glow']),
   renew: r('holy', 'leafGreen', [{ p: 'heart', pal: 'leafGreen' }], ['sparkle']),
   mind_blast: r('shadow', 'shadowPurple', ['eye'], ['arcs', 'glow']),
+  inner_fire: r('holy', 'gold', ['flame', { p: 'shield', ...TL }], ['glow']),
+  holy_fire: r('holy', 'holyGold', ['flame', { p: 'sunburst', ...TL }], ['glow']),
   // shaman
   lightning_bolt: r('storm', 'sky', ['lightning'], ['glow']),
   rockbiter_weapon: r('earth', 'earthBrown', ['fist'], ['crack']),
   healing_wave: r('frost', 'sky', ['droplet'], ['arcs', 'sparkle']),
+  lesser_healing_wave: r('frost', 'sky', ['droplet', { p: 'cross', ...TL }], ['motion', 'sparkle']),
   earth_shock: r('earth', 'earthBrown', [{ p: 'lightning', pal: 'earthBrown' }], ['crack']),
   lightning_shield: r('storm', 'sky', ['shield', { p: 'lightning', s: 0.6 }], ['glow']),
   flame_shock: r('fire', 'ember', ['flame'], ['arcs']),

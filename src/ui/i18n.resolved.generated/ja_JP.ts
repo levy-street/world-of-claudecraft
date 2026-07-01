@@ -4028,6 +4028,10 @@ export const ja_JP: EnTranslations = {
         "name": "マインドブラスト",
         "description": "対象の精神を打ち、{damage} の暗黒ダメージを与えます。"
       },
+      "inner_fire": {
+        "name": "インナーファイア",
+        "description": "聖なる力が30分間、防御力を25上昇させます。"
+      },
       "heal": {
         "name": "ヒール",
         "description": "遅いが強力な祈りで、味方対象の体力を {damage} 回復します。"
@@ -4040,6 +4044,10 @@ export const ja_JP: EnTranslations = {
         "name": "フラッシュヒール",
         "description": "素早い祈りで味方対象の体力を {damage} 回復します。"
       },
+      "holy_fire": {
+        "name": "ホーリーファイア",
+        "description": "敵を聖なる炎で包み、{damage} の神聖ダメージを与え、8秒間燃やします。"
+      },
       "lightning_bolt": {
         "name": "ライトニングボルト",
         "description": "稲妻の矢を放ち、{damage} の自然ダメージを与えます。"
@@ -4051,6 +4059,10 @@ export const ja_JP: EnTranslations = {
       "healing_wave": {
         "name": "ヒーリングウェーブ",
         "description": "味方対象の体力を {damage} 回復します。"
+      },
+      "lesser_healing_wave": {
+        "name": "下級ヒーリングウェーブ",
+        "description": "素早い水の波で味方対象の体力を {damage} 回復します。"
       },
       "earth_shock": {
         "name": "アースショック",

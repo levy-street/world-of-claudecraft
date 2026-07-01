@@ -1894,6 +1894,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': 'Explosión mental',
   'entities.abilities.mind_blast.description':
     'Ataca la mente del objetivo por {damage} de daño de las Sombras.',
+  'entities.abilities.inner_fire.name': 'Fuego interno',
+  'entities.abilities.inner_fire.description':
+    'Una explosion de energia sagrada aumenta tu armadura en 25 durante 30 min.',
   'entities.abilities.heal.name': 'Sanar',
   'entities.abilities.heal.description':
     'Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}.',
@@ -1903,6 +1906,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flash_heal.name': 'Sanación relámpago',
   'entities.abilities.flash_heal.description':
     'Una plegaria rápida que sana a un objetivo amistoso por {damage}.',
+  'entities.abilities.holy_fire.name': 'Fuego Sagrado',
+  'entities.abilities.holy_fire.description':
+    'Consume al enemigo en fuego sagrado e inflige {damage} de dano Sagrado mas una quemadura durante 8 s.',
   'entities.abilities.lightning_bolt.name': 'Relámpago',
   'entities.abilities.lightning_bolt.description':
     'Lanza un rayo que inflige {damage} de daño de Naturaleza.',
@@ -1911,6 +1917,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Imbuye tu arma con la furia de la piedra: cada golpe inflige 5 de daño adicional durante 5 min.',
   'entities.abilities.healing_wave.name': 'Ola de sanación',
   'entities.abilities.healing_wave.description': 'Sana a un objetivo amistoso por {damage}.',
+  'entities.abilities.lesser_healing_wave.name': 'Ola de sanacion inferior',
+  'entities.abilities.lesser_healing_wave.description':
+    'Una rapida oleada de agua que sana a un objetivo amistoso por {damage}.',
   'entities.abilities.earth_shock.name': 'Choque de tierra',
   'entities.abilities.earth_shock.description':
     'Sacude al objetivo al instante con fuerza contundente por {damage} de daño de Naturaleza.',

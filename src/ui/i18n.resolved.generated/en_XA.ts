@@ -4028,6 +4028,10 @@ export const en_XA: EnTranslations = {
         "name": "[Ɱíñð Ɓļášţ]",
         "description": "[Ɓļášţš ţĥé ţáŕĝéţ'š ɱíñð ƒóŕ {damage} Šĥáðóŵ ðáɱáĝé.]"
       },
+      "inner_fire": {
+        "name": "[Íññéŕ Ƒíŕé]",
+        "description": "[Á ƀúŕšţ óƒ ĥóļý éñéŕĝý íñçŕéášéš ýóúŕ áŕɱóŕ ƀý 25 ƒóŕ 30 ɱíñ.]"
+      },
       "heal": {
         "name": "[Ĥéáļ]",
         "description": "[Á šļóŵ ƀúţ þóŵéŕƒúļ þŕáýéŕ ţĥáţ ĥéáļš á ƒŕíéñðļý ţáŕĝéţ ƒóŕ {damage}.]"
@@ -4040,6 +4044,10 @@ export const en_XA: EnTranslations = {
         "name": "[Ƒļášĥ Ĥéáļ]",
         "description": "[Á ƒášţ þŕáýéŕ ţĥáţ ĥéáļš á ƒŕíéñðļý ţáŕĝéţ ƒóŕ {damage}.]"
       },
+      "holy_fire": {
+        "name": "[Ĥóļý Ƒíŕé]",
+        "description": "[Çóñšúɱéš ţĥé éñéɱý íñ ĥóļý ƒļáɱé ƒóŕ {damage} Ĥóļý ðáɱáĝé þļúš á ƀúŕñ óʋéŕ 8 šéç.]"
+      },
       "lightning_bolt": {
         "name": "[Ļíĝĥţñíñĝ Ɓóļţ]",
         "description": "[Ĥúŕļš á ƀóļţ óƒ ļíĝĥţñíñĝ ƒóŕ {damage} Ñáţúŕé ðáɱáĝé.]"
@@ -4051,6 +4059,10 @@ export const en_XA: EnTranslations = {
       "healing_wave": {
         "name": "[Ĥéáļíñĝ Ŵáʋé]",
         "description": "[Ĥéáļš á ƒŕíéñðļý ţáŕĝéţ ƒóŕ {damage}.]"
+      },
+      "lesser_healing_wave": {
+        "name": "[Ļéššéŕ Ĥéáļíñĝ Ŵáʋé]",
+        "description": "[Á ɋúíçķ šúŕĝé óƒ ŵáţéŕ ţĥáţ ĥéáļš á ƒŕíéñðļý ţáŕĝéţ ƒóŕ {damage}.]"
       },
       "earth_shock": {
         "name": "[Éáŕţĥ Šĥóçķ]",

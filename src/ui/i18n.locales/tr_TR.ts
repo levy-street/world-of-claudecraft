@@ -535,6 +535,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Can Emme',
   'entities.abilities.earth_shock.description':
     'Hedefi sersemletici bir kuvvetle anında şoklar ve {damage} Doğa hasarı verir.',
+  'entities.abilities.lesser_healing_wave.name': 'Kucuk Sifa Dalgasi',
+  'entities.abilities.lesser_healing_wave.description':
+    'Dost bir hedefi {damage} iyilestiren hizli bir su dalgasi.',
   'entities.abilities.earth_shock.name': 'Toprak Şoku',
   'entities.abilities.enrage.description': 'Anında 20 öfke üretir. Yalnızca Ayı Formu.',
   'entities.abilities.enrage.name': 'Öfkelenme',
@@ -612,6 +615,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Diz Ardı Kesme',
   'entities.abilities.heal.description':
     'Dost bir hedefi {damage} iyileştiren yavaş ama güçlü bir dua.',
+  'entities.abilities.inner_fire.name': 'Ic Ates',
+  'entities.abilities.inner_fire.description':
+    'Kutsal enerji patlamasi zirhini 30 dk boyunca 25 artirir.',
   'entities.abilities.heal.name': 'İyileştirme',
   'entities.abilities.healing_touch.description': 'Dost bir hedefi {damage} iyileştirir.',
   'entities.abilities.healing_touch.name': 'İyileştirici Dokunuş',
@@ -652,6 +658,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.life_tap.name': 'Can Aktarımı',
   'entities.abilities.lightning_bolt.description':
     'Bir yıldırım oku fırlatarak {damage} Doğa hasarı verir.',
+  'entities.abilities.holy_fire.name': 'Kutsal Ates',
+  'entities.abilities.holy_fire.description':
+    'Dusmani kutsal alevle sarar, {damage} Kutsal hasar verir ve 8 sn boyunca yakar.',
   'entities.abilities.lightning_bolt.name': 'Yıldırım Oku',
   'entities.abilities.lightning_shield.description':
     'Seni çatırdayan yıldırımla sarar: yakın dövüş saldırganları 13 Doğa hasarı alır.',

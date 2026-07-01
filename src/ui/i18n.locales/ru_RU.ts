@@ -1880,6 +1880,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': 'Взрыв разума',
   'entities.abilities.mind_blast.description':
     'Поражает разум цели на {damage} ед. урона от темной магии.',
+  'entities.abilities.inner_fire.name': 'Внутренний огонь',
+  'entities.abilities.inner_fire.description':
+    'Всплеск священной энергии повышает вашу броню на 25 на 30 мин.',
   'entities.abilities.heal.name': 'Исцеление',
   'entities.abilities.heal.description':
     'Медленная, но мощная молитва, исцеляющая дружественную цель на {damage}.',
@@ -1889,6 +1892,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flash_heal.name': 'Быстрое исцеление',
   'entities.abilities.flash_heal.description':
     'Быстрая молитва, исцеляющая дружественную цель на {damage}.',
+  'entities.abilities.holy_fire.name': 'Священный огонь',
+  'entities.abilities.holy_fire.description':
+    'Охватывает врага священным пламенем, нанося {damage} ед. урона от Света и ожог на 8 сек.',
   'entities.abilities.lightning_bolt.name': 'Молния',
   'entities.abilities.lightning_bolt.description':
     'Метает разряд молнии, нанося {damage} ед. урона от сил природы.',
@@ -1897,6 +1903,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Насыщает ваше оружие яростью камня: каждый удар наносит 5 ед. дополнительного урона в течение 5 мин.',
   'entities.abilities.healing_wave.name': 'Волна исцеления',
   'entities.abilities.healing_wave.description': 'Исцеляет дружественную цель на {damage}.',
+  'entities.abilities.lesser_healing_wave.name': 'Малая волна исцеления',
+  'entities.abilities.lesser_healing_wave.description':
+    'Быстрая волна воды исцеляет дружественную цель на {damage}.',
   'entities.abilities.earth_shock.name': 'Земной шок',
   'entities.abilities.earth_shock.description':
     'Мгновенно поражает цель ударной силой, нанося {damage} ед. урона от сил природы.',

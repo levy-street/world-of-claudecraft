@@ -4028,6 +4028,10 @@ export const nl_NL: EnTranslations = {
         "name": "Geestesstoot",
         "description": "Treft de geest van het doelwit voor {damage} Schaduwschade."
       },
+      "inner_fire": {
+        "name": "Innerlijk Vuur",
+        "description": "Een uitbarsting van heilige energie verhoogt je pantser met 25 gedurende 30 min."
+      },
       "heal": {
         "name": "Genezing",
         "description": "Een traag maar krachtig gebed dat een bevriend doelwit voor {damage} geneest."
@@ -4040,6 +4044,10 @@ export const nl_NL: EnTranslations = {
         "name": "Snelle Genezing",
         "description": "Een snel gebed dat een bevriend doelwit voor {damage} geneest."
       },
+      "holy_fire": {
+        "name": "Heilig Vuur",
+        "description": "Verteert de vijand in heilig vuur voor {damage} Heilige schade plus een brandwond gedurende 8 sec."
+      },
       "lightning_bolt": {
         "name": "Bliksemschicht",
         "description": "Werpt een bliksemschicht voor {damage} Natuurschade."
@@ -4051,6 +4059,10 @@ export const nl_NL: EnTranslations = {
       "healing_wave": {
         "name": "Genezende Golf",
         "description": "Geneest een bevriend doelwit voor {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Kleine Genezingsgolf",
+        "description": "Een snelle golf water die een vriendelijk doelwit voor {damage} geneest."
       },
       "earth_shock": {
         "name": "Aardschok",

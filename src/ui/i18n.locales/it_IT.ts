@@ -1883,6 +1883,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': 'Detonazione Mentale',
   'entities.abilities.mind_blast.description':
     'Colpisce la mente del bersaglio per {damage} danni da Ombra.',
+  'entities.abilities.inner_fire.name': 'Fuoco Interiore',
+  'entities.abilities.inner_fire.description':
+    'Un impulso di energia sacra aumenta la tua armatura di 25 per 30 min.',
   'entities.abilities.heal.name': 'Cura',
   'entities.abilities.heal.description':
     'Una preghiera lenta ma potente che cura un bersaglio alleato di {damage}.',
@@ -1892,6 +1895,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flash_heal.name': 'Cura Rapida',
   'entities.abilities.flash_heal.description':
     'Una preghiera veloce che cura un bersaglio alleato di {damage}.',
+  'entities.abilities.holy_fire.name': 'Fuoco Sacro',
+  'entities.abilities.holy_fire.description':
+    'Consuma il nemico con fiamme sacre infliggendo {damage} danni Sacri piu una bruciatura per 8 s.',
   'entities.abilities.lightning_bolt.name': 'Dardo Fulminante',
   'entities.abilities.lightning_bolt.description':
     'Scaglia un fulmine per {damage} danni da Natura.',
@@ -1900,6 +1906,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Imbeve la tua arma con la furia della pietra: ogni colpo infligge 5 danni aggiuntivi per 5 min.',
   'entities.abilities.healing_wave.name': 'Ondata di Cura',
   'entities.abilities.healing_wave.description': 'Cura un bersaglio alleato di {damage}.',
+  'entities.abilities.lesser_healing_wave.name': 'Ondata di Cura Inferiore',
+  'entities.abilities.lesser_healing_wave.description':
+    'Una rapida ondata d acqua che cura un bersaglio alleato di {damage}.',
   'entities.abilities.earth_shock.name': 'Folgore della Terra',
   'entities.abilities.earth_shock.description':
     'Scuote istantaneamente il bersaglio con forza dirompente per {damage} danni da Natura.',

@@ -1853,6 +1853,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': 'マインドブラスト',
   'entities.abilities.mind_blast.description':
     '対象の精神を打ち、{damage} の暗黒ダメージを与えます。',
+  'entities.abilities.inner_fire.name': 'インナーファイア',
+  'entities.abilities.inner_fire.description': '聖なる力が30分間、防御力を25上昇させます。',
   'entities.abilities.heal.name': 'ヒール',
   'entities.abilities.heal.description':
     '遅いが強力な祈りで、味方対象の体力を {damage} 回復します。',
@@ -1861,6 +1863,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '暗黒エネルギーで対象の精神を攻撃し、3秒間、毎秒{damage}ダメージを与えます。',
   'entities.abilities.flash_heal.name': 'フラッシュヒール',
   'entities.abilities.flash_heal.description': '素早い祈りで味方対象の体力を {damage} 回復します。',
+  'entities.abilities.holy_fire.name': 'ホーリーファイア',
+  'entities.abilities.holy_fire.description':
+    '敵を聖なる炎で包み、{damage} の神聖ダメージを与え、8秒間燃やします。',
   'entities.abilities.lightning_bolt.name': 'ライトニングボルト',
   'entities.abilities.lightning_bolt.description':
     '稲妻の矢を放ち、{damage} の自然ダメージを与えます。',
@@ -1869,6 +1874,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '石の怒りを武器に込めます。5分間、各スイングが5の追加ダメージを与えます。',
   'entities.abilities.healing_wave.name': 'ヒーリングウェーブ',
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
+  'entities.abilities.lesser_healing_wave.name': '下級ヒーリングウェーブ',
+  'entities.abilities.lesser_healing_wave.description':
+    '素早い水の波で味方対象の体力を {damage} 回復します。',
   'entities.abilities.earth_shock.name': 'アースショック',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',

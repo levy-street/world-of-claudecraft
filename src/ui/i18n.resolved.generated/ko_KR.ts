@@ -4028,6 +4028,10 @@ export const ko_KR: EnTranslations = {
         "name": "정신의 일격",
         "description": "대상의 정신을 강타해 {damage}의 암흑 피해를 입힙니다."
       },
+      "inner_fire": {
+        "name": "내면의 열정",
+        "description": "성스러운 기운이 30분 동안 방어도를 25만큼 증가시킵니다."
+      },
       "heal": {
         "name": "치유",
         "description": "느리지만 강력한 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
@@ -4040,6 +4044,10 @@ export const ko_KR: EnTranslations = {
         "name": "순간 치유",
         "description": "빠른 기도로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
+      "holy_fire": {
+        "name": "신성한 불꽃",
+        "description": "적을 신성한 불꽃으로 태워 {damage}의 신성 피해를 주고 8초 동안 불태웁니다."
+      },
       "lightning_bolt": {
         "name": "번개 화살",
         "description": "번개 화살을 던져 {damage}의 자연 피해를 입힙니다."
@@ -4051,6 +4059,10 @@ export const ko_KR: EnTranslations = {
       "healing_wave": {
         "name": "치유의 물결",
         "description": "아군 대상의 생명력을 {damage}만큼 회복시킵니다."
+      },
+      "lesser_healing_wave": {
+        "name": "하급 치유의 물결",
+        "description": "빠른 물의 파동으로 아군 대상의 생명력을 {damage}만큼 회복시킵니다."
       },
       "earth_shock": {
         "name": "대지 충격",

@@ -4028,6 +4028,10 @@ export const es_ES: EnTranslations = {
         "name": "Explosión mental",
         "description": "Ataca la mente del objetivo por {damage} de daño de las Sombras."
       },
+      "inner_fire": {
+        "name": "Fuego interno",
+        "description": "Una explosion de energia sagrada aumenta tu armadura en 25 durante 30 min."
+      },
       "heal": {
         "name": "Sanar",
         "description": "Una plegaria lenta pero poderosa que sana a un objetivo amistoso por {damage}."
@@ -4040,6 +4044,10 @@ export const es_ES: EnTranslations = {
         "name": "Sanación relámpago",
         "description": "Una plegaria rápida que sana a un objetivo amistoso por {damage}."
       },
+      "holy_fire": {
+        "name": "Fuego Sagrado",
+        "description": "Consume al enemigo en fuego sagrado e inflige {damage} de dano Sagrado mas una quemadura durante 8 s."
+      },
       "lightning_bolt": {
         "name": "Relámpago",
         "description": "Lanza un rayo que inflige {damage} de daño de Naturaleza."
@@ -4051,6 +4059,10 @@ export const es_ES: EnTranslations = {
       "healing_wave": {
         "name": "Ola de sanación",
         "description": "Sana a un objetivo amistoso por {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Ola de sanacion inferior",
+        "description": "Una rapida oleada de agua que sana a un objetivo amistoso por {damage}."
       },
       "earth_shock": {
         "name": "Choque de tierra",

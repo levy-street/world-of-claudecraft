@@ -4028,6 +4028,10 @@ export const zh_TW: EnTranslations = {
         "name": "心靈震爆",
         "description": "震擊目標的心靈，造成 {damage} 點暗影傷害。"
       },
+      "inner_fire": {
+        "name": "心靈之火",
+        "description": "一股神聖能量使你的護甲提高 25，持續 30 分鐘。"
+      },
       "heal": {
         "name": "治療術",
         "description": "緩慢但強大的祈禱，為一個友方目標恢復 {damage} 點生命值。"
@@ -4040,6 +4044,10 @@ export const zh_TW: EnTranslations = {
         "name": "快速治療",
         "description": "快速祈禱，為一個友方目標恢復 {damage} 點生命值。"
       },
+      "holy_fire": {
+        "name": "神聖之火",
+        "description": "以神聖火焰吞噬敵人，造成 {damage} 點神聖傷害，並在 8 秒內持續灼燒。"
+      },
       "lightning_bolt": {
         "name": "閃電箭",
         "description": "投擲一道閃電，造成 {damage} 點自然傷害。"
@@ -4051,6 +4059,10 @@ export const zh_TW: EnTranslations = {
       "healing_wave": {
         "name": "治療波",
         "description": "為一個友方目標恢復 {damage} 點生命值。"
+      },
+      "lesser_healing_wave": {
+        "name": "次級治療波",
+        "description": "一股迅捷的水流，為友方目標恢復 {damage} 點生命值。"
       },
       "earth_shock": {
         "name": "地震術",

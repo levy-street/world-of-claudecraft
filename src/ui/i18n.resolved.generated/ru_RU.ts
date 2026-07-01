@@ -4028,6 +4028,10 @@ export const ru_RU: EnTranslations = {
         "name": "Взрыв разума",
         "description": "Поражает разум цели на {damage} ед. урона от темной магии."
       },
+      "inner_fire": {
+        "name": "Внутренний огонь",
+        "description": "Всплеск священной энергии повышает вашу броню на 25 на 30 мин."
+      },
       "heal": {
         "name": "Исцеление",
         "description": "Медленная, но мощная молитва, исцеляющая дружественную цель на {damage}."
@@ -4040,6 +4044,10 @@ export const ru_RU: EnTranslations = {
         "name": "Быстрое исцеление",
         "description": "Быстрая молитва, исцеляющая дружественную цель на {damage}."
       },
+      "holy_fire": {
+        "name": "Священный огонь",
+        "description": "Охватывает врага священным пламенем, нанося {damage} ед. урона от Света и ожог на 8 сек."
+      },
       "lightning_bolt": {
         "name": "Молния",
         "description": "Метает разряд молнии, нанося {damage} ед. урона от сил природы."
@@ -4051,6 +4059,10 @@ export const ru_RU: EnTranslations = {
       "healing_wave": {
         "name": "Волна исцеления",
         "description": "Исцеляет дружественную цель на {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Малая волна исцеления",
+        "description": "Быстрая волна воды исцеляет дружественную цель на {damage}."
       },
       "earth_shock": {
         "name": "Земной шок",

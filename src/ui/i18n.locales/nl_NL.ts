@@ -539,6 +539,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Leven Aftappen',
   'entities.abilities.earth_shock.description':
     'Schokt het doelwit ogenblikkelijk met verpletterende kracht voor {damage} Natuurschade.',
+  'entities.abilities.lesser_healing_wave.name': 'Kleine Genezingsgolf',
+  'entities.abilities.lesser_healing_wave.description':
+    'Een snelle golf water die een vriendelijk doelwit voor {damage} geneest.',
   'entities.abilities.earth_shock.name': 'Aardschok',
   'entities.abilities.enrage.description':
     'Genereert ogenblikkelijk 20 woede. Alleen in Berengedaante.',
@@ -620,6 +623,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Kniepees',
   'entities.abilities.heal.description':
     'Een traag maar krachtig gebed dat een bevriend doelwit voor {damage} geneest.',
+  'entities.abilities.inner_fire.name': 'Innerlijk Vuur',
+  'entities.abilities.inner_fire.description':
+    'Een uitbarsting van heilige energie verhoogt je pantser met 25 gedurende 30 min.',
   'entities.abilities.heal.name': 'Genezing',
   'entities.abilities.healing_touch.description': 'Geneest een bevriend doelwit voor {damage}.',
   'entities.abilities.healing_touch.name': 'Genezende Aanraking',
@@ -660,6 +666,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.life_tap.name': 'Levenstap',
   'entities.abilities.lightning_bolt.description':
     'Werpt een bliksemschicht voor {damage} Natuurschade.',
+  'entities.abilities.holy_fire.name': 'Heilig Vuur',
+  'entities.abilities.holy_fire.description':
+    'Verteert de vijand in heilig vuur voor {damage} Heilige schade plus een brandwond gedurende 8 sec.',
   'entities.abilities.lightning_bolt.name': 'Bliksemschicht',
   'entities.abilities.lightning_shield.description':
     'Omringt je met knetterende bliksem: aanvallers van dichtbij lijden 13 Natuurschade.',

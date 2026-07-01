@@ -529,6 +529,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Dræn Liv',
   'entities.abilities.earth_shock.description':
     'Chokerer øjeblikkeligt målet med rystende kraft for {damage} naturskade.',
+  'entities.abilities.lesser_healing_wave.name': 'Mindre helbredende bolge',
+  'entities.abilities.lesser_healing_wave.description':
+    'En hurtig bolge vand, der helbreder et venligt mal for {damage}.',
   'entities.abilities.earth_shock.name': 'Jordchok',
   'entities.abilities.enrage.description': 'Skaber 20 raseri øjeblikkeligt. Kun i Bjørneform.',
   'entities.abilities.enrage.name': 'Forbittrelse',
@@ -607,6 +610,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Haseskær',
   'entities.abilities.heal.description':
     'En langsom, men kraftfuld bøn, der helbreder et venligt mål for {damage}.',
+  'entities.abilities.inner_fire.name': 'Indre ild',
+  'entities.abilities.inner_fire.description':
+    'Et udbrud af hellig energi oger din rustning med 25 i 30 min.',
   'entities.abilities.heal.name': 'Helbredelse',
   'entities.abilities.healing_touch.description': 'Helbreder et venligt mål for {damage}.',
   'entities.abilities.healing_touch.name': 'Helbredende Berøring',
@@ -646,6 +652,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.life_tap.description': 'Omdanner 30 helbred til 30 mana.',
   'entities.abilities.life_tap.name': 'Livstapning',
   'entities.abilities.lightning_bolt.description': 'Slynger et lyn for {damage} naturskade.',
+  'entities.abilities.holy_fire.name': 'Hellig ild',
+  'entities.abilities.holy_fire.description':
+    'Fortaerer fjenden i hellig ild for {damage} hellig skade plus en forbraending i 8 sek.',
   'entities.abilities.lightning_bolt.name': 'Lynnedslag',
   'entities.abilities.lightning_shield.description':
     'Omgiver dig med knitrende lyn: nærkampsangribere tager 13 naturskade.',

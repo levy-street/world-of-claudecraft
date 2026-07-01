@@ -531,6 +531,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Wyssanie życia',
   'entities.abilities.earth_shock.description':
     'Natychmiast razi cel wstrząsową siłą, zadając {damage} obrażeń od natury.',
+  'entities.abilities.lesser_healing_wave.name': 'Pomniejsza fala leczenia',
+  'entities.abilities.lesser_healing_wave.description':
+    'Szybka fala wody leczy przyjazny cel o {damage}.',
   'entities.abilities.earth_shock.name': 'Wstrząs ziemi',
   'entities.abilities.enrage.description':
     'Natychmiast generuje 20 wściekłości. Tylko w postaci niedźwiedzia.',
@@ -611,6 +614,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Podcięcie ścięgien',
   'entities.abilities.heal.description':
     'Powolna, lecz potężna modlitwa, która leczy sprzymierzony cel o {damage}.',
+  'entities.abilities.inner_fire.name': 'Wewnetrzny ogien',
+  'entities.abilities.inner_fire.description':
+    'Wybuch swietej energii zwieksza twoj pancerz o 25 na 30 min.',
   'entities.abilities.heal.name': 'Leczenie',
   'entities.abilities.healing_touch.description': 'Leczy sprzymierzony cel o {damage}.',
   'entities.abilities.healing_touch.name': 'Uzdrawiający dotyk',
@@ -651,6 +657,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.life_tap.name': 'Pobór życia',
   'entities.abilities.lightning_bolt.description':
     'Ciska piorunem, zadając {damage} obrażeń od natury.',
+  'entities.abilities.holy_fire.name': 'Swiety ogien',
+  'entities.abilities.holy_fire.description':
+    'Pochlania wroga swietym ogniem, zadajac {damage} obrazen od Swietosci oraz podpalenie przez 8 sek.',
   'entities.abilities.lightning_bolt.name': 'Błyskawica',
   'entities.abilities.lightning_shield.description':
     'Otacza cię trzaskająca błyskawica: napastnicy w zwarciu otrzymują 13 obrażeń od natury.',

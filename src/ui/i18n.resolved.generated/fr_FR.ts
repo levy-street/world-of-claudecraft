@@ -4028,6 +4028,10 @@ export const fr_FR: EnTranslations = {
         "name": "Attaque mentale",
         "description": "Frappe l'esprit de la cible pour {damage} points de dégâts d'Ombre."
       },
+      "inner_fire": {
+        "name": "Feu interieur",
+        "description": "Une poussee d energie sacree augmente votre armure de 25 pendant 30 min."
+      },
       "heal": {
         "name": "Soins",
         "description": "Une prière lente mais puissante qui rend {damage} points de vie à une cible alliée."
@@ -4040,6 +4044,10 @@ export const fr_FR: EnTranslations = {
         "name": "Soins rapides",
         "description": "Une prière rapide qui rend {damage} points de vie à une cible alliée."
       },
+      "holy_fire": {
+        "name": "Feu sacre",
+        "description": "Consume l ennemi dans une flamme sacree et inflige {damage} points de degats Sacres plus une brulure pendant 8 s."
+      },
       "lightning_bolt": {
         "name": "Éclair",
         "description": "Lance un éclair qui inflige {damage} points de dégâts de Nature."
@@ -4051,6 +4059,10 @@ export const fr_FR: EnTranslations = {
       "healing_wave": {
         "name": "Vague de soins",
         "description": "Rend {damage} points de vie à une cible alliée."
+      },
+      "lesser_healing_wave": {
+        "name": "Vague de soins inferieure",
+        "description": "Une vague d eau rapide rend {damage} points de vie a une cible alliee."
       },
       "earth_shock": {
         "name": "Horion de terre",

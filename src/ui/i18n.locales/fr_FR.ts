@@ -1907,6 +1907,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_blast.name': 'Attaque mentale',
   'entities.abilities.mind_blast.description':
     "Frappe l'esprit de la cible pour {damage} points de dégâts d'Ombre.",
+  'entities.abilities.inner_fire.name': 'Feu interieur',
+  'entities.abilities.inner_fire.description':
+    'Une poussee d energie sacree augmente votre armure de 25 pendant 30 min.',
   'entities.abilities.heal.name': 'Soins',
   'entities.abilities.heal.description':
     'Une prière lente mais puissante qui rend {damage} points de vie à une cible alliée.',
@@ -1916,6 +1919,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.flash_heal.name': 'Soins rapides',
   'entities.abilities.flash_heal.description':
     'Une prière rapide qui rend {damage} points de vie à une cible alliée.',
+  'entities.abilities.holy_fire.name': 'Feu sacre',
+  'entities.abilities.holy_fire.description':
+    'Consume l ennemi dans une flamme sacree et inflige {damage} points de degats Sacres plus une brulure pendant 8 s.',
   'entities.abilities.lightning_bolt.name': 'Éclair',
   'entities.abilities.lightning_bolt.description':
     'Lance un éclair qui inflige {damage} points de dégâts de Nature.',
@@ -1924,6 +1930,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Imprègne votre arme de la fureur de la pierre: chaque frappe inflige 5 points de dégâts supplémentaires pendant 5 min.',
   'entities.abilities.healing_wave.name': 'Vague de soins',
   'entities.abilities.healing_wave.description': 'Rend {damage} points de vie à une cible alliée.',
+  'entities.abilities.lesser_healing_wave.name': 'Vague de soins inferieure',
+  'entities.abilities.lesser_healing_wave.description':
+    'Une vague d eau rapide rend {damage} points de vie a une cible alliee.',
   'entities.abilities.earth_shock.name': 'Horion de terre',
   'entities.abilities.earth_shock.description':
     'Secoue instantanément la cible avec une force brutale pour {damage} points de dégâts de Nature.',

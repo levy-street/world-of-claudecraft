@@ -4028,6 +4028,10 @@ export const vi_VN: EnTranslations = {
         "name": "Nổ Tâm Trí",
         "description": "Nổ tung tâm trí của mục tiêu gây {damage} sát thương Bóng Tối."
       },
+      "inner_fire": {
+        "name": "Lua Noi Tam",
+        "description": "Mot dot nang luong than thanh tang giap cua ban them 25 trong 30 phut."
+      },
       "heal": {
         "name": "Trị Liệu",
         "description": "Một lời cầu nguyện chậm nhưng mạnh mẽ trị liệu cho đồng minh {damage} máu."
@@ -4040,6 +4044,10 @@ export const vi_VN: EnTranslations = {
         "name": "Trị Liệu Nhanh",
         "description": "Một lời cầu nguyện nhanh trị liệu cho đồng minh {damage} máu."
       },
+      "holy_fire": {
+        "name": "Lua Thanh",
+        "description": "Thieu dot ke dich bang lua thanh, gay {damage} sat thuong Thanh va dot chay trong 8 giay."
+      },
       "lightning_bolt": {
         "name": "Tia Sét",
         "description": "Phóng ra một tia sét gây {damage} sát thương Tự Nhiên."
@@ -4051,6 +4059,10 @@ export const vi_VN: EnTranslations = {
       "healing_wave": {
         "name": "Sóng Trị Liệu",
         "description": "Trị liệu cho đồng minh {damage} máu."
+      },
+      "lesser_healing_wave": {
+        "name": "Song Tri Lieu Nho",
+        "description": "Mot lan song nuoc nhanh hoi mau cho muc tieu dong minh {damage}."
       },
       "earth_shock": {
         "name": "Chấn Địa",

@@ -530,6 +530,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Dränera liv',
   'entities.abilities.earth_shock.description':
     'Chockar omedelbart målet med dånande kraft för {damage} naturskada.',
+  'entities.abilities.lesser_healing_wave.name': 'Mindre helande vag',
+  'entities.abilities.lesser_healing_wave.description':
+    'En snabb vattenvag som helar ett vanligt mal for {damage}.',
   'entities.abilities.earth_shock.name': 'Jordchock',
   'entities.abilities.enrage.description': 'Genererar omedelbart 20 raseri. Endast i björnform.',
   'entities.abilities.enrage.name': 'Ursinne',
@@ -609,6 +612,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Hälsenehugg',
   'entities.abilities.heal.description':
     'En långsam men kraftfull bön som läker ett vänligt mål för {damage}.',
+  'entities.abilities.inner_fire.name': 'Inre eld',
+  'entities.abilities.inner_fire.description':
+    'En stot av helig energi okar din rustning med 25 i 30 min.',
   'entities.abilities.heal.name': 'Läka',
   'entities.abilities.healing_touch.description': 'Läker ett vänligt mål för {damage}.',
   'entities.abilities.healing_touch.name': 'Läkande beröring',
@@ -648,6 +654,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.life_tap.description': 'Omvandlar 30 hälsa till 30 mana.',
   'entities.abilities.life_tap.name': 'Livstappning',
   'entities.abilities.lightning_bolt.description': 'Slungar en blixt för {damage} naturskada.',
+  'entities.abilities.holy_fire.name': 'Helig eld',
+  'entities.abilities.holy_fire.description':
+    'Fortar fienden i helig eld for {damage} helig skada plus en brannskada under 8 sek.',
   'entities.abilities.lightning_bolt.name': 'Blixt',
   'entities.abilities.lightning_shield.description':
     'Omger dig med knastrande blixtar: närstridsanfallare tar 13 naturskada.',

@@ -4028,6 +4028,10 @@ export const pl_PL: EnTranslations = {
         "name": "Atak umysłu",
         "description": "Razi umysł celu, zadając {damage} obrażeń od cienia."
       },
+      "inner_fire": {
+        "name": "Wewnetrzny ogien",
+        "description": "Wybuch swietej energii zwieksza twoj pancerz o 25 na 30 min."
+      },
       "heal": {
         "name": "Leczenie",
         "description": "Powolna, lecz potężna modlitwa, która leczy sprzymierzony cel o {damage}."
@@ -4040,6 +4044,10 @@ export const pl_PL: EnTranslations = {
         "name": "Błyskawiczne leczenie",
         "description": "Szybka modlitwa, która leczy sprzymierzony cel o {damage}."
       },
+      "holy_fire": {
+        "name": "Swiety ogien",
+        "description": "Pochlania wroga swietym ogniem, zadajac {damage} obrazen od Swietosci oraz podpalenie przez 8 sek."
+      },
       "lightning_bolt": {
         "name": "Błyskawica",
         "description": "Ciska piorunem, zadając {damage} obrażeń od natury."
@@ -4051,6 +4059,10 @@ export const pl_PL: EnTranslations = {
       "healing_wave": {
         "name": "Fala uzdrowienia",
         "description": "Leczy sprzymierzony cel o {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Pomniejsza fala leczenia",
+        "description": "Szybka fala wody leczy przyjazny cel o {damage}."
       },
       "earth_shock": {
         "name": "Wstrząs ziemi",

@@ -534,6 +534,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.name': 'Hút Sinh Lực',
   'entities.abilities.earth_shock.description':
     'Lập tức giáng chấn động vào mục tiêu, gây {damage} sát thương Tự Nhiên.',
+  'entities.abilities.lesser_healing_wave.name': 'Song Tri Lieu Nho',
+  'entities.abilities.lesser_healing_wave.description':
+    'Mot lan song nuoc nhanh hoi mau cho muc tieu dong minh {damage}.',
   'entities.abilities.earth_shock.name': 'Chấn Địa',
   'entities.abilities.enrage.description': 'Lập tức tạo ra 20 nộ khí. Chỉ dùng được ở Hình Gấu.',
   'entities.abilities.enrage.name': 'Phẫn Nộ',
@@ -614,6 +617,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hamstring.name': 'Cắt Gân',
   'entities.abilities.heal.description':
     'Một lời cầu nguyện chậm nhưng mạnh mẽ trị liệu cho đồng minh {damage} máu.',
+  'entities.abilities.inner_fire.name': 'Lua Noi Tam',
+  'entities.abilities.inner_fire.description':
+    'Mot dot nang luong than thanh tang giap cua ban them 25 trong 30 phut.',
   'entities.abilities.heal.name': 'Trị Liệu',
   'entities.abilities.healing_touch.description': 'Trị liệu cho đồng minh {damage} máu.',
   'entities.abilities.healing_touch.name': 'Bàn Tay Trị Liệu',
@@ -654,6 +660,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.life_tap.name': 'Trích Sinh Lực',
   'entities.abilities.lightning_bolt.description':
     'Phóng ra một tia sét gây {damage} sát thương Tự Nhiên.',
+  'entities.abilities.holy_fire.name': 'Lua Thanh',
+  'entities.abilities.holy_fire.description':
+    'Thieu dot ke dich bang lua thanh, gay {damage} sat thuong Thanh va dot chay trong 8 giay.',
   'entities.abilities.lightning_bolt.name': 'Tia Sét',
   'entities.abilities.lightning_shield.description':
     'Bao quanh bạn bằng sét lốp bốp: kẻ tấn công cận chiến nhận 13 sát thương Tự Nhiên.',

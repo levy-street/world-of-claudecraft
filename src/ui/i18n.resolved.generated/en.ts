@@ -4028,6 +4028,10 @@ export const en: EnTranslations = {
         "name": "Mind Blast",
         "description": "Blasts the target's mind for {damage} Shadow damage."
       },
+      "inner_fire": {
+        "name": "Inner Fire",
+        "description": "A burst of holy energy increases your armor by 25 for 30 min."
+      },
       "heal": {
         "name": "Heal",
         "description": "A slow but powerful prayer that heals a friendly target for {damage}."
@@ -4040,6 +4044,10 @@ export const en: EnTranslations = {
         "name": "Flash Heal",
         "description": "A fast prayer that heals a friendly target for {damage}."
       },
+      "holy_fire": {
+        "name": "Holy Fire",
+        "description": "Consumes the enemy in holy flame for {damage} Holy damage plus a burn over 8 sec."
+      },
       "lightning_bolt": {
         "name": "Lightning Bolt",
         "description": "Hurls a bolt of lightning for {damage} Nature damage."
@@ -4051,6 +4059,10 @@ export const en: EnTranslations = {
       "healing_wave": {
         "name": "Healing Wave",
         "description": "Heals a friendly target for {damage}."
+      },
+      "lesser_healing_wave": {
+        "name": "Lesser Healing Wave",
+        "description": "A quick surge of water that heals a friendly target for {damage}."
       },
       "earth_shock": {
         "name": "Earth Shock",
