@@ -270,6 +270,15 @@ export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
 export type ArmorType = 'cloth' | 'leather' | 'mail';
 
+export type FoodBuffKind = 'buff_sta' | 'buff_agi' | 'buff_int' | 'buff_spi' | 'buff_ap';
+
+export interface FoodBuffDef {
+  aura: string;
+  kind: FoodBuffKind;
+  value: number;
+  duration: number;
+}
+
 type ItemKind =
   | 'weapon'
   | 'armor'
@@ -305,6 +314,7 @@ interface BaseItemDef {
   // consumables: total restored over 18 seconds while sitting
   foodHp?: number;
   drinkMana?: number;
+  foodBuff?: FoodBuffDef;
   // potions: restored instantly, usable in combat, share a cooldown (#103)
   potionHp?: number;
   potionMana?: number;

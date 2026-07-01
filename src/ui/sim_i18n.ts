@@ -122,6 +122,7 @@ const baseEnTable = {
   'aura.tamed': 'Tamed',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
+  'aura.wellFed': 'Well Fed',
   'mechanic.warStomp': 'War Stomp',
   'mechanic.boneCarapace': 'Bone Carapace',
   'mechanic.bansheesWail': "Banshee's Wail",
@@ -315,6 +316,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Tamed',
     'aura.causticSpores': 'Caustic Spores',
     'aura.elixirBear': 'Might of the Bear',
+    'aura.wellFed': 'Well Fed',
     'mechanic.warStomp': 'War Stomp',
     'mechanic.boneCarapace': 'Bone Carapace',
     'mechanic.bansheesWail': "Banshee's Wail",
@@ -498,6 +500,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Domado',
     'aura.causticSpores': 'Esporas Cáusticas',
     'aura.elixirBear': 'Poder del Oso',
+    'aura.wellFed': 'Bien alimentado',
   },
   es_ES: {
     'log.learnedAbility': 'Has aprendido una nueva habilidad: {name}.',
@@ -639,6 +642,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Domado',
     'aura.causticSpores': 'Esporas Cáusticas',
     'aura.elixirBear': 'Poder del Oso',
+    'aura.wellFed': 'Bien alimentado',
   },
   fr_FR: {
     'log.learnedAbility': 'Vous avez appris une nouvelle technique : {name}.',
@@ -782,6 +786,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Apprivoisé',
     'aura.causticSpores': 'Spores Caustiques',
     'aura.elixirBear': "Puissance de l'Ours",
+    'aura.wellFed': 'Bien nourri',
   },
   fr_CA: {
     'log.learnedAbility': 'Vous avez appris une nouvelle technique : {name}.',
@@ -926,6 +931,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Apprivoisé',
     'aura.causticSpores': 'Spores Caustiques',
     'aura.elixirBear': "Puissance de l'Ours",
+    'aura.wellFed': 'Bien nourri',
   },
   en_CA: {
     'log.learnedAbility': 'You have learned a new ability: {name}.',
@@ -1066,6 +1072,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Tamed',
     'aura.causticSpores': 'Caustic Spores',
     'aura.elixirBear': 'Might of the Bear',
+    'aura.wellFed': 'Well Fed',
   },
   it_IT: {
     'log.learnedAbility': 'Hai imparato una nuova abilità: {name}.',
@@ -1207,6 +1214,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Addomesticato',
     'aura.causticSpores': 'Spore Caustiche',
     'aura.elixirBear': "Potenza dell'Orso",
+    'aura.wellFed': 'Ben nutrito',
   },
   de_DE: {
     'log.learnedAbility': 'Ihr habt eine neue Fähigkeit erlernt: {name}.',
@@ -1349,6 +1357,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Gezähmt',
     'aura.causticSpores': 'Ätzende Sporen',
     'aura.elixirBear': 'Macht des Bären',
+    'aura.wellFed': 'Gut genährt',
   },
   zh_CN: {
     'log.learnedAbility': '你学会了新技能：{name}。',
@@ -1488,6 +1497,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': '已驯服',
     'aura.causticSpores': '腐蚀孢子',
     'aura.elixirBear': '巨熊之力',
+    'aura.wellFed': '饱食',
   },
   zh_TW: {
     'log.learnedAbility': '你學會了新技能：{name}。',
@@ -1627,6 +1637,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': '馴服',
     'aura.causticSpores': '腐蝕孢子',
     'aura.elixirBear': '巨熊之力',
+    'aura.wellFed': '飽食',
   },
   ko_KR: {
     'log.learnedAbility': '새로운 기술을 배웠습니다: {name}.',
@@ -1768,6 +1779,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': '길들여짐',
     'aura.causticSpores': '부식성 포자',
     'aura.elixirBear': '곰의 힘',
+    'aura.wellFed': '충분히 먹음',
   },
   ja_JP: {
     'log.learnedAbility': '新しいアビリティ「{name}」を習得しました。',
@@ -1912,6 +1924,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'テイム',
     'aura.causticSpores': '腐食胞子',
     'aura.elixirBear': '熊の力',
+    'aura.wellFed': '十分に食べた',
   },
   pt_BR: {
     'log.learnedAbility': 'Você aprendeu uma nova habilidade: {name}.',
@@ -2052,6 +2065,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Domado',
     'aura.causticSpores': 'Esporos Cáusticos',
     'aura.elixirBear': 'Força do Urso',
+    'aura.wellFed': 'Bem alimentado',
   },
   ru_RU: {
     'log.learnedAbility': 'Вы изучили новое умение: {name}.',
@@ -2195,6 +2209,7 @@ const BASE_DICT: Record<SupportedLanguage, Record<BaseSimMessageKey, string>> = 
     'aura.tamed': 'Приручён',
     'aura.causticSpores': 'Едкие споры',
     'aura.elixirBear': 'Мощь Медведя',
+    'aura.wellFed': 'Сытый',
   },
   ...BASE_NEW,
 };
@@ -2783,6 +2798,7 @@ function locPetGrowlAutoState(state: string): string {
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Might of the Bear': 'aura.elixirBear',
+  'Well Fed': 'aura.wellFed',
   Summoned: 'aura.summoned',
   Fed: 'aura.fed',
   'Caustic Spores': 'aura.causticSpores',

@@ -28,6 +28,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -90,7 +91,22 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
       p.resource = Math.min(p.maxResource, p.resource + c.manaPer2s);
     }
     c.remaining -= 2;
-    if (c.remaining <= 0) p[slot] = null;
+    if (c.remaining <= 0) {
+      p[slot] = null;
+      const foodBuff = c.kind === 'food' ? ITEMS[c.itemId]?.foodBuff : undefined;
+      if (foodBuff) {
+        ctx.applyAura(p, {
+          id: 'well_fed',
+          name: foodBuff.aura,
+          kind: foodBuff.kind,
+          remaining: foodBuff.duration,
+          duration: foodBuff.duration,
+          value: foodBuff.value,
+          sourceId: p.id,
+          school: 'nature',
+        });
+      }
+    }
   }
 }
 
