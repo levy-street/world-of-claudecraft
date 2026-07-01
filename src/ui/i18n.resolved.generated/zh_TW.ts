@@ -2847,6 +2847,12 @@ export const zh_TW: EnTranslations = {
       "mapCanvasLabel": "地圖",
       "mapSummary": "{zone}的地圖。"
     },
+    "deathRecap": {
+      "title": "誰擊殺了你",
+      "critical": "爆擊",
+      "killingBlow": "致命一擊",
+      "environment": "環境"
+    },
     "options": {
       "gameMenu": "遊戲選單",
       "keyBindings": "按鍵設定",

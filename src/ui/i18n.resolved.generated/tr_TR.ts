@@ -2847,6 +2847,12 @@ export const tr_TR: EnTranslations = {
       "mapCanvasLabel": "Harita",
       "mapSummary": "{zone} haritası."
     },
+    "deathRecap": {
+      "title": "Seni ne öldürdü",
+      "critical": "Kritik",
+      "killingBlow": "Öldürücü darbe",
+      "environment": "Çevre"
+    },
     "options": {
       "gameMenu": "Oyun Menüsü",
       "keyBindings": "Tuş Atamaları",

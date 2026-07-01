@@ -2847,6 +2847,12 @@ export const ru_RU: EnTranslations = {
       "mapCanvasLabel": "Карта",
       "mapSummary": "Карта зоны {zone}."
     },
+    "deathRecap": {
+      "title": "Что вас убило",
+      "critical": "Крит",
+      "killingBlow": "Смертельный удар",
+      "environment": "Окружение"
+    },
     "options": {
       "gameMenu": "Меню игры",
       "keyBindings": "Назначение клавиш",

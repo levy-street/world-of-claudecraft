@@ -185,6 +185,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.queuedOnSwing = null;
   p.combatTimer = 99;
   p.inCombat = false;
+  meta.recentDamageTaken = [];
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }
 
@@ -197,6 +198,7 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   run.deathsThisRun[pid] = deaths;
   if (deaths >= 2) {
     r.e.dead = false;
+    r.meta.recentDamageTaken = [];
     ctx.failDelveRun(run);
     return;
   }
@@ -220,6 +222,7 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.targetId = null;
   p.combatTimer = 99;
   p.inCombat = false;
+  r.meta.recentDamageTaken = [];
   ctx.emit({ type: 'respawn', pid });
 }
 

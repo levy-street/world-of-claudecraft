@@ -2847,6 +2847,12 @@ export const vi_VN: EnTranslations = {
       "mapCanvasLabel": "Bản Đồ",
       "mapSummary": "Bản đồ của {zone}."
     },
+    "deathRecap": {
+      "title": "Điều gì đã hạ gục bạn",
+      "critical": "Chí mạng",
+      "killingBlow": "Đòn kết liễu",
+      "environment": "Môi trường"
+    },
     "options": {
       "gameMenu": "Menu Trò Chơi",
       "keyBindings": "Gán Phím",

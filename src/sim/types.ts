@@ -1572,7 +1572,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'castStart'; entityId: number; ability: string; time: number }
   | { type: 'castStop'; entityId: number; success: boolean }
   | { type: 'comboPoint'; points: number }
-  | { type: 'playerDeath' }
+  | { type: 'playerDeath'; recap: DeathRecapEntry[] }
   | { type: 'respawn' }
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
@@ -1735,6 +1735,17 @@ export interface MoveInput {
   strafeLeft: boolean;
   strafeRight: boolean;
   jump: boolean;
+}
+
+export interface DeathRecapEntry {
+  sourceId: number;
+  sourceName: string;
+  ability: string | null;
+  school: string;
+  amount: number;
+  crit: boolean;
+  at: number;
+  killingBlow?: boolean;
 }
 
 export interface SimConfig {

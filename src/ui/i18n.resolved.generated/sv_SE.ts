@@ -2847,6 +2847,12 @@ export const sv_SE: EnTranslations = {
       "mapCanvasLabel": "Karta",
       "mapSummary": "Karta över {zone}."
     },
+    "deathRecap": {
+      "title": "Vad som dödade dig",
+      "critical": "Krit",
+      "killingBlow": "Dödande slag",
+      "environment": "Omgivning"
+    },
     "options": {
       "gameMenu": "Spelmeny",
       "keyBindings": "Tangentbindningar",

@@ -9,10 +9,15 @@ import { describe, expect, it } from 'vitest';
 import { dealDamage, grantXp, handleDeath } from '../src/sim/combat/damage';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
+import type { Aura, Entity, SimEvent } from '../src/sim/types';
 
 type AnyEntity = Entity & Record<string, any>;
+type PlayerDeathEvent = SimEvent & { type: 'playerDeath' };
+
+function isPlayerDeathEvent(event: SimEvent): event is PlayerDeathEvent {
+  return event.type === 'playerDeath';
+}
 
 function makeSim(seed = 4242): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -104,6 +109,49 @@ describe('combat/damage dealDamage (post-mitigation)', () => {
     ).toBe(true);
   });
 
+  it('emits a capped player death recap and clears it on release', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    const meta = sim.players.get(p.id) as PlayerMeta;
+    const wolf = spawnHostileMob(sim, 'forest_wolf', 5);
+    p.maxHp = 80;
+    p.hp = 80;
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, wolf, p, 5, false, 'physical', 'Claw 1', 'hit');
+    dealDamage(sim.ctx, wolf, p, 0, false, 'physical', 'Glance', 'hit');
+    dealDamage(sim.ctx, wolf, p, 0, false, 'physical', 'Miss', 'miss');
+    dealDamage(sim.ctx, wolf, p, 6, false, 'physical', 'Claw 2', 'hit');
+    dealDamage(sim.ctx, wolf, p, 7, false, 'physical', 'Claw 3', 'hit');
+    dealDamage(sim.ctx, wolf, p, 8, false, 'physical', 'Claw 4', 'hit');
+    dealDamage(sim.ctx, wolf, p, 9, false, 'physical', 'Claw 5', 'hit');
+    dealDamage(sim.ctx, wolf, p, 50, true, 'shadow', 'Finisher', 'hit');
+
+    const death = sim.drainEvents().find(isPlayerDeathEvent);
+    expect(death).toBeTruthy();
+    if (!death) throw new Error('expected playerDeath event');
+    expect(death.recap.map((entry) => entry.amount)).toEqual([6, 7, 8, 9, 50]);
+    expect(death.recap.map((entry) => entry.ability)).toEqual([
+      'Claw 2',
+      'Claw 3',
+      'Claw 4',
+      'Claw 5',
+      'Finisher',
+    ]);
+    expect(death.recap.at(-1)).toMatchObject({
+      sourceId: wolf.id,
+      sourceName: wolf.name,
+      ability: 'Finisher',
+      school: 'shadow',
+      crit: true,
+      killingBlow: true,
+    });
+    expect(meta.recentDamageTaken).toHaveLength(5);
+
+    sim.releaseSpirit();
+
+    expect(meta.recentDamageTaken).toEqual([]);
+  });
   it('drives the only in-slice rng draw via maybeFrenzyOnHit (frenzyOnHit mob gains blood_frenzy)', () => {
     const sim = makeSim();
     sim.setPlayerLevel(12);
@@ -128,7 +176,7 @@ describe('combat/damage grantXp', () => {
     const sim = makeSim();
     sim.setPlayerLevel(1);
     const p = sim.player as AnyEntity;
-    const meta = sim.players.get(p.id) as any;
+    const meta = sim.players.get(p.id) as PlayerMeta;
     const beforeLevel = p.level;
     const beforeLifetime = meta.lifetimeXp;
 
@@ -142,7 +190,7 @@ describe('combat/damage grantXp', () => {
     const sim = makeSim();
     sim.setPlayerLevel(5);
     const p = sim.player as AnyEntity;
-    const meta = sim.players.get(p.id) as any;
+    const meta = sim.players.get(p.id) as PlayerMeta;
     const before = meta.lifetimeXp;
     grantXp(sim.ctx, 0, meta);
     expect(meta.lifetimeXp).toBe(before);
@@ -154,7 +202,7 @@ describe('combat/damage handleDeath', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);
     const p = sim.player as AnyEntity;
-    const meta = sim.players.get(p.id) as any;
+    const meta = sim.players.get(p.id) as PlayerMeta;
     const mob = spawnHostileMob(sim, 'forest_wolf', 5);
     mob.tappedById = p.id;
     mob.auras.push({

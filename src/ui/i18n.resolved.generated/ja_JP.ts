@@ -2847,6 +2847,12 @@ export const ja_JP: EnTranslations = {
       "mapCanvasLabel": "マップ",
       "mapSummary": "{zone}のマップ。"
     },
+    "deathRecap": {
+      "title": "何に倒されたか",
+      "critical": "クリティカル",
+      "killingBlow": "とどめ",
+      "environment": "環境"
+    },
     "options": {
       "gameMenu": "ゲームメニュー",
       "keyBindings": "キー設定",

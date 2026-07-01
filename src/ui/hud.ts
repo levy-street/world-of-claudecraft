@@ -66,6 +66,7 @@ import { PICK_ACTIONS } from '../sim/lockpick';
 import type { ResolvedAbility } from '../sim/sim';
 import type {
   AbilityDef,
+  DeathRecapEntry,
   EquipSlot,
   InvSlot,
   LootRollChoice,
@@ -774,6 +775,8 @@ export class Hud {
   private swingFillEl = this.swingbarEl.querySelector('.fill') as HTMLElement;
   private swingLabelEl = this.swingbarEl.querySelector('.label') as HTMLElement;
   private deathOverlayEl = $('#death-overlay');
+  private deathRecapEl = $('#death-recap');
+  private deathRecapListEl = $('#death-recap-list');
   private releaseSpiritBtnEl = $('#release-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
@@ -6680,11 +6683,13 @@ export class Hud {
           break;
         }
         case 'playerDeath': {
+          this.renderDeathRecap(ev.recap);
           this.log(t('hud.system.playerDeath'), '#ff4444');
           audio.death();
           break;
         }
         case 'respawn':
+          this.clearDeathRecap();
           this.log(t('hud.system.respawn'), '#7fdc4f');
           break;
         case 'castStart':
@@ -6712,6 +6717,50 @@ export class Hud {
     }
   }
 
+  private clearDeathRecap(): void {
+    this.deathRecapEl.hidden = true;
+    this.deathRecapListEl.replaceChildren();
+  }
+
+  private renderDeathRecap(recap: DeathRecapEntry[]): void {
+    this.deathRecapListEl.replaceChildren();
+    if (recap.length === 0) {
+      this.deathRecapEl.hidden = true;
+      return;
+    }
+
+    for (const entry of [...recap].reverse()) {
+      const row = document.createElement('div');
+      row.className = `death-recap-row${entry.killingBlow ? ' killing-blow' : ''}`;
+
+      const main = document.createElement('div');
+      main.className = 'death-recap-main';
+      const source = entry.sourceId >= 0 ? this.sim.entities.get(entry.sourceId) : null;
+      const sourceName = source
+        ? entityDisplayName(source)
+        : entry.sourceName || t('hud.deathRecap.environment');
+      main.textContent = `${sourceName} - ${combatAbilityName(entry.ability)}`;
+
+      const amount = document.createElement('div');
+      amount.className = 'death-recap-amount';
+      amount.textContent = formatNumber(entry.amount, { maximumFractionDigits: 0 });
+
+      const tags = [
+        entry.crit ? t('hud.deathRecap.critical') : '',
+        entry.killingBlow ? t('hud.deathRecap.killingBlow') : '',
+      ].filter(Boolean);
+      if (tags.length > 0) {
+        const tagEl = document.createElement('span');
+        tagEl.className = 'death-recap-tags';
+        tagEl.textContent = tags.join(' / ');
+        amount.appendChild(tagEl);
+      }
+
+      row.append(main, amount);
+      this.deathRecapListEl.appendChild(row);
+    }
+    this.deathRecapEl.hidden = false;
+  }
   log(text: string, color = '#ccc'): void {
     this.appendLog(this.chatLogEl, text, color, true, 'system');
   }

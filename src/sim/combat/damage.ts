@@ -28,7 +28,7 @@ import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../ent
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
-import type { Entity } from '../types';
+import type { DeathRecapEntry, Entity } from '../types';
 import {
   dist2d,
   FISHING_CAST_ID,
@@ -49,6 +49,40 @@ import {
 const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
+const DEATH_RECAP_LIMIT = 5;
+
+function recordRecentPlayerDamage(
+  ctx: SimContext,
+  source: Entity | null,
+  target: Entity,
+  amount: number,
+  crit: boolean,
+  school: string,
+  ability: string | null,
+  kind: 'hit' | 'miss' | 'dodge',
+  killingBlow: boolean,
+): void {
+  if (target.kind !== 'player' || kind !== 'hit' || amount <= 0) return;
+  const meta = ctx.players.get(target.id);
+  if (!meta) return;
+  if (killingBlow) {
+    for (const entry of meta.recentDamageTaken) entry.killingBlow = false;
+  }
+  const entry: DeathRecapEntry = {
+    sourceId: source?.id ?? -1,
+    sourceName: source?.name ?? 'Environment',
+    ability,
+    school,
+    amount,
+    crit,
+    at: ctx.time,
+    ...(killingBlow ? { killingBlow: true } : {}),
+  };
+  meta.recentDamageTaken.push(entry);
+  if (meta.recentDamageTaken.length > DEATH_RECAP_LIMIT) {
+    meta.recentDamageTaken.splice(0, meta.recentDamageTaken.length - DEATH_RECAP_LIMIT);
+  }
+}
 
 // A handful of casts ignore vanilla spell pushback (e.g. ghost_wolf). Sole user is
 // the dealDamage pushback branch, so the predicate lives here with it.
@@ -171,6 +205,7 @@ export function dealDamage(
     if (target.hp - amount < 1) {
       amount = Math.max(0, target.hp - 1);
       target.hp = 1;
+      recordRecentPlayerDamage(ctx, source, target, amount, crit, school, ability, kind, false);
       ctx.emit({
         type: 'damage',
         sourceId: source?.id ?? -1,
@@ -213,6 +248,7 @@ export function dealDamage(
     if (target.hp - amount <= 0) {
       amount = Math.max(0, target.hp);
       target.hp = 0;
+      recordRecentPlayerDamage(ctx, source, target, amount, crit, school, ability, kind, false);
       ctx.emit({
         type: 'damage',
         sourceId: source?.id ?? -1,
@@ -242,6 +278,7 @@ export function dealDamage(
       amount = Math.max(0, target.hp);
       target.hp = 0;
       match.defeated.add(target.id);
+      recordRecentPlayerDamage(ctx, source, target, amount, crit, school, ability, kind, true);
       ctx.emit({
         type: 'damage',
         sourceId: source?.id ?? -1,
@@ -262,6 +299,17 @@ export function dealDamage(
   }
 
   target.hp = Math.max(0, target.hp - amount);
+  recordRecentPlayerDamage(
+    ctx,
+    source,
+    target,
+    amount,
+    crit,
+    school,
+    ability,
+    kind,
+    target.hp <= 0,
+  );
   ctx.emit({
     type: 'damage',
     sourceId: source?.id ?? -1,
@@ -495,6 +543,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
 
   if (e.kind === 'player') {
     const meta = ctx.players.get(e.id);
+    const recap = meta ? meta.recentDamageTaken.map((entry) => ({ ...entry })) : [];
     if (meta) meta.counters.deaths++;
     e.autoAttack = false;
     e.queuedOnSwing = null;
@@ -505,7 +554,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.chargeTargetId = null;
     e.chargePath = [];
     e.followTargetId = null;
-    ctx.emit({ type: 'playerDeath', pid: e.id });
+    ctx.emit({ type: 'playerDeath', recap, pid: e.id });
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left

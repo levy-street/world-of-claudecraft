@@ -3266,6 +3266,62 @@
     text-shadow: 2px 2px 8px #000;
     font-family: var(--title-font);
   }
+  .death-recap {
+    width: min(420px, calc(100vw - 32px));
+    color: #f0e4d6;
+    background: #11090dcc;
+    border: 1px solid #8e2d2d;
+    border-radius: 6px;
+    box-shadow: 0 6px 22px #0009;
+    padding: 12px 14px;
+  }
+  .death-recap-title {
+    color: #ffb4a8;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .death-recap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .death-recap-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 28px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    background: #271014cc;
+    border: 1px solid #ffffff14;
+  }
+  .death-recap-row.killing-blow {
+    border-color: #ff6f61aa;
+    background: #3a1318dd;
+  }
+  .death-recap-main {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .death-recap-amount {
+    color: #ffd2cb;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .death-recap-tags {
+    margin-left: 6px;
+    color: #ff9f92;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
   /* Chrome cluster (chat input, party frames, context menu, prompts, trade window,
      elite target frame): in-world chrome that was never extracted with the
      rest of the HUD; homed here under @layer

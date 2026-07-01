@@ -2847,6 +2847,12 @@ export const nl_NL: EnTranslations = {
       "mapCanvasLabel": "Kaart",
       "mapSummary": "Kaart van {zone}."
     },
+    "deathRecap": {
+      "title": "Waardoor je stierf",
+      "critical": "Krit",
+      "killingBlow": "Dodelijke slag",
+      "environment": "Omgeving"
+    },
     "options": {
       "gameMenu": "Spelmenu",
       "keyBindings": "Toetsbindingen",

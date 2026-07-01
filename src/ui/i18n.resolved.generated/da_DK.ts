@@ -2847,6 +2847,12 @@ export const da_DK: EnTranslations = {
       "mapCanvasLabel": "Kort",
       "mapSummary": "Kort over {zone}."
     },
+    "deathRecap": {
+      "title": "Hvad dræbte dig",
+      "critical": "Krit",
+      "killingBlow": "Dræbende slag",
+      "environment": "Omgivelser"
+    },
     "options": {
       "gameMenu": "Spilmenu",
       "keyBindings": "Tastebindinger",

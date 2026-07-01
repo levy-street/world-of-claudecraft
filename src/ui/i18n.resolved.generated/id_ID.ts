@@ -2847,6 +2847,12 @@ export const id_ID: EnTranslations = {
       "mapCanvasLabel": "Peta",
       "mapSummary": "Peta {zone}."
     },
+    "deathRecap": {
+      "title": "Yang membunuhmu",
+      "critical": "Kritis",
+      "killingBlow": "Pukulan mematikan",
+      "environment": "Lingkungan"
+    },
     "options": {
       "gameMenu": "Menu Permainan",
       "keyBindings": "Pengaturan Tombol",

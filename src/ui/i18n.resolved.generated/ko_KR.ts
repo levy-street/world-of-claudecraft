@@ -2847,6 +2847,12 @@ export const ko_KR: EnTranslations = {
       "mapCanvasLabel": "지도",
       "mapSummary": "{zone}의 지도."
     },
+    "deathRecap": {
+      "title": "무엇이 당신을 죽였나",
+      "critical": "치명타",
+      "killingBlow": "결정타",
+      "environment": "환경"
+    },
     "options": {
       "gameMenu": "게임 메뉴",
       "keyBindings": "키 설정",

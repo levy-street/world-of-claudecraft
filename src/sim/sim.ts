@@ -264,6 +264,7 @@ import {
   armorReduction,
   type CrowdControlDrCategory,
   DELVE_COMPANION_HEAL_INTERVAL,
+  type DeathRecapEntry,
   type DelveDef,
   type DelveModuleDef,
   type DelveRun,
@@ -656,6 +657,8 @@ export interface PlayerMeta {
   // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
   // cannot farm the area alone.
   lastActiveTick: number;
+  // Session-only ring buffer for the death-screen recap; cleared on respawn.
+  recentDamageTaken: DeathRecapEntry[];
   // Ashen Coliseum standings. Legacy arenaRating/Wins/Losses are the 1v1
   // bracket; 2v2 is fully independent and persisted alongside them.
   arenaRating: number;
@@ -1175,6 +1178,7 @@ export class Sim {
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
       lastActiveTick: this.tickCount,
+      recentDamageTaken: [],
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
       arenaLosses: savedArena1v1.losses,

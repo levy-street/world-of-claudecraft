@@ -2847,6 +2847,12 @@ export const en_XA: EnTranslations = {
       "mapCanvasLabel": "[Ɱáþ]",
       "mapSummary": "[Ɱáþ óƒ {zone}.]"
     },
+    "deathRecap": {
+      "title": "[Ŵĥáţ ķíļļéð ýóú]",
+      "critical": "[Çŕíţ]",
+      "killingBlow": "[Ķíļļíñĝ ƀļóŵ]",
+      "environment": "[Éñʋíŕóñɱéñţ]"
+    },
     "options": {
       "gameMenu": "[Ĝáɱé Ɱéñú]",
       "keyBindings": "[Ķéý Ɓíñðíñĝš]",

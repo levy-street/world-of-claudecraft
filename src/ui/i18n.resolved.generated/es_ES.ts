@@ -2847,6 +2847,12 @@ export const es_ES: EnTranslations = {
       "mapCanvasLabel": "Mapa",
       "mapSummary": "Mapa de {zone}."
     },
+    "deathRecap": {
+      "title": "Qué te mató",
+      "critical": "Crít.",
+      "killingBlow": "Golpe mortal",
+      "environment": "Entorno"
+    },
     "options": {
       "gameMenu": "Menú del juego",
       "keyBindings": "Atajos de teclado",
