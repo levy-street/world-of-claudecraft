@@ -203,6 +203,50 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
   });
 });
 
+it('emits structured loot-history events for wins and returned rolls', () => {
+  const { sim, a, b, c } = partyOfThree();
+  const mob = deadCorpse(sim, a, [a, b, c], {
+    copper: 0,
+    items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+  });
+  awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+  const rollId = lootRollEvent(sim).rollId;
+  sim.events.length = 0;
+  submitLootRoll(sim.ctx, rollId, 'greed', b);
+  submitLootRoll(sim.ctx, rollId, 'need', a);
+  submitLootRoll(sim.ctx, rollId, 'pass', c);
+  const award = sim.events.find((e) => e.type === 'lootAwarded');
+  expect(award).toMatchObject({
+    type: 'lootAwarded',
+    itemId: 'greyjaw_hide_boots',
+    method: 'need',
+    winnerPid: a,
+    winnerName: 'Aaa',
+    encounterId: mob.id,
+    encounterName: mob.name,
+  });
+  expect((award as any).roll).toBeGreaterThanOrEqual(1);
+  expect((award as any).roll).toBeLessThanOrEqual(100);
+
+  const again = deadCorpse(sim, a, [a, b, c], {
+    copper: 0,
+    items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+  });
+  awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', again, playerMeta(sim, a));
+  const returnedRollId = [...sim.events].reverse().find((e) => e.type === 'lootRoll')?.rollId;
+  if (returnedRollId === undefined) throw new Error('expected second roll');
+  sim.events.length = 0;
+  submitLootRoll(sim.ctx, returnedRollId, 'pass', a);
+  submitLootRoll(sim.ctx, returnedRollId, 'pass', b);
+  submitLootRoll(sim.ctx, returnedRollId, 'pass', c);
+  expect(sim.events.find((e) => e.type === 'lootAwarded')).toMatchObject({
+    type: 'lootAwarded',
+    itemId: 'greyjaw_hide_boots',
+    method: 'returned',
+    encounterId: again.id,
+  });
+});
+
 describe('loot_roll: fair-split copper (module entry)', () => {
   it('splits copper deterministically with a non-zero remainder (Fisher-Yates draw)', () => {
     const run = () => {

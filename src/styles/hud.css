@@ -1772,6 +1772,45 @@
     color: #ffe;
     text-shadow: 1px 1px 1px #000;
   }
+  .mt-loot-row {
+    height: auto;
+    min-height: 34px;
+    padding: 4px 5px;
+  }
+  .mt-loot-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+  }
+  .mt-loot-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px #000;
+  }
+  .mt-loot-method {
+    flex: none;
+    border: 1px solid #463a1c;
+    border-radius: 3px;
+    padding: 0 4px;
+    color: var(--gold);
+    font-size: 9px;
+    line-height: 14px;
+    background: #20170e;
+  }
+  .mt-loot-detail {
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #c8b98c;
+    font-size: 10px;
+    line-height: 12px;
+  }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
     overflow-y: auto;

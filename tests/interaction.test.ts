@@ -144,6 +144,34 @@ describe('interaction.lootCorpse', () => {
   });
 });
 
+it('emits structured loot-history events for open and personal corpse slots', () => {
+  const { sim, a } = twoPlayers();
+  const openMob = corpse(sim, 20, 22, 999999, [{ itemId: 'wolf_fang', count: 2, openToAll: true }]);
+  sim.events = [];
+  interaction.lootCorpse(ctxOf(sim), openMob.id, a);
+  expect(sim.events.find((e) => e.type === 'lootAwarded')).toMatchObject({
+    type: 'lootAwarded',
+    itemId: 'wolf_fang',
+    method: 'looter',
+    count: 2,
+    winnerPid: a,
+    encounterId: openMob.id,
+  });
+
+  const personalMob = corpse(sim, 20, 22, 999999, [
+    { itemId: 'gnarled_staff', count: 1, personalFor: [a] },
+  ]);
+  sim.events = [];
+  interaction.lootCorpse(ctxOf(sim), personalMob.id, a);
+  expect(sim.events.find((e) => e.type === 'lootAwarded')).toMatchObject({
+    type: 'lootAwarded',
+    itemId: 'gnarled_staff',
+    method: 'personal',
+    winnerPid: a,
+    encounterId: personalMob.id,
+  });
+});
+
 describe('interaction.pickUpObject', () => {
   it('picks up a generic non-quest object (ward/relic short-circuits fall through)', () => {
     const { sim, a } = twoPlayers();

@@ -46,6 +46,7 @@ import {
 } from '../delve_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
+import { emitLootAward } from '../loot/loot_roll';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
@@ -1223,6 +1224,13 @@ export function collectDelveChestLoot(ctx: SimContext, chestId: number, pid?: nu
   }
   for (const slot of state.pendingLoot) {
     ctx.addItem(slot.itemId, slot.count, r.meta.entityId);
+    emitLootAward(ctx, slot.itemId, 'delve', [r.meta.entityId], {
+      count: slot.count,
+      winnerPid: r.meta.entityId,
+      winnerName: r.meta.name,
+      encounterId: chestId,
+      encounterName: obj?.name,
+    });
   }
   state.pendingLoot = [];
 }

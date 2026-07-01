@@ -1502,6 +1502,14 @@ export interface NythraxisEncounterState {
 }
 
 export type ErrorReason = 'target_dead';
+export type LootAwardMethod =
+  | 'need'
+  | 'greed'
+  | 'master'
+  | 'looter'
+  | 'personal'
+  | 'delve'
+  | 'returned';
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
@@ -1526,6 +1534,19 @@ export type SimEvent = { pid?: number } & (
   | { type: 'milestoneUnlocked'; milestoneId: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
+  | {
+      type: 'lootAwarded';
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      count?: number;
+      method: LootAwardMethod;
+      winnerPid?: number;
+      winnerName?: string;
+      roll?: number;
+      encounterId?: number;
+      encounterName?: string;
+    }
   | {
       type: 'lootRoll';
       rollId: number;

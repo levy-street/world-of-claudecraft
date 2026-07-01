@@ -33,6 +33,7 @@ import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from '
 import {
   awardSharedLootItem,
   distributeLootCopper,
+  emitLootAward,
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
@@ -68,12 +69,26 @@ export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
   for (const s of [...mob.loot.items]) {
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
-      for (let i = 0; i < s.count; i++) ctx.addItem(s.itemId, 1, meta.entityId);
+      const count = s.count;
+      for (let i = 0; i < count; i++) ctx.addItem(s.itemId, 1, meta.entityId);
+      emitLootAward(ctx, s.itemId, 'looter', [meta.entityId], {
+        count,
+        winnerPid: meta.entityId,
+        winnerName: meta.name,
+        encounterId: mob.id,
+        encounterName: mob.name,
+      });
       s.count = 0;
       continue;
     }
     if (s.personalFor) {
       ctx.addItem(s.itemId, 1, meta.entityId);
+      emitLootAward(ctx, s.itemId, 'personal', [meta.entityId], {
+        winnerPid: meta.entityId,
+        winnerName: meta.name,
+        encounterId: mob.id,
+        encounterName: mob.name,
+      });
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       continue;
     }

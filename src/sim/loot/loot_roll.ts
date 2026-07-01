@@ -33,6 +33,7 @@ import type {
   Entity,
   ItemDef,
   ItemLootStrategy,
+  LootAwardMethod,
   LootEntry,
   LootRollChoice,
   LootRollPrompt,
@@ -107,6 +108,41 @@ function effectiveItemLootStrategy(ctx: SimContext, itemId: string, mob: Entity)
   const strategies = partyLootStrategiesForMob(ctx, mob);
   if (!strategies) return 'looter-takes-all';
   return q === 'poor' || q === 'common' ? strategies.commonItems : strategies.premiumItems;
+}
+
+export function emitLootAward(
+  ctx: SimContext,
+  itemId: string,
+  method: LootAwardMethod,
+  recipientPids: Iterable<number>,
+  details: {
+    count?: number;
+    winnerPid?: number;
+    winnerName?: string;
+    roll?: number;
+    encounterId?: number;
+    encounterName?: string;
+  } = {},
+): void {
+  const def = ITEMS[itemId];
+  const recipients = new Set(recipientPids);
+
+  for (const pid of recipients) {
+    ctx.emit({
+      type: 'lootAwarded',
+      itemId,
+      itemName: def?.name ?? itemId,
+      quality: def?.quality ?? 'common',
+      method,
+      ...(details.count !== undefined && details.count !== 1 ? { count: details.count } : {}),
+      ...(details.winnerPid !== undefined ? { winnerPid: details.winnerPid } : {}),
+      ...(details.winnerName !== undefined ? { winnerName: details.winnerName } : {}),
+      ...(details.roll !== undefined ? { roll: details.roll } : {}),
+      ...(details.encounterId !== undefined ? { encounterId: details.encounterId } : {}),
+      ...(details.encounterName !== undefined ? { encounterName: details.encounterName } : {}),
+      pid,
+    });
+  }
 }
 
 function needsQuestDrop(ctx: SimContext, entry: LootEntry, meta: PlayerMeta): boolean {
@@ -298,7 +334,15 @@ export function awardSharedLootItem(
   looter: PlayerMeta,
 ): void {
   if (startMasterLootRoll(ctx, itemId, mob)) return;
-  if (!startNeedGreedRoll(ctx, itemId, mob)) ctx.addItem(itemId, 1, looter.entityId);
+  if (!startNeedGreedRoll(ctx, itemId, mob)) {
+    ctx.addItem(itemId, 1, looter.entityId);
+    emitLootAward(ctx, itemId, 'looter', [looter.entityId], {
+      winnerPid: looter.entityId,
+      winnerName: looter.name,
+      encounterId: mob.id,
+      encounterName: mob.name,
+    });
+  }
 }
 
 // Open need-greed rolls the given player may still answer. Mirrors the
@@ -378,6 +422,12 @@ export function assignMasterLoot(
         text: `${r.meta.name} assigned ${roll.itemName} to ${targetName}.`,
         pid: recipient,
       });
+    emitLootAward(ctx, roll.itemId, 'master', recipients, {
+      winnerPid: targets[0],
+      winnerName: targetName,
+      encounterId: roll.mobId,
+      encounterName: ctx.entities.get(roll.mobId)?.name,
+    });
     ctx.addItem(roll.itemId, 1, targets[0]);
     return;
   }
@@ -464,6 +514,10 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     needers.length > 0 ? needers : entries.filter((entry) => entry.result.choice === 'greed');
   if (contenders.length === 0) {
     returnLootRollItemToCorpse(ctx, roll);
+    emitLootAward(ctx, roll.itemId, 'returned', roll.candidates, {
+      encounterId: roll.mobId,
+      encounterName: ctx.entities.get(roll.mobId)?.name,
+    });
     for (const pid of roll.candidates)
       ctx.emit({ type: 'loot', text: `Everyone passed on ${roll.itemName}.`, pid });
     return;
@@ -481,6 +535,14 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       pid,
     });
   }
+  const winningMethod = winner.result.choice === 'need' ? 'need' : 'greed';
+  emitLootAward(ctx, roll.itemId, winningMethod, roll.candidates, {
+    winnerPid: winner.pid,
+    winnerName,
+    roll: winner.result.roll ?? undefined,
+    encounterId: roll.mobId,
+    encounterName: ctx.entities.get(roll.mobId)?.name,
+  });
   ctx.addItem(roll.itemId, 1, winner.pid);
 }
 

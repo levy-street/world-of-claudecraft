@@ -9,16 +9,36 @@ function fakeWorld(): IWorld {
   entities.set(1, { id: 1, kind: 'player', name: 'Hero', templateId: 'warrior' });
   entities.set(2, { id: 2, kind: 'player', name: 'Pal', templateId: 'priest' });
   entities.set(50, { id: 50, kind: 'mob', name: 'Wolf', maxHp: 60, dead: false, aggroTargetId: 1 });
-  entities.set(51, { id: 51, kind: 'mob', name: 'Gorrak', maxHp: 400, dead: false, aggroTargetId: 1 });
+  entities.set(51, {
+    id: 51,
+    kind: 'mob',
+    name: 'Gorrak',
+    maxHp: 400,
+    dead: false,
+    aggroTargetId: 1,
+  });
   return {
     entities,
     player: entities.get(1),
-    partyInfo: { leader: 1, raid: false, members: [{ pid: 2, name: 'Pal', cls: 'priest', group: 1 }] },
+    partyInfo: {
+      leader: 1,
+      raid: false,
+      members: [{ pid: 2, name: 'Pal', cls: 'priest', group: 1 }],
+    },
   } as unknown as IWorld;
 }
 
 const dmg = (sourceId: number, targetId: number, amount: number): SimEvent =>
-  ({ type: 'damage', sourceId, targetId, amount, crit: false, school: 'physical', ability: null, kind: 'hit' }) as SimEvent;
+  ({
+    type: 'damage',
+    sourceId,
+    targetId,
+    amount,
+    crit: false,
+    school: 'physical',
+    ability: null,
+    kind: 'hit',
+  }) as SimEvent;
 const heal = (sourceId: number, targetId: number, amount: number): SimEvent =>
   ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability: 'Heal' }) as SimEvent;
 
@@ -74,11 +94,62 @@ describe('combat meters', () => {
   it('can tally controlled pet damage when the HUD includes the pet in the party set', () => {
     const w = fakeWorld();
     const party = new Set([1, 2, 3]);
-    (w.entities as Map<number, any>).set(3, { id: 3, kind: 'mob', name: 'Wolf Pet', templateId: 'forest_wolf', ownerId: 1 });
+    (w.entities as Map<number, any>).set(3, {
+      id: 3,
+      kind: 'mob',
+      name: 'Wolf Pet',
+      templateId: 'forest_wolf',
+      ownerId: 1,
+    });
     const m = new MeterData(0);
     m.onEvent(dmg(3, 50, 18), w, party, 1000);
     expect(m.current).not.toBeNull();
     expect(m.current!.tallies.get(3)!.name).toBe('Wolf Pet');
     expect(m.current!.tallies.get(3)!.dmg).toBe(18);
+  });
+
+  it('records structured loot awards newest-first without starting combat', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(
+      {
+        type: 'lootAwarded',
+        itemId: 'wolf_fang',
+        itemName: 'Wolf Fang',
+        quality: 'common',
+        method: 'looter',
+        winnerPid: 1,
+        winnerName: 'Hero',
+        encounterId: 50,
+        encounterName: 'Wolf',
+        pid: 1,
+      } as SimEvent,
+      w,
+      party,
+      1000,
+    );
+    m.onEvent(
+      {
+        type: 'lootAwarded',
+        itemId: 'greyjaw_hide_boots',
+        itemName: 'Greyjaw Hide Boots',
+        quality: 'uncommon',
+        method: 'need',
+        winnerPid: 2,
+        winnerName: 'Pal',
+        roll: 87,
+        encounterId: 51,
+        encounterName: 'Gorrak',
+        pid: 1,
+      } as SimEvent,
+      w,
+      party,
+      2000,
+    );
+
+    expect(m.current).toBeNull();
+    expect(m.lootHistory.map((e) => e.itemId)).toEqual(['greyjaw_hide_boots', 'wolf_fang']);
+    expect(m.lootHistory[0]).toMatchObject({ method: 'need', winnerName: 'Pal', roll: 87 });
   });
 });
