@@ -9,24 +9,62 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "es_ES": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "fr_FR": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "fr_CA": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "de_DE": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "zh_CN": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "zh_TW": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "ko_KR": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "ja_JP": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "pt_BR": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "ru_RU": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "nl_NL": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "pl_PL": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "id_ID": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "tr_TR": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "sv_SE": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "vi_VN": [
+    "hudChrome.options.showExternalIntegrations"
+  ],
+  "da_DK": [
+    "hudChrome.options.showExternalIntegrations"
+  ]
 };

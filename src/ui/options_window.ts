@@ -1142,7 +1142,10 @@ export class OptionsWindow {
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
     ];
+    const integrationsVisible =
+      this.deps.options()?.settings.get('showExternalIntegrations') ?? true;
     for (const a of BIND_ACTIONS) {
+      if (a.id === 'discord' && !integrationsVisible) continue;
       if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default
       if (a.kind !== 'edge' && a.id !== 'jump') continue;
       opts.push({ value: a.id, label: this.actionDisplayName(a.id, a.label) });
@@ -1321,9 +1324,13 @@ export class OptionsWindow {
     // The Attack Move key is only meaningful (and only rebindable) while its mode
     // is on; otherwise hide its row so it can't shadow Turn Left's A in the list.
     const attackMoveOn = !!hooks?.settings.get('attackMove');
+    const integrationsVisible = hooks?.settings.get('showExternalIntegrations') ?? true;
     for (const category of BIND_CATEGORIES) {
       const visible = BIND_ACTIONS.filter(
-        (a) => a.category === category && (a.id !== 'attackMove' || attackMoveOn),
+        (a) =>
+          a.category === category &&
+          (a.id !== 'attackMove' || attackMoveOn) &&
+          (a.id !== 'discord' || integrationsVisible),
       );
       if (visible.length === 0) continue;
       // Each category is its own column block (header + its rows) so the wide

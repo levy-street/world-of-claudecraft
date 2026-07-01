@@ -299,6 +299,7 @@ export const hudChromeStrings = {
     lockCursorOnRotate: 'Lock Cursor While Rotating',
     keybindHelpLockCursorOnRotate:
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
+    showExternalIntegrations: 'Show External Integrations',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
     // Interface panel toggle: nameplate glyph/outline, inspect block, player

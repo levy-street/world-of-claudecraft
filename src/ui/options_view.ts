@@ -361,6 +361,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
     boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
+    boolToggle(s, 'showExternalIntegrations', 'hudChrome.options.showExternalIntegrations'),
     boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
     boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
     boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),

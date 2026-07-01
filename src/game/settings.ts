@@ -205,6 +205,11 @@ export const BOOL_SETTINGS = {
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
   showItemLevel: { def: false },
+  // on by default: show external integration UI for this character (Discord,
+  // GitHub developer badge/link surfaces, wallet/WOC rows, and related CTAs).
+  // This is a local display preference only; linked accounts, rewards, and
+  // server-verified perks remain active when hidden.
+  showExternalIntegrations: { def: true },
   // off by default: out of the box the HUD shows a single action bar. When on, the
   // second action bar row (#actionbar2, slots 12..22) is revealed via a body class
   // applied in main.ts. Purely a display preference; the slots stay reachable via
@@ -254,19 +259,26 @@ export function clickMoveButtonLabel(value: number): string {
 
 export class Settings {
   private values: GameSettings;
+  private readonly storeKey: string;
 
-  constructor() {
+  constructor(scope = '') {
+    this.storeKey = scope ? `${STORE_KEY}:${scope}` : STORE_KEY;
     this.values = this.load();
   }
 
-  private load(): GameSettings {
-    let stored: unknown = null;
+  private readStore(key: string): Record<string, unknown> | null {
     try {
-      stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null');
+      const stored = JSON.parse(localStorage.getItem(key) ?? 'null');
+      return stored && typeof stored === 'object' && !Array.isArray(stored)
+        ? (stored as Record<string, unknown>)
+        : null;
     } catch {
-      /* corrupt */
+      return null;
     }
-    const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
+  }
+
+  private load(): GameSettings {
+    const raw = this.readStore(this.storeKey) ?? this.readStore(STORE_KEY) ?? {};
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {
       const v = raw[key];
@@ -281,7 +293,7 @@ export class Settings {
 
   private save(): void {
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.values));
+      localStorage.setItem(this.storeKey, JSON.stringify(this.values));
     } catch {
       /* storage unavailable */
     }

@@ -867,7 +867,8 @@ async function startGame(
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds(keybindScope);
-  const settings = new Settings();
+  const settings = new Settings(keybindScope);
+  activeGameSettings = settings;
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
   // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
@@ -924,7 +925,8 @@ async function startGame(
   try {
     renderer = new Renderer(world, canvas, nameplates);
     renderer.setAudioSink(sfx);
-    renderer.showDevBadges = settings.get('showDevBadges');
+    renderer.showDevBadges =
+      settings.get('showExternalIntegrations') && settings.get('showDevBadges');
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -1309,6 +1311,17 @@ async function startGame(
     body.add(...browserBodyClasses(browserEnv, tier));
   }
 
+  function syncExternalIntegrationVisibility(): void {
+    renderer.showDevBadges =
+      settings.get('showExternalIntegrations') && settings.get('showDevBadges');
+    syncWalletCharacterScreenVisibility();
+    updateWalletButton();
+    updateDiscordCtaBanner();
+    syncDiscordMobileEntry();
+    if (!settings.get('showExternalIntegrations')) toggleDiscordPanel(false);
+    void refreshGithubLinkStatus();
+  }
+
   function applySetting(key: keyof GameSettings, value: number | boolean): void {
     if (key === 'mouseCamera') {
       const v = settings.set('mouseCamera', !!value);
@@ -1387,14 +1400,23 @@ async function startGame(
     if (key === 'showWalletOnCharacterScreen') {
       settings.set('showWalletOnCharacterScreen', !!value);
       syncWalletCharacterScreenVisibility();
+      updateWalletButton();
       return;
     }
     if (key === 'showWalletOnPlayerCard') {
       settings.set('showWalletOnPlayerCard', !!value);
+      updateWalletButton();
       return;
     }
     if (key === 'showDevBadges') {
-      renderer.showDevBadges = settings.set('showDevBadges', !!value);
+      settings.set('showDevBadges', !!value);
+      renderer.showDevBadges =
+        settings.get('showExternalIntegrations') && settings.get('showDevBadges');
+      return;
+    }
+    if (key === 'showExternalIntegrations') {
+      settings.set('showExternalIntegrations', !!value);
+      syncExternalIntegrationVisibility();
       return;
     }
     if (key === 'invertLookY') {
@@ -2479,6 +2501,19 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
 // ---------------------------------------------------------------------------
 
 const api = new Api();
+let activeGameSettings: Settings | null = null;
+
+function currentIntegrationSettings(): Settings {
+  return activeGameSettings ?? new Settings();
+}
+
+function externalIntegrationsVisible(): boolean {
+  try {
+    return currentIntegrationSettings().get('showExternalIntegrations');
+  } catch {
+    return true;
+  }
+}
 
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
@@ -4606,7 +4641,8 @@ const WALLET_ENABLED =
 
 function walletCharacterScreenVisible(): boolean {
   try {
-    return new Settings().get('showWalletOnCharacterScreen');
+    const settings = currentIntegrationSettings();
+    return settings.get('showExternalIntegrations') && settings.get('showWalletOnCharacterScreen');
   } catch {
     return true;
   }
@@ -4912,6 +4948,7 @@ function updateWalletButton(): void {
     return;
   }
   syncWalletCharacterScreenVisibility();
+  const showIntegrations = externalIntegrationsVisible();
   // currentWallet is sync; before the module loads, treat as disconnected.
   const { address, isConnected } = walletMod
     ? walletMod.currentWallet()
@@ -4924,8 +4961,11 @@ function updateWalletButton(): void {
   const previewBalance = connected && !linkedWalletPubkey ? connectedWocBalance : null;
   // Mirror the balance into the HUD store so the bag footer stays in sync. Only
   // a balance for the linked wallet may drive verified holder claims.
-  setWocBalance(verifiedBalance ?? previewBalance, verifiedBalance !== null);
-  setWalletDisplayAvailable(connected || linkedWalletPubkey !== null);
+  setWocBalance(
+    showIntegrations ? (verifiedBalance ?? previewBalance) : null,
+    showIntegrations && verifiedBalance !== null,
+  );
+  setWalletDisplayAvailable(showIntegrations && (connected || linkedWalletPubkey !== null));
   const btn = document.getElementById('btn-wallet');
   const label = document.getElementById('wallet-label');
   if (!btn || !label) return;
@@ -5082,6 +5122,7 @@ let lastOnDemandRefreshAt = 0;
 const ON_DEMAND_REFRESH_THROTTLE_MS = 5000;
 function refreshWocBalanceOnDemand(): void {
   if (!WALLET_ENABLED) return;
+  if (!externalIntegrationsVisible()) return;
   const address = linkedWalletPubkey ?? walletMod?.currentWallet().address ?? null;
   if (!address) return;
   const now = Date.now();
@@ -5246,7 +5287,7 @@ window.addEventListener('message', (e: MessageEvent) => {
 async function refreshGithubLinkStatus(): Promise<void> {
   const group = document.getElementById('cs-github-group');
   if (!group) return;
-  if (!api.token) {
+  if (!api.token || !externalIntegrationsVisible()) {
     group.hidden = true;
     return;
   }
@@ -5256,7 +5297,7 @@ async function refreshGithubLinkStatus(): Promise<void> {
   } catch (err) {
     console.error('[github] could not load status', err);
   }
-  if (!status || status.enabled !== true) {
+  if (status?.enabled !== true) {
     group.hidden = true;
     return;
   }
@@ -5370,7 +5411,12 @@ function updateDiscordCtaBanner(): void {
   }
   const status = discordStatus();
   const show =
-    DISCORD_BUILD_ENABLED && discordUiEnabled() && !!api.token && !status.linked && !dismissed;
+    DISCORD_BUILD_ENABLED &&
+    externalIntegrationsVisible() &&
+    discordUiEnabled() &&
+    !!api.token &&
+    !status.linked &&
+    !dismissed;
   banner.hidden = !show;
   if (!show) return;
   const stats = document.getElementById('discord-cta-stats');
@@ -5395,7 +5441,8 @@ function updateDiscordCtaBanner(): void {
 function syncDiscordMobileEntry(): void {
   const btn = document.getElementById('mobile-discord');
   if (!btn) return;
-  const available = DISCORD_BUILD_ENABLED && discordUiEnabled() && !!api.token;
+  const available =
+    DISCORD_BUILD_ENABLED && externalIntegrationsVisible() && discordUiEnabled() && !!api.token;
   btn.hidden = !available;
 }
 
@@ -5461,7 +5508,11 @@ function renderDiscordPanel(): void {
 }
 function toggleDiscordPanel(open?: boolean): void {
   const el = document.getElementById('discord-window');
-  if (!el || !DISCORD_BUILD_ENABLED || !api.token) return;
+  if (!el || !DISCORD_BUILD_ENABLED || !api.token || !externalIntegrationsVisible()) {
+    discordPanelOpen = false;
+    if (el) el.hidden = true;
+    return;
+  }
   discordPanelOpen = open ?? !discordPanelOpen;
   el.hidden = !discordPanelOpen;
   if (discordPanelOpen) {

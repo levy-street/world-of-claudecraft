@@ -2797,7 +2797,9 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#leaderboard-window'),
     ...this.windowFocus('#leaderboard-window'),
-    showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+    showDevBadges: () =>
+      (this.optionsHooks?.settings.get('showExternalIntegrations') ?? true) &&
+      (this.optionsHooks?.settings.get('showDevBadges') ?? true),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
   // The window renders ability rows (not item rows), so it composes no presentation
@@ -8384,7 +8386,8 @@ export class Hud {
     audio.bagOpen();
     // Pull a fresh on-chain $WOC balance for the footer; the async result
     // re-renders the bag via the onWalletUiChange listener wired in the ctor.
-    this.optionsHooks?.refreshWocBalance();
+    if (this.optionsHooks?.settings.get('showExternalIntegrations') ?? true)
+      this.optionsHooks?.refreshWocBalance();
   }
 
   // Called when an authoritative inventory delta lands (online snapshots
@@ -9054,6 +9057,7 @@ export class Hud {
     const poseButtons = Array.from(back.querySelectorAll<HTMLButtonElement>('.pc-pose'));
     let requestedPoseIndex = 0;
     let showWalletOnCard =
+      (this.optionsHooks?.settings.get('showExternalIntegrations') ?? true) &&
       walletDisplayAvailable() &&
       (this.optionsHooks?.settings.get('showWalletOnPlayerCard') ?? true);
     let metadataReady = false;
@@ -9067,7 +9071,10 @@ export class Hud {
     };
     const syncWalletToggle = (): void => {
       if (!walletToggle || !walletToggleState) return;
-      const on = walletDisplayAvailable() && showWalletOnCard;
+      const integrationsVisible =
+        this.optionsHooks?.settings.get('showExternalIntegrations') ?? true;
+      walletToggle.hidden = !integrationsVisible;
+      const on = integrationsVisible && walletDisplayAvailable() && showWalletOnCard;
       walletToggle.classList.toggle('off', !on);
       walletToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
       walletToggle.setAttribute('aria-label', t('hudChrome.playerCard.showWalletBadge'));
@@ -9383,7 +9390,10 @@ export class Hud {
     // Developer badge: a global display preference (no per-card modal toggle
     // like the wallet flair has, since "hide dev badges" is meant to apply
     // everywhere at once, not be re-decided per export).
-    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
+    const showExternalIntegrations =
+      this.optionsHooks?.settings.get('showExternalIntegrations') ?? true;
+    const showDevBadges =
+      showExternalIntegrations && (this.optionsHooks?.settings.get('showDevBadges') ?? true);
 
     const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
     const gear = slots.map((slot) => {
@@ -10009,12 +10019,17 @@ export class Hud {
   // and players with no linked flair at all.
   private updateTargetDiscordLine(target: Entity): void {
     const el = this.targetDiscordEl;
-    const tier = target.discordTier ?? 0;
-    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
+    const showExternalIntegrations =
+      this.optionsHooks?.settings.get('showExternalIntegrations') ?? true;
+    const tier = showExternalIntegrations ? (target.discordTier ?? 0) : 0;
+    const showDevBadges =
+      showExternalIntegrations && (this.optionsHooks?.settings.get('showDevBadges') ?? true);
     const devIdx = showDevBadges ? (target.devTier ?? 0) : 0;
     if (
       target.kind !== 'player' ||
-      (!tier && !target.discordName && !target.discordRole && !devIdx)
+      (!tier &&
+        (!showExternalIntegrations || (!target.discordName && !target.discordRole)) &&
+        !devIdx)
     ) {
       if (this.targetDiscordSig !== '') {
         this.targetDiscordSig = '';
@@ -10026,7 +10041,7 @@ export class Hud {
     // This runs every frame the target frame updates; only rebuild when the Discord
     // content actually changes (else a fresh <img> per frame would re-fetch the
     // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
-    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}`;
+    const sig = `${tier}|${showExternalIntegrations ? (target.discordName ?? '') : ''}|${showExternalIntegrations ? (target.discordRole ?? '') : ''}|${showExternalIntegrations ? (target.discordAvatar ?? '') : ''}|${devIdx}`;
     if (sig === this.targetDiscordSig) return;
     this.targetDiscordSig = sig;
     const roleTagLabel = (key: string | undefined): string => {
@@ -10044,13 +10059,14 @@ export class Hud {
       }
     };
     const parts: string[] = [];
-    const nameInner = target.discordAvatar
-      ? `<img src="${esc(target.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">${esc(target.discordName ?? '')}`
-      : esc(target.discordName ?? '');
-    if (target.discordName || target.discordAvatar) {
+    const nameInner =
+      showExternalIntegrations && target.discordAvatar
+        ? `<img src="${esc(target.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">${esc(target.discordName ?? '')}`
+        : esc(target.discordName ?? '');
+    if (showExternalIntegrations && (target.discordName || target.discordAvatar)) {
       parts.push(`<span class="uf-dc-name">${nameInner}</span>`);
     }
-    const roleLabel = roleTagLabel(target.discordRole);
+    const roleLabel = showExternalIntegrations ? roleTagLabel(target.discordRole) : '';
     if (roleLabel) {
       parts.push(
         `<span class="uf-dc-chip role" style="--role:${specialRoleColor(target.discordRole) ?? '#888'}">${esc(roleLabel)}</span>`,
@@ -10084,7 +10100,9 @@ export class Hud {
     // broadcast per-entity via the `ht`/`hb` identity fields (server-set). Shown
     // only when the inspected player has a tier (> 0); the exact balance rides
     // along in `hb` and reads out beneath the rung name when present.
-    const tierDef = holderTierByIndex(e.holderTier ?? 0);
+    const showExternalIntegrations =
+      this.optionsHooks?.settings.get('showExternalIntegrations') ?? true;
+    const tierDef = showExternalIntegrations ? holderTierByIndex(e.holderTier ?? 0) : undefined;
     const holderHtml = tierDef
       ? `<div class="inspect-holder">` +
         `<img class="inspect-holder-badge" src="${holderTierBadgeDataUrl(tierDef)}" alt="" draggable="false">` +
@@ -10094,7 +10112,7 @@ export class Hud {
         `</div></div>`
       : '';
     // Linked-Discord flair: avatar/badge, nickname, rank, "member since", role.
-    const discordTierIdx = e.discordTier ?? 0;
+    const discordTierIdx = showExternalIntegrations ? (e.discordTier ?? 0) : 0;
     const discordImg = e.discordAvatar
       ? `<img class="inspect-holder-badge inspect-discord-pfp" src="${esc(e.discordAvatar)}" referrerpolicy="no-referrer" alt="" draggable="false">`
       : `<img class="inspect-holder-badge" src="${discordStatusBadgeDataUrl(discordTierIdx)}" alt="" draggable="false">`;
@@ -10139,7 +10157,8 @@ export class Hud {
     // `dvt`/`dvc`/`dgl` identity fields. Shown only for an actual contributor
     // (tier > 0), with the merged-PR count and the @login under the rung name,
     // and only while the viewer's own showDevBadges display preference is on.
-    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
+    const showDevBadges =
+      showExternalIntegrations && (this.optionsHooks?.settings.get('showDevBadges') ?? true);
     const devTierDef = showDevBadges ? devTierByIndex(e.devTier ?? 0) : undefined;
     const devSub = e.devMergedPrs
       ? t('hudChrome.devBadge.prsLanded', {

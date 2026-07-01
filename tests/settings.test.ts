@@ -233,6 +233,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showWalletOnCharacterScreen')).toBe(true);
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
     expect(s.get('showDevBadges')).toBe(true);
+    expect(s.get('showExternalIntegrations')).toBe(true);
     expect(s.get('invertLookY')).toBe(false);
   });
 
@@ -255,20 +256,38 @@ describe('Interface & Comfort settings pack', () => {
     s.set('showWalletOnCharacterScreen', false);
     s.set('showWalletOnPlayerCard', false);
     s.set('showDevBadges', false);
+    s.set('showExternalIntegrations', false);
     // a fresh instance reads the same backing store
     expect(new Settings().get('reduceMotion')).toBe(true);
     expect(new Settings().get('showFps')).toBe(true);
     expect(new Settings().get('showWalletOnCharacterScreen')).toBe(false);
     expect(new Settings().get('showWalletOnPlayerCard')).toBe(false);
     expect(new Settings().get('showDevBadges')).toBe(false);
+    expect(new Settings().get('showExternalIntegrations')).toBe(false);
     s.reset();
     expect(s.get('reduceMotion')).toBe(false);
     expect(s.get('showFps')).toBe(false);
     expect(s.get('showWalletOnCharacterScreen')).toBe(true);
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
     expect(s.get('showDevBadges')).toBe(true);
+    expect(s.get('showExternalIntegrations')).toBe(true);
     expect(s.get('invertLookY')).toBe(false);
     expect(s.get('frostedPanels')).toBe(false);
+  });
+
+  it('scopes character settings while seeding from the legacy global profile once', () => {
+    const legacy = new Settings();
+    legacy.set('showExternalIntegrations', false);
+    legacy.set('showSecondaryActionBar', true);
+
+    const firstChar = new Settings('char:1');
+    expect(firstChar.get('showExternalIntegrations')).toBe(false);
+    expect(firstChar.get('showSecondaryActionBar')).toBe(true);
+    firstChar.set('showExternalIntegrations', true);
+
+    expect(new Settings('char:1').get('showExternalIntegrations')).toBe(true);
+    expect(new Settings('char:2').get('showExternalIntegrations')).toBe(false);
+    expect(new Settings().get('showExternalIntegrations')).toBe(false);
   });
 
   it('adds a global UI Scale (default 1, clamped to bounds) and a landing high-contrast toggle', () => {
