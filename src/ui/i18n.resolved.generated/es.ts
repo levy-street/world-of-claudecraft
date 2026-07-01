@@ -313,7 +313,8 @@ export const es: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Rueda de gestos",
       "targetFriendly": "Objetivo amistoso más cercano",
-      "targetFriendlyNext": "Objetivo amistoso siguiente"
+      "targetFriendlyNext": "Objetivo amistoso siguiente",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Clic izquierdo",
@@ -338,6 +339,7 @@ export const es: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Escala de la interfaz",
       "highContrastBackground": "Fondo de alto contraste",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Mostrar nivel de objeto",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
@@ -488,6 +490,9 @@ export const es: EnTranslations = {
       "noQuestSelected": "Selecciona una misión en tu diario para compartirla.",
       "linkTitle": "Mayús + clic para enlazar esta misión en el chat."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "eres {rank}, {count} miembro",
@@ -512,6 +517,12 @@ export const es: EnTranslations = {
         "few": "Quién: {count} jugadores conectados en {realm}.",
         "many": "Quién: {count} jugadores conectados en {realm}.",
         "other": "Quién: {count} jugadores conectados en {realm}."
+      },
+      "playersMatching": {
+        "one": "Quién: {count} jugador que coincide con \"{query}\" en {realm}.",
+        "few": "Quién: {count} jugadores que coinciden con \"{query}\" en {realm}.",
+        "many": "Quién: {count} jugadores que coinciden con \"{query}\" en {realm}.",
+        "other": "Quién: {count} jugadores que coinciden con \"{query}\" en {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const es: EnTranslations = {
       "assigned": "{looter} asigno {item} a {target}.",
       "unassigned": "{item} no fue asignado y queda libre para todos.",
       "leaderOnly": "Solo el lider del grupo puede cambiar el metodo de botin."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoría",

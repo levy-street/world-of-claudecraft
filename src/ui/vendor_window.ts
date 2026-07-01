@@ -46,14 +46,21 @@ export function renderVendorWindow(
   const scrollTop = el.scrollTop;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
-  for (const { itemId, item, price: priceCopper } of view.goods) {
+  for (const { itemId, item, price: priceCopper, quantity } of view.goods) {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'vendor-item';
     const price = formatLocalizedMoney(priceCopper);
     const itemName = itemDisplayName(item);
-    row.setAttribute('aria-label', t('itemUi.vendor.buyAria', { item: itemName, price }));
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    const stack =
+      quantity > 1
+        ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
+        : '';
+    row.setAttribute(
+      'aria-label',
+      t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+    );
+    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
     deps.attachTooltip(
       row,

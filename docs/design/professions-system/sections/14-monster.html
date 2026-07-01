@@ -1,0 +1,53 @@
+  <h2 id="monster">Monster Harvesting (single-use corpses) and focus</h2>
+  <p>The deliberate opposite of world nodes, to make specialization social and to justify higher-value materials.</p>
+  <ul>
+    <li>Each corpse can be gathered <strong>once</strong>, first come. Corpses are a shared, scarce resource.</li>
+    <li>Scarcity rewards coordination: a regular group plans who specializes in which monster component types, so each member knows which monsters to harvest and which to leave for a teammate.</li>
+    <li>A monster is tagged with one or more <strong>component types</strong> (horn, hide, venom sac, gills, ...), defined per mob as content.</li>
+    <li>At the corpse, the UI lets the player focus on a single component type or several at once. Fewer components yields higher tier; spreading across many yields lower tier each.</li>
+  </ul>
+
+  <div class="figure">
+    <h4>Figure 5. Per-corpse extraction tradeoff</h4>
+    <p class="cap">A drake corpse tagged with three component types. Concentrating extraction on one component returns a high tier; splitting across all three returns a lower tier of each. The persistent town focus shifts these tiers further up for your specialized components.</p>
+    <svg id="corpse-diagram" viewBox="0 0 720 230" role="img" aria-label="Extraction tradeoff bars"></svg>
+  </div>
+
+  <h3>Focus: additive allocation (voluntary)</h3>
+  <p>On top of the per-corpse choice, a player sets a persistent <strong>focus</strong> in town. Focus is additive: every component starts at a guaranteed baseline that is never penalized, and focus points <em>add</em> rarity/yield bonuses to chosen components only. The only cost is opportunity. This lets a group divide the work: each member focuses different components so the party covers more high-tier materials between them.</p>
+
+  <div class="figure">
+    <h4>Figure 6. Additive focus: the baseline never drops</h4>
+    <p class="cap">Monster Harvesting focus over component types. The inner solid ring is the guaranteed baseline for every component. Focus points add the outer band on chosen components only (here a venom specialist boosting venom sacs and glands). Unfocused components stay at baseline, never below. Contrast the production wheel, where only one specialty is empowered at a time rather than every axis at once.</p>
+    <div class="row">
+      <div class="col"><svg id="radar-additive" viewBox="-92 -10 544 380" role="img" aria-label="Additive focus radar over monster component types"></svg></div>
+      <div class="col">
+        <div class="legend" style="margin-top:0">
+          <span><span class="swatch" style="background:var(--teal)"></span>Baseline (always present)</span>
+          <span><span class="swatch" style="background:var(--gold)"></span>Focus bonus (added on top)</span>
+        </div>
+        <p class="muted" style="font-size:14px">Whether focus is a small skill tree or a town-rebalanced additive radar is TBD; the invariant is fixed either way: additive only, baseline never drops, configured in town.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Re-spec cost: time, coins, or materials</h3>
+  <p>Re-aiming your focus draws on three resources, and you choose which one or two to spend:</p>
+  <table>
+    <tr><th>Pay with</th><th>Speed</th><th>Cost</th></tr>
+    <tr><td>Time only</td><td>Very slow</td><td>Free</td></tr>
+    <tr><td>Time plus a little coin or materials</td><td>Faster</td><td>Small coin or material cost</td></tr>
+    <tr><td>Coins plus materials</td><td>Instant</td><td>Higher coin and material cost</td></tr>
+  </table>
+  <p>The deeper and more peaked your focus, the larger the budget of whichever resources you use, so a casual rebalance is cheap and a hard pivot is a real commitment. (Gathering focus is additive and has no attunement gate, so unlike a production specialty there is no structural cost to switching, hence this explicit re-spec to keep a hard pivot meaningful.) Exact curves are tuning, deferred.</p>
+
+  <h3>Signed materials and the self-gathered bonus</h3>
+  <ul>
+    <li>Gathering a <strong>rare or better</strong> monster material stamps the item with the <strong>gatherer's name</strong> (a signed material).</li>
+    <li>Using a material <strong>you gathered yourself</strong> in a craft grants a bonus: either a small lift to the output's item-level budget, or a reduction in the quantity of that material the recipe requires.</li>
+    <li>This rewards the player who does both halves, and turns a signed material from someone else into a mark of provenance rather than a transferable mechanical bonus.</li>
+  </ul>
+
+  <h3>Why account-level breadth does not break exclusivity</h3>
+  <p>An account can hold many characters, so a dedicated player can in principle spread the archetypes across alts and cover the whole wheel over time. That does not collapse the design, because <strong>the top of crafting is gated behind adventuring, not just crafting</strong>. The best materials come from Monster Harvesting, which means killing higher-tier monsters, and later Battlefield Experience (the channel above, still exploratory) improves what you craft. Both require a character that actually fights, so a combat level 1 crafting alt is never prevented from crafting but is capped well below an adventurer-crafter. Monster Harvesting alone carries this gate today; Battlefield Experience only deepens it. This is the pillar that negates the one-alt-per-craft pattern that guts crafting value in so many MMOs.</p>
+  <p>Two further inputs reinforce it. Contested single-use corpses are an always-on friction no one can multibox. And a recipe that requires a material <strong>signed by its recipient</strong> removes the shared-gatherer-alt shortcut for bound gear, because the wearer has to have gathered it themselves. A bare signature on its own is only provenance, not an anti-alt lever (each alt signs its own materials); the exclusivity comes from the adventuring gate and the contested and recipient-bound inputs, not the signature. You can only ever play one or two characters at once, so you can never bring the top of every archetype to bear at the same time. Specialization stays per-character.</p>

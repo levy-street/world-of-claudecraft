@@ -313,7 +313,8 @@ export const zh_CN: EnTranslations = {
     "keybinds": {
       "emoteWheel": "表情轮盘",
       "targetFriendly": "选中最近友方",
-      "targetFriendlyNext": "切换友方目标"
+      "targetFriendlyNext": "切换友方目标",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "左键",
@@ -338,6 +339,7 @@ export const zh_CN: EnTranslations = {
       "showDevBadges": "显示开发者徽章",
       "uiScale": "界面缩放",
       "highContrastBackground": "高对比度背景",
+      "startAttackOnAbility": "使用技能时自动攻击",
       "showItemLevel": "显示物品等级",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
@@ -488,6 +490,9 @@ export const zh_CN: EnTranslations = {
       "noQuestSelected": "在任务日志中选择一个任务进行分享。",
       "linkTitle": "Shift + 点击可在聊天中链接该任务。"
     },
+    "itemShare": {
+      "linkHint": "Shift + 点击可在聊天中链接该物品。"
+    },
     "plurals": {
       "guildMembers": {
         "one": "你是{rank}，{count}名成员",
@@ -512,6 +517,12 @@ export const zh_CN: EnTranslations = {
         "few": "查询：{realm}上有{count}名玩家在线。",
         "many": "查询：{realm}上有{count}名玩家在线。",
         "other": "查询：{realm}上有{count}名玩家在线。"
+      },
+      "playersMatching": {
+        "one": "查询：{realm}上有{count}名玩家匹配“{query}”。",
+        "few": "查询：{realm}上有{count}名玩家匹配“{query}”。",
+        "many": "查询：{realm}上有{count}名玩家匹配“{query}”。",
+        "other": "查询：{realm}上有{count}名玩家匹配“{query}”。"
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const zh_CN: EnTranslations = {
       "assigned": "{looter}将{item}分配给了{target}。",
       "unassigned": "{item}未被分配，现可自由拾取。",
       "leaderOnly": "只有队长才能更改拾取方式。"
+    },
+    "party": {
+      "promoteLeader": "提升为队长"
     },
     "bags": {
       "filterGroupAria": "按类别筛选背包",

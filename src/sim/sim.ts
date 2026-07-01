@@ -219,6 +219,7 @@ import {
 // (online.ts) stays byte-identical.
 export { computeQuestState } from './quests/quest_commands';
 
+import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
 import * as duelMod from './social/duel';
 
@@ -331,6 +332,10 @@ const JUMP_VELOCITY = 6; // apex = v^2/2g ≈ 1.125 yd
 // Exported for social/chat_readouts.ts (the /falling readout shares the landing-damage
 // threshold with the in-sim fall-damage model below).
 export const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
+// Host-agnostic raid-lockout fallback: when no host injects a reset boundary (offline
+// browser, headless RL env, tests), a kill locks for a flat 24h day. The authoritative
+// server overrides this with its realm-local 3 AM daily reset via SimConfig.raidResetMs.
+const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
 // OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
 // respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
 // gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
@@ -905,6 +910,7 @@ export class Sim {
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
+      raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
     };
     this.rng = new Rng(cfg.seed);
     // S0b seam: the shared SimContext every extracted slice routes through. Built
@@ -1052,6 +1058,12 @@ export class Sim {
 
   private lockoutNowMs(): number {
     return this.cfg.lockoutNowMs?.() ?? Math.floor(this.time * 1000);
+  }
+
+  // The next raid-reset instant for a given lockout "now". The host owns the boundary
+  // (server: realm-local 3 AM daily reset); offline/headless fall back to a flat 24h day.
+  private raidResetMs(nowMs: number): number {
+    return this.cfg.raidResetMs(nowMs);
   }
 
   // -------------------------------------------------------------------------
@@ -1283,6 +1295,10 @@ export class Sim {
     // Restore ability/potion cooldowns so a relog cannot reset them (see
     // cooldown_persist.ts). Re-anchored to this sim's clock; a fresh character has none.
     player.potionCooldownUntil = applyCooldowns(savedState?.cooldowns, player.cooldowns, this.time);
+    // Re-derive the display copy from the restored authority; otherwise a relog inside
+    // the shared potion cooldown paints the action bar as READY (no swipe) while the
+    // use-gate (which reads potionCooldownUntil) still rejects the quaff.
+    player.potionCdRemaining = Math.max(0, player.potionCooldownUntil - this.time);
     if (savedState?.pet) this.restorePet(player, savedState.pet);
     return player.id;
   }
@@ -1970,10 +1986,14 @@ export class Sim {
       onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),
       countItem: sim.countItem.bind(sim),
+      completeQuestForDev: (questId, pid) => completeQuestForDev(sim.ctx, questId, pid),
+      completeCurrentQuestsForDev: (pid) => completeCurrentQuestsForDev(sim.ctx, pid),
       // I1 dungeon instancing now lives in instances/dungeons.ts; these route through
       // the same-named Sim delegates (foreign callers use this.X). lockoutNowMs is the
-      // shared raid-lockout clock that stays on Sim (N1 also writes through it).
+      // shared raid-lockout clock that stays on Sim (N1 also writes through it);
+      // raidResetMs is the host-owned reset boundary the lockout grant reads through.
       lockoutNowMs: sim.lockoutNowMs.bind(sim),
+      raidResetMs: sim.raidResetMs.bind(sim),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       enterDungeon: sim.enterDungeon.bind(sim),
@@ -4466,6 +4486,14 @@ export class Sim {
     questCommands.turnInQuest(this.ctx, questId, pid);
   }
 
+  completeQuestForDev(questId: string, pid?: number): boolean {
+    return completeQuestForDev(this.ctx, questId, pid);
+  }
+
+  completeCurrentQuestsForDev(pid?: number): number {
+    return completeCurrentQuestsForDev(this.ctx, pid);
+  }
+
   // No-op in offline mode
   reportTelemetry(): void {}
 
@@ -4598,6 +4626,10 @@ export class Sim {
 
   partyKick(targetPid: number, pid?: number): void {
     this.party.partyKick(targetPid, pid);
+  }
+
+  partyPromote(targetPid: number, pid?: number): void {
+    this.party.partyPromote(targetPid, pid);
   }
 
   convertPartyToRaid(pid?: number): void {

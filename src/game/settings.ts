@@ -139,6 +139,12 @@ export const BOOL_SETTINGS = {
   // swipe-to-look) so pushing the stick up tilts the camera down — the classic
   // flight-sim / console preference some touch players reach for (#323-adjacent)
   touchInvertLook: { def: false },
+  // on by default: classic-style "start auto-attack on ability use". When on,
+  // using an offensive ability also engages your white-swing auto-attack (read
+  // live by the HUD at cast time, see ui/attack_on_ability.ts). The sim's
+  // startAutoAttack still no-ops unless a valid hostile target is in range, and
+  // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
+  startAttackOnAbilityUse: { def: true },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players

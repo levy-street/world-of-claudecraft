@@ -576,7 +576,7 @@ export function consumableReadout(e: Entity): string {
 }
 // Self-only readout of the shared combat-potion cooldown (#103). Distinct from
 // /cooldowns, which reads the per-ability Entity.cooldowns map and never shows
-// this separate 60s potion timer. potionCooldownUntil is an absolute sim-time
+// this separate 2-minute potion timer. potionCooldownUntil is an absolute sim-time
 // deadline, so the remaining time is computed against ctx.time.
 export function potionReadout(ctx: SimContext, e: Entity): string {
   const remaining = e.potionCooldownUntil - ctx.time;

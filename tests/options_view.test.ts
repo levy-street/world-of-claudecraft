@@ -243,6 +243,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'showDevBadges',
       'landingHighContrast',
       'invertLookY',
+      'startAttackOnAbilityUse',
       'showItemLevel',
       'showSecondaryActionBar',
     ]);

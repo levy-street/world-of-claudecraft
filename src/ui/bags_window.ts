@@ -35,6 +35,7 @@ import {
   type BagMode,
   bagItemAction,
   bagQualityKey,
+  bagShiftLinks,
   bagTooltipHintKey,
   buildBagGrid,
 } from './bags_view';
@@ -116,6 +117,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   addItemToTrade(itemId: string): void;
   /** Stage a bag item for a Market listing (selects it + repaints the market). */
   stageMarketSell(itemId: string): void;
+  /** Shift-click: insert a readable item link into the chat input. */
+  insertItemChatLink(itemId: string): void;
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
@@ -307,6 +310,10 @@ export class BagsWindow {
       );
       row.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemName)}</span><span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
+        if (ev.shiftKey && bagShiftLinks(this.bagMode())) {
+          this.deps.insertItemChatLink(s.itemId);
+          return;
+        }
         const action = bagItemAction(item, this.bagMode());
         switch (action) {
           case 'trade':
@@ -365,7 +372,10 @@ export class BagsWindow {
       this.deps.attachTooltip(row, () => {
         const key = bagTooltipHintKey(item, this.bagMode());
         const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
-        return this.deps.itemTooltip(item) + extra;
+        const link = bagShiftLinks(this.bagMode())
+          ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
+          : '';
+        return this.deps.itemTooltip(item) + extra + link;
       });
       grid.appendChild(row);
     }

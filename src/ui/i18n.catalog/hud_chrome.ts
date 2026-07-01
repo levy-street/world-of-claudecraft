@@ -263,6 +263,8 @@ export const hudChromeStrings = {
     emoteWheel: 'Emote Wheel',
     targetFriendly: 'Target Nearest Friendly',
     targetFriendlyNext: 'Cycle Friendly Target',
+    // Discord is a brand name; it stays identical across locales.
+    discord: 'Discord',
   },
   // Click-to-move mouse-button toggle labels (Key Bindings panel). The button id
   // 0/2 maps to these at the HUD render boundary.
@@ -306,6 +308,9 @@ export const hudChromeStrings = {
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
     highContrastBackground: 'High-Contrast Background',
+    // Interface panel toggle: also engage auto-attack when using an offensive
+    // ability, so white swings start without a separate Attack press (on by default).
+    startAttackOnAbility: 'Auto-Attack on Ability Use',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',
@@ -492,6 +497,9 @@ export const hudChromeStrings = {
     noQuestSelected: 'Select a quest in your log to share.',
     linkTitle: 'Shift-click to link this quest in chat.',
   },
+  itemShare: {
+    linkHint: 'Shift-click to link this item in chat.',
+  },
   // CLDR-categorized count strings resolved through tPlural(base, count) in
   // src/ui/i18n.ts: it selects the active locale's cardinal category (one / few /
   // many / other) via Intl.PluralRules and looks up the matching leaf, so e.g.
@@ -523,6 +531,12 @@ export const hudChromeStrings = {
       few: 'Who: {count} players online on {realm}.',
       many: 'Who: {count} players online on {realm}.',
       other: 'Who: {count} players online on {realm}.',
+    },
+    playersMatching: {
+      one: 'Who: {count} player matching "{query}" on {realm}.',
+      few: 'Who: {count} players matching "{query}" on {realm}.',
+      many: 'Who: {count} players matching "{query}" on {realm}.',
+      other: 'Who: {count} players matching "{query}" on {realm}.',
     },
   },
   // "Report a Bug" options sub-view (online only). Captures realm/character/
@@ -668,6 +682,13 @@ export const hudChromeStrings = {
     assigned: '{looter} assigned {item} to {target}.',
     unassigned: '{item} was not assigned and is free for all.',
     leaderOnly: 'Only the party leader can change the loot method.',
+  },
+  // Party leadership: the right-click "Promote to Leader" handoff action shown on a
+  // party member's context menu to the current leader. Lives in the English-only
+  // hud_chrome domain so an English-only PR compiles; the new-leader announcement
+  // itself is a sim emit re-localized through localizeSystemText (hud.logs.partyLeader).
+  party: {
+    promoteLeader: 'Promote to Leader',
   },
   // Modular bag filtering controls: the category chips, sort dropdown, and live
   // search above the bag grid, plus the "no items match" empty state.

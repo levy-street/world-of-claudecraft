@@ -313,7 +313,8 @@ export const vi_VN: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Vòng Biểu Cảm",
       "targetFriendly": "Chọn Đồng Minh Gần Nhất",
-      "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh"
+      "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Nhấp Trái",
@@ -338,6 +339,7 @@ export const vi_VN: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Tỷ Lệ Giao Diện",
       "highContrastBackground": "Nền Tương Phản Cao",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
@@ -488,6 +490,9 @@ export const vi_VN: EnTranslations = {
       "noQuestSelected": "Chọn một nhiệm vụ trong nhật ký để chia sẻ.",
       "linkTitle": "Shift-click để dẫn nhiệm vụ này vào khung trò chuyện."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "bạn là {rank}, {count} thành viên",
@@ -512,6 +517,12 @@ export const vi_VN: EnTranslations = {
         "few": "Ai: {count} người chơi đang trực tuyến trên {realm}.",
         "many": "Ai: {count} người chơi đang trực tuyến trên {realm}.",
         "other": "Ai: {count} người chơi đang trực tuyến trên {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const vi_VN: EnTranslations = {
       "assigned": "{looter} da gan {item} cho {target}.",
       "unassigned": "{item} chua duoc gan va moi nguoi deu co the nhat.",
       "leaderOnly": "Chi truong nhom co the doi phuong thuc chien loi pham."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Lọc túi đồ theo danh mục",

@@ -3313,6 +3313,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': 'Quedan {count} segundos',
   'hudChrome.plurals.secondsRemaining.many': 'Quedan {count} segundos',
   'hudChrome.plurals.secondsRemaining.other': 'Quedan {count} segundos',
+  'hudChrome.plurals.playersMatching.one':
+    'Quién: {count} jugador que coincide con "{query}" en {realm}.',
+  'hudChrome.plurals.playersMatching.few':
+    'Quién: {count} jugadores que coinciden con "{query}" en {realm}.',
+  'hudChrome.plurals.playersMatching.many':
+    'Quién: {count} jugadores que coinciden con "{query}" en {realm}.',
+  'hudChrome.plurals.playersMatching.other':
+    'Quién: {count} jugadores que coinciden con "{query}" en {realm}.',
   'hudChrome.plurals.playersOnline.one': 'Quién: {count} jugador conectado en {realm}.',
   'hudChrome.plurals.playersOnline.few': 'Quién: {count} jugadores conectados en {realm}.',
   'hudChrome.plurals.playersOnline.many': 'Quién: {count} jugadores conectados en {realm}.',

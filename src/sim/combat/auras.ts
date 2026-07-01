@@ -96,6 +96,7 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
 
 export function updateTimers(p: Entity): void {
   p.gcdRemaining = Math.max(0, p.gcdRemaining - DT);
+  p.potionCdRemaining = Math.max(0, p.potionCdRemaining - DT);
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {

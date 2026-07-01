@@ -313,7 +313,8 @@ export const ja_JP: EnTranslations = {
     "keybinds": {
       "emoteWheel": "エモートホイール",
       "targetFriendly": "最も近い味方をターゲット",
-      "targetFriendlyNext": "味方ターゲットを順に切り替え"
+      "targetFriendlyNext": "味方ターゲットを順に切り替え",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "左クリック",
@@ -338,6 +339,7 @@ export const ja_JP: EnTranslations = {
       "showDevBadges": "開発者バッジを表示",
       "uiScale": "UIスケール",
       "highContrastBackground": "高コントラスト背景",
+      "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
@@ -488,6 +490,9 @@ export const ja_JP: EnTranslations = {
       "noQuestSelected": "共有するクエストをログから選択してください。",
       "linkTitle": "Shift + クリックでこのクエストをチャットにリンクします。"
     },
+    "itemShare": {
+      "linkHint": "Shift + クリックでこのアイテムをチャットにリンクします。"
+    },
     "plurals": {
       "guildMembers": {
         "one": "あなたは{rank}、{count}人のメンバー",
@@ -512,6 +517,12 @@ export const ja_JP: EnTranslations = {
         "few": "Who：{realm}に{count}人のプレイヤーがオンラインです。",
         "many": "Who：{realm}に{count}人のプレイヤーがオンラインです。",
         "other": "Who：{realm}に{count}人のプレイヤーがオンラインです。"
+      },
+      "playersMatching": {
+        "one": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。",
+        "few": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。",
+        "many": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。",
+        "other": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。"
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const ja_JP: EnTranslations = {
       "assigned": "{looter}が{item}を{target}に分配しました。",
       "unassigned": "{item}は分配されず、誰でも入手できます。",
       "leaderOnly": "分配方式を変更できるのはパーティリーダーだけです。"
+    },
+    "party": {
+      "promoteLeader": "パーティリーダーに指定"
     },
     "bags": {
       "filterGroupAria": "バッグをカテゴリーで絞り込む",

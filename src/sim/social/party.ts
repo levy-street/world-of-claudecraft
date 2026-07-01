@@ -187,6 +187,30 @@ export class PartyMachine {
     this.removeFromParty(targetPid, 'has been removed from the party');
   }
 
+  // Leader-only handoff: pass leadership to another member without changing the
+  // roster. Master loot pinned to the leader (looter 0) and the leader-only HUD
+  // controls track `party.leader`, so they follow the new leader automatically.
+  partyPromote(targetPid: number, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    const party = this.partyOf(r.meta.entityId);
+    if (!party || party.leader !== r.meta.entityId) {
+      this.ctx.error(r.meta.entityId, 'You are not the party leader.');
+      return;
+    }
+    if (!party.members.includes(targetPid) || targetPid === party.leader) return;
+    party.leader = targetPid;
+    const newLeader = this.ctx.players.get(targetPid);
+    for (const mPid of party.members) {
+      this.ctx.emit({
+        type: 'log',
+        text: `${newLeader?.name ?? 'Someone'} is now the party leader.`,
+        color: '#aaf',
+        pid: mPid,
+      });
+    }
+  }
+
   convertPartyToRaid(pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;

@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { dist2d, type Aura, type Entity } from '../src/sim/types';
-import { DUNGEONS, ITEMS, MOBS, dungeonAt, instanceOrigin } from '../src/sim/data';
-import { isBlocked } from '../src/sim/colliders';
-import { groundHeight } from '../src/sim/world';
-import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { nextRaidResetMs } from '../server/raid_reset';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
+import { isBlocked } from '../src/sim/colliders';
+import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
+import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { Sim } from '../src/sim/sim';
+import { type Aura, dist2d, type Entity } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 type TickEvent = ReturnType<Sim['tick']>[number];
 type TimedEvent = { at: number; event: TickEvent };
@@ -31,8 +32,8 @@ function isDamageEvent(event: TickEvent): event is DamageEvent {
   return event.type === 'damage';
 }
 
-function makeWorld(lockoutNowMs?: () => number) {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, lockoutNowMs });
+function makeWorld(lockoutNowMs?: () => number, raidResetMs?: (nowMs: number) => number) {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, lockoutNowMs, raidResetMs });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -69,16 +70,20 @@ function enterRaid(sim: Sim, pid: number) {
 }
 
 function mob(sim: Sim, templateId: string): Entity {
-  const found = [...sim.entities.values()].find((e) => e.kind === 'mob' && e.templateId === templateId && !e.dead);
+  const found = [...sim.entities.values()].find(
+    (e) => e.kind === 'mob' && e.templateId === templateId && !e.dead,
+  );
   expect(found).toBeTruthy();
   return found!;
 }
 
 function objects(sim: Sim, itemId: string, near?: { x: number; z: number }): Entity[] {
-  return [...sim.entities.values()].filter((e) =>
-    e.kind === 'object'
-    && e.objectItemId === itemId
-    && (!near || dist2d(e.pos, { x: near.x, y: 0, z: near.z }) < 140));
+  return [...sim.entities.values()].filter(
+    (e) =>
+      e.kind === 'object' &&
+      e.objectItemId === itemId &&
+      (!near || dist2d(e.pos, { x: near.x, y: 0, z: near.z }) < 140),
+  );
 }
 
 function deathlessChannelObjects(sim: Sim, near: { x: number; z: number }): Entity[] {
@@ -119,13 +124,32 @@ function collectEventsForSeconds(sim: Sim, seconds: number): TimedEvent[] {
 }
 
 function killMob(sim: Sim, mob: Entity, killer: Entity) {
-  (sim as unknown as {
-    dealDamage(source: Entity, target: Entity, amount: number, crit: boolean, school: string, ability: string | null, kind: 'hit', noRage?: boolean): void;
-  }).dealDamage(killer, mob, mob.hp, false, 'physical', null, 'hit', true);
+  (
+    sim as unknown as {
+      dealDamage(
+        source: Entity,
+        target: Entity,
+        amount: number,
+        crit: boolean,
+        school: string,
+        ability: string | null,
+        kind: 'hit',
+        noRage?: boolean,
+      ): void;
+    }
+  ).dealDamage(killer, mob, mob.hp, false, 'physical', null, 'hit', true);
 }
 
-function applyExternalAura(sim: Sim, target: Entity, sourceId: number, aura: Omit<Aura, 'sourceId'>) {
-  (sim as unknown as { applyAura(target: Entity, aura: Aura): void }).applyAura(target, { ...aura, sourceId });
+function applyExternalAura(
+  sim: Sim,
+  target: Entity,
+  sourceId: number,
+  aura: Omit<Aura, 'sourceId'>,
+) {
+  (sim as unknown as { applyAura(target: Entity, aura: Aura): void }).applyAura(target, {
+    ...aura,
+    sourceId,
+  });
 }
 
 describe('Nythraxis raid encounter', () => {
@@ -133,15 +157,18 @@ describe('Nythraxis raid encounter', () => {
     const crypt = DUNGEONS.nythraxis_crypt;
     const dungeon = DUNGEONS.nythraxis_boss_arena;
     expect(crypt.interior).toBe('crypt');
-    expect(crypt.objects?.some((o) => o.templateId === 'dungeon_door' && o.dungeonId === 'nythraxis_boss_arena' && o.z >= 109)).toBe(true);
+    expect(
+      crypt.objects?.some(
+        (o) =>
+          o.templateId === 'dungeon_door' && o.dungeonId === 'nythraxis_boss_arena' && o.z >= 109,
+      ),
+    ).toBe(true);
     // The crypt's interactables are the three attunement relics that summon the
     // guardian undead. The Royal Graves belong to the overworld q_nythraxis_graves
     // quest (ZONE3_OBJECTS) — they must not be duplicated inside the crypt.
-    expect(crypt.objects?.map((o) => o.itemId)).toEqual(expect.arrayContaining([
-      'captains_crest',
-      'priests_sigil',
-      'royal_seal',
-    ]));
+    expect(crypt.objects?.map((o) => o.itemId)).toEqual(
+      expect.arrayContaining(['captains_crest', 'priests_sigil', 'royal_seal']),
+    );
     expect(crypt.objects?.some((o) => o.itemId.startsWith('grave_'))).toBe(false);
     expect(dungeon.interior).toBe('nythraxis');
     expect(dungeon.suggestedPlayers).toBe(10);
@@ -169,8 +196,15 @@ describe('Nythraxis raid encounter', () => {
     const wards = objects(sim, 'bastion_ward_stone', origin);
     const pillars = objects(sim, 'soulshard_pillar', origin);
     expect(wards).toHaveLength(3);
-    expect(wards.map((w) => ({ x: Math.round(w.pos.x - origin.x), z: Math.round(w.pos.z - origin.z) })).sort((a, b) => a.x - b.x))
-      .toEqual([{ x: -40, z: 79 }, { x: 0, z: 63 }, { x: 40, z: 79 }]);
+    expect(
+      wards
+        .map((w) => ({ x: Math.round(w.pos.x - origin.x), z: Math.round(w.pos.z - origin.z) }))
+        .sort((a, b) => a.x - b.x),
+    ).toEqual([
+      { x: -40, z: 79 },
+      { x: 0, z: 63 },
+      { x: 40, z: 79 },
+    ]);
     expect(pillars).toHaveLength(0);
     expect(isBlocked(sim.cfg.seed, origin.x + 0, origin.z + 96)).toBe(false);
     expect(isBlocked(sim.cfg.seed, origin.x + 18, origin.z + 82)).toBe(false);
@@ -319,10 +353,15 @@ describe('Nythraxis raid encounter', () => {
     engage(boss, tank);
 
     const events = collectEventsForSeconds(sim, 6);
-    const openingYells = events.filter(isTimedChatEvent).filter((row) =>
-      row.event.from === boss.name
-      && row.event.channel === 'yell'
-      && (row.event.text === 'Another kingdom comes to challenge me' || row.event.text === 'You will join the rest'));
+    const openingYells = events
+      .filter(isTimedChatEvent)
+      .filter(
+        (row) =>
+          row.event.from === boss.name &&
+          row.event.channel === 'yell' &&
+          (row.event.text === 'Another kingdom comes to challenge me' ||
+            row.event.text === 'You will join the rest'),
+      );
 
     expect(openingYells.map((row) => row.event.text)).toEqual([
       'Another kingdom comes to challenge me',
@@ -345,17 +384,23 @@ describe('Nythraxis raid encounter', () => {
     engage(boss, tank);
 
     const events = collectEventsForSeconds(sim, 12);
-    const bossYells = events.filter(isTimedChatEvent).filter((row) =>
-      row.event.from === boss.name
-      && row.event.channel === 'yell');
-    const openingYells = bossYells.filter((row) =>
-      row.event.text === 'Another kingdom comes to challenge me'
-      || row.event.text === 'You will join the rest');
+    const bossYells = events
+      .filter(isTimedChatEvent)
+      .filter((row) => row.event.from === boss.name && row.event.channel === 'yell');
+    const openingYells = bossYells.filter(
+      (row) =>
+        row.event.text === 'Another kingdom comes to challenge me' ||
+        row.event.text === 'You will join the rest',
+    );
     const kneelYells = bossYells.filter((row) => row.event.text === 'Kneel before your king');
-    const gravebreakerFx = events.filter(isTimedSpellFxEvent).filter((row) =>
-      row.event.sourceId === boss.id
-      && row.event.fx === 'nova'
-      && row.event.school === 'physical');
+    const gravebreakerFx = events
+      .filter(isTimedSpellFxEvent)
+      .filter(
+        (row) =>
+          row.event.sourceId === boss.id &&
+          row.event.fx === 'nova' &&
+          row.event.school === 'physical',
+      );
 
     expect(openingYells.map((row) => row.event.text)).toEqual([
       'Another kingdom comes to challenge me',
@@ -405,13 +450,17 @@ describe('Nythraxis raid encounter', () => {
     };
 
     const events = collectEventsForSeconds(sim, 66);
-    const gravebreakerFx = events.filter(isTimedSpellFxEvent).filter((row) =>
-      row.event.sourceId === boss.id
-      && row.event.fx === 'nova'
-      && row.event.school === 'physical');
-    const kneelYells = events.filter(isTimedChatEvent).filter((row) =>
-      row.event.text === 'Kneel before your king'
-      && row.event.from === boss.name);
+    const gravebreakerFx = events
+      .filter(isTimedSpellFxEvent)
+      .filter(
+        (row) =>
+          row.event.sourceId === boss.id &&
+          row.event.fx === 'nova' &&
+          row.event.school === 'physical',
+      );
+    const kneelYells = events
+      .filter(isTimedChatEvent)
+      .filter((row) => row.event.text === 'Kneel before your king' && row.event.from === boss.name);
 
     expect(gravebreakerFx).toHaveLength(6);
     expect(kneelYells).toHaveLength(2);
@@ -464,10 +513,11 @@ describe('Nythraxis raid encounter', () => {
     };
 
     const events = sim.tick();
-    const gravebreakerHits = events.filter(isDamageEvent).filter((ev) =>
-      ev.sourceId === boss.id
-      && ev.ability === 'Gravebreaker'
-      && ev.kind === 'hit');
+    const gravebreakerHits = events
+      .filter(isDamageEvent)
+      .filter(
+        (ev) => ev.sourceId === boss.id && ev.ability === 'Gravebreaker' && ev.kind === 'hit',
+      );
     const tankHit = gravebreakerHits.find((ev) => ev.targetId === tank.id);
     const secondaryHit = gravebreakerHits.find((ev) => ev.targetId === secondary.id);
 
@@ -522,10 +572,11 @@ describe('Nythraxis raid encounter', () => {
     };
 
     const events = sim.tick();
-    const gravebreakerHits = events.filter(isDamageEvent).filter((ev) =>
-      ev.sourceId === boss.id
-      && ev.ability === 'Gravebreaker'
-      && ev.kind === 'hit');
+    const gravebreakerHits = events
+      .filter(isDamageEvent)
+      .filter(
+        (ev) => ev.sourceId === boss.id && ev.ability === 'Gravebreaker' && ev.kind === 'hit',
+      );
     const tankHit = gravebreakerHits.find((ev) => ev.targetId === tank.id);
     const besideTankHit = gravebreakerHits.find((ev) => ev.targetId === besideTank.id);
     const behindHit = gravebreakerHits.find((ev) => ev.targetId === behind.id);
@@ -591,10 +642,11 @@ describe('Nythraxis raid encounter', () => {
     };
 
     const events = sim.tick();
-    const gravebreakerHits = events.filter(isDamageEvent).filter((ev) =>
-      ev.sourceId === boss.id
-      && ev.ability === 'Gravebreaker'
-      && ev.kind === 'hit');
+    const gravebreakerHits = events
+      .filter(isDamageEvent)
+      .filter(
+        (ev) => ev.sourceId === boss.id && ev.ability === 'Gravebreaker' && ev.kind === 'hit',
+      );
 
     expect(gravebreakerHits.some((ev) => ev.targetId === tank.id)).toBe(true);
     expect(gravebreakerHits.some((ev) => ev.targetId === inside.id)).toBe(true);
@@ -638,12 +690,18 @@ describe('Nythraxis raid encounter', () => {
 
     const events = sim.tick();
 
-    expect(events.some((ev) =>
-      ev.type === 'spellfx'
-      && ev.sourceId === boss.id
-      && ev.fx === 'nova'
-      && ev.school === 'physical')).toBe(true);
-    expect(events.some((ev) => ev.type === 'chat' && ev.text === 'Kneel before your king')).toBe(false);
+    expect(
+      events.some(
+        (ev) =>
+          ev.type === 'spellfx' &&
+          ev.sourceId === boss.id &&
+          ev.fx === 'nova' &&
+          ev.school === 'physical',
+      ),
+    ).toBe(true);
+    expect(events.some((ev) => ev.type === 'chat' && ev.text === 'Kneel before your king')).toBe(
+      false,
+    );
   });
 
   it('lets Soul Rend callout interrupt an active non-critical dialogue set', () => {
@@ -683,7 +741,9 @@ describe('Nythraxis raid encounter', () => {
 
     const events = sim.tick();
 
-    expect(events.some((ev) => ev.type === 'chat' && ev.text === 'Your spirit belongs to me')).toBe(true);
+    expect(events.some((ev) => ev.type === 'chat' && ev.text === 'Your spirit belongs to me')).toBe(
+      true,
+    );
     expect(boss.nythraxis.soulRendMarks.length).toBeGreaterThan(0);
   });
 
@@ -720,7 +780,9 @@ describe('Nythraxis raid encounter', () => {
 
     const events = sim.tick();
 
-    expect(events.some((ev) => ev.type === 'chat' && ev.text === 'Witness true eternity!')).toBe(true);
+    expect(events.some((ev) => ev.type === 'chat' && ev.text === 'Witness true eternity!')).toBe(
+      true,
+    );
     expect(boss.castingAbility).toBe('nythraxis_deathless_rage');
   });
 
@@ -741,7 +803,11 @@ describe('Nythraxis raid encounter', () => {
     const events = sim.tick();
 
     expect(dist2d(boss.pos, tank.pos)).toBeLessThanOrEqual(8);
-    expect(events.some((ev) => ev.type === 'damage' && ev.sourceId === boss.id && ev.targetId === tank.id)).toBe(true);
+    expect(
+      events.some(
+        (ev) => ev.type === 'damage' && ev.sourceId === boss.id && ev.targetId === tank.id,
+      ),
+    ).toBe(true);
   });
 
   it('keeps Nythraxis closing to his desired melee band while he can already swing', () => {
@@ -790,11 +856,15 @@ describe('Nythraxis raid encounter', () => {
         tank.prevPos = oldPos;
       }
       const events = sim.tick();
-      if (events.some((ev) =>
-        ev.type === 'damage'
-        && ev.sourceId === boss.id
-        && ev.targetId === tank.id
-        && ev.ability === null)) {
+      if (
+        events.some(
+          (ev) =>
+            ev.type === 'damage' &&
+            ev.sourceId === boss.id &&
+            ev.targetId === tank.id &&
+            ev.ability === null,
+        )
+      ) {
         hitTimes.push(t);
       }
     }
@@ -850,11 +920,15 @@ describe('Nythraxis raid encounter', () => {
       tank.pos.y = groundHeight(tank.pos.x, tank.pos.z, sim.cfg.seed);
       tank.prevPos = oldPos;
       const events = sim.tick();
-      if (events.some((ev) =>
-        ev.type === 'damage'
-        && ev.sourceId === boss.id
-        && ev.targetId === tank.id
-        && ev.ability === null)) {
+      if (
+        events.some(
+          (ev) =>
+            ev.type === 'damage' &&
+            ev.sourceId === boss.id &&
+            ev.targetId === tank.id &&
+            ev.ability === null,
+        )
+      ) {
         hitTimes.push(t);
       }
     }
@@ -907,7 +981,11 @@ describe('Nythraxis raid encounter', () => {
     const events = sim.tick();
 
     expect(dist2d(add.pos, tank.pos)).toBeLessThanOrEqual(5.75);
-    expect(events.some((ev) => ev.type === 'damage' && ev.sourceId === add.id && ev.targetId === tank.id)).toBe(true);
+    expect(
+      events.some(
+        (ev) => ev.type === 'damage' && ev.sourceId === add.id && ev.targetId === tank.id,
+      ),
+    ).toBe(true);
   });
 
   it('keeps Nythraxis adds closing to their desired melee band while they can already swing', () => {
@@ -1008,7 +1086,11 @@ describe('Nythraxis raid encounter', () => {
       tank.pos.y = groundHeight(tank.pos.x, tank.pos.z, sim.cfg.seed);
       tank.prevPos = oldPos;
       const events = sim.tick();
-      if (events.some((ev) => ev.type === 'damage' && ev.sourceId === add.id && ev.targetId === tank.id)) {
+      if (
+        events.some(
+          (ev) => ev.type === 'damage' && ev.sourceId === add.id && ev.targetId === tank.id,
+        )
+      ) {
         hitTimes.push(t);
       }
     }
@@ -1070,7 +1152,11 @@ describe('Nythraxis raid encounter', () => {
       tank.pos.y = groundHeight(tank.pos.x, tank.pos.z, sim.cfg.seed);
       tank.prevPos = oldPos;
       const events = sim.tick();
-      if (events.some((ev) => ev.type === 'damage' && ev.sourceId === add.id && ev.targetId === tank.id)) {
+      if (
+        events.some(
+          (ev) => ev.type === 'damage' && ev.sourceId === add.id && ev.targetId === tank.id,
+        )
+      ) {
         hitTimes.push(t);
       }
     }
@@ -1248,11 +1334,51 @@ describe('Nythraxis raid encounter', () => {
     enterRaid(sim, tankPid);
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     const controls: Omit<Aura, 'sourceId'>[] = [
-      { id: 'test_slow', name: 'Test Slow', kind: 'slow', remaining: 10, duration: 10, value: 0.5, school: 'frost' },
-      { id: 'test_root', name: 'Test Root', kind: 'root', remaining: 10, duration: 10, value: 0, school: 'nature' },
-      { id: 'test_stun', name: 'Test Stun', kind: 'stun', remaining: 4, duration: 4, value: 0, school: 'physical' },
-      { id: 'test_fear', name: 'Test Fear', kind: 'incapacitate', remaining: 8, duration: 8, value: 0, school: 'shadow' },
-      { id: 'test_poly', name: 'Test Polymorph', kind: 'polymorph', remaining: 12, duration: 12, value: 0, school: 'arcane' },
+      {
+        id: 'test_slow',
+        name: 'Test Slow',
+        kind: 'slow',
+        remaining: 10,
+        duration: 10,
+        value: 0.5,
+        school: 'frost',
+      },
+      {
+        id: 'test_root',
+        name: 'Test Root',
+        kind: 'root',
+        remaining: 10,
+        duration: 10,
+        value: 0,
+        school: 'nature',
+      },
+      {
+        id: 'test_stun',
+        name: 'Test Stun',
+        kind: 'stun',
+        remaining: 4,
+        duration: 4,
+        value: 0,
+        school: 'physical',
+      },
+      {
+        id: 'test_fear',
+        name: 'Test Fear',
+        kind: 'incapacitate',
+        remaining: 8,
+        duration: 8,
+        value: 0,
+        school: 'shadow',
+      },
+      {
+        id: 'test_poly',
+        name: 'Test Polymorph',
+        kind: 'polymorph',
+        remaining: 12,
+        duration: 12,
+        value: 0,
+        school: 'arcane',
+      },
     ];
 
     for (const aura of controls) applyExternalAura(sim, boss, tankPid, aura);
@@ -1290,11 +1416,51 @@ describe('Nythraxis raid encounter', () => {
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     const controls: Omit<Aura, 'sourceId'>[] = [
-      { id: 'test_slow', name: 'Test Slow', kind: 'slow', remaining: 10, duration: 10, value: 0.5, school: 'frost' },
-      { id: 'test_root', name: 'Test Root', kind: 'root', remaining: 10, duration: 10, value: 0, school: 'nature' },
-      { id: 'test_stun', name: 'Test Stun', kind: 'stun', remaining: 4, duration: 4, value: 0, school: 'physical' },
-      { id: 'test_fear', name: 'Test Fear', kind: 'incapacitate', remaining: 8, duration: 8, value: 0, school: 'shadow' },
-      { id: 'test_poly', name: 'Test Polymorph', kind: 'polymorph', remaining: 12, duration: 12, value: 0, school: 'arcane' },
+      {
+        id: 'test_slow',
+        name: 'Test Slow',
+        kind: 'slow',
+        remaining: 10,
+        duration: 10,
+        value: 0.5,
+        school: 'frost',
+      },
+      {
+        id: 'test_root',
+        name: 'Test Root',
+        kind: 'root',
+        remaining: 10,
+        duration: 10,
+        value: 0,
+        school: 'nature',
+      },
+      {
+        id: 'test_stun',
+        name: 'Test Stun',
+        kind: 'stun',
+        remaining: 4,
+        duration: 4,
+        value: 0,
+        school: 'physical',
+      },
+      {
+        id: 'test_fear',
+        name: 'Test Fear',
+        kind: 'incapacitate',
+        remaining: 8,
+        duration: 8,
+        value: 0,
+        school: 'shadow',
+      },
+      {
+        id: 'test_poly',
+        name: 'Test Polymorph',
+        kind: 'polymorph',
+        remaining: 12,
+        duration: 12,
+        value: 0,
+        school: 'arcane',
+      },
     ];
 
     for (const aura of controls) applyExternalAura(sim, add, tankPid, aura);
@@ -1418,12 +1584,18 @@ describe('Nythraxis raid encounter', () => {
     expect(tank.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
     // Brother Aldric is a dynamically-spawned NPC (not a friendly mob) so the
     // online client can open his turn-in dialog.
-    const aldric = [...sim.entities.values()].find((e) => e.templateId === 'brother_aldric_raid' && !e.dead);
+    const aldric = [...sim.entities.values()].find(
+      (e) => e.templateId === 'brother_aldric_raid' && !e.dead,
+    );
     expect(aldric).toBeTruthy();
     expect(aldric!.kind).toBe('npc');
 
     tickSeconds(sim, 8);
-    expect(deathlessChannelObjects(sim, boss.spawnPos).every((w) => w.auras.some((a) => a.id === 'nythraxis_wardstone_lit'))).toBe(true);
+    expect(
+      deathlessChannelObjects(sim, boss.spawnPos).every((w) =>
+        w.auras.some((a) => a.id === 'nythraxis_wardstone_lit'),
+      ),
+    ).toBe(true);
     tickSeconds(sim, 20);
     expect(boss.nythraxis?.phase).toBe(2);
     expect(boss.nythraxis?.soulRendTimer).toBeGreaterThan(4);
@@ -1465,7 +1637,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
     };
     sim.tick();
-    const adds = [...sim.entities.values()].filter((e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior');
+    const adds = [...sim.entities.values()].filter(
+      (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior',
+    );
     expect(adds).toHaveLength(2);
     for (const add of adds) {
       add.pos = { ...tank.pos };
@@ -1482,10 +1656,17 @@ describe('Nythraxis raid encounter', () => {
     const transitionHp = tank.hp;
     const transitionEvents = collectEventsForSeconds(sim, 20);
 
-    expect(adds.every((add) => add.auras.some((a) => a.id === 'nythraxis_transition_stun'))).toBe(true);
-    expect(transitionEvents.filter(isTimedDamageEvent).some((row) =>
-      adds.some((add) => add.id === row.event.sourceId)
-      && row.event.targetId === tank.id)).toBe(false);
+    expect(adds.every((add) => add.auras.some((a) => a.id === 'nythraxis_transition_stun'))).toBe(
+      true,
+    );
+    expect(
+      transitionEvents
+        .filter(isTimedDamageEvent)
+        .some(
+          (row) =>
+            adds.some((add) => add.id === row.event.sourceId) && row.event.targetId === tank.id,
+        ),
+    ).toBe(false);
     expect(tank.hp).toBe(transitionHp);
     expect(boss.nythraxis?.phase).toBe('transition');
   });
@@ -1514,9 +1695,11 @@ describe('Nythraxis raid encounter', () => {
     const transitionEvents = collectEventsForSeconds(sim, 20);
 
     expect(pet.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
-    expect(transitionEvents.filter(isTimedDamageEvent).some((row) =>
-      row.event.sourceId === pet.id
-      && row.event.targetId === boss.id)).toBe(false);
+    expect(
+      transitionEvents
+        .filter(isTimedDamageEvent)
+        .some((row) => row.event.sourceId === pet.id && row.event.targetId === boss.id),
+    ).toBe(false);
     expect(boss.hp).toBe(transitionBossHp);
   });
 
@@ -1532,10 +1715,16 @@ describe('Nythraxis raid encounter', () => {
     engage(boss, tank);
 
     tickSeconds(sim, 31);
-    expect([...sim.entities.values()].filter((e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead)).toHaveLength(0);
+    expect(
+      [...sim.entities.values()].filter(
+        (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead,
+      ),
+    ).toHaveLength(0);
 
     tickSeconds(sim, 15);
-    const adds = [...sim.entities.values()].filter((e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead);
+    const adds = [...sim.entities.values()].filter(
+      (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead,
+    );
     expect(adds).toHaveLength(2);
     expect(adds[0].weapon.min).toBe(159);
     expect(adds[0].weapon.max).toBe(248);
@@ -1559,10 +1748,12 @@ describe('Nythraxis raid encounter', () => {
 
     sim.tick();
     const transitionEvents = collectEventsForSeconds(sim, 27);
-    const aldricYells = transitionEvents.filter(isTimedChatEvent).filter((row) =>
-      row.event.from === 'Brother Aldric'
-      && row.event.channel === 'yell');
-    const uniqueAldricYells = aldricYells.filter((row, i) => i === 0 || row.event.text !== aldricYells[i - 1].event.text);
+    const aldricYells = transitionEvents
+      .filter(isTimedChatEvent)
+      .filter((row) => row.event.from === 'Brother Aldric' && row.event.channel === 'yell');
+    const uniqueAldricYells = aldricYells.filter(
+      (row, i) => i === 0 || row.event.text !== aldricYells[i - 1].event.text,
+    );
     expect(uniqueAldricYells.map((row) => row.event.text)).toEqual([
       'Your kingdom is gone, Nythraxis',
       'Yet you still cling to it',
@@ -1578,14 +1769,18 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.nythraxis?.soulRendMarks).toHaveLength(0);
 
     const settleEvents = collectEventsForSeconds(sim, 4);
-    expect(settleEvents.filter(isTimedChatEvent).some((row) =>
-      row.event.text === 'Your spirit belongs to me')).toBe(false);
+    expect(
+      settleEvents
+        .filter(isTimedChatEvent)
+        .some((row) => row.event.text === 'Your spirit belongs to me'),
+    ).toBe(false);
     expect(boss.nythraxis?.phase).toBe(2);
     expect(boss.nythraxis?.soulRendMarks).toHaveLength(0);
 
     const openerEvents = collectEventsForSeconds(sim, 2);
-    const soulRendYell = openerEvents.filter(isTimedChatEvent).find((row) =>
-      row.event.text === 'Your spirit belongs to me');
+    const soulRendYell = openerEvents
+      .filter(isTimedChatEvent)
+      .find((row) => row.event.text === 'Your spirit belongs to me');
     expect(soulRendYell).toBeDefined();
     expect(soulRendYell!.at).toBeGreaterThan(uniqueAldricYells.at(-1)!.at);
     expect(boss.nythraxis?.soulRendMarks.length).toBeGreaterThan(0);
@@ -1883,8 +2078,16 @@ describe('Nythraxis raid encounter', () => {
     expect(alive.hp).toBeLessThan(alive.maxHp);
     expect(deadPlayer.hp).toBe(0);
     expect(pet.hp).toBe(pet.maxHp);
-    expect(events.some((ev) => ev.type === 'damage' && ev.targetId === deadPid && ev.ability === 'Soul Rend')).toBe(false);
-    expect(events.some((ev) => ev.type === 'damage' && ev.targetId === pet.id && ev.ability === 'Soul Rend')).toBe(false);
+    expect(
+      events.some(
+        (ev) => ev.type === 'damage' && ev.targetId === deadPid && ev.ability === 'Soul Rend',
+      ),
+    ).toBe(false);
+    expect(
+      events.some(
+        (ev) => ev.type === 'damage' && ev.targetId === pet.id && ev.ability === 'Soul Rend',
+      ),
+    ).toBe(false);
   });
 
   it('interrupts Deathless Rage when three players channel the wardstones', () => {
@@ -1928,7 +2131,9 @@ describe('Nythraxis raid encounter', () => {
 
     expect(boss.castingAbility).toBeNull();
     expect(boss.nythraxis?.deathlessStunRemaining).toBeGreaterThan(0);
-    expect(boss.auras.some((a) => a.id === 'nythraxis_deathless_stun' && a.kind === 'stun')).toBe(true);
+    expect(boss.auras.some((a) => a.id === 'nythraxis_deathless_stun' && a.kind === 'stun')).toBe(
+      true,
+    );
     expect(channelers.every((pid) => sim.entities.get(pid)!.castingAbility === null)).toBe(true);
     expect(objects(sim, 'bastion_ward_stone', origin)).toHaveLength(3);
     expect(objects(sim, 'soulshard_pillar', origin)).toHaveLength(0);
@@ -1972,7 +2177,9 @@ describe('Nythraxis raid encounter', () => {
     expect(remaining).toBeLessThan(4);
 
     sim.interact(pid);
-    expect(boss.nythraxis!.wardChannels.find((c) => c.objectId === ward.id)!.remaining).toBeCloseTo(remaining);
+    expect(boss.nythraxis!.wardChannels.find((c) => c.objectId === ward.id)!.remaining).toBeCloseTo(
+      remaining,
+    );
   });
 
   it('does not interrupt Deathless Rage unless all three wardstone channels complete', () => {
@@ -2107,7 +2314,9 @@ describe('Nythraxis raid encounter', () => {
     expect(channel.playerId).toBe(pid);
     expect(sim.entities.get(pid)!.castingAbility).toBe('nythraxis_ward_channel');
     expect(ward.lootable).toBe(true);
-    expect(sim.players.get(pid)!.inventory.some((slot) => slot?.itemId === 'bastion_ward_stone')).toBe(false);
+    expect(
+      sim.players.get(pid)!.inventory.some((slot) => slot?.itemId === 'bastion_ward_stone'),
+    ).toBe(false);
   });
 
   it('never leashes/resets when kited — keeps chasing instead of evading home', () => {
@@ -2115,16 +2324,19 @@ describe('Nythraxis raid encounter', () => {
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
     const tank = sim.entities.get(tankPid)!;
-    tank.maxHp = 1e7; tank.hp = tank.maxHp; // survive so a wipe can't muddy the test
+    tank.maxHp = 1e7;
+    tank.hp = tank.maxHp; // survive so a wipe can't muddy the test
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     engage(boss, tank);
     sim.tick(); // init the encounter
     // drag the boss far from its home (further than any leash) but keep the tank
     // alive in the room; a normal mob would evade — Nythraxis must not.
     teleport(sim, tankPid, origin.x + 150, origin.z + 96);
-    boss.pos.x = origin.x + 140; boss.pos.z = origin.z + 96; boss.prevPos = { ...boss.pos };
+    boss.pos.x = origin.x + 140;
+    boss.pos.z = origin.z + 96;
+    boss.prevPos = { ...boss.pos };
     tickSeconds(sim, 3);
-    expect(boss.nythraxis).toBeTruthy();        // encounter still live
+    expect(boss.nythraxis).toBeTruthy(); // encounter still live
     expect(boss.dead).toBe(false);
     expect(boss.aiState).not.toBe('evade');
     expect(boss.aiState).not.toBe('idle');
@@ -2140,10 +2352,11 @@ describe('Nythraxis raid encounter', () => {
     sim.tick();
     expect(boss.nythraxis).toBeTruthy();
     boss.hp = Math.floor(boss.maxHp * 0.4); // mid-fight
-    tank.dead = true; tank.hp = 0;            // raid wipes
+    tank.dead = true;
+    tank.hp = 0; // raid wipes
     tickSeconds(sim, 1);
-    expect(boss.nythraxis).toBeUndefined();             // encounter reset
-    expect(boss.hp).toBe(boss.maxHp);                   // back to full
+    expect(boss.nythraxis).toBeUndefined(); // encounter reset
+    expect(boss.hp).toBe(boss.maxHp); // back to full
     expect(dist2d(boss.pos, boss.spawnPos)).toBeLessThan(1); // sent home
     expect(boss.inCombat).toBe(false);
   });
@@ -2161,14 +2374,45 @@ describe('Nythraxis raid encounter', () => {
     expect(dist2d(tank.pos, inside)).toBeLessThan(0.1); // could not flee
     expect(tank.pos.x).toBeGreaterThan(3000);
     // boss dies -> seal lifts
-    boss.dead = true; boss.hp = 0;
+    boss.dead = true;
+    boss.hp = 0;
     sim.tick();
     sim.leaveDungeon(tankPid);
     expect(tank.pos.x).toBeLessThan(3000); // back out to Thornpeak
   });
 
-  it('locks raid members out of the Nythraxis arena for 24 hours after boss defeat', () => {
-    let now = 1_000_000;
+  it('locks raid members out of the Nythraxis arena until the next realm-local 3 AM reset', () => {
+    // 2025-06-29 12:00 EDT (16:00 UTC). With the server's realm-local reset injected
+    // through the lockout seam, the lockout expires at the next US Eastern 3 AM reset
+    // (2025-06-30 03:00 EDT == 07:00 UTC), not 24h from the kill.
+    let now = Date.UTC(2025, 5, 29, 16, 0, 0);
+    const reset = nextRaidResetMs(now);
+    const sim = makeWorld(
+      () => now,
+      (nowMs) => nextRaidResetMs(nowMs),
+    );
+    const tankPid = sim.addPlayer('warrior', 'Tank');
+    enterRaid(sim, tankPid);
+    const tank = sim.entities.get(tankPid)!;
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    engage(boss, tank);
+    killMob(sim, boss, tank);
+    expect(sim.players.get(tankPid)?.raidLockouts.get('nythraxis_boss_arena')).toBe(reset);
+
+    sim.leaveDungeon(tankPid);
+    expect(tank.pos.x).toBeLessThan(3000);
+    sim.enterDungeon('nythraxis_boss_arena', tankPid);
+    expect(tank.pos.x).toBeLessThan(3000); // still locked before the reset
+
+    now = reset + 1; // just past the daily reset boundary
+    sim.enterDungeon('nythraxis_boss_arena', tankPid);
+    expect(tank.pos.x).toBeGreaterThan(3000); // lockout lifted, re-entry allowed
+  });
+
+  it('falls back to a flat 24h lockout when the host injects no reset boundary (offline/headless)', () => {
+    // The offline browser and the headless RL env omit raidResetMs, so a kill locks for
+    // a plain 24h day rather than a realm-local 3 AM reset (the server's behavior).
+    const now = 1_000_000;
     const sim = makeWorld(() => now);
     const tankPid = sim.addPlayer('warrior', 'Tank');
     enterRaid(sim, tankPid);
@@ -2176,16 +2420,9 @@ describe('Nythraxis raid encounter', () => {
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     engage(boss, tank);
     killMob(sim, boss, tank);
-    expect(sim.players.get(tankPid)?.raidLockouts.get('nythraxis_boss_arena')).toBe(now + 24 * 60 * 60 * 1000);
-
-    sim.leaveDungeon(tankPid);
-    expect(tank.pos.x).toBeLessThan(3000);
-    sim.enterDungeon('nythraxis_boss_arena', tankPid);
-    expect(tank.pos.x).toBeLessThan(3000);
-
-    now += 24 * 60 * 60 * 1000 + 1;
-    sim.enterDungeon('nythraxis_boss_arena', tankPid);
-    expect(tank.pos.x).toBeGreaterThan(3000);
+    expect(sim.players.get(tankPid)?.raidLockouts.get('nythraxis_boss_arena')).toBe(
+      now + 24 * 60 * 60 * 1000,
+    );
   });
 
   it('does not allow dueling inside the Nythraxis boss arena', () => {

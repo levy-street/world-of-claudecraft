@@ -5,6 +5,7 @@ import {
   type BagMode,
   bagItemAction,
   bagQualityKey,
+  bagShiftLinks,
   bagTooltipHintKey,
   buildBagGrid,
 } from '../src/ui/bags_view';
@@ -26,6 +27,16 @@ const ITEMS: Record<string, ItemDef> = {
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
+
+describe('bagShiftLinks', () => {
+  it('links to chat in every mode except at a vendor (split-stack owns shift there)', () => {
+    expect(bagShiftLinks(NO_MODE)).toBe(true);
+    expect(bagShiftLinks({ ...NO_MODE, tradeOpen: true })).toBe(true);
+    expect(bagShiftLinks({ ...NO_MODE, marketSell: true })).toBe(true);
+    expect(bagShiftLinks({ ...NO_MODE, petFeed: true })).toBe(true);
+    expect(bagShiftLinks({ ...NO_MODE, vendorOpen: true })).toBe(false);
+  });
+});
 
 describe('bagItemAction priority order', () => {
   it('honors trade > market-sell > vendor > pet-feed > quest > use', () => {

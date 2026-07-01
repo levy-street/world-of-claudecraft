@@ -734,6 +734,7 @@ function blankEntity(id: number): Entity {
     comboTargetId: null,
     overpowerUntil: -1,
     potionCooldownUntil: -1,
+    potionCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -1383,6 +1384,7 @@ export class ClientWorld implements IWorld {
       if (s.cds !== undefined)
         e.cooldowns = new Map(Object.entries(s.cds).map(([k, v]) => [k, Number(v)]));
       e.gcdRemaining = s.gcd ?? 0;
+      e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
       e.comboTargetId = s.comboTgt ?? null;
       e.targetId = s.target ?? null;
@@ -1793,6 +1795,9 @@ export class ClientWorld implements IWorld {
   }
   partyKick(targetPid: number): void {
     this.cmd({ cmd: 'pkick', id: targetPid });
+  }
+  partyPromote(targetPid: number): void {
+    this.cmd({ cmd: 'ppromote', id: targetPid });
   }
   convertPartyToRaid(): void {
     this.cmd({ cmd: 'praid' });

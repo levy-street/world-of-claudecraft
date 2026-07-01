@@ -1475,6 +1475,21 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* Item chat link: color is set inline from the item quality, so hover just
+     brightens rather than overriding the quality hue. */
+  .chat-item-link {
+    cursor: var(--cursor-point);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .chat-item-link:hover {
+    filter: brightness(1.25);
+  }
+  .chat-item-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   .chat-pane::-webkit-scrollbar {
     width: 8px;
   }

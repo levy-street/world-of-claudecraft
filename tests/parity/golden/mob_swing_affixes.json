@@ -10,8 +10,8 @@
     "mobSwing affix cascade: rampage stacking buff_ap (warlord_drogmar self-buff)",
     "friendly-pet mobSwing: mob.hostile=false short-circuits every proc (no debuff on its target)"
   ],
-  "draws": 250,
-  "drawDigest": "569af84e",
+  "draws": 244,
+  "drawDigest": "b3e85652",
   "frames": [
     {
       "tick": 0,
@@ -101,44 +101,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 395,
-      "state": "b622981e",
-      "events": "61ee31e6",
+      "state": "978a2a2f",
+      "events": "886c2a18",
       "rng": {
-        "draws": 58,
-        "digest": "54c982e9"
+        "draws": 54,
+        "digest": "d9836924"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 395,
-      "state": "5b96845e",
-      "events": "c2e0fc78",
+      "state": "571d207d",
+      "events": "56c8e558",
       "rng": {
-        "draws": 99,
-        "digest": "d7d725bd"
+        "draws": 95,
+        "digest": "43c2d2eb"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 395,
-      "state": "bc21e116",
-      "events": "945cb77a",
+      "state": "780c658e",
+      "events": "256426da",
       "rng": {
-        "draws": 229,
-        "digest": "5cad4635"
+        "draws": 224,
+        "digest": "22d4749f"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 395,
-      "state": "fb331212",
+      "state": "0a4d00f2",
       "events": "741638a5",
       "rng": {
-        "draws": 229,
-        "digest": "5cad4635"
+        "draws": 224,
+        "digest": "22d4749f"
       },
       "label": "affixes",
       "players": [
@@ -150,7 +150,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1549
+            "damageTaken": 1497
           },
           "delveClears": {},
           "delveDaily": {},
@@ -172,25 +172,34 @@
           "attackPower": 106,
           "auras": [
             {
-              "duration": 1,
-              "id": "stun_mogger_lackey",
-              "kind": "stun",
-              "name": "Skullthump",
-              "remaining": 0.05,
-              "school": "physical",
-              "sourceId": 389
+              "duration": 3,
+              "id": "ensnare_webwood_spider",
+              "kind": "root",
+              "name": "Sticky Web",
+              "remaining": 1,
+              "school": "nature",
+              "sourceId": 390
             },
             {
               "duration": 10,
               "id": "venom_webwood_spider",
               "kind": "dot",
               "name": "Spider Venom",
-              "remaining": 9.5,
+              "remaining": 9,
               "school": "nature",
               "sourceId": 390,
               "tickInterval": 2,
-              "tickTimer": 1.5,
+              "tickTimer": 1,
               "value": 2
+            },
+            {
+              "duration": 1,
+              "id": "stun_mogger_lackey",
+              "kind": "stun",
+              "name": "Skullthump",
+              "remaining": 0.5,
+              "school": "physical",
+              "sourceId": 389
             },
             {
               "duration": 4,
@@ -200,16 +209,6 @@
               "remaining": 3.5,
               "school": "shadow",
               "sourceId": 391
-            },
-            {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 9.5,
-              "school": "shadow",
-              "sourceId": 391,
-              "value": 120
             }
           ],
           "combatTimer": 0.3,
@@ -236,7 +235,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 57.37037,
+          "resource": 55.444444,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -262,7 +261,7 @@
         {
           "aggroTargetId": 388,
           "aiState": "attack",
-          "combatTimer": 0.95,
+          "combatTimer": 0.5,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
@@ -307,7 +306,7 @@
         {
           "aggroTargetId": 388,
           "aiState": "attack",
-          "combatTimer": 0.5,
+          "combatTimer": 1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
@@ -506,7 +505,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199923,
+          "hp": 199917,
           "id": 394,
           "inCombat": true,
           "kind": "mob",
@@ -542,7 +541,7 @@
           "threat": [
             [
               393,
-              78
+              84
             ]
           ],
           "weapon": {
@@ -557,11 +556,11 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 395,
-      "state": "e9b49a3f",
-      "events": "f1f00ecc",
+      "state": "100dfaf1",
+      "events": "741638a5",
       "rng": {
-        "draws": 250,
-        "digest": "569af84e"
+        "draws": 244,
+        "digest": "b3e85652"
       },
       "label": "final",
       "players": [
@@ -573,7 +572,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1549
+            "damageTaken": 1497
           },
           "delveClears": {},
           "delveDaily": {},
@@ -595,16 +594,34 @@
           "attackPower": 106,
           "auras": [
             {
+              "duration": 3,
+              "id": "ensnare_webwood_spider",
+              "kind": "root",
+              "name": "Sticky Web",
+              "remaining": 0.8,
+              "school": "nature",
+              "sourceId": 390
+            },
+            {
               "duration": 10,
               "id": "venom_webwood_spider",
               "kind": "dot",
               "name": "Spider Venom",
-              "remaining": 9.3,
+              "remaining": 8.8,
               "school": "nature",
               "sourceId": 390,
               "tickInterval": 2,
-              "tickTimer": 1.3,
+              "tickTimer": 0.8,
               "value": 2
+            },
+            {
+              "duration": 1,
+              "id": "stun_mogger_lackey",
+              "kind": "stun",
+              "name": "Skullthump",
+              "remaining": 0.3,
+              "school": "physical",
+              "sourceId": 389
             },
             {
               "duration": 4,
@@ -614,16 +631,6 @@
               "remaining": 3.3,
               "school": "shadow",
               "sourceId": 391
-            },
-            {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 9.3,
-              "school": "shadow",
-              "sourceId": 391,
-              "value": 120
             }
           ],
           "combatTimer": 0.5,
@@ -650,7 +657,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 57.37037,
+          "resource": 55.444444,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -676,7 +683,7 @@
         {
           "aggroTargetId": 388,
           "aiState": "attack",
-          "combatTimer": 1.15,
+          "combatTimer": 0.7,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
@@ -721,7 +728,7 @@
         {
           "aggroTargetId": 388,
           "aiState": "attack",
-          "combatTimer": 0.7,
+          "combatTimer": 1.2,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
@@ -920,7 +927,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199923,
+          "hp": 199917,
           "id": 394,
           "inCombat": true,
           "kind": "mob",
@@ -956,7 +963,7 @@
           "threat": [
             [
               393,
-              78
+              84
             ]
           ],
           "weapon": {

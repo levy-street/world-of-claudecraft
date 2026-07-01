@@ -48,13 +48,35 @@ Grants: link (+250), guild member (+250), booster (+1000), daily active (+50, bo
 Status ladder (lifetime points): Initiate 0, Squire 100, Footman 500, Knight 2k,
 Champion 5k, Warlord 15k, Legend 50k, Mythic 150k (`src/sim/discord_tier.ts`).
 
+## Auto-join (seamless server membership)
+When `DISCORD_BOT_TOKEN` is set in the game-server env (not just the bot), the OAuth
+flow also requests the `guilds.join` scope and the callback ADDS the player to the
+official guild for them (`PUT /guilds/{id}/members/{id}`, Bot-authed, the user's
+access token in the body: 201 added / 204 already in). No separate invite click.
+It is best-effort (a failure never blocks login/link) and idempotent (an existing
+member is skipped). On success `guildMember` is true, so the same paths persist
+membership + grant the member reward, and the bot's `GUILD_MEMBER_ADD` welcome
+fires. The bot must be a guild member with the Create Invite permission. Unset the
+token and the flow is unchanged: membership is only verified, and the widget offers
+the invite link (`hudChrome.discord.joinCta`) instead.
+
+Known edge (accepted): if the guild has Membership Screening enabled, the add
+returns 201 with `pending: true` and the player is counted as a member (and gets the
+member reward) before they finish screening. This matches the existing membership
+semantics (a pending member already appears in `/users/@me/guilds`), and the
+official guild does not use screening; if that ever changes, gate the reward on
+`!member.pending` from the join response body.
+
 ## Endpoints
 Player REST (`server/main.ts` -> `server/discord.ts`):
 - `POST /api/auth/discord/start?mode=login|link` -> `{ url }` (authorize URL). `link`
   requires a full session; `login` is unauthenticated and may provision an account.
+  Requests `guilds.join` too when auto-join is configured (see above).
 - `GET /api/auth/discord/callback?code&state` -> HTML bounce page. Exempt from the
   web-login Origin guard (it is a discord.com redirect with no Origin). Login mints
   a normal session token; link writes the 1:1 `discord_links` row (409 on conflict).
+  When auto-join is on and `guilds.join` was granted, a non-member is added to the
+  guild here before the link/session is finalized.
 - `GET /api/discord` -> link status + points/tier + claimed swag + invite/widget URL
   + live presence (`bearerReadAccount`).
 - `DELETE /api/discord` -> unlink (`bearerActiveAccount`).
@@ -97,6 +119,9 @@ also pushes voice-room membership so the widget shows it even without the iframe
 ## Ops
 - Env: see `.env.example` (Discord section). Feature is OFF until
   `DISCORD_CLIENT_ID/SECRET` are set.
+- Auto-join is OFF until `DISCORD_BOT_TOKEN` is also present in the game-server env
+  and `DISCORD_GUILD_ID` is a valid guild; the bot must be in that guild with the
+  Create Invite permission. Without it, link/login only verifies membership.
 - Run the bot: `npm run bot` (separate process; needs the privileged GUILD_MEMBERS +
   GUILD_PRESENCES intents). Create `WoC <Tier>` roles in the guild to enable
   status-tier role sync.

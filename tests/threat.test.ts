@@ -278,6 +278,65 @@ describe('classic pull-over rules (110% melee / 130% ranged)', () => {
     expect(wolf.aggroTargetId).toBe(b.id); // 135 > 130
   });
 
+  it('a large mob treats a challenger within its big reach as melee (110%, not 130%)', () => {
+    // Regression: the melee/ranged boundary used a flat MELEE_RANGE * 1.2 (6yd),
+    // so a challenger standing at a big creature's feet (well within its
+    // size-scaled reach) was misclassified as ranged and forced to clear 130%.
+    const { sim, a, b, wolf } = aggroSetup();
+    wolf.scale = 3; // a boss-sized creature
+    const reach = (sim as any).mobMeleeRange(wolf);
+    expect(reach).toBeGreaterThan(6); // scaled reach exceeds the old flat 6yd gate
+    // 8yd is inside the big reach (~11yd) but beyond the old flat 6yd check
+    teleport(sim, b, wolf.pos.x - 8, wolf.pos.z);
+    expect(dist2d(wolf.pos, b.pos)).toBeGreaterThan(6);
+    expect(dist2d(wolf.pos, b.pos)).toBeLessThanOrEqual(reach);
+    // just under 110% does not switch
+    wolf.threat.set(b.id, 109);
+    sim.tick();
+    expect(wolf.aggroTargetId).toBe(a.id);
+    // 115 is over 110% but under 130%: the old flat check would have kept a (ranged),
+    // the fix counts b as melee and rips aggro
+    wolf.threat.set(b.id, 115);
+    sim.tick();
+    expect(wolf.aggroTargetId).toBe(b.id);
+  });
+
+  it('a normal-sized mob keeps the classic 6yd melee boundary (challenger at 5.5yd is melee)', () => {
+    // The size-scaled reach for a scale-1 mob is only MELEE_RANGE (5yd), but the
+    // melee/ranged pull-over boundary is floored at the classic MELEE_RANGE * 1.2
+    // (6yd), so a challenger at 5.5yd (past 5, inside 6) still counts as melee and
+    // needs only 110% (not 130%) to pull.
+    const { sim, a, b, wolf } = aggroSetup();
+    wolf.scale = 1; // a normal-sized creature
+    teleport(sim, b, wolf.pos.x - 5.5, wolf.pos.z);
+    const d = dist2d(wolf.pos, b.pos);
+    expect(d).toBeGreaterThan(5); // beyond the raw scale-1 reach
+    expect(d).toBeLessThanOrEqual(6); // within the classic 6yd floor
+    // just under 110% does not switch
+    wolf.threat.set(b.id, 109);
+    sim.tick();
+    expect(wolf.aggroTargetId).toBe(a.id);
+    // 115 is over 110% but under 130%: the 6yd floor counts b as melee and rips
+    // aggro (a size-scaled-only reach of 5yd would misclassify b as ranged).
+    wolf.threat.set(b.id, 115);
+    sim.tick();
+    expect(wolf.aggroTargetId).toBe(b.id);
+  });
+
+  it('identical setup yields an identical target choice (determinism)', () => {
+    function run(): number | null {
+      const { sim, b, wolf } = aggroSetup();
+      teleport(sim, b, wolf.pos.x - 8, wolf.pos.z);
+      wolf.scale = 3;
+      wolf.threat.set(b.id, 115);
+      sim.tick();
+      return wolf.aggroTargetId;
+    }
+    const first = run();
+    const second = run();
+    expect(first).toBe(second);
+  });
+
   it('when the target dies the mob swings to the next-highest threat, not the nearest', () => {
     const { sim, a, b, wolf } = aggroSetup();
     const c = sim.entities.get(sim.addPlayer('rogue', 'C'))!;

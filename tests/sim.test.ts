@@ -917,10 +917,10 @@ describe('food, drink, vendor', () => {
     const sim = makeSim('warrior');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
-    sim.copper = 100;
+    sim.copper = 200;
     sim.buyItem(wilkes.id, 'baked_bread');
-    expect(sim.countItem('baked_bread')).toBe(1);
-    expect(sim.copper).toBe(75);
+    expect(sim.countItem('baked_bread')).toBe(5); // food is sold in a stack of 5
+    expect(sim.copper).toBe(75); // 200 - 125 (buyValue 25 per unit x the stack of 5)
     sim.addItem('wolf_fang', 2);
     sim.sellItem('wolf_fang');
     expect(sim.copper).toBe(79);

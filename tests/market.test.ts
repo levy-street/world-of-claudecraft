@@ -401,6 +401,57 @@ describe('the World Market — the Merchant', () => {
     expect(new Set(ids).size).toBe(ids.length); // no id collisions
   });
 
+  it('keeps listings and collection items whose item id is no longer known', () => {
+    // A content edit (rename/retire/typo of an item id) must NOT vaporize every
+    // in-flight copy of that item sitting on the market at the next restart.
+    // The character load path keeps unknown ids verbatim as dormant data; the
+    // market must do the same so a re-added or corrected id rehydrates later.
+    const save = {
+      listings: [
+        {
+          id: 7,
+          sellerKey: '12',
+          sellerName: 'Seller',
+          itemId: 'retired_relic', // not in ITEMS
+          count: 2,
+          price: 300,
+          secondsLeft: 600,
+        },
+      ],
+      collections: [
+        {
+          key: '12',
+          copper: 50,
+          items: [
+            { itemId: 'wolf_fang', count: 1 }, // still known
+            { itemId: 'removed_widget', count: 3 }, // not in ITEMS
+          ],
+        },
+      ],
+      nextListingId: 8,
+    };
+
+    const sim = makeWorld();
+    sim.loadMarket(save);
+
+    // the unknown-id listing survived the load, escrowed goods intact
+    const loaded = sim.marketListings.filter((l) => !l.house);
+    expect(loaded.length).toBe(1);
+    expect(loaded[0]).toMatchObject({ itemId: 'retired_relic', count: 2, price: 300 });
+
+    // the unknown-id collection item survived alongside the known one, and it
+    // round-trips back out so it is not lost on the next save either (asserted
+    // via the public serialize path, since the collection map is Market-private)
+    const out = sim.serializeMarket();
+    expect(out.listings.find((l) => l.itemId === 'retired_relic')).toBeTruthy();
+    expect(
+      out.collections
+        .find((c) => c.key === '12')
+        ?.items.map((s) => s.itemId)
+        .sort(),
+    ).toEqual(['removed_widget', 'wolf_fang']);
+  });
+
   it('always wires a seller their own listings even when the market overflows the wire cap', () => {
     const sim = makeWorld();
     const seller = sim.addPlayer('warrior', 'Seller');

@@ -313,7 +313,8 @@ export const en: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Emote Wheel",
       "targetFriendly": "Target Nearest Friendly",
-      "targetFriendlyNext": "Cycle Friendly Target"
+      "targetFriendlyNext": "Cycle Friendly Target",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Left Click",
@@ -338,6 +339,7 @@ export const en: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "UI Scale",
       "highContrastBackground": "High-Contrast Background",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
@@ -488,6 +490,9 @@ export const en: EnTranslations = {
       "noQuestSelected": "Select a quest in your log to share.",
       "linkTitle": "Shift-click to link this quest in chat."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "you are {rank}, {count} member",
@@ -512,6 +517,12 @@ export const en: EnTranslations = {
         "few": "Who: {count} players online on {realm}.",
         "many": "Who: {count} players online on {realm}.",
         "other": "Who: {count} players online on {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const en: EnTranslations = {
       "assigned": "{looter} assigned {item} to {target}.",
       "unassigned": "{item} was not assigned and is free for all.",
       "leaderOnly": "Only the party leader can change the loot method."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filter bags by category",
@@ -3501,8 +3515,8 @@ export const en: EnTranslations = {
       "cannotVendor": "Cannot be sold to merchants",
       "clickDestroy": "Click to destroy",
       "useFishing": "Use: Fish in nearby waters.",
-      "useHealingPotion": "Use: Instantly restores {amount} health. Usable in combat. 1 min cooldown.",
-      "useManaPotion": "Use: Instantly restores {amount} mana. Usable in combat. 1 min cooldown.",
+      "useHealingPotion": "Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.",
+      "useManaPotion": "Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.",
       "clickUseInstant": "Click to use instantly in combat",
       "clickUse": "Click to use",
       "clickBuyback": "Click to buy back"

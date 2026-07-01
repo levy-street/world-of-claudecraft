@@ -313,7 +313,8 @@ export const fr_FR: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Roue des emotes",
       "targetFriendly": "Cibler l'allié le plus proche",
-      "targetFriendlyNext": "Changer de cible alliée"
+      "targetFriendlyNext": "Changer de cible alliée",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Clic gauche",
@@ -338,6 +339,7 @@ export const fr_FR: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Échelle de l’interface",
       "highContrastBackground": "Arrière-plan à contraste élevé",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Afficher le niveau d'objet",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
@@ -488,6 +490,9 @@ export const fr_FR: EnTranslations = {
       "noQuestSelected": "Sélectionnez une quête dans votre journal à partager.",
       "linkTitle": "Maj + clic pour insérer le lien de cette quête dans le chat."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "vous êtes {rank}, {count} membre",
@@ -512,6 +517,12 @@ export const fr_FR: EnTranslations = {
         "few": "Qui : {count} joueurs en ligne sur {realm}.",
         "many": "Qui : {count} joueurs en ligne sur {realm}.",
         "other": "Qui : {count} joueurs en ligne sur {realm}."
+      },
+      "playersMatching": {
+        "one": "Qui : {count} joueur correspondant à \"{query}\" sur {realm}.",
+        "few": "Qui : {count} joueurs correspondant à \"{query}\" sur {realm}.",
+        "many": "Qui : {count} joueurs correspondant à \"{query}\" sur {realm}.",
+        "other": "Qui : {count} joueurs correspondant à \"{query}\" sur {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const fr_FR: EnTranslations = {
       "assigned": "{looter} a attribue {item} a {target}.",
       "unassigned": "{item} n a pas ete attribue et devient libre pour tous.",
       "leaderOnly": "Seul le chef de groupe peut changer le mode de butin."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filtrer les sacs par catégorie",

@@ -1,6 +1,6 @@
 // W0c: the IWorld structural-parity gate.
 //
-// `IWorld` (src/world_api.ts:341-510, 146 members) is the ONE seam render/ui depend
+// `IWorld` (src/world_api.ts:341-510, 147 members) is the ONE seam render/ui depend
 // on. `tsc` already proves both the offline `Sim` and the online `ClientWorld` satisfy
 // it structurally, but the interface is erased at build: there is NO runtime member
 // list, so nothing catches a present-but-throws stub or a kind flip (method vs read).
@@ -9,7 +9,7 @@
 // IWORLD_MEMBERS below is the hand-maintained member list, the W0c analog of the
 // append-only CALLBACK_KEYS in tests/sim_context.test.ts. It is APPEND-ONLY WITH THE
 // INTERFACE: whenever a future slice adds (or removes/renames) a member on `IWorld`,
-// it lands the matching edit here in the SAME commit. The count pins (146 / 36 / 110)
+// it lands the matching edit here in the SAME commit. The count pins (147 / 36 / 111)
 // plus the sorted-name `toEqual` snapshots (modeled on the anti-loosening exclude-set
 // pin in tests/parity/harness.test.ts:131-162) are what force that: a dropped or
 // renamed member reddens deliberately, never silently.
@@ -64,8 +64,8 @@ interface IWorldMember {
   readonly kind: IWorldMemberKind;
 }
 
-// The 146 members of `interface IWorld`, in interface order (world_api.ts:342-509).
-// Partition: 36 `data` + 110 `method` (read-returning + command-void + 3 async).
+// The 147 members of `interface IWorld`, in interface order (world_api.ts:342-509).
+// Partition: 36 `data` + 111 `method` (read-returning + command-void + 3 async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -143,6 +143,7 @@ export const IWORLD_MEMBERS = [
   { name: 'partyDecline', kind: 'method' },
   { name: 'partyLeave', kind: 'method' },
   { name: 'partyKick', kind: 'method' },
+  { name: 'partyPromote', kind: 'method' },
   { name: 'convertPartyToRaid', kind: 'method' },
   { name: 'convertRaidToParty', kind: 'method' },
   { name: 'moveRaidMember', kind: 'method' },
@@ -432,6 +433,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInvite',
       'partyKick',
       'partyLeave',
+      'partyPromote',
       'petAttack',
       'petTaunt',
       'pickUpObject',
@@ -604,6 +606,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyInvite',
       'partyKick',
       'partyLeave',
+      'partyPromote',
       'petAttack',
       'petTaunt',
       'pickUpObject',
@@ -836,6 +839,7 @@ const FACET_PARTY = [
   'partyDecline',
   'partyLeave',
   'partyKick',
+  'partyPromote',
   'convertPartyToRaid',
   'convertRaidToParty',
   'moveRaidMember',

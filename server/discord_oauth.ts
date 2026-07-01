@@ -15,6 +15,27 @@ export const DISCORD_CDN_BASE = 'https://cdn.discordapp.com';
 // the official server (for the member reward) without any privileged intent.
 export const DEFAULT_DISCORD_SCOPES = ['identify', 'guilds'] as const;
 
+// The OAuth2 scope that lets us ADD the user to a guild for them via
+// PUT /guilds/{id}/members/{id}. When a bot token + guild id are configured the
+// server requests this too, so Discord's consent screen shows "join servers" and
+// the callback can auto-join the player in one flow.
+export const GUILD_JOIN_SCOPE = 'guilds.join';
+export const DISCORD_SCOPES_WITH_JOIN = ['identify', 'guilds', GUILD_JOIN_SCOPE] as const;
+
+/** The scopes to request: with `guilds.join` only when auto-join is configured. */
+export function discordScopes(opts: { autoJoin: boolean }): readonly string[] {
+  return opts.autoJoin ? DISCORD_SCOPES_WITH_JOIN : DEFAULT_DISCORD_SCOPES;
+}
+
+/**
+ * Whether a granted-scope string (space separated, as Discord returns it on the
+ * token response) actually contains a scope. The user could in theory strip a
+ * scope, so we verify `guilds.join` was granted before attempting the join.
+ */
+export function grantedScope(granted: string, want: string): boolean {
+  return granted.split(/\s+/).filter(Boolean).includes(want);
+}
+
 /** Discord ids are 64-bit snowflakes serialized as decimal strings. */
 export function isDiscordSnowflake(value: unknown): value is string {
   return typeof value === 'string' && /^[0-9]{15,21}$/.test(value);
@@ -67,6 +88,31 @@ export function buildTokenRequestBody(opts: {
     redirect_uri: opts.redirectUri,
     code_verifier: opts.codeVerifier,
   }).toString();
+}
+
+export interface GuildJoinRequest {
+  url: string;
+  body: string;
+}
+
+/**
+ * Build the `PUT /guilds/{guildId}/members/{userId}` request that adds a consenting
+ * user to the guild. The caller supplies the `Authorization: Bot <token>` header;
+ * the body carries the user's OAuth access token (which must have been granted the
+ * `guilds.join` scope). Returns null when either id is not a snowflake, so a
+ * malformed id never reaches the API. A 201 means added, a 204 already a member.
+ */
+export function buildGuildJoinRequest(opts: {
+  apiBase: string;
+  guildId: string;
+  userId: string;
+  accessToken: string;
+}): GuildJoinRequest | null {
+  if (!isDiscordSnowflake(opts.guildId) || !isDiscordSnowflake(opts.userId)) return null;
+  return {
+    url: `${opts.apiBase}/guilds/${opts.guildId}/members/${opts.userId}`,
+    body: JSON.stringify({ access_token: opts.accessToken }),
+  };
 }
 
 export interface DiscordTokenResult {

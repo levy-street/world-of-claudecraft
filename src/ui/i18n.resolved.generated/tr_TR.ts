@@ -313,7 +313,8 @@ export const tr_TR: EnTranslations = {
     "keybinds": {
       "emoteWheel": "İfade Çarkı",
       "targetFriendly": "En Yakın Dostu Hedefle",
-      "targetFriendlyNext": "Dost Hedefler Arasında Geç"
+      "targetFriendlyNext": "Dost Hedefler Arasında Geç",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Sol Tık",
@@ -338,6 +339,7 @@ export const tr_TR: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Arayüz Ölçeği",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
@@ -488,6 +490,9 @@ export const tr_TR: EnTranslations = {
       "noQuestSelected": "Paylaşmak için günlüğünden bir görev seç.",
       "linkTitle": "Bu görevi sohbette bağlamak için Shift'e basılı tutarak tıkla."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "rütben {rank}, {count} üye",
@@ -512,6 +517,12 @@ export const tr_TR: EnTranslations = {
         "few": "Kimler: {realm} sunucusunda {count} oyuncu çevrimiçi.",
         "many": "Kimler: {realm} sunucusunda {count} oyuncu çevrimiçi.",
         "other": "Kimler: {realm} sunucusunda {count} oyuncu çevrimiçi."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const tr_TR: EnTranslations = {
       "assigned": "{looter}, {item} esyasini {target} oyuncusuna atadi.",
       "unassigned": "{item} atanmadi ve herkes icin serbest.",
       "leaderOnly": "Ganimet yontemini yalnizca grup lideri degistirebilir."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Çantaları kategoriye göre filtrele",

@@ -3487,7 +3487,7 @@ function inventoryVendor(): Scenario {
   return {
     name: 'inventory_vendor',
     coverage: [
-      'buyItem: meta.copper - buyValue + addItem at trader_wilkes (vendor proximity gate)',
+      'buyItem: meta.copper - buyValue*stackSize + addItem stack at trader_wilkes (vendor proximity gate)',
       'equipItem empty-slot equip + recalcPlayerStats',
       'equipItem same-slot SWAP: old piece returned to bags via addItemSilent + recalc',
       'unequipItem: piece back to bags, slot emptied, recalc',

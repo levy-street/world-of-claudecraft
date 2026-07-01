@@ -10,8 +10,6 @@ export interface ModerationSession {
 }
 
 export interface ModerationHost<TSession extends ModerationSession> {
-  selectedTargetId(adminPid: number): number | null;
-  sessionByPid(pid: number): TSession | null;
   sessionByName(name: string): TSession | null;
   notice(session: TSession, text: string): void;
   systemNotice(session: TSession, text: string): void;
@@ -71,22 +69,22 @@ export class ModerationService<TSession extends ModerationSession> {
     if (!actor.isAdmin) return true;
     switch (command.kind) {
       case 'kick':
-        this.kick(actor, command.reason);
+        this.kick(actor, command.name, command.reason);
         break;
       case 'kill':
-        this.killTarget(actor, command.reason);
+        this.killTarget(actor, command.name, command.reason);
         break;
       case 'forcerename':
-        this.forceRename(actor, command.reason);
+        this.forceRename(actor, command.name, command.reason);
         break;
       case 'mute':
-        this.mute(actor, command.minutes, command.reason);
+        this.mute(actor, command.name, command.minutes, command.reason);
         break;
       case 'ban':
-        this.ban(actor, command.reason);
+        this.ban(actor, command.name, command.reason);
         break;
       case 'suspend':
-        this.suspend(actor, command.minutes, command.reason);
+        this.suspend(actor, command.name, command.minutes, command.reason);
         break;
       case 'spectate':
         this.spectate(actor, command.name);
@@ -98,8 +96,8 @@ export class ModerationService<TSession extends ModerationSession> {
     return true;
   }
 
-  private kick(actor: TSession, reason: string): void {
-    const target = this.resolveTarget(actor);
+  private kick(actor: TSession, name: string | null, reason: string): void {
+    const target = this.resolveNamedTarget(actor, name);
     if (!target) return;
     void this.audit
       .recordAction({
@@ -115,8 +113,8 @@ export class ModerationService<TSession extends ModerationSession> {
       .catch((err) => console.error('failed to audit in-game kick:', err));
   }
 
-  private killTarget(actor: TSession, reason: string): void {
-    const target = this.resolveTarget(actor);
+  private killTarget(actor: TSession, name: string | null, reason: string): void {
+    const target = this.resolveNamedTarget(actor, name);
     if (!target) return;
     void this.audit
       .recordAction({
@@ -132,12 +130,12 @@ export class ModerationService<TSession extends ModerationSession> {
       .catch((err) => console.error('failed to audit in-game kill:', err));
   }
 
-  private mute(actor: TSession, minutes: number | null, reason: string): void {
-    if (minutes === null) {
-      this.host.notice(actor, 'Usage: /mute <minutes> <reason>');
+  private mute(actor: TSession, name: string | null, minutes: number | null, reason: string): void {
+    if (name === null || minutes === null) {
+      this.host.notice(actor, 'Usage: /mute "<name>" <minutes> [reason]');
       return;
     }
-    const target = this.resolveTarget(actor);
+    const target = this.resolveNamedTarget(actor, name);
     if (!target) return;
     const expiresAt = new Date(Date.now() + minutes * 60_000).toISOString();
     void this.audit
@@ -149,8 +147,8 @@ export class ModerationService<TSession extends ModerationSession> {
       .catch((err) => console.error('failed to mute in-game:', err));
   }
 
-  private ban(actor: TSession, reason: string): void {
-    const target = this.resolveTarget(actor);
+  private ban(actor: TSession, name: string | null, reason: string): void {
+    const target = this.resolveNamedTarget(actor, name);
     if (!target) return;
     void this.audit
       .ban({ accountId: target.accountId, adminAccountId: actor.accountId, reason })
@@ -161,12 +159,17 @@ export class ModerationService<TSession extends ModerationSession> {
       .catch((err) => console.error('failed to ban in-game:', err));
   }
 
-  private suspend(actor: TSession, minutes: number | null, reason: string): void {
-    if (minutes === null) {
-      this.host.notice(actor, 'Usage: /suspend <minutes> <reason>');
+  private suspend(
+    actor: TSession,
+    name: string | null,
+    minutes: number | null,
+    reason: string,
+  ): void {
+    if (name === null || minutes === null) {
+      this.host.notice(actor, 'Usage: /suspend "<name>" <minutes> [reason]');
       return;
     }
-    const target = this.resolveTarget(actor);
+    const target = this.resolveNamedTarget(actor, name);
     if (!target) return;
     const expiresAt = new Date(Date.now() + minutes * 60_000).toISOString();
     void this.audit
@@ -181,8 +184,8 @@ export class ModerationService<TSession extends ModerationSession> {
       .catch((err) => console.error('failed to suspend in-game:', err));
   }
 
-  private forceRename(actor: TSession, reason: string): void {
-    const target = this.resolveTarget(actor);
+  private forceRename(actor: TSession, name: string | null, reason: string): void {
+    const target = this.resolveNamedTarget(actor, name);
     if (!target) return;
     void this.audit
       .forceRename({
@@ -197,7 +200,7 @@ export class ModerationService<TSession extends ModerationSession> {
       .catch((err) => console.error('failed to force-rename in-game:', err));
   }
 
-  private spectate(actor: TSession, name: string): void {
+  private spectate(actor: TSession, name: string | null): void {
     if (!name) {
       this.host.notice(actor, 'Usage: /spectate <name>');
       return;
@@ -214,14 +217,17 @@ export class ModerationService<TSession extends ModerationSession> {
     this.host.enterSpectate(actor, target);
   }
 
-  private resolveTarget(actor: TSession): TSession | null {
-    const targetId = this.host.selectedTargetId(actor.pid);
-    if (targetId === null) {
-      this.host.notice(actor, 'Select a player to moderate first.');
+  private resolveNamedTarget(actor: TSession, name: string | null): TSession | null {
+    if (name === null) {
+      this.host.notice(actor, 'Enclose the character name in double quotes.');
       return null;
     }
-    const target = this.host.sessionByPid(targetId);
-    if (!target || target.pid === actor.pid || target.isAdmin) {
+    const target = this.host.sessionByName(name);
+    if (!target) {
+      this.host.notice(actor, `No online player named '${name}'.`);
+      return null;
+    }
+    if (target.pid === actor.pid || target.isAdmin) {
       this.host.notice(actor, "You can't moderate that player.");
       return null;
     }

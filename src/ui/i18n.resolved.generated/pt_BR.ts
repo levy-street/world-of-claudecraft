@@ -313,7 +313,8 @@ export const pt_BR: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Roda de emotes",
       "targetFriendly": "Selecionar aliado mais próximo",
-      "targetFriendlyNext": "Alternar alvo aliado"
+      "targetFriendlyNext": "Alternar alvo aliado",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Clique esquerdo",
@@ -338,6 +339,7 @@ export const pt_BR: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Escala da interface",
       "highContrastBackground": "Fundo de alto contraste",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Mostrar nível do item",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
@@ -488,6 +490,9 @@ export const pt_BR: EnTranslations = {
       "noQuestSelected": "Selecione uma missão no seu registro para compartilhar.",
       "linkTitle": "Shift + clique para vincular esta missão no chat."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "você é {rank}, {count} membro",
@@ -512,6 +517,12 @@ export const pt_BR: EnTranslations = {
         "few": "Quem: {count} jogadores online em {realm}.",
         "many": "Quem: {count} jogadores online em {realm}.",
         "other": "Quem: {count} jogadores online em {realm}."
+      },
+      "playersMatching": {
+        "one": "Quem: {count} jogador correspondente a \"{query}\" em {realm}.",
+        "few": "Quem: {count} jogadores correspondentes a \"{query}\" em {realm}.",
+        "many": "Quem: {count} jogadores correspondentes a \"{query}\" em {realm}.",
+        "other": "Quem: {count} jogadores correspondentes a \"{query}\" em {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const pt_BR: EnTranslations = {
       "assigned": "{looter} atribuiu {item} a {target}.",
       "unassigned": "{item} nao foi atribuido e esta livre para todos.",
       "leaderOnly": "Somente o lider do grupo pode alterar o metodo de saque."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filtrar bolsas por categoria",

@@ -101,6 +101,8 @@ export interface MobileControlCallbacks {
   onChat(): void;
   onMenu(): void;
   onSocial(): void;
+  /** Open the Discord account panel (link / unlink / status). */
+  onDiscord(): void;
   onEmotes(): void;
   onArena(): void;
   onQuestLog(): void;
@@ -375,6 +377,7 @@ export class MobileControls {
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
+    this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
     this.bindButton('mobile-emote', () => this.callbacks.onEmotes());
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());

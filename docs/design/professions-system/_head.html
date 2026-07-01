@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Professions System (High-Level Design)</title>
+<style>
+  :root {
+    --bg: #14161c; --panel: #1c1f28; --ink: #e7e9ee; --muted: #a4abbb; --line: #2b303c;
+    --gold: #d9b25a; --amber: #e0b15f; --teal: #4fd0c0; --green: #6fd08a; --violet: #b594e8;
+    --grey: #8a93a6; --tan: #c79a5a; --red: #e0795f; --blue: #6fa8ff; --rare: #2f86ff;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 40px 24px 96px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 4px; color: #fff; }
+  h2 { font-size: 22px; margin: 48px 0 12px; color: #fff; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  h3 { font-size: 17px; margin: 28px 0 8px; color: var(--gold); }
+  p, li { color: var(--ink); }
+  .muted { color: var(--muted); }
+  .lede { font-size: 17px; color: var(--muted); max-width: 72ch; }
+  .status { display: inline-block; font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 12px; margin-top: 8px; }
+  code { background: #11131a; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; font: 14px/1.4 "SF Mono", Menlo, Consolas, monospace; color: #d7dcea; }
+  ul { padding-left: 22px; } li { margin: 4px 0; }
+  .figure { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin: 20px 0; }
+  .figure h4 { margin: 0 0 4px; font-size: 15px; color: #fff; }
+  .figure .cap { color: var(--muted); font-size: 13.5px; margin: 0 0 14px; max-width: 72ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  .col { flex: 1 1 280px; min-width: 240px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); margin-top: 10px; }
+  .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+  .callout { border-left: 3px solid var(--gold); background: #1a1c24; padding: 10px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; color: var(--ink); }
+  .warn { border-left-color: var(--red); }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #1a1c24; color: #fff; font-weight: 600; }
+  .name { color: #fff; font-weight: 600; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .spectrum-bar { width: 100%; height: 46px; border-radius: 8px; overflow: hidden; display: flex; }
+  .spectrum-bar > div { display: flex; align-items: center; justify-content: center; font-size: 12.5px; color: #0c0e13; font-weight: 600; padding: 0 6px; text-align: center; }
+  .toc { font-size: 14.5px; }
+  .toc a { color: var(--teal); text-decoration: none; }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  .hbtn { display: block; width: 100%; text-align: left; background: #11131a; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; margin: 5px 0; cursor: pointer; font-size: 13px; }
+  .hbtn.active { border-color: var(--rare); color: #fff; background: #131c2a; }
+  @media (max-width: 560px) { h1 { font-size: 25px; } }
+</style>
+</head>
+<body>
+<main>

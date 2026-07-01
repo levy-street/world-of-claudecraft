@@ -34,8 +34,8 @@ function ability(id: string, opts: Partial<AbilityDef> & { cost?: number } = {})
   return { def, cost: opts.cost ?? 0 };
 }
 
-function item(id: string): ItemDef {
-  return { id } as unknown as ItemDef;
+function item(id: string, kind?: string): ItemDef {
+  return { id, kind } as unknown as ItemDef;
 }
 
 interface SlotOpts {
@@ -85,6 +85,7 @@ interface WorldOpts {
   resource?: number;
   cooldowns?: Map<string, number>;
   gcdRemaining?: number;
+  potionCdRemaining?: number;
   queuedOnSwing?: string | null;
   playerPos?: { x: number; y: number; z: number };
   targetPos?: { x: number; y: number; z: number } | null;
@@ -101,6 +102,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       resource: opts.resource ?? 100,
       cooldowns: opts.cooldowns ?? new Map(),
       gcdRemaining: opts.gcdRemaining ?? 0,
+      potionCdRemaining: opts.potionCdRemaining ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
     },
@@ -290,6 +292,35 @@ describe('actionBarView: attack + item slots', () => {
       .slots[0];
     expect(dead.usable).toBe(false);
   });
+
+  it('paints the shared potion cooldown swipe on a potion item-slot', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { item: item('healing_potion', 'potion') })),
+      fakeDeps(),
+    );
+    // half of the 120s shared cooldown remaining: half-height swipe + ceil text.
+    const onCd = view.tick(world({ potionCdRemaining: 60 })).slots[0];
+    expect(onCd.kind).toBe('item');
+    expect(onCd.cooldownRemaining).toBe(60);
+    expect(onCd.cooldownTotal).toBe(120);
+    expect(onCd.cooldownPercent).toBe(50);
+    expect(onCd.cdText).toBe('60');
+
+    // ready again: no swipe, no text.
+    const ready = view.tick(world({ potionCdRemaining: 0 })).slots[0];
+    expect(ready.cooldownPercent).toBe(0);
+    expect(ready.cdText).toBe('');
+  });
+
+  it('does not paint a cooldown on a non-potion item even while the potion timer runs', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { item: item('iron_dagger', 'weapon') })),
+      fakeDeps(),
+    );
+    const s = view.tick(world({ potionCdRemaining: 60 })).slots[0];
+    expect(s.cooldownPercent).toBe(0);
+    expect(s.cooldownRemaining).toBe(0);
+  });
 });
 
 describe('actionBarView: the aria-label is resolved in the core via the injected t()', () => {
@@ -423,20 +454,24 @@ describe('actionBarView: instance-parameterized + parity', () => {
       slot(1, {
         ability: ability('fireball', { cooldown: 6, requiresTarget: true, range: 5, cost: 30 }),
       }),
-      slot(2, { item: item('potion') }),
+      slot(2, { item: item('potion', 'potion') }),
     );
-    // Sim builds cooldowns directly as a Map and inventory as InvSlot objects.
+    // Sim builds cooldowns directly as a Map and inventory as InvSlot objects, and
+    // materializes potionCdRemaining per tick from potionCooldownUntil.
     const simWorld = world({
       resource: 50,
       cooldowns: new Map([['fireball', 3]]),
+      potionCdRemaining: 42,
       targetPos: { x: 1, y: 1, z: 1 },
       inventory: [{ itemId: 'potion', count: 2 }],
     });
     // ClientWorld mirrors a snapshot: cooldowns rebuilt from Object.entries of the
-    // wire `cds` blob, inventory rebuilt from the snapshot `inv` array (online.ts).
+    // wire `cds` blob, inventory rebuilt from the snapshot `inv` array, and
+    // potionCdRemaining decoded from the wire `pcd` scalar (online.ts).
     const clientWorld = world({
       resource: 50,
       cooldowns: new Map(Object.entries({ fireball: 3 }).map(([k, v]) => [k, Number(v)])),
+      potionCdRemaining: Number('42'),
       targetPos: { x: 1, y: 1, z: 1 },
       inventory: [...[{ itemId: 'potion', count: 2 }]],
     });

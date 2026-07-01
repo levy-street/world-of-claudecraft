@@ -30,10 +30,11 @@ import {
   type EquipSlot,
   FISHING_CAST_ID,
   INTERACT_RANGE,
+  POTION_COOLDOWN,
 } from './types';
+import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
-const POTION_COOLDOWN = 60; // seconds; shared cooldown across combat potions (#103)
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -156,7 +157,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       pid: meta.entityId,
     });
   } else if (def.kind === 'potion') {
-    // instant, usable in combat, on a shared 60s cooldown (#103)
+    // instant, usable in combat, on a shared 2-minute cooldown (#103)
     if (ctx.time < p.potionCooldownUntil) {
       ctx.error(meta.entityId, 'That potion is not ready yet.');
       return;
@@ -175,6 +176,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     }
     ctx.removeItem(itemId, 1, meta.entityId);
     p.potionCooldownUntil = ctx.time + POTION_COOLDOWN;
+    p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
     if (restoresHp) {
       const heal = Math.min(Math.round(def.potionHp! * ctx.healingTakenMult(p)), p.maxHp - p.hp);
       p.hp += heal;
@@ -228,12 +230,17 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
-  if (meta.copper < def.buyValue) {
+  // Food and drink are handed over in a stack (vendorStackSize); the player pays
+  // the per-unit buyValue for every unit, so the per-unit price stays classic and
+  // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
+  const qty = vendorStackSize(def);
+  const cost = def.buyValue * qty;
+  if (meta.copper < cost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
-  meta.copper -= def.buyValue;
-  ctx.addItem(itemId, 1, meta.entityId);
+  meta.copper -= cost;
+  ctx.addItem(itemId, qty, meta.entityId);
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }
 

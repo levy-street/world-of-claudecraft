@@ -117,11 +117,18 @@ For off-box safety, sync the directory to S3 occasionally:
   set by `REALM_NAME` (default `Claudemoon`). To add a realm, run another
   process against the **same** `DATABASE_URL` with a different `REALM_NAME`
   and `PORT` (e.g. behind its own vhost or compose service). Characters,
-  friends, guilds, and presence are realm-scoped, so the worlds are fully
-  isolated — players on different realms can't see, whisper, friend, or
-  guild each other. Concurrent boots serialize their schema setup behind a
+  friends, guilds, presence, and the World Market are realm-scoped, so the
+  worlds are fully isolated: players on different realms can't see, whisper,
+  friend, guild, or share an auction house with each other. Concurrent boots
+  serialize their schema setup behind a
   Postgres advisory lock, so starting several at once is safe. Character and
   guild names remain globally unique across realms.
+- **Raid reset time zone**: raid lockouts end at the next 3 AM (03:00, the classic daily
+  reset) in the realm's civil time zone. Set `REALM_RESET_TZ` to an IANA zone per
+  realm process (e.g. `America/New_York`, `Europe/Paris`); it defaults to
+  `America/New_York`. The process must run on a full-ICU Node (the default for
+  modern Node); an unresolvable zone falls back to the default, and if even the
+  default cannot be resolved the process fails fast at boot.
 - **Bot gate (Cloudflare Turnstile)**: login and registration can be gated by
   Turnstile so headless clients (the aiohttp/websockets bot wave) can't create or
   sign into accounts. It is **off until configured**: both halves must be set or

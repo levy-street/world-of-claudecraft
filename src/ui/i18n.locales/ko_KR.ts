@@ -45,6 +45,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questShare.ineligible': '이 퀘스트의 요구 조건을 충족하지 못합니다.',
   'hudChrome.questShare.noQuestSelected': '공유할 퀘스트를 기록에서 선택하세요.',
   'hudChrome.questShare.linkTitle': 'Shift + 클릭하면 이 퀘스트를 채팅에 연결합니다.',
+  'hudChrome.itemShare.linkHint': 'Shift + 클릭하면 이 아이템을 채팅에 연결합니다.',
   'hudChrome.unitFrame.partyGroup': '{n}번 그룹',
   'hudChrome.character.modelPreview': '캐릭터 모델 미리보기',
   'character.sortBy': '정렬',
@@ -74,6 +75,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.enableAria': '분배 담당 사용',
   'hudChrome.masterLoot.looterLabel': '분배 담당자',
   'hudChrome.masterLoot.leaderOption': '파티장',
+  'hudChrome.party.promoteLeader': '파티장으로 지정',
   'hudChrome.masterLoot.thresholdLabel': '품질 기준',
   'hudChrome.masterLoot.thresholdUncommon': '고급 이상',
   'hudChrome.masterLoot.thresholdRare': '희귀 이상',
@@ -236,6 +238,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자동은 브라우저와 기기에 맞춰 무거운 CSS 효과(흐림, 글로우, 배경 모션)를 낮춥니다. 인터페이스가 느리게 느껴지면 수동으로 낮추세요.',
   'hudChrome.options.footstepSounds': '발소리',
   'hudChrome.options.clickFeedback': '클릭 표시',
+  'hudChrome.options.startAttackOnAbility': '스킬 사용 시 자동 공격',
   'hudChrome.options.lockCursorOnRotate': '회전 중 커서 고정',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     '드래그하여 카메라를 회전하는 동안 마우스 커서를 창 안에 유지하여 화면 가장자리에 닿거나 다른 모니터로 이동하지 않도록 합니다. 자유로운 커서를 원하면 끄세요.',
@@ -3299,6 +3302,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.many': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.other': '{count}초 남음',
+  'hudChrome.plurals.playersMatching.one':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
+  'hudChrome.plurals.playersMatching.few':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
+  'hudChrome.plurals.playersMatching.many':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
+  'hudChrome.plurals.playersMatching.other':
+    'Who: {realm}에서 "{query}"와 일치하는 플레이어 {count}명.',
   'hudChrome.plurals.playersOnline.one':
     '검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.',
   'hudChrome.plurals.playersOnline.few':

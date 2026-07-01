@@ -313,7 +313,8 @@ export const pl_PL: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Koło emotek",
       "targetFriendly": "Obierz najbliższego sojusznika",
-      "targetFriendlyNext": "Przełączaj przyjazny cel"
+      "targetFriendlyNext": "Przełączaj przyjazny cel",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Lewy przycisk",
@@ -338,6 +339,7 @@ export const pl_PL: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Skala interfejsu",
       "highContrastBackground": "Tło o wysokim kontraście",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
@@ -488,6 +490,9 @@ export const pl_PL: EnTranslations = {
       "noQuestSelected": "Wybierz zadanie w dzienniku, aby je udostępnić.",
       "linkTitle": "Kliknij z Shiftem, aby podlinkować to zadanie na czacie."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "jesteś rangi {rank}, {count} członek",
@@ -512,6 +517,12 @@ export const pl_PL: EnTranslations = {
         "few": "Kto: {count} graczy online na realmie {realm}.",
         "many": "Kto: {count} graczy online na realmie {realm}.",
         "other": "Kto: {count} graczy online na realmie {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const pl_PL: EnTranslations = {
       "assigned": "{looter} przydzielil {item} graczowi {target}.",
       "unassigned": "{item} nie zostal przydzielony i jest wolny dla wszystkich.",
       "leaderOnly": "Tylko przywodca grupy moze zmienic metode lupow."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filtruj torby według kategorii",

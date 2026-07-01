@@ -3,7 +3,15 @@ import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
-import { DELVES, DUNGEONS, zoneAt } from '../src/sim/data';
+import {
+  DELVES,
+  DUNGEON_X_THRESHOLD,
+  DUNGEONS,
+  delveAt,
+  dungeonAt,
+  isDelvePos,
+  zoneAt,
+} from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
 import type { PickAction } from '../src/sim/lockpick';
@@ -55,6 +63,7 @@ import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
@@ -65,13 +74,15 @@ import {
   recordInGameAction,
 } from './moderation_db';
 import { type ModerationHost, ModerationService } from './moderation_service';
-import { REALM, REALM_PUBLIC_ORIGIN } from './realm';
+import { nextRaidResetMs } from './raid_reset';
+import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createSerialWriter } from './serial_writer';
 import type { Presence, PresenceStatus, SocialActor, SocialTransport } from './social';
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { TickProfiler } from './tick_profiler';
 import { holderInfoForPubkey } from './woc_balance';
+import { isBackpressureExceeded } from './ws_backpressure';
 
 const WORLD_SEED = 20061;
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
@@ -731,6 +742,9 @@ export class GameServer {
       noPlayer: true,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
       lockoutNowMs: () => Date.now(),
+      // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
+      // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
+      raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
     this.moderation = new ModerationService(this.moderationHost(), {
@@ -779,8 +793,6 @@ export class GameServer {
 
   private moderationHost(): ModerationHost<ClientSession> {
     return {
-      selectedTargetId: (adminPid) => this.sim.entities.get(adminPid)?.targetId ?? null,
-      sessionByPid: (pid) => this.clients.get(pid) ?? null,
       sessionByName: (name) => this.sessionByName(name),
       notice: (session, text) => this.sendChatNotice(session, text),
       systemNotice: (session, text) => this.sendSystemNotice(session, text),
@@ -857,17 +869,35 @@ export class GameServer {
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
 
-  // Live location + activity of an online character, for friend/guild rosters.
+  // The instance (dungeon OR delve) an entity is inside, named as its own zone,
+  // or null when the entity is in the overworld (or an arena, which is not a
+  // dungeon). Resolved in order: an explicit dungeonId portal field, then a
+  // delve position, then any other far-off instance-space x as a dungeon. A
+  // failed lookup returns null so callers fall back to the overworld zone
+  // rather than ever surfacing a raw id. `pos` defaults to the entity's live
+  // position but callers pass a spectator's saved position so a spectating
+  // moderator reports where they really are, not the limbo they were parked in.
+  private instanceZoneName(e: Entity, pos: { x: number; z: number } = e.pos): string | null {
+    if (e.dungeonId) return DUNGEONS[e.dungeonId]?.name ?? e.dungeonId;
+    if (isDelvePos(pos.x)) return delveAt(pos.x)?.name ?? null;
+    if (pos.x > DUNGEON_X_THRESHOLD) return dungeonAt(pos.x)?.name ?? null;
+    return null;
+  }
+
+  // Live location + activity of an online character, for friend/guild rosters
+  // and /who. A player inside any instance (dungeon or delve) reports the
+  // instance name and the 'dungeon' status, not the overworld zone the instance
+  // coordinates happen to fall under.
   private presenceOf(session: ClientSession): Presence {
     const e = this.sim.entities.get(session.pid);
     if (!e) return { zone: 'Unknown', status: 'online' };
     const pos = session.spectating?.savedPos ?? e.pos;
+    const instanceZone = this.instanceZoneName(e, pos);
     let status: PresenceStatus = 'online';
     if (e.dead) status = 'dead';
-    else if (e.dungeonId) status = 'dungeon';
+    else if (instanceZone != null) status = 'dungeon';
     else if (e.inCombat) status = 'combat';
-    const zone = e.dungeonId ? (DUNGEONS[e.dungeonId]?.name ?? e.dungeonId) : zoneAt(pos.z).name;
-    return { zone, status, x: pos.x, z: pos.z };
+    return { zone: instanceZone ?? zoneAt(pos.z).name, status, x: pos.x, z: pos.z };
   }
 
   private socialTransport(): SocialTransport {
@@ -946,58 +976,69 @@ export class GameServer {
     let last = process.hrtime.bigint();
     let acc = 0;
     this.interval = setInterval(() => {
-      const now = process.hrtime.bigint();
-      let dt = Number(now - last) / 1e9;
-      last = now;
-      if (dt > 0.5) dt = 0.5;
-      acc += dt;
-      // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
-      // works without the sim reading the wall clock itself (determinism invariant).
-      this.sim.utcDay = new Date().toISOString().slice(0, 10);
-      this.bcastGridNs = 0n;
-      this.bcastSelfNs = 0n;
-      this.bcSerializeNs = 0n;
-      this.bcVisits = 0;
-      this.bcSerializes = 0;
-      let mark = now;
-      const lap = (phase: string): void => {
-        const t = process.hrtime.bigint();
-        this.tickProfiler.add(phase, Number(t - mark) / 1e6);
-        mark = t;
-      };
-      while (acc >= DT) {
-        this.clearStaleInputs();
-        lap('stale');
-        const events = this.sim.tick();
-        lap('tick');
-        this.routeEvents(events);
-        this.detectActivity(events);
-        lap('events');
-        this.runAntibotTick();
-        lap('antibot');
-        acc -= DT;
-      }
-      this.broadcastSnapshots();
-      lap('broadcast');
-      this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
-      this.tickProfiler.add('bcastSelf', Number(this.bcastSelfNs) / 1e6);
-      this.socialPosTimer += dt;
-      if (this.socialPosTimer >= 1) {
-        this.socialPosTimer = 0;
-        this.broadcastSocialPositions();
-      }
-      lap('social');
-      const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
-      this.tickProfiler.commit(tickMs);
-      this.maybeLogTickPerf(tickMs);
-      this.tickMsAvg =
-        this.tickMsAvg === 0 ? tickMs : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
-      this.saveTimer += dt;
-      if (this.saveTimer >= AUTOSAVE_SECONDS) {
-        this.saveTimer = 0;
-        void this.saveAll('autosave');
-        void this.saveMarket();
-      }
+      // The whole tick body runs guarded: an unguarded throw here (sim tick, a
+      // broadcast, an autosave kick-off) would unwind the callback and skip the
+      // rest of this tick for everyone. Log and let the next tick self-heal so a
+      // transient fault never starves the loop (server/CLAUDE.md).
+      runGuarded(
+        () => {
+          const now = process.hrtime.bigint();
+          let dt = Number(now - last) / 1e9;
+          last = now;
+          if (dt > 0.5) dt = 0.5;
+          acc += dt;
+          // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
+          // works without the sim reading the wall clock itself (determinism invariant).
+          this.sim.utcDay = new Date().toISOString().slice(0, 10);
+          this.bcastGridNs = 0n;
+          this.bcastSelfNs = 0n;
+          this.bcSerializeNs = 0n;
+          this.bcVisits = 0;
+          this.bcSerializes = 0;
+          let mark = now;
+          const lap = (phase: string): void => {
+            const t = process.hrtime.bigint();
+            this.tickProfiler.add(phase, Number(t - mark) / 1e6);
+            mark = t;
+          };
+          while (acc >= DT) {
+            this.clearStaleInputs();
+            lap('stale');
+            const events = this.sim.tick();
+            lap('tick');
+            this.routeEvents(events);
+            this.detectActivity(events);
+            lap('events');
+            this.runAntibotTick();
+            lap('antibot');
+            acc -= DT;
+          }
+          this.broadcastSnapshots();
+          lap('broadcast');
+          this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
+          this.tickProfiler.add('bcastSelf', Number(this.bcastSelfNs) / 1e6);
+          this.socialPosTimer += dt;
+          if (this.socialPosTimer >= 1) {
+            this.socialPosTimer = 0;
+            this.broadcastSocialPositions();
+          }
+          lap('social');
+          const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
+          this.tickProfiler.commit(tickMs);
+          this.maybeLogTickPerf(tickMs);
+          this.tickMsAvg =
+            this.tickMsAvg === 0
+              ? tickMs
+              : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
+          this.saveTimer += dt;
+          if (this.saveTimer >= AUTOSAVE_SECONDS) {
+            this.saveTimer = 0;
+            void this.saveAll('autosave');
+            void this.saveMarket();
+          }
+        },
+        (err) => console.error('[tick] guarded tick body threw, skipping this tick:', err),
+      );
     }, 50);
     // Refresh every online player's $WOC holder-tier flair off the 20 Hz loop:
     // an RPC call per wallet (cached for minutes inside holderInfoForPubkey) has
@@ -2287,8 +2328,19 @@ export class GameServer {
         if (session.isAdmin && this.moderation.handleChatCommand(session, text)) break;
         if (this.isChatMuted(session)) break;
         if (!this.consumeChatToken(session)) break;
-        if (/^\/who(?:\s|$)/i.test(text)) {
-          this.sendWhoRoster(session);
+        const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
+        if (whoMatch) {
+          // Optional filter: "/who Mr" lists only players whose name OR zone
+          // contains "Mr" (case-insensitive). Zone names carry spaces
+          // ("Thornpeak Heights"), so keep spaces: strip only double-quotes
+          // and control chars, collapse internal whitespace, and cap the
+          // length, so the echoed query stays a clean, single-line token.
+          const filter = (whoMatch[1] ?? '')
+            .replace(/[\p{Cc}"]/gu, '')
+            .trim()
+            .replace(/\s+/g, ' ')
+            .slice(0, 32);
+          this.sendWhoRoster(session, filter || undefined);
           break;
         }
         // Hard-word + mute enforcement gate, applied to every channel before the
@@ -2362,6 +2414,9 @@ export class GameServer {
         break;
       case 'pkick':
         if (typeof msg.id === 'number') sim.partyKick(msg.id, pid);
+        break;
+      case 'ppromote':
+        if (typeof msg.id === 'number') sim.partyPromote(msg.id, pid);
         break;
       case 'praid':
         sim.convertPartyToRaid(pid);
@@ -2621,6 +2676,30 @@ export class GameServer {
         }
         break;
       }
+      case 'dev_complete_quest': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.quest === 'string') {
+          const beforeDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
+          sim.completeQuestForDev(msg.quest, pid);
+          const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
+          if (!beforeDone && afterDone && msg.quest === ALDRIC_METEOR_QUEST_ID) {
+            this.noteAccountQuestComplete(session, msg.quest);
+          }
+          this.resyncQuests(session);
+        }
+        break;
+      }
+      case 'dev_complete_all_quests': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') {
+          const beforeDone = sim.meta(pid)?.questsDone.has(ALDRIC_METEOR_QUEST_ID) ?? false;
+          sim.completeCurrentQuestsForDev(pid);
+          const afterDone = sim.meta(pid)?.questsDone.has(ALDRIC_METEOR_QUEST_ID) ?? false;
+          if (!beforeDone && afterDone) {
+            this.noteAccountQuestComplete(session, ALDRIC_METEOR_QUEST_ID);
+          }
+          this.resyncQuests(session);
+        }
+        break;
+      }
       // dungeons ('enter_crypt'/'leave_crypt' kept as aliases for older bots)
       case 'enter_crypt':
       case 'enter_dungeon': {
@@ -2742,96 +2821,103 @@ export class GameServer {
     if (this.clients.size === 0) return;
     const tick = this.sim.tickCount;
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}`;
-    for (const session of this.clients.values()) {
-      const p = this.sim.entities.get(session.pid);
-      const meta = this.sim.meta(session.pid);
-      if (!p || !meta) continue;
-      let anchorEntity = p;
-      let anchorMeta = meta;
-      let anchorSession = session;
-      if (session.spectating) {
-        const spectateName = session.spectating.name;
-        const target = this.sessionByCharacterId(session.spectating.characterId);
-        const targetEntity = target ? this.sim.entities.get(target.pid) : null;
-        const targetMeta = target ? this.sim.meta(target.pid) : null;
-        if (!target || target.left || !targetEntity || !targetMeta) {
-          this.exitSpectate(session, false);
-          this.sendChatNotice(session, `${spectateName} is no longer online; spectate ended.`);
-        } else {
-          anchorEntity = targetEntity;
-          anchorMeta = targetMeta;
-          anchorSession = target;
-        }
-      }
-      const ents: string[] = [];
-      const keep: number[] = [];
-      const present = new Set<number>();
-      const gridStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
-      this.sim.grid.forEachInRadius(
-        anchorEntity.pos.x,
-        anchorEntity.pos.z,
-        INTEREST_QUERY_RADIUS,
-        (e, d2) => {
-          if (this.profileBroadcastPhases) this.bcVisits++;
-          if (e.id === anchorEntity.id) return;
-          if (!this.canObserveEntity(anchorEntity, e, d2)) return;
-          const known = session.sentEnts.get(e.id);
-          // the viewer's current target stays in interest to the widest drop
-          // radius so its unit frame doesn't vanish mid-chase
-          const limitSq =
-            anchorEntity.targetId === e.id
-              ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
-              : interestLimitSq(e, known !== undefined);
-          if (d2 > limitSq) return;
-          present.add(e.id);
-          const cache = this.wireCacheFor(e);
-          if (known === undefined) {
-            // first sight carries the at-rest state exactly, so no settle
-            // record is owed until it moves again
-            ents.push(cache.fullJson);
-            session.sentEnts.set(e.id, {
-              idVer: cache.idVer,
-              dynVer: cache.dynVer,
-              sentAtTick: tick,
-              settled: true,
-            });
-            return;
+    // Guard each session: a throw while building one player's snapshot must not
+    // starve every other session of its snapshot this tick (server/CLAUDE.md).
+    forEachGuarded(
+      this.clients.values(),
+      (session) => {
+        const p = this.sim.entities.get(session.pid);
+        const meta = this.sim.meta(session.pid);
+        if (!p || !meta) return;
+        let anchorEntity = p;
+        let anchorMeta = meta;
+        let anchorSession = session;
+        if (session.spectating) {
+          const spectateName = session.spectating.name;
+          const target = this.sessionByCharacterId(session.spectating.characterId);
+          const targetEntity = target ? this.sim.entities.get(target.pid) : null;
+          const targetMeta = target ? this.sim.meta(target.pid) : null;
+          if (!target || target.left || !targetEntity || !targetMeta) {
+            this.exitSpectate(session, false);
+            this.sendChatNotice(session, `${spectateName} is no longer online; spectate ended.`);
+          } else {
+            anchorEntity = targetEntity;
+            anchorMeta = targetMeta;
+            anchorSession = target;
           }
-          if (known.idVer !== cache.idVer) {
-            ents.push(cache.fullJson);
-            known.idVer = cache.idVer;
+        }
+        const ents: string[] = [];
+        const keep: number[] = [];
+        const present = new Set<number>();
+        const gridStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
+        this.sim.grid.forEachInRadius(
+          anchorEntity.pos.x,
+          anchorEntity.pos.z,
+          INTEREST_QUERY_RADIUS,
+          (e, d2) => {
+            if (this.profileBroadcastPhases) this.bcVisits++;
+            if (e.id === anchorEntity.id) return;
+            if (!this.canObserveEntity(anchorEntity, e, d2)) return;
+            const known = session.sentEnts.get(e.id);
+            // the viewer's current target stays in interest to the widest drop
+            // radius so its unit frame doesn't vanish mid-chase
+            const limitSq =
+              anchorEntity.targetId === e.id
+                ? NPC_DROP_RADIUS * NPC_DROP_RADIUS
+                : interestLimitSq(e, known !== undefined);
+            if (d2 > limitSq) return;
+            present.add(e.id);
+            const cache = this.wireCacheFor(e);
+            if (known === undefined) {
+              // first sight carries the at-rest state exactly, so no settle
+              // record is owed until it moves again
+              ents.push(cache.fullJson);
+              session.sentEnts.set(e.id, {
+                idVer: cache.idVer,
+                dynVer: cache.dynVer,
+                sentAtTick: tick,
+                settled: true,
+              });
+              return;
+            }
+            if (known.idVer !== cache.idVer) {
+              ents.push(cache.fullJson);
+              known.idVer = cache.idVer;
+              known.dynVer = cache.dynVer;
+              known.sentAtTick = tick;
+              known.settled = false;
+              return;
+            }
+            if (
+              !isUpdateDue(tick, e, d2, anchorEntity, known.sentAtTick) ||
+              (known.dynVer === cache.dynVer && known.settled)
+            ) {
+              // not due at this distance tier yet, or unchanged and already
+              // settled: a bare id keeps it alive on the client
+              keep.push(e.id);
+              return;
+            }
+            // due, and either changed or owing its one settle record
+            known.settled = known.dynVer === cache.dynVer;
             known.dynVer = cache.dynVer;
             known.sentAtTick = tick;
-            known.settled = false;
-            return;
-          }
-          if (
-            !isUpdateDue(tick, e, d2, anchorEntity, known.sentAtTick) ||
-            (known.dynVer === cache.dynVer && known.settled)
-          ) {
-            // not due at this distance tier yet, or unchanged and already
-            // settled: a bare id keeps it alive on the client
-            keep.push(e.id);
-            return;
-          }
-          // due, and either changed or owing its one settle record
-          known.settled = known.dynVer === cache.dynVer;
-          known.dynVer = cache.dynVer;
-          known.sentAtTick = tick;
-          ents.push(cache.liteJson);
-        },
-      );
-      // forget entities that left interest, so a re-entry sends identity again
-      for (const id of session.sentEnts.keys()) {
-        if (!present.has(id)) session.sentEnts.delete(id);
-      }
-      const selfStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
-      if (this.profileBroadcastPhases) this.bcastGridNs += selfStart - gridStart;
-      const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
-      if (this.profileBroadcastPhases) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
-      const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-      this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
-    }
+            ents.push(cache.liteJson);
+          },
+        );
+        // forget entities that left interest, so a re-entry sends identity again
+        for (const id of session.sentEnts.keys()) {
+          if (!present.has(id)) session.sentEnts.delete(id);
+        }
+        const selfStart = this.profileBroadcastPhases ? process.hrtime.bigint() : 0n;
+        if (this.profileBroadcastPhases) this.bcastGridNs += selfStart - gridStart;
+        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
+        if (this.profileBroadcastPhases) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
+        const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
+        this.sendRaw(session, `${head},"self":${selfJson},"ents":[${ents.join(',')}]${keepJson}}`);
+      },
+      (err, session) =>
+        console.error(`[snap] failed to build snapshot for pid ${session.pid}, skipping:`, err),
+    );
     // >= rather than a modulo check: catch-up broadcasts can skip ticks
     if (tick - this.lastWireSweepTick >= WIRE_CACHE_SWEEP_TICKS) {
       this.lastWireSweepTick = tick;
@@ -2917,6 +3003,7 @@ export class GameServer {
       prk: meta.prestigeRank,
       copper: meta.copper,
       gcd: round2(p.gcdRemaining),
+      pcd: round2(p.potionCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
       comboTgt: p.comboTargetId,
@@ -3182,83 +3269,90 @@ export class GameServer {
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
-    for (const session of this.clients.values()) {
-      const p = this.sim.entities.get(session.pid);
-      if (!p) continue;
-      let anchorPid = session.pid;
-      let anchorPos = p.pos;
-      if (session.spectating) {
-        const target = this.sessionByCharacterId(session.spectating.characterId);
-        const targetEntity = target ? this.sim.entities.get(target.pid) : null;
-        if (!target || target.left || !targetEntity) continue;
-        anchorPid = target.pid;
-        anchorPos = targetEntity.pos;
-      }
-      const mine: SimEvent[] = [];
-      for (const ev of events) {
-        // ignore list: drop chat originating from a character this player has
-        // blocked, before it ever reaches their client
-        if (
-          !session.spectating &&
-          ev.type === 'chat' &&
-          session.blockedIds.size > 0 &&
-          this.isBlockedSender(session, ev.fromPid)
-        )
-          continue;
-        if (ev.pid !== undefined) {
+    // Guard each session: a throw while routing events to one player must not
+    // drop this tick's events for every other session (server/CLAUDE.md).
+    forEachGuarded(
+      this.clients.values(),
+      (session) => {
+        const p = this.sim.entities.get(session.pid);
+        if (!p) return;
+        let anchorPid = session.pid;
+        let anchorPos = p.pos;
+        if (session.spectating) {
+          const target = this.sessionByCharacterId(session.spectating.characterId);
+          const targetEntity = target ? this.sim.entities.get(target.pid) : null;
+          if (!target || target.left || !targetEntity) return;
+          anchorPid = target.pid;
+          anchorPos = targetEntity.pos;
+        }
+        const mine: SimEvent[] = [];
+        for (const ev of events) {
+          // ignore list: drop chat originating from a character this player has
+          // blocked, before it ever reaches their client
           if (
-            session.spectating &&
-            ev.pid === session.pid &&
+            !session.spectating &&
             ev.type === 'chat' &&
-            ev.channel !== 'say' &&
-            ev.channel !== 'yell'
-          ) {
-            if (this.isBlockedSender(session, ev.fromPid)) continue;
-            mine.push(ev);
-            if (ev.channel === 'whisper' && ev.to === undefined && ev.fromPid !== session.pid) {
-              session.lastWhisperFrom = ev.from;
-            }
-            this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
+            session.blockedIds.size > 0 &&
+            this.isBlockedSender(session, ev.fromPid)
+          )
             continue;
-          }
-          if (ev.pid === anchorPid) {
+          if (ev.pid !== undefined) {
             if (
               session.spectating &&
+              ev.pid === session.pid &&
               ev.type === 'chat' &&
               ev.channel !== 'say' &&
               ev.channel !== 'yell'
             ) {
+              if (this.isBlockedSender(session, ev.fromPid)) continue;
+              mine.push(ev);
+              if (ev.channel === 'whisper' && ev.to === undefined && ev.fromPid !== session.pid) {
+                session.lastWhisperFrom = ev.from;
+              }
+              this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
               continue;
             }
-            mine.push(ev);
-            // a sim-driven change to a heavy self field (loot, level-up, quest
-            // credit, ...) refreshes those fields on the next snapshot
-            if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
-            // remember the last person to whisper us, for /r reply (the
-            // recipient copy of a whisper has no `to`; the sender echo does)
-            if (
-              ev.type === 'chat' &&
-              ev.channel === 'whisper' &&
-              ev.to === undefined &&
-              ev.fromPid !== session.pid &&
-              !session.spectating
-            ) {
-              session.lastWhisperFrom = ev.from;
+            if (ev.pid === anchorPid) {
+              if (
+                session.spectating &&
+                ev.type === 'chat' &&
+                ev.channel !== 'say' &&
+                ev.channel !== 'yell'
+              ) {
+                continue;
+              }
+              mine.push(ev);
+              // a sim-driven change to a heavy self field (loot, level-up, quest
+              // credit, ...) refreshes those fields on the next snapshot
+              if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
+              // remember the last person to whisper us, for /r reply (the
+              // recipient copy of a whisper has no `to`; the sender echo does)
+              if (
+                ev.type === 'chat' &&
+                ev.channel === 'whisper' &&
+                ev.to === undefined &&
+                ev.fromPid !== session.pid &&
+                !session.spectating
+              ) {
+                session.lastWhisperFrom = ev.from;
+              }
+              if (!session.spectating) {
+                this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
+              }
             }
-            if (!session.spectating) {
-              this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
-            }
+            continue;
           }
-          continue;
+          // world events: only those near this player
+          const anchor = this.eventAnchor(ev);
+          if (anchor === null || dist2d(anchorPos, anchor) <= EVENT_RADIUS) {
+            mine.push(ev);
+          }
         }
-        // world events: only those near this player
-        const anchor = this.eventAnchor(ev);
-        if (anchor === null || dist2d(anchorPos, anchor) <= EVENT_RADIUS) {
-          mine.push(ev);
-        }
-      }
-      if (mine.length > 0) this.send(session, { t: 'events', list: mine });
-    }
+        if (mine.length > 0) this.send(session, { t: 'events', list: mine });
+      },
+      (err, session) =>
+        console.error(`[events] failed to route events for pid ${session.pid}, skipping:`, err),
+    );
   }
 
   // Maps a chat event's source pid to its character id and checks the
@@ -3518,7 +3612,7 @@ export class GameServer {
     return `You are muted from chat for ${minutes} more minute${minutes === 1 ? '' : 's'}.${reason}`;
   }
 
-  private sendWhoRoster(session: ClientSession): void {
+  private sendWhoRoster(session: ClientSession, filter?: string): void {
     if (!session.blockListLoaded) {
       this.send(session, {
         t: 'events',
@@ -3528,12 +3622,21 @@ export class GameServer {
       });
       return;
     }
-    const rows = this.whoRosterFor(session);
+    let rows = this.whoRosterFor(session);
+    if (filter) {
+      const q = filter.toLowerCase();
+      rows = rows.filter(
+        (row) => row.name.toLowerCase().includes(q) || row.zone.toLowerCase().includes(q),
+      );
+    }
     const total = rows.length;
+    const header = filter
+      ? `Who: ${total} ${total === 1 ? 'player' : 'players'} matching "${filter}" on ${REALM}.`
+      : `Who: ${total} ${total === 1 ? 'player' : 'players'} online on ${REALM}.`;
     const list: { type: 'log'; text: string; color: string }[] = [
       {
         type: 'log',
-        text: `Who: ${total} ${total === 1 ? 'player' : 'players'} online on ${REALM}.`,
+        text: header,
         color: '#7fd4ff',
       },
     ];
@@ -3611,8 +3714,23 @@ export class GameServer {
   }
 
   private sendRaw(session: ClientSession, payload: string): void {
-    if (session.ws.readyState === 1) {
-      session.ws.send(payload);
+    if (session.ws.readyState !== 1) return;
+    // A client that has stopped draining its socket lets ws.bufferedAmount grow
+    // without bound (send() never blocks); left unchecked one stuck reader OOMs
+    // the process and starves everyone. Terminate the offender instead. close()
+    // would try to flush the already-huge buffer, so destroy the socket: the
+    // 'close' handler funnels into the idempotent leave() for normal cleanup.
+    if (isBackpressureExceeded(session.ws.bufferedAmount)) {
+      if (!session.left) {
+        try {
+          session.ws.terminate();
+        } catch {
+          /* socket already torn down */
+        }
+        void this.leave(session, 'backpressure');
+      }
+      return;
     }
+    session.ws.send(payload);
   }
 }

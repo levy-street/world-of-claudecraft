@@ -171,6 +171,10 @@ export interface SimContextCallbacks {
   // through the seam; implemented in instances/dungeons, Sim keeps thin delegates so
   // existing `this.enterDungeon` etc. call sites resolve unchanged.
   lockoutNowMs(): number;
+  // The next raid-reset instant (epoch ms) for a given lockout "now". The host owns
+  // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
+  // the sim core never reads a time zone; offline/headless fall back to a flat 24h day.
+  raidResetMs(nowMs: number): number;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   enterDungeon(dungeonId: string, pid?: number): void;
@@ -292,6 +296,8 @@ export interface SimContextCallbacks {
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
   countItem(itemId: string, pid?: number): number;
+  completeQuestForDev(questId: string, pid?: number): boolean;
+  completeCurrentQuestsForDev(pid?: number): number;
 
   // T1 player target selection consumes isHostileTo/isFriendlyTo/pvpController/stopFollow;
   // all already on the seam (C4a added the first two + stopFollow, C1 added pvpController)
@@ -706,6 +712,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     emit: host.emit,
     error: host.error,
     lockoutNowMs: host.lockoutNowMs,
+    raidResetMs: host.raidResetMs,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     enterDungeon: host.enterDungeon,
@@ -763,6 +770,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,
     countItem: host.countItem,
+    completeQuestForDev: host.completeQuestForDev,
+    completeCurrentQuestsForDev: host.completeCurrentQuestsForDev,
     addEntity: host.addEntity,
     dropEntity: host.dropEntity,
     rebucket: host.rebucket,

@@ -539,6 +539,25 @@ describe('Input Escape handling', () => {
   });
 });
 
+describe('Input Discord keybind', () => {
+  it("dispatches onUiKey('discord') for the default U key", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('discord');
+  });
+
+  it('is a normal interface key: suppressed while a modal blocks game keys', () => {
+    const { cb, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+
+    expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
+});
+
 describe('Input Space handling', () => {
   it('prevents native Space button activation while preserving jump input', () => {
     const { input, windowListeners } = makeInput();

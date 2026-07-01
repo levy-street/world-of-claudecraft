@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildAuthorizeUrl,
+  buildGuildJoinRequest,
   buildTokenRequestBody,
+  DISCORD_SCOPES_WITH_JOIN,
   discordAvatarUrl,
   discordDisplayName,
+  discordScopes,
+  GUILD_JOIN_SCOPE,
+  grantedScope,
   isDiscordLinkMode,
   isDiscordSnowflake,
   isMemberOfGuild,
@@ -117,6 +122,62 @@ describe('response parsers', () => {
     expect(isMemberOfGuild(ids, '111111111111111111')).toBe(true);
     expect(isMemberOfGuild(ids, '222222222222222222')).toBe(false);
     expect(parseGuildIds('not an array')).toEqual([]);
+  });
+});
+
+describe('auto-join (guilds.join)', () => {
+  it('requests guilds.join only when auto-join is enabled', () => {
+    expect(discordScopes({ autoJoin: false })).toEqual(['identify', 'guilds']);
+    expect(discordScopes({ autoJoin: true })).toEqual(['identify', 'guilds', 'guilds.join']);
+    expect(DISCORD_SCOPES_WITH_JOIN).toContain(GUILD_JOIN_SCOPE);
+  });
+
+  it('adds guilds.join to the authorize URL scope when configured', () => {
+    const url = new URL(
+      buildAuthorizeUrl({
+        clientId: '123',
+        redirectUri: 'https://x/cb',
+        state: 's',
+        codeChallenge: 'c',
+        scopes: discordScopes({ autoJoin: true }),
+      }),
+    );
+    expect(url.searchParams.get('scope')).toBe('identify guilds guilds.join');
+  });
+
+  it('detects a granted scope in the space-separated token scope string', () => {
+    expect(grantedScope('identify guilds guilds.join', GUILD_JOIN_SCOPE)).toBe(true);
+    expect(grantedScope('identify guilds', GUILD_JOIN_SCOPE)).toBe(false);
+    // A user who stripped the scope must not be treated as having granted it.
+    expect(grantedScope('  identify   guilds  ', 'guilds')).toBe(true);
+    expect(grantedScope('', GUILD_JOIN_SCOPE)).toBe(false);
+  });
+
+  it('builds the PUT guild-member request with the access token in the body', () => {
+    const req = buildGuildJoinRequest({
+      apiBase: 'https://discord.com/api/v10',
+      guildId: '111111111111111111',
+      userId: '999999999999999999',
+      accessToken: 'user-access-tok',
+    });
+    expect(req).not.toBeNull();
+    expect(req?.url).toBe(
+      'https://discord.com/api/v10/guilds/111111111111111111/members/999999999999999999',
+    );
+    expect(JSON.parse(req?.body ?? '{}')).toEqual({ access_token: 'user-access-tok' });
+  });
+
+  it('refuses to build a request for a non-snowflake guild or user id', () => {
+    const base = {
+      apiBase: 'https://discord.com/api/v10',
+      accessToken: 'tok',
+    };
+    expect(
+      buildGuildJoinRequest({ ...base, guildId: 'nope', userId: '999999999999999999' }),
+    ).toBeNull();
+    expect(
+      buildGuildJoinRequest({ ...base, guildId: '111111111111111111', userId: 'bad' }),
+    ).toBeNull();
   });
 });
 

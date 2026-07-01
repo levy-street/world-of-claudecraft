@@ -37,6 +37,8 @@ export interface IWorldParty {
   partyDecline(): void;
   partyLeave(): void;
   partyKick(targetPid: number): void;
+  // Leader-only handoff: pass leadership to another member (roster unchanged).
+  partyPromote(targetPid: number): void;
   convertPartyToRaid(): void;
   convertRaidToParty(): void;
   moveRaidMember(targetPid: number, group: 1 | 2): void;

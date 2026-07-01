@@ -313,7 +313,8 @@ export const en_XA: EnTranslations = {
     "keybinds": {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
-      "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]"
+      "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]",
+      "discord": "[Ðíšçóŕð]"
     },
     "options": {
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",
@@ -338,6 +339,7 @@ export const en_XA: EnTranslations = {
       "showDevBadges": "[Šĥóŵ Ðéʋéļóþéŕ Ɓáðĝéš]",
       "uiScale": "[ÚÍ Šçáļé]",
       "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
+      "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
       "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
@@ -488,6 +490,9 @@ export const en_XA: EnTranslations = {
       "noQuestSelected": "[Šéļéçţ á ɋúéšţ íñ ýóúŕ ļóĝ ţó šĥáŕé.]",
       "linkTitle": "[Šĥíƒţ-çļíçķ ţó ļíñķ ţĥíš ɋúéšţ íñ çĥáţ.]"
     },
+    "itemShare": {
+      "linkHint": "[Šĥíƒţ-çļíçķ ţó ļíñķ ţĥíš íţéɱ íñ çĥáţ.]"
+    },
     "plurals": {
       "guildMembers": {
         "one": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
@@ -512,6 +517,12 @@ export const en_XA: EnTranslations = {
         "few": "[Ŵĥó: {count} þļáýéŕš óñļíñé óñ {realm}.]",
         "many": "[Ŵĥó: {count} þļáýéŕš óñļíñé óñ {realm}.]",
         "other": "[Ŵĥó: {count} þļáýéŕš óñļíñé óñ {realm}.]"
+      },
+      "playersMatching": {
+        "one": "[Ŵĥó: {count} þļáýéŕ ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
+        "few": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
+        "many": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
+        "other": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]"
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const en_XA: EnTranslations = {
       "assigned": "[{looter} áššíĝñéð {item} ţó {target}.]",
       "unassigned": "[{item} ŵáš ñóţ áššíĝñéð áñð íš ƒŕéé ƒóŕ áļļ.]",
       "leaderOnly": "[Óñļý ţĥé þáŕţý ļéáðéŕ çáñ çĥáñĝé ţĥé ļóóţ ɱéţĥóð.]"
+    },
+    "party": {
+      "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]"
     },
     "bags": {
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
@@ -3501,8 +3515,8 @@ export const en_XA: EnTranslations = {
       "cannotVendor": "[Çáññóţ ƀé šóļð ţó ɱéŕçĥáñţš]",
       "clickDestroy": "[Çļíçķ ţó ðéšţŕóý]",
       "useFishing": "[Úšé: Ƒíšĥ íñ ñéáŕƀý ŵáţéŕš.]",
-      "useHealingPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ĥéáļţĥ. Úšáƀļé íñ çóɱƀáţ. 1 ɱíñ çóóļðóŵñ.]",
-      "useManaPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ɱáñá. Úšáƀļé íñ çóɱƀáţ. 1 ɱíñ çóóļðóŵñ.]",
+      "useHealingPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ĥéáļţĥ. Úšáƀļé íñ çóɱƀáţ. 2 ɱíñ çóóļðóŵñ.]",
+      "useManaPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ɱáñá. Úšáƀļé íñ çóɱƀáţ. 2 ɱíñ çóóļðóŵñ.]",
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
       "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]"

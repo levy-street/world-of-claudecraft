@@ -195,6 +195,38 @@ describe('spectate client POV', () => {
   });
 });
 
+describe('per-session isolation in the broadcast loop', () => {
+  it('keeps broadcasting to healthy sessions when one session throws', () => {
+    // Regression: the broadcast loop iterated every session unguarded, so a throw
+    // while building one player's snapshot unwound the whole call and starved every
+    // other session of its snapshot that tick (server/CLAUDE.md: one socket must
+    // not crash the loop). forEachGuarded must isolate the bad session.
+    const server = new GameServer();
+    const before = fakeWs();
+    const bad = fakeWs();
+    const after = fakeWs();
+    joinServer(server, before, 1, 'Before');
+    const badSession = joinServer(server, bad, 2, 'Broken');
+    // 'After' joins last, so it is iterated AFTER the throwing session: the real
+    // regression is that this one used to be starved when 'Broken' threw.
+    joinServer(server, after, 3, 'After');
+
+    // Force a throw only while serializing the bad session's self payload.
+    const original = (server as any).selfWireJson.bind(server);
+    vi.spyOn(server as any, 'selfWireJson').mockImplementation((session: any, ...rest: any[]) => {
+      if (session.pid === badSession.pid) throw new Error('corrupt self state');
+      return original(session, ...rest);
+    });
+
+    expect(() => broadcast(server)).not.toThrow();
+    // Both healthy sessions, on either side of the throw, still got a snapshot;
+    // only the broken one was skipped.
+    expect(lastSnap(before.sent)).not.toBeNull();
+    expect(lastSnap(after.sent)).not.toBeNull();
+    expect(lastSnap(bad.sent)).toBeNull();
+  });
+});
+
 describe('raid lockouts over the wire', () => {
   it('ships a granted lockout in self.lockouts and ClientWorld mirrors it end to end', () => {
     const server = new GameServer();
@@ -389,7 +421,19 @@ describe('delta snapshots', () => {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
     // the always-on fields are still present every snapshot
-    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'swing', 'xp', 'copper', 'target']) {
+    for (const key of [
+      'x',
+      'z',
+      'hp',
+      'mhp',
+      'res',
+      'gcd',
+      'pcd',
+      'swing',
+      'xp',
+      'copper',
+      'target',
+    ]) {
       expect(snap.self).toHaveProperty(key);
     }
   });
@@ -403,6 +447,17 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.swingTimer).toBeCloseTo(1.7, 1);
+  });
+
+  it('mirrors the shared potion cooldown to the online client for the action-bar swipe', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    player.potionCdRemaining = 95.5;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.pcd).toBeCloseTo(95.5, 1);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.player.potionCdRemaining).toBeCloseTo(95.5, 1);
   });
 
   it('includes live aura and movement diagnostics in admin online rows', () => {
@@ -679,6 +734,30 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap.self.qlog).toEqual([]);
     expect(snap.self.qdone).toEqual([]);
+  });
+
+  it('dev quest completion resyncs qlog and qdone', () => {
+    const previous = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    try {
+      broadcast(server);
+      fc.sent.length = 0;
+
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'dev_complete_quest', quest: 'q_wolves' }),
+      );
+      broadcast(server);
+
+      const snap = lastSnap(fc.sent);
+      expect(snap.self).toHaveProperty('qlog');
+      expect(snap.self).toHaveProperty('qdone');
+      expect(snap.self.qlog).toEqual([]);
+      expect(snap.self.qdone).toContain('q_wolves');
+    } finally {
+      if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = previous;
+    }
   });
 
   it('each client gets full state on its own first snapshot', () => {

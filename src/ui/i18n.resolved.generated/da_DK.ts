@@ -313,7 +313,8 @@ export const da_DK: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Følelseshjul",
       "targetFriendly": "Sigt mod nærmeste allierede",
-      "targetFriendlyNext": "Skift allieret mål"
+      "targetFriendlyNext": "Skift allieret mål",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Venstreklik",
@@ -338,6 +339,7 @@ export const da_DK: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "UI-skala",
       "highContrastBackground": "Baggrund med høj kontrast",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -488,6 +490,9 @@ export const da_DK: EnTranslations = {
       "noQuestSelected": "Vælg en opgave i din log for at dele den.",
       "linkTitle": "Shift-klik for at linke denne opgave i chatten."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "du er {rank}, {count} medlem",
@@ -512,6 +517,12 @@ export const da_DK: EnTranslations = {
         "few": "Hvem: {count} spillere online på {realm}.",
         "many": "Hvem: {count} spillere online på {realm}.",
         "other": "Hvem: {count} spillere online på {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const da_DK: EnTranslations = {
       "assigned": "{looter} tildelte {item} til {target}.",
       "unassigned": "{item} blev ikke tildelt og er frit for alle.",
       "leaderOnly": "Kun gruppelederen kan aendre lootmetoden."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filtrér tasker efter kategori",

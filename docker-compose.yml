@@ -68,6 +68,9 @@ services:
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
       DISCORD_GUILD_INVITE: ${DISCORD_GUILD_INVITE:-}
       DISCORD_BOT_SECRET: ${DISCORD_BOT_SECRET:-}
+      # Runtime: the game server uses the bot token to auto-join a linking player to
+      # the official guild (guilds.join). Empty disables auto-join (verify-only).
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
     # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"

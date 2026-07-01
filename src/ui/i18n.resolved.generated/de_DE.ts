@@ -313,7 +313,8 @@ export const de_DE: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Emote-Rad",
       "targetFriendly": "Nächsten Verbündeten anvisieren",
-      "targetFriendlyNext": "Freundliches Ziel wechseln"
+      "targetFriendlyNext": "Freundliches Ziel wechseln",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Linksklick",
@@ -338,6 +339,7 @@ export const de_DE: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "UI-Skalierung",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Gegenstandsstufe anzeigen",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
@@ -488,6 +490,9 @@ export const de_DE: EnTranslations = {
       "noQuestSelected": "Wählt eine Quest in Eurem Questlog zum Teilen aus.",
       "linkTitle": "Umschalt + Klick, um diese Quest im Chat zu verlinken."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "Ihr seid {rank}, {count} Mitglied",
@@ -512,6 +517,12 @@ export const de_DE: EnTranslations = {
         "few": "Wer: {count} Spieler online auf {realm}.",
         "many": "Wer: {count} Spieler online auf {realm}.",
         "other": "Wer: {count} Spieler online auf {realm}."
+      },
+      "playersMatching": {
+        "one": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
+        "few": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
+        "many": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
+        "other": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const de_DE: EnTranslations = {
       "assigned": "{looter} hat {item} an {target} zugewiesen.",
       "unassigned": "{item} wurde nicht zugewiesen und ist fuer alle frei.",
       "leaderOnly": "Nur der Gruppenleiter kann die Beutemethode aendern."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Taschen nach Kategorie filtern",

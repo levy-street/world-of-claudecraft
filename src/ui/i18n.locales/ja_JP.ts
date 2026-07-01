@@ -46,6 +46,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questShare.ineligible': 'このクエストの条件を満たしていません。',
   'hudChrome.questShare.noQuestSelected': '共有するクエストをログから選択してください。',
   'hudChrome.questShare.linkTitle': 'Shift + クリックでこのクエストをチャットにリンクします。',
+  'hudChrome.itemShare.linkHint': 'Shift + クリックでこのアイテムをチャットにリンクします。',
   'hudChrome.unitFrame.partyGroup': 'グループ {n}',
   'hudChrome.character.modelPreview': 'キャラクターモデルプレビュー',
   'character.sortBy': '並べ替え',
@@ -75,6 +76,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.enableAria': 'マスタールートを有効化',
   'hudChrome.masterLoot.looterLabel': '分配担当',
   'hudChrome.masterLoot.leaderOption': 'パーティリーダー',
+  'hudChrome.party.promoteLeader': 'パーティリーダーに指定',
   'hudChrome.masterLoot.thresholdLabel': '品質しきい値',
   'hudChrome.masterLoot.thresholdUncommon': 'アンコモン以上',
   'hudChrome.masterLoot.thresholdRare': 'レア以上',
@@ -233,6 +235,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自動はブラウザとデバイスに応じて、負荷の高い CSS エフェクト（ぼかし・グロー・背景アニメーション）を抑えます。動作が重い場合は手動で下げてください。',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
+  'hudChrome.options.startAttackOnAbility': 'アビリティ使用時に自動攻撃',
   'hudChrome.options.lockCursorOnRotate': '回転中はカーソルを固定',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。',
@@ -3299,6 +3302,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '残り {count} 秒',
   'hudChrome.plurals.secondsRemaining.many': '残り {count} 秒',
   'hudChrome.plurals.secondsRemaining.other': '残り {count} 秒',
+  'hudChrome.plurals.playersMatching.one':
+    'Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。',
+  'hudChrome.plurals.playersMatching.few':
+    'Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。',
+  'hudChrome.plurals.playersMatching.many':
+    'Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。',
+  'hudChrome.plurals.playersMatching.other':
+    'Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。',
   'hudChrome.plurals.playersOnline.one': 'Who：{realm}に{count}人のプレイヤーがオンラインです。',
   'hudChrome.plurals.playersOnline.few': 'Who：{realm}に{count}人のプレイヤーがオンラインです。',
   'hudChrome.plurals.playersOnline.many': 'Who：{realm}に{count}人のプレイヤーがオンラインです。',

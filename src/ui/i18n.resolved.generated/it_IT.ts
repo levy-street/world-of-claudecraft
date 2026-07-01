@@ -313,7 +313,8 @@ export const it_IT: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Ruota emote",
       "targetFriendly": "Bersaglia l'amico più vicino",
-      "targetFriendlyNext": "Scorri i bersagli amici"
+      "targetFriendlyNext": "Scorri i bersagli amici",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Clic sinistro",
@@ -338,6 +339,7 @@ export const it_IT: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Scala dell'interfaccia",
       "highContrastBackground": "Sfondo a contrasto elevato",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Mostra livello oggetto",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
@@ -488,6 +490,9 @@ export const it_IT: EnTranslations = {
       "noQuestSelected": "Seleziona una missione nel registro da condividere.",
       "linkTitle": "Maiusc + clic per collegare questa missione in chat."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "sei {rank}, {count} membro",
@@ -512,6 +517,12 @@ export const it_IT: EnTranslations = {
         "few": "Chi: {count} giocatori online su {realm}.",
         "many": "Chi: {count} giocatori online su {realm}.",
         "other": "Chi: {count} giocatori online su {realm}."
+      },
+      "playersMatching": {
+        "one": "Chi: {count} giocatore corrispondente a \"{query}\" su {realm}.",
+        "few": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
+        "many": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
+        "other": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const it_IT: EnTranslations = {
       "assigned": "{looter} ha assegnato {item} a {target}.",
       "unassigned": "{item} non e stato assegnato ed e libero per tutti.",
       "leaderOnly": "Solo il capogruppo puo cambiare il metodo bottino."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filtra le borse per categoria",

@@ -313,7 +313,8 @@ export const nl_NL: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Emotewiel",
       "targetFriendly": "Dichtstbijzijnde Bondgenoot Aanwijzen",
-      "targetFriendlyNext": "Door Bondgenoten Bladeren"
+      "targetFriendlyNext": "Door Bondgenoten Bladeren",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Linkermuisklik",
@@ -338,6 +339,7 @@ export const nl_NL: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "UI-schaal",
       "highContrastBackground": "Hoog-contrastachtergrond",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -488,6 +490,9 @@ export const nl_NL: EnTranslations = {
       "noQuestSelected": "Selecteer een queeste in je logboek om te delen.",
       "linkTitle": "Shift-klik om deze queeste in de chat te koppelen."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "je bent {rank}, {count} lid",
@@ -512,6 +517,12 @@ export const nl_NL: EnTranslations = {
         "few": "Wie: {count} spelers online op {realm}.",
         "many": "Wie: {count} spelers online op {realm}.",
         "other": "Wie: {count} spelers online op {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const nl_NL: EnTranslations = {
       "assigned": "{looter} heeft {item} toegewezen aan {target}.",
       "unassigned": "{item} is niet toegewezen en is vrij voor iedereen.",
       "leaderOnly": "Alleen de groepsleider kan de buitmethode wijzigen."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Tassen filteren op categorie",

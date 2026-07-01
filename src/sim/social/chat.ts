@@ -811,8 +811,21 @@ export function handleDevChat(
     ctx.addItem(itemId, count, pid);
     return null;
   }
+  const questM = /^\/(?:dev\s+quest|devquest)\s+(\S+)\s*$/i.exec(raw);
+  if (questM) {
+    ctx.completeQuestForDev(questM[1], pid);
+    return null;
+  }
+  const questAllM = /^\/(?:dev\s+(?:quests|questall)|devquestall)\s*$/i.exec(raw);
+  if (questAllM) {
+    ctx.completeCurrentQuestsForDev(pid);
+    return null;
+  }
   if (/^\/dev(?:\s|$)/i.test(raw)) {
-    ctx.error(pid, 'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count]');
+    ctx.error(
+      pid,
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev quest questId, /dev quests',
+    );
     return null;
   }
   return undefined;

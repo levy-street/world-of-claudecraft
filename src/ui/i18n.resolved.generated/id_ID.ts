@@ -313,7 +313,8 @@ export const id_ID: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Roda Emote",
       "targetFriendly": "Bidik Sekutu Terdekat",
-      "targetFriendlyNext": "Putar Bidikan Sekutu"
+      "targetFriendlyNext": "Putar Bidikan Sekutu",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Klik Kiri",
@@ -338,6 +339,7 @@ export const id_ID: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Skala UI",
       "highContrastBackground": "Latar Kontras Tinggi",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
@@ -488,6 +490,9 @@ export const id_ID: EnTranslations = {
       "noQuestSelected": "Pilih misi di catatan Anda untuk dibagikan.",
       "linkTitle": "Shift-klik untuk menautkan misi ini di obrolan."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "Anda adalah {rank}, {count} anggota",
@@ -512,6 +517,12 @@ export const id_ID: EnTranslations = {
         "few": "Who: {count} pemain daring di {realm}.",
         "many": "Who: {count} pemain daring di {realm}.",
         "other": "Who: {count} pemain daring di {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const id_ID: EnTranslations = {
       "assigned": "{looter} memberikan {item} kepada {target}.",
       "unassigned": "{item} tidak diberikan dan bebas untuk semua.",
       "leaderOnly": "Hanya pemimpin grup yang dapat mengubah metode loot."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Saring tas menurut kategori",

@@ -154,6 +154,20 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
   });
 });
 
+describe('options_window: viewport resync on open (PR #1118)', () => {
+  it('calls syncAppViewport() before the panel flips to display: block', () => {
+    expect(painter).toContain("import { syncAppViewport } from '../game/app_viewport'");
+    const toggle = painter.slice(painter.indexOf('toggle(): void {'));
+    const toggleEnd = toggle.indexOf('\n  }\n');
+    const body = toggle.slice(0, toggleEnd);
+    const syncIdx = body.indexOf('syncAppViewport()');
+    const displayIdx = body.indexOf("root().style.display = 'block'");
+    expect(syncIdx).toBeGreaterThan(-1);
+    expect(displayIdx).toBeGreaterThan(-1);
+    expect(syncIdx).toBeLessThan(displayIdx);
+  });
+});
+
 describe('options_window: stays a cold window', () => {
   it('exposes no per-frame refresh and is never wired into Hud.update', () => {
     // the painter is open-on-demand only: no refreshIfChanged/update method

@@ -1,7 +1,7 @@
 type Messages = Record<string, string>;
 
 const en: Messages = {
-  'moderation.noTarget': 'Select a player to moderate first.',
+  'moderation.quotedNameRequired': 'Enclose the character name in double quotes.',
   'moderation.invalidTarget': "You can't moderate that player.",
   'moderation.kicked': 'Kicked {name}.',
   'moderation.killConfirm': 'Killed {name}.',
@@ -10,8 +10,8 @@ const en: Messages = {
   'moderation.banConfirm': 'Banned {name}.',
   'moderation.suspendConfirm': 'Suspended {name} for {duration}.',
   'moderation.banned': 'This account has been banned.',
-  'moderation.muteUsage': 'Usage: /mute <minutes> <reason>',
-  'moderation.suspendUsage': 'Usage: /suspend <minutes> <reason>',
+  'moderation.muteUsage': 'Usage: /mute "<name>" <minutes> [reason]',
+  'moderation.suspendUsage': 'Usage: /suspend "<name>" <minutes> [reason]',
   'moderation.spectateUsage': 'Usage: /spectate <name>',
   'moderation.spectateNotOnline': "No online player named '{name}'.",
   'moderation.notSpectating': 'You are not spectating anyone.',
@@ -22,7 +22,7 @@ const en: Messages = {
 };
 
 const es: Messages = {
-  'moderation.noTarget': 'Selecciona primero a un jugador para moderar.',
+  'moderation.quotedNameRequired': 'Escribe el nombre del personaje entre comillas dobles.',
   'moderation.invalidTarget': 'No puedes moderar a ese jugador.',
   'moderation.kicked': 'Has expulsado a {name}.',
   'moderation.killConfirm': 'Has matado a {name}.',
@@ -31,8 +31,8 @@ const es: Messages = {
   'moderation.banConfirm': 'Has baneado a {name}.',
   'moderation.suspendConfirm': 'Has suspendido a {name} durante {duration}.',
   'moderation.banned': 'Esta cuenta ha sido baneada.',
-  'moderation.muteUsage': 'Uso: /mute <minutos> <motivo>',
-  'moderation.suspendUsage': 'Uso: /suspend <minutos> <motivo>',
+  'moderation.muteUsage': 'Uso: /mute "<nombre>" <minutos> [motivo]',
+  'moderation.suspendUsage': 'Uso: /suspend "<nombre>" <minutos> [motivo]',
   'moderation.spectateUsage': 'Uso: /spectate <nombre>',
   'moderation.spectateNotOnline': "No hay ningún jugador conectado llamado '{name}'.",
   'moderation.notSpectating': 'No estás observando a nadie.',
@@ -43,7 +43,7 @@ const es: Messages = {
 };
 
 const fr: Messages = {
-  'moderation.noTarget': "Sélectionnez d'abord un joueur à modérer.",
+  'moderation.quotedNameRequired': 'Entourez le nom du personnage de guillemets doubles.',
   'moderation.invalidTarget': 'Vous ne pouvez pas modérer ce joueur.',
   'moderation.kicked': '{name} a été expulsé.',
   'moderation.killConfirm': '{name} a été tué.',
@@ -52,8 +52,8 @@ const fr: Messages = {
   'moderation.banConfirm': '{name} est banni.',
   'moderation.suspendConfirm': '{name} est suspendu pour {duration}.',
   'moderation.banned': 'Ce compte a été banni.',
-  'moderation.muteUsage': 'Usage : /mute <minutes> <raison>',
-  'moderation.suspendUsage': 'Usage : /suspend <minutes> <raison>',
+  'moderation.muteUsage': 'Usage : /mute "<nom>" <minutes> [raison]',
+  'moderation.suspendUsage': 'Usage : /suspend "<nom>" <minutes> [raison]',
   'moderation.spectateUsage': 'Utilisation : /spectate <nom>',
   'moderation.spectateNotOnline': 'Aucun joueur en ligne nommé « {name} ».',
   'moderation.notSpectating': "Vous n'observez personne.",
@@ -65,7 +65,7 @@ const fr: Messages = {
 };
 
 const it: Messages = {
-  'moderation.noTarget': 'Seleziona prima un giocatore da moderare.',
+  'moderation.quotedNameRequired': 'Racchiudi il nome del personaggio tra virgolette doppie.',
   'moderation.invalidTarget': 'Non puoi moderare quel giocatore.',
   'moderation.kicked': '{name} è stato espulso.',
   'moderation.killConfirm': '{name} è stato ucciso.',
@@ -74,8 +74,8 @@ const it: Messages = {
   'moderation.banConfirm': '{name} è stato bandito.',
   'moderation.suspendConfirm': '{name} è stato sospeso per {duration}.',
   'moderation.banned': 'Questo account è stato bandito.',
-  'moderation.muteUsage': 'Uso: /mute <minuti> <motivo>',
-  'moderation.suspendUsage': 'Uso: /suspend <minuti> <motivo>',
+  'moderation.muteUsage': 'Uso: /mute "<nome>" <minuti> [motivo]',
+  'moderation.suspendUsage': 'Uso: /suspend "<nome>" <minuti> [motivo]',
   'moderation.spectateUsage': 'Uso: /spectate <nome>',
   'moderation.spectateNotOnline': "Nessun giocatore online chiamato '{name}'.",
   'moderation.notSpectating': 'Non stai osservando nessuno.',
@@ -87,7 +87,7 @@ const it: Messages = {
 };
 
 const de: Messages = {
-  'moderation.noTarget': 'Wählt zuerst einen Spieler zum Moderieren aus.',
+  'moderation.quotedNameRequired': 'Setzt den Charakternamen in doppelte Anführungszeichen.',
   'moderation.invalidTarget': 'Diesen Spieler könnt ihr nicht moderieren.',
   'moderation.kicked': '{name} wurde entfernt.',
   'moderation.killConfirm': '{name} wurde getötet.',
@@ -96,8 +96,8 @@ const de: Messages = {
   'moderation.banConfirm': '{name} wurde gebannt.',
   'moderation.suspendConfirm': '{name} wurde für {duration} gesperrt.',
   'moderation.banned': 'Dieses Konto wurde gebannt.',
-  'moderation.muteUsage': 'Verwendung: /mute <Minuten> <Grund>',
-  'moderation.suspendUsage': 'Verwendung: /suspend <Minuten> <Grund>',
+  'moderation.muteUsage': 'Verwendung: /mute "<Name>" <Minuten> [Grund]',
+  'moderation.suspendUsage': 'Verwendung: /suspend "<Name>" <Minuten> [Grund]',
   'moderation.spectateUsage': 'Verwendung: /spectate <Name>',
   'moderation.spectateNotOnline': "Kein Spieler namens '{name}' ist online.",
   'moderation.notSpectating': 'Ihr beobachtet derzeit niemanden.',
@@ -109,7 +109,7 @@ const de: Messages = {
 };
 
 const zhCN: Messages = {
-  'moderation.noTarget': '请先选择要管理的玩家。',
+  'moderation.quotedNameRequired': '请用双引号括住角色名称。',
   'moderation.invalidTarget': '你不能管理该玩家。',
   'moderation.kicked': '已踢出 {name}。',
   'moderation.killConfirm': '已击杀 {name}。',
@@ -118,8 +118,8 @@ const zhCN: Messages = {
   'moderation.banConfirm': '已封禁 {name}。',
   'moderation.suspendConfirm': '已暂停 {name} {duration}。',
   'moderation.banned': '该账号已被封禁。',
-  'moderation.muteUsage': '用法：/mute <分钟> <原因>',
-  'moderation.suspendUsage': '用法：/suspend <分钟> <原因>',
+  'moderation.muteUsage': '用法：/mute "<名字>" <分钟> [原因]',
+  'moderation.suspendUsage': '用法：/suspend "<名字>" <分钟> [原因]',
   'moderation.spectateUsage': '用法：/spectate <名字>',
   'moderation.spectateNotOnline': '没有名为“{name}”的在线玩家。',
   'moderation.notSpectating': '你当前没有观察任何玩家。',
@@ -130,7 +130,7 @@ const zhCN: Messages = {
 };
 
 const zhTW: Messages = {
-  'moderation.noTarget': '請先選擇要管理的玩家。',
+  'moderation.quotedNameRequired': '請用雙引號括住角色名稱。',
   'moderation.invalidTarget': '你不能管理該玩家。',
   'moderation.kicked': '已踢出 {name}。',
   'moderation.killConfirm': '已擊殺 {name}。',
@@ -139,8 +139,8 @@ const zhTW: Messages = {
   'moderation.banConfirm': '已封禁 {name}。',
   'moderation.suspendConfirm': '已將 {name} 停權 {duration}。',
   'moderation.banned': '此帳號已被封禁。',
-  'moderation.muteUsage': '用法：/mute <分鐘> <原因>',
-  'moderation.suspendUsage': '用法：/suspend <分鐘> <原因>',
+  'moderation.muteUsage': '用法：/mute "<名字>" <分鐘> [原因]',
+  'moderation.suspendUsage': '用法：/suspend "<名字>" <分鐘> [原因]',
   'moderation.spectateUsage': '用法：/spectate <名字>',
   'moderation.spectateNotOnline': '沒有名為「{name}」的線上玩家。',
   'moderation.notSpectating': '你目前沒有觀察任何玩家。',
@@ -151,7 +151,7 @@ const zhTW: Messages = {
 };
 
 const ko: Messages = {
-  'moderation.noTarget': '먼저 관리할 플레이어를 선택하십시오.',
+  'moderation.quotedNameRequired': '캐릭터 이름을 큰따옴표로 묶으십시오.',
   'moderation.invalidTarget': '해당 플레이어를 관리할 수 없습니다.',
   'moderation.kicked': '{name}님을 추방했습니다.',
   'moderation.killConfirm': '{name}님을 처치했습니다.',
@@ -160,8 +160,8 @@ const ko: Messages = {
   'moderation.banConfirm': '{name}님을 차단했습니다.',
   'moderation.suspendConfirm': '{name}님을 {duration} 동안 정지했습니다.',
   'moderation.banned': '이 계정은 차단되었습니다.',
-  'moderation.muteUsage': '사용법: /mute <분> <사유>',
-  'moderation.suspendUsage': '사용법: /suspend <분> <사유>',
+  'moderation.muteUsage': '사용법: /mute "<이름>" <분> [사유]',
+  'moderation.suspendUsage': '사용법: /suspend "<이름>" <분> [사유]',
   'moderation.spectateUsage': '사용법: /spectate <이름>',
   'moderation.spectateNotOnline': "'{name}'(이)라는 온라인 플레이어가 없습니다.",
   'moderation.notSpectating': '현재 아무도 관전하고 있지 않습니다.',
@@ -172,7 +172,7 @@ const ko: Messages = {
 };
 
 const ja: Messages = {
-  'moderation.noTarget': '先にモデレートするプレイヤーを選択してください。',
+  'moderation.quotedNameRequired': 'キャラクター名を二重引用符で囲んでください。',
   'moderation.invalidTarget': 'そのプレイヤーをモデレートできません。',
   'moderation.kicked': '{name} をキックしました。',
   'moderation.killConfirm': '{name} を倒しました。',
@@ -181,8 +181,8 @@ const ja: Messages = {
   'moderation.banConfirm': '{name} を BAN しました。',
   'moderation.suspendConfirm': '{name} を {duration} の間停止しました。',
   'moderation.banned': 'このアカウントは BAN されました。',
-  'moderation.muteUsage': '使い方: /mute <分> <理由>',
-  'moderation.suspendUsage': '使い方: /suspend <分> <理由>',
+  'moderation.muteUsage': '使い方: /mute "<名前>" <分> [理由]',
+  'moderation.suspendUsage': '使い方: /suspend "<名前>" <分> [理由]',
   'moderation.spectateUsage': '使い方: /spectate <名前>',
   'moderation.spectateNotOnline': '「{name}」というオンラインプレイヤーはいません。',
   'moderation.notSpectating': '現在誰も観戦していません。',
@@ -193,7 +193,7 @@ const ja: Messages = {
 };
 
 const pt: Messages = {
-  'moderation.noTarget': 'Selecione primeiro um jogador para moderar.',
+  'moderation.quotedNameRequired': 'Coloque o nome do personagem entre aspas duplas.',
   'moderation.invalidTarget': 'Você não pode moderar esse jogador.',
   'moderation.kicked': '{name} foi expulso.',
   'moderation.killConfirm': '{name} foi morto.',
@@ -202,8 +202,8 @@ const pt: Messages = {
   'moderation.banConfirm': '{name} foi banido.',
   'moderation.suspendConfirm': '{name} foi suspenso por {duration}.',
   'moderation.banned': 'Esta conta foi banida.',
-  'moderation.muteUsage': 'Uso: /mute <minutos> <motivo>',
-  'moderation.suspendUsage': 'Uso: /suspend <minutos> <motivo>',
+  'moderation.muteUsage': 'Uso: /mute "<nome>" <minutos> [motivo]',
+  'moderation.suspendUsage': 'Uso: /suspend "<nome>" <minutos> [motivo]',
   'moderation.spectateUsage': 'Uso: /spectate <nome>',
   'moderation.spectateNotOnline': "Não há nenhum jogador online chamado '{name}'.",
   'moderation.notSpectating': 'Você não está observando ninguém.',
@@ -215,7 +215,7 @@ const pt: Messages = {
 };
 
 const ru: Messages = {
-  'moderation.noTarget': 'Сначала выберите игрока для модерации.',
+  'moderation.quotedNameRequired': 'Заключите имя персонажа в двойные кавычки.',
   'moderation.invalidTarget': 'Вы не можете модерировать этого игрока.',
   'moderation.kicked': '{name} исключён.',
   'moderation.killConfirm': '{name} убит.',
@@ -224,8 +224,8 @@ const ru: Messages = {
   'moderation.banConfirm': '{name} забанен.',
   'moderation.suspendConfirm': '{name} заблокирован на {duration}.',
   'moderation.banned': 'Эта учётная запись забанена.',
-  'moderation.muteUsage': 'Использование: /mute <минуты> <причина>',
-  'moderation.suspendUsage': 'Использование: /suspend <минуты> <причина>',
+  'moderation.muteUsage': 'Использование: /mute "<имя>" <минуты> [причина]',
+  'moderation.suspendUsage': 'Использование: /suspend "<имя>" <минуты> [причина]',
   'moderation.spectateUsage': 'Использование: /spectate <имя>',
   'moderation.spectateNotOnline': 'Игрок с именем «{name}» не в сети.',
   'moderation.notSpectating': 'Вы никого не наблюдаете.',
@@ -236,7 +236,7 @@ const ru: Messages = {
 };
 
 const da: Messages = {
-  'moderation.noTarget': 'Vælg først en spiller, der skal modereres.',
+  'moderation.quotedNameRequired': 'Sæt figurens navn i dobbelte anførselstegn.',
   'moderation.invalidTarget': 'Du kan ikke moderere denne spiller.',
   'moderation.kicked': '{name} blev smidt ud.',
   'moderation.killConfirm': '{name} blev dræbt.',
@@ -245,8 +245,8 @@ const da: Messages = {
   'moderation.banConfirm': '{name} blev udelukket.',
   'moderation.suspendConfirm': '{name} blev suspenderet i {duration}.',
   'moderation.banned': 'Denne konto er blevet udelukket.',
-  'moderation.muteUsage': 'Brug: /mute <minutter> <årsag>',
-  'moderation.suspendUsage': 'Brug: /suspend <minutter> <årsag>',
+  'moderation.muteUsage': 'Brug: /mute "<navn>" <minutter> [årsag]',
+  'moderation.suspendUsage': 'Brug: /suspend "<navn>" <minutter> [årsag]',
   'moderation.spectateUsage': 'Brug: /spectate <navn>',
   'moderation.spectateNotOnline': "Ingen online spiller hedder '{name}'.",
   'moderation.notSpectating': 'Du observerer ikke nogen.',
@@ -257,7 +257,7 @@ const da: Messages = {
 };
 
 const id: Messages = {
-  'moderation.noTarget': 'Pilih pemain yang akan dimoderasi terlebih dahulu.',
+  'moderation.quotedNameRequired': 'Apit nama karakter dengan tanda kutip ganda.',
   'moderation.invalidTarget': 'Anda tidak dapat memoderasi pemain itu.',
   'moderation.kicked': '{name} telah dikeluarkan.',
   'moderation.killConfirm': '{name} telah dibunuh.',
@@ -266,8 +266,8 @@ const id: Messages = {
   'moderation.banConfirm': '{name} diblokir.',
   'moderation.suspendConfirm': '{name} ditangguhkan selama {duration}.',
   'moderation.banned': 'Akun ini telah diblokir.',
-  'moderation.muteUsage': 'Penggunaan: /mute <menit> <alasan>',
-  'moderation.suspendUsage': 'Penggunaan: /suspend <menit> <alasan>',
+  'moderation.muteUsage': 'Penggunaan: /mute "<nama>" <menit> [alasan]',
+  'moderation.suspendUsage': 'Penggunaan: /suspend "<nama>" <menit> [alasan]',
   'moderation.spectateUsage': 'Penggunaan: /spectate <nama>',
   'moderation.spectateNotOnline': "Tidak ada pemain online bernama '{name}'.",
   'moderation.notSpectating': 'Anda tidak sedang mengamati siapa pun.',
@@ -278,7 +278,7 @@ const id: Messages = {
 };
 
 const nl: Messages = {
-  'moderation.noTarget': 'Selecteer eerst een speler om te modereren.',
+  'moderation.quotedNameRequired': 'Zet de naam van het personage tussen dubbele aanhalingstekens.',
   'moderation.invalidTarget': 'Je kunt die speler niet modereren.',
   'moderation.kicked': '{name} is verwijderd.',
   'moderation.killConfirm': '{name} is gedood.',
@@ -287,8 +287,8 @@ const nl: Messages = {
   'moderation.banConfirm': '{name} is verbannen.',
   'moderation.suspendConfirm': '{name} is voor {duration} geschorst.',
   'moderation.banned': 'Dit account is verbannen.',
-  'moderation.muteUsage': 'Gebruik: /mute <minuten> <reden>',
-  'moderation.suspendUsage': 'Gebruik: /suspend <minuten> <reden>',
+  'moderation.muteUsage': 'Gebruik: /mute "<naam>" <minuten> [reden]',
+  'moderation.suspendUsage': 'Gebruik: /suspend "<naam>" <minuten> [reden]',
   'moderation.spectateUsage': 'Gebruik: /spectate <naam>',
   'moderation.spectateNotOnline': "Er is geen online speler met de naam '{name}'.",
   'moderation.notSpectating': 'Je observeert momenteel niemand.',
@@ -300,7 +300,7 @@ const nl: Messages = {
 };
 
 const pl: Messages = {
-  'moderation.noTarget': 'Najpierw wybierz gracza do moderacji.',
+  'moderation.quotedNameRequired': 'Umieść nazwę postaci w podwójnym cudzysłowie.',
   'moderation.invalidTarget': 'Nie możesz moderować tego gracza.',
   'moderation.kicked': 'Gracz {name} został wyrzucony.',
   'moderation.killConfirm': 'Gracz {name} został zabity.',
@@ -309,8 +309,8 @@ const pl: Messages = {
   'moderation.banConfirm': 'Gracz {name} został zbanowany.',
   'moderation.suspendConfirm': 'Gracz {name} został zawieszony na {duration}.',
   'moderation.banned': 'To konto zostało zbanowane.',
-  'moderation.muteUsage': 'Użycie: /mute <minuty> <powód>',
-  'moderation.suspendUsage': 'Użycie: /suspend <minuty> <powód>',
+  'moderation.muteUsage': 'Użycie: /mute "<nazwa>" <minuty> [powód]',
+  'moderation.suspendUsage': 'Użycie: /suspend "<nazwa>" <minuty> [powód]',
   'moderation.spectateUsage': 'Użycie: /spectate <nazwa>',
   'moderation.spectateNotOnline': 'Brak gracza online o nazwie „{name}”.',
   'moderation.notSpectating': 'Nikogo obecnie nie obserwujesz.',
@@ -321,7 +321,7 @@ const pl: Messages = {
 };
 
 const sv: Messages = {
-  'moderation.noTarget': 'Välj först en spelare att moderera.',
+  'moderation.quotedNameRequired': 'Sätt karaktärens namn inom dubbla citattecken.',
   'moderation.invalidTarget': 'Du kan inte moderera den spelaren.',
   'moderation.kicked': '{name} har sparkats ut.',
   'moderation.killConfirm': '{name} har dödats.',
@@ -330,8 +330,8 @@ const sv: Messages = {
   'moderation.banConfirm': '{name} har bannlysts.',
   'moderation.suspendConfirm': '{name} har stängts av i {duration}.',
   'moderation.banned': 'Detta konto har bannlysts.',
-  'moderation.muteUsage': 'Användning: /mute <minuter> <orsak>',
-  'moderation.suspendUsage': 'Användning: /suspend <minuter> <orsak>',
+  'moderation.muteUsage': 'Användning: /mute "<namn>" <minuter> [orsak]',
+  'moderation.suspendUsage': 'Användning: /suspend "<namn>" <minuter> [orsak]',
   'moderation.spectateUsage': 'Användning: /spectate <namn>',
   'moderation.spectateNotOnline': "Ingen onlinespelare heter '{name}'.",
   'moderation.notSpectating': 'Du observerar ingen just nu.',
@@ -342,7 +342,7 @@ const sv: Messages = {
 };
 
 const tr: Messages = {
-  'moderation.noTarget': 'Önce denetlenecek bir oyuncu seçin.',
+  'moderation.quotedNameRequired': 'Karakter adını çift tırnak içine alın.',
   'moderation.invalidTarget': 'Bu oyuncuyu denetleyemezsiniz.',
   'moderation.kicked': '{name} oyundan atıldı.',
   'moderation.killConfirm': '{name} öldürüldü.',
@@ -351,8 +351,8 @@ const tr: Messages = {
   'moderation.banConfirm': '{name} yasaklandı.',
   'moderation.suspendConfirm': '{name}, {duration} boyunca askıya alındı.',
   'moderation.banned': 'Bu hesap yasaklandı.',
-  'moderation.muteUsage': 'Kullanım: /mute <dakika> <neden>',
-  'moderation.suspendUsage': 'Kullanım: /suspend <dakika> <neden>',
+  'moderation.muteUsage': 'Kullanım: /mute "<ad>" <dakika> [neden]',
+  'moderation.suspendUsage': 'Kullanım: /suspend "<ad>" <dakika> [neden]',
   'moderation.spectateUsage': 'Kullanım: /spectate <ad>',
   'moderation.spectateNotOnline': "'{name}' adında çevrimiçi oyuncu yok.",
   'moderation.notSpectating': 'Şu anda kimseyi izlemiyorsunuz.',
@@ -363,7 +363,7 @@ const tr: Messages = {
 };
 
 const vi: Messages = {
-  'moderation.noTarget': 'Hãy chọn người chơi cần kiểm duyệt trước.',
+  'moderation.quotedNameRequired': 'Đặt tên nhân vật trong dấu ngoặc kép.',
   'moderation.invalidTarget': 'Bạn không thể kiểm duyệt người chơi đó.',
   'moderation.kicked': '{name} đã bị đuổi.',
   'moderation.killConfirm': '{name} đã bị hạ.',
@@ -372,8 +372,8 @@ const vi: Messages = {
   'moderation.banConfirm': '{name} đã bị cấm.',
   'moderation.suspendConfirm': '{name} đã bị đình chỉ trong {duration}.',
   'moderation.banned': 'Tài khoản này đã bị cấm.',
-  'moderation.muteUsage': 'Cách dùng: /mute <phút> <lý do>',
-  'moderation.suspendUsage': 'Cách dùng: /suspend <phút> <lý do>',
+  'moderation.muteUsage': 'Cách dùng: /mute "<tên>" <phút> [lý do]',
+  'moderation.suspendUsage': 'Cách dùng: /suspend "<tên>" <phút> [lý do]',
   'moderation.spectateUsage': 'Cách dùng: /spectate <tên>',
   'moderation.spectateNotOnline': "Không có người chơi trực tuyến tên '{name}'.",
   'moderation.notSpectating': 'Bạn hiện không theo dõi ai.',

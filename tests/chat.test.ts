@@ -1067,6 +1067,8 @@ describe('chat module (direct, no Sim)', () => {
     const ctx = {
       setPlayerLevel: (lvl: number, pid?: number) => calls.push(['level', lvl, pid]),
       addItem: (id: string, n: number, pid?: number) => calls.push(['item', id, n, pid]),
+      completeQuestForDev: (questId: string, pid?: number) => calls.push(['quest', questId, pid]),
+      completeCurrentQuestsForDev: (pid?: number) => calls.push(['quests', pid]),
       emit: () => {},
       error: () => {},
       entities: new Map(),
@@ -1078,6 +1080,10 @@ describe('chat module (direct, no Sim)', () => {
     expect(calls).toContainEqual(['level', 5, 1]);
     expect(chatMod.handleDevChat(ctx, '/dev give wolf_fang 3', 1)).toBe(null);
     expect(calls).toContainEqual(['item', 'wolf_fang', 3, 1]);
+    expect(chatMod.handleDevChat(ctx, '/dev quest q_wolves', 1)).toBe(null);
+    expect(calls).toContainEqual(['quest', 'q_wolves', 1]);
+    expect(chatMod.handleDevChat(ctx, '/dev quests', 1)).toBe(null);
+    expect(calls).toContainEqual(['quests', 1]);
     expect(chatMod.handleDevChat(ctx, 'hello world', 1)).toBe(undefined);
   });
 });

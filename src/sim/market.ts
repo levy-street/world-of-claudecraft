@@ -299,7 +299,10 @@ export class Market {
     const listing = this.marketListings[idx];
     const def = ITEMS[listing.itemId];
     if (!def) {
-      this.marketListings.splice(idx, 1);
+      // The item id is no longer known (a content edit). Do not silently delete
+      // the listing: that destroys the seller's escrowed goods with no refund.
+      // Leave it intact so the owner can cancel/reclaim it; just refuse the buy.
+      this.ctx.error(meta.entityId, 'That listing is no longer available.');
       return;
     }
     if (this.marketListingBelongsTo(listing, meta)) {
@@ -497,7 +500,15 @@ export class Market {
   loadMarket(save: MarketSave | null | undefined): void {
     if (!save) return;
     for (const l of save.listings ?? []) {
-      if (!l || typeof l.itemId !== 'string' || !ITEMS[l.itemId]) continue;
+      // Keep a listing whose item id is no longer in ITEMS (a content rename,
+      // retirement, or typo). Dropping it would silently destroy every escrowed
+      // copy on the next restart and never refund the seller. An unknown id is
+      // dormant, recoverable data (the owner can reclaim it into bags, exactly
+      // as the character load path keeps unknown ids verbatim); a re-added or
+      // corrected id rehydrates it. Display/buy paths already guard on ITEMS[id].
+      if (!l || typeof l.itemId !== 'string') continue;
+      if (!ITEMS[l.itemId])
+        console.warn(`market: keeping listing with unknown item id ${l.itemId}`);
       this.marketListings.push({
         id: l.id,
         sellerKey: String(l.sellerKey ?? ''),
@@ -518,8 +529,11 @@ export class Market {
       if (!c || typeof c.key !== 'string') continue;
       this.marketCollections.set(c.key, {
         copper: Math.max(0, Math.floor(c.copper) || 0),
+        // Keep returned/expired-listing items even when their id is unknown, for
+        // the same reason as listings above: a content edit must not silently
+        // empty a player's pending pickups. The id stays dormant until corrected.
         items: (c.items ?? [])
-          .filter((s) => s && ITEMS[s.itemId])
+          .filter((s) => s && typeof s.itemId === 'string')
           .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) })),
       });
     }

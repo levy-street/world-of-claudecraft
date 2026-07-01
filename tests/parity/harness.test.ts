@@ -142,6 +142,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'overheadEmoteId',
       'overheadEmoteSeq',
       'overheadEmoteUntil',
+      'potionCdRemaining',
       'prevFacing',
       'prevPos',
       'scale',

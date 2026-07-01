@@ -109,9 +109,11 @@ import {
   ITEM_ICON_PREFIX,
 } from './action_bar_view';
 import { ArenaWindow } from './arena_window';
+import { abilityStartsAutoAttack, hasAutoAttackTarget } from './attack_on_ability';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
+import { attachAvatarFallback } from './avatar_fallback';
 import { BagsWindow } from './bags_window';
 import { CastBarPainter } from './cast_bar_painter';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
@@ -242,7 +244,7 @@ import {
 import { chatPlayerContextActions } from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
-import { encodeQuestLink, parseChatSegments } from './quest_link';
+import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 import { QuestLogWindow } from './questlog_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
@@ -720,6 +722,9 @@ export class Hud {
   private targetNameEl = $('#tf-name');
   private targetLevelEl = $('#tf-level');
   private targetDiscordEl = $('#tf-discord');
+  // Diff key for the target-frame Discord line, so its per-frame update only rebuilds
+  // innerHTML (and re-attaches the avatar fallback) when the Discord content changes.
+  private targetDiscordSig = '';
   private targetHpEl = $('#tf-hp');
   private targetHpTextEl = $('#tf-hp-text');
   private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
@@ -858,7 +863,7 @@ export class Hud {
   });
   private openGossipNpcId: number | null = null;
   private openQuestDetailId: string | null = null;
-  private pendingChatLinks = new Map<string, string>(); // display "[Name]" -> questId
+  private pendingChatLinks = new Map<string, string>(); // display "[Name]" -> [[q:id]]/[[i:id]] token
   private questDialogTrap: FocusTrapHandle | null = null;
   private questDialogOpenedAtMs = 0;
   // swing timer: the period is captured from the reset edge (swingTimer jumping
@@ -2016,7 +2021,7 @@ export class Hud {
   // channel tab. main.ts calls this on Enter so a channel tab works without
   // retyping the slash command; an explicit "/..." the player typed still wins.
   composeChatSend(typed: string): string {
-    const withLinks = this.applyPendingQuestLinks(typed);
+    const withLinks = this.applyPendingChatLinks(typed);
     const ch = this.chatFilterChannel();
     return ch ? composeChatLine(ch, withLinks) : withLinks.trim();
   }
@@ -2024,9 +2029,22 @@ export class Hud {
   // Shift-click a quest-log entry: open the chat input and insert a readable
   // [Name] link. composeChatSend swaps it for the canonical [[q:id]] token on send.
   insertQuestChatLink(questId: string): void {
+    this.insertChatLink(`[${questTitle(questId)}]`, encodeQuestLink(questId));
+  }
+
+  // Shift-click a bag item: insert a readable [Item Name] link into chat. On send,
+  // composeChatSend swaps it for the canonical [[i:id]] token (name resolved at render).
+  insertItemChatLink(itemId: string): void {
+    const item = ITEMS[itemId];
+    if (!item) return;
+    this.insertChatLink(`[${itemDisplayName(item)}]`, encodeItemLink(itemId));
+  }
+
+  // Shared affordance: append a readable [Name] to the chat input and remember the
+  // token it stands for, so applyPendingChatLinks can swap it back in on send.
+  private insertChatLink(display: string, token: string): void {
     const input = $('#chat-input') as unknown as HTMLInputElement;
-    const display = `[${questTitle(questId)}]`;
-    this.pendingChatLinks.set(display, questId);
+    this.pendingChatLinks.set(display, token);
     input.placeholder = this.activeChatPlaceholder();
     input.style.display = 'block';
     input.value =
@@ -2038,16 +2056,15 @@ export class Hud {
 
   // Drop any shift-click-inserted links that were never sent (chat closed/cleared),
   // so a stale [Name] entry can't silently rewrite a later message.
-  clearPendingQuestLinks(): void {
+  clearPendingChatLinks(): void {
     this.pendingChatLinks.clear();
   }
 
-  // Replace any inserted readable [Name] with its [[q:id]] token, then forget them.
-  private applyPendingQuestLinks(typed: string): string {
+  // Replace any inserted readable [Name] with its [[q:id]]/[[i:id]] token, then forget them.
+  private applyPendingChatLinks(typed: string): string {
     if (this.pendingChatLinks.size === 0) return typed;
     let out = typed;
-    for (const [display, questId] of this.pendingChatLinks)
-      out = out.split(display).join(encodeQuestLink(questId));
+    for (const [display, token] of this.pendingChatLinks) out = out.split(display).join(token);
     this.pendingChatLinks.clear();
     return out;
   }
@@ -2607,6 +2624,7 @@ export class Hud {
     closeVendor: () => this.closeVendor(),
     addItemToTrade: (itemId) => this.addItemToTrade(itemId),
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
+    insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
       this.pendingPetFeed = active;
@@ -3517,8 +3535,27 @@ export class Hud {
     if (action?.type === 'ability') {
       // cast by ability id: the server validates against its own known list,
       // so the client-side slot remap never desyncs slot semantics
-      if (this.abilityForSlot(barSlot)) {
+      const resolved = this.abilityForSlot(barSlot);
+      if (resolved) {
         this.sim.castAbility(action.id);
+        // Optional QoL: also engage auto-attack when the ability is an offensive
+        // attack, so white swings start without a separate Attack press. Gated on
+        // the player setting; abilityStartsAutoAttack skips heals/buffs and any
+        // damage-breakable CC (gouge/sap/sheep) the swing would shatter. We MUST also
+        // gate on hasAutoAttackTarget: many damaging abilities are requiresTarget:false
+        // AOEs (Arcane Explosion, Frost Nova, Thunder Clap, ...) cast with no hostile
+        // target, where startAutoAttack does NOT no-op but errors "Invalid attack
+        // target." (sim/combat/auto_attack.ts). The explicit Attack button keeps that
+        // error feedback; this convenience path must not trip it.
+        const tid = this.sim.player.targetId;
+        const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
+        if (
+          this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
+          abilityStartsAutoAttack(resolved.effects) &&
+          hasAutoAttackTarget(target)
+        ) {
+          this.sim.startAutoAttack();
+        }
         this.flashActionSlot(barSlot);
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
@@ -6231,7 +6268,7 @@ export class Hud {
             (ev.channel === 'say' || ev.channel === 'yell' || ev.channel === 'emote') &&
             ev.entityId !== undefined
           ) {
-            const masked = this.maskChat(this.questLinkPlainText(ev.text));
+            const masked = this.maskChat(this.chatLinkPlainText(ev.text));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
             this.renderer.showChatBubble(ev.entityId, bubble, ev.channel === 'yell');
           }
@@ -6705,6 +6742,10 @@ export class Hud {
         if (seg.value) parent.append(document.createTextNode(this.maskChat(seg.value)));
         continue;
       }
+      if (seg.kind === 'item') {
+        this.appendChatItemLink(parent, seg.itemId);
+        continue;
+      }
       const quest = QUESTS[seg.questId];
       if (!quest) {
         parent.append(document.createTextNode(this.maskChat('[?]')));
@@ -6726,13 +6767,36 @@ export class Hud {
     }
   }
 
-  // The plain-text form of a chat string with [[q:id]] tokens replaced by [Name]
-  // — used for 3D chat bubbles, which can't host interactive spans.
-  private questLinkPlainText(text: string): string {
+  // Render a [[i:id]] chat segment as a quality-colored, inspectable item link.
+  // Hover/focus shows the same item tooltip the bags window uses; an unknown id
+  // (e.g. content drift between players) degrades to a plain [?].
+  private appendChatItemLink(parent: HTMLElement, itemId: string): void {
+    const item = ITEMS[itemId];
+    if (!item) {
+      parent.append(document.createTextNode(this.maskChat('[?]')));
+      return;
+    }
+    const link = document.createElement('span');
+    link.className = 'chat-item-link';
+    link.style.color = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
+    link.textContent = `[${itemDisplayName(item)}]`;
+    link.tabIndex = 0;
+    this.attachTooltip(link, () => this.itemTooltip(item));
+    parent.append(link);
+  }
+
+  // The plain-text form of a chat string with [[q:id]]/[[i:id]] tokens replaced by
+  // [Name] — used for 3D chat bubbles, which can't host interactive spans.
+  private chatLinkPlainText(text: string): string {
     return parseChatSegments(text)
-      .map((s) =>
-        s.kind === 'text' ? s.value : `[${QUESTS[s.questId] ? questTitle(s.questId) : '?'}]`,
-      )
+      .map((s) => {
+        if (s.kind === 'text') return s.value;
+        if (s.kind === 'item') {
+          const item = ITEMS[s.itemId];
+          return `[${item ? itemDisplayName(item) : '?'}]`;
+        }
+        return `[${QUESTS[s.questId] ? questTitle(s.questId) : '?'}]`;
+      })
       .join('');
   }
 
@@ -7864,7 +7928,9 @@ export class Hud {
     this.activeMasterRolls.set(ev.rollId, {
       event: ev,
       receivedAt: performance.now(),
-      durationMs: 60_000,
+      // The master looter's curate window is 5 minutes (sim MASTER_LOOT_TIMEOUT),
+      // longer than a need/greed roll, so the countdown bar must span the full window.
+      durationMs: 300_000,
     });
     this.renderLootRolls();
   }
@@ -9854,8 +9920,10 @@ export class Hud {
     )}</div>`;
     if (this.reportHooks && pid !== this.sim.playerId)
       html += `<div class="ctx-item" data-act="report">${esc(t('hud.chat.context.report'))}</div>`;
-    if (isLeader && isMember && pid !== this.sim.playerId)
+    if (isLeader && isMember && pid !== this.sim.playerId) {
+      html += `<div class="ctx-item" data-act="promote">${esc(t('hudChrome.party.promoteLeader'))}</div>`;
       html += `<div class="ctx-item" data-act="kick">${esc(t('hud.chat.context.removeParty'))}</div>`;
+    }
     html += `<div class="ctx-item" data-act="close">${esc(t('hud.chat.context.cancel'))}</div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -9874,6 +9942,7 @@ export class Hud {
           ignored ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
         } else this.toggleChatIgnore(name);
       } else if (act === 'report') this.openReportWindow({ pid, name });
+      else if (act === 'promote') this.sim.partyPromote(pid);
       else if (act === 'kick') this.sim.partyKick(pid);
     });
   }
@@ -9890,10 +9959,19 @@ export class Hud {
       target.kind !== 'player' ||
       (!tier && !target.discordName && !target.discordRole && !devIdx)
     ) {
-      el.classList.remove('show');
-      el.replaceChildren();
+      if (this.targetDiscordSig !== '') {
+        this.targetDiscordSig = '';
+        el.classList.remove('show');
+        el.replaceChildren();
+      }
       return;
     }
+    // This runs every frame the target frame updates; only rebuild when the Discord
+    // content actually changes (else a fresh <img> per frame would re-fetch the
+    // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
+    const sig = `${tier}|${target.discordName ?? ''}|${target.discordRole ?? ''}|${target.discordAvatar ?? ''}|${devIdx}`;
+    if (sig === this.targetDiscordSig) return;
+    this.targetDiscordSig = sig;
     const roleTagLabel = (key: string | undefined): string => {
       switch (key) {
         case 'levyst':
@@ -9929,6 +10007,10 @@ export class Hud {
       parts.push(`<span class="uf-dc-chip dev">${esc(devTierDisplayName(devDef))}</span>`);
     }
     el.innerHTML = parts.join('');
+    // Hide the external Discord avatar if its CDN image fails to load, so the line
+    // never shows the browser's broken-image placeholder (the nickname stays).
+    const dcAvatar = el.querySelector<HTMLImageElement>('.uf-dc-name img');
+    if (dcAvatar) attachAvatarFallback(dcAvatar);
     el.classList.add('show');
   }
 
@@ -10040,6 +10122,16 @@ export class Hud {
       `<div class="equip-col equip-col-right" id="inspect-equip-right"></div>` +
       `</div></div>`;
     hydratePortraits(el);
+    // If the linked-Discord avatar fails to load from the CDN, degrade to exactly the
+    // no-avatar rendering (the plain status-tier badge, without the pfp's blue ring)
+    // instead of the browser's broken-image placeholder.
+    const inspectPfp = el.querySelector<HTMLImageElement>('.inspect-discord-pfp');
+    if (inspectPfp) {
+      attachAvatarFallback(inspectPfp, (img) => {
+        img.classList.remove('inspect-discord-pfp');
+        img.src = discordStatusBadgeDataUrl(discordTierIdx);
+      });
+    }
     const view = buildPaperdollView(e.equippedItems, ITEMS);
     const leftCol = el.querySelector('#inspect-equip-left');
     const rightCol = el.querySelector('#inspect-equip-right');

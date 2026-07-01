@@ -500,7 +500,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 12,
     buyValue: 100,
   },
-  // --- combat potions (vendor): instant, usable in combat, 60s shared cooldown.
+  // --- combat potions (vendor): instant, usable in combat, 2-minute shared cooldown.
   // Restore less than sitting to eat/drink, the price you pay for not sitting (#103).
   minor_healing_potion: {
     id: 'minor_healing_potion',
@@ -533,7 +533,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // Higher tiers of the combat-potion ladder, keeping pace with the zone-2/3
   // level bands (classic Minor -> Lesser -> standard progression). Same instant,
-  // in-combat, 60s-shared-cooldown rules as the Minor tier above.
+  // in-combat, 2-minute-shared-cooldown rules as the Minor tier above.
   lesser_healing_potion: {
     id: 'lesser_healing_potion',
     name: 'Lesser Healing Potion',

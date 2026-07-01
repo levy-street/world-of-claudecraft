@@ -47,6 +47,13 @@ import { LOOT_FFA_DELAY } from './loot_ffa';
 // users are startNeedGreedRoll + pruneCorpseLoot, so the constant lives with them.
 const LOOT_ROLL_TIMEOUT = 60;
 
+// How long (seconds) the master looter has to curate a threshold drop before it
+// falls back to a need/greed roll for all candidates. Longer than a need/greed
+// window because assigning loot by hand (deciding who gets the drop) is a
+// deliberate call, not a quick roll. On timeout convertMasterRollToNeedGreed
+// refreshes the roll to a fresh LOOT_ROLL_TIMEOUT need/greed window.
+const MASTER_LOOT_TIMEOUT = 300;
+
 // The server-authoritative pending need-greed roll record. Sim-internal (the public
 // projection clients see is LootRollPrompt); the `pendingLootRolls` map lives on Sim
 // and is reached through the SimContext seam.
@@ -265,11 +272,11 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
     quality: def?.quality,
     candidates: candidates.map((candidate) => candidate.entityId),
     choices: new Map(),
-    expiresAt: ctx.time + LOOT_ROLL_TIMEOUT,
+    expiresAt: ctx.time + MASTER_LOOT_TIMEOUT,
     masterLooter: looterPid,
   };
   ctx.pendingLootRolls.set(roll.id, roll);
-  mob.corpseTimer = Math.max(mob.corpseTimer, LOOT_ROLL_TIMEOUT + 2);
+  mob.corpseTimer = Math.max(mob.corpseTimer, MASTER_LOOT_TIMEOUT + 2);
   // Sent only to the master looter; the candidate list is who they can assign to.
   ctx.emit({
     type: 'masterLoot',

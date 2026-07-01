@@ -30,6 +30,7 @@ import type { DelveModuleId } from '../sim/delve_layout';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
@@ -3166,6 +3167,10 @@ export class Renderer {
     discordEl.alt = '';
     discordEl.referrerPolicy = 'no-referrer';
     discordEl.style.display = 'none';
+    // The avatar is the one nameplate image sourced from an external URL (Discord's
+    // CDN); if it fails to load, hide it rather than leave the browser's broken-image
+    // placeholder on the plate. Attached once here; the element is reused per entity.
+    attachAvatarFallback(discordEl);
     const nameEl = document.createElement('div');
     nameEl.className = 'np-name';
     nameEl.textContent = e.kind === 'object' ? objectDisplayName(e) : e.name;

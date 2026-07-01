@@ -180,17 +180,35 @@ describe('master loot', () => {
     expect(sim.events.filter((e) => e.type === 'lootRoll')).toHaveLength(0); // not converted to a roll
   });
 
-  it('converts an uncurated drop to a need/greed roll for all candidates at timeout', () => {
+  it('gives the master looter a 5-minute curate window (longer than a need/greed roll)', () => {
+    const sim = makeSim();
+    const { a, mob } = partyOnCorpse(sim, PREMIUM);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a);
+    sim.lootCorpse(mob.id, a);
+    const prompt = sim.events.find((e) => e.type === 'masterLoot')!;
+    // The master looter's curate window is 5 minutes (300s) from now.
+    expect((prompt as { expiresAt: number }).expiresAt).toBeCloseTo(sim.time + 300, 5);
+    // A still-open master roll has NOT fallen back to need/greed at 4 minutes.
+    const rollId = prompt.rollId;
+    let convertedEarly = false;
+    for (let i = 0; i < 20 * 240; i++) {
+      for (const e of sim.tick())
+        if (e.type === 'lootRoll' && e.rollId === rollId) convertedEarly = true;
+    }
+    expect(convertedEarly).toBe(false);
+  });
+
+  it('converts an uncurated drop to a need/greed roll for all candidates at the 5-min timeout', () => {
     const sim = makeSim();
     const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
     sim.setPartyLootMaster(true, 0, 'uncommon', a);
     sim.lootCorpse(mob.id, a);
     const rollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
 
-    // Run past the 60s curate timeout, collecting events from each tick (the
-    // sim drains its event buffer per tick, so capture the returns).
+    // Run past the 300s (5-minute) curate timeout, collecting events from each tick
+    // (the sim drains its event buffer per tick, so capture the returns).
     const rolls: number[] = [];
-    for (let i = 0; i < 20 * 61; i++) {
+    for (let i = 0; i < 20 * 301; i++) {
       for (const e of sim.tick())
         if (e.type === 'lootRoll' && e.rollId === rollId && e.pid !== undefined) rolls.push(e.pid);
     }
@@ -204,6 +222,22 @@ describe('master loot', () => {
     expect(sim.partyInfo?.master.enabled).toBe(false);
     sim.setPartyLootMaster(true, 0, 'uncommon', a);
     expect(sim.partyInfo?.master.enabled).toBe(true);
+  });
+
+  it('master loot pinned to the leader follows a promote-to-leader handoff', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // 0 = leader is master looter
+
+    sim.partyPromote(b, a); // hand leadership from a to b
+    expect(sim.partyOf(b)?.leader).toBe(b);
+
+    sim.events.length = 0;
+    sim.lootCorpse(mob.id, a);
+    const prompts = sim.events.filter((e) => e.type === 'masterLoot');
+    expect(prompts).toHaveLength(1);
+    // The assignment prompt now reaches the NEW leader (b), not the old leader (a).
+    expect((prompts[0] as { pid: number }).pid).toBe(b);
   });
 
   it('disabled master loot keeps the existing need/greed behavior', () => {

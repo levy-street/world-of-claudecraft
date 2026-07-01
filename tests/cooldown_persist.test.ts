@@ -78,6 +78,27 @@ describe('Sim cooldown persistence round-trip (anti-relog-reset)', () => {
     expect(e2.potionCooldownUntil).toBe(sim2.time + 30);
   });
 
+  it('re-anchors the derived potion display copy (potionCdRemaining) on load', () => {
+    // Regression: load restored the authoritative potionCooldownUntil but left the
+    // derived display copy at 0, so after a relog inside the shared potion cooldown the
+    // action bar painted the potion READY (no swipe) while the sim gate still rejected
+    // the quaff. The display copy must be re-derived from the restored authority.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Quaffer');
+    const e = sim.entities.get(pid)!;
+    e.potionCooldownUntil = sim.time + 40; // 40s left on the shared potion cooldown
+    e.potionCdRemaining = 40; // as a quaff materializes it
+
+    const state = sim.serializeCharacter(pid)!;
+    const sim2 = makeWorld();
+    const pid2 = sim2.addPlayer('warrior', 'Quaffer', { state });
+    const e2 = sim2.entities.get(pid2)!;
+    // Authority restored, so the use-gate still blocks...
+    expect(e2.potionCooldownUntil).toBe(sim2.time + 40);
+    // ...and the display copy is re-derived to match, so the swipe/countdown shows.
+    expect(e2.potionCdRemaining).toBeCloseTo(40, 5);
+  });
+
   it('a populated character round-trips deep-equal through serialize -> load -> serialize', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Onco');

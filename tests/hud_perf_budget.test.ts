@@ -538,6 +538,7 @@ function idleWorld(): ActionBarWorldInput {
       resource: 100,
       cooldowns: new Map(),
       gcdRemaining: 0,
+      potionCdRemaining: 0,
       queuedOnSwing: null,
       pos: { x: 0, y: 0, z: 0 },
     },

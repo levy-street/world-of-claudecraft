@@ -313,7 +313,8 @@ export const zh_TW: EnTranslations = {
     "keybinds": {
       "emoteWheel": "表情輪盤",
       "targetFriendly": "選取最近友方",
-      "targetFriendlyNext": "切換友方目標"
+      "targetFriendlyNext": "切換友方目標",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "左鍵",
@@ -338,6 +339,7 @@ export const zh_TW: EnTranslations = {
       "showDevBadges": "顯示開發者徽章",
       "uiScale": "介面縮放",
       "highContrastBackground": "高對比度背景",
+      "startAttackOnAbility": "使用技能時自動攻擊",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
@@ -488,6 +490,9 @@ export const zh_TW: EnTranslations = {
       "noQuestSelected": "在任務日誌中選擇一個任務進行分享。",
       "linkTitle": "Shift + 點擊可在聊天中連結該任務。"
     },
+    "itemShare": {
+      "linkHint": "Shift + 點擊可在聊天中連結該物品。"
+    },
     "plurals": {
       "guildMembers": {
         "one": "你是{rank}，{count}名成員",
@@ -512,6 +517,12 @@ export const zh_TW: EnTranslations = {
         "few": "查詢：{realm} 上有 {count} 名玩家在線上。",
         "many": "查詢：{realm} 上有 {count} 名玩家在線上。",
         "other": "查詢：{realm} 上有 {count} 名玩家在線上。"
+      },
+      "playersMatching": {
+        "one": "查詢：{realm} 上有 {count} 名玩家符合「{query}」。",
+        "few": "查詢：{realm} 上有 {count} 名玩家符合「{query}」。",
+        "many": "查詢：{realm} 上有 {count} 名玩家符合「{query}」。",
+        "other": "查詢：{realm} 上有 {count} 名玩家符合「{query}」。"
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const zh_TW: EnTranslations = {
       "assigned": "{looter}將{item}分配給了{target}。",
       "unassigned": "{item}未被分配，現可自由拾取。",
       "leaderOnly": "只有隊長才能更改拾取方式。"
+    },
+    "party": {
+      "promoteLeader": "提升為隊長"
     },
     "bags": {
       "filterGroupAria": "依類別篩選背包",

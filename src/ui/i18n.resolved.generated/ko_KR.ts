@@ -313,7 +313,8 @@ export const ko_KR: EnTranslations = {
     "keybinds": {
       "emoteWheel": "감정 표현 휠",
       "targetFriendly": "가장 가까운 아군 대상 지정",
-      "targetFriendlyNext": "아군 대상 순환"
+      "targetFriendlyNext": "아군 대상 순환",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "왼쪽 클릭",
@@ -338,6 +339,7 @@ export const ko_KR: EnTranslations = {
       "showDevBadges": "개발자 배지 표시",
       "uiScale": "UI 배율",
       "highContrastBackground": "고대비 배경",
+      "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
@@ -488,6 +490,9 @@ export const ko_KR: EnTranslations = {
       "noQuestSelected": "공유할 퀘스트를 기록에서 선택하세요.",
       "linkTitle": "Shift + 클릭하면 이 퀘스트를 채팅에 연결합니다."
     },
+    "itemShare": {
+      "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
+    },
     "plurals": {
       "guildMembers": {
         "one": "당신은 {rank}, {count}명 회원",
@@ -512,6 +517,12 @@ export const ko_KR: EnTranslations = {
         "few": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",
         "many": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.",
         "other": "검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다."
+      },
+      "playersMatching": {
+        "one": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
+        "few": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
+        "many": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
+        "other": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const ko_KR: EnTranslations = {
       "assigned": "{looter}님이 {item}을(를) {target}에게 분배했습니다.",
       "unassigned": "{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.",
       "leaderOnly": "파티장만 전리품 방식을 변경할 수 있습니다."
+    },
+    "party": {
+      "promoteLeader": "파티장으로 지정"
     },
     "bags": {
       "filterGroupAria": "가방을 분류별로 필터링",

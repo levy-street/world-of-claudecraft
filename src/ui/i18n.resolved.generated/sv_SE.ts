@@ -313,7 +313,8 @@ export const sv_SE: EnTranslations = {
     "keybinds": {
       "emoteWheel": "Gesthjul",
       "targetFriendly": "Måltavla närmaste vänlig",
-      "targetFriendlyNext": "Växla vänligt mål"
+      "targetFriendlyNext": "Växla vänligt mål",
+      "discord": "Discord"
     },
     "options": {
       "clickMoveLeft": "Vänsterklick",
@@ -338,6 +339,7 @@ export const sv_SE: EnTranslations = {
       "showDevBadges": "Show Developer Badges",
       "uiScale": "Gränssnittsskala",
       "highContrastBackground": "Bakgrund med hög kontrast",
+      "startAttackOnAbility": "Auto-Attack on Ability Use",
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
@@ -488,6 +490,9 @@ export const sv_SE: EnTranslations = {
       "noQuestSelected": "Välj ett uppdrag i din loggbok att dela.",
       "linkTitle": "Skift-klicka för att länka det här uppdraget i chatten."
     },
+    "itemShare": {
+      "linkHint": "Shift-click to link this item in chat."
+    },
     "plurals": {
       "guildMembers": {
         "one": "du är {rank}, {count} medlem",
@@ -512,6 +517,12 @@ export const sv_SE: EnTranslations = {
         "few": "Vilka: {count} spelare online på {realm}.",
         "many": "Vilka: {count} spelare online på {realm}.",
         "other": "Vilka: {count} spelare online på {realm}."
+      },
+      "playersMatching": {
+        "one": "Who: {count} player matching \"{query}\" on {realm}.",
+        "few": "Who: {count} players matching \"{query}\" on {realm}.",
+        "many": "Who: {count} players matching \"{query}\" on {realm}.",
+        "other": "Who: {count} players matching \"{query}\" on {realm}."
       }
     },
     "bugReport": {
@@ -631,6 +642,9 @@ export const sv_SE: EnTranslations = {
       "assigned": "{looter} tilldelade {item} till {target}.",
       "unassigned": "{item} tilldelades inte och ar fritt for alla.",
       "leaderOnly": "Endast gruppledaren kan andra lootmetoden."
+    },
+    "party": {
+      "promoteLeader": "Promote to Leader"
     },
     "bags": {
       "filterGroupAria": "Filtrera väskor efter kategori",

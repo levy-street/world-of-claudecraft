@@ -18,6 +18,7 @@ import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
+import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
@@ -49,6 +50,15 @@ import { svgIcon } from './ui_icons';
 // shared QUALITY_COLOR map carries the real per-quality hex; this token covers a
 // listing whose item has no quality field, so no raw hex lives in the painter.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+
+// The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
+// components.css). #market-window clips with overflow: hidden on mobile, and a menu
+// that renders past that clip has no scroll path to the rest of it, so every open
+// recomputes placement against the window's actual clip box instead of assuming
+// there is always room below the trigger.
+const MKT_MENU_PREFERRED_HEIGHT = 236;
+const MKT_MENU_GAP = 4;
+const MKT_MENU_MIN_HEIGHT = 80;
 
 /**
  * Hud-supplied glue. Composes the shared PainterHostPresentation bag
@@ -205,13 +215,43 @@ export class MarketWindow {
     });
     const closeFilterMenus = () => {
       el.querySelectorAll<HTMLElement>('.mkt-select.open').forEach((menu) => {
-        menu.classList.remove('open');
+        menu.classList.remove('open', 'open-up');
         menu
           .querySelector<HTMLButtonElement>('.mkt-select-btn')
           ?.setAttribute('aria-expanded', 'false');
         const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
-        if (list) list.hidden = true;
+        if (list) {
+          list.hidden = true;
+          list.style.maxHeight = '';
+        }
       });
+    };
+    const positionFilterMenu = (menu: HTMLElement) => {
+      const trigger = menu.querySelector<HTMLButtonElement>('.mkt-select-btn');
+      const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
+      // `el` (deps.root()) already IS #market-window, so there is no separate
+      // container to look up: querySelector('#market-window') on the window
+      // itself never matches its own root and would always fall back to `el`.
+      if (!trigger || !list) return;
+      const t = trigger.getBoundingClientRect();
+      const c = el.getBoundingClientRect();
+      // #market-window clips at its padding box (overflow: hidden), which sits
+      // inset from the border box measured above by the panel's border width on
+      // each edge; subtract it so the clamp matches the real clip, not the
+      // border-inclusive box.
+      const borderTop = Number.parseFloat(getComputedStyle(el).borderTopWidth) || 0;
+      const borderBottom = Number.parseFloat(getComputedStyle(el).borderBottomWidth) || 0;
+      const placement = computeDropdownPlacement({
+        triggerTop: t.top,
+        triggerBottom: t.bottom,
+        containerTop: c.top + borderTop,
+        containerBottom: c.bottom - borderBottom,
+        preferredMaxHeight: MKT_MENU_PREFERRED_HEIGHT,
+        gap: MKT_MENU_GAP,
+        minHeight: MKT_MENU_MIN_HEIGHT,
+      });
+      menu.classList.toggle('open-up', placement.side === 'above');
+      list.style.maxHeight = `${placement.maxHeight}px`;
     };
     el.querySelectorAll<HTMLButtonElement>('.mkt-select-btn').forEach((button) => {
       button.addEventListener('click', (event) => {
@@ -224,6 +264,7 @@ export class MarketWindow {
         button.setAttribute('aria-expanded', wantOpen ? 'true' : 'false');
         const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
         if (list) list.hidden = !wantOpen;
+        if (wantOpen) positionFilterMenu(menu);
       });
     });
     el.querySelectorAll<HTMLButtonElement>('[data-market-filter-option]').forEach((option) => {
@@ -297,6 +338,7 @@ export class MarketWindow {
             trigger?.setAttribute('aria-expanded', 'true');
             const list = select.querySelector<HTMLElement>('.mkt-select-menu');
             if (list) list.hidden = false;
+            positionFilterMenu(select);
             options[action.index]?.focus();
             break;
           }

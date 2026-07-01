@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import type { Input, TouchMoveInput } from '../src/game/input';
 import {
   CHAT_LONG_PRESS_MS,
   clampJoystickOrigin,
@@ -8,9 +9,9 @@ import {
   isPhoneTouchDevice,
   isRecenterDoubleTap,
   loadHapticsEnabled,
+  MobileControls,
   mapJoystickVector,
   mapLookVector,
-  MobileControls,
   pinchZoomDelta,
   RECENTER_DOUBLE_TAP_MS,
   resolveTouchInterface,
@@ -19,24 +20,63 @@ import {
   triggerHaptic,
   useTouchInterface,
 } from '../src/game/mobile_controls';
-import type { Input, TouchMoveInput } from '../src/game/input';
 
 describe('mapJoystickVector', () => {
   it('returns neutral inside the deadzone', () => {
-    expect(mapJoystickVector(0, 0)).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: false });
-    expect(mapJoystickVector(0.05, -0.08)).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: false });
+    expect(mapJoystickVector(0, 0)).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+    expect(mapJoystickVector(0.05, -0.08)).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
   });
 
   it('maps cardinal movement directions', () => {
-    expect(mapJoystickVector(0, -1)).toEqual({ forward: true, back: false, strafeLeft: false, strafeRight: false });
-    expect(mapJoystickVector(0, 1)).toEqual({ forward: false, back: true, strafeLeft: false, strafeRight: false });
-    expect(mapJoystickVector(-1, 0)).toEqual({ forward: false, back: false, strafeLeft: true, strafeRight: false });
-    expect(mapJoystickVector(1, 0)).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: true });
+    expect(mapJoystickVector(0, -1)).toEqual({
+      forward: true,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+    expect(mapJoystickVector(0, 1)).toEqual({
+      forward: false,
+      back: true,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+    expect(mapJoystickVector(-1, 0)).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: true,
+      strafeRight: false,
+    });
+    expect(mapJoystickVector(1, 0)).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: true,
+    });
   });
 
   it('maps diagonal movement directions', () => {
-    expect(mapJoystickVector(0.7, -0.7)).toEqual({ forward: true, back: false, strafeLeft: false, strafeRight: true });
-    expect(mapJoystickVector(-0.7, 0.7)).toEqual({ forward: false, back: true, strafeLeft: true, strafeRight: false });
+    expect(mapJoystickVector(0.7, -0.7)).toEqual({
+      forward: true,
+      back: false,
+      strafeLeft: false,
+      strafeRight: true,
+    });
+    expect(mapJoystickVector(-0.7, 0.7)).toEqual({
+      forward: false,
+      back: true,
+      strafeLeft: true,
+      strafeRight: false,
+    });
   });
 
   it('honours a custom deadzone (Joystick Deadzone setting)', () => {
@@ -77,7 +117,10 @@ describe('isPhoneTouchDevice', () => {
     // coarse primary pointer on a phone-sized screen still resolves to the touch UI.
     const queries: string[] = [];
     const win = {
-      matchMedia: (q: string) => { queries.push(q); return { matches: true }; },
+      matchMedia: (q: string) => {
+        queries.push(q);
+        return { matches: true };
+      },
     } as unknown as Window;
     isPhoneTouchDevice(win);
     expect(queries[0]).toContain('(pointer: coarse) and (max-width: 940px)');
@@ -185,11 +228,17 @@ describe('clampJoystickOrigin', () => {
   });
 
   it('pushes a corner touch inward so the whole circle stays on-screen', () => {
-    expect(clampJoystickOrigin(5, 595, radius, bounds)).toEqual({ x: radius, y: bounds.bottom - radius });
+    expect(clampJoystickOrigin(5, 595, radius, bounds)).toEqual({
+      x: radius,
+      y: bounds.bottom - radius,
+    });
   });
 
   it('clamps against the far edges too', () => {
-    expect(clampJoystickOrigin(900, -50, radius, bounds)).toEqual({ x: bounds.right - radius, y: radius });
+    expect(clampJoystickOrigin(900, -50, radius, bounds)).toEqual({
+      x: bounds.right - radius,
+      y: radius,
+    });
   });
 
   it('falls back to the axis midpoint when the zone is smaller than the joystick', () => {
@@ -222,7 +271,9 @@ describe('haptics', () => {
     const map = new Map(Object.entries(initial));
     return {
       getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
-      setItem: (k: string, v: string) => { map.set(k, v); },
+      setItem: (k: string, v: string) => {
+        map.set(k, v);
+      },
       map,
     };
   };
@@ -244,16 +295,25 @@ describe('haptics', () => {
 
   it('vibrates only when enabled and the API exists', () => {
     const calls: Array<number | number[]> = [];
-    const nav = { vibrate: (p: number | number[]) => { calls.push(p); return true; } };
+    const nav = {
+      vibrate: (p: number | number[]) => {
+        calls.push(p);
+        return true;
+      },
+    };
     expect(triggerHaptic(10, true, nav)).toBe(true);
     expect(triggerHaptic(10, false, nav)).toBe(false); // disabled
-    expect(triggerHaptic(10, true, {})).toBe(false);    // no Vibration API
-    expect(triggerHaptic(10, true, null)).toBe(false);  // no navigator
+    expect(triggerHaptic(10, true, {})).toBe(false); // no Vibration API
+    expect(triggerHaptic(10, true, null)).toBe(false); // no navigator
     expect(calls).toEqual([10]);
   });
 
   it('swallows Vibration API exceptions', () => {
-    const nav = { vibrate: () => { throw new Error('blocked'); } };
+    const nav = {
+      vibrate: () => {
+        throw new Error('blocked');
+      },
+    };
     expect(triggerHaptic([12, 40, 12], true, nav)).toBe(false);
   });
 });
@@ -287,7 +347,9 @@ class FakeElement extends EventTarget {
   offsetWidth = 122;
   private captured = new Set<number>();
 
-  constructor(private rect = { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 }) {
+  constructor(
+    private rect = { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 },
+  ) {
     super();
   }
 
@@ -328,8 +390,14 @@ const previousGlobals = {
 };
 
 afterEach(() => {
-  Object.defineProperty(globalThis, 'document', { value: previousGlobals.document, configurable: true });
-  Object.defineProperty(globalThis, 'window', { value: previousGlobals.window, configurable: true });
+  Object.defineProperty(globalThis, 'document', {
+    value: previousGlobals.document,
+    configurable: true,
+  });
+  Object.defineProperty(globalThis, 'window', {
+    value: previousGlobals.window,
+    configurable: true,
+  });
 });
 
 function installMobileControlDom(): {
@@ -339,22 +407,32 @@ function installMobileControlDom(): {
   cameraJoystick: FakeElement;
   jumpButton: FakeElement;
   emoteButton: FakeElement;
+  discordButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const elements = new Map<string, FakeElement>([
-    ['game-canvas', new FakeElement({ left: 0, top: 0, right: 390, bottom: 844, width: 390, height: 844 })],
+    [
+      'game-canvas',
+      new FakeElement({ left: 0, top: 0, right: 390, bottom: 844, width: 390, height: 844 }),
+    ],
     ['mobile-controls', new FakeElement()],
-    ['mobile-move-zone', new FakeElement({ left: 0, top: 0, right: 240, bottom: 240, width: 240, height: 240 })],
+    [
+      'mobile-move-zone',
+      new FakeElement({ left: 0, top: 0, right: 240, bottom: 240, width: 240, height: 240 }),
+    ],
     ['mobile-move-joystick', new FakeElement()],
     ['mobile-move-stick', new FakeElement()],
     ['mobile-camera-joystick', new FakeElement()],
     ['mobile-camera-stick', new FakeElement()],
     ['mobile-jump', new FakeElement()],
     ['mobile-emote', new FakeElement()],
+    ['mobile-discord', new FakeElement()],
   ]);
   const body = new FakeElement();
   const documentTarget = new EventTarget();
-  const windowTarget = new EventTarget() as EventTarget & { matchMedia(query: string): FakeMediaQueryList };
+  const windowTarget = new EventTarget() as EventTarget & {
+    matchMedia(query: string): FakeMediaQueryList;
+  };
   windowTarget.matchMedia = () => new FakeMediaQueryList();
 
   const documentFake = documentTarget as EventTarget & {
@@ -376,11 +454,15 @@ function installMobileControlDom(): {
     cameraJoystick: elements.get('mobile-camera-joystick')!,
     jumpButton: elements.get('mobile-jump')!,
     emoteButton: elements.get('mobile-emote')!,
+    discordButton: elements.get('mobile-discord')!,
     windowTarget,
   };
 }
 
-function pointerEvent(type: string, init: { pointerId: number; clientX?: number; clientY?: number; pointerType?: string }): Event {
+function pointerEvent(
+  type: string,
+  init: { pointerId: number; clientX?: number; clientY?: number; pointerType?: string },
+): Event {
   const event = new Event(type, { bubbles: true, cancelable: true });
   Object.defineProperties(event, {
     pointerId: { value: init.pointerId },
@@ -402,6 +484,7 @@ function mobileCallbacks() {
     onChat: noop,
     onMenu: noop,
     onSocial: noop,
+    onDiscord: noop,
     onEmotes: noop,
     onArena: noop,
     onQuestLog: noop,
@@ -423,16 +506,25 @@ describe('MobileControls pointer lifecycle', () => {
     let lastMove: TouchMoveInput | null = null;
     let clearCount = 0;
     const input = {
-      setTouchMove: (move: TouchMoveInput) => { lastMove = move; },
-      clearTouchMove: () => { clearCount += 1; lastMove = null; },
+      setTouchMove: (move: TouchMoveInput) => {
+        lastMove = move;
+      },
+      clearTouchMove: () => {
+        clearCount += 1;
+        lastMove = null;
+      },
       setTouchLook: () => {},
       setTouchLookVector: () => {},
     } as unknown as Input;
 
     new MobileControls(input, mobileCallbacks()).start();
 
-    moveZone.dispatchEvent(pointerEvent('pointerdown', { pointerId: 4, clientX: 100, clientY: 50 }));
-    moveZone.dispatchEvent(pointerEvent('pointermove', { pointerId: 4, clientX: 160, clientY: 50 }));
+    moveZone.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 4, clientX: 100, clientY: 50 }),
+    );
+    moveZone.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 4, clientX: 160, clientY: 50 }),
+    );
 
     expect(lastMove).toEqual({ forward: false, back: false, strafeLeft: false, strafeRight: true });
 
@@ -449,14 +541,22 @@ describe('MobileControls pointer lifecycle', () => {
     const input = {
       setTouchMove: () => {},
       clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => { touchLookActive = active; },
-      setTouchLookVector: (look: { x: number; y: number }) => { lastLook = look; },
+      setTouchLook: (active: boolean) => {
+        touchLookActive = active;
+      },
+      setTouchLookVector: (look: { x: number; y: number }) => {
+        lastLook = look;
+      },
     } as unknown as Input;
 
     new MobileControls(input, mobileCallbacks()).start();
 
-    cameraJoystick.dispatchEvent(pointerEvent('pointerdown', { pointerId: 9, clientX: 50, clientY: 50 }));
-    windowTarget.dispatchEvent(pointerEvent('pointermove', { pointerId: 9, clientX: 100, clientY: 50 }));
+    cameraJoystick.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 9, clientX: 50, clientY: 50 }),
+    );
+    windowTarget.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 9, clientX: 100, clientY: 50 }),
+    );
 
     expect(touchLookActive).toBe(true);
     expect(lastLook).toEqual({ x: 0.8, y: 0 });
@@ -477,12 +577,40 @@ describe('MobileControls pointer lifecycle', () => {
     } as unknown as Input;
 
     let emotes = 0;
-    const callbacks = { ...mobileCallbacks(), onEmotes: () => { emotes += 1; } };
+    const callbacks = {
+      ...mobileCallbacks(),
+      onEmotes: () => {
+        emotes += 1;
+      },
+    };
     new MobileControls(input, callbacks).start();
 
     emoteButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
     expect(emotes).toBe(1);
+  });
+
+  it('fires the Discord callback when the on-screen Discord button is tapped', () => {
+    const { discordButton } = installMobileControlDom();
+    const input = {
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    let discord = 0;
+    const callbacks = {
+      ...mobileCallbacks(),
+      onDiscord: () => {
+        discord += 1;
+      },
+    };
+    new MobileControls(input, callbacks).start();
+
+    discordButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
+
+    expect(discord).toBe(1);
   });
 
   it('closes the open More modal when tapping outside it', () => {
@@ -531,7 +659,12 @@ describe('MobileControls pointer lifecycle', () => {
     } as unknown as Input;
 
     let jumps = 0;
-    const callbacks = { ...mobileCallbacks(), onJump: () => { jumps += 1; } };
+    const callbacks = {
+      ...mobileCallbacks(),
+      onJump: () => {
+        jumps += 1;
+      },
+    };
     new MobileControls(input, callbacks).start();
 
     jumpButton.dispatchEvent(pointerEvent('pointerdown', { pointerId: 30, pointerType: 'touch' }));
@@ -549,26 +682,70 @@ describe('MobileControls pointer lifecycle', () => {
     const input = {
       setTouchMove: () => {},
       clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => { lookActive.push(active); },
-      setTouchLookVector: (look: { x: number; y: number }) => { lookVectors.push(look); },
-      applyTouchLookDelta: (dx: number, dy: number) => { deltas.push({ dx, dy }); },
+      setTouchLook: (active: boolean) => {
+        lookActive.push(active);
+      },
+      setTouchLookVector: (look: { x: number; y: number }) => {
+        lookVectors.push(look);
+      },
+      applyTouchLookDelta: (dx: number, dy: number) => {
+        deltas.push({ dx, dy });
+      },
       zoomBy: () => {},
     } as unknown as Input;
 
     new MobileControls(input, mobileCallbacks()).start();
 
-    canvas.dispatchEvent(pointerEvent('pointerdown', { pointerId: 12, pointerType: 'touch', clientX: 100, clientY: 100 }));
-    canvas.dispatchEvent(pointerEvent('pointermove', { pointerId: 12, pointerType: 'touch', clientX: 103, clientY: 102 }));
-    canvas.dispatchEvent(pointerEvent('pointermove', { pointerId: 12, pointerType: 'touch', clientX: 122, clientY: 109 }));
-    canvas.dispatchEvent(pointerEvent('pointermove', { pointerId: 12, pointerType: 'touch', clientX: 140, clientY: 120 }));
-    canvas.dispatchEvent(pointerEvent('pointerup', { pointerId: 12, pointerType: 'touch', clientX: 140, clientY: 120 }));
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 12,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 12,
+        pointerType: 'touch',
+        clientX: 103,
+        clientY: 102,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 12,
+        pointerType: 'touch',
+        clientX: 122,
+        clientY: 109,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 12,
+        pointerType: 'touch',
+        clientX: 140,
+        clientY: 120,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 12,
+        pointerType: 'touch',
+        clientX: 140,
+        clientY: 120,
+      }),
+    );
 
     expect(deltas).toEqual([
       { dx: 22, dy: 9 },
       { dx: 18, dy: 11 },
     ]);
     expect(lookActive).toEqual([true, false]);
-    expect(lookVectors).toEqual([{ x: 0, y: 0 }, { x: 0, y: 0 }]);
+    expect(lookVectors).toEqual([
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ]);
   });
 
   it('cancels canvas swipe rotation when a second finger starts pinch zoom', () => {
@@ -579,19 +756,60 @@ describe('MobileControls pointer lifecycle', () => {
     const input = {
       setTouchMove: () => {},
       clearTouchMove: () => {},
-      setTouchLook: (active: boolean) => { lookActive.push(active); },
+      setTouchLook: (active: boolean) => {
+        lookActive.push(active);
+      },
       setTouchLookVector: () => {},
-      applyTouchLookDelta: (dx: number, dy: number) => { deltas.push({ dx, dy }); },
-      zoomBy: (delta: number) => { zooms.push(delta); },
+      applyTouchLookDelta: (dx: number, dy: number) => {
+        deltas.push({ dx, dy });
+      },
+      zoomBy: (delta: number) => {
+        zooms.push(delta);
+      },
     } as unknown as Input;
 
     new MobileControls(input, mobileCallbacks()).start();
 
-    canvas.dispatchEvent(pointerEvent('pointerdown', { pointerId: 21, pointerType: 'touch', clientX: 100, clientY: 100 }));
-    canvas.dispatchEvent(pointerEvent('pointermove', { pointerId: 21, pointerType: 'touch', clientX: 116, clientY: 100 }));
-    canvas.dispatchEvent(pointerEvent('pointerdown', { pointerId: 22, pointerType: 'touch', clientX: 200, clientY: 100 }));
-    canvas.dispatchEvent(pointerEvent('pointermove', { pointerId: 21, pointerType: 'touch', clientX: 130, clientY: 100 }));
-    canvas.dispatchEvent(pointerEvent('pointermove', { pointerId: 22, pointerType: 'touch', clientX: 220, clientY: 100 }));
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 21,
+        pointerType: 'touch',
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 21,
+        pointerType: 'touch',
+        clientX: 116,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 22,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 21,
+        pointerType: 'touch',
+        clientX: 130,
+        clientY: 100,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 22,
+        pointerType: 'touch',
+        clientX: 220,
+        clientY: 100,
+      }),
+    );
 
     expect(deltas).toEqual([{ dx: 16, dy: 0 }]);
     expect(lookActive).toEqual([true, false]);

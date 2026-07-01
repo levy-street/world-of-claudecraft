@@ -6,6 +6,7 @@
 // object. It owns no state and never imports Hud. The branching logic lives in
 // the pure view (discord_widget_view.ts); this just paints + wires clicks.
 
+import { attachAvatarFallback } from './avatar_fallback';
 import type {
   DiscordAccountStatus,
   DiscordPresenceState,
@@ -156,6 +157,20 @@ export function renderDiscordWidget(
     `</section>`;
 
   el.innerHTML = `${header}<div class="dc-body">${account}${ladder}${community}</div>`;
+
+  // If the linked Discord avatar fails to load from the CDN, degrade to exactly the
+  // no-avatar rendering (a single clean tier badge, replacing the pfp + corner-badge
+  // wrap) instead of the browser's broken-image placeholder.
+  if (view.mode === 'linked') {
+    const wrap = el.querySelector<HTMLElement>('.dc-avatar-wrap');
+    const pfp = wrap?.querySelector<HTMLImageElement>('.dc-pfp');
+    if (wrap && pfp) {
+      const tierIndex = view.tierIndex;
+      attachAvatarFallback(pfp, () => {
+        wrap.outerHTML = `<img class="dc-tier-badge" src="${esc(discordStatusBadgeDataUrl(tierIndex))}" alt="" aria-hidden="true" />`;
+      });
+    }
+  }
 
   // ── wire clicks ────────────────────────────────────────────────────────────
   el.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => deps.onClose());

@@ -42,7 +42,7 @@ import {
 } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
 import { rallyFleeingAllies } from './social_aggro';
-import { isTrivialTo, retargetMob, updateMobTarget } from './targeting';
+import { isTrivialTo, retargetMob, tickForcedTarget, updateMobTarget } from './targeting';
 
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
@@ -142,6 +142,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   if (ctx.isStunned(mob)) {
+    // A taunt/growl window is real-time: keep it counting down even while the mob
+    // is stunned, since the stun path skips updateMobTarget where it normally ticks.
+    tickForcedTarget(mob);
     if (ctx.updateFearMovement(mob)) return;
     if (mob.auras.some((a) => a.kind === 'polymorph')) {
       mob.wanderTimer -= DT;

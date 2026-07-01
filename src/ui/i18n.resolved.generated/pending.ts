@@ -30,12 +30,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader"
   ],
   "es_ES": [
     "hudChrome.devBadge.badgeTitle",
@@ -58,12 +62,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader"
   ],
   "fr_FR": [
     "hudChrome.devBadge.badgeTitle",
@@ -86,12 +94,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader"
   ],
   "fr_CA": [
     "hudChrome.devBadge.badgeTitle",
@@ -114,12 +126,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader"
   ],
   "en_CA": [],
   "it_IT": [
@@ -143,12 +159,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader"
   ],
   "de_DE": [
     "hudChrome.devBadge.badgeTitle",
@@ -171,17 +191,29 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.keybinds.discord"
+  ],
+  "zh_TW": [
+    "hudChrome.keybinds.discord"
+  ],
+  "ko_KR": [
+    "hudChrome.keybinds.discord"
+  ],
+  "ja_JP": [
+    "hudChrome.keybinds.discord"
+  ],
   "pt_BR": [
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
@@ -203,14 +235,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.keybinds.discord"
+  ],
   "nl_NL": [
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
@@ -232,12 +270,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "pl_PL": [
     "hudChrome.devBadge.badgeTitle",
@@ -260,12 +306,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "id_ID": [
     "hudChrome.devBadge.badgeTitle",
@@ -288,12 +342,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "tr_TR": [
     "hudChrome.devBadge.badgeTitle",
@@ -316,12 +378,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "sv_SE": [
     "hudChrome.devBadge.badgeTitle",
@@ -344,12 +414,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "vi_VN": [
     "hudChrome.devBadge.badgeTitle",
@@ -372,12 +450,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ],
   "da_DK": [
     "hudChrome.devBadge.badgeTitle",
@@ -400,11 +486,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.tiers.worldwright",
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
+    "hudChrome.itemShare.linkHint",
+    "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
     "hudChrome.leaderboard.devTierCol",
     "hudChrome.leaderboard.mergedPrs",
     "hudChrome.leaderboard.tabDevs",
-    "hudChrome.options.showDevBadges"
+    "hudChrome.options.showDevBadges",
+    "hudChrome.options.startAttackOnAbility",
+    "hudChrome.party.promoteLeader",
+    "hudChrome.plurals.playersMatching.few",
+    "hudChrome.plurals.playersMatching.many",
+    "hudChrome.plurals.playersMatching.one",
+    "hudChrome.plurals.playersMatching.other"
   ]
 };

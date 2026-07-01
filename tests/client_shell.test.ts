@@ -671,6 +671,16 @@ describe('client HTML shell', () => {
     expect(html).toContain('aria-label="Quest Log"');
   });
 
+  it('offers a Discord entry in the mobile drawer, hidden until Discord is available', () => {
+    // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
+    // this drawer button is the touch path into #discord-window (link / unlink).
+    expect(html).toContain('id="mobile-discord"');
+    // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
+    expect(html).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
+    // Starts hidden; main.ts reveals it only when Discord is enabled and logged in.
+    expect(html).toMatch(/id="mobile-discord"\s+hidden/);
+  });
+
   it('keeps the game menu free of duplicate and dev-only entries', () => {
     const interfaceEntries = optionsViewTs.match(/labelKey: 'hud\.options\.interface'/g) ?? [];
     expect(interfaceEntries).toHaveLength(1);

@@ -73,6 +73,13 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   return 'use';
 }
 
+/** Whether a shift-click on a bag item should link it into chat (classic
+ *  shift-click-to-link). True in every mode except at a vendor, where shift-click
+ *  already owns the split-stack sell prompt; that affordance is left untouched. */
+export function bagShiftLinks(mode: BagMode): boolean {
+  return !mode.vendorOpen;
+}
+
 /** The tooltip hint sub-line for a bag item, matching the original tooltip's
  *  mode-then-kind branch. Returns '' when no hint applies (e.g. a material). */
 export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipHintKey {

@@ -95,6 +95,46 @@ describe('mob/locomotion: blockedTowardSpawn', () => {
   });
 });
 
+describe('mob/locomotion: forced-target (taunt) window ticks while stunned', () => {
+  // Regression: the stun early-return skipped updateMobTarget, where the taunt
+  // timer is decremented, so a stun landed mid-taunt stretched a 3s taunt by the
+  // full stun duration. The window is real-time and must keep counting down.
+  const stunnedMob = () => {
+    const sim = makeSim();
+    const mob = createMob(900020, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 }) as AnyEntity;
+    (sim as any).addEntity(mob);
+    mob.aiState = 'attack';
+    mob.inCombat = true;
+    mob.forcedTargetId = 4242; // a (missing) taunter; the timer must still tick
+    mob.forcedTargetTimer = 3;
+    mob.auras.push({
+      id: 'stun_test',
+      name: 'Test Stun',
+      kind: 'stun',
+      remaining: 5,
+      duration: 5,
+      value: 0,
+      sourceId: 0,
+      school: 'physical',
+    });
+    return { sim, mob };
+  };
+
+  it('decrements forcedTargetTimer by DT on a stunned tick', () => {
+    const { sim, mob } = stunnedMob();
+    updateMob(ctxOf(sim), mob);
+    expect(mob.forcedTargetTimer).toBeCloseTo(2.95, 5); // -= DT (0.05), not frozen at 3
+  });
+
+  it('expires the forced target after the window elapses under stun', () => {
+    const { sim, mob } = stunnedMob();
+    mob.forcedTargetTimer = 0.02;
+    updateMob(ctxOf(sim), mob);
+    expect(mob.forcedTargetTimer).toBeLessThanOrEqual(0);
+    expect(mob.forcedTargetId).toBe(null);
+  });
+});
+
 describe('mob/locomotion: updateMob', () => {
   it('an idle mob out of aggro range picks a wander target via the rng', () => {
     const sim = makeSim();

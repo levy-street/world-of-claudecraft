@@ -13,6 +13,7 @@ vi.mock('pg', () => ({
 }));
 
 import { saveCharacterAndMarketState } from '../server/db';
+import { REALM } from '../server/realm';
 import type { CharacterState, MarketSave } from '../src/sim/sim';
 
 beforeEach(() => {
@@ -54,7 +55,7 @@ describe('saveCharacterAndMarketState', () => {
     expect(client.release).toHaveBeenCalled();
   });
 
-  it('targets the market world_state key and the right character id', async () => {
+  it('targets the realm-scoped market world_state key and the right character id', async () => {
     const client = clientStub();
     dbMock.connect.mockResolvedValueOnce(client as any);
 
@@ -63,7 +64,11 @@ describe('saveCharacterAndMarketState', () => {
     const charCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));
     expect(charCall?.[1]).toEqual(expect.arrayContaining([99, 12]));
     const marketCall = client.query.mock.calls.find((c) => /world_state/i.test(String(c[0])));
-    expect(marketCall?.[1]).toContain('market');
+    // The leave-flush market write must use the SAME realm-scoped key that
+    // loadMarketState/saveMarketState use, never the bare shared 'market' row,
+    // or the escrowed listing lands in a key nothing reads back on next boot.
+    expect(marketCall?.[1][0]).toBe(`market:${REALM}`);
+    expect(marketCall?.[1]).not.toContain('market');
   });
 
   it('rolls back and rethrows if either write fails, leaving no half-commit', async () => {
