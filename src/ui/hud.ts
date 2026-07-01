@@ -4007,6 +4007,7 @@ export class Hud {
       ['#mm-arena', 'arena', 'hud.core.mobileArena'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
       ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
+      ['#mm-discord', 'discord', 'hudChrome.discord.title'],
       ['#mm-social', 'social', 'hud.social.friendsTab'],
     ];
     for (const [selector, action, labelKey] of sideButtons) {

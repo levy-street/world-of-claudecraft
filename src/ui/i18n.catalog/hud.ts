@@ -28,7 +28,7 @@ const hudStringsEn = {
       chatTab: 'Chat',
       combatLogTab: 'Combat Log',
       chatPlaceholder:
-        'Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)',
+        'Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, !help community)',
       chatChannels: {
         add: 'Add chat channel',
         addTitle: 'Add channel',

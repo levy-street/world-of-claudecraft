@@ -87,6 +87,10 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const i18nCatalogHudTs = readFileSync(
+  new URL('../src/ui/i18n.catalog/hud.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -679,6 +683,24 @@ describe('client HTML shell', () => {
     expect(html).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
     // Starts hidden; main.ts reveals it only when Discord is enabled and logged in.
     expect(html).toMatch(/id="mobile-discord"\s+hidden/);
+  });
+
+  it('offers a Discord entry in the desktop micro menu, hidden until Discord is available', () => {
+    expect(html).toContain('id="mm-discord"');
+    expect(html).toMatch(/id="mm-discord"[^>]*data-icon="discord"/);
+    expect(html).toMatch(/id="mm-discord"\s+hidden/);
+    expect(playHtml).toContain('id="mm-discord"');
+    expect(mainTs).toContain(
+      "document.getElementById('mm-discord')?.addEventListener('click', () => toggleDiscordPanel(true));",
+    );
+    expect(mainTs).toContain("for (const id of ['mobile-discord', 'mm-discord'])");
+    expect(hudTs).toContain("['#mm-discord', 'discord', 'hudChrome.discord.title']");
+  });
+
+  it('surfaces the community command menu hint in the localized chat placeholder', () => {
+    expect(html).toContain('!help community');
+    expect(playHtml).toContain('!help community');
+    expect(i18nCatalogHudTs).toContain('!help community');
   });
 
   it('keeps the game menu free of duplicate and dev-only entries', () => {

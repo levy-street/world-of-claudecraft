@@ -1166,6 +1166,7 @@ async function startGame(
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
   });
   mobileControls.start();
+  document.getElementById('mm-discord')?.addEventListener('click', () => toggleDiscordPanel(true));
   // reflect the current music state on the touch toggle (it may already be off
   // from a prior session, persisted in localStorage)
   document.getElementById('mobile-music')?.classList.toggle('mm-muted', !music.enabled);
@@ -5386,17 +5387,17 @@ function updateDiscordCtaBanner(): void {
   }
 }
 
-// Show/hide the Discord entry in the mobile "More" tray. Mobile has no keyboard,
-// so the U-key panel toggle is unreachable there; this button is the touch path
-// into the same #discord-window (link / unlink / status). It is only meaningful
-// when Discord is available: the client build enables it, the server has it on,
-// and the player is logged in. Driven off the same status-change signal as the
-// panel, so it tracks login/logout and the server's enabled flag.
-function syncDiscordMobileEntry(): void {
-  const btn = document.getElementById('mobile-discord');
-  if (!btn) return;
+// Show/hide the Discord entries. Mobile has the More-tray touch button; desktop
+// has the same panel in the micro menu. Both are only meaningful when Discord is
+// available: the client build enables it, the server has it on, and the player is
+// logged in. Driven off the same status-change signal as the panel, so both
+// entries track login/logout and the server's enabled flag.
+function syncDiscordEntries(): void {
   const available = DISCORD_BUILD_ENABLED && discordUiEnabled() && !!api.token;
-  btn.hidden = !available;
+  for (const id of ['mobile-discord', 'mm-discord']) {
+    const btn = document.getElementById(id);
+    if (btn) btn.hidden = !available;
+  }
 }
 
 function wireDiscordCtaBanner(): void {
@@ -5471,7 +5472,7 @@ function toggleDiscordPanel(open?: boolean): void {
 }
 // Keep an open panel in sync as status/presence updates arrive.
 onDiscordStatusChange(() => {
-  syncDiscordMobileEntry();
+  syncDiscordEntries();
   if (discordPanelOpen) renderDiscordPanel();
 });
 // The Discord panel toggles via the rebindable `discord` keybind action (default

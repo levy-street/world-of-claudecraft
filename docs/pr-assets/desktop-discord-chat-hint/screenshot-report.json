@@ -1,0 +1,12 @@
+{
+  "desktopInfo": {
+    "hiddenBefore": true,
+    "visibleForScreenshot": true,
+    "placeholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, !help community)",
+    "hasHint": true
+  },
+  "mobileInfo": {
+    "placeholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, !help community)",
+    "hasHint": true
+  }
+}
