@@ -67,6 +67,10 @@ generation, confirm cost before running); a mob needs its GLB registered in
 An icon just needs a new `ITEM_RECIPES` entry in `src/ui/icons.ts` (no external
 generation, procedural, free).
 
+Full execution brief for picking this up (sizes, clip requirements, a Phase 0
+free-reuse check before spending any Meshy credits): see
+`drowned-litany-asset-generation-plan.md` in this same directory.
+
 Post-Stage-4 manual verification (in-game, via new scripts/drowned_litany_shots.mjs and
 scripts/drowned_litany_boss_shot.mjs): screenshotted all 7 rooms (size curve and
 shallow/deep water tiers visually confirmed) and drove a live Tolling Bells volley.
