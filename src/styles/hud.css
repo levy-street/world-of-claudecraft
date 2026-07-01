@@ -49,14 +49,28 @@
     letter-spacing: 0.2px;
     margin-top: -1px;
   }
-  /* $WOC holder-tier flair badge, inline to the left of a player's name */
+  /* $WOC holder-tier flair badge, inline to the right of a player's name */
   .np-tier {
     display: inline-block;
     width: 15px;
     height: 15px;
     vertical-align: middle;
-    margin-right: 3px;
+    margin-left: 3px;
     filter: drop-shadow(0 1px 1px #000);
+  }
+  /* Linked-Discord PFP, inline to the left of a player's name. Lives here (not
+     index.extra.css) because nameplates render on both the index and play game
+     entries; a per-entry sheet would leave it unstyled on play.html. */
+  .np-discord {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 3px;
+    border-radius: 50%;
+    border: 1.5px solid #5865f2;
+    object-fit: cover;
+    box-shadow: 0 1px 1px #000;
   }
   .np-hpbar {
     width: 78px;

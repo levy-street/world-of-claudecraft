@@ -52,18 +52,8 @@
 #discord-choice-panel .auth-or {
   margin: 10px 0;
 }
-/* Linked-Discord PFP next to a nameplate name (and the inspect-card discord pfp). */
-.np-discord {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
-  margin-right: 3px;
-  border-radius: 50%;
-  border: 1.5px solid #5865f2;
-  object-fit: cover;
-  box-shadow: 0 1px 1px #000;
-}
+/* The nameplate .np-discord rule moved to hud.css (shared by both game entries);
+   nameplates render on index.html and play.html, so it can't be per-entry CSS. */
 .inspect-discord-pfp {
   border: 1.5px solid #5865f2 !important;
 }
