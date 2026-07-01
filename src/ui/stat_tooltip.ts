@@ -407,7 +407,15 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
     }
     case 'armor': {
       sources.push({ kind: 'base', value: basePrimary(cls, 'armor', level) });
-      const fromAgi = stats.agi * AGI_ARMOR_PER_POINT;
+      // recalcPlayerStats adds armor from Agility (agi * 2) BEFORE druid Cat Form raises
+      // Agility, so the Agility that actually feeds armor excludes the Cat Form bonus
+      // (entity.ts). Subtract it when shifted so the "From Agility" line is honest; the Cat
+      // Form bonus still shows in the remainder of the Agility cell's own breakdown. (Crit
+      // and dodge read Agility AFTER the form bonus, so they need no such adjustment.)
+      const catAgiBonus = buffs.some((b) => b.kind === 'form_cat')
+        ? Math.max(2, Math.floor(level / 2))
+        : 0;
+      const fromAgi = (stats.agi - catAgiBonus) * AGI_ARMOR_PER_POINT;
       if (fromAgi !== 0) sources.push({ kind: 'attributes', value: fromAgi, fromStat: 'agi' });
       const g = gearTotal(gear, 'armor');
       if (g !== 0) sources.push({ kind: 'gear', value: g });
