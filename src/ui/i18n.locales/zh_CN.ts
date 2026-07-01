@@ -4712,4 +4712,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': '无法关联 GitHub，请重试。',
   'hudChrome.devBadge.linkedAs': '已关联为 {login}',
   'hudChrome.devBadge.unlink': '取消关联 GitHub',
+  'itemUi.slots.trinket': 'Shipin',
+  'itemUi.kind.trinket': 'Shipin',
+  'itemUi.tooltip.useTrinketAura': 'Shiyong: shi {stat} tigao {value}, chixu {seconds} miao.',
+  'entities.items.redbrook_rally_charm.name': 'Chixi jijie hufu',
 };

@@ -5127,4 +5127,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Hilfe benötigt',
   'hudChrome.discord.relay.help.hint': 'Bitte die Gemeinschaft um Hilfe',
   'hudChrome.options.showSecondaryActionBar': 'Zweite Aktionsleiste anzeigen',
+  'itemUi.slots.trinket': 'Schmuckstueck',
+  'itemUi.kind.trinket': 'Schmuckstueck',
+  'itemUi.tooltip.useTrinketAura': 'Benutzen: erhoeht {stat} um {value} fuer {seconds} Sek.',
+  'entities.items.redbrook_rally_charm.name': 'Redbrook-Sammelamulett',
 };

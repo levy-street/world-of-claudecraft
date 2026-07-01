@@ -3490,7 +3490,8 @@ export const sv_SE: EnTranslations = {
       "waist": "Midja",
       "legs": "Ben",
       "gloves": "Handskar",
-      "feet": "Fötter"
+      "feet": "Fötter",
+      "trinket": "Smycke"
     },
     "quality": {
       "poor": "Skräp",
@@ -3507,6 +3508,7 @@ export const sv_SE: EnTranslations = {
       "junk": "Skräp",
       "food": "Mat",
       "drink": "Dryck",
+      "trinket": "Smycke",
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir"
@@ -3549,6 +3551,7 @@ export const sv_SE: EnTranslations = {
       "useFishing": "Använd: Fiska i närliggande vatten.",
       "useHealingPotion": "Använd: Återställer omedelbart {amount} hälsa. Användbar i strid. 1 min nedkylning.",
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
+      "useTrinketAura": "Anvand: okar {stat} med {value} i {seconds} sek.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
       "clickBuyback": "Klicka för att köpa tillbaka"
@@ -4316,6 +4319,9 @@ export const sv_SE: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Rostig handyxa"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redbrooks samlingsamulett"
       },
       "recruit_tunic": {
         "name": "Rekrytens tunika"

@@ -3490,7 +3490,8 @@ export const id_ID: EnTranslations = {
       "waist": "Pinggang",
       "legs": "Tungkai",
       "gloves": "Sarung Tangan",
-      "feet": "Kaki"
+      "feet": "Kaki",
+      "trinket": "Pernak-pernik"
     },
     "quality": {
       "poor": "Buruk",
@@ -3507,6 +3508,7 @@ export const id_ID: EnTranslations = {
       "junk": "Rongsokan",
       "food": "Makanan",
       "drink": "Minuman",
+      "trinket": "Pernak-pernik",
       "tool": "Perkakas",
       "potion": "Ramuan",
       "elixir": "Eliksir"
@@ -3549,6 +3551,7 @@ export const id_ID: EnTranslations = {
       "useFishing": "Pakai: Memancing di perairan terdekat.",
       "useHealingPotion": "Pakai: Memulihkan {amount} nyawa seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
+      "useTrinketAura": "Gunakan: meningkatkan {stat} sebesar {value} selama {seconds} dtk.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
       "clickBuyback": "Klik untuk membeli kembali"
@@ -4316,6 +4319,9 @@ export const id_ID: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Kapak Kecil Berkarat"
+      },
+      "redbrook_rally_charm": {
+        "name": "Jimat Seruan Redbrook"
       },
       "recruit_tunic": {
         "name": "Tunik Rekrut"

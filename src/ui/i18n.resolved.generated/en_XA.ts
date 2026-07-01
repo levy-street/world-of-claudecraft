@@ -3490,7 +3490,8 @@ export const en_XA: EnTranslations = {
       "waist": "[Ŵáíšţ]",
       "legs": "[Ļéĝš]",
       "gloves": "[Ĝļóʋéš]",
-      "feet": "[Ƒééţ]"
+      "feet": "[Ƒééţ]",
+      "trinket": "[Ţŕíñķéţ]"
     },
     "quality": {
       "poor": "[Þóóŕ]",
@@ -3507,6 +3508,7 @@ export const en_XA: EnTranslations = {
       "junk": "[Ĵúñķ]",
       "food": "[Ƒóóð]",
       "drink": "[Ðŕíñķ]",
+      "trinket": "[Ţŕíñķéţ]",
       "tool": "[Ţóóļ]",
       "potion": "[Þóţíóñ]",
       "elixir": "[Éļíẋíŕ]"
@@ -3549,6 +3551,7 @@ export const en_XA: EnTranslations = {
       "useFishing": "[Úšé: Ƒíšĥ íñ ñéáŕƀý ŵáţéŕš.]",
       "useHealingPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ĥéáļţĥ. Úšáƀļé íñ çóɱƀáţ. 2 ɱíñ çóóļðóŵñ.]",
       "useManaPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ɱáñá. Úšáƀļé íñ çóɱƀáţ. 2 ɱíñ çóóļðóŵñ.]",
+      "useTrinketAura": "[Úšé: Íñçŕéášéš {stat} ƀý {value} ƒóŕ {seconds} šéç.]",
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
       "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]"
@@ -4316,6 +4319,9 @@ export const en_XA: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "[Ŕúšţý Ĥáţçĥéţ]"
+      },
+      "redbrook_rally_charm": {
+        "name": "[Ŕéðƀŕóóķ Ŕáļļý Çĥáŕɱ]"
       },
       "recruit_tunic": {
         "name": "[Ŕéçŕúíţ'š Ţúñíç]"

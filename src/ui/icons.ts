@@ -2681,6 +2681,10 @@ function itemFallback(id: string): IconRecipe | null {
     const prim: PrimitiveName = has(name, ['pole', 'rod', 'staff']) ? 'staff' : 'mace';
     return r('wood', 'earthBrown', [prim], fx);
   }
+  if (it.kind === 'trinket') {
+    const t = trinketPrimitive(name);
+    return r('treasure', t.pal, [{ p: t.p, pal: t.pal }], fx);
+  }
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);
 }

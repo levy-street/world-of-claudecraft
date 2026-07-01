@@ -4966,4 +4966,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': 'GitHub를 연결할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.devBadge.linkedAs': '{login}(으)로 연결됨',
   'hudChrome.devBadge.unlink': 'GitHub 연결 해제',
+  'itemUi.slots.trinket': 'Jangsingu',
+  'itemUi.kind.trinket': 'Jangsingu',
+  'itemUi.tooltip.useTrinketAura': 'Sayong: {seconds}cho dongan {stat}i {value} jeungga.',
+  'entities.items.redbrook_rally_charm.name': 'Redeubeuruk jipgyeol bujeok',
 };

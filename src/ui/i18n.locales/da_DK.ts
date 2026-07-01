@@ -5002,4 +5002,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Brug for hjælp',
   'hudChrome.discord.relay.help.hint': 'Bed fællesskabet om hjælp',
   'hudChrome.options.showSecondaryActionBar': 'Vis sekundær handlingslinje',
+  'itemUi.slots.trinket': 'Smykke',
+  'itemUi.kind.trinket': 'Smykke',
+  'itemUi.tooltip.useTrinketAura': 'Brug: oger {stat} med {value} i {seconds} sek.',
+  'entities.items.redbrook_rally_charm.name': 'Redbrook samlingsamulet',
 };

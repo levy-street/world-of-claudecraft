@@ -3490,7 +3490,8 @@ export const ja_JP: EnTranslations = {
       "waist": "腰",
       "legs": "脚",
       "gloves": "手",
-      "feet": "足"
+      "feet": "足",
+      "trinket": "Soshin-gu"
     },
     "quality": {
       "poor": "粗悪",
@@ -3507,6 +3508,7 @@ export const ja_JP: EnTranslations = {
       "junk": "雑貨",
       "food": "食べ物",
       "drink": "飲み物",
+      "trinket": "Soshin-gu",
       "tool": "道具",
       "potion": "ポーション",
       "elixir": "エリクサー"
@@ -3549,6 +3551,7 @@ export const ja_JP: EnTranslations = {
       "useFishing": "使用: 近くの水辺で釣りをします。",
       "useHealingPotion": "使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
+      "useTrinketAura": "Shiyo: {seconds} byo kan {stat} ga {value} agaru.",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
       "clickBuyback": "クリックして買い戻す"
@@ -4316,6 +4319,9 @@ export const ja_JP: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "錆びた手斧"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redbrook kesshu charm"
       },
       "recruit_tunic": {
         "name": "新兵のチュニック"

@@ -73,6 +73,7 @@ export const SLOT_STAT_MULT: Record<EquipSlot, number> = {
   waist: 0.7,
   gloves: 0.7,
   feet: 0.65,
+  trinket: 0.75,
 };
 
 // Primary-stat points granted per item level at full (rare-mult x chest-mult = 1).
@@ -181,7 +182,9 @@ export function itemFromRaid(itemId: string): boolean {
 // quest objects, cosmetics) can exist in the item model, but should not get an
 // item-level readout or stat budget.
 export function isItemLevelEligible(item: ItemDef): boolean {
-  return !!item.slot && (item.kind === 'armor' || item.kind === 'weapon');
+  return (
+    !!item.slot && (item.kind === 'armor' || item.kind === 'weapon' || item.kind === 'trinket')
+  );
 }
 
 // The item level (tier number) shown in the tooltip, or undefined when there is no

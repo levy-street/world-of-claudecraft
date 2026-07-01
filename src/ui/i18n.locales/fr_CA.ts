@@ -230,4 +230,8 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'ombre',
   'hudChrome.auraEffect.school.holy': 'sacré',
   'hudChrome.auraEffect.school.nature': 'nature',
+  'itemUi.slots.trinket': 'Bijou',
+  'itemUi.kind.trinket': 'Bijou',
+  'itemUi.tooltip.useTrinketAura': 'Utiliser : augmente {stat} de {value} pendant {seconds} s.',
+  'entities.items.redbrook_rally_charm.name': 'Charme de ralliement de Redbrook',
 };

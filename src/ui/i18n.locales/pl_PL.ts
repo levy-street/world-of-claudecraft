@@ -5041,4 +5041,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Potrzebuję pomocy',
   'hudChrome.discord.relay.help.hint': 'Poproś społeczność o pomoc',
   'hudChrome.options.showSecondaryActionBar': 'Pokaż dodatkowy pasek akcji',
+  'itemUi.slots.trinket': 'Ozdoba',
+  'itemUi.kind.trinket': 'Ozdoba',
+  'itemUi.tooltip.useTrinketAura': 'Uzycie: zwieksza {stat} o {value} na {seconds} sek.',
+  'entities.items.redbrook_rally_charm.name': 'Amulet zwolania Redbrook',
 };

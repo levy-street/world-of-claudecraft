@@ -3490,7 +3490,8 @@ export const ko_KR: EnTranslations = {
       "waist": "허리",
       "legs": "다리",
       "gloves": "손",
-      "feet": "발"
+      "feet": "발",
+      "trinket": "Jangsingu"
     },
     "quality": {
       "poor": "하급",
@@ -3507,6 +3508,7 @@ export const ko_KR: EnTranslations = {
       "junk": "잡동사니",
       "food": "음식",
       "drink": "음료",
+      "trinket": "Jangsingu",
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약"
@@ -3549,6 +3551,7 @@ export const ko_KR: EnTranslations = {
       "useFishing": "사용: 가까운 물가에서 낚시합니다.",
       "useHealingPotion": "사용: 즉시 생명력을 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "useManaPotion": "사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
+      "useTrinketAura": "Sayong: {seconds}cho dongan {stat}i {value} jeungga.",
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
       "clickBuyback": "클릭하여 되사기"
@@ -4316,6 +4319,9 @@ export const ko_KR: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "녹슨 손도끼"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redeubeuruk jipgyeol bujeok"
       },
       "recruit_tunic": {
         "name": "신병 튜닉"

@@ -240,9 +240,10 @@ export type EquipSlot =
   | 'waist'
   | 'legs'
   | 'gloves'
-  | 'feet';
+  | 'feet'
+  | 'trinket';
 
-// The eight equip slots, in the canonical paperdoll order. Single source for
+// The nine equip slots, in the canonical paperdoll order. Single source for
 // the entity loop and the server's unequip-command validation.
 export const EQUIP_SLOTS: readonly EquipSlot[] = [
   'mainhand',
@@ -253,6 +254,7 @@ export const EQUIP_SLOTS: readonly EquipSlot[] = [
   'legs',
   'gloves',
   'feet',
+  'trinket',
 ];
 
 export type SkinCatalog = 'class' | 'mech';
@@ -263,6 +265,15 @@ export type ItemUse =
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
   | { type: 'skinSelect'; catalog?: SkinCatalog };
+
+export interface ItemOnUseAura {
+  type: 'aura';
+  aura: string;
+  kind: AuraKind;
+  value: number;
+  duration: number;
+  cooldown: number;
+}
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -279,7 +290,8 @@ type ItemKind =
   | 'drink'
   | 'tool'
   | 'potion'
-  | 'elixir';
+  | 'elixir'
+  | 'trinket';
 
 interface BaseItemDef {
   id: string;
@@ -292,6 +304,7 @@ interface BaseItemDef {
   // not one of the six primary attributes.
   spellPower?: number;
   use?: ItemUse;
+  onUse?: ItemOnUseAura;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
   questId?: string;
@@ -352,7 +365,7 @@ export interface ItemSet {
 
 export interface ArmorItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: Exclude<EquipSlot, 'mainhand'>;
+  slot: Exclude<EquipSlot, 'mainhand' | 'trinket'>;
   armorType: ArmorType;
   weapon?: never;
 }
@@ -364,12 +377,19 @@ export interface WeaponItemDef extends BaseItemDef {
   armorType?: never;
 }
 
+export interface TrinketItemDef extends BaseItemDef {
+  kind: 'trinket';
+  slot: 'trinket';
+  armorType?: never;
+  weapon?: never;
+}
+
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon'>;
+  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'trinket'>;
   armorType?: never;
 }
 
-export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
+export type ItemDef = ArmorItemDef | WeaponItemDef | TrinketItemDef | OtherItemDef;
 
 export interface InvSlot {
   itemId: string;

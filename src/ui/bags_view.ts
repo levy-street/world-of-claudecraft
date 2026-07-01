@@ -92,7 +92,8 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
   if (mode.vendorOpen)
     return item.kind === 'quest' ? 'itemUi.tooltip.cannotVendor' : 'itemUi.tooltip.clickSell';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
-  if (item.kind === 'weapon' || item.kind === 'armor') return 'itemUi.tooltip.clickEquip';
+  if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'trinket')
+    return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';
   if (item.kind === 'potion') return 'itemUi.tooltip.clickUseInstant';
   if (item.use) return 'itemUi.tooltip.clickUse';

@@ -441,6 +441,7 @@ const ITEM_SLOT_LABEL_KEYS: Record<EquipSlot, TranslationKey> = {
   legs: 'itemUi.slots.legs',
   gloves: 'itemUi.slots.gloves',
   feet: 'itemUi.slots.feet',
+  trinket: 'itemUi.slots.trinket',
 };
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
@@ -460,6 +461,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   tool: 'itemUi.kind.tool',
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
+  trinket: 'itemUi.kind.trinket',
 };
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
@@ -3066,6 +3068,11 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
+    if (item.onUse?.type === 'aura') {
+      const stat =
+        item.onUse.kind === 'buff_ap' ? itemStatName('attackPower') : itemStatName('spi');
+      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useTrinketAura', { stat, value: itemNumber(item.onUse.value), seconds: itemNumber(item.onUse.duration) }))}</div>`;
+    }
     if (item.kind === 'quest')
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
@@ -3075,7 +3082,7 @@ export class Hud {
     // Red when the viewer is below the requirement (cannot equip yet), otherwise
     // a normal sub line. Level math/data lives in the pure sim leaf.
     const req = requiredLevelFor(item);
-    if ((item.kind === 'weapon' || item.kind === 'armor') && req > 1) {
+    if ((item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'trinket') && req > 1) {
       const meets = this.sim.player.level >= req;
       html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }))}</div>`;
     }
@@ -9385,7 +9392,7 @@ export class Hud {
     // everywhere at once, not be re-decided per export).
     const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
 
-    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
+    const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet', 'trinket'];
     const gear = slots.map((slot) => {
       const id = sim.equipment[slot];
       const item = id ? ITEMS[id] : null;

@@ -3490,7 +3490,8 @@ export const fr_FR: EnTranslations = {
       "waist": "Taille",
       "legs": "Jambes",
       "gloves": "Mains",
-      "feet": "Pieds"
+      "feet": "Pieds",
+      "trinket": "Bijou"
     },
     "quality": {
       "poor": "Médiocre",
@@ -3507,6 +3508,7 @@ export const fr_FR: EnTranslations = {
       "junk": "Camelote",
       "food": "Nourriture",
       "drink": "Boisson",
+      "trinket": "Bijou",
       "tool": "Outil",
       "potion": "Potion",
       "elixir": "Élixir"
@@ -3549,6 +3551,7 @@ export const fr_FR: EnTranslations = {
       "useFishing": "Utiliser : pêcher dans les eaux proches.",
       "useHealingPotion": "Utiliser : rend instantanément {amount} points de vie. Utilisable en combat. Recharge de 1 min.",
       "useManaPotion": "Utiliser : rend instantanément {amount} mana. Utilisable en combat. Recharge de 1 min.",
+      "useTrinketAura": "Utiliser : augmente {stat} de {value} pendant {seconds} s.",
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
       "clickBuyback": "Cliquer pour racheter"
@@ -4316,6 +4319,9 @@ export const fr_FR: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Hachette rouillée"
+      },
+      "redbrook_rally_charm": {
+        "name": "Charme de ralliement de Redbrook"
       },
       "recruit_tunic": {
         "name": "Tunique de recrue"

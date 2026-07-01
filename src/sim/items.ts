@@ -65,7 +65,8 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
+  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'trinket'))
+    return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
   if (!canEquipItem(meta.cls, def)) {
     ctx.error(meta.entityId, 'You cannot equip that.');
@@ -115,7 +116,9 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   if (!def) return;
-  if (ctx.countItem(itemId, meta.entityId) <= 0) {
+  const inBags = ctx.countItem(itemId, meta.entityId) > 0;
+  const equippedTrinket = def.kind === 'trinket' && meta.equipment.trinket === itemId;
+  if (!inBags && !equippedTrinket) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
@@ -208,6 +211,30 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       school: 'nature',
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
+  } else if (def.kind === 'trinket') {
+    if (!equippedTrinket) {
+      equipItem(ctx, itemId, meta.entityId);
+      return;
+    }
+    const onUse = def.onUse;
+    if (!onUse) return;
+    const remaining = p.cooldowns.get(itemId) ?? 0;
+    if (remaining > 0) {
+      ctx.error(meta.entityId, 'That item is not ready yet.');
+      return;
+    }
+    p.cooldowns.set(itemId, onUse.cooldown);
+    ctx.applyAura(p, {
+      id: `trinket_${itemId}`,
+      name: onUse.aura,
+      kind: onUse.kind,
+      remaining: onUse.duration,
+      duration: onUse.duration,
+      value: onUse.value,
+      sourceId: p.id,
+      school: 'arcane',
+    });
+    ctx.emit({ type: 'log', text: `You activate ${def.name}.`, color: '#c9f', pid: meta.entityId });
   } else if (def.kind === 'weapon' || def.kind === 'armor') {
     equipItem(ctx, itemId, meta.entityId);
   }

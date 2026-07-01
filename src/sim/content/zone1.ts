@@ -537,6 +537,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'tough_jerky',
       'minor_healing_potion',
       'minor_mana_potion',
+      'redbrook_rally_charm',
     ],
     greeting: 'Fresh bread, clean water, fair prices. What can I get you?',
   },

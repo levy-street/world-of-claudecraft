@@ -3490,7 +3490,8 @@ export const ru_RU: EnTranslations = {
       "waist": "Пояс",
       "legs": "Ноги",
       "gloves": "Кисти рук",
-      "feet": "Ступни"
+      "feet": "Ступни",
+      "trinket": "Aksessuar"
     },
     "quality": {
       "poor": "Низкое",
@@ -3507,6 +3508,7 @@ export const ru_RU: EnTranslations = {
       "junk": "Хлам",
       "food": "Еда",
       "drink": "Напиток",
+      "trinket": "Aksessuar",
       "tool": "Инструмент",
       "potion": "Зелье",
       "elixir": "Эликсир"
@@ -3549,6 +3551,7 @@ export const ru_RU: EnTranslations = {
       "useFishing": "Использование: ловите рыбу в ближайшей воде.",
       "useHealingPotion": "Использование: мгновенно восстанавливает {amount} здоровья. Можно использовать в бою. Восстановление 1 мин.",
       "useManaPotion": "Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.",
+      "useTrinketAura": "Ispolzovanie: povyshaet {stat} na {value} na {seconds} sek.",
       "clickUseInstant": "Нажмите, чтобы мгновенно использовать в бою",
       "clickUse": "Нажмите, чтобы использовать",
       "clickBuyback": "Нажмите, чтобы выкупить"
@@ -4316,6 +4319,9 @@ export const ru_RU: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Ржавый топорик"
+      },
+      "redbrook_rally_charm": {
+        "name": "Obereg sbora Redbruka"
       },
       "recruit_tunic": {
         "name": "Китель рекрута"

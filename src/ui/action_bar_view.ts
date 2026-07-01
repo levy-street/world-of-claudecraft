@@ -133,12 +133,13 @@ export interface ActionBarTargetInput {
   pos: Vec3;
 }
 
-/** The world subset one tick reads: the player, the current target, and inventory
- *  (the item-slot stack count source). */
+/** The world subset one tick reads: the player, the current target, inventory,
+ *  and equipped items that can back item slots after they leave the bags. */
 export interface ActionBarWorldInput {
   player: ActionBarPlayerInput;
   target: ActionBarTargetInput | null;
   inventory: readonly { itemId: string; count: number }[];
+  equipment?: Partial<Record<string, string>>;
 }
 
 /** One slot's derived state. All fields are mutated IN PLACE each tick; the object
@@ -280,28 +281,34 @@ export function createActionBarView(
         }
 
         if (item !== null) {
-          const count = inventoryCount(world.inventory, item.id);
-          // Potions share one global cooldown, so any potion slot paints the same
-          // swipe; other items have no cooldown.
-          const potionCd = item.kind === 'potion' ? player.potionCdRemaining : 0;
+          const bagCount = inventoryCount(world.inventory, item.id);
+          const equippedTrinket = item.kind === 'trinket' && world.equipment?.trinket === item.id;
+          // Potions share one global cooldown; equipped on-use trinkets use their
+          // own item id in the normal cooldown map.
+          const itemCd =
+            item.kind === 'potion'
+              ? player.potionCdRemaining
+              : item.onUse
+                ? (player.cooldowns.get(item.id) ?? 0)
+                : 0;
+          const cooldownTotal =
+            item.kind === 'potion' ? POTION_COOLDOWN : (item.onUse?.cooldown ?? 0);
           slot.kind = 'item';
           slot.abilityId = null;
           slot.itemId = item.id;
           slot.iconKey = `${ITEM_ICON_PREFIX}${item.id}`;
-          slot.cooldownRemaining = potionCd;
-          slot.cooldownTotal = potionCd > 0 ? POTION_COOLDOWN : 0;
+          slot.cooldownRemaining = itemCd;
+          slot.cooldownTotal = itemCd > 0 ? cooldownTotal : 0;
           slot.cooldownPercent =
-            potionCd > 0
+            itemCd > 0
               ? Math.min(
                   MAX_COOLDOWN_PERCENT,
-                  (potionCd / Math.max(COOLDOWN_DENOM_FLOOR, POTION_COOLDOWN)) *
-                    MAX_COOLDOWN_PERCENT,
+                  (itemCd / Math.max(COOLDOWN_DENOM_FLOOR, cooldownTotal)) * MAX_COOLDOWN_PERCENT,
                 )
               : 0;
-          slot.cdText =
-            potionCd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(potionCd)) : '';
-          slot.count = deps.formatCount(count);
-          slot.usable = !(count <= 0 || player.dead);
+          slot.cdText = itemCd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(itemCd)) : '';
+          slot.count = bagCount > 0 ? deps.formatCount(bagCount) : '';
+          slot.usable = !(bagCount <= 0 && !equippedTrinket) && !player.dead;
           slot.outOfRange = false;
           slot.queued = false;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {

@@ -5069,4 +5069,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Hulp nodig',
   'hudChrome.discord.relay.help.hint': 'Vraag de gemeenschap om hulp',
   'hudChrome.options.showSecondaryActionBar': 'Secundaire actiebalk tonen',
+  'itemUi.slots.trinket': 'Sieraad',
+  'itemUi.kind.trinket': 'Sieraad',
+  'itemUi.tooltip.useTrinketAura': 'Gebruik: verhoogt {stat} met {value} gedurende {seconds} sec.',
+  'entities.items.redbrook_rally_charm.name': 'Redbrook-verzamelamulet',
 };

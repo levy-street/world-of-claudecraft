@@ -286,4 +286,8 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombra',
   'hudChrome.auraEffect.school.holy': 'Sagrada',
   'hudChrome.auraEffect.school.nature': 'Natural',
+  'itemUi.slots.trinket': 'Abalorio',
+  'itemUi.kind.trinket': 'Abalorio',
+  'itemUi.tooltip.useTrinketAura': 'Uso: aumenta {stat} en {value} durante {seconds} s.',
+  'entities.items.redbrook_rally_charm.name': 'Talisman de reunion de Redbrook',
 };

@@ -27,4 +27,8 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.armorStat': '{value} Armour',
   // Stat tooltips keep the en prose; only the Armor -> Armour spelling diverges.
   'hudChrome.statInfo.effects.armor': '+{value} Armour',
+  'itemUi.slots.trinket': 'Trinket',
+  'itemUi.kind.trinket': 'Trinket',
+  'itemUi.tooltip.useTrinketAura': 'Use: Increases {stat} by {value} for {seconds} sec.',
+  'entities.items.redbrook_rally_charm.name': 'Redbrook Rally Charm',
 };

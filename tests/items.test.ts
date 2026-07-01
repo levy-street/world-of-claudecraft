@@ -155,6 +155,34 @@ describe('items.useItem', () => {
     expect(p.potionCdRemaining).toBeGreaterThan(0);
   });
 
+  it('equips and activates an on-use trinket from the equipped slot', () => {
+    const sim = makeWorld();
+    const { pid, p, meta } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('redbrook_rally_charm', 1, pid);
+    const baseSpi = p.stats.spi;
+
+    items.useItem(ctx, 'redbrook_rally_charm', pid);
+    expect(meta.equipment.trinket).toBe('redbrook_rally_charm');
+    expect(sim.countItem('redbrook_rally_charm', pid)).toBe(0);
+    expect(p.stats.spi).toBe(baseSpi + 1);
+
+    sim.drainEvents();
+    const baseAp = p.attackPower;
+    items.useItem(ctx, 'redbrook_rally_charm', pid);
+    expect(p.cooldowns.get('redbrook_rally_charm')).toBe(120);
+    expect(p.auras.filter((a) => a.id === 'trinket_redbrook_rally_charm')).toHaveLength(1);
+    expect(p.attackPower).toBe(baseAp + 12);
+    expect(
+      sim.drainEvents().some((e) => e.type === 'log' && e.text.includes('Redbrook Rally Charm')),
+    ).toBe(true);
+
+    items.useItem(ctx, 'redbrook_rally_charm', pid);
+    expect(p.cooldowns.get('redbrook_rally_charm')).toBe(120);
+    expect(p.auras.filter((a) => a.id === 'trinket_redbrook_rally_charm')).toHaveLength(1);
+    expect(errorTexts(sim.drainEvents())).toContain('That item is not ready yet.');
+  });
+
   it('elixir applies the battle-elixir buff aura', () => {
     const sim = makeWorld();
     const { pid, p } = vendorPlayer(sim);

@@ -3490,7 +3490,8 @@ export const it_IT: EnTranslations = {
       "waist": "Vita",
       "legs": "Gambe",
       "gloves": "Mani",
-      "feet": "Piedi"
+      "feet": "Piedi",
+      "trinket": "Monile"
     },
     "quality": {
       "poor": "Scadente",
@@ -3507,6 +3508,7 @@ export const it_IT: EnTranslations = {
       "junk": "Cianfrusaglia",
       "food": "Cibo",
       "drink": "Bevanda",
+      "trinket": "Monile",
       "tool": "Strumento",
       "potion": "Pozione",
       "elixir": "Elisir"
@@ -3549,6 +3551,7 @@ export const it_IT: EnTranslations = {
       "useFishing": "Uso: pesca nelle acque vicine.",
       "useHealingPotion": "Uso: ripristina istantaneamente {amount} salute. Usabile in combattimento. Recupero 1 min.",
       "useManaPotion": "Uso: ripristina istantaneamente {amount} mana. Usabile in combattimento. Recupero 1 min.",
+      "useTrinketAura": "Uso: aumenta {stat} di {value} per {seconds} s.",
       "clickUseInstant": "Clicca per usare subito in combattimento",
       "clickUse": "Clicca per usare",
       "clickBuyback": "Clicca per ricomprare"
@@ -4316,6 +4319,9 @@ export const it_IT: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Accetta arrugginita"
+      },
+      "redbrook_rally_charm": {
+        "name": "Talismano del raduno di Redbrook"
       },
       "recruit_tunic": {
         "name": "Tunica da recluta"

@@ -492,13 +492,20 @@ const mergeStringsEn = {
   },
   itemUi: {
     ...itemNames.en.itemUi,
-    kind: { ...itemNames.en.itemUi.kind, tool: 'Tool', potion: 'Potion', elixir: 'Elixir' },
+    kind: {
+      ...itemNames.en.itemUi.kind,
+      tool: 'Tool',
+      potion: 'Potion',
+      elixir: 'Elixir',
+      trinket: 'Trinket',
+    },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
       useFishing: 'Use: Fish in nearby waters.',
       useHealingPotion:
         'Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.',
       useManaPotion: 'Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.',
+      useTrinketAura: 'Use: Increases {stat} by {value} for {seconds} sec.',
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
       clickBuyback: 'Click to buy back',
@@ -820,7 +827,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.fr_FR.itemUi,
-      kind: { ...itemNames.fr_FR.itemUi.kind, tool: 'Outil', potion: 'Potion', elixir: 'Élixir' },
+      kind: {
+        ...itemNames.fr_FR.itemUi.kind,
+        tool: 'Outil',
+        potion: 'Potion',
+        elixir: 'Élixir',
+        trinket: 'Trinket',
+      },
       tooltip: {
         ...itemNames.fr_FR.itemUi.tooltip,
         useFishing: 'Utiliser : pêcher dans les eaux proches.',
@@ -1298,7 +1311,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_CN.itemUi,
-      kind: { ...itemNames.zh_CN.itemUi.kind, tool: '工具', potion: '药水', elixir: '药剂' },
+      kind: {
+        ...itemNames.zh_CN.itemUi.kind,
+        tool: '工具',
+        potion: '药水',
+        elixir: '药剂',
+        trinket: 'Trinket',
+      },
       tooltip: {
         ...itemNames.zh_CN.itemUi.tooltip,
         useFishing: '使用：在附近水域钓鱼。',
@@ -1450,7 +1469,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_TW.itemUi,
-      kind: { ...itemNames.zh_TW.itemUi.kind, tool: '工具', potion: '藥水', elixir: '藥劑' },
+      kind: {
+        ...itemNames.zh_TW.itemUi.kind,
+        tool: '工具',
+        potion: '藥水',
+        elixir: '藥劑',
+        trinket: 'Trinket',
+      },
       tooltip: {
         ...itemNames.zh_TW.itemUi.tooltip,
         useFishing: '使用：在附近水域釣魚。',
@@ -1602,7 +1627,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ko_KR.itemUi,
-      kind: { ...itemNames.ko_KR.itemUi.kind, tool: '도구', potion: '물약', elixir: '비약' },
+      kind: {
+        ...itemNames.ko_KR.itemUi.kind,
+        tool: '도구',
+        potion: '물약',
+        elixir: '비약',
+        trinket: 'Trinket',
+      },
       tooltip: {
         ...itemNames.ko_KR.itemUi.tooltip,
         useFishing: '사용: 가까운 물가에서 낚시합니다.',

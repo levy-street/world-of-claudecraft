@@ -5096,4 +5096,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Serve aiuto',
   'hudChrome.discord.relay.help.hint': 'Chiedi aiuto alla comunita',
   'hudChrome.options.showSecondaryActionBar': 'Mostra la barra delle azioni secondaria',
+  'itemUi.slots.trinket': 'Monile',
+  'itemUi.kind.trinket': 'Monile',
+  'itemUi.tooltip.useTrinketAura': 'Uso: aumenta {stat} di {value} per {seconds} s.',
+  'entities.items.redbrook_rally_charm.name': 'Talismano del raduno di Redbrook',
 };

@@ -3490,7 +3490,8 @@ export const pl_PL: EnTranslations = {
       "waist": "Pas",
       "legs": "Nogi",
       "gloves": "Rękawice",
-      "feet": "Stopy"
+      "feet": "Stopy",
+      "trinket": "Ozdoba"
     },
     "quality": {
       "poor": "Nędzny",
@@ -3507,6 +3508,7 @@ export const pl_PL: EnTranslations = {
       "junk": "Tandeta",
       "food": "Jedzenie",
       "drink": "Napój",
+      "trinket": "Ozdoba",
       "tool": "Narzędzie",
       "potion": "Mikstura",
       "elixir": "Eliksir"
@@ -3549,6 +3551,7 @@ export const pl_PL: EnTranslations = {
       "useFishing": "Użycie: Łów ryby w pobliskich wodach.",
       "useHealingPotion": "Użycie: Natychmiast przywraca {amount} zdrowia. Można użyć w walce. Czas odnowienia 1 min.",
       "useManaPotion": "Użycie: Natychmiast przywraca {amount} many. Można użyć w walce. Czas odnowienia 1 min.",
+      "useTrinketAura": "Uzycie: zwieksza {stat} o {value} na {seconds} sek.",
       "clickUseInstant": "Kliknij, aby użyć natychmiast w walce",
       "clickUse": "Kliknij, aby użyć",
       "clickBuyback": "Kliknij, aby odkupić"
@@ -4316,6 +4319,9 @@ export const pl_PL: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Zardzewiały toporek"
+      },
+      "redbrook_rally_charm": {
+        "name": "Amulet zwolania Redbrook"
       },
       "recruit_tunic": {
         "name": "Tunika rekruta"

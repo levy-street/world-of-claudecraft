@@ -5083,4 +5083,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Preciso de Ajuda',
   'hudChrome.discord.relay.help.hint': 'Peça ajuda à comunidade',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar Barra de Ação Secundária',
+  'itemUi.slots.trinket': 'Berloque',
+  'itemUi.kind.trinket': 'Berloque',
+  'itemUi.tooltip.useTrinketAura': 'Usar: aumenta {stat} em {value} por {seconds} s.',
+  'entities.items.redbrook_rally_charm.name': 'Amuleto de Reuniao de Redbrook',
 };

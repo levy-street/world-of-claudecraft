@@ -3490,7 +3490,8 @@ export const tr_TR: EnTranslations = {
       "waist": "Bel",
       "legs": "Bacaklar",
       "gloves": "Eldivenler",
-      "feet": "Ayaklar"
+      "feet": "Ayaklar",
+      "trinket": "Sus esyasi"
     },
     "quality": {
       "poor": "Değersiz",
@@ -3507,6 +3508,7 @@ export const tr_TR: EnTranslations = {
       "junk": "Döküntü",
       "food": "Yiyecek",
       "drink": "İçecek",
+      "trinket": "Sus esyasi",
       "tool": "Alet",
       "potion": "Şifa İksiri",
       "elixir": "İksir"
@@ -3549,6 +3551,7 @@ export const tr_TR: EnTranslations = {
       "useFishing": "Kullanım: Yakındaki sularda balık tut.",
       "useHealingPotion": "Kullanım: Anında {amount} can yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
+      "useTrinketAura": "Kullan: {seconds} sn. boyunca {stat} degerini {value} artirir.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
       "clickBuyback": "Geri satın almak için tıkla"
@@ -4316,6 +4319,9 @@ export const tr_TR: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Paslı Balta"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redbrook Toplanma Tilsimi"
       },
       "recruit_tunic": {
         "name": "Acemi Erin Tuniği"

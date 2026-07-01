@@ -5015,4 +5015,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Behöver hjälp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hjälp',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
+  'itemUi.slots.trinket': 'Smycke',
+  'itemUi.kind.trinket': 'Smycke',
+  'itemUi.tooltip.useTrinketAura': 'Anvand: okar {stat} med {value} i {seconds} sek.',
+  'entities.items.redbrook_rally_charm.name': 'Redbrooks samlingsamulett',
 };

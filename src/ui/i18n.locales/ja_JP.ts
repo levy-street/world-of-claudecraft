@@ -4957,4 +4957,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': 'GitHub を連携できませんでした。もう一度お試しください。',
   'hudChrome.devBadge.linkedAs': '{login} として連携済み',
   'hudChrome.devBadge.unlink': 'GitHub の連携を解除',
+  'itemUi.slots.trinket': 'Soshin-gu',
+  'itemUi.kind.trinket': 'Soshin-gu',
+  'itemUi.tooltip.useTrinketAura': 'Shiyo: {seconds} byo kan {stat} ga {value} agaru.',
+  'entities.items.redbrook_rally_charm.name': 'Redbrook kesshu charm',
 };

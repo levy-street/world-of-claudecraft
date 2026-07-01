@@ -3490,7 +3490,8 @@ export const zh_CN: EnTranslations = {
       "waist": "腰部",
       "legs": "腿部",
       "gloves": "手部",
-      "feet": "脚部"
+      "feet": "脚部",
+      "trinket": "Shipin"
     },
     "quality": {
       "poor": "粗糙",
@@ -3507,6 +3508,7 @@ export const zh_CN: EnTranslations = {
       "junk": "杂物",
       "food": "食物",
       "drink": "饮料",
+      "trinket": "Shipin",
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂"
@@ -3549,6 +3551,7 @@ export const zh_CN: EnTranslations = {
       "useFishing": "使用：在附近水域钓鱼。",
       "useHealingPotion": "使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。",
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
+      "useTrinketAura": "Shiyong: shi {stat} tigao {value}, chixu {seconds} miao.",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
       "clickBuyback": "点击回购"
@@ -4316,6 +4319,9 @@ export const zh_CN: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "生锈手斧"
+      },
+      "redbrook_rally_charm": {
+        "name": "Chixi jijie hufu"
       },
       "recruit_tunic": {
         "name": "新兵外套"

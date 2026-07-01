@@ -5111,4 +5111,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Necesito ayuda',
   'hudChrome.discord.relay.help.hint': 'Pide ayuda a la comunidad',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar barra de acción secundaria',
+  'itemUi.slots.trinket': 'Abalorio',
+  'itemUi.kind.trinket': 'Abalorio',
+  'itemUi.tooltip.useTrinketAura': 'Uso: aumenta {stat} en {value} durante {seconds} s.',
+  'entities.items.redbrook_rally_charm.name': 'Talisman de reunion de Redbrook',
 };

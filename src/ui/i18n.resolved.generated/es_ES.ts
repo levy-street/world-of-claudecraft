@@ -3490,7 +3490,8 @@ export const es_ES: EnTranslations = {
       "waist": "Cintura",
       "legs": "Piernas",
       "gloves": "Manos",
-      "feet": "Pies"
+      "feet": "Pies",
+      "trinket": "Abalorio"
     },
     "quality": {
       "poor": "Pobre",
@@ -3507,6 +3508,7 @@ export const es_ES: EnTranslations = {
       "junk": "Chatarra",
       "food": "Comida",
       "drink": "Bebida",
+      "trinket": "Abalorio",
       "tool": "Herramienta",
       "potion": "Poción",
       "elixir": "Elixir"
@@ -3549,6 +3551,7 @@ export const es_ES: EnTranslations = {
       "useFishing": "Uso: pesca en aguas cercanas.",
       "useHealingPotion": "Uso: restaura al instante {amount} de salud. Se puede usar en combate. Reutilización de 1 min.",
       "useManaPotion": "Uso: restaura al instante {amount} de maná. Se puede usar en combate. Reutilización de 1 min.",
+      "useTrinketAura": "Uso: aumenta {stat} en {value} durante {seconds} s.",
       "clickUseInstant": "Haz clic para usar al instante en combate",
       "clickUse": "Haz clic para usar",
       "clickBuyback": "Haz clic para recomprar"
@@ -4316,6 +4319,9 @@ export const es_ES: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Hachuela oxidada"
+      },
+      "redbrook_rally_charm": {
+        "name": "Talisman de reunion de Redbrook"
       },
       "recruit_tunic": {
         "name": "Túnica de recluta"

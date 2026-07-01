@@ -34,8 +34,8 @@ function ability(id: string, opts: Partial<AbilityDef> & { cost?: number } = {})
   return { def, cost: opts.cost ?? 0 };
 }
 
-function item(id: string, kind?: string): ItemDef {
-  return { id, kind } as unknown as ItemDef;
+function item(id: string, kind?: string, opts: Partial<ItemDef> = {}): ItemDef {
+  return { id, kind, ...opts } as unknown as ItemDef;
 }
 
 interface SlotOpts {
@@ -91,6 +91,7 @@ interface WorldOpts {
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
+  equipment?: Partial<Record<string, string>>;
 }
 
 function world(opts: WorldOpts = {}): ActionBarWorldInput {
@@ -108,6 +109,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
+    equipment: opts.equipment ?? {},
   };
 }
 
@@ -285,7 +287,7 @@ describe('actionBarView: attack + item slots', () => {
     expect(some.usable).toBe(true);
 
     const none = view.tick(world({ inventory: [] })).slots[0];
-    expect(none.count).toBe('0');
+    expect(none.count).toBe('');
     expect(none.usable).toBe(false);
 
     const dead = view.tick(world({ dead: true, inventory: [{ itemId: 'potion', count: 1 }] }))
@@ -310,6 +312,34 @@ describe('actionBarView: attack + item slots', () => {
     const ready = view.tick(world({ potionCdRemaining: 0 })).slots[0];
     expect(ready.cooldownPercent).toBe(0);
     expect(ready.cdText).toBe('');
+  });
+
+  it('keeps an equipped on-use trinket usable after it leaves the bags and paints its item cooldown', () => {
+    const charm = item('redbrook_rally_charm', 'trinket', {
+      onUse: {
+        type: 'aura',
+        aura: 'Redbrook Rally',
+        kind: 'buff_ap',
+        value: 12,
+        duration: 15,
+        cooldown: 120,
+      },
+    });
+    const view = createActionBarView(descriptor(slot(1, { item: charm })), fakeDeps());
+
+    const s = view.tick(
+      world({
+        cooldowns: new Map([['redbrook_rally_charm', 60]]),
+        equipment: { trinket: 'redbrook_rally_charm' },
+        inventory: [],
+      }),
+    ).slots[0];
+
+    expect(s.count).toBe('');
+    expect(s.usable).toBe(true);
+    expect(s.cooldownRemaining).toBe(60);
+    expect(s.cooldownTotal).toBe(120);
+    expect(s.cooldownPercent).toBe(50);
   });
 
   it('does not paint a cooldown on a non-potion item even while the potion timer runs', () => {

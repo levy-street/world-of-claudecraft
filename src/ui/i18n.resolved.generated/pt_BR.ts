@@ -3490,7 +3490,8 @@ export const pt_BR: EnTranslations = {
       "waist": "Cintura",
       "legs": "Pernas",
       "gloves": "Mãos",
-      "feet": "Pés"
+      "feet": "Pés",
+      "trinket": "Berloque"
     },
     "quality": {
       "poor": "Ruim",
@@ -3507,6 +3508,7 @@ export const pt_BR: EnTranslations = {
       "junk": "Sucata",
       "food": "Comida",
       "drink": "Bebida",
+      "trinket": "Berloque",
       "tool": "Ferramenta",
       "potion": "Poção",
       "elixir": "Elixir"
@@ -3549,6 +3551,7 @@ export const pt_BR: EnTranslations = {
       "useFishing": "Uso: pesca em águas próximas.",
       "useHealingPotion": "Uso: restaura instantaneamente {amount} de vida. Pode ser usada em combate. Recarga de 1 min.",
       "useManaPotion": "Uso: restaura instantaneamente {amount} de mana. Pode ser usada em combate. Recarga de 1 min.",
+      "useTrinketAura": "Usar: aumenta {stat} em {value} por {seconds} s.",
       "clickUseInstant": "Clique para usar instantaneamente em combate",
       "clickUse": "Clique para usar",
       "clickBuyback": "Clique para recomprar"
@@ -4316,6 +4319,9 @@ export const pt_BR: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Machadinha enferrujada"
+      },
+      "redbrook_rally_charm": {
+        "name": "Amuleto de Reuniao de Redbrook"
       },
       "recruit_tunic": {
         "name": "Túnica de recruta"

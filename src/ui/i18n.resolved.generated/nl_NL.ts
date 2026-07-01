@@ -3490,7 +3490,8 @@ export const nl_NL: EnTranslations = {
       "waist": "Middel",
       "legs": "Benen",
       "gloves": "Handschoenen",
-      "feet": "Voeten"
+      "feet": "Voeten",
+      "trinket": "Sieraad"
     },
     "quality": {
       "poor": "Waardeloos",
@@ -3507,6 +3508,7 @@ export const nl_NL: EnTranslations = {
       "junk": "Rommel",
       "food": "Voedsel",
       "drink": "Drank",
+      "trinket": "Sieraad",
       "tool": "Gereedschap",
       "potion": "Toverdrank",
       "elixir": "Elixer"
@@ -3549,6 +3551,7 @@ export const nl_NL: EnTranslations = {
       "useFishing": "Gebruik: Vis in nabijgelegen wateren.",
       "useHealingPotion": "Gebruik: Herstelt direct {amount} levenskracht. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "useManaPotion": "Gebruik: Herstelt direct {amount} mana. Bruikbaar in gevecht. 1 min afkoeltijd.",
+      "useTrinketAura": "Gebruik: verhoogt {stat} met {value} gedurende {seconds} sec.",
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
       "clickBuyback": "Klik om terug te kopen"
@@ -4316,6 +4319,9 @@ export const nl_NL: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Roestige Bijl"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redbrook-verzamelamulet"
       },
       "recruit_tunic": {
         "name": "Tuniek van de Rekruut"

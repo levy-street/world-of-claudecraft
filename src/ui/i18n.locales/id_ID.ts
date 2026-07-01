@@ -5077,4 +5077,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Butuh Bantuan',
   'hudChrome.discord.relay.help.hint': 'Minta bantuan dari komunitas',
   'hudChrome.options.showSecondaryActionBar': 'Tampilkan Bilah Aksi Sekunder',
+  'itemUi.slots.trinket': 'Pernak-pernik',
+  'itemUi.kind.trinket': 'Pernak-pernik',
+  'itemUi.tooltip.useTrinketAura':
+    'Gunakan: meningkatkan {stat} sebesar {value} selama {seconds} dtk.',
+  'entities.items.redbrook_rally_charm.name': 'Jimat Seruan Redbrook',
 };

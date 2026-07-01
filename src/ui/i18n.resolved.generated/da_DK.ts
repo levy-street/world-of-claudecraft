@@ -3490,7 +3490,8 @@ export const da_DK: EnTranslations = {
       "waist": "Talje",
       "legs": "Ben",
       "gloves": "Handsker",
-      "feet": "Fødder"
+      "feet": "Fødder",
+      "trinket": "Smykke"
     },
     "quality": {
       "poor": "Ringe",
@@ -3507,6 +3508,7 @@ export const da_DK: EnTranslations = {
       "junk": "Skrammel",
       "food": "Mad",
       "drink": "Drikke",
+      "trinket": "Smykke",
       "tool": "Værktøj",
       "potion": "Eliksir",
       "elixir": "Eliksir"
@@ -3549,6 +3551,7 @@ export const da_DK: EnTranslations = {
       "useFishing": "Brug: Fisk i nærliggende vande.",
       "useHealingPotion": "Brug: Genopretter øjeblikkeligt {amount} helbred. Brugbar i kamp. 1 min afkøling.",
       "useManaPotion": "Brug: Genopretter øjeblikkeligt {amount} mana. Brugbar i kamp. 1 min afkøling.",
+      "useTrinketAura": "Brug: oger {stat} med {value} i {seconds} sek.",
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
       "clickBuyback": "Klik for at købe tilbage"
@@ -4316,6 +4319,9 @@ export const da_DK: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Rusten Økse"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redbrook samlingsamulet"
       },
       "recruit_tunic": {
         "name": "Rekruttens Tunika"

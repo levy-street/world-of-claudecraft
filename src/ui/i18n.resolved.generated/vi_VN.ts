@@ -3490,7 +3490,8 @@ export const vi_VN: EnTranslations = {
       "waist": "Thắt Lưng",
       "legs": "Quần Giáp",
       "gloves": "Găng Tay",
-      "feet": "Giày"
+      "feet": "Giày",
+      "trinket": "Phu kien"
     },
     "quality": {
       "poor": "Kém",
@@ -3507,6 +3508,7 @@ export const vi_VN: EnTranslations = {
       "junk": "Đồ Vụn",
       "food": "Thức Ăn",
       "drink": "Đồ Uống",
+      "trinket": "Phu kien",
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
       "elixir": "Tiên Dược"
@@ -3549,6 +3551,7 @@ export const vi_VN: EnTranslations = {
       "useFishing": "Dùng: Câu cá ở vùng nước gần đó.",
       "useHealingPotion": "Dùng: Hồi tức thời {amount} sinh lực. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
+      "useTrinketAura": "Dung: tang {stat} them {value} trong {seconds} giay.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
       "clickBuyback": "Nhấp để mua lại"
@@ -4316,6 +4319,9 @@ export const vi_VN: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Rìu Nhỏ Gỉ Sét"
+      },
+      "redbrook_rally_charm": {
+        "name": "Bua hieu trieu Redbrook"
       },
       "recruit_tunic": {
         "name": "Áo Da của Tân Binh"

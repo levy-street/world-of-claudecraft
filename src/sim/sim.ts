@@ -4217,7 +4217,10 @@ export class Sim {
       pid: meta.entityId,
     });
     this.ctx.onInventoryChangedForQuests(meta);
-    if (meta.autoEquip && (def?.kind === 'weapon' || def?.kind === 'armor')) {
+    if (
+      meta.autoEquip &&
+      (def?.kind === 'weapon' || def?.kind === 'armor' || def?.kind === 'trinket')
+    ) {
       this.maybeAutoEquip(itemId, meta);
     }
   }

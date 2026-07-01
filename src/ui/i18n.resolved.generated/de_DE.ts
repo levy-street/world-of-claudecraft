@@ -3490,7 +3490,8 @@ export const de_DE: EnTranslations = {
       "waist": "Taille",
       "legs": "Beine",
       "gloves": "Hände",
-      "feet": "Füße"
+      "feet": "Füße",
+      "trinket": "Schmuckstueck"
     },
     "quality": {
       "poor": "Schlecht",
@@ -3507,6 +3508,7 @@ export const de_DE: EnTranslations = {
       "junk": "Plunder",
       "food": "Essen",
       "drink": "Getränk",
+      "trinket": "Schmuckstueck",
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier"
@@ -3549,6 +3551,7 @@ export const de_DE: EnTranslations = {
       "useFishing": "Benutzen: Angelt in nahen Gewässern.",
       "useHealingPotion": "Benutzen: Stellt sofort {amount} Gesundheit wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.",
       "useManaPotion": "Benutzen: Stellt sofort {amount} Mana wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.",
+      "useTrinketAura": "Benutzen: erhoeht {stat} um {value} fuer {seconds} Sek.",
       "clickUseInstant": "Zum sofortigen Benutzen im Kampf klicken",
       "clickUse": "Zum Benutzen klicken",
       "clickBuyback": "Zum Rückkaufen klicken"
@@ -4316,6 +4319,9 @@ export const de_DE: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Rostiges Beil"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redbrook-Sammelamulett"
       },
       "recruit_tunic": {
         "name": "Rekrutentunika"

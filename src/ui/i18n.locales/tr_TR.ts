@@ -5006,4 +5006,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Yardım Lazım',
   'hudChrome.discord.relay.help.hint': 'Topluluktan yardım iste',
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
+  'itemUi.slots.trinket': 'Sus esyasi',
+  'itemUi.kind.trinket': 'Sus esyasi',
+  'itemUi.tooltip.useTrinketAura': 'Kullan: {seconds} sn. boyunca {stat} degerini {value} artirir.',
+  'entities.items.redbrook_rally_charm.name': 'Redbrook Toplanma Tilsimi',
 };

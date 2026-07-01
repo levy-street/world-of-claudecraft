@@ -5033,4 +5033,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Cần Trợ Giúp',
   'hudChrome.discord.relay.help.hint': 'Nhờ cộng đồng giúp đỡ',
   'hudChrome.options.showSecondaryActionBar': 'Hiện Thanh Hành Động Phụ',
+  'itemUi.slots.trinket': 'Phu kien',
+  'itemUi.kind.trinket': 'Phu kien',
+  'itemUi.tooltip.useTrinketAura': 'Dung: tang {stat} them {value} trong {seconds} giay.',
+  'entities.items.redbrook_rally_charm.name': 'Bua hieu trieu Redbrook',
 };

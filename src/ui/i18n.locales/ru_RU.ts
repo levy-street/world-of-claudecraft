@@ -5067,4 +5067,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': 'Не удалось привязать GitHub. Пожалуйста, попробуйте снова.',
   'hudChrome.devBadge.linkedAs': 'Привязан как {login}',
   'hudChrome.devBadge.unlink': 'Отвязать GitHub',
+  'itemUi.slots.trinket': 'Aksessuar',
+  'itemUi.kind.trinket': 'Aksessuar',
+  'itemUi.tooltip.useTrinketAura': 'Ispolzovanie: povyshaet {stat} na {value} na {seconds} sek.',
+  'entities.items.redbrook_rally_charm.name': 'Obereg sbora Redbruka',
 };

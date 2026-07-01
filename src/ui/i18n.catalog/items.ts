@@ -23,6 +23,7 @@ const itemStringsEn = {
       legs: 'Legs',
       gloves: 'Gloves',
       feet: 'Feet',
+      trinket: 'Trinket',
     },
     quality: {
       poor: 'Poor',
@@ -39,6 +40,7 @@ const itemStringsEn = {
       junk: 'Junk',
       food: 'Food',
       drink: 'Drink',
+      trinket: 'Trinket',
     },
     stats: {
       armor: 'Armor',
@@ -214,6 +216,7 @@ export const itemStrings = {
         legs: 'Piernas',
         gloves: 'Manos',
         feet: 'Pies',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Pobre',
@@ -230,6 +233,7 @@ export const itemStrings = {
         junk: 'Chatarra',
         food: 'Comida',
         drink: 'Bebida',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armadura',
@@ -372,6 +376,7 @@ export const itemStrings = {
         legs: 'Jambes',
         gloves: 'Mains',
         feet: 'Pieds',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Médiocre',
@@ -388,6 +393,7 @@ export const itemStrings = {
         junk: 'Camelote',
         food: 'Nourriture',
         drink: 'Boisson',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armure',
@@ -531,6 +537,7 @@ export const itemStrings = {
         legs: 'Gambe',
         gloves: 'Mani',
         feet: 'Piedi',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Scadente',
@@ -547,6 +554,7 @@ export const itemStrings = {
         junk: 'Cianfrusaglia',
         food: 'Cibo',
         drink: 'Bevanda',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armatura',
@@ -686,6 +694,7 @@ export const itemStrings = {
         legs: 'Beine',
         gloves: 'Hände',
         feet: 'Füße',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Schlecht',
@@ -702,6 +711,7 @@ export const itemStrings = {
         junk: 'Plunder',
         food: 'Essen',
         drink: 'Getränk',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Rüstung',
@@ -843,6 +853,7 @@ export const itemStrings = {
         legs: '腿部',
         gloves: '手部',
         feet: '脚部',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '粗糙',
@@ -859,6 +870,7 @@ export const itemStrings = {
         junk: '杂物',
         food: '食物',
         drink: '饮料',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '护甲',
@@ -993,6 +1005,7 @@ export const itemStrings = {
         legs: '腿部',
         gloves: '手部',
         feet: '腳部',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '粗糙',
@@ -1009,6 +1022,7 @@ export const itemStrings = {
         junk: '雜物',
         food: '食物',
         drink: '飲料',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '護甲',
@@ -1143,6 +1157,7 @@ export const itemStrings = {
         legs: '다리',
         gloves: '손',
         feet: '발',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '하급',
@@ -1159,6 +1174,7 @@ export const itemStrings = {
         junk: '잡동사니',
         food: '음식',
         drink: '음료',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '방어도',
@@ -1297,6 +1313,7 @@ export const itemStrings = {
         legs: '脚',
         gloves: '手',
         feet: '足',
+        trinket: 'Trinket',
       },
       quality: {
         poor: '粗悪',
@@ -1313,6 +1330,7 @@ export const itemStrings = {
         junk: '雑貨',
         food: '食べ物',
         drink: '飲み物',
+        trinket: 'Trinket',
       },
       stats: {
         armor: '防御力',
@@ -1451,6 +1469,7 @@ export const itemStrings = {
         legs: 'Pernas',
         gloves: 'Mãos',
         feet: 'Pés',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Ruim',
@@ -1467,6 +1486,7 @@ export const itemStrings = {
         junk: 'Sucata',
         food: 'Comida',
         drink: 'Bebida',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Armadura',
@@ -1605,6 +1625,7 @@ export const itemStrings = {
         legs: 'Ноги',
         gloves: 'Кисти рук',
         feet: 'Ступни',
+        trinket: 'Trinket',
       },
       quality: {
         poor: 'Низкое',
@@ -1621,6 +1642,7 @@ export const itemStrings = {
         junk: 'Хлам',
         food: 'Еда',
         drink: 'Напиток',
+        trinket: 'Trinket',
       },
       stats: {
         armor: 'Броня',
@@ -1752,6 +1774,7 @@ const ITEM_ENTITY_IDS = [
   'rusty_dagger',
   'training_mace',
   'rusty_hatchet',
+  'redbrook_rally_charm',
   'recruit_tunic',
   'apprentice_robe',
   'footpad_jerkin',
@@ -1970,6 +1993,7 @@ const itemNamesEn = {
       'Rusty Dagger',
       'Training Mace',
       'Rusty Hatchet',
+      'Redbrook Rally Charm',
       "Recruit's Tunic",
       "Apprentice's Robe",
       "Footpad's Jerkin",
@@ -2171,6 +2195,7 @@ export const itemNames = {
         'Daga oxidada',
         'Maza de entrenamiento',
         'Hachuela oxidada',
+        'Redbrook Rally Charm',
         'Túnica de recluta',
         'Toga de aprendiz',
         'Jubón de salteador',
@@ -2370,6 +2395,7 @@ export const itemNames = {
         'Dague rouillée',
         "Masse d'entraînement",
         'Hachette rouillée',
+        'Redbrook Rally Charm',
         'Tunique de recrue',
         "Robe d'apprenti",
         'Pourpoint de coupe-jarret',
@@ -2570,6 +2596,7 @@ export const itemNames = {
         'Pugnale arrugginito',
         'Mazza da addestramento',
         'Accetta arrugginita',
+        'Redbrook Rally Charm',
         'Tunica da recluta',
         "Veste dell'apprendista",
         'Giaco del tagliaborse',
@@ -2768,6 +2795,7 @@ export const itemNames = {
         'Rostiger Dolch',
         'Übungsstreitkolben',
         'Rostiges Beil',
+        'Redbrook Rally Charm',
         'Rekrutentunika',
         'Lehrlingsrobe',
         'Wams des Wegelagerers',
@@ -2966,6 +2994,7 @@ export const itemNames = {
         '生锈匕首',
         '训练钉锤',
         '生锈手斧',
+        'Redbrook Rally Charm',
         '新兵外套',
         '学徒长袍',
         '窃贼皮甲',
@@ -3164,6 +3193,7 @@ export const itemNames = {
         '生鏽匕首',
         '訓練釘錘',
         '生鏽手斧',
+        'Redbrook Rally Charm',
         '新兵外套',
         '學徒長袍',
         '竊賊皮甲',
@@ -3362,6 +3392,7 @@ export const itemNames = {
         '녹슨 단검',
         '훈련용 철퇴',
         '녹슨 손도끼',
+        'Redbrook Rally Charm',
         '신병 튜닉',
         '견습생 로브',
         '노상강도의 웃옷',
@@ -3560,6 +3591,7 @@ export const itemNames = {
         '錆びたダガー',
         '訓練用メイス',
         '錆びた手斧',
+        'Redbrook Rally Charm',
         '新兵のチュニック',
         '見習いのローブ',
         '追いはぎのジャーキン',
@@ -3758,6 +3790,7 @@ export const itemNames = {
         'Adaga enferrujada',
         'Maça de treino',
         'Machadinha enferrujada',
+        'Redbrook Rally Charm',
         'Túnica de recruta',
         'Veste de aprendiz',
         'Gibão de salteador',
@@ -3956,6 +3989,7 @@ export const itemNames = {
         'Ржавый кинжал',
         'Учебная булава',
         'Ржавый топорик',
+        'Redbrook Rally Charm',
         'Китель рекрута',
         'Роба ученика',
         'Куртка налетчика',

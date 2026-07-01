@@ -3490,7 +3490,8 @@ export const en_CA: EnTranslations = {
       "waist": "Waist",
       "legs": "Legs",
       "gloves": "Gloves",
-      "feet": "Feet"
+      "feet": "Feet",
+      "trinket": "Trinket"
     },
     "quality": {
       "poor": "Poor",
@@ -3507,6 +3508,7 @@ export const en_CA: EnTranslations = {
       "junk": "Junk",
       "food": "Food",
       "drink": "Drink",
+      "trinket": "Trinket",
       "tool": "Tool",
       "potion": "Potion",
       "elixir": "Elixir"
@@ -3549,6 +3551,7 @@ export const en_CA: EnTranslations = {
       "useFishing": "Use: Fish in nearby waters.",
       "useHealingPotion": "Use: Instantly restores {amount} health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.",
+      "useTrinketAura": "Use: Increases {stat} by {value} for {seconds} sec.",
       "clickUseInstant": "Click to use instantly in combat",
       "clickUse": "Click to use",
       "clickBuyback": "Click to buy back"
@@ -4316,6 +4319,9 @@ export const en_CA: EnTranslations = {
       },
       "rusty_hatchet": {
         "name": "Rusty Hatchet"
+      },
+      "redbrook_rally_charm": {
+        "name": "Redbrook Rally Charm"
       },
       "recruit_tunic": {
         "name": "Recruit's Tunic"
