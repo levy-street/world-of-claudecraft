@@ -4101,6 +4101,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.tooFar': 'Kamu terlalu jauh dari Pedagang.',
   'itemUi.errors.tooManyListings':
     'Kamu hanya boleh menyimpan paling banyak {count} barang di pasar sekaligus.',
+  'entities.items.basic_mining_pick.name': 'Beliung tambang dasar',
+  'entities.items.basic_logging_axe.name': 'Kapak penebang dasar',
+  'entities.items.basic_herbalists_sickle.name': 'Sabit herbalis dasar',
   'itemUi.kind.armor': 'Zirah',
   'itemUi.kind.drink': 'Minuman',
   'itemUi.kind.elixir': 'Eliksir',

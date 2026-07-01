@@ -5126,6 +5126,15 @@ export const pt_BR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Capuz sombrio de Varric"
       },
+      "basic_mining_pick": {
+        "name": "Picareta de mineração básica"
+      },
+      "basic_logging_axe": {
+        "name": "Machado de lenhador básico"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Foice de herbalista básica"
+      },
       "the_codfather": {
         "name": "O Bacalhau-Padrinho"
       },

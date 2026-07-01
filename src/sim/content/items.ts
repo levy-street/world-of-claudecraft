@@ -408,6 +408,33 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
   },
+  basic_mining_pick: {
+    id: 'basic_mining_pick',
+    name: 'Basic Mining Pick',
+    kind: 'tool',
+    quality: 'common',
+    gatheringTool: { profession: 'mining', tier: 1, infiniteDurability: true },
+    sellValue: 4,
+    buyValue: 20,
+  },
+  basic_logging_axe: {
+    id: 'basic_logging_axe',
+    name: 'Basic Logging Axe',
+    kind: 'tool',
+    quality: 'common',
+    gatheringTool: { profession: 'logging', tier: 1, infiniteDurability: true },
+    sellValue: 4,
+    buyValue: 20,
+  },
+  basic_herbalists_sickle: {
+    id: 'basic_herbalists_sickle',
+    name: "Basic Herbalist's Sickle",
+    kind: 'tool',
+    quality: 'common',
+    gatheringTool: { profession: 'herbalism', tier: 1, infiniteDurability: true },
+    sellValue: 4,
+    buyValue: 20,
+  },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.
   event_skin_token: {

@@ -5126,6 +5126,15 @@ export const en_XA: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "[Ʋáŕŕíç'š Šĥáðóŵ Çóŵļ]"
       },
+      "basic_mining_pick": {
+        "name": "[Ɓášíç Ɱíñíñĝ Þíçķ]"
+      },
+      "basic_logging_axe": {
+        "name": "[Ɓášíç Ļóĝĝíñĝ Áẋé]"
+      },
+      "basic_herbalists_sickle": {
+        "name": "[Ɓášíç Ĥéŕƀáļíšţ'š Šíçķļé]"
+      },
       "the_codfather": {
         "name": "[Ţĥé Çóðƒáţĥéŕ]"
       },

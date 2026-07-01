@@ -5126,6 +5126,15 @@ export const it_IT: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Cappuccio d'ombra di Varric"
       },
+      "basic_mining_pick": {
+        "name": "Piccone da minatore base"
+      },
+      "basic_logging_axe": {
+        "name": "Ascia da boscaiolo base"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Falce da erborista base"
+      },
       "the_codfather": {
         "name": "Il Pescadrino"
       },

@@ -5126,6 +5126,15 @@ export const id_ID: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Tudung Bayangan Varric"
       },
+      "basic_mining_pick": {
+        "name": "Beliung tambang dasar"
+      },
+      "basic_logging_axe": {
+        "name": "Kapak penebang dasar"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Sabit herbalis dasar"
+      },
       "the_codfather": {
         "name": "Sang Bapak Kod"
       },

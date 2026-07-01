@@ -5126,6 +5126,15 @@ export const ru_RU: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Теневой капюшон Варрика"
       },
+      "basic_mining_pick": {
+        "name": "Базовая кирка"
+      },
+      "basic_logging_axe": {
+        "name": "Базовый топор лесоруба"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Базовый серп травника"
+      },
       "the_codfather": {
         "name": "Крестная треска"
       },

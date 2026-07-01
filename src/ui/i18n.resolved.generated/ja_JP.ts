@@ -5126,6 +5126,15 @@ export const ja_JP: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "ヴァリックの影のフード"
       },
+      "basic_mining_pick": {
+        "name": "基本の採掘つるはし"
+      },
+      "basic_logging_axe": {
+        "name": "基本の伐採斧"
+      },
+      "basic_herbalists_sickle": {
+        "name": "基本の薬草刈り鎌"
+      },
       "the_codfather": {
         "name": "タラのゴッドファーザー"
       },

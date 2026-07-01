@@ -5126,6 +5126,15 @@ export const tr_TR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varric'in Gölge Başlığı"
       },
+      "basic_mining_pick": {
+        "name": "Temel madenci kazması"
+      },
+      "basic_logging_axe": {
+        "name": "Temel oduncu baltası"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Temel bitkici orağı"
+      },
       "the_codfather": {
         "name": "Morina Baba"
       },

@@ -5126,6 +5126,15 @@ export const es: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Capucha sombría de Varric"
       },
+      "basic_mining_pick": {
+        "name": "Pico minero básico"
+      },
+      "basic_logging_axe": {
+        "name": "Hacha maderera básica"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Hoz herbolaria básica"
+      },
       "the_codfather": {
         "name": "El Bacaladrino"
       },

@@ -5126,6 +5126,15 @@ export const ko_KR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "바릭의 그림자 두건"
       },
+      "basic_mining_pick": {
+        "name": "기본 채광 곡괭이"
+      },
+      "basic_logging_axe": {
+        "name": "기본 벌목 도끼"
+      },
+      "basic_herbalists_sickle": {
+        "name": "기본 약초 채집 낫"
+      },
       "the_codfather": {
         "name": "대구 대부"
       },

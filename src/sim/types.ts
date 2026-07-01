@@ -270,6 +270,8 @@ export type SkinRank = 'uncommon' | 'rare' | 'epic';
 
 export type ArmorType = 'cloth' | 'leather' | 'mail';
 
+export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism';
+
 type ItemKind =
   | 'weapon'
   | 'armor'
@@ -312,6 +314,12 @@ interface BaseItemDef {
   // `aura` is a flavor name shown in the buff frame; `value` is the stat amount,
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
+  // Base gathering tools gate which material tiers the player can gather.
+  gatheringTool?: {
+    profession: GatheringProfessionId;
+    tier: number;
+    infiniteDurability?: true;
+  };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
   /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */

@@ -5126,6 +5126,15 @@ export const da_DK: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics Skyggehætte"
       },
+      "basic_mining_pick": {
+        "name": "Simpel minehakke"
+      },
+      "basic_logging_axe": {
+        "name": "Simpel skovhuggerøkse"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Simpel urtesegl"
+      },
       "the_codfather": {
         "name": "Torskefaderen"
       },

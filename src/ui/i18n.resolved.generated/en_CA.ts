@@ -5126,6 +5126,15 @@ export const en_CA: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varric's Shadow Cowl"
       },
+      "basic_mining_pick": {
+        "name": "Basic Mining Pick"
+      },
+      "basic_logging_axe": {
+        "name": "Basic Logging Axe"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Basic Herbalist's Sickle"
+      },
       "the_codfather": {
         "name": "The Codfather"
       },

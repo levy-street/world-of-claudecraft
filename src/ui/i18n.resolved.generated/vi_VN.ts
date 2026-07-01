@@ -5126,6 +5126,15 @@ export const vi_VN: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Mũ Trùm Bóng Tối của Varric"
       },
+      "basic_mining_pick": {
+        "name": "Cuốc khai khoáng cơ bản"
+      },
+      "basic_logging_axe": {
+        "name": "Rìu đốn gỗ cơ bản"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Liềm thảo dược cơ bản"
+      },
       "the_codfather": {
         "name": "Cá Bố Già"
       },

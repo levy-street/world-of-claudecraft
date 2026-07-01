@@ -5126,6 +5126,15 @@ export const zh_CN: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "瓦里克的暗影兜帽"
       },
+      "basic_mining_pick": {
+        "name": "基础矿镐"
+      },
+      "basic_logging_axe": {
+        "name": "基础伐木斧"
+      },
+      "basic_herbalists_sickle": {
+        "name": "基础采药镰"
+      },
       "the_codfather": {
         "name": "鳕鱼教父"
       },

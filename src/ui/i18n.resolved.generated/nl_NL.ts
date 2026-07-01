@@ -5126,6 +5126,15 @@ export const nl_NL: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics Schaduwkap"
       },
+      "basic_mining_pick": {
+        "name": "Eenvoudige mijnwerkershouweel"
+      },
+      "basic_logging_axe": {
+        "name": "Eenvoudige houthakkersbijl"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Eenvoudige kruidensikkel"
+      },
       "the_codfather": {
         "name": "De Kabeljauwvader"
       },

@@ -5126,6 +5126,15 @@ export const pl_PL: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Mroczny kaptur Varrica"
       },
+      "basic_mining_pick": {
+        "name": "Podstawowy kilof górniczy"
+      },
+      "basic_logging_axe": {
+        "name": "Podstawowa siekiera drwala"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Podstawowy sierp zielarza"
+      },
       "the_codfather": {
         "name": "Dorszny Ojciec"
       },

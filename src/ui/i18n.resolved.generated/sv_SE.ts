@@ -5126,6 +5126,15 @@ export const sv_SE: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics skugghuva"
       },
+      "basic_mining_pick": {
+        "name": "Enkel gruvhacka"
+      },
+      "basic_logging_axe": {
+        "name": "Enkel skogshuggaryxa"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Enkel örtskära"
+      },
       "the_codfather": {
         "name": "Torskfadern"
       },

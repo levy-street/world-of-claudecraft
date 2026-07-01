@@ -5126,6 +5126,15 @@ export const de_DE: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics Schattenkapuze"
       },
+      "basic_mining_pick": {
+        "name": "Einfache Bergbauspitzhacke"
+      },
+      "basic_logging_axe": {
+        "name": "Einfache Holzfälleraxt"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Einfache Kräutersichel"
+      },
       "the_codfather": {
         "name": "Der Kabeljaupate"
       },

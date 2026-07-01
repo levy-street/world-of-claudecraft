@@ -5126,6 +5126,15 @@ export const fr_FR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Cagoule d'ombre de Varric"
       },
+      "basic_mining_pick": {
+        "name": "Pioche de mineur basique"
+      },
+      "basic_logging_axe": {
+        "name": "Hache de bûcheron basique"
+      },
+      "basic_herbalists_sickle": {
+        "name": "Faucille d'herboriste basique"
+      },
       "the_codfather": {
         "name": "Capitaine brochet"
       },
