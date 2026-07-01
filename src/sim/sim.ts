@@ -43,7 +43,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
-import { isSpellResisted } from './combat/spell_resist';
+import { isEntitySpellResisted } from './combat/spell_resist';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
 // (AUGMENTS_BY_ID/AugmentDef/eligibleAugments/POWERUPS/PowerupDef/tierForWave)
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
@@ -3788,8 +3788,9 @@ export class Sim {
       school: spell.school,
       fx: 'projectile',
     });
-    // Pet spells are resisted, not missed (same semantics as player casts).
-    if (isSpellResisted(this.rng, pet.level, target.level)) {
+    // Mob/pet spells are resisted, not missed. Hostile wild mobs use the entity-aware
+    // helper so lower-level casters still threaten higher-level players and pets.
+    if (isEntitySpellResisted(this.rng, pet, target)) {
       this.emit({
         type: 'damage',
         sourceId: pet.id,

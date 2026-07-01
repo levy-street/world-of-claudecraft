@@ -6,15 +6,29 @@
 
 import { describe, expect, it } from 'vitest';
 import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle';
-import { isSpellResisted, spellResistChance } from '../src/sim/combat/spell_resist';
+import {
+  entitySpellHitChance,
+  isEntitySpellResisted,
+  isSpellResisted,
+  spellResistChance,
+} from '../src/sim/combat/spell_resist';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
-import { type Entity, type PlayerClass, spellHitChance } from '../src/sim/types';
+import {
+  MOB_VS_PLAYER_MAX_MISS,
+  type Entity,
+  type PlayerClass,
+  spellHitChance,
+} from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
+
+function entity(over: Partial<Entity>): Entity {
+  return { kind: 'mob', level: 1, hostile: true, ownerId: null, ...over } as unknown as Entity;
+}
 
 describe('spell_resist: pure leaf', () => {
   it('resist chance is the complement of spell-hit chance', () => {
@@ -39,6 +53,44 @@ describe('spell_resist: pure leaf', () => {
     expect(draws).toBe(1);
     expect(landed).toBe(false); // chance(hit)=true means NOT resisted
     expect(isSpellResisted({ chance: () => false }, 5, 5)).toBe(true);
+  });
+  it('caps hostile wild mob spell resists against higher-level players and pets', () => {
+    const mob = entity({ kind: 'mob', level: 1, hostile: true, ownerId: null });
+    const player = entity({ kind: 'player', level: 10, ownerId: null });
+    const pet = entity({ kind: 'mob', level: 10, ownerId: 99 });
+    const playerSideFloor = 1 - MOB_VS_PLAYER_MAX_MISS;
+
+    expect(spellHitChance(mob.level, player.level)).toBeLessThan(playerSideFloor);
+    expect(entitySpellHitChance(mob, player)).toBeCloseTo(playerSideFloor);
+    expect(entitySpellHitChance(mob, pet)).toBeCloseTo(playerSideFloor);
+  });
+
+  it('keeps the full spell penalty for player-owned pets attacking higher-level mobs', () => {
+    const pet = entity({ kind: 'mob', level: 1, hostile: false, ownerId: 99 });
+    const mob = entity({ kind: 'mob', level: 10, hostile: true, ownerId: null });
+
+    expect(entitySpellHitChance(pet, mob)).toBe(spellHitChance(pet.level, mob.level));
+    expect(entitySpellHitChance(pet, mob)).toBeLessThan(1 - MOB_VS_PLAYER_MAX_MISS);
+  });
+
+  it('isEntitySpellResisted draws from the entity-aware hit chance', () => {
+    const mob = entity({ kind: 'mob', level: 1, hostile: true, ownerId: null });
+    const player = entity({ kind: 'player', level: 10, ownerId: null });
+    let seen = 0;
+
+    expect(
+      isEntitySpellResisted(
+        {
+          chance: (p) => {
+            seen = p;
+            return true;
+          },
+        },
+        mob,
+        player,
+      ),
+    ).toBe(false);
+    expect(seen).toBeCloseTo(1 - MOB_VS_PLAYER_MAX_MISS);
   });
 });
 
@@ -109,5 +161,76 @@ describe('spell_resist: cast outcome labeling', () => {
     const dmg = events.filter((e) => e.type === 'damage' && e.targetId === mob.id);
     expect(dmg.some((e) => e.kind === 'miss')).toBe(true);
     expect(dmg.some((e) => e.kind === 'resist')).toBe(false);
+  });
+});
+
+describe('spell_resist: hostile mob spell floor', () => {
+  function rangedCaster(level: number, id: number): AnyEntity {
+    const mob = createMob(id, MOBS.forest_wolf, level, { x: 0, y: 0, z: 0 }) as AnyEntity;
+    mob.hostile = true;
+    mob.ownerId = null;
+    mob.swingTimer = 0;
+    return mob;
+  }
+
+  function ownedPet(level: number, ownerId: number, id: number): AnyEntity {
+    const pet = createMob(id, MOBS.forest_wolf, level, { x: 0, y: 0, z: 0 }) as AnyEntity;
+    pet.hostile = false;
+    pet.ownerId = ownerId;
+    pet.maxHp = 1000;
+    pet.hp = 1000;
+    return pet;
+  }
+
+  it('lets a low-level hostile caster mob land spells on a higher-level player', () => {
+    const { sim, p } = makeSim('mage', 20);
+    const caster = rangedCaster(1, 900700);
+    sim.addEntity(caster);
+    p.maxHp = 1000;
+    p.hp = 1000;
+    let seenHitChance = 0;
+    sim.rng.chance = (chance: number) => {
+      seenHitChance = chance;
+      return chance >= 1 - MOB_VS_PLAYER_MAX_MISS;
+    };
+    sim.rng.range = () => 12;
+
+    sim.ctx.updateRangedPetAttack(caster, p, {
+      name: 'Test Bolt',
+      school: 'shadow',
+      min: 8,
+      max: 10,
+      range: 30,
+      every: 2,
+    });
+
+    expect(seenHitChance).toBeCloseTo(1 - MOB_VS_PLAYER_MAX_MISS);
+    expect(p.hp).toBeLessThan(1000);
+  });
+
+  it('also lets low-level hostile caster mobs threaten player-owned pets', () => {
+    const { sim } = makeSim('hunter', 20);
+    const caster = rangedCaster(1, 900701);
+    const pet = ownedPet(20, sim.playerId, 900702);
+    sim.addEntity(caster);
+    sim.addEntity(pet);
+    let seenHitChance = 0;
+    sim.rng.chance = (chance: number) => {
+      seenHitChance = chance;
+      return chance >= 1 - MOB_VS_PLAYER_MAX_MISS;
+    };
+    sim.rng.range = () => 12;
+
+    sim.ctx.updateRangedPetAttack(caster, pet, {
+      name: 'Test Bolt',
+      school: 'shadow',
+      min: 8,
+      max: 10,
+      range: 30,
+      every: 2,
+    });
+
+    expect(seenHitChance).toBeCloseTo(1 - MOB_VS_PLAYER_MAX_MISS);
+    expect(pet.hp).toBeLessThan(1000);
   });
 });
