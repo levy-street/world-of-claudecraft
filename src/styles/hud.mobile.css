@@ -559,8 +559,14 @@
     flex-wrap: nowrap;
     gap: 4px;
     padding: 4px;
-    width: 100%;
-    max-width: 100%;
+    /* Compensate the action-bar zoom (actionBarScale) on this fixed-width mobile
+       band: divide the box back so the scroll strip keeps the band width and the
+       bar stays centered between the thumb clusters, mirroring the #ui ui-scale
+       rule in hud.css. Without this, >100% spills over the jump/attack controls
+       and <100% under-fills and left-aligns. Landscape inherits this (its rule
+       overrides only gap/padding/background, not width). */
+    width: calc(100% / var(--action-bar-scale, 1));
+    max-width: calc(100% / var(--action-bar-scale, 1));
     min-height: 50px;
     box-sizing: border-box;
     overflow-x: auto;
