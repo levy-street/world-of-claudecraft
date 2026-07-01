@@ -9,19 +9,57 @@ function fakeWorld(): IWorld {
   entities.set(1, { id: 1, kind: 'player', name: 'Hero', templateId: 'warrior' });
   entities.set(2, { id: 2, kind: 'player', name: 'Pal', templateId: 'priest' });
   entities.set(50, { id: 50, kind: 'mob', name: 'Wolf', maxHp: 60, dead: false, aggroTargetId: 1 });
-  entities.set(51, { id: 51, kind: 'mob', name: 'Gorrak', maxHp: 400, dead: false, aggroTargetId: 1 });
+  entities.set(51, {
+    id: 51,
+    kind: 'mob',
+    name: 'Gorrak',
+    maxHp: 400,
+    dead: false,
+    aggroTargetId: 1,
+  });
   return {
     entities,
     player: entities.get(1),
-    partyInfo: { leader: 1, raid: false, members: [{ pid: 2, name: 'Pal', cls: 'priest', group: 1 }] },
+    partyInfo: {
+      leader: 1,
+      raid: false,
+      members: [{ pid: 2, name: 'Pal', cls: 'priest', group: 1 }],
+    },
   } as unknown as IWorld;
 }
 
 const dmg = (sourceId: number, targetId: number, amount: number): SimEvent =>
-  ({ type: 'damage', sourceId, targetId, amount, crit: false, school: 'physical', ability: null, kind: 'hit' }) as SimEvent;
+  ({
+    type: 'damage',
+    sourceId,
+    targetId,
+    amount,
+    crit: false,
+    school: 'physical',
+    ability: null,
+    kind: 'hit',
+  }) as SimEvent;
 const heal = (sourceId: number, targetId: number, amount: number): SimEvent =>
   ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability: 'Heal' }) as SimEvent;
 
+const lootAward = (
+  itemId: string,
+  winnerPid: number | null,
+  mobId = 50,
+  returnedToCorpse = false,
+): SimEvent =>
+  ({
+    type: 'lootAwarded',
+    itemId,
+    itemName: itemId === 'greyjaw_hide_boots' ? 'Greyjaw Hide Boots' : itemId,
+    quality: 'uncommon',
+    winnerPid,
+    winnerName: winnerPid === null ? null : winnerPid === 1 ? 'Hero' : 'Pal',
+    method: returnedToCorpse ? 'pass' : 'need',
+    roll: returnedToCorpse ? null : 88,
+    mobId,
+    returnedToCorpse,
+  }) as SimEvent;
 describe('combat meters', () => {
   it('tallies party damage and healing into the current encounter and all-time', () => {
     const w = fakeWorld();
@@ -74,11 +112,54 @@ describe('combat meters', () => {
   it('can tally controlled pet damage when the HUD includes the pet in the party set', () => {
     const w = fakeWorld();
     const party = new Set([1, 2, 3]);
-    (w.entities as Map<number, any>).set(3, { id: 3, kind: 'mob', name: 'Wolf Pet', templateId: 'forest_wolf', ownerId: 1 });
+    (w.entities as Map<number, any>).set(3, {
+      id: 3,
+      kind: 'mob',
+      name: 'Wolf Pet',
+      templateId: 'forest_wolf',
+      ownerId: 1,
+    });
     const m = new MeterData(0);
     m.onEvent(dmg(3, 50, 18), w, party, 1000);
     expect(m.current).not.toBeNull();
     expect(m.current!.tallies.get(3)!.name).toBe('Wolf Pet');
     expect(m.current!.tallies.get(3)!.dmg).toBe(18);
+  });
+  it('records loot awards on the matching encounter and all-session history', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 50, 10), w, party, 1000);
+    (w.entities.get(50) as any).aggroTargetId = null;
+    (w.entities.get(51) as any).aggroTargetId = null;
+    m.update(w, party, 10_001);
+
+    m.onEvent(lootAward('greyjaw_hide_boots', 2, 50), w, party, 11_000);
+
+    expect(m.current).toBeNull();
+    expect(m.history[0].loot).toHaveLength(1);
+    expect(m.history[0].loot[0]).toMatchObject({
+      itemId: 'greyjaw_hide_boots',
+      winnerPid: 2,
+      method: 'need',
+      roll: 88,
+      returnedToCorpse: false,
+    });
+    expect(m.allTime.loot[0].itemId).toBe('greyjaw_hide_boots');
+  });
+
+  it('keeps everyone-passed loot returns visible even without a combat tally', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+
+    m.onEvent(lootAward('greyjaw_hide_boots', null, 999, true), w, party, 1000);
+
+    expect(m.current).not.toBeNull();
+    expect(m.current!.loot[0]).toMatchObject({
+      winnerPid: null,
+      method: 'pass',
+      returnedToCorpse: true,
+    });
   });
 });

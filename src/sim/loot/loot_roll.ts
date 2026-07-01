@@ -34,6 +34,7 @@ import type {
   ItemDef,
   ItemLootStrategy,
   LootEntry,
+  LootAwardMethod,
   LootRollChoice,
   LootRollPrompt,
   LootSlot,
@@ -110,6 +111,49 @@ function partyMembersForRoll(roll: PendingLootRoll): number[] {
   return roll.partyMembers.length > 0 ? roll.partyMembers : roll.candidates;
 }
 
+function emitLootAwarded(
+  ctx: SimContext,
+  roll: Pick<PendingLootRoll, 'itemId' | 'itemName' | 'quality' | 'mobId'>,
+  method: LootAwardMethod,
+  winnerPid: number | null,
+  rollValue: number | null,
+  returnedToCorpse = false,
+): void {
+  const winner = winnerPid !== null ? ctx.players.get(winnerPid) : null;
+  ctx.emit({
+    type: 'lootAwarded',
+    itemId: roll.itemId,
+    itemName: roll.itemName,
+    quality: roll.quality,
+    winnerPid,
+    winnerName: winner?.name ?? null,
+    method,
+    roll: rollValue,
+    mobId: roll.mobId,
+    returnedToCorpse,
+  });
+}
+
+function emitDirectLootAwarded(
+  ctx: SimContext,
+  itemId: string,
+  mob: Entity,
+  winner: PlayerMeta,
+): void {
+  const def = ITEMS[itemId];
+  emitLootAwarded(
+    ctx,
+    {
+      itemId,
+      itemName: def?.name ?? itemId,
+      quality: def?.quality,
+      mobId: mob.id,
+    },
+    'ffa',
+    winner.entityId,
+    null,
+  );
+}
 function effectiveCurrencyLootStrategy(ctx: SimContext, mob: Entity): CurrencyLootStrategy {
   return partyLootStrategiesForMob(ctx, mob)?.currency ?? 'looter-takes-all';
 }
@@ -271,7 +315,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
 // apply: disabled, below threshold, a solo looter, or no resolvable looter.
 function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
   const strategies = partyLootStrategiesForMob(ctx, mob);
-  if (!strategies || !strategies.master.enabled) return false;
+  if (!strategies?.master.enabled) return false;
   const def = ITEMS[itemId];
   if (!meetsMasterThreshold(def?.quality, strategies.master.threshold)) return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);
@@ -316,7 +360,10 @@ export function awardSharedLootItem(
   looter: PlayerMeta,
 ): void {
   if (startMasterLootRoll(ctx, itemId, mob)) return;
-  if (!startNeedGreedRoll(ctx, itemId, mob)) ctx.addItem(itemId, 1, looter.entityId);
+  if (!startNeedGreedRoll(ctx, itemId, mob)) {
+    ctx.addItem(itemId, 1, looter.entityId);
+    emitDirectLootAwarded(ctx, itemId, mob, looter);
+  }
 }
 
 // Open need-greed rolls the given player may still answer. Mirrors the
@@ -396,6 +443,7 @@ export function assignMasterLoot(
         pid,
       });
     ctx.addItem(roll.itemId, 1, targets[0]);
+    emitLootAwarded(ctx, roll, 'master', targets[0], null);
     return;
   }
   convertMasterRollToNeedGreed(ctx, roll, targets);
@@ -489,6 +537,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     returnLootRollItemToCorpse(ctx, roll);
     for (const pid of partyMembersForRoll(roll))
       ctx.emit({ type: 'loot', text: `Everyone passed on [[i:${roll.itemId}]].`, pid });
+    emitLootAwarded(ctx, roll, 'pass', null, null, true);
     return;
   }
   const highestRoll = Math.max(...contenders.map((contender) => contender.result.roll ?? 0));
@@ -505,6 +554,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     });
   }
   ctx.addItem(roll.itemId, 1, winner.pid);
+  emitLootAwarded(ctx, roll, winner.result.choice, winner.pid, winner.result.roll ?? null);
 }
 
 function returnLootRollItemToCorpse(ctx: SimContext, roll: PendingLootRoll): void {

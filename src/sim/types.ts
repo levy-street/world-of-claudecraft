@@ -1524,6 +1524,8 @@ export type ErrorReason = 'target_dead';
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
+export type LootAwardMethod = 'need' | 'greed' | 'master' | 'ffa' | 'personal' | 'pass';
+
 export type SimEvent = { pid?: number } & (
   | {
       type: 'damage';
@@ -1545,6 +1547,18 @@ export type SimEvent = { pid?: number } & (
   | { type: 'milestoneUnlocked'; milestoneId: string }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
+  | {
+      type: 'lootAwarded';
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+      winnerPid: number | null;
+      winnerName: string | null;
+      method: LootAwardMethod;
+      roll: number | null;
+      mobId: number | null;
+      returnedToCorpse?: boolean;
+    }
   | {
       type: 'lootRoll';
       rollId: number;

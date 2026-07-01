@@ -135,6 +135,15 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     expect(sim.countItem('greyjaw_hide_boots', a)).toBe(1);
     expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
     expect(sim.countItem('greyjaw_hide_boots', c)).toBe(0);
+    const award = sim.events.find((e) => e.type === 'lootAwarded');
+    expect(award).toMatchObject({
+      type: 'lootAwarded',
+      itemId: 'greyjaw_hide_boots',
+      winnerPid: a,
+      method: 'need',
+      mobId: mob.id,
+    });
+    expect((award as Extract<SimEvent, { type: 'lootAwarded' }>).roll).toBeGreaterThan(0);
   });
 
   it('ties between two needers break by the higher d100 roll, deterministically per seed', () => {
@@ -198,6 +207,15 @@ describe('loot_roll: need-greed resolution (module entry)', () => {
     expect([a, b, c].every((pid) => sim.countItem('greyjaw_hide_boots', pid) === 0)).toBe(true);
     const returned = mob.loot?.items.find((s) => s.itemId === 'greyjaw_hide_boots');
     expect(returned?.openToAll).toBe(true);
+    const award = sim.events.find((e) => e.type === 'lootAwarded');
+    expect(award).toMatchObject({
+      type: 'lootAwarded',
+      itemId: 'greyjaw_hide_boots',
+      winnerPid: null,
+      method: 'pass',
+      mobId: mob.id,
+      returnedToCorpse: true,
+    });
     // The roll is closed and no longer offered to anyone.
     expect(activeLootRolls(sim.ctx, a)).toHaveLength(0);
   });
@@ -247,6 +265,26 @@ describe('loot_roll: fair-split copper (module entry)', () => {
     distributeLootCopper(sim.ctx, mob, meta);
     expect(meta.copper - before).toBe(50);
     expect(mob.loot?.copper).toBe(0);
+  });
+
+  it('emits a structured FFA award for looter-takes-all item grants', () => {
+    const sim = makeSim(7);
+    const a = sim.addPlayer('warrior', 'Solo');
+    const mob = deadCorpse(sim, a, [a], {
+      copper: 0,
+      items: [{ itemId: 'worn_sword', count: 1 }],
+    });
+
+    awardSharedLootItem(sim.ctx, 'worn_sword', mob, playerMeta(sim, a));
+
+    expect(sim.events.find((e) => e.type === 'lootAwarded')).toMatchObject({
+      type: 'lootAwarded',
+      itemId: 'worn_sword',
+      winnerPid: a,
+      method: 'ffa',
+      roll: null,
+      mobId: mob.id,
+    });
   });
 });
 

@@ -39,6 +39,27 @@ import {
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, OBJECT_RESPAWN } from './types';
 
+function emitCorpsePickupAward(
+  ctx: SimContext,
+  itemId: string,
+  mob: Entity,
+  pid: number,
+  method: 'ffa' | 'personal',
+): void {
+  const def = ITEMS[itemId];
+  const winner = ctx.players.get(pid);
+  ctx.emit({
+    type: 'lootAwarded',
+    itemId,
+    itemName: def?.name ?? itemId,
+    quality: def?.quality,
+    winnerPid: pid,
+    winnerName: winner?.name ?? null,
+    method,
+    roll: null,
+    mobId: mob.id,
+  });
+}
 export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -68,12 +89,16 @@ export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
   for (const s of [...mob.loot.items]) {
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
-      for (let i = 0; i < s.count; i++) ctx.addItem(s.itemId, 1, meta.entityId);
+      for (let i = 0; i < s.count; i++) {
+        ctx.addItem(s.itemId, 1, meta.entityId);
+        emitCorpsePickupAward(ctx, s.itemId, mob, meta.entityId, 'ffa');
+      }
       s.count = 0;
       continue;
     }
     if (s.personalFor) {
       ctx.addItem(s.itemId, 1, meta.entityId);
+      emitCorpsePickupAward(ctx, s.itemId, mob, meta.entityId, 'personal');
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       continue;
     }

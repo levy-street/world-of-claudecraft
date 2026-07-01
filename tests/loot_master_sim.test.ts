@@ -70,6 +70,14 @@ describe('master loot', () => {
     expect(sim.countItem(PREMIUM, b)).toBe(1);
     expect(sim.countItem(PREMIUM, a)).toBe(0);
     expect(sim.events.some((e) => e.type === 'loot' && e.text.includes('assigned'))).toBe(true);
+    expect(sim.events.find((e) => e.type === 'lootAwarded')).toMatchObject({
+      type: 'lootAwarded',
+      itemId: PREMIUM,
+      winnerPid: b,
+      method: 'master',
+      roll: null,
+      mobId: mob.id,
+    });
     expect(sim.events.filter((e) => e.type === 'lootRoll')).toHaveLength(0); // 1 target skips the roll
   });
 
