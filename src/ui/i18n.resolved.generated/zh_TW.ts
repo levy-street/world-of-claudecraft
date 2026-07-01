@@ -343,7 +343,9 @@ export const zh_TW: EnTranslations = {
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
-      "showSecondaryActionBar": "顯示副動作列"
+      "showSecondaryActionBar": "顯示副動作列",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "手把",

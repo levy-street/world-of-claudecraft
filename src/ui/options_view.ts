@@ -358,6 +358,8 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
     slider(s, 'chatOpacity', 'hud.options.chatOpacity'),
     boolToggle(s, 'compactChat', 'hud.options.compactChat'),
+    boolToggle(s, 'hideJoinLeaveSystemMessages', 'hudChrome.options.hideJoinLeaveSystemMessages'),
+    boolToggle(s, 'hideDuelArenaSystemMessages', 'hudChrome.options.hideDuelArenaSystemMessages'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
     boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
     boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),

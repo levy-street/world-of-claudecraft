@@ -343,7 +343,9 @@ export const en_XA: EnTranslations = {
       "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
-      "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]"
+      "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
+      "hideJoinLeaveSystemMessages": "[Ĥíðé Ĵóíñ/Ļéáʋé Ɱéššáĝéš]",
+      "hideDuelArenaSystemMessages": "[Ĥíðé Ðúéļ/Áŕéñá Íñƒó]"
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",

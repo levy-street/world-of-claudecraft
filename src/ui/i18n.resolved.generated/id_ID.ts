@@ -343,7 +343,9 @@ export const id_ID: EnTranslations = {
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
-      "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder"
+      "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Kontroler",

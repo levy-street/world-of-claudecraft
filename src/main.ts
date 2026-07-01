@@ -1369,6 +1369,14 @@ async function startGame(
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
       return;
     }
+    if (key === 'hideJoinLeaveSystemMessages') {
+      settings.set('hideJoinLeaveSystemMessages', !!value);
+      return;
+    }
+    if (key === 'hideDuelArenaSystemMessages') {
+      settings.set('hideDuelArenaSystemMessages', !!value);
+      return;
+    }
     if (key === 'showSecondaryActionBar') {
       document.body.classList.toggle(
         'show-actionbar2',

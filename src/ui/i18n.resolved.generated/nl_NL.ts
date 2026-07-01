@@ -343,7 +343,9 @@ export const nl_NL: EnTranslations = {
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
-      "showSecondaryActionBar": "Secundaire actiebalk tonen"
+      "showSecondaryActionBar": "Secundaire actiebalk tonen",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Controller",

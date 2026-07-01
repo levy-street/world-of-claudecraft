@@ -343,7 +343,9 @@ export const vi_VN: EnTranslations = {
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
-      "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ"
+      "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Tay Cầm",

@@ -343,7 +343,9 @@ export const ko_KR: EnTranslations = {
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
-      "showSecondaryActionBar": "보조 액션 바 표시"
+      "showSecondaryActionBar": "보조 액션 바 표시",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "컨트롤러",

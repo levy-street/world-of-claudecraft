@@ -161,6 +161,12 @@ export const BOOL_SETTINGS = {
   // off by default: shrink the chat frame to a compact height so it covers
   // less of the lower-left world view.
   compactChat: { def: false },
+  // off by default: hide low-priority player world presence lines from the
+  // local chat log while leaving errors, whispers, invites, and combat intact.
+  hideJoinLeaveSystemMessages: { def: false },
+  // off by default: hide informational duel/arena chatter from the local chat
+  // log. Prompts, banners, and combat-relevant outcomes still surface elsewhere.
+  hideDuelArenaSystemMessages: { def: false },
   // off by default: show a small frames-per-second readout in the corner for
   // players tuning their graphics settings.
   showFps: { def: false },

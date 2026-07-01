@@ -134,6 +134,11 @@ import {
   parseChatTabs,
   serializeChatTabs,
 } from './chat_channels';
+import {
+  classifyLowPrioritySystemChatMessage,
+  shouldShowSystemChatMessage,
+  type SystemChatFilterCategory,
+} from './chat_system_filters';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './chat_timestamp';
 import { type ChatBoxGeometry, clampChatBox, parseChatBox, serializeChatBox } from './chat_window';
 import { formatClockTime } from './clock';
@@ -6452,10 +6457,11 @@ export class Hud {
               position: formatNumber(ev.position, { maximumFractionDigits: 0 }),
             }),
             '#ffa040',
+            'duelArena',
           );
           break;
         case 'arenaUnqueued':
-          this.log(t('hud.system.arenaUnqueued'), '#ffa040');
+          this.log(t('hud.system.arenaUnqueued'), '#ffa040', 'duelArena');
           break;
         case 'arenaFound': {
           const name =
@@ -6469,6 +6475,7 @@ export class Hud {
               className: cls,
             }),
             '#ffa040',
+            'duelArena',
           );
           audio.duelChallenge();
           break;
@@ -6657,8 +6664,9 @@ export class Hud {
           break;
         }
         case 'log': {
+          const category = classifyLowPrioritySystemChatMessage(ev.text);
           const text = this.localizeSystemText(ev.text);
-          this.log(text, ev.color ?? '#ccc');
+          this.log(text, ev.color ?? '#ccc', category);
           const isNythraxisVisionLine = [
             'My king was a good man.',
             'I swore my blade to him.',
@@ -6712,8 +6720,25 @@ export class Hud {
     }
   }
 
-  log(text: string, color = '#ccc'): void {
+  log(text: string, color = '#ccc', category: SystemChatFilterCategory | null = null): void {
+    if (!this.shouldShowSystemLog(text, category)) return;
     this.appendLog(this.chatLogEl, text, color, true, 'system');
+  }
+
+  private shouldShowSystemLog(
+    text: string,
+    category: SystemChatFilterCategory | null = null,
+  ): boolean {
+    return shouldShowSystemChatMessage(
+      text,
+      {
+        hideJoinLeaveSystemMessages:
+          this.optionsHooks?.settings.get('hideJoinLeaveSystemMessages') ?? false,
+        hideDuelArenaSystemMessages:
+          this.optionsHooks?.settings.get('hideDuelArenaSystemMessages') ?? false,
+      },
+      category,
+    );
   }
 
   // Prepend a dim bracketed wall-clock prefix to a chat line when the "Show

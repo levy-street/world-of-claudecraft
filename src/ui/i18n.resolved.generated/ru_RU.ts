@@ -343,7 +343,9 @@ export const ru_RU: EnTranslations = {
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
-      "showSecondaryActionBar": "Показывать вторичную панель действий"
+      "showSecondaryActionBar": "Показывать вторичную панель действий",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Геймпад",

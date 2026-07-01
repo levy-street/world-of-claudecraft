@@ -343,7 +343,9 @@ export const da_DK: EnTranslations = {
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
-      "showSecondaryActionBar": "Vis sekundær handlingslinje"
+      "showSecondaryActionBar": "Vis sekundær handlingslinje",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Controller",

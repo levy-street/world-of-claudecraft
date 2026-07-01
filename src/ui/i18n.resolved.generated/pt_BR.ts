@@ -343,7 +343,9 @@ export const pt_BR: EnTranslations = {
       "showItemLevel": "Mostrar nível do item",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
-      "showSecondaryActionBar": "Mostrar Barra de Ação Secundária"
+      "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Controle",

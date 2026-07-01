@@ -9,24 +9,81 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "es_ES": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "fr_FR": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "fr_CA": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "de_DE": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "zh_CN": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "zh_TW": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "ko_KR": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "ja_JP": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "pt_BR": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "ru_RU": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "nl_NL": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "pl_PL": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "id_ID": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "tr_TR": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "sv_SE": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "vi_VN": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ],
+  "da_DK": [
+    "hudChrome.options.hideDuelArenaSystemMessages",
+    "hudChrome.options.hideJoinLeaveSystemMessages"
+  ]
 };

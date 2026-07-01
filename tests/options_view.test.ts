@@ -235,6 +235,8 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'chatFontScale',
       'chatOpacity',
       'compactChat',
+      'hideJoinLeaveSystemMessages',
+      'hideDuelArenaSystemMessages',
       'frostedPanels',
       'highContrastText',
       'reduceMotion',

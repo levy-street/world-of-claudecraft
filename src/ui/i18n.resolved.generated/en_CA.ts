@@ -343,7 +343,9 @@ export const en_CA: EnTranslations = {
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
-      "showSecondaryActionBar": "Show Secondary Action Bar"
+      "showSecondaryActionBar": "Show Secondary Action Bar",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Controller",

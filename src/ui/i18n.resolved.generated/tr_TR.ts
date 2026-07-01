@@ -343,7 +343,9 @@ export const tr_TR: EnTranslations = {
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
-      "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster"
+      "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Oyun Kolu",

@@ -343,7 +343,9 @@ export const sv_SE: EnTranslations = {
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
-      "showSecondaryActionBar": "Visa sekundärt handlingsfält"
+      "showSecondaryActionBar": "Visa sekundärt handlingsfält",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Handkontroll",

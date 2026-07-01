@@ -343,7 +343,9 @@ export const fr_FR: EnTranslations = {
       "showItemLevel": "Afficher le niveau d'objet",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
-      "showSecondaryActionBar": "Afficher la barre d'action secondaire"
+      "showSecondaryActionBar": "Afficher la barre d'action secondaire",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "Manette",

@@ -343,7 +343,9 @@ export const ja_JP: EnTranslations = {
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
-      "showSecondaryActionBar": "セカンダリアクションバーを表示"
+      "showSecondaryActionBar": "セカンダリアクションバーを表示",
+      "hideJoinLeaveSystemMessages": "Hide Join/Leave Messages",
+      "hideDuelArenaSystemMessages": "Hide Duel/Arena Info"
     },
     "controller": {
       "title": "コントローラー",

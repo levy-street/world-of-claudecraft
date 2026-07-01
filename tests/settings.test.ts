@@ -229,6 +229,8 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('highContrastText')).toBe(false);
     expect(s.get('frostedPanels')).toBe(false);
     expect(s.get('compactChat')).toBe(false);
+    expect(s.get('hideJoinLeaveSystemMessages')).toBe(false);
+    expect(s.get('hideDuelArenaSystemMessages')).toBe(false);
     expect(s.get('showFps')).toBe(false);
     expect(s.get('showWalletOnCharacterScreen')).toBe(true);
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
@@ -252,12 +254,16 @@ describe('Interface & Comfort settings pack', () => {
     s.set('showFps', true);
     s.set('invertLookY', true);
     s.set('frostedPanels', true);
+    s.set('hideJoinLeaveSystemMessages', true);
+    s.set('hideDuelArenaSystemMessages', true);
     s.set('showWalletOnCharacterScreen', false);
     s.set('showWalletOnPlayerCard', false);
     s.set('showDevBadges', false);
     // a fresh instance reads the same backing store
     expect(new Settings().get('reduceMotion')).toBe(true);
     expect(new Settings().get('showFps')).toBe(true);
+    expect(new Settings().get('hideJoinLeaveSystemMessages')).toBe(true);
+    expect(new Settings().get('hideDuelArenaSystemMessages')).toBe(true);
     expect(new Settings().get('showWalletOnCharacterScreen')).toBe(false);
     expect(new Settings().get('showWalletOnPlayerCard')).toBe(false);
     expect(new Settings().get('showDevBadges')).toBe(false);
