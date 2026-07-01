@@ -534,6 +534,49 @@ describe('MobileControls pointer lifecycle', () => {
     expect(lastMove).toBeNull();
   });
 
+  it('uses the actual touch start as the move origin when the visual joystick is clamped', () => {
+    const { moveZone, windowTarget } = installMobileControlDom();
+    const moves: TouchMoveInput[] = [];
+    const input = {
+      setTouchMove: (move: TouchMoveInput) => {
+        moves.push(move);
+      },
+      clearTouchMove: () => {
+        moves.push({ forward: false, back: false, strafeLeft: false, strafeRight: false });
+      },
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+    } as unknown as Input;
+
+    new MobileControls(input, mobileCallbacks()).start();
+
+    moveZone.dispatchEvent(pointerEvent('pointerdown', { pointerId: 8, clientX: 5, clientY: 235 }));
+    windowTarget.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 8, clientX: 5, clientY: 235 }),
+    );
+    windowTarget.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 8, clientX: 105, clientY: 235 }),
+    );
+
+    expect(moves[0]).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+    expect(moves[1]).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: false,
+    });
+    expect(moves[2]).toEqual({
+      forward: false,
+      back: false,
+      strafeLeft: false,
+      strafeRight: true,
+    });
+  });
   it('keeps updating camera look when the active pointer moves outside the joystick element', () => {
     const { cameraJoystick, windowTarget } = installMobileControlDom();
     let touchLookActive = false;

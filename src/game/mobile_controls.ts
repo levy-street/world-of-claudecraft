@@ -233,8 +233,8 @@ export class MobileControls {
   private cameraDownY = 0;
   private cameraMoved = false;
 
-  private moveOriginX = 0;
-  private moveOriginY = 0;
+  private moveInputOriginX = 0;
+  private moveInputOriginY = 0;
   private moveRadius = 1;
 
   // two-finger pinch-to-zoom on the game view (phones have no scroll wheel)
@@ -571,8 +571,8 @@ export class MobileControls {
     const radius = Math.max(1, this.moveJoystick.offsetWidth / 2 || 61);
     const zone = (this.moveZone ?? this.moveJoystick).getBoundingClientRect();
     const origin = clampJoystickOrigin(e.clientX, e.clientY, radius, zone);
-    this.moveOriginX = origin.x;
-    this.moveOriginY = origin.y;
+    this.moveInputOriginX = e.clientX;
+    this.moveInputOriginY = e.clientY;
     this.moveRadius = radius;
     this.moveJoystick.style.left = `${(origin.x - radius).toFixed(1)}px`;
     this.moveJoystick.style.top = `${(origin.y - radius).toFixed(1)}px`;
@@ -589,8 +589,8 @@ export class MobileControls {
     if (!this.active || e.pointerId !== this.joyPointer || !this.moveStick) return;
     e.preventDefault();
     const radius = this.moveRadius;
-    const rawX = (e.clientX - this.moveOriginX) / radius;
-    const rawY = (e.clientY - this.moveOriginY) / radius;
+    const rawX = (e.clientX - this.moveInputOriginX) / radius;
+    const rawY = (e.clientY - this.moveInputOriginY) / radius;
     const mag = Math.max(1, Math.hypot(rawX, rawY));
     const x = rawX / mag;
     const y = rawY / mag;
