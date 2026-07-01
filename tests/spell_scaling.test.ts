@@ -3,10 +3,12 @@ import {
   abilityScalingPower,
   channelSpellCoeff,
   channelTickBonus,
+  directHealBonus,
   directHitBonus,
   directSpellCoeff,
   dotTickBonus,
   dotTotalCoeff,
+  hotTickBonus,
 } from '../src/sim/spell_scaling';
 import type { AbilityDef } from '../src/sim/types';
 import {
@@ -115,6 +117,36 @@ describe('dotTickBonus', () => {
     expect(dotTickBonus(rap, d, 15, 3)).toBe(
       Math.round((rap * (15 / 15) * RANGED_SPELL_AP_SCALE) / 5),
     );
+  });
+});
+
+describe('directHealBonus', () => {
+  it('scales heals off Spell Power at the direct coeff, instants use the 1.5 floor', () => {
+    const sp = 200;
+    expect(directHealBonus(sp, 0)).toBe(
+      Math.round(sp * (SPELL_COEFF_MIN_CAST / SPELL_COEFF_DIVISOR)),
+    );
+    expect(directHealBonus(sp, 3.0)).toBe(Math.round(sp * (3.0 / 3.5)));
+    expect(directHealBonus(sp, 3.5)).toBe(sp); // a 3.5s+ heal takes the full Spell Power
+  });
+
+  it('never takes an AP scale-down (heals are pure Spell Power)', () => {
+    // Same Spell Power and cast time as a full-coeff nuke: heal takes the full 1.0.
+    const sp = 300;
+    expect(directHealBonus(sp, 3.5)).toBe(directHitBonus(sp, def({ school: 'holy' }), 3.5));
+  });
+});
+
+describe('hotTickBonus', () => {
+  it('splits the total DoT coefficient across HoT ticks off Spell Power', () => {
+    const sp = 150;
+    // duration 12, interval 3 -> 4 ticks, total coeff 12/15
+    expect(hotTickBonus(sp, 12, 3)).toBe(Math.round((sp * (12 / 15)) / 4));
+  });
+
+  it('matches dotTickBonus for a pure (holy/nature) spell but without any AP path', () => {
+    const sp = 210;
+    expect(hotTickBonus(sp, 15, 3)).toBe(dotTickBonus(sp, def({ school: 'nature' }), 15, 3));
   });
 });
 

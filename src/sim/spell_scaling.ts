@@ -81,6 +81,24 @@ export function directHitBonus(
   return Math.round(power * coeff * powerScale(def));
 }
 
+// Flat bonus added to ONE direct heal. Healing always scales off Spell Power at
+// the full cast-time coefficient with no AP scale-down (heals are never "attack
+// spells"): instants use the 1.5 floor, like a direct nuke. `castTimeSec` is the
+// rank-resolved cast time (res.castTime), so higher ranks and talent-hastened
+// heals scale correctly.
+export function directHealBonus(spellPower: number, castTimeSec: number): number {
+  return Math.round(spellPower * directSpellCoeff(castTimeSec));
+}
+
+// Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)
+// split across its ticks, scaling off Spell Power. Mirrors dotTickBonus but never
+// takes the AP scale-down, since HoTs are pure healing.
+export function hotTickBonus(spellPower: number, durationSec: number, intervalSec: number): number {
+  const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
+  const coeff = dotTotalCoeff(durationSec) / ticks;
+  return Math.round(spellPower * coeff);
+}
+
 // Flat bonus added to ONE channel tick (e.g. each Arcane Missile / Mind Flay tick).
 export function channelTickBonus(power: number, def: AbilityDef): number {
   const ch = def.channel;
