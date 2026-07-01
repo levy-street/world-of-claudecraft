@@ -73,6 +73,33 @@ describe('loot lifecycle broadcasts', () => {
     );
     expect(wins.map((e) => (e as { pid?: number }).pid).sort()).toEqual([a, b, c].sort());
   });
+
+  it('broadcasts to the rolls own party even if a candidate re-groups mid-roll', () => {
+    const sim = makeSim();
+    const { a, b, c, mob } = partyOfThree(sim, PREMIUM);
+    sim.lootCorpse(mob.id, a); // opens the need/greed roll, snapshotting party [a,b,c]
+    const roll = [
+      ...(
+        sim as unknown as { pendingLootRolls: Map<number, { id: number; candidates: number[] }> }
+      ).pendingLootRolls.values(),
+    ][0];
+    // The first candidate leaves and joins a DIFFERENT party while the roll is open.
+    const d = sim.addPlayer('rogue', 'Dane');
+    sim.partyLeave(a);
+    sim.partyInvite(a, d);
+    sim.partyAccept(a);
+    sim.events.length = 0;
+    for (const pid of roll.candidates) sim.submitLootRoll(roll.id, 'pass', pid);
+    const passed = sim.events.filter(
+      (e) =>
+        e.type === 'loot' &&
+        /^Everyone passed on \[\[i:.+\]\]\.$/.test((e as { text: string }).text),
+    );
+    const pids = passed.map((e) => (e as { pid?: number }).pid).sort();
+    // The outcome reaches the party that opened the roll, never Dane's unrelated party.
+    expect(pids).toEqual([a, b, c].sort());
+    expect(pids).not.toContain(d);
+  });
 });
 
 describe('loot settings announcements', () => {

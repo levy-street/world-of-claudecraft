@@ -64,6 +64,10 @@ export interface PendingLootRoll {
   itemName: string;
   quality: ItemDef['quality'];
   candidates: number[];
+  // Full party/raid membership snapshot captured when the roll opened. Whole-group
+  // loot broadcasts target this, NOT the live party of a candidate: a snapshot stays
+  // anchored to the roll's own party even if a member re-groups during the window.
+  partyMembers: number[];
   choices: Map<number, { choice: LootRollChoice; roll: number | null }>;
   expiresAt: number;
   // When set, this is a master-loot assignment (not a need/greed vote): only the
@@ -99,11 +103,11 @@ export function partyLootCandidatesForMob(ctx: SimContext, mob: Entity): PlayerM
 }
 
 // The full party/raid membership behind a roll (for whole-group broadcasts), vs
-// partyLootCandidatesForMob which is only the in-range, loot-eligible subset.
-function partyMembersForRoll(ctx: SimContext, roll: PendingLootRoll): number[] {
-  const anchor = roll.candidates[0];
-  const party = anchor !== undefined ? ctx.partyOf(anchor) : null;
-  return party ? [...party.members] : roll.candidates;
+// partyLootCandidatesForMob which is only the in-range, loot-eligible subset. Read
+// from the creation-time snapshot; falls back to the candidate set for any roll that
+// predates the snapshot (defensive, since partyMembers is set at every creation site).
+function partyMembersForRoll(roll: PendingLootRoll): number[] {
+  return roll.partyMembers.length > 0 ? roll.partyMembers : roll.candidates;
 }
 
 function effectiveCurrencyLootStrategy(ctx: SimContext, mob: Entity): CurrencyLootStrategy {
@@ -230,6 +234,8 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
   if (candidates.length <= 1) return false;
   const def = ITEMS[itemId];
   const itemName = def?.name ?? itemId;
+  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  const partyMembers = party ? [...party.members] : candidates.map((cand) => cand.entityId);
   const roll: PendingLootRoll = {
     id: ctx.nextLootRollId++,
     mobId: mob.id,
@@ -237,6 +243,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
     itemName,
     quality: def?.quality,
     candidates: candidates.map((candidate) => candidate.entityId),
+    partyMembers,
     choices: new Map(),
     expiresAt: ctx.time + LOOT_ROLL_TIMEOUT,
   };
@@ -253,8 +260,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
       pid: candidate.entityId,
     });
   }
-  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
-  for (const pid of party ? party.members : candidates.map((cand) => cand.entityId))
+  for (const pid of partyMembers)
     ctx.emit({ type: 'loot', text: `Rolling for [[i:${itemId}]].`, pid });
   return true;
 }
@@ -282,6 +288,7 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
     itemName,
     quality: def?.quality,
     candidates: candidates.map((candidate) => candidate.entityId),
+    partyMembers: [...party.members],
     choices: new Map(),
     expiresAt: ctx.time + MASTER_LOOT_TIMEOUT,
     masterLooter: looterPid,
@@ -382,7 +389,7 @@ export function assignMasterLoot(
   if (targets.length === 1) {
     if (!ctx.pendingLootRolls.delete(roll.id)) return;
     const targetName = ctx.players.get(targets[0])?.name ?? 'Unknown';
-    for (const pid of partyMembersForRoll(ctx, roll))
+    for (const pid of partyMembersForRoll(roll))
       ctx.emit({
         type: 'loot',
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
@@ -480,7 +487,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     needers.length > 0 ? needers : entries.filter((entry) => entry.result.choice === 'greed');
   if (contenders.length === 0) {
     returnLootRollItemToCorpse(ctx, roll);
-    for (const pid of partyMembersForRoll(ctx, roll))
+    for (const pid of partyMembersForRoll(roll))
       ctx.emit({ type: 'loot', text: `Everyone passed on [[i:${roll.itemId}]].`, pid });
     return;
   }
@@ -490,7 +497,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
     tiedWinners.length === 1 ? tiedWinners[0] : tiedWinners[ctx.rng.int(0, tiedWinners.length - 1)];
   const winnerMeta = ctx.players.get(winner.pid);
   const winnerName = winnerMeta?.name ?? 'Unknown';
-  for (const pid of partyMembersForRoll(ctx, roll)) {
+  for (const pid of partyMembersForRoll(roll)) {
     ctx.emit({
       type: 'loot',
       text: `${winnerName} wins [[i:${roll.itemId}]] (${winner.result.roll ?? 0})`,
