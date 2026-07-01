@@ -31,13 +31,13 @@ import {
 import { formatMoney } from '../format_money';
 import { MARKET_MAX_LISTINGS } from '../market';
 import * as petCommands from '../pet/pet_commands';
+import { FIVE_SECOND_RULE_THRESHOLD } from '../regen';
 import { FALL_SAFE_DISTANCE, type PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { threatEntries } from '../threat';
 import {
   type ArenaFormat,
   type Aura,
-  type AuraKind,
   dist2d,
   type Entity,
   type EquipSlot,
@@ -303,14 +303,13 @@ export function formReadout(e: Entity): string {
 // out-of-combat mana regen only ticks once it reaches FSR_THRESHOLD. Only
 // mana users have meaningful state here — rage/energy classes never spend mana.
 export function manaRegenReadout(e: Entity): string {
-  const FSR_THRESHOLD = 5; // matches the `fiveSecondRule >= 5` gate in updateRegen
   if (e.resourceType !== 'mana') {
     return 'Mana regeneration does not apply to your class.';
   }
-  if (e.fiveSecondRule >= FSR_THRESHOLD) {
+  if (e.fiveSecondRule >= FIVE_SECOND_RULE_THRESHOLD) {
     return 'Your mana is regenerating (out of combat for 5s+).';
   }
-  const resumesIn = Math.ceil(FSR_THRESHOLD - e.fiveSecondRule);
+  const resumesIn = Math.ceil(FIVE_SECOND_RULE_THRESHOLD - e.fiveSecondRule);
   return `Mana regen is paused — resumes in ${resumesIn}s (you spent mana recently).`;
 }
 // Self-only readout of vertical/fall state — surfaces the otherwise-invisible

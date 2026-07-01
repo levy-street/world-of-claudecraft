@@ -1,21 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, armorReduction, type PlayerClass } from '../src/sim/types';
 import { CLASSES } from '../src/sim/content/classes';
 import { ITEMS } from '../src/sim/data';
+import { restingHealthPer5s, restingManaPer5s } from '../src/sim/regen';
+import { Sim } from '../src/sim/sim';
+import { ALL_CLASSES, armorReduction, type PlayerClass } from '../src/sim/types';
 import {
+  agiMeleeApPerPoint,
   buildStatTooltip,
   healthFromStamina,
-  manaFromIntellect,
-  restingHealthPer5s,
-  restingManaPer5s,
   isManaClass,
-  strApPerPoint,
-  agiMeleeApPerPoint,
-  weaponDps,
+  manaFromIntellect,
   type StatEffect,
   type StatId,
   type StatTooltipInput,
+  strApPerPoint,
+  weaponDps,
 } from '../src/ui/stat_tooltip';
 
 // A gear-free, buff-free, talent-free player: autoEquip defaults to false, so the
@@ -40,9 +39,14 @@ function inputFor(cls: PlayerClass, p: ReturnType<typeof freshPlayer>): StatTool
   };
 }
 
-const effect = (effects: StatEffect[], kind: StatEffect['kind']) => effects.find((e) => e.kind === kind);
-const valueOf = (cls: PlayerClass, p: ReturnType<typeof freshPlayer>, stat: StatId, kind: StatEffect['kind']) =>
-  effect(buildStatTooltip(stat, inputFor(cls, p)).effects, kind)?.value;
+const effect = (effects: StatEffect[], kind: StatEffect['kind']) =>
+  effects.find((e) => e.kind === kind);
+const effectValue = (
+  cls: PlayerClass,
+  p: ReturnType<typeof freshPlayer>,
+  stat: StatId,
+  kind: StatEffect['kind'],
+) => effect(buildStatTooltip(stat, inputFor(cls, p)).effects, kind)?.value;
 
 const LEVELS = [1, 10, 20];
 
@@ -51,15 +55,15 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
     for (const level of LEVELS) {
       it(`${cls} L${level}: attack power breakdown sums to entity.attackPower`, () => {
         const p = freshPlayer(cls, level);
-        const strAp = valueOf(cls, p, 'str', 'attackPower') ?? 0;
-        const agiAp = valueOf(cls, p, 'agi', 'attackPower') ?? 0; // present for rogue/hunter only
+        const strAp = effectValue(cls, p, 'str', 'attackPower') ?? 0;
+        const agiAp = effectValue(cls, p, 'agi', 'attackPower') ?? 0; // present for rogue/hunter only
         expect(strAp + agiAp).toBe(p.attackPower);
       });
 
       it(`${cls} L${level}: agility crit/dodge match the 5% base + 0.05%/agi curve`, () => {
         const p = freshPlayer(cls, level);
-        const critPct = valueOf(cls, p, 'agi', 'critPct') ?? 0;
-        const dodgePct = valueOf(cls, p, 'agi', 'dodgePct') ?? 0;
+        const critPct = effectValue(cls, p, 'agi', 'critPct') ?? 0;
+        const dodgePct = effectValue(cls, p, 'agi', 'dodgePct') ?? 0;
         expect(0.05 + critPct / 100).toBeCloseTo(p.critChance, 6);
         expect(0.05 + dodgePct / 100).toBeCloseTo(p.dodgeChance, 6);
       });
@@ -72,9 +76,10 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
         // Players keep their class starting chest even with autoEquip off, so total
         // armor = class growth + that gear's armor + agility*2. Isolate the agi part.
         let gearArmor = 0;
-        for (const id of Object.values(sim.equipment)) gearArmor += (id && ITEMS[id]?.stats?.armor) || 0;
+        for (const id of Object.values(sim.equipment))
+          gearArmor += (id && ITEMS[id]?.stats?.armor) || 0;
         const baseArmor = def.baseStats.armor + def.statsPerLevel.armor * (level - 1);
-        const agiArmor = valueOf(cls, p, 'agi', 'armor') ?? 0;
+        const agiArmor = effectValue(cls, p, 'agi', 'armor') ?? 0;
         expect(agiArmor).toBe(p.stats.armor - baseArmor - gearArmor); // proves the sim adds agi*2
         expect(agiArmor).toBe(p.stats.agi * 2); // proves the tooltip matches
       });
@@ -83,7 +88,7 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
         const p = freshPlayer(cls, level);
         const def = CLASSES[cls];
         const base = def.baseHp + def.hpPerLevel * (level - 1);
-        const maxHealth = valueOf(cls, p, 'sta', 'maxHealth') ?? 0;
+        const maxHealth = effectValue(cls, p, 'sta', 'maxHealth') ?? 0;
         expect(maxHealth).toBe(p.maxHp - base);
         expect(maxHealth).toBe(healthFromStamina(p.stats.sta));
       });
@@ -103,7 +108,7 @@ describe('stat tooltip math reconciles with recalcPlayerStats', () => {
       const p = freshPlayer(cls, 20);
       const def = CLASSES[cls];
       const base = def.baseMana + def.manaPerLevel * (20 - 1);
-      const maxMana = valueOf(cls, p, 'int', 'maxMana') ?? 0;
+      const maxMana = effectValue(cls, p, 'int', 'maxMana') ?? 0;
       expect(maxMana).toBe(p.maxResource - base);
       expect(maxMana).toBe(manaFromIntellect(p.stats.int));
     }
@@ -126,17 +131,30 @@ describe('class-aware effect selection', () => {
   it('Agility melee AP applies only to rogue and hunter', () => {
     expect(agiMeleeApPerPoint('rogue')).toBe(1);
     expect(agiMeleeApPerPoint('hunter')).toBe(1);
-    for (const cls of ['warrior', 'paladin', 'shaman', 'druid', 'mage', 'priest', 'warlock'] as PlayerClass[]) {
+    for (const cls of [
+      'warrior',
+      'paladin',
+      'shaman',
+      'druid',
+      'mage',
+      'priest',
+      'warlock',
+    ] as PlayerClass[]) {
       expect(agiMeleeApPerPoint(cls)).toBe(0);
     }
   });
 
   it('only hunters get a ranged attack power line from Agility', () => {
     const hunter = freshPlayer('hunter', 20);
-    const ranged = effect(buildStatTooltip('agi', inputFor('hunter', hunter)).effects, 'rangedAttackPower');
+    const ranged = effect(
+      buildStatTooltip('agi', inputFor('hunter', hunter)).effects,
+      'rangedAttackPower',
+    );
     expect(ranged?.value).toBe(hunter.stats.agi * 2);
     const warrior = freshPlayer('warrior', 20);
-    expect(effect(buildStatTooltip('agi', inputFor('warrior', warrior)).effects, 'rangedAttackPower')).toBeUndefined();
+    expect(
+      effect(buildStatTooltip('agi', inputFor('warrior', warrior)).effects, 'rangedAttackPower'),
+    ).toBeUndefined();
   });
 
   it('Intellect and Spirit show the minor-benefit note for non-mana classes only', () => {
@@ -229,8 +247,12 @@ describe('weaponDps', () => {
 });
 
 describe('effect wiring reconciles each effect kind with its source', () => {
-  const effVal = (cls: PlayerClass, p: ReturnType<typeof freshPlayer>, stat: StatId, kind: StatEffect['kind']) =>
-    valueOf(cls, p, stat, kind);
+  const effVal = (
+    cls: PlayerClass,
+    p: ReturnType<typeof freshPlayer>,
+    stat: StatId,
+    kind: StatEffect['kind'],
+  ) => effectValue(cls, p, stat, kind);
 
   it('attackPower cell emits dpsFromAp = attackPower / 14', () => {
     const p = freshPlayer('warrior', 20);

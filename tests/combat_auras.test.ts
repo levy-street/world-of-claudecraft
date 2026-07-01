@@ -15,6 +15,7 @@ import {
 } from '../src/sim/combat/auras';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { manaRegenPerTick } from '../src/sim/regen';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
@@ -161,6 +162,23 @@ describe('auras: updateRegen', () => {
     updateRegen(sim.ctx, p, meta);
     expect(p.hp).toBe(hp0);
     expect(p.eating?.remaining).toBe(6); // untouched
+  });
+
+  it('uses the shared spirit and level mana tick formula once the five-second rule is clear', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    const meta = sim.players.get(p.id) as PlayerMeta;
+    p.resourceType = 'mana';
+    p.maxResource = 500;
+    p.resource = 100;
+    p.stats.spi = 18;
+    p.level = 20;
+    p.fiveSecondRule = 5;
+    sim.tickCount = 40;
+
+    updateRegen(sim.ctx, p, meta);
+
+    expect(p.resource).toBe(100 + manaRegenPerTick(18, 20));
   });
 });
 

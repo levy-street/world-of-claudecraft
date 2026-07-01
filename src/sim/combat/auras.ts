@@ -29,6 +29,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { recalcPlayerStats } from '../entity';
+import { FIVE_SECOND_RULE_THRESHOLD, healthRegenPerTick, manaRegenPerTick } from '../regen';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
@@ -61,12 +62,11 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   if (p.resourceType === 'mana') {
-    if (p.fiveSecondRule >= 5) {
+    if (p.fiveSecondRule >= FIVE_SECOND_RULE_THRESHOLD) {
       // out-of-combat mana regen: faster than before and scales with spirit
       // (gear/level) plus a small flat per-level floor so low-spirit casters
       // still recover at a reasonable pace (#103)
-      const regen = p.stats.spi / 3 + 4 + Math.floor(p.level / 5);
-      p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
+      p.resource = Math.min(p.maxResource, p.resource + manaRegenPerTick(p.stats.spi, p.level));
     }
   } else if (p.resourceType === 'energy') {
     p.resource = Math.min(p.maxResource, p.resource + 20);
@@ -74,8 +74,7 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
     p.resource = Math.max(0, p.resource - 2);
   }
   if (!p.inCombat && p.hp < p.maxHp && !p.eating) {
-    const regen = p.stats.sta * 0.3 + 2;
-    p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
+    p.hp = Math.min(p.maxHp, p.hp + healthRegenPerTick(p.stats.sta));
   }
   // food and drink tick independently, so both can run at once
   for (const slot of ['eating', 'drinking'] as const) {

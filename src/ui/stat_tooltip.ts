@@ -10,8 +10,11 @@
 // `recalcPlayerStats` in src/sim/entity.ts (armor reduction is imported outright).
 // tests/stat_tooltip.test.ts cross-checks this module against real
 // recalcPlayerStats output so the numbers cannot silently drift.
-import { armorReduction, type PlayerClass, type Stats, type WeaponInfo } from '../sim/types';
 import { CLASSES } from '../sim/data';
+import { restingHealthPer5s, restingManaPer5s } from '../sim/regen';
+import { armorReduction, type PlayerClass, type Stats, type WeaponInfo } from '../sim/types';
+
+export { restingHealthPer5s, restingManaPer5s };
 
 // The unarmed default weapon the sim falls back to (src/sim/entity.ts recalcPlayerStats),
 // so an unarmed character still reads its real fist damage instead of a flat 0.
@@ -28,8 +31,16 @@ export function weaponDps(weapon: WeaponInfo | null | undefined, attackPower: nu
 
 /** The ten cells on the character sheet, in their itemUi.stats.* id form. */
 export type StatId =
-  | 'str' | 'agi' | 'sta' | 'int' | 'spi'
-  | 'armor' | 'attackPower' | 'dps' | 'critChance' | 'dodge';
+  | 'str'
+  | 'agi'
+  | 'sta'
+  | 'int'
+  | 'spi'
+  | 'armor'
+  | 'attackPower'
+  | 'dps'
+  | 'critChance'
+  | 'dodge';
 
 /** A single contribution line. `value` is already in the unit the line displays
  *  (attack power as an integer, percents as a percent number like 1.1, etc.). */
@@ -92,10 +103,6 @@ const AGI_DODGE_PER_POINT = 0.0005; // entity.ts: dodgeChance = 0.05 + s.agi * 0
 const HUNTER_RANGED_AP_PER_AGI = 2; // entity.ts: rangedPower = s.agi * 2 (hunter)
 const INT_SPELLCRIT_PER_POINT = 0.0008; // sim.ts spellCrit(): 0.05 + int * 0.0008
 const AP_PER_DPS = 14; // sim.ts: attackPower / 14 = bonus dps
-// updateRegen (sim.ts) ticks every 2s out of combat; 5s is ~2.5 ticks. The "per
-// 5 sec" framing is the classic MP5/HP5 convention players expect.
-const REGEN_TICKS_PER_5S = 2.5;
-
 /** Mana classes are the only ones Intellect (mana pool) and Spirit (mana regen)
  *  meaningfully serve; rage/energy classes get the "minor benefit" note.
  *
@@ -131,21 +138,6 @@ export function healthFromStamina(sta: number): number {
 export function manaFromIntellect(int: number): number {
   const i = Math.max(0, int);
   return Math.min(i, 20) + Math.max(0, i - 20) * 15;
-}
-
-/** Out-of-combat health regen, expressed per 5 sec (sim.ts updateRegen: hp gains
- *  round(sta * 0.3 + 2) every 2s). Note this game derives health regen from Stamina.
- *  We round the PER-TICK amount first (as the engine does), then scale by 2.5 ticks,
- *  so the displayed figure tracks what the sim actually adds. */
-export function restingHealthPer5s(sta: number): number {
-  return Math.round(Math.round(Math.max(0, sta) * 0.3 + 2) * REGEN_TICKS_PER_5S);
-}
-
-/** Out-of-combat mana regen, per 5 sec (sim.ts updateRegen, five-second rule:
- *  mana gains round(spi / 3 + 4 + floor(level / 5)) every 2s). Per-tick rounded
- *  first to match the engine, then scaled by 2.5 ticks. */
-export function restingManaPer5s(spi: number, level: number): number {
-  return Math.round(Math.round(Math.max(0, spi) / 3 + 4 + Math.floor(level / 5)) * REGEN_TICKS_PER_5S);
 }
 
 /** Build the structured breakdown for one stat cell. Pure: no DOM, no i18n.
@@ -214,7 +206,11 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
     case 'armor': {
       isPrimary = false;
       statValue = stats.armor;
-      effects.push({ kind: 'damageReduction', value: armorReduction(stats.armor, level) * 100, level });
+      effects.push({
+        kind: 'damageReduction',
+        value: armorReduction(stats.armor, level) * 100,
+        level,
+      });
       break;
     }
     case 'attackPower': {
