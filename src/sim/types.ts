@@ -1344,6 +1344,7 @@ export interface Entity {
   hostile: boolean;
   // combat
   targetId: number | null;
+  focusTargetId: number | null;
   autoAttack: boolean;
   swingTimer: number;
   inCombat: boolean;

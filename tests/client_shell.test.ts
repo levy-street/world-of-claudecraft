@@ -330,6 +330,16 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('ships a focus frame in BOTH entries and wires it through the HUD painter', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="focus-frame" class="unitframe" type="button"');
+      expect(entry).toContain('id="ff-portrait"');
+      expect(entry).toContain('id="ff-hp-text"');
+    }
+    expect(hudTs).toContain("private focusFrameEl = $('#focus-frame');");
+    expect(hudTs).toContain('private readonly focusFramePainter = new UnitFramePainter(');
+    expect(hudTs).toContain("$('#focus-frame').addEventListener('click'");
+  });
   it('labels the party-frames region as a role=group with a localized name in BOTH entries', () => {
     // Each party member is a focusable role="button" named by its visible
     // member text, and labels the #party-frames container as a role="group" via

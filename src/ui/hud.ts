@@ -743,12 +743,21 @@ export class Hud {
   // writers, exactly as the player frame drives its own absorb node.
   private targetAbsorbEl = $('#tf-absorb');
   private targetDebuffsEl = $('#tf-debuffs');
+  private focusFrameEl = $('#focus-frame');
+  private focusNameEl = $('#ff-name');
+  private focusLevelEl = $('#ff-level');
+  private focusHpEl = $('#ff-hp');
+  private focusHpTextEl = $('#ff-hp-text');
+  private focusPortraitEl = $('#ff-portrait') as unknown as HTMLCanvasElement;
+  private focusAbsorbEl = $('#ff-absorb');
+  private focusFrameVisible = false;
   // The target whose portrait the family painter's repaint gate redraws this frame.
   // The gate fires synchronously inside the targetFramePainter.paint() call below,
   // so this holds the subject for that one call (the old inline block read `target`
   // from its enclosing scope; the gate now lives in the painter, so the redraw
   // closure reads it from here).
   private targetPortraitSubject: Entity | null = null;
+  private focusPortraitSubject: Entity | null = null;
   private comboRowEl = $('#combo-row');
   private castbarEl = $('#castbar');
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
@@ -1030,6 +1039,7 @@ export class Hud {
     onPortraitsReady(() => {
       this.drawPlayerFramePortrait();
       this.targetFramePainter.invalidatePortrait();
+      this.focusFramePainter.invalidatePortrait();
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
@@ -1125,6 +1135,11 @@ export class Hud {
       this.updateClock();
     });
     this.updateClock();
+    $('#focus-frame').addEventListener('click', () => {
+      const focusId = this.sim.player.focusTargetId;
+      const focus = focusId !== null ? this.sim.entities.get(focusId) : null;
+      if (focus && !focus.dead && focus.kind !== 'object') this.sim.targetEntity(focus.id);
+    });
     // classic MMOs: the player interaction menu opens from the target portrait
     $('#target-frame').addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
@@ -2487,6 +2502,21 @@ export class Hud {
       repaintPortrait: () => this.drawTargetPortrait(),
     },
   );
+  private readonly focusFramePainter = new UnitFramePainter(
+    this.writerFacet,
+    {
+      frame: this.focusFrameEl,
+      name: this.focusNameEl,
+      level: this.focusLevelEl,
+      hpFill: this.focusHpEl,
+      hpText: this.focusHpTextEl,
+      absorb: this.focusAbsorbEl,
+    },
+    {
+      shownDisplay: 'flex',
+      repaintPortrait: () => this.drawFocusPortrait(),
+    },
+  );
   // The party frames are N further instances of the unit_frame family, one per
   // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
   // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
@@ -2873,6 +2903,22 @@ export class Hud {
     }
   }
 
+  private drawFocusPortrait(): void {
+    const focus = this.focusPortraitSubject;
+    if (!focus) return;
+    if (focus.kind === 'player') {
+      this.portraits.drawClass(
+        this.focusPortraitEl,
+        focus.templateId as PlayerClass,
+        focus.skin ?? 0,
+      );
+    } else {
+      this.portraits.drawCrest(
+        this.focusPortraitEl,
+        crestIdForEntity(focus.kind, MOBS[focus.templateId]?.family),
+      );
+    }
+  }
   private itemIcon(item: ItemDef): string {
     const q = item.quality ?? 'common';
     return `<img class="item-icon q-${q}" src="${iconDataUrl('item', item.id)}" alt="" draggable="false">`;
@@ -4557,6 +4603,8 @@ export class Hud {
       }
       this.targetFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
     }
+
+    this.updateFocusFrame(p);
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
     // the player-only eat/drink overlay (consumeBarState), and clears on hide.
@@ -9840,10 +9888,41 @@ export class Hud {
   // Party frames
   // -------------------------------------------------------------------------
 
+  private updateFocusFrame(p: Entity): void {
+    const focus = p.focusTargetId !== null ? this.sim.entities.get(p.focusTargetId) : null;
+    this.focusFrameVisible = !!focus && !focus.dead && focus.kind !== 'object';
+    if (!this.focusFrameVisible || !focus) {
+      this.focusFramePainter.paint(unitFrameView(ABSENT_TARGET_DESCRIPTOR));
+      this.writerFacet.setAttr(this.focusFrameEl, 'aria-label', '');
+      this.writerFacet.setAttr(this.focusFrameEl, 'title', '');
+      return;
+    }
+    const name = entityDisplayName(focus);
+    this.focusPortraitSubject = focus;
+    this.writerFacet.setAttr(this.focusFrameEl, 'aria-label', name);
+    this.writerFacet.setAttr(this.focusFrameEl, 'title', name);
+    this.focusFramePainter.paint(
+      unitFrameView({
+        present: true,
+        hpFrac: focus.hp / Math.max(1, focus.maxHp),
+        hpText: `${focus.hp} / ${focus.maxHp}`,
+        resourceKind: 'none',
+        resFrac: 0,
+        resText: '',
+        levelText: MOBS[focus.templateId]?.boss ? '??' : String(focus.level),
+        name,
+        portraitKey: `${focus.kind}:${focus.templateId}:${focus.id}:${focus.skin ?? 0}`,
+        absorb: focus,
+        dead: false,
+        outOfRange: false,
+      }),
+    );
+  }
   private updatePartyFrames(): void {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
     this.partyFramesPainter.setBelowTarget(!!target && target.kind !== 'object');
+    this.partyFramesPainter.setBelowFocus(this.focusFrameVisible);
     const info = this.sim.partyInfo;
     if (!info) {
       // Clear only on the transition out of a party (matching the inline `innerHTML

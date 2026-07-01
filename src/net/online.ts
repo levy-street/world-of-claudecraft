@@ -714,6 +714,7 @@ function blankEntity(id: number): Entity {
     moveSpeed: 7,
     hostile: false,
     targetId: null,
+    focusTargetId: null,
     autoAttack: false,
     swingTimer: 0,
     inCombat: false,
@@ -1393,6 +1394,7 @@ export class ClientWorld implements IWorld {
       e.comboPoints = s.combo ?? 0;
       e.comboTargetId = s.comboTgt ?? null;
       e.targetId = s.target ?? null;
+      e.focusTargetId = s.focus ?? null;
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
       e.queuedOnSwing = s.queued ?? null;

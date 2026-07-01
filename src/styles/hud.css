@@ -428,6 +428,50 @@
     display: none;
     z-index: 6;
   }
+  #focus-frame {
+    left: 250px;
+    top: 12px;
+    display: none;
+    z-index: 6;
+    width: 186px;
+    min-height: 52px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  #focus-frame .portrait-wrap {
+    width: 48px;
+    height: 48px;
+  }
+  #focus-frame .portrait {
+    width: 44px;
+    height: 44px;
+  }
+  #focus-frame .level-chip {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+  #focus-frame .uf-bars {
+    width: 140px;
+    min-width: 0;
+    padding: 4px 8px 4px 12px;
+  }
+  #focus-frame .uf-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #focus-frame .bar {
+    height: 12px;
+  }
+  #focus-frame .bar-text {
+    font-size: 9px;
+  }
   .portrait-wrap {
     position: relative;
     width: 64px;
@@ -3314,6 +3358,9 @@
   }
   #party-frames.below-target {
     top: 96px;
+  }
+  #party-frames.below-focus {
+    top: 154px;
   }
   .party-frame {
     --cls: #7fb8ff;

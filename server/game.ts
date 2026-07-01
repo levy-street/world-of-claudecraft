@@ -3033,6 +3033,7 @@ export class GameServer {
       combo: p.comboPoints,
       comboTgt: p.comboTargetId,
       target: p.targetId,
+      focus: p.focusTargetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
       ap: p.attackPower,

@@ -4091,6 +4091,23 @@ const RULES: Rule[] = [
     re: /^Your (.+) has improved to Rank (\d+)\.$/,
     build: (m) => tSim('log.abilityRankUp', { name: locAbility(m[1]), rank: m[2] }),
   },
+  // /focus family. Names are user-entered or entity display names; preserve unknown
+  // player text verbatim while localizing known mob names in the success readout.
+  {
+    re: /^Several units match '(.+)'\. Use exact capitalization\.$/,
+    build: (m) => `Several units match '${m[1]}'. Use exact capitalization.`,
+  },
+  {
+    re: /^There is no unit named '(.+)'\.$/,
+    build: (m) => `There is no unit named '${m[1]}'.`,
+  },
+  {
+    re: /^Target a unit to focus, or use \/focus <name>\.$/,
+    build: () => 'Target a unit to focus, or use /focus <name>.',
+  },
+  { re: /^Focus set to (.+)\.$/, build: (m) => `Focus set to ${locMob(m[1])}.` },
+  { re: /^You have no focus target\.$/, build: () => 'You have no focus target.' },
+  { re: /^Focus target cleared\.$/, build: () => 'Focus target cleared.' },
   // /follow family. {name} is another player (a mob name only if it happens to collide).
   {
     re: /^(.+) is too far away to follow\.$/,

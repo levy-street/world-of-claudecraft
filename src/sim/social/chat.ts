@@ -280,6 +280,54 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
 
+  // "/focus [name]" pins a second unit that survives ordinary retargeting.
+  // With no name it uses the current target, matching classic focus workflows.
+  const focusMatch = /^\/focus(?:\s+([\s\S]+))?$/i.exec(raw);
+  if (focusMatch) {
+    const nameArg = (focusMatch[1] ?? '').trim();
+    let target: Entity | null = null;
+    if (nameArg) {
+      const wanted = nameArg.toLowerCase();
+      const matches: Entity[] = [];
+      for (const e of ctx.entities.values()) {
+        if (e.dead || e.kind === 'object') continue;
+        if (e.name === nameArg) {
+          target = e;
+          break;
+        }
+        if (e.name.toLowerCase() === wanted) matches.push(e);
+      }
+      if (!target) {
+        if (matches.length === 1) target = matches[0];
+        else if (matches.length > 1) {
+          ctx.error(r.meta.entityId, `Several units match '${nameArg}'. Use exact capitalization.`);
+          return null;
+        }
+      }
+      if (!target) {
+        ctx.error(r.meta.entityId, `There is no unit named '${nameArg}'.`);
+        return null;
+      }
+    } else {
+      target = r.e.targetId !== null ? (ctx.entities.get(r.e.targetId) ?? null) : null;
+      if (!target || target.kind === 'object' || target.dead) {
+        ctx.error(r.meta.entityId, 'Target a unit to focus, or use /focus <name>.');
+        return null;
+      }
+    }
+    r.e.focusTargetId = target.id;
+    ctx.error(r.meta.entityId, `Focus set to ${target.name}.`);
+    return null;
+  }
+
+  if (/^\/clearfocus(?:\s|$)/i.test(raw)) {
+    if (r.e.focusTargetId === null) ctx.error(r.meta.entityId, 'You have no focus target.');
+    else {
+      r.e.focusTargetId = null;
+      ctx.error(r.meta.entityId, 'Focus target cleared.');
+    }
+    return null;
+  }
   // "/follow [name]" trails another player; with no name it follows the
   // current target. Movement, combat, casting, re-targeting, or the leader
   // moving out of range all end it (see updateFollowMovement).
@@ -926,7 +974,7 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
+    'Other commands: /join <world|lfg>, /roll, /inspect <name>, /follow <name>, /unfollow, /focus, /clearfocus, /assist <name>, /afk, /dnd, /who.',
     'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',

@@ -38,6 +38,7 @@ const CLASS_COLOR_PROP = '--cls';
 const COMBAT_CLASS = 'combat';
 // The container class that drops the frames below the target frame.
 const BELOW_TARGET_CLASS = 'below-target';
+const BELOW_FOCUS_CLASS = 'below-focus';
 // Badge visibility: '' reverts to the stylesheet display (shown), 'none' hides. The
 // badges persist in the DOM and only their display toggles, so the icon cue survives
 // forced-colors (where the combat box-shadow is dropped).
@@ -90,6 +91,10 @@ export class PartyFramesPainter {
    *  matching the inline `el.classList.toggle('below-target', ...)`. */
   setBelowTarget(on: boolean): void {
     this.writers.toggleClass(this.container, BELOW_TARGET_CLASS, on);
+  }
+
+  setBelowFocus(on: boolean): void {
+    this.writers.toggleClass(this.container, BELOW_FOCUS_CLASS, on);
   }
 
   /** Set (or clear with null) the leader-only master-loot control. The Hud rebuilds

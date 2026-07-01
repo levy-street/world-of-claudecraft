@@ -724,6 +724,13 @@
     transform: scale(0.82);
     transform-origin: left top;
   }
+  body.mobile-touch #focus-frame {
+    left: max(8px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 126px);
+    transform: scale(0.82);
+    transform-origin: left top;
+    min-height: 40px;
+  }
   body.mobile-touch #party-frames {
     position: fixed;
     left: max(8px, env(safe-area-inset-left));
@@ -737,6 +744,9 @@
   /* party rows are role="button" tap targets (tap to target a member), so they
      must clear the 40x40 mobile touch floor, not the compact desktop
      raid-frame height. Base and landscape both move 30/25px up to 40px; #party-leave too. */
+  body.mobile-touch #party-frames.below-focus {
+    top: calc(max(8px, env(safe-area-inset-top)) + 176px);
+  }
   body.mobile-touch #party-frames .party-frame {
     width: 132px;
     min-height: 40px;
@@ -1844,6 +1854,9 @@
       top: calc(max(6px, env(safe-area-inset-top)) + 100px);
     }
     /* keep the 40x40 touch floor in landscape too (was 25px). */
+    body.mobile-touch #party-frames.below-focus {
+      top: calc(max(6px, env(safe-area-inset-top)) + 138px);
+    }
     body.mobile-touch #party-frames .party-frame {
       width: 118px;
       min-height: 40px;

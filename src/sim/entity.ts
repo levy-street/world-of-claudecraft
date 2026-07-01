@@ -40,6 +40,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     moveSpeed: 7,
     hostile: false,
     targetId: null,
+    focusTargetId: null,
     autoAttack: false,
     swingTimer: 0,
     inCombat: false,
