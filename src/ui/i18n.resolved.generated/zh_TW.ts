@@ -753,6 +753,9 @@ export const zh_TW: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "需要等級 {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const zh_TW: EnTranslations = {
         "name": "凱迪斯博學者",
         "title": "博學者",
         "greeting": "小心鬆動的頁岩，{className}。這座山近來不安，我想知道原因。"
+      },
+      "auctioneer_voss": {
+        "name": "拍賣師沃斯",
+        "title": "世界市場守護者",
+        "greeting": "世界市場在此亦可使用，{className}。從王國各地的冒險者手中購買，或出售你自己的貨物。"
       },
       "brother_aldric_raid": {
         "name": "奧德里克修士",

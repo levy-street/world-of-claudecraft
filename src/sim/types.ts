@@ -314,6 +314,10 @@ interface BaseItemDef {
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   requiredClass?: PlayerClass[];
+  // Minimum character level needed to equip this piece. When omitted, the level
+  // is DERIVED from `quality` (see src/sim/item_level_req.ts); set this only to
+  // override the per-quality default for a specific item.
+  requiredLevel?: number;
   /** Set id this piece belongs to; equipping enough pieces grants the set bonuses (see ITEM_SETS). */
   set?: string;
 }

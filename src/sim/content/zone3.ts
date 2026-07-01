@@ -914,6 +914,21 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     greeting:
       'Mind the loose shale, $C. The mountain has been... restless of late. I intend to learn why.',
   },
+  // A second auctioneer: the same shared World Market as The Merchant in Eastbrook,
+  // reachable up here in Highwatch so zone-3 players need not trek back to deal. A
+  // distinct name and amethyst tint set her apart from the gold Eastbrook merchant.
+  auctioneer_voss: {
+    id: 'auctioneer_voss',
+    name: 'Auctioneer Voss',
+    title: 'Keeper of the World Market',
+    pos: { x: 16, z: 666 },
+    facing: -2.2,
+    color: 0x8e5ad6,
+    questIds: [],
+    market: true,
+    greeting:
+      'The World Market is open here too, $C. Buy from every adventurer in the realm, or set out your own wares.',
+  },
 };
 
 // ---------------------------------------------------------------------------

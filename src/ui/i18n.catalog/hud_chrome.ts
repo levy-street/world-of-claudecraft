@@ -821,6 +821,12 @@ export const hudChromeStrings = {
     mob: '[{level}] {name}',
     mobElite: '[{level}+] {name}',
   },
+  // Item tooltip: the minimum character level needed to equip a piece (classic
+  // "Requires Level N"). Shown red when the viewer is below it. {level} runs
+  // through formatNumber.
+  itemTooltip: {
+    requiresLevel: 'Requires Level {level}',
+  },
   discord: {
     title: 'Discord',
     panelTitle: 'World of ClaudeCraft',

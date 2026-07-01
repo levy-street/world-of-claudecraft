@@ -16,6 +16,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.spectate.banner': '正在观察 {name}',
   'hudChrome.loot.chestTitle': '宝箱',
+  'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
   'hudChrome.spellbook.removeFromBarAria': '从动作条移除{name}',
   'hudChrome.nameplate.mob': '[{level}] {name}',
@@ -2332,6 +2333,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremaster_caddis.title': '博学者',
   'entities.npcs.loremaster_caddis.greeting':
     '小心松动的页岩，{className}。这座山近来不安，我想知道原因。',
+  'entities.npcs.auctioneer_voss.name': '拍卖师沃斯',
+  'entities.npcs.auctioneer_voss.title': '世界市场守护者',
+  'entities.npcs.auctioneer_voss.greeting':
+    '世界市场在此亦可使用，{className}。从王国各地的冒险者手中购买，或出售你自己的货物。',
   'entities.npcs.tidewatcher_ondrel.name': '翁德雷尔·凡恩',
   'entities.npcs.tidewatcher_ondrel.title': '守潮者',
   'entities.npcs.tidewatcher_ondrel.greeting':

@@ -4,6 +4,9 @@ import { Sim } from '../src/sim/sim';
 function equip(cls: Parameters<Sim['addPlayer']>[0], itemId: string) {
   const sim = new Sim({ seed: 42, playerClass: cls, noPlayer: true, autoEquip: false });
   const pid = sim.addPlayer(cls, `${cls}-${itemId}`);
+  // Max level so the per-quality level gate (item_level_req.ts) never fires:
+  // these cases test CLASS/armor proficiency in isolation, not the level gate.
+  sim.setPlayerLevel(20, pid);
   sim.addItem(itemId, 1, pid);
   sim.equipItem(itemId, pid);
   return sim.meta(pid)!;
@@ -38,12 +41,26 @@ describe('armor proficiencies', () => {
   });
 
   it('allows caster weapons for caster and hybrid classes', () => {
-    expect(equip('mage', 'staff_of_the_gravewyrm').equipment.mainhand).toBe('staff_of_the_gravewyrm');
-    expect(equip('priest', 'staff_of_the_gravewyrm').equipment.mainhand).toBe('staff_of_the_gravewyrm');
-    expect(equip('warlock', 'staff_of_the_gravewyrm').equipment.mainhand).toBe('staff_of_the_gravewyrm');
-    expect(equip('shaman', 'staff_of_the_gravewyrm').equipment.mainhand).toBe('staff_of_the_gravewyrm');
-    expect(equip('paladin', 'staff_of_the_gravewyrm').equipment.mainhand).toBe('staff_of_the_gravewyrm');
-    expect(equip('druid', 'staff_of_the_gravewyrm').equipment.mainhand).toBe('staff_of_the_gravewyrm');
-    expect(equip('warrior', 'staff_of_the_gravewyrm').equipment.mainhand).not.toBe('staff_of_the_gravewyrm');
+    expect(equip('mage', 'staff_of_the_gravewyrm').equipment.mainhand).toBe(
+      'staff_of_the_gravewyrm',
+    );
+    expect(equip('priest', 'staff_of_the_gravewyrm').equipment.mainhand).toBe(
+      'staff_of_the_gravewyrm',
+    );
+    expect(equip('warlock', 'staff_of_the_gravewyrm').equipment.mainhand).toBe(
+      'staff_of_the_gravewyrm',
+    );
+    expect(equip('shaman', 'staff_of_the_gravewyrm').equipment.mainhand).toBe(
+      'staff_of_the_gravewyrm',
+    );
+    expect(equip('paladin', 'staff_of_the_gravewyrm').equipment.mainhand).toBe(
+      'staff_of_the_gravewyrm',
+    );
+    expect(equip('druid', 'staff_of_the_gravewyrm').equipment.mainhand).toBe(
+      'staff_of_the_gravewyrm',
+    );
+    expect(equip('warrior', 'staff_of_the_gravewyrm').equipment.mainhand).not.toBe(
+      'staff_of_the_gravewyrm',
+    );
   });
 });

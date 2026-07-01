@@ -753,6 +753,9 @@ export const en_XA: EnTranslations = {
       "mob": "[[{level}] {name}]",
       "mobElite": "[[{level}+] {name}]"
     },
+    "itemTooltip": {
+      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
+    },
     "discord": {
       "title": "[Ðíšçóŕð]",
       "panelTitle": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",
@@ -5679,6 +5682,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ļóŕéɱášţéŕ Çáððíš]",
         "title": "[Ļóŕéɱášţéŕ]",
         "greeting": "[Ɱíñð ţĥé ļóóšé šĥáļé, {className}. Ţĥé ɱóúñţáíñ ĥáš ƀééñ... ŕéšţļéšš óƒ ļáţé. Í íñţéñð ţó ļéáŕñ ŵĥý.]"
+      },
+      "auctioneer_voss": {
+        "name": "[Áúçţíóñééŕ Ʋóšš]",
+        "title": "[Ķééþéŕ óƒ ţĥé Ŵóŕļð Ɱáŕķéţ]",
+        "greeting": "[Ţĥé Ŵóŕļð Ɱáŕķéţ íš óþéñ ĥéŕé ţóó, {className}. Ɓúý ƒŕóɱ éʋéŕý áðʋéñţúŕéŕ íñ ţĥé ŕéáļɱ, óŕ šéţ óúţ ýóúŕ óŵñ ŵáŕéš.]"
       },
       "brother_aldric_raid": {
         "name": "[Ɓŕóţĥéŕ Áļðŕíç]",

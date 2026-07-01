@@ -753,6 +753,9 @@ export const id_ID: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const id_ID: EnTranslations = {
         "name": "Ahli Sejarah Caddis",
         "title": "Ahli Sejarah",
         "greeting": "Hati-hati dengan batu serpih yang longgar, {className}. Gunung ini... gelisah belakangan ini. Aku berniat mencari tahu sebabnya."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Bruder Aldric",

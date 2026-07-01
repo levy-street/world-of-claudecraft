@@ -1942,7 +1942,7 @@ function dirtyEveryDeltaField(): {
   run.companion = { companionId: 'companion_tessa', entityId: mp };
   const party = (sim as any).partyOf(lp);
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
-  const merchant = sim.entities.get(sim.market.merchantId);
+  const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
 
   // Direct PlayerMeta fields.

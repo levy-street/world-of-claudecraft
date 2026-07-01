@@ -17,6 +17,7 @@ import { abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/
 import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
+import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
@@ -1920,8 +1921,15 @@ export class ClientWorld implements IWorld {
   }
   // --- IWorldMarket: World Market browse/list/buy/cancel/collect command sends
   // (snake_case wire strings). marketInfo is a snapshot read (mirror field above). ---
-  marketSearch(query: string): void {
-    this.cmd({ cmd: 'market_search', q: query });
+  marketSearch(query: MarketQuery): void {
+    this.cmd({
+      cmd: 'market_search',
+      q: query.search,
+      itemType: query.itemType,
+      subtype: query.subtype,
+      rarity: query.rarity,
+      page: query.page,
+    });
   }
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });

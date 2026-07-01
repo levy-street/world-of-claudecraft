@@ -3,8 +3,8 @@ import type { DevLeaderboardEntry, GuildLeaderboardEntry, LeaderboardEntry } fro
 // Host-agnostic pagination for the high-score boards. Lives in src/sim/
 // (no DOM, no randomness) so BOTH the authoritative server and the offline Sim
 // can share one slicing rule; the client only renders the page the server
-// already decided. Mirrors paginateMarketListings (src/ui/market_filters.ts) but
-// is reachable from server/ (which may import sim/ but never ui/).
+// already decided. Same shape as the World Market's server-side pagination
+// (src/sim/market.ts) and reachable from server/ (which may import sim/ but never ui/).
 
 // 50 ranks per page: 10 pages cover the 500 deepest, 20 cover the 1000-cap.
 export const LEADERBOARD_PAGE_SIZE = 50;

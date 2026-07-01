@@ -29,6 +29,7 @@ import {
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
   type MarketItemTypeFilter,
+  type MarketQuery,
   type MarketRarityFilter,
   type MarketSubtypeFilter,
 } from './market_filters';
@@ -113,7 +114,7 @@ export class MarketWindow {
     this.browsePage = 0;
     this.sellItemId = null;
     this.searchQuery = '';
-    this.deps.world().marketSearch('');
+    this.pushQuery();
     this.lastSig = '';
     this.render();
     this.deps.root().style.display = 'flex';
@@ -139,6 +140,25 @@ export class MarketWindow {
     this.render();
   }
 
+  /** The current browse query (search + filters + page) the UI sends to the server. */
+  private currentQuery(): MarketQuery {
+    return {
+      search: this.searchQuery,
+      itemType: this.itemTypeFilter,
+      subtype: this.subtypeFilter,
+      rarity: this.rarityFilter,
+      page: this.browsePage,
+    };
+  }
+
+  // Push the current query to the server, which filters + paginates the whole market
+  // and streams back the matching page. Offline (Sim) this resolves synchronously, so
+  // the snapshot is up to date by the next render; online it round-trips and the
+  // per-frame refreshIfChanged repaints when the new page arrives.
+  private pushQuery(): void {
+    this.deps.world().marketSearch(this.currentQuery());
+  }
+
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
   // change. The Sell tab holds typed inputs, so it is only rebuilt on actions.
   refreshIfChanged(): void {
@@ -153,6 +173,8 @@ export class MarketWindow {
       info?.listings,
       info?.totalCount,
       info?.filter,
+      info?.page,
+      info?.pageCount,
       info?.collectionCopper,
       info?.collectionItems,
     ]);
@@ -288,6 +310,7 @@ export class MarketWindow {
         } else {
           return;
         }
+        this.pushQuery(); // filtering is server-side now, so the query must round-trip
         this.lastSig = '';
         audio.click();
         this.render();
@@ -370,7 +393,6 @@ export class MarketWindow {
         subtype: this.subtypeFilter,
         rarity: this.rarityFilter,
       },
-      browsePage: this.browsePage,
       sellItemId: this.sellItemId,
       sellHave: this.sellItemId ? this.bagCount(this.sellItemId) : 0,
     });
@@ -406,7 +428,7 @@ export class MarketWindow {
         if (!search) return;
         this.searchQuery = search.value;
         this.browsePage = 0;
-        this.deps.world().marketSearch(search.value);
+        this.pushQuery();
       });
       body.appendChild(search);
       list = document.createElement('div');
@@ -448,13 +470,22 @@ export class MarketWindow {
     }
     const page = view.page;
     this.browsePage = page.page;
-    const note = document.createElement('div');
-    note.className = 'mkt-note';
-    const shown = `${formatNumber(page.start + 1, { maximumFractionDigits: 0 })}-${formatNumber(page.end, { maximumFractionDigits: 0 })}`;
-    const total = formatNumber(page.total, { maximumFractionDigits: 0 });
-    note.textContent = t('itemUi.market.pageRange', { shown, total });
-    list.appendChild(note);
-    status.textContent = note.textContent;
+    // The range note describes the paged OTHER listings; on a page with none (e.g. only
+    // the viewer's own listings match) it is skipped, leaving just the rows.
+    if (page.end > page.start) {
+      const note = document.createElement('div');
+      note.className = 'mkt-note';
+      const shown = `${formatNumber(page.start + 1, { maximumFractionDigits: 0 })}-${formatNumber(page.end, { maximumFractionDigits: 0 })}`;
+      const total = formatNumber(page.total, { maximumFractionDigits: 0 });
+      note.textContent = t('itemUi.market.pageRange', { shown, total });
+      list.appendChild(note);
+      status.textContent = note.textContent;
+    } else {
+      status.textContent = t('itemUi.market.pageRange', {
+        shown: formatNumber(page.items.length, { maximumFractionDigits: 0 }),
+        total: formatNumber(page.total, { maximumFractionDigits: 0 }),
+      });
+    }
     for (const { listing: l, item } of page.items) {
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const row = document.createElement('div');
@@ -505,7 +536,8 @@ export class MarketWindow {
         button.addEventListener('click', () => {
           if (button.disabled) return;
           const dir = button.dataset.marketPage;
-          this.browsePage += dir === 'next' ? 1 : -1;
+          this.browsePage = Math.max(0, this.browsePage + (dir === 'next' ? 1 : -1));
+          this.pushQuery(); // the server returns the requested page of listings
           this.lastSig = '';
           audio.click();
           this.renderContent();

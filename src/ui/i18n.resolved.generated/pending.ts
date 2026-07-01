@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -31,6 +34,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -42,6 +46,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.party.promoteLeader"
   ],
   "es_ES": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -63,6 +70,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -74,6 +82,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.party.promoteLeader"
   ],
   "fr_FR": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -95,6 +106,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -106,6 +118,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.party.promoteLeader"
   ],
   "fr_CA": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -127,6 +142,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -139,6 +155,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -160,6 +179,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -171,6 +191,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.party.promoteLeader"
   ],
   "de_DE": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -192,6 +215,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -215,6 +239,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.discord"
   ],
   "pt_BR": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -236,6 +263,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -250,6 +278,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.keybinds.discord"
   ],
   "nl_NL": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -271,6 +302,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -286,6 +318,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.other"
   ],
   "pl_PL": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -307,6 +342,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -322,6 +358,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.other"
   ],
   "id_ID": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -343,6 +382,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -358,6 +398,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.other"
   ],
   "tr_TR": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -379,6 +422,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -394,6 +438,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.other"
   ],
   "sv_SE": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -415,6 +462,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -430,6 +478,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.other"
   ],
   "vi_VN": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -451,6 +502,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",
@@ -466,6 +518,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.playersMatching.other"
   ],
   "da_DK": [
+    "entities.npcs.auctioneer_voss.greeting",
+    "entities.npcs.auctioneer_voss.name",
+    "entities.npcs.auctioneer_voss.title",
     "hudChrome.devBadge.badgeTitle",
     "hudChrome.devBadge.contributor",
     "hudChrome.devBadge.flavors.architect",
@@ -487,6 +542,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.devBadge.title",
     "hudChrome.devBadge.unlink",
     "hudChrome.itemShare.linkHint",
+    "hudChrome.itemTooltip.requiresLevel",
     "hudChrome.keybinds.discord",
     "hudChrome.leaderboard.devEmpty",
     "hudChrome.leaderboard.devName",

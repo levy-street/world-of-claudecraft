@@ -753,6 +753,9 @@ export const nl_NL: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const nl_NL: EnTranslations = {
         "name": "Verhalenmeester Caddis",
         "title": "Verhalenmeester",
         "greeting": "Pas op voor de losse leisteen, {className}. De berg is... rusteloos geweest de laatste tijd. Ik ben van plan uit te zoeken waarom."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Broeder Aldric",

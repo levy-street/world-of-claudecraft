@@ -753,6 +753,9 @@ export const pl_PL: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const pl_PL: EnTranslations = {
         "name": "Mistrz Wiedzy Caddis",
         "title": "Mistrz Wiedzy",
         "greeting": "Uważaj na luźny łupek, {className}. Góra była ostatnio... niespokojna. Zamierzam dociec dlaczego."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Brat Aldric",

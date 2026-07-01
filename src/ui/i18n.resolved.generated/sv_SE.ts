@@ -753,6 +753,9 @@ export const sv_SE: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const sv_SE: EnTranslations = {
         "name": "Läromästare Caddis",
         "title": "Läromästare",
         "greeting": "Akta den lösa skiffern, {className}. Berget har varit... rastlöst på sistone. Jag ämnar ta reda på varför."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Broder Aldric",

@@ -60,6 +60,7 @@ import {
 import { specialRoleColor } from '../sim/discord_roles';
 import { armorTypeForItem, canEquipItem, weaponArchetypeForItem } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
+import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { PICK_ACTIONS } from '../sim/lockpick';
 import type { ResolvedAbility } from '../sim/sim';
@@ -3044,6 +3045,14 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
+    }
+    // Classic "Requires Level N" line for equippable gear gated above level 1.
+    // Red when the viewer is below the requirement (cannot equip yet), otherwise
+    // a normal sub line. Level math/data lives in the pure sim leaf.
+    const req = requiredLevelFor(item);
+    if ((item.kind === 'weapon' || item.kind === 'armor') && req > 1) {
+      const meets = this.sim.player.level >= req;
+      html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }))}</div>`;
     }
     html += this.itemSetBlock(item);
     if (item.sellValue > 0)

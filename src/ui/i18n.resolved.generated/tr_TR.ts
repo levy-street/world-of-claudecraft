@@ -753,6 +753,9 @@ export const tr_TR: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const tr_TR: EnTranslations = {
         "name": "İrfan Ustası Caddis",
         "title": "İrfan Ustası",
         "greeting": "Gevşek kayalara dikkat et, {className}. Dağ son zamanlarda... huzursuz. Nedenini öğrenmeye niyetliyim."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Birader Aldric",

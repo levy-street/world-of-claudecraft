@@ -16,6 +16,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.loot.chestTitle': '宝箱',
+  'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
   'hudChrome.nameplate.mob': '[{level}] {name}',
@@ -2437,6 +2438,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremaster_caddis.title': '博識者',
   'entities.npcs.loremaster_caddis.greeting':
     '崩れやすい頁岩に気をつけてください、{className}。山は近ごろ落ち着きがなく、その理由を知りたいのです。',
+  'entities.npcs.auctioneer_voss.name': '競売人ヴォス',
+  'entities.npcs.auctioneer_voss.title': '世界市場の守り手',
+  'entities.npcs.auctioneer_voss.greeting':
+    '世界市場はここでも利用できます、{className}。王国中の冒険者から買うことも、自分の品を売ることもできます。',
   'entities.npcs.tidewatcher_ondrel.name': 'オンドレル・ヴェイン',
   'entities.npcs.tidewatcher_ondrel.title': '潮見の番人',
   'entities.npcs.tidewatcher_ondrel.greeting':

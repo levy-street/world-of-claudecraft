@@ -16,6 +16,7 @@ import type { TranslationKey } from '../i18n.catalog';
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
   'hudChrome.loot.chestTitle': 'Сундук',
+  'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
   'hudChrome.nameplate.mob': '[{level}] {name}',
@@ -2469,6 +2470,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.loremaster_caddis.title': 'Хранитель знаний',
   'entities.npcs.loremaster_caddis.greeting':
     'Осторожнее с рыхлым сланцем, {className}. Гора стала беспокойной, и я намерен узнать почему.',
+  'entities.npcs.auctioneer_voss.name': 'Аукционист Восс',
+  'entities.npcs.auctioneer_voss.title': 'Хранитель мирового рынка',
+  'entities.npcs.auctioneer_voss.greeting':
+    'Мировой рынок доступен и здесь, {className}. Покупайте у искателей приключений всего королевства или выставляйте свои товары.',
   'entities.npcs.tidewatcher_ondrel.name': 'Ондрел Вейн',
   'entities.npcs.tidewatcher_ondrel.title': 'Страж приливов',
   'entities.npcs.tidewatcher_ondrel.greeting':

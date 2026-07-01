@@ -753,6 +753,9 @@ export const vi_VN: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Requires Level {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const vi_VN: EnTranslations = {
         "name": "Sử Gia Caddis",
         "title": "Sử Gia",
         "greeting": "Coi chừng đá phiến lỏng lẻo, {className}. Ngọn núi gần đây... bất an. Ta định tìm hiểu lý do."
+      },
+      "auctioneer_voss": {
+        "name": "Auctioneer Voss",
+        "title": "Keeper of the World Market",
+        "greeting": "The World Market is open here too, {className}. Buy from every adventurer in the realm, or set out your own wares."
       },
       "brother_aldric_raid": {
         "name": "Tu Huynh Aldric",

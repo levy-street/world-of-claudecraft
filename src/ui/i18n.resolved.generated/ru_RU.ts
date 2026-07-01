@@ -753,6 +753,9 @@ export const ru_RU: EnTranslations = {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
     },
+    "itemTooltip": {
+      "requiresLevel": "Требуется уровень {level}"
+    },
     "discord": {
       "title": "Discord",
       "panelTitle": "World of ClaudeCraft",
@@ -5679,6 +5682,11 @@ export const ru_RU: EnTranslations = {
         "name": "Хранитель знаний Каддис",
         "title": "Хранитель знаний",
         "greeting": "Осторожнее с рыхлым сланцем, {className}. Гора стала беспокойной, и я намерен узнать почему."
+      },
+      "auctioneer_voss": {
+        "name": "Аукционист Восс",
+        "title": "Хранитель мирового рынка",
+        "greeting": "Мировой рынок доступен и здесь, {className}. Покупайте у искателей приключений всего королевства или выставляйте свои товары."
       },
       "brother_aldric_raid": {
         "name": "Брат Алдрик",
