@@ -5,8 +5,8 @@ import { hasSharedLootRights, LOOT_FFA_DELAY, lootHasGoneFfa } from '../src/sim/
 // owner has not cleared within LOOT_FFA_DELAY seconds opens to everyone.
 
 describe('loot FFA timeout', () => {
-  it('locks to classic one minute', () => {
-    expect(LOOT_FFA_DELAY).toBe(60);
+  it('opens tapped corpses after ten seconds', () => {
+    expect(LOOT_FFA_DELAY).toBe(10);
   });
 
   it('lootHasGoneFfa flips only once the countdown reaches zero', () => {

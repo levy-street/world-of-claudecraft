@@ -79,6 +79,7 @@ export const en_XA: EnTranslations = {
     },
     "hud": {
       "lowMana": "[Ļóŵ Ɱáñá]",
+      "outOfMana": "[Óúţ óƒ Ɱáñá]",
       "lowEnergy": "[Ļóŵ Éñéŕĝý]"
     },
     "talents": {

@@ -79,6 +79,7 @@ export const nl_NL: EnTranslations = {
     },
     "hud": {
       "lowMana": "Weinig mana",
+      "outOfMana": "Geen mana",
       "lowEnergy": "Weinig energie"
     },
     "talents": {

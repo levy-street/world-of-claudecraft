@@ -1991,6 +1991,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Servicevoorwaarden',
   'game.hud.lowEnergy': 'Weinig energie',
   'game.hud.lowMana': 'Weinig mana',
+  'game.hud.outOfMana': 'Geen mana',
   'game.leaderboard.empty': 'Nog geen kampioenen, wees de eerste die zijn stempel drukt.',
   'game.leaderboard.globalSubtitle': 'Topkampioenen uit alle realms',
   'game.leaderboard.level': 'Niv',

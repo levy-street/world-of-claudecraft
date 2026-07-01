@@ -79,6 +79,7 @@ export const zh_CN: EnTranslations = {
     },
     "hud": {
       "lowMana": "法力不足",
+      "outOfMana": "法力耗尽",
       "lowEnergy": "能量不足"
     },
     "talents": {

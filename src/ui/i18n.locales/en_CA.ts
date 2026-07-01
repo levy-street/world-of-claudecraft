@@ -27,4 +27,5 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.armorStat': '{value} Armour',
   // Stat tooltips keep the en prose; only the Armor -> Armour spelling diverges.
   'hudChrome.statInfo.effects.armor': '+{value} Armour',
+  'game.hud.outOfMana': 'Out of Mana',
 };

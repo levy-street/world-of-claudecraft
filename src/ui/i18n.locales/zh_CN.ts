@@ -297,6 +297,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadFailed': '无法加载该语言。将保留当前语言。',
   'settings.languageLoadUnavailable': '该语言不可用。',
   'game.hud.lowMana': '法力不足',
+  'game.hud.outOfMana': '法力耗尽',
   'game.hud.lowEnergy': '能量不足',
   'game.talents.title': '天赋',
   'game.talents.classTab': '职业',

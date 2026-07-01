@@ -303,6 +303,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Impossibile caricare questa lingua. La lingua attuale verrà mantenuta.',
   'settings.languageLoadUnavailable': 'Questa lingua non è disponibile.',
   'game.hud.lowMana': 'Mana basso',
+  'game.hud.outOfMana': 'Mana esaurito',
   'game.hud.lowEnergy': 'Energia bassa',
   'game.talents.title': 'Talenti',
   'game.talents.classTab': 'Classe',

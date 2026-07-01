@@ -1994,6 +1994,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Ketentuan Layanan',
   'game.hud.lowEnergy': 'Energi Rendah',
   'game.hud.lowMana': 'Mana Rendah',
+  'game.hud.outOfMana': 'Mana habis',
   'game.leaderboard.empty': 'Belum ada juara, jadilah yang pertama menorehkan jejakmu.',
   'game.leaderboard.globalSubtitle': 'Juara teratas di seluruh realm',
   'game.leaderboard.level': 'Lvl',

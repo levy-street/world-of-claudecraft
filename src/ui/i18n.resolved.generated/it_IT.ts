@@ -79,6 +79,7 @@ export const it_IT: EnTranslations = {
     },
     "hud": {
       "lowMana": "Mana basso",
+      "outOfMana": "Mana esaurito",
       "lowEnergy": "Energia bassa"
     },
     "talents": {

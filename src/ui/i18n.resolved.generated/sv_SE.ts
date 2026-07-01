@@ -79,6 +79,7 @@ export const sv_SE: EnTranslations = {
     },
     "hud": {
       "lowMana": "Låg mana",
+      "outOfMana": "Slut på mana",
       "lowEnergy": "Låg energi"
     },
     "talents": {

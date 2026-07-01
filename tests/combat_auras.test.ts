@@ -149,6 +149,20 @@ describe('auras: updateRegen', () => {
     expect(p.eating?.remaining).toBe(4); // remaining decremented by 2
   });
 
+  it('stops food and drink ticks once their bars are already full', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    const meta = sim.players.get(p.id) as PlayerMeta;
+    p.resourceType = 'mana';
+    p.resource = p.maxResource;
+    p.hp = p.maxHp;
+    p.eating = { itemId: 'food', kind: 'food', hpPer2s: 90, manaPer2s: 0, remaining: 6 };
+    p.drinking = { itemId: 'water', kind: 'drink', hpPer2s: 0, manaPer2s: 80, remaining: 6 };
+    sim.tickCount = 40;
+    updateRegen(sim.ctx, p, meta);
+    expect(p.eating).toBeNull();
+    expect(p.drinking).toBeNull();
+  });
   it('does nothing off the 40-tick boundary', () => {
     const sim = makeSim();
     const p = sim.player as AnyEntity;

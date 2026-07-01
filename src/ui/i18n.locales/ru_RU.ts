@@ -321,6 +321,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadFailed': 'Не удалось загрузить этот язык. Текущий язык будет сохранён.',
   'settings.languageLoadUnavailable': 'Этот язык недоступен.',
   'game.hud.lowMana': 'Мало маны',
+  'game.hud.outOfMana': 'Нет маны',
   'game.hud.lowEnergy': 'Мало энергии',
   'game.talents.title': 'Таланты',
   'game.talents.classTab': 'Класс',

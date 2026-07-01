@@ -79,6 +79,7 @@ export const da_DK: EnTranslations = {
     },
     "hud": {
       "lowMana": "Lav Mana",
+      "outOfMana": "Ingen Mana",
       "lowEnergy": "Lav Energi"
     },
     "talents": {

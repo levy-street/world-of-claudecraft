@@ -311,6 +311,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadFailed': '해당 언어를 불러오지 못했습니다. 현재 언어를 유지합니다.',
   'settings.languageLoadUnavailable': '해당 언어를 사용할 수 없습니다.',
   'game.hud.lowMana': '마나 부족',
+  'game.hud.outOfMana': '마나 고갈',
   'game.hud.lowEnergy': '기력 부족',
   'game.talents.title': '특성',
   'game.talents.classTab': '직업',

@@ -308,6 +308,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadFailed': 'その言語を読み込めませんでした。現在の言語を維持します。',
   'settings.languageLoadUnavailable': 'その言語は利用できません。',
   'game.hud.lowMana': 'マナ低下',
+  'game.hud.outOfMana': 'マナ切れ',
   'game.hud.lowEnergy': 'エネルギー低下',
   'game.talents.title': 'タレント',
   'game.talents.classTab': 'クラス',

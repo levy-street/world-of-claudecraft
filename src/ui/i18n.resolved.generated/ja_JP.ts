@@ -79,6 +79,7 @@ export const ja_JP: EnTranslations = {
     },
     "hud": {
       "lowMana": "マナ低下",
+      "outOfMana": "マナ切れ",
       "lowEnergy": "エネルギー低下"
     },
     "talents": {

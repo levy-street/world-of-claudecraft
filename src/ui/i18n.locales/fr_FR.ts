@@ -308,6 +308,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Impossible de charger cette langue. Votre langue actuelle est conservée.',
   'settings.languageLoadUnavailable': "Cette langue n'est pas disponible.",
   'game.hud.lowMana': 'Mana faible',
+  'game.hud.outOfMana': 'Plus de mana',
   'game.hud.lowEnergy': 'Énergie faible',
   'game.talents.title': 'Talents',
   'game.talents.classTab': 'Classe',

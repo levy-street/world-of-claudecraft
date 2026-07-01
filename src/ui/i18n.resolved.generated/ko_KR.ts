@@ -79,6 +79,7 @@ export const ko_KR: EnTranslations = {
     },
     "hud": {
       "lowMana": "마나 부족",
+      "outOfMana": "마나 고갈",
       "lowEnergy": "기력 부족"
     },
     "talents": {

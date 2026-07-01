@@ -1977,6 +1977,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Warunki korzystania z usługi',
   'game.hud.lowEnergy': 'Niska energia',
   'game.hud.lowMana': 'Niska mana',
+  'game.hud.outOfMana': 'Brak many',
   'game.leaderboard.empty':
     'Jeszcze żadnych mistrzów, zostań pierwszym, który zapisze się w historii.',
   'game.leaderboard.globalSubtitle': 'Najlepsi mistrzowie ze wszystkich światów',

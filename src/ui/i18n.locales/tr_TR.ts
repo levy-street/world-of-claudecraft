@@ -1960,6 +1960,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Hizmet Koşulları',
   'game.hud.lowEnergy': 'Düşük Enerji',
   'game.hud.lowMana': 'Düşük Mana',
+  'game.hud.outOfMana': 'Mana Yok',
   'game.leaderboard.empty': 'Henüz şampiyon yok — izini bırakan ilk kişi sen ol.',
   'game.leaderboard.globalSubtitle': 'Tüm diyarların en iyi şampiyonları',
   'game.leaderboard.level': 'Sv',

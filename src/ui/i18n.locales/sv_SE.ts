@@ -1967,6 +1967,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Användarvillkor',
   'game.hud.lowEnergy': 'Låg energi',
   'game.hud.lowMana': 'Låg mana',
+  'game.hud.outOfMana': 'Slut på mana',
   'game.leaderboard.empty': 'Inga mästare än, bli den första att göra avtryck.',
   'game.leaderboard.globalSubtitle': 'Främsta mästarna över alla riken',
   'game.leaderboard.level': 'Nivå',

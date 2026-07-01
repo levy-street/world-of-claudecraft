@@ -79,6 +79,7 @@ export const ru_RU: EnTranslations = {
     },
     "hud": {
       "lowMana": "Мало маны",
+      "outOfMana": "Нет маны",
       "lowEnergy": "Мало энергии"
     },
     "talents": {

@@ -79,6 +79,7 @@ export const vi_VN: EnTranslations = {
     },
     "hud": {
       "lowMana": "Cạn Mana",
+      "outOfMana": "Hết Mana",
       "lowEnergy": "Cạn Năng Lượng"
     },
     "talents": {

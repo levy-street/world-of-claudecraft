@@ -48,7 +48,7 @@ function setup() {
 
 const copperOf = (meta: PlayerMeta | undefined) => meta?.copper ?? 0;
 
-describe('loot goes FFA one minute after a corpse becomes lootable', () => {
+describe('loot goes FFA after a short owner-lock grace', () => {
   it('blocks a stranger while the corpse is still owner-locked', () => {
     const { sim, internals, stranger, mob } = setup();
     expect(mob.lootFfaTimer).toBeGreaterThan(0);

@@ -1985,6 +1985,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Điều Khoản Dịch Vụ',
   'game.hud.lowEnergy': 'Cạn Năng Lượng',
   'game.hud.lowMana': 'Cạn Mana',
+  'game.hud.outOfMana': 'Hết Mana',
   'game.leaderboard.empty': 'Chưa có nhà vô địch nào, hãy là người đầu tiên ghi dấu ấn.',
   'game.leaderboard.globalSubtitle': 'Những nhà vô địch hàng đầu trên mọi máy chủ',
   'game.leaderboard.level': 'Cấp',

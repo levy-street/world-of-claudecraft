@@ -79,6 +79,7 @@ export const tr_TR: EnTranslations = {
     },
     "hud": {
       "lowMana": "Düşük Mana",
+      "outOfMana": "Mana Yok",
       "lowEnergy": "Düşük Enerji"
     },
     "talents": {

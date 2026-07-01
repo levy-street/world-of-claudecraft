@@ -79,6 +79,7 @@ export const en: EnTranslations = {
     },
     "hud": {
       "lowMana": "Low Mana",
+      "outOfMana": "Out of Mana",
       "lowEnergy": "Low Energy"
     },
     "talents": {

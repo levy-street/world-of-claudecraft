@@ -81,6 +81,14 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
   for (const slot of ['eating', 'drinking'] as const) {
     const c = p[slot];
     if (!c) continue;
+    const restoresHp = c.hpPer2s > 0;
+    const restoresMana = c.manaPer2s > 0 && p.resourceType === 'mana';
+    const hpFull = !restoresHp || p.hp >= p.maxHp;
+    const manaFull = !restoresMana || p.resource >= p.maxResource;
+    if (hpFull && manaFull) {
+      p[slot] = null;
+      continue;
+    }
     if (c.hpPer2s > 0 && p.hp < p.maxHp) {
       const heal = Math.min(Math.round(c.hpPer2s * ctx.healingTakenMult(p)), p.maxHp - p.hp);
       p.hp += heal;

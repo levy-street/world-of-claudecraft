@@ -79,6 +79,7 @@ export const id_ID: EnTranslations = {
     },
     "hud": {
       "lowMana": "Mana Rendah",
+      "outOfMana": "Mana habis",
       "lowEnergy": "Energi Rendah"
     },
     "talents": {

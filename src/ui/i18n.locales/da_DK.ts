@@ -1962,6 +1962,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Servicevilkår',
   'game.hud.lowEnergy': 'Lav Energi',
   'game.hud.lowMana': 'Lav Mana',
+  'game.hud.outOfMana': 'Ingen Mana',
   'game.leaderboard.empty': 'Ingen mestre endnu, vær den første til at sætte dit præg.',
   'game.leaderboard.globalSubtitle': 'Topmestre på tværs af alle riger',
   'game.leaderboard.level': 'Niv',

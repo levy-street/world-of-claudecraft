@@ -302,6 +302,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadFailed': 'No se pudo cargar ese idioma. Se mantendrá tu idioma actual.',
   'settings.languageLoadUnavailable': 'Ese idioma no está disponible.',
   'game.hud.lowMana': 'Maná bajo',
+  'game.hud.outOfMana': 'Sin maná',
   'game.hud.lowEnergy': 'Energía baja',
   'game.talents.title': 'Talentos',
   'game.talents.classTab': 'Clase',

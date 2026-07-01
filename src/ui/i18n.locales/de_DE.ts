@@ -303,6 +303,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Diese Sprache konnte nicht geladen werden. Deine aktuelle Sprache bleibt erhalten.',
   'settings.languageLoadUnavailable': 'Diese Sprache ist nicht verfügbar.',
   'game.hud.lowMana': 'Wenig Mana',
+  'game.hud.outOfMana': 'Kein Mana',
   'game.hud.lowEnergy': 'Wenig Energie',
   'game.talents.title': 'Talente',
   'game.talents.classTab': 'Klasse',
