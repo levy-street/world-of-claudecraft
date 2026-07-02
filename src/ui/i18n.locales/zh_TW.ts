@@ -3168,6 +3168,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.rest.resting': '休息中',
   'hudChrome.swing.ready': '揮砍',
   'hudChrome.swing.seconds': '{seconds}秒',
+  'hudChrome.veil.arenaName': '灰燼鬥獸場',
+  'hudChrome.veil.entering': '正在進入',
   'hudChrome.widgets.clockTitle': '本地時間 - 點擊切換 12／24 小時制',
   'hudChrome.widgets.coordinates': '座標',
   'hudChrome.widgets.heading': '方位',

@@ -85,6 +85,13 @@ export const hudChromeStrings = {
     ready: 'Swing',
     seconds: '{seconds}s',
   },
+  // Instance-transition veil (the loading curtain on dungeon/arena/delve
+  // teleports). Zone/dungeon/delve destination names come from the entity
+  // resolvers; the arena is not an entity, so its display name lives here.
+  veil: {
+    entering: 'Now entering',
+    arenaName: 'The Ashen Coliseum',
+  },
   rest: {
     resting: 'Resting',
   },

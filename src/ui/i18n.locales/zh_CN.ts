@@ -3167,6 +3167,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.rest.resting': '休息中',
   'hudChrome.swing.ready': '挥击',
   'hudChrome.swing.seconds': '{seconds}秒',
+  'hudChrome.veil.arenaName': '灰烬斗兽场',
+  'hudChrome.veil.entering': '正在进入',
   'hudChrome.widgets.clockTitle': '本地时间 - 点击切换 12/24 小时制',
   'hudChrome.widgets.coordinates': '坐标',
   'hudChrome.widgets.heading': '朝向',

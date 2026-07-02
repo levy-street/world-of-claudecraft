@@ -222,6 +222,10 @@ export const vi_VN: EnTranslations = {
       "ready": "Vung Đòn",
       "seconds": "{seconds}s"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Đang Nghỉ Ngơi"
     },

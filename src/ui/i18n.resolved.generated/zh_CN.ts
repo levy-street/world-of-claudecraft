@@ -222,6 +222,10 @@ export const zh_CN: EnTranslations = {
       "ready": "挥击",
       "seconds": "{seconds}秒"
     },
+    "veil": {
+      "entering": "正在进入",
+      "arenaName": "灰烬斗兽场"
+    },
     "rest": {
       "resting": "休息中"
     },

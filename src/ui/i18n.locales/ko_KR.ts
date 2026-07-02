@@ -3302,6 +3302,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.rest.resting': '휴식 중',
   'hudChrome.swing.ready': '공격',
   'hudChrome.swing.seconds': '{seconds}초',
+  'hudChrome.veil.arenaName': '잿빛 콜로세움',
+  'hudChrome.veil.entering': '입장 중',
   'hudChrome.widgets.clockTitle': '현지 시각 - 클릭하면 12/24시간제 전환',
   'hudChrome.widgets.coordinates': '좌표',
   'hudChrome.widgets.heading': '방향',

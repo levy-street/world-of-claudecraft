@@ -156,6 +156,7 @@ const UI_PURE_CORES = [
   'src/ui/action_bar_view.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
+  'src/ui/zone_veil_view.ts',
   'src/ui/fct_core.ts',
   'src/ui/fct_event.ts',
   'src/ui/focus_order.ts',

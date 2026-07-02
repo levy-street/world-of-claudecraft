@@ -222,6 +222,10 @@ export const ru_RU: EnTranslations = {
       "ready": "Замах",
       "seconds": "{seconds} сек."
     },
+    "veil": {
+      "entering": "Вы входите",
+      "arenaName": "Пепельный Колизей"
+    },
     "rest": {
       "resting": "Отдых"
     },

@@ -222,6 +222,10 @@ export const zh_TW: EnTranslations = {
       "ready": "揮砍",
       "seconds": "{seconds}秒"
     },
+    "veil": {
+      "entering": "正在進入",
+      "arenaName": "灰燼鬥獸場"
+    },
     "rest": {
       "resting": "休息中"
     },

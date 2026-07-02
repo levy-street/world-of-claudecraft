@@ -355,6 +355,15 @@
     <div id="banner"></div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner"></div>
+    <!-- instance-transition veil: the loading curtain on dungeon/arena/delve
+         teleports (src/ui/zone_veil_painter.ts fills the text through t()).
+         aria-hidden is deliberate: the destination is already announced to
+         screen readers by the chat-log live region (the dungeon enterText /
+         enteringZone log lines), so the curtain stays decorative. -->
+    <div id="zone-veil" aria-hidden="true">
+      <div class="veil-sub"></div>
+      <div class="veil-name"></div>
+    </div>
 
     <div id="death-overlay">
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>

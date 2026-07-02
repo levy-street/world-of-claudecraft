@@ -222,6 +222,10 @@ export const da_DK: EnTranslations = {
       "ready": "Slag",
       "seconds": "{seconds}s"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Hviler"
     },

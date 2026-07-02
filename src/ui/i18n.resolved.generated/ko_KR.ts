@@ -222,6 +222,10 @@ export const ko_KR: EnTranslations = {
       "ready": "공격",
       "seconds": "{seconds}초"
     },
+    "veil": {
+      "entering": "입장 중",
+      "arenaName": "잿빛 콜로세움"
+    },
     "rest": {
       "resting": "휴식 중"
     },

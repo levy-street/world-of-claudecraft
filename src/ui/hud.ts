@@ -305,6 +305,8 @@ import {
 import { makeWindowFocus } from './window_focus';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
+import { ZoneVeilPainter } from './zone_veil_painter';
+import { ZoneVeilCore } from './zone_veil_view';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -2467,6 +2469,17 @@ export class Hud {
     this.swingFillEl,
     this.swingLabelEl,
   );
+  // Instance-transition veil (the loading curtain on dungeon/arena/delve
+  // teleports): trigger detection + phase machine in the pure core, DOM via
+  // the same write-elision facet (the .show toggle and the two label writes
+  // land only on a phase change / a new trigger, so steady state is all skips).
+  private readonly zoneVeilCore = new ZoneVeilCore();
+  private readonly zoneVeilPainter = new ZoneVeilPainter(
+    this.writerFacet,
+    $('#zone-veil'),
+    $('#zone-veil .veil-sub'),
+    $('#zone-veil .veil-name'),
+  );
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
   // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
   // projects the head anchor ONCE (screen-anchored, byte-faithful to the old fct() and to
@@ -4432,6 +4445,9 @@ export class Hud {
     if (fastHud) this.chatAnnouncer.flush(now);
 
     this.meters.update();
+    // Instance-transition veil: fed every frame (a teleport must be caught on
+    // the frame it lands, before the destination renders un-veiled).
+    this.zoneVeilPainter.paint(this.zoneVeilCore.update(p.pos.x, p.pos.z, now));
     this.lockpickWindow.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();

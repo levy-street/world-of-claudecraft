@@ -222,6 +222,10 @@ export const sv_SE: EnTranslations = {
       "ready": "Sving",
       "seconds": "{seconds}s"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Vilar"
     },

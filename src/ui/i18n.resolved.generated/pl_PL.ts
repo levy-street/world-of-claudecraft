@@ -222,6 +222,10 @@ export const pl_PL: EnTranslations = {
       "ready": "Zamach",
       "seconds": "{seconds}s"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Odpoczynek"
     },

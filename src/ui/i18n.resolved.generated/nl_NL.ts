@@ -222,6 +222,10 @@ export const nl_NL: EnTranslations = {
       "ready": "Slag",
       "seconds": "{seconds}s"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Aan het rusten"
     },

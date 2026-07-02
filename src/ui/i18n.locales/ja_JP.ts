@@ -3302,6 +3302,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.rest.resting': '休息中',
   'hudChrome.swing.ready': '攻撃',
   'hudChrome.swing.seconds': '{seconds}秒',
+  'hudChrome.veil.arenaName': '灰燼の闘技場',
+  'hudChrome.veil.entering': 'まもなく到着',
   'hudChrome.widgets.clockTitle': '現地時刻 - クリックで12/24時間表記を切り替え',
   'hudChrome.widgets.coordinates': '座標',
   'hudChrome.widgets.heading': '方角',

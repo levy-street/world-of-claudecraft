@@ -222,6 +222,10 @@ export const id_ID: EnTranslations = {
       "ready": "Ayun",
       "seconds": "{seconds}d"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Beristirahat"
     },

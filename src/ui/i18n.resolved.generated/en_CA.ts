@@ -222,6 +222,10 @@ export const en_CA: EnTranslations = {
       "ready": "Swing",
       "seconds": "{seconds}s"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Resting"
     },

@@ -222,6 +222,10 @@ export const ja_JP: EnTranslations = {
       "ready": "攻撃",
       "seconds": "{seconds}秒"
     },
+    "veil": {
+      "entering": "まもなく到着",
+      "arenaName": "灰燼の闘技場"
+    },
     "rest": {
       "resting": "休息中"
     },

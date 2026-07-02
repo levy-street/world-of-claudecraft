@@ -3349,6 +3349,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.rest.resting': 'Отдых',
   'hudChrome.swing.ready': 'Замах',
   'hudChrome.swing.seconds': '{seconds} сек.',
+  'hudChrome.veil.arenaName': 'Пепельный Колизей',
+  'hudChrome.veil.entering': 'Вы входите',
   'hudChrome.widgets.clockTitle': 'Местное время — нажмите для переключения 12/24-часового формата',
   'hudChrome.widgets.coordinates': 'Координаты',
   'hudChrome.widgets.heading': 'Направление',

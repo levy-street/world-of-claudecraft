@@ -222,6 +222,10 @@ export const en_XA: EnTranslations = {
       "ready": "[Šŵíñĝ]",
       "seconds": "[{seconds}š]"
     },
+    "veil": {
+      "entering": "[Ñóŵ éñţéŕíñĝ]",
+      "arenaName": "[Ţĥé Ášĥéñ Çóļíšéúɱ]"
+    },
     "rest": {
       "resting": "[Ŕéšţíñĝ]"
     },

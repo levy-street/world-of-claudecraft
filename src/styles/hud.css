@@ -3193,6 +3193,59 @@
     white-space: nowrap;
   }
 
+  /* Instance-transition veil: the full-screen loading curtain on dungeon /
+     arena / delve teleports. The painter (zone_veil_painter.ts) toggles .show
+     during the cover+hold phases and publishes --veil-cover-ms /
+     --veil-reveal-ms from the view-core constants; both fades multiply by
+     --motion-scale so reduced motion collapses them to instant while
+     transitionend still fires. visibility (not display) keeps the opacity
+     transition runnable from the hidden state, and pointer-events:none means
+     the curtain never eats input. z-index sits above every HUD window and the
+     mobile controls (250) but below the pre-game shell (300). */
+  #zone-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 260;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: radial-gradient(ellipse at center, #10131c 0%, #05070c 78%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity calc(var(--veil-reveal-ms, 380ms) * var(--motion-scale, 1)) ease,
+      visibility 0s linear calc(var(--veil-reveal-ms, 380ms) * var(--motion-scale, 1));
+  }
+  #zone-veil.show {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity calc(var(--veil-cover-ms, 140ms) * var(--motion-scale, 1)) ease,
+      visibility 0s;
+  }
+  #zone-veil .veil-sub {
+    color: var(--color-gold);
+    font-family: var(--title-font);
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+  #zone-veil .veil-name {
+    color: #fff;
+    font-family: var(--title-font);
+    font-size: 34px;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 0 16px;
+    text-shadow:
+      0 0 18px #00000088,
+      1px 1px 4px #000;
+  }
+
   /* ---------- low-health screen vignette ---------- */
   /* Pulsing red edge glow that fades in as the player nears death. Opacity and
      pulse cadence are driven from JS via the --lhv-* custom properties; the

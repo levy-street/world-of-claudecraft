@@ -222,6 +222,10 @@ export const fr_CA: EnTranslations = {
       "ready": "Coup",
       "seconds": "{seconds} s"
     },
+    "veil": {
+      "entering": "Now entering",
+      "arenaName": "The Ashen Coliseum"
+    },
     "rest": {
       "resting": "Au repos"
     },
