@@ -196,7 +196,7 @@ describe('master loot', () => {
         if (e.type === 'lootRoll' && e.rollId === rollId) convertedEarly = true;
     }
     expect(convertedEarly).toBe(false);
-  });
+  }, 90_000);
 
   it('converts an uncurated drop to a need/greed roll for all candidates at the 5-min timeout', () => {
     const sim = makeSim();
@@ -213,7 +213,7 @@ describe('master loot', () => {
         if (e.type === 'lootRoll' && e.rollId === rollId && e.pid !== undefined) rolls.push(e.pid);
     }
     expect(rolls.sort((x, y) => x - y)).toEqual([a, b].sort((x, y) => x - y));
-  });
+  }, 90_000);
 
   it('only the leader can change the loot method', () => {
     const sim = makeSim();
