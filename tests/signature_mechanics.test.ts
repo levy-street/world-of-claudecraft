@@ -378,6 +378,28 @@ describe('PR3 signature mechanics', () => {
     expect(bfBuff && bfBuff.type === 'selfBuff' ? bfBuff.value : 0).toBeCloseTo(1.2);
   });
 
+  it('Trueshot Aura BUFFS the caster and nearby allies, never debuffing hostiles', () => {
+    // Regression: it originally shipped as aoeAttackPower, which is the
+    // Demoralizing Shout HOSTILE AP DEBUFF mechanic.
+    const { sim, p } = makeSim('hunter');
+    expect(sim.setSpec('marksmanship')).toBe(true);
+    const friendId = sim.addPlayer('warrior', 'Friend');
+    sim.setPlayerLevel(20, friendId);
+    const friend = entityOf(sim, friendId);
+    friend.pos = { x: p.pos.x + 3, y: p.pos.y, z: p.pos.z };
+    friend.prevPos = { ...friend.pos };
+    const hostile = spawnTarget(sim, p, 4);
+    p.resource = p.maxResource;
+
+    sim.castAbility('trueshot_aura');
+
+    expect(p.auras.some((a) => a.kind === 'buff_ap' && a.id === 'trueshot_aura_ap')).toBe(true);
+    expect(friend.auras.some((a) => a.kind === 'buff_ap' && a.id === 'trueshot_aura_ap')).toBe(
+      true,
+    );
+    expect(hostile.auras.length).toBe(0);
+  });
+
   it('Shadowform carries its Spell Power bonus in the form aura, dying with the toggle', () => {
     const { sim, p } = makeSim('priest');
     expect(sim.setSpec('shadow')).toBe(true);

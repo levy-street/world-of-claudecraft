@@ -626,6 +626,23 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyAttackPower': {
+        // The friendly mirror of aoeAttackPower: an AP BUFF on the caster and
+        // nearby allies (Trueshot Aura), riding the PR3a friendlies seam.
+        for (const m of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+          ctx.applyAura(m, {
+            id: `${ability.id}_ap`,
+            name: ability.name,
+            kind: 'buff_ap',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.amount,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
       case 'aoeRoot': {
         ctx.emit({
           type: 'spellfx',

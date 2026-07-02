@@ -3658,7 +3658,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'aoeAttackPower', amount: 35, duration: 300, radius: 30 }],
+    effects: [{ type: 'aoeAllyAttackPower', amount: 35, duration: 300, radius: 30 }],
     description:
       'Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)',
   },
