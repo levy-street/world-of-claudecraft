@@ -890,17 +890,19 @@
           </div>
         </div>
 
-        <div id="offline-select" class="panel auth-panel auth-panel-premium" hidden>
-          <h2 class="auth-title" data-i18n="auth.offlineCharacter">Offline Character</h2>
-          <div class="charselect-layout">
-            <!-- Left Column: Character Name & Class Chips & Actions -->
-            <div class="charselect-col-left">
+        <div id="offline-select" class="panel charselect-screen" hidden>
+          <header class="cs-head">
+            <h2 class="auth-title cs-title" data-i18n="auth.offlineCharacter">Offline Character</h2>
+          </header>
+          <div class="cs-body cs-body-create">
+            <div class="cs-create-col">
               <div class="char-create">
-                <label for="char-name" class="auth-label" data-i18n="auth.characterName">Character Name</label>
+                <div class="cs-section-header" data-i18n="auth.characterName">Character Name</div>
                 <div class="char-input-group">
-                  <input id="char-name" maxlength="16" data-i18n-placeholder="auth.characterNamePlaceholder" placeholder="Character name" value="" aria-describedby="offline-error" autocomplete="off" />
+                  <input id="char-name" maxlength="16" data-i18n-placeholder="auth.characterNamePlaceholder" placeholder="Character name" value="" data-i18n-aria="auth.characterName" aria-label="Character Name" aria-describedby="offline-error" autocomplete="off" />
                   <div id="offline-error" class="auth-error" aria-live="polite"></div>
                 </div>
+                <div class="cs-section-header" data-i18n="auth.class">Class</div>
                 <div class="mini-class-row">
                   <button type="button" class="mini-class" data-class="warrior" data-i18n-aria="classes.warriorAria" data-i18n="classes.warrior" aria-label="Warrior class" aria-pressed="false">Warrior</button>
                   <button type="button" class="mini-class" data-class="paladin" data-i18n-aria="classes.paladinAria" data-i18n="classes.paladin" aria-label="Paladin class" aria-pressed="false">Paladin</button>
@@ -942,16 +944,18 @@
                     </div>
                   </div>
                 </div>
-                <div id="offline-skin-row" class="skin-row"></div>
-                <div class="auth-actions">
-                  <button type="button" class="btn btn-primary" id="btn-start-offline" data-i18n="auth.enterWorld">Enter World</button>
+                <div class="skin-picker">
+                  <div class="skin-picker-header" data-i18n="auth.appearance">Appearance</div>
+                  <div id="offline-skin-row" class="skin-row"></div>
+                </div>
+                <div class="auth-actions cs-form-actions">
                   <button type="button" class="btn btn-secondary" id="btn-offline-back" data-i18n="auth.back">Back</button>
+                  <button type="button" class="btn btn-primary" id="btn-start-offline" data-i18n="auth.enterWorld">Enter World</button>
                 </div>
               </div>
             </div>
-            <!-- Right Column: Detailed Class Info & Preview -->
-            <div class="charselect-col-right">
-              <div class="char-preview-container" id="offline-preview-container"></div>
+            <div class="cs-detail-col">
+              <div class="char-preview-container cs-preview" id="offline-preview-container"></div>
               <div id="offline-class-details" class="class-details-panel" aria-live="polite"></div>
             </div>
           </div>

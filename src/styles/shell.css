@@ -3978,7 +3978,7 @@
       width: min(1160px, 96vw) !important;
       max-width: none !important;
       height: min(640px, calc(100vh - 190px));
-      min-height: 520px;
+      min-height: 460px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -4487,6 +4487,29 @@
     margin-top: 0;
     padding-top: 0;
     align-items: stretch;
+  }
+
+  /* Bound both create screens to the viewport on desktop so the form column
+     scrolls internally (the Faction & Race section made it taller than one
+     screen) and the Create/Enter World actions never fall below the fold. */
+  @media (min-width: 900px) {
+    body:not(.mobile-touch) #charcreate-panel,
+    body:not(.mobile-touch) #offline-select {
+      display: flex;
+      flex-direction: column;
+      height: min(760px, calc(100vh - 270px));
+      min-height: 460px;
+      overflow: hidden;
+    }
+    body:not(.mobile-touch) #charcreate-panel .cs-form-actions,
+    body:not(.mobile-touch) #offline-select .cs-form-actions {
+      /* keep the actions visible while the sections above scroll */
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 10, 15, 0.96) 30%);
+      padding-top: 14px;
+      margin-top: auto;
+    }
   }
   .cs-create-col .char-input-group {
     max-width: none;
