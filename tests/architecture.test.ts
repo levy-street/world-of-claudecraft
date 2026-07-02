@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
@@ -363,7 +363,9 @@ describe('src/world_api IWorld seam purity invariants', () => {
   it('pulls only TYPES from src/sim (a value sim import would drag the engine into the seam)', () => {
     const violations: string[] = [];
     for (const file of worldApiFiles) {
-      const rel = relative(repoRoot, file);
+      // Windows: path.relative yields backslash-separated paths; the allowlist
+      // keys use '/', so normalize before the lookup or the sanction never matches.
+      const rel = relative(repoRoot, file).split(sep).join('/');
       const allowed = SANCTIONED_VALUE_SIM_IMPORTS[rel] ?? new Set<string>();
       const src = stripComments(readFileSync(file, 'utf8'));
       for (const m of src.matchAll(SEAM_IMPORT_RE)) {
