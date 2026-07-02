@@ -181,7 +181,9 @@ function composeTownEastbrook(): Theme {
     pushNote(ev, b0 + 2, c.root - 24, 1.8, 0.42, 'bass');
     // harp: flowing eighth arpeggio root-3rd-5th-octave and back
     const arp = [t[0], t[1], t[2], t[0] + 12, t[2], t[1], t[0], t[1]];
-    arp.forEach((n, i) => pushNote(ev, b0 + i * 0.5, n, 0.5, 0.34, 'harp'));
+    arp.forEach((n, i) => {
+      pushNote(ev, b0 + i * 0.5, n, 0.5, 0.34, 'harp');
+    });
     // horn counterline in the back half of each section
     if (bar % 8 >= 4) {
       pushNote(ev, b0, c.root - 12, 2, 0.16, 'horn');
@@ -257,7 +259,9 @@ function pushRepeated(
   vel: number,
   inst: Inst,
 ): void {
-  notes.forEach((m, i) => pushNote(out, startBeat + i * step, m, dur, vel, inst));
+  notes.forEach((m, i) => {
+    pushNote(out, startBeat + i * step, m, dur, vel, inst);
+  });
 }
 
 function pushDrumHits(
@@ -268,9 +272,9 @@ function pushDrumHits(
   vel: number,
   midi = 42,
 ): void {
-  offsets.forEach((b, i) =>
-    pushNote(out, startBeat + b, midi, 0.22, vel * (i % 2 === 0 ? 1 : 0.78), inst),
-  );
+  offsets.forEach((b, i) => {
+    pushNote(out, startBeat + b, midi, 0.22, vel * (i % 2 === 0 ? 1 : 0.78), inst);
+  });
 }
 
 function pushPedal(out: NoteEvent[], beat: number, root: number, inst: Inst, vel: number): void {
@@ -580,9 +584,9 @@ function composeLegacyVale(): Theme {
     if (bar % 4 === 1) pushNote(ev, b0 + 2, c.root - 5, 1.8, 0.24, 'bass');
     if (bar % 4 === 3) pushNote(ev, b0 + 2.5, c.root - 10, 1.4, 0.22, 'bass');
     if (bar % 4 === 2) {
-      [t[2], t[0] + 12, t[1] + 12].forEach((n, i) =>
-        pushNote(ev, b0 + 1 + i * 0.5, n, 0.5, 0.2, 'harp'),
-      );
+      [t[2], t[0] + 12, t[1] + 12].forEach((n, i) => {
+        pushNote(ev, b0 + 1 + i * 0.5, n, 0.5, 0.2, 'harp');
+      });
     }
   });
 
@@ -861,7 +865,7 @@ function composeDungeonFight(
     const ost = opts.doubleTime
       ? [0, 1, 0, 3, 0, 6, 5, 3, 0, 1, 0, 3, 7, 6, 5, 3]
       : [0, 1, 0, 3, 0, 6, 5, 3];
-    ost.forEach((s, i) =>
+    ost.forEach((s, i) => {
       pushNote(
         ev,
         b0 + i * (opts.doubleTime ? 0.25 : 0.5),
@@ -869,8 +873,8 @@ function composeDungeonFight(
         opts.doubleTime ? 0.18 : 0.28,
         0.2,
         i % 2 === 0 ? 'stacc' : opts.lead,
-      ),
-    );
+      );
+    });
 
     pushDrumHits(
       ev,
@@ -1015,7 +1019,9 @@ function composeCombat(): Theme {
     pushNote(ev, b0 + 3.5, 38, 0.5, 0.3, 'timpani');
     // driving staccato eighths: 1-1-b3-1-5-1-b3-4 in semitones from D3
     const steps = [0, 0, 3, 0, 7, 0, 3, 5];
-    steps.forEach((s, i) => pushNote(ev, b0 + i * 0.5, 50 + s, 0.4, 0.26, 'stacc'));
+    steps.forEach((s, i) => {
+      pushNote(ev, b0 + i * 0.5, 50 + s, 0.4, 0.26, 'stacc');
+    });
     if (bar % 2 === 1) {
       pushNote(ev, b0, 50, 1.6, 0.2, 'horn');
       pushNote(ev, b0 + 0.02, 57, 1.6, 0.16, 'horn');

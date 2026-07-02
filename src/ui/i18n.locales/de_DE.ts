@@ -5305,6 +5305,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.craterheart_mantle.name': 'Kraterherz-Mantel',
   'entities.items.butchers_chainguard.name': 'Kettenschutz des Schlächters',
   'entities.items.vhorlans_flensing_blade.name': 'Vhorlans Schindklinge',
-  'entities.items.warbringers_hellforged_cuirass.name': 'Höllengeschmiedeter Harnisch des Kriegsbringers',
+  'entities.items.warbringers_hellforged_cuirass.name':
+    'Höllengeschmiedeter Harnisch des Kriegsbringers',
   'entities.items.khorvax_warcleaver.name': 'Khorvax-Kriegsspalter',
 };

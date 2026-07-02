@@ -3,7 +3,12 @@ import { CLASSES } from '../src/sim/content/classes';
 import { ITEMS } from '../src/sim/data';
 import { recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, armorReduction, type PlayerClass, SPELL_POWER_PER_INT } from '../src/sim/types';
+import {
+  ALL_CLASSES,
+  armorReduction,
+  type PlayerClass,
+  SPELL_POWER_PER_INT,
+} from '../src/sim/types';
 import {
   agiMeleeApPerPoint,
   buildStatTooltip,

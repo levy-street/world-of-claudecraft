@@ -2144,7 +2144,8 @@ const itemNamesEn = {
   },
   entities: {
     ...classAbilityNamesEn.entities,
-    items: itemTranslations([      'Worn Shortsword',
+    items: itemTranslations([
+      'Worn Shortsword',
       'Gnarled Staff',
       'Rusty Dagger',
       'Training Mace',

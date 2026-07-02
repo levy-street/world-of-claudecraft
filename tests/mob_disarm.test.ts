@@ -14,7 +14,7 @@ function makeSim(playerClass: 'warrior' | 'mage' = 'warrior') {
 
 // Spawn a Thornpeak Crusher adjacent to the player, engaged and ready to swing.
 function spawnCrusher(sim: Sim, target: Entity): Entity {
-  const template = MOBS['ogre_crusher'];
+  const template = MOBS.ogre_crusher;
   const mob = createMob((sim as any).nextId++, template, 17, {
     x: target.pos.x,
     y: target.pos.y,
@@ -32,7 +32,7 @@ function swing(sim: Sim, mob: Entity, target: Entity) {
 
 describe('mob disarm ("Disarming Smash")', () => {
   it('seeds the disarm mechanic on the Thornpeak Crusher', () => {
-    expect(MOBS['ogre_crusher'].disarm).toEqual({
+    expect(MOBS.ogre_crusher.disarm).toEqual({
       chance: 0.25,
       duration: 6,
       name: 'Disarming Smash',
@@ -46,17 +46,17 @@ describe('mob disarm ("Disarming Smash")', () => {
     p.maxHp = 100000;
     p.hp = 100000;
     const mob = spawnCrusher(sim, p);
-    MOBS['ogre_crusher'].disarm!.chance = 1; // deterministic for the test
+    MOBS.ogre_crusher.disarm!.chance = 1; // deterministic for the test
     // The swing itself can still miss/dodge on the hit table, so land one for
     // real (bounded; chance 1 means the first LANDED hit must disarm).
     for (let i = 0; i < 10 && !p.auras.some((a) => a.kind === 'disarm'); i++) {
       swing(sim, mob, p);
     }
-    MOBS['ogre_crusher'].disarm!.chance = 0.25;
+    MOBS.ogre_crusher.disarm!.chance = 0.25;
     const aura = p.auras.find((a) => a.kind === 'disarm');
     expect(aura).toBeTruthy();
-    expect(aura!.name).toBe('Disarming Smash');
-    expect(aura!.remaining).toBe(6);
+    expect(aura?.name).toBe('Disarming Smash');
+    expect(aura?.remaining).toBe(6);
   });
 
   it('suppresses auto-attack while disarmed, then resumes once it falls off', () => {
@@ -64,7 +64,7 @@ describe('mob disarm ("Disarming Smash")', () => {
     const p = sim.player;
     const meta = (sim as any).players.get(p.id);
     // A defenseless dummy directly in front of the player, inside melee range.
-    const dummy = createMob((sim as any).nextId++, MOBS['ogre_crusher'], 1, {
+    const dummy = createMob((sim as any).nextId++, MOBS.ogre_crusher, 1, {
       x: p.pos.x + 1,
       y: p.pos.y,
       z: p.pos.z,
@@ -111,9 +111,9 @@ describe('mob disarm ("Disarming Smash")', () => {
     const pet = spawnCrusher(sim, p);
     pet.hostile = false; // a friendly shape sharing the mobSwing path
     pet.ownerId = p.id;
-    MOBS['ogre_crusher'].disarm!.chance = 1;
+    MOBS.ogre_crusher.disarm!.chance = 1;
     swing(sim, pet, p);
-    MOBS['ogre_crusher'].disarm!.chance = 0.25;
+    MOBS.ogre_crusher.disarm!.chance = 0.25;
     expect(p.auras.some((a) => a.kind === 'disarm')).toBe(false);
   });
 });
