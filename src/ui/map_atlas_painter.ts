@@ -11,8 +11,8 @@
 // --color-map-* tokens via getComputedStyle ONCE per redraw; every other
 // literal (fonts, alphas, widths, offsets) is a named constant.
 
-import { t } from './i18n';
 import { zoneDisplayName } from './entity_i18n';
+import { t } from './i18n';
 import type { AtlasAccent, AtlasModel } from './map_atlas_view';
 
 const TITLE_FONT = 'bold 16px Georgia';
