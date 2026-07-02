@@ -2200,8 +2200,9 @@ export const fr_CA: EnTranslations = {
       "tombstoneOpen": "Un passage de pierre tombale scellé s'ouvre en grinçant vers le nord. Avancez dedans pour continuer.",
       "tombstoneInto": "Vous franchissez la pierre tombale vers {name}.",
       "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
-      "eggSacBurst": "The egg-sac bursts. Blackwater slops across the baptistry rim.",
-      "baptistryEggs": "The baptistry falls quiet. Widow egg-sacs swell along the rim.",
+      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
+      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
       "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Le coffre est vide.",
       "notInDelve": "Vous n'êtes pas dans une excavation.",
@@ -5691,6 +5692,9 @@ export const fr_CA: EnTranslations = {
       },
       "mirefen_widowling": {
         "name": "Mirefen Widowling"
+      },
+      "spider_egg_sac": {
+        "name": "Spider Egg-Sac"
       },
       "grave_silt_bulwark": {
         "name": "Grave-Silt Bulwark"

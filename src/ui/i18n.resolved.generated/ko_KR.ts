@@ -2200,8 +2200,9 @@ export const ko_KR: EnTranslations = {
       "tombstoneOpen": "봉인된 묘비 통로가 북쪽으로 갈리며 열립니다. 그 안으로 걸어 들어가 계속 진행하세요.",
       "tombstoneInto": "묘비를 통과해 {name}(으)로 들어갑니다.",
       "bellRopeShock": "종줄이 팽팽하게 당겨진다. 익사한 영창자들이 충격에 비틀거린다.",
-      "eggSacBurst": "알주머니가 터진다. 흑수가 세례당 가장자리로 튄다.",
-      "baptistryEggs": "세례당이 고요해진다. 과부 알주머니가 가장자리를 따라 부풀어 오른다.",
+      "eggSacBurst": "알집이 터진다. 거미 새끼들이 세례당 가장자리로 흩어져 달아난다.",
+      "baptistryEggs": "세례당이 고요해진다. 거미 알집이 축축하게 가장자리에 들러붙어 있다.",
+      "baptistrySpidersSealed": "거미 알집을 파괴해 보아야 할 것이다.",
       "baptistryWave": "세례당의 검은 물속에서 무언가가 꿈틀거린다.",
       "chestEmpty": "상자가 비어 있습니다.",
       "notInDelve": "탐굴 중이 아닙니다.",
@@ -5691,6 +5692,9 @@ export const ko_KR: EnTranslations = {
       },
       "mirefen_widowling": {
         "name": "진창늪 과부거미"
+      },
+      "spider_egg_sac": {
+        "name": "거미 알집"
       },
       "grave_silt_bulwark": {
         "name": "무덤진흙 방벽"

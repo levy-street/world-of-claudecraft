@@ -2200,8 +2200,9 @@ export const ja_JP: EnTranslations = {
       "tombstoneOpen": "封じられた墓石の通路が北へきしみながら開く。中へ歩み入って進め。",
       "tombstoneInto": "あなたは墓石を抜けて{name}へ入る。",
       "bellRopeShock": "鐘の縄がピンと張り詰める。溺れし詠唱者たちが衝撃によろめく。",
-      "eggSacBurst": "卵嚢が破裂する。黒水が洗礼堂の縁に飛び散る。",
-      "baptistryEggs": "洗礼堂が静まり返る。未亡人の卵嚢が縁に沿って膨らむ。",
+      "eggSacBurst": "卵嚢が破裂する。蜘蛛の子らが洗礼堂の縁を散り散りに這い出す。",
+      "baptistryEggs": "洗礼堂が静まり返る。蜘蛛の卵嚢が縁に湿った音を立てて張り付く。",
+      "baptistrySpidersSealed": "蜘蛛の卵嚢を破壊してみるべきだ。",
       "baptistryWave": "洗礼堂の黒い水の中で何かが蠢く。",
       "chestEmpty": "宝箱は空だ。",
       "notInDelve": "あなたはデルヴの中にいない。",
@@ -5691,6 +5692,9 @@ export const ja_JP: EnTranslations = {
       },
       "mirefen_widowling": {
         "name": "泥沼の未亡人蜘蛛"
+      },
+      "spider_egg_sac": {
+        "name": "蜘蛛の卵嚢"
       },
       "grave_silt_bulwark": {
         "name": "墓泥の防壁"

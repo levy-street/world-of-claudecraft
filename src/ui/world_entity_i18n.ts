@@ -86,6 +86,7 @@ const MOB_IDS = [
   'reedbound_acolyte',
   'deepfen_spearjaw',
   'mirefen_widowling',
+  'spider_egg_sac',
   'grave_silt_bulwark',
   'sump_troll_devourer',
   'choir_thrall',

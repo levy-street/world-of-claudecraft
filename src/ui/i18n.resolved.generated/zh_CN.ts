@@ -2200,8 +2200,9 @@ export const zh_CN: EnTranslations = {
       "tombstoneOpen": "一条封闭的墓碑通道向北轰然开启。走进去即可继续前行。",
       "tombstoneInto": "你穿过墓碑进入{name}。",
       "bellRopeShock": "钟绳猛然绷紧。溺亡诵经者们因震荡而踉跄。",
-      "eggSacBurst": "卵囊破裂了。黑水泼溅过洗礼堂的边缘。",
-      "baptistryEggs": "洗礼堂归于寂静。寡妇卵囊沿着边缘膨胀。",
+      "eggSacBurst": "卵囊破裂了。蜘蛛幼体四散逃窜过洗礼堂的边缘。",
+      "baptistryEggs": "洗礼堂归于寂静。蜘蛛卵囊湿漉漉地附着在边缘。",
+      "baptistrySpidersSealed": "你应该试着摧毁那些蜘蛛卵囊。",
       "baptistryWave": "洗礼堂的黑水中有什么东西在搅动。",
       "chestEmpty": "宝箱是空的。",
       "notInDelve": "你不在探秘之中。",
@@ -5691,6 +5692,9 @@ export const zh_CN: EnTranslations = {
       },
       "mirefen_widowling": {
         "name": "泥沼寡妇蛛"
+      },
+      "spider_egg_sac": {
+        "name": "蜘蛛卵囊"
       },
       "grave_silt_bulwark": {
         "name": "墓淤壁垒"

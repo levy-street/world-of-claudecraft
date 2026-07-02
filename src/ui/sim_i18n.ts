@@ -4318,12 +4318,16 @@ const RULES: Rule[] = [
     build: () => t('sim.delve.bellRopeShock'),
   },
   {
-    re: /^The egg-sac bursts\. Blackwater slops across the baptistry rim\.$/,
+    re: /^The egg-sac bursts\. Spiderlings skitter free across the baptistry rim\.$/,
     build: () => t('sim.delve.eggSacBurst'),
   },
   {
-    re: /^The baptistry falls quiet\. Widow egg-sacs swell along the rim\.$/,
+    re: /^The baptistry falls quiet\. Spider egg-sacs cling wetly to the rim\.$/,
     build: () => t('sim.delve.baptistryEggs'),
+  },
+  {
+    re: /^You should try to destroy the spider sacs\.$/,
+    build: () => t('sim.delve.baptistrySpidersSealed'),
   },
   {
     re: /^Something stirs in the black baptistry water\.$/,

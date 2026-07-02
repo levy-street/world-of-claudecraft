@@ -3059,7 +3059,6 @@ export class Renderer {
         !e.templateId.startsWith('delve_sluice_valve') &&
         !e.templateId.startsWith('delve_grave_tablet') &&
         !e.templateId.startsWith('delve_corpse_candle') &&
-        !e.templateId.startsWith('delve_widow_egg_sac') &&
         !e.templateId.startsWith('delve_bell_rope') &&
         e.templateId !== 'delve_locked_door' &&
         e.templateId !== 'delve_destructible_wall'

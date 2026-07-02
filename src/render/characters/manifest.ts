@@ -919,6 +919,22 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2,
   },
+  // Spider Egg-Sac (Sinkhole Baptistry finale trigger, The Drowned Litany):
+  // Meshy-generated static prop, no rig/clips (it never moves; it dies to a
+  // single hit). The visual/animation pipeline no-ops gracefully when a clip
+  // name below has no match in the GLB, so it just renders static, which is
+  // exactly right for a stationary egg-sac.
+  mob_spider_egg_sac: {
+    url: `${CREATURES}/spider_egg_sac.glb`,
+    height: 1.8,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      death: 'Idle',
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -939,6 +955,7 @@ const MOB_KEYS: Record<string, string> = {
   // The Drowned Litany (Mirefen Marsh): give marsh enemies the right silhouette
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',
+  spider_egg_sac: 'mob_spider_egg_sac',
   sump_troll_devourer: 'mob_troll',
   grave_silt_bulwark: 'mob_ogre',
   drowned_cantor: 'delve_mob_acolyte',

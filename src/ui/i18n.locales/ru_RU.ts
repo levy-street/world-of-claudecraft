@@ -5111,8 +5111,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.delve.bellRopeShock':
     'Верёвка колокола резко натягивается. Утопших Канторов шатает от удара.',
   'sim.delve.eggSacBurst':
-    'Яйцевой мешок лопается. Чёрная вода расплёскивается по краю крестильни.',
-  'sim.delve.baptistryEggs': 'Крестильня затихает. Яйцевые мешки вдов вздуваются вдоль края.',
+    'Яйцевой мешок лопается. Паучата разбегаются по краю крестильни.',
+  'sim.delve.baptistryEggs':
+    'Крестильня затихает. Паучьи яйцевые мешки влажно облепили край.',
+  'sim.delve.baptistrySpidersSealed': 'Тебе стоит попытаться уничтожить паучьи коконы.',
   'sim.delve.baptistryWave': 'Что-то шевелится в чёрной воде крестильни.',
   'sim.delve.nhaliaCantorShield': 'Канторы, держите ноту!',
   'sim.delve.nhaliaBlackwaterMark': '{name} метит {player} Чёрной Водой!',
@@ -5208,6 +5210,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
   'entities.mobs.mirefen_widowling.name': 'Трясинный Паучок-вдовушка',
+  'entities.mobs.spider_egg_sac.name': 'Паучий Яйцевой Кокон',
   'entities.mobs.grave_silt_bulwark.name': 'Могильно-илистый Бастион',
   'entities.mobs.sump_troll_devourer.name': 'Болотный Тролль-Пожиратель',
   'entities.mobs.choir_thrall.name': 'Раб Хора',

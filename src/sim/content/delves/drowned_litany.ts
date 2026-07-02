@@ -155,14 +155,10 @@ export const DROWNED_LITANY_MODULES: Record<string, DelveModuleDef> = {
     layout: 'litany_baptistry',
     length: 110,
     spawnSets: [BAPTISTRY_SPAWNS],
-    // Puzzle: destroy 3 widow egg-sacs (Primitive B in the design; MVP reuses the
-    // Click primitive). Spaced around the pit-rim walkway, clear of the central
-    // Blackwater font and the pit pillars.
-    interactableSlots: [
-      { x: 15, z: 10, variants: ['widow_egg_sac'] },
-      { x: -15, z: 6, variants: ['widow_egg_sac'] },
-      { x: 0, z: 58, variants: ['widow_egg_sac'] },
-    ],
+    // Spider egg-sacs (destroyable, spawns spiders on death) are spawned as mobs
+    // by drowned_litany_rooms.ts once all trash waves clear; see
+    // BAPTISTRY_EGG_SAC_SPOTS there, not an interactable slot.
+    interactableSlots: [],
     hazards: litanyModuleHazards('litany_baptistry'),
   },
   litany_choir_loft: {
@@ -206,11 +202,10 @@ export const DROWNED_LITANY_DELVE: DelveDef = {
   index: 1,
   minLevel: 12,
   suggestedPlayers: 2,
-  // Northern edge of Mirefen Marsh (zone z 180..540; hub at z=300), just short
-  // of the Thornpeak Heights border. Flat, dry ground east of the Gravecaller
-  // camp / Sunken Bastion cluster and the Fenbridge->Highwatch mountain road
-  // (which hugs x~0..10), matching Brother Halven's marsh camp.
-  doorPos: { x: 70, z: 530 },
+  // Northern edge of Mirefen Marsh (zone z 180..540; hub at z=300), north of
+  // the Troll Mounds and clear of their camps, short of the steep rise toward
+  // Thornpeak Heights. Matches Brother Halven's marsh camp.
+  doorPos: { x: -95, z: 505 },
   modules: [
     'litany_sluice',
     'litany_ledger',

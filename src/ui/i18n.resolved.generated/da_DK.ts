@@ -2200,8 +2200,9 @@ export const da_DK: EnTranslations = {
       "tombstoneOpen": "En forseglet gravstenspassage maler sig op mod nord. Gå ind i den for at fortsætte.",
       "tombstoneInto": "Du går gennem gravstenen ind i {name}.",
       "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
-      "eggSacBurst": "The egg-sac bursts. Blackwater slops across the baptistry rim.",
-      "baptistryEggs": "The baptistry falls quiet. Widow egg-sacs swell along the rim.",
+      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
+      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
       "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Kisten er tom.",
       "notInDelve": "Du er ikke i et delve.",
@@ -5691,6 +5692,9 @@ export const da_DK: EnTranslations = {
       },
       "mirefen_widowling": {
         "name": "Mirefen Widowling"
+      },
+      "spider_egg_sac": {
+        "name": "Spider Egg-Sac"
       },
       "grave_silt_bulwark": {
         "name": "Grave-Silt Bulwark"

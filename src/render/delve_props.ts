@@ -887,9 +887,6 @@ export function buildDelveInteractable(
     case 'delve_corpse_candle':
     case 'delve_corpse_candle_lit':
       return buildPressurePlate(templateId.endsWith('_lit'), entityId);
-    case 'delve_widow_egg_sac':
-    case 'delve_widow_egg_sac_burst':
-      return buildPressurePlate(templateId.endsWith('_burst'), entityId);
     case 'delve_bell_rope':
     case 'delve_bell_rope_pulled':
       return buildPressurePlate(templateId.endsWith('_pulled'), entityId);

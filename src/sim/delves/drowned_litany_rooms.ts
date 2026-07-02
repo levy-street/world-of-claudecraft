@@ -1,15 +1,14 @@
 // The Drowned Litany room puzzle semantics (sim-only). Walk-on valves/tablets/
 // candles/ropes and destroyable baptistry egg-sacs gate the module exit.
 
-import { DELVE_MODULES, delveModuleZOffset as delveModuleZOffsetLayout, MOBS } from '../data';
-import { createGroundObject, createMob } from '../entity';
+import { delveModuleZOffset as delveModuleZOffsetLayout, MOBS } from '../data';
+import { createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import { DELVE_PLATE_RADIUS, type DelveRun, dist2d, type Entity, type Vec3 } from '../types';
 export const LITANY_PUZZLE_KINDS = new Set([
   'sluice_valve',
   'grave_tablet',
   'corpse_candle',
-  'widow_egg_sac',
   'bell_rope',
 ]);
 
@@ -24,6 +23,15 @@ export function isDelvePuzzleKind(kind: string | undefined): boolean {
 const EGG_SAC_WAVE_RADIUS = 7;
 const EGG_SAC_WAVE_PCT = 0.06;
 const BELL_ROPE_DAMAGE = 18;
+
+// Sinkhole Baptistry egg-sac spawn points, on the pit-rim walkway, clear of the
+// two flanking stubs and the four pit pillars (same spots the old widow_egg_sac
+// interactables used).
+const BAPTISTRY_EGG_SAC_SPOTS: Array<{ x: number; z: number }> = [
+  { x: 15, z: 10 },
+  { x: -15, z: 6 },
+  { x: 0, z: 58 },
+];
 
 // Sinkhole Baptistry waves (PRD section 9, Room 4). Positions sit on the pit-rim
 // walkway, clear of the two flanking stubs (x=+-14, z 35..45) and the four pit
@@ -64,8 +72,6 @@ export function litanyPuzzleTriggeredTemplate(kind: string, triggered: boolean):
       return 'delve_grave_tablet_lit';
     case 'corpse_candle':
       return 'delve_corpse_candle_lit';
-    case 'widow_egg_sac':
-      return 'delve_widow_egg_sac_burst';
     case 'bell_rope':
       return 'delve_bell_rope_pulled';
     default:
@@ -107,20 +113,29 @@ function onBellRopePulled(ctx: SimContext, run: DelveRun): void {
   }
 }
 
-function onEggSacBurst(ctx: SimContext, run: DelveRun, obj: Entity): void {
+// How long the burst VFX plays before the corpse is removed from the world.
+const EGG_SAC_BURST_DESPAWN = 1.1;
+
+/** Fires once a spawned spider_egg_sac mob dies: a burst VFX, small nature-damage
+ * tick on nearby players, 2 mirefen_widowling adds hatching out near the corpse,
+ * then the sac itself is gone shortly after, it is a stationary prop, not a real
+ * creature, so it should not linger as a normal lootable mob corpse. */
+function onEggSacBurst(ctx: SimContext, run: DelveRun, dead: Entity): void {
+  ctx.emit({ type: 'spellfx', sourceId: dead.id, targetId: dead.id, school: 'nature', fx: 'nova' });
+  dead.despawnTimer = EGG_SAC_BURST_DESPAWN;
   if (!run.partyKey) return;
   const members = ctx.partyMembersForKey(run.partyKey);
   for (const pid of members) {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) continue;
-    if (dist2d(p.pos, obj.pos) > EGG_SAC_WAVE_RADIUS) continue;
+    if (dist2d(p.pos, dead.pos) > EGG_SAC_WAVE_RADIUS) continue;
     const dmg = Math.max(1, Math.round(p.maxHp * EGG_SAC_WAVE_PCT));
     ctx.dealDamage(null, p, dmg, false, 'nature', 'Egg-Sac Burst', 'hit', true);
   }
   for (const pid of members) {
     ctx.emit({
       type: 'log',
-      text: 'The egg-sac bursts. Blackwater slops across the baptistry rim.',
+      text: 'The egg-sac bursts. Spiderlings skitter free across the baptistry rim.',
       color: '#8c9',
       pid,
     });
@@ -130,7 +145,7 @@ function onEggSacBurst(ctx: SimContext, run: DelveRun, obj: Entity): void {
   for (let i = 0; i < 2; i++) {
     const ang = ctx.rng.range(0, Math.PI * 2);
     const dist = ctx.rng.range(2, 4.5);
-    const pos = ctx.groundPos(obj.pos.x + Math.sin(ang) * dist, obj.pos.z + Math.cos(ang) * dist);
+    const pos = ctx.groundPos(dead.pos.x + Math.sin(ang) * dist, dead.pos.z + Math.cos(ang) * dist);
     const add = createMob(ctx.nextId++, tmpl, tmpl.minLevel, pos);
     add.facing = Math.PI;
     ctx.addEntity(add);
@@ -148,7 +163,6 @@ function markPuzzleTriggered(
   const nextTpl = litanyPuzzleTriggeredTemplate(state.kind, true);
   if (nextTpl) obj.templateId = nextTpl;
   if (state.kind === 'bell_rope') onBellRopePulled(ctx, run);
-  if (state.kind === 'widow_egg_sac') onEggSacBurst(ctx, run, obj);
 }
 
 function livingTrashInModule(ctx: SimContext, run: DelveRun): boolean {
@@ -188,42 +202,56 @@ function spawnBaptistryWave(
   }
 }
 
-function spawnLitanyEggSac(ctx: SimContext, run: DelveRun, pos: Vec3): void {
-  const obj = createGroundObject(ctx.nextId++, '', 'Widow Egg-Sac', pos);
-  obj.templateId = 'delve_widow_egg_sac';
-  obj.maxHp = 1;
-  obj.hp = 1;
-  run.objectState[obj.id] = {
-    kind: 'widow_egg_sac',
-    triggered: false,
-    hp: 1,
-    maxHp: 1,
-    linkIds: [],
-    open: true,
-  };
-  run.objectIds.push(obj.id);
-  ctx.addEntity(obj);
+/** Spawns a stationary spider_egg_sac mob (1hp, real combat target) at `pos`,
+ * registers it on the run, and returns its entity id. */
+function spawnLitanyEggSacMob(
+  ctx: SimContext,
+  run: DelveRun,
+  pos: Vec3,
+  enemyLevelBonus: number,
+): number {
+  const tmpl = MOBS.spider_egg_sac;
+  if (!tmpl) return -1;
+  const mob = createMob(ctx.nextId++, tmpl, tmpl.minLevel + enemyLevelBonus, pos);
+  mob.facing = 0;
+  mob.prevFacing = mob.facing;
+  ctx.addEntity(mob);
+  run.mobIds.push(mob.id);
+  return mob.id;
 }
 
 function enableLitanyBaptistryEggSacs(ctx: SimContext, run: DelveRun, zBase: number): void {
-  const mod = DELVE_MODULES.litany_baptistry;
-  if (!mod || !run.litanyBaptistry || run.litanyBaptistry.eggsEnabled) return;
+  if (!run.litanyBaptistry || run.litanyBaptistry.eggsEnabled) return;
   run.litanyBaptistry.eggsEnabled = true;
-  for (const slot of mod.interactableSlots) {
-    for (const variant of slot.variants) {
-      if (variant !== 'widow_egg_sac') continue;
-      const pos = ctx.groundPos(run.origin.x + slot.x, run.origin.z + zBase + slot.z);
-      spawnLitanyEggSac(ctx, run, pos);
-    }
+  const enemyLevelBonus = run.tierId === 'heroic' ? 3 : 0;
+  for (const spot of BAPTISTRY_EGG_SAC_SPOTS) {
+    const pos = ctx.groundPos(run.origin.x + spot.x, run.origin.z + zBase + spot.z);
+    const id = spawnLitanyEggSacMob(ctx, run, pos, enemyLevelBonus);
+    if (id >= 0) run.litanyBaptistry.eggSacIds.push(id);
   }
   if (!run.partyKey) return;
   for (const pid of ctx.partyMembersForKey(run.partyKey)) {
     ctx.emit({
       type: 'log',
-      text: 'The baptistry falls quiet. Widow egg-sacs swell along the rim.',
+      text: 'The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.',
       color: '#8c9',
       pid,
     });
+  }
+}
+
+/** Polls the spawned egg-sac mobs for a kill and fires the burst exactly once
+ * per sac (mob death has no dedicated event hook into delve room logic, so
+ * this rides the same per-tick poll the baptistry waves already use). */
+function tickLitanyEggSacBursts(ctx: SimContext, run: DelveRun): void {
+  const st = run.litanyBaptistry;
+  if (!st?.eggsEnabled) return;
+  for (const id of st.eggSacIds) {
+    if (st.burstIds.includes(id)) continue;
+    const dead = ctx.entities.get(id);
+    if (!dead?.dead) continue;
+    st.burstIds.push(id);
+    onEggSacBurst(ctx, run, dead);
   }
 }
 
@@ -233,7 +261,7 @@ export function initLitanyBaptistryModule(
   enemyLevelBonus: number,
   zBase: number,
 ): void {
-  run.litanyBaptistry = { wave: 0, eggsEnabled: false };
+  run.litanyBaptistry = { wave: 0, eggsEnabled: false, eggSacIds: [], burstIds: [] };
   spawnBaptistryWave(ctx, run, 0, enemyLevelBonus, zBase);
 }
 
@@ -282,5 +310,6 @@ function tickLitanyRoomPuzzles(ctx: SimContext, run: DelveRun): void {
 
 export function tickDrownedLitanyRooms(ctx: SimContext, run: DelveRun): void {
   tickLitanyBaptistryWaves(ctx, run);
+  tickLitanyEggSacBursts(ctx, run);
   tickLitanyRoomPuzzles(ctx, run);
 }

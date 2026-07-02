@@ -790,9 +790,6 @@ export function spawnDelveInteractables(
   for (const slot of mod.interactableSlots) {
     for (const variant of slot.variants) {
       if (variant === 'darkness_zone') continue;
-      if (variant === 'widow_egg_sac' && run.litanyBaptistry && !run.litanyBaptistry.eggsEnabled) {
-        continue;
-      }
       const pos = ctx.groundPos(run.origin.x + slot.x, run.origin.z + zBase + slot.z);
       const obj = createDelveObject(ctx, run, variant, pos);
       spawned.push({ kind: variant, id: obj.id });
@@ -816,7 +813,6 @@ export function createDelveObject(ctx: SimContext, run: DelveRun, kind: string, 
     sluice_valve: 'Sluice Valve',
     grave_tablet: 'Grave Tablet',
     corpse_candle: 'Corpse-Candle',
-    widow_egg_sac: 'Widow Egg-Sac',
     bell_rope: 'Bell Rope',
     locked_door: 'Locked Door',
     cracked_grave: 'Cracked Grave',
@@ -1277,7 +1273,14 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
   }
   if (state.kind === 'module_exit') {
     if (!state.open) {
-      ctx.error(r.meta.entityId, 'The passage is sealed.');
+      const spiderSacsBlocking =
+        run.modules[run.moduleIndex] === 'litany_baptistry' && run.litanyBaptistry?.eggsEnabled;
+      ctx.error(
+        r.meta.entityId,
+        spiderSacsBlocking
+          ? 'You should try to destroy the spider sacs.'
+          : 'The passage is sealed.',
+      );
       return;
     }
     if (dist2d(r.e.pos, obj.pos) > DELVE_EXIT_PORTAL_RADIUS + 2) {

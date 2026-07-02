@@ -234,6 +234,28 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     scale: 0.8,
     color: 0x2e2a34,
   },
+  // Sinkhole Baptistry finale trigger: a stationary, defenseless 1hp sac. Dies
+  // to any single hit; the Drowned Litany room logic (drowned_litany_rooms.ts)
+  // spawns 2 mirefen_widowling adds and a small nature-damage burst on death.
+  // moveSpeed/aggroRadius/dmgBase are all 0, it never chases or fights back.
+  spider_egg_sac: {
+    id: 'spider_egg_sac',
+    name: 'Spider Egg-Sac',
+    minLevel: 12,
+    maxLevel: 13,
+    family: 'beast',
+    hpBase: 1,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 999,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0xc8dcc0,
+  },
   grave_silt_bulwark: {
     id: 'grave_silt_bulwark',
     name: 'Grave-Silt Bulwark',

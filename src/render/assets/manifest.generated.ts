@@ -71,6 +71,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/orcenemy.glb": "/media/models/creatures/orcenemy.49c2f413407e.glb",
   "models/creatures/reedbound_acolyte.glb": "/media/models/creatures/reedbound_acolyte.15839b7478b8.glb",
   "models/creatures/spider.glb": "/media/models/creatures/spider.5becf8b6510f.glb",
+  "models/creatures/spider_egg_sac.glb": "/media/models/creatures/spider_egg_sac.4bd950b4c952.glb",
   "models/creatures/stag.glb": "/media/models/creatures/stag.ec967c29bd35.glb",
   "models/creatures/tolling_bell.glb": "/media/models/creatures/tolling_bell.7f89922472aa.glb",
   "models/creatures/tribal.glb": "/media/models/creatures/tribal.36f1f0f698db.glb",

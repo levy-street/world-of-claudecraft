@@ -2219,6 +2219,10 @@ export interface DrownedLitanyBaptistryState {
   /** Index of the active wave in BAPTISTRY_WAVES (0..2). */
   wave: number;
   eggsEnabled: boolean;
+  /** Mob ids of the spawned spider_egg_sac adds (set once, at spawn time). */
+  eggSacIds: number[];
+  /** Subset of eggSacIds whose death burst has already fired, so a kill is processed once. */
+  burstIds: number[];
 }
 
 export interface DelveDailyState {

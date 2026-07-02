@@ -32,11 +32,12 @@ export const BROTHER_HALVEN_MARSH: NpcDef = {
   id: 'brother_halven_marsh',
   name: 'Brother Halven',
   title: 'Reliquary Keeper',
-  // Near the marsh's northern edge, close to the Thornpeak Heights border.
-  // Matches DROWNED_LITANY_DELVE.doorPos (flat, dry ground clear of the
-  // Gravecaller camp / Sunken Bastion cluster and the mountain road).
-  pos: { x: 70, z: 530 },
-  // Faces -z (south, back down the marsh) to greet arrivals from Fenbridge.
+  // A clearing north of the Troll Mounds, clear of the fen_troll/grubjaw camps
+  // (which top out around z~488) and short of the steep rise toward Thornpeak
+  // Heights (the ground climbs fast past z~510 here). Matches
+  // DROWNED_LITANY_DELVE.doorPos.
+  pos: { x: -95, z: 505 },
+  // Faces -z (south), back down toward the Troll Mounds and the marsh.
   facing: Math.PI,
   color: 0x2b2620,
   questIds: [],

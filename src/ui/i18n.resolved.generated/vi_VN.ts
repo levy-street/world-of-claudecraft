@@ -2200,8 +2200,9 @@ export const vi_VN: EnTranslations = {
       "tombstoneOpen": "Một lối đi bia mộ bị niêm phong rền rĩ mở ra về phía bắc. Hãy bước vào để tiếp tục.",
       "tombstoneInto": "Bạn đi xuyên qua bia mộ vào {name}.",
       "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
-      "eggSacBurst": "The egg-sac bursts. Blackwater slops across the baptistry rim.",
-      "baptistryEggs": "The baptistry falls quiet. Widow egg-sacs swell along the rim.",
+      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
+      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
       "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Chiếc rương trống rỗng.",
       "notInDelve": "Bạn không ở trong một hầm thám hiểm.",
@@ -5691,6 +5692,9 @@ export const vi_VN: EnTranslations = {
       },
       "mirefen_widowling": {
         "name": "Mirefen Widowling"
+      },
+      "spider_egg_sac": {
+        "name": "Spider Egg-Sac"
       },
       "grave_silt_bulwark": {
         "name": "Grave-Silt Bulwark"

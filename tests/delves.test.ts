@@ -1576,7 +1576,7 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     litany_sluice: 2, // turn 2 sluice valves
     litany_ledger: 4, // activate 4 grave tablets
     litany_ring: 2, // light 2 corpse-candles
-    litany_baptistry: 3, // destroy 3 egg-sacs
+    litany_baptistry: 0, // 3 egg-sacs, but spawned as mobs (drowned_litany_rooms.ts), not interactableSlots
     litany_choir_loft: 2, // pull 2 bell ropes
     litany_causeway: 0, // no puzzle
   };
@@ -1702,7 +1702,7 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     expect(run.litanyBaptistry?.eggsEnabled).toBe(false);
     expect(run.mobIds.length).toBe(6); // PRD wave 1: 4 widowlings + 2 spearjaws
     const eggSacs = () =>
-      run.objectIds.filter((id) => run.objectState[id]?.kind === 'widow_egg_sac').length;
+      run.mobIds.filter((id) => sim.entities.get(id)?.templateId === 'spider_egg_sac').length;
     expect(eggSacs()).toBe(0);
     const killAll = () => {
       for (const id of [...run.mobIds]) {
@@ -1728,6 +1728,71 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     killAll();
     expect(run.litanyBaptistry?.eggsEnabled).toBe(true);
     expect(eggSacs()).toBe(3);
+  });
+
+  it('a spider egg-sac is a real 1hp combat target: one hit kills it and hatches 2 widowlings', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = enterModule(sim, 'litany_baptistry');
+    run.litanyBaptistry!.wave = 2; // skip straight past the wave gate
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob) mob.dead = true;
+    }
+    sim.tick(); // waves poll sees no living trash, enables the egg-sacs
+    expect(run.litanyBaptistry?.eggsEnabled).toBe(true);
+    const sacId = run.litanyBaptistry!.eggSacIds[0]!;
+    const sac = sim.entities.get(sacId)!;
+    expect(sac.templateId).toBe('spider_egg_sac');
+    expect(sac.maxHp).toBe(1);
+    sim.player.pos = { ...sac.pos };
+    sim.player.prevPos = { ...sac.pos };
+    const widowlingsBefore = run.mobIds.filter(
+      (id) => sim.entities.get(id)?.templateId === 'mirefen_widowling',
+    ).length;
+    // A single hit, of any size, kills a 1hp target: this is the real combat
+    // path a player's auto-attack/ability takes, not a bespoke destroy call.
+    (sim as any).dealDamage(sim.player, sac, 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+    expect(sac.dead).toBe(true);
+    const widowlingsAfter = run.mobIds.filter(
+      (id) => sim.entities.get(id)?.templateId === 'mirefen_widowling',
+    ).length;
+    expect(widowlingsAfter - widowlingsBefore).toBe(2);
+  });
+
+  it('the sealed exit hints to destroy the spider sacs once they are up, generic otherwise', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['litany_baptistry', 'litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const exitId = run.objectIds.find((id) => run.objectState[id]?.kind === 'module_exit')!;
+    const exit = sim.entities.get(exitId)!;
+    sim.player.pos = { ...exit.pos };
+    sim.player.prevPos = { ...exit.pos };
+    sim.drainEvents();
+    sim.delveInteract(exitId);
+    let events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error' && e.text === 'The passage is sealed.')).toBe(
+      true,
+    );
+    run.litanyBaptistry!.wave = 2;
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob) mob.dead = true;
+    }
+    sim.tick();
+    expect(run.litanyBaptistry?.eggsEnabled).toBe(true);
+    sim.drainEvents();
+    sim.delveInteract(exitId);
+    events = sim.drainEvents();
+    expect(
+      events.some(
+        (e) => e.type === 'error' && e.text === 'You should try to destroy the spider sacs.',
+      ),
+    ).toBe(true);
   });
 });
 
