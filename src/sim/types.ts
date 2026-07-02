@@ -225,6 +225,22 @@ export interface Stats {
   armor: number;
 }
 
+export type ItemEnhancementKind = 'enchant' | 'gem';
+
+export interface ItemEnhancementEffect {
+  stats?: Partial<Stats>;
+  attackPower?: number;
+  spellPower?: number;
+  crit?: number;
+}
+
+export interface ItemEnhancement {
+  id: string;
+  name: string;
+  kind: ItemEnhancementKind;
+  effect: ItemEnhancementEffect;
+}
+
 export interface WeaponInfo {
   min: number;
   max: number;
@@ -287,6 +303,7 @@ interface BaseItemDef {
   slot?: EquipSlot;
   weapon?: WeaponInfo;
   stats?: Partial<Stats>;
+  enhancements?: ItemEnhancement[];
   // Spell Power affix (caster gear): flat Spell Power, summed in recalcPlayerStats.
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.

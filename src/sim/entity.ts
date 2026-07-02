@@ -1,5 +1,6 @@
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { aggregateItemEnhancements } from './item_enhancements';
 import { meetsLevelRequirement } from './item_level_req';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
 import { EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
@@ -172,6 +173,8 @@ export function recalcPlayerStats(
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
   };
   const setCounts = new Map<string, number>();
+  let enhancementAp = 0;
+  let enhancementCrit = 0;
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
   for (const slot of EQUIP_SLOTS) {
     const itemId = equipment[slot];
@@ -186,13 +189,16 @@ export function recalcPlayerStats(
     if (!meetsLevelRequirement(lvl, item)) continue;
     if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
     bonusSp += item.spellPower ?? 0;
-    if (!item.stats) continue;
-    s.str += item.stats.str ?? 0;
-    s.agi += item.stats.agi ?? 0;
-    s.sta += item.stats.sta ?? 0;
-    s.int += item.stats.int ?? 0;
-    s.spi += item.stats.spi ?? 0;
-    s.armor += item.stats.armor ?? 0;
+    const enhancements = aggregateItemEnhancements(item);
+    enhancementAp += enhancements.attackPower;
+    enhancementCrit += enhancements.crit;
+    bonusSp += enhancements.spellPower;
+    s.str += (item.stats?.str ?? 0) + enhancements.stats.str;
+    s.agi += (item.stats?.agi ?? 0) + enhancements.stats.agi;
+    s.sta += (item.stats?.sta ?? 0) + enhancements.stats.sta;
+    s.int += (item.stats?.int ?? 0) + enhancements.stats.int;
+    s.spi += (item.stats?.spi ?? 0) + enhancements.stats.spi;
+    s.armor += (item.stats?.armor ?? 0) + enhancements.stats.armor;
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
   // totals so they feed every derivation below; AP/crit/pushback fold in at
@@ -204,7 +210,7 @@ export function recalcPlayerStats(
   s.int += setEff.int;
   s.spi += setEff.spi;
   // Buff auras
-  let bonusAp = setEff.ap;
+  let bonusAp = setEff.ap + enhancementAp;
   let bonusDodge = 0;
   let bearForm = false;
   let catForm = false;
@@ -310,7 +316,7 @@ export function recalcPlayerStats(
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
   // Crit: ~1% per 20 agi at low level
-  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
+  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit + enhancementCrit;
   e.castPushbackReduction = setEff.castPushbackReduction;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);

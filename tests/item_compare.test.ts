@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ItemDef, Stats } from '../src/sim/types';
 import { itemStatDeltas } from '../src/ui/item_compare';
 
-function armor(id: string, stats: Partial<Stats>): ItemDef {
+function armor(id: string, stats: Partial<Stats>, extra: Partial<ItemDef> = {}): ItemDef {
   return {
     id,
     name: id,
@@ -11,7 +11,8 @@ function armor(id: string, stats: Partial<Stats>): ItemDef {
     slot: 'chest',
     sellValue: 1,
     stats,
-  };
+    ...extra,
+  } as ItemDef;
 }
 function weapon(id: string, min: number, max: number, speed: number): ItemDef {
   return {
@@ -59,6 +60,44 @@ describe('itemStatDeltas', () => {
       itemStatDeltas(candidate, equipped).map((d) => [d.stat, d.delta]),
     );
     expect(byStat.int).toBe(12);
+    expect(byStat.armor).toBeUndefined();
+  });
+
+  it('includes item enhancement primary stats in deltas', () => {
+    const candidate = armor(
+      'enchanted',
+      { armor: 30 },
+      {
+        enhancements: [
+          {
+            id: 'minor_agility',
+            name: 'Minor Agility',
+            kind: 'enchant',
+            effect: { stats: { agi: 5 } },
+          },
+        ],
+      },
+    );
+    const equipped = armor(
+      'socketed',
+      { armor: 30 },
+      {
+        enhancements: [
+          {
+            id: 'small_ruby',
+            name: 'Small Ruby',
+            kind: 'gem',
+            effect: { stats: { sta: 2 } },
+          },
+        ],
+      },
+    );
+
+    const byStat = Object.fromEntries(
+      itemStatDeltas(candidate, equipped).map((d) => [d.stat, d.delta]),
+    );
+    expect(byStat.agi).toBe(5);
+    expect(byStat.sta).toBe(-2);
     expect(byStat.armor).toBeUndefined();
   });
 });
