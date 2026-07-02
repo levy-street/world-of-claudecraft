@@ -4402,156 +4402,156 @@ export const id_ID: EnTranslations = {
         "description": "Restaura maná rápidamente. (Talento de mago)"
       },
       "rebuke": {
-        "name": "Rebuke",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)"
+        "name": "Hardik",
+        "description": "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Paladin)"
       },
       "crusader_strike": {
-        "name": "Crusader Strike",
-        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+        "name": "Serangan Tentara Salib",
+        "description": "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)"
       },
       "holy_wrath": {
-        "name": "Holy Wrath",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+        "name": "Murka Suci",
+        "description": "Melepaskan kekuatan suci dan melukai musuh di sekitar sebesar {damage}. (talenta Paladin)"
       },
       "divine_shield": {
-        "name": "Divine Shield",
-        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+        "name": "Perisai Ilahi",
+        "description": "Melindungimu dengan kekuatan suci, menyerap kerusakan sangat besar selama 8 dtk. (talenta Paladin)"
       },
       "avenging_wrath": {
-        "name": "Avenging Wrath",
-        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+        "name": "Murka Pembalas",
+        "description": "Memanggil kekuatan pembalas, meningkatkan daya serang dan kekuatan mantra selama 20 dtk. (talenta Paladin)"
       },
       "hammer_of_wrath": {
-        "name": "Hammer of Wrath",
-        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+        "name": "Palu Murka",
+        "description": "Melempar palu suci ke musuh yang terluka, menimbulkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)"
       },
       "counter_shot": {
-        "name": "Counter Shot",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)"
+        "name": "Tembakan Balasan",
+        "description": "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Pemburu)"
       },
       "frost_trap": {
-        "name": "Frost Trap",
-        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+        "name": "Perangkap Es",
+        "description": "Membekukan musuh di area target selama 3 dtk. (talenta Pemburu)"
       },
       "mend_pet": {
-        "name": "Mend Pet",
-        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+        "name": "Sembuhkan Peliharaan",
+        "description": "Menyembuhkan target bersahabat sebesar {damage} selama 15 dtk. (talenta Pemburu)"
       },
       "multi_shot": {
-        "name": "Multi-Shot",
-        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+        "name": "Tembakan Ganda",
+        "description": "Menembakkan beberapa proyektil dan mengenai musuh di sekitar sebesar {damage}. (talenta Pemburu)"
       },
       "deterrence": {
-        "name": "Deterrence",
-        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+        "name": "Penangkisan",
+        "description": "Meningkatkan peluang menghindarmu sebesar 50% selama 10 dtk. (talenta Pemburu)"
       },
       "aspect_of_the_wild": {
-        "name": "Aspect of the Wild",
-        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+        "name": "Aspek Alam Liar",
+        "description": "Mengilhami sekutu di sekitar dengan kekuatan liar, meningkatkan daya serang selama 5 mnt. (talenta Pemburu)"
       },
       "kick": {
-        "name": "Kick",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)"
+        "name": "Tendang",
+        "description": "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Rogue)"
       },
       "preparation": {
-        "name": "Preparation",
-        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+        "name": "Persiapan",
+        "description": "Mengakhiri cooldown Sprint, Evasion, dan Vanish. (talenta Rogue)"
       },
       "ghostly_strike": {
-        "name": "Ghostly Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "name": "Serangan Arwah",
+        "description": "Menyerang musuh dengan kerusakan senjata ditambah {damage} dan sebentar meningkatkan menghindar. Memberi 1 poin kombo. (talenta Rogue)"
       },
       "cloak_of_shadows": {
-        "name": "Cloak of Shadows",
-        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+        "name": "Jubah Bayangan",
+        "description": "Menyelimutimu dengan bayangan, menyerap kerusakan selama 5 dtk. (talenta Rogue)"
       },
       "shadowstep": {
-        "name": "Shadowstep",
-        "description": "Steps through the shadows toward your target. (Rogue talent)"
+        "name": "Langkah Bayangan",
+        "description": "Melangkah melalui bayangan menuju targetmu. (talenta Rogue)"
       },
       "silence": {
-        "name": "Silence",
-        "description": "Silences the target for 4 sec. (Priest talent)"
+        "name": "Bungkam",
+        "description": "Membungkam target selama 4 dtk. (talenta Rogue)"
       },
       "psychic_scream": {
-        "name": "Psychic Scream",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "name": "Jeritan Psikis",
+        "description": "Menakuti musuh di sekitar hingga 4 dtk. Kerusakan dapat mematahkan efek. (talenta Priest)"
       },
       "inner_focus": {
-        "name": "Inner Focus",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "name": "Fokus Batin",
+        "description": "Membuat mantra berikutnya gratis. Berlangsung 60 dtk. (talenta Priest)"
       },
       "desperate_prayer": {
-        "name": "Desperate Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "name": "Doa Putus Asa",
+        "description": "Seketika menyembuhkanmu sebesar {damage}. (talenta Priest)"
       },
       "prayer_of_healing": {
-        "name": "Prayer of Healing",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "name": "Doa Penyembuhan",
+        "description": "Menyembuhkan sekutu di sekitar sebesar {damage}. (talenta Priest)"
       },
       "mind_sear": {
-        "name": "Mind Sear",
-        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "name": "Bakar Pikiran",
+        "description": "Menyalurkan energi Bayangan di area target, melukai musuh di sekitar tiap detik sebesar {damage}. (talenta Priest)"
       },
       "earthbind": {
-        "name": "Earthbind",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "name": "Ikatan Bumi",
+        "description": "Mengikat musuh di sekitar ke tanah dan mengakar mereka selama 2 dtk. (talenta Shaman)"
       },
       "healing_stream": {
-        "name": "Healing Stream",
-        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+        "name": "Aliran Penyembuhan",
+        "description": "Memulihkan target bersahabat selama 12 dtk. (talenta Shaman)"
       },
       "chain_lightning": {
-        "name": "Chain Lightning",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "name": "Rantai Petir",
+        "description": "Melontarkan petir ke area target, melukai musuh di sekitar sebesar {damage}. (talenta Shaman)"
       },
       "bloodlust": {
-        "name": "Bloodlust",
-        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+        "name": "Haus Darah",
+        "description": "Mengobarkan sekutu di sekitar, meningkatkan kecepatan serang selama 15 dtk. (talenta Shaman)"
       },
       "spell_lock": {
-        "name": "Spell Lock",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)"
+        "name": "Kunci Mantra",
+        "description": "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 5 dtk. (talenta Warlock)"
       },
       "howl_of_terror": {
-        "name": "Howl of Terror",
-        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+        "name": "Lolongan Teror",
+        "description": "Menakuti musuh di sekitar hingga 3 dtk. Kerusakan dapat mematahkan efek. (talenta Warlock)"
       },
       "curse_of_exhaustion": {
-        "name": "Curse of Exhaustion",
-        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+        "name": "Kutukan Kelelahan",
+        "description": "Mengutuk target, mengurangi kecepatan gerak sebesar 30% selama 12 dtk. (talenta Warlock)"
       },
       "death_coil": {
-        "name": "Death Coil",
-        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+        "name": "Kumparan Kematian",
+        "description": "Menghantam musuh dengan {damage} kerusakan Bayangan, lalu membuatnya ngeri selama 3 dtk. Versi ini tidak menyembuhkan perapal. (talenta Warlock)"
       },
       "chaos_bolt": {
-        "name": "Chaos Bolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "name": "Baut Kekacauan",
+        "description": "Melontarkan baut api kacau sebesar {damage} kerusakan Api. (talenta Warlock)"
       },
       "metamorphosis": {
-        "name": "Metamorphosis",
-        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+        "name": "Metamorfosis",
+        "description": "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)"
       },
       "skull_bash": {
-        "name": "Skull Bash",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)"
+        "name": "Hantaman Tengkorak",
+        "description": "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Druid)"
       },
       "innervate": {
-        "name": "Innervate",
-        "description": "Instantly restores a large amount of mana. (Druid talent)"
+        "name": "Aliran Tenaga",
+        "description": "Seketika memulihkan 200 dari sumber daya saat ini. (talenta Druid)"
       },
       "frenzied_regeneration": {
-        "name": "Frenzied Regeneration",
-        "description": "Regenerates health over 10 sec. Bear Form only. (Druid talent)"
+        "name": "Regenerasi Frenetik",
+        "description": "Meregenerasi nyawa selama 10 dtk. Hanya Bentuk Beruang. (talenta Druid)"
       },
       "berserk": {
-        "name": "Berserk",
-        "description": "Increases attack power for 15 sec. (Druid talent)"
+        "name": "Mengamuk",
+        "description": "Meningkatkan daya serang selama 15 dtk. (talenta Druid)"
       },
       "tranquility": {
-        "name": "Tranquility",
-        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
+        "name": "Ketenangan",
+        "description": "Menyalurkan energi pemulih, menyembuhkan sekutu di sekitar setiap detik. (talenta Druid)"
       },
       "holy_shock": {
         "name": "Kejutan Suci",

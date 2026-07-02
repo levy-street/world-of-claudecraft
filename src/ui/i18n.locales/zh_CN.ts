@@ -4912,9 +4912,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '复仇之怒',
   'entities.abilities.avenging_wrath.description':
     '召唤复仇之力，使攻击强度和法术强度提高，持续 20 秒。（圣骑士天赋）',
-  'entities.abilities.hammer_of_wrath.name': '愤怒之锤',
+  'entities.abilities.hammer_of_wrath.name': "愤怒之锤",
   'entities.abilities.hammer_of_wrath.description':
-    '向敌人投掷神圣之锤，造成 {damage} 点神圣伤害。（圣骑士天赋）',
+    "向受伤的敌人投掷一柄神圣之锤，造成 {damage} 点神圣伤害。只能对生命值低于 20% 的目标使用。（圣骑士天赋）",
   'entities.abilities.counter_shot.name': '反制射击',
   'entities.abilities.counter_shot.description':
     '打断施法，并使该系法术在 4 秒内无法施放。（猎人天赋）',
@@ -4956,9 +4956,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '治疗祷言',
   'entities.abilities.prayer_of_healing.description':
     '为附近盟友恢复 {damage} 点生命值。（牧师天赋）',
-  'entities.abilities.mind_sear.name': '精神灼烧',
+  'entities.abilities.mind_sear.name': "精神灼烧",
   'entities.abilities.mind_sear.description':
-    '引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）',
+    "在目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）",
   'entities.abilities.earthbind.name': '大地束缚',
   'entities.abilities.earthbind.description':
     '将附近敌人缚于大地，使其定身 2 秒。（萨满天赋）',
@@ -4980,9 +4980,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_exhaustion.name': '疲劳诅咒',
   'entities.abilities.curse_of_exhaustion.description':
     '诅咒目标，使移动速度降低 30%，持续 12 秒。（术士天赋）',
-  'entities.abilities.death_coil.name': '死亡缠绕',
+  'entities.abilities.death_coil.name': "死亡缠绕",
   'entities.abilities.death_coil.description':
-    '恐吓敌人，并在短暂时间内将生命吸回自身。（术士天赋）',
+    "以 {damage} 点暗影伤害冲击敌人，然后使其惊骇 3 秒。此版本不会治疗施法者。（术士天赋）",
   'entities.abilities.chaos_bolt.name': '混乱箭',
   'entities.abilities.chaos_bolt.description':
     '投出混乱火焰之箭，造成 {damage} 点火焰伤害。（术士天赋）',
@@ -4992,9 +4992,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.name': '碎颅猛击',
   'entities.abilities.skull_bash.description':
     '打断施法，并阻止该系法术施放 4 秒。（德鲁伊天赋）',
-  'entities.abilities.innervate.name': '激活',
+  'entities.abilities.innervate.name': "激活",
   'entities.abilities.innervate.description':
-    '立即恢复大量法力值。（德鲁伊天赋）',
+    "立即恢复 200 点当前资源。（德鲁伊天赋）",
   'entities.abilities.frenzied_regeneration.name': '狂暴回复',
   'entities.abilities.frenzied_regeneration.description':
     '在 10 秒内恢复生命值。仅限熊形态。（德鲁伊天赋）',

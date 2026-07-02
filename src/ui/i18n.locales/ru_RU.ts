@@ -5280,9 +5280,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': 'Гнев карателя',
   'entities.abilities.avenging_wrath.description':
     'Призывает карающую силу, повышая силу атаки и силу заклинаний на 20 сек. (талант паладина)',
-  'entities.abilities.hammer_of_wrath.name': 'Молот гнева',
+  'entities.abilities.hammer_of_wrath.name': "Молот гнева",
   'entities.abilities.hammer_of_wrath.description':
-    'Бросает в противника священный молот, нанося {damage} ед. урона от Света. (талант паладина)',
+    "Метает священный молот в раненого противника, нанося {damage} ед. урона от светлой магии. Можно использовать только против целей с менее чем 20% здоровья. (талант паладина)",
   'entities.abilities.counter_shot.name': 'Ответный выстрел',
   'entities.abilities.counter_shot.description':
     'Прерывает произнесение заклинания и не дает применять заклинания этой школы 4 сек. (талант охотника)',
@@ -5330,9 +5330,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': 'Молитва исцеления',
   'entities.abilities.prayer_of_healing.description':
     'Исцеляет ближайших союзников на {damage}. (талант жреца)',
-  'entities.abilities.mind_sear.name': 'Иссушение разума',
+  'entities.abilities.mind_sear.name': "Иссушение разума",
   'entities.abilities.mind_sear.description':
-    'Направляет темную энергию, каждую секунду нанося ближайшим врагам {damage} ед. урона. (талант жреца)',
+    "Направляет энергию Тьмы в выбранную область, каждую секунду нанося ближайшим противникам {damage} ед. урона. (талант жреца)",
   'entities.abilities.earthbind.name': 'Оковы земли',
   'entities.abilities.earthbind.description':
     'Сковывает ближайших врагов землей, обездвиживая их на 2 сек. (талант шамана)',
@@ -5354,9 +5354,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_exhaustion.name': 'Проклятие изнеможения',
   'entities.abilities.curse_of_exhaustion.description':
     'Проклинает цель, снижая скорость передвижения на 30% на 12 сек. (талант чернокнижника)',
-  'entities.abilities.death_coil.name': 'Лик смерти',
+  'entities.abilities.death_coil.name': "Лик смерти",
   'entities.abilities.death_coil.description':
-    'Ужасает врага и за короткое время возвращает вам часть жизни. (талант чернокнижника)',
+    "Поражает противника, нанося {damage} ед. урона от темной магии, затем повергает его в ужас на 3 сек. Эта версия не исцеляет заклинателя. (талант чернокнижника)",
   'entities.abilities.chaos_bolt.name': 'Стрела хаоса',
   'entities.abilities.chaos_bolt.description':
     'Запускает стрелу хаотического огня, нанося {damage} ед. урона от огня. (талант чернокнижника)',
@@ -5366,9 +5366,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.name': 'Удар черепом',
   'entities.abilities.skull_bash.description':
     'Прерывает применение заклинания и запрещает эту школу магии на 4 сек. (талант друида)',
-  'entities.abilities.innervate.name': 'Озарение',
+  'entities.abilities.innervate.name': "Озарение",
   'entities.abilities.innervate.description':
-    'Мгновенно восстанавливает большой запас маны. (талант друида)',
+    "Мгновенно восполняет 200 ед. текущего ресурса. (талант друида)",
   'entities.abilities.frenzied_regeneration.name': 'Неистовое восстановление',
   'entities.abilities.frenzied_regeneration.description':
     'Восстанавливает здоровье в течение 10 сек. Только в облике медведя. (талант друида)',

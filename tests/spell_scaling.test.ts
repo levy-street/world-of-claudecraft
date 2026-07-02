@@ -97,6 +97,14 @@ describe('channelTickBonus', () => {
     expect(channelTickBonus(sp, d)).toBe(Math.round(sp * (3 / 3.5 / 3)));
   });
 
+  it('applies the AoE coefficient to channel tick riders when requested', () => {
+    const sp = 210;
+    const d = def({ castTime: 0, channel: { duration: 3, ticks: 3 } });
+    expect(channelTickBonus(sp, d, true)).toBe(
+      Math.round(sp * (3 / 3.5 / 3) * SPELL_AOE_COEFF_MULT),
+    );
+  });
+
   it('returns 0 for a non-channeled ability', () => {
     expect(channelTickBonus(500, def({}))).toBe(0);
   });

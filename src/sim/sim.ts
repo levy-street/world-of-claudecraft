@@ -3284,7 +3284,10 @@ export class Sim {
     }
     if (category === 'fear') {
       target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });
-      return PVP_FEAR_DR_DURATIONS[Math.min(stage, PVP_FEAR_DR_DURATIONS.length - 1)];
+      return Math.min(
+        duration,
+        PVP_FEAR_DR_DURATIONS[Math.min(stage, PVP_FEAR_DR_DURATIONS.length - 1)],
+      );
     }
     if (stage >= PVP_CC_DR_MULTIPLIERS.length) return null;
     target.ccDr.set(category, { stage: stage + 1, resetAt: this.time + reset });

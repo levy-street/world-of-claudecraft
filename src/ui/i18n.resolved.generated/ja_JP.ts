@@ -4423,7 +4423,7 @@ export const ja_JP: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "怒りの槌",
-        "description": "敵に聖なる槌を投げつけ、{damage} の聖なるダメージを与えます。（パラディンのタレント）"
+        "description": "負傷した敵に聖なる槌を投げつけ、{damage} の神聖ダメージを与えます。体力が20%未満の対象にのみ使用できます。（パラディンのタレント）"
       },
       "counter_shot": {
         "name": "反撃射撃",
@@ -4491,7 +4491,7 @@ export const ja_JP: EnTranslations = {
       },
       "mind_sear": {
         "name": "精神焼灼",
-        "description": "影の力を導き、近くの敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）"
+        "description": "対象地点にシャドウエネルギーを集中し、付近の敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）"
       },
       "earthbind": {
         "name": "大地の束縛",
@@ -4523,7 +4523,7 @@ export const ja_JP: EnTranslations = {
       },
       "death_coil": {
         "name": "死の螺旋",
-        "description": "敵を恐怖させ、短い間に生命力を自分へ吸い戻します。（ウォーロックの天賦）"
+        "description": "敵に {damage} の暗黒ダメージを与え、その後3秒間恐怖状態にします。この版では術者を回復しません。（ウォーロックのタレント）"
       },
       "chaos_bolt": {
         "name": "混沌の矢",
@@ -4539,7 +4539,7 @@ export const ja_JP: EnTranslations = {
       },
       "innervate": {
         "name": "啓発",
-        "description": "大量のマナを即座に回復します。（ドルイドの天賦）"
+        "description": "現在のリソースを即座に200回復します。（ドルイドのタレント）"
       },
       "frenzied_regeneration": {
         "name": "狂乱再生",

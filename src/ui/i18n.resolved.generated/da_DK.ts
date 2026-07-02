@@ -4402,156 +4402,156 @@ export const da_DK: EnTranslations = {
         "description": "Restaura maná rápidamente. (Talento de mago)"
       },
       "rebuke": {
-        "name": "Rebuke",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)"
+        "name": "Irettesættelse",
+        "description": "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Paladin-talent)"
       },
       "crusader_strike": {
-        "name": "Crusader Strike",
-        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+        "name": "Korsfarerslag",
+        "description": "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)"
       },
       "holy_wrath": {
-        "name": "Holy Wrath",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+        "name": "Hellig vrede",
+        "description": "Udløser hellig kraft og skader fjender i nærheden for {damage}. (Paladin-talent)"
       },
       "divine_shield": {
-        "name": "Divine Shield",
-        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+        "name": "Guddommeligt skjold",
+        "description": "Skærmer dig med hellig kraft og absorberer en enorm mængde skade i 8 sek. (Paladin-talent)"
       },
       "avenging_wrath": {
-        "name": "Avenging Wrath",
-        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+        "name": "Hævnende vrede",
+        "description": "Kalder hævnende kraft frem og øger angrebskraft og spell power i 20 sek. (Paladin-talent)"
       },
       "hammer_of_wrath": {
-        "name": "Hammer of Wrath",
-        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+        "name": "Vredens hammer",
+        "description": "Kaster en hellig hammer mod en såret fjende for {damage} hellig skade. Kan kun bruges under 20% helbred. (Paladin-talent)"
       },
       "counter_shot": {
-        "name": "Counter Shot",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)"
+        "name": "Modskud",
+        "description": "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Jæger-talent)"
       },
       "frost_trap": {
-        "name": "Frost Trap",
-        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+        "name": "Frostfælde",
+        "description": "Fryser fjender på målområdet fast i 3 sek. (Jæger-talent)"
       },
       "mend_pet": {
-        "name": "Mend Pet",
-        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+        "name": "Helbred kæledyr",
+        "description": "Helbreder et venligt mål for {damage} over 15 sek. (Jæger-talent)"
       },
       "multi_shot": {
-        "name": "Multi-Shot",
-        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+        "name": "Multiskud",
+        "description": "Affyrer flere projektiler og rammer fjender i nærheden for {damage}. (Jæger-talent)"
       },
       "deterrence": {
-        "name": "Deterrence",
-        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+        "name": "Afskrækkelse",
+        "description": "Øger din undvigelseschance med 50% i 10 sek. (Jæger-talent)"
       },
       "aspect_of_the_wild": {
-        "name": "Aspect of the Wild",
-        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+        "name": "Vildmarkens aspekt",
+        "description": "Inspirerer nærliggende allierede med vild styrke og øger angrebskraft i 5 min. (Jæger-talent)"
       },
       "kick": {
-        "name": "Kick",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)"
+        "name": "Spark",
+        "description": "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Rogue-talent)"
       },
       "preparation": {
-        "name": "Preparation",
-        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+        "name": "Forberedelse",
+        "description": "Afslutter nedkølingen på Sprint, Evasion og Vanish. (Rogue-talent)"
       },
       "ghostly_strike": {
-        "name": "Ghostly Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "name": "Spøgelsesagtigt slag",
+        "description": "Slår fjenden for våbenskade plus {damage} og øger kortvarigt undvigelse. Giver 1 combo point. (Rogue-talent)"
       },
       "cloak_of_shadows": {
-        "name": "Cloak of Shadows",
-        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+        "name": "Skyggernes kappe",
+        "description": "Indhyller dig i skygger og absorberer skade i 5 sek. (Rogue-talent)"
       },
       "shadowstep": {
-        "name": "Shadowstep",
-        "description": "Steps through the shadows toward your target. (Rogue talent)"
+        "name": "Skyggeskridt",
+        "description": "Træder gennem skyggerne mod dit mål. (Rogue-talent)"
       },
       "silence": {
-        "name": "Silence",
-        "description": "Silences the target for 4 sec. (Priest talent)"
+        "name": "Stilhed",
+        "description": "Gør målet tavst i 4 sek. (Præst-talent)"
       },
       "psychic_scream": {
-        "name": "Psychic Scream",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "name": "Psykisk skrig",
+        "description": "Skræmmer fjender i nærheden i op til 4 sek. Skade kan bryde effekten. (Præst-talent)"
       },
       "inner_focus": {
-        "name": "Inner Focus",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "name": "Indre fokus",
+        "description": "Gør din næste besværgelse gratis. Varer 60 sek. (Præst-talent)"
       },
       "desperate_prayer": {
-        "name": "Desperate Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "name": "Desperat bøn",
+        "description": "Helbreder dig øjeblikkeligt for {damage}. (Præst-talent)"
       },
       "prayer_of_healing": {
-        "name": "Prayer of Healing",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "name": "Helbredelsesbøn",
+        "description": "Helbreder nærliggende allierede for {damage}. (Præst-talent)"
       },
       "mind_sear": {
-        "name": "Mind Sear",
-        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "name": "Sindssvidning",
+        "description": "Kanaliserer skyggeenergi mod målområdet og skader fjender i nærheden hvert sekund for {damage}. (Præst-talent)"
       },
       "earthbind": {
-        "name": "Earthbind",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "name": "Jordbinding",
+        "description": "Binder fjender i nærheden til jorden og rodfæster dem i 2 sek. (Shaman-talent)"
       },
       "healing_stream": {
-        "name": "Healing Stream",
-        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+        "name": "Helbredende strøm",
+        "description": "Genopretter et venligt mål over 12 sek. (Shaman-talent)"
       },
       "chain_lightning": {
-        "name": "Chain Lightning",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "name": "Kædelyn",
+        "description": "Slynger lyn mod målområdet og skader fjender i nærheden for {damage}. (Shaman-talent)"
       },
       "bloodlust": {
-        "name": "Bloodlust",
-        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+        "name": "Blodrus",
+        "description": "Pisker nærliggende allierede op i raseri og øger angrebshastighed i 15 sek. (Shaman-talent)"
       },
       "spell_lock": {
-        "name": "Spell Lock",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)"
+        "name": "Besværgelseslås",
+        "description": "Afbryder besværgelse og forhindrer besværgelser fra den skole i 5 sek. (Warlock-talent)"
       },
       "howl_of_terror": {
-        "name": "Howl of Terror",
-        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+        "name": "Rædselshyl",
+        "description": "Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (Warlock-talent)"
       },
       "curse_of_exhaustion": {
-        "name": "Curse of Exhaustion",
-        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+        "name": "Udmattelsens forbandelse",
+        "description": "Forbander målet og sænker bevægelseshastighed med 30% i 12 sek. (Warlock-talent)"
       },
       "death_coil": {
-        "name": "Death Coil",
-        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+        "name": "Dødsspiral",
+        "description": "Sprænger fjenden for {damage} skyggeskade og rædselsskræmmer dem derefter i 3 sek. Denne version helbreder ikke kasteren. (Warlock-talent)"
       },
       "chaos_bolt": {
-        "name": "Chaos Bolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "name": "Kaosbolt",
+        "description": "Slynger en kaotisk ildbolt for {damage} ildskade. (Warlock-talent)"
       },
       "metamorphosis": {
-        "name": "Metamorphosis",
-        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+        "name": "Metamorfose",
+        "description": "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)"
       },
       "skull_bash": {
-        "name": "Skull Bash",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)"
+        "name": "Kranieslag",
+        "description": "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Druide-talent)"
       },
       "innervate": {
-        "name": "Innervate",
-        "description": "Instantly restores a large amount of mana. (Druid talent)"
+        "name": "Innervering",
+        "description": "Gendanner øjeblikkeligt 200 af din aktuelle ressource. (Druide-talent)"
       },
       "frenzied_regeneration": {
-        "name": "Frenzied Regeneration",
-        "description": "Regenerates health over 10 sec. Bear Form only. (Druid talent)"
+        "name": "Vanvittig regeneration",
+        "description": "Gendanner helbred over 10 sek. Kun Bjørneform. (Druide-talent)"
       },
       "berserk": {
-        "name": "Berserk",
-        "description": "Increases attack power for 15 sec. (Druid talent)"
+        "name": "Bersærk",
+        "description": "Øger angrebskraft i 15 sek. (Druide-talent)"
       },
       "tranquility": {
-        "name": "Tranquility",
-        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
+        "name": "Ro",
+        "description": "Kanaliserer genoprettende energi og helbreder nærliggende allierede hvert sekund. (Druide-talent)"
       },
       "holy_shock": {
         "name": "Hellig chok",

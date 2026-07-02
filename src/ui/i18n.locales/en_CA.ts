@@ -116,7 +116,7 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
     'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
   'entities.abilities.hammer_of_wrath.name': 'Hammer of Wrath',
   'entities.abilities.hammer_of_wrath.description':
-    'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
+    'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
   'entities.abilities.counter_shot.name': 'Counter Shot',
   'entities.abilities.counter_shot.description':
     'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
@@ -166,7 +166,7 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
     'Heals nearby allies for {damage}. (Priest talent)',
   'entities.abilities.mind_sear.name': 'Mind Sear',
   'entities.abilities.mind_sear.description':
-    'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
+    'Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)',
   'entities.abilities.earthbind.name': 'Earthbind',
   'entities.abilities.earthbind.description':
     'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
@@ -190,7 +190,7 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
     'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
   'entities.abilities.death_coil.name': 'Death Coil',
   'entities.abilities.death_coil.description':
-    'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
+    'Blasts the enemy for {damage} Shadow damage, then horrifies them for 3 sec. This version does not heal the caster. (Warlock talent)',
   'entities.abilities.chaos_bolt.name': 'Chaos Bolt',
   'entities.abilities.chaos_bolt.description':
     'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
@@ -202,7 +202,7 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
     'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
   'entities.abilities.innervate.name': 'Innervate',
   'entities.abilities.innervate.description':
-    'Instantly restores a large amount of mana. (Druid talent)',
+    'Instantly restores 200 of your current resource. (Druid talent)',
   'entities.abilities.frenzied_regeneration.name': 'Frenzied Regeneration',
   'entities.abilities.frenzied_regeneration.description':
     'Regenerates health over 10 sec. Bear Form only. (Druid talent)',

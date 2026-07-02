@@ -4912,9 +4912,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '復仇之怒',
   'entities.abilities.avenging_wrath.description':
     '召喚復仇之力，使攻擊強度和法術強度提高，持續 20 秒。（聖騎士天賦）',
-  'entities.abilities.hammer_of_wrath.name': '憤怒之錘',
+  'entities.abilities.hammer_of_wrath.name': "憤怒之錘",
   'entities.abilities.hammer_of_wrath.description':
-    '向敵人投擲神聖之錘，造成 {damage} 點神聖傷害。（聖騎士天賦）',
+    "向受傷的敵人投擲一柄神聖之錘，造成 {damage} 點神聖傷害。只能對生命值低於 20% 的目標使用。（聖騎士天賦）",
   'entities.abilities.counter_shot.name': '反制射擊',
   'entities.abilities.counter_shot.description':
     '打斷施法，並使該系法術在 4 秒內無法施放。（獵人天賦）',
@@ -4956,9 +4956,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '治療禱言',
   'entities.abilities.prayer_of_healing.description':
     '為附近盟友恢復 {damage} 點生命值。（牧師天賦）',
-  'entities.abilities.mind_sear.name': '精神灼燒',
+  'entities.abilities.mind_sear.name': "精神灼燒",
   'entities.abilities.mind_sear.description':
-    '引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）',
+    "在目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）",
   'entities.abilities.earthbind.name': '大地束縛',
   'entities.abilities.earthbind.description':
     '將附近敵人縛於大地，使其定身 2 秒。（薩滿天賦）',
@@ -4980,9 +4980,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_exhaustion.name': '疲勞詛咒',
   'entities.abilities.curse_of_exhaustion.description':
     '詛咒目標，使移動速度降低 30%，持續 12 秒。（術士天賦）',
-  'entities.abilities.death_coil.name': '死亡纏繞',
+  'entities.abilities.death_coil.name': "死亡纏繞",
   'entities.abilities.death_coil.description':
-    '恐嚇敵人，並在短暫時間內將生命吸回自身。（術士天賦）',
+    "以 {damage} 點暗影傷害衝擊敵人，然後使其驚駭 3 秒。此版本不會治療施法者。（術士天賦）",
   'entities.abilities.chaos_bolt.name': '混沌箭',
   'entities.abilities.chaos_bolt.description':
     '投出混沌火焰之箭，造成 {damage} 點火焰傷害。（術士天賦）',
@@ -4992,9 +4992,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.name': '碎顱猛擊',
   'entities.abilities.skull_bash.description':
     '打斷施法，並阻止該系法術施放 4 秒。（德魯伊天賦）',
-  'entities.abilities.innervate.name': '啟動',
+  'entities.abilities.innervate.name': "啟動",
   'entities.abilities.innervate.description':
-    '立即恢復大量法力值。（德魯伊天賦）',
+    "立即恢復 200 點目前資源。（德魯伊天賦）",
   'entities.abilities.frenzied_regeneration.name': '狂暴回復',
   'entities.abilities.frenzied_regeneration.description':
     '在 10 秒內恢復生命值。僅限熊形態。（德魯伊天賦）',

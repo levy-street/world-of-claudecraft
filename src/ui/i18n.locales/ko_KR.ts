@@ -5179,9 +5179,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '응징의 격노',
   'entities.abilities.avenging_wrath.description':
     '응징의 힘을 불러 20초 동안 전투력과 주문력을 높입니다. (성기사 특성)',
-  'entities.abilities.hammer_of_wrath.name': '응징의 망치',
+  'entities.abilities.hammer_of_wrath.name': "응징의 망치",
   'entities.abilities.hammer_of_wrath.description':
-    '적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. (성기사 특성)',
+    "부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. 생명력이 20% 미만인 대상에게만 사용할 수 있습니다. (성기사 특성)",
   'entities.abilities.counter_shot.name': '반격 사격',
   'entities.abilities.counter_shot.description':
     '주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (사냥꾼 특성)',
@@ -5228,9 +5228,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '치유의 기원',
   'entities.abilities.prayer_of_healing.description':
     '주위 아군을 {damage}만큼 치유합니다. (사제 특성)',
-  'entities.abilities.mind_sear.name': '정신 불태우기',
+  'entities.abilities.mind_sear.name': "정신 불태우기",
   'entities.abilities.mind_sear.description':
-    '암흑 에너지를 집중해 매초 주위 적에게 {damage}의 피해를 줍니다. (사제 특성)',
+    "대상 지역에 암흑 에너지를 집중해 주변 적에게 매초 {damage}의 피해를 줍니다. (사제 특성)",
   'entities.abilities.earthbind.name': '대지 결속',
   'entities.abilities.earthbind.description':
     '주변 적을 대지에 묶어 2초 동안 이동 불가로 만듭니다. (주술사 특성)',
@@ -5252,9 +5252,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_exhaustion.name': '피로의 저주',
   'entities.abilities.curse_of_exhaustion.description':
     '대상을 저주해 12초 동안 이동 속도를 30% 낮춥니다. (흑마법사 특성)',
-  'entities.abilities.death_coil.name': '죽음의 고리',
+  'entities.abilities.death_coil.name': "죽음의 고리",
   'entities.abilities.death_coil.description':
-    '적을 공포에 빠뜨리고 짧은 시간 동안 생명력을 자신에게 흡수합니다. (흑마법사 특성)',
+    "적에게 {damage}의 암흑 피해를 준 뒤 3초 동안 공포에 빠뜨립니다. 이 버전은 시전자를 치유하지 않습니다. (흑마법사 특성)",
   'entities.abilities.chaos_bolt.name': '혼돈의 화살',
   'entities.abilities.chaos_bolt.description':
     '혼돈의 불꽃 화살을 던져 {damage}의 화염 피해를 줍니다. (흑마법사 특성)',
@@ -5264,9 +5264,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.name': '두개골 강타',
   'entities.abilities.skull_bash.description':
     '시전을 방해하고 해당 계열 주문을 4초 동안 막습니다. (드루이드 특성)',
-  'entities.abilities.innervate.name': '정신 자극',
+  'entities.abilities.innervate.name': "정신 자극",
   'entities.abilities.innervate.description':
-    '많은 마나를 즉시 회복합니다. (드루이드 특성)',
+    "현재 자원을 즉시 200 회복합니다. (드루이드 특성)",
   'entities.abilities.frenzied_regeneration.name': '광포한 재생력',
   'entities.abilities.frenzied_regeneration.description':
     '10초에 걸쳐 생명력을 회복합니다. 곰 변신 전용. (드루이드 특성)',

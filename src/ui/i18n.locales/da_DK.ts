@@ -5200,117 +5200,118 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': 'Rebuke',
+  'entities.abilities.rebuke.name': "Irettesættelse",
   'entities.abilities.rebuke.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
-  'entities.abilities.crusader_strike.name': 'Crusader Strike',
+    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Paladin-talent)",
+  'entities.abilities.crusader_strike.name': "Korsfarerslag",
   'entities.abilities.crusader_strike.description':
-    'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.holy_wrath.name': 'Holy Wrath',
+    "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)",
+  'entities.abilities.holy_wrath.name': "Hellig vrede",
   'entities.abilities.holy_wrath.description':
-    'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
-  'entities.abilities.divine_shield.name': 'Divine Shield',
+    "Udløser hellig kraft og skader fjender i nærheden for {damage}. (Paladin-talent)",
+  'entities.abilities.divine_shield.name': "Guddommeligt skjold",
   'entities.abilities.divine_shield.description':
-    'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
-  'entities.abilities.avenging_wrath.name': 'Avenging Wrath',
+    "Skærmer dig med hellig kraft og absorberer en enorm mængde skade i 8 sek. (Paladin-talent)",
+  'entities.abilities.avenging_wrath.name': "Hævnende vrede",
   'entities.abilities.avenging_wrath.description':
-    'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
-  'entities.abilities.hammer_of_wrath.name': 'Hammer of Wrath',
+    "Kalder hævnende kraft frem og øger angrebskraft og spell power i 20 sek. (Paladin-talent)",
+  'entities.abilities.hammer_of_wrath.name': "Vredens hammer",
   'entities.abilities.hammer_of_wrath.description':
-    'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.counter_shot.name': 'Counter Shot',
+    "Kaster en hellig hammer mod en såret fjende for {damage} hellig skade. Kan kun bruges under 20% helbred. (Paladin-talent)",
+  'entities.abilities.counter_shot.name': "Modskud",
   'entities.abilities.counter_shot.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
-  'entities.abilities.frost_trap.name': 'Frost Trap',
+    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Jæger-talent)",
+  'entities.abilities.frost_trap.name': "Frostfælde",
   'entities.abilities.frost_trap.description':
-    'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
-  'entities.abilities.mend_pet.name': 'Mend Pet',
+    "Fryser fjender på målområdet fast i 3 sek. (Jæger-talent)",
+  'entities.abilities.mend_pet.name': "Helbred kæledyr",
   'entities.abilities.mend_pet.description':
-    'Heals a friendly target for {damage} over 15 sec. (Hunter talent)',
-  'entities.abilities.multi_shot.name': 'Multi-Shot',
+    "Helbreder et venligt mål for {damage} over 15 sek. (Jæger-talent)",
+  'entities.abilities.multi_shot.name': "Multiskud",
   'entities.abilities.multi_shot.description':
-    'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
-  'entities.abilities.deterrence.name': 'Deterrence',
+    "Affyrer flere projektiler og rammer fjender i nærheden for {damage}. (Jæger-talent)",
+  'entities.abilities.deterrence.name': "Afskrækkelse",
   'entities.abilities.deterrence.description':
-    'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
-  'entities.abilities.aspect_of_the_wild.name': 'Aspect of the Wild',
+    "Øger din undvigelseschance med 50% i 10 sek. (Jæger-talent)",
+  'entities.abilities.aspect_of_the_wild.name': "Vildmarkens aspekt",
   'entities.abilities.aspect_of_the_wild.description':
-    'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
-  'entities.abilities.kick.name': 'Kick',
+    "Inspirerer nærliggende allierede med vild styrke og øger angrebskraft i 5 min. (Jæger-talent)",
+  'entities.abilities.kick.name': "Spark",
   'entities.abilities.kick.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
-  'entities.abilities.preparation.name': 'Preparation',
+    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Rogue-talent)",
+  'entities.abilities.preparation.name': "Forberedelse",
   'entities.abilities.preparation.description':
-    'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
-  'entities.abilities.ghostly_strike.name': 'Ghostly Strike',
+    "Afslutter nedkølingen på Sprint, Evasion og Vanish. (Rogue-talent)",
+  'entities.abilities.ghostly_strike.name': "Spøgelsesagtigt slag",
   'entities.abilities.ghostly_strike.description':
-    'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
-  'entities.abilities.cloak_of_shadows.name': 'Cloak of Shadows',
+    "Slår fjenden for våbenskade plus {damage} og øger kortvarigt undvigelse. Giver 1 combo point. (Rogue-talent)",
+  'entities.abilities.cloak_of_shadows.name': "Skyggernes kappe",
   'entities.abilities.cloak_of_shadows.description':
-    'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
-  'entities.abilities.shadowstep.name': 'Shadowstep',
+    "Indhyller dig i skygger og absorberer skade i 5 sek. (Rogue-talent)",
+  'entities.abilities.shadowstep.name': "Skyggeskridt",
   'entities.abilities.shadowstep.description':
-    'Steps through the shadows toward your target. (Rogue talent)',
-  'entities.abilities.silence.name': 'Silence',
-  'entities.abilities.silence.description': 'Silences the target for 4 sec. (Priest talent)',
-  'entities.abilities.psychic_scream.name': 'Psychic Scream',
+    "Træder gennem skyggerne mod dit mål. (Rogue-talent)",
+  'entities.abilities.silence.name': "Stilhed",
+  'entities.abilities.silence.description':
+    "Gør målet tavst i 4 sek. (Præst-talent)",
+  'entities.abilities.psychic_scream.name': "Psykisk skrig",
   'entities.abilities.psychic_scream.description':
-    'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
-  'entities.abilities.inner_focus.name': 'Inner Focus',
+    "Skræmmer fjender i nærheden i op til 4 sek. Skade kan bryde effekten. (Præst-talent)",
+  'entities.abilities.inner_focus.name': "Indre fokus",
   'entities.abilities.inner_focus.description':
-    'Makes your next spell free. Lasts 60 sec. (Priest talent)',
-  'entities.abilities.desperate_prayer.name': 'Desperate Prayer',
+    "Gør din næste besværgelse gratis. Varer 60 sek. (Præst-talent)",
+  'entities.abilities.desperate_prayer.name': "Desperat bøn",
   'entities.abilities.desperate_prayer.description':
-    'Instantly heals you for {damage}. (Priest talent)',
-  'entities.abilities.prayer_of_healing.name': 'Prayer of Healing',
+    "Helbreder dig øjeblikkeligt for {damage}. (Præst-talent)",
+  'entities.abilities.prayer_of_healing.name': "Helbredelsesbøn",
   'entities.abilities.prayer_of_healing.description':
-    'Heals nearby allies for {damage}. (Priest talent)',
-  'entities.abilities.mind_sear.name': 'Mind Sear',
+    "Helbreder nærliggende allierede for {damage}. (Præst-talent)",
+  'entities.abilities.mind_sear.name': "Sindssvidning",
   'entities.abilities.mind_sear.description':
-    'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
-  'entities.abilities.earthbind.name': 'Earthbind',
+    "Kanaliserer skyggeenergi mod målområdet og skader fjender i nærheden hvert sekund for {damage}. (Præst-talent)",
+  'entities.abilities.earthbind.name': "Jordbinding",
   'entities.abilities.earthbind.description':
-    'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
-  'entities.abilities.healing_stream.name': 'Healing Stream',
+    "Binder fjender i nærheden til jorden og rodfæster dem i 2 sek. (Shaman-talent)",
+  'entities.abilities.healing_stream.name': "Helbredende strøm",
   'entities.abilities.healing_stream.description':
-    'Restores a friendly target over 12 sec. (Shaman talent)',
-  'entities.abilities.chain_lightning.name': 'Chain Lightning',
+    "Genopretter et venligt mål over 12 sek. (Shaman-talent)",
+  'entities.abilities.chain_lightning.name': "Kædelyn",
   'entities.abilities.chain_lightning.description':
-    'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
-  'entities.abilities.bloodlust.name': 'Bloodlust',
+    "Slynger lyn mod målområdet og skader fjender i nærheden for {damage}. (Shaman-talent)",
+  'entities.abilities.bloodlust.name': "Blodrus",
   'entities.abilities.bloodlust.description':
-    'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
-  'entities.abilities.spell_lock.name': 'Spell Lock',
+    "Pisker nærliggende allierede op i raseri og øger angrebshastighed i 15 sek. (Shaman-talent)",
+  'entities.abilities.spell_lock.name': "Besværgelseslås",
   'entities.abilities.spell_lock.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
-  'entities.abilities.howl_of_terror.name': 'Howl of Terror',
+    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 5 sek. (Warlock-talent)",
+  'entities.abilities.howl_of_terror.name': "Rædselshyl",
   'entities.abilities.howl_of_terror.description':
-    'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
-  'entities.abilities.curse_of_exhaustion.name': 'Curse of Exhaustion',
+    "Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (Warlock-talent)",
+  'entities.abilities.curse_of_exhaustion.name': "Udmattelsens forbandelse",
   'entities.abilities.curse_of_exhaustion.description':
-    'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
-  'entities.abilities.death_coil.name': 'Death Coil',
+    "Forbander målet og sænker bevægelseshastighed med 30% i 12 sek. (Warlock-talent)",
+  'entities.abilities.death_coil.name': "Dødsspiral",
   'entities.abilities.death_coil.description':
-    'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
-  'entities.abilities.chaos_bolt.name': 'Chaos Bolt',
+    "Sprænger fjenden for {damage} skyggeskade og rædselsskræmmer dem derefter i 3 sek. Denne version helbreder ikke kasteren. (Warlock-talent)",
+  'entities.abilities.chaos_bolt.name': "Kaosbolt",
   'entities.abilities.chaos_bolt.description':
-    'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
-  'entities.abilities.metamorphosis.name': 'Metamorphosis',
+    "Slynger en kaotisk ildbolt for {damage} ildskade. (Warlock-talent)",
+  'entities.abilities.metamorphosis.name': "Metamorfose",
   'entities.abilities.metamorphosis.description':
-    'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
-  'entities.abilities.skull_bash.name': 'Skull Bash',
+    "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)",
+  'entities.abilities.skull_bash.name': "Kranieslag",
   'entities.abilities.skull_bash.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
-  'entities.abilities.innervate.name': 'Innervate',
+    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Druide-talent)",
+  'entities.abilities.innervate.name': "Innervering",
   'entities.abilities.innervate.description':
-    'Instantly restores a large amount of mana. (Druid talent)',
-  'entities.abilities.frenzied_regeneration.name': 'Frenzied Regeneration',
+    "Gendanner øjeblikkeligt 200 af din aktuelle ressource. (Druide-talent)",
+  'entities.abilities.frenzied_regeneration.name': "Vanvittig regeneration",
   'entities.abilities.frenzied_regeneration.description':
-    'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
-  'entities.abilities.berserk.name': 'Berserk',
+    "Gendanner helbred over 10 sek. Kun Bjørneform. (Druide-talent)",
+  'entities.abilities.berserk.name': "Bersærk",
   'entities.abilities.berserk.description':
-    'Increases attack power for 15 sec. (Druid talent)',
-  'entities.abilities.tranquility.name': 'Tranquility',
+    "Øger angrebskraft i 15 sek. (Druide-talent)",
+  'entities.abilities.tranquility.name': "Ro",
   'entities.abilities.tranquility.description':
-    'Channels restorative energy, healing nearby allies each second. (Druid talent)',
+    "Kanaliserer genoprettende energi og helbreder nærliggende allierede hvert sekund. (Druide-talent)",
 };

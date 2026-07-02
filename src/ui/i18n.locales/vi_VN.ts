@@ -5230,117 +5230,118 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': 'Rebuke',
+  'entities.abilities.rebuke.name': "Quở trách",
   'entities.abilities.rebuke.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
-  'entities.abilities.crusader_strike.name': 'Crusader Strike',
+    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Paladin)",
+  'entities.abilities.crusader_strike.name': "Đòn Thập Tự",
   'entities.abilities.crusader_strike.description':
-    'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.holy_wrath.name': 'Holy Wrath',
+    "Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)",
+  'entities.abilities.holy_wrath.name': "Thịnh nộ Thánh",
   'entities.abilities.holy_wrath.description':
-    'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
-  'entities.abilities.divine_shield.name': 'Divine Shield',
+    "Phóng thích sức mạnh thánh, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Paladin)",
+  'entities.abilities.divine_shield.name': "Khiên Thần Thánh",
   'entities.abilities.divine_shield.description':
-    'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
-  'entities.abilities.avenging_wrath.name': 'Avenging Wrath',
+    "Che chở bạn bằng sức mạnh thánh, hấp thụ lượng sát thương cực lớn trong 8 giây. (tài năng Paladin)",
+  'entities.abilities.avenging_wrath.name': "Thịnh nộ Báo Thù",
   'entities.abilities.avenging_wrath.description':
-    'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
-  'entities.abilities.hammer_of_wrath.name': 'Hammer of Wrath',
+    "Gọi sức mạnh báo thù, tăng sức tấn công và sức mạnh phép trong 20 giây. (tài năng Paladin)",
+  'entities.abilities.hammer_of_wrath.name': "Búa Thịnh Nộ",
   'entities.abilities.hammer_of_wrath.description':
-    'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.counter_shot.name': 'Counter Shot',
+    "Ném búa thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi máu dưới 20%. (tài năng Paladin)",
+  'entities.abilities.counter_shot.name': "Bắn Phản Kích",
   'entities.abilities.counter_shot.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
-  'entities.abilities.frost_trap.name': 'Frost Trap',
+    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Thợ săn)",
+  'entities.abilities.frost_trap.name': "Bẫy Băng Giá",
   'entities.abilities.frost_trap.description':
-    'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
-  'entities.abilities.mend_pet.name': 'Mend Pet',
+    "Đóng băng kẻ địch tại vùng mục tiêu trong 3 giây. (tài năng Thợ săn)",
+  'entities.abilities.mend_pet.name': "Chữa lành Thú Cưng",
   'entities.abilities.mend_pet.description':
-    'Heals a friendly target for {damage} over 15 sec. (Hunter talent)',
-  'entities.abilities.multi_shot.name': 'Multi-Shot',
+    "Chữa lành mục tiêu thân thiện {damage} trong 15 giây. (tài năng Thợ săn)",
+  'entities.abilities.multi_shot.name': "Bắn Đa Mục Tiêu",
   'entities.abilities.multi_shot.description':
-    'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
-  'entities.abilities.deterrence.name': 'Deterrence',
+    "Bắn nhiều mũi tên, đánh trúng kẻ địch gần đó với {damage} sát thương. (tài năng Thợ săn)",
+  'entities.abilities.deterrence.name': "Ngăn Chặn",
   'entities.abilities.deterrence.description':
-    'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
-  'entities.abilities.aspect_of_the_wild.name': 'Aspect of the Wild',
+    "Tăng cơ hội né tránh của bạn thêm 50% trong 10 giây. (tài năng Thợ săn)",
+  'entities.abilities.aspect_of_the_wild.name': "Dáng Vẻ Hoang Dã",
   'entities.abilities.aspect_of_the_wild.description':
-    'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
-  'entities.abilities.kick.name': 'Kick',
+    "Truyền sức mạnh hoang dã cho đồng minh gần đó, tăng sức tấn công trong 5 phút. (tài năng Thợ săn)",
+  'entities.abilities.kick.name': "Đá",
   'entities.abilities.kick.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
-  'entities.abilities.preparation.name': 'Preparation',
+    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Rogue)",
+  'entities.abilities.preparation.name': "Chuẩn Bị",
   'entities.abilities.preparation.description':
-    'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
-  'entities.abilities.ghostly_strike.name': 'Ghostly Strike',
+    "Kết thúc hồi chiêu của Sprint, Evasion và Vanish. (tài năng Rogue)",
+  'entities.abilities.ghostly_strike.name': "Đòn Đánh Ma Quái",
   'entities.abilities.ghostly_strike.description':
-    'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
-  'entities.abilities.cloak_of_shadows.name': 'Cloak of Shadows',
+    "Đánh kẻ địch bằng sát thương vũ khí cộng {damage} và tăng né tránh trong chốc lát. Cho 1 điểm combo. (tài năng Rogue)",
+  'entities.abilities.cloak_of_shadows.name': "Áo Choàng Bóng Tối",
   'entities.abilities.cloak_of_shadows.description':
-    'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
-  'entities.abilities.shadowstep.name': 'Shadowstep',
+    "Bao phủ bạn bằng bóng tối, hấp thụ sát thương trong 5 giây. (tài năng Rogue)",
+  'entities.abilities.shadowstep.name': "Bước Bóng Tối",
   'entities.abilities.shadowstep.description':
-    'Steps through the shadows toward your target. (Rogue talent)',
-  'entities.abilities.silence.name': 'Silence',
-  'entities.abilities.silence.description': 'Silences the target for 4 sec. (Priest talent)',
-  'entities.abilities.psychic_scream.name': 'Psychic Scream',
+    "Bước qua bóng tối về phía mục tiêu. (tài năng Rogue)",
+  'entities.abilities.silence.name': "Câm Lặng",
+  'entities.abilities.silence.description':
+    "Làm câm lặng mục tiêu trong 4 giây. (tài năng Rogue)",
+  'entities.abilities.psychic_scream.name': "Tiếng Thét Tâm Linh",
   'entities.abilities.psychic_scream.description':
-    'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
-  'entities.abilities.inner_focus.name': 'Inner Focus',
+    "Làm kẻ địch gần đó hoảng sợ tối đa 4 giây. Sát thương có thể phá hiệu ứng. (tài năng Priest)",
+  'entities.abilities.inner_focus.name': "Tập Trung Nội Tâm",
   'entities.abilities.inner_focus.description':
-    'Makes your next spell free. Lasts 60 sec. (Priest talent)',
-  'entities.abilities.desperate_prayer.name': 'Desperate Prayer',
+    "Làm phép tiếp theo không tốn tài nguyên. Kéo dài 60 giây. (tài năng Priest)",
+  'entities.abilities.desperate_prayer.name': "Lời Cầu Tuyệt Vọng",
   'entities.abilities.desperate_prayer.description':
-    'Instantly heals you for {damage}. (Priest talent)',
-  'entities.abilities.prayer_of_healing.name': 'Prayer of Healing',
+    "Chữa lành bạn ngay lập tức {damage}. (tài năng Priest)",
+  'entities.abilities.prayer_of_healing.name': "Lời Cầu Chữa Lành",
   'entities.abilities.prayer_of_healing.description':
-    'Heals nearby allies for {damage}. (Priest talent)',
-  'entities.abilities.mind_sear.name': 'Mind Sear',
+    "Chữa lành đồng minh gần đó {damage}. (tài năng Priest)",
+  'entities.abilities.mind_sear.name': "Thiêu Đốt Tâm Trí",
   'entities.abilities.mind_sear.description':
-    'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
-  'entities.abilities.earthbind.name': 'Earthbind',
+    "Dẫn năng lượng Bóng Tối vào vùng mục tiêu, gây {damage} sát thương mỗi giây cho kẻ địch gần đó. (tài năng Priest)",
+  'entities.abilities.earthbind.name': "Trói Đất",
   'entities.abilities.earthbind.description':
-    'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
-  'entities.abilities.healing_stream.name': 'Healing Stream',
+    "Trói kẻ địch gần đó vào đất, giữ chân chúng trong 2 giây. (tài năng Shaman)",
+  'entities.abilities.healing_stream.name': "Dòng Chữa Lành",
   'entities.abilities.healing_stream.description':
-    'Restores a friendly target over 12 sec. (Shaman talent)',
-  'entities.abilities.chain_lightning.name': 'Chain Lightning',
+    "Hồi phục một mục tiêu thân thiện trong 12 giây. (tài năng Shaman)",
+  'entities.abilities.chain_lightning.name': "Sét Chuỗi",
   'entities.abilities.chain_lightning.description':
-    'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
-  'entities.abilities.bloodlust.name': 'Bloodlust',
+    "Phóng sét vào vùng mục tiêu, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Shaman)",
+  'entities.abilities.bloodlust.name': "Khát Máu",
   'entities.abilities.bloodlust.description':
-    'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
-  'entities.abilities.spell_lock.name': 'Spell Lock',
+    "Kích động đồng minh gần đó, tăng tốc độ tấn công trong 15 giây. (tài năng Shaman)",
+  'entities.abilities.spell_lock.name': "Khóa Phép",
   'entities.abilities.spell_lock.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
-  'entities.abilities.howl_of_terror.name': 'Howl of Terror',
+    "Ngắt niệm phép và chặn phép thuộc trường đó trong 5 giây. (tài năng Warlock)",
+  'entities.abilities.howl_of_terror.name': "Tiếng Hú Kinh Hoàng",
   'entities.abilities.howl_of_terror.description':
-    'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
-  'entities.abilities.curse_of_exhaustion.name': 'Curse of Exhaustion',
+    "Làm kẻ địch gần đó hoảng sợ tối đa 3 giây. Sát thương có thể phá hiệu ứng. (tài năng Warlock)",
+  'entities.abilities.curse_of_exhaustion.name': "Lời Nguyền Kiệt Sức",
   'entities.abilities.curse_of_exhaustion.description':
-    'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
-  'entities.abilities.death_coil.name': 'Death Coil',
+    "Nguyền rủa mục tiêu, giảm tốc độ di chuyển 30% trong 12 giây. (tài năng Warlock)",
+  'entities.abilities.death_coil.name': "Vòng Xoáy Tử Vong",
   'entities.abilities.death_coil.description':
-    'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
-  'entities.abilities.chaos_bolt.name': 'Chaos Bolt',
+    "Đánh kẻ địch bằng {damage} sát thương Bóng Tối, rồi làm chúng kinh hoàng trong 3 giây. Phiên bản này không chữa cho người thi triển. (tài năng Warlock)",
+  'entities.abilities.chaos_bolt.name': "Tia Hỗn Mang",
   'entities.abilities.chaos_bolt.description':
-    'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
-  'entities.abilities.metamorphosis.name': 'Metamorphosis',
+    "Phóng tia lửa hỗn mang gây {damage} sát thương Lửa. (tài năng Warlock)",
+  'entities.abilities.metamorphosis.name': "Biến Hình",
   'entities.abilities.metamorphosis.description':
-    'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
-  'entities.abilities.skull_bash.name': 'Skull Bash',
+    "Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)",
+  'entities.abilities.skull_bash.name': "Đập Sọ",
   'entities.abilities.skull_bash.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
-  'entities.abilities.innervate.name': 'Innervate',
+    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Druid)",
+  'entities.abilities.innervate.name': "Tiếp Sức",
   'entities.abilities.innervate.description':
-    'Instantly restores a large amount of mana. (Druid talent)',
-  'entities.abilities.frenzied_regeneration.name': 'Frenzied Regeneration',
+    "Hồi ngay 200 tài nguyên hiện tại của bạn. (tài năng Druid)",
+  'entities.abilities.frenzied_regeneration.name': "Tái Sinh Cuồng Loạn",
   'entities.abilities.frenzied_regeneration.description':
-    'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
-  'entities.abilities.berserk.name': 'Berserk',
+    "Hồi máu trong 10 giây. Chỉ trong Dạng Gấu. (tài năng Druid)",
+  'entities.abilities.berserk.name': "Cuồng Bạo",
   'entities.abilities.berserk.description':
-    'Increases attack power for 15 sec. (Druid talent)',
-  'entities.abilities.tranquility.name': 'Tranquility',
+    "Tăng sức tấn công trong 15 giây. (tài năng Druid)",
+  'entities.abilities.tranquility.name': "An Nhiên",
   'entities.abilities.tranquility.description':
-    'Channels restorative energy, healing nearby allies each second. (Druid talent)',
+    "Dẫn năng lượng hồi phục, chữa lành đồng minh gần đó mỗi giây. (tài năng Druid)",
 };

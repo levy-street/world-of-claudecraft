@@ -4402,156 +4402,156 @@ export const pt_BR: EnTranslations = {
         "description": "Restaura mana rapidamente. (Talento de mago)"
       },
       "rebuke": {
-        "name": "Rebuke",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)"
+        "name": "Repreensão",
+        "description": "Interrompe o lançamento de feitiços e impede feitiços daquela escola por 4 s. (talento de paladino)"
       },
       "crusader_strike": {
-        "name": "Crusader Strike",
-        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+        "name": "Golpe do Cruzado",
+        "description": "Golpeia o alvo com dano da arma mais {damage} de dano Sagrado. (talento de paladino)"
       },
       "holy_wrath": {
-        "name": "Holy Wrath",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+        "name": "Ira Sagrada",
+        "description": "Libera poder sagrado, causando {damage} de dano a inimigos próximos. (talento de paladino)"
       },
       "divine_shield": {
-        "name": "Divine Shield",
-        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+        "name": "Escudo Divino",
+        "description": "Protege você com poder sagrado, absorvendo uma enorme quantidade de dano por 8 s. (talento de paladino)"
       },
       "avenging_wrath": {
-        "name": "Avenging Wrath",
-        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+        "name": "Ira Vingativa",
+        "description": "Invoca poder vingativo, aumentando o poder de ataque e o poder mágico por 20 s. (talento de paladino)"
       },
       "hammer_of_wrath": {
-        "name": "Hammer of Wrath",
-        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+        "name": "Martelo da Ira",
+        "description": "Arremessa um martelo sagrado contra um inimigo ferido, causando {damage} de dano Sagrado. Só pode ser usado abaixo de 20% de vida. (talento de paladino)"
       },
       "counter_shot": {
-        "name": "Counter Shot",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)"
+        "name": "Contradisparo",
+        "description": "Interrompe o lançamento de feitiços e impede feitiços daquela escola por 4 s. (talento de caçador)"
       },
       "frost_trap": {
-        "name": "Frost Trap",
-        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+        "name": "Armadilha Congelante",
+        "description": "Congela inimigos na área alvo por 3 s. (talento de caçador)"
       },
       "mend_pet": {
-        "name": "Mend Pet",
-        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+        "name": "Curar Ajudante",
+        "description": "Cura um alvo aliado em {damage} ao longo de 15 s. (talento de caçador)"
       },
       "multi_shot": {
-        "name": "Multi-Shot",
-        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+        "name": "Tiro Múltiplo",
+        "description": "Dispara vários projéteis, atingindo inimigos próximos com {damage}. (talento de caçador)"
       },
       "deterrence": {
-        "name": "Deterrence",
-        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+        "name": "Dissuasão",
+        "description": "Aumenta sua chance de esquiva em 50% por 10 s. (talento de caçador)"
       },
       "aspect_of_the_wild": {
-        "name": "Aspect of the Wild",
-        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+        "name": "Aspecto da Natureza",
+        "description": "Inspira aliados próximos com força selvagem, aumentando o poder de ataque por 5 min. (talento de caçador)"
       },
       "kick": {
-        "name": "Kick",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)"
+        "name": "Chute",
+        "description": "Interrompe o lançamento de feitiços e impede feitiços daquela escola por 4 s. (talento de ladino)"
       },
       "preparation": {
-        "name": "Preparation",
-        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+        "name": "Preparação",
+        "description": "Encerra o tempo de recarga de Disparada, Evasão e Sumir. (talento de ladino)"
       },
       "ghostly_strike": {
-        "name": "Ghostly Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "name": "Golpe Fantasmagórico",
+        "description": "Golpeia o inimigo com dano da arma mais {damage} e aumenta brevemente a esquiva. Concede 1 ponto de combo. (talento de ladino)"
       },
       "cloak_of_shadows": {
-        "name": "Cloak of Shadows",
-        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+        "name": "Manto das Sombras",
+        "description": "Envolve você em sombras, absorvendo dano por 5 s. (talento de ladino)"
       },
       "shadowstep": {
-        "name": "Shadowstep",
-        "description": "Steps through the shadows toward your target. (Rogue talent)"
+        "name": "Passo Furtivo",
+        "description": "Avança pelas sombras na direção do seu alvo. (talento de ladino)"
       },
       "silence": {
-        "name": "Silence",
-        "description": "Silences the target for 4 sec. (Priest talent)"
+        "name": "Silêncio",
+        "description": "Silencia o alvo por 4 s. (talento de sacerdote)"
       },
       "psychic_scream": {
-        "name": "Psychic Scream",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "name": "Grito Psíquico",
+        "description": "Assusta inimigos próximos por até 4 s. Dano pode quebrar o efeito. (talento de sacerdote)"
       },
       "inner_focus": {
-        "name": "Inner Focus",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "name": "Foco Interior",
+        "description": "Faz seu próximo feitiço não custar recurso. Dura 60 s. (talento de sacerdote)"
       },
       "desperate_prayer": {
-        "name": "Desperate Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "name": "Prece Desesperada",
+        "description": "Cura você instantaneamente em {damage}. (talento de sacerdote)"
       },
       "prayer_of_healing": {
-        "name": "Prayer of Healing",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "name": "Prece de Cura",
+        "description": "Cura aliados próximos em {damage}. (talento de sacerdote)"
       },
       "mind_sear": {
-        "name": "Mind Sear",
-        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "name": "Calcinação Mental",
+        "description": "Canaliza energia Sombria na área alvo, causando {damage} de dano por segundo a inimigos próximos. (talento de sacerdote)"
       },
       "earthbind": {
-        "name": "Earthbind",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "name": "Vínculo Terreno",
+        "description": "Prende inimigos próximos à terra e os enraíza por 2 s. (talento de xamã)"
       },
       "healing_stream": {
-        "name": "Healing Stream",
-        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+        "name": "Corrente de Cura",
+        "description": "Restaura um alvo aliado ao longo de 12 s. (talento de xamã)"
       },
       "chain_lightning": {
-        "name": "Chain Lightning",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "name": "Cadeia de Raios",
+        "description": "Arremessa raios na área alvo, causando {damage} de dano a inimigos próximos. (talento de xamã)"
       },
       "bloodlust": {
-        "name": "Bloodlust",
-        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+        "name": "Sede de Sangue",
+        "description": "Incita aliados próximos em frenesi, aumentando a velocidade de ataque por 15 s. (talento de xamã)"
       },
       "spell_lock": {
-        "name": "Spell Lock",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)"
+        "name": "Bloqueio de Feitiço",
+        "description": "Interrompe o lançamento de feitiços e impede feitiços daquela escola por 5 s. (talento de bruxo)"
       },
       "howl_of_terror": {
-        "name": "Howl of Terror",
-        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+        "name": "Uivo de Terror",
+        "description": "Assusta inimigos próximos por até 3 s. Dano pode quebrar o efeito. (talento de bruxo)"
       },
       "curse_of_exhaustion": {
-        "name": "Curse of Exhaustion",
-        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+        "name": "Maldição da Exaustão",
+        "description": "Amaldiçoa o alvo, reduzindo a velocidade de movimento em 30% por 12 s. (talento de bruxo)"
       },
       "death_coil": {
-        "name": "Death Coil",
-        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+        "name": "Espiral da Morte",
+        "description": "Atinge o inimigo com {damage} de dano Sombrio e depois o horroriza por 3 s. Esta versão não cura o lançador. (talento de bruxo)"
       },
       "chaos_bolt": {
-        "name": "Chaos Bolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "name": "Seta do Caos",
+        "description": "Arremessa uma seta de fogo caótico causando {damage} de dano de Fogo. (talento de bruxo)"
       },
       "metamorphosis": {
-        "name": "Metamorphosis",
-        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+        "name": "Metamorfose",
+        "description": "Assume poder demoníaco, aumentando armadura e poder de ataque por 20 s. (talento de bruxo)"
       },
       "skull_bash": {
-        "name": "Skull Bash",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)"
+        "name": "Pancada de Crânio",
+        "description": "Interrompe o lançamento de feitiços e impede feitiços daquela escola por 4 s. (talento de druida)"
       },
       "innervate": {
-        "name": "Innervate",
-        "description": "Instantly restores a large amount of mana. (Druid talent)"
+        "name": "Avivar",
+        "description": "Restaura instantaneamente 200 do seu recurso atual. (talento de druida)"
       },
       "frenzied_regeneration": {
-        "name": "Frenzied Regeneration",
-        "description": "Regenerates health over 10 sec. Bear Form only. (Druid talent)"
+        "name": "Regeneração Frenética",
+        "description": "Regenera vida ao longo de 10 s. Apenas Forma de Urso. (talento de druida)"
       },
       "berserk": {
         "name": "Berserk",
-        "description": "Increases attack power for 15 sec. (Druid talent)"
+        "description": "Aumenta o poder de ataque por 15 s. (talento de druida)"
       },
       "tranquility": {
-        "name": "Tranquility",
-        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
+        "name": "Tranquilidade",
+        "description": "Canaliza energia restauradora, curando aliados próximos a cada segundo. (talento de druida)"
       },
       "holy_shock": {
         "name": "Choque Sagrado",

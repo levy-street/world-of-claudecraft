@@ -4423,7 +4423,7 @@ export const zh_CN: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "愤怒之锤",
-        "description": "向敌人投掷神圣之锤，造成 {damage} 点神圣伤害。（圣骑士天赋）"
+        "description": "向受伤的敌人投掷一柄神圣之锤，造成 {damage} 点神圣伤害。只能对生命值低于 20% 的目标使用。（圣骑士天赋）"
       },
       "counter_shot": {
         "name": "反制射击",
@@ -4491,7 +4491,7 @@ export const zh_CN: EnTranslations = {
       },
       "mind_sear": {
         "name": "精神灼烧",
-        "description": "引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"
+        "description": "在目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"
       },
       "earthbind": {
         "name": "大地束缚",
@@ -4523,7 +4523,7 @@ export const zh_CN: EnTranslations = {
       },
       "death_coil": {
         "name": "死亡缠绕",
-        "description": "恐吓敌人，并在短暂时间内将生命吸回自身。（术士天赋）"
+        "description": "以 {damage} 点暗影伤害冲击敌人，然后使其惊骇 3 秒。此版本不会治疗施法者。（术士天赋）"
       },
       "chaos_bolt": {
         "name": "混乱箭",
@@ -4539,7 +4539,7 @@ export const zh_CN: EnTranslations = {
       },
       "innervate": {
         "name": "激活",
-        "description": "立即恢复大量法力值。（德鲁伊天赋）"
+        "description": "立即恢复 200 点当前资源。（德鲁伊天赋）"
       },
       "frenzied_regeneration": {
         "name": "狂暴回复",

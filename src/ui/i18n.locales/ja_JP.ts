@@ -5172,9 +5172,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '復讐の翼',
   'entities.abilities.avenging_wrath.description':
     '復讐の力を呼び、20 秒間、攻撃力と呪文力を高めます。（パラディンのタレント）',
-  'entities.abilities.hammer_of_wrath.name': '怒りの槌',
+  'entities.abilities.hammer_of_wrath.name': "怒りの槌",
   'entities.abilities.hammer_of_wrath.description':
-    '敵に聖なる槌を投げつけ、{damage} の聖なるダメージを与えます。（パラディンのタレント）',
+    "負傷した敵に聖なる槌を投げつけ、{damage} の神聖ダメージを与えます。体力が20%未満の対象にのみ使用できます。（パラディンのタレント）",
   'entities.abilities.counter_shot.name': '反撃射撃',
   'entities.abilities.counter_shot.description':
     '詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（ハンターのタレント）',
@@ -5221,9 +5221,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '治癒の祈り',
   'entities.abilities.prayer_of_healing.description':
     '近くの味方を {damage} 回復します。（プリーストのタレント）',
-  'entities.abilities.mind_sear.name': '精神焼灼',
+  'entities.abilities.mind_sear.name': "精神焼灼",
   'entities.abilities.mind_sear.description':
-    '影の力を導き、近くの敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）',
+    "対象地点にシャドウエネルギーを集中し、付近の敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）",
   'entities.abilities.earthbind.name': '大地の束縛',
   'entities.abilities.earthbind.description':
     '近くの敵を大地に縛り、2 秒間移動不能にします。（シャーマンの天賦）',
@@ -5245,9 +5245,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_exhaustion.name': '疲弊の呪い',
   'entities.abilities.curse_of_exhaustion.description':
     '対象を呪い、12 秒間移動速度を 30% 低下させます。（ウォーロックの天賦）',
-  'entities.abilities.death_coil.name': '死の螺旋',
+  'entities.abilities.death_coil.name': "死の螺旋",
   'entities.abilities.death_coil.description':
-    '敵を恐怖させ、短い間に生命力を自分へ吸い戻します。（ウォーロックの天賦）',
+    "敵に {damage} の暗黒ダメージを与え、その後3秒間恐怖状態にします。この版では術者を回復しません。（ウォーロックのタレント）",
   'entities.abilities.chaos_bolt.name': '混沌の矢',
   'entities.abilities.chaos_bolt.description':
     '混沌の炎の矢を放ち、{damage} の火炎ダメージを与えます。（ウォーロックの天賦）',
@@ -5257,9 +5257,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.name': '頭蓋砕き',
   'entities.abilities.skull_bash.description':
     '詠唱を中断し、その系統の呪文を 4 秒間封じます。（ドルイドの天賦）',
-  'entities.abilities.innervate.name': '啓発',
+  'entities.abilities.innervate.name': "啓発",
   'entities.abilities.innervate.description':
-    '大量のマナを即座に回復します。（ドルイドの天賦）',
+    "現在のリソースを即座に200回復します。（ドルイドのタレント）",
   'entities.abilities.frenzied_regeneration.name': '狂乱再生',
   'entities.abilities.frenzied_regeneration.description':
     '10 秒かけて体力を回復します。熊形態専用。（ドルイドの天賦）',

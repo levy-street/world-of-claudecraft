@@ -1112,6 +1112,7 @@ export interface AbilityDef {
   spendsCombo?: boolean; // rogue finishers
   requiresDodgeProc?: boolean; // overpower
   requiresTargetHpBelow?: number; // execute-style (fraction)
+  fearDr?: boolean; // incapacitate effects use fear PvP diminishing returns
   // Classic threat riders: flat bonus threat on a successful use and/or a
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };

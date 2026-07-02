@@ -5277,117 +5277,118 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': 'Rebuke',
+  'entities.abilities.rebuke.name': "Hardik",
   'entities.abilities.rebuke.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
-  'entities.abilities.crusader_strike.name': 'Crusader Strike',
+    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Paladin)",
+  'entities.abilities.crusader_strike.name': "Serangan Tentara Salib",
   'entities.abilities.crusader_strike.description':
-    'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.holy_wrath.name': 'Holy Wrath',
+    "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)",
+  'entities.abilities.holy_wrath.name': "Murka Suci",
   'entities.abilities.holy_wrath.description':
-    'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
-  'entities.abilities.divine_shield.name': 'Divine Shield',
+    "Melepaskan kekuatan suci dan melukai musuh di sekitar sebesar {damage}. (talenta Paladin)",
+  'entities.abilities.divine_shield.name': "Perisai Ilahi",
   'entities.abilities.divine_shield.description':
-    'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
-  'entities.abilities.avenging_wrath.name': 'Avenging Wrath',
+    "Melindungimu dengan kekuatan suci, menyerap kerusakan sangat besar selama 8 dtk. (talenta Paladin)",
+  'entities.abilities.avenging_wrath.name': "Murka Pembalas",
   'entities.abilities.avenging_wrath.description':
-    'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
-  'entities.abilities.hammer_of_wrath.name': 'Hammer of Wrath',
+    "Memanggil kekuatan pembalas, meningkatkan daya serang dan kekuatan mantra selama 20 dtk. (talenta Paladin)",
+  'entities.abilities.hammer_of_wrath.name': "Palu Murka",
   'entities.abilities.hammer_of_wrath.description':
-    'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.counter_shot.name': 'Counter Shot',
+    "Melempar palu suci ke musuh yang terluka, menimbulkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)",
+  'entities.abilities.counter_shot.name': "Tembakan Balasan",
   'entities.abilities.counter_shot.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
-  'entities.abilities.frost_trap.name': 'Frost Trap',
+    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Pemburu)",
+  'entities.abilities.frost_trap.name': "Perangkap Es",
   'entities.abilities.frost_trap.description':
-    'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
-  'entities.abilities.mend_pet.name': 'Mend Pet',
+    "Membekukan musuh di area target selama 3 dtk. (talenta Pemburu)",
+  'entities.abilities.mend_pet.name': "Sembuhkan Peliharaan",
   'entities.abilities.mend_pet.description':
-    'Heals a friendly target for {damage} over 15 sec. (Hunter talent)',
-  'entities.abilities.multi_shot.name': 'Multi-Shot',
+    "Menyembuhkan target bersahabat sebesar {damage} selama 15 dtk. (talenta Pemburu)",
+  'entities.abilities.multi_shot.name': "Tembakan Ganda",
   'entities.abilities.multi_shot.description':
-    'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
-  'entities.abilities.deterrence.name': 'Deterrence',
+    "Menembakkan beberapa proyektil dan mengenai musuh di sekitar sebesar {damage}. (talenta Pemburu)",
+  'entities.abilities.deterrence.name': "Penangkisan",
   'entities.abilities.deterrence.description':
-    'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
-  'entities.abilities.aspect_of_the_wild.name': 'Aspect of the Wild',
+    "Meningkatkan peluang menghindarmu sebesar 50% selama 10 dtk. (talenta Pemburu)",
+  'entities.abilities.aspect_of_the_wild.name': "Aspek Alam Liar",
   'entities.abilities.aspect_of_the_wild.description':
-    'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
-  'entities.abilities.kick.name': 'Kick',
+    "Mengilhami sekutu di sekitar dengan kekuatan liar, meningkatkan daya serang selama 5 mnt. (talenta Pemburu)",
+  'entities.abilities.kick.name': "Tendang",
   'entities.abilities.kick.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
-  'entities.abilities.preparation.name': 'Preparation',
+    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Rogue)",
+  'entities.abilities.preparation.name': "Persiapan",
   'entities.abilities.preparation.description':
-    'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
-  'entities.abilities.ghostly_strike.name': 'Ghostly Strike',
+    "Mengakhiri cooldown Sprint, Evasion, dan Vanish. (talenta Rogue)",
+  'entities.abilities.ghostly_strike.name': "Serangan Arwah",
   'entities.abilities.ghostly_strike.description':
-    'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
-  'entities.abilities.cloak_of_shadows.name': 'Cloak of Shadows',
+    "Menyerang musuh dengan kerusakan senjata ditambah {damage} dan sebentar meningkatkan menghindar. Memberi 1 poin kombo. (talenta Rogue)",
+  'entities.abilities.cloak_of_shadows.name': "Jubah Bayangan",
   'entities.abilities.cloak_of_shadows.description':
-    'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
-  'entities.abilities.shadowstep.name': 'Shadowstep',
+    "Menyelimutimu dengan bayangan, menyerap kerusakan selama 5 dtk. (talenta Rogue)",
+  'entities.abilities.shadowstep.name': "Langkah Bayangan",
   'entities.abilities.shadowstep.description':
-    'Steps through the shadows toward your target. (Rogue talent)',
-  'entities.abilities.silence.name': 'Silence',
-  'entities.abilities.silence.description': 'Silences the target for 4 sec. (Priest talent)',
-  'entities.abilities.psychic_scream.name': 'Psychic Scream',
+    "Melangkah melalui bayangan menuju targetmu. (talenta Rogue)",
+  'entities.abilities.silence.name': "Bungkam",
+  'entities.abilities.silence.description':
+    "Membungkam target selama 4 dtk. (talenta Rogue)",
+  'entities.abilities.psychic_scream.name': "Jeritan Psikis",
   'entities.abilities.psychic_scream.description':
-    'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
-  'entities.abilities.inner_focus.name': 'Inner Focus',
+    "Menakuti musuh di sekitar hingga 4 dtk. Kerusakan dapat mematahkan efek. (talenta Priest)",
+  'entities.abilities.inner_focus.name': "Fokus Batin",
   'entities.abilities.inner_focus.description':
-    'Makes your next spell free. Lasts 60 sec. (Priest talent)',
-  'entities.abilities.desperate_prayer.name': 'Desperate Prayer',
+    "Membuat mantra berikutnya gratis. Berlangsung 60 dtk. (talenta Priest)",
+  'entities.abilities.desperate_prayer.name': "Doa Putus Asa",
   'entities.abilities.desperate_prayer.description':
-    'Instantly heals you for {damage}. (Priest talent)',
-  'entities.abilities.prayer_of_healing.name': 'Prayer of Healing',
+    "Seketika menyembuhkanmu sebesar {damage}. (talenta Priest)",
+  'entities.abilities.prayer_of_healing.name': "Doa Penyembuhan",
   'entities.abilities.prayer_of_healing.description':
-    'Heals nearby allies for {damage}. (Priest talent)',
-  'entities.abilities.mind_sear.name': 'Mind Sear',
+    "Menyembuhkan sekutu di sekitar sebesar {damage}. (talenta Priest)",
+  'entities.abilities.mind_sear.name': "Bakar Pikiran",
   'entities.abilities.mind_sear.description':
-    'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
-  'entities.abilities.earthbind.name': 'Earthbind',
+    "Menyalurkan energi Bayangan di area target, melukai musuh di sekitar tiap detik sebesar {damage}. (talenta Priest)",
+  'entities.abilities.earthbind.name': "Ikatan Bumi",
   'entities.abilities.earthbind.description':
-    'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
-  'entities.abilities.healing_stream.name': 'Healing Stream',
+    "Mengikat musuh di sekitar ke tanah dan mengakar mereka selama 2 dtk. (talenta Shaman)",
+  'entities.abilities.healing_stream.name': "Aliran Penyembuhan",
   'entities.abilities.healing_stream.description':
-    'Restores a friendly target over 12 sec. (Shaman talent)',
-  'entities.abilities.chain_lightning.name': 'Chain Lightning',
+    "Memulihkan target bersahabat selama 12 dtk. (talenta Shaman)",
+  'entities.abilities.chain_lightning.name': "Rantai Petir",
   'entities.abilities.chain_lightning.description':
-    'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
-  'entities.abilities.bloodlust.name': 'Bloodlust',
+    "Melontarkan petir ke area target, melukai musuh di sekitar sebesar {damage}. (talenta Shaman)",
+  'entities.abilities.bloodlust.name': "Haus Darah",
   'entities.abilities.bloodlust.description':
-    'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
-  'entities.abilities.spell_lock.name': 'Spell Lock',
+    "Mengobarkan sekutu di sekitar, meningkatkan kecepatan serang selama 15 dtk. (talenta Shaman)",
+  'entities.abilities.spell_lock.name': "Kunci Mantra",
   'entities.abilities.spell_lock.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
-  'entities.abilities.howl_of_terror.name': 'Howl of Terror',
+    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 5 dtk. (talenta Warlock)",
+  'entities.abilities.howl_of_terror.name': "Lolongan Teror",
   'entities.abilities.howl_of_terror.description':
-    'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
-  'entities.abilities.curse_of_exhaustion.name': 'Curse of Exhaustion',
+    "Menakuti musuh di sekitar hingga 3 dtk. Kerusakan dapat mematahkan efek. (talenta Warlock)",
+  'entities.abilities.curse_of_exhaustion.name': "Kutukan Kelelahan",
   'entities.abilities.curse_of_exhaustion.description':
-    'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
-  'entities.abilities.death_coil.name': 'Death Coil',
+    "Mengutuk target, mengurangi kecepatan gerak sebesar 30% selama 12 dtk. (talenta Warlock)",
+  'entities.abilities.death_coil.name': "Kumparan Kematian",
   'entities.abilities.death_coil.description':
-    'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
-  'entities.abilities.chaos_bolt.name': 'Chaos Bolt',
+    "Menghantam musuh dengan {damage} kerusakan Bayangan, lalu membuatnya ngeri selama 3 dtk. Versi ini tidak menyembuhkan perapal. (talenta Warlock)",
+  'entities.abilities.chaos_bolt.name': "Baut Kekacauan",
   'entities.abilities.chaos_bolt.description':
-    'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
-  'entities.abilities.metamorphosis.name': 'Metamorphosis',
+    "Melontarkan baut api kacau sebesar {damage} kerusakan Api. (talenta Warlock)",
+  'entities.abilities.metamorphosis.name': "Metamorfosis",
   'entities.abilities.metamorphosis.description':
-    'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
-  'entities.abilities.skull_bash.name': 'Skull Bash',
+    "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)",
+  'entities.abilities.skull_bash.name': "Hantaman Tengkorak",
   'entities.abilities.skull_bash.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
-  'entities.abilities.innervate.name': 'Innervate',
+    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Druid)",
+  'entities.abilities.innervate.name': "Aliran Tenaga",
   'entities.abilities.innervate.description':
-    'Instantly restores a large amount of mana. (Druid talent)',
-  'entities.abilities.frenzied_regeneration.name': 'Frenzied Regeneration',
+    "Seketika memulihkan 200 dari sumber daya saat ini. (talenta Druid)",
+  'entities.abilities.frenzied_regeneration.name': "Regenerasi Frenetik",
   'entities.abilities.frenzied_regeneration.description':
-    'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
-  'entities.abilities.berserk.name': 'Berserk',
+    "Meregenerasi nyawa selama 10 dtk. Hanya Bentuk Beruang. (talenta Druid)",
+  'entities.abilities.berserk.name': "Mengamuk",
   'entities.abilities.berserk.description':
-    'Increases attack power for 15 sec. (Druid talent)',
-  'entities.abilities.tranquility.name': 'Tranquility',
+    "Meningkatkan daya serang selama 15 dtk. (talenta Druid)",
+  'entities.abilities.tranquility.name': "Ketenangan",
   'entities.abilities.tranquility.description':
-    'Channels restorative energy, healing nearby allies each second. (Druid talent)',
+    "Menyalurkan energi pemulih, menyembuhkan sekutu di sekitar setiap detik. (talenta Druid)",
 };

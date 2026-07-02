@@ -1225,7 +1225,7 @@ const classAbilityNamesEn = {
       [
         'hammer_of_wrath',
         'Hammer of Wrath',
-        'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
+        'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
       ],
       [
         'counter_shot',
@@ -1290,7 +1290,7 @@ const classAbilityNamesEn = {
       [
         'mind_sear',
         'Mind Sear',
-        'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
+        'Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)',
       ],
       [
         'earthbind',
@@ -1330,7 +1330,7 @@ const classAbilityNamesEn = {
       [
         'death_coil',
         'Death Coil',
-        'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
+        'Blasts the enemy for {damage} Shadow damage, then horrifies them for 3 sec. This version does not heal the caster. (Warlock talent)',
       ],
       [
         'chaos_bolt',
@@ -1347,7 +1347,7 @@ const classAbilityNamesEn = {
         'Skull Bash',
         'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
       ],
-      ['innervate', 'Innervate', 'Instantly restores a large amount of mana. (Druid talent)'],
+      ['innervate', 'Innervate', 'Instantly restores 200 of your current resource. (Druid talent)'],
       [
         'frenzied_regeneration',
         'Frenzied Regeneration',

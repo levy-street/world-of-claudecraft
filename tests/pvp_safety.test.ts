@@ -282,6 +282,81 @@ describe('PvP control abilities in active duels', () => {
     expect(castFear()).toBe(8);
   });
 
+  it('caps fear DR by the requested duration for short fear abilities', () => {
+    const psychic = startDuel('priest', 'warrior', 20);
+    expect(psychic.sim.chooseRow(8, 'pri_r8_psychic_scream', psychic.aPid)).toBe(true);
+    const castPsychic = () => {
+      for (let attempt = 0; attempt < 50; attempt++) {
+        psychic.b.auras = psychic.b.auras.filter((aura) => aura.id !== 'fear_incap');
+        psychic.a.gcdRemaining = 0;
+        psychic.a.resource = psychic.a.maxResource;
+        psychic.a.cooldowns.delete('psychic_scream');
+        psychic.sim.castAbility('psychic_scream', psychic.aPid);
+        const dur = psychic.b.auras.find((aura) => aura.id === 'fear_incap')?.duration ?? 0;
+        if (dur > 0) return dur;
+      }
+      return 0;
+    };
+    expect(castPsychic()).toBe(4);
+
+    const howl = startDuel('warlock', 'warrior', 20);
+    expect(howl.sim.chooseRow(8, 'wlk_r8_howl_of_terror', howl.aPid)).toBe(true);
+    const castHowl = () => {
+      for (let attempt = 0; attempt < 50; attempt++) {
+        howl.b.auras = howl.b.auras.filter((aura) => aura.id !== 'fear_incap');
+        howl.a.gcdRemaining = 0;
+        howl.a.resource = howl.a.maxResource;
+        howl.a.cooldowns.delete('howl_of_terror');
+        howl.sim.castAbility('howl_of_terror', howl.aPid);
+        const dur = howl.b.auras.find((aura) => aura.id === 'fear_incap')?.duration ?? 0;
+        if (dur > 0) return dur;
+      }
+      return 0;
+    };
+    expect(castHowl()).toBe(3);
+
+    const fear = startDuel('warlock', 'warrior', 20);
+    fear.sim.targetEntity(fear.bPid, fear.aPid);
+    const castFear = () => {
+      for (let attempt = 0; attempt < 50; attempt++) {
+        fear.b.auras = fear.b.auras.filter((aura) => aura.id !== 'fear_incap');
+        fear.a.gcdRemaining = 0;
+        fear.a.resource = fear.a.maxResource;
+        fear.sim.castAbility('fear', fear.aPid);
+        finishCast(fear.sim, fear.aPid);
+        const dur = fear.b.auras.find((aura) => aura.id === 'fear_incap')?.duration ?? 0;
+        if (dur > 0) return dur;
+      }
+      return 0;
+    };
+    expect(castFear()).toBe(8);
+  });
+
+  it('routes Death Coil horror through fear diminishing returns in PvP', () => {
+    const { sim, aPid, bPid, a, b } = startDuel('warlock', 'warrior', 20);
+    expect(sim.chooseRow(17, 'wlk_r17_death_coil', aPid)).toBe(true);
+    sim.targetEntity(bPid, aPid);
+
+    const castCoil = () => {
+      for (let attempt = 0; attempt < 50; attempt++) {
+        b.auras = b.auras.filter((aura) => aura.id !== 'death_coil_incap');
+        a.gcdRemaining = 0;
+        a.resource = a.maxResource;
+        a.cooldowns.delete('death_coil');
+        sim.castAbility('death_coil', aPid);
+        finishCast(sim, aPid);
+        const dur = b.auras.find((aura) => aura.id === 'death_coil_incap')?.duration ?? 0;
+        if (dur > 0) return dur;
+      }
+      return 0;
+    };
+
+    expect(castCoil()).toBe(3);
+    expect(castCoil()).toBe(3);
+    expect(castCoil()).toBe(2);
+    expect(castCoil()).toBe(1);
+  });
+
   it('diminishes repeated duel stuns to full, half, quarter, then immune, resetting after 18s', () => {
     const { sim, aPid, b } = startDuel('paladin', 'warrior', 20);
 

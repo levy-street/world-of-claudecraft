@@ -1039,9 +1039,16 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pri_r11_vampiric_embrace',
           name: 'Vampiric Embrace',
-          description: 'Mind Blast deals 15% more damage.',
+          description: 'Mind Blast heals you for a share of its damage over 3 sec.',
           icon: 'mind_blast',
-          effect: { ability: [{ ability: 'mind_blast', dmgPct: 0.15 }] },
+          effect: {
+            ability: [
+              {
+                ability: 'mind_blast',
+                addEffects: [{ type: 'dot', total: 30, duration: 3, interval: 1, leechPct: 1 }],
+              },
+            ],
+          },
         },
       ],
     },

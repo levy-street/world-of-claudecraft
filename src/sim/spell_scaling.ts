@@ -102,10 +102,10 @@ export function hotTickBonus(spellPower: number, durationSec: number, intervalSe
 }
 
 // Flat bonus added to ONE channel tick (e.g. each Arcane Missile / Mind Flay tick).
-export function channelTickBonus(power: number, def: AbilityDef): number {
+export function channelTickBonus(power: number, def: AbilityDef, aoe = false): number {
   const ch = def.channel;
   if (!ch || ch.ticks <= 0) return 0;
-  const coeff = channelSpellCoeff(ch.duration) / ch.ticks;
+  const coeff = (channelSpellCoeff(ch.duration) / ch.ticks) * (aoe ? SPELL_AOE_COEFF_MULT : 1);
   return Math.round(power * coeff * powerScale(def));
 }
 

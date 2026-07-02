@@ -4402,156 +4402,156 @@ export const vi_VN: EnTranslations = {
         "description": "Restaura maná rápidamente. (Talento de mago)"
       },
       "rebuke": {
-        "name": "Rebuke",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)"
+        "name": "Quở trách",
+        "description": "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Paladin)"
       },
       "crusader_strike": {
-        "name": "Crusader Strike",
-        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+        "name": "Đòn Thập Tự",
+        "description": "Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)"
       },
       "holy_wrath": {
-        "name": "Holy Wrath",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+        "name": "Thịnh nộ Thánh",
+        "description": "Phóng thích sức mạnh thánh, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Paladin)"
       },
       "divine_shield": {
-        "name": "Divine Shield",
-        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+        "name": "Khiên Thần Thánh",
+        "description": "Che chở bạn bằng sức mạnh thánh, hấp thụ lượng sát thương cực lớn trong 8 giây. (tài năng Paladin)"
       },
       "avenging_wrath": {
-        "name": "Avenging Wrath",
-        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+        "name": "Thịnh nộ Báo Thù",
+        "description": "Gọi sức mạnh báo thù, tăng sức tấn công và sức mạnh phép trong 20 giây. (tài năng Paladin)"
       },
       "hammer_of_wrath": {
-        "name": "Hammer of Wrath",
-        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+        "name": "Búa Thịnh Nộ",
+        "description": "Ném búa thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi máu dưới 20%. (tài năng Paladin)"
       },
       "counter_shot": {
-        "name": "Counter Shot",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)"
+        "name": "Bắn Phản Kích",
+        "description": "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Thợ săn)"
       },
       "frost_trap": {
-        "name": "Frost Trap",
-        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+        "name": "Bẫy Băng Giá",
+        "description": "Đóng băng kẻ địch tại vùng mục tiêu trong 3 giây. (tài năng Thợ săn)"
       },
       "mend_pet": {
-        "name": "Mend Pet",
-        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+        "name": "Chữa lành Thú Cưng",
+        "description": "Chữa lành mục tiêu thân thiện {damage} trong 15 giây. (tài năng Thợ săn)"
       },
       "multi_shot": {
-        "name": "Multi-Shot",
-        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+        "name": "Bắn Đa Mục Tiêu",
+        "description": "Bắn nhiều mũi tên, đánh trúng kẻ địch gần đó với {damage} sát thương. (tài năng Thợ săn)"
       },
       "deterrence": {
-        "name": "Deterrence",
-        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+        "name": "Ngăn Chặn",
+        "description": "Tăng cơ hội né tránh của bạn thêm 50% trong 10 giây. (tài năng Thợ săn)"
       },
       "aspect_of_the_wild": {
-        "name": "Aspect of the Wild",
-        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+        "name": "Dáng Vẻ Hoang Dã",
+        "description": "Truyền sức mạnh hoang dã cho đồng minh gần đó, tăng sức tấn công trong 5 phút. (tài năng Thợ săn)"
       },
       "kick": {
-        "name": "Kick",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)"
+        "name": "Đá",
+        "description": "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Rogue)"
       },
       "preparation": {
-        "name": "Preparation",
-        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+        "name": "Chuẩn Bị",
+        "description": "Kết thúc hồi chiêu của Sprint, Evasion và Vanish. (tài năng Rogue)"
       },
       "ghostly_strike": {
-        "name": "Ghostly Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "name": "Đòn Đánh Ma Quái",
+        "description": "Đánh kẻ địch bằng sát thương vũ khí cộng {damage} và tăng né tránh trong chốc lát. Cho 1 điểm combo. (tài năng Rogue)"
       },
       "cloak_of_shadows": {
-        "name": "Cloak of Shadows",
-        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+        "name": "Áo Choàng Bóng Tối",
+        "description": "Bao phủ bạn bằng bóng tối, hấp thụ sát thương trong 5 giây. (tài năng Rogue)"
       },
       "shadowstep": {
-        "name": "Shadowstep",
-        "description": "Steps through the shadows toward your target. (Rogue talent)"
+        "name": "Bước Bóng Tối",
+        "description": "Bước qua bóng tối về phía mục tiêu. (tài năng Rogue)"
       },
       "silence": {
-        "name": "Silence",
-        "description": "Silences the target for 4 sec. (Priest talent)"
+        "name": "Câm Lặng",
+        "description": "Làm câm lặng mục tiêu trong 4 giây. (tài năng Rogue)"
       },
       "psychic_scream": {
-        "name": "Psychic Scream",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "name": "Tiếng Thét Tâm Linh",
+        "description": "Làm kẻ địch gần đó hoảng sợ tối đa 4 giây. Sát thương có thể phá hiệu ứng. (tài năng Priest)"
       },
       "inner_focus": {
-        "name": "Inner Focus",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "name": "Tập Trung Nội Tâm",
+        "description": "Làm phép tiếp theo không tốn tài nguyên. Kéo dài 60 giây. (tài năng Priest)"
       },
       "desperate_prayer": {
-        "name": "Desperate Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "name": "Lời Cầu Tuyệt Vọng",
+        "description": "Chữa lành bạn ngay lập tức {damage}. (tài năng Priest)"
       },
       "prayer_of_healing": {
-        "name": "Prayer of Healing",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "name": "Lời Cầu Chữa Lành",
+        "description": "Chữa lành đồng minh gần đó {damage}. (tài năng Priest)"
       },
       "mind_sear": {
-        "name": "Mind Sear",
-        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "name": "Thiêu Đốt Tâm Trí",
+        "description": "Dẫn năng lượng Bóng Tối vào vùng mục tiêu, gây {damage} sát thương mỗi giây cho kẻ địch gần đó. (tài năng Priest)"
       },
       "earthbind": {
-        "name": "Earthbind",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "name": "Trói Đất",
+        "description": "Trói kẻ địch gần đó vào đất, giữ chân chúng trong 2 giây. (tài năng Shaman)"
       },
       "healing_stream": {
-        "name": "Healing Stream",
-        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+        "name": "Dòng Chữa Lành",
+        "description": "Hồi phục một mục tiêu thân thiện trong 12 giây. (tài năng Shaman)"
       },
       "chain_lightning": {
-        "name": "Chain Lightning",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "name": "Sét Chuỗi",
+        "description": "Phóng sét vào vùng mục tiêu, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Shaman)"
       },
       "bloodlust": {
-        "name": "Bloodlust",
-        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+        "name": "Khát Máu",
+        "description": "Kích động đồng minh gần đó, tăng tốc độ tấn công trong 15 giây. (tài năng Shaman)"
       },
       "spell_lock": {
-        "name": "Spell Lock",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)"
+        "name": "Khóa Phép",
+        "description": "Ngắt niệm phép và chặn phép thuộc trường đó trong 5 giây. (tài năng Warlock)"
       },
       "howl_of_terror": {
-        "name": "Howl of Terror",
-        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+        "name": "Tiếng Hú Kinh Hoàng",
+        "description": "Làm kẻ địch gần đó hoảng sợ tối đa 3 giây. Sát thương có thể phá hiệu ứng. (tài năng Warlock)"
       },
       "curse_of_exhaustion": {
-        "name": "Curse of Exhaustion",
-        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+        "name": "Lời Nguyền Kiệt Sức",
+        "description": "Nguyền rủa mục tiêu, giảm tốc độ di chuyển 30% trong 12 giây. (tài năng Warlock)"
       },
       "death_coil": {
-        "name": "Death Coil",
-        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+        "name": "Vòng Xoáy Tử Vong",
+        "description": "Đánh kẻ địch bằng {damage} sát thương Bóng Tối, rồi làm chúng kinh hoàng trong 3 giây. Phiên bản này không chữa cho người thi triển. (tài năng Warlock)"
       },
       "chaos_bolt": {
-        "name": "Chaos Bolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "name": "Tia Hỗn Mang",
+        "description": "Phóng tia lửa hỗn mang gây {damage} sát thương Lửa. (tài năng Warlock)"
       },
       "metamorphosis": {
-        "name": "Metamorphosis",
-        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+        "name": "Biến Hình",
+        "description": "Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)"
       },
       "skull_bash": {
-        "name": "Skull Bash",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)"
+        "name": "Đập Sọ",
+        "description": "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Druid)"
       },
       "innervate": {
-        "name": "Innervate",
-        "description": "Instantly restores a large amount of mana. (Druid talent)"
+        "name": "Tiếp Sức",
+        "description": "Hồi ngay 200 tài nguyên hiện tại của bạn. (tài năng Druid)"
       },
       "frenzied_regeneration": {
-        "name": "Frenzied Regeneration",
-        "description": "Regenerates health over 10 sec. Bear Form only. (Druid talent)"
+        "name": "Tái Sinh Cuồng Loạn",
+        "description": "Hồi máu trong 10 giây. Chỉ trong Dạng Gấu. (tài năng Druid)"
       },
       "berserk": {
-        "name": "Berserk",
-        "description": "Increases attack power for 15 sec. (Druid talent)"
+        "name": "Cuồng Bạo",
+        "description": "Tăng sức tấn công trong 15 giây. (tài năng Druid)"
       },
       "tranquility": {
-        "name": "Tranquility",
-        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
+        "name": "An Nhiên",
+        "description": "Dẫn năng lượng hồi phục, chữa lành đồng minh gần đó mỗi giây. (tài năng Druid)"
       },
       "holy_shock": {
         "name": "Sốc Thánh",

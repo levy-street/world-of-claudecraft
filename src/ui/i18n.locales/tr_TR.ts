@@ -5206,117 +5206,118 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': 'Rebuke',
+  'entities.abilities.rebuke.name': "Azar",
   'entities.abilities.rebuke.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
-  'entities.abilities.crusader_strike.name': 'Crusader Strike',
+    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Paladin yeteneği)",
+  'entities.abilities.crusader_strike.name': "Haçlı Darbesi",
   'entities.abilities.crusader_strike.description':
-    'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.holy_wrath.name': 'Holy Wrath',
+    "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)",
+  'entities.abilities.holy_wrath.name': "Kutsal Gazap",
   'entities.abilities.holy_wrath.description':
-    'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
-  'entities.abilities.divine_shield.name': 'Divine Shield',
+    "Kutsal gücü serbest bırakır ve yakındaki düşmanlara {damage} hasar verir. (Paladin yeteneği)",
+  'entities.abilities.divine_shield.name': "İlahi Kalkan",
   'entities.abilities.divine_shield.description':
-    'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
-  'entities.abilities.avenging_wrath.name': 'Avenging Wrath',
+    "Seni kutsal güçle korur, 8 sn. boyunca çok büyük miktarda hasar emer. (Paladin yeteneği)",
+  'entities.abilities.avenging_wrath.name': "İntikamcı Gazap",
   'entities.abilities.avenging_wrath.description':
-    'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
-  'entities.abilities.hammer_of_wrath.name': 'Hammer of Wrath',
+    "İntikamcı gücü çağırır, saldırı gücünü ve büyü gücünü 20 sn. artırır. (Paladin yeteneği)",
+  'entities.abilities.hammer_of_wrath.name': "Gazap Çekici",
   'entities.abilities.hammer_of_wrath.description':
-    'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.counter_shot.name': 'Counter Shot',
+    "Yaralı bir düşmana kutsal çekiç fırlatır ve {damage} Kutsal hasar verir. Yalnızca canı 20% altındayken kullanılabilir. (Paladin yeteneği)",
+  'entities.abilities.counter_shot.name': "Karşı Atış",
   'entities.abilities.counter_shot.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
-  'entities.abilities.frost_trap.name': 'Frost Trap',
+    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Avcı yeteneği)",
+  'entities.abilities.frost_trap.name': "Buz Tuzağı",
   'entities.abilities.frost_trap.description':
-    'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
-  'entities.abilities.mend_pet.name': 'Mend Pet',
+    "Hedef alandaki düşmanları 3 sn. yerinde dondurur. (Avcı yeteneği)",
+  'entities.abilities.mend_pet.name': "Yoldaşı İyileştir",
   'entities.abilities.mend_pet.description':
-    'Heals a friendly target for {damage} over 15 sec. (Hunter talent)',
-  'entities.abilities.multi_shot.name': 'Multi-Shot',
+    "Dost bir hedefi 15 sn. boyunca {damage} iyileştirir. (Avcı yeteneği)",
+  'entities.abilities.multi_shot.name': "Çoklu Atış",
   'entities.abilities.multi_shot.description':
-    'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
-  'entities.abilities.deterrence.name': 'Deterrence',
+    "Birden fazla mermi atar, yakındaki düşmanlara {damage} hasar verir. (Avcı yeteneği)",
+  'entities.abilities.deterrence.name': "Caydırma",
   'entities.abilities.deterrence.description':
-    'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
-  'entities.abilities.aspect_of_the_wild.name': 'Aspect of the Wild',
+    "Kaçınma şansını 10 sn. boyunca 50% artırır. (Avcı yeteneği)",
+  'entities.abilities.aspect_of_the_wild.name': "Vahşi Doğa Sureti",
   'entities.abilities.aspect_of_the_wild.description':
-    'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
-  'entities.abilities.kick.name': 'Kick',
+    "Yakındaki müttefiklere vahşi güç verir, saldırı gücünü 5 dk. artırır. (Avcı yeteneği)",
+  'entities.abilities.kick.name': "Tekme",
   'entities.abilities.kick.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
-  'entities.abilities.preparation.name': 'Preparation',
+    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Rogue yeteneği)",
+  'entities.abilities.preparation.name': "Hazırlık",
   'entities.abilities.preparation.description':
-    'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
-  'entities.abilities.ghostly_strike.name': 'Ghostly Strike',
+    "Sprint, Evasion ve Vanish bekleme sürelerini bitirir. (Rogue yeteneği)",
+  'entities.abilities.ghostly_strike.name': "Hayalet Darbe",
   'entities.abilities.ghostly_strike.description':
-    'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
-  'entities.abilities.cloak_of_shadows.name': 'Cloak of Shadows',
+    "Düşmana silah hasarı artı {damage} vurur ve kısa süreliğine kaçınmayı artırır. 1 kombo puanı verir. (Rogue yeteneği)",
+  'entities.abilities.cloak_of_shadows.name': "Gölgeler Pelerini",
   'entities.abilities.cloak_of_shadows.description':
-    'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
-  'entities.abilities.shadowstep.name': 'Shadowstep',
+    "Seni gölgelerle sarar, 5 sn. hasar emer. (Rogue yeteneği)",
+  'entities.abilities.shadowstep.name': "Gölge Adımı",
   'entities.abilities.shadowstep.description':
-    'Steps through the shadows toward your target. (Rogue talent)',
-  'entities.abilities.silence.name': 'Silence',
-  'entities.abilities.silence.description': 'Silences the target for 4 sec. (Priest talent)',
-  'entities.abilities.psychic_scream.name': 'Psychic Scream',
+    "Gölgelerin içinden hedefine doğru adım atarsın. (Rogue yeteneği)",
+  'entities.abilities.silence.name': "Sessizlik",
+  'entities.abilities.silence.description':
+    "Hedefi 4 sn. susturur. (Rogue yeteneği)",
+  'entities.abilities.psychic_scream.name': "Psişik Çığlık",
   'entities.abilities.psychic_scream.description':
-    'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
-  'entities.abilities.inner_focus.name': 'Inner Focus',
+    "Yakındaki düşmanları en fazla 4 sn. korkutur. Hasar etkiyi bozabilir. (Rahip yeteneği)",
+  'entities.abilities.inner_focus.name': "İç Odak",
   'entities.abilities.inner_focus.description':
-    'Makes your next spell free. Lasts 60 sec. (Priest talent)',
-  'entities.abilities.desperate_prayer.name': 'Desperate Prayer',
+    "Sonraki büyünü ücretsiz yapar. 60 sn. sürer. (Rahip yeteneği)",
+  'entities.abilities.desperate_prayer.name': "Çaresiz Dua",
   'entities.abilities.desperate_prayer.description':
-    'Instantly heals you for {damage}. (Priest talent)',
-  'entities.abilities.prayer_of_healing.name': 'Prayer of Healing',
+    "Seni anında {damage} iyileştirir. (Rahip yeteneği)",
+  'entities.abilities.prayer_of_healing.name': "Şifa Duası",
   'entities.abilities.prayer_of_healing.description':
-    'Heals nearby allies for {damage}. (Priest talent)',
-  'entities.abilities.mind_sear.name': 'Mind Sear',
+    "Yakındaki müttefikleri {damage} iyileştirir. (Rahip yeteneği)",
+  'entities.abilities.mind_sear.name': "Zihin Yakma",
   'entities.abilities.mind_sear.description':
-    'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
-  'entities.abilities.earthbind.name': 'Earthbind',
+    "Hedef alanda Gölge enerjisi kanalize eder, yakındaki düşmanlara her saniye {damage} hasar verir. (Rahip yeteneği)",
+  'entities.abilities.earthbind.name': "Toprak Bağı",
   'entities.abilities.earthbind.description':
-    'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
-  'entities.abilities.healing_stream.name': 'Healing Stream',
+    "Yakındaki düşmanları toprağa bağlar ve 2 sn. kökler. (Shaman yeteneği)",
+  'entities.abilities.healing_stream.name': "Şifa Akışı",
   'entities.abilities.healing_stream.description':
-    'Restores a friendly target over 12 sec. (Shaman talent)',
-  'entities.abilities.chain_lightning.name': 'Chain Lightning',
+    "Dost bir hedefi 12 sn. boyunca yeniler. (Shaman yeteneği)",
+  'entities.abilities.chain_lightning.name': "Zincir Şimşek",
   'entities.abilities.chain_lightning.description':
-    'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
-  'entities.abilities.bloodlust.name': 'Bloodlust',
+    "Hedef alana şimşekler savurur, yakındaki düşmanlara {damage} hasar verir. (Shaman yeteneği)",
+  'entities.abilities.bloodlust.name': "Kana Susama",
   'entities.abilities.bloodlust.description':
-    'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
-  'entities.abilities.spell_lock.name': 'Spell Lock',
+    "Yakındaki müttefikleri çılgınlığa iter, saldırı hızını 15 sn. artırır. (Shaman yeteneği)",
+  'entities.abilities.spell_lock.name': "Büyü Kilidi",
   'entities.abilities.spell_lock.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
-  'entities.abilities.howl_of_terror.name': 'Howl of Terror',
+    "Büyü kullanımını keser ve o okuldan büyüleri 5 sn. engeller. (Warlock yeteneği)",
+  'entities.abilities.howl_of_terror.name': "Dehşet Uluması",
   'entities.abilities.howl_of_terror.description':
-    'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
-  'entities.abilities.curse_of_exhaustion.name': 'Curse of Exhaustion',
+    "Yakındaki düşmanları en fazla 3 sn. korkutur. Hasar etkiyi bozabilir. (Warlock yeteneği)",
+  'entities.abilities.curse_of_exhaustion.name': "Tükeniş Laneti",
   'entities.abilities.curse_of_exhaustion.description':
-    'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
-  'entities.abilities.death_coil.name': 'Death Coil',
+    "Hedefi lanetler, hareket hızını 12 sn. boyunca 30% azaltır. (Warlock yeteneği)",
+  'entities.abilities.death_coil.name': "Ölüm Sarmalı",
   'entities.abilities.death_coil.description':
-    'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
-  'entities.abilities.chaos_bolt.name': 'Chaos Bolt',
+    "Düşmana {damage} Gölge hasarı verir, sonra onu 3 sn. dehşete düşürür. Bu sürüm kullananı iyileştirmez. (Warlock yeteneği)",
+  'entities.abilities.chaos_bolt.name': "Kaos Oku",
   'entities.abilities.chaos_bolt.description':
-    'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
-  'entities.abilities.metamorphosis.name': 'Metamorphosis',
+    "Kaotik bir ateş oku fırlatır ve {damage} Ateş hasarı verir. (Warlock yeteneği)",
+  'entities.abilities.metamorphosis.name': "Metamorfoz",
   'entities.abilities.metamorphosis.description':
-    'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
-  'entities.abilities.skull_bash.name': 'Skull Bash',
+    "İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)",
+  'entities.abilities.skull_bash.name': "Kafatası Darbesi",
   'entities.abilities.skull_bash.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
-  'entities.abilities.innervate.name': 'Innervate',
+    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Druid yeteneği)",
+  'entities.abilities.innervate.name': "Canlandırma",
   'entities.abilities.innervate.description':
-    'Instantly restores a large amount of mana. (Druid talent)',
-  'entities.abilities.frenzied_regeneration.name': 'Frenzied Regeneration',
+    "Geçerli kaynağından anında 200 yeniler. (Druid yeteneği)",
+  'entities.abilities.frenzied_regeneration.name': "Çılgın Yenilenme",
   'entities.abilities.frenzied_regeneration.description':
-    'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
-  'entities.abilities.berserk.name': 'Berserk',
+    "10 sn. boyunca can yeniler. Yalnızca Ayı Formu. (Druid yeteneği)",
+  'entities.abilities.berserk.name': "Berserk",
   'entities.abilities.berserk.description':
-    'Increases attack power for 15 sec. (Druid talent)',
-  'entities.abilities.tranquility.name': 'Tranquility',
+    "Saldırı gücünü 15 sn. artırır. (Druid yeteneği)",
+  'entities.abilities.tranquility.name': "Sükunet",
   'entities.abilities.tranquility.description':
-    'Channels restorative energy, healing nearby allies each second. (Druid talent)',
+    "Yenileyici enerji kanalize eder, yakındaki müttefikleri her saniye iyileştirir. (Druid yeteneği)",
 };

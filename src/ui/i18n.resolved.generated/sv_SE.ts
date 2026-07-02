@@ -4402,156 +4402,156 @@ export const sv_SE: EnTranslations = {
         "description": "Restaura maná rápidamente. (Talento de mago)"
       },
       "rebuke": {
-        "name": "Rebuke",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)"
+        "name": "Tillrättavisning",
+        "description": "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (paladintalang)"
       },
       "crusader_strike": {
-        "name": "Crusader Strike",
-        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+        "name": "Korsfararslag",
+        "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
       },
       "holy_wrath": {
-        "name": "Holy Wrath",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+        "name": "Helig vrede",
+        "description": "Släpper lös helig kraft och skadar fiender i närheten för {damage}. (paladintalang)"
       },
       "divine_shield": {
-        "name": "Divine Shield",
-        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+        "name": "Gudomlig sköld",
+        "description": "Skyddar dig med helig kraft och absorberar enorm skada i 8 sek. (paladintalang)"
       },
       "avenging_wrath": {
-        "name": "Avenging Wrath",
-        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+        "name": "Hämnande vrede",
+        "description": "Kallar fram hämnande kraft och ökar attackkraft och besvärjelsekraft i 20 sek. (paladintalang)"
       },
       "hammer_of_wrath": {
-        "name": "Hammer of Wrath",
-        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+        "name": "Vredens hammare",
+        "description": "Kastar en helig hammare mot en sårad fiende för {damage} Helig skada. Kan bara användas under 20% hälsa. (paladintalang)"
       },
       "counter_shot": {
-        "name": "Counter Shot",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)"
+        "name": "Moteld",
+        "description": "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (jägartalang)"
       },
       "frost_trap": {
-        "name": "Frost Trap",
-        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+        "name": "Frostfälla",
+        "description": "Fryser fiender i målområdet på plats i 3 sek. (jägartalang)"
       },
       "mend_pet": {
-        "name": "Mend Pet",
-        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+        "name": "Läk husdjur",
+        "description": "Läker ett vänligt mål för {damage} under 15 sek. (jägartalang)"
       },
       "multi_shot": {
-        "name": "Multi-Shot",
-        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+        "name": "Flerskott",
+        "description": "Avfyrar flera projektiler och träffar fiender i närheten för {damage}. (jägartalang)"
       },
       "deterrence": {
-        "name": "Deterrence",
-        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+        "name": "Avskräckning",
+        "description": "Ökar din chans att ducka med 50% i 10 sek. (jägartalang)"
       },
       "aspect_of_the_wild": {
-        "name": "Aspect of the Wild",
-        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+        "name": "Vildmarkens aspekt",
+        "description": "Inspirerar närliggande allierade med vild styrka och ökar attackkraft i 5 min. (jägartalang)"
       },
       "kick": {
-        "name": "Kick",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)"
+        "name": "Spark",
+        "description": "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (skurktalang)"
       },
       "preparation": {
-        "name": "Preparation",
-        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+        "name": "Förberedelse",
+        "description": "Avslutar nedkylningen på Sprint, Evasion och Vanish. (skurktalang)"
       },
       "ghostly_strike": {
-        "name": "Ghostly Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "name": "Spöklikt slag",
+        "description": "Träffar fienden med vapenskada plus {damage} och ökar kort undvikande. Ger 1 kombopoäng. (skurktalang)"
       },
       "cloak_of_shadows": {
-        "name": "Cloak of Shadows",
-        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+        "name": "Skuggornas mantel",
+        "description": "Sveper in dig i skuggor och absorberar skada i 5 sek. (skurktalang)"
       },
       "shadowstep": {
-        "name": "Shadowstep",
-        "description": "Steps through the shadows toward your target. (Rogue talent)"
+        "name": "Skuggsteg",
+        "description": "Kliver genom skuggorna mot ditt mål. (skurktalang)"
       },
       "silence": {
-        "name": "Silence",
-        "description": "Silences the target for 4 sec. (Priest talent)"
+        "name": "Tystnad",
+        "description": "Tystar målet i 4 sek. (skurktalang)"
       },
       "psychic_scream": {
-        "name": "Psychic Scream",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "name": "Psykiskt skrik",
+        "description": "Skrämmer fiender i närheten i upp till 4 sek. Skada kan bryta effekten. (prästtalang)"
       },
       "inner_focus": {
-        "name": "Inner Focus",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "name": "Inre fokus",
+        "description": "Gör din nästa besvärjelse gratis. Varar 60 sek. (prästtalang)"
       },
       "desperate_prayer": {
-        "name": "Desperate Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "name": "Desperat bön",
+        "description": "Läker dig omedelbart för {damage}. (prästtalang)"
       },
       "prayer_of_healing": {
-        "name": "Prayer of Healing",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "name": "Helandets bön",
+        "description": "Läker närliggande allierade för {damage}. (prästtalang)"
       },
       "mind_sear": {
-        "name": "Mind Sear",
-        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "name": "Sinnesbränning",
+        "description": "Kanaliserar skuggenergi i målområdet och skadar fiender i närheten varje sekund för {damage}. (prästtalang)"
       },
       "earthbind": {
-        "name": "Earthbind",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "name": "Jordbindning",
+        "description": "Binder fiender i närheten till jorden och rotar dem i 2 sek. (shamantalang)"
       },
       "healing_stream": {
-        "name": "Healing Stream",
-        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+        "name": "Helande ström",
+        "description": "Återställer ett vänligt mål under 12 sek. (shamantalang)"
       },
       "chain_lightning": {
-        "name": "Chain Lightning",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "name": "Kedjeblixt",
+        "description": "Slungar blixtar mot målområdet och skadar fiender i närheten för {damage}. (shamantalang)"
       },
       "bloodlust": {
-        "name": "Bloodlust",
-        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+        "name": "Blodtörst",
+        "description": "Piskar upp närliggande allierade och ökar attackhastigheten i 15 sek. (shamantalang)"
       },
       "spell_lock": {
-        "name": "Spell Lock",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)"
+        "name": "Besvärjelselås",
+        "description": "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 5 sek. (warlocktalang)"
       },
       "howl_of_terror": {
-        "name": "Howl of Terror",
-        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+        "name": "Terrorskrik",
+        "description": "Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (warlocktalang)"
       },
       "curse_of_exhaustion": {
-        "name": "Curse of Exhaustion",
-        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+        "name": "Utmattningens förbannelse",
+        "description": "Förbannar målet och minskar rörelsehastigheten med 30% i 12 sek. (warlocktalang)"
       },
       "death_coil": {
-        "name": "Death Coil",
-        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+        "name": "Dödsspiral",
+        "description": "Träffar fienden med {damage} Skuggskada och skrämmer den sedan i 3 sek. Den här versionen läker inte kastaren. (warlocktalang)"
       },
       "chaos_bolt": {
-        "name": "Chaos Bolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "name": "Kaosblixt",
+        "description": "Slungar en kaotisk eldblixt för {damage} Eldskada. (warlocktalang)"
       },
       "metamorphosis": {
-        "name": "Metamorphosis",
-        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+        "name": "Metamorfos",
+        "description": "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)"
       },
       "skull_bash": {
-        "name": "Skull Bash",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)"
+        "name": "Skallkross",
+        "description": "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (druidentalang)"
       },
       "innervate": {
-        "name": "Innervate",
-        "description": "Instantly restores a large amount of mana. (Druid talent)"
+        "name": "Innervera",
+        "description": "Återställer omedelbart 200 av din nuvarande resurs. (druidentalang)"
       },
       "frenzied_regeneration": {
-        "name": "Frenzied Regeneration",
-        "description": "Regenerates health over 10 sec. Bear Form only. (Druid talent)"
+        "name": "Frenetisk regeneration",
+        "description": "Regenererar hälsa under 10 sek. Endast Björnform. (druidentalang)"
       },
       "berserk": {
         "name": "Berserk",
-        "description": "Increases attack power for 15 sec. (Druid talent)"
+        "description": "Ökar attackkraft i 15 sek. (druidentalang)"
       },
       "tranquility": {
-        "name": "Tranquility",
-        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
+        "name": "Stillhet",
+        "description": "Kanaliserar återställande energi och läker närliggande allierade varje sekund. (druidentalang)"
       },
       "holy_shock": {
         "name": "Helig chock",

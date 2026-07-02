@@ -4423,7 +4423,7 @@ export const zh_TW: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "憤怒之錘",
-        "description": "向敵人投擲神聖之錘，造成 {damage} 點神聖傷害。（聖騎士天賦）"
+        "description": "向受傷的敵人投擲一柄神聖之錘，造成 {damage} 點神聖傷害。只能對生命值低於 20% 的目標使用。（聖騎士天賦）"
       },
       "counter_shot": {
         "name": "反制射擊",
@@ -4491,7 +4491,7 @@ export const zh_TW: EnTranslations = {
       },
       "mind_sear": {
         "name": "精神灼燒",
-        "description": "引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）"
+        "description": "在目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）"
       },
       "earthbind": {
         "name": "大地束縛",
@@ -4523,7 +4523,7 @@ export const zh_TW: EnTranslations = {
       },
       "death_coil": {
         "name": "死亡纏繞",
-        "description": "恐嚇敵人，並在短暫時間內將生命吸回自身。（術士天賦）"
+        "description": "以 {damage} 點暗影傷害衝擊敵人，然後使其驚駭 3 秒。此版本不會治療施法者。（術士天賦）"
       },
       "chaos_bolt": {
         "name": "混沌箭",
@@ -4539,7 +4539,7 @@ export const zh_TW: EnTranslations = {
       },
       "innervate": {
         "name": "啟動",
-        "description": "立即恢復大量法力值。（德魯伊天賦）"
+        "description": "立即恢復 200 點目前資源。（德魯伊天賦）"
       },
       "frenzied_regeneration": {
         "name": "狂暴回復",

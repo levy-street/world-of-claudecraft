@@ -5270,117 +5270,118 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': 'Rebuke',
+  'entities.abilities.rebuke.name': "Berisping",
   'entities.abilities.rebuke.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
-  'entities.abilities.crusader_strike.name': 'Crusader Strike',
+    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (paladijntalent)",
+  'entities.abilities.crusader_strike.name': "Kruisvaardersslag",
   'entities.abilities.crusader_strike.description':
-    'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.holy_wrath.name': 'Holy Wrath',
+    "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)",
+  'entities.abilities.holy_wrath.name': "Heilige toorn",
   'entities.abilities.holy_wrath.description':
-    'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
-  'entities.abilities.divine_shield.name': 'Divine Shield',
+    "Ontketent heilige kracht en beschadigt nabije vijanden voor {damage}. (paladijntalent)",
+  'entities.abilities.divine_shield.name': "Goddelijk schild",
   'entities.abilities.divine_shield.description':
-    'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
-  'entities.abilities.avenging_wrath.name': 'Avenging Wrath',
+    "Beschermt je met heilige kracht en absorbeert 8 sec. lang enorm veel schade. (paladijntalent)",
+  'entities.abilities.avenging_wrath.name': "Wrekende toorn",
   'entities.abilities.avenging_wrath.description':
-    'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
-  'entities.abilities.hammer_of_wrath.name': 'Hammer of Wrath',
+    "Verhoogt aanvalskracht en spreukkracht 20 sec. lang. (paladijntalent)",
+  'entities.abilities.hammer_of_wrath.name': "Hamer der gramschap",
   'entities.abilities.hammer_of_wrath.description':
-    'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
-  'entities.abilities.counter_shot.name': 'Counter Shot',
+    "Werpt een heilige hamer naar een gewonde vijand voor {damage} Heilige schade. Alleen bruikbaar onder 20% gezondheid. (paladijntalent)",
+  'entities.abilities.counter_shot.name': "Tegenschot",
   'entities.abilities.counter_shot.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
-  'entities.abilities.frost_trap.name': 'Frost Trap',
+    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (jagertalent)",
+  'entities.abilities.frost_trap.name': "Vorstval",
   'entities.abilities.frost_trap.description':
-    'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
-  'entities.abilities.mend_pet.name': 'Mend Pet',
+    "Bevriest vijanden in het doelgebied 3 sec. lang. (jagertalent)",
+  'entities.abilities.mend_pet.name': "Huisdier genezen",
   'entities.abilities.mend_pet.description':
-    'Heals a friendly target for {damage} over 15 sec. (Hunter talent)',
-  'entities.abilities.multi_shot.name': 'Multi-Shot',
+    "Geneest een vriendelijk doelwit voor {damage} gedurende 15 sec. (jagertalent)",
+  'entities.abilities.multi_shot.name': "Meervoudig schot",
   'entities.abilities.multi_shot.description':
-    'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
-  'entities.abilities.deterrence.name': 'Deterrence',
+    "Vuurt meerdere projectielen af en raakt nabije vijanden voor {damage}. (jagertalent)",
+  'entities.abilities.deterrence.name': "Afschrikking",
   'entities.abilities.deterrence.description':
-    'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
-  'entities.abilities.aspect_of_the_wild.name': 'Aspect of the Wild',
+    "Verhoogt je ontwijkkans 10 sec. lang met 50%. (jagertalent)",
+  'entities.abilities.aspect_of_the_wild.name': "Aspect van de wildernis",
   'entities.abilities.aspect_of_the_wild.description':
-    'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
-  'entities.abilities.kick.name': 'Kick',
+    "Inspireert nabije bondgenoten en verhoogt aanvalskracht 5 min. lang. (jagertalent)",
+  'entities.abilities.kick.name': "Trap",
   'entities.abilities.kick.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
-  'entities.abilities.preparation.name': 'Preparation',
+    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (schurktalent)",
+  'entities.abilities.preparation.name': "Voorbereiding",
   'entities.abilities.preparation.description':
-    'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
-  'entities.abilities.ghostly_strike.name': 'Ghostly Strike',
+    "Beëindigt de afkoeling van Sprint, Ontwijken en Verdwijnen. (schurktalent)",
+  'entities.abilities.ghostly_strike.name': "Geestelijke slag",
   'entities.abilities.ghostly_strike.description':
-    'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
-  'entities.abilities.cloak_of_shadows.name': 'Cloak of Shadows',
+    "Treft de vijand voor wapenschade plus {damage} en verhoogt kort ontwijken. Geeft 1 combopunt. (schurktalent)",
+  'entities.abilities.cloak_of_shadows.name': "Mantel der schaduwen",
   'entities.abilities.cloak_of_shadows.description':
-    'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
-  'entities.abilities.shadowstep.name': 'Shadowstep',
+    "Hult je in schaduwen en absorbeert 5 sec. lang schade. (schurktalent)",
+  'entities.abilities.shadowstep.name': "Schaduwstap",
   'entities.abilities.shadowstep.description':
-    'Steps through the shadows toward your target. (Rogue talent)',
-  'entities.abilities.silence.name': 'Silence',
-  'entities.abilities.silence.description': 'Silences the target for 4 sec. (Priest talent)',
-  'entities.abilities.psychic_scream.name': 'Psychic Scream',
+    "Stapt door de schaduwen naar je doelwit. (schurktalent)",
+  'entities.abilities.silence.name': "Stilte",
+  'entities.abilities.silence.description':
+    "Legt het doelwit 4 sec. lang het zwijgen op. (schurktalent)",
+  'entities.abilities.psychic_scream.name': "Psychische schreeuw",
   'entities.abilities.psychic_scream.description':
-    'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
-  'entities.abilities.inner_focus.name': 'Inner Focus',
+    "Jaagt nabije vijanden tot 4 sec. angst aan. Schade kan het effect breken. (priestertalent)",
+  'entities.abilities.inner_focus.name': "Innerlijke focus",
   'entities.abilities.inner_focus.description':
-    'Makes your next spell free. Lasts 60 sec. (Priest talent)',
-  'entities.abilities.desperate_prayer.name': 'Desperate Prayer',
+    "Maakt je volgende spreuk gratis. Duurt 60 sec. (priestertalent)",
+  'entities.abilities.desperate_prayer.name': "Wanhopig gebed",
   'entities.abilities.desperate_prayer.description':
-    'Instantly heals you for {damage}. (Priest talent)',
-  'entities.abilities.prayer_of_healing.name': 'Prayer of Healing',
+    "Geneest je onmiddellijk voor {damage}. (priestertalent)",
+  'entities.abilities.prayer_of_healing.name': "Gebed van genezing",
   'entities.abilities.prayer_of_healing.description':
-    'Heals nearby allies for {damage}. (Priest talent)',
-  'entities.abilities.mind_sear.name': 'Mind Sear',
+    "Geneest nabije bondgenoten voor {damage}. (priestertalent)",
+  'entities.abilities.mind_sear.name': "Gedachtenzengen",
   'entities.abilities.mind_sear.description':
-    'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
-  'entities.abilities.earthbind.name': 'Earthbind',
+    "Kanalisert schaduwenergie in het doelgebied en beschadigt nabije vijanden elke seconde voor {damage}. (priestertalent)",
+  'entities.abilities.earthbind.name': "Aardbinding",
   'entities.abilities.earthbind.description':
-    'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
-  'entities.abilities.healing_stream.name': 'Healing Stream',
+    "Bindt nabije vijanden aan de aarde en wortelt ze 2 sec. lang. (sjamaantalent)",
+  'entities.abilities.healing_stream.name': "Genezende stroom",
   'entities.abilities.healing_stream.description':
-    'Restores a friendly target over 12 sec. (Shaman talent)',
-  'entities.abilities.chain_lightning.name': 'Chain Lightning',
+    "Herstelt een vriendelijk doelwit gedurende 12 sec. (sjamaantalent)",
+  'entities.abilities.chain_lightning.name': "Kettingbliksem",
   'entities.abilities.chain_lightning.description':
-    'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
-  'entities.abilities.bloodlust.name': 'Bloodlust',
+    "Slingert bliksem naar het doelgebied en beschadigt nabije vijanden voor {damage}. (sjamaantalent)",
+  'entities.abilities.bloodlust.name': "Bloeddorst",
   'entities.abilities.bloodlust.description':
-    'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
-  'entities.abilities.spell_lock.name': 'Spell Lock',
+    "Zweept nabije bondgenoten op en verhoogt aanvalssnelheid 15 sec. lang. (sjamaantalent)",
+  'entities.abilities.spell_lock.name': "Spreukslot",
   'entities.abilities.spell_lock.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
-  'entities.abilities.howl_of_terror.name': 'Howl of Terror',
+    "Onderbreekt spreuken en verhindert 5 sec. lang spreuken van die school. (heksenmeestertalent)",
+  'entities.abilities.howl_of_terror.name': "Huil van terreur",
   'entities.abilities.howl_of_terror.description':
-    'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
-  'entities.abilities.curse_of_exhaustion.name': 'Curse of Exhaustion',
+    "Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect breken. (heksenmeestertalent)",
+  'entities.abilities.curse_of_exhaustion.name': "Vloek van uitputting",
   'entities.abilities.curse_of_exhaustion.description':
-    'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
-  'entities.abilities.death_coil.name': 'Death Coil',
+    "Vervloekt het doelwit en verlaagt bewegingssnelheid 12 sec. lang met 30%. (heksenmeestertalent)",
+  'entities.abilities.death_coil.name': "Doodsspiraal",
   'entities.abilities.death_coil.description':
-    'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
-  'entities.abilities.chaos_bolt.name': 'Chaos Bolt',
+    "Treft de vijand met {damage} Schaduwschade en vervult hem daarna 3 sec. met afgrijzen. Deze versie geneest de caster niet. (heksenmeestertalent)",
+  'entities.abilities.chaos_bolt.name': "Chaosflits",
   'entities.abilities.chaos_bolt.description':
-    'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
-  'entities.abilities.metamorphosis.name': 'Metamorphosis',
+    "Slingert een chaotische vuurbout voor {damage} Vuurschade. (heksenmeestertalent)",
+  'entities.abilities.metamorphosis.name': "Metamorfose",
   'entities.abilities.metamorphosis.description':
-    'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
-  'entities.abilities.skull_bash.name': 'Skull Bash',
+    "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)",
+  'entities.abilities.skull_bash.name': "Schedelbeuk",
   'entities.abilities.skull_bash.description':
-    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
-  'entities.abilities.innervate.name': 'Innervate',
+    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (druïdetalent)",
+  'entities.abilities.innervate.name': "Bezielen",
   'entities.abilities.innervate.description':
-    'Instantly restores a large amount of mana. (Druid talent)',
-  'entities.abilities.frenzied_regeneration.name': 'Frenzied Regeneration',
+    "Herstelt onmiddellijk 200 van je huidige resource. (druïdetalent)",
+  'entities.abilities.frenzied_regeneration.name': "Razende regeneratie",
   'entities.abilities.frenzied_regeneration.description':
-    'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
-  'entities.abilities.berserk.name': 'Berserk',
+    "Regenereert gezondheid gedurende 10 sec. Alleen Berenvorm. (druïdetalent)",
+  'entities.abilities.berserk.name': "Berserk",
   'entities.abilities.berserk.description':
-    'Increases attack power for 15 sec. (Druid talent)',
-  'entities.abilities.tranquility.name': 'Tranquility',
+    "Verhoogt aanvalskracht 15 sec. lang. (druïdetalent)",
+  'entities.abilities.tranquility.name': "Rust",
   'entities.abilities.tranquility.description':
-    'Channels restorative energy, healing nearby allies each second. (Druid talent)',
+    "Kanalisert herstellende energie en geneest nabije bondgenoten elke seconde. (druïdetalent)",
 };

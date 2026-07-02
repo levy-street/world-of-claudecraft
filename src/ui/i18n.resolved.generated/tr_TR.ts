@@ -4402,156 +4402,156 @@ export const tr_TR: EnTranslations = {
         "description": "Restaura maná rápidamente. (Talento de mago)"
       },
       "rebuke": {
-        "name": "Rebuke",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)"
+        "name": "Azar",
+        "description": "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Paladin yeteneği)"
       },
       "crusader_strike": {
-        "name": "Crusader Strike",
-        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+        "name": "Haçlı Darbesi",
+        "description": "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)"
       },
       "holy_wrath": {
-        "name": "Holy Wrath",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+        "name": "Kutsal Gazap",
+        "description": "Kutsal gücü serbest bırakır ve yakındaki düşmanlara {damage} hasar verir. (Paladin yeteneği)"
       },
       "divine_shield": {
-        "name": "Divine Shield",
-        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+        "name": "İlahi Kalkan",
+        "description": "Seni kutsal güçle korur, 8 sn. boyunca çok büyük miktarda hasar emer. (Paladin yeteneği)"
       },
       "avenging_wrath": {
-        "name": "Avenging Wrath",
-        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+        "name": "İntikamcı Gazap",
+        "description": "İntikamcı gücü çağırır, saldırı gücünü ve büyü gücünü 20 sn. artırır. (Paladin yeteneği)"
       },
       "hammer_of_wrath": {
-        "name": "Hammer of Wrath",
-        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+        "name": "Gazap Çekici",
+        "description": "Yaralı bir düşmana kutsal çekiç fırlatır ve {damage} Kutsal hasar verir. Yalnızca canı 20% altındayken kullanılabilir. (Paladin yeteneği)"
       },
       "counter_shot": {
-        "name": "Counter Shot",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)"
+        "name": "Karşı Atış",
+        "description": "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Avcı yeteneği)"
       },
       "frost_trap": {
-        "name": "Frost Trap",
-        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+        "name": "Buz Tuzağı",
+        "description": "Hedef alandaki düşmanları 3 sn. yerinde dondurur. (Avcı yeteneği)"
       },
       "mend_pet": {
-        "name": "Mend Pet",
-        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+        "name": "Yoldaşı İyileştir",
+        "description": "Dost bir hedefi 15 sn. boyunca {damage} iyileştirir. (Avcı yeteneği)"
       },
       "multi_shot": {
-        "name": "Multi-Shot",
-        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+        "name": "Çoklu Atış",
+        "description": "Birden fazla mermi atar, yakındaki düşmanlara {damage} hasar verir. (Avcı yeteneği)"
       },
       "deterrence": {
-        "name": "Deterrence",
-        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+        "name": "Caydırma",
+        "description": "Kaçınma şansını 10 sn. boyunca 50% artırır. (Avcı yeteneği)"
       },
       "aspect_of_the_wild": {
-        "name": "Aspect of the Wild",
-        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+        "name": "Vahşi Doğa Sureti",
+        "description": "Yakındaki müttefiklere vahşi güç verir, saldırı gücünü 5 dk. artırır. (Avcı yeteneği)"
       },
       "kick": {
-        "name": "Kick",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)"
+        "name": "Tekme",
+        "description": "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Rogue yeteneği)"
       },
       "preparation": {
-        "name": "Preparation",
-        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+        "name": "Hazırlık",
+        "description": "Sprint, Evasion ve Vanish bekleme sürelerini bitirir. (Rogue yeteneği)"
       },
       "ghostly_strike": {
-        "name": "Ghostly Strike",
-        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+        "name": "Hayalet Darbe",
+        "description": "Düşmana silah hasarı artı {damage} vurur ve kısa süreliğine kaçınmayı artırır. 1 kombo puanı verir. (Rogue yeteneği)"
       },
       "cloak_of_shadows": {
-        "name": "Cloak of Shadows",
-        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+        "name": "Gölgeler Pelerini",
+        "description": "Seni gölgelerle sarar, 5 sn. hasar emer. (Rogue yeteneği)"
       },
       "shadowstep": {
-        "name": "Shadowstep",
-        "description": "Steps through the shadows toward your target. (Rogue talent)"
+        "name": "Gölge Adımı",
+        "description": "Gölgelerin içinden hedefine doğru adım atarsın. (Rogue yeteneği)"
       },
       "silence": {
-        "name": "Silence",
-        "description": "Silences the target for 4 sec. (Priest talent)"
+        "name": "Sessizlik",
+        "description": "Hedefi 4 sn. susturur. (Rogue yeteneği)"
       },
       "psychic_scream": {
-        "name": "Psychic Scream",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "name": "Psişik Çığlık",
+        "description": "Yakındaki düşmanları en fazla 4 sn. korkutur. Hasar etkiyi bozabilir. (Rahip yeteneği)"
       },
       "inner_focus": {
-        "name": "Inner Focus",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "name": "İç Odak",
+        "description": "Sonraki büyünü ücretsiz yapar. 60 sn. sürer. (Rahip yeteneği)"
       },
       "desperate_prayer": {
-        "name": "Desperate Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "name": "Çaresiz Dua",
+        "description": "Seni anında {damage} iyileştirir. (Rahip yeteneği)"
       },
       "prayer_of_healing": {
-        "name": "Prayer of Healing",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "name": "Şifa Duası",
+        "description": "Yakındaki müttefikleri {damage} iyileştirir. (Rahip yeteneği)"
       },
       "mind_sear": {
-        "name": "Mind Sear",
-        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "name": "Zihin Yakma",
+        "description": "Hedef alanda Gölge enerjisi kanalize eder, yakındaki düşmanlara her saniye {damage} hasar verir. (Rahip yeteneği)"
       },
       "earthbind": {
-        "name": "Earthbind",
-        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+        "name": "Toprak Bağı",
+        "description": "Yakındaki düşmanları toprağa bağlar ve 2 sn. kökler. (Shaman yeteneği)"
       },
       "healing_stream": {
-        "name": "Healing Stream",
-        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+        "name": "Şifa Akışı",
+        "description": "Dost bir hedefi 12 sn. boyunca yeniler. (Shaman yeteneği)"
       },
       "chain_lightning": {
-        "name": "Chain Lightning",
-        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+        "name": "Zincir Şimşek",
+        "description": "Hedef alana şimşekler savurur, yakındaki düşmanlara {damage} hasar verir. (Shaman yeteneği)"
       },
       "bloodlust": {
-        "name": "Bloodlust",
-        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+        "name": "Kana Susama",
+        "description": "Yakındaki müttefikleri çılgınlığa iter, saldırı hızını 15 sn. artırır. (Shaman yeteneği)"
       },
       "spell_lock": {
-        "name": "Spell Lock",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)"
+        "name": "Büyü Kilidi",
+        "description": "Büyü kullanımını keser ve o okuldan büyüleri 5 sn. engeller. (Warlock yeteneği)"
       },
       "howl_of_terror": {
-        "name": "Howl of Terror",
-        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+        "name": "Dehşet Uluması",
+        "description": "Yakındaki düşmanları en fazla 3 sn. korkutur. Hasar etkiyi bozabilir. (Warlock yeteneği)"
       },
       "curse_of_exhaustion": {
-        "name": "Curse of Exhaustion",
-        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+        "name": "Tükeniş Laneti",
+        "description": "Hedefi lanetler, hareket hızını 12 sn. boyunca 30% azaltır. (Warlock yeteneği)"
       },
       "death_coil": {
-        "name": "Death Coil",
-        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+        "name": "Ölüm Sarmalı",
+        "description": "Düşmana {damage} Gölge hasarı verir, sonra onu 3 sn. dehşete düşürür. Bu sürüm kullananı iyileştirmez. (Warlock yeteneği)"
       },
       "chaos_bolt": {
-        "name": "Chaos Bolt",
-        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+        "name": "Kaos Oku",
+        "description": "Kaotik bir ateş oku fırlatır ve {damage} Ateş hasarı verir. (Warlock yeteneği)"
       },
       "metamorphosis": {
-        "name": "Metamorphosis",
-        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+        "name": "Metamorfoz",
+        "description": "İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)"
       },
       "skull_bash": {
-        "name": "Skull Bash",
-        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)"
+        "name": "Kafatası Darbesi",
+        "description": "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Druid yeteneği)"
       },
       "innervate": {
-        "name": "Innervate",
-        "description": "Instantly restores a large amount of mana. (Druid talent)"
+        "name": "Canlandırma",
+        "description": "Geçerli kaynağından anında 200 yeniler. (Druid yeteneği)"
       },
       "frenzied_regeneration": {
-        "name": "Frenzied Regeneration",
-        "description": "Regenerates health over 10 sec. Bear Form only. (Druid talent)"
+        "name": "Çılgın Yenilenme",
+        "description": "10 sn. boyunca can yeniler. Yalnızca Ayı Formu. (Druid yeteneği)"
       },
       "berserk": {
         "name": "Berserk",
-        "description": "Increases attack power for 15 sec. (Druid talent)"
+        "description": "Saldırı gücünü 15 sn. artırır. (Druid yeteneği)"
       },
       "tranquility": {
-        "name": "Tranquility",
-        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
+        "name": "Sükunet",
+        "description": "Yenileyici enerji kanalize eder, yakındaki müttefikleri her saniye iyileştirir. (Druid yeteneği)"
       },
       "holy_shock": {
         "name": "Kutsal Şok",

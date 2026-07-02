@@ -4423,7 +4423,7 @@ export const ko_KR: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "응징의 망치",
-        "description": "적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. (성기사 특성)"
+        "description": "부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. 생명력이 20% 미만인 대상에게만 사용할 수 있습니다. (성기사 특성)"
       },
       "counter_shot": {
         "name": "반격 사격",
@@ -4491,7 +4491,7 @@ export const ko_KR: EnTranslations = {
       },
       "mind_sear": {
         "name": "정신 불태우기",
-        "description": "암흑 에너지를 집중해 매초 주위 적에게 {damage}의 피해를 줍니다. (사제 특성)"
+        "description": "대상 지역에 암흑 에너지를 집중해 주변 적에게 매초 {damage}의 피해를 줍니다. (사제 특성)"
       },
       "earthbind": {
         "name": "대지 결속",
@@ -4523,7 +4523,7 @@ export const ko_KR: EnTranslations = {
       },
       "death_coil": {
         "name": "죽음의 고리",
-        "description": "적을 공포에 빠뜨리고 짧은 시간 동안 생명력을 자신에게 흡수합니다. (흑마법사 특성)"
+        "description": "적에게 {damage}의 암흑 피해를 준 뒤 3초 동안 공포에 빠뜨립니다. 이 버전은 시전자를 치유하지 않습니다. (흑마법사 특성)"
       },
       "chaos_bolt": {
         "name": "혼돈의 화살",
@@ -4539,7 +4539,7 @@ export const ko_KR: EnTranslations = {
       },
       "innervate": {
         "name": "정신 자극",
-        "description": "많은 마나를 즉시 회복합니다. (드루이드 특성)"
+        "description": "현재 자원을 즉시 200 회복합니다. (드루이드 특성)"
       },
       "frenzied_regeneration": {
         "name": "광포한 재생력",

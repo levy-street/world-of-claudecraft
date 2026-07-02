@@ -515,7 +515,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       school: res.def.school,
       fx: 'nova',
     });
-    const channelHeal = channelTickBonus(p.spellPower, res.def);
+    const channelHeal = channelTickBonus(p.spellPower, res.def, true);
     for (const eff of res.effects) {
       if (eff.type !== 'aoeHeal') continue;
       for (const m of ctx.friendliesInRadius(p, p.pos, eff.radius)) {

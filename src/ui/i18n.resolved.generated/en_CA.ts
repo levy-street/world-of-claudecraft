@@ -4423,7 +4423,7 @@ export const en_CA: EnTranslations = {
       },
       "hammer_of_wrath": {
         "name": "Hammer of Wrath",
-        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+        "description": "Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)"
       },
       "counter_shot": {
         "name": "Counter Shot",
@@ -4491,7 +4491,7 @@ export const en_CA: EnTranslations = {
       },
       "mind_sear": {
         "name": "Mind Sear",
-        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
       "earthbind": {
         "name": "Earthbind",
@@ -4523,7 +4523,7 @@ export const en_CA: EnTranslations = {
       },
       "death_coil": {
         "name": "Death Coil",
-        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+        "description": "Blasts the enemy for {damage} Shadow damage, then horrifies them for 3 sec. This version does not heal the caster. (Warlock talent)"
       },
       "chaos_bolt": {
         "name": "Chaos Bolt",
@@ -4539,7 +4539,7 @@ export const en_CA: EnTranslations = {
       },
       "innervate": {
         "name": "Innervate",
-        "description": "Instantly restores a large amount of mana. (Druid talent)"
+        "description": "Instantly restores 200 of your current resource. (Druid talent)"
       },
       "frenzied_regeneration": {
         "name": "Frenzied Regeneration",

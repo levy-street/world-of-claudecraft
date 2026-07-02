@@ -2748,6 +2748,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 20,
     school: 'shadow',
     requiresTarget: true,
+    fearDr: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
     description:
       'Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect.',
@@ -3903,8 +3904,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'holy',
     requiresTarget: true,
+    requiresTargetHpBelow: 0.2,
     effects: [{ type: 'directDamage', min: 110, max: 136 }],
-    description: 'Hurls a holy hammer at the enemy for $d Holy damage. (Paladin talent)',
+    description:
+      'Hurls a holy hammer at a wounded enemy for $d Holy damage. Only usable below 20% health. (Paladin talent)',
   },
   counter_shot: {
     id: 'counter_shot',
@@ -4157,12 +4160,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
     cooldown: 0,
-    range: 0,
+    range: 30,
     school: 'shadow',
     requiresTarget: false,
+    targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 34, max: 42, radius: 8 }],
     description:
-      'Channels shadow energy, damaging nearby enemies each second for $d. (Priest talent)',
+      'Channels shadow energy at the target area, damaging nearby enemies each second for $d. (Priest talent)',
   },
   earthbind: {
     id: 'earthbind',
@@ -4277,12 +4281,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 20,
     school: 'shadow',
     requiresTarget: true,
+    fearDr: true,
     effects: [
+      { type: 'directDamage', min: 55, max: 65 },
       { type: 'incapacitate', duration: 3 },
-      { type: 'dot', total: 90, duration: 1, interval: 1, leechPct: 1 },
     ],
     description:
-      'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
+      'Blasts the enemy for $d Shadow damage, then horrifies them for 3 sec. This version does not heal the caster. (Warlock talent)',
   },
   chaos_bolt: {
     id: 'chaos_bolt',
@@ -4343,7 +4348,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'gainResource', amount: 200 }],
-    description: 'Instantly restores a large amount of mana. (Druid talent)',
+    description: 'Instantly restores 200 of your current resource. (Druid talent)',
   },
   frenzied_regeneration: {
     id: 'frenzied_regeneration',

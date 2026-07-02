@@ -8,7 +8,16 @@ const SEED = 20061;
 const MIN_DRY_GROUND = WATER_LEVEL - 0.8;
 
 function makeSim(
-  cls: 'warrior' | 'mage' | 'hunter' | 'rogue' | 'priest' | 'shaman' | 'warlock' | 'druid',
+  cls:
+    | 'warrior'
+    | 'mage'
+    | 'paladin'
+    | 'hunter'
+    | 'rogue'
+    | 'priest'
+    | 'shaman'
+    | 'warlock'
+    | 'druid',
 ): Sim {
   const sim = new Sim({ seed: SEED, playerClass: cls });
   sim.setPlayerLevel(MAX_LEVEL);
@@ -31,6 +40,10 @@ function firstWolf(sim: Sim): Entity {
   wolf.maxHp = 10000;
   wolf.hp = 10000;
   return wolf;
+}
+
+function finishProjectiles(sim: Sim): void {
+  for (let i = 0; i < 20 * 3 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
 }
 
 function pickDryToDeepSegment(): {
@@ -273,6 +286,22 @@ describe('Talents 2.0 PR5 Wave A regressions', () => {
     expect(side).toBeLessThan(-0.5);
   });
 
+  it('Shadowstep lands adjacent to a nearby target without overshooting it', () => {
+    const sim = makeSim('rogue');
+    expect(sim.chooseRow(20, 'rog_r20_shadowstep')).toBe(true);
+    const p = sim.player;
+    const wolf = firstWolf(sim);
+    teleportTo(sim, p, 0, -40);
+    teleportTo(sim, wolf, 10, -40);
+    p.facing = Math.PI;
+    sim.targetEntity(wolf.id);
+
+    sim.castAbility('shadowstep');
+
+    expect(dist2d(p.pos, wolf.pos)).toBeLessThanOrEqual(2.5);
+    expect(p.pos.x).toBeLessThan(wolf.pos.x);
+  });
+
   it('Priest Silence applies a silence aura and Psychic Scream applies area fear', () => {
     const silence = makeSim('priest');
     expect(silence.chooseRow(8, 'pri_r8_silence')).toBe(true);
@@ -298,9 +327,53 @@ describe('Talents 2.0 PR5 Wave A regressions', () => {
 
     fear.castAbility('psychic_scream');
 
-    expect(
-      wolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'psychic_scream_fear'),
-    ).toBe(true);
+    const before = { ...wolf.pos };
+    expect(wolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'fear_incap')).toBe(true);
+
+    for (let i = 0; i < 20; i++) fear.tick();
+
+    expect(dist2d(before, wolf.pos)).toBeGreaterThan(1);
+  });
+
+  it('Mind Sear channel ticks damage hostiles at the aimed area', () => {
+    const sim = makeSim('priest');
+    expect(sim.chooseRow(20, 'pri_r20_mind_sear')).toBe(true);
+    const wolf = firstWolf(sim);
+    teleportTo(sim, sim.player, 0, -40);
+    teleportTo(sim, wolf, 20, -40);
+    const hpBefore = wolf.hp;
+
+    sim.castAbilityAt('mind_sear', { x: wolf.pos.x, z: wolf.pos.z });
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    expect(wolf.hp).toBeLessThan(hpBefore);
+  });
+
+  it('Hammer of Wrath only lands on targets below 20% health', () => {
+    const sim = makeSim('paladin');
+    expect(sim.chooseRow(20, 'pal_r20_hammer_of_wrath')).toBe(true);
+    const p = sim.player;
+    const wolf = firstWolf(sim);
+    teleportTo(sim, p, 0, -40);
+    teleportTo(sim, wolf, 10, -40);
+    p.facing = Math.atan2(wolf.pos.x - p.pos.x, wolf.pos.z - p.pos.z);
+    sim.targetEntity(wolf.id);
+
+    const hpBefore = wolf.hp;
+    sim.castAbility('hammer_of_wrath');
+    expect(wolf.hp).toBe(hpBefore);
+
+    p.gcdRemaining = 0;
+    p.cooldowns.delete('hammer_of_wrath');
+    wolf.hp = Math.floor(wolf.maxHp * 0.19);
+    for (let attempt = 0; attempt < 20 && wolf.hp === Math.floor(wolf.maxHp * 0.19); attempt++) {
+      p.gcdRemaining = 0;
+      p.cooldowns.delete('hammer_of_wrath');
+      p.resource = p.maxResource;
+      sim.castAbility('hammer_of_wrath');
+      finishProjectiles(sim);
+    }
+    expect(wolf.hp).toBeLessThan(Math.floor(wolf.maxHp * 0.19));
   });
 
   it('Earthbind roots nearby enemies without hidden damage', () => {
@@ -330,7 +403,7 @@ describe('Talents 2.0 PR5 Wave A regressions', () => {
     );
   });
 
-  it('Warlock control grants apply area fear, slow, and leeching Death Coil', () => {
+  it('Warlock control grants apply area fear, slow, and Death Coil horror', () => {
     const fear = makeSim('warlock');
     expect(fear.chooseRow(8, 'wlk_r8_howl_of_terror')).toBe(true);
     const fearedWolf = firstWolf(fear);
@@ -339,9 +412,9 @@ describe('Talents 2.0 PR5 Wave A regressions', () => {
 
     fear.castAbility('howl_of_terror');
 
-    expect(
-      fearedWolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'howl_of_terror_fear'),
-    ).toBe(true);
+    expect(fearedWolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'fear_incap')).toBe(
+      true,
+    );
 
     const slow = makeSim('warlock');
     expect(slow.chooseRow(8, 'wlk_r8_curse_of_exhaustion')).toBe(true);
@@ -366,10 +439,45 @@ describe('Talents 2.0 PR5 Wave A regressions', () => {
     const hpBefore = coil.player.hp;
     coil.targetEntity(coiledWolf.id);
 
-    coil.castAbility('death_coil');
-    for (let i = 0; i < 40; i++) coil.tick();
+    for (
+      let attempt = 0;
+      attempt < 20 &&
+      !coiledWolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'death_coil_incap');
+      attempt++
+    ) {
+      coil.player.gcdRemaining = 0;
+      coil.player.cooldowns.delete('death_coil');
+      coil.player.resource = coil.player.maxResource;
+      coil.castAbility('death_coil');
+      finishProjectiles(coil);
+    }
 
-    expect(coil.player.hp).toBeGreaterThan(hpBefore);
+    expect(coil.player.hp).toBe(hpBefore);
+    expect(coiledWolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'death_coil_incap'))
+      .toBe(true);
+
+    for (let i = 0; i < 20 * 2; i++) coil.tick();
+
+    expect(coiledWolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'death_coil_incap'))
+      .toBe(true);
+  });
+
+  it('Vampiric Embrace makes Mind Blast rider heal the priest', () => {
+    const sim = makeSim('priest');
+    expect(sim.chooseRow(11, 'pri_r11_vampiric_embrace')).toBe(true);
+    const p = sim.player;
+    const wolf = firstWolf(sim);
+    teleportTo(sim, p, 0, -40);
+    teleportTo(sim, wolf, 10, -40);
+    p.facing = Math.atan2(wolf.pos.x - p.pos.x, wolf.pos.z - p.pos.z);
+    p.hp = Math.max(1, p.hp - 80);
+    const hpBefore = p.hp;
+    sim.targetEntity(wolf.id);
+
+    sim.castAbility('mind_blast');
+    for (let i = 0; i < 20 * 4; i++) sim.tick();
+
+    expect(p.hp).toBeGreaterThan(hpBefore);
   });
 
   it('Tranquility channel ticks heal the caster', () => {

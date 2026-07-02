@@ -515,7 +515,7 @@ export function runEffects(
       case 'incapacitate': {
         if (!target || target.dead) break;
         const remaining =
-          ability.id === 'fear'
+          ability.fearDr
             ? ctx.diminishedCrowdControlDuration(p, target, 'fear', eff.duration)
             : eff.duration;
         if (remaining === null) break;
@@ -525,7 +525,7 @@ export function runEffects(
           kind: 'incapacitate',
           remaining,
           duration: remaining,
-          value: ability.id === 'fear' ? ctx.rng.range(-Math.PI, Math.PI) : 0,
+          value: ability.fearDr ? ctx.rng.range(-Math.PI, Math.PI) : 0,
           sourceId: p.id,
           school: ability.school,
           breaksOnDamage: true,
@@ -782,7 +782,7 @@ export function runEffects(
           const remaining = ctx.diminishedCrowdControlDuration(p, m, 'fear', eff.duration);
           if (remaining === null) continue;
           ctx.applyAura(m, {
-            id: `${ability.id}_fear`,
+            id: 'fear_incap',
             name: ability.name,
             kind: 'incapacitate',
             remaining,
@@ -934,8 +934,20 @@ export function runEffects(
       }
       case 'blinkForward': {
         if (eff.breakRoots) removeRootAuras(ctx, p);
-        const x = p.pos.x + Math.sin(p.facing) * eff.distance;
-        const z = p.pos.z + Math.cos(p.facing) * eff.distance;
+        let distance = eff.distance;
+        let facing = p.facing;
+        const target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+        if (ability.id === 'shadowstep' && target && !target.dead) {
+          const dx = target.pos.x - p.pos.x;
+          const dz = target.pos.z - p.pos.z;
+          const toTarget = Math.hypot(dx, dz);
+          if (toTarget <= 1.5) break;
+          facing = Math.atan2(dx, dz);
+          p.facing = facing;
+          distance = Math.min(toTarget - 1.5, eff.distance);
+        }
+        const x = p.pos.x + Math.sin(facing) * distance;
+        const z = p.pos.z + Math.cos(facing) * distance;
         sweptReposition(ctx, p, x, z);
         break;
       }
