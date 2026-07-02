@@ -30,6 +30,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     meta.arena2v2Losses = 4;
     meta.prestigeRank = 2;
     meta.unlockedMilestones = new Set(['m_first', 'm_second']);
+    sim.unlockAchievement('level_10', pid);
     meta.restedXp = 321;
     meta.skin = 3;
     meta.skinCatalog = 'mech';
@@ -52,6 +53,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     expect(s2.delveMarks).toBe(17);
     expect(s2.loadouts?.length).toBe(1);
     expect(s2.skinCatalog).toBe('mech');
+    expect(s2.achievements).toEqual({ unlocked: ['level_10', 'lifetime_xp_1000'], points: 15 });
   });
 
   it('a legacy state missing the post-launch fields loads with sane defaults', () => {
@@ -84,6 +86,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
       'delveDaily',
       'prestigeRank',
       'unlockedMilestones',
+      'achievements',
       'lifetimeXp',
       'restedXp',
     ]) {
@@ -104,6 +107,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     expect(m.skinCatalog).toBe('class');
     expect(m.loadouts).toEqual([]);
     expect(m.prestigeRank).toBe(0);
+    expect(m.achievements).toEqual({ unlocked: [], points: 0 });
     expect(m.restedXp).toBe(0);
     // re-serializing a defaulted character does not throw and fills the new fields.
     expect(() => sim2.serializeCharacter(pid)).not.toThrow();

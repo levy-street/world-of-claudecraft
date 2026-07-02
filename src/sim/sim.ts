@@ -4,6 +4,14 @@ import type {
   DelveRunInfo,
   LockpickView,
 } from '../world_api';
+import {
+  applyAchievementEvaluation,
+  cloneAchievementState,
+  emptyAchievementState,
+  type AchievementState,
+  normalizeAchievementState,
+  unlockAchievement as unlockAchievementState,
+} from './achievements';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import {
@@ -640,6 +648,7 @@ export interface PlayerMeta {
   lifetimeXp: number;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
+  achievements: AchievementState;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
   // inn, spent to double kill XP. Persisted in CharacterState.
   restedXp: number;
@@ -728,6 +737,7 @@ export interface CharacterState {
   lifetimeXp?: number;
   prestigeRank?: number;
   unlockedMilestones?: string[];
+  achievements?: AchievementState;
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
   restedXp?: number;
   copper: number;
@@ -1167,6 +1177,7 @@ export class Sim {
       lifetimeXp: 0,
       prestigeRank: 0,
       unlockedMilestones: new Set(),
+      achievements: emptyAchievementState(),
       restedXp: 0,
       known: [],
       questLog: new Map(),
@@ -1217,6 +1228,7 @@ export class Sim {
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
+      meta.achievements = normalizeAchievementState(s.achievements);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
@@ -1385,6 +1397,7 @@ export class Sim {
       lifetimeXp: meta.lifetimeXp,
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
+      achievements: cloneAchievementState(meta.achievements),
       restedXp: meta.restedXp,
       copper: meta.copper,
       hp: e.hp,
@@ -1622,6 +1635,9 @@ export class Sim {
   get unlockedMilestones(): string[] {
     return [...this.primary.unlockedMilestones];
   }
+  get achievements(): AchievementState {
+    return cloneAchievementState(this.primary.achievements);
+  }
   // Offline leaderboard: rank the players the local sim knows about by lifetime
   // XP. Online play overrides this with the cached, realm-scoped server query.
   // Paged through the same helper the server uses so both worlds behave alike.
@@ -1701,6 +1717,26 @@ export class Sim {
 
   meta(pid: number): PlayerMeta | null {
     return this.players.get(pid) ?? null;
+  }
+
+  achievementsFor(pid?: number): AchievementState {
+    const r = this.resolve(pid);
+    return r ? cloneAchievementState(r.meta.achievements) : emptyAchievementState();
+  }
+
+  unlockAchievement(achievementId: string, pid?: number): boolean {
+    const r = this.resolve(pid);
+    return r ? unlockAchievementState(r.meta.achievements, achievementId) : false;
+  }
+
+  evaluateAchievements(pid?: number): string[] {
+    const r = this.resolve(pid);
+    if (!r) return [];
+    return applyAchievementEvaluation(r.meta.achievements, {
+      level: r.e.level,
+      lifetimeXp: r.meta.lifetimeXp,
+      counters: r.meta.counters,
+    });
   }
 
   private resolve(pid?: number): { meta: PlayerMeta; e: Entity } | null {
@@ -2248,6 +2284,7 @@ export class Sim {
     if (r.e.resourceType === 'mana') r.e.resource = r.e.maxResource;
     this.refreshKnownAbilities(r.meta, false);
     this.syncPetLevel(r.e);
+    this.evaluateAchievements(pid);
   }
 
   // -------------------------------------------------------------------------
@@ -3447,6 +3484,7 @@ export class Sim {
 
   grantXp(amount: number, meta: PlayerMeta = this.primary, opts?: { fromKill?: boolean }): void {
     grantXpImpl(this.ctx, amount, meta, opts);
+    this.evaluateAchievements(meta.entityId);
   }
 
   // Opt-in cosmetic prestige: only at the cap. Resets the level XP
