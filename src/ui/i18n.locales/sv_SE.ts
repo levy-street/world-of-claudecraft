@@ -3340,6 +3340,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.noTarget': 'Du har inget mål.',
   'hud.errors.notEnoughEnergy': 'Inte tillräckligt med energi!',
   'hud.errors.notEnoughHealth': 'Inte tillräckligt med hälsa.',
+  'hud.errors.nothingToConsume': 'Inget att förtära.',
   'hud.errors.notEnoughMana': 'Inte tillräckligt med mana!',
   'hud.errors.notEnoughRage': 'Inte tillräckligt med raseri!',
   'hud.errors.notEnoughResource': 'Inte tillräckligt med {resource}!',

@@ -3163,6 +3163,7 @@ export const ru_RU: EnTranslations = {
       "notEnoughMana": "Недостаточно маны!",
       "notEnoughResource": "Недостаточно {resource}!",
       "notEnoughHealth": "Недостаточно здоровья.",
+      "nothingToConsume": "Нечего поглотить.",
       "targetMustDodge": "Ваша цель должна сначала уклониться.",
       "requiresCombo": "Этой способности нужны очки серии.",
       "requiresForm": "Вы должны быть в облике {form}.",

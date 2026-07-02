@@ -3388,6 +3388,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.errors.noTarget': 'Kamu tidak memiliki sasaran.',
   'hud.errors.notEnoughEnergy': 'Energi tidak cukup!',
   'hud.errors.notEnoughHealth': 'Nyawa tidak cukup.',
+  'hud.errors.nothingToConsume': 'Tidak ada yang bisa dikonsumsi.',
   'hud.errors.notEnoughMana': 'Mana tidak cukup!',
   'hud.errors.notEnoughRage': 'Amarah tidak cukup!',
   'hud.errors.notEnoughResource': '{resource} tidak cukup!',

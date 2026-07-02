@@ -4290,6 +4290,7 @@ const RULES: Rule[] = [
   { re: /^The door is locked\.$/, build: () => t('sim.delve.doorLocked') },
   { re: /^Strike the wall to break through\.$/, build: () => t('sim.delve.strikeWall') },
   { re: /^Nothing happens\.$/, build: () => t('sim.delve.nothingHappens') },
+  { re: /^Nothing to consume\.$/, build: () => t('hud.errors.nothingToConsume') },
   { re: /^Unknown companion\.$/, build: () => t('sim.delve.unknownCompanion') },
   {
     re: /^This companion is already fully upgraded\.$/,

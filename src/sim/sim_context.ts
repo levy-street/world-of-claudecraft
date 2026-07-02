@@ -263,6 +263,7 @@ export interface SimContextCallbacks {
     duration: number,
   ): number | null;
   hostilesInRadius(source: Entity, pos: Vec3, radius: number): Entity[];
+  friendliesInRadius(source: Entity, pos: Vec3, radius: number): Entity[];
   breakStealth(entity: Entity): void;
 
   // Shared entry point (stays on Sim, exposed here): taunt forces a mob's target.
@@ -757,6 +758,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     applyKnockback: host.applyKnockback,
     diminishedCrowdControlDuration: host.diminishedCrowdControlDuration,
     hostilesInRadius: host.hostilesInRadius,
+    friendliesInRadius: host.friendliesInRadius,
     breakStealth: host.breakStealth,
     applyTaunt: host.applyTaunt,
     summonPet: host.summonPet,

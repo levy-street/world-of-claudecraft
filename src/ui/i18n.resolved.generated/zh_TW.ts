@@ -3163,6 +3163,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughMana": "法力不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
+      "nothingToConsume": "沒有可消耗的效果。",
       "targetMustDodge": "你的目標必須先閃避。",
       "requiresCombo": "該技能需要連擊點。",
       "requiresForm": "你必須處於{form}形態。",

@@ -3622,10 +3622,11 @@ function scaleEffect(
     case 'dot':
       return { ...eff, total: Math.round(eff.total * dmgMult + flat) };
     case 'aoeDamage':
+    case 'aoeHeal':
       return {
         ...eff,
-        min: Math.round(eff.min * dmgMult + flat),
-        max: Math.round(eff.max * dmgMult + flat),
+        min: Math.round(eff.min * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
+        max: Math.round(eff.max * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
       };
     case 'aoeRoot':
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
@@ -3654,6 +3655,24 @@ function scaleEffect(
       };
     case 'hot':
       return { ...eff, total: Math.round(eff.total * healMult + flat) };
+    case 'consumeAura':
+      // `flat` is added once, to the PRIMARY magnitude only: deal when present,
+      // else heal (a dual deal+heal def must not double-apply a flat talent mod).
+      return {
+        ...eff,
+        deal: eff.deal
+          ? {
+              min: Math.round(eff.deal.min * dmgMult + flat),
+              max: Math.round(eff.deal.max * dmgMult + flat),
+            }
+          : undefined,
+        heal: eff.heal
+          ? {
+              min: Math.round(eff.heal.min * healMult + (eff.deal ? 0 : flat)),
+              max: Math.round(eff.heal.max * healMult + (eff.deal ? 0 : flat)),
+            }
+          : undefined,
+      };
     case 'absorb':
       return { ...eff, amount: Math.round(eff.amount * healMult + flat) };
     case 'buffTarget':

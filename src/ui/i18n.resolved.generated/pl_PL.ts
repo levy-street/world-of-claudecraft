@@ -3163,6 +3163,7 @@ export const pl_PL: EnTranslations = {
       "notEnoughMana": "Za mało many!",
       "notEnoughResource": "Za mało: {resource}!",
       "notEnoughHealth": "Za mało zdrowia.",
+      "nothingToConsume": "Brak efektu do pochłonięcia.",
       "targetMustDodge": "Twój cel musi najpierw zrobić unik.",
       "requiresCombo": "Ta umiejętność wymaga punktów kombinacji.",
       "requiresForm": "Musisz być w postaci: {form}.",

@@ -34,6 +34,7 @@ import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
 import { isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
+import { isFormAuraKind } from './forms';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 
@@ -43,6 +44,28 @@ function isStealthToggle(ability: AbilityDef): boolean {
 
 function preservesStealth(ability: AbilityDef): boolean {
   return isStealthToggle(ability) || ability.id === 'sprint';
+}
+
+function consumeMatchingAura(
+  ctx: SimContext,
+  caster: Entity,
+  target: Entity | null,
+  eff: Extract<ResolvedAbility['effects'][number], { type: 'consumeAura' }>,
+): number {
+  if (!target) return -1;
+  return target.auras.findIndex((a) => {
+    // Only dot/hot auras are consumable, even by id: a raw splice skips the
+    // stat-aura teardown expiry performs, so consuming a stat-carrying aura
+    // (buff_*/form_*) would leak its contribution permanently.
+    if (a.kind !== 'dot' && a.kind !== 'hot') return false;
+    const matchesId = eff.auraIds?.includes(a.id);
+    const matchesKind = eff.auraKind !== undefined && a.kind === eff.auraKind;
+    if (!matchesId && !matchesKind) return false;
+    if (target !== caster && ctx.isHostileTo(caster, target) && a.kind === 'dot') {
+      return a.sourceId === caster.id;
+    }
+    return true;
+  });
 }
 
 export function runEffects(
@@ -358,6 +381,7 @@ export function runEffects(
           tickTimer: eff.interval,
           sourceId: p.id,
           school: ability.school,
+          leechPct: eff.leechPct,
         });
         ctx.enterCombat(p, target);
         break;
@@ -509,6 +533,22 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeHeal': {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'nova',
+        });
+        const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true);
+        for (const m of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+          if (!ctx.hasLineOfSight(p, m)) continue;
+          const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
+          ctx.applyHeal(p, m, healAmount, ability.name);
+        }
+        break;
+      }
       case 'groundAoE': {
         // Ground-targeted casts drop the zone where they were aimed; others lay it
         // under the caster (e.g. Consecration at your feet).
@@ -617,10 +657,48 @@ export function runEffects(
         }
         break;
       }
+      case 'consumeAura': {
+        if (!target || target.dead) {
+          ctx.error(p.id, 'Nothing to consume.');
+          break;
+        }
+        const auraIdx = consumeMatchingAura(ctx, p, target, eff);
+        if (auraIdx < 0) {
+          ctx.error(p.id, 'Nothing to consume.');
+          break;
+        }
+        const consumed = target.auras[auraIdx];
+        target.auras.splice(auraIdx, 1);
+        ctx.emit({ type: 'aura', targetId: target.id, name: consumed.name, gained: false });
+        if (eff.deal) {
+          let dmg =
+            ctx.rng.range(eff.deal.min, eff.deal.max) +
+            directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+          const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
+          if (crit) dmg *= isSpell ? 1.5 : 2;
+          if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+          ctx.dealDamage(
+            p,
+            target,
+            Math.round(dmg),
+            crit,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+          );
+        }
+        if (eff.heal) {
+          const healAmount =
+            ctx.rng.range(eff.heal.min, eff.heal.max) + directHealBonus(p.spellPower, res.castTime);
+          ctx.applyHeal(p, target, healAmount, ability.name);
+        }
+        break;
+      }
       case 'selfBuff': {
         // forms, stances and stealth are toggles: casting again cancels
-        const isFormKind =
-          eff.kind === 'form_bear' || eff.kind === 'form_cat' || eff.kind === 'form_travel';
+        const isFormKind = isFormAuraKind(eff.kind);
         const isToggle =
           isFormKind ||
           eff.kind === 'defensive_stance' ||
@@ -640,10 +718,7 @@ export function runEffects(
         if (isFormKind) {
           for (let i = p.auras.length - 1; i >= 0; i--) {
             const a = p.auras[i];
-            if (
-              (a.kind === 'form_bear' || a.kind === 'form_cat' || a.kind === 'form_travel') &&
-              a.kind !== eff.kind
-            ) {
+            if (isFormAuraKind(a.kind) && a.kind !== eff.kind) {
               p.auras.splice(i, 1);
               ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
             }

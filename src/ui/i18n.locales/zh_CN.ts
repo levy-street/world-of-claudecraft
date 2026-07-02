@@ -1101,6 +1101,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': '法力不足！',
   'hud.errors.notEnoughResource': '{resource}不足！',
   'hud.errors.notEnoughHealth': '生命值不足。',
+  'hud.errors.nothingToConsume': '没有可消耗的效果。',
   'hud.errors.targetMustDodge': '你的目标必须先闪避。',
   'hud.errors.requiresCombo': '该技能需要连击点。',
   'hud.errors.requiresForm': '你必须处于{form}形态。',

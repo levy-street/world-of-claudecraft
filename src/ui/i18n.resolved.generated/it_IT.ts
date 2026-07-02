@@ -3163,6 +3163,7 @@ export const it_IT: EnTranslations = {
       "notEnoughMana": "Mana insufficiente!",
       "notEnoughResource": "{resource} insufficiente!",
       "notEnoughHealth": "Salute insufficiente.",
+      "nothingToConsume": "Niente da consumare.",
       "targetMustDodge": "Il bersaglio deve prima schivare.",
       "requiresCombo": "Quell'abilità richiede punti combo.",
       "requiresForm": "Devi essere in Forma di {form}.",

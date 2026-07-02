@@ -3163,6 +3163,7 @@ export const ja_JP: EnTranslations = {
       "notEnoughMana": "マナが足りません！",
       "notEnoughResource": "{resource}が足りません！",
       "notEnoughHealth": "体力が足りません。",
+      "nothingToConsume": "消費できる効果がありません。",
       "targetMustDodge": "対象が先に回避する必要があります。",
       "requiresCombo": "その能力にはコンボポイントが必要です。",
       "requiresForm": "{form}フォームである必要があります。",

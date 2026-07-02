@@ -7180,6 +7180,7 @@ export class Hud {
       'Not enough energy!': 'hud.errors.notEnoughEnergy',
       'Not enough mana!': 'hud.errors.notEnoughMana',
       'Not enough health.': 'hud.errors.notEnoughHealth',
+      'Nothing to consume.': 'hud.errors.nothingToConsume',
       'Your target must dodge first.': 'hud.errors.targetMustDodge',
       'That ability requires combo points.': 'hud.errors.requiresCombo',
       "You can't do that while shapeshifted.": 'hud.errors.shapeshifted',
@@ -11390,7 +11391,9 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       eff.type === 'weaponDamage' ||
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
+      eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
+      eff.type === 'consumeAura' ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick',
   );
@@ -11399,9 +11402,18 @@ function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): stri
       case 'directDamage':
       case 'heal':
       case 'aoeDamage':
+      case 'aoeHeal':
       case 'aoeRoot':
       case 'drainTick':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'consumeAura':
+        if (primary.deal) {
+          return abilityAmountRange(primary.deal.min, primary.deal.max) + suffix(primary);
+        }
+        if (primary.heal) {
+          return abilityAmountRange(primary.heal.min, primary.heal.max) + suffix(primary);
+        }
+        return '';
       case 'weaponDamage':
       case 'weaponStrike':
         return formatAbilityNumber(primary.bonus);

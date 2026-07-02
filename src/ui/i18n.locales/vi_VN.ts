@@ -3366,6 +3366,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.noTarget': 'Bạn không có mục tiêu.',
   'hud.errors.notEnoughEnergy': 'Không đủ năng lượng!',
   'hud.errors.notEnoughHealth': 'Không đủ sinh lực.',
+  'hud.errors.nothingToConsume': 'Không có gì để hấp thụ.',
   'hud.errors.notEnoughMana': 'Không đủ mana!',
   'hud.errors.notEnoughRage': 'Không đủ nộ khí!',
   'hud.errors.notEnoughResource': 'Không đủ {resource}!',

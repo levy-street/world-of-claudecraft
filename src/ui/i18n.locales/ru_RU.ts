@@ -1181,6 +1181,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': 'Недостаточно маны!',
   'hud.errors.notEnoughResource': 'Недостаточно {resource}!',
   'hud.errors.notEnoughHealth': 'Недостаточно здоровья.',
+  'hud.errors.nothingToConsume': 'Нечего поглотить.',
   'hud.errors.targetMustDodge': 'Ваша цель должна сначала уклониться.',
   'hud.errors.requiresCombo': 'Этой способности нужны очки серии.',
   'hud.errors.requiresForm': 'Вы должны быть в облике {form}.',

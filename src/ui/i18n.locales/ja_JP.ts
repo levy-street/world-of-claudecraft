@@ -1163,6 +1163,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': 'マナが足りません！',
   'hud.errors.notEnoughResource': '{resource}が足りません！',
   'hud.errors.notEnoughHealth': '体力が足りません。',
+  'hud.errors.nothingToConsume': '消費できる効果がありません。',
   'hud.errors.targetMustDodge': '対象が先に回避する必要があります。',
   'hud.errors.requiresCombo': 'その能力にはコンボポイントが必要です。',
   'hud.errors.requiresForm': '{form}フォームである必要があります。',

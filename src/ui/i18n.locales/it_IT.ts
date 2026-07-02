@@ -1141,6 +1141,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': 'Mana insufficiente!',
   'hud.errors.notEnoughResource': '{resource} insufficiente!',
   'hud.errors.notEnoughHealth': 'Salute insufficiente.',
+  'hud.errors.nothingToConsume': 'Niente da consumare.',
   'hud.errors.targetMustDodge': 'Il bersaglio deve prima schivare.',
   'hud.errors.requiresCombo': "Quell'abilità richiede punti combo.",
   'hud.errors.requiresForm': 'Devi essere in Forma di {form}.',

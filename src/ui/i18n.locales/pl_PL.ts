@@ -3356,6 +3356,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.noTarget': 'Nie masz celu.',
   'hud.errors.notEnoughEnergy': 'Za mało energii!',
   'hud.errors.notEnoughHealth': 'Za mało zdrowia.',
+  'hud.errors.nothingToConsume': 'Brak efektu do pochłonięcia.',
   'hud.errors.notEnoughMana': 'Za mało many!',
   'hud.errors.notEnoughRage': 'Za mało wściekłości!',
   'hud.errors.notEnoughResource': 'Za mało: {resource}!',

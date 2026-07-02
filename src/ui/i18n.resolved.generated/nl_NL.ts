@@ -3163,6 +3163,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughMana": "Niet genoeg mana!",
       "notEnoughResource": "Niet genoeg {resource}!",
       "notEnoughHealth": "Niet genoeg gezondheid.",
+      "nothingToConsume": "Niets om te verbruiken.",
       "targetMustDodge": "Je doelwit moet eerst ontwijken.",
       "requiresCombo": "Die vaardigheid vereist combopunten.",
       "requiresForm": "Je moet in {form}-gedaante zijn.",

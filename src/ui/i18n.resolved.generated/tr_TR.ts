@@ -3163,6 +3163,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughMana": "Yeterli mana yok!",
       "notEnoughResource": "Yeterli {resource} yok!",
       "notEnoughHealth": "Yeterli can yok.",
+      "nothingToConsume": "Tüketilecek bir şey yok.",
       "targetMustDodge": "Önce hedefinin sıyrılması gerekir.",
       "requiresCombo": "O yetenek kombo puanı gerektirir.",
       "requiresForm": "{form} Formunda olmalısın.",

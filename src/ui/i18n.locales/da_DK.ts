@@ -3331,6 +3331,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.errors.noTarget': 'Du har intet mål.',
   'hud.errors.notEnoughEnergy': 'Ikke nok energi!',
   'hud.errors.notEnoughHealth': 'Ikke nok helbred.',
+  'hud.errors.nothingToConsume': 'Intet at forbruge.',
   'hud.errors.notEnoughMana': 'Ikke nok mana!',
   'hud.errors.notEnoughRage': 'Ikke nok raseri!',
   'hud.errors.notEnoughResource': 'Ikke nok {resource}!',

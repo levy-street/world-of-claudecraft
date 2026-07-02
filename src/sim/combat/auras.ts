@@ -153,6 +153,24 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
           );
+          if (a.leechPct !== undefined) {
+            const src = ctx.entities.get(a.sourceId);
+            if (src && !src.dead) {
+              const healed = Math.min(Math.round(a.value * a.leechPct), src.maxHp - src.hp);
+              if (healed > 0) {
+                src.hp += healed;
+                ctx.emit({
+                  type: 'heal2',
+                  sourceId: src.id,
+                  targetId: src.id,
+                  amount: healed,
+                  crit: false,
+                  ability: a.name,
+                });
+                ctx.healingThreat(src, src, healed);
+              }
+            }
+          }
           if (e.dead) return;
         } else if (a.kind === 'hot') {
           const healed = Math.min(Math.round(a.value * ctx.healingTakenMult(e)), e.maxHp - e.hp);

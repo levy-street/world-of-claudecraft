@@ -3163,6 +3163,7 @@ export const vi_VN: EnTranslations = {
       "notEnoughMana": "Không đủ mana!",
       "notEnoughResource": "Không đủ {resource}!",
       "notEnoughHealth": "Không đủ sinh lực.",
+      "nothingToConsume": "Không có gì để hấp thụ.",
       "targetMustDodge": "Mục tiêu của bạn phải né được trước đã.",
       "requiresCombo": "Kỹ năng đó cần điểm liên hoàn.",
       "requiresForm": "Bạn phải ở Hình {form}.",

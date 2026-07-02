@@ -54,6 +54,7 @@ import {
   consumeNextCastInstant,
   hasNextCastFree,
 } from './empower_next';
+import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import { isSpellResisted } from './spell_resist';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
@@ -61,11 +62,7 @@ import { isSpellResisted } from './spell_resist';
 const SHAMAN_SHOCK_COOLDOWN_IDS = ['earth_shock', 'flame_shock', 'frost_shock'] as const;
 
 function isFormToggle(ability: AbilityDef): boolean {
-  return ability.effects.some(
-    (e) =>
-      e.type === 'selfBuff' &&
-      (e.kind === 'form_bear' || e.kind === 'form_cat' || e.kind === 'form_travel'),
-  );
+  return ability.effects.some((e) => e.type === 'selfBuff' && isFormAuraKind(e.kind));
 }
 
 // Forms, stances and stealth are toggles: re-casting cancels the aura, and
@@ -75,11 +72,7 @@ function isToggleBuff(ability: AbilityDef): boolean {
   return ability.effects.some(
     (e) =>
       e.type === 'selfBuff' &&
-      (e.kind === 'form_bear' ||
-        e.kind === 'form_cat' ||
-        e.kind === 'form_travel' ||
-        e.kind === 'defensive_stance' ||
-        e.kind === 'stealth'),
+      (isFormAuraKind(e.kind) || e.kind === 'defensive_stance' || e.kind === 'stealth'),
   );
 }
 
@@ -253,9 +246,7 @@ export function castAbility(
   }
   // druid forms gate their kit both ways: form abilities need the form, and
   // everything else (the caster kit) is locked while shapeshifted
-  const form = p.auras.find(
-    (a) => a.kind === 'form_bear' || a.kind === 'form_cat' || a.kind === 'form_travel',
-  );
+  const form = p.auras.find((a) => isResourceShiftFormAuraKind(a.kind));
   if (ability.requiresForm) {
     const need = ability.requiresForm === 'bear' ? 'form_bear' : 'form_cat';
     if (!form || form.kind !== need) {
@@ -476,10 +467,7 @@ export function spendResource(p: Entity, cost: number): void {
 function formShiftKind(p: Entity, ability: AbilityDef): 'off' | 'cross' | null {
   if (!isFormToggle(ability)) return null;
   if (p.auras.some((a) => a.id === ability.id)) return 'off';
-  if (
-    p.auras.some((a) => a.kind === 'form_bear' || a.kind === 'form_cat' || a.kind === 'form_travel')
-  )
-    return 'cross';
+  if (p.auras.some((a) => isFormAuraKind(a.kind))) return 'cross';
   return null;
 }
 
@@ -488,7 +476,16 @@ function spendAbilityCost(p: Entity, res: ResolvedAbility): void {
   const shift = formShiftKind(p, res.def);
   if (shift === 'off') return;
   if (shift === 'cross') {
-    p.savedMana = Math.max(0, p.savedMana - res.cost);
+    // The parked-mana debit only applies when the CURRENT form swapped the
+    // resource bar (bear/cat rage/energy park the mana pool). A caster form
+    // (moonkin/shadow) keeps the live mana bar, and recalc would overwrite
+    // savedMana on the next resource-shift entry anyway, so bill live mana.
+    const parked = p.auras.some((a) => isResourceShiftFormAuraKind(a.kind));
+    if (parked) {
+      p.savedMana = Math.max(0, p.savedMana - res.cost);
+    } else {
+      spendResource(p, res.cost);
+    }
     return;
   }
   spendResource(p, res.cost);

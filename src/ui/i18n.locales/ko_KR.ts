@@ -1153,6 +1153,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.notEnoughMana': '마나가 부족합니다!',
   'hud.errors.notEnoughResource': '{resource}이 부족합니다!',
   'hud.errors.notEnoughHealth': '생명력이 부족합니다.',
+  'hud.errors.nothingToConsume': '소모할 효과가 없습니다.',
   'hud.errors.targetMustDodge': '대상이 먼저 회피해야 합니다.',
   'hud.errors.requiresCombo': '그 능력은 연계 점수가 필요합니다.',
   'hud.errors.requiresForm': '{form} 변신 상태여야 합니다.',

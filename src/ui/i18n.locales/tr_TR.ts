@@ -3332,6 +3332,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.noTarget': 'Hiçbir hedefin yok.',
   'hud.errors.notEnoughEnergy': 'Yeterli enerji yok!',
   'hud.errors.notEnoughHealth': 'Yeterli can yok.',
+  'hud.errors.nothingToConsume': 'Tüketilecek bir şey yok.',
   'hud.errors.notEnoughMana': 'Yeterli mana yok!',
   'hud.errors.notEnoughRage': 'Yeterli öfke yok!',
   'hud.errors.notEnoughResource': 'Yeterli {resource} yok!',

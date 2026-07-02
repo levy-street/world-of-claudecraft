@@ -3163,6 +3163,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughMana": "Inte tillräckligt med mana!",
       "notEnoughResource": "Inte tillräckligt med {resource}!",
       "notEnoughHealth": "Inte tillräckligt med hälsa.",
+      "nothingToConsume": "Inget att förtära.",
       "targetMustDodge": "Ditt mål måste väja undan först.",
       "requiresCombo": "Den förmågan kräver kombopoäng.",
       "requiresForm": "Du måste vara i {form}-form.",

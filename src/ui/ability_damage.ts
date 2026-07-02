@@ -11,6 +11,7 @@ import type { ResolvedAbility } from '../sim/sim';
 import {
   abilityScalingPower,
   channelTickBonus,
+  directHealBonus,
   directHitBonus,
   dotTickBonus,
 } from '../sim/spell_scaling';
@@ -52,6 +53,13 @@ export function abilityDamageBonus(
     case 'aoeDamage':
     case 'aoeRoot':
       return directHitBonus(power, def, res.castTime, true);
+    case 'aoeHeal':
+      // AoE heals take the same per-target coefficient penalty as aoeDamage.
+      return directHealBonus(scaling.spellPower, res.castTime, true);
+    case 'consumeAura':
+      if (eff.deal) return directHitBonus(power, def, res.castTime, false);
+      if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
+      return 0;
     case 'drainTick':
       return channelTickBonus(power, def);
     case 'dot': {

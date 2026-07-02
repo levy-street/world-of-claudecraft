@@ -3163,6 +3163,7 @@ export const fr_FR: EnTranslations = {
       "notEnoughMana": "Pas assez de mana !",
       "notEnoughResource": "Pas assez de {resource} !",
       "notEnoughHealth": "Pas assez de points de vie.",
+      "nothingToConsume": "Rien à consommer.",
       "targetMustDodge": "Votre cible doit d'abord esquiver.",
       "requiresCombo": "Cette technique requiert des points de combo.",
       "requiresForm": "Vous devez être en forme de {form}.",

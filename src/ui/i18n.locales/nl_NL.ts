@@ -3382,6 +3382,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.noTarget': 'Je hebt geen doelwit.',
   'hud.errors.notEnoughEnergy': 'Niet genoeg energie!',
   'hud.errors.notEnoughHealth': 'Niet genoeg gezondheid.',
+  'hud.errors.nothingToConsume': 'Niets om te verbruiken.',
   'hud.errors.notEnoughMana': 'Niet genoeg mana!',
   'hud.errors.notEnoughRage': 'Niet genoeg woede!',
   'hud.errors.notEnoughResource': 'Niet genoeg {resource}!',

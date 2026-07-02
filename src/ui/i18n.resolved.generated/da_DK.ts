@@ -3163,6 +3163,7 @@ export const da_DK: EnTranslations = {
       "notEnoughMana": "Ikke nok mana!",
       "notEnoughResource": "Ikke nok {resource}!",
       "notEnoughHealth": "Ikke nok helbred.",
+      "nothingToConsume": "Intet at forbruge.",
       "targetMustDodge": "Dit mål skal undvige først.",
       "requiresCombo": "Den evne kræver kombopoint.",
       "requiresForm": "Du skal være i {form}-form.",

@@ -3163,6 +3163,7 @@ export const en_XA: EnTranslations = {
       "notEnoughMana": "[Ñóţ éñóúĝĥ ɱáñá!]",
       "notEnoughResource": "[Ñóţ éñóúĝĥ {resource}!]",
       "notEnoughHealth": "[Ñóţ éñóúĝĥ ĥéáļţĥ.]",
+      "nothingToConsume": "[Ñóţĥíñĝ ţó çóñšúɱé.]",
       "targetMustDodge": "[Ýóúŕ ţáŕĝéţ ɱúšţ ðóðĝé ƒíŕšţ.]",
       "requiresCombo": "[Ţĥáţ áƀíļíţý ŕéɋúíŕéš çóɱƀó þóíñţš.]",
       "requiresForm": "[Ýóú ɱúšţ ƀé íñ {form} Ƒóŕɱ.]",

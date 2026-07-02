@@ -3163,6 +3163,7 @@ export const de_DE: EnTranslations = {
       "notEnoughMana": "Nicht genug Mana!",
       "notEnoughResource": "Nicht genug {resource}!",
       "notEnoughHealth": "Nicht genug Gesundheit.",
+      "nothingToConsume": "Nichts zu verzehren.",
       "targetMustDodge": "Euer Ziel muss zuerst ausweichen.",
       "requiresCombo": "Diese Fähigkeit benötigt Combopunkte.",
       "requiresForm": "Ihr müsst in {form}form sein.",
