@@ -99,13 +99,36 @@ export type PlayerRace =
   | 'nomad'
   | 'stone_warden';
 
-// A playable race record (content/races.ts). Races are identity, not power:
-// they pick the faction and a cosmetic body scale, never stats or abilities,
-// so no race is ever a mechanical advantage.
+// A race's passive trait, WoW-style: one small always-on bonus folded into
+// recalcPlayerStats (or, for restedRatePct, the rested-XP accrual). Values are
+// deliberately modest (1-5%): flavor that interacts with the class choice, not
+// a mandatory min-max pick. Names/descriptions live client-side in the i18n
+// catalog (races.racial*); the sim stays language-agnostic.
+export interface RacialEffects {
+  strPct?: number;
+  agiPct?: number;
+  staPct?: number;
+  intPct?: number;
+  spiPct?: number;
+  armorPct?: number;
+  maxHpPct?: number;
+  spellPowerPct?: number;
+  crit?: number; // additive crit chance (0.01 = +1%)
+  dodge?: number; // additive dodge chance
+  castPushbackReduction?: number; // 0.2 = pushback reduced 20%
+  restedRatePct?: number; // rested-XP accrues this much faster (human)
+}
+
+// A playable race record (content/races.ts). A race picks the faction, a
+// cosmetic base aspect (body scale + a subtle model tint), and one passive
+// racial trait. Pre-race saves load as 'human', whose racial is rested-XP
+// only, so a legacy character's combat numbers stay byte-identical.
 export interface RaceDef {
   id: PlayerRace;
   faction: PlayerFaction;
   scale: number; // cosmetic body-size multiplier (render hint, like buff_scale)
+  tint: number; // cosmetic model tint (render hint; never feeds gameplay)
+  racial: RacialEffects;
 }
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking

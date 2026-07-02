@@ -1,5 +1,7 @@
-// Playable races (Valdris): identity persistence, back-compat defaulting, and
-// the gameplay-neutrality contract (races carry a cosmetic scale, never stats).
+// Playable races (Valdris): identity persistence, back-compat defaulting, the
+// cosmetic base aspect (scale + tint), and the racial passives contract: one
+// small always-on effect per race, folded by recalcPlayerStats (human's is
+// rested-XP only so pre-race saves keep byte-identical combat numbers).
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -41,13 +43,19 @@ describe('race registry', () => {
     expect(isPlayerRace(undefined)).toBe(false);
   });
 
-  it('races are identity only: no stats, no abilities, just a cosmetic scale', () => {
+  it('every race has a base aspect (scale + tint) and exactly one distinct racial effect', () => {
     for (const race of RACE_LIST) {
       const def = RACES[race];
-      expect(Object.keys(def).sort()).toEqual(['faction', 'id', 'scale']);
+      expect(Object.keys(def).sort()).toEqual(['faction', 'id', 'racial', 'scale', 'tint']);
       expect(def.scale).toBeGreaterThan(0.5);
       expect(def.scale).toBeLessThan(1.5);
+      expect(def.tint).toBeGreaterThan(0);
+      expect(def.tint).toBeLessThanOrEqual(0xffffff);
+      expect(Object.keys(def.racial)).toHaveLength(1);
     }
+    // no two races share an effect kind: twelve races, twelve distinct passives
+    const kinds = RACE_LIST.map((r) => Object.keys(RACES[r].racial)[0]);
+    expect(new Set(kinds).size).toBe(RACE_LIST.length);
   });
 });
 
@@ -115,19 +123,87 @@ describe('race persistence and back-compat', () => {
   });
 });
 
-describe('race gameplay neutrality', () => {
-  it('two same-class characters of different races have identical combat stats', () => {
+describe('racial passives', () => {
+  // Human is the reference body: its racial is rested-XP only, so a human's
+  // combat stats are exactly the class/level/gear baseline.
+  const pair = (cls: Parameters<Sim['addPlayer']>[0], race: PlayerRace) => {
     const sim = makeSim();
-    const a = sim.addPlayer('warrior', 'Tiny', { race: 'gnome' });
-    const b = sim.addPlayer('warrior', 'Huge', { race: 'stone_warden' });
-    const ea = sim.entities.get(a)!;
-    const eb = sim.entities.get(b)!;
-    expect(ea.stats).toEqual(eb.stats);
-    expect(ea.maxHp).toBe(eb.maxHp);
-    expect(ea.attackPower).toBe(eb.attackPower);
-    expect(ea.moveSpeed).toBe(eb.moveSpeed);
-    // the ONLY divergence is the cosmetic body scale
-    expect(ea.scale).toBeCloseTo(RACES.gnome.scale, 5);
-    expect(eb.scale).toBeCloseTo(RACES.stone_warden.scale, 5);
+    const h = sim.entities.get(sim.addPlayer(cls, 'Ref', { race: 'human' }))!;
+    const r = sim.entities.get(sim.addPlayer(cls, 'Raced', { race }))!;
+    return { h, r };
+  };
+
+  it('human keeps the pre-race combat baseline (cosmetic scale 1, rested-only racial)', () => {
+    expect(Object.keys(RACES.human.racial)).toEqual(['restedRatePct']);
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Legacy');
+    const e = sim.entities.get(pid)!;
+    expect(sim.meta(pid)!.race).toBe('human');
+    expect(e.scale).toBe(1);
+  });
+
+  it('primary-attribute racials multiply the summed attribute', () => {
+    const { h: hm, r: gn } = pair('mage', 'gnome');
+    expect(gn.stats.int).toBe(Math.round(hm.stats.int * 1.05));
+    const { h: hr, r: sw } = pair('rogue', 'shadow_walker');
+    expect(sw.stats.agi).toBe(Math.round(hr.stats.agi * 1.03));
+    const { h: hw, r: qw } = pair('warrior', 'stone_warden');
+    expect(qw.stats.str).toBe(Math.round(hw.stats.str * 1.03));
+    expect(qw.attackPower).toBeGreaterThan(hw.attackPower); // str feeds warrior AP
+    const { h: hp, r: fk } = pair('priest', 'frost_kin');
+    expect(fk.stats.sta).toBe(Math.round(hp.stats.sta * 1.03));
+    // sta feeds hp, though at level 1 the 3% can round away entirely
+    expect(fk.maxHp).toBeGreaterThanOrEqual(hp.maxHp);
+    const { h: hs, r: nm } = pair('shaman', 'nomad');
+    expect(nm.stats.spi).toBe(Math.round(hs.stats.spi * 1.05));
+  });
+
+  it('derived-stat racials fold at their own steps', () => {
+    const { h: hw, r: dw } = pair('warrior', 'dwarf');
+    expect(dw.stats.armor).toBe(Math.round(hw.stats.armor * 1.05));
+    const { h: he, r: el } = pair('hunter', 'elf');
+    expect(el.dodgeChance).toBeCloseTo(he.dodgeChance + 0.01, 10);
+    const { h: hf, r: df } = pair('warlock', 'dark_fae');
+    expect(df.critChance).toBeCloseTo(hf.critChance + 0.01, 10);
+    const { h: hx, r: ee } = pair('mage', 'elf_exile');
+    expect(ee.castPushbackReduction).toBeCloseTo(hx.castPushbackReduction + 0.2, 10);
+    const { h: hd, r: dc } = pair('paladin', 'desert_clan');
+    expect(dc.maxHp).toBe(Math.round(hd.maxHp * 1.03));
+    const { h: hg, r: sm } = pair('mage', 'sand_mage');
+    expect(sm.spellPower).toBe(Math.round(hg.spellPower * 1.05));
+  });
+
+  it('setPlayerRace applies the racial immediately', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('mage', 'Switch', { race: 'human' });
+    const before = sim.entities.get(pid)!.stats.int;
+    sim.setPlayerRace(pid, 'gnome');
+    expect(sim.entities.get(pid)!.stats.int).toBe(Math.round(before * 1.05));
+    expect(sim.entities.get(pid)!.scale).toBeCloseTo(RACES.gnome.scale, 5);
+  });
+
+  it('humans accrue rested XP 25% faster at an inn', () => {
+    const sim = makeSim();
+    const human = sim.addPlayer('warrior', 'Innkeep', { race: 'human' });
+    const elf = sim.addPlayer('warrior', 'Wanderer', { race: 'elf' });
+    // park both inside the Eastbrook inn footprint (zone1 PROPS)
+    for (const pid of [human, elf]) {
+      const e = sim.entities.get(pid)!;
+      e.pos.x = 12;
+      e.pos.z = -6;
+    }
+    for (let i = 0; i < 200; i++) sim.tick();
+    const restedHuman = sim.meta(human)!.restedXp;
+    const restedElf = sim.meta(elf)!.restedXp;
+    expect(restedElf).toBeGreaterThan(0);
+    expect(restedHuman / restedElf).toBeCloseTo(1.25, 3);
+  });
+
+  it('the cosmetic body scale still tracks the race', () => {
+    const sim = makeSim();
+    const a = sim.entities.get(sim.addPlayer('warrior', 'Tiny', { race: 'gnome' }))!;
+    const b = sim.entities.get(sim.addPlayer('warrior', 'Huge', { race: 'stone_warden' }))!;
+    expect(a.scale).toBeCloseTo(RACES.gnome.scale, 5);
+    expect(b.scale).toBeCloseTo(RACES.stone_warden.scale, 5);
   });
 });

@@ -113,15 +113,27 @@ export class CharacterVisual {
     skinIndex = 0,
     weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
+    tintOverride: { color: number; strength: number } | null = null,
   ) {
     const prep = prepareVisual(key);
     // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
     // wearer class's held-weapon layout (e.g. the rogue dual-wields in both hands).
     // Override just attach + weaponSlots on a shallow def clone, leaving the rest of
     // the def (clips/height/tint) intact and never mutating the shared cached def.
-    this.def = weaponOverride
-      ? { ...prep.def, attach: weaponOverride.attach, weaponSlots: weaponOverride.weaponSlots }
-      : prep.def;
+    // A tint override (the per-race cosmetic cast) likewise lands on a shallow
+    // clone so the shared cached def is never mutated.
+    this.def =
+      weaponOverride || tintOverride
+        ? {
+            ...prep.def,
+            ...(weaponOverride
+              ? { attach: weaponOverride.attach, weaponSlots: weaponOverride.weaponSlots }
+              : {}),
+            ...(tintOverride
+              ? { tint: tintOverride.color, tintStrength: tintOverride.strength }
+              : {}),
+          }
+        : prep.def;
     this.key = key;
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
@@ -165,7 +177,7 @@ export class CharacterVisual {
     if (prep.idleGeo) {
       this.farMesh = new THREE.Mesh(
         prep.idleGeo,
-        tintedFarMaterials(prep.def, entityColor, prep.idleSrcMats),
+        tintedFarMaterials(this.def, entityColor, prep.idleSrcMats),
       );
       this.farMaterials = this.farMesh.material;
       this.farMesh.visible = false;

@@ -260,6 +260,7 @@ import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 import { QuestLogWindow } from './questlog_window';
+import { raceDisplayName, racialTraitDesc, racialTraitName } from './race_display';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { restView } from './rest_indicator';
@@ -10325,6 +10326,19 @@ export class Hud {
     if (e?.kind !== 'player') return;
     const cls = e.templateId as PlayerClass;
     const className = classDisplayName(cls);
+    // Race rides the identity wire (`rc`), so the inspected player's race and
+    // racial trait render fully client-side like the class does.
+    const inspectLevel = formatNumber(e.level, { maximumFractionDigits: 0 });
+    const inspectMeta = e.race
+      ? t('races.levelRaceClass', {
+          level: inspectLevel,
+          race: raceDisplayName(e.race),
+          className,
+        })
+      : t('itemUi.equipment.levelClass', { level: inspectLevel, className });
+    const racialHtml = e.race
+      ? `<div class="inspect-racial">${esc(t('races.racialLabel'))}: ${esc(racialTraitName(e.race))} (${esc(racialTraitDesc(e.race))})</div>`
+      : '';
     const el = $('#inspect-window');
     this.closeOtherWindows('#inspect-window');
     // $WOC holder-tier flair: cosmetic badge for a connected/holder wallet,
@@ -10411,7 +10425,8 @@ export class Hud {
       `<div class="inspect-card">` +
       portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg' }) +
       `<div class="inspect-name">${esc(e.name)}</div>` +
-      `<div class="inspect-meta">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(e.level, { maximumFractionDigits: 0 }), className }))}</div>` +
+      `<div class="inspect-meta">${esc(inspectMeta)}</div>` +
+      racialHtml +
       holderHtml +
       discordHtml +
       devHtml +

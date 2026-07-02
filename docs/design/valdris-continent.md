@@ -73,12 +73,17 @@ Three player factions (`PlayerFaction`), each with four playable races
 - Confederation of Veth: Elf, Dark Fae, Frost Kin, Shadow Walker.
 - Domain of Ossara: Desert Clan, Sand Mage, Nomad, Stone Warden.
 
-Races are identity, not power: they set the faction and a cosmetic body
-scale. No stats, no racial abilities (deliberate: the repo rule is never to
-invent balance numbers; classic racials can be added later from real data).
-Faction is derived from race and never stored separately. Characters saved
-before races existed load as Human (Kael) via the standard optional-JSONB
-default in `addPlayer`; their saved position (the Landing) is untouched.
+A race sets the faction, a cosmetic base aspect (body scale plus a subtle
+model tint the renderer applies), and ONE passive racial trait in the classic
+1-5% band (`RacialEffects` on the race record, folded by `recalcPlayerStats`;
+see `src/sim/content/races.ts` for the twelve traits). The human racial is
+rested-XP only (Promise of the Landing: rested XP accrues 25% faster), a
+deliberate choice so pre-race characters, which load as Human, keep
+byte-identical combat numbers. Racial names/descriptions are client i18n
+(`races.racial*`). Faction is derived from race and never stored separately.
+Characters saved before races existed load as Human (Kael) via the standard
+optional-JSONB default in `addPlayer`; their saved position (the Landing) is
+untouched.
 
 Every new character of every race still spawns at The Landing's
 `PLAYER_START`: the lore's tutorial island is the shared first-spawn zone,

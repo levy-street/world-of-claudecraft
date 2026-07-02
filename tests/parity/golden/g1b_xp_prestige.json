@@ -103,7 +103,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1360,
-      "state": "4bb7525b",
+      "state": "ddc7bbd3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -114,7 +114,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1360,
-      "state": "5ca04943",
+      "state": "a85ea380",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -125,7 +125,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1360,
-      "state": "4878379d",
+      "state": "9a63e9a0",
       "events": "741638a5",
       "rng": {
         "draws": 313,
@@ -136,7 +136,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1360,
-      "state": "4878379d",
+      "state": "9a63e9a0",
       "events": "741638a5",
       "rng": {
         "draws": 313,
@@ -160,7 +160,7 @@
             "mainhand": "worn_sword"
           },
           "race": "human",
-          "restedXp": 0.125,
+          "restedXp": 0.15625,
           "talents": {
             "choices": {},
             "ranks": {}

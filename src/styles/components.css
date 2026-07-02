@@ -912,6 +912,21 @@
     color: #fff;
     font-weight: normal;
   }
+  /* Racial-trait row under the stat grid; hover/focus opens the description
+     tooltip like a stat cell. */
+  .char-racial {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 8px;
+    border-top: 1px solid #463a1c;
+    padding-top: 8px;
+    display: flex;
+    gap: 6px;
+    cursor: var(--cursor-point);
+  }
+  .char-racial-name {
+    color: #fff;
+  }
   /* Each stat is a hoverable/focusable cell that opens a class-aware breakdown
      tooltip. The padding + matching negative margin turn the hover/focus tint into
      a padded pill WITHOUT moving the text (layout-neutral: the margin box equals the

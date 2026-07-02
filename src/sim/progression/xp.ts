@@ -4,6 +4,7 @@
 // (`updateRested` / `isResting`), MOVED verbatim out of sim.ts behind SimContext
 // (move + import, not a rewrite). The XP curve formulas (xpForLevel / canPrestige)
 // stay pure in ../types and are imported here.
+import { RACES } from '../content/races';
 import { PROPS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -50,7 +51,10 @@ export function updateRested(p: Entity, meta: PlayerMeta): void {
   }
   if (!isResting(p)) return;
   const fillSeconds = RESTED_FILL_HOURS * RESTED_SECONDS_PER_GAME_HOUR;
-  const perSecond = (RESTED_FILL_FRACTION * xpForLevel(p.level)) / fillSeconds;
+  // Racial: humans (Promise of the Landing) accrue rested XP faster. Rate-only
+  // and rng-free, so it never touches combat parity for pre-race saves.
+  const racialRate = 1 + (p.race ? (RACES[p.race].racial.restedRatePct ?? 0) : 0);
+  const perSecond = ((RESTED_FILL_FRACTION * xpForLevel(p.level)) / fillSeconds) * racialRate;
   meta.restedXp = Math.min(cap, meta.restedXp + perSecond * DT);
 }
 

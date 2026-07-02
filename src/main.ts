@@ -160,6 +160,7 @@ import {
   setStandingProvider,
 } from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
+import { raceDisplayName, racialTraitDesc, racialTraitName } from './ui/race_display';
 import { tServer } from './ui/server_i18n';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
@@ -2641,12 +2642,15 @@ function updatePreviewContainer(panelId: string): void {
     // The selected roster row drives the showcase (class + that character's chroma).
     const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
     const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
+    characterPreview.setRace((row?.dataset.race as PlayerRace | undefined) ?? null);
     characterPreview.setClass(cls);
     characterPreview.setSkin(Number(row?.dataset.skin ?? 0) || 0);
     syncPreviewAfterPanelLayout();
     return;
   }
 
+  // creation panels: the turntable previews the picked race's aspect too
+  characterPreview.setRace(panelId === '#charcreate-panel' ? onlineRace : offlineRace);
   const selSelector =
     panelId === '#charcreate-panel'
       ? '#charcreate-panel .mini-class.sel'
@@ -3641,7 +3645,9 @@ async function refreshCharacters(): Promise<void> {
       row.setAttribute('aria-selected', 'false');
       row.dataset.class = c.class;
       row.dataset.skin = String(c.skin ?? 0);
+      row.dataset.race = c.race ?? 'human';
       const className = classDisplayName(c.class);
+      const raceName = raceDisplayName(c.race ?? 'human');
       // Online characters explain themselves on their own hint line (below the
       // class) instead of the terse "(in world)" suffix, so the reason for the
       // Take Over button is unmissable.
@@ -3652,7 +3658,7 @@ async function refreshCharacters(): Promise<void> {
       row.innerHTML = `${portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm' })}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>
-          <span class="char-sub">${escapeHtml(t('character.levelClass', { level: c.level, className }))}${escapeHtml(statusText)}</span>
+          <span class="char-sub">${escapeHtml(t('races.levelRaceClass', { level: c.level, race: raceName, className }))}${escapeHtml(statusText)}</span>
           ${inWorldHint}
         </div>
         ${
@@ -6465,7 +6471,16 @@ function wireStartScreens(): void {
   // (online create + offline quick-start). Selection is pure UI state; the
   // server (or the offline Sim) re-validates the race id on create.
   const wireRacePicker = (panelSel: string, onPick: (race: PlayerRace) => void) => {
+    const infoEl = document.querySelector(`${panelSel} .race-racial-info`);
+    const showRacial = (race: PlayerRace) => {
+      if (infoEl) infoEl.textContent = `${racialTraitName(race)}: ${racialTraitDesc(race)}`;
+    };
+    const selectedRace = (): PlayerRace =>
+      ((document.querySelector(`${panelSel} .mini-race.sel`) as HTMLElement | null)?.dataset
+        .race as PlayerRace) ?? 'human';
+    showRacial(selectedRace());
     document.querySelectorAll(`${panelSel} .mini-race`).forEach((el) => {
+      const race = ((el as HTMLElement).dataset.race as PlayerRace) ?? 'human';
       const selectRace = () => {
         document.querySelectorAll(`${panelSel} .mini-race`).forEach((x) => {
           x.classList.remove('sel');
@@ -6473,19 +6488,27 @@ function wireStartScreens(): void {
         });
         el.classList.add('sel');
         el.setAttribute('aria-pressed', 'true');
-        onPick(((el as HTMLElement).dataset.race as PlayerRace) ?? 'human');
+        showRacial(race);
+        onPick(race);
       };
       el.addEventListener('click', selectRace);
       el.addEventListener('keydown', (e) =>
         handleKeyboardActivation(e as KeyboardEvent, selectRace),
       );
+      // hover/focus peeks that race's racial trait; leaving restores the pick
+      el.addEventListener('mouseenter', () => showRacial(race));
+      el.addEventListener('focus', () => showRacial(race));
+      el.addEventListener('mouseleave', () => showRacial(selectedRace()));
+      el.addEventListener('blur', () => showRacial(selectedRace()));
     });
   };
   wireRacePicker('#charcreate-panel', (race) => {
     onlineRace = race;
+    characterPreview?.setRace(race);
   });
   wireRacePicker('#offline-select', (race) => {
     offlineRace = race;
+    characterPreview?.setRace(race);
   });
 
   // character creation

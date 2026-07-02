@@ -2,7 +2,7 @@ import { RACES } from './content/races';
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { meetsLevelRequirement } from './item_level_req';
-import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
+import type { Entity, EquipSlot, MobTemplate, PlayerClass, PlayerRace, Stats, Vec3 } from './types';
 import { EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
 
 function baseEntity(id: number, pos: Vec3): Entity {
@@ -253,6 +253,21 @@ export function recalcPlayerStats(
     if (m.intPct) s.int = Math.round(s.int * (1 + m.intPct));
     if (m.spiPct) s.spi = Math.round(s.spi * (1 + m.spiPct));
   }
+  // Racial passives (content/races.ts): one small always-on bonus per race.
+  // Primary-attribute percents land here, after gear/buffs/talents, so they
+  // multiply the fully-summed attribute and flow into every derivation below
+  // (agi -> armor/dodge, int -> spell power/mana, sta -> hp). The derived-stat
+  // racials (armor/crit/dodge/pushback/spell power/max hp) fold at their own
+  // steps. Human carries no combat racial (rested-XP only, see progression/
+  // xp.ts), so pre-race saves keep byte-identical numbers.
+  const racial = e.race ? RACES[e.race].racial : undefined;
+  if (racial) {
+    if (racial.strPct) s.str = Math.round(s.str * (1 + racial.strPct));
+    if (racial.agiPct) s.agi = Math.round(s.agi * (1 + racial.agiPct));
+    if (racial.staPct) s.sta = Math.round(s.sta * (1 + racial.staPct));
+    if (racial.intPct) s.int = Math.round(s.int * (1 + racial.intPct));
+    if (racial.spiPct) s.spi = Math.round(s.spi * (1 + racial.spiPct));
+  }
   // Floor Agility at 0 so a draining debuff (negative buff_agi) can never push the
   // derived armor/dodge below what zero Agility would give.
   s.agi = Math.max(0, s.agi);
@@ -266,6 +281,7 @@ export function recalcPlayerStats(
     s.agi += Math.max(2, Math.floor(lvl / 2));
   }
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
+  if (racial?.armorPct) s.armor = Math.round(s.armor * (1 + racial.armorPct));
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.
   s.spi = Math.max(0, s.spi);
@@ -309,17 +325,22 @@ export function recalcPlayerStats(
       : 0;
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
-  e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
+  e.spellPower = Math.max(
+    0,
+    Math.round((s.int * SPELL_POWER_PER_INT + bonusSp) * (1 + (racial?.spellPowerPct ?? 0))),
+  );
   // Crit: ~1% per 20 agi at low level
-  e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
-  e.castPushbackReduction = setEff.castPushbackReduction;
+  e.critChance =
+    0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit + (racial?.crit ?? 0);
+  e.castPushbackReduction = setEff.castPushbackReduction + (racial?.castPushbackReduction ?? 0);
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
-  e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
+  e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge + (racial?.dodge ?? 0));
 
   const hpFrac = e.maxHp > 0 ? e.hp / e.maxHp : 1;
   e.maxHp = def.baseHp + def.hpPerLevel * (lvl - 1) + hpFromStamina(s.sta);
   if (bearForm) e.maxHp = Math.round(e.maxHp * 1.15);
   if (mods?.stats.maxHpPct) e.maxHp = Math.round(e.maxHp * (1 + mods.stats.maxHpPct));
+  if (racial?.maxHpPct) e.maxHp = Math.round(e.maxHp * (1 + racial.maxHpPct));
   // Fiesta "Colossus"-style buffs: growing bigger also makes you tankier.
   if (scaleMul > 1) e.maxHp = Math.round(e.maxHp * scaleMul);
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));
@@ -372,9 +393,11 @@ export function characterDerivedStats(
   level: number,
   equipment: PlayerEquipment,
   mods?: TalentModifiers,
+  race?: PlayerRace,
 ): DerivedCharacterStats {
   const e = createPlayer(0, cls, { x: 0, y: 0, z: 0 }, '');
   e.level = Math.max(1, Math.floor(level));
+  if (race) e.race = race; // racial passives shape the sheet like a live player
   recalcPlayerStats(e, cls, equipment, mods);
   return {
     stats: e.stats,

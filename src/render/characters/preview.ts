@@ -1,9 +1,14 @@
 import * as THREE from 'three';
+import { RACES } from '../../sim/content/races';
 import { CLASSES } from '../../sim/data';
-import type { PlayerClass } from '../../sim/types';
+import type { PlayerClass, PlayerRace } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
 import type { WeaponLayoutOverride } from './manifest';
 import { CharacterVisual } from './visual';
+
+// Mirror of the in-world race cast (see index.ts raceTintFor) so the creation
+// turntable previews the picked race's aspect.
+const PREVIEW_RACE_TINT_STRENGTH = 0.22;
 
 const PREVIEW_ANIM_STATE = {
   speed: 0,
@@ -25,6 +30,11 @@ export class CharacterPreview {
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
   private currentSkin = 0;
+  private currentRace: PlayerRace | null = null;
+  // last-shown model, so setRace/setSkin can rebuild it with the new aspect
+  private lastVisualKey: string | null = null;
+  private lastWeaponItemId: string | null = null;
+  private lastWeaponOverride: WeaponLayoutOverride | null = null;
   private clock = new THREE.Clock();
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -118,6 +128,15 @@ export class CharacterPreview {
       this.currentVisual = null;
     }
 
+    this.lastVisualKey = visualKey;
+    this.lastWeaponItemId = weaponItemId;
+    this.lastWeaponOverride = weaponOverride;
+    // Race aspect: player-class bodies take the picked race's tint + scale;
+    // cosmetic bodies (mech) and non-player keys stay untouched.
+    const raced =
+      this.currentRace && visualKey.startsWith('player_') && visualKey !== 'player_mech'
+        ? RACES[this.currentRace]
+        : null;
     try {
       this.currentVisual = new CharacterVisual(
         visualKey,
@@ -125,7 +144,9 @@ export class CharacterPreview {
         this.currentSkin,
         weaponItemId,
         weaponOverride,
+        raced ? { color: raced.tint, strength: PREVIEW_RACE_TINT_STRENGTH } : null,
       );
+      this.currentVisual.root.scale.setScalar(raced ? raced.scale : 1);
       this.characterGroup.add(this.currentVisual.root);
 
       // Reset rotation of group so new character faces forward but holds any user offset if preferred.
@@ -133,6 +154,16 @@ export class CharacterPreview {
       this.characterGroup.rotation.y = 0;
     } catch (err) {
       console.error(`Failed to load preview character visual for ${visualKey}:`, err);
+    }
+  }
+
+  /** Preview a race's cosmetic aspect (tint + body scale); persists across
+   *  setClass. Pass null to clear (e.g. the cosmetic-body turntable). */
+  setRace(race: PlayerRace | null): void {
+    if (this.destroyed || race === this.currentRace) return;
+    this.currentRace = race;
+    if (this.lastVisualKey) {
+      this.setVisualKey(this.lastVisualKey, this.lastWeaponItemId, this.lastWeaponOverride);
     }
   }
 

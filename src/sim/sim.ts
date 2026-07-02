@@ -1478,6 +1478,9 @@ export class Sim {
     if (!meta || !e || !isPlayerRace(race)) return false;
     meta.race = race;
     e.race = race;
+    // apply the racial passive (and cosmetic scale) immediately, not on the
+    // next incidental recalc
+    recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta));
     return true;
   }
 
