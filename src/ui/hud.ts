@@ -945,6 +945,9 @@ export class Hud {
   // Zones waiting for an idle map-background prewarm (the whole world is
   // queued at world entry; priority requests jump to the front).
   private mapPrewarmQueue: string[] = [];
+  // Partially rendered prewarm jobs preempted by a priority request; each
+  // resumes from its parked row when its zone reaches the queue front again.
+  private readonly mapPrewarmParked = new Map<string, NonNullable<Hud['mapPrewarm']>>();
   private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
   private mapView: {
     spanX: number;
@@ -4695,7 +4698,9 @@ export class Hud {
             this.logZoneWelcome(currentZone);
           }
           this.lastZoneId = currentZone.id;
-          this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
+          // priority: the just-entered zone preempts the background trickle so
+          // its map bg is ready (or nearly so) before the player opens the map
+          this.prewarmMapBg(currentZone.id, true);
         }
       }
 
@@ -5457,26 +5462,42 @@ export class Hud {
 
   // Kick off (or queue) an idle, time-sliced render of a zone's map background
   // so opening the map never pays the ~200ms terrain cost on the click. Every
-  // zone is queued once at world entry; priority requests (the committed zone,
-  // an atlas drill-down) jump the queue while the in-flight slice finishes.
+  // zone is queued once at world entry. A priority request (the zone being
+  // viewed, the player's zone on a border crossing) PREEMPTS the in-flight
+  // render: that job is parked with its progress intact and re-queued at the
+  // front, so the zone the player actually needs never waits behind a
+  // background trickle.
   private prewarmMapBg(zoneId: string, priority = false): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
     if (this.mapPrewarm) {
-      // a job is in flight: queue this zone instead of dropping either render
-      const at = this.mapPrewarmQueue.indexOf(zoneId);
-      if (at >= 0) {
-        if (!priority || at === 0) return;
-        this.mapPrewarmQueue.splice(at, 1);
+      if (priority) {
+        const parked = this.mapPrewarm;
+        this.mapPrewarmParked.set(parked.zoneId, parked);
+        this.mapPrewarmQueue = this.mapPrewarmQueue.filter(
+          (id) => id !== parked.zoneId && id !== zoneId,
+        );
+        this.mapPrewarmQueue.unshift(parked.zoneId);
+        this.mapPrewarm = null;
+        this.cancelMapPrewarmTick();
+        this.startMapPrewarmJob(zoneId);
+        return;
       }
-      if (priority) this.mapPrewarmQueue.unshift(zoneId);
-      else this.mapPrewarmQueue.push(zoneId);
+      if (!this.mapPrewarmQueue.includes(zoneId)) this.mapPrewarmQueue.push(zoneId);
       return;
     }
     this.startMapPrewarmJob(zoneId);
   }
 
   private startMapPrewarmJob(zoneId: string): void {
+    // a preempted job resumes from the row it was parked at
+    const parked = this.mapPrewarmParked.get(zoneId);
+    if (parked) {
+      this.mapPrewarmParked.delete(zoneId);
+      this.mapPrewarm = parked;
+      this.scheduleMapPrewarm();
+      return;
+    }
     const zone = ZONES.find((z) => z.id === zoneId);
     if (!zone) return;
     const region = this.mapZoneRegion(zone);
@@ -5499,8 +5520,17 @@ export class Hud {
     this.scheduleMapPrewarm();
   }
 
-  // (the old cancelMapPrewarm was dropped with the sync-render fallback: the
-  // prewarm queue never abandons a job, it finishes each render and moves on)
+  // Cancel the pending pump tick (used by preemption so the freshly started
+  // priority job reschedules at its own, possibly urgent, cadence instead of
+  // waiting out a parked 500ms idle slot).
+  private cancelMapPrewarmTick(): void {
+    if (!this.mapPrewarmVia) return;
+    const w = window as typeof window & { cancelIdleCallback?: (handle: number) => void };
+    if (this.mapPrewarmVia === 'idle') w.cancelIdleCallback?.(this.mapPrewarmHandle);
+    else window.clearTimeout(this.mapPrewarmHandle);
+    this.mapPrewarmHandle = 0;
+    this.mapPrewarmVia = null;
+  }
 
   /** True while the open zone map is waiting on the in-flight prewarm (it is
    *  showing the placeholder backdrop), which upgrades the trickle cadence. */
