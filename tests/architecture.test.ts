@@ -144,6 +144,7 @@ const UI_PURE_CORES = [
   'src/ui/market_view.ts',
   'src/ui/char_view.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/map_atlas_view.ts',
   'src/ui/arena_window_view.ts',
   'src/ui/leaderboard_view.ts',
   'src/ui/guild_leaderboard_view.ts',

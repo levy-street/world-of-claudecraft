@@ -5174,4 +5174,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': '보를란의 살바르는 칼',
   'entities.items.warbringers_hellforged_cuirass.name': '전쟁인도자의 지옥단조 흉갑',
   'entities.items.khorvax_warcleaver.name': '코르박스 전쟁도끼',
+  'hudChrome.map.worldTitle': '발드리스: 알려진 세계',
+  'hudChrome.map.theLanding': '상륙지',
+  'hudChrome.map.theBreachRing': '균열과 분쟁의 고리',
+  'hudChrome.map.clickHint': '지역을 클릭하면 지도가 열립니다',
+  'hudChrome.map.backHint': '영토를 클릭해 열기. 우클릭으로 한 단계 위로',
 };

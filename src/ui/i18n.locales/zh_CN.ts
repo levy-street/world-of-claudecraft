@@ -4920,4 +4920,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': '沃兰的剥皮利刃',
   'entities.items.warbringers_hellforged_cuirass.name': '战争使者的地狱铸铠',
   'entities.items.khorvax_warcleaver.name': '库尔瓦克斯战争劈刀',
+  'hudChrome.map.worldTitle': '瓦尔德里斯：已知世界',
+  'hudChrome.map.theLanding': '登陆之岛',
+  'hudChrome.map.theBreachRing': '裂隙与争夺之环',
+  'hudChrome.map.clickHint': '点击区域打开其地图',
+  'hudChrome.map.backHint': '点击领地进入。右键返回上一级',
 };

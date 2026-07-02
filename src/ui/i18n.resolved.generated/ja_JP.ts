@@ -258,6 +258,14 @@ export const ja_JP: EnTranslations = {
       "returnBodyTouch": "依頼は完了しました。レッドブルック元帥のもとへ戻り、「使用」ボタンをタップして納品しましょう。",
       "doneBodyTouch": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！"
     },
+    "map": {
+      "worldTitle": "ヴァルドリス：既知の世界",
+      "theLanding": "ザ・ランディング",
+      "theBreachRing": "ブリーチと係争の環",
+      "levelBand": "Lv {min}-{max}",
+      "clickHint": "地域をクリックしてマップを開く",
+      "backHint": "領地をクリックで開く。右クリックで一段戻る"
+    },
     "widgets": {
       "clockTitle": "現地時刻 - クリックで12/24時間表記を切り替え",
       "worldCoordinates": "ワールド座標",

@@ -114,6 +114,16 @@
     --color-map-mudhut: #7a6a4a;
     --color-map-campfire: #ff9a3c;
 
+    /* painted atlas levels (world / Breach region) region accents, resolved by
+       map_atlas_painter.ts via getComputedStyle; hues match the interactive
+       cartography's faction colors */
+    --color-map-accent-kael: #e0b34a;
+    --color-map-accent-veth: #60a5fa;
+    --color-map-accent-ossara: #fb923c;
+    --color-map-accent-war: #ef4444;
+    --color-map-accent-landing: #22c55e;
+    --color-map-accent-contested: #f59e0b;
+
     /* overworld minimap markers (resolved by minimap_painter.ts via getComputedStyle:
        a 2D canvas context cannot read a CSS var directly). Exact pre-existing values
        from the inline updateMinimap overworld branch. */

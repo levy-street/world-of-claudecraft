@@ -258,6 +258,14 @@ export const zh_CN: EnTranslations = {
       "returnBodyTouch": "任务已完成。返回雷德布鲁克元帅处并点击“使用”按钮交付任务。",
       "doneBodyTouch": "你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。"
     },
+    "map": {
+      "worldTitle": "瓦尔德里斯：已知世界",
+      "theLanding": "登陆之岛",
+      "theBreachRing": "裂隙与争夺之环",
+      "levelBand": "Lv {min}-{max}",
+      "clickHint": "点击区域打开其地图",
+      "backHint": "点击领地进入。右键返回上一级"
+    },
     "widgets": {
       "clockTitle": "本地时间 - 点击切换 12/24 小时制",
       "worldCoordinates": "世界坐标",

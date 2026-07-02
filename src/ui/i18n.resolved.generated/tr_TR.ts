@@ -258,6 +258,14 @@ export const tr_TR: EnTranslations = {
       "returnBodyTouch": "Görevin tamamlandı. Mareşal Redbrook'a dön ve teslim etmek için Kullan düğmesine dokun.",
       "doneBodyTouch": "Temelleri öğrendin, {name}. Vadi keşfetmen için senindir. Görev günlüğünü dilediğin an gözden geçirmek için Daha Fazla'ya, ardından Görevler'e dokun. İyi avlar."
     },
+    "map": {
+      "worldTitle": "Valdris, the Known World",
+      "theLanding": "The Landing",
+      "theBreachRing": "The Breach and the Contested Ring",
+      "levelBand": "Lv {min}-{max}",
+      "clickHint": "Click a region to open its map",
+      "backHint": "Click a territory to open it. Right-click to zoom out"
+    },
     "widgets": {
       "clockTitle": "Yerel saat - 12/24 saat biçimi arasında geçiş için tıkla",
       "worldCoordinates": "Dünya koordinatları",

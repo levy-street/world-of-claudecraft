@@ -258,6 +258,14 @@ export const it_IT: EnTranslations = {
       "returnBodyTouch": "Il tuo incarico è compiuto. Torna dal maresciallo Redbrook e tocca il pulsante Usa per consegnarlo.",
       "doneBodyTouch": "Hai imparato le basi, {name}. La Valle è tutta da esplorare: tocca Altro, poi Registro missioni, per rivedere il tuo registro missioni in qualsiasi momento. Buona caccia!"
     },
+    "map": {
+      "worldTitle": "Valdris, the Known World",
+      "theLanding": "The Landing",
+      "theBreachRing": "The Breach and the Contested Ring",
+      "levelBand": "Lv {min}-{max}",
+      "clickHint": "Click a region to open its map",
+      "backHint": "Click a territory to open it. Right-click to zoom out"
+    },
     "widgets": {
       "clockTitle": "Ora locale - clicca per alternare 12/24 ore",
       "worldCoordinates": "Coordinate del mondo",

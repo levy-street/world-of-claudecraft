@@ -233,6 +233,7 @@ const HOT_PAINTERS: ReadonlyArray<{
 // cadence-throttled nameplate_painter, are intentionally outside this HUD-painter file.)
 const CANVAS_PAINTERS: ReadonlyArray<string> = [
   'delve_map_painter.ts',
+  'map_atlas_painter.ts',
   'map_window_painter.ts',
   'minimap_painter.ts',
   'perf_graph_painter.ts',

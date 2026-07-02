@@ -258,6 +258,14 @@ export const sv_SE: EnTranslations = {
       "returnBodyTouch": "Din uppgift är klar. Återvänd till marskalk Redbrook och tryck på Använd-knappen för att lämna in den.",
       "doneBodyTouch": "Du behärskar grunderna, {name}. Dalen är din att utforska. Tryck på Mer och sedan Uppdrag för att granska din uppdragslogg när som helst. Lycka till på jakten."
     },
+    "map": {
+      "worldTitle": "Valdris, the Known World",
+      "theLanding": "The Landing",
+      "theBreachRing": "The Breach and the Contested Ring",
+      "levelBand": "Lv {min}-{max}",
+      "clickHint": "Click a region to open its map",
+      "backHint": "Click a territory to open it. Right-click to zoom out"
+    },
     "widgets": {
       "clockTitle": "Lokal tid - klicka för att växla mellan 12/24-timmar",
       "worldCoordinates": "Världskoordinater",

@@ -5275,4 +5275,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Свежевальный клинок Ворлана',
   'entities.items.warbringers_hellforged_cuirass.name': 'Адски кованная кираса Вестника войны',
   'entities.items.khorvax_warcleaver.name': 'Боевой тесак Корвакса',
+  'hudChrome.map.worldTitle': 'Валдрис: известный мир',
+  'hudChrome.map.theLanding': 'Пристань',
+  'hudChrome.map.theBreachRing': 'Разлом и спорное кольцо',
+  'hudChrome.map.clickHint': 'Щелкните по региону, чтобы открыть его карту',
+  'hudChrome.map.backHint': 'Щелчок: открыть территорию. Правая кнопка: наверх',
 };

@@ -258,6 +258,14 @@ export const id_ID: EnTranslations = {
       "returnBodyTouch": "Tugas Anda selesai. Kembalilah ke Marshal Redbrook dan ketuk tombol Use untuk menyerahkannya.",
       "doneBodyTouch": "Anda sudah menguasai dasarnya, {name}. Lembah ini milik Anda untuk dijelajahi. Ketuk More, lalu Quests, untuk meninjau catatan misi Anda kapan saja. Selamat berburu."
     },
+    "map": {
+      "worldTitle": "Valdris, the Known World",
+      "theLanding": "The Landing",
+      "theBreachRing": "The Breach and the Contested Ring",
+      "levelBand": "Lv {min}-{max}",
+      "clickHint": "Click a region to open its map",
+      "backHint": "Click a territory to open it. Right-click to zoom out"
+    },
     "widgets": {
       "clockTitle": "Waktu lokal - klik untuk beralih 12/24 jam",
       "worldCoordinates": "Koordinat dunia",

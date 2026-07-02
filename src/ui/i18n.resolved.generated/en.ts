@@ -258,6 +258,14 @@ export const en: EnTranslations = {
       "returnBodyTouch": "Your task is done. Return to Marshal Redbrook and tap the Use button to turn it in.",
       "doneBodyTouch": "You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting."
     },
+    "map": {
+      "worldTitle": "Valdris, the Known World",
+      "theLanding": "The Landing",
+      "theBreachRing": "The Breach and the Contested Ring",
+      "levelBand": "Lv {min}-{max}",
+      "clickHint": "Click a region to open its map",
+      "backHint": "Click a territory to open it. Right-click to zoom out"
+    },
     "widgets": {
       "clockTitle": "Local time - click to toggle 12/24-hour",
       "worldCoordinates": "World coordinates",

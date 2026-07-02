@@ -5165,4 +5165,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'ヴォルランの解体刃',
   'entities.items.warbringers_hellforged_cuirass.name': '戦招きの地獄鍛造胸鎧',
   'entities.items.khorvax_warcleaver.name': 'コルヴァクスの戦割り斧',
+  'hudChrome.map.worldTitle': 'ヴァルドリス：既知の世界',
+  'hudChrome.map.theLanding': 'ザ・ランディング',
+  'hudChrome.map.theBreachRing': 'ブリーチと係争の環',
+  'hudChrome.map.clickHint': '地域をクリックしてマップを開く',
+  'hudChrome.map.backHint': '領地をクリックで開く。右クリックで一段戻る',
 };

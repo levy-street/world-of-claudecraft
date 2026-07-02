@@ -207,6 +207,17 @@ import { lootSettingsView } from './loot_settings_view';
 import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
+import { MapAtlasPainter } from './map_atlas_painter';
+import {
+  type AtlasLevelId,
+  atlasFit,
+  atlasHitTest,
+  atlasLevelUp,
+  atlasParentLevel,
+  buildAtlasModel,
+  MAP_ATLAS,
+  resolveAtlasTarget,
+} from './map_atlas_view';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import { MAP_MAX_ZOOM, mapWindowMode } from './map_window_view';
@@ -922,6 +933,15 @@ export class Hud {
   private lastZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
+  // WoW-style hierarchical map: the painted zoom-out level currently shown
+  // (null = the procedural zone map), the atlas-picked zone being viewed (null
+  // = follow the player's committed zone), and the hovered atlas shape.
+  private mapAtlasLevel: AtlasLevelId | null = null;
+  private mapViewZoneId: string | null = null;
+  private mapAtlasHover: string | null = null;
+  // The painted level art, loaded on first use; a load-completion repaints the
+  // open map so the art pops in under the already-drawn shapes.
+  private readonly mapAtlasImages = new Map<AtlasLevelId, HTMLImageElement>();
   private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
   private mapView: {
     spanX: number;
@@ -1208,6 +1228,28 @@ export class Hud {
     );
     $('#map-zoom-in')?.addEventListener('click', () => this.zoomMap(1.4));
     $('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(1 / 1.4));
+    // WoW-style hierarchy: right-click zooms the map out one level (zone ->
+    // painted region -> world); on a painted level, click drills into the
+    // region under the cursor and pointer-move drives the hover highlight.
+    const mapCanvasPoint = (ev: MouseEvent): { x: number; y: number } => {
+      const rect = mapCanvas.getBoundingClientRect();
+      return {
+        x: ((ev.clientX - rect.left) * mapCanvas.width) / rect.width,
+        y: ((ev.clientY - rect.top) * mapCanvas.height) / rect.height,
+      };
+    };
+    mapCanvas.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault();
+      this.mapNavigateUp();
+    });
+    mapCanvas.addEventListener('click', (ev) => {
+      const { x, y } = mapCanvasPoint(ev);
+      this.mapAtlasClick(x, y);
+    });
+    mapCanvas.addEventListener('pointermove', (ev) => {
+      const { x, y } = mapCanvasPoint(ev);
+      this.mapAtlasHoverAt(x, y);
+    });
     // drag to pan (only meaningful while zoomed in; at zoom 1 the whole zone fits)
     mapCanvas.addEventListener('pointerdown', (ev) => {
       if (!this.mapView || this.mapZoom <= 1) return;
@@ -2506,6 +2548,7 @@ export class Hud {
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
   // the cached whole-world decorations; redraws from the mediumHud band while open.
   private readonly mapPainter = new MapWindowPainter();
+  private readonly mapAtlasPainter = new MapAtlasPainter();
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target debuffs (#tf-debuffs, mode 'debuffs'). The shared deps fire
@@ -5693,12 +5736,95 @@ export class Hud {
     this.closeOtherWindows('#map-window');
     this.mapZoom = 1; // always open at the full-zone view, following the player
     this.mapCenter = null;
+    this.mapAtlasLevel = null; // WoW-style: the map opens at your own zone
+    this.mapViewZoneId = null;
+    this.mapAtlasHover = null;
     el.style.display = 'block';
     this.updateMapWindow();
   }
 
+  /** The zone the player counts as standing in for atlas highlights (inside an
+   *  instance that is the zone holding the dungeon's door). */
+  private mapPlayerZoneId(): string {
+    const p = this.sim.player;
+    const dungeon = dungeonAt(p.pos.x);
+    return (dungeon ? zoneAt(dungeon.doorPos.z) : zoneAt(p.pos.z)).id;
+  }
+
+  /** The painted art for an atlas level, or null while it loads (a completed
+   *  load repaints the open map). */
+  private mapAtlasImage(level: AtlasLevelId): HTMLImageElement | null {
+    let img = this.mapAtlasImages.get(level);
+    if (!img) {
+      img = new Image();
+      img.addEventListener('load', () => {
+        if ($('#map-window').style.display === 'block') this.updateMapWindow();
+      });
+      img.src = MAP_ATLAS[level].image;
+      this.mapAtlasImages.set(level, img);
+    }
+    return img.complete && img.naturalWidth > 0 ? img : null;
+  }
+
+  /** Right-click: walk the map up one level (zone -> its painted region ->
+   *  world), WoW-style. A no-op at the world level and in the delve view. */
+  private mapNavigateUp(): void {
+    if (mapWindowMode(this.sim) === 'delve') return;
+    if (this.mapAtlasLevel) {
+      const up = atlasLevelUp(this.mapAtlasLevel);
+      if (up) {
+        this.mapAtlasLevel = up;
+        this.mapAtlasHover = null;
+        this.updateMapWindow();
+      }
+      return;
+    }
+    const zoneId = this.mapViewZoneId ?? (this.lastZoneId || this.mapPlayerZoneId());
+    this.mapAtlasLevel = atlasParentLevel(zoneId);
+    this.mapAtlasHover = null;
+    this.mapZoom = 1;
+    this.mapCenter = null;
+    this.updateMapWindow();
+  }
+
+  /** Left-click on a painted level: drill into the clicked region (a zone map,
+   *  or the Breach region level from the world map). */
+  private mapAtlasClick(canvasX: number, canvasY: number): void {
+    if (!this.mapAtlasLevel) return;
+    const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
+    const fit = atlasFit(this.mapAtlasLevel, canvas.width, canvas.height);
+    const node = atlasHitTest(this.mapAtlasLevel, canvasX, canvasY, fit);
+    if (!node) return;
+    const target = resolveAtlasTarget(node, this.mapPlayerZoneId());
+    if (target.kind === 'level') {
+      this.mapAtlasLevel = target.level;
+    } else {
+      this.mapAtlasLevel = null;
+      this.mapViewZoneId = target.zoneId;
+      this.mapZoom = 1;
+      this.mapCenter = null;
+      this.prewarmMapBg(target.zoneId);
+    }
+    this.mapAtlasHover = null;
+    this.updateMapWindow();
+  }
+
+  /** Pointer-move hover over the painted levels (repaints only on change). */
+  private mapAtlasHoverAt(canvasX: number, canvasY: number): void {
+    if (!this.mapAtlasLevel) return;
+    const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
+    const fit = atlasFit(this.mapAtlasLevel, canvas.width, canvas.height);
+    const node = atlasHitTest(this.mapAtlasLevel, canvasX, canvasY, fit);
+    const id = node ? node.id : null;
+    if (id !== this.mapAtlasHover) {
+      this.mapAtlasHover = id;
+      this.updateMapWindow();
+    }
+  }
+
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
+    if (this.mapAtlasLevel) return; // painted levels have no free zoom; right-click/click navigate
     const prev = this.mapZoom;
     this.mapZoom = Math.max(1, Math.min(MAP_MAX_ZOOM, this.mapZoom * factor));
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
@@ -5732,13 +5858,46 @@ export class Hud {
       return;
     }
 
-    // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
-    // the instance x-band layout); outdoors, follow the committed zone so
-    // border-straddling can't thrash the cached terrain regen.
+    // painted zoom-out levels (world / Breach region): the atlas painter owns
+    // the whole draw; navigation stays with the click/contextmenu handlers.
+    if (this.mapAtlasLevel) {
+      const model = buildAtlasModel({
+        level: this.mapAtlasLevel,
+        canvasW: S,
+        canvasH: S,
+        playerZoneId: this.mapPlayerZoneId(),
+        hoverNodeId: this.mapAtlasHover,
+      });
+      this.mapAtlasPainter.paint(ctx, {
+        model,
+        image: this.mapAtlasImage(this.mapAtlasLevel),
+        canvasW: S,
+        canvasH: S,
+      });
+      this.mapView = null;
+      if (!this.mapDrag) canvas.style.cursor = this.mapAtlasHover ? 'pointer' : 'default';
+      this.setText(
+        summaryEl,
+        t('hud.core.mapSummary', {
+          zone:
+            this.mapAtlasLevel === 'world'
+              ? t('hudChrome.map.worldTitle')
+              : t('hudChrome.map.theBreachRing'),
+        }),
+      );
+      return;
+    }
+
+    // an atlas-picked zone wins; else inside an instance, show the zone the
+    // dungeon's door is in (dungeonAt owns the instance x-band layout);
+    // outdoors, follow the committed zone so border-straddling can't thrash
+    // the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
-    const zone: ZoneDef = dungeon
-      ? zoneAt(dungeon.doorPos.z)
-      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+    const zone: ZoneDef =
+      (this.mapViewZoneId ? ZONES.find((z) => z.id === this.mapViewZoneId) : undefined) ??
+      (dungeon
+        ? zoneAt(dungeon.doorPos.z)
+        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z)));
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
       bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle

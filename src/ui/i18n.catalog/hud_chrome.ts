@@ -181,6 +181,17 @@ export const hudChromeStrings = {
     doneBodyTouch:
       'You have the basics, {name}. The Vale is yours to explore. Tap More, then Quests, to review your quest log anytime. Good hunting.',
   },
+  // The world-map atlas levels (the WoW-style zoom-out views painted from the
+  // Valdris cartography): level titles, the two group-region names, the level
+  // band chip, and the navigation hints (map_atlas_painter.ts).
+  map: {
+    worldTitle: 'Valdris, the Known World',
+    theLanding: 'The Landing',
+    theBreachRing: 'The Breach and the Contested Ring',
+    levelBand: 'Lv {min}-{max}',
+    clickHint: 'Click a region to open its map',
+    backHint: 'Click a territory to open it. Right-click to zoom out',
+  },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {
     clockTitle: 'Local time - click to toggle 12/24-hour',
