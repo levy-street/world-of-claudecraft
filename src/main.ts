@@ -2430,7 +2430,12 @@ function sanitizeOfflineName(raw: string): string {
   return /^[A-Za-z][A-Za-z' -]{1,15}$/.test(stripped) ? stripped : 'Adventurer';
 }
 
-async function startOffline(playerClass: PlayerClass, name: string, skin = 0): Promise<void> {
+async function startOffline(
+  playerClass: PlayerClass,
+  name: string,
+  skin = 0,
+  race: PlayerRace = 'human',
+): Promise<void> {
   if (!(await prepareWorldEntry())) return;
   enterLoadingState(t('loading.world'));
   const sim = new Sim({
@@ -2440,6 +2445,7 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
     devCommands: import.meta.env.DEV,
   });
   sim.setPlayerSkin(sim.playerId, skin);
+  sim.setPlayerRace(sim.playerId, race);
   // Dev convenience: ?mech drops an offline session straight into the Combat Mech
   // cosmetic body holding a spread of class-usable weapons, to eyeball the held
   // weapon model on the mech (swap them in the bag to see each one). DEV builds
@@ -2502,6 +2508,7 @@ let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
+let offlineRace: PlayerRace = 'human'; // chosen race for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
 let onlineRace: PlayerRace = 'human'; // chosen race for new online characters (faction source)
 
@@ -5982,7 +5989,7 @@ function wireStartScreens(): void {
     music.init();
     sfx.init();
     const name = sanitizeOfflineName(rawName);
-    void startOffline(cls, name, selectedSkin('#offline-skin-row', offlineSkin));
+    void startOffline(cls, name, selectedSkin('#offline-skin-row', offlineSkin), offlineRace);
   };
 
   const handleOfflineSelect = () => {
@@ -6454,20 +6461,31 @@ function wireStartScreens(): void {
     if (sortDropdownOpen && e.key === 'Escape') closeSortDropdown();
   });
 
-  // character creation: race picker (faction + race). Selection is pure UI
-  // state; the server re-validates the race id on create.
-  document.querySelectorAll('#charcreate-panel .mini-race').forEach((el) => {
-    const selectRace = () => {
-      document.querySelectorAll('#charcreate-panel .mini-race').forEach((x) => {
-        x.classList.remove('sel');
-        x.setAttribute('aria-pressed', 'false');
-      });
-      el.classList.add('sel');
-      el.setAttribute('aria-pressed', 'true');
-      onlineRace = ((el as HTMLElement).dataset.race as PlayerRace) ?? 'human';
-    };
-    el.addEventListener('click', selectRace);
-    el.addEventListener('keydown', (e) => handleKeyboardActivation(e as KeyboardEvent, selectRace));
+  // character creation: race picker (faction + race), one instance per panel
+  // (online create + offline quick-start). Selection is pure UI state; the
+  // server (or the offline Sim) re-validates the race id on create.
+  const wireRacePicker = (panelSel: string, onPick: (race: PlayerRace) => void) => {
+    document.querySelectorAll(`${panelSel} .mini-race`).forEach((el) => {
+      const selectRace = () => {
+        document.querySelectorAll(`${panelSel} .mini-race`).forEach((x) => {
+          x.classList.remove('sel');
+          x.setAttribute('aria-pressed', 'false');
+        });
+        el.classList.add('sel');
+        el.setAttribute('aria-pressed', 'true');
+        onPick(((el as HTMLElement).dataset.race as PlayerRace) ?? 'human');
+      };
+      el.addEventListener('click', selectRace);
+      el.addEventListener('keydown', (e) =>
+        handleKeyboardActivation(e as KeyboardEvent, selectRace),
+      );
+    });
+  };
+  wireRacePicker('#charcreate-panel', (race) => {
+    onlineRace = race;
+  });
+  wireRacePicker('#offline-select', (race) => {
+    offlineRace = race;
   });
 
   // character creation
