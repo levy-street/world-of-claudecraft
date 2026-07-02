@@ -86,6 +86,7 @@ export const en_XA: EnTranslations = {
       "classTab": "[Çļášš]",
       "specTab": "[Šþéçíáļížáţíóñ]",
       "choicesTab": "[Çĥóíçéš]",
+      "rowUnlockToast": "[Ñéŵ ţáļéñţ çĥóíçé áʋáíļáƀļé!]",
       "rowUnlocks": "[Úñļóçķš áţ ļéʋéļ {level}]",
       "available": "[Áʋáíļáƀļé]",
       "spent": "[Šþéñţ]",

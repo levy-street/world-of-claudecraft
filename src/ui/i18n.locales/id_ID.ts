@@ -2192,6 +2192,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'game.talents.spent': 'Terpakai',
   'game.talents.title': 'Talenta',
   'game.talents.choicesTab': 'Pilihan',
+  'game.talents.rowUnlockToast': 'Pilihan talenta baru tersedia!',
   'game.talents.rowUnlocks': 'Terbuka di level {level}',
   'game.talents.unlockBanner': 'Talenta Terbuka!',
   'game.talents.unlockHint':

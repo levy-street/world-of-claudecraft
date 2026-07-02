@@ -86,6 +86,7 @@ export const ru_RU: EnTranslations = {
       "classTab": "Класс",
       "specTab": "Специализация",
       "choicesTab": "Варианты",
+      "rowUnlockToast": "Доступен новый выбор таланта!",
       "rowUnlocks": "Открывается на {level} уровне",
       "available": "Доступно",
       "spent": "Потрачено",

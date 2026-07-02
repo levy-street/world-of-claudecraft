@@ -86,6 +86,7 @@ export const nl_NL: EnTranslations = {
       "classTab": "Klasse",
       "specTab": "Specialisatie",
       "choicesTab": "Keuzes",
+      "rowUnlockToast": "Nieuwe talentkeuze beschikbaar!",
       "rowUnlocks": "Ontgrendelt op niveau {level}",
       "available": "Beschikbaar",
       "spent": "Besteed",

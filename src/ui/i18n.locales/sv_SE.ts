@@ -2160,6 +2160,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.spent': 'Lagda',
   'game.talents.title': 'Talanger',
   'game.talents.choicesTab': 'Val',
+  'game.talents.rowUnlockToast': 'Nytt talangval tillgängligt!',
   'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
   'game.talents.unlockBanner': 'Talanger upplåsta!',
   'game.talents.unlockHint':

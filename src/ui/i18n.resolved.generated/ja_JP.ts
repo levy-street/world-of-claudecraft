@@ -86,6 +86,7 @@ export const ja_JP: EnTranslations = {
       "classTab": "クラス",
       "specTab": "専門化",
       "choicesTab": "選択",
+      "rowUnlockToast": "新しいタレント選択が解放されました!",
       "rowUnlocks": "レベル{level}で解放",
       "available": "使用可能",
       "spent": "使用済み",

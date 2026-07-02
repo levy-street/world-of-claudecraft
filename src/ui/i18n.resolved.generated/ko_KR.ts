@@ -86,6 +86,7 @@ export const ko_KR: EnTranslations = {
       "classTab": "직업",
       "specTab": "전문화",
       "choicesTab": "선택",
+      "rowUnlockToast": "새로운 특성 선택이 열렸습니다!",
       "rowUnlocks": "{level} 레벨에 해제",
       "available": "사용 가능",
       "spent": "사용함",

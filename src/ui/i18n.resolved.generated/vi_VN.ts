@@ -86,6 +86,7 @@ export const vi_VN: EnTranslations = {
       "classTab": "Lớp",
       "specTab": "Chuyên môn",
       "choicesTab": "Lựa chọn",
+      "rowUnlockToast": "Có lựa chọn thiên phú mới!",
       "rowUnlocks": "Mở khóa ở cấp {level}",
       "available": "Khả dụng",
       "spent": "Đã dùng",

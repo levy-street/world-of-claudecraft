@@ -33,6 +33,10 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   setStage(stage: TalentAllocation | null): void;
   playerClass(): PlayerClass;
   playerLevel(): number;
+  /** Server-authoritative full-allocation apply (build import). */
+  applyTalents(alloc: TalentAllocation): void;
+  /** Server-authoritative row reset (the free respec). */
+  resetRows(): void;
   chooseRow(level: ChoiceRowLevel, optionId: string): void;
   currentAllocation(): TalentAllocation;
   activeLoadout(): number;
@@ -329,7 +333,9 @@ export class TalentsWindow {
   private wireFooter(el: HTMLElement, stage: TalentAllocation, playerLevel: number): void {
     const cls = this.deps.playerClass();
     el.querySelector('[data-act="clear"]')?.addEventListener('click', () => {
-      stage.rows = {};
+      // the FREE respec: server-authoritative row reset (rows re-pick freely);
+      // render re-reads the live allocation, so no stage bookkeeping here
+      this.deps.resetRows();
       this.render();
     });
     const saveStagedBuild = (name: string): void => {
@@ -440,7 +446,10 @@ export class TalentsWindow {
             this.deps.showError(t('game.talents.invalidBuild'));
             return;
           }
-          this.deps.setStage(res.alloc);
+          // imports APPLY (server-authoritative): staging alone would be
+          // clobbered by the live-rows re-sync on the next render
+          this.deps.applyTalents(res.alloc);
+          this.deps.setStage(cloneAllocation(res.alloc));
           this.render();
         },
       });

@@ -381,6 +381,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'game.hud.lowEnergy': '기력 부족',
   'game.talents.title': '특성',
   'game.talents.choicesTab': '선택',
+  'game.talents.rowUnlockToast': '새로운 특성 선택이 열렸습니다!',
   'game.talents.rowUnlocks': '{level} 레벨에 해제',
   'game.talents.classTab': '직업',
   'game.talents.specTab': '전문화',

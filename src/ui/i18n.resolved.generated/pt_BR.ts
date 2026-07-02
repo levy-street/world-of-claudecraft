@@ -86,6 +86,7 @@ export const pt_BR: EnTranslations = {
       "classTab": "Classe",
       "specTab": "Especialização",
       "choicesTab": "Escolhas",
+      "rowUnlockToast": "Nova escolha de talento disponível!",
       "rowUnlocks": "Desbloqueia no nível {level}",
       "available": "Disponíveis",
       "spent": "Gastos",

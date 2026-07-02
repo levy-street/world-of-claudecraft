@@ -86,6 +86,7 @@ export const tr_TR: EnTranslations = {
       "classTab": "Sınıf",
       "specTab": "Uzmanlık",
       "choicesTab": "Seçimler",
+      "rowUnlockToast": "Yeni yetenek seçimi mevcut!",
       "rowUnlocks": "{level}. seviyede açılır",
       "available": "Mevcut",
       "spent": "Harcanan",

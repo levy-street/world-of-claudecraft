@@ -390,6 +390,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'game.hud.lowEnergy': 'Мало энергии',
   'game.talents.title': 'Таланты',
   'game.talents.choicesTab': 'Варианты',
+  'game.talents.rowUnlockToast': 'Доступен новый выбор таланта!',
   'game.talents.rowUnlocks': 'Открывается на {level} уровне',
   'game.talents.classTab': 'Класс',
   'game.talents.specTab': 'Специализация',

@@ -86,6 +86,7 @@ export const sv_SE: EnTranslations = {
       "classTab": "Klass",
       "specTab": "Specialisering",
       "choicesTab": "Val",
+      "rowUnlockToast": "Nytt talangval tillgängligt!",
       "rowUnlocks": "Låses upp på nivå {level}",
       "available": "Tillgänglig",
       "spent": "Lagda",

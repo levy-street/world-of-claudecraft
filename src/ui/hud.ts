@@ -24,7 +24,7 @@ import {
 } from '../render/characters/portrait';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
-import { CHOICE_ROW_LEVELS } from '../sim/content/choice_rows';
+import { CHOICE_ROW_LEVELS, isChoiceRowLevel, rowForLevel } from '../sim/content/choice_rows';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -2684,6 +2684,8 @@ export class Hud {
     playerClass: () => this.sim.cfg.playerClass,
     playerLevel: () => this.sim.player.level,
     chooseRow: (level, optionId) => this.sim.chooseRow(level, optionId),
+    applyTalents: (alloc) => this.sim.applyTalents(alloc),
+    resetRows: () => this.sim.resetRows(),
     currentAllocation: () => this.sim.talents,
     activeLoadout: () => this.sim.activeLoadout,
     loadouts: () => this.sim.loadouts,
@@ -6390,6 +6392,14 @@ export class Hud {
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
             this.showBanner(t('game.talents.unlockBanner'));
             this.log(t('game.talents.unlockHint'), '#ffd100');
+          }
+          // A new choice row opens at 5/8/11/14/17/20 (PRD: per-row toast).
+          if (
+            isChoiceRowLevel(ev.level) &&
+            rowForLevel(this.sim.cfg.playerClass, ev.level) !== null
+          ) {
+            this.showBanner(t('game.talents.rowUnlockToast'));
+            this.log(t('game.talents.rowUnlockToast'), '#ffd100');
           }
           break;
         }

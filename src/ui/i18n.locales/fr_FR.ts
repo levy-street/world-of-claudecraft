@@ -375,6 +375,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'game.hud.lowEnergy': 'Énergie faible',
   'game.talents.title': 'Talents',
   'game.talents.choicesTab': 'Choix',
+  'game.talents.rowUnlockToast': 'Nouveau choix de talent disponible !',
   'game.talents.rowUnlocks': 'Se débloque au niveau {level}',
   'game.talents.classTab': 'Classe',
   'game.talents.specTab': 'Spécialisation',

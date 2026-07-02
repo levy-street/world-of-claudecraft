@@ -2177,6 +2177,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'game.talents.spent': 'Đã dùng',
   'game.talents.title': 'Thiên phú',
   'game.talents.choicesTab': 'Lựa chọn',
+  'game.talents.rowUnlockToast': 'Có lựa chọn thiên phú mới!',
   'game.talents.rowUnlocks': 'Mở khóa ở cấp {level}',
   'game.talents.unlockBanner': 'Đã Mở Khóa Thiên Phú!',
   'game.talents.unlockHint': 'Bạn vừa nhận được điểm thiên phú đầu tiên — nhấn N để mở Thiên phú.',

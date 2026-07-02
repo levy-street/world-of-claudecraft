@@ -86,6 +86,7 @@ export const zh_TW: EnTranslations = {
       "classTab": "職業",
       "specTab": "專精",
       "choicesTab": "抉擇",
+      "rowUnlockToast": "新的天賦抉擇已解鎖！",
       "rowUnlocks": "在 {level} 級解鎖",
       "available": "可用",
       "spent": "已用",

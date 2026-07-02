@@ -86,6 +86,7 @@ export const da_DK: EnTranslations = {
       "classTab": "Klasse",
       "specTab": "Specialisering",
       "choicesTab": "Valg",
+      "rowUnlockToast": "Nyt talentvalg tilgængeligt!",
       "rowUnlocks": "Låses op på niveau {level}",
       "available": "Tilgængelig",
       "spent": "Brugt",

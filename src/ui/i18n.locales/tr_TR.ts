@@ -2156,6 +2156,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'game.talents.spent': 'Harcanan',
   'game.talents.title': 'Yetenekler',
   'game.talents.choicesTab': 'Seçimler',
+  'game.talents.rowUnlockToast': 'Yeni yetenek seçimi mevcut!',
   'game.talents.rowUnlocks': '{level}. seviyede açılır',
   'game.talents.unlockBanner': 'Yetenekler Açıldı!',
   'game.talents.unlockHint': "İlk yetenek puanını kazandın — Yetenekleri açmak için N'ye bas.",

@@ -86,6 +86,7 @@ export const id_ID: EnTranslations = {
       "classTab": "Kelas",
       "specTab": "Spesialisasi",
       "choicesTab": "Pilihan",
+      "rowUnlockToast": "Pilihan talenta baru tersedia!",
       "rowUnlocks": "Terbuka di level {level}",
       "available": "Tersedia",
       "spent": "Terpakai",
