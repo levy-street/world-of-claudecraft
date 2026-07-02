@@ -29,7 +29,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1361,
-      "state": "c5c321d9",
+      "state": "5a8e8077",
       "events": "238f0149",
       "rng": {
         "draws": 0,
@@ -162,7 +162,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 11,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -184,7 +184,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1361,
-      "state": "c5c321d9",
+      "state": "5a8e8077",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -317,7 +317,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 11,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -339,7 +339,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1361,
-      "state": "c5c321d9",
+      "state": "5a8e8077",
       "events": "3239e968",
       "rng": {
         "draws": 0,
@@ -472,7 +472,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 11,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -494,7 +494,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1361,
-      "state": "6e8d96cd",
+      "state": "966e22fb",
       "events": "44b2ecf6",
       "rng": {
         "draws": 0,
@@ -639,7 +639,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 11,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -661,7 +661,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1361,
-      "state": "c5c321d9",
+      "state": "5a8e8077",
       "events": "097f8197",
       "rng": {
         "draws": 0,
@@ -794,7 +794,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 11,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -816,7 +816,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1361,
-      "state": "db1cf859",
+      "state": "6fe856f7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -949,7 +949,7 @@
             "y": 1.5,
             "z": -2
           },
-          "spellPower": 13,
+          "spellPower": 11,
           "stats": {
             "agi": 12,
             "armor": 57,

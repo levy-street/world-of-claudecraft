@@ -2071,10 +2071,13 @@ export function armorReduction(armor: number, attackerLevel: number): number {
 // Attack Power, mirroring the physical attack-power path. The pure coefficient
 // helpers live in src/sim/spell_scaling.ts; these are the tuning knobs.
 // ---------------------------------------------------------------------------
-// Spell Power gained per point of Intellect (1 Spell Power per 2 Intellect). Tuned
-// (see tests/spell_power.test.ts) so a fully-leveled caster gets a meaningful but
-// not dominant damage lift, scaling further as caster gear adds Int + Spell Power.
-export const SPELL_POWER_PER_INT = 0.5;
+// Spell Power gained per point of Intellect. Tuned (see tests/spell_power.test.ts)
+// so a fully-leveled caster gets a meaningful but not dominant damage lift, scaling
+// further as caster gear adds Int + Spell Power. Re-tuned 0.5 -> 0.45 with the
+// level-60 cap: Intellect now grows over 60 levels while spell base damage still
+// tops out at the level-20 ranks, which pushed the flagship-nuke share past the
+// dominance bound the balance-band test pins.
+export const SPELL_POWER_PER_INT = 0.45;
 // Direct nuke coefficient = clamp(castTime, MIN, MAX) / DIVISOR (vanilla 3.5). The
 // max equals the divisor so the direct coefficient caps at 1.0 (a 3.5s+ cast gets
 // full Spell Power; a 6s Pyroblast does not exceed it).

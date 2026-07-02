@@ -223,5 +223,12 @@ export default defineConfig({
       'tests/browser/**',
       '**/*.browser.test.ts',
     ],
+    // The Valdris continent grew the default world from 3 zones / ~300 mobs to
+    // 17 zones / ~1350 mobs, so a full-world Sim ticks ~2.5x slower (per-mob
+    // cost is unchanged; there are simply more of them). The sim-heavy suites
+    // that tick minutes of game time need headroom over the 5s default when
+    // files run on parallel workers.
+    testTimeout: 20000,
+    hookTimeout: 20000,
   },
 });

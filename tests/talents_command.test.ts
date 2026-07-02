@@ -22,12 +22,15 @@ describe('/talents readout', () => {
 
   it('shows spec, spent/total and the per-tree split', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
-    sim.setPlayerLevel(MAX_LEVEL); // 11 points available at level 20
+    sim.setPlayerLevel(MAX_LEVEL); // 51 points available at the level-60 cap
     expect(sim.applyTalents({ spec: 'arms', ranks: { war_toughness: 3 }, choices: {} })).toBe(true);
 
+    const total = MAX_LEVEL - 9; // classic formula, level minus 9
     const armsName = talentsFor('warrior')!.specs.find((s) => s.id === 'arms')!.name;
     const text = readout(sim, '/talents');
-    expect(text).toBe(`Talents: ${armsName} — 3/11 points spent (Class 3, ${armsName} 0). 8 unspent.`);
+    expect(text).toBe(
+      `Talents: ${armsName} — 3/${total} points spent (Class 3, ${armsName} 0). ${total - 3} unspent.`,
+    );
   });
 
   it('reports no specialization when none is chosen', () => {
@@ -35,13 +38,16 @@ describe('/talents readout', () => {
     sim.setPlayerLevel(MAX_LEVEL);
     expect(sim.applyTalents({ spec: null, ranks: { war_toughness: 2 }, choices: {} })).toBe(true);
 
+    const total = MAX_LEVEL - 9;
     const text = readout(sim, '/talents');
-    expect(text).toBe('Talents: no specialization — 2/11 points spent (Class 2). 9 unspent.');
+    expect(text).toBe(
+      `Talents: no specialization — 2/${total} points spent (Class 2). ${total - 2} unspent.`,
+    );
   });
 
   it('omits the unspent suffix when all points are spent and aliases resolve', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
-    sim.setPlayerLevel(MAX_LEVEL);
+    sim.setPlayerLevel(20); // 11 points at level 20, exactly spendable below
     // 11 points, all in the class tree (Toughness/Cruelty cap at 3 each here).
     expect(sim.applyTalents({
       spec: null,
