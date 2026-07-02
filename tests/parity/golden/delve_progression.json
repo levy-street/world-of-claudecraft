@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "f9a3a987",
+      "nextId": 391,
+      "state": "3971bbe1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -34,7 +34,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 390,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -56,9 +56,10 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 390,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 90,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -77,6 +78,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 20,
             "armor": 110,
@@ -97,9 +99,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 411,
-      "state": "9e5df443",
-      "events": "807a5f77",
+      "nextId": 412,
+      "state": "d59f2153",
+      "events": "ed7d34e3",
       "rng": {
         "draws": 1,
         "digest": "5eb1ea5d"
@@ -108,8 +110,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 411,
-      "state": "34dc6a75",
+      "nextId": 412,
+      "state": "27b07b99",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -127,7 +129,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 390,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -149,9 +151,10 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 389,
+          "id": 390,
           "kind": "player",
           "level": 7,
+          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -169,6 +172,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 194,
@@ -189,9 +193,9 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 411,
-      "state": "064f3425",
-      "events": "62f98853",
+      "nextId": 412,
+      "state": "f7680141",
+      "events": "d9e58883",
       "rng": {
         "draws": 3,
         "digest": "e3485a8b"
@@ -214,7 +218,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 389,
+          "entityId": 390,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -237,9 +241,10 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 338,
-          "id": 389,
+          "id": 390,
           "kind": "player",
           "level": 7,
+          "lootFfaTimer": "Infinity",
           "maxHp": 338,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -257,6 +262,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 242,
@@ -277,8 +283,8 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 411,
-      "state": "78c37103",
+      "nextId": 412,
+      "state": "8ac50193",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -302,7 +308,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 389,
+          "entityId": 390,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -325,9 +331,10 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 338,
-          "id": 389,
+          "id": 390,
           "kind": "player",
           "level": 7,
+          "lootFfaTimer": "Infinity",
           "maxHp": 338,
           "maxResource": 100,
           "moveSpeed": 7,
@@ -345,6 +352,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 5,
           "stats": {
             "agi": 26,
             "armor": 242,

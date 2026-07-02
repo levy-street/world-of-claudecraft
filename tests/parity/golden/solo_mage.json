@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "645bee80",
+      "nextId": 391,
+      "state": "20e117fd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -33,7 +33,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 390,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -55,9 +55,10 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 389,
+          "id": 390,
           "kind": "player",
           "level": 1,
+          "lootFfaTimer": "Infinity",
           "maxHp": 54,
           "maxResource": 195,
           "moveSpeed": 7,
@@ -77,6 +78,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 13,
           "stats": {
             "agi": 12,
             "armor": 57,
@@ -97,9 +99,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 391,
-      "state": "22bddc46",
-      "events": "97cb4b90",
+      "nextId": 392,
+      "state": "8860c847",
+      "events": "8938d9b6",
       "rng": {
         "draws": 3,
         "digest": "73521d70"
@@ -108,9 +110,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 391,
-      "state": "60b34805",
-      "events": "083f7181",
+      "nextId": 392,
+      "state": "039b5850",
+      "events": "868a4a61",
       "rng": {
         "draws": 3,
         "digest": "73521d70"
@@ -119,9 +121,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 391,
-      "state": "0a3b9029",
-      "events": "a7c7771b",
+      "nextId": 392,
+      "state": "0b15bf4c",
+      "events": "67f2ec49",
       "rng": {
         "draws": 73,
         "digest": "7ef074c8"
@@ -130,9 +132,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 391,
-      "state": "0bb45591",
-      "events": "a7c7771b",
+      "nextId": 392,
+      "state": "f7def288",
+      "events": "67f2ec49",
       "rng": {
         "draws": 162,
         "digest": "a72d4df2"
@@ -141,9 +143,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 391,
-      "state": "1f4d0785",
-      "events": "68be82c9",
+      "nextId": 392,
+      "state": "cf48d75c",
+      "events": "7e7bbdad",
       "rng": {
         "draws": 254,
         "digest": "8a8c6a7c"
@@ -152,9 +154,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 391,
-      "state": "358d8b54",
-      "events": "a7c7771b",
+      "nextId": 392,
+      "state": "a3f934b1",
+      "events": "67f2ec49",
       "rng": {
         "draws": 367,
         "digest": "6d00992d"
@@ -163,8 +165,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 391,
-      "state": "5ba3a1b0",
+      "nextId": 392,
+      "state": "5ee84e0d",
       "events": "741638a5",
       "rng": {
         "draws": 411,
@@ -182,7 +184,7 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 390,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -207,9 +209,10 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 105.4,
           "hp": 50000,
-          "id": 389,
+          "id": 390,
           "kind": "player",
           "level": 10,
+          "lootFfaTimer": "Infinity",
           "maxHp": 50000,
           "maxResource": 816,
           "moveSpeed": 7,
@@ -229,6 +232,7 @@
             "y": 1.5,
             "z": -2
           },
+          "spellPower": 26,
           "stats": {
             "agi": 12,
             "armor": 93,
@@ -237,7 +241,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 390,
+          "targetId": 391,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -256,9 +260,10 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 9000,
-          "id": 390,
+          "id": 391,
           "kind": "mob",
           "level": 5,
+          "lootFfaTimer": "Infinity",
           "maxHp": 9000,
           "moveSpeed": 8,
           "onGround": true,

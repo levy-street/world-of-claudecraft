@@ -1729,7 +1729,32 @@ export const GUIDE_DELVES: GuideDelve[] = [
       "Candleblind",
       "Grave Tax",
       "Unstable Roof",
-      "Cult Remnants"
+      "Cult Remnants",
+      "Belligerent Dead"
+    ]
+  },
+  {
+    "id": "drowned_litany",
+    "name": "The Drowned Litany",
+    "theme": "ruin",
+    "minLevel": 12,
+    "suggestedPlayers": 2,
+    "keeper": {
+      "name": "Brother Aldric",
+      "title": "Fenbridge Watch"
+    },
+    "companion": {
+      "name": "Edda Reedhand",
+      "role": "healer"
+    },
+    "tiers": [
+      "Normal",
+      "Heroic"
+    ],
+    "affixes": [
+      "High Water",
+      "Lively Choir",
+      "Belligerent Dead"
     ]
   }
 ];
