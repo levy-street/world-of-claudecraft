@@ -218,19 +218,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "holy",
         "name": "Holy",
         "role": "healer",
-        "signature": "flash_of_light"
+        "signature": "holy_shock"
       },
       {
         "id": "protection",
         "name": "Protection",
         "role": "tank",
-        "signature": "righteous_fury"
+        "signature": "holy_shield"
       },
       {
         "id": "retribution",
         "name": "Retribution",
         "role": "dps",
-        "signature": "judgement"
+        "signature": "repentance"
       }
     ],
     "signatureAbilities": [
@@ -328,19 +328,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "beast_mastery",
         "name": "Beast Mastery",
         "role": "dps",
-        "signature": "tame_beast"
+        "signature": "bestial_wrath"
       },
       {
         "id": "marksmanship",
         "name": "Marksmanship",
         "role": "dps",
-        "signature": "aimed_shot"
+        "signature": "trueshot_aura"
       },
       {
         "id": "survival",
         "name": "Survival",
         "role": "dps",
-        "signature": "wing_clip"
+        "signature": "wyvern_sting"
       }
     ],
     "signatureAbilities": [
@@ -446,19 +446,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "assassination",
         "name": "Assassination",
         "role": "dps",
-        "signature": "eviscerate"
+        "signature": "cold_blood"
       },
       {
         "id": "combat",
         "name": "Combat",
         "role": "dps",
-        "signature": "adrenaline_rush"
+        "signature": "blade_flurry"
       },
       {
         "id": "subtlety",
         "name": "Subtlety",
         "role": "dps",
-        "signature": "ambush"
+        "signature": "hemorrhage"
       }
     ],
     "signatureAbilities": [
@@ -589,19 +589,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "discipline",
         "name": "Discipline",
         "role": "healer",
-        "signature": "power_word_shield"
+        "signature": "power_infusion"
       },
       {
         "id": "holy",
         "name": "Holy",
         "role": "healer",
-        "signature": "flash_heal"
+        "signature": "holy_nova"
       },
       {
         "id": "shadow",
         "name": "Shadow",
         "role": "dps",
-        "signature": "mind_flay"
+        "signature": "shadowform"
       }
     ],
     "signatureAbilities": [
@@ -689,19 +689,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "elemental",
         "name": "Elemental",
         "role": "dps",
-        "signature": "lightning_bolt"
+        "signature": "elemental_mastery"
       },
       {
         "id": "enhancement",
         "name": "Enhancement",
         "role": "dps",
-        "signature": "stormstrike"
+        "signature": "shamanistic_rage"
       },
       {
         "id": "restoration",
         "name": "Restoration",
         "role": "healer",
-        "signature": "healing_wave"
+        "signature": "natures_swiftness"
       }
     ],
     "signatureAbilities": [
@@ -796,19 +796,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "arcane",
         "name": "Arcane",
         "role": "dps",
-        "signature": "arcane_missiles"
+        "signature": "arcane_power"
       },
       {
         "id": "fire",
         "name": "Fire",
         "role": "dps",
-        "signature": "scorch"
+        "signature": "combustion"
       },
       {
         "id": "frost",
         "name": "Frost",
         "role": "dps",
-        "signature": "ice_barrier"
+        "signature": "cone_of_cold"
       }
     ],
     "signatureAbilities": [
@@ -914,19 +914,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "affliction",
         "name": "Affliction",
         "role": "dps",
-        "signature": "drain_life"
+        "signature": "siphon_life"
       },
       {
         "id": "demonology",
         "name": "Demonology",
         "role": "dps",
-        "signature": "demon_skin"
+        "signature": "fel_domination"
       },
       {
         "id": "destruction",
         "name": "Destruction",
         "role": "dps",
-        "signature": "shadowburn"
+        "signature": "conflagrate"
       }
     ],
     "signatureAbilities": [
@@ -1047,19 +1047,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "balance",
         "name": "Balance",
         "role": "dps",
-        "signature": "starfire"
+        "signature": "moonkin_form"
       },
       {
         "id": "feral",
         "name": "Feral",
         "role": "tank",
-        "signature": "bear_form"
+        "signature": "feral_charge"
       },
       {
         "id": "restoration",
         "name": "Restoration",
         "role": "healer",
-        "signature": "regrowth"
+        "signature": "swiftmend"
       }
     ],
     "signatureAbilities": [

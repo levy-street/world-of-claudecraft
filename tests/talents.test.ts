@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
 import {
   computeTalentModifiers,
   dormantNodes,
@@ -87,6 +87,21 @@ describe('talent tree validation (load-time)', () => {
           for (const mod of eff!.ability ?? [])
             expect(ABILITIES[mod.ability], `${node.id}:${mod.ability}`).toBeTruthy();
         }
+      }
+    }
+  });
+
+  it('keeps every spec signature grant-only', () => {
+    const kitAbilities = new Set<string>();
+    for (const cls of ALL_CLASSES) {
+      for (const abilityId of CLASSES[cls].abilities) kitAbilities.add(abilityId);
+    }
+
+    for (const cls of ALL_CLASSES) {
+      const ct = talentsFor(cls)!;
+      for (const s of ct.specs) {
+        expect(ABILITIES[s.signature], `${cls}:${s.id}:${s.signature}`).toBeTruthy();
+        expect(kitAbilities.has(s.signature), `${cls}:${s.id}:${s.signature}`).toBe(false);
       }
     }
   });
@@ -302,6 +317,21 @@ describe('precomputed modifiers', () => {
         );
         expect(
           known.some((k) => k.def.id === s.signature),
+          `${cls}:${s.id}:${s.signature}`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('grants every chosen spec signature through the sim known set', () => {
+    for (const cls of ALL_CLASSES) {
+      const ct = talentsFor(cls)!;
+      for (const s of ct.specs) {
+        const sim = new Sim({ seed: 9, playerClass: cls });
+        sim.setPlayerLevel(FIRST_TALENT_LEVEL);
+        expect(sim.setSpec(s.id), `${cls}:${s.id}`).toBe(true);
+        expect(
+          sim.known.some((k) => k.def.id === s.signature),
           `${cls}:${s.id}:${s.signature}`,
         ).toBe(true);
       }

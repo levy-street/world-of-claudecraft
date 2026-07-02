@@ -4784,4 +4784,76 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
+  'entities.abilities.holy_shock.name': '神聖震擊',
+  'entities.abilities.holy_shock.description':
+    '以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）',
+  'entities.abilities.holy_shield.name': '神聖之盾',
+  'entities.abilities.holy_shield.description':
+    '以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）',
+  'entities.abilities.repentance.name': '懺悔',
+  'entities.abilities.repentance.description':
+    '使敵人進入冥想狀態，最多持續6秒。受到任何傷害都會打破效果。（懲戒專精招牌）',
+  'entities.abilities.bestial_wrath.name': '狂野怒火',
+  'entities.abilities.bestial_wrath.description':
+    '使你進入野獸怒火狀態，攻擊強度提高55點，持續15秒。（野獸控制專精招牌）',
+  'entities.abilities.trueshot_aura.name': '強擊光環',
+  'entities.abilities.trueshot_aura.description':
+    '鼓舞附近盟友，使攻擊強度提高35點，持續5分鐘。（射擊專精招牌）',
+  'entities.abilities.wyvern_sting.name': '翼龍釘刺',
+  'entities.abilities.wyvern_sting.description':
+    '從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）',
+  'entities.abilities.arcane_power.name': '祕法強化',
+  'entities.abilities.arcane_power.description':
+    '讓你充滿祕法能量，法術強度提高28點，持續12秒。（祕法專精招牌）',
+  'entities.abilities.combustion.name': '燃燒',
+  'entities.abilities.combustion.description':
+    '集中你的火焰魔法，使下一次攻擊造成致命一擊。（火焰專精招牌）',
+  'entities.abilities.cone_of_cold.name': '冰錐術',
+  'entities.abilities.cone_of_cold.description':
+    '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）',
+  'entities.abilities.cold_blood.name': '冷血',
+  'entities.abilities.cold_blood.description':
+    '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）',
+  'entities.abilities.blade_flurry.name': '劍刃亂舞',
+  'entities.abilities.blade_flurry.description':
+    '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）',
+  'entities.abilities.hemorrhage.name': '出血',
+  'entities.abilities.hemorrhage.description':
+    '攻擊敵人，造成武器傷害加{damage}點傷害，並在12秒內造成流血傷害。獎勵1個連擊點。（敏銳專精招牌）',
+  'entities.abilities.power_infusion.name': '能量灌注',
+  'entities.abilities.power_infusion.description':
+    '向一名友方目標灌注能量，使其法術強度提高28點，持續15秒。（戒律專精招牌）',
+  'entities.abilities.holy_nova.name': '神聖新星',
+  'entities.abilities.holy_nova.description':
+    '引發神聖之光爆炸，為附近盟友恢復{damage}點生命值並傷害附近敵人。（神聖專精招牌）',
+  'entities.abilities.shadowform.name': '暗影形態',
+  'entities.abilities.shadowform.description':
+    '進入暗影形態，強化暗影魔法直到你切換回來。再次施放可返回普通形態。（暗影專精招牌）',
+  'entities.abilities.elemental_mastery.name': '元素精通',
+  'entities.abilities.elemental_mastery.description':
+    '呼喚元素精通，使你的下一個法術變為瞬發。（元素專精招牌）',
+  'entities.abilities.shamanistic_rage.name': '薩滿之怒',
+  'entities.abilities.shamanistic_rage.description':
+    "釋放薩滿之怒，恢復160點法力值。（增強專精招牌）",
+  'entities.abilities.natures_swiftness.name': '自然迅捷',
+  'entities.abilities.natures_swiftness.description':
+    '呼喚自然之力，使你的下一個法術變為瞬發。（恢復專精招牌）',
+  'entities.abilities.siphon_life.name': '生命虹吸',
+  'entities.abilities.siphon_life.description':
+    '虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）',
+  'entities.abilities.fel_domination.name': '惡魔支配',
+  'entities.abilities.fel_domination.description':
+    '支配魔能，使你的下一個法術變為瞬發。（惡魔學識專精招牌）',
+  'entities.abilities.conflagrate.name': "燃盡",
+  'entities.abilities.conflagrate.description':
+    '吞噬敵人身上的獻祭，將其點燃並造成{damage}點火焰傷害。（毀滅專精招牌）',
+  'entities.abilities.moonkin_form.name': '梟獸形態',
+  'entities.abilities.moonkin_form.description':
+    '進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）',
+  'entities.abilities.feral_charge.name': '野性衝鋒',
+  'entities.abilities.feral_charge.description':
+    '衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）',
+  'entities.abilities.swiftmend.name': '迅癒',
+  'entities.abilities.swiftmend.description':
+    '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
 };

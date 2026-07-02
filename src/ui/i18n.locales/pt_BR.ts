@@ -5164,4 +5164,76 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Agora não',
   'hudChrome.nativeUpdate.title': 'Atualização disponível',
   'hudChrome.nativeUpdate.update': 'Atualizar',
+  'entities.abilities.holy_shock.name': 'Choque Sagrado',
+  'entities.abilities.holy_shock.description':
+    "Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)",
+  'entities.abilities.holy_shield.name': 'Escudo Sagrado',
+  'entities.abilities.holy_shield.description':
+    "Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)",
+  'entities.abilities.repentance.name': 'Arrependimento',
+  'entities.abilities.repentance.description':
+    "Coloca o inimigo em estado de meditação por até 6 s. Qualquer dano quebra o efeito. (assinatura Retribuição)",
+  'entities.abilities.bestial_wrath.name': 'Ira Bestial',
+  'entities.abilities.bestial_wrath.description':
+    "Lança você em ira bestial, aumentando o poder de ataque em 55 por 15 s. (assinatura Domínio das Feras)",
+  'entities.abilities.trueshot_aura.name': 'Aura de Tiro Certeiro',
+  'entities.abilities.trueshot_aura.description':
+    "Inspira aliados próximos, aumentando o poder de ataque em 35 por 5 min. (assinatura Precisão)",
+  'entities.abilities.wyvern_sting.name': 'Aguilhão de Mantícora',
+  'entities.abilities.wyvern_sting.description':
+    "Fere o inimigo à distância, incapacitando-o por até 4 s. Qualquer dano quebra o efeito. (assinatura Sobrevivência)",
+  'entities.abilities.arcane_power.name': 'Poder Arcano',
+  'entities.abilities.arcane_power.description':
+    "Enche você de poder Arcano, aumentando o poder mágico em 28 por 12 s. (assinatura Arcano)",
+  'entities.abilities.combustion.name': 'Combustão',
+  'entities.abilities.combustion.description':
+    "Concentra sua magia de fogo para que seu próximo ataque seja um acerto crítico. (assinatura Fogo)",
+  'entities.abilities.cone_of_cold.name': 'Cone de Frio',
+  'entities.abilities.cone_of_cold.description':
+    "Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (assinatura Gelo)",
+  'entities.abilities.cold_blood.name': 'Sangue Frio',
+  'entities.abilities.cold_blood.description':
+    "Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)",
+  'entities.abilities.blade_flurry.name': 'Torrente de Lâminas',
+  'entities.abilities.blade_flurry.description':
+    "Libera uma rajada de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura Combate)",
+  'entities.abilities.hemorrhage.name': 'Hemorragia',
+  'entities.abilities.hemorrhage.description':
+    "Atinge o inimigo com dano de arma mais {damage} e causa dano de sangramento por 12 s. Concede 1 ponto de combo. (assinatura Sutileza)",
+  'entities.abilities.power_infusion.name': 'Infusão de Poder',
+  'entities.abilities.power_infusion.description':
+    "Infunde poder em um alvo aliado, aumentando o poder mágico em 28 por 15 s. (assinatura Disciplina)",
+  'entities.abilities.holy_nova.name': 'Nova Sagrada',
+  'entities.abilities.holy_nova.description':
+    "Causa uma explosão de luz Sagrada, curando aliados próximos em {damage} e causando dano a inimigos próximos. (assinatura Sagrado)",
+  'entities.abilities.shadowform.name': 'Forma de Sombra',
+  'entities.abilities.shadowform.description':
+    "Assume Forma de Sombra, fortalecendo a magia sombria até você voltar. Lance novamente para retornar à forma normal. (assinatura Sombras)",
+  'entities.abilities.elemental_mastery.name': 'Maestria Elemental',
+  'entities.abilities.elemental_mastery.description':
+    "Invoca maestria elemental, tornando seu próximo feitiço instantâneo. (assinatura Elemental)",
+  'entities.abilities.shamanistic_rage.name': 'Raiva Xamânica',
+  'entities.abilities.shamanistic_rage.description':
+    "Libera raiva xamânica, restaurando 160 de mana. (assinatura Aperfeiçoamento)",
+  'entities.abilities.natures_swiftness.name': 'Rapidez da Natureza',
+  'entities.abilities.natures_swiftness.description':
+    "Invoca a natureza para tornar seu próximo feitiço instantâneo. (assinatura Restauração)",
+  'entities.abilities.siphon_life.name': 'Sifão de Vida',
+  'entities.abilities.siphon_life.description':
+    "Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)",
+  'entities.abilities.fel_domination.name': 'Dominação Vil',
+  'entities.abilities.fel_domination.description':
+    "Domina energias vis, tornando seu próximo feitiço instantâneo. (assinatura Demonologia)",
+  'entities.abilities.conflagrate.name': 'Conflagrar',
+  'entities.abilities.conflagrate.description':
+    "Consome seu Imolar no inimigo para incendiá-lo com {damage} de dano de Fogo. (assinatura Destruição)",
+  'entities.abilities.moonkin_form.name': 'Forma de Luniscante',
+  'entities.abilities.moonkin_form.description':
+    "Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)",
+  'entities.abilities.feral_charge.name': 'Investida Feral',
+  'entities.abilities.feral_charge.description':
+    "Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)",
+  'entities.abilities.swiftmend.name': 'Recuperação Rápida',
+  'entities.abilities.swiftmend.description':
+    "Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)",
 };

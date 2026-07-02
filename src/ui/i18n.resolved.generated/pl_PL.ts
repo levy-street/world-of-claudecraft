@@ -4339,6 +4339,102 @@ export const pl_PL: EnTranslations = {
         "name": "Furia berserkera",
         "description": "Wpadnij w furię berserkera, generując 20 wściekłości. (Talent wojownika)"
       },
+      "holy_shock": {
+        "name": "Święty wstrząs",
+        "description": "Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)"
+      },
+      "holy_shield": {
+        "name": "Święta tarcza",
+        "description": "Osłaniasz się Świętą mocą na 10 sek., zwiększając pancerz o 90 i rażąc napastników w zwarciu za 12 obrażeń Świętych. (specjalizacja Ochrona)"
+      },
+      "repentance": {
+        "name": "Skrucha",
+        "description": "Wprowadza wroga w stan medytacji na maksymalnie 6 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Odwet)"
+      },
+      "bestial_wrath": {
+        "name": "Bestialski gniew",
+        "description": "Wpadasz w bestialski szał, zwiększając siłę ataku o 55 na 15 sek. (specjalizacja Władca Bestii)"
+      },
+      "trueshot_aura": {
+        "name": "Aura celnego strzału",
+        "description": "Inspiruje pobliskich sojuszników, zwiększając siłę ataku o 35 na 5 min. (specjalizacja Strzelectwo)"
+      },
+      "wyvern_sting": {
+        "name": "Żądło wiwerny",
+        "description": "Żądli wroga z dystansu, obezwładniając go na maksymalnie 4 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Przetrwanie)"
+      },
+      "arcane_power": {
+        "name": "Moc Arkanów",
+        "description": "Napełnia cię mocą Arkanów, zwiększając moc zaklęć o 28 na 12 sek. (specjalizacja Arkana)"
+      },
+      "combustion": {
+        "name": "Zapłon",
+        "description": "Skupia twoją magię ognia, aby następny atak był trafieniem krytycznym. (specjalizacja Ogień)"
+      },
+      "cone_of_cold": {
+        "name": "Stożek zimna",
+        "description": "Uderza pobliskich wrogów mrozem, zadając {damage} obrażeń od Mrozu. (specjalizacja Mróz)"
+      },
+      "cold_blood": {
+        "name": "Zimna krew",
+        "description": "Skupia twoją morderczą intencję, aby następny atak był trafieniem krytycznym. (specjalizacja Zabójstwo)"
+      },
+      "blade_flurry": {
+        "name": "Nawałnica ostrzy",
+        "description": "Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 12 sek. (specjalizacja Walka)"
+      },
+      "hemorrhage": {
+        "name": "Krwotok",
+        "description": "Uderza wroga za obrażenia broni plus {damage} i powoduje krwawienie przez 12 sek. Daje 1 punkt combo. (specjalizacja Subtelność)"
+      },
+      "power_infusion": {
+        "name": "Infuzja mocy",
+        "description": "Napełnia przyjazny cel mocą, zwiększając moc zaklęć o 28 na 15 sek. (specjalizacja Dyscyplina)"
+      },
+      "holy_nova": {
+        "name": "Święta nova",
+        "description": "Wywołuje wybuch Świętego światła, leczy pobliskich sojuszników za {damage} i rani pobliskich wrogów. (specjalizacja Świętość)"
+      },
+      "shadowform": {
+        "name": "Postać cienia",
+        "description": "Przyjmujesz postać cienia, wzmacniając magię cienia do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Cień)"
+      },
+      "elemental_mastery": {
+        "name": "Mistrzostwo żywiołów",
+        "description": "Przywołuje mistrzostwo żywiołów, sprawiając, że następne zaklęcie jest natychmiastowe. (specjalizacja Żywioły)"
+      },
+      "shamanistic_rage": {
+        "name": "Szamański gniew",
+        "description": "Uwalnia szamański gniew, przywracając 160 many. (specjalizacja Wzmocnienie)"
+      },
+      "natures_swiftness": {
+        "name": "Szybkość natury",
+        "description": "Przywołuje naturę, aby następne zaklęcie było natychmiastowe. (specjalizacja Odnowa)"
+      },
+      "siphon_life": {
+        "name": "Wyssanie życia",
+        "description": "Wysysa życie z wroga, zadając {damage} obrażeń od Cienia przez 30 sek. i lecząc cię za zadane obrażenia. (specjalizacja Udręka)"
+      },
+      "fel_domination": {
+        "name": "Dominacja spaczenia",
+        "description": "Opanowuje spaczonymi energiami, sprawiając, że następne zaklęcie jest natychmiastowe. (specjalizacja Demonologia)"
+      },
+      "conflagrate": {
+        "name": "Pożoga",
+        "description": "Zużywa twoje podpalenie na wrogu, aby zajął się ogniem i otrzymał {damage} obrażeń od Ognia. (specjalizacja Zniszczenie)"
+      },
+      "moonkin_form": {
+        "name": "Postać księżycowej sowy",
+        "description": "Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)"
+      },
+      "feral_charge": {
+        "name": "Dzika szarża",
+        "description": "Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)"
+      },
+      "swiftmend": {
+        "name": "Szybkie uzdrowienie",
+        "description": "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. (specjalizacja Odnowa)"
+      },
       "summon_imp": {
         "name": "Przywołanie chochlika",
         "description": "Przywołuje chochlika pod komendę Czarnoksiężnika. Chochlik ciska Ognistymi pociskami w twoich wrogów z oddali. Przywołanie nowego demona odprawia obecnego. Możesz mieć jednego demona naraz."

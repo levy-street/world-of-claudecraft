@@ -4339,6 +4339,102 @@ export const vi_VN: EnTranslations = {
         "name": "Cuồng Nộ Berserker",
         "description": "Bước vào cơn cuồng nộ berserker, tạo 20 nộ khí. (Tài năng Chiến Binh)"
       },
+      "holy_shock": {
+        "name": "Sốc Thánh",
+        "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"
+      },
+      "holy_shield": {
+        "name": "Khiên Thánh",
+        "description": "Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)"
+      },
+      "repentance": {
+        "name": "Sám Hối",
+        "description": "Đưa kẻ địch vào trạng thái thiền định tối đa 6 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Trừng Phạt)"
+      },
+      "bestial_wrath": {
+        "name": "Cơn Thịnh Nộ Dã Thú",
+        "description": "Đưa bạn vào cơn giận dã thú, tăng sức mạnh tấn công thêm 55 trong 15 giây. (dấu ấn Thuần Thú)"
+      },
+      "trueshot_aura": {
+        "name": "Hào Quang Bắn Chuẩn",
+        "description": "Truyền cảm hứng cho đồng minh gần đó, tăng sức mạnh tấn công thêm 35 trong 5 phút. (dấu ấn Thiện Xạ)"
+      },
+      "wyvern_sting": {
+        "name": "Cú Chích Rồng Bay",
+        "description": "Chích kẻ địch từ xa, làm chúng bất động tối đa 4 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Sinh Tồn)"
+      },
+      "arcane_power": {
+        "name": "Sức Mạnh Bí Thuật",
+        "description": "Nạp đầy sức mạnh bí thuật cho bạn, tăng sức mạnh phép thêm 28 trong 12 giây. (dấu ấn Bí Thuật)"
+      },
+      "combustion": {
+        "name": "Thiêu Đốt",
+        "description": "Tập trung ma thuật lửa để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Lửa)"
+      },
+      "cone_of_cold": {
+        "name": "Nón Lạnh",
+        "description": "Thổi băng vào kẻ địch gần đó, gây {damage} sát thương Băng. (dấu ấn Băng)"
+      },
+      "cold_blood": {
+        "name": "Máu Lạnh",
+        "description": "Tập trung sát ý để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Ám Sát)"
+      },
+      "blade_flurry": {
+        "name": "Loạn Đao",
+        "description": "Tung ra một loạt lưỡi dao, tăng tốc độ tấn công thêm 20% trong 12 giây. (dấu ấn Chiến Đấu)"
+      },
+      "hemorrhage": {
+        "name": "Xuất Huyết",
+        "description": "Đánh kẻ địch gây sát thương vũ khí cộng {damage} và gây sát thương chảy máu trong 12 giây. Nhận 1 điểm combo. (dấu ấn Tinh Tế)"
+      },
+      "power_infusion": {
+        "name": "Truyền Sức Mạnh",
+        "description": "Truyền sức mạnh cho một mục tiêu đồng minh, tăng sức mạnh phép thêm 28 trong 15 giây. (dấu ấn Kỷ Luật)"
+      },
+      "holy_nova": {
+        "name": "Nova Thánh",
+        "description": "Gây một vụ nổ ánh sáng Thánh, hồi cho đồng minh gần đó {damage} và gây sát thương cho kẻ địch gần đó. (dấu ấn Thánh)"
+      },
+      "shadowform": {
+        "name": "Dạng Bóng Tối",
+        "description": "Nhận dạng bóng tối, cường hóa ma thuật bóng tối cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Bóng Tối)"
+      },
+      "elemental_mastery": {
+        "name": "Tinh Thông Nguyên Tố",
+        "description": "Kêu gọi tinh thông nguyên tố, khiến phép tiếp theo của bạn thi triển tức thì. (dấu ấn Nguyên Tố)"
+      },
+      "shamanistic_rage": {
+        "name": "Cơn Thịnh Nộ Pháp Sư Linh Hồn",
+        "description": "Giải phóng cơn thịnh nộ pháp sư linh hồn, hồi 160 mana. (dấu ấn Cường Hóa)"
+      },
+      "natures_swiftness": {
+        "name": "Sự Nhanh Nhẹn của Thiên Nhiên",
+        "description": "Kêu gọi thiên nhiên để khiến phép tiếp theo của bạn thi triển tức thì. (dấu ấn Phục Hồi)"
+      },
+      "siphon_life": {
+        "name": "Hút Sự Sống",
+        "description": "Hút sự sống từ kẻ địch, gây {damage} sát thương Bóng Tối trong 30 giây và hồi cho bạn bằng lượng sát thương đã gây. (dấu ấn Đau Khổ)"
+      },
+      "fel_domination": {
+        "name": "Khống Chế Ma Năng",
+        "description": "Khống chế năng lượng ma quỷ, khiến phép tiếp theo của bạn thi triển tức thì. (dấu ấn Quỷ Học)"
+      },
+      "conflagrate": {
+        "name": "Bùng Cháy",
+        "description": "Tiêu thụ Thiêu Đốt của bạn trên kẻ địch để đốt chúng, gây {damage} sát thương Lửa. (dấu ấn Hủy Diệt)"
+      },
+      "moonkin_form": {
+        "name": "Dạng Cú Mặt Trăng",
+        "description": "Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)"
+      },
+      "feral_charge": {
+        "name": "Xung Phong Hoang Dã",
+        "description": "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)"
+      },
+      "swiftmend": {
+        "name": "Hồi Phục Nhanh",
+        "description": "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)"
+      },
       "summon_imp": {
         "name": "Triệu Hồi Tiểu Quỷ",
         "description": "Triệu hồi một Tiểu Quỷ dưới quyền chỉ huy của Thuật Sĩ Hắc Ám. Tiểu Quỷ ném Tiễn Lửa vào kẻ địch của bạn từ xa. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."

@@ -5046,4 +5046,76 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.remainingMinutes': '{minutes}분',
   'hudChrome.dailyRewards.sol': '{amount} SOL',
   'hudChrome.dailyRewards.usd': '{amount} USD',
+  'entities.abilities.holy_shock.name': '신성 충격',
+  'entities.abilities.holy_shock.description':
+    '신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)',
+  'entities.abilities.holy_shield.name': '신성한 방패',
+  'entities.abilities.holy_shield.description':
+    '10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)',
+  'entities.abilities.repentance.name': '참회',
+  'entities.abilities.repentance.description':
+    '적을 최대 6초 동안 명상 상태로 만듭니다. 피해를 받으면 효과가 해제됩니다. (징벌 전문화 상징)',
+  'entities.abilities.bestial_wrath.name': '야수의 격노',
+  'entities.abilities.bestial_wrath.description':
+    '야수의 분노에 휩싸여 15초 동안 전투력이 55만큼 증가합니다. (야수 전문화 상징)',
+  'entities.abilities.trueshot_aura.name': '정조준 오라',
+  'entities.abilities.trueshot_aura.description':
+    '주위 아군을 고무하여 5분 동안 전투력을 35만큼 증가시킵니다. (사격 전문화 상징)',
+  'entities.abilities.wyvern_sting.name': '비룡 쐐기',
+  'entities.abilities.wyvern_sting.description':
+    '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
+  'entities.abilities.arcane_power.name': '신비의 마법 강화',
+  'entities.abilities.arcane_power.description':
+    '신비한 힘으로 가득 차 12초 동안 주문력이 28만큼 증가합니다. (비전 전문화 상징)',
+  'entities.abilities.combustion.name': '발화',
+  'entities.abilities.combustion.description':
+    '화염 마법을 집중하여 다음 공격이 치명타로 적중하게 합니다. (화염 전문화 상징)',
+  'entities.abilities.cone_of_cold.name': '냉기 돌풍',
+  'entities.abilities.cone_of_cold.description':
+    '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (냉기 전문화 상징)',
+  'entities.abilities.cold_blood.name': '냉혈',
+  'entities.abilities.cold_blood.description':
+    '살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)',
+  'entities.abilities.blade_flurry.name': '폭풍의 칼날',
+  'entities.abilities.blade_flurry.description':
+    '칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)',
+  'entities.abilities.hemorrhage.name': '과다출혈',
+  'entities.abilities.hemorrhage.description':
+    '적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)',
+  'entities.abilities.power_infusion.name': '마력 주입',
+  'entities.abilities.power_infusion.description':
+    '아군 대상에게 힘을 주입하여 15초 동안 주문력을 28만큼 증가시킵니다. (수양 전문화 상징)',
+  'entities.abilities.holy_nova.name': '신성한 폭발',
+  'entities.abilities.holy_nova.description':
+    '신성한 빛을 폭발시켜 주위 아군을 {damage}만큼 치유하고 주위 적에게 피해를 줍니다. (신성 전문화 상징)',
+  'entities.abilities.shadowform.name': '어둠의 형상',
+  'entities.abilities.shadowform.description':
+    '어둠의 형상을 취해 돌아올 때까지 암흑 마법을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (암흑 전문화 상징)',
+  'entities.abilities.elemental_mastery.name': '정기의 깨달음',
+  'entities.abilities.elemental_mastery.description':
+    '정기의 깨달음을 불러 다음 주문을 즉시 시전하게 합니다. (정기 전문화 상징)',
+  'entities.abilities.shamanistic_rage.name': '주술의 분노',
+  'entities.abilities.shamanistic_rage.description':
+    '주술의 분노를 방출하여 마나 160를 회복합니다. (고양 전문화 상징)',
+  'entities.abilities.natures_swiftness.name': '자연의 신속함',
+  'entities.abilities.natures_swiftness.description':
+    '자연을 불러 다음 주문을 즉시 시전하게 합니다. (복원 전문화 상징)',
+  'entities.abilities.siphon_life.name': '생명력 착취',
+  'entities.abilities.siphon_life.description':
+    '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
+  'entities.abilities.fel_domination.name': '악마 지배',
+  'entities.abilities.fel_domination.description':
+    '지옥의 기운을 지배하여 다음 주문을 즉시 시전하게 합니다. (악마 전문화 상징)',
+  'entities.abilities.conflagrate.name': '점화',
+  'entities.abilities.conflagrate.description':
+    '적에게 걸린 제물 효과를 소모해 불태우고 {damage}의 화염 피해를 줍니다. (파괴 전문화 상징)',
+  'entities.abilities.moonkin_form.name': '달빛야수 변신',
+  'entities.abilities.moonkin_form.description':
+    '달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)',
+  'entities.abilities.feral_charge.name': '야성의 돌진',
+  'entities.abilities.feral_charge.description':
+    '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
+  'entities.abilities.swiftmend.name': '신속한 치유',
+  'entities.abilities.swiftmend.description':
+    '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
 };

@@ -4339,6 +4339,102 @@ export const pt_BR: EnTranslations = {
         "name": "Raiva Berserker",
         "description": "Entra em raiva berserker e gera 20 de raiva. (talento de guerreiro)"
       },
+      "holy_shock": {
+        "name": "Choque Sagrado",
+        "description": "Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)"
+      },
+      "holy_shield": {
+        "name": "Escudo Sagrado",
+        "description": "Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)"
+      },
+      "repentance": {
+        "name": "Arrependimento",
+        "description": "Coloca o inimigo em estado de meditação por até 6 s. Qualquer dano quebra o efeito. (assinatura Retribuição)"
+      },
+      "bestial_wrath": {
+        "name": "Ira Bestial",
+        "description": "Lança você em ira bestial, aumentando o poder de ataque em 55 por 15 s. (assinatura Domínio das Feras)"
+      },
+      "trueshot_aura": {
+        "name": "Aura de Tiro Certeiro",
+        "description": "Inspira aliados próximos, aumentando o poder de ataque em 35 por 5 min. (assinatura Precisão)"
+      },
+      "wyvern_sting": {
+        "name": "Aguilhão de Mantícora",
+        "description": "Fere o inimigo à distância, incapacitando-o por até 4 s. Qualquer dano quebra o efeito. (assinatura Sobrevivência)"
+      },
+      "arcane_power": {
+        "name": "Poder Arcano",
+        "description": "Enche você de poder Arcano, aumentando o poder mágico em 28 por 12 s. (assinatura Arcano)"
+      },
+      "combustion": {
+        "name": "Combustão",
+        "description": "Concentra sua magia de fogo para que seu próximo ataque seja um acerto crítico. (assinatura Fogo)"
+      },
+      "cone_of_cold": {
+        "name": "Cone de Frio",
+        "description": "Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (assinatura Gelo)"
+      },
+      "cold_blood": {
+        "name": "Sangue Frio",
+        "description": "Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)"
+      },
+      "blade_flurry": {
+        "name": "Torrente de Lâminas",
+        "description": "Libera uma rajada de lâminas, aumentando a velocidade de ataque em 20% por 12 s. (assinatura Combate)"
+      },
+      "hemorrhage": {
+        "name": "Hemorragia",
+        "description": "Atinge o inimigo com dano de arma mais {damage} e causa dano de sangramento por 12 s. Concede 1 ponto de combo. (assinatura Sutileza)"
+      },
+      "power_infusion": {
+        "name": "Infusão de Poder",
+        "description": "Infunde poder em um alvo aliado, aumentando o poder mágico em 28 por 15 s. (assinatura Disciplina)"
+      },
+      "holy_nova": {
+        "name": "Nova Sagrada",
+        "description": "Causa uma explosão de luz Sagrada, curando aliados próximos em {damage} e causando dano a inimigos próximos. (assinatura Sagrado)"
+      },
+      "shadowform": {
+        "name": "Forma de Sombra",
+        "description": "Assume Forma de Sombra, fortalecendo a magia sombria até você voltar. Lance novamente para retornar à forma normal. (assinatura Sombras)"
+      },
+      "elemental_mastery": {
+        "name": "Maestria Elemental",
+        "description": "Invoca maestria elemental, tornando seu próximo feitiço instantâneo. (assinatura Elemental)"
+      },
+      "shamanistic_rage": {
+        "name": "Raiva Xamânica",
+        "description": "Libera raiva xamânica, restaurando 160 de mana. (assinatura Aperfeiçoamento)"
+      },
+      "natures_swiftness": {
+        "name": "Rapidez da Natureza",
+        "description": "Invoca a natureza para tornar seu próximo feitiço instantâneo. (assinatura Restauração)"
+      },
+      "siphon_life": {
+        "name": "Sifão de Vida",
+        "description": "Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)"
+      },
+      "fel_domination": {
+        "name": "Dominação Vil",
+        "description": "Domina energias vis, tornando seu próximo feitiço instantâneo. (assinatura Demonologia)"
+      },
+      "conflagrate": {
+        "name": "Conflagrar",
+        "description": "Consome seu Imolar no inimigo para incendiá-lo com {damage} de dano de Fogo. (assinatura Destruição)"
+      },
+      "moonkin_form": {
+        "name": "Forma de Luniscante",
+        "description": "Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)"
+      },
+      "feral_charge": {
+        "name": "Investida Feral",
+        "description": "Investe contra um inimigo e o enraíza por 1 s. Alcance de 8-25 m. (assinatura Feral)"
+      },
+      "swiftmend": {
+        "name": "Recuperação Rápida",
+        "description": "Consome um efeito de cura ao longo do tempo em um alvo aliado para curá-lo em {damage}. (assinatura Restauração)"
+      },
       "summon_imp": {
         "name": "Invocar diabrete",
         "description": "Invoca um Diabrete sob o comando do bruxo. O Diabrete arremessa Flechas de Fogo nos seus inimigos à distância. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez."

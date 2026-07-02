@@ -5111,4 +5111,76 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Cập Nhật',
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
+  'entities.abilities.holy_shock.name': "Sốc Thánh",
+  'entities.abilities.holy_shock.description':
+    "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)",
+  'entities.abilities.holy_shield.name': "Khiên Thánh",
+  'entities.abilities.holy_shield.description':
+    "Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)",
+  'entities.abilities.repentance.name': "Sám Hối",
+  'entities.abilities.repentance.description':
+    "Đưa kẻ địch vào trạng thái thiền định tối đa 6 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Trừng Phạt)",
+  'entities.abilities.bestial_wrath.name': "Cơn Thịnh Nộ Dã Thú",
+  'entities.abilities.bestial_wrath.description':
+    "Đưa bạn vào cơn giận dã thú, tăng sức mạnh tấn công thêm 55 trong 15 giây. (dấu ấn Thuần Thú)",
+  'entities.abilities.trueshot_aura.name': "Hào Quang Bắn Chuẩn",
+  'entities.abilities.trueshot_aura.description':
+    "Truyền cảm hứng cho đồng minh gần đó, tăng sức mạnh tấn công thêm 35 trong 5 phút. (dấu ấn Thiện Xạ)",
+  'entities.abilities.wyvern_sting.name': "Cú Chích Rồng Bay",
+  'entities.abilities.wyvern_sting.description':
+    "Chích kẻ địch từ xa, làm chúng bất động tối đa 4 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Sinh Tồn)",
+  'entities.abilities.arcane_power.name': "Sức Mạnh Bí Thuật",
+  'entities.abilities.arcane_power.description':
+    "Nạp đầy sức mạnh bí thuật cho bạn, tăng sức mạnh phép thêm 28 trong 12 giây. (dấu ấn Bí Thuật)",
+  'entities.abilities.combustion.name': "Thiêu Đốt",
+  'entities.abilities.combustion.description':
+    "Tập trung ma thuật lửa để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Lửa)",
+  'entities.abilities.cone_of_cold.name': "Nón Lạnh",
+  'entities.abilities.cone_of_cold.description':
+    "Thổi băng vào kẻ địch gần đó, gây {damage} sát thương Băng. (dấu ấn Băng)",
+  'entities.abilities.cold_blood.name': "Máu Lạnh",
+  'entities.abilities.cold_blood.description':
+    "Tập trung sát ý để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Ám Sát)",
+  'entities.abilities.blade_flurry.name': "Loạn Đao",
+  'entities.abilities.blade_flurry.description':
+    "Tung ra một loạt lưỡi dao, tăng tốc độ tấn công thêm 20% trong 12 giây. (dấu ấn Chiến Đấu)",
+  'entities.abilities.hemorrhage.name': "Xuất Huyết",
+  'entities.abilities.hemorrhage.description':
+    "Đánh kẻ địch gây sát thương vũ khí cộng {damage} và gây sát thương chảy máu trong 12 giây. Nhận 1 điểm combo. (dấu ấn Tinh Tế)",
+  'entities.abilities.power_infusion.name': "Truyền Sức Mạnh",
+  'entities.abilities.power_infusion.description':
+    "Truyền sức mạnh cho một mục tiêu đồng minh, tăng sức mạnh phép thêm 28 trong 15 giây. (dấu ấn Kỷ Luật)",
+  'entities.abilities.holy_nova.name': "Nova Thánh",
+  'entities.abilities.holy_nova.description':
+    "Gây một vụ nổ ánh sáng Thánh, hồi cho đồng minh gần đó {damage} và gây sát thương cho kẻ địch gần đó. (dấu ấn Thánh)",
+  'entities.abilities.shadowform.name': "Dạng Bóng Tối",
+  'entities.abilities.shadowform.description':
+    "Nhận dạng bóng tối, cường hóa ma thuật bóng tối cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Bóng Tối)",
+  'entities.abilities.elemental_mastery.name': "Tinh Thông Nguyên Tố",
+  'entities.abilities.elemental_mastery.description':
+    "Kêu gọi tinh thông nguyên tố, khiến phép tiếp theo của bạn thi triển tức thì. (dấu ấn Nguyên Tố)",
+  'entities.abilities.shamanistic_rage.name': "Cơn Thịnh Nộ Pháp Sư Linh Hồn",
+  'entities.abilities.shamanistic_rage.description':
+    "Giải phóng cơn thịnh nộ pháp sư linh hồn, hồi 160 mana. (dấu ấn Cường Hóa)",
+  'entities.abilities.natures_swiftness.name': "Sự Nhanh Nhẹn của Thiên Nhiên",
+  'entities.abilities.natures_swiftness.description':
+    "Kêu gọi thiên nhiên để khiến phép tiếp theo của bạn thi triển tức thì. (dấu ấn Phục Hồi)",
+  'entities.abilities.siphon_life.name': "Hút Sự Sống",
+  'entities.abilities.siphon_life.description':
+    "Hút sự sống từ kẻ địch, gây {damage} sát thương Bóng Tối trong 30 giây và hồi cho bạn bằng lượng sát thương đã gây. (dấu ấn Đau Khổ)",
+  'entities.abilities.fel_domination.name': "Khống Chế Ma Năng",
+  'entities.abilities.fel_domination.description':
+    "Khống chế năng lượng ma quỷ, khiến phép tiếp theo của bạn thi triển tức thì. (dấu ấn Quỷ Học)",
+  'entities.abilities.conflagrate.name': "Bùng Cháy",
+  'entities.abilities.conflagrate.description':
+    "Tiêu thụ Thiêu Đốt của bạn trên kẻ địch để đốt chúng, gây {damage} sát thương Lửa. (dấu ấn Hủy Diệt)",
+  'entities.abilities.moonkin_form.name': "Dạng Cú Mặt Trăng",
+  'entities.abilities.moonkin_form.description':
+    "Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)",
+  'entities.abilities.feral_charge.name': "Xung Phong Hoang Dã",
+  'entities.abilities.feral_charge.description':
+    "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)",
+  'entities.abilities.swiftmend.name': "Hồi Phục Nhanh",
+  'entities.abilities.swiftmend.description':
+    "Tiêu thụ một hiệu ứng hồi máu theo thời gian trên mục tiêu đồng minh để hồi cho họ {damage}. (dấu ấn Phục Hồi)",
 };

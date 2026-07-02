@@ -4339,6 +4339,102 @@ export const nl_NL: EnTranslations = {
         "name": "Berserkerwoede",
         "description": "Ga in een berserkerwoede en genereer 20 woede. (Krijger-talent)"
       },
+      "holy_shock": {
+        "name": "Heilige schok",
+        "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
+      },
+      "holy_shield": {
+        "name": "Heilig schild",
+        "description": "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)"
+      },
+      "repentance": {
+        "name": "Berouw",
+        "description": "Brengt de vijand tot 6 sec in een meditatieve staat. Elke schade verbreekt het effect. (Vergelding signatuur)"
+      },
+      "bestial_wrath": {
+        "name": "Beestachtige woede",
+        "description": "Stuurt je in beestachtige razernij, waardoor aanvalskracht 15 sec met 55 toeneemt. (Beestbeheersing signatuur)"
+      },
+      "trueshot_aura": {
+        "name": "Zuiver schot-aura",
+        "description": "Inspireert nabije bondgenoten, waardoor aanvalskracht 5 min met 35 toeneemt. (Scherpschutter signatuur)"
+      },
+      "wyvern_sting": {
+        "name": "Wyvernsteek",
+        "description": "Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)"
+      },
+      "arcane_power": {
+        "name": "Arcanekracht",
+        "description": "Vult je met arcanekracht, waardoor spreukkracht 12 sec met 28 toeneemt. (Arcaan signatuur)"
+      },
+      "combustion": {
+        "name": "Verbranding",
+        "description": "Bundelt je vuurmagie zodat je volgende aanval een kritieke treffer is. (Vuur signatuur)"
+      },
+      "cone_of_cold": {
+        "name": "Kegel van kou",
+        "description": "Treft nabije vijanden met vorst voor {damage} Vorstschade. (Vorst signatuur)"
+      },
+      "cold_blood": {
+        "name": "Koud bloed",
+        "description": "Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)"
+      },
+      "blade_flurry": {
+        "name": "Klingenvlaag",
+        "description": "Ontketent een vlaag van klingen, waardoor aanvalssnelheid 12 sec met 20% toeneemt. (Gevecht signatuur)"
+      },
+      "hemorrhage": {
+        "name": "Bloeding",
+        "description": "Raakt de vijand voor wapenschade plus {damage} en veroorzaakt bloedschade gedurende 12 sec. Geeft 1 combopunt. (Subtiliteit signatuur)"
+      },
+      "power_infusion": {
+        "name": "Krachtinfusie",
+        "description": "Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)"
+      },
+      "holy_nova": {
+        "name": "Heilige nova",
+        "description": "Veroorzaakt een explosie van Heilig licht, geneest nabije bondgenoten voor {damage} en beschadigt nabije vijanden. (Heilig signatuur)"
+      },
+      "shadowform": {
+        "name": "Schaduwvorm",
+        "description": "Neem schaduwvorm aan en versterk schaduwmagie totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Schaduw signatuur)"
+      },
+      "elemental_mastery": {
+        "name": "Elementaire meesterschap",
+        "description": "Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)"
+      },
+      "shamanistic_rage": {
+        "name": "Sjamanistische woede",
+        "description": "Laat sjamanistische woede los en herstelt 160 mana. (Versterking signatuur)"
+      },
+      "natures_swiftness": {
+        "name": "Snelheid van de natuur",
+        "description": "Roept de natuur aan om je volgende spreuk onmiddellijk te maken. (Herstel signatuur)"
+      },
+      "siphon_life": {
+        "name": "Levenshevel",
+        "description": "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)"
+      },
+      "fel_domination": {
+        "name": "Duivelse overheersing",
+        "description": "Overheerst duivelse energieën, waardoor je volgende spreuk onmiddellijk is. (Demonologie signatuur)"
+      },
+      "conflagrate": {
+        "name": "Ontvlamming",
+        "description": "Verbruikt je Verbranden op de vijand om hem te ontsteken voor {damage} Vuurschade. (Vernietiging signatuur)"
+      },
+      "moonkin_form": {
+        "name": "Maanuilvorm",
+        "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
+      },
+      "feral_charge": {
+        "name": "Wilde stormloop",
+        "description": "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)"
+      },
+      "swiftmend": {
+        "name": "Snelle genezing",
+        "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
+      },
       "summon_imp": {
         "name": "Duiveltje Oproepen",
         "description": "Roept een Duiveltje op onder bevel van de Heksenmeester. Het Duiveltje slingert van veraf Vuurbouten naar je vijanden. Het oproepen van een nieuwe demon stuurt je huidige weg. Je mag één demon tegelijk hebben."

@@ -3581,6 +3581,380 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'gainResource', amount: 20 }],
     description: 'Enter a berserker rage, generating 20 rage. (Warrior talent)',
   },
+
+  // ============== TALENT-GRANTED (Classic specs) ==============
+  // Not in CLASSES.*.abilities. Unlocked only via spec grants.
+  holy_shock: {
+    id: 'holy_shock',
+    name: 'Holy Shock',
+    class: 'paladin',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 15,
+    range: 30,
+    school: 'holy',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'heal', min: 76, max: 90 }],
+    description: 'Shocks a friendly target with Holy energy, healing them for $d. (Holy signature)',
+  },
+  holy_shield: {
+    id: 'holy_shield',
+    name: 'Holy Shield',
+    class: 'paladin',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfBuff', kind: 'thorns', value: 12, duration: 10 },
+      { type: 'selfBuff', kind: 'buff_armor', value: 90, duration: 10 },
+    ],
+    description:
+      'Shields you with Holy power for 10 sec, increasing armor by 90 and striking melee attackers for 12 Holy damage. (Protection signature)',
+  },
+  repentance: {
+    id: 'repentance',
+    name: 'Repentance',
+    class: 'paladin',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 60,
+    range: 20,
+    school: 'holy',
+    requiresTarget: true,
+    effects: [{ type: 'incapacitate', duration: 6 }],
+    description:
+      'Puts the enemy in a state of meditation for up to 6 sec. Any damage breaks the effect. (Retribution signature)',
+  },
+  bestial_wrath: {
+    id: 'bestial_wrath',
+    name: 'Bestial Wrath',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 40,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 55, duration: 15 }],
+    description:
+      'Sends you into a bestial rage, increasing attack power by 55 for 15 sec. (Beast Mastery signature)',
+  },
+  trueshot_aura: {
+    id: 'trueshot_aura',
+    name: 'Trueshot Aura',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'aoeAttackPower', amount: 35, duration: 300, radius: 30 }],
+    description:
+      'Inspires nearby allies, increasing attack power by 35 for 5 min. (Marksmanship signature)',
+  },
+  wyvern_sting: {
+    id: 'wyvern_sting',
+    name: 'Wyvern Sting',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 60,
+    range: 30,
+    minRange: 8,
+    school: 'nature',
+    scalesWith: 'ranged',
+    requiresTarget: true,
+    effects: [{ type: 'incapacitate', duration: 4 }],
+    description:
+      'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
+  },
+  arcane_power: {
+    id: 'arcane_power',
+    name: 'Arcane Power',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 70,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'buff_spellpower', value: 28, duration: 12 }],
+    description:
+      'Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)',
+  },
+  combustion: {
+    id: 'combustion',
+    name: 'Combustion',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60 }],
+    description:
+      'Focuses your fire magic so your next attack is a critical strike. (Fire signature)',
+  },
+  cone_of_cold: {
+    id: 'cone_of_cold',
+    name: 'Cone of Cold',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 60,
+    castTime: 0,
+    cooldown: 20,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'aoeDamage', min: 28, max: 36, radius: 8 }],
+    description: 'Blasts nearby enemies with frost for $d Frost damage. (Frost signature)',
+  },
+  cold_blood: {
+    id: 'cold_blood',
+    name: 'Cold Blood',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60 }],
+    description:
+      'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
+  },
+  blade_flurry: {
+    id: 'blade_flurry',
+    name: 'Blade Flurry',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 25,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.2, duration: 12 }],
+    description:
+      'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
+  },
+  hemorrhage: {
+    id: 'hemorrhage',
+    name: 'Hemorrhage',
+    class: 'rogue',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    awardsCombo: 1,
+    effects: [
+      { type: 'weaponStrike', bonus: 16 },
+      { type: 'dot', total: 36, duration: 12, interval: 3 },
+    ],
+    description:
+      'Strikes the enemy for weapon damage plus $d and causes bleeding damage over 12 sec. Awards 1 combo point. (Subtlety signature)',
+  },
+  power_infusion: {
+    id: 'power_infusion',
+    name: 'Power Infusion',
+    class: 'priest',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 120,
+    range: 30,
+    school: 'holy',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'buffTarget', kind: 'buff_spellpower', value: 28, duration: 15 }],
+    description:
+      'Infuses a friendly target with power, increasing spell power by 28 for 15 sec. (Discipline signature)',
+  },
+  holy_nova: {
+    id: 'holy_nova',
+    name: 'Holy Nova',
+    class: 'priest',
+    learnLevel: 10,
+    cost: 70,
+    castTime: 0,
+    cooldown: 20,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    effects: [
+      { type: 'aoeHeal', min: 34, max: 42, radius: 10 },
+      { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
+    ],
+    description:
+      'Causes an explosion of Holy light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
+  },
+  shadowform: {
+    id: 'shadowform',
+    name: 'Shadowform',
+    class: 'priest',
+    learnLevel: 10,
+    cost: 60,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 15, duration: 3600 }],
+    description:
+      'Assume a Shadowform, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+  },
+  elemental_mastery: {
+    id: 'elemental_mastery',
+    name: 'Elemental Mastery',
+    class: 'shaman',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
+    description:
+      'Calls on elemental mastery, making your next spell instant. (Elemental signature)',
+  },
+  shamanistic_rage: {
+    id: 'shamanistic_rage',
+    name: 'Shamanistic Rage',
+    class: 'shaman',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'gainResource', amount: 160 }],
+    description: 'Releases shamanistic rage, restoring 160 mana. (Enhancement signature)',
+  },
+  natures_swiftness: {
+    id: 'natures_swiftness',
+    name: "Nature's Swiftness",
+    class: 'shaman',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
+    description: 'Calls on nature to make your next spell instant. (Restoration signature)',
+  },
+  siphon_life: {
+    id: 'siphon_life',
+    name: 'Siphon Life',
+    class: 'warlock',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'shadow',
+    requiresTarget: true,
+    effects: [{ type: 'dot', total: 60, duration: 30, interval: 3, leechPct: 1 }],
+    description:
+      'Siphons life from the enemy, causing $d Shadow damage over 30 sec and healing you for the damage done. (Affliction signature)',
+  },
+  fel_domination: {
+    id: 'fel_domination',
+    name: 'Fel Domination',
+    class: 'warlock',
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'shadow',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
+    description: 'Dominates fel energies, making your next spell instant. (Demonology signature)',
+  },
+  conflagrate: {
+    id: 'conflagrate',
+    name: 'Conflagrate',
+    class: 'warlock',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 10,
+    range: 30,
+    school: 'fire',
+    requiresTarget: true,
+    effects: [{ type: 'consumeAura', auraIds: ['immolate'], deal: { min: 54, max: 64 } }],
+    description:
+      'Consumes your Immolate on the enemy to ignite them for $d Fire damage. (Destruction signature)',
+  },
+  moonkin_form: {
+    id: 'moonkin_form',
+    name: 'Moonkin Form',
+    class: 'druid',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'form_moonkin', value: 15, duration: 3600 }],
+    description:
+      'Assume Moonkin Form, empowering spellcasting until you shift back. Cast again to return to normal form. (Balance signature)',
+  },
+  feral_charge: {
+    id: 'feral_charge',
+    name: 'Feral Charge',
+    class: 'druid',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 15,
+    range: 25,
+    minRange: 8,
+    school: 'physical',
+    requiresTarget: true,
+    offGcd: true,
+    effects: [{ type: 'charge' }, { type: 'root', duration: 1 }],
+    description: 'Charge an enemy and root it for 1 sec. 8-25 yd range. (Feral signature)',
+  },
+  swiftmend: {
+    id: 'swiftmend',
+    name: 'Swiftmend',
+    class: 'druid',
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 15,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
+    description:
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. (Restoration signature)',
+  },
 };
 
 // A class ability resolved to a concrete rank, with talent modifiers already
@@ -3676,8 +4050,14 @@ function scaleEffect(
     case 'absorb':
       return { ...eff, amount: Math.round(eff.amount * healMult + flat) };
     case 'buffTarget':
-      return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
     case 'selfBuff':
+      // MULTIPLIER-shaped buff values (haste 1.2 = +20% swing speed, fiesta
+      // scale/jump) must never take damage scaling: rounding a multiplier
+      // destroys it (round(1.2 * 1.1) = 1 = zero haste; round(1.4 * 1.1) = 2 =
+      // double speed). Only additive buff values (AP, armor, spellpower) scale.
+      if (eff.kind === 'buff_haste' || eff.kind === 'buff_scale' || eff.kind === 'buff_jump') {
+        return eff;
+      }
       return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
     case 'lifeTap':
       return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
@@ -3713,10 +4093,14 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.castWhileMoving) entry.castWhileMoving = true;
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
+    // Multiplier-shaped values (buff_haste/scale/jump) are exempt like in scaleEffect.
     if (am.buffPct) {
       const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
-        e.type === 'selfBuff' || e.type === 'buffTarget'
+        (e.type === 'selfBuff' || e.type === 'buffTarget') &&
+        e.kind !== 'buff_haste' &&
+        e.kind !== 'buff_scale' &&
+        e.kind !== 'buff_jump'
           ? { ...e, value: Math.round(e.value * mul) }
           : e,
       );

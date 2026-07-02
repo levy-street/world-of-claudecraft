@@ -5094,4 +5094,76 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Inte nu',
   'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
   'hudChrome.nativeUpdate.update': 'Uppdatera',
+  'entities.abilities.holy_shock.name': "Helig chock",
+  'entities.abilities.holy_shock.description':
+    "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)",
+  'entities.abilities.holy_shield.name': "Helig sköld",
+  'entities.abilities.holy_shield.description':
+    "Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)",
+  'entities.abilities.repentance.name': "Ånger",
+  'entities.abilities.repentance.description':
+    "Försätter fienden i meditation i upp till 6 sek. All skada bryter effekten. (Vedergällningssignatur)",
+  'entities.abilities.bestial_wrath.name': "Bestialisk vrede",
+  'entities.abilities.bestial_wrath.description':
+    "Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)",
+  'entities.abilities.trueshot_aura.name': "Träffsäkerhetsaura",
+  'entities.abilities.trueshot_aura.description':
+    "Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)",
+  'entities.abilities.wyvern_sting.name': "Wyvernsting",
+  'entities.abilities.wyvern_sting.description':
+    "Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)",
+  'entities.abilities.arcane_power.name': "Arkan kraft",
+  'entities.abilities.arcane_power.description':
+    "Fyller dig med arkan kraft och ökar besvärjelsekraft med 28 i 12 sek. (Arkan signatur)",
+  'entities.abilities.combustion.name': "Förbränning",
+  'entities.abilities.combustion.description':
+    "Fokuserar din eldmagi så att din nästa attack blir en kritisk träff. (Eldsignatur)",
+  'entities.abilities.cone_of_cold.name': "Köldkon",
+  'entities.abilities.cone_of_cold.description':
+    "Spränger närliggande fiender med frost för {damage} frostskada. (Frostsignatur)",
+  'entities.abilities.cold_blood.name': "Kallt blod",
+  'entities.abilities.cold_blood.description':
+    "Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)",
+  'entities.abilities.blade_flurry.name': "Klingflod",
+  'entities.abilities.blade_flurry.description':
+    "Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)",
+  'entities.abilities.hemorrhage.name': "Blödning",
+  'entities.abilities.hemorrhage.description':
+    "Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)",
+  'entities.abilities.power_infusion.name': "Kraftinfusion",
+  'entities.abilities.power_infusion.description':
+    "Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)",
+  'entities.abilities.holy_nova.name': "Helig nova",
+  'entities.abilities.holy_nova.description':
+    "Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)",
+  'entities.abilities.shadowform.name': "Skuggform",
+  'entities.abilities.shadowform.description':
+    "Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)",
+  'entities.abilities.elemental_mastery.name': "Elementär mästerskap",
+  'entities.abilities.elemental_mastery.description':
+    "Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)",
+  'entities.abilities.shamanistic_rage.name': "Schamanistisk vrede",
+  'entities.abilities.shamanistic_rage.description':
+    "Släpper lös schamanistisk vrede och återställer 160 mana. (Förstärkningssignatur)",
+  'entities.abilities.natures_swiftness.name': "Naturens snabbhet",
+  'entities.abilities.natures_swiftness.description':
+    "Åkallar naturen för att göra din nästa besvärjelse omedelbar. (Återställningssignatur)",
+  'entities.abilities.siphon_life.name': "Livssifon",
+  'entities.abilities.siphon_life.description':
+    "Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)",
+  'entities.abilities.fel_domination.name': "Demonisk dominans",
+  'entities.abilities.fel_domination.description':
+    "Behärskar demoniska energier och gör din nästa besvärjelse omedelbar. (Demonologisignatur)",
+  'entities.abilities.conflagrate.name': "Storbrand",
+  'entities.abilities.conflagrate.description':
+    "Förbrukar din Förbränna på fienden för att antända den för {damage} eldskada. (Förstörelsesignatur)",
+  'entities.abilities.moonkin_form.name': "Månugglaform",
+  'entities.abilities.moonkin_form.description':
+    "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)",
+  'entities.abilities.feral_charge.name': "Vild rusning",
+  'entities.abilities.feral_charge.description':
+    "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)",
+  'entities.abilities.swiftmend.name': "Snabb läkning",
+  'entities.abilities.swiftmend.description':
+    "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)",
 };

@@ -4339,6 +4339,102 @@ export const id_ID: EnTranslations = {
         "name": "Amukan Berserker",
         "description": "Memasuki amukan berserker, menghasilkan 20 amarah. (Talenta Prajurit)"
       },
+      "holy_shock": {
+        "name": "Kejutan Suci",
+        "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
+      },
+      "holy_shield": {
+        "name": "Perisai Suci",
+        "description": "Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)"
+      },
+      "repentance": {
+        "name": "Pertobatan",
+        "description": "Membuat musuh masuk ke keadaan meditasi hingga 6 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Pembalasan)"
+      },
+      "bestial_wrath": {
+        "name": "Murka Buas",
+        "description": "Membawamu ke amarah buas, meningkatkan kekuatan serangan sebesar 55 selama 15 dtk. (ciri khas Penguasa Binatang)"
+      },
+      "trueshot_aura": {
+        "name": "Aura Tembakan Jitu",
+        "description": "Mengilhami sekutu di dekatmu, meningkatkan kekuatan serangan sebesar 35 selama 5 mnt. (ciri khas Penembakan)"
+      },
+      "wyvern_sting": {
+        "name": "Sengatan Wivern",
+        "description": "Menyengat musuh dari jarak jauh dan melumpuhkannya hingga 4 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Bertahan Hidup)"
+      },
+      "arcane_power": {
+        "name": "Kekuatan Arkan",
+        "description": "Mengisimu dengan kekuatan arkan, meningkatkan kekuatan mantra sebesar 28 selama 12 dtk. (ciri khas Arkan)"
+      },
+      "combustion": {
+        "name": "Pembakaran",
+        "description": "Memusatkan sihir apimu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Api)"
+      },
+      "cone_of_cold": {
+        "name": "Kerucut Dingin",
+        "description": "Menghantam musuh di dekatmu dengan es, menimbulkan {damage} kerusakan Es. (ciri khas Es)"
+      },
+      "cold_blood": {
+        "name": "Darah Dingin",
+        "description": "Memusatkan niat membunuhmu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Pembunuhan)"
+      },
+      "blade_flurry": {
+        "name": "Tebasan Bertubi",
+        "description": "Melepaskan hujan bilah, meningkatkan kecepatan serangan sebesar 20% selama 12 dtk. (ciri khas Pertarungan)"
+      },
+      "hemorrhage": {
+        "name": "Pendarahan",
+        "description": "Menyerang musuh dengan kerusakan senjata ditambah {damage} dan menyebabkan kerusakan berdarah selama 12 dtk. Memberi 1 poin kombo. (ciri khas Kelicikan)"
+      },
+      "power_infusion": {
+        "name": "Infusi Kekuatan",
+        "description": "Mengisi target kawan dengan kekuatan, meningkatkan kekuatan mantra sebesar 28 selama 15 dtk. (ciri khas Disiplin)"
+      },
+      "holy_nova": {
+        "name": "Nova Suci",
+        "description": "Menimbulkan ledakan cahaya Suci, memulihkan sekutu di dekatmu sebesar {damage} dan melukai musuh di dekatmu. (ciri khas Suci)"
+      },
+      "shadowform": {
+        "name": "Wujud Bayangan",
+        "description": "Mengambil wujud bayangan, memperkuat sihir bayangan sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Bayangan)"
+      },
+      "elemental_mastery": {
+        "name": "Penguasaan Elemen",
+        "description": "Memanggil penguasaan elemen, membuat mantra berikutnya seketika. (ciri khas Elemen)"
+      },
+      "shamanistic_rage": {
+        "name": "Amarah Shamanistik",
+        "description": "Melepaskan amarah shamanistik, memulihkan 160 mana. (ciri khas Peningkatan)"
+      },
+      "natures_swiftness": {
+        "name": "Kelincahan Alam",
+        "description": "Memanggil alam untuk membuat mantra berikutnya seketika. (ciri khas Pemulihan)"
+      },
+      "siphon_life": {
+        "name": "Sifon Nyawa",
+        "description": "Menyedot nyawa dari musuh, menimbulkan {damage} kerusakan Bayangan selama 30 dtk dan memulihkanmu sebesar kerusakan yang terjadi. (ciri khas Penderitaan)"
+      },
+      "fel_domination": {
+        "name": "Dominasi Iblis",
+        "description": "Menguasai energi iblis, membuat mantra berikutnya seketika. (ciri khas Demonologi)"
+      },
+      "conflagrate": {
+        "name": "Kobaran Api",
+        "description": "Menghabiskan Pembakaran milikmu pada musuh untuk menyulutnya dengan {damage} kerusakan Api. (ciri khas Penghancuran)"
+      },
+      "moonkin_form": {
+        "name": "Wujud Burung Bulan",
+        "description": "Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)"
+      },
+      "feral_charge": {
+        "name": "Terjangan Liar",
+        "description": "Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)"
+      },
+      "swiftmend": {
+        "name": "Pemulihan Cepat",
+        "description": "Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)"
+      },
       "summon_imp": {
         "name": "Panggil Imp",
         "description": "Memanggil Imp di bawah perintah Penyihir Iblis. Imp melontarkan Panah Api ke arah musuhmu dari kejauhan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."

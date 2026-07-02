@@ -5081,4 +5081,76 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Opdater',
   'errors.api.desktopCodeInvalid':
     'Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.',
+  'entities.abilities.holy_shock.name': "Hellig chok",
+  'entities.abilities.holy_shock.description':
+    "Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)",
+  'entities.abilities.holy_shield.name': "Hellig skjold",
+  'entities.abilities.holy_shield.description':
+    "Beskytter dig med hellig kraft i 10 sek, øger rustning med 90 og rammer nærkampsangribere for 12 hellig skade. (Beskyttelsessignatur)",
+  'entities.abilities.repentance.name': "Anger",
+  'entities.abilities.repentance.description':
+    "Sætter fjenden i en meditativ tilstand i op til 6 sek. Enhver skade bryder effekten. (Gengældelsessignatur)",
+  'entities.abilities.bestial_wrath.name': "Bestialsk vrede",
+  'entities.abilities.bestial_wrath.description':
+    "Sender dig i bestialsk raseri, så angrebskraft øges med 55 i 15 sek. (Bæstmestersignatur)",
+  'entities.abilities.trueshot_aura.name': "Træfsikkerhedsaura",
+  'entities.abilities.trueshot_aura.description':
+    "Inspirerer nærliggende allierede og øger angrebskraft med 35 i 5 min. (Skytte signatur)",
+  'entities.abilities.wyvern_sting.name': "Wyvernstik",
+  'entities.abilities.wyvern_sting.description':
+    "Stikker fjenden på afstand og gør den ukampdygtig i op til 4 sek. Enhver skade bryder effekten. (Overlevelsessignatur)",
+  'entities.abilities.arcane_power.name': "Arkan kraft",
+  'entities.abilities.arcane_power.description':
+    "Fylder dig med arkan kraft og øger besværgelseskraft med 28 i 12 sek. (Arkan signatur)",
+  'entities.abilities.combustion.name': "Forbrænding",
+  'entities.abilities.combustion.description':
+    "Fokuserer din ildmagi, så dit næste angreb bliver et kritisk træf. (Ildsignatur)",
+  'entities.abilities.cone_of_cold.name': "Kuldekegle",
+  'entities.abilities.cone_of_cold.description':
+    "Sprænger nærliggende fjender med frost for {damage} frostskade. (Frostsignatur)",
+  'entities.abilities.cold_blood.name': "Koldt blod",
+  'entities.abilities.cold_blood.description':
+    "Fokuserer din dræbervilje, så dit næste angreb bliver et kritisk træf. (Snigmordersignatur)",
+  'entities.abilities.blade_flurry.name': "Klingevirvel",
+  'entities.abilities.blade_flurry.description':
+    "Udløser en byge af klinger og øger angrebshastighed med 20% i 12 sek. (Kampsignatur)",
+  'entities.abilities.hemorrhage.name': "Blødning",
+  'entities.abilities.hemorrhage.description':
+    "Ramler fjenden for våbenskade plus {damage} og påfører blødningsskade over 12 sek. Giver 1 combopoint. (Underfundighedssignatur)",
+  'entities.abilities.power_infusion.name': "Kraftinfusion",
+  'entities.abilities.power_infusion.description':
+    "Indgyder et venligt mål med kraft og øger besværgelseskraft med 28 i 15 sek. (Disciplin signatur)",
+  'entities.abilities.holy_nova.name': "Hellig nova",
+  'entities.abilities.holy_nova.description':
+    "Udløser en eksplosion af helligt lys, helbreder nærliggende allierede for {damage} og skader nærliggende fjender. (Hellig signatur)",
+  'entities.abilities.shadowform.name': "Skyggeform",
+  'entities.abilities.shadowform.description':
+    "Antag skyggeform, som styrker skyggemagi, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Skyggesignatur)",
+  'entities.abilities.elemental_mastery.name': "Elementær beherskelse",
+  'entities.abilities.elemental_mastery.description':
+    "Påkalder elementær beherskelse og gør din næste besværgelse øjeblikkelig. (Elementær signatur)",
+  'entities.abilities.shamanistic_rage.name': "Shamanistisk raseri",
+  'entities.abilities.shamanistic_rage.description':
+    "Frigør shamanistisk raseri og genopretter 160 mana. (Forstærkningssignatur)",
+  'entities.abilities.natures_swiftness.name': "Naturens hurtighed",
+  'entities.abilities.natures_swiftness.description':
+    "Påkalder naturen for at gøre din næste besværgelse øjeblikkelig. (Genoprettelsessignatur)",
+  'entities.abilities.siphon_life.name': "Sug liv",
+  'entities.abilities.siphon_life.description':
+    "Suger liv fra fjenden, påfører {damage} skyggeskade over 30 sek og helbreder dig for den skade, der bliver gjort. (Lidelsessignatur)",
+  'entities.abilities.fel_domination.name': "Dæmonisk dominans",
+  'entities.abilities.fel_domination.description':
+    "Behersker dæmoniske energier og gør din næste besværgelse øjeblikkelig. (Dæmonologisignatur)",
+  'entities.abilities.conflagrate.name': "Antændelse",
+  'entities.abilities.conflagrate.description':
+    "Forbruger din Opbrænding på fjenden for at antænde den for {damage} ildskade. (Ødelæggelsessignatur)",
+  'entities.abilities.moonkin_form.name': "Månekinform",
+  'entities.abilities.moonkin_form.description':
+    "Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)",
+  'entities.abilities.feral_charge.name': "Vild ladning",
+  'entities.abilities.feral_charge.description':
+    "Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)",
+  'entities.abilities.swiftmend.name': "Hurtig heling",
+  'entities.abilities.swiftmend.description':
+    "Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)",
 };

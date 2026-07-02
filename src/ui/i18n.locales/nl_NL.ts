@@ -5151,4 +5151,76 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Niet nu',
   'hudChrome.nativeUpdate.title': 'Update beschikbaar',
   'hudChrome.nativeUpdate.update': 'Bijwerken',
+  'entities.abilities.holy_shock.name': "Heilige schok",
+  'entities.abilities.holy_shock.description':
+    "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)",
+  'entities.abilities.holy_shield.name': "Heilig schild",
+  'entities.abilities.holy_shield.description':
+    "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)",
+  'entities.abilities.repentance.name': "Berouw",
+  'entities.abilities.repentance.description':
+    "Brengt de vijand tot 6 sec in een meditatieve staat. Elke schade verbreekt het effect. (Vergelding signatuur)",
+  'entities.abilities.bestial_wrath.name': "Beestachtige woede",
+  'entities.abilities.bestial_wrath.description':
+    "Stuurt je in beestachtige razernij, waardoor aanvalskracht 15 sec met 55 toeneemt. (Beestbeheersing signatuur)",
+  'entities.abilities.trueshot_aura.name': "Zuiver schot-aura",
+  'entities.abilities.trueshot_aura.description':
+    "Inspireert nabije bondgenoten, waardoor aanvalskracht 5 min met 35 toeneemt. (Scherpschutter signatuur)",
+  'entities.abilities.wyvern_sting.name': "Wyvernsteek",
+  'entities.abilities.wyvern_sting.description':
+    "Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)",
+  'entities.abilities.arcane_power.name': "Arcanekracht",
+  'entities.abilities.arcane_power.description':
+    "Vult je met arcanekracht, waardoor spreukkracht 12 sec met 28 toeneemt. (Arcaan signatuur)",
+  'entities.abilities.combustion.name': "Verbranding",
+  'entities.abilities.combustion.description':
+    "Bundelt je vuurmagie zodat je volgende aanval een kritieke treffer is. (Vuur signatuur)",
+  'entities.abilities.cone_of_cold.name': "Kegel van kou",
+  'entities.abilities.cone_of_cold.description':
+    "Treft nabije vijanden met vorst voor {damage} Vorstschade. (Vorst signatuur)",
+  'entities.abilities.cold_blood.name': "Koud bloed",
+  'entities.abilities.cold_blood.description':
+    "Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)",
+  'entities.abilities.blade_flurry.name': "Klingenvlaag",
+  'entities.abilities.blade_flurry.description':
+    "Ontketent een vlaag van klingen, waardoor aanvalssnelheid 12 sec met 20% toeneemt. (Gevecht signatuur)",
+  'entities.abilities.hemorrhage.name': "Bloeding",
+  'entities.abilities.hemorrhage.description':
+    "Raakt de vijand voor wapenschade plus {damage} en veroorzaakt bloedschade gedurende 12 sec. Geeft 1 combopunt. (Subtiliteit signatuur)",
+  'entities.abilities.power_infusion.name': "Krachtinfusie",
+  'entities.abilities.power_infusion.description':
+    "Doordrenkt een bevriend doelwit met kracht, waardoor spreukkracht 15 sec met 28 toeneemt. (Discipline signatuur)",
+  'entities.abilities.holy_nova.name': "Heilige nova",
+  'entities.abilities.holy_nova.description':
+    "Veroorzaakt een explosie van Heilig licht, geneest nabije bondgenoten voor {damage} en beschadigt nabije vijanden. (Heilig signatuur)",
+  'entities.abilities.shadowform.name': "Schaduwvorm",
+  'entities.abilities.shadowform.description':
+    "Neem schaduwvorm aan en versterk schaduwmagie totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Schaduw signatuur)",
+  'entities.abilities.elemental_mastery.name': "Elementaire meesterschap",
+  'entities.abilities.elemental_mastery.description':
+    "Roept elementaire meesterschap aan, waardoor je volgende spreuk onmiddellijk is. (Elementair signatuur)",
+  'entities.abilities.shamanistic_rage.name': "Sjamanistische woede",
+  'entities.abilities.shamanistic_rage.description':
+    "Laat sjamanistische woede los en herstelt 160 mana. (Versterking signatuur)",
+  'entities.abilities.natures_swiftness.name': "Snelheid van de natuur",
+  'entities.abilities.natures_swiftness.description':
+    "Roept de natuur aan om je volgende spreuk onmiddellijk te maken. (Herstel signatuur)",
+  'entities.abilities.siphon_life.name': "Levenshevel",
+  'entities.abilities.siphon_life.description':
+    "Hevelt leven uit de vijand, veroorzaakt {damage} Schaduwschade gedurende 30 sec en geneest je voor de toegebrachte schade. (Kwelling signatuur)",
+  'entities.abilities.fel_domination.name': "Duivelse overheersing",
+  'entities.abilities.fel_domination.description':
+    "Overheerst duivelse energieën, waardoor je volgende spreuk onmiddellijk is. (Demonologie signatuur)",
+  'entities.abilities.conflagrate.name': "Ontvlamming",
+  'entities.abilities.conflagrate.description':
+    "Verbruikt je Verbranden op de vijand om hem te ontsteken voor {damage} Vuurschade. (Vernietiging signatuur)",
+  'entities.abilities.moonkin_form.name': "Maanuilvorm",
+  'entities.abilities.moonkin_form.description':
+    "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)",
+  'entities.abilities.feral_charge.name': "Wilde stormloop",
+  'entities.abilities.feral_charge.description':
+    "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)",
+  'entities.abilities.swiftmend.name': "Snelle genezing",
+  'entities.abilities.swiftmend.description':
+    "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)",
 };

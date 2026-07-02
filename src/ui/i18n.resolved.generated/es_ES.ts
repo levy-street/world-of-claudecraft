@@ -4339,6 +4339,102 @@ export const es_ES: EnTranslations = {
         "name": "Ira rabiosa",
         "description": "Entras en una ira rabiosa y generas 20 de ira. (talento de guerrero)"
       },
+      "holy_shock": {
+        "name": "Choque Sagrado",
+        "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"
+      },
+      "holy_shield": {
+        "name": "Escudo Sagrado",
+        "description": "Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)"
+      },
+      "repentance": {
+        "name": "Arrepentimiento",
+        "description": "Pone al enemigo en estado de meditación hasta 6 s. Cualquier daño rompe el efecto. (habilidad distintiva de Reprensión)"
+      },
+      "bestial_wrath": {
+        "name": "Cólera de las bestias",
+        "description": "Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)"
+      },
+      "trueshot_aura": {
+        "name": "Aura de disparo certero",
+        "description": "Inspira a los aliados cercanos, aumentando el poder de ataque en 35 durante 5 min. (habilidad distintiva de Puntería)"
+      },
+      "wyvern_sting": {
+        "name": "Picadura de dracoleón",
+        "description": "Pica al enemigo a distancia y lo incapacita hasta 4 s. Cualquier daño rompe el efecto. (habilidad distintiva de Supervivencia)"
+      },
+      "arcane_power": {
+        "name": "Poder Arcano",
+        "description": "Te llena de poder Arcano, aumentando el poder con hechizos en 28 durante 12 s. (habilidad distintiva de Arcano)"
+      },
+      "combustion": {
+        "name": "Combustión",
+        "description": "Concentra tu magia de fuego para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Fuego)"
+      },
+      "cone_of_cold": {
+        "name": "Cono de frío",
+        "description": "Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)"
+      },
+      "cold_blood": {
+        "name": "Sangre fría",
+        "description": "Concentra tu intención asesina para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Asesinato)"
+      },
+      "blade_flurry": {
+        "name": "Aluvión de acero",
+        "description": "Desata una ráfaga de hojas, aumentando la velocidad de ataque un 20% durante 12 s. (habilidad distintiva de Combate)"
+      },
+      "hemorrhage": {
+        "name": "Hemorragia",
+        "description": "Golpea al enemigo con daño de arma más {damage} y causa daño de sangrado durante 12 s. Otorga 1 punto de combo. (habilidad distintiva de Sutileza)"
+      },
+      "power_infusion": {
+        "name": "Infusión de poder",
+        "description": "Infunde poder a un objetivo amistoso, aumentando el poder con hechizos en 28 durante 15 s. (habilidad distintiva de Disciplina)"
+      },
+      "holy_nova": {
+        "name": "Nova Sagrada",
+        "description": "Provoca una explosión de luz Sagrada, sana a los aliados cercanos por {damage} y daña a los enemigos cercanos. (habilidad distintiva de Sagrado)"
+      },
+      "shadowform": {
+        "name": "Forma de las Sombras",
+        "description": "Adopta Forma de las Sombras, potenciando la magia de sombras hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Sombras)"
+      },
+      "elemental_mastery": {
+        "name": "Maestría elemental",
+        "description": "Invoca la maestría elemental, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Elemental)"
+      },
+      "shamanistic_rage": {
+        "name": "Ira del chamán",
+        "description": "Libera ira chamánica y restaura 160 de maná. (habilidad distintiva de Mejora)"
+      },
+      "natures_swiftness": {
+        "name": "Presteza de la Naturaleza",
+        "description": "Invoca a la naturaleza para hacer que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Restauración)"
+      },
+      "siphon_life": {
+        "name": "Succionar vida",
+        "description": "Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)"
+      },
+      "fel_domination": {
+        "name": "Dominación vil",
+        "description": "Domina energías viles, haciendo que tu siguiente hechizo sea instantáneo. (habilidad distintiva de Demonología)"
+      },
+      "conflagrate": {
+        "name": "Conflagrar",
+        "description": "Consume tu Inmolar en el enemigo para prenderlo e infligir {damage} de daño de Fuego. (habilidad distintiva de Destrucción)"
+      },
+      "moonkin_form": {
+        "name": "Forma de lechúcico lunar",
+        "description": "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)"
+      },
+      "feral_charge": {
+        "name": "Carga feral",
+        "description": "Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)"
+      },
+      "swiftmend": {
+        "name": "Alivio presto",
+        "description": "Consume un efecto de sanación en el tiempo sobre un objetivo amistoso para sanarlo por {damage}. (habilidad distintiva de Restauración)"
+      },
       "summon_imp": {
         "name": "Invocar diablillo",
         "description": "Invoca a un Diablillo bajo el mando del brujo. El Diablillo lanza Descargas de Fuego a tus enemigos desde la distancia. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez."

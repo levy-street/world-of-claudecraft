@@ -5120,4 +5120,76 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Nie teraz',
   'hudChrome.nativeUpdate.title': 'Dostępna aktualizacja',
   'hudChrome.nativeUpdate.update': 'Aktualizuj',
+  'entities.abilities.holy_shock.name': "Święty wstrząs",
+  'entities.abilities.holy_shock.description':
+    "Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)",
+  'entities.abilities.holy_shield.name': "Święta tarcza",
+  'entities.abilities.holy_shield.description':
+    "Osłaniasz się Świętą mocą na 10 sek., zwiększając pancerz o 90 i rażąc napastników w zwarciu za 12 obrażeń Świętych. (specjalizacja Ochrona)",
+  'entities.abilities.repentance.name': "Skrucha",
+  'entities.abilities.repentance.description':
+    "Wprowadza wroga w stan medytacji na maksymalnie 6 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Odwet)",
+  'entities.abilities.bestial_wrath.name': "Bestialski gniew",
+  'entities.abilities.bestial_wrath.description':
+    "Wpadasz w bestialski szał, zwiększając siłę ataku o 55 na 15 sek. (specjalizacja Władca Bestii)",
+  'entities.abilities.trueshot_aura.name': "Aura celnego strzału",
+  'entities.abilities.trueshot_aura.description':
+    "Inspiruje pobliskich sojuszników, zwiększając siłę ataku o 35 na 5 min. (specjalizacja Strzelectwo)",
+  'entities.abilities.wyvern_sting.name': "Żądło wiwerny",
+  'entities.abilities.wyvern_sting.description':
+    "Żądli wroga z dystansu, obezwładniając go na maksymalnie 4 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Przetrwanie)",
+  'entities.abilities.arcane_power.name': "Moc Arkanów",
+  'entities.abilities.arcane_power.description':
+    "Napełnia cię mocą Arkanów, zwiększając moc zaklęć o 28 na 12 sek. (specjalizacja Arkana)",
+  'entities.abilities.combustion.name': "Zapłon",
+  'entities.abilities.combustion.description':
+    "Skupia twoją magię ognia, aby następny atak był trafieniem krytycznym. (specjalizacja Ogień)",
+  'entities.abilities.cone_of_cold.name': "Stożek zimna",
+  'entities.abilities.cone_of_cold.description':
+    "Uderza pobliskich wrogów mrozem, zadając {damage} obrażeń od Mrozu. (specjalizacja Mróz)",
+  'entities.abilities.cold_blood.name': "Zimna krew",
+  'entities.abilities.cold_blood.description':
+    "Skupia twoją morderczą intencję, aby następny atak był trafieniem krytycznym. (specjalizacja Zabójstwo)",
+  'entities.abilities.blade_flurry.name': "Nawałnica ostrzy",
+  'entities.abilities.blade_flurry.description':
+    "Uwalnia nawałnicę ostrzy, zwiększając szybkość ataku o 20% na 12 sek. (specjalizacja Walka)",
+  'entities.abilities.hemorrhage.name': "Krwotok",
+  'entities.abilities.hemorrhage.description':
+    "Uderza wroga za obrażenia broni plus {damage} i powoduje krwawienie przez 12 sek. Daje 1 punkt combo. (specjalizacja Subtelność)",
+  'entities.abilities.power_infusion.name': "Infuzja mocy",
+  'entities.abilities.power_infusion.description':
+    "Napełnia przyjazny cel mocą, zwiększając moc zaklęć o 28 na 15 sek. (specjalizacja Dyscyplina)",
+  'entities.abilities.holy_nova.name': "Święta nova",
+  'entities.abilities.holy_nova.description':
+    "Wywołuje wybuch Świętego światła, leczy pobliskich sojuszników za {damage} i rani pobliskich wrogów. (specjalizacja Świętość)",
+  'entities.abilities.shadowform.name': "Postać cienia",
+  'entities.abilities.shadowform.description':
+    "Przyjmujesz postać cienia, wzmacniając magię cienia do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Cień)",
+  'entities.abilities.elemental_mastery.name': "Mistrzostwo żywiołów",
+  'entities.abilities.elemental_mastery.description':
+    "Przywołuje mistrzostwo żywiołów, sprawiając, że następne zaklęcie jest natychmiastowe. (specjalizacja Żywioły)",
+  'entities.abilities.shamanistic_rage.name': "Szamański gniew",
+  'entities.abilities.shamanistic_rage.description':
+    "Uwalnia szamański gniew, przywracając 160 many. (specjalizacja Wzmocnienie)",
+  'entities.abilities.natures_swiftness.name': "Szybkość natury",
+  'entities.abilities.natures_swiftness.description':
+    "Przywołuje naturę, aby następne zaklęcie było natychmiastowe. (specjalizacja Odnowa)",
+  'entities.abilities.siphon_life.name': "Wyssanie życia",
+  'entities.abilities.siphon_life.description':
+    "Wysysa życie z wroga, zadając {damage} obrażeń od Cienia przez 30 sek. i lecząc cię za zadane obrażenia. (specjalizacja Udręka)",
+  'entities.abilities.fel_domination.name': "Dominacja spaczenia",
+  'entities.abilities.fel_domination.description':
+    "Opanowuje spaczonymi energiami, sprawiając, że następne zaklęcie jest natychmiastowe. (specjalizacja Demonologia)",
+  'entities.abilities.conflagrate.name': "Pożoga",
+  'entities.abilities.conflagrate.description':
+    "Zużywa twoje podpalenie na wrogu, aby zajął się ogniem i otrzymał {damage} obrażeń od Ognia. (specjalizacja Zniszczenie)",
+  'entities.abilities.moonkin_form.name': "Postać księżycowej sowy",
+  'entities.abilities.moonkin_form.description':
+    "Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)",
+  'entities.abilities.feral_charge.name': "Dzika szarża",
+  'entities.abilities.feral_charge.description':
+    "Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)",
+  'entities.abilities.swiftmend.name': "Szybkie uzdrowienie",
+  'entities.abilities.swiftmend.description':
+    "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. (specjalizacja Odnowa)",
 };

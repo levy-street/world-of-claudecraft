@@ -4339,6 +4339,102 @@ export const zh_CN: EnTranslations = {
         "name": "狂暴之怒",
         "description": "进入狂暴之怒，产生 20 点怒气。（战士天赋）"
       },
+      "holy_shock": {
+        "name": "神圣震击",
+        "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"
+      },
+      "holy_shield": {
+        "name": "神圣之盾",
+        "description": "以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）"
+      },
+      "repentance": {
+        "name": "忏悔",
+        "description": "使敌人进入冥想状态，最多持续6秒。受到任何伤害都会打破效果。（惩戒专精招牌）"
+      },
+      "bestial_wrath": {
+        "name": "狂野怒火",
+        "description": "使你进入野兽怒火状态，攻击强度提高55点，持续15秒。（野兽控制专精招牌）"
+      },
+      "trueshot_aura": {
+        "name": "强击光环",
+        "description": "鼓舞附近盟友，使攻击强度提高35点，持续5分钟。（射击专精招牌）"
+      },
+      "wyvern_sting": {
+        "name": "翼龙钉刺",
+        "description": "从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）"
+      },
+      "arcane_power": {
+        "name": "奥术强化",
+        "description": "让你充满奥术能量，法术强度提高28点，持续12秒。（奥术专精招牌）"
+      },
+      "combustion": {
+        "name": "燃烧",
+        "description": "集中你的火焰魔法，使下一次攻击造成暴击。（火焰专精招牌）"
+      },
+      "cone_of_cold": {
+        "name": "冰锥术",
+        "description": "以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）"
+      },
+      "cold_blood": {
+        "name": "冷血",
+        "description": "集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）"
+      },
+      "blade_flurry": {
+        "name": "剑刃乱舞",
+        "description": "释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）"
+      },
+      "hemorrhage": {
+        "name": "出血",
+        "description": "攻击敌人，造成武器伤害加{damage}点伤害，并在12秒内造成流血伤害。奖励1个连击点。（敏锐专精招牌）"
+      },
+      "power_infusion": {
+        "name": "能量灌注",
+        "description": "向一个友方目标灌注能量，使其法术强度提高28点，持续15秒。（戒律专精招牌）"
+      },
+      "holy_nova": {
+        "name": "神圣新星",
+        "description": "引发神圣之光爆炸，为附近盟友恢复{damage}点生命值并伤害附近敌人。（神圣专精招牌）"
+      },
+      "shadowform": {
+        "name": "暗影形态",
+        "description": "进入暗影形态，强化暗影魔法直到你切换回来。再次施放可返回普通形态。（暗影专精招牌）"
+      },
+      "elemental_mastery": {
+        "name": "元素掌握",
+        "description": "呼唤元素掌握，使你的下一个法术变为瞬发。（元素专精招牌）"
+      },
+      "shamanistic_rage": {
+        "name": "萨满之怒",
+        "description": "释放萨满之怒，恢复160点法力值。（增强专精招牌）"
+      },
+      "natures_swiftness": {
+        "name": "自然迅捷",
+        "description": "呼唤自然之力，使你的下一个法术变为瞬发。（恢复专精招牌）"
+      },
+      "siphon_life": {
+        "name": "生命虹吸",
+        "description": "虹吸敌人的生命，在30秒内造成{damage}点暗影伤害，并按造成的伤害治疗你。（痛苦专精招牌）"
+      },
+      "fel_domination": {
+        "name": "恶魔支配",
+        "description": "支配邪能，使你的下一个法术变为瞬发。（恶魔学识专精招牌）"
+      },
+      "conflagrate": {
+        "name": "燃尽",
+        "description": "吞噬敌人身上的献祭，将其点燃并造成{damage}点火焰伤害。（毁灭专精招牌）"
+      },
+      "moonkin_form": {
+        "name": "枭兽形态",
+        "description": "进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）"
+      },
+      "feral_charge": {
+        "name": "野性冲锋",
+        "description": "冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）"
+      },
+      "swiftmend": {
+        "name": "迅捷治愈",
+        "description": "吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）"
+      },
       "summon_imp": {
         "name": "召唤小鬼",
         "description": "召唤一只听从术士命令的小鬼。小鬼会从远处向你的敌人投掷火焰箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"

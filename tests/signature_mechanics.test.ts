@@ -320,4 +320,84 @@ describe('PR3 signature mechanics', () => {
     expect(p.auras.some((a) => a.kind === 'form_bear')).toBe(false);
     expect(p.resource).toBe(savedBefore - 25);
   });
+
+  it('holy priest signature Holy Nova heals allies and damages enemies from real content', () => {
+    const { sim, p } = makeSim('priest');
+    expect(sim.setSpec('holy')).toBe(true);
+    const friendId = sim.addPlayer('mage', 'Friend');
+    sim.setPlayerLevel(20, friendId);
+    const friend = entityOf(sim, friendId);
+    friend.pos = { x: p.pos.x + 2, y: p.pos.y, z: p.pos.z };
+    friend.prevPos = { ...friend.pos };
+    const hostile = spawnTarget(sim, p, 2);
+    sim.tick();
+
+    p.hp = p.maxHp - 100;
+    friend.hp = friend.maxHp - 100;
+    const hostileBefore = hostile.hp;
+    p.resource = p.maxResource;
+
+    sim.castAbility('holy_nova');
+
+    expect(p.hp).toBeGreaterThan(p.maxHp - 100);
+    expect(friend.hp).toBeGreaterThan(friend.maxHp - 100);
+    expect(hostile.hp).toBeLessThan(hostileBefore);
+  });
+
+  it('restoration druid signature Swiftmend consumes Rejuvenation from real content', () => {
+    const { sim, p } = makeSim('druid');
+    expect(sim.setSpec('restoration')).toBe(true);
+    const friendId = sim.addPlayer('priest', 'Friend');
+    sim.setPlayerLevel(20, friendId);
+    const friend = entityOf(sim, friendId);
+    friend.maxHp = 1000;
+    friend.hp = 700;
+    p.resource = p.maxResource;
+    sim.targetEntity(friend.id, p.id);
+
+    sim.castAbility('rejuvenation');
+    expect(friend.auras.some((a) => a.id === 'rejuvenation' && a.kind === 'hot')).toBe(true);
+    for (let i = 0; i < 31; i++) sim.tick();
+
+    const beforeSwiftmend = friend.hp;
+    p.resource = p.maxResource;
+    sim.castAbility('swiftmend');
+
+    expect(friend.auras.some((a) => a.id === 'rejuvenation')).toBe(false);
+    expect(friend.hp).toBeGreaterThan(beforeSwiftmend);
+  });
+
+  it('haste multipliers survive talent damage scaling (Blade Flurry under combat mastery)', () => {
+    // round(1.2 * meleeDmg 1.1) = 1 would be ZERO haste: multiplier-shaped
+    // buff values must be exempt from the global damage scaling that
+    // additive buff values (AP, armor, spellpower) take.
+    const { sim, p } = makeSim('rogue');
+    expect(sim.setSpec('combat')).toBe(true);
+    const bf = sim.resolvedAbility('blade_flurry', p.id);
+    const bfBuff = bf?.effects.find((e) => e.type === 'selfBuff');
+    expect(bfBuff && bfBuff.type === 'selfBuff' ? bfBuff.value : 0).toBeCloseTo(1.2);
+  });
+
+  it('Shadowform carries its Spell Power bonus in the form aura, dying with the toggle', () => {
+    const { sim, p } = makeSim('priest');
+    expect(sim.setSpec('shadow')).toBe(true);
+    const spBefore = p.spellPower;
+
+    // The resolved selfBuff value carries the mastery's global multiplier
+    // (spell +12% scales buff values like any other), so assert against it.
+    const sf = sim.resolvedAbility('shadowform', p.id);
+    const rider = sf?.effects.find((e) => e.type === 'selfBuff');
+    if (!rider || rider.type !== 'selfBuff') throw new Error('missing shadowform selfBuff');
+    expect(rider.value).toBeGreaterThanOrEqual(15);
+
+    p.resource = p.maxResource;
+    sim.castAbility('shadowform');
+    expect(p.auras.some((a) => a.kind === 'form_shadow')).toBe(true);
+    expect(p.spellPower).toBe(spBefore + rider.value);
+
+    p.gcdRemaining = 0;
+    sim.castAbility('shadowform');
+    expect(p.auras.some((a) => a.kind === 'form_shadow')).toBe(false);
+    expect(p.spellPower).toBe(spBefore);
+  });
 });

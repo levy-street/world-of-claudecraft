@@ -4339,6 +4339,102 @@ export const it_IT: EnTranslations = {
         "name": "Rabbia del Berserker",
         "description": "Entri in una furia berserker e generi 20 rabbia. (talento del guerriero)"
       },
+      "holy_shock": {
+        "name": "Shock Sacro",
+        "description": "Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)"
+      },
+      "holy_shield": {
+        "name": "Scudo Sacro",
+        "description": "Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)"
+      },
+      "repentance": {
+        "name": "Pentimento",
+        "description": "Mette il nemico in stato di meditazione per un massimo di 6 s. Qualsiasi danno interrompe l’effetto. (firma Castigo)"
+      },
+      "bestial_wrath": {
+        "name": "Ira Bestiale",
+        "description": "Ti spinge in una furia bestiale, aumentando la potenza d’attacco di 55 per 15 s. (firma Affinità Animale)"
+      },
+      "trueshot_aura": {
+        "name": "Aura di Precisione",
+        "description": "Ispira gli alleati vicini, aumentando la potenza d’attacco di 35 per 5 min. (firma Precisione)"
+      },
+      "wyvern_sting": {
+        "name": "Morso della Viverna",
+        "description": "Punzecchia il nemico a distanza, incapacitandolo per un massimo di 4 s. Qualsiasi danno interrompe l’effetto. (firma Sopravvivenza)"
+      },
+      "arcane_power": {
+        "name": "Potere Arcano",
+        "description": "Ti riempie di potere Arcano, aumentando la potenza magica di 28 per 12 s. (firma Arcano)"
+      },
+      "combustion": {
+        "name": "Combustione",
+        "description": "Concentra la tua magia del fuoco, così il tuo prossimo attacco è un colpo critico. (firma Fuoco)"
+      },
+      "cone_of_cold": {
+        "name": "Cono di Freddo",
+        "description": "Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (firma Gelo)"
+      },
+      "cold_blood": {
+        "name": "Sangue Freddo",
+        "description": "Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)"
+      },
+      "blade_flurry": {
+        "name": "Vortice di Lame",
+        "description": "Scatena un turbine di lame, aumentando la velocità d’attacco del 20% per 12 s. (firma Combattimento)"
+      },
+      "hemorrhage": {
+        "name": "Emorragia",
+        "description": "Colpisce il nemico per danni dell’arma più {damage} e causa danni da sanguinamento per 12 s. Conferisce 1 punto combo. (firma Scaltrezza)"
+      },
+      "power_infusion": {
+        "name": "Infusione di Potere",
+        "description": "Infone potere in un bersaglio alleato, aumentando la potenza magica di 28 per 15 s. (firma Disciplina)"
+      },
+      "holy_nova": {
+        "name": "Nova Sacra",
+        "description": "Provoca un’esplosione di luce Sacra, curando gli alleati vicini di {damage} e danneggiando i nemici vicini. (firma Sacro)"
+      },
+      "shadowform": {
+        "name": "Forma d'Ombra",
+        "description": "Assume Forma d’Ombra, potenziando la magia d’ombra finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Ombra)"
+      },
+      "elemental_mastery": {
+        "name": "Maestria Elementale",
+        "description": "Invoca la maestria elementale, rendendo istantaneo il tuo prossimo incantesimo. (firma Elementale)"
+      },
+      "shamanistic_rage": {
+        "name": "Rabbia Sciamanica",
+        "description": "Libera rabbia sciamanica, ripristinando 160 mana. (firma Potenziamento)"
+      },
+      "natures_swiftness": {
+        "name": "Rapidità della Natura",
+        "description": "Invoca la natura per rendere istantaneo il tuo prossimo incantesimo. (firma Guarigione)"
+      },
+      "siphon_life": {
+        "name": "Risucchio Vitale",
+        "description": "Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)"
+      },
+      "fel_domination": {
+        "name": "Dominazione Demoniaca",
+        "description": "Domina energie demoniache, rendendo istantaneo il tuo prossimo incantesimo. (firma Demonologia)"
+      },
+      "conflagrate": {
+        "name": "Conflagrazione",
+        "description": "Consuma il tuo Immolazione sul nemico per incendiarlo, infliggendo {damage} danni da Fuoco. (firma Distruzione)"
+      },
+      "moonkin_form": {
+        "name": "Forma di Lunagufo",
+        "description": "Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)"
+      },
+      "feral_charge": {
+        "name": "Carica Ferina",
+        "description": "Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)"
+      },
+      "swiftmend": {
+        "name": "Rapidità di Guarigione",
+        "description": "Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)"
+      },
       "summon_imp": {
         "name": "Evoca folletto",
         "description": "Evoca un Folletto al comando dello stregone. Il Folletto scaglia Dardi di fuoco contro i tuoi nemici a distanza. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta."
