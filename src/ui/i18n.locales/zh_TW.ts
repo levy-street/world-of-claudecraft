@@ -4714,7 +4714,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.linkedAs': '已連結為 {login}',
   'hudChrome.devBadge.unlink': '取消連結 GitHub',
   'hudChrome.nativeUpdate.title': '有可用更新',
-  'hudChrome.nativeUpdate.body': 'World of ClaudeCraft 有新版本可用。立即更新以取得最新修正與改進。',
+  'hudChrome.nativeUpdate.body':
+    'World of ClaudeCraft 有新版本可用。立即更新以取得最新修正與改進。',
   'hudChrome.nativeUpdate.bodyWithVersion':
     'World of ClaudeCraft {version} 版本已可用。立即更新以取得最新修正與改進。',
   'hudChrome.nativeUpdate.notNow': '暫不',
