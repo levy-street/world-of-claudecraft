@@ -820,6 +820,58 @@ describe('coverage: each scenario fires its subsystem', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
+  it('talents2_mage_rows: row grants drive rooted Ice Lance, Shatter critVsRooted, PoM, Blink, and Deep Freeze', () => {
+    const rec = run('talents2_mage_rows');
+    const sim = rec.sim as any;
+    const ev = rec.allEvents as Ev[];
+    const main = rec.notes.main as number;
+    const shatter = rec.notes.shatter as number;
+    const rootedId = rec.notes.rootedId as number;
+    const shatterTargetId = rec.notes.shatterTargetId as number;
+    const mainMeta = sim.players.get(main);
+    const shatterMeta = sim.players.get(shatter);
+    expect(mainMeta.talents.rows).toEqual({
+      5: 'mag_r5_firestarter',
+      8: 'mag_r8_counterspell',
+      11: 'mag_r11_ice_lance',
+      14: 'mag_r14_presence_of_mind',
+      17: 'mag_r17_blink',
+      20: 'mag_r20_deep_freeze',
+    });
+    expect(shatterMeta.talents.rows[11]).toBe('mag_r11_shatter');
+    expect(shatterMeta.talentMods.global.critVsRooted).toBeCloseTo(0.3);
+    expect(
+      ev.some((e) => e.type === 'damage' && e.ability === 'Ice Lance' && e.targetId === rootedId),
+    ).toBe(true);
+    expect(
+      ev.some(
+        (e) => e.type === 'damage' && e.ability === 'Frostbolt' && e.targetId === shatterTargetId,
+      ),
+    ).toBe(true);
+    expect(ev.some((e) => e.type === 'aura' && e.name === 'Presence of Mind')).toBe(true);
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Fireball')).toBe(true);
+    expect(sim.entities.get(main).pos.x).toBeGreaterThan(10);
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Deep Freeze')).toBe(true);
+  });
+
+  it('talents2_warrior_interrupt: accepted duel allows Pummel lockout DR and Heroic Leap', () => {
+    const rec = run('talents2_warrior_interrupt');
+    const sim = rec.sim as any;
+    const ev = rec.allEvents as Ev[];
+    const warrior = rec.notes.warrior as number;
+    const mage = rec.notes.mage as number;
+    const warriorMeta = sim.players.get(warrior);
+    const mageEntity = sim.entities.get(mage);
+    expect(warriorMeta.talents.rows[5]).toBe('war_r5_heroic_leap');
+    expect(warriorMeta.talents.rows[8]).toBe('war_r8_pummel');
+    expect(ev.some((e) => e.type === 'duelStart' && e.pid === warrior)).toBe(true);
+    const cancelled = ev.filter((e) => e.type === 'castStop' && e.entityId === mage);
+    expect(cancelled.filter((e) => e.success === false)).toHaveLength(2);
+    expect(mageEntity.ccDr.get('lockout')?.stage).toBe(2);
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Heroic Leap')).toBe(true);
+    expect(sim.entities.get(warrior).pos.x).toBeGreaterThan(1);
+  });
+
   it('nythraxis_full_pull: every phase fires (transition + soul rend + deathless interrupt + lockout + death dialogue)', () => {
     const rec = run('nythraxis_full_pull');
     const ev = rec.allEvents as Ev[];

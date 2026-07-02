@@ -3752,6 +3752,174 @@ function chatSocial(): Scenario {
   };
 }
 
+function talents2MageRows(): Scenario {
+  return {
+    name: 'talents2_mage_rows',
+    coverage: [
+      'Talents 2.0 mage full row build: firestarter/counterspell/ice_lance/presence_of_mind/blink/deep_freeze',
+      'frost_nova roots into ice_lance vsRootedMult damage',
+      'mag_r11_shatter critVsRooted path on a rooted target',
+      'presence_of_mind next_cast_instant consume into fireball',
+      'blinkForward swept reposition',
+      'deep_freeze granted row capstone resolves',
+    ],
+    build: () => new Sim({ seed: 1024, playerClass: 'mage', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const main = sim.addPlayer('mage', 'Rowmage');
+      const shatter = sim.addPlayer('mage', 'Shattermage');
+      sim.setPlayerLevel(20, main);
+      sim.setPlayerLevel(20, shatter);
+      for (const [level, option] of [
+        [5, 'mag_r5_firestarter'],
+        [8, 'mag_r8_counterspell'],
+        [11, 'mag_r11_ice_lance'],
+        [14, 'mag_r14_presence_of_mind'],
+        [17, 'mag_r17_blink'],
+        [20, 'mag_r20_deep_freeze'],
+      ] as const) {
+        sim.chooseRow(level, option, main);
+      }
+      for (const [level, option] of [
+        [5, 'mag_r5_firestarter'],
+        [8, 'mag_r8_ice_nova'],
+        [11, 'mag_r11_shatter'],
+      ] as const) {
+        sim.chooseRow(level, option, shatter);
+      }
+      const mainMage = sim.entities.get(main) as AnyEntity;
+      const shatterMage = sim.entities.get(shatter) as AnyEntity;
+      teleport(sim, mainMage, 0, 0);
+      teleport(sim, shatterMage, 12, 0);
+      const rooted = spawnMob(sim, 'forest_wolf', 20, 4, mainMage.pos.y, 0);
+      const shatterTarget = spawnMob(sim, 'forest_wolf', 20, 16, shatterMage.pos.y, 0);
+      beef(rooted, 5000);
+      beef(shatterTarget, 5000);
+      rec.track(rooted.id, shatterTarget.id);
+      rec.notes.main = main;
+      rec.notes.shatter = shatter;
+      rec.notes.rootedId = rooted.id;
+      rec.notes.shatterTargetId = shatterTarget.id;
+      sim.targetEntity(rooted.id, main);
+      sim.targetEntity(shatterTarget.id, shatter);
+      face(mainMage, rooted);
+      face(shatterMage, shatterTarget);
+      rec.snapshot('rows-picked');
+
+      mainMage.resource = mainMage.maxResource;
+      sim.castAbility('frost_nova', main);
+      rec.tick(30);
+      face(mainMage, rooted);
+      mainMage.resource = mainMage.maxResource;
+      sim.castAbility('ice_lance', main);
+      rec.tick(18);
+      rec.snapshot('ice-lance-rooted');
+
+      shatterMage.resource = shatterMage.maxResource;
+      sim.castAbility('frost_nova', shatter);
+      rec.tick(30);
+      face(shatterMage, shatterTarget);
+      shatterMage.resource = shatterMage.maxResource;
+      sim.castAbility('frostbolt', shatter);
+      rec.tick(80);
+      rec.snapshot('shatter-rooted');
+
+      mainMage.resource = mainMage.maxResource;
+      sim.castAbility('presence_of_mind', main);
+      rec.tick(30);
+      face(mainMage, rooted);
+      mainMage.resource = mainMage.maxResource;
+      sim.castAbility('fireball', main);
+      rec.tick(30);
+      rec.snapshot('pom-fireball');
+
+      mainMage.cooldowns.delete('blink');
+      mainMage.resource = mainMage.maxResource;
+      face(mainMage, rooted);
+      sim.castAbility('blink', main);
+      rec.tick(30);
+      rec.snapshot('blink');
+
+      mainMage.cooldowns.delete('deep_freeze');
+      mainMage.resource = mainMage.maxResource;
+      sim.targetEntity(rooted.id, main);
+      face(mainMage, rooted);
+      sim.castAbility('deep_freeze', main);
+      rec.tick(18);
+      rec.snapshot('deep-freeze');
+    },
+  };
+}
+
+function talents2WarriorInterrupt(): Scenario {
+  return {
+    name: 'talents2_warrior_interrupt',
+    coverage: [
+      'Talents 2.0 warrior row build grants heroic_leap and pummel',
+      'accepted duel consent makes player target hostile',
+      'pummel interrupts a second player cast and applies lockout',
+      'second pummel hits lockout diminishing returns',
+      'heroic_leap uses swept repositionToAim and area damage',
+    ],
+    build: () => new Sim({ seed: 1025, playerClass: 'warrior', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const warrior = sim.addPlayer('warrior', 'Pummeler');
+      const mage = sim.addPlayer('mage', 'Caster');
+      sim.setPlayerLevel(20, warrior);
+      sim.setPlayerLevel(20, mage);
+      for (const [level, option] of [
+        [5, 'war_r5_heroic_leap'],
+        [8, 'war_r8_pummel'],
+        [11, 'war_r11_berserker_rage'],
+        [14, 'war_r14_mortal_strike'],
+        [17, 'war_r17_iron_hide'],
+        [20, 'war_r20_avatar'],
+      ] as const) {
+        sim.chooseRow(level, option, warrior);
+      }
+      const w = sim.entities.get(warrior) as AnyEntity;
+      const m = sim.entities.get(mage) as AnyEntity;
+      beef(w, 5000);
+      beef(m, 5000);
+      teleport(sim, w, 0, -20);
+      teleport(sim, m, 2, -20);
+      sim.duelRequest(mage, warrior);
+      sim.duelAccept(mage);
+      rec.tick(62);
+      rec.notes.warrior = warrior;
+      rec.notes.mage = mage;
+      sim.targetEntity(mage, warrior);
+      sim.targetEntity(warrior, mage);
+      face(w, m);
+      face(m, w);
+      rec.snapshot('duel-active');
+
+      m.resource = m.maxResource;
+      sim.castAbility('fireball', mage);
+      rec.tick(2);
+      w.resource = w.maxResource;
+      sim.castAbility('pummel', warrior);
+      rec.tick(210);
+      rec.snapshot('first-pummel');
+
+      m.resource = m.maxResource;
+      sim.castAbility('fireball', mage);
+      rec.tick(2);
+      w.resource = w.maxResource;
+      sim.castAbility('pummel', warrior);
+      rec.tick(30);
+      rec.snapshot('second-pummel-dr');
+
+      w.cooldowns.delete('heroic_leap');
+      w.resource = w.maxResource;
+      sim.castAbility('heroic_leap', warrior, { x: m.pos.x, z: m.pos.z });
+      rec.tick(8);
+      rec.snapshot('heroic-leap');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -3800,4 +3968,6 @@ export const SCENARIOS: Scenario[] = [
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),
+  talents2MageRows(),
+  talents2WarriorInterrupt(),
 ];

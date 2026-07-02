@@ -1,0 +1,2398 @@
+{
+  "scenario": "talents2_mage_rows",
+  "seed": 1024,
+  "sampleEvery": 20,
+  "ticks": 266,
+  "coverage": [
+    "Talents 2.0 mage full row build: firestarter/counterspell/ice_lance/presence_of_mind/blink/deep_freeze",
+    "frost_nova roots into ice_lance vsRootedMult damage",
+    "mag_r11_shatter critVsRooted path on a rooted target",
+    "presence_of_mind next_cast_instant consume into fireball",
+    "blinkForward swept reposition",
+    "deep_freeze granted row capstone resolves"
+  ],
+  "draws": 1255,
+  "drawDigest": "6b145d0b",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 389,
+      "state": "5bc471b0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [],
+      "entities": []
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 393,
+      "state": "9c572bc4",
+      "events": "f7be7ef0",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "rows-picked",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_counterspell",
+              "11": "mag_r11_ice_lance",
+              "14": "mag_r14_presence_of_mind",
+              "17": "mag_r17_blink",
+              "20": "mag_r20_deep_freeze"
+            }
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_ice_nova",
+              "11": "mag_r11_shatter"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 418,
+          "id": 389,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 391,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 418,
+          "id": 390,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 12,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 392,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 5000,
+          "id": 391,
+          "kind": "mob",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "templateId": "forest_wolf",
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 5000,
+          "id": 392,
+          "kind": "mob",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "templateId": "forest_wolf",
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 393,
+      "state": "4e61fedc",
+      "events": "b9b56ebe",
+      "rng": {
+        "draws": 7,
+        "digest": "55984f68"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 393,
+      "state": "0753123e",
+      "events": "8fcbf9cc",
+      "rng": {
+        "draws": 10,
+        "digest": "cfa821d5"
+      }
+    },
+    {
+      "tick": 48,
+      "time": 2.4,
+      "nextId": 393,
+      "state": "2378277c",
+      "events": "10774c6c",
+      "rng": {
+        "draws": 54,
+        "digest": "775a1ba3"
+      },
+      "label": "ice-lance-rooted",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 148,
+            "damageTaken": 61
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_counterspell",
+              "11": "mag_r11_ice_lance",
+              "14": "mag_r14_presence_of_mind",
+              "17": "mag_r17_blink",
+              "20": "mag_r20_deep_freeze"
+            }
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 60
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_ice_nova",
+              "11": "mag_r11_shatter"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.35,
+          "cooldowns": [
+            [
+              "frost_nova",
+              19.6
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.9,
+          "gcdRemaining": 0.6,
+          "hp": 357,
+          "id": 389,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1486,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 391,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.3,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 101.4,
+          "hp": 358,
+          "id": 390,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 12,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1506,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 392,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 389,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 8,
+              "id": "frost_nova_root",
+              "kind": "root",
+              "name": "Frost Nova",
+              "remaining": 5.6,
+              "school": "frost",
+              "sourceId": 389
+            }
+          ],
+          "combatTimer": 0.35,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4852,
+          "id": 391,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 1.65,
+          "tappedById": 389,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              389,
+              149
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 390,
+          "aiState": "attack",
+          "combatTimer": 0.3,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 5000,
+          "id": 392,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 16,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 1.7,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              390,
+              1
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 393,
+      "state": "d4771d0d",
+      "events": "713e4d5a",
+      "rng": {
+        "draws": 112,
+        "digest": "7c8e90fc"
+      }
+    },
+    {
+      "tick": 80,
+      "time": 4,
+      "nextId": 393,
+      "state": "94bb8b45",
+      "events": "a622c35b",
+      "rng": {
+        "draws": 213,
+        "digest": "ceccfc27"
+      }
+    },
+    {
+      "tick": 100,
+      "time": 5,
+      "nextId": 393,
+      "state": "77253685",
+      "events": "253cadce",
+      "rng": {
+        "draws": 324,
+        "digest": "dc032d9a"
+      }
+    },
+    {
+      "tick": 120,
+      "time": 6,
+      "nextId": 393,
+      "state": "887859b4",
+      "events": "741638a5",
+      "rng": {
+        "draws": 441,
+        "digest": "5ac38dca"
+      }
+    },
+    {
+      "tick": 140,
+      "time": 7,
+      "nextId": 393,
+      "state": "b3618917",
+      "events": "c8b5ce34",
+      "rng": {
+        "draws": 568,
+        "digest": "60e2ce00"
+      }
+    },
+    {
+      "tick": 158,
+      "time": 7.9,
+      "nextId": 393,
+      "state": "8b58650a",
+      "events": "9b84847b",
+      "rng": {
+        "draws": 690,
+        "digest": "c4c07a4a"
+      },
+      "label": "shatter-rooted",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 148,
+            "damageTaken": 131
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_counterspell",
+              "11": "mag_r11_ice_lance",
+              "14": "mag_r14_presence_of_mind",
+              "17": "mag_r17_blink",
+              "20": "mag_r20_deep_freeze"
+            }
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 146,
+            "damageTaken": 123
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_ice_nova",
+              "11": "mag_r11_shatter"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 1.85,
+          "cooldowns": [
+            [
+              "frost_nova",
+              14.1
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 6.4,
+          "hp": 287,
+          "id": 389,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1486,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 391,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "castTotal": 3.5,
+          "combatTimer": 0.35,
+          "cooldowns": [
+            [
+              "frost_nova",
+              7.7
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.55,
+          "hp": 295,
+          "id": 390,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 12,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1436,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 392,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 389,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 8,
+              "id": "frost_nova_root",
+              "kind": "root",
+              "name": "Frost Nova",
+              "remaining": 0.1,
+              "school": "frost",
+              "sourceId": 389
+            },
+            {
+              "duration": 8,
+              "id": "frost_nova_root",
+              "kind": "root",
+              "name": "Frost Nova",
+              "remaining": 2.5,
+              "school": "frost",
+              "sourceId": 390
+            }
+          ],
+          "combatTimer": 1.85,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4826,
+          "id": 391,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 0.15,
+          "tappedById": 389,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              389,
+              149
+            ],
+            [
+              390,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 390,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 8,
+              "id": "frost_nova_root",
+              "kind": "root",
+              "name": "Frost Nova",
+              "remaining": 2.5,
+              "school": "frost",
+              "sourceId": 390
+            },
+            {
+              "duration": 9,
+              "id": "frostbolt_slow",
+              "kind": "slow",
+              "name": "Frostbolt",
+              "remaining": 8.65,
+              "school": "frost",
+              "sourceId": 390,
+              "value": 0.6
+            }
+          ],
+          "combatTimer": 0.35,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4880,
+          "id": 392,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 16,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 0.2,
+          "tappedById": 390,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              390,
+              121
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 160,
+      "time": 8,
+      "nextId": 393,
+      "state": "f7ae645d",
+      "events": "9d68caed",
+      "rng": {
+        "draws": 695,
+        "digest": "c959c987"
+      }
+    },
+    {
+      "tick": 180,
+      "time": 9,
+      "nextId": 393,
+      "state": "445c5f12",
+      "events": "6616c155",
+      "rng": {
+        "draws": 823,
+        "digest": "aeb91d02"
+      }
+    },
+    {
+      "tick": 200,
+      "time": 10,
+      "nextId": 393,
+      "state": "487b2f86",
+      "events": "2e1407fc",
+      "rng": {
+        "draws": 969,
+        "digest": "f413c9eb"
+      }
+    },
+    {
+      "tick": 218,
+      "time": 10.9,
+      "nextId": 393,
+      "state": "81f3789f",
+      "events": "ea45b934",
+      "rng": {
+        "draws": 1040,
+        "digest": "aeddec24"
+      },
+      "label": "pom-fireball",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 246,
+            "damageTaken": 203
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_counterspell",
+              "11": "mag_r11_ice_lance",
+              "14": "mag_r14_presence_of_mind",
+              "17": "mag_r17_blink",
+              "20": "mag_r20_deep_freeze"
+            }
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 146,
+            "damageTaken": 189
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_ice_nova",
+              "11": "mag_r11_shatter"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.85,
+          "cooldowns": [
+            [
+              "frost_nova",
+              11.1
+            ],
+            [
+              "presence_of_mind",
+              57
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 1.5,
+          "hp": 215,
+          "id": 389,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1411,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 391,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "castTotal": 3.5,
+          "combatTimer": 0.8,
+          "cooldowns": [
+            [
+              "frost_nova",
+              4.7
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 3.55,
+          "hp": 229,
+          "id": 390,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 12,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1436,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 392,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 389,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 8,
+              "id": "fireball",
+              "kind": "dot",
+              "name": "Fireball",
+              "remaining": 6.65,
+              "school": "fire",
+              "sourceId": 389,
+              "tickInterval": 2,
+              "tickTimer": 0.65,
+              "value": 3
+            }
+          ],
+          "combatTimer": 0.85,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4728,
+          "id": 391,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 1.15,
+          "tappedById": 389,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              389,
+              247
+            ],
+            [
+              390,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 390,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 9,
+              "id": "frostbolt_slow",
+              "kind": "slow",
+              "name": "Frostbolt",
+              "remaining": 5.65,
+              "school": "frost",
+              "sourceId": 390,
+              "value": 0.6
+            }
+          ],
+          "combatTimer": 0.8,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4880,
+          "id": 392,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 16,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 1.2,
+          "tappedById": 390,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              390,
+              121
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 220,
+      "time": 11,
+      "nextId": 393,
+      "state": "1bb031fc",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1045,
+        "digest": "a3eba3c6"
+      }
+    },
+    {
+      "tick": 240,
+      "time": 12,
+      "nextId": 393,
+      "state": "5bc79ce6",
+      "events": "3599521d",
+      "rng": {
+        "draws": 1118,
+        "digest": "05572e9a"
+      }
+    },
+    {
+      "tick": 248,
+      "time": 12.4,
+      "nextId": 393,
+      "state": "659ce453",
+      "events": "31e0e738",
+      "rng": {
+        "draws": 1157,
+        "digest": "eb018bba"
+      },
+      "label": "blink",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 249,
+            "damageTaken": 238
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_counterspell",
+              "11": "mag_r11_ice_lance",
+              "14": "mag_r14_presence_of_mind",
+              "17": "mag_r17_blink",
+              "20": "mag_r20_deep_freeze"
+            }
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 146,
+            "damageTaken": 254
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_ice_nova",
+              "11": "mag_r11_shatter"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.2,
+          "cooldowns": [
+            [
+              "blink",
+              13.5
+            ],
+            [
+              "frost_nova",
+              9.6
+            ],
+            [
+              "presence_of_mind",
+              55.5
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 1.5,
+          "hp": 180,
+          "id": 389,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 15,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1466,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 391,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "castTotal": 3.5,
+          "combatTimer": 0.3,
+          "cooldowns": [
+            [
+              "frost_nova",
+              3.2
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 5.05,
+          "hp": 164,
+          "id": 390,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 12,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1436,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 392,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 389,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 8,
+              "id": "fireball",
+              "kind": "dot",
+              "name": "Fireball",
+              "remaining": 5.15,
+              "school": "fire",
+              "sourceId": 389,
+              "tickInterval": 2,
+              "tickTimer": 1.15,
+              "value": 3
+            }
+          ],
+          "combatTimer": 0.2,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4725,
+          "id": 391,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 10,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 1.8,
+          "tappedById": 389,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              389,
+              250
+            ],
+            [
+              390,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 390,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 9,
+              "id": "frostbolt_slow",
+              "kind": "slow",
+              "name": "Frostbolt",
+              "remaining": 4.15,
+              "school": "frost",
+              "sourceId": 390,
+              "value": 0.6
+            }
+          ],
+          "combatTimer": 0.3,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4880,
+          "id": 392,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 16,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 1.7,
+          "tappedById": 390,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              390,
+              121
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 260,
+      "time": 13,
+      "nextId": 393,
+      "state": "c7a2cf54",
+      "events": "62cf3349",
+      "rng": {
+        "draws": 1225,
+        "digest": "2980776a"
+      }
+    },
+    {
+      "tick": 266,
+      "time": 13.3,
+      "nextId": 393,
+      "state": "523227e6",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1255,
+        "digest": "6b145d0b"
+      },
+      "label": "deep-freeze",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 249,
+            "damageTaken": 238
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_counterspell",
+              "11": "mag_r11_ice_lance",
+              "14": "mag_r14_presence_of_mind",
+              "17": "mag_r17_blink",
+              "20": "mag_r20_deep_freeze"
+            }
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 146,
+            "damageTaken": 254
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_ice_nova",
+              "11": "mag_r11_shatter"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.75,
+          "cooldowns": [
+            [
+              "blink",
+              12.6
+            ],
+            [
+              "deep_freeze",
+              29.1
+            ],
+            [
+              "frost_nova",
+              8.7
+            ],
+            [
+              "presence_of_mind",
+              54.6
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.9,
+          "gcdRemaining": 0.6,
+          "hp": 180,
+          "id": 389,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 15,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1446,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 391,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "castTotal": 3.5,
+          "combatTimer": 1.2,
+          "cooldowns": [
+            [
+              "frost_nova",
+              2.3
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 5.95,
+          "hp": 164,
+          "id": 390,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 12,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1436,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 392,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 389,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 8,
+              "id": "fireball",
+              "kind": "dot",
+              "name": "Fireball",
+              "remaining": 4.25,
+              "school": "fire",
+              "sourceId": 389,
+              "tickInterval": 2,
+              "tickTimer": 0.25,
+              "value": 3
+            }
+          ],
+          "combatTimer": 0.75,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4725,
+          "id": 391,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 10,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 0.9,
+          "tappedById": 389,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              389,
+              250
+            ],
+            [
+              390,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 390,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 9,
+              "id": "frostbolt_slow",
+              "kind": "slow",
+              "name": "Frostbolt",
+              "remaining": 3.25,
+              "school": "frost",
+              "sourceId": 390,
+              "value": 0.6
+            }
+          ],
+          "combatTimer": 1.2,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4880,
+          "id": 392,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 16,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 0.8,
+          "tappedById": 390,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              390,
+              121
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 266,
+      "time": 13.3,
+      "nextId": 393,
+      "state": "523227e6",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1255,
+        "digest": "6b145d0b"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 249,
+            "damageTaken": 238
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_counterspell",
+              "11": "mag_r11_ice_lance",
+              "14": "mag_r14_presence_of_mind",
+              "17": "mag_r17_blink",
+              "20": "mag_r20_deep_freeze"
+            }
+          }
+        },
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 146,
+            "damageTaken": 254
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 390,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "choices": {},
+            "ranks": {},
+            "rows": {
+              "5": "mag_r5_firestarter",
+              "8": "mag_r8_ice_nova",
+              "11": "mag_r11_shatter"
+            }
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 0.75,
+          "cooldowns": [
+            [
+              "blink",
+              12.6
+            ],
+            [
+              "deep_freeze",
+              29.1
+            ],
+            [
+              "frost_nova",
+              8.7
+            ],
+            [
+              "presence_of_mind",
+              54.6
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.9,
+          "gcdRemaining": 0.6,
+          "hp": 180,
+          "id": 389,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 15,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1446,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 391,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "castTotal": 3.5,
+          "combatTimer": 1.2,
+          "cooldowns": [
+            [
+              "frost_nova",
+              2.3
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 5.95,
+          "hp": 164,
+          "id": 390,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 12,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1436,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 133,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 392,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 389,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 8,
+              "id": "fireball",
+              "kind": "dot",
+              "name": "Fireball",
+              "remaining": 4.25,
+              "school": "fire",
+              "sourceId": 389,
+              "tickInterval": 2,
+              "tickTimer": 0.25,
+              "value": 3
+            }
+          ],
+          "combatTimer": 0.75,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4725,
+          "id": 391,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 10,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 0.9,
+          "tappedById": 389,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              389,
+              250
+            ],
+            [
+              390,
+              26
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        },
+        {
+          "aggroTargetId": 390,
+          "aiState": "attack",
+          "auras": [
+            {
+              "duration": 9,
+              "id": "frostbolt_slow",
+              "kind": "slow",
+              "name": "Frostbolt",
+              "remaining": 3.25,
+              "school": "frost",
+              "sourceId": 390,
+              "value": 0.6
+            }
+          ],
+          "combatTimer": 1.2,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": -1.570796,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 4880,
+          "id": 392,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 16,
+            "y": 1.5
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 5000,
+          "moveSpeed": 8,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 16,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 190
+          },
+          "swingTimer": 0.8,
+          "tappedById": 390,
+          "templateId": "forest_wolf",
+          "threat": [
+            [
+              390,
+              121
+            ]
+          ],
+          "weapon": {
+            "max": 42,
+            "min": 27,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}
