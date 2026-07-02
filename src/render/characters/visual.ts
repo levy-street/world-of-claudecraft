@@ -5,6 +5,7 @@
 // only releases mixer bindings.
 import * as THREE from 'three';
 import type { OverheadEmoteId } from '../../world_api';
+import type { FormTint } from '../form_tint';
 import { GFX } from '../gfx';
 import {
   type AnimState,
@@ -89,6 +90,7 @@ export class CharacterVisual {
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
+  private formTintMaterials = new Map<string, Map<THREE.Material, THREE.Material>>();
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -105,6 +107,8 @@ export class CharacterVisual {
   private shadowOn = true;
   private far = false;
   private soulRend = false;
+  private formTint: FormTint | null = null;
+  private formTintSig = '';
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -392,6 +396,14 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  setFormTint(tint: FormTint | null): void {
+    const sig = tint ? `${tint.color}:${tint.opacity}` : '';
+    if (sig === this.formTintSig) return;
+    this.formTint = tint;
+    this.formTintSig = sig;
+    this.applyVisualMaterials();
+  }
+
   private applyVisualMaterials(): void {
     for (const [mesh, original] of this.originalMaterials) {
       mesh.material = this.effectMaterial(original);
@@ -513,9 +525,11 @@ export class CharacterVisual {
   }
 
   private effectSingleMaterial(material: THREE.Material): THREE.Material {
-    if (this.soulRend) return this.soulRendMaterial(material);
-    if (this.ghosted) return this.ghostMaterial(material);
-    return material;
+    let effected = material;
+    if (this.soulRend) effected = this.soulRendMaterial(effected);
+    else if (this.ghosted) effected = this.ghostMaterial(effected);
+    if (this.formTint) effected = this.formTintMaterial(effected, this.formTint);
+    return effected;
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
@@ -548,6 +562,29 @@ export class CharacterVisual {
     }
     this.soulRendMaterials.set(material, marked);
     return marked;
+  }
+
+  private formTintMaterial(material: THREE.Material, tint: FormTint): THREE.Material {
+    let byMaterial = this.formTintMaterials.get(this.formTintSig);
+    if (!byMaterial) {
+      byMaterial = new Map<THREE.Material, THREE.Material>();
+      this.formTintMaterials.set(this.formTintSig, byMaterial);
+    }
+    const cached = byMaterial.get(material);
+    if (cached) return cached;
+    const tinted = material.clone();
+    const withColor = tinted as THREE.Material & {
+      color?: THREE.Color;
+      opacity: number;
+    };
+    if (withColor.color) withColor.color.multiply(new THREE.Color(tint.color));
+    if (tint.opacity < 1) {
+      tinted.transparent = true;
+      withColor.opacity *= tint.opacity;
+      tinted.depthWrite = false;
+    }
+    byMaterial.set(material, tinted);
+    return tinted;
   }
 
   private action(name: string | undefined): THREE.AnimationAction | null {
