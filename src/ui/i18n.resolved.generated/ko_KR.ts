@@ -2126,6 +2126,36 @@ export const ko_KR: EnTranslations = {
     "warlockAria": "흑마법사 직업",
     "druidAria": "드루이드 직업"
   },
+  "races": {
+    "sectionTitle": "진영과 종족",
+    "factionKael": "카엘 제국",
+    "factionVeth": "베스 연맹",
+    "factionOssara": "오사라 영지",
+    "human": "인간",
+    "dwarf": "드워프",
+    "gnome": "노움",
+    "elf_exile": "추방된 엘프",
+    "elf": "엘프",
+    "dark_fae": "어둠 요정",
+    "frost_kin": "서리 일족",
+    "shadow_walker": "그림자 방랑자",
+    "desert_clan": "사막 부족",
+    "sand_mage": "모래 마법사",
+    "nomad": "유목민",
+    "stone_warden": "돌 수호자",
+    "humanAria": "인간 종족",
+    "dwarfAria": "드워프 종족",
+    "gnomeAria": "노움 종족",
+    "elf_exileAria": "추방된 엘프 종족",
+    "elfAria": "엘프 종족",
+    "dark_faeAria": "어둠 요정 종족",
+    "frost_kinAria": "서리 일족 종족",
+    "shadow_walkerAria": "그림자 방랑자 종족",
+    "desert_clanAria": "사막 부족 종족",
+    "sand_mageAria": "모래 마법사 종족",
+    "nomadAria": "유목민 종족",
+    "stone_wardenAria": "돌 수호자 종족"
+  },
   "controls": {
     "title": "조작 가이드",
     "movement": "이동 조작",
@@ -4833,6 +4863,543 @@ export const ko_KR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "군주의 왕관"
       },
+      "dune_prowler_pelt": {
+        "name": "모래언덕 배회자 가죽"
+      },
+      "glasswind_stinger": {
+        "name": "유리바람 독침"
+      },
+      "stolen_relic": {
+        "name": "도난당한 성물"
+      },
+      "nameless_burial_shroud": {
+        "name": "이름 없는 매장 수의"
+      },
+      "storm_glass_core": {
+        "name": "폭풍유리 핵"
+      },
+      "verdict_seal": {
+        "name": "판결 인장"
+      },
+      "glasswind_husk": {
+        "name": "유리바람 껍데기"
+      },
+      "mirage_stalker_eye": {
+        "name": "신기루 추적자의 눈"
+      },
+      "dig_manifest": {
+        "name": "발굴 목록"
+      },
+      "tomb_censer": {
+        "name": "무덤 향로"
+      },
+      "sentence_tablet": {
+        "name": "선고 석판"
+      },
+      "duststorm_heart": {
+        "name": "모래폭풍의 심장"
+      },
+      "ravager_hide": {
+        "name": "유린자 가죽"
+      },
+      "aqueduct_bronze": {
+        "name": "수도교 청동 이음쇠"
+      },
+      "judge_regalia": {
+        "name": "제1법정 예복"
+      },
+      "sunbleached_fang": {
+        "name": "햇빛에 바랜 송곳니"
+      },
+      "cracked_scarab_shell": {
+        "name": "금 간 풍뎅이 껍데기"
+      },
+      "emberjaw_pelt": {
+        "name": "불꽃아귀 우두머리의 가죽"
+      },
+      "karns_funeral_mask": {
+        "name": "카른의 장례 가면"
+      },
+      "qesh_flatbread": {
+        "name": "케쉬 납작빵"
+      },
+      "oasis_waterskin": {
+        "name": "오아시스 물주머니"
+      },
+      "spiced_scarab_skewer": {
+        "name": "향신료 풍뎅이 꼬치"
+      },
+      "duneweave_robe": {
+        "name": "모래언덕 직조 로브"
+      },
+      "caravan_guard_hauberk": {
+        "name": "대상 호위병 사슬갑옷"
+      },
+      "prowlerhide_vest": {
+        "name": "배회자 가죽 조끼"
+      },
+      "sandwalker_treads": {
+        "name": "모래걸음꾼의 신"
+      },
+      "dunewatch_legguards": {
+        "name": "모래언덕 감시자의 다리보호구"
+      },
+      "qesh_khopesh": {
+        "name": "케쉬 코페쉬"
+      },
+      "judgestaff_of_ossara": {
+        "name": "오사라 재판관의 지팡이"
+      },
+      "glasswind_talon": {
+        "name": "유리바람 갈퀴발톱"
+      },
+      "emberjaw_prowlgrips": {
+        "name": "불꽃아귀 사냥 장갑"
+      },
+      "unburied_gravewraps": {
+        "name": "묻히지 못한 자의 무덤붕대"
+      },
+      "sandmaw_scale_cuirass": {
+        "name": "모래아귀 비늘 흉갑"
+      },
+      "tyrantfang_edge": {
+        "name": "폭군니 칼날"
+      },
+      "palewidow_silk": {
+        "name": "창백거미 명주실"
+      },
+      "waterlogged_ledger": {
+        "name": "물에 젖은 장부"
+      },
+      "guildless_sigil": {
+        "name": "길드 없는 자의 인장"
+      },
+      "silent_court_seal": {
+        "name": "침묵 법정의 인장"
+      },
+      "duskmane_pelt_strip": {
+        "name": "황혼갈기 가죽끈"
+      },
+      "palewidow_venom_sac": {
+        "name": "창백거미 독주머니"
+      },
+      "quay_manifest": {
+        "name": "물에 젖은 부두 목록"
+      },
+      "wisplight_essence": {
+        "name": "도깨비불 정수"
+      },
+      "drowned_toll_coin": {
+        "name": "물에 잠긴 통행료 동전"
+      },
+      "cutthroat_contract": {
+        "name": "목따개의 계약서"
+      },
+      "court_ledger_page": {
+        "name": "법정 장부 한 장"
+      },
+      "frostpine_war_totem": {
+        "name": "서리소나무 전쟁 토템"
+      },
+      "rimeclaw_pelt": {
+        "name": "서리발톱 가죽"
+      },
+      "duskmane_tuft": {
+        "name": "황혼갈기 털뭉치"
+      },
+      "guttering_wisp_mote": {
+        "name": "깜박이는 도깨비불 티끌"
+      },
+      "frostpine_charm": {
+        "name": "서리소나무 부적"
+      },
+      "palefang_pelt": {
+        "name": "고요한 창백니의 가죽"
+      },
+      "grelnoks_frozen_idol": {
+        "name": "그렐노크의 얼어붙은 우상"
+      },
+      "nighthollow_black_bread": {
+        "name": "밤골 흑빵"
+      },
+      "pinefrost_tea": {
+        "name": "솔서리 차"
+      },
+      "smoked_blackmere_eel": {
+        "name": "검은호수 훈제 장어"
+      },
+      "wispweave_robe": {
+        "name": "도깨비불 직조 로브"
+      },
+      "quayguard_hauberk": {
+        "name": "부두 경비병 사슬갑옷"
+      },
+      "duskstalker_vest": {
+        "name": "황혼 추적자 조끼"
+      },
+      "nightpath_treads": {
+        "name": "밤길의 신"
+      },
+      "blackriver_legguards": {
+        "name": "검은강 다리보호구"
+      },
+      "terracewatch_leggings": {
+        "name": "계단밭 감시자의 각반"
+      },
+      "quays_cutlass": {
+        "name": "부두의 커틀러스"
+      },
+      "wispcaller_staff": {
+        "name": "도깨비불 부름꾼의 지팡이"
+      },
+      "whispersteel_stiletto": {
+        "name": "속삭임강철 단검"
+      },
+      "palefang_grips": {
+        "name": "창백니 장갑"
+      },
+      "hoarbound_bindings": {
+        "name": "서리묶인 자의 결박구"
+      },
+      "forsworn_lamellar": {
+        "name": "맹세배반자의 미늘 갑옷"
+      },
+      "forsworn_edge": {
+        "name": "맹세배반자의 칼날"
+      },
+      "stolen_tithe_ledger": {
+        "name": "도난당한 십일조 장부"
+      },
+      "granite_core_shard": {
+        "name": "화강암 핵 조각"
+      },
+      "legion_deserter_insignia": {
+        "name": "군단 탈영병 휘장"
+      },
+      "chewed_tithe_scrip": {
+        "name": "씹다 만 십일조 전표"
+      },
+      "candle_tax_tally": {
+        "name": "양초세 계산패"
+      },
+      "assay_office_seal": {
+        "name": "검정소 인장"
+      },
+      "legion_pay_manifest": {
+        "name": "군단 급여 목록"
+      },
+      "prime_wolf_pelt": {
+        "name": "최상급 늑대 가죽"
+      },
+      "wendigo_gallstone": {
+        "name": "웬디고 담석"
+      },
+      "icehowler_ruff": {
+        "name": "얼음울음꾼 목털"
+      },
+      "legion_quarrel_bundle": {
+        "name": "군단 쇠뇌살 묶음"
+      },
+      "clipped_imperial_coin": {
+        "name": "깎아낸 제국 주화"
+      },
+      "rimewoven_hide": {
+        "name": "서리로 짠 가죽"
+      },
+      "sellsword_pig_iron": {
+        "name": "용병의 무쇠"
+      },
+      "lean_wolf_haunch": {
+        "name": "기름기 없는 늑대 뒷다리"
+      },
+      "pilfered_ration_pack": {
+        "name": "훔친 배급 꾸러미"
+      },
+      "sellsword_requisition_chit": {
+        "name": "용병 징발 전표"
+      },
+      "frostbrush_wolf_fang": {
+        "name": "서리덤불 늑대 송곳니"
+      },
+      "bent_legion_buckle": {
+        "name": "휘어진 군단 버클"
+      },
+      "ogre_knuckle_dice": {
+        "name": "오우거 손가락뼈 주사위"
+      },
+      "hoarfang_pelt": {
+        "name": "서리송곳니 우두머리의 가죽"
+      },
+      "kazriks_brass_whistle": {
+        "name": "카즈리크의 놋쇠 호루라기"
+      },
+      "kaelspire_barley_loaf": {
+        "name": "카엘첨탑 보리빵"
+      },
+      "silverbrook_spring_water": {
+        "name": "은시내 샘물"
+      },
+      "imperial_field_ration": {
+        "name": "제국 야전 배급식"
+      },
+      "imperial_clerks_robe": {
+        "name": "제국 서기 로브"
+      },
+      "kael_infantry_hauberk": {
+        "name": "카엘 보병 사슬갑옷"
+      },
+      "wolfsward_hunting_jerkin": {
+        "name": "늑대수비대 사냥 가죽옷"
+      },
+      "tithe_road_marchboots": {
+        "name": "십일조 길 행군화"
+      },
+      "imperial_marcher_legguards": {
+        "name": "제국 행군병 다리보호구"
+      },
+      "kael_arming_sword": {
+        "name": "카엘 기사검"
+      },
+      "frosthelm_warstaff": {
+        "name": "서리투구 전쟁지팡이"
+      },
+      "wolfsward_skinner": {
+        "name": "늑대수비대 가죽칼"
+      },
+      "prefects_sealed_mantle": {
+        "name": "집정관의 봉인된 망토"
+      },
+      "huntmasters_winter_hood": {
+        "name": "사냥단장의 겨울 두건"
+      },
+      "hoarfang_clawgrips": {
+        "name": "서리송곳니 발톱 장갑"
+      },
+      "overseers_candlewraps": {
+        "name": "감독관의 양초 붕대"
+      },
+      "oathbreakers_battleplate": {
+        "name": "맹세파괴자의 전투판금"
+      },
+      "oathbreakers_greatblade": {
+        "name": "맹세파괴자의 대검"
+      },
+      "grey_shale_chip": {
+        "name": "회색 혈암 조각"
+      },
+      "smuggled_trinket": {
+        "name": "밀수된 장신구"
+      },
+      "barbed_thorn_husk": {
+        "name": "가시돋친 꼬투리"
+      },
+      "thornfen_tusk": {
+        "name": "가시늪 트롤 엄니"
+      },
+      "torn_caravan_banner": {
+        "name": "찢어진 대상 깃발"
+      },
+      "ironpass_rubble_core": {
+        "name": "무쇠고개 잔해 핵"
+      },
+      "wyvern_tail_barb": {
+        "name": "와이번 꼬리 가시"
+      },
+      "reagent_gland": {
+        "name": "시약으로 부푼 분비선"
+      },
+      "fogged_lantern_glass": {
+        "name": "김서린 등불 유리"
+      },
+      "river_worn_idol": {
+        "name": "강물에 닳은 우상"
+      },
+      "gull_picked_bone": {
+        "name": "갈매기가 쪼아먹은 뼈"
+      },
+      "underway_hardtack": {
+        "name": "지하길 건빵"
+      },
+      "smugglers_black_brew": {
+        "name": "밀수꾼의 검은 술"
+      },
+      "thornberry_loaf": {
+        "name": "가시열매 빵"
+      },
+      "palisade_pine_tea": {
+        "name": "방책 소나무 차"
+      },
+      "tollhouse_stew": {
+        "name": "통행소 스튜"
+      },
+      "ironpass_mulled_cider": {
+        "name": "무쇠고개 뜨거운 사과주"
+      },
+      "lanternfen_eel_skewer": {
+        "name": "등불늪 장어 꼬치"
+      },
+      "fogberry_tonic": {
+        "name": "안개열매 강장제"
+      },
+      "bridgewatch_rations": {
+        "name": "다리감시 배급식"
+      },
+      "nameless_river_water": {
+        "name": "이름 없는 강물"
+      },
+      "smuggler_kings_softsteps": {
+        "name": "밀수왕의 사뿐걸음 신"
+      },
+      "briarfather_bark_mitts": {
+        "name": "가시아버지의 나무껍질 장갑"
+      },
+      "skarns_war_harness": {
+        "name": "스카른의 전쟁 마구"
+      },
+      "colossus_mireheart_girdle": {
+        "name": "진창심장 허리띠"
+      },
+      "bridgekeepers_tollstaff": {
+        "name": "다리지기의 통행 지팡이"
+      },
+      "melted_ration_tin": {
+        "name": "녹아버린 배급 깡통"
+      },
+      "ashcaked_fang": {
+        "name": "재가 눌어붙은 송곳니"
+      },
+      "ember_glass_shard": {
+        "name": "불씨유리 조각"
+      },
+      "saltglass_shard": {
+        "name": "소금유리 조각"
+      },
+      "salt_crusted_chitin": {
+        "name": "소금이 굳은 키틴"
+      },
+      "bleached_bone_charm": {
+        "name": "바랜 뼈 부적"
+      },
+      "tarnished_prewar_coin": {
+        "name": "빛바랜 전쟁 전 주화"
+      },
+      "sewer_silk_wad": {
+        "name": "하수도 명주 뭉치"
+      },
+      "gutter_hound_pelt": {
+        "name": "시궁창 사냥개 가죽"
+      },
+      "cracked_salamander_scale": {
+        "name": "금 간 화염도롱뇽 비늘"
+      },
+      "cooled_magma_bead": {
+        "name": "식은 용암 구슬"
+      },
+      "slag_nugget": {
+        "name": "광재 덩어리"
+      },
+      "rusted_deserter_badge": {
+        "name": "녹슨 탈영병 배지"
+      },
+      "redspire_rock_shard": {
+        "name": "붉은첨탑 바위 조각"
+      },
+      "spire_stalker_claw": {
+        "name": "첨탑 추적자의 발톱"
+      },
+      "cinderrest_ashcake": {
+        "name": "잿불쉼터 재과자"
+      },
+      "boiled_cistern_water": {
+        "name": "끓인 저수조 물"
+      },
+      "brinehollow_salt_jerky": {
+        "name": "소금골 육포"
+      },
+      "desalted_waterskin": {
+        "name": "담수 물주머니"
+      },
+      "gutter_stew": {
+        "name": "유배자 시장 시궁창 스튜"
+      },
+      "black_market_tea": {
+        "name": "암시장 차"
+      },
+      "forgefall_hardtack": {
+        "name": "용광로몰락 건빵"
+      },
+      "coalfire_stout": {
+        "name": "석탄불 흑맥주"
+      },
+      "waymeet_marching_bread": {
+        "name": "길목 행군빵"
+      },
+      "bitterroot_brew": {
+        "name": "쓴뿌리 술"
+      },
+      "revenant_cinderguard": {
+        "name": "망령의 재수호 갑옷"
+      },
+      "marrowhide_leggings": {
+        "name": "골수가죽 각반"
+      },
+      "scavenger_kings_shiv": {
+        "name": "약탈왕의 조잡한 칼"
+      },
+      "forgewyrm_scale_helm": {
+        "name": "단조 지렁이 비늘 투구"
+      },
+      "mantle_of_the_last_muster": {
+        "name": "최후 소집의 망토"
+      },
+      "scorched_banner_scrap": {
+        "name": "그을린 깃발 조각"
+      },
+      "melted_signet_ring": {
+        "name": "녹아내린 인장 반지"
+      },
+      "cracked_horror_horn": {
+        "name": "금 간 공포의 뿔"
+      },
+      "bastion_hardtack": {
+        "name": "요새 건빵"
+      },
+      "trucewater_flask": {
+        "name": "휴전수 물병"
+      },
+      "ashguard_robe": {
+        "name": "재수호 로브"
+      },
+      "breachwalker_jerkin": {
+        "name": "틈새를 걷는 자의 가죽옷"
+      },
+      "bastion_plated_hauberk": {
+        "name": "요새 판금 사슬갑옷"
+      },
+      "bastion_arming_sword": {
+        "name": "요새 기사검"
+      },
+      "mercenary_greatblade": {
+        "name": "용병 대검"
+      },
+      "tithe_collectors_grasps": {
+        "name": "십일조 징수관의 장갑"
+      },
+      "craterheart_mantle": {
+        "name": "분화구심장 망토"
+      },
+      "butchers_chainguard": {
+        "name": "도살자의 사슬보호구"
+      },
+      "vhorlans_flensing_blade": {
+        "name": "보를란의 살바르는 칼"
+      },
+      "warbringers_hellforged_cuirass": {
+        "name": "전쟁인도자의 지옥단조 흉갑"
+      },
+      "khorvax_warcleaver": {
+        "name": "코르박스 전쟁도끼"
+      },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
       },
@@ -5507,6 +6074,297 @@ export const ko_KR: EnTranslations = {
       "acolyte_tessa": {
         "name": "수련사제 테사"
       },
+      "dune_prowler": {
+        "name": "Dune Prowler"
+      },
+      "emberjaw_matriarch": {
+        "name": "Emberjaw Matriarch"
+      },
+      "glasswind_scorpion": {
+        "name": "Glasswind Scorpion"
+      },
+      "tombrobber_scavenger": {
+        "name": "Tombrobber Scavenger"
+      },
+      "sandbound_shade": {
+        "name": "Sandbound Shade"
+      },
+      "duststorm_elemental": {
+        "name": "Duststorm Elemental"
+      },
+      "forsaken_judge": {
+        "name": "Forsaken Judge"
+      },
+      "karn_the_unburied": {
+        "name": "Karn the Unburied"
+      },
+      "sandmaw_tyrant": {
+        "name": "Sandmaw Tyrant"
+      },
+      "duskmane_stalker": {
+        "name": "Duskmane Stalker"
+      },
+      "palefang_the_silent": {
+        "name": "Palefang the Silent"
+      },
+      "palewidow_weaver": {
+        "name": "Palewidow Weaver"
+      },
+      "blackriver_skulker": {
+        "name": "Blackriver Skulker"
+      },
+      "feral_wisp": {
+        "name": "Feral Wisp"
+      },
+      "guildless_cutthroat": {
+        "name": "Guildless Cutthroat"
+      },
+      "hollow_revenant": {
+        "name": "Hollow Revenant"
+      },
+      "frostpine_headhunter": {
+        "name": "Frostpine Headhunter"
+      },
+      "grelnok_the_hoarbound": {
+        "name": "Grelnok the Hoarbound"
+      },
+      "veykar_the_forsworn": {
+        "name": "Veykar the Forsworn"
+      },
+      "wolfsward_packwolf": {
+        "name": "Wolfsward Packwolf"
+      },
+      "hoarfang_alpha": {
+        "name": "Hoarfang Alpha"
+      },
+      "ironhold_digger": {
+        "name": "Ironhold Digger"
+      },
+      "broken_legion_deserter": {
+        "name": "Broken Legion Deserter"
+      },
+      "broken_legion_arbalist": {
+        "name": "Broken Legion Arbalist"
+      },
+      "granite_churn_elemental": {
+        "name": "Granite Churn Elemental"
+      },
+      "sellsword_ogre": {
+        "name": "Sellsword Ogre"
+      },
+      "frosthelm_wendigo": {
+        "name": "Frosthelm Wendigo"
+      },
+      "overseer_kazrik": {
+        "name": "Overseer Kazrik"
+      },
+      "commander_vaelis": {
+        "name": "Commander Vaelis the Oathbroken"
+      },
+      "hollow_lurker": {
+        "name": "Hollow Lurker"
+      },
+      "underway_renegade": {
+        "name": "Underway Renegade"
+      },
+      "pale_gnawer": {
+        "name": "Pale Gnawer"
+      },
+      "deep_shale_elemental": {
+        "name": "Deep Shale Elemental"
+      },
+      "vask_smuggler_king": {
+        "name": "Vask the Smuggler King"
+      },
+      "thornfen_creeper": {
+        "name": "Thornfen Creeper"
+      },
+      "thornwarped_stag": {
+        "name": "Thorn-Warped Stag"
+      },
+      "thornfen_troll": {
+        "name": "Thornfen Troll"
+      },
+      "briar_horror": {
+        "name": "Briar Horror"
+      },
+      "briarfather_yew": {
+        "name": "Briarfather Yew"
+      },
+      "pass_raider": {
+        "name": "Pass Raider"
+      },
+      "crag_toller": {
+        "name": "Crag Ogre Toller"
+      },
+      "ironpass_crag_elemental": {
+        "name": "Cragheart Elemental"
+      },
+      "ridge_wyvern": {
+        "name": "Ridge Wyvern"
+      },
+      "warlord_skarn": {
+        "name": "Warlord Skarn"
+      },
+      "emberveil_bloat": {
+        "name": "Emberveil Bloat"
+      },
+      "emberveil_leech": {
+        "name": "Reagent-Fat Leech"
+      },
+      "mire_strider": {
+        "name": "Mire Strider"
+      },
+      "fog_wraith": {
+        "name": "Fog Wraith"
+      },
+      "emberveil_colossus": {
+        "name": "The Emberveil Colossus"
+      },
+      "bridge_cultist": {
+        "name": "Bridge Cultist"
+      },
+      "gullpicked_skeleton": {
+        "name": "Gull-Picked Skeleton"
+      },
+      "riverbank_revenant": {
+        "name": "Riverbank Revenant"
+      },
+      "pale_watcher": {
+        "name": "Pale Watcher"
+      },
+      "the_bridgekeeper": {
+        "name": "The Bridgekeeper"
+      },
+      "warped_warhound": {
+        "name": "Warped Warhound"
+      },
+      "breach_horror": {
+        "name": "Breach Horror"
+      },
+      "ember_revenant": {
+        "name": "Ember Revenant"
+      },
+      "magma_elemental": {
+        "name": "Magma Elemental"
+      },
+      "ash_wraith": {
+        "name": "Ash Wraith"
+      },
+      "breachsworn_deserter": {
+        "name": "Breachsworn Deserter"
+      },
+      "breach_scavenger_ogre": {
+        "name": "Breach Scavenger Ogre"
+      },
+      "ashwing_drake": {
+        "name": "Ashwing Drake"
+      },
+      "mazhrekk_the_flesh_tithe": {
+        "name": "Mazhrekk the Flesh-Tithe"
+      },
+      "butcher_vhorlan": {
+        "name": "Butcher Vhorlan"
+      },
+      "firstborn_of_the_crater": {
+        "name": "Firstborn of the Crater"
+      },
+      "warbringer_khorvax": {
+        "name": "Warbringer Khorvax"
+      },
+      "ash_ghoul": {
+        "name": "Ash Ghoul"
+      },
+      "cinder_hound": {
+        "name": "Cinder Hound"
+      },
+      "veilstalker": {
+        "name": "Veilstalker"
+      },
+      "ash_elemental": {
+        "name": "Ash Elemental"
+      },
+      "burnfield_revenant": {
+        "name": "Revenant of the Burned Fields"
+      },
+      "colossid_fragment": {
+        "name": "Colossid Fragment"
+      },
+      "brine_scuttler": {
+        "name": "Brine Scuttler"
+      },
+      "bonepicker_renegade": {
+        "name": "Bonepicker Renegade"
+      },
+      "salt_wraith": {
+        "name": "Salt Wraith"
+      },
+      "marrowfeaster": {
+        "name": "The Marrowfeaster"
+      },
+      "duskwall_scavenger": {
+        "name": "Duskwall Scavenger"
+      },
+      "rubble_haunt": {
+        "name": "Rubble Haunt"
+      },
+      "sewer_broodspider": {
+        "name": "Sewer Broodspider"
+      },
+      "gutter_hound": {
+        "name": "Gutter Hound"
+      },
+      "scavenger_king": {
+        "name": "The Scavenger King"
+      },
+      "forgefall_salamander": {
+        "name": "Forgefall Salamander"
+      },
+      "magma_serpent": {
+        "name": "Magma Serpent"
+      },
+      "claimjumper_sapper": {
+        "name": "Claim-Jumper Sapper"
+      },
+      "slag_ogre": {
+        "name": "Slag Ogre"
+      },
+      "smeltjaw": {
+        "name": "Smeltjaw the Forge-Wyrm"
+      },
+      "deserter_wraith": {
+        "name": "Deserter Wraith"
+      },
+      "ridge_shrieker": {
+        "name": "Ridge Shrieker"
+      },
+      "spire_stalker": {
+        "name": "Spire Stalker"
+      },
+      "not_quite_man": {
+        "name": "Not-Quite-Man"
+      },
+      "deserter_king": {
+        "name": "The Deserter King"
+      },
+      "mirage_stalker": {
+        "name": "Mirage Stalker"
+      },
+      "bonewind_ravager": {
+        "name": "Bonewind Ravager"
+      },
+      "blackmere_drowned": {
+        "name": "Blackmere Drowned"
+      },
+      "rimeclaw_prowler": {
+        "name": "Rimeclaw Prowler"
+      },
+      "ironhold_geomancer": {
+        "name": "Ironhold Geomancer"
+      },
+      "frosthelm_icehowler": {
+        "name": "Frosthelm Icehowler"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -5726,6 +6584,146 @@ export const ko_KR: EnTranslations = {
         "name": "브라더 할벤",
         "title": "성물실 관리인",
         "greeting": "아래의 성물실이 또 움직였소."
+      },
+      "judge_saphira": {
+        "name": "Judge Saphira",
+        "title": "Judge of the Domain",
+        "greeting": "Ossara does not ask for heroes, {className}. It asks for hands that finish what they start. Show me yours."
+      },
+      "caravan_master_odai": {
+        "name": "Caravan Master Odai",
+        "title": "Master of the Qesh Road",
+        "greeting": "Water, bread, and boots that keep the sand out: the road runs on all three, {className}."
+      },
+      "armorer_khet": {
+        "name": "Armorer Khet",
+        "title": "Stone-Quarter Smith",
+        "greeting": "Steel keeps its edge here if you oil it against the sand. If it cuts, I sell it."
+      },
+      "spymaster_vael": {
+        "name": "Spymaster Vael",
+        "title": "Keeper of the Ledger",
+        "greeting": "Nothing in Veth is free, {className}, and nothing is wasted. Tell me what you can do, and I will tell you what it is worth."
+      },
+      "provisioner_maren": {
+        "name": "Provisioner Maren",
+        "title": "Sutler of the Whisper Market",
+        "greeting": "Bread, tea, and a coat the damp cannot argue with: the Quays run on credit, {className}, but you will pay me in coin."
+      },
+      "isyra_coldwater": {
+        "name": "Isyra Coldwater",
+        "title": "Dealer in Quiet Steel",
+        "greeting": "Quiet steel for quiet work. If a blade of mine sings, I will refund the difference."
+      },
+      "marshal_corvin": {
+        "name": "Marshal Corvin",
+        "title": "Marshal of the Northern March",
+        "greeting": "The Empire holds because someone files the reports and someone holds the road, {className}. Today you are both."
+      },
+      "quartermaster_hilde": {
+        "name": "Quartermaster Hilde",
+        "title": "Kaelspire Garrison Stores",
+        "greeting": "Requisitions in triplicate or coin up front, {className}. Coin is faster, and the bread is fresher than the forms."
+      },
+      "armorer_ottokar": {
+        "name": "Armorer Ottokar",
+        "title": "Imperial Pattern Smith",
+        "greeting": "Imperial pattern, imperial steel. If it fails in the field, bring back the pieces and the paperwork."
+      },
+      "fence_odrik": {
+        "name": "Fence Odrik",
+        "title": "Underway Provisioner",
+        "greeting": "No questions in the Underway, friend. Coin buys bread, and bread asks nothing."
+      },
+      "quartermaster_senna": {
+        "name": "Quartermaster Senna",
+        "title": "Palisade Provisioner",
+        "greeting": "Stay inside the stakes after dark, {className}. The wood does not stay where we left it."
+      },
+      "tollkeeper_brann": {
+        "name": "Tollkeeper Brann",
+        "title": "Tollhouse Provisioner",
+        "greeting": "Everyone pays at Ironpass: raiders, banners, and you. Lucky for you, I take copper."
+      },
+      "lanternkeeper_ketta": {
+        "name": "Lanternkeeper Ketta",
+        "title": "Stilts Provisioner",
+        "greeting": "Keep to the stilts and mind your lantern, {className}. The fog eats light out here, and worse."
+      },
+      "sutler_ives": {
+        "name": "Sutler Ives",
+        "title": "Bridgewatch Sutler",
+        "greeting": "Rations, water, and no opinions on who built the bridge. That last keeps me alive."
+      },
+      "trucekeeper_maro": {
+        "name": "Trucekeeper Maro",
+        "title": "Warden of the Last Bastion",
+        "greeting": "Three banners drink under this roof and not one of them owns it. Keep your blade sheathed inside the wall, {className}, and we will get along fine."
+      },
+      "provisioner_saskia": {
+        "name": "Provisioner Saskia",
+        "title": "Sutler of the Bastion",
+        "greeting": "Kael coin, Veth coin, Ossara coin: it all spends the same out here, {className}. Eat before the war does."
+      },
+      "armorer_dreng": {
+        "name": "Armorer Dreng",
+        "title": "Salvage Smith",
+        "greeting": "Every blade I sell was pulled off this field, reforged, and sold back to it. Try to break the cycle, {className}."
+      },
+      "provisioner_hask": {
+        "name": "Provisioner Hask",
+        "title": "Cinderrest Quartermaster",
+        "greeting": "Ash gets into everything out here, {className}: bread, boots, lungs. I sell what keeps you moving anyway."
+      },
+      "provisioner_sela": {
+        "name": "Provisioner Sela",
+        "title": "Brinehollow Sutler",
+        "greeting": "Salt cures meat and men both, {playerName}. Drink before you cross the Glare; the flats do not forgive thirst."
+      },
+      "provisioner_varrow": {
+        "name": "Provisioner Varrow",
+        "title": "Exile Market Stallkeeper",
+        "greeting": "Everything in the Exile Market fell off a wagon somewhere, {className}. My stew fell slower than most."
+      },
+      "provisioner_bruna": {
+        "name": "Provisioner Bruna",
+        "title": "Forgefall Camp Sutler",
+        "greeting": "Hardtack, stout, and potions that work, {className}. Forgefall runs on all three, and so will you."
+      },
+      "provisioner_odric": {
+        "name": "Provisioner Odric",
+        "title": "Keeper of the Last Waymeet",
+        "greeting": "This is the last fire before the end of the world, {playerName}. Fill your pack; past the Waymeet there is only the deserters and the wind."
+      },
+      "oasis_keeper_neriah": {
+        "name": "Oasis Keeper Neriah",
+        "title": "Keeper of the Mirage Oasis",
+        "greeting": "Every drop Qesh Aram drinks walks in from the oasis on somebody's back, {className}. Help me keep the road it walks."
+      },
+      "relic_warden_temos": {
+        "name": "Relic-Warden Temos",
+        "title": "Warden of the Buried Faith",
+        "greeting": "The Domain guards what the sand keeps, {className}. My office counts what it has already lost."
+      },
+      "factor_ilvane": {
+        "name": "Factor Ilvane",
+        "title": "Broker of Small Debts",
+        "greeting": "Every small debt in Nighthollow crosses this desk before it becomes a large one, {className}. Yours can start here."
+      },
+      "auditor_cress": {
+        "name": "Auditor Cress",
+        "title": "Examiner of Closed Accounts",
+        "greeting": "I audit what the dark takes, {className}, and lately it takes more than it reports."
+      },
+      "prefect_alina": {
+        "name": "Prefect Alina",
+        "title": "Imperial Tithe Prefect",
+        "greeting": "The quarter closes whether the province cooperates or not, {className}. Sign here. And here."
+      },
+      "huntmaster_roderic": {
+        "name": "Huntmaster Roderic",
+        "title": "Wolfsward Huntmaster",
+        "greeting": "The Empire hunts by charter and quota, {className}, and the quota is behind. Fetch your bow or fetch excuses; I only file one of them."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -6486,6 +7484,830 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_dune_prowlers": {
+        "title": "The Road Bleeds",
+        "text": "The prowler packs have learned the caravan bell means food, {playerName}. Every wagon we lose feeds them and starves Qesh Aram. Thin the packs on the dunes flanking the south road: twelve, to start.",
+        "completion": "Twelve fewer shadows pacing the wagons. The road breathes tonight, and so do I.",
+        "objectives": {
+          "0": {
+            "label": "Dune Prowler slain"
+          }
+        }
+      },
+      "q_dune_prowler_pelts": {
+        "title": "Pelts for the North Road",
+        "text": "Desert nights strip the heat out of you faster than any snow, {playerName}. Eight prowler pelts will line enough bedrolls to get my next caravan over the Veth passes alive.",
+        "completion": "Thick and warm. The north caravan leaves at dawn; take these treads for your trouble.",
+        "objectives": {
+          "0": {
+            "label": "Dune Prowler Pelt"
+          }
+        }
+      },
+      "q_glasswind_venom": {
+        "title": "Venom in the Glass",
+        "text": "The scorpions out on the Glasswind Flats sting through boiled leather like it was linen. I want six stingers, {playerName}: whatever they temper their glass with, I mean to temper my steel with it.",
+        "completion": "Look at that edge drink the venom in. The next blade I sell you will bite deeper than anything on these flats.",
+        "objectives": {
+          "0": {
+            "label": "Glasswind Stinger"
+          }
+        }
+      },
+      "q_tombrobbers": {
+        "title": "What the Sand Keeps",
+        "text": "The scavengers picking at the Sunken Aqueduct are not treasure hunters, {playerName}; they are hired hands, and their masters want what Ossara keeps buried. Kill ten, and bring me four of the relics they have already pried loose.",
+        "completion": "These relics belong to the faith, not to whoever holds the heavier purse. The Domain remembers this service.",
+        "objectives": {
+          "0": {
+            "label": "Tombrobber Scavenger slain"
+          },
+          "1": {
+            "label": "Stolen Relic"
+          }
+        }
+      },
+      "q_sandbound": {
+        "title": "The Unquiet Tombs",
+        "text": "The robbers broke more than seals, {playerName}. The dead of the old civilization walk the Tombs of the Nameless, wrapped in shrouds older than any faction. Put twelve shades to rest and bring me five shrouds; the rites require them whole.",
+        "completion": "The shrouds will be reburied with the rites they were owed. What the sand keeps, {playerName}, it keeps for a reason.",
+        "objectives": {
+          "0": {
+            "label": "Sandbound Shade slain"
+          },
+          "1": {
+            "label": "Nameless Burial Shroud"
+          }
+        }
+      },
+      "q_duststorms": {
+        "title": "Glass in the Wind",
+        "text": "Duststorm Rise did not use to walk, {playerName}. Now the storms come down the dunes with shapes inside them, and my drivers refuse the west fork outright. Break twelve of the elementals and bring me six of the storm-glass cores they leave behind.",
+        "completion": "The cores still hum like wind through wire. The west fork reopens tomorrow; you have my thanks and my coin.",
+        "objectives": {
+          "0": {
+            "label": "Duststorm Elemental slain"
+          },
+          "1": {
+            "label": "Storm-Glass Core"
+          }
+        }
+      },
+      "q_forsaken_judges": {
+        "title": "The First Verdicts",
+        "text": "On the terrace above the tombs, the first Judges still hold court, dead two ages and still passing sentence on anything that climbs the stair. I will not pretend it is not heresy to say it, {playerName}: put twelve of them down, and bring me three of their verdict seals. The Domain's claim rests on what those seals say.",
+        "completion": "So the first verdicts name no heir at all... This stays between us, {playerName}. The Domain rests on older claims than truth.",
+        "objectives": {
+          "0": {
+            "label": "Forsaken Judge slain"
+          },
+          "1": {
+            "label": "Verdict Seal"
+          }
+        }
+      },
+      "q_sandmaw": {
+        "title": "The Tyrant of the Barrens",
+        "text": "Every caravan that crosses the Bonewind Barrens pays a toll in oxen or in drivers, and the collector is a basilisk the clans have named the Sandmaw Tyrant. Take companions, {playerName}: when the sand geysers, do not be standing where you were. End it, for the Domain.",
+        "completion": "The Barrens toll is repealed, {playerName}. The clans will sing the beast bigger every year; let them. You and I know exactly how big it was.",
+        "objectives": {
+          "0": {
+            "label": "Sandmaw Tyrant slain"
+          }
+        }
+      },
+      "q_duskmane_hunt": {
+        "title": "The Price of Teeth",
+        "text": "The duskmane packs have started taking porters off the south towpath, {playerName}. Every body they drag into the dark is a debt the Confederation must settle with someone. Kill twelve; the ledger prefers round numbers.",
+        "completion": "Twelve, as written. The porters will not thank you; they will never know your name. That is how Veth prefers its debts paid.",
+        "objectives": {
+          "0": {
+            "label": "Duskmane Stalker slain"
+          }
+        }
+      },
+      "q_palewidow_silk": {
+        "title": "Silk for the Ledger",
+        "text": "Palewidow silk holds a knot better than anything the south sells, and my buyers do not ask where it comes from, {playerName}. Eight skeins, cut from the weavers in the hollows east of the towpath. I pay the fair rate, which is the rate I say is fair.",
+        "completion": "Fine cuts, barely a strand frayed. Take the treads; call the rest of your fee goodwill, which in Veth is worth more than coin.",
+        "objectives": {
+          "0": {
+            "label": "Palewidow Silk"
+          }
+        }
+      },
+      "q_blackmere_ledgers": {
+        "title": "The Drowned Accounts",
+        "text": "A courier barge went down where the black river widens into the Blackmere, {playerName}, and the skulkers have nested in the wreck ever since. The cargo was paper: four ledgers, and Veth remembers what is written even when the water does not. Kill ten of the skulkers and bring the books up dry.",
+        "completion": "Waterstained but legible. Half the names in these pages owe the Confederation money; the other half will, by morning.",
+        "objectives": {
+          "0": {
+            "label": "Blackriver Skulker slain"
+          },
+          "1": {
+            "label": "Waterlogged Ledger"
+          }
+        }
+      },
+      "q_guildless_debts": {
+        "title": "Debts Called Due",
+        "text": "Every blade I sell is numbered, {playerName}, and the guild keeps the numbers. The cutthroats working the north road were expelled for freelancing; they kept their sigils, and the guild wants them back. Ten dead, five sigils. The guild does not pay for apologies.",
+        "completion": "Five sigils, struck from the rolls. You did not hear a guild mentioned, and I did not say the word. We understand each other.",
+        "objectives": {
+          "0": {
+            "label": "Guildless Cutthroat slain"
+          },
+          "1": {
+            "label": "Guildless Sigil"
+          }
+        }
+      },
+      "q_silent_court": {
+        "title": "The Silent Court",
+        "text": "The city-state that raised the Silent Court refused the Agreement, {playerName}, and it is no coincidence that nobody remembers its name. Its courtiers still hold session in the ruin, and they have begun collecting tolls on the west bank again. Put twelve of them down and bring me five of their court seals; unpaid history is still a debt.",
+        "completion": "Seals of a court that no longer exists, for a debt that never expires. The Confederation settles everything eventually, {playerName}. Remember that.",
+        "objectives": {
+          "0": {
+            "label": "Hollow Revenant slain"
+          },
+          "1": {
+            "label": "Silent Court Seal"
+          }
+        }
+      },
+      "q_forsworn_master": {
+        "title": "The Forsworn Master",
+        "text": "Veykar kept the oldest lodge in the guild and broke its oldest rule: he chose his own contracts. Now he sells Veth secrets out of the Last Lodge and calls it independence. The guild will not touch him; he trained half of them. Take companions, {playerName}, mind the knives when he turns, and close the account.",
+        "completion": "It is done, then. No song, no statue; his name comes off the rolls tonight, and yours goes into a ledger very few are permitted to read. Consider that the highest payment Veth offers.",
+        "objectives": {
+          "0": {
+            "label": "Veykar the Forsworn slain"
+          }
+        }
+      },
+      "q_wolfsward_culling": {
+        "title": "A Predation Report",
+        "text": "Filed this morning: three grain carts overturned on the Tithe Road, two oxen lost, one driver. The Wolfsward packs have learned that imperial convoys mean meat, {playerName}, and the Empire does not negotiate with wolves. Cull twelve and I will close the report.",
+        "completion": "Twelve, witnessed and logged. The convoys roll at dawn and the report is closed. Efficient work, {playerName}; the Empire notices efficiency.",
+        "objectives": {
+          "0": {
+            "label": "Wolfsward Packwolf slain"
+          }
+        }
+      },
+      "q_ironhold_ledgers": {
+        "title": "The Missing Ledgers",
+        "text": "The kobolds under Ironhold Mine broke into the assay office and carried off the tithe ledgers for the entire quarter. They eat the candle wax and nest in the paper, {playerName}. Without those ledgers, no tithe in the north can be certified. Kill ten of the diggers and recover five ledgers. Intact, if you please.",
+        "completion": "Chewed at the corners, but the seals held; the assessors can certify the quarter after all. Requisition these marchboots, {playerName}: signed, stamped, and yours.",
+        "objectives": {
+          "0": {
+            "label": "Ironhold Digger slain"
+          },
+          "1": {
+            "label": "Stolen Tithe Ledger"
+          }
+        }
+      },
+      "q_granite_tempering": {
+        "title": "Steel and Stone",
+        "text": "The mine woke something under the deep terraces, {playerName}: granite churns, the miners call them, and imperial picks blunt against their hides. Break twelve and bring me six of their core shards. Stone that shrugs off a pick will temper a blade the Empire can rely on.",
+        "completion": "Look how the quench takes to it. Imperial pattern, granite temper: the next blade off my bench will hold its edge through a winter campaign.",
+        "objectives": {
+          "0": {
+            "label": "Granite Churn Elemental slain"
+          },
+          "1": {
+            "label": "Granite Core Shard"
+          }
+        }
+      },
+      "q_broken_legion": {
+        "title": "Strike the Rolls",
+        "text": "The Broken Legion was the Ninth, {playerName}, before they burned their muster rolls, took their pay chests, and made for the pines. Deserters do not resign; they are struck from the rolls. Kill twelve and bring me five insignia. Each one is a name I can strike with a clear conscience.",
+        "completion": "Five insignia, five names, five lines of ink. The Ninth is smaller tonight and the rolls are honest again. The Empire thanks you in writing, {playerName}; I thank you in coin.",
+        "objectives": {
+          "0": {
+            "label": "Broken Legion Deserter slain"
+          },
+          "1": {
+            "label": "Legion Deserter Insignia"
+          }
+        }
+      },
+      "q_frosthelm_pass": {
+        "title": "Clearing the Ascent",
+        "text": "Two obstructions on the Frosthelm Ascent, {playerName}. First: the ogre sellswords the deserters bought with stolen imperial pay. Second: the wendigo that come down with the snow line. The pass must be open before the winter caravans. Eight of each; the paperwork is already drafted.",
+        "completion": "The Ascent is passable and the caravans are rescheduled. Two obstructions, one invoice, zero delays. I wish half my garrison filed results like yours, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Sellsword Ogre slain"
+          },
+          "1": {
+            "label": "Frosthelm Wendigo slain"
+          }
+        }
+      },
+      "q_renegade_commander": {
+        "title": "The Oathbroken",
+        "text": "Commander Vaelis of the Ninth swore his oath in Kaelspire and broke it in the pines, and every deserter and hired ogre in this province answers to him. His sentence was signed the day he ran; it wants only an executioner. Take companions, {playerName}: he did not keep his rank by being easy to kill. Deliver it at his redoubt.",
+        "completion": "So ends the Broken Legion: not with a battle honor, but with a signature and a good blade. The province stands quiet, {playerName}, and quiet is what the Empire pays for. Take your pick of the recovered arms; you have earned first requisition.",
+        "objectives": {
+          "0": {
+            "label": "Commander Vaelis the Oathbroken slain"
+          }
+        }
+      },
+      "q_oasis_waterline": {
+        "title": "Teeth at the Waterline",
+        "text": "The prowlers have learned that everything alive in this desert comes to water sooner or later, {playerName}. My carriers will not walk the oasis road while the packs hold it. Clear sixteen from the dunes between here and the shore.",
+        "completion": "The carriers shouldered their yokes within the hour of your word reaching them. Water walks again, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Dune Prowler slain"
+          }
+        }
+      },
+      "q_glasswind_husks": {
+        "title": "The Dew Carriers",
+        "text": "A scorpion husk holds the cold of the night long past noon, {playerName}; the old carriers lined their water jars with them, and what I line does not spoil. Kill twelve of the glasswind scorpions and bring me eight husks worth the name.",
+        "completion": "Feel how the shade lives inside the shell? Eight jars will cross the flats now without turning foul.",
+        "objectives": {
+          "0": {
+            "label": "Glasswind Scorpion slain"
+          },
+          "1": {
+            "label": "Glasswind Husk"
+          }
+        }
+      },
+      "q_mirage_stalkers": {
+        "title": "What Walks in the Shimmer",
+        "text": "The heat over the oasis has learned to stalk, {playerName}. Beasts hunt inside the shimmer where the eye gives up, and two of my carriers did not come back from the shallows. Kill sixteen of the mirage stalkers, and do not trust your own shadow while you do it.",
+        "completion": "Sixteen, and the shimmer is only heat again. The oasis owes you, {playerName}, and the oasis pays its debts.",
+        "objectives": {
+          "0": {
+            "label": "Mirage Stalker slain"
+          }
+        }
+      },
+      "q_mirage_eyes": {
+        "title": "Eyes That Hold the Lie",
+        "text": "A stalker's eye does not see the desert we see, {playerName}: it sees the lie laid over it. The faith has uses for glass like that. Bring me eight eyes whole, and put down another twelve of the beasts so the shimmer stays honest.",
+        "completion": "Look into one long enough and the oasis doubles... enough of that. These go to the Judges under seal, {playerName}, and we both drink easier.",
+        "objectives": {
+          "0": {
+            "label": "Mirage Stalker slain"
+          },
+          "1": {
+            "label": "Mirage Stalker Eye"
+          }
+        }
+      },
+      "q_dig_manifests": {
+        "title": "Paper for the Warden",
+        "text": "Every relic the tombrobbers pry loose is tallied on a dig manifest before it leaves the sand, {playerName}. Names, weights, buyers. Kill twelve of the scavengers at the aqueduct and bring me eight manifests; I will burn their trade road out from under them.",
+        "completion": "Buyers in three cities, and two names I have dined with... The Domain thanks you, {playerName}. The knives that follow this paper will not be mine.",
+        "objectives": {
+          "0": {
+            "label": "Tombrobber Scavenger slain"
+          },
+          "1": {
+            "label": "Dig Manifest"
+          }
+        }
+      },
+      "q_shade_censers": {
+        "title": "Smoke for the Nameless",
+        "text": "The shades in the tombs were censer-bearers once, {playerName}; they clutch the bronze they carried in life, and the rites cannot be sung over an empty bowl. Put sixteen of them to rest and recover six censers. Handle the bronze gently; the dead notice.",
+        "completion": "Six bowls, and not one dropped. We will fill them with sweetgrass, and the Nameless will sleep another age, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Sandbound Shade slain"
+          },
+          "1": {
+            "label": "Tomb Censer"
+          }
+        }
+      },
+      "q_judge_tablets": {
+        "title": "The Sentences in Stone",
+        "text": "Before seals, the first court cut its sentences into stone, {playerName}, and the dead Judges on the terrace still carry the tablets they died holding. Saphira keeps the seals; I want the sentences. Sixteen Judges, five tablets, and say nothing of this in the square.",
+        "completion": "Read here: exile, exile, exile... and mercy. So the first court bent once. That is worth more than every seal in the Domain, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Forsaken Judge slain"
+          },
+          "1": {
+            "label": "Sentence Tablet"
+          }
+        }
+      },
+      "q_karn_unburied": {
+        "title": "What Karn Brought Up",
+        "text": "The tombrobbers leave offerings so Karn stays down the shaft, {playerName}, and lately he does not stay. Whatever he found beneath the Tombs of the Nameless, he carried it back up in place of his own soul. Take companions to the shaft mouth and bury him properly this time.",
+        "completion": "Down, and buried with the rites owed him. Whatever Karn found stays found by no one, {playerName}. The Domain owes you a debt it will pretend it never carried.",
+        "objectives": {
+          "0": {
+            "label": "Karn the Unburied slain"
+          }
+        }
+      },
+      "q_emberjaw_matriarch": {
+        "title": "The Matriarch's Toll",
+        "text": "Cull the packs all you like, {playerName}; while the Emberjaw Matriarch dens above the south road they will always come back. She has dragged guards off moving wagons in daylight. Take help, corner her, and end her line.",
+        "completion": "The old huntress is down. The packs will scatter leaderless for a season, and the road will feel it, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Emberjaw Matriarch slain"
+          }
+        }
+      },
+      "q_bonewind_ravagers": {
+        "title": "The Barrens Pack",
+        "text": "The Bonewind Barrens keep their own tax collectors, {playerName}: ravager packs that strip a fallen ox to bright bone before the drivers can cut it loose. The Tyrant is not the only reason caravans refuse the northeast. Break the packs; sixteen ravagers.",
+        "completion": "The clans report the packs thinned and shy of torchlight. That is as close to gratitude as the Barrens come, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Bonewind Ravager slain"
+          }
+        }
+      },
+      "q_rise_walks": {
+        "title": "The Rise Still Walks",
+        "text": "I reopened the west fork too soon, {playerName}. The storms came back down the Rise with hearts beating grit inside them, and this time they took a wagon whole. Break sixteen more of the elementals and cut out eight of the storm-hearts; I want to know what drives them.",
+        "completion": "Still warm, and humming like the inside of thunder. These go to wiser heads than mine, {playerName}; the fork stays open either way.",
+        "objectives": {
+          "0": {
+            "label": "Duststorm Elemental slain"
+          },
+          "1": {
+            "label": "Duststorm Heart"
+          }
+        }
+      },
+      "q_ravager_hides": {
+        "title": "Hides for the High Passes",
+        "text": "Prowler pelt lines a bedroll, {playerName}, but ravager hide turns wind like a shed wall, and the Veth passes will kill a driver the pelts would only chill. Bring me eight barrens ravager hides, and thin ten of the brutes while you are cutting.",
+        "completion": "Stiff as boot leather and twice as warm. My drivers will curse the smell all the way up to Veth and thank me at the top, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Bonewind Ravager slain"
+          },
+          "1": {
+            "label": "Ravager Hide"
+          }
+        }
+      },
+      "q_aqueduct_bronze": {
+        "title": "Old Bronze, New Edges",
+        "text": "The scavengers strip bronze fittings off the Sunken Aqueduct and sell them for scrap, {playerName}. Scrap! That alloy outlived the civilization that poured it. Kill ten of the scavengers and bring me eight fittings; I will fold old kingdom into new steel.",
+        "completion": "Look at the color in that metal. Whatever the old kingdom knew, a sliver of it goes into every blade I strike from this, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Tombrobber Scavenger slain"
+          },
+          "1": {
+            "label": "Aqueduct Bronze Fitting"
+          }
+        }
+      },
+      "q_judge_regalia": {
+        "title": "Rust of the First Court",
+        "text": "The dead Judges on the terrace wear regalia older than the Domain that claims them, {playerName}, and in two ages the metal has not rusted. I need six pieces, and the twelve Judges wearing them will not be persuaded politely.",
+        "completion": "No rust, no pitting, and it sings when struck. Armor from this will outlive us both, {playerName}, and I intend to test that personally.",
+        "objectives": {
+          "0": {
+            "label": "Forsaken Judge slain"
+          },
+          "1": {
+            "label": "First Court Regalia"
+          }
+        }
+      },
+      "q_veth_pelt_lots": {
+        "title": "Pelts by the Lot",
+        "text": "The southern lots trade duskmane pelts at four times what the beasts cost to skin, {playerName}. Thin the packs on the Run, twelve of them, and bring me eight clean pelt strips. The margin is mine; the fee is yours.",
+        "completion": "Eight strips, uncut, and twelve fewer mouths on the towpath. I will enter it as a profit, which in Veth is the warmest word we have.",
+        "objectives": {
+          "0": {
+            "label": "Duskmane Stalker slain"
+          },
+          "1": {
+            "label": "Duskmane Pelt Strip"
+          }
+        }
+      },
+      "q_veth_venom_ledger": {
+        "title": "The Venom Ledger",
+        "text": "Palewidow venom sells south as medicine and north as something else, {playerName}; I do not write down which. Fourteen weavers culled and eight venom sacs, unruptured. Handle them the way you would handle your own accounts: carefully.",
+        "completion": "Not one sac ruptured. You have a bookkeeper's hands, {playerName}. That is a compliment; in Nighthollow there is no higher one.",
+        "objectives": {
+          "0": {
+            "label": "Palewidow Weaver slain"
+          },
+          "1": {
+            "label": "Palewidow Venom Sac"
+          }
+        }
+      },
+      "q_veth_quay_manifests": {
+        "title": "Manifests in the Mud",
+        "text": "The skulkers have been dragging cargo off the Quays and the manifests with it, {playerName}. Paper is the only proof a debt exists. Fourteen skulkers, eight manifests, and mind the chill in the water; I do not insure against it.",
+        "completion": "Smeared, but the numbers survive. Numbers usually do. The Quays owe you; I have written it down, which makes it true.",
+        "objectives": {
+          "0": {
+            "label": "Blackriver Skulker slain"
+          },
+          "1": {
+            "label": "Sodden Quay Manifest"
+          }
+        }
+      },
+      "q_veth_palefang_price": {
+        "title": "A Debt of Silence",
+        "text": "Palefang has taken three porters and a factor this season, and the Run goes quiet a full minute before she steps out of it, {playerName}. The Confederation has priced that silence and found it too expensive. Bring companions; she has never needed them.",
+        "completion": "So the Run has sound again. The porters will invent a hero for this, and they will be wrong twice. Your fee is entered; the ledger does not care who is thanked.",
+        "objectives": {
+          "0": {
+            "label": "Palefang the Silent slain"
+          }
+        }
+      },
+      "q_veth_wisp_essence": {
+        "title": "What the Light Eats",
+        "text": "The wisps in the Wispwood feed on what travelers know: names, routes, sums, {playerName}. That is Veth property. Cull twelve and bring me eight of their essences; I intend to bill the forest itself if I can find where it banks.",
+        "completion": "Warm as a lie and twice as bright. The essences balance against three lost couriers; the forest still owes us two.",
+        "objectives": {
+          "0": {
+            "label": "Feral Wisp slain"
+          },
+          "1": {
+            "label": "Wisplight Essence"
+          }
+        }
+      },
+      "q_veth_wispwood_cull": {
+        "title": "A Correction in the Wood",
+        "text": "The audit says the Wispwood holds a third more wisps than last season, and the skulkers have begun nesting under its bank, {playerName}. The Confederation calls this drift, and drift gets corrected. Fourteen wisps, ten skulkers; round the account down.",
+        "completion": "Corrected. The wood will drift again by spring, and someone will be paid to correct it again. This is what stability costs, {playerName}; Veth pays it gladly.",
+        "objectives": {
+          "0": {
+            "label": "Feral Wisp slain"
+          },
+          "1": {
+            "label": "Blackriver Skulker slain"
+          }
+        }
+      },
+      "q_veth_drowned_tolls": {
+        "title": "Tolls for the Drowned",
+        "text": "The drowned have started collecting tolls at the Blackmere landing: coin, cargo, and twice a porter, {playerName}. A toll requires a charter, and they have none on file. Put fourteen of them down and recover eight of the toll coins they hoard; those are Confederation currency.",
+        "completion": "Cold coin, but coin. The drowned may keep what they took from older ledgers than ours; these eight are ours, and now they are home.",
+        "objectives": {
+          "0": {
+            "label": "Blackmere Drowned slain"
+          },
+          "1": {
+            "label": "Drowned Toll Coin"
+          }
+        }
+      },
+      "q_veth_mere_bottom": {
+        "title": "The Bottom of the Mere",
+        "text": "Whatever charter the drowned think they hold, it was not issued by Veth, {playerName}. Sixteen more of them, and ten of the skulkers ferrying for them. When the Blackmere is quiet, the audit closes.",
+        "completion": "The Blackmere reports quiet water and no new claims. I am closing the account. Do not mistake that for gratitude; it is better, it is a balance.",
+        "objectives": {
+          "0": {
+            "label": "Blackmere Drowned slain"
+          },
+          "1": {
+            "label": "Blackriver Skulker slain"
+          }
+        }
+      },
+      "q_veth_broken_contracts": {
+        "title": "Broken Contracts",
+        "text": "The sigils were the start, {playerName}. The guildless still carry their old contracts, and every page names clients who believe those debts died with the expulsion. The guild disagrees. Fourteen cutthroats, eight contracts, and no copies.",
+        "completion": "Eight contracts, and every client on them suddenly owes the guild an apology and a fee. You have made several important people poorer, {playerName}. They will never know it was you; that is the service.",
+        "objectives": {
+          "0": {
+            "label": "Guildless Cutthroat slain"
+          },
+          "1": {
+            "label": "Cutthroat Contract"
+          }
+        }
+      },
+      "q_veth_knife_tax": {
+        "title": "The Knife Tax",
+        "text": "The freelancers on the north road have begun taxing porters at knifepoint and calling it a toll, {playerName}. There is one tax collector in Veth, and it is not them. Sixteen, and make it plain.",
+        "completion": "The road reports no collections this week. Plain enough. The guild thanks you in the only language it is fluent in: coin.",
+        "objectives": {
+          "0": {
+            "label": "Guildless Cutthroat slain"
+          }
+        }
+      },
+      "q_veth_court_records": {
+        "title": "Records of the Court",
+        "text": "Before the Agreement, the Silent Court licensed killings the guild now claims as its own history, {playerName}. The revenants still file those pages in the ruin. Fourteen of them put down, eight pages recovered; the guild prefers its history unread.",
+        "completion": "Pages older than the Agreement, and half the names still legible. They go in the vault, not the fire; the guild's history is a weapon, and weapons are not burned.",
+        "objectives": {
+          "0": {
+            "label": "Hollow Revenant slain"
+          },
+          "1": {
+            "label": "Court Ledger Page"
+          }
+        }
+      },
+      "q_veth_adjourn_court": {
+        "title": "Court Adjourned",
+        "text": "The Court has begun sending its tollmen east of the river, and the guildless sell them passage, {playerName}. Both sides of that trade are unlicensed. Sixteen revenants, ten cutthroats, and the west bank keeps its quiet.",
+        "completion": "Adjourned, then. A court with no session, a road with no toll, and a ledger with no outstanding lines. This is as close to a holiday as Veth observes.",
+        "objectives": {
+          "0": {
+            "label": "Hollow Revenant slain"
+          },
+          "1": {
+            "label": "Guildless Cutthroat slain"
+          }
+        }
+      },
+      "q_veth_totem_tally": {
+        "title": "A Tally of Totems",
+        "text": "The Frostpine trolls carve a war totem for every raid they intend to make, {playerName}, which makes their intentions admirably easy to audit. The current count is too high. Fourteen headhunters, and bring me eight totems; each one is a raid that never happens.",
+        "completion": "Eight raids, cancelled in advance. Cheaper than walls, quieter than war. This is why Veth keeps ledgers instead of armies.",
+        "objectives": {
+          "0": {
+            "label": "Frostpine Headhunter slain"
+          },
+          "1": {
+            "label": "Frostpine War Totem"
+          }
+        }
+      },
+      "q_veth_rimeclaw_pelts": {
+        "title": "Rimeclaw Futures",
+        "text": "The rimeclaws have come down from the high ice and the terrace trade in furs has noticed, {playerName}. Twelve prowlers thinned and eight pelts, whole. The Confederation buys low, in the north, in winter, from you.",
+        "completion": "Whole pelts, winter weight. They will sell south for six times your fee, and you will not resent it, because you knew the rate when you took the work. Veth values that in a contractor.",
+        "objectives": {
+          "0": {
+            "label": "Rimeclaw Prowler slain"
+          },
+          "1": {
+            "label": "Rimeclaw Pelt"
+          }
+        }
+      },
+      "q_veth_terrace_sweep": {
+        "title": "Sweeping the Terraces",
+        "text": "The northern terraces are the only road to the Kael border, and this season it is held by spears and claws in roughly equal measure, {playerName}. Sixteen headhunters, twelve rimeclaws. The pass stays open; the ledger stays balanced.",
+        "completion": "The border porters crossed this morning without an escort, which is the only report that matters. The north is passable. What comes down that road next is another account entirely.",
+        "objectives": {
+          "0": {
+            "label": "Frostpine Headhunter slain"
+          },
+          "1": {
+            "label": "Rimeclaw Prowler slain"
+          }
+        }
+      },
+      "q_veth_hoarbound_debt": {
+        "title": "The Hoarbound Debt",
+        "text": "The trolls sank Grelnok in the ice for eating his own war party, and the ice let him back out, {playerName}. He has been collecting the terraces piece by piece since, and Veth does not recognize his claim. Take companions onto the ice. The cold is his; make sure the ledger is ours.",
+        "completion": "The ice keeps him this time; we paid it more than the trolls did. Take the leggings, {playerName}, and the fee. Your account with the north is closed, and very few people can say that.",
+        "objectives": {
+          "0": {
+            "label": "Grelnok the Hoarbound slain"
+          }
+        }
+      },
+      "q_tithe_scrip_recovery": {
+        "title": "Scrip in the Snow",
+        "text": "A tithe courier went into the Wolfsward pines nine days ago and his satchel did not come out, {playerName}. The scrip he carried is legal tender against the quarter, and at present it is bedding in wolf dens. Cull fourteen of the packs and recover six notes of scrip. The Empire honors its paper in any condition.",
+        "completion": "Six notes, chewed but countable. I will enter them at face value, and the courier's widow draws his back pay by the next post. The wolves are a closed line item now, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Wolfsward Packwolf slain"
+          },
+          "1": {
+            "label": "Chewed Tithe Scrip"
+          }
+        }
+      },
+      "q_candle_tax_arrears": {
+        "title": "Arrears in Wax",
+        "text": "Every candle burned under an imperial mine is a taxed candle, {playerName}, and the Ironhold warrens have eaten four quarters of tallies along with the wax. Fourteen diggers, six tax tallies recovered. Arrears do not forgive themselves.",
+        "completion": "Six tallies, teeth marks notwithstanding. The arrears ledger balances for the first time since the mine broke through. You would be surprised how rarely I get to write the word settled, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Ironhold Digger slain"
+          },
+          "1": {
+            "label": "Candle Tax Tally"
+          }
+        }
+      },
+      "q_assay_seal_audit": {
+        "title": "The Assay Seals",
+        "text": "The assay office stamps every ore cart with a lead seal, and an unsealed cart is contraband by definition. The kobold geomancers pry the seals off and wear imperial lead as charms, {playerName}. Fourteen geomancers, six seals. The audit does not wait on the weather and neither do I.",
+        "completion": "Six seals, all imperial lead. The carts can move, the assay stands, and the contraband file goes back in its drawer. Precise work, {playerName}; precision is the only compliment I keep in stock.",
+        "objectives": {
+          "0": {
+            "label": "Ironhold Geomancer slain"
+          },
+          "1": {
+            "label": "Assay Office Seal"
+          }
+        }
+      },
+      "q_pay_chest_manifest": {
+        "title": "Chests Without Manifests",
+        "text": "The Ninth took its pay chests when it deserted, and every chest moved with a manifest. The deserters still carry them, {playerName}: proof of theft, itemized, in their own quartermaster's hand. Sixteen deserters, six manifests. I intend to charge them by the line.",
+        "completion": "Itemized, dated, signed. A court will read these one day, {playerName}, and the Ninth wrote every word of the case against itself. Bureaucracy has a long arm and a longer memory.",
+        "objectives": {
+          "0": {
+            "label": "Broken Legion Deserter slain"
+          },
+          "1": {
+            "label": "Legion Pay Manifest"
+          }
+        }
+      },
+      "q_overseer_audit": {
+        "title": "Abolish the Overseer",
+        "text": "Overseer Kazrik taxes his own warren in candles and styles himself an assessor of the Empire, {playerName}. The Empire licenses no competitors. His office is hereby abolished; the abolition wants delivering, he will contest the finding, and he does not argue alone. Take witnesses.",
+        "completion": "The office of Overseer stands abolished and its brass whistle is on my desk. The warrens will miss him less than they think. The Empire remembers its instruments, {playerName}; wear this one.",
+        "objectives": {
+          "0": {
+            "label": "Overseer Kazrik slain"
+          }
+        }
+      },
+      "q_pelt_requisition": {
+        "title": "The Pelt Requisition",
+        "text": "Requisition ninety-one, winter cloaks, garrison of Kaelspire: approved in spring, and the wool never came, {playerName}. Wolf pelt serves better on the Ascent anyway. Fourteen packwolves culled, eight prime pelts delivered, and the garrison stops freezing on my quota.",
+        "completion": "Eight primes, thick as any I have brought in myself. The tanner owes me a favor and the garrison owes you their ears and fingers, {playerName}. Requisition ninety-one: filled.",
+        "objectives": {
+          "0": {
+            "label": "Wolfsward Packwolf slain"
+          },
+          "1": {
+            "label": "Prime Wolf Pelt"
+          }
+        }
+      },
+      "q_hoarfang_writ": {
+        "title": "The Hoarfang Writ",
+        "text": "Three bounty notices name the Hoarfang Alpha, {playerName}, and three list the hunters who went to collect. The writ is countersigned by the Marshal himself now, which makes it mandatory. Do not flatter yourself into going alone; the pack fights where he fights.",
+        "completion": "So the old sire is down. I will not pretend the pines are safe, but they are safer, and three families can stop reading bounty notices. The writ is discharged, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Hoarfang Alpha slain"
+          }
+        }
+      },
+      "q_wendigo_gall": {
+        "title": "Galls for the Surgeon",
+        "text": "The garrison surgeon prescribes wendigo gall against frostrot, and the Ascent provides, {playerName}. Sixteen wendigo culled and six gallstones packed in snow. Do not ask what the tincture tastes like; the men on the signal line stopped asking years ago.",
+        "completion": "Packed, potent, and paid for. The surgeon will grumble that they are small and then use every one. Frostrot takes toes, {playerName}; you have saved the garrison a crate of them.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Wendigo slain"
+          },
+          "1": {
+            "label": "Wendigo Gallstone"
+          }
+        }
+      },
+      "q_icehowler_cull": {
+        "title": "The Icehowler Cull",
+        "text": "New packs above the snow line, {playerName}: icehowlers, running ahead of the winter the wendigo come down with. If they den before the caravans move, the Ascent closes itself and no form reopens it. Fifteen culled, six ruffs for proof. This is the hunt that decides the season.",
+        "completion": "Six ruffs, winter weight. The passes stay open and the quota is met with the season to spare. Take the hood, {playerName}: huntmaster's issue, and you have out-hunted the huntmaster.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Icehowler slain"
+          },
+          "1": {
+            "label": "Icehowler Ruff"
+          }
+        }
+      },
+      "q_arbalist_lines": {
+        "title": "Break the Firing Lines",
+        "text": "The watch-fort walls are manned by the Ninth's arbalists, {playerName}, and a wall of quarrels is still a wall. Fourteen arbalists struck from the rolls and six quarrel bundles confiscated. Every bundle you carry off is a volley they never fire.",
+        "completion": "Fourteen names, six volleys, zero apologies. The walls answer slower already, {playerName}. File this under progress.",
+        "objectives": {
+          "0": {
+            "label": "Broken Legion Arbalist slain"
+          },
+          "1": {
+            "label": "Legion Quarrel Bundle"
+          }
+        }
+      },
+      "q_ogre_paymasters": {
+        "title": "Follow the Coin",
+        "text": "The ogres were paid from the stolen chests in imperial coin, clipped to stretch further, {playerName}. Clipped coin is a second crime stacked on the first. Fourteen sellswords, six coins in evidence. The Empire audits its enemies too.",
+        "completion": "Clipped, stamped, and damning. The coins go in the evidence box and the box goes to the capital under my seal. Vaelis bought muscle with the Empire's own silver, {playerName}; now the silver testifies.",
+        "objectives": {
+          "0": {
+            "label": "Sellsword Ogre slain"
+          },
+          "1": {
+            "label": "Clipped Imperial Coin"
+          }
+        }
+      },
+      "q_watchfort_reclamation": {
+        "title": "Retake the Watch-Fort",
+        "text": "The ruined watch-fort was imperial before the Ninth squatted in it, and it will be imperial after, {playerName}. Fourteen deserters, fourteen arbalists: thin the garrison until what remains cannot hold a wall. I have masons on retainer waiting for the keys.",
+        "completion": "The fort is a ruin held by stragglers and ghosts now. The masons go up within the month and the Empire gets its wall back. Methodical, {playerName}. I approve of methodical.",
+        "objectives": {
+          "0": {
+            "label": "Broken Legion Deserter slain"
+          },
+          "1": {
+            "label": "Broken Legion Arbalist slain"
+          }
+        }
+      },
+      "q_frosthelm_signals": {
+        "title": "Relight the Signal Line",
+        "text": "Three signal stations on the Frosthelm Ascent, all dark, {playerName}. The crews will not climb while the wendigo hold the line, and I do not blame them; I requisition someone the wendigo should worry about instead. Eighteen culled, and the beacons burn again.",
+        "completion": "The first beacon lit within the hour, {playerName}. Kaelspire talks to the passes again and the winter reports flow on schedule. The Empire runs on schedules; today it ran on you.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Wendigo slain"
+          }
+        }
+      },
+      "q_wendigo_hide_lining": {
+        "title": "Linings Against the Cold",
+        "text": "Imperial steel does not fail on the Ascent, {playerName}; imperial fingers do. Wendigo hide is rimewoven, it never stiffens in the cold, and I need six hides to line the garrison gauntlets. The wendigo will not donate them. Fourteen culled, six hides.",
+        "completion": "Feel that: supple at the deepest frost. Every gauntlet off my bench this winter carries your hunting in its lining, {playerName}. The garrison will not know to thank you; I do.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Wendigo slain"
+          },
+          "1": {
+            "label": "Rimewoven Hide"
+          }
+        }
+      },
+      "q_ogre_iron_reforging": {
+        "title": "Sellsword Iron",
+        "text": "The ogres carry crude pig iron for patching their kit, {playerName}, and crude or not, iron is iron. Reforged to imperial pattern it becomes bolt heads, hinges, and one fewer requisition I wait on. Twelve sellswords, eight ingots.",
+        "completion": "Ogre iron, imperial pattern. The forge does not care who smelted it first, and after the third folding neither do I. Good weight, {playerName}; the bolt heads will fly true.",
+        "objectives": {
+          "0": {
+            "label": "Sellsword Ogre slain"
+          },
+          "1": {
+            "label": "Sellsword Pig Iron"
+          }
+        }
+      },
+      "q_larder_restock": {
+        "title": "Restock the Larder",
+        "text": "The garrison pot does not fill itself, {playerName}, and salted wolf haunch keeps through the winter better than promises from the granary office. Twelve packwolves, eight lean haunches, delivered to my cold store. The forms are already stamped.",
+        "completion": "Eight haunches, good weight, no spoilage. The pot is full for a month and the men fight better fed. Simple arithmetic, {playerName}, and you carry it well.",
+        "objectives": {
+          "0": {
+            "label": "Wolfsward Packwolf slain"
+          },
+          "1": {
+            "label": "Lean Wolf Haunch"
+          }
+        }
+      },
+      "q_ration_theft": {
+        "title": "The Ration Count",
+        "text": "Fourteen crates of field rations left the granaries, {playerName}; eleven arrived. The Ironhold diggers pilfer from the supply carts at the mine turnoff, and my count will balance if I have to weigh every kobold in the warren. Fourteen diggers, six ration packs recovered.",
+        "completion": "Six packs recovered and the count balances. I will not ask what state the biscuit is in; the form has no field for teeth marks. The Empire thanks you in inventory, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Ironhold Digger slain"
+          },
+          "1": {
+            "label": "Pilfered Ration Pack"
+          }
+        }
+      },
+      "q_stores_for_the_ascent": {
+        "title": "Stores for the Ascent",
+        "text": "The winter stores for the Frosthelm garrison move under requisition chits, and the ogres took the whole consignment, chits and all, {playerName}. Without the chits I cannot even certify the loss. Fourteen sellswords, six chits, and the Ascent eats this winter.",
+        "completion": "Six chits, countersigned and legible. The stores they cover are gone into ogre bellies, but a certified loss is a loss the Empire replaces. The Ascent eats, {playerName}, because the paperwork survived.",
+        "objectives": {
+          "0": {
+            "label": "Sellsword Ogre slain"
+          },
+          "1": {
+            "label": "Sellsword Requisition Chit"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -6650,6 +8472,366 @@ export const ko_KR: EnTranslations = {
           },
           "9": {
             "label": "무덤고룡 성소"
+          }
+        }
+      },
+      "ossara_domain": {
+        "name": "Ossara Domain",
+        "welcome": "Judge Saphira keeps the caravan road open from Qesh Aram, barely.",
+        "pois": {
+          "0": {
+            "label": "Qesh Aram"
+          },
+          "1": {
+            "label": "The Caravan Road"
+          },
+          "2": {
+            "label": "Prowler Dunes"
+          },
+          "3": {
+            "label": "Glasswind Flats"
+          },
+          "4": {
+            "label": "Sunken Aqueduct"
+          },
+          "5": {
+            "label": "Tombs of the Nameless"
+          },
+          "6": {
+            "label": "Mirage Oasis"
+          },
+          "7": {
+            "label": "Duststorm Rise"
+          },
+          "8": {
+            "label": "Judges' Terrace"
+          },
+          "9": {
+            "label": "Bonewind Barrens"
+          }
+        }
+      },
+      "veth_confederation": {
+        "name": "Veth Confederation",
+        "welcome": "Veth is not a nation, it is an agreement, and Nighthollow keeps its ledger.",
+        "pois": {
+          "0": {
+            "label": "Nighthollow"
+          },
+          "1": {
+            "label": "Duskmane Run"
+          },
+          "2": {
+            "label": "Palewidow Hollows"
+          },
+          "3": {
+            "label": "Blackwater Quays"
+          },
+          "4": {
+            "label": "The Whisper Market"
+          },
+          "5": {
+            "label": "The Blackmere"
+          },
+          "6": {
+            "label": "Wispwood"
+          },
+          "7": {
+            "label": "The Silent Court"
+          },
+          "8": {
+            "label": "Frostpine Terraces"
+          },
+          "9": {
+            "label": "The Last Lodge"
+          }
+        }
+      },
+      "kael_empire": {
+        "name": "Kael Empire",
+        "welcome": "Marshal Corvin keeps the Tithe Road open from Kaelspire; the Empire expects it kept.",
+        "pois": {
+          "0": {
+            "label": "Kaelspire"
+          },
+          "1": {
+            "label": "The Tithe Road"
+          },
+          "2": {
+            "label": "The Imperial Granaries"
+          },
+          "3": {
+            "label": "Wolfsward Pines"
+          },
+          "4": {
+            "label": "The Tithe House"
+          },
+          "5": {
+            "label": "Silverbrook Millpond"
+          },
+          "6": {
+            "label": "Ironhold Mine"
+          },
+          "7": {
+            "label": "The Broken Legion Camp"
+          },
+          "8": {
+            "label": "Frosthelm Ascent"
+          }
+        }
+      },
+      "grey_hollows": {
+        "name": "Grey Hollows",
+        "welcome": "Half of the Grey Hollows is underfoot, and none of it is empty.",
+        "pois": {
+          "0": {
+            "label": "The Underway Rest"
+          },
+          "1": {
+            "label": "The Old South Road"
+          },
+          "2": {
+            "label": "Sunken Mouths"
+          },
+          "3": {
+            "label": "The Gnaw Warrens"
+          },
+          "4": {
+            "label": "Shale Gallery"
+          },
+          "5": {
+            "label": "Smugglers Spoil"
+          }
+        }
+      },
+      "thornfen_border": {
+        "name": "Thornfen Border",
+        "welcome": "The wardens mark the trees every night; by morning the marks have moved.",
+        "pois": {
+          "0": {
+            "label": "Wardens Palisade"
+          },
+          "1": {
+            "label": "Creeper Hollows"
+          },
+          "2": {
+            "label": "The Moving Wood"
+          },
+          "3": {
+            "label": "Troll Fen"
+          },
+          "4": {
+            "label": "Briarheart Thicket"
+          }
+        }
+      },
+      "ironpass_crossing": {
+        "name": "Ironpass Crossing",
+        "welcome": "Every banner on the pass claims the road; the Tollhouse just charges them all.",
+        "pois": {
+          "0": {
+            "label": "The Tollhouse"
+          },
+          "1": {
+            "label": "The Banner Road"
+          },
+          "2": {
+            "label": "Raider Bluffs"
+          },
+          "3": {
+            "label": "The Ogre Toll"
+          },
+          "4": {
+            "label": "Cragfall Slopes"
+          },
+          "5": {
+            "label": "Wyvern Eyries"
+          }
+        }
+      },
+      "emberveil_marshes": {
+        "name": "Emberveil Marshes",
+        "welcome": "The fog over Emberveil has never lifted; bring your own light.",
+        "pois": {
+          "0": {
+            "label": "Lanternfen Stilts"
+          },
+          "1": {
+            "label": "Bloatwater Shallows"
+          },
+          "2": {
+            "label": "The Steaming Pools"
+          },
+          "3": {
+            "label": "Silkstrand Mire"
+          },
+          "4": {
+            "label": "The Fogwall"
+          }
+        }
+      },
+      "pale_crossing": {
+        "name": "Pale Crossing",
+        "welcome": "Every faction claims it built the Pale Bridge; the bridge has never agreed.",
+        "pois": {
+          "0": {
+            "label": "Bridgewatch"
+          },
+          "1": {
+            "label": "The Kneeling Stones"
+          },
+          "2": {
+            "label": "The Pale Bridge"
+          },
+          "3": {
+            "label": "Drowned Banks"
+          },
+          "4": {
+            "label": "Gullwatch Rise"
+          }
+        }
+      },
+      "the_breach": {
+        "name": "The Breach",
+        "welcome": "No banner holds The Breach. The truce ends at the Last Bastion palisade; beyond it there is only the war.",
+        "pois": {
+          "0": {
+            "label": "Last Bastion"
+          },
+          "1": {
+            "label": "The Sundered Field"
+          },
+          "2": {
+            "label": "The Ember Scar"
+          },
+          "3": {
+            "label": "The Ashen Saps"
+          },
+          "4": {
+            "label": "The Broken Siege Line"
+          },
+          "5": {
+            "label": "Wreck of the Third Offensive"
+          },
+          "6": {
+            "label": "The Shattered Vanguard"
+          },
+          "7": {
+            "label": "The First Crater"
+          },
+          "8": {
+            "label": "The Molten Gate"
+          },
+          "9": {
+            "label": "Khorvax's Redoubt"
+          }
+        }
+      },
+      "ashveil_wastes": {
+        "name": "Ashveil Wastes",
+        "welcome": "These fields fed half a kingdom once. One battle burned them for years; Cinderrest is what grew back.",
+        "pois": {
+          "0": {
+            "label": "Cinderrest"
+          },
+          "1": {
+            "label": "The Charred Furrows"
+          },
+          "2": {
+            "label": "Bonewhite Tor"
+          },
+          "3": {
+            "label": "The Smolder Line"
+          },
+          "4": {
+            "label": "Ashfall Reach"
+          }
+        }
+      },
+      "saltbone_flats": {
+        "name": "Saltbone Flats",
+        "welcome": "A white glare, colossal bones, and no two stories about them that agree. Brinehollow trades with all of them.",
+        "pois": {
+          "0": {
+            "label": "Brinehollow"
+          },
+          "1": {
+            "label": "The Glare Flats"
+          },
+          "2": {
+            "label": "The Great Ribcage"
+          },
+          "3": {
+            "label": "Bonepicker Trails"
+          },
+          "4": {
+            "label": "The Sunken Vertebrae"
+          }
+        }
+      },
+      "duskwall_ruins": {
+        "name": "Duskwall Ruins",
+        "welcome": "Duskwall died in the war thirty years ago. Everything picking through it now claims to be a scavenger.",
+        "pois": {
+          "0": {
+            "label": "The Exile Market"
+          },
+          "1": {
+            "label": "The Broken Gate"
+          },
+          "2": {
+            "label": "The Old Boulevard"
+          },
+          "3": {
+            "label": "The Collapsed Quarter"
+          },
+          "4": {
+            "label": "Old Duskwall Sewers"
+          },
+          "5": {
+            "label": "The King's Midden"
+          }
+        }
+      },
+      "cindral_ridge": {
+        "name": "Cindral Ridge",
+        "welcome": "The ridge is full of forge-metal, and the dwarves of Forgefall Camp have spent decades failing to hold it.",
+        "pois": {
+          "0": {
+            "label": "Forgefall Camp"
+          },
+          "1": {
+            "label": "The Slag Steps"
+          },
+          "2": {
+            "label": "The Abandoned Diggings"
+          },
+          "3": {
+            "label": "Magmavein Gulch"
+          },
+          "4": {
+            "label": "The Smeltheart Vent"
+          }
+        }
+      },
+      "redspire_pass": {
+        "name": "Redspire Pass",
+        "welcome": "Past the Last Waymeet there is only red rock, the old deserters, and the rim of the known world.",
+        "pois": {
+          "0": {
+            "label": "The Last Waymeet"
+          },
+          "1": {
+            "label": "The Broken Teeth"
+          },
+          "2": {
+            "label": "Deserter Hollows"
+          },
+          "3": {
+            "label": "The Silent Muster"
+          },
+          "4": {
+            "label": "The Rim of the World"
           }
         }
       }
