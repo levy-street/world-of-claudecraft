@@ -560,7 +560,7 @@ describe('delve reward chest + surface exit flow', () => {
     enterReliquary(sim);
     const run = sim.delveRunForPlayer(sim.playerId)!;
     // Pin the normal (non-Bountiful) chest so these fixtures aren't at the mercy of
-    // the ultra-rare roll (seed 42 happens to roll Bountiful). The Bountiful-Coffer
+    // the ultra-rare roll (whatever the seed happened to roll). The Bountiful-Coffer
     // tests below opt back in explicitly with `run.bountiful = true`.
     run.bountiful = false;
     // Jump straight to the finale as the only module
@@ -726,7 +726,8 @@ describe('delve reward chest + surface exit flow', () => {
 
   it('the Bountiful roll is deterministic for a given seed', () => {
     // Read the raw roll via enterReliquary (enterFinale pins it false). Same seed
-    // ⇒ same outcome; seed 42 is known to roll Bountiful (drives the fixtures above).
+    // ⇒ same outcome; seed 7 is known to roll Bountiful under the Valdris world
+    // (world-gen consumes more ctor draws, so the old seed-42 roll moved).
     const rollFor = (seed: number) => {
       const s = makeSim('warrior', seed);
       s.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -734,7 +735,8 @@ describe('delve reward chest + surface exit flow', () => {
       return s.delveRunForPlayer(s.playerId)?.bountiful;
     };
     expect(rollFor(1234)).toBe(rollFor(1234));
-    expect(rollFor(42)).toBe(true);
+    expect(rollFor(42)).toBe(false);
+    expect(rollFor(7)).toBe(true);
   });
 
   it('a Bountiful Coffer refuses the lower antes and only opens at Hard-tier + Premium ante', () => {

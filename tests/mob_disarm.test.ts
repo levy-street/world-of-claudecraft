@@ -39,7 +39,11 @@ describe('mob disarm ("Disarming Smash")', () => {
     p.maxHp = 100000; p.hp = 100000;
     const mob = spawnCrusher(sim, p);
     MOBS['ogre_crusher'].disarm!.chance = 1; // deterministic for the test
-    swing(sim, mob, p);
+    // The swing itself can still miss/dodge on the hit table, so land one for
+    // real (bounded; chance 1 means the first LANDED hit must disarm).
+    for (let i = 0; i < 10 && !p.auras.some((a) => a.kind === 'disarm'); i++) {
+      swing(sim, mob, p);
+    }
     MOBS['ogre_crusher'].disarm!.chance = 0.25;
     const aura = p.auras.find((a) => a.kind === 'disarm');
     expect(aura).toBeTruthy();
@@ -69,10 +73,13 @@ describe('mob disarm ("Disarming Smash")', () => {
     (sim as any).updatePlayerAutoAttack(p, meta);
     expect(dummy.hp).toBe(before); // no swing while disarmed
 
-    // Weapon recovered: the same ready swing now lands.
+    // Weapon recovered: a ready swing connects again (bounded retries; the
+    // hit table can still roll a miss/dodge on any single swing).
     p.auras = p.auras.filter((a) => a.kind !== 'disarm');
-    p.swingTimer = 0;
-    (sim as any).updatePlayerAutoAttack(p, meta);
+    for (let i = 0; i < 10 && dummy.hp === before; i++) {
+      p.swingTimer = 0;
+      (sim as any).updatePlayerAutoAttack(p, meta);
+    }
     expect(dummy.hp).toBeLessThan(before);
   });
 

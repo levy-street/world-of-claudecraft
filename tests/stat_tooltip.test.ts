@@ -3,7 +3,7 @@ import { CLASSES } from '../src/sim/content/classes';
 import { ITEMS } from '../src/sim/data';
 import { recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, armorReduction, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, armorReduction, type PlayerClass, SPELL_POWER_PER_INT } from '../src/sim/types';
 import {
   agiMeleeApPerPoint,
   buildStatTooltip,
@@ -368,7 +368,7 @@ describe('upstream source breakdown reconciles to the displayed stat', () => {
     const model = buildStatTooltip('spellPower', inputWithGear(sim, 'mage'));
     const fromInt = model.sources.find((s) => s.kind === 'attributes');
     expect(fromInt?.fromStat).toBe('int');
-    expect(fromInt?.value).toBe(Math.round(p.stats.int * 0.5));
+    expect(fromInt?.value).toBe(Math.round(p.stats.int * SPELL_POWER_PER_INT));
     const sum = model.sources.reduce((acc, s) => acc + s.value, 0);
     expect(sum).toBe(p.spellPower);
     // non-casters get the minor-benefit note on the spell power cell
