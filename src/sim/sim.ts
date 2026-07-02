@@ -159,6 +159,18 @@ import {
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
 import * as lifecycle from './mob/lifecycle';
+import {
+  activateMount,
+  activeMountSpeedMult,
+  BASIC_MOUNT_ID,
+  clearActiveMount,
+  cloneMountState,
+  emptyMountState,
+  learnMount as learnMountImpl,
+  MOUNTS,
+  normalizeMountState,
+  type PlayerMountState,
+} from './mounts';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import {
@@ -630,6 +642,7 @@ export interface PlayerMeta {
   wireRev: number;
   inventory: InvSlot[];
   vendorBuyback: InvSlot[];
+  mounts: PlayerMountState;
   copper: number;
   equipment: PlayerEquipment;
   xp: number;
@@ -738,6 +751,7 @@ export interface CharacterState {
   equipment: PlayerEquipment;
   inventory: InvSlot[];
   vendorBuyback?: InvSlot[];
+  mounts?: PlayerMountState;
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
@@ -1161,6 +1175,7 @@ export class Sim {
       wireRev: 0,
       inventory: [],
       vendorBuyback: [],
+      mounts: emptyMountState(),
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
       xp: 0,
@@ -1221,6 +1236,7 @@ export class Sim {
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((i) => ({ ...i }));
+      meta.mounts = normalizeMountState(s.mounts);
       for (const q of s.questLog) {
         if (q.state !== 'done')
           meta.questLog.set(q.questId, {
@@ -1402,6 +1418,7 @@ export class Sim {
       equipment: { ...meta.equipment },
       inventory: meta.inventory.map((i) => ({ ...i })),
       vendorBuyback: meta.vendorBuyback.map((i) => ({ ...i })),
+      mounts: cloneMountState(meta.mounts),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
         counts: [...q.counts],
@@ -1595,6 +1612,9 @@ export class Sim {
   get vendorBuyback(): InvSlot[] {
     return this.primary.vendorBuyback;
   }
+  get mounts(): PlayerMountState {
+    return cloneMountState(this.primary.mounts);
+  }
   get equipment(): PlayerEquipment {
     return this.primary.equipment;
   }
@@ -1701,6 +1721,32 @@ export class Sim {
 
   meta(pid: number): PlayerMeta | null {
     return this.players.get(pid) ?? null;
+  }
+
+  mountsFor(pid: number = this.primaryId): PlayerMountState {
+    const meta = this.players.get(pid);
+    return meta ? cloneMountState(meta.mounts) : emptyMountState();
+  }
+
+  learnMount(mountId: string = BASIC_MOUNT_ID, pid: number = this.primaryId): boolean {
+    const meta = this.players.get(pid);
+    if (!meta) return false;
+    return learnMountImpl(meta.mounts, mountId);
+  }
+
+  summonMount(mountId: string = BASIC_MOUNT_ID, pid: number = this.primaryId): boolean {
+    const meta = this.players.get(pid);
+    const p = this.entities.get(pid);
+    const def = MOUNTS[mountId];
+    if (!meta || !p || !def || !meta.mounts.known.includes(mountId)) return false;
+    if (p.dead || p.inCombat || p.level < def.minLevel) return false;
+    if (dungeonAt(p.pos.x) || this.arenaMatches.has(pid)) return false;
+    return activateMount(meta.mounts, mountId);
+  }
+
+  dismountPlayer(pid: number = this.primaryId): boolean {
+    const meta = this.players.get(pid);
+    return meta ? clearActiveMount(meta.mounts) : false;
   }
 
   private resolve(pid?: number): { meta: PlayerMeta; e: Entity } | null {
@@ -1961,6 +2007,7 @@ export class Sim {
       diminishedCrowdControlDuration: sim.diminishedCrowdControlDuration.bind(sim),
       hostilesInRadius: sim.hostilesInRadius.bind(sim),
       breakStealth: sim.breakStealth.bind(sim),
+      dismountPlayer: sim.dismountPlayer.bind(sim),
       applyTaunt: sim.applyTaunt.bind(sim),
       summonPet: sim.summonPet.bind(sim),
       petOf: sim.petOf.bind(sim),
@@ -2507,8 +2554,13 @@ export class Sim {
     }
     // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
     if (e.kind === 'player') {
-      const ms = this.players.get(e.id)?.fiestaSpecial.moveSpeedPct;
+      const meta = this.players.get(e.id);
+      const ms = meta?.fiestaSpecial.moveSpeedPct;
       if (ms) speed += ms;
+      const mountSpeed = meta ? activeMountSpeedMult(meta.mounts) : 1;
+      if (mountSpeed > 1 && !dungeonAt(e.pos.x) && !this.arenaMatches.has(e.id)) {
+        speed = Math.max(speed, mountSpeed);
+      }
     }
     return slow * speed;
   }
@@ -3418,6 +3470,8 @@ export class Sim {
   }
 
   private enterCombat(a: Entity, b: Entity): void {
+    if (a.kind === 'player') this.dismountPlayer(a.id);
+    if (b.kind === 'player') this.dismountPlayer(b.id);
     a.combatTimer = 0;
     b.combatTimer = 0;
     a.inCombat = true;

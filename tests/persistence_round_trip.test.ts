@@ -7,6 +7,7 @@
 // normalizer; this slice did not change their bodies (verify pass).
 
 import { describe, expect, it } from 'vitest';
+import { BASIC_MOUNT_ID } from '../src/sim/mounts';
 import { Sim } from '../src/sim/sim';
 
 function makeWorld() {
@@ -41,6 +42,9 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     meta.companionUpgrades = { tessa: 2 };
     meta.delveLoreUnlocked = new Set(['lore_1']);
     meta.delveDaily = { date: '2026-06-26', firstClearXp: new Set(['crypt']), markClears: 2 };
+    sim.setPlayerLevel(20, pid);
+    sim.learnMount(BASIC_MOUNT_ID, pid);
+    sim.summonMount(BASIC_MOUNT_ID, pid);
 
     const s1 = sim.serializeCharacter(pid)!;
     const sim2 = makeWorld();
@@ -52,6 +56,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     expect(s2.delveMarks).toBe(17);
     expect(s2.loadouts?.length).toBe(1);
     expect(s2.skinCatalog).toBe('mech');
+    expect(s2.mounts?.activeId).toBe(BASIC_MOUNT_ID);
   });
 
   it('a legacy state missing the post-launch fields loads with sane defaults', () => {
@@ -86,6 +91,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
       'unlockedMilestones',
       'lifetimeXp',
       'restedXp',
+      'mounts',
     ]) {
       delete legacy[key];
     }
@@ -105,6 +111,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     expect(m.loadouts).toEqual([]);
     expect(m.prestigeRank).toBe(0);
     expect(m.restedXp).toBe(0);
+    expect(m.mounts).toEqual({ known: [], activeId: null });
     // re-serializing a defaulted character does not throw and fills the new fields.
     expect(() => sim2.serializeCharacter(pid)).not.toThrow();
     expect(sim2.serializeCharacter(pid)!.delveMarks).toBe(0);

@@ -158,6 +158,7 @@ function makeCtx() {
     diminishedCrowdControlDuration: vi.fn(() => null),
     hostilesInRadius: vi.fn(() => []),
     breakStealth: vi.fn(),
+    dismountPlayer: vi.fn(() => false),
     applyTaunt: vi.fn(),
     summonPet: vi.fn(),
     petOf: vi.fn(() => null),

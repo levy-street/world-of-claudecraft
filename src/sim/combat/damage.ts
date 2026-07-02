@@ -293,8 +293,10 @@ export function dealDamage(
   // taking or dealing real damage breaks stealth
   if (amount > 0) {
     ctx.breakStealth(target);
+    if (target.kind === 'player') ctx.dismountPlayer(target.id);
     if (source && source.id !== target.id) {
       ctx.breakStealth(source);
+      if (source.kind === 'player') ctx.dismountPlayer(source.id);
     }
   }
 
