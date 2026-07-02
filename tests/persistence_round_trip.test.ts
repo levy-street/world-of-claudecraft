@@ -41,6 +41,12 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     meta.companionUpgrades = { tessa: 2 };
     meta.delveLoreUnlocked = new Set(['lore_1']);
     meta.delveDaily = { date: '2026-06-26', firstClearXp: new Set(['crypt']), markClears: 2 };
+    const mailer = sim.addPlayer('mage', 'Mailer');
+    const mailerMeta = sim.meta(mailer);
+    expect(mailerMeta).toBeTruthy();
+    if (!mailerMeta) throw new Error('missing mailer meta');
+    mailerMeta.copper = 99;
+    sim.sendMail(mailer, pid, { subject: 'Stored', body: 'Persist me', copper: 42 });
 
     const s1 = sim.serializeCharacter(pid)!;
     const sim2 = makeWorld();
@@ -52,6 +58,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     expect(s2.delveMarks).toBe(17);
     expect(s2.loadouts?.length).toBe(1);
     expect(s2.skinCatalog).toBe('mech');
+    expect(s2.mailbox?.inbox[0]?.subject).toBe('Stored');
   });
 
   it('a legacy state missing the post-launch fields loads with sane defaults', () => {
@@ -86,6 +93,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
       'unlockedMilestones',
       'lifetimeXp',
       'restedXp',
+      'mailbox',
     ]) {
       delete legacy[key];
     }
@@ -105,6 +113,7 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
     expect(m.loadouts).toEqual([]);
     expect(m.prestigeRank).toBe(0);
     expect(m.restedXp).toBe(0);
+    expect(m.mailbox).toEqual({ nextId: 1, inbox: [] });
     // re-serializing a defaulted character does not throw and fills the new fields.
     expect(() => sim2.serializeCharacter(pid)).not.toThrow();
     expect(sim2.serializeCharacter(pid)!.delveMarks).toBe(0);

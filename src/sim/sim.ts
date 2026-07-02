@@ -156,6 +156,19 @@ import {
   setPartyLootMaster as setPartyLootMasterImpl,
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
+import {
+  cloneMailbox,
+  emptyMailbox,
+  enqueueMail,
+  type MailAttachmentPayload,
+  type MailboxState,
+  type MailDraft,
+  markMailRead as markMailReadImpl,
+  normalizeMailbox,
+  normalizeMailItems,
+  type PlayerMail,
+  takeMailAttachments,
+} from './mail';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
 import * as lifecycle from './mob/lifecycle';
@@ -630,6 +643,7 @@ export interface PlayerMeta {
   wireRev: number;
   inventory: InvSlot[];
   vendorBuyback: InvSlot[];
+  mailbox: MailboxState;
   copper: number;
   equipment: PlayerEquipment;
   xp: number;
@@ -738,6 +752,7 @@ export interface CharacterState {
   equipment: PlayerEquipment;
   inventory: InvSlot[];
   vendorBuyback?: InvSlot[];
+  mailbox?: MailboxState;
   questLog: { questId: string; counts: number[]; state: 'active' | 'ready' | 'done' }[];
   questsDone: string[];
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
@@ -1161,6 +1176,7 @@ export class Sim {
       wireRev: 0,
       inventory: [],
       vendorBuyback: [],
+      mailbox: emptyMailbox(),
       copper: 0,
       equipment: { mainhand: classDef.startWeapon, chest: classDef.startChest },
       xp: 0,
@@ -1221,6 +1237,7 @@ export class Sim {
       meta.equipment = { ...s.equipment };
       meta.inventory = s.inventory.map((i) => ({ ...i }));
       meta.vendorBuyback = (s.vendorBuyback ?? []).map((i) => ({ ...i }));
+      meta.mailbox = normalizeMailbox(s.mailbox);
       for (const q of s.questLog) {
         if (q.state !== 'done')
           meta.questLog.set(q.questId, {
@@ -1402,6 +1419,7 @@ export class Sim {
       equipment: { ...meta.equipment },
       inventory: meta.inventory.map((i) => ({ ...i })),
       vendorBuyback: meta.vendorBuyback.map((i) => ({ ...i })),
+      mailbox: cloneMailbox(meta.mailbox),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
         counts: [...q.counts],
@@ -1595,6 +1613,9 @@ export class Sim {
   get vendorBuyback(): InvSlot[] {
     return this.primary.vendorBuyback;
   }
+  get mailbox(): MailboxState {
+    return cloneMailbox(this.primary.mailbox);
+  }
   get equipment(): PlayerEquipment {
     return this.primary.equipment;
   }
@@ -1701,6 +1722,61 @@ export class Sim {
 
   meta(pid: number): PlayerMeta | null {
     return this.players.get(pid) ?? null;
+  }
+
+  mailboxFor(pid: number = this.primaryId): MailboxState {
+    const meta = this.players.get(pid);
+    return meta ? cloneMailbox(meta.mailbox) : emptyMailbox();
+  }
+
+  sendMail(
+    fromPid: number,
+    toPid: number,
+    draft: Omit<MailDraft, 'fromName' | 'fromCharacterId' | 'sentAt'>,
+  ): PlayerMail | null {
+    const from = this.players.get(fromPid);
+    const to = this.players.get(toPid);
+    if (!from || !to) return null;
+    const copper = Math.max(0, Math.floor(draft.copper ?? 0));
+    if (from.copper < copper) return null;
+    const items = this.cleanMailAttachments(fromPid, draft.items);
+    if (!items) return null;
+
+    from.copper -= copper;
+    for (const item of items) this.removeItem(item.itemId, item.count, fromPid);
+    return enqueueMail(to.mailbox, {
+      ...draft,
+      copper,
+      items,
+      fromName: from.name,
+      fromCharacterId: from.characterId,
+      sentAt: this.tickCount,
+    });
+  }
+
+  markMailRead(pid: number, mailId: number): boolean {
+    const meta = this.players.get(pid);
+    return meta ? markMailReadImpl(meta.mailbox, mailId) : false;
+  }
+
+  collectMailAttachments(pid: number, mailId: number): MailAttachmentPayload | null {
+    const meta = this.players.get(pid);
+    if (!meta) return null;
+    const payload = takeMailAttachments(meta.mailbox, mailId);
+    if (!payload) return null;
+    meta.copper += payload.copper;
+    for (const item of payload.items) this.addItem(item.itemId, item.count, pid);
+    return payload;
+  }
+
+  private cleanMailAttachments(pid: number, items: InvSlot[] | undefined): InvSlot[] | null {
+    const normalized = normalizeMailItems(items);
+    for (const item of normalized) {
+      const def = ITEMS[item.itemId];
+      if (!def || def.kind === 'quest') return null;
+      if (this.countItem(item.itemId, pid) < item.count) return null;
+    }
+    return normalized;
   }
 
   private resolve(pid?: number): { meta: PlayerMeta; e: Entity } | null {
