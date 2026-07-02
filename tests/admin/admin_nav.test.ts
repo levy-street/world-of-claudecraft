@@ -25,10 +25,29 @@ describe('AdminNav', () => {
     );
     expect(screen.getByRole('link', { name: t('nav.chatFilter') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.sharedIps') })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: t('nav.suspiciousPlayers') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.players') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.accounts') })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: t('nav.characters') })).toBeInTheDocument();
+  });
+
+  it('groups bot detector pages between moderation and support', () => {
+    render(AdminNav, {
+      route: { page: 'suspicious-players' },
+      onSelect: () => {},
+      onClose: () => {},
+    });
+
+    const sections = screen.getAllByRole('link').map((link) => link.textContent);
+    expect(sections.indexOf(t('nav.moderation'))).toBeLessThan(
+      sections.indexOf(t('nav.botDetector')),
+    );
+    expect(sections.indexOf(t('nav.botDetector'))).toBeLessThan(sections.indexOf(t('nav.support')));
+    expect(screen.getByRole('link', { name: t('nav.botDetector') })).toHaveClass('active-section');
+    expect(screen.getByRole('link', { name: t('nav.liveEvidence') })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: t('nav.calibration') })).toBeInTheDocument();
   });
 
   it('keeps the moderation section active for an IP detail route', () => {
