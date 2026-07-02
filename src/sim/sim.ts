@@ -130,6 +130,7 @@ import {
 import { canEquipItem } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import { normalizeHonor } from './honor';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -664,6 +665,10 @@ export interface PlayerMeta {
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
+  // PvP honor is a persistent currency; lifetime honor drives the rank ladder.
+  pvpHonor: number;
+  lifetimePvpHonor: number;
+  lifetimeHonorableKills: number;
   // Talents & Specializations. `talents` is the active allocation; `talentMods`
   // is its precomputed flat struct — resolved only on allocation/respec/loadout
   // change (recomputeTalents), never walked on the combat or stat hot path.
@@ -751,6 +756,9 @@ export interface CharacterState {
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  pvpHonor?: number;
+  lifetimePvpHonor?: number;
+  lifetimeHonorableKills?: number;
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -1181,6 +1189,9 @@ export class Sim {
       arena2v2Rating: savedArena2v2.rating,
       arena2v2Wins: savedArena2v2.wins,
       arena2v2Losses: savedArena2v2.losses,
+      pvpHonor: 0,
+      lifetimePvpHonor: 0,
+      lifetimeHonorableKills: 0,
       talents: emptyAllocation(),
       talentMods: emptyModifiers(),
       fiestaAugments: [],
@@ -1215,6 +1226,9 @@ export class Sim {
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
+      meta.pvpHonor = normalizeHonor(s.pvpHonor);
+      meta.lifetimePvpHonor = normalizeHonor(s.lifetimePvpHonor ?? s.pvpHonor);
+      meta.lifetimeHonorableKills = normalizeHonor(s.lifetimeHonorableKills);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
@@ -1417,6 +1431,9 @@ export class Sim {
       arena2v2Rating: meta.arena2v2Rating,
       arena2v2Wins: meta.arena2v2Wins,
       arena2v2Losses: meta.arena2v2Losses,
+      pvpHonor: meta.pvpHonor,
+      lifetimePvpHonor: meta.lifetimePvpHonor,
+      lifetimeHonorableKills: meta.lifetimeHonorableKills,
       talents: cloneAllocation(restore ? restore.talents : meta.talents),
       loadouts: meta.loadouts.map((l) => ({
         name: l.name,

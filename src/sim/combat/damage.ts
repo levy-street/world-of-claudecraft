@@ -25,6 +25,7 @@
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
+import { grantPvpHonorForKill } from '../honor';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
@@ -241,6 +242,7 @@ export function dealDamage(
     if (target.hp - amount <= 0) {
       amount = Math.max(0, target.hp);
       target.hp = 0;
+      grantPvpHonorForKill(ctx, source, target);
       match.defeated.add(target.id);
       ctx.emit({
         type: 'damage',
@@ -496,6 +498,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   if (e.kind === 'player') {
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    grantPvpHonorForKill(ctx, killer, e);
     e.autoAttack = false;
     e.queuedOnSwing = null;
     e.comboPoints = 0;
