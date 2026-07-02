@@ -5435,6 +5435,24 @@ export const ko_KR: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "코르박스 전쟁도끼"
       },
+      "conjured_bread4": {
+        "name": "마법 시나몬 롤"
+      },
+      "conjured_bread5": {
+        "name": "마법 사워도우 빵"
+      },
+      "conjured_bread6": {
+        "name": "마법 달콤한 케이크"
+      },
+      "conjured_water4": {
+        "name": "마법 수정 생수"
+      },
+      "conjured_water5": {
+        "name": "마법 빙하수"
+      },
+      "conjured_water6": {
+        "name": "마법 산악수"
+      },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
       },

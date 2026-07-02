@@ -5182,4 +5182,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Vhorlans flåklinge',
   'entities.items.warbringers_hellforged_cuirass.name': 'Krigsbringerens helvedessmedede kyras',
   'entities.items.khorvax_warcleaver.name': 'Khorvax-krigskløver',
+  'entities.items.conjured_bread4.name': 'Fremmanet kanelsnegl',
+  'entities.items.conjured_bread5.name': 'Fremmanet surdejsbrød',
+  'entities.items.conjured_bread6.name': 'Fremmanet sødkage',
+  'entities.items.conjured_water4.name': 'Fremmanet krystalvand',
+  'entities.items.conjured_water5.name': 'Fremmanet gletsjervand',
+  'entities.items.conjured_water6.name': 'Fremmanet bjergvand',
 };

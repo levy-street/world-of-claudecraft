@@ -5195,4 +5195,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Vhorlans flåklinga',
   'entities.items.warbringers_hellforged_cuirass.name': 'Krigsbringarens helvetessmidda kyrass',
   'entities.items.khorvax_warcleaver.name': 'Khorvax-krigsklyvare',
+  'entities.items.conjured_bread4.name': 'Framtrollad kanelbulle',
+  'entities.items.conjured_bread5.name': 'Framtrollat surdegsbröd',
+  'entities.items.conjured_bread6.name': 'Framtrollad sötkaka',
+  'entities.items.conjured_water4.name': 'Framtrollat kristallvatten',
+  'entities.items.conjured_water5.name': 'Framtrollat glaciärvatten',
+  'entities.items.conjured_water6.name': 'Framtrollat bergsvatten',
 };

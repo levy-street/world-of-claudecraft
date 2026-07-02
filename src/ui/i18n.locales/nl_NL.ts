@@ -5249,4 +5249,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Vhorlans vilkling',
   'entities.items.warbringers_hellforged_cuirass.name': 'Helgesmeed kuras van de Oorlogsbrenger',
   'entities.items.khorvax_warcleaver.name': 'Khorvax-oorlogskliever',
+  'entities.items.conjured_bread4.name': 'Opgeroepen kaneelbroodje',
+  'entities.items.conjured_bread5.name': 'Opgeroepen zuurdesembrood',
+  'entities.items.conjured_bread6.name': 'Opgeroepen zoete cake',
+  'entities.items.conjured_water4.name': 'Opgeroepen kristalwater',
+  'entities.items.conjured_water5.name': 'Opgeroepen gletsjerwater',
+  'entities.items.conjured_water6.name': 'Opgeroepen bergwater',
 };

@@ -5435,6 +5435,24 @@ export const da_DK: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Khorvax-krigskløver"
       },
+      "conjured_bread4": {
+        "name": "Fremmanet kanelsnegl"
+      },
+      "conjured_bread5": {
+        "name": "Fremmanet surdejsbrød"
+      },
+      "conjured_bread6": {
+        "name": "Fremmanet sødkage"
+      },
+      "conjured_water4": {
+        "name": "Fremmanet krystalvand"
+      },
+      "conjured_water5": {
+        "name": "Fremmanet gletsjervand"
+      },
+      "conjured_water6": {
+        "name": "Fremmanet bjergvand"
+      },
       "bristleback_maul": {
         "name": "Børsterygs-Lemlæster"
       },

@@ -5435,6 +5435,24 @@ export const id_ID: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Kapak Perang Khorvax"
       },
+      "conjured_bread4": {
+        "name": "Roti kayu manis sihir"
+      },
+      "conjured_bread5": {
+        "name": "Roti sourdough sihir"
+      },
+      "conjured_bread6": {
+        "name": "Kue manis sihir"
+      },
+      "conjured_water4": {
+        "name": "Air kristal sihir"
+      },
+      "conjured_water5": {
+        "name": "Air gletser sihir"
+      },
+      "conjured_water6": {
+        "name": "Air pegunungan sihir"
+      },
       "bristleback_maul": {
         "name": "Cabikan Punggung Berbulu"
       },

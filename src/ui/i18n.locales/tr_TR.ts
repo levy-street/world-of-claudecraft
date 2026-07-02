@@ -5186,4 +5186,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': "Vhorlan'ın Yüzme Keskisi",
   'entities.items.warbringers_hellforged_cuirass.name': 'Savaş Getirenin Cehennem Dövmesi Zırhı',
   'entities.items.khorvax_warcleaver.name': 'Khorvax Savaş Satırı',
+  'entities.items.conjured_bread4.name': 'Yaratılmış tarçınlı çörek',
+  'entities.items.conjured_bread5.name': 'Yaratılmış ekşi mayalı ekmek',
+  'entities.items.conjured_bread6.name': 'Yaratılmış tatlı kek',
+  'entities.items.conjured_water4.name': 'Yaratılmış kristal su',
+  'entities.items.conjured_water5.name': 'Yaratılmış buzul suyu',
+  'entities.items.conjured_water6.name': 'Yaratılmış dağ suyu',
 };

@@ -4,18 +4,20 @@
 // 1.5-level cap, kill-XP consumption (2x, kills only — not quests), the xp-bar
 // rested overlay fraction, and CharacterState persistence round-trip.
 import { describe, expect, it } from 'vitest';
+import { PROPS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { DT, xpForLevel } from '../src/sim/types';
-import { PROPS } from '../src/sim/data';
-import { xpBarView } from '../src/ui/xp_bar';
 import { terrainHeight } from '../src/sim/world';
+import { xpBarView } from '../src/ui/xp_bar';
 
 function makeSim(): Sim {
   return new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
 }
 
 function teleport(sim: Sim, e: any, x: number, z: number) {
-  e.pos.x = x; e.pos.z = z; e.pos.y = terrainHeight(x, z, sim.cfg.seed);
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = terrainHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
 }
 
@@ -29,7 +31,9 @@ describe('rested XP — accrual', () => {
     expect(sim.restedXp).toBe(0);
     for (let i = 0; i < 100; i++) sim.tick();
     // 5% of the level's XP per 8 in-game hours (= 8*60 sim seconds) for 100 ticks.
-    const perSecond = (0.05 * xpForLevel(sim.player.level)) / (8 * 60);
+    // default players are Human: the Promise of the Landing racial accrues
+    // rested XP 25% faster (see src/sim/content/races.ts)
+    const perSecond = ((0.05 * xpForLevel(sim.player.level)) / (8 * 60)) * 1.25;
     const expected = perSecond * DT * 100;
     expect(sim.restedXp).toBeCloseTo(expected, 4);
     expect(meta.restedXp).toBeGreaterThan(0);
@@ -113,14 +117,26 @@ describe('rested XP — consumption', () => {
 describe('rested XP — xp-bar overlay', () => {
   it('reports a rested overlay fraction ahead of the fill', () => {
     const need = xpForLevel(1);
-    const view = xpBarView({ level: 1, xp: need * 0.2, lifetimeXp: 0, restedXp: need * 0.3, showOverflow: false });
+    const view = xpBarView({
+      level: 1,
+      xp: need * 0.2,
+      lifetimeXp: 0,
+      restedXp: need * 0.3,
+      showOverflow: false,
+    });
     expect(view.fillFrac).toBeCloseTo(0.2, 5);
     expect(view.restedFrac).toBeCloseTo(0.3, 5);
   });
 
   it('clamps the overlay to the end of the bar', () => {
     const need = xpForLevel(1);
-    const view = xpBarView({ level: 1, xp: need * 0.8, lifetimeXp: 0, restedXp: need * 0.9, showOverflow: false });
+    const view = xpBarView({
+      level: 1,
+      xp: need * 0.8,
+      lifetimeXp: 0,
+      restedXp: need * 0.9,
+      showOverflow: false,
+    });
     expect(view.restedFrac).toBeCloseTo(0.2, 5); // 0.8 + 0.9 clamps to 1.0
   });
 

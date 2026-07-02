@@ -5277,4 +5277,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.warbringers_hellforged_cuirass.name':
     'Corazza forgiata agli inferi del Portaguerra',
   'entities.items.khorvax_warcleaver.name': 'Squarciatore da guerra di Khorvax',
+  'entities.items.conjured_bread4.name': 'Girella alla cannella evocata',
+  'entities.items.conjured_bread5.name': 'Pane a lievitazione naturale evocato',
+  'entities.items.conjured_bread6.name': 'Dolcetto evocato',
+  'entities.items.conjured_water4.name': 'Acqua cristallina evocata',
+  'entities.items.conjured_water5.name': 'Acqua glaciale evocata',
+  'entities.items.conjured_water6.name': 'Acqua di montagna evocata',
 };

@@ -372,6 +372,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
         threatFlat: 78,
         effects: [{ type: 'weaponDamage', bonus: 44 }],
       },
+
+      { rank: 5, level: 26, cost: 15, effects: [{ type: 'weaponDamage', bonus: 62 }] },
+      { rank: 6, level: 32, cost: 15, effects: [{ type: 'weaponDamage', bonus: 83 }] },
+      { rank: 7, level: 38, cost: 15, effects: [{ type: 'weaponDamage', bonus: 111 }] },
+      { rank: 8, level: 44, cost: 15, effects: [{ type: 'weaponDamage', bonus: 138 }] },
+      { rank: 9, level: 50, cost: 15, effects: [{ type: 'weaponDamage', bonus: 173 }] },
+      { rank: 10, level: 56, cost: 15, effects: [{ type: 'weaponDamage', bonus: 216 }] },
     ],
     description: 'A strong attack that increases melee damage by $d. Activates on your next swing.',
   },
@@ -401,6 +408,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 10,
         effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 50, duration: 120 }],
       },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 71, duration: 120 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 94, duration: 120 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 126, duration: 120 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 157, duration: 120 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 196, duration: 120 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 245, duration: 120 }],
+      },
     ],
     description: 'Increases your attack power by 20 for 2 min.',
   },
@@ -424,6 +468,37 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 10,
         effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 11, duration: 120 }],
       },
+
+      {
+        rank: 3,
+        level: 30,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 16, duration: 120 }],
+      },
+      {
+        rank: 4,
+        level: 36,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 21, duration: 120 }],
+      },
+      {
+        rank: 5,
+        level: 42,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 28, duration: 120 }],
+      },
+      {
+        rank: 6,
+        level: 48,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 35, duration: 120 }],
+      },
+      {
+        rank: 7,
+        level: 54,
+        cost: 10,
+        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 43, duration: 120 }],
+      },
     ],
     description: 'Increases your Stamina by 6 for 2 min.',
   },
@@ -445,6 +520,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 10,
         effects: [{ type: 'aoeAttackPower', amount: 45, duration: 30, radius: 10 }],
+      },
+
+      {
+        rank: 3,
+        level: 26,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 64, duration: 30, radius: 10 }],
+      },
+      {
+        rank: 4,
+        level: 32,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 85, duration: 30, radius: 10 }],
+      },
+      {
+        rank: 5,
+        level: 38,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 113, duration: 30, radius: 10 }],
+      },
+      {
+        rank: 6,
+        level: 44,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 141, duration: 30, radius: 10 }],
+      },
+      {
+        rank: 7,
+        level: 50,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 177, duration: 30, radius: 10 }],
+      },
+      {
+        rank: 8,
+        level: 56,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 221, duration: 30, radius: 10 }],
       },
     ],
     description:
@@ -491,6 +603,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 10,
         effects: [{ type: 'dot', total: 36, duration: 12, interval: 3 }],
       },
+
+      {
+        rank: 4,
+        level: 22,
+        cost: 10,
+        effects: [{ type: 'dot', total: 51, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 5,
+        level: 28,
+        cost: 10,
+        effects: [{ type: 'dot', total: 73, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 6,
+        level: 34,
+        cost: 10,
+        effects: [{ type: 'dot', total: 97, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 7,
+        level: 40,
+        cost: 10,
+        effects: [{ type: 'dot', total: 128, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 8,
+        level: 46,
+        cost: 10,
+        effects: [{ type: 'dot', total: 161, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 9,
+        level: 52,
+        cost: 10,
+        effects: [{ type: 'dot', total: 201, duration: 12, interval: 3 }],
+      },
     ],
     description: 'Wounds the target, causing them to bleed for $d damage over 9 sec.',
   },
@@ -529,6 +678,61 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'aoeAttackSpeed', mult: 1.1, duration: 10, radius: 8 },
         ],
       },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 20,
+        effects: [
+          { type: 'aoeDamage', min: 43, max: 49, radius: 8 },
+          { type: 'aoeAttackSpeed', mult: 1.1, duration: 10, radius: 8 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 20,
+        effects: [
+          { type: 'aoeDamage', min: 49, max: 57, radius: 8 },
+          { type: 'aoeAttackSpeed', mult: 1.1, duration: 10, radius: 8 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 20,
+        effects: [
+          { type: 'aoeDamage', min: 56, max: 65, radius: 8 },
+          { type: 'aoeAttackSpeed', mult: 1.1, duration: 10, radius: 8 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 20,
+        effects: [
+          { type: 'aoeDamage', min: 65, max: 75, radius: 8 },
+          { type: 'aoeAttackSpeed', mult: 1.1, duration: 10, radius: 8 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 20,
+        effects: [
+          { type: 'aoeDamage', min: 74, max: 86, radius: 8 },
+          { type: 'aoeAttackSpeed', mult: 1.1, duration: 10, radius: 8 },
+        ],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 20,
+        effects: [
+          { type: 'aoeDamage', min: 86, max: 99, radius: 8 },
+          { type: 'aoeAttackSpeed', mult: 1.1, duration: 10, radius: 8 },
+        ],
+      },
     ],
     description: 'Blasts nearby enemies for $d damage and slows their attacks by 10% for 10 sec.',
   },
@@ -554,6 +758,61 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 10,
         effects: [
           { type: 'directDamage', min: 12, max: 12 },
+          { type: 'slow', mult: 0.5, duration: 15 },
+        ],
+      },
+
+      {
+        rank: 3,
+        level: 22,
+        cost: 10,
+        effects: [
+          { type: 'directDamage', min: 14, max: 14 },
+          { type: 'slow', mult: 0.5, duration: 15 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 28,
+        cost: 10,
+        effects: [
+          { type: 'directDamage', min: 16, max: 16 },
+          { type: 'slow', mult: 0.5, duration: 15 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 34,
+        cost: 10,
+        effects: [
+          { type: 'directDamage', min: 18, max: 18 },
+          { type: 'slow', mult: 0.5, duration: 15 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 40,
+        cost: 10,
+        effects: [
+          { type: 'directDamage', min: 21, max: 21 },
+          { type: 'slow', mult: 0.5, duration: 15 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 46,
+        cost: 10,
+        effects: [
+          { type: 'directDamage', min: 24, max: 24 },
+          { type: 'slow', mult: 0.5, duration: 15 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 52,
+        cost: 10,
+        effects: [
+          { type: 'directDamage', min: 28, max: 28 },
           { type: 'slow', mult: 0.5, duration: 15 },
         ],
       },
@@ -598,6 +857,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 5,
         effects: [{ type: 'weaponStrike', bonus: 15, cannotBeDodged: true }],
       },
+
+      {
+        rank: 3,
+        level: 22,
+        cost: 5,
+        effects: [{ type: 'weaponStrike', bonus: 21, cannotBeDodged: true }],
+      },
+      {
+        rank: 4,
+        level: 28,
+        cost: 5,
+        effects: [{ type: 'weaponStrike', bonus: 30, cannotBeDodged: true }],
+      },
+      {
+        rank: 5,
+        level: 34,
+        cost: 5,
+        effects: [{ type: 'weaponStrike', bonus: 40, cannotBeDodged: true }],
+      },
+      {
+        rank: 6,
+        level: 40,
+        cost: 5,
+        effects: [{ type: 'weaponStrike', bonus: 54, cannotBeDodged: true }],
+      },
+      {
+        rank: 7,
+        level: 46,
+        cost: 5,
+        effects: [{ type: 'weaponStrike', bonus: 67, cannotBeDodged: true }],
+      },
+      {
+        rank: 8,
+        level: 52,
+        cost: 5,
+        effects: [{ type: 'weaponStrike', bonus: 84, cannotBeDodged: true }],
+      },
     ],
     description:
       'Instant attack for weapon damage +5. Only usable after the target dodges. Cannot be dodged.',
@@ -615,6 +911,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     requiresTargetHpBelow: 0.2,
     effects: [{ type: 'directDamage', min: 60, max: 75 }],
+    ranks: [
+      { rank: 2, level: 24, cost: 15, effects: [{ type: 'directDamage', min: 76, max: 95 }] },
+      { rank: 3, level: 32, cost: 15, effects: [{ type: 'directDamage', min: 88, max: 110 }] },
+      { rank: 4, level: 40, cost: 15, effects: [{ type: 'directDamage', min: 100, max: 125 }] },
+      { rank: 5, level: 48, cost: 15, effects: [{ type: 'directDamage', min: 112, max: 140 }] },
+      { rank: 6, level: 56, cost: 15, effects: [{ type: 'directDamage', min: 124, max: 155 }] },
+    ],
     description:
       'Attempt to finish off a wounded foe, causing $d damage. Only usable on enemies below 20% health.',
   },
@@ -630,6 +933,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'weaponStrike', bonus: 25 }],
+    ranks: [
+      { rank: 2, level: 24, cost: 15, effects: [{ type: 'weaponStrike', bonus: 40 }] },
+      { rank: 3, level: 32, cost: 15, effects: [{ type: 'weaponStrike', bonus: 58 }] },
+      { rank: 4, level: 40, cost: 15, effects: [{ type: 'weaponStrike', bonus: 85 }] },
+      { rank: 5, level: 48, cost: 15, effects: [{ type: 'weaponStrike', bonus: 115 }] },
+      { rank: 6, level: 56, cost: 15, effects: [{ type: 'weaponStrike', bonus: 155 }] },
+    ],
     description: 'Slams the opponent for weapon damage plus $d.',
   },
   cleave: {
@@ -645,6 +955,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     threat: { flat: 30 }, // classic 100 at rank 5/level 58, scaled to the 1-20 band
     effects: [{ type: 'aoeDamage', min: 20, max: 26, radius: 5 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 26,
+        cost: 20,
+        effects: [{ type: 'aoeDamage', min: 24, max: 31, radius: 5 }],
+      },
+      {
+        rank: 3,
+        level: 34,
+        cost: 20,
+        effects: [{ type: 'aoeDamage', min: 29, max: 38, radius: 5 }],
+      },
+      {
+        rank: 4,
+        level: 42,
+        cost: 20,
+        effects: [{ type: 'aoeDamage', min: 35, max: 45, radius: 5 }],
+      },
+      {
+        rank: 5,
+        level: 50,
+        cost: 20,
+        effects: [{ type: 'aoeDamage', min: 42, max: 55, radius: 5 }],
+      },
+      {
+        rank: 6,
+        level: 58,
+        cost: 20,
+        effects: [{ type: 'aoeDamage', min: 51, max: 66, radius: 5 }],
+      },
+    ],
     description: 'A sweeping strike that hits all enemies in front of you for $d damage.',
   },
   defensive_stance: {
@@ -684,6 +1026,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
         threatFlat: 130,
         effects: [{ type: 'sunder', armor: 40, maxStacks: 5 }],
       },
+
+      { rank: 3, level: 22, cost: 15, effects: [{ type: 'sunder', armor: 57, maxStacks: 5 }] },
+      { rank: 4, level: 28, cost: 15, effects: [{ type: 'sunder', armor: 81, maxStacks: 5 }] },
+      { rank: 5, level: 34, cost: 15, effects: [{ type: 'sunder', armor: 107, maxStacks: 5 }] },
+      { rank: 6, level: 40, cost: 15, effects: [{ type: 'sunder', armor: 143, maxStacks: 5 }] },
+      { rank: 7, level: 46, cost: 15, effects: [{ type: 'sunder', armor: 178, maxStacks: 5 }] },
+      { rank: 8, level: 52, cost: 15, effects: [{ type: 'sunder', armor: 223, maxStacks: 5 }] },
     ],
     description:
       "Sunders the target's armor, reducing it by $d per application. Stacks up to 5 times. Generates a high amount of threat.",
@@ -752,6 +1101,67 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'dot', total: 12, duration: 8, interval: 2 },
         ],
       },
+
+      {
+        rank: 5,
+        level: 24,
+        cost: 130,
+        castTime: 3.0,
+        effects: [
+          { type: 'directDamage', min: 82, max: 111 },
+          { type: 'dot', total: 17, duration: 8, interval: 2 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 30,
+        cost: 175,
+        castTime: 3.0,
+        effects: [
+          { type: 'directDamage', min: 117, max: 157 },
+          { type: 'dot', total: 24, duration: 8, interval: 2 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 36,
+        cost: 210,
+        castTime: 3.0,
+        effects: [
+          { type: 'directDamage', min: 156, max: 209 },
+          { type: 'dot', total: 32, duration: 8, interval: 2 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 42,
+        cost: 250,
+        castTime: 3.0,
+        effects: [
+          { type: 'directDamage', min: 207, max: 278 },
+          { type: 'dot', total: 43, duration: 8, interval: 2 },
+        ],
+      },
+      {
+        rank: 9,
+        level: 48,
+        cost: 290,
+        castTime: 3.0,
+        effects: [
+          { type: 'directDamage', min: 259, max: 348 },
+          { type: 'dot', total: 54, duration: 8, interval: 2 },
+        ],
+      },
+      {
+        rank: 10,
+        level: 54,
+        cost: 335,
+        castTime: 3.0,
+        effects: [
+          { type: 'directDamage', min: 323, max: 435 },
+          { type: 'dot', total: 67, duration: 8, interval: 2 },
+        ],
+      },
     ],
     description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
   },
@@ -780,6 +1190,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 45,
         effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 70, duration: 1800 }],
       },
+
+      {
+        rank: 4,
+        level: 24,
+        cost: 60,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 99, duration: 1800 }],
+      },
+      {
+        rank: 5,
+        level: 30,
+        cost: 80,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 141, duration: 1800 }],
+      },
+      {
+        rank: 6,
+        level: 36,
+        cost: 95,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 188, duration: 1800 }],
+      },
+      {
+        rank: 7,
+        level: 42,
+        cost: 115,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 250, duration: 1800 }],
+      },
+      {
+        rank: 8,
+        level: 48,
+        cost: 130,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 312, duration: 1800 }],
+      },
+      {
+        rank: 9,
+        level: 54,
+        cost: 150,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 390, duration: 1800 }],
+      },
     ],
     description: 'Encases you in frost, increasing armor by 30 for 30 min.',
   },
@@ -801,6 +1248,49 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 14,
         cost: 60,
         effects: [{ type: 'selfBuff', kind: 'buff_int', value: 7, duration: 1800 }],
+      },
+
+      {
+        rank: 3,
+        level: 20,
+        cost: 80,
+        effects: [{ type: 'selfBuff', kind: 'buff_int', value: 10, duration: 1800 }],
+      },
+      {
+        rank: 4,
+        level: 26,
+        cost: 110,
+        effects: [{ type: 'selfBuff', kind: 'buff_int', value: 14, duration: 1800 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 130,
+        effects: [{ type: 'selfBuff', kind: 'buff_int', value: 19, duration: 1800 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 155,
+        effects: [{ type: 'selfBuff', kind: 'buff_int', value: 25, duration: 1800 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 180,
+        effects: [{ type: 'selfBuff', kind: 'buff_int', value: 31, duration: 1800 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 205,
+        effects: [{ type: 'selfBuff', kind: 'buff_int', value: 39, duration: 1800 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 235,
+        effects: [{ type: 'selfBuff', kind: 'buff_int', value: 49, duration: 1800 }],
       },
     ],
     description: 'Increases Intellect by 2 for 30 min.',
@@ -851,6 +1341,67 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'slow', mult: 0.6, duration: 9 },
         ],
       },
+
+      {
+        rank: 5,
+        level: 26,
+        cost: 95,
+        castTime: 2.5,
+        effects: [
+          { type: 'directDamage', min: 94, max: 105 },
+          { type: 'slow', mult: 0.6, duration: 9 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 32,
+        cost: 115,
+        castTime: 2.5,
+        effects: [
+          { type: 'directDamage', min: 125, max: 140 },
+          { type: 'slow', mult: 0.6, duration: 9 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 38,
+        cost: 140,
+        castTime: 2.5,
+        effects: [
+          { type: 'directDamage', min: 166, max: 186 },
+          { type: 'slow', mult: 0.6, duration: 9 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 44,
+        cost: 160,
+        castTime: 2.5,
+        effects: [
+          { type: 'directDamage', min: 207, max: 232 },
+          { type: 'slow', mult: 0.6, duration: 9 },
+        ],
+      },
+      {
+        rank: 9,
+        level: 50,
+        cost: 185,
+        castTime: 2.5,
+        effects: [
+          { type: 'directDamage', min: 259, max: 290 },
+          { type: 'slow', mult: 0.6, duration: 9 },
+        ],
+      },
+      {
+        rank: 10,
+        level: 56,
+        cost: 215,
+        castTime: 2.5,
+        effects: [
+          { type: 'directDamage', min: 324, max: 363 },
+          { type: 'slow', mult: 0.6, duration: 9 },
+        ],
+      },
     ],
     description: 'Launches a bolt of frost, causing $d Frost damage and slowing movement by 40%.',
   },
@@ -869,6 +1420,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 10, cost: 70, effects: [] },
       { rank: 3, level: 16, cost: 110, effects: [] },
+      { rank: 4, level: 28, cost: 155, effects: [] },
+      { rank: 5, level: 40, cost: 205, effects: [] },
+      { rank: 6, level: 52, cost: 255, effects: [] },
     ],
     description:
       'Conjures 2 bottles of water, restoring mana when drunk. Higher ranks conjure purer water.',
@@ -888,6 +1442,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 12, cost: 75, effects: [] },
       { rank: 3, level: 18, cost: 115, effects: [] },
+      { rank: 4, level: 28, cost: 160, effects: [] },
+      { rank: 5, level: 40, cost: 210, effects: [] },
+      { rank: 6, level: 52, cost: 260, effects: [] },
     ],
     description:
       'Conjures 2 servings of bread, restoring health when eaten. Higher ranks conjure heartier fare.',
@@ -907,6 +1464,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 12, cost: 60, effects: [{ type: 'directDamage', min: 44, max: 54 }] },
       { rank: 3, level: 18, cost: 85, effects: [{ type: 'directDamage', min: 68, max: 82 }] },
+
+      { rank: 4, level: 24, cost: 115, effects: [{ type: 'directDamage', min: 97, max: 116 }] },
+      { rank: 5, level: 30, cost: 155, effects: [{ type: 'directDamage', min: 137, max: 165 }] },
+      { rank: 6, level: 36, cost: 185, effects: [{ type: 'directDamage', min: 182, max: 220 }] },
+      { rank: 7, level: 42, cost: 220, effects: [{ type: 'directDamage', min: 243, max: 292 }] },
+      { rank: 8, level: 48, cost: 255, effects: [{ type: 'directDamage', min: 303, max: 366 }] },
+      { rank: 9, level: 54, cost: 295, effects: [{ type: 'directDamage', min: 379, max: 457 }] },
     ],
     description: 'Blasts the enemy for $d Fire damage. Instant.',
   },
@@ -926,6 +1490,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 14, cost: 75, effects: [{ type: 'directDamage', min: 14, max: 14 }] },
       { rank: 3, level: 20, cost: 105, effects: [{ type: 'directDamage', min: 22, max: 22 }] },
+
+      { rank: 4, level: 26, cost: 140, effects: [{ type: 'directDamage', min: 31, max: 31 }] },
+      { rank: 5, level: 32, cost: 170, effects: [{ type: 'directDamage', min: 42, max: 42 }] },
+      { rank: 6, level: 38, cost: 205, effects: [{ type: 'directDamage', min: 55, max: 55 }] },
+      { rank: 7, level: 44, cost: 235, effects: [{ type: 'directDamage', min: 69, max: 69 }] },
+      { rank: 8, level: 50, cost: 270, effects: [{ type: 'directDamage', min: 86, max: 86 }] },
+      { rank: 9, level: 56, cost: 310, effects: [{ type: 'directDamage', min: 108, max: 108 }] },
     ],
     description:
       'Launches Arcane Missiles at the enemy, causing $d Arcane damage each second for 3 sec.',
@@ -965,6 +1536,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 50,
         effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 12, max: 14 }],
       },
+
+      {
+        rank: 3,
+        level: 22,
+        cost: 70,
+        effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 17, max: 20 }],
+      },
+      {
+        rank: 4,
+        level: 28,
+        cost: 95,
+        effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 24, max: 28 }],
+      },
+      {
+        rank: 5,
+        level: 34,
+        cost: 115,
+        effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 32, max: 38 }],
+      },
+      {
+        rank: 6,
+        level: 40,
+        cost: 140,
+        effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 43, max: 50 }],
+      },
+      {
+        rank: 7,
+        level: 46,
+        cost: 160,
+        effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 54, max: 62 }],
+      },
+      {
+        rank: 8,
+        level: 52,
+        cost: 185,
+        effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 67, max: 78 }],
+      },
     ],
     description: 'Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage.',
   },
@@ -980,6 +1588,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: false,
     effects: [{ type: 'aoeDamage', min: 26, max: 31, radius: 10 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 22,
+        cost: 90,
+        effects: [{ type: 'aoeDamage', min: 41, max: 49, radius: 10 }],
+      },
+      {
+        rank: 3,
+        level: 30,
+        cost: 135,
+        effects: [{ type: 'aoeDamage', min: 66, max: 79, radius: 10 }],
+      },
+      {
+        rank: 4,
+        level: 38,
+        cost: 170,
+        effects: [{ type: 'aoeDamage', min: 97, max: 116, radius: 10 }],
+      },
+      {
+        rank: 5,
+        level: 46,
+        cost: 205,
+        effects: [{ type: 'aoeDamage', min: 130, max: 156, radius: 10 }],
+      },
+      {
+        rank: 6,
+        level: 54,
+        cost: 245,
+        effects: [{ type: 'aoeDamage', min: 176, max: 209, radius: 10 }],
+      },
+    ],
     description: 'A burst of Arcane energy hits all nearby enemies for $d Arcane damage.',
   },
   scorch: {
@@ -994,6 +1634,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'fire',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 32, max: 40 }],
+    ranks: [
+      { rank: 2, level: 24, cost: 50, effects: [{ type: 'directDamage', min: 51, max: 64 }] },
+      { rank: 3, level: 32, cost: 65, effects: [{ type: 'directDamage', min: 75, max: 93 }] },
+      { rank: 4, level: 40, cost: 85, effects: [{ type: 'directDamage', min: 109, max: 137 }] },
+      { rank: 5, level: 48, cost: 100, effects: [{ type: 'directDamage', min: 147, max: 184 }] },
+      { rank: 6, level: 56, cost: 120, effects: [{ type: 'directDamage', min: 198, max: 248 }] },
+    ],
     description: 'Scorches the enemy for $d Fire damage. Quick to cast.',
   },
   pyroblast: {
@@ -1011,6 +1658,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'directDamage', min: 170, max: 225 },
       { type: 'dot', total: 48, duration: 12, interval: 2 },
     ],
+    ranks: [
+      {
+        rank: 2,
+        level: 28,
+        cost: 185,
+        effects: [
+          { type: 'directDamage', min: 271, max: 359 },
+          { type: 'dot', total: 77, duration: 12, interval: 2 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 36,
+        cost: 235,
+        effects: [
+          { type: 'directDamage', min: 397, max: 525 },
+          { type: 'dot', total: 112, duration: 12, interval: 2 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 44,
+        cost: 285,
+        effects: [
+          { type: 'directDamage', min: 534, max: 707 },
+          { type: 'dot', total: 151, duration: 12, interval: 2 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 52,
+        cost: 345,
+        effects: [
+          { type: 'directDamage', min: 720, max: 952 },
+          { type: 'dot', total: 203, duration: 12, interval: 2 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 60,
+        cost: 415,
+        effects: [
+          { type: 'directDamage', min: 969, max: 1282 },
+          { type: 'dot', total: 274, duration: 12, interval: 2 },
+        ],
+      },
+    ],
     description:
       'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
   },
@@ -1026,6 +1720,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'frost',
     requiresTarget: false,
     effects: [{ type: 'absorb', amount: 130, duration: 60 }],
+    ranks: [
+      { rank: 2, level: 30, cost: 150, effects: [{ type: 'absorb', amount: 233, duration: 60 }] },
+      { rank: 3, level: 40, cost: 205, effects: [{ type: 'absorb', amount: 375, duration: 60 }] },
+      { rank: 4, level: 50, cost: 260, effects: [{ type: 'absorb', amount: 544, duration: 60 }] },
+      { rank: 5, level: 60, cost: 330, effects: [{ type: 'absorb', amount: 789, duration: 60 }] },
+    ],
     description: 'Shields you in ice, absorbing 130 damage for 60 sec.',
   },
 
@@ -1047,6 +1747,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 8, cost: 45, effects: [{ type: 'weaponStrike', bonus: 6 }] },
       { rank: 3, level: 14, cost: 45, effects: [{ type: 'weaponStrike', bonus: 12 }] },
       { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponStrike', bonus: 18 }] },
+
+      { rank: 5, level: 26, cost: 45, effects: [{ type: 'weaponStrike', bonus: 26 }] },
+      { rank: 6, level: 32, cost: 45, effects: [{ type: 'weaponStrike', bonus: 34 }] },
+      { rank: 7, level: 38, cost: 45, effects: [{ type: 'weaponStrike', bonus: 45 }] },
+      { rank: 8, level: 44, cost: 45, effects: [{ type: 'weaponStrike', bonus: 57 }] },
+      { rank: 9, level: 50, cost: 45, effects: [{ type: 'weaponStrike', bonus: 71 }] },
+      { rank: 10, level: 56, cost: 45, effects: [{ type: 'weaponStrike', bonus: 88 }] },
     ],
     description: 'An instant strike for weapon damage plus $d. Awards 1 combo point.',
   },
@@ -1075,6 +1782,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 18,
         cost: 35,
         effects: [{ type: 'finisherDamage', base: 14, perCombo: 18, variance: 9 }],
+      },
+
+      {
+        rank: 4,
+        level: 24,
+        cost: 35,
+        effects: [{ type: 'finisherDamage', base: 20, perCombo: 26, variance: 13 }],
+      },
+      {
+        rank: 5,
+        level: 30,
+        cost: 35,
+        effects: [{ type: 'finisherDamage', base: 28, perCombo: 36, variance: 18 }],
+      },
+      {
+        rank: 6,
+        level: 36,
+        cost: 35,
+        effects: [{ type: 'finisherDamage', base: 38, perCombo: 48, variance: 24 }],
+      },
+      {
+        rank: 7,
+        level: 42,
+        cost: 35,
+        effects: [{ type: 'finisherDamage', base: 50, perCombo: 64, variance: 32 }],
+      },
+      {
+        rank: 8,
+        level: 48,
+        cost: 35,
+        effects: [{ type: 'finisherDamage', base: 62, perCombo: 80, variance: 40 }],
+      },
+      {
+        rank: 9,
+        level: 54,
+        cost: 35,
+        effects: [{ type: 'finisherDamage', base: 78, perCombo: 100, variance: 50 }],
       },
     ],
     description: 'Finishing move that causes damage per combo point.',
@@ -1105,6 +1849,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 60,
         effects: [{ type: 'weaponStrike', bonus: 32, requiresBehind: true, weaponMult: 1.5 }],
       },
+
+      {
+        rank: 4,
+        level: 24,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 45, requiresBehind: true, weaponMult: 1.5 }],
+      },
+      {
+        rank: 5,
+        level: 30,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 65, requiresBehind: true, weaponMult: 1.5 }],
+      },
+      {
+        rank: 6,
+        level: 36,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 86, requiresBehind: true, weaponMult: 1.5 }],
+      },
+      {
+        rank: 7,
+        level: 42,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 114, requiresBehind: true, weaponMult: 1.5 }],
+      },
+      {
+        rank: 8,
+        level: 48,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 143, requiresBehind: true, weaponMult: 1.5 }],
+      },
+      {
+        rank: 9,
+        level: 54,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 178, requiresBehind: true, weaponMult: 1.5 }],
+      },
     ],
     description:
       'Backstab the target for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point.',
@@ -1132,6 +1913,70 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 45,
         effects: [
           { type: 'directDamage', min: 15, max: 17 },
+          { type: 'incapacitate', duration: 4 },
+        ],
+      },
+
+      {
+        rank: 3,
+        level: 20,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 17, max: 20 },
+          { type: 'incapacitate', duration: 4 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 26,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 20, max: 22 },
+          { type: 'incapacitate', duration: 4 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 23, max: 26 },
+          { type: 'incapacitate', duration: 4 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 26, max: 30 },
+          { type: 'incapacitate', duration: 4 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 30, max: 34 },
+          { type: 'incapacitate', duration: 4 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 35, max: 39 },
+          { type: 'incapacitate', duration: 4 },
+        ],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 40, max: 45 },
           { type: 'incapacitate', duration: 4 },
         ],
       },
@@ -1214,6 +2059,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     awardsCombo: 1,
     requiresStealth: true,
     effects: [{ type: 'weaponStrike', bonus: 28, requiresBehind: true, weaponMult: 2.5 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 26,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 50, requiresBehind: true, weaponMult: 2.5 }],
+      },
+      {
+        rank: 3,
+        level: 34,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 73, requiresBehind: true, weaponMult: 2.5 }],
+      },
+      {
+        rank: 4,
+        level: 42,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 107, requiresBehind: true, weaponMult: 2.5 }],
+      },
+      {
+        rank: 5,
+        level: 50,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 145, requiresBehind: true, weaponMult: 2.5 }],
+      },
+      {
+        rank: 6,
+        level: 58,
+        cost: 60,
+        effects: [{ type: 'weaponStrike', bonus: 195, requiresBehind: true, weaponMult: 2.5 }],
+      },
+    ],
     description:
       'Ambush the target for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
   },
@@ -1274,6 +2151,70 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [
           { type: 'directDamage', min: 9, max: 12 },
           { type: 'dot', total: 132, duration: 18, interval: 3 },
+        ],
+      },
+
+      {
+        rank: 3,
+        level: 20,
+        cost: 50,
+        effects: [
+          { type: 'directDamage', min: 10, max: 14 },
+          { type: 'dot', total: 152, duration: 18, interval: 3 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 26,
+        cost: 50,
+        effects: [
+          { type: 'directDamage', min: 12, max: 16 },
+          { type: 'dot', total: 175, duration: 18, interval: 3 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 50,
+        effects: [
+          { type: 'directDamage', min: 14, max: 18 },
+          { type: 'dot', total: 201, duration: 18, interval: 3 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 50,
+        effects: [
+          { type: 'directDamage', min: 16, max: 21 },
+          { type: 'dot', total: 231, duration: 18, interval: 3 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 50,
+        effects: [
+          { type: 'directDamage', min: 18, max: 24 },
+          { type: 'dot', total: 265, duration: 18, interval: 3 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 50,
+        effects: [
+          { type: 'directDamage', min: 21, max: 28 },
+          { type: 'dot', total: 305, duration: 18, interval: 3 },
+        ],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 50,
+        effects: [
+          { type: 'directDamage', min: 24, max: 32 },
+          { type: 'dot', total: 351, duration: 18, interval: 3 },
         ],
       },
     ],
@@ -1348,6 +2289,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     effects: [{ type: 'sunder', armor: 170, maxStacks: 1 }],
+    ranks: [
+      { rank: 2, level: 26, cost: 25, effects: [{ type: 'sunder', armor: 343, maxStacks: 1 }] },
+      { rank: 3, level: 36, cost: 25, effects: [{ type: 'sunder', armor: 551, maxStacks: 1 }] },
+      { rank: 4, level: 46, cost: 25, effects: [{ type: 'sunder', armor: 800, maxStacks: 1 }] },
+      { rank: 5, level: 56, cost: 25, effects: [{ type: 'sunder', armor: 1160, maxStacks: 1 }] },
+    ],
     description:
       'Finishing move that exposes the target, reducing its armor. More combo points spent build into a deeper cut.',
   },
@@ -1364,6 +2311,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     effects: [{ type: 'dot', total: 96, duration: 16, interval: 2 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 24,
+        cost: 25,
+        effects: [{ type: 'dot', total: 116, duration: 16, interval: 2 }],
+      },
+      {
+        rank: 3,
+        level: 32,
+        cost: 25,
+        effects: [{ type: 'dot', total: 139, duration: 16, interval: 2 }],
+      },
+      {
+        rank: 4,
+        level: 40,
+        cost: 25,
+        effects: [{ type: 'dot', total: 168, duration: 16, interval: 2 }],
+      },
+      {
+        rank: 5,
+        level: 48,
+        cost: 25,
+        effects: [{ type: 'dot', total: 202, duration: 16, interval: 2 }],
+      },
+      {
+        rank: 6,
+        level: 56,
+        cost: 25,
+        effects: [{ type: 'dot', total: 244, duration: 16, interval: 2 }],
+      },
+    ],
     description: 'Finishing move that wounds the target, causing it to bleed for $d over 16 sec.',
   },
   vanish: {
@@ -1394,6 +2373,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'imbue', bonus: 8, duration: 1800 }],
+    ranks: [
+      { rank: 2, level: 26, cost: 40, effects: [{ type: 'imbue', bonus: 13, duration: 1800 }] },
+      { rank: 3, level: 34, cost: 40, effects: [{ type: 'imbue', bonus: 19, duration: 1800 }] },
+      { rank: 4, level: 42, cost: 40, effects: [{ type: 'imbue', bonus: 27, duration: 1800 }] },
+      { rank: 5, level: 50, cost: 40, effects: [{ type: 'imbue', bonus: 37, duration: 1800 }] },
+      { rank: 6, level: 58, cost: 40, effects: [{ type: 'imbue', bonus: 50, duration: 1800 }] },
+    ],
     description:
       'Coats your weapon for 30 min, causing each of your melee swings to deal 8 additional Nature damage.',
   },
@@ -1409,6 +2395,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'imbue', bonus: 14, duration: 1800 }],
+    ranks: [
+      { rank: 2, level: 28, cost: 40, effects: [{ type: 'imbue', bonus: 22, duration: 1800 }] },
+      { rank: 3, level: 36, cost: 40, effects: [{ type: 'imbue', bonus: 33, duration: 1800 }] },
+      { rank: 4, level: 44, cost: 40, effects: [{ type: 'imbue', bonus: 44, duration: 1800 }] },
+      { rank: 5, level: 52, cost: 40, effects: [{ type: 'imbue', bonus: 59, duration: 1800 }] },
+      { rank: 6, level: 60, cost: 40, effects: [{ type: 'imbue', bonus: 80, duration: 1800 }] },
+    ],
     description:
       'Coats your weapon for 30 min, causing each of your melee swings to deal 14 additional Nature damage.',
   },
@@ -1454,6 +2447,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 50,
         effects: [{ type: 'imbue', bonus: 11, duration: 30, judgeMin: 30, judgeMax: 44 }],
       },
+
+      {
+        rank: 4,
+        level: 22,
+        cost: 70,
+        effects: [{ type: 'imbue', bonus: 16, duration: 30, judgeMin: 43, judgeMax: 62 }],
+      },
+      {
+        rank: 5,
+        level: 28,
+        cost: 95,
+        effects: [{ type: 'imbue', bonus: 22, duration: 30, judgeMin: 60, judgeMax: 89 }],
+      },
+      {
+        rank: 6,
+        level: 34,
+        cost: 115,
+        effects: [{ type: 'imbue', bonus: 29, duration: 30, judgeMin: 80, judgeMax: 118 }],
+      },
+      {
+        rank: 7,
+        level: 40,
+        cost: 140,
+        effects: [{ type: 'imbue', bonus: 39, duration: 30, judgeMin: 107, judgeMax: 157 }],
+      },
+      {
+        rank: 8,
+        level: 46,
+        cost: 160,
+        effects: [{ type: 'imbue', bonus: 49, duration: 30, judgeMin: 134, judgeMax: 196 }],
+      },
+      {
+        rank: 9,
+        level: 52,
+        cost: 185,
+        effects: [{ type: 'imbue', bonus: 61, duration: 30, judgeMin: 167, judgeMax: 245 }],
+      },
     ],
     description:
       'Fills you with Holy power for 30 sec, causing each of your melee swings to deal 4 additional Holy damage. Unleash with Judgement.',
@@ -1475,6 +2505,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 8, cost: 60, effects: [{ type: 'heal', min: 76, max: 90 }] },
       { rank: 3, level: 14, cost: 95, effects: [{ type: 'heal', min: 122, max: 144 }] },
       { rank: 4, level: 20, cost: 140, effects: [{ type: 'heal', min: 190, max: 222 }] },
+
+      { rank: 5, level: 26, cost: 190, effects: [{ type: 'heal', min: 270, max: 315 }] },
+      { rank: 6, level: 32, cost: 230, effects: [{ type: 'heal', min: 359, max: 419 }] },
+      { rank: 7, level: 38, cost: 275, effects: [{ type: 'heal', min: 477, max: 558 }] },
+      { rank: 8, level: 44, cost: 315, effects: [{ type: 'heal', min: 597, max: 697 }] },
+      { rank: 9, level: 50, cost: 360, effects: [{ type: 'heal', min: 746, max: 871 }] },
+      { rank: 10, level: 56, cost: 415, effects: [{ type: 'heal', min: 932, max: 1089 }] },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -1503,6 +2540,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 18,
         cost: 0,
         effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 110, duration: 1800 }],
+      },
+
+      {
+        rank: 4,
+        level: 24,
+        cost: 0,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 156, duration: 1800 }],
+      },
+      {
+        rank: 5,
+        level: 30,
+        cost: 0,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 222, duration: 1800 }],
+      },
+      {
+        rank: 6,
+        level: 36,
+        cost: 0,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 295, duration: 1800 }],
+      },
+      {
+        rank: 7,
+        level: 42,
+        cost: 0,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 392, duration: 1800 }],
+      },
+      {
+        rank: 8,
+        level: 48,
+        cost: 0,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 490, duration: 1800 }],
+      },
+      {
+        rank: 9,
+        level: 54,
+        cost: 0,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 613, duration: 1800 }],
       },
     ],
     description: 'Increases your armor by 40 for 30 min.',
@@ -1548,6 +2622,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 60,
         effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 45, duration: 300 }],
       },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 80,
+        effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 64, duration: 300 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 95,
+        effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 85, duration: 300 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 115,
+        effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 113, duration: 300 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 130,
+        effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 141, duration: 300 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 150,
+        effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 177, duration: 300 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 170,
+        effects: [{ type: 'buffTarget', kind: 'buff_ap', value: 221, duration: 300 }],
+      },
     ],
     description: 'Places a Blessing on a friendly target, increasing attack power by 15 for 5 min.',
   },
@@ -1566,6 +2677,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'absorb', amount: 50, duration: 10 }],
     ranks: [
       { rank: 2, level: 14, cost: 25, effects: [{ type: 'absorb', amount: 110, duration: 10 }] },
+
+      { rank: 3, level: 20, cost: 35, effects: [{ type: 'absorb', amount: 156, duration: 10 }] },
+      { rank: 4, level: 26, cost: 45, effects: [{ type: 'absorb', amount: 222, duration: 10 }] },
+      { rank: 5, level: 32, cost: 55, effects: [{ type: 'absorb', amount: 295, duration: 10 }] },
+      { rank: 6, level: 38, cost: 65, effects: [{ type: 'absorb', amount: 392, duration: 10 }] },
+      { rank: 7, level: 44, cost: 75, effects: [{ type: 'absorb', amount: 490, duration: 10 }] },
+      { rank: 8, level: 50, cost: 85, effects: [{ type: 'absorb', amount: 613, duration: 10 }] },
+      { rank: 9, level: 56, cost: 100, effects: [{ type: 'absorb', amount: 766, duration: 10 }] },
     ],
     description: 'A holy shield absorbs 50 damage for 10 sec.',
   },
@@ -1597,7 +2716,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 250, max: 250 }],
-    ranks: [{ rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] }],
+    ranks: [
+      { rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] },
+      { rank: 3, level: 24, cost: 0, effects: [{ type: 'heal', min: 852, max: 852 }] },
+      { rank: 4, level: 30, cost: 0, effects: [{ type: 'heal', min: 1210, max: 1210 }] },
+      { rank: 5, level: 36, cost: 0, effects: [{ type: 'heal', min: 1609, max: 1609 }] },
+      { rank: 6, level: 42, cost: 0, effects: [{ type: 'heal', min: 2140, max: 2140 }] },
+      { rank: 7, level: 48, cost: 0, effects: [{ type: 'heal', min: 2675, max: 2675 }] },
+      { rank: 8, level: 54, cost: 0, effects: [{ type: 'heal', min: 3344, max: 3344 }] },
+    ],
     description: 'A massive surge of healing: restores 250 health. 10 min cooldown.',
   },
   flash_of_light: {
@@ -1613,6 +2740,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 62, max: 76 }],
+    ranks: [
+      { rank: 2, level: 20, cost: 50, effects: [{ type: 'heal', min: 99, max: 121 }] },
+      { rank: 3, level: 28, cost: 75, effects: [{ type: 'heal', min: 158, max: 194 }] },
+      { rank: 4, level: 36, cost: 95, effects: [{ type: 'heal', min: 231, max: 283 }] },
+      { rank: 5, level: 44, cost: 115, effects: [{ type: 'heal', min: 311, max: 381 }] },
+      { rank: 6, level: 52, cost: 140, effects: [{ type: 'heal', min: 419, max: 513 }] },
+      { rank: 7, level: 60, cost: 170, effects: [{ type: 'heal', min: 564, max: 691 }] },
+    ],
     description: 'A quick, efficient flash of Light that heals a friendly target for $d.',
   },
   exorcism: {
@@ -1627,6 +2762,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 46, max: 56 }],
+    ranks: [
+      { rank: 2, level: 22, cost: 80, effects: [{ type: 'directDamage', min: 73, max: 89 }] },
+      { rank: 3, level: 30, cost: 120, effects: [{ type: 'directDamage', min: 117, max: 143 }] },
+      { rank: 4, level: 38, cost: 155, effects: [{ type: 'directDamage', min: 171, max: 209 }] },
+      { rank: 5, level: 46, cost: 185, effects: [{ type: 'directDamage', min: 231, max: 281 }] },
+      { rank: 6, level: 54, cost: 225, effects: [{ type: 'directDamage', min: 311, max: 378 }] },
+    ],
     description: 'Banishes the wicked with Holy wrath, causing $d Holy damage.',
   },
   consecration: {
@@ -1641,6 +2783,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: false,
     effects: [{ type: 'groundAoE', min: 28, max: 34, radius: 8, duration: 10, interval: 2 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 28,
+        cost: 100,
+        effects: [{ type: 'groundAoE', min: 50, max: 61, radius: 8, duration: 10, interval: 2 }],
+      },
+      {
+        rank: 3,
+        level: 36,
+        cost: 130,
+        effects: [{ type: 'groundAoE', min: 73, max: 89, radius: 8, duration: 10, interval: 2 }],
+      },
+      {
+        rank: 4,
+        level: 44,
+        cost: 155,
+        effects: [{ type: 'groundAoE', min: 99, max: 120, radius: 8, duration: 10, interval: 2 }],
+      },
+      {
+        rank: 5,
+        level: 52,
+        cost: 185,
+        effects: [{ type: 'groundAoE', min: 133, max: 162, radius: 8, duration: 10, interval: 2 }],
+      },
+      {
+        rank: 6,
+        level: 60,
+        cost: 225,
+        effects: [{ type: 'groundAoE', min: 179, max: 218, radius: 8, duration: 10, interval: 2 }],
+      },
+    ],
     description: 'Consecrates the ground beneath you, searing nearby enemies for $d Holy damage.',
   },
   righteous_fury: {
@@ -1737,6 +2911,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 8, cost: 25, effects: [{ type: 'weaponDamage', bonus: 11 }] },
       { rank: 3, level: 14, cost: 35, effects: [{ type: 'weaponDamage', bonus: 18 }] },
       { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponDamage', bonus: 27 }] },
+
+      { rank: 5, level: 26, cost: 60, effects: [{ type: 'weaponDamage', bonus: 38 }] },
+      { rank: 6, level: 32, cost: 70, effects: [{ type: 'weaponDamage', bonus: 51 }] },
+      { rank: 7, level: 38, cost: 85, effects: [{ type: 'weaponDamage', bonus: 68 }] },
+      { rank: 8, level: 44, cost: 100, effects: [{ type: 'weaponDamage', bonus: 85 }] },
+      { rank: 9, level: 50, cost: 115, effects: [{ type: 'weaponDamage', bonus: 106 }] },
+      { rank: 10, level: 56, cost: 130, effects: [{ type: 'weaponDamage', bonus: 132 }] },
     ],
     description: 'A strong melee attack that increases damage by 5. Activates on your next swing.',
   },
@@ -1765,6 +2946,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 18,
         cost: 40,
         effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 50, duration: 1800 }],
+      },
+
+      {
+        rank: 4,
+        level: 24,
+        cost: 55,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 71, duration: 1800 }],
+      },
+      {
+        rank: 5,
+        level: 30,
+        cost: 75,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 101, duration: 1800 }],
+      },
+      {
+        rank: 6,
+        level: 36,
+        cost: 90,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 134, duration: 1800 }],
+      },
+      {
+        rank: 7,
+        level: 42,
+        cost: 110,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 178, duration: 1800 }],
+      },
+      {
+        rank: 8,
+        level: 48,
+        cost: 125,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 223, duration: 1800 }],
+      },
+      {
+        rank: 9,
+        level: 54,
+        cost: 145,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 279, duration: 1800 }],
       },
     ],
     description: 'Take on the aspect of the hawk, increasing attack power by 20 for 30 min.',
@@ -1796,6 +3014,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 35,
         effects: [{ type: 'dot', total: 55, duration: 15, interval: 3 }],
       },
+
+      {
+        rank: 4,
+        level: 22,
+        cost: 45,
+        effects: [{ type: 'dot', total: 61, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 5,
+        level: 28,
+        cost: 60,
+        effects: [{ type: 'dot', total: 68, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 6,
+        level: 34,
+        cost: 70,
+        effects: [{ type: 'dot', total: 75, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 7,
+        level: 40,
+        cost: 85,
+        effects: [{ type: 'dot', total: 83, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 8,
+        level: 46,
+        cost: 100,
+        effects: [{ type: 'dot', total: 93, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 9,
+        level: 52,
+        cost: 115,
+        effects: [{ type: 'dot', total: 103, duration: 15, interval: 3 }],
+      },
     ],
     description: 'Stings the target, dealing $d Nature damage over 15 sec.',
   },
@@ -1814,8 +3069,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 13, max: 17 }],
     ranks: [
-      { rank: 2, level: 12, cost: 40, effects: [{ type: 'directDamage', min: 24, max: 30 }] },
-      { rank: 3, level: 18, cost: 55, effects: [{ type: 'directDamage', min: 38, max: 47 }] },
+      { rank: 2, level: 12, cost: 40, effects: [{ type: 'directDamage', min: 14, max: 19 }] },
+      { rank: 3, level: 18, cost: 55, effects: [{ type: 'directDamage', min: 16, max: 21 }] },
+
+      { rank: 4, level: 24, cost: 75, effects: [{ type: 'directDamage', min: 18, max: 23 }] },
+      { rank: 5, level: 30, cost: 100, effects: [{ type: 'directDamage', min: 20, max: 26 }] },
+      { rank: 6, level: 36, cost: 120, effects: [{ type: 'directDamage', min: 22, max: 29 }] },
+      { rank: 7, level: 42, cost: 145, effects: [{ type: 'directDamage', min: 24, max: 32 }] },
+      { rank: 8, level: 48, cost: 165, effects: [{ type: 'directDamage', min: 27, max: 35 }] },
+      { rank: 9, level: 54, cost: 190, effects: [{ type: 'directDamage', min: 30, max: 39 }] },
     ],
     description: 'An instant shot that deals $d Arcane damage.',
   },
@@ -1859,6 +3121,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 10,
         effects: [{ type: 'weaponStrike', bonus: 24, cannotBeDodged: true }],
+      },
+
+      {
+        rank: 3,
+        level: 22,
+        cost: 10,
+        effects: [{ type: 'weaponStrike', bonus: 34, cannotBeDodged: true }],
+      },
+      {
+        rank: 4,
+        level: 28,
+        cost: 10,
+        effects: [{ type: 'weaponStrike', bonus: 48, cannotBeDodged: true }],
+      },
+      {
+        rank: 5,
+        level: 34,
+        cost: 10,
+        effects: [{ type: 'weaponStrike', bonus: 64, cannotBeDodged: true }],
+      },
+      {
+        rank: 6,
+        level: 40,
+        cost: 10,
+        effects: [{ type: 'weaponStrike', bonus: 86, cannotBeDodged: true }],
+      },
+      {
+        rank: 7,
+        level: 46,
+        cost: 10,
+        effects: [{ type: 'weaponStrike', bonus: 107, cannotBeDodged: true }],
+      },
+      {
+        rank: 8,
+        level: 52,
+        cost: 10,
+        effects: [{ type: 'weaponStrike', bonus: 134, cannotBeDodged: true }],
       },
     ],
     description:
@@ -1925,6 +3224,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 50, max: 62 }],
+    ranks: [
+      { rank: 2, level: 24, cost: 75, effects: [{ type: 'directDamage', min: 57, max: 71 }] },
+      { rank: 3, level: 32, cost: 95, effects: [{ type: 'directDamage', min: 66, max: 82 }] },
+      { rank: 4, level: 40, cost: 120, effects: [{ type: 'directDamage', min: 76, max: 94 }] },
+      { rank: 5, level: 48, cost: 145, effects: [{ type: 'directDamage', min: 87, max: 108 }] },
+      { rank: 6, level: 56, cost: 175, effects: [{ type: 'directDamage', min: 100, max: 124 }] },
+    ],
     description: 'A carefully aimed shot that deals $d damage.',
   },
   rapid_fire: {
@@ -1972,6 +3278,49 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.5,
         effects: [{ type: 'directDamage', min: 64, max: 78 }],
       },
+
+      {
+        rank: 5,
+        level: 26,
+        cost: 95,
+        castTime: 2.5,
+        effects: [{ type: 'directDamage', min: 91, max: 111 }],
+      },
+      {
+        rank: 6,
+        level: 32,
+        cost: 115,
+        castTime: 2.5,
+        effects: [{ type: 'directDamage', min: 121, max: 147 }],
+      },
+      {
+        rank: 7,
+        level: 38,
+        cost: 140,
+        castTime: 2.5,
+        effects: [{ type: 'directDamage', min: 161, max: 196 }],
+      },
+      {
+        rank: 8,
+        level: 44,
+        cost: 160,
+        castTime: 2.5,
+        effects: [{ type: 'directDamage', min: 201, max: 245 }],
+      },
+      {
+        rank: 9,
+        level: 50,
+        cost: 185,
+        castTime: 2.5,
+        effects: [{ type: 'directDamage', min: 251, max: 306 }],
+      },
+      {
+        rank: 10,
+        level: 56,
+        cost: 215,
+        castTime: 2.5,
+        effects: [{ type: 'directDamage', min: 314, max: 383 }],
+      },
     ],
     description: 'Smites the enemy for $d Holy damage.',
   },
@@ -1991,6 +3340,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 6, cost: 45, effects: [{ type: 'heal', min: 72, max: 86 }] },
       { rank: 3, level: 12, cost: 65, effects: [{ type: 'heal', min: 110, max: 132 }] },
+
+      { rank: 4, level: 18, cost: 90, effects: [{ type: 'heal', min: 156, max: 187 }] },
+      { rank: 5, level: 24, cost: 120, effects: [{ type: 'heal', min: 222, max: 266 }] },
+      { rank: 6, level: 30, cost: 160, effects: [{ type: 'heal', min: 315, max: 378 }] },
+      { rank: 7, level: 36, cost: 190, effects: [{ type: 'heal', min: 419, max: 503 }] },
+      { rank: 8, level: 42, cost: 230, effects: [{ type: 'heal', min: 557, max: 669 }] },
+      { rank: 9, level: 48, cost: 265, effects: [{ type: 'heal', min: 696, max: 836 }] },
+      { rank: 10, level: 54, cost: 305, effects: [{ type: 'heal', min: 871, max: 1045 }] },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -2020,6 +3377,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 80,
         effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 12, duration: 1800 }],
       },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 110,
+        effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 17, duration: 1800 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 130,
+        effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 23, duration: 1800 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 155,
+        effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 30, duration: 1800 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 180,
+        effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 38, duration: 1800 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 205,
+        effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 47, duration: 1800 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 235,
+        effects: [{ type: 'buffTarget', kind: 'buff_sta', value: 59, duration: 1800 }],
+      },
     ],
     description: "Increases the target's Stamina by 3 for 30 min.",
   },
@@ -2048,6 +3442,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 55,
         effects: [{ type: 'dot', total: 84, duration: 18, interval: 3 }],
       },
+
+      {
+        rank: 4,
+        level: 22,
+        cost: 75,
+        effects: [{ type: 'dot', total: 119, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 5,
+        level: 28,
+        cost: 100,
+        effects: [{ type: 'dot', total: 169, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 6,
+        level: 34,
+        cost: 120,
+        effects: [{ type: 'dot', total: 225, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 7,
+        level: 40,
+        cost: 145,
+        effects: [{ type: 'dot', total: 300, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 8,
+        level: 46,
+        cost: 165,
+        effects: [{ type: 'dot', total: 375, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 9,
+        level: 52,
+        cost: 190,
+        effects: [{ type: 'dot', total: 468, duration: 18, interval: 3 }],
+      },
     ],
     description: 'A word of darkness causes $d Shadow damage over 18 sec.',
   },
@@ -2067,6 +3498,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 12, cost: 70, effects: [{ type: 'absorb', amount: 90, duration: 30 }] },
       { rank: 3, level: 18, cost: 100, effects: [{ type: 'absorb', amount: 145, duration: 30 }] },
+
+      { rank: 4, level: 24, cost: 135, effects: [{ type: 'absorb', amount: 206, duration: 30 }] },
+      { rank: 5, level: 30, cost: 180, effects: [{ type: 'absorb', amount: 292, duration: 30 }] },
+      { rank: 6, level: 36, cost: 215, effects: [{ type: 'absorb', amount: 389, duration: 30 }] },
+      { rank: 7, level: 42, cost: 260, effects: [{ type: 'absorb', amount: 517, duration: 30 }] },
+      { rank: 8, level: 48, cost: 300, effects: [{ type: 'absorb', amount: 646, duration: 30 }] },
+      { rank: 9, level: 54, cost: 345, effects: [{ type: 'absorb', amount: 808, duration: 30 }] },
     ],
     description: 'Shields the target, absorbing 48 damage for 30 sec.',
   },
@@ -2096,6 +3534,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 75,
         effects: [{ type: 'hot', total: 140, duration: 15, interval: 3 }],
       },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 100,
+        effects: [{ type: 'hot', total: 199, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 120,
+        effects: [{ type: 'hot', total: 264, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 145,
+        effects: [{ type: 'hot', total: 352, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 165,
+        effects: [{ type: 'hot', total: 440, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 190,
+        effects: [{ type: 'hot', total: 549, duration: 15, interval: 3 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 220,
+        effects: [{ type: 'hot', total: 687, duration: 15, interval: 3 }],
+      },
     ],
     description: 'Heals the target for $d over 15 sec.',
   },
@@ -2114,6 +3589,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 14, cost: 70, effects: [{ type: 'directDamage', min: 60, max: 66 }] },
       { rank: 3, level: 20, cost: 95, effects: [{ type: 'directDamage', min: 86, max: 94 }] },
+
+      { rank: 4, level: 26, cost: 130, effects: [{ type: 'directDamage', min: 122, max: 133 }] },
+      { rank: 5, level: 32, cost: 155, effects: [{ type: 'directDamage', min: 162, max: 178 }] },
+      { rank: 6, level: 38, cost: 185, effects: [{ type: 'directDamage', min: 216, max: 236 }] },
+      { rank: 7, level: 44, cost: 215, effects: [{ type: 'directDamage', min: 270, max: 295 }] },
+      { rank: 8, level: 50, cost: 245, effects: [{ type: 'directDamage', min: 338, max: 369 }] },
+      { rank: 9, level: 56, cost: 280, effects: [{ type: 'directDamage', min: 422, max: 461 }] },
     ],
     description: "Blasts the target's mind for $d Shadow damage.",
   },
@@ -2130,7 +3612,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 165, max: 195 }],
-    ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 230, max: 270 }] }],
+    ranks: [
+      { rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 230, max: 270 }] },
+      { rank: 3, level: 26, cost: 175, effects: [{ type: 'heal', min: 327, max: 383 }] },
+      { rank: 4, level: 32, cost: 210, effects: [{ type: 'heal', min: 434, max: 510 }] },
+      { rank: 5, level: 38, cost: 250, effects: [{ type: 'heal', min: 578, max: 678 }] },
+      { rank: 6, level: 44, cost: 290, effects: [{ type: 'heal', min: 722, max: 848 }] },
+      { rank: 7, level: 50, cost: 335, effects: [{ type: 'heal', min: 903, max: 1060 }] },
+      { rank: 8, level: 56, cost: 385, effects: [{ type: 'heal', min: 1128, max: 1325 }] },
+    ],
     description: 'A slow but powerful prayer that heals a friendly target for $d.',
   },
   mind_flay: {
@@ -2146,6 +3636,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 24,
+        cost: 65,
+        effects: [{ type: 'drainTick', min: 19, max: 19, healFrac: 0 }],
+      },
+      {
+        rank: 3,
+        level: 32,
+        cost: 85,
+        effects: [{ type: 'drainTick', min: 28, max: 28, healFrac: 0 }],
+      },
+      {
+        rank: 4,
+        level: 40,
+        cost: 110,
+        effects: [{ type: 'drainTick', min: 41, max: 41, healFrac: 0 }],
+      },
+      {
+        rank: 5,
+        level: 48,
+        cost: 135,
+        effects: [{ type: 'drainTick', min: 55, max: 55, healFrac: 0 }],
+      },
+      {
+        rank: 6,
+        level: 56,
+        cost: 165,
+        effects: [{ type: 'drainTick', min: 74, max: 74, healFrac: 0 }],
+      },
+    ],
     description:
       "Assaults the target's mind with Shadow energy, causing $d Shadow damage each second for 3 sec.",
   },
@@ -2162,6 +3684,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 120, max: 142 }],
+    ranks: [
+      { rank: 2, level: 26, cost: 100, effects: [{ type: 'heal', min: 170, max: 202 }] },
+      { rank: 3, level: 32, cost: 120, effects: [{ type: 'heal', min: 227, max: 268 }] },
+      { rank: 4, level: 38, cost: 145, effects: [{ type: 'heal', min: 301, max: 357 }] },
+      { rank: 5, level: 44, cost: 165, effects: [{ type: 'heal', min: 377, max: 446 }] },
+      { rank: 6, level: 50, cost: 190, effects: [{ type: 'heal', min: 471, max: 557 }] },
+      { rank: 7, level: 56, cost: 220, effects: [{ type: 'heal', min: 589, max: 697 }] },
+    ],
     description: 'A fast prayer that heals a friendly target for $d.',
   },
 
@@ -2200,6 +3730,49 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 3.0,
         effects: [{ type: 'directDamage', min: 75, max: 85 }],
       },
+
+      {
+        rank: 5,
+        level: 26,
+        cost: 80,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 106, max: 121 }],
+      },
+      {
+        rank: 6,
+        level: 32,
+        cost: 95,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 142, max: 161 }],
+      },
+      {
+        rank: 7,
+        level: 38,
+        cost: 115,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 188, max: 214 }],
+      },
+      {
+        rank: 8,
+        level: 44,
+        cost: 130,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 235, max: 267 }],
+      },
+      {
+        rank: 9,
+        level: 50,
+        cost: 150,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 294, max: 334 }],
+      },
+      {
+        rank: 10,
+        level: 56,
+        cost: 170,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 368, max: 417 }],
+      },
     ],
     description: 'Hurls a bolt of lightning for $d Nature damage.',
   },
@@ -2218,6 +3791,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 8, cost: 30, effects: [{ type: 'imbue', bonus: 9, duration: 300 }] },
       { rank: 3, level: 16, cost: 45, effects: [{ type: 'imbue', bonus: 14, duration: 300 }] },
+
+      { rank: 4, level: 22, cost: 60, effects: [{ type: 'imbue', bonus: 20, duration: 300 }] },
+      { rank: 5, level: 28, cost: 80, effects: [{ type: 'imbue', bonus: 28, duration: 300 }] },
+      { rank: 6, level: 34, cost: 95, effects: [{ type: 'imbue', bonus: 38, duration: 300 }] },
+      { rank: 7, level: 40, cost: 115, effects: [{ type: 'imbue', bonus: 50, duration: 300 }] },
+      { rank: 8, level: 46, cost: 130, effects: [{ type: 'imbue', bonus: 62, duration: 300 }] },
+      { rank: 9, level: 52, cost: 150, effects: [{ type: 'imbue', bonus: 78, duration: 300 }] },
     ],
     description:
       'Imbues your weapon with the fury of stone: each swing deals 5 additional damage for 5 min.',
@@ -2251,6 +3831,49 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.5,
         effects: [{ type: 'heal', min: 138, max: 164 }],
       },
+
+      {
+        rank: 5,
+        level: 24,
+        cost: 120,
+        castTime: 2.5,
+        effects: [{ type: 'heal', min: 196, max: 233 }],
+      },
+      {
+        rank: 6,
+        level: 30,
+        cost: 160,
+        castTime: 2.5,
+        effects: [{ type: 'heal', min: 278, max: 331 }],
+      },
+      {
+        rank: 7,
+        level: 36,
+        cost: 190,
+        castTime: 2.5,
+        effects: [{ type: 'heal', min: 370, max: 440 }],
+      },
+      {
+        rank: 8,
+        level: 42,
+        cost: 230,
+        castTime: 2.5,
+        effects: [{ type: 'heal', min: 492, max: 585 }],
+      },
+      {
+        rank: 9,
+        level: 48,
+        cost: 265,
+        castTime: 2.5,
+        effects: [{ type: 'heal', min: 615, max: 731 }],
+      },
+      {
+        rank: 10,
+        level: 54,
+        cost: 305,
+        castTime: 2.5,
+        effects: [{ type: 'heal', min: 769, max: 914 }],
+      },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -2269,6 +3892,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 10, cost: 45, effects: [{ type: 'directDamage', min: 33, max: 38 }] },
       { rank: 3, level: 16, cost: 65, effects: [{ type: 'directDamage', min: 54, max: 61 }] },
+
+      { rank: 4, level: 22, cost: 90, effects: [{ type: 'directDamage', min: 77, max: 87 }] },
+      { rank: 5, level: 28, cost: 120, effects: [{ type: 'directDamage', min: 109, max: 123 }] },
+      { rank: 6, level: 34, cost: 145, effects: [{ type: 'directDamage', min: 145, max: 164 }] },
+      { rank: 7, level: 40, cost: 175, effects: [{ type: 'directDamage', min: 193, max: 218 }] },
+      { rank: 8, level: 46, cost: 200, effects: [{ type: 'directDamage', min: 241, max: 272 }] },
+      { rank: 9, level: 52, cost: 230, effects: [{ type: 'directDamage', min: 301, max: 340 }] },
     ],
     description: 'Instantly shocks the target with concussive force for $d Nature damage.',
   },
@@ -2324,6 +3954,97 @@ export const ABILITIES: Record<string, AbilityDef> = {
           },
         ],
       },
+
+      {
+        rank: 4,
+        level: 24,
+        cost: 75,
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 41,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
+      },
+      {
+        rank: 5,
+        level: 30,
+        cost: 100,
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 58,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
+      },
+      {
+        rank: 6,
+        level: 36,
+        cost: 120,
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 78,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
+      },
+      {
+        rank: 7,
+        level: 42,
+        cost: 145,
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 103,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
+      },
+      {
+        rank: 8,
+        level: 48,
+        cost: 165,
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 129,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
+      },
+      {
+        rank: 9,
+        level: 54,
+        cost: 190,
+        effects: [
+          {
+            type: 'selfBuff',
+            kind: 'thorns',
+            value: 162,
+            duration: 600,
+            charges: 3,
+            internalCooldown: 5,
+          },
+        ],
+      },
     ],
     description:
       'Surrounds you with crackling lightning: melee attackers take 13 Nature damage, up to 3 charges and at most once every 5 seconds.',
@@ -2353,6 +4074,61 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'dot', total: 48, duration: 12, interval: 3 },
         ],
       },
+
+      {
+        rank: 3,
+        level: 22,
+        cost: 75,
+        effects: [
+          { type: 'directDamage', min: 60, max: 60 },
+          { type: 'dot', total: 68, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 28,
+        cost: 100,
+        effects: [
+          { type: 'directDamage', min: 85, max: 85 },
+          { type: 'dot', total: 97, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 34,
+        cost: 120,
+        effects: [
+          { type: 'directDamage', min: 113, max: 113 },
+          { type: 'dot', total: 129, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 40,
+        cost: 145,
+        effects: [
+          { type: 'directDamage', min: 150, max: 150 },
+          { type: 'dot', total: 171, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 46,
+        cost: 165,
+        effects: [
+          { type: 'directDamage', min: 187, max: 187 },
+          { type: 'dot', total: 214, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 52,
+        cost: 190,
+        effects: [
+          { type: 'directDamage', min: 234, max: 234 },
+          { type: 'dot', total: 268, duration: 12, interval: 3 },
+        ],
+      },
     ],
     description: 'Sears the target with fire for 25 damage plus $d over 12 sec.',
   },
@@ -2370,6 +4146,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'imbue', bonus: 8, duration: 300 }],
     ranks: [
       { rank: 2, level: 18, cost: 40, effects: [{ type: 'imbue', bonus: 13, duration: 300 }] },
+
+      { rank: 3, level: 24, cost: 55, effects: [{ type: 'imbue', bonus: 18, duration: 300 }] },
+      { rank: 4, level: 30, cost: 75, effects: [{ type: 'imbue', bonus: 26, duration: 300 }] },
+      { rank: 5, level: 36, cost: 90, effects: [{ type: 'imbue', bonus: 35, duration: 300 }] },
+      { rank: 6, level: 42, cost: 110, effects: [{ type: 'imbue', bonus: 46, duration: 300 }] },
+      { rank: 7, level: 48, cost: 125, effects: [{ type: 'imbue', bonus: 58, duration: 300 }] },
+      { rank: 8, level: 54, cost: 145, effects: [{ type: 'imbue', bonus: 72, duration: 300 }] },
     ],
     description:
       'Imbues your weapon with elemental fire: each swing deals 8 additional Fire damage for 5 min.',
@@ -2389,6 +4172,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'directDamage', min: 36, max: 42 },
       { type: 'slow', mult: 0.5, duration: 8 },
     ],
+    ranks: [
+      {
+        rank: 2,
+        level: 22,
+        cost: 75,
+        effects: [
+          { type: 'directDamage', min: 57, max: 67 },
+          { type: 'slow', mult: 0.5, duration: 8 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 30,
+        cost: 110,
+        effects: [
+          { type: 'directDamage', min: 92, max: 107 },
+          { type: 'slow', mult: 0.5, duration: 8 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 38,
+        cost: 140,
+        effects: [
+          { type: 'directDamage', min: 134, max: 156 },
+          { type: 'slow', mult: 0.5, duration: 8 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 46,
+        cost: 170,
+        effects: [
+          { type: 'directDamage', min: 181, max: 211 },
+          { type: 'slow', mult: 0.5, duration: 8 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 54,
+        cost: 205,
+        effects: [
+          { type: 'directDamage', min: 243, max: 284 },
+          { type: 'slow', mult: 0.5, duration: 8 },
+        ],
+      },
+    ],
     description:
       'Instantly shocks the target with frost for $d Frost damage and slows its movement by 50% for 8 sec.',
   },
@@ -2406,6 +4236,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'imbue', bonus: 8, duration: 300 }],
     ranks: [
       { rank: 2, level: 20, cost: 40, effects: [{ type: 'imbue', bonus: 13, duration: 300 }] },
+
+      { rank: 3, level: 26, cost: 55, effects: [{ type: 'imbue', bonus: 18, duration: 300 }] },
+      { rank: 4, level: 32, cost: 65, effects: [{ type: 'imbue', bonus: 25, duration: 300 }] },
+      { rank: 5, level: 38, cost: 80, effects: [{ type: 'imbue', bonus: 33, duration: 300 }] },
+      { rank: 6, level: 44, cost: 90, effects: [{ type: 'imbue', bonus: 41, duration: 300 }] },
+      { rank: 7, level: 50, cost: 105, effects: [{ type: 'imbue', bonus: 51, duration: 300 }] },
+      { rank: 8, level: 56, cost: 120, effects: [{ type: 'imbue', bonus: 64, duration: 300 }] },
     ],
     description:
       'Imbues your weapon with biting frost: each swing deals 8 additional damage for 5 min.',
@@ -2437,6 +4274,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'weaponStrike', bonus: 26 }],
+    ranks: [
+      { rank: 2, level: 28, cost: 60, effects: [{ type: 'weaponStrike', bonus: 41 }] },
+      { rank: 3, level: 36, cost: 75, effects: [{ type: 'weaponStrike', bonus: 61 }] },
+      { rank: 4, level: 44, cost: 90, effects: [{ type: 'weaponStrike', bonus: 82 }] },
+      { rank: 5, level: 52, cost: 110, effects: [{ type: 'weaponStrike', bonus: 110 }] },
+      { rank: 6, level: 60, cost: 135, effects: [{ type: 'weaponStrike', bonus: 148 }] },
+    ],
     description:
       'Channels the storm through your weapon, instantly striking for weapon damage plus $d.',
   },
@@ -2476,6 +4320,49 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 3.0,
         effects: [{ type: 'directDamage', min: 68, max: 84 }],
       },
+
+      {
+        rank: 5,
+        level: 26,
+        cost: 110,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 97, max: 119 }],
+      },
+      {
+        rank: 6,
+        level: 32,
+        cost: 130,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 128, max: 159 }],
+      },
+      {
+        rank: 7,
+        level: 38,
+        cost: 155,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 171, max: 211 }],
+      },
+      {
+        rank: 8,
+        level: 44,
+        cost: 180,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 214, max: 264 }],
+      },
+      {
+        rank: 9,
+        level: 50,
+        cost: 205,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 267, max: 330 }],
+      },
+      {
+        rank: 10,
+        level: 56,
+        cost: 235,
+        castTime: 3.0,
+        effects: [{ type: 'directDamage', min: 334, max: 412 }],
+      },
     ],
     description: 'Sends a shadowy bolt at the enemy for $d Shadow damage.',
   },
@@ -2503,6 +4390,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 50,
         effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 80, duration: 1800 }],
+      },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 70,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 114, duration: 1800 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 85,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 151, duration: 1800 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 100,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 201, duration: 1800 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 115,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 251, duration: 1800 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 130,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 314, duration: 1800 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 150,
+        effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 392, duration: 1800 }],
       },
     ],
     description: 'Demonic skin increases your armor by 30 for 30 min.',
@@ -2541,6 +4465,61 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'dot', total: 60, duration: 15, interval: 3 },
         ],
       },
+
+      {
+        rank: 4,
+        level: 22,
+        cost: 80,
+        effects: [
+          { type: 'directDamage', min: 54, max: 54 },
+          { type: 'dot', total: 85, duration: 15, interval: 3 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 28,
+        cost: 110,
+        effects: [
+          { type: 'directDamage', min: 77, max: 77 },
+          { type: 'dot', total: 121, duration: 15, interval: 3 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 34,
+        cost: 130,
+        effects: [
+          { type: 'directDamage', min: 102, max: 102 },
+          { type: 'dot', total: 161, duration: 15, interval: 3 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 40,
+        cost: 155,
+        effects: [
+          { type: 'directDamage', min: 136, max: 136 },
+          { type: 'dot', total: 214, duration: 15, interval: 3 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 46,
+        cost: 180,
+        effects: [
+          { type: 'directDamage', min: 169, max: 169 },
+          { type: 'dot', total: 268, duration: 15, interval: 3 },
+        ],
+      },
+      {
+        rank: 9,
+        level: 52,
+        cost: 205,
+        effects: [
+          { type: 'directDamage', min: 212, max: 212 },
+          { type: 'dot', total: 334, duration: 15, interval: 3 },
+        ],
+      },
     ],
     description: 'Burns the enemy for 11 Fire damage and an additional $d over 15 sec.',
   },
@@ -2569,6 +4548,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 75,
         effects: [{ type: 'dot', total: 85, duration: 18, interval: 3 }],
       },
+
+      {
+        rank: 4,
+        level: 24,
+        cost: 100,
+        effects: [{ type: 'dot', total: 121, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 5,
+        level: 30,
+        cost: 135,
+        effects: [{ type: 'dot', total: 171, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 6,
+        level: 36,
+        cost: 160,
+        effects: [{ type: 'dot', total: 228, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 7,
+        level: 42,
+        cost: 190,
+        effects: [{ type: 'dot', total: 303, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 8,
+        level: 48,
+        cost: 220,
+        effects: [{ type: 'dot', total: 379, duration: 18, interval: 3 }],
+      },
+      {
+        rank: 9,
+        level: 54,
+        cost: 255,
+        effects: [{ type: 'dot', total: 474, duration: 18, interval: 3 }],
+      },
     ],
     description: 'Corrupts the target, causing $d Shadow damage over 18 sec.',
   },
@@ -2587,6 +4603,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 14, cost: 0, effects: [{ type: 'lifeTap', hp: 55, mana: 55 }] },
       { rank: 3, level: 20, cost: 0, effects: [{ type: 'lifeTap', hp: 85, mana: 85 }] },
+
+      { rank: 4, level: 26, cost: 0, effects: [{ type: 'lifeTap', hp: 121, mana: 121 }] },
+      { rank: 5, level: 32, cost: 0, effects: [{ type: 'lifeTap', hp: 161, mana: 161 }] },
+      { rank: 6, level: 38, cost: 0, effects: [{ type: 'lifeTap', hp: 214, mana: 214 }] },
+      { rank: 7, level: 44, cost: 0, effects: [{ type: 'lifeTap', hp: 267, mana: 267 }] },
+      { rank: 8, level: 50, cost: 0, effects: [{ type: 'lifeTap', hp: 334, mana: 334 }] },
+      { rank: 9, level: 56, cost: 0, effects: [{ type: 'lifeTap', hp: 417, mana: 417 }] },
     ],
     description: 'Converts 30 health into 30 mana.',
   },
@@ -2614,6 +4637,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 60,
         effects: [{ type: 'dot', total: 78, duration: 24, interval: 3 }],
+      },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 80,
+        effects: [{ type: 'dot', total: 111, duration: 24, interval: 3 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 95,
+        effects: [{ type: 'dot', total: 147, duration: 24, interval: 3 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 115,
+        effects: [{ type: 'dot', total: 196, duration: 24, interval: 3 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 130,
+        effects: [{ type: 'dot', total: 245, duration: 24, interval: 3 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 150,
+        effects: [{ type: 'dot', total: 306, duration: 24, interval: 3 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 170,
+        effects: [{ type: 'dot', total: 383, duration: 24, interval: 3 }],
       },
     ],
     description: 'Curses the target with agony: $d Shadow damage over 24 sec.',
@@ -2643,6 +4703,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 70,
         effects: [{ type: 'drainTick', min: 17, max: 17, healFrac: 1 }],
+      },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 95,
+        effects: [{ type: 'drainTick', min: 24, max: 24, healFrac: 1 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 115,
+        effects: [{ type: 'drainTick', min: 32, max: 32, healFrac: 1 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 140,
+        effects: [{ type: 'drainTick', min: 43, max: 43, healFrac: 1 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 160,
+        effects: [{ type: 'drainTick', min: 53, max: 53, healFrac: 1 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 185,
+        effects: [{ type: 'drainTick', min: 67, max: 67, healFrac: 1 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 215,
+        effects: [{ type: 'drainTick', min: 83, max: 83, healFrac: 1 }],
       },
     ],
     description: "Drains the target's life, transferring $d health to you each second for 5 sec.",
@@ -2674,6 +4771,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'fire',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 30, max: 38 }],
+    ranks: [
+      { rank: 2, level: 24, cost: 50, effects: [{ type: 'directDamage', min: 48, max: 61 }] },
+      { rank: 3, level: 32, cost: 65, effects: [{ type: 'directDamage', min: 70, max: 89 }] },
+      { rank: 4, level: 40, cost: 85, effects: [{ type: 'directDamage', min: 102, max: 130 }] },
+      { rank: 5, level: 48, cost: 100, effects: [{ type: 'directDamage', min: 138, max: 175 }] },
+      { rank: 6, level: 56, cost: 120, effects: [{ type: 'directDamage', min: 186, max: 235 }] },
+    ],
     description: 'Sears the enemy with agonizing fire for $d Fire damage. Quick to cast.',
   },
   shadowburn: {
@@ -2688,6 +4792,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 56, max: 66 }],
+    ranks: [
+      { rank: 2, level: 28, cost: 105, effects: [{ type: 'directDamage', min: 89, max: 105 }] },
+      { rank: 3, level: 36, cost: 135, effects: [{ type: 'directDamage', min: 131, max: 154 }] },
+      { rank: 4, level: 44, cost: 165, effects: [{ type: 'directDamage', min: 176, max: 207 }] },
+      { rank: 5, level: 52, cost: 200, effects: [{ type: 'directDamage', min: 237, max: 279 }] },
+      { rank: 6, level: 60, cost: 240, effects: [{ type: 'directDamage', min: 319, max: 376 }] },
+    ],
     description: 'Instantly blasts the target with Shadow Flame for $d Shadow damage.',
   },
   summon_imp: {
@@ -2819,6 +4930,49 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
       { rank: 3, level: 14, cost: 48, effects: [{ type: 'directDamage', min: 38, max: 45 }] },
       { rank: 4, level: 20, cost: 70, effects: [{ type: 'directDamage', min: 60, max: 71 }] },
+
+      {
+        rank: 5,
+        level: 26,
+        cost: 95,
+        castTime: 2.0,
+        effects: [{ type: 'directDamage', min: 85, max: 101 }],
+      },
+      {
+        rank: 6,
+        level: 32,
+        cost: 115,
+        castTime: 2.0,
+        effects: [{ type: 'directDamage', min: 113, max: 134 }],
+      },
+      {
+        rank: 7,
+        level: 38,
+        cost: 140,
+        castTime: 2.0,
+        effects: [{ type: 'directDamage', min: 151, max: 178 }],
+      },
+      {
+        rank: 8,
+        level: 44,
+        cost: 160,
+        castTime: 2.0,
+        effects: [{ type: 'directDamage', min: 188, max: 223 }],
+      },
+      {
+        rank: 9,
+        level: 50,
+        cost: 185,
+        castTime: 2.0,
+        effects: [{ type: 'directDamage', min: 235, max: 279 }],
+      },
+      {
+        rank: 10,
+        level: 56,
+        cost: 215,
+        castTime: 2.0,
+        effects: [{ type: 'directDamage', min: 294, max: 348 }],
+      },
     ],
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
   },
@@ -2839,6 +4993,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 8, cost: 45, castTime: 3.0, effects: [{ type: 'heal', min: 68, max: 86 }] },
       { rank: 3, level: 14, cost: 75, effects: [{ type: 'heal', min: 115, max: 140 }] },
       { rank: 4, level: 20, cost: 110, effects: [{ type: 'heal', min: 175, max: 208 }] },
+
+      { rank: 5, level: 26, cost: 150, effects: [{ type: 'heal', min: 248, max: 295 }] },
+      { rank: 6, level: 32, cost: 180, effects: [{ type: 'heal', min: 331, max: 393 }] },
+      { rank: 7, level: 38, cost: 215, effects: [{ type: 'heal', min: 440, max: 522 }] },
+      { rank: 8, level: 44, cost: 245, effects: [{ type: 'heal', min: 549, max: 653 }] },
+      { rank: 9, level: 50, cost: 280, effects: [{ type: 'heal', min: 687, max: 816 }] },
+      { rank: 10, level: 56, cost: 320, effects: [{ type: 'heal', min: 859, max: 1020 }] },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -2867,6 +5028,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 50,
         effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 75, duration: 1800 }],
+      },
+
+      {
+        rank: 4,
+        level: 22,
+        cost: 70,
+        effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 106, duration: 1800 }],
+      },
+      {
+        rank: 5,
+        level: 28,
+        cost: 95,
+        effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 151, duration: 1800 }],
+      },
+      {
+        rank: 6,
+        level: 34,
+        cost: 115,
+        effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 201, duration: 1800 }],
+      },
+      {
+        rank: 7,
+        level: 40,
+        cost: 140,
+        effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 268, duration: 1800 }],
+      },
+      {
+        rank: 8,
+        level: 46,
+        cost: 160,
+        effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 334, duration: 1800 }],
+      },
+      {
+        rank: 9,
+        level: 52,
+        cost: 185,
+        effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 418, duration: 1800 }],
       },
     ],
     description:
@@ -2906,6 +5104,61 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'dot', total: 40, duration: 12, interval: 3 },
         ],
       },
+
+      {
+        rank: 4,
+        level: 22,
+        cost: 80,
+        effects: [
+          { type: 'directDamage', min: 40, max: 48 },
+          { type: 'dot', total: 57, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 28,
+        cost: 110,
+        effects: [
+          { type: 'directDamage', min: 56, max: 69 },
+          { type: 'dot', total: 81, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 34,
+        cost: 130,
+        effects: [
+          { type: 'directDamage', min: 75, max: 91 },
+          { type: 'dot', total: 107, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 40,
+        cost: 155,
+        effects: [
+          { type: 'directDamage', min: 100, max: 121 },
+          { type: 'dot', total: 143, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 46,
+        cost: 180,
+        effects: [
+          { type: 'directDamage', min: 125, max: 152 },
+          { type: 'dot', total: 178, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 9,
+        level: 52,
+        cost: 205,
+        effects: [
+          { type: 'directDamage', min: 156, max: 189 },
+          { type: 'dot', total: 223, duration: 12, interval: 3 },
+        ],
+      },
     ],
     description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
   },
@@ -2941,6 +5194,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 80,
         effects: [{ type: 'hot', total: 116, duration: 12, interval: 3 }],
       },
+
+      {
+        rank: 5,
+        level: 26,
+        cost: 110,
+        effects: [{ type: 'hot', total: 165, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 6,
+        level: 32,
+        cost: 130,
+        effects: [{ type: 'hot', total: 219, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 7,
+        level: 38,
+        cost: 155,
+        effects: [{ type: 'hot', total: 291, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 8,
+        level: 44,
+        cost: 180,
+        effects: [{ type: 'hot', total: 364, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 9,
+        level: 50,
+        cost: 205,
+        effects: [{ type: 'hot', total: 455, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 10,
+        level: 56,
+        cost: 235,
+        effects: [{ type: 'hot', total: 569, duration: 12, interval: 3 }],
+      },
     ],
     description: 'Heals the target for $d over 12 sec.',
   },
@@ -2970,6 +5260,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 50,
         effects: [{ type: 'buffTarget', kind: 'thorns', value: 9, duration: 600 }],
       },
+
+      {
+        rank: 4,
+        level: 26,
+        cost: 70,
+        effects: [{ type: 'buffTarget', kind: 'thorns', value: 13, duration: 600 }],
+      },
+      {
+        rank: 5,
+        level: 32,
+        cost: 85,
+        effects: [{ type: 'buffTarget', kind: 'thorns', value: 17, duration: 600 }],
+      },
+      {
+        rank: 6,
+        level: 38,
+        cost: 100,
+        effects: [{ type: 'buffTarget', kind: 'thorns', value: 23, duration: 600 }],
+      },
+      {
+        rank: 7,
+        level: 44,
+        cost: 115,
+        effects: [{ type: 'buffTarget', kind: 'thorns', value: 28, duration: 600 }],
+      },
+      {
+        rank: 8,
+        level: 50,
+        cost: 130,
+        effects: [{ type: 'buffTarget', kind: 'thorns', value: 35, duration: 600 }],
+      },
+      {
+        rank: 9,
+        level: 56,
+        cost: 150,
+        effects: [{ type: 'buffTarget', kind: 'thorns', value: 44, duration: 600 }],
+      },
     ],
     description: 'Thorns sprout from the target: melee attackers take 3 Nature damage.',
   },
@@ -2993,6 +5320,61 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [
           { type: 'root', duration: 12 },
           { type: 'dot', total: 32, duration: 12, interval: 3 },
+        ],
+      },
+
+      {
+        rank: 3,
+        level: 22,
+        cost: 70,
+        effects: [
+          { type: 'root', duration: 12 },
+          { type: 'dot', total: 45, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 28,
+        cost: 95,
+        effects: [
+          { type: 'root', duration: 12 },
+          { type: 'dot', total: 65, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 34,
+        cost: 115,
+        effects: [
+          { type: 'root', duration: 12 },
+          { type: 'dot', total: 86, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 40,
+        cost: 140,
+        effects: [
+          { type: 'root', duration: 12 },
+          { type: 'dot', total: 114, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 46,
+        cost: 160,
+        effects: [
+          { type: 'root', duration: 12 },
+          { type: 'dot', total: 143, duration: 12, interval: 3 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 52,
+        cost: 185,
+        effects: [
+          { type: 'root', duration: 12 },
+          { type: 'dot', total: 178, duration: 12, interval: 3 },
         ],
       },
     ],
@@ -3055,6 +5437,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
         threatFlat: 50,
         effects: [{ type: 'weaponDamage', bonus: 27 }],
       },
+
+      { rank: 3, level: 22, cost: 15, effects: [{ type: 'weaponDamage', bonus: 38 }] },
+      { rank: 4, level: 28, cost: 15, effects: [{ type: 'weaponDamage', bonus: 54 }] },
+      { rank: 5, level: 34, cost: 15, effects: [{ type: 'weaponDamage', bonus: 72 }] },
+      { rank: 6, level: 40, cost: 15, effects: [{ type: 'weaponDamage', bonus: 96 }] },
+      { rank: 7, level: 46, cost: 15, effects: [{ type: 'weaponDamage', bonus: 120 }] },
+      { rank: 8, level: 52, cost: 15, effects: [{ type: 'weaponDamage', bonus: 150 }] },
     ],
     description:
       'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bear Form only.',
@@ -3095,6 +5484,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 10,
         effects: [{ type: 'aoeAttackPower', amount: 35, duration: 20, radius: 8 }],
+      },
+
+      {
+        rank: 3,
+        level: 22,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 50, duration: 20, radius: 8 }],
+      },
+      {
+        rank: 4,
+        level: 28,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 71, duration: 20, radius: 8 }],
+      },
+      {
+        rank: 5,
+        level: 34,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 94, duration: 20, radius: 8 }],
+      },
+      {
+        rank: 6,
+        level: 40,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 125, duration: 20, radius: 8 }],
+      },
+      {
+        rank: 7,
+        level: 46,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 156, duration: 20, radius: 8 }],
+      },
+      {
+        rank: 8,
+        level: 52,
+        cost: 10,
+        effects: [{ type: 'aoeAttackPower', amount: 195, duration: 20, radius: 8 }],
       },
     ],
     description:
@@ -3159,6 +5585,61 @@ export const ABILITIES: Record<string, AbilityDef> = {
           { type: 'dot', total: 48, duration: 9, interval: 3 },
         ],
       },
+
+      {
+        rank: 3,
+        level: 24,
+        cost: 35,
+        effects: [
+          { type: 'weaponStrike', bonus: 14 },
+          { type: 'dot', total: 55, duration: 9, interval: 3 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 30,
+        cost: 35,
+        effects: [
+          { type: 'weaponStrike', bonus: 16 },
+          { type: 'dot', total: 63, duration: 9, interval: 3 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 36,
+        cost: 35,
+        effects: [
+          { type: 'weaponStrike', bonus: 18 },
+          { type: 'dot', total: 73, duration: 9, interval: 3 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 42,
+        cost: 35,
+        effects: [
+          { type: 'weaponStrike', bonus: 21 },
+          { type: 'dot', total: 84, duration: 9, interval: 3 },
+        ],
+      },
+      {
+        rank: 7,
+        level: 48,
+        cost: 35,
+        effects: [
+          { type: 'weaponStrike', bonus: 24 },
+          { type: 'dot', total: 97, duration: 9, interval: 3 },
+        ],
+      },
+      {
+        rank: 8,
+        level: 54,
+        cost: 35,
+        effects: [
+          { type: 'weaponStrike', bonus: 28 },
+          { type: 'dot', total: 111, duration: 9, interval: 3 },
+        ],
+      },
     ],
     description:
       'A stealth opener that rakes the enemy for weapon damage plus $d and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
@@ -3177,7 +5658,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     awardsCombo: 1,
     requiresForm: 'cat',
     effects: [{ type: 'weaponStrike', bonus: 12 }],
-    ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 20 }] }],
+    ranks: [
+      { rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 20 }] },
+      { rank: 3, level: 24, cost: 45, effects: [{ type: 'weaponStrike', bonus: 28 }] },
+      { rank: 4, level: 30, cost: 45, effects: [{ type: 'weaponStrike', bonus: 40 }] },
+      { rank: 5, level: 36, cost: 45, effects: [{ type: 'weaponStrike', bonus: 54 }] },
+      { rank: 6, level: 42, cost: 45, effects: [{ type: 'weaponStrike', bonus: 71 }] },
+      { rank: 7, level: 48, cost: 45, effects: [{ type: 'weaponStrike', bonus: 89 }] },
+      { rank: 8, level: 54, cost: 45, effects: [{ type: 'weaponStrike', bonus: 111 }] },
+    ],
     description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wolf Form only.',
   },
   ferocious_bite: {
@@ -3194,6 +5683,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     requiresForm: 'cat',
     effects: [{ type: 'finisherDamage', base: 10, perCombo: 14, variance: 6 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 24,
+        cost: 60,
+        effects: [{ type: 'finisherDamage', base: 18, perCombo: 25, variance: 11 }],
+      },
+      {
+        rank: 3,
+        level: 32,
+        cost: 75,
+        effects: [{ type: 'finisherDamage', base: 26, perCombo: 37, variance: 16 }],
+      },
+      {
+        rank: 4,
+        level: 40,
+        cost: 95,
+        effects: [{ type: 'finisherDamage', base: 38, perCombo: 54, variance: 23 }],
+      },
+      {
+        rank: 5,
+        level: 48,
+        cost: 115,
+        effects: [{ type: 'finisherDamage', base: 52, perCombo: 72, variance: 31 }],
+      },
+      {
+        rank: 6,
+        level: 56,
+        cost: 140,
+        effects: [{ type: 'finisherDamage', base: 70, perCombo: 97, variance: 42 }],
+      },
+    ],
     description: 'Finishing move that causes damage per combo point. Wolf Form only.',
   },
   swipe: {
@@ -3210,6 +5731,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     threat: { mult: 1.75 }, // classic: swipe damage causes 1.75x threat
     effects: [{ type: 'aoeDamage', min: 12, max: 15, radius: 5 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 26,
+        cost: 35,
+        effects: [{ type: 'aoeDamage', min: 22, max: 27, radius: 5 }],
+      },
+      {
+        rank: 3,
+        level: 34,
+        cost: 45,
+        effects: [{ type: 'aoeDamage', min: 31, max: 39, radius: 5 }],
+      },
+      {
+        rank: 4,
+        level: 42,
+        cost: 55,
+        effects: [{ type: 'aoeDamage', min: 46, max: 58, radius: 5 }],
+      },
+      {
+        rank: 5,
+        level: 50,
+        cost: 65,
+        effects: [{ type: 'aoeDamage', min: 62, max: 78, radius: 5 }],
+      },
+      {
+        rank: 6,
+        level: 58,
+        cost: 80,
+        effects: [{ type: 'aoeDamage', min: 84, max: 104, radius: 5 }],
+      },
+    ],
     description: 'Swipe nearby enemies for $d damage. Causes extra threat. Bear Form only.',
   },
   regrowth: {
@@ -3227,6 +5780,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'heal', min: 52, max: 62 },
       { type: 'hot', total: 49, duration: 21, interval: 3 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 22,
+        cost: 80,
+        effects: [
+          { type: 'heal', min: 83, max: 99 },
+          { type: 'hot', total: 78, duration: 21, interval: 3 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 30,
+        cost: 120,
+        effects: [
+          { type: 'heal', min: 132, max: 158 },
+          { type: 'hot', total: 125, duration: 21, interval: 3 },
+        ],
+      },
+      {
+        rank: 4,
+        level: 38,
+        cost: 155,
+        effects: [
+          { type: 'heal', min: 194, max: 231 },
+          { type: 'hot', total: 183, duration: 21, interval: 3 },
+        ],
+      },
+      {
+        rank: 5,
+        level: 46,
+        cost: 185,
+        effects: [
+          { type: 'heal', min: 261, max: 311 },
+          { type: 'hot', total: 246, duration: 21, interval: 3 },
+        ],
+      },
+      {
+        rank: 6,
+        level: 54,
+        cost: 225,
+        effects: [
+          { type: 'heal', min: 351, max: 419 },
+          { type: 'hot', total: 331, duration: 21, interval: 3 },
+        ],
+      },
     ],
     description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
   },
@@ -3257,6 +5857,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 80, max: 112 }],
+    ranks: [
+      { rank: 2, level: 26, cost: 120, effects: [{ type: 'directDamage', min: 128, max: 179 }] },
+      { rank: 3, level: 34, cost: 155, effects: [{ type: 'directDamage', min: 187, max: 261 }] },
+      { rank: 4, level: 42, cost: 200, effects: [{ type: 'directDamage', min: 273, max: 382 }] },
+      { rank: 5, level: 50, cost: 240, effects: [{ type: 'directDamage', min: 368, max: 515 }] },
+      { rank: 6, level: 58, cost: 290, effects: [{ type: 'directDamage', min: 495, max: 693 }] },
+    ],
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
   },
   travel_form: {
@@ -3317,6 +5924,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'sunder', armor: 35, maxStacks: 1 }],
+    ranks: [
+      { rank: 2, level: 30, cost: 55, effects: [{ type: 'sunder', armor: 71, maxStacks: 1 }] },
+      { rank: 3, level: 42, cost: 80, effects: [{ type: 'sunder', armor: 125, maxStacks: 1 }] },
+      { rank: 4, level: 54, cost: 105, effects: [{ type: 'sunder', armor: 195, maxStacks: 1 }] },
+    ],
     description: "Decreases the target's armor by 35 for 40 sec.",
   },
   hibernate: {
@@ -3379,6 +5991,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'dot', total: 48, duration: 12, interval: 3 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 30,
+        cost: 75,
+        effects: [{ type: 'dot', total: 86, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 3,
+        level: 40,
+        cost: 100,
+        effects: [{ type: 'dot', total: 139, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 4,
+        level: 50,
+        cost: 125,
+        effects: [{ type: 'dot', total: 201, duration: 12, interval: 3 }],
+      },
+      {
+        rank: 5,
+        level: 60,
+        cost: 160,
+        effects: [{ type: 'dot', total: 291, duration: 12, interval: 3 }],
+      },
+    ],
     description: 'The enemy is swarmed by insects, taking $d Nature damage over 12 sec.',
   },
   tigers_fury: {
@@ -3394,6 +6032,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresForm: 'cat',
     effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 28,
+        cost: 45,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 64, duration: 6 }],
+      },
+      {
+        rank: 3,
+        level: 38,
+        cost: 60,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 103, duration: 6 }],
+      },
+      {
+        rank: 4,
+        level: 48,
+        cost: 75,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 149, duration: 6 }],
+      },
+      {
+        rank: 5,
+        level: 58,
+        cost: 95,
+        effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 216, duration: 6 }],
+      },
+    ],
     description: 'Increases attack power by 40 for 6 sec. Wolf Form only.',
   },
   rip: {
@@ -3410,6 +6074,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     requiresForm: 'cat',
     effects: [{ type: 'dot', total: 60, duration: 12, interval: 2 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 28,
+        cost: 45,
+        effects: [{ type: 'dot', total: 72, duration: 12, interval: 2 }],
+      },
+      {
+        rank: 3,
+        level: 36,
+        cost: 55,
+        effects: [{ type: 'dot', total: 87, duration: 12, interval: 2 }],
+      },
+      {
+        rank: 4,
+        level: 44,
+        cost: 65,
+        effects: [{ type: 'dot', total: 105, duration: 12, interval: 2 }],
+      },
+      {
+        rank: 5,
+        level: 52,
+        cost: 80,
+        effects: [{ type: 'dot', total: 126, duration: 12, interval: 2 }],
+      },
+      {
+        rank: 6,
+        level: 60,
+        cost: 95,
+        effects: [{ type: 'dot', total: 152, duration: 12, interval: 2 }],
+      },
+    ],
     description:
       'Finishing move that causes Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
   },
@@ -3430,6 +6126,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     threat: { mult: 1.2 },
     effects: [{ type: 'weaponStrike', bonus: 40 }],
+    ranks: [
+      { rank: 2, level: 24, cost: 30, effects: [{ type: 'weaponStrike', bonus: 91 }] },
+      { rank: 3, level: 36, cost: 30, effects: [{ type: 'weaponStrike', bonus: 160 }] },
+      { rank: 4, level: 48, cost: 30, effects: [{ type: 'weaponStrike', bonus: 251 }] },
+      { rank: 5, level: 60, cost: 30, effects: [{ type: 'weaponStrike', bonus: 392 }] },
+    ],
     description: 'A vicious strike dealing weapon damage plus $d. (Arms signature)',
   },
   bloodthirst: {
@@ -3444,6 +6146,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'weaponStrike', bonus: 35, weaponMult: 0.6 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 24,
+        cost: 30,
+        effects: [{ type: 'weaponStrike', bonus: 79, weaponMult: 0.6 }],
+      },
+      {
+        rank: 3,
+        level: 36,
+        cost: 30,
+        effects: [{ type: 'weaponStrike', bonus: 140, weaponMult: 0.6 }],
+      },
+      {
+        rank: 4,
+        level: 48,
+        cost: 30,
+        effects: [{ type: 'weaponStrike', bonus: 219, weaponMult: 0.6 }],
+      },
+      {
+        rank: 5,
+        level: 60,
+        cost: 30,
+        effects: [{ type: 'weaponStrike', bonus: 343, weaponMult: 0.6 }],
+      },
+    ],
     description: 'Instantly attack in a blood frenzy for $d. (Fury signature)',
   },
   shield_slam: {
@@ -3459,6 +6187,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     threat: { flat: 110 },
     effects: [{ type: 'weaponStrike', bonus: 30, weaponMult: 0.5 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 24,
+        cost: 20,
+        effects: [{ type: 'weaponStrike', bonus: 68, weaponMult: 0.5 }],
+      },
+      {
+        rank: 3,
+        level: 36,
+        cost: 20,
+        effects: [{ type: 'weaponStrike', bonus: 120, weaponMult: 0.5 }],
+      },
+      {
+        rank: 4,
+        level: 48,
+        cost: 20,
+        effects: [{ type: 'weaponStrike', bonus: 188, weaponMult: 0.5 }],
+      },
+      {
+        rank: 5,
+        level: 60,
+        cost: 20,
+        effects: [{ type: 'weaponStrike', bonus: 294, weaponMult: 0.5 }],
+      },
+    ],
     description:
       'Slam the target with your shield for $d and massive threat. (Protection signature)',
   },
@@ -3474,6 +6228,32 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'aoeDamage', min: 30, max: 42, radius: 8 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 24,
+        cost: 25,
+        effects: [{ type: 'aoeDamage', min: 42, max: 58, radius: 8 }],
+      },
+      {
+        rank: 3,
+        level: 36,
+        cost: 25,
+        effects: [{ type: 'aoeDamage', min: 55, max: 77, radius: 8 }],
+      },
+      {
+        rank: 4,
+        level: 48,
+        cost: 25,
+        effects: [{ type: 'aoeDamage', min: 73, max: 102, radius: 8 }],
+      },
+      {
+        rank: 5,
+        level: 60,
+        cost: 25,
+        effects: [{ type: 'aoeDamage', min: 96, max: 135, radius: 8 }],
+      },
+    ],
     description: 'Spin in a deadly arc, striking all nearby enemies for $d. (Fury talent)',
   },
   berserker_rage: {

@@ -5308,4 +5308,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.warbringers_hellforged_cuirass.name':
     'Höllengeschmiedeter Harnisch des Kriegsbringers',
   'entities.items.khorvax_warcleaver.name': 'Khorvax-Kriegsspalter',
+  'entities.items.conjured_bread4.name': 'Herbeigezauberte Zimtschnecke',
+  'entities.items.conjured_bread5.name': 'Herbeigezaubertes Sauerteigbrot',
+  'entities.items.conjured_bread6.name': 'Herbeigezauberter Süßkuchen',
+  'entities.items.conjured_water4.name': 'Herbeigezaubertes Kristallwasser',
+  'entities.items.conjured_water5.name': 'Herbeigezaubertes Gletscherwasser',
+  'entities.items.conjured_water6.name': 'Herbeigezaubertes Bergwasser',
 };

@@ -5206,4 +5206,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.map.theBreachRing': '균열과 분쟁의 고리',
   'hudChrome.map.clickHint': '지역을 클릭하면 지도가 열립니다',
   'hudChrome.map.backHint': '영토를 클릭해 열기. 우클릭으로 한 단계 위로',
+  'entities.items.conjured_bread4.name': '마법 시나몬 롤',
+  'entities.items.conjured_bread5.name': '마법 사워도우 빵',
+  'entities.items.conjured_bread6.name': '마법 달콤한 케이크',
+  'entities.items.conjured_water4.name': '마법 수정 생수',
+  'entities.items.conjured_water5.name': '마법 빙하수',
+  'entities.items.conjured_water6.name': '마법 산악수',
 };

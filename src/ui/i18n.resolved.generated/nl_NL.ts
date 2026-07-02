@@ -5435,6 +5435,24 @@ export const nl_NL: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Khorvax-oorlogskliever"
       },
+      "conjured_bread4": {
+        "name": "Opgeroepen kaneelbroodje"
+      },
+      "conjured_bread5": {
+        "name": "Opgeroepen zuurdesembrood"
+      },
+      "conjured_bread6": {
+        "name": "Opgeroepen zoete cake"
+      },
+      "conjured_water4": {
+        "name": "Opgeroepen kristalwater"
+      },
+      "conjured_water5": {
+        "name": "Opgeroepen gletsjerwater"
+      },
+      "conjured_water6": {
+        "name": "Opgeroepen bergwater"
+      },
       "bristleback_maul": {
         "name": "Borstelrug-Strijdhamer"
       },

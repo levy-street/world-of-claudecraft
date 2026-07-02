@@ -5435,6 +5435,24 @@ export const tr_TR: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Khorvax Savaş Satırı"
       },
+      "conjured_bread4": {
+        "name": "Yaratılmış tarçınlı çörek"
+      },
+      "conjured_bread5": {
+        "name": "Yaratılmış ekşi mayalı ekmek"
+      },
+      "conjured_bread6": {
+        "name": "Yaratılmış tatlı kek"
+      },
+      "conjured_water4": {
+        "name": "Yaratılmış kristal su"
+      },
+      "conjured_water5": {
+        "name": "Yaratılmış buzul suyu"
+      },
+      "conjured_water6": {
+        "name": "Yaratılmış dağ suyu"
+      },
       "bristleback_maul": {
         "name": "Dikensırt Balyozu"
       },

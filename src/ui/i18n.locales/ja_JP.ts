@@ -5197,4 +5197,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.map.theBreachRing': 'ブリーチと係争の環',
   'hudChrome.map.clickHint': '地域をクリックしてマップを開く',
   'hudChrome.map.backHint': '領地をクリックで開く。右クリックで一段戻る',
+  'entities.items.conjured_bread4.name': '魔法のシナモンロール',
+  'entities.items.conjured_bread5.name': '魔法のサワードウパン',
+  'entities.items.conjured_bread6.name': '魔法の甘いケーキ',
+  'entities.items.conjured_water4.name': '魔法のクリスタルウォーター',
+  'entities.items.conjured_water5.name': '魔法の氷河水',
+  'entities.items.conjured_water6.name': '魔法の山の水',
 };

@@ -6158,4 +6158,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'races.racialDesc_nomad': 'El espíritu aumenta un 5%.',
   'races.racialName_stone_warden': 'Fuerza de cantera',
   'races.racialDesc_stone_warden': 'La fuerza aumenta un 3%.',
+  'entities.items.conjured_bread4.name': 'Rollo de canela conjurado',
+  'entities.items.conjured_bread5.name': 'Pan de masa madre conjurado',
+  'entities.items.conjured_bread6.name': 'Bizcocho conjurado',
+  'entities.items.conjured_water4.name': 'Agua cristalina conjurada',
+  'entities.items.conjured_water5.name': 'Agua glacial conjurada',
+  'entities.items.conjured_water6.name': 'Agua de montaña conjurada',
 };

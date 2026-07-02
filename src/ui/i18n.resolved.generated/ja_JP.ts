@@ -5435,6 +5435,24 @@ export const ja_JP: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "コルヴァクスの戦割り斧"
       },
+      "conjured_bread4": {
+        "name": "魔法のシナモンロール"
+      },
+      "conjured_bread5": {
+        "name": "魔法のサワードウパン"
+      },
+      "conjured_bread6": {
+        "name": "魔法の甘いケーキ"
+      },
+      "conjured_water4": {
+        "name": "魔法のクリスタルウォーター"
+      },
+      "conjured_water5": {
+        "name": "魔法の氷河水"
+      },
+      "conjured_water6": {
+        "name": "魔法の山の水"
+      },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
       },

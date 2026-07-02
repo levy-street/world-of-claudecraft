@@ -5435,6 +5435,24 @@ export const it_IT: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Squarciatore da guerra di Khorvax"
       },
+      "conjured_bread4": {
+        "name": "Girella alla cannella evocata"
+      },
+      "conjured_bread5": {
+        "name": "Pane a lievitazione naturale evocato"
+      },
+      "conjured_bread6": {
+        "name": "Dolcetto evocato"
+      },
+      "conjured_water4": {
+        "name": "Acqua cristallina evocata"
+      },
+      "conjured_water5": {
+        "name": "Acqua glaciale evocata"
+      },
+      "conjured_water6": {
+        "name": "Acqua di montagna evocata"
+      },
       "bristleback_maul": {
         "name": "Maglio Bristleback"
       },

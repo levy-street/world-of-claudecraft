@@ -5435,6 +5435,24 @@ export const vi_VN: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Đao Chiến Khorvax"
       },
+      "conjured_bread4": {
+        "name": "Bánh quế triệu hồi"
+      },
+      "conjured_bread5": {
+        "name": "Bánh mì bột chua triệu hồi"
+      },
+      "conjured_bread6": {
+        "name": "Bánh ngọt triệu hồi"
+      },
+      "conjured_water4": {
+        "name": "Nước pha lê triệu hồi"
+      },
+      "conjured_water5": {
+        "name": "Nước sông băng triệu hồi"
+      },
+      "conjured_water6": {
+        "name": "Nước suối núi triệu hồi"
+      },
       "bristleback_maul": {
         "name": "Vồ Lưng Gai"
       },

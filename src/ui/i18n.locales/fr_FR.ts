@@ -5323,4 +5323,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.warbringers_hellforged_cuirass.name':
     'Cuirasse forgée aux enfers du Porte-Guerre',
   'entities.items.khorvax_warcleaver.name': 'Fendoir de guerre de Khorvax',
+  'entities.items.conjured_bread4.name': 'Roulé à la cannelle conjuré',
+  'entities.items.conjured_bread5.name': 'Pain au levain conjuré',
+  'entities.items.conjured_bread6.name': 'Gâteau conjuré',
+  'entities.items.conjured_water4.name': 'Eau cristalline conjurée',
+  'entities.items.conjured_water5.name': 'Eau glaciaire conjurée',
+  'entities.items.conjured_water6.name': 'Eau de montagne conjurée',
 };

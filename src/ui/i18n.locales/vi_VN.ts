@@ -5213,4 +5213,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Lưỡi Lột Da Của Vhorlan',
   'entities.items.warbringers_hellforged_cuirass.name': 'Giáp Rèn Địa Ngục Của Kẻ Mang Chiến Tranh',
   'entities.items.khorvax_warcleaver.name': 'Đao Chiến Khorvax',
+  'entities.items.conjured_bread4.name': 'Bánh quế triệu hồi',
+  'entities.items.conjured_bread5.name': 'Bánh mì bột chua triệu hồi',
+  'entities.items.conjured_bread6.name': 'Bánh ngọt triệu hồi',
+  'entities.items.conjured_water4.name': 'Nước pha lê triệu hồi',
+  'entities.items.conjured_water5.name': 'Nước sông băng triệu hồi',
+  'entities.items.conjured_water6.name': 'Nước suối núi triệu hồi',
 };

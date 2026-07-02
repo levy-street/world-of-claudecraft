@@ -5435,6 +5435,24 @@ export const ru_RU: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Боевой тесак Корвакса"
       },
+      "conjured_bread4": {
+        "name": "Наколдованная булочка с корицей"
+      },
+      "conjured_bread5": {
+        "name": "Наколдованный хлеб на закваске"
+      },
+      "conjured_bread6": {
+        "name": "Наколдованный сладкий пирог"
+      },
+      "conjured_water4": {
+        "name": "Наколдованная кристальная вода"
+      },
+      "conjured_water5": {
+        "name": "Наколдованная ледниковая вода"
+      },
+      "conjured_water6": {
+        "name": "Наколдованная горная вода"
+      },
       "bristleback_maul": {
         "name": "Кувалда Щетиноспина"
       },

@@ -5263,4 +5263,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Lâmina esfoladora de Vhorlan',
   'entities.items.warbringers_hellforged_cuirass.name': 'Couraça forjada no inferno do Belicoso',
   'entities.items.khorvax_warcleaver.name': 'Rachador de guerra de Khorvax',
+  'entities.items.conjured_bread4.name': 'Rolo de canela conjurado',
+  'entities.items.conjured_bread5.name': 'Pão de fermentação natural conjurado',
+  'entities.items.conjured_bread6.name': 'Bolo doce conjurado',
+  'entities.items.conjured_water4.name': 'Água cristalina conjurada',
+  'entities.items.conjured_water5.name': 'Água glacial conjurada',
+  'entities.items.conjured_water6.name': 'Água da montanha conjurada',
 };

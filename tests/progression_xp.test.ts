@@ -58,7 +58,9 @@ describe('progression/xp — updateRested (accrual + cap)', () => {
     sim.player.inCombat = false;
     meta.restedXp = 0;
     updateRested(sim.player, meta);
-    const perSecond = (0.05 * xpForLevel(sim.player.level)) / (8 * 60);
+    // default players are Human: the Promise of the Landing racial accrues
+    // rested XP 25% faster (see src/sim/content/races.ts)
+    const perSecond = ((0.05 * xpForLevel(sim.player.level)) / (8 * 60)) * 1.25;
     expect(meta.restedXp).toBeCloseTo(perSecond * DT, 6);
   });
 

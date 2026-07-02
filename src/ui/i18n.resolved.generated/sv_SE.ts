@@ -5435,6 +5435,24 @@ export const sv_SE: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Khorvax-krigsklyvare"
       },
+      "conjured_bread4": {
+        "name": "Framtrollad kanelbulle"
+      },
+      "conjured_bread5": {
+        "name": "Framtrollat surdegsbröd"
+      },
+      "conjured_bread6": {
+        "name": "Framtrollad sötkaka"
+      },
+      "conjured_water4": {
+        "name": "Framtrollat kristallvatten"
+      },
+      "conjured_water5": {
+        "name": "Framtrollat glaciärvatten"
+      },
+      "conjured_water6": {
+        "name": "Framtrollat bergsvatten"
+      },
       "bristleback_maul": {
         "name": "Borstryggens klubba"
       },

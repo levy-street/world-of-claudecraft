@@ -5257,4 +5257,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Bilah Pengulit Vhorlan',
   'entities.items.warbringers_hellforged_cuirass.name': 'Kuiras Tempaan Neraka Sang Pembawa Perang',
   'entities.items.khorvax_warcleaver.name': 'Kapak Perang Khorvax',
+  'entities.items.conjured_bread4.name': 'Roti kayu manis sihir',
+  'entities.items.conjured_bread5.name': 'Roti sourdough sihir',
+  'entities.items.conjured_bread6.name': 'Kue manis sihir',
+  'entities.items.conjured_water4.name': 'Air kristal sihir',
+  'entities.items.conjured_water5.name': 'Air gletser sihir',
+  'entities.items.conjured_water6.name': 'Air pegunungan sihir',
 };

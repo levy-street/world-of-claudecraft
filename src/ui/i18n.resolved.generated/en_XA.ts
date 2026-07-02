@@ -5435,6 +5435,24 @@ export const en_XA: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "[Ķĥóŕʋáẋ Ŵáŕçļéáʋéŕ]"
       },
+      "conjured_bread4": {
+        "name": "[Çóñĵúŕéð Çíññáɱóñ Ŕóļļ]"
+      },
+      "conjured_bread5": {
+        "name": "[Çóñĵúŕéð Šóúŕðóúĝĥ]"
+      },
+      "conjured_bread6": {
+        "name": "[Çóñĵúŕéð Šŵééţçáķé]"
+      },
+      "conjured_water4": {
+        "name": "[Çóñĵúŕéð Çŕýšţáļ Ŵáţéŕ]"
+      },
+      "conjured_water5": {
+        "name": "[Çóñĵúŕéð Ĝļáçíéŕ Ŵáţéŕ]"
+      },
+      "conjured_water6": {
+        "name": "[Çóñĵúŕéð Ɱóúñţáíñ Ŵáţéŕ]"
+      },
       "bristleback_maul": {
         "name": "[Ɓŕíšţļéƀáçķ Ɱáúļ]"
       },

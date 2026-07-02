@@ -5221,4 +5221,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.vhorlans_flensing_blade.name': 'Ostrze oprawcy Vhorlana',
   'entities.items.warbringers_hellforged_cuirass.name': 'Piekielnie kuty kirys Niosącego Wojnę',
   'entities.items.khorvax_warcleaver.name': 'Wojenny tasak Khorvaxa',
+  'entities.items.conjured_bread4.name': 'Wyczarowana bułka cynamonowa',
+  'entities.items.conjured_bread5.name': 'Wyczarowany chleb na zakwasie',
+  'entities.items.conjured_bread6.name': 'Wyczarowane słodkie ciasto',
+  'entities.items.conjured_water4.name': 'Wyczarowana krystaliczna woda',
+  'entities.items.conjured_water5.name': 'Wyczarowana lodowcowa woda',
+  'entities.items.conjured_water6.name': 'Wyczarowana górska woda',
 };

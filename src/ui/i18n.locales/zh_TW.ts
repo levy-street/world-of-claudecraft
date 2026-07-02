@@ -4952,4 +4952,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.map.theBreachRing': '裂隙與爭奪之環',
   'hudChrome.map.clickHint': '點擊區域打開其地圖',
   'hudChrome.map.backHint': '點擊領地進入。右鍵返回上一級',
+  'entities.items.conjured_bread4.name': '魔法肉桂捲',
+  'entities.items.conjured_bread5.name': '魔法酸麵包',
+  'entities.items.conjured_bread6.name': '魔法甜糕',
+  'entities.items.conjured_water4.name': '魔法水晶水',
+  'entities.items.conjured_water5.name': '魔法冰川水',
+  'entities.items.conjured_water6.name': '魔法山泉水',
 };

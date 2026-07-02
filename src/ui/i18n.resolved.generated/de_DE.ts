@@ -5435,6 +5435,24 @@ export const de_DE: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Khorvax-Kriegsspalter"
       },
+      "conjured_bread4": {
+        "name": "Herbeigezauberte Zimtschnecke"
+      },
+      "conjured_bread5": {
+        "name": "Herbeigezaubertes Sauerteigbrot"
+      },
+      "conjured_bread6": {
+        "name": "Herbeigezauberter Süßkuchen"
+      },
+      "conjured_water4": {
+        "name": "Herbeigezaubertes Kristallwasser"
+      },
+      "conjured_water5": {
+        "name": "Herbeigezaubertes Gletscherwasser"
+      },
+      "conjured_water6": {
+        "name": "Herbeigezaubertes Bergwasser"
+      },
       "bristleback_maul": {
         "name": "Bristleback-Schlägel"
       },

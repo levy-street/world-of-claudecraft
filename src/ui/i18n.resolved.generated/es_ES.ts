@@ -5435,6 +5435,24 @@ export const es_ES: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Hendedor de guerra de Khorvax"
       },
+      "conjured_bread4": {
+        "name": "Rollo de canela conjurado"
+      },
+      "conjured_bread5": {
+        "name": "Pan de masa madre conjurado"
+      },
+      "conjured_bread6": {
+        "name": "Bizcocho conjurado"
+      },
+      "conjured_water4": {
+        "name": "Agua cristalina conjurada"
+      },
+      "conjured_water5": {
+        "name": "Agua glacial conjurada"
+      },
+      "conjured_water6": {
+        "name": "Agua de montaña conjurada"
+      },
       "bristleback_maul": {
         "name": "Maza Bristleback"
       },

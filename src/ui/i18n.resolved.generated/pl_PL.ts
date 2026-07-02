@@ -5435,6 +5435,24 @@ export const pl_PL: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "Wojenny tasak Khorvaxa"
       },
+      "conjured_bread4": {
+        "name": "Wyczarowana bułka cynamonowa"
+      },
+      "conjured_bread5": {
+        "name": "Wyczarowany chleb na zakwasie"
+      },
+      "conjured_bread6": {
+        "name": "Wyczarowane słodkie ciasto"
+      },
+      "conjured_water4": {
+        "name": "Wyczarowana krystaliczna woda"
+      },
+      "conjured_water5": {
+        "name": "Wyczarowana lodowcowa woda"
+      },
+      "conjured_water6": {
+        "name": "Wyczarowana górska woda"
+      },
       "bristleback_maul": {
         "name": "Tłuk szczeciniastych"
       },

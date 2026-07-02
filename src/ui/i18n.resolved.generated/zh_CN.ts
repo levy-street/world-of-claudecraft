@@ -5435,6 +5435,24 @@ export const zh_CN: EnTranslations = {
       "khorvax_warcleaver": {
         "name": "库尔瓦克斯战争劈刀"
       },
+      "conjured_bread4": {
+        "name": "魔法肉桂卷"
+      },
+      "conjured_bread5": {
+        "name": "魔法酸面包"
+      },
+      "conjured_bread6": {
+        "name": "魔法甜糕"
+      },
+      "conjured_water4": {
+        "name": "魔法水晶水"
+      },
+      "conjured_water5": {
+        "name": "魔法冰川水"
+      },
+      "conjured_water6": {
+        "name": "魔法山泉水"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
