@@ -828,6 +828,40 @@ describe('food, drink, vendor', () => {
     expect(sim.player.drinking).toBe(null);
   });
 
+  it('stops eating and stands once food tops off health', () => {
+    const sim = makeSim('warrior');
+    sim.addItem('baked_bread', 1);
+    sim.player.hp = sim.player.maxHp - 1;
+    sim.player.combatTimer = 99;
+    sim.player.inCombat = false;
+
+    sim.useItem('baked_bread');
+    for (let i = 0; i < 40; i++) sim.tick();
+
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+    expect(sim.player.eating).toBe(null);
+    expect(sim.player.sitting).toBe(false);
+  });
+
+  it('stops drinking at full mana while food keeps restoring health', () => {
+    const sim = makeSim('mage');
+    sim.addItem('baked_bread', 1);
+    sim.addItem('spring_water', 1);
+    sim.player.hp = 20;
+    sim.player.resource = sim.player.maxResource - 1;
+    sim.player.combatTimer = 99;
+    sim.player.inCombat = false;
+
+    sim.useItem('baked_bread');
+    sim.useItem('spring_water');
+    for (let i = 0; i < 40; i++) sim.tick();
+
+    expect(sim.player.resource).toBe(sim.player.maxResource);
+    expect(sim.player.drinking).toBe(null);
+    expect(sim.player.eating).not.toBe(null);
+    expect(sim.player.sitting).toBe(true);
+  });
+
   it('combat potions restore instantly, work in combat, and share a cooldown (#103)', () => {
     const sim = makeSim('mage');
     sim.addItem('minor_mana_potion', 2);

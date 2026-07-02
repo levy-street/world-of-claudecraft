@@ -90,8 +90,11 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
       p.resource = Math.min(p.maxResource, p.resource + c.manaPer2s);
     }
     c.remaining -= 2;
-    if (c.remaining <= 0) p[slot] = null;
+    const fullHealth = c.hpPer2s > 0 && p.hp >= p.maxHp;
+    const fullMana = c.manaPer2s > 0 && (p.resourceType !== 'mana' || p.resource >= p.maxResource);
+    if (c.remaining <= 0 || fullHealth || fullMana) p[slot] = null;
   }
+  if (!p.eating && !p.drinking) p.sitting = false;
 }
 
 export function updateTimers(p: Entity): void {
