@@ -83,8 +83,10 @@ type MapColors = Record<keyof typeof MAP_COLOR_TOKENS, string>;
  *  Hud-owned (Hud keys the bg cache by zone); the painter owns the decorations. */
 export interface MapPaintOptions {
   zone: ZoneDef;
-  /** The cached terrain background canvas for the committed zone. */
-  bg: HTMLCanvasElement;
+  /** The cached terrain background canvas for the committed zone, or null when
+   *  the idle prewarm has not produced it yet (markers/labels still draw and
+   *  the finished background repaints in when its prewarm completes). */
+  bg: HTMLCanvasElement | null;
   /** The square map-canvas side in px. */
   canvasSize: number;
   zoom: number;
@@ -120,6 +122,13 @@ export class MapWindowPainter {
   }
 
   /** Paint the overworld map for one redraw and report the view rect + cursor. */
+  /** Generate (or reuse) the whole-world decoration cache ahead of the first
+   *  map open, so an idle callback pays the one-time cost instead of the
+   *  opening click. */
+  prewarmDecorations(seed: number): void {
+    if (!this.decorations) this.decorations = generateDecorations(seed);
+  }
+
   paintOverworld(
     ctx: CanvasRenderingContext2D,
     world: IWorld,
@@ -142,23 +151,29 @@ export class MapWindowPainter {
   private draw(
     ctx: CanvasRenderingContext2D,
     model: OverworldMapModel,
-    bg: HTMLCanvasElement,
+    bg: HTMLCanvasElement | null,
     S: number,
     colors: MapColors,
   ): void {
     // Blit the matching sub-rect of the cached terrain (note: +X is map-left).
+    // While the prewarm is still producing this zone's background, draw the
+    // markers over the window's own backdrop; the finished terrain repaints in.
     ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(
-      bg,
-      model.blit.sxFrac * bg.width,
-      model.blit.syFrac * bg.height,
-      model.blit.swFrac * bg.width,
-      model.blit.shFrac * bg.height,
-      0,
-      0,
-      S,
-      S,
-    );
+    if (bg) {
+      ctx.drawImage(
+        bg,
+        model.blit.sxFrac * bg.width,
+        model.blit.syFrac * bg.height,
+        model.blit.swFrac * bg.width,
+        model.blit.shFrac * bg.height,
+        0,
+        0,
+        S,
+        S,
+      );
+    } else {
+      ctx.clearRect(0, 0, S, S);
+    }
 
     if (model.detail) this.drawDetail(ctx, model.detail, colors);
 

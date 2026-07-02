@@ -942,6 +942,9 @@ export class Hud {
   // The painted level art, loaded on first use; a load-completion repaints the
   // open map so the art pops in under the already-drawn shapes.
   private readonly mapAtlasImages = new Map<AtlasLevelId, HTMLImageElement>();
+  // Zones waiting for an idle map-background prewarm (the whole world is
+  // queued at world entry; priority requests jump to the front).
+  private mapPrewarmQueue: string[] = [];
   private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
   private mapView: {
     spanX: number;
@@ -1328,7 +1331,25 @@ export class Hud {
     const startZone = zoneAt(sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
-    this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
+    // Prewarm the whole map surface during idle so neither the first open nor
+    // any atlas drill-down ever pays a render on the click: the spawn zone
+    // first, then every other zone trickles through the same idle queue, plus
+    // the painted atlas art (decoded ahead of the first draw) and the
+    // whole-world decoration cache the zoomed-in detail overlay reads.
+    this.prewarmMapBg(startZone.id, true);
+    for (const z of ZONES) this.prewarmMapBg(z.id);
+    this.mapAtlasImage('world');
+    this.mapAtlasImage('breach');
+    const idle = (
+      window as typeof window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
+    const warmDecorations = () => this.mapPainter.prewarmDecorations(this.sim.cfg.seed);
+    // the timeout forces the warm-up through even on a saturated main thread,
+    // where pure idle slots may never arrive
+    if (idle) idle(warmDecorations, { timeout: 1500 });
+    else window.setTimeout(warmDecorations, 1500);
     this.showBanner(startZoneName);
     this.log(t('hud.core.welcomeZone', { zone: startZoneName }), '#ffd100');
     this.logZoneWelcome(startZone);
@@ -5423,29 +5444,41 @@ export class Hud {
     return { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
   }
 
-  // The cached terrain background for a zone, rendering it synchronously only if
-  // a prewarm hasn't already produced it. The synchronous path is the fallback
-  // for "opened the map the instant we entered a zone"; normally the idle
-  // prewarm has it ready and this is a Map hit.
-  private mapZoneBg(zone: ZoneDef): HTMLCanvasElement {
+  // The cached terrain background for a zone, or null while the idle prewarm
+  // is still producing it (the miss bumps that zone to the queue front and the
+  // finished render repaints the open map). Never renders synchronously: the
+  // old sync fallback was the ~200ms open/zone-change hitch.
+  private mapZoneBg(zone: ZoneDef): HTMLCanvasElement | null {
     const cached = this.mapBgCache.get(zone.id);
     if (cached) return cached;
-    const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
-    this.mapBgCache.set(zone.id, bg);
-    // a redundant in-flight prewarm for this same zone can be dropped now
-    if (this.mapPrewarm?.zoneId === zone.id) this.cancelMapPrewarm();
-    return bg;
+    this.prewarmMapBg(zone.id, true);
+    return null;
   }
 
-  // Kick off (or no-op) an idle, time-sliced render of a zone's map background
-  // so opening the map never pays the ~200ms terrain cost on the click. Called
-  // when the committed zone changes and once at startup for the spawn zone.
-  private prewarmMapBg(zoneId: string): void {
+  // Kick off (or queue) an idle, time-sliced render of a zone's map background
+  // so opening the map never pays the ~200ms terrain cost on the click. Every
+  // zone is queued once at world entry; priority requests (the committed zone,
+  // an atlas drill-down) jump the queue while the in-flight slice finishes.
+  private prewarmMapBg(zoneId: string, priority = false): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
+    if (this.mapPrewarm) {
+      // a job is in flight: queue this zone instead of dropping either render
+      const at = this.mapPrewarmQueue.indexOf(zoneId);
+      if (at >= 0) {
+        if (!priority || at === 0) return;
+        this.mapPrewarmQueue.splice(at, 1);
+      }
+      if (priority) this.mapPrewarmQueue.unshift(zoneId);
+      else this.mapPrewarmQueue.push(zoneId);
+      return;
+    }
+    this.startMapPrewarmJob(zoneId);
+  }
+
+  private startMapPrewarmJob(zoneId: string): void {
     const zone = ZONES.find((z) => z.id === zoneId);
     if (!zone) return;
-    this.cancelMapPrewarm(); // drop any prewarm for a now-stale zone
     const region = this.mapZoneRegion(zone);
     const W = MAP_BG_RES;
     const H = mapCanvasHeight(W, region);
@@ -5466,24 +5499,18 @@ export class Hud {
     this.scheduleMapPrewarm();
   }
 
-  private cancelMapPrewarm(): void {
-    if (this.mapPrewarmHandle) {
-      // Cancel only with the scheduler that produced this handle (see
-      // mapPrewarmVia): the two id pools are separate per spec, so a cross
-      // canceller could clear an unrelated timer sharing the number. When the
-      // idle path lacks cancelIdleCallback there is nothing to call, but the
-      // pumpMapPrewarm `if (!job) return` guard makes the stale callback a no-op.
-      if (this.mapPrewarmVia === 'idle') {
-        const cancel = (window as typeof window & { cancelIdleCallback?: (h: number) => void })
-          .cancelIdleCallback;
-        if (cancel) cancel(this.mapPrewarmHandle);
-      } else {
-        clearTimeout(this.mapPrewarmHandle);
-      }
-      this.mapPrewarmHandle = 0;
-      this.mapPrewarmVia = null;
-    }
-    this.mapPrewarm = null;
+  // (the old cancelMapPrewarm was dropped with the sync-render fallback: the
+  // prewarm queue never abandons a job, it finishes each render and moves on)
+
+  /** True while the open zone map is waiting on the in-flight prewarm (it is
+   *  showing the placeholder backdrop), which upgrades the trickle cadence. */
+  private mapPrewarmUrgent(): boolean {
+    return (
+      $('#map-window').style.display === 'block' &&
+      !this.mapAtlasLevel &&
+      this.mapPrewarm !== null &&
+      !this.mapBgCache.has(this.mapPrewarm.zoneId)
+    );
   }
 
   private scheduleMapPrewarm(): void {
@@ -5493,38 +5520,56 @@ export class Hud {
         opts?: { timeout: number },
       ) => number;
     };
-    if (w.requestIdleCallback) {
-      this.mapPrewarmHandle = w.requestIdleCallback(this.pumpMapPrewarm, { timeout: 2000 });
-      this.mapPrewarmVia = 'idle';
-    } else {
+    // when the open map is waiting on this very render, pace with a fast timer
+    // instead of idle slots so the terrain pops in within a second or two even
+    // on a fully loaded main thread
+    if (this.mapPrewarmUrgent() || !w.requestIdleCallback) {
       this.mapPrewarmHandle = window.setTimeout(() => this.pumpMapPrewarm(), 16);
       this.mapPrewarmVia = 'timeout';
+      return;
     }
+    this.mapPrewarmHandle = w.requestIdleCallback(this.pumpMapPrewarm, { timeout: 500 });
+    this.mapPrewarmVia = 'idle';
   }
 
   // Paint a budgeted slice of the in-flight prewarm, then reschedule until the
   // zone is fully rendered. Whole rows per slice keeps it byte-identical to a
   // one-shot render (the only per-row state, hillshade, resets each row).
-  // With an idle deadline we paint as many slices as fit; without one (the
-  // setTimeout fallback) we paint a single slice and let the reschedule pace it,
-  // so the no-requestIdleCallback path stays sliced instead of rendering the
-  // whole canvas in one ~200ms hitch.
+  // Each callback paints for at least MIN_SLICE_MS even when the idle deadline
+  // reports no spare time (a saturated main thread otherwise starves the pump
+  // to one slice per forced-timeout callback and the queue never drains), and
+  // keeps consuming genuinely idle time beyond that.
   private pumpMapPrewarm = (deadline?: { timeRemaining(): number }): void => {
     const job = this.mapPrewarm;
     if (!job) return;
     const seed = this.sim.cfg.seed;
     const ROWS_PER_SLICE = 16; // ~6ms at MAP_BG_RES; one frame fits several
+    const MIN_SLICE_MS = this.mapPrewarmUrgent() ? 12 : 6;
+    const start = performance.now();
     do {
       const end = Math.min(job.H, job.row + ROWS_PER_SLICE);
       paintTerrainRows(job.img.data, job.W, job.H, job.region, seed, job.row, end);
       job.row = end;
-    } while (job.row < job.H && deadline !== undefined && deadline.timeRemaining() > 3);
+    } while (
+      job.row < job.H &&
+      (performance.now() - start < MIN_SLICE_MS ||
+        (deadline !== undefined && deadline.timeRemaining() > 3))
+    );
     if (job.row >= job.H) {
       job.ctx.putImageData(job.img, 0, 0);
       this.mapBgCache.set(job.zoneId, job.canvas);
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;
+      // if the open map is showing this zone with the placeholder backdrop,
+      // repaint so the finished terrain pops in
+      if ($('#map-window').style.display === 'block' && !this.mapAtlasLevel) {
+        this.updateMapWindow();
+      }
+      // trickle through the rest of the world during idle
+      const next = this.mapPrewarmQueue.find((id) => !this.mapBgCache.has(id));
+      this.mapPrewarmQueue = this.mapPrewarmQueue.filter((id) => id !== next);
+      if (next) this.startMapPrewarmJob(next);
       return;
     }
     this.scheduleMapPrewarm();
@@ -5758,6 +5803,8 @@ export class Hud {
     if (!img) {
       img = new Image();
       img.addEventListener('load', () => {
+        // pre-decode so the first drawImage never pays the decode hitch
+        img?.decode?.().catch(() => {});
         if ($('#map-window').style.display === 'block') this.updateMapWindow();
       });
       img.src = MAP_ATLAS[level].image;
