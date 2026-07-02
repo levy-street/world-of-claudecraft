@@ -496,6 +496,10 @@ export interface EntityView {
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
+  /** templateId the object mesh was built from. The sim swaps delve interactable
+   *  templates in place (plate -> triggered, rope -> pulled); diffing this each
+   *  frame drops the stale view so it rebuilds with the new mesh. */
+  builtTemplateId?: string;
   portal?: THREE.Mesh; // dungeon door swirl
   objectCasters: THREE.Object3D[]; // object-view shadow meshes, distance-gated
   viewLights: THREE.PointLight[]; // point lights this view contributes to the budget
@@ -3059,7 +3063,9 @@ export class Renderer {
         !e.templateId.startsWith('delve_sluice_valve') &&
         !e.templateId.startsWith('delve_grave_tablet') &&
         !e.templateId.startsWith('delve_corpse_candle') &&
-        !e.templateId.startsWith('delve_bell_rope') &&
+        // A pullable rope IS an F-interactable, so it keeps the sparkle until
+        // pulled (unlike the flush walk-on plates above).
+        e.templateId !== 'delve_bell_rope_pulled' &&
         e.templateId !== 'delve_locked_door' &&
         e.templateId !== 'delve_destructible_wall'
       ) {
@@ -3284,6 +3290,7 @@ export class Renderer {
       sparkle,
       objectMesh,
       objectPoolKey,
+      builtTemplateId: e.kind === 'object' ? e.templateId : undefined,
       portal,
       nameplateDisplay: 'none',
       nameplateTransform: '',
@@ -3935,6 +3942,13 @@ export class Renderer {
       v.group.rotation.y = facing;
 
       if (e.kind === 'object') {
+        // The sim swaps delve interactable templates in place (pressure plate ->
+        // triggered, bell rope -> pulled). Drop the stale view; the create pass
+        // rebuilds it from the new template within a frame.
+        if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
+          this.removeView(id);
+          continue;
+        }
         const isPortalObject = isPersistentPortalObject(e);
         const vis = e.lootable && (!isPortalObject || d2 <= ENTITY_VIEW_CREATE_RANGE_SQ);
         v.group.visible = vis;

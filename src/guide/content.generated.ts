@@ -1729,8 +1729,7 @@ export const GUIDE_DELVES: GuideDelve[] = [
       "Candleblind",
       "Grave Tax",
       "Unstable Roof",
-      "Cult Remnants",
-      "Belligerent Dead"
+      "Cult Remnants"
     ]
   },
   {

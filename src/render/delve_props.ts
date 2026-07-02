@@ -846,6 +846,64 @@ function buildDrownedReliquary(
 }
 
 // ---------------------------------------------------------------------------
+// delve_bell_rope, a hanging rope on a wooden frame the player pulls with F
+// (the Choir Loft puzzle). Unpulled: the rope hangs low with a knotted end,
+// inviting the pull. Pulled: the rope is drawn short, the bell is tipped, and
+// a green floor glow marks it done (same "triggered" cue as the plates).
+// ---------------------------------------------------------------------------
+function buildBellRope(pulled: boolean, entityId: number): { group: THREE.Group; height: number } {
+  const group = new THREE.Group();
+  const rotY = ((entityId * 13) % 7) * 0.12 - 0.4;
+  group.rotation.y = rotY;
+
+  const wood = stoneMat(0x4a3c28);
+  const rope = stoneMat(0x8a7a58);
+  const bronze = ironMat(pulled ? 0x53604f : 0x3a4440);
+
+  // Frame: two posts plus a crossbeam.
+  for (const side of [-1, 1]) {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.24, 3.2, 0.24), wood);
+    post.position.set(side * 1.0, 1.6, 0);
+    post.castShadow = true;
+    group.add(post);
+  }
+  const beam = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.2, 0.2), wood);
+  beam.position.y = 3.2;
+  beam.castShadow = true;
+  group.add(beam);
+
+  // Bell under the beam, tipped once rung.
+  const bell = new THREE.Mesh(
+    new THREE.SphereGeometry(0.34, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.72),
+    bronze,
+  );
+  bell.position.set(0, 2.85, 0);
+  bell.rotation.x = Math.PI;
+  if (pulled) bell.rotation.z = 0.5;
+  group.add(bell);
+
+  // The rope itself: taut and knotted at grab height before the pull, drawn
+  // up short after.
+  const ropeLen = pulled ? 0.7 : 1.9;
+  const ropeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, ropeLen, 6), rope);
+  ropeMesh.position.set(pulled ? 0.18 : 0, 2.62 - ropeLen / 2, 0);
+  if (pulled) ropeMesh.rotation.z = 0.35;
+  group.add(ropeMesh);
+  if (!pulled) {
+    const knot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 6), rope);
+    knot.position.set(0, 2.62 - ropeLen, 0);
+    group.add(knot);
+  } else {
+    const glow = new THREE.Mesh(new THREE.CircleGeometry(1.0, 24), glowMat(0x22aa44, 0.32));
+    glow.rotation.x = -Math.PI / 2;
+    glow.position.y = 0.06;
+    group.add(glow);
+  }
+
+  return { group, height: 3.5 };
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -889,7 +947,7 @@ export function buildDelveInteractable(
       return buildPressurePlate(templateId.endsWith('_lit'), entityId);
     case 'delve_bell_rope':
     case 'delve_bell_rope_pulled':
-      return buildPressurePlate(templateId.endsWith('_pulled'), entityId);
+      return buildBellRope(templateId.endsWith('_pulled'), entityId);
     case 'delve_rite_shrine_bell':
     case 'delve_rite_shrine_candle':
     case 'delve_rite_shrine_reed':

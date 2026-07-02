@@ -80,6 +80,7 @@ import {
   initLitanyBaptistryModule,
   isDelvePuzzleKind,
   LITANY_PUZZLE_KINDS,
+  pullLitanyBellRope,
   tickDrownedLitanyRooms,
 } from './drowned_litany_rooms';
 
@@ -1271,16 +1272,35 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
     ctx.error(r.meta.entityId, 'Strike the wall to break through.');
     return;
   }
+  if (state.kind === 'bell_rope') {
+    // Deliberate pull, the one litany puzzle that is an F-interact rather than
+    // a walk-on trigger. An already-pulled rope falls through to the generic
+    // "Nothing happens." so it reads inert.
+    if (!state.triggered) {
+      pullLitanyBellRope(ctx, run, obj, state);
+      return;
+    }
+    ctx.error(r.meta.entityId, 'Nothing happens.');
+    return;
+  }
   if (state.kind === 'module_exit') {
     if (!state.open) {
       const spiderSacsBlocking =
         run.modules[run.moduleIndex] === 'litany_baptistry' && run.litanyBaptistry?.eggsEnabled;
-      ctx.error(
-        r.meta.entityId,
-        spiderSacsBlocking
-          ? 'You should try to destroy the spider sacs.'
-          : 'The passage is sealed.',
-      );
+      // Every plate/valve/tablet/candle/rope in the room gates the exit (see
+      // tryOpenDelveExitPortal); hint at the specific blocker instead of the
+      // generic sealed line so a cleared-room player knows what to look for.
+      const untriggeredKinds = run.objectIds
+        .filter((id) => isDelvePuzzleKind(run.objectState[id]?.kind))
+        .filter((id) => !run.objectState[id]?.triggered)
+        .map((id) => run.objectState[id].kind);
+      let text = 'The passage is sealed.';
+      if (spiderSacsBlocking) text = 'You should try to destroy the spider sacs.';
+      else if (untriggeredKinds.includes('bell_rope'))
+        text = 'You should try pulling the bell ropes.';
+      else if (untriggeredKinds.length > 0)
+        text = 'You need to open the seal by applying pressure somewhere in the room.';
+      ctx.error(r.meta.entityId, text);
       return;
     }
     if (dist2d(r.e.pos, obj.pos) > DELVE_EXIT_PORTAL_RADIUS + 2) {

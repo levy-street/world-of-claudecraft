@@ -5008,6 +5008,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.eggSacBurst': '알집이 터진다. 거미 새끼들이 세례당 가장자리로 흩어져 달아난다.',
   'sim.delve.baptistryEggs': '세례당이 고요해진다. 거미 알집이 축축하게 가장자리에 들러붙어 있다.',
   'sim.delve.baptistrySpidersSealed': '거미 알집을 파괴해 보아야 할 것이다.',
+  'sim.delve.puzzleSealed': '방 안 어딘가에 압력을 가해 봉인을 풀어야 한다.',
+  'sim.delve.ropesSealed': '종줄을 당겨 보아야 할 것이다.',
   'sim.delve.baptistryWave': '세례당의 검은 물속에서 무언가가 꿈틀거린다.',
   'sim.delve.nhaliaCantorShield': '영창자들이여, 음을 유지하라!',
   'sim.delve.nhaliaBlackwaterMark': '{name}이(가) {player}에게 흑수 표식을 남긴다!',

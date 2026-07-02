@@ -4752,6 +4752,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'sim.delve.eggSacBurst': '卵囊破裂了。蜘蛛幼體四散逃竄過洗禮堂的邊緣。',
   'sim.delve.baptistryEggs': '洗禮堂歸於寂靜。蜘蛛卵囊濕漉漉地附著在邊緣。',
   'sim.delve.baptistrySpidersSealed': '你應該試著摧毀那些蜘蛛卵囊。',
+  'sim.delve.puzzleSealed': '你需要在房間裡某處施加壓力來解開封印。',
+  'sim.delve.ropesSealed': '你應該試著拉動那些鐘繩。',
   'sim.delve.baptistryWave': '洗禮堂的黑水中有什麼東西在攪動。',
   'sim.delve.nhaliaCantorShield': '誦經者們，穩住音符！',
   'sim.delve.nhaliaBlackwaterMark': '{name}用黑水標記了{player}！',

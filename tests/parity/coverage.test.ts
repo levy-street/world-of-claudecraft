@@ -253,6 +253,34 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(r.objectState[r.surfaceExitId].open).toBe(true);
   });
 
+  it('drowned_litany: heroic affix rolls, Bell Shock lands, the driver draws, the rite starts', () => {
+    const rec = run('drowned_litany');
+    const ev = rec.allEvents as Ev[];
+    // Heroic entry rolled a ruin affix off the run seed.
+    expect((rec.notes.affixes as string[]).length).toBeGreaterThan(0);
+    // The bell-rope pull shocked the live cantor mid-combat.
+    expect(
+      ev.some(
+        (e) =>
+          e.type === 'log' &&
+          typeof e.text === 'string' &&
+          e.text.includes('The bell rope snaps taut'),
+      ),
+    ).toBe(true);
+    // The Sister Nhalia driver drew on the shared stream: a Blackwater Mark was
+    // placed and a Tolling Bells volley was live at the sampling instant.
+    expect(rec.notes.marksSeen as number).toBeGreaterThan(0);
+    expect(rec.notes.bellsLive as number).toBeGreaterThan(0);
+    // Cantor phase fired, and after the boss died the rite choose started playback.
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && typeof e.text === 'string' && e.text.includes('Cantors, hold'),
+      ),
+    ).toBe(true);
+    expect(ev.some((e) => e.type === 'delveRiteChoosePrompt')).toBe(true);
+    expect(ev.some((e) => e.type === 'delveRitePulse')).toBe(true);
+  });
+
   it('party_loot: a need/greed loot roll prompt fires', () => {
     const rec = run('party_loot');
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'lootRoll')).toBe(true);

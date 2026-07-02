@@ -2203,6 +2203,8 @@ export const ja_JP: EnTranslations = {
       "eggSacBurst": "卵嚢が破裂する。蜘蛛の子らが洗礼堂の縁を散り散りに這い出す。",
       "baptistryEggs": "洗礼堂が静まり返る。蜘蛛の卵嚢が縁に湿った音を立てて張り付く。",
       "baptistrySpidersSealed": "蜘蛛の卵嚢を破壊してみるべきだ。",
+      "puzzleSealed": "部屋のどこかに圧力をかけて封印を解く必要がある。",
+      "ropesSealed": "鐘の縄を引いてみるべきだ。",
       "baptistryWave": "洗礼堂の黒い水の中で何かが蠢く。",
       "chestEmpty": "宝箱は空だ。",
       "notInDelve": "あなたはデルヴの中にいない。",

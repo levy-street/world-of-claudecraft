@@ -34,6 +34,7 @@ import {
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   PRESTIGE_XP_PER_RANK,
+  SISTER_NHALIA_BOSS_ID,
   xpForLevel,
 } from '../../src/sim/types';
 import { terrainHeight } from '../../src/sim/world';
@@ -1138,6 +1139,171 @@ function delveLockpickFail(): Scenario {
         rec.tick(64);
       }
       rec.snapshot('lockpick-jammed');
+      rec.tick(2);
+    },
+  };
+}
+
+// The Drowned Litany (second delve): heroic entry rolls a ruin affix, the choir
+// loft exercises the bell-rope F-pull (Bell Shock on live cantors mid-combat)
+// and the every-puzzle exit gate, then the apse runs the Sister Nhalia driver
+// through its shared-stream rng draws (Blackwater Mark target pick, Tolling
+// Bells volley offset + interval) plus both cantor phases and the Final Bell,
+// ending on the Drowned Reliquary Rite choose -> first playback pulses.
+function drownedLitany(): Scenario {
+  return {
+    name: 'drowned_litany',
+    coverage: [
+      'drowned_litany heroic run (ruin affix roll + module advance)',
+      'bell-rope pull -> Bell Shock on live cantors (delveInteract)',
+      'Sister Nhalia driver: Blackwater Mark + Tolling Bells volley rng draws',
+      'cantor phases + Final Bell + rite choose -> playback pulses',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 3131, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const def = DELVES.drowned_litany;
+      const heroic = def.tiers.find((t: any) => t.id === 'heroic');
+      sim.setPlayerLevel(heroic?.minPlayerLevel ?? def.minLevel);
+      const p = sim.player as AnyEntity;
+      beef(p);
+      teleport(sim, p, def.doorPos.x, def.doorPos.z);
+      sim.enterDelve('drowned_litany', 'heroic');
+      const run = sim.delveRunForPlayer(sim.playerId);
+      if (!run) {
+        rec.tick(2);
+        return;
+      }
+      run.bountiful = false; // pin against the rare coffer roll
+      rec.notes.affixes = [...run.affixes];
+      run.modules = ['litany_choir_loft', 'litany_apse'];
+      run.moduleIndex = 0;
+      (sim as any).spawnDelveModule(run);
+      // Open combat on a cantor so onBellRopePulled has a live, in-combat target.
+      const cantor = run.mobIds
+        .map((id: number) => sim.entities.get(id) as AnyEntity | undefined)
+        .find((m: AnyEntity | undefined) => m && !m.dead && m.templateId === 'drowned_cantor');
+      if (cantor) {
+        rec.track(cantor.id);
+        aggroOnto(cantor, p);
+        sim.dealDamage(p, cantor, 1, false, 'physical', null, 'hit', true);
+        rec.tick(2);
+      }
+      // Pull both ropes mid-combat: the deliberate F-pull path (delveInteract),
+      // Bell Shock lands on the cantor, and the rope template swaps to _pulled.
+      for (const oid of [...run.objectIds]) {
+        if (run.objectState[oid]?.kind !== 'bell_rope') continue;
+        const rope = sim.entities.get(oid) as AnyEntity | undefined;
+        if (!rope) continue;
+        // In-delve placement copies the object's pos: the teleport helper's
+        // terrainHeight y is the open-world surface, a lethal fall in here.
+        p.pos = { ...rope.pos };
+        p.prevPos = { ...p.pos };
+        sim.rebucket(p);
+        sim.delveInteract(oid);
+        rec.tick(1);
+      }
+      // Clear the room; with every rope pulled the exit opens and walking into
+      // the tombstone advances onto the apse finale.
+      for (const id of [...run.mobIds]) {
+        const m = sim.entities.get(id) as AnyEntity | undefined;
+        if (m) m.dead = true;
+      }
+      rec.tick(2);
+      const portal = [...sim.entities.values()].find(
+        (e: AnyEntity) => run.objectState[e.id]?.kind === 'module_exit',
+      ) as AnyEntity | undefined;
+      if (portal) {
+        p.pos = { ...portal.pos };
+        p.prevPos = { ...p.pos };
+        sim.rebucket(p);
+        rec.tick(3);
+      }
+      rec.snapshot('advanced-to-apse');
+      const boss = run.mobIds
+        .map((id: number) => sim.entities.get(id) as AnyEntity | undefined)
+        .find((m: AnyEntity | undefined) => m && m.templateId === SISTER_NHALIA_BOSS_ID);
+      if (boss) {
+        rec.track(boss.id);
+        p.pos = { x: boss.pos.x + 1.5, y: boss.pos.y, z: boss.pos.z };
+        p.prevPos = { ...p.pos };
+        sim.rebucket(p);
+        face(p, boss);
+        // Real engagement: the boss runs PROFILED mob combat, whose state machine
+        // manages its own aggro, so a synthetic aggroOnto does not stick. Auto-
+        // attacking keeps the pull live the whole window (threat + inCombat).
+        sim.targetEntity(boss.id);
+        addThreat(boss, p.id, 5000);
+        aggroOnto(boss, p);
+        sim.startAutoAttack();
+        // Past the 70% gate -> cantor phase 1 (shield adds), then ride out the
+        // 14s mark timer + ~12s first volley window on the driver's rng draws.
+        sim.dealDamage(
+          p,
+          boss,
+          Math.ceil(boss.hp - boss.maxHp * 0.65),
+          false,
+          'physical',
+          null,
+          'hit',
+          true,
+        );
+        for (let round = 0; round < 15; round++) {
+          rec.tick(20);
+          if (!boss.dead) face(p, boss);
+        }
+        rec.notes.marksSeen = (run.nhaliaBoss?.marks?.length ?? 0) as number;
+        rec.notes.bellsLive = run.mobIds.filter((id: number) => {
+          const m = sim.entities.get(id) as AnyEntity | undefined;
+          return m && !m.dead && m.templateId === 'tolling_bell';
+        }).length;
+        // Drop the shield adds, cross the 35% gate (phase 2), then the Final
+        // Bell at 10%, and finish the boss.
+        for (const id of [...run.mobIds]) {
+          const m = sim.entities.get(id) as AnyEntity | undefined;
+          if (m && !m.dead && m.templateId === 'drowned_cantor') lethal(sim, p, m);
+        }
+        rec.tick(20);
+        sim.dealDamage(
+          p,
+          boss,
+          Math.ceil(boss.hp - boss.maxHp * 0.3),
+          false,
+          'physical',
+          null,
+          'hit',
+          true,
+        );
+        rec.tick(40);
+        sim.dealDamage(
+          p,
+          boss,
+          Math.ceil(boss.hp - boss.maxHp * 0.08),
+          false,
+          'physical',
+          null,
+          'hit',
+          true,
+        );
+        rec.tick(40);
+        lethal(sim, p, boss);
+      }
+      rec.tick(6); // reliquary + shrines rise, rite awaits the intensity choice
+      const reliquary = [...run.objectIds]
+        .map((id: number) => sim.entities.get(id) as AnyEntity | undefined)
+        .find(
+          (o: AnyEntity | undefined) => o && run.objectState[o.id]?.kind === 'drowned_reliquary',
+        );
+      if (reliquary) {
+        p.pos = { x: reliquary.pos.x + 1, y: reliquary.pos.y, z: reliquary.pos.z };
+        p.prevPos = { ...p.pos };
+        sim.rebucket(p);
+        sim.delveInteract(reliquary.id); // -> delveRiteChoosePrompt (the popup cue)
+      }
+      sim.delveRiteChoose('easy');
+      rec.tick(90); // first playback pulses stream out
+      rec.snapshot('rite-started');
       rec.tick(2);
     },
   };
@@ -3768,6 +3934,7 @@ export const SCENARIOS: Scenario[] = [
   arena2v2Wipe(),
   delveLockpick(),
   delveLockpickFail(),
+  drownedLitany(),
   partyLoot(),
   partyRaid(),
   l1LootDistribution(),

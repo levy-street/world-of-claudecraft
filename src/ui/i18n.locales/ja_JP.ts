@@ -4999,6 +4999,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.delve.eggSacBurst': '卵嚢が破裂する。蜘蛛の子らが洗礼堂の縁を散り散りに這い出す。',
   'sim.delve.baptistryEggs': '洗礼堂が静まり返る。蜘蛛の卵嚢が縁に湿った音を立てて張り付く。',
   'sim.delve.baptistrySpidersSealed': '蜘蛛の卵嚢を破壊してみるべきだ。',
+  'sim.delve.puzzleSealed': '部屋のどこかに圧力をかけて封印を解く必要がある。',
+  'sim.delve.ropesSealed': '鐘の縄を引いてみるべきだ。',
   'sim.delve.baptistryWave': '洗礼堂の黒い水の中で何かが蠢く。',
   'sim.delve.nhaliaCantorShield': '詠唱者たちよ、音を保て！',
   'sim.delve.nhaliaBlackwaterMark': '{name}が{player}に黒水の刻印を刻む！',

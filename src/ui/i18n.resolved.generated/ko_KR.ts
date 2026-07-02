@@ -2203,6 +2203,8 @@ export const ko_KR: EnTranslations = {
       "eggSacBurst": "알집이 터진다. 거미 새끼들이 세례당 가장자리로 흩어져 달아난다.",
       "baptistryEggs": "세례당이 고요해진다. 거미 알집이 축축하게 가장자리에 들러붙어 있다.",
       "baptistrySpidersSealed": "거미 알집을 파괴해 보아야 할 것이다.",
+      "puzzleSealed": "방 안 어딘가에 압력을 가해 봉인을 풀어야 한다.",
+      "ropesSealed": "종줄을 당겨 보아야 할 것이다.",
       "baptistryWave": "세례당의 검은 물속에서 무언가가 꿈틀거린다.",
       "chestEmpty": "상자가 비어 있습니다.",
       "notInDelve": "탐굴 중이 아닙니다.",

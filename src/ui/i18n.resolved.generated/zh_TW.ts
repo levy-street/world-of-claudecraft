@@ -2203,6 +2203,8 @@ export const zh_TW: EnTranslations = {
       "eggSacBurst": "卵囊破裂了。蜘蛛幼體四散逃竄過洗禮堂的邊緣。",
       "baptistryEggs": "洗禮堂歸於寂靜。蜘蛛卵囊濕漉漉地附著在邊緣。",
       "baptistrySpidersSealed": "你應該試著摧毀那些蜘蛛卵囊。",
+      "puzzleSealed": "你需要在房間裡某處施加壓力來解開封印。",
+      "ropesSealed": "你應該試著拉動那些鐘繩。",
       "baptistryWave": "洗禮堂的黑水中有什麼東西在攪動。",
       "chestEmpty": "寶箱是空的。",
       "notInDelve": "你並不在秘探之中。",

@@ -22,6 +22,7 @@ provided as a courtesy.
 | HDRI environment maps (kloofendal_48d_partly_cloudy_puresky, belfast_open_field, kiara_1_dawn, dikhololo_night) | Poly Haven | https://polyhaven.com | CC0 1.0 |
 | Water normal maps (waternormals.jpg, Water_1/2_M_Normal.jpg) | three.js authors | https://github.com/mrdoob/three.js (r165, examples/textures) | MIT |
 | Biome backdrop panoramas (vale_backdrop.webp, marsh_backdrop.webp, peaks_backdrop.webp and 4K variants) | World of ClaudeCraft | Project-generated procedural painterly sky panorama art | Project asset |
+| Drowned Litany creature models (edda_reedhand, reedbound_acolyte, tolling_bell, spider_egg_sac in `public/models/creatures/`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; the humanoids rigged and animated), owned under the Meshy paid-plan license | Project asset |
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,

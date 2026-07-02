@@ -2203,6 +2203,8 @@ export const fr_FR: EnTranslations = {
       "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
       "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
       "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
+      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
+      "ropesSealed": "You should try pulling the bell ropes.",
       "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Le coffre est vide.",
       "notInDelve": "Vous n'êtes pas dans une plongée.",

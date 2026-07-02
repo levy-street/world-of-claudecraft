@@ -165,6 +165,19 @@ function markPuzzleTriggered(
   if (state.kind === 'bell_rope') onBellRopePulled(ctx, run);
 }
 
+/** Deliberate F-pull on a bell rope (delveInteract routes here). Unlike the
+ * walk-on plates, ropes only trigger on an explicit interact. Range and run
+ * membership are already checked by the caller. */
+export function pullLitanyBellRope(
+  ctx: SimContext,
+  run: DelveRun,
+  obj: Entity,
+  state: { kind: string; triggered: boolean },
+): void {
+  if (state.triggered) return;
+  markPuzzleTriggered(ctx, run, obj, state);
+}
+
 function livingTrashInModule(ctx: SimContext, run: DelveRun): boolean {
   return run.mobIds.some((id) => {
     const m = ctx.entities.get(id);
@@ -302,6 +315,9 @@ function tickLitanyRoomPuzzles(ctx: SimContext, run: DelveRun): void {
       const d = dist2d(p.pos, obj.pos);
       if (d <= DELVE_PLATE_RADIUS + 4) ctx.maybeCompanionBark(run, pid, 'trap_spotted');
       if (d > DELVE_PLATE_RADIUS) continue;
+      // Bell ropes are deliberate F-pulls (pullLitanyBellRope via delveInteract),
+      // never walk-on triggers; the companion still barks the hint above.
+      if (state.kind === 'bell_rope') continue;
       markPuzzleTriggered(ctx, run, obj, state);
       break;
     }

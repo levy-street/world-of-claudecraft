@@ -5115,6 +5115,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.delve.baptistryEggs':
     'Крестильня затихает. Паучьи яйцевые мешки влажно облепили край.',
   'sim.delve.baptistrySpidersSealed': 'Тебе стоит попытаться уничтожить паучьи коконы.',
+  'sim.delve.puzzleSealed': 'Тебе нужно снять печать, воздействовав давлением где-то в комнате.',
+  'sim.delve.ropesSealed': 'Тебе стоит попробовать потянуть за верёвки колоколов.',
   'sim.delve.baptistryWave': 'Что-то шевелится в чёрной воде крестильни.',
   'sim.delve.nhaliaCantorShield': 'Канторы, держите ноту!',
   'sim.delve.nhaliaBlackwaterMark': '{name} метит {player} Чёрной Водой!',

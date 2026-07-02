@@ -4330,6 +4330,14 @@ const RULES: Rule[] = [
     build: () => t('sim.delve.baptistrySpidersSealed'),
   },
   {
+    re: /^You need to open the seal by applying pressure somewhere in the room\.$/,
+    build: () => t('sim.delve.puzzleSealed'),
+  },
+  {
+    re: /^You should try pulling the bell ropes\.$/,
+    build: () => t('sim.delve.ropesSealed'),
+  },
+  {
     re: /^Something stirs in the black baptistry water\.$/,
     build: () => t('sim.delve.baptistryWave'),
   },

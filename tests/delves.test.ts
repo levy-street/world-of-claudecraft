@@ -1,6 +1,7 @@
 // Delve system, spatial band, lifecycle, death rules, and pet stow (Phase 1).
 
 import { describe, expect, it } from 'vitest';
+import { DELVE_AFFIXES } from '../src/sim/content/delves/affixes';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import {
   ARENA_X,
@@ -25,6 +26,7 @@ import {
   litanyModuleIsNonRectangular,
 } from '../src/sim/delve_litany_layout';
 import { isLitanyPuzzleKind, LITANY_PUZZLE_KINDS } from '../src/sim/delves/drowned_litany_rooms';
+import { rollDelveAffixes } from '../src/sim/delves/runs';
 
 import { createMob } from '../src/sim/entity';
 import { solveLockActions } from '../src/sim/lockpick';
@@ -1689,8 +1691,20 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     const rope = sim.entities.get(ropeId!)!;
     sim.player.pos = { ...rope.pos };
     sim.player.prevPos = { ...sim.player.pos };
+    // Standing on the rope does nothing: it is a deliberate F-pull, not a
+    // walk-on plate.
     sim.tick();
+    expect(run.objectState[ropeId!].triggered).toBe(false);
+    expect(cantor.hp).toBe(hp0);
+    sim.delveInteract(ropeId!);
     expect(run.objectState[ropeId!].triggered).toBe(true);
+    expect(rope.templateId).toBe('delve_bell_rope_pulled');
+    expect(hp0 - cantor.hp).toBe(18);
+    // A second pull on a slack rope is inert.
+    sim.drainEvents();
+    sim.delveInteract(ropeId!);
+    const events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error' && e.text === 'Nothing happens.')).toBe(true);
     expect(hp0 - cantor.hp).toBe(18);
   });
 
@@ -1794,6 +1808,74 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
       ),
     ).toBe(true);
   });
+
+  it('the sealed exit hints per blocker: pull the ropes (choir loft) or apply pressure (valves)', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['litany_choir_loft', 'litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob) mob.dead = true;
+    }
+    sim.tick();
+    const exitId = run.objectIds.find((id) => run.objectState[id]?.kind === 'module_exit')!;
+    const exit = sim.entities.get(exitId)!;
+    sim.player.pos = { ...exit.pos };
+    sim.player.prevPos = { ...exit.pos };
+    sim.drainEvents();
+    sim.delveInteract(exitId);
+    let events = sim.drainEvents();
+    expect(
+      events.some((e) => e.type === 'error' && e.text === 'You should try pulling the bell ropes.'),
+    ).toBe(true);
+    const ropeIds = run.objectIds.filter((id) => run.objectState[id]?.kind === 'bell_rope');
+    expect(ropeIds.length).toBe(2);
+    for (const ropeId of ropeIds) {
+      const rope = sim.entities.get(ropeId)!;
+      sim.player.pos = { ...rope.pos };
+      sim.player.prevPos = { ...rope.pos };
+      sim.delveInteract(ropeId);
+      sim.tick();
+    }
+    expect(run.exitPortalOpen).toBe(true);
+    sim.player.pos = { ...exit.pos };
+    sim.player.prevPos = { ...exit.pos };
+    sim.drainEvents();
+    sim.delveInteract(exitId);
+    events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error')).toBe(false);
+  });
+
+  it('the sealed exit hints to apply pressure for walk-on puzzles (sluice valves)', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['litany_sluice', 'litany_apse'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob) mob.dead = true;
+    }
+    sim.tick();
+    const exitId = run.objectIds.find((id) => run.objectState[id]?.kind === 'module_exit')!;
+    const exit = sim.entities.get(exitId)!;
+    sim.player.pos = { ...exit.pos };
+    sim.player.prevPos = { ...exit.pos };
+    sim.drainEvents();
+    sim.delveInteract(exitId);
+    const events = sim.drainEvents();
+    expect(
+      events.some(
+        (e) =>
+          e.type === 'error' &&
+          e.text === 'You need to open the seal by applying pressure somewhere in the room.',
+      ),
+    ).toBe(true);
+  });
 });
 
 describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
@@ -1841,6 +1923,15 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
     const spawnLevel = MOBS.grave_silt_bulwark.minLevel + heroicTier.enemyLevelBonus;
     const base = createMob(880002, MOBS.grave_silt_bulwark, spawnLevel, { x: 0, y: 0, z: 0 });
     expect(bulwark.maxHp).toBe(Math.round(base.maxHp * 1.1));
+  });
+
+  it('belligerent_dead never rolls for the crypt delve, where its bulwark hook is inert', () => {
+    expect(DELVE_AFFIXES.belligerent_dead.themes).toEqual(['ruin']);
+    for (let seed = 1; seed <= 200; seed++) {
+      expect(rollDelveAffixes(DELVES.collapsed_reliquary, 'heroic', seed)).not.toContain(
+        'belligerent_dead',
+      );
+    }
   });
 
   it('lively_choir adds two Bog Thralls on cantor boss phases', () => {
