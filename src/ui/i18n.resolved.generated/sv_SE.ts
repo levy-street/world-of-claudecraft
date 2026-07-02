@@ -1008,6 +1008,11 @@ export const sv_SE: EnTranslations = {
       },
       "linkedAs": "Länkad som {login}",
       "unlink": "Avlänka GitHub"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

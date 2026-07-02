@@ -988,6 +988,7 @@ export class Renderer {
     this.webgl.shadowMap.type = THREE.PCFSoftShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
+    this.webgl.xr.enabled = true; // WebXR opt-in; inert unless an immersive session starts (see vr_session.ts)
     // Only worth gating view draws on compileAsync when programs can link OFF the
     // main thread; without the extension compileAsync compiles synchronously, so
     // gating would just delay the same stall. Detected once here.
@@ -2340,7 +2341,7 @@ export class Renderer {
 
   private renderPrewarmPass(dt: number): void {
     this.prewarmWorldFrame(dt);
-    if (this.post) this.post.render();
+    if (this.post && !this.webgl.xr.isPresenting) this.post.render();
     else this.webgl.render(this.scene, this.camera);
   }
 
@@ -4513,7 +4514,7 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
-    if (this.post) this.post.render();
+    if (this.post && !this.webgl.xr.isPresenting) this.post.render();
     else this.webgl.render(this.scene, this.camera);
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
@@ -4602,7 +4603,7 @@ export class Renderer {
   // failure (lost context, tainted canvas) so the caller can degrade gracefully.
   captureScreenshot(maxEdge = 1280, quality = 0.7): string | null {
     try {
-      if (this.post) this.post.render();
+      if (this.post && !this.webgl.xr.isPresenting) this.post.render();
       else this.webgl.render(this.scene, this.camera);
       const gl = this.webgl.domElement;
       const dims = downscaleDims(gl.width, gl.height, maxEdge);
@@ -4739,6 +4740,17 @@ export class Renderer {
   }
 
   private updateCamera(selfPos: THREE.Vector3, dt: number): void {
+    // WebXR: while presenting, the headset owns the view orientation (placed in
+    // the world via the XR reference-space offset in vr_session.ts). Keep the
+    // user camera parked at the player's eye in WORLD space so terrain/sky/cloud
+    // streaming — all of which read camera.position — keep working, and skip the
+    // third-person chase math entirely (third-person VR causes motion sickness).
+    if (this.webgl.xr.isPresenting) {
+      this.camera.position.set(selfPos.x, selfPos.y + 1.6, selfPos.z);
+      this.camera.quaternion.identity();
+      this.camera.updateMatrixWorld();
+      return;
+    }
     const p = this.sim.player;
     const seed = this.sim.cfg.seed;
     const px = selfPos.x;

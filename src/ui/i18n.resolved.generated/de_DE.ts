@@ -1008,6 +1008,11 @@ export const de_DE: EnTranslations = {
       },
       "linkedAs": "Verknüpft als {login}",
       "unlink": "GitHub trennen"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

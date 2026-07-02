@@ -1008,6 +1008,11 @@ export const ja_JP: EnTranslations = {
       },
       "linkedAs": "{login} として連携済み",
       "unlink": "GitHub の連携を解除"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

@@ -1094,4 +1094,10 @@ export const hudChromeStrings = {
     linkedAs: 'Linked as {login}',
     unlink: 'Unlink GitHub',
   },
+  // Flatscreen WebXR entry control (only shown when immersive-vr is supported).
+  vr: {
+    enter: 'Enter VR',
+    exit: 'Exit VR',
+    unavailable: 'VR unavailable',
+  },
 };

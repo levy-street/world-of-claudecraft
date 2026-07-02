@@ -1008,6 +1008,11 @@ export const vi_VN: EnTranslations = {
       },
       "linkedAs": "Đã liên kết với {login}",
       "unlink": "Hủy liên kết GitHub"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

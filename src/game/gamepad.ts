@@ -28,6 +28,9 @@ export interface GamepadCallbacks {
   // True while any interactive HUD window is open, switching the pad into the
   // virtual-cursor UI-navigation mode (movement/camera/abilities are suspended).
   isPointerMode(): boolean;
+  // True while an immersive WebXR session is active. Right-stick smooth look is
+  // suppressed so vr_session can own comfort snap-turn instead.
+  isVrPresenting?(): boolean;
   // Current local-player health, for rumble-on-damage. Optional.
   getPlayerHealth?(): number;
 }
@@ -151,11 +154,13 @@ export class GamepadManager {
     const ly = pad.axes[AXIS.LEFT_Y] ?? 0;
     this.input.setGamepadMove(stickToMoveFlags(lx, ly, this.deadzone));
 
-    // Camera: right stick.
-    const rx = pad.axes[AXIS.RIGHT_X] ?? 0;
-    const ry = pad.axes[AXIS.RIGHT_Y] ?? 0;
-    const look = stickToLook(rx, ry, this.deadzone, this.camSpeed, this.invertY, dt);
-    this.input.applyGamepadLook(look.yaw, look.pitch);
+    // Camera: right stick (smooth look). In VR, snap-turn owns the right stick.
+    if (!this.cb.isVrPresenting?.()) {
+      const rx = pad.axes[AXIS.RIGHT_X] ?? 0;
+      const ry = pad.axes[AXIS.RIGHT_Y] ?? 0;
+      const look = stickToLook(rx, ry, this.deadzone, this.camSpeed, this.invertY, dt);
+      this.input.applyGamepadLook(look.yaw, look.pitch);
+    }
 
     // Edge actions: one-shot on each button's rising edge.
     for (const idx of risingEdges(this.prevPressed, cur)) {

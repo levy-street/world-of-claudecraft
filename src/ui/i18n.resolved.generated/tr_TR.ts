@@ -1008,6 +1008,11 @@ export const tr_TR: EnTranslations = {
       },
       "linkedAs": "{login} olarak bağlandı",
       "unlink": "GitHub Bağlantısını Kaldır"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

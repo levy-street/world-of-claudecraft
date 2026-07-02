@@ -84,6 +84,8 @@ import { installWebGLContextRelease } from './render/context_release';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
+import { vrLocomotionFacing } from './render/vr_comfort';
+import { installVrSession, type VrSessionHandle } from './render/vr_session';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
@@ -946,11 +948,36 @@ async function startGame(
   uiEffectsApplier.applyNow();
   let renderer!: Renderer;
   let hud!: Hud;
+  let vr: VrSessionHandle | null = null;
   const perf = createPerfMonitor(null);
   try {
     renderer = new Renderer(world, canvas, nameplates);
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
+    // Experimental WebXR: adds an "Enter VR" button when a headset is present.
+    // Inert otherwise; the flatscreen path is unchanged.
+    vr = installVrSession(renderer.webgl, renderer.camera, {
+      getPose: () => ({
+        x: world.player.pos.x,
+        y: world.player.pos.y,
+        z: world.player.pos.z,
+      }),
+      getHudStats: () => {
+        const p = world.player;
+        return {
+          name: p.name,
+          hp: p.hp,
+          maxHp: p.maxHp,
+          resource: p.resource,
+          maxResource: p.maxResource,
+          resourceKind: p.resourceType ?? 'mana',
+          dead: p.dead,
+        };
+      },
+      onSnapTurn: (yawDelta) => {
+        input.camYaw = wrapAngle(input.camYaw + yawDelta);
+      },
+    });
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -1279,6 +1306,7 @@ async function startGame(
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
     isPointerMode: () => hud.isWindowOpen(),
+    isVrPresenting: () => !!vr?.presenting,
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
   });
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
@@ -2231,10 +2259,13 @@ async function startGame(
   });
 
   function frame(now: number): void {
-    requestAnimationFrame(frame);
+    // Driven by renderer.webgl.setAnimationLoop (works for both flatscreen rAF
+    // and WebXR's frame loop).
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
+    // Offset the XR reference space to the player after frameDt is known.
+    vr?.update(frameDt);
     perf.frame(frameDt);
     syncPerfOverlay(frameDt, now);
 
@@ -2262,9 +2293,18 @@ async function startGame(
     } else if (edgeReleaseFacing !== null) {
       pendingReleaseFacing = edgeReleaseFacing;
     }
-    const movementFacing = !world.player.dead
+    let movementFacing = !world.player.dead
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
+    // WebXR: while presenting, the headset drives the movement heading.
+    if (vr?.presenting) {
+      const headYaw = vr.headYaw();
+      if (headYaw !== null) {
+        const vrFacing = vrLocomotionFacing(headYaw, vr.snapYaw);
+        movementFacing = vrFacing;
+        input.camYaw = vrFacing;
+      }
+    }
 
     if (offlineSim) {
       acc += frameDt;
@@ -2449,7 +2489,8 @@ async function startGame(
   }
   await nextPaint();
   last = performance.now();
-  requestAnimationFrame(frame);
+  // setAnimationLoop drives the frame for both flatscreen (rAF) and WebXR.
+  renderer.webgl.setAnimationLoop(frame);
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {

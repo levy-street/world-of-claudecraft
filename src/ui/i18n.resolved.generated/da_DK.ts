@@ -1008,6 +1008,11 @@ export const da_DK: EnTranslations = {
       },
       "linkedAs": "Tilknyttet som {login}",
       "unlink": "Fjern GitHub-tilknytning"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

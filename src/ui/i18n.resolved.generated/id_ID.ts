@@ -1008,6 +1008,11 @@ export const id_ID: EnTranslations = {
       },
       "linkedAs": "Tertaut sebagai {login}",
       "unlink": "Putuskan Tautan GitHub"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

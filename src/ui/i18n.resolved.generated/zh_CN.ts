@@ -1008,6 +1008,11 @@ export const zh_CN: EnTranslations = {
       },
       "linkedAs": "已关联为 {login}",
       "unlink": "取消关联 GitHub"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

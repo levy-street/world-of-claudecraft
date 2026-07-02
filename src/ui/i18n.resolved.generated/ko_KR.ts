@@ -1008,6 +1008,11 @@ export const ko_KR: EnTranslations = {
       },
       "linkedAs": "{login}(으)로 연결됨",
       "unlink": "GitHub 연결 해제"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

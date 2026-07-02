@@ -1008,6 +1008,11 @@ export const it_IT: EnTranslations = {
       },
       "linkedAs": "Collegato come {login}",
       "unlink": "Scollega GitHub"
+    },
+    "vr": {
+      "enter": "Enter VR",
+      "exit": "Exit VR",
+      "unavailable": "VR unavailable"
     }
   },
   "guide": {

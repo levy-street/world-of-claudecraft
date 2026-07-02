@@ -1008,6 +1008,11 @@ export const en_XA: EnTranslations = {
       },
       "linkedAs": "[Ļíñķéð áš {login}]",
       "unlink": "[Úñļíñķ ĜíţĤúƀ]"
+    },
+    "vr": {
+      "enter": "[Éñţéŕ ƲŔ]",
+      "exit": "[Éẋíţ ƲŔ]",
+      "unavailable": "[ƲŔ úñáʋáíļáƀļé]"
     }
   },
   "guide": {
