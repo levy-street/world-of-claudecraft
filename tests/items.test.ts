@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import { vendorStackSize } from '../src/sim/vendor_stack';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -214,11 +216,11 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
 
     items.buyItem(ctx, wilkes.id, 'baked_bread', pid);
     expect(sim.countItem('baked_bread', pid)).toBe(5); // food is sold in a stack of 5
-    expect(meta.copper).toBe(75); // 200 - 125 (buyValue 25 per unit x the stack of 5)
+    expect(meta.copper).toBe(165); // 200 - 35 (buyValue 7 per unit x the stack of 5)
 
     sim.addItem('wolf_fang', 2, pid);
     items.sellItem(ctx, 'wolf_fang', 1, pid);
-    expect(meta.copper).toBe(79); // + sellValue 4
+    expect(meta.copper).toBe(169); // + sellValue 4
     expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(meta.vendorBuyback[0]).toEqual({ itemId: 'wolf_fang', count: 1 });
   });
@@ -231,12 +233,41 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
 
     items.buyItem(ctx, wilkes.id, 'spring_water', pid);
     expect(sim.countItem('spring_water', pid)).toBe(5); // drink is a staple stack
-    expect(meta.copper).toBe(875); // 1000 - 125 (buyValue 25 per unit x the stack of 5)
+    expect(meta.copper).toBe(965); // 1000 - 35 (buyValue 7 per unit x the stack of 5)
 
     items.buyItem(ctx, wilkes.id, 'minor_healing_potion', pid);
     expect(sim.countItem('minor_healing_potion', pid)).toBe(1); // non-staples stay single
   });
 
+  it('prices vendor food and drink stacks below matching potions without sellback profit', () => {
+    const cases = [
+      { staple: 'baked_bread', potion: 'minor_healing_potion' },
+      { staple: 'spring_water', potion: 'minor_mana_potion' },
+      { staple: 'tough_jerky', potion: 'minor_healing_potion' },
+      { staple: 'roasted_boar', potion: 'minor_healing_potion' },
+      { staple: 'fenbridge_rye', potion: 'lesser_healing_potion' },
+      { staple: 'marsh_mint_tea', potion: 'lesser_mana_potion' },
+      { staple: 'smoked_eel', potion: 'lesser_healing_potion' },
+      { staple: 'silvermist_cordial', potion: 'lesser_mana_potion' },
+    ] as const;
+
+    for (const { staple, potion } of cases) {
+      const stapleDef = ITEMS[staple];
+      const potionDef = ITEMS[potion];
+      expect(stapleDef.buyValue).toBeDefined();
+      expect(potionDef.buyValue).toBeDefined();
+      const quantity = vendorStackSize(stapleDef);
+      const stackCost = (stapleDef.buyValue ?? 0) * quantity;
+      const sellBackValue = stapleDef.sellValue * quantity;
+
+      expect(stackCost, `${staple} stack should cost less than ${potion}`).toBeLessThan(
+        potionDef.buyValue ?? 0,
+      );
+      expect(stackCost, `${staple} stack should not be vendor arbitrage`).toBeGreaterThan(
+        sellBackValue,
+      );
+    }
+  });
   it('buying a food stack then selling it back is a net loss (no vendor arbitrage)', () => {
     const sim = makeWorld();
     const { pid, wilkes, meta } = vendorPlayer(sim);
@@ -244,14 +275,14 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     meta.copper = 500;
     const before = meta.copper;
 
-    // baked_bread: buyValue 25 per unit, sellValue 6 per unit. A stack of 5 must cost
-    // more to buy (25 x 5 = 125) than it returns when sold back (6 x 5 = 30), or the
+    // baked_bread: buyValue 7 per unit, sellValue 6 per unit. A stack of 5 must cost
+    // more to buy (7 x 5 = 35) than it returns when sold back (6 x 5 = 30), or the
     // vendor would print money. Regression guard for the flat-price stack exploit.
     items.buyItem(ctx, wilkes.id, 'baked_bread', pid);
     expect(sim.countItem('baked_bread', pid)).toBe(5);
     items.sellItem(ctx, 'baked_bread', 5, pid);
     expect(sim.countItem('baked_bread', pid)).toBe(0);
-    expect(meta.copper).toBe(before - 125 + 30); // 405: paid 125, recovered 30
+    expect(meta.copper).toBe(before - 35 + 30); // 495: paid 35, recovered 30
     expect(meta.copper).toBeLessThan(before);
   });
 

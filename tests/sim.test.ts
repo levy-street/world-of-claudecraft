@@ -920,10 +920,10 @@ describe('food, drink, vendor', () => {
     sim.copper = 200;
     sim.buyItem(wilkes.id, 'baked_bread');
     expect(sim.countItem('baked_bread')).toBe(5); // food is sold in a stack of 5
-    expect(sim.copper).toBe(75); // 200 - 125 (buyValue 25 per unit x the stack of 5)
+    expect(sim.copper).toBe(165); // 200 - 35 (buyValue 7 per unit x the stack of 5)
     sim.addItem('wolf_fang', 2);
     sim.sellItem('wolf_fang');
-    expect(sim.copper).toBe(79);
+    expect(sim.copper).toBe(169);
     expect(sim.countItem('wolf_fang')).toBe(1);
   });
 

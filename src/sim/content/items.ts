@@ -388,7 +388,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     foodHp: 61,
     sellValue: 6,
-    buyValue: 25,
+    buyValue: 7,
   },
   spring_water: {
     id: 'spring_water',
@@ -397,7 +397,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     drinkMana: 76,
     sellValue: 6,
-    buyValue: 25,
+    buyValue: 7,
   },
   simple_fishing_pole: {
     id: 'simple_fishing_pole',
@@ -497,8 +497,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'common',
     foodHp: 117,
-    sellValue: 12,
-    buyValue: 100,
+    sellValue: 6,
+    buyValue: 7,
   },
   // --- combat potions (vendor): instant, usable in combat, 2-minute shared cooldown.
   // Restore less than sitting to eat/drink, the price you pay for not sitting (#103).
@@ -1029,7 +1029,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     foodHp: 61,
     sellValue: 2,
-    buyValue: 25,
+    buyValue: 7,
   },
   mudfin_scale: {
     id: 'mudfin_scale',
