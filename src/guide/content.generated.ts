@@ -1677,9 +1677,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 22,
         "rare": false,
         "templateId": "dune_prowler",
-        "model": "mob_wolf",
+        "model": "mob_raptor",
         "tint": "#c9a86a",
-        "still": "/guide-stills/mob_wolf__c9a86a.webp"
+        "still": "/guide-stills/mob_raptor__c9a86a.webp"
       },
       {
         "name": "Mirage Stalker",
@@ -1687,9 +1687,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 25,
         "rare": false,
         "templateId": "mirage_stalker",
-        "model": "mob_wolf",
+        "model": "mob_raptor",
         "tint": "#d8c9a3",
-        "still": "/guide-stills/mob_wolf__d8c9a3.webp"
+        "still": "/guide-stills/mob_raptor__d8c9a3.webp"
       },
       {
         "name": "Bonewind Ravager",
@@ -1697,9 +1697,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 28,
         "rare": false,
         "templateId": "bonewind_ravager",
-        "model": "mob_wolf",
+        "model": "mob_bull",
         "tint": "#b99a66",
-        "still": "/guide-stills/mob_wolf__b99a66.webp"
+        "still": "/guide-stills/mob_bull__b99a66.webp"
       },
       {
         "name": "Duskmane Stalker",
@@ -1757,9 +1757,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 38,
         "rare": false,
         "templateId": "emberveil_leech",
-        "model": "mob_wolf",
+        "model": "mob_ooze",
         "tint": "#6a4b52",
-        "still": "/guide-stills/mob_wolf__6a4b52.webp"
+        "still": "/guide-stills/mob_ooze__6a4b52.webp"
       },
       {
         "name": "Cinder Hound",
@@ -1787,9 +1787,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 40,
         "rare": false,
         "templateId": "frosthelm_wendigo",
-        "model": "mob_bear",
-        "tint": "#5a4030",
-        "still": "/guide-stills/mob_bear__5a4030.webp"
+        "model": "mob_yeti",
+        "tint": "#cfe0e8",
+        "still": "/guide-stills/mob_yeti__cfe0e8.webp"
       },
       {
         "name": "Warped Warhound",
@@ -1817,9 +1817,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 51,
         "rare": false,
         "templateId": "spire_stalker",
-        "model": "mob_wolf",
+        "model": "mob_raptor",
         "tint": "#7d4f3a",
-        "still": "/guide-stills/mob_wolf__7d4f3a.webp"
+        "still": "/guide-stills/mob_raptor__7d4f3a.webp"
       }
     ]
   },
@@ -1852,9 +1852,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 23,
         "rare": false,
         "templateId": "glasswind_scorpion",
-        "model": "mob_spider",
+        "model": "mob_crab",
         "tint": "#d9c48b",
-        "still": "/guide-stills/mob_spider__d9c48b.webp"
+        "still": "/guide-stills/mob_crab__d9c48b.webp"
       },
       {
         "name": "Palewidow Weaver",
@@ -1882,9 +1882,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 41,
         "rare": false,
         "templateId": "brine_scuttler",
-        "model": "mob_spider",
+        "model": "mob_crab",
         "tint": "#bfd8d8",
-        "still": "/guide-stills/mob_spider__bfd8d8.webp"
+        "still": "/guide-stills/mob_crab__bfd8d8.webp"
       },
       {
         "name": "Mire Strider",
@@ -1892,9 +1892,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 43,
         "rare": false,
         "templateId": "mire_strider",
-        "model": "mob_spider",
+        "model": "mob_crab",
         "tint": "#556655",
-        "still": "/guide-stills/mob_spider__556655.webp"
+        "still": "/guide-stills/mob_crab__556655.webp"
       },
       {
         "name": "Sewer Broodspider",
@@ -1957,9 +1957,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 35,
         "rare": false,
         "templateId": "emberveil_bloat",
-        "model": "mob_murloc",
+        "model": "mob_ooze",
         "tint": "#86a05a",
-        "still": "/guide-stills/mob_murloc__86a05a.webp"
+        "still": "/guide-stills/mob_ooze__86a05a.webp"
       }
     ]
   },
@@ -2012,9 +2012,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 39,
         "rare": false,
         "templateId": "pale_gnawer",
-        "model": "mob_kobold",
+        "model": "mob_gnawer",
         "tint": "#cabfa8",
-        "still": "/guide-stills/mob_kobold__cabfa8.webp"
+        "still": "/guide-stills/mob_gnawer__cabfa8.webp"
       },
       {
         "name": "Claim-Jumper Sapper",
@@ -2117,9 +2117,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 34,
         "rare": false,
         "templateId": "pass_raider",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_bruiser",
+        "tint": "#7d5b48",
+        "still": "/guide-stills/mob_bruiser__7d5b48.webp"
       },
       {
         "name": "Underway Renegade",
@@ -2167,9 +2167,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 38,
         "rare": false,
         "templateId": "broken_legion_arbalist",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_arbalist",
+        "tint": "#5c6470",
+        "still": "/guide-stills/mob_arbalist__5c6470.webp"
       },
       {
         "name": "Veilstalker",
@@ -2197,9 +2197,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 54,
         "rare": false,
         "templateId": "not_quite_man",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_tribal",
+        "tint": "#9c8f7d",
+        "still": "/guide-stills/mob_tribal__9c8f7d.webp"
       },
       {
         "name": "Breachsworn Deserter",
@@ -2307,9 +2307,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 57,
         "rare": false,
         "templateId": "breach_scavenger_ogre",
-        "model": "mob_bruiser",
+        "model": "mob_ogre",
         "tint": "#8a7a5c",
-        "still": "/guide-stills/mob_bruiser__8a7a5c.webp"
+        "still": "/guide-stills/mob_ogre__8a7a5c.webp"
       }
     ]
   },
@@ -2362,9 +2362,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 25,
         "rare": false,
         "templateId": "sandbound_shade",
-        "model": "skel_minion",
+        "model": "mob_ghost",
         "tint": "#d8cdb0",
-        "still": "/guide-stills/skel_minion__d8cdb0.webp"
+        "still": "/guide-stills/mob_ghost__d8cdb0.webp"
       },
       {
         "name": "Forsaken Judge",
@@ -2392,9 +2392,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 33,
         "rare": false,
         "templateId": "hollow_revenant",
-        "model": "mob_dark_caster",
+        "model": "mob_ghost",
         "tint": "#b8c4d0",
-        "still": "/guide-stills/mob_dark_caster__b8c4d0.webp"
+        "still": "/guide-stills/mob_ghost__b8c4d0.webp"
       },
       {
         "name": "Ash Ghoul",
@@ -2412,9 +2412,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 41,
         "rare": false,
         "templateId": "gullpicked_skeleton",
-        "model": "skel_warrior",
+        "model": "skel_minion",
         "tint": "#d6d0bd",
-        "still": "/guide-stills/skel_warrior__d6d0bd.webp"
+        "still": "/guide-stills/skel_minion__d6d0bd.webp"
       },
       {
         "name": "Rubble Haunt",
@@ -2432,9 +2432,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 44,
         "rare": false,
         "templateId": "deserter_wraith",
-        "model": "mob_dark_caster",
+        "model": "mob_ghost",
         "tint": "#8f9bb0",
-        "still": "/guide-stills/mob_dark_caster__8f9bb0.webp"
+        "still": "/guide-stills/mob_ghost__8f9bb0.webp"
       },
       {
         "name": "Riverbank Revenant",
@@ -2452,9 +2452,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 48,
         "rare": false,
         "templateId": "fog_wraith",
-        "model": "mob_dark_caster",
+        "model": "mob_ghost",
         "tint": "#b8c4c8",
-        "still": "/guide-stills/mob_dark_caster__b8c4c8.webp"
+        "still": "/guide-stills/mob_ghost__b8c4c8.webp"
       },
       {
         "name": "Salt Wraith",
@@ -2462,9 +2462,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 47,
         "rare": false,
         "templateId": "salt_wraith",
-        "model": "mob_dark_caster",
+        "model": "mob_ghost",
         "tint": "#dfe8e6",
-        "still": "/guide-stills/mob_dark_caster__dfe8e6.webp"
+        "still": "/guide-stills/mob_ghost__dfe8e6.webp"
       },
       {
         "name": "Ember Revenant",
@@ -2482,9 +2482,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 54,
         "rare": false,
         "templateId": "ash_wraith",
-        "model": "skel_minion",
+        "model": "mob_ghost",
         "tint": "#9a9aa8",
-        "still": "/guide-stills/skel_minion__9a9aa8.webp"
+        "still": "/guide-stills/mob_ghost__9a9aa8.webp"
       }
     ]
   },
@@ -2527,9 +2527,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 31,
         "rare": false,
         "templateId": "feral_wisp",
-        "model": "mob_elemental",
+        "model": "mob_ghost",
         "tint": "#9fd4e8",
-        "still": "/guide-stills/mob_elemental__9fd4e8.webp"
+        "still": "/guide-stills/mob_ghost__9fd4e8.webp"
       },
       {
         "name": "Colossid Fragment",
@@ -2587,9 +2587,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 45,
         "rare": false,
         "templateId": "magma_serpent",
-        "model": "mob_elemental",
+        "model": "mob_dragonkin",
         "tint": "#d8542a",
-        "still": "/guide-stills/mob_elemental__d8542a.webp"
+        "still": "/guide-stills/mob_dragonkin__d8542a.webp"
       },
       {
         "name": "Briar Horror",
@@ -2597,9 +2597,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 46,
         "rare": false,
         "templateId": "briar_horror",
-        "model": "mob_elemental",
+        "model": "mob_tribal",
         "tint": "#4c6b35",
-        "still": "/guide-stills/mob_elemental__4c6b35.webp"
+        "still": "/guide-stills/mob_tribal__4c6b35.webp"
       },
       {
         "name": "Pale Watcher",
@@ -2607,9 +2607,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 50,
         "rare": false,
         "templateId": "pale_watcher",
-        "model": "mob_elemental",
+        "model": "mob_ghost",
         "tint": "#dfe4e8",
-        "still": "/guide-stills/mob_elemental__dfe4e8.webp"
+        "still": "/guide-stills/mob_ghost__dfe4e8.webp"
       },
       {
         "name": "Magma Elemental",
@@ -2687,9 +2687,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 48,
         "rare": false,
         "templateId": "breach_horror",
-        "model": "mob_demon",
+        "model": "mob_maw",
         "tint": "#8a3a3a",
-        "still": "/guide-stills/mob_demon__8a3a3a.webp"
+        "still": "/guide-stills/mob_maw__8a3a3a.webp"
       }
     ]
   }
@@ -2963,16 +2963,66 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "hover": 0.25,
     "tintStrength": 0.2
   },
-  "mob_bear": {
+  "mob_raptor": {
+    "url": "models/creatures/velociraptor.glb",
+    "idle": "Velociraptor_Idle",
+    "height": 1.7,
+    "tintStrength": 0.35
+  },
+  "mob_crab": {
+    "url": "models/creatures/crabenemy.glb",
+    "idle": "Idle",
+    "height": 1.5,
+    "tintStrength": 0.35
+  },
+  "mob_ghost": {
+    "url": "models/creatures/ghost.glb",
+    "idle": "Flying_Idle",
+    "height": 1.9,
+    "hover": 0.35,
+    "tintStrength": 0.35
+  },
+  "mob_bull": {
+    "url": "models/creatures/bull.glb",
+    "idle": "Idle",
+    "height": 1.9,
+    "tintStrength": 0.35
+  },
+  "mob_arbalist": {
+    "url": "models/chars/players/ranger.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "attach": [
+      {
+        "url": "models/weapons/crossbow_1handed.glb",
+        "bone": "handslot.r"
+      }
+    ],
+    "tintStrength": 0.3
+  },
+  "mob_yeti": {
     "url": "models/creatures/yetialt.glb",
     "idle": "Idle",
-    "height": 2.2,
-    "tintStrength": 0.5
+    "height": 2.3,
+    "tintStrength": 0.35
+  },
+  "mob_gnawer": {
+    "url": "models/creatures/yeti.glb",
+    "idle": "Idle",
+    "height": 1.5,
+    "tintStrength": 0.35
   },
   "mob_stag": {
     "url": "models/creatures/stag.glb",
     "idle": "Idle",
     "height": 1.9,
+    "tintStrength": 0.35
+  },
+  "mob_tribal": {
+    "url": "models/creatures/tribal.glb",
+    "idle": "Flying_Idle",
+    "height": 2,
+    "hover": 0.25,
     "tintStrength": 0.35
   },
   "mob_bruiser": {
@@ -2988,6 +3038,19 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ],
+    "tintStrength": 0.3
+  },
+  "mob_ooze": {
+    "url": "models/creatures/glubevolved.glb",
+    "idle": "Flying_Idle",
+    "height": 1.5,
+    "hover": 0.2,
+    "tintStrength": 0.45
+  },
+  "mob_maw": {
+    "url": "models/creatures/orcenemy.glb",
+    "idle": "Idle",
+    "height": 1.6,
     "tintStrength": 0.3
   },
   "mob_demon_flying": {

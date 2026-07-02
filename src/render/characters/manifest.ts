@@ -187,6 +187,26 @@ const ENEMY7: ClipMap = {
   death: 'Death',
 };
 
+// Quaternius biter rig (yeti/orcenemy/crabenemy): no Run clip, bite attacks,
+// and the pack's misspelt 'HitRecieve' react.
+const BITER: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Bite_Front'],
+  hit: ['HitRecieve'],
+  death: 'Death',
+};
+
+// Quaternius velociraptor rig: every clip name is Velociraptor_-prefixed.
+const RAPTOR: ClipMap = {
+  idle: 'Velociraptor_Idle',
+  walk: 'Velociraptor_Walk',
+  run: 'Velociraptor_Run',
+  attack: ['Velociraptor_Attack'],
+  death: 'Velociraptor_Death', // no hit-react in asset
+};
+
 // floating/flying rigs (goleling/dragon) — hover instead of walking
 const FLOATING: ClipMap = {
   idle: 'Flying_Idle',
@@ -537,6 +557,86 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0x5a4030,
     tintStrength: 0.5,
   },
+  // Valdris variety pass: the previously-unwired pack models, so the new
+  // continent's mobs stop sharing the handful of launch-zone bodies.
+  // the real yeti body (yetialt.glb; mob_bear pins it brown, this one takes
+  // the template tint, so wendigos read pale and the Marrowfeaster dark)
+  mob_yeti: {
+    url: `${CREATURES}/yetialt.glb`,
+    height: 2.3,
+    clips: BIPED14,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // the two blob-head monsters (Orc_Blob / Yeti_Blob): gnashing horrors
+  mob_maw: {
+    url: `${CREATURES}/orcenemy.glb`,
+    height: 1.6,
+    clips: BITER,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_gnawer: {
+    url: `${CREATURES}/yeti.glb`,
+    height: 1.5,
+    clips: BITER,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_crab: {
+    url: `${CREATURES}/crabenemy.glb`,
+    height: 1.5,
+    clips: { ...BITER, attack: ['Bite_Front', 'Bite_InPlace'] },
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_ghost: {
+    url: `${CREATURES}/ghost.glb`,
+    height: 1.9,
+    hover: 0.35,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // the floating masked totem-spirit: briar horrors and the Not-Quite-Man
+  mob_tribal: {
+    url: `${CREATURES}/tribal.glb`,
+    height: 2.0,
+    hover: 0.25,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_ooze: {
+    url: `${CREATURES}/glubevolved.glb`,
+    height: 1.5,
+    hover: 0.2,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.45,
+  },
+  mob_raptor: {
+    url: `${CREATURES}/velociraptor.glb`,
+    height: 1.7,
+    clips: RAPTOR,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_bull: {
+    url: `${CREATURES}/bull.glb`,
+    height: 1.9,
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // the giant body again but colossus-sized: the two crater/emberveil bosses
+  mob_colossus: {
+    url: `${CREATURES}/giant.glb`,
+    height: 3.4,
+    clips: ENEMY7,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
   mob_spider: {
     url: `${CREATURES}/spider.glb`,
     height: 1.4,
@@ -756,6 +856,24 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.3,
   },
+  // fallen legion officers: armored knight body, entity-tinted hostile
+  mob_fallen_knight: {
+    url: `${PLAYERS}/knight.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    show: ['Knight_Helmet', 'Knight_Cape'],
+    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_arbalist: {
+    url: `${PLAYERS}/ranger.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Ranged_Shoot']),
+    attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
 
   // -- NPCs ------------------------------------------------------------------
   npc_knight: {
@@ -877,29 +995,68 @@ const MOB_KEYS: Record<string, string> = {
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
   // Valdris continent (v0.19): mobs whose family default reads wrong
-  breach_horror: 'mob_demon',
   mazhrekk_the_flesh_tithe: 'mob_demon',
   warbringer_khorvax: 'mob_demon',
   ashwing_drake: 'mob_demon_flying',
   ridge_shrieker: 'mob_demon_flying',
-  breach_scavenger_ogre: 'mob_bruiser',
-  butcher_vhorlan: 'mob_bruiser',
-  frosthelm_wendigo: 'mob_bear',
-  marrowfeaster: 'mob_bear',
   thornwarped_stag: 'mob_stag',
-  hollow_revenant: 'mob_dark_caster',
   bridge_cultist: 'mob_dark_caster',
-  deserter_wraith: 'mob_dark_caster',
-  salt_wraith: 'mob_dark_caster',
-  fog_wraith: 'mob_dark_caster',
-  gullpicked_skeleton: 'skel_warrior',
   riverbank_revenant: 'skel_warrior',
   the_bridgekeeper: 'skel_boss',
   deserter_king: 'skel_boss',
   ember_revenant: 'skel_warrior',
   burnfield_revenant: 'skel_warrior',
   rubble_haunt: 'skel_mage',
+  // Valdris variety pass: spread the crowded family defaults across the
+  // previously-unwired pack models (see the matching VISUALS entries).
+  // wendigos and the great frost beasts: the yeti body
+  frosthelm_wendigo: 'mob_yeti',
+  marrowfeaster: 'mob_yeti',
+  // breach brutes: the scavenger keeps its ogre-family giant; the human
+  // brutes take the barbarian bruiser with their own tints
+  butcher_vhorlan: 'mob_bruiser',
+  warlord_skarn: 'mob_bruiser',
+  // gnashing blob-head horrors: the two unused monster heads
+  breach_horror: 'mob_maw',
+  pale_gnawer: 'mob_gnawer',
+  // wraiths, shades and wisps: the ghost body instead of robed-caster copies
+  salt_wraith: 'mob_ghost',
+  fog_wraith: 'mob_ghost',
+  deserter_wraith: 'mob_ghost',
+  hollow_revenant: 'mob_ghost',
+  ash_wraith: 'mob_ghost',
+  sandbound_shade: 'mob_ghost',
+  pale_watcher: 'mob_ghost',
+  feral_wisp: 'mob_ghost',
+  // briar horrors and the Not-Quite-Man: the floating masked totem-spirit
+  briar_horror: 'mob_tribal',
+  briarfather_yew: 'mob_tribal',
+  not_quite_man: 'mob_tribal',
+  // scuttlers and scorpions: the crab body instead of a fourth spider
+  brine_scuttler: 'mob_crab',
+  glasswind_scorpion: 'mob_crab',
+  mire_strider: 'mob_crab',
+  // desert and spire runners: the raptor body instead of a recolored wolf
+  dune_prowler: 'mob_raptor',
+  mirage_stalker: 'mob_raptor',
+  spire_stalker: 'mob_raptor',
+  bonewind_ravager: 'mob_bull',
+  // the emberveil oozes: the glub body instead of murloc/wolf copies
+  emberveil_bloat: 'mob_ooze',
+  emberveil_leech: 'mob_ooze',
+  // crater/emberveil bosses: colossus-sized giant instead of goleling copies
+  emberveil_colossus: 'mob_colossus',
+  firstborn_of_the_crater: 'mob_colossus',
+  magma_serpent: 'mob_dragonkin',
+  // fallen-legion officers and their crossbowman
+  commander_vaelis: 'mob_fallen_knight',
+  veykar_the_forsworn: 'mob_fallen_knight',
+  broken_legion_arbalist: 'mob_arbalist',
+  pass_raider: 'mob_bruiser',
+  scavenger_king: 'mob_bruiser',
+  // split the shoreline skeletons off the warrior-revenant body
   ash_ghoul: 'skel_rogue',
+  gullpicked_skeleton: 'skel_minion',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
