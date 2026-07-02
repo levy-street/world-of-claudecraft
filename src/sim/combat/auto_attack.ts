@@ -28,6 +28,7 @@
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
 import { CLASSES, MOBS } from '../data';
+import { playerMeleeRangeAgainstTarget } from '../mob_combat';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -39,7 +40,6 @@ import {
   dist2d,
   type Entity,
   MELEE_ARC,
-  MELEE_RANGE,
   normAngle,
   swingMissChance,
 } from '../types';
@@ -65,7 +65,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const ranged = CLASSES[r.meta.cls].ranged;
   const inAutoAttackRange = ranged
     ? d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange) && ctx.hasLineOfSight(p, t)
-    : d <= MELEE_RANGE;
+    : d <= playerMeleeRangeAgainstTarget(t);
   if (
     inAutoAttackRange &&
     t.kind === 'mob' &&
@@ -111,7 +111,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     p.swingTimer = ranged.speed * ctx.swingIntervalMult(p);
     return;
   }
-  if (d > MELEE_RANGE) return;
+  if (d > playerMeleeRangeAgainstTarget(t)) return;
   ctx.breakGhostWolf(p);
 
   let bonus = 0;

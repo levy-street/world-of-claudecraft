@@ -24,10 +24,12 @@
 // the offline Sim and the online ClientWorld mirror expose (player.cooldowns is a
 // Map, inventory is InvSlot[]); the core never reaches for a Sim-only field.
 
+import { playerMeleeRangeAgainstTarget } from '../sim/mob_combat';
 import {
   type AbilityDef,
   dist2d,
   GCD,
+  type EntityKind,
   type ItemDef,
   MELEE_RANGE,
   POTION_COOLDOWN,
@@ -131,6 +133,10 @@ export interface ActionBarPlayerInput {
 export interface ActionBarTargetInput {
   dead: boolean;
   pos: Vec3;
+  prevPos?: Vec3;
+  kind?: EntityKind;
+  templateId?: string;
+  scale?: number;
 }
 
 /** The world subset one tick reads: the player, the current target, and inventory
@@ -203,6 +209,24 @@ function inventoryCount(
   return total;
 }
 
+function hasMeleeProfileTarget(target: ActionBarTargetInput): target is ActionBarTargetInput & {
+  kind: EntityKind;
+  templateId: string;
+  scale: number;
+  prevPos: Vec3;
+} {
+  return (
+    target.kind !== undefined &&
+    target.templateId !== undefined &&
+    target.scale !== undefined &&
+    target.prevPos !== undefined
+  );
+}
+
+function meleeRangeForTarget(target: ActionBarTargetInput): number {
+  return hasMeleeProfileTarget(target) ? playerMeleeRangeAgainstTarget(target) : MELEE_RANGE;
+}
+
 /**
  * Build an action-bar view bound to one descriptor. The per-slot state array is
  * preallocated once here; tick() mutates it in place and returns the SAME references
@@ -220,6 +244,8 @@ export function createActionBarView(
     tick(world: ActionBarWorldInput): ActionBarState {
       const { player, target } = world;
       const tgtDist = target !== null && !target.dead ? dist2d(player.pos, target.pos) : null;
+      const targetMeleeRange =
+        target !== null && !target.dead ? meleeRangeForTarget(target) : MELEE_RANGE;
       let boundCount = 0;
 
       for (let i = 0; i < descriptor.slots.length; i++) {
@@ -248,7 +274,7 @@ export function createActionBarView(
           slot.cdText = '';
           slot.count = '';
           slot.usable = true;
-          slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
+          slot.outOfRange = tgtDist !== null && tgtDist > targetMeleeRange;
           slot.queued = player.autoAttack;
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
@@ -339,7 +365,7 @@ export function createActionBarView(
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
-          tgtDist > (def.range > 0 ? def.range : MELEE_RANGE);
+          tgtDist > (def.range > 0 ? def.range : targetMeleeRange);
         slot.queued = player.queuedOnSwing === def.id;
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,

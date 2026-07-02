@@ -28,6 +28,7 @@
 // tests/architecture.test.ts.
 
 import { ITEMS, MOBS } from '../data';
+import { playerMeleeRangeAgainstTarget } from '../mob_combat';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -43,7 +44,6 @@ import {
   dist2d,
   FISHING_CAST_ID,
   MELEE_ARC,
-  MELEE_RANGE,
   normAngle,
 } from '../types';
 import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
@@ -271,7 +271,7 @@ export function castAbility(ctx: SimContext, abilityId: string, pid?: number): v
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    const maxRange = ability.range > 0 ? ability.range : playerMeleeRangeAgainstTarget(target);
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -440,7 +440,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     cancelCast(ctx, p);
     return;
   }
-  const maxRange = res.def.range > 0 ? res.def.range : MELEE_RANGE;
+  const maxRange = res.def.range > 0 ? res.def.range : playerMeleeRangeAgainstTarget(target);
   if (dist2d(p.pos, target.pos) > maxRange) {
     ctx.error(p.id, 'Out of range.');
     cancelCast(ctx, p);
@@ -543,7 +543,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    const maxRange = ability.range > 0 ? ability.range : playerMeleeRangeAgainstTarget(target);
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;

@@ -83,6 +83,11 @@ import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
+import {
+  selfSnapshotAlpha,
+  selfSnapshotPositionInto,
+  stepSelfRenderPositionInto,
+} from './self_render_motion';
 import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { shouldRenderStealthGhost } from './stealth';
@@ -192,8 +197,6 @@ const CAMERA_PULL_OUT_RATE = 6;
 const CAMERA_SOFT_PULL_WEIGHT = 0.45;
 const CAMERA_BASE_FOV = 60;
 const CAMERA_MAX_COMP_FOV = 98;
-const SELF_RENDER_SMOOTH_RATE = 30;
-const SELF_RENDER_SNAP_DIST_SQ = 6 * 6;
 const SUN_HALO_OPACITY = 0.35; // bloom now supplies most of the halo
 // lighting rig (high/ultra) — IBL supplies ambient, sun carries the key
 const HEMI_INTENSITY = 0.45;
@@ -443,10 +446,6 @@ interface ClickMarkerSlot {
   ringMat: THREE.MeshBasicMaterial;
   crossMat: THREE.MeshBasicMaterial;
   elapsed: number; // seconds since spawn; >= CLICK_MARKER_LIFETIME means free
-}
-
-function selfSnapshotAlpha(alpha: number, lead: number): number {
-  return Math.min(1.25, alpha + Math.max(0, lead));
 }
 
 export interface EntityView {
@@ -4271,7 +4270,7 @@ export class Renderer {
     this.tickFiestaGlows(dt);
     worldStart = markWorldPhase('vfx', worldStart);
 
-    this.updateCamera(selfPos, dt);
+    this.updateCamera(this.selfCameraAnchor(alpha, selfAlphaLead, this.tmpV), dt);
     worldStart = markWorldPhase('camera', worldStart);
     // Fully-fogged terrain chunks / tree buckets are dropped before the
     // frustum; camera-ghost props hide against the current eye-to-camera ray.
@@ -4573,6 +4572,14 @@ export class Renderer {
     }
   }
 
+  private selfCameraAnchor(
+    alpha: number,
+    selfAlphaLead: number,
+    out: THREE.Vector3,
+  ): THREE.Vector3 {
+    const p = this.sim.player;
+    return selfSnapshotPositionInto(p.prevPos, p.pos, alpha, selfAlphaLead, out);
+  }
   private updateSelfRenderPosition(
     alpha: number,
     dt: number,
@@ -4584,18 +4591,16 @@ export class Renderer {
     const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
     const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
     if (selfAlphaLead > 0) {
-      const dx = px - this.selfRenderPosition.x;
-      const dy = py - this.selfRenderPosition.y;
-      const dz = pz - this.selfRenderPosition.z;
-      if (!this.selfRenderPositionReady || dx * dx + dy * dy + dz * dz > SELF_RENDER_SNAP_DIST_SQ) {
-        this.selfRenderPosition.set(px, py, pz);
-        this.selfRenderPositionReady = true;
-      } else {
-        const t = 1 - Math.exp(-SELF_RENDER_SMOOTH_RATE * Math.max(0, dt));
-        this.selfRenderPosition.x += dx * t;
-        this.selfRenderPosition.y += dy * t;
-        this.selfRenderPosition.z += dz * t;
-      }
+      stepSelfRenderPositionInto(
+        this.selfRenderPosition,
+        px,
+        py,
+        pz,
+        this.selfRenderPositionReady,
+        dt,
+        this.selfRenderPosition,
+      );
+      this.selfRenderPositionReady = true;
     } else {
       this.selfRenderPosition.set(px, py, pz);
       this.selfRenderPositionReady = true;

@@ -1,4 +1,4 @@
-import { MELEE_RANGE } from './types';
+import { MELEE_RANGE, type Entity } from './types';
 
 export type MobCombatProfile = {
   meleeRange: number;
@@ -64,4 +64,15 @@ export function combatProfileForMob(templateId: string, scale: number): MobComba
 export function effectiveMobMeleeRange(profile: MobCombatProfile, mobMoved: boolean): number {
   if (!mobMoved) return profile.meleeRange;
   return profile.meleeRange + profile.movingRangeBonus;
+}
+
+export function playerMeleeRangeAgainstTarget(
+  target: Pick<Entity, 'kind' | 'templateId' | 'scale' | 'pos' | 'prevPos'>,
+): number {
+  if (target.kind !== 'mob') return MELEE_RANGE;
+  const profile = combatProfileForMob(target.templateId, target.scale);
+  const dx = target.pos.x - target.prevPos.x;
+  const dz = target.pos.z - target.prevPos.z;
+  const moved = dx * dx + dz * dz > 0.05 * 0.05;
+  return Math.max(MELEE_RANGE, effectiveMobMeleeRange(profile, moved));
 }
