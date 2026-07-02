@@ -3,11 +3,9 @@ import { talentsFor } from '../src/sim/content/talents';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL, type SimEvent } from '../src/sim/types';
 
-// "/talents" emits a self-only `error` event (the same self-reply channel /who
-// uses) and returns null, so we collect the text from the next tick's events.
 function readout(sim: Sim, cmd: string): string | undefined {
-  sim.tick(); // drain any setup events first
-  expect(sim.chat(cmd)).toBeNull(); // readouts are never logged as chat
+  sim.tick();
+  expect(sim.chat(cmd)).toBeNull();
   const errs = sim
     .tick()
     .filter((e: SimEvent): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
@@ -15,52 +13,29 @@ function readout(sim: Sim, cmd: string): string | undefined {
 }
 
 describe('/talents readout', () => {
-  it('reports not-yet-unlocked below the talent level', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' }); // fresh = level 1
+  it('shows rows picked before the specialization gate', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
     const text = readout(sim, '/talents');
-    expect(text).toBe('You have not unlocked talents yet — they begin at level 10.');
+    expect(text).toBe('Talents: no specialization, 0/0 choice rows picked. Specializations unlock at level 10.');
   });
 
-  it('shows spec, spent/total and the per-tree split', () => {
+  it('shows spec and picked row count', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
-    sim.setPlayerLevel(MAX_LEVEL); // 11 points available at level 20
-    expect(
-      sim.applyTalents({ spec: 'arms', ranks: { war_toughness: 3 }, choices: {}, rows: {} }),
-    ).toBe(true);
+    sim.setPlayerLevel(MAX_LEVEL);
+    expect(sim.applyTalents({ spec: 'arms', rows: { 5: 'war_r5_juggernaut' } })).toBe(true);
 
     const armsName = talentsFor('warrior')!.specs.find((s) => s.id === 'arms')!.name;
     const text = readout(sim, '/talents');
-    expect(text).toBe(
-      `Talents: ${armsName} — 3/11 points spent (Class 3, ${armsName} 0). 8 unspent.`,
-    );
+    expect(text).toBe(`Talents: ${armsName}, 1/6 choice rows picked.`);
   });
 
-  it('reports no specialization when none is chosen', () => {
+  it('reports no specialization when none is chosen and aliases resolve', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
     sim.setPlayerLevel(MAX_LEVEL);
-    expect(
-      sim.applyTalents({ spec: null, ranks: { war_toughness: 2 }, choices: {}, rows: {} }),
-    ).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 5: 'war_r5_juggernaut', 8: 'war_r8_pummel' } })).toBe(true);
 
-    const text = readout(sim, '/talents');
-    expect(text).toBe('Talents: no specialization — 2/11 points spent (Class 2). 9 unspent.');
-  });
-
-  it('omits the unspent suffix when all points are spent and aliases resolve', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
-    sim.setPlayerLevel(MAX_LEVEL);
-    // 11 points, all in the class tree (Toughness/Cruelty cap at 3 each here).
-    expect(
-      sim.applyTalents({
-        spec: null,
-        ranks: { war_toughness: 3, war_cruelty: 3, war_deflection: 3, war_imp_thunder_clap: 2 },
-        choices: {},
-        rows: {},
-      }),
-    ).toBe(true);
-
-    const text = readout(sim, '/talent'); // alias
-    expect(text).toBe('Talents: no specialization — 11/11 points spent (Class 11).');
-    expect(readout(sim, '/spec')).toBe(text); // alias parity
+    const text = readout(sim, '/talent');
+    expect(text).toBe('Talents: no specialization, 2/6 choice rows picked.');
+    expect(readout(sim, '/spec')).toBe(text);
   });
 });

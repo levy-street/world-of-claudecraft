@@ -222,11 +222,13 @@ function stripEmptyTalentRows(value: unknown): unknown {
     rows &&
     typeof rows === 'object' &&
     !Array.isArray(rows) &&
-    Object.keys(rows).length === 0 &&
-    'ranks' in out &&
-    'choices' in out
+    Object.keys(rows).length === 0
   ) {
     delete out.rows;
+    if (!('spec' in out)) {
+      out.choices = {};
+      out.ranks = {};
+    }
   }
   return out;
 }

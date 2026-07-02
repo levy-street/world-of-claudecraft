@@ -16,13 +16,8 @@ describe('talents_window: no magic values', () => {
     expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
   });
 
-  it('drives the tree-arrow + accent colors through CSS custom properties', () => {
+  it('drives the remaining accent colors through CSS custom properties', () => {
     for (const token of [
-      'var(--color-talent-arrow)',
-      'var(--color-talent-arrow-dim)',
-      'var(--color-talent-opt-dim)',
-      'var(--color-talent-hint)',
-      'var(--color-talent-req)',
       'var(--color-talent-dormant)',
       'var(--color-text-muted)',
       'var(--gold)',

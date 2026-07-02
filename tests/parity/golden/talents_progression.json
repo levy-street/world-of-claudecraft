@@ -4,10 +4,10 @@
   "sampleEvery": 2,
   "ticks": 0,
   "coverage": [
-    "applyTalents valid spec build (G1a) + recomputeTalents flat-struct bake",
-    "respec wipes ranks, keeps spec",
+    "applyTalents valid rows build (G1a) + recomputeTalents flat-struct bake",
+    "respec wipes rows, keeps spec",
     "saveLoadout (object-alloc overload) + switchLoadout (2 of 4 slots)",
-    "setSpec drops the prior spec tree points",
+    "setSpec keeps row choices while changing spec",
     "refreshKnownAbilities(announce=false): known-ability list flips per change"
   ],
   "draws": 0,
@@ -101,7 +101,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "363a7889",
+      "state": "4b771564",
       "events": "799cce3e",
       "rng": {
         "draws": 0,
@@ -126,97 +126,10 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {
-              "arms_imp_overpower": 2,
-              "war_cruelty": 2
+            "rows": {
+              "5": "war_r5_juggernaut",
+              "14": "war_r14_mortal_strike"
             },
-            "spec": "arms"
-          }
-        }
-      ],
-      "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 122,
-          "combatTimer": 99,
-          "critChance": 0.0895,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 812,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 39,
-            "armor": 376,
-            "int": 10,
-            "spi": 11,
-            "sta": 60,
-            "str": 61
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 390,
-      "state": "16514c32",
-      "events": "a8848b3e",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "respec",
-      "players": [
-        {
-          "activeLoadout": -1,
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "autoEquip": true,
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "counters": {},
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 389,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
-          },
-          "lifetimeXp": 167200,
-          "talents": {
-            "choices": {},
-            "ranks": {},
             "spec": "arms"
           }
         }
@@ -276,7 +189,91 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "4bac6cc1",
+      "state": "0df9b2e1",
+      "events": "a8848b3e",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "respec",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "lifetimeXp": 167200,
+          "talents": {
+            "spec": "arms"
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "combatTimer": 99,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 812,
+          "id": 389,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 812,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 376,
+            "int": 10,
+            "spi": 11,
+            "sta": 60,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 390,
+      "state": "008b74ee",
       "events": "f3824701",
       "rng": {
         "draws": 0,
@@ -302,9 +299,8 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
+                "rows": {
+                  "14": "war_r14_mortal_strike"
                 },
                 "spec": "arms"
               },
@@ -317,216 +313,9 @@
             }
           ],
           "talents": {
-            "choices": {},
-            "ranks": {
-              "war_cruelty": 3
+            "rows": {
+              "14": "war_r14_whirlwind"
             },
-            "spec": "arms"
-          }
-        }
-      ],
-      "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 122,
-          "combatTimer": 99,
-          "critChance": 0.0995,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 812,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 39,
-            "armor": 376,
-            "int": 10,
-            "spi": 11,
-            "sta": 60,
-            "str": 61
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 390,
-      "state": "08b0b9a8",
-      "events": "68e599fc",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "switch-loadout",
-      "players": [
-        {
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "autoEquip": true,
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "counters": {},
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 389,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
-          },
-          "lifetimeXp": 167200,
-          "loadouts": [
-            {
-              "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
-                "spec": "arms"
-              },
-              "bar": [
-                "mortal_strike",
-                "overpower",
-                null
-              ],
-              "name": "Arms"
-            }
-          ],
-          "talents": {
-            "choices": {},
-            "ranks": {
-              "arms_imp_overpower": 2
-            },
-            "spec": "arms"
-          }
-        }
-      ],
-      "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 122,
-          "combatTimer": 99,
-          "critChance": 0.0695,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 812,
-          "id": 389,
-          "kind": "player",
-          "level": 20,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 812,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "potionCooldownUntil": -1,
-          "resourceType": "rage",
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 39,
-            "armor": 376,
-            "int": 10,
-            "spi": 11,
-            "sta": 60,
-            "str": 61
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 390,
-      "state": "8c93b4ec",
-      "events": "799cce3e",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "set-spec",
-      "players": [
-        {
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "autoEquip": true,
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "counters": {},
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 389,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
-          },
-          "lifetimeXp": 167200,
-          "loadouts": [
-            {
-              "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
-                },
-                "spec": "arms"
-              },
-              "bar": [
-                "mortal_strike",
-                "overpower",
-                null
-              ],
-              "name": "Arms"
-            }
-          ],
-          "talents": {
-            "choices": {},
-            "ranks": {},
             "spec": "fury"
           }
         }
@@ -586,7 +375,211 @@
       "tick": 0,
       "time": 0,
       "nextId": 390,
-      "state": "8c93b4ec",
+      "state": "ff63e960",
+      "events": "68e599fc",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "switch-loadout",
+      "players": [
+        {
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "lifetimeXp": 167200,
+          "loadouts": [
+            {
+              "alloc": {
+                "rows": {
+                  "14": "war_r14_mortal_strike"
+                },
+                "spec": "arms"
+              },
+              "bar": [
+                "mortal_strike",
+                "overpower",
+                null
+              ],
+              "name": "Arms"
+            }
+          ],
+          "talents": {
+            "rows": {
+              "14": "war_r14_mortal_strike"
+            },
+            "spec": "arms"
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "combatTimer": 99,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 812,
+          "id": 389,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 812,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 376,
+            "int": 10,
+            "spi": 11,
+            "sta": 60,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 390,
+      "state": "5f75eba2",
+      "events": "799cce3e",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "set-spec",
+      "players": [
+        {
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 389,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword"
+          },
+          "lifetimeXp": 167200,
+          "loadouts": [
+            {
+              "alloc": {
+                "rows": {
+                  "14": "war_r14_mortal_strike"
+                },
+                "spec": "arms"
+              },
+              "bar": [
+                "mortal_strike",
+                "overpower",
+                null
+              ],
+              "name": "Arms"
+            }
+          ],
+          "talents": {
+            "rows": {
+              "14": "war_r14_mortal_strike"
+            },
+            "spec": "fury"
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 132,
+          "combatTimer": 99,
+          "critChance": 0.1195,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 812,
+          "id": 389,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 812,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 376,
+            "int": 10,
+            "spi": 11,
+            "sta": 60,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 390,
+      "state": "5f75eba2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -612,9 +605,8 @@
           "loadouts": [
             {
               "alloc": {
-                "choices": {},
-                "ranks": {
-                  "arms_imp_overpower": 2
+                "rows": {
+                  "14": "war_r14_mortal_strike"
                 },
                 "spec": "arms"
               },
@@ -627,8 +619,9 @@
             }
           ],
           "talents": {
-            "choices": {},
-            "ranks": {},
+            "rows": {
+              "14": "war_r14_mortal_strike"
+            },
             "spec": "fury"
           }
         }

@@ -110,9 +110,9 @@ describe('choice row validation and repair', () => {
 
   it('validates rows as part of the whole allocation', () => {
     withRows();
-    expect(validateAllocation(cls, alloc({ rows: { 5: 'fixture_sta' } }), 0, 5).ok).toBe(true);
-    expect(validateAllocation(cls, alloc({ rows: { 5: 'fixture_sta' } }), 0, 4).ok).toBe(false);
-    expect(validateAllocation(cls, alloc({ rows: { 5: 'missing' } }), 0, 20).ok).toBe(false);
+    expect(validateAllocation(cls, alloc({ rows: { 5: 'fixture_sta' } }), 5).ok).toBe(true);
+    expect(validateAllocation(cls, alloc({ rows: { 5: 'fixture_sta' } }), 4).ok).toBe(false);
+    expect(validateAllocation(cls, alloc({ rows: { 5: 'missing' } }), 20).ok).toBe(false);
   });
 
   it('repairs stale allocation rows on load', () => {
@@ -120,7 +120,6 @@ describe('choice row validation and repair', () => {
     const repaired = repairAllocation(
       cls,
       alloc({ rows: { 5: 'fixture_sta', 8: 'missing' } }),
-      0,
       20,
     );
     expect(repaired.rows).toEqual({ 5: 'fixture_sta' });

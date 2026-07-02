@@ -396,9 +396,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'game.talents.available': 'Доступно',
   'game.talents.spent': 'Потрачено',
   'game.talents.pointSource':
-    'Получайте 1 очко талантов за каждый уровень с {first} по {cap}. Повышайте уровень, чтобы получить больше очков.',
+    'Ряды выбора открываются с {first} по {cap} уровень. Выберите один вариант в каждом открытом ряду.',
   'game.talents.apply': 'Применить изменения',
-  'game.talents.clear': 'Сбросить очки',
+  'game.talents.clear': 'Сбросить выбор',
   'game.talents.reset': 'Сброс',
   'game.talents.chooseSpec': 'Выберите специализацию',
   'game.talents.noSpec': 'Специализация не выбрана',
@@ -418,7 +418,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'game.talents.currentBuildHint':
     'Выберите сохраненный билд, затем сохраните текущий для обновления. Экспорт делится выбранным билдом.',
   'game.talents.createBuildHint':
-    'Новый билд сохраняет текущие очки отдельно. Импорт вставляет общую строку.',
+    'Новый билд сохраняет текущий выбор отдельно. Импорт вставляет общую строку.',
   'game.talents.buildHint': 'Выберите сохраненный билд, обновите его или создайте новый.',
   'game.talents.buildInvalid': 'Этот билд пока недействителен.',
   'game.talents.selectBuildFirst': 'Сначала выберите сохраненный билд для удаления.',
@@ -443,7 +443,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'game.talents.nothingStaged': 'Нет изменений для применения.',
   'game.talents.pickSpecFirst': 'Выберите специализацию, чтобы открыть это дерево.',
   'game.talents.unlockBanner': 'Таланты открыты!',
-  'game.talents.unlockHint': 'Вы получили первое очко талантов: нажмите N, чтобы открыть Таланты.',
+  'game.talents.unlockHint': 'Варианты талантов доступны: нажмите N, чтобы открыть Таланты.',
   'game.talents.copy': 'Копировать',
   'game.talents.close': 'Закрыть',
   'game.talents.cancel': 'Отмена',
@@ -5378,4 +5378,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': 'Спокойствие',
   'entities.abilities.tranquility.description':
     'Направляет восстанавливающую энергию, каждую секунду исцеляя ближайших союзников. (талант друида)',
+  'game.talents.readout.rowsSummary': 'Таланты: {head}, выбрано рядов {picked}/{unlocked}.',
+  'game.talents.readout.specLocked': ' Специализации открываются на {level} уровне.',
 };

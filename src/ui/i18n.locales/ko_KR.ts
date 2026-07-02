@@ -387,9 +387,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'game.talents.available': '사용 가능',
   'game.talents.spent': '사용함',
   'game.talents.pointSource':
-    '{first}레벨부터 {cap}레벨까지 레벨마다 특성 점수 1점을 얻습니다. 더 많은 점수를 얻으려면 레벨을 올리세요.',
+    '선택 줄은 {first}레벨부터 {cap}레벨까지 해제됩니다. 해제된 각 줄에서 하나를 고르세요.',
   'game.talents.apply': '변경 적용',
-  'game.talents.clear': '점수 초기화',
+  'game.talents.clear': '선택 초기화',
   'game.talents.reset': '초기화',
   'game.talents.chooseSpec': '전문화 선택',
   'game.talents.noSpec': '선택한 전문화 없음',
@@ -409,7 +409,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'game.talents.currentBuildHint':
     '저장한 빌드를 고른 뒤 현재 저장으로 갱신하세요. 내보내기는 선택한 빌드를 공유합니다.',
   'game.talents.createBuildHint':
-    '새 빌드는 현재 점수를 별도 빌드로 저장합니다. 가져오기는 공유 문자열을 붙여넣습니다.',
+    '새 빌드는 현재 선택을 별도 빌드로 저장합니다. 가져오기는 공유 문자열을 붙여넣습니다.',
   'game.talents.buildHint': '저장한 빌드를 고르고 현재 저장으로 갱신하거나 새 빌드를 만드세요.',
   'game.talents.buildInvalid': '이 빌드는 아직 유효하지 않습니다.',
   'game.talents.selectBuildFirst': '삭제할 저장 빌드를 먼저 선택하세요.',
@@ -434,7 +434,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'game.talents.nothingStaged': '적용할 변경이 없습니다.',
   'game.talents.pickSpecFirst': '이 트리를 사용하려면 전문화를 선택하세요.',
   'game.talents.unlockBanner': '특성 해제!',
-  'game.talents.unlockHint': '첫 특성 점수를 얻었습니다. N을 눌러 특성을 여세요.',
+  'game.talents.unlockHint': '특성 선택을 사용할 수 있습니다. N을 눌러 특성을 여세요.',
   'game.talents.copy': '복사',
   'game.talents.close': '닫기',
   'game.talents.cancel': '취소',
@@ -5276,4 +5276,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': '평온',
   'entities.abilities.tranquility.description':
     '회복 에너지를 집중하여 주변 아군을 매초 치유합니다. (드루이드 특성)',
+  'game.talents.readout.rowsSummary': '특성: {head}, 선택한 줄 {picked}/{unlocked}.',
+  'game.talents.readout.specLocked': ' 전문화는 {level}레벨에 해제됩니다.',
 };

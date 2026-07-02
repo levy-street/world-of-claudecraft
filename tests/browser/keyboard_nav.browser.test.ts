@@ -12,7 +12,7 @@
 // the open()->trap and close()->return-to-opener integration is driven, not just source-scanned.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type TalentAllocation, type TalentNode, talentsFor } from '../../src/sim/content/talents';
+import type { TalentAllocation } from '../../src/sim/content/talents';
 import { FocusManager } from '../../src/ui/focus_manager';
 import { MarketWindow } from '../../src/ui/market_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -139,8 +139,8 @@ describe('keyboard-nav: a REAL window painter through the captureFocus bridge', 
           stage = s;
         },
         playerClass: () => 'warrior',
-        totalPoints: () => 31,
-        currentAllocation: () => ({ ranks: {}, choices: {} }) as TalentAllocation,
+        playerLevel: () => 20,
+        currentAllocation: () => ({ spec: null, rows: {} }),
         activeLoadout: () => -1,
         loadouts: () => [],
         currentBar: () => [],
@@ -160,80 +160,6 @@ describe('keyboard-nav: a REAL window painter through the captureFocus bridge', 
     // defers the restore a tick.
     win.close();
     await vi.waitFor(() => expect(document.activeElement).toBe(opener));
-  });
-});
-
-// The talents choice-node flyout (openChoicePopup) is a role=menu of menuitemradio options
-// that lives on document.body (OUTSIDE the dialog's focus trap), so it owns its own keyboard
-// model: roving tabindex + Arrow/Home/End move focus (no select-on-move), Enter/Space pick,
-// and any focus leaving it (Tab-out, click-away, Escape) dismisses it and returns focus to
-// the anchor so a keyboard user cannot escape the dialog through the flyout. This behavior
-// shipped with no test; this drives it on a REAL warrior choice node.
-describe('keyboard-nav: the talents choice-node flyout (roving menu + focus-return)', () => {
-  function openPopup(): { anchor: HTMLElement; pop: HTMLElement } {
-    const root = host('talents-window');
-    root.style.display = 'block';
-    // A stand-in anchor inside the window root (openChoicePopup positions against it and
-    // returns focus to it on dismiss); a real rendered node would do, but this keeps the
-    // fixture to the one method under test.
-    const anchor = document.createElement('div');
-    anchor.className = 'tal-node';
-    anchor.tabIndex = 0;
-    root.appendChild(anchor);
-    const win = new TalentsWindow(
-      stubDeps({ root: () => root, playerClass: () => 'warrior', totalPoints: () => 31 }),
-    );
-    const node = talentsFor('warrior')?.nodes.find((n) => n.kind === 'choice');
-    if (!node) throw new Error('fixture: warrior has no choice node');
-    (
-      win as unknown as {
-        openChoicePopup(a: HTMLElement, n: TalentNode, s: TalentAllocation): void;
-      }
-    ).openChoicePopup(anchor, node, { ranks: {}, choices: {} } as TalentAllocation);
-    const pop = document.getElementById('tal-choice-pop');
-    if (!pop) throw new Error('the choice flyout did not open');
-    return { anchor, pop };
-  }
-
-  it('opens as a menu with roving tabindex (exactly one option focusable, and focused)', () => {
-    const { pop } = openPopup();
-    expect(pop.getAttribute('role')).toBe('menu');
-    const opts = Array.from(pop.querySelectorAll<HTMLElement>('.tal-choice-opt'));
-    expect(opts.length).toBeGreaterThan(1);
-    expect(opts.every((o) => o.getAttribute('role') === 'menuitemradio')).toBe(true);
-    // exactly one option is in the tab order (roving), and the flyout holds focus
-    expect(opts.filter((o) => o.getAttribute('tabindex') === '0')).toHaveLength(1);
-    expect(pop.contains(document.activeElement)).toBe(true);
-  });
-
-  it('Arrow keys move the roving focus among options without selecting or dismissing', () => {
-    const { pop } = openPopup();
-    const opts = Array.from(pop.querySelectorAll<HTMLElement>('.tal-choice-opt'));
-    const active = document.activeElement;
-    const start = active instanceof HTMLElement ? opts.indexOf(active) : -1;
-    opts[start].dispatchEvent(key('ArrowDown'));
-    const next = (start + 1) % opts.length;
-    expect(document.activeElement).toBe(opts[next]);
-    expect(opts[next].getAttribute('tabindex')).toBe('0');
-    expect(opts[start].getAttribute('tabindex')).toBe('-1');
-    // moving focus does NOT select or close the flyout (Enter/Space is what picks)
-    expect(document.getElementById('tal-choice-pop')).toBeTruthy();
-  });
-
-  it('Escape dismisses the flyout and returns focus to the anchor', () => {
-    const { anchor, pop } = openPopup();
-    pop.querySelector<HTMLElement>('.tal-choice-opt[tabindex="0"]')?.dispatchEvent(key('Escape'));
-    expect(document.getElementById('tal-choice-pop')).toBeNull();
-    expect(document.activeElement).toBe(anchor);
-  });
-
-  it('focus leaving the flyout (Tab-out) dismisses it and returns focus to the anchor', () => {
-    const { anchor } = openPopup();
-    const outside = document.createElement('button');
-    document.body.appendChild(outside);
-    outside.focus(); // focus leaves the popup -> focusout -> dismiss + return-to-anchor
-    expect(document.getElementById('tal-choice-pop')).toBeNull();
-    expect(document.activeElement).toBe(anchor);
   });
 });
 

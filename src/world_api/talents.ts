@@ -9,7 +9,6 @@ export interface IWorldTalents {
   talentRole: Role | null;
   loadouts: SavedLoadout[];
   activeLoadout: number;
-  talentPoints(): { total: number; spent: number };
   applyTalents(alloc: TalentAllocation): void;
   respec(): void;
   chooseRow(level: ChoiceRowLevel, optionId: string): void;

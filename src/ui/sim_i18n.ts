@@ -3930,6 +3930,20 @@ const RULES: Rule[] = [
       }) + (m[5] ? locTalentTail(m[5]) : ''),
   },
   {
+    re: /^Talents: (.+), (.+)\/(.+) choice rows picked\.(.*)$/,
+    build: (m) =>
+      t('game.talents.readout.rowsSummary', {
+        head: m[1] === 'no specialization' ? t('game.talents.readout.noSpec') : m[1],
+        picked: m[2],
+        unlocked: m[3],
+      }) +
+      (m[4]
+        ? t('game.talents.readout.specLocked', {
+            level: m[4].match(/level (.+)\./)?.[1] ?? m[4],
+          })
+        : ''),
+  },
+  {
     re: /^The ritual circle is silent without the Crypt Keystone\.$/,
     build: () => tQuestExtra('ritualNeedsKey'),
   },

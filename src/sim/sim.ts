@@ -73,7 +73,6 @@ import {
   type SavedLoadout,
   type TalentAllocation,
   type TalentModifiers,
-  talentPointsAtLevel,
 } from './content/talents';
 import { applyCooldowns, type SavedCooldowns, serializeCooldowns } from './cooldown_persist';
 import type { DelveShopGate, DelveShopOffer } from './data';
@@ -186,9 +185,7 @@ import {
   respecTalents,
   saveTalentLoadout,
   setTalentSpec,
-  spendTalentPoint,
   switchTalentLoadout,
-  talentPointBudget,
 } from './progression/talents';
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
@@ -1251,17 +1248,14 @@ export class Sim {
           cls,
           {
             spec: s.talents.spec ?? null,
-            ranks: { ...(s.talents.ranks ?? {}) },
-            choices: { ...(s.talents.choices ?? {}) },
             rows: { ...(s.talents.rows ?? {}) },
           },
-          talentPointsAtLevel(player.level),
           player.level,
         );
       if (s.loadouts)
         meta.loadouts = s.loadouts.map((l) => ({
           name: l.name,
-          alloc: cloneAllocation(l.alloc),
+          alloc: repairAllocation(cls, l.alloc, player.level),
           bar: [...(l.bar ?? [])],
         }));
       if (typeof s.activeLoadout === 'number') meta.activeLoadout = s.activeLoadout;
@@ -2337,20 +2331,10 @@ export class Sim {
   // playerMods (the Fiesta overlay) stay on Sim.
   // -------------------------------------------------------------------------
 
-  talentPoints(pid?: number): { total: number; spent: number } {
-    return talentPointBudget(this.ctx, pid);
-  }
-
   // Commit a whole staged allocation in one shot (the UI's "Apply"). Rejects any
   // allocation that fails server-side validation with a reason event (FR-4.5).
   applyTalents(alloc: TalentAllocation, pid?: number): boolean {
     return applyTalentAllocation(this.ctx, alloc, pid);
-  }
-
-  // Spend a single point into a node (incremental API; the UI mostly stages then
-  // applies). Validated identically by building + checking a candidate alloc.
-  spendTalent(nodeId: string, pid?: number): boolean {
-    return spendTalentPoint(this.ctx, nodeId, pid);
   }
 
   // Choose / change specialization. Switching specs drops the previous spec

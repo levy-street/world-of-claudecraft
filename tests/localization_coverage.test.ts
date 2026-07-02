@@ -1059,9 +1059,9 @@ describe('i18n Localization Key Coverage', () => {
       setLanguage('es');
       expect(
         renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_toughness' && entry.field === 'name')!,
+          talentEntries.find((entry) => entry.id === 'protection' && entry.field === 'name')!,
         ),
-      ).toContain('Dureza');
+      ).toContain('Protección');
       expect(
         renderTalentManifestEntry(
           talentEntries.find(
@@ -1073,15 +1073,17 @@ describe('i18n Localization Key Coverage', () => {
       setLanguage('zh_CN');
       expect(
         renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_cruelty' && entry.field === 'name')!,
+          talentEntries.find(
+            (entry) => entry.id === '5.war_r5_juggernaut' && entry.field === 'name',
+          )!,
         ),
-      ).toContain('残忍');
+      ).toContain('天赋');
 
       setLanguage('ko_KR');
       expect(
         renderTalentManifestEntry(
           talentEntries.find(
-            (entry) => entry.id === 'prot_choice.pc_last_stand' && entry.field === 'description',
+            (entry) => entry.id === '17.mag_r17_battlemage_armor' && entry.field === 'description',
           )!,
         ),
       ).toContain('생명력');

@@ -241,8 +241,6 @@ function talentAllocationFromWire(value: unknown): TalentAllocation | null {
   }
   return {
     spec: typeof source.spec === 'string' ? source.spec : null,
-    ranks: numberRecord(source.ranks),
-    choices: stringRecord(source.choices),
     rows,
   };
 }

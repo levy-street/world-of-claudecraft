@@ -9,24 +9,66 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "es_ES": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "fr_FR": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "fr_CA": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "de_DE": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "pl_PL": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "id_ID": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "tr_TR": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "sv_SE": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "vi_VN": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ],
+  "da_DK": [
+    "game.talents.readout.rowsSummary",
+    "game.talents.readout.specLocked"
+  ]
 };

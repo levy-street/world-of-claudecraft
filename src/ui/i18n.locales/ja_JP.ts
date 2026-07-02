@@ -386,9 +386,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'game.talents.available': '使用可能',
   'game.talents.spent': '使用済み',
   'game.talents.pointSource':
-    'レベル{first}から{cap}まで、レベルごとにタレントポイントを1獲得します。さらにポイントを得るにはレベルを上げてください。',
+    '選択行はレベル{first}から{cap}まで解放されます。解放済みの各行から1つ選びます。',
   'game.talents.apply': '変更を適用',
-  'game.talents.clear': 'ポイントをリセット',
+  'game.talents.clear': '選択をリセット',
   'game.talents.reset': 'リセット',
   'game.talents.chooseSpec': '専門化を選択',
   'game.talents.noSpec': '専門化未選択',
@@ -408,7 +408,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'game.talents.currentBuildHint':
     '保存ビルドを選び、現在を保存で更新します。エクスポートは選択したビルドを共有します。',
   'game.talents.createBuildHint':
-    '新規ビルドは現在のポイントを別ビルドとして保存します。インポートは共有文字列を貼り付けます。',
+    '新規ビルドは現在の選択を別ビルドとして保存します。インポートは共有文字列を貼り付けます。',
   'game.talents.buildHint': '保存ビルドを選び、現在を保存で更新するか、新規ビルドを作成します。',
   'game.talents.buildInvalid': 'このビルドはまだ有効ではありません。',
   'game.talents.selectBuildFirst': '削除する保存ビルドを選択してください。',
@@ -433,7 +433,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'game.talents.nothingStaged': '適用する変更はありません。',
   'game.talents.pickSpecFirst': 'このツリーを使うには専門化を選択してください。',
   'game.talents.unlockBanner': 'タレント解除!',
-  'game.talents.unlockHint': '最初のタレントポイントを獲得しました。Nでタレントを開きます。',
+  'game.talents.unlockHint': 'タレント選択が利用可能です。Nでタレントを開きます。',
   'game.talents.copy': 'コピー',
   'game.talents.close': '閉じる',
   'game.talents.cancel': 'キャンセル',
@@ -5269,4 +5269,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': '静寂',
   'entities.abilities.tranquility.description':
     '回復の力を詠唱し、近くの味方を毎秒回復します。（ドルイドの天賦）',
+  'game.talents.readout.rowsSummary': 'タレント: {head}、選択済み行 {picked}/{unlocked}。',
+  'game.talents.readout.specLocked': ' 専門化はレベル {level} で解放されます。',
 };

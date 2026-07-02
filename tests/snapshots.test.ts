@@ -1962,12 +1962,12 @@ function dirtyEveryDeltaField(): {
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
-  meta.talents = { spec: 'arms', ranks: {}, choices: {}, rows: { 5: 'fixture_row_choice' } };
+  meta.talents = { spec: 'arms', rows: { 5: 'fixture_row_choice' } };
   meta.talentMods.spec = 'arms';
   meta.loadouts = [
     {
       name: 'PvP',
-      alloc: { spec: 'arms', ranks: {}, choices: {}, rows: { 5: 'fixture_row_choice' } },
+      alloc: { spec: 'arms', rows: { 5: 'fixture_row_choice' } },
       bar: [],
     },
   ];
@@ -2075,15 +2075,13 @@ describe('full self-state snapshot delta fixture', () => {
     // tal -> talents / talentSpec / loadouts / activeLoadout
     expect(client.talents).toEqual({
       spec: 'arms',
-      ranks: {},
-      choices: {},
       rows: { 5: 'fixture_row_choice' },
     });
     expect(client.talentSpec).toBe('arms');
     expect(client.loadouts).toEqual([
       {
         name: 'PvP',
-        alloc: { spec: 'arms', ranks: {}, choices: {}, rows: { 5: 'fixture_row_choice' } },
+        alloc: { spec: 'arms', rows: { 5: 'fixture_row_choice' } },
         bar: [],
       },
     ]);

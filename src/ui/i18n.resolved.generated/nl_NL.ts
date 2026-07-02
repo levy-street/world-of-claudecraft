@@ -145,6 +145,8 @@ export const nl_NL: EnTranslations = {
         "noTree": "Je klasse heeft nog geen talentenboom.",
         "locked": "Je hebt nog geen talenten ontgrendeld — die beginnen op niveau {level}.",
         "noSpec": "geen specialisatie",
+        "rowsSummary": "Talents: {head}, {picked}/{unlocked} choice rows picked.",
+        "specLocked": " Specializations unlock at level {level}.",
         "summary": "Talenten: {head} — {spent}/{total} punten besteed ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",

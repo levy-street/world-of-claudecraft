@@ -807,15 +807,15 @@ export const guideStrings = {
       'Talents are how you make a class your own. They are optional, forgiving, and easy to change, so you can experiment without fear.',
     whatHeading: 'What talents do',
     whatBody:
-      'As you level, you earn talent points to spend on small, permanent upgrades to your abilities and stats. They shape how a class feels, leaning it toward more damage, sturdier defense, or stronger healing.',
+      'As you level, talent rows unlock with a small set of choices. Each pick adds a permanent upgrade to your abilities, stats, or toolkit, shaping how your class feels in combat.',
     howHeading: 'How they work',
     howBody:
-      "Talents open up at level 10, and you keep earning points as you climb to the cap. You spend them in your class's talent panel, and you can save more than one layout to swap between builds.",
+      "Rows unlock as you level, and specializations open at level 10. Choose a specialization for its signature ability and mastery, then use the Choices tab to pick one option from each unlocked row.",
     shareNote:
       'A finished build can be copied to a short shareable code and handed to a friend, who pastes it straight into their own talent panel to load it.',
     resetTitle: 'Nothing is permanent',
     resetNote:
-      'You can reset your talents any time you are out of combat, so an early pick is never a trap. Try things, see what you like, and change your mind freely.',
+      'You can reset your choices any time you are out of combat, so an early pick is never a trap. Try things, see what you like, and change your mind freely.',
     specsHeading: 'Specializations by class',
     specsBody:
       'Every class has a handful of specializations, each with its own role and a signature focus. Here is the shape of all of them. Open a class for its full kit.',

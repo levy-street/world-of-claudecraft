@@ -13,12 +13,10 @@ import {
   cloneAllocation,
   computeTalentModifiers,
   emptyAllocation,
-  pointsSpent,
   type Role,
   SAVED_LOADOUT_BAR_SLOTS,
   type SavedLoadout,
   type TalentAllocation,
-  talentPointsAtLevel,
 } from '../sim/content/talents';
 import { abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
@@ -2229,14 +2227,10 @@ export class ClientWorld implements IWorld {
   prestige(): void {
     this.cmd({ cmd: 'prestige' });
   }
-  // --- IWorldTalents: talentPoints is a local compute (no send); applyTalents/
-  // respec/setSpec/saveLoadout/switchLoadout/deleteLoadout send camelCase commands,
-  // saveLoadout/deleteLoadout carry sanctioned display-only local recompute.
+  // --- IWorldTalents: applyTalents/respec/setSpec/saveLoadout/switchLoadout/
+  // deleteLoadout send camelCase commands, saveLoadout/deleteLoadout carry
+  // sanctioned display-only local recompute.
   // Talents & Specializations: the server re-validates every allocation. ---
-  talentPoints(): { total: number; spent: number } {
-    const level = this.entities.get(this.playerId)?.level ?? 1;
-    return { total: talentPointsAtLevel(level), spent: pointsSpent(this.talents) };
-  }
   applyTalents(alloc: TalentAllocation): void {
     this.cmd({ cmd: 'applyTalents', alloc });
   }

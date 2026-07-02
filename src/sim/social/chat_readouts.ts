@@ -12,12 +12,8 @@
 
 import { isDebuffAura } from '../aura_classify';
 import { isRooted } from '../combat/cc';
-import {
-  FIRST_TALENT_LEVEL,
-  pointsSpent,
-  talentPointsAtLevel,
-  talentsFor,
-} from '../content/talents';
+import { CHOICE_ROW_LEVELS } from '../content/choice_rows';
+import { FIRST_TALENT_LEVEL, talentsFor } from '../content/talents';
 import {
   ABILITIES,
   abilitiesKnownAt,
@@ -603,33 +599,17 @@ export function queuedReadout(ctx: SimContext, e: Entity): string {
   return `${name} is queued for your next melee swing, but you cannot afford it (costs ${queued.cost} ${res}; you have ${have}) — it will fizzle.`;
 }
 
-// Self-only readout for "/talents": the player's specialization and how their
-// talent points are split across the Class tree and the chosen spec tree.
-// Points are derived live from level (talentPointsAtLevel), so the total stays
-// correct after a level-up even if the allocation hasn't been touched since.
+// Self-only readout for "/talents": the player's specialization and row picks.
 export function talentsReadout(meta: PlayerMeta, e: Entity): string {
   const ct = talentsFor(meta.cls);
   if (!ct) return 'Your class has no talent tree yet.';
-  const total = talentPointsAtLevel(e.level);
-  if (total <= 0)
-    return `You have not unlocked talents yet — they begin at level ${FIRST_TALENT_LEVEL}.`;
-  const spent = pointsSpent(meta.talents);
-  // Split spent points by tree (cold path: walk the allocation once on demand).
-  const byId = new Map(ct.nodes.map((n) => [n.id, n] as const));
-  let classPts = 0;
-  let specPts = 0;
-  for (const id in meta.talents.ranks) {
-    const node = byId.get(id);
-    if (!node) continue;
-    if (node.tree === 'class') classPts += meta.talents.ranks[id];
-    else specPts += meta.talents.ranks[id];
-  }
   const specName = meta.talents.spec
     ? (ct.specs.find((s) => s.id === meta.talents.spec)?.name ?? meta.talents.spec)
     : null;
   const head = specName ?? 'no specialization';
-  const breakdown = specName ? `Class ${classPts}, ${specName} ${specPts}` : `Class ${classPts}`;
-  const unspent = total - spent;
-  const tail = unspent > 0 ? ` ${unspent} unspent.` : '';
-  return `Talents: ${head} — ${spent}/${total} points spent (${breakdown}).${tail}`;
+  const unlocked = CHOICE_ROW_LEVELS.filter((level) => e.level >= level).length;
+  const picked = Object.keys(meta.talents.rows ?? {}).length;
+  const specTail =
+    e.level < FIRST_TALENT_LEVEL ? ` Specializations unlock at level ${FIRST_TALENT_LEVEL}.` : '';
+  return `Talents: ${head}, ${picked}/${unlocked} choice rows picked.${specTail}`;
 }

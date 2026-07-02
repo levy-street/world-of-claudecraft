@@ -367,10 +367,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'game.talents.specTab': '专精',
   'game.talents.available': '可用',
   'game.talents.spent': '已用',
-  'game.talents.pointSource':
-    '从 {first} 级到 {cap} 级，每升一级获得 1 点天赋点。继续升级可获得更多点数。',
+  'game.talents.pointSource': '选项行会从 {first} 级到 {cap} 级解锁。每个已解锁的行中选择一个选项。',
   'game.talents.apply': '应用更改',
-  'game.talents.clear': '重置点数',
+  'game.talents.clear': '重置选项',
   'game.talents.reset': '重置',
   'game.talents.chooseSpec': '选择一个专精',
   'game.talents.noSpec': '未选择专精',
@@ -388,7 +387,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'game.talents.newBuild': '新配置',
   'game.talents.deleteBuild': '删除',
   'game.talents.currentBuildHint': '选择已保存配置，然后用保存当前更新它。导出会分享所选配置。',
-  'game.talents.createBuildHint': '新配置会把当前点数另存为一个配置。导入可粘贴分享字符串。',
+  'game.talents.createBuildHint': '新配置会把当前选项另存为一个配置。导入可粘贴分享字符串。',
   'game.talents.buildHint': '选择已保存配置，用保存当前更新，或创建新配置。',
   'game.talents.buildInvalid': '此配置尚未有效。',
   'game.talents.selectBuildFirst': '先选择要删除的已保存配置。',
@@ -412,7 +411,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'game.talents.nothingStaged': '没有要应用的更改。',
   'game.talents.pickSpecFirst': '选择专精后才能使用此树。',
   'game.talents.unlockBanner': '天赋已解锁！',
-  'game.talents.unlockHint': '你获得了第一个天赋点：按 N 打开天赋。',
+  'game.talents.unlockHint': '天赋选项已可用：按 N 打开天赋。',
   'game.talents.copy': '复制',
   'game.talents.close': '关闭',
   'game.talents.cancel': '取消',
@@ -5004,4 +5003,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': '宁静',
   'entities.abilities.tranquility.description':
     '引导恢复能量，每秒治疗附近盟友。（德鲁伊天赋）',
+  'game.talents.readout.rowsSummary': '天赋：{head}，已选择 {picked}/{unlocked} 行选项。',
+  'game.talents.readout.specLocked': ' 专精将在 {level} 级解锁。',
 };

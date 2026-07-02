@@ -359,8 +359,8 @@ export interface SimContextCallbacks {
   // both consume refreshKnownAbilities: the talent path always passes announce=false
   // (a silent re-resolve, no learnAbility spam); the level-up path passes announce=true.
   // G1a's talent module also consumes the core `error` sink (declared above). The talent
-  // PUBLIC API (applyTalents/spendTalent/setSpec/respec/saveLoadout/switchLoadout/
-  // deleteLoadout/talentPoints) is NOT on this seam: Sim keeps thin wrapper methods that
+  // PUBLIC API (applyTalents/setSpec/respec/saveLoadout/switchLoadout/
+  // deleteLoadout) is NOT on this seam: Sim keeps thin wrapper methods that
   // delegate into the module (server/HUD/tests call the `Sim` facade directly).
   refreshKnownAbilities(meta: PlayerMeta, announce: boolean): void;
   syncPetLevel(owner: Entity): void;

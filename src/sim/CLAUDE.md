@@ -63,7 +63,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/effect_dispatch.ts` | `runEffects` (the per-effect switch) |
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
 | `progression/xp.ts` | `prestige`, rested-XP, `isResting` |
-| `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |
+| `progression/talents.ts` | `applyTalents`/`setSpec`/`respec`/loadouts/`recomputeTalents` |
 | `mob/targeting.ts` | `updateMobTarget`, `retargetMob`, highest-threat target, trivial-target check |
 | `mob/locomotion.ts` | `updateMob` dispatcher, `resetEvadingMob`, flee recovery, spawn-block; `onBossDeath` points-at `encounters/nythraxis` |
 | `mob/mob_swing.ts` | the mob on-hit affix cascade (`runMobSwingAffixes`); the base hit-table shell stays on `Sim` |

@@ -24,6 +24,7 @@ import {
 } from '../render/characters/portrait';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
+import { CHOICE_ROW_LEVELS } from '../sim/content/choice_rows';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -2683,7 +2684,6 @@ export class Hud {
     playerClass: () => this.sim.cfg.playerClass,
     playerLevel: () => this.sim.player.level,
     chooseRow: (level, optionId) => this.sim.chooseRow(level, optionId),
-    totalPoints: () => this.sim.talentPoints().total,
     currentAllocation: () => this.sim.talents,
     activeLoadout: () => this.sim.activeLoadout,
     loadouts: () => this.sim.loadouts,
@@ -4637,9 +4637,10 @@ export class Hud {
     this.syncActiveHotbarForm();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
 
-    // talent buttons glow while the player has unspent points (and a tree exists)
-    const tp = sim.talentPoints();
-    const talGlow = talentsFor(sim.cfg.playerClass) !== null && tp.spent < tp.total;
+    // talent buttons glow while the player has unlocked row picks available
+    const unlockedRows = CHOICE_ROW_LEVELS.filter((level) => sim.player.level >= level).length;
+    const pickedRows = Object.keys(sim.talents.rows ?? {}).length;
+    const talGlow = talentsFor(sim.cfg.playerClass) !== null && pickedRows < unlockedRows;
     document.getElementById('mm-talents')?.classList.toggle('has-points', talGlow);
     document.getElementById('mobile-talents')?.classList.toggle('has-points', talGlow);
 
@@ -6385,7 +6386,7 @@ export class Hud {
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
           if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });
-          // First talent point (and spec) unlock — nudge the player to the panel.
+          // Specialization unlock: nudge the player to the panel.
           if (ev.level === FIRST_TALENT_LEVEL && talentsFor(this.sim.cfg.playerClass)) {
             this.showBanner(t('game.talents.unlockBanner'));
             this.log(t('game.talents.unlockHint'), '#ffd100');

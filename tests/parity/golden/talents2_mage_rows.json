@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "9c572bc4",
+      "state": "485229b0",
       "events": "f7be7ef0",
       "rng": {
         "draws": 0,
@@ -56,8 +56,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
@@ -84,8 +82,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_ice_nova",
@@ -276,7 +272,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 393,
-      "state": "4e61fedc",
+      "state": "05008f20",
       "events": "b9b56ebe",
       "rng": {
         "draws": 7,
@@ -287,7 +283,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 393,
-      "state": "0753123e",
+      "state": "2678ffda",
       "events": "8fcbf9cc",
       "rng": {
         "draws": 10,
@@ -298,7 +294,7 @@
       "tick": 48,
       "time": 2.4,
       "nextId": 393,
-      "state": "2378277c",
+      "state": "f28629cc",
       "events": "10774c6c",
       "rng": {
         "draws": 54,
@@ -325,8 +321,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
@@ -355,8 +349,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_ice_nova",
@@ -596,7 +588,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 393,
-      "state": "d4771d0d",
+      "state": "22f5eda3",
       "events": "713e4d5a",
       "rng": {
         "draws": 112,
@@ -607,7 +599,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 393,
-      "state": "94bb8b45",
+      "state": "76d757db",
       "events": "a622c35b",
       "rng": {
         "draws": 213,
@@ -618,7 +610,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 393,
-      "state": "77253685",
+      "state": "55a66b7f",
       "events": "253cadce",
       "rng": {
         "draws": 324,
@@ -629,7 +621,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 393,
-      "state": "887859b4",
+      "state": "6f5b78ca",
       "events": "741638a5",
       "rng": {
         "draws": 441,
@@ -640,7 +632,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 393,
-      "state": "b3618917",
+      "state": "ce010d6f",
       "events": "c8b5ce34",
       "rng": {
         "draws": 568,
@@ -651,7 +643,7 @@
       "tick": 158,
       "time": 7.9,
       "nextId": 393,
-      "state": "8b58650a",
+      "state": "b3c2c144",
       "events": "9b84847b",
       "rng": {
         "draws": 690,
@@ -678,8 +670,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
@@ -709,8 +699,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_ice_nova",
@@ -991,7 +979,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 393,
-      "state": "f7ae645d",
+      "state": "e3f29c2b",
       "events": "9d68caed",
       "rng": {
         "draws": 695,
@@ -1002,7 +990,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 393,
-      "state": "445c5f12",
+      "state": "cb9b4784",
       "events": "6616c155",
       "rng": {
         "draws": 823,
@@ -1013,7 +1001,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 393,
-      "state": "487b2f86",
+      "state": "03bd5ff8",
       "events": "2e1407fc",
       "rng": {
         "draws": 969,
@@ -1024,7 +1012,7 @@
       "tick": 218,
       "time": 10.9,
       "nextId": 393,
-      "state": "81f3789f",
+      "state": "c35b7631",
       "events": "ea45b934",
       "rng": {
         "draws": 1040,
@@ -1051,8 +1039,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
@@ -1082,8 +1068,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_ice_nova",
@@ -1353,7 +1337,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 393,
-      "state": "1bb031fc",
+      "state": "6e2d2412",
       "events": "741638a5",
       "rng": {
         "draws": 1045,
@@ -1364,7 +1348,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 393,
-      "state": "5bc79ce6",
+      "state": "f8f9c5d4",
       "events": "3599521d",
       "rng": {
         "draws": 1118,
@@ -1375,7 +1359,7 @@
       "tick": 248,
       "time": 12.4,
       "nextId": 393,
-      "state": "659ce453",
+      "state": "c531d425",
       "events": "31e0e738",
       "rng": {
         "draws": 1157,
@@ -1402,8 +1386,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
@@ -1433,8 +1415,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_ice_nova",
@@ -1709,7 +1689,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 393,
-      "state": "c7a2cf54",
+      "state": "1fe12f22",
       "events": "62cf3349",
       "rng": {
         "draws": 1225,
@@ -1720,7 +1700,7 @@
       "tick": 266,
       "time": 13.3,
       "nextId": 393,
-      "state": "523227e6",
+      "state": "51707e1c",
       "events": "741638a5",
       "rng": {
         "draws": 1255,
@@ -1747,8 +1727,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
@@ -1778,8 +1756,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_ice_nova",
@@ -2059,7 +2035,7 @@
       "tick": 266,
       "time": 13.3,
       "nextId": 393,
-      "state": "523227e6",
+      "state": "51707e1c",
       "events": "741638a5",
       "rng": {
         "draws": 1255,
@@ -2086,8 +2062,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
@@ -2117,8 +2091,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_ice_nova",

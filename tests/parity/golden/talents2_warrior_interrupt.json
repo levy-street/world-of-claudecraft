@@ -31,7 +31,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 391,
-      "state": "de43d1d3",
+      "state": "6dff7536",
       "events": "205c8443",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 391,
-      "state": "8455b8db",
+      "state": "bdf79c4e",
       "events": "fb9f1bfd",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 391,
-      "state": "b74ada1f",
+      "state": "6f4075da",
       "events": "6e4acb7f",
       "rng": {
         "draws": 69,
@@ -64,7 +64,7 @@
       "tick": 62,
       "time": 3.1,
       "nextId": 391,
-      "state": "1dfc2344",
+      "state": "7967c985",
       "events": "e4d70525",
       "rng": {
         "draws": 83,
@@ -88,8 +88,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "war_r5_heroic_leap",
               "8": "war_r8_pummel",
@@ -228,7 +226,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 391,
-      "state": "cddd3d9d",
+      "state": "013213f0",
       "events": "38512b34",
       "rng": {
         "draws": 161,
@@ -239,7 +237,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 391,
-      "state": "9486633c",
+      "state": "7891046d",
       "events": "741638a5",
       "rng": {
         "draws": 262,
@@ -250,7 +248,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 391,
-      "state": "00801ca8",
+      "state": "091c4f11",
       "events": "741638a5",
       "rng": {
         "draws": 390,
@@ -261,7 +259,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 391,
-      "state": "098e646e",
+      "state": "dd9cfa37",
       "events": "741638a5",
       "rng": {
         "draws": 519,
@@ -272,7 +270,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 391,
-      "state": "aad98080",
+      "state": "740196d9",
       "events": "7b798664",
       "rng": {
         "draws": 625,
@@ -283,7 +281,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 391,
-      "state": "b4811985",
+      "state": "84b1f6c8",
       "events": "741638a5",
       "rng": {
         "draws": 765,
@@ -294,7 +292,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 391,
-      "state": "f6f3071c",
+      "state": "9be0aacd",
       "events": "741638a5",
       "rng": {
         "draws": 887,
@@ -305,7 +303,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 391,
-      "state": "e23ed645",
+      "state": "cc3c8d88",
       "events": "741638a5",
       "rng": {
         "draws": 956,
@@ -316,7 +314,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 391,
-      "state": "8a9d17c0",
+      "state": "f69f5319",
       "events": "741638a5",
       "rng": {
         "draws": 1031,
@@ -327,7 +325,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 391,
-      "state": "0330ad51",
+      "state": "440e304c",
       "events": "741638a5",
       "rng": {
         "draws": 1115,
@@ -338,7 +336,7 @@
       "tick": 274,
       "time": 13.7,
       "nextId": 391,
-      "state": "1b51a7f1",
+      "state": "52f663ec",
       "events": "741638a5",
       "rng": {
         "draws": 1178,
@@ -362,8 +360,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "war_r5_heroic_leap",
               "8": "war_r8_pummel",
@@ -513,7 +509,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 391,
-      "state": "46b3b057",
+      "state": "e77d0ce2",
       "events": "38512b34",
       "rng": {
         "draws": 1201,
@@ -524,7 +520,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 391,
-      "state": "74710167",
+      "state": "71318992",
       "events": "741638a5",
       "rng": {
         "draws": 1299,
@@ -535,7 +531,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 391,
-      "state": "2451d988",
+      "state": "8002acf1",
       "events": "741638a5",
       "rng": {
         "draws": 1340,
@@ -559,8 +555,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "war_r5_heroic_leap",
               "8": "war_r8_pummel",
@@ -727,7 +721,7 @@
       "tick": 314,
       "time": 15.7,
       "nextId": 391,
-      "state": "c506ab1e",
+      "state": "73d4daef",
       "events": "27b903ce",
       "rng": {
         "draws": 1394,
@@ -753,8 +747,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "war_r5_heroic_leap",
               "8": "war_r8_pummel",
@@ -931,7 +923,7 @@
       "tick": 314,
       "time": 15.7,
       "nextId": 391,
-      "state": "c506ab1e",
+      "state": "73d4daef",
       "events": "741638a5",
       "rng": {
         "draws": 1394,
@@ -957,8 +949,6 @@
           },
           "lifetimeXp": 167200,
           "talents": {
-            "choices": {},
-            "ranks": {},
             "rows": {
               "5": "war_r5_heroic_leap",
               "8": "war_r8_pummel",
