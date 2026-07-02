@@ -373,15 +373,29 @@ async function stageScene(page, scene) {
       placePlayerFromTarget(target, 12);
       target.hp = target.maxHp;
       castAndResolve('immolate', target, 120);
-      tickUntil(() => auraOn(target, (a) => a.id === 'immolate' && a.sourceId === playerId), 80, 'immolate dot');
+      tickUntil(
+        () => auraOn(target, (a) => a.id === 'immolate' && a.sourceId === playerId),
+        60,
+        'immolate dot',
+      );
       const before = {
         hp: target.hp,
-        hasImmolate: !!auraOn(target, (a) => a.id === 'immolate'),
+        hasImmolate: !!auraOn(target, (a) => a.id === 'immolate' && a.sourceId === playerId),
       };
       resetGcdAndResource();
       cast('conflagrate');
+      tickUntil(
+        () =>
+          target.hp < before.hp &&
+          !auraOn(target, (a) => a.id === 'immolate' && a.sourceId === playerId),
+        20,
+        'conflagrate impact damage',
+      );
       result.assertions.immolateBefore = before.hasImmolate;
-      result.assertions.immolateConsumed = !auraOn(target, (a) => a.id === 'immolate');
+      result.assertions.immolateConsumed = !auraOn(
+        target,
+        (a) => a.id === 'immolate' && a.sourceId === playerId,
+      );
       result.assertions.targetDamaged = target.hp < before.hp;
       result.target = { id: target.id, hpBefore: before.hp, hpAfter: target.hp };
     } else if (key === 'swiftmend') {
@@ -443,6 +457,11 @@ async function stageScene(page, scene) {
       const target = nearestHostile();
       placePlayerFromTarget(target, 18);
       cast('wyvern_sting');
+      tickUntil(
+        () => auraOn(target, (a) => a.kind === 'incapacitate'),
+        60,
+        'wyvern sting incapacitate',
+      );
       result.assertions.incapacitateApplied = !!auraOn(target, (a) => a.kind === 'incapacitate');
       result.target = { id: target.id, auras: target.auras.map((a) => ({ id: a.id, kind: a.kind })) };
     } else if (key === 'trueshot_aura') {
@@ -450,8 +469,14 @@ async function stageScene(page, scene) {
       const target = nearestHostile();
       placeTargetFromPlayer(target, 10);
       cast('trueshot_aura');
-      result.assertions.playerAuraPresent = !!auraOn(player, (a) => a.id === 'trueshot_aura' && a.kind === 'buff_ap');
-      result.assertions.friendAuraPresent = !!auraOn(friend, (a) => a.id === 'trueshot_aura' && a.kind === 'buff_ap');
+      result.assertions.playerAuraPresent = !!auraOn(
+        player,
+        (a) => a.id === 'trueshot_aura_ap' && a.kind === 'buff_ap',
+      );
+      result.assertions.friendAuraPresent = !!auraOn(
+        friend,
+        (a) => a.id === 'trueshot_aura_ap' && a.kind === 'buff_ap',
+      );
       result.playerAuras = player.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
       result.friendAuras = friend.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
       result.targetAuras = target.auras.map((a) => ({ id: a.id, kind: a.kind, value: a.value }));
@@ -464,15 +489,18 @@ async function stageScene(page, scene) {
       const buffBefore = !!auraOn(player, (a) => a.kind === 'next_attack_crit');
       let critEvent = null;
       for (let i = 0; i < 80 && !critEvent; i++) {
+        player.critChance = 0;
         player.gcdRemaining = 0;
         player.swingTimer = 0;
         sim.targetEntity(target.id, playerId);
         sim.castAbility('sinister_strike', playerId);
+        player.critChance = 0;
         tick(1);
         critEvent = (sim.events ?? []).find(
           (e) => e.type === 'damage' && e.sourceId === playerId && e.targetId === target.id && e.crit,
         );
       }
+      player.critChance = 0;
       result.assertions.critChancePinned = player.critChance === 0;
       result.assertions.coldBloodBuffBeforeAttack = buffBefore;
       result.assertions.guaranteedCritLanded = !!critEvent;
@@ -486,6 +514,7 @@ async function stageScene(page, scene) {
       const lb = ability('lightning_bolt');
       const beforeHp = target.hp;
       cast('lightning_bolt');
+      tickUntil(() => target.hp < beforeHp, 40, 'lightning bolt impact damage');
       result.assertions.lightningBoltResolvedCastTime = lb.castTime;
       result.assertions.instantBuffBefore = buffBefore;
       result.assertions.firedInstantly = player.castingAbility !== 'lightning_bolt';
