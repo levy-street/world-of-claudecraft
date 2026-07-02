@@ -26,6 +26,8 @@ describe('server-sent message localization', () => {
     'Usage: /suspend "<name>" <minutes> [reason]',
     'Usage: /spectate <name>',
     "No online player named 'Zephyr'.",
+    "You can't spectate yourself.",
+    'You can only spectate players who are in an active duel or arena match.',
     'You are not spectating anyone.',
     'Now spectating Zephyr.',
     'Stopped spectating.',
@@ -148,6 +150,16 @@ describe('in-game moderation strings round-trip through localizeServerText', () 
       input: "No online player named 'Bob'.",
       es: "No hay ningún jugador conectado llamado 'Bob'.",
       de: "Kein Spieler namens 'Bob' ist online.",
+    },
+    {
+      input: "You can't spectate yourself.",
+      es: 'No puedes observarte a ti mismo.',
+      de: 'Ihr koennt euch nicht selbst beobachten.',
+    },
+    {
+      input: 'You can only spectate players who are in an active duel or arena match.',
+      es: 'Solo puedes observar a jugadores que esten en un duelo o combate de arena activo.',
+      de: 'Ihr koennt nur Spieler beobachten, die sich in einem aktiven Duell oder Arenamatch befinden.',
     },
     {
       input: 'Now spectating Bob.',

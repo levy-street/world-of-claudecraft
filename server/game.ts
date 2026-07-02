@@ -74,6 +74,7 @@ import {
   muteAccountChat,
   recordInGameAction,
 } from './moderation_db';
+import { parseModerationChatCommand } from './moderation_commands';
 import { type ModerationHost, ModerationService } from './moderation_service';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -825,6 +826,45 @@ export class GameServer {
       enterSpectate: (moderator, target) => this.enterSpectate(moderator, target),
       exitSpectate: (moderator) => this.exitSpectate(moderator),
     };
+  }
+
+  private handlePublicSpectateCommand(session: ClientSession, text: string): boolean {
+    const command = parseModerationChatCommand(text);
+    if (!command || (command.kind !== 'spectate' && command.kind !== 'unspectate')) return false;
+    if (command.kind === 'unspectate') {
+      this.exitSpectate(session);
+      return true;
+    }
+    const name = command.name;
+    if (!name) {
+      this.sendChatNotice(session, 'Usage: /spectate <name>');
+      return true;
+    }
+    const target = this.sessionByName(name);
+    if (!target) {
+      this.sendChatNotice(session, `No online player named '${name}'.`);
+      return true;
+    }
+    if (target.pid === session.pid) {
+      this.sendChatNotice(session, "You can't spectate yourself.");
+      return true;
+    }
+    if (!this.isPublicSpectateTarget(target)) {
+      this.sendChatNotice(
+        session,
+        'You can only spectate players who are in an active duel or arena match.',
+      );
+      return true;
+    }
+    this.enterSpectate(session, target);
+    return true;
+  }
+
+  private isPublicSpectateTarget(target: ClientSession): boolean {
+    const duel = this.sim.duelFor(target.pid);
+    if (duel && (duel.state === 'countdown' || duel.state === 'active')) return true;
+    const arena = this.sim.arenaMatchFor(target.pid);
+    return arena !== null && (arena.state === 'countdown' || arena.state === 'active');
   }
 
   private enterSpectate(moderator: ClientSession, target: ClientSession): void {
@@ -2342,6 +2382,7 @@ export class GameServer {
         if (typeof msg.text !== 'string') break;
         const text = msg.text.trim();
         if (session.isAdmin && this.moderation.handleChatCommand(session, text)) break;
+        if (!session.isAdmin && this.handlePublicSpectateCommand(session, text)) break;
         if (this.isChatMuted(session)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);

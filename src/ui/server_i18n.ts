@@ -1874,6 +1874,14 @@ const RULES: Rule[] = [
     build: (m) => tServer('moderation.spectateNotOnline', { name: m[1] }),
   },
   {
+    re: /^You can't spectate yourself\.$/,
+    build: () => tServer('moderation.spectateSelf'),
+  },
+  {
+    re: /^You can only spectate players who are in an active duel or arena match\.$/,
+    build: () => tServer('moderation.spectatePvpOnly'),
+  },
+  {
     re: /^Now spectating (.+)\.$/,
     build: (m) => tServer('moderation.spectateStart', { name: m[1] }),
   },

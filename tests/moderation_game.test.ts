@@ -338,6 +338,63 @@ describe('moderator spectate integration', () => {
     expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null });
   });
 
+  it('allows regular players to spectate live arena targets only', () => {
+    const server = new GameServer();
+    const spectatorWs = fakeWs();
+    const spectator = joined(server.join(spectatorWs, 1, 101, 'Spectator', 'mage', null));
+    const first = joined(server.join(fakeWs(), 2, 102, 'Arenaone', 'warrior', null));
+    const second = joined(server.join(fakeWs(), 3, 103, 'Arenatwo', 'rogue', null));
+    joined(server.join(fakeWs(), 4, 104, 'Idle', 'priest', null));
+    const original = { ...entity(server, spectator.pid).pos };
+
+    command(server, spectator, '/spectate Idle');
+    expect(spectator.spectating).toBeNull();
+    expect(entity(server, spectator.pid).pos).toEqual(original);
+    expect(eventTexts(spectatorWs)).toContain(
+      'You can only spectate players who are in an active duel or arena match.',
+    );
+
+    spectatorWs.send.mockClear();
+    server.handleMessage(first, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));
+    server.handleMessage(second, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));
+    server.sim.tick();
+    expect(server.sim.arenaMatchFor(first.pid)).not.toBeNull();
+
+    command(server, spectator, '/spectate Arenaone');
+    expect(spectator.spectating?.characterId).toBe(first.characterId);
+    expect(entity(server, spectator.pid).pos.x).toBe(-10_000);
+    expect(entity(server, spectator.pid).pos.z).toBe(-10_000);
+    expect(frames(spectatorWs)).toContainEqual({ t: 'spectate', name: 'Arenaone' });
+
+    spectatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const snapshot = frames(spectatorWs).find((frame) => frame.t === 'snap');
+    if (!snapshot?.self) throw new Error('public spectator snapshot missing');
+    expect(snapshot.self.id).toBe(first.pid);
+    expect(snapshot.self.nm).toBe('Arenaone');
+    expect(snapshot.self.ack).toBe(0);
+
+    command(server, spectator, '/unspectate');
+    expect(spectator.spectating).toBeNull();
+    expect(entity(server, spectator.pid).pos).toEqual(original);
+  });
+
+  it('allows regular players to spectate active duel targets', () => {
+    const server = new GameServer();
+    const spectatorWs = fakeWs();
+    const spectator = joined(server.join(spectatorWs, 1, 101, 'Duelwatcher', 'mage', null));
+    const challenger = joined(server.join(fakeWs(), 2, 102, 'Challenger', 'warrior', null));
+    const defender = joined(server.join(fakeWs(), 3, 103, 'Defender', 'rogue', null));
+
+    server.sim.duelRequest(defender.pid, challenger.pid);
+    server.sim.duelAccept(defender.pid);
+    expect(server.sim.duelFor(defender.pid)?.state).toBe('countdown');
+
+    command(server, spectator, '/spectate Defender');
+
+    expect(spectator.spectating?.characterId).toBe(defender.characterId);
+    expect(frames(spectatorWs)).toContainEqual({ t: 'spectate', name: 'Defender' });
+  });
   it('switches targets without moving the saved return point', () => {
     const server = new GameServer();
     const moderator = joined(
