@@ -1850,6 +1850,7 @@ function talentsProgression(): Scenario {
         spec: 'arms',
         ranks: { war_cruelty: 2, arms_imp_overpower: 2 },
         choices: {},
+        rows: {},
       });
       rec.snapshot('apply-arms');
       // (2) Respec: ranks wiped, spec retained, stats revert.
@@ -1861,8 +1862,9 @@ function talentsProgression(): Scenario {
         spec: 'arms',
         ranks: { arms_imp_overpower: 2 },
         choices: {},
+        rows: {},
       });
-      sim.applyTalents({ spec: 'arms', ranks: { war_cruelty: 3 }, choices: {} });
+      sim.applyTalents({ spec: 'arms', ranks: { war_cruelty: 3 }, choices: {}, rows: {} });
       rec.snapshot('second-build');
       sim.switchLoadout(0);
       rec.snapshot('switch-loadout');

@@ -1,3 +1,4 @@
+import type { ChoiceRowLevel } from '../sim/content/choice_rows';
 import type { Role, SavedLoadout, TalentAllocation } from '../sim/content/talents';
 
 export interface IWorldTalents {
@@ -11,6 +12,8 @@ export interface IWorldTalents {
   talentPoints(): { total: number; spent: number };
   applyTalents(alloc: TalentAllocation): void;
   respec(): void;
+  chooseRow(level: ChoiceRowLevel, optionId: string): void;
+  resetRows(): void;
   setSpec(specId: string | null): void;
   saveLoadout(name: string, bar: (string | null)[], alloc?: TalentAllocation): void;
   switchLoadout(index: number): void;

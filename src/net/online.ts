@@ -7,6 +7,7 @@ import {
   runtimeWebSocketUrl,
 } from '../runtime';
 import { signChallenge } from '../sim/client_challenge';
+import type { ChoiceRowLevel } from '../sim/content/choice_rows';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
   cloneAllocation,
@@ -2241,6 +2242,12 @@ export class ClientWorld implements IWorld {
   }
   respec(): void {
     this.cmd({ cmd: 'respec' });
+  }
+  chooseRow(level: ChoiceRowLevel, optionId: string): void {
+    this.cmd({ cmd: 'chooseRow', level, optionId });
+  }
+  resetRows(): void {
+    this.cmd({ cmd: 'resetRows' });
   }
   setSpec(specId: string | null): void {
     this.cmd({ cmd: 'setSpec', spec: specId });

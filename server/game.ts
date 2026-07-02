@@ -1,6 +1,7 @@
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { CHOICE_ROW_LEVELS, type ChoiceRowLevel } from '../src/sim/content/choice_rows';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import {
@@ -228,10 +229,21 @@ function stringRecord(value: unknown): Record<string, string> {
 function talentAllocationFromWire(value: unknown): TalentAllocation | null {
   const source = recordValue(value);
   if (!source) return null;
+  const rows: Partial<Record<ChoiceRowLevel, string>> = {};
+  const sourceRows = recordValue(source.rows);
+  if (sourceRows) {
+    for (const [key, raw] of Object.entries(sourceRows)) {
+      const level = Number(key);
+      if (CHOICE_ROW_LEVELS.includes(level as ChoiceRowLevel) && typeof raw === 'string') {
+        rows[level as ChoiceRowLevel] = raw;
+      }
+    }
+  }
   return {
     spec: typeof source.spec === 'string' ? source.spec : null,
     ranks: numberRecord(source.ranks),
     choices: stringRecord(source.choices),
+    rows,
   };
 }
 
@@ -264,6 +276,8 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'abandon',
   'applyTalents',
   'respec',
+  'chooseRow',
+  'resetRows',
   'setSpec',
   'saveLoadout',
   'switchLoadout',
@@ -2658,6 +2672,17 @@ export class GameServer {
       }
       case 'respec':
         sim.respec(pid);
+        break;
+      case 'chooseRow':
+        if (
+          typeof msg.level === 'number' &&
+          CHOICE_ROW_LEVELS.includes(msg.level as ChoiceRowLevel) &&
+          typeof msg.optionId === 'string'
+        )
+          sim.chooseRow(msg.level as ChoiceRowLevel, msg.optionId, pid);
+        break;
+      case 'resetRows':
+        sim.resetRows(pid);
         break;
       case 'setSpec':
         sim.setSpec(typeof msg.spec === 'string' ? msg.spec : null, pid);

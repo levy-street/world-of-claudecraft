@@ -52,6 +52,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import type { ChoiceRowLevel } from './content/choice_rows';
 import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
@@ -179,7 +180,9 @@ import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import {
   applyTalentAllocation,
+  chooseTalentRow,
   deleteTalentLoadout,
+  resetTalentRows,
   respecTalents,
   saveTalentLoadout,
   setTalentSpec,
@@ -1248,10 +1251,12 @@ export class Sim {
           cls,
           {
             spec: s.talents.spec ?? null,
-            ranks: { ...s.talents.ranks },
-            choices: { ...s.talents.choices },
+            ranks: { ...(s.talents.ranks ?? {}) },
+            choices: { ...(s.talents.choices ?? {}) },
+            rows: { ...(s.talents.rows ?? {}) },
           },
           talentPointsAtLevel(player.level),
+          player.level,
         );
       if (s.loadouts)
         meta.loadouts = s.loadouts.map((l) => ({
@@ -2356,6 +2361,14 @@ export class Sim {
   // Free respec (out of combat): wipe all talent points. Spec is retained.
   respec(pid?: number): boolean {
     return respecTalents(this.ctx, pid);
+  }
+
+  chooseRow(level: ChoiceRowLevel, optionId: string, pid?: number): boolean {
+    return chooseTalentRow(this.ctx, level, optionId, pid);
+  }
+
+  resetRows(pid?: number): boolean {
+    return resetTalentRows(this.ctx, pid);
   }
 
   // Save the current build (talents + spec + the given action-bar slot map) as a

@@ -1,0 +1,112 @@
+import type { PlayerClass } from '../types';
+import { accumulateTalentEffect, type TalentEffect, type TalentModifiers } from './talents';
+
+export const CHOICE_ROW_LEVELS = [5, 8, 11, 14, 17, 20] as const;
+export type ChoiceRowLevel = (typeof CHOICE_ROW_LEVELS)[number];
+
+export interface ChoiceRowOption {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  effect: TalentEffect;
+}
+
+export interface ChoiceRow {
+  level: ChoiceRowLevel;
+  theme: string;
+  options: [ChoiceRowOption, ChoiceRowOption, ChoiceRowOption];
+}
+
+export interface ClassChoiceRows {
+  rows: ChoiceRow[];
+}
+
+export type ChoiceRowAllocation = Partial<Record<ChoiceRowLevel, string>>;
+
+export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> = {
+  warrior: { rows: [] },
+  paladin: { rows: [] },
+  hunter: { rows: [] },
+  rogue: { rows: [] },
+  priest: { rows: [] },
+  shaman: { rows: [] },
+  mage: { rows: [] },
+  warlock: { rows: [] },
+  druid: { rows: [] },
+};
+
+const CHOICE_ROW_LEVEL_SET = new Set<number>(CHOICE_ROW_LEVELS);
+
+export function isChoiceRowLevel(level: number): level is ChoiceRowLevel {
+  return CHOICE_ROW_LEVEL_SET.has(level);
+}
+
+export function rowForLevel(cls: PlayerClass, level: number): ChoiceRow | null {
+  if (!isChoiceRowLevel(level)) return null;
+  // guard the lookup: a bad class string from a future caller must fail
+  // validation, not throw
+  return CHOICE_ROWS[cls]?.rows.find((row) => row.level === level) ?? null;
+}
+
+export interface RowCheck {
+  ok: boolean;
+  reason?: string;
+}
+
+// Every rejection reason is the EXISTING localized 'Invalid talent build.'
+// string (error.invalidBuild in sim_i18n, translated in every locale): row
+// picks come from a pre-validating UI, so the distinct causes are only ever
+// reachable by tampered clients and do not earn their own player strings.
+export function validateRows(cls: PlayerClass, level: number, rows: ChoiceRowAllocation): RowCheck {
+  const seen = new Set<number>();
+  for (const [rawLevel, optionId] of Object.entries(rows)) {
+    const rowLevel = Number(rawLevel);
+    if (!Number.isInteger(rowLevel) || !isChoiceRowLevel(rowLevel)) {
+      return { ok: false, reason: 'Invalid talent build.' };
+    }
+    if (seen.has(rowLevel)) return { ok: false, reason: 'Invalid talent build.' };
+    seen.add(rowLevel);
+    if (typeof optionId !== 'string' || optionId.length === 0) {
+      return { ok: false, reason: 'Invalid talent build.' };
+    }
+    const row = rowForLevel(cls, rowLevel);
+    if (!row) return { ok: false, reason: 'Invalid talent build.' };
+    if (level < row.level) return { ok: false, reason: 'Invalid talent build.' };
+    if (!row.options.some((option) => option.id === optionId)) {
+      return { ok: false, reason: 'Invalid talent build.' };
+    }
+  }
+  return { ok: true };
+}
+
+export function repairRows(
+  cls: PlayerClass,
+  level: number,
+  rows: ChoiceRowAllocation | undefined | null,
+): ChoiceRowAllocation {
+  const out: ChoiceRowAllocation = {};
+  if (!rows) return out;
+  for (const [rawLevel, optionId] of Object.entries(rows)) {
+    const rowLevel = Number(rawLevel);
+    if (!Number.isInteger(rowLevel) || !isChoiceRowLevel(rowLevel)) continue;
+    if (typeof optionId !== 'string' || optionId.length === 0) continue;
+    const cand = { ...out, [rowLevel]: optionId };
+    if (validateRows(cls, level, cand).ok) out[rowLevel] = optionId;
+  }
+  return out;
+}
+
+export function accumulateRowEffects(
+  mods: TalentModifiers,
+  cls: PlayerClass,
+  rows: ChoiceRowAllocation,
+): void {
+  for (const [rawLevel, optionId] of Object.entries(rows)) {
+    const rowLevel = Number(rawLevel);
+    if (!Number.isInteger(rowLevel) || !isChoiceRowLevel(rowLevel)) continue;
+    const row = rowForLevel(cls, rowLevel);
+    const option = row?.options.find((candidate) => candidate.id === optionId);
+    if (option) accumulateTalentEffect(mods, option.effect, 1);
+  }
+}

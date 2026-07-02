@@ -32,6 +32,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import type { ChoiceRowLevel } from '../content/choice_rows';
 import {
   cloneAllocation,
   computeTalentModifiers,
@@ -77,6 +78,7 @@ function sanitizeTalentAllocation(alloc: TalentAllocation): TalentAllocation {
     spec: alloc.spec ?? null,
     ranks: {},
     choices: { ...alloc.choices },
+    rows: { ...(alloc.rows ?? {}) },
   };
   for (const id in alloc.ranks) {
     const v = Math.floor(alloc.ranks[id]);
@@ -104,7 +106,12 @@ export function applyTalentAllocation(
     ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
     return false;
   }
-  const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
+  const check = validateAllocation(
+    r.meta.cls,
+    sanitized,
+    talentPointsAtLevel(r.e.level),
+    r.e.level,
+  );
   if (!check.ok) {
     ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
     return false;
@@ -161,7 +168,7 @@ export function respecTalents(ctx: SimContext, pid?: number): boolean {
     ctx.error(r.e.id, lock);
     return false;
   }
-  r.meta.talents = { spec: r.meta.talents.spec, ranks: {}, choices: {} };
+  r.meta.talents = { spec: r.meta.talents.spec, ranks: {}, choices: {}, rows: {} };
   recomputeTalents(ctx, r.meta);
   ctx.emit({ type: 'log', pid: r.e.id, text: 'Talents reset.', color: '#ffd100' });
   return true;
@@ -192,7 +199,12 @@ export function saveTalentLoadout(
       ctx.error(r.e.id, `You may choose a specialization at level ${FIRST_TALENT_LEVEL}.`);
       return -1;
     }
-    const check = validateAllocation(r.meta.cls, sanitized, talentPointsAtLevel(r.e.level));
+    const check = validateAllocation(
+      r.meta.cls,
+      sanitized,
+      talentPointsAtLevel(r.e.level),
+      r.e.level,
+    );
     if (!check.ok) {
       ctx.error(r.e.id, check.reason ?? 'Invalid talent build.');
       return -1;
@@ -241,7 +253,7 @@ export function switchTalentLoadout(ctx: SimContext, index: number, pid?: number
     ctx.error(r.e.id, 'That loadout needs a higher level.');
     return false;
   }
-  const check = validateAllocation(r.meta.cls, lo.alloc, talentPointsAtLevel(r.e.level));
+  const check = validateAllocation(r.meta.cls, lo.alloc, talentPointsAtLevel(r.e.level), r.e.level);
   if (!check.ok) {
     ctx.error(r.e.id, `Loadout invalid: ${check.reason ?? 'unknown'}`);
     return false;
@@ -272,10 +284,36 @@ export function deleteTalentLoadout(ctx: SimContext, index: number, pid?: number
       // This is an AUTO-apply (no user gate), so repair against the level budget
       // first: switchTalentLoadout validates on its path, but here a stale or
       // tampered next loadout would otherwise be baked into live mods wholesale.
-      r.meta.talents = repairAllocation(r.meta.cls, next.alloc, talentPointsAtLevel(r.e.level));
+      r.meta.talents = repairAllocation(
+        r.meta.cls,
+        next.alloc,
+        talentPointsAtLevel(r.e.level),
+        r.e.level,
+      );
       recomputeTalents(ctx, r.meta);
     }
   } else if (r.meta.activeLoadout > index) r.meta.activeLoadout -= 1;
   ctx.emit({ type: 'log', pid: r.e.id, text: `Deleted build "${name}".`, color: '#ffd100' });
   return true;
+}
+
+export function chooseTalentRow(
+  ctx: SimContext,
+  level: ChoiceRowLevel,
+  optionId: string,
+  pid?: number,
+): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const cand = cloneAllocation(r.meta.talents);
+  cand.rows[level] = optionId;
+  return applyTalentAllocation(ctx, cand, pid);
+}
+
+export function resetTalentRows(ctx: SimContext, pid?: number): boolean {
+  const r = ctx.resolve(pid);
+  if (!r) return false;
+  const cand = cloneAllocation(r.meta.talents);
+  cand.rows = {};
+  return applyTalentAllocation(ctx, cand, pid);
 }

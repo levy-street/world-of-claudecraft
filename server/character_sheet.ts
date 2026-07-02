@@ -120,6 +120,7 @@ function normalizeAllocation(state: CharacterState): TalentAllocation {
     spec: typeof a.spec === 'string' ? a.spec : null,
     ranks: a.ranks && typeof a.ranks === 'object' ? a.ranks : {},
     choices: a.choices && typeof a.choices === 'object' ? a.choices : {},
+    rows: a.rows && typeof a.rows === 'object' ? a.rows : {},
   };
 }
 

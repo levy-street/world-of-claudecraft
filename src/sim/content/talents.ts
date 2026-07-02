@@ -13,6 +13,13 @@
 import type { AbilityEffect } from '../types';
 import { MAX_LEVEL, type PlayerClass } from '../types';
 import {
+  accumulateRowEffects,
+  type ChoiceRowAllocation,
+  isChoiceRowLevel,
+  repairRows,
+  validateRows,
+} from './choice_rows';
+import {
   DRUID_TALENTS,
   HUNTER_TALENTS,
   MAGE_TALENTS,
@@ -133,14 +140,20 @@ export interface TalentAllocation {
   spec: string | null;
   ranks: Record<string, number>; // nodeId -> ranks spent
   choices: Record<string, string>; // choice nodeId -> chosen option id
+  rows: ChoiceRowAllocation; // choice row level -> chosen option id
 }
 
 export function emptyAllocation(): TalentAllocation {
-  return { spec: null, ranks: {}, choices: {} };
+  return { spec: null, ranks: {}, choices: {}, rows: {} };
 }
 
 export function cloneAllocation(a: TalentAllocation): TalentAllocation {
-  return { spec: a.spec, ranks: { ...a.ranks }, choices: { ...a.choices } };
+  return {
+    spec: a.spec,
+    ranks: { ...a.ranks },
+    choices: { ...a.choices },
+    rows: { ...(a.rows ?? {}) },
+  };
 }
 
 export interface SavedLoadout {
@@ -374,6 +387,7 @@ export function validateAllocation(
   cls: PlayerClass,
   alloc: TalentAllocation,
   availablePoints: number,
+  playerLevel = availablePoints + (FIRST_TALENT_LEVEL - 1),
 ): AllocCheck {
   const ct = talentsFor(cls);
   if (!ct) return { ok: false, reason: 'no talent tree for class' };
@@ -382,6 +396,8 @@ export function validateAllocation(
   if (alloc.spec !== null && !ct.specs.some((s) => s.id === alloc.spec)) {
     return { ok: false, reason: 'unknown specialization' };
   }
+  const rowCheck = validateRows(cls, playerLevel, alloc.rows ?? {});
+  if (!rowCheck.ok) return rowCheck;
 
   let total = 0;
   for (const id in alloc.ranks) {
@@ -454,6 +470,7 @@ export function repairAllocation(
   cls: PlayerClass,
   alloc: TalentAllocation,
   availablePoints: number,
+  playerLevel = availablePoints + (FIRST_TALENT_LEVEL - 1),
 ): TalentAllocation {
   const ct = talentsFor(cls);
   if (!ct) return emptyAllocation();
@@ -464,7 +481,12 @@ export function repairAllocation(
     alloc.spec !== null && availablePoints > 0 && ct.specs.some((s) => s.id === alloc.spec)
       ? alloc.spec
       : null;
-  const out: TalentAllocation = { spec, ranks: {}, choices: {} };
+  const out: TalentAllocation = {
+    spec,
+    ranks: {},
+    choices: {},
+    rows: repairRows(cls, playerLevel, alloc.rows),
+  };
   const order = [...ct.nodes].sort((a, b) => {
     if (a.tree !== b.tree) return a.tree === 'class' ? -1 : 1;
     return a.row - b.row || a.col - b.col;
@@ -550,7 +572,11 @@ export function emptyModifiers(): TalentModifiers {
   };
 }
 
-function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: number): void {
+export function accumulateTalentEffect(
+  mods: TalentModifiers,
+  eff: TalentEffect | undefined,
+  mult: number,
+): void {
   if (!eff) return;
   if (eff.stats) {
     const s = mods.stats,
@@ -610,7 +636,7 @@ export function defaultBuild(cls: PlayerClass, points: number): TalentAllocation
   const ct = talentsFor(cls);
   if (!ct) return emptyAllocation();
   const spec = ct.specs[0] ?? null;
-  const alloc: TalentAllocation = { spec: spec?.id ?? null, ranks: {}, choices: {} };
+  const alloc: TalentAllocation = { spec: spec?.id ?? null, ranks: {}, choices: {}, rows: {} };
   const order = [...ct.nodes].sort((a, b) => {
     if (a.tree !== b.tree) return a.tree === 'class' ? -1 : 1;
     return a.row - b.row || a.col - b.col;
@@ -660,7 +686,7 @@ export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation
     mods.spec = spec.id;
     mods.role = spec.role;
     mods.grants.push({ ability: spec.signature, rank: 1 }); // signature ability
-    accumulate(mods, spec.mastery.effect, 1); // Mastery passive
+    accumulateTalentEffect(mods, spec.mastery.effect, 1); // Mastery passive
   }
 
   for (const id in alloc.ranks) {
@@ -671,11 +697,12 @@ export function computeTalentModifiers(cls: PlayerClass, alloc: TalentAllocation
     if (node.tree === 'spec' && node.specId !== mods.spec) continue; // dormant: ignore
     if (node.kind === 'choice') {
       const opt = node.choices?.find((c) => c.id === alloc.choices[id]);
-      if (opt) accumulate(mods, opt.effect, 1);
+      if (opt) accumulateTalentEffect(mods, opt.effect, 1);
     } else {
-      accumulate(mods, node.effect, rank);
+      accumulateTalentEffect(mods, node.effect, rank);
     }
   }
+  accumulateRowEffects(mods, cls, alloc.rows ?? {});
   return mods;
 }
 
@@ -703,6 +730,7 @@ export function exportBuild(cls: PlayerClass, alloc: TalentAllocation): string {
     s: alloc.spec,
     r: alloc.ranks,
     h: alloc.choices,
+    w: alloc.rows,
   };
   return b64encode(JSON.stringify(payload));
 }
@@ -738,6 +766,16 @@ export function importBuild(str: string): BuildImport {
       if (typeof v === 'string') choices[k] = v;
     }
   }
+  const rows: ChoiceRowAllocation = {};
+  if (payload.w && typeof payload.w === 'object') {
+    for (const k in payload.w) {
+      const level = Number(k);
+      const v = payload.w[k];
+      if (Number.isInteger(level) && isChoiceRowLevel(level) && typeof v === 'string') {
+        rows[level] = v;
+      }
+    }
+  }
   const spec = typeof payload.s === 'string' ? payload.s : null;
-  return { ok: true, cls: payload.c, alloc: { spec, ranks, choices } };
+  return { ok: true, cls: payload.c, alloc: { spec, ranks, choices, rows } };
 }

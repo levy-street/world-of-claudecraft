@@ -97,7 +97,7 @@ describe('buildTalentsView node gating matches validateAllocation byte-for-byte'
         n.kind !== 'choice',
     );
     expect(target).toBeDefined();
-    const one: TalentAllocation = { spec: null, ranks: { [target!.id]: 1 }, choices: {} };
+    const one: TalentAllocation = { spec: null, ranks: { [target!.id]: 1 }, choices: {}, rows: {} };
     const view = buildTalentsView(one, CLS, TOTAL);
     const vm = view.classTree.nodes.find((v) => v.node.id === target!.id)!;
     expect(view.spent).toBe(1);
@@ -110,6 +110,7 @@ describe('buildTalentsView node gating matches validateAllocation byte-for-byte'
       spec: null,
       ranks: { [target!.id]: target!.maxRank },
       choices: {},
+      rows: {},
     };
     const vMax = buildTalentsView(maxed, CLS, TOTAL).classTree.nodes.find(
       (v) => v.node.id === target!.id,
@@ -123,7 +124,12 @@ describe('buildTalentsView node gating matches validateAllocation byte-for-byte'
       (n) => n.tree === 'class' && ((n.requires?.length ?? 0) > 0 || (n.pointsGate ?? 0) > 0),
     );
     expect(gated).toBeDefined();
-    const alloc: TalentAllocation = { spec: null, ranks: { [gated!.id]: 1 }, choices: {} };
+    const alloc: TalentAllocation = {
+      spec: null,
+      ranks: { [gated!.id]: 1 },
+      choices: {},
+      rows: {},
+    };
     const vm = buildTalentsView(alloc, CLS, TOTAL).classTree.nodes.find(
       (v) => v.node.id === gated!.id,
     )!;
@@ -161,7 +167,7 @@ describe('buildTalentsView prereq arrows', () => {
     expect(edge!.filled).toBe(false);
 
     const ranked = buildTalentsView(
-      { spec: null, ranks: { [from.id]: 1 }, choices: {} },
+      { spec: null, ranks: { [from.id]: 1 }, choices: {}, rows: {} },
       cls,
       TOTAL,
     ).classTree;
@@ -172,7 +178,7 @@ describe('buildTalentsView prereq arrows', () => {
 describe('buildTalentsView is a pure projection', () => {
   it('returns identical structure for identical input (same input -> same output)', () => {
     const spec = talentsFor(CLS)!.specs[0].id;
-    const alloc: TalentAllocation = { spec, ranks: {}, choices: {} };
+    const alloc: TalentAllocation = { spec, ranks: {}, choices: {}, rows: {} };
     expect(buildTalentsView(cloneAllocation(alloc), CLS, TOTAL)).toEqual(
       buildTalentsView(cloneAllocation(alloc), CLS, TOTAL),
     );
@@ -209,7 +215,7 @@ describe('ClientWorld-vs-Sim seed parity', () => {
 
   it('yields identical views from a Sim-shaped and a ClientWorld-mirror-shaped seed', () => {
     const ct = talentsFor(CLS)!;
-    const seed: TalentAllocation = { spec: ct.specs[0].id, ranks: {}, choices: {} };
+    const seed: TalentAllocation = { spec: ct.specs[0].id, ranks: {}, choices: {}, rows: {} };
     // spend a spec point so the spec tree + tab pips are exercised, not just empties
     const specNode = ct.nodes.find(
       (n) =>

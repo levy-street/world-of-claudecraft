@@ -1962,9 +1962,15 @@ function dirtyEveryDeltaField(): {
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
-  meta.talents = { spec: 'arms', ranks: {}, choices: {} };
+  meta.talents = { spec: 'arms', ranks: {}, choices: {}, rows: { 5: 'fixture_row_choice' } };
   meta.talentMods.spec = 'arms';
-  meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] }];
+  meta.loadouts = [
+    {
+      name: 'PvP',
+      alloc: { spec: 'arms', ranks: {}, choices: {}, rows: { 5: 'fixture_row_choice' } },
+      bar: [],
+    },
+  ];
   meta.activeLoadout = 0;
 
   // Session-scoped account cosmetics.
@@ -2067,10 +2073,19 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
     expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
     // tal -> talents / talentSpec / loadouts / activeLoadout
-    expect(client.talents).toEqual({ spec: 'arms', ranks: {}, choices: {} });
+    expect(client.talents).toEqual({
+      spec: 'arms',
+      ranks: {},
+      choices: {},
+      rows: { 5: 'fixture_row_choice' },
+    });
     expect(client.talentSpec).toBe('arms');
     expect(client.loadouts).toEqual([
-      { name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] },
+      {
+        name: 'PvP',
+        alloc: { spec: 'arms', ranks: {}, choices: {}, rows: { 5: 'fixture_row_choice' } },
+        bar: [],
+      },
     ]);
     expect(client.activeLoadout).toBe(0);
   });

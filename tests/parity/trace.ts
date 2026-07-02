@@ -209,7 +209,26 @@ function sampleExcluding(source: Record<string, unknown>, exclude: ReadonlySet<s
     if (exclude.has(k)) continue;
     filtered[k] = source[k];
   }
-  return canonical(filtered, { omitDefaults: true });
+  return stripEmptyTalentRows(canonical(filtered, { omitDefaults: true }));
+}
+
+function stripEmptyTalentRows(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stripEmptyTalentRows);
+  if (!value || typeof value !== 'object') return value;
+  const out: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) out[key] = stripEmptyTalentRows(child);
+  const rows = out.rows;
+  if (
+    rows &&
+    typeof rows === 'object' &&
+    !Array.isArray(rows) &&
+    Object.keys(rows).length === 0 &&
+    'ranks' in out &&
+    'choices' in out
+  ) {
+    delete out.rows;
+  }
+  return out;
 }
 
 // Deterministic per-Entity sample: every gameplay field (hp/pos/auras/cooldowns/

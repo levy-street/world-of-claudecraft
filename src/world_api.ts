@@ -253,6 +253,8 @@ export const COMMAND_NAMES = [
   'prestige',
   'applyTalents',
   'respec',
+  'chooseRow',
+  'resetRows',
   'setSpec',
   'saveLoadout',
   'switchLoadout',
@@ -370,6 +372,8 @@ export const COMMAND_FACETS = {
   // compute with no send; the server re-validates every allocation).
   applyTalents: 'IWorldTalents',
   respec: 'IWorldTalents',
+  chooseRow: 'IWorldTalents',
+  resetRows: 'IWorldTalents',
   setSpec: 'IWorldTalents',
   saveLoadout: 'IWorldTalents',
   switchLoadout: 'IWorldTalents',
