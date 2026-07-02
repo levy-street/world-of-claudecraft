@@ -37,6 +37,7 @@ import { offensiveName } from './auth';
 import type {
   BotDetector,
   BotTrackingContext,
+  CalibrationHistogram,
   SessionRuntimeSnapshot,
   SuspiciousPlayer,
 } from './bot_detector/contract';
@@ -1809,6 +1810,10 @@ export class GameServer {
 
   suspiciousPlayers(): SuspiciousPlayer[] {
     return this.botDetector.listSuspiciousPlayers();
+  }
+
+  detectionCalibration(): CalibrationHistogram[] {
+    return this.botDetector.listCalibrationHistograms();
   }
 
   private liveLocationFor(e: Entity): AdminLiveLocation {

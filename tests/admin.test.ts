@@ -75,7 +75,7 @@ import {
   overviewCounts,
   type PerfRawRow,
 } from '../server/admin_db';
-import type { SuspiciousPlayer } from '../server/bot_detector/contract';
+import type { CalibrationHistogram, SuspiciousPlayer } from '../server/bot_detector/contract';
 import {
   addFilterWord,
   chatModerationForAccount,
@@ -159,6 +159,7 @@ const fakeGameState = {
   }),
   liveSessions: () => [],
   suspiciousPlayers: vi.fn<() => SuspiciousPlayer[]>(() => []),
+  detectionCalibration: vi.fn<() => CalibrationHistogram[]>(() => []),
   liveAccountIds: () => new Set([9]),
   liveSharedIps: vi.fn<() => LiveSharedIp[]>(() => []),
   disconnectAccount: vi.fn(),
@@ -313,6 +314,38 @@ describe('admin api auth', () => {
       }),
     );
     expect(fakeGame.suspiciousPlayers).toHaveBeenCalledOnce();
+  });
+
+  it('serves detection calibration histograms to an authenticated admin', async () => {
+    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    fakeGame.detectionCalibration.mockReturnValue([
+      {
+        id: 'metric_a_ms',
+        count: 2,
+        min: 10,
+        max: 30,
+        sum: 40,
+        buckets: [
+          { le: 10, count: 1 },
+          { le: 50, count: 1 },
+        ],
+        overflowCount: 0,
+      },
+    ]);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/detection-calibration' }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.histograms[0]).toEqual(
+      expect.objectContaining({ id: 'metric_a_ms', count: 2 }),
+    );
+    expect(fakeGame.detectionCalibration).toHaveBeenCalledOnce();
   });
 
   it('rejects admin login for a non-admin account even with the right password', async () => {

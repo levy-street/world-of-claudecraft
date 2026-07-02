@@ -7,6 +7,7 @@ export type AdminPage =
   | 'characters'
   | 'moderation'
   | 'suspicious-players'
+  | 'detection-calibration'
   | 'shared-ips'
   | 'chat-filter'
   | 'blocked-ips'
@@ -52,6 +53,7 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     items: [
       { id: 'moderation', labelKey: 'nav.reports' },
       { id: 'suspicious-players', labelKey: 'nav.suspiciousPlayers' },
+      { id: 'detection-calibration', labelKey: 'nav.detectionCalibration' },
       { id: 'shared-ips', labelKey: 'nav.sharedIps' },
       { id: 'blocked-ips', labelKey: 'nav.blockedIps' },
       { id: 'chat-filter', labelKey: 'nav.chatFilter' },
