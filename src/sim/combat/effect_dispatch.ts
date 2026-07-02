@@ -434,6 +434,8 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
+          const crit = ctx.rng.chance(isSpell ? ctx.spellCrit(p) : p.critChance);
+          if (crit) dmg *= isSpell ? 1.5 : 2;
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -442,7 +444,7 @@ export function runEffects(
             p,
             m,
             Math.round(dmg),
-            false,
+            crit,
             ability.school,
             ability.name,
             'hit',
@@ -531,8 +533,10 @@ export function runEffects(
         );
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
-          const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
-          ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
+          let dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
+          const crit = ctx.rng.chance(isSpell ? ctx.spellCrit(p) : p.critChance);
+          if (crit) dmg *= isSpell ? 1.5 : 2;
+          ctx.dealDamage(p, m, Math.round(dmg), crit, ability.school, ability.name, 'hit');
           if (!m.dead && ctx.isHostileTo(p, m)) {
             ctx.applyRootAura(
               p,

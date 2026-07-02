@@ -13,12 +13,13 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
 
 type TestSim = Sim & {
   nextId: number;
   players: Map<number, PlayerMeta>;
   addEntity(entity: Entity): void;
+  drainEvents(): SimEvent[];
 };
 
 function harness(sim: Sim): TestSim {
@@ -58,6 +59,13 @@ function resolve(sim: TestSim, abilityId: string, pid: number): ResolvedAbility 
   const res = sim.ctx.resolvedAbility(abilityId, pid) as ResolvedAbility | null;
   if (!res) throw new Error(`${abilityId} did not resolve`);
   return res;
+}
+
+function damageEvents(sim: TestSim, abilityName: string): Extract<SimEvent, { type: 'damage' }>[] {
+  return sim.drainEvents().filter(
+    (ev): ev is Extract<SimEvent, { type: 'damage' }> =>
+      ev.type === 'damage' && ev.ability === abilityName,
+  );
 }
 
 describe('effect_dispatch: a single cast fans into every listed effect', () => {
@@ -115,6 +123,49 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
     sim.ctx.pulseGroundAoE(sim.ctx.groundAoEs[0]);
     expect(mob.leashAnchor.x).toBeCloseTo(anchorAfterCast.x);
     expect(mob.leashAnchor.z).toBeCloseTo(anchorAfterCast.z);
+  });
+
+  it('mage Arcane Explosion: aoeDamage rolls spell crits per target', () => {
+    const { sim, p, meta } = makeSim('mage', 14);
+    spawnTarget(sim, p);
+    p.stats.int = 2000;
+    sim.drainEvents();
+    const res = resolve(sim, 'arcane_explosion', p.id);
+
+    runEffects(sim.ctx, p, meta, null, res);
+
+    const events = damageEvents(sim, 'Arcane Explosion');
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.every((ev) => ev.crit)).toBe(true);
+  });
+
+  it('mage Frost Nova: aoeRoot rolls spell crits and still roots survivors', () => {
+    const { sim, p, meta } = makeSim('mage', 10);
+    const mob = spawnTarget(sim, p);
+    p.stats.int = 2000;
+    sim.drainEvents();
+    const res = resolve(sim, 'frost_nova', p.id);
+
+    runEffects(sim.ctx, p, meta, null, res);
+
+    const events = damageEvents(sim, 'Frost Nova');
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.every((ev) => ev.crit)).toBe(true);
+    expect(mob.auras.some((aura) => aura.kind === 'root')).toBe(true);
+  });
+
+  it('druid Swipe: physical aoeDamage rolls melee crits per target', () => {
+    const { sim, p, meta } = makeSim('druid', 16);
+    spawnTarget(sim, p);
+    p.critChance = 1;
+    sim.drainEvents();
+    const res = resolve(sim, 'swipe', p.id);
+
+    runEffects(sim.ctx, p, meta, null, res);
+
+    const events = damageEvents(sim, 'Swipe');
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.every((ev) => ev.crit)).toBe(true);
   });
 });
 
