@@ -1,0 +1,714 @@
+{
+  "license": "CraftPix premium (royalty-free commercial). Icons purchased by Levy Street account - callum@levystreet.com",
+  "iconSize": 128,
+  "note": "Resource/consumable item icons, curated + verified from CraftPix packs. WebP only.",
+  "entries": [
+    {
+      "itemId": "alien_armor_plate",
+      "name": "Alien Armor Plate",
+      "sourcePack": "craft_resources",
+      "sourceFile": "9.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "amber_crimson_armor_plate",
+      "name": "Amber Crimson",
+      "sourcePack": "blacksmith",
+      "sourceFile": "23.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "amber_hide",
+      "name": "Amber Hide",
+      "sourcePack": "craft_resources",
+      "sourceFile": "42.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "amethyst_silver_armor_plate",
+      "name": "Amethyst Silver",
+      "sourcePack": "blacksmith",
+      "sourceFile": "32.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "baked_bread",
+      "name": "Freshly Baked Bread",
+      "sourcePack": "cooking",
+      "sourceFile": "38.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "bastion_ward_stone",
+      "name": "Bastion Ward Stone",
+      "sourcePack": "buff",
+      "sourceFile": "30.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "blessed_embers",
+      "name": "Blessed Embers",
+      "sourcePack": "generic100b",
+      "sourceFile": "51.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "boar_hide",
+      "name": "Bristly Boar Hide",
+      "sourcePack": "craft_resources",
+      "sourceFile": "34.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "bogiron_nugget",
+      "name": "Bogiron Nugget",
+      "sourcePack": "craft_resources",
+      "sourceFile": "11.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "bone_fragments",
+      "name": "Bone Fragments",
+      "sourcePack": "generic100b",
+      "sourceFile": "26.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "brightwood_venison",
+      "name": "Brightwood Venison",
+      "sourcePack": "hunting",
+      "sourceFile": "4.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "chipped_tusk",
+      "name": "Chipped Tusk",
+      "sourcePack": "hunting",
+      "sourceFile": "40.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "conjured_bread",
+      "name": "Conjured Bread",
+      "sourcePack": "cooking",
+      "sourceFile": "49.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "conjured_bread3",
+      "name": "Conjured Sweet Roll",
+      "sourcePack": "cooking",
+      "sourceFile": "50.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "conjured_water",
+      "name": "Conjured Spring Water",
+      "sourcePack": "alchemist",
+      "sourceFile": "7.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "conjured_water2",
+      "name": "Conjured Mineral Water",
+      "sourcePack": "alchemist",
+      "sourceFile": "28.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "conjured_water3",
+      "name": "Conjured Sparkling Water",
+      "sourcePack": "alchemist",
+      "sourceFile": "34.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "cracked_fetish",
+      "name": "Cracked Fetish",
+      "sourcePack": "generic100b",
+      "sourceFile": "49.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "cracked_ogre_tusk",
+      "name": "Cracked Ogre Tusk",
+      "sourcePack": "hunting",
+      "sourceFile": "19.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "cracked_wyrm_scale",
+      "name": "Cracked Wyrm Scale",
+      "sourcePack": "hunting",
+      "sourceFile": "29.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "crimson_amber_armor_plate",
+      "name": "Crimson Amber",
+      "sourcePack": "blacksmith",
+      "sourceFile": "25.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "crypt_keystone",
+      "name": "Crypt Keystone",
+      "sourcePack": "generic100b",
+      "sourceFile": "47.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "crypt_ritual_circle",
+      "name": "Ritual Circle",
+      "sourcePack": "generic100a",
+      "sourceFile": "skill 41.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "cult_cipher",
+      "name": "Gravecaller Cipher",
+      "sourcePack": "generic100b",
+      "sourceFile": "27.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "cyan_magenta_armor_plate",
+      "name": "Cyan Magenta",
+      "sourcePack": "blacksmith",
+      "sourceFile": "34.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "deepfen_pearl",
+      "name": "Deepfen Pearl",
+      "sourcePack": "gems",
+      "sourceFile": "23.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "drowned_offering",
+      "name": "Drowned Offering",
+      "sourcePack": "generic100b",
+      "sourceFile": "93.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "elixir_of_the_bear",
+      "name": "Elixir of the Bear",
+      "sourcePack": "generic100b",
+      "sourceFile": "64.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "emberwing_cinderscale",
+      "name": "Emberwing Cinderscale",
+      "sourcePack": "craft_resources",
+      "sourceFile": "35.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "event_skin_token",
+      "name": "Mysterious Cosmetic Cache",
+      "sourcePack": "generic100b",
+      "sourceFile": "46.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "fen_muster_order",
+      "name": "Fenbridge Muster Order",
+      "sourcePack": "generic100b",
+      "sourceFile": "30.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "fenbridge_rye",
+      "name": "Fenbridge Rye Loaf",
+      "sourcePack": "cooking",
+      "sourceFile": "43.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "forest_pink_armor_plate",
+      "name": "Forest Pink",
+      "sourcePack": "blacksmith",
+      "sourceFile": "36.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "frayed_prayer_beads",
+      "name": "Frayed Prayer Beads",
+      "sourcePack": "generic100b",
+      "sourceFile": "39.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "ghostly_essence",
+      "name": "Ghostly Essence",
+      "sourcePack": "generic100b",
+      "sourceFile": "57.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "glacier_melt",
+      "name": "Glacier Melt",
+      "sourcePack": "alchemist",
+      "sourceFile": "30.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "glimmerfin_koi",
+      "name": "Glimmerfin Koi",
+      "sourcePack": "fishing",
+      "sourceFile": "12.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "glowing_wax",
+      "name": "Glowing Wax",
+      "sourcePack": "generic100b",
+      "sourceFile": "59.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "grave_high_priest_malric",
+      "name": "Grave of High Priest Malric",
+      "sourcePack": "generic100b",
+      "sourceFile": "95.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "gravecaller_sigil",
+      "name": "Gravecaller's Sigil",
+      "sourcePack": "generic100c",
+      "sourceFile": "skill 81.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "gravewyrm_sigil",
+      "name": "Gravewyrm Sigil",
+      "sourcePack": "generic100a",
+      "sourceFile": "skill 16.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "greyjaw_fang",
+      "name": "Old Greyjaw's Fang",
+      "sourcePack": "hunting",
+      "sourceFile": "37.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "grubjaw_tusk",
+      "name": "Grubjaw's Tusk",
+      "sourcePack": "generic100b",
+      "sourceFile": "91.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "healing_potion",
+      "name": "Healing Potion",
+      "sourcePack": "alchemist",
+      "sourceFile": "49.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "highwatch_summons",
+      "name": "Highwatch Summons",
+      "sourcePack": "generic100b",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "imperial_crimson_armor_plate",
+      "name": "Imperial Crimson",
+      "sourcePack": "blacksmith",
+      "sourceFile": "35.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "imperial_gold_armor_plate",
+      "name": "Imperial Gold",
+      "sourcePack": "blacksmith",
+      "sourceFile": "29.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "inert_storm_shard",
+      "name": "Inert Storm Shard",
+      "sourcePack": "gems",
+      "sourceFile": "53.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "ivory_copper_armor_plate",
+      "name": "Ivory Copper",
+      "sourcePack": "blacksmith",
+      "sourceFile": "30.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "kazzix_heartshard",
+      "name": "Kazzix's Heartshard",
+      "sourcePack": "generic100b",
+      "sourceFile": "97.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "lesser_healing_potion",
+      "name": "Lesser Healing Potion",
+      "sourcePack": "alchemist",
+      "sourceFile": "1.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "lesser_mana_potion",
+      "name": "Lesser Mana Potion",
+      "sourcePack": "generic100b",
+      "sourceFile": "66.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "linen_scrap",
+      "name": "Linen Scrap",
+      "sourcePack": "generic100b",
+      "sourceFile": "41.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "lost_caravan_goods",
+      "name": "Lost Caravan Goods",
+      "sourcePack": "generic100b",
+      "sourceFile": "84.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "magenta_cyan_armor_plate",
+      "name": "Magenta Cyan",
+      "sourcePack": "blacksmith",
+      "sourceFile": "37.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "mana_potion",
+      "name": "Mana Potion",
+      "sourcePack": "alchemist",
+      "sourceFile": "48.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "marsh_mint_tea",
+      "name": "Marsh Mint Tea",
+      "sourcePack": "generic100b",
+      "sourceFile": "82.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "minor_healing_potion",
+      "name": "Minor Healing Potion",
+      "sourcePack": "generic100b",
+      "sourceFile": "62.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "mire_prowler_pelt",
+      "name": "Mire Prowler Pelt",
+      "sourcePack": "hunting",
+      "sourceFile": "36.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "moongate_rubbing",
+      "name": "Warding Rubbing",
+      "sourcePack": "generic100c",
+      "sourceFile": "skill 49.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "moonpale_scale",
+      "name": "Moonpale Scale",
+      "sourcePack": "hunting",
+      "sourceFile": "28.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "morthen_grimoire",
+      "name": "Morthen's Grimoire",
+      "sourcePack": "generic100b",
+      "sourceFile": "71.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "mudfin_scale",
+      "name": "Slimy Murloc Scale",
+      "sourcePack": "craft_resources",
+      "sourceFile": "38.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "ogre_toe_ring",
+      "name": "Ogre Toe Ring",
+      "sourcePack": "generic100b",
+      "sourceFile": "4.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "old_cragmaws_pelt",
+      "name": "Old Cragmaw's Pelt",
+      "sourcePack": "hunting",
+      "sourceFile": "33.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "pale_pearl",
+      "name": "Pale Pearl",
+      "sourcePack": "gems",
+      "sourceFile": "30.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "palecoil_heartscale",
+      "name": "Sethrael's Heartscale",
+      "sourcePack": "gems",
+      "sourceFile": "86.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "pink_forest_armor_plate",
+      "name": "Pink Forest",
+      "sourcePack": "gems",
+      "sourceFile": "54.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "priests_sigil",
+      "name": "Crypt Keystone Lower",
+      "sourcePack": "gems",
+      "sourceFile": "28.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "raw_bog_eel",
+      "name": "Raw Bog Eel",
+      "sourcePack": "fishing",
+      "sourceFile": "25.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "raw_frostgill_trout",
+      "name": "Raw Frostgill Trout",
+      "sourcePack": "fishing",
+      "sourceFile": "20.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "raw_marsh_pike",
+      "name": "Raw Marsh Pike",
+      "sourcePack": "fishing",
+      "sourceFile": "8.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "raw_mirror_trout",
+      "name": "Raw Mirror Trout",
+      "sourcePack": "fishing",
+      "sourceFile": "13.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "raw_river_perch",
+      "name": "Raw River Perch",
+      "sourcePack": "fishing",
+      "sourceFile": "5.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "raw_stonescale_carp",
+      "name": "Raw Stonescale Carp",
+      "sourcePack": "fishing",
+      "sourceFile": "2.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "ridge_stalker_pelt",
+      "name": "Ridge Stalker Pelt",
+      "sourcePack": "hunting",
+      "sourceFile": "34.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "ritual_phylactery",
+      "name": "Ritual Phylactery",
+      "sourcePack": "generic100b",
+      "sourceFile": "86.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "roast_mountain_goat",
+      "name": "Roast Mountain Goat",
+      "sourcePack": "hunting",
+      "sourceFile": "16.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "roasted_boar",
+      "name": "Roasted Boar Meat",
+      "sourcePack": "cooking",
+      "sourceFile": "30.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "royal_seal",
+      "name": "Ancient Diary",
+      "sourcePack": "generic100b",
+      "sourceFile": "85.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "runed_bone_shard",
+      "name": "Runed Bone Shard",
+      "sourcePack": "craft_resources",
+      "sourceFile": "3.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "silvermist_cordial",
+      "name": "Silvermist Cordial",
+      "sourcePack": "cooking",
+      "sourceFile": "22.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "simple_fishing_pole",
+      "name": "Simple Fishing Pole",
+      "sourcePack": "fishing",
+      "sourceFile": "32.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "smoked_eel",
+      "name": "Smoked Mirefen Eel",
+      "sourcePack": "cooking",
+      "sourceFile": "48.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "soft_down",
+      "name": "Soft Down Tuft",
+      "sourcePack": "craft_resources",
+      "sourceFile": "44.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "spring_water",
+      "name": "Refreshing Spring Water",
+      "sourcePack": "generic100b",
+      "sourceFile": "61.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "stag_antler",
+      "name": "Branching Antler",
+      "sourcePack": "hunting",
+      "sourceFile": "43.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "steel_orange_armor_plate",
+      "name": "Steel Orange",
+      "sourcePack": "blacksmith",
+      "sourceFile": "24.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "storm_core",
+      "name": "Storm Core",
+      "sourcePack": "gems",
+      "sourceFile": "92.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "supply_crate",
+      "name": "Stolen Supply Crate",
+      "sourcePack": "generic100b",
+      "sourceFile": "58.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "tangled_weed",
+      "name": "Tangled Weed",
+      "sourcePack": "craft_resources",
+      "sourceFile": "45.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "the_codfather",
+      "name": "The Codfather",
+      "sourcePack": "generic100b",
+      "sourceFile": "14.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "tough_jerky",
+      "name": "Tough Jerky",
+      "sourcePack": "cooking",
+      "sourceFile": "45.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "trail_hardtack",
+      "name": "Highwatch Trail Hardtack",
+      "sourcePack": "cooking",
+      "sourceFile": "46.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "troll_fetish",
+      "name": "Mirefen Troll Fetish",
+      "sourcePack": "generic100b",
+      "sourceFile": "94.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "vanguard_azure_armor_plate",
+      "name": "Vanguard Azure",
+      "sourcePack": "gems",
+      "sourceFile": "55.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "weathered_ledger_page",
+      "name": "Weathered Ledger Page",
+      "sourcePack": "generic100b",
+      "sourceFile": "75.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "webwood_silk",
+      "name": "Webwood Silk Gland",
+      "sourcePack": "craft_resources",
+      "sourceFile": "48.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "widow_venom_sac",
+      "name": "Widow Venom Sac",
+      "sourcePack": "hunting",
+      "sourceFile": "24.png",
+      "confidence": "medium"
+    },
+    {
+      "itemId": "wolf_fang",
+      "name": "Cracked Wolf Fang",
+      "sourcePack": "generic100b",
+      "sourceFile": "31.png",
+      "confidence": "high"
+    },
+    {
+      "itemId": "wyrmcult_orders",
+      "name": "Wyrmcult Orders",
+      "sourcePack": "generic100b",
+      "sourceFile": "81.png",
+      "confidence": "medium"
+    }
+  ]
+}

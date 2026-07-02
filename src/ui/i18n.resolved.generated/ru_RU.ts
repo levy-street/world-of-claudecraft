@@ -177,6 +177,48 @@ export const ru_RU: EnTranslations = {
       "title": "Эмоции",
       "done": "Готово"
     },
+    "dailyRewards": {
+      "title": "Ежедневные награды",
+      "close": "Закрыть ежедневные награды",
+      "loading": "Загрузка ежедневных наград...",
+      "error": "Не удалось загрузить ежедневные награды.",
+      "intro": "Держите достаточно WOC в подтвержденном кошельке, чтобы открыть ежедневные награды. Зарабатывайте очки за один ежедневный спин и сменяющиеся задания, затем поднимайтесь в ежедневной таблице лидеров ради доли призового фонда.",
+      "prize": "Призовой фонд",
+      "reset": "Сброс",
+      "endsIn": "Осталось {time}",
+      "remainingLessThanMinute": "<1м",
+      "remainingMinutes": "{minutes}м",
+      "remainingHoursMinutes": "{hours}ч {minutes}м",
+      "score": "Счёт",
+      "walletValue": "Стоимость кошелька (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Неизвестно",
+      "spinTitle": "Ежедневный спин",
+      "spinDialogTitle": "Спин ежедневной награды",
+      "spinClose": "Закрыть ежедневный спин",
+      "spinReady": "Доступен один спин.",
+      "spinClaimed": "Получено: +{points} очков.",
+      "spinResult": "+{points} очков",
+      "spinButton": "Крутить",
+      "tasks": "Задания",
+      "leaderboard": "Ежедневная таблица лидеров",
+      "history": "Прошлые победители",
+      "noLeaders": "Пока нет очков.",
+      "noHistory": "Пока нет выплат.",
+      "walletConnectTitle": "Подтвердить кошелек",
+      "walletConnectBody": "Подтвердите кошелек Solana с WOC, чтобы открыть ежедневные награды.",
+      "walletConnectButton": "Подтвердить кошелек",
+      "walletHoldTitle": "Держите WOC",
+      "walletHoldBody": "Держите не менее {amount} USD в WOC, чтобы открыть ежедневные награды.",
+      "walletPriceBody": "Цена WOC сейчас недоступна. Загляните чуть позже.",
+      "reason": {
+        "eligible": "Награды открыты.",
+        "no_wallet": "Подключите кошелек с не менее чем $20 USD в WOC.",
+        "under_minimum": "Кошелек ниже минимума в $20 USD WOC.",
+        "price_unavailable": "Цена WOC недоступна, награды временно заблокированы."
+      }
+    },
     "theme": {
       "preset": "Тема интерфейса",
       "customColors": "Настраиваемые цвета",
@@ -347,6 +389,7 @@ export const ru_RU: EnTranslations = {
       "uiScale": "Масштаб интерфейса",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
+      "groundReticle": "Прицел наземного наведения",
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
@@ -3805,6 +3848,26 @@ export const ru_RU: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Огненный удар",
+        "description": "Обрушивает огненный взрыв на указанную область, нанося {damage} ед. урона от огня врагам в зоне взрыва."
+      },
+      "rain_of_fire": {
+        "name": "Огненный дождь",
+        "description": "Обрушивает огненный дождь на указанную область, сжигая врагов и нанося {damage} ед. урона от огня."
+      },
+      "volley": {
+        "name": "Залп",
+        "description": "Осыпает указанную область стрелами, нанося {damage} ед. урона врагам в ней."
+      },
+      "hurricane": {
+        "name": "Ураган",
+        "description": "Обрушивает ураган на указанную область, нанося врагам {damage} ед. урона силами природы."
+      },
+      "earthquake": {
+        "name": "Землетрясение",
+        "description": "Сотрясает указанную область, нанося врагам {damage} ед. урона силами природы."
+      },
       "heroic_strike": {
         "name": "Удар героя",
         "description": "Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием."

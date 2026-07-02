@@ -92,6 +92,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'scorch',
       'ice_barrier',
       'pyroblast',
+      'flamestrike',
     ],
     color: 0x69ccf0,
   },
@@ -189,6 +190,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'aspect_of_the_cheetah',
       'aimed_shot',
       'rapid_fire',
+      'volley',
     ],
     color: 0xabd473,
   },
@@ -243,6 +245,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frostbrand_weapon',
       'ghost_wolf',
       'stormstrike',
+      'earthquake',
     ],
     color: 0x0070de,
   },
@@ -277,6 +280,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'summon_felguard',
       'summon_infernal',
       'summon_doomguard',
+      'rain_of_fire',
     ],
     color: 0x9482c9,
   },
@@ -324,6 +328,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'insect_swarm',
       'tigers_fury',
       'rip',
+      'hurricane',
     ],
     color: 0xff7d0a,
   },
@@ -981,6 +986,91 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeDamage', min: 26, max: 31, radius: 10 }],
     description: 'A burst of Arcane energy hits all nearby enemies for $d Arcane damage.',
+  },
+  // Ground-targeted (targetMode 'position'): the mage aims a patch of roaring flame
+  // at a chosen spot within range, which burns enemies standing in it. The first
+  // spell built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
+  flamestrike: {
+    id: 'flamestrike',
+    name: 'Flamestrike',
+    class: 'mage',
+    learnLevel: 20,
+    cost: 80,
+    castTime: 0,
+    cooldown: 12,
+    range: 30,
+    school: 'fire',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'aoeDamage', min: 34, max: 44, radius: 7 }],
+    description:
+      'Calls down a burst of flame at the target area, dealing $d Fire damage to enemies caught in the blast.',
+  },
+  // Ground-targeted thematic spells (targetMode 'position'), one per caster/ranged
+  // class, all built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
+  rain_of_fire: {
+    id: 'rain_of_fire',
+    name: 'Rain of Fire',
+    class: 'warlock',
+    learnLevel: 18,
+    cost: 85,
+    castTime: 0,
+    cooldown: 10,
+    range: 30,
+    school: 'fire',
+    requiresTarget: false,
+    targetMode: 'position',
+    channel: { duration: 4, ticks: 4 },
+    effects: [{ type: 'aoeDamage', min: 14, max: 18, radius: 7 }],
+    description: 'Calls a rain of fire onto the target area, burning enemies for $d Fire damage.',
+  },
+  volley: {
+    id: 'volley',
+    name: 'Volley',
+    class: 'hunter',
+    learnLevel: 18,
+    cost: 60,
+    castTime: 0,
+    cooldown: 8,
+    range: 35,
+    school: 'physical',
+    scalesWith: 'ranged',
+    requiresTarget: false,
+    targetMode: 'position',
+    channel: { duration: 3, ticks: 6 },
+    effects: [{ type: 'aoeDamage', min: 12, max: 16, radius: 8 }],
+    description: 'Rains arrows on the target area, dealing $d damage to enemies caught in it.',
+  },
+  hurricane: {
+    id: 'hurricane',
+    name: 'Hurricane',
+    class: 'druid',
+    learnLevel: 18,
+    cost: 90,
+    castTime: 0,
+    cooldown: 12,
+    range: 30,
+    school: 'nature',
+    requiresTarget: false,
+    targetMode: 'position',
+    channel: { duration: 6, ticks: 6 },
+    effects: [{ type: 'aoeDamage', min: 12, max: 16, radius: 8 }],
+    description: 'Calls a hurricane onto the target area, battering enemies for $d Nature damage.',
+  },
+  earthquake: {
+    id: 'earthquake',
+    name: 'Earthquake',
+    class: 'shaman',
+    learnLevel: 18,
+    cost: 80,
+    castTime: 0,
+    cooldown: 12,
+    range: 30,
+    school: 'nature',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'groundAoE', min: 13, max: 17, radius: 8, duration: 6, interval: 1.5 }],
+    description: 'Shakes the target area, battering enemies for $d Nature damage.',
   },
   scorch: {
     id: 'scorch',
@@ -3506,6 +3596,7 @@ export interface KnownAbility {
   effects: AbilityEffect[];
   threatFlat: number;
   threatMult: number;
+  castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
 }
 
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
@@ -3588,6 +3679,11 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
   const flat = am?.flatDmg ?? 0;
+  if (am?.addEffects.length) {
+    // Append copies before the scaling pass so added effects inherit the same
+    // global and per-ability damage/heal modifiers as native effects.
+    entry.effects = [...entry.effects, ...am.addEffects.map((e) => ({ ...e }))];
+  }
   if (dmgMult !== 1 || healMult !== 1 || flat !== 0) {
     entry.effects = entry.effects.map((e) => scaleEffect(e, dmgMult, healMult, flat));
   }
@@ -3595,6 +3691,7 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
+    if (am.castWhileMoving) entry.castWhileMoving = true;
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
     if (am.buffPct) {

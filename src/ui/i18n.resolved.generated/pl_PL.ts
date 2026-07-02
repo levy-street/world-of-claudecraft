@@ -177,6 +177,48 @@ export const pl_PL: EnTranslations = {
       "title": "Emotki",
       "done": "Gotowe"
     },
+    "dailyRewards": {
+      "title": "Codzienne nagrody",
+      "close": "Zamknij codzienne nagrody",
+      "loading": "Ładowanie codziennych nagród...",
+      "error": "Nie udało się załadować codziennych nagród.",
+      "intro": "Trzymaj wystarczająco dużo WOC w zweryfikowanym portfelu, aby odblokować codzienne nagrody. Zdobywaj punkty dzięki jednemu codziennemu losowaniu i zmieniającym się zadaniom, a następnie wspinaj się w codziennej tabeli wyników, aby zdobyć udział w puli nagród.",
+      "prize": "Pula nagród",
+      "reset": "Reset",
+      "endsIn": "Kończy się za {time}",
+      "remainingLessThanMinute": "<1 min",
+      "remainingMinutes": "{minutes} min",
+      "remainingHoursMinutes": "{hours} godz. {minutes} min",
+      "score": "Wynik",
+      "walletValue": "Wartość portfela (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Nieznane",
+      "spinTitle": "Codzienne losowanie",
+      "spinDialogTitle": "Losowanie codziennej nagrody",
+      "spinClose": "Zamknij codzienne losowanie",
+      "spinReady": "Jedno losowanie jest gotowe.",
+      "spinClaimed": "Odebrano: +{points} pkt.",
+      "spinResult": "+{points} pkt",
+      "spinButton": "Zakręć",
+      "tasks": "Zadania",
+      "leaderboard": "Codzienna tabela wyników",
+      "history": "Poprzedni zwycięzcy",
+      "noLeaders": "Jeszcze brak punktów.",
+      "noHistory": "Jeszcze brak wypłat.",
+      "walletConnectTitle": "Zweryfikuj portfel",
+      "walletConnectBody": "Zweryfikuj portfel Solana z WOC, aby odblokować codzienne nagrody.",
+      "walletConnectButton": "Zweryfikuj portfel",
+      "walletHoldTitle": "Trzymaj WOC",
+      "walletHoldBody": "Trzymaj co najmniej {amount} USD w WOC, aby odblokować codzienne nagrody.",
+      "walletPriceBody": "Wycena WOC jest obecnie niedostępna. Sprawdź ponownie za chwilę.",
+      "reason": {
+        "eligible": "Nagrody odblokowane.",
+        "no_wallet": "Podłącz portfel z co najmniej 20 USD w WOC.",
+        "under_minimum": "Portfel jest poniżej minimum 20 USD w WOC.",
+        "price_unavailable": "Cena WOC jest niedostępna, nagrody są tymczasowo zablokowane."
+      }
+    },
     "theme": {
       "preset": "Motyw interfejsu",
       "customColors": "Własne kolory",
@@ -266,11 +308,11 @@ export const pl_PL: EnTranslations = {
       "minimapZoom": "Przybliżenie minimapy"
     },
     "nativeUpdate": {
-      "title": "Update Available",
-      "body": "A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "notNow": "Not now",
-      "update": "Update"
+      "title": "Dostępna aktualizacja",
+      "body": "Dostępna jest nowa wersja World of ClaudeCraft. Zaktualizuj teraz, aby uzyskać najnowsze poprawki i ulepszenia.",
+      "bodyWithVersion": "Dostępna jest wersja {version} World of ClaudeCraft. Zaktualizuj teraz, aby uzyskać najnowsze poprawki i ulepszenia.",
+      "notNow": "Nie teraz",
+      "update": "Aktualizuj"
     },
     "castBar": {
       "playerAria": "Twój pasek rzucania",
@@ -347,6 +389,7 @@ export const pl_PL: EnTranslations = {
       "uiScale": "Skala interfejsu",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
+      "groundReticle": "Celownik naziemny",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
@@ -2723,7 +2766,7 @@ export const pl_PL: EnTranslations = {
       "usernameTaken": "Ta nazwa użytkownika jest już zajęta.",
       "invalidCredentials": "Nieprawidłowa nazwa użytkownika lub hasło.",
       "verificationFailed": "Weryfikacja nie powiodła się. Spróbuj ponownie.",
-      "desktopCodeInvalid": "Desktop login code is invalid or expired. Please try again.",
+      "desktopCodeInvalid": "Kod logowania do aplikacji jest nieprawidłowy lub wygasł. Spróbuj ponownie.",
       "invalidCharacterName": "Nieprawidłowe imię postaci. Użyj od 2 do 16 liter.",
       "characterNameNotAllowed": "To imię postaci jest niedozwolone.",
       "invalidClass": "Nieprawidłowa klasa.",
@@ -2744,17 +2787,17 @@ export const pl_PL: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Downloading update {version}...",
-      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
-      "restart": "Restart now",
-      "later": "Later"
+      "downloading": "Pobieranie aktualizacji {version}...",
+      "ready": "Aktualizacja {version} jest gotowa. Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.",
+      "restart": "Uruchom ponownie teraz",
+      "later": "Później"
     },
     "crash": {
       "title": "World of ClaudeCraft",
-      "body": "The game view stopped working. Reload it?",
-      "reload": "Reload",
-      "quit": "Quit",
-      "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
+      "body": "Widok gry przestał działać. Załadować ponownie?",
+      "reload": "Załaduj ponownie",
+      "quit": "Zakończ",
+      "fatalBody": "World of ClaudeCraft napotkał nieoczekiwany błąd i musi się zamknąć."
     }
   },
   "realm": {
@@ -3805,6 +3848,26 @@ export const pl_PL: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Ognista nawała",
+        "description": "Sprowadza wybuch płomieni na wybrany obszar, zadając {damage} obrażeń od ognia wrogom w zasięgu eksplozji."
+      },
+      "rain_of_fire": {
+        "name": "Deszcz ognia",
+        "description": "Sprowadza deszcz ognia na wybrany obszar, paląc wrogów i zadając {damage} obrażeń od ognia."
+      },
+      "volley": {
+        "name": "Salwa",
+        "description": "Zasypuje wybrany obszar strzałami, zadając {damage} obrażeń wrogom w jego obrębie."
+      },
+      "hurricane": {
+        "name": "Huragan",
+        "description": "Sprowadza huragan na wybrany obszar, smagając wrogów i zadając {damage} obrażeń od sił natury."
+      },
+      "earthquake": {
+        "name": "Trzęsienie ziemi",
+        "description": "Wstrząsa wybranym obszarem, smagając wrogów i zadając {damage} obrażeń od sił natury."
+      },
       "heroic_strike": {
         "name": "Heroiczne uderzenie",
         "description": "Potężny atak, który zwiększa obrażenia w zwarciu o {damage}. Aktywuje się przy następnym uderzeniu."

@@ -14,6 +14,44 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  // Daily rewards (M16 non-Latin fill)
+  'hudChrome.dailyRewards.title': '일일 보상',
+  'hudChrome.dailyRewards.close': '일일 보상 닫기',
+  'hudChrome.dailyRewards.loading': '일일 보상 불러오는 중...',
+  'hudChrome.dailyRewards.error': '일일 보상을 불러올 수 없습니다.',
+  'hudChrome.dailyRewards.intro':
+    '인증된 지갑에 충분한 WOC를 보유하여 일일 보상을 잠금 해제하세요. 하루 한 번의 스핀과 교체되는 과제로 포인트를 획득한 뒤, 일일 순위표를 올라 상금 풀의 일부를 차지하세요.',
+  'hudChrome.dailyRewards.prize': '상금 풀',
+  'hudChrome.dailyRewards.reset': '초기화',
+  'hudChrome.dailyRewards.score': '점수',
+  'hudChrome.dailyRewards.walletValue': '지갑 가치 (WOC)',
+  'hudChrome.dailyRewards.unknown': '알 수 없음',
+  'hudChrome.dailyRewards.spinTitle': '일일 스핀',
+  'hudChrome.dailyRewards.spinDialogTitle': '일일 보상 스핀',
+  'hudChrome.dailyRewards.spinClose': '일일 스핀 닫기',
+  'hudChrome.dailyRewards.spinReady': '스핀 한 번을 사용할 수 있습니다.',
+  'hudChrome.dailyRewards.spinClaimed': '획득: +{points} 포인트.',
+  'hudChrome.dailyRewards.spinResult': '+{points} 포인트',
+  'hudChrome.dailyRewards.spinButton': '돌리기',
+  'hudChrome.dailyRewards.tasks': '과제',
+  'hudChrome.dailyRewards.leaderboard': '일일 순위표',
+  'hudChrome.dailyRewards.history': '지난 당첨자',
+  'hudChrome.dailyRewards.noLeaders': '아직 포인트가 없습니다.',
+  'hudChrome.dailyRewards.noHistory': '아직 지급 내역이 없습니다.',
+  'hudChrome.dailyRewards.walletConnectTitle': '지갑 인증',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'WOC를 보유한 Solana 지갑을 인증하여 일일 보상을 잠금 해제하세요.',
+  'hudChrome.dailyRewards.walletConnectButton': '지갑 인증',
+  'hudChrome.dailyRewards.walletHoldTitle': 'WOC 보유',
+  'hudChrome.dailyRewards.walletHoldBody':
+    '일일 보상을 잠금 해제하려면 최소 {amount} USD 상당의 WOC를 보유하세요.',
+  'hudChrome.dailyRewards.walletPriceBody':
+    '현재 WOC 가격을 확인할 수 없습니다. 잠시 후 다시 확인하세요.',
+  'hudChrome.dailyRewards.reason.eligible': '보상이 잠금 해제되었습니다.',
+  'hudChrome.dailyRewards.reason.no_wallet': '$20 USD 상당 이상의 WOC를 보유한 지갑을 연결하세요.',
+  'hudChrome.dailyRewards.reason.under_minimum': '지갑이 최소 $20 USD WOC 기준에 미치지 못합니다.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name} 관전 중',
   'hudChrome.loot.chestTitle': '상자',
@@ -124,6 +162,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.knob.rage': '분노',
   'hudChrome.theme.knob.energy': '에너지',
   'hudChrome.options.interfaceMode': '인터페이스 모드',
+  'hudChrome.options.groundReticle': '지면 조준 표시기',
   'hudChrome.options.interfaceModeAuto': '자동',
   'hudChrome.options.interfaceModeDesktop': '데스크톱',
   'hudChrome.options.interfaceModeTouch': '터치',
@@ -1657,6 +1696,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
   'entities.abilities.fireball.name': '화염구',
+  'entities.abilities.rain_of_fire.name': '불의 비',
+  'entities.abilities.rain_of_fire.description':
+    '지정한 지역에 불의 비를 내려 적을 불태우고 {damage}의 화염 피해를 입힙니다.',
+  'entities.abilities.volley.name': '일제 사격',
+  'entities.abilities.volley.description':
+    '지정한 지역에 화살을 쏟아부어 그 안의 적에게 {damage}의 피해를 입힙니다.',
+  'entities.abilities.hurricane.name': '폭풍우',
+  'entities.abilities.hurricane.description':
+    '지정한 지역에 폭풍우를 일으켜 적을 강타하고 {damage}의 자연 피해를 입힙니다.',
+  'entities.abilities.earthquake.name': '지진',
+  'entities.abilities.earthquake.description':
+    '지정한 지역을 뒤흔들어 적을 강타하고 {damage}의 자연 피해를 입힙니다.',
+  'entities.abilities.flamestrike.name': '화염 폭발',
+  'entities.abilities.flamestrike.description':
+    '지정한 지역에 화염 폭발을 일으켜 폭발 범위 안의 적에게 {damage}의 화염 피해를 입힙니다.',
   'entities.abilities.fireball.description':
     '불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.',
   'entities.abilities.frost_armor.name': '냉기 갑옷',
@@ -5119,4 +5173,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.',
   'entities.delves.drowned_litany.leaveText':
     '그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다.',
+  'hudChrome.dailyRewards.endsIn': '{time} 후 종료',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}시간 {minutes}분',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '1분 미만',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}분',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
 };

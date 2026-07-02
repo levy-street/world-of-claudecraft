@@ -14,6 +14,43 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  // Daily rewards (M16 non-Latin fill)
+  'hudChrome.dailyRewards.title': 'Ежедневные награды',
+  'hudChrome.dailyRewards.close': 'Закрыть ежедневные награды',
+  'hudChrome.dailyRewards.loading': 'Загрузка ежедневных наград...',
+  'hudChrome.dailyRewards.error': 'Не удалось загрузить ежедневные награды.',
+  'hudChrome.dailyRewards.intro':
+    'Держите достаточно WOC в подтвержденном кошельке, чтобы открыть ежедневные награды. Зарабатывайте очки за один ежедневный спин и сменяющиеся задания, затем поднимайтесь в ежедневной таблице лидеров ради доли призового фонда.',
+  'hudChrome.dailyRewards.prize': 'Призовой фонд',
+  'hudChrome.dailyRewards.reset': 'Сброс',
+  'hudChrome.dailyRewards.score': 'Счёт',
+  'hudChrome.dailyRewards.walletValue': 'Стоимость кошелька (WOC)',
+  'hudChrome.dailyRewards.unknown': 'Неизвестно',
+  'hudChrome.dailyRewards.spinTitle': 'Ежедневный спин',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Спин ежедневной награды',
+  'hudChrome.dailyRewards.spinClose': 'Закрыть ежедневный спин',
+  'hudChrome.dailyRewards.spinReady': 'Доступен один спин.',
+  'hudChrome.dailyRewards.spinClaimed': 'Получено: +{points} очков.',
+  'hudChrome.dailyRewards.spinResult': '+{points} очков',
+  'hudChrome.dailyRewards.spinButton': 'Крутить',
+  'hudChrome.dailyRewards.tasks': 'Задания',
+  'hudChrome.dailyRewards.leaderboard': 'Ежедневная таблица лидеров',
+  'hudChrome.dailyRewards.history': 'Прошлые победители',
+  'hudChrome.dailyRewards.noLeaders': 'Пока нет очков.',
+  'hudChrome.dailyRewards.noHistory': 'Пока нет выплат.',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Подтвердить кошелек',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Подтвердите кошелек Solana с WOC, чтобы открыть ежедневные награды.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Подтвердить кошелек',
+  'hudChrome.dailyRewards.walletHoldTitle': 'Держите WOC',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Держите не менее {amount} USD в WOC, чтобы открыть ежедневные награды.',
+  'hudChrome.dailyRewards.walletPriceBody': 'Цена WOC сейчас недоступна. Загляните чуть позже.',
+  'hudChrome.dailyRewards.reason.eligible': 'Награды открыты.',
+  'hudChrome.dailyRewards.reason.no_wallet': 'Подключите кошелек с не менее чем $20 USD в WOC.',
+  'hudChrome.dailyRewards.reason.under_minimum': 'Кошелек ниже минимума в $20 USD WOC.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'Цена WOC недоступна, награды временно заблокированы.',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
   'hudChrome.loot.chestTitle': 'Сундук',
@@ -125,6 +162,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.knob.rage': 'Ярость',
   'hudChrome.theme.knob.energy': 'Энергия',
   'hudChrome.options.interfaceMode': 'Режим интерфейса',
+  'hudChrome.options.groundReticle': 'Прицел наземного наведения',
   'hudChrome.options.interfaceModeAuto': 'Авто',
   'hudChrome.options.interfaceModeDesktop': 'Компьютер',
   'hudChrome.options.interfaceModeTouch': 'Сенсорный',
@@ -1690,6 +1728,21 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
   'entities.abilities.fireball.name': 'Огненный шар',
+  'entities.abilities.rain_of_fire.name': 'Огненный дождь',
+  'entities.abilities.rain_of_fire.description':
+    'Обрушивает огненный дождь на указанную область, сжигая врагов и нанося {damage} ед. урона от огня.',
+  'entities.abilities.volley.name': 'Залп',
+  'entities.abilities.volley.description':
+    'Осыпает указанную область стрелами, нанося {damage} ед. урона врагам в ней.',
+  'entities.abilities.hurricane.name': 'Ураган',
+  'entities.abilities.hurricane.description':
+    'Обрушивает ураган на указанную область, нанося врагам {damage} ед. урона силами природы.',
+  'entities.abilities.earthquake.name': 'Землетрясение',
+  'entities.abilities.earthquake.description':
+    'Сотрясает указанную область, нанося врагам {damage} ед. урона силами природы.',
+  'entities.abilities.flamestrike.name': 'Огненный удар',
+  'entities.abilities.flamestrike.description':
+    'Обрушивает огненный взрыв на указанную область, нанося {damage} ед. урона от огня врагам в зоне взрыва.',
   'entities.abilities.fireball.description':
     'Бросает огненный шар, наносящий {damage} ед. урона от огня и дополнительный периодический урон.',
   'entities.abilities.frost_armor.name': 'Морозный доспех',
@@ -5227,4 +5280,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.delves.drowned_litany.enterText': 'Вы спускаетесь в утонувшее святилище на краю топи.',
   'entities.delves.drowned_litany.leaveText':
     'Вы поднимаетесь обратно к брату Хальвену на краю топи.',
+  'hudChrome.dailyRewards.endsIn': 'Осталось {time}',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}ч {minutes}м',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1м',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}м',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
 };

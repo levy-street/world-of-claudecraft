@@ -177,6 +177,48 @@ export const da_DK: EnTranslations = {
       "title": "Følelsesudtryk",
       "done": "Færdig"
     },
+    "dailyRewards": {
+      "title": "Daglige belønninger",
+      "close": "Luk daglige belønninger",
+      "loading": "Indlæser daglige belønninger...",
+      "error": "Kunne ikke indlæse daglige belønninger.",
+      "intro": "Behold nok WOC i din verificerede wallet for at låse daglige belønninger op. Optjen point med én daglig drejning og skiftende opgaver, og klatr så op ad den daglige resultattavle for en andel af præmiepuljen.",
+      "prize": "Præmiepulje",
+      "reset": "Nulstil",
+      "endsIn": "Slutter om {time}",
+      "remainingLessThanMinute": "<1m",
+      "remainingMinutes": "{minutes}m",
+      "remainingHoursMinutes": "{hours}t {minutes}m",
+      "score": "Score",
+      "walletValue": "Wallet-værdi (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Ukendt",
+      "spinTitle": "Daglig drejning",
+      "spinDialogTitle": "Daglig belønningsdrejning",
+      "spinClose": "Luk daglig drejning",
+      "spinReady": "Én drejning er klar.",
+      "spinClaimed": "Indløst: +{points} point.",
+      "spinResult": "+{points} point",
+      "spinButton": "Drej",
+      "tasks": "Opgaver",
+      "leaderboard": "Daglig resultattavle",
+      "history": "Tidligere vindere",
+      "noLeaders": "Ingen point endnu.",
+      "noHistory": "Ingen udbetalinger endnu.",
+      "walletConnectTitle": "Verificer wallet",
+      "walletConnectBody": "Verificer en Solana-wallet med WOC for at låse daglige belønninger op.",
+      "walletConnectButton": "Verificer wallet",
+      "walletHoldTitle": "Behold WOC",
+      "walletHoldBody": "Behold mindst {amount} USD i WOC for at låse daglige belønninger op.",
+      "walletPriceBody": "WOC-prissætning er utilgængelig lige nu. Kom tilbage om lidt.",
+      "reason": {
+        "eligible": "Belønninger låst op.",
+        "no_wallet": "Forbind en wallet med mindst 20 USD i WOC.",
+        "under_minimum": "Wallet er under WOC-minimummet på 20 USD.",
+        "price_unavailable": "WOC-prisen er utilgængelig, belønninger er midlertidigt låst."
+      }
+    },
     "theme": {
       "preset": "UI-tema",
       "customColors": "Tilpassede farver",
@@ -266,11 +308,11 @@ export const da_DK: EnTranslations = {
       "minimapZoom": "Minikort-zoom"
     },
     "nativeUpdate": {
-      "title": "Update Available",
-      "body": "A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "notNow": "Not now",
-      "update": "Update"
+      "title": "Opdatering tilgængelig",
+      "body": "En ny version af World of ClaudeCraft er tilgængelig. Opdater nu for de nyeste rettelser og forbedringer.",
+      "bodyWithVersion": "Version {version} af World of ClaudeCraft er tilgængelig. Opdater nu for de nyeste rettelser og forbedringer.",
+      "notNow": "Ikke nu",
+      "update": "Opdater"
     },
     "castBar": {
       "playerAria": "Din castbjælke",
@@ -347,6 +389,7 @@ export const da_DK: EnTranslations = {
       "uiScale": "UI-skala",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
+      "groundReticle": "Jordsigte-retikel",
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -2723,7 +2766,7 @@ export const da_DK: EnTranslations = {
       "usernameTaken": "Det brugernavn er allerede optaget.",
       "invalidCredentials": "Ugyldigt brugernavn eller adgangskode.",
       "verificationFailed": "Verificeringen mislykkedes. Prøv venligst igen.",
-      "desktopCodeInvalid": "Desktop login code is invalid or expired. Please try again.",
+      "desktopCodeInvalid": "Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.",
       "invalidCharacterName": "Ugyldigt karakternavn. Brug 2-16 bogstaver.",
       "characterNameNotAllowed": "Det karakternavn er ikke tilladt.",
       "invalidClass": "Ugyldig klasse.",
@@ -2744,17 +2787,17 @@ export const da_DK: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Downloading update {version}...",
-      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
-      "restart": "Restart now",
-      "later": "Later"
+      "downloading": "Downloader opdatering {version}...",
+      "ready": "Opdatering {version} er klar. Den installeres, når du afslutter, eller genstart nu.",
+      "restart": "Genstart nu",
+      "later": "Senere"
     },
     "crash": {
       "title": "World of ClaudeCraft",
-      "body": "The game view stopped working. Reload it?",
-      "reload": "Reload",
-      "quit": "Quit",
-      "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
+      "body": "Spilvisningen holdt op med at virke. Genindlæs den?",
+      "reload": "Genindlæs",
+      "quit": "Afslut",
+      "fatalBody": "World of ClaudeCraft stødte på en uventet fejl og skal lukke."
     }
   },
   "realm": {
@@ -3805,6 +3848,26 @@ export const da_DK: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Flammeslag",
+        "description": "Nedkalder en flammeeksplosion på målområdet, der giver {damage} Ildskade til fjender fanget i eksplosionen."
+      },
+      "rain_of_fire": {
+        "name": "Ildregn",
+        "description": "Nedkalder en ildregn over målområdet og brænder fjender for {damage} Ildskade."
+      },
+      "volley": {
+        "name": "Pileregn",
+        "description": "Nedkalder en regn af pile over målområdet og påfører {damage} skade på fjender i det."
+      },
+      "hurricane": {
+        "name": "Orkan",
+        "description": "Slipper en orkan løs over målområdet og rammer fjender for {damage} Naturskade."
+      },
+      "earthquake": {
+        "name": "Jordskælv",
+        "description": "Ryster målområdet og rammer fjender for {damage} Naturskade."
+      },
       "heroic_strike": {
         "name": "Heroisk Slag",
         "description": "Et stærkt angreb, der øger nærkampsskaden med {damage}. Aktiveres ved dit næste hug."

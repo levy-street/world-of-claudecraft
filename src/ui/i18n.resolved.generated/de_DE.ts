@@ -177,6 +177,48 @@ export const de_DE: EnTranslations = {
       "title": "Emotes",
       "done": "Fertig"
     },
+    "dailyRewards": {
+      "title": "Tägliche Belohnungen",
+      "close": "Tägliche Belohnungen schließen",
+      "loading": "Tägliche Belohnungen werden geladen...",
+      "error": "Tägliche Belohnungen konnten nicht geladen werden.",
+      "intro": "Halte genügend WOC in deiner verifizierten Wallet, um tägliche Belohnungen freizuschalten. Verdiene Punkte mit einem täglichen Dreh und wechselnden Aufgaben und klettere dann in der täglichen Rangliste nach oben, um einen Anteil am Preispool zu erhalten.",
+      "prize": "Preispool",
+      "reset": "Zurücksetzen",
+      "endsIn": "Endet in {time}",
+      "remainingLessThanMinute": "<1Min",
+      "remainingMinutes": "{minutes}Min",
+      "remainingHoursMinutes": "{hours}Std {minutes}Min",
+      "score": "Punktzahl",
+      "walletValue": "Wallet-Wert (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Unbekannt",
+      "spinTitle": "Täglicher Dreh",
+      "spinDialogTitle": "Täglicher Belohnungsdreh",
+      "spinClose": "Täglichen Dreh schließen",
+      "spinReady": "Ein Dreh ist bereit.",
+      "spinClaimed": "Erhalten: +{points} Punkte.",
+      "spinResult": "+{points} Punkte",
+      "spinButton": "Drehen",
+      "tasks": "Aufgaben",
+      "leaderboard": "Tägliche Rangliste",
+      "history": "Bisherige Gewinner",
+      "noLeaders": "Noch keine Punkte.",
+      "noHistory": "Noch keine Auszahlungen.",
+      "walletConnectTitle": "Wallet verifizieren",
+      "walletConnectBody": "Verifiziere eine Solana-Wallet mit WOC, um tägliche Belohnungen freizuschalten.",
+      "walletConnectButton": "Wallet verifizieren",
+      "walletHoldTitle": "WOC halten",
+      "walletHoldBody": "Halte mindestens {amount} USD in WOC, um tägliche Belohnungen freizuschalten.",
+      "walletPriceBody": "Der WOC-Preis ist derzeit nicht verfügbar. Schau bald wieder vorbei.",
+      "reason": {
+        "eligible": "Belohnungen freigeschaltet.",
+        "no_wallet": "Verbinde eine Wallet mit mindestens 20 USD in WOC.",
+        "under_minimum": "Deine Wallet liegt unter dem Mindestwert von 20 USD in WOC.",
+        "price_unavailable": "Der WOC-Preis ist nicht verfügbar, Belohnungen sind vorübergehend gesperrt."
+      }
+    },
     "theme": {
       "preset": "Oberflächendesign",
       "customColors": "Eigene Farben",
@@ -266,11 +308,11 @@ export const de_DE: EnTranslations = {
       "minimapZoom": "Minikarten-Zoom"
     },
     "nativeUpdate": {
-      "title": "Update Available",
-      "body": "A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "notNow": "Not now",
-      "update": "Update"
+      "title": "Update verfügbar",
+      "body": "Eine neue Version von World of ClaudeCraft ist verfügbar. Aktualisiere jetzt für die neuesten Fehlerbehebungen und Verbesserungen.",
+      "bodyWithVersion": "Version {version} von World of ClaudeCraft ist verfügbar. Aktualisiere jetzt für die neuesten Fehlerbehebungen und Verbesserungen.",
+      "notNow": "Jetzt nicht",
+      "update": "Aktualisieren"
     },
     "castBar": {
       "playerAria": "Eure Zauberleiste",
@@ -347,6 +389,7 @@ export const de_DE: EnTranslations = {
       "uiScale": "UI-Skalierung",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
+      "groundReticle": "Bodenziel-Fadenkreuz",
       "showItemLevel": "Gegenstandsstufe anzeigen",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
@@ -2723,7 +2766,7 @@ export const de_DE: EnTranslations = {
       "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
       "invalidCredentials": "Benutzername oder Passwort ungültig.",
       "verificationFailed": "Verifizierung fehlgeschlagen. Bitte versuche es erneut.",
-      "desktopCodeInvalid": "Desktop login code is invalid or expired. Please try again.",
+      "desktopCodeInvalid": "Der Desktop-Anmeldecode ist ungültig oder abgelaufen. Bitte versuche es erneut.",
       "invalidCharacterName": "Ungültiger Charaktername. Verwende 2-16 Buchstaben.",
       "characterNameNotAllowed": "Dieser Charaktername ist nicht erlaubt.",
       "invalidClass": "Ungültige Klasse.",
@@ -2744,17 +2787,17 @@ export const de_DE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Downloading update {version}...",
-      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
-      "restart": "Restart now",
-      "later": "Later"
+      "downloading": "Update {version} wird heruntergeladen...",
+      "ready": "Update {version} ist bereit. Es wird beim Beenden installiert, oder starte jetzt neu.",
+      "restart": "Jetzt neu starten",
+      "later": "Später"
     },
     "crash": {
       "title": "World of ClaudeCraft",
-      "body": "The game view stopped working. Reload it?",
-      "reload": "Reload",
-      "quit": "Quit",
-      "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
+      "body": "Die Spielansicht funktioniert nicht mehr. Neu laden?",
+      "reload": "Neu laden",
+      "quit": "Beenden",
+      "fatalBody": "World of ClaudeCraft ist auf einen unerwarteten Fehler gestoßen und muss geschlossen werden."
     }
   },
   "realm": {
@@ -3805,6 +3848,26 @@ export const de_DE: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Flammenschlag",
+        "description": "Lässt am Zielort eine Feuerexplosion niedergehen, die allen Gegnern im Wirkungsbereich {damage} Feuerschaden zufügt."
+      },
+      "rain_of_fire": {
+        "name": "Feuerregen",
+        "description": "Lässt einen Feuerregen auf den Zielbereich niedergehen, der Gegner verbrennt und {damage} Feuerschaden verursacht."
+      },
+      "volley": {
+        "name": "Pfeilhagel",
+        "description": "Lässt einen Pfeilhagel auf den Zielbereich niedergehen und verursacht {damage} Schaden an den Gegnern darin."
+      },
+      "hurricane": {
+        "name": "Wirbelsturm",
+        "description": "Entfesselt einen Wirbelsturm über dem Zielbereich, der Gegner trifft und {damage} Naturschaden verursacht."
+      },
+      "earthquake": {
+        "name": "Erdbeben",
+        "description": "Lässt den Zielbereich erbeben, trifft Gegner und verursacht {damage} Naturschaden."
+      },
       "heroic_strike": {
         "name": "Heldenhafter Stoß",
         "description": "Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst."

@@ -177,6 +177,48 @@ export const sv_SE: EnTranslations = {
       "title": "Gester",
       "done": "Klar"
     },
+    "dailyRewards": {
+      "title": "Dagliga belöningar",
+      "close": "Stäng dagliga belöningar",
+      "loading": "Laddar dagliga belöningar...",
+      "error": "Kunde inte ladda dagliga belöningar.",
+      "intro": "Håll tillräckligt med WOC i din verifierade plånbok för att låsa upp dagliga belöningar. Tjäna poäng med ett dagligt snurr och roterande uppgifter, och klättra sedan på den dagliga topplistan för en andel av prispotten.",
+      "prize": "Prispott",
+      "reset": "Återställning",
+      "endsIn": "Slutar om {time}",
+      "remainingLessThanMinute": "<1 min",
+      "remainingMinutes": "{minutes} min",
+      "remainingHoursMinutes": "{hours} h {minutes} min",
+      "score": "Poäng",
+      "walletValue": "Plånbokens värde (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Okänd",
+      "spinTitle": "Dagligt snurr",
+      "spinDialogTitle": "Dagligt belöningssnurr",
+      "spinClose": "Stäng dagligt snurr",
+      "spinReady": "Ett snurr är redo.",
+      "spinClaimed": "Hämtad: +{points} poäng.",
+      "spinResult": "+{points} poäng",
+      "spinButton": "Snurra",
+      "tasks": "Uppgifter",
+      "leaderboard": "Daglig topplista",
+      "history": "Tidigare vinnare",
+      "noLeaders": "Inga poäng ännu.",
+      "noHistory": "Inga utbetalningar ännu.",
+      "walletConnectTitle": "Verifiera plånbok",
+      "walletConnectBody": "Verifiera en Solana-plånbok med WOC för att låsa upp dagliga belöningar.",
+      "walletConnectButton": "Verifiera plånbok",
+      "walletHoldTitle": "Håll WOC",
+      "walletHoldBody": "Håll minst {amount} USD i WOC för att låsa upp dagliga belöningar.",
+      "walletPriceBody": "WOC-prissättningen är otillgänglig just nu. Kom tillbaka snart.",
+      "reason": {
+        "eligible": "Belöningar upplåsta.",
+        "no_wallet": "Anslut en plånbok med minst 20 USD i WOC.",
+        "under_minimum": "Plånboken är under WOC-miniminivån på 20 USD.",
+        "price_unavailable": "WOC-priset är otillgängligt, belöningar är tillfälligt låsta."
+      }
+    },
     "theme": {
       "preset": "Gränssnittstema",
       "customColors": "Anpassade färger",
@@ -266,11 +308,11 @@ export const sv_SE: EnTranslations = {
       "minimapZoom": "Minikartans zoom"
     },
     "nativeUpdate": {
-      "title": "Update Available",
-      "body": "A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
-      "notNow": "Not now",
-      "update": "Update"
+      "title": "Uppdatering tillgänglig",
+      "body": "En ny version av World of ClaudeCraft är tillgänglig. Uppdatera nu för de senaste korrigeringarna och förbättringarna.",
+      "bodyWithVersion": "Version {version} av World of ClaudeCraft är tillgänglig. Uppdatera nu för de senaste korrigeringarna och förbättringarna.",
+      "notNow": "Inte nu",
+      "update": "Uppdatera"
     },
     "castBar": {
       "playerAria": "Din besvärjelsemätare",
@@ -347,6 +389,7 @@ export const sv_SE: EnTranslations = {
       "uiScale": "Gränssnittsskala",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
+      "groundReticle": "Markriktmedel",
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
@@ -2723,7 +2766,7 @@ export const sv_SE: EnTranslations = {
       "usernameTaken": "Det användarnamnet är redan upptaget.",
       "invalidCredentials": "Ogiltigt användarnamn eller lösenord.",
       "verificationFailed": "Verifieringen misslyckades. Försök igen.",
-      "desktopCodeInvalid": "Desktop login code is invalid or expired. Please try again.",
+      "desktopCodeInvalid": "Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.",
       "invalidCharacterName": "Ogiltigt karaktärsnamn. Använd 2-16 bokstäver.",
       "characterNameNotAllowed": "Det karaktärsnamnet är inte tillåtet.",
       "invalidClass": "Ogiltig klass.",
@@ -2744,17 +2787,17 @@ export const sv_SE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Downloading update {version}...",
-      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
-      "restart": "Restart now",
-      "later": "Later"
+      "downloading": "Laddar ner uppdatering {version}...",
+      "ready": "Uppdatering {version} är klar. Den installeras när du avslutar, eller starta om nu.",
+      "restart": "Starta om nu",
+      "later": "Senare"
     },
     "crash": {
       "title": "World of ClaudeCraft",
-      "body": "The game view stopped working. Reload it?",
-      "reload": "Reload",
-      "quit": "Quit",
-      "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
+      "body": "Spelvyn slutade fungera. Ladda om den?",
+      "reload": "Ladda om",
+      "quit": "Avsluta",
+      "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
     }
   },
   "realm": {
@@ -3805,6 +3848,26 @@ export const sv_SE: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Flamslag",
+        "description": "Kallar ner en eldexplosion på målområdet som ger {damage} Eldskada till fiender som fångas i explosionen."
+      },
+      "rain_of_fire": {
+        "name": "Eldregn",
+        "description": "Låter ett eldregn falla över målområdet och bränner fiender för {damage} Eldskada."
+      },
+      "volley": {
+        "name": "Pilregn",
+        "description": "Låter pilar regna över målområdet och vållar {damage} skada på fiender i det."
+      },
+      "hurricane": {
+        "name": "Orkan",
+        "description": "Släpper lös en orkan över målområdet och slår fiender för {damage} Naturskada."
+      },
+      "earthquake": {
+        "name": "Jordbävning",
+        "description": "Skakar målområdet och slår fiender för {damage} Naturskada."
+      },
       "heroic_strike": {
         "name": "Hjältehugg",
         "description": "Ett kraftfullt anfall som ökar närstridsskadan med {damage}. Aktiveras vid ditt nästa hugg."

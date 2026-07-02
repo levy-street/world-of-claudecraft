@@ -30,7 +30,9 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
-import { armorReduction, meleeMissChance } from '../types';
+import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
+import { isRooted } from './cc';
+import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
@@ -78,14 +80,21 @@ export function runEffects(
       }
       case 'directDamage': {
         if (!target) break;
-        const critChance = isSpell ? ctx.spellCrit(p) : p.critChance;
+        const rooted = isRooted(target);
+        const critChance =
+          isSpell && rooted
+            ? ctx.spellCrit(p) + ctx.playerMods(meta).global.critVsRooted
+            : isSpell
+              ? ctx.spellCrit(p)
+              : p.critChance;
         let dmg = ctx.rng.range(eff.min, eff.max);
         // The flat rider scales with the school's rating: Spell Power for spells,
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
-        const crit = ctx.rng.chance(critChance);
+        if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
         if (crit) dmg *= isSpell ? 1.5 : 2;
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
@@ -112,7 +121,7 @@ export function runEffects(
           eff.perCombo * spentCombo +
           ctx.rng.range(0, eff.variance) +
           ctx.effectiveAttackPower(p) / 14;
-        const crit = ctx.rng.chance(p.critChance);
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance);
         if (crit) dmg *= 2;
         dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
         ctx.dealDamage(
@@ -247,9 +256,42 @@ export function runEffects(
         let dmg =
           ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
           directHitBonus(p.spellPower, ability, res.castTime);
-        const crit = ctx.rng.chance(ctx.spellCrit(p));
+        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
         if (crit) dmg *= 1.5;
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
+        break;
+      }
+      case 'interrupt': {
+        if (!target || target.castingAbility === null || target.castingAbility === FISHING_CAST_ID)
+          break;
+        if (p.kind === 'player' && target.kind === 'player' && !ctx.isHostileTo(p, target)) break;
+        // Resolve per-player when possible (rank/mods), but fall back to the
+        // global ability table so a non-player caster (a mob whose cast is an
+        // ability id) is interruptible too; scripted pseudo-casts resolve to
+        // nothing and are immune by design.
+        const interruptedDef =
+          ctx.resolvedAbility(target.castingAbility, target.id)?.def ??
+          ABILITIES[target.castingAbility];
+        if (
+          !interruptedDef ||
+          interruptedDef.school === 'physical' ||
+          interruptedDef.uninterruptible
+        )
+          break;
+        const school = interruptedDef.school;
+        const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.lockout);
+        ctx.cancelCast(target);
+        if (remaining === null) break;
+        ctx.applyAura(target, {
+          id: `${ability.id}_lockout`,
+          name: ability.name,
+          kind: 'lockout',
+          remaining,
+          duration: remaining,
+          value: 0,
+          sourceId: p.id,
+          school,
+        });
         break;
       }
       case 'lifeTap': {
@@ -418,20 +460,35 @@ export function runEffects(
         break;
       }
       case 'aoeDamage': {
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: ability.school,
-          fx: 'nova',
-        });
+        // Ground-targeted casts blast where they were aimed; others detonate on
+        // the caster. The fx follows the same center (a world-anchored burst for
+        // an aimed blast, the entity-anchored nova otherwise).
+        const aoeCenter = p.castAim ?? p.pos;
+        if (p.castAim) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: aoeCenter.x,
+            z: aoeCenter.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+          });
+        } else {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'nova',
+          });
+        }
         const aoeSpBonus = directHitBonus(
           abilityScalingPower(p, ability),
           ability,
           res.castTime,
           true,
         );
-        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+        for (const m of ctx.hostilesInRadius(p, aoeCenter, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           // Armor only mitigates physical damage, mirroring the single-target
@@ -453,9 +510,12 @@ export function runEffects(
         break;
       }
       case 'groundAoE': {
+        // Ground-targeted casts drop the zone where they were aimed; others lay it
+        // under the caster (e.g. Consecration at your feet).
+        const zoneCenter = p.castAim ?? p.pos;
         const groundEffect: GroundAoE = {
           sourceId: p.id,
-          pos: { ...p.pos },
+          pos: { ...zoneCenter },
           radius: eff.radius,
           min: eff.min,
           max: eff.max,
@@ -468,13 +528,24 @@ export function runEffects(
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
           spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         };
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
-          school: ability.school,
-          fx: 'nova',
-        });
+        if (p.castAim) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+          });
+        } else {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'nova',
+          });
+        }
         ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
         break;

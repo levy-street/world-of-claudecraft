@@ -276,6 +276,10 @@ export class Input {
     return this.cameraDragActive;
   }
 
+  cursorPoint(): { x: number; y: number } | null {
+    return this.hoverActive ? { x: this.hoverX, y: this.hoverY } : null;
+  }
+
   setClickMoveMouseButton(button: 0 | 2 | null): void {
     this.clickMoveMouseButton = button;
     if (button !== null && this.downButton === button) {
