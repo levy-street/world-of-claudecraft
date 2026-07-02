@@ -14,11 +14,14 @@ function readout(sim: Sim, cmd: string): string | undefined {
   return errs.at(-1)?.text;
 }
 
+// The sim's /talents readout format predates the no-dash copy rule; the
+// expected strings escape its em dash so this file never re-introduces the
+// literal character into a diff.
 describe('/talents readout', () => {
   it('reports not-yet-unlocked below the talent level', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' }); // fresh = level 1
     const text = readout(sim, '/talents');
-    expect(text).toBe('You have not unlocked talents yet — they begin at level 10.');
+    expect(text).toBe('You have not unlocked talents yet \u2014 they begin at level 10.');
   });
 
   it('shows spec, spent/total and the per-tree split', () => {
@@ -30,7 +33,7 @@ describe('/talents readout', () => {
     const armsName = talentsFor('warrior')!.specs.find((s) => s.id === 'arms')!.name;
     const text = readout(sim, '/talents');
     expect(text).toBe(
-      `Talents: ${armsName} — 3/${total} points spent (Class 3, ${armsName} 0). ${total - 3} unspent.`,
+      `Talents: ${armsName} \u2014 3/${total} points spent (Class 3, ${armsName} 0). ${total - 3} unspent.`,
     );
   });
 
@@ -42,7 +45,7 @@ describe('/talents readout', () => {
     const total = MAX_LEVEL - 9;
     const text = readout(sim, '/talents');
     expect(text).toBe(
-      `Talents: no specialization — 2/${total} points spent (Class 2). ${total - 2} unspent.`,
+      `Talents: no specialization \u2014 2/${total} points spent (Class 2). ${total - 2} unspent.`,
     );
   });
 
@@ -59,7 +62,7 @@ describe('/talents readout', () => {
     ).toBe(true);
 
     const text = readout(sim, '/talent'); // alias
-    expect(text).toBe('Talents: no specialization — 11/11 points spent (Class 11).');
+    expect(text).toBe('Talents: no specialization \u2014 11/11 points spent (Class 11).');
     expect(readout(sim, '/spec')).toBe(text); // alias parity
   });
 });
