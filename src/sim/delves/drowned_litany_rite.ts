@@ -92,12 +92,15 @@ function grantRiteBonus(ctx: SimContext, run: DelveRun, tier: LootTier): void {
       2,
   );
   const bonusCopper = Math.round(baseCopper * (reward.copperMult - 1));
+  // The Drowned Litany pays double Marks vs. the Collapsed Reliquary's lockpick
+  // chest (delve index 1 vs. 0): a deliberate currency-curve step.
+  const bonusMarks = reward.bonusMarks * 2;
   for (const pid of members) {
     const meta = ctx.players.get(pid);
     if (!meta) continue;
-    meta.delveMarks += reward.bonusMarks;
+    meta.delveMarks += bonusMarks;
     meta.copper += bonusCopper;
-    ctx.emit({ type: 'lockpickBonus', tier, marks: reward.bonusMarks, copper: bonusCopper, pid });
+    ctx.emit({ type: 'lockpickBonus', tier, marks: bonusMarks, copper: bonusCopper, pid });
   }
 }
 

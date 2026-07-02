@@ -653,9 +653,9 @@ export const en = {
         greeting:
           'The reliquary below has shifted again. We hear chanting through the floor after midnight, and Acolyte Tessa swears the burial ledgers are changing their own ink. If you have courage enough, {playerName}, take a candle and go below. Do not trust every voice you hear down there. Some of them knew your name before you were born.',
       },
-      aldric: {
+      halvenMarsh: {
         greeting:
-          'Fenbridge hears bells under the water now, {playerName}. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return.',
+          'The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return.',
       },
     },
     intro: {
@@ -691,7 +691,7 @@ export const en = {
       litany_ledger: 'The Island Ledger',
       litany_ring: 'The Ring Reliquary',
       litany_baptistry: 'The Sinkhole Baptistry',
-      litany_choir_loft: 'The Fan Choir Loft',
+      litany_choir_loft: 'The Reedsong Gallery',
       litany_causeway: 'The Y-Split Causeway',
       litany_apse: 'The Drowned Apse',
     },
@@ -970,6 +970,15 @@ export const en = {
       blackwater_vanguard_chest: { name: 'Blackwater Vanguard Chestguard' },
       siltstep_leggings: { name: 'Siltstep Leggings' },
       sunken_reliquary_hood: { name: 'Sunken Reliquary Hood' },
+      litany_legs: { name: 'Silt-Walker Greaves' },
+      litany_shoulder: { name: 'Blackwater Drift Mantle' },
+      litany_gloves_rog: { name: 'Reed-Bound Handwraps' },
+      litany_plate_chest: { name: 'Sump-Warden Cuirass' },
+      litany_leather_chest: { name: 'Silt-Deep Vestment' },
+      litany_cloth_chest: { name: 'Choir-Drowned Raiment' },
+      litany_helm: { name: "Reliquant's Drowned Cowl" },
+      sister_nhalia_choir_plate: { name: "Sister Nhalia's Choir-Forged Plate" },
+      drowned_choir_fang: { name: 'Drowned Choir-Fang' },
       the_codfather: { name: 'The Codfather' },
       runed_bone_shard: { name: 'Runed Bone Shard' },
       grave_sir_aldren: { name: 'Grave of Captain Aldren' },

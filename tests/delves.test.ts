@@ -1165,7 +1165,7 @@ describe('The Drowned Litany (Phase 1 skeleton)', () => {
     expect(d.index).toBe(1);
     expect(d.objective).toBe('kill_boss');
     expect(d.minLevel).toBe(12);
-    expect(d.boardNpcId).toBe('brother_aldric_watch');
+    expect(d.boardNpcId).toBe('brother_halven_marsh');
     expect(d.bosses).toEqual(['sister_nhalia_drowned_canticle']);
     // Its own band: delveAt resolves index 1 at the second delve x-offset.
     expect(delveAt(delveOrigin(1, 0).x)?.id).toBe('drowned_litany');
@@ -1438,7 +1438,7 @@ describe('The Drowned Litany (Phase 4 enemy kits)', () => {
     expect(m.stomp?.name).toBe('Sump Stomp');
   });
 
-  it('the Choir Thrall is a fragile swarm add with pack frenzy', () => {
+  it('the Bog Thrall is a fragile swarm add with pack frenzy', () => {
     const m = MOBS.choir_thrall;
     expect(m.hpBase).toBeLessThan(MOBS.drowned_cantor.hpBase);
     expect(m.packFrenzy?.hasteMult ?? 1).toBeGreaterThan(1);
@@ -1778,7 +1778,7 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
     expect(bulwark.maxHp).toBe(Math.round(base.maxHp * 1.1));
   });
 
-  it('lively_choir adds two Choir Thralls on cantor boss phases', () => {
+  it('lively_choir adds two Bog Thralls on cantor boss phases', () => {
     const sim = makeSim();
     enterLitany(sim);
     const run = sim.delveRunForPlayer(sim.playerId)!;
@@ -1931,7 +1931,7 @@ describe('The Drowned Litany (Phase 6 boss mechanics)', () => {
     expect(boss.auras.some((a) => a.id === 'nhalia_cantor_shield')).toBe(true);
   });
 
-  it('Final Bell at 10% HP spawns Choir Thralls and hits the party once', () => {
+  it('Final Bell at 10% HP spawns Bog Thralls and hits the party once', () => {
     const sim = makeSim();
     enterLitanyApse(sim);
     const boss = nhalia(sim);

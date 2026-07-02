@@ -117,7 +117,7 @@ const NPC_IDS = [
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
-  'brother_aldric_watch', // Drowned Litany delve board NPC (Fenbridge Watch)
+  'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
 ] as const;
 
 const QUEST_IDS = [

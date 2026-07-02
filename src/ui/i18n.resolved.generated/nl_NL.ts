@@ -2378,8 +2378,8 @@ export const nl_NL: EnTranslations = {
       "halven": {
         "greeting": "Het reliekschrijn beneden is opnieuw verschoven. We horen na middernacht gezang door de vloer, en Acoliet Tessa zweert dat de grafregisters hun eigen inkt veranderen. Als je moed genoeg hebt, {playerName}, neem dan een kaars en ga naar beneden. Vertrouw niet elke stem die je daar beneden hoort. Sommige kenden jouw naam al voordat je geboren werd."
       },
-      "aldric": {
-        "greeting": "Fenbridge hears bells under the water now, {playerName}. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
+      "halvenMarsh": {
+        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
@@ -2410,7 +2410,7 @@ export const nl_NL: EnTranslations = {
       "litany_ledger": "The Island Ledger",
       "litany_ring": "The Ring Reliquary",
       "litany_baptistry": "The Sinkhole Baptistry",
-      "litany_choir_loft": "The Fan Choir Loft",
+      "litany_choir_loft": "The Reedsong Gallery",
       "litany_causeway": "The Y-Split Causeway",
       "litany_apse": "The Drowned Apse"
     },
@@ -5342,6 +5342,33 @@ export const nl_NL: EnTranslations = {
       "sunken_reliquary_hood": {
         "name": "Sunken Reliquary Hood"
       },
+      "litany_legs": {
+        "name": "Silt-Walker Greaves"
+      },
+      "litany_shoulder": {
+        "name": "Blackwater Drift Mantle"
+      },
+      "litany_gloves_rog": {
+        "name": "Reed-Bound Handwraps"
+      },
+      "litany_plate_chest": {
+        "name": "Sump-Warden Cuirass"
+      },
+      "litany_leather_chest": {
+        "name": "Silt-Deep Vestment"
+      },
+      "litany_cloth_chest": {
+        "name": "Choir-Drowned Raiment"
+      },
+      "litany_helm": {
+        "name": "Reliquant's Drowned Cowl"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "Sister Nhalia's Choir-Forged Plate"
+      },
+      "drowned_choir_fang": {
+        "name": "Drowned Choir-Fang"
+      },
       "the_codfather": {
         "name": "De Kabeljauwvader"
       },
@@ -5672,7 +5699,7 @@ export const nl_NL: EnTranslations = {
         "name": "Sump Troll Devourer"
       },
       "choir_thrall": {
-        "name": "Choir Thrall"
+        "name": "Bog Thrall"
       },
       "sister_nhalia_drowned_canticle": {
         "name": "Sister Nhalia, the Drowned Canticle"
@@ -5903,10 +5930,10 @@ export const nl_NL: EnTranslations = {
         "title": "Reliekbewaarder",
         "greeting": "Het reliekschrijn beneden is opnieuw verschoven."
       },
-      "brother_aldric_watch": {
-        "name": "Brother Aldric",
-        "title": "Fenbridge Watch",
-        "greeting": "Fenbridge hears bells under the water now. The Gravecallers are teaching the drowned to sing. Choose your tier, and I will hold the rope until you return."
+      "brother_halven_marsh": {
+        "name": "Brother Halven",
+        "title": "Reliquary Keeper",
+        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6875,8 +6902,8 @@ export const nl_NL: EnTranslations = {
       },
       "drowned_litany": {
         "name": "The Drowned Litany",
-        "enterText": "You descend beneath Fenbridge into the drowned shrine.",
-        "leaveText": "You climb back to Brother Aldric on the Fenbridge causeway."
+        "enterText": "You descend into the drowned shrine at the marsh's edge.",
+        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "itemSets": {

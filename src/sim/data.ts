@@ -25,8 +25,8 @@ export type { FishingEntry } from './content/items';
 export { FISHING_RARE_ID, FISHING_TABLES };
 
 import {
-  BROTHER_ALDRIC_WATCH,
   BROTHER_HALVEN,
+  BROTHER_HALVEN_MARSH,
   COLLAPSED_RELIQUARY_DELVE,
   COLLAPSED_RELIQUARY_MODULES,
   DELVE_MOBS,
@@ -162,7 +162,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
-  brother_aldric_watch: BROTHER_ALDRIC_WATCH,
+  brother_halven_marsh: BROTHER_HALVEN_MARSH,
 };
 
 export const QUESTS: Record<string, QuestDef> = {

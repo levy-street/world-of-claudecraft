@@ -9,6 +9,7 @@ import {
   litanyModuleDressing,
 } from '../sim/delve_litany_layout';
 import type { DungeonLayout } from '../sim/dungeon_layout';
+import { polygonXAtZ } from '../sim/geometry2d';
 import { hash2 } from '../sim/rng';
 import { GFX, surfaceMat } from './gfx';
 
@@ -57,33 +58,39 @@ export function placeMarshClutter(p: MarshPlacementSink, layout: DungeonLayout):
   }
 }
 
+/** Wall-hugging x at height z for the given side, honoring the polygon shell
+ * when present (falls back to the constant wallX band otherwise, or if the
+ * polygon lookup misses at that z). */
+function wallEdgeAt(layout: DungeonLayout, z: number, side: -1 | 1): number {
+  const constEdge = (layout.wallX ?? 25) - 1.6;
+  if (!layout.shellPolygon) return side * constEdge;
+  const x = polygonXAtZ(layout.shellPolygon, z, side);
+  return x === null ? side * constEdge : x - side * 1.6;
+}
+
 /** Marsh wall dressing: reed posts, broken bells, no grave shelves. */
 export function placeMarshWallDressing(p: MarshPlacementSink, layout: DungeonLayout): void {
-  const edge = (layout.wallX ?? 25) - 1.6;
   for (let z = layout.zMin + 22; z < layout.zMax - 10; z += 17) {
-    for (const side of [-1, 1]) {
+    for (const side of [-1, 1] as const) {
+      const wx = wallEdgeAt(layout, z, side);
       const r = hash2(side * 5.1, z, MARSH_SEED);
       if (r < 0.45) {
-        p.add('rubble_half', side * edge, 0, z, side < 0 ? Math.PI / 2 : -Math.PI / 2, 1.2);
+        p.add('rubble_half', wx, 0, z, side < 0 ? Math.PI / 2 : -Math.PI / 2, 1.2);
       } else if (r < 0.75) {
-        p.add('gravemarker_A', side * edge, 0, z, side < 0 ? Math.PI / 2 : -Math.PI / 2, 1.45);
+        p.add('gravemarker_A', wx, 0, z, side < 0 ? Math.PI / 2 : -Math.PI / 2, 1.45);
       } else {
-        p.add(
-          'plaque_candles',
-          side * edge,
-          0,
-          z + 1.5,
-          side < 0 ? Math.PI / 2 : -Math.PI / 2,
-          1.3,
-        );
+        p.add('plaque_candles', wx, 0, z + 1.5, side < 0 ? Math.PI / 2 : -Math.PI / 2, 1.3);
       }
       if (r > 0.55) {
-        p.add('skull_candle', side * (edge - 1.3), 0, z + 2.2, r * 6, 1.1);
+        const wx2 = wallEdgeAt(layout, z + 2.2, side) - side * 1.3;
+        p.add('skull_candle', wx2, 0, z + 2.2, r * 6, 1.1);
       }
     }
   }
-  p.add('shrine_candles', -edge, 0, layout.zMin + 4, Math.PI / 4, 1.45);
-  p.add('gravestone', edge, 0, layout.zMax - 5, -Math.PI * 0.75, 1.55);
+  const startZ = layout.zMin + 4;
+  const endZ = layout.zMax - 5;
+  p.add('shrine_candles', wallEdgeAt(layout, startZ, -1), 0, startZ, Math.PI / 4, 1.45);
+  p.add('gravestone', wallEdgeAt(layout, endZ, 1), 0, endZ, -Math.PI * 0.75, 1.55);
 }
 
 function addReedCluster(group: THREE.Group, x: number, z: number, rot = 0): void {
@@ -215,6 +222,77 @@ function addDeadTree(group: THREE.Group, x: number, z: number, rot = 0): void {
   }
 }
 
+function addSluicePost(group: THREE.Group, x: number, z: number, rot = 0): void {
+  const wood = surfaceMat({
+    color: 0x3a3028,
+    roughness: 0.96,
+    flatShading: !GFX.standardMaterials,
+  });
+  // Weathered post, tapered so the waterline base reads thicker than the top.
+  const postH = 2.0 + hash2(x, z, MARSH_SEED) * 0.4;
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.16, postH, 6), wood);
+  post.position.set(x, postH / 2, z);
+  post.rotation.y = rot;
+  post.rotation.z = (hash2(z, x, MARSH_SEED) - 0.5) * 0.08;
+  group.add(post);
+  // Horizontal crossbeam lashed near the top.
+  const beamLen = 1.5 + hash2(x * 1.7, z, MARSH_SEED) * 0.4;
+  const beam = new THREE.Mesh(new THREE.BoxGeometry(beamLen, 0.14, 0.14), wood);
+  beam.position.set(x, postH - 0.3, z);
+  beam.rotation.y = rot + (hash2(z, x * 2.3, MARSH_SEED) - 0.5) * 0.3;
+  group.add(beam);
+  // Slack rope hint: a thin cylinder angled down from the crossbeam end.
+  const rope = surfaceMat({
+    color: 0x4a4030,
+    roughness: 0.98,
+    flatShading: !GFX.standardMaterials,
+  });
+  const ropeLen = 0.9 + hash2(z * 1.3, x, MARSH_SEED) * 0.5;
+  const ropeAngle = rot + beamLen / 2;
+  const ropeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, ropeLen, 4), rope);
+  ropeMesh.position.set(
+    x + Math.sin(rot) * (beamLen / 2 - 0.1),
+    postH - 0.3 - ropeLen / 2 + 0.15,
+    z + Math.cos(rot) * (beamLen / 2 - 0.1),
+  );
+  ropeMesh.rotation.set(0.35, ropeAngle, 0.5, 'YXZ');
+  group.add(ropeMesh);
+}
+
+function addRootWall(group: THREE.Group, x: number, z: number, rot = 0): void {
+  const bark = surfaceMat({
+    color: 0x201a12,
+    roughness: 0.97,
+    flatShading: !GFX.standardMaterials,
+  });
+  const mossyBark = surfaceMat({
+    color: 0x201a12,
+    roughness: 0.95,
+    emissive: 0x1a3020,
+    emissiveIntensity: 0.4,
+    flatShading: !GFX.standardMaterials,
+  });
+  const rootCount = 3 + Math.floor(hash2(x, z, MARSH_SEED) * 3); // 3..5
+  for (let i = 0; i < rootCount; i++) {
+    const len = 1.5 + hash2(x + i * 2.1, z - i, MARSH_SEED) * 1.0;
+    const fan = (i - (rootCount - 1) / 2) * 0.5; // spread the arcs across the fan
+    const angle = rot + fan + (hash2(z, x + i, MARSH_SEED) - 0.5) * 0.3;
+    const tilt = 0.5 + hash2(x + i, z + i, MARSH_SEED) * 0.5; // bent up and outward
+    const mossy = hash2(i, x - z, MARSH_SEED) > 0.6;
+    const root = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.14, len, 6),
+      mossy ? mossyBark : bark,
+    );
+    root.position.set(
+      x + Math.sin(angle) * 0.3,
+      (len / 2) * Math.cos(tilt) * 0.6,
+      z + Math.cos(angle) * 0.3,
+    );
+    root.rotation.set(tilt, angle, 0, 'YXZ');
+    group.add(root);
+  }
+}
+
 function addBrokenBellFrame(group: THREE.Group, x: number, z: number, rot = 0): void {
   const wood = surfaceMat({
     color: 0x3a3028,
@@ -260,7 +338,11 @@ function placeDressingAnchor(group: THREE.Group, anchor: LitanyDressingAnchor): 
       addDeadTree(group, anchor.x, anchor.z, rot);
       break;
     case 'sluice_post':
+      addSluicePost(group, anchor.x, anchor.z, rot);
+      break;
     case 'root_wall':
+      addRootWall(group, anchor.x, anchor.z, rot);
+      break;
     case 'bone_pile':
       addShrineFragment(group, anchor.x, anchor.z, rot);
       break;

@@ -134,7 +134,7 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
 
   // =========================================================================
   // The Drowned Litany (Mirefen Marsh delve, index 1). Fenbridge cult of the
-  // Gravecallers; drowned choir + marsh skirmishers. Levels 12-14.
+  // Gravecallers; flood-cult cantors + marsh predators. Levels 12-14.
   // Abilities are MVP-simple here; richer telegraphs land in a later phase.
   // =========================================================================
 
@@ -288,7 +288,7 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
   },
   choir_thrall: {
     id: 'choir_thrall',
-    name: 'Choir Thrall',
+    name: 'Bog Thrall',
     minLevel: 12,
     maxLevel: 12,
     family: 'undead',

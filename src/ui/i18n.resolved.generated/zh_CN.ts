@@ -2378,8 +2378,8 @@ export const zh_CN: EnTranslations = {
       "halven": {
         "greeting": "下方的圣物库又移位了。每到午夜过后，我们便能透过地板听见诵唱，侍僧泰莎更发誓说葬礼名册正在自行改写墨迹。若你有足够的勇气，{playerName}，就拿上一支蜡烛下去吧。别相信下面听到的每一个声音。它们中有些，早在你出生之前就知道你的名字了。"
       },
-      "aldric": {
-        "greeting": "芬桥如今能听见水下的钟声，{playerName}。唤墓者正在教溺亡者歌唱。选择你的难度，我会握紧绳索，直到你归来。"
+      "halvenMarsh": {
+        "greeting": "小径向北通往沼泽，{playerName}。又一座圣物库在黑水下歌唱，溺亡者应和着钟声。见习信徒艾达比我更懂这片芦苇，紧跟她的灯笼。选择你的难度，我会握紧绳索，直到你归来。"
       }
     },
     "intro": {
@@ -5342,6 +5342,33 @@ export const zh_CN: EnTranslations = {
       "sunken_reliquary_hood": {
         "name": "沉没圣髑兜帽"
       },
+      "litany_legs": {
+        "name": "淤行者护胫"
+      },
+      "litany_shoulder": {
+        "name": "黑水浮肩甲"
+      },
+      "litany_gloves_rog": {
+        "name": "苇缚护手"
+      },
+      "litany_plate_chest": {
+        "name": "沼卫胸甲"
+      },
+      "litany_leather_chest": {
+        "name": "深淤皮衣"
+      },
+      "litany_cloth_chest": {
+        "name": "唱诗溺袍"
+      },
+      "litany_helm": {
+        "name": "圣物猎人的溺兜"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "娜哈莉亚修女的唱诗锻甲"
+      },
+      "drowned_choir_fang": {
+        "name": "溺水唱诗獠牙"
+      },
       "the_codfather": {
         "name": "鳕鱼教父"
       },
@@ -5903,10 +5930,10 @@ export const zh_CN: EnTranslations = {
         "title": "圣物库守护人",
         "greeting": "下方的圣物库又移位了。"
       },
-      "brother_aldric_watch": {
-        "name": "阿尔德里克修士",
-        "title": "芬桥守卫",
-        "greeting": "芬桥如今能听见水下的钟声。唤墓者正在教溺亡者歌唱。选择你的难度，我会握紧绳索，直到你归来。"
+      "brother_halven_marsh": {
+        "name": "哈尔文修士",
+        "title": "圣物库守护人",
+        "greeting": "小径向北延伸。又一座圣物库，又一场仪式。选择你的难度，我会为你守住绳索，直到你归来。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -6875,8 +6902,8 @@ export const zh_CN: EnTranslations = {
       },
       "drowned_litany": {
         "name": "溺亡连祷",
-        "enterText": "你潜入芬桥之下，进入那座溺亡的神殿。",
-        "leaveText": "你爬回芬桥堤道，回到阿尔德里克修士身边。"
+        "enterText": "你潜入沼泽边缘，进入那座溺亡的神殿。",
+        "leaveText": "你爬回沼泽边缘，回到哈尔文修士身边。"
       }
     },
     "itemSets": {

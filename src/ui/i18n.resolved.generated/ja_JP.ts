@@ -2378,8 +2378,8 @@ export const ja_JP: EnTranslations = {
       "halven": {
         "greeting": "下の聖遺物庫がまた動いた。真夜中を過ぎると床越しに詠唱が聞こえ、侍祭テッサは埋葬台帳が自らインクを書き換えていると言って譲らぬ。勇気があるなら、{playerName}、蝋燭を持って下りてくれ。そこで聞こえる声をすべて信じるな。その中には、お前が生まれる前からお前の名を知っていた者もいる。"
       },
-      "aldric": {
-        "greeting": "フェンブリッジは今、水の底で鐘の音を聞く、{playerName}。墓呼びたちは溺れし者に歌を教えている。難易度を選べ、お前が戻るまで縄を握っていよう。"
+      "halvenMarsh": {
+        "greeting": "道は北の沼地へ続いていた、{playerName}。また聖遺物庫が黒い水の底で歌い、溺れし死者が鐘に応える。信徒エッダはこの葦のことを私よりよく知っている、彼女の灯りのそばを離れるな。難易度を選べ、お前が戻るまで縄を握っていよう。"
       }
     },
     "intro": {
@@ -5342,6 +5342,33 @@ export const ja_JP: EnTranslations = {
       "sunken_reliquary_hood": {
         "name": "沈める聖遺物のフード"
       },
+      "litany_legs": {
+        "name": "泥歩きの脛当て"
+      },
+      "litany_shoulder": {
+        "name": "黒水漂流のマント"
+      },
+      "litany_gloves_rog": {
+        "name": "葦縛りの手甲"
+      },
+      "litany_plate_chest": {
+        "name": "沼番の胸当て"
+      },
+      "litany_leather_chest": {
+        "name": "深淤の胴着"
+      },
+      "litany_cloth_chest": {
+        "name": "聖歌隊溺れのローブ"
+      },
+      "litany_helm": {
+        "name": "聖遺物狩人の溺れずきん"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "ナリア修道女の聖歌鍛造鎧"
+      },
+      "drowned_choir_fang": {
+        "name": "溺れた聖歌の牙"
+      },
       "the_codfather": {
         "name": "タラのゴッドファーザー"
       },
@@ -5903,10 +5930,10 @@ export const ja_JP: EnTranslations = {
         "title": "聖遺物庫の番人",
         "greeting": "下の聖遺物庫がまた動いた。"
       },
-      "brother_aldric_watch": {
-        "name": "修道士アルドリック",
-        "title": "フェンブリッジ番人",
-        "greeting": "フェンブリッジは今、水の底で鐘の音を聞く。墓呼びたちは溺れし者に歌を教えている。難易度を選べ、お前が戻るまで縄を握っていよう。"
+      "brother_halven_marsh": {
+        "name": "ハルヴェン修道士",
+        "title": "聖遺物庫の番人",
+        "greeting": "道は北へ続いていた。また聖遺物庫、また儀式。難易度を選べ、お前が戻るまで縄を握っていよう。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -6875,8 +6902,8 @@ export const ja_JP: EnTranslations = {
       },
       "drowned_litany": {
         "name": "溺れし連祷",
-        "enterText": "あなたはフェンブリッジの下へ、溺れし神殿へと降りていく。",
-        "leaveText": "あなたはフェンブリッジの土手道を登り、アルドリック修道士のもとへ戻る。"
+        "enterText": "あなたは沼地の果てへ、溺れし神殿へと降りていく。",
+        "leaveText": "あなたは沼地の果てへ登り、ハルヴェン修道士のもとへ戻る。"
       }
     },
     "itemSets": {

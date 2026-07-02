@@ -1740,8 +1740,8 @@ export const GUIDE_DELVES: GuideDelve[] = [
     "minLevel": 12,
     "suggestedPlayers": 2,
     "keeper": {
-      "name": "Brother Aldric",
-      "title": "Fenbridge Watch"
+      "name": "Brother Halven",
+      "title": "Reliquary Keeper"
     },
     "companion": {
       "name": "Edda Reedhand",

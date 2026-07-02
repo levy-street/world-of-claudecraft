@@ -4772,8 +4772,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'delveRiteUi.closeAria': '關閉',
   'delveUi.board.openDelveLitany': '溺亡連禱',
   'delveUi.board.companion.edda': '艾達·蘆手',
-  'delveUi.npc.aldric.greeting':
-    '芬橋如今能聽見水下的鐘聲，{playerName}。喚墓者正在教溺亡者歌唱。選擇你的難度，我會握緊繩索，直到你歸來。',
+  'delveUi.npc.halvenMarsh.greeting':
+    '小徑向北通往沼澤，{playerName}。又一座聖物庫在黑水下歌唱，溺亡者應和著鐘聲。見習信徒艾達比我更懂這片蘆葦，緊跟她的燈籠。選擇你的難度，我會握緊繩索，直到你歸來。',
   'delveUi.intro.litanyNormal':
     '蘆葦堵塞的階梯沒入芬橋之下。艾達·蘆手舉起她的提燈。"沼澤記得每一個被淹死之人的名字，{playerName}。留在光中。"',
   'delveUi.intro.litanyHeroic':
@@ -4823,6 +4823,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.blackwater_vanguard_chest.name': '黑水先鋒胸甲',
   'entities.items.siltstep_leggings.name': '淤步護腿',
   'entities.items.sunken_reliquary_hood.name': '沉沒聖髑兜帽',
+  'entities.items.litany_legs.name': '淤行者護脛',
+  'entities.items.litany_shoulder.name': '黑水浮肩甲',
+  'entities.items.litany_gloves_rog.name': '葦縛護手',
+  'entities.items.litany_plate_chest.name': '沼衛胸甲',
+  'entities.items.litany_leather_chest.name': '深淤皮衣',
+  'entities.items.litany_cloth_chest.name': '唱詩溺袍',
+  'entities.items.litany_helm.name': '聖物獵人的溺兜',
+  'entities.items.sister_nhalia_choir_plate.name': '娜哈莉亞修女的唱詩鍛甲',
+  'entities.items.drowned_choir_fang.name': '溺水唱詩獠牙',
   'entities.mobs.drowned_cantor.name': '溺亡誦經者',
   'entities.mobs.reedbound_acolyte.name': '蘆葦縛信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼槍顎獸',
@@ -4833,11 +4842,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '娜哈莉亞修女，溺亡的聖歌',
   'entities.mobs.edda_reedhand.name': '艾達·蘆手',
   'entities.mobs.tolling_bell.name': '鳴鐘',
-  'entities.npcs.brother_aldric_watch.name': '阿爾德里克修士',
-  'entities.npcs.brother_aldric_watch.title': '芬橋守衛',
-  'entities.npcs.brother_aldric_watch.greeting':
-    '芬橋如今能聽見水下的鐘聲。喚墓者正在教溺亡者歌唱。選擇你的難度，我會握緊繩索，直到你歸來。',
+  'entities.npcs.brother_halven_marsh.name': '哈爾文修士',
+  'entities.npcs.brother_halven_marsh.title': '聖物庫守護人',
+  'entities.npcs.brother_halven_marsh.greeting':
+    '小徑向北延伸。又一座聖物庫，又一場儀式。選擇你的難度，我會為你守住繩索，直到你歸來。',
   'entities.delves.drowned_litany.name': '溺亡連禱',
-  'entities.delves.drowned_litany.enterText': '你潛入芬橋之下，進入那座溺亡的神殿。',
-  'entities.delves.drowned_litany.leaveText': '你爬回芬橋堤道，回到阿爾德里克修士身邊。',
+  'entities.delves.drowned_litany.enterText': '你潛入沼澤邊緣，進入那座溺亡的神殿。',
+  'entities.delves.drowned_litany.leaveText': '你爬回沼澤邊緣，回到哈爾文修士身邊。',
 };

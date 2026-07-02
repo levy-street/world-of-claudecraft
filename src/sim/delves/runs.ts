@@ -108,7 +108,7 @@ export const DELVE_MODULE_NAMES: Record<string, string> = {
   litany_ledger: 'The Island Ledger',
   litany_ring: 'The Ring Reliquary',
   litany_baptistry: 'The Sinkhole Baptistry',
-  litany_choir_loft: 'The Fan Choir Loft',
+  litany_choir_loft: 'The Reedsong Gallery',
   litany_causeway: 'The Y-Split Causeway',
   litany_apse: 'The Drowned Apse',
 };
@@ -715,7 +715,9 @@ export function grantDelveClearTo(
     ? (tier?.firstClearXp ?? delve.baseRewards.firstClearXp)
     : (tier?.repeatClearXp ?? delve.baseRewards.repeatClearXp);
   if (firstClear) meta.delveDaily.firstClearXp.add(clearKey);
-  const marks = delveMarkPayout(ctx, run, meta);
+  // The Drowned Litany pays double Marks per clear vs. the Collapsed Reliquary
+  // (delve index 1 vs. 0): a deliberate currency-curve step, not a formula change.
+  const marks = delveMarkPayout(ctx, run, meta) * (delve.id === 'drowned_litany' ? 2 : 1);
   meta.delveDaily.markClears += 1;
   meta.delveMarks += marks;
   meta.delveClears[clearKey] = (meta.delveClears[clearKey] ?? 0) + 1;

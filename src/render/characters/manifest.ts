@@ -639,7 +639,7 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2,
   },
-  // Choir Thrall (The Drowned Litany): unused floating ghost rig, a stronger
+  // Bog Thrall (The Drowned Litany): unused floating ghost rig, a stronger
   // fit for an undead swarm add than the generic skel_minion skeleton
   // (docs/prd/drowned-litany-asset-generation-plan.md).
   mob_choir_thrall: {
@@ -658,7 +658,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // (docs/prd/drowned-litany-asset-generation-plan.md).
   mob_tolling_bell: {
     url: `${CREATURES}/tolling_bell.glb`,
-    height: 0.75,
+    // Reads ~2m in world after the template's 0.6 scale: the rolling bell is a
+    // boss projectile the player dodges, so it must loom, not look like a prop.
+    height: 3.4,
     clips: TOLLING_BELL,
     tint: 'entity',
     tintStrength: 0.15,
@@ -902,14 +904,17 @@ export const VISUALS: Record<string, VisualDef> = {
   // (docs/prd/drowned-litany-asset-generation-plan.md).
   npc_edda_reedhand: {
     url: `${CREATURES}/edda_reedhand.glb`,
-    height: 1.75,
+    // 2x human height, same reason as the Reedbound Acolyte below: the
+    // realistically proportioned Meshy mesh reads small next to the chibi rigs.
+    height: 3.5,
     clips: MESHY_HUMANOID,
   },
   // Reedbound Acolyte (The Drowned Litany trash mob): Meshy-generated marsh
-  // cultist, ragged and gaunt.
+  // cultist, ragged and gaunt. Rendered at 2x human height: the realistically
+  // proportioned Meshy mesh reads too small next to the chunky chibi rigs.
   mob_reedbound_acolyte: {
     url: `${CREATURES}/reedbound_acolyte.glb`,
-    height: 1.7,
+    height: 3.4,
     clips: MESHY_HUMANOID,
     tint: 'entity',
     tintStrength: 0.2,
@@ -1010,6 +1015,7 @@ const NPC_KEYS: Record<string, string> = {
   provisioner_hale: 'npc_villager',
   quartermaster_bree: 'npc_villager',
   brother_halven: 'npc_reliquary_keeper',
+  brother_halven_marsh: 'npc_reliquary_keeper',
 };
 
 export function visualKeyFor(e: Entity): string {

@@ -13,13 +13,13 @@ import type { DelveDef, DelveModuleDef } from '../../types';
 // Run picks 3 of the 6 trash modules (seeded) then appends the boss apse.
 // =============================================================================
 
-// --- Crescent sluice: priority casters behind marsh skirmishers. ---
+// --- Crescent sluice: marsh predators screening a lone cantor. ---
 const SLUICE_SPAWNS = {
   id: 'sluice_trash',
   weight: 1,
   spawns: [
     { mobId: 'deepfen_spearjaw', x: 10, z: 24 },
-    { mobId: 'drowned_cantor', x: 10, z: 32 },
+    { mobId: 'mirefen_widowling', x: 10, z: 32 },
     { mobId: 'deepfen_spearjaw', x: 8, z: 40 },
     { mobId: 'deepfen_spearjaw', x: 5, z: 46 },
     { mobId: 'drowned_cantor', x: 11, z: 52 },
@@ -36,17 +36,17 @@ const LEDGER_SPAWNS = {
     { mobId: 'mirefen_widowling', x: 6, z: 28 },
     { mobId: 'reedbound_acolyte', x: -5, z: 42 },
     { mobId: 'mirefen_widowling', x: 5, z: 44 },
-    { mobId: 'reedbound_acolyte', x: -4, z: 56 },
+    { mobId: 'mirefen_widowling', x: -4, z: 56 },
     { mobId: 'drowned_cantor', x: 4, z: 58 },
   ],
 };
 
-// --- Ring reliquary: cantors guard an elite sump troll. ---
+// --- Ring reliquary: a cantor and skirmishers guard an elite sump troll. ---
 const RING_SPAWNS = {
   id: 'ring_trash',
   weight: 1,
   spawns: [
-    { mobId: 'drowned_cantor', x: -6, z: 26 },
+    { mobId: 'deepfen_spearjaw', x: -6, z: 26 },
     { mobId: 'reedbound_acolyte', x: 14, z: 28 },
     { mobId: 'drowned_cantor', x: -4, z: 42 },
     { mobId: 'reedbound_acolyte', x: 4, z: 44 },
@@ -68,7 +68,7 @@ const BAPTISTRY_SPAWNS = {
   ],
 };
 
-// --- Fan choir loft: a wall of cantors backed by choir thralls. ---
+// --- Fan gallery: ranked cantors backed by bog thralls. ---
 const CHOIR_LOFT_SPAWNS = {
   id: 'choir_loft_trash',
   weight: 1,
@@ -77,7 +77,7 @@ const CHOIR_LOFT_SPAWNS = {
     { mobId: 'choir_thrall', x: 8, z: 26 },
     { mobId: 'drowned_cantor', x: -6, z: 42 },
     { mobId: 'drowned_cantor', x: 0, z: 44 },
-    { mobId: 'drowned_cantor', x: 6, z: 42 },
+    { mobId: 'reedbound_acolyte', x: 6, z: 42 },
     { mobId: 'grave_silt_bulwark', x: 0, z: 58 },
   ],
 };
@@ -206,8 +206,11 @@ export const DROWNED_LITANY_DELVE: DelveDef = {
   index: 1,
   minLevel: 12,
   suggestedPlayers: 2,
-  // North causeway just outside Fenbridge (hub at z=300; marsh zone z 180..540).
-  doorPos: { x: 8, z: 268 },
+  // Northern edge of Mirefen Marsh (zone z 180..540; hub at z=300), just short
+  // of the Thornpeak Heights border. Flat, dry ground east of the Gravecaller
+  // camp / Sunken Bastion cluster and the Fenbridge->Highwatch mountain road
+  // (which hugs x~0..10), matching Brother Halven's marsh camp.
+  doorPos: { x: 70, z: 530 },
   modules: [
     'litany_sluice',
     'litany_ledger',
@@ -220,10 +223,10 @@ export const DROWNED_LITANY_DELVE: DelveDef = {
   finaleModuleId: 'litany_apse',
   bosses: ['sister_nhalia_drowned_canticle'],
   objective: 'kill_boss',
-  boardNpcId: 'brother_aldric_watch',
+  boardNpcId: 'brother_halven_marsh',
   autoCompanionId: 'companion_edda',
-  enterText: 'You descend beneath Fenbridge into the drowned shrine.',
-  leaveText: 'You climb back to Brother Aldric on the Fenbridge causeway.',
+  enterText: "You descend into the drowned shrine at the marsh's edge.",
+  leaveText: "You climb back to Brother Halven at the marsh's edge.",
   tiers: [
     {
       id: 'normal',

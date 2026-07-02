@@ -107,7 +107,7 @@ export function handlePickedEntity(
       else hud.showError(t('questUi.errors.tooFar'));
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
-        if (e.templateId === 'brother_halven' || e.templateId === 'brother_aldric_watch')
+        if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
@@ -134,7 +134,7 @@ export function handlePickedEntity(
       // out of range it just targets (no error spam while exploring)
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 2) {
-        if (e.templateId === 'brother_halven' || e.templateId === 'brother_aldric_watch')
+        if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       }

@@ -2378,8 +2378,8 @@ export const ko_KR: EnTranslations = {
       "halven": {
         "greeting": "아래의 성물실이 또 움직였소. 자정이 지나면 바닥 너머로 영창 소리가 들리고, 수련사제 테사는 매장 명부가 스스로 잉크를 바꾼다고 단언하오. 용기가 있다면, {playerName}, 촛불을 들고 아래로 내려가시오. 거기서 들리는 모든 목소리를 믿지는 마시오. 그중 몇은 그대가 태어나기도 전에 그대의 이름을 알고 있었으니."
       },
-      "aldric": {
-        "greeting": "이제 펜브릿지에는 물 아래서 종소리가 들린다, {playerName}. 무덤부름꾼들이 익사자들에게 노래를 가르치고 있다. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
+      "halvenMarsh": {
+        "greeting": "오솔길이 북쪽 늪지로 이어졌다, {playerName}. 또 다른 성물실이 검은 물 아래서 노래하고, 익사한 자들이 종소리에 화답한다. 신도 에다가 나보다 이 갈대밭을 더 잘 안다, 그녀의 등불 곁에 머물러라. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
       }
     },
     "intro": {
@@ -5342,6 +5342,33 @@ export const ko_KR: EnTranslations = {
       "sunken_reliquary_hood": {
         "name": "침몰한 유물함 후드"
       },
+      "litany_legs": {
+        "name": "진흙보행자 각반"
+      },
+      "litany_shoulder": {
+        "name": "흑수 표류 망토"
+      },
+      "litany_gloves_rog": {
+        "name": "갈대묶음 손보호구"
+      },
+      "litany_plate_chest": {
+        "name": "늪지기 흉갑"
+      },
+      "litany_leather_chest": {
+        "name": "깊은진흙 겉옷"
+      },
+      "litany_cloth_chest": {
+        "name": "익사한 성가대 예복"
+      },
+      "litany_helm": {
+        "name": "성물사냥꾼의 익사 두건"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "나할리아 수녀의 성가 단조 판금"
+      },
+      "drowned_choir_fang": {
+        "name": "익사한 성가대의 송곳니"
+      },
       "the_codfather": {
         "name": "대구 대부"
       },
@@ -5903,10 +5930,10 @@ export const ko_KR: EnTranslations = {
         "title": "성물실 관리인",
         "greeting": "아래의 성물실이 또 움직였소."
       },
-      "brother_aldric_watch": {
-        "name": "알드릭 수사",
-        "title": "펜브릿지 파수꾼",
-        "greeting": "이제 펜브릿지에는 물 아래서 종소리가 들린다. 무덤부름꾼들이 익사자들에게 노래를 가르치고 있다. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
+      "brother_halven_marsh": {
+        "name": "브라더 할벤",
+        "title": "성물실 관리인",
+        "greeting": "오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -6875,8 +6902,8 @@ export const ko_KR: EnTranslations = {
       },
       "drowned_litany": {
         "name": "익사한 연도",
-        "enterText": "그대는 펜브릿지 아래로 내려가 익사한 신전으로 들어간다.",
-        "leaveText": "그대는 펜브릿지 둑길로 다시 올라가 알드릭 수사에게 돌아간다."
+        "enterText": "그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.",
+        "leaveText": "그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다."
       }
     },
     "itemSets": {

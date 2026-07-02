@@ -103,8 +103,16 @@ export function delveLocalToCanvas(
   const rawModuleId = (layout as { litanyModuleId?: string }).litanyModuleId;
   const litany =
     rawModuleId && isLitanyModuleId(rawModuleId) ? litanyModuleGeometry(rawModuleId) : null;
-  const xMin = -(litany?.wallX ?? 23);
-  const xMax = litany?.wallX ?? 23;
+  // When the module has an authored boundary polygon, size the canvas bounds
+  // from its actual max |x| (an irregular outline can bow wider than wallX,
+  // e.g. the ring's root-wall flanks) instead of the legacy rectangle width.
+  const polyPoints = litany?.walkable[0]?.points;
+  const polyMaxAbsX = polyPoints?.length
+    ? polyPoints.reduce((m, p) => Math.max(m, Math.abs(p.x)), 0)
+    : null;
+  const halfWidth = polyMaxAbsX ?? litany?.wallX ?? 23;
+  const xMin = -halfWidth;
+  const xMax = halfWidth;
   const roomW = xMax - xMin;
   const roomD = layout.zMax - layout.zMin;
   const drawW = canvasSize - pad * 2;

@@ -32,6 +32,7 @@ import {
   TOMB_HD,
   type WallStub,
 } from '../sim/dungeon_layout';
+import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import {
@@ -128,6 +129,16 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   // the drowned apse burns brighter and colder: a cyan corpse-glow over the stage
   delve_marsh_apse: { flame: 0x7fe6c0, emissive: 0x2f8f6f, light: 0x6affb0 },
 };
+
+// The Drowned Litany reuses the same KayKit crypt-stone wall/floor/pillar kit as
+// every other interior, so without a tint it would just read as a recolored
+// crypt. These multiply the shared pack material toward wet mossy stone (walls,
+// pillars) and dark peat/mud (floors) for delve_marsh / delve_marsh_apse only;
+// tuned pale enough that the bog-green torchlight (TORCH_COLORS.delve_marsh*)
+// still reads clearly against them. See marshMaterial() for how the tint is
+// applied to a clone of the shared pack material, never the source itself.
+const MARSH_WALL_TINT = 0x5a6a52;
+const MARSH_FLOOR_TINT = 0x3c3830;
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
 // (driven by the shared uTime so it needs no per-frame plumbing) with cheap
@@ -452,6 +463,9 @@ const RECEIVER_KINDS = new Set([
   'floor_tile_grate',
   'floor_foundation_allsides',
 ]);
+// Wall + pillar kinds only, for the delve_marsh wet-stone tint (marshMaterial):
+// excludes banners/torches/props so the tint stays scoped to structural stone.
+const WALL_PILLAR_KINDS = new Set([...ARENA_WALL_CASTER_KINDS, 'pillar', 'pillar_decorated']);
 
 // ---------------------------------------------------------------------------
 
@@ -565,6 +579,11 @@ export class DungeonInteriors {
   private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
   private flameGeo: THREE.BufferGeometry | null = null;
   private packMats = new Map<Pack, THREE.Material>();
+  // delve_marsh / delve_marsh_apse wall+pillar and floor tints: clones of
+  // packMats keyed by pack, built once and reused for every marsh room this
+  // instance draws (see marshMaterial). Never touched by any other variant.
+  private marshWallMats = new Map<Pack, THREE.Material>();
+  private marshFloorMats = new Map<Pack, THREE.Material>();
   private waterMat: THREE.ShaderMaterial | null = null;
   private arenaHideables: ArenaHideable[] = [];
 
@@ -679,7 +698,7 @@ export class DungeonInteriors {
       }
     }
 
-    this.emit(group, p);
+    this.emit(group, p, variant);
     if (arenaWalls) {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall);
     }
@@ -884,7 +903,31 @@ export class DungeonInteriors {
     return mat;
   }
 
-  private emit(group: THREE.Group, p: Placements): void {
+  // delve_marsh / delve_marsh_apse only: a tinted clone of the shared pack
+  // material (never the source, never this.material(pack)'s own instance) so
+  // the Drowned Litany's wall/pillar/floor stone reads as wet mossy rock and
+  // dark peat instead of the same crypt-stone grey every other interior uses.
+  // Cached per pack + surface (wall vs floor), built once per DungeonInteriors
+  // instance and reused for every marsh room, never cloned per room or mesh.
+  private marshMaterial(pack: Pack, surface: 'wall' | 'floor'): THREE.Material {
+    const cache = surface === 'wall' ? this.marshWallMats : this.marshFloorMats;
+    let mat = cache.get(pack);
+    if (mat) return mat;
+    // this.material(pack) is itself already a clone of the immutable GLB cache
+    // source (see material() above); clone again so the marsh tint never
+    // mutates the shared pack material every other variant instances from.
+    const base = this.material(pack).clone() as
+      | THREE.MeshLambertMaterial
+      | THREE.MeshStandardMaterial;
+    base.color.multiply(new THREE.Color(surface === 'wall' ? MARSH_WALL_TINT : MARSH_FLOOR_TINT));
+    if (base instanceof THREE.MeshStandardMaterial) base.roughness = Math.max(base.roughness, 0.92);
+    mat = base;
+    cache.set(pack, mat);
+    return mat;
+  }
+
+  private emit(group: THREE.Group, p: Placements, variant: Variant): void {
+    const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, mats] of p.byKind) {
       const asset = moduleAssets.get(kind);
       if (!asset) {
@@ -892,7 +935,13 @@ export class DungeonInteriors {
         console.warn(`dungeon: unknown module kind '${kind}'`);
         continue;
       }
-      const mesh = new THREE.InstancedMesh(asset.geo, this.material(asset.pack), mats.length);
+      // Marsh wall/pillar/floor stone gets a wet-mossy / peat tint (see
+      // marshMaterial); every other kind (banners, torches, props) and every
+      // other variant keep the plain shared pack material unchanged.
+      let mat = this.material(asset.pack);
+      if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
+      else if (isMarsh && RECEIVER_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'floor');
+      const mesh = new THREE.InstancedMesh(asset.geo, mat, mats.length);
       for (let i = 0; i < mats.length; i++) mesh.setMatrixAt(i, mats[i]);
       mesh.instanceMatrix.needsUpdate = true;
       mesh.computeBoundingSphere();
@@ -1094,19 +1143,28 @@ export class DungeonInteriors {
     // Default the floor to the inner wall face so wider rooms (delve |x|=25)
     // are not left with a bare strip between the aisle floor and the side walls.
     const floorHalfX = layout.floorHalfX ?? (layout.wallX ?? DUNGEON_WALL_X) - 1;
+    const poly = layout.shellPolygon;
     for (let z = layout.zMin - 2; z <= layout.zMax + 2; z += FLOOR_CELL) {
       for (let x = -floorHalfX; x <= floorHalfX; x += FLOOR_CELL) {
+        // Polygon shell: mask the rectangular grid down to the authored room
+        // outline (same grid stepping and tile-kind logic, just skip cells
+        // whose own center falls outside the polygon). Boundary tiles will
+        // stair-step; accepted for this kit.
+        if (poly && !polygonContainsPoint(poly, x, z)) continue;
         let kind = this.floorKind(variant, hash2(x * 1.31, z));
         if (kind === 'grate' && Math.abs(x) < 4) kind = 'floor_tile_large'; // keep pits off the walk aisle
         if (kind === 'grate') {
-          // floor_tile_grate is 4x2: a pair fills the cell
-          p.add('floor_tile_grate', x, FLOOR_Y, z - 1);
-          p.add('floor_tile_grate', x, FLOOR_Y, z + 1);
+          // floor_tile_grate is 4x2: a pair fills the cell, test each half's own center
+          if (!poly || polygonContainsPoint(poly, x, z - 1))
+            p.add('floor_tile_grate', x, FLOOR_Y, z - 1);
+          if (!poly || polygonContainsPoint(poly, x, z + 1))
+            p.add('floor_tile_grate', x, FLOOR_Y, z + 1);
           continue;
         }
         if (kind === 'quad') {
           for (const dx of [-1, 1]) {
             for (const dz of [-1, 1]) {
+              if (poly && !polygonContainsPoint(poly, x + dx, z + dz)) continue;
               const sub = this.floorQuadKind(variant, hash2(x + dx, z + dz));
               const rot = Math.floor(hash2(z + dz, x + dx) * 4) * quarter;
               p.add(sub, x + dx, FLOOR_Y, z + dz, rot);
@@ -1242,6 +1300,10 @@ export class DungeonInteriors {
     variant: Variant,
     arenaWalls?: PendingArenaWalls,
   ): void {
+    if (layout.shellPolygon) {
+      this.placePolygonWalls(p, layout.shellPolygon, variant);
+      return;
+    }
     const bannerEvery = variant === 'crypt' ? 4 : 3;
     const wallX = layout.wallX ?? DUNGEON_WALL_X;
     const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
@@ -1293,6 +1355,48 @@ export class DungeonInteriors {
         Math.PI,
         MODULE_SCALE,
       );
+    }
+  }
+
+  // Polygon-shell wall path: walks each authored boundary edge and places
+  // fixed-pitch wall modules along it (same ~8u module pitch and variant-keyed
+  // wallKind/banner logic as the rectangular loop above), rotated to run along
+  // the edge. This covers the end faces too (the polygon already closes the
+  // room), so there is no separate end-cap pass and no door gap (Drowned
+  // Litany rooms are teleport-in, matching the sim shell colliders built by
+  // polygonShellColliders in sim/delve_litany_layout.ts). Rotation uses the
+  // SAME rot = atan2(-edgeDz, edgeDx) convention as that sim helper (and the
+  // fence OBBs in sim/colliders.ts): it aligns the OBB/module's local +x
+  // (world (cos(rot), -sin(rot)) under Three's Y-Euler) along the edge
+  // direction, which reproduces the existing side-wall ry for the west/east
+  // straight edges (see report for the verification walkthrough).
+  private placePolygonWalls(
+    p: Placements,
+    points: ReadonlyArray<{ x: number; z: number }>,
+    variant: Variant,
+  ): void {
+    const bannerEvery = variant === 'crypt' ? 4 : 3;
+    const n = points.length;
+    let i = 0;
+    for (let e = 0; e < n; e++) {
+      const a = points[e];
+      const b = points[(e + 1) % n];
+      const dx = b.x - a.x;
+      const dz = b.z - a.z;
+      const len = Math.hypot(dx, dz);
+      if (len < 1e-6) continue;
+      const rot = Math.atan2(-dz, dx);
+      const count = Math.max(1, Math.round(len / 8));
+      for (let s = 0; s < count; s++, i++) {
+        const t = (s + 0.5) / count;
+        const x = a.x + dx * t;
+        const z = a.z + dz * t;
+        const kind = this.wallKind(variant, hash2(x * 13.7, z));
+        p.add(kind, x, 0, z, rot, MODULE_SCALE);
+        if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+          p.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
+        }
+      }
     }
   }
 
@@ -1717,13 +1821,22 @@ export class DungeonInteriors {
         p.add('shrine', edge, 0, layout.zMax - 6, -Math.PI / 2, 1.5);
         return;
       }
-      // delve_finale: bell-chamber trophies and the boss's reliquary hoard south
+      // delve_finale / delve_marsh_apse: bell-chamber trophies and the boss's
+      // reliquary hoard south. delve_marsh_apse is a litany room (polygon
+      // shell), so hug the polygon edge instead of the constant wallX band
+      // when one is authored.
+      const shellPolygon = layout.shellPolygon;
+      const edgeAt = (z: number, side: -1 | 1): number => {
+        if (!shellPolygon) return side * edge;
+        const x = polygonXAtZ(shellPolygon, z, side);
+        return x === null ? side * edge : x - side * 1.6;
+      };
       for (let z = layout.zMin + 14; z < layout.dais.z - 16; z += 20) {
-        for (const side of [-1, 1]) {
+        for (const side of [-1, 1] as const) {
           const r = hash2(side * 9.2, z);
           p.add(
             r < 0.5 ? 'ribcage' : 'gravestone',
-            side * edge,
+            edgeAt(z, side),
             0,
             z,
             side < 0 ? Math.PI / 2 : -Math.PI / 2,
@@ -1731,8 +1844,9 @@ export class DungeonInteriors {
           );
         }
       }
-      p.add('shrine_candles', -edge, 0, layout.dais.z - 4, Math.PI / 2, 1.5);
-      p.add('shrine_candles', edge, 0, layout.dais.z - 4, -Math.PI / 2, 1.5);
+      const daisZ = layout.dais.z - 4;
+      p.add('shrine_candles', edgeAt(daisZ, -1), 0, daisZ, Math.PI / 2, 1.5);
+      p.add('shrine_candles', edgeAt(daisZ, 1), 0, daisZ, -Math.PI / 2, 1.5);
       return;
     }
 

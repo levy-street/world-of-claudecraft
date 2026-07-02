@@ -2758,5 +2758,5 @@ export const ZONE3_PROPS: ZonePropsDef = {
     { x: 138, z: 838 },
     { x: -139, z: 787 },
   ],
-  delveMarkers: [{ x: 8, z: 268, delveId: 'drowned_litany' }],
+  delveMarkers: [{ x: 70, z: 530, delveId: 'drowned_litany' }],
 };

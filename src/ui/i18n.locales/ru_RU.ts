@@ -5137,8 +5137,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveRiteUi.closeAria': 'Закрыть',
   'delveUi.board.openDelveLitany': 'Утонувшая Литания',
   'delveUi.board.companion.edda': 'Эдда Тростниковая Рука',
-  'delveUi.npc.aldric.greeting':
-    'Фенбридж теперь слышит колокола под водой, {playerName}. Могилопризыватели учат утопленников петь. Выбери свой уровень, и я буду держать верёвку, пока ты не вернёшься.',
+  'delveUi.npc.halvenMarsh.greeting':
+    'Тропа вела на север, к топи, {playerName}. Ещё один реликварий поёт под чёрной водой, и утопшие мертвецы отвечают колоколам. Послушница Эдда знает эти тростники лучше меня, держись поближе к её фонарю. Выбери свой уровень, и я буду держать верёвку, пока ты не вернёшься.',
   'delveUi.intro.litanyNormal':
     'Заросшие тростником ступени уходят под Фенбридж. Эдда Тростниковая Рука поднимает свой фонарь. "Болото помнит имя каждого, кого оно утопило, {playerName}. Держись света."',
   'delveUi.intro.litanyHeroic':
@@ -5195,6 +5195,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.blackwater_vanguard_chest.name': 'Нагрудник Авангарда Чёрных Вод',
   'entities.items.siltstep_leggings.name': 'Поножи Илистой Поступи',
   'entities.items.sunken_reliquary_hood.name': 'Капюшон Затонувшего Реликвария',
+  'entities.items.litany_legs.name': 'Поножи Илоброда',
+  'entities.items.litany_shoulder.name': 'Мантия Черноводного Дрейфа',
+  'entities.items.litany_gloves_rog.name': 'Тростниковые Обмотки',
+  'entities.items.litany_plate_chest.name': 'Кираса Стража Топи',
+  'entities.items.litany_leather_chest.name': 'Одеяние Глубокой Тины',
+  'entities.items.litany_cloth_chest.name': 'Одеяние Утопшего Хора',
+  'entities.items.litany_helm.name': 'Капюшон Утопшего Реликвария',
+  'entities.items.sister_nhalia_choir_plate.name': 'Хоровая Кованая Броня Сестры Нхалии',
+  'entities.items.drowned_choir_fang.name': 'Клык Утопшего Хора',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -5205,12 +5214,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': 'Сестра Нхалия, Утонувшая Песнь',
   'entities.mobs.edda_reedhand.name': 'Эдда Тростниковая Рука',
   'entities.mobs.tolling_bell.name': 'Звонящий Колокол',
-  'entities.npcs.brother_aldric_watch.name': 'Брат Алдрик',
-  'entities.npcs.brother_aldric_watch.title': 'Дозор Фенбриджа',
-  'entities.npcs.brother_aldric_watch.greeting':
-    'Фенбридж теперь слышит колокола под водой. Могилопризыватели учат утопленников петь. Выбери свой уровень, и я буду держать верёвку, пока ты не вернёшься.',
+  'entities.npcs.brother_halven_marsh.name': 'Брат Хальвен',
+  'entities.npcs.brother_halven_marsh.title': 'Хранитель Реликвария',
+  'entities.npcs.brother_halven_marsh.greeting':
+    'Тропа вела на север. Ещё один реликварий, ещё один обряд. Выбирай уровень, и я буду держать верёвку, пока ты не вернёшься.',
   'entities.delves.drowned_litany.name': 'Утонувшая Литания',
-  'entities.delves.drowned_litany.enterText': 'Вы спускаетесь под Фенбридж, в утонувшее святилище.',
+  'entities.delves.drowned_litany.enterText': 'Вы спускаетесь в утонувшее святилище на краю топи.',
   'entities.delves.drowned_litany.leaveText':
-    'Вы поднимаетесь обратно на дамбу Фенбриджа, к брату Алдрику.',
+    'Вы поднимаетесь обратно к брату Хальвену на краю топи.',
 };

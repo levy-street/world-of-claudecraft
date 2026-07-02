@@ -5021,8 +5021,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveRiteUi.closeAria': '閉じる',
   'delveUi.board.openDelveLitany': '溺れし連祷',
   'delveUi.board.companion.edda': 'エッダ・リードハンド',
-  'delveUi.npc.aldric.greeting':
-    'フェンブリッジは今、水の底で鐘の音を聞く、{playerName}。墓呼びたちは溺れし者に歌を教えている。難易度を選べ、お前が戻るまで縄を握っていよう。',
+  'delveUi.npc.halvenMarsh.greeting':
+    '道は北の沼地へ続いていた、{playerName}。また聖遺物庫が黒い水の底で歌い、溺れし死者が鐘に応える。信徒エッダはこの葦のことを私よりよく知っている、彼女の灯りのそばを離れるな。難易度を選べ、お前が戻るまで縄を握っていよう。',
   'delveUi.intro.litanyNormal':
     '葦に埋もれた階段がフェンブリッジの下へと落ちていく。エッダ・リードハンドがランタンを掲げる。「沼は溺れさせた者たちの名をすべて覚えている、{playerName}。光の中にいなさい。」',
   'delveUi.intro.litanyHeroic':
@@ -5074,6 +5074,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.blackwater_vanguard_chest.name': '黒水先鋒の胸当て',
   'entities.items.siltstep_leggings.name': '泥歩の脚甲',
   'entities.items.sunken_reliquary_hood.name': '沈める聖遺物のフード',
+  'entities.items.litany_legs.name': '泥歩きの脛当て',
+  'entities.items.litany_shoulder.name': '黒水漂流のマント',
+  'entities.items.litany_gloves_rog.name': '葦縛りの手甲',
+  'entities.items.litany_plate_chest.name': '沼番の胸当て',
+  'entities.items.litany_leather_chest.name': '深淤の胴着',
+  'entities.items.litany_cloth_chest.name': '聖歌隊溺れのローブ',
+  'entities.items.litany_helm.name': '聖遺物狩人の溺れずきん',
+  'entities.items.sister_nhalia_choir_plate.name': 'ナリア修道女の聖歌鍛造鎧',
+  'entities.items.drowned_choir_fang.name': '溺れた聖歌の牙',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -5084,13 +5093,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '修道女ナリア、溺れし聖歌',
   'entities.mobs.edda_reedhand.name': 'エッダ・リードハンド',
   'entities.mobs.tolling_bell.name': '鳴り響く鐘',
-  'entities.npcs.brother_aldric_watch.name': '修道士アルドリック',
-  'entities.npcs.brother_aldric_watch.title': 'フェンブリッジ番人',
-  'entities.npcs.brother_aldric_watch.greeting':
-    'フェンブリッジは今、水の底で鐘の音を聞く。墓呼びたちは溺れし者に歌を教えている。難易度を選べ、お前が戻るまで縄を握っていよう。',
+  'entities.npcs.brother_halven_marsh.name': 'ハルヴェン修道士',
+  'entities.npcs.brother_halven_marsh.title': '聖遺物庫の番人',
+  'entities.npcs.brother_halven_marsh.greeting':
+    '道は北へ続いていた。また聖遺物庫、また儀式。難易度を選べ、お前が戻るまで縄を握っていよう。',
   'entities.delves.drowned_litany.name': '溺れし連祷',
   'entities.delves.drowned_litany.enterText':
-    'あなたはフェンブリッジの下へ、溺れし神殿へと降りていく。',
+    'あなたは沼地の果てへ、溺れし神殿へと降りていく。',
   'entities.delves.drowned_litany.leaveText':
-    'あなたはフェンブリッジの土手道を登り、アルドリック修道士のもとへ戻る。',
+    'あなたは沼地の果てへ登り、ハルヴェン修道士のもとへ戻る。',
 };
