@@ -229,6 +229,7 @@ import * as duelMod from './social/duel';
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
 export { eloDelta } from './social/arena';
 
+import { isPlayerRace } from './content/races';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
 // by the fiestaMatchInfo presentation accessor (which STAYS on Sim).
@@ -308,7 +309,6 @@ import {
   virtualLevel,
   xpToReachLevel,
 } from './types';
-import { isPlayerRace } from './content/races';
 import { warZonePvpHostile } from './war_zone';
 import { groundHeight, WATER_LEVEL } from './world';
 

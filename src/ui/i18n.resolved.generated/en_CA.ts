@@ -4918,7 +4918,7 @@ export const en_CA: EnTranslations = {
         "name": "Pelt of the Emberjaw Matriarch"
       },
       "karns_funeral_mask": {
-        "name": "Qesh Flatbread"
+        "name": "Karn's Funeral Mask"
       },
       "qesh_flatbread": {
         "name": "Qesh Flatbread"
@@ -5017,7 +5017,7 @@ export const en_CA: EnTranslations = {
         "name": "Pelt of Palefang the Silent"
       },
       "grelnoks_frozen_idol": {
-        "name": "Nighthollow Black Bread"
+        "name": "Grelnok's Frozen Idol"
       },
       "nighthollow_black_bread": {
         "name": "Nighthollow Black Bread"
@@ -5131,7 +5131,7 @@ export const en_CA: EnTranslations = {
         "name": "Pelt of the Hoarfang Alpha"
       },
       "kazriks_brass_whistle": {
-        "name": "Kaelspire Barley Loaf"
+        "name": "Kazrik's Brass Whistle"
       },
       "kaelspire_barley_loaf": {
         "name": "Kaelspire Barley Loaf"
@@ -5143,7 +5143,7 @@ export const en_CA: EnTranslations = {
         "name": "Imperial Field Ration"
       },
       "imperial_clerks_robe": {
-        "name": "Kael Infantry Hauberk"
+        "name": "Imperial Clerk's Robe"
       },
       "kael_infantry_hauberk": {
         "name": "Kael Infantry Hauberk"
@@ -5167,10 +5167,10 @@ export const en_CA: EnTranslations = {
         "name": "Wolfsward Skinner"
       },
       "prefects_sealed_mantle": {
-        "name": "Hoarfang Clawgrips"
+        "name": "Prefect's Sealed Mantle"
       },
       "huntmasters_winter_hood": {
-        "name": "Hoarfang Clawgrips"
+        "name": "Huntmaster's Winter Hood"
       },
       "hoarfang_clawgrips": {
         "name": "Hoarfang Clawgrips"
@@ -5221,7 +5221,7 @@ export const en_CA: EnTranslations = {
         "name": "Underway Hardtack"
       },
       "smugglers_black_brew": {
-        "name": "Thornberry Loaf"
+        "name": "Smuggler's Black Brew"
       },
       "thornberry_loaf": {
         "name": "Thornberry Loaf"
@@ -5248,13 +5248,13 @@ export const en_CA: EnTranslations = {
         "name": "Nameless River Water"
       },
       "smuggler_kings_softsteps": {
-        "name": "Briarfather Bark Mitts"
+        "name": "Smuggler King's Softsteps"
       },
       "briarfather_bark_mitts": {
         "name": "Briarfather Bark Mitts"
       },
       "skarns_war_harness": {
-        "name": "Mireheart Girdle"
+        "name": "Skarn's War Harness"
       },
       "colossus_mireheart_girdle": {
         "name": "Mireheart Girdle"
@@ -5344,7 +5344,7 @@ export const en_CA: EnTranslations = {
         "name": "Marrowhide Leggings"
       },
       "scavenger_kings_shiv": {
-        "name": "Forge-Wyrm Scale Helm"
+        "name": "Scavenger King's Shiv"
       },
       "forgewyrm_scale_helm": {
         "name": "Forge-Wyrm Scale Helm"

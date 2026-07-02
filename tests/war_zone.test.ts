@@ -75,13 +75,17 @@ describe('war zone hostility through the sim choke point', () => {
     expect(sim.isHostileTo(ea, eb)).toBe(true);
     expect(sim.isHostileTo(eb, ea)).toBe(true);
     // and never heal-able
-    expect((sim as unknown as { isFriendlyTo(a: Entity, b: Entity): boolean }).isFriendlyTo(ea, eb)).toBe(false);
+    expect(
+      (sim as unknown as { isFriendlyTo(a: Entity, b: Entity): boolean }).isFriendlyTo(ea, eb),
+    ).toBe(false);
   });
 
   it('same-faction players stay friendly inside the breach', () => {
     const { sim, ea, eb } = pairInBreach('human', 'dwarf');
     expect(sim.isHostileTo(ea, eb)).toBe(false);
-    expect((sim as unknown as { isFriendlyTo(a: Entity, b: Entity): boolean }).isFriendlyTo(ea, eb)).toBe(true);
+    expect(
+      (sim as unknown as { isFriendlyTo(a: Entity, b: Entity): boolean }).isFriendlyTo(ea, eb),
+    ).toBe(true);
   });
 
   it('cross-faction players are NOT hostile outside the breach', () => {

@@ -8,9 +8,16 @@
 import type { BiomeId } from '../sim/types';
 
 export type MusicZone =
-  | 'town_eastbrook' | 'town_fenbridge' | 'town_highwatch'
-  | 'vale' | 'vale_legacy' | 'marsh' | 'peaks'
-  | 'dungeon_hollow_crypt' | 'dungeon_sunken_bastion' | 'dungeon_gravewyrm_sanctum';
+  | 'town_eastbrook'
+  | 'town_fenbridge'
+  | 'town_highwatch'
+  | 'vale'
+  | 'vale_legacy'
+  | 'marsh'
+  | 'peaks'
+  | 'dungeon_hollow_crypt'
+  | 'dungeon_sunken_bastion'
+  | 'dungeon_gravewyrm_sanctum';
 
 const TOWN_MUSIC: Record<string, MusicZone> = {
   eastbrook_vale: 'town_eastbrook',
@@ -32,7 +39,10 @@ export function dungeonMusicZoneForDungeon(dungeonId: string): MusicZone {
   return DUNGEON_MUSIC[dungeonId] ?? 'dungeon_hollow_crypt';
 }
 
-export function shouldResetMusicForDungeonEntry(previousDungeonId: string | null, nextDungeonId: string | null): boolean {
+export function shouldResetMusicForDungeonEntry(
+  previousDungeonId: string | null,
+  nextDungeonId: string | null,
+): boolean {
   return nextDungeonId !== null && previousDungeonId !== nextDungeonId;
 }
 
@@ -63,9 +73,26 @@ export function musicZoneForLocation(
   return ZONE_MUSIC[zoneId] ?? BIOME_THEME[biome];
 }
 
-type Inst = 'strings' | 'flute' | 'harp' | 'horn' | 'choir' | 'bell' | 'timpani' | 'bass' | 'stacc' | 'pad'
-  | 'lute' | 'dulcimer' | 'frameDrum' | 'warDrum' | 'reed' | 'pipe'
-  | 'squareLead' | 'woodBlock' | 'tinyBell';
+type Inst =
+  | 'strings'
+  | 'flute'
+  | 'harp'
+  | 'horn'
+  | 'choir'
+  | 'bell'
+  | 'timpani'
+  | 'bass'
+  | 'stacc'
+  | 'pad'
+  | 'lute'
+  | 'dulcimer'
+  | 'frameDrum'
+  | 'warDrum'
+  | 'reed'
+  | 'pipe'
+  | 'squareLead'
+  | 'woodBlock'
+  | 'tinyBell';
 
 interface NoteEvent {
   beat: number; // quarter-note position in the loop
@@ -91,7 +118,7 @@ interface Layer {
   transpose: number;
 }
 
-const mtof = (m: number): number => 440 * Math.pow(2, (m - 69) / 12);
+const mtof = (m: number): number => 440 * 2 ** ((m - 69) / 12);
 
 // ---------------------------------------------------------------------------
 // Composition helpers
@@ -106,14 +133,27 @@ function triad(c: ChordDef): number[] {
   return [c.root, c.root + (c.minor ? 3 : 4), c.root + 7];
 }
 
-function pushNote(out: NoteEvent[], beat: number, midi: number, dur: number, vel: number, inst: Inst): void {
+function pushNote(
+  out: NoteEvent[],
+  beat: number,
+  midi: number,
+  dur: number,
+  vel: number,
+  inst: Inst,
+): void {
   out.push({ beat, midi, dur, vel, inst });
 }
 
 // melody phrases written as [beatOffset, midi, durBeats]
 type Phrase = [number, number, number][];
 
-function pushPhrase(out: NoteEvent[], startBeat: number, phrase: Phrase, vel: number, inst: Inst): void {
+function pushPhrase(
+  out: NoteEvent[],
+  startBeat: number,
+  phrase: Phrase,
+  vel: number,
+  inst: Inst,
+): void {
   for (const [b, m, d] of phrase) pushNote(out, startBeat + b, m, d, vel, inst);
 }
 
@@ -124,15 +164,18 @@ function pushPhrase(out: NoteEvent[], startBeat: number, phrase: Phrase, vel: nu
 function composeTownEastbrook(): Theme {
   const ev: NoteEvent[] = [];
   // D major, warm and pastoral
-  const D = { root: 62 }, A = { root: 57 }, Bm = { root: 59, minor: true };
-  const G = { root: 55 }, F$m = { root: 54, minor: true };
+  const D = { root: 62 },
+    A = { root: 57 },
+    Bm = { root: 59, minor: true };
+  const G = { root: 55 },
+    F$m = { root: 54, minor: true };
   const chords: ChordDef[] = [D, A, Bm, G, D, G, A, D, D, F$m, G, D, Bm, G, A, D];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
     const t = triad(c);
     // string pad: whole-bar triad, octave below
-    for (const n of t) pushNote(ev, b0, n - 12, 4.05, 0.30, 'strings');
+    for (const n of t) pushNote(ev, b0, n - 12, 4.05, 0.3, 'strings');
     // cello bass: root on 1 and 3
     pushNote(ev, b0, c.root - 24, 1.8, 0.5, 'bass');
     pushNote(ev, b0 + 2, c.root - 24, 1.8, 0.42, 'bass');
@@ -148,22 +191,55 @@ function composeTownEastbrook(): Theme {
 
   // flute melody (two 8-bar phrases)
   const phraseA: Phrase = [
-    [0, 69, 1], [1, 74, 1], [2, 76, 1], [3, 78, 1],
-    [4, 78, 1.5], [5.5, 76, 0.5], [6, 74, 2],
-    [8, 76, 1], [9, 78, 1], [10, 79, 1], [11, 78, 1],
+    [0, 69, 1],
+    [1, 74, 1],
+    [2, 76, 1],
+    [3, 78, 1],
+    [4, 78, 1.5],
+    [5.5, 76, 0.5],
+    [6, 74, 2],
+    [8, 76, 1],
+    [9, 78, 1],
+    [10, 79, 1],
+    [11, 78, 1],
     [12, 76, 3],
-    [16, 74, 1], [17, 78, 1], [18, 81, 1.5], [19.5, 79, 0.5],
-    [20, 78, 1.5], [21.5, 76, 0.5], [22, 74, 1], [23, 76, 1],
-    [24, 78, 2], [26, 76, 2], [28, 74, 3],
+    [16, 74, 1],
+    [17, 78, 1],
+    [18, 81, 1.5],
+    [19.5, 79, 0.5],
+    [20, 78, 1.5],
+    [21.5, 76, 0.5],
+    [22, 74, 1],
+    [23, 76, 1],
+    [24, 78, 2],
+    [26, 76, 2],
+    [28, 74, 3],
   ];
   const phraseB: Phrase = [
-    [0, 81, 1], [1, 78, 1], [2, 79, 1], [3, 81, 1],
-    [4, 83, 1.5], [5.5, 81, 0.5], [6, 79, 1], [7, 78, 1],
-    [8, 79, 1], [9, 78, 1], [10, 76, 1], [11, 79, 1],
+    [0, 81, 1],
+    [1, 78, 1],
+    [2, 79, 1],
+    [3, 81, 1],
+    [4, 83, 1.5],
+    [5.5, 81, 0.5],
+    [6, 79, 1],
+    [7, 78, 1],
+    [8, 79, 1],
+    [9, 78, 1],
+    [10, 76, 1],
+    [11, 79, 1],
     [12, 78, 3],
-    [16, 71, 1], [17, 74, 1], [18, 78, 1], [19, 81, 1],
-    [20, 79, 1.5], [21.5, 78, 0.5], [22, 76, 1], [23, 79, 1],
-    [24, 78, 2], [26, 76, 2], [28, 74, 4],
+    [16, 71, 1],
+    [17, 74, 1],
+    [18, 78, 1],
+    [19, 81, 1],
+    [20, 79, 1.5],
+    [21.5, 78, 0.5],
+    [22, 76, 1],
+    [23, 79, 1],
+    [24, 78, 2],
+    [26, 76, 2],
+    [28, 74, 4],
   ];
   pushPhrase(ev, 0, phraseA, 0.34, 'flute');
   pushPhrase(ev, 32, phraseB, 0.34, 'flute');
@@ -172,12 +248,29 @@ function composeTownEastbrook(): Theme {
   return { bpm: 80, bars: 16, events: ev };
 }
 
-function pushRepeated(out: NoteEvent[], startBeat: number, notes: number[], step: number, dur: number, vel: number, inst: Inst): void {
+function pushRepeated(
+  out: NoteEvent[],
+  startBeat: number,
+  notes: number[],
+  step: number,
+  dur: number,
+  vel: number,
+  inst: Inst,
+): void {
   notes.forEach((m, i) => pushNote(out, startBeat + i * step, m, dur, vel, inst));
 }
 
-function pushDrumHits(out: NoteEvent[], startBeat: number, offsets: number[], inst: Inst, vel: number, midi = 42): void {
-  offsets.forEach((b, i) => pushNote(out, startBeat + b, midi, 0.22, vel * (i % 2 === 0 ? 1 : 0.78), inst));
+function pushDrumHits(
+  out: NoteEvent[],
+  startBeat: number,
+  offsets: number[],
+  inst: Inst,
+  vel: number,
+  midi = 42,
+): void {
+  offsets.forEach((b, i) =>
+    pushNote(out, startBeat + b, midi, 0.22, vel * (i % 2 === 0 ? 1 : 0.78), inst),
+  );
 }
 
 function pushPedal(out: NoteEvent[], beat: number, root: number, inst: Inst, vel: number): void {
@@ -190,7 +283,11 @@ function composeTownFenbridge(): Theme {
   // F mixolydian market-town: deliberate old-school medieval MIDI flavor.
   // The lead is original, short, and hooky; the accompaniment leans lute,
   // dulcimer, frame drum, and square/reed color rather than orchestral wash.
-  const F = { root: 65 }, Eb = { root: 63 }, Bb = { root: 58 }, C = { root: 60 }, Dm = { root: 62, minor: true };
+  const F = { root: 65 },
+    Eb = { root: 63 },
+    Bb = { root: 58 },
+    C = { root: 60 },
+    Dm = { root: 62, minor: true };
   const chords: ChordDef[] = [F, Eb, Bb, F, Dm, Bb, C, F, F, Bb, Eb, F, Dm, C, Bb, F];
 
   chords.forEach((c, bar) => {
@@ -214,19 +311,65 @@ function composeTownFenbridge(): Theme {
   });
 
   const hookA: Phrase = [
-    [0, 77, 0.5], [0.5, 75, 0.5], [1, 72, 1], [2, 70, 0.5], [2.5, 72, 0.5], [3, 75, 1],
-    [4, 77, 0.5], [4.5, 80, 0.5], [5, 79, 1], [6, 75, 0.5], [6.5, 72, 0.5], [7, 70, 1],
-    [8, 72, 0.5], [8.5, 75, 0.5], [9, 77, 1], [10, 80, 0.5], [10.5, 79, 0.5], [11, 77, 1],
-    [12, 75, 0.5], [12.5, 72, 0.5], [13, 70, 1], [14, 72, 0.5], [14.5, 75, 0.5], [15, 77, 1],
+    [0, 77, 0.5],
+    [0.5, 75, 0.5],
+    [1, 72, 1],
+    [2, 70, 0.5],
+    [2.5, 72, 0.5],
+    [3, 75, 1],
+    [4, 77, 0.5],
+    [4.5, 80, 0.5],
+    [5, 79, 1],
+    [6, 75, 0.5],
+    [6.5, 72, 0.5],
+    [7, 70, 1],
+    [8, 72, 0.5],
+    [8.5, 75, 0.5],
+    [9, 77, 1],
+    [10, 80, 0.5],
+    [10.5, 79, 0.5],
+    [11, 77, 1],
+    [12, 75, 0.5],
+    [12.5, 72, 0.5],
+    [13, 70, 1],
+    [14, 72, 0.5],
+    [14.5, 75, 0.5],
+    [15, 77, 1],
   ];
   const hookB: Phrase = [
-    [0, 84, 0.5], [0.5, 82, 0.5], [1, 80, 0.5], [1.5, 77, 0.5], [2, 75, 1], [3, 77, 1],
-    [4, 80, 0.5], [4.5, 79, 0.5], [5, 77, 1], [6, 75, 0.5], [6.5, 72, 0.5], [7, 75, 1],
-    [8, 77, 0.5], [8.5, 80, 0.5], [9, 82, 0.5], [9.5, 84, 0.5], [10, 82, 1], [11, 79, 1],
-    [12, 80, 0.5], [12.5, 77, 0.5], [13, 75, 1], [14, 72, 0.5], [14.5, 75, 0.5], [15, 77, 1],
+    [0, 84, 0.5],
+    [0.5, 82, 0.5],
+    [1, 80, 0.5],
+    [1.5, 77, 0.5],
+    [2, 75, 1],
+    [3, 77, 1],
+    [4, 80, 0.5],
+    [4.5, 79, 0.5],
+    [5, 77, 1],
+    [6, 75, 0.5],
+    [6.5, 72, 0.5],
+    [7, 75, 1],
+    [8, 77, 0.5],
+    [8.5, 80, 0.5],
+    [9, 82, 0.5],
+    [9.5, 84, 0.5],
+    [10, 82, 1],
+    [11, 79, 1],
+    [12, 80, 0.5],
+    [12.5, 77, 0.5],
+    [13, 75, 1],
+    [14, 72, 0.5],
+    [14.5, 75, 0.5],
+    [15, 77, 1],
   ];
   pushPhrase(ev, 0, hookA, 0.18, 'pipe');
-  pushPhrase(ev, 16, hookA.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]), 0.12, 'reed');
+  pushPhrase(
+    ev,
+    16,
+    hookA.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]),
+    0.12,
+    'reed',
+  );
   pushPhrase(ev, 32, hookB, 0.18, 'squareLead');
   pushPhrase(ev, 48, hookA, 0.14, 'pipe');
 
@@ -238,8 +381,12 @@ function composeTownHighwatch(): Theme {
   const ev: NoteEvent[] = [];
   // B minor highland watch post: faster medieval march with pipe/reed hooks,
   // blocky harmony, and field percussion instead of a slow cinematic cue.
-  const Bm = { root: 59, minor: true }, G = { root: 55 }, A = { root: 57 }, D = { root: 62 };
-  const Em = { root: 52, minor: true }, Fsm = { root: 54, minor: true };
+  const Bm = { root: 59, minor: true },
+    G = { root: 55 },
+    A = { root: 57 },
+    D = { root: 62 };
+  const Em = { root: 52, minor: true },
+    Fsm = { root: 54, minor: true };
   const chords: ChordDef[] = [Bm, G, A, Bm, D, A, Em, Fsm, Bm, G, D, A, Em, G, Fsm, Bm];
 
   chords.forEach((c, bar) => {
@@ -248,7 +395,7 @@ function composeTownHighwatch(): Theme {
     pushPedal(ev, b0, c.root, 'strings', 0.15);
     if (bar % 2 === 0) {
       pushNote(ev, b0, c.root - 12, 2.8, 0.14, 'horn');
-      pushNote(ev, b0 + 0.03, c.root - 5, 2.8, 0.10, 'horn');
+      pushNote(ev, b0 + 0.03, c.root - 5, 2.8, 0.1, 'horn');
     }
     pushNote(ev, b0, c.root - 24, 1.2, 0.42, 'bass');
     pushNote(ev, b0 + 1.5, c.root - 17, 0.9, 0.28, 'bass');
@@ -261,16 +408,55 @@ function composeTownHighwatch(): Theme {
   });
 
   const pipes: Phrase = [
-    [0, 74, 0.5], [0.5, 76, 0.5], [1, 78, 1], [2, 76, 0.5], [2.5, 74, 0.5], [3, 71, 1],
-    [4, 74, 0.5], [4.5, 78, 0.5], [5, 81, 1], [6, 79, 0.5], [6.5, 78, 0.5], [7, 76, 1],
-    [8, 78, 0.5], [8.5, 81, 0.5], [9, 83, 1], [10, 81, 0.5], [10.5, 78, 0.5], [11, 76, 1],
-    [12, 74, 0.5], [12.5, 76, 0.5], [13, 78, 1], [14, 76, 0.5], [14.5, 74, 0.5], [15, 71, 1],
+    [0, 74, 0.5],
+    [0.5, 76, 0.5],
+    [1, 78, 1],
+    [2, 76, 0.5],
+    [2.5, 74, 0.5],
+    [3, 71, 1],
+    [4, 74, 0.5],
+    [4.5, 78, 0.5],
+    [5, 81, 1],
+    [6, 79, 0.5],
+    [6.5, 78, 0.5],
+    [7, 76, 1],
+    [8, 78, 0.5],
+    [8.5, 81, 0.5],
+    [9, 83, 1],
+    [10, 81, 0.5],
+    [10.5, 78, 0.5],
+    [11, 76, 1],
+    [12, 74, 0.5],
+    [12.5, 76, 0.5],
+    [13, 78, 1],
+    [14, 76, 0.5],
+    [14.5, 74, 0.5],
+    [15, 71, 1],
   ];
   const answer: Phrase = [
-    [0, 71, 1], [1, 74, 0.5], [1.5, 76, 0.5], [2, 78, 1], [3, 76, 1],
-    [4, 74, 0.5], [4.5, 71, 0.5], [5, 69, 1], [6, 71, 0.5], [6.5, 74, 0.5], [7, 76, 1],
-    [8, 78, 0.5], [8.5, 76, 0.5], [9, 74, 1], [10, 71, 0.5], [10.5, 69, 0.5], [11, 71, 1],
-    [12, 74, 0.5], [12.5, 76, 0.5], [13, 78, 1], [14, 76, 0.5], [14.5, 74, 0.5], [15, 71, 1],
+    [0, 71, 1],
+    [1, 74, 0.5],
+    [1.5, 76, 0.5],
+    [2, 78, 1],
+    [3, 76, 1],
+    [4, 74, 0.5],
+    [4.5, 71, 0.5],
+    [5, 69, 1],
+    [6, 71, 0.5],
+    [6.5, 74, 0.5],
+    [7, 76, 1],
+    [8, 78, 0.5],
+    [8.5, 76, 0.5],
+    [9, 74, 1],
+    [10, 71, 0.5],
+    [10.5, 69, 0.5],
+    [11, 71, 1],
+    [12, 74, 0.5],
+    [12.5, 76, 0.5],
+    [13, 78, 1],
+    [14, 76, 0.5],
+    [14.5, 74, 0.5],
+    [15, 71, 1],
   ];
   pushPhrase(ev, 0, pipes, 0.17, 'pipe');
   pushPhrase(ev, 16, answer, 0.15, 'reed');
@@ -284,7 +470,11 @@ function composeTownHighwatch(): Theme {
 function composeVale(): Theme {
   const ev: NoteEvent[] = [];
   // A dorian overworld: playful and looping, with sparse orchestral depth.
-  const Am = { root: 57, minor: true }, G = { root: 55 }, D = { root: 62 }, C = { root: 60 }, Em = { root: 52, minor: true };
+  const Am = { root: 57, minor: true },
+    G = { root: 55 },
+    D = { root: 62 },
+    C = { root: 60 },
+    Em = { root: 52, minor: true };
   const chords: ChordDef[] = [Am, G, D, Am, C, G, Em, Am, Am, C, D, G, Am, Em, G, Am];
 
   chords.forEach((c, bar) => {
@@ -292,27 +482,74 @@ function composeVale(): Theme {
     const t = triad(c);
     if (bar % 2 === 0) pushPedal(ev, b0, c.root, 'pad', 0.17);
     pushNote(ev, b0, c.root - 24, 1.5, 0.28, 'bass');
-    pushNote(ev, b0 + 2, c.root - 19, 1.2, 0.20, 'bass');
+    pushNote(ev, b0 + 2, c.root - 19, 1.2, 0.2, 'bass');
     const lilt = [t[0], t[2], t[1] + 12, t[2], t[0] + 12, t[2], t[1] + 12, t[2]];
     pushRepeated(ev, b0, lilt, 0.5, 0.24, 0.18, 'lute');
-    if (bar % 2 === 1) pushRepeated(ev, b0 + 0.25, [t[2] + 12, t[0] + 24, t[1] + 12], 1, 0.18, 0.12, 'dulcimer');
+    if (bar % 2 === 1)
+      pushRepeated(ev, b0 + 0.25, [t[2] + 12, t[0] + 24, t[1] + 12], 1, 0.18, 0.12, 'dulcimer');
     if (bar % 4 === 0 || bar % 4 === 2) pushDrumHits(ev, b0, [0, 1.5, 2.5], 'frameDrum', 0.09, 44);
   });
 
   const motifA: Phrase = [
-    [0, 69, 0.5], [0.5, 72, 0.5], [1, 74, 1], [2, 76, 0.5], [2.5, 74, 0.5], [3, 72, 1],
-    [4, 69, 0.5], [4.5, 67, 0.5], [5, 69, 1], [6, 72, 0.5], [6.5, 74, 0.5], [7, 76, 1],
-    [8, 79, 0.5], [8.5, 76, 0.5], [9, 74, 1], [10, 72, 0.5], [10.5, 69, 0.5], [11, 67, 1],
-    [12, 69, 0.5], [12.5, 72, 0.5], [13, 74, 1], [14, 72, 0.5], [14.5, 69, 0.5], [15, 69, 1],
+    [0, 69, 0.5],
+    [0.5, 72, 0.5],
+    [1, 74, 1],
+    [2, 76, 0.5],
+    [2.5, 74, 0.5],
+    [3, 72, 1],
+    [4, 69, 0.5],
+    [4.5, 67, 0.5],
+    [5, 69, 1],
+    [6, 72, 0.5],
+    [6.5, 74, 0.5],
+    [7, 76, 1],
+    [8, 79, 0.5],
+    [8.5, 76, 0.5],
+    [9, 74, 1],
+    [10, 72, 0.5],
+    [10.5, 69, 0.5],
+    [11, 67, 1],
+    [12, 69, 0.5],
+    [12.5, 72, 0.5],
+    [13, 74, 1],
+    [14, 72, 0.5],
+    [14.5, 69, 0.5],
+    [15, 69, 1],
   ];
   const motifB: Phrase = [
-    [0, 76, 0.5], [0.5, 79, 0.5], [1, 81, 1], [2, 79, 0.5], [2.5, 76, 0.5], [3, 74, 1],
-    [4, 72, 0.5], [4.5, 74, 0.5], [5, 76, 1], [6, 79, 0.5], [6.5, 81, 0.5], [7, 84, 1],
-    [8, 81, 0.5], [8.5, 79, 0.5], [9, 76, 1], [10, 74, 0.5], [10.5, 72, 0.5], [11, 69, 1],
-    [12, 67, 0.5], [12.5, 69, 0.5], [13, 72, 1], [14, 74, 0.5], [14.5, 72, 0.5], [15, 69, 1],
+    [0, 76, 0.5],
+    [0.5, 79, 0.5],
+    [1, 81, 1],
+    [2, 79, 0.5],
+    [2.5, 76, 0.5],
+    [3, 74, 1],
+    [4, 72, 0.5],
+    [4.5, 74, 0.5],
+    [5, 76, 1],
+    [6, 79, 0.5],
+    [6.5, 81, 0.5],
+    [7, 84, 1],
+    [8, 81, 0.5],
+    [8.5, 79, 0.5],
+    [9, 76, 1],
+    [10, 74, 0.5],
+    [10.5, 72, 0.5],
+    [11, 69, 1],
+    [12, 67, 0.5],
+    [12.5, 69, 0.5],
+    [13, 72, 1],
+    [14, 74, 0.5],
+    [14.5, 72, 0.5],
+    [15, 69, 1],
   ];
   pushPhrase(ev, 4, motifA, 0.16, 'pipe');
-  pushPhrase(ev, 20, motifA.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]), 0.11, 'reed');
+  pushPhrase(
+    ev,
+    20,
+    motifA.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]),
+    0.11,
+    'reed',
+  );
   pushPhrase(ev, 36, motifB, 0.15, 'squareLead');
   pushPhrase(ev, 52, motifA, 0.14, 'pipe');
 
@@ -323,8 +560,12 @@ function composeVale(): Theme {
 function composeLegacyVale(): Theme {
   const ev: NoteEvent[] = [];
   // Original Eastbrook Vale wilderness theme from before the per-zone soundtrack expansion.
-  const Am = { root: 57, minor: true }, C = { root: 60 }, G = { root: 55 };
-  const Em = { root: 52, minor: true }, Dmaj = { root: 62 }, F = { root: 53 };
+  const Am = { root: 57, minor: true },
+    C = { root: 60 },
+    G = { root: 55 };
+  const Em = { root: 52, minor: true },
+    Dmaj = { root: 62 },
+    F = { root: 53 };
   const chords: ChordDef[] = [Am, Am, C, G, Am, Em, G, Am, Am, C, Dmaj, Am, F, C, Em, Am];
 
   chords.forEach((c, bar) => {
@@ -339,15 +580,56 @@ function composeLegacyVale(): Theme {
     if (bar % 4 === 1) pushNote(ev, b0 + 2, c.root - 5, 1.8, 0.24, 'bass');
     if (bar % 4 === 3) pushNote(ev, b0 + 2.5, c.root - 10, 1.4, 0.22, 'bass');
     if (bar % 4 === 2) {
-      [t[2], t[0] + 12, t[1] + 12].forEach((n, i) => pushNote(ev, b0 + 1 + i * 0.5, n, 0.5, 0.2, 'harp'));
+      [t[2], t[0] + 12, t[1] + 12].forEach((n, i) =>
+        pushNote(ev, b0 + 1 + i * 0.5, n, 0.5, 0.2, 'harp'),
+      );
     }
   });
 
   const motifs: [number, Phrase][] = [
-    [4, [[0, 69, 1], [1, 71, 1], [2, 72, 1.5], [3.5, 71, 0.5], [4, 67, 2], [6, 64, 2]]],
-    [20, [[0, 76, 1.5], [1.5, 74, 0.5], [2, 72, 1], [3, 71, 1], [4, 69, 3]]],
-    [36, [[0, 72, 1], [1, 74, 1], [2, 76, 1.5], [3.5, 74, 0.5], [4, 72, 1], [5, 69, 1], [6, 71, 3]]],
-    [52, [[0, 69, 1], [1, 72, 1], [2, 71, 1], [3, 67, 1], [4, 69, 4]]],
+    [
+      4,
+      [
+        [0, 69, 1],
+        [1, 71, 1],
+        [2, 72, 1.5],
+        [3.5, 71, 0.5],
+        [4, 67, 2],
+        [6, 64, 2],
+      ],
+    ],
+    [
+      20,
+      [
+        [0, 76, 1.5],
+        [1.5, 74, 0.5],
+        [2, 72, 1],
+        [3, 71, 1],
+        [4, 69, 3],
+      ],
+    ],
+    [
+      36,
+      [
+        [0, 72, 1],
+        [1, 74, 1],
+        [2, 76, 1.5],
+        [3.5, 74, 0.5],
+        [4, 72, 1],
+        [5, 69, 1],
+        [6, 71, 3],
+      ],
+    ],
+    [
+      52,
+      [
+        [0, 69, 1],
+        [1, 72, 1],
+        [2, 71, 1],
+        [3, 67, 1],
+        [4, 69, 4],
+      ],
+    ],
   ];
   for (const [start, ph] of motifs) pushPhrase(ev, start, ph, 0.26, 'flute');
 
@@ -358,36 +640,90 @@ function composeLegacyVale(): Theme {
 function composeMarsh(): Theme {
   const ev: NoteEvent[] = [];
   // E aeolian swamp: darker but still old-school, with croaky reed and wood clicks.
-  const Em = { root: 52, minor: true }, C = { root: 60 }, D = { root: 62 }, Am = { root: 57, minor: true }, Bm = { root: 59, minor: true };
+  const Em = { root: 52, minor: true },
+    C = { root: 60 },
+    D = { root: 62 },
+    Am = { root: 57, minor: true },
+    Bm = { root: 59, minor: true };
   const chords: ChordDef[] = [Em, Em, C, D, Em, Am, Bm, Em, C, Em, D, C, Am, Bm, D, Em];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
     const t = triad(c);
     if (bar % 2 === 0) {
-      pushPedal(ev, b0, c.root, 'pad', 0.20);
+      pushPedal(ev, b0, c.root, 'pad', 0.2);
       pushNote(ev, b0, c.root - 12, 4.1, 0.08, 'choir');
     }
     pushNote(ev, b0, c.root - 24, 1.8, 0.34, 'bass');
     pushNote(ev, b0 + 2.5, c.root - 22, 1, 0.18, 'bass');
-    const crawl = [t[0] - 12, t[1] - 12, t[2] - 12, t[1] - 12, t[0], t[1] - 12, t[2] - 12, t[1] - 12];
+    const crawl = [
+      t[0] - 12,
+      t[1] - 12,
+      t[2] - 12,
+      t[1] - 12,
+      t[0],
+      t[1] - 12,
+      t[2] - 12,
+      t[1] - 12,
+    ];
     pushRepeated(ev, b0, crawl, 0.5, 0.22, 0.14, 'lute');
-    if (bar % 2 === 1) pushRepeated(ev, b0 + 0.75, [t[0] + 12, t[1] + 12, t[2] + 12], 1, 0.15, 0.10, 'tinyBell');
-    pushDrumHits(ev, b0, [0.5, 1.75, 3.25], 'woodBlock', 0.10, 70);
+    if (bar % 2 === 1)
+      pushRepeated(ev, b0 + 0.75, [t[0] + 12, t[1] + 12, t[2] + 12], 1, 0.15, 0.1, 'tinyBell');
+    pushDrumHits(ev, b0, [0.5, 1.75, 3.25], 'woodBlock', 0.1, 70);
     if (bar % 4 === 3) pushNote(ev, b0 + 3, 43, 0.25, 0.11, 'frameDrum');
   });
 
   const reedA: Phrase = [
-    [0, 64, 0.5], [0.5, 67, 0.5], [1, 66, 1], [2, 64, 0.5], [2.5, 62, 0.5], [3, 64, 1],
-    [4, 67, 0.5], [4.5, 69, 0.5], [5, 67, 1], [6, 64, 0.5], [6.5, 62, 0.5], [7, 59, 1],
-    [8, 62, 0.5], [8.5, 64, 0.5], [9, 67, 1], [10, 66, 0.5], [10.5, 64, 0.5], [11, 62, 1],
-    [12, 59, 0.5], [12.5, 62, 0.5], [13, 64, 1], [14, 62, 0.5], [14.5, 59, 0.5], [15, 64, 1],
+    [0, 64, 0.5],
+    [0.5, 67, 0.5],
+    [1, 66, 1],
+    [2, 64, 0.5],
+    [2.5, 62, 0.5],
+    [3, 64, 1],
+    [4, 67, 0.5],
+    [4.5, 69, 0.5],
+    [5, 67, 1],
+    [6, 64, 0.5],
+    [6.5, 62, 0.5],
+    [7, 59, 1],
+    [8, 62, 0.5],
+    [8.5, 64, 0.5],
+    [9, 67, 1],
+    [10, 66, 0.5],
+    [10.5, 64, 0.5],
+    [11, 62, 1],
+    [12, 59, 0.5],
+    [12.5, 62, 0.5],
+    [13, 64, 1],
+    [14, 62, 0.5],
+    [14.5, 59, 0.5],
+    [15, 64, 1],
   ];
   const pipeB: Phrase = [
-    [0, 76, 0.5], [0.5, 74, 0.5], [1, 71, 1], [2, 72, 0.5], [2.5, 74, 0.5], [3, 76, 1],
-    [4, 79, 0.5], [4.5, 76, 0.5], [5, 74, 1], [6, 72, 0.5], [6.5, 71, 0.5], [7, 69, 1],
-    [8, 71, 0.5], [8.5, 72, 0.5], [9, 74, 1], [10, 76, 0.5], [10.5, 74, 0.5], [11, 72, 1],
-    [12, 71, 0.5], [12.5, 69, 0.5], [13, 67, 1], [14, 66, 0.5], [14.5, 64, 0.5], [15, 64, 1],
+    [0, 76, 0.5],
+    [0.5, 74, 0.5],
+    [1, 71, 1],
+    [2, 72, 0.5],
+    [2.5, 74, 0.5],
+    [3, 76, 1],
+    [4, 79, 0.5],
+    [4.5, 76, 0.5],
+    [5, 74, 1],
+    [6, 72, 0.5],
+    [6.5, 71, 0.5],
+    [7, 69, 1],
+    [8, 71, 0.5],
+    [8.5, 72, 0.5],
+    [9, 74, 1],
+    [10, 76, 0.5],
+    [10.5, 74, 0.5],
+    [11, 72, 1],
+    [12, 71, 0.5],
+    [12.5, 69, 0.5],
+    [13, 67, 1],
+    [14, 66, 0.5],
+    [14.5, 64, 0.5],
+    [15, 64, 1],
   ];
   pushPhrase(ev, 8, reedA, 0.14, 'reed');
   pushPhrase(ev, 24, reedA, 0.11, 'squareLead');
@@ -401,7 +737,11 @@ function composeMarsh(): Theme {
 function composePeaks(): Theme {
   const ev: NoteEvent[] = [];
   // G mixolydian mountain route: quick heroic folk, bright pipe, square counterline.
-  const G = { root: 55 }, F = { root: 53 }, C = { root: 60 }, D = { root: 62 }, Em = { root: 52, minor: true };
+  const G = { root: 55 },
+    F = { root: 53 },
+    C = { root: 60 },
+    D = { root: 62 },
+    Em = { root: 52, minor: true };
   const chords: ChordDef[] = [G, F, C, G, D, C, G, F, G, C, D, G, Em, C, D, G];
 
   chords.forEach((c, bar) => {
@@ -415,22 +755,71 @@ function composePeaks(): Theme {
     pushNote(ev, b0, c.root - 24, 1.2, 0.36, 'bass');
     pushNote(ev, b0 + 2, c.root - 17, 1, 0.24, 'bass');
     const climb = [t[0], t[1], t[2], t[0] + 12, t[2], t[1], t[0], t[2]];
-    pushRepeated(ev, b0, climb, 0.5, 0.16, 0.20, 'dulcimer');
-    if (bar % 4 >= 2) pushRepeated(ev, b0 + 0.25, climb.map(n => n - 12), 0.5, 0.16, 0.13, 'lute');
-    pushDrumHits(ev, b0, [0, 1, 2, 3], 'frameDrum', 0.10, 46);
+    pushRepeated(ev, b0, climb, 0.5, 0.16, 0.2, 'dulcimer');
+    if (bar % 4 >= 2)
+      pushRepeated(
+        ev,
+        b0 + 0.25,
+        climb.map((n) => n - 12),
+        0.5,
+        0.16,
+        0.13,
+        'lute',
+      );
+    pushDrumHits(ev, b0, [0, 1, 2, 3], 'frameDrum', 0.1, 46);
   });
 
   const peakHook: Phrase = [
-    [0, 79, 0.5], [0.5, 81, 0.5], [1, 84, 1], [2, 86, 0.5], [2.5, 84, 0.5], [3, 81, 1],
-    [4, 79, 0.5], [4.5, 77, 0.5], [5, 79, 1], [6, 81, 0.5], [6.5, 84, 0.5], [7, 86, 1],
-    [8, 88, 0.5], [8.5, 86, 0.5], [9, 84, 1], [10, 81, 0.5], [10.5, 79, 0.5], [11, 77, 1],
-    [12, 79, 0.5], [12.5, 81, 0.5], [13, 84, 1], [14, 81, 0.5], [14.5, 79, 0.5], [15, 79, 1],
+    [0, 79, 0.5],
+    [0.5, 81, 0.5],
+    [1, 84, 1],
+    [2, 86, 0.5],
+    [2.5, 84, 0.5],
+    [3, 81, 1],
+    [4, 79, 0.5],
+    [4.5, 77, 0.5],
+    [5, 79, 1],
+    [6, 81, 0.5],
+    [6.5, 84, 0.5],
+    [7, 86, 1],
+    [8, 88, 0.5],
+    [8.5, 86, 0.5],
+    [9, 84, 1],
+    [10, 81, 0.5],
+    [10.5, 79, 0.5],
+    [11, 77, 1],
+    [12, 79, 0.5],
+    [12.5, 81, 0.5],
+    [13, 84, 1],
+    [14, 81, 0.5],
+    [14.5, 79, 0.5],
+    [15, 79, 1],
   ];
   const counter: Phrase = [
-    [0, 67, 0.5], [0.5, 71, 0.5], [1, 74, 0.5], [1.5, 71, 0.5], [2, 67, 1], [3, 69, 1],
-    [4, 71, 0.5], [4.5, 74, 0.5], [5, 76, 0.5], [5.5, 74, 0.5], [6, 71, 1], [7, 67, 1],
-    [8, 69, 0.5], [8.5, 71, 0.5], [9, 74, 1], [10, 76, 0.5], [10.5, 74, 0.5], [11, 71, 1],
-    [12, 67, 0.5], [12.5, 69, 0.5], [13, 71, 1], [14, 74, 0.5], [14.5, 71, 0.5], [15, 67, 1],
+    [0, 67, 0.5],
+    [0.5, 71, 0.5],
+    [1, 74, 0.5],
+    [1.5, 71, 0.5],
+    [2, 67, 1],
+    [3, 69, 1],
+    [4, 71, 0.5],
+    [4.5, 74, 0.5],
+    [5, 76, 0.5],
+    [5.5, 74, 0.5],
+    [6, 71, 1],
+    [7, 67, 1],
+    [8, 69, 0.5],
+    [8.5, 71, 0.5],
+    [9, 74, 1],
+    [10, 76, 0.5],
+    [10.5, 74, 0.5],
+    [11, 71, 1],
+    [12, 67, 0.5],
+    [12.5, 69, 0.5],
+    [13, 71, 1],
+    [14, 74, 0.5],
+    [14.5, 71, 0.5],
+    [15, 67, 1],
   ];
   pushPhrase(ev, 0, peakHook, 0.16, 'pipe');
   pushPhrase(ev, 16, counter, 0.13, 'squareLead');
@@ -462,7 +851,7 @@ function composeDungeonFight(
     const t = triad(c);
     // Keep dungeon writing much more active: ostinato + drums + eerie modal color.
     pushNote(ev, b0, c.root - 24, 4.05, opts.mode === 'wyrm' ? 0.34 : 0.28, 'choir');
-    pushNote(ev, b0, c.root - 17, 4.05, 0.20, 'choir');
+    pushNote(ev, b0, c.root - 17, 4.05, 0.2, 'choir');
     pushNote(ev, b0, c.root - 12, 2.1, 0.18, 'strings');
     pushNote(ev, b0 + 2, c.root - 10, 2.1, 0.14, 'strings');
     pushNote(ev, b0, c.root - 24, 0.9, 0.46, 'bass');
@@ -472,20 +861,51 @@ function composeDungeonFight(
     const ost = opts.doubleTime
       ? [0, 1, 0, 3, 0, 6, 5, 3, 0, 1, 0, 3, 7, 6, 5, 3]
       : [0, 1, 0, 3, 0, 6, 5, 3];
-    ost.forEach((s, i) => pushNote(ev, b0 + i * (opts.doubleTime ? 0.25 : 0.5), figureRoot + s, opts.doubleTime ? 0.18 : 0.28, 0.20, i % 2 === 0 ? 'stacc' : opts.lead));
+    ost.forEach((s, i) =>
+      pushNote(
+        ev,
+        b0 + i * (opts.doubleTime ? 0.25 : 0.5),
+        figureRoot + s,
+        opts.doubleTime ? 0.18 : 0.28,
+        0.2,
+        i % 2 === 0 ? 'stacc' : opts.lead,
+      ),
+    );
 
-    pushDrumHits(ev, b0, opts.mode === 'crypt' ? [0, 1.5, 2.5, 3.5] : [0, 0.75, 1.5, 2, 2.75, 3.5], 'warDrum', opts.mode === 'wyrm' ? 0.34 : 0.26, 38);
+    pushDrumHits(
+      ev,
+      b0,
+      opts.mode === 'crypt' ? [0, 1.5, 2.5, 3.5] : [0, 0.75, 1.5, 2, 2.75, 3.5],
+      'warDrum',
+      opts.mode === 'wyrm' ? 0.34 : 0.26,
+      38,
+    );
     pushDrumHits(ev, b0, [0.5, 1.25, 2.25, 3.25], 'woodBlock', 0.11, 70);
     if (bar % 2 === 0) {
-      pushNote(ev, b0, c.root - 12, 1.1, 0.20, 'horn');
+      pushNote(ev, b0, c.root - 12, 1.1, 0.2, 'horn');
       pushNote(ev, b0 + 0.02, c.root - 5, 1.1, 0.16, 'horn');
     }
-    if (bar % 2 === 1) pushRepeated(ev, b0 + 0.25, [t[2] + 12, t[1] + 12, t[0] + 12, t[1] + 12], 0.75, 0.13, 0.12, 'dulcimer');
+    if (bar % 2 === 1)
+      pushRepeated(
+        ev,
+        b0 + 0.25,
+        [t[2] + 12, t[1] + 12, t[0] + 12, t[1] + 12],
+        0.75,
+        0.13,
+        0.12,
+        'dulcimer',
+      );
   });
 
   // Lead appears twice per loop with a lower response; phrases are original modal fragments.
   pushPhrase(ev, 0, hook, 0.18, opts.lead);
-  pushPhrase(ev, bars * 2, hook.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]), 0.12, 'reed');
+  pushPhrase(
+    ev,
+    bars * 2,
+    hook.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]),
+    0.12,
+    'reed',
+  );
   for (let b = 0; b < bars * 4; b += 4) {
     if (b % 8 === 0) pushNote(ev, b, figureRoot + 12, 1.6, 0.08, 'tinyBell');
   }
@@ -496,35 +916,93 @@ function composeDungeonFight(
 
 /** Hollow Crypt — D phrygian, now a faster skeletal dance rather than ambience. */
 function composeDungeonHollowCrypt(): Theme {
-  const Dm = { root: 62, minor: true }, Eb = { root: 63 }, Gm = { root: 55, minor: true };
-  const Bb = { root: 58 }, A = { root: 57 };
+  const Dm = { root: 62, minor: true },
+    Eb = { root: 63 },
+    Gm = { root: 55, minor: true };
+  const Bb = { root: 58 },
+    A = { root: 57 };
   const hook: Phrase = [
-    [0, 74, 0.5], [0.5, 75, 0.5], [1, 74, 0.5], [1.5, 70, 0.5], [2, 69, 1], [3, 74, 1],
-    [4, 77, 0.5], [4.5, 75, 0.5], [5, 74, 0.5], [5.5, 70, 0.5], [6, 69, 1], [7, 62, 1],
+    [0, 74, 0.5],
+    [0.5, 75, 0.5],
+    [1, 74, 0.5],
+    [1.5, 70, 0.5],
+    [2, 69, 1],
+    [3, 74, 1],
+    [4, 77, 0.5],
+    [4.5, 75, 0.5],
+    [5, 74, 0.5],
+    [5.5, 70, 0.5],
+    [6, 69, 1],
+    [7, 62, 1],
   ];
-  return composeDungeonFight([Dm, Eb, Dm, Gm, Bb, A, Eb, Dm], 128, hook, 62, { mode: 'crypt', lead: 'squareLead' });
+  return composeDungeonFight([Dm, Eb, Dm, Gm, Bb, A, Eb, Dm], 128, hook, 62, {
+    mode: 'crypt',
+    lead: 'squareLead',
+  });
 }
 
 /** Sunken Bastion — E phrygian, high-BPM flooded fortress chase. */
 function composeDungeonSunkenBastion(): Theme {
-  const Em = { root: 64, minor: true }, F = { root: 65 }, Am = { root: 57, minor: true };
-  const C = { root: 60 }, B = { root: 59 };
+  const Em = { root: 64, minor: true },
+    F = { root: 65 },
+    Am = { root: 57, minor: true };
+  const C = { root: 60 },
+    B = { root: 59 };
   const hook: Phrase = [
-    [0, 76, 0.25], [0.25, 77, 0.25], [0.5, 76, 0.5], [1, 72, 0.5], [1.5, 71, 0.5], [2, 76, 0.5], [2.5, 79, 0.5], [3, 77, 1],
-    [4, 76, 0.5], [4.5, 72, 0.5], [5, 71, 0.5], [5.5, 67, 0.5], [6, 71, 0.5], [6.5, 72, 0.5], [7, 76, 1],
+    [0, 76, 0.25],
+    [0.25, 77, 0.25],
+    [0.5, 76, 0.5],
+    [1, 72, 0.5],
+    [1.5, 71, 0.5],
+    [2, 76, 0.5],
+    [2.5, 79, 0.5],
+    [3, 77, 1],
+    [4, 76, 0.5],
+    [4.5, 72, 0.5],
+    [5, 71, 0.5],
+    [5.5, 67, 0.5],
+    [6, 71, 0.5],
+    [6.5, 72, 0.5],
+    [7, 76, 1],
   ];
-  return composeDungeonFight([Em, F, Em, Am, C, B, F, Em], 136, hook, 64, { mode: 'sunken', lead: 'reed', doubleTime: true });
+  return composeDungeonFight([Em, F, Em, Am, C, B, F, Em], 136, hook, 64, {
+    mode: 'sunken',
+    lead: 'reed',
+    doubleTime: true,
+  });
 }
 
 /** Gravewyrm Sanctum — B phrygian boss route, fastest and most percussive. */
 function composeDungeonGravewyrmSanctum(): Theme {
-  const Bm = { root: 59, minor: true }, C = { root: 60 }, Em = { root: 52, minor: true };
-  const G = { root: 55 }, Fsm = { root: 54, minor: true };
+  const Bm = { root: 59, minor: true },
+    C = { root: 60 },
+    Em = { root: 52, minor: true };
+  const G = { root: 55 },
+    Fsm = { root: 54, minor: true };
   const hook: Phrase = [
-    [0, 71, 0.25], [0.25, 72, 0.25], [0.5, 71, 0.25], [0.75, 67, 0.25], [1, 66, 0.5], [1.5, 67, 0.5], [2, 71, 0.5], [2.5, 74, 0.5], [3, 72, 1],
-    [4, 71, 0.25], [4.25, 72, 0.25], [4.5, 74, 0.5], [5, 78, 0.5], [5.5, 74, 0.5], [6, 72, 0.5], [6.5, 71, 0.5], [7, 66, 1],
+    [0, 71, 0.25],
+    [0.25, 72, 0.25],
+    [0.5, 71, 0.25],
+    [0.75, 67, 0.25],
+    [1, 66, 0.5],
+    [1.5, 67, 0.5],
+    [2, 71, 0.5],
+    [2.5, 74, 0.5],
+    [3, 72, 1],
+    [4, 71, 0.25],
+    [4.25, 72, 0.25],
+    [4.5, 74, 0.5],
+    [5, 78, 0.5],
+    [5.5, 74, 0.5],
+    [6, 72, 0.5],
+    [6.5, 71, 0.5],
+    [7, 66, 1],
   ];
-  return composeDungeonFight([Bm, C, Bm, Em, G, Fsm, C, Bm], 152, hook, 59, { mode: 'wyrm', lead: 'squareLead', doubleTime: true });
+  return composeDungeonFight([Bm, C, Bm, Em, G, Fsm, C, Bm], 152, hook, 59, {
+    mode: 'wyrm',
+    lead: 'squareLead',
+    doubleTime: true,
+  });
 }
 
 function composeCombat(): Theme {
@@ -610,25 +1088,63 @@ class MusicSynth {
     const dur = Math.max(0.1, evt.dur * spb);
     const out = layer.gain;
     switch (evt.inst) {
-      case 'strings': this.strings(when, freq, dur, evt.vel, out); break;
-      case 'flute': this.flute(when, freq, dur, evt.vel, out); break;
-      case 'harp': this.pluck(when, freq, evt.vel, out, 1.4); break;
-      case 'bass': this.pluck(when, freq, evt.vel, out, 0.9, true); break;
-      case 'horn': this.horn(when, freq, dur, evt.vel, out); break;
-      case 'choir': this.choir(when, freq, dur, evt.vel, out); break;
-      case 'bell': this.bell(when, freq, evt.vel, out); break;
-      case 'timpani': this.timpani(when, freq, evt.vel, out); break;
-      case 'stacc': this.strings(when, freq, Math.min(dur, 0.22), evt.vel, out, 0.02); break;
-      case 'pad': this.pad(when, freq, dur, evt.vel, out); break;
-      case 'lute': this.lute(when, freq, evt.vel, out); break;
-      case 'dulcimer': this.dulcimer(when, freq, evt.vel, out); break;
-      case 'frameDrum': this.frameDrum(when, evt.vel, out); break;
-      case 'warDrum': this.warDrum(when, evt.vel, out); break;
-      case 'reed': this.reed(when, freq, dur, evt.vel, out); break;
-      case 'pipe': this.pipe(when, freq, dur, evt.vel, out); break;
-      case 'squareLead': this.squareLead(when, freq, dur, evt.vel, out); break;
-      case 'woodBlock': this.woodBlock(when, evt.vel, out); break;
-      case 'tinyBell': this.tinyBell(when, freq, evt.vel, out); break;
+      case 'strings':
+        this.strings(when, freq, dur, evt.vel, out);
+        break;
+      case 'flute':
+        this.flute(when, freq, dur, evt.vel, out);
+        break;
+      case 'harp':
+        this.pluck(when, freq, evt.vel, out, 1.4);
+        break;
+      case 'bass':
+        this.pluck(when, freq, evt.vel, out, 0.9, true);
+        break;
+      case 'horn':
+        this.horn(when, freq, dur, evt.vel, out);
+        break;
+      case 'choir':
+        this.choir(when, freq, dur, evt.vel, out);
+        break;
+      case 'bell':
+        this.bell(when, freq, evt.vel, out);
+        break;
+      case 'timpani':
+        this.timpani(when, freq, evt.vel, out);
+        break;
+      case 'stacc':
+        this.strings(when, freq, Math.min(dur, 0.22), evt.vel, out, 0.02);
+        break;
+      case 'pad':
+        this.pad(when, freq, dur, evt.vel, out);
+        break;
+      case 'lute':
+        this.lute(when, freq, evt.vel, out);
+        break;
+      case 'dulcimer':
+        this.dulcimer(when, freq, evt.vel, out);
+        break;
+      case 'frameDrum':
+        this.frameDrum(when, evt.vel, out);
+        break;
+      case 'warDrum':
+        this.warDrum(when, evt.vel, out);
+        break;
+      case 'reed':
+        this.reed(when, freq, dur, evt.vel, out);
+        break;
+      case 'pipe':
+        this.pipe(when, freq, dur, evt.vel, out);
+        break;
+      case 'squareLead':
+        this.squareLead(when, freq, dur, evt.vel, out);
+        break;
+      case 'woodBlock':
+        this.woodBlock(when, evt.vel, out);
+        break;
+      case 'tinyBell':
+        this.tinyBell(when, freq, evt.vel, out);
+        break;
     }
   }
 
@@ -642,7 +1158,14 @@ class MusicSynth {
     return g;
   }
 
-  private strings(when: number, freq: number, dur: number, vel: number, out: GainNode, attack = 0.3): void {
+  private strings(
+    when: number,
+    freq: number,
+    dur: number,
+    vel: number,
+    out: GainNode,
+    attack = 0.3,
+  ): void {
     const ctx = this.ctx;
     const g = this.adsr(when, dur, vel * 0.16, attack, 0.7);
     const lp = ctx.createBiquadFilter();
@@ -688,7 +1211,14 @@ class MusicSynth {
     }
   }
 
-  private pluck(when: number, freq: number, vel: number, out: GainNode, decay: number, dark = false): void {
+  private pluck(
+    when: number,
+    freq: number,
+    vel: number,
+    out: GainNode,
+    decay: number,
+    dark = false,
+  ): void {
     const ctx = this.ctx;
     const g = ctx.createGain();
     g.gain.setValueAtTime(vel * (dark ? 0.3 : 0.22), when);
@@ -729,8 +1259,10 @@ class MusicSynth {
     o2.frequency.value = freq;
     o.connect(lp);
     o2.connect(lp);
-    o.start(when); o.stop(when + dur + 0.5);
-    o2.start(when); o2.stop(when + dur + 0.5);
+    o.start(when);
+    o.stop(when + dur + 0.5);
+    o2.start(when);
+    o2.stop(when + dur + 0.5);
   }
 
   private choir(when: number, freq: number, dur: number, vel: number, out: GainNode): void {
@@ -827,7 +1359,11 @@ class MusicSynth {
     g.gain.exponentialRampToValueAtTime(0.0001, when + 1.8);
     body.connect(g).connect(out);
 
-    for (const [ratio, amp, decay] of [[1, 1, 1.8], [2.01, 0.35, 1.1], [3.02, 0.12, 0.7]] as const) {
+    for (const [ratio, amp, decay] of [
+      [1, 1, 1.8],
+      [2.01, 0.35, 1.1],
+      [3.02, 0.12, 0.7],
+    ] as const) {
       const og = ctx.createGain();
       og.gain.setValueAtTime(amp, when);
       og.gain.exponentialRampToValueAtTime(0.0001, when + decay);
@@ -922,7 +1458,11 @@ class MusicSynth {
 
   private tinyBell(when: number, freq: number, vel: number, out: GainNode): void {
     const ctx = this.ctx;
-    for (const [ratio, amp, dec] of [[1, 0.16, 1.1], [2.01, 0.06, 0.7], [3.01, 0.025, 0.42]] as const) {
+    for (const [ratio, amp, dec] of [
+      [1, 0.16, 1.1],
+      [2.01, 0.06, 0.7],
+      [3.01, 0.025, 0.42],
+    ] as const) {
       const g = ctx.createGain();
       g.gain.setValueAtTime(vel * amp, when);
       g.gain.exponentialRampToValueAtTime(0.0001, when + dec);
@@ -949,7 +1489,8 @@ class MusicSynth {
     const noiseLen = Math.floor(ctx.sampleRate * 0.035);
     const buf = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
     const data = buf.getChannelData(0);
-    for (let i = 0; i < noiseLen; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, 2.2);
+    for (let i = 0; i < noiseLen; i++)
+      data[i] = (Math.random() * 2 - 1) * (1 - i / noiseLen) ** 2.2;
     const src = ctx.createBufferSource();
     src.buffer = buf;
     src.connect(body);
@@ -977,7 +1518,8 @@ class MusicSynth {
     const noiseLen = Math.floor(ctx.sampleRate * 0.09);
     const buf = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
     const data = buf.getChannelData(0);
-    for (let i = 0; i < noiseLen; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / noiseLen, 1.6);
+    for (let i = 0; i < noiseLen; i++)
+      data[i] = (Math.random() * 2 - 1) * (1 - i / noiseLen) ** 1.6;
     const src = ctx.createBufferSource();
     src.buffer = buf;
     src.connect(bp);
@@ -1025,7 +1567,11 @@ class MusicSynth {
 
   private bell(when: number, freq: number, vel: number, out: GainNode): void {
     const ctx = this.ctx;
-    for (const [ratio, amp, dec] of [[1, 0.22, 3.4], [2.0, 0.08, 2.2], [2.76, 0.06, 1.4]] as const) {
+    for (const [ratio, amp, dec] of [
+      [1, 0.22, 3.4],
+      [2.0, 0.08, 2.2],
+      [2.76, 0.06, 1.4],
+    ] as const) {
       const g = ctx.createGain();
       g.gain.setValueAtTime(vel * amp, when);
       g.gain.exponentialRampToValueAtTime(0.0001, when + dec);
@@ -1084,7 +1630,8 @@ export class MusicDirector {
   // null until the first update() so the initial state always applies
   private zone: MusicZone | null = null;
   private combat = false;
-  private _enabled = (typeof localStorage === 'undefined') ? true : localStorage.getItem(STORAGE_KEY) !== '0';
+  private _enabled =
+    typeof localStorage === 'undefined' ? true : localStorage.getItem(STORAGE_KEY) !== '0';
   private _vol = 1; // 0..1 volume, set from the settings menu
   private _menuPaused = false; // temporary mute while the game menu is open
   // Boss-fight override: a looped file track routed through the same AudioContext
@@ -1113,7 +1660,8 @@ export class MusicDirector {
     if (on) this.ensureBossBuffer();
     if (!on) this.stopBossSource();
     this.applyBossPlayback();
-    if (this.ctx && this.master) this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, on ? 0.4 : 0.7);
+    if (this.ctx && this.master)
+      this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, on ? 0.4 : 0.7);
   }
 
   resetForDungeonEntry(dungeonId: string | null): void {
@@ -1126,7 +1674,11 @@ export class MusicDirector {
       layer.loopCount = 0;
     }
     if (this.bossElement) {
-      try { this.bossElement.currentTime = 0; } catch { /* browser may reject seeking before metadata */ }
+      try {
+        this.bossElement.currentTime = 0;
+      } catch {
+        /* browser may reject seeking before metadata */
+      }
     }
     this.stopBossSource();
   }
@@ -1149,8 +1701,7 @@ export class MusicDirector {
         this.ensureBossBuffer();
         this.startBossSource();
       }
-    }
-    else {
+    } else {
       if (this.bossElement) this.bossElement.pause();
       this.stopBossSource();
     }
@@ -1178,7 +1729,9 @@ export class MusicDirector {
         this.bossLoading = false;
         this.applyBossPlayback();
       })
-      .catch(() => { this.bossLoading = false; });
+      .catch(() => {
+        this.bossLoading = false;
+      });
   }
 
   private startBossSource(): void {
@@ -1194,7 +1747,11 @@ export class MusicDirector {
 
   private stopBossSource(): void {
     if (!this.bossSource) return;
-    try { this.bossSource.stop(); } catch { /* already stopped */ }
+    try {
+      this.bossSource.stop();
+    } catch {
+      /* already stopped */
+    }
     this.bossSource.disconnect();
     this.bossSource = null;
   }
@@ -1242,7 +1799,7 @@ export class MusicDirector {
     for (let ch = 0; ch < 2; ch++) {
       const data = ir.getChannelData(ch);
       for (let i = 0; i < len; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.4);
+        data[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 2.4;
       }
     }
     this.reverb = ctx.createConvolver();
@@ -1258,7 +1815,15 @@ export class MusicDirector {
       gain.gain.value = 0;
       gain.connect(this.master);
       gain.connect(this.reverbSend);
-      this.layers[name] = { theme, gain, target: 0, anchor: 0, nextIdx: -1, loopCount: 0, transpose: 0 };
+      this.layers[name] = {
+        theme,
+        gain,
+        target: 0,
+        anchor: 0,
+        nextIdx: -1,
+        loopCount: 0,
+        transpose: 0,
+      };
     }
     this.timer = window.setInterval(() => this.tickScheduler(), 110);
   }
@@ -1267,7 +1832,9 @@ export class MusicDirector {
     this._enabled = on;
     try {
       localStorage.setItem(STORAGE_KEY, on ? '1' : '0');
-    } catch { /* private mode */ }
+    } catch {
+      /* private mode */
+    }
     if (this.ctx && this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.3);
     }

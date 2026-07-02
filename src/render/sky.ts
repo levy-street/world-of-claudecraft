@@ -80,7 +80,8 @@ function shouldUseLiteHdri(): boolean {
     const nav = navigator as Navigator & { deviceMemory?: number };
     if (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) return true;
     if (nav.maxTouchPoints > 0 && typeof matchMedia !== 'undefined') {
-      if (matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 900px)').matches) return true;
+      if (matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 900px)').matches)
+        return true;
     }
   }
   return false;
@@ -152,10 +153,12 @@ function shouldUseLiteBackdrop(): boolean {
     const nav = navigator as NavigatorWithBackdropHints;
     const connection = nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
     if (connection?.saveData) return true;
-    if (connection?.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType)) return true;
+    if (connection?.effectiveType && ['slow-2g', '2g', '3g'].includes(connection.effectiveType))
+      return true;
     if (nav.deviceMemory !== undefined && nav.deviceMemory <= 4) return true;
     if (nav.maxTouchPoints > 0 && typeof matchMedia !== 'undefined') {
-      if (matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 900px)').matches) return true;
+      if (matchMedia('(pointer: coarse)').matches || matchMedia('(max-width: 900px)').matches)
+        return true;
     }
   }
   return false;
@@ -186,20 +189,26 @@ const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
 // preload, so this best-effort device gate keeps mobile out of the worst path.
 if (GFX.standardMaterials) {
   for (const biome of Object.keys(BIOME_HDRI) as BiomeId[]) {
-    registerPreload(loadHdr(BIOME_HDRI[biome]).then((tex) => {
-      tex.wrapS = THREE.RepeatWrapping; // azimuth rotation needs u to wrap
-      hdriStore[biome] = tex;
-      return tex;
-    }));
-    registerPreload(loadTexture(BIOME_BACKDROP[biome], { srgb: true }).then((tex) => {
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      tex.generateMipmaps = true;
-      backdropStore[biome] = tex;
-      return tex;
-    }).catch(() => undefined));
+    registerPreload(
+      loadHdr(BIOME_HDRI[biome]).then((tex) => {
+        tex.wrapS = THREE.RepeatWrapping; // azimuth rotation needs u to wrap
+        hdriStore[biome] = tex;
+        return tex;
+      }),
+    );
+    registerPreload(
+      loadTexture(BIOME_BACKDROP[biome], { srgb: true })
+        .then((tex) => {
+          tex.wrapS = THREE.RepeatWrapping;
+          tex.wrapT = THREE.ClampToEdgeWrapping;
+          tex.minFilter = THREE.LinearMipmapLinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          tex.generateMipmaps = true;
+          backdropStore[biome] = tex;
+          return tex;
+        })
+        .catch(() => undefined),
+    );
   }
 }
 
@@ -341,7 +350,12 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   if (lowGfx || !hasSkyHdriAssets()) {
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(DOME_RADIUS, 24, 16),
-      new THREE.MeshBasicMaterial({ map: skyTexture(), side: THREE.BackSide, fog: false, depthWrite: false }),
+      new THREE.MeshBasicMaterial({
+        map: skyTexture(),
+        side: THREE.BackSide,
+        fog: false,
+        depthWrite: false,
+      }),
     );
     dome.renderOrder = -10;
     return {
@@ -440,9 +454,17 @@ export function buildClouds(lowGfx: boolean): CloudLayer {
     ? [cloudTexture()]
     : [cloudTexture(14, 0.5), cloudTexture(8, 0.7), cloudTexture(20, 0.42)];
   const sprites: THREE.Sprite[] = [];
-  const span = (WORLD_MAX_Z - WORLD_MIN_Z) + 240;
+  const span = WORLD_MAX_Z - WORLD_MIN_Z + 240;
 
-  const spawn = (count: number, yMin: number, yMax: number, baseOpacity: number, drift: number, scaleMin: number, scaleMax: number): void => {
+  const spawn = (
+    count: number,
+    yMin: number,
+    yMax: number,
+    baseOpacity: number,
+    drift: number,
+    scaleMin: number,
+    scaleMax: number,
+  ): void => {
     for (let i = 0; i < count; i++) {
       const y = yMin + Math.random() * (yMax - yMin);
       // higher clouds thin out
@@ -457,11 +479,7 @@ export function buildClouds(lowGfx: boolean): CloudLayer {
       const sprite = new THREE.Sprite(mat);
       const sc = scaleMin + Math.random() * (scaleMax - scaleMin);
       sprite.scale.set(sc, sc * 0.45, 1);
-      sprite.position.set(
-        (Math.random() - 0.5) * 600,
-        y,
-        WORLD_MIN_Z - 120 + Math.random() * span,
-      );
+      sprite.position.set((Math.random() - 0.5) * 600, y, WORLD_MIN_Z - 120 + Math.random() * span);
       sprite.userData.drift = drift;
       sprites.push(sprite);
     }

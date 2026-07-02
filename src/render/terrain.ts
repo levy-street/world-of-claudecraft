@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-import {
-  WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES,
-} from '../sim/data';
+import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
@@ -38,11 +36,13 @@ const ALBEDO_ANISOTROPY = 8;
 const NORMAL_ANISOTROPY = 4;
 
 function kickTerrainTex(key: string, file: string, srgb: boolean): void {
-  registerPreload(loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
-    tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
-    TERRAIN_TEX[key] = tex;
-    return tex;
-  }));
+  registerPreload(
+    loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
+      tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
+      TERRAIN_TEX[key] = tex;
+      return tex;
+    }),
+  );
 }
 
 // ~15MB of JPEGs — skip when the URL already forces the Lambert tier (an
@@ -62,11 +62,16 @@ if (GFX.terrainSplat) {
 
 export function hasTerrainSplatAssets(): boolean {
   return Boolean(
-    TERRAIN_TEX.grassC && TERRAIN_TEX.grassN
-      && TERRAIN_TEX.dirtC && TERRAIN_TEX.dirtN
-      && TERRAIN_TEX.rockC && TERRAIN_TEX.rockN
-      && TERRAIN_TEX.sandC && TERRAIN_TEX.sandN
-      && TERRAIN_TEX.mudC && TERRAIN_TEX.snowC,
+    TERRAIN_TEX.grassC &&
+      TERRAIN_TEX.grassN &&
+      TERRAIN_TEX.dirtC &&
+      TERRAIN_TEX.dirtN &&
+      TERRAIN_TEX.rockC &&
+      TERRAIN_TEX.rockN &&
+      TERRAIN_TEX.sandC &&
+      TERRAIN_TEX.sandN &&
+      TERRAIN_TEX.mudC &&
+      TERRAIN_TEX.snowC,
   );
 }
 
@@ -102,17 +107,68 @@ const NORMAL_TEX_STRENGTH = 1.35;
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
 // multiplies into (splat textures are authored near mid-gray).
-const BIOME_PALETTE: Record<BiomeId, { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }> = {
-  vale: { grass: 0x548545, grassDark: 0x3e6635, grassYellow: 0x768c44, dirt: 0x8a6f47, sand: 0xc2b283 },
-  marsh: { grass: 0x596d36, grassDark: 0x41522b, grassYellow: 0x71764a, dirt: 0x6e5a3e, sand: 0x8f7f5c },
-  peaks: { grass: 0x687a55, grassDark: 0x4d5c45, grassYellow: 0x8d9168, dirt: 0x7d6a50, sand: 0xb0a486 },
+const BIOME_PALETTE: Record<
+  BiomeId,
+  { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
+> = {
+  vale: {
+    grass: 0x548545,
+    grassDark: 0x3e6635,
+    grassYellow: 0x768c44,
+    dirt: 0x8a6f47,
+    sand: 0xc2b283,
+  },
+  marsh: {
+    grass: 0x596d36,
+    grassDark: 0x41522b,
+    grassYellow: 0x71764a,
+    dirt: 0x6e5a3e,
+    sand: 0x8f7f5c,
+  },
+  peaks: {
+    grass: 0x687a55,
+    grassDark: 0x4d5c45,
+    grassYellow: 0x8d9168,
+    dirt: 0x7d6a50,
+    sand: 0xb0a486,
+  },
   // Valdris biomes: Ossara dunes, Veth twilight forest, Kael highlands, the
   // war-scarred Breach ring, and the blinding Saltbone pan.
-  desert: { grass: 0xc4a468, grassDark: 0xa8874f, grassYellow: 0xd6bb7e, dirt: 0x9a7b4d, sand: 0xd8c493 },
-  shadowwood: { grass: 0x3d5540, grassDark: 0x2b3f31, grassYellow: 0x4f6350, dirt: 0x5c4a38, sand: 0x7d7358 },
-  highlands: { grass: 0x5c8348, grassDark: 0x446238, grassYellow: 0x8f9a52, dirt: 0x8a6f47, sand: 0xc2b283 },
-  scorched: { grass: 0x6b5a4a, grassDark: 0x4a3c31, grassYellow: 0x7d6a52, dirt: 0x5f4636, sand: 0x8f7a62 },
-  salt: { grass: 0xd8d5c8, grassDark: 0xbdb9a8, grassYellow: 0xe4e0d0, dirt: 0xb8ab90, sand: 0xe8e4d6 },
+  desert: {
+    grass: 0xc4a468,
+    grassDark: 0xa8874f,
+    grassYellow: 0xd6bb7e,
+    dirt: 0x9a7b4d,
+    sand: 0xd8c493,
+  },
+  shadowwood: {
+    grass: 0x3d5540,
+    grassDark: 0x2b3f31,
+    grassYellow: 0x4f6350,
+    dirt: 0x5c4a38,
+    sand: 0x7d7358,
+  },
+  highlands: {
+    grass: 0x5c8348,
+    grassDark: 0x446238,
+    grassYellow: 0x8f9a52,
+    dirt: 0x8a6f47,
+    sand: 0xc2b283,
+  },
+  scorched: {
+    grass: 0x6b5a4a,
+    grassDark: 0x4a3c31,
+    grassYellow: 0x7d6a52,
+    dirt: 0x5f4636,
+    sand: 0x8f7a62,
+  },
+  salt: {
+    grass: 0xd8d5c8,
+    grassDark: 0xbdb9a8,
+    grassYellow: 0xe4e0d0,
+    dirt: 0xb8ab90,
+    sand: 0xe8e4d6,
+  },
 };
 
 // rock starts creeping in at lower slopes in the peaks, later in the marsh
@@ -140,8 +196,11 @@ interface VertexSample {
 
 // Shared scratch colors for the palette blend (hot loop, avoid allocation).
 const cTmp = new THREE.Color();
-const grassC = new THREE.Color(), grassDarkC = new THREE.Color(), grassYellowC = new THREE.Color();
-const dirtC = new THREE.Color(), sandC = new THREE.Color();
+const grassC = new THREE.Color(),
+  grassDarkC = new THREE.Color(),
+  grassYellowC = new THREE.Color();
+const dirtC = new THREE.Color(),
+  sandC = new THREE.Color();
 const dirtDarkC = new THREE.Color(0x73592f);
 const rockC = new THREE.Color(0x7a7a72);
 const impactAshC = new THREE.Color(0x18110d);
@@ -153,8 +212,11 @@ const lowShadeC = new THREE.Color(0x60745b);
 const zonePalettes = ZONES.map((zn) => {
   const p = BIOME_PALETTE[zn.biome];
   return {
-    grass: new THREE.Color(p.grass), grassDark: new THREE.Color(p.grassDark),
-    grassYellow: new THREE.Color(p.grassYellow), dirt: new THREE.Color(p.dirt), sand: new THREE.Color(p.sand),
+    grass: new THREE.Color(p.grass),
+    grassDark: new THREE.Color(p.grassDark),
+    grassYellow: new THREE.Color(p.grassYellow),
+    dirt: new THREE.Color(p.dirt),
+    sand: new THREE.Color(p.sand),
   };
 });
 
@@ -210,7 +272,9 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   const slope = Math.sqrt(hx * hx + hz * hz) / (2 * SLOPE_EPS);
   const invLen = 1 / Math.hypot(hx / (2 * SLOPE_EPS), 1, hz / (2 * SLOPE_EPS));
   const normal: [number, number, number] = [
-    -(hx / (2 * SLOPE_EPS)) * invLen, invLen, -(hz / (2 * SLOPE_EPS)) * invLen,
+    -(hx / (2 * SLOPE_EPS)) * invLen,
+    invLen,
+    -(hz / (2 * SLOPE_EPS)) * invLen,
   ];
 
   paletteAt(z);
@@ -295,7 +359,11 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     cTmp.multiplyScalar(0.98 + upland * 0.04 - ridge * 0.025);
   }
   return {
-    height: h, slope, normal, color: [cTmp.r, cTmp.g, cTmp.b], splat: w,
+    height: h,
+    slope,
+    normal,
+    color: [cTmp.r, cTmp.g, cTmp.b],
+    splat: w,
     extra: [mud, snow, impact.scorch, impact.ash],
   };
 }
@@ -305,7 +373,14 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
 // vertices sit on the chunk border but 0.3u lower, hiding LOD cracks.
 // ---------------------------------------------------------------------------
 
-function buildChunkGeometry(x0: number, z0: number, size: number, spacing: number, seed: number, withSplat: boolean): THREE.BufferGeometry {
+function buildChunkGeometry(
+  x0: number,
+  z0: number,
+  size: number,
+  spacing: number,
+  seed: number,
+  withSplat: boolean,
+): THREE.BufferGeometry {
   const nx = Math.max(4, Math.round(size / spacing));
   const nz = nx;
   const stepX = size / nx;
@@ -325,7 +400,8 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
   const sampleCache = new Map<number, VertexSample>();
   for (let gj = 0; gj < gh; gj++) {
     for (let gi = 0; gi < gw; gi++) {
-      const i = gi - 1, j = gj - 1; // interior indices; -1 / n+1 are skirt
+      const i = gi - 1,
+        j = gj - 1; // interior indices; -1 / n+1 are skirt
       const ci = Math.max(0, Math.min(nx, i));
       const cj = Math.max(0, Math.min(nz, j));
       const isSkirt = i !== ci || j !== cj;
@@ -365,7 +441,8 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
     }
   }
 
-  const quadsX = gw - 1, quadsZ = gh - 1;
+  const quadsX = gw - 1,
+    quadsZ = gh - 1;
   const indices = new Uint32Array(quadsX * quadsZ * 6);
   let k = 0;
   for (let gj = 0; gj < quadsZ; gj++) {
@@ -374,8 +451,12 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
       const b = a + 1;
       const c = a + gw;
       const d = c + 1;
-      indices[k++] = a; indices[k++] = c; indices[k++] = b;
-      indices[k++] = b; indices[k++] = c; indices[k++] = d;
+      indices[k++] = a;
+      indices[k++] = c;
+      indices[k++] = b;
+      indices[k++] = b;
+      indices[k++] = c;
+      indices[k++] = d;
     }
   }
 
@@ -399,7 +480,8 @@ function buildChunkGeometry(x0: number, z0: number, size: number, spacing: numbe
 // ---------------------------------------------------------------------------
 
 function terrainNormalTexture(seed: number): THREE.DataTexture {
-  const w = NORMAL_TEX_W, h = NORMAL_TEX_H;
+  const w = NORMAL_TEX_W,
+    h = NORMAL_TEX_H;
   const worldW = WORLD_MAX_X * 2;
   const worldD = WORLD_MAX_Z - WORLD_MIN_Z;
   const stepX = worldW / w;
@@ -414,8 +496,10 @@ function terrainNormalTexture(seed: number): THREE.DataTexture {
   const data = new Uint8Array(w * h * 4);
   for (let j = 0; j < h; j++) {
     for (let i = 0; i < w; i++) {
-      const iw = Math.max(0, i - 1), ie = Math.min(w - 1, i + 1);
-      const jn = Math.max(0, j - 1), js = Math.min(h - 1, j + 1);
+      const iw = Math.max(0, i - 1),
+        ie = Math.min(w - 1, i + 1);
+      const jn = Math.max(0, j - 1),
+        js = Math.min(h - 1, j + 1);
       const dhdx = (heights[j * w + ie] - heights[j * w + iw]) / ((ie - iw) * stepX);
       const dhdz = (heights[js * w + i] - heights[jn * w + i]) / ((js - jn) * stepZ);
       const nx = -dhdx * NORMAL_TEX_STRENGTH;
@@ -470,26 +554,37 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
       uMacro: { value: macro },
     });
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', `#include <common>
+      .replace(
+        '#include <common>',
+        `#include <common>
         attribute vec4 aSplat;
         attribute vec4 aExtra;
         varying vec4 vSplat;
         varying vec4 vExtra;
         varying vec3 vWPos;
-        varying vec3 vWNorm;`)
-      .replace('#include <begin_vertex>', `#include <begin_vertex>
+        varying vec3 vWNorm;`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
         vSplat = aSplat;
         vExtra = aExtra;
         vWPos = (modelMatrix * vec4(position, 1.0)).xyz;
-        vWNorm = objectNormal; // terrain mesh is untransformed: object == world`);
+        vWNorm = objectNormal; // terrain mesh is untransformed: object == world`,
+      );
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', `#include <common>
+      .replace(
+        '#include <common>',
+        `#include <common>
         varying vec4 vSplat;
         varying vec4 vExtra;
         varying vec3 vWPos;
         varying vec3 vWNorm;
-        uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro;`)
-      .replace('#include <map_fragment>', `
+        uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro;`,
+      )
+      .replace(
+        '#include <map_fragment>',
+        `
         vec2 tuv = vWPos.xz * 0.22;
         // grass blends two scales so the 1K photo source never reads as tile
         vec3 grassAlb = mix(texture2D(uGrass, tuv).rgb, texture2D(uGrass, tuv * 0.31).rgb, 0.42);
@@ -528,15 +623,24 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
         // (vColor was authored as a full sRGB ground color, so re-centre it
         // around 1.0 before using it as a multiplier.)
         vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
-        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro;`)
-      .replace('#include <color_fragment>', `
+        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro;`,
+      )
+      .replace(
+        '#include <color_fragment>',
+        `
         // vertex color already folded into the splat albedo above (gently);
-        // the stock full multiply would re-tint the real textures to mush`)
-      .replace('#include <roughnessmap_fragment>', `
+        // the stock full multiply would re-tint the real textures to mush`,
+      )
+      .replace(
+        '#include <roughnessmap_fragment>',
+        `
         float roughnessFactor = roughness * mix(
           dot(vSplat, vec4(${ROUGH_GRASS}, mix(${ROUGH_DIRT}, ${ROUGH_MUD}, vExtra.x), ${ROUGH_ROCK}, ${ROUGH_SAND})),
-          ${ROUGH_SNOW}, vExtra.y);`)
-      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+          ${ROUGH_SNOW}, vExtra.y);`,
+      )
+      .replace(
+        '#include <normal_fragment_maps>',
+        `#include <normal_fragment_maps>
         // per-layer detail normals (GL-convention), weighted by splat
         vec3 gN = texture2D(uGrassN, tuv).xyz * 2.0 - 1.0;
         vec3 dN = texture2D(uDirtN, tuv * 0.8).xyz * 2.0 - 1.0;
@@ -556,7 +660,8 @@ function buildSplatMaterial(seed: number): THREE.MeshStandardMaterial {
           vec3 rNz = texture2D(uRockN, vWPos.xy * 0.132).xyz * 2.0 - 1.0; // +-z faces
           vec3 wallPerturb = mix(vec3(rNz.x, rNz.y, 0.0), vec3(0.0, rNx.y, rNx.x), axisW);
           normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 0.8));
-        }`);
+        }`,
+      );
   };
   return mat;
 }
@@ -611,7 +716,9 @@ export function buildTerrain(seed: number): TerrainView {
     mesh.receiveShadow = true;
     group.add(mesh);
     chunks.push({
-      mesh, x: x0 + size / 2, z: z0 + size / 2,
+      mesh,
+      x: x0 + size / 2,
+      z: z0 + size / 2,
       half: size / 2,
     });
   };
@@ -623,18 +730,39 @@ export function buildTerrain(seed: number): TerrainView {
   for (let cz = 0; cz < chunksZ; cz++) {
     for (let cx = 0; cx < chunksX; cx++) {
       if (built.has(cz * chunksX + cx)) continue;
-      const superOk = cx % 2 === 0 && cz % 2 === 0 && cx + 1 < chunksX && cz + 1 < chunksZ
-        && bandIndexAt(cx, cz) === farBand && bandIndexAt(cx + 1, cz) === farBand
-        && bandIndexAt(cx, cz + 1) === farBand && bandIndexAt(cx + 1, cz + 1) === farBand;
+      const superOk =
+        cx % 2 === 0 &&
+        cz % 2 === 0 &&
+        cx + 1 < chunksX &&
+        cz + 1 < chunksZ &&
+        bandIndexAt(cx, cz) === farBand &&
+        bandIndexAt(cx + 1, cz) === farBand &&
+        bandIndexAt(cx, cz + 1) === farBand &&
+        bandIndexAt(cx + 1, cz + 1) === farBand;
       if (superOk) {
-        for (const [dx, dz] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+        for (const [dx, dz] of [
+          [0, 0],
+          [1, 0],
+          [0, 1],
+          [1, 1],
+        ]) {
           built.add((cz + dz) * chunksX + (cx + dx));
         }
-        addChunk(-WORLD_MAX_X + cx * CHUNK_SIZE, WORLD_MIN_Z + cz * CHUNK_SIZE, CHUNK_SIZE * 2, bands[farBand].spacing);
+        addChunk(
+          -WORLD_MAX_X + cx * CHUNK_SIZE,
+          WORLD_MIN_Z + cz * CHUNK_SIZE,
+          CHUNK_SIZE * 2,
+          bands[farBand].spacing,
+        );
       } else {
         built.add(cz * chunksX + cx);
         const band = bands[bandIndexAt(cx, cz)];
-        addChunk(-WORLD_MAX_X + cx * CHUNK_SIZE, WORLD_MIN_Z + cz * CHUNK_SIZE, CHUNK_SIZE, band.spacing);
+        addChunk(
+          -WORLD_MAX_X + cx * CHUNK_SIZE,
+          WORLD_MIN_Z + cz * CHUNK_SIZE,
+          CHUNK_SIZE,
+          band.spacing,
+        );
       }
     }
   }

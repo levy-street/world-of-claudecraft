@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import { terrainHeight, zoneBiomeAt, WATER_LEVEL } from '../sim/world';
+import { terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { GFX } from './gfx';
 
 // ---------------------------------------------------------------------------
@@ -154,7 +154,10 @@ export function buildMotes(seed: number): MotesView {
         const dx = homeX[i] - px;
         const dz = homeZ[i] - pz;
         if (dx * dx + dz * dz > RADIUS * RADIUS) {
-          if (!place(i, px, pz)) { baseY[i] = -1e6; continue; }
+          if (!place(i, px, pz)) {
+            baseY[i] = -1e6;
+            continue;
+          }
         }
         if (baseY[i] < -1e5) continue; // parked
         const ph = phase[i] + t * 0.6;

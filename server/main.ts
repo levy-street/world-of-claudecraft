@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 import { type WebSocket, WebSocketServer } from 'ws';
+import { isPlayerRace } from '../src/sim/content/races';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -9,7 +10,6 @@ import {
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
-import { isPlayerRace } from '../src/sim/content/races';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass, PlayerRace } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';

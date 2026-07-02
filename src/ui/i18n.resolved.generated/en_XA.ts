@@ -4918,7 +4918,7 @@ export const en_XA: EnTranslations = {
         "name": "[Þéļţ óƒ ţĥé Éɱƀéŕĵáŵ Ɱáţŕíáŕçĥ]"
       },
       "karns_funeral_mask": {
-        "name": "[Ɋéšĥ Ƒļáţƀŕéáð]"
+        "name": "[Ķáŕñ'š Ƒúñéŕáļ Ɱášķ]"
       },
       "qesh_flatbread": {
         "name": "[Ɋéšĥ Ƒļáţƀŕéáð]"
@@ -5017,7 +5017,7 @@ export const en_XA: EnTranslations = {
         "name": "[Þéļţ óƒ Þáļéƒáñĝ ţĥé Šíļéñţ]"
       },
       "grelnoks_frozen_idol": {
-        "name": "[Ñíĝĥţĥóļļóŵ Ɓļáçķ Ɓŕéáð]"
+        "name": "[Ĝŕéļñóķ'š Ƒŕóžéñ Íðóļ]"
       },
       "nighthollow_black_bread": {
         "name": "[Ñíĝĥţĥóļļóŵ Ɓļáçķ Ɓŕéáð]"
@@ -5131,7 +5131,7 @@ export const en_XA: EnTranslations = {
         "name": "[Þéļţ óƒ ţĥé Ĥóáŕƒáñĝ Áļþĥá]"
       },
       "kazriks_brass_whistle": {
-        "name": "[Ķáéļšþíŕé Ɓáŕļéý Ļóáƒ]"
+        "name": "[Ķážŕíķ'š Ɓŕášš Ŵĥíšţļé]"
       },
       "kaelspire_barley_loaf": {
         "name": "[Ķáéļšþíŕé Ɓáŕļéý Ļóáƒ]"
@@ -5143,7 +5143,7 @@ export const en_XA: EnTranslations = {
         "name": "[Íɱþéŕíáļ Ƒíéļð Ŕáţíóñ]"
       },
       "imperial_clerks_robe": {
-        "name": "[Ķáéļ Íñƒáñţŕý Ĥáúƀéŕķ]"
+        "name": "[Íɱþéŕíáļ Çļéŕķ'š Ŕóƀé]"
       },
       "kael_infantry_hauberk": {
         "name": "[Ķáéļ Íñƒáñţŕý Ĥáúƀéŕķ]"
@@ -5167,10 +5167,10 @@ export const en_XA: EnTranslations = {
         "name": "[Ŵóļƒšŵáŕð Šķíññéŕ]"
       },
       "prefects_sealed_mantle": {
-        "name": "[Ĥóáŕƒáñĝ Çļáŵĝŕíþš]"
+        "name": "[Þŕéƒéçţ'š Šéáļéð Ɱáñţļé]"
       },
       "huntmasters_winter_hood": {
-        "name": "[Ĥóáŕƒáñĝ Çļáŵĝŕíþš]"
+        "name": "[Ĥúñţɱášţéŕ'š Ŵíñţéŕ Ĥóóð]"
       },
       "hoarfang_clawgrips": {
         "name": "[Ĥóáŕƒáñĝ Çļáŵĝŕíþš]"
@@ -5221,7 +5221,7 @@ export const en_XA: EnTranslations = {
         "name": "[Úñðéŕŵáý Ĥáŕðţáçķ]"
       },
       "smugglers_black_brew": {
-        "name": "[Ţĥóŕñƀéŕŕý Ļóáƒ]"
+        "name": "[Šɱúĝĝļéŕ'š Ɓļáçķ Ɓŕéŵ]"
       },
       "thornberry_loaf": {
         "name": "[Ţĥóŕñƀéŕŕý Ļóáƒ]"
@@ -5248,13 +5248,13 @@ export const en_XA: EnTranslations = {
         "name": "[Ñáɱéļéšš Ŕíʋéŕ Ŵáţéŕ]"
       },
       "smuggler_kings_softsteps": {
-        "name": "[Ɓŕíáŕƒáţĥéŕ Ɓáŕķ Ɱíţţš]"
+        "name": "[Šɱúĝĝļéŕ Ķíñĝ'š Šóƒţšţéþš]"
       },
       "briarfather_bark_mitts": {
         "name": "[Ɓŕíáŕƒáţĥéŕ Ɓáŕķ Ɱíţţš]"
       },
       "skarns_war_harness": {
-        "name": "[Ɱíŕéĥéáŕţ Ĝíŕðļé]"
+        "name": "[Šķáŕñ'š Ŵáŕ Ĥáŕñéšš]"
       },
       "colossus_mireheart_girdle": {
         "name": "[Ɱíŕéĥéáŕţ Ĝíŕðļé]"
@@ -5344,7 +5344,7 @@ export const en_XA: EnTranslations = {
         "name": "[Ɱáŕŕóŵĥíðé Ļéĝĝíñĝš]"
       },
       "scavenger_kings_shiv": {
-        "name": "[Ƒóŕĝé-Ŵýŕɱ Šçáļé Ĥéļɱ]"
+        "name": "[Šçáʋéñĝéŕ Ķíñĝ'š Šĥíʋ]"
       },
       "forgewyrm_scale_helm": {
         "name": "[Ƒóŕĝé-Ŵýŕɱ Šçáļé Ĥéļɱ]"

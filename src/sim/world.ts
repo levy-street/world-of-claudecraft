@@ -1,8 +1,15 @@
-import { fbm2, hash2 } from './rng';
 import {
-  CAMPS, DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, ROADS, WORLD_MAX_X, WORLD_MAX_Z,
-  WORLD_MIN_X, WORLD_MIN_Z, ZONES,
+  CAMPS,
+  DUNGEON_FLOOR_Y,
+  DUNGEON_X_THRESHOLD,
+  ROADS,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+  ZONES,
 } from './data';
+import { fbm2, hash2 } from './rng';
 import type { BiomeId } from './types';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -67,16 +74,16 @@ export function mirefenImpactCraterOffset(x: number, z: number): number {
   if (d >= MIREFEN_IMPACT_CRATER.radius) return 0;
 
   const bowlT = d / MIREFEN_IMPACT_CRATER.bowlRadius;
-  const bowl = d < MIREFEN_IMPACT_CRATER.bowlRadius
-    ? -MIREFEN_IMPACT_CRATER.depth * (1 - smoothstep(0, 1, bowlT))
-    : 0;
+  const bowl =
+    d < MIREFEN_IMPACT_CRATER.bowlRadius
+      ? -MIREFEN_IMPACT_CRATER.depth * (1 - smoothstep(0, 1, bowlT))
+      : 0;
 
   const rimStart = MIREFEN_IMPACT_CRATER.bowlRadius * 0.82;
   if (d <= rimStart) return bowl;
   const rimT = (d - rimStart) / (MIREFEN_IMPACT_CRATER.radius - rimStart);
-  const rim = MIREFEN_IMPACT_CRATER.rimHeight
-    * smoothstep(0, 0.35, rimT)
-    * (1 - smoothstep(0.72, 1, rimT));
+  const rim =
+    MIREFEN_IMPACT_CRATER.rimHeight * smoothstep(0, 0.35, rimT) * (1 - smoothstep(0.72, 1, rimT));
   return bowl + rim;
 }
 
@@ -100,7 +107,8 @@ function shapeAt(z: number): { hill: number; base: number } {
 
 function baseHeight(x: number, z: number, seed: number): number {
   const shape = shapeAt(z);
-  let h = (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
+  let h =
+    (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
   // Flatten each zone's hub settlement into a plateau. The cheap |dz| band
   // check skips zones whose hub cannot influence this sample (identical
@@ -188,12 +196,16 @@ export function roadDistance(x: number, z: number): number {
   let best = Infinity;
   for (const road of ROADS) {
     for (let i = 0; i < road.length - 1; i++) {
-      const a = road[i], b = road[i + 1];
-      const abx = b.x - a.x, abz = b.z - a.z;
-      const apx = x - a.x, apz = z - a.z;
+      const a = road[i],
+        b = road[i + 1];
+      const abx = b.x - a.x,
+        abz = b.z - a.z;
+      const apx = x - a.x,
+        apz = z - a.z;
       const len2 = abx * abx + abz * abz;
       const t = len2 > 0 ? Math.max(0, Math.min(1, (apx * abx + apz * abz) / len2)) : 0;
-      const dx = apx - abx * t, dz = apz - abz * t;
+      const dx = apx - abx * t,
+        dz = apz - abz * t;
       const d = Math.sqrt(dx * dx + dz * dz);
       if (d < best) best = d;
     }
@@ -228,12 +240,12 @@ const DECOR_MIX: Record<BiomeId, { gate: number; tree: number; tree2: number }> 
 };
 
 const DECORATION_EXCLUSION_RADIUS = 1.2;
-const DECORATION_EXCLUSIONS = [
-  { x: 2.456450840458274, z: 211.33819991815835 },
-];
+const DECORATION_EXCLUSIONS = [{ x: 2.456450840458274, z: 211.33819991815835 }];
 
 function isExcludedDecoration(x: number, z: number): boolean {
-  return DECORATION_EXCLUSIONS.some((p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS);
+  return DECORATION_EXCLUSIONS.some(
+    (p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS,
+  );
 }
 
 export function zoneBiomeAt(z: number): BiomeId {
@@ -258,25 +270,35 @@ export function generateDecorations(seed: number): Decoration[] {
       const kind: Decoration['kind'] = r < mix.tree ? 'tree' : r < mix.tree2 ? 'tree2' : 'rock';
       const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * step;
       const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * step;
-      const x = gx + ox, z = gz + oz;
+      const x = gx + ox,
+        z = gz + oz;
       if (isExcludedDecoration(x, z)) continue;
       let inHub = false;
       for (const zone of ZONES) {
-        const dx = x - zone.hub.x, dz = z - zone.hub.z;
-        if (Math.sqrt(dx * dx + dz * dz) < zone.hub.radius + 4) { inHub = true; break; }
+        const dx = x - zone.hub.x,
+          dz = z - zone.hub.z;
+        if (Math.sqrt(dx * dx + dz * dz) < zone.hub.radius + 4) {
+          inHub = true;
+          break;
+        }
       }
       if (inHub) continue;
       if (terrainHeight(x, z, seed) < WATER_LEVEL + 1) continue;
       if (roadDistance(x, z) < 5) continue;
       let inCamp = false;
       for (const c of CAMPS) {
-        const dx = x - c.center.x, dz = z - c.center.z;
-        if (Math.sqrt(dx * dx + dz * dz) < c.radius + 3) { inCamp = true; break; }
+        const dx = x - c.center.x,
+          dz = z - c.center.z;
+        if (Math.sqrt(dx * dx + dz * dz) < c.radius + 3) {
+          inCamp = true;
+          break;
+        }
       }
       if (inCamp) continue;
       out.push({
         kind,
-        x, z,
+        x,
+        z,
         scale: 0.7 + hash2(Math.round(gx), Math.round(gz), seed + 13) * 0.9,
         variant: Math.floor(hash2(Math.round(gx), Math.round(gz), seed + 77) * 3),
         biome,

@@ -7,7 +7,7 @@
 // The colours sample the SAME `terrainHeight`/`roadDistance` the renderer and
 // sim use, so the map always matches the real world, do not diverge them.
 import { ZONES } from '../sim/data';
-import { terrainHeight, roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 
 export interface MapRegion {
   minX: number;
@@ -46,38 +46,91 @@ export function paintTerrainRows(
       const z = region.maxZ - (iy / H) * spanZ;
       const h = terrainHeight(x, z, seed);
       const biome = zoneBiomeAt(z);
-      let r = 58, g = 105, b = 48;
-      if (biome === 'marsh') { r = 64; g = 86; b = 48; }
-      else if (biome === 'peaks') { r = 92; g = 100; b = 82; }
-      else if (biome === 'desert') { r = 168; g = 142; b = 92; }
-      else if (biome === 'shadowwood') { r = 44; g = 66; b = 54; }
-      else if (biome === 'highlands') { r = 74; g = 108; b = 58; }
-      else if (biome === 'scorched') { r = 96; g = 74; b = 60; }
-      else if (biome === 'salt') { r = 196; g = 192; b = 176; }
+      let r = 58,
+        g = 105,
+        b = 48;
+      if (biome === 'marsh') {
+        r = 64;
+        g = 86;
+        b = 48;
+      } else if (biome === 'peaks') {
+        r = 92;
+        g = 100;
+        b = 82;
+      } else if (biome === 'desert') {
+        r = 168;
+        g = 142;
+        b = 92;
+      } else if (biome === 'shadowwood') {
+        r = 44;
+        g = 66;
+        b = 54;
+      } else if (biome === 'highlands') {
+        r = 74;
+        g = 108;
+        b = 58;
+      } else if (biome === 'scorched') {
+        r = 96;
+        g = 74;
+        b = 60;
+      } else if (biome === 'salt') {
+        r = 196;
+        g = 192;
+        b = 176;
+      }
       // dry/arid biomes keep their ground color at rolling heights; only the
       // ridge band goes rock+snow (the mid-height rocky/dry-grass overrides
       // are green-biome shading and would repaint dunes and salt as grass)
       const arid = biome === 'desert' || biome === 'salt' || biome === 'scorched';
-      if (h < WATER_LEVEL) { r = 38; g = 84; b = 138; }
-      else if (h > 26) { r = 168; g = 172; b = 178; } // ridge / peak rock+snow
-      else if (h > 11 && !arid) { r = 112; g = 110; b = 102; }
-      else if (h > 6 && !arid) { r = 88; g = 102; b = 62; }
+      if (h < WATER_LEVEL) {
+        r = 38;
+        g = 84;
+        b = 138;
+      } else if (h > 26) {
+        r = 168;
+        g = 172;
+        b = 178;
+      } // ridge / peak rock+snow
+      else if (h > 11 && !arid) {
+        r = 112;
+        g = 110;
+        b = 102;
+      } else if (h > 6 && !arid) {
+        r = 88;
+        g = 102;
+        b = 62;
+      }
       let nearHub = false;
       for (const zn of ZONES) {
-        if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 14) { nearHub = true; break; }
+        if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 14) {
+          nearHub = true;
+          break;
+        }
       }
-      if (nearHub) { r = 125; g = 100; b = 66; }
-      else if (h >= WATER_LEVEL && roadDistance(x, z) < 2.4) { r = 138; g = 111; b = 71; }
+      if (nearHub) {
+        r = 125;
+        g = 100;
+        b = 66;
+      } else if (h >= WATER_LEVEL && roadDistance(x, z) < 2.4) {
+        r = 138;
+        g = 111;
+        b = 71;
+      }
       // hillshade: relief from the west-to-east slope, reusing the already-computed
       // left-neighbour height so it costs no extra terrainHeight() calls
       const left = ix === 0 ? h : prevH;
       prevH = h;
       if (h >= WATER_LEVEL) {
         const shade = Math.max(0.74, Math.min(1.28, 1 + (h - left) * 0.16));
-        r = Math.min(255, r * shade); g = Math.min(255, g * shade); b = Math.min(255, b * shade);
+        r = Math.min(255, r * shade);
+        g = Math.min(255, g * shade);
+        b = Math.min(255, b * shade);
       }
       const k = (iy * W + ix) * 4;
-      data[k] = r; data[k + 1] = g; data[k + 2] = b; data[k + 3] = 255;
+      data[k] = r;
+      data[k + 1] = g;
+      data[k + 2] = b;
+      data[k + 3] = 255;
     }
   }
 }

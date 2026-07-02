@@ -44,6 +44,18 @@ import {
   TEMPLE_QUEST_ORDER,
   TEMPLE_QUESTS,
 } from './content/temple';
+import {
+  VALDRIS_CAMPS,
+  VALDRIS_ITEMS,
+  VALDRIS_MOBS,
+  VALDRIS_NPCS,
+  VALDRIS_OBJECTS,
+  VALDRIS_PROPS,
+  VALDRIS_QUEST_ORDER,
+  VALDRIS_QUESTS,
+  VALDRIS_ROADS,
+  VALDRIS_ZONES,
+} from './content/valdris';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import {
   GRAVEYARD_POS,
@@ -85,18 +97,6 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
-import {
-  VALDRIS_CAMPS,
-  VALDRIS_ITEMS,
-  VALDRIS_MOBS,
-  VALDRIS_NPCS,
-  VALDRIS_OBJECTS,
-  VALDRIS_PROPS,
-  VALDRIS_QUEST_ORDER,
-  VALDRIS_QUESTS,
-  VALDRIS_ROADS,
-  VALDRIS_ZONES,
-} from './content/valdris';
 import { DUNGEON_WALL_HW } from './dungeon_layout';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';

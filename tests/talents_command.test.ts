@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
-import { MAX_LEVEL } from '../src/sim/types';
 import { talentsFor } from '../src/sim/content/talents';
+import { Sim } from '../src/sim/sim';
+import { MAX_LEVEL, type SimEvent } from '../src/sim/types';
 
 // "/talents" emits a self-only `error` event (the same self-reply channel /who
 // uses) and returns null, so we collect the text from the next tick's events.
 function readout(sim: Sim, cmd: string): string | undefined {
-  sim.tick();                       // drain any setup events first
+  sim.tick(); // drain any setup events first
   expect(sim.chat(cmd)).toBeNull(); // readouts are never logged as chat
-  const errs = sim.tick().filter((e: SimEvent): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
+  const errs = sim
+    .tick()
+    .filter((e: SimEvent): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
   return errs.at(-1)?.text;
 }
 
@@ -49,11 +50,13 @@ describe('/talents readout', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
     sim.setPlayerLevel(20); // 11 points at level 20, exactly spendable below
     // 11 points, all in the class tree (Toughness/Cruelty cap at 3 each here).
-    expect(sim.applyTalents({
-      spec: null,
-      ranks: { war_toughness: 3, war_cruelty: 3, war_deflection: 3, war_imp_thunder_clap: 2 },
-      choices: {},
-    })).toBe(true);
+    expect(
+      sim.applyTalents({
+        spec: null,
+        ranks: { war_toughness: 3, war_cruelty: 3, war_deflection: 3, war_imp_thunder_clap: 2 },
+        choices: {},
+      }),
+    ).toBe(true);
 
     const text = readout(sim, '/talent'); // alias
     expect(text).toBe('Talents: no specialization — 11/11 points spent (Class 11).');
