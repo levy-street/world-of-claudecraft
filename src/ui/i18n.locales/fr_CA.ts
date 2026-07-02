@@ -230,10 +230,4 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'ombre',
   'hudChrome.auraEffect.school.holy': 'sacré',
   'hudChrome.auraEffect.school.nature': 'nature',
-  'entities.items.conjured_bread4.name': 'Roulé à la cannelle conjuré',
-  'entities.items.conjured_bread5.name': 'Pain au levain conjuré',
-  'entities.items.conjured_bread6.name': 'Gâteau conjuré',
-  'entities.items.conjured_water4.name': 'Eau cristalline conjurée',
-  'entities.items.conjured_water5.name': 'Eau glaciaire conjurée',
-  'entities.items.conjured_water6.name': 'Eau de montagne conjurée',
 };

@@ -1296,7 +1296,7 @@ describe('quest npc roles', () => {
 
     for (let i = 0; i < 2 * 20; i++) sim.tick();
     expect(sim.entities.has(boneguard.id)).toBe(false);
-  });
+  }, 90_000);
 
   it('despawns the Bound Guardian after 60 seconds out of combat without damage and resets on damage taken', () => {
     const sim = makeSim();

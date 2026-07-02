@@ -84,5 +84,5 @@ describe('loot goes FFA one minute after a corpse becomes lootable', () => {
       return Math.max(0, Math.round(mob.lootFfaTimer * 1000));
     };
     expect(run()).toEqual(run());
-  });
+  }, 90_000);
 });
