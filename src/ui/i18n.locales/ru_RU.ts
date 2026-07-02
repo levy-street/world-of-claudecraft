@@ -5219,4 +5219,48 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': 'Быстрое восстановление',
   'entities.abilities.swiftmend.description':
     'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)',
+  'entities.abilities.heroic_leap.name': 'Героический прыжок',
+  'entities.abilities.heroic_leap.description':
+    'Прыжок в выбранную область, наносящий {damage} физического урона ближайшим врагам. (Талант воина)',
+  'entities.abilities.pummel.name': 'Зуботычина',
+  'entities.abilities.pummel.description':
+    'Прерывает произнесение заклинания и не дает применять заклинания этой школы 4 сек. (Талант воина)',
+  'entities.abilities.shield_wall.name': 'Глухая оборона',
+  'entities.abilities.shield_wall.description':
+    'Вы поднимаете щитовую стену, значительно повышая броню на 10 сек. (Талант воина)',
+  'entities.abilities.last_stand.name': 'Ни шагу назад',
+  'entities.abilities.last_stand.description':
+    'Временно повышает выносливость на 15 сек., увеличивая максимальный запас здоровья. (Талант воина)',
+  'entities.abilities.bladestorm.name': 'Вихрь клинков',
+  'entities.abilities.bladestorm.description':
+    'Вы становитесь бурей стали и каждую секунду поражаете ближайших врагов на {damage}. (Талант воина)',
+  'entities.abilities.avatar.name': 'Аватара',
+  'entities.abilities.avatar.description':
+    'Вы превращаетесь в колосса, повышая силу атаки на 20 сек. (Талант воина)',
+  'entities.abilities.rallying_cry.name': 'Ободряющий клич',
+  'entities.abilities.rallying_cry.description':
+    'Вы издаете ободряющий клич, повышая силу атаки ближайших союзников на 10 сек. (Талант воина)',
+  'entities.abilities.counterspell.name': 'Антимагия',
+  'entities.abilities.counterspell.description':
+    'Прерывает вражеское заклинание и не дает применять заклинания этой школы 6 сек. (Талант мага)',
+  'entities.abilities.ice_lance.name': 'Ледяное копье',
+  'entities.abilities.ice_lance.description':
+    'Метает осколок льда, наносящий {damage} урона от магии льда. Наносит тройной урон обездвиженным целям. (Талант мага)',
+  'entities.abilities.presence_of_mind.name': 'Величие разума',
+  'entities.abilities.presence_of_mind.description':
+    'Ваше следующее заклинание со временем произнесения становится мгновенным. Длится 60 сек. (Талант мага)',
+  'entities.abilities.blink.name': 'Скачок',
+  'entities.abilities.blink.description':
+    'Телепортирует вас на 15 м вперед и снимает эффекты корней. (Талант мага)',
+  'entities.abilities.ice_block.name': 'Ледяная глыба',
+  'entities.abilities.ice_block.description':
+    'Заключает вас в лед, поглощая огромное количество урона в течение 8 сек. (Талант мага)',
+  'entities.abilities.deep_freeze.name': 'Глубокая заморозка',
+  'entities.abilities.deep_freeze.description':
+    'Глубоко замораживает цель, наносит {damage} урона от магии льда и оглушает на 4 сек. (Талант мага)',
+  'entities.abilities.meteor.name': 'Метеор',
+  'entities.abilities.meteor.description':
+    'Обрушивает метеор на выбранную область, наносит {damage} урона от огня и поджигает землю. (Талант мага)',
+  'entities.abilities.evocation.name': 'Прилив сил',
+  'entities.abilities.evocation.description': 'Быстро восстанавливает ману. (Талант мага)',
 };

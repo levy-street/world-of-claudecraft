@@ -4339,6 +4339,66 @@ export const de_DE: EnTranslations = {
         "name": "Berserkerwut",
         "description": "Ihr verfallt in Berserkerwut und erzeugt 20 Wut. (Krieger-Talent)"
       },
+      "heroic_leap": {
+        "name": "Heldenhafter Sprung",
+        "description": "Springt zum Zielgebiet und fügt Gegnern in der Nähe {damage} körperlichen Schaden zu. (Krieger Talent)"
+      },
+      "pummel": {
+        "name": "Zuschlagen",
+        "description": "Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Krieger Talent)"
+      },
+      "shield_wall": {
+        "name": "Schildwall",
+        "description": "Errichtet euren Schildwall und erhöht die Rüstung 10 Sek. lang stark. (Krieger Talent)"
+      },
+      "last_stand": {
+        "name": "Letztes Gefecht",
+        "description": "Erhöht die Ausdauer 15 Sek. lang vorübergehend und erhöht so die maximale Gesundheit. (Krieger Talent)"
+      },
+      "bladestorm": {
+        "name": "Klingensturm",
+        "description": "Ihr werdet zu einem Sturm aus Stahl und trefft Gegner in der Nähe jede Sekunde für {damage}. (Krieger Talent)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Verwandelt euch in einen Koloss und erhöht die Angriffskraft 20 Sek. lang. (Krieger Talent)"
+      },
+      "rallying_cry": {
+        "name": "Sammelruf",
+        "description": "Stoßt einen Sammelruf aus, der die Angriffskraft naher Verbündeter 10 Sek. lang erhöht. (Krieger Talent)"
+      },
+      "counterspell": {
+        "name": "Gegenzauber",
+        "description": "Kontert gegnerisches Zauberwirken und verhindert 6 Sek. lang Zauber dieser Schule. (Magier Talent)"
+      },
+      "ice_lance": {
+        "name": "Eislanze",
+        "description": "Schleudert einen Eissplitter, der {damage} Frostschaden verursacht. Verursacht dreifachen Schaden gegen verwurzelte Ziele. (Magier Talent)"
+      },
+      "presence_of_mind": {
+        "name": "Geistesgegenwart",
+        "description": "Macht euren nächsten Zauber mit Zauberzeit sofort. Hält 60 Sek. an. (Magier Talent)"
+      },
+      "blink": {
+        "name": "Blinzeln",
+        "description": "Teleportiert euch 15 m nach vorn und bricht Wurzeln. (Magier Talent)"
+      },
+      "ice_block": {
+        "name": "Eisblock",
+        "description": "Schließt euch in Eis ein und absorbiert 8 Sek. lang eine massive Schadensmenge. (Magier Talent)"
+      },
+      "deep_freeze": {
+        "name": "Tieffrieren",
+        "description": "Friert das Ziel tief ein, verursacht {damage} Frostschaden und betäubt es 4 Sek. lang. (Magier Talent)"
+      },
+      "meteor": {
+        "name": "Meteor",
+        "description": "Ruft einen Meteor auf das Zielgebiet herab, verursacht {damage} Feuerschaden und verbrennt den Boden. (Magier Talent)"
+      },
+      "evocation": {
+        "name": "Hervorrufung",
+        "description": "Stellt rasch Mana wieder her. (Magier Talent)"
+      },
       "holy_shock": {
         "name": "Heiliger Schock",
         "description": "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)"

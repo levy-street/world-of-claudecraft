@@ -2120,6 +2120,7 @@ export class Sim {
       swingIntervalMult: sim.swingIntervalMult.bind(sim),
       mobEffectiveMeleeRange: sim.mobEffectiveMeleeRange.bind(sim),
       mobCanSwim: sim.mobCanSwim.bind(sim),
+      resolveMove: sim.resolveMove.bind(sim),
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
       // through this seam binding (late-bound arrow so sim.ctx resolves at call time).

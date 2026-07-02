@@ -4339,6 +4339,66 @@ export const zh_CN: EnTranslations = {
         "name": "狂暴之怒",
         "description": "进入狂暴之怒，产生 20 点怒气。（战士天赋）"
       },
+      "heroic_leap": {
+        "name": "英勇飞跃",
+        "description": "跃向目标区域，对附近敌人造成 {damage} 点物理伤害。（战士天赋）"
+      },
+      "pummel": {
+        "name": "拳击",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（战士天赋）"
+      },
+      "shield_wall": {
+        "name": "盾墙",
+        "description": "举起盾墙，护甲大幅提高，持续 10 秒。（战士天赋）"
+      },
+      "last_stand": {
+        "name": "破釜沉舟",
+        "description": "耐力暂时提高，持续 15 秒，从而提高最大生命值。（战士天赋）"
+      },
+      "bladestorm": {
+        "name": "剑刃风暴",
+        "description": "化为钢铁风暴，每秒对附近敌人造成 {damage} 点伤害。（战士天赋）"
+      },
+      "avatar": {
+        "name": "天神下凡",
+        "description": "化身巨像，攻击强度提高，持续 20 秒。（战士天赋）"
+      },
+      "rallying_cry": {
+        "name": "集结呐喊",
+        "description": "发出集结呐喊，使附近盟友的攻击强度提高，持续 10 秒。（战士天赋）"
+      },
+      "counterspell": {
+        "name": "法术反制",
+        "description": "反制敌人的施法，并使该系法术在 6 秒内无法施放。（法师天赋）"
+      },
+      "ice_lance": {
+        "name": "冰枪术",
+        "description": "投掷寒冰碎片，造成 {damage} 点冰霜伤害。对被定身目标造成三倍伤害。（法师天赋）"
+      },
+      "presence_of_mind": {
+        "name": "气定神闲",
+        "description": "使你的下一个有施法时间的法术变为瞬发。持续 60 秒。（法师天赋）"
+      },
+      "blink": {
+        "name": "闪现术",
+        "description": "向前传送 15 码并解除定身效果。（法师天赋）"
+      },
+      "ice_block": {
+        "name": "寒冰屏障",
+        "description": "将你封入寒冰，吸收大量伤害，持续 8 秒。（法师天赋）"
+      },
+      "deep_freeze": {
+        "name": "深度冻结",
+        "description": "深度冻结目标，造成 {damage} 点冰霜伤害并使其昏迷 4 秒。（法师天赋）"
+      },
+      "meteor": {
+        "name": "流星",
+        "description": "在目标区域召唤流星，造成 {damage} 点火焰伤害并点燃地面。（法师天赋）"
+      },
+      "evocation": {
+        "name": "唤醒",
+        "description": "快速恢复法力值。（法师天赋）"
+      },
       "holy_shock": {
         "name": "神圣震击",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"

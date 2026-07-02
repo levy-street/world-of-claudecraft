@@ -4339,6 +4339,66 @@ export const fr_CA: EnTranslations = {
         "name": "Rage berserker",
         "description": "Entre dans une rage berserker et génère 20 rage. (talent de guerrier)"
       },
+      "heroic_leap": {
+        "name": "Bond héroïque",
+        "description": "Bondit vers la zone ciblée et inflige {damage} points de dégâts physiques aux ennemis proches. (Talent de guerrier)"
+      },
+      "pummel": {
+        "name": "Volée de coups",
+        "description": "Interrompt l’incantation et empêche de lancer des sorts de cette école pendant 4 s. (Talent de guerrier)"
+      },
+      "shield_wall": {
+        "name": "Mur protecteur",
+        "description": "Dresse votre mur protecteur, ce qui augmente fortement l’armure pendant 10 s. (Talent de guerrier)"
+      },
+      "last_stand": {
+        "name": "Dernier rempart",
+        "description": "Augmente temporairement l’Endurance pendant 15 s, ce qui augmente les points de vie maximum. (Talent de guerrier)"
+      },
+      "bladestorm": {
+        "name": "Tempête de lames",
+        "description": "Vous devenez une tempête d’acier et frappez les ennemis proches chaque seconde pour {damage} points de dégâts. (Talent de guerrier)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Vous transforme en colosse, ce qui augmente la puissance d’attaque pendant 20 s. (Talent de guerrier)"
+      },
+      "rallying_cry": {
+        "name": "Cri de ralliement",
+        "description": "Pousse un cri de ralliement qui augmente la puissance d’attaque des alliés proches pendant 10 s. (Talent de guerrier)"
+      },
+      "counterspell": {
+        "name": "Contresort",
+        "description": "Contre l’incantation ennemie et empêche de lancer des sorts de cette école pendant 6 s. (Talent de mage)"
+      },
+      "ice_lance": {
+        "name": "Javelot de glace",
+        "description": "Projette un éclat de glace qui inflige {damage} points de dégâts de Givre. Inflige le triple aux cibles enracinées. (Talent de mage)"
+      },
+      "presence_of_mind": {
+        "name": "Présence spirituelle",
+        "description": "Rend instantané votre prochain sort avec un temps d incantation. Dure 60 s. (Talent de mage)"
+      },
+      "blink": {
+        "name": "Transfert",
+        "description": "Vous téléporte de 15 m vers l’avant et brise les racines. (Talent de mage)"
+      },
+      "ice_block": {
+        "name": "Bloc de glace",
+        "description": "Vous enferme dans la glace et absorbe une quantité massive de dégâts pendant 8 s. (Talent de mage)"
+      },
+      "deep_freeze": {
+        "name": "Congélation profonde",
+        "description": "Congèle profondément la cible, inflige {damage} points de dégâts de Givre et l’étourdit pendant 4 s. (Talent de mage)"
+      },
+      "meteor": {
+        "name": "Météore",
+        "description": "Fait tomber un météore sur la zone ciblée, inflige {damage} points de dégâts de Feu et embrase le sol. (Talent de mage)"
+      },
+      "evocation": {
+        "name": "Évocation",
+        "description": "Restaure rapidement du mana. (Talent de mage)"
+      },
       "holy_shock": {
         "name": "Horion sacré",
         "description": "Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)"

@@ -395,6 +395,15 @@ export interface SimContextCallbacks {
   swingIntervalMult(e: Entity): number;
   mobEffectiveMeleeRange(mob: Entity): number;
   mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean;
+  resolveMove(
+    fromX: number,
+    fromZ: number,
+    nx: number,
+    nz: number,
+    r: number,
+    e: Entity,
+    ignoreFences?: boolean,
+  ): { x: number; z: number };
   resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number };
   // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1) ---
   updatePet(pet: Entity): void;
@@ -821,6 +830,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     swingIntervalMult: host.swingIntervalMult,
     mobEffectiveMeleeRange: host.mobEffectiveMeleeRange,
     mobCanSwim: host.mobCanSwim,
+    resolveMove: host.resolveMove,
     resolveMovePoint: host.resolveMovePoint,
     updatePet: host.updatePet,
     isDelveCompanionMob: host.isDelveCompanionMob,

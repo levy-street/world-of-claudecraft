@@ -4339,6 +4339,66 @@ export const pt_BR: EnTranslations = {
         "name": "Raiva Berserker",
         "description": "Entra em raiva berserker e gera 20 de raiva. (talento de guerreiro)"
       },
+      "heroic_leap": {
+        "name": "Salto Heroico",
+        "description": "Salta até a área alvo e causa {damage} de dano Físico aos inimigos próximos. (Talento de guerreiro)"
+      },
+      "pummel": {
+        "name": "Murro",
+        "description": "Interrompe a conjuração e impede feitiços dessa escola por 4 s. (Talento de guerreiro)"
+      },
+      "shield_wall": {
+        "name": "Muralha de Escudos",
+        "description": "Ergue sua muralha de escudos, aumentando muito a armadura por 10 s. (Talento de guerreiro)"
+      },
+      "last_stand": {
+        "name": "Último Recurso",
+        "description": "Aumenta temporariamente o Vigor por 15 s, aumentando a vida máxima. (Talento de guerreiro)"
+      },
+      "bladestorm": {
+        "name": "Tormenta de Lâminas",
+        "description": "Você se torna uma tormenta de aço, atingindo inimigos próximos a cada segundo por {damage}. (Talento de guerreiro)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transforma você em um colosso, aumentando o poder de ataque por 20 s. (Talento de guerreiro)"
+      },
+      "rallying_cry": {
+        "name": "Brado de Convocação",
+        "description": "Solta um brado de convocação que aumenta o poder de ataque de aliados próximos por 10 s. (Talento de guerreiro)"
+      },
+      "counterspell": {
+        "name": "Contrafeitiço",
+        "description": "Anula a conjuração inimiga e impede feitiços dessa escola por 6 s. (Talento de mago)"
+      },
+      "ice_lance": {
+        "name": "Lança de Gelo",
+        "description": "Arremessa uma lasca de gelo que causa {damage} de dano de Gelo. Causa dano triplo contra alvos enraizados. (Talento de mago)"
+      },
+      "presence_of_mind": {
+        "name": "Presença de Espírito",
+        "description": "Torna instantâneo seu próximo feitiço com tempo de conjuração. Dura 60 s. (Talento de mago)"
+      },
+      "blink": {
+        "name": "Lampejo",
+        "description": "Teleporta você 15 m para a frente e rompe raízes. (Talento de mago)"
+      },
+      "ice_block": {
+        "name": "Bloco de Gelo",
+        "description": "Envolve você em gelo, absorvendo uma quantidade enorme de dano por 8 s. (Talento de mago)"
+      },
+      "deep_freeze": {
+        "name": "Congelamento Profundo",
+        "description": "Congela profundamente o alvo, causa {damage} de dano de Gelo e o atordoa por 4 s. (Talento de mago)"
+      },
+      "meteor": {
+        "name": "Meteoro",
+        "description": "Invoca um meteoro na área alvo, causando {damage} de dano de Fogo e queimando o chão. (Talento de mago)"
+      },
+      "evocation": {
+        "name": "Evocação",
+        "description": "Restaura mana rapidamente. (Talento de mago)"
+      },
       "holy_shock": {
         "name": "Choque Sagrado",
         "description": "Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)"

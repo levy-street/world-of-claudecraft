@@ -4834,7 +4834,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '呼喚元素精通，使你的下一個法術變為瞬發。（元素專精招牌）',
   'entities.abilities.shamanistic_rage.name': '薩滿之怒',
   'entities.abilities.shamanistic_rage.description':
-    "釋放薩滿之怒，恢復160點法力值。（增強專精招牌）",
+    '釋放薩滿之怒，恢復160點法力值。（增強專精招牌）',
   'entities.abilities.natures_swiftness.name': '自然迅捷',
   'entities.abilities.natures_swiftness.description':
     '呼喚自然之力，使你的下一個法術變為瞬發。（恢復專精招牌）',
@@ -4844,7 +4844,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fel_domination.name': '惡魔支配',
   'entities.abilities.fel_domination.description':
     '支配魔能，使你的下一個法術變為瞬發。（惡魔學識專精招牌）',
-  'entities.abilities.conflagrate.name': "燃盡",
+  'entities.abilities.conflagrate.name': '燃盡',
   'entities.abilities.conflagrate.description':
     '吞噬敵人身上的獻祭，將其點燃並造成{damage}點火焰傷害。（毀滅專精招牌）',
   'entities.abilities.moonkin_form.name': '梟獸形態',
@@ -4856,4 +4856,43 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': '迅癒',
   'entities.abilities.swiftmend.description':
     '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
+  'entities.abilities.heroic_leap.name': '英勇躍擊',
+  'entities.abilities.heroic_leap.description':
+    '躍向目標區域，對附近敵人造成 {damage} 點物理傷害。（戰士天賦）',
+  'entities.abilities.pummel.name': '拳擊',
+  'entities.abilities.pummel.description': '打斷施法，並使該系法術在 4 秒內無法施放。（戰士天賦）',
+  'entities.abilities.shield_wall.name': '盾牆',
+  'entities.abilities.shield_wall.description': '舉起盾牆，大幅提高護甲，持續 10 秒。（戰士天賦）',
+  'entities.abilities.last_stand.name': '破釜沉舟',
+  'entities.abilities.last_stand.description':
+    '暫時提高耐力，持續 15 秒，進而提高最大生命值。（戰士天賦）',
+  'entities.abilities.bladestorm.name': '劍刃風暴',
+  'entities.abilities.bladestorm.description':
+    '化為鋼鐵風暴，每秒對附近敵人造成 {damage} 點傷害。（戰士天賦）',
+  'entities.abilities.avatar.name': '天神下凡',
+  'entities.abilities.avatar.description': '化身為巨像，提高攻擊強度，持續 20 秒。（戰士天賦）',
+  'entities.abilities.rallying_cry.name': '集結吶喊',
+  'entities.abilities.rallying_cry.description':
+    '發出集結吶喊，提高附近盟友的攻擊強度，持續 10 秒。（戰士天賦）',
+  'entities.abilities.counterspell.name': '法術反制',
+  'entities.abilities.counterspell.description':
+    '反制敵人的施法，並使該系法術在 6 秒內無法施放。（法師天賦）',
+  'entities.abilities.ice_lance.name': '冰霜長矛',
+  'entities.abilities.ice_lance.description':
+    '投擲寒冰碎片，造成 {damage} 點冰霜傷害。對被定身目標造成三倍傷害。（法師天賦）',
+  'entities.abilities.presence_of_mind.name': '氣定神閒',
+  'entities.abilities.presence_of_mind.description':
+    '使你的下一個有施法時間的法術變為瞬發。持續 60 秒。（法師天賦）',
+  'entities.abilities.blink.name': '閃現術',
+  'entities.abilities.blink.description': '向前傳送 15 碼並解除定身效果。（法師天賦）',
+  'entities.abilities.ice_block.name': '寒冰屏障',
+  'entities.abilities.ice_block.description': '將你封入寒冰，吸收大量傷害，持續 8 秒。（法師天賦）',
+  'entities.abilities.deep_freeze.name': '深度凍結',
+  'entities.abilities.deep_freeze.description':
+    '深度凍結目標，造成 {damage} 點冰霜傷害並使其昏迷 4 秒。（法師天賦）',
+  'entities.abilities.meteor.name': '隕石',
+  'entities.abilities.meteor.description':
+    '在目標區域召喚隕石，造成 {damage} 點火焰傷害並燃燒地面。（法師天賦）',
+  'entities.abilities.evocation.name': '喚醒',
+  'entities.abilities.evocation.description': '快速恢復法力值。（法師天賦）',
 };

@@ -4339,6 +4339,66 @@ export const en: EnTranslations = {
         "name": "Berserker Rage",
         "description": "Enter a berserker rage, generating 20 rage. (Warrior talent)"
       },
+      "heroic_leap": {
+        "name": "Heroic Leap",
+        "description": "Leap to the target area, dealing {damage} Physical damage to nearby enemies. (Warrior talent)"
+      },
+      "pummel": {
+        "name": "Pummel",
+        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Warrior talent)"
+      },
+      "shield_wall": {
+        "name": "Shield Wall",
+        "description": "Raise your shield wall, greatly increasing armor for 10 sec. (Warrior talent)"
+      },
+      "last_stand": {
+        "name": "Last Stand",
+        "description": "Temporarily increases Stamina for 15 sec, increasing maximum health. (Warrior talent)"
+      },
+      "bladestorm": {
+        "name": "Bladestorm",
+        "description": "Become a storm of steel, striking nearby enemies each second for {damage}. (Warrior talent)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Transform into a colossus, increasing attack power for 20 sec. (Warrior talent)"
+      },
+      "rallying_cry": {
+        "name": "Rallying Cry",
+        "description": "Lets loose a rallying cry, increasing nearby allies' attack power for 10 sec. (Warrior talent)"
+      },
+      "counterspell": {
+        "name": "Counterspell",
+        "description": "Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)"
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Hurls a shard of ice for {damage} Frost damage. Deals triple damage against rooted targets. (Mage talent)"
+      },
+      "presence_of_mind": {
+        "name": "Presence of Mind",
+        "description": "Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)"
+      },
+      "blink": {
+        "name": "Blink",
+        "description": "Teleports you 15 yd forward and breaks roots. (Mage talent)"
+      },
+      "ice_block": {
+        "name": "Ice Block",
+        "description": "Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)"
+      },
+      "deep_freeze": {
+        "name": "Deep Freeze",
+        "description": "Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)"
+      },
+      "meteor": {
+        "name": "Meteor",
+        "description": "Calls down a meteor at the target area, dealing {damage} Fire damage and burning the ground. (Mage talent)"
+      },
+      "evocation": {
+        "name": "Evocation",
+        "description": "Rapidly restores mana. (Mage talent)"
+      },
       "holy_shock": {
         "name": "Holy Shock",
         "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"

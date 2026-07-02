@@ -18,6 +18,7 @@ const CONTROLLED_STUNS = new Set([
   'bash',
   'charge',
   'bear_charge',
+  'deep_freeze',
 ]);
 
 export function stunDrCategory(abilityId: string): CrowdControlDrCategory {

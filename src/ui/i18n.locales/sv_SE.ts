@@ -5095,75 +5095,120 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
   'hudChrome.nativeUpdate.update': 'Uppdatera',
   'entities.abilities.holy_shock.name': "Helig chock",
+  'entities.abilities.holy_shock.name': 'Helig chock',
   'entities.abilities.holy_shock.description':
-    "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)",
-  'entities.abilities.holy_shield.name': "Helig sköld",
+    'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
+  'entities.abilities.holy_shield.name': 'Helig sköld',
   'entities.abilities.holy_shield.description':
-    "Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)",
-  'entities.abilities.repentance.name': "Ånger",
+    'Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)',
+  'entities.abilities.repentance.name': 'Ånger',
   'entities.abilities.repentance.description':
-    "Försätter fienden i meditation i upp till 6 sek. All skada bryter effekten. (Vedergällningssignatur)",
-  'entities.abilities.bestial_wrath.name': "Bestialisk vrede",
+    'Försätter fienden i meditation i upp till 6 sek. All skada bryter effekten. (Vedergällningssignatur)',
+  'entities.abilities.bestial_wrath.name': 'Bestialisk vrede',
   'entities.abilities.bestial_wrath.description':
-    "Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)",
-  'entities.abilities.trueshot_aura.name': "Träffsäkerhetsaura",
+    'Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)',
+  'entities.abilities.trueshot_aura.name': 'Träffsäkerhetsaura',
   'entities.abilities.trueshot_aura.description':
-    "Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)",
-  'entities.abilities.wyvern_sting.name': "Wyvernsting",
+    'Inspirerar närliggande allierade och ökar attackkraft med 35 i 5 min. (Skytte signatur)',
+  'entities.abilities.wyvern_sting.name': 'Wyvernsting',
   'entities.abilities.wyvern_sting.description':
-    "Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)",
-  'entities.abilities.arcane_power.name': "Arkan kraft",
+    'Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)',
+  'entities.abilities.arcane_power.name': 'Arkan kraft',
   'entities.abilities.arcane_power.description':
-    "Fyller dig med arkan kraft och ökar besvärjelsekraft med 28 i 12 sek. (Arkan signatur)",
-  'entities.abilities.combustion.name': "Förbränning",
+    'Fyller dig med arkan kraft och ökar besvärjelsekraft med 28 i 12 sek. (Arkan signatur)',
+  'entities.abilities.combustion.name': 'Förbränning',
   'entities.abilities.combustion.description':
-    "Fokuserar din eldmagi så att din nästa attack blir en kritisk träff. (Eldsignatur)",
-  'entities.abilities.cone_of_cold.name': "Köldkon",
+    'Fokuserar din eldmagi så att din nästa attack blir en kritisk träff. (Eldsignatur)',
+  'entities.abilities.cone_of_cold.name': 'Köldkon',
   'entities.abilities.cone_of_cold.description':
-    "Spränger närliggande fiender med frost för {damage} frostskada. (Frostsignatur)",
-  'entities.abilities.cold_blood.name': "Kallt blod",
+    'Spränger närliggande fiender med frost för {damage} frostskada. (Frostsignatur)',
+  'entities.abilities.cold_blood.name': 'Kallt blod',
   'entities.abilities.cold_blood.description':
-    "Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)",
-  'entities.abilities.blade_flurry.name': "Klingflod",
+    'Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)',
+  'entities.abilities.blade_flurry.name': 'Klingflod',
   'entities.abilities.blade_flurry.description':
-    "Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)",
-  'entities.abilities.hemorrhage.name': "Blödning",
+    'Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)',
+  'entities.abilities.hemorrhage.name': 'Blödning',
   'entities.abilities.hemorrhage.description':
-    "Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)",
-  'entities.abilities.power_infusion.name': "Kraftinfusion",
+    'Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)',
+  'entities.abilities.power_infusion.name': 'Kraftinfusion',
   'entities.abilities.power_infusion.description':
-    "Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)",
-  'entities.abilities.holy_nova.name': "Helig nova",
+    'Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)',
+  'entities.abilities.holy_nova.name': 'Helig nova',
   'entities.abilities.holy_nova.description':
-    "Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)",
-  'entities.abilities.shadowform.name': "Skuggform",
+    'Skapar en explosion av heligt ljus, läker närliggande allierade för {damage} och skadar närliggande fiender. (Helig signatur)',
+  'entities.abilities.shadowform.name': 'Skuggform',
   'entities.abilities.shadowform.description':
-    "Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)",
-  'entities.abilities.elemental_mastery.name': "Elementär mästerskap",
+    'Anta skuggform och stärk skuggmagi tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Skuggsignatur)',
+  'entities.abilities.elemental_mastery.name': 'Elementär mästerskap',
   'entities.abilities.elemental_mastery.description':
-    "Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)",
-  'entities.abilities.shamanistic_rage.name': "Schamanistisk vrede",
+    'Åkallar elementär mästerskap och gör din nästa besvärjelse omedelbar. (Elementär signatur)',
+  'entities.abilities.shamanistic_rage.name': 'Schamanistisk vrede',
   'entities.abilities.shamanistic_rage.description':
-    "Släpper lös schamanistisk vrede och återställer 160 mana. (Förstärkningssignatur)",
-  'entities.abilities.natures_swiftness.name': "Naturens snabbhet",
+    'Släpper lös schamanistisk vrede och återställer 160 mana. (Förstärkningssignatur)',
+  'entities.abilities.natures_swiftness.name': 'Naturens snabbhet',
   'entities.abilities.natures_swiftness.description':
-    "Åkallar naturen för att göra din nästa besvärjelse omedelbar. (Återställningssignatur)",
-  'entities.abilities.siphon_life.name': "Livssifon",
+    'Åkallar naturen för att göra din nästa besvärjelse omedelbar. (Återställningssignatur)',
+  'entities.abilities.siphon_life.name': 'Livssifon',
   'entities.abilities.siphon_life.description':
-    "Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)",
-  'entities.abilities.fel_domination.name': "Demonisk dominans",
+    'Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)',
+  'entities.abilities.fel_domination.name': 'Demonisk dominans',
   'entities.abilities.fel_domination.description':
-    "Behärskar demoniska energier och gör din nästa besvärjelse omedelbar. (Demonologisignatur)",
-  'entities.abilities.conflagrate.name': "Storbrand",
+    'Behärskar demoniska energier och gör din nästa besvärjelse omedelbar. (Demonologisignatur)',
+  'entities.abilities.conflagrate.name': 'Storbrand',
   'entities.abilities.conflagrate.description':
-    "Förbrukar din Förbränna på fienden för att antända den för {damage} eldskada. (Förstörelsesignatur)",
-  'entities.abilities.moonkin_form.name': "Månugglaform",
+    'Förbrukar din Förbränna på fienden för att antända den för {damage} eldskada. (Förstörelsesignatur)',
+  'entities.abilities.moonkin_form.name': 'Månugglaform',
   'entities.abilities.moonkin_form.description':
-    "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)",
-  'entities.abilities.feral_charge.name': "Vild rusning",
+    'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)',
+  'entities.abilities.feral_charge.name': 'Vild rusning',
   'entities.abilities.feral_charge.description':
-    "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)",
-  'entities.abilities.swiftmend.name': "Snabb läkning",
+    'Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)',
+  'entities.abilities.swiftmend.name': 'Snabb läkning',
   'entities.abilities.swiftmend.description':
-    "Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)",
+    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)',
+  'entities.abilities.heroic_leap.name': 'Salto heroico',
+  'entities.abilities.heroic_leap.description':
+    'Salta al área objetivo e inflige {damage} de daño físico a los enemigos cercanos. (Talento de guerrero)',
+  'entities.abilities.pummel.name': 'Zurrar',
+  'entities.abilities.pummel.description':
+    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (Talento de guerrero)',
+  'entities.abilities.shield_wall.name': 'Muro de escudo',
+  'entities.abilities.shield_wall.description':
+    'Alza tu muro de escudo y aumenta mucho la armadura durante 10 s. (Talento de guerrero)',
+  'entities.abilities.last_stand.name': 'Última carga',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente el Aguante durante 15 s, lo que aumenta la salud máxima. (Talento de guerrero)',
+  'entities.abilities.bladestorm.name': 'Filotormenta',
+  'entities.abilities.bladestorm.description':
+    'Te conviertes en una tormenta de acero y golpeas a los enemigos cercanos cada segundo por {damage}. (Talento de guerrero)',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Te transformas en un coloso y aumentas el poder de ataque durante 20 s. (Talento de guerrero)',
+  'entities.abilities.rallying_cry.name': 'Grito de convocación',
+  'entities.abilities.rallying_cry.description':
+    'Sueltas un grito de convocación que aumenta el poder de ataque de los aliados cercanos durante 10 s. (Talento de guerrero)',
+  'entities.abilities.counterspell.name': 'Contrahechizo',
+  'entities.abilities.counterspell.description':
+    'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
+  'entities.abilities.ice_lance.name': 'Lanza de hielo',
+  'entities.abilities.ice_lance.description':
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+  'entities.abilities.presence_of_mind.name': 'Presencia mental',
+  'entities.abilities.presence_of_mind.description':
+    'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
+  'entities.abilities.blink.name': 'Traslación',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (Talento de mago)',
+  'entities.abilities.ice_block.name': 'Bloque de hielo',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (Talento de mago)',
+  'entities.abilities.deep_freeze.name': 'Congelación profunda',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente al objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (Talento de mago)',
+  'entities.abilities.meteor.name': 'Meteoro',
+  'entities.abilities.meteor.description':
+    'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
+  'entities.abilities.evocation.name': 'Evocación',
+  'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
 };

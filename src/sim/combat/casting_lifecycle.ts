@@ -47,7 +47,7 @@ import {
   MELEE_RANGE,
   normAngle,
 } from '../types';
-import { isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import { isLockedOut, isRooted, isSilenced, isStunned, tonguesMult } from './cc';
 import {
   consumeNextAttackCrit,
   consumeNextCastFree,
@@ -211,6 +211,7 @@ export function castAbility(
     ctx.error(p.id, 'You are busy.');
     return;
   }
+  if (ability.id === 'heroic_leap' && isRooted(p)) return;
   if (!ability.offGcd && p.gcdRemaining > 0) return; // silent, classic spams this
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   const sharedCooldown = isShamanShock(ability.id)

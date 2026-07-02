@@ -1,4 +1,5 @@
 import type { PlayerClass } from '../types';
+import { MAGE_CHOICE_ROWS, WARRIOR_CHOICE_ROWS } from './choice_rows_classic';
 import { accumulateTalentEffect, type TalentEffect, type TalentModifiers } from './talents';
 
 export const CHOICE_ROW_LEVELS = [5, 8, 11, 14, 17, 20] as const;
@@ -25,13 +26,13 @@ export interface ClassChoiceRows {
 export type ChoiceRowAllocation = Partial<Record<ChoiceRowLevel, string>>;
 
 export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> = {
-  warrior: { rows: [] },
+  warrior: WARRIOR_CHOICE_ROWS,
   paladin: { rows: [] },
   hunter: { rows: [] },
   rogue: { rows: [] },
   priest: { rows: [] },
   shaman: { rows: [] },
-  mage: { rows: [] },
+  mage: MAGE_CHOICE_ROWS,
   warlock: { rows: [] },
   druid: { rows: [] },
 };

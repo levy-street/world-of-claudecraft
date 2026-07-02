@@ -4339,6 +4339,66 @@ export const es: EnTranslations = {
         "name": "Ira rabiosa",
         "description": "Entras en una ira rabiosa y generas 20 de ira. (talento de guerrero)"
       },
+      "heroic_leap": {
+        "name": "Salto heroico",
+        "description": "Salta al área objetivo e inflige {damage} de daño físico a los enemigos cercanos. (Talento de guerrero)"
+      },
+      "pummel": {
+        "name": "Zurrar",
+        "description": "Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (Talento de guerrero)"
+      },
+      "shield_wall": {
+        "name": "Muro de escudo",
+        "description": "Alza tu muro de escudo y aumenta mucho la armadura durante 10 s. (Talento de guerrero)"
+      },
+      "last_stand": {
+        "name": "Última carga",
+        "description": "Aumenta temporalmente el Aguante durante 15 s, lo que aumenta la salud máxima. (Talento de guerrero)"
+      },
+      "bladestorm": {
+        "name": "Filotormenta",
+        "description": "Te conviertes en una tormenta de acero y golpeas a los enemigos cercanos cada segundo por {damage}. (Talento de guerrero)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Te transformas en un coloso y aumentas el poder de ataque durante 20 s. (Talento de guerrero)"
+      },
+      "rallying_cry": {
+        "name": "Grito de convocación",
+        "description": "Sueltas un grito de convocación que aumenta el poder de ataque de los aliados cercanos durante 10 s. (Talento de guerrero)"
+      },
+      "counterspell": {
+        "name": "Contrahechizo",
+        "description": "Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)"
+      },
+      "ice_lance": {
+        "name": "Lanza de hielo",
+        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+      },
+      "presence_of_mind": {
+        "name": "Presencia mental",
+        "description": "Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)"
+      },
+      "blink": {
+        "name": "Traslación",
+        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (Talento de mago)"
+      },
+      "ice_block": {
+        "name": "Bloque de hielo",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (Talento de mago)"
+      },
+      "deep_freeze": {
+        "name": "Congelación profunda",
+        "description": "Congela profundamente al objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (Talento de mago)"
+      },
+      "meteor": {
+        "name": "Meteoro",
+        "description": "Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)"
+      },
+      "evocation": {
+        "name": "Evocación",
+        "description": "Restaura maná rápidamente. (Talento de mago)"
+      },
       "holy_shock": {
         "name": "Choque Sagrado",
         "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"

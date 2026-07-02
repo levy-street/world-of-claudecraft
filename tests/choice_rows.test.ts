@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  CHOICE_ROW_LEVELS,
   CHOICE_ROWS,
   type ClassChoiceRows,
   repairRows,
@@ -14,8 +15,9 @@ import {
   type TalentAllocation,
   validateAllocation,
 } from '../src/sim/content/talents';
+import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, MAX_LEVEL } from '../src/sim/types';
+import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 
 const cls = 'warrior';
 const originalRows = CHOICE_ROWS[cls];
@@ -170,8 +172,122 @@ describe('choice row effects and sim facade', () => {
 
   it('ships dormant empty rows for every class', () => {
     for (const playerClass of ALL_CLASSES) {
+      if (playerClass === 'warrior' || playerClass === 'mage') continue;
       expect(CHOICE_ROWS[playerClass].rows).toEqual([]);
       expect(validateRows(playerClass, 20, { 5: 'anything' }).ok).toBe(false);
     }
   });
 });
+
+describe('choice row real content for warrior and mage', () => {
+  it('ships exactly six rows and three options per row for the pilot classes', () => {
+    for (const playerClass of ['warrior', 'mage'] as const) {
+      const rows = CHOICE_ROWS[playerClass].rows;
+      expect(rows.map((row) => row.level)).toEqual([...CHOICE_ROW_LEVELS]);
+      for (const row of rows) expect(row.options).toHaveLength(3);
+    }
+  });
+
+  it('has resolvable effects for every warrior and mage option', () => {
+    for (const playerClass of ['warrior', 'mage'] as const) {
+      for (const row of CHOICE_ROWS[playerClass].rows) {
+        for (const option of row.options) {
+          if (option.effect.grant) {
+            expect(ABILITIES[option.effect.grant.ability], option.id).toBeDefined();
+          }
+          for (const abilityMod of option.effect.ability ?? []) {
+            expect(ABILITIES[abilityMod.ability], option.id).toBeDefined();
+          }
+        }
+      }
+    }
+  });
+
+  it('grants every granted warrior and mage row ability through the sim facade', () => {
+    for (const playerClass of ['warrior', 'mage'] as const) {
+      for (const row of CHOICE_ROWS[playerClass].rows) {
+        for (const option of row.options) {
+          const grant = option.effect.grant?.ability;
+          if (!grant) continue;
+          const sim = new Sim({ seed: 987, playerClass });
+          sim.setPlayerLevel(MAX_LEVEL);
+          expect(sim.resolvedAbility(grant), `${option.id} should not be known before pick`).toBe(
+            null,
+          );
+          expect(sim.chooseRow(row.level, option.id)).toBe(true);
+          expect(sim.resolvedAbility(grant), `${option.id} should grant ${grant}`).not.toBeNull();
+        }
+      }
+    }
+  });
+
+  it('lands authored mod numbers in resolved abilities', () => {
+    const warrior = simAtLevel('warrior', MAX_LEVEL);
+    const baseCharge = expectResolved(warrior, 'charge');
+    expect(warrior.chooseRow(5, 'war_r5_juggernaut')).toBe(true);
+    expect(expectResolved(warrior, 'charge').cooldown).toBe(baseCharge.cooldown * 0.5);
+
+    const mage = simAtLevel('mage', MAX_LEVEL);
+    const baseFireBlast = expectResolved(mage, 'fire_blast');
+    expect(mage.chooseRow(5, 'mag_r5_impulse')).toBe(true);
+    expect(expectResolved(mage, 'fire_blast').cooldown).toBe(baseFireBlast.cooldown * 0.5);
+  });
+
+  it('lands P5 addEffects row options in resolved abilities', () => {
+    const warbringer = simAtLevel('warrior', MAX_LEVEL);
+    expect(warbringer.chooseRow(5, 'war_r5_warbringer')).toBe(true);
+    expect(expectResolved(warbringer, 'charge').effects).toContainEqual({
+      type: 'root',
+      duration: 1.5,
+    });
+
+    const concussiveClap = simAtLevel('warrior', MAX_LEVEL);
+    expect(concussiveClap.chooseRow(8, 'war_r8_concussive_clap')).toBe(true);
+    expect(expectResolved(concussiveClap, 'thunder_clap').effects).toContainEqual({
+      type: 'aoeRoot',
+      duration: 1,
+      radius: 8,
+      min: 0,
+      max: 0,
+    });
+  });
+
+  it('lands Iron Hide armor in recalc and Shatter crit in player mods', () => {
+    const warrior = simAtLevel('warrior', MAX_LEVEL);
+    const armorBefore = warrior.player.stats.armor;
+    expect(warrior.chooseRow(17, 'war_r17_iron_hide')).toBe(true);
+    expect(warrior.player.stats.armor).toBeCloseTo(Math.round(armorBefore * 1.12), 0);
+
+    const mage = simAtLevel('mage', MAX_LEVEL);
+    expect(mage.chooseRow(11, 'mag_r11_shatter')).toBe(true);
+    const meta = mage.meta(mage.playerId);
+    expect(meta).not.toBeNull();
+    if (!meta) throw new Error('missing mage meta');
+    const mods = (
+      mage as never as {
+        playerMods(m: NonNullable<typeof meta>): { global: { critVsRooted: number } };
+      }
+    ).playerMods(meta);
+    expect(mods.global.critVsRooted).toBeCloseTo(0.3);
+  });
+
+  it('makes Scorch castable while moving through Firestarter', () => {
+    const mage = simAtLevel('mage', MAX_LEVEL);
+    expect(expectResolved(mage, 'scorch').castWhileMoving).toBeUndefined();
+    expect(mage.chooseRow(5, 'mag_r5_firestarter')).toBe(true);
+    expect(expectResolved(mage, 'scorch').castWhileMoving).toBe(true);
+  });
+});
+
+function simAtLevel(playerClass: PlayerClass, level: number): Sim {
+  const sim = new Sim({ seed: 654, playerClass });
+  sim.setPlayerLevel(level);
+  return sim;
+}
+
+function expectResolved(sim: Sim, abilityId: string) {
+  const resolved = sim.resolvedAbility(abilityId);
+  expect(resolved, `${abilityId} should resolve`).not.toBeNull();
+  if (!resolved) throw new Error(`${abilityId} should resolve`);
+  return resolved;
+}

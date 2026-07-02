@@ -228,6 +228,7 @@ function makeCtx() {
     swingIntervalMult: vi.fn(() => 1),
     mobEffectiveMeleeRange: vi.fn(() => 0),
     mobCanSwim: vi.fn(() => false),
+    resolveMove: vi.fn(() => ({ x: 0, z: 0 })),
     resolveMovePoint: vi.fn(() => ({ x: 0, z: 0 })),
     updatePet: vi.fn(),
     isDelveCompanionMob: vi.fn(() => false),

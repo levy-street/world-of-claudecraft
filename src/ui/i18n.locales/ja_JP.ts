@@ -5111,4 +5111,48 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description':
     '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
+  'entities.abilities.heroic_leap.name': 'ヒロイックリープ',
+  'entities.abilities.heroic_leap.description':
+    '対象地点へ跳躍し、周囲の敵に {damage} の物理ダメージを与えます。（ウォリアーのタレント）',
+  'entities.abilities.pummel.name': 'パメル',
+  'entities.abilities.pummel.description':
+    '呪文の詠唱を中断し、4秒間その系統の呪文を唱えられなくします。（ウォリアーのタレント）',
+  'entities.abilities.shield_wall.name': 'シールドウォール',
+  'entities.abilities.shield_wall.description':
+    '盾を構え、10秒間アーマーを大きく増加させます。（ウォリアーのタレント）',
+  'entities.abilities.last_stand.name': 'ラストスタンド',
+  'entities.abilities.last_stand.description':
+    '15秒間一時的にスタミナを増加させ、最大体力を増やします。（ウォリアーのタレント）',
+  'entities.abilities.bladestorm.name': 'ブレードストーム',
+  'entities.abilities.bladestorm.description':
+    '鋼の嵐となり、毎秒周囲の敵に {damage} のダメージを与えます。（ウォリアーのタレント）',
+  'entities.abilities.avatar.name': 'アバター',
+  'entities.abilities.avatar.description':
+    '巨像に変身し、20秒間攻撃力を増加させます。（ウォリアーのタレント）',
+  'entities.abilities.rallying_cry.name': 'ラリイングクライ',
+  'entities.abilities.rallying_cry.description':
+    'ラリイングクライを放ち、10秒間周囲の味方の攻撃力を増加させます。（ウォリアーのタレント）',
+  'entities.abilities.counterspell.name': 'カウンタースペル',
+  'entities.abilities.counterspell.description':
+    '敵の呪文詠唱を妨害し、6秒間その系統の呪文を唱えられなくします。（メイジのタレント）',
+  'entities.abilities.ice_lance.name': 'アイスランス',
+  'entities.abilities.ice_lance.description':
+    '氷の破片を投げ、{damage} のフロストダメージを与えます。移動不能の対象には3倍のダメージを与えます。（メイジのタレント）',
+  'entities.abilities.presence_of_mind.name': 'プレゼンスオブマインド',
+  'entities.abilities.presence_of_mind.description':
+    '次の詠唱時間のある呪文を即時発動にします。60秒間持続します。（メイジのタレント）',
+  'entities.abilities.blink.name': 'ブリンク',
+  'entities.abilities.blink.description':
+    '15メートル前方へ瞬間移動し、移動不能効果を解除します。（メイジのタレント）',
+  'entities.abilities.ice_block.name': 'アイスブロック',
+  'entities.abilities.ice_block.description':
+    '氷に身を包み、8秒間大量のダメージを吸収します。（メイジのタレント）',
+  'entities.abilities.deep_freeze.name': 'ディープフリーズ',
+  'entities.abilities.deep_freeze.description':
+    '対象を深く凍結させ、{damage} のフロストダメージを与えて4秒間スタンさせます。（メイジのタレント）',
+  'entities.abilities.meteor.name': 'メテオ',
+  'entities.abilities.meteor.description':
+    '対象地点に隕石を落とし、{damage} の火炎ダメージを与えて地面を燃やします。（メイジのタレント）',
+  'entities.abilities.evocation.name': 'エヴォケーション',
+  'entities.abilities.evocation.description': 'マナを急速に回復します。（メイジのタレント）',
 };

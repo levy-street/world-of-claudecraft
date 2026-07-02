@@ -4339,6 +4339,66 @@ export const ko_KR: EnTranslations = {
         "name": "광전사의 격노",
         "description": "광전사의 격노에 들어가 분노 20을 생성합니다. (전사 특성)"
       },
+      "heroic_leap": {
+        "name": "영웅의 도약",
+        "description": "대상 지역으로 뛰어올라 주변 적에게 {damage}의 물리 피해를 줍니다. (전사 특성)"
+      },
+      "pummel": {
+        "name": "자루 공격",
+        "description": "주문 시전을 방해하고 4초 동안 같은 계열의 주문을 시전하지 못하게 합니다. (전사 특성)"
+      },
+      "shield_wall": {
+        "name": "방패의 벽",
+        "description": "방패의 벽을 세워 10초 동안 방어도를 크게 증가시킵니다. (전사 특성)"
+      },
+      "last_stand": {
+        "name": "최후의 저항",
+        "description": "15초 동안 체력을 일시적으로 증가시켜 최대 생명력을 높입니다. (전사 특성)"
+      },
+      "bladestorm": {
+        "name": "칼날폭풍",
+        "description": "강철의 폭풍이 되어 매초 주변 적에게 {damage}의 피해를 줍니다. (전사 특성)"
+      },
+      "avatar": {
+        "name": "투신",
+        "description": "거인으로 변신해 20초 동안 전투력을 증가시킵니다. (전사 특성)"
+      },
+      "rallying_cry": {
+        "name": "재집결의 함성",
+        "description": "재집결의 함성을 질러 10초 동안 주변 아군의 전투력을 증가시킵니다. (전사 특성)"
+      },
+      "counterspell": {
+        "name": "마법 차단",
+        "description": "적의 주문 시전을 차단하고 6초 동안 같은 계열의 주문을 시전하지 못하게 합니다. (마법사 특성)"
+      },
+      "ice_lance": {
+        "name": "얼음창",
+        "description": "얼음 파편을 던져 {damage}의 냉기 피해를 줍니다. 이동 불가 대상에게 세 배의 피해를 줍니다. (마법사 특성)"
+      },
+      "presence_of_mind": {
+        "name": "냉정",
+        "description": "다음 시전 시간이 있는 주문을 즉시 시전하게 합니다. 60초 동안 지속됩니다. (마법사 특성)"
+      },
+      "blink": {
+        "name": "점멸",
+        "description": "15미터 앞으로 순간이동하고 이동 불가 효과를 해제합니다. (마법사 특성)"
+      },
+      "ice_block": {
+        "name": "얼음 방패",
+        "description": "얼음 속에 자신을 가두어 8초 동안 막대한 피해를 흡수합니다. (마법사 특성)"
+      },
+      "deep_freeze": {
+        "name": "동결",
+        "description": "대상을 깊이 얼려 {damage}의 냉기 피해를 주고 4초 동안 기절시킵니다. (마법사 특성)"
+      },
+      "meteor": {
+        "name": "유성",
+        "description": "대상 지역에 유성을 불러내 {damage}의 화염 피해를 주고 지면을 불태웁니다. (마법사 특성)"
+      },
+      "evocation": {
+        "name": "환기",
+        "description": "마나를 빠르게 회복합니다. (마법사 특성)"
+      },
       "holy_shock": {
         "name": "신성 충격",
         "description": "신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)"

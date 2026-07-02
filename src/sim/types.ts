@@ -1056,6 +1056,8 @@ export type AbilityEffect =
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'charge' }
+  | { type: 'repositionToAim'; breakRoots?: boolean }
+  | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
   | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet

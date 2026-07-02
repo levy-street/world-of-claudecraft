@@ -4339,6 +4339,66 @@ export const it_IT: EnTranslations = {
         "name": "Rabbia del Berserker",
         "description": "Entri in una furia berserker e generi 20 rabbia. (talento del guerriero)"
       },
+      "heroic_leap": {
+        "name": "Balzo Eroico",
+        "description": "Balza nell’area bersaglio e infligge {damage} danni fisici ai nemici vicini. (Talento da guerriero)"
+      },
+      "pummel": {
+        "name": "Percossa",
+        "description": "Interrompe il lancio di incantesimi e impedisce di lanciare magie di quella scuola per 4 s. (Talento da guerriero)"
+      },
+      "shield_wall": {
+        "name": "Muro di Scudi",
+        "description": "Alzi il muro di scudi, aumentando molto l’armatura per 10 s. (Talento da guerriero)"
+      },
+      "last_stand": {
+        "name": "Ultima Difesa",
+        "description": "Aumenta temporaneamente la Tempra per 15 s, aumentando la salute massima. (Talento da guerriero)"
+      },
+      "bladestorm": {
+        "name": "Tempesta di Lame",
+        "description": "Diventi una tempesta d’acciaio, colpendo ogni secondo i nemici vicini per {damage}. (Talento da guerriero)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Ti trasformi in un colosso, aumentando il potere d’attacco per 20 s. (Talento da guerriero)"
+      },
+      "rallying_cry": {
+        "name": "Grido di Incitamento",
+        "description": "Lanci un grido di incitamento che aumenta il potere d’attacco degli alleati vicini per 10 s. (Talento da guerriero)"
+      },
+      "counterspell": {
+        "name": "Controincantesimo",
+        "description": "Contrasta il lancio nemico e impedisce di lanciare magie di quella scuola per 6 s. (Talento da mago)"
+      },
+      "ice_lance": {
+        "name": "Lancia di Ghiaccio",
+        "description": "Scaglia una scheggia di ghiaccio che infligge {damage} danni da Gelo. Infligge danni tripli ai bersagli immobilizzati. (Talento da mago)"
+      },
+      "presence_of_mind": {
+        "name": "Presenza Mentale",
+        "description": "Rende istantaneo il tuo prossimo incantesimo con tempo di lancio. Dura 60 s. (Talento da mago)"
+      },
+      "blink": {
+        "name": "Traslazione",
+        "description": "Ti teletrasporta di 15 m in avanti e spezza le radici. (Talento da mago)"
+      },
+      "ice_block": {
+        "name": "Blocco di Ghiaccio",
+        "description": "Ti racchiude nel ghiaccio e assorbe una quantità enorme di danni per 8 s. (Talento da mago)"
+      },
+      "deep_freeze": {
+        "name": "Congelamento Profondo",
+        "description": "Congela profondamente il bersaglio, infligge {damage} danni da Gelo e lo stordisce per 4 s. (Talento da mago)"
+      },
+      "meteor": {
+        "name": "Meteora",
+        "description": "Fa cadere una meteora nell’area bersaglio, infliggendo {damage} danni da Fuoco e bruciando il terreno. (Talento da mago)"
+      },
+      "evocation": {
+        "name": "Evocazione",
+        "description": "Rigenera rapidamente mana. (Talento da mago)"
+      },
       "holy_shock": {
         "name": "Shock Sacro",
         "description": "Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)"

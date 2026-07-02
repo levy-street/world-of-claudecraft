@@ -18,6 +18,7 @@
 import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -31,12 +32,16 @@ import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
+import { groundHeight, WATER_LEVEL } from '../world';
 import { isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { isFormAuraKind } from './forms';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
+const TELEPORT_SWEEP_STEP = 0.5;
+const TELEPORT_MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+const TELEPORT_MIN_GROUND = WATER_LEVEL - PLAYER_SWIM_DEPTH;
 
 function isStealthToggle(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stealth');
@@ -66,6 +71,60 @@ function consumeMatchingAura(
     }
     return true;
   });
+}
+
+function removeRootAuras(ctx: SimContext, p: Entity): void {
+  for (let i = p.auras.length - 1; i >= 0; i--) {
+    const aura = p.auras[i];
+    if (aura.kind !== 'root') continue;
+    p.auras.splice(i, 1);
+    ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+  }
+}
+
+function sweptReposition(ctx: SimContext, p: Entity, destX: number, destZ: number): void {
+  const fromX = p.pos.x;
+  const fromZ = p.pos.z;
+  const dx = destX - fromX;
+  const dz = destZ - fromZ;
+  const distance = Math.hypot(dx, dz);
+  let safeX = fromX;
+  let safeZ = fromZ;
+  let prevGround = groundHeight(fromX, fromZ, ctx.cfg.seed);
+  if (distance > 1e-6) {
+    const steps = Math.max(1, Math.ceil(distance / TELEPORT_SWEEP_STEP));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      const nextX = fromX + dx * t;
+      const nextZ = fromZ + dz * t;
+      const step = Math.hypot(nextX - safeX, nextZ - safeZ);
+      const nextGround = groundHeight(nextX, nextZ, ctx.cfg.seed);
+      if (nextGround < TELEPORT_MIN_GROUND) break;
+      if (
+        nextGround > prevGround &&
+        step > 1e-6 &&
+        (nextGround - prevGround) / step > TELEPORT_MAX_CLIMB_SLOPE
+      ) {
+        break;
+      }
+      const resolved = ctx.resolveMove(safeX, safeZ, nextX, nextZ, PLAYER_BODY_RADIUS, p);
+      const moved = Math.hypot(resolved.x - safeX, resolved.z - safeZ);
+      const blocked =
+        Math.hypot(resolved.x - nextX, resolved.z - nextZ) > PLAYER_BODY_RADIUS * 0.25;
+      if (blocked || moved < step * 0.5) break;
+      safeX = resolved.x;
+      safeZ = resolved.z;
+      prevGround = groundHeight(safeX, safeZ, ctx.cfg.seed);
+    }
+  }
+  p.pos.x = safeX;
+  p.pos.z = safeZ;
+  p.pos.y = groundHeight(safeX, safeZ, ctx.cfg.seed);
+  p.vy = 0;
+  p.onGround = true;
+  p.fallStartY = p.pos.y;
+  p.chargeTargetId = null;
+  p.chargePath = [];
 }
 
 export function runEffects(
@@ -657,10 +716,13 @@ export function runEffects(
           res.castTime,
           true,
         );
+        const rootOnly = eff.min === 0 && eff.max === 0;
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
-          const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
-          ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
+          if (!rootOnly) {
+            const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
+            ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
+          }
           if (!m.dead && ctx.isHostileTo(p, m)) {
             ctx.applyRootAura(
               p,
@@ -798,6 +860,19 @@ export function runEffects(
         p.chargePath = ctx.findChargePath(p, target);
         if (p.resourceType === 'rage') p.resource = Math.min(p.maxResource, p.resource + 9);
         ctx.enterCombat(p, target);
+        break;
+      }
+      case 'repositionToAim': {
+        if (eff.breakRoots) removeRootAuras(ctx, p);
+        const aim = p.castAim ?? p.pos;
+        sweptReposition(ctx, p, aim.x, aim.z);
+        break;
+      }
+      case 'blinkForward': {
+        if (eff.breakRoots) removeRootAuras(ctx, p);
+        const x = p.pos.x + Math.sin(p.facing) * eff.distance;
+        const z = p.pos.z + Math.cos(p.facing) * eff.distance;
+        sweptReposition(ctx, p, x, z);
         break;
       }
       case 'sunder': {

@@ -13,6 +13,7 @@ describe('stun DR categories (#1004)', () => {
     expect(stunDrCategory('bash')).toBe('controlledStun');
     expect(stunDrCategory('charge')).toBe('controlledStun');
     expect(stunDrCategory('bear_charge')).toBe('controlledStun');
+    expect(stunDrCategory('deep_freeze')).toBe('controlledStun');
   });
 
   it('keeps opener and controlled stuns in independent buckets', () => {

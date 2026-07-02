@@ -5118,4 +5118,48 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': '신속한 치유',
   'entities.abilities.swiftmend.description':
     '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
+  'entities.abilities.heroic_leap.name': '영웅의 도약',
+  'entities.abilities.heroic_leap.description':
+    '대상 지역으로 뛰어올라 주변 적에게 {damage}의 물리 피해를 줍니다. (전사 특성)',
+  'entities.abilities.pummel.name': '자루 공격',
+  'entities.abilities.pummel.description':
+    '주문 시전을 방해하고 4초 동안 같은 계열의 주문을 시전하지 못하게 합니다. (전사 특성)',
+  'entities.abilities.shield_wall.name': '방패의 벽',
+  'entities.abilities.shield_wall.description':
+    '방패의 벽을 세워 10초 동안 방어도를 크게 증가시킵니다. (전사 특성)',
+  'entities.abilities.last_stand.name': '최후의 저항',
+  'entities.abilities.last_stand.description':
+    '15초 동안 체력을 일시적으로 증가시켜 최대 생명력을 높입니다. (전사 특성)',
+  'entities.abilities.bladestorm.name': '칼날폭풍',
+  'entities.abilities.bladestorm.description':
+    '강철의 폭풍이 되어 매초 주변 적에게 {damage}의 피해를 줍니다. (전사 특성)',
+  'entities.abilities.avatar.name': '투신',
+  'entities.abilities.avatar.description':
+    '거인으로 변신해 20초 동안 전투력을 증가시킵니다. (전사 특성)',
+  'entities.abilities.rallying_cry.name': '재집결의 함성',
+  'entities.abilities.rallying_cry.description':
+    '재집결의 함성을 질러 10초 동안 주변 아군의 전투력을 증가시킵니다. (전사 특성)',
+  'entities.abilities.counterspell.name': '마법 차단',
+  'entities.abilities.counterspell.description':
+    '적의 주문 시전을 차단하고 6초 동안 같은 계열의 주문을 시전하지 못하게 합니다. (마법사 특성)',
+  'entities.abilities.ice_lance.name': '얼음창',
+  'entities.abilities.ice_lance.description':
+    '얼음 파편을 던져 {damage}의 냉기 피해를 줍니다. 이동 불가 대상에게 세 배의 피해를 줍니다. (마법사 특성)',
+  'entities.abilities.presence_of_mind.name': '냉정',
+  'entities.abilities.presence_of_mind.description':
+    '다음 시전 시간이 있는 주문을 즉시 시전하게 합니다. 60초 동안 지속됩니다. (마법사 특성)',
+  'entities.abilities.blink.name': '점멸',
+  'entities.abilities.blink.description':
+    '15미터 앞으로 순간이동하고 이동 불가 효과를 해제합니다. (마법사 특성)',
+  'entities.abilities.ice_block.name': '얼음 방패',
+  'entities.abilities.ice_block.description':
+    '얼음 속에 자신을 가두어 8초 동안 막대한 피해를 흡수합니다. (마법사 특성)',
+  'entities.abilities.deep_freeze.name': '동결',
+  'entities.abilities.deep_freeze.description':
+    '대상을 깊이 얼려 {damage}의 냉기 피해를 주고 4초 동안 기절시킵니다. (마법사 특성)',
+  'entities.abilities.meteor.name': '유성',
+  'entities.abilities.meteor.description':
+    '대상 지역에 유성을 불러내 {damage}의 화염 피해를 주고 지면을 불태웁니다. (마법사 특성)',
+  'entities.abilities.evocation.name': '환기',
+  'entities.abilities.evocation.description': '마나를 빠르게 회복합니다. (마법사 특성)',
 };

@@ -5159,75 +5159,120 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.title': 'Pembaruan Tersedia',
   'hudChrome.nativeUpdate.update': 'Perbarui',
   'entities.abilities.holy_shock.name': "Kejutan Suci",
+  'entities.abilities.holy_shock.name': 'Kejutan Suci',
   'entities.abilities.holy_shock.description':
-    "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)",
-  'entities.abilities.holy_shield.name': "Perisai Suci",
+    'Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)',
+  'entities.abilities.holy_shield.name': 'Perisai Suci',
   'entities.abilities.holy_shield.description':
-    "Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)",
-  'entities.abilities.repentance.name': "Pertobatan",
+    'Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)',
+  'entities.abilities.repentance.name': 'Pertobatan',
   'entities.abilities.repentance.description':
-    "Membuat musuh masuk ke keadaan meditasi hingga 6 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Pembalasan)",
-  'entities.abilities.bestial_wrath.name': "Murka Buas",
+    'Membuat musuh masuk ke keadaan meditasi hingga 6 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Pembalasan)',
+  'entities.abilities.bestial_wrath.name': 'Murka Buas',
   'entities.abilities.bestial_wrath.description':
-    "Membawamu ke amarah buas, meningkatkan kekuatan serangan sebesar 55 selama 15 dtk. (ciri khas Penguasa Binatang)",
-  'entities.abilities.trueshot_aura.name': "Aura Tembakan Jitu",
+    'Membawamu ke amarah buas, meningkatkan kekuatan serangan sebesar 55 selama 15 dtk. (ciri khas Penguasa Binatang)',
+  'entities.abilities.trueshot_aura.name': 'Aura Tembakan Jitu',
   'entities.abilities.trueshot_aura.description':
-    "Mengilhami sekutu di dekatmu, meningkatkan kekuatan serangan sebesar 35 selama 5 mnt. (ciri khas Penembakan)",
-  'entities.abilities.wyvern_sting.name': "Sengatan Wivern",
+    'Mengilhami sekutu di dekatmu, meningkatkan kekuatan serangan sebesar 35 selama 5 mnt. (ciri khas Penembakan)',
+  'entities.abilities.wyvern_sting.name': 'Sengatan Wivern',
   'entities.abilities.wyvern_sting.description':
-    "Menyengat musuh dari jarak jauh dan melumpuhkannya hingga 4 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Bertahan Hidup)",
-  'entities.abilities.arcane_power.name': "Kekuatan Arkan",
+    'Menyengat musuh dari jarak jauh dan melumpuhkannya hingga 4 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Bertahan Hidup)',
+  'entities.abilities.arcane_power.name': 'Kekuatan Arkan',
   'entities.abilities.arcane_power.description':
-    "Mengisimu dengan kekuatan arkan, meningkatkan kekuatan mantra sebesar 28 selama 12 dtk. (ciri khas Arkan)",
-  'entities.abilities.combustion.name': "Pembakaran",
+    'Mengisimu dengan kekuatan arkan, meningkatkan kekuatan mantra sebesar 28 selama 12 dtk. (ciri khas Arkan)',
+  'entities.abilities.combustion.name': 'Pembakaran',
   'entities.abilities.combustion.description':
-    "Memusatkan sihir apimu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Api)",
-  'entities.abilities.cone_of_cold.name': "Kerucut Dingin",
+    'Memusatkan sihir apimu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Api)',
+  'entities.abilities.cone_of_cold.name': 'Kerucut Dingin',
   'entities.abilities.cone_of_cold.description':
-    "Menghantam musuh di dekatmu dengan es, menimbulkan {damage} kerusakan Es. (ciri khas Es)",
-  'entities.abilities.cold_blood.name': "Darah Dingin",
+    'Menghantam musuh di dekatmu dengan es, menimbulkan {damage} kerusakan Es. (ciri khas Es)',
+  'entities.abilities.cold_blood.name': 'Darah Dingin',
   'entities.abilities.cold_blood.description':
-    "Memusatkan niat membunuhmu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Pembunuhan)",
-  'entities.abilities.blade_flurry.name': "Tebasan Bertubi",
+    'Memusatkan niat membunuhmu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Pembunuhan)',
+  'entities.abilities.blade_flurry.name': 'Tebasan Bertubi',
   'entities.abilities.blade_flurry.description':
-    "Melepaskan hujan bilah, meningkatkan kecepatan serangan sebesar 20% selama 12 dtk. (ciri khas Pertarungan)",
-  'entities.abilities.hemorrhage.name': "Pendarahan",
+    'Melepaskan hujan bilah, meningkatkan kecepatan serangan sebesar 20% selama 12 dtk. (ciri khas Pertarungan)',
+  'entities.abilities.hemorrhage.name': 'Pendarahan',
   'entities.abilities.hemorrhage.description':
-    "Menyerang musuh dengan kerusakan senjata ditambah {damage} dan menyebabkan kerusakan berdarah selama 12 dtk. Memberi 1 poin kombo. (ciri khas Kelicikan)",
-  'entities.abilities.power_infusion.name': "Infusi Kekuatan",
+    'Menyerang musuh dengan kerusakan senjata ditambah {damage} dan menyebabkan kerusakan berdarah selama 12 dtk. Memberi 1 poin kombo. (ciri khas Kelicikan)',
+  'entities.abilities.power_infusion.name': 'Infusi Kekuatan',
   'entities.abilities.power_infusion.description':
-    "Mengisi target kawan dengan kekuatan, meningkatkan kekuatan mantra sebesar 28 selama 15 dtk. (ciri khas Disiplin)",
-  'entities.abilities.holy_nova.name': "Nova Suci",
+    'Mengisi target kawan dengan kekuatan, meningkatkan kekuatan mantra sebesar 28 selama 15 dtk. (ciri khas Disiplin)',
+  'entities.abilities.holy_nova.name': 'Nova Suci',
   'entities.abilities.holy_nova.description':
-    "Menimbulkan ledakan cahaya Suci, memulihkan sekutu di dekatmu sebesar {damage} dan melukai musuh di dekatmu. (ciri khas Suci)",
-  'entities.abilities.shadowform.name': "Wujud Bayangan",
+    'Menimbulkan ledakan cahaya Suci, memulihkan sekutu di dekatmu sebesar {damage} dan melukai musuh di dekatmu. (ciri khas Suci)',
+  'entities.abilities.shadowform.name': 'Wujud Bayangan',
   'entities.abilities.shadowform.description':
-    "Mengambil wujud bayangan, memperkuat sihir bayangan sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Bayangan)",
-  'entities.abilities.elemental_mastery.name': "Penguasaan Elemen",
+    'Mengambil wujud bayangan, memperkuat sihir bayangan sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Bayangan)',
+  'entities.abilities.elemental_mastery.name': 'Penguasaan Elemen',
   'entities.abilities.elemental_mastery.description':
-    "Memanggil penguasaan elemen, membuat mantra berikutnya seketika. (ciri khas Elemen)",
-  'entities.abilities.shamanistic_rage.name': "Amarah Shamanistik",
+    'Memanggil penguasaan elemen, membuat mantra berikutnya seketika. (ciri khas Elemen)',
+  'entities.abilities.shamanistic_rage.name': 'Amarah Shamanistik',
   'entities.abilities.shamanistic_rage.description':
-    "Melepaskan amarah shamanistik, memulihkan 160 mana. (ciri khas Peningkatan)",
-  'entities.abilities.natures_swiftness.name': "Kelincahan Alam",
+    'Melepaskan amarah shamanistik, memulihkan 160 mana. (ciri khas Peningkatan)',
+  'entities.abilities.natures_swiftness.name': 'Kelincahan Alam',
   'entities.abilities.natures_swiftness.description':
-    "Memanggil alam untuk membuat mantra berikutnya seketika. (ciri khas Pemulihan)",
-  'entities.abilities.siphon_life.name': "Sifon Nyawa",
+    'Memanggil alam untuk membuat mantra berikutnya seketika. (ciri khas Pemulihan)',
+  'entities.abilities.siphon_life.name': 'Sifon Nyawa',
   'entities.abilities.siphon_life.description':
-    "Menyedot nyawa dari musuh, menimbulkan {damage} kerusakan Bayangan selama 30 dtk dan memulihkanmu sebesar kerusakan yang terjadi. (ciri khas Penderitaan)",
-  'entities.abilities.fel_domination.name': "Dominasi Iblis",
+    'Menyedot nyawa dari musuh, menimbulkan {damage} kerusakan Bayangan selama 30 dtk dan memulihkanmu sebesar kerusakan yang terjadi. (ciri khas Penderitaan)',
+  'entities.abilities.fel_domination.name': 'Dominasi Iblis',
   'entities.abilities.fel_domination.description':
-    "Menguasai energi iblis, membuat mantra berikutnya seketika. (ciri khas Demonologi)",
-  'entities.abilities.conflagrate.name': "Kobaran Api",
+    'Menguasai energi iblis, membuat mantra berikutnya seketika. (ciri khas Demonologi)',
+  'entities.abilities.conflagrate.name': 'Kobaran Api',
   'entities.abilities.conflagrate.description':
-    "Menghabiskan Pembakaran milikmu pada musuh untuk menyulutnya dengan {damage} kerusakan Api. (ciri khas Penghancuran)",
-  'entities.abilities.moonkin_form.name': "Wujud Burung Bulan",
+    'Menghabiskan Pembakaran milikmu pada musuh untuk menyulutnya dengan {damage} kerusakan Api. (ciri khas Penghancuran)',
+  'entities.abilities.moonkin_form.name': 'Wujud Burung Bulan',
   'entities.abilities.moonkin_form.description':
-    "Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)",
-  'entities.abilities.feral_charge.name': "Terjangan Liar",
+    'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
+  'entities.abilities.feral_charge.name': 'Terjangan Liar',
   'entities.abilities.feral_charge.description':
-    "Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)",
-  'entities.abilities.swiftmend.name': "Pemulihan Cepat",
+    'Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)',
+  'entities.abilities.swiftmend.name': 'Pemulihan Cepat',
   'entities.abilities.swiftmend.description':
-    "Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)",
+    'Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)',
+  'entities.abilities.heroic_leap.name': 'Salto heroico',
+  'entities.abilities.heroic_leap.description':
+    'Salta al área objetivo e inflige {damage} de daño físico a los enemigos cercanos. (Talento de guerrero)',
+  'entities.abilities.pummel.name': 'Zurrar',
+  'entities.abilities.pummel.description':
+    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (Talento de guerrero)',
+  'entities.abilities.shield_wall.name': 'Muro de escudo',
+  'entities.abilities.shield_wall.description':
+    'Alza tu muro de escudo y aumenta mucho la armadura durante 10 s. (Talento de guerrero)',
+  'entities.abilities.last_stand.name': 'Última carga',
+  'entities.abilities.last_stand.description':
+    'Aumenta temporalmente el Aguante durante 15 s, lo que aumenta la salud máxima. (Talento de guerrero)',
+  'entities.abilities.bladestorm.name': 'Filotormenta',
+  'entities.abilities.bladestorm.description':
+    'Te conviertes en una tormenta de acero y golpeas a los enemigos cercanos cada segundo por {damage}. (Talento de guerrero)',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Te transformas en un coloso y aumentas el poder de ataque durante 20 s. (Talento de guerrero)',
+  'entities.abilities.rallying_cry.name': 'Grito de convocación',
+  'entities.abilities.rallying_cry.description':
+    'Sueltas un grito de convocación que aumenta el poder de ataque de los aliados cercanos durante 10 s. (Talento de guerrero)',
+  'entities.abilities.counterspell.name': 'Contrahechizo',
+  'entities.abilities.counterspell.description':
+    'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
+  'entities.abilities.ice_lance.name': 'Lanza de hielo',
+  'entities.abilities.ice_lance.description':
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+  'entities.abilities.presence_of_mind.name': 'Presencia mental',
+  'entities.abilities.presence_of_mind.description':
+    'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
+  'entities.abilities.blink.name': 'Traslación',
+  'entities.abilities.blink.description':
+    'Te teletransporta 15 m hacia delante y rompe raíces. (Talento de mago)',
+  'entities.abilities.ice_block.name': 'Bloque de hielo',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (Talento de mago)',
+  'entities.abilities.deep_freeze.name': 'Congelación profunda',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente al objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (Talento de mago)',
+  'entities.abilities.meteor.name': 'Meteoro',
+  'entities.abilities.meteor.description':
+    'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
+  'entities.abilities.evocation.name': 'Evocación',
+  'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
 };
