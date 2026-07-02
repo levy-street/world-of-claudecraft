@@ -7,7 +7,9 @@ import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 const SEED = 20061;
 const MIN_DRY_GROUND = WATER_LEVEL - 0.8;
 
-function makeSim(cls: 'warrior' | 'mage' | 'hunter' | 'rogue' | 'priest'): Sim {
+function makeSim(
+  cls: 'warrior' | 'mage' | 'hunter' | 'rogue' | 'priest' | 'shaman' | 'warlock' | 'druid',
+): Sim {
   const sim = new Sim({ seed: SEED, playerClass: cls });
   sim.setPlayerLevel(MAX_LEVEL);
   return sim;
@@ -299,5 +301,86 @@ describe('Talents 2.0 PR5 Wave A regressions', () => {
     expect(
       wolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'psychic_scream_fear'),
     ).toBe(true);
+  });
+
+  it('Earthbind roots nearby enemies without hidden damage', () => {
+    const sim = makeSim('shaman');
+    expect(sim.chooseRow(17, 'sha_r17_earthbind')).toBe(true);
+    teleportTo(sim, sim.player, 0, -40);
+    const wolf = firstWolf(sim);
+    teleportTo(sim, wolf, 2, -40);
+
+    sim.castAbility('earthbind');
+
+    const damageEvents = sim.events.filter(
+      (event) => event.type === 'damage' && event.ability === 'Earthbind',
+    );
+    expect(damageEvents).toHaveLength(0);
+    expect(wolf.auras.some((a) => a.kind === 'root' && a.id === 'earthbind_root')).toBe(true);
+  });
+
+  it('Bloodlust applies haste to the caster through the ally aura path', () => {
+    const sim = makeSim('shaman');
+    expect(sim.chooseRow(20, 'sha_r20_bloodlust')).toBe(true);
+
+    sim.castAbility('bloodlust');
+
+    expect(sim.player.auras.some((a) => a.kind === 'buff_haste' && a.id === 'bloodlust')).toBe(
+      true,
+    );
+  });
+
+  it('Warlock control grants apply area fear, slow, and leeching Death Coil', () => {
+    const fear = makeSim('warlock');
+    expect(fear.chooseRow(8, 'wlk_r8_howl_of_terror')).toBe(true);
+    const fearedWolf = firstWolf(fear);
+    teleportTo(fear, fear.player, 0, -40);
+    teleportTo(fear, fearedWolf, 2, -40);
+
+    fear.castAbility('howl_of_terror');
+
+    expect(
+      fearedWolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'howl_of_terror_fear'),
+    ).toBe(true);
+
+    const slow = makeSim('warlock');
+    expect(slow.chooseRow(8, 'wlk_r8_curse_of_exhaustion')).toBe(true);
+    const slowedWolf = firstWolf(slow);
+    teleportTo(slow, slow.player, 0, -40);
+    teleportTo(slow, slowedWolf, 2, -40);
+    slow.targetEntity(slowedWolf.id);
+
+    slow.castAbility('curse_of_exhaustion');
+    for (let i = 0; i < 20; i++) slow.tick();
+
+    expect(
+      slowedWolf.auras.some((a) => a.kind === 'slow' && a.id === 'curse_of_exhaustion_slow'),
+    ).toBe(true);
+
+    const coil = makeSim('warlock');
+    expect(coil.chooseRow(17, 'wlk_r17_death_coil')).toBe(true);
+    const coiledWolf = firstWolf(coil);
+    teleportTo(coil, coil.player, 0, -40);
+    teleportTo(coil, coiledWolf, 10, -40);
+    coil.player.hp = Math.max(1, coil.player.hp - 80);
+    const hpBefore = coil.player.hp;
+    coil.targetEntity(coiledWolf.id);
+
+    coil.castAbility('death_coil');
+    for (let i = 0; i < 40; i++) coil.tick();
+
+    expect(coil.player.hp).toBeGreaterThan(hpBefore);
+  });
+
+  it('Tranquility channel ticks heal the caster', () => {
+    const sim = makeSim('druid');
+    expect(sim.chooseRow(20, 'dru_r20_tranquility')).toBe(true);
+    sim.player.hp = Math.max(1, sim.player.hp - 120);
+    const hpBefore = sim.player.hp;
+
+    sim.castAbility('tranquility');
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    expect(sim.player.hp).toBeGreaterThan(hpBefore);
   });
 });

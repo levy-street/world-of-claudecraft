@@ -4959,4 +4959,49 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.name': '精神灼燒',
   'entities.abilities.mind_sear.description':
     '引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）',
+  'entities.abilities.earthbind.name': '大地束縛',
+  'entities.abilities.earthbind.description':
+    '將附近敵人縛於大地，使其定身 2 秒。（薩滿天賦）',
+  'entities.abilities.healing_stream.name': '治療之泉',
+  'entities.abilities.healing_stream.description':
+    '在 12 秒內恢復友方目標的生命值。（薩滿天賦）',
+  'entities.abilities.chain_lightning.name': '閃電鏈',
+  'entities.abilities.chain_lightning.description':
+    '向目標區域投出閃電，對附近敵人造成 {damage} 點自然傷害。（薩滿天賦）',
+  'entities.abilities.bloodlust.name': '嗜血',
+  'entities.abilities.bloodlust.description':
+    '激發附近盟友的狂怒，使攻擊速度提高，持續 15 秒。（薩滿天賦）',
+  'entities.abilities.spell_lock.name': '法術封鎖',
+  'entities.abilities.spell_lock.description':
+    '打斷施法，並阻止該系法術施放 5 秒。（術士天賦）',
+  'entities.abilities.howl_of_terror.name': '恐懼嚎叫',
+  'entities.abilities.howl_of_terror.description':
+    '使附近敵人恐懼，最多持續 3 秒。受到傷害可能打破效果。（術士天賦）',
+  'entities.abilities.curse_of_exhaustion.name': '疲勞詛咒',
+  'entities.abilities.curse_of_exhaustion.description':
+    '詛咒目標，使移動速度降低 30%，持續 12 秒。（術士天賦）',
+  'entities.abilities.death_coil.name': '死亡纏繞',
+  'entities.abilities.death_coil.description':
+    '恐嚇敵人，並在短暫時間內將生命吸回自身。（術士天賦）',
+  'entities.abilities.chaos_bolt.name': '混沌箭',
+  'entities.abilities.chaos_bolt.description':
+    '投出混沌火焰之箭，造成 {damage} 點火焰傷害。（術士天賦）',
+  'entities.abilities.metamorphosis.name': '惡魔變形',
+  'entities.abilities.metamorphosis.description':
+    '化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）',
+  'entities.abilities.skull_bash.name': '碎顱猛擊',
+  'entities.abilities.skull_bash.description':
+    '打斷施法，並阻止該系法術施放 4 秒。（德魯伊天賦）',
+  'entities.abilities.innervate.name': '啟動',
+  'entities.abilities.innervate.description':
+    '立即恢復大量法力值。（德魯伊天賦）',
+  'entities.abilities.frenzied_regeneration.name': '狂暴回復',
+  'entities.abilities.frenzied_regeneration.description':
+    '在 10 秒內恢復生命值。僅限熊形態。（德魯伊天賦）',
+  'entities.abilities.berserk.name': '狂暴',
+  'entities.abilities.berserk.description':
+    '攻擊強度提高 15 秒。（德魯伊天賦）',
+  'entities.abilities.tranquility.name': '寧靜',
+  'entities.abilities.tranquility.description':
+    '引導恢復能量，每秒治療附近盟友。（德魯伊天賦）',
 };

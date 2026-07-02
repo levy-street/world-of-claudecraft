@@ -2347,6 +2347,18 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   frost_shock: r('frost', 'ice', ['snowflake'], ['motion']),
   ghost_wolf: r('nature', 'leafGreen', ['paw'], ['glow']),
   stormstrike: r('storm', 'sky', ['sword', { p: 'lightning', ...BR }]),
+  earthbind: r('earth', 'earthBrown', ['tendrils', { p: 'mace', ...BR }], ['crack']),
+  healing_stream: r('nature', 'sky', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
+  chain_lightning: r(
+    'storm',
+    'sky',
+    [
+      { p: 'lightning', x: -9, s: 0.72 },
+      { p: 'lightning', x: 9, y: 6, s: 0.72, rot: 0.4 },
+    ],
+    ['arcs'],
+  ),
+  bloodlust: r('fury', 'blood', ['fist', { p: 'lightning', ...BR }], ['glow']),
   // warlock
   fear: r('shadow', 'shadowPurple', ['roar'], ['glow']),
   searing_pain: r('fire', 'ember', ['bolt'], ['glow']),
@@ -2358,6 +2370,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   summon_felguard: r('shadow', 'steel', ['axe', { p: 'helm', ...TL }], ['glow']),
   summon_infernal: r('fire', 'ember', ['meteor'], ['glow']),
   summon_doomguard: r('shadow', 'shadowPurple', ['wing', { p: 'skull', ...BR }], ['glow']),
+  spell_lock: r('shadow', 'venom', ['sigil_rune', { p: 'fang', ...BR }], ['arcs']),
+  howl_of_terror: r('shadow', 'blood', ['roar', { p: 'skull', ...BR }], ['glow']),
+  curse_of_exhaustion: r('shadow', 'shadowPurple', ['boot', { p: 'skull', ...TR }], ['motion']),
+  death_coil: r('shadow', 'blood', ['skull', { p: 'heart', ...BR }], ['drips']),
+  chaos_bolt: r('fire', 'shadowPurple', ['bolt', { p: 'flame', ...BR }], ['crack']),
+  metamorphosis: r('shadow', 'ember', ['wing', { p: 'chestplate', ...BR }], ['glow']),
   // druid
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
@@ -2372,6 +2390,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   regrowth: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   barkskin: r('earth', 'earthBrown', ['shield', { p: 'leaf', ...BR }]),
   starfire: r('arcane', 'silverWhite', ['moon', { p: 'sunburst', ...BR }], ['sparkle', 'glow']),
+  skull_bash: r('earth', 'bone', ['skull', { p: 'paw', ...BR }], ['motion']),
+  innervate: r('nature', 'leafGreen', ['leaf', { p: 'gem', ...BR }], ['sparkle']),
+  frenzied_regeneration: r('nature', 'blood', ['heart', { p: 'paw', ...BR }], ['glow']),
+  berserk: r('fury', 'blood', ['paw', { p: 'fist', ...BR }], ['glow']),
+  tranquility: r('nature', 'silverWhite', ['heart', { p: 'leaf', ...BR }], ['sparkle']),
   // spec signature spells (Talents 2.0 PR3b): one per spec, grant-only
   holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
   holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),

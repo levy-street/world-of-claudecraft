@@ -4959,4 +4959,49 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.name': '精神灼烧',
   'entities.abilities.mind_sear.description':
     '引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）',
+  'entities.abilities.earthbind.name': '大地束缚',
+  'entities.abilities.earthbind.description':
+    '将附近敌人缚于大地，使其定身 2 秒。（萨满天赋）',
+  'entities.abilities.healing_stream.name': '治疗之泉',
+  'entities.abilities.healing_stream.description':
+    '在 12 秒内恢复友方目标的生命值。（萨满天赋）',
+  'entities.abilities.chain_lightning.name': '闪电链',
+  'entities.abilities.chain_lightning.description':
+    '向目标区域投出闪电，对附近敌人造成 {damage} 点自然伤害。（萨满天赋）',
+  'entities.abilities.bloodlust.name': '嗜血',
+  'entities.abilities.bloodlust.description':
+    '激发附近盟友的狂怒，使攻击速度提高，持续 15 秒。（萨满天赋）',
+  'entities.abilities.spell_lock.name': '法术封锁',
+  'entities.abilities.spell_lock.description':
+    '打断施法，并阻止该系法术施放 5 秒。（术士天赋）',
+  'entities.abilities.howl_of_terror.name': '恐惧嚎叫',
+  'entities.abilities.howl_of_terror.description':
+    '使附近敌人恐惧，最多持续 3 秒。受到伤害可能打破效果。（术士天赋）',
+  'entities.abilities.curse_of_exhaustion.name': '疲劳诅咒',
+  'entities.abilities.curse_of_exhaustion.description':
+    '诅咒目标，使移动速度降低 30%，持续 12 秒。（术士天赋）',
+  'entities.abilities.death_coil.name': '死亡缠绕',
+  'entities.abilities.death_coil.description':
+    '恐吓敌人，并在短暂时间内将生命吸回自身。（术士天赋）',
+  'entities.abilities.chaos_bolt.name': '混乱箭',
+  'entities.abilities.chaos_bolt.description':
+    '投出混乱火焰之箭，造成 {damage} 点火焰伤害。（术士天赋）',
+  'entities.abilities.metamorphosis.name': '恶魔变形',
+  'entities.abilities.metamorphosis.description':
+    '化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）',
+  'entities.abilities.skull_bash.name': '碎颅猛击',
+  'entities.abilities.skull_bash.description':
+    '打断施法，并阻止该系法术施放 4 秒。（德鲁伊天赋）',
+  'entities.abilities.innervate.name': '激活',
+  'entities.abilities.innervate.description':
+    '立即恢复大量法力值。（德鲁伊天赋）',
+  'entities.abilities.frenzied_regeneration.name': '狂暴回复',
+  'entities.abilities.frenzied_regeneration.description':
+    '在 10 秒内恢复生命值。仅限熊形态。（德鲁伊天赋）',
+  'entities.abilities.berserk.name': '狂暴',
+  'entities.abilities.berserk.description':
+    '攻击强度提高 15 秒。（德鲁伊天赋）',
+  'entities.abilities.tranquility.name': '宁静',
+  'entities.abilities.tranquility.description':
+    '引导恢复能量，每秒治疗附近盟友。（德鲁伊天赋）',
 };

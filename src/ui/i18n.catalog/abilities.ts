@@ -1293,6 +1293,73 @@ const classAbilityNamesEn = {
         'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
       ],
       [
+        'earthbind',
+        'Earthbind',
+        'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
+      ],
+      [
+        'healing_stream',
+        'Healing Stream',
+        'Restores a friendly target over 12 sec. (Shaman talent)',
+      ],
+      [
+        'chain_lightning',
+        'Chain Lightning',
+        'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
+      ],
+      [
+        'bloodlust',
+        'Bloodlust',
+        'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
+      ],
+      [
+        'spell_lock',
+        'Spell Lock',
+        'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
+      ],
+      [
+        'howl_of_terror',
+        'Howl of Terror',
+        'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
+      ],
+      [
+        'curse_of_exhaustion',
+        'Curse of Exhaustion',
+        'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
+      ],
+      [
+        'death_coil',
+        'Death Coil',
+        'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
+      ],
+      [
+        'chaos_bolt',
+        'Chaos Bolt',
+        'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
+      ],
+      [
+        'metamorphosis',
+        'Metamorphosis',
+        'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
+      ],
+      [
+        'skull_bash',
+        'Skull Bash',
+        'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
+      ],
+      ['innervate', 'Innervate', 'Instantly restores a large amount of mana. (Druid talent)'],
+      [
+        'frenzied_regeneration',
+        'Frenzied Regeneration',
+        'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
+      ],
+      ['berserk', 'Berserk', 'Increases attack power for 15 sec. (Druid talent)'],
+      [
+        'tranquility',
+        'Tranquility',
+        'Channels restorative energy, healing nearby allies each second. (Druid talent)',
+      ],
+      [
         'holy_shock',
         'Holy Shock',
         'Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)',

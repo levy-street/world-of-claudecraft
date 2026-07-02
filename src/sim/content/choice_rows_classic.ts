@@ -1133,3 +1133,551 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
     },
   ],
 };
+
+export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
+  rows: [
+    {
+      level: 5,
+      theme: 'elements',
+      options: [
+        {
+          id: 'sha_r5_concussion',
+          name: 'Concussion',
+          description: 'Lightning Bolt deals 15% more damage.',
+          icon: 'lightning_bolt',
+          effect: { ability: [{ ability: 'lightning_bolt', dmgPct: 0.15 }] },
+        },
+        {
+          id: 'sha_r5_improved_lightning_shield',
+          name: 'Improved Lightning Shield',
+          description: 'Lightning Shield damage increased by 40%.',
+          icon: 'lightning_shield',
+          effect: { ability: [{ ability: 'lightning_shield', buffPct: 0.4 }] },
+        },
+        {
+          id: 'sha_r5_imbue_mastery',
+          name: 'Imbue Mastery',
+          description: 'Weapon imbues deal 30% more damage.',
+          icon: 'rockbiter_weapon',
+          effect: {
+            ability: [
+              { ability: 'rockbiter_weapon', dmgPct: 0.3 },
+              { ability: 'flametongue_weapon', dmgPct: 0.3 },
+              { ability: 'frostbrand_weapon', dmgPct: 0.3 },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      level: 8,
+      theme: 'shocks',
+      options: [
+        {
+          id: 'sha_r8_improved_earth_shock',
+          name: 'Improved Earth Shock',
+          description: 'Earth Shock also interrupts spellcasting for a 2 sec school lockout.',
+          icon: 'earth_shock',
+          effect: {
+            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
+          },
+        },
+        {
+          id: 'sha_r8_frost_bind',
+          name: 'Frost Bind',
+          description: 'Frost Shock also roots the target for 1 sec.',
+          icon: 'frost_shock',
+          effect: {
+            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 1 }] }],
+          },
+        },
+        {
+          id: 'sha_r8_shock_efficiency',
+          name: 'Shock Efficiency',
+          description: 'Shock costs reduced by 20%.',
+          icon: 'earth_shock',
+          effect: {
+            ability: [
+              { ability: 'earth_shock', costPct: -0.2 },
+              { ability: 'flame_shock', costPct: -0.2 },
+              { ability: 'frost_shock', costPct: -0.2 },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      level: 11,
+      theme: 'restoration',
+      options: [
+        {
+          id: 'sha_r11_ancestral_guidance',
+          name: 'Ancestral Guidance',
+          description: 'Healing Wave casts 20% faster.',
+          icon: 'healing_wave',
+          effect: { ability: [{ ability: 'healing_wave', castPct: -0.2 }] },
+        },
+        {
+          id: 'sha_r11_elemental_attunement',
+          name: 'Elemental Attunement',
+          description: 'Lightning Bolt costs 20% less.',
+          icon: 'lightning_bolt',
+          effect: { ability: [{ ability: 'lightning_bolt', costPct: -0.2 }] },
+        },
+        {
+          id: 'sha_r11_healing_stream',
+          name: 'Healing Stream',
+          description: 'Grants Healing Stream.',
+          icon: 'healing_stream',
+          effect: { grant: { ability: 'healing_stream' } },
+        },
+      ],
+    },
+    {
+      level: 14,
+      theme: 'storm',
+      options: [
+        {
+          id: 'sha_r14_chain_lightning',
+          name: 'Chain Lightning',
+          description: 'Grants Chain Lightning.',
+          icon: 'chain_lightning',
+          effect: { grant: { ability: 'chain_lightning' } },
+        },
+        {
+          id: 'sha_r14_improved_flame_shock',
+          name: 'Improved Flame Shock',
+          description: 'Flame Shock deals 30% more damage.',
+          icon: 'flame_shock',
+          effect: { ability: [{ ability: 'flame_shock', dmgPct: 0.3 }] },
+        },
+        {
+          id: 'sha_r14_weapon_fury',
+          name: 'Weapon Fury',
+          description: 'Attack power increased by 10%.',
+          icon: 'stormstrike',
+          effect: { stats: { apPct: 0.1 } },
+        },
+      ],
+    },
+    {
+      level: 17,
+      theme: 'warding',
+      options: [
+        {
+          id: 'sha_r17_earthbind',
+          name: 'Earthbind',
+          description: 'Grants Earthbind.',
+          icon: 'earthbind',
+          effect: { grant: { ability: 'earthbind' } },
+        },
+        {
+          id: 'sha_r17_improved_ghost_wolf',
+          name: 'Improved Ghost Wolf',
+          description: 'Ghost Wolf becomes instant.',
+          icon: 'ghost_wolf',
+          effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
+        },
+        {
+          id: 'sha_r17_elemental_warding',
+          name: 'Elemental Warding',
+          description: 'Armor and maximum health increased by 8%.',
+          icon: 'lightning_shield',
+          effect: { stats: { armorPct: 0.08, maxHpPct: 0.08 } },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'bloodlust',
+      options: [
+        {
+          id: 'sha_r20_bloodlust',
+          name: 'Bloodlust',
+          description: 'Grants Bloodlust.',
+          icon: 'bloodlust',
+          effect: { grant: { ability: 'bloodlust' } },
+        },
+        {
+          id: 'sha_r20_elemental_fury',
+          name: 'Elemental Fury',
+          description: 'Critical strike chance increased by 5%.',
+          icon: 'lightning_bolt',
+          effect: { stats: { crit: 0.05 } },
+        },
+        {
+          id: 'sha_r20_tidal_waves',
+          name: 'Tidal Waves',
+          description: 'Healing Wave heals 20% more and costs 10% less.',
+          icon: 'healing_wave',
+          effect: { ability: [{ ability: 'healing_wave', dmgPct: 0.2, costPct: -0.1 }] },
+        },
+      ],
+    },
+  ],
+};
+
+export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
+  rows: [
+    {
+      level: 5,
+      theme: 'affliction',
+      options: [
+        {
+          id: 'wlk_r5_bane',
+          name: 'Bane',
+          description: 'Shadow Bolt casts 20% faster.',
+          icon: 'shadow_bolt',
+          effect: { ability: [{ ability: 'shadow_bolt', castPct: -0.2 }] },
+        },
+        {
+          id: 'wlk_r5_improved_corruption',
+          name: 'Improved Corruption',
+          description: 'Corruption becomes instant.',
+          icon: 'corruption',
+          effect: { ability: [{ ability: 'corruption', castPct: -1 }] },
+        },
+        {
+          id: 'wlk_r5_improved_immolate',
+          name: 'Improved Immolate',
+          description: 'Immolate deals 25% more damage.',
+          icon: 'immolate',
+          effect: { ability: [{ ability: 'immolate', dmgPct: 0.25 }] },
+        },
+      ],
+    },
+    {
+      level: 8,
+      theme: 'control',
+      options: [
+        {
+          id: 'wlk_r8_spell_lock',
+          name: 'Spell Lock',
+          description: 'Grants Spell Lock.',
+          icon: 'spell_lock',
+          effect: { grant: { ability: 'spell_lock' } },
+        },
+        {
+          id: 'wlk_r8_howl_of_terror',
+          name: 'Howl of Terror',
+          description: 'Grants Howl of Terror.',
+          icon: 'howl_of_terror',
+          effect: { grant: { ability: 'howl_of_terror' } },
+        },
+        {
+          id: 'wlk_r8_curse_of_exhaustion',
+          name: 'Curse of Exhaustion',
+          description: 'Grants Curse of Exhaustion.',
+          icon: 'curse_of_exhaustion',
+          effect: { grant: { ability: 'curse_of_exhaustion' } },
+        },
+      ],
+    },
+    {
+      level: 11,
+      theme: 'demonology',
+      options: [
+        {
+          id: 'wlk_r11_improved_life_tap',
+          name: 'Improved Life Tap',
+          description: 'Life Tap restores 30% more mana.',
+          icon: 'life_tap',
+          effect: { ability: [{ ability: 'life_tap', dmgPct: 0.3 }] },
+        },
+        {
+          id: 'wlk_r11_fel_concentration',
+          name: 'Fel Concentration',
+          description: 'Drain Life deals 25% more damage.',
+          icon: 'drain_life',
+          effect: { ability: [{ ability: 'drain_life', dmgPct: 0.25 }] },
+        },
+        {
+          id: 'wlk_r11_demon_armor',
+          name: 'Demon Armor',
+          description: 'Demon Skin armor increased by 40%.',
+          icon: 'demon_skin',
+          effect: { ability: [{ ability: 'demon_skin', buffPct: 0.4 }] },
+        },
+      ],
+    },
+    {
+      level: 14,
+      theme: 'destruction',
+      options: [
+        {
+          id: 'wlk_r14_amplify_curse',
+          name: 'Amplify Curse',
+          description: 'Curse of Agony deals 25% more damage.',
+          icon: 'curse_of_agony',
+          effect: { ability: [{ ability: 'curse_of_agony', dmgPct: 0.25 }] },
+        },
+        {
+          id: 'wlk_r14_ruin',
+          name: 'Ruin',
+          description: 'Searing Pain and Shadowburn deal 20% more damage.',
+          icon: 'shadowburn',
+          effect: {
+            ability: [
+              { ability: 'searing_pain', dmgPct: 0.2 },
+              { ability: 'shadowburn', dmgPct: 0.2 },
+            ],
+          },
+        },
+        {
+          id: 'wlk_r14_shadow_mastery',
+          name: 'Shadow Mastery',
+          description: 'Spell damage increased by 6%.',
+          icon: 'shadow_bolt',
+          effect: { global: { spellDmgPct: 0.06 } },
+        },
+      ],
+    },
+    {
+      level: 17,
+      theme: 'horror',
+      options: [
+        {
+          id: 'wlk_r17_death_coil',
+          name: 'Death Coil',
+          description: 'Grants Death Coil.',
+          icon: 'death_coil',
+          effect: { grant: { ability: 'death_coil' } },
+        },
+        {
+          id: 'wlk_r17_improved_fear',
+          name: 'Improved Fear',
+          description: 'Fear casts 30% faster.',
+          icon: 'fear',
+          effect: { ability: [{ ability: 'fear', castPct: -0.3 }] },
+        },
+        {
+          id: 'wlk_r17_demonic_resilience',
+          name: 'Demonic Resilience',
+          description: 'Maximum health increased by 10%.',
+          icon: 'demon_skin',
+          effect: { stats: { maxHpPct: 0.1 } },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'apotheosis',
+      options: [
+        {
+          id: 'wlk_r20_chaos_bolt',
+          name: 'Chaos Bolt',
+          description: 'Grants Chaos Bolt.',
+          icon: 'chaos_bolt',
+          effect: { grant: { ability: 'chaos_bolt' } },
+        },
+        {
+          id: 'wlk_r20_metamorphosis',
+          name: 'Metamorphosis',
+          description: 'Grants Metamorphosis.',
+          icon: 'metamorphosis',
+          effect: { grant: { ability: 'metamorphosis' } },
+        },
+        {
+          id: 'wlk_r20_curse_mastery',
+          name: 'Curse Mastery',
+          description: 'Corruption and Curse of Agony deal 20% more damage.',
+          icon: 'curse_of_agony',
+          effect: {
+            ability: [
+              { ability: 'corruption', dmgPct: 0.2 },
+              { ability: 'curse_of_agony', dmgPct: 0.2 },
+            ],
+          },
+        },
+      ],
+    },
+  ],
+};
+
+export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
+  rows: [
+    {
+      level: 5,
+      theme: 'nature',
+      options: [
+        {
+          id: 'dru_r5_improved_wrath',
+          name: 'Improved Wrath',
+          description: 'Wrath casts 20% faster.',
+          icon: 'wrath',
+          effect: { ability: [{ ability: 'wrath', castPct: -0.2 }] },
+        },
+        {
+          id: 'dru_r5_ferocity',
+          name: 'Ferocity',
+          description: 'Claw and Rake cost 20% less.',
+          icon: 'claw',
+          effect: {
+            ability: [
+              { ability: 'claw', costPct: -0.2 },
+              { ability: 'rake', costPct: -0.2 },
+            ],
+          },
+        },
+        {
+          id: 'dru_r5_natures_bounty',
+          name: "Nature's Bounty",
+          description: 'Rejuvenation heals 25% more.',
+          icon: 'rejuvenation',
+          effect: { ability: [{ ability: 'rejuvenation', dmgPct: 0.25 }] },
+        },
+      ],
+    },
+    {
+      level: 8,
+      theme: 'feral',
+      options: [
+        {
+          id: 'dru_r8_skull_bash',
+          name: 'Skull Bash',
+          description: 'Grants Skull Bash.',
+          icon: 'skull_bash',
+          effect: { grant: { ability: 'skull_bash' } },
+        },
+        {
+          id: 'dru_r8_improved_roots',
+          name: 'Improved Roots',
+          description: 'Entangling Roots costs 30% less and casts 30% faster.',
+          icon: 'entangling_roots',
+          effect: { ability: [{ ability: 'entangling_roots', costPct: -0.3, castPct: -0.3 }] },
+        },
+        {
+          id: 'dru_r8_brutal_bash',
+          name: 'Brutal Bash',
+          description: 'Bash cooldown reduced by 30%.',
+          icon: 'bash',
+          effect: { ability: [{ ability: 'bash', cooldownPct: -0.3 }] },
+        },
+      ],
+    },
+    {
+      level: 11,
+      theme: 'restoration',
+      options: [
+        {
+          id: 'dru_r11_innervate',
+          name: 'Innervate',
+          description: 'Grants Innervate.',
+          icon: 'innervate',
+          effect: { grant: { ability: 'innervate' } },
+        },
+        {
+          id: 'dru_r11_furor',
+          name: 'Furor',
+          description: 'Shapeshift costs reduced by 50%.',
+          icon: 'bear_form',
+          effect: {
+            ability: [
+              { ability: 'bear_form', costPct: -0.5 },
+              { ability: 'cat_form', costPct: -0.5 },
+              { ability: 'travel_form', costPct: -0.5 },
+            ],
+          },
+        },
+        {
+          id: 'dru_r11_improved_mark',
+          name: 'Improved Mark',
+          description: 'Mark of the Wild effect increased by 40%.',
+          icon: 'mark_of_the_wild',
+          effect: { ability: [{ ability: 'mark_of_the_wild', buffPct: 0.4 }] },
+        },
+      ],
+    },
+    {
+      level: 14,
+      theme: 'balance',
+      options: [
+        {
+          id: 'dru_r14_savage_fury',
+          name: 'Savage Fury',
+          description: 'Ferocious Bite and Rip deal 20% more damage.',
+          icon: 'ferocious_bite',
+          effect: {
+            ability: [
+              { ability: 'ferocious_bite', dmgPct: 0.2 },
+              { ability: 'rip', dmgPct: 0.2 },
+            ],
+          },
+        },
+        {
+          id: 'dru_r14_moonfury',
+          name: 'Moonfury',
+          description: 'Starfire and Moonfire deal 15% more damage.',
+          icon: 'moonfire',
+          effect: {
+            ability: [
+              { ability: 'starfire', dmgPct: 0.15 },
+              { ability: 'moonfire', dmgPct: 0.15 },
+            ],
+          },
+        },
+        {
+          id: 'dru_r14_empowered_touch',
+          name: 'Empowered Touch',
+          description: 'Healing Touch heals 20% more and casts 10% faster.',
+          icon: 'healing_touch',
+          effect: { ability: [{ ability: 'healing_touch', dmgPct: 0.2, castPct: -0.1 }] },
+        },
+      ],
+    },
+    {
+      level: 17,
+      theme: 'survival',
+      options: [
+        {
+          id: 'dru_r17_improved_barkskin',
+          name: 'Improved Barkskin',
+          description: 'Barkskin armor increased by 40% and cooldown reduced by 25%.',
+          icon: 'barkskin',
+          effect: { ability: [{ ability: 'barkskin', buffPct: 0.4, cooldownPct: -0.25 }] },
+        },
+        {
+          id: 'dru_r17_frenzied_regeneration',
+          name: 'Frenzied Regeneration',
+          description: 'Grants Frenzied Regeneration.',
+          icon: 'frenzied_regeneration',
+          effect: { grant: { ability: 'frenzied_regeneration' } },
+        },
+        {
+          id: 'dru_r17_survival_of_the_fittest',
+          name: 'Survival of the Fittest',
+          description: 'Armor increased by 10% and maximum health increased by 5%.',
+          icon: 'bear_form',
+          effect: { stats: { armorPct: 0.1, maxHpPct: 0.05 } },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'harmony',
+      options: [
+        {
+          id: 'dru_r20_improved_hurricane',
+          name: 'Improved Hurricane',
+          description: 'Hurricane deals 30% more damage and costs 20% less.',
+          icon: 'hurricane',
+          effect: { ability: [{ ability: 'hurricane', dmgPct: 0.3, costPct: -0.2 }] },
+        },
+        {
+          id: 'dru_r20_berserk',
+          name: 'Berserk',
+          description: 'Grants Berserk.',
+          icon: 'berserk',
+          effect: { grant: { ability: 'berserk' } },
+        },
+        {
+          id: 'dru_r20_tranquility',
+          name: 'Tranquility',
+          description: 'Grants Tranquility.',
+          icon: 'tranquility',
+          effect: { grant: { ability: 'tranquility' } },
+        },
+      ],
+    },
+  ],
+};

@@ -19,17 +19,37 @@ describe('choice rows view model', () => {
     expect(r20.pickedId).toBeNull();
   });
 
-  it('every row carries exactly three options for the pilot classes', () => {
-    for (const cls of ['warrior', 'mage'] as const) {
+  it('every row carries exactly three options for every class', () => {
+    for (const cls of [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ] as const) {
       for (const row of buildChoiceRowsView(cls, 20, {}).rows) {
         expect(row.options).toHaveLength(3);
       }
     }
   });
 
-  it('hasChoiceRows gates the tab: pilot classes on, pre-wave classes off', () => {
-    expect(hasChoiceRows('warrior')).toBe(true);
-    expect(hasChoiceRows('mage')).toBe(true);
-    expect(hasChoiceRows('shaman')).toBe(false); // until Wave B2 lands
+  it('hasChoiceRows gates the tab on for all nine classes', () => {
+    for (const cls of [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ] as const) {
+      expect(hasChoiceRows(cls)).toBe(true);
+    }
   });
 });

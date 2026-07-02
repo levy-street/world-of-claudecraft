@@ -21,7 +21,17 @@ import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 
 const cls = 'warrior';
 const originalRows = CHOICE_ROWS[cls];
-const PR5_CLASSES = ['warrior', 'mage', 'paladin', 'hunter', 'rogue', 'priest'] as const;
+const PR5_CLASSES = [
+  'warrior',
+  'mage',
+  'paladin',
+  'hunter',
+  'rogue',
+  'priest',
+  'shaman',
+  'warlock',
+  'druid',
+] as const;
 
 const fixtureRows: ClassChoiceRows = {
   rows: [
@@ -171,11 +181,10 @@ describe('choice row effects and sim facade', () => {
     expect(restored.meta(pid)?.loadouts[0].alloc.rows).toEqual({ 5: 'fixture_sta' });
   });
 
-  it('ships dormant empty rows for every class', () => {
+  it('ships choice rows for every class', () => {
     for (const playerClass of ALL_CLASSES) {
-      if ((PR5_CLASSES as readonly PlayerClass[]).includes(playerClass)) continue;
-      expect(CHOICE_ROWS[playerClass].rows).toEqual([]);
-      expect(validateRows(playerClass, 20, { 5: 'anything' }).ok).toBe(false);
+      expect((PR5_CLASSES as readonly PlayerClass[]).includes(playerClass)).toBe(true);
+      expect(CHOICE_ROWS[playerClass].rows).not.toEqual([]);
     }
   });
 });
@@ -251,6 +260,20 @@ describe('choice row real content for PR5 classes', () => {
       min: 0,
       max: 0,
     });
+
+    const improvedEarthShock = simAtLevel('shaman', MAX_LEVEL);
+    expect(improvedEarthShock.chooseRow(8, 'sha_r8_improved_earth_shock')).toBe(true);
+    expect(expectResolved(improvedEarthShock, 'earth_shock').effects).toContainEqual({
+      type: 'interrupt',
+      lockout: 2,
+    });
+
+    const frostBind = simAtLevel('shaman', MAX_LEVEL);
+    expect(frostBind.chooseRow(8, 'sha_r8_frost_bind')).toBe(true);
+    expect(expectResolved(frostBind, 'frost_shock').effects).toContainEqual({
+      type: 'root',
+      duration: 1,
+    });
   });
 
   it('lands Iron Hide armor in recalc and Shatter crit in player mods', () => {
@@ -301,6 +324,26 @@ describe('choice row real content for PR5 classes', () => {
     const baseMindBlast = expectResolved(priest, 'mind_blast');
     expect(priest.chooseRow(14, 'pri_r14_mind_melt')).toBe(true);
     expect(expectResolved(priest, 'mind_blast').cooldown).toBeCloseTo(baseMindBlast.cooldown * 0.6);
+
+    const shaman = simAtLevel('shaman', MAX_LEVEL);
+    const baseLightningBolt = expectResolved(shaman, 'lightning_bolt');
+    expect(shaman.chooseRow(5, 'sha_r5_concussion')).toBe(true);
+    const improvedLightningBolt = expectResolved(shaman, 'lightning_bolt');
+    expect((improvedLightningBolt.effects[0] as { min: number }).min).toBe(
+      Math.round((baseLightningBolt.effects[0] as { min: number }).min * 1.15),
+    );
+
+    const warlock = simAtLevel('warlock', MAX_LEVEL);
+    const baseShadowBolt = expectResolved(warlock, 'shadow_bolt');
+    expect(warlock.chooseRow(5, 'wlk_r5_bane')).toBe(true);
+    expect(expectResolved(warlock, 'shadow_bolt').castTime).toBeCloseTo(
+      baseShadowBolt.castTime * 0.8,
+    );
+
+    const druid = simAtLevel('druid', MAX_LEVEL);
+    const baseWrath = expectResolved(druid, 'wrath');
+    expect(druid.chooseRow(5, 'dru_r5_improved_wrath')).toBe(true);
+    expect(expectResolved(druid, 'wrath').castTime).toBeCloseTo(baseWrath.castTime * 0.8);
   });
 
   it('lands representative Wave B1 stats and P5 effects', () => {
@@ -322,13 +365,37 @@ describe('choice row real content for PR5 classes', () => {
     const spiritBefore = priest.player.stats.spi;
     expect(priest.chooseRow(17, 'pri_r17_inner_fire')).toBe(true);
     expect(priest.player.stats.spi).toBe(spiritBefore + 3);
+
+    const shaman = simAtLevel('shaman', MAX_LEVEL);
+    const hpBefore = shaman.player.maxHp;
+    expect(shaman.chooseRow(17, 'sha_r17_elemental_warding')).toBe(true);
+    expect(shaman.player.maxHp).toBeGreaterThan(hpBefore);
+
+    const warlock = simAtLevel('warlock', MAX_LEVEL);
+    const shadowBolt = expectResolved(warlock, 'shadow_bolt');
+    expect(warlock.chooseRow(14, 'wlk_r14_shadow_mastery')).toBe(true);
+    const masteredShadowBolt = expectResolved(warlock, 'shadow_bolt');
+    expect((masteredShadowBolt.effects[0] as { min: number }).min).toBe(
+      Math.round((shadowBolt.effects[0] as { min: number }).min * 1.06),
+    );
+
+    const druid = simAtLevel('druid', MAX_LEVEL);
+    const armorBefore = druid.player.stats.armor;
+    expect(druid.chooseRow(17, 'dru_r17_survival_of_the_fittest')).toBe(true);
+    expect(druid.player.stats.armor).toBeCloseTo(Math.round(armorBefore * 1.1), 0);
   });
 
   it('defines every new PR5 interrupt as a physical-school interrupt', () => {
-    for (const id of ['rebuke', 'counter_shot', 'kick'] as const) {
+    for (const [id, lockout] of [
+      ['rebuke', 4],
+      ['counter_shot', 4],
+      ['kick', 4],
+      ['spell_lock', 5],
+      ['skull_bash', 4],
+    ] as const) {
       const def = ABILITIES[id];
       expect(def.school, id).toBe('physical');
-      expect(def.effects, id).toContainEqual({ type: 'interrupt', lockout: 4 });
+      expect(def.effects, id).toContainEqual({ type: 'interrupt', lockout });
     }
   });
 });

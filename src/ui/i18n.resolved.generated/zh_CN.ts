@@ -4493,6 +4493,66 @@ export const zh_CN: EnTranslations = {
         "name": "精神灼烧",
         "description": "引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"
       },
+      "earthbind": {
+        "name": "大地束缚",
+        "description": "将附近敌人缚于大地，使其定身 2 秒。（萨满天赋）"
+      },
+      "healing_stream": {
+        "name": "治疗之泉",
+        "description": "在 12 秒内恢复友方目标的生命值。（萨满天赋）"
+      },
+      "chain_lightning": {
+        "name": "闪电链",
+        "description": "向目标区域投出闪电，对附近敌人造成 {damage} 点自然伤害。（萨满天赋）"
+      },
+      "bloodlust": {
+        "name": "嗜血",
+        "description": "激发附近盟友的狂怒，使攻击速度提高，持续 15 秒。（萨满天赋）"
+      },
+      "spell_lock": {
+        "name": "法术封锁",
+        "description": "打断施法，并阻止该系法术施放 5 秒。（术士天赋）"
+      },
+      "howl_of_terror": {
+        "name": "恐惧嚎叫",
+        "description": "使附近敌人恐惧，最多持续 3 秒。受到伤害可能打破效果。（术士天赋）"
+      },
+      "curse_of_exhaustion": {
+        "name": "疲劳诅咒",
+        "description": "诅咒目标，使移动速度降低 30%，持续 12 秒。（术士天赋）"
+      },
+      "death_coil": {
+        "name": "死亡缠绕",
+        "description": "恐吓敌人，并在短暂时间内将生命吸回自身。（术士天赋）"
+      },
+      "chaos_bolt": {
+        "name": "混乱箭",
+        "description": "投出混乱火焰之箭，造成 {damage} 点火焰伤害。（术士天赋）"
+      },
+      "metamorphosis": {
+        "name": "恶魔变形",
+        "description": "化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）"
+      },
+      "skull_bash": {
+        "name": "碎颅猛击",
+        "description": "打断施法，并阻止该系法术施放 4 秒。（德鲁伊天赋）"
+      },
+      "innervate": {
+        "name": "激活",
+        "description": "立即恢复大量法力值。（德鲁伊天赋）"
+      },
+      "frenzied_regeneration": {
+        "name": "狂暴回复",
+        "description": "在 10 秒内恢复生命值。仅限熊形态。（德鲁伊天赋）"
+      },
+      "berserk": {
+        "name": "狂暴",
+        "description": "攻击强度提高 15 秒。（德鲁伊天赋）"
+      },
+      "tranquility": {
+        "name": "宁静",
+        "description": "引导恢复能量，每秒治疗附近盟友。（德鲁伊天赋）"
+      },
       "holy_shock": {
         "name": "神圣震击",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"

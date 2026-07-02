@@ -1034,6 +1034,7 @@ export type AbilityEffect =
   | { type: 'aoeAttackPower'; amount: number; duration: number; radius: number } // demoralizing roar/shout
   // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
   | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
+  | { type: 'aoeAllyHaste'; mult: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
   | { type: 'aoeFear'; duration: number; radius: number }
   | {

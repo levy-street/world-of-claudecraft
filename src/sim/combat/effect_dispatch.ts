@@ -719,6 +719,21 @@ export function runEffects(
         }
         break;
       }
+      case 'aoeAllyHaste': {
+        for (const m of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+          ctx.applyAura(m, {
+            id: ability.id,
+            name: ability.name,
+            kind: 'buff_haste',
+            remaining: eff.duration,
+            duration: eff.duration,
+            value: eff.mult,
+            sourceId: p.id,
+            school: ability.school,
+          });
+        }
+        break;
+      }
       case 'aoeRoot': {
         ctx.emit({
           ...(p.castAim

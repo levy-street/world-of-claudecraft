@@ -4493,6 +4493,66 @@ export const ko_KR: EnTranslations = {
         "name": "정신 불태우기",
         "description": "암흑 에너지를 집중해 매초 주위 적에게 {damage}의 피해를 줍니다. (사제 특성)"
       },
+      "earthbind": {
+        "name": "대지 결속",
+        "description": "주변 적을 대지에 묶어 2초 동안 이동 불가로 만듭니다. (주술사 특성)"
+      },
+      "healing_stream": {
+        "name": "치유의 물줄기",
+        "description": "12초에 걸쳐 아군 대상의 생명력을 회복시킵니다. (주술사 특성)"
+      },
+      "chain_lightning": {
+        "name": "연쇄 번개",
+        "description": "대상 지역에 번개를 던져 주변 적에게 {damage}의 자연 피해를 줍니다. (주술사 특성)"
+      },
+      "bloodlust": {
+        "name": "피의 욕망",
+        "description": "주변 아군을 광분시켜 15초 동안 공격 속도를 높입니다. (주술사 특성)"
+      },
+      "spell_lock": {
+        "name": "주문 잠금",
+        "description": "시전을 방해하고 해당 계열 주문을 5초 동안 막습니다. (흑마법사 특성)"
+      },
+      "howl_of_terror": {
+        "name": "공포의 울부짖음",
+        "description": "주변 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 풀릴 수 있습니다. (흑마법사 특성)"
+      },
+      "curse_of_exhaustion": {
+        "name": "피로의 저주",
+        "description": "대상을 저주해 12초 동안 이동 속도를 30% 낮춥니다. (흑마법사 특성)"
+      },
+      "death_coil": {
+        "name": "죽음의 고리",
+        "description": "적을 공포에 빠뜨리고 짧은 시간 동안 생명력을 자신에게 흡수합니다. (흑마법사 특성)"
+      },
+      "chaos_bolt": {
+        "name": "혼돈의 화살",
+        "description": "혼돈의 불꽃 화살을 던져 {damage}의 화염 피해를 줍니다. (흑마법사 특성)"
+      },
+      "metamorphosis": {
+        "name": "악마 변신",
+        "description": "악마의 힘을 받아 20초 동안 방어도와 전투력을 높입니다. (흑마법사 특성)"
+      },
+      "skull_bash": {
+        "name": "두개골 강타",
+        "description": "시전을 방해하고 해당 계열 주문을 4초 동안 막습니다. (드루이드 특성)"
+      },
+      "innervate": {
+        "name": "정신 자극",
+        "description": "많은 마나를 즉시 회복합니다. (드루이드 특성)"
+      },
+      "frenzied_regeneration": {
+        "name": "광포한 재생력",
+        "description": "10초에 걸쳐 생명력을 회복합니다. 곰 변신 전용. (드루이드 특성)"
+      },
+      "berserk": {
+        "name": "광폭화",
+        "description": "15초 동안 전투력을 높입니다. (드루이드 특성)"
+      },
+      "tranquility": {
+        "name": "평온",
+        "description": "회복 에너지를 집중하여 주변 아군을 매초 치유합니다. (드루이드 특성)"
+      },
       "holy_shock": {
         "name": "신성 충격",
         "description": "신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)"

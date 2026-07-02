@@ -4493,6 +4493,66 @@ export const zh_TW: EnTranslations = {
         "name": "精神灼燒",
         "description": "引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）"
       },
+      "earthbind": {
+        "name": "大地束縛",
+        "description": "將附近敵人縛於大地，使其定身 2 秒。（薩滿天賦）"
+      },
+      "healing_stream": {
+        "name": "治療之泉",
+        "description": "在 12 秒內恢復友方目標的生命值。（薩滿天賦）"
+      },
+      "chain_lightning": {
+        "name": "閃電鏈",
+        "description": "向目標區域投出閃電，對附近敵人造成 {damage} 點自然傷害。（薩滿天賦）"
+      },
+      "bloodlust": {
+        "name": "嗜血",
+        "description": "激發附近盟友的狂怒，使攻擊速度提高，持續 15 秒。（薩滿天賦）"
+      },
+      "spell_lock": {
+        "name": "法術封鎖",
+        "description": "打斷施法，並阻止該系法術施放 5 秒。（術士天賦）"
+      },
+      "howl_of_terror": {
+        "name": "恐懼嚎叫",
+        "description": "使附近敵人恐懼，最多持續 3 秒。受到傷害可能打破效果。（術士天賦）"
+      },
+      "curse_of_exhaustion": {
+        "name": "疲勞詛咒",
+        "description": "詛咒目標，使移動速度降低 30%，持續 12 秒。（術士天賦）"
+      },
+      "death_coil": {
+        "name": "死亡纏繞",
+        "description": "恐嚇敵人，並在短暫時間內將生命吸回自身。（術士天賦）"
+      },
+      "chaos_bolt": {
+        "name": "混沌箭",
+        "description": "投出混沌火焰之箭，造成 {damage} 點火焰傷害。（術士天賦）"
+      },
+      "metamorphosis": {
+        "name": "惡魔變形",
+        "description": "化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）"
+      },
+      "skull_bash": {
+        "name": "碎顱猛擊",
+        "description": "打斷施法，並阻止該系法術施放 4 秒。（德魯伊天賦）"
+      },
+      "innervate": {
+        "name": "啟動",
+        "description": "立即恢復大量法力值。（德魯伊天賦）"
+      },
+      "frenzied_regeneration": {
+        "name": "狂暴回復",
+        "description": "在 10 秒內恢復生命值。僅限熊形態。（德魯伊天賦）"
+      },
+      "berserk": {
+        "name": "狂暴",
+        "description": "攻擊強度提高 15 秒。（德魯伊天賦）"
+      },
+      "tranquility": {
+        "name": "寧靜",
+        "description": "引導恢復能量，每秒治療附近盟友。（德魯伊天賦）"
+      },
       "holy_shock": {
         "name": "神聖震擊",
         "description": "以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）"

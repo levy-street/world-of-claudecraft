@@ -5333,4 +5333,49 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.name': 'Иссушение разума',
   'entities.abilities.mind_sear.description':
     'Направляет темную энергию, каждую секунду нанося ближайшим врагам {damage} ед. урона. (талант жреца)',
+  'entities.abilities.earthbind.name': 'Оковы земли',
+  'entities.abilities.earthbind.description':
+    'Сковывает ближайших врагов землей, обездвиживая их на 2 сек. (талант шамана)',
+  'entities.abilities.healing_stream.name': 'Целительный поток',
+  'entities.abilities.healing_stream.description':
+    'Восстанавливает здоровье дружественной цели в течение 12 сек. (талант шамана)',
+  'entities.abilities.chain_lightning.name': 'Цепная молния',
+  'entities.abilities.chain_lightning.description':
+    'Бросает молнию в выбранную область, нанося ближайшим врагам {damage} ед. урона от сил природы. (талант шамана)',
+  'entities.abilities.bloodlust.name': 'Жажда крови',
+  'entities.abilities.bloodlust.description':
+    'Вводит ближайших союзников в боевой раж, повышая скорость атаки на 15 сек. (талант шамана)',
+  'entities.abilities.spell_lock.name': 'Запрет чар',
+  'entities.abilities.spell_lock.description':
+    'Прерывает применение заклинания и запрещает эту школу магии на 5 сек. (талант чернокнижника)',
+  'entities.abilities.howl_of_terror.name': 'Вой ужаса',
+  'entities.abilities.howl_of_terror.description':
+    'Повергает ближайших врагов в страх на срок до 3 сек. Урон может прервать эффект. (талант чернокнижника)',
+  'entities.abilities.curse_of_exhaustion.name': 'Проклятие изнеможения',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Проклинает цель, снижая скорость передвижения на 30% на 12 сек. (талант чернокнижника)',
+  'entities.abilities.death_coil.name': 'Лик смерти',
+  'entities.abilities.death_coil.description':
+    'Ужасает врага и за короткое время возвращает вам часть жизни. (талант чернокнижника)',
+  'entities.abilities.chaos_bolt.name': 'Стрела хаоса',
+  'entities.abilities.chaos_bolt.description':
+    'Запускает стрелу хаотического огня, нанося {damage} ед. урона от огня. (талант чернокнижника)',
+  'entities.abilities.metamorphosis.name': 'Метаморфоза',
+  'entities.abilities.metamorphosis.description':
+    'Принимает демоническую силу, повышая броню и силу атаки на 20 сек. (талант чернокнижника)',
+  'entities.abilities.skull_bash.name': 'Удар черепом',
+  'entities.abilities.skull_bash.description':
+    'Прерывает применение заклинания и запрещает эту школу магии на 4 сек. (талант друида)',
+  'entities.abilities.innervate.name': 'Озарение',
+  'entities.abilities.innervate.description':
+    'Мгновенно восстанавливает большой запас маны. (талант друида)',
+  'entities.abilities.frenzied_regeneration.name': 'Неистовое восстановление',
+  'entities.abilities.frenzied_regeneration.description':
+    'Восстанавливает здоровье в течение 10 сек. Только в облике медведя. (талант друида)',
+  'entities.abilities.berserk.name': 'Берсерк',
+  'entities.abilities.berserk.description':
+    'Повышает силу атаки на 15 сек. (талант друида)',
+  'entities.abilities.tranquility.name': 'Спокойствие',
+  'entities.abilities.tranquility.description':
+    'Направляет восстанавливающую энергию, каждую секунду исцеляя ближайших союзников. (талант друида)',
 };

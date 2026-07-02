@@ -507,6 +507,26 @@ function armAbilityCooldown(
 }
 
 function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): void {
+  if (res.effects.some((eff) => eff.type === 'aoeHeal')) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: p.id,
+      school: res.def.school,
+      fx: 'nova',
+    });
+    const channelHeal = channelTickBonus(p.spellPower, res.def);
+    for (const eff of res.effects) {
+      if (eff.type !== 'aoeHeal') continue;
+      for (const m of ctx.friendliesInRadius(p, p.pos, eff.radius)) {
+        if (!ctx.hasLineOfSight(p, m)) continue;
+        const healAmount = ctx.rng.range(eff.min, eff.max) + channelHeal;
+        ctx.applyHeal(p, m, healAmount, res.def.name);
+      }
+    }
+    return;
+  }
+
   // Ground-targeted channels (Rain of Fire / Volley / Hurricane): each tick pulses
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.

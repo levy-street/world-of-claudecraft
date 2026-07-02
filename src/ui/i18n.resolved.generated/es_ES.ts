@@ -4493,6 +4493,66 @@ export const es_ES: EnTranslations = {
         "name": "Mind Sear",
         "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
       },
+      "earthbind": {
+        "name": "Earthbind",
+        "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
+      },
+      "healing_stream": {
+        "name": "Healing Stream",
+        "description": "Restores a friendly target over 12 sec. (Shaman talent)"
+      },
+      "chain_lightning": {
+        "name": "Chain Lightning",
+        "description": "Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)"
+      },
+      "bloodlust": {
+        "name": "Bloodlust",
+        "description": "Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)"
+      },
+      "spell_lock": {
+        "name": "Spell Lock",
+        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)"
+      },
+      "howl_of_terror": {
+        "name": "Howl of Terror",
+        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+      },
+      "curse_of_exhaustion": {
+        "name": "Curse of Exhaustion",
+        "description": "Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)"
+      },
+      "death_coil": {
+        "name": "Death Coil",
+        "description": "Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)"
+      },
+      "chaos_bolt": {
+        "name": "Chaos Bolt",
+        "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
+      },
+      "metamorphosis": {
+        "name": "Metamorphosis",
+        "description": "Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)"
+      },
+      "skull_bash": {
+        "name": "Skull Bash",
+        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)"
+      },
+      "innervate": {
+        "name": "Innervate",
+        "description": "Instantly restores a large amount of mana. (Druid talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Frenzied Regeneration",
+        "description": "Regenerates health over 10 sec. Bear Form only. (Druid talent)"
+      },
+      "berserk": {
+        "name": "Berserk",
+        "description": "Increases attack power for 15 sec. (Druid talent)"
+      },
+      "tranquility": {
+        "name": "Tranquility",
+        "description": "Channels restorative energy, healing nearby allies each second. (Druid talent)"
+      },
       "holy_shock": {
         "name": "Choque Sagrado",
         "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"

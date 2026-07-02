@@ -5394,4 +5394,49 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.name': 'Mind Sear',
   'entities.abilities.mind_sear.description':
     'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
+  'entities.abilities.earthbind.name': 'Earthbind',
+  'entities.abilities.earthbind.description':
+    'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
+  'entities.abilities.healing_stream.name': 'Healing Stream',
+  'entities.abilities.healing_stream.description':
+    'Restores a friendly target over 12 sec. (Shaman talent)',
+  'entities.abilities.chain_lightning.name': 'Chain Lightning',
+  'entities.abilities.chain_lightning.description':
+    'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
+  'entities.abilities.bloodlust.name': 'Bloodlust',
+  'entities.abilities.bloodlust.description':
+    'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
+  'entities.abilities.spell_lock.name': 'Spell Lock',
+  'entities.abilities.spell_lock.description':
+    'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
+  'entities.abilities.howl_of_terror.name': 'Howl of Terror',
+  'entities.abilities.howl_of_terror.description':
+    'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
+  'entities.abilities.curse_of_exhaustion.name': 'Curse of Exhaustion',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
+  'entities.abilities.death_coil.name': 'Death Coil',
+  'entities.abilities.death_coil.description':
+    'Horrifies the enemy and drains life back to you over a brief moment. (Warlock talent)',
+  'entities.abilities.chaos_bolt.name': 'Chaos Bolt',
+  'entities.abilities.chaos_bolt.description':
+    'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
+  'entities.abilities.metamorphosis.name': 'Metamorphosis',
+  'entities.abilities.metamorphosis.description':
+    'Assume demonic power, increasing armor and attack power for 20 sec. (Warlock talent)',
+  'entities.abilities.skull_bash.name': 'Skull Bash',
+  'entities.abilities.skull_bash.description':
+    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
+  'entities.abilities.innervate.name': 'Innervate',
+  'entities.abilities.innervate.description':
+    'Instantly restores a large amount of mana. (Druid talent)',
+  'entities.abilities.frenzied_regeneration.name': 'Frenzied Regeneration',
+  'entities.abilities.frenzied_regeneration.description':
+    'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
+  'entities.abilities.berserk.name': 'Berserk',
+  'entities.abilities.berserk.description':
+    'Increases attack power for 15 sec. (Druid talent)',
+  'entities.abilities.tranquility.name': 'Tranquility',
+  'entities.abilities.tranquility.description':
+    'Channels restorative energy, healing nearby allies each second. (Druid talent)',
 };

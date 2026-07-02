@@ -4493,6 +4493,66 @@ export const ja_JP: EnTranslations = {
         "name": "精神焼灼",
         "description": "影の力を導き、近くの敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）"
       },
+      "earthbind": {
+        "name": "大地の束縛",
+        "description": "近くの敵を大地に縛り、2 秒間移動不能にします。（シャーマンの天賦）"
+      },
+      "healing_stream": {
+        "name": "癒やしの流れ",
+        "description": "12 秒かけて味方対象の体力を回復します。（シャーマンの天賦）"
+      },
+      "chain_lightning": {
+        "name": "連鎖稲妻",
+        "description": "対象地点に稲妻を放ち、近くの敵に {damage} の自然ダメージを与えます。（シャーマンの天賦）"
+      },
+      "bloodlust": {
+        "name": "血の渇望",
+        "description": "近くの味方を狂熱させ、15 秒間攻撃速度を上げます。（シャーマンの天賦）"
+      },
+      "spell_lock": {
+        "name": "呪文封じ",
+        "description": "詠唱を中断し、その系統の呪文を 5 秒間封じます。（ウォーロックの天賦）"
+      },
+      "howl_of_terror": {
+        "name": "恐怖の遠吠え",
+        "description": "近くの敵を最大 3 秒間恐怖させます。ダメージで解除されることがあります。（ウォーロックの天賦）"
+      },
+      "curse_of_exhaustion": {
+        "name": "疲弊の呪い",
+        "description": "対象を呪い、12 秒間移動速度を 30% 低下させます。（ウォーロックの天賦）"
+      },
+      "death_coil": {
+        "name": "死の螺旋",
+        "description": "敵を恐怖させ、短い間に生命力を自分へ吸い戻します。（ウォーロックの天賦）"
+      },
+      "chaos_bolt": {
+        "name": "混沌の矢",
+        "description": "混沌の炎の矢を放ち、{damage} の火炎ダメージを与えます。（ウォーロックの天賦）"
+      },
+      "metamorphosis": {
+        "name": "悪魔変身",
+        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックの天賦）"
+      },
+      "skull_bash": {
+        "name": "頭蓋砕き",
+        "description": "詠唱を中断し、その系統の呪文を 4 秒間封じます。（ドルイドの天賦）"
+      },
+      "innervate": {
+        "name": "啓発",
+        "description": "大量のマナを即座に回復します。（ドルイドの天賦）"
+      },
+      "frenzied_regeneration": {
+        "name": "狂乱再生",
+        "description": "10 秒かけて体力を回復します。熊形態専用。（ドルイドの天賦）"
+      },
+      "berserk": {
+        "name": "狂暴化",
+        "description": "15 秒間攻撃力を高めます。（ドルイドの天賦）"
+      },
+      "tranquility": {
+        "name": "静寂",
+        "description": "回復の力を詠唱し、近くの味方を毎秒回復します。（ドルイドの天賦）"
+      },
       "holy_shock": {
         "name": "ホーリーショック",
         "description": "聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）"

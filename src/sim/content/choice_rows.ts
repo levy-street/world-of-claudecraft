@@ -1,11 +1,14 @@
 import type { PlayerClass } from '../types';
 import {
+  DRUID_CHOICE_ROWS,
   HUNTER_CHOICE_ROWS,
   MAGE_CHOICE_ROWS,
   PALADIN_CHOICE_ROWS,
   PRIEST_CHOICE_ROWS,
   ROGUE_CHOICE_ROWS,
+  SHAMAN_CHOICE_ROWS,
   WARRIOR_CHOICE_ROWS,
+  WARLOCK_CHOICE_ROWS,
 } from './choice_rows_classic';
 import { accumulateTalentEffect, type TalentEffect, type TalentModifiers } from './talents';
 
@@ -38,10 +41,10 @@ export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> = {
   hunter: HUNTER_CHOICE_ROWS,
   rogue: ROGUE_CHOICE_ROWS,
   priest: PRIEST_CHOICE_ROWS,
-  shaman: { rows: [] },
+  shaman: SHAMAN_CHOICE_ROWS,
   mage: MAGE_CHOICE_ROWS,
-  warlock: { rows: [] },
-  druid: { rows: [] },
+  warlock: WARLOCK_CHOICE_ROWS,
+  druid: DRUID_CHOICE_ROWS,
 };
 
 const CHOICE_ROW_LEVEL_SET = new Set<number>(CHOICE_ROW_LEVELS);
