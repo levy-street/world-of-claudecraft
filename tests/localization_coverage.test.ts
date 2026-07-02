@@ -1077,7 +1077,7 @@ describe('i18n Localization Key Coverage', () => {
             (entry) => entry.id === '5.war_r5_juggernaut' && entry.field === 'name',
           )!,
         ),
-      ).toContain('天赋');
+      ).toContain('势不可挡');
 
       setLanguage('ko_KR');
       expect(

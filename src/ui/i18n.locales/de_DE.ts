@@ -428,7 +428,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'game.talents.pickSpecFirst': 'Wählt eine Spezialisierung, um diesen Baum zu öffnen.',
   'game.talents.unlockBanner': 'Talente freigeschaltet!',
   'game.talents.unlockHint':
-    'Ihr habt Euren ersten Talentpunkt verdient: Drückt N, um Talente zu öffnen.',
+  "Talententscheidungen sind verfügbar: Drückt N, um Talente zu öffnen.",
   'game.talents.copy': 'Kopieren',
   'game.talents.close': 'Schließen',
   'game.talents.cancel': 'Abbrechen',
@@ -4191,20 +4191,20 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Solofreundlich',
   'guide.talentsPage.heading': 'Talente und Spezialisierungen',
   'guide.talentsPage.howBody':
-    'Talente schalten sich auf Stufe 10 frei, und du verdienst weiter Punkte, während du zur Höchststufe aufsteigst. Du verteilst sie im Talentfenster deiner Klasse, und du kannst mehr als eine Verteilung speichern, um zwischen Builds zu wechseln.',
+  "Reihen werden beim Stufenaufstieg freigeschaltet, Spezialisierungen ab Stufe 10. Wählt eine Spezialisierung für ihre Signaturfähigkeit und Meisterschaft, dann nutzt den Reiter Entscheidungen und wählt eine Option aus jeder freigeschalteten Reihe.",
   'guide.talentsPage.howHeading': 'Wie sie funktionieren',
   'guide.talentsPage.intro':
-    'Talente sind die Art, wie du eine Klasse zu deiner eigenen machst. Sie sind optional, nachsichtig und leicht zu ändern, sodass du ohne Sorge experimentieren kannst.',
+  "Talente machen eine Klasse zu Eurer eigenen. Sie sind optional, verzeihend und leicht zu ändern, damit Ihr ohne Sorge experimentieren könnt.",
   'guide.talentsPage.resetNote':
-    'Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle. Probier Dinge aus, schau, was dir gefällt, und ändere deine Meinung frei.',
+  "Ihr könnt Eure Entscheidungen jederzeit außerhalb des Kampfes zurücksetzen, also ist eine frühe Wahl nie eine Falle. Probiert Dinge aus, seht was Euch gefällt und ändert frei Eure Meinung.",
   'guide.talentsPage.resetTitle': 'Nichts ist endgültig',
   'guide.talentsPage.shareNote':
-    'Ein fertiger Build lässt sich in einen kurzen, teilbaren Code kopieren und einem Freund geben, der ihn direkt in sein eigenes Talentfenster einfügt, um ihn zu laden.',
+  "Ein fertiger Build kann als kurzer teilbarer Code kopiert und an einen Freund gegeben werden, der ihn direkt in sein Talentfenster einfügt.",
   'guide.talentsPage.specsBody':
-    'Jede Klasse hat eine Handvoll Spezialisierungen, jede mit ihrer eigenen Rolle und einem charakteristischen Schwerpunkt. Hier ist der Aufbau aller. Öffne eine Klasse für ihr volles Repertoire.',
+  "Jede Klasse hat mehrere Spezialisierungen, jede mit eigener Rolle und Signaturausrichtung. Hier seht Ihr ihre Grundform. Öffnet eine Klasse für ihr vollständiges Kit.",
   'guide.talentsPage.specsHeading': 'Spezialisierungen nach Klasse',
   'guide.talentsPage.whatBody':
-    'Während du aufsteigst, verdienst du Talentpunkte, die du in kleine, dauerhafte Verbesserungen deiner Fähigkeiten und Werte investierst. Sie prägen, wie sich eine Klasse anfühlt, und lenken sie zu mehr Schaden, robusterer Verteidigung oder stärkerer Heilung.',
+  "Beim Stufenaufstieg werden Talentreihen mit wenigen Entscheidungen freigeschaltet. Jede Wahl fügt Fähigkeiten, Werten oder Werkzeugen eine dauerhafte Verbesserung hinzu und prägt, wie sich Eure Klasse im Kampf anfühlt.",
   'guide.talentsPage.whatHeading': 'Was Talente bewirken',
   'guide.toc.heading': 'Auf dieser Seite',
   'guide.wishPage.heading': 'Was ich gern früher gewusst hätte',

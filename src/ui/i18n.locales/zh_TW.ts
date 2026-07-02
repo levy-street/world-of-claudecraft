@@ -3923,20 +3923,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': '適合單人',
   'guide.talentsPage.heading': '天賦與專精',
   'guide.talentsPage.howBody':
-    '天賦在10級開放，隨著你向等級上限攀升，會持續獲得點數。你在職業的天賦面板中分配點數，而且可以儲存多套配置以在不同構築間切換。',
+  "天賦列會隨等級解鎖，專精在 10 級開放。先選擇一個專精，取得它的代表技能與精通，然後在抉擇分頁中，從每個已解鎖的列裡選擇一個選項。",
   'guide.talentsPage.howHeading': '運作方式',
   'guide.talentsPage.intro':
-    '天賦是你讓職業展現個人風格的方式。它們是選擇性的、寬容的，而且容易更動，所以你可以放心嘗試。',
+  "天賦讓職業更符合你的玩法。它們是可選、寬容且容易更改的，所以你可以放心嘗試。",
   'guide.talentsPage.resetNote':
-    '只要脫離戰鬥，你隨時都能重置天賦，所以早期的選擇絕不會是陷阱。儘管嘗試，看看自己喜歡什麼，並自由地改變主意。',
+  "只要不在戰鬥中，你隨時可以重置選擇，所以早期選擇不會成為陷阱。多試幾種，看看喜歡什麼，再自由調整。",
   'guide.talentsPage.resetTitle': '沒有什麼是永久的',
   'guide.talentsPage.shareNote':
-    '一套完成的天賦配置可以複製成一段可分享的短代碼，交給朋友，對方只要把它直接貼進自己的天賦面板即可載入。',
+  "完成後的配置可以複製成簡短分享碼交給朋友，對方可直接貼到自己的天賦面板中載入。",
   'guide.talentsPage.specsBody':
-    '每個職業都有數種專精，各有自己的角色定位和標誌性的著重方向。以下是它們全部的輪廓。打開某個職業即可查看其完整技能。',
+  "每個職業都有數個專精，各自擁有職責和代表重點。這裡列出它們的整體形態。打開職業頁面可查看完整技能套組。",
   'guide.talentsPage.specsHeading': '各職業的專精',
   'guide.talentsPage.whatBody':
-    '隨著升級，你會獲得天賦點數，可用於小幅且永久地強化你的技能與屬性。它們塑造職業的手感，使其偏向更高的傷害、更堅固的防禦或更強的治療。',
+  "隨著升級，天賦列會逐步解鎖，每列提供少量選擇。每個選擇都會為你的技能、屬性或工具箱加入永久強化，塑造職業在戰鬥中的手感。",
   'guide.talentsPage.whatHeading': '天賦的作用',
   'guide.toc.heading': '本頁內容',
   'guide.wishPage.heading': '我希望早點知道的事',

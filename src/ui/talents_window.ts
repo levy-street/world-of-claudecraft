@@ -208,15 +208,15 @@ export class TalentsWindow {
         card.setAttribute('role', 'radio');
         card.setAttribute('aria-checked', String(picked));
         card.disabled = !row.unlocked;
-        const grantId = option.effect.grant?.ability;
-        const label = grantId ? signatureName(grantId) : option.name;
+        const label = tTalent({ kind: 'talentChoice', choice: option, field: 'name' });
+        const description = tTalent({ kind: 'talentChoice', choice: option, field: 'description' });
         card.innerHTML =
           `<span class="tco-icon" style="background-image:url(${esc(
             talentChoiceIconDataUrl(option),
           )})"></span>` + `<span class="tal-row-opt-name">${esc(label)}</span>`;
         this.deps.attachTooltip(card, () => {
           let html = `<div class="tt-name">${esc(label)}</div>`;
-          html += `<div class="tt-desc">${esc(option.description)}</div>`;
+          html += `<div class="tt-desc">${esc(description)}</div>`;
           if (!row.unlocked) {
             html += `<div class="tt-sub" style="color:${TAL_COLOR.dormant}">${esc(
               t('game.talents.rowUnlocks').replace('{level}', String(row.level)),

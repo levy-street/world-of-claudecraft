@@ -134,7 +134,7 @@ export const sv_SE: EnTranslations = {
       "nothingStaged": "Inga ändringar att tillämpa.",
       "pickSpecFirst": "Välj en specialisering för att komma åt detta träd.",
       "unlockBanner": "Talanger upplåsta!",
-      "unlockHint": "Du har tjänat din första talangpoäng, tryck på N för att öppna Talanger.",
+      "unlockHint": "Talangval är tillgängliga: tryck på N för att öppna Talanger.",
       "copy": "Kopiera",
       "close": "Stäng",
       "cancel": "Avbryt",
@@ -1601,16 +1601,16 @@ export const sv_SE: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Talanger och specialiseringar",
-      "intro": "Talanger är hur du gör en klass till din egen. De är frivilliga, förlåtande och lätta att ändra, så du kan experimentera utan rädsla.",
+      "intro": "Talanger är hur du gör en klass till din egen. De är valfria, förlåtande och enkla att ändra, så du kan experimentera utan oro.",
       "whatHeading": "Vad talanger gör",
-      "whatBody": "När du levlar tjänar du talangpoäng att spendera på små, permanenta förbättringar av dina förmågor och egenskaper. De formar hur en klass känns och lutar den mot mer skada, robustare försvar eller starkare läkning.",
+      "whatBody": "När du går upp i nivå låses talangrader upp med ett litet antal val. Varje val lägger till en permanent förbättring av dina förmågor, värden eller verktyg och formar hur klassen känns i strid.",
       "howHeading": "Så fungerar de",
-      "howBody": "Talanger låses upp vid nivå 10, och du fortsätter tjäna poäng medan du klättrar mot maxnivån. Du spenderar dem i din klass talangpanel, och du kan spara fler än en uppsättning för att växla mellan byggen.",
-      "shareNote": "Ett färdigt bygge kan kopieras till en kort delbar kod och ges till en vän, som klistrar in den rakt i sin egen talangpanel för att ladda det.",
+      "howBody": "Rader låses upp när du levlar, och specialiseringar öppnas på nivå 10. Välj en specialisering för dess signaturförmåga och mästerskap, använd sedan fliken Val för att välja ett alternativ från varje upplåst rad.",
+      "shareNote": "En färdig build kan kopieras till en kort delningskod och ges till en vän, som klistrar in den direkt i sin egen talangpanel.",
       "resetTitle": "Inget är permanent",
-      "resetNote": "Du kan återställa dina talanger när som helst du är utanför strid, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar, och ändra dig fritt.",
+      "resetNote": "Du kan återställa dina val när du är utanför strid, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar och ändra dig fritt.",
       "specsHeading": "Specialiseringar per klass",
-      "specsBody": "Varje klass har en handfull specialiseringar, var och en med sin egen roll och ett kännetecknande fokus. Här är formen på dem alla. Öppna en klass för dess fullständiga uppsättning."
+      "specsBody": "Varje klass har flera specialiseringar, var och en med egen roll och signaturfokus. Här är formen på dem alla. Öppna en klass för hela kitet."
     },
     "arenaPage": {
       "heading": "Arena och PvP",

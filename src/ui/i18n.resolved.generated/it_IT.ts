@@ -1601,16 +1601,16 @@ export const it_IT: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Talenti e specializzazioni",
-      "intro": "I talenti sono il modo in cui rendi una classe tua. Sono facoltativi, indulgenti e facili da cambiare, così puoi sperimentare senza timori.",
+      "intro": "I talenti sono il modo per rendere tua una classe. Sono opzionali, flessibili e facili da cambiare, quindi puoi sperimentare senza paura.",
       "whatHeading": "Cosa fanno i talenti",
-      "whatBody": "Salendo di livello, guadagni punti talento da spendere in piccoli, permanenti miglioramenti alle tue abilità e statistiche. Plasmano il modo in cui una classe si sente, orientandola verso più danno, una difesa più solida o cure più potenti.",
+      "whatBody": "Salendo di livello si sbloccano righe di talenti con poche scelte. Ogni scelta aggiunge un miglioramento permanente ad abilità, statistiche o strumenti, modellando la sensazione della classe in combattimento.",
       "howHeading": "Come funzionano",
-      "howBody": "I talenti si sbloccano al livello 10, e continui a guadagnare punti man mano che sali verso il limite. Li spendi nel pannello dei talenti della tua classe, e puoi salvare più di una configurazione per passare da una costruzione all'altra.",
-      "shareNote": "Una configurazione finita può essere copiata in un breve codice condivisibile e passata a un amico, che lo incolla direttamente nel proprio pannello dei talenti per caricarla.",
+      "howBody": "Le righe si sbloccano salendo di livello e le specializzazioni si aprono al livello 10. Scegli una specializzazione per la sua abilità distintiva e maestria, poi usa la scheda Scelte per selezionare un opzione da ogni riga sbloccata.",
+      "shareNote": "Una build completata può essere copiata in un breve codice condivisibile e passata a un amico, che lo incolla nel proprio pannello talenti per caricarla.",
       "resetTitle": "Niente è permanente",
-      "resetNote": "Puoi reimpostare i tuoi talenti in qualsiasi momento, purché tu sia fuori dal combattimento, quindi una scelta iniziale non è mai una trappola. Prova le cose, scopri cosa ti piace e cambia idea liberamente.",
+      "resetNote": "Puoi azzerare le scelte ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai una trappola. Prova, scopri cosa ti piace e cambia liberamente.",
       "specsHeading": "Specializzazioni per classe",
-      "specsBody": "Ogni classe ha una manciata di specializzazioni, ciascuna con il proprio ruolo e un'impronta caratteristica. Ecco la forma di tutte quante. Apri una classe per il suo arsenale completo."
+      "specsBody": "Ogni classe ha alcune specializzazioni, ognuna con un ruolo e un focus distintivo. Ecco la forma di tutte. Apri una classe per il kit completo."
     },
     "arenaPage": {
       "heading": "Arena e PvP",

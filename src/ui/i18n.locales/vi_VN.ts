@@ -3124,20 +3124,20 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Một MMO phong cách cổ điển bạn chơi miễn phí ngay trên trình duyệt.',
   'guide.talentsPage.heading': 'Tài năng và chuyên môn hóa',
   'guide.talentsPage.howBody':
-    'Tài năng mở ra ở cấp 10, và bạn tiếp tục kiếm điểm khi leo dần lên cấp tối đa. Bạn tiêu chúng trong bảng tài năng của lớp nhân vật, và có thể lưu nhiều hơn một bố cục để hoán đổi giữa các lối xây dựng.',
+  "Các hàng mở khi bạn lên cấp, còn chuyên môn hóa mở ở cấp 10. Chọn một chuyên môn hóa vì kỹ năng đặc trưng và tinh thông của nó, rồi dùng thẻ Lựa chọn để chọn một tùy chọn từ mỗi hàng đã mở.",
   'guide.talentsPage.howHeading': 'Cách chúng hoạt động',
   'guide.talentsPage.intro':
-    'Tài năng là cách bạn biến một lớp nhân vật thành của riêng mình. Chúng là tùy chọn, dễ tha thứ và dễ thay đổi, nên bạn có thể thử nghiệm mà không phải lo sợ.',
+  "Tài năng là cách bạn biến lớp nhân vật thành của riêng mình. Chúng là tùy chọn, dễ sửa và dễ đổi, nên bạn có thể thử nghiệm mà không sợ.",
   'guide.talentsPage.resetNote':
-    'Bạn có thể đặt lại tài năng bất cứ khi nào bạn ở ngoài chiến đấu, nên một lựa chọn sớm không bao giờ là cái bẫy. Cứ thử, xem bạn thích gì, và đổi ý thoải mái.',
+  "Bạn có thể đặt lại lựa chọn bất cứ lúc nào khi ngoài chiến đấu, nên lựa chọn sớm không bao giờ là cái bẫy. Hãy thử, xem bạn thích gì và đổi tự do.",
   'guide.talentsPage.resetTitle': 'Không có gì là vĩnh viễn',
   'guide.talentsPage.shareNote':
-    'Một cấu hình hoàn chỉnh có thể được sao thành một mã chia sẻ ngắn rồi trao cho một người bạn, người đó dán thẳng vào bảng tài năng của mình để nạp nó.',
+  "Một build hoàn chỉnh có thể sao chép thành mã ngắn để chia sẻ cho bạn bè, họ dán thẳng vào bảng tài năng của mình để tải.",
   'guide.talentsPage.specsBody':
-    'Mỗi lớp nhân vật có một vài chuyên môn hóa, mỗi cái có vai trò riêng và một trọng tâm đặc trưng. Đây là hình hài của tất cả chúng. Mở một lớp để xem trọn bộ kỹ năng của nó.',
+  "Mỗi lớp có vài chuyên môn hóa, mỗi chuyên môn hóa có vai trò và trọng tâm riêng. Đây là hình dạng tổng quát của tất cả. Mở một lớp để xem toàn bộ bộ kỹ năng.",
   'guide.talentsPage.specsHeading': 'Chuyên môn hóa theo lớp',
   'guide.talentsPage.whatBody':
-    'Khi lên cấp, bạn kiếm được điểm tài năng để tiêu vào những nâng cấp nhỏ, vĩnh viễn cho các kỹ năng và chỉ số của mình. Chúng định hình cảm giác của một lớp nhân vật, nghiêng nó về hướng sát thương nhiều hơn, phòng thủ vững chắc hơn, hoặc trị liệu mạnh hơn.',
+  "Khi lên cấp, các hàng tài năng mở ra với một nhóm lựa chọn nhỏ. Mỗi lựa chọn thêm một nâng cấp vĩnh viễn cho kỹ năng, chỉ số hoặc bộ công cụ, định hình cảm giác của lớp trong chiến đấu.",
   'guide.talentsPage.whatHeading': 'Tài năng làm gì',
   'guide.toc.heading': 'Trên trang này',
   'guide.viewer.canvasLabel': 'Mô hình 3D xoay được của {name}',

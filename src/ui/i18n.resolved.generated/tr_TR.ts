@@ -1601,16 +1601,16 @@ export const tr_TR: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Yetenekler ve uzmanlıklar",
-      "intro": "Yetenekler, bir sınıfı kendinize özgü hale getirme yolunuzdur. İsteğe bağlı, hoşgörülü ve değiştirmesi kolaydır, bu yüzden korkmadan denemeler yapabilirsiniz.",
+      "intro": "Yetenekler bir sınıfı sana ait hale getirmenin yoludur. İsteğe bağlıdır, affedicidir ve kolayca değişir, bu yüzden korkmadan deneyebilirsin.",
       "whatHeading": "Yetenekler ne işe yarar",
-      "whatBody": "Seviye atladıkça, yeteneklerinize ve özelliklerinize küçük, kalıcı geliştirmeler yapmak için yetenek puanları kazanırsınız. Bunlar bir sınıfın hissini şekillendirir; onu daha fazla hasara, daha sağlam savunmaya ya da daha güçlü iyileştirmeye yöneltir.",
+      "whatBody": "Seviye aldıkça az sayıda seçenek içeren yetenek sıraları açılır. Her seçim yeteneklerine, niteliklerine veya araçlarına kalıcı bir geliştirme ekler ve sınıfın savaşta nasıl hissettirdiğini şekillendirir.",
       "howHeading": "Nasıl çalışırlar",
-      "howBody": "Yetenekler 10. seviyede açılır ve seviye tavanına tırmandıkça puan kazanmaya devam edersiniz. Bunları sınıfınızın yetenek panelinde harcarsınız ve birden fazla düzeni kaydederek yapılarınız arasında geçiş yapabilirsiniz.",
-      "shareNote": "Tamamlanmış bir kurgu, paylaşılabilir kısa bir koda kopyalanıp bir arkadaşa verilebilir; o da onu yüklemek için doğrudan kendi yetenek paneline yapıştırır.",
+      "howBody": "Sıralar seviye aldıkça açılır, uzmanlıklar ise 10. seviyede açılır. İmza yeteneği ve ustalığı için bir uzmanlık seç, sonra Seçimler sekmesinde açılmış her sıradan bir seçenek seç.",
+      "shareNote": "Tamamlanmış bir dizilim kısa bir paylaşım kodu olarak kopyalanıp bir arkadaşa verilebilir; o da bunu kendi yetenek paneline yapıştırarak yükler.",
       "resetTitle": "Hiçbir şey kalıcı değildir",
-      "resetNote": "Yeteneklerinizi dövüş dışında olduğunuz her an sıfırlayabilirsiniz, bu yüzden erken bir seçim asla bir tuzak değildir. Bir şeyler deneyin, neyi sevdiğinizi görün ve fikrinizi serbestçe değiştirin.",
+      "resetNote": "Savaşta değilken seçimlerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir. Dene, neyi sevdiğini gör ve özgürce değiştir.",
       "specsHeading": "Sınıfa göre uzmanlıklar",
-      "specsBody": "Her sınıfın, her biri kendi rolüne ve kendine özgü bir odağına sahip birkaç uzmanlığı vardır. İşte hepsinin genel görünümü. Tam donanımı için bir sınıfı açın."
+      "specsBody": "Her sınıfta birkaç uzmanlık vardır; her birinin kendi rolü ve imza odağı bulunur. Hepsinin genel şekli burada. Tam set için bir sınıf aç."
     },
     "arenaPage": {
       "heading": "Arena ve PvP",

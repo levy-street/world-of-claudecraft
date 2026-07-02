@@ -2193,7 +2193,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'Ontgrendelt op niveau {level}',
   'game.talents.unlockBanner': 'Talenten Ontgrendeld!',
   'game.talents.unlockHint':
-    'Je hebt je eerste talentpunt verdiend — druk op N om Talenten te openen.',
+  "Talentkeuzes zijn beschikbaar: druk op N om Talenten te openen.",
   'game.xp.lv': 'Nv',
   'game.xp.maxLevel': 'MAX NIVEAU',
   'game.xp.rested': 'Uitgerust',
@@ -3138,20 +3138,20 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Een MMO in klassieke stijl die je gratis in je browser speelt.',
   'guide.talentsPage.heading': 'Talenten en specialisaties',
   'guide.talentsPage.howBody':
-    'Talenten gaan open op niveau 10, en je blijft punten verdienen terwijl je richting het maximum klimt. Je besteedt ze in het talentpaneel van je klasse, en je kunt meer dan één indeling opslaan om tussen builds te wisselen.',
+  "Rijen openen terwijl je levelt, en specialisaties openen op level 10. Kies een specialisatie voor de kenmerkende vaardigheid en beheersing, gebruik daarna het tabblad Keuzes om één optie uit elke vrijgespeelde rij te kiezen.",
   'guide.talentsPage.howHeading': 'Hoe ze werken',
   'guide.talentsPage.intro':
-    'Met talenten maak je een klasse helemaal van jezelf. Ze zijn optioneel, vergevingsgezind en makkelijk te wijzigen, zodat je zonder angst kunt experimenteren.',
+  "Talenten maken een klasse van jou. Ze zijn optioneel, vergevingsgezind en makkelijk te wijzigen, zodat je zonder zorgen kunt experimenteren.",
   'guide.talentsPage.resetNote':
-    'Je kunt je talenten op elk moment dat je buiten gevecht bent resetten, dus een vroege keuze is nooit een valkuil. Probeer dingen uit, kijk wat je bevalt en verander vrijuit van gedachten.',
+  "Je kunt je keuzes resetten wanneer je buiten gevecht bent, dus een vroege keuze is nooit een val. Probeer dingen, kijk wat je bevalt en wijzig vrij.",
   'guide.talentsPage.resetTitle': 'Niets is permanent',
   'guide.talentsPage.shareNote':
-    'Een afgeronde build kun je kopiëren naar een korte deelbare code en aan een vriend geven, die hem rechtstreeks in zijn eigen talentenpaneel plakt om hem te laden.',
+  "Een afgeronde build kun je kopiëren als korte deelcode en aan een vriend geven, die hem direct in het eigen talentpaneel plakt.",
   'guide.talentsPage.specsBody':
-    'Elke klasse heeft een handvol specialisaties, elk met een eigen rol en een kenmerkende focus. Hier zie je de vorm van allemaal. Open een klasse voor de volledige uitrusting.',
+  "Elke klasse heeft meerdere specialisaties, elk met een eigen rol en kenmerkende focus. Hier zie je de vorm van allemaal. Open een klasse voor de volledige kit.",
   'guide.talentsPage.specsHeading': 'Specialisaties per klasse',
   'guide.talentsPage.whatBody':
-    'Naarmate je in niveau stijgt, verdien je talentpunten om te besteden aan kleine, permanente verbeteringen van je vaardigheden en attributen. Ze bepalen hoe een klasse aanvoelt en buigen die naar meer schade, stevigere verdediging of sterkere genezing.',
+  "Tijdens het levelen speel je talentrijen vrij met een klein aantal keuzes. Elke keuze voegt een permanente verbetering toe aan je vaardigheden, statistieken of gereedschap en bepaalt hoe je klasse in gevecht voelt.",
   'guide.talentsPage.whatHeading': 'Wat talenten doen',
   'guide.toc.heading': 'Op deze pagina',
   'guide.viewer.canvasLabel': 'Draaibaar 3D-model van {name}',

@@ -134,7 +134,7 @@ export const pt_BR: EnTranslations = {
       "nothingStaged": "Não há mudanças para aplicar.",
       "pickSpecFirst": "Escolha uma especialização para acessar esta árvore.",
       "unlockBanner": "Talentos desbloqueados!",
-      "unlockHint": "Você ganhou seu primeiro ponto de talento: pressione N para abrir Talentos.",
+      "unlockHint": "Escolhas de talento estão disponíveis: pressione N para abrir Talentos.",
       "copy": "Copiar",
       "close": "Fechar",
       "cancel": "Cancelar",
@@ -1601,16 +1601,16 @@ export const pt_BR: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Talentos e especializações",
-      "intro": "Os talentos são como você torna uma classe a sua. Eles são opcionais, tolerantes e fáceis de mudar, então você pode experimentar sem medo.",
+      "intro": "Talentos são como você deixa uma classe com a sua cara. Eles são opcionais, flexíveis e fáceis de mudar, então dá para experimentar sem medo.",
       "whatHeading": "O que os talentos fazem",
-      "whatBody": "Conforme você sobe de nível, ganha pontos de talento para gastar em pequenas melhorias permanentes em suas habilidades e atributos. Eles moldam como uma classe se sente, inclinando-a para mais dano, defesa mais robusta ou cura mais forte.",
+      "whatBody": "Ao subir de nível, linhas de talento são desbloqueadas com um pequeno conjunto de escolhas. Cada escolha adiciona uma melhoria permanente às suas habilidades, atributos ou ferramentas, moldando como a classe se sente em combate.",
       "howHeading": "Como funcionam",
-      "howBody": "Os talentos ficam disponíveis no nível 10, e você continua ganhando pontos conforme sobe até o limite. Você os gasta no painel de talentos da sua classe, e pode salvar mais de uma configuração para alternar entre builds.",
-      "shareNote": "Uma build pronta pode ser copiada para um código curto compartilhável e passada a um amigo, que o cola direto no próprio painel de talentos para carregá-la.",
+      "howBody": "As linhas desbloqueiam conforme você sobe de nível, e as especializações abrem no nível 10. Escolha uma especialização pela habilidade assinatura e maestria, depois use a aba Escolhas para escolher uma opção de cada linha desbloqueada.",
+      "shareNote": "Uma build pronta pode ser copiada como um código curto compartilhável e enviada a um amigo, que cola direto no próprio painel de talentos para carregar.",
       "resetTitle": "Nada é permanente",
-      "resetNote": "Você pode redefinir seus talentos a qualquer momento fora de combate, então uma escolha precoce nunca é uma armadilha. Teste coisas, veja do que gosta e mude de ideia à vontade.",
+      "resetNote": "Você pode redefinir suas escolhas sempre que estiver fora de combate, então uma escolha inicial nunca é uma armadilha. Experimente, veja do que gosta e mude livremente.",
       "specsHeading": "Especializações por classe",
-      "specsBody": "Toda classe tem algumas especializações, cada uma com sua própria função e um foco característico. Aqui está o formato de todas elas. Abra uma classe para ver seu arsenal completo."
+      "specsBody": "Cada classe tem algumas especializações, cada uma com seu papel e foco assinatura. Aqui está o formato de todas elas. Abra uma classe para ver o kit completo."
     },
     "arenaPage": {
       "heading": "Arena e JcJ",

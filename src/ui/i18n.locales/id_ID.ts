@@ -2196,7 +2196,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'Terbuka di level {level}',
   'game.talents.unlockBanner': 'Talenta Terbuka!',
   'game.talents.unlockHint':
-    'Kamu mendapat poin talenta pertamamu — tekan N untuk membuka Talenta.',
+  "Pilihan talenta tersedia: tekan N untuk membuka Talenta.",
   'game.xp.lv': 'Lv',
   'game.xp.maxLevel': 'LEVEL MAKS',
   'game.xp.rested': 'Pulih',
@@ -3146,20 +3146,20 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'MMO bergaya klasik yang bisa kamu mainkan gratis di peramban.',
   'guide.talentsPage.heading': 'Bakat dan spesialisasi',
   'guide.talentsPage.howBody':
-    'Bakat terbuka pada level 10, dan kamu terus mengumpulkan poin saat menanjak menuju batas tertinggi. Kamu membelanjakannya di panel bakat kelasmu, dan kamu bisa menyimpan lebih dari satu susunan untuk berganti antar-bangun.',
+  "Baris terbuka saat kamu naik level, dan spesialisasi terbuka pada level 10. Pilih spesialisasi untuk kemampuan khas dan penguasaannya, lalu gunakan tab Pilihan untuk memilih satu opsi dari tiap baris yang terbuka.",
   'guide.talentsPage.howHeading': 'Cara kerjanya',
   'guide.talentsPage.intro':
-    'Bakat adalah cara kamu menjadikan sebuah kelas milikmu sendiri. Bakat bersifat opsional, pemaaf, dan mudah diubah, jadi kamu bisa bereksperimen tanpa rasa takut.',
+  "Talenta adalah cara membuat kelas terasa milikmu. Sistem ini opsional, mudah dimaafkan, dan gampang diubah, jadi kamu bisa bereksperimen tanpa takut.",
   'guide.talentsPage.resetNote':
-    'Kamu bisa mengatur ulang bakatmu kapan saja saat berada di luar pertempuran, jadi pilihan awal tidak pernah menjadi jebakan. Cobalah berbagai hal, lihat apa yang kamu suka, dan ubah pikiranmu dengan bebas.',
+  "Kamu bisa mereset pilihan kapan saja saat di luar pertarungan, jadi pilihan awal tidak pernah menjadi jebakan. Coba berbagai hal, lihat yang kamu suka, lalu ubah dengan bebas.",
   'guide.talentsPage.resetTitle': 'Tidak ada yang permanen',
   'guide.talentsPage.shareNote':
-    'Sebuah susunan yang rampung bisa disalin menjadi kode pendek yang dapat dibagikan dan diberikan kepada teman, yang menempelkannya langsung ke panel bakatnya sendiri untuk memuatnya.',
+  "Build selesai dapat disalin sebagai kode pendek yang bisa dibagikan kepada teman, lalu ditempel langsung ke panel talenta mereka untuk dimuat.",
   'guide.talentsPage.specsBody':
-    'Setiap kelas memiliki beberapa spesialisasi, masing-masing dengan peran dan fokus khasnya sendiri. Inilah gambaran semuanya. Buka sebuah kelas untuk melihat perangkat lengkapnya.',
+  "Setiap kelas memiliki beberapa spesialisasi, masing-masing dengan peran dan fokus khas. Inilah bentuk semuanya. Buka kelas untuk melihat kit lengkapnya.",
   'guide.talentsPage.specsHeading': 'Spesialisasi per kelas',
   'guide.talentsPage.whatBody':
-    'Seiring kamu naik level, kamu mendapatkan poin bakat untuk dibelanjakan pada peningkatan kecil dan permanen bagi kemampuan dan statistikmu. Poin-poin itu membentuk bagaimana sebuah kelas terasa, mencondongkannya ke arah lebih banyak kerusakan, pertahanan lebih kokoh, atau penyembuhan lebih kuat.',
+  "Saat naik level, baris talenta terbuka dengan beberapa pilihan. Setiap pilihan menambahkan peningkatan permanen ke kemampuan, statistik, atau alatmu, dan membentuk rasa kelas dalam pertarungan.",
   'guide.talentsPage.whatHeading': 'Apa yang dilakukan bakat',
   'guide.toc.heading': 'Di halaman ini',
   'guide.viewer.canvasLabel': 'Model 3D {name} yang dapat diputar',

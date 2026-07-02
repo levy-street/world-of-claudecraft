@@ -1601,16 +1601,16 @@ export const es_ES: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Talentos y especializaciones",
-      "intro": "Los talentos son la forma de hacer tuya una clase. Son opcionales, indulgentes y fáciles de cambiar, así que puedes experimentar sin miedo.",
+      "intro": "Los talentos son la forma de hacer tuya una clase. Son opcionales, flexibles y fáciles de cambiar, así que puedes probar sin miedo.",
       "whatHeading": "Qué hacen los talentos",
-      "whatBody": "A medida que subes de nivel, ganas puntos de talento para gastar en pequeñas mejoras permanentes a tus habilidades y características. Dan forma a cómo se siente una clase, orientándola hacia más daño, una defensa más sólida o una sanación más potente.",
+      "whatBody": "Al subir de nivel se desbloquean filas de talentos con unas pocas elecciones. Cada elección añade una mejora permanente a tus habilidades, estadísticas o herramientas, y cambia cómo se siente tu clase en combate.",
       "howHeading": "Cómo funcionan",
-      "howBody": "Los talentos se desbloquean al nivel 10, y sigues ganando puntos a medida que asciendes hasta el límite. Los gastas en el panel de talentos de tu clase, y puedes guardar más de una configuración para alternar entre builds.",
-      "shareNote": "Una build terminada se puede copiar a un código corto para compartir y entregárselo a un amigo, que lo pega directamente en su propio panel de talentos para cargarla.",
+      "howBody": "Las filas se desbloquean al subir de nivel y las especializaciones se abren en el nivel 10. Elige una especialización por su habilidad distintiva y maestría, luego usa la pestaña Elecciones para elegir una opción de cada fila desbloqueada.",
+      "shareNote": "Una configuración terminada se puede copiar como un código corto para compartir y pasar a un amigo, que lo pega directamente en su panel de talentos para cargarla.",
       "resetTitle": "Nada es permanente",
-      "resetNote": "Puedes restablecer tus talentos en cualquier momento que estés fuera de combate, así que una elección temprana nunca es una trampa. Prueba cosas, descubre lo que te gusta y cambia de opinión con libertad.",
+      "resetNote": "Puedes restablecer tus elecciones cuando estés fuera de combate, así que una elección temprana nunca es una trampa. Prueba opciones, mira qué te gusta y cambia libremente.",
       "specsHeading": "Especializaciones por clase",
-      "specsBody": "Cada clase tiene unas cuantas especializaciones, cada una con su propio rol y un enfoque distintivo. Aquí tienes la forma de todas ellas. Abre una clase para ver su repertorio completo."
+      "specsBody": "Cada clase tiene varias especializaciones, cada una con su propio rol y foco distintivo. Esta es la forma de todas ellas. Abre una clase para ver su kit completo."
     },
     "arenaPage": {
       "heading": "Arena y JcJ",

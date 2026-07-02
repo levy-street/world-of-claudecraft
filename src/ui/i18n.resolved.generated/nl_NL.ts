@@ -134,7 +134,7 @@ export const nl_NL: EnTranslations = {
       "nothingStaged": "Geen wijzigingen om toe te passen.",
       "pickSpecFirst": "Kies een specialisatie om toegang te krijgen tot deze boom.",
       "unlockBanner": "Talenten Ontgrendeld!",
-      "unlockHint": "Je hebt je eerste talentpunt verdiend — druk op N om Talenten te openen.",
+      "unlockHint": "Talentkeuzes zijn beschikbaar: druk op N om Talenten te openen.",
       "copy": "Kopiëren",
       "close": "Sluiten",
       "cancel": "Annuleren",
@@ -1601,16 +1601,16 @@ export const nl_NL: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Talenten en specialisaties",
-      "intro": "Met talenten maak je een klasse helemaal van jezelf. Ze zijn optioneel, vergevingsgezind en makkelijk te wijzigen, zodat je zonder angst kunt experimenteren.",
+      "intro": "Talenten maken een klasse van jou. Ze zijn optioneel, vergevingsgezind en makkelijk te wijzigen, zodat je zonder zorgen kunt experimenteren.",
       "whatHeading": "Wat talenten doen",
-      "whatBody": "Naarmate je in niveau stijgt, verdien je talentpunten om te besteden aan kleine, permanente verbeteringen van je vaardigheden en attributen. Ze bepalen hoe een klasse aanvoelt en buigen die naar meer schade, stevigere verdediging of sterkere genezing.",
+      "whatBody": "Tijdens het levelen speel je talentrijen vrij met een klein aantal keuzes. Elke keuze voegt een permanente verbetering toe aan je vaardigheden, statistieken of gereedschap en bepaalt hoe je klasse in gevecht voelt.",
       "howHeading": "Hoe ze werken",
-      "howBody": "Talenten gaan open op niveau 10, en je blijft punten verdienen terwijl je richting het maximum klimt. Je besteedt ze in het talentpaneel van je klasse, en je kunt meer dan één indeling opslaan om tussen builds te wisselen.",
-      "shareNote": "Een afgeronde build kun je kopiëren naar een korte deelbare code en aan een vriend geven, die hem rechtstreeks in zijn eigen talentenpaneel plakt om hem te laden.",
+      "howBody": "Rijen openen terwijl je levelt, en specialisaties openen op level 10. Kies een specialisatie voor de kenmerkende vaardigheid en beheersing, gebruik daarna het tabblad Keuzes om één optie uit elke vrijgespeelde rij te kiezen.",
+      "shareNote": "Een afgeronde build kun je kopiëren als korte deelcode en aan een vriend geven, die hem direct in het eigen talentpaneel plakt.",
       "resetTitle": "Niets is permanent",
-      "resetNote": "Je kunt je talenten op elk moment dat je buiten gevecht bent resetten, dus een vroege keuze is nooit een valkuil. Probeer dingen uit, kijk wat je bevalt en verander vrijuit van gedachten.",
+      "resetNote": "Je kunt je keuzes resetten wanneer je buiten gevecht bent, dus een vroege keuze is nooit een val. Probeer dingen, kijk wat je bevalt en wijzig vrij.",
       "specsHeading": "Specialisaties per klasse",
-      "specsBody": "Elke klasse heeft een handvol specialisaties, elk met een eigen rol en een kenmerkende focus. Hier zie je de vorm van allemaal. Open een klasse voor de volledige uitrusting."
+      "specsBody": "Elke klasse heeft meerdere specialisaties, elk met een eigen rol en kenmerkende focus. Hier zie je de vorm van allemaal. Open een klasse voor de volledige kit."
     },
     "arenaPage": {
       "heading": "Arena en PvP",

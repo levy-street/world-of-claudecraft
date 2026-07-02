@@ -134,7 +134,7 @@ export const da_DK: EnTranslations = {
       "nothingStaged": "Ingen ændringer at anvende.",
       "pickSpecFirst": "Vælg en specialisering for at få adgang til dette træ.",
       "unlockBanner": "Talenter Låst Op!",
-      "unlockHint": "Du har optjent dit første talentpoint — tryk på N for at åbne Talenter.",
+      "unlockHint": "Talentvalg er tilgængelige: tryk N for at åbne Talenter.",
       "copy": "Kopier",
       "close": "Luk",
       "cancel": "Annuller",
@@ -1603,14 +1603,14 @@ export const da_DK: EnTranslations = {
       "heading": "Talenter og specialiseringer",
       "intro": "Talenter er måden, du gør en klasse til din egen. De er valgfrie, tilgivende og nemme at ændre, så du kan eksperimentere uden frygt.",
       "whatHeading": "Hvad talenter gør",
-      "whatBody": "Efterhånden som du stiger i niveau, tjener du talentpoint at bruge på små, permanente forbedringer af dine evner og egenskaber. De former, hvordan en klasse føles, og hælder den mod mere skade, sejere forsvar eller stærkere helbredelse.",
+      "whatBody": "Når du stiger i niveau, låses talentrækker op med et lille udvalg af valg. Hvert valg giver en permanent forbedring til dine evner, værdier eller værktøjer og former, hvordan klassen føles i kamp.",
       "howHeading": "Sådan virker de",
-      "howBody": "Talenter låses op på niveau 10, og du bliver ved med at tjene point, mens du klatrer mod grænsen. Du bruger dem i din klasses talentpanel, og du kan gemme mere end ét opsæt for at skifte mellem builds.",
-      "shareNote": "En færdig build kan kopieres til en kort delbar kode og gives til en ven, der indsætter den direkte i sit eget talentpanel for at indlæse den.",
+      "howBody": "Rækker låses op, når du stiger i niveau, og specialiseringer åbner på niveau 10. Vælg en specialisering for dens signaturevne og mesterskab, og brug derefter fanen Valg til at vælge én mulighed fra hver oplåst række.",
+      "shareNote": "Et færdigt build kan kopieres som en kort delingskode og gives til en ven, som indsætter den direkte i sit eget talentpanel.",
       "resetTitle": "Intet er permanent",
-      "resetNote": "Du kan nulstille dine talenter når som helst, du er uden for kamp, så et tidligt valg er aldrig en fælde. Prøv tingene, se hvad du kan lide, og skift mening frit.",
+      "resetNote": "Du kan nulstille dine valg når som helst uden for kamp, så et tidligt valg er aldrig en fælde. Prøv ting af, se hvad du kan lide, og skift frit mening.",
       "specsHeading": "Specialiseringer efter klasse",
-      "specsBody": "Hver klasse har en håndfuld specialiseringer, hver med sin egen rolle og sit særkende. Her er formen på dem alle. Åbn en klasse for dens fulde udstyr."
+      "specsBody": "Hver klasse har flere specialiseringer, hver med sin egen rolle og signaturfokus. Her er formen på dem alle. Åbn en klasse for hele sættet."
     },
     "arenaPage": {
       "heading": "Arena og PvP",

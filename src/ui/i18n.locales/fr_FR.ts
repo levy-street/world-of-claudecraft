@@ -431,7 +431,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'game.talents.pickSpecFirst': 'Choisissez une spécialisation pour accéder à cet arbre.',
   'game.talents.unlockBanner': 'Talents débloqués!',
   'game.talents.unlockHint':
-    'Vous avez gagné votre premier point de talent: appuyez sur N pour ouvrir Talents.',
+  "Des choix de talents sont disponibles: appuyez sur N pour ouvrir Talents.",
   'game.talents.copy': 'Copier',
   'game.talents.close': 'Fermer',
   'game.talents.cancel': 'Annuler',
@@ -4206,20 +4206,20 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Adaptée au solo',
   'guide.talentsPage.heading': 'Talents et spécialisations',
   'guide.talentsPage.howBody':
-    "Les talents se débloquent au niveau 10, et vous continuez de gagner des points en grimpant jusqu'au plafond. Vous les dépensez dans le panneau de talents de votre classe, et vous pouvez enregistrer plusieurs configurations pour passer de l'une à l'autre.",
+  "Les rangées se débloquent avec les niveaux, et les spécialisations s ouvrent au niveau 10. Choisissez une spécialisation pour sa technique signature et sa maîtrise, puis utilisez l onglet Choix pour prendre une option dans chaque rangée débloquée.",
   'guide.talentsPage.howHeading': 'Comment ils fonctionnent',
   'guide.talentsPage.intro':
-    'Les talents sont ce qui vous permet de vous approprier une classe. Ils sont facultatifs, indulgents et faciles à modifier, pour que vous puissiez expérimenter sans crainte.',
+  "Les talents vous permettent de personnaliser votre classe. Ils sont optionnels, souples et faciles à changer, vous pouvez donc expérimenter sans crainte.",
   'guide.talentsPage.resetNote':
-    "Vous pouvez réinitialiser vos talents à tout moment hors combat : un choix précoce n'est donc jamais un piège. Essayez des choses, voyez ce qui vous plaît, et changez d'avis librement.",
+  "Vous pouvez réinitialiser vos choix dès que vous êtes hors combat, donc un choix précoce n est jamais un piège. Essayez, voyez ce qui vous plaît et changez librement.",
   'guide.talentsPage.resetTitle': "Rien n'est définitif",
   'guide.talentsPage.shareNote':
-    'Une configuration terminée peut être copiée en un court code partageable et transmise à un ami, qui le colle directement dans son propre panneau de talents pour la charger.',
+  "Une configuration terminée peut être copiée sous forme de code court à partager avec un ami, qui le colle directement dans son panneau de talents pour la charger.",
   'guide.talentsPage.specsBody':
-    'Chaque classe possède une poignée de spécialisations, chacune avec son propre rôle et une orientation emblématique. Voici à quoi elles ressemblent toutes. Ouvrez une classe pour voir sa panoplie complète.',
+  "Chaque classe a plusieurs spécialisations, chacune avec son rôle et son axe signature. Voici leur profil général. Ouvrez une classe pour voir tout son kit.",
   'guide.talentsPage.specsHeading': 'Spécialisations par classe',
   'guide.talentsPage.whatBody':
-    "En gagnant des niveaux, vous obtenez des points de talent à dépenser pour de petites améliorations permanentes de vos capacités et de vos caractéristiques. Ils façonnent le ressenti d'une classe, l'orientant vers plus de dégâts, une défense plus solide ou des soins plus puissants.",
+  "En montant de niveau, des rangées de talents se débloquent avec quelques choix. Chaque choix ajoute une amélioration permanente à vos techniques, caractéristiques ou outils, et façonne le ressenti de votre classe en combat.",
   'guide.talentsPage.whatHeading': 'Ce que font les talents',
   'guide.toc.heading': 'Sur cette page',
   'guide.wishPage.heading': "Ce que j'aurais aimé savoir",

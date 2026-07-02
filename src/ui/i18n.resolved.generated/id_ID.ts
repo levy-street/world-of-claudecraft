@@ -134,7 +134,7 @@ export const id_ID: EnTranslations = {
       "nothingStaged": "Tidak ada perubahan untuk diterapkan.",
       "pickSpecFirst": "Pilih spesialisasi untuk mengakses pohon ini.",
       "unlockBanner": "Talenta Terbuka!",
-      "unlockHint": "Kamu mendapat poin talenta pertamamu — tekan N untuk membuka Talenta.",
+      "unlockHint": "Pilihan talenta tersedia: tekan N untuk membuka Talenta.",
       "copy": "Salin",
       "close": "Tutup",
       "cancel": "Batal",
@@ -1601,16 +1601,16 @@ export const id_ID: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Bakat dan spesialisasi",
-      "intro": "Bakat adalah cara kamu menjadikan sebuah kelas milikmu sendiri. Bakat bersifat opsional, pemaaf, dan mudah diubah, jadi kamu bisa bereksperimen tanpa rasa takut.",
+      "intro": "Talenta adalah cara membuat kelas terasa milikmu. Sistem ini opsional, mudah dimaafkan, dan gampang diubah, jadi kamu bisa bereksperimen tanpa takut.",
       "whatHeading": "Apa yang dilakukan bakat",
-      "whatBody": "Seiring kamu naik level, kamu mendapatkan poin bakat untuk dibelanjakan pada peningkatan kecil dan permanen bagi kemampuan dan statistikmu. Poin-poin itu membentuk bagaimana sebuah kelas terasa, mencondongkannya ke arah lebih banyak kerusakan, pertahanan lebih kokoh, atau penyembuhan lebih kuat.",
+      "whatBody": "Saat naik level, baris talenta terbuka dengan beberapa pilihan. Setiap pilihan menambahkan peningkatan permanen ke kemampuan, statistik, atau alatmu, dan membentuk rasa kelas dalam pertarungan.",
       "howHeading": "Cara kerjanya",
-      "howBody": "Bakat terbuka pada level 10, dan kamu terus mengumpulkan poin saat menanjak menuju batas tertinggi. Kamu membelanjakannya di panel bakat kelasmu, dan kamu bisa menyimpan lebih dari satu susunan untuk berganti antar-bangun.",
-      "shareNote": "Sebuah susunan yang rampung bisa disalin menjadi kode pendek yang dapat dibagikan dan diberikan kepada teman, yang menempelkannya langsung ke panel bakatnya sendiri untuk memuatnya.",
+      "howBody": "Baris terbuka saat kamu naik level, dan spesialisasi terbuka pada level 10. Pilih spesialisasi untuk kemampuan khas dan penguasaannya, lalu gunakan tab Pilihan untuk memilih satu opsi dari tiap baris yang terbuka.",
+      "shareNote": "Build selesai dapat disalin sebagai kode pendek yang bisa dibagikan kepada teman, lalu ditempel langsung ke panel talenta mereka untuk dimuat.",
       "resetTitle": "Tidak ada yang permanen",
-      "resetNote": "Kamu bisa mengatur ulang bakatmu kapan saja saat berada di luar pertempuran, jadi pilihan awal tidak pernah menjadi jebakan. Cobalah berbagai hal, lihat apa yang kamu suka, dan ubah pikiranmu dengan bebas.",
+      "resetNote": "Kamu bisa mereset pilihan kapan saja saat di luar pertarungan, jadi pilihan awal tidak pernah menjadi jebakan. Coba berbagai hal, lihat yang kamu suka, lalu ubah dengan bebas.",
       "specsHeading": "Spesialisasi per kelas",
-      "specsBody": "Setiap kelas memiliki beberapa spesialisasi, masing-masing dengan peran dan fokus khasnya sendiri. Inilah gambaran semuanya. Buka sebuah kelas untuk melihat perangkat lengkapnya."
+      "specsBody": "Setiap kelas memiliki beberapa spesialisasi, masing-masing dengan peran dan fokus khas. Inilah bentuk semuanya. Buka kelas untuk melihat kit lengkapnya."
     },
     "arenaPage": {
       "heading": "Arena dan PvP",

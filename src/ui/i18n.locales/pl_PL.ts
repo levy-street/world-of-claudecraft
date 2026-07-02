@@ -2175,7 +2175,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'Odblokowuje się na poziomie {level}',
   'game.talents.unlockBanner': 'Talenty odblokowane!',
   'game.talents.unlockHint':
-    'Zdobyłeś swój pierwszy punkt talentu — naciśnij N, aby otworzyć Talenty.',
+  "Wybory talentów są dostępne: naciśnij N, aby otworzyć Talenty.",
   'game.xp.lv': 'Poz.',
   'game.xp.maxLevel': 'MAKS. POZIOM',
   'game.xp.rested': 'Wypoczęty',
@@ -3113,20 +3113,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Klasyczne MMO, w które zagrasz za darmo w przeglądarce.',
   'guide.talentsPage.heading': 'Talenty i specjalizacje',
   'guide.talentsPage.howBody':
-    'Talenty odblokowują się na 10. poziomie, a kolejne punkty zdobywasz w miarę wspinaczki ku maksimum. Wydajesz je w panelu talentów swojej klasy i możesz zapisać więcej niż jeden układ, aby przełączać się między buildami.',
+  "Rzędy odblokowują się podczas zdobywania poziomów, a specjalizacje otwierają się na poziomie 10. Wybierz specjalizację dla jej sztandarowej zdolności i mistrzostwa, potem w karcie Wybory wybierz po jednej opcji z każdego odblokowanego rzędu.",
   'guide.talentsPage.howHeading': 'Jak działają',
   'guide.talentsPage.intro':
-    'Talenty to sposób, w jaki czynisz klasę swoją własną. Są opcjonalne, wyrozumiałe i łatwe do zmiany, więc możesz eksperymentować bez obaw.',
+  "Talenty pozwalają dopasować klasę do siebie. Są opcjonalne, wyrozumiałe i łatwe do zmiany, więc można eksperymentować bez obaw.",
   'guide.talentsPage.resetNote':
-    'Talenty możesz zresetować w dowolnej chwili poza walką, więc wczesny wybór nigdy nie jest pułapką. Próbuj różnych rzeczy, sprawdzaj, co lubisz, i zmieniaj zdanie do woli.',
+  "Poza walką możesz w każdej chwili zresetować wybory, więc wczesna decyzja nigdy nie jest pułapką. Testuj, sprawdzaj co lubisz i zmieniaj bez ograniczeń.",
   'guide.talentsPage.resetTitle': 'Nic nie jest na stałe',
   'guide.talentsPage.shareNote':
-    'Gotowy zestaw można skopiować do krótkiego kodu do udostępniania i przekazać przyjacielowi, który wkleja go prosto do własnego panelu talentów, aby go wczytać.',
+  "Gotowy build można skopiować jako krótki kod do udostępnienia i przekazać znajomemu, który wklei go prosto do własnego panelu talentów.",
   'guide.talentsPage.specsBody':
-    'Każda klasa ma kilka specjalizacji, a każda z nich ma własną rolę i charakterystyczny motyw przewodni. Oto zarys ich wszystkich. Otwórz klasę, by poznać jej pełny zestaw.',
+  "Każda klasa ma kilka specjalizacji, każda z własną rolą i głównym motywem. Oto ich ogólny kształt. Otwórz klasę, aby zobaczyć pełny zestaw.",
   'guide.talentsPage.specsHeading': 'Specjalizacje według klas',
   'guide.talentsPage.whatBody':
-    'Wraz z awansowaniem zdobywasz punkty talentów, które wydajesz na drobne, stałe ulepszenia swoich zdolności i statystyk. Kształtują one to, jak gra się daną klasą, kierując ją ku większym obrażeniom, wytrzymalszej obronie lub silniejszemu leczeniu.',
+  "Wraz z poziomami odblokowują się rzędy talentów z kilkoma wyborami. Każdy wybór dodaje trwałe ulepszenie zdolności, statystyk lub narzędzi i kształtuje odczucie klasy w walce.",
   'guide.talentsPage.whatHeading': 'Co robią talenty',
   'guide.toc.heading': 'Na tej stronie',
   'guide.viewer.canvasLabel': 'Obrotowy model 3D: {name}',

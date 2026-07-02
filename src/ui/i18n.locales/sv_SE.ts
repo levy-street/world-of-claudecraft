@@ -2164,7 +2164,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
   'game.talents.unlockBanner': 'Talanger upplåsta!',
   'game.talents.unlockHint':
-    'Du har tjänat din första talangpoäng, tryck på N för att öppna Talanger.',
+  "Talangval är tillgängliga: tryck på N för att öppna Talanger.",
   'game.xp.lv': 'Nivå',
   'game.xp.maxLevel': 'MAXNIVÅ',
   'game.xp.rested': 'Utvilad',
@@ -3097,20 +3097,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'En klassisk MMO du spelar gratis i din webbläsare.',
   'guide.talentsPage.heading': 'Talanger och specialiseringar',
   'guide.talentsPage.howBody':
-    'Talanger låses upp vid nivå 10, och du fortsätter tjäna poäng medan du klättrar mot maxnivån. Du spenderar dem i din klass talangpanel, och du kan spara fler än en uppsättning för att växla mellan byggen.',
+  "Rader låses upp när du levlar, och specialiseringar öppnas på nivå 10. Välj en specialisering för dess signaturförmåga och mästerskap, använd sedan fliken Val för att välja ett alternativ från varje upplåst rad.",
   'guide.talentsPage.howHeading': 'Så fungerar de',
   'guide.talentsPage.intro':
-    'Talanger är hur du gör en klass till din egen. De är frivilliga, förlåtande och lätta att ändra, så du kan experimentera utan rädsla.',
+  "Talanger är hur du gör en klass till din egen. De är valfria, förlåtande och enkla att ändra, så du kan experimentera utan oro.",
   'guide.talentsPage.resetNote':
-    'Du kan återställa dina talanger när som helst du är utanför strid, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar, och ändra dig fritt.',
+  "Du kan återställa dina val när du är utanför strid, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar och ändra dig fritt.",
   'guide.talentsPage.resetTitle': 'Inget är permanent',
   'guide.talentsPage.shareNote':
-    'Ett färdigt bygge kan kopieras till en kort delbar kod och ges till en vän, som klistrar in den rakt i sin egen talangpanel för att ladda det.',
+  "En färdig build kan kopieras till en kort delningskod och ges till en vän, som klistrar in den direkt i sin egen talangpanel.",
   'guide.talentsPage.specsBody':
-    'Varje klass har en handfull specialiseringar, var och en med sin egen roll och ett kännetecknande fokus. Här är formen på dem alla. Öppna en klass för dess fullständiga uppsättning.',
+  "Varje klass har flera specialiseringar, var och en med egen roll och signaturfokus. Här är formen på dem alla. Öppna en klass för hela kitet.",
   'guide.talentsPage.specsHeading': 'Specialiseringar per klass',
   'guide.talentsPage.whatBody':
-    'När du levlar tjänar du talangpoäng att spendera på små, permanenta förbättringar av dina förmågor och egenskaper. De formar hur en klass känns och lutar den mot mer skada, robustare försvar eller starkare läkning.',
+  "När du går upp i nivå låses talangrader upp med ett litet antal val. Varje val lägger till en permanent förbättring av dina förmågor, värden eller verktyg och formar hur klassen känns i strid.",
   'guide.talentsPage.whatHeading': 'Vad talanger gör',
   'guide.toc.heading': 'På den här sidan',
   'guide.viewer.canvasLabel': 'Roterbar 3D-modell av {name}',

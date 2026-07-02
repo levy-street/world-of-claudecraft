@@ -3089,20 +3089,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Tarayıcınızda ücretsiz oynayabileceğiniz klasik tarzda bir MMO.',
   'guide.talentsPage.heading': 'Yetenekler ve uzmanlıklar',
   'guide.talentsPage.howBody':
-    'Yetenekler 10. seviyede açılır ve seviye tavanına tırmandıkça puan kazanmaya devam edersiniz. Bunları sınıfınızın yetenek panelinde harcarsınız ve birden fazla düzeni kaydederek yapılarınız arasında geçiş yapabilirsiniz.',
+  "Sıralar seviye aldıkça açılır, uzmanlıklar ise 10. seviyede açılır. İmza yeteneği ve ustalığı için bir uzmanlık seç, sonra Seçimler sekmesinde açılmış her sıradan bir seçenek seç.",
   'guide.talentsPage.howHeading': 'Nasıl çalışırlar',
   'guide.talentsPage.intro':
-    'Yetenekler, bir sınıfı kendinize özgü hale getirme yolunuzdur. İsteğe bağlı, hoşgörülü ve değiştirmesi kolaydır, bu yüzden korkmadan denemeler yapabilirsiniz.',
+  "Yetenekler bir sınıfı sana ait hale getirmenin yoludur. İsteğe bağlıdır, affedicidir ve kolayca değişir, bu yüzden korkmadan deneyebilirsin.",
   'guide.talentsPage.resetNote':
-    'Yeteneklerinizi dövüş dışında olduğunuz her an sıfırlayabilirsiniz, bu yüzden erken bir seçim asla bir tuzak değildir. Bir şeyler deneyin, neyi sevdiğinizi görün ve fikrinizi serbestçe değiştirin.',
+  "Savaşta değilken seçimlerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir. Dene, neyi sevdiğini gör ve özgürce değiştir.",
   'guide.talentsPage.resetTitle': 'Hiçbir şey kalıcı değildir',
   'guide.talentsPage.shareNote':
-    'Tamamlanmış bir kurgu, paylaşılabilir kısa bir koda kopyalanıp bir arkadaşa verilebilir; o da onu yüklemek için doğrudan kendi yetenek paneline yapıştırır.',
+  "Tamamlanmış bir dizilim kısa bir paylaşım kodu olarak kopyalanıp bir arkadaşa verilebilir; o da bunu kendi yetenek paneline yapıştırarak yükler.",
   'guide.talentsPage.specsBody':
-    'Her sınıfın, her biri kendi rolüne ve kendine özgü bir odağına sahip birkaç uzmanlığı vardır. İşte hepsinin genel görünümü. Tam donanımı için bir sınıfı açın.',
+  "Her sınıfta birkaç uzmanlık vardır; her birinin kendi rolü ve imza odağı bulunur. Hepsinin genel şekli burada. Tam set için bir sınıf aç.",
   'guide.talentsPage.specsHeading': 'Sınıfa göre uzmanlıklar',
   'guide.talentsPage.whatBody':
-    'Seviye atladıkça, yeteneklerinize ve özelliklerinize küçük, kalıcı geliştirmeler yapmak için yetenek puanları kazanırsınız. Bunlar bir sınıfın hissini şekillendirir; onu daha fazla hasara, daha sağlam savunmaya ya da daha güçlü iyileştirmeye yöneltir.',
+  "Seviye aldıkça az sayıda seçenek içeren yetenek sıraları açılır. Her seçim yeteneklerine, niteliklerine veya araçlarına kalıcı bir geliştirme ekler ve sınıfın savaşta nasıl hissettirdiğini şekillendirir.",
   'guide.talentsPage.whatHeading': 'Yetenekler ne işe yarar',
   'guide.toc.heading': 'Bu sayfada',
   'guide.viewer.canvasLabel': '{name} ögesinin döndürülebilir 3B modeli',

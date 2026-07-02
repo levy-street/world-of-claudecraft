@@ -1601,16 +1601,16 @@ export const vi_VN: EnTranslations = {
     },
     "talentsPage": {
       "heading": "Tài năng và chuyên môn hóa",
-      "intro": "Tài năng là cách bạn biến một lớp nhân vật thành của riêng mình. Chúng là tùy chọn, dễ tha thứ và dễ thay đổi, nên bạn có thể thử nghiệm mà không phải lo sợ.",
+      "intro": "Tài năng là cách bạn biến lớp nhân vật thành của riêng mình. Chúng là tùy chọn, dễ sửa và dễ đổi, nên bạn có thể thử nghiệm mà không sợ.",
       "whatHeading": "Tài năng làm gì",
-      "whatBody": "Khi lên cấp, bạn kiếm được điểm tài năng để tiêu vào những nâng cấp nhỏ, vĩnh viễn cho các kỹ năng và chỉ số của mình. Chúng định hình cảm giác của một lớp nhân vật, nghiêng nó về hướng sát thương nhiều hơn, phòng thủ vững chắc hơn, hoặc trị liệu mạnh hơn.",
+      "whatBody": "Khi lên cấp, các hàng tài năng mở ra với một nhóm lựa chọn nhỏ. Mỗi lựa chọn thêm một nâng cấp vĩnh viễn cho kỹ năng, chỉ số hoặc bộ công cụ, định hình cảm giác của lớp trong chiến đấu.",
       "howHeading": "Cách chúng hoạt động",
-      "howBody": "Tài năng mở ra ở cấp 10, và bạn tiếp tục kiếm điểm khi leo dần lên cấp tối đa. Bạn tiêu chúng trong bảng tài năng của lớp nhân vật, và có thể lưu nhiều hơn một bố cục để hoán đổi giữa các lối xây dựng.",
-      "shareNote": "Một cấu hình hoàn chỉnh có thể được sao thành một mã chia sẻ ngắn rồi trao cho một người bạn, người đó dán thẳng vào bảng tài năng của mình để nạp nó.",
+      "howBody": "Các hàng mở khi bạn lên cấp, còn chuyên môn hóa mở ở cấp 10. Chọn một chuyên môn hóa vì kỹ năng đặc trưng và tinh thông của nó, rồi dùng thẻ Lựa chọn để chọn một tùy chọn từ mỗi hàng đã mở.",
+      "shareNote": "Một build hoàn chỉnh có thể sao chép thành mã ngắn để chia sẻ cho bạn bè, họ dán thẳng vào bảng tài năng của mình để tải.",
       "resetTitle": "Không có gì là vĩnh viễn",
-      "resetNote": "Bạn có thể đặt lại tài năng bất cứ khi nào bạn ở ngoài chiến đấu, nên một lựa chọn sớm không bao giờ là cái bẫy. Cứ thử, xem bạn thích gì, và đổi ý thoải mái.",
+      "resetNote": "Bạn có thể đặt lại lựa chọn bất cứ lúc nào khi ngoài chiến đấu, nên lựa chọn sớm không bao giờ là cái bẫy. Hãy thử, xem bạn thích gì và đổi tự do.",
       "specsHeading": "Chuyên môn hóa theo lớp",
-      "specsBody": "Mỗi lớp nhân vật có một vài chuyên môn hóa, mỗi cái có vai trò riêng và một trọng tâm đặc trưng. Đây là hình hài của tất cả chúng. Mở một lớp để xem trọn bộ kỹ năng của nó."
+      "specsBody": "Mỗi lớp có vài chuyên môn hóa, mỗi chuyên môn hóa có vai trò và trọng tâm riêng. Đây là hình dạng tổng quát của tất cả. Mở một lớp để xem toàn bộ bộ kỹ năng."
     },
     "arenaPage": {
       "heading": "Đấu Trường và PvP",

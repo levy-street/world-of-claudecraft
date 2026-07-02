@@ -28,6 +28,8 @@ export const TALENT_NEW: Record<
       cost: 'omkostning',
       cooldown: 'afkøling',
       castTime: 'fremmaningstid',
+      castWhileMoving: 'kan fremmanes under bevægelse',
+      spellCritVsRooted: 'kritisk chance med besværgelser mod rodfæstede mål',
     },
     roleLabels: { tank: 'tank', healer: 'helbreder', dps: 'skade' },
     perRank: ' pr. rang',
@@ -38,6 +40,17 @@ export const TALENT_NEW: Record<
     grant: (abilityName) => 'Giver ' + abilityName + '.',
     increase: (target, amount, perRank) => 'Forøger ' + target + ' med ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Reducerer ' + target + ' med ' + amount + perRank + '.',
+    castWhileMoving: (abilityName) => abilityName + ' kan fremmanes under bevægelse.',
+    addRoot: (abilityName, seconds) =>
+      abilityName + ' rodfæster også målet i ' + seconds + ' sek.',
+    addAoeRoot: (abilityName, seconds) =>
+      abilityName + ' rodfæster også ramte mål i ' + seconds + ' sek.',
+    addInterrupt: (abilityName, seconds) =>
+      abilityName + ' afbryder også kast og låser den skole i ' + seconds + ' sek.',
+    addDot: (abilityName, amount, seconds) =>
+      abilityName + ' påfører også ' + amount + ' skade over ' + seconds + ' sek.',
+    addLeechDot: (abilityName, amount, seconds) =>
+      abilityName + ' helbreder dig også for op til ' + amount + ' over ' + seconds + ' sek.',
   },
   id_ID: {
     statLabels: {
@@ -62,6 +75,8 @@ export const TALENT_NEW: Record<
       cost: 'biaya',
       cooldown: 'waktu jeda',
       castTime: 'waktu merapal',
+      castWhileMoving: 'dapat dirapal sambil bergerak',
+      spellCritVsRooted: 'peluang kritis mantra terhadap target yang terikat',
     },
     roleLabels: { tank: 'tank', healer: 'penyembuh', dps: 'kerusakan' },
     perRank: ' per tingkat',
@@ -80,6 +95,17 @@ export const TALENT_NEW: Record<
       'Meningkatkan ' + target + ' sebesar ' + amount + perRank + '.',
     reduce: (target, amount, perRank) =>
       'Mengurangi ' + target + ' sebesar ' + amount + perRank + '.',
+    castWhileMoving: (abilityName) => abilityName + ' dapat dirapal sambil bergerak.',
+    addRoot: (abilityName, seconds) =>
+      abilityName + ' juga mengikat target selama ' + seconds + ' dtk.',
+    addAoeRoot: (abilityName, seconds) =>
+      abilityName + ' juga mengikat target yang terkena selama ' + seconds + ' dtk.',
+    addInterrupt: (abilityName, seconds) =>
+      abilityName + ' juga menghentikan rapalan dan mengunci sekolah itu selama ' + seconds + ' dtk.',
+    addDot: (abilityName, amount, seconds) =>
+      abilityName + ' juga memberikan ' + amount + ' kerusakan selama ' + seconds + ' dtk.',
+    addLeechDot: (abilityName, amount, seconds) =>
+      abilityName + ' juga menyembuhkanmu hingga ' + amount + ' selama ' + seconds + ' dtk.',
   },
   nl_NL: {
     statLabels: {
@@ -104,6 +130,8 @@ export const TALENT_NEW: Record<
       cost: 'kosten',
       cooldown: 'afkoeltijd',
       castTime: 'spreuktijd',
+      castWhileMoving: 'te gebruiken tijdens bewegen',
+      spellCritVsRooted: 'kritieke spreukkans tegen gewortelde doelen',
     },
     roleLabels: { tank: 'tank', healer: 'genezer', dps: 'schade' },
     perRank: ' per rang',
@@ -119,6 +147,17 @@ export const TALENT_NEW: Record<
     grant: (abilityName) => 'Verleent ' + abilityName + '.',
     increase: (target, amount, perRank) => 'Verhoogt ' + target + ' met ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Verlaagt ' + target + ' met ' + amount + perRank + '.',
+    castWhileMoving: (abilityName) => abilityName + ' kan tijdens bewegen worden gebruikt.',
+    addRoot: (abilityName, seconds) =>
+      abilityName + ' wortelt het doel ook ' + seconds + ' sec.',
+    addAoeRoot: (abilityName, seconds) =>
+      abilityName + ' wortelt geraakte doelen ook ' + seconds + ' sec.',
+    addInterrupt: (abilityName, seconds) =>
+      abilityName + ' onderbreekt ook het spreuken en blokkeert die school ' + seconds + ' sec.',
+    addDot: (abilityName, amount, seconds) =>
+      abilityName + ' brengt ook ' + amount + ' schade toe over ' + seconds + ' sec.',
+    addLeechDot: (abilityName, amount, seconds) =>
+      abilityName + ' geneest je ook tot ' + amount + ' over ' + seconds + ' sec.',
   },
   pl_PL: {
     statLabels: {
@@ -143,6 +182,8 @@ export const TALENT_NEW: Record<
       cost: 'koszt',
       cooldown: 'czas odnowienia',
       castTime: 'czas rzucania',
+      castWhileMoving: 'można rzucać w ruchu',
+      spellCritVsRooted: 'szansa na krytyczne zaklęcie przeciw unieruchomionym celom',
     },
     roleLabels: { tank: 'tank', healer: 'uzdrowiciel', dps: 'obrażenia' },
     perRank: ' na poziom',
@@ -159,6 +200,17 @@ export const TALENT_NEW: Record<
     grant: (abilityName) => 'Daje ' + abilityName + '.',
     increase: (target, amount, perRank) => 'Zwiększa ' + target + ' o ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Zmniejsza ' + target + ' o ' + amount + perRank + '.',
+    castWhileMoving: (abilityName) => abilityName + ' można rzucać w ruchu.',
+    addRoot: (abilityName, seconds) =>
+      abilityName + ' dodatkowo unieruchamia cel na ' + seconds + ' sek.',
+    addAoeRoot: (abilityName, seconds) =>
+      abilityName + ' dodatkowo unieruchamia trafione cele na ' + seconds + ' sek.',
+    addInterrupt: (abilityName, seconds) =>
+      abilityName + ' dodatkowo przerywa rzucanie i blokuje tę szkołę na ' + seconds + ' sek.',
+    addDot: (abilityName, amount, seconds) =>
+      abilityName + ' dodatkowo zadaje ' + amount + ' obrażeń przez ' + seconds + ' sek.',
+    addLeechDot: (abilityName, amount, seconds) =>
+      abilityName + ' dodatkowo leczy cię do ' + amount + ' przez ' + seconds + ' sek.',
   },
   sv_SE: {
     statLabels: {
@@ -183,6 +235,8 @@ export const TALENT_NEW: Record<
       cost: 'kostnad',
       cooldown: 'nedkylning',
       castTime: 'kanaliseringstid',
+      castWhileMoving: 'kan kastas under rörelse',
+      spellCritVsRooted: 'kritisk chans med besvärjelser mot rotade mål',
     },
     roleLabels: { tank: 'tank', healer: 'läkare', dps: 'skada' },
     perRank: ' per rang',
@@ -193,6 +247,17 @@ export const TALENT_NEW: Record<
     grant: (abilityName) => 'Ger ' + abilityName + '.',
     increase: (target, amount, perRank) => 'Ökar ' + target + ' med ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Minskar ' + target + ' med ' + amount + perRank + '.',
+    castWhileMoving: (abilityName) => abilityName + ' kan kastas under rörelse.',
+    addRoot: (abilityName, seconds) =>
+      abilityName + ' rotar också målet i ' + seconds + ' sek.',
+    addAoeRoot: (abilityName, seconds) =>
+      abilityName + ' rotar också träffade mål i ' + seconds + ' sek.',
+    addInterrupt: (abilityName, seconds) =>
+      abilityName + ' avbryter också kast och låser den skolan i ' + seconds + ' sek.',
+    addDot: (abilityName, amount, seconds) =>
+      abilityName + ' orsakar också ' + amount + ' skada över ' + seconds + ' sek.',
+    addLeechDot: (abilityName, amount, seconds) =>
+      abilityName + ' läker dig också för upp till ' + amount + ' över ' + seconds + ' sek.',
   },
   tr_TR: {
     statLabels: {
@@ -217,6 +282,8 @@ export const TALENT_NEW: Record<
       cost: 'maliyet',
       cooldown: 'bekleme süresi',
       castTime: 'büyü süresi',
+      castWhileMoving: 'hareket ederken kullanılabilir',
+      spellCritVsRooted: 'sabitlenmiş hedeflere karşı büyü kritik şansı',
     },
     roleLabels: { tank: 'tank', healer: 'şifacı', dps: 'hasar' },
     perRank: ' her rütbede',
@@ -227,6 +294,17 @@ export const TALENT_NEW: Record<
     grant: (abilityName) => abilityName + ' kazandırır.',
     increase: (target, amount, perRank) => target + ' değerini ' + amount + perRank + ' artırır.',
     reduce: (target, amount, perRank) => target + ' değerini ' + amount + perRank + ' azaltır.',
+    castWhileMoving: (abilityName) => abilityName + ' hareket ederken kullanılabilir.',
+    addRoot: (abilityName, seconds) =>
+      abilityName + ' hedefi ayrıca ' + seconds + ' sn. sabitler.',
+    addAoeRoot: (abilityName, seconds) =>
+      abilityName + ' isabet alan hedefleri ayrıca ' + seconds + ' sn. sabitler.',
+    addInterrupt: (abilityName, seconds) =>
+      abilityName + ' ayrıca büyüyü keser ve o okulu ' + seconds + ' sn. kilitler.',
+    addDot: (abilityName, amount, seconds) =>
+      abilityName + ' ayrıca ' + seconds + ' sn. boyunca ' + amount + ' hasar verir.',
+    addLeechDot: (abilityName, amount, seconds) =>
+      abilityName + ' ayrıca ' + seconds + ' sn. boyunca seni en fazla ' + amount + ' iyileştirir.',
   },
   vi_VN: {
     statLabels: {
@@ -251,6 +329,8 @@ export const TALENT_NEW: Record<
       cost: 'chi phí',
       cooldown: 'thời gian hồi',
       castTime: 'thời gian niệm',
+      castWhileMoving: 'có thể niệm khi di chuyển',
+      spellCritVsRooted: 'tỉ lệ chí mạng phép lên mục tiêu bị trói chân',
     },
     roleLabels: { tank: 'đỡ đòn', healer: 'trị liệu', dps: 'sát thương' },
     perRank: ' mỗi cấp',
@@ -267,5 +347,16 @@ export const TALENT_NEW: Record<
     grant: (abilityName) => 'Trao ' + abilityName + '.',
     increase: (target, amount, perRank) => 'Tăng ' + target + ' thêm ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Giảm ' + target + ' đi ' + amount + perRank + '.',
+    castWhileMoving: (abilityName) => abilityName + ' có thể niệm khi di chuyển.',
+    addRoot: (abilityName, seconds) =>
+      abilityName + ' cũng trói chân mục tiêu trong ' + seconds + ' giây.',
+    addAoeRoot: (abilityName, seconds) =>
+      abilityName + ' cũng trói chân các mục tiêu trúng đòn trong ' + seconds + ' giây.',
+    addInterrupt: (abilityName, seconds) =>
+      abilityName + ' cũng ngắt niệm và khóa hệ đó trong ' + seconds + ' giây.',
+    addDot: (abilityName, amount, seconds) =>
+      abilityName + ' cũng gây ' + amount + ' sát thương trong ' + seconds + ' giây.',
+    addLeechDot: (abilityName, amount, seconds) =>
+      abilityName + ' cũng hồi cho bạn tối đa ' + amount + ' trong ' + seconds + ' giây.',
   },
 };
