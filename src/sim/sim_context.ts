@@ -522,6 +522,10 @@ export interface SimContextCallbacks {
   // moveSpeedMult/swingIntervalMult are M2 decls above -> all deduped.)
   setPlayerLevel(level: number, pid?: number): void;
   notice(pid: number, text: string, color?: string): void;
+  // Dev-only test-dummy spawner backing "/dev bot <name>" (handleDevChat, gated by
+  // devCommands). Adds a stationary whisperable player near the primary; returns the
+  // new pid, or -1 if the name is blank or already taken. Stays on Sim.
+  spawnDevBot(name: string): number;
 
   // L2 inventory/vendor (src/sim/items.ts): the four helpers the moved useItem
   // dispatches to that STAY on Sim (their owning facets are decided later). W2 owns
@@ -876,6 +880,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // G2 social plumbing passthroughs (hasPendingSocialInvite already bound above; deduped).
     setPlayerLevel: host.setPlayerLevel,
     notice: host.notice,
+    spawnDevBot: host.spawnDevBot,
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,

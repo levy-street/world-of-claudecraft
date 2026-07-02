@@ -4,20 +4,23 @@
 // Input instance (movement / camera / jump), dispatching edge-button actions via
 // the host's onAction callback, the virtual-cursor UI-navigation mode, and
 // haptic rumble. Modeled structurally on MobileControls.
-import type { Input } from './input';
+
 import type { GamepadBindings } from './gamepad_bindings';
 import {
-  STANDARD_BUTTON_COUNT,
   AXIS,
-  GP,
-  TRIGGER_THRESHOLD,
   GAMEPAD_NONE,
-  stickToMoveFlags,
-  stickToLook,
+  GP,
   risingEdges,
+  STANDARD_BUTTON_COUNT,
+  stickToLook,
+  stickToMoveFlags,
+  TRIGGER_THRESHOLD,
 } from './gamepad_map';
+import type { Input } from './input';
 
 export interface GamepadCallbacks {
+  // Record one physical button rising edge for the HUD's APM readout.
+  onInputEdge(): void;
   // Dispatch a bound action id (slotN / target / interact / bags / escape / ...).
   // Reuses the host's existing keybind/UI dispatch; jump & autorun are handled
   // here against Input directly and never reach this.
@@ -46,7 +49,11 @@ export class GamepadManager {
   private boundConnect = (e: GamepadEvent) => this.onConnect(e);
   private boundDisconnect = (e: GamepadEvent) => this.onDisconnect(e);
 
-  constructor(private input: Input, private bindings: GamepadBindings, private cb: GamepadCallbacks) {}
+  constructor(
+    private input: Input,
+    private bindings: GamepadBindings,
+    private cb: GamepadCallbacks,
+  ) {}
 
   start(): void {
     if (typeof navigator === 'undefined' || typeof navigator.getGamepads !== 'function') return;
@@ -54,7 +61,10 @@ export class GamepadManager {
     window.addEventListener('gamepaddisconnected', this.boundDisconnect);
     // Pick up a pad that was already connected before we started listening.
     for (const pad of navigator.getGamepads()) {
-      if (pad?.connected) { this.index = pad.index; break; }
+      if (pad?.connected) {
+        this.index = pad.index;
+        break;
+      }
     }
   }
 
@@ -72,12 +82,22 @@ export class GamepadManager {
     this.hideCursor();
   }
 
-  setDeadzone(v: number): void { this.deadzone = Math.min(0.4, Math.max(0.05, v)); }
-  setCameraSpeed(v: number): void { this.camSpeed = Math.max(0.1, v); }
-  setInvertY(on: boolean): void { this.invertY = on; }
-  setVibration(v: number): void { this.vibration = Math.min(1, Math.max(0, v)); }
+  setDeadzone(v: number): void {
+    this.deadzone = Math.min(0.4, Math.max(0.05, v));
+  }
+  setCameraSpeed(v: number): void {
+    this.camSpeed = Math.max(0.1, v);
+  }
+  setInvertY(on: boolean): void {
+    this.invertY = on;
+  }
+  setVibration(v: number): void {
+    this.vibration = Math.min(1, Math.max(0, v));
+  }
 
-  isConnected(): boolean { return this.index !== null; }
+  isConnected(): boolean {
+    return this.index !== null;
+  }
 
   private onConnect(e: GamepadEvent): void {
     if (this.index === null) this.index = e.gamepad.index;
@@ -89,6 +109,14 @@ export class GamepadManager {
       this.prevPressed.fill(false);
       this.input.clearGamepadMove();
       this.hideCursor();
+    }
+  }
+
+  private windowFocused(): boolean {
+    try {
+      return typeof document === 'undefined' || document.hasFocus();
+    } catch {
+      return true;
     }
   }
 
@@ -112,6 +140,17 @@ export class GamepadManager {
     };
     const cur: boolean[] = [];
     for (let i = 0; i < STANDARD_BUTTON_COUNT; i++) cur[i] = pressed(i);
+
+    // Match keyboard and mouse, which the browser only delivers to a focused
+    // window: an unfocused window takes no pad input. Consume the button state
+    // without dispatching so a button held across a refocus does not fire a
+    // stale edge on return.
+    if (!this.windowFocused()) {
+      this.input.clearGamepadMove();
+      this.hideCursor();
+      this.prevPressed = cur;
+      return;
+    }
 
     this.checkRumble();
 
@@ -138,7 +177,10 @@ export class GamepadManager {
     this.input.applyGamepadLook(look.yaw, look.pitch);
 
     // Edge actions: one-shot on each button's rising edge.
-    for (const idx of risingEdges(this.prevPressed, cur)) this.dispatch(idx);
+    for (const idx of risingEdges(this.prevPressed, cur)) {
+      this.cb.onInputEdge();
+      this.dispatch(idx);
+    }
 
     this.prevPressed = cur;
   }
@@ -146,14 +188,23 @@ export class GamepadManager {
   private dispatch(buttonIndex: number): void {
     const action = this.bindings.actionFor(buttonIndex);
     if (action === GAMEPAD_NONE) return;
-    if (action === 'jump') { this.input.triggerGamepadJump(); return; }
-    if (action === 'autorun') { this.input.toggleAutorun(); return; }
+    if (action === 'jump') {
+      this.input.triggerGamepadJump();
+      return;
+    }
+    if (action === 'autorun') {
+      this.input.toggleAutorun();
+      return;
+    }
     this.cb.onAction(action);
   }
 
   // --- Haptics -------------------------------------------------------------
   private checkRumble(): void {
-    if (this.vibration <= 0 || !this.cb.getPlayerHealth) { this.lastHealth = null; return; }
+    if (this.vibration <= 0 || !this.cb.getPlayerHealth) {
+      this.lastHealth = null;
+      return;
+    }
     const hp = this.cb.getPlayerHealth();
     if (this.lastHealth !== null && hp < this.lastHealth) {
       const dmgFrac = Math.min(1, (this.lastHealth - hp) / Math.max(1, this.lastHealth));
@@ -165,7 +216,11 @@ export class GamepadManager {
   /** Fire a dual-rumble effect scaled by the vibration setting (best-effort). */
   rumble(strength: number, durationMs: number): void {
     const pad = this.activePad();
-    const actuator = (pad as unknown as { vibrationActuator?: { playEffect(type: string, opts: object): Promise<unknown> } })?.vibrationActuator;
+    const actuator = (
+      pad as unknown as {
+        vibrationActuator?: { playEffect(type: string, opts: object): Promise<unknown> };
+      }
+    )?.vibrationActuator;
     if (!actuator?.playEffect) return;
     const mag = Math.min(1, Math.max(0, strength)) * this.vibration;
     try {
@@ -174,7 +229,9 @@ export class GamepadManager {
         strongMagnitude: mag,
         weakMagnitude: mag * 0.6,
       });
-    } catch { /* unsupported actuator type */ }
+    } catch {
+      /* unsupported actuator type */
+    }
   }
 
   // --- UI-navigation virtual cursor ---------------------------------------
@@ -200,7 +257,10 @@ export class GamepadManager {
     // Left stick (or d-pad) moves the pointer.
     let mx = pad.axes[AXIS.LEFT_X] ?? 0;
     let my = pad.axes[AXIS.LEFT_Y] ?? 0;
-    if (Math.hypot(mx, my) < this.deadzone) { mx = 0; my = 0; }
+    if (Math.hypot(mx, my) < this.deadzone) {
+      mx = 0;
+      my = 0;
+    }
     if (cur[GP.DPAD_LEFT]) mx = -1;
     if (cur[GP.DPAD_RIGHT]) mx = 1;
     if (cur[GP.DPAD_UP]) my = -1;
@@ -211,6 +271,7 @@ export class GamepadManager {
     el.style.top = `${this.cursorY}px`;
 
     for (const idx of risingEdges(this.prevPressed, cur)) {
+      this.cb.onInputEdge();
       if (idx === GP.A) this.clickAtCursor();
       else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
     }

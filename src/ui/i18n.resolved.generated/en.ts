@@ -177,6 +177,48 @@ export const en: EnTranslations = {
       "title": "Emotes",
       "done": "Done"
     },
+    "dailyRewards": {
+      "title": "Daily Rewards",
+      "close": "Close daily rewards",
+      "loading": "Loading daily rewards...",
+      "error": "Could not load daily rewards.",
+      "intro": "Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.",
+      "prize": "Prize Pool",
+      "reset": "Reset",
+      "endsIn": "Ends in {time}",
+      "remainingLessThanMinute": "<1m",
+      "remainingMinutes": "{minutes}m",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "score": "Score",
+      "walletValue": "Wallet Value (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Unknown",
+      "spinTitle": "Daily Spin",
+      "spinDialogTitle": "Daily Reward Spin",
+      "spinClose": "Close daily spin",
+      "spinReady": "One spin is ready.",
+      "spinClaimed": "Claimed: +{points} points.",
+      "spinResult": "+{points} points",
+      "spinButton": "Spin",
+      "tasks": "Tasks",
+      "leaderboard": "Daily Leaderboard",
+      "history": "Past Winners",
+      "noLeaders": "No points yet.",
+      "noHistory": "No payouts yet.",
+      "walletConnectTitle": "Verify Wallet",
+      "walletConnectBody": "Verify a Solana wallet with WOC to unlock daily rewards.",
+      "walletConnectButton": "Verify Wallet",
+      "walletHoldTitle": "Hold WOC",
+      "walletHoldBody": "Hold at least {amount} USD in WOC to unlock daily rewards.",
+      "walletPriceBody": "WOC pricing is unavailable right now. Check back shortly.",
+      "reason": {
+        "eligible": "Rewards unlocked.",
+        "no_wallet": "Connect a wallet with at least $20 USD in WOC.",
+        "under_minimum": "Wallet is below the $20 USD WOC minimum.",
+        "price_unavailable": "WOC price is unavailable, rewards are temporarily locked."
+      }
+    },
     "theme": {
       "preset": "UI Theme",
       "customColors": "Custom Colors",
@@ -265,6 +307,13 @@ export const en: EnTranslations = {
       "heading": "Heading",
       "minimapZoom": "Minimap zoom"
     },
+    "nativeUpdate": {
+      "title": "Update Available",
+      "body": "A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
+      "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
+      "notNow": "Not now",
+      "update": "Update"
+    },
     "castBar": {
       "playerAria": "Your Cast Bar",
       "targetAria": "Unit Cast Bar"
@@ -340,6 +389,7 @@ export const en: EnTranslations = {
       "uiScale": "UI Scale",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
+      "groundReticle": "Ground-Targeting Reticle",
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
@@ -2626,6 +2676,7 @@ export const en: EnTranslations = {
       "usernameTaken": "That username is already taken.",
       "invalidCredentials": "Invalid username or password.",
       "verificationFailed": "Verification failed. Please try again.",
+      "desktopCodeInvalid": "Desktop login code is invalid or expired. Please try again.",
       "invalidCharacterName": "Invalid character name. Use 2-16 letters.",
       "characterNameNotAllowed": "That character name is not allowed.",
       "invalidClass": "Invalid class.",
@@ -2642,6 +2693,21 @@ export const en: EnTranslations = {
       "takenOver": "Your character was taken over by another session.",
       "renameBeforeEntering": "This character must be renamed before entering the world.",
       "renameNotPermitted": "Renaming this character is not allowed."
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "Downloading update {version}...",
+      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
+      "restart": "Restart now",
+      "later": "Later"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "The game view stopped working. Reload it?",
+      "reload": "Reload",
+      "quit": "Quit",
+      "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
     }
   },
   "realm": {
@@ -3217,7 +3283,7 @@ export const en: EnTranslations = {
       "attack": "Attack",
       "taunt": "Taunt",
       "healDemon": "Heal Demon",
-      "healPet": "Heal Pet",
+      "healPet": "Feed Pet",
       "passive": "Passive",
       "defensive": "Defensive",
       "aggressive": "Aggressive",
@@ -3226,7 +3292,7 @@ export const en: EnTranslations = {
       "petTauntTitle": "Pet Taunt",
       "petTauntDesc": "Command your pet to engage and Growl when in range. 10 second cooldown.",
       "healDemonDesc": "Spend mana to channel healing into your demon over 5 seconds.",
-      "healPetDesc": "Click, then click food in your bags to feed and heal your pet over 5 seconds.",
+      "healPetDesc": "Click, then click food in your bags to feed your pet, healing it over 5 seconds.",
       "stanceTitle": "Pet Stance",
       "stanceDesc": "Click to choose Passive, Defensive, or Aggressive.",
       "passiveDesc": "Only attacks when you command it.",
@@ -3692,6 +3758,26 @@ export const en: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Flamestrike",
+        "description": "Calls down a burst of flame at the target area, dealing {damage} Fire damage to enemies caught in the blast."
+      },
+      "rain_of_fire": {
+        "name": "Rain of Fire",
+        "description": "Calls a rain of fire onto the target area, burning enemies for {damage} Fire damage."
+      },
+      "volley": {
+        "name": "Volley",
+        "description": "Rains arrows on the target area, dealing {damage} damage to enemies caught in it."
+      },
+      "hurricane": {
+        "name": "Hurricane",
+        "description": "Calls a hurricane onto the target area, battering enemies for {damage} Nature damage."
+      },
+      "earthquake": {
+        "name": "Earthquake",
+        "description": "Shakes the target area, battering enemies for {damage} Nature damage."
+      },
       "heroic_strike": {
         "name": "Heroic Strike",
         "description": "A strong attack that increases melee damage by {damage}. Activates on your next swing."

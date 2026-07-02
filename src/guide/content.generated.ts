@@ -425,6 +425,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rapid_fire",
         "name": "Rapid Fire"
+      },
+      {
+        "id": "volley",
+        "name": "Volley"
       }
     ],
     "model": "player_hunter",
@@ -770,6 +774,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "stormstrike",
         "name": "Stormstrike"
+      },
+      {
+        "id": "earthquake",
+        "name": "Earthquake"
       }
     ],
     "model": "player_shaman",
@@ -885,6 +893,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "pyroblast",
         "name": "Pyroblast"
+      },
+      {
+        "id": "flamestrike",
+        "name": "Flamestrike"
       }
     ],
     "model": "player_mage",
@@ -1011,6 +1023,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "summon_doomguard",
         "name": "Summon Doomguard"
+      },
+      {
+        "id": "rain_of_fire",
+        "name": "Rain of Fire"
       }
     ],
     "model": "player_warlock",
@@ -1196,6 +1212,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rip",
         "name": "Rip"
+      },
+      {
+        "id": "hurricane",
+        "name": "Hurricane"
       }
     ],
     "model": "player_druid",

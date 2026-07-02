@@ -145,6 +145,10 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // on by default: desktop ground-targeted spells open a terrain reticle before
+  // casting. Touch keeps the instant target-feet fallback because there is no
+  // persistent cursor to preview.
+  groundReticle: { def: true },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players

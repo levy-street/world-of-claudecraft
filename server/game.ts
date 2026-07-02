@@ -43,6 +43,7 @@ import type {
 import { ChatFilter } from './chat_filter';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
   closePlaySession,
@@ -310,6 +311,7 @@ const HOLDER_TIER_REFRESH_MS = 60_000;
 // to real engagement, not idling. Discord activity grants the rest (bot-driven).
 const PLAYTIME_GRANT_MS = 5 * 60_000;
 const PLAYTIME_POINTS = 10;
+const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
@@ -701,6 +703,7 @@ export class GameServer {
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
+  private dailyRewardActivityInterval: NodeJS.Timeout | null = null;
   private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
@@ -1066,12 +1069,16 @@ export class GameServer {
     this.playtimeInterval = setInterval(() => {
       void this.grantPlaytimePoints();
     }, PLAYTIME_GRANT_MS);
+    this.dailyRewardActivityInterval = setInterval(() => {
+      void this.recordDailyRewardActivity();
+    }, DAILY_REWARD_ACTIVITY_MS);
   }
 
   stop(): void {
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
+    if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
   }
 
   // Grant playtime reward points to each online account that has been ACTIVE (gave
@@ -1088,6 +1095,18 @@ export class GameServer {
         await grantRewardPoints(pool, session.accountId, PLAYTIME_POINTS, 'playtime');
       } catch (err) {
         console.error('playtime reward grant failed:', err);
+      }
+    }
+  }
+
+  private async recordDailyRewardActivity(): Promise<void> {
+    const activeSeconds = await dailyRewardService.activeSeconds();
+    for (const session of this.clients.values()) {
+      if (this.sim.time - session.lastInputAt > activeSeconds) continue;
+      try {
+        await dailyRewardService.recordOnlineMinute(session.accountId);
+      } catch (err) {
+        console.error('daily reward activity record failed:', err);
       }
     }
   }
@@ -2197,6 +2216,19 @@ export class GameServer {
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
         break;
+      case 'castAt':
+        // Ground-targeted cast: the client proposes a world point; the sim clamps
+        // it to the ability's range from the caster (server-authoritative).
+        if (
+          typeof msg.ability === 'string' &&
+          typeof msg.x === 'number' &&
+          typeof msg.z === 'number' &&
+          Number.isFinite(msg.x) &&
+          Number.isFinite(msg.z)
+        ) {
+          sim.castAbility(msg.ability, pid, { x: msg.x, z: msg.z });
+        }
+        break;
       case 'cast':
         if (typeof msg.ability === 'string') sim.castAbility(msg.ability, pid);
         break;
@@ -2252,8 +2284,13 @@ export class GameServer {
           const beforeDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
           sim.turnInQuest(msg.quest, pid);
           const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
-          if (!beforeDone && afterDone && msg.quest === ALDRIC_METEOR_QUEST_ID) {
-            this.noteAccountQuestComplete(session, msg.quest);
+          if (!beforeDone && afterDone) {
+            void dailyRewardService
+              .recordQuestCompletion(session.accountId, msg.quest)
+              .catch((err) => console.error('daily reward quest task failed:', err));
+            if (msg.quest === ALDRIC_METEOR_QUEST_ID) {
+              this.noteAccountQuestComplete(session, msg.quest);
+            }
           }
           this.resyncQuests(session);
         }
@@ -3272,9 +3309,18 @@ export class GameServer {
           `duel:${ev.winnerName}:${ev.loserName}`,
           now,
         );
-      } else if (ev.type === 'arenaEnd' && ev.won && !ev.draw && ev.pid !== undefined) {
+      } else if (ev.type === 'arenaEnd' && !ev.draw && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (!s) continue;
+        void dailyRewardService
+          .recordArenaResult(s.accountId, {
+            won: ev.won,
+            format: ev.format,
+            ratingBefore: ev.ratingBefore,
+            ratingAfter: ev.ratingAfter,
+          })
+          .catch((err) => console.error('daily reward arena task failed:', err));
+        if (!ev.won) continue;
         enqueueActivity(
           {
             kind: 'arena',
@@ -3393,8 +3439,14 @@ export class GameServer {
     let id: number | undefined;
     if ('targetId' in ev && typeof ev.targetId === 'number') id = ev.targetId;
     else if ('entityId' in ev && typeof ev.entityId === 'number') id = ev.entityId;
-    if (id === undefined) return null; // chat/log etc: broadcast
-    return this.sim.entities.get(id)?.pos ?? null;
+    if (id !== undefined) return this.sim.entities.get(id)?.pos ?? null;
+    // world-coordinate events (spellfxAt: a ground-targeted impact) anchor at
+    // their own point so they interest-scope like entity-anchored fx instead
+    // of fanning out server-wide (dist2d ignores y)
+    if ('x' in ev && 'z' in ev && typeof ev.x === 'number' && typeof ev.z === 'number') {
+      return { x: ev.x, y: 0, z: ev.z };
+    }
+    return null; // chat/log etc: broadcast
   }
 
   private isSpectateLocalChat(session: ClientSession, text: string): boolean {

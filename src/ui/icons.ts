@@ -2087,7 +2087,49 @@ function r(
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
+  // Talents 2.0 ground-targeted spells (each aimed AoE gets a distinct recipe;
+  // grouped here so the family reads together, order within the map is cosmetic).
+  flamestrike: r('fire', 'ember', ['meteor', { p: 'sunburst', ...BIG }], ['glow']),
+  rain_of_fire: r(
+    'fire',
+    'ember',
+    [
+      { p: 'flame', x: -11, y: -11, s: 0.6 },
+      { p: 'flame', s: 0.72 },
+      { p: 'flame', x: 11, y: 11, s: 0.84 },
+    ],
+    ['drips'],
+  ),
+  volley: r(
+    'storm',
+    'sky',
+    [
+      { p: 'arrow', x: -11, y: -11, s: 0.6 },
+      { p: 'arrow', s: 0.72 },
+      { p: 'arrow', x: 11, y: 11, s: 0.84 },
+    ],
+    ['motion'],
+  ),
+  hurricane: r(
+    'nature',
+    'leafGreen',
+    [
+      { p: 'leaf', x: -11, y: -10, s: 0.62 },
+      { p: 'leaf', s: 0.74 },
+      { p: 'leaf', x: 11, y: 10, s: 0.62 },
+    ],
+    ['arcs'],
+  ),
+  earthquake: r('earth', 'earthBrown', ['sunburst'], ['crack']),
   attack: r('steel', 'steel', ['sword'], ['motion']),
+  // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
+  pet_attack: r('blood', 'blood', ['fang'], ['motion']),
+  pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
+  pet_feed: r('food', 'ember', ['meat']), // roasted meat: hunters feed, not magic-heal
+  pet_mend: r('shadow', 'shadowPurple', ['heart'], ['drips']),
+  pet_passive: r('nature', 'earthBrown', ['paw']),
+  pet_defensive: r('leather', 'earthBrown', ['shield']),
+  pet_aggressive: r('fury', 'blood', ['claw_slash'], ['glow']),
   // warrior
   heroic_strike: r('fury', 'steel', ['sword'], ['glow']),
   battle_shout: r('fury', 'gold', ['fist'], ['arcs']),
@@ -3001,6 +3043,128 @@ export function abilityImageUrl(id: string): string | null {
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
+// Item ids with committed painted art under /ui/items/<id>.webp (curated from the CraftPix
+// resource/consumable packs; provenance + license in public/ui/items/mapping.json). Served
+// for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Items not listed fall
+// through to the procedural ITEM_RECIPES below. WebP only, like the skill icons. Add art via
+// `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
+const ITEM_ICON_DIR = '/ui/items';
+export const ITEM_IMAGE_IDS = new Set<string>([
+  // food
+  'baked_bread',
+  'brightwood_venison',
+  'conjured_bread',
+  'conjured_bread3',
+  'fenbridge_rye',
+  'glimmerfin_koi',
+  'raw_bog_eel',
+  'raw_frostgill_trout',
+  'raw_marsh_pike',
+  'raw_mirror_trout',
+  'raw_river_perch',
+  'raw_stonescale_carp',
+  'roast_mountain_goat',
+  'roasted_boar',
+  'smoked_eel',
+  'tough_jerky',
+  'trail_hardtack',
+  // drink
+  'conjured_water',
+  'conjured_water2',
+  'conjured_water3',
+  'glacier_melt',
+  'marsh_mint_tea',
+  'silvermist_cordial',
+  'spring_water',
+  // potion
+  'healing_potion',
+  'lesser_healing_potion',
+  'lesser_mana_potion',
+  'mana_potion',
+  'minor_healing_potion',
+  // elixir
+  'elixir_of_the_bear',
+  // junk
+  'amber_hide',
+  'bogiron_nugget',
+  'bone_fragments',
+  'chipped_tusk',
+  'cracked_fetish',
+  'cracked_ogre_tusk',
+  'cracked_wyrm_scale',
+  'deepfen_pearl',
+  'emberwing_cinderscale',
+  'frayed_prayer_beads',
+  'inert_storm_shard',
+  'linen_scrap',
+  'moonpale_scale',
+  'mudfin_scale',
+  'ogre_toe_ring',
+  'old_cragmaws_pelt',
+  'pale_pearl',
+  'soft_down',
+  'stag_antler',
+  'tangled_weed',
+  'wolf_fang',
+  // quest
+  'bastion_ward_stone',
+  'blessed_embers',
+  'boar_hide',
+  'crypt_keystone',
+  'crypt_ritual_circle',
+  'cult_cipher',
+  'drowned_offering',
+  'fen_muster_order',
+  'ghostly_essence',
+  'glowing_wax',
+  'grave_high_priest_malric',
+  'gravecaller_sigil',
+  'gravewyrm_sigil',
+  'greyjaw_fang',
+  'grubjaw_tusk',
+  'highwatch_summons',
+  'kazzix_heartshard',
+  'lost_caravan_goods',
+  'mire_prowler_pelt',
+  'moongate_rubbing',
+  'morthen_grimoire',
+  'palecoil_heartscale',
+  'priests_sigil',
+  'ridge_stalker_pelt',
+  'ritual_phylactery',
+  'royal_seal',
+  'runed_bone_shard',
+  'storm_core',
+  'supply_crate',
+  'the_codfather',
+  'troll_fetish',
+  'weathered_ledger_page',
+  'webwood_silk',
+  'widow_venom_sac',
+  'wyrmcult_orders',
+  // tool
+  'alien_armor_plate',
+  'amber_crimson_armor_plate',
+  'amethyst_silver_armor_plate',
+  'crimson_amber_armor_plate',
+  'cyan_magenta_armor_plate',
+  'event_skin_token',
+  'forest_pink_armor_plate',
+  'imperial_crimson_armor_plate',
+  'imperial_gold_armor_plate',
+  'ivory_copper_armor_plate',
+  'magenta_cyan_armor_plate',
+  'pink_forest_armor_plate',
+  'simple_fishing_pole',
+  'steel_orange_armor_plate',
+  'vanguard_azure_armor_plate',
+]);
+
+/** Static URL of an item's image icon, or null if it uses a recipe. */
+export function itemImageUrl(id: string): string | null {
+  return ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
+}
+
 const urlCache = new Map<string, string>();
 const warnedIds = new Set<string>();
 
@@ -3059,7 +3223,9 @@ export function iconCanvas(
 // data URL. Both forms work as an <img src> or CSS background-image.
 export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_ICON_SIZE): string {
   if (kind === 'item') {
-    const img = weaponIconUrl(id);
+    const weapon = weaponIconUrl(id);
+    if (weapon) return weapon;
+    const img = itemImageUrl(id);
     if (img) return img;
   }
   // Abilities, and auras that carry a real ability id (a DoT/buff applied by that

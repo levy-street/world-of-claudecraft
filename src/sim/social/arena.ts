@@ -728,6 +728,7 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   e.targetId = null;
   e.autoAttack = false;
   e.queuedOnSwing = null;
+  delete e.queuedOnSwingFree;
   e.castingAbility = null;
   e.castRemaining = 0;
   e.channeling = false;

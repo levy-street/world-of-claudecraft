@@ -432,7 +432,7 @@ describe('client HTML shell', () => {
     // on the target frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'elite'");
     expect(hudTs).toMatch(/this\.setStyleProp\(\s*this\.targetNameEl,\s*'color',/);
-    expect(hudTs).toContain("this.toggleClass(pip as HTMLElement, 'on', i < points);");
+    expect(hudTs).toContain("this.toggleClass(pips[i] as HTMLElement, 'on', i < points);");
     // The forced-colors hostile cue is a non-color redundant marker on the target
     // name, routed through the same elided toggleClass writer (no raw class write on the
     // per-frame hot path) so it stays write-elided.
@@ -470,7 +470,9 @@ describe('client HTML shell', () => {
     expect(html).toContain('<li class="nav-item" id="nav-item-account" hidden>');
     expect(html).toContain('<li class="nav-item" id="nav-item-logout" hidden>');
     expect(mainTs).toContain('if (api.restoreSession()) {');
-    expect(mainTs).toContain('} else {\n    enterLoggedOutChrome();\n  }');
+    expect(mainTs).toContain(
+      "} else {\n    enterLoggedOutChrome();\n    if (isDesktopLoginPage()) show('#login-panel');\n  }",
+    );
   });
 
   it('keeps the Discord unlink panel clickable over the pre-game shell', () => {
@@ -624,15 +626,19 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("'DiscordClick'");
   });
 
-  it('excludes wallet verification surfaces from native app builds', () => {
+  it('excludes wallet verification surfaces from native and desktop app builds', () => {
     expect(hudCss).toContain('body.native-app #nav-btn-download,');
     expect(hudCss).toContain(
       'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
     );
     expect(hudCss).toContain('body.native-app #performance-tip,');
+    expect(hudCss).toContain(
+      'body.desktop-app #token-ca,\n  body.desktop-app .cs-wallet,\n  body.desktop-app .cs-wallet-hidden-note,\n  body.desktop-app .account-wallet-card,\n  body.desktop-app .official-site-copy',
+    );
     expect(html).toContain('<section class="account-card account-wallet-card">');
+    expect(mainTs).toContain("document.body.classList.toggle('desktop-app', DESKTOP_APP);");
     expect(mainTs).toContain(
-      "const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
+      "!NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
     );
     expect(mainTs).toContain("document.querySelector('.cs-wallet')?.remove();");
     expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");

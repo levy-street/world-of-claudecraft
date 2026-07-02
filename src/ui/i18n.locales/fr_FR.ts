@@ -65,6 +65,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Réglages de butin : Butin par maître, maître du butin {name}, seuil {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Seuil de butin réglé sur {threshold}.',
   'hudChrome.options.showDevBadges': 'Afficher les badges de développeur',
+  'hudChrome.options.groundReticle': 'Réticule de ciblage au sol',
   'hudChrome.options.startAttackOnAbility': "Attaque auto à l'utilisation d'une compétence",
   'hudChrome.party.promoteLeader': 'Promouvoir chef',
   'hudChrome.statInfo.desc.spellPower':
@@ -1713,6 +1714,21 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     'Provoque la cible: votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s.',
   'entities.abilities.fireball.name': 'Boule de feu',
+  'entities.abilities.rain_of_fire.name': 'Pluie de feu',
+  'entities.abilities.rain_of_fire.description':
+    'Fait pleuvoir du feu sur la zone visée, brûlant les ennemis pour {damage} points de dégâts de Feu.',
+  'entities.abilities.volley.name': 'Volée de flèches',
+  'entities.abilities.volley.description':
+    'Fait pleuvoir des flèches sur la zone visée, infligeant {damage} points de dégâts aux ennemis présents.',
+  'entities.abilities.hurricane.name': 'Ouragan',
+  'entities.abilities.hurricane.description':
+    'Déchaîne un ouragan sur la zone visée, frappant les ennemis pour {damage} points de dégâts de Nature.',
+  'entities.abilities.earthquake.name': 'Tremblement de terre',
+  'entities.abilities.earthquake.description':
+    'Fait trembler la zone visée, frappant les ennemis pour {damage} points de dégâts de Nature.',
+  'entities.abilities.flamestrike.name': 'Frappe enflammée',
+  'entities.abilities.flamestrike.description':
+    "Fait s'abattre une explosion de flammes sur la zone visée, infligeant {damage} points de dégâts de Feu aux ennemis pris dans la déflagration.",
   'entities.abilities.fireball.description':
     'Lance une boule enflammée qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée.',
   'entities.abilities.frost_armor.name': 'Armure de givre',
@@ -5142,4 +5158,69 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': "Besoin d'aide",
   'hudChrome.discord.relay.help.hint': "Demander de l'aide à la communauté",
   'hudChrome.options.showSecondaryActionBar': "Afficher la barre d'action secondaire",
+  'errors.api.desktopCodeInvalid':
+    "Le code de connexion de l'application de bureau est invalide ou expiré. Veuillez réessayer.",
+  'desktop.crash.body': "L'affichage du jeu a cessé de fonctionner. Le recharger ?",
+  'desktop.crash.fatalBody':
+    'World of ClaudeCraft a rencontré une erreur inattendue et doit se fermer.',
+  'desktop.crash.quit': 'Quitter',
+  'desktop.crash.reload': 'Recharger',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.update.downloading': 'Téléchargement de la mise à jour {version}...',
+  'desktop.update.later': 'Plus tard',
+  'desktop.update.ready':
+    "La mise à jour {version} est prête. Elle s'installe à la fermeture, ou redémarrez maintenant.",
+  'desktop.update.restart': 'Redémarrer maintenant',
+  'hudChrome.dailyRewards.close': 'Fermer les récompenses quotidiennes',
+  'hudChrome.dailyRewards.endsIn': 'Se termine dans {time}',
+  'hudChrome.dailyRewards.error': 'Impossible de charger les récompenses quotidiennes.',
+  'hudChrome.dailyRewards.history': 'Anciens gagnants',
+  'hudChrome.dailyRewards.intro':
+    'Détenez assez de WOC dans votre portefeuille vérifié pour débloquer les récompenses quotidiennes. Gagnez des points grâce à un tour quotidien et à des tâches en rotation, puis grimpez dans le classement quotidien pour remporter une part de la cagnotte.',
+  'hudChrome.dailyRewards.leaderboard': 'Classement quotidien',
+  'hudChrome.dailyRewards.loading': 'Chargement des récompenses quotidiennes...',
+  'hudChrome.dailyRewards.noHistory': "Aucun versement pour l'instant.",
+  'hudChrome.dailyRewards.noLeaders': "Aucun point pour l'instant.",
+  'hudChrome.dailyRewards.prize': 'Cagnotte',
+  'hudChrome.dailyRewards.reason.eligible': 'Récompenses débloquées.',
+  'hudChrome.dailyRewards.reason.no_wallet':
+    'Connectez un portefeuille contenant au moins 20 USD en WOC.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'Le cours du WOC est indisponible, les récompenses sont temporairement verrouillées.',
+  'hudChrome.dailyRewards.reason.under_minimum':
+    'Le portefeuille est en dessous du minimum de 20 USD en WOC.',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}h {minutes}min',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1min',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}min',
+  'hudChrome.dailyRewards.reset': 'Réinitialisation',
+  'hudChrome.dailyRewards.score': 'Score',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.spinButton': 'Tourner',
+  'hudChrome.dailyRewards.spinClaimed': 'Récupéré : +{points} points.',
+  'hudChrome.dailyRewards.spinClose': 'Fermer le tour quotidien',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Tour de récompense quotidien',
+  'hudChrome.dailyRewards.spinReady': 'Un tour est disponible.',
+  'hudChrome.dailyRewards.spinResult': '+{points} points',
+  'hudChrome.dailyRewards.spinTitle': 'Tour quotidien',
+  'hudChrome.dailyRewards.tasks': 'Tâches',
+  'hudChrome.dailyRewards.title': 'Récompenses quotidiennes',
+  'hudChrome.dailyRewards.unknown': 'Inconnu',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Vérifiez un portefeuille Solana contenant du WOC pour débloquer les récompenses quotidiennes.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Vérifier le portefeuille',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Vérifier le portefeuille',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Détenez au moins {amount} USD en WOC pour débloquer les récompenses quotidiennes.',
+  'hudChrome.dailyRewards.walletHoldTitle': 'Détenir du WOC',
+  'hudChrome.dailyRewards.walletPriceBody':
+    "Le cours du WOC est indisponible pour le moment. Revenez d'ici peu.",
+  'hudChrome.dailyRewards.walletValue': 'Valeur du portefeuille (WOC)',
+  'hudChrome.nativeUpdate.body':
+    'Une nouvelle version de World of ClaudeCraft est disponible. Mettez à jour maintenant pour les derniers correctifs et améliorations.',
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    'La version {version} de World of ClaudeCraft est disponible. Mettez à jour maintenant pour les derniers correctifs et améliorations.',
+  'hudChrome.nativeUpdate.notNow': 'Pas maintenant',
+  'hudChrome.nativeUpdate.title': 'Mise à jour disponible',
+  'hudChrome.nativeUpdate.update': 'Mettre à jour',
 };

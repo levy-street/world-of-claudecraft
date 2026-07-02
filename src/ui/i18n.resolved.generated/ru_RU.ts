@@ -177,6 +177,48 @@ export const ru_RU: EnTranslations = {
       "title": "Эмоции",
       "done": "Готово"
     },
+    "dailyRewards": {
+      "title": "Ежедневные награды",
+      "close": "Закрыть ежедневные награды",
+      "loading": "Загрузка ежедневных наград...",
+      "error": "Не удалось загрузить ежедневные награды.",
+      "intro": "Держите достаточно WOC в подтвержденном кошельке, чтобы открыть ежедневные награды. Зарабатывайте очки за один ежедневный спин и сменяющиеся задания, затем поднимайтесь в ежедневной таблице лидеров ради доли призового фонда.",
+      "prize": "Призовой фонд",
+      "reset": "Сброс",
+      "endsIn": "Осталось {time}",
+      "remainingLessThanMinute": "<1м",
+      "remainingMinutes": "{minutes}м",
+      "remainingHoursMinutes": "{hours}ч {minutes}м",
+      "score": "Счёт",
+      "walletValue": "Стоимость кошелька (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Неизвестно",
+      "spinTitle": "Ежедневный спин",
+      "spinDialogTitle": "Спин ежедневной награды",
+      "spinClose": "Закрыть ежедневный спин",
+      "spinReady": "Доступен один спин.",
+      "spinClaimed": "Получено: +{points} очков.",
+      "spinResult": "+{points} очков",
+      "spinButton": "Крутить",
+      "tasks": "Задания",
+      "leaderboard": "Ежедневная таблица лидеров",
+      "history": "Прошлые победители",
+      "noLeaders": "Пока нет очков.",
+      "noHistory": "Пока нет выплат.",
+      "walletConnectTitle": "Подтвердить кошелек",
+      "walletConnectBody": "Подтвердите кошелек Solana с WOC, чтобы открыть ежедневные награды.",
+      "walletConnectButton": "Подтвердить кошелек",
+      "walletHoldTitle": "Держите WOC",
+      "walletHoldBody": "Держите не менее {amount} USD в WOC, чтобы открыть ежедневные награды.",
+      "walletPriceBody": "Цена WOC сейчас недоступна. Загляните чуть позже.",
+      "reason": {
+        "eligible": "Награды открыты.",
+        "no_wallet": "Подключите кошелек с не менее чем $20 USD в WOC.",
+        "under_minimum": "Кошелек ниже минимума в $20 USD WOC.",
+        "price_unavailable": "Цена WOC недоступна, награды временно заблокированы."
+      }
+    },
     "theme": {
       "preset": "Тема интерфейса",
       "customColors": "Настраиваемые цвета",
@@ -265,6 +307,13 @@ export const ru_RU: EnTranslations = {
       "heading": "Направление",
       "minimapZoom": "Масштаб миникарты"
     },
+    "nativeUpdate": {
+      "title": "Доступно обновление",
+      "body": "Доступна новая версия World of ClaudeCraft. Обновите сейчас, чтобы получить последние исправления и улучшения.",
+      "bodyWithVersion": "Доступна версия {version} World of ClaudeCraft. Обновите сейчас, чтобы получить последние исправления и улучшения.",
+      "notNow": "Не сейчас",
+      "update": "Обновить"
+    },
     "castBar": {
       "playerAria": "Ваша полоса применения",
       "targetAria": "Полоса применения цели"
@@ -340,6 +389,7 @@ export const ru_RU: EnTranslations = {
       "uiScale": "Масштаб интерфейса",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
+      "groundReticle": "Прицел наземного наведения",
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
@@ -2626,6 +2676,7 @@ export const ru_RU: EnTranslations = {
       "usernameTaken": "Это имя пользователя уже занято.",
       "invalidCredentials": "Неверное имя пользователя или пароль.",
       "verificationFailed": "Проверка не пройдена. Повторите попытку.",
+      "desktopCodeInvalid": "Код входа для настольного приложения недействителен или истёк. Повторите попытку.",
       "invalidCharacterName": "Недопустимое имя персонажа. Используйте 2-16 букв.",
       "characterNameNotAllowed": "Это имя персонажа запрещено.",
       "invalidClass": "Недопустимый класс.",
@@ -2642,6 +2693,21 @@ export const ru_RU: EnTranslations = {
       "takenOver": "Вашего персонажа перехватила другая сессия.",
       "renameBeforeEntering": "Перед входом в мир этому персонажу нужно сменить имя.",
       "renameNotPermitted": "Переименование этого персонажа не разрешено."
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "Загрузка обновления {version}...",
+      "ready": "Обновление {version} готово. Оно установится при выходе из игры, либо перезапустите сейчас.",
+      "restart": "Перезапустить сейчас",
+      "later": "Позже"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "Игровой экран перестал отвечать. Перезагрузить его?",
+      "reload": "Перезагрузить",
+      "quit": "Выйти",
+      "fatalBody": "World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта."
     }
   },
   "realm": {
@@ -3692,6 +3758,26 @@ export const ru_RU: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Огненный удар",
+        "description": "Обрушивает огненный взрыв на указанную область, нанося {damage} ед. урона от огня врагам в зоне взрыва."
+      },
+      "rain_of_fire": {
+        "name": "Огненный дождь",
+        "description": "Обрушивает огненный дождь на указанную область, сжигая врагов и нанося {damage} ед. урона от огня."
+      },
+      "volley": {
+        "name": "Залп",
+        "description": "Осыпает указанную область стрелами, нанося {damage} ед. урона врагам в ней."
+      },
+      "hurricane": {
+        "name": "Ураган",
+        "description": "Обрушивает ураган на указанную область, нанося врагам {damage} ед. урона силами природы."
+      },
+      "earthquake": {
+        "name": "Землетрясение",
+        "description": "Сотрясает указанную область, нанося врагам {damage} ед. урона силами природы."
+      },
       "heroic_strike": {
         "name": "Удар героя",
         "description": "Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием."

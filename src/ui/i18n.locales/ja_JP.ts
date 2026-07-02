@@ -14,6 +14,46 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  // Daily rewards (M16 non-Latin fill)
+  'hudChrome.dailyRewards.title': 'デイリー報酬',
+  'hudChrome.dailyRewards.close': 'デイリー報酬を閉じる',
+  'hudChrome.dailyRewards.loading': 'デイリー報酬を読み込み中...',
+  'hudChrome.dailyRewards.error': 'デイリー報酬を読み込めませんでした。',
+  'hudChrome.dailyRewards.intro':
+    '認証済みウォレットに十分なWOCを保有すると、デイリー報酬が解放されます。1日1回のスピンとローテーションするタスクでポイントを獲得し、デイリーランキングを駆け上がって賞金プールの分け前を狙いましょう。',
+  'hudChrome.dailyRewards.prize': '賞金プール',
+  'hudChrome.dailyRewards.reset': 'リセット',
+  'hudChrome.dailyRewards.score': 'スコア',
+  'hudChrome.dailyRewards.walletValue': 'ウォレット価値 (WOC)',
+  'hudChrome.dailyRewards.unknown': '不明',
+  'hudChrome.dailyRewards.spinTitle': 'デイリースピン',
+  'hudChrome.dailyRewards.spinDialogTitle': 'デイリー報酬スピン',
+  'hudChrome.dailyRewards.spinClose': 'デイリースピンを閉じる',
+  'hudChrome.dailyRewards.spinReady': 'スピンが1回可能です。',
+  'hudChrome.dailyRewards.spinClaimed': '獲得: +{points} ポイント。',
+  'hudChrome.dailyRewards.spinResult': '+{points} ポイント',
+  'hudChrome.dailyRewards.spinButton': 'スピン',
+  'hudChrome.dailyRewards.tasks': 'タスク',
+  'hudChrome.dailyRewards.leaderboard': 'デイリーランキング',
+  'hudChrome.dailyRewards.history': '過去の当選者',
+  'hudChrome.dailyRewards.noLeaders': 'まだポイントがありません。',
+  'hudChrome.dailyRewards.noHistory': 'まだ支払いがありません。',
+  'hudChrome.dailyRewards.walletConnectTitle': 'ウォレットを認証',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'WOCを保有するSolanaウォレットを認証して、デイリー報酬を解放しましょう。',
+  'hudChrome.dailyRewards.walletConnectButton': 'ウォレットを認証',
+  'hudChrome.dailyRewards.walletHoldTitle': 'WOCを保有',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'デイリー報酬を解放するには、少なくとも {amount} USD 相当のWOCを保有してください。',
+  'hudChrome.dailyRewards.walletPriceBody':
+    '現在WOCの価格を取得できません。しばらくしてから再度ご確認ください。',
+  'hudChrome.dailyRewards.reason.eligible': '報酬が解放されました。',
+  'hudChrome.dailyRewards.reason.no_wallet':
+    '$20 USD 相当以上のWOCを保有するウォレットを接続してください。',
+  'hudChrome.dailyRewards.reason.under_minimum':
+    'ウォレットが最低額の $20 USD 相当のWOCを下回っています。',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'WOCの価格を取得できないため、報酬は一時的にロックされています。',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.loot.chestTitle': '宝箱',
@@ -124,6 +164,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.knob.rage': '怒り',
   'hudChrome.theme.knob.energy': 'エネルギー',
   'hudChrome.options.interfaceMode': '操作モード',
+  'hudChrome.options.groundReticle': '地面ターゲットのレティクル',
   'hudChrome.options.interfaceModeAuto': '自動',
   'hudChrome.options.interfaceModeDesktop': 'デスクトップ',
   'hudChrome.options.interfaceModeTouch': 'タッチ',
@@ -714,6 +755,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'errors.api.usernameTaken': 'そのユーザー名は既に使われています。',
   'errors.api.invalidCredentials': 'ユーザー名またはパスワードが正しくありません。',
   'errors.api.verificationFailed': '確認に失敗しました。もう一度お試しください。',
+  'errors.api.desktopCodeInvalid':
+    'デスクトップ版のログインコードが無効か期限切れです。もう一度お試しください。',
   'errors.api.invalidCharacterName': 'キャラクター名が無効です。2-16文字の英字を使用してください。',
   'errors.api.characterNameNotAllowed': 'そのキャラクター名は使用できません。',
   'errors.api.invalidClass': '無効なクラスです。',
@@ -1669,6 +1712,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
   'entities.abilities.fireball.name': 'ファイアボール',
+  'entities.abilities.rain_of_fire.name': '火炎の雨',
+  'entities.abilities.rain_of_fire.description':
+    '対象地点に火の雨を降らせ、敵に{damage}の火炎ダメージを与えます。',
+  'entities.abilities.volley.name': '乱射',
+  'entities.abilities.volley.description':
+    '対象地点に矢を降らせ、範囲内の敵に{damage}のダメージを与えます。',
+  'entities.abilities.hurricane.name': 'ハリケーン',
+  'entities.abilities.hurricane.description':
+    '対象地点にハリケーンを呼び起こし、敵に{damage}の自然ダメージを与えます。',
+  'entities.abilities.earthquake.name': '地震',
+  'entities.abilities.earthquake.description':
+    '対象地点を揺るがし、敵に{damage}の自然ダメージを与えます。',
+  'entities.abilities.flamestrike.name': 'フレイムストライク',
+  'entities.abilities.flamestrike.description':
+    '対象地点に炎の爆発を呼び出し、爆発に巻き込まれた敵に{damage}の火炎ダメージを与えます。',
   'entities.abilities.fireball.description':
     '炎の球を放ち、{damage} の火炎ダメージと追加の継続ダメージを与えます。',
   'entities.abilities.frost_armor.name': 'フロストアーマー',
@@ -4957,4 +5015,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.devBadge.link.error': 'GitHub を連携できませんでした。もう一度お試しください。',
   'hudChrome.devBadge.linkedAs': '{login} として連携済み',
   'hudChrome.devBadge.unlink': 'GitHub の連携を解除',
+  'hudChrome.nativeUpdate.title': 'アップデートがあります',
+  'hudChrome.nativeUpdate.body':
+    'World of ClaudeCraft の新しいバージョンが利用可能です。今すぐアップデートして最新の修正と改善を入手しましょう。',
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    'World of ClaudeCraft のバージョン {version} が利用可能です。今すぐアップデートして最新の修正と改善を入手しましょう。',
+  'hudChrome.nativeUpdate.notNow': '後で',
+  'hudChrome.nativeUpdate.update': '更新',
+  'desktop.update.downloading': 'アップデート {version} をダウンロード中...',
+  'desktop.update.ready':
+    'アップデート {version} の準備ができました。ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。',
+  'desktop.update.restart': '今すぐ再起動',
+  'desktop.update.later': '後で',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
+  'desktop.crash.reload': '再読み込み',
+  'desktop.crash.quit': '終了',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
+  'hudChrome.dailyRewards.endsIn': '終了まで{time}',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}時間{minutes}分',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '1分未満',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}分',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
 };

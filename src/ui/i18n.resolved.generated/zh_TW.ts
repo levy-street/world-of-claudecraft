@@ -177,6 +177,48 @@ export const zh_TW: EnTranslations = {
       "title": "表情",
       "done": "完成"
     },
+    "dailyRewards": {
+      "title": "每日獎勵",
+      "close": "關閉每日獎勵",
+      "loading": "正在載入每日獎勵...",
+      "error": "無法載入每日獎勵。",
+      "intro": "在已驗證的錢包中持有足夠的 WOC 即可解鎖每日獎勵。透過每日一次轉盤與輪換任務賺取點數，再登上每日排行榜以分得獎池的一份獎勵。",
+      "prize": "獎池",
+      "reset": "重置",
+      "endsIn": "{time}後結束",
+      "remainingLessThanMinute": "<1分",
+      "remainingMinutes": "{minutes}分",
+      "remainingHoursMinutes": "{hours}小時{minutes}分",
+      "score": "分數",
+      "walletValue": "錢包價值 (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "未知",
+      "spinTitle": "每日轉盤",
+      "spinDialogTitle": "每日獎勵轉盤",
+      "spinClose": "關閉每日轉盤",
+      "spinReady": "有一次轉盤可用。",
+      "spinClaimed": "已領取：+{points} 點。",
+      "spinResult": "+{points} 點",
+      "spinButton": "轉動",
+      "tasks": "任務",
+      "leaderboard": "每日排行榜",
+      "history": "歷屆得獎者",
+      "noLeaders": "尚無點數。",
+      "noHistory": "尚無派彩紀錄。",
+      "walletConnectTitle": "驗證錢包",
+      "walletConnectBody": "驗證持有 WOC 的 Solana 錢包以解鎖每日獎勵。",
+      "walletConnectButton": "驗證錢包",
+      "walletHoldTitle": "持有 WOC",
+      "walletHoldBody": "持有至少價值 {amount} USD 的 WOC 以解鎖每日獎勵。",
+      "walletPriceBody": "目前無法取得 WOC 價格，請稍後再試。",
+      "reason": {
+        "eligible": "獎勵已解鎖。",
+        "no_wallet": "請連接持有至少 $20 USD WOC 的錢包。",
+        "under_minimum": "錢包低於 $20 USD 的 WOC 最低要求。",
+        "price_unavailable": "無法取得 WOC 價格，獎勵暫時鎖定。"
+      }
+    },
     "theme": {
       "preset": "介面主題",
       "customColors": "自訂顏色",
@@ -265,6 +307,13 @@ export const zh_TW: EnTranslations = {
       "heading": "方位",
       "minimapZoom": "小地圖縮放"
     },
+    "nativeUpdate": {
+      "title": "有可用更新",
+      "body": "World of ClaudeCraft 有新版本可用。立即更新以取得最新修正與改進。",
+      "bodyWithVersion": "World of ClaudeCraft {version} 版本已可用。立即更新以取得最新修正與改進。",
+      "notNow": "暫不",
+      "update": "更新"
+    },
     "castBar": {
       "playerAria": "你的施法條",
       "targetAria": "目標施法條"
@@ -340,6 +389,7 @@ export const zh_TW: EnTranslations = {
       "uiScale": "介面縮放",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
+      "groundReticle": "地面瞄準指示圈",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
@@ -2626,6 +2676,7 @@ export const zh_TW: EnTranslations = {
       "usernameTaken": "此使用者名稱已被使用。",
       "invalidCredentials": "使用者名稱或密碼無效。",
       "verificationFailed": "驗證失敗，請重試。",
+      "desktopCodeInvalid": "桌面版登入代碼無效或已過期，請重試。",
       "invalidCharacterName": "角色名稱無效。請使用 2-16 個字母。",
       "characterNameNotAllowed": "此角色名稱不可使用。",
       "invalidClass": "職業無效。",
@@ -2642,6 +2693,21 @@ export const zh_TW: EnTranslations = {
       "takenOver": "你的角色已被另一個工作階段接管。",
       "renameBeforeEntering": "此角色必須先更名才能進入世界。",
       "renameNotPermitted": "不允許為此角色更名。"
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "正在下載更新 {version}...",
+      "ready": "更新 {version} 已就緒。離開遊戲時將自動安裝，也可立即重新啟動。",
+      "restart": "立即重新啟動",
+      "later": "稍後"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "遊戲畫面已停止運作。要重新載入嗎？",
+      "reload": "重新載入",
+      "quit": "離開",
+      "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
     }
   },
   "realm": {
@@ -3692,6 +3758,26 @@ export const zh_TW: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "烈焰風暴",
+        "description": "在目標區域召喚一次烈焰爆發，對爆炸範圍內的敵人造成 {damage} 點火焰傷害。"
+      },
+      "rain_of_fire": {
+        "name": "烈火之雨",
+        "description": "在目標區域降下烈火之雨，灼燒敵人，造成 {damage} 點火焰傷害。"
+      },
+      "volley": {
+        "name": "亂射",
+        "description": "向目標區域射出箭雨，對其中的敵人造成 {damage} 點傷害。"
+      },
+      "hurricane": {
+        "name": "颶風",
+        "description": "在目標區域召喚颶風，重擊敵人，造成 {damage} 點自然傷害。"
+      },
+      "earthquake": {
+        "name": "地震",
+        "description": "撼動目標區域，重擊敵人，造成 {damage} 點自然傷害。"
+      },
       "heroic_strike": {
         "name": "英勇打擊",
         "description": "一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。"

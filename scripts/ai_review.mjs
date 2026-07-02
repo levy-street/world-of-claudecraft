@@ -1,48 +1,103 @@
 // Minimal AI pull-request reviewer. Sends the PR diff to an OpenRouter model (default:
-// the free openrouter/owl-alpha stealth model) and posts the review as a single sticky
-// comment on the PR. No new npm deps: Node 18+ global fetch + the GitHub REST API.
+// the free nvidia/nemotron-3-ultra-550b-a55b:free model) and posts the review as a
+// sticky comment on the PR. No new npm deps: Node 18+ global fetch + the GitHub REST
+// API.
+//
+// Two ways to trigger it (both wired in .github/workflows/pr-ai.yml):
+//   - automatically on every push to the PR: DIFF_FILE points at a precomputed diff.
+//   - on demand: an OWNER/MEMBER/COLLABORATOR comments `/review` or `/suggest <focus>`
+//     on the PR. The workflow gates on the commenter's author_association; this script
+//     fetches the diff itself via the GitHub API (no DIFF_FILE, no checkout of the PR
+//     head) and posts a fresh reply comment keyed to the triggering comment, separate
+//     from the sticky automatic review.
 //
 // It is best-effort and NON-BLOCKING: if OPENROUTER_API_KEY is absent (for example a
 // fork PR that cannot read repo secrets) it prints a notice and exits 0, so it never
 // gates a merge. The model is swappable via OPENROUTER_MODEL with zero workflow edits,
-// which matters because owl-alpha is a free stealth model that can disappear at any time.
+// which matters because free OpenRouter models can disappear or change at any time.
 //
-// PRIVACY: the free owl-alpha tier logs prompts to improve the model, so the diff you
-// send is retained by a third party. Point OPENROUTER_MODEL at a non-logging / paid
-// model (or a self-hosted one) before using this on code you cannot disclose.
+// PRIVACY: free OpenRouter models commonly log prompts to improve the model, so the
+// diff you send may be retained by a third party. Check the model's Data Policy on
+// openrouter.ai, or point OPENROUTER_MODEL at a non-logging / paid model (or a
+// self-hosted one), before using this on code you cannot disclose.
 //
 // Env (set by the workflow):
 //   OPENROUTER_API_KEY  OpenRouter key (repo secret); absent -> skip, exit 0
 //   GITHUB_TOKEN        token with pull-requests:write (default Actions token)
 //   GITHUB_REPOSITORY   owner/repo
 //   PR_NUMBER           the pull request number
-//   DIFF_FILE           path to a unified diff to review
-//   OPENROUTER_MODEL    model id (default openrouter/owl-alpha)
+//   DIFF_FILE           path to a precomputed unified diff (automatic run); when absent,
+//                       the diff is fetched from the GitHub API instead (comment run)
+//   COMMENT_BODY        the triggering comment's body (comment run only)
+//   COMMENT_ID          the triggering comment's id; keys its reply comment
+//   COMMENT_AUTHOR      the triggering comment's author; credited in the reply
+//   OPENROUTER_MODEL    model id (default nvidia/nemotron-3-ultra-550b-a55b:free)
 //   MAX_DIFF_CHARS      cap on diff chars sent to the model (default 60000)
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import { upsertStickyComment } from './gh_sticky_comment.mjs';
 
-const MARKER = '<!-- pr-ai-review -->';
-const MODEL = process.env.OPENROUTER_MODEL || 'openrouter/owl-alpha';
+const MODEL = process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free';
 const MAX_DIFF_CHARS = Number(process.env.MAX_DIFF_CHARS || 60000);
 const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+const GITHUB_API = process.env.GITHUB_API_URL ?? 'https://api.github.com';
 
 const key = process.env.OPENROUTER_API_KEY;
 const prNumber = process.env.PR_NUMBER;
 const diffFile = process.env.DIFF_FILE;
+const commentBody = process.env.COMMENT_BODY;
+const commentId = process.env.COMMENT_ID;
+const commentAuthor = process.env.COMMENT_AUTHOR;
 
 if (!key) {
   console.log('[ai_review] OPENROUTER_API_KEY not set; skipping AI review (non-blocking).');
   process.exit(0);
 }
 
-let diff = '';
-try {
-  diff = fs.readFileSync(diffFile, 'utf8');
-} catch {
-  console.log(`[ai_review] could not read DIFF_FILE=${diffFile}; skipping.`);
+// A comment-triggered run carries COMMENT_BODY: parse the /review or /suggest <focus>
+// command out of it. The workflow only invokes this script for a comment that already
+// matched one of the two commands from a trusted author association, but parse
+// defensively so a direct/manual invocation with an unrecognized body no-ops instead of
+// reviewing on unexpected input.
+function parseCommand(body) {
+  if (!body) return null;
+  const m = body.trim().match(/^\/(review|suggest)\b[ \t]*([\s\S]*)$/);
+  return m ? { command: m[1], focus: m[2].trim() } : null;
+}
+const command = parseCommand(commentBody);
+if (commentBody && !command) {
+  console.log('[ai_review] comment did not match /review or /suggest; skipping.');
   process.exit(0);
+}
+
+async function fetchDiffFromApi() {
+  const token = process.env.GITHUB_TOKEN;
+  const repo = process.env.GITHUB_REPOSITORY;
+  if (!token || !repo || !prNumber) return '';
+  const res = await fetch(`${GITHUB_API}/repos/${repo}/pulls/${prNumber}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github.v3.diff',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+  if (!res.ok) {
+    console.log(`[ai_review] could not fetch PR diff via API (HTTP ${res.status}); skipping.`);
+    return '';
+  }
+  return res.text();
+}
+
+let diff = '';
+if (diffFile) {
+  try {
+    diff = fs.readFileSync(diffFile, 'utf8');
+  } catch {
+    console.log(`[ai_review] could not read DIFF_FILE=${diffFile}; skipping.`);
+    process.exit(0);
+  }
+} else {
+  diff = await fetchDiffFromApi();
 }
 if (!diff.trim()) {
   console.log('[ai_review] empty diff; skipping.');
@@ -57,7 +112,10 @@ if (diff.length > MAX_DIFF_CHARS) {
 
 // Give the model the file list of the directories this diff touches, so it stops
 // hallucinating that existing imports/helpers are "missing" (its top false positive).
-// Best-effort: empty string when not in a git checkout.
+// Best-effort: empty string when not in a git checkout. On a comment-triggered run the
+// checkout is the base branch (no PR-head checkout, intentionally, see the module
+// comment), so a file the PR itself newly adds will not appear here; that is a known
+// false-positive risk specific to the /review and /suggest path.
 function listTouchedDirs(d) {
   const files = [...d.matchAll(/^\+\+\+ b\/(.+)$/gm)]
     .map((m) => m[1])
@@ -142,6 +200,9 @@ Do not restate the diff. Output GitHub-flavored Markdown.`;
 
 const user = [
   truncated ? `Note: the diff was truncated to the first ${MAX_DIFF_CHARS} characters.\n` : '',
+  command?.focus
+    ? `The reviewer specifically asked (via a PR comment) to focus on:\n\n${command.focus}\n\nStill mention any other high-confidence finding, but prioritize this.\n`
+    : '',
   repoFiles
     ? `Files that already exist in the directories this diff touches (so you can resolve imports and must NOT flag these as missing):\n\n\`\`\`\n${repoFiles}\n\`\`\`\n`
     : '',
@@ -189,17 +250,28 @@ try {
   reviewText = `_The automated review could not run this time (\`${MODEL}\`). See the workflow logs._`;
 }
 
+const heading = command
+  ? `## AI review (\`${MODEL}\`, requested by @${commentAuthor ?? 'a maintainer'} via \`/${command.command}\`)`
+  : `## AI review (\`${MODEL}\`)`;
+
 const body = [
-  `## AI review (\`${MODEL}\`)`,
+  heading,
   '',
   reviewText,
   truncated ? `\n<sub>Diff truncated to the first ${MAX_DIFF_CHARS} characters.</sub>` : '',
   '',
-  '<sub>Automated and non-blocking. May be wrong; a human review still decides. The free owl-alpha tier logs prompts, so the diff is retained by a third party.</sub>',
+  '<sub>Automated and non-blocking. May be wrong; a human review still decides. Free OpenRouter models commonly log prompts, so the diff may be retained by a third party.</sub>',
 ].join('\n');
 
+// A comment-triggered run gets its own marker keyed to the triggering comment, so a
+// reply to /review or /suggest never overwrites the standing automatic review, but a
+// retried workflow run for the same comment updates its own reply instead of duplicating.
+const marker = command
+  ? `<!-- pr-ai-review-comment-${commentId ?? prNumber} -->`
+  : '<!-- pr-ai-review -->';
+
 try {
-  const result = await upsertStickyComment({ marker: MARKER, body, prNumber });
+  const result = await upsertStickyComment({ marker, body, prNumber });
   console.log(`ai review comment: ${result ?? 'skipped'}`);
 } catch (e) {
   console.log(`[ai_review] could not post comment (non-blocking): ${e.message}`);

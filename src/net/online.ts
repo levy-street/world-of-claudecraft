@@ -1,5 +1,11 @@
 // Online play: REST auth client + WebSocket world mirror.
 
+import {
+  isDesktopAppRuntime,
+  normalizeOrigin,
+  runtimeApiOrigin,
+  runtimeWebSocketUrl,
+} from '../runtime';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -39,6 +45,9 @@ import {
   type ArenaInfo,
   type CharacterSearchResult,
   type ClientCommand,
+  type DailyRewardHistory,
+  type DailyRewardSpinResult,
+  type DailyRewardStatus,
   type DelveCompanionInfo,
   type DelveDailyInfo,
   type DelveRunInfo,
@@ -92,20 +101,17 @@ function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
-  const proto = protocol === 'https:' ? 'wss' : 'ws';
-  return `${proto}://${host}/ws`;
-}
-
-function normalizeOrigin(raw: string): string {
-  return raw.trim().replace(/\/+$/, '');
+  return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
 }
 
 export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
 export const NATIVE_API_ORIGIN = normalizeOrigin(String(import.meta.env.VITE_API_ORIGIN ?? ''));
+export const DESKTOP_APP = isDesktopAppRuntime();
+export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
 
 export function apiUrl(path: string, base = ''): string {
   if (/^https?:\/\//.test(path)) return path;
-  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN;
+  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
   return origin ? `${origin}${path}` : path;
 }
 
@@ -176,10 +182,10 @@ export class Api {
   realm: string | null = null;
   // base origin for realm-scoped calls (characters, search, ws). '' = the page
   // origin; set to another realm's origin when the player picks a realm
-  base = NATIVE_API_ORIGIN;
+  base = NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
 
   setRealm(url: string): void {
-    this.base = normalizeOrigin(url) || NATIVE_API_ORIGIN;
+    this.base = normalizeOrigin(url) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
   }
 
   // The realm directory is always read from the page's own server. Sending the
@@ -287,6 +293,20 @@ export class Api {
     this.token = data.token;
     this.username = data.username;
     return {};
+  }
+
+  async createDesktopLoginCode(): Promise<{ code: string; expiresInMs: number }> {
+    const data = await this.post('/api/desktop-login/create', {});
+    return {
+      code: typeof data.code === 'string' ? data.code : '',
+      expiresInMs: typeof data.expiresInMs === 'number' ? data.expiresInMs : 0,
+    };
+  }
+
+  async exchangeDesktopLoginCode(code: string): Promise<void> {
+    const data = await this.post('/api/desktop-login/exchange', { code });
+    this.token = data.token;
+    this.username = data.username;
   }
 
   // ── Persistent session (home-page account portal) ──────────────────────────
@@ -724,6 +744,7 @@ function blankEntity(id: number): Entity {
     castingAbility: null,
     castRemaining: 0,
     castTotal: 0,
+    castAim: null,
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -877,6 +898,9 @@ export class ClientWorld implements IWorld {
   // entity id -> performance.now() when it first went missing from a snapshot;
   // used for the despawn grace window (anti-flicker), cleared once it returns
   private missingSince = new Map<number, number>();
+  // scratch for applySnapshot's per-message "ids present in this snap" set,
+  // reused across snapshots (20 Hz) instead of allocating a Set per message
+  private wireSeen = new Set<number>();
   // camera follow for keyboard turns applied by the main loop
   pendingFacingDelta = 0;
   connected = false;
@@ -912,7 +936,7 @@ export class ClientWorld implements IWorld {
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     this.characterId = characterId;
     this.token = token;
-    this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN;
+    this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
@@ -1196,7 +1220,11 @@ export class ClientWorld implements IWorld {
     }
     this.lastSnapAt = now;
 
-    const seen = new Set<number>();
+    // lazy init (not the field initializer alone): tests build bare instances
+    // via Object.create(ClientWorld.prototype), which skips field initializers
+    if (this.wireSeen === undefined) this.wireSeen = new Set();
+    const seen = this.wireSeen;
+    seen.clear();
     const prevSelf = this.entities.get(this.playerId);
     const prevSelfFacing = prevSelf?.facing;
     const prevSelfDead = prevSelf?.dead ?? false;
@@ -1319,31 +1347,68 @@ export class ClientWorld implements IWorld {
       e.petTauntTimer = w.pt ?? 0;
       e.petAutoTaunt = !!w.pa;
       e.petManualTauntPending = false;
-      e.threat = new Map(w.thr ?? []);
-      e.auras = (w.auras ?? []).map((a: any) => ({
-        id: a.id,
-        name: a.name,
-        kind: a.kind,
-        remaining: a.rem,
-        duration: a.dur,
-        // The wire carries the aura magnitude (and imbue range / tick cadence / school) so buff
-        // and debuff hover tooltips show the real numbers online exactly as offline (aura_effect
-        // reads these). A 0/absent value decodes to 0 (value-less auras and an old server are
-        // unchanged), a missing school falls back to the physical default, and imbue range /
-        // tick cadence stay undefined when not sent. sourceId stays simplified (a separate
-        // pre-existing wire reduction, not read by the tooltip).
-        value: a.value ?? 0,
-        value2: a.value2,
-        value3: a.value3,
-        tickInterval: a.tickInterval,
-        sourceId: 0,
-        school: a.school ?? 'physical',
-        stacks: a.stacks,
-        // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire sends it
-        // only when defined (server/game.ts), so an ordinary aura or an old server decodes to
-        // undefined and the badge falls back to the stacks path, exactly as before.
-        charges: a.charges,
-      }));
+      // same semantics as `new Map(w.thr ?? [])` (absent thr = empty table), but
+      // updates the existing Map in place: no per-entity Map churn at 20 Hz
+      e.threat.clear();
+      if (w.thr) for (const [tid, tv] of w.thr as [number, number][]) e.threat.set(tid, tv);
+      // The wire carries the aura magnitude (and imbue range / tick cadence / school) so buff
+      // and debuff hover tooltips show the real numbers online exactly as offline (aura_effect
+      // reads these). A 0/absent value decodes to 0 (value-less auras and an old server are
+      // unchanged), a missing school falls back to the physical default, and imbue range /
+      // tick cadence stay undefined when not sent. sourceId stays simplified (a separate
+      // pre-existing wire reduction, not read by the tooltip).
+      //
+      // Between snapshots the aura SET is usually unchanged (only `rem` ticks down), so when
+      // the incoming ids line up index-for-index with the existing records, update those
+      // records in place: no array + per-aura object allocation per entity at 20 Hz, and the
+      // preserved object identity matches the offline Sim (one live aura object across ticks).
+      // Any composition change (gain/fade/reorder) falls back to the fresh build below.
+      const wireAuras: any[] = w.auras ?? [];
+      let sameAuraShape = e.auras.length === wireAuras.length;
+      if (sameAuraShape) {
+        for (let i = 0; i < wireAuras.length; i++) {
+          if (e.auras[i].id !== wireAuras[i].id) {
+            sameAuraShape = false;
+            break;
+          }
+        }
+      }
+      if (sameAuraShape) {
+        for (let i = 0; i < wireAuras.length; i++) {
+          const a = wireAuras[i];
+          const rec = e.auras[i];
+          rec.name = a.name;
+          rec.kind = a.kind;
+          rec.remaining = a.rem;
+          rec.duration = a.dur;
+          rec.value = a.value ?? 0;
+          rec.value2 = a.value2;
+          rec.value3 = a.value3;
+          rec.tickInterval = a.tickInterval;
+          rec.school = a.school ?? 'physical';
+          rec.stacks = a.stacks;
+          // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire
+          // sends it only when defined (server/game.ts), so an ordinary aura or an old server
+          // decodes to undefined and the badge falls back to the stacks path, exactly as before.
+          rec.charges = a.charges;
+        }
+      } else {
+        e.auras = wireAuras.map((a: any) => ({
+          id: a.id,
+          name: a.name,
+          kind: a.kind,
+          remaining: a.rem,
+          duration: a.dur,
+          value: a.value ?? 0,
+          value2: a.value2,
+          value3: a.value3,
+          tickInterval: a.tickInterval,
+          sourceId: 0,
+          school: a.school ?? 'physical',
+          stacks: a.stacks,
+          charges: a.charges,
+        }));
+      }
       e.loot = w.lootList ?? null;
       return e;
     };
@@ -1386,8 +1451,12 @@ export class ClientWorld implements IWorld {
       e.resourceType = s.rtype;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
-      if (s.cds !== undefined)
-        e.cooldowns = new Map(Object.entries(s.cds).map(([k, v]) => [k, Number(v)]));
+      if (s.cds !== undefined) {
+        // in-place rebuild (same result as `new Map(Object.entries(...))`): no
+        // intermediate entry arrays and no Map churn on the 20 Hz self record
+        e.cooldowns.clear();
+        for (const k in s.cds) e.cooldowns.set(k, Number(s.cds[k]));
+      }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
@@ -1586,6 +1655,10 @@ export class ClientWorld implements IWorld {
       return;
     }
     this.cmd({ cmd: 'castSlot', slot });
+  }
+  castAbilityAt(abilityId: string, aim: { x: number; z: number }): void {
+    // Ground-targeted: no entity target involved, so no dead-target guard.
+    this.cmd({ cmd: 'castAt', ability: abilityId, x: aim.x, z: aim.z });
   }
   cancelAura(auraId: string): void {
     // Authoritative on the server; the dropped aura disappears on the next self
@@ -2121,6 +2194,37 @@ export class ClientWorld implements IWorld {
       return empty;
     }
   }
+
+  async dailyRewards(): Promise<DailyRewardStatus> {
+    const res = await fetch(apiUrl('/api/daily-rewards', this.base), {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    if (!res.ok) throw new Error('daily rewards unavailable');
+    return (await res.json()) as DailyRewardStatus;
+  }
+
+  async spinDailyReward(): Promise<DailyRewardSpinResult> {
+    const res = await fetch(apiUrl('/api/daily-rewards/spin', this.base), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: '{}',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? 'daily spin unavailable');
+    return data as DailyRewardSpinResult;
+  }
+
+  async dailyRewardHistory(): Promise<DailyRewardHistory> {
+    const res = await fetch(apiUrl('/api/daily-rewards/history', this.base), {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    if (!res.ok) return { payouts: [] };
+    return (await res.json()) as DailyRewardHistory;
+  }
+
   prestige(): void {
     this.cmd({ cmd: 'prestige' });
   }

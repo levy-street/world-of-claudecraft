@@ -177,6 +177,48 @@ export const vi_VN: EnTranslations = {
       "title": "Biểu Cảm",
       "done": "Xong"
     },
+    "dailyRewards": {
+      "title": "Phần Thưởng Hằng Ngày",
+      "close": "Đóng phần thưởng hằng ngày",
+      "loading": "Đang tải phần thưởng hằng ngày...",
+      "error": "Không thể tải phần thưởng hằng ngày.",
+      "intro": "Giữ đủ WOC trong ví đã xác minh của bạn để mở khóa phần thưởng hằng ngày. Kiếm điểm bằng một lượt quay mỗi ngày và các nhiệm vụ luân phiên, rồi leo lên bảng xếp hạng hằng ngày để nhận phần chia từ quỹ giải thưởng.",
+      "prize": "Quỹ Giải Thưởng",
+      "reset": "Đặt Lại",
+      "endsIn": "Kết thúc sau {time}",
+      "remainingLessThanMinute": "<1p",
+      "remainingMinutes": "{minutes}p",
+      "remainingHoursMinutes": "{hours}h {minutes}p",
+      "score": "Điểm",
+      "walletValue": "Giá Trị Ví (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Không rõ",
+      "spinTitle": "Vòng Quay Hằng Ngày",
+      "spinDialogTitle": "Vòng Quay Phần Thưởng Hằng Ngày",
+      "spinClose": "Đóng lượt quay hằng ngày",
+      "spinReady": "Một lượt quay đã sẵn sàng.",
+      "spinClaimed": "Đã nhận: +{points} điểm.",
+      "spinResult": "+{points} điểm",
+      "spinButton": "Quay",
+      "tasks": "Nhiệm Vụ",
+      "leaderboard": "Bảng Xếp Hạng Hằng Ngày",
+      "history": "Người Thắng Trước Đây",
+      "noLeaders": "Chưa có điểm nào.",
+      "noHistory": "Chưa có khoản chi trả nào.",
+      "walletConnectTitle": "Xác Minh Ví",
+      "walletConnectBody": "Xác minh một ví Solana có WOC để mở khóa phần thưởng hằng ngày.",
+      "walletConnectButton": "Xác Minh Ví",
+      "walletHoldTitle": "Giữ WOC",
+      "walletHoldBody": "Giữ ít nhất {amount} USD WOC để mở khóa phần thưởng hằng ngày.",
+      "walletPriceBody": "Hiện chưa có giá WOC. Vui lòng quay lại sau ít phút.",
+      "reason": {
+        "eligible": "Đã mở khóa phần thưởng.",
+        "no_wallet": "Kết nối một ví có ít nhất 20 USD WOC.",
+        "under_minimum": "Ví thấp hơn mức tối thiểu 20 USD WOC.",
+        "price_unavailable": "Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa."
+      }
+    },
     "theme": {
       "preset": "Giao Diện UI",
       "customColors": "Màu Tùy Chỉnh",
@@ -265,6 +307,13 @@ export const vi_VN: EnTranslations = {
       "heading": "Hướng",
       "minimapZoom": "Thu phóng bản đồ nhỏ"
     },
+    "nativeUpdate": {
+      "title": "Có Bản Cập Nhật",
+      "body": "Đã có phiên bản mới của World of ClaudeCraft. Cập nhật ngay để nhận các bản sửa lỗi và cải tiến mới nhất.",
+      "bodyWithVersion": "Đã có phiên bản {version} của World of ClaudeCraft. Cập nhật ngay để nhận các bản sửa lỗi và cải tiến mới nhất.",
+      "notNow": "Không phải bây giờ",
+      "update": "Cập Nhật"
+    },
     "castBar": {
       "playerAria": "Thanh Niệm Chú Của Bạn",
       "targetAria": "Thanh Niệm Chú Của Mục Tiêu"
@@ -340,6 +389,7 @@ export const vi_VN: EnTranslations = {
       "uiScale": "Tỷ Lệ Giao Diện",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
+      "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
@@ -2626,6 +2676,7 @@ export const vi_VN: EnTranslations = {
       "usernameTaken": "Tên đăng nhập đó đã được sử dụng.",
       "invalidCredentials": "Tên đăng nhập hoặc mật khẩu không đúng.",
       "verificationFailed": "Xác minh thất bại. Vui lòng thử lại.",
+      "desktopCodeInvalid": "Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.",
       "invalidCharacterName": "Tên nhân vật không hợp lệ. Dùng 2-16 chữ cái.",
       "characterNameNotAllowed": "Tên nhân vật đó không được phép.",
       "invalidClass": "Lớp không hợp lệ.",
@@ -2642,6 +2693,21 @@ export const vi_VN: EnTranslations = {
       "takenOver": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "renameBeforeEntering": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
       "renameNotPermitted": "Không được phép đổi tên nhân vật này."
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "Đang tải bản cập nhật {version}...",
+      "ready": "Bản cập nhật {version} đã sẵn sàng. Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
+      "restart": "Khởi động lại ngay",
+      "later": "Để sau"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "Khung trò chơi đã ngừng hoạt động. Tải lại chứ?",
+      "reload": "Tải lại",
+      "quit": "Thoát",
+      "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
     }
   },
   "realm": {
@@ -3692,6 +3758,26 @@ export const vi_VN: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Cú Đánh Lửa",
+        "description": "Gọi một vụ nổ lửa xuống khu vực mục tiêu, gây {damage} sát thương Lửa cho kẻ địch trong vụ nổ."
+      },
+      "rain_of_fire": {
+        "name": "Mưa Lửa",
+        "description": "Trút một cơn mưa lửa xuống khu vực mục tiêu, thiêu đốt kẻ địch gây {damage} sát thương Lửa."
+      },
+      "volley": {
+        "name": "Loạt Tên",
+        "description": "Trút mưa tên xuống khu vực mục tiêu, gây {damage} sát thương cho kẻ địch bên trong."
+      },
+      "hurricane": {
+        "name": "Cuồng Phong",
+        "description": "Triệu hồi cuồng phong xuống khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên."
+      },
+      "earthquake": {
+        "name": "Động Đất",
+        "description": "Làm rung chuyển khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên."
+      },
       "heroic_strike": {
         "name": "Đòn Anh Hùng",
         "description": "Một đòn đánh mạnh tăng sát thương cận chiến thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn."

@@ -53,6 +53,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Ganimet Ayarları: Yönetilen Ganimet, Ganimet Yöneticisi {name}, eşik {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Ganimet eşiği {threshold} olarak ayarlandı.',
   'hudChrome.options.showDevBadges': 'Geliştirici Rozetlerini Göster',
+  'hudChrome.options.groundReticle': 'Yer hedefleme halkası',
   'hudChrome.options.startAttackOnAbility': 'Yetenek Kullanımında Otomatik Saldırı',
   'hudChrome.party.promoteLeader': 'Lider Yap',
   'hudChrome.plurals.playersMatching.few':
@@ -566,6 +567,21 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.description':
     'Ateşli bir top fırlatarak {damage} Ateş hasarı ve ek olarak zamana yayılı hasar verir.',
   'entities.abilities.fireball.name': 'Ateş Topu',
+  'entities.abilities.rain_of_fire.name': 'Ateş Yağmuru',
+  'entities.abilities.rain_of_fire.description':
+    'Hedef alana ateş yağdırır ve düşmanları yakarak {damage} Ateş hasarı verir.',
+  'entities.abilities.volley.name': 'Ok Yağmuru',
+  'entities.abilities.volley.description':
+    'Hedef alana ok yağdırır ve içindeki düşmanlara {damage} hasar verir.',
+  'entities.abilities.hurricane.name': 'Kasırga',
+  'entities.abilities.hurricane.description':
+    'Hedef alana bir kasırga indirir ve düşmanlara {damage} Doğa hasarı verir.',
+  'entities.abilities.earthquake.name': 'Deprem',
+  'entities.abilities.earthquake.description':
+    'Hedef alanı sarsar ve düşmanlara {damage} Doğa hasarı verir.',
+  'entities.abilities.flamestrike.name': 'Alev Vuruşu',
+  'entities.abilities.flamestrike.description':
+    'Hedef alanda bir alev patlaması yaratır ve patlamaya yakalanan düşmanlara {damage} Ateş hasarı verir.',
   'entities.abilities.flame_shock.description':
     'Hedefi ateşle dağlar: 25 hasar artı 12 saniye boyunca {damage}.',
   'entities.abilities.flame_shock.name': 'Alev Şoku',
@@ -5006,4 +5022,68 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Yardım Lazım',
   'hudChrome.discord.relay.help.hint': 'Topluluktan yardım iste',
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
+  'errors.api.desktopCodeInvalid':
+    'Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',
+  'desktop.crash.body': 'Oyun görünümü çalışmayı durdurdu. Yeniden yüklensin mi?',
+  'desktop.crash.fatalBody':
+    'World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor.',
+  'desktop.crash.quit': 'Çık',
+  'desktop.crash.reload': 'Yeniden Yükle',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.update.downloading': '{version} güncellemesi indiriliyor...',
+  'desktop.update.later': 'Daha Sonra',
+  'desktop.update.ready':
+    '{version} güncellemesi hazır. Çıkış yaptığında kurulur ya da şimdi yeniden başlat.',
+  'desktop.update.restart': 'Şimdi Yeniden Başlat',
+  'hudChrome.dailyRewards.close': 'Günlük ödülleri kapat',
+  'hudChrome.dailyRewards.endsIn': 'Bitmesine {time}',
+  'hudChrome.dailyRewards.error': 'Günlük ödüller yüklenemedi.',
+  'hudChrome.dailyRewards.history': 'Geçmiş Kazananlar',
+  'hudChrome.dailyRewards.intro':
+    'Günlük ödüllerin kilidini açmak için doğrulanmış cüzdanında yeterince WOC bulundur. Bir günlük çevirme ve dönüşümlü görevlerle puan kazan, ardından ödül havuzundan pay almak için günlük lider tablosunda yüksel.',
+  'hudChrome.dailyRewards.leaderboard': 'Günlük Lider Tablosu',
+  'hudChrome.dailyRewards.loading': 'Günlük ödüller yükleniyor...',
+  'hudChrome.dailyRewards.noHistory': 'Henüz ödeme yok.',
+  'hudChrome.dailyRewards.noLeaders': 'Henüz puan yok.',
+  'hudChrome.dailyRewards.prize': 'Ödül Havuzu',
+  'hudChrome.dailyRewards.reason.eligible': 'Ödüllerin kilidi açıldı.',
+  'hudChrome.dailyRewards.reason.no_wallet': 'En az 20 USD değerinde WOC bulunan bir cüzdan bağla.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'WOC fiyatı alınamıyor, ödüller geçici olarak kilitli.',
+  'hudChrome.dailyRewards.reason.under_minimum':
+    'Cüzdan, 20 USD değerindeki WOC alt sınırının altında.',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}sa {minutes}dk',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1dk',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}dk',
+  'hudChrome.dailyRewards.reset': 'Sıfırla',
+  'hudChrome.dailyRewards.score': 'Skor',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.spinButton': 'Çevir',
+  'hudChrome.dailyRewards.spinClaimed': 'Alındı: +{points} puan.',
+  'hudChrome.dailyRewards.spinClose': 'Günlük çevirmeyi kapat',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Günlük Ödül Çevirmesi',
+  'hudChrome.dailyRewards.spinReady': 'Bir çevirme hazır.',
+  'hudChrome.dailyRewards.spinResult': '+{points} puan',
+  'hudChrome.dailyRewards.spinTitle': 'Günlük Çevirme',
+  'hudChrome.dailyRewards.tasks': 'Görevler',
+  'hudChrome.dailyRewards.title': 'Günlük Ödüller',
+  'hudChrome.dailyRewards.unknown': 'Bilinmiyor',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Günlük ödüllerin kilidini açmak için WOC bulunan bir Solana cüzdanını doğrula.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Cüzdanı Doğrula',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Cüzdanı Doğrula',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Günlük ödüllerin kilidini açmak için en az {amount} USD değerinde WOC bulundur.',
+  'hudChrome.dailyRewards.walletHoldTitle': 'WOC Bulundur',
+  'hudChrome.dailyRewards.walletPriceBody':
+    'WOC fiyatı şu anda alınamıyor. Kısa süre sonra tekrar bak.',
+  'hudChrome.dailyRewards.walletValue': 'Cüzdan Değeri (WOC)',
+  'hudChrome.nativeUpdate.body':
+    "World of ClaudeCraft'ın yeni bir sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    "World of ClaudeCraft'ın {version} sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
+  'hudChrome.nativeUpdate.notNow': 'Şimdi Değil',
+  'hudChrome.nativeUpdate.title': 'Güncelleme Mevcut',
+  'hudChrome.nativeUpdate.update': 'Güncelle',
 };

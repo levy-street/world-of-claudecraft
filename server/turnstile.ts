@@ -9,7 +9,11 @@
 // Verification is gated by TURNSTILE_SECRET being set (see server/main.ts): with
 // no secret configured (local dev / tests) the caller skips this entirely, so
 // `npm run dev` stays frictionless.
+import type { IncomingMessage } from 'node:http';
+import { verifyNativeAttestation } from './native_attestation';
 import { recordUsageMetric } from './provider_usage';
+import { requestIp } from './ratelimit';
+import { isDesktopAppRequest, isNativeAppRequest } from './web_login_guard';
 
 const SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const VERIFY_TIMEOUT_MS = 5000;
@@ -47,4 +51,27 @@ export async function verifyTurnstile(
     recordUsageMetric('turnstile.verify.failure');
     return false;
   }
+}
+
+// The full bot gate for account creation / login. Returns true when the request
+// may proceed. Native apps prove themselves with a platform attestation instead
+// of the widget. The Electron desktop shell is admitted by Origin alone: the
+// widget cannot pass Cloudflare's domain validation at app://worldofclaudecraft
+// (siteverify widget error 110200, verified empirically), so there is no token
+// it could send. An Origin header is spoofable, so this is a deliberate,
+// documented softening of the bot gate for the desktop origins only; a real
+// desktop attestation (mirroring the native one) is the long-term fix. With no
+// secret configured, verification is off entirely. The English rejection error
+// the callers emit is matched to a t() key by userFacingApiError() in
+// src/main.ts; keep the two strings in sync.
+export async function passesTurnstile(
+  req: IncomingMessage,
+  body: Record<string, unknown>,
+  secret: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<boolean> {
+  if (isNativeAppRequest(req)) return verifyNativeAttestation(req, body.nativeAttestation);
+  if (isDesktopAppRequest(req)) return true;
+  if (!secret) return true;
+  return verifyTurnstile(String(body.turnstileToken ?? ''), secret, requestIp(req), fetchImpl);
 }
