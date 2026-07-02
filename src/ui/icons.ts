@@ -2405,6 +2405,61 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ['crack'],
   ),
   linen_scrap: r('junk', 'silverWhite', [{ p: 'pelt', pal: 'silverWhite' }]),
+  // --- The Drowned Litany (Drowned Reliquary Rite loot) ---
+  siltguard_helm: r('earth', 'earthBrown', [
+    { p: 'helm', pal: 'earthBrown' },
+    { p: 'droplet', ...BR, pal: 'venom' },
+  ]),
+  bulwark_rusted_pauldrons: r(
+    'earth',
+    'earthBrown',
+    [{ p: 'pauldron', pal: 'earthBrown' }],
+    ['crack'],
+  ),
+  nhalias_bell_maul: r(
+    'shadow',
+    'bone',
+    ['mace', { p: 'sunburst', ...TR, pal: 'bone' }],
+    ['glow', 'arcs'],
+  ),
+  reedstalker_jerkin: r('leather', 'leafGreen', [{ p: 'chestplate', pal: 'leafGreen' }]),
+  mirejaw_fang_knife: r('earth', 'venom', ['dagger', { p: 'fang', ...BR, pal: 'bone' }]),
+  widow_silk_hood: r(
+    'shadow',
+    'shadowPurple',
+    [
+      { p: 'helm', pal: 'shadowPurple' },
+      { p: 'web', ...TR },
+    ],
+    ['glow'],
+  ),
+  cantors_drowned_sash: r('drink', 'sky', [{ p: 'belt', pal: 'sky' }]),
+  corpse_candle_focus: r('shadow', 'bone', [{ p: 'candle', pal: 'bone' }], ['drips']),
+  nhalias_litany_rod: r(
+    'shadow',
+    'bone',
+    ['staff', { p: 'sunburst', ...TR, pal: 'bone' }],
+    ['glow'],
+  ),
+  blackwater_vanguard_chest: r(
+    'steel',
+    'steel',
+    [
+      { p: 'chestplate', pal: 'steel' },
+      { p: 'droplet', ...BR, pal: 'sky' },
+    ],
+    ['glow', 'sparkle'],
+  ),
+  siltstep_leggings: r('leather', 'earthBrown', ['trousers'], ['glow', 'sparkle']),
+  sunken_reliquary_hood: r(
+    'cloth',
+    'arcanePink',
+    [
+      { p: 'helm', pal: 'arcanePink' },
+      { p: 'gem', ...TR },
+    ],
+    ['glow', 'sparkle'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
