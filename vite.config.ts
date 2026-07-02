@@ -68,6 +68,11 @@ const appBuildId =
   ]) ??
   gitSha() ??
   appBuildDate.replace(/[-:TZ.]/g, '').slice(0, 12);
+const desktopApiOrigin = env(['VITE_DESKTOP_API_ORIGIN']);
+const isDesktopDevBuild = env(['VITE_DESKTOP_APP']) === '1';
+const apiProxyTarget =
+  isDesktopDevBuild && desktopApiOrigin ? desktopApiOrigin : 'http://127.0.0.1:8787';
+const wsProxyTarget = apiProxyTarget.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
 
 // Pretty-URL aliases for standalone static HTML pages. Mirrors the production
 // server rewrite in server/main.ts so these paths resolve in dev and preview too.
@@ -179,9 +184,9 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': { target: 'http://127.0.0.1:8787', changeOrigin: true },
-      '/admin/api': { target: 'http://127.0.0.1:8787', changeOrigin: true },
-      '/ws': { target: 'ws://127.0.0.1:8787', ws: true },
+      '/api': { target: apiProxyTarget, changeOrigin: true },
+      '/admin/api': { target: apiProxyTarget, changeOrigin: true },
+      '/ws': { target: wsProxyTarget, ws: true },
       // MediaWiki community wiki runs as its own container on :8080. Proxy /wiki*
       // to it so the in-app "Browse the Wiki" link resolves in dev too — mirrors
       // the prod reverse-proxy route (nginx /wiki -> :8080). Needs the container

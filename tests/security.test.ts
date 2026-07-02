@@ -3,29 +3,46 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  normalizeCharName,
+  offensiveName,
+  offensiveUsername,
+  validCharName,
+  validUsername,
+} from '../server/auth';
+import {
+  consumeDesktopLoginCode,
+  createDesktopLoginCode,
+  type DesktopLoginRouteDeps,
+  desktopLoginCodeCountForTest,
+  handleDesktopLoginCreate,
+  handleDesktopLoginExchange,
+  resetDesktopLoginCodesForTest,
+} from '../server/desktop_login';
+import {
+  authFailureCount,
+  authThrottled,
+  CARD_UPLOAD_MAX_PER_MINUTE,
+  cardUploadRateLimited,
+  clearAuthFailures,
+  rateLimited,
+  recordAuthFailure,
+  requestIp,
+  resetAuthFailures,
+  resetCardUploadRateLimits,
+  resetRateLimits,
+  resetWalletLinkRateLimits,
+  resetWocBalanceRateLimits,
+  trackedIpCount,
+  WALLET_LINK_MAX_PER_MINUTE,
+  WOC_BALANCE_MAX_PER_MINUTE,
+  walletLinkRateLimited,
+  wocBalanceRateLimited,
+} from '../server/ratelimit';
+import { passesTurnstile } from '../server/turnstile';
+import { isWebClientRequest } from '../server/web_login_guard';
 import { buildWebSocketAuthMessage, buildWebSocketUrl } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
-import { normalizeCharName, offensiveName, offensiveUsername, validCharName, validUsername } from '../server/auth';
-import {
-  rateLimited,
-  requestIp,
-  authThrottled,
-  recordAuthFailure,
-  clearAuthFailures,
-  authFailureCount,
-  resetAuthFailures,
-  trackedIpCount,
-  resetRateLimits,
-  cardUploadRateLimited,
-  CARD_UPLOAD_MAX_PER_MINUTE,
-  resetCardUploadRateLimits,
-  walletLinkRateLimited,
-  WALLET_LINK_MAX_PER_MINUTE,
-  resetWalletLinkRateLimits,
-  wocBalanceRateLimited,
-  WOC_BALANCE_MAX_PER_MINUTE,
-  resetWocBalanceRateLimits,
-} from '../server/ratelimit';
 
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   const req: any = new EventEmitter();
@@ -75,6 +92,38 @@ describe('websocket authentication', () => {
       character: 42,
       clientSeed: 'seed-123',
     });
+  });
+});
+
+describe('desktop app request origins', () => {
+  it('allows the Electron app protocol through the web-client login guard', () => {
+    const req = fakeReq({ origin: 'app://worldofclaudecraft' }, '127.0.0.1');
+
+    expect(isWebClientRequest(req)).toBe(true);
+  });
+});
+
+describe('desktop login handoff codes', () => {
+  beforeEach(() => {
+    resetDesktopLoginCodesForTest();
+  });
+
+  it('exchanges a code once for the same client IP', () => {
+    const req = fakeReq({ 'x-forwarded-for': '203.0.113.55' }, '172.18.0.1');
+    const { code, expiresInMs } = createDesktopLoginCode(req, { id: 42, username: 'titoisking' });
+
+    expect(code).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(expiresInMs).toBeGreaterThan(0);
+    expect(consumeDesktopLoginCode(req, code)).toEqual({ accountId: 42, username: 'titoisking' });
+    expect(consumeDesktopLoginCode(req, code)).toBeNull();
+  });
+
+  it('rejects a code exchange from a different client IP', () => {
+    const issuer = fakeReq({ 'x-forwarded-for': '203.0.113.55' }, '172.18.0.1');
+    const attacker = fakeReq({ 'x-forwarded-for': '198.51.100.77' }, '172.18.0.1');
+    const { code } = createDesktopLoginCode(issuer, { id: 42, username: 'titoisking' });
+
+    expect(consumeDesktopLoginCode(attacker, code)).toBeNull();
   });
 });
 
@@ -152,33 +201,61 @@ describe('rate-limit client IP selection', () => {
   it('rate-limits card uploads by account across client IPs', () => {
     const accountId = 77;
     for (let i = 0; i < CARD_UPLOAD_MAX_PER_MINUTE; i++) {
-      expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': `203.0.113.${i + 1}` }, '172.18.0.1'), accountId)).toBe(false);
+      expect(
+        cardUploadRateLimited(
+          fakeReq({ 'x-forwarded-for': `203.0.113.${i + 1}` }, '172.18.0.1'),
+          accountId,
+        ),
+      ).toBe(false);
     }
-    expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': '203.0.113.250' }, '172.18.0.1'), accountId)).toBe(true);
+    expect(
+      cardUploadRateLimited(
+        fakeReq({ 'x-forwarded-for': '203.0.113.250' }, '172.18.0.1'),
+        accountId,
+      ),
+    ).toBe(true);
   });
 
   it('rate-limits card uploads by client IP across accounts', () => {
     const ip = '203.0.113.220';
     for (let i = 0; i < CARD_UPLOAD_MAX_PER_MINUTE; i++) {
-      expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i)).toBe(false);
+      expect(
+        cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i),
+      ).toBe(false);
     }
-    expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(true);
+    expect(cardUploadRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(
+      true,
+    );
   });
 
   it('rate-limits wallet link/challenge attempts by account across client IPs', () => {
     const accountId = 77;
     for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
-      expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': `203.0.114.${i + 1}` }, '172.18.0.1'), accountId)).toBe(false);
+      expect(
+        walletLinkRateLimited(
+          fakeReq({ 'x-forwarded-for': `203.0.114.${i + 1}` }, '172.18.0.1'),
+          accountId,
+        ),
+      ).toBe(false);
     }
-    expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': '203.0.114.250' }, '172.18.0.1'), accountId)).toBe(true);
+    expect(
+      walletLinkRateLimited(
+        fakeReq({ 'x-forwarded-for': '203.0.114.250' }, '172.18.0.1'),
+        accountId,
+      ),
+    ).toBe(true);
   });
 
   it('rate-limits wallet link/challenge attempts by client IP across accounts', () => {
     const ip = '203.0.114.220';
     for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
-      expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i)).toBe(false);
+      expect(
+        walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 1000 + i),
+      ).toBe(false);
     }
-    expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(true);
+    expect(walletLinkRateLimited(fakeReq({ 'x-forwarded-for': ip }, '172.18.0.1'), 2000)).toBe(
+      true,
+    );
   });
 
   it('rate-limits the $WOC balance proxy per IP on its OWN bucket (decoupled from login/register)', () => {
@@ -273,7 +350,9 @@ describe('rate-limit client IP selection', () => {
     }
 
     // The admin-limited victim must still be limited under the admin policy.
-    expect(rateLimited(fakeReq({ 'x-forwarded-for': victim }, '172.18.0.1'), adminLimit)).toBe(true);
+    expect(rateLimited(fakeReq({ 'x-forwarded-for': victim }, '172.18.0.1'), adminLimit)).toBe(
+      true,
+    );
   });
 
   it('keeps the IP map bounded under a flood of distinct in-window clients', () => {
@@ -408,7 +487,10 @@ describe('malformed websocket frames cannot crash the server', () => {
   });
 
   it('still accepts a well-formed object frame', () => {
-    expect(parseFrame(JSON.stringify({ t: 'input', mi: { f: 1 } }))).toEqual({ t: 'input', mi: { f: 1 } });
+    expect(parseFrame(JSON.stringify({ t: 'input', mi: { f: 1 } }))).toEqual({
+      t: 'input',
+      mi: { f: 1 },
+    });
   });
 });
 
@@ -499,7 +581,10 @@ describe('username censorship', () => {
   });
 
   it('can load banned username terms from a configured file', () => {
-    const file = join(tmpdir(), `woc-banlist-${Date.now()}-${Math.random().toString(16).slice(2)}.txt`);
+    const file = join(
+      tmpdir(),
+      `woc-banlist-${Date.now()}-${Math.random().toString(16).slice(2)}.txt`,
+    );
     writeFileSync(file, 'forbidden\n');
     try {
       withUsernameBanlist({ file }, () => {
@@ -573,5 +658,236 @@ describe('character name censorship', () => {
     withUsernameBanlist({ inline: 'gravecaller' }, () => {
       expect(validCharName('Grave Caller')).toBe(false);
     });
+  });
+});
+
+describe('desktop login handoff codes: expiry and code shape', () => {
+  beforeEach(() => {
+    resetDesktopLoginCodesForTest();
+  });
+
+  it('rejects malformed or non-string codes before touching the store', () => {
+    const req = fakeReq({}, '203.0.113.55');
+    createDesktopLoginCode(req, { id: 7, username: 'tito' });
+    expect(consumeDesktopLoginCode(req, undefined)).toBeNull();
+    expect(consumeDesktopLoginCode(req, 42)).toBeNull();
+    expect(consumeDesktopLoginCode(req, { code: 'x' })).toBeNull();
+    expect(consumeDesktopLoginCode(req, 'tooshort')).toBeNull();
+    expect(consumeDesktopLoginCode(req, `${'a'.repeat(30)}!`)).toBeNull();
+    expect(consumeDesktopLoginCode(req, 'a'.repeat(81))).toBeNull();
+    // the well-formed entry minted above is still there: nothing was consumed
+    expect(desktopLoginCodeCountForTest()).toBe(1);
+  });
+
+  it('expires a code after its TTL and prunes it from the store', () => {
+    vi.useFakeTimers();
+    try {
+      const req = fakeReq({}, '203.0.113.55');
+      const { code, expiresInMs } = createDesktopLoginCode(req, { id: 7, username: 'tito' });
+      expect(desktopLoginCodeCountForTest()).toBe(1);
+      vi.advanceTimersByTime(expiresInMs + 1);
+      expect(consumeDesktopLoginCode(req, code)).toBeNull();
+      expect(desktopLoginCodeCountForTest()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('still honours a code just inside the TTL', () => {
+    vi.useFakeTimers();
+    try {
+      const req = fakeReq({}, '203.0.113.55');
+      const { code, expiresInMs } = createDesktopLoginCode(req, { id: 7, username: 'tito' });
+      vi.advanceTimersByTime(expiresInMs - 1000);
+      expect(consumeDesktopLoginCode(req, code)).toEqual({ accountId: 7, username: 'tito' });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+function desktopRouteDeps(overrides: Partial<DesktopLoginRouteDeps> = {}) {
+  const sent: Array<{ status: number; body: any }> = [];
+  const deps: DesktopLoginRouteDeps = {
+    bearerToken: () => null,
+    readBody: async () => ({}),
+    json: (_res, status, body) => {
+      sent.push({ status, body });
+    },
+    requestMetadata: () => ({ ip: '203.0.113.55', userAgent: 'test-agent' }),
+    accountForToken: async () => null,
+    accountById: async () => null,
+    moderationStatusForAccount: async () => ({ locked: false, message: '' }),
+    touchLogin: async () => {},
+    saveToken: async () => {},
+    ...overrides,
+  };
+  return { deps, sent };
+}
+
+describe('desktop login route handlers', () => {
+  beforeEach(() => {
+    resetDesktopLoginCodesForTest();
+  });
+
+  it('create rejects a missing bearer token with 401 before any account lookup', async () => {
+    const accountForToken = vi.fn(async () => null);
+    const { deps, sent } = desktopRouteDeps({ accountForToken });
+    await handleDesktopLoginCreate(fakeReq({}, '203.0.113.55'), {} as any, deps);
+    expect(sent).toEqual([{ status: 401, body: { error: 'not authenticated' } }]);
+    expect(accountForToken).not.toHaveBeenCalled();
+  });
+
+  it('create rejects an unknown or stale token with 401', async () => {
+    const { deps, sent } = desktopRouteDeps({ bearerToken: () => 'tok' });
+    await handleDesktopLoginCreate(fakeReq({}, '203.0.113.55'), {} as any, deps);
+    expect(sent).toEqual([{ status: 401, body: { error: 'not authenticated' } }]);
+  });
+
+  it('create refuses a moderation-locked account with 403 and the moderation message', async () => {
+    const { deps, sent } = desktopRouteDeps({
+      bearerToken: () => 'tok',
+      accountForToken: async () => 7,
+      accountById: async () => ({ id: 7, username: 'tito' }),
+      moderationStatusForAccount: async () => ({
+        locked: true,
+        message: 'This account has been banned.',
+      }),
+    });
+    await handleDesktopLoginCreate(fakeReq({}, '203.0.113.55'), {} as any, deps);
+    expect(sent).toEqual([{ status: 403, body: { error: 'This account has been banned.' } }]);
+    expect(desktopLoginCodeCountForTest()).toBe(0);
+  });
+
+  it('create mints a code the same IP can exchange', async () => {
+    const { deps, sent } = desktopRouteDeps({
+      bearerToken: () => 'tok',
+      accountForToken: async () => 7,
+      accountById: async () => ({ id: 7, username: 'tito' }),
+    });
+    const req = fakeReq({}, '203.0.113.55');
+    await handleDesktopLoginCreate(req, {} as any, deps);
+    expect(sent[0].status).toBe(200);
+    expect(sent[0].body.code).toMatch(/^[A-Za-z0-9_-]{20,80}$/);
+    expect(sent[0].body.expiresInMs).toBe(5 * 60 * 1000);
+    expect(consumeDesktopLoginCode(req, sent[0].body.code)).toEqual({
+      accountId: 7,
+      username: 'tito',
+    });
+  });
+
+  it('exchange rejects a missing or unknown code with 401 and never mints a session', async () => {
+    const saveToken = vi.fn(async () => {});
+    const missing = desktopRouteDeps({ saveToken });
+    await handleDesktopLoginExchange(fakeReq({}, '203.0.113.55'), {} as any, missing.deps);
+    expect(missing.sent).toEqual([
+      { status: 401, body: { error: 'invalid or expired desktop login code' } },
+    ]);
+    const unknown = desktopRouteDeps({
+      readBody: async () => ({ code: 'a'.repeat(27) }),
+      saveToken,
+    });
+    await handleDesktopLoginExchange(fakeReq({}, '203.0.113.55'), {} as any, unknown.deps);
+    expect(unknown.sent[0].status).toBe(401);
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('exchange refuses a moderation-locked account with 403 after consuming the code', async () => {
+    const req = fakeReq({}, '203.0.113.55');
+    const { code } = createDesktopLoginCode(req, { id: 7, username: 'tito' });
+    const saveToken = vi.fn(async () => {});
+    const { deps, sent } = desktopRouteDeps({
+      readBody: async () => ({ code }),
+      moderationStatusForAccount: async () => ({
+        locked: true,
+        message: 'This account has been banned.',
+      }),
+      saveToken,
+    });
+    await handleDesktopLoginExchange(req, {} as any, deps);
+    expect(sent).toEqual([{ status: 403, body: { error: 'This account has been banned.' } }]);
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('exchange issues a session token for a valid code exactly once', async () => {
+    const req = fakeReq({}, '203.0.113.55');
+    const { code } = createDesktopLoginCode(req, { id: 7, username: 'tito' });
+    const saveToken = vi.fn(async () => {});
+    const touchLogin = vi.fn(async () => {});
+    const { deps, sent } = desktopRouteDeps({
+      readBody: async () => ({ code }),
+      saveToken,
+      touchLogin,
+    });
+    await handleDesktopLoginExchange(req, {} as any, deps);
+    expect(sent[0].status).toBe(200);
+    expect(sent[0].body.username).toBe('tito');
+    expect(sent[0].body.token).toMatch(/^[0-9a-f]{64}$/);
+    expect(saveToken).toHaveBeenCalledWith(sent[0].body.token, 7);
+    expect(touchLogin).toHaveBeenCalledWith(7, { ip: '203.0.113.55', userAgent: 'test-agent' });
+    const second = desktopRouteDeps({ readBody: async () => ({ code }) });
+    await handleDesktopLoginExchange(req, {} as any, second.deps);
+    expect(second.sent[0].status).toBe(401);
+  });
+});
+
+describe('Turnstile gate policy (passesTurnstile)', () => {
+  const testSecret = 'turnstile-secret-under-test';
+
+  it('bypasses verification for every desktop app origin even with a secret set', async () => {
+    const fetchSpy = vi.fn();
+    for (const origin of [
+      'app://worldofclaudecraft',
+      'http://127.0.0.1:5173',
+      'http://localhost:5173',
+    ]) {
+      const req = fakeReq({ origin }, '203.0.113.55');
+      await expect(passesTurnstile(req, {}, testSecret, fetchSpy as any)).resolves.toBe(true);
+    }
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('still fails closed for plain web origins with a secret set and no token', async () => {
+    const fetchSpy = vi.fn();
+    const req = fakeReq({ origin: 'https://worldofclaudecraft.com' }, '203.0.113.55');
+    await expect(passesTurnstile(req, {}, testSecret, fetchSpy as any)).resolves.toBe(false);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('does not bypass for a look-alike desktop origin', async () => {
+    const req = fakeReq({ origin: 'app://evil' }, '203.0.113.55');
+    await expect(passesTurnstile(req, {}, testSecret, vi.fn() as any)).resolves.toBe(false);
+  });
+
+  it('verifies a supplied web token against siteverify', async () => {
+    const req = fakeReq({ origin: 'https://worldofclaudecraft.com' }, '203.0.113.55');
+    const fetchOk = vi.fn(
+      async () => new Response(JSON.stringify({ success: true }), { status: 200 }),
+    );
+    await expect(
+      passesTurnstile(req, { turnstileToken: 'tok' }, testSecret, fetchOk as any),
+    ).resolves.toBe(true);
+    expect(fetchOk).toHaveBeenCalledOnce();
+  });
+
+  it('lets requests through when no secret is configured', async () => {
+    const req = fakeReq({ origin: 'https://worldofclaudecraft.com' }, '203.0.113.55');
+    await expect(passesTurnstile(req, {}, '')).resolves.toBe(true);
+  });
+
+  it('keeps the native attestation arm ahead of the desktop bypass and the no-secret skip', async () => {
+    process.env.NATIVE_ATTESTATION_REQUIRED = '1';
+    try {
+      // A native origin with attestation required and no proof is refused even
+      // with no secret configured: only the native arm can produce that false,
+      // so this pins the branch order in passesTurnstile.
+      const native = fakeReq({ origin: 'capacitor://localhost' }, '203.0.113.55');
+      await expect(passesTurnstile(native, {}, '')).resolves.toBe(false);
+      // and the desktop bypass still admits its own origins under the same env
+      const desktop = fakeReq({ origin: 'app://worldofclaudecraft' }, '203.0.113.55');
+      await expect(passesTurnstile(desktop, {}, testSecret)).resolves.toBe(true);
+    } finally {
+      delete process.env.NATIVE_ATTESTATION_REQUIRED;
+    }
   });
 });

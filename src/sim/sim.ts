@@ -693,7 +693,7 @@ export interface PlayerMeta {
   // Session-only World Market browse query: the search string, the type / subtype /
   // rarity filters, and the page index. The server filters + paginates against this,
   // so the player can page through and filter the WHOLE market a window at a time.
-  // Never persisted — resets on login.
+  // Never persisted, resets on login.
   marketQuery: MarketQuery;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;

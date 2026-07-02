@@ -5,6 +5,10 @@ node_modules
 dist/
 dist-env/
 dist-server/
+release/
+release-steam/
+# generated main-process runtime bundles (scripts/electron-vendor.mjs)
+electron/vendor/
 media-cache/
 
 # i18n per-locale emit crash leftovers (the build sweeps these; never commit one)

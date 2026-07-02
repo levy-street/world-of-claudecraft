@@ -1,5 +1,11 @@
 // Online play: REST auth client + WebSocket world mirror.
 
+import {
+  isDesktopAppRuntime,
+  normalizeOrigin,
+  runtimeApiOrigin,
+  runtimeWebSocketUrl,
+} from '../runtime';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -92,20 +98,17 @@ function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
-  const proto = protocol === 'https:' ? 'wss' : 'ws';
-  return `${proto}://${host}/ws`;
-}
-
-function normalizeOrigin(raw: string): string {
-  return raw.trim().replace(/\/+$/, '');
+  return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
 }
 
 export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
 export const NATIVE_API_ORIGIN = normalizeOrigin(String(import.meta.env.VITE_API_ORIGIN ?? ''));
+export const DESKTOP_APP = isDesktopAppRuntime();
+export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
 
 export function apiUrl(path: string, base = ''): string {
   if (/^https?:\/\//.test(path)) return path;
-  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN;
+  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
   return origin ? `${origin}${path}` : path;
 }
 
@@ -176,10 +179,10 @@ export class Api {
   realm: string | null = null;
   // base origin for realm-scoped calls (characters, search, ws). '' = the page
   // origin; set to another realm's origin when the player picks a realm
-  base = NATIVE_API_ORIGIN;
+  base = NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
 
   setRealm(url: string): void {
-    this.base = normalizeOrigin(url) || NATIVE_API_ORIGIN;
+    this.base = normalizeOrigin(url) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
   }
 
   // The realm directory is always read from the page's own server. Sending the
@@ -287,6 +290,20 @@ export class Api {
     this.token = data.token;
     this.username = data.username;
     return {};
+  }
+
+  async createDesktopLoginCode(): Promise<{ code: string; expiresInMs: number }> {
+    const data = await this.post('/api/desktop-login/create', {});
+    return {
+      code: typeof data.code === 'string' ? data.code : '',
+      expiresInMs: typeof data.expiresInMs === 'number' ? data.expiresInMs : 0,
+    };
+  }
+
+  async exchangeDesktopLoginCode(code: string): Promise<void> {
+    const data = await this.post('/api/desktop-login/exchange', { code });
+    this.token = data.token;
+    this.username = data.username;
   }
 
   // ── Persistent session (home-page account portal) ──────────────────────────
@@ -912,7 +929,7 @@ export class ClientWorld implements IWorld {
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     this.characterId = characterId;
     this.token = token;
-    this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN;
+    this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };

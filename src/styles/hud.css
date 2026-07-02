@@ -2155,6 +2155,13 @@
   body.native-app .official-site-copy {
     display: none !important;
   }
+  body.desktop-app #token-ca,
+  body.desktop-app .cs-wallet,
+  body.desktop-app .cs-wallet-hidden-note,
+  body.desktop-app .account-wallet-card,
+  body.desktop-app .official-site-copy {
+    display: none !important;
+  }
 
   /* ---------- tooltip ---------- */
   #tooltip {
