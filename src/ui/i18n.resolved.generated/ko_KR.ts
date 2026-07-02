@@ -2294,6 +2294,9 @@ export const ko_KR: EnTranslations = {
     "easy": "Easy",
     "medium": "보통",
     "hard": "Hard",
+    "guideWatch": "선택하면 네 개의 제단이 차례로 빛납니다. 순서를 기억하세요.",
+    "guideRepeat": "제단이 어두워지면 같은 순서로 각 제단에 걸어가 F(상호작용)를 누르세요.",
+    "guideStakes": "잘못된 제단을 만지면 검은 물을 뒤집어쓰고 시도 횟수를 잃습니다. 순서를 완성하면 성물함이 열립니다.",
     "showsTimes": "순서를 {count}회 표시",
     "showsOnce": "순서를 한 번만 표시",
     "symbols": "기호 {count}개",
@@ -2349,7 +2352,11 @@ export const ko_KR: EnTranslations = {
       "complete": "완료",
       "marks": "탐굴 증표: {count}",
       "exitHintOpen": "묘비 통로로 걸어 들어가세요 (북쪽)",
-      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요"
+      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요",
+      "riteChoose": "가라앉은 성물함에 다가가 F를 눌러 의식을 시작하세요",
+      "ritePlayback": "제단을 지켜보세요: 빛나는 순서를 기억하세요",
+      "riteInput": "빛난 순서대로 각 제단에서 F를 누르세요 ({current}/{total})",
+      "riteOpen": "성물함이 열렸습니다: F를 눌러 전리품을 획득하세요"
     },
     "objective": {
       "kill_boss": "{boss} 처치",
@@ -6917,6 +6924,11 @@ export const ko_KR: EnTranslations = {
     "dungeonInstanceBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하십시오.",
     "delveLockedChestInteract": "F를 눌러 자물쇠 따기",
     "delveRewardChestInteract": "F를 눌러 전리품 받기",
-    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기"
+    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기",
+    "delveReliquaryInteract": "가라앉은 성물함: F를 눌러 의식 시작",
+    "delveRiteShrineBellInteract": "종 제단: F를 눌러 울리기",
+    "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
+    "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
+    "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기"
   }
 };

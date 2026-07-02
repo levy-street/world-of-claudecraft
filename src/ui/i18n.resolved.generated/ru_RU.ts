@@ -2294,6 +2294,9 @@ export const ru_RU: EnTranslations = {
     "easy": "Easy",
     "medium": "Средний",
     "hard": "Hard",
+    "guideWatch": "После выбора четыре святилища будут загораться по очереди. Запомните порядок.",
+    "guideRepeat": "Когда святилища погаснут, подойдите к каждому в том же порядке и нажмите F (взаимодействие).",
+    "guideStakes": "Ошибка окатит вас черной водой и отнимет попытку. Завершите последовательность, чтобы открыть реликварий.",
     "showsTimes": "Последовательность показана {count} раз(а)",
     "showsOnce": "Последовательность показана один раз",
     "symbols": "Символов: {count}",
@@ -2349,7 +2352,11 @@ export const ru_RU: EnTranslations = {
       "complete": "Завершено",
       "marks": "Метки Вылазок: {count}",
       "exitHintOpen": "Войдите в надгробный проход (север)",
-      "exitHintLocked": "Зачистите врагов, чтобы открыть проход на север"
+      "exitHintLocked": "Зачистите врагов, чтобы открыть проход на север",
+      "riteChoose": "Подойдите к Утопшему реликварию и нажмите F, чтобы начать обряд",
+      "ritePlayback": "Следите за святилищами: запомните порядок, в котором они загораются",
+      "riteInput": "Нажимайте F у каждого святилища в порядке их загорания ({current}/{total})",
+      "riteOpen": "Реликварий открыт: нажмите F рядом с ним, чтобы забрать добычу"
     },
     "objective": {
       "kill_boss": "Убейте: {boss}",
@@ -6917,6 +6924,11 @@ export const ru_RU: EnTranslations = {
     "dungeonInstanceBusy": "Все копии {name} заняты. Попробуйте еще раз чуть позже.",
     "delveLockedChestInteract": "Нажмите F, чтобы вскрыть замок",
     "delveRewardChestInteract": "Нажмите F, чтобы забрать добычу",
-    "delveSurfaceExitInteract": "Нажмите F, чтобы подняться"
+    "delveSurfaceExitInteract": "Нажмите F, чтобы подняться",
+    "delveReliquaryInteract": "Утопший реликварий: нажмите F, чтобы начать обряд",
+    "delveRiteShrineBellInteract": "Святилище колокола: нажмите F, чтобы позвонить",
+    "delveRiteShrineCandleInteract": "Святилище свечи: нажмите F, чтобы коснуться",
+    "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
+    "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться"
   }
 };

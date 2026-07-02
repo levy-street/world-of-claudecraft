@@ -102,7 +102,7 @@ describe('Tolling Bells: mob template', () => {
 });
 
 describe('Tolling Bells: Normal tier volley', () => {
-  it('spawns 2 bell entities on Normal after the volley timer fires', () => {
+  it('spawns 4 bell entities on Normal after the volley timer fires', () => {
     const sim = makeSim(42);
     const run = enterLitanyFinale(sim, 'normal');
     expect(run).not.toBeNull();
@@ -118,13 +118,34 @@ describe('Tolling Bells: Normal tier volley', () => {
     const before = countBellEntities(sim);
     sim.tick(); // timer fires -> volley spawned
     const after = countBellEntities(sim);
-    expect(after - before).toBe(2); // Normal = 2 bells
-    expect(run.nhaliaBoss.bells.length).toBeGreaterThanOrEqual(2);
+    expect(after - before).toBe(4); // every volley = 4 bells
+    expect(run.nhaliaBoss.bells.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('bells in one volley fly in 4 different directions (90 degrees apart)', () => {
+    const sim = makeSim(42);
+    const run = enterLitanyFinale(sim, 'normal');
+    expect(run).not.toBeNull();
+    const boss = setupNhaliaCombat(sim, run);
+    expect(boss).not.toBeNull();
+
+    const st = run.nhaliaBoss;
+    st.bellVolleyTimer = DT * 0.5;
+    sim.tick();
+
+    const angles = st.bells
+      .map((b: any) => Math.atan2(b.vx, -b.vz))
+      .sort((a: number, b: number) => a - b);
+    expect(angles).toHaveLength(4);
+    // Consecutive directions are 90 degrees apart.
+    for (let i = 1; i < angles.length; i++) {
+      expect(angles[i] - angles[i - 1]).toBeCloseTo(Math.PI / 2, 5);
+    }
   });
 });
 
 describe('Tolling Bells: Heroic tier volley', () => {
-  it('spawns 3 bell entities on Heroic', () => {
+  it('spawns 4 bell entities on Heroic', () => {
     const sim = makeSim(99);
     const run = enterLitanyFinale(sim, 'heroic');
     expect(run).not.toBeNull();
@@ -139,7 +160,39 @@ describe('Tolling Bells: Heroic tier volley', () => {
     const before = countBellEntities(sim);
     sim.tick();
     const after = countBellEntities(sim);
-    expect(after - before).toBe(3); // Heroic = 3 bells
+    expect(after - before).toBe(4); // every volley = 4 bells, Heroic included
+  });
+});
+
+describe('Tolling Bells: wall pass-through despawn', () => {
+  it('a bell despawns once it has flown past the apse walls', () => {
+    const sim = makeSim(42);
+    const run = enterLitanyFinale(sim, 'normal');
+    expect(run).not.toBeNull();
+    const boss = setupNhaliaCombat(sim, run);
+    expect(boss).not.toBeNull();
+
+    const st = run.nhaliaBoss;
+    st.bellVolleyTimer = DT * 0.5;
+    sim.tick(); // spawn bells
+
+    // Lifetime never fires; only the wall bounds check can drop these bells.
+    const ids = st.bells.map((b: any) => b.entityId);
+    expect(ids).toHaveLength(4);
+    for (const b of st.bells) b.remaining = 999;
+    st.bellVolleyTimer = 9999; // no further volleys during the flight
+
+    // At 8 yd/s the farthest wall (altar z=72 to zMin -16, 88yd + margin) is
+    // crossed in ~11.4s. Every bell must be gone well before its lifetime.
+    for (let i = 0; i < 20 * 14; i++) {
+      sim.player.hp = sim.player.maxHp; // stay alive so the run keeps ticking
+      sim.tick();
+      st.bellVolleyTimer = 9999;
+    }
+    for (const id of ids) {
+      expect((sim as any).entities.get(id)).toBeUndefined();
+    }
+    expect(st.bells).toHaveLength(0);
   });
 });
 

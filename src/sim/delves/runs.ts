@@ -1521,7 +1521,19 @@ export function delveCompanionWire(ctx: SimContext, pid: number): DelveCompanion
 export function delveRunWire(ctx: SimContext, pid: number): object | null {
   const run = delveRunForPlayer(ctx, pid);
   if (!run?.partyKey) return null;
+  // Drowned Reliquary Rite phase for the HUD guidance (world_api DelveRiteInfo).
+  const rite = run.drownedLitanyRite;
+  let riteInfo: { phase: string; current: number; total: number } | null = null;
+  if (rite) {
+    if (rite.opened) riteInfo = { phase: 'open', current: 0, total: 0 };
+    else if (rite.awaitingChoice) riteInfo = { phase: 'choose', current: 0, total: 0 };
+    else if (rite.sequencePlaying)
+      riteInfo = { phase: 'playback', current: 0, total: rite.sequence.length };
+    else if (rite.puzzleActive)
+      riteInfo = { phase: 'input', current: rite.currentIndex, total: rite.sequence.length };
+  }
   return {
+    rite: riteInfo,
     delveId: run.delveId,
     tierId: run.tierId,
     slot: run.slot,

@@ -2950,6 +2950,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveLockedChestInteract': 'Fで錠を開ける',
   'worldContent.delveRewardChestInteract': 'Fで戦利品を受け取る',
   'worldContent.delveSurfaceExitInteract': 'Fで地上へ登る',
+  'worldContent.delveReliquaryInteract': '沈んだ聖遺物匣：Fで儀式を始める',
+  'worldContent.delveRiteShrineBellInteract': '鐘の祠：Fで鳴らす',
+  'worldContent.delveRiteShrineCandleInteract': '蝋燭の祠：Fで触れる',
+  'worldContent.delveRiteShrineReedInteract': '葦の祠：Fで触れる',
+  'worldContent.delveRiteShrineSkullInteract': '髑髏の祠：Fで触れる',
   'worldContent.dungeonPartyWarning':
     '{name}は{count}人のフルパーティ向けです。慎重に進んでください。',
   'worldContent.dungeonInstanceBusy':
@@ -4603,6 +4608,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.affix': 'アフィックス',
   'delveUi.tracker.complete': '完了',
   'delveUi.tracker.exitHintLocked': '雑魚を一掃して北の通路を開け',
+  'delveUi.tracker.riteChoose': '沈んだ聖遺物匣に近づき、Fで儀式を始める',
+  'delveUi.tracker.ritePlayback': '祠を見よ：光る順番を覚えること',
+  'delveUi.tracker.riteInput': '光った順に各祠の前でFを押す（{current}/{total}）',
+  'delveUi.tracker.riteOpen': '聖遺物匣が開いた：Fで戦利品を受け取る',
   'delveUi.tracker.exitHintOpen': '墓石の通路へ歩み入れ(北)',
   'delveUi.tracker.marks': 'デルヴの刻印: {count}',
   'delveUi.tracker.module': 'モジュール {current}/{total}',
@@ -4997,6 +5006,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '祠は順番に光る。各祠を順に起動して順序を繰り返せ。誤った接触は試みを失敗させ順序を再生する。完璧な試みは最も豊かな戦利品を得て、試行回数を使い果たすと聖遺物匣は最も貧しい形で開く。儀式がお前をどう試すか選べ。',
   'delveRiteUi.medium': '普通',
   'delveRiteUi.showsTimes': '順序を{count}回表示',
+  'delveRiteUi.guideWatch': '選択すると、4つの祠が順番に光ります。順番を覚えてください。',
+  'delveRiteUi.guideRepeat':
+    '祠が暗くなったら、同じ順番で各祠まで歩きFキー（インタラクト）を押してください。',
+  'delveRiteUi.guideStakes':
+    '間違った祠に触れると黒水を浴び、挑戦回数を1回失います。順番を最後までなぞれば聖遺物匣が開きます。',
   'delveRiteUi.showsOnce': '順序は一度だけ表示',
   'delveRiteUi.symbols': '{count}個の記号',
   'delveRiteUi.mistakes': '{count}回の失敗が許容される',

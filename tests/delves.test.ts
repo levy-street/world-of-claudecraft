@@ -2040,6 +2040,22 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     expect(run.drownedLitanyRite?.sequencePlaying).toBe(false);
   });
 
+  it('surfaces the rite phase on delveRun for the HUD guidance', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    expect(sim.delveRun?.rite).toBeNull();
+    killNhalia(sim);
+    expect(sim.delveRun?.rite?.phase).toBe('choose');
+    chooseRite(sim, 'easy');
+    sim.tick();
+    expect(sim.delveRun?.rite?.phase).toBe('playback');
+    waitForRitePlayback(sim, run);
+    expect(sim.delveRun?.rite?.phase).toBe('input');
+    expect(sim.delveRun?.rite?.total).toBe(run.drownedLitanyRite!.sequence.length);
+    replaySequence(sim, run);
+    expect(sim.delveRun?.rite?.phase).toBe('open');
+  });
+
   it('each intensity sets its sequence length, tries, and playback count', () => {
     const cfg = (intensity: 'easy' | 'medium' | 'hard') => {
       const sim = makeSim();

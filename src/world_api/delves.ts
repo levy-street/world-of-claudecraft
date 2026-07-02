@@ -1,6 +1,18 @@
 import type { Ante, LootTier, PickAction, VisibleCell } from '../sim/lockpick';
 import type { DelveObjectiveState, RiteIntensity } from '../sim/types';
 
+/** Drowned Reliquary Rite progress, surfaced so the HUD can guide the player:
+ * choose = the reliquary is up and waits for a difficulty pick, playback = the
+ * shrine sequence is being shown, input = the player must repeat it (current/
+ * total track progress through the sequence), open = the reliquary has opened. */
+export type DelveRitePhase = 'choose' | 'playback' | 'input' | 'open';
+
+export interface DelveRiteInfo {
+  phase: DelveRitePhase;
+  current: number;
+  total: number;
+}
+
 export interface DelveRunInfo {
   delveId: string;
   tierId: string;
@@ -16,6 +28,8 @@ export interface DelveRunInfo {
   /** §7.6: this run rolled Bountiful: the reward chest is a purple Coffer that
    * only yields to a Hard + Premium-ante solve and guarantees a signature rare. */
   bountiful: boolean;
+  /** The Drowned Reliquary Rite finale state, or null while no rite is up. */
+  rite: DelveRiteInfo | null;
 }
 
 // Render-safe projection of an active lockpicking attempt. Only ever holds cells

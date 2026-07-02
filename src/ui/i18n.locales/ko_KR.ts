@@ -2948,6 +2948,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveLockedChestInteract': 'F를 눌러 자물쇠 따기',
   'worldContent.delveRewardChestInteract': 'F를 눌러 전리품 받기',
   'worldContent.delveSurfaceExitInteract': 'F를 눌러 지상으로 오르기',
+  'worldContent.delveReliquaryInteract': '가라앉은 성물함: F를 눌러 의식 시작',
+  'worldContent.delveRiteShrineBellInteract': '종 제단: F를 눌러 울리기',
+  'worldContent.delveRiteShrineCandleInteract': '촛불 제단: F를 눌러 만지기',
+  'worldContent.delveRiteShrineReedInteract': '갈대 제단: F를 눌러 만지기',
+  'worldContent.delveRiteShrineSkullInteract': '해골 제단: F를 눌러 만지기',
   'worldContent.dungeonPartyWarning':
     '{name}은 {count}명의 완전한 파티를 위해 마련된 곳입니다. 조심해서 나아가십시오.',
   'worldContent.dungeonInstanceBusy':
@@ -4614,6 +4619,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.affix': '고난 요소',
   'delveUi.tracker.complete': '완료',
   'delveUi.tracker.exitHintLocked': '북쪽 통로를 열려면 잡몹을 정리하세요',
+  'delveUi.tracker.riteChoose': '가라앉은 성물함에 다가가 F를 눌러 의식을 시작하세요',
+  'delveUi.tracker.ritePlayback': '제단을 지켜보세요: 빛나는 순서를 기억하세요',
+  'delveUi.tracker.riteInput': '빛난 순서대로 각 제단에서 F를 누르세요 ({current}/{total})',
+  'delveUi.tracker.riteOpen': '성물함이 열렸습니다: F를 눌러 전리품을 획득하세요',
   'delveUi.tracker.exitHintOpen': '묘비 통로로 걸어 들어가세요 (북쪽)',
   'delveUi.tracker.marks': '탐굴 증표: {count}',
   'delveUi.tracker.module': '구역 {current}/{total}',
@@ -5006,6 +5015,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '성소들이 순서대로 빛난다. 각 성소를 차례로 활성화하여 순서를 반복하라. 잘못된 접촉은 시도를 실패시키고 순서를 다시 재생한다. 완벽한 시도는 가장 풍성한 전리품을 얻고, 시도 횟수를 모두 소진하면 유물함이 가장 초라한 상태로 열린다. 의식이 그대를 어떻게 시험할지 선택하라.',
   'delveRiteUi.medium': '보통',
   'delveRiteUi.showsTimes': '순서를 {count}회 표시',
+  'delveRiteUi.guideWatch': '선택하면 네 개의 제단이 차례로 빛납니다. 순서를 기억하세요.',
+  'delveRiteUi.guideRepeat':
+    '제단이 어두워지면 같은 순서로 각 제단에 걸어가 F(상호작용)를 누르세요.',
+  'delveRiteUi.guideStakes':
+    '잘못된 제단을 만지면 검은 물을 뒤집어쓰고 시도 횟수를 잃습니다. 순서를 완성하면 성물함이 열립니다.',
   'delveRiteUi.showsOnce': '순서를 한 번만 표시',
   'delveRiteUi.symbols': '기호 {count}개',
   'delveRiteUi.mistakes': '{count}회의 실수 허용',

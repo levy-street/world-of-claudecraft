@@ -2983,6 +2983,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveLockedChestInteract': 'Нажмите F, чтобы вскрыть замок',
   'worldContent.delveRewardChestInteract': 'Нажмите F, чтобы забрать добычу',
   'worldContent.delveSurfaceExitInteract': 'Нажмите F, чтобы подняться',
+  'worldContent.delveReliquaryInteract': 'Утопший реликварий: нажмите F, чтобы начать обряд',
+  'worldContent.delveRiteShrineBellInteract': 'Святилище колокола: нажмите F, чтобы позвонить',
+  'worldContent.delveRiteShrineCandleInteract': 'Святилище свечи: нажмите F, чтобы коснуться',
+  'worldContent.delveRiteShrineReedInteract': 'Святилище тростника: нажмите F, чтобы коснуться',
+  'worldContent.delveRiteShrineSkullInteract': 'Святилище черепа: нажмите F, чтобы коснуться',
   'worldContent.dungeonPartyWarning':
     '{name} рассчитано на полную группу из {count} игроков. Продвигайтесь осторожно.',
   'worldContent.dungeonInstanceBusy': 'Все копии {name} заняты. Попробуйте еще раз чуть позже.',
@@ -4704,6 +4709,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.affix': 'Аффиксы',
   'delveUi.tracker.complete': 'Завершено',
   'delveUi.tracker.exitHintLocked': 'Зачистите врагов, чтобы открыть проход на север',
+  'delveUi.tracker.riteChoose': 'Подойдите к Утопшему реликварию и нажмите F, чтобы начать обряд',
+  'delveUi.tracker.ritePlayback':
+    'Следите за святилищами: запомните порядок, в котором они загораются',
+  'delveUi.tracker.riteInput':
+    'Нажимайте F у каждого святилища в порядке их загорания ({current}/{total})',
+  'delveUi.tracker.riteOpen': 'Реликварий открыт: нажмите F рядом с ним, чтобы забрать добычу',
   'delveUi.tracker.exitHintOpen': 'Войдите в надгробный проход (север)',
   'delveUi.tracker.marks': 'Метки Вылазок: {count}',
   'delveUi.tracker.module': 'Секция {current} из {total}',
@@ -5110,6 +5121,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Святилища загорятся по порядку. Повторите последовательность, активируя каждое святилище по очереди. Неверное касание проваливает попытку и повторяет последовательность, безупречная попытка приносит богатейшую добычу, а исчерпание попыток открывает реликварий с самой скудной добычей. Выберите, как обряд испытает вас.',
   'delveRiteUi.medium': 'Средний',
   'delveRiteUi.showsTimes': 'Последовательность показана {count} раз(а)',
+  'delveRiteUi.guideWatch':
+    'После выбора четыре святилища будут загораться по очереди. Запомните порядок.',
+  'delveRiteUi.guideRepeat':
+    'Когда святилища погаснут, подойдите к каждому в том же порядке и нажмите F (взаимодействие).',
+  'delveRiteUi.guideStakes':
+    'Ошибка окатит вас черной водой и отнимет попытку. Завершите последовательность, чтобы открыть реликварий.',
   'delveRiteUi.showsOnce': 'Последовательность показана один раз',
   'delveRiteUi.symbols': 'Символов: {count}',
   'delveRiteUi.mistakes': 'Допустимо ошибок: {count}',

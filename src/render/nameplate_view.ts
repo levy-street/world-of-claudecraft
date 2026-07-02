@@ -98,7 +98,10 @@ export function nameplatePlanInto(
   const isDelveInteract =
     e.templateId === 'delve_locked_chest' ||
     e.templateId === 'delve_reward_chest' ||
-    e.templateId === 'delve_surface_exit';
+    e.templateId === 'delve_surface_exit' ||
+    e.templateId === 'delve_drowned_reliquary' ||
+    e.templateId === 'delve_drowned_reliquary_open' ||
+    e.templateId?.startsWith('delve_rite_shrine_');
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =

@@ -15,6 +15,7 @@ import {
   DT,
   type Entity,
   SISTER_NHALIA_BOSS_ID,
+  TOLLING_BELL_TEMPLATE_ID,
   type TollingBellEntity,
 } from '../types';
 
@@ -33,23 +34,31 @@ const FINAL_BELL_HP = 0.1;
 const FINAL_BELL_THRALLS = 4;
 const FINAL_BELL_DMG_PCT = 0.22;
 
-// Tolling Bells: volley every ~10-12s, 2 bells on Normal / 3 on Heroic.
-// Each bell travels at 8 yd/s and expires after ~12s (covers ~96yd, past
-// the Apse moat). Contact radius 1.3yd, damage 12% maxHp (nature),
-// knockback directed outward from altar center.
+// Tolling Bells: volley every ~10-12s, 4 bells per volley on every tier, spread
+// evenly at 90 degrees apart with a random rotation per volley so each volley
+// flies in 4 different directions. Each bell travels at 8 yd/s, passes straight
+// through the apse walls, and despawns a short margin beyond them (lifetime is
+// only a failsafe). Contact radius 2yd, damage 12% maxHp (nature), knockback
+// directed outward from altar center.
 const BELL_VOLLEY_INTERVAL_MIN = 10;
 const BELL_VOLLEY_INTERVAL_MAX = 12;
-const BELL_COUNT_NORMAL = 2;
-const BELL_COUNT_HEROIC = 3;
+const BELL_COUNT = 4;
 const BELL_SPEED = 8; // yd/s
-const BELL_LIFETIME = 12; // seconds
-const BELL_HIT_RADIUS = 1.3; // yards
+const BELL_LIFETIME = 12; // seconds, failsafe only; the bounds check despawns first
+const BELL_HIT_RADIUS = 2.0; // yards, matches the ~2m rendered bell
 const BELL_DMG_PCT = 0.12;
 const BELL_KNOCKBACK_DIST = 5; // yards pushed outward from altar
-const BELL_TEMPLATE_ID = 'tolling_bell';
+const BELL_TEMPLATE_ID = TOLLING_BELL_TEMPLATE_ID;
 // Altar center in room-local coords (Apse layout: altar at [0,72,11,11]).
 const ALTAR_X = 0;
 const ALTAR_Z = 72;
+// Apse room bounds in room-local coords (delve_litany_layout LITANY_APSE:
+// wallX 25, zMin -16, zMax 92). A bell that has flown this margin past a wall
+// has visibly passed through it and despawns.
+const APSE_WALL_X = 25;
+const APSE_Z_MIN = -16;
+const APSE_Z_MAX = 92;
+const BELL_DESPAWN_MARGIN = 3;
 
 export function initDrownedLitanyBossState(run: DelveRun): void {
   if (run.delveId !== 'drowned_litany') return;
@@ -301,8 +310,9 @@ function spawnBellEntity(
   return { entityId: id, remaining: BELL_LIFETIME, vx, vz };
 }
 
-// Fire a Tolling Bells volley: emit the telegraph + spawn one bell per count,
-// spread at equal angles from the altar outward across the apse.
+// Fire a Tolling Bells volley: emit the telegraph + spawn BELL_COUNT bells,
+// evenly spaced around the altar with a random rotation so every volley flies
+// out in 4 different directions.
 function fireBellVolley(
   ctx: SimContext,
   run: DelveRun,
@@ -325,20 +335,12 @@ function fireBellVolley(
     fx: 'nova',
   });
 
-  // Spread angles: count bells evenly across a ~180-degree forward arc from altar.
-  // The base angle is northward (toward z-min = toward players on the field).
-  // Each bell gets a slightly randomized start angle within its slice.
-  const arcTotal = Math.PI * 0.9; // ~162 degrees
-  const sliceSize = arcTotal / Math.max(1, count - 1 || 1);
-  const arcStart = -arcTotal / 2;
-
+  // Spread angles: count bells evenly around the full circle (90 degrees apart
+  // for 4), rotated by a random offset each volley so the directions differ
+  // volley to volley. Angle 0 = toward z-min (north, into the arena field).
+  const offset = ctx.rng.next() * ((Math.PI * 2) / Math.max(1, count));
   for (let i = 0; i < count; i++) {
-    // For a single bell, shoot straight north; for multiple, spread them.
-    const baseAngle = count === 1 ? 0 : arcStart + i * sliceSize;
-    // Small random jitter within half a slice to avoid perfectly parallel paths.
-    const jitter = count === 1 ? 0 : (ctx.rng.next() - 0.5) * sliceSize * 0.4;
-    const angle = baseAngle + jitter;
-    // Outward from altar: angle 0 = toward z-min (players), rotate from there.
+    const angle = offset + (i * Math.PI * 2) / Math.max(1, count);
     const vx = Math.sin(angle);
     const vz = -Math.cos(angle); // negative z = forward/north into the arena field
     const bell = spawnBellEntity(ctx, run, ALTAR_X, ALTAR_Z, vx, vz, zBase);
@@ -366,10 +368,23 @@ function tickBells(
     const bellE = ctx.entities.get(bell.entityId);
     if (!bellE || bellE.dead) continue;
 
-    // Move the bell entity this tick.
+    // Move the bell entity this tick. Bells ignore collision on purpose: they
+    // fly straight through the apse walls, then despawn just past them.
     bellE.pos.x += bell.vx * BELL_SPEED * DT;
     bellE.pos.z += bell.vz * BELL_SPEED * DT;
     ctx.rebucket(bellE);
+
+    // Out of the room: the bell has passed through a wall, remove it.
+    const localX = bellE.pos.x - run.origin.x;
+    const localZ = bellE.pos.z - zBase;
+    if (
+      Math.abs(localX) > APSE_WALL_X + BELL_DESPAWN_MARGIN ||
+      localZ < APSE_Z_MIN - BELL_DESPAWN_MARGIN ||
+      localZ > APSE_Z_MAX + BELL_DESPAWN_MARGIN
+    ) {
+      ctx.dropEntity(bell.entityId);
+      continue;
+    }
 
     // Contact check: damage + knockback any player within hit radius.
     const bx = bellE.pos.x;
@@ -411,13 +426,6 @@ function tickTollingBells(
   st: DrownedLitanyBossState,
   zBase: number,
 ): void {
-  const tier = DELVES[run.delveId]?.tiers.find((t) => t.id === run.tierId);
-  const heroic = (tier?.enemyLevelBonus ?? 0) > 0;
-  const count = heroic ? BELL_COUNT_HEROIC : BELL_COUNT_NORMAL;
-
-  // Advance in-flight bells every tick.
-  tickBells(ctx, run, boss, st, zBase);
-
   // Countdown to next volley.
   st.bellVolleyTimer -= DT;
   if (st.bellVolleyTimer > 0) return;
@@ -427,7 +435,7 @@ function tickTollingBells(
     BELL_VOLLEY_INTERVAL_MIN +
     ctx.rng.next() * (BELL_VOLLEY_INTERVAL_MAX - BELL_VOLLEY_INTERVAL_MIN);
 
-  fireBellVolley(ctx, run, boss, st, count, zBase);
+  fireBellVolley(ctx, run, boss, st, BELL_COUNT, zBase);
 }
 
 export function tickDrownedLitanyBoss(ctx: SimContext, run: DelveRun): void {
@@ -448,6 +456,9 @@ export function tickDrownedLitanyBoss(ctx: SimContext, run: DelveRun): void {
   const zBase = boss.spawnPos.z - ALTAR_Z;
 
   tickBlackwaterMarks(ctx, run, boss, st);
+  // In-flight bells keep moving (and despawn past the walls) even while the
+  // boss is out of combat or resetting; only NEW volleys need the combat gate.
+  tickBells(ctx, run, boss, st, zBase);
   if (boss.dead) {
     // Remove any lingering bell entities when the boss dies.
     for (const bell of st.bells) {

@@ -207,7 +207,10 @@
   }
 
   /* ---------- lockpicking minigame ("Tumbler's Path") ---------- */
-  #lockpick-panel {
+  /* #delve-rite-panel (the Drowned Reliquary Rite difficulty popup) reuses the
+     lp-ante-* selector family by design (rite_window.ts mirrors the ante picker). */
+  #lockpick-panel,
+  #delve-rite-panel {
     width: 420px;
     max-width: 92vw;
     padding: 14px;
@@ -216,18 +219,29 @@
     transform: translate(-50%, -50%);
     position: fixed;
   }
-  #lockpick-panel .lp-blurb {
+  #lockpick-panel .lp-blurb,
+  #delve-rite-panel .lp-blurb {
     font-size: 12px;
     color: #e8e0c8;
     line-height: 1.4;
     margin: 8px 0 12px;
   }
-  #lockpick-panel .lp-ante-row {
+  #delve-rite-panel .rite-guide {
+    margin: 0 0 12px;
+    padding-left: 18px;
+    list-style: decimal;
+  }
+  #delve-rite-panel .rite-guide li {
+    margin: 2px 0;
+  }
+  #lockpick-panel .lp-ante-row,
+  #delve-rite-panel .lp-ante-row {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
-  #lockpick-panel .lp-ante-btn {
+  #lockpick-panel .lp-ante-btn,
+  #delve-rite-panel .lp-ante-btn {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -241,20 +255,25 @@
     gap: 12px;
   }
   #lockpick-panel .lp-ante-btn:hover,
-  #lockpick-panel .lp-ante-btn:focus-visible {
+  #lockpick-panel .lp-ante-btn:focus-visible,
+  #delve-rite-panel .lp-ante-btn:hover,
+  #delve-rite-panel .lp-ante-btn:focus-visible {
     border-color: var(--gold);
     background: #2a2010;
   }
-  #lockpick-panel .lp-ante-tier {
+  #lockpick-panel .lp-ante-tier,
+  #delve-rite-panel .lp-ante-tier {
     font-family: var(--title-font);
     font-size: 15px;
   }
-  #lockpick-panel .lp-ante-badges {
+  #lockpick-panel .lp-ante-badges,
+  #delve-rite-panel .lp-ante-badges {
     display: flex;
     gap: 6px;
     align-items: center;
   }
-  #lockpick-panel .lp-ante-pages {
+  #lockpick-panel .lp-ante-pages,
+  #delve-rite-panel .lp-ante-pages {
     font-size: 11px;
     color: #1a1410;
     background: var(--gold);
@@ -263,7 +282,8 @@
     font-weight: 700;
     white-space: nowrap;
   }
-  #lockpick-panel .lp-ante-tries {
+  #lockpick-panel .lp-ante-tries,
+  #delve-rite-panel .lp-ante-tries {
     font-size: 11px;
     color: #c9b27a;
     border: 1px solid #5a4a28;
@@ -271,10 +291,24 @@
     padding: 2px 8px;
     white-space: nowrap;
   }
-  #lockpick-panel .lp-ante-timer {
+  #lockpick-panel .lp-ante-timer,
+  #delve-rite-panel .lp-ante-timer {
     font-size: 11px;
     color: #ff9e5a;
     white-space: nowrap;
+  }
+  /* The rite buttons carry two long trailing labels (playback count + reward),
+     so unlike the lockpick ante row they must wrap instead of overflowing the
+     420px panel (and the 92vw mobile panel). Placed AFTER the shared lp-ante
+     rules so these same-specificity overrides win the cascade. */
+  #delve-rite-panel .lp-ante-btn {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 4px;
+  }
+  #delve-rite-panel .lp-ante-timer {
+    white-space: normal;
+    text-align: left;
   }
   /* §7.6 Bountiful Coffer, purple/epic accent overriding the gold ante selector. */
   #lockpick-panel .lp-blurb-coffer {

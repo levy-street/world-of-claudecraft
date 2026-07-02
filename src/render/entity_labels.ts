@@ -26,6 +26,26 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'delve_surface_exit') {
     return t('worldContent.delveSurfaceExitInteract');
   }
+  // The Drowned Reliquary Rite finale: the risen reliquary and the four shrines
+  // all carry an explicit "Press F" call to action while the rite is up.
+  if (entity.templateId === 'delve_drowned_reliquary') {
+    return t('worldContent.delveReliquaryInteract');
+  }
+  if (entity.templateId === 'delve_drowned_reliquary_open') {
+    return t('worldContent.delveRewardChestInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_bell') {
+    return t('worldContent.delveRiteShrineBellInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_candle') {
+    return t('worldContent.delveRiteShrineCandleInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_reed') {
+    return t('worldContent.delveRiteShrineReedInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_skull') {
+    return t('worldContent.delveRiteShrineSkullInteract');
+  }
   if (
     (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
     entity.dungeonId

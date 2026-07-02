@@ -2294,6 +2294,9 @@ export const es: EnTranslations = {
     "easy": "Easy",
     "medium": "Medium",
     "hard": "Hard",
+    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
+    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
+    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
@@ -2349,7 +2352,11 @@ export const es: EnTranslations = {
       "complete": "Completado",
       "marks": "Marcas de Expedición: {count}",
       "exitHintOpen": "Entra al pasaje de lápida (norte)",
-      "exitHintLocked": "Despeja a los enemigos para abrir el pasaje al norte"
+      "exitHintLocked": "Despeja a los enemigos para abrir el pasaje al norte",
+      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
+      "ritePlayback": "Watch the shrines: memorize the order they light up",
+      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
+      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
     },
     "objective": {
       "kill_boss": "Da muerte a {boss}",
@@ -6917,6 +6924,11 @@ export const es: EnTranslations = {
     "dungeonInstanceBusy": "Todas las instancias de {name} están ocupadas. Inténtalo de nuevo pronto.",
     "delveLockedChestInteract": "Pulsa F para forzar la cerradura",
     "delveRewardChestInteract": "Pulsa F para reclamar el botín",
-    "delveSurfaceExitInteract": "Pulsa F para trepar"
+    "delveSurfaceExitInteract": "Pulsa F para trepar",
+    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
+    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
+    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
+    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
   }
 };

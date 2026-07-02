@@ -2294,6 +2294,9 @@ export const zh_CN: EnTranslations = {
     "easy": "Easy",
     "medium": "中等",
     "hard": "Hard",
+    "guideWatch": "选择后，四座神龛会依次亮起。记住顺序。",
+    "guideRepeat": "神龛熄灭后，按同样的顺序走到每座神龛前按 F（互动）。",
+    "guideStakes": "按错神龛会被黑水泼溅并损失一次尝试。完成整个顺序即可开启圣物匣。",
     "showsTimes": "顺序展示{count}次",
     "showsOnce": "顺序仅展示一次",
     "symbols": "{count}个符号",
@@ -2349,7 +2352,11 @@ export const zh_CN: EnTranslations = {
       "complete": "已完成",
       "marks": "探秘印记：{count}",
       "exitHintOpen": "走进墓碑通道（北面）",
-      "exitHintLocked": "清空杂兵以开启向北的通道"
+      "exitHintLocked": "清空杂兵以开启向北的通道",
+      "riteChoose": "靠近沉溺圣物匣并按 F 开始仪式",
+      "ritePlayback": "注视神龛：记住它们亮起的顺序",
+      "riteInput": "按亮起的顺序在每座神龛前按 F（{current}/{total}）",
+      "riteOpen": "圣物匣已开启：在它面前按 F 领取战利品"
     },
     "objective": {
       "kill_boss": "击杀{boss}",
@@ -6917,6 +6924,11 @@ export const zh_CN: EnTranslations = {
     "dungeonInstanceBusy": "{name}的所有副本都已被占用。请稍后再试。",
     "delveLockedChestInteract": "按 F 撬锁",
     "delveRewardChestInteract": "按 F 领取战利品",
-    "delveSurfaceExitInteract": "按 F 攀回地表"
+    "delveSurfaceExitInteract": "按 F 攀回地表",
+    "delveReliquaryInteract": "沉溺圣物匣：按 F 开始仪式",
+    "delveRiteShrineBellInteract": "铜铃神龛：按 F 敲响",
+    "delveRiteShrineCandleInteract": "烛火神龛：按 F 触碰",
+    "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
+    "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰"
   }
 };

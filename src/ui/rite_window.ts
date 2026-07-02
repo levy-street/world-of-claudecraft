@@ -63,6 +63,11 @@ export class RiteWindow {
       `<div class="panel-title"><span>${esc(t('delveRiteUi.title'))}</span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('delveRiteUi.closeAria'))}">${svgIcon('close')}</button></div>` +
       `<div class="lp-blurb">${esc(t('delveRiteUi.blurb'))}</div>` +
+      `<ol class="lp-blurb rite-guide">` +
+      `<li>${esc(t('delveRiteUi.guideWatch'))}</li>` +
+      `<li>${esc(t('delveRiteUi.guideRepeat'))}</li>` +
+      `<li>${esc(t('delveRiteUi.guideStakes'))}</li>` +
+      `</ol>` +
       `<div class="lp-ante-row">${buttons}</div>`;
     el.querySelectorAll('[data-rite]').forEach((btn) => {
       btn.addEventListener('click', () => {

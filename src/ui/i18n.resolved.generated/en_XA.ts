@@ -2294,6 +2294,9 @@ export const en_XA: EnTranslations = {
     "easy": "[Éášý]",
     "medium": "[Ɱéðíúɱ]",
     "hard": "[Ĥáŕð]",
+    "guideWatch": "[Áƒţéŕ ýóú çĥóóšé, ţĥé ƒóúŕ šĥŕíñéš ļíĝĥţ úþ óñé áţ á ţíɱé. Ɱéɱóŕížé ţĥé óŕðéŕ.]",
+    "guideRepeat": "[Ŵĥéñ ţĥé šĥŕíñéš ƒáļļ ðáŕķ, ŵáļķ ţó éáçĥ šĥŕíñé áñð þŕéšš Ƒ (Íñţéŕáçţ) íñ ţĥáţ šáɱé óŕðéŕ.]",
+    "guideStakes": "[Á ŵŕóñĝ šĥŕíñé šþļášĥéš ýóú ŵíţĥ ƀļáçķŵáţéŕ áñð çóšţš á ţŕý. Çóɱþļéţé ţĥé šéɋúéñçé ţó óþéñ ţĥé ŕéļíɋúáŕý.]",
     "showsTimes": "[Šéɋúéñçé šĥóŵñ {count} ţíɱéš]",
     "showsOnce": "[Šéɋúéñçé šĥóŵñ óñçé]",
     "symbols": "[{count} šýɱƀóļš]",
@@ -2349,7 +2352,11 @@ export const en_XA: EnTranslations = {
       "complete": "[Çóɱþļéţé]",
       "marks": "[Ðéļʋé Ɱáŕķš: {count}]",
       "exitHintOpen": "[Ŵáļķ íñţó ţĥé ţóɱƀšţóñé þáššáĝé (ñóŕţĥ)]",
-      "exitHintLocked": "[Çļéáŕ ţŕášĥ ɱóƀš ţó óþéñ ţĥé þáššáĝé ñóŕţĥ]"
+      "exitHintLocked": "[Çļéáŕ ţŕášĥ ɱóƀš ţó óþéñ ţĥé þáššáĝé ñóŕţĥ]",
+      "riteChoose": "[Áþþŕóáçĥ ţĥé Ðŕóŵñéð Ŕéļíɋúáŕý áñð þŕéšš Ƒ ţó ƀéĝíñ ţĥé ŕíţé]",
+      "ritePlayback": "[Ŵáţçĥ ţĥé šĥŕíñéš: ɱéɱóŕížé ţĥé óŕðéŕ ţĥéý ļíĝĥţ úþ]",
+      "riteInput": "[Þŕéšš Ƒ áţ éáçĥ šĥŕíñé íñ ţĥé óŕðéŕ ţĥéý ļíţ ({current}/{total})]",
+      "riteOpen": "[Ţĥé ŕéļíɋúáŕý íš óþéñ: þŕéšš Ƒ óñ íţ ţó çļáíɱ ýóúŕ šþóíļš]"
     },
     "objective": {
       "kill_boss": "[Šļáý {boss}]",
@@ -6917,6 +6924,11 @@ export const en_XA: EnTranslations = {
     "dungeonInstanceBusy": "[Áļļ íñšţáñçéš óƒ {name} áŕé ƀúšý. Ţŕý áĝáíñ šóóñ.]",
     "delveLockedChestInteract": "[Þŕéšš Ƒ ţó þíçķ ţĥé ļóçķ]",
     "delveRewardChestInteract": "[Þŕéšš Ƒ ţó çļáíɱ šþóíļš]",
-    "delveSurfaceExitInteract": "[Þŕéšš Ƒ ţó çļíɱƀ]"
+    "delveSurfaceExitInteract": "[Þŕéšš Ƒ ţó çļíɱƀ]",
+    "delveReliquaryInteract": "[Ðŕóŵñéð Ŕéļíɋúáŕý: Þŕéšš Ƒ ţó ƀéĝíñ ţĥé ŕíţé]",
+    "delveRiteShrineBellInteract": "[Ɓéļļ Šĥŕíñé: Þŕéšš Ƒ ţó ŕíñĝ íţ]",
+    "delveRiteShrineCandleInteract": "[Çáñðļé Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
+    "delveRiteShrineReedInteract": "[Ŕééð Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
+    "delveRiteShrineSkullInteract": "[Šķúļļ Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]"
   }
 };

@@ -1811,6 +1811,9 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 // The Drowned Litany finale boss. Used by the drowned_litany_boss driver.
 export const SISTER_NHALIA_BOSS_ID = 'sister_nhalia_drowned_canticle';
+// The Tolling Bells projectile mob (Drowned Litany finale): moved exclusively by
+// the boss driver. Shared with mob/locomotion.ts so the AI dispatcher skips it.
+export const TOLLING_BELL_TEMPLATE_ID = 'tolling_bell';
 
 export function xpForLevel(level: number): number {
   return XP_TABLE[Math.min(level - 1, XP_TABLE.length - 1)];

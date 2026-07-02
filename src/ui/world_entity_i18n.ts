@@ -239,6 +239,11 @@ type WorldEntityTranslations = {
     delveLockedChestInteract: string;
     delveRewardChestInteract: string;
     delveSurfaceExitInteract: string;
+    delveReliquaryInteract: string;
+    delveRiteShrineBellInteract: string;
+    delveRiteShrineCandleInteract: string;
+    delveRiteShrineReedInteract: string;
+    delveRiteShrineSkullInteract: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -334,6 +339,11 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveLockedChestInteract: 'Press F to pick the lock',
       delveRewardChestInteract: 'Press F to claim spoils',
       delveSurfaceExitInteract: 'Press F to climb',
+      delveReliquaryInteract: 'Drowned Reliquary: Press F to begin the rite',
+      delveRiteShrineBellInteract: 'Bell Shrine: Press F to ring it',
+      delveRiteShrineCandleInteract: 'Candle Shrine: Press F to touch it',
+      delveRiteShrineReedInteract: 'Reed Shrine: Press F to touch it',
+      delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves },
   };
