@@ -4401,6 +4401,98 @@ export const zh_CN: EnTranslations = {
         "name": "唤醒",
         "description": "快速恢复法力值。（法师天赋）"
       },
+      "rebuke": {
+        "name": "责难",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（圣骑士天赋）"
+      },
+      "crusader_strike": {
+        "name": "十字军打击",
+        "description": "打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）"
+      },
+      "holy_wrath": {
+        "name": "神圣愤怒",
+        "description": "释放神圣之力，对附近敌人造成 {damage} 点伤害。（圣骑士天赋）"
+      },
+      "divine_shield": {
+        "name": "圣盾术",
+        "description": "以神圣之力保护你，吸收大量伤害，持续 8 秒。（圣骑士天赋）"
+      },
+      "avenging_wrath": {
+        "name": "复仇之怒",
+        "description": "召唤复仇之力，使攻击强度和法术强度提高，持续 20 秒。（圣骑士天赋）"
+      },
+      "hammer_of_wrath": {
+        "name": "愤怒之锤",
+        "description": "向敌人投掷神圣之锤，造成 {damage} 点神圣伤害。（圣骑士天赋）"
+      },
+      "counter_shot": {
+        "name": "反制射击",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（猎人天赋）"
+      },
+      "frost_trap": {
+        "name": "冰霜陷阱",
+        "description": "冻结目标区域的敌人，使其定身 3 秒。（猎人天赋）"
+      },
+      "mend_pet": {
+        "name": "治疗宠物",
+        "description": "使一个友方目标在 15 秒内恢复 {damage} 点生命值。（猎人天赋）"
+      },
+      "multi_shot": {
+        "name": "多重射击",
+        "description": "发射多枚箭矢，对附近敌人造成 {damage} 点伤害。（猎人天赋）"
+      },
+      "deterrence": {
+        "name": "威慑",
+        "description": "使你的躲闪几率提高 50%，持续 10 秒。（猎人天赋）"
+      },
+      "aspect_of_the_wild": {
+        "name": "野性守护",
+        "description": "以野性之力鼓舞附近盟友，使攻击强度提高，持续 5 分钟。（猎人天赋）"
+      },
+      "kick": {
+        "name": "脚踢",
+        "description": "打断施法，并使该系法术在 4 秒内无法施放。（潜行者天赋）"
+      },
+      "preparation": {
+        "name": "预备",
+        "description": "结束疾跑、闪避和消失的冷却时间。（潜行者天赋）"
+      },
+      "ghostly_strike": {
+        "name": "鬼魅攻击",
+        "description": "打击敌人，造成武器伤害外加 {damage} 点伤害，并短暂提高躲闪。奖励 1 个连击点。（潜行者天赋）"
+      },
+      "cloak_of_shadows": {
+        "name": "暗影斗篷",
+        "description": "以暗影包裹自身，吸收伤害，持续 5 秒。（潜行者天赋）"
+      },
+      "shadowstep": {
+        "name": "暗影步",
+        "description": "穿过暗影向目标移动。（潜行者天赋）"
+      },
+      "silence": {
+        "name": "沉默",
+        "description": "使目标沉默 4 秒。（牧师天赋）"
+      },
+      "psychic_scream": {
+        "name": "心灵尖啸",
+        "description": "恐吓附近敌人，最多持续 4 秒。受到伤害可能打破效果。（牧师天赋）"
+      },
+      "inner_focus": {
+        "name": "心灵专注",
+        "description": "使你的下一个法术不消耗法力值。持续 60 秒。（牧师天赋）"
+      },
+      "desperate_prayer": {
+        "name": "绝望祷言",
+        "description": "立即为你恢复 {damage} 点生命值。（牧师天赋）"
+      },
+      "prayer_of_healing": {
+        "name": "治疗祷言",
+        "description": "为附近盟友恢复 {damage} 点生命值。（牧师天赋）"
+      },
+      "mind_sear": {
+        "name": "精神灼烧",
+        "description": "引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）"
+      },
       "holy_shock": {
         "name": "神圣震击",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"

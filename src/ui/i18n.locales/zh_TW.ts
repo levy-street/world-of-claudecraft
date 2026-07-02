@@ -4897,4 +4897,66 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在目標區域召喚隕石，造成 {damage} 點火焰傷害並燃燒地面。（法師天賦）',
   'entities.abilities.evocation.name': '喚醒',
   'entities.abilities.evocation.description': '快速恢復法力值。（法師天賦）',
+  'entities.abilities.rebuke.name': '責難',
+  'entities.abilities.rebuke.description':
+    '打斷施法，並使該系法術在 4 秒內無法施放。（聖騎士天賦）',
+  'entities.abilities.crusader_strike.name': '十字軍聖擊',
+  'entities.abilities.crusader_strike.description':
+    '打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）',
+  'entities.abilities.holy_wrath.name': '神聖憤怒',
+  'entities.abilities.holy_wrath.description':
+    '釋放神聖之力，對附近敵人造成 {damage} 點傷害。（聖騎士天賦）',
+  'entities.abilities.divine_shield.name': '聖盾術',
+  'entities.abilities.divine_shield.description':
+    '以神聖之力保護你，吸收大量傷害，持續 8 秒。（聖騎士天賦）',
+  'entities.abilities.avenging_wrath.name': '復仇之怒',
+  'entities.abilities.avenging_wrath.description':
+    '召喚復仇之力，使攻擊強度和法術強度提高，持續 20 秒。（聖騎士天賦）',
+  'entities.abilities.hammer_of_wrath.name': '憤怒之錘',
+  'entities.abilities.hammer_of_wrath.description':
+    '向敵人投擲神聖之錘，造成 {damage} 點神聖傷害。（聖騎士天賦）',
+  'entities.abilities.counter_shot.name': '反制射擊',
+  'entities.abilities.counter_shot.description':
+    '打斷施法，並使該系法術在 4 秒內無法施放。（獵人天賦）',
+  'entities.abilities.frost_trap.name': '冰霜陷阱',
+  'entities.abilities.frost_trap.description': '凍結目標區域的敵人，使其定身 3 秒。（獵人天賦）',
+  'entities.abilities.mend_pet.name': '治療寵物',
+  'entities.abilities.mend_pet.description':
+    '使一個友方目標在 15 秒內恢復 {damage} 點生命值。（獵人天賦）',
+  'entities.abilities.multi_shot.name': '多重射擊',
+  'entities.abilities.multi_shot.description':
+    '發射多枚箭矢，對附近敵人造成 {damage} 點傷害。（獵人天賦）',
+  'entities.abilities.deterrence.name': '威懾',
+  'entities.abilities.deterrence.description': '使你的閃躲機率提高 50%，持續 10 秒。（獵人天賦）',
+  'entities.abilities.aspect_of_the_wild.name': '野性守護',
+  'entities.abilities.aspect_of_the_wild.description':
+    '以野性之力鼓舞附近盟友，使攻擊強度提高，持續 5 分鐘。（獵人天賦）',
+  'entities.abilities.kick.name': '腳踢',
+  'entities.abilities.kick.description': '打斷施法，並使該系法術在 4 秒內無法施放。（盜賊天賦）',
+  'entities.abilities.preparation.name': '伺機待發',
+  'entities.abilities.preparation.description': '結束疾跑、閃避和消失的冷卻時間。（盜賊天賦）',
+  'entities.abilities.ghostly_strike.name': '鬼魅攻擊',
+  'entities.abilities.ghostly_strike.description':
+    '打擊敵人，造成武器傷害外加 {damage} 點傷害，並短暫提高閃躲。獎勵 1 個連擊點。（盜賊天賦）',
+  'entities.abilities.cloak_of_shadows.name': '暗影披風',
+  'entities.abilities.cloak_of_shadows.description':
+    '以暗影包裹自身，吸收傷害，持續 5 秒。（盜賊天賦）',
+  'entities.abilities.shadowstep.name': '暗影閃現',
+  'entities.abilities.shadowstep.description': '穿過暗影向目標移動。（盜賊天賦）',
+  'entities.abilities.silence.name': '沉默',
+  'entities.abilities.silence.description': '使目標沉默 4 秒。（牧師天賦）',
+  'entities.abilities.psychic_scream.name': '心靈尖嘯',
+  'entities.abilities.psychic_scream.description':
+    '恐嚇附近敵人，最多持續 4 秒。受到傷害可能打破效果。（牧師天賦）',
+  'entities.abilities.inner_focus.name': '心靈專注',
+  'entities.abilities.inner_focus.description':
+    '使你的下一個法術不消耗法力值。持續 60 秒。（牧師天賦）',
+  'entities.abilities.desperate_prayer.name': '絕望禱言',
+  'entities.abilities.desperate_prayer.description': '立即為你恢復 {damage} 點生命值。（牧師天賦）',
+  'entities.abilities.prayer_of_healing.name': '治療禱言',
+  'entities.abilities.prayer_of_healing.description':
+    '為附近盟友恢復 {damage} 點生命值。（牧師天賦）',
+  'entities.abilities.mind_sear.name': '精神灼燒',
+  'entities.abilities.mind_sear.description':
+    '引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）',
 };

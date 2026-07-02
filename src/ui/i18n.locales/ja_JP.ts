@@ -5157,4 +5157,71 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象地点に隕石を落とし、{damage} の火炎ダメージを与えて地面を燃やします。（メイジのタレント）',
   'entities.abilities.evocation.name': 'エヴォケーション',
   'entities.abilities.evocation.description': 'マナを急速に回復します。（メイジのタレント）',
+  'entities.abilities.rebuke.name': '叱責',
+  'entities.abilities.rebuke.description':
+    '詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（パラディンのタレント）',
+  'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
+  'entities.abilities.crusader_strike.description':
+    '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
+  'entities.abilities.holy_wrath.name': '聖なる怒り',
+  'entities.abilities.holy_wrath.description':
+    '聖なる力を解き放ち、近くの敵に {damage} のダメージを与えます。（パラディンのタレント）',
+  'entities.abilities.divine_shield.name': '神聖なる盾',
+  'entities.abilities.divine_shield.description':
+    '聖なる力で身を守り、8 秒間、大量のダメージを吸収します。（パラディンのタレント）',
+  'entities.abilities.avenging_wrath.name': '復讐の翼',
+  'entities.abilities.avenging_wrath.description':
+    '復讐の力を呼び、20 秒間、攻撃力と呪文力を高めます。（パラディンのタレント）',
+  'entities.abilities.hammer_of_wrath.name': '怒りの槌',
+  'entities.abilities.hammer_of_wrath.description':
+    '敵に聖なる槌を投げつけ、{damage} の聖なるダメージを与えます。（パラディンのタレント）',
+  'entities.abilities.counter_shot.name': '反撃射撃',
+  'entities.abilities.counter_shot.description':
+    '詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（ハンターのタレント）',
+  'entities.abilities.frost_trap.name': '氷霜の罠',
+  'entities.abilities.frost_trap.description':
+    '指定地点の敵を凍らせ、3 秒間足止めします。（ハンターのタレント）',
+  'entities.abilities.mend_pet.name': 'ペット治療',
+  'entities.abilities.mend_pet.description':
+    '味方対象を 15 秒かけて {damage} 回復します。（ハンターのタレント）',
+  'entities.abilities.multi_shot.name': '複数射撃',
+  'entities.abilities.multi_shot.description':
+    '複数の矢弾を放ち、近くの敵に {damage} のダメージを与えます。（ハンターのタレント）',
+  'entities.abilities.deterrence.name': '抑止',
+  'entities.abilities.deterrence.description':
+    '10 秒間、回避率を 50% 高めます。（ハンターのタレント）',
+  'entities.abilities.aspect_of_the_wild.name': '野性の相',
+  'entities.abilities.aspect_of_the_wild.description':
+    '野性の力で近くの味方を鼓舞し、5 分間、攻撃力を高めます。（ハンターのタレント）',
+  'entities.abilities.kick.name': 'キック',
+  'entities.abilities.kick.description':
+    '詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（ローグのタレント）',
+  'entities.abilities.preparation.name': '準備',
+  'entities.abilities.preparation.description':
+    'スプリント、回避、消失のクールダウンを終わらせます。（ローグのタレント）',
+  'entities.abilities.ghostly_strike.name': '幽鬼の一撃',
+  'entities.abilities.ghostly_strike.description':
+    '敵を攻撃し、武器ダメージに加えて {damage} を与え、短時間回避を高めます。コンボポイントを 1 得ます。（ローグのタレント）',
+  'entities.abilities.cloak_of_shadows.name': '影の外套',
+  'entities.abilities.cloak_of_shadows.description':
+    '影で身を包み、5 秒間ダメージを吸収します。（ローグのタレント）',
+  'entities.abilities.shadowstep.name': '影歩き',
+  'entities.abilities.shadowstep.description': '影を通って対象へ移動します。（ローグのタレント）',
+  'entities.abilities.silence.name': '沈黙',
+  'entities.abilities.silence.description': '対象を 4 秒間沈黙させます。（プリーストのタレント）',
+  'entities.abilities.psychic_scream.name': '精神の叫び',
+  'entities.abilities.psychic_scream.description':
+    '近くの敵を最大 4 秒間恐怖させます。ダメージで解除されることがあります。（プリーストのタレント）',
+  'entities.abilities.inner_focus.name': '内なる集中',
+  'entities.abilities.inner_focus.description':
+    '次の呪文を無料にします。60 秒間持続します。（プリーストのタレント）',
+  'entities.abilities.desperate_prayer.name': '絶望の祈り',
+  'entities.abilities.desperate_prayer.description':
+    '即座に自分を {damage} 回復します。（プリーストのタレント）',
+  'entities.abilities.prayer_of_healing.name': '治癒の祈り',
+  'entities.abilities.prayer_of_healing.description':
+    '近くの味方を {damage} 回復します。（プリーストのタレント）',
+  'entities.abilities.mind_sear.name': '精神焼灼',
+  'entities.abilities.mind_sear.description':
+    '影の力を導き、近くの敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）',
 };

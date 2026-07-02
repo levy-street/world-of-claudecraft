@@ -30,6 +30,6 @@ describe('choice rows view model', () => {
   it('hasChoiceRows gates the tab: pilot classes on, pre-wave classes off', () => {
     expect(hasChoiceRows('warrior')).toBe(true);
     expect(hasChoiceRows('mage')).toBe(true);
-    expect(hasChoiceRows('priest')).toBe(false); // until Wave B1 lands
+    expect(hasChoiceRows('shaman')).toBe(false); // until Wave B2 lands
   });
 });

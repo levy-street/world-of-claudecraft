@@ -7,7 +7,7 @@ import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 const SEED = 20061;
 const MIN_DRY_GROUND = WATER_LEVEL - 0.8;
 
-function makeSim(cls: 'warrior' | 'mage'): Sim {
+function makeSim(cls: 'warrior' | 'mage' | 'hunter' | 'rogue' | 'priest'): Sim {
   const sim = new Sim({ seed: SEED, playerClass: cls });
   sim.setPlayerLevel(MAX_LEVEL);
   return sim;
@@ -211,5 +211,93 @@ describe('Talents 2.0 PR5 Wave A regressions', () => {
     );
     expect(damageEvents).toHaveLength(1);
     expect(wolf.auras.some((a) => a.kind === 'root' && a.id === 'thunder_clap_root')).toBe(true);
+  });
+
+  it('Frost Trap roots at the aimed position without hidden damage', () => {
+    const sim = makeSim('hunter');
+    expect(sim.chooseRow(8, 'hun_r8_frost_trap')).toBe(true);
+    const p = sim.player;
+    teleportTo(sim, p, 0, -40);
+    const wolf = firstWolf(sim);
+    teleportTo(sim, wolf, 8, -40);
+
+    sim.castAbilityAt('frost_trap', { x: 8, z: -40 });
+
+    const damageEvents = sim.events.filter(
+      (event) => event.type === 'damage' && event.ability === 'Frost Trap',
+    );
+    expect(damageEvents).toHaveLength(0);
+    expect(wolf.auras.some((a) => a.kind === 'root' && a.id === 'frost_trap_root')).toBe(true);
+  });
+
+  it('Preparation clears only its listed rogue cooldowns', () => {
+    const sim = makeSim('rogue');
+    expect(sim.chooseRow(11, 'rog_r11_preparation')).toBe(true);
+    const p = sim.player;
+    p.cooldowns.set('sprint', 20);
+    p.cooldowns.set('evasion', 30);
+    p.cooldowns.set('vanish', 40);
+    p.cooldowns.set('blind', 50);
+
+    sim.castAbility('preparation');
+
+    expect(p.cooldowns.has('sprint')).toBe(false);
+    expect(p.cooldowns.has('evasion')).toBe(false);
+    expect(p.cooldowns.has('vanish')).toBe(false);
+    expect(p.cooldowns.get('blind')).toBe(50);
+  });
+
+  it('Shadowstep uses swept movement and cannot cross an authored fence', () => {
+    const sim = makeSim('rogue');
+    expect(sim.chooseRow(20, 'rog_r20_shadowstep')).toBe(true);
+    const p = sim.player;
+    const wolf = firstWolf(sim);
+    const fence = PROPS.fences[0];
+    const mx = (fence.x1 + fence.x2) / 2;
+    const mz = (fence.z1 + fence.z2) / 2;
+    const dx = fence.x2 - fence.x1;
+    const dz = fence.z2 - fence.z1;
+    const len = Math.hypot(dx, dz);
+    const nx = -dz / len;
+    const nz = dx / len;
+    teleportTo(sim, p, mx - nx * 7, mz - nz * 7);
+    teleportTo(sim, wolf, mx + nx * 7, mz + nz * 7);
+    p.facing = Math.atan2(wolf.pos.x - p.pos.x, wolf.pos.z - p.pos.z);
+    sim.targetEntity(wolf.id);
+
+    sim.castAbility('shadowstep');
+
+    const side = (p.pos.x - mx) * nx + (p.pos.z - mz) * nz;
+    expect(side).toBeLessThan(-0.5);
+  });
+
+  it('Priest Silence applies a silence aura and Psychic Scream applies area fear', () => {
+    const silence = makeSim('priest');
+    expect(silence.chooseRow(8, 'pri_r8_silence')).toBe(true);
+    const target = firstWolf(silence);
+    teleportTo(silence, silence.player, 0, -40);
+    teleportTo(silence, target, 10, -40);
+    silence.player.facing = Math.atan2(
+      target.pos.x - silence.player.pos.x,
+      target.pos.z - silence.player.pos.z,
+    );
+    silence.targetEntity(target.id);
+
+    silence.castAbility('silence');
+    for (let i = 0; i < 20; i++) silence.tick();
+
+    expect(target.auras.some((a) => a.kind === 'silence' && a.id === 'silence_silence')).toBe(true);
+
+    const fear = makeSim('priest');
+    expect(fear.chooseRow(8, 'pri_r8_psychic_scream')).toBe(true);
+    const wolf = firstWolf(fear);
+    teleportTo(fear, fear.player, 0, -40);
+    teleportTo(fear, wolf, 2, -40);
+
+    fear.castAbility('psychic_scream');
+
+    expect(
+      wolf.auras.some((a) => a.kind === 'incapacitate' && a.id === 'psychic_scream_fear'),
+    ).toBe(true);
   });
 });

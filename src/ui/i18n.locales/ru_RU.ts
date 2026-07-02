@@ -5265,4 +5265,72 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Обрушивает метеор на выбранную область, наносит {damage} урона от огня и поджигает землю. (Талант мага)',
   'entities.abilities.evocation.name': 'Прилив сил',
   'entities.abilities.evocation.description': 'Быстро восстанавливает ману. (Талант мага)',
+  'entities.abilities.rebuke.name': 'Укор',
+  'entities.abilities.rebuke.description':
+    'Прерывает произнесение заклинания и не дает применять заклинания этой школы 4 сек. (талант паладина)',
+  'entities.abilities.crusader_strike.name': 'Удар воина Света',
+  'entities.abilities.crusader_strike.description':
+    'Бьет цель, нанося урон оружием плюс {damage} ед. урона от Света. (талант паладина)',
+  'entities.abilities.holy_wrath.name': 'Гнев Света',
+  'entities.abilities.holy_wrath.description':
+    'Высвобождает силу Света, нанося ближайшим врагам {damage} ед. урона. (талант паладина)',
+  'entities.abilities.divine_shield.name': 'Божественный щит',
+  'entities.abilities.divine_shield.description':
+    'Окутывает вас силой Света и поглощает огромный урон в течение 8 сек. (талант паладина)',
+  'entities.abilities.avenging_wrath.name': 'Гнев карателя',
+  'entities.abilities.avenging_wrath.description':
+    'Призывает карающую силу, повышая силу атаки и силу заклинаний на 20 сек. (талант паладина)',
+  'entities.abilities.hammer_of_wrath.name': 'Молот гнева',
+  'entities.abilities.hammer_of_wrath.description':
+    'Бросает в противника священный молот, нанося {damage} ед. урона от Света. (талант паладина)',
+  'entities.abilities.counter_shot.name': 'Ответный выстрел',
+  'entities.abilities.counter_shot.description':
+    'Прерывает произнесение заклинания и не дает применять заклинания этой школы 4 сек. (талант охотника)',
+  'entities.abilities.frost_trap.name': 'Ледяная ловушка',
+  'entities.abilities.frost_trap.description':
+    'Сковывает врагов в указанной области на 3 сек. (талант охотника)',
+  'entities.abilities.mend_pet.name': 'Лечение питомца',
+  'entities.abilities.mend_pet.description':
+    'Исцеляет дружественную цель на {damage} ед. за 15 сек. (талант охотника)',
+  'entities.abilities.multi_shot.name': 'Залп',
+  'entities.abilities.multi_shot.description':
+    'Выпускает несколько стрел, нанося ближайшим врагам {damage} ед. урона. (талант охотника)',
+  'entities.abilities.deterrence.name': 'Сдерживание',
+  'entities.abilities.deterrence.description':
+    'Повышает вероятность уклонения на 50% на 10 сек. (талант охотника)',
+  'entities.abilities.aspect_of_the_wild.name': 'Дух дикой природы',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Вдохновляет ближайших союзников дикой силой, повышая силу атаки на 5 мин. (талант охотника)',
+  'entities.abilities.kick.name': 'Пинок',
+  'entities.abilities.kick.description':
+    'Прерывает произнесение заклинания и не дает применять заклинания этой школы 4 сек. (талант разбойника)',
+  'entities.abilities.preparation.name': 'Подготовка',
+  'entities.abilities.preparation.description':
+    'Завершает восстановление Спринта, Ускользания и Исчезновения. (талант разбойника)',
+  'entities.abilities.ghostly_strike.name': 'Призрачный удар',
+  'entities.abilities.ghostly_strike.description':
+    'Бьет врага, нанося урон оружием плюс {damage} ед. урона, и ненадолго повышает уклонение. Дает 1 прием серии. (талант разбойника)',
+  'entities.abilities.cloak_of_shadows.name': 'Плащ теней',
+  'entities.abilities.cloak_of_shadows.description':
+    'Окутывает вас тенями, поглощая урон в течение 5 сек. (талант разбойника)',
+  'entities.abilities.shadowstep.name': 'Шаг сквозь тень',
+  'entities.abilities.shadowstep.description':
+    'Позволяет шагнуть сквозь тени к цели. (талант разбойника)',
+  'entities.abilities.silence.name': 'Безмолвие',
+  'entities.abilities.silence.description': 'Накладывает на цель немоту на 4 сек. (талант жреца)',
+  'entities.abilities.psychic_scream.name': 'Ментальный крик',
+  'entities.abilities.psychic_scream.description':
+    'Пугает ближайших врагов на время до 4 сек. Урон может развеять эффект. (талант жреца)',
+  'entities.abilities.inner_focus.name': 'Внутреннее сосредоточение',
+  'entities.abilities.inner_focus.description':
+    'Следующее заклинание не требует ресурса. Длится 60 сек. (талант жреца)',
+  'entities.abilities.desperate_prayer.name': 'Молитва отчаяния',
+  'entities.abilities.desperate_prayer.description':
+    'Мгновенно исцеляет вас на {damage}. (талант жреца)',
+  'entities.abilities.prayer_of_healing.name': 'Молитва исцеления',
+  'entities.abilities.prayer_of_healing.description':
+    'Исцеляет ближайших союзников на {damage}. (талант жреца)',
+  'entities.abilities.mind_sear.name': 'Иссушение разума',
+  'entities.abilities.mind_sear.description':
+    'Направляет темную энергию, каждую секунду нанося ближайшим врагам {damage} ед. урона. (талант жреца)',
 };

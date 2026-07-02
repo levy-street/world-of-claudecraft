@@ -5230,4 +5230,72 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
+  'entities.abilities.rebuke.name': 'Rebuke',
+  'entities.abilities.rebuke.description':
+    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
+  'entities.abilities.crusader_strike.name': 'Crusader Strike',
+  'entities.abilities.crusader_strike.description':
+    'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
+  'entities.abilities.holy_wrath.name': 'Holy Wrath',
+  'entities.abilities.holy_wrath.description':
+    'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
+  'entities.abilities.divine_shield.name': 'Divine Shield',
+  'entities.abilities.divine_shield.description':
+    'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
+  'entities.abilities.avenging_wrath.name': 'Avenging Wrath',
+  'entities.abilities.avenging_wrath.description':
+    'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
+  'entities.abilities.hammer_of_wrath.name': 'Hammer of Wrath',
+  'entities.abilities.hammer_of_wrath.description':
+    'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
+  'entities.abilities.counter_shot.name': 'Counter Shot',
+  'entities.abilities.counter_shot.description':
+    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
+  'entities.abilities.frost_trap.name': 'Frost Trap',
+  'entities.abilities.frost_trap.description':
+    'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
+  'entities.abilities.mend_pet.name': 'Mend Pet',
+  'entities.abilities.mend_pet.description':
+    'Heals a friendly target for {damage} over 15 sec. (Hunter talent)',
+  'entities.abilities.multi_shot.name': 'Multi-Shot',
+  'entities.abilities.multi_shot.description':
+    'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
+  'entities.abilities.deterrence.name': 'Deterrence',
+  'entities.abilities.deterrence.description':
+    'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspect of the Wild',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
+  'entities.abilities.kick.name': 'Kick',
+  'entities.abilities.kick.description':
+    'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
+  'entities.abilities.preparation.name': 'Preparation',
+  'entities.abilities.preparation.description':
+    'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
+  'entities.abilities.ghostly_strike.name': 'Ghostly Strike',
+  'entities.abilities.ghostly_strike.description':
+    'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
+  'entities.abilities.cloak_of_shadows.name': 'Cloak of Shadows',
+  'entities.abilities.cloak_of_shadows.description':
+    'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
+  'entities.abilities.shadowstep.name': 'Shadowstep',
+  'entities.abilities.shadowstep.description':
+    'Steps through the shadows toward your target. (Rogue talent)',
+  'entities.abilities.silence.name': 'Silence',
+  'entities.abilities.silence.description': 'Silences the target for 4 sec. (Priest talent)',
+  'entities.abilities.psychic_scream.name': 'Psychic Scream',
+  'entities.abilities.psychic_scream.description':
+    'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
+  'entities.abilities.inner_focus.name': 'Inner Focus',
+  'entities.abilities.inner_focus.description':
+    'Makes your next spell free. Lasts 60 sec. (Priest talent)',
+  'entities.abilities.desperate_prayer.name': 'Desperate Prayer',
+  'entities.abilities.desperate_prayer.description':
+    'Instantly heals you for {damage}. (Priest talent)',
+  'entities.abilities.prayer_of_healing.name': 'Prayer of Healing',
+  'entities.abilities.prayer_of_healing.description':
+    'Heals nearby allies for {damage}. (Priest talent)',
+  'entities.abilities.mind_sear.name': 'Mind Sear',
+  'entities.abilities.mind_sear.description':
+    'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
 };

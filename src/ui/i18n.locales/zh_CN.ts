@@ -4897,4 +4897,66 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在目标区域召唤流星，造成 {damage} 点火焰伤害并点燃地面。（法师天赋）',
   'entities.abilities.evocation.name': '唤醒',
   'entities.abilities.evocation.description': '快速恢复法力值。（法师天赋）',
+  'entities.abilities.rebuke.name': '责难',
+  'entities.abilities.rebuke.description':
+    '打断施法，并使该系法术在 4 秒内无法施放。（圣骑士天赋）',
+  'entities.abilities.crusader_strike.name': '十字军打击',
+  'entities.abilities.crusader_strike.description':
+    '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
+  'entities.abilities.holy_wrath.name': '神圣愤怒',
+  'entities.abilities.holy_wrath.description':
+    '释放神圣之力，对附近敌人造成 {damage} 点伤害。（圣骑士天赋）',
+  'entities.abilities.divine_shield.name': '圣盾术',
+  'entities.abilities.divine_shield.description':
+    '以神圣之力保护你，吸收大量伤害，持续 8 秒。（圣骑士天赋）',
+  'entities.abilities.avenging_wrath.name': '复仇之怒',
+  'entities.abilities.avenging_wrath.description':
+    '召唤复仇之力，使攻击强度和法术强度提高，持续 20 秒。（圣骑士天赋）',
+  'entities.abilities.hammer_of_wrath.name': '愤怒之锤',
+  'entities.abilities.hammer_of_wrath.description':
+    '向敌人投掷神圣之锤，造成 {damage} 点神圣伤害。（圣骑士天赋）',
+  'entities.abilities.counter_shot.name': '反制射击',
+  'entities.abilities.counter_shot.description':
+    '打断施法，并使该系法术在 4 秒内无法施放。（猎人天赋）',
+  'entities.abilities.frost_trap.name': '冰霜陷阱',
+  'entities.abilities.frost_trap.description': '冻结目标区域的敌人，使其定身 3 秒。（猎人天赋）',
+  'entities.abilities.mend_pet.name': '治疗宠物',
+  'entities.abilities.mend_pet.description':
+    '使一个友方目标在 15 秒内恢复 {damage} 点生命值。（猎人天赋）',
+  'entities.abilities.multi_shot.name': '多重射击',
+  'entities.abilities.multi_shot.description':
+    '发射多枚箭矢，对附近敌人造成 {damage} 点伤害。（猎人天赋）',
+  'entities.abilities.deterrence.name': '威慑',
+  'entities.abilities.deterrence.description': '使你的躲闪几率提高 50%，持续 10 秒。（猎人天赋）',
+  'entities.abilities.aspect_of_the_wild.name': '野性守护',
+  'entities.abilities.aspect_of_the_wild.description':
+    '以野性之力鼓舞附近盟友，使攻击强度提高，持续 5 分钟。（猎人天赋）',
+  'entities.abilities.kick.name': '脚踢',
+  'entities.abilities.kick.description': '打断施法，并使该系法术在 4 秒内无法施放。（潜行者天赋）',
+  'entities.abilities.preparation.name': '预备',
+  'entities.abilities.preparation.description': '结束疾跑、闪避和消失的冷却时间。（潜行者天赋）',
+  'entities.abilities.ghostly_strike.name': '鬼魅攻击',
+  'entities.abilities.ghostly_strike.description':
+    '打击敌人，造成武器伤害外加 {damage} 点伤害，并短暂提高躲闪。奖励 1 个连击点。（潜行者天赋）',
+  'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
+  'entities.abilities.cloak_of_shadows.description':
+    '以暗影包裹自身，吸收伤害，持续 5 秒。（潜行者天赋）',
+  'entities.abilities.shadowstep.name': '暗影步',
+  'entities.abilities.shadowstep.description': '穿过暗影向目标移动。（潜行者天赋）',
+  'entities.abilities.silence.name': '沉默',
+  'entities.abilities.silence.description': '使目标沉默 4 秒。（牧师天赋）',
+  'entities.abilities.psychic_scream.name': '心灵尖啸',
+  'entities.abilities.psychic_scream.description':
+    '恐吓附近敌人，最多持续 4 秒。受到伤害可能打破效果。（牧师天赋）',
+  'entities.abilities.inner_focus.name': '心灵专注',
+  'entities.abilities.inner_focus.description':
+    '使你的下一个法术不消耗法力值。持续 60 秒。（牧师天赋）',
+  'entities.abilities.desperate_prayer.name': '绝望祷言',
+  'entities.abilities.desperate_prayer.description': '立即为你恢复 {damage} 点生命值。（牧师天赋）',
+  'entities.abilities.prayer_of_healing.name': '治疗祷言',
+  'entities.abilities.prayer_of_healing.description':
+    '为附近盟友恢复 {damage} 点生命值。（牧师天赋）',
+  'entities.abilities.mind_sear.name': '精神灼烧',
+  'entities.abilities.mind_sear.description':
+    '引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）',
 };

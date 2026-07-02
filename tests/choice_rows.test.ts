@@ -21,6 +21,7 @@ import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 
 const cls = 'warrior';
 const originalRows = CHOICE_ROWS[cls];
+const PR5_CLASSES = ['warrior', 'mage', 'paladin', 'hunter', 'rogue', 'priest'] as const;
 
 const fixtureRows: ClassChoiceRows = {
   rows: [
@@ -172,24 +173,24 @@ describe('choice row effects and sim facade', () => {
 
   it('ships dormant empty rows for every class', () => {
     for (const playerClass of ALL_CLASSES) {
-      if (playerClass === 'warrior' || playerClass === 'mage') continue;
+      if ((PR5_CLASSES as readonly PlayerClass[]).includes(playerClass)) continue;
       expect(CHOICE_ROWS[playerClass].rows).toEqual([]);
       expect(validateRows(playerClass, 20, { 5: 'anything' }).ok).toBe(false);
     }
   });
 });
 
-describe('choice row real content for warrior and mage', () => {
-  it('ships exactly six rows and three options per row for the pilot classes', () => {
-    for (const playerClass of ['warrior', 'mage'] as const) {
+describe('choice row real content for PR5 classes', () => {
+  it('ships exactly six rows and three options per row for the PR5 classes', () => {
+    for (const playerClass of PR5_CLASSES) {
       const rows = CHOICE_ROWS[playerClass].rows;
       expect(rows.map((row) => row.level)).toEqual([...CHOICE_ROW_LEVELS]);
       for (const row of rows) expect(row.options).toHaveLength(3);
     }
   });
 
-  it('has resolvable effects for every warrior and mage option', () => {
-    for (const playerClass of ['warrior', 'mage'] as const) {
+  it('has resolvable effects for every PR5 option', () => {
+    for (const playerClass of PR5_CLASSES) {
       for (const row of CHOICE_ROWS[playerClass].rows) {
         for (const option of row.options) {
           if (option.effect.grant) {
@@ -203,8 +204,8 @@ describe('choice row real content for warrior and mage', () => {
     }
   });
 
-  it('grants every granted warrior and mage row ability through the sim facade', () => {
-    for (const playerClass of ['warrior', 'mage'] as const) {
+  it('grants every granted PR5 row ability through the sim facade', () => {
+    for (const playerClass of PR5_CLASSES) {
       for (const row of CHOICE_ROWS[playerClass].rows) {
         for (const option of row.options) {
           const grant = option.effect.grant?.ability;
@@ -276,6 +277,59 @@ describe('choice row real content for warrior and mage', () => {
     expect(expectResolved(mage, 'scorch').castWhileMoving).toBeUndefined();
     expect(mage.chooseRow(5, 'mag_r5_firestarter')).toBe(true);
     expect(expectResolved(mage, 'scorch').castWhileMoving).toBe(true);
+  });
+
+  it('lands representative Wave B1 mod numbers in resolved abilities', () => {
+    const paladin = simAtLevel('paladin', MAX_LEVEL);
+    const baseJudgement = expectResolved(paladin, 'judgement');
+    expect(paladin.chooseRow(5, 'pal_r5_crusaders_zeal')).toBe(true);
+    expect(expectResolved(paladin, 'judgement').cooldown).toBeCloseTo(baseJudgement.cooldown * 0.6);
+
+    const hunter = simAtLevel('hunter', MAX_LEVEL);
+    const baseArcaneShot = expectResolved(hunter, 'arcane_shot');
+    expect(hunter.chooseRow(5, 'hun_r5_quick_shots')).toBe(true);
+    expect(expectResolved(hunter, 'arcane_shot').cooldown).toBeCloseTo(
+      baseArcaneShot.cooldown * 0.6,
+    );
+
+    const rogue = simAtLevel('rogue', MAX_LEVEL);
+    const baseSinister = expectResolved(rogue, 'sinister_strike');
+    expect(rogue.chooseRow(5, 'rog_r5_relentless_strikes')).toBe(true);
+    expect(expectResolved(rogue, 'sinister_strike').cost).toBe(Math.round(baseSinister.cost * 0.8));
+
+    const priest = simAtLevel('priest', MAX_LEVEL);
+    const baseMindBlast = expectResolved(priest, 'mind_blast');
+    expect(priest.chooseRow(14, 'pri_r14_mind_melt')).toBe(true);
+    expect(expectResolved(priest, 'mind_blast').cooldown).toBeCloseTo(baseMindBlast.cooldown * 0.6);
+  });
+
+  it('lands representative Wave B1 stats and P5 effects', () => {
+    const hunter = simAtLevel('hunter', MAX_LEVEL);
+    const dodgeBefore = hunter.player.dodgeChance;
+    expect(hunter.chooseRow(11, 'hun_r11_survival_instincts')).toBe(true);
+    expect(hunter.player.dodgeChance).toBeCloseTo(dodgeBefore + 0.02);
+
+    const serpent = simAtLevel('hunter', MAX_LEVEL);
+    expect(serpent.chooseRow(14, 'hun_r14_serpents_venom')).toBe(true);
+    expect(expectResolved(serpent, 'arcane_shot').effects).toContainEqual({
+      type: 'dot',
+      total: 24,
+      duration: 6,
+      interval: 2,
+    });
+
+    const priest = simAtLevel('priest', MAX_LEVEL);
+    const spiritBefore = priest.player.stats.spi;
+    expect(priest.chooseRow(17, 'pri_r17_inner_fire')).toBe(true);
+    expect(priest.player.stats.spi).toBe(spiritBefore + 3);
+  });
+
+  it('defines every new PR5 interrupt as a physical-school interrupt', () => {
+    for (const id of ['rebuke', 'counter_shot', 'kick'] as const) {
+      const def = ABILITIES[id];
+      expect(def.school, id).toBe('physical');
+      expect(def.effects, id).toContainEqual({ type: 'interrupt', lockout: 4 });
+    }
   });
 });
 

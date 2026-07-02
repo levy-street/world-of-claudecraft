@@ -4401,6 +4401,98 @@ export const ko_KR: EnTranslations = {
         "name": "환기",
         "description": "마나를 빠르게 회복합니다. (마법사 특성)"
       },
+      "rebuke": {
+        "name": "비난",
+        "description": "주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (성기사 특성)"
+      },
+      "crusader_strike": {
+        "name": "성전사의 일격",
+        "description": "대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)"
+      },
+      "holy_wrath": {
+        "name": "신성한 격노",
+        "description": "신성한 힘을 방출해 주위 적에게 {damage}의 피해를 줍니다. (성기사 특성)"
+      },
+      "divine_shield": {
+        "name": "천상의 보호막",
+        "description": "신성한 힘으로 자신을 보호해 8초 동안 막대한 피해를 흡수합니다. (성기사 특성)"
+      },
+      "avenging_wrath": {
+        "name": "응징의 격노",
+        "description": "응징의 힘을 불러 20초 동안 전투력과 주문력을 높입니다. (성기사 특성)"
+      },
+      "hammer_of_wrath": {
+        "name": "응징의 망치",
+        "description": "적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. (성기사 특성)"
+      },
+      "counter_shot": {
+        "name": "반격 사격",
+        "description": "주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (사냥꾼 특성)"
+      },
+      "frost_trap": {
+        "name": "냉기 덫",
+        "description": "대상 지점의 적을 얼려 3초 동안 이동하지 못하게 합니다. (사냥꾼 특성)"
+      },
+      "mend_pet": {
+        "name": "동물 치료",
+        "description": "아군 대상의 생명력을 15초에 걸쳐 {damage}만큼 회복시킵니다. (사냥꾼 특성)"
+      },
+      "multi_shot": {
+        "name": "일제 사격",
+        "description": "여러 발을 발사해 주위 적에게 {damage}의 피해를 줍니다. (사냥꾼 특성)"
+      },
+      "deterrence": {
+        "name": "공격 저지",
+        "description": "10초 동안 회피 확률이 50% 증가합니다. (사냥꾼 특성)"
+      },
+      "aspect_of_the_wild": {
+        "name": "야생의 상",
+        "description": "야생의 힘으로 주위 아군을 고무해 5분 동안 전투력을 높입니다. (사냥꾼 특성)"
+      },
+      "kick": {
+        "name": "발차기",
+        "description": "주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (도적 특성)"
+      },
+      "preparation": {
+        "name": "마음가짐",
+        "description": "전력 질주, 회피, 소멸의 재사용 대기시간을 끝냅니다. (도적 특성)"
+      },
+      "ghostly_strike": {
+        "name": "유령의 일격",
+        "description": "적을 공격해 무기 피해에 추가로 {damage}의 피해를 주고 잠시 회피를 높입니다. 연계 점수 1점을 얻습니다. (도적 특성)"
+      },
+      "cloak_of_shadows": {
+        "name": "그림자 망토",
+        "description": "그림자로 몸을 감싸 5초 동안 피해를 흡수합니다. (도적 특성)"
+      },
+      "shadowstep": {
+        "name": "그림자 밟기",
+        "description": "그림자를 지나 대상에게 이동합니다. (도적 특성)"
+      },
+      "silence": {
+        "name": "침묵",
+        "description": "대상을 4초 동안 침묵시킵니다. (사제 특성)"
+      },
+      "psychic_scream": {
+        "name": "영혼의 절규",
+        "description": "주위 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 깨질 수 있습니다. (사제 특성)"
+      },
+      "inner_focus": {
+        "name": "내면의 집중력",
+        "description": "다음 주문의 비용을 없앱니다. 60초 동안 지속됩니다. (사제 특성)"
+      },
+      "desperate_prayer": {
+        "name": "구원의 기도",
+        "description": "즉시 자신을 {damage}만큼 치유합니다. (사제 특성)"
+      },
+      "prayer_of_healing": {
+        "name": "치유의 기원",
+        "description": "주위 아군을 {damage}만큼 치유합니다. (사제 특성)"
+      },
+      "mind_sear": {
+        "name": "정신 불태우기",
+        "description": "암흑 에너지를 집중해 매초 주위 적에게 {damage}의 피해를 줍니다. (사제 특성)"
+      },
       "holy_shock": {
         "name": "신성 충격",
         "description": "신성한 기운으로 아군 대상을 충격시켜 생명력을 {damage}만큼 회복시킵니다. (신성 전문화 상징)"

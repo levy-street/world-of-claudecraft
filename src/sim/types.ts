@@ -1017,6 +1017,7 @@ export type AbilityEffect =
   | { type: 'slow'; mult: number; duration: number }
   | { type: 'root'; duration: number }
   | { type: 'stun'; duration: number }
+  | { type: 'silence'; duration: number }
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
@@ -1034,6 +1035,7 @@ export type AbilityEffect =
   // party-style ALLY buff: +AP aura on the caster and nearby friendlies (Trueshot Aura)
   | { type: 'aoeAllyAttackPower'; amount: number; duration: number; radius: number }
   | { type: 'aoeRoot'; duration: number; radius: number; min: number; max: number }
+  | { type: 'aoeFear'; duration: number; radius: number }
   | {
       type: 'consumeAura';
       auraIds?: string[];
@@ -1054,6 +1056,7 @@ export type AbilityEffect =
   | { type: 'finisherHaste'; mult: number; basedur: number; perCombo: number } // slice and dice
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
+  | { type: 'clearCooldowns'; abilities: string[] }
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'charge' }
   | { type: 'repositionToAim'; breakRoots?: boolean }

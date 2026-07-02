@@ -4401,6 +4401,98 @@ export const zh_TW: EnTranslations = {
         "name": "喚醒",
         "description": "快速恢復法力值。（法師天賦）"
       },
+      "rebuke": {
+        "name": "責難",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（聖騎士天賦）"
+      },
+      "crusader_strike": {
+        "name": "十字軍聖擊",
+        "description": "打擊目標，造成武器傷害外加 {damage} 點神聖傷害。（聖騎士天賦）"
+      },
+      "holy_wrath": {
+        "name": "神聖憤怒",
+        "description": "釋放神聖之力，對附近敵人造成 {damage} 點傷害。（聖騎士天賦）"
+      },
+      "divine_shield": {
+        "name": "聖盾術",
+        "description": "以神聖之力保護你，吸收大量傷害，持續 8 秒。（聖騎士天賦）"
+      },
+      "avenging_wrath": {
+        "name": "復仇之怒",
+        "description": "召喚復仇之力，使攻擊強度和法術強度提高，持續 20 秒。（聖騎士天賦）"
+      },
+      "hammer_of_wrath": {
+        "name": "憤怒之錘",
+        "description": "向敵人投擲神聖之錘，造成 {damage} 點神聖傷害。（聖騎士天賦）"
+      },
+      "counter_shot": {
+        "name": "反制射擊",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（獵人天賦）"
+      },
+      "frost_trap": {
+        "name": "冰霜陷阱",
+        "description": "凍結目標區域的敵人，使其定身 3 秒。（獵人天賦）"
+      },
+      "mend_pet": {
+        "name": "治療寵物",
+        "description": "使一個友方目標在 15 秒內恢復 {damage} 點生命值。（獵人天賦）"
+      },
+      "multi_shot": {
+        "name": "多重射擊",
+        "description": "發射多枚箭矢，對附近敵人造成 {damage} 點傷害。（獵人天賦）"
+      },
+      "deterrence": {
+        "name": "威懾",
+        "description": "使你的閃躲機率提高 50%，持續 10 秒。（獵人天賦）"
+      },
+      "aspect_of_the_wild": {
+        "name": "野性守護",
+        "description": "以野性之力鼓舞附近盟友，使攻擊強度提高，持續 5 分鐘。（獵人天賦）"
+      },
+      "kick": {
+        "name": "腳踢",
+        "description": "打斷施法，並使該系法術在 4 秒內無法施放。（盜賊天賦）"
+      },
+      "preparation": {
+        "name": "伺機待發",
+        "description": "結束疾跑、閃避和消失的冷卻時間。（盜賊天賦）"
+      },
+      "ghostly_strike": {
+        "name": "鬼魅攻擊",
+        "description": "打擊敵人，造成武器傷害外加 {damage} 點傷害，並短暫提高閃躲。獎勵 1 個連擊點。（盜賊天賦）"
+      },
+      "cloak_of_shadows": {
+        "name": "暗影披風",
+        "description": "以暗影包裹自身，吸收傷害，持續 5 秒。（盜賊天賦）"
+      },
+      "shadowstep": {
+        "name": "暗影閃現",
+        "description": "穿過暗影向目標移動。（盜賊天賦）"
+      },
+      "silence": {
+        "name": "沉默",
+        "description": "使目標沉默 4 秒。（牧師天賦）"
+      },
+      "psychic_scream": {
+        "name": "心靈尖嘯",
+        "description": "恐嚇附近敵人，最多持續 4 秒。受到傷害可能打破效果。（牧師天賦）"
+      },
+      "inner_focus": {
+        "name": "心靈專注",
+        "description": "使你的下一個法術不消耗法力值。持續 60 秒。（牧師天賦）"
+      },
+      "desperate_prayer": {
+        "name": "絕望禱言",
+        "description": "立即為你恢復 {damage} 點生命值。（牧師天賦）"
+      },
+      "prayer_of_healing": {
+        "name": "治療禱言",
+        "description": "為附近盟友恢復 {damage} 點生命值。（牧師天賦）"
+      },
+      "mind_sear": {
+        "name": "精神灼燒",
+        "description": "引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）"
+      },
       "holy_shock": {
         "name": "神聖震擊",
         "description": "以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）"

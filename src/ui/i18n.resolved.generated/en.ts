@@ -4401,6 +4401,98 @@ export const en: EnTranslations = {
         "name": "Evocation",
         "description": "Rapidly restores mana. (Mage talent)"
       },
+      "rebuke": {
+        "name": "Rebuke",
+        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)"
+      },
+      "crusader_strike": {
+        "name": "Crusader Strike",
+        "description": "Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)"
+      },
+      "holy_wrath": {
+        "name": "Holy Wrath",
+        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
+      },
+      "divine_shield": {
+        "name": "Divine Shield",
+        "description": "Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)"
+      },
+      "avenging_wrath": {
+        "name": "Avenging Wrath",
+        "description": "Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Hammer of Wrath",
+        "description": "Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)"
+      },
+      "counter_shot": {
+        "name": "Counter Shot",
+        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)"
+      },
+      "frost_trap": {
+        "name": "Frost Trap",
+        "description": "Freezes enemies at the target area in place for 3 sec. (Hunter talent)"
+      },
+      "mend_pet": {
+        "name": "Mend Pet",
+        "description": "Heals a friendly target for {damage} over 15 sec. (Hunter talent)"
+      },
+      "multi_shot": {
+        "name": "Multi-Shot",
+        "description": "Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)"
+      },
+      "deterrence": {
+        "name": "Deterrence",
+        "description": "Increases your dodge chance by 50% for 10 sec. (Hunter talent)"
+      },
+      "aspect_of_the_wild": {
+        "name": "Aspect of the Wild",
+        "description": "Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)"
+      },
+      "kick": {
+        "name": "Kick",
+        "description": "Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)"
+      },
+      "preparation": {
+        "name": "Preparation",
+        "description": "Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)"
+      },
+      "ghostly_strike": {
+        "name": "Ghostly Strike",
+        "description": "Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)"
+      },
+      "cloak_of_shadows": {
+        "name": "Cloak of Shadows",
+        "description": "Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)"
+      },
+      "shadowstep": {
+        "name": "Shadowstep",
+        "description": "Steps through the shadows toward your target. (Rogue talent)"
+      },
+      "silence": {
+        "name": "Silence",
+        "description": "Silences the target for 4 sec. (Priest talent)"
+      },
+      "psychic_scream": {
+        "name": "Psychic Scream",
+        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+      },
+      "inner_focus": {
+        "name": "Inner Focus",
+        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+      },
+      "desperate_prayer": {
+        "name": "Desperate Prayer",
+        "description": "Instantly heals you for {damage}. (Priest talent)"
+      },
+      "prayer_of_healing": {
+        "name": "Prayer of Healing",
+        "description": "Heals nearby allies for {damage}. (Priest talent)"
+      },
+      "mind_sear": {
+        "name": "Mind Sear",
+        "description": "Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)"
+      },
       "holy_shock": {
         "name": "Holy Shock",
         "description": "Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)"

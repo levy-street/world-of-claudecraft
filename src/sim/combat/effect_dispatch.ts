@@ -495,6 +495,23 @@ export function runEffects(
         ctx.enterCombat(p, target);
         break;
       }
+      case 'silence': {
+        if (!target || target.dead) break;
+        const remaining = ctx.diminishedCrowdControlDuration(p, target, 'lockout', eff.duration);
+        if (remaining === null) break;
+        ctx.applyAura(target, {
+          id: `${ability.id}_silence`,
+          name: ability.name,
+          kind: 'silence',
+          remaining,
+          duration: remaining,
+          value: 0,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        ctx.enterCombat(p, target);
+        break;
+      }
       case 'incapacitate': {
         if (!target || target.dead) break;
         const remaining =
@@ -704,9 +721,9 @@ export function runEffects(
       }
       case 'aoeRoot': {
         ctx.emit({
-          type: 'spellfx',
-          sourceId: p.id,
-          targetId: p.id,
+          ...(p.castAim
+            ? { type: 'spellfxAt' as const, x: p.castAim.x, z: p.castAim.z, radius: eff.radius }
+            : { type: 'spellfx' as const, sourceId: p.id, targetId: p.id }),
           school: ability.school,
           fx: 'nova',
         });
@@ -717,7 +734,8 @@ export function runEffects(
           true,
         );
         const rootOnly = eff.min === 0 && eff.max === 0;
-        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+        const center = p.castAim ?? p.pos;
+        for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           if (!rootOnly) {
             const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
@@ -733,6 +751,33 @@ export function runEffects(
               ability.school,
             );
           }
+        }
+        break;
+      }
+      case 'aoeFear': {
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: p.id,
+          school: ability.school,
+          fx: 'nova',
+        });
+        for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
+          if (!ctx.hasLineOfSight(p, m)) continue;
+          const remaining = ctx.diminishedCrowdControlDuration(p, m, 'fear', eff.duration);
+          if (remaining === null) continue;
+          ctx.applyAura(m, {
+            id: `${ability.id}_fear`,
+            name: ability.name,
+            kind: 'incapacitate',
+            remaining,
+            duration: remaining,
+            value: ctx.rng.range(-Math.PI, Math.PI),
+            sourceId: p.id,
+            school: ability.school,
+            breaksOnDamage: true,
+          });
+          ctx.enterCombat(p, m);
         }
         break;
       }
@@ -834,6 +879,10 @@ export function runEffects(
       }
       case 'gainResource': {
         p.resource = Math.min(p.maxResource, p.resource + eff.amount);
+        break;
+      }
+      case 'clearCooldowns': {
+        for (const id of eff.abilities) p.cooldowns.delete(id);
         break;
       }
       case 'selfDamagePctMax': {

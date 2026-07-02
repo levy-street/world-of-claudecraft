@@ -4401,6 +4401,98 @@ export const ja_JP: EnTranslations = {
         "name": "エヴォケーション",
         "description": "マナを急速に回復します。（メイジのタレント）"
       },
+      "rebuke": {
+        "name": "叱責",
+        "description": "詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（パラディンのタレント）"
+      },
+      "crusader_strike": {
+        "name": "クルセイダー ストライク",
+        "description": "対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）"
+      },
+      "holy_wrath": {
+        "name": "聖なる怒り",
+        "description": "聖なる力を解き放ち、近くの敵に {damage} のダメージを与えます。（パラディンのタレント）"
+      },
+      "divine_shield": {
+        "name": "神聖なる盾",
+        "description": "聖なる力で身を守り、8 秒間、大量のダメージを吸収します。（パラディンのタレント）"
+      },
+      "avenging_wrath": {
+        "name": "復讐の翼",
+        "description": "復讐の力を呼び、20 秒間、攻撃力と呪文力を高めます。（パラディンのタレント）"
+      },
+      "hammer_of_wrath": {
+        "name": "怒りの槌",
+        "description": "敵に聖なる槌を投げつけ、{damage} の聖なるダメージを与えます。（パラディンのタレント）"
+      },
+      "counter_shot": {
+        "name": "反撃射撃",
+        "description": "詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（ハンターのタレント）"
+      },
+      "frost_trap": {
+        "name": "氷霜の罠",
+        "description": "指定地点の敵を凍らせ、3 秒間足止めします。（ハンターのタレント）"
+      },
+      "mend_pet": {
+        "name": "ペット治療",
+        "description": "味方対象を 15 秒かけて {damage} 回復します。（ハンターのタレント）"
+      },
+      "multi_shot": {
+        "name": "複数射撃",
+        "description": "複数の矢弾を放ち、近くの敵に {damage} のダメージを与えます。（ハンターのタレント）"
+      },
+      "deterrence": {
+        "name": "抑止",
+        "description": "10 秒間、回避率を 50% 高めます。（ハンターのタレント）"
+      },
+      "aspect_of_the_wild": {
+        "name": "野性の相",
+        "description": "野性の力で近くの味方を鼓舞し、5 分間、攻撃力を高めます。（ハンターのタレント）"
+      },
+      "kick": {
+        "name": "キック",
+        "description": "詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（ローグのタレント）"
+      },
+      "preparation": {
+        "name": "準備",
+        "description": "スプリント、回避、消失のクールダウンを終わらせます。（ローグのタレント）"
+      },
+      "ghostly_strike": {
+        "name": "幽鬼の一撃",
+        "description": "敵を攻撃し、武器ダメージに加えて {damage} を与え、短時間回避を高めます。コンボポイントを 1 得ます。（ローグのタレント）"
+      },
+      "cloak_of_shadows": {
+        "name": "影の外套",
+        "description": "影で身を包み、5 秒間ダメージを吸収します。（ローグのタレント）"
+      },
+      "shadowstep": {
+        "name": "影歩き",
+        "description": "影を通って対象へ移動します。（ローグのタレント）"
+      },
+      "silence": {
+        "name": "沈黙",
+        "description": "対象を 4 秒間沈黙させます。（プリーストのタレント）"
+      },
+      "psychic_scream": {
+        "name": "精神の叫び",
+        "description": "近くの敵を最大 4 秒間恐怖させます。ダメージで解除されることがあります。（プリーストのタレント）"
+      },
+      "inner_focus": {
+        "name": "内なる集中",
+        "description": "次の呪文を無料にします。60 秒間持続します。（プリーストのタレント）"
+      },
+      "desperate_prayer": {
+        "name": "絶望の祈り",
+        "description": "即座に自分を {damage} 回復します。（プリーストのタレント）"
+      },
+      "prayer_of_healing": {
+        "name": "治癒の祈り",
+        "description": "近くの味方を {damage} 回復します。（プリーストのタレント）"
+      },
+      "mind_sear": {
+        "name": "精神焼灼",
+        "description": "影の力を導き、近くの敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）"
+      },
       "holy_shock": {
         "name": "ホーリーショック",
         "description": "聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）"

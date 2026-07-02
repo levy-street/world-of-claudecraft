@@ -1198,6 +1198,101 @@ const classAbilityNamesEn = {
       ],
       ['evocation', 'Evocation', 'Rapidly restores mana. (Mage talent)'],
       [
+        'rebuke',
+        'Rebuke',
+        'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
+      ],
+      [
+        'crusader_strike',
+        'Crusader Strike',
+        'Strikes the target for weapon damage plus {damage} Holy damage. (Paladin talent)',
+      ],
+      [
+        'holy_wrath',
+        'Holy Wrath',
+        'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
+      ],
+      [
+        'divine_shield',
+        'Divine Shield',
+        'Shields you with holy power, absorbing a massive amount of damage for 8 sec. (Paladin talent)',
+      ],
+      [
+        'avenging_wrath',
+        'Avenging Wrath',
+        'Calls down avenging power, increasing attack power and spell power for 20 sec. (Paladin talent)',
+      ],
+      [
+        'hammer_of_wrath',
+        'Hammer of Wrath',
+        'Hurls a holy hammer at the enemy for {damage} Holy damage. (Paladin talent)',
+      ],
+      [
+        'counter_shot',
+        'Counter Shot',
+        'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
+      ],
+      [
+        'frost_trap',
+        'Frost Trap',
+        'Freezes enemies at the target area in place for 3 sec. (Hunter talent)',
+      ],
+      ['mend_pet', 'Mend Pet', 'Heals a friendly target for {damage} over 15 sec. (Hunter talent)'],
+      [
+        'multi_shot',
+        'Multi-Shot',
+        'Fires several missiles, striking nearby enemies for {damage}. (Hunter talent)',
+      ],
+      [
+        'deterrence',
+        'Deterrence',
+        'Increases your dodge chance by 50% for 10 sec. (Hunter talent)',
+      ],
+      [
+        'aspect_of_the_wild',
+        'Aspect of the Wild',
+        'Inspires nearby allies with wild strength, increasing attack power for 5 min. (Hunter talent)',
+      ],
+      [
+        'kick',
+        'Kick',
+        'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Rogue talent)',
+      ],
+      [
+        'preparation',
+        'Preparation',
+        'Finishes the cooldown on Sprint, Evasion, and Vanish. (Rogue talent)',
+      ],
+      [
+        'ghostly_strike',
+        'Ghostly Strike',
+        'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
+      ],
+      [
+        'cloak_of_shadows',
+        'Cloak of Shadows',
+        'Wraps you in shadows, absorbing damage for 5 sec. (Rogue talent)',
+      ],
+      ['shadowstep', 'Shadowstep', 'Steps through the shadows toward your target. (Rogue talent)'],
+      ['silence', 'Silence', 'Silences the target for 4 sec. (Priest talent)'],
+      [
+        'psychic_scream',
+        'Psychic Scream',
+        'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
+      ],
+      ['inner_focus', 'Inner Focus', 'Makes your next spell free. Lasts 60 sec. (Priest talent)'],
+      ['desperate_prayer', 'Desperate Prayer', 'Instantly heals you for {damage}. (Priest talent)'],
+      [
+        'prayer_of_healing',
+        'Prayer of Healing',
+        'Heals nearby allies for {damage}. (Priest talent)',
+      ],
+      [
+        'mind_sear',
+        'Mind Sear',
+        'Channels shadow energy, damaging nearby enemies each second for {damage}. (Priest talent)',
+      ],
+      [
         'holy_shock',
         'Holy Shock',
         'Shocks a friendly target with Holy energy, healing them for {damage}. (Holy signature)',

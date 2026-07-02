@@ -5164,4 +5164,71 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상 지역에 유성을 불러내 {damage}의 화염 피해를 주고 지면을 불태웁니다. (마법사 특성)',
   'entities.abilities.evocation.name': '환기',
   'entities.abilities.evocation.description': '마나를 빠르게 회복합니다. (마법사 특성)',
+  'entities.abilities.rebuke.name': '비난',
+  'entities.abilities.rebuke.description':
+    '주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (성기사 특성)',
+  'entities.abilities.crusader_strike.name': '성전사의 일격',
+  'entities.abilities.crusader_strike.description':
+    '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
+  'entities.abilities.holy_wrath.name': '신성한 격노',
+  'entities.abilities.holy_wrath.description':
+    '신성한 힘을 방출해 주위 적에게 {damage}의 피해를 줍니다. (성기사 특성)',
+  'entities.abilities.divine_shield.name': '천상의 보호막',
+  'entities.abilities.divine_shield.description':
+    '신성한 힘으로 자신을 보호해 8초 동안 막대한 피해를 흡수합니다. (성기사 특성)',
+  'entities.abilities.avenging_wrath.name': '응징의 격노',
+  'entities.abilities.avenging_wrath.description':
+    '응징의 힘을 불러 20초 동안 전투력과 주문력을 높입니다. (성기사 특성)',
+  'entities.abilities.hammer_of_wrath.name': '응징의 망치',
+  'entities.abilities.hammer_of_wrath.description':
+    '적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. (성기사 특성)',
+  'entities.abilities.counter_shot.name': '반격 사격',
+  'entities.abilities.counter_shot.description':
+    '주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (사냥꾼 특성)',
+  'entities.abilities.frost_trap.name': '냉기 덫',
+  'entities.abilities.frost_trap.description':
+    '대상 지점의 적을 얼려 3초 동안 이동하지 못하게 합니다. (사냥꾼 특성)',
+  'entities.abilities.mend_pet.name': '동물 치료',
+  'entities.abilities.mend_pet.description':
+    '아군 대상의 생명력을 15초에 걸쳐 {damage}만큼 회복시킵니다. (사냥꾼 특성)',
+  'entities.abilities.multi_shot.name': '일제 사격',
+  'entities.abilities.multi_shot.description':
+    '여러 발을 발사해 주위 적에게 {damage}의 피해를 줍니다. (사냥꾼 특성)',
+  'entities.abilities.deterrence.name': '공격 저지',
+  'entities.abilities.deterrence.description':
+    '10초 동안 회피 확률이 50% 증가합니다. (사냥꾼 특성)',
+  'entities.abilities.aspect_of_the_wild.name': '야생의 상',
+  'entities.abilities.aspect_of_the_wild.description':
+    '야생의 힘으로 주위 아군을 고무해 5분 동안 전투력을 높입니다. (사냥꾼 특성)',
+  'entities.abilities.kick.name': '발차기',
+  'entities.abilities.kick.description':
+    '주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (도적 특성)',
+  'entities.abilities.preparation.name': '마음가짐',
+  'entities.abilities.preparation.description':
+    '전력 질주, 회피, 소멸의 재사용 대기시간을 끝냅니다. (도적 특성)',
+  'entities.abilities.ghostly_strike.name': '유령의 일격',
+  'entities.abilities.ghostly_strike.description':
+    '적을 공격해 무기 피해에 추가로 {damage}의 피해를 주고 잠시 회피를 높입니다. 연계 점수 1점을 얻습니다. (도적 특성)',
+  'entities.abilities.cloak_of_shadows.name': '그림자 망토',
+  'entities.abilities.cloak_of_shadows.description':
+    '그림자로 몸을 감싸 5초 동안 피해를 흡수합니다. (도적 특성)',
+  'entities.abilities.shadowstep.name': '그림자 밟기',
+  'entities.abilities.shadowstep.description': '그림자를 지나 대상에게 이동합니다. (도적 특성)',
+  'entities.abilities.silence.name': '침묵',
+  'entities.abilities.silence.description': '대상을 4초 동안 침묵시킵니다. (사제 특성)',
+  'entities.abilities.psychic_scream.name': '영혼의 절규',
+  'entities.abilities.psychic_scream.description':
+    '주위 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 깨질 수 있습니다. (사제 특성)',
+  'entities.abilities.inner_focus.name': '내면의 집중력',
+  'entities.abilities.inner_focus.description':
+    '다음 주문의 비용을 없앱니다. 60초 동안 지속됩니다. (사제 특성)',
+  'entities.abilities.desperate_prayer.name': '구원의 기도',
+  'entities.abilities.desperate_prayer.description':
+    '즉시 자신을 {damage}만큼 치유합니다. (사제 특성)',
+  'entities.abilities.prayer_of_healing.name': '치유의 기원',
+  'entities.abilities.prayer_of_healing.description':
+    '주위 아군을 {damage}만큼 치유합니다. (사제 특성)',
+  'entities.abilities.mind_sear.name': '정신 불태우기',
+  'entities.abilities.mind_sear.description':
+    '암흑 에너지를 집중해 매초 주위 적에게 {damage}의 피해를 줍니다. (사제 특성)',
 };
