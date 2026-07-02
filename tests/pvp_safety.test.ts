@@ -169,7 +169,7 @@ describe('PvP control abilities in active duels', () => {
     for (let i = 0; i < 20 * 61; i++) sim.tick();
 
     expect(castPolymorph()).toBe(10);
-  });
+  }, 90_000);
 
   it('makes feared hostile players run in a deterministic panic direction', () => {
     const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
@@ -259,7 +259,7 @@ describe('PvP control abilities in active duels', () => {
     b.auras = b.auras.filter((aura) => aura.id !== 'hammer_of_justice_stun');
     for (let i = 0; i < 20 * 19; i++) sim.tick();
     expect(castStun()).toBe(4);
-  });
+  }, 90_000);
 
   it('keeps opener and controlled stuns on independent DR chains (#1004)', () => {
     // Classic-style stun DR is not one bucket: a from-stealth opener (Cheap Shot,

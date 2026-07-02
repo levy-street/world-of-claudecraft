@@ -5824,8 +5824,19 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
-    if (this.mapAtlasLevel) return; // painted levels have no free zoom; right-click/click navigate
+    // Painted levels have no free zoom: zooming out walks up a level (the
+    // touch/wheel path to the hierarchy); clicks/right-clicks do the rest.
+    if (this.mapAtlasLevel) {
+      if (factor < 1) this.mapNavigateUp();
+      return;
+    }
     const prev = this.mapZoom;
+    // WoW-style: zooming out past the full-zone view climbs to the painted
+    // parent level instead of clamping silently.
+    if (factor < 1 && prev === 1) {
+      this.mapNavigateUp();
+      return;
+    }
     this.mapZoom = Math.max(1, Math.min(MAP_MAX_ZOOM, this.mapZoom * factor));
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
     // follow view anchors the pan at the player so dragging starts from there
