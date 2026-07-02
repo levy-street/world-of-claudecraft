@@ -2417,6 +2417,8 @@ export const ja_JP: EnTranslations = {
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "蝋燭も名簿も持ちました、{playerName}。先へどうぞ。",
+        "ally_revive": "立って。今夜の名簿にあなたの名前はありません。",
         "combat_start": "足元に気をつけて、{playerName}。ここの死者は安らいでいません。",
         "low_hp": "息をして。あなたのための祈りはまだ残っています。",
         "trap_spotted": "待って。床の何かが足音を覚えています。",
@@ -2431,6 +2433,8 @@ export const ja_JP: EnTranslations = {
         }
       },
       "edda": {
+        "run_start": "板の道を外れるな、{playerName}。泥は驕った足から呑む。",
+        "ally_revive": "さあ立て。今日は沼に渡さない。",
         "combat_start": "黒水に気をつけろ、{playerName}。沼が聞いている。",
         "low_hp": "落ち着け。私のランタンはまだ消えていない。",
         "trap_spotted": "待て。ここの葦がおかしい。",

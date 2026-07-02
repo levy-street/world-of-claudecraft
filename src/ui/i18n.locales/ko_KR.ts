@@ -5050,6 +5050,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'delveUi.companion.edda.boss_pull':
     '저 성가가 그대의 이름을 알고 있다, {playerName}. 노래로 답하지 마라.',
   'delveUi.companion.edda.completion': '늪은 하룻밤 더 그 비밀을 삼킬 수 있다.',
+  'delveUi.companion.edda.run_start':
+    '널빤지 길을 따라가라, {playerName}. 진창은 오만한 발걸음부터 삼킨다.',
+  'delveUi.companion.edda.ally_revive': '어서 일어나라. 오늘은 늪이 그대를 데려가지 못한다.',
+  'delveUi.companion.tessa.run_start': '초와 명부는 챙겼어요, {playerName}. 앞장서 주세요.',
+  'delveUi.companion.tessa.ally_revive': '일어나요. 오늘 밤 명부에 당신의 이름은 없어요.',
   'delveUi.companion.edda.rank.1': '등불지기',
   'delveUi.companion.edda.rank.2': '갈대 감시자',
   'delveUi.companion.edda.rank.3': '펜브릿지 신도',

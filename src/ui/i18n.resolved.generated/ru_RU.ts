@@ -2417,6 +2417,8 @@ export const ru_RU: EnTranslations = {
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "Свеча и книга при мне, {playerName}. Веди.",
+        "ally_revive": "Вставай. В сегодняшней книге нет твоего имени.",
         "combat_start": "Держись на ногах, {playerName}. Мёртвые здесь неспокойны.",
         "low_hp": "Дыши. У меня ещё остались молитвы для тебя.",
         "trap_spotted": "Стой. Что-то в полу помнит шаги.",
@@ -2431,6 +2433,8 @@ export const ru_RU: EnTranslations = {
         }
       },
       "edda": {
+        "run_start": "Держись дощатой тропы, {playerName}. Ил забирает горделивый шаг.",
+        "ally_revive": "Вставай же. Сегодня топь тебя не получит.",
         "combat_start": "Берегись чёрной воды, {playerName}. Болото слушает.",
         "low_hp": "Держись. Мой фонарь ещё не погас.",
         "trap_spotted": "Погоди. Тростник здесь какой-то не такой.",

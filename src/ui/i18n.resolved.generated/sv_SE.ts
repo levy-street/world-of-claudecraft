@@ -2417,6 +2417,8 @@ export const sv_SE: EnTranslations = {
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
+        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Håll fotfästet, {playerName}. De döda är rastlösa här.",
         "low_hp": "Andas. Jag har böner kvar åt dig.",
         "trap_spotted": "Vänta. Något i golvet minns fotsteg.",
@@ -2431,6 +2433,8 @@ export const sv_SE: EnTranslations = {
         }
       },
       "edda": {
+        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
+        "ally_revive": "Up, now. The marsh does not get you today.",
         "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
         "low_hp": "Steady. My lantern is not out yet.",
         "trap_spotted": "Wait. The reeds are wrong here.",

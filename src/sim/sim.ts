@@ -5588,6 +5588,7 @@ export class Sim {
     mob.wanderTimer = DELVE_COMPANION_HEAL_INTERVAL;
     this.addEntity(mob);
     run.companion = { companionId, entityId: mob.id };
+    this.maybeCompanionBark(run, pid, 'run_start');
   }
 
   private despawnDelveCompanion(run: DelveRun): void {

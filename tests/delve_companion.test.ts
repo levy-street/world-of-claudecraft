@@ -116,8 +116,17 @@ describe('delve companions', () => {
     (sim as any).spawnDelveModule(run);
     const boss = [...sim.entities.values()].find((e) => e.templateId === 'deacon_varric');
     (sim as any).aggroMob(boss, sim.player, false);
-    const bark = sim.tick().find((e) => e.type === 'companionBark');
-    expect(bark?.barkId).toBe('boss_pull');
+    const bark = sim.tick().find((e) => e.type === 'companionBark' && e.barkId === 'boss_pull');
+    expect(bark).toBeDefined();
+  });
+
+  it('barks a run_start greeting when the companion spawns', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const bark = sim.tick().find((e) => e.type === 'companionBark' && e.barkId === 'run_start');
+    expect(bark).toBeDefined();
   });
 
   it('does not repeat a bark id within a run (dedup guard)', () => {
@@ -137,6 +146,48 @@ describe('delve companions', () => {
     (sim as any).aggroMob(boss, sim.player, false);
     const second = sim.tick().find((e) => e.type === 'companionBark' && e.barkId === 'boss_pull');
     expect(second).toBeUndefined();
+  });
+
+  it('rank 3 revives the fallen owner once per run at half health', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    const meta = (sim as any).players.get(sim.playerId);
+    meta.companionUpgrades.companion_tessa = 3;
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const companion = sim.entities.get(run.companion!.entityId)!;
+    const p = sim.player;
+    p.dead = true;
+    p.hp = 0;
+    updateDelveCompanion((sim as any).ctx, companion);
+    expect(p.dead).toBe(false);
+    expect(p.hp).toBe(Math.max(1, Math.round(p.maxHp * 0.5)));
+    expect(run.companion!.reviveUsed).toBe(true);
+    expect(sim.entities.has(companion.id)).toBe(true); // she stays with the run
+    // Second death in the same run: the boon is spent, so the pre-existing
+    // dead-owner despawn behavior applies unchanged.
+    p.dead = true;
+    p.hp = 0;
+    updateDelveCompanion((sim as any).ctx, companion);
+    expect(p.dead).toBe(true);
+    expect(sim.entities.has(companion.id)).toBe(false);
+  });
+
+  it('below rank 3 a dead owner still despawns the companion (no revive)', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const companion = sim.entities.get(run.companion!.entityId)!;
+    const p = sim.player;
+    p.dead = true;
+    p.hp = 0;
+    updateDelveCompanion((sim as any).ctx, companion);
+    expect(p.dead).toBe(true);
+    expect(run.companion?.reviveUsed).toBeUndefined();
+    expect(sim.entities.has(companion.id)).toBe(false);
   });
 
   it('companion upgrade rank 2 costs 3 marks (Marks only, no copper)', () => {

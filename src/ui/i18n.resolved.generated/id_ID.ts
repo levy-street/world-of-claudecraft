@@ -2417,6 +2417,8 @@ export const id_ID: EnTranslations = {
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
+        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Jaga pijakanmu, {playerName}. Para mati gelisah di sini.",
         "low_hp": "Tarik napas. Aku masih menyimpan doa untukmu.",
         "trap_spotted": "Tahan. Ada sesuatu di lantai yang mengingat langkah kaki.",
@@ -2431,6 +2433,8 @@ export const id_ID: EnTranslations = {
         }
       },
       "edda": {
+        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
+        "ally_revive": "Up, now. The marsh does not get you today.",
         "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
         "low_hp": "Steady. My lantern is not out yet.",
         "trap_spotted": "Wait. The reeds are wrong here.",

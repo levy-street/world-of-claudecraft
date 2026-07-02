@@ -5155,6 +5155,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.companion.edda.trap_spotted': 'Погоди. Тростник здесь какой-то не такой.',
   'delveUi.companion.edda.boss_pull': 'Эта песнь знает твоё имя, {playerName}. Не пой в ответ.',
   'delveUi.companion.edda.completion': 'Болото может хранить свои тайны ещё одну ночь.',
+  'delveUi.companion.edda.run_start':
+    'Держись дощатой тропы, {playerName}. Ил забирает горделивый шаг.',
+  'delveUi.companion.edda.ally_revive': 'Вставай же. Сегодня топь тебя не получит.',
+  'delveUi.companion.tessa.run_start': 'Свеча и книга при мне, {playerName}. Веди.',
+  'delveUi.companion.tessa.ally_revive': 'Вставай. В сегодняшней книге нет твоего имени.',
   'delveUi.companion.edda.rank.1': 'Хранитель Фонаря',
   'delveUi.companion.edda.rank.2': 'Страж Тростника',
   'delveUi.companion.edda.rank.3': 'Послушник Фенбриджа',

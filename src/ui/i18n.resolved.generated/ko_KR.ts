@@ -2417,6 +2417,8 @@ export const ko_KR: EnTranslations = {
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "초와 명부는 챙겼어요, {playerName}. 앞장서 주세요.",
+        "ally_revive": "일어나요. 오늘 밤 명부에 당신의 이름은 없어요.",
         "combat_start": "발을 단단히 디뎌요, {playerName}. 이곳의 죽은 자들은 잠들지 못했어요.",
         "low_hp": "숨을 고르세요. 당신을 위한 기도가 아직 남아 있어요.",
         "trap_spotted": "멈춰요, 바닥에 있는 무언가가 발소리를 기억하고 있어요.",
@@ -2431,6 +2433,8 @@ export const ko_KR: EnTranslations = {
         }
       },
       "edda": {
+        "run_start": "널빤지 길을 따라가라, {playerName}. 진창은 오만한 발걸음부터 삼킨다.",
+        "ally_revive": "어서 일어나라. 오늘은 늪이 그대를 데려가지 못한다.",
         "combat_start": "흑수를 조심해라, {playerName}. 늪이 듣고 있다.",
         "low_hp": "침착해라. 내 등불은 아직 꺼지지 않았다.",
         "trap_spotted": "잠깐. 여기 갈대가 이상하다.",

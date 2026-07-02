@@ -2163,6 +2163,8 @@ export interface DelveObjectiveState {
 export interface DelveCompanionState {
   companionId: string;
   entityId: number;
+  /** Rank 3 boon: set once the once-per-run ally revive has been spent. */
+  reviveUsed?: boolean;
 }
 
 export interface DelveRun {

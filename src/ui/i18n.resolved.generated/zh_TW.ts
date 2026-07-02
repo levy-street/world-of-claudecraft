@@ -2417,6 +2417,8 @@ export const zh_TW: EnTranslations = {
     "companion": {
       "barkLine": "{name}：{line}",
       "tessa": {
+        "run_start": "蠟燭和名冊我都帶上了，{playerName}。帶路吧。",
+        "ally_revive": "起來。今夜的名冊上沒有你的名字。",
         "combat_start": "站穩，{playerName}。此處的亡者並不安寧。",
         "low_hp": "深呼吸。我還留有為你準備的禱詞。",
         "trap_spotted": "停下，地板裡有東西記得腳步聲。",
@@ -2431,6 +2433,8 @@ export const zh_TW: EnTranslations = {
         }
       },
       "edda": {
+        "run_start": "沿著木板走，{playerName}。淤泥專吞驕傲的腳步。",
+        "ally_revive": "快起來。今天沼澤帶不走你。",
         "combat_start": "小心黑水，{playerName}。沼澤在傾聽。",
         "low_hp": "穩住。我的提燈還沒熄滅。",
         "trap_spotted": "等等。這裡的蘆葦不對勁。",
