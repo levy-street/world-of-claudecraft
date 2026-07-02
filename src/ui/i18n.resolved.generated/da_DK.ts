@@ -265,6 +265,13 @@ export const da_DK: EnTranslations = {
       "heading": "Retning",
       "minimapZoom": "Minikort-zoom"
     },
+    "nativeUpdate": {
+      "title": "Update Available",
+      "body": "A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
+      "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
+      "notNow": "Not now",
+      "update": "Update"
+    },
     "castBar": {
       "playerAria": "Din castbjælke",
       "targetAria": "Enhedens castbjælke"

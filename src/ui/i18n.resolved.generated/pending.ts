@@ -9,24 +9,138 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "es_ES": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "fr_FR": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "fr_CA": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "de_DE": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "zh_CN": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "zh_TW": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "ko_KR": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "ja_JP": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "pt_BR": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "ru_RU": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "nl_NL": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "pl_PL": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "id_ID": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "tr_TR": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "sv_SE": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "vi_VN": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ],
+  "da_DK": [
+    "hudChrome.nativeUpdate.body",
+    "hudChrome.nativeUpdate.bodyWithVersion",
+    "hudChrome.nativeUpdate.notNow",
+    "hudChrome.nativeUpdate.title",
+    "hudChrome.nativeUpdate.update"
+  ]
 };

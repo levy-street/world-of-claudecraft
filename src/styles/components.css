@@ -2021,6 +2021,47 @@
     color: #ffe6a8;
   }
 
+  .native-update-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.72);
+  }
+  .native-update-dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: min(360px, calc(100vw - 32px));
+    padding: 16px;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+  }
+  .native-update-title {
+    font-family: var(--title-font);
+    font-size: 18px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .native-update-body {
+    color: var(--color-text-light);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .native-update-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .native-update-cta {
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+  }
+
   /* player card: char-window entry button + share modal */
   .pc-share-row {
     margin-top: 10px;

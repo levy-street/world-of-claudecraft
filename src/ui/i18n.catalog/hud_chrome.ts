@@ -189,6 +189,14 @@ export const hudChromeStrings = {
     heading: 'Heading',
     minimapZoom: 'Minimap zoom',
   },
+  nativeUpdate: {
+    title: 'Update Available',
+    body: 'A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.',
+    bodyWithVersion:
+      'Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.',
+    notNow: 'Not now',
+    update: 'Update',
+  },
   // Cast-bar progressbar accessible names (the visible spell name + seconds-left
   // text are the live status; these name which bar is which). One for the player's
   // own cast (#castbar) and one for the target/boss cast (#tf-castbar).

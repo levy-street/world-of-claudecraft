@@ -265,6 +265,13 @@ export const pt_BR: EnTranslations = {
       "heading": "Direção",
       "minimapZoom": "Zoom do minimapa"
     },
+    "nativeUpdate": {
+      "title": "Update Available",
+      "body": "A new version of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
+      "bodyWithVersion": "Version {version} of World of ClaudeCraft is available. Update now for the latest fixes and improvements.",
+      "notNow": "Not now",
+      "update": "Update"
+    },
     "castBar": {
       "playerAria": "Sua barra de conjuração",
       "targetAria": "Barra de conjuração do alvo"
