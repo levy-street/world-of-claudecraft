@@ -621,6 +621,58 @@ before the next starts.
   content-unused, on branch feature/talents-2-0-pr2 (stacked on PR1 #1305;
   its PR opens when #1305 lands). Goldens untouched.
 
+**PR3 implementation shapes (binding for the build; grounded in the actual
+effect/aura vocabulary on the branch).** New machinery is EXACTLY four items;
+everything else reuses existing types:
+- NEW 'aoeHeal' AbilityEffect (mirrors aoeDamage but heals nearby friendly
+  party targets via applyHeal): Holy Nova now, Tranquility/Prayer of Healing
+  in PR5.
+- NEW optional 'leechPct' on the dot effect/aura: each tick heals the
+  SOURCE for that fraction of tick damage: Siphon Life now, Vampiric
+  Embrace in PR5.
+- NEW 'consumeAura' AbilityEffect { auraIds?: string[]; auraKind?: 'dot' |
+  'hot'; deal?: {min,max}; heal?: {min,max} }: consumes the first matching
+  aura on the target (dots must be the caster's own) then deals damage or
+  heals; errors without consuming when nothing matches: Conflagrate
+  (consume your immolate, fire damage) and Swiftmend (consume a HoT on a
+  friendly, instant heal).
+- NEW caster-form aura kinds 'form_moonkin' and 'form_shadow' joining the
+  form family (toggle semantics like bear/cat/travel) but which do NOT
+  restrict spellcasting; render tint rides a separate render slice.
+
+Per-ability shapes (cooldowns/durations illustrative, numbers sized to rank
+peers at implementation):
+| Ability | Shape |
+|---|---|
+| Holy Shock | instant heal effect, 15s cd |
+| Holy Shield | selfBuff thorns (holy) + selfBuff buff_armor, 10s, 30s cd |
+| Repentance | incapacitate effect 6s, range 20, 60s cd |
+| Bestial Wrath | selfBuff buff_ap (large), 15s, 2min cd |
+| Trueshot Aura | aoeAttackPower party buff (battle_shout pattern), 300s |
+| Wyvern Sting | incapacitate effect 4s at range 30 (gouge at range), 60s cd |
+| Arcane Power | selfBuff buff_spellpower, 12s, 90s cd |
+| Combustion | applies next_attack_crit self-aura (P3 reuse), 2min cd |
+| Cone of Cold | aoeDamage frost, instant, 20s cd |
+| Cold Blood | applies next_attack_crit (P3 reuse), 2min cd |
+| Blade Flurry | selfBuff buff_haste +20%, 12s, 2min cd (cleave part deferred) |
+| Hemorrhage | weaponStrike + physical bleed dot rider, awards combo |
+| Power Infusion | buffTarget buff_spellpower on a friendly, 15s, 2min cd |
+| Holy Nova | aoeHeal (NEW) + aoeDamage holy, instant, 20s cd |
+| Shadowform | form_shadow toggle (NEW kind) + buff_spellpower while in form |
+| Elemental Mastery | applies next_cast_instant (P3 reuse), 2min cd |
+| Shamanistic Rage | gainResource mana ~30%, instant, 2min cd |
+| Nature's Swiftness | applies next_cast_instant (P3 reuse), 2min cd |
+| Siphon Life | shadow dot with leechPct (NEW field), 30s |
+| Fel Domination | applies next_cast_instant (P3 reuse; summon-only filter deferred), 3min cd |
+| Conflagrate | consumeAura (NEW) auraIds ['immolate'], deal fire burst, 10s cd |
+| Moonkin Form | form_moonkin toggle (NEW kind) + buff_spellpower while in form |
+| Feral Charge | charge effect + 1s root rider, 15s cd (distinct from bear_charge) |
+| Swiftmend | consumeAura (NEW) auraKind 'hot' on a friendly, instant heal, 15s cd |
+
+Build order: PR3a mechanics (the four NEW items, content-unused, goldens
+untouched), then PR3b content (24 defs + spec rewiring + i18n fills + guide
+regen + tests), then the render tint slice.
+
 **PR3: signature fairness (real spec spells under the EXISTING system).**
 - The 24 new grant-only signature abilities from the table above (Holy
   Shock, Combustion, Shadowform, Arcane Power, Cone of Cold, Cold Blood,
