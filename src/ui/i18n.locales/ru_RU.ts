@@ -389,6 +389,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'game.hud.lowMana': 'Мало маны',
   'game.hud.lowEnergy': 'Мало энергии',
   'game.talents.title': 'Таланты',
+  'game.talents.choicesTab': 'Варианты',
+  'game.talents.rowUnlocks': 'Открывается на {level} уровне',
   'game.talents.classTab': 'Класс',
   'game.talents.specTab': 'Специализация',
   'game.talents.available': 'Доступно',

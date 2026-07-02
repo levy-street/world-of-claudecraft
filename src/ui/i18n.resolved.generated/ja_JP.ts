@@ -85,6 +85,8 @@ export const ja_JP: EnTranslations = {
       "title": "タレント",
       "classTab": "クラス",
       "specTab": "専門化",
+      "choicesTab": "選択",
+      "rowUnlocks": "レベル{level}で解放",
       "available": "使用可能",
       "spent": "使用済み",
       "pointSource": "レベル{first}から{cap}まで、レベルごとにタレントポイントを1獲得します。さらにポイントを得るにはレベルを上げてください。",

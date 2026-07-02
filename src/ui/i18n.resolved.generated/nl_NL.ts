@@ -85,6 +85,8 @@ export const nl_NL: EnTranslations = {
       "title": "Talenten",
       "classTab": "Klasse",
       "specTab": "Specialisatie",
+      "choicesTab": "Keuzes",
+      "rowUnlocks": "Ontgrendelt op niveau {level}",
       "available": "Beschikbaar",
       "spent": "Besteed",
       "pointSource": "Verdien 1 talentpunt per level van level {first} tot {cap}. Level omhoog om meer punten te krijgen.",

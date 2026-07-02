@@ -85,6 +85,8 @@ export const zh_CN: EnTranslations = {
       "title": "天赋",
       "classTab": "职业",
       "specTab": "专精",
+      "choicesTab": "抉择",
+      "rowUnlocks": "在 {level} 级解锁",
       "available": "可用",
       "spent": "已用",
       "pointSource": "从 {first} 级到 {cap} 级，每升一级获得 1 点天赋点。继续升级可获得更多点数。",

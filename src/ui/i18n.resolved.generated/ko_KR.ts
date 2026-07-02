@@ -85,6 +85,8 @@ export const ko_KR: EnTranslations = {
       "title": "특성",
       "classTab": "직업",
       "specTab": "전문화",
+      "choicesTab": "선택",
+      "rowUnlocks": "{level} 레벨에 해제",
       "available": "사용 가능",
       "spent": "사용함",
       "pointSource": "{first}레벨부터 {cap}레벨까지 레벨마다 특성 점수 1점을 얻습니다. 더 많은 점수를 얻으려면 레벨을 올리세요.",

@@ -362,6 +362,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'game.hud.lowMana': '法力不足',
   'game.hud.lowEnergy': '能量不足',
   'game.talents.title': '天賦',
+  'game.talents.choicesTab': '抉擇',
+  'game.talents.rowUnlocks': '在 {level} 級解鎖',
   'game.talents.classTab': '職業',
   'game.talents.specTab': '專精',
   'game.talents.available': '可用',

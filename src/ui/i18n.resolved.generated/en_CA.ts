@@ -85,6 +85,8 @@ export const en_CA: EnTranslations = {
       "title": "Talents",
       "classTab": "Class",
       "specTab": "Specialization",
+      "choicesTab": "Choices",
+      "rowUnlocks": "Unlocks at level {level}",
       "available": "Available",
       "spent": "Spent",
       "pointSource": "Earn 1 talent point each level from level {first} to {cap}. Level up to get more points.",

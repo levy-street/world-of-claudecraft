@@ -2156,6 +2156,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'game.talents.specTab': 'Specialisering',
   'game.talents.spent': 'Brugt',
   'game.talents.title': 'Talenter',
+  'game.talents.choicesTab': 'Valg',
+  'game.talents.rowUnlocks': 'Låses op på niveau {level}',
   'game.talents.unlockBanner': 'Talenter Låst Op!',
   'game.talents.unlockHint':
     'Du har optjent dit første talentpoint — tryk på N for at åbne Talenter.',

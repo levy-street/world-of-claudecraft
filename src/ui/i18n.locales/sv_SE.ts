@@ -2159,6 +2159,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.specTab': 'Specialisering',
   'game.talents.spent': 'Lagda',
   'game.talents.title': 'Talanger',
+  'game.talents.choicesTab': 'Val',
+  'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
   'game.talents.unlockBanner': 'Talanger upplåsta!',
   'game.talents.unlockHint':
     'Du har tjänat din första talangpoäng, tryck på N för att öppna Talanger.',

@@ -85,6 +85,8 @@ export const zh_TW: EnTranslations = {
       "title": "天賦",
       "classTab": "職業",
       "specTab": "專精",
+      "choicesTab": "抉擇",
+      "rowUnlocks": "在 {level} 級解鎖",
       "available": "可用",
       "spent": "已用",
       "pointSource": "從 {first} 級到 {cap} 級，每升一級獲得 1 點天賦點。繼續升級可獲得更多點數。",

@@ -85,6 +85,8 @@ export const en_XA: EnTranslations = {
       "title": "[Ţáļéñţš]",
       "classTab": "[Çļášš]",
       "specTab": "[Šþéçíáļížáţíóñ]",
+      "choicesTab": "[Çĥóíçéš]",
+      "rowUnlocks": "[Úñļóçķš áţ ļéʋéļ {level}]",
       "available": "[Áʋáíļáƀļé]",
       "spent": "[Šþéñţ]",
       "pointSource": "[Éáŕñ 1 ţáļéñţ þóíñţ éáçĥ ļéʋéļ ƒŕóɱ ļéʋéļ {first} ţó {cap}. Ļéʋéļ úþ ţó ĝéţ ɱóŕé þóíñţš.]",

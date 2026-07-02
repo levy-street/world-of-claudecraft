@@ -85,6 +85,8 @@ export const vi_VN: EnTranslations = {
       "title": "Thiên phú",
       "classTab": "Lớp",
       "specTab": "Chuyên môn",
+      "choicesTab": "Lựa chọn",
+      "rowUnlocks": "Mở khóa ở cấp {level}",
       "available": "Khả dụng",
       "spent": "Đã dùng",
       "pointSource": "Nhận 1 điểm tài năng mỗi cấp từ cấp {first} đến {cap}. Lên cấp để có thêm điểm.",

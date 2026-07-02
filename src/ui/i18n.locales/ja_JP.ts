@@ -379,6 +379,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'game.hud.lowMana': 'マナ低下',
   'game.hud.lowEnergy': 'エネルギー低下',
   'game.talents.title': 'タレント',
+  'game.talents.choicesTab': '選択',
+  'game.talents.rowUnlocks': 'レベル{level}で解放',
   'game.talents.classTab': 'クラス',
   'game.talents.specTab': '専門化',
   'game.talents.available': '使用可能',

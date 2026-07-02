@@ -85,6 +85,8 @@ export const ru_RU: EnTranslations = {
       "title": "Таланты",
       "classTab": "Класс",
       "specTab": "Специализация",
+      "choicesTab": "Варианты",
+      "rowUnlocks": "Открывается на {level} уровне",
       "available": "Доступно",
       "spent": "Потрачено",
       "pointSource": "Получайте 1 очко талантов за каждый уровень с {first} по {cap}. Повышайте уровень, чтобы получить больше очков.",

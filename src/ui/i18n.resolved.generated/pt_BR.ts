@@ -85,6 +85,8 @@ export const pt_BR: EnTranslations = {
       "title": "Talentos",
       "classTab": "Classe",
       "specTab": "Especialização",
+      "choicesTab": "Escolhas",
+      "rowUnlocks": "Desbloqueia no nível {level}",
       "available": "Disponíveis",
       "spent": "Gastos",
       "pointSource": "Ganhe 1 ponto de talento por nível do {first} ao {cap}. Suba de nível para conseguir mais pontos.",
