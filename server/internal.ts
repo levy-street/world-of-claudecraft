@@ -2,6 +2,7 @@ import { timingSafeEqual } from 'node:crypto';
 import type * as http from 'node:http';
 import { specialRoleByKey } from '../src/sim/discord_roles';
 import { DISCORD_REWARD_GRANTS, discordStatusIndexForPoints } from '../src/sim/discord_tier';
+import { dailyRewardService } from './daily_rewards';
 import { pool } from './db';
 import { discordFlexForAccount, setDiscordPresenceCache } from './discord';
 import { drainActivity } from './discord_activity';
@@ -182,6 +183,19 @@ async function handleDiscordInternal(
       out.push({ ...rest, participants });
     }
     return ok(res, { items: out });
+  }
+
+  if (req.method === 'GET' && url.pathname === '/internal/discord/daily-rewards-winners') {
+    const limit = clampInt(Number(url.searchParams.get('limit')) || 1, 1, 5);
+    return ok(res, await dailyRewardService.discordWinnerAnnouncements(limit));
+  }
+
+  if (req.method === 'POST' && url.pathname === '/internal/discord/daily-rewards-winners/mark') {
+    const result = await dailyRewardService.markDiscordWinnersAnnounced(
+      await readBody(req).catch(() => ({})),
+    );
+    if ('error' in result) return fail(res, result.status, result.error);
+    return ok(res, result);
   }
 
   // POST /internal/discord/members-meta -> the bot pushes guild join dates + top

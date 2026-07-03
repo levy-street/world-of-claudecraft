@@ -591,14 +591,19 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     // classic-WoW "/r": the recipient's reply target is whoever last
     // whispered them, so record it on the target (not the sender).
     target.lastWhisperFrom = r.meta.name;
-    ctx.emit({
-      type: 'chat',
-      fromPid: r.meta.entityId,
-      from: r.meta.name,
-      text: msg,
-      channel: 'whisper',
-      pid: target.entityId,
-    });
+    // The recipient's copy of the whisper. A dev bot ("/dev bot") has no owning
+    // client to deliver it to, and offline the single client renders every event
+    // regardless of pid, so this copy would show as a duplicate of the sender's own
+    // line. Skip it for a bot: you still get your echo below plus the bot's reply.
+    if (!target.isDevBot)
+      ctx.emit({
+        type: 'chat',
+        fromPid: r.meta.entityId,
+        from: r.meta.name,
+        text: msg,
+        channel: 'whisper',
+        pid: target.entityId,
+      });
     ctx.emit({
       type: 'chat',
       fromPid: r.meta.entityId,
@@ -608,6 +613,22 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       channel: 'whisper',
       pid: r.meta.entityId,
     });
+    if (target.isDevBot) {
+      // A dev test dummy ("/dev bot") answers, so a whisper to it lands back in your
+      // chat (and whisper tab), letting you test both directions offline; your /r now
+      // targets it. English content via a var: whisper bodies are player content the
+      // client shows verbatim inside its own localized template.
+      r.meta.lastWhisperFrom = target.name;
+      const reply = `Hi ${r.meta.name}! You whispered me: "${msg}"`;
+      ctx.emit({
+        type: 'chat',
+        fromPid: target.entityId,
+        from: target.name,
+        text: reply,
+        channel: 'whisper',
+        pid: r.meta.entityId,
+      });
+    }
     return { channel: 'whisper', message: msg, target: target.name };
   }
 
@@ -821,10 +842,22 @@ export function handleDevChat(
     ctx.completeCurrentQuestsForDev(pid);
     return null;
   }
+  const botM = /^\/(?:dev\s+bot|devbot)\s+(\S+)\s*$/i.exec(raw);
+  if (botM) {
+    const botName = botM[1];
+    const botPid = ctx.spawnDevBot(botName);
+    // Dev-only English diagnostics, routed through vars so they read as dev-channel
+    // text (like the other /dev feedback) rather than localizable UI copy.
+    const okText = `[dev] Spawned ${botName}. Whisper it: /w ${botName} hi (or right-click its name).`;
+    const failText = `[dev] Could not spawn '${botName}' (name blank or already in use).`;
+    if (botPid < 0) ctx.error(pid, failText);
+    else ctx.emit({ type: 'log', text: okText, pid });
+    return null;
+  }
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev quest questId, /dev quests',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev quest questId, /dev quests, /dev bot name',
     );
     return null;
   }

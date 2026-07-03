@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Hardened-runtime entitlements for the PRODUCTION (Developer ID, notarized)
+  macOS build, applied to the app and every nested helper via mac.entitlements /
+  mac.entitlementsInherit. Only what Electron 43 needs to run under the hardened
+  runtime:
+    - allow-jit: V8 JIT pages; Electron does not launch without it.
+    - allow-unsigned-executable-memory: Electron's non-JIT executable
+      allocations (WASM trap handlers, etc.).
+  Deliberately absent: com.apple.security.cs.disable-library-validation (no
+  native modules ship, so the production app keeps library validation ON; the
+  LOCAL ad-hoc build needs it and gets entitlements.mac.adhoc.plist instead,
+  wired in scripts/electron-build.mjs), allow-dyld-environment-variables (keeps
+  DYLD_INSERT_LIBRARIES injection blocked), and the App Sandbox-only
+  entitlements like network.client (this is a hardened-runtime, non-sandboxed
+  Developer ID app).
+-->
+<plist version="1.0">
+  <dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+  </dict>
+</plist>

@@ -183,6 +183,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.targetId = null;
   p.autoAttack = false;
   p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
   p.combatTimer = 99;
   p.inCombat = false;
   ctx.emit({ type: 'respawn', pid: meta.entityId });

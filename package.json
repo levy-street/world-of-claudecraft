@@ -1,9 +1,11 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "private": true,
   "license": "MIT",
+  "author": "levy-street",
   "type": "module",
+  "main": "electron/main.cjs",
   "description": "World of Claudecraft: a WoW-Classic-style micro-MMO + headless RL training environment",
   "scripts": {
     "dev": "vite",
@@ -17,6 +19,11 @@
     "native:sync": "npm run build:native && npx cap sync",
     "native:open:ios": "npm run native:sync && npx cap open ios",
     "native:open:android": "npm run native:sync && npx cap open android",
+    "electron:dev": "node scripts/electron-dev.mjs",
+    "electron:pack": "node scripts/electron-build.mjs pack",
+    "electron:pack:steam": "node scripts/electron-build.mjs pack steam",
+    "electron:build": "node scripts/electron-build.mjs build",
+    "electron:build:steam": "node scripts/electron-build.mjs build steam",
     "preview": "vite preview",
     "format": "biome format --write .",
     "format:check": "biome format .",
@@ -75,6 +82,8 @@
     "@wallet-standard/base": "^1.1.1",
     "@wallet-standard/features": "^1.1.1",
     "bs58": "^6.0.0",
+    "electron-log": "^5.4.4",
+    "electron-updater": "^6.8.9",
     "n8ao": "^1.10.1",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
@@ -99,6 +108,8 @@
     "@vitest/browser": "4.1.8",
     "@vitest/browser-playwright": "4.1.8",
     "axe-core": "4.12.1",
+    "electron": "^43.0.0",
+    "electron-builder": "^26.15.6",
     "esbuild": "^0.28.1",
     "jsdom": "^29.1.1",
     "lightningcss": "1.32.0",
@@ -111,6 +122,107 @@
     "typescript": "^5.5.0",
     "vite": "^8.0.16",
     "vitest": "4.1.8"
+  },
+  "build": {
+    "appId": "com.worldofclaudecraft.desktop",
+    "productName": "World of ClaudeCraft",
+    "icon": "build/icon.png",
+    "files": [
+      "dist/**",
+      "electron/**",
+      "build/icon.png",
+      "build/icon.ico",
+      "build/icon.icns",
+      "package.json",
+      "!node_modules/**"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "grantFileProtocolExtraPrivileges": false,
+      "onlyLoadAppFromAsar": true,
+      "enableEmbeddedAsarIntegrityValidation": true
+    },
+    "protocols": [
+      {
+        "name": "World of ClaudeCraft Login",
+        "schemes": [
+          "worldofclaudecraft"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.games",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "category": "Game",
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+    "publish": {
+      "provider": "generic",
+      "url": "https://updates.worldofclaudecraft.com/desktop"
+    }
   },
   "allowScripts": {
     "sharp@0.34.5": true

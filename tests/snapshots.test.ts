@@ -2369,3 +2369,153 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(mirror.value).toBe(0);
   });
 });
+
+describe('aura decode reuses records across snapshots (allocation fast path)', () => {
+  function wolfWire(sim: Sim, mobId: number): Record<string, unknown> {
+    return JSON.parse(JSON.stringify(wireEntity(sim.entities.get(mobId)!)));
+  }
+
+  function makeMobWithAura(): { sim: Sim; mobId: number } {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Poker');
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob')!;
+    void pid;
+    mob.auras.push({
+      id: 'corruption',
+      name: 'Corruption',
+      kind: 'dot',
+      remaining: 12,
+      duration: 12,
+      value: 15,
+      tickInterval: 3,
+      sourceId: 0,
+      school: 'shadow',
+    });
+    return { sim, mobId: mob.id };
+  }
+
+  it('keeps the same array and record objects while only fields change', () => {
+    const { sim, mobId } = makeMobWithAura();
+    const client = bareClient(999);
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const firstArr = client.entities.get(mobId)!.auras;
+    const firstRec = firstArr[0];
+    expect(firstRec.remaining).toBe(12);
+
+    // same aura set, only the remaining ticked down: the mirror must update the
+    // SAME objects in place (no per-snapshot churn) with the new field values
+    sim.entities.get(mobId)!.auras[0].remaining = 7.5;
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const secondArr = client.entities.get(mobId)!.auras;
+    expect(secondArr).toBe(firstArr);
+    expect(secondArr[0]).toBe(firstRec);
+    expect(firstRec.remaining).toBe(7.5);
+    expect(firstRec.value).toBe(15);
+    expect(firstRec.school).toBe('shadow');
+  });
+
+  it('rebuilds the list when the aura composition changes', () => {
+    const { sim, mobId } = makeMobWithAura();
+    const client = bareClient(999);
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const firstArr = client.entities.get(mobId)!.auras;
+
+    sim.entities.get(mobId)!.auras.push({
+      id: 'venom_bite',
+      name: 'Venom Bite',
+      kind: 'dot',
+      remaining: 6,
+      duration: 6,
+      value: 4,
+      tickInterval: 2,
+      sourceId: 0,
+      school: 'nature',
+    });
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    const secondArr = client.entities.get(mobId)!.auras;
+    expect(secondArr).not.toBe(firstArr); // composition changed: fresh build
+    expect(secondArr.map((a) => a.id)).toEqual(['corruption', 'venom_bite']);
+    expect(secondArr[1].value).toBe(4);
+
+    // and dropping back to one aura rebuilds again (length mismatch path)
+    sim.entities.get(mobId)!.auras.pop();
+    (client as any).applySnapshot({ t: 'snap', ents: [wolfWire(sim, mobId)] });
+    expect(client.entities.get(mobId)!.auras.map((a) => a.id)).toEqual(['corruption']);
+  });
+});
+
+describe('aura decode fast-path guards (composition edge cases)', () => {
+  function client2(sim: Sim, mobId: number) {
+    const client = bareClient(999);
+    const apply = () =>
+      (client as any).applySnapshot({
+        t: 'snap',
+        ents: [JSON.parse(JSON.stringify(wireEntity(sim.entities.get(mobId)!)))],
+      });
+    return { client, apply };
+  }
+
+  function makeMobWithTwoAuras(): { sim: Sim; mobId: number } {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    sim.addPlayer('warrior', 'Poker');
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob')!;
+    mob.auras.push(
+      {
+        id: 'corruption',
+        name: 'Corruption',
+        kind: 'dot',
+        remaining: 12,
+        duration: 12,
+        value: 15,
+        sourceId: 0,
+        school: 'shadow',
+      },
+      {
+        id: 'weakness',
+        name: 'Weakness',
+        kind: 'buff_ap',
+        remaining: 9,
+        duration: 9,
+        value: -5,
+        sourceId: 0,
+        school: 'physical',
+      },
+    );
+    return { sim, mobId: mob.id };
+  }
+
+  it('a same-length REORDER rebuilds instead of smearing fields across records', () => {
+    const { sim, mobId } = makeMobWithTwoAuras();
+    const { client, apply } = client2(sim, mobId);
+    apply();
+    const mob = sim.entities.get(mobId)!;
+    // swap the two auras: same ids, same length, different order
+    mob.auras.reverse();
+    apply();
+    const mirrored = client.entities.get(mobId)!.auras;
+    expect(mirrored.map((a) => a.id)).toEqual(['weakness', 'corruption']);
+    // each record carries ITS aura's fields, not the other slot's
+    expect(mirrored[0].value).toBe(-5);
+    expect(mirrored[1].value).toBe(15);
+    expect(mirrored[1].school).toBe('shadow');
+  });
+
+  it('the in-place path clears optional sub-fields the wire stops sending', () => {
+    const { sim, mobId } = makeMobWithTwoAuras();
+    const mob = sim.entities.get(mobId)!;
+    mob.auras[0].stacks = 3;
+    mob.auras[0].value2 = 8;
+    const { client, apply } = client2(sim, mobId);
+    apply();
+    const rec = client.entities.get(mobId)!.auras[0];
+    expect(rec.stacks).toBe(3);
+    expect(rec.value2).toBe(8);
+    // same aura set (fast path), but the optionals dropped off the wire
+    mob.auras[0].stacks = undefined;
+    mob.auras[0].value2 = undefined;
+    apply();
+    expect(client.entities.get(mobId)!.auras[0]).toBe(rec); // fast path taken
+    expect(rec.stacks).toBeUndefined(); // not a stale 3
+    expect(rec.value2).toBeUndefined(); // not a stale 8
+  });
+});

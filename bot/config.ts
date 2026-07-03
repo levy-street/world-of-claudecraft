@@ -22,6 +22,8 @@ export interface BotConfig {
   relayChannelId: string;
   /** Channel id the significant-activity feed (level-ups, drops, ...) posts to. */
   activityChannelId: string;
+  /** Channel id for daily rewards top-10 winner announcements. */
+  dailyRewardsChannelId: string;
   /** Public game URL shown in bot replies. */
   gameUrl: string;
   /** Sync each linked member's Discord nickname to include their in-game level. */
@@ -53,6 +55,7 @@ export function loadConfig(): BotConfig {
       process.env.DISCORD_RELAY_CHANNEL_ID ||
       process.env.DISCORD_TEST_CHANNEL_ID ||
       '',
+    dailyRewardsChannelId: process.env.DISCORD_DAILY_REWARDS_CHANNEL_ID || '',
     gameUrl: process.env.PUBLIC_GAME_URL || 'https://worldofclaudecraft.com',
     syncNicknames: process.env.DISCORD_SYNC_NICKNAMES !== '0',
   };

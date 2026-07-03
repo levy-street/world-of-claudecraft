@@ -72,7 +72,16 @@
   }
   body.mobile-touch.game-active #mobile-controls {
     position: absolute;
-    inset: 0;
+    /* Size from the shared --app-vw/--app-vh box (the one #game-canvas, html/body,
+       #ui, and #nameplates use), NOT `inset: 0`: inset resolves against the initial
+       containing block, and whenever that disagrees with the JS-synced app viewport
+       (device emulation, pinch zoom, a mid-resize snapshot) the joysticks and combat
+       buttons anchor to a different bottom edge than the action bar and drift into
+       the middle of the screen. One box for every full-screen HUD layer. */
+    left: 0;
+    top: 0;
+    width: var(--app-vw);
+    height: var(--app-vh);
     display: block;
     pointer-events: none;
     z-index: 60;
@@ -325,7 +334,7 @@
     transform: translateX(-50%);
     display: none;
     width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
-    padding: 10px;
+    --window-pad: 10px;
     pointer-events: auto;
     z-index: 100;
     border: 2px solid #5b4618;
@@ -335,9 +344,11 @@
       0 8px 28px #000d,
       inset 0 1px 0 #ffffff12;
     /* Top-centred modal: cap to the safe viewport so short landscape phones can
-       scroll the full menu without hiding rows behind controls or browser chrome. */
+       scroll the full menu without hiding rows behind controls or browser chrome.
+       No --ui-scale division: this drawer is a <body>-level window OUTSIDE the
+       zoomed #ui (see the --window-scale note in layout.css). */
     max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
-    max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
@@ -347,7 +358,10 @@
     flex-direction: column;
   }
   body.mobile-touch #mobile-extra-controls .panel-title {
-    min-height: 32px;
+    /* 48px, not the old 32px: the close button is a 40x40 absolute-pinned touch
+       target now (it no longer props the header height from the flex flow), so
+       the header itself must be at least as tall as the target. */
+    min-height: 48px;
     margin-bottom: 8px;
     padding-bottom: 6px;
     cursor: move;
@@ -513,7 +527,35 @@
     pointer-events: auto;
   }
   body.mobile-touch #side-buttons {
+    display: block;
+    right: max(8px, env(safe-area-inset-right));
+    top: calc(max(8px, env(safe-area-inset-top)) + 210px);
+    bottom: auto;
+    width: 70px;
+    z-index: 81;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-window-open #side-buttons {
+    z-index: 1;
+    pointer-events: none;
+  }
+  body.mobile-touch #side-buttons .micro-btn {
     display: none;
+  }
+  body.mobile-touch #daily-rewards-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 54px;
+    height: 50px;
+    pointer-events: auto;
+  }
+  body.mobile-touch #daily-rewards-button .daily-rewards-label {
+    display: none;
+  }
+  body.native-app.mobile-touch #daily-rewards-button,
+  body.native-app.mobile-touch #daily-rewards-window {
+    display: none !important;
   }
   body.mobile-touch #actionbar {
     display: flex;
@@ -820,7 +862,7 @@
     bottom: calc(31px + env(safe-area-inset-bottom));
     width: min(220px, calc(50vw - 144px));
     min-width: 142px;
-    max-height: min(170px, calc(100vh - 128px));
+    max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 128px));
     overflow: hidden;
     z-index: 25;
   }
@@ -862,7 +904,22 @@
   }
   body.mobile-touch .window {
     max-width: calc(100vw - 20px);
-    max-height: calc(100vh - 40px);
+    /* --window-scale, never --ui-scale: this generic rule also governs the
+       body-level windows OUTSIDE the zoomed #ui (the confirm/input dialog),
+       which pin --window-scale to 1 (see the shell note in layout.css). */
+    max-height: calc(var(--app-vh) / var(--window-scale, 1) - 40px);
+  }
+  /* The mobile close button is a 40x40 touch target pinned in the header's
+     top-right corner (absolute, see the .window > .panel-title shell rule in
+     layout.css), so reserve inline-end room for it: the title must never slide
+     under it, and the header must be at least as tall as the target. */
+  body.mobile-touch .window > .panel-title {
+    padding-inline: var(--window-pad) 52px;
+    min-height: 48px;
+  }
+  body.mobile-touch #leaderboard-window,
+  body.mobile-touch #daily-rewards-window {
+    z-index: 95;
   }
   body.mobile-touch.mobile-window-open #ui {
     z-index: 90;
@@ -890,7 +947,7 @@
      Give the window the full available height (like #trade-window) so the listing
      body keeps a usable, touch-scrollable height under the header. */
   body.mobile-touch #market-window {
-    max-height: calc(100vh - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
   }
   /* Floor the listing body so it keeps a usable, touch-scrollable height even when
@@ -921,7 +978,7 @@
     top: 10px;
     width: auto;
     max-width: calc(100vw - 20px);
-    max-height: calc(100vh - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     transform: none;
     box-sizing: border-box;
     overflow-y: auto;
@@ -949,12 +1006,12 @@
   }
   body.mobile-touch #social-window {
     bottom: 10px;
-    height: min(560px, calc(100vh - 20px));
+    height: min(560px, calc(var(--app-vh) / var(--ui-scale, 1) - 20px));
   }
   body.mobile-touch #trade-window {
     top: 10px;
     transform: none;
-    max-height: calc(100vh - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow-y: auto;
   }
   body.mobile-touch #trade-window .trade-cols {
@@ -1043,7 +1100,7 @@
     right: auto;
     transform: none;
     width: min(360px, calc(100vw - 20px));
-    max-height: calc(100vh - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     box-sizing: border-box;
     overflow-y: auto;
   }
@@ -1081,7 +1138,7 @@
   body.mobile-touch #quest-log-window,
   body.mobile-touch #quest-dialog {
     max-width: calc(100vw - 20px);
-    max-height: calc(100vh - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
   }
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
@@ -1091,7 +1148,7 @@
     top: 12px;
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
-    max-height: calc(100vh - 92px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
     transform: translateX(-50%);
   }
   body.mobile-touch.vendor-open #vendor-window,
@@ -1142,7 +1199,7 @@
     right: auto;
     top: 12px;
     width: min(560px, calc(100vw - 170px));
-    max-height: calc(100vh - 92px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
     transform: translateX(-50%);
   }
   /* On touch, stack the categories back into a single column so the large
@@ -1231,7 +1288,7 @@
     top: 50%;
     width: min(600px, calc(100vw - 20px));
     max-width: calc(100vw - 20px);
-    max-height: calc(100vh - 24px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 24px);
     transform: translate(-50%, -50%);
     z-index: 95 !important;
   }
@@ -1344,8 +1401,8 @@
     top: 44%;
     bottom: auto;
     width: min(360px, calc(100vw - 170px));
-    height: min(380px, calc(100vh - 116px));
-    max-height: calc(100vh - 116px);
+    height: min(380px, calc(var(--app-vh) / var(--ui-scale, 1) - 116px));
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
     transform: translate(-50%, -50%);
     z-index: 45;
   }
@@ -1354,7 +1411,10 @@
     top: calc(46% - env(safe-area-inset-bottom));
     width: min(46vw, 330px);
     max-width: calc(100vw - 220px);
-    padding: 8px;
+    /* The variable, not raw padding, like every other window (the map has no
+       sticky header today, but keeping it in the --window-pad system means
+       adding one later cannot silently misalign; see layout.css). */
+    --window-pad: 8px;
     transform: translate(-50%, -50%);
   }
   body.mobile-touch #map-canvas {
@@ -1593,10 +1653,40 @@
       width: 96px;
     }
     body.mobile-touch #community-hud {
-      top: clamp(calc(max(8px, env(safe-area-inset-top)) + 210px), 44dvh, calc(100dvh - 230px));
+      /* var(--app-vh), not dvh: viewport units resolve against the initial
+         containing block, which can disagree with the JS-synced app viewport
+         (see the #mobile-controls note above); --app-vh is this HUD's one
+         source of viewport height. Divided by --ui-scale because #community-hud
+         lives INSIDE the zoomed #ui (the layout.css rule of thumb: divide
+         inside #ui, raw outside). */
+      top: clamp(
+        calc(max(8px, env(safe-area-inset-top)) + 210px),
+        calc(var(--app-vh) * 0.44 / var(--ui-scale, 1)),
+        calc(var(--app-vh) / var(--ui-scale, 1) - 230px)
+      );
       right: max(8px, env(safe-area-inset-right));
       bottom: auto;
       width: 70px;
+    }
+  }
+
+  /* Narrow-portrait phones (320-384px: iPhone SE, small Androids): the portrait
+     combat row above is 372px wide (96 + 6x42 + gaps), so centred it clips both
+     the Attack and More buttons off-screen. Shrink the row to 312px so the whole
+     strip always fits with a margin. 36px-wide buttons are below the 40px touch
+     floor, the documented infeasible case (7 targets across a 320px screen); the
+     44px height keeps each target at WCAG size. */
+  @media (orientation: portrait) and (max-width: 384px) {
+    body.mobile-touch #mobile-combat-controls {
+      grid-template-columns: 78px repeat(6, 36px);
+      gap: 3px;
+    }
+    body.mobile-touch .mobile-btn {
+      width: 36px;
+      font-size: 14px;
+    }
+    body.mobile-touch #mobile-attack-nearest {
+      width: 78px;
     }
   }
 
@@ -1724,8 +1814,14 @@
       left: 50%;
       top: max(10px, env(safe-area-inset-top));
       bottom: auto;
-      padding: 8px;
-      max-height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      --window-pad: 8px;
+      /* No --ui-scale division: body-level window outside the zoomed #ui. */
+      max-height: calc(
+        var(--app-vh) -
+        28px -
+        env(safe-area-inset-top) -
+        env(safe-area-inset-bottom)
+      );
     }
     body.mobile-touch #mobile-extra-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1895,7 +1991,7 @@
       bottom: calc(26px + env(safe-area-inset-bottom));
       width: min(190px, calc(50vw - 142px));
       min-width: 128px;
-      max-height: min(135px, calc(100vh - 112px));
+      max-height: min(135px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));
       transform: none;
     }
     body.mobile-touch #banner {

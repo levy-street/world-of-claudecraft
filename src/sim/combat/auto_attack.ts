@@ -45,6 +45,7 @@ import {
 } from '../types';
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
+import { consumeNextAttackCrit } from './empower_next';
 import { baseSwingSpeed } from './form_swing';
 import { applyThornsReaction } from './thorns_charge';
 
@@ -122,8 +123,9 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
     if (queued) {
       const eff = queued.effects.find((e) => e.type === 'weaponDamage');
-      if (p.resource >= queued.cost && eff && eff.type === 'weaponDamage') {
-        spendResource(p, queued.cost);
+      const queuedCost = p.queuedOnSwingFree === true ? 0 : queued.cost;
+      if (p.resource >= queuedCost && eff && eff.type === 'weaponDamage') {
+        spendResource(p, queuedCost);
         // on-next-swing abilities (e.g. Raptor Strike) resolve here rather than
         // in castAbility, so their cooldown must be applied on the swing too (#56)
         if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
@@ -134,6 +136,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       }
     }
     p.queuedOnSwing = null;
+    delete p.queuedOnSwingFree;
   }
   meleeSwing(ctx, p, t, bonus, abilityName, { threatFlat, threatMult });
   // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
@@ -177,7 +180,7 @@ export function rangedSwing(
     let dmg = ctx.rng.range(ranged.min, ranged.max) + (atk.rangedPower / 14) * ranged.speed;
     // ranged white hits suffer the same higher-level crit suppression as melee
     const critChance = Math.max(0.005, atk.critChance - Math.max(0, tgt.level - atk.level) * 0.002);
-    const crit = ctx.rng.chance(critChance);
+    const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, atk) ? 1 : critChance);
     if (crit) dmg *= 2;
     // wand bolts are magic — armor doesn't apply; physical auto shot is mitigated
     if (!ranged.wand) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), atk.level);
@@ -253,7 +256,7 @@ export function meleeSwing(
     0.005,
     attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
   );
-  const crit = ctx.rng.chance(critChance);
+  const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
   if (crit) dmg *= 2;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   ctx.dealDamage(

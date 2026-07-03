@@ -1223,6 +1223,7 @@
     bottom: 74px;
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
     gap: 4px;
     z-index: 19;
   }
@@ -1503,11 +1504,6 @@
   #report-window {
     width: 320px;
     z-index: 95;
-  }
-  #report-window .panel-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
   #report-window [data-close] {
     background: transparent;
@@ -2043,6 +2039,125 @@
       0 0 8px #c9a86a66,
       0 1px 3px #000a;
   }
+  #daily-rewards-button {
+    position: relative;
+    width: 50px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: var(--cursor-point);
+    pointer-events: auto;
+    touch-action: manipulation;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    background: transparent;
+    border: 2px solid transparent;
+    box-shadow: none;
+    color: #f6c15b;
+    overflow: visible;
+    transition:
+      transform 0.16s,
+      filter 0.16s;
+  }
+  #daily-rewards-button.spin-ready {
+    border-color: var(--gold);
+    box-shadow: 0 0 5px #ffd10066;
+    color: #fff;
+    animation: tal-pulse 1.6s ease-in-out infinite;
+    animation-duration: calc(1.6s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  #daily-rewards-button.spin-ready .daily-rewards-icon {
+    animation: daily-rewards-icon-pulse 1.6s ease-in-out infinite;
+    animation-duration: calc(1.6s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  #daily-rewards-button::before {
+    content: none;
+  }
+  #daily-rewards-button::after {
+    content: none;
+  }
+  #daily-rewards-button .daily-rewards-icon {
+    position: relative;
+    z-index: 1;
+    width: 58px;
+    height: 58px;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 4px #ffd56d55);
+  }
+  #daily-rewards-button .daily-rewards-label {
+    position: absolute;
+    right: calc(100% - 6px);
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    max-width: 0;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    line-height: 1;
+    color: var(--color-text-muted);
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    border: 2px solid #4a3d1d;
+    border-right: none;
+    border-radius: 5px 0 0 5px;
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+    pointer-events: none;
+    z-index: -1;
+    transition:
+      max-width 0.2s ease,
+      opacity 0.15s ease,
+      padding 0.2s ease,
+      border-color 0.12s ease,
+      color 0.12s ease;
+  }
+  #daily-rewards-button:hover .daily-rewards-label,
+  #daily-rewards-button:focus-visible .daily-rewards-label {
+    max-width: 220px;
+    opacity: 1;
+    padding: 0 18px 0 12px;
+  }
+  #daily-rewards-button:hover,
+  #daily-rewards-button:focus-visible,
+  #daily-rewards-button:hover .daily-rewards-label,
+  #daily-rewards-button:focus-visible .daily-rewards-label {
+    border-color: #ffe08a;
+    outline: none;
+    color: #fff;
+  }
+  #daily-rewards-button:hover,
+  #daily-rewards-button:focus-visible {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+  }
+  #daily-rewards-button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+  @keyframes daily-rewards-icon-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 4px #ffd56d55) brightness(1);
+    }
+    50% {
+      filter: drop-shadow(0 2px 2px #000b) drop-shadow(0 0 14px #ffe08acc) brightness(1.16)
+        saturate(1.12);
+    }
+  }
   /* the lockout panel rows inside the shared tooltip box */
   .rl-panel-title {
     margin-bottom: 4px;
@@ -2153,6 +2268,13 @@
   body.native-app .account-wallet-card,
   body.native-app #performance-tip,
   body.native-app .official-site-copy {
+    display: none !important;
+  }
+  body.desktop-app #token-ca,
+  body.desktop-app .cs-wallet,
+  body.desktop-app .cs-wallet-hidden-note,
+  body.desktop-app .account-wallet-card,
+  body.desktop-app .official-site-copy {
     display: none !important;
   }
 
