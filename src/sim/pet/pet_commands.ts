@@ -35,7 +35,7 @@
 // directly (already pure); everything that touches not-yet-extracted Sim state
 // routes through the seam.
 
-import { DUNGEON_X_THRESHOLD, isDelvePos, ITEMS, MOBS } from '../data';
+import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { PetState } from '../sim';
 import type { SimContext } from '../sim_context';
