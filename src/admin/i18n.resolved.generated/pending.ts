@@ -13,6 +13,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -23,11 +24,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "es_ES": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -38,11 +42,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "fr_FR": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -53,11 +60,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "fr_CA": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -68,12 +78,15 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "en_CA": [],
   "it_IT": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -84,11 +97,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "de_DE": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -99,11 +115,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "zh_CN": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -114,11 +133,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "zh_TW": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -129,11 +151,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "ko_KR": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -144,11 +169,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "ja_JP": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -159,11 +187,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "pt_BR": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -174,11 +205,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "ru_RU": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -189,11 +223,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "nl_NL": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -204,11 +241,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "pl_PL": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -219,11 +259,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "id_ID": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -234,11 +277,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "tr_TR": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -249,11 +295,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "sv_SE": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -264,11 +313,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "vi_VN": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -279,11 +331,14 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ],
   "da_DK": [
     "calibration.autoRefresh",
     "calibration.description",
+    "calibration.downloadJson",
     "calibration.empty",
     "calibration.loadFailed",
     "calibration.loading",
@@ -294,6 +349,8 @@ export const pending: Record<string, readonly string[]> = {
     "calibration.statP50",
     "calibration.statP95",
     "calibration.statP99",
-    "nav.detectionCalibration"
+    "nav.botDetector",
+    "nav.calibration",
+    "nav.liveEvidence"
   ]
 };

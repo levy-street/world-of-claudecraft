@@ -37,10 +37,13 @@ import { offensiveName } from './auth';
 import type {
   BotDetector,
   BotTrackingContext,
-  CalibrationHistogram,
   SessionRuntimeSnapshot,
   SuspiciousPlayer,
 } from './bot_detector/contract';
+import {
+  buildDetectionCalibrationSnapshot,
+  type DetectionCalibrationSnapshot,
+} from './calibration_snapshot';
 import { ChatFilter } from './chat_filter';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
@@ -1812,8 +1815,12 @@ export class GameServer {
     return this.botDetector.listSuspiciousPlayers();
   }
 
-  detectionCalibration(): CalibrationHistogram[] {
-    return this.botDetector.listCalibrationHistograms();
+  detectionCalibration(): DetectionCalibrationSnapshot {
+    return buildDetectionCalibrationSnapshot(
+      this.botDetector.listCalibrationHistograms(),
+      this.startedAt,
+      Date.now(),
+    );
   }
 
   private liveLocationFor(e: Entity): AdminLiveLocation {

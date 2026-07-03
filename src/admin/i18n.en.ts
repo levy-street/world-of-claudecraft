@@ -77,6 +77,7 @@ export const en = {
   'suspiciousPlayers.evidenceWeight': 'weight {value}',
   'calibration.description':
     'Raw value distributions observed by the bot detector, for threshold calibration. Held in memory only: counts reset when the server restarts.',
+  'calibration.downloadJson': 'Download JSON',
   'calibration.autoRefresh': 'Auto-refresh ({seconds}s)',
   'calibration.loading': 'Loading calibration data...',
   'calibration.loadFailed': 'Failed to load calibration data.',

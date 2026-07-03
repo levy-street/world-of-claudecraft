@@ -414,7 +414,7 @@ export async function handleAdminApi(
       return ok(res, { players: game.suspiciousPlayers() });
     }
     if (path === '/admin/api/detection-calibration') {
-      return ok(res, { histograms: game.detectionCalibration() });
+      return ok(res, game.detectionCalibration());
     }
     if (path === '/admin/api/online-history') {
       return ok(res, await onlineHistory(url.searchParams.get('range') ?? '30d'));

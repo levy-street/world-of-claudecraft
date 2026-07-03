@@ -136,6 +136,10 @@ export interface CalibrationHistogram {
 }
 
 export interface DetectionCalibrationData {
+  schemaVersion: 1;
+  capturedAt: string;
+  serverStartedAt: string;
+  uptimeSeconds: number;
   histograms: CalibrationHistogram[];
 }
 

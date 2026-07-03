@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet } from '../api';
+  import { buildCalibrationExport } from '../calibration_export';
   import BarChart from '../components/BarChart.svelte';
   import Panel from '../components/Panel.svelte';
   import { estimateQuantile, histogramBarPoints } from '../histogram_stats';
@@ -54,6 +55,26 @@
     if (autoRefresh) void refresh();
   }
 
+  function downloadJson(): void {
+    if (data === null) return;
+    const file = buildCalibrationExport(data);
+    const url = URL.createObjectURL(
+      new Blob([file.contents], {
+        type: 'application/json',
+      }),
+    );
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file.filename;
+    document.body.append(link);
+    try {
+      link.click();
+    } finally {
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+  }
+
   $effect(() => {
     if (!mounted || !autoRefresh) return;
     const id = setInterval(() => void refresh(), LIVE_REFRESH_MS);
@@ -74,13 +95,18 @@
   <Panel>
     <div class="page-controls">
       <p class="description">{t('calibration.description')}</p>
-      <label class="auto-refresh">
-        <input type="checkbox" checked={autoRefresh} onchange={changeAutoRefresh} />
-        <span class="switch-track" aria-hidden="true"><span></span></span>
-        <span>
-          {t('calibration.autoRefresh', { seconds: LIVE_REFRESH_MS / 1000 })}
-        </span>
-      </label>
+      <div class="control-actions">
+        <button type="button" disabled={data === null} onclick={downloadJson}>
+          {t('calibration.downloadJson')}
+        </button>
+        <label class="auto-refresh">
+          <input type="checkbox" checked={autoRefresh} onchange={changeAutoRefresh} />
+          <span class="switch-track" aria-hidden="true"><span></span></span>
+          <span>
+            {t('calibration.autoRefresh', { seconds: LIVE_REFRESH_MS / 1000 })}
+          </span>
+        </label>
+      </div>
     </div>
 
     {#if failed}
@@ -131,6 +157,13 @@
     justify-content: space-between;
     gap: 12px 24px;
     margin-bottom: 14px;
+  }
+
+  .control-actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 12px;
   }
 
   .auto-refresh {
@@ -240,5 +273,16 @@
     margin: 0;
     color: var(--text);
     font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 700px) {
+    .page-controls {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .control-actions {
+      flex-wrap: wrap;
+    }
   }
 </style>
