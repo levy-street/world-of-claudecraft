@@ -2179,6 +2179,8 @@ export interface DelveDef {
   index: number;
   minLevel: number;
   suggestedPlayers: number;
+  // Hard cap: a party larger than this may not enter (delves are solo/duo content).
+  maxPlayers: number;
   doorPos: { x: number; z: number };
   modules: string[];
   moduleCount: [number, number];
@@ -2302,6 +2304,10 @@ export interface DelveObjectState {
   pendingLoot?: { itemId: string; count: number }[];
   /** Entity id of the player who picked the lock; only they may collect the loot. */
   lootOwnerId?: number;
+  // Drowned Reliquary loot (kind === 'drowned_reliquary'): each party member rolls
+  // and collects their own items independently, so there is no single owner to
+  // front-run. Keyed by pid; emptied per member as they collect.
+  partyLoot?: Record<number, { itemId: string; count: number }[]>;
 }
 
 export interface DelveRaiseDeadChannel {

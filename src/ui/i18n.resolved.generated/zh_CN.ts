@@ -2217,6 +2217,7 @@ export const zh_CN: EnTranslations = {
       "unknownTier": "未知的探秘难度。",
       "levelRequired": "你必须达到 {level} 级才能进入{name}。",
       "levelRequiredTier": "你必须达到 {level} 级才能以{tier}难度进入{name}。",
+      "partyTooLarge": "{name}仅限单人或双人探索。{max}人及以上的队伍不得进入。",
       "instancesBusy": "{name}的所有副本都已占用。请稍后再试。",
       "runFailed": "{name}探秘失败。",
       "complete": "{name}已完成。",
@@ -2363,6 +2364,7 @@ export const zh_CN: EnTranslations = {
       "openDelveAria": "从{name}打开探秘面板",
       "marks": "探秘印记：{count}",
       "minLevel": "需要等级 {level}",
+      "partyTooLarge": "仅限单人或双人（最多 {max} 人）",
       "tier": {
         "normal": "普通",
         "heroic": "英雄"

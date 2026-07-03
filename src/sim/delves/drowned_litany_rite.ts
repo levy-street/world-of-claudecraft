@@ -214,19 +214,22 @@ function openDrownedReliquary(
 
   const state = run.objectState[st.reliquaryId];
   const obj = ctx.entities.get(st.reliquaryId);
-  const ownerCls = ctx.players.get(openerId)?.cls ?? 'warrior';
   const isCoffer = run.bountiful && st.reliquaryId === run.rewardChestId;
-  const items = drownedLitanyChestItemsForTier(tier, ownerCls, ctx.rng, isCoffer);
+  // Every party member rolls their own loot, for their own class: the rite is
+  // completed once, but each player gets an independent chest to collect from,
+  // so there is no single owner and no front-running to guard against.
+  const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [openerId];
+  const partyLoot: Record<number, { itemId: string; count: number }[]> = {};
+  for (const pid of members) {
+    const cls = ctx.players.get(pid)?.cls ?? 'warrior';
+    partyLoot[pid] = drownedLitanyChestItemsForTier(tier, cls, ctx.rng, isCoffer);
+  }
   if (state) {
     state.looted = true;
     state.open = true;
     state.triggered = true;
     state.lootedTier = tier;
-    state.pendingLoot = items.map((s) => ({ ...s }));
-    // Loot belongs to whoever completed the rite (it was rolled for their class);
-    // record it so another party member standing on the reliquary cannot
-    // front-run the collect. Mirrors lockpickSucceed's guard.
-    state.lootOwnerId = openerId;
+    state.partyLoot = partyLoot;
   }
   if (obj) {
     obj.name = 'Opened Drowned Reliquary';
@@ -235,7 +238,9 @@ function openDrownedReliquary(
   grantDelveRewards(ctx, run);
   grantRiteBonus(ctx, run, tier);
   openDelveSurfaceExit(ctx, run);
-  ctx.emit({ type: 'delveChestLoot', chestId: st.reliquaryId, items, pid: openerId });
+  for (const pid of members) {
+    ctx.emit({ type: 'delveChestLoot', chestId: st.reliquaryId, items: partyLoot[pid], pid });
+  }
   emitPartyLog(ctx, run, 'The Drowned Reliquary opens.', '#8cf');
 }
 
@@ -284,7 +289,7 @@ export function interactDrownedLitanyRite(
   if (!state) return false;
 
   if (state.kind === 'drowned_reliquary') {
-    if (state.looted && state.pendingLoot?.length) {
+    if (state.looted && state.partyLoot?.[pid]?.length) {
       return false; // let collectDelveChestLoot handle
     }
     if (state.open) {

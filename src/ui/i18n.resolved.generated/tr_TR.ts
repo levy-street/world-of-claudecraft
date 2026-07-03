@@ -2217,6 +2217,7 @@ export const tr_TR: EnTranslations = {
       "unknownTier": "Bilinmeyen delve kademesi.",
       "levelRequired": "{name} bölümüne girmek için {level}. seviyede olmalısın.",
       "levelRequiredTier": "{tier} kademesinde {name} bölümüne girmek için {level}. seviyede olmalısın.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "{name} için tüm örnekler dolu. Birazdan tekrar dene.",
       "runFailed": "{name} seferi başarısız oldu.",
       "complete": "{name} tamamlandı.",
@@ -2363,6 +2364,7 @@ export const tr_TR: EnTranslations = {
       "openDelveAria": "{name} üzerinden Mağara Panosunu aç",
       "marks": "Mağara Nişanları: {count}",
       "minLevel": "Seviye {level} gerektirir",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Kahramanca"

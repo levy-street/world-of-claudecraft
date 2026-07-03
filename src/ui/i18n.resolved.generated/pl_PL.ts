@@ -2217,6 +2217,7 @@ export const pl_PL: EnTranslations = {
       "unknownTier": "Nieznany poziom trudności eskapady.",
       "levelRequired": "Musisz być na poziomie {level}, aby wejść do {name}.",
       "levelRequiredTier": "Musisz być na poziomie {level}, aby wejść do {name} na poziomie trudności {tier}.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Wszystkie instancje {name} są zajęte. Spróbuj ponownie wkrótce.",
       "runFailed": "Wyprawa {name} nie powiodła się.",
       "complete": "{name} ukończone.",
@@ -2363,6 +2364,7 @@ export const pl_PL: EnTranslations = {
       "openDelveAria": "Otwórz Tablicę Wypraw od {name}",
       "marks": "Znaki Wypraw: {count}",
       "minLevel": "Wymaga poziomu {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normalny",
         "heroic": "Heroiczny"

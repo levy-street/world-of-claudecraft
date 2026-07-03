@@ -2217,6 +2217,7 @@ export const da_DK: EnTranslations = {
       "unknownTier": "Ukendt delve-niveau.",
       "levelRequired": "Du skal være niveau {level} for at gå ind i {name}.",
       "levelRequiredTier": "Du skal være niveau {level} for at gå ind i {name} på {tier}.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Alle instanser af {name} er optaget. Prøv igen snart.",
       "runFailed": "{name}-forsøg mislykkedes.",
       "complete": "{name} fuldført.",
@@ -2363,6 +2364,7 @@ export const da_DK: EnTranslations = {
       "openDelveAria": "Åbn Delve-Tavlen fra {name}",
       "marks": "Delve-Mærker: {count}",
       "minLevel": "Kræver Niveau {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroisk"

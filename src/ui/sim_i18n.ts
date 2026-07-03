@@ -4490,6 +4490,10 @@ const RULES: Rule[] = [
     re: /^You must be level (\d+) to enter (.+)\.$/,
     build: (m) => t('sim.delve.levelRequired', { level: m[1], name: m[2] }),
   },
+  {
+    re: /^(.+) is meant for solo or duo delves\. Parties of (\d+) or more may not enter\.$/,
+    build: (m) => t('sim.delve.partyTooLarge', { name: m[1], max: m[2] }),
+  },
   // "All instances of X are busy" is handled by the hud-local localizeErrorText
   // arm (it runs first and resolves the dungeon-or-delve name), so no rule here.
   { re: /^(.+) run failed\.$/, build: (m) => t('sim.delve.runFailed', { name: locDelve(m[1]) }) },

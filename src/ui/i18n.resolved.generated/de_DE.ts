@@ -2217,6 +2217,7 @@ export const de_DE: EnTranslations = {
       "unknownTier": "Unbekannte Tiefgang-Stufe.",
       "levelRequired": "Du musst Stufe {level} sein, um {name} zu betreten.",
       "levelRequiredTier": "Du musst Stufe {level} sein, um {name} auf {tier} zu betreten.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Alle Instanzen von {name} sind belegt. Versuche es bald erneut.",
       "runFailed": "Lauf von {name} gescheitert.",
       "complete": "{name} abgeschlossen.",
@@ -2363,6 +2364,7 @@ export const de_DE: EnTranslations = {
       "openDelveAria": "Tiefgang-Tafel bei {name} öffnen",
       "marks": "Tiefgang-Marken: {count}",
       "minLevel": "Erfordert Stufe {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroisch"

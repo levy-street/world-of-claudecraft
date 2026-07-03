@@ -2217,6 +2217,7 @@ export const es_ES: EnTranslations = {
       "unknownTier": "Nivel de Profundidad desconocido.",
       "levelRequired": "Debes ser nivel {level} para entrar en {name}.",
       "levelRequiredTier": "Debes ser nivel {level} para entrar a {name} en {tier}.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Todas las instancias de {name} están ocupadas. Inténtalo de nuevo pronto.",
       "runFailed": "La incursión a {name} ha fracasado.",
       "complete": "{name} completada.",
@@ -2363,6 +2364,7 @@ export const es_ES: EnTranslations = {
       "openDelveAria": "Abrir el Tablón de Profundidades desde {name}",
       "marks": "Marcas de Profundidad: {count}",
       "minLevel": "Requiere nivel {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroico"

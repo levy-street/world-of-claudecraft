@@ -2217,6 +2217,7 @@ export const fr_CA: EnTranslations = {
       "unknownTier": "Palier d'excavation inconnu.",
       "levelRequired": "Vous devez être niveau {level} pour entrer dans {name}.",
       "levelRequiredTier": "Vous devez être niveau {level} pour entrer dans {name} en {tier}.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Toutes les instances de {name} sont occupées. Réessayez bientôt.",
       "runFailed": "L'excavation {name} a échoué.",
       "complete": "{name} terminé.",
@@ -2363,6 +2364,7 @@ export const fr_CA: EnTranslations = {
       "openDelveAria": "Ouvrir le tableau des excavations depuis {name}",
       "marks": "Marques d'excavation : {count}",
       "minLevel": "Niveau {level} requis",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Héroïque"

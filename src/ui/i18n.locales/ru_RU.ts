@@ -4686,6 +4686,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.enterAria': 'Войти в {delve} на сложности {tier}',
   'delveUi.board.marks': 'Метки Вылазок: {count}',
   'delveUi.board.minLevel': 'Требуется уровень {level}',
+  'delveUi.board.partyTooLarge': 'Только соло или дуэт (максимум {max} игрока)',
   'delveUi.board.openDelve': 'Обрушившийся Реликварий',
   'delveUi.board.openDelveAria': 'Открыть доску Вылазок у {name}',
   'delveUi.board.tier.heroic': 'Героическая',
@@ -4794,6 +4795,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.delve.leaveArenaFirst': 'Сначала покиньте арену.',
   'sim.delve.leaveDungeonFirst': 'Сначала покиньте подземелье.',
   'sim.delve.levelRequired': 'Чтобы войти в {name}, нужен уровень {level}.',
+  'sim.delve.partyTooLarge':
+    '{name} рассчитан только на одиночное или парное прохождение. Группы из {max} и более игроков не могут войти.',
   'sim.delve.mechanismOpen':
     'Рядом со щелчком открывается механизм. На севере открывается проход: найдите впереди выходной портал.',
   'sim.delve.moduleEnter': '{name}: {objective}',

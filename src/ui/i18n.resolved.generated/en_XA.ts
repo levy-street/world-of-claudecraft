@@ -2217,6 +2217,7 @@ export const en_XA: EnTranslations = {
       "unknownTier": "[Úñķñóŵñ ðéļʋé ţíéŕ.]",
       "levelRequired": "[Ýóú ɱúšţ ƀé ļéʋéļ {level} ţó éñţéŕ {name}.]",
       "levelRequiredTier": "[Ýóú ɱúšţ ƀé ļéʋéļ {level} ţó éñţéŕ {name} óñ {tier}.]",
+      "partyTooLarge": "[{name} íš ɱéáñţ ƒóŕ šóļó óŕ ðúó ðéļʋéš. Þáŕţíéš óƒ {max} óŕ ɱóŕé ɱáý ñóţ éñţéŕ.]",
       "instancesBusy": "[Áļļ íñšţáñçéš óƒ {name} áŕé ƀúšý. Ţŕý áĝáíñ šóóñ.]",
       "runFailed": "[{name} ŕúñ ƒáíļéð.]",
       "complete": "[{name} çóɱþļéţé.]",
@@ -2363,6 +2364,7 @@ export const en_XA: EnTranslations = {
       "openDelveAria": "[Óþéñ Ðéļʋé Ɓóáŕð ƒŕóɱ {name}]",
       "marks": "[Ðéļʋé Ɱáŕķš: {count}]",
       "minLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
+      "partyTooLarge": "[Šóļó óŕ ðúó óñļý ({max} þļáýéŕš ɱáẋ)]",
       "tier": {
         "normal": "[Ñóŕɱáļ]",
         "heroic": "[Ĥéŕóíç]"

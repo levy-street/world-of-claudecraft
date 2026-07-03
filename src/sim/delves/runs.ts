@@ -347,6 +347,14 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
     );
     return;
   }
+  const party = ctx.partyOf(r.meta.entityId);
+  if (party && party.members.length > delve.maxPlayers) {
+    ctx.error(
+      r.meta.entityId,
+      `${delve.name} is meant for solo or duo delves. Parties of ${delve.maxPlayers + 1} or more may not enter.`,
+    );
+    return;
+  }
   const key = ctx.instanceKeyFor(r.meta.entityId);
   let run = ctx.delveRuns.find((d) => d.delveId === delveId && d.partyKey === key);
   if (!run) {
@@ -1403,16 +1411,29 @@ export function collectDelveChestLoot(ctx: SimContext, chestId: number, pid?: nu
     ctx.error(r.meta.entityId, 'There is nothing left to take.');
     return;
   }
+  if (!obj || dist2d(r.e.pos, obj.pos) > DELVE_PLATE_RADIUS + 2) {
+    ctx.error(r.meta.entityId, 'Move closer to the chest.');
+    return;
+  }
+  if (state.kind === 'drowned_reliquary') {
+    // Every party member rolled their own loot; collect only your own slice.
+    const own = state.partyLoot?.[r.meta.entityId];
+    if (!own?.length) {
+      ctx.error(r.meta.entityId, 'There is nothing left to take.');
+      return;
+    }
+    for (const slot of own) {
+      ctx.addItem(slot.itemId, slot.count, r.meta.entityId);
+    }
+    state.partyLoot![r.meta.entityId] = [];
+    return;
+  }
   if (!state.pendingLoot?.length) {
     ctx.error(r.meta.entityId, 'There is nothing left to take.');
     return;
   }
   if (state.lootOwnerId != null && state.lootOwnerId !== r.meta.entityId) {
     ctx.error(r.meta.entityId, 'There is nothing left to take.');
-    return;
-  }
-  if (!obj || dist2d(r.e.pos, obj.pos) > DELVE_PLATE_RADIUS + 2) {
-    ctx.error(r.meta.entityId, 'Move closer to the chest.');
     return;
   }
   for (const slot of state.pendingLoot) {

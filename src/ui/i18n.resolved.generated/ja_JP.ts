@@ -2217,6 +2217,7 @@ export const ja_JP: EnTranslations = {
       "unknownTier": "不明なデルヴの難易度だ。",
       "levelRequired": "{name}に入るにはレベル{level}でなければならない。",
       "levelRequiredTier": "{tier}で{name}に入るにはレベル{level}が必要だ。",
+      "partyTooLarge": "{name}はソロまたはデュオ専用だ。{max}人以上のパーティーは入れない。",
       "instancesBusy": "{name}のすべてのインスタンスが使用中だ。しばらくしてからもう一度試せ。",
       "runFailed": "{name}の攻略に失敗した。",
       "complete": "{name}を踏破した。",
@@ -2363,6 +2364,7 @@ export const ja_JP: EnTranslations = {
       "openDelveAria": "{name}からデルヴボードを開く",
       "marks": "デルヴの刻印: {count}",
       "minLevel": "必要レベル{level}",
+      "partyTooLarge": "ソロまたはデュオ専用（最大{max}人）",
       "tier": {
         "normal": "ノーマル",
         "heroic": "ヒロイック"

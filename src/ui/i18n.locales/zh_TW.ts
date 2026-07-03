@@ -4353,6 +4353,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.enterAria': '以 {tier} 難度進入 {delve}',
   'delveUi.board.marks': '秘探印記：{count}',
   'delveUi.board.minLevel': '需要等級 {level}',
+  'delveUi.board.partyTooLarge': '僅限單人或雙人（最多 {max} 人）',
   'delveUi.board.openDelve': '崩塌的聖物庫',
   'delveUi.board.openDelveAria': '從 {name} 開啟秘探看板',
   'delveUi.board.tier.heroic': '英雄',
@@ -4452,6 +4453,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'sim.delve.leaveArenaFirst': '請先離開競技場。',
   'sim.delve.leaveDungeonFirst': '請先離開地下城。',
   'sim.delve.levelRequired': '你必須達到等級 {level} 才能進入 {name}。',
+  'sim.delve.partyTooLarge': '{name}僅限單人或雙人探索。{max} 人以上的隊伍不得進入。',
   'sim.delve.mechanismOpen':
     '附近有一處機關喀噠開啟。一條通往北方的通道開啟了，往前找到出口傳送門。',
   'sim.delve.moduleEnter': '{name}：{objective}',

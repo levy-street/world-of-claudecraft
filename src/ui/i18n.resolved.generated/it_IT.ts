@@ -2217,6 +2217,7 @@ export const it_IT: EnTranslations = {
       "unknownTier": "Difficoltà d'incursione sconosciuta.",
       "levelRequired": "Devi essere di livello {level} per entrare in {name}.",
       "levelRequiredTier": "Devi essere di livello {level} per entrare in {name} a {tier}.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Tutte le istanze di {name} sono occupate. Riprova tra poco.",
       "runFailed": "Incursione di {name} fallita.",
       "complete": "{name} completata.",
@@ -2363,6 +2364,7 @@ export const it_IT: EnTranslations = {
       "openDelveAria": "Apri il Tabellone delle Incursioni da {name}",
       "marks": "Sigilli d'Incursione: {count}",
       "minLevel": "Richiede il livello {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normale",
         "heroic": "Eroica"

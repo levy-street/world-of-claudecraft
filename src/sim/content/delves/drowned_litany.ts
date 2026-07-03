@@ -202,6 +202,7 @@ export const DROWNED_LITANY_DELVE: DelveDef = {
   index: 1,
   minLevel: 12,
   suggestedPlayers: 2,
+  maxPlayers: 2,
   // Northern edge of Mirefen Marsh (zone z 180..540; hub at z=300), north of
   // the Troll Mounds and clear of their camps, short of the steep rise toward
   // Thornpeak Heights. Matches Brother Halven's marsh camp.

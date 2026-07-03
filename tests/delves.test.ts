@@ -263,6 +263,39 @@ describe('delve lifecycle', () => {
     expect(new Set(claimed.map((run) => run.slot)).size).toBe(PARTIES);
   });
 
+  it('refuses entry to a party of 3+ (delves are solo or duo only)', () => {
+    const sim = makeSim();
+    const p2 = sim.addPlayer('warrior', 'Duoist');
+    const p3 = sim.addPlayer('warrior', 'ThirdWheel');
+    sim.partyInvite(p2, sim.playerId);
+    sim.partyAccept(p2);
+    sim.partyInvite(p3, sim.playerId);
+    sim.partyAccept(p3);
+    for (const pid of [sim.playerId, p2, p3]) {
+      sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, pid);
+    }
+    sim.drainEvents();
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error' && /solo or duo/i.test(e.text ?? ''))).toBe(true);
+    expect(sim.delveRunForPlayer(sim.playerId)).toBeNull();
+  });
+
+  it('allows a duo (party of 2) to enter together', () => {
+    const sim = makeSim();
+    const p2 = sim.addPlayer('warrior', 'Duoist');
+    sim.partyInvite(p2, sim.playerId);
+    sim.partyAccept(p2);
+    for (const pid of [sim.playerId, p2]) {
+      sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, pid);
+    }
+    sim.drainEvents();
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error')).toBe(false);
+    expect(sim.delveRunForPlayer(sim.playerId)).not.toBeNull();
+  });
+
   it('enter and leave toggle delve position band', () => {
     const sim = makeSim();
     enterReliquary(sim);
@@ -2533,46 +2566,46 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     expect(run.completed).toBe(true);
     expect(run.objectState[chestId].lootedTier).toBe('premium');
     expect(run.surfaceExitId).not.toBeNull();
-    const loot = run.objectState[chestId].pendingLoot!;
+    const loot = run.objectState[chestId].partyLoot![sim.playerId]!;
     // Premium: guaranteed uncommon + 20% rare. At least 1 item, first is always uncommon.
     expect(loot.length).toBeGreaterThanOrEqual(1);
     expect(['siltguard_helm', 'bulwark_rusted_pauldrons']).toContain(loot[0].itemId);
     if (loot.length > 1) expect(loot[1].itemId).toBe('nhalias_bell_maul');
   });
 
-  it('rite loot is owner-locked so a party member cannot front-run the collect', () => {
+  it('rite loot rolls independently per party member, each collecting their own share', () => {
     const sim = makeSim('warrior');
-    const rival = sim.addPlayer('warrior', 'Frontrunner');
+    const rival = sim.addPlayer('warrior', 'Duoist');
     sim.partyInvite(rival, sim.playerId);
     sim.partyAccept(rival);
     const run = enterLitanyApse(sim);
     killNhalia(sim);
-    chooseRite(sim, 'easy');
+    // Hard flawless guarantees a premium (non-empty) roll for both members, unlike
+    // low tier's 50% chance at nothing, so this test isn't seed-flaky.
+    chooseRite(sim, 'hard');
     waitForRitePlayback(sim, run);
     replaySequence(sim, run);
     const chestId = run.rewardChestId!;
     const state = run.objectState[chestId];
-    expect(state.pendingLoot!.length).toBeGreaterThan(0);
-    // Same guard the lockpick chest uses: collectDelveChestLoot refuses any
-    // pid other than lootOwnerId while it is set.
-    expect(state.lootOwnerId).toBe(sim.playerId);
-    // A partied run-mate standing ON the chest is refused by the owner guard,
-    // not the distance check; the refusal error proves the guard fired (a
-    // silent early return would leave pendingLoot untouched too).
+    // Both party members rolled their own loot; neither's slice is empty.
+    expect(state.partyLoot![sim.playerId]!.length).toBeGreaterThan(0);
+    expect(state.partyLoot![rival]!.length).toBeGreaterThan(0);
+    // A run-mate standing ON the chest collects their OWN slice, not the opener's.
     const chest = sim.entities.get(chestId)!;
     const rivalEnt = sim.entities.get(rival)!;
     rivalEnt.pos = { ...chest.pos };
     rivalEnt.prevPos = { ...chest.pos };
     sim.drainEvents();
     sim.collectDelveChestLoot(chestId, rival);
-    expect(state.pendingLoot!.length).toBeGreaterThan(0);
+    expect(state.partyLoot![rival]!.length).toBe(0);
+    expect(state.partyLoot![sim.playerId]!.length).toBeGreaterThan(0);
     const refusals = sim.drainEvents().filter((e) => e.type === 'error');
-    expect(refusals.some((e) => /nothing left to take/i.test(e.text ?? ''))).toBe(true);
-    // The opener collects normally.
+    expect(refusals.some((e) => /nothing left to take/i.test(e.text ?? ''))).toBe(false);
+    // The opener still collects their own share normally afterward.
     sim.player.pos = { ...chest.pos };
     sim.player.prevPos = { ...chest.pos };
     sim.collectDelveChestLoot(chestId);
-    expect(state.pendingLoot!.length).toBe(0);
+    expect(state.partyLoot![sim.playerId]!.length).toBe(0);
   });
 
   it('Easy caps loot at low even with a flawless replay', () => {

@@ -2217,6 +2217,7 @@ export const nl_NL: EnTranslations = {
       "unknownTier": "Onbekende delve-tier.",
       "levelRequired": "Je moet niveau {level} zijn om {name} te betreden.",
       "levelRequiredTier": "Je moet niveau {level} zijn om {name} op {tier} te betreden.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Alle instanties van {name} zijn bezet. Probeer het binnenkort opnieuw.",
       "runFailed": "Run van {name} mislukt.",
       "complete": "{name} voltooid.",
@@ -2363,6 +2364,7 @@ export const nl_NL: EnTranslations = {
       "openDelveAria": "Open Delvebord bij {name}",
       "marks": "Delve-Tekens: {count}",
       "minLevel": "Vereist Niveau {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normaal",
         "heroic": "Heroïsch"

@@ -2217,6 +2217,7 @@ export const ko_KR: EnTranslations = {
       "unknownTier": "알 수 없는 탐굴 등급입니다.",
       "levelRequired": "{name}에 진입하려면 레벨 {level} 이상이어야 합니다.",
       "levelRequiredTier": "{tier} 난이도로 {name}에 진입하려면 레벨 {level}이(가) 필요합니다.",
+      "partyTooLarge": "{name}은(는) 솔로 또는 듀오 전용입니다. {max}명 이상의 파티는 입장할 수 없습니다.",
       "instancesBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하세요.",
       "runFailed": "{name} 진행에 실패했습니다.",
       "complete": "{name} 완료.",
@@ -2363,6 +2364,7 @@ export const ko_KR: EnTranslations = {
       "openDelveAria": "{name}에서 탐굴 게시판 열기",
       "marks": "탐굴 증표: {count}",
       "minLevel": "필요 레벨 {level}",
+      "partyTooLarge": "솔로 또는 듀오 전용 (최대 {max}명)",
       "tier": {
         "normal": "일반",
         "heroic": "영웅"

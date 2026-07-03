@@ -4590,6 +4590,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.enterAria': '{tier}難易度で{delve}に入る',
   'delveUi.board.marks': 'デルヴの刻印: {count}',
   'delveUi.board.minLevel': '必要レベル{level}',
+  'delveUi.board.partyTooLarge': 'ソロまたはデュオ専用（最大{max}人）',
   'delveUi.board.openDelve': '崩れた聖遺物庫',
   'delveUi.board.openDelveAria': '{name}からデルヴボードを開く',
   'delveUi.board.tier.heroic': 'ヒロイック',
@@ -4695,6 +4696,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.delve.leaveArenaFirst': 'まずアリーナから出よ。',
   'sim.delve.leaveDungeonFirst': 'まずダンジョンから出よ。',
   'sim.delve.levelRequired': '{name}に入るにはレベル{level}でなければならない。',
+  'sim.delve.partyTooLarge': '{name}はソロまたはデュオ専用だ。{max}人以上のパーティーは入れない。',
   'sim.delve.mechanismOpen':
     '近くで機構がカチリと開く。北へ通路が開いた。先にある出口のポータルを探せ。',
   'sim.delve.moduleEnter': '{name}: {objective}',

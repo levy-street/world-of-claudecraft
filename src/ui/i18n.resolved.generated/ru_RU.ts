@@ -2217,6 +2217,7 @@ export const ru_RU: EnTranslations = {
       "unknownTier": "Неизвестная сложность вылазки.",
       "levelRequired": "Чтобы войти в {name}, нужен уровень {level}.",
       "levelRequiredTier": "Чтобы войти в {name} на сложности {tier}, нужен уровень {level}.",
+      "partyTooLarge": "{name} рассчитан только на одиночное или парное прохождение. Группы из {max} и более игроков не могут войти.",
       "instancesBusy": "Все копии {name} заняты. Попробуйте чуть позже.",
       "runFailed": "Вылазка {name} провалена.",
       "complete": "{name}: завершено.",
@@ -2363,6 +2364,7 @@ export const ru_RU: EnTranslations = {
       "openDelveAria": "Открыть доску Вылазок у {name}",
       "marks": "Метки Вылазок: {count}",
       "minLevel": "Требуется уровень {level}",
+      "partyTooLarge": "Только соло или дуэт (максимум {max} игрока)",
       "tier": {
         "normal": "Обычная",
         "heroic": "Героическая"

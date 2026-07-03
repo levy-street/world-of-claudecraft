@@ -103,6 +103,7 @@ export const COLLAPSED_RELIQUARY_DELVE: DelveDef = {
   index: 0,
   minLevel: 7,
   suggestedPlayers: 2,
+  maxPlayers: 2,
   doorPos: { x: -5, z: -52 },
   modules: ['reliquary_sunken_ossuary', 'reliquary_bell_niche', 'reliquary_saintless_hall'],
   moduleCount: [3, 3],

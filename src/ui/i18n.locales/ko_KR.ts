@@ -4598,6 +4598,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.enterAria': '{tier} 난이도로 {delve} 진입',
   'delveUi.board.marks': '탐굴 증표: {count}',
   'delveUi.board.minLevel': '필요 레벨 {level}',
+  'delveUi.board.partyTooLarge': '솔로 또는 듀오 전용 (최대 {max}명)',
   'delveUi.board.openDelve': '무너진 성물실',
   'delveUi.board.openDelveAria': '{name}에서 탐굴 게시판 열기',
   'delveUi.board.tier.heroic': '영웅',
@@ -4703,6 +4704,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.leaveArenaFirst': '먼저 투기장에서 나가세요.',
   'sim.delve.leaveDungeonFirst': '먼저 던전에서 나가세요.',
   'sim.delve.levelRequired': '{name}에 진입하려면 레벨 {level} 이상이어야 합니다.',
+  'sim.delve.partyTooLarge': '{name}은(는) 솔로 또는 듀오 전용입니다. {max}명 이상의 파티는 입장할 수 없습니다.',
   'sim.delve.mechanismOpen':
     '근처에서 기계 장치가 철컥 열립니다. 북쪽으로 통로가 열립니다. 앞쪽의 출구 차원문을 찾으세요.',
   'sim.delve.moduleEnter': '{name}: {objective}',

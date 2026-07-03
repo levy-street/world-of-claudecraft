@@ -2217,6 +2217,7 @@ export const en_CA: EnTranslations = {
       "unknownTier": "Unknown delve tier.",
       "levelRequired": "You must be level {level} to enter {name}.",
       "levelRequiredTier": "You must be level {level} to enter {name} on {tier}.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "All instances of {name} are busy. Try again soon.",
       "runFailed": "{name} run failed.",
       "complete": "{name} complete.",
@@ -2363,6 +2364,7 @@ export const en_CA: EnTranslations = {
       "openDelveAria": "Open Delve Board from {name}",
       "marks": "Delve Marks: {count}",
       "minLevel": "Requires Level {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroic"
