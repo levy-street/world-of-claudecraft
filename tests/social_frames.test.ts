@@ -130,6 +130,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             rank: 'member',
           },
         ],
+        events: [],
       },
     });
 
@@ -151,6 +152,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             rank: 'member',
           },
         ],
+        events: [],
       },
     });
     // the dirty flag flips true once, then back to false (HUD re-render poll)
@@ -187,6 +189,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             rank: 'member',
           },
         ],
+        events: [],
       },
     };
     c.socialInfo = social;

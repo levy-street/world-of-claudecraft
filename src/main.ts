@@ -1138,6 +1138,9 @@ async function startGame(
           case 'leaderboard':
             hud.toggleLeaderboard();
             break;
+          case 'calendar':
+            hud.toggleCalendar();
+            break;
           case 'discord':
             toggleDiscordPanel();
             break;
@@ -1266,6 +1269,9 @@ async function startGame(
         break;
       case 'leaderboard':
         hud.toggleLeaderboard();
+        break;
+      case 'calendar':
+        hud.toggleCalendar();
         break;
       case 'discord':
         toggleDiscordPanel();

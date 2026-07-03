@@ -4839,6 +4839,8 @@ export class Sim {
   guildDemote(_name: string): void {}
   guildTransfer(_name: string): void {}
   guildDisband(): void {}
+  guildEventCreate(_day: string, _hour: number | null, _title: string, _note: string): void {}
+  guildEventRemove(_eventId: number): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }

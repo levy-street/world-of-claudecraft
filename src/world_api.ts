@@ -118,6 +118,7 @@ export type {
 export type {
   CharacterSearchResult,
   FriendInfo,
+  GuildEventInfo,
   GuildInfo,
   GuildMemberInfo,
   GuildRank,
@@ -289,6 +290,8 @@ export const COMMAND_NAMES = [
   'mail_take',
   'mail_delete',
   'mail_read',
+  'guild_event_create',
+  'guild_event_remove',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -449,6 +452,8 @@ export const COMMAND_FACETS = {
   guild_demote: 'IWorldSocialGraph',
   guild_transfer: 'IWorldSocialGraph',
   guild_disband: 'IWorldSocialGraph',
+  guild_event_create: 'IWorldSocialGraph',
+  guild_event_remove: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
