@@ -104,8 +104,13 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   lanternWall: { url: '/models/props/lantern_wall.glb', kit: 'qprops' },
   // Meshy-generated portal door used as the overworld Reliquary Hill marker;
   // has its own backing slab so the animated shader plane sits on the front face.
-  // yaw: Math.PI if the model loads backwards after inspecting in-game.
-  delveEntrance2: { url: '/models/dungeon/delve_entrance_2.glb', kit: 'dungeon' },
+  // In-game inspection at the Drowned Litany door showed the model loading
+  // backwards from the authored 0 = +z convention; yaw corrects it to face town.
+  delveEntrance2: {
+    url: '/models/dungeon/delve_entrance_2.glb',
+    kit: 'dungeon',
+    yaw: (150 * Math.PI) / 180,
+  },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
@@ -1251,16 +1256,20 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   for (const dm of PROPS.delveMarkers ?? []) {
     if (!loadedProps.has('delveEntrance2')) continue;
     const isDrowned = dm.delveId === 'drowned_litany';
-    const gy = ground(dm.x, dm.z);
 
     // Portal-door model with its own backing slab, no separate vault sphere needed.
-    // Rotation 0 = portal face toward +z (town); add yaw: Math.PI to the asset def
-    // if the model loads backwards after inspecting in-game.
+    // Rotation 0 = portal face toward +z (town); the asset def's yaw corrects a
+    // model that loads backwards.
     const arch = propAsset('delveEntrance2');
     const SX = 3.6,
       SY = 3.6,
       SZ = 3.6;
     const archZ = dm.z - 4; // south of Halven (also the leaveDelve drop: doorPos.z - 4)
+    // Sample ground height at the arch's OWN placement (archZ), not Halven's
+    // (dm.z): marsh terrain can slope/dip between the two, and sampling the
+    // wrong z left the model's normalized (min-y at 0) base floating above the
+    // real ground a few units south.
+    const gy = ground(dm.x, archZ);
     const ag = new THREE.Group();
     for (const part of arch.parts) {
       // drowned shrine: recolor the baked red veil to water-blue (stone unaffected)
