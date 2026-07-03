@@ -502,6 +502,14 @@ export class SocialService {
       this.err(actor.characterId, 'Your guild is full.');
       return;
     }
+    // A target who has the inviter on their ignore list never sees the invite.
+    // From the inviter's side this is indistinguishable from an ordinary
+    // decline (guildDecline is silent): the usual confirmation, then nothing.
+    // No pending state is created, so other guilds can still invite the target.
+    if (this.tx.isIgnoring(target.id, actor.characterId)) {
+      this.info(actor.characterId, `You have invited ${target.name} to the guild.`);
+      return;
+    }
     this.pendingGuildInvites.set(target.id, {
       guildId: membership.guildId,
       guildName: membership.guildName,

@@ -3586,6 +3586,10 @@ export class GameServer {
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
+    // ignore list: social invites from blocked senders are resolved once per
+    // batch (dropped for every session and declined in the sim), not per
+    // receiving session, so spectators of the target never see them either.
+    const suppressedInvites = this.suppressBlockedSocialInvites(events);
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -3604,6 +3608,7 @@ export class GameServer {
         }
         const mine: SimEvent[] = [];
         for (const ev of events) {
+          if (suppressedInvites !== null && suppressedInvites.has(ev)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -3679,6 +3684,35 @@ export class GameServer {
     if (fromPid === recipient.pid) return false;
     const sender = this.clients.get(fromPid);
     return sender ? recipient.blockedIds.has(sender.characterId) : false;
+  }
+
+  // ignore list: a party invite, trade request, or duel challenge from a
+  // character the target has blocked never reaches the target's client (every
+  // path: pinvite/trade_req/duel_req by id, and /invite by name via sim chat).
+  // The sim has already recorded a pending invite by the time the event routes,
+  // so it is declined on the target's behalf through the same sim call a real
+  // decline command dispatches: the pending state clears immediately (an
+  // unblocked player can invite right away) and the sender sees only the
+  // ordinary declined outcome on the next tick. Trade has no decline command (a
+  // real target simply lets the request lapse), so its invite is removed
+  // silently, which is exactly what the sender would observe anyway. Returns
+  // the events to drop for every session, or null when nothing is suppressed.
+  private suppressBlockedSocialInvites(events: SimEvent[]): Set<SimEvent> | null {
+    let suppressed: Set<SimEvent> | null = null;
+    for (const ev of events) {
+      if (ev.type !== 'partyInvite' && ev.type !== 'tradeRequest' && ev.type !== 'duelRequest')
+        continue;
+      if (ev.pid === undefined) continue;
+      const target = this.clients.get(ev.pid);
+      if (!target || target.blockedIds.size === 0) continue;
+      if (!this.isBlockedSender(target, ev.fromPid)) continue;
+      suppressed ??= new Set();
+      suppressed.add(ev);
+      if (ev.type === 'partyInvite') this.sim.partyDecline(ev.pid);
+      else if (ev.type === 'duelRequest') this.sim.duelDecline(ev.pid);
+      else this.sim.tradeInvites.delete(ev.pid);
+    }
+    return suppressed;
   }
 
   private eventAnchor(ev: SimEvent): { x: number; y: number; z: number } | null {
