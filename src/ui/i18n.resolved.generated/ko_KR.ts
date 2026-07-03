@@ -4378,7 +4378,7 @@ export const ko_KR: EnTranslations = {
       },
       "ice_lance": {
         "name": "얼음창",
-        "description": "얼음 파편을 던져 {damage}의 냉기 피해를 줍니다. 이동 불가 대상에게 세 배의 피해를 줍니다. (마법사 특성)"
+        "description": "얼음 파편을 던져 {damage}의 냉기 피해를 줍니다. 이동 불가 대상에게 세 배의 피해를 줍니다."
       },
       "presence_of_mind": {
         "name": "냉정",
@@ -4582,15 +4582,19 @@ export const ko_KR: EnTranslations = {
       },
       "arcane_power": {
         "name": "신비의 마법 강화",
-        "description": "신비한 힘으로 가득 차 12초 동안 주문력이 28만큼 증가합니다. (비전 전문화 상징)"
+        "description": "10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)"
       },
       "combustion": {
         "name": "발화",
-        "description": "화염 마법을 집중하여 다음 공격이 치명타로 적중하게 합니다. (화염 전문화 상징)"
+        "description": "15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)"
+      },
+      "icy_veins": {
+        "name": "얼음 핏줄",
+        "description": "10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)"
       },
       "cone_of_cold": {
         "name": "냉기 돌풍",
-        "description": "주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (냉기 전문화 상징)"
+        "description": "주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (마법사 특성)"
       },
       "cold_blood": {
         "name": "냉혈",

@@ -4,8 +4,9 @@
   "sampleEvery": 20,
   "ticks": 266,
   "coverage": [
-    "Talents 2.0 mage full row build: firestarter/counterspell/ice_lance/presence_of_mind/blink/deep_freeze",
-    "frost_nova roots into ice_lance vsRootedMult damage",
+    "Talents 2.0 mage full row build: firestarter/counterspell/cone_of_cold/presence_of_mind/blink/deep_freeze",
+    "frost_nova roots into baseline ice_lance vsRootedMult damage",
+    "mag_r11_cone_of_cold grant remains selected after Ice Lance moved baseline",
     "mag_r11_shatter critVsRooted path on a rooted target",
     "presence_of_mind next_cast_instant consume into fireball",
     "blinkForward swept reposition",
@@ -32,7 +33,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "485229b0",
+      "state": "c20dd2bd",
       "events": "f7be7ef0",
       "rng": {
         "draws": 0,
@@ -59,7 +60,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -272,7 +273,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 393,
-      "state": "05008f20",
+      "state": "d329f3fd",
       "events": "b9b56ebe",
       "rng": {
         "draws": 7,
@@ -283,7 +284,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 393,
-      "state": "2678ffda",
+      "state": "51121f4f",
       "events": "8fcbf9cc",
       "rng": {
         "draws": 10,
@@ -294,7 +295,7 @@
       "tick": 48,
       "time": 2.4,
       "nextId": 393,
-      "state": "f28629cc",
+      "state": "ccfacaed",
       "events": "10774c6c",
       "rng": {
         "draws": 54,
@@ -324,7 +325,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -588,7 +589,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 393,
-      "state": "22f5eda3",
+      "state": "fb033bd8",
       "events": "713e4d5a",
       "rng": {
         "draws": 112,
@@ -599,7 +600,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 393,
-      "state": "76d757db",
+      "state": "27254870",
       "events": "a622c35b",
       "rng": {
         "draws": 213,
@@ -610,7 +611,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 393,
-      "state": "55a66b7f",
+      "state": "3e7c9b18",
       "events": "253cadce",
       "rng": {
         "draws": 324,
@@ -621,7 +622,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 393,
-      "state": "6f5b78ca",
+      "state": "bb72b76b",
       "events": "741638a5",
       "rng": {
         "draws": 441,
@@ -632,7 +633,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 393,
-      "state": "ce010d6f",
+      "state": "127c2742",
       "events": "c8b5ce34",
       "rng": {
         "draws": 568,
@@ -643,7 +644,7 @@
       "tick": 158,
       "time": 7.9,
       "nextId": 393,
-      "state": "b3c2c144",
+      "state": "60c8b9f3",
       "events": "9b84847b",
       "rng": {
         "draws": 690,
@@ -673,7 +674,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -979,7 +980,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 393,
-      "state": "e3f29c2b",
+      "state": "9a02511e",
       "events": "9d68caed",
       "rng": {
         "draws": 695,
@@ -990,7 +991,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 393,
-      "state": "cb9b4784",
+      "state": "0b20f88b",
       "events": "6616c155",
       "rng": {
         "draws": 823,
@@ -1001,7 +1002,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 393,
-      "state": "03bd5ff8",
+      "state": "294666bf",
       "events": "2e1407fc",
       "rng": {
         "draws": 969,
@@ -1012,7 +1013,7 @@
       "tick": 218,
       "time": 10.9,
       "nextId": 393,
-      "state": "c35b7631",
+      "state": "a0324250",
       "events": "ea45b934",
       "rng": {
         "draws": 1040,
@@ -1042,7 +1043,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -1337,7 +1338,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 393,
-      "state": "6e2d2412",
+      "state": "53353075",
       "events": "741638a5",
       "rng": {
         "draws": 1045,
@@ -1348,7 +1349,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 393,
-      "state": "f8f9c5d4",
+      "state": "296995d7",
       "events": "3599521d",
       "rng": {
         "draws": 1118,
@@ -1359,7 +1360,7 @@
       "tick": 248,
       "time": 12.4,
       "nextId": 393,
-      "state": "c531d425",
+      "state": "9edc2b16",
       "events": "31e0e738",
       "rng": {
         "draws": 1157,
@@ -1389,7 +1390,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -1689,7 +1690,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 393,
-      "state": "1fe12f22",
+      "state": "31acf94f",
       "events": "62cf3349",
       "rng": {
         "draws": 1225,
@@ -1700,7 +1701,7 @@
       "tick": 266,
       "time": 13.3,
       "nextId": 393,
-      "state": "51707e1c",
+      "state": "8a057509",
       "events": "741638a5",
       "rng": {
         "draws": 1255,
@@ -1730,7 +1731,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -2035,7 +2036,7 @@
       "tick": 266,
       "time": 13.3,
       "nextId": 393,
-      "state": "51707e1c",
+      "state": "8a057509",
       "events": "741638a5",
       "rng": {
         "draws": 1255,
@@ -2065,7 +2066,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"

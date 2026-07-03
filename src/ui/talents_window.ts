@@ -33,6 +33,7 @@ export interface TalentsWindowDeps extends PainterHostPresentation {
   setStage(stage: TalentAllocation | null): void;
   playerClass(): PlayerClass;
   playerLevel(): number;
+  abilityTooltipForGrant(abilityId: string): string | null;
   /** Server-authoritative full-allocation apply (build import). */
   applyTalents(alloc: TalentAllocation): void;
   /** Server-authoritative row reset (the free respec). */
@@ -217,6 +218,9 @@ export class TalentsWindow {
         this.deps.attachTooltip(card, () => {
           let html = `<div class="tt-name">${esc(label)}</div>`;
           html += `<div class="tt-desc">${esc(description)}</div>`;
+          const granted = option.effect.grant?.ability;
+          const grantTooltip = granted ? this.deps.abilityTooltipForGrant(granted) : null;
+          if (grantTooltip) html += grantTooltip;
           if (!row.unlocked) {
             html += `<div class="tt-sub" style="color:${TAL_COLOR.dormant}">${esc(
               t('game.talents.rowUnlocks').replace('{level}', String(row.level)),
@@ -260,13 +264,15 @@ export class TalentsWindow {
       const masteryDescription = tTalent({ kind: 'talentMastery', spec: sp, field: 'description' });
       card.setAttribute('aria-label', `${specName}, ${roleLabel(specVM.role)}`);
       card.innerHTML = `<div class="ts-icon">${esc(sp.icon)}</div><div class="ts-name">${esc(specName)}</div><div class="ts-role">${roleLabel(specVM.role)}</div>`;
-      this.deps.attachTooltip(
-        card,
-        () =>
+      this.deps.attachTooltip(card, () => {
+        let html =
           `<div class="tt-title">${esc(specName)}</div><div class="tt-sub">${esc(specDescription)}</div>` +
           `<div class="tt-sub" style="color:${TAL_COLOR.signature}">${t('game.talents.signature')}: ${esc(signatureName(sp.signature))}</div>` +
-          `<div class="tt-sub">${t('game.talents.mastery')}: ${esc(masteryName)} - ${esc(masteryDescription)}</div>`,
-      );
+          `<div class="tt-sub">${t('game.talents.mastery')}: ${esc(masteryName)} - ${esc(masteryDescription)}</div>`;
+        const grantTooltip = this.deps.abilityTooltipForGrant(sp.signature);
+        if (grantTooltip) html += grantTooltip;
+        return html;
+      });
       card.addEventListener('click', () => this.setSpec(stage, sp.id));
       card.addEventListener('keydown', (e) => {
         const ke = e as KeyboardEvent;

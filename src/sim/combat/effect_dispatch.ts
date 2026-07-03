@@ -37,6 +37,7 @@ import { isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 import { isFormAuraKind } from './forms';
+import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 const TELEPORT_SWEEP_STEP = 0.5;
@@ -176,9 +177,11 @@ export function runEffects(
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
+        if (isSpell) dmg *= spellDamageMultFromAuras(p);
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : critChance);
         if (crit) dmg *= isSpell ? 1.5 : 2;
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+        if (isSpell) noteSpellHit(ctx, p, crit);
         ctx.dealDamage(
           p,
           target,
@@ -338,8 +341,10 @@ export function runEffects(
         let dmg =
           ctx.rng.range(seal.value2 ?? 10, seal.value3 ?? 15) +
           directHitBonus(p.spellPower, ability, res.castTime);
+        dmg *= spellDamageMultFromAuras(p);
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
         if (crit) dmg *= 1.5;
+        noteSpellHit(ctx, p, crit);
         ctx.dealDamage(p, target, Math.round(dmg), crit, 'holy', ability.name, 'hit');
         break;
       }
@@ -355,6 +360,7 @@ export function runEffects(
           ctx.resolvedAbility(target.castingAbility, target.id)?.def ??
           ABILITIES[target.castingAbility];
         if (
+          hasCastShield(target) ||
           !interruptedDef ||
           interruptedDef.school === 'physical' ||
           interruptedDef.uninterruptible
@@ -429,13 +435,16 @@ export function runEffects(
         const dotSp = !hybrid
           ? dotTickBonus(abilityScalingPower(p, ability), ability, eff.duration, eff.interval)
           : 0;
+        const dotValue = dotBase + dotSp;
         ctx.applyAura(target, {
           id: ability.id,
           name: ability.name,
           kind: 'dot',
           remaining: eff.duration,
           duration: eff.duration,
-          value: dotBase + dotSp,
+          value: isSpell
+            ? Math.max(1, Math.round(dotValue * spellDamageMultFromAuras(p)))
+            : dotValue,
           tickInterval: eff.interval,
           tickTimer: eff.interval,
           sourceId: p.id,
@@ -514,10 +523,9 @@ export function runEffects(
       }
       case 'incapacitate': {
         if (!target || target.dead) break;
-        const remaining =
-          ability.fearDr
-            ? ctx.diminishedCrowdControlDuration(p, target, 'fear', eff.duration)
-            : eff.duration;
+        const remaining = ability.fearDr
+          ? ctx.diminishedCrowdControlDuration(p, target, 'fear', eff.duration)
+          : eff.duration;
         if (remaining === null) break;
         ctx.applyAura(target, {
           id: `${ability.id}_incap`,
@@ -591,6 +599,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, aoeCenter, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
           // Armor only mitigates physical damage, mirroring the single-target
           // path above — spell-school AoE (Arcane Explosion, Consecration) is
           // not reduced by the target's armor.
@@ -753,7 +762,8 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           if (!rootOnly) {
-            const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
+            let dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
+            if (isSpell) dmg *= spellDamageMultFromAuras(p);
             ctx.dealDamage(p, m, Math.round(dmg), false, ability.school, ability.name, 'hit');
           }
           if (!m.dead && ctx.isHostileTo(p, m)) {
@@ -813,9 +823,11 @@ export function runEffects(
           let dmg =
             ctx.rng.range(eff.deal.min, eff.deal.max) +
             directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+          if (isSpell) dmg *= spellDamageMultFromAuras(p);
           const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : ctx.spellCrit(p));
           if (crit) dmg *= isSpell ? 1.5 : 2;
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(target), p.level);
+          if (isSpell) noteSpellHit(ctx, p, crit);
           ctx.dealDamage(
             p,
             target,

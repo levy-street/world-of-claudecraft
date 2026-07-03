@@ -4378,7 +4378,7 @@ export const nl_NL: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lanza de hielo",
-        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados."
       },
       "presence_of_mind": {
         "name": "Presencia mental",
@@ -4582,15 +4582,19 @@ export const nl_NL: EnTranslations = {
       },
       "arcane_power": {
         "name": "Arcanekracht",
-        "description": "Vult je met arcanekracht, waardoor spreukkracht 12 sec met 28 toeneemt. (Arcaan signatuur)"
+        "description": "Verhoogt spreukschade met 20% en spreukhaast met 10% gedurende 10 sec. (Arcane-signatuur)"
       },
       "combustion": {
         "name": "Verbranding",
-        "description": "Bundelt je vuurmagie zodat je volgende aanval een kritieke treffer is. (Vuur signatuur)"
+        "description": "Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)"
+      },
+      "icy_veins": {
+        "name": "IJzige Aders",
+        "description": "Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)"
       },
       "cone_of_cold": {
         "name": "Kegel van kou",
-        "description": "Treft nabije vijanden met vorst voor {damage} Vorstschade. (Vorst signatuur)"
+        "description": "Bestookt nabije vijanden met vorst voor {damage} vorstschade. (magiërstalent)"
       },
       "cold_blood": {
         "name": "Koud bloed",

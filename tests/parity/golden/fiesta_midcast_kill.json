@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 393,
-      "state": "46b74713",
+      "state": "19ef2d2e",
       "events": "0e7699f8",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 393,
-      "state": "0ead320f",
+      "state": "d27fa60a",
       "events": "536fe27e",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 393,
-      "state": "2afdcc63",
+      "state": "799da0fe",
       "events": "09b268e6",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 393,
-      "state": "6c4618b3",
+      "state": "31e8c18e",
       "events": "df43dd26",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 393,
-      "state": "44302800",
+      "state": "ee1496f1",
       "events": "7c1828ad",
       "rng": {
         "draws": 300,
@@ -143,7 +143,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -422,7 +422,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 393,
-      "state": "bb64f2fa",
+      "state": "8d9187c5",
       "events": "b5892330",
       "rng": {
         "draws": 300,
@@ -490,7 +490,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -767,7 +767,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 393,
-      "state": "c4e90426",
+      "state": "a7b9ab7b",
       "events": "291a7b31",
       "rng": {
         "draws": 300,
@@ -836,7 +836,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"
@@ -1114,7 +1114,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 393,
-      "state": "152beb80",
+      "state": "4022af55",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1125,7 +1125,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 393,
-      "state": "7e88c07e",
+      "state": "0037f033",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1194,7 +1194,7 @@
             "rows": {
               "5": "mag_r5_firestarter",
               "8": "mag_r8_counterspell",
-              "11": "mag_r11_ice_lance",
+              "11": "mag_r11_cone_of_cold",
               "14": "mag_r14_presence_of_mind",
               "17": "mag_r17_blink",
               "20": "mag_r20_deep_freeze"

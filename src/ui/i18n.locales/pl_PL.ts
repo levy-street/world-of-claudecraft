@@ -2174,8 +2174,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlockToast': 'Nowy wybór talentu dostępny!',
   'game.talents.rowUnlocks': 'Odblokowuje się na poziomie {level}',
   'game.talents.unlockBanner': 'Talenty odblokowane!',
-  'game.talents.unlockHint':
-  "Wybory talentów są dostępne: naciśnij N, aby otworzyć Talenty.",
+  'game.talents.unlockHint': 'Wybory talentów są dostępne: naciśnij N, aby otworzyć Talenty.',
   'game.xp.lv': 'Poz.',
   'game.xp.maxLevel': 'MAKS. POZIOM',
   'game.xp.rested': 'Wypoczęty',
@@ -3113,20 +3112,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Klasyczne MMO, w które zagrasz za darmo w przeglądarce.',
   'guide.talentsPage.heading': 'Talenty i specjalizacje',
   'guide.talentsPage.howBody':
-  "Rzędy odblokowują się podczas zdobywania poziomów, a specjalizacje otwierają się na poziomie 10. Wybierz specjalizację dla jej sztandarowej zdolności i mistrzostwa, potem w karcie Wybory wybierz po jednej opcji z każdego odblokowanego rzędu.",
+    'Rzędy odblokowują się podczas zdobywania poziomów, a specjalizacje otwierają się na poziomie 10. Wybierz specjalizację dla jej sztandarowej zdolności i mistrzostwa, potem w karcie Wybory wybierz po jednej opcji z każdego odblokowanego rzędu.',
   'guide.talentsPage.howHeading': 'Jak działają',
   'guide.talentsPage.intro':
-  "Talenty pozwalają dopasować klasę do siebie. Są opcjonalne, wyrozumiałe i łatwe do zmiany, więc można eksperymentować bez obaw.",
+    'Talenty pozwalają dopasować klasę do siebie. Są opcjonalne, wyrozumiałe i łatwe do zmiany, więc można eksperymentować bez obaw.',
   'guide.talentsPage.resetNote':
-  "Poza walką możesz w każdej chwili zresetować wybory, więc wczesna decyzja nigdy nie jest pułapką. Testuj, sprawdzaj co lubisz i zmieniaj bez ograniczeń.",
+    'Poza walką możesz w każdej chwili zresetować wybory, więc wczesna decyzja nigdy nie jest pułapką. Testuj, sprawdzaj co lubisz i zmieniaj bez ograniczeń.',
   'guide.talentsPage.resetTitle': 'Nic nie jest na stałe',
   'guide.talentsPage.shareNote':
-  "Gotowy build można skopiować jako krótki kod do udostępnienia i przekazać znajomemu, który wklei go prosto do własnego panelu talentów.",
+    'Gotowy build można skopiować jako krótki kod do udostępnienia i przekazać znajomemu, który wklei go prosto do własnego panelu talentów.',
   'guide.talentsPage.specsBody':
-  "Każda klasa ma kilka specjalizacji, każda z własną rolą i głównym motywem. Oto ich ogólny kształt. Otwórz klasę, aby zobaczyć pełny zestaw.",
+    'Każda klasa ma kilka specjalizacji, każda z własną rolą i głównym motywem. Oto ich ogólny kształt. Otwórz klasę, aby zobaczyć pełny zestaw.',
   'guide.talentsPage.specsHeading': 'Specjalizacje według klas',
   'guide.talentsPage.whatBody':
-  "Wraz z poziomami odblokowują się rzędy talentów z kilkoma wyborami. Każdy wybór dodaje trwałe ulepszenie zdolności, statystyk lub narzędzi i kształtuje odczucie klasy w walce.",
+    'Wraz z poziomami odblokowują się rzędy talentów z kilkoma wyborami. Każdy wybór dodaje trwałe ulepszenie zdolności, statystyk lub narzędzi i kształtuje odczucie klasy w walce.',
   'guide.talentsPage.whatHeading': 'Co robią talenty',
   'guide.toc.heading': 'Na tej stronie',
   'guide.viewer.canvasLabel': 'Obrotowy model 3D: {name}',
@@ -5123,7 +5122,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Nie teraz',
   'hudChrome.nativeUpdate.title': 'Dostępna aktualizacja',
   'hudChrome.nativeUpdate.update': 'Aktualizuj',
-  'entities.abilities.holy_shock.name': "Święty wstrząs",
+  'entities.abilities.holy_shock.name': 'Święty wstrząs',
   'entities.abilities.holy_shock.description':
     'Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)',
   'entities.abilities.holy_shield.name': 'Święta tarcza',
@@ -5143,13 +5142,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Żądli wroga z dystansu, obezwładniając go na maksymalnie 4 sek. Jakiekolwiek obrażenia przerywają efekt. (specjalizacja Przetrwanie)',
   'entities.abilities.arcane_power.name': 'Moc Arkanów',
   'entities.abilities.arcane_power.description':
-    'Napełnia cię mocą Arkanów, zwiększając moc zaklęć o 28 na 12 sek. (specjalizacja Arkana)',
+    'Zwiększa obrażenia zaklęć o 20% i przyspieszenie zaklęć o 10% na 10 sek. (specjalizacja Arkana)',
   'entities.abilities.combustion.name': 'Zapłon',
   'entities.abilities.combustion.description':
-    'Skupia twoją magię ognia, aby następny atak był trafieniem krytycznym. (specjalizacja Ogień)',
+    'Zwiększa szansę na krytyczny efekt zaklęć o 50% na 15 sek. (specjalizacja Ogień)',
+  'entities.abilities.icy_veins.name': 'Lodowe Żyły',
+  'entities.abilities.icy_veins.description':
+    'Zwiększa przyspieszenie zaklęć o 30% oraz zapobiega przerwaniu i opóźnieniu rzucania na 10 sek. (specjalizacja Mróz)',
   'entities.abilities.cone_of_cold.name': 'Stożek zimna',
   'entities.abilities.cone_of_cold.description':
-    'Uderza pobliskich wrogów mrozem, zadając {damage} obrażeń od Mrozu. (specjalizacja Mróz)',
+    'Razisz pobliskich wrogów mrozem, zadając {damage} obrażeń od Mrozu. (talent maga)',
   'entities.abilities.cold_blood.name': 'Zimna krew',
   'entities.abilities.cold_blood.description':
     'Skupia twoją morderczą intencję, aby następny atak był trafieniem krytycznym. (specjalizacja Zabójstwo)',
@@ -5195,162 +5197,160 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.name': 'Szybkie uzdrowienie',
   'entities.abilities.swiftmend.description':
     'Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. (specjalizacja Odnowa)',
-  'entities.abilities.heroic_leap.name': 'Salto heroico',
+  'entities.abilities.heroic_leap.name': 'Heroiczny skok',
   'entities.abilities.heroic_leap.description':
-    'Salta al área objetivo e inflige {damage} de daño físico a los enemigos cercanos. (Talento de guerrero)',
-  'entities.abilities.pummel.name': 'Zurrar',
+    'Skacze na obszar celu, zadając pobliskim wrogom {damage} obrażeń fizycznych. (talent wojownika)',
+  'entities.abilities.pummel.name': 'Okładanie',
   'entities.abilities.pummel.description':
-    'Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (Talento de guerrero)',
-  'entities.abilities.shield_wall.name': 'Muro de escudo',
+    'Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent wojownika)',
+  'entities.abilities.shield_wall.name': 'Mur tarcz',
   'entities.abilities.shield_wall.description':
-    'Alza tu muro de escudo y aumenta mucho la armadura durante 10 s. (Talento de guerrero)',
-  'entities.abilities.last_stand.name': 'Última carga',
+    'Wznosi mur tarcz, znacznie zwiększając pancerz na 10 s. (talent wojownika)',
+  'entities.abilities.last_stand.name': 'Ostatni bastion',
   'entities.abilities.last_stand.description':
-    'Aumenta temporalmente el Aguante durante 15 s, lo que aumenta la salud máxima. (Talento de guerrero)',
-  'entities.abilities.bladestorm.name': 'Filotormenta',
+    'Tymczasowo zwiększa Wytrzymałość na 15 s, zwiększając maksymalne zdrowie. (talent wojownika)',
+  'entities.abilities.bladestorm.name': 'Burza ostrzy',
   'entities.abilities.bladestorm.description':
-    'Te conviertes en una tormenta de acero y golpeas a los enemigos cercanos cada segundo por {damage}. (Talento de guerrero)',
-  'entities.abilities.avatar.name': 'Avatar',
+    'Zamienia cię w burzę stali, uderzając pobliskich wrogów co sekundę za {damage}. (talent wojownika)',
+  'entities.abilities.avatar.name': 'Awatar',
   'entities.abilities.avatar.description':
-    'Te transformas en un coloso y aumentas el poder de ataque durante 20 s. (Talento de guerrero)',
-  'entities.abilities.rallying_cry.name': 'Grito de convocación',
+    'Przemienia cię w kolosa, zwiększając siłę ataku na 20 s. (talent wojownika)',
+  'entities.abilities.rallying_cry.name': 'Okrzyk mobilizujący',
   'entities.abilities.rallying_cry.description':
-    'Sueltas un grito de convocación que aumenta el poder de ataque de los aliados cercanos durante 10 s. (Talento de guerrero)',
-  'entities.abilities.counterspell.name': 'Contrahechizo',
+    'Wydaje mobilizujący okrzyk, zwiększając siłę ataku pobliskich sojuszników na 10 s. (talent wojownika)',
+  'entities.abilities.counterspell.name': 'Kontrzaklęcie',
   'entities.abilities.counterspell.description':
-    'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
-  'entities.abilities.ice_lance.name': 'Lanza de hielo',
+    'Kontruje rzucanie zaklęć wroga i blokuje zaklęcia tej szkoły na 6 s. (talent maga)',
+  'entities.abilities.ice_lance.name': 'Lodowa lanca',
   'entities.abilities.ice_lance.description':
-    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
-  'entities.abilities.presence_of_mind.name': 'Presencia mental',
+    'Ciska odłamkiem lodu, zadając {damage} obrażeń od Mrozu. Zadaje potrójne obrażenia unieruchomionym celom.',
+  'entities.abilities.presence_of_mind.name': 'Przytomność umysłu',
   'entities.abilities.presence_of_mind.description':
-    'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
-  'entities.abilities.blink.name': 'Traslación',
+    'Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 s. (talent maga)',
+  'entities.abilities.blink.name': 'Mgnienie',
   'entities.abilities.blink.description':
-    'Te teletransporta 15 m hacia delante y rompe raíces. (Talento de mago)',
-  'entities.abilities.ice_block.name': 'Bloque de hielo',
+    'Teleportuje cię 15 m do przodu i uwalnia z unieruchomień. (talent maga)',
+  'entities.abilities.ice_block.name': 'Bryła lodu',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (Talento de mago)',
-  'entities.abilities.deep_freeze.name': 'Congelación profunda',
+    'Zamyka cię w lodzie, pochłaniając ogromne obrażenia przez 8 s. (talent maga)',
+  'entities.abilities.deep_freeze.name': 'Głębokie zamrożenie',
   'entities.abilities.deep_freeze.description':
-    'Congela profundamente al objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (Talento de mago)',
-  'entities.abilities.meteor.name': 'Meteoro',
+    'Głęboko zamraża cel, zadając {damage} obrażeń od Mrozu i ogłuszając go na 4 s. (talent maga)',
+  'entities.abilities.meteor.name': 'Meteor',
   'entities.abilities.meteor.description':
-    'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
-  'entities.abilities.evocation.name': 'Evocación',
-  'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': "Nagana",
+    'Sprowadza meteor na obszar celu, zadając {damage} obrażeń od Ognia i podpalając ziemię. (talent maga)',
+  'entities.abilities.evocation.name': 'Ewokacja',
+  'entities.abilities.evocation.description': 'Szybko przywraca manę. (talent maga)',
+  'entities.abilities.rebuke.name': 'Nagana',
   'entities.abilities.rebuke.description':
-    "Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent paladyna)",
-  'entities.abilities.crusader_strike.name': "Cios krzyżowca",
+    'Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent paladyna)',
+  'entities.abilities.crusader_strike.name': 'Cios krzyżowca',
   'entities.abilities.crusader_strike.description':
-    "Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)",
-  'entities.abilities.holy_wrath.name': "Święty gniew",
+    'Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)',
+  'entities.abilities.holy_wrath.name': 'Święty gniew',
   'entities.abilities.holy_wrath.description':
-    "Wyzwala świętą moc i zadaje pobliskim wrogom {damage} obrażeń. (talent paladyna)",
-  'entities.abilities.divine_shield.name': "Boska tarcza",
+    'Wyzwala świętą moc i zadaje pobliskim wrogom {damage} obrażeń. (talent paladyna)',
+  'entities.abilities.divine_shield.name': 'Boska tarcza',
   'entities.abilities.divine_shield.description':
-    "Osłania cię świętą mocą, pochłaniając ogromne obrażenia przez 8 s. (talent paladyna)",
-  'entities.abilities.avenging_wrath.name': "Mściwy gniew",
+    'Osłania cię świętą mocą, pochłaniając ogromne obrażenia przez 8 s. (talent paladyna)',
+  'entities.abilities.avenging_wrath.name': 'Mściwy gniew',
   'entities.abilities.avenging_wrath.description':
-    "Zwiększa siłę ataku i moc zaklęć na 20 s. (talent paladyna)",
-  'entities.abilities.hammer_of_wrath.name': "Młot gniewu",
+    'Zwiększa siłę ataku i moc zaklęć na 20 s. (talent paladyna)',
+  'entities.abilities.hammer_of_wrath.name': 'Młot gniewu',
   'entities.abilities.hammer_of_wrath.description':
-    "Rzuca święty młot w rannego wroga, zadając {damage} obrażeń od Świętości. Tylko poniżej 20% zdrowia. (talent paladyna)",
-  'entities.abilities.counter_shot.name': "Kontrstrzał",
+    'Rzuca święty młot w rannego wroga, zadając {damage} obrażeń od Świętości. Tylko poniżej 20% zdrowia. (talent paladyna)',
+  'entities.abilities.counter_shot.name': 'Kontrstrzał',
   'entities.abilities.counter_shot.description':
-    "Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent łowcy)",
-  'entities.abilities.frost_trap.name': "Pułapka mrozu",
+    'Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent łowcy)',
+  'entities.abilities.frost_trap.name': 'Pułapka mrozu',
   'entities.abilities.frost_trap.description':
-    "Zamraża wrogów w obszarze celu na 3 s. (talent łowcy)",
-  'entities.abilities.mend_pet.name': "Uleczenie zwierzaka",
+    'Zamraża wrogów w obszarze celu na 3 s. (talent łowcy)',
+  'entities.abilities.mend_pet.name': 'Uleczenie zwierzaka',
   'entities.abilities.mend_pet.description':
-    "Leczy sojuszniczy cel o {damage} przez 15 s. (talent łowcy)",
-  'entities.abilities.multi_shot.name': "Wielostrzał",
+    'Leczy sojuszniczy cel o {damage} przez 15 s. (talent łowcy)',
+  'entities.abilities.multi_shot.name': 'Wielostrzał',
   'entities.abilities.multi_shot.description':
-    "Wystrzeliwuje kilka pocisków, trafiając pobliskich wrogów za {damage}. (talent łowcy)",
-  'entities.abilities.deterrence.name': "Odstraszanie",
+    'Wystrzeliwuje kilka pocisków, trafiając pobliskich wrogów za {damage}. (talent łowcy)',
+  'entities.abilities.deterrence.name': 'Odstraszanie',
   'entities.abilities.deterrence.description':
-    "Zwiększa szansę uniku o 50% na 10 s. (talent łowcy)",
-  'entities.abilities.aspect_of_the_wild.name': "Aspekt dziczy",
+    'Zwiększa szansę uniku o 50% na 10 s. (talent łowcy)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspekt dziczy',
   'entities.abilities.aspect_of_the_wild.description':
-    "Inspiruje pobliskich sojuszników, zwiększając siłę ataku na 5 min. (talent łowcy)",
-  'entities.abilities.kick.name': "Kopnięcie",
+    'Inspiruje pobliskich sojuszników, zwiększając siłę ataku na 5 min. (talent łowcy)',
+  'entities.abilities.kick.name': 'Kopnięcie',
   'entities.abilities.kick.description':
-    "Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent łotrzyka)",
-  'entities.abilities.preparation.name': "Przygotowanie",
+    'Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent łotrzyka)',
+  'entities.abilities.preparation.name': 'Przygotowanie',
   'entities.abilities.preparation.description':
-    "Kończy czas odnowienia Sprintu, Uniku i Zniknięcia. (talent łotrzyka)",
-  'entities.abilities.ghostly_strike.name': "Widmowy cios",
+    'Kończy czas odnowienia Sprintu, Uniku i Zniknięcia. (talent łotrzyka)',
+  'entities.abilities.ghostly_strike.name': 'Widmowy cios',
   'entities.abilities.ghostly_strike.description':
-    "Uderza wroga za obrażenia broni plus {damage} i krótko zwiększa unik. Daje 1 punkt combo. (talent łotrzyka)",
-  'entities.abilities.cloak_of_shadows.name': "Płaszcz cieni",
+    'Uderza wroga za obrażenia broni plus {damage} i krótko zwiększa unik. Daje 1 punkt combo. (talent łotrzyka)',
+  'entities.abilities.cloak_of_shadows.name': 'Płaszcz cieni',
   'entities.abilities.cloak_of_shadows.description':
-    "Otula cię cieniami, pochłaniając obrażenia przez 5 s. (talent łotrzyka)",
-  'entities.abilities.shadowstep.name': "Cienisty krok",
+    'Otula cię cieniami, pochłaniając obrażenia przez 5 s. (talent łotrzyka)',
+  'entities.abilities.shadowstep.name': 'Cienisty krok',
   'entities.abilities.shadowstep.description':
-    "Przechodzisz przez cienie ku celowi. (talent łotrzyka)",
-  'entities.abilities.silence.name': "Cisza",
-  'entities.abilities.silence.description':
-    "Wycisza cel na 4 s. (talent łotrzyka)",
-  'entities.abilities.psychic_scream.name': "Psychiczny krzyk",
+    'Przechodzisz przez cienie ku celowi. (talent łotrzyka)',
+  'entities.abilities.silence.name': 'Cisza',
+  'entities.abilities.silence.description': 'Wycisza cel na 4 s. (talent kapłana)',
+  'entities.abilities.psychic_scream.name': 'Psychiczny krzyk',
   'entities.abilities.psychic_scream.description':
-    "Przeraża pobliskich wrogów do 4 s. Obrażenia mogą przerwać efekt. (talent kapłana)",
-  'entities.abilities.inner_focus.name': "Wewnętrzne skupienie",
+    'Przeraża pobliskich wrogów do 4 s. Obrażenia mogą przerwać efekt. (talent kapłana)',
+  'entities.abilities.inner_focus.name': 'Wewnętrzne skupienie',
   'entities.abilities.inner_focus.description':
-    "Sprawia, że następne zaklęcie jest darmowe. Trwa 60 s. (talent kapłana)",
-  'entities.abilities.desperate_prayer.name': "Desperacka modlitwa",
+    'Sprawia, że następne zaklęcie jest darmowe. Trwa 60 s. (talent kapłana)',
+  'entities.abilities.desperate_prayer.name': 'Desperacka modlitwa',
   'entities.abilities.desperate_prayer.description':
-    "Natychmiast leczy cię o {damage}. (talent kapłana)",
-  'entities.abilities.prayer_of_healing.name': "Modlitwa uzdrowienia",
+    'Natychmiast leczy cię o {damage}. (talent kapłana)',
+  'entities.abilities.prayer_of_healing.name': 'Modlitwa uzdrowienia',
   'entities.abilities.prayer_of_healing.description':
-    "Leczy pobliskich sojuszników o {damage}. (talent kapłana)",
-  'entities.abilities.mind_sear.name': "Spopielenie umysłu",
+    'Leczy pobliskich sojuszników o {damage}. (talent kapłana)',
+  'entities.abilities.mind_sear.name': 'Spopielenie umysłu',
   'entities.abilities.mind_sear.description':
-    "Kanalizuje energię Cienia w obszarze celu, zadając pobliskim wrogom {damage} obrażeń co sekundę. (talent kapłana)",
-  'entities.abilities.earthbind.name': "Uwiązanie ziemi",
+    'Kanalizuje energię Cienia w obszarze celu, zadając pobliskim wrogom {damage} obrażeń co sekundę. (talent kapłana)',
+  'entities.abilities.earthbind.name': 'Uwiązanie ziemi',
   'entities.abilities.earthbind.description':
-    "Wiąże pobliskich wrogów z ziemią i unieruchamia ich na 2 s. (talent szamana)",
-  'entities.abilities.healing_stream.name': "Strumień leczenia",
+    'Wiąże pobliskich wrogów z ziemią i unieruchamia ich na 2 s. (talent szamana)',
+  'entities.abilities.healing_stream.name': 'Strumień leczenia',
   'entities.abilities.healing_stream.description':
-    "Odnawia sojuszniczy cel przez 12 s. (talent szamana)",
-  'entities.abilities.chain_lightning.name': "Łańcuch błyskawic",
+    'Odnawia sojuszniczy cel przez 12 s. (talent szamana)',
+  'entities.abilities.chain_lightning.name': 'Łańcuch błyskawic',
   'entities.abilities.chain_lightning.description':
-    "Ciska błyskawice w obszar celu, zadając pobliskim wrogom {damage} obrażeń. (talent szamana)",
-  'entities.abilities.bloodlust.name': "Żądza krwi",
+    'Ciska błyskawice w obszar celu, zadając pobliskim wrogom {damage} obrażeń. (talent szamana)',
+  'entities.abilities.bloodlust.name': 'Żądza krwi',
   'entities.abilities.bloodlust.description':
-    "Wprawia pobliskich sojuszników w szał, zwiększając szybkość ataku na 15 s. (talent szamana)",
-  'entities.abilities.spell_lock.name': "Blokada czaru",
+    'Wprawia pobliskich sojuszników w szał, zwiększając szybkość ataku na 15 s. (talent szamana)',
+  'entities.abilities.spell_lock.name': 'Blokada czaru',
   'entities.abilities.spell_lock.description':
-    "Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 5 s. (talent czarnoksiężnika)",
-  'entities.abilities.howl_of_terror.name': "Wycie grozy",
+    'Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 5 s. (talent czarnoksiężnika)',
+  'entities.abilities.howl_of_terror.name': 'Wycie grozy',
   'entities.abilities.howl_of_terror.description':
-    "Przeraża pobliskich wrogów do 3 s. Obrażenia mogą przerwać efekt. (talent czarnoksiężnika)",
-  'entities.abilities.curse_of_exhaustion.name': "Klątwa wyczerpania",
+    'Przeraża pobliskich wrogów do 3 s. Obrażenia mogą przerwać efekt. (talent czarnoksiężnika)',
+  'entities.abilities.curse_of_exhaustion.name': 'Klątwa wyczerpania',
   'entities.abilities.curse_of_exhaustion.description':
-    "Przeklina cel, zmniejszając szybkość ruchu o 30% na 12 s. (talent czarnoksiężnika)",
-  'entities.abilities.death_coil.name': "Spirala śmierci",
+    'Przeklina cel, zmniejszając szybkość ruchu o 30% na 12 s. (talent czarnoksiężnika)',
+  'entities.abilities.death_coil.name': 'Spirala śmierci',
   'entities.abilities.death_coil.description':
-    "Uderza wroga za {damage} obrażeń od Cienia, po czym przeraża go na 3 s. Ta wersja nie leczy rzucającego. (talent czarnoksiężnika)",
-  'entities.abilities.chaos_bolt.name': "Pocisk chaosu",
+    'Uderza wroga za {damage} obrażeń od Cienia, po czym przeraża go na 3 s. Ta wersja nie leczy rzucającego. (talent czarnoksiężnika)',
+  'entities.abilities.chaos_bolt.name': 'Pocisk chaosu',
   'entities.abilities.chaos_bolt.description':
-    "Ciska chaotyczny pocisk ognia za {damage} obrażeń od Ognia. (talent czarnoksiężnika)",
-  'entities.abilities.metamorphosis.name': "Metamorfoza",
+    'Ciska chaotyczny pocisk ognia za {damage} obrażeń od Ognia. (talent czarnoksiężnika)',
+  'entities.abilities.metamorphosis.name': 'Metamorfoza',
   'entities.abilities.metamorphosis.description':
-    "Przyjmujesz demoniczną moc, zwiększając pancerz i siłę ataku na 20 s. (talent czarnoksiężnika)",
-  'entities.abilities.skull_bash.name': "Uderzenie czaszką",
+    'Przyjmujesz demoniczną moc, zwiększając pancerz i siłę ataku na 20 s. (talent czarnoksiężnika)',
+  'entities.abilities.skull_bash.name': 'Uderzenie czaszką',
   'entities.abilities.skull_bash.description':
-    "Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent druida)",
-  'entities.abilities.innervate.name': "Pobudzenie",
+    'Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent druida)',
+  'entities.abilities.innervate.name': 'Pobudzenie',
   'entities.abilities.innervate.description':
-    "Natychmiast przywraca 200 aktualnego zasobu. (talent druida)",
-  'entities.abilities.frenzied_regeneration.name': "Szaleńcza regeneracja",
+    'Natychmiast przywraca 200 aktualnego zasobu. (talent druida)',
+  'entities.abilities.frenzied_regeneration.name': 'Szaleńcza regeneracja',
   'entities.abilities.frenzied_regeneration.description':
-    "Regeneruje zdrowie przez 10 s. Tylko Forma niedźwiedzia. (talent druida)",
-  'entities.abilities.berserk.name': "Berserk",
-  'entities.abilities.berserk.description':
-    "Zwiększa siłę ataku na 15 s. (talent druida)",
-  'entities.abilities.tranquility.name': "Ukojenie",
+    'Regeneruje zdrowie przez 10 s. Tylko Forma niedźwiedzia. (talent druida)',
+  'entities.abilities.berserk.name': 'Berserk',
+  'entities.abilities.berserk.description': 'Zwiększa siłę ataku na 15 s. (talent druida)',
+  'entities.abilities.tranquility.name': 'Ukojenie',
   'entities.abilities.tranquility.description':
-    "Kanalizuje odnawiającą energię, lecząc pobliskich sojuszników co sekundę. (talent druida)",
+    'Kanalizuje odnawiającą energię, lecząc pobliskich sojuszników co sekundę. (talent druida)',
 };

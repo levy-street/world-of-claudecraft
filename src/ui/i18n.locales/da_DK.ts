@@ -2160,8 +2160,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlockToast': 'Nyt talentvalg tilgængeligt!',
   'game.talents.rowUnlocks': 'Låses op på niveau {level}',
   'game.talents.unlockBanner': 'Talenter Låst Op!',
-  'game.talents.unlockHint':
-  "Talentvalg er tilgængelige: tryk N for at åbne Talenter.",
+  'game.talents.unlockHint': 'Talentvalg er tilgængelige: tryk N for at åbne Talenter.',
   'game.xp.lv': 'Niv',
   'game.xp.maxLevel': 'MAKS NIVEAU',
   'game.xp.rested': 'Udhvilet',
@@ -3090,20 +3089,20 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'En klassisk MMO, du spiller gratis i din browser.',
   'guide.talentsPage.heading': 'Talenter og specialiseringer',
   'guide.talentsPage.howBody':
-  "Rækker låses op, når du stiger i niveau, og specialiseringer åbner på niveau 10. Vælg en specialisering for dens signaturevne og mesterskab, og brug derefter fanen Valg til at vælge én mulighed fra hver oplåst række.",
+    'Rækker låses op, når du stiger i niveau, og specialiseringer åbner på niveau 10. Vælg en specialisering for dens signaturevne og mesterskab, og brug derefter fanen Valg til at vælge én mulighed fra hver oplåst række.',
   'guide.talentsPage.howHeading': 'Sådan virker de',
   'guide.talentsPage.intro':
-  "Talenter er måden, du gør en klasse til din egen. De er valgfrie, tilgivende og nemme at ændre, så du kan eksperimentere uden frygt.",
+    'Talenter er måden, du gør en klasse til din egen. De er valgfrie, tilgivende og nemme at ændre, så du kan eksperimentere uden frygt.',
   'guide.talentsPage.resetNote':
-  "Du kan nulstille dine valg når som helst uden for kamp, så et tidligt valg er aldrig en fælde. Prøv ting af, se hvad du kan lide, og skift frit mening.",
+    'Du kan nulstille dine valg når som helst uden for kamp, så et tidligt valg er aldrig en fælde. Prøv ting af, se hvad du kan lide, og skift frit mening.',
   'guide.talentsPage.resetTitle': 'Intet er permanent',
   'guide.talentsPage.shareNote':
-  "Et færdigt build kan kopieres som en kort delingskode og gives til en ven, som indsætter den direkte i sit eget talentpanel.",
+    'Et færdigt build kan kopieres som en kort delingskode og gives til en ven, som indsætter den direkte i sit eget talentpanel.',
   'guide.talentsPage.specsBody':
-  "Hver klasse har flere specialiseringer, hver med sin egen rolle og signaturfokus. Her er formen på dem alle. Åbn en klasse for hele sættet.",
+    'Hver klasse har flere specialiseringer, hver med sin egen rolle og signaturfokus. Her er formen på dem alle. Åbn en klasse for hele sættet.',
   'guide.talentsPage.specsHeading': 'Specialiseringer efter klasse',
   'guide.talentsPage.whatBody':
-  "Når du stiger i niveau, låses talentrækker op med et lille udvalg af valg. Hvert valg giver en permanent forbedring til dine evner, værdier eller værktøjer og former, hvordan klassen føles i kamp.",
+    'Når du stiger i niveau, låses talentrækker op med et lille udvalg af valg. Hvert valg giver en permanent forbedring til dine evner, værdier eller værktøjer og former, hvordan klassen føles i kamp.',
   'guide.talentsPage.whatHeading': 'Hvad talenter gør',
   'guide.toc.heading': 'På denne side',
   'guide.viewer.canvasLabel': 'Roterbar 3D-model af {name}',
@@ -5084,7 +5083,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Opdater',
   'errors.api.desktopCodeInvalid':
     'Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.',
-  'entities.abilities.holy_shock.name': "Hellig chok",
+  'entities.abilities.holy_shock.name': 'Hellig chok',
   'entities.abilities.holy_shock.description':
     'Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)',
   'entities.abilities.holy_shield.name': 'Hellig skjold',
@@ -5104,13 +5103,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Stikker fjenden på afstand og gør den ukampdygtig i op til 4 sek. Enhver skade bryder effekten. (Overlevelsessignatur)',
   'entities.abilities.arcane_power.name': 'Arkan kraft',
   'entities.abilities.arcane_power.description':
-    'Fylder dig med arkan kraft og øger besværgelseskraft med 28 i 12 sek. (Arkan signatur)',
+    'Øger besværgelsesskade med 20% og besværgelseshast med 10% i 10 sek. (Arcane-signatur)',
   'entities.abilities.combustion.name': 'Forbrænding',
   'entities.abilities.combustion.description':
-    'Fokuserer din ildmagi, så dit næste angreb bliver et kritisk træf. (Ildsignatur)',
+    'Øger kritisk chance med besværgelser med 50% i 15 sek. (Fire-signatur)',
+  'entities.abilities.icy_veins.name': 'Iskolde Årer',
+  'entities.abilities.icy_veins.description':
+    'Øger besværgelseshast med 30% og forhindrer afbrydelse og tilbageslag i 10 sek. (Frost-signatur)',
   'entities.abilities.cone_of_cold.name': 'Kuldekegle',
   'entities.abilities.cone_of_cold.description':
-    'Sprænger nærliggende fjender med frost for {damage} frostskade. (Frostsignatur)',
+    'Ram nærliggende fjender med frost for {damage} Frost-skade. (magikertalent)',
   'entities.abilities.cold_blood.name': 'Koldt blod',
   'entities.abilities.cold_blood.description':
     'Fokuserer din dræbervilje, så dit næste angreb bliver et kritisk træf. (Snigmordersignatur)',
@@ -5182,7 +5184,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
   'entities.abilities.ice_lance.name': 'Lanza de hielo',
   'entities.abilities.ice_lance.description':
-    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados.',
   'entities.abilities.presence_of_mind.name': 'Presencia mental',
   'entities.abilities.presence_of_mind.description':
     'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
@@ -5200,118 +5202,116 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': "Irettesættelse",
+  'entities.abilities.rebuke.name': 'Irettesættelse',
   'entities.abilities.rebuke.description':
-    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Paladin-talent)",
-  'entities.abilities.crusader_strike.name': "Korsfarerslag",
+    'Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Paladin-talent)',
+  'entities.abilities.crusader_strike.name': 'Korsfarerslag',
   'entities.abilities.crusader_strike.description':
-    "Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)",
-  'entities.abilities.holy_wrath.name': "Hellig vrede",
+    'Slår målet for våbenskade plus {damage} hellig skade. (Paladin-talent)',
+  'entities.abilities.holy_wrath.name': 'Hellig vrede',
   'entities.abilities.holy_wrath.description':
-    "Udløser hellig kraft og skader fjender i nærheden for {damage}. (Paladin-talent)",
-  'entities.abilities.divine_shield.name': "Guddommeligt skjold",
+    'Udløser hellig kraft og skader fjender i nærheden for {damage}. (Paladin-talent)',
+  'entities.abilities.divine_shield.name': 'Guddommeligt skjold',
   'entities.abilities.divine_shield.description':
-    "Skærmer dig med hellig kraft og absorberer en enorm mængde skade i 8 sek. (Paladin-talent)",
-  'entities.abilities.avenging_wrath.name': "Hævnende vrede",
+    'Skærmer dig med hellig kraft og absorberer en enorm mængde skade i 8 sek. (Paladin-talent)',
+  'entities.abilities.avenging_wrath.name': 'Hævnende vrede',
   'entities.abilities.avenging_wrath.description':
-    "Kalder hævnende kraft frem og øger angrebskraft og spell power i 20 sek. (Paladin-talent)",
-  'entities.abilities.hammer_of_wrath.name': "Vredens hammer",
+    'Kalder hævnende kraft frem og øger angrebskraft og spell power i 20 sek. (Paladin-talent)',
+  'entities.abilities.hammer_of_wrath.name': 'Vredens hammer',
   'entities.abilities.hammer_of_wrath.description':
-    "Kaster en hellig hammer mod en såret fjende for {damage} hellig skade. Kan kun bruges under 20% helbred. (Paladin-talent)",
-  'entities.abilities.counter_shot.name': "Modskud",
+    'Kaster en hellig hammer mod en såret fjende for {damage} hellig skade. Kan kun bruges under 20% helbred. (Paladin-talent)',
+  'entities.abilities.counter_shot.name': 'Modskud',
   'entities.abilities.counter_shot.description':
-    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Jæger-talent)",
-  'entities.abilities.frost_trap.name': "Frostfælde",
+    'Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Jæger-talent)',
+  'entities.abilities.frost_trap.name': 'Frostfælde',
   'entities.abilities.frost_trap.description':
-    "Fryser fjender på målområdet fast i 3 sek. (Jæger-talent)",
-  'entities.abilities.mend_pet.name': "Helbred kæledyr",
+    'Fryser fjender på målområdet fast i 3 sek. (Jæger-talent)',
+  'entities.abilities.mend_pet.name': 'Helbred kæledyr',
   'entities.abilities.mend_pet.description':
-    "Helbreder et venligt mål for {damage} over 15 sek. (Jæger-talent)",
-  'entities.abilities.multi_shot.name': "Multiskud",
+    'Helbreder et venligt mål for {damage} over 15 sek. (Jæger-talent)',
+  'entities.abilities.multi_shot.name': 'Multiskud',
   'entities.abilities.multi_shot.description':
-    "Affyrer flere projektiler og rammer fjender i nærheden for {damage}. (Jæger-talent)",
-  'entities.abilities.deterrence.name': "Afskrækkelse",
+    'Affyrer flere projektiler og rammer fjender i nærheden for {damage}. (Jæger-talent)',
+  'entities.abilities.deterrence.name': 'Afskrækkelse',
   'entities.abilities.deterrence.description':
-    "Øger din undvigelseschance med 50% i 10 sek. (Jæger-talent)",
-  'entities.abilities.aspect_of_the_wild.name': "Vildmarkens aspekt",
+    'Øger din undvigelseschance med 50% i 10 sek. (Jæger-talent)',
+  'entities.abilities.aspect_of_the_wild.name': 'Vildmarkens aspekt',
   'entities.abilities.aspect_of_the_wild.description':
-    "Inspirerer nærliggende allierede med vild styrke og øger angrebskraft i 5 min. (Jæger-talent)",
-  'entities.abilities.kick.name': "Spark",
+    'Inspirerer nærliggende allierede med vild styrke og øger angrebskraft i 5 min. (Jæger-talent)',
+  'entities.abilities.kick.name': 'Spark',
   'entities.abilities.kick.description':
-    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Rogue-talent)",
-  'entities.abilities.preparation.name': "Forberedelse",
+    'Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Rogue-talent)',
+  'entities.abilities.preparation.name': 'Forberedelse',
   'entities.abilities.preparation.description':
-    "Afslutter nedkølingen på Sprint, Evasion og Vanish. (Rogue-talent)",
-  'entities.abilities.ghostly_strike.name': "Spøgelsesagtigt slag",
+    'Afslutter nedkølingen på Sprint, Evasion og Vanish. (Rogue-talent)',
+  'entities.abilities.ghostly_strike.name': 'Spøgelsesagtigt slag',
   'entities.abilities.ghostly_strike.description':
-    "Slår fjenden for våbenskade plus {damage} og øger kortvarigt undvigelse. Giver 1 combo point. (Rogue-talent)",
-  'entities.abilities.cloak_of_shadows.name': "Skyggernes kappe",
+    'Slår fjenden for våbenskade plus {damage} og øger kortvarigt undvigelse. Giver 1 combo point. (Rogue-talent)',
+  'entities.abilities.cloak_of_shadows.name': 'Skyggernes kappe',
   'entities.abilities.cloak_of_shadows.description':
-    "Indhyller dig i skygger og absorberer skade i 5 sek. (Rogue-talent)",
-  'entities.abilities.shadowstep.name': "Skyggeskridt",
+    'Indhyller dig i skygger og absorberer skade i 5 sek. (Rogue-talent)',
+  'entities.abilities.shadowstep.name': 'Skyggeskridt',
   'entities.abilities.shadowstep.description':
-    "Træder gennem skyggerne mod dit mål. (Rogue-talent)",
-  'entities.abilities.silence.name': "Stilhed",
-  'entities.abilities.silence.description':
-    "Gør målet tavst i 4 sek. (Præst-talent)",
-  'entities.abilities.psychic_scream.name': "Psykisk skrig",
+    'Træder gennem skyggerne mod dit mål. (Rogue-talent)',
+  'entities.abilities.silence.name': 'Stilhed',
+  'entities.abilities.silence.description': 'Gør målet tavst i 4 sek. (Præst-talent)',
+  'entities.abilities.psychic_scream.name': 'Psykisk skrig',
   'entities.abilities.psychic_scream.description':
-    "Skræmmer fjender i nærheden i op til 4 sek. Skade kan bryde effekten. (Præst-talent)",
-  'entities.abilities.inner_focus.name': "Indre fokus",
+    'Skræmmer fjender i nærheden i op til 4 sek. Skade kan bryde effekten. (Præst-talent)',
+  'entities.abilities.inner_focus.name': 'Indre fokus',
   'entities.abilities.inner_focus.description':
-    "Gør din næste besværgelse gratis. Varer 60 sek. (Præst-talent)",
-  'entities.abilities.desperate_prayer.name': "Desperat bøn",
+    'Gør din næste besværgelse gratis. Varer 60 sek. (Præst-talent)',
+  'entities.abilities.desperate_prayer.name': 'Desperat bøn',
   'entities.abilities.desperate_prayer.description':
-    "Helbreder dig øjeblikkeligt for {damage}. (Præst-talent)",
-  'entities.abilities.prayer_of_healing.name': "Helbredelsesbøn",
+    'Helbreder dig øjeblikkeligt for {damage}. (Præst-talent)',
+  'entities.abilities.prayer_of_healing.name': 'Helbredelsesbøn',
   'entities.abilities.prayer_of_healing.description':
-    "Helbreder nærliggende allierede for {damage}. (Præst-talent)",
-  'entities.abilities.mind_sear.name': "Sindssvidning",
+    'Helbreder nærliggende allierede for {damage}. (Præst-talent)',
+  'entities.abilities.mind_sear.name': 'Sindssvidning',
   'entities.abilities.mind_sear.description':
-    "Kanaliserer skyggeenergi mod målområdet og skader fjender i nærheden hvert sekund for {damage}. (Præst-talent)",
-  'entities.abilities.earthbind.name': "Jordbinding",
+    'Kanaliserer skyggeenergi mod målområdet og skader fjender i nærheden hvert sekund for {damage}. (Præst-talent)',
+  'entities.abilities.earthbind.name': 'Jordbinding',
   'entities.abilities.earthbind.description':
-    "Binder fjender i nærheden til jorden og rodfæster dem i 2 sek. (Shaman-talent)",
-  'entities.abilities.healing_stream.name': "Helbredende strøm",
+    'Binder fjender i nærheden til jorden og rodfæster dem i 2 sek. (Shaman-talent)',
+  'entities.abilities.healing_stream.name': 'Helbredende strøm',
   'entities.abilities.healing_stream.description':
-    "Genopretter et venligt mål over 12 sek. (Shaman-talent)",
-  'entities.abilities.chain_lightning.name': "Kædelyn",
+    'Genopretter et venligt mål over 12 sek. (Shaman-talent)',
+  'entities.abilities.chain_lightning.name': 'Kædelyn',
   'entities.abilities.chain_lightning.description':
-    "Slynger lyn mod målområdet og skader fjender i nærheden for {damage}. (Shaman-talent)",
-  'entities.abilities.bloodlust.name': "Blodrus",
+    'Slynger lyn mod målområdet og skader fjender i nærheden for {damage}. (Shaman-talent)',
+  'entities.abilities.bloodlust.name': 'Blodrus',
   'entities.abilities.bloodlust.description':
-    "Pisker nærliggende allierede op i raseri og øger angrebshastighed i 15 sek. (Shaman-talent)",
-  'entities.abilities.spell_lock.name': "Besværgelseslås",
+    'Pisker nærliggende allierede op i raseri og øger angrebshastighed i 15 sek. (Shaman-talent)',
+  'entities.abilities.spell_lock.name': 'Besværgelseslås',
   'entities.abilities.spell_lock.description':
-    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 5 sek. (Warlock-talent)",
-  'entities.abilities.howl_of_terror.name': "Rædselshyl",
+    'Afbryder besværgelse og forhindrer besværgelser fra den skole i 5 sek. (Warlock-talent)',
+  'entities.abilities.howl_of_terror.name': 'Rædselshyl',
   'entities.abilities.howl_of_terror.description':
-    "Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (Warlock-talent)",
-  'entities.abilities.curse_of_exhaustion.name': "Udmattelsens forbandelse",
+    'Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (Warlock-talent)',
+  'entities.abilities.curse_of_exhaustion.name': 'Udmattelsens forbandelse',
   'entities.abilities.curse_of_exhaustion.description':
-    "Forbander målet og sænker bevægelseshastighed med 30% i 12 sek. (Warlock-talent)",
-  'entities.abilities.death_coil.name': "Dødsspiral",
+    'Forbander målet og sænker bevægelseshastighed med 30% i 12 sek. (Warlock-talent)',
+  'entities.abilities.death_coil.name': 'Dødsspiral',
   'entities.abilities.death_coil.description':
-    "Sprænger fjenden for {damage} skyggeskade og rædselsskræmmer dem derefter i 3 sek. Denne version helbreder ikke kasteren. (Warlock-talent)",
-  'entities.abilities.chaos_bolt.name': "Kaosbolt",
+    'Sprænger fjenden for {damage} skyggeskade og rædselsskræmmer dem derefter i 3 sek. Denne version helbreder ikke kasteren. (Warlock-talent)',
+  'entities.abilities.chaos_bolt.name': 'Kaosbolt',
   'entities.abilities.chaos_bolt.description':
-    "Slynger en kaotisk ildbolt for {damage} ildskade. (Warlock-talent)",
-  'entities.abilities.metamorphosis.name': "Metamorfose",
+    'Slynger en kaotisk ildbolt for {damage} ildskade. (Warlock-talent)',
+  'entities.abilities.metamorphosis.name': 'Metamorfose',
   'entities.abilities.metamorphosis.description':
-    "Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)",
-  'entities.abilities.skull_bash.name': "Kranieslag",
+    'Antag dæmonisk kraft og øg rustning og angrebskraft i 20 sek. (Warlock-talent)',
+  'entities.abilities.skull_bash.name': 'Kranieslag',
   'entities.abilities.skull_bash.description':
-    "Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Druide-talent)",
-  'entities.abilities.innervate.name': "Innervering",
+    'Afbryder besværgelse og forhindrer besværgelser fra den skole i 4 sek. (Druide-talent)',
+  'entities.abilities.innervate.name': 'Innervering',
   'entities.abilities.innervate.description':
-    "Gendanner øjeblikkeligt 200 af din aktuelle ressource. (Druide-talent)",
-  'entities.abilities.frenzied_regeneration.name': "Vanvittig regeneration",
+    'Gendanner øjeblikkeligt 200 af din aktuelle ressource. (Druide-talent)',
+  'entities.abilities.frenzied_regeneration.name': 'Vanvittig regeneration',
   'entities.abilities.frenzied_regeneration.description':
-    "Gendanner helbred over 10 sek. Kun Bjørneform. (Druide-talent)",
-  'entities.abilities.berserk.name': "Bersærk",
-  'entities.abilities.berserk.description':
-    "Øger angrebskraft i 15 sek. (Druide-talent)",
-  'entities.abilities.tranquility.name': "Ro",
+    'Gendanner helbred over 10 sek. Kun Bjørneform. (Druide-talent)',
+  'entities.abilities.berserk.name': 'Bersærk',
+  'entities.abilities.berserk.description': 'Øger angrebskraft i 15 sek. (Druide-talent)',
+  'entities.abilities.tranquility.name': 'Ro',
   'entities.abilities.tranquility.description':
-    "Kanaliserer genoprettende energi og helbreder nærliggende allierede hvert sekund. (Druide-talent)",
+    'Kanaliserer genoprettende energi og helbreder nærliggende allierede hvert sekund. (Druide-talent)',
 };

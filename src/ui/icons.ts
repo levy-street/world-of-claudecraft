@@ -2399,6 +2399,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
   arcane_power: r('arcane', 'arcanePink', ['sigil_rune'], ['glow']),
   combustion: r('fire', 'ember', ['flame'], ['sparkle']),
+  icy_veins: r('frost', 'ice', ['snowflake'], ['glow']),
   cone_of_cold: r('frost', 'ice', ['snowflake'], ['arcs']),
   cold_blood: r('frost', 'steel', ['dagger'], ['glow']),
   blade_flurry: r('fury', 'steel', ['sword', { p: 'sword', ...BR }], ['motion']),

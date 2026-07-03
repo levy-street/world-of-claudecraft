@@ -4378,7 +4378,7 @@ export const de_DE: EnTranslations = {
       },
       "ice_lance": {
         "name": "Eislanze",
-        "description": "Schleudert einen Eissplitter, der {damage} Frostschaden verursacht. Verursacht dreifachen Schaden gegen verwurzelte Ziele. (Magier Talent)"
+        "description": "Schleudert einen Eissplitter, der {damage} Frostschaden verursacht. Verursacht dreifachen Schaden gegen verwurzelte Ziele."
       },
       "presence_of_mind": {
         "name": "Geistesgegenwart",
@@ -4582,15 +4582,19 @@ export const de_DE: EnTranslations = {
       },
       "arcane_power": {
         "name": "Arkane Macht",
-        "description": "Erfüllt Euch mit arkaner Macht und erhöht Eure Zaubermacht 12 Sek. lang um 28. (Arkan-Signatur)"
+        "description": "Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)"
       },
       "combustion": {
         "name": "Verbrennung",
-        "description": "Bündelt Eure Feuermagie, sodass Euer nächster Angriff ein kritischer Treffer ist. (Feuer-Signatur)"
+        "description": "Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)"
+      },
+      "icy_veins": {
+        "name": "Eisige Adern",
+        "description": "Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)"
       },
       "cone_of_cold": {
         "name": "Kältekegel",
-        "description": "Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Frost-Signatur)"
+        "description": "Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Magiertalent)"
       },
       "cold_blood": {
         "name": "Kaltblütigkeit",

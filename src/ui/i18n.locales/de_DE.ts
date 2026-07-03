@@ -427,8 +427,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'game.talents.nothingStaged': 'Keine Änderungen zum Anwenden.',
   'game.talents.pickSpecFirst': 'Wählt eine Spezialisierung, um diesen Baum zu öffnen.',
   'game.talents.unlockBanner': 'Talente freigeschaltet!',
-  'game.talents.unlockHint':
-  "Talententscheidungen sind verfügbar: Drückt N, um Talente zu öffnen.",
+  'game.talents.unlockHint': 'Talententscheidungen sind verfügbar: Drückt N, um Talente zu öffnen.',
   'game.talents.copy': 'Kopieren',
   'game.talents.close': 'Schließen',
   'game.talents.cancel': 'Abbrechen',
@@ -4191,20 +4190,20 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Solofreundlich',
   'guide.talentsPage.heading': 'Talente und Spezialisierungen',
   'guide.talentsPage.howBody':
-  "Reihen werden beim Stufenaufstieg freigeschaltet, Spezialisierungen ab Stufe 10. Wählt eine Spezialisierung für ihre Signaturfähigkeit und Meisterschaft, dann nutzt den Reiter Entscheidungen und wählt eine Option aus jeder freigeschalteten Reihe.",
+    'Reihen werden beim Stufenaufstieg freigeschaltet, Spezialisierungen ab Stufe 10. Wählt eine Spezialisierung für ihre Signaturfähigkeit und Meisterschaft, dann nutzt den Reiter Entscheidungen und wählt eine Option aus jeder freigeschalteten Reihe.',
   'guide.talentsPage.howHeading': 'Wie sie funktionieren',
   'guide.talentsPage.intro':
-  "Talente machen eine Klasse zu Eurer eigenen. Sie sind optional, verzeihend und leicht zu ändern, damit Ihr ohne Sorge experimentieren könnt.",
+    'Talente machen eine Klasse zu Eurer eigenen. Sie sind optional, verzeihend und leicht zu ändern, damit Ihr ohne Sorge experimentieren könnt.',
   'guide.talentsPage.resetNote':
-  "Ihr könnt Eure Entscheidungen jederzeit außerhalb des Kampfes zurücksetzen, also ist eine frühe Wahl nie eine Falle. Probiert Dinge aus, seht was Euch gefällt und ändert frei Eure Meinung.",
+    'Ihr könnt Eure Entscheidungen jederzeit außerhalb des Kampfes zurücksetzen, also ist eine frühe Wahl nie eine Falle. Probiert Dinge aus, seht was Euch gefällt und ändert frei Eure Meinung.',
   'guide.talentsPage.resetTitle': 'Nichts ist endgültig',
   'guide.talentsPage.shareNote':
-  "Ein fertiger Build kann als kurzer teilbarer Code kopiert und an einen Freund gegeben werden, der ihn direkt in sein Talentfenster einfügt.",
+    'Ein fertiger Build kann als kurzer teilbarer Code kopiert und an einen Freund gegeben werden, der ihn direkt in sein Talentfenster einfügt.',
   'guide.talentsPage.specsBody':
-  "Jede Klasse hat mehrere Spezialisierungen, jede mit eigener Rolle und Signaturausrichtung. Hier seht Ihr ihre Grundform. Öffnet eine Klasse für ihr vollständiges Kit.",
+    'Jede Klasse hat mehrere Spezialisierungen, jede mit eigener Rolle und Signaturausrichtung. Hier seht Ihr ihre Grundform. Öffnet eine Klasse für ihr vollständiges Kit.',
   'guide.talentsPage.specsHeading': 'Spezialisierungen nach Klasse',
   'guide.talentsPage.whatBody':
-  "Beim Stufenaufstieg werden Talentreihen mit wenigen Entscheidungen freigeschaltet. Jede Wahl fügt Fähigkeiten, Werten oder Werkzeugen eine dauerhafte Verbesserung hinzu und prägt, wie sich Eure Klasse im Kampf anfühlt.",
+    'Beim Stufenaufstieg werden Talentreihen mit wenigen Entscheidungen freigeschaltet. Jede Wahl fügt Fähigkeiten, Werten oder Werkzeugen eine dauerhafte Verbesserung hinzu und prägt, wie sich Eure Klasse im Kampf anfühlt.',
   'guide.talentsPage.whatHeading': 'Was Talente bewirken',
   'guide.toc.heading': 'Auf dieser Seite',
   'guide.wishPage.heading': 'Was ich gern früher gewusst hätte',
@@ -5231,13 +5230,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Sticht den Gegner aus der Distanz und macht ihn bis zu 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. (Überlebens-Signatur)',
   'entities.abilities.arcane_power.name': 'Arkane Macht',
   'entities.abilities.arcane_power.description':
-    'Erfüllt Euch mit arkaner Macht und erhöht Eure Zaubermacht 12 Sek. lang um 28. (Arkan-Signatur)',
+    'Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)',
   'entities.abilities.combustion.name': 'Verbrennung',
   'entities.abilities.combustion.description':
-    'Bündelt Eure Feuermagie, sodass Euer nächster Angriff ein kritischer Treffer ist. (Feuer-Signatur)',
+    'Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)',
+  'entities.abilities.icy_veins.name': 'Eisige Adern',
+  'entities.abilities.icy_veins.description':
+    'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
   'entities.abilities.cone_of_cold.name': 'Kältekegel',
   'entities.abilities.cone_of_cold.description':
-    'Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Frost-Signatur)',
+    'Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Magiertalent)',
   'entities.abilities.cold_blood.name': 'Kaltblütigkeit',
   'entities.abilities.cold_blood.description':
     'Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)',
@@ -5309,7 +5311,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kontert gegnerisches Zauberwirken und verhindert 6 Sek. lang Zauber dieser Schule. (Magier Talent)',
   'entities.abilities.ice_lance.name': 'Eislanze',
   'entities.abilities.ice_lance.description':
-    'Schleudert einen Eissplitter, der {damage} Frostschaden verursacht. Verursacht dreifachen Schaden gegen verwurzelte Ziele. (Magier Talent)',
+    'Schleudert einen Eissplitter, der {damage} Frostschaden verursacht. Verursacht dreifachen Schaden gegen verwurzelte Ziele.',
   'entities.abilities.presence_of_mind.name': 'Geistesgegenwart',
   'entities.abilities.presence_of_mind.description':
     'Macht euren nächsten Zauber mit Zauberzeit sofort. Hält 60 Sek. an. (Magier Talent)',
@@ -5327,118 +5329,118 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ruft einen Meteor auf das Zielgebiet herab, verursacht {damage} Feuerschaden und verbrennt den Boden. (Magier Talent)',
   'entities.abilities.evocation.name': 'Hervorrufung',
   'entities.abilities.evocation.description': 'Stellt rasch Mana wieder her. (Magier Talent)',
-  'entities.abilities.rebuke.name': "Zurechtweisung",
+  'entities.abilities.rebuke.name': 'Zurechtweisung',
   'entities.abilities.rebuke.description':
-    "Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Paladin-Talent)",
-  'entities.abilities.crusader_strike.name': "Kreuzfahrerstoß",
+    'Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Paladin-Talent)',
+  'entities.abilities.crusader_strike.name': 'Kreuzfahrerstoß',
   'entities.abilities.crusader_strike.description':
-    "Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)",
-  'entities.abilities.holy_wrath.name': "Heiliger Zorn",
+    'Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)',
+  'entities.abilities.holy_wrath.name': 'Heiliger Zorn',
   'entities.abilities.holy_wrath.description':
-    "Entfesselt heilige Macht und fügt Gegnern in der Nähe {damage} Schaden zu. (Paladin-Talent)",
-  'entities.abilities.divine_shield.name': "Gottesschild",
+    'Entfesselt heilige Macht und fügt Gegnern in der Nähe {damage} Schaden zu. (Paladin-Talent)',
+  'entities.abilities.divine_shield.name': 'Gottesschild',
   'entities.abilities.divine_shield.description':
-    "Schützt Euch mit heiliger Macht und absorbiert 8 Sek. lang eine enorme Schadensmenge. (Paladin-Talent)",
-  'entities.abilities.avenging_wrath.name': "Zornige Vergeltung",
+    'Schützt Euch mit heiliger Macht und absorbiert 8 Sek. lang eine enorme Schadensmenge. (Paladin-Talent)',
+  'entities.abilities.avenging_wrath.name': 'Zornige Vergeltung',
   'entities.abilities.avenging_wrath.description':
-    "Ruft vergeltende Macht herab und erhöht Angriffskraft und Zaubermacht 20 Sek. lang. (Paladin-Talent)",
-  'entities.abilities.hammer_of_wrath.name': "Hammer des Zorns",
+    'Ruft vergeltende Macht herab und erhöht Angriffskraft und Zaubermacht 20 Sek. lang. (Paladin-Talent)',
+  'entities.abilities.hammer_of_wrath.name': 'Hammer des Zorns',
   'entities.abilities.hammer_of_wrath.description':
-    "Schleudert einen heiligen Hammer auf einen verwundeten Gegner und verursacht {damage} Heiligschaden. Nur unter 20% Gesundheit einsetzbar. (Paladin-Talent)",
-  'entities.abilities.counter_shot.name': "Gegenschuss",
+    'Schleudert einen heiligen Hammer auf einen verwundeten Gegner und verursacht {damage} Heiligschaden. Nur unter 20% Gesundheit einsetzbar. (Paladin-Talent)',
+  'entities.abilities.counter_shot.name': 'Gegenschuss',
   'entities.abilities.counter_shot.description':
-    "Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Jäger-Talent)",
-  'entities.abilities.frost_trap.name': "Frostfalle",
+    'Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Jäger-Talent)',
+  'entities.abilities.frost_trap.name': 'Frostfalle',
   'entities.abilities.frost_trap.description':
-    "Friert Gegner im Zielgebiet 3 Sek. lang fest. (Jäger-Talent)",
-  'entities.abilities.mend_pet.name': "Tier heilen",
+    'Friert Gegner im Zielgebiet 3 Sek. lang fest. (Jäger-Talent)',
+  'entities.abilities.mend_pet.name': 'Tier heilen',
   'entities.abilities.mend_pet.description':
-    "Heilt ein freundliches Ziel über 15 Sek. um {damage}. (Jäger-Talent)",
-  'entities.abilities.multi_shot.name': "Mehrfachschuss",
+    'Heilt ein freundliches Ziel über 15 Sek. um {damage}. (Jäger-Talent)',
+  'entities.abilities.multi_shot.name': 'Mehrfachschuss',
   'entities.abilities.multi_shot.description':
-    "Feuert mehrere Geschosse ab und trifft Gegner in der Nähe für {damage}. (Jäger-Talent)",
-  'entities.abilities.deterrence.name': "Abschreckung",
+    'Feuert mehrere Geschosse ab und trifft Gegner in der Nähe für {damage}. (Jäger-Talent)',
+  'entities.abilities.deterrence.name': 'Abschreckung',
   'entities.abilities.deterrence.description':
-    "Erhöht Eure Ausweichchance 10 Sek. lang um 50%. (Jäger-Talent)",
-  'entities.abilities.aspect_of_the_wild.name': "Aspekt der Wildnis",
+    'Erhöht Eure Ausweichchance 10 Sek. lang um 50%. (Jäger-Talent)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspekt der Wildnis',
   'entities.abilities.aspect_of_the_wild.description':
-    "Inspiriert nahe Verbündete mit wilder Stärke und erhöht 5 Min. lang die Angriffskraft. (Jäger-Talent)",
-  'entities.abilities.kick.name': "Tritt",
+    'Inspiriert nahe Verbündete mit wilder Stärke und erhöht 5 Min. lang die Angriffskraft. (Jäger-Talent)',
+  'entities.abilities.kick.name': 'Tritt',
   'entities.abilities.kick.description':
-    "Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Schurken-Talent)",
-  'entities.abilities.preparation.name': "Vorbereitung",
+    'Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Schurken-Talent)',
+  'entities.abilities.preparation.name': 'Vorbereitung',
   'entities.abilities.preparation.description':
-    "Beendet die Abklingzeit von Sprinten, Entrinnen und Verschwinden. (Schurken-Talent)",
-  'entities.abilities.ghostly_strike.name': "Geisterhafter Stoß",
+    'Beendet die Abklingzeit von Sprinten, Entrinnen und Verschwinden. (Schurken-Talent)',
+  'entities.abilities.ghostly_strike.name': 'Geisterhafter Stoß',
   'entities.abilities.ghostly_strike.description':
-    "Trifft den Gegner für Waffenschaden plus {damage} und erhöht kurzzeitig das Ausweichen. Gewährt 1 Combopunkt. (Schurken-Talent)",
-  'entities.abilities.cloak_of_shadows.name': "Mantel der Schatten",
+    'Trifft den Gegner für Waffenschaden plus {damage} und erhöht kurzzeitig das Ausweichen. Gewährt 1 Combopunkt. (Schurken-Talent)',
+  'entities.abilities.cloak_of_shadows.name': 'Mantel der Schatten',
   'entities.abilities.cloak_of_shadows.description':
-    "Hüllt Euch in Schatten und absorbiert 5 Sek. lang Schaden. (Schurken-Talent)",
-  'entities.abilities.shadowstep.name': "Schattenschritt",
+    'Hüllt Euch in Schatten und absorbiert 5 Sek. lang Schaden. (Schurken-Talent)',
+  'entities.abilities.shadowstep.name': 'Schattenschritt',
   'entities.abilities.shadowstep.description':
-    "Schreitet durch die Schatten auf Euer Ziel zu. (Schurken-Talent)",
-  'entities.abilities.silence.name': "Stille",
+    'Schreitet durch die Schatten auf Euer Ziel zu. (Schurken-Talent)',
+  'entities.abilities.silence.name': 'Stille',
   'entities.abilities.silence.description':
-    "Bringt das Ziel 4 Sek. lang zum Schweigen. (Priester-Talent)",
-  'entities.abilities.psychic_scream.name': "Psychischer Schrei",
+    'Bringt das Ziel 4 Sek. lang zum Schweigen. (Priester-Talent)',
+  'entities.abilities.psychic_scream.name': 'Psychischer Schrei',
   'entities.abilities.psychic_scream.description':
-    "Versetzt Gegner in der Nähe bis zu 4 Sek. lang in Furcht. Schaden kann den Effekt brechen. (Priester-Talent)",
-  'entities.abilities.inner_focus.name': "Innerer Fokus",
+    'Versetzt Gegner in der Nähe bis zu 4 Sek. lang in Furcht. Schaden kann den Effekt brechen. (Priester-Talent)',
+  'entities.abilities.inner_focus.name': 'Innerer Fokus',
   'entities.abilities.inner_focus.description':
-    "Macht Euren nächsten Zauber kostenlos. Hält 60 Sek. lang an. (Priester-Talent)",
-  'entities.abilities.desperate_prayer.name': "Verzweifeltes Gebet",
+    'Macht Euren nächsten Zauber kostenlos. Hält 60 Sek. lang an. (Priester-Talent)',
+  'entities.abilities.desperate_prayer.name': 'Verzweifeltes Gebet',
   'entities.abilities.desperate_prayer.description':
-    "Heilt Euch sofort um {damage}. (Priester-Talent)",
-  'entities.abilities.prayer_of_healing.name': "Gebet der Heilung",
+    'Heilt Euch sofort um {damage}. (Priester-Talent)',
+  'entities.abilities.prayer_of_healing.name': 'Gebet der Heilung',
   'entities.abilities.prayer_of_healing.description':
-    "Heilt Verbündete in der Nähe um {damage}. (Priester-Talent)",
-  'entities.abilities.mind_sear.name': "Gedankenexplosion",
+    'Heilt Verbündete in der Nähe um {damage}. (Priester-Talent)',
+  'entities.abilities.mind_sear.name': 'Gedankenexplosion',
   'entities.abilities.mind_sear.description':
-    "Kanalisiert Schattenenergie im Zielgebiet und fügt Gegnern in der Nähe jede Sekunde {damage} Schaden zu. (Priester-Talent)",
-  'entities.abilities.earthbind.name': "Erdbindung",
+    'Kanalisiert Schattenenergie im Zielgebiet und fügt Gegnern in der Nähe jede Sekunde {damage} Schaden zu. (Priester-Talent)',
+  'entities.abilities.earthbind.name': 'Erdbindung',
   'entities.abilities.earthbind.description':
-    "Bindet Gegner in der Nähe an die Erde und verwurzelt sie 2 Sek. lang. (Schamanen-Talent)",
-  'entities.abilities.healing_stream.name': "Strom der Heilung",
+    'Bindet Gegner in der Nähe an die Erde und verwurzelt sie 2 Sek. lang. (Schamanen-Talent)',
+  'entities.abilities.healing_stream.name': 'Strom der Heilung',
   'entities.abilities.healing_stream.description':
-    "Stellt ein freundliches Ziel über 12 Sek. wieder her. (Schamanen-Talent)",
-  'entities.abilities.chain_lightning.name': "Kettenblitzschlag",
+    'Stellt ein freundliches Ziel über 12 Sek. wieder her. (Schamanen-Talent)',
+  'entities.abilities.chain_lightning.name': 'Kettenblitzschlag',
   'entities.abilities.chain_lightning.description':
-    "Schleudert Blitze in das Zielgebiet und fügt Gegnern in der Nähe {damage} Schaden zu. (Schamanen-Talent)",
-  'entities.abilities.bloodlust.name': "Kampfrausch",
+    'Schleudert Blitze in das Zielgebiet und fügt Gegnern in der Nähe {damage} Schaden zu. (Schamanen-Talent)',
+  'entities.abilities.bloodlust.name': 'Kampfrausch',
   'entities.abilities.bloodlust.description':
-    "Peitscht nahe Verbündete in Raserei und erhöht 15 Sek. lang die Angriffsgeschwindigkeit. (Schamanen-Talent)",
-  'entities.abilities.spell_lock.name': "Zaubersperre",
+    'Peitscht nahe Verbündete in Raserei und erhöht 15 Sek. lang die Angriffsgeschwindigkeit. (Schamanen-Talent)',
+  'entities.abilities.spell_lock.name': 'Zaubersperre',
   'entities.abilities.spell_lock.description':
-    "Unterbricht das Zauberwirken und verhindert 5 Sek. lang Zauber dieser Schule. (Hexenmeister-Talent)",
-  'entities.abilities.howl_of_terror.name': "Schreckensgeheul",
+    'Unterbricht das Zauberwirken und verhindert 5 Sek. lang Zauber dieser Schule. (Hexenmeister-Talent)',
+  'entities.abilities.howl_of_terror.name': 'Schreckensgeheul',
   'entities.abilities.howl_of_terror.description':
-    "Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt brechen. (Hexenmeister-Talent)",
-  'entities.abilities.curse_of_exhaustion.name': "Fluch der Erschöpfung",
+    'Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt brechen. (Hexenmeister-Talent)',
+  'entities.abilities.curse_of_exhaustion.name': 'Fluch der Erschöpfung',
   'entities.abilities.curse_of_exhaustion.description':
-    "Verflucht das Ziel und verringert 12 Sek. lang die Bewegungsgeschwindigkeit um 30%. (Hexenmeister-Talent)",
-  'entities.abilities.death_coil.name': "Todesmantel",
+    'Verflucht das Ziel und verringert 12 Sek. lang die Bewegungsgeschwindigkeit um 30%. (Hexenmeister-Talent)',
+  'entities.abilities.death_coil.name': 'Todesmantel',
   'entities.abilities.death_coil.description':
-    "Trifft den Gegner mit {damage} Schattenschaden und versetzt ihn danach 3 Sek. lang in Schrecken. Diese Version heilt den Zaubernden nicht. (Hexenmeister-Talent)",
-  'entities.abilities.chaos_bolt.name': "Chaosblitz",
+    'Trifft den Gegner mit {damage} Schattenschaden und versetzt ihn danach 3 Sek. lang in Schrecken. Diese Version heilt den Zaubernden nicht. (Hexenmeister-Talent)',
+  'entities.abilities.chaos_bolt.name': 'Chaosblitz',
   'entities.abilities.chaos_bolt.description':
-    "Schleudert einen chaotischen Feuerblitz für {damage} Feuerschaden. (Hexenmeister-Talent)",
-  'entities.abilities.metamorphosis.name': "Metamorphose",
+    'Schleudert einen chaotischen Feuerblitz für {damage} Feuerschaden. (Hexenmeister-Talent)',
+  'entities.abilities.metamorphosis.name': 'Metamorphose',
   'entities.abilities.metamorphosis.description':
-    "Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)",
-  'entities.abilities.skull_bash.name': "Schädelstoß",
+    'Nehmt dämonische Macht an und erhöht 20 Sek. lang Rüstung und Angriffskraft. (Hexenmeister-Talent)',
+  'entities.abilities.skull_bash.name': 'Schädelstoß',
   'entities.abilities.skull_bash.description':
-    "Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Druiden-Talent)",
-  'entities.abilities.innervate.name': "Anregen",
+    'Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule. (Druiden-Talent)',
+  'entities.abilities.innervate.name': 'Anregen',
   'entities.abilities.innervate.description':
-    "Stellt sofort 200 Eurer aktuellen Ressource wieder her. (Druiden-Talent)",
-  'entities.abilities.frenzied_regeneration.name': "Rasende Regeneration",
+    'Stellt sofort 200 Eurer aktuellen Ressource wieder her. (Druiden-Talent)',
+  'entities.abilities.frenzied_regeneration.name': 'Rasende Regeneration',
   'entities.abilities.frenzied_regeneration.description':
-    "Regeneriert Gesundheit über 10 Sek. Nur in Bärengestalt. (Druiden-Talent)",
-  'entities.abilities.berserk.name': "Berserker",
+    'Regeneriert Gesundheit über 10 Sek. Nur in Bärengestalt. (Druiden-Talent)',
+  'entities.abilities.berserk.name': 'Berserker',
   'entities.abilities.berserk.description':
-    "Erhöht 15 Sek. lang die Angriffskraft. (Druiden-Talent)",
-  'entities.abilities.tranquility.name': "Gelassenheit",
+    'Erhöht 15 Sek. lang die Angriffskraft. (Druiden-Talent)',
+  'entities.abilities.tranquility.name': 'Gelassenheit',
   'entities.abilities.tranquility.description':
-    "Kanalisiert erneuernde Energie und heilt jede Sekunde Verbündete in der Nähe. (Druiden-Talent)",
+    'Kanalisiert erneuernde Energie und heilt jede Sekunde Verbündete in der Nähe. (Druiden-Talent)',
 };

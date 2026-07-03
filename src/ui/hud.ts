@@ -32,10 +32,16 @@ import {
   type SkinTier,
   skinRankOrder,
 } from '../sim/content/skins';
-import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
+import {
+  computeTalentModifiers,
+  FIRST_TALENT_LEVEL,
+  type TalentAllocation,
+  talentsFor,
+} from '../sim/content/talents';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
+  abilitiesKnownAt,
   CLASSES,
   COMPANION_UPGRADE_COSTS,
   DELVE_AFFIXES,
@@ -2683,6 +2689,7 @@ export class Hud {
     },
     playerClass: () => this.sim.cfg.playerClass,
     playerLevel: () => this.sim.player.level,
+    abilityTooltipForGrant: (abilityId) => this.abilityTooltipForGrant(abilityId),
     chooseRow: (level, optionId) => this.sim.chooseRow(level, optionId),
     applyTalents: (alloc) => this.sim.applyTalents(alloc),
     resetRows: () => this.sim.resetRows(),
@@ -3402,6 +3409,18 @@ export class Hud {
     return html;
   }
 
+  private abilityTooltipForGrant(abilityId: string): string | null {
+    const known = this.sim.known.find((k) => k.def.id === abilityId);
+    if (known) return this.abilityTooltip(known);
+    if (!ABILITIES[abilityId]) return null;
+    const mods = computeTalentModifiers(this.sim.cfg.playerClass, this.sim.talents);
+    mods.grants.push({ ability: abilityId, rank: 1 });
+    const granted = abilitiesKnownAt(this.sim.cfg.playerClass, this.sim.player.level, mods).find(
+      (k) => k.def.id === abilityId,
+    );
+    return granted ? this.abilityTooltip(granted) : null;
+  }
+
   // -------------------------------------------------------------------------
   // Action bar
   // -------------------------------------------------------------------------
@@ -3653,13 +3672,17 @@ export class Hud {
     const consider = (id: string) => {
       if (this.shouldAutoPlaceOnForm(id, this.activeHotbarForm)) autoPlaceAbilityIds.add(id);
     };
+    const newlyLearnedIds = new Set<string>();
     if (this.knownAbilityIdsAtLastSlotSync === null) {
       if (!this.loadedSlotMapFromStorage) {
         for (const id of knownAbilityIds) consider(id);
       }
     } else {
       for (const id of knownAbilityIds) {
-        if (!this.knownAbilityIdsAtLastSlotSync.has(id)) consider(id);
+        if (!this.knownAbilityIdsAtLastSlotSync.has(id)) {
+          consider(id);
+          newlyLearnedIds.add(id);
+        }
       }
     }
     const formToggle = this.formToggleAbilityId();
@@ -3667,6 +3690,19 @@ export class Hud {
     const synced = syncHotbarActions(this.hotbarActions, knownAbilityIds, autoPlaceAbilityIds);
     this.hotbarActions = synced.actions;
     if (synced.changed) this.saveSlotMap();
+    // Announce only abilities learned this sync that did not land on a bar, so
+    // a persistently full bar cannot re-log the same line every update.
+    for (const id of newlyLearnedIds) {
+      if (this.hotbarActions.some((action) => action?.type === 'ability' && action.id === id)) {
+        continue;
+      }
+      const ability = ABILITIES[id];
+      if (!ability) continue;
+      this.log(
+        this.localizeSystemText(`You have learned a new ability: ${ability.name}.`),
+        '#ffd100',
+      );
+    }
     this.knownAbilityIdsAtLastSlotSync = new Set(knownAbilityIds);
   }
 

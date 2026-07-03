@@ -10,8 +10,7 @@
 // numbers; they never walk the tree. See docs/prd/talents-and-specializations.md.
 // ---------------------------------------------------------------------------
 
-import type { AbilityEffect } from '../types';
-import type { PlayerClass } from '../types';
+import type { AbilityEffect, PlayerClass } from '../types';
 import {
   accumulateRowEffects,
   CHOICE_ROW_LEVELS,
@@ -85,6 +84,7 @@ export interface GlobalModEffect {
   healPct?: number; // healing done
   threatPct?: number; // bonus threat (tank role)
   critVsRooted?: number; // additive spell crit chance against rooted targets
+  hotStreak?: boolean; // two consecutive spell crits empower the next cast-time spell
 }
 
 export interface TalentEffect {
@@ -310,7 +310,9 @@ export function repairAllocation(
   const ct = talentsFor(cls);
   if (!ct) return emptyAllocation();
   const spec =
-    alloc.spec !== null && playerLevel >= FIRST_TALENT_LEVEL && ct.specs.some((s) => s.id === alloc.spec)
+    alloc.spec !== null &&
+    playerLevel >= FIRST_TALENT_LEVEL &&
+    ct.specs.some((s) => s.id === alloc.spec)
       ? alloc.spec
       : null;
   return {
@@ -346,7 +348,14 @@ function zeroStats(): Required<StatModEffect> {
   };
 }
 function zeroGlobal(): Required<GlobalModEffect> {
-  return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0, critVsRooted: 0 };
+  return {
+    meleeDmgPct: 0,
+    spellDmgPct: 0,
+    healPct: 0,
+    threatPct: 0,
+    critVsRooted: 0,
+    hotStreak: false,
+  };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
   return {
@@ -407,6 +416,7 @@ export function accumulateTalentEffect(
     g.healPct += (e.healPct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
     g.critVsRooted += (e.critVsRooted ?? 0) * mult;
+    if (e.hotStreak) g.hotStreak = true;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];

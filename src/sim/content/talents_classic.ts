@@ -137,7 +137,7 @@ const MAGE_SPECS: SpecDef[] = [
     'dps',
     '#',
     'A controlling caster who trades peak burst for survival and slows.',
-    'cone_of_cold',
+    'icy_veins',
     'Shatter',
     'Increases armor by 10%. Increases spell damage by 6%.',
     { global: { spellDmgPct: 0.06 }, stats: { armorPct: 0.1 } },

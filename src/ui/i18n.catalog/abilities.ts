@@ -1173,7 +1173,7 @@ const classAbilityNamesEn = {
       [
         'ice_lance',
         'Ice Lance',
-        'Hurls a shard of ice for {damage} Frost damage. Deals triple damage against rooted targets. (Mage talent)',
+        'Hurls a shard of ice for {damage} Frost damage. Deals triple damage against rooted targets.',
       ],
       [
         'presence_of_mind',
@@ -1392,17 +1392,22 @@ const classAbilityNamesEn = {
       [
         'arcane_power',
         'Arcane Power',
-        'Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)',
+        'Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)',
       ],
       [
         'combustion',
         'Combustion',
-        'Focuses your fire magic so your next attack is a critical strike. (Fire signature)',
+        'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+      ],
+      [
+        'icy_veins',
+        'Icy Veins',
+        'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
       ],
       [
         'cone_of_cold',
         'Cone of Cold',
-        'Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)',
+        'Blasts nearby enemies with frost for {damage} Frost damage. (Mage talent)',
       ],
       [
         'cold_blood',
@@ -2169,17 +2174,22 @@ export const classAbilityNames = {
         [
           'arcane_power',
           'Poder Arcano',
-          'Te llena de poder Arcano, aumentando el poder con hechizos en 28 durante 12 s. (habilidad distintiva de Arcano)',
+          'Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)',
         ],
         [
           'combustion',
           'Combustión',
-          'Concentra tu magia de fuego para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Fuego)',
+          'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
+        ],
+        [
+          'icy_veins',
+          'Venas heladas',
+          'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',
         ],
         [
           'cone_of_cold',
           'Cono de frío',
-          'Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)',
+          'Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (talento de mago)',
         ],
         [
           'cold_blood',
@@ -2978,17 +2988,22 @@ export const classAbilityNames = {
         [
           'arcane_power',
           'Pouvoir des Arcanes',
-          'Vous emplit de puissance arcanique, augmentant la puissance des sorts de 28 pendant 12 s. (signature Arcane)',
+          'Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)',
         ],
         [
           'combustion',
           'Combustion',
-          'Concentre votre magie du feu afin que votre prochaine attaque soit un coup critique. (signature Feu)',
+          'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
+        ],
+        [
+          'icy_veins',
+          'Veines glaciales',
+          'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
         ],
         [
           'cone_of_cold',
           'Cône de froid',
-          'Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (signature Givre)',
+          'Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (talent de mage)',
         ],
         [
           'cold_blood',
@@ -3710,17 +3725,22 @@ export const classAbilityNames = {
         [
           'arcane_power',
           'Potere Arcano',
-          'Ti riempie di potere Arcano, aumentando la potenza magica di 28 per 12 s. (firma Arcano)',
+          'Aumenta i danni magici del 20% e la celerità magica del 10% per 10 s. (firma Arcano)',
         ],
         [
           'combustion',
           'Combustione',
-          'Concentra la tua magia del fuoco, così il tuo prossimo attacco è un colpo critico. (firma Fuoco)',
+          'Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)',
+        ],
+        [
+          'icy_veins',
+          'Vene Gelide',
+          'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
         ],
         [
           'cone_of_cold',
           'Cono di Freddo',
-          'Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (firma Gelo)',
+          'Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (talento del mago)',
         ],
         [
           'cold_blood',
@@ -4448,17 +4468,22 @@ export const classAbilityNames = {
         [
           'arcane_power',
           'Arkane Macht',
-          'Erfüllt Euch mit arkaner Macht und erhöht Eure Zaubermacht 12 Sek. lang um 28. (Arkan-Signatur)',
+          'Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)',
         ],
         [
           'combustion',
           'Verbrennung',
-          'Bündelt Eure Feuermagie, sodass Euer nächster Angriff ein kritischer Treffer ist. (Feuer-Signatur)',
+          'Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)',
+        ],
+        [
+          'icy_veins',
+          'Eisige Adern',
+          'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
         ],
         [
           'cone_of_cold',
           'Kältekegel',
-          'Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Frost-Signatur)',
+          'Trifft nahe Gegner mit Frost und verursacht {damage} Frostschaden. (Magiertalent)',
         ],
         [
           'cold_blood',
@@ -4890,10 +4915,15 @@ export const classAbilityNames = {
         [
           'arcane_power',
           '奥术强化',
-          '让你充满奥术能量，法术强度提高28点，持续12秒。（奥术专精招牌）',
+          '法术伤害提高20%，法术急速提高10%，持续10秒。（奥术专精招牌）',
         ],
-        ['combustion', '燃烧', '集中你的火焰魔法，使下一次攻击造成暴击。（火焰专精招牌）'],
-        ['cone_of_cold', '冰锥术', '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）'],
+        ['combustion', '燃烧', '法术暴击几率提高50%，持续15秒。（火焰专精招牌）'],
+        [
+          'icy_veins',
+          '冰冷血脉',
+          '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
+        ],
+        ['cone_of_cold', '冰锥术', '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（法师天赋）'],
         ['cold_blood', '冷血', '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）'],
         ['blade_flurry', '剑刃乱舞', '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）'],
         [
@@ -5304,10 +5334,15 @@ export const classAbilityNames = {
         [
           'arcane_power',
           '祕法強化',
-          '讓你充滿祕法能量，法術強度提高28點，持續12秒。（祕法專精招牌）',
+          '法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）',
         ],
-        ['combustion', '燃燒', '集中你的火焰魔法，使下一次攻擊造成致命一擊。（火焰專精招牌）'],
-        ['cone_of_cold', '冰錐術', '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）'],
+        ['combustion', '燃燒', '法術致命一擊機率提高50%，持續15秒。（火焰專精招牌）'],
+        [
+          'icy_veins',
+          '冰冷血脈',
+          '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
+        ],
+        ['cone_of_cold', '冰錐術', '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（法師天賦）'],
         ['cold_blood', '冷血', '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）'],
         ['blade_flurry', '劍刃亂舞', '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）'],
         [
@@ -5910,17 +5945,18 @@ export const classAbilityNames = {
         [
           'arcane_power',
           '신비의 마법 강화',
-          '신비한 힘으로 가득 차 12초 동안 주문력이 28만큼 증가합니다. (비전 전문화 상징)',
+          '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
         ],
+        ['combustion', '발화', '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)'],
         [
-          'combustion',
-          '발화',
-          '화염 마법을 집중하여 다음 공격이 치명타로 적중하게 합니다. (화염 전문화 상징)',
+          'icy_veins',
+          '얼음 핏줄',
+          '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
         ],
         [
           'cone_of_cold',
           '냉기 돌풍',
-          '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (냉기 전문화 상징)',
+          '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (마법사 특성)',
         ],
         [
           'cold_blood',
@@ -6580,17 +6616,22 @@ export const classAbilityNames = {
         [
           'arcane_power',
           'アーケインパワー',
-          '秘術の力に満たされ、12秒間呪文力が28上がります。（アーケイン特性のシグネチャ）',
+          '10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）',
         ],
         [
           'combustion',
           'コンバッション',
-          '炎の魔法を集中し、次の攻撃をクリティカルにします。（ファイア特性のシグネチャ）',
+          '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
+        ],
+        [
+          'icy_veins',
+          'アイシーヴェインズ',
+          '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
         ],
         [
           'cone_of_cold',
           'コーンオブコールド',
-          '近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（フロスト特性のシグネチャ）',
+          '近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（メイジタレント）',
         ],
         [
           'cold_blood',
@@ -7294,17 +7335,22 @@ export const classAbilityNames = {
         [
           'arcane_power',
           'Poder Arcano',
-          'Enche você de poder Arcano, aumentando o poder mágico em 28 por 12 s. (assinatura Arcano)',
+          'Aumenta o dano de feitiços em 20% e a aceleração de feitiços em 10% por 10 s. (assinatura Arcano)',
         ],
         [
           'combustion',
           'Combustão',
-          'Concentra sua magia de fogo para que seu próximo ataque seja um acerto crítico. (assinatura Fogo)',
+          'Aumenta a chance de acerto crítico de feitiços em 50% por 15 s. (assinatura Fogo)',
+        ],
+        [
+          'icy_veins',
+          'Veias Gélidas',
+          'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
         ],
         [
           'cone_of_cold',
           'Cone de Frio',
-          'Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (assinatura Gelo)',
+          'Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (talento de mago)',
         ],
         [
           'cold_blood',
@@ -8032,17 +8078,22 @@ export const classAbilityNames = {
         [
           'arcane_power',
           'Мощь тайной магии',
-          'Наполняет вас тайной магией, повышая силу заклинаний на 28 на 12 сек. (знаковое умение Тайной магии)',
+          'Повышает урон от заклинаний на 20% и скорость заклинаний на 10% на 10 сек. (знаковое умение Тайной магии)',
         ],
         [
           'combustion',
           'Возгорание',
-          'Сосредоточивает магию огня, чтобы следующая атака стала критической. (знаковое умение Огня)',
+          'Повышает шанс критического эффекта заклинаний на 50% на 15 сек. (знаковое умение Огня)',
+        ],
+        [
+          'icy_veins',
+          'Ледяные жилы',
+          'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
         ],
         [
           'cone_of_cold',
           'Конус холода',
-          'Поражает ближайших врагов холодом, нанося {damage} ед. урона от магии льда. (знаковое умение Льда)',
+          'Поражает ближайших врагов холодом, нанося {damage} ед. урона от магии льда. (талант мага)',
         ],
         [
           'cold_blood',

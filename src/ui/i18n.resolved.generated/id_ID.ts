@@ -4378,7 +4378,7 @@ export const id_ID: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lanza de hielo",
-        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados."
       },
       "presence_of_mind": {
         "name": "Presencia mental",
@@ -4582,15 +4582,19 @@ export const id_ID: EnTranslations = {
       },
       "arcane_power": {
         "name": "Kekuatan Arkan",
-        "description": "Mengisimu dengan kekuatan arkan, meningkatkan kekuatan mantra sebesar 28 selama 12 dtk. (ciri khas Arkan)"
+        "description": "Meningkatkan kerusakan mantra sebesar 20% dan haste mantra sebesar 10% selama 10 dtk. (signature Arcane)"
       },
       "combustion": {
         "name": "Pembakaran",
-        "description": "Memusatkan sihir apimu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Api)"
+        "description": "Meningkatkan peluang kritis mantra sebesar 50% selama 15 dtk. (signature Fire)"
+      },
+      "icy_veins": {
+        "name": "Urat Es",
+        "description": "Meningkatkan haste mantra sebesar 30% dan mencegah interupsi serta pushback cast selama 10 dtk. (signature Frost)"
       },
       "cone_of_cold": {
         "name": "Kerucut Dingin",
-        "description": "Menghantam musuh di dekatmu dengan es, menimbulkan {damage} kerusakan Es. (ciri khas Es)"
+        "description": "Menghantam musuh di sekitar dengan es sebesar {damage} kerusakan Frost. (talenta Mage)"
       },
       "cold_blood": {
         "name": "Darah Dingin",

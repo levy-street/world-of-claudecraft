@@ -4378,7 +4378,7 @@ export const ja_JP: EnTranslations = {
       },
       "ice_lance": {
         "name": "アイスランス",
-        "description": "氷の破片を投げ、{damage} のフロストダメージを与えます。移動不能の対象には3倍のダメージを与えます。（メイジのタレント）"
+        "description": "氷の破片を投げ、{damage} のフロストダメージを与えます。移動不能の対象には3倍のダメージを与えます。"
       },
       "presence_of_mind": {
         "name": "プレゼンスオブマインド",
@@ -4498,31 +4498,31 @@ export const ja_JP: EnTranslations = {
       },
       "earthbind": {
         "name": "大地の束縛",
-        "description": "近くの敵を大地に縛り、2 秒間移動不能にします。（シャーマンの天賦）"
+        "description": "近くの敵を大地に縛り、2 秒間移動不能にします。（シャーマンのタレント）"
       },
       "healing_stream": {
         "name": "癒やしの流れ",
-        "description": "12 秒かけて味方対象の体力を回復します。（シャーマンの天賦）"
+        "description": "12 秒かけて味方対象の体力を回復します。（シャーマンのタレント）"
       },
       "chain_lightning": {
         "name": "連鎖稲妻",
-        "description": "対象地点に稲妻を放ち、近くの敵に {damage} の自然ダメージを与えます。（シャーマンの天賦）"
+        "description": "対象地点に稲妻を放ち、近くの敵に {damage} のダメージを与えます。（シャーマンのタレント）"
       },
       "bloodlust": {
         "name": "血の渇望",
-        "description": "近くの味方を狂熱させ、15 秒間攻撃速度を上げます。（シャーマンの天賦）"
+        "description": "近くの味方を狂熱させ、15 秒間攻撃速度を上げます。（シャーマンのタレント）"
       },
       "spell_lock": {
         "name": "呪文封じ",
-        "description": "詠唱を中断し、その系統の呪文を 5 秒間封じます。（ウォーロックの天賦）"
+        "description": "詠唱を中断し、その系統の呪文を 5 秒間封じます。（ウォーロックのタレント）"
       },
       "howl_of_terror": {
         "name": "恐怖の遠吠え",
-        "description": "近くの敵を最大 3 秒間恐怖させます。ダメージで解除されることがあります。（ウォーロックの天賦）"
+        "description": "近くの敵を最大 3 秒間恐怖させます。ダメージで解除されることがあります。（ウォーロックのタレント）"
       },
       "curse_of_exhaustion": {
         "name": "疲弊の呪い",
-        "description": "対象を呪い、12 秒間移動速度を 30% 低下させます。（ウォーロックの天賦）"
+        "description": "対象を呪い、12 秒間移動速度を 30% 低下させます。（ウォーロックのタレント）"
       },
       "death_coil": {
         "name": "死の螺旋",
@@ -4530,15 +4530,15 @@ export const ja_JP: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "混沌の矢",
-        "description": "混沌の炎の矢を放ち、{damage} の火炎ダメージを与えます。（ウォーロックの天賦）"
+        "description": "混沌の炎の矢を放ち、{damage} の火炎ダメージを与えます。（ウォーロックのタレント）"
       },
       "metamorphosis": {
         "name": "悪魔変身",
-        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックの天賦）"
+        "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
       },
       "skull_bash": {
         "name": "頭蓋砕き",
-        "description": "詠唱を中断し、その系統の呪文を 4 秒間封じます。（ドルイドの天賦）"
+        "description": "詠唱を中断し、その系統の呪文を 4 秒間封じます。（ドルイドのタレント）"
       },
       "innervate": {
         "name": "啓発",
@@ -4546,15 +4546,15 @@ export const ja_JP: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "狂乱再生",
-        "description": "10 秒かけて体力を回復します。熊形態専用。（ドルイドの天賦）"
+        "description": "10 秒かけて体力を回復します。熊形態専用。（ドルイドのタレント）"
       },
       "berserk": {
         "name": "狂暴化",
-        "description": "15 秒間攻撃力を高めます。（ドルイドの天賦）"
+        "description": "15 秒間攻撃力を高めます。（ドルイドのタレント）"
       },
       "tranquility": {
         "name": "静寂",
-        "description": "回復の力を詠唱し、近くの味方を毎秒回復します。（ドルイドの天賦）"
+        "description": "回復の力を詠唱し、近くの味方を毎秒回復します。（ドルイドのタレント）"
       },
       "holy_shock": {
         "name": "ホーリーショック",
@@ -4582,15 +4582,19 @@ export const ja_JP: EnTranslations = {
       },
       "arcane_power": {
         "name": "アーケインパワー",
-        "description": "秘術の力に満たされ、12秒間呪文力が28上がります。（アーケイン特性のシグネチャ）"
+        "description": "10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）"
       },
       "combustion": {
         "name": "コンバッション",
-        "description": "炎の魔法を集中し、次の攻撃をクリティカルにします。（ファイア特性のシグネチャ）"
+        "description": "15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）"
+      },
+      "icy_veins": {
+        "name": "アイシーヴェインズ",
+        "description": "10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）"
       },
       "cone_of_cold": {
         "name": "コーンオブコールド",
-        "description": "近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（フロスト特性のシグネチャ）"
+        "description": "近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（メイジタレント）"
       },
       "cold_blood": {
         "name": "コールドブラッド",

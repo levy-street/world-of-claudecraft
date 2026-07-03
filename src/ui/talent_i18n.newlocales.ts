@@ -34,6 +34,8 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'helbreder', dps: 'skade' },
     perRank: ' pr. rang',
     noEffect: 'Giver en specialiseringsfordel.',
+    hotStreak:
+      'Efter to kritiske besværgelsestræf i træk bliver din næste besværgelse med udførelsestid øjeblikkelig og gratis.',
     chooseOne: (name) => 'Vælg én ' + name + '-mulighed.',
     specDescription: (className, role, abilityName) =>
       className + '-specialisering med fokus på ' + role + '. Signaturevne: ' + abilityName + '.',
@@ -41,8 +43,7 @@ export const TALENT_NEW: Record<
     increase: (target, amount, perRank) => 'Forøger ' + target + ' med ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Reducerer ' + target + ' med ' + amount + perRank + '.',
     castWhileMoving: (abilityName) => abilityName + ' kan fremmanes under bevægelse.',
-    addRoot: (abilityName, seconds) =>
-      abilityName + ' rodfæster også målet i ' + seconds + ' sek.',
+    addRoot: (abilityName, seconds) => abilityName + ' rodfæster også målet i ' + seconds + ' sek.',
     addAoeRoot: (abilityName, seconds) =>
       abilityName + ' rodfæster også ramte mål i ' + seconds + ' sek.',
     addInterrupt: (abilityName, seconds) =>
@@ -81,6 +82,8 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'penyembuh', dps: 'kerusakan' },
     perRank: ' per tingkat',
     noEffect: 'Memberikan manfaat spesialisasi.',
+    hotStreak:
+      'Setelah dua serangan kritis mantra berturut-turut, mantra berikutnya yang memiliki waktu rapal menjadi instan dan gratis.',
     chooseOne: (name) => 'Pilih salah satu opsi ' + name + '.',
     specDescription: (className, role, abilityName) =>
       'Spesialisasi ' +
@@ -101,7 +104,10 @@ export const TALENT_NEW: Record<
     addAoeRoot: (abilityName, seconds) =>
       abilityName + ' juga mengikat target yang terkena selama ' + seconds + ' dtk.',
     addInterrupt: (abilityName, seconds) =>
-      abilityName + ' juga menghentikan rapalan dan mengunci sekolah itu selama ' + seconds + ' dtk.',
+      abilityName +
+      ' juga menghentikan rapalan dan mengunci sekolah itu selama ' +
+      seconds +
+      ' dtk.',
     addDot: (abilityName, amount, seconds) =>
       abilityName + ' juga memberikan ' + amount + ' kerusakan selama ' + seconds + ' dtk.',
     addLeechDot: (abilityName, amount, seconds) =>
@@ -136,6 +142,8 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'genezer', dps: 'schade' },
     perRank: ' per rang',
     noEffect: 'Biedt een specialisatievoordeel.',
+    hotStreak:
+      'Na twee opeenvolgende kritieke spreukentreffers is je volgende spreuk met een wierptijd onmiddellijk en gratis.',
     chooseOne: (name) => 'Kies één ' + name + '-optie.',
     specDescription: (className, role, abilityName) =>
       className +
@@ -148,8 +156,7 @@ export const TALENT_NEW: Record<
     increase: (target, amount, perRank) => 'Verhoogt ' + target + ' met ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Verlaagt ' + target + ' met ' + amount + perRank + '.',
     castWhileMoving: (abilityName) => abilityName + ' kan tijdens bewegen worden gebruikt.',
-    addRoot: (abilityName, seconds) =>
-      abilityName + ' wortelt het doel ook ' + seconds + ' sec.',
+    addRoot: (abilityName, seconds) => abilityName + ' wortelt het doel ook ' + seconds + ' sec.',
     addAoeRoot: (abilityName, seconds) =>
       abilityName + ' wortelt geraakte doelen ook ' + seconds + ' sec.',
     addInterrupt: (abilityName, seconds) =>
@@ -188,6 +195,8 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'uzdrowiciel', dps: 'obrażenia' },
     perRank: ' na poziom',
     noEffect: 'Zapewnia korzyść specjalizacji.',
+    hotStreak:
+      'Po dwóch kolejnych krytycznych trafieniach zaklęciami twoje następne zaklęcie z czasem rzucania jest natychmiastowe i darmowe.',
     chooseOne: (name) => 'Wybierz jedną opcję: ' + name + '.',
     specDescription: (className, role, abilityName) =>
       'Specjalizacja klasy ' +
@@ -241,6 +250,8 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'läkare', dps: 'skada' },
     perRank: ' per rang',
     noEffect: 'Ger en specialiseringsfördel.',
+    hotStreak:
+      'Efter två kritiska besvärjelseträffar i rad blir din nästa besvärjelse med förberedelsetid omedelbar och gratis.',
     chooseOne: (name) => 'Välj ett ' + name + '-alternativ.',
     specDescription: (className, role, abilityName) =>
       className + '-specialisering inriktad på ' + role + '. Signaturförmåga: ' + abilityName + '.',
@@ -248,8 +259,7 @@ export const TALENT_NEW: Record<
     increase: (target, amount, perRank) => 'Ökar ' + target + ' med ' + amount + perRank + '.',
     reduce: (target, amount, perRank) => 'Minskar ' + target + ' med ' + amount + perRank + '.',
     castWhileMoving: (abilityName) => abilityName + ' kan kastas under rörelse.',
-    addRoot: (abilityName, seconds) =>
-      abilityName + ' rotar också målet i ' + seconds + ' sek.',
+    addRoot: (abilityName, seconds) => abilityName + ' rotar också målet i ' + seconds + ' sek.',
     addAoeRoot: (abilityName, seconds) =>
       abilityName + ' rotar också träffade mål i ' + seconds + ' sek.',
     addInterrupt: (abilityName, seconds) =>
@@ -288,6 +298,8 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'şifacı', dps: 'hasar' },
     perRank: ' her rütbede',
     noEffect: 'Bir uzmanlık avantajı sağlar.',
+    hotStreak:
+      'Art arda iki büyü kritik isabetinden sonra, kullanım süresi olan bir sonraki büyün anında ve bedava olur.',
     chooseOne: (name) => 'Bir ' + name + ' seçeneği seçin.',
     specDescription: (className, role, abilityName) =>
       role + ' odaklı ' + className + ' uzmanlığı. İmza yeteneği: ' + abilityName + '.',
@@ -295,8 +307,7 @@ export const TALENT_NEW: Record<
     increase: (target, amount, perRank) => target + ' değerini ' + amount + perRank + ' artırır.',
     reduce: (target, amount, perRank) => target + ' değerini ' + amount + perRank + ' azaltır.',
     castWhileMoving: (abilityName) => abilityName + ' hareket ederken kullanılabilir.',
-    addRoot: (abilityName, seconds) =>
-      abilityName + ' hedefi ayrıca ' + seconds + ' sn. sabitler.',
+    addRoot: (abilityName, seconds) => abilityName + ' hedefi ayrıca ' + seconds + ' sn. sabitler.',
     addAoeRoot: (abilityName, seconds) =>
       abilityName + ' isabet alan hedefleri ayrıca ' + seconds + ' sn. sabitler.',
     addInterrupt: (abilityName, seconds) =>
@@ -335,6 +346,8 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'đỡ đòn', healer: 'trị liệu', dps: 'sát thương' },
     perRank: ' mỗi cấp',
     noEffect: 'Mang lại lợi ích chuyên môn hóa.',
+    hotStreak:
+      'Sau hai đòn chí mạng phép thuật liên tiếp, phép có thời gian niệm tiếp theo của bạn được thi triển tức thì và miễn phí.',
     chooseOne: (name) => 'Chọn một tùy chọn ' + name + '.',
     specDescription: (className, role, abilityName) =>
       'Chuyên môn hóa ' +

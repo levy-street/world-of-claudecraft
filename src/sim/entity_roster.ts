@@ -184,6 +184,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.autoAttack = false;
   p.queuedOnSwing = null;
   delete p.queuedOnSwingFree;
+  p.spellCritStreak = 0;
   p.combatTimer = 99;
   p.inCombat = false;
   ctx.emit({ type: 'respawn', pid: meta.entityId });
@@ -219,6 +220,10 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
         ? 100
         : 0;
   p.targetId = null;
+  p.autoAttack = false;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  p.spellCritStreak = 0;
   p.combatTimer = 99;
   p.inCombat = false;
   ctx.emit({ type: 'respawn', pid });

@@ -4152,20 +4152,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': '솔로에 적합',
   'guide.talentsPage.heading': '특성과 전문화',
   'guide.talentsPage.howBody':
-  "줄은 레벨에 따라 열리고 전문화는 10레벨에 열립니다. 대표 능력과 숙련을 보고 전문화를 고른 뒤, 선택 탭에서 열린 각 줄마다 하나의 선택지를 고르세요.",
+    '줄은 레벨에 따라 열리고 전문화는 10레벨에 열립니다. 대표 능력과 숙련을 보고 전문화를 고른 뒤, 선택 탭에서 열린 각 줄마다 하나의 선택지를 고르세요.',
   'guide.talentsPage.howHeading': '작동 방식',
   'guide.talentsPage.intro':
-  "특성은 직업을 내 방식으로 다듬는 수단입니다. 선택 사항이고 부담 없이 바꿀 수 있어 마음껏 실험할 수 있습니다.",
+    '특성은 직업을 내 방식으로 다듬는 수단입니다. 선택 사항이고 부담 없이 바꿀 수 있어 마음껏 실험할 수 있습니다.',
   'guide.talentsPage.resetNote':
-  "전투 중이 아닐 때는 언제든 선택을 초기화할 수 있으므로 초반 선택이 함정이 되지 않습니다. 여러 가지를 시험하고 마음에 드는 것을 찾은 뒤 자유롭게 바꾸세요.",
+    '전투 중이 아닐 때는 언제든 선택을 초기화할 수 있으므로 초반 선택이 함정이 되지 않습니다. 여러 가지를 시험하고 마음에 드는 것을 찾은 뒤 자유롭게 바꾸세요.',
   'guide.talentsPage.resetTitle': '영구적인 것은 없습니다',
   'guide.talentsPage.shareNote':
-  "완성한 빌드는 짧은 공유 코드로 복사해 친구에게 줄 수 있으며, 친구는 자신의 특성 패널에 붙여넣어 바로 불러올 수 있습니다.",
+    '완성한 빌드는 짧은 공유 코드로 복사해 친구에게 줄 수 있으며, 친구는 자신의 특성 패널에 붙여넣어 바로 불러올 수 있습니다.',
   'guide.talentsPage.specsBody':
-  "각 직업에는 여러 전문화가 있으며, 각각 고유한 역할과 대표 초점이 있습니다. 여기에서 전체 형태를 확인하세요. 전체 기술 구성을 보려면 직업을 여세요.",
+    '각 직업에는 여러 전문화가 있으며, 각각 고유한 역할과 대표 초점이 있습니다. 여기에서 전체 형태를 확인하세요. 전체 기술 구성을 보려면 직업을 여세요.',
   'guide.talentsPage.specsHeading': '직업별 전문화',
   'guide.talentsPage.whatBody':
-  "레벨을 올리면 몇 가지 선택지가 있는 특성 줄이 열립니다. 각 선택은 능력, 능력치, 도구에 영구적인 강화를 더해 전투에서 직업의 느낌을 바꿉니다.",
+    '레벨을 올리면 몇 가지 선택지가 있는 특성 줄이 열립니다. 각 선택은 능력, 능력치, 도구에 영구적인 강화를 더해 전투에서 직업의 느낌을 바꿉니다.',
   'guide.talentsPage.whatHeading': '특성이 하는 일',
   'guide.toc.heading': '이 페이지에서',
   'guide.wishPage.heading': '미리 알았으면 좋았을 것들',
@@ -5069,13 +5069,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '원거리에서 적을 쏘아 최대 4초 동안 행동 불가로 만듭니다. 피해를 받으면 효과가 해제됩니다. (생존 전문화 상징)',
   'entities.abilities.arcane_power.name': '신비의 마법 강화',
   'entities.abilities.arcane_power.description':
-    '신비한 힘으로 가득 차 12초 동안 주문력이 28만큼 증가합니다. (비전 전문화 상징)',
+    '10초 동안 주문 공격력이 20%, 주문 가속이 10% 증가합니다. (비전 전문화 상징)',
   'entities.abilities.combustion.name': '발화',
   'entities.abilities.combustion.description':
-    '화염 마법을 집중하여 다음 공격이 치명타로 적중하게 합니다. (화염 전문화 상징)',
+    '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)',
+  'entities.abilities.icy_veins.name': '얼음 핏줄',
+  'entities.abilities.icy_veins.description':
+    '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
   'entities.abilities.cone_of_cold.name': '냉기 돌풍',
   'entities.abilities.cone_of_cold.description':
-    '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (냉기 전문화 상징)',
+    '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (마법사 특성)',
   'entities.abilities.cold_blood.name': '냉혈',
   'entities.abilities.cold_blood.description':
     '살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)',
@@ -5147,7 +5150,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적의 주문 시전을 차단하고 6초 동안 같은 계열의 주문을 시전하지 못하게 합니다. (마법사 특성)',
   'entities.abilities.ice_lance.name': '얼음창',
   'entities.abilities.ice_lance.description':
-    '얼음 파편을 던져 {damage}의 냉기 피해를 줍니다. 이동 불가 대상에게 세 배의 피해를 줍니다. (마법사 특성)',
+    '얼음 파편을 던져 {damage}의 냉기 피해를 줍니다. 이동 불가 대상에게 세 배의 피해를 줍니다.',
   'entities.abilities.presence_of_mind.name': '냉정',
   'entities.abilities.presence_of_mind.description':
     '다음 시전 시간이 있는 주문을 즉시 시전하게 합니다. 60초 동안 지속됩니다. (마법사 특성)',
@@ -5180,9 +5183,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '응징의 격노',
   'entities.abilities.avenging_wrath.description':
     '응징의 힘을 불러 20초 동안 전투력과 주문력을 높입니다. (성기사 특성)',
-  'entities.abilities.hammer_of_wrath.name': "응징의 망치",
+  'entities.abilities.hammer_of_wrath.name': '응징의 망치',
   'entities.abilities.hammer_of_wrath.description':
-    "부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. 생명력이 20% 미만인 대상에게만 사용할 수 있습니다. (성기사 특성)",
+    '부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 줍니다. 생명력이 20% 미만인 대상에게만 사용할 수 있습니다. (성기사 특성)',
   'entities.abilities.counter_shot.name': '반격 사격',
   'entities.abilities.counter_shot.description':
     '주문 시전을 방해하고 같은 계열 주문을 4초 동안 시전하지 못하게 합니다. (사냥꾼 특성)',
@@ -5229,9 +5232,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '치유의 기원',
   'entities.abilities.prayer_of_healing.description':
     '주위 아군을 {damage}만큼 치유합니다. (사제 특성)',
-  'entities.abilities.mind_sear.name': "정신 불태우기",
+  'entities.abilities.mind_sear.name': '정신 불태우기',
   'entities.abilities.mind_sear.description':
-    "대상 지역에 암흑 에너지를 집중해 주변 적에게 매초 {damage}의 피해를 줍니다. (사제 특성)",
+    '대상 지역에 암흑 에너지를 집중해 주변 적에게 매초 {damage}의 피해를 줍니다. (사제 특성)',
   'entities.abilities.earthbind.name': '대지 결속',
   'entities.abilities.earthbind.description':
     '주변 적을 대지에 묶어 2초 동안 이동 불가로 만듭니다. (주술사 특성)',
@@ -5253,9 +5256,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.curse_of_exhaustion.name': '피로의 저주',
   'entities.abilities.curse_of_exhaustion.description':
     '대상을 저주해 12초 동안 이동 속도를 30% 낮춥니다. (흑마법사 특성)',
-  'entities.abilities.death_coil.name': "죽음의 고리",
+  'entities.abilities.death_coil.name': '죽음의 고리',
   'entities.abilities.death_coil.description':
-    "적에게 {damage}의 암흑 피해를 준 뒤 3초 동안 공포에 빠뜨립니다. 이 버전은 시전자를 치유하지 않습니다. (흑마법사 특성)",
+    '적에게 {damage}의 암흑 피해를 준 뒤 3초 동안 공포에 빠뜨립니다. 이 버전은 시전자를 치유하지 않습니다. (흑마법사 특성)',
   'entities.abilities.chaos_bolt.name': '혼돈의 화살',
   'entities.abilities.chaos_bolt.description':
     '혼돈의 불꽃 화살을 던져 {damage}의 화염 피해를 줍니다. (흑마법사 특성)',
@@ -5265,15 +5268,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.skull_bash.name': '두개골 강타',
   'entities.abilities.skull_bash.description':
     '시전을 방해하고 해당 계열 주문을 4초 동안 막습니다. (드루이드 특성)',
-  'entities.abilities.innervate.name': "정신 자극",
-  'entities.abilities.innervate.description':
-    "현재 자원을 즉시 200 회복합니다. (드루이드 특성)",
+  'entities.abilities.innervate.name': '정신 자극',
+  'entities.abilities.innervate.description': '현재 자원을 즉시 200 회복합니다. (드루이드 특성)',
   'entities.abilities.frenzied_regeneration.name': '광포한 재생력',
   'entities.abilities.frenzied_regeneration.description':
     '10초에 걸쳐 생명력을 회복합니다. 곰 변신 전용. (드루이드 특성)',
   'entities.abilities.berserk.name': '광폭화',
-  'entities.abilities.berserk.description':
-    '15초 동안 전투력을 높입니다. (드루이드 특성)',
+  'entities.abilities.berserk.description': '15초 동안 전투력을 높입니다. (드루이드 특성)',
   'entities.abilities.tranquility.name': '평온',
   'entities.abilities.tranquility.description':
     '회복 에너지를 집중하여 주변 아군을 매초 치유합니다. (드루이드 특성)',

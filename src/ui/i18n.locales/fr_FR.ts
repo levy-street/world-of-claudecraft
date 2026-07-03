@@ -431,7 +431,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'game.talents.pickSpecFirst': 'Choisissez une spécialisation pour accéder à cet arbre.',
   'game.talents.unlockBanner': 'Talents débloqués!',
   'game.talents.unlockHint':
-  "Des choix de talents sont disponibles: appuyez sur N pour ouvrir Talents.",
+    'Des choix de talents sont disponibles: appuyez sur N pour ouvrir Talents.',
   'game.talents.copy': 'Copier',
   'game.talents.close': 'Fermer',
   'game.talents.cancel': 'Annuler',
@@ -4206,20 +4206,20 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Adaptée au solo',
   'guide.talentsPage.heading': 'Talents et spécialisations',
   'guide.talentsPage.howBody':
-  "Les rangées se débloquent avec les niveaux, et les spécialisations s ouvrent au niveau 10. Choisissez une spécialisation pour sa technique signature et sa maîtrise, puis utilisez l onglet Choix pour prendre une option dans chaque rangée débloquée.",
+    'Les rangées se débloquent avec les niveaux, et les spécialisations s ouvrent au niveau 10. Choisissez une spécialisation pour sa technique signature et sa maîtrise, puis utilisez l onglet Choix pour prendre une option dans chaque rangée débloquée.',
   'guide.talentsPage.howHeading': 'Comment ils fonctionnent',
   'guide.talentsPage.intro':
-  "Les talents vous permettent de personnaliser votre classe. Ils sont optionnels, souples et faciles à changer, vous pouvez donc expérimenter sans crainte.",
+    'Les talents vous permettent de personnaliser votre classe. Ils sont optionnels, souples et faciles à changer, vous pouvez donc expérimenter sans crainte.',
   'guide.talentsPage.resetNote':
-  "Vous pouvez réinitialiser vos choix dès que vous êtes hors combat, donc un choix précoce n est jamais un piège. Essayez, voyez ce qui vous plaît et changez librement.",
+    'Vous pouvez réinitialiser vos choix dès que vous êtes hors combat, donc un choix précoce n est jamais un piège. Essayez, voyez ce qui vous plaît et changez librement.',
   'guide.talentsPage.resetTitle': "Rien n'est définitif",
   'guide.talentsPage.shareNote':
-  "Une configuration terminée peut être copiée sous forme de code court à partager avec un ami, qui le colle directement dans son panneau de talents pour la charger.",
+    'Une configuration terminée peut être copiée sous forme de code court à partager avec un ami, qui le colle directement dans son panneau de talents pour la charger.',
   'guide.talentsPage.specsBody':
-  "Chaque classe a plusieurs spécialisations, chacune avec son rôle et son axe signature. Voici leur profil général. Ouvrez une classe pour voir tout son kit.",
+    'Chaque classe a plusieurs spécialisations, chacune avec son rôle et son axe signature. Voici leur profil général. Ouvrez une classe pour voir tout son kit.',
   'guide.talentsPage.specsHeading': 'Spécialisations par classe',
   'guide.talentsPage.whatBody':
-  "En montant de niveau, des rangées de talents se débloquent avec quelques choix. Chaque choix ajoute une amélioration permanente à vos techniques, caractéristiques ou outils, et façonne le ressenti de votre classe en combat.",
+    'En montant de niveau, des rangées de talents se débloquent avec quelques choix. Chaque choix ajoute une amélioration permanente à vos techniques, caractéristiques ou outils, et façonne le ressenti de votre classe en combat.',
   'guide.talentsPage.whatHeading': 'Ce que font les talents',
   'guide.toc.heading': 'Sur cette page',
   'guide.wishPage.heading': "Ce que j'aurais aimé savoir",
@@ -5247,13 +5247,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Pique l’ennemi à distance et le rend incapable d’agir pendant un maximum de 4 s. Tout dégât interrompt l’effet. (signature Survie)',
   'entities.abilities.arcane_power.name': 'Pouvoir des Arcanes',
   'entities.abilities.arcane_power.description':
-    'Vous emplit de puissance arcanique, augmentant la puissance des sorts de 28 pendant 12 s. (signature Arcane)',
+    'Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)',
   'entities.abilities.combustion.name': 'Combustion',
   'entities.abilities.combustion.description':
-    'Concentre votre magie du feu afin que votre prochaine attaque soit un coup critique. (signature Feu)',
+    'Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)',
+  'entities.abilities.icy_veins.name': 'Veines glaciales',
+  'entities.abilities.icy_veins.description':
+    'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
   'entities.abilities.cone_of_cold.name': 'Cône de froid',
   'entities.abilities.cone_of_cold.description':
-    'Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (signature Givre)',
+    'Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (talent de mage)',
   'entities.abilities.cold_blood.name': 'Sang froid',
   'entities.abilities.cold_blood.description':
     'Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)',
@@ -5325,7 +5328,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Contre l’incantation ennemie et empêche de lancer des sorts de cette école pendant 6 s. (Talent de mage)',
   'entities.abilities.ice_lance.name': 'Javelot de glace',
   'entities.abilities.ice_lance.description':
-    'Projette un éclat de glace qui inflige {damage} points de dégâts de Givre. Inflige le triple aux cibles enracinées. (Talent de mage)',
+    'Projette un éclat de glace qui inflige {damage} points de dégâts de Givre. Inflige le triple aux cibles enracinées.',
   'entities.abilities.presence_of_mind.name': 'Présence spirituelle',
   'entities.abilities.presence_of_mind.description':
     'Rend instantané votre prochain sort avec un temps d incantation. Dure 60 s. (Talent de mage)',
@@ -5343,118 +5346,118 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Fait tomber un météore sur la zone ciblée, inflige {damage} points de dégâts de Feu et embrase le sol. (Talent de mage)',
   'entities.abilities.evocation.name': 'Évocation',
   'entities.abilities.evocation.description': 'Restaure rapidement du mana. (Talent de mage)',
-  'entities.abilities.rebuke.name': "Réprimande",
+  'entities.abilities.rebuke.name': 'Réprimande',
   'entities.abilities.rebuke.description':
-    "Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de paladin)",
-  'entities.abilities.crusader_strike.name': "Frappe du croisé",
+    'Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de paladin)',
+  'entities.abilities.crusader_strike.name': 'Frappe du croisé',
   'entities.abilities.crusader_strike.description':
-    "Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)",
-  'entities.abilities.holy_wrath.name': "Colère divine",
+    'Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)',
+  'entities.abilities.holy_wrath.name': 'Colère divine',
   'entities.abilities.holy_wrath.description':
-    "Déchaîne la puissance sacrée et inflige {damage} points de dégâts aux ennemis proches. (talent de paladin)",
-  'entities.abilities.divine_shield.name': "Bouclier divin",
+    'Déchaîne la puissance sacrée et inflige {damage} points de dégâts aux ennemis proches. (talent de paladin)',
+  'entities.abilities.divine_shield.name': 'Bouclier divin',
   'entities.abilities.divine_shield.description':
-    "Vous protège d’une puissance sacrée et absorbe une quantité massive de dégâts pendant 8 s. (talent de paladin)",
-  'entities.abilities.avenging_wrath.name': "Courroux vengeur",
+    'Vous protège d’une puissance sacrée et absorbe une quantité massive de dégâts pendant 8 s. (talent de paladin)',
+  'entities.abilities.avenging_wrath.name': 'Courroux vengeur',
   'entities.abilities.avenging_wrath.description':
-    "Appelle une puissance vengeresse, ce qui augmente la puissance d’attaque et la puissance des sorts pendant 20 s. (talent de paladin)",
-  'entities.abilities.hammer_of_wrath.name': "Marteau de courroux",
+    'Appelle une puissance vengeresse, ce qui augmente la puissance d’attaque et la puissance des sorts pendant 20 s. (talent de paladin)',
+  'entities.abilities.hammer_of_wrath.name': 'Marteau de courroux',
   'entities.abilities.hammer_of_wrath.description':
-    "Lance un marteau sacré sur un ennemi blessé et inflige {damage} points de dégâts du Sacré. Utilisable seulement sous 20% de points de vie. (talent de paladin)",
-  'entities.abilities.counter_shot.name': "Flèche-bâillon",
+    'Lance un marteau sacré sur un ennemi blessé et inflige {damage} points de dégâts du Sacré. Utilisable seulement sous 20% de points de vie. (talent de paladin)',
+  'entities.abilities.counter_shot.name': 'Flèche-bâillon',
   'entities.abilities.counter_shot.description':
-    "Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de chasseur)",
-  'entities.abilities.frost_trap.name': "Piège de givre",
+    'Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de chasseur)',
+  'entities.abilities.frost_trap.name': 'Piège de givre',
   'entities.abilities.frost_trap.description':
-    "Gèle les ennemis dans la zone ciblée pendant 3 s. (talent de chasseur)",
-  'entities.abilities.mend_pet.name': "Guérison du familier",
+    'Gèle les ennemis dans la zone ciblée pendant 3 s. (talent de chasseur)',
+  'entities.abilities.mend_pet.name': 'Guérison du familier',
   'entities.abilities.mend_pet.description':
-    "Rend {damage} points de vie à une cible alliée en 15 s. (talent de chasseur)",
-  'entities.abilities.multi_shot.name': "Flèches multiples",
+    'Rend {damage} points de vie à une cible alliée en 15 s. (talent de chasseur)',
+  'entities.abilities.multi_shot.name': 'Flèches multiples',
   'entities.abilities.multi_shot.description':
-    "Tire plusieurs projectiles qui touchent les ennemis proches et infligent {damage} points de dégâts. (talent de chasseur)",
-  'entities.abilities.deterrence.name': "Dissuasion",
+    'Tire plusieurs projectiles qui touchent les ennemis proches et infligent {damage} points de dégâts. (talent de chasseur)',
+  'entities.abilities.deterrence.name': 'Dissuasion',
   'entities.abilities.deterrence.description':
-    "Augmente vos chances d’esquiver de 50% pendant 10 s. (talent de chasseur)",
-  'entities.abilities.aspect_of_the_wild.name': "Aspect de la nature",
+    'Augmente vos chances d’esquiver de 50% pendant 10 s. (talent de chasseur)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspect de la nature',
   'entities.abilities.aspect_of_the_wild.description':
-    "Inspire les alliés proches d’une force sauvage, ce qui augmente leur puissance d’attaque pendant 5 min. (talent de chasseur)",
-  'entities.abilities.kick.name': "Coup de pied",
+    'Inspire les alliés proches d’une force sauvage, ce qui augmente leur puissance d’attaque pendant 5 min. (talent de chasseur)',
+  'entities.abilities.kick.name': 'Coup de pied',
   'entities.abilities.kick.description':
-    "Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de voleur)",
-  'entities.abilities.preparation.name': "Préparation",
+    'Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de voleur)',
+  'entities.abilities.preparation.name': 'Préparation',
   'entities.abilities.preparation.description':
-    "Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de voleur)",
-  'entities.abilities.ghostly_strike.name': "Frappe fantomatique",
+    'Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de voleur)',
+  'entities.abilities.ghostly_strike.name': 'Frappe fantomatique',
   'entities.abilities.ghostly_strike.description':
-    "Frappe l’ennemi avec les dégâts de l’arme plus {damage} et augmente brièvement l’esquive. Confère 1 point de combo. (talent de voleur)",
-  'entities.abilities.cloak_of_shadows.name': "Cape d’ombre",
+    'Frappe l’ennemi avec les dégâts de l’arme plus {damage} et augmente brièvement l’esquive. Confère 1 point de combo. (talent de voleur)',
+  'entities.abilities.cloak_of_shadows.name': 'Cape d’ombre',
   'entities.abilities.cloak_of_shadows.description':
-    "Vous enveloppe d’ombres et absorbe les dégâts pendant 5 s. (talent de voleur)",
-  'entities.abilities.shadowstep.name': "Pas de l’ombre",
+    'Vous enveloppe d’ombres et absorbe les dégâts pendant 5 s. (talent de voleur)',
+  'entities.abilities.shadowstep.name': 'Pas de l’ombre',
   'entities.abilities.shadowstep.description':
-    "Vous avancez à travers les ombres vers votre cible. (talent de voleur)",
-  'entities.abilities.silence.name': "Silence",
+    'Vous avancez à travers les ombres vers votre cible. (talent de voleur)',
+  'entities.abilities.silence.name': 'Silence',
   'entities.abilities.silence.description':
-    "Réduit la cible au silence pendant 4 s. (talent de prêtre)",
-  'entities.abilities.psychic_scream.name': "Cri psychique",
+    'Réduit la cible au silence pendant 4 s. (talent de prêtre)',
+  'entities.abilities.psychic_scream.name': 'Cri psychique',
   'entities.abilities.psychic_scream.description':
-    "Effraie les ennemis proches pendant un maximum de 4 s. Les dégâts peuvent interrompre l’effet. (talent de prêtre)",
-  'entities.abilities.inner_focus.name': "Focalisation améliorée",
+    'Effraie les ennemis proches pendant un maximum de 4 s. Les dégâts peuvent interrompre l’effet. (talent de prêtre)',
+  'entities.abilities.inner_focus.name': 'Focalisation améliorée',
   'entities.abilities.inner_focus.description':
-    "Rend votre prochain sort gratuit. Dure 60 s. (talent de prêtre)",
-  'entities.abilities.desperate_prayer.name': "Prière du désespoir",
+    'Rend votre prochain sort gratuit. Dure 60 s. (talent de prêtre)',
+  'entities.abilities.desperate_prayer.name': 'Prière du désespoir',
   'entities.abilities.desperate_prayer.description':
-    "Vous rend instantanément {damage} points de vie. (talent de prêtre)",
-  'entities.abilities.prayer_of_healing.name': "Prière de soins",
+    'Vous rend instantanément {damage} points de vie. (talent de prêtre)',
+  'entities.abilities.prayer_of_healing.name': 'Prière de soins',
   'entities.abilities.prayer_of_healing.description':
-    "Rend {damage} points de vie aux alliés proches. (talent de prêtre)",
-  'entities.abilities.mind_sear.name': "Incandescence mentale",
+    'Rend {damage} points de vie aux alliés proches. (talent de prêtre)',
+  'entities.abilities.mind_sear.name': 'Incandescence mentale',
   'entities.abilities.mind_sear.description':
-    "Canalise de l’énergie d’Ombre dans la zone ciblée et inflige {damage} points de dégâts par seconde aux ennemis proches. (talent de prêtre)",
-  'entities.abilities.earthbind.name': "Lien terrestre",
+    'Canalise de l’énergie d’Ombre dans la zone ciblée et inflige {damage} points de dégâts par seconde aux ennemis proches. (talent de prêtre)',
+  'entities.abilities.earthbind.name': 'Lien terrestre',
   'entities.abilities.earthbind.description':
-    "Lie les ennemis proches à la terre et les immobilise pendant 2 s. (talent de chaman)",
-  'entities.abilities.healing_stream.name': "Flot de soins",
+    'Lie les ennemis proches à la terre et les immobilise pendant 2 s. (talent de chaman)',
+  'entities.abilities.healing_stream.name': 'Flot de soins',
   'entities.abilities.healing_stream.description':
-    "Restaure une cible alliée pendant 12 s. (talent de chaman)",
-  'entities.abilities.chain_lightning.name': "Chaîne d’éclairs",
+    'Restaure une cible alliée pendant 12 s. (talent de chaman)',
+  'entities.abilities.chain_lightning.name': 'Chaîne d’éclairs',
   'entities.abilities.chain_lightning.description':
-    "Projette des éclairs dans la zone ciblée et inflige {damage} points de dégâts aux ennemis proches. (talent de chaman)",
-  'entities.abilities.bloodlust.name': "Furie sanguinaire",
+    'Projette des éclairs dans la zone ciblée et inflige {damage} points de dégâts aux ennemis proches. (talent de chaman)',
+  'entities.abilities.bloodlust.name': 'Furie sanguinaire',
   'entities.abilities.bloodlust.description':
-    "Pousse les alliés proches à la frénésie et augmente leur vitesse d’attaque pendant 15 s. (talent de chaman)",
-  'entities.abilities.spell_lock.name': "Verrou magique",
+    'Pousse les alliés proches à la frénésie et augmente leur vitesse d’attaque pendant 15 s. (talent de chaman)',
+  'entities.abilities.spell_lock.name': 'Verrou magique',
   'entities.abilities.spell_lock.description':
-    "Interrompt l’incantation et empêche les sorts de cette école pendant 5 s. (talent de démoniste)",
-  'entities.abilities.howl_of_terror.name': "Hurlement de terreur",
+    'Interrompt l’incantation et empêche les sorts de cette école pendant 5 s. (talent de démoniste)',
+  'entities.abilities.howl_of_terror.name': 'Hurlement de terreur',
   'entities.abilities.howl_of_terror.description':
-    "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l’effet. (talent de démoniste)",
-  'entities.abilities.curse_of_exhaustion.name': "Malédiction de fatigue",
+    'Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l’effet. (talent de démoniste)',
+  'entities.abilities.curse_of_exhaustion.name': 'Malédiction de fatigue',
   'entities.abilities.curse_of_exhaustion.description':
-    "Maudit la cible et réduit sa vitesse de déplacement de 30% pendant 12 s. (talent de démoniste)",
-  'entities.abilities.death_coil.name': "Voile mortel",
+    'Maudit la cible et réduit sa vitesse de déplacement de 30% pendant 12 s. (talent de démoniste)',
+  'entities.abilities.death_coil.name': 'Voile mortel',
   'entities.abilities.death_coil.description':
-    "Frappe l’ennemi et inflige {damage} points de dégâts d’Ombre, puis l’horrifie pendant 3 s. Cette version ne soigne pas le lanceur. (talent de démoniste)",
-  'entities.abilities.chaos_bolt.name': "Trait du chaos",
+    'Frappe l’ennemi et inflige {damage} points de dégâts d’Ombre, puis l’horrifie pendant 3 s. Cette version ne soigne pas le lanceur. (talent de démoniste)',
+  'entities.abilities.chaos_bolt.name': 'Trait du chaos',
   'entities.abilities.chaos_bolt.description':
-    "Projette un trait de feu chaotique qui inflige {damage} points de dégâts de Feu. (talent de démoniste)",
-  'entities.abilities.metamorphosis.name': "Métamorphose",
+    'Projette un trait de feu chaotique qui inflige {damage} points de dégâts de Feu. (talent de démoniste)',
+  'entities.abilities.metamorphosis.name': 'Métamorphose',
   'entities.abilities.metamorphosis.description':
-    "Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)",
-  'entities.abilities.skull_bash.name': "Coup de crâne",
+    'Vous adoptez une puissance démoniaque, ce qui augmente l’armure et la puissance d’attaque pendant 20 s. (talent de démoniste)',
+  'entities.abilities.skull_bash.name': 'Coup de crâne',
   'entities.abilities.skull_bash.description':
-    "Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de druide)",
-  'entities.abilities.innervate.name': "Innervation",
+    'Interrompt l’incantation et empêche les sorts de cette école pendant 4 s. (talent de druide)',
+  'entities.abilities.innervate.name': 'Innervation',
   'entities.abilities.innervate.description':
-    "Restaure instantanément 200 de votre ressource actuelle. (talent de druide)",
-  'entities.abilities.frenzied_regeneration.name': "Régénération frénétique",
+    'Restaure instantanément 200 de votre ressource actuelle. (talent de druide)',
+  'entities.abilities.frenzied_regeneration.name': 'Régénération frénétique',
   'entities.abilities.frenzied_regeneration.description':
-    "Régénère des points de vie pendant 10 s. Forme d’ours uniquement. (talent de druide)",
-  'entities.abilities.berserk.name': "Berserk",
+    'Régénère des points de vie pendant 10 s. Forme d’ours uniquement. (talent de druide)',
+  'entities.abilities.berserk.name': 'Berserk',
   'entities.abilities.berserk.description':
-    "Augmente la puissance d’attaque pendant 15 s. (talent de druide)",
-  'entities.abilities.tranquility.name': "Tranquillité",
+    'Augmente la puissance d’attaque pendant 15 s. (talent de druide)',
+  'entities.abilities.tranquility.name': 'Tranquillité',
   'entities.abilities.tranquility.description':
-    "Canalise une énergie restauratrice qui soigne chaque seconde les alliés proches. (talent de druide)",
+    'Canalise une énergie restauratrice qui soigne chaque seconde les alliés proches. (talent de druide)',
 };

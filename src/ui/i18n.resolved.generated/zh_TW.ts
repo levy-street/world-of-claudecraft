@@ -4378,7 +4378,7 @@ export const zh_TW: EnTranslations = {
       },
       "ice_lance": {
         "name": "冰霜長矛",
-        "description": "投擲寒冰碎片，造成 {damage} 點冰霜傷害。對被定身目標造成三倍傷害。（法師天賦）"
+        "description": "投擲寒冰碎片，造成 {damage} 點冰霜傷害。對被定身目標造成三倍傷害。"
       },
       "presence_of_mind": {
         "name": "氣定神閒",
@@ -4582,15 +4582,19 @@ export const zh_TW: EnTranslations = {
       },
       "arcane_power": {
         "name": "祕法強化",
-        "description": "讓你充滿祕法能量，法術強度提高28點，持續12秒。（祕法專精招牌）"
+        "description": "法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）"
       },
       "combustion": {
         "name": "燃燒",
-        "description": "集中你的火焰魔法，使下一次攻擊造成致命一擊。（火焰專精招牌）"
+        "description": "法術致命一擊機率提高50%，持續15秒。（火焰專精招牌）"
+      },
+      "icy_veins": {
+        "name": "冰冷血脈",
+        "description": "法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）"
       },
       "cone_of_cold": {
         "name": "冰錐術",
-        "description": "以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）"
+        "description": "以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（法師天賦）"
       },
       "cold_blood": {
         "name": "冷血",

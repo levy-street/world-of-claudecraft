@@ -368,7 +368,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'game.talents.specTab': '专精',
   'game.talents.available': '可用',
   'game.talents.spent': '已用',
-  'game.talents.pointSource': '选项行会从 {first} 级到 {cap} 级解锁。每个已解锁的行中选择一个选项。',
+  'game.talents.pointSource':
+    '选项行会从 {first} 级到 {cap} 级解锁。每个已解锁的行中选择一个选项。',
   'game.talents.apply': '应用更改',
   'game.talents.clear': '重置选项',
   'game.talents.reset': '重置',
@@ -3922,20 +3923,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': '适合单人',
   'guide.talentsPage.heading': '天赋与专精',
   'guide.talentsPage.howBody':
-  "天赋行会随等级解锁，专精在 10 级开放。先选择一个专精，获得它的标志技能和精通，然后在抉择标签页中，从每个已解锁的行里选择一个选项。",
+    '天赋行会随等级解锁，专精在 10 级开放。先选择一个专精，获得它的标志技能和精通，然后在抉择标签页中，从每个已解锁的行里选择一个选项。',
   'guide.talentsPage.howHeading': '它们如何运作',
   'guide.talentsPage.intro':
-  "天赋让职业更符合你的玩法。它们是可选的、宽容的，也很容易更改，所以你可以放心尝试。",
+    '天赋让职业更符合你的玩法。它们是可选的、宽容的，也很容易更改，所以你可以放心尝试。',
   'guide.talentsPage.resetNote':
-  "只要不在战斗中，你随时可以重置选择，所以早期选择不会变成陷阱。多试几种，看看喜欢什么，再自由调整。",
+    '只要不在战斗中，你随时可以重置选择，所以早期选择不会变成陷阱。多试几种，看看喜欢什么，再自由调整。',
   'guide.talentsPage.resetTitle': '一切都不是永久的',
   'guide.talentsPage.shareNote':
-  "完成后的配置可以复制成简短分享码交给朋友，对方可直接粘贴到自己的天赋面板中载入。",
+    '完成后的配置可以复制成简短分享码交给朋友，对方可直接粘贴到自己的天赋面板中载入。',
   'guide.talentsPage.specsBody':
-  "每个职业都有数个专精，各自拥有职责和标志重点。这里列出它们的整体形态。打开职业页面可查看完整技能套组。",
+    '每个职业都有数个专精，各自拥有职责和标志重点。这里列出它们的整体形态。打开职业页面可查看完整技能套组。',
   'guide.talentsPage.specsHeading': '各职业的专精',
   'guide.talentsPage.whatBody':
-  "随着升级，天赋行会逐步解锁，每行提供少量选择。每个选择都会为你的技能、属性或工具箱加入永久强化，塑造职业在战斗中的手感。",
+    '随着升级，天赋行会逐步解锁，每行提供少量选择。每个选择都会为你的技能、属性或工具箱加入永久强化，塑造职业在战斗中的手感。',
   'guide.talentsPage.whatHeading': '天赋的作用',
   'guide.toc.heading': '本页内容',
   'guide.wishPage.heading': '我希望早点知道的事',
@@ -4806,13 +4807,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '从远处钉刺敌人，使其瘫痪最多4秒。受到任何伤害都会打破效果。（生存专精招牌）',
   'entities.abilities.arcane_power.name': '奥术强化',
   'entities.abilities.arcane_power.description':
-    '让你充满奥术能量，法术强度提高28点，持续12秒。（奥术专精招牌）',
+    '法术伤害提高20%，法术急速提高10%，持续10秒。（奥术专精招牌）',
   'entities.abilities.combustion.name': '燃烧',
-  'entities.abilities.combustion.description':
-    '集中你的火焰魔法，使下一次攻击造成暴击。（火焰专精招牌）',
+  'entities.abilities.combustion.description': '法术暴击几率提高50%，持续15秒。（火焰专精招牌）',
+  'entities.abilities.icy_veins.name': '冰冷血脉',
+  'entities.abilities.icy_veins.description':
+    '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
   'entities.abilities.cone_of_cold.name': '冰锥术',
   'entities.abilities.cone_of_cold.description':
-    '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）',
+    '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（法师天赋）',
   'entities.abilities.cold_blood.name': '冷血',
   'entities.abilities.cold_blood.description':
     '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）',
@@ -4881,7 +4884,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '反制敌人的施法，并使该系法术在 6 秒内无法施放。（法师天赋）',
   'entities.abilities.ice_lance.name': '冰枪术',
   'entities.abilities.ice_lance.description':
-    '投掷寒冰碎片，造成 {damage} 点冰霜伤害。对被定身目标造成三倍伤害。（法师天赋）',
+    '投掷寒冰碎片，造成 {damage} 点冰霜伤害。对被定身目标造成三倍伤害。',
   'entities.abilities.presence_of_mind.name': '气定神闲',
   'entities.abilities.presence_of_mind.description':
     '使你的下一个有施法时间的法术变为瞬发。持续 60 秒。（法师天赋）',
@@ -4912,9 +4915,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '复仇之怒',
   'entities.abilities.avenging_wrath.description':
     '召唤复仇之力，使攻击强度和法术强度提高，持续 20 秒。（圣骑士天赋）',
-  'entities.abilities.hammer_of_wrath.name': "愤怒之锤",
+  'entities.abilities.hammer_of_wrath.name': '愤怒之锤',
   'entities.abilities.hammer_of_wrath.description':
-    "向受伤的敌人投掷一柄神圣之锤，造成 {damage} 点神圣伤害。只能对生命值低于 20% 的目标使用。（圣骑士天赋）",
+    '向受伤的敌人投掷一柄神圣之锤，造成 {damage} 点神圣伤害。只能对生命值低于 20% 的目标使用。（圣骑士天赋）',
   'entities.abilities.counter_shot.name': '反制射击',
   'entities.abilities.counter_shot.description':
     '打断施法，并使该系法术在 4 秒内无法施放。（猎人天赋）',
@@ -4956,15 +4959,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '治疗祷言',
   'entities.abilities.prayer_of_healing.description':
     '为附近盟友恢复 {damage} 点生命值。（牧师天赋）',
-  'entities.abilities.mind_sear.name': "精神灼烧",
+  'entities.abilities.mind_sear.name': '精神灼烧',
   'entities.abilities.mind_sear.description':
-    "在目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）",
+    '在目标区域引导暗影能量，每秒对附近敌人造成 {damage} 点伤害。（牧师天赋）',
   'entities.abilities.earthbind.name': '大地束缚',
-  'entities.abilities.earthbind.description':
-    '将附近敌人缚于大地，使其定身 2 秒。（萨满天赋）',
+  'entities.abilities.earthbind.description': '将附近敌人缚于大地，使其定身 2 秒。（萨满天赋）',
   'entities.abilities.healing_stream.name': '治疗之泉',
-  'entities.abilities.healing_stream.description':
-    '在 12 秒内恢复友方目标的生命值。（萨满天赋）',
+  'entities.abilities.healing_stream.description': '在 12 秒内恢复友方目标的生命值。（萨满天赋）',
   'entities.abilities.chain_lightning.name': '闪电链',
   'entities.abilities.chain_lightning.description':
     '向目标区域投出闪电，对附近敌人造成 {damage} 点自然伤害。（萨满天赋）',
@@ -4972,17 +4973,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '激发附近盟友的狂怒，使攻击速度提高，持续 15 秒。（萨满天赋）',
   'entities.abilities.spell_lock.name': '法术封锁',
-  'entities.abilities.spell_lock.description':
-    '打断施法，并阻止该系法术施放 5 秒。（术士天赋）',
+  'entities.abilities.spell_lock.description': '打断施法，并阻止该系法术施放 5 秒。（术士天赋）',
   'entities.abilities.howl_of_terror.name': '恐惧嚎叫',
   'entities.abilities.howl_of_terror.description':
     '使附近敌人恐惧，最多持续 3 秒。受到伤害可能打破效果。（术士天赋）',
   'entities.abilities.curse_of_exhaustion.name': '疲劳诅咒',
   'entities.abilities.curse_of_exhaustion.description':
     '诅咒目标，使移动速度降低 30%，持续 12 秒。（术士天赋）',
-  'entities.abilities.death_coil.name': "死亡缠绕",
+  'entities.abilities.death_coil.name': '死亡缠绕',
   'entities.abilities.death_coil.description':
-    "以 {damage} 点暗影伤害冲击敌人，然后使其惊骇 3 秒。此版本不会治疗施法者。（术士天赋）",
+    '以 {damage} 点暗影伤害冲击敌人，然后使其惊骇 3 秒。此版本不会治疗施法者。（术士天赋）',
   'entities.abilities.chaos_bolt.name': '混乱箭',
   'entities.abilities.chaos_bolt.description':
     '投出混乱火焰之箭，造成 {damage} 点火焰伤害。（术士天赋）',
@@ -4990,20 +4990,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.description':
     '化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）',
   'entities.abilities.skull_bash.name': '碎颅猛击',
-  'entities.abilities.skull_bash.description':
-    '打断施法，并阻止该系法术施放 4 秒。（德鲁伊天赋）',
-  'entities.abilities.innervate.name': "激活",
-  'entities.abilities.innervate.description':
-    "立即恢复 200 点当前资源。（德鲁伊天赋）",
+  'entities.abilities.skull_bash.description': '打断施法，并阻止该系法术施放 4 秒。（德鲁伊天赋）',
+  'entities.abilities.innervate.name': '激活',
+  'entities.abilities.innervate.description': '立即恢复 200 点当前资源。（德鲁伊天赋）',
   'entities.abilities.frenzied_regeneration.name': '狂暴回复',
   'entities.abilities.frenzied_regeneration.description':
     '在 10 秒内恢复生命值。仅限熊形态。（德鲁伊天赋）',
   'entities.abilities.berserk.name': '狂暴',
-  'entities.abilities.berserk.description':
-    '攻击强度提高 15 秒。（德鲁伊天赋）',
+  'entities.abilities.berserk.description': '攻击强度提高 15 秒。（德鲁伊天赋）',
   'entities.abilities.tranquility.name': '宁静',
-  'entities.abilities.tranquility.description':
-    '引导恢复能量，每秒治疗附近盟友。（德鲁伊天赋）',
+  'entities.abilities.tranquility.description': '引导恢复能量，每秒治疗附近盟友。（德鲁伊天赋）',
   'game.talents.readout.rowsSummary': '天赋：{head}，已选择 {picked}/{unlocked} 行选项。',
   'game.talents.readout.specLocked': ' 专精将在 {level} 级解锁。',
 };

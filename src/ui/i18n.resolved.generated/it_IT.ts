@@ -4378,7 +4378,7 @@ export const it_IT: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lancia di Ghiaccio",
-        "description": "Scaglia una scheggia di ghiaccio che infligge {damage} danni da Gelo. Infligge danni tripli ai bersagli immobilizzati. (Talento da mago)"
+        "description": "Scaglia una scheggia di ghiaccio che infligge {damage} danni da Gelo. Infligge danni tripli ai bersagli immobilizzati."
       },
       "presence_of_mind": {
         "name": "Presenza Mentale",
@@ -4582,15 +4582,19 @@ export const it_IT: EnTranslations = {
       },
       "arcane_power": {
         "name": "Potere Arcano",
-        "description": "Ti riempie di potere Arcano, aumentando la potenza magica di 28 per 12 s. (firma Arcano)"
+        "description": "Aumenta i danni magici del 20% e la celerità magica del 10% per 10 s. (firma Arcano)"
       },
       "combustion": {
         "name": "Combustione",
-        "description": "Concentra la tua magia del fuoco, così il tuo prossimo attacco è un colpo critico. (firma Fuoco)"
+        "description": "Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)"
+      },
+      "icy_veins": {
+        "name": "Vene Gelide",
+        "description": "Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)"
       },
       "cone_of_cold": {
         "name": "Cono di Freddo",
-        "description": "Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (firma Gelo)"
+        "description": "Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (talento del mago)"
       },
       "cold_blood": {
         "name": "Sangue Freddo",

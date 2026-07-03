@@ -47,13 +47,16 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
     'Stings the enemy from range, incapacitating it for up to 4 sec. Any damage breaks the effect. (Survival signature)',
   'entities.abilities.arcane_power.name': 'Arcane Power',
   'entities.abilities.arcane_power.description':
-    'Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)',
+    'Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)',
   'entities.abilities.combustion.name': 'Combustion',
   'entities.abilities.combustion.description':
-    'Focuses your fire magic so your next attack is a critical strike. (Fire signature)',
+    'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+  'entities.abilities.icy_veins.name': 'Icy Veins',
+  'entities.abilities.icy_veins.description':
+    'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
   'entities.abilities.cone_of_cold.name': 'Cone of Cold',
   'entities.abilities.cone_of_cold.description':
-    'Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)',
+    'Blasts nearby enemies with frost for {damage} Frost damage. (Mage talent)',
   'entities.abilities.cold_blood.name': 'Cold Blood',
   'entities.abilities.cold_blood.description':
     'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
@@ -207,8 +210,7 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frenzied_regeneration.description':
     'Regenerates health over 10 sec. Bear Form only. (Druid talent)',
   'entities.abilities.berserk.name': 'Berserk',
-  'entities.abilities.berserk.description':
-    'Increases attack power for 15 sec. (Druid talent)',
+  'entities.abilities.berserk.description': 'Increases attack power for 15 sec. (Druid talent)',
   'entities.abilities.tranquility.name': 'Tranquility',
   'entities.abilities.tranquility.description':
     'Channels restorative energy, healing nearby allies each second. (Druid talent)',

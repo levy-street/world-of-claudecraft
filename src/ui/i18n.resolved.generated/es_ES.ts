@@ -4378,7 +4378,7 @@ export const es_ES: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lanza de hielo",
-        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados."
       },
       "presence_of_mind": {
         "name": "Presencia mental",
@@ -4582,15 +4582,19 @@ export const es_ES: EnTranslations = {
       },
       "arcane_power": {
         "name": "Poder Arcano",
-        "description": "Te llena de poder Arcano, aumentando el poder con hechizos en 28 durante 12 s. (habilidad distintiva de Arcano)"
+        "description": "Aumenta el daño con hechizos un 20% y la celeridad con hechizos un 10% durante 10 s. (habilidad distintiva de Arcano)"
       },
       "combustion": {
         "name": "Combustión",
-        "description": "Concentra tu magia de fuego para que tu siguiente ataque sea un golpe crítico. (habilidad distintiva de Fuego)"
+        "description": "Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)"
+      },
+      "icy_veins": {
+        "name": "Venas heladas",
+        "description": "Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)"
       },
       "cone_of_cold": {
         "name": "Cono de frío",
-        "description": "Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (habilidad distintiva de Escarcha)"
+        "description": "Azota a los enemigos cercanos con escarcha e inflige {damage} de daño de Escarcha. (talento de mago)"
       },
       "cold_blood": {
         "name": "Sangre fría",

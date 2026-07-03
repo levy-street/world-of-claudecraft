@@ -4145,20 +4145,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'ソロ向き',
   'guide.talentsPage.heading': 'タレントとスペシャライゼーション',
   'guide.talentsPage.howBody':
-  "行はレベルに応じて解放され、専門化はレベル10で開きます。シグネチャ能力と熟達を見て専門化を選び、選択タブで解放済みの各行から1つずつ選びます。",
+    '行はレベルに応じて解放され、専門化はレベル10で開きます。シグネチャ能力と熟達を見て専門化を選び、選択タブで解放済みの各行から1つずつ選びます。',
   'guide.talentsPage.howHeading': '仕組み',
   'guide.talentsPage.intro':
-  "タレントはクラスを自分らしくする仕組みです。任意で、やり直しやすく、簡単に変更できるので安心して試せます。",
+    'タレントはクラスを自分らしくする仕組みです。任意で、やり直しやすく、簡単に変更できるので安心して試せます。',
   'guide.talentsPage.resetNote':
-  "戦闘中でなければいつでも選択をリセットできるため、序盤の選択が罠になることはありません。試して、好みを見つけ、自由に変えられます。",
+    '戦闘中でなければいつでも選択をリセットできるため、序盤の選択が罠になることはありません。試して、好みを見つけ、自由に変えられます。',
   'guide.talentsPage.resetTitle': '決定的なものは何もない',
   'guide.talentsPage.shareNote':
-  "完成したビルドは短い共有コードとしてコピーして友人に渡せます。友人は自分のタレントパネルに貼り付けて読み込めます。",
+    '完成したビルドは短い共有コードとしてコピーして友人に渡せます。友人は自分のタレントパネルに貼り付けて読み込めます。',
   'guide.talentsPage.specsBody':
-  "各クラスには複数の専門化があり、それぞれ役割とシグネチャの方向性があります。ここで全体像を確認できます。完全なキットはクラスを開いて見てください。",
+    '各クラスには複数の専門化があり、それぞれ役割とシグネチャの方向性があります。ここで全体像を確認できます。完全なキットはクラスを開いて見てください。',
   'guide.talentsPage.specsHeading': 'クラス別のスペシャライゼーション',
   'guide.talentsPage.whatBody':
-  "レベルが上がると、いくつかの選択肢を持つタレント行が解放されます。各選択はアビリティ、ステータス、道具立てに恒久的な強化を加え、戦闘でのクラスの感触を形作ります。",
+    'レベルが上がると、いくつかの選択肢を持つタレント行が解放されます。各選択はアビリティ、ステータス、道具立てに恒久的な強化を加え、戦闘でのクラスの感触を形作ります。',
   'guide.talentsPage.whatHeading': 'タレントの役割',
   'guide.toc.heading': 'このページの内容',
   'guide.wishPage.heading': '知っておきたかったこと',
@@ -5062,13 +5062,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '遠距離から敵を刺し、最大4秒間行動不能にします。ダメージを受けると効果は解除されます。（サバイバル特性のシグネチャ）',
   'entities.abilities.arcane_power.name': 'アーケインパワー',
   'entities.abilities.arcane_power.description':
-    '秘術の力に満たされ、12秒間呪文力が28上がります。（アーケイン特性のシグネチャ）',
+    '10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）',
   'entities.abilities.combustion.name': 'コンバッション',
   'entities.abilities.combustion.description':
-    '炎の魔法を集中し、次の攻撃をクリティカルにします。（ファイア特性のシグネチャ）',
+    '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
+  'entities.abilities.icy_veins.name': 'アイシーヴェインズ',
+  'entities.abilities.icy_veins.description':
+    '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
   'entities.abilities.cone_of_cold.name': 'コーンオブコールド',
   'entities.abilities.cone_of_cold.description':
-    '近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（フロスト特性のシグネチャ）',
+    '近くの敵に冷気を浴びせ、{damage}のフロストダメージを与えます。（メイジタレント）',
   'entities.abilities.cold_blood.name': 'コールドブラッド',
   'entities.abilities.cold_blood.description':
     '殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）',
@@ -5140,7 +5143,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵の呪文詠唱を妨害し、6秒間その系統の呪文を唱えられなくします。（メイジのタレント）',
   'entities.abilities.ice_lance.name': 'アイスランス',
   'entities.abilities.ice_lance.description':
-    '氷の破片を投げ、{damage} のフロストダメージを与えます。移動不能の対象には3倍のダメージを与えます。（メイジのタレント）',
+    '氷の破片を投げ、{damage} のフロストダメージを与えます。移動不能の対象には3倍のダメージを与えます。',
   'entities.abilities.presence_of_mind.name': 'プレゼンスオブマインド',
   'entities.abilities.presence_of_mind.description':
     '次の詠唱時間のある呪文を即時発動にします。60秒間持続します。（メイジのタレント）',
@@ -5173,9 +5176,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '復讐の翼',
   'entities.abilities.avenging_wrath.description':
     '復讐の力を呼び、20 秒間、攻撃力と呪文力を高めます。（パラディンのタレント）',
-  'entities.abilities.hammer_of_wrath.name': "怒りの槌",
+  'entities.abilities.hammer_of_wrath.name': '怒りの槌',
   'entities.abilities.hammer_of_wrath.description':
-    "負傷した敵に聖なる槌を投げつけ、{damage} の神聖ダメージを与えます。体力が20%未満の対象にのみ使用できます。（パラディンのタレント）",
+    '負傷した敵に聖なる槌を投げつけ、{damage} の神聖ダメージを与えます。体力が20%未満の対象にのみ使用できます。（パラディンのタレント）',
   'entities.abilities.counter_shot.name': '反撃射撃',
   'entities.abilities.counter_shot.description':
     '詠唱を妨害し、同系統の呪文を 4 秒間使えなくします。（ハンターのタレント）',
@@ -5222,54 +5225,53 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '治癒の祈り',
   'entities.abilities.prayer_of_healing.description':
     '近くの味方を {damage} 回復します。（プリーストのタレント）',
-  'entities.abilities.mind_sear.name': "精神焼灼",
+  'entities.abilities.mind_sear.name': '精神焼灼',
   'entities.abilities.mind_sear.description':
-    "対象地点にシャドウエネルギーを集中し、付近の敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）",
+    '対象地点にシャドウエネルギーを集中し、付近の敵に毎秒 {damage} のダメージを与えます。（プリーストのタレント）',
   'entities.abilities.earthbind.name': '大地の束縛',
   'entities.abilities.earthbind.description':
-    '近くの敵を大地に縛り、2 秒間移動不能にします。（シャーマンの天賦）',
+    '近くの敵を大地に縛り、2 秒間移動不能にします。（シャーマンのタレント）',
   'entities.abilities.healing_stream.name': '癒やしの流れ',
   'entities.abilities.healing_stream.description':
-    '12 秒かけて味方対象の体力を回復します。（シャーマンの天賦）',
+    '12 秒かけて味方対象の体力を回復します。（シャーマンのタレント）',
   'entities.abilities.chain_lightning.name': '連鎖稲妻',
   'entities.abilities.chain_lightning.description':
-    '対象地点に稲妻を放ち、近くの敵に {damage} の自然ダメージを与えます。（シャーマンの天賦）',
+    '対象地点に稲妻を放ち、近くの敵に {damage} のダメージを与えます。（シャーマンのタレント）',
   'entities.abilities.bloodlust.name': '血の渇望',
   'entities.abilities.bloodlust.description':
-    '近くの味方を狂熱させ、15 秒間攻撃速度を上げます。（シャーマンの天賦）',
+    '近くの味方を狂熱させ、15 秒間攻撃速度を上げます。（シャーマンのタレント）',
   'entities.abilities.spell_lock.name': '呪文封じ',
   'entities.abilities.spell_lock.description':
-    '詠唱を中断し、その系統の呪文を 5 秒間封じます。（ウォーロックの天賦）',
+    '詠唱を中断し、その系統の呪文を 5 秒間封じます。（ウォーロックのタレント）',
   'entities.abilities.howl_of_terror.name': '恐怖の遠吠え',
   'entities.abilities.howl_of_terror.description':
-    '近くの敵を最大 3 秒間恐怖させます。ダメージで解除されることがあります。（ウォーロックの天賦）',
+    '近くの敵を最大 3 秒間恐怖させます。ダメージで解除されることがあります。（ウォーロックのタレント）',
   'entities.abilities.curse_of_exhaustion.name': '疲弊の呪い',
   'entities.abilities.curse_of_exhaustion.description':
-    '対象を呪い、12 秒間移動速度を 30% 低下させます。（ウォーロックの天賦）',
-  'entities.abilities.death_coil.name': "死の螺旋",
+    '対象を呪い、12 秒間移動速度を 30% 低下させます。（ウォーロックのタレント）',
+  'entities.abilities.death_coil.name': '死の螺旋',
   'entities.abilities.death_coil.description':
-    "敵に {damage} の暗黒ダメージを与え、その後3秒間恐怖状態にします。この版では術者を回復しません。（ウォーロックのタレント）",
+    '敵に {damage} の暗黒ダメージを与え、その後3秒間恐怖状態にします。この版では術者を回復しません。（ウォーロックのタレント）',
   'entities.abilities.chaos_bolt.name': '混沌の矢',
   'entities.abilities.chaos_bolt.description':
-    '混沌の炎の矢を放ち、{damage} の火炎ダメージを与えます。（ウォーロックの天賦）',
+    '混沌の炎の矢を放ち、{damage} の火炎ダメージを与えます。（ウォーロックのタレント）',
   'entities.abilities.metamorphosis.name': '悪魔変身',
   'entities.abilities.metamorphosis.description':
-    '悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックの天賦）',
+    '悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）',
   'entities.abilities.skull_bash.name': '頭蓋砕き',
   'entities.abilities.skull_bash.description':
-    '詠唱を中断し、その系統の呪文を 4 秒間封じます。（ドルイドの天賦）',
-  'entities.abilities.innervate.name': "啓発",
+    '詠唱を中断し、その系統の呪文を 4 秒間封じます。（ドルイドのタレント）',
+  'entities.abilities.innervate.name': '啓発',
   'entities.abilities.innervate.description':
-    "現在のリソースを即座に200回復します。（ドルイドのタレント）",
+    '現在のリソースを即座に200回復します。（ドルイドのタレント）',
   'entities.abilities.frenzied_regeneration.name': '狂乱再生',
   'entities.abilities.frenzied_regeneration.description':
-    '10 秒かけて体力を回復します。熊形態専用。（ドルイドの天賦）',
+    '10 秒かけて体力を回復します。熊形態専用。（ドルイドのタレント）',
   'entities.abilities.berserk.name': '狂暴化',
-  'entities.abilities.berserk.description':
-    '15 秒間攻撃力を高めます。（ドルイドの天賦）',
+  'entities.abilities.berserk.description': '15 秒間攻撃力を高めます。（ドルイドのタレント）',
   'entities.abilities.tranquility.name': '静寂',
   'entities.abilities.tranquility.description':
-    '回復の力を詠唱し、近くの味方を毎秒回復します。（ドルイドの天賦）',
+    '回復の力を詠唱し、近くの味方を毎秒回復します。（ドルイドのタレント）',
   'game.talents.readout.rowsSummary': 'タレント: {head}、選択済み行 {picked}/{unlocked}。',
   'game.talents.readout.specLocked': ' 専門化はレベル {level} で解放されます。',
 };

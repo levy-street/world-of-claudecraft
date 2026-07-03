@@ -15,7 +15,7 @@ import {
   type TalentAllocation,
   validateAllocation,
 } from '../src/sim/content/talents';
-import { ABILITIES } from '../src/sim/data';
+import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 
@@ -84,6 +84,27 @@ afterEach(() => {
 });
 
 describe('choice row validation and repair', () => {
+  it('moves Ice Lance into the baseline mage kit at level 12', () => {
+    expect(CLASSES.mage.abilities).toContain('ice_lance');
+    expect(ABILITIES.ice_lance.learnLevel).toBe(12);
+    expect(abilitiesKnownAt('mage', 11).some((known) => known.def.id === 'ice_lance')).toBe(false);
+    expect(abilitiesKnownAt('mage', 12).some((known) => known.def.id === 'ice_lance')).toBe(true);
+  });
+
+  it('grants Cone of Cold from the mage level 11 row', () => {
+    const row = CHOICE_ROWS.mage.rows.find((entry) => entry.level === 11);
+    expect(row?.options.map((option) => option.id)).toEqual([
+      'mag_r11_cone_of_cold',
+      'mag_r11_shatter',
+      'mag_r11_permafrost',
+    ]);
+    const mods = computeTalentModifiers('mage', alloc({ rows: { 11: 'mag_r11_cone_of_cold' } }));
+    expect(mods.grants.some((grant) => grant.ability === 'cone_of_cold')).toBe(true);
+    expect(
+      abilitiesKnownAt('mage', 11, mods).some((known) => known.def.id === 'cone_of_cold'),
+    ).toBe(true);
+  });
+
   it('rejects unknown levels, wrong options, underlevel picks, and empty dormant rows', () => {
     withRows();
     expect(validateRows(cls, 20, { 6: 'fixture_sta' } as never).ok).toBe(false);
@@ -117,11 +138,7 @@ describe('choice row validation and repair', () => {
 
   it('repairs stale allocation rows on load', () => {
     withRows();
-    const repaired = repairAllocation(
-      cls,
-      alloc({ rows: { 5: 'fixture_sta', 8: 'missing' } }),
-      20,
-    );
+    const repaired = repairAllocation(cls, alloc({ rows: { 5: 'fixture_sta', 8: 'missing' } }), 20);
     expect(repaired.rows).toEqual({ 5: 'fixture_sta' });
   });
 

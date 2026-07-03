@@ -4378,7 +4378,7 @@ export const vi_VN: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lanza de hielo",
-        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados."
       },
       "presence_of_mind": {
         "name": "Presencia mental",
@@ -4582,15 +4582,19 @@ export const vi_VN: EnTranslations = {
       },
       "arcane_power": {
         "name": "Sức Mạnh Bí Thuật",
-        "description": "Nạp đầy sức mạnh bí thuật cho bạn, tăng sức mạnh phép thêm 28 trong 12 giây. (dấu ấn Bí Thuật)"
+        "description": "Tăng sát thương phép 20% và tốc độ phép 10% trong 10 giây. (kỹ năng đặc trưng Arcane)"
       },
       "combustion": {
         "name": "Thiêu Đốt",
-        "description": "Tập trung ma thuật lửa để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Lửa)"
+        "description": "Tăng tỉ lệ chí mạng phép 50% trong 15 giây. (kỹ năng đặc trưng Fire)"
+      },
+      "icy_veins": {
+        "name": "Huyết Mạch Băng Giá",
+        "description": "Tăng tốc độ phép 30% và ngăn gián đoạn cùng đẩy lùi thi triển trong 10 giây. (kỹ năng đặc trưng Frost)"
       },
       "cone_of_cold": {
         "name": "Nón Lạnh",
-        "description": "Thổi băng vào kẻ địch gần đó, gây {damage} sát thương Băng. (dấu ấn Băng)"
+        "description": "Tấn công kẻ địch gần đó bằng băng, gây {damage} sát thương Frost. (tài năng Mage)"
       },
       "cold_blood": {
         "name": "Máu Lạnh",

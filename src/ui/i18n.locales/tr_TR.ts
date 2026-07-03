@@ -3089,20 +3089,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Tarayıcınızda ücretsiz oynayabileceğiniz klasik tarzda bir MMO.',
   'guide.talentsPage.heading': 'Yetenekler ve uzmanlıklar',
   'guide.talentsPage.howBody':
-  "Sıralar seviye aldıkça açılır, uzmanlıklar ise 10. seviyede açılır. İmza yeteneği ve ustalığı için bir uzmanlık seç, sonra Seçimler sekmesinde açılmış her sıradan bir seçenek seç.",
+    'Sıralar seviye aldıkça açılır, uzmanlıklar ise 10. seviyede açılır. İmza yeteneği ve ustalığı için bir uzmanlık seç, sonra Seçimler sekmesinde açılmış her sıradan bir seçenek seç.',
   'guide.talentsPage.howHeading': 'Nasıl çalışırlar',
   'guide.talentsPage.intro':
-  "Yetenekler bir sınıfı sana ait hale getirmenin yoludur. İsteğe bağlıdır, affedicidir ve kolayca değişir, bu yüzden korkmadan deneyebilirsin.",
+    'Yetenekler bir sınıfı sana ait hale getirmenin yoludur. İsteğe bağlıdır, affedicidir ve kolayca değişir, bu yüzden korkmadan deneyebilirsin.',
   'guide.talentsPage.resetNote':
-  "Savaşta değilken seçimlerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir. Dene, neyi sevdiğini gör ve özgürce değiştir.",
+    'Savaşta değilken seçimlerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir. Dene, neyi sevdiğini gör ve özgürce değiştir.',
   'guide.talentsPage.resetTitle': 'Hiçbir şey kalıcı değildir',
   'guide.talentsPage.shareNote':
-  "Tamamlanmış bir dizilim kısa bir paylaşım kodu olarak kopyalanıp bir arkadaşa verilebilir; o da bunu kendi yetenek paneline yapıştırarak yükler.",
+    'Tamamlanmış bir dizilim kısa bir paylaşım kodu olarak kopyalanıp bir arkadaşa verilebilir; o da bunu kendi yetenek paneline yapıştırarak yükler.',
   'guide.talentsPage.specsBody':
-  "Her sınıfta birkaç uzmanlık vardır; her birinin kendi rolü ve imza odağı bulunur. Hepsinin genel şekli burada. Tam set için bir sınıf aç.",
+    'Her sınıfta birkaç uzmanlık vardır; her birinin kendi rolü ve imza odağı bulunur. Hepsinin genel şekli burada. Tam set için bir sınıf aç.',
   'guide.talentsPage.specsHeading': 'Sınıfa göre uzmanlıklar',
   'guide.talentsPage.whatBody':
-  "Seviye aldıkça az sayıda seçenek içeren yetenek sıraları açılır. Her seçim yeteneklerine, niteliklerine veya araçlarına kalıcı bir geliştirme ekler ve sınıfın savaşta nasıl hissettirdiğini şekillendirir.",
+    'Seviye aldıkça az sayıda seçenek içeren yetenek sıraları açılır. Her seçim yeteneklerine, niteliklerine veya araçlarına kalıcı bir geliştirme ekler ve sınıfın savaşta nasıl hissettirdiğini şekillendirir.',
   'guide.talentsPage.whatHeading': 'Yetenekler ne işe yarar',
   'guide.toc.heading': 'Bu sayfada',
   'guide.viewer.canvasLabel': '{name} ögesinin döndürülebilir 3B modeli',
@@ -5090,7 +5090,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Şimdi Değil',
   'hudChrome.nativeUpdate.title': 'Güncelleme Mevcut',
   'hudChrome.nativeUpdate.update': 'Güncelle',
-  'entities.abilities.holy_shock.name': "Kutsal Şok",
+  'entities.abilities.holy_shock.name': 'Kutsal Şok',
   'entities.abilities.holy_shock.description':
     'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',
   'entities.abilities.holy_shield.name': 'Kutsal Kalkan',
@@ -5110,13 +5110,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmanı uzaktan sokar ve en fazla 4 sn boyunca etkisiz bırakır. Herhangi bir hasar etkiyi bozar. (Hayatta Kalma imzası)',
   'entities.abilities.arcane_power.name': 'Gizemli Güç',
   'entities.abilities.arcane_power.description':
-    'Seni gizemli güçle doldurur, büyü gücünü 12 sn boyunca 28 artırır. (Gizem imzası)',
+    'Büyü hasarını %20 ve büyü hızını %10 artırır, 10 sn sürer. (Gizem imza yeteneği)',
   'entities.abilities.combustion.name': 'Yakma',
   'entities.abilities.combustion.description':
-    'Ateş büyünü odaklar, böylece sonraki saldırın kritik vuruş olur. (Ateş imzası)',
+    'Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)',
+  'entities.abilities.icy_veins.name': 'Buzlu Damarlar',
+  'entities.abilities.icy_veins.description':
+    'Büyü hızını %30 artırır ve 10 sn boyunca büyü kesintisini ve geri itmeyi önler. (Buz imza yeteneği)',
   'entities.abilities.cone_of_cold.name': 'Soğuk Konisi',
   'entities.abilities.cone_of_cold.description':
-    'Yakındaki düşmanları buzla patlatır ve {damage} Buz hasarı verir. (Buz imzası)',
+    'Yakındaki düşmanları buzla vurur ve {damage} Buz hasarı verir. (Büyücü yeteneği)',
   'entities.abilities.cold_blood.name': 'Soğukkanlılık',
   'entities.abilities.cold_blood.description':
     'Öldürme niyetini odaklar, böylece sonraki saldırın kritik vuruş olur. (Suikast imzası)',
@@ -5188,7 +5191,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
   'entities.abilities.ice_lance.name': 'Lanza de hielo',
   'entities.abilities.ice_lance.description':
-    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados.',
   'entities.abilities.presence_of_mind.name': 'Presencia mental',
   'entities.abilities.presence_of_mind.description':
     'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
@@ -5206,118 +5209,116 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': "Azar",
+  'entities.abilities.rebuke.name': 'Azar',
   'entities.abilities.rebuke.description':
-    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Paladin yeteneği)",
-  'entities.abilities.crusader_strike.name': "Haçlı Darbesi",
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Paladin yeteneği)',
+  'entities.abilities.crusader_strike.name': 'Haçlı Darbesi',
   'entities.abilities.crusader_strike.description':
-    "Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)",
-  'entities.abilities.holy_wrath.name': "Kutsal Gazap",
+    'Hedefe silah hasarı artı {damage} Kutsal hasar verir. (Paladin yeteneği)',
+  'entities.abilities.holy_wrath.name': 'Kutsal Gazap',
   'entities.abilities.holy_wrath.description':
-    "Kutsal gücü serbest bırakır ve yakındaki düşmanlara {damage} hasar verir. (Paladin yeteneği)",
-  'entities.abilities.divine_shield.name': "İlahi Kalkan",
+    'Kutsal gücü serbest bırakır ve yakındaki düşmanlara {damage} hasar verir. (Paladin yeteneği)',
+  'entities.abilities.divine_shield.name': 'İlahi Kalkan',
   'entities.abilities.divine_shield.description':
-    "Seni kutsal güçle korur, 8 sn. boyunca çok büyük miktarda hasar emer. (Paladin yeteneği)",
-  'entities.abilities.avenging_wrath.name': "İntikamcı Gazap",
+    'Seni kutsal güçle korur, 8 sn. boyunca çok büyük miktarda hasar emer. (Paladin yeteneği)',
+  'entities.abilities.avenging_wrath.name': 'İntikamcı Gazap',
   'entities.abilities.avenging_wrath.description':
-    "İntikamcı gücü çağırır, saldırı gücünü ve büyü gücünü 20 sn. artırır. (Paladin yeteneği)",
-  'entities.abilities.hammer_of_wrath.name': "Gazap Çekici",
+    'İntikamcı gücü çağırır, saldırı gücünü ve büyü gücünü 20 sn. artırır. (Paladin yeteneği)',
+  'entities.abilities.hammer_of_wrath.name': 'Gazap Çekici',
   'entities.abilities.hammer_of_wrath.description':
-    "Yaralı bir düşmana kutsal çekiç fırlatır ve {damage} Kutsal hasar verir. Yalnızca canı 20% altındayken kullanılabilir. (Paladin yeteneği)",
-  'entities.abilities.counter_shot.name': "Karşı Atış",
+    'Yaralı bir düşmana kutsal çekiç fırlatır ve {damage} Kutsal hasar verir. Yalnızca canı 20% altındayken kullanılabilir. (Paladin yeteneği)',
+  'entities.abilities.counter_shot.name': 'Karşı Atış',
   'entities.abilities.counter_shot.description':
-    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Avcı yeteneği)",
-  'entities.abilities.frost_trap.name': "Buz Tuzağı",
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Avcı yeteneği)',
+  'entities.abilities.frost_trap.name': 'Buz Tuzağı',
   'entities.abilities.frost_trap.description':
-    "Hedef alandaki düşmanları 3 sn. yerinde dondurur. (Avcı yeteneği)",
-  'entities.abilities.mend_pet.name': "Yoldaşı İyileştir",
+    'Hedef alandaki düşmanları 3 sn. yerinde dondurur. (Avcı yeteneği)',
+  'entities.abilities.mend_pet.name': 'Yoldaşı İyileştir',
   'entities.abilities.mend_pet.description':
-    "Dost bir hedefi 15 sn. boyunca {damage} iyileştirir. (Avcı yeteneği)",
-  'entities.abilities.multi_shot.name': "Çoklu Atış",
+    'Dost bir hedefi 15 sn. boyunca {damage} iyileştirir. (Avcı yeteneği)',
+  'entities.abilities.multi_shot.name': 'Çoklu Atış',
   'entities.abilities.multi_shot.description':
-    "Birden fazla mermi atar, yakındaki düşmanlara {damage} hasar verir. (Avcı yeteneği)",
-  'entities.abilities.deterrence.name': "Caydırma",
+    'Birden fazla mermi atar, yakındaki düşmanlara {damage} hasar verir. (Avcı yeteneği)',
+  'entities.abilities.deterrence.name': 'Caydırma',
   'entities.abilities.deterrence.description':
-    "Kaçınma şansını 10 sn. boyunca 50% artırır. (Avcı yeteneği)",
-  'entities.abilities.aspect_of_the_wild.name': "Vahşi Doğa Sureti",
+    'Kaçınma şansını 10 sn. boyunca 50% artırır. (Avcı yeteneği)',
+  'entities.abilities.aspect_of_the_wild.name': 'Vahşi Doğa Sureti',
   'entities.abilities.aspect_of_the_wild.description':
-    "Yakındaki müttefiklere vahşi güç verir, saldırı gücünü 5 dk. artırır. (Avcı yeteneği)",
-  'entities.abilities.kick.name': "Tekme",
+    'Yakındaki müttefiklere vahşi güç verir, saldırı gücünü 5 dk. artırır. (Avcı yeteneği)',
+  'entities.abilities.kick.name': 'Tekme',
   'entities.abilities.kick.description':
-    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Rogue yeteneği)",
-  'entities.abilities.preparation.name': "Hazırlık",
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Rogue yeteneği)',
+  'entities.abilities.preparation.name': 'Hazırlık',
   'entities.abilities.preparation.description':
-    "Sprint, Evasion ve Vanish bekleme sürelerini bitirir. (Rogue yeteneği)",
-  'entities.abilities.ghostly_strike.name': "Hayalet Darbe",
+    'Sprint, Evasion ve Vanish bekleme sürelerini bitirir. (Rogue yeteneği)',
+  'entities.abilities.ghostly_strike.name': 'Hayalet Darbe',
   'entities.abilities.ghostly_strike.description':
-    "Düşmana silah hasarı artı {damage} vurur ve kısa süreliğine kaçınmayı artırır. 1 kombo puanı verir. (Rogue yeteneği)",
-  'entities.abilities.cloak_of_shadows.name': "Gölgeler Pelerini",
+    'Düşmana silah hasarı artı {damage} vurur ve kısa süreliğine kaçınmayı artırır. 1 kombo puanı verir. (Rogue yeteneği)',
+  'entities.abilities.cloak_of_shadows.name': 'Gölgeler Pelerini',
   'entities.abilities.cloak_of_shadows.description':
-    "Seni gölgelerle sarar, 5 sn. hasar emer. (Rogue yeteneği)",
-  'entities.abilities.shadowstep.name': "Gölge Adımı",
+    'Seni gölgelerle sarar, 5 sn. hasar emer. (Rogue yeteneği)',
+  'entities.abilities.shadowstep.name': 'Gölge Adımı',
   'entities.abilities.shadowstep.description':
-    "Gölgelerin içinden hedefine doğru adım atarsın. (Rogue yeteneği)",
-  'entities.abilities.silence.name': "Sessizlik",
-  'entities.abilities.silence.description':
-    "Hedefi 4 sn. susturur. (Rogue yeteneği)",
-  'entities.abilities.psychic_scream.name': "Psişik Çığlık",
+    'Gölgelerin içinden hedefine doğru adım atarsın. (Rogue yeteneği)',
+  'entities.abilities.silence.name': 'Sessizlik',
+  'entities.abilities.silence.description': 'Hedefi 4 sn. susturur. (Rogue yeteneği)',
+  'entities.abilities.psychic_scream.name': 'Psişik Çığlık',
   'entities.abilities.psychic_scream.description':
-    "Yakındaki düşmanları en fazla 4 sn. korkutur. Hasar etkiyi bozabilir. (Rahip yeteneği)",
-  'entities.abilities.inner_focus.name': "İç Odak",
+    'Yakındaki düşmanları en fazla 4 sn. korkutur. Hasar etkiyi bozabilir. (Rahip yeteneği)',
+  'entities.abilities.inner_focus.name': 'İç Odak',
   'entities.abilities.inner_focus.description':
-    "Sonraki büyünü ücretsiz yapar. 60 sn. sürer. (Rahip yeteneği)",
-  'entities.abilities.desperate_prayer.name': "Çaresiz Dua",
+    'Sonraki büyünü ücretsiz yapar. 60 sn. sürer. (Rahip yeteneği)',
+  'entities.abilities.desperate_prayer.name': 'Çaresiz Dua',
   'entities.abilities.desperate_prayer.description':
-    "Seni anında {damage} iyileştirir. (Rahip yeteneği)",
-  'entities.abilities.prayer_of_healing.name': "Şifa Duası",
+    'Seni anında {damage} iyileştirir. (Rahip yeteneği)',
+  'entities.abilities.prayer_of_healing.name': 'Şifa Duası',
   'entities.abilities.prayer_of_healing.description':
-    "Yakındaki müttefikleri {damage} iyileştirir. (Rahip yeteneği)",
-  'entities.abilities.mind_sear.name': "Zihin Yakma",
+    'Yakındaki müttefikleri {damage} iyileştirir. (Rahip yeteneği)',
+  'entities.abilities.mind_sear.name': 'Zihin Yakma',
   'entities.abilities.mind_sear.description':
-    "Hedef alanda Gölge enerjisi kanalize eder, yakındaki düşmanlara her saniye {damage} hasar verir. (Rahip yeteneği)",
-  'entities.abilities.earthbind.name': "Toprak Bağı",
+    'Hedef alanda Gölge enerjisi kanalize eder, yakındaki düşmanlara her saniye {damage} hasar verir. (Rahip yeteneği)',
+  'entities.abilities.earthbind.name': 'Toprak Bağı',
   'entities.abilities.earthbind.description':
-    "Yakındaki düşmanları toprağa bağlar ve 2 sn. kökler. (Shaman yeteneği)",
-  'entities.abilities.healing_stream.name': "Şifa Akışı",
+    'Yakındaki düşmanları toprağa bağlar ve 2 sn. kökler. (Shaman yeteneği)',
+  'entities.abilities.healing_stream.name': 'Şifa Akışı',
   'entities.abilities.healing_stream.description':
-    "Dost bir hedefi 12 sn. boyunca yeniler. (Shaman yeteneği)",
-  'entities.abilities.chain_lightning.name': "Zincir Şimşek",
+    'Dost bir hedefi 12 sn. boyunca yeniler. (Shaman yeteneği)',
+  'entities.abilities.chain_lightning.name': 'Zincir Şimşek',
   'entities.abilities.chain_lightning.description':
-    "Hedef alana şimşekler savurur, yakındaki düşmanlara {damage} hasar verir. (Shaman yeteneği)",
-  'entities.abilities.bloodlust.name': "Kana Susama",
+    'Hedef alana şimşekler savurur, yakındaki düşmanlara {damage} hasar verir. (Shaman yeteneği)',
+  'entities.abilities.bloodlust.name': 'Kana Susama',
   'entities.abilities.bloodlust.description':
-    "Yakındaki müttefikleri çılgınlığa iter, saldırı hızını 15 sn. artırır. (Shaman yeteneği)",
-  'entities.abilities.spell_lock.name': "Büyü Kilidi",
+    'Yakındaki müttefikleri çılgınlığa iter, saldırı hızını 15 sn. artırır. (Shaman yeteneği)',
+  'entities.abilities.spell_lock.name': 'Büyü Kilidi',
   'entities.abilities.spell_lock.description':
-    "Büyü kullanımını keser ve o okuldan büyüleri 5 sn. engeller. (Warlock yeteneği)",
-  'entities.abilities.howl_of_terror.name': "Dehşet Uluması",
+    'Büyü kullanımını keser ve o okuldan büyüleri 5 sn. engeller. (Warlock yeteneği)',
+  'entities.abilities.howl_of_terror.name': 'Dehşet Uluması',
   'entities.abilities.howl_of_terror.description':
-    "Yakındaki düşmanları en fazla 3 sn. korkutur. Hasar etkiyi bozabilir. (Warlock yeteneği)",
-  'entities.abilities.curse_of_exhaustion.name': "Tükeniş Laneti",
+    'Yakındaki düşmanları en fazla 3 sn. korkutur. Hasar etkiyi bozabilir. (Warlock yeteneği)',
+  'entities.abilities.curse_of_exhaustion.name': 'Tükeniş Laneti',
   'entities.abilities.curse_of_exhaustion.description':
-    "Hedefi lanetler, hareket hızını 12 sn. boyunca 30% azaltır. (Warlock yeteneği)",
-  'entities.abilities.death_coil.name': "Ölüm Sarmalı",
+    'Hedefi lanetler, hareket hızını 12 sn. boyunca 30% azaltır. (Warlock yeteneği)',
+  'entities.abilities.death_coil.name': 'Ölüm Sarmalı',
   'entities.abilities.death_coil.description':
-    "Düşmana {damage} Gölge hasarı verir, sonra onu 3 sn. dehşete düşürür. Bu sürüm kullananı iyileştirmez. (Warlock yeteneği)",
-  'entities.abilities.chaos_bolt.name': "Kaos Oku",
+    'Düşmana {damage} Gölge hasarı verir, sonra onu 3 sn. dehşete düşürür. Bu sürüm kullananı iyileştirmez. (Warlock yeteneği)',
+  'entities.abilities.chaos_bolt.name': 'Kaos Oku',
   'entities.abilities.chaos_bolt.description':
-    "Kaotik bir ateş oku fırlatır ve {damage} Ateş hasarı verir. (Warlock yeteneği)",
-  'entities.abilities.metamorphosis.name': "Metamorfoz",
+    'Kaotik bir ateş oku fırlatır ve {damage} Ateş hasarı verir. (Warlock yeteneği)',
+  'entities.abilities.metamorphosis.name': 'Metamorfoz',
   'entities.abilities.metamorphosis.description':
-    "İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)",
-  'entities.abilities.skull_bash.name': "Kafatası Darbesi",
+    'İblis gücüne bürünür, zırhı ve saldırı gücünü 20 sn. artırır. (Warlock yeteneği)',
+  'entities.abilities.skull_bash.name': 'Kafatası Darbesi',
   'entities.abilities.skull_bash.description':
-    "Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Druid yeteneği)",
-  'entities.abilities.innervate.name': "Canlandırma",
+    'Büyü kullanımını keser ve o okuldan büyüleri 4 sn. engeller. (Druid yeteneği)',
+  'entities.abilities.innervate.name': 'Canlandırma',
   'entities.abilities.innervate.description':
-    "Geçerli kaynağından anında 200 yeniler. (Druid yeteneği)",
-  'entities.abilities.frenzied_regeneration.name': "Çılgın Yenilenme",
+    'Geçerli kaynağından anında 200 yeniler. (Druid yeteneği)',
+  'entities.abilities.frenzied_regeneration.name': 'Çılgın Yenilenme',
   'entities.abilities.frenzied_regeneration.description':
-    "10 sn. boyunca can yeniler. Yalnızca Ayı Formu. (Druid yeteneği)",
-  'entities.abilities.berserk.name': "Berserk",
-  'entities.abilities.berserk.description':
-    "Saldırı gücünü 15 sn. artırır. (Druid yeteneği)",
-  'entities.abilities.tranquility.name': "Sükunet",
+    '10 sn. boyunca can yeniler. Yalnızca Ayı Formu. (Druid yeteneği)',
+  'entities.abilities.berserk.name': 'Berserk',
+  'entities.abilities.berserk.description': 'Saldırı gücünü 15 sn. artırır. (Druid yeteneği)',
+  'entities.abilities.tranquility.name': 'Sükunet',
   'entities.abilities.tranquility.description':
-    "Yenileyici enerji kanalize eder, yakındaki müttefikleri her saniye iyileştirir. (Druid yeteneği)",
+    'Yenileyici enerji kanalize eder, yakındaki müttefikleri her saniye iyileştirir. (Druid yeteneği)',
 };

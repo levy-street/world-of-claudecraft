@@ -143,6 +143,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
       g.healPct += e.healPct ?? 0;
       g.threatPct += e.threatPct ?? 0;
       g.critVsRooted += e.critVsRooted ?? 0;
+      if (e.hotStreak) g.hotStreak = true;
     }
     for (const am of eff.ability ?? []) {
       if (!m.abilities[am.ability]) {
@@ -292,6 +293,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
+  e.spellCritStreak = 0;
   e.comboPoints = 0;
   e.comboTargetId = null;
   e.eating = null;

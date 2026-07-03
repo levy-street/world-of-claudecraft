@@ -4378,7 +4378,7 @@ export const fr_FR: EnTranslations = {
       },
       "ice_lance": {
         "name": "Javelot de glace",
-        "description": "Projette un éclat de glace qui inflige {damage} points de dégâts de Givre. Inflige le triple aux cibles enracinées. (Talent de mage)"
+        "description": "Projette un éclat de glace qui inflige {damage} points de dégâts de Givre. Inflige le triple aux cibles enracinées."
       },
       "presence_of_mind": {
         "name": "Présence spirituelle",
@@ -4582,15 +4582,19 @@ export const fr_FR: EnTranslations = {
       },
       "arcane_power": {
         "name": "Pouvoir des Arcanes",
-        "description": "Vous emplit de puissance arcanique, augmentant la puissance des sorts de 28 pendant 12 s. (signature Arcane)"
+        "description": "Augmente les dégâts des sorts de 20% et la hâte des sorts de 10% pendant 10 s. (signature Arcane)"
       },
       "combustion": {
         "name": "Combustion",
-        "description": "Concentre votre magie du feu afin que votre prochaine attaque soit un coup critique. (signature Feu)"
+        "description": "Augmente les chances de coup critique des sorts de 50% pendant 15 s. (signature Feu)"
+      },
+      "icy_veins": {
+        "name": "Veines glaciales",
+        "description": "Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)"
       },
       "cone_of_cold": {
         "name": "Cône de froid",
-        "description": "Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (signature Givre)"
+        "description": "Frappe les ennemis proches avec du givre et inflige {damage} points de dégâts de Givre. (talent de mage)"
       },
       "cold_blood": {
         "name": "Sang froid",

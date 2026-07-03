@@ -4378,7 +4378,7 @@ export const da_DK: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lanza de hielo",
-        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados."
       },
       "presence_of_mind": {
         "name": "Presencia mental",
@@ -4582,15 +4582,19 @@ export const da_DK: EnTranslations = {
       },
       "arcane_power": {
         "name": "Arkan kraft",
-        "description": "Fylder dig med arkan kraft og øger besværgelseskraft med 28 i 12 sek. (Arkan signatur)"
+        "description": "Øger besværgelsesskade med 20% og besværgelseshast med 10% i 10 sek. (Arcane-signatur)"
       },
       "combustion": {
         "name": "Forbrænding",
-        "description": "Fokuserer din ildmagi, så dit næste angreb bliver et kritisk træf. (Ildsignatur)"
+        "description": "Øger kritisk chance med besværgelser med 50% i 15 sek. (Fire-signatur)"
+      },
+      "icy_veins": {
+        "name": "Iskolde Årer",
+        "description": "Øger besværgelseshast med 30% og forhindrer afbrydelse og tilbageslag i 10 sek. (Frost-signatur)"
       },
       "cone_of_cold": {
         "name": "Kuldekegle",
-        "description": "Sprænger nærliggende fjender med frost for {damage} frostskade. (Frostsignatur)"
+        "description": "Ram nærliggende fjender med frost for {damage} Frost-skade. (magikertalent)"
       },
       "cold_blood": {
         "name": "Koldt blod",

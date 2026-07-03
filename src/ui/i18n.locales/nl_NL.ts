@@ -2192,8 +2192,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlockToast': 'Nieuwe talentkeuze beschikbaar!',
   'game.talents.rowUnlocks': 'Ontgrendelt op niveau {level}',
   'game.talents.unlockBanner': 'Talenten Ontgrendeld!',
-  'game.talents.unlockHint':
-  "Talentkeuzes zijn beschikbaar: druk op N om Talenten te openen.",
+  'game.talents.unlockHint': 'Talentkeuzes zijn beschikbaar: druk op N om Talenten te openen.',
   'game.xp.lv': 'Nv',
   'game.xp.maxLevel': 'MAX NIVEAU',
   'game.xp.rested': 'Uitgerust',
@@ -3138,20 +3137,20 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Een MMO in klassieke stijl die je gratis in je browser speelt.',
   'guide.talentsPage.heading': 'Talenten en specialisaties',
   'guide.talentsPage.howBody':
-  "Rijen openen terwijl je levelt, en specialisaties openen op level 10. Kies een specialisatie voor de kenmerkende vaardigheid en beheersing, gebruik daarna het tabblad Keuzes om één optie uit elke vrijgespeelde rij te kiezen.",
+    'Rijen openen terwijl je levelt, en specialisaties openen op level 10. Kies een specialisatie voor de kenmerkende vaardigheid en beheersing, gebruik daarna het tabblad Keuzes om één optie uit elke vrijgespeelde rij te kiezen.',
   'guide.talentsPage.howHeading': 'Hoe ze werken',
   'guide.talentsPage.intro':
-  "Talenten maken een klasse van jou. Ze zijn optioneel, vergevingsgezind en makkelijk te wijzigen, zodat je zonder zorgen kunt experimenteren.",
+    'Talenten maken een klasse van jou. Ze zijn optioneel, vergevingsgezind en makkelijk te wijzigen, zodat je zonder zorgen kunt experimenteren.',
   'guide.talentsPage.resetNote':
-  "Je kunt je keuzes resetten wanneer je buiten gevecht bent, dus een vroege keuze is nooit een val. Probeer dingen, kijk wat je bevalt en wijzig vrij.",
+    'Je kunt je keuzes resetten wanneer je buiten gevecht bent, dus een vroege keuze is nooit een val. Probeer dingen, kijk wat je bevalt en wijzig vrij.',
   'guide.talentsPage.resetTitle': 'Niets is permanent',
   'guide.talentsPage.shareNote':
-  "Een afgeronde build kun je kopiëren als korte deelcode en aan een vriend geven, die hem direct in het eigen talentpaneel plakt.",
+    'Een afgeronde build kun je kopiëren als korte deelcode en aan een vriend geven, die hem direct in het eigen talentpaneel plakt.',
   'guide.talentsPage.specsBody':
-  "Elke klasse heeft meerdere specialisaties, elk met een eigen rol en kenmerkende focus. Hier zie je de vorm van allemaal. Open een klasse voor de volledige kit.",
+    'Elke klasse heeft meerdere specialisaties, elk met een eigen rol en kenmerkende focus. Hier zie je de vorm van allemaal. Open een klasse voor de volledige kit.',
   'guide.talentsPage.specsHeading': 'Specialisaties per klasse',
   'guide.talentsPage.whatBody':
-  "Tijdens het levelen speel je talentrijen vrij met een klein aantal keuzes. Elke keuze voegt een permanente verbetering toe aan je vaardigheden, statistieken of gereedschap en bepaalt hoe je klasse in gevecht voelt.",
+    'Tijdens het levelen speel je talentrijen vrij met een klein aantal keuzes. Elke keuze voegt een permanente verbetering toe aan je vaardigheden, statistieken of gereedschap en bepaalt hoe je klasse in gevecht voelt.',
   'guide.talentsPage.whatHeading': 'Wat talenten doen',
   'guide.toc.heading': 'Op deze pagina',
   'guide.viewer.canvasLabel': 'Draaibaar 3D-model van {name}',
@@ -5154,7 +5153,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Niet nu',
   'hudChrome.nativeUpdate.title': 'Update beschikbaar',
   'hudChrome.nativeUpdate.update': 'Bijwerken',
-  'entities.abilities.holy_shock.name': "Heilige schok",
+  'entities.abilities.holy_shock.name': 'Heilige schok',
   'entities.abilities.holy_shock.description':
     'Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)',
   'entities.abilities.holy_shield.name': 'Heilig schild',
@@ -5174,13 +5173,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Steekt de vijand van afstand en maakt hem tot 4 sec uitgeschakeld. Elke schade verbreekt het effect. (Overleving signatuur)',
   'entities.abilities.arcane_power.name': 'Arcanekracht',
   'entities.abilities.arcane_power.description':
-    'Vult je met arcanekracht, waardoor spreukkracht 12 sec met 28 toeneemt. (Arcaan signatuur)',
+    'Verhoogt spreukschade met 20% en spreukhaast met 10% gedurende 10 sec. (Arcane-signatuur)',
   'entities.abilities.combustion.name': 'Verbranding',
   'entities.abilities.combustion.description':
-    'Bundelt je vuurmagie zodat je volgende aanval een kritieke treffer is. (Vuur signatuur)',
+    'Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)',
+  'entities.abilities.icy_veins.name': 'IJzige Aders',
+  'entities.abilities.icy_veins.description':
+    'Verhoogt spreukhaast met 30% en voorkomt onderbreking en terugslag van spreuken gedurende 10 sec. (Frost-signatuur)',
   'entities.abilities.cone_of_cold.name': 'Kegel van kou',
   'entities.abilities.cone_of_cold.description':
-    'Treft nabije vijanden met vorst voor {damage} Vorstschade. (Vorst signatuur)',
+    'Bestookt nabije vijanden met vorst voor {damage} vorstschade. (magiërstalent)',
   'entities.abilities.cold_blood.name': 'Koud bloed',
   'entities.abilities.cold_blood.description':
     'Bundelt je dodelijke intentie zodat je volgende aanval een kritieke treffer is. (Moord signatuur)',
@@ -5252,7 +5254,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
   'entities.abilities.ice_lance.name': 'Lanza de hielo',
   'entities.abilities.ice_lance.description':
-    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados.',
   'entities.abilities.presence_of_mind.name': 'Presencia mental',
   'entities.abilities.presence_of_mind.description':
     'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
@@ -5270,118 +5272,117 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': "Berisping",
+  'entities.abilities.rebuke.name': 'Berisping',
   'entities.abilities.rebuke.description':
-    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (paladijntalent)",
-  'entities.abilities.crusader_strike.name': "Kruisvaardersslag",
+    'Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (paladijntalent)',
+  'entities.abilities.crusader_strike.name': 'Kruisvaardersslag',
   'entities.abilities.crusader_strike.description':
-    "Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)",
-  'entities.abilities.holy_wrath.name': "Heilige toorn",
+    'Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)',
+  'entities.abilities.holy_wrath.name': 'Heilige toorn',
   'entities.abilities.holy_wrath.description':
-    "Ontketent heilige kracht en beschadigt nabije vijanden voor {damage}. (paladijntalent)",
-  'entities.abilities.divine_shield.name': "Goddelijk schild",
+    'Ontketent heilige kracht en beschadigt nabije vijanden voor {damage}. (paladijntalent)',
+  'entities.abilities.divine_shield.name': 'Goddelijk schild',
   'entities.abilities.divine_shield.description':
-    "Beschermt je met heilige kracht en absorbeert 8 sec. lang enorm veel schade. (paladijntalent)",
-  'entities.abilities.avenging_wrath.name': "Wrekende toorn",
+    'Beschermt je met heilige kracht en absorbeert 8 sec. lang enorm veel schade. (paladijntalent)',
+  'entities.abilities.avenging_wrath.name': 'Wrekende toorn',
   'entities.abilities.avenging_wrath.description':
-    "Verhoogt aanvalskracht en spreukkracht 20 sec. lang. (paladijntalent)",
-  'entities.abilities.hammer_of_wrath.name': "Hamer der gramschap",
+    'Verhoogt aanvalskracht en spreukkracht 20 sec. lang. (paladijntalent)',
+  'entities.abilities.hammer_of_wrath.name': 'Hamer der gramschap',
   'entities.abilities.hammer_of_wrath.description':
-    "Werpt een heilige hamer naar een gewonde vijand voor {damage} Heilige schade. Alleen bruikbaar onder 20% gezondheid. (paladijntalent)",
-  'entities.abilities.counter_shot.name': "Tegenschot",
+    'Werpt een heilige hamer naar een gewonde vijand voor {damage} Heilige schade. Alleen bruikbaar onder 20% gezondheid. (paladijntalent)',
+  'entities.abilities.counter_shot.name': 'Tegenschot',
   'entities.abilities.counter_shot.description':
-    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (jagertalent)",
-  'entities.abilities.frost_trap.name': "Vorstval",
+    'Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (jagertalent)',
+  'entities.abilities.frost_trap.name': 'Vorstval',
   'entities.abilities.frost_trap.description':
-    "Bevriest vijanden in het doelgebied 3 sec. lang. (jagertalent)",
-  'entities.abilities.mend_pet.name': "Huisdier genezen",
+    'Bevriest vijanden in het doelgebied 3 sec. lang. (jagertalent)',
+  'entities.abilities.mend_pet.name': 'Huisdier genezen',
   'entities.abilities.mend_pet.description':
-    "Geneest een vriendelijk doelwit voor {damage} gedurende 15 sec. (jagertalent)",
-  'entities.abilities.multi_shot.name': "Meervoudig schot",
+    'Geneest een vriendelijk doelwit voor {damage} gedurende 15 sec. (jagertalent)',
+  'entities.abilities.multi_shot.name': 'Meervoudig schot',
   'entities.abilities.multi_shot.description':
-    "Vuurt meerdere projectielen af en raakt nabije vijanden voor {damage}. (jagertalent)",
-  'entities.abilities.deterrence.name': "Afschrikking",
+    'Vuurt meerdere projectielen af en raakt nabije vijanden voor {damage}. (jagertalent)',
+  'entities.abilities.deterrence.name': 'Afschrikking',
   'entities.abilities.deterrence.description':
-    "Verhoogt je ontwijkkans 10 sec. lang met 50%. (jagertalent)",
-  'entities.abilities.aspect_of_the_wild.name': "Aspect van de wildernis",
+    'Verhoogt je ontwijkkans 10 sec. lang met 50%. (jagertalent)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspect van de wildernis',
   'entities.abilities.aspect_of_the_wild.description':
-    "Inspireert nabije bondgenoten en verhoogt aanvalskracht 5 min. lang. (jagertalent)",
-  'entities.abilities.kick.name': "Trap",
+    'Inspireert nabije bondgenoten en verhoogt aanvalskracht 5 min. lang. (jagertalent)',
+  'entities.abilities.kick.name': 'Trap',
   'entities.abilities.kick.description':
-    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (schurktalent)",
-  'entities.abilities.preparation.name': "Voorbereiding",
+    'Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (schurktalent)',
+  'entities.abilities.preparation.name': 'Voorbereiding',
   'entities.abilities.preparation.description':
-    "Beëindigt de afkoeling van Sprint, Ontwijken en Verdwijnen. (schurktalent)",
-  'entities.abilities.ghostly_strike.name': "Geestelijke slag",
+    'Beëindigt de afkoeling van Sprint, Ontwijken en Verdwijnen. (schurktalent)',
+  'entities.abilities.ghostly_strike.name': 'Geestelijke slag',
   'entities.abilities.ghostly_strike.description':
-    "Treft de vijand voor wapenschade plus {damage} en verhoogt kort ontwijken. Geeft 1 combopunt. (schurktalent)",
-  'entities.abilities.cloak_of_shadows.name': "Mantel der schaduwen",
+    'Treft de vijand voor wapenschade plus {damage} en verhoogt kort ontwijken. Geeft 1 combopunt. (schurktalent)',
+  'entities.abilities.cloak_of_shadows.name': 'Mantel der schaduwen',
   'entities.abilities.cloak_of_shadows.description':
-    "Hult je in schaduwen en absorbeert 5 sec. lang schade. (schurktalent)",
-  'entities.abilities.shadowstep.name': "Schaduwstap",
+    'Hult je in schaduwen en absorbeert 5 sec. lang schade. (schurktalent)',
+  'entities.abilities.shadowstep.name': 'Schaduwstap',
   'entities.abilities.shadowstep.description':
-    "Stapt door de schaduwen naar je doelwit. (schurktalent)",
-  'entities.abilities.silence.name': "Stilte",
+    'Stapt door de schaduwen naar je doelwit. (schurktalent)',
+  'entities.abilities.silence.name': 'Stilte',
   'entities.abilities.silence.description':
-    "Legt het doelwit 4 sec. lang het zwijgen op. (schurktalent)",
-  'entities.abilities.psychic_scream.name': "Psychische schreeuw",
+    'Legt het doelwit 4 sec. lang het zwijgen op. (schurktalent)',
+  'entities.abilities.psychic_scream.name': 'Psychische schreeuw',
   'entities.abilities.psychic_scream.description':
-    "Jaagt nabije vijanden tot 4 sec. angst aan. Schade kan het effect breken. (priestertalent)",
-  'entities.abilities.inner_focus.name': "Innerlijke focus",
+    'Jaagt nabije vijanden tot 4 sec. angst aan. Schade kan het effect breken. (priestertalent)',
+  'entities.abilities.inner_focus.name': 'Innerlijke focus',
   'entities.abilities.inner_focus.description':
-    "Maakt je volgende spreuk gratis. Duurt 60 sec. (priestertalent)",
-  'entities.abilities.desperate_prayer.name': "Wanhopig gebed",
+    'Maakt je volgende spreuk gratis. Duurt 60 sec. (priestertalent)',
+  'entities.abilities.desperate_prayer.name': 'Wanhopig gebed',
   'entities.abilities.desperate_prayer.description':
-    "Geneest je onmiddellijk voor {damage}. (priestertalent)",
-  'entities.abilities.prayer_of_healing.name': "Gebed van genezing",
+    'Geneest je onmiddellijk voor {damage}. (priestertalent)',
+  'entities.abilities.prayer_of_healing.name': 'Gebed van genezing',
   'entities.abilities.prayer_of_healing.description':
-    "Geneest nabije bondgenoten voor {damage}. (priestertalent)",
-  'entities.abilities.mind_sear.name': "Gedachtenzengen",
+    'Geneest nabije bondgenoten voor {damage}. (priestertalent)',
+  'entities.abilities.mind_sear.name': 'Gedachtenzengen',
   'entities.abilities.mind_sear.description':
-    "Kanalisert schaduwenergie in het doelgebied en beschadigt nabije vijanden elke seconde voor {damage}. (priestertalent)",
-  'entities.abilities.earthbind.name': "Aardbinding",
+    'Kanalisert schaduwenergie in het doelgebied en beschadigt nabije vijanden elke seconde voor {damage}. (priestertalent)',
+  'entities.abilities.earthbind.name': 'Aardbinding',
   'entities.abilities.earthbind.description':
-    "Bindt nabije vijanden aan de aarde en wortelt ze 2 sec. lang. (sjamaantalent)",
-  'entities.abilities.healing_stream.name': "Genezende stroom",
+    'Bindt nabije vijanden aan de aarde en wortelt ze 2 sec. lang. (sjamaantalent)',
+  'entities.abilities.healing_stream.name': 'Genezende stroom',
   'entities.abilities.healing_stream.description':
-    "Herstelt een vriendelijk doelwit gedurende 12 sec. (sjamaantalent)",
-  'entities.abilities.chain_lightning.name': "Kettingbliksem",
+    'Herstelt een vriendelijk doelwit gedurende 12 sec. (sjamaantalent)',
+  'entities.abilities.chain_lightning.name': 'Kettingbliksem',
   'entities.abilities.chain_lightning.description':
-    "Slingert bliksem naar het doelgebied en beschadigt nabije vijanden voor {damage}. (sjamaantalent)",
-  'entities.abilities.bloodlust.name': "Bloeddorst",
+    'Slingert bliksem naar het doelgebied en beschadigt nabije vijanden voor {damage}. (sjamaantalent)',
+  'entities.abilities.bloodlust.name': 'Bloeddorst',
   'entities.abilities.bloodlust.description':
-    "Zweept nabije bondgenoten op en verhoogt aanvalssnelheid 15 sec. lang. (sjamaantalent)",
-  'entities.abilities.spell_lock.name': "Spreukslot",
+    'Zweept nabije bondgenoten op en verhoogt aanvalssnelheid 15 sec. lang. (sjamaantalent)',
+  'entities.abilities.spell_lock.name': 'Spreukslot',
   'entities.abilities.spell_lock.description':
-    "Onderbreekt spreuken en verhindert 5 sec. lang spreuken van die school. (heksenmeestertalent)",
-  'entities.abilities.howl_of_terror.name': "Huil van terreur",
+    'Onderbreekt spreuken en verhindert 5 sec. lang spreuken van die school. (heksenmeestertalent)',
+  'entities.abilities.howl_of_terror.name': 'Huil van terreur',
   'entities.abilities.howl_of_terror.description':
-    "Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect breken. (heksenmeestertalent)",
-  'entities.abilities.curse_of_exhaustion.name': "Vloek van uitputting",
+    'Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect breken. (heksenmeestertalent)',
+  'entities.abilities.curse_of_exhaustion.name': 'Vloek van uitputting',
   'entities.abilities.curse_of_exhaustion.description':
-    "Vervloekt het doelwit en verlaagt bewegingssnelheid 12 sec. lang met 30%. (heksenmeestertalent)",
-  'entities.abilities.death_coil.name': "Doodsspiraal",
+    'Vervloekt het doelwit en verlaagt bewegingssnelheid 12 sec. lang met 30%. (heksenmeestertalent)',
+  'entities.abilities.death_coil.name': 'Doodsspiraal',
   'entities.abilities.death_coil.description':
-    "Treft de vijand met {damage} Schaduwschade en vervult hem daarna 3 sec. met afgrijzen. Deze versie geneest de caster niet. (heksenmeestertalent)",
-  'entities.abilities.chaos_bolt.name': "Chaosflits",
+    'Treft de vijand met {damage} Schaduwschade en vervult hem daarna 3 sec. met afgrijzen. Deze versie geneest de caster niet. (heksenmeestertalent)',
+  'entities.abilities.chaos_bolt.name': 'Chaosflits',
   'entities.abilities.chaos_bolt.description':
-    "Slingert een chaotische vuurbout voor {damage} Vuurschade. (heksenmeestertalent)",
-  'entities.abilities.metamorphosis.name': "Metamorfose",
+    'Slingert een chaotische vuurbout voor {damage} Vuurschade. (heksenmeestertalent)',
+  'entities.abilities.metamorphosis.name': 'Metamorfose',
   'entities.abilities.metamorphosis.description':
-    "Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)",
-  'entities.abilities.skull_bash.name': "Schedelbeuk",
+    'Neemt demonische kracht aan en verhoogt pantser en aanvalskracht 20 sec. lang. (heksenmeestertalent)',
+  'entities.abilities.skull_bash.name': 'Schedelbeuk',
   'entities.abilities.skull_bash.description':
-    "Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (druïdetalent)",
-  'entities.abilities.innervate.name': "Bezielen",
+    'Onderbreekt spreuken en verhindert 4 sec. lang spreuken van die school. (druïdetalent)',
+  'entities.abilities.innervate.name': 'Bezielen',
   'entities.abilities.innervate.description':
-    "Herstelt onmiddellijk 200 van je huidige resource. (druïdetalent)",
-  'entities.abilities.frenzied_regeneration.name': "Razende regeneratie",
+    'Herstelt onmiddellijk 200 van je huidige resource. (druïdetalent)',
+  'entities.abilities.frenzied_regeneration.name': 'Razende regeneratie',
   'entities.abilities.frenzied_regeneration.description':
-    "Regenereert gezondheid gedurende 10 sec. Alleen Berenvorm. (druïdetalent)",
-  'entities.abilities.berserk.name': "Berserk",
-  'entities.abilities.berserk.description':
-    "Verhoogt aanvalskracht 15 sec. lang. (druïdetalent)",
-  'entities.abilities.tranquility.name': "Rust",
+    'Regenereert gezondheid gedurende 10 sec. Alleen Berenvorm. (druïdetalent)',
+  'entities.abilities.berserk.name': 'Berserk',
+  'entities.abilities.berserk.description': 'Verhoogt aanvalskracht 15 sec. lang. (druïdetalent)',
+  'entities.abilities.tranquility.name': 'Rust',
   'entities.abilities.tranquility.description':
-    "Kanalisert herstellende energie en geneest nabije bondgenoten elke seconde. (druïdetalent)",
+    'Kanalisert herstellende energie en geneest nabije bondgenoten elke seconde. (druïdetalent)',
 };

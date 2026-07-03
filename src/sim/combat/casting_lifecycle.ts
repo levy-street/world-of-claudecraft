@@ -46,6 +46,7 @@ import {
   MELEE_ARC,
   MELEE_RANGE,
   normAngle,
+  SPELL_CAST_ARC,
 } from '../types';
 import { isLockedOut, isRooted, isSilenced, isStunned, tonguesMult } from './cc';
 import {
@@ -55,6 +56,12 @@ import {
   hasNextCastFree,
 } from './empower_next';
 import { isFormAuraKind, isResourceShiftFormAuraKind } from './forms';
+import {
+  hasCastShield,
+  noteSpellHit,
+  spellDamageMultFromAuras,
+  spellHasteMultFromAuras,
+} from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
@@ -80,6 +87,19 @@ function isShamanShock(abilityId: string): boolean {
   return (
     (SHAMAN_SHOCK_COOLDOWN_IDS as readonly string[]).includes(abilityId) ||
     abilityId === 'lightning_shock'
+  );
+}
+
+function isFacingWithinArc(p: Entity, target: Entity, halfArc: number): boolean {
+  return Math.abs(normAngle(angleTo(p.pos, target.pos) - p.facing)) <= halfArc;
+}
+
+function requiresSpellFacing(ability: AbilityDef): boolean {
+  return (
+    ability.requiresTarget &&
+    ability.targetType !== 'friendly' &&
+    ability.targetMode !== 'position' &&
+    ability.school !== 'physical'
   );
 }
 
@@ -156,6 +176,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
 }
 
 export function pushbackCast(p: Entity): void {
+  if (hasCastShield(p)) return;
   // Item-set caster bonus scales damage-driven pushback (1 = fully immune).
   const factor = 1 - p.castPushbackReduction;
   if (factor <= 0) return;
@@ -223,7 +244,7 @@ export function castAbility(
   }
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, res.castTime);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(
       p.id,
@@ -301,8 +322,8 @@ export function castAbility(
       ctx.error(p.id, 'Line of sight.');
       return;
     }
-    const facingDiff = Math.abs(normAngle(angleTo(p.pos, target.pos) - p.facing));
-    if (facingDiff > MELEE_ARC) {
+    const facingArc = requiresSpellFacing(ability) ? SPELL_CAST_ARC : MELEE_ARC;
+    if (!isFacingWithinArc(p, target, facingArc)) {
       ctx.error(p.id, 'You must be facing your target.');
       return;
     }
@@ -396,7 +417,7 @@ export function castAbility(
   if (ability.onNextSwing) {
     const toggledOff = p.queuedOnSwing === ability.id;
     p.queuedOnSwing = toggledOff ? null : ability.id;
-    if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p)) {
+    if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p, res.castTime)) {
       p.queuedOnSwingFree = true;
     } else {
       delete p.queuedOnSwingFree;
@@ -413,13 +434,15 @@ export function castAbility(
     ability.school !== 'physical' &&
     consumeNextCastInstant(ctx, p)
       ? 0
-      : res.castTime;
+      : ability.school !== 'physical'
+        ? res.castTime / spellHasteMultFromAuras(p)
+        : res.castTime;
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
   // ability, so the charge must survive until then and be consumed there.
   if ((castTime === 0 || ability.channel) && !togglingOff) {
-    if (canCastFree && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
+    if (canCastFree && consumeNextCastFree(ctx, p, res.castTime)) res = { ...res, cost: 0 };
   }
 
   if (ability.channel) {
@@ -548,6 +571,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
         if (!ctx.hasLineOfSight(p, m)) continue;
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        if (isSpell) dmg *= spellDamageMultFromAuras(p);
         // physical channels (Volley) are mitigated by armor; spell-school rain is not,
         // mirroring the instant aoeDamage path in effect_dispatch.
         if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
@@ -559,6 +583,11 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
 
   const target = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(p, target)) {
+    cancelCast(ctx, p);
+    return;
+  }
+  if (requiresSpellFacing(res.def) && !isFacingWithinArc(p, target, SPELL_CAST_ARC)) {
+    ctx.error(p.id, 'You must be facing your target.');
     cancelCast(ctx, p);
     return;
   }
@@ -587,8 +616,9 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     for (const eff of res.effects) {
       if (eff.type === 'directDamage') {
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
-        let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
+        let dmg = (ctx.rng.range(eff.min, eff.max) + channelSp) * spellDamageMultFromAuras(src);
         if (crit) dmg *= 1.5;
+        noteSpellHit(ctx, src, crit);
         ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
       } else if (eff.type === 'drainTick') {
         const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
@@ -620,7 +650,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   // early-return utility branches below bill directly, so they must go through
   // this too or a free conjure/revive would keep the charge alive.
   const billableCost = (): number =>
-    res.cost > 0 && !togglingOff && consumeNextCastFree(ctx, p) ? 0 : res.cost;
+    res.cost > 0 && !togglingOff && consumeNextCastFree(ctx, p, res.castTime) ? 0 : res.cost;
   if (ability.id === 'conjure_water') {
     spendResource(p, billableCost());
     // higher ranks conjure better water (falls back if the item isn't defined)
@@ -680,12 +710,14 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       return;
     }
   }
-  const canCastFree = res.cost > 0 && hasNextCastFree(p);
+  const canCastFree = res.cost > 0 && hasNextCastFree(p, res.castTime);
   if (p.resource < res.cost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
   }
-  if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p)) res = { ...res, cost: 0 };
+  if (canCastFree && !togglingOff && consumeNextCastFree(ctx, p, res.castTime)) {
+    res = { ...res, cost: 0 };
+  }
 
   // helpful spells never miss
   if (ability.targetType === 'friendly') {

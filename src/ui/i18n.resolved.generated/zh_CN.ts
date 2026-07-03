@@ -4378,7 +4378,7 @@ export const zh_CN: EnTranslations = {
       },
       "ice_lance": {
         "name": "冰枪术",
-        "description": "投掷寒冰碎片，造成 {damage} 点冰霜伤害。对被定身目标造成三倍伤害。（法师天赋）"
+        "description": "投掷寒冰碎片，造成 {damage} 点冰霜伤害。对被定身目标造成三倍伤害。"
       },
       "presence_of_mind": {
         "name": "气定神闲",
@@ -4582,15 +4582,19 @@ export const zh_CN: EnTranslations = {
       },
       "arcane_power": {
         "name": "奥术强化",
-        "description": "让你充满奥术能量，法术强度提高28点，持续12秒。（奥术专精招牌）"
+        "description": "法术伤害提高20%，法术急速提高10%，持续10秒。（奥术专精招牌）"
       },
       "combustion": {
         "name": "燃烧",
-        "description": "集中你的火焰魔法，使下一次攻击造成暴击。（火焰专精招牌）"
+        "description": "法术暴击几率提高50%，持续15秒。（火焰专精招牌）"
+      },
+      "icy_veins": {
+        "name": "冰冷血脉",
+        "description": "法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）"
       },
       "cone_of_cold": {
         "name": "冰锥术",
-        "description": "以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）"
+        "description": "以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（法师天赋）"
       },
       "cold_blood": {
         "name": "冷血",

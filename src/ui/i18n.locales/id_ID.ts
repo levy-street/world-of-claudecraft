@@ -2195,8 +2195,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlockToast': 'Pilihan talenta baru tersedia!',
   'game.talents.rowUnlocks': 'Terbuka di level {level}',
   'game.talents.unlockBanner': 'Talenta Terbuka!',
-  'game.talents.unlockHint':
-  "Pilihan talenta tersedia: tekan N untuk membuka Talenta.",
+  'game.talents.unlockHint': 'Pilihan talenta tersedia: tekan N untuk membuka Talenta.',
   'game.xp.lv': 'Lv',
   'game.xp.maxLevel': 'LEVEL MAKS',
   'game.xp.rested': 'Pulih',
@@ -3146,20 +3145,20 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'MMO bergaya klasik yang bisa kamu mainkan gratis di peramban.',
   'guide.talentsPage.heading': 'Bakat dan spesialisasi',
   'guide.talentsPage.howBody':
-  "Baris terbuka saat kamu naik level, dan spesialisasi terbuka pada level 10. Pilih spesialisasi untuk kemampuan khas dan penguasaannya, lalu gunakan tab Pilihan untuk memilih satu opsi dari tiap baris yang terbuka.",
+    'Baris terbuka saat kamu naik level, dan spesialisasi terbuka pada level 10. Pilih spesialisasi untuk kemampuan khas dan penguasaannya, lalu gunakan tab Pilihan untuk memilih satu opsi dari tiap baris yang terbuka.',
   'guide.talentsPage.howHeading': 'Cara kerjanya',
   'guide.talentsPage.intro':
-  "Talenta adalah cara membuat kelas terasa milikmu. Sistem ini opsional, mudah dimaafkan, dan gampang diubah, jadi kamu bisa bereksperimen tanpa takut.",
+    'Talenta adalah cara membuat kelas terasa milikmu. Sistem ini opsional, mudah dimaafkan, dan gampang diubah, jadi kamu bisa bereksperimen tanpa takut.',
   'guide.talentsPage.resetNote':
-  "Kamu bisa mereset pilihan kapan saja saat di luar pertarungan, jadi pilihan awal tidak pernah menjadi jebakan. Coba berbagai hal, lihat yang kamu suka, lalu ubah dengan bebas.",
+    'Kamu bisa mereset pilihan kapan saja saat di luar pertarungan, jadi pilihan awal tidak pernah menjadi jebakan. Coba berbagai hal, lihat yang kamu suka, lalu ubah dengan bebas.',
   'guide.talentsPage.resetTitle': 'Tidak ada yang permanen',
   'guide.talentsPage.shareNote':
-  "Build selesai dapat disalin sebagai kode pendek yang bisa dibagikan kepada teman, lalu ditempel langsung ke panel talenta mereka untuk dimuat.",
+    'Build selesai dapat disalin sebagai kode pendek yang bisa dibagikan kepada teman, lalu ditempel langsung ke panel talenta mereka untuk dimuat.',
   'guide.talentsPage.specsBody':
-  "Setiap kelas memiliki beberapa spesialisasi, masing-masing dengan peran dan fokus khas. Inilah bentuk semuanya. Buka kelas untuk melihat kit lengkapnya.",
+    'Setiap kelas memiliki beberapa spesialisasi, masing-masing dengan peran dan fokus khas. Inilah bentuk semuanya. Buka kelas untuk melihat kit lengkapnya.',
   'guide.talentsPage.specsHeading': 'Spesialisasi per kelas',
   'guide.talentsPage.whatBody':
-  "Saat naik level, baris talenta terbuka dengan beberapa pilihan. Setiap pilihan menambahkan peningkatan permanen ke kemampuan, statistik, atau alatmu, dan membentuk rasa kelas dalam pertarungan.",
+    'Saat naik level, baris talenta terbuka dengan beberapa pilihan. Setiap pilihan menambahkan peningkatan permanen ke kemampuan, statistik, atau alatmu, dan membentuk rasa kelas dalam pertarungan.',
   'guide.talentsPage.whatHeading': 'Apa yang dilakukan bakat',
   'guide.toc.heading': 'Di halaman ini',
   'guide.viewer.canvasLabel': 'Model 3D {name} yang dapat diputar',
@@ -5161,7 +5160,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jangan sekarang',
   'hudChrome.nativeUpdate.title': 'Pembaruan Tersedia',
   'hudChrome.nativeUpdate.update': 'Perbarui',
-  'entities.abilities.holy_shock.name': "Kejutan Suci",
+  'entities.abilities.holy_shock.name': 'Kejutan Suci',
   'entities.abilities.holy_shock.description':
     'Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)',
   'entities.abilities.holy_shield.name': 'Perisai Suci',
@@ -5181,13 +5180,16 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyengat musuh dari jarak jauh dan melumpuhkannya hingga 4 dtk. Kerusakan apa pun mematahkan efek ini. (ciri khas Bertahan Hidup)',
   'entities.abilities.arcane_power.name': 'Kekuatan Arkan',
   'entities.abilities.arcane_power.description':
-    'Mengisimu dengan kekuatan arkan, meningkatkan kekuatan mantra sebesar 28 selama 12 dtk. (ciri khas Arkan)',
+    'Meningkatkan kerusakan mantra sebesar 20% dan haste mantra sebesar 10% selama 10 dtk. (signature Arcane)',
   'entities.abilities.combustion.name': 'Pembakaran',
   'entities.abilities.combustion.description':
-    'Memusatkan sihir apimu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Api)',
+    'Meningkatkan peluang kritis mantra sebesar 50% selama 15 dtk. (signature Fire)',
+  'entities.abilities.icy_veins.name': 'Urat Es',
+  'entities.abilities.icy_veins.description':
+    'Meningkatkan haste mantra sebesar 30% dan mencegah interupsi serta pushback cast selama 10 dtk. (signature Frost)',
   'entities.abilities.cone_of_cold.name': 'Kerucut Dingin',
   'entities.abilities.cone_of_cold.description':
-    'Menghantam musuh di dekatmu dengan es, menimbulkan {damage} kerusakan Es. (ciri khas Es)',
+    'Menghantam musuh di sekitar dengan es sebesar {damage} kerusakan Frost. (talenta Mage)',
   'entities.abilities.cold_blood.name': 'Darah Dingin',
   'entities.abilities.cold_blood.description':
     'Memusatkan niat membunuhmu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Pembunuhan)',
@@ -5259,7 +5261,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
   'entities.abilities.ice_lance.name': 'Lanza de hielo',
   'entities.abilities.ice_lance.description':
-    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados.',
   'entities.abilities.presence_of_mind.name': 'Presencia mental',
   'entities.abilities.presence_of_mind.description':
     'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
@@ -5277,118 +5279,117 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': "Hardik",
+  'entities.abilities.rebuke.name': 'Hardik',
   'entities.abilities.rebuke.description':
-    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Paladin)",
-  'entities.abilities.crusader_strike.name': "Serangan Tentara Salib",
+    'Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Paladin)',
+  'entities.abilities.crusader_strike.name': 'Serangan Tentara Salib',
   'entities.abilities.crusader_strike.description':
-    "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)",
-  'entities.abilities.holy_wrath.name': "Murka Suci",
+    'Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)',
+  'entities.abilities.holy_wrath.name': 'Murka Suci',
   'entities.abilities.holy_wrath.description':
-    "Melepaskan kekuatan suci dan melukai musuh di sekitar sebesar {damage}. (talenta Paladin)",
-  'entities.abilities.divine_shield.name': "Perisai Ilahi",
+    'Melepaskan kekuatan suci dan melukai musuh di sekitar sebesar {damage}. (talenta Paladin)',
+  'entities.abilities.divine_shield.name': 'Perisai Ilahi',
   'entities.abilities.divine_shield.description':
-    "Melindungimu dengan kekuatan suci, menyerap kerusakan sangat besar selama 8 dtk. (talenta Paladin)",
-  'entities.abilities.avenging_wrath.name': "Murka Pembalas",
+    'Melindungimu dengan kekuatan suci, menyerap kerusakan sangat besar selama 8 dtk. (talenta Paladin)',
+  'entities.abilities.avenging_wrath.name': 'Murka Pembalas',
   'entities.abilities.avenging_wrath.description':
-    "Memanggil kekuatan pembalas, meningkatkan daya serang dan kekuatan mantra selama 20 dtk. (talenta Paladin)",
-  'entities.abilities.hammer_of_wrath.name': "Palu Murka",
+    'Memanggil kekuatan pembalas, meningkatkan daya serang dan kekuatan mantra selama 20 dtk. (talenta Paladin)',
+  'entities.abilities.hammer_of_wrath.name': 'Palu Murka',
   'entities.abilities.hammer_of_wrath.description':
-    "Melempar palu suci ke musuh yang terluka, menimbulkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)",
-  'entities.abilities.counter_shot.name': "Tembakan Balasan",
+    'Melempar palu suci ke musuh yang terluka, menimbulkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)',
+  'entities.abilities.counter_shot.name': 'Tembakan Balasan',
   'entities.abilities.counter_shot.description':
-    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Pemburu)",
-  'entities.abilities.frost_trap.name': "Perangkap Es",
+    'Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Pemburu)',
+  'entities.abilities.frost_trap.name': 'Perangkap Es',
   'entities.abilities.frost_trap.description':
-    "Membekukan musuh di area target selama 3 dtk. (talenta Pemburu)",
-  'entities.abilities.mend_pet.name': "Sembuhkan Peliharaan",
+    'Membekukan musuh di area target selama 3 dtk. (talenta Pemburu)',
+  'entities.abilities.mend_pet.name': 'Sembuhkan Peliharaan',
   'entities.abilities.mend_pet.description':
-    "Menyembuhkan target bersahabat sebesar {damage} selama 15 dtk. (talenta Pemburu)",
-  'entities.abilities.multi_shot.name': "Tembakan Ganda",
+    'Menyembuhkan target bersahabat sebesar {damage} selama 15 dtk. (talenta Pemburu)',
+  'entities.abilities.multi_shot.name': 'Tembakan Ganda',
   'entities.abilities.multi_shot.description':
-    "Menembakkan beberapa proyektil dan mengenai musuh di sekitar sebesar {damage}. (talenta Pemburu)",
-  'entities.abilities.deterrence.name': "Penangkisan",
+    'Menembakkan beberapa proyektil dan mengenai musuh di sekitar sebesar {damage}. (talenta Pemburu)',
+  'entities.abilities.deterrence.name': 'Penangkisan',
   'entities.abilities.deterrence.description':
-    "Meningkatkan peluang menghindarmu sebesar 50% selama 10 dtk. (talenta Pemburu)",
-  'entities.abilities.aspect_of_the_wild.name': "Aspek Alam Liar",
+    'Meningkatkan peluang menghindarmu sebesar 50% selama 10 dtk. (talenta Pemburu)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspek Alam Liar',
   'entities.abilities.aspect_of_the_wild.description':
-    "Mengilhami sekutu di sekitar dengan kekuatan liar, meningkatkan daya serang selama 5 mnt. (talenta Pemburu)",
-  'entities.abilities.kick.name': "Tendang",
+    'Mengilhami sekutu di sekitar dengan kekuatan liar, meningkatkan daya serang selama 5 mnt. (talenta Pemburu)',
+  'entities.abilities.kick.name': 'Tendang',
   'entities.abilities.kick.description':
-    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Rogue)",
-  'entities.abilities.preparation.name': "Persiapan",
+    'Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Rogue)',
+  'entities.abilities.preparation.name': 'Persiapan',
   'entities.abilities.preparation.description':
-    "Mengakhiri cooldown Sprint, Evasion, dan Vanish. (talenta Rogue)",
-  'entities.abilities.ghostly_strike.name': "Serangan Arwah",
+    'Mengakhiri cooldown Sprint, Evasion, dan Vanish. (talenta Rogue)',
+  'entities.abilities.ghostly_strike.name': 'Serangan Arwah',
   'entities.abilities.ghostly_strike.description':
-    "Menyerang musuh dengan kerusakan senjata ditambah {damage} dan sebentar meningkatkan menghindar. Memberi 1 poin kombo. (talenta Rogue)",
-  'entities.abilities.cloak_of_shadows.name': "Jubah Bayangan",
+    'Menyerang musuh dengan kerusakan senjata ditambah {damage} dan sebentar meningkatkan menghindar. Memberi 1 poin kombo. (talenta Rogue)',
+  'entities.abilities.cloak_of_shadows.name': 'Jubah Bayangan',
   'entities.abilities.cloak_of_shadows.description':
-    "Menyelimutimu dengan bayangan, menyerap kerusakan selama 5 dtk. (talenta Rogue)",
-  'entities.abilities.shadowstep.name': "Langkah Bayangan",
+    'Menyelimutimu dengan bayangan, menyerap kerusakan selama 5 dtk. (talenta Rogue)',
+  'entities.abilities.shadowstep.name': 'Langkah Bayangan',
   'entities.abilities.shadowstep.description':
-    "Melangkah melalui bayangan menuju targetmu. (talenta Rogue)",
-  'entities.abilities.silence.name': "Bungkam",
-  'entities.abilities.silence.description':
-    "Membungkam target selama 4 dtk. (talenta Rogue)",
-  'entities.abilities.psychic_scream.name': "Jeritan Psikis",
+    'Melangkah melalui bayangan menuju targetmu. (talenta Rogue)',
+  'entities.abilities.silence.name': 'Bungkam',
+  'entities.abilities.silence.description': 'Membungkam target selama 4 dtk. (talenta Rogue)',
+  'entities.abilities.psychic_scream.name': 'Jeritan Psikis',
   'entities.abilities.psychic_scream.description':
-    "Menakuti musuh di sekitar hingga 4 dtk. Kerusakan dapat mematahkan efek. (talenta Priest)",
-  'entities.abilities.inner_focus.name': "Fokus Batin",
+    'Menakuti musuh di sekitar hingga 4 dtk. Kerusakan dapat mematahkan efek. (talenta Priest)',
+  'entities.abilities.inner_focus.name': 'Fokus Batin',
   'entities.abilities.inner_focus.description':
-    "Membuat mantra berikutnya gratis. Berlangsung 60 dtk. (talenta Priest)",
-  'entities.abilities.desperate_prayer.name': "Doa Putus Asa",
+    'Membuat mantra berikutnya gratis. Berlangsung 60 dtk. (talenta Priest)',
+  'entities.abilities.desperate_prayer.name': 'Doa Putus Asa',
   'entities.abilities.desperate_prayer.description':
-    "Seketika menyembuhkanmu sebesar {damage}. (talenta Priest)",
-  'entities.abilities.prayer_of_healing.name': "Doa Penyembuhan",
+    'Seketika menyembuhkanmu sebesar {damage}. (talenta Priest)',
+  'entities.abilities.prayer_of_healing.name': 'Doa Penyembuhan',
   'entities.abilities.prayer_of_healing.description':
-    "Menyembuhkan sekutu di sekitar sebesar {damage}. (talenta Priest)",
-  'entities.abilities.mind_sear.name': "Bakar Pikiran",
+    'Menyembuhkan sekutu di sekitar sebesar {damage}. (talenta Priest)',
+  'entities.abilities.mind_sear.name': 'Bakar Pikiran',
   'entities.abilities.mind_sear.description':
-    "Menyalurkan energi Bayangan di area target, melukai musuh di sekitar tiap detik sebesar {damage}. (talenta Priest)",
-  'entities.abilities.earthbind.name': "Ikatan Bumi",
+    'Menyalurkan energi Bayangan di area target, melukai musuh di sekitar tiap detik sebesar {damage}. (talenta Priest)',
+  'entities.abilities.earthbind.name': 'Ikatan Bumi',
   'entities.abilities.earthbind.description':
-    "Mengikat musuh di sekitar ke tanah dan mengakar mereka selama 2 dtk. (talenta Shaman)",
-  'entities.abilities.healing_stream.name': "Aliran Penyembuhan",
+    'Mengikat musuh di sekitar ke tanah dan mengakar mereka selama 2 dtk. (talenta Shaman)',
+  'entities.abilities.healing_stream.name': 'Aliran Penyembuhan',
   'entities.abilities.healing_stream.description':
-    "Memulihkan target bersahabat selama 12 dtk. (talenta Shaman)",
-  'entities.abilities.chain_lightning.name': "Rantai Petir",
+    'Memulihkan target bersahabat selama 12 dtk. (talenta Shaman)',
+  'entities.abilities.chain_lightning.name': 'Rantai Petir',
   'entities.abilities.chain_lightning.description':
-    "Melontarkan petir ke area target, melukai musuh di sekitar sebesar {damage}. (talenta Shaman)",
-  'entities.abilities.bloodlust.name': "Haus Darah",
+    'Melontarkan petir ke area target, melukai musuh di sekitar sebesar {damage}. (talenta Shaman)',
+  'entities.abilities.bloodlust.name': 'Haus Darah',
   'entities.abilities.bloodlust.description':
-    "Mengobarkan sekutu di sekitar, meningkatkan kecepatan serang selama 15 dtk. (talenta Shaman)",
-  'entities.abilities.spell_lock.name': "Kunci Mantra",
+    'Mengobarkan sekutu di sekitar, meningkatkan kecepatan serang selama 15 dtk. (talenta Shaman)',
+  'entities.abilities.spell_lock.name': 'Kunci Mantra',
   'entities.abilities.spell_lock.description':
-    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 5 dtk. (talenta Warlock)",
-  'entities.abilities.howl_of_terror.name': "Lolongan Teror",
+    'Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 5 dtk. (talenta Warlock)',
+  'entities.abilities.howl_of_terror.name': 'Lolongan Teror',
   'entities.abilities.howl_of_terror.description':
-    "Menakuti musuh di sekitar hingga 3 dtk. Kerusakan dapat mematahkan efek. (talenta Warlock)",
-  'entities.abilities.curse_of_exhaustion.name': "Kutukan Kelelahan",
+    'Menakuti musuh di sekitar hingga 3 dtk. Kerusakan dapat mematahkan efek. (talenta Warlock)',
+  'entities.abilities.curse_of_exhaustion.name': 'Kutukan Kelelahan',
   'entities.abilities.curse_of_exhaustion.description':
-    "Mengutuk target, mengurangi kecepatan gerak sebesar 30% selama 12 dtk. (talenta Warlock)",
-  'entities.abilities.death_coil.name': "Kumparan Kematian",
+    'Mengutuk target, mengurangi kecepatan gerak sebesar 30% selama 12 dtk. (talenta Warlock)',
+  'entities.abilities.death_coil.name': 'Kumparan Kematian',
   'entities.abilities.death_coil.description':
-    "Menghantam musuh dengan {damage} kerusakan Bayangan, lalu membuatnya ngeri selama 3 dtk. Versi ini tidak menyembuhkan perapal. (talenta Warlock)",
-  'entities.abilities.chaos_bolt.name': "Baut Kekacauan",
+    'Menghantam musuh dengan {damage} kerusakan Bayangan, lalu membuatnya ngeri selama 3 dtk. Versi ini tidak menyembuhkan perapal. (talenta Warlock)',
+  'entities.abilities.chaos_bolt.name': 'Baut Kekacauan',
   'entities.abilities.chaos_bolt.description':
-    "Melontarkan baut api kacau sebesar {damage} kerusakan Api. (talenta Warlock)",
-  'entities.abilities.metamorphosis.name': "Metamorfosis",
+    'Melontarkan baut api kacau sebesar {damage} kerusakan Api. (talenta Warlock)',
+  'entities.abilities.metamorphosis.name': 'Metamorfosis',
   'entities.abilities.metamorphosis.description':
-    "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)",
-  'entities.abilities.skull_bash.name': "Hantaman Tengkorak",
+    'Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)',
+  'entities.abilities.skull_bash.name': 'Hantaman Tengkorak',
   'entities.abilities.skull_bash.description':
-    "Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Druid)",
-  'entities.abilities.innervate.name': "Aliran Tenaga",
+    'Menghentikan perapalan mantra dan mencegah mantra dari sekolah itu selama 4 dtk. (talenta Druid)',
+  'entities.abilities.innervate.name': 'Aliran Tenaga',
   'entities.abilities.innervate.description':
-    "Seketika memulihkan 200 dari sumber daya saat ini. (talenta Druid)",
-  'entities.abilities.frenzied_regeneration.name': "Regenerasi Frenetik",
+    'Seketika memulihkan 200 dari sumber daya saat ini. (talenta Druid)',
+  'entities.abilities.frenzied_regeneration.name': 'Regenerasi Frenetik',
   'entities.abilities.frenzied_regeneration.description':
-    "Meregenerasi nyawa selama 10 dtk. Hanya Bentuk Beruang. (talenta Druid)",
-  'entities.abilities.berserk.name': "Mengamuk",
+    'Meregenerasi nyawa selama 10 dtk. Hanya Bentuk Beruang. (talenta Druid)',
+  'entities.abilities.berserk.name': 'Mengamuk',
   'entities.abilities.berserk.description':
-    "Meningkatkan daya serang selama 15 dtk. (talenta Druid)",
-  'entities.abilities.tranquility.name': "Ketenangan",
+    'Meningkatkan daya serang selama 15 dtk. (talenta Druid)',
+  'entities.abilities.tranquility.name': 'Ketenangan',
   'entities.abilities.tranquility.description':
-    "Menyalurkan energi pemulih, menyembuhkan sekutu di sekitar setiap detik. (talenta Druid)",
+    'Menyalurkan energi pemulih, menyembuhkan sekutu di sekitar setiap detik. (talenta Druid)',
 };

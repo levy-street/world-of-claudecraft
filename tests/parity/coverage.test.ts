@@ -820,7 +820,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it('talents2_mage_rows: row grants drive rooted Ice Lance, Shatter critVsRooted, PoM, Blink, and Deep Freeze', () => {
+  it('talents2_mage_rows: row grants drive Cone of Cold, baseline Ice Lance, Shatter critVsRooted, PoM, Blink, and Deep Freeze', () => {
     const rec = run('talents2_mage_rows');
     const sim = rec.sim as any;
     const ev = rec.allEvents as Ev[];
@@ -833,11 +833,14 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(mainMeta.talents.rows).toEqual({
       5: 'mag_r5_firestarter',
       8: 'mag_r8_counterspell',
-      11: 'mag_r11_ice_lance',
+      11: 'mag_r11_cone_of_cold',
       14: 'mag_r14_presence_of_mind',
       17: 'mag_r17_blink',
       20: 'mag_r20_deep_freeze',
     });
+    expect(
+      mainMeta.talentMods.grants.some((g: { ability: string }) => g.ability === 'cone_of_cold'),
+    ).toBe(true);
     expect(shatterMeta.talents.rows[11]).toBe('mag_r11_shatter');
     expect(shatterMeta.talentMods.global.critVsRooted).toBeCloseTo(0.3);
     expect(

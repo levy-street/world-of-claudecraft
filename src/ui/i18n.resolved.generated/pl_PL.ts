@@ -4345,64 +4345,64 @@ export const pl_PL: EnTranslations = {
         "description": "Wpadnij w furię berserkera, generując 20 wściekłości. (Talent wojownika)"
       },
       "heroic_leap": {
-        "name": "Salto heroico",
-        "description": "Salta al área objetivo e inflige {damage} de daño físico a los enemigos cercanos. (Talento de guerrero)"
+        "name": "Heroiczny skok",
+        "description": "Skacze na obszar celu, zadając pobliskim wrogom {damage} obrażeń fizycznych. (talent wojownika)"
       },
       "pummel": {
-        "name": "Zurrar",
-        "description": "Interrumpe el lanzamiento de hechizos e impide lanzar hechizos de esa escuela durante 4 s. (Talento de guerrero)"
+        "name": "Okładanie",
+        "description": "Przerywa rzucanie zaklęć i blokuje zaklęcia tej szkoły na 4 s. (talent wojownika)"
       },
       "shield_wall": {
-        "name": "Muro de escudo",
-        "description": "Alza tu muro de escudo y aumenta mucho la armadura durante 10 s. (Talento de guerrero)"
+        "name": "Mur tarcz",
+        "description": "Wznosi mur tarcz, znacznie zwiększając pancerz na 10 s. (talent wojownika)"
       },
       "last_stand": {
-        "name": "Última carga",
-        "description": "Aumenta temporalmente el Aguante durante 15 s, lo que aumenta la salud máxima. (Talento de guerrero)"
+        "name": "Ostatni bastion",
+        "description": "Tymczasowo zwiększa Wytrzymałość na 15 s, zwiększając maksymalne zdrowie. (talent wojownika)"
       },
       "bladestorm": {
-        "name": "Filotormenta",
-        "description": "Te conviertes en una tormenta de acero y golpeas a los enemigos cercanos cada segundo por {damage}. (Talento de guerrero)"
+        "name": "Burza ostrzy",
+        "description": "Zamienia cię w burzę stali, uderzając pobliskich wrogów co sekundę za {damage}. (talent wojownika)"
       },
       "avatar": {
-        "name": "Avatar",
-        "description": "Te transformas en un coloso y aumentas el poder de ataque durante 20 s. (Talento de guerrero)"
+        "name": "Awatar",
+        "description": "Przemienia cię w kolosa, zwiększając siłę ataku na 20 s. (talent wojownika)"
       },
       "rallying_cry": {
-        "name": "Grito de convocación",
-        "description": "Sueltas un grito de convocación que aumenta el poder de ataque de los aliados cercanos durante 10 s. (Talento de guerrero)"
+        "name": "Okrzyk mobilizujący",
+        "description": "Wydaje mobilizujący okrzyk, zwiększając siłę ataku pobliskich sojuszników na 10 s. (talent wojownika)"
       },
       "counterspell": {
-        "name": "Contrahechizo",
-        "description": "Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)"
+        "name": "Kontrzaklęcie",
+        "description": "Kontruje rzucanie zaklęć wroga i blokuje zaklęcia tej szkoły na 6 s. (talent maga)"
       },
       "ice_lance": {
-        "name": "Lanza de hielo",
-        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+        "name": "Lodowa lanca",
+        "description": "Ciska odłamkiem lodu, zadając {damage} obrażeń od Mrozu. Zadaje potrójne obrażenia unieruchomionym celom."
       },
       "presence_of_mind": {
-        "name": "Presencia mental",
-        "description": "Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)"
+        "name": "Przytomność umysłu",
+        "description": "Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 s. (talent maga)"
       },
       "blink": {
-        "name": "Traslación",
-        "description": "Te teletransporta 15 m hacia delante y rompe raíces. (Talento de mago)"
+        "name": "Mgnienie",
+        "description": "Teleportuje cię 15 m do przodu i uwalnia z unieruchomień. (talent maga)"
       },
       "ice_block": {
-        "name": "Bloque de hielo",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (Talento de mago)"
+        "name": "Bryła lodu",
+        "description": "Zamyka cię w lodzie, pochłaniając ogromne obrażenia przez 8 s. (talent maga)"
       },
       "deep_freeze": {
-        "name": "Congelación profunda",
-        "description": "Congela profundamente al objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (Talento de mago)"
+        "name": "Głębokie zamrożenie",
+        "description": "Głęboko zamraża cel, zadając {damage} obrażeń od Mrozu i ogłuszając go na 4 s. (talent maga)"
       },
       "meteor": {
-        "name": "Meteoro",
-        "description": "Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)"
+        "name": "Meteor",
+        "description": "Sprowadza meteor na obszar celu, zadając {damage} obrażeń od Ognia i podpalając ziemię. (talent maga)"
       },
       "evocation": {
-        "name": "Evocación",
-        "description": "Restaura maná rápidamente. (Talento de mago)"
+        "name": "Ewokacja",
+        "description": "Szybko przywraca manę. (talent maga)"
       },
       "rebuke": {
         "name": "Nagana",
@@ -4474,7 +4474,7 @@ export const pl_PL: EnTranslations = {
       },
       "silence": {
         "name": "Cisza",
-        "description": "Wycisza cel na 4 s. (talent łotrzyka)"
+        "description": "Wycisza cel na 4 s. (talent kapłana)"
       },
       "psychic_scream": {
         "name": "Psychiczny krzyk",
@@ -4582,15 +4582,19 @@ export const pl_PL: EnTranslations = {
       },
       "arcane_power": {
         "name": "Moc Arkanów",
-        "description": "Napełnia cię mocą Arkanów, zwiększając moc zaklęć o 28 na 12 sek. (specjalizacja Arkana)"
+        "description": "Zwiększa obrażenia zaklęć o 20% i przyspieszenie zaklęć o 10% na 10 sek. (specjalizacja Arkana)"
       },
       "combustion": {
         "name": "Zapłon",
-        "description": "Skupia twoją magię ognia, aby następny atak był trafieniem krytycznym. (specjalizacja Ogień)"
+        "description": "Zwiększa szansę na krytyczny efekt zaklęć o 50% na 15 sek. (specjalizacja Ogień)"
+      },
+      "icy_veins": {
+        "name": "Lodowe Żyły",
+        "description": "Zwiększa przyspieszenie zaklęć o 30% oraz zapobiega przerwaniu i opóźnieniu rzucania na 10 sek. (specjalizacja Mróz)"
       },
       "cone_of_cold": {
         "name": "Stożek zimna",
-        "description": "Uderza pobliskich wrogów mrozem, zadając {damage} obrażeń od Mrozu. (specjalizacja Mróz)"
+        "description": "Razisz pobliskich wrogów mrozem, zadając {damage} obrażeń od Mrozu. (talent maga)"
       },
       "cold_blood": {
         "name": "Zimna krew",

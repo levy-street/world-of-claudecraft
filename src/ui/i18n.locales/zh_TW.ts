@@ -369,7 +369,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'game.talents.specTab': '專精',
   'game.talents.available': '可用',
   'game.talents.spent': '已用',
-  'game.talents.pointSource': '選項列會從 {first} 級到 {cap} 級解鎖。每個已解鎖的列中選擇一個選項。',
+  'game.talents.pointSource':
+    '選項列會從 {first} 級到 {cap} 級解鎖。每個已解鎖的列中選擇一個選項。',
   'game.talents.apply': '套用變更',
   'game.talents.clear': '重置選項',
   'game.talents.reset': '重置',
@@ -3923,20 +3924,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': '適合單人',
   'guide.talentsPage.heading': '天賦與專精',
   'guide.talentsPage.howBody':
-  "天賦列會隨等級解鎖，專精在 10 級開放。先選擇一個專精，取得它的代表技能與精通，然後在抉擇分頁中，從每個已解鎖的列裡選擇一個選項。",
+    '天賦列會隨等級解鎖，專精在 10 級開放。先選擇一個專精，取得它的代表技能與精通，然後在抉擇分頁中，從每個已解鎖的列裡選擇一個選項。',
   'guide.talentsPage.howHeading': '運作方式',
   'guide.talentsPage.intro':
-  "天賦讓職業更符合你的玩法。它們是可選、寬容且容易更改的，所以你可以放心嘗試。",
+    '天賦讓職業更符合你的玩法。它們是可選、寬容且容易更改的，所以你可以放心嘗試。',
   'guide.talentsPage.resetNote':
-  "只要不在戰鬥中，你隨時可以重置選擇，所以早期選擇不會成為陷阱。多試幾種，看看喜歡什麼，再自由調整。",
+    '只要不在戰鬥中，你隨時可以重置選擇，所以早期選擇不會成為陷阱。多試幾種，看看喜歡什麼，再自由調整。',
   'guide.talentsPage.resetTitle': '沒有什麼是永久的',
   'guide.talentsPage.shareNote':
-  "完成後的配置可以複製成簡短分享碼交給朋友，對方可直接貼到自己的天賦面板中載入。",
+    '完成後的配置可以複製成簡短分享碼交給朋友，對方可直接貼到自己的天賦面板中載入。',
   'guide.talentsPage.specsBody':
-  "每個職業都有數個專精，各自擁有職責和代表重點。這裡列出它們的整體形態。打開職業頁面可查看完整技能套組。",
+    '每個職業都有數個專精，各自擁有職責和代表重點。這裡列出它們的整體形態。打開職業頁面可查看完整技能套組。',
   'guide.talentsPage.specsHeading': '各職業的專精',
   'guide.talentsPage.whatBody':
-  "隨著升級，天賦列會逐步解鎖，每列提供少量選擇。每個選擇都會為你的技能、屬性或工具箱加入永久強化，塑造職業在戰鬥中的手感。",
+    '隨著升級，天賦列會逐步解鎖，每列提供少量選擇。每個選擇都會為你的技能、屬性或工具箱加入永久強化，塑造職業在戰鬥中的手感。',
   'guide.talentsPage.whatHeading': '天賦的作用',
   'guide.toc.heading': '本頁內容',
   'guide.wishPage.heading': '我希望早點知道的事',
@@ -4806,13 +4807,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '從遠處釘刺敵人，使其癱瘓最多4秒。受到任何傷害都會打破效果。（生存專精招牌）',
   'entities.abilities.arcane_power.name': '祕法強化',
   'entities.abilities.arcane_power.description':
-    '讓你充滿祕法能量，法術強度提高28點，持續12秒。（祕法專精招牌）',
+    '法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）',
   'entities.abilities.combustion.name': '燃燒',
   'entities.abilities.combustion.description':
-    '集中你的火焰魔法，使下一次攻擊造成致命一擊。（火焰專精招牌）',
+    '法術致命一擊機率提高50%，持續15秒。（火焰專精招牌）',
+  'entities.abilities.icy_veins.name': '冰冷血脈',
+  'entities.abilities.icy_veins.description':
+    '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
   'entities.abilities.cone_of_cold.name': '冰錐術',
   'entities.abilities.cone_of_cold.description':
-    '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）',
+    '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（法師天賦）',
   'entities.abilities.cold_blood.name': '冷血',
   'entities.abilities.cold_blood.description':
     '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）',
@@ -4881,7 +4885,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '反制敵人的施法，並使該系法術在 6 秒內無法施放。（法師天賦）',
   'entities.abilities.ice_lance.name': '冰霜長矛',
   'entities.abilities.ice_lance.description':
-    '投擲寒冰碎片，造成 {damage} 點冰霜傷害。對被定身目標造成三倍傷害。（法師天賦）',
+    '投擲寒冰碎片，造成 {damage} 點冰霜傷害。對被定身目標造成三倍傷害。',
   'entities.abilities.presence_of_mind.name': '氣定神閒',
   'entities.abilities.presence_of_mind.description':
     '使你的下一個有施法時間的法術變為瞬發。持續 60 秒。（法師天賦）',
@@ -4912,9 +4916,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.avenging_wrath.name': '復仇之怒',
   'entities.abilities.avenging_wrath.description':
     '召喚復仇之力，使攻擊強度和法術強度提高，持續 20 秒。（聖騎士天賦）',
-  'entities.abilities.hammer_of_wrath.name': "憤怒之錘",
+  'entities.abilities.hammer_of_wrath.name': '憤怒之錘',
   'entities.abilities.hammer_of_wrath.description':
-    "向受傷的敵人投擲一柄神聖之錘，造成 {damage} 點神聖傷害。只能對生命值低於 20% 的目標使用。（聖騎士天賦）",
+    '向受傷的敵人投擲一柄神聖之錘，造成 {damage} 點神聖傷害。只能對生命值低於 20% 的目標使用。（聖騎士天賦）',
   'entities.abilities.counter_shot.name': '反制射擊',
   'entities.abilities.counter_shot.description':
     '打斷施法，並使該系法術在 4 秒內無法施放。（獵人天賦）',
@@ -4956,15 +4960,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prayer_of_healing.name': '治療禱言',
   'entities.abilities.prayer_of_healing.description':
     '為附近盟友恢復 {damage} 點生命值。（牧師天賦）',
-  'entities.abilities.mind_sear.name': "精神灼燒",
+  'entities.abilities.mind_sear.name': '精神灼燒',
   'entities.abilities.mind_sear.description':
-    "在目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）",
+    '在目標區域引導暗影能量，每秒對附近敵人造成 {damage} 點傷害。（牧師天賦）',
   'entities.abilities.earthbind.name': '大地束縛',
-  'entities.abilities.earthbind.description':
-    '將附近敵人縛於大地，使其定身 2 秒。（薩滿天賦）',
+  'entities.abilities.earthbind.description': '將附近敵人縛於大地，使其定身 2 秒。（薩滿天賦）',
   'entities.abilities.healing_stream.name': '治療之泉',
-  'entities.abilities.healing_stream.description':
-    '在 12 秒內恢復友方目標的生命值。（薩滿天賦）',
+  'entities.abilities.healing_stream.description': '在 12 秒內恢復友方目標的生命值。（薩滿天賦）',
   'entities.abilities.chain_lightning.name': '閃電鏈',
   'entities.abilities.chain_lightning.description':
     '向目標區域投出閃電，對附近敵人造成 {damage} 點自然傷害。（薩滿天賦）',
@@ -4972,17 +4974,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '激發附近盟友的狂怒，使攻擊速度提高，持續 15 秒。（薩滿天賦）',
   'entities.abilities.spell_lock.name': '法術封鎖',
-  'entities.abilities.spell_lock.description':
-    '打斷施法，並阻止該系法術施放 5 秒。（術士天賦）',
+  'entities.abilities.spell_lock.description': '打斷施法，並阻止該系法術施放 5 秒。（術士天賦）',
   'entities.abilities.howl_of_terror.name': '恐懼嚎叫',
   'entities.abilities.howl_of_terror.description':
     '使附近敵人恐懼，最多持續 3 秒。受到傷害可能打破效果。（術士天賦）',
   'entities.abilities.curse_of_exhaustion.name': '疲勞詛咒',
   'entities.abilities.curse_of_exhaustion.description':
     '詛咒目標，使移動速度降低 30%，持續 12 秒。（術士天賦）',
-  'entities.abilities.death_coil.name': "死亡纏繞",
+  'entities.abilities.death_coil.name': '死亡纏繞',
   'entities.abilities.death_coil.description':
-    "以 {damage} 點暗影傷害衝擊敵人，然後使其驚駭 3 秒。此版本不會治療施法者。（術士天賦）",
+    '以 {damage} 點暗影傷害衝擊敵人，然後使其驚駭 3 秒。此版本不會治療施法者。（術士天賦）',
   'entities.abilities.chaos_bolt.name': '混沌箭',
   'entities.abilities.chaos_bolt.description':
     '投出混沌火焰之箭，造成 {damage} 點火焰傷害。（術士天賦）',
@@ -4990,20 +4991,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.description':
     '化為惡魔之力，使護甲和攻擊強度提高 20 秒。（術士天賦）',
   'entities.abilities.skull_bash.name': '碎顱猛擊',
-  'entities.abilities.skull_bash.description':
-    '打斷施法，並阻止該系法術施放 4 秒。（德魯伊天賦）',
-  'entities.abilities.innervate.name': "啟動",
-  'entities.abilities.innervate.description':
-    "立即恢復 200 點目前資源。（德魯伊天賦）",
+  'entities.abilities.skull_bash.description': '打斷施法，並阻止該系法術施放 4 秒。（德魯伊天賦）',
+  'entities.abilities.innervate.name': '啟動',
+  'entities.abilities.innervate.description': '立即恢復 200 點目前資源。（德魯伊天賦）',
   'entities.abilities.frenzied_regeneration.name': '狂暴回復',
   'entities.abilities.frenzied_regeneration.description':
     '在 10 秒內恢復生命值。僅限熊形態。（德魯伊天賦）',
   'entities.abilities.berserk.name': '狂暴',
-  'entities.abilities.berserk.description':
-    '攻擊強度提高 15 秒。（德魯伊天賦）',
+  'entities.abilities.berserk.description': '攻擊強度提高 15 秒。（德魯伊天賦）',
   'entities.abilities.tranquility.name': '寧靜',
-  'entities.abilities.tranquility.description':
-    '引導恢復能量，每秒治療附近盟友。（德魯伊天賦）',
+  'entities.abilities.tranquility.description': '引導恢復能量，每秒治療附近盟友。（德魯伊天賦）',
   'game.talents.readout.rowsSummary': '天賦：{head}，已選擇 {picked}/{unlocked} 列選項。',
   'game.talents.readout.specLocked': ' 專精將在 {level} 級解鎖。',
 };

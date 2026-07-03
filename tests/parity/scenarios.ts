@@ -3752,8 +3752,9 @@ function talents2MageRows(): Scenario {
   return {
     name: 'talents2_mage_rows',
     coverage: [
-      'Talents 2.0 mage full row build: firestarter/counterspell/ice_lance/presence_of_mind/blink/deep_freeze',
-      'frost_nova roots into ice_lance vsRootedMult damage',
+      'Talents 2.0 mage full row build: firestarter/counterspell/cone_of_cold/presence_of_mind/blink/deep_freeze',
+      'frost_nova roots into baseline ice_lance vsRootedMult damage',
+      'mag_r11_cone_of_cold grant remains selected after Ice Lance moved baseline',
       'mag_r11_shatter critVsRooted path on a rooted target',
       'presence_of_mind next_cast_instant consume into fireball',
       'blinkForward swept reposition',
@@ -3769,7 +3770,7 @@ function talents2MageRows(): Scenario {
       for (const [level, option] of [
         [5, 'mag_r5_firestarter'],
         [8, 'mag_r8_counterspell'],
-        [11, 'mag_r11_ice_lance'],
+        [11, 'mag_r11_cone_of_cold'],
         [14, 'mag_r14_presence_of_mind'],
         [17, 'mag_r17_blink'],
         [20, 'mag_r20_deep_freeze'],

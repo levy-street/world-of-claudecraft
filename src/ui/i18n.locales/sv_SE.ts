@@ -2163,8 +2163,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlockToast': 'Nytt talangval tillgängligt!',
   'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
   'game.talents.unlockBanner': 'Talanger upplåsta!',
-  'game.talents.unlockHint':
-  "Talangval är tillgängliga: tryck på N för att öppna Talanger.",
+  'game.talents.unlockHint': 'Talangval är tillgängliga: tryck på N för att öppna Talanger.',
   'game.xp.lv': 'Nivå',
   'game.xp.maxLevel': 'MAXNIVÅ',
   'game.xp.rested': 'Utvilad',
@@ -3097,20 +3096,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'En klassisk MMO du spelar gratis i din webbläsare.',
   'guide.talentsPage.heading': 'Talanger och specialiseringar',
   'guide.talentsPage.howBody':
-  "Rader låses upp när du levlar, och specialiseringar öppnas på nivå 10. Välj en specialisering för dess signaturförmåga och mästerskap, använd sedan fliken Val för att välja ett alternativ från varje upplåst rad.",
+    'Rader låses upp när du levlar, och specialiseringar öppnas på nivå 10. Välj en specialisering för dess signaturförmåga och mästerskap, använd sedan fliken Val för att välja ett alternativ från varje upplåst rad.',
   'guide.talentsPage.howHeading': 'Så fungerar de',
   'guide.talentsPage.intro':
-  "Talanger är hur du gör en klass till din egen. De är valfria, förlåtande och enkla att ändra, så du kan experimentera utan oro.",
+    'Talanger är hur du gör en klass till din egen. De är valfria, förlåtande och enkla att ändra, så du kan experimentera utan oro.',
   'guide.talentsPage.resetNote':
-  "Du kan återställa dina val när du är utanför strid, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar och ändra dig fritt.",
+    'Du kan återställa dina val när du är utanför strid, så ett tidigt val är aldrig en fälla. Prova saker, se vad du gillar och ändra dig fritt.',
   'guide.talentsPage.resetTitle': 'Inget är permanent',
   'guide.talentsPage.shareNote':
-  "En färdig build kan kopieras till en kort delningskod och ges till en vän, som klistrar in den direkt i sin egen talangpanel.",
+    'En färdig build kan kopieras till en kort delningskod och ges till en vän, som klistrar in den direkt i sin egen talangpanel.',
   'guide.talentsPage.specsBody':
-  "Varje klass har flera specialiseringar, var och en med egen roll och signaturfokus. Här är formen på dem alla. Öppna en klass för hela kitet.",
+    'Varje klass har flera specialiseringar, var och en med egen roll och signaturfokus. Här är formen på dem alla. Öppna en klass för hela kitet.',
   'guide.talentsPage.specsHeading': 'Specialiseringar per klass',
   'guide.talentsPage.whatBody':
-  "När du går upp i nivå låses talangrader upp med ett litet antal val. Varje val lägger till en permanent förbättring av dina förmågor, värden eller verktyg och formar hur klassen känns i strid.",
+    'När du går upp i nivå låses talangrader upp med ett litet antal val. Varje val lägger till en permanent förbättring av dina förmågor, värden eller verktyg och formar hur klassen känns i strid.',
   'guide.talentsPage.whatHeading': 'Vad talanger gör',
   'guide.toc.heading': 'På den här sidan',
   'guide.viewer.canvasLabel': 'Roterbar 3D-modell av {name}',
@@ -5097,7 +5096,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Inte nu',
   'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
   'hudChrome.nativeUpdate.update': 'Uppdatera',
-  'entities.abilities.holy_shock.name': "Helig chock",
+  'entities.abilities.holy_shock.name': 'Helig chock',
   'entities.abilities.holy_shock.description':
     'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
   'entities.abilities.holy_shield.name': 'Helig sköld',
@@ -5117,13 +5116,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Sticker fienden på avstånd och försätter den ur strid i upp till 4 sek. All skada bryter effekten. (Överlevnadssignatur)',
   'entities.abilities.arcane_power.name': 'Arkan kraft',
   'entities.abilities.arcane_power.description':
-    'Fyller dig med arkan kraft och ökar besvärjelsekraft med 28 i 12 sek. (Arkan signatur)',
+    'Ökar besvärjelseskada med 20% och besvärjelsehastighet med 10% i 10 sek. (Arkan signatur)',
   'entities.abilities.combustion.name': 'Förbränning',
   'entities.abilities.combustion.description':
-    'Fokuserar din eldmagi så att din nästa attack blir en kritisk träff. (Eldsignatur)',
+    'Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)',
+  'entities.abilities.icy_veins.name': 'Isiga Ådror',
+  'entities.abilities.icy_veins.description':
+    'Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)',
   'entities.abilities.cone_of_cold.name': 'Köldkon',
   'entities.abilities.cone_of_cold.description':
-    'Spränger närliggande fiender med frost för {damage} frostskada. (Frostsignatur)',
+    'Slår närliggande fiender med frost för {damage} frostskada. (magikertalang)',
   'entities.abilities.cold_blood.name': 'Kallt blod',
   'entities.abilities.cold_blood.description':
     'Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)',
@@ -5195,7 +5197,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
   'entities.abilities.ice_lance.name': 'Lanza de hielo',
   'entities.abilities.ice_lance.description':
-    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados.',
   'entities.abilities.presence_of_mind.name': 'Presencia mental',
   'entities.abilities.presence_of_mind.description':
     'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
@@ -5213,118 +5215,115 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': "Tillrättavisning",
+  'entities.abilities.rebuke.name': 'Tillrättavisning',
   'entities.abilities.rebuke.description':
-    "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (paladintalang)",
-  'entities.abilities.crusader_strike.name': "Korsfararslag",
+    'Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (paladintalang)',
+  'entities.abilities.crusader_strike.name': 'Korsfararslag',
   'entities.abilities.crusader_strike.description':
-    "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)",
-  'entities.abilities.holy_wrath.name': "Helig vrede",
+    'Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)',
+  'entities.abilities.holy_wrath.name': 'Helig vrede',
   'entities.abilities.holy_wrath.description':
-    "Släpper lös helig kraft och skadar fiender i närheten för {damage}. (paladintalang)",
-  'entities.abilities.divine_shield.name': "Gudomlig sköld",
+    'Släpper lös helig kraft och skadar fiender i närheten för {damage}. (paladintalang)',
+  'entities.abilities.divine_shield.name': 'Gudomlig sköld',
   'entities.abilities.divine_shield.description':
-    "Skyddar dig med helig kraft och absorberar enorm skada i 8 sek. (paladintalang)",
-  'entities.abilities.avenging_wrath.name': "Hämnande vrede",
+    'Skyddar dig med helig kraft och absorberar enorm skada i 8 sek. (paladintalang)',
+  'entities.abilities.avenging_wrath.name': 'Hämnande vrede',
   'entities.abilities.avenging_wrath.description':
-    "Kallar fram hämnande kraft och ökar attackkraft och besvärjelsekraft i 20 sek. (paladintalang)",
-  'entities.abilities.hammer_of_wrath.name': "Vredens hammare",
+    'Kallar fram hämnande kraft och ökar attackkraft och besvärjelsekraft i 20 sek. (paladintalang)',
+  'entities.abilities.hammer_of_wrath.name': 'Vredens hammare',
   'entities.abilities.hammer_of_wrath.description':
-    "Kastar en helig hammare mot en sårad fiende för {damage} Helig skada. Kan bara användas under 20% hälsa. (paladintalang)",
-  'entities.abilities.counter_shot.name': "Moteld",
+    'Kastar en helig hammare mot en sårad fiende för {damage} Helig skada. Kan bara användas under 20% hälsa. (paladintalang)',
+  'entities.abilities.counter_shot.name': 'Moteld',
   'entities.abilities.counter_shot.description':
-    "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (jägartalang)",
-  'entities.abilities.frost_trap.name': "Frostfälla",
+    'Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (jägartalang)',
+  'entities.abilities.frost_trap.name': 'Frostfälla',
   'entities.abilities.frost_trap.description':
-    "Fryser fiender i målområdet på plats i 3 sek. (jägartalang)",
-  'entities.abilities.mend_pet.name': "Läk husdjur",
+    'Fryser fiender i målområdet på plats i 3 sek. (jägartalang)',
+  'entities.abilities.mend_pet.name': 'Läk husdjur',
   'entities.abilities.mend_pet.description':
-    "Läker ett vänligt mål för {damage} under 15 sek. (jägartalang)",
-  'entities.abilities.multi_shot.name': "Flerskott",
+    'Läker ett vänligt mål för {damage} under 15 sek. (jägartalang)',
+  'entities.abilities.multi_shot.name': 'Flerskott',
   'entities.abilities.multi_shot.description':
-    "Avfyrar flera projektiler och träffar fiender i närheten för {damage}. (jägartalang)",
-  'entities.abilities.deterrence.name': "Avskräckning",
+    'Avfyrar flera projektiler och träffar fiender i närheten för {damage}. (jägartalang)',
+  'entities.abilities.deterrence.name': 'Avskräckning',
   'entities.abilities.deterrence.description':
-    "Ökar din chans att ducka med 50% i 10 sek. (jägartalang)",
-  'entities.abilities.aspect_of_the_wild.name': "Vildmarkens aspekt",
+    'Ökar din chans att ducka med 50% i 10 sek. (jägartalang)',
+  'entities.abilities.aspect_of_the_wild.name': 'Vildmarkens aspekt',
   'entities.abilities.aspect_of_the_wild.description':
-    "Inspirerar närliggande allierade med vild styrka och ökar attackkraft i 5 min. (jägartalang)",
-  'entities.abilities.kick.name': "Spark",
+    'Inspirerar närliggande allierade med vild styrka och ökar attackkraft i 5 min. (jägartalang)',
+  'entities.abilities.kick.name': 'Spark',
   'entities.abilities.kick.description':
-    "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (skurktalang)",
-  'entities.abilities.preparation.name': "Förberedelse",
+    'Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (skurktalang)',
+  'entities.abilities.preparation.name': 'Förberedelse',
   'entities.abilities.preparation.description':
-    "Avslutar nedkylningen på Sprint, Evasion och Vanish. (skurktalang)",
-  'entities.abilities.ghostly_strike.name': "Spöklikt slag",
+    'Avslutar nedkylningen på Sprint, Evasion och Vanish. (skurktalang)',
+  'entities.abilities.ghostly_strike.name': 'Spöklikt slag',
   'entities.abilities.ghostly_strike.description':
-    "Träffar fienden med vapenskada plus {damage} och ökar kort undvikande. Ger 1 kombopoäng. (skurktalang)",
-  'entities.abilities.cloak_of_shadows.name': "Skuggornas mantel",
+    'Träffar fienden med vapenskada plus {damage} och ökar kort undvikande. Ger 1 kombopoäng. (skurktalang)',
+  'entities.abilities.cloak_of_shadows.name': 'Skuggornas mantel',
   'entities.abilities.cloak_of_shadows.description':
-    "Sveper in dig i skuggor och absorberar skada i 5 sek. (skurktalang)",
-  'entities.abilities.shadowstep.name': "Skuggsteg",
-  'entities.abilities.shadowstep.description':
-    "Kliver genom skuggorna mot ditt mål. (skurktalang)",
-  'entities.abilities.silence.name': "Tystnad",
-  'entities.abilities.silence.description':
-    "Tystar målet i 4 sek. (skurktalang)",
-  'entities.abilities.psychic_scream.name': "Psykiskt skrik",
+    'Sveper in dig i skuggor och absorberar skada i 5 sek. (skurktalang)',
+  'entities.abilities.shadowstep.name': 'Skuggsteg',
+  'entities.abilities.shadowstep.description': 'Kliver genom skuggorna mot ditt mål. (skurktalang)',
+  'entities.abilities.silence.name': 'Tystnad',
+  'entities.abilities.silence.description': 'Tystar målet i 4 sek. (skurktalang)',
+  'entities.abilities.psychic_scream.name': 'Psykiskt skrik',
   'entities.abilities.psychic_scream.description':
-    "Skrämmer fiender i närheten i upp till 4 sek. Skada kan bryta effekten. (prästtalang)",
-  'entities.abilities.inner_focus.name': "Inre fokus",
+    'Skrämmer fiender i närheten i upp till 4 sek. Skada kan bryta effekten. (prästtalang)',
+  'entities.abilities.inner_focus.name': 'Inre fokus',
   'entities.abilities.inner_focus.description':
-    "Gör din nästa besvärjelse gratis. Varar 60 sek. (prästtalang)",
-  'entities.abilities.desperate_prayer.name': "Desperat bön",
+    'Gör din nästa besvärjelse gratis. Varar 60 sek. (prästtalang)',
+  'entities.abilities.desperate_prayer.name': 'Desperat bön',
   'entities.abilities.desperate_prayer.description':
-    "Läker dig omedelbart för {damage}. (prästtalang)",
-  'entities.abilities.prayer_of_healing.name': "Helandets bön",
+    'Läker dig omedelbart för {damage}. (prästtalang)',
+  'entities.abilities.prayer_of_healing.name': 'Helandets bön',
   'entities.abilities.prayer_of_healing.description':
-    "Läker närliggande allierade för {damage}. (prästtalang)",
-  'entities.abilities.mind_sear.name': "Sinnesbränning",
+    'Läker närliggande allierade för {damage}. (prästtalang)',
+  'entities.abilities.mind_sear.name': 'Sinnesbränning',
   'entities.abilities.mind_sear.description':
-    "Kanaliserar skuggenergi i målområdet och skadar fiender i närheten varje sekund för {damage}. (prästtalang)",
-  'entities.abilities.earthbind.name': "Jordbindning",
+    'Kanaliserar skuggenergi i målområdet och skadar fiender i närheten varje sekund för {damage}. (prästtalang)',
+  'entities.abilities.earthbind.name': 'Jordbindning',
   'entities.abilities.earthbind.description':
-    "Binder fiender i närheten till jorden och rotar dem i 2 sek. (shamantalang)",
-  'entities.abilities.healing_stream.name': "Helande ström",
+    'Binder fiender i närheten till jorden och rotar dem i 2 sek. (shamantalang)',
+  'entities.abilities.healing_stream.name': 'Helande ström',
   'entities.abilities.healing_stream.description':
-    "Återställer ett vänligt mål under 12 sek. (shamantalang)",
-  'entities.abilities.chain_lightning.name': "Kedjeblixt",
+    'Återställer ett vänligt mål under 12 sek. (shamantalang)',
+  'entities.abilities.chain_lightning.name': 'Kedjeblixt',
   'entities.abilities.chain_lightning.description':
-    "Slungar blixtar mot målområdet och skadar fiender i närheten för {damage}. (shamantalang)",
-  'entities.abilities.bloodlust.name': "Blodtörst",
+    'Slungar blixtar mot målområdet och skadar fiender i närheten för {damage}. (shamantalang)',
+  'entities.abilities.bloodlust.name': 'Blodtörst',
   'entities.abilities.bloodlust.description':
-    "Piskar upp närliggande allierade och ökar attackhastigheten i 15 sek. (shamantalang)",
-  'entities.abilities.spell_lock.name': "Besvärjelselås",
+    'Piskar upp närliggande allierade och ökar attackhastigheten i 15 sek. (shamantalang)',
+  'entities.abilities.spell_lock.name': 'Besvärjelselås',
   'entities.abilities.spell_lock.description':
-    "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 5 sek. (warlocktalang)",
-  'entities.abilities.howl_of_terror.name': "Terrorskrik",
+    'Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 5 sek. (warlocktalang)',
+  'entities.abilities.howl_of_terror.name': 'Terrorskrik',
   'entities.abilities.howl_of_terror.description':
-    "Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (warlocktalang)",
-  'entities.abilities.curse_of_exhaustion.name': "Utmattningens förbannelse",
+    'Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (warlocktalang)',
+  'entities.abilities.curse_of_exhaustion.name': 'Utmattningens förbannelse',
   'entities.abilities.curse_of_exhaustion.description':
-    "Förbannar målet och minskar rörelsehastigheten med 30% i 12 sek. (warlocktalang)",
-  'entities.abilities.death_coil.name': "Dödsspiral",
+    'Förbannar målet och minskar rörelsehastigheten med 30% i 12 sek. (warlocktalang)',
+  'entities.abilities.death_coil.name': 'Dödsspiral',
   'entities.abilities.death_coil.description':
-    "Träffar fienden med {damage} Skuggskada och skrämmer den sedan i 3 sek. Den här versionen läker inte kastaren. (warlocktalang)",
-  'entities.abilities.chaos_bolt.name': "Kaosblixt",
+    'Träffar fienden med {damage} Skuggskada och skrämmer den sedan i 3 sek. Den här versionen läker inte kastaren. (warlocktalang)',
+  'entities.abilities.chaos_bolt.name': 'Kaosblixt',
   'entities.abilities.chaos_bolt.description':
-    "Slungar en kaotisk eldblixt för {damage} Eldskada. (warlocktalang)",
-  'entities.abilities.metamorphosis.name': "Metamorfos",
+    'Slungar en kaotisk eldblixt för {damage} Eldskada. (warlocktalang)',
+  'entities.abilities.metamorphosis.name': 'Metamorfos',
   'entities.abilities.metamorphosis.description':
-    "Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)",
-  'entities.abilities.skull_bash.name': "Skallkross",
+    'Antar demonisk kraft och ökar rustning och attackkraft i 20 sek. (warlocktalang)',
+  'entities.abilities.skull_bash.name': 'Skallkross',
   'entities.abilities.skull_bash.description':
-    "Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (druidentalang)",
-  'entities.abilities.innervate.name': "Innervera",
+    'Avbryter besvärjelsekastning och hindrar besvärjelser från den skolan i 4 sek. (druidentalang)',
+  'entities.abilities.innervate.name': 'Innervera',
   'entities.abilities.innervate.description':
-    "Återställer omedelbart 200 av din nuvarande resurs. (druidentalang)",
-  'entities.abilities.frenzied_regeneration.name': "Frenetisk regeneration",
+    'Återställer omedelbart 200 av din nuvarande resurs. (druidentalang)',
+  'entities.abilities.frenzied_regeneration.name': 'Frenetisk regeneration',
   'entities.abilities.frenzied_regeneration.description':
-    "Regenererar hälsa under 10 sek. Endast Björnform. (druidentalang)",
-  'entities.abilities.berserk.name': "Berserk",
-  'entities.abilities.berserk.description':
-    "Ökar attackkraft i 15 sek. (druidentalang)",
-  'entities.abilities.tranquility.name': "Stillhet",
+    'Regenererar hälsa under 10 sek. Endast Björnform. (druidentalang)',
+  'entities.abilities.berserk.name': 'Berserk',
+  'entities.abilities.berserk.description': 'Ökar attackkraft i 15 sek. (druidentalang)',
+  'entities.abilities.tranquility.name': 'Stillhet',
   'entities.abilities.tranquility.description':
-    "Kanaliserar återställande energi och läker närliggande allierade varje sekund. (druidentalang)",
+    'Kanaliserar återställande energi och läker närliggande allierade varje sekund. (druidentalang)',
 };

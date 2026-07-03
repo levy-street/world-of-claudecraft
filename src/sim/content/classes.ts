@@ -88,6 +88,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'arcane_missiles',
       'polymorph',
       'frost_nova',
+      'ice_lance',
       'arcane_explosion',
       'scorch',
       'ice_barrier',
@@ -3709,7 +3710,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ice_lance',
     name: 'Ice Lance',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 12,
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -3718,7 +3719,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 24, max: 30, vsRootedMult: 3 }],
     description:
-      'Hurls a shard of ice for $d Frost damage. Deals triple damage against rooted targets. (Mage talent)',
+      'Hurls a shard of ice for $d Frost damage. Deals triple damage against rooted targets.',
   },
   presence_of_mind: {
     id: 'presence_of_mind',
@@ -4210,7 +4211,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 70, max: 86, radius: 8 }],
-    description: 'Hurls lightning at the target area, damaging nearby enemies for $d. (Shaman talent)',
+    description:
+      'Hurls lightning at the target area, damaging nearby enemies for $d. (Shaman talent)',
   },
   bloodlust: {
     id: 'bloodlust',
@@ -4224,7 +4226,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'aoeAllyHaste', mult: 1.3, duration: 15, radius: 30 }],
-    description: 'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
+    description:
+      'Whips nearby allies into a frenzy, increasing attack speed for 15 sec. (Shaman talent)',
   },
   spell_lock: {
     id: 'spell_lock',
@@ -4497,30 +4500,50 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Arcane Power',
     class: 'mage',
     learnLevel: 10,
-    cost: 70,
+    cost: 0,
     castTime: 0,
     cooldown: 90,
     range: 0,
     school: 'arcane',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_spellpower', value: 28, duration: 12 }],
+    effects: [
+      { type: 'selfBuff', kind: 'buff_spelldmg', value: 0.2, duration: 10 },
+      { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.1, duration: 10 },
+    ],
     description:
-      'Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)',
+      'Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)',
   },
   combustion: {
     id: 'combustion',
     name: 'Combustion',
     class: 'mage',
     learnLevel: 10,
-    cost: 55,
+    cost: 0,
     castTime: 0,
     cooldown: 120,
     range: 0,
     school: 'fire',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60 }],
+    effects: [{ type: 'selfBuff', kind: 'buff_spellcrit', value: 0.5, duration: 15 }],
+    description: 'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+  },
+  icy_veins: {
+    id: 'icy_veins',
+    name: 'Icy Veins',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.3, duration: 10 },
+      { type: 'selfBuff', kind: 'cast_shield', value: 1, duration: 10 },
+    ],
     description:
-      'Focuses your fire magic so your next attack is a critical strike. (Fire signature)',
+      'Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)',
   },
   cone_of_cold: {
     id: 'cone_of_cold',
@@ -4534,7 +4557,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'frost',
     requiresTarget: false,
     effects: [{ type: 'aoeDamage', min: 28, max: 36, radius: 8 }],
-    description: 'Blasts nearby enemies with frost for $d Frost damage. (Frost signature)',
+    description: 'Blasts nearby enemies with frost for $d Frost damage. (Mage talent)',
   },
   cold_blood: {
     id: 'cold_blood',
@@ -4868,7 +4891,15 @@ function scaleEffect(
       // scale/jump) must never take damage scaling: rounding a multiplier
       // destroys it (round(1.2 * 1.1) = 1 = zero haste; round(1.4 * 1.1) = 2 =
       // double speed). Only additive buff values (AP, armor, spellpower) scale.
-      if (eff.kind === 'buff_haste' || eff.kind === 'buff_scale' || eff.kind === 'buff_jump') {
+      if (
+        eff.kind === 'buff_haste' ||
+        eff.kind === 'buff_scale' ||
+        eff.kind === 'buff_jump' ||
+        eff.kind === 'buff_spellcrit' ||
+        eff.kind === 'buff_spelldmg' ||
+        eff.kind === 'buff_spellhaste' ||
+        eff.kind === 'cast_shield'
+      ) {
         return eff;
       }
       return { ...eff, value: Math.round(eff.value * dmgMult + flat) };
@@ -4913,7 +4944,11 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
         (e.type === 'selfBuff' || e.type === 'buffTarget') &&
         e.kind !== 'buff_haste' &&
         e.kind !== 'buff_scale' &&
-        e.kind !== 'buff_jump'
+        e.kind !== 'buff_jump' &&
+        e.kind !== 'buff_spellcrit' &&
+        e.kind !== 'buff_spelldmg' &&
+        e.kind !== 'buff_spellhaste' &&
+        e.kind !== 'cast_shield'
           ? { ...e, value: Math.round(e.value * mul) }
           : e,
       );

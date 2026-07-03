@@ -4378,7 +4378,7 @@ export const pt_BR: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lança de Gelo",
-        "description": "Arremessa uma lasca de gelo que causa {damage} de dano de Gelo. Causa dano triplo contra alvos enraizados. (Talento de mago)"
+        "description": "Arremessa uma lasca de gelo que causa {damage} de dano de Gelo. Causa dano triplo contra alvos enraizados."
       },
       "presence_of_mind": {
         "name": "Presença de Espírito",
@@ -4582,15 +4582,19 @@ export const pt_BR: EnTranslations = {
       },
       "arcane_power": {
         "name": "Poder Arcano",
-        "description": "Enche você de poder Arcano, aumentando o poder mágico em 28 por 12 s. (assinatura Arcano)"
+        "description": "Aumenta o dano de feitiços em 20% e a aceleração de feitiços em 10% por 10 s. (assinatura Arcano)"
       },
       "combustion": {
         "name": "Combustão",
-        "description": "Concentra sua magia de fogo para que seu próximo ataque seja um acerto crítico. (assinatura Fogo)"
+        "description": "Aumenta a chance de acerto crítico de feitiços em 50% por 15 s. (assinatura Fogo)"
+      },
+      "icy_veins": {
+        "name": "Veias Gélidas",
+        "description": "Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)"
       },
       "cone_of_cold": {
         "name": "Cone de Frio",
-        "description": "Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (assinatura Gelo)"
+        "description": "Atinge inimigos próximos com gelo, causando {damage} de dano de Gelo. (talento de mago)"
       },
       "cold_blood": {
         "name": "Sangue Frio",

@@ -13,16 +13,17 @@ const mageSpellCostMods = [
   'arcane_missiles',
   'polymorph',
   'frost_nova',
+  'ice_lance',
   'arcane_explosion',
   'arcane_power',
   'combustion',
+  'icy_veins',
   'cone_of_cold',
   'flamestrike',
   'scorch',
   'pyroblast',
   'ice_barrier',
   'counterspell',
-  'ice_lance',
   'presence_of_mind',
   'blink',
   'ice_block',
@@ -276,11 +277,11 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
       theme: 'shatter',
       options: [
         {
-          id: 'mag_r11_ice_lance',
-          name: 'Ice Lance',
-          description: 'Grants Ice Lance.',
-          icon: 'ice_lance',
-          effect: { grant: { ability: 'ice_lance' } },
+          id: 'mag_r11_cone_of_cold',
+          name: 'Cone of Cold',
+          description: 'Grants Cone of Cold.',
+          icon: 'cone_of_cold',
+          effect: { grant: { ability: 'cone_of_cold' } },
         },
         {
           id: 'mag_r11_shatter',
@@ -312,9 +313,10 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'mag_r14_hot_streak',
           name: 'Hot Streak',
-          description: 'Pyroblast cast time reduced by 50%.',
+          description:
+            'After two consecutive spell critical hits, your next cast-time spell is instant and free.',
           icon: 'pyroblast',
-          effect: { ability: [{ ability: 'pyroblast', castPct: -0.5 }] },
+          effect: { global: { hotStreak: true } },
         },
         {
           id: 'mag_r14_netherwind',

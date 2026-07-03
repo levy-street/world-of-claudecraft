@@ -3124,20 +3124,20 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.tagline': 'Một MMO phong cách cổ điển bạn chơi miễn phí ngay trên trình duyệt.',
   'guide.talentsPage.heading': 'Tài năng và chuyên môn hóa',
   'guide.talentsPage.howBody':
-  "Các hàng mở khi bạn lên cấp, còn chuyên môn hóa mở ở cấp 10. Chọn một chuyên môn hóa vì kỹ năng đặc trưng và tinh thông của nó, rồi dùng thẻ Lựa chọn để chọn một tùy chọn từ mỗi hàng đã mở.",
+    'Các hàng mở khi bạn lên cấp, còn chuyên môn hóa mở ở cấp 10. Chọn một chuyên môn hóa vì kỹ năng đặc trưng và tinh thông của nó, rồi dùng thẻ Lựa chọn để chọn một tùy chọn từ mỗi hàng đã mở.',
   'guide.talentsPage.howHeading': 'Cách chúng hoạt động',
   'guide.talentsPage.intro':
-  "Tài năng là cách bạn biến lớp nhân vật thành của riêng mình. Chúng là tùy chọn, dễ sửa và dễ đổi, nên bạn có thể thử nghiệm mà không sợ.",
+    'Tài năng là cách bạn biến lớp nhân vật thành của riêng mình. Chúng là tùy chọn, dễ sửa và dễ đổi, nên bạn có thể thử nghiệm mà không sợ.',
   'guide.talentsPage.resetNote':
-  "Bạn có thể đặt lại lựa chọn bất cứ lúc nào khi ngoài chiến đấu, nên lựa chọn sớm không bao giờ là cái bẫy. Hãy thử, xem bạn thích gì và đổi tự do.",
+    'Bạn có thể đặt lại lựa chọn bất cứ lúc nào khi ngoài chiến đấu, nên lựa chọn sớm không bao giờ là cái bẫy. Hãy thử, xem bạn thích gì và đổi tự do.',
   'guide.talentsPage.resetTitle': 'Không có gì là vĩnh viễn',
   'guide.talentsPage.shareNote':
-  "Một build hoàn chỉnh có thể sao chép thành mã ngắn để chia sẻ cho bạn bè, họ dán thẳng vào bảng tài năng của mình để tải.",
+    'Một build hoàn chỉnh có thể sao chép thành mã ngắn để chia sẻ cho bạn bè, họ dán thẳng vào bảng tài năng của mình để tải.',
   'guide.talentsPage.specsBody':
-  "Mỗi lớp có vài chuyên môn hóa, mỗi chuyên môn hóa có vai trò và trọng tâm riêng. Đây là hình dạng tổng quát của tất cả. Mở một lớp để xem toàn bộ bộ kỹ năng.",
+    'Mỗi lớp có vài chuyên môn hóa, mỗi chuyên môn hóa có vai trò và trọng tâm riêng. Đây là hình dạng tổng quát của tất cả. Mở một lớp để xem toàn bộ bộ kỹ năng.',
   'guide.talentsPage.specsHeading': 'Chuyên môn hóa theo lớp',
   'guide.talentsPage.whatBody':
-  "Khi lên cấp, các hàng tài năng mở ra với một nhóm lựa chọn nhỏ. Mỗi lựa chọn thêm một nâng cấp vĩnh viễn cho kỹ năng, chỉ số hoặc bộ công cụ, định hình cảm giác của lớp trong chiến đấu.",
+    'Khi lên cấp, các hàng tài năng mở ra với một nhóm lựa chọn nhỏ. Mỗi lựa chọn thêm một nâng cấp vĩnh viễn cho kỹ năng, chỉ số hoặc bộ công cụ, định hình cảm giác của lớp trong chiến đấu.',
   'guide.talentsPage.whatHeading': 'Tài năng làm gì',
   'guide.toc.heading': 'Trên trang này',
   'guide.viewer.canvasLabel': 'Mô hình 3D xoay được của {name}',
@@ -5114,7 +5114,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Cập Nhật',
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
-  'entities.abilities.holy_shock.name': "Sốc Thánh",
+  'entities.abilities.holy_shock.name': 'Sốc Thánh',
   'entities.abilities.holy_shock.description':
     'Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)',
   'entities.abilities.holy_shield.name': 'Khiên Thánh',
@@ -5134,13 +5134,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chích kẻ địch từ xa, làm chúng bất động tối đa 4 giây. Bất kỳ sát thương nào cũng phá hiệu ứng. (dấu ấn Sinh Tồn)',
   'entities.abilities.arcane_power.name': 'Sức Mạnh Bí Thuật',
   'entities.abilities.arcane_power.description':
-    'Nạp đầy sức mạnh bí thuật cho bạn, tăng sức mạnh phép thêm 28 trong 12 giây. (dấu ấn Bí Thuật)',
+    'Tăng sát thương phép 20% và tốc độ phép 10% trong 10 giây. (kỹ năng đặc trưng Arcane)',
   'entities.abilities.combustion.name': 'Thiêu Đốt',
   'entities.abilities.combustion.description':
-    'Tập trung ma thuật lửa để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Lửa)',
+    'Tăng tỉ lệ chí mạng phép 50% trong 15 giây. (kỹ năng đặc trưng Fire)',
+  'entities.abilities.icy_veins.name': 'Huyết Mạch Băng Giá',
+  'entities.abilities.icy_veins.description':
+    'Tăng tốc độ phép 30% và ngăn gián đoạn cùng đẩy lùi thi triển trong 10 giây. (kỹ năng đặc trưng Frost)',
   'entities.abilities.cone_of_cold.name': 'Nón Lạnh',
   'entities.abilities.cone_of_cold.description':
-    'Thổi băng vào kẻ địch gần đó, gây {damage} sát thương Băng. (dấu ấn Băng)',
+    'Tấn công kẻ địch gần đó bằng băng, gây {damage} sát thương Frost. (tài năng Mage)',
   'entities.abilities.cold_blood.name': 'Máu Lạnh',
   'entities.abilities.cold_blood.description':
     'Tập trung sát ý để đòn tấn công tiếp theo của bạn là một cú chí mạng. (dấu ấn Ám Sát)',
@@ -5212,7 +5215,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Contrarresta el lanzamiento enemigo e impide lanzar hechizos de esa escuela durante 6 s. (Talento de mago)',
   'entities.abilities.ice_lance.name': 'Lanza de hielo',
   'entities.abilities.ice_lance.description':
-    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)',
+    'Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados.',
   'entities.abilities.presence_of_mind.name': 'Presencia mental',
   'entities.abilities.presence_of_mind.description':
     'Hace que tu siguiente hechizo con tiempo de lanzamiento sea instantáneo. Dura 60 s. (Talento de mago)',
@@ -5230,118 +5233,116 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Invoca un meteoro en el área objetivo, inflige {damage} de daño de Fuego y quema el suelo. (Talento de mago)',
   'entities.abilities.evocation.name': 'Evocación',
   'entities.abilities.evocation.description': 'Restaura maná rápidamente. (Talento de mago)',
-  'entities.abilities.rebuke.name': "Quở trách",
+  'entities.abilities.rebuke.name': 'Quở trách',
   'entities.abilities.rebuke.description':
-    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Paladin)",
-  'entities.abilities.crusader_strike.name': "Đòn Thập Tự",
+    'Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Paladin)',
+  'entities.abilities.crusader_strike.name': 'Đòn Thập Tự',
   'entities.abilities.crusader_strike.description':
-    "Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)",
-  'entities.abilities.holy_wrath.name': "Thịnh nộ Thánh",
+    'Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)',
+  'entities.abilities.holy_wrath.name': 'Thịnh nộ Thánh',
   'entities.abilities.holy_wrath.description':
-    "Phóng thích sức mạnh thánh, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Paladin)",
-  'entities.abilities.divine_shield.name': "Khiên Thần Thánh",
+    'Phóng thích sức mạnh thánh, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Paladin)',
+  'entities.abilities.divine_shield.name': 'Khiên Thần Thánh',
   'entities.abilities.divine_shield.description':
-    "Che chở bạn bằng sức mạnh thánh, hấp thụ lượng sát thương cực lớn trong 8 giây. (tài năng Paladin)",
-  'entities.abilities.avenging_wrath.name': "Thịnh nộ Báo Thù",
+    'Che chở bạn bằng sức mạnh thánh, hấp thụ lượng sát thương cực lớn trong 8 giây. (tài năng Paladin)',
+  'entities.abilities.avenging_wrath.name': 'Thịnh nộ Báo Thù',
   'entities.abilities.avenging_wrath.description':
-    "Gọi sức mạnh báo thù, tăng sức tấn công và sức mạnh phép trong 20 giây. (tài năng Paladin)",
-  'entities.abilities.hammer_of_wrath.name': "Búa Thịnh Nộ",
+    'Gọi sức mạnh báo thù, tăng sức tấn công và sức mạnh phép trong 20 giây. (tài năng Paladin)',
+  'entities.abilities.hammer_of_wrath.name': 'Búa Thịnh Nộ',
   'entities.abilities.hammer_of_wrath.description':
-    "Ném búa thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi máu dưới 20%. (tài năng Paladin)",
-  'entities.abilities.counter_shot.name': "Bắn Phản Kích",
+    'Ném búa thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi máu dưới 20%. (tài năng Paladin)',
+  'entities.abilities.counter_shot.name': 'Bắn Phản Kích',
   'entities.abilities.counter_shot.description':
-    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Thợ săn)",
-  'entities.abilities.frost_trap.name': "Bẫy Băng Giá",
+    'Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Thợ săn)',
+  'entities.abilities.frost_trap.name': 'Bẫy Băng Giá',
   'entities.abilities.frost_trap.description':
-    "Đóng băng kẻ địch tại vùng mục tiêu trong 3 giây. (tài năng Thợ săn)",
-  'entities.abilities.mend_pet.name': "Chữa lành Thú Cưng",
+    'Đóng băng kẻ địch tại vùng mục tiêu trong 3 giây. (tài năng Thợ săn)',
+  'entities.abilities.mend_pet.name': 'Chữa lành Thú Cưng',
   'entities.abilities.mend_pet.description':
-    "Chữa lành mục tiêu thân thiện {damage} trong 15 giây. (tài năng Thợ săn)",
-  'entities.abilities.multi_shot.name': "Bắn Đa Mục Tiêu",
+    'Chữa lành mục tiêu thân thiện {damage} trong 15 giây. (tài năng Thợ săn)',
+  'entities.abilities.multi_shot.name': 'Bắn Đa Mục Tiêu',
   'entities.abilities.multi_shot.description':
-    "Bắn nhiều mũi tên, đánh trúng kẻ địch gần đó với {damage} sát thương. (tài năng Thợ săn)",
-  'entities.abilities.deterrence.name': "Ngăn Chặn",
+    'Bắn nhiều mũi tên, đánh trúng kẻ địch gần đó với {damage} sát thương. (tài năng Thợ săn)',
+  'entities.abilities.deterrence.name': 'Ngăn Chặn',
   'entities.abilities.deterrence.description':
-    "Tăng cơ hội né tránh của bạn thêm 50% trong 10 giây. (tài năng Thợ săn)",
-  'entities.abilities.aspect_of_the_wild.name': "Dáng Vẻ Hoang Dã",
+    'Tăng cơ hội né tránh của bạn thêm 50% trong 10 giây. (tài năng Thợ săn)',
+  'entities.abilities.aspect_of_the_wild.name': 'Dáng Vẻ Hoang Dã',
   'entities.abilities.aspect_of_the_wild.description':
-    "Truyền sức mạnh hoang dã cho đồng minh gần đó, tăng sức tấn công trong 5 phút. (tài năng Thợ săn)",
-  'entities.abilities.kick.name': "Đá",
+    'Truyền sức mạnh hoang dã cho đồng minh gần đó, tăng sức tấn công trong 5 phút. (tài năng Thợ săn)',
+  'entities.abilities.kick.name': 'Đá',
   'entities.abilities.kick.description':
-    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Rogue)",
-  'entities.abilities.preparation.name': "Chuẩn Bị",
+    'Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Rogue)',
+  'entities.abilities.preparation.name': 'Chuẩn Bị',
   'entities.abilities.preparation.description':
-    "Kết thúc hồi chiêu của Sprint, Evasion và Vanish. (tài năng Rogue)",
-  'entities.abilities.ghostly_strike.name': "Đòn Đánh Ma Quái",
+    'Kết thúc hồi chiêu của Sprint, Evasion và Vanish. (tài năng Rogue)',
+  'entities.abilities.ghostly_strike.name': 'Đòn Đánh Ma Quái',
   'entities.abilities.ghostly_strike.description':
-    "Đánh kẻ địch bằng sát thương vũ khí cộng {damage} và tăng né tránh trong chốc lát. Cho 1 điểm combo. (tài năng Rogue)",
-  'entities.abilities.cloak_of_shadows.name': "Áo Choàng Bóng Tối",
+    'Đánh kẻ địch bằng sát thương vũ khí cộng {damage} và tăng né tránh trong chốc lát. Cho 1 điểm combo. (tài năng Rogue)',
+  'entities.abilities.cloak_of_shadows.name': 'Áo Choàng Bóng Tối',
   'entities.abilities.cloak_of_shadows.description':
-    "Bao phủ bạn bằng bóng tối, hấp thụ sát thương trong 5 giây. (tài năng Rogue)",
-  'entities.abilities.shadowstep.name': "Bước Bóng Tối",
+    'Bao phủ bạn bằng bóng tối, hấp thụ sát thương trong 5 giây. (tài năng Rogue)',
+  'entities.abilities.shadowstep.name': 'Bước Bóng Tối',
   'entities.abilities.shadowstep.description':
-    "Bước qua bóng tối về phía mục tiêu. (tài năng Rogue)",
-  'entities.abilities.silence.name': "Câm Lặng",
-  'entities.abilities.silence.description':
-    "Làm câm lặng mục tiêu trong 4 giây. (tài năng Rogue)",
-  'entities.abilities.psychic_scream.name': "Tiếng Thét Tâm Linh",
+    'Bước qua bóng tối về phía mục tiêu. (tài năng Rogue)',
+  'entities.abilities.silence.name': 'Câm Lặng',
+  'entities.abilities.silence.description': 'Làm câm lặng mục tiêu trong 4 giây. (tài năng Rogue)',
+  'entities.abilities.psychic_scream.name': 'Tiếng Thét Tâm Linh',
   'entities.abilities.psychic_scream.description':
-    "Làm kẻ địch gần đó hoảng sợ tối đa 4 giây. Sát thương có thể phá hiệu ứng. (tài năng Priest)",
-  'entities.abilities.inner_focus.name': "Tập Trung Nội Tâm",
+    'Làm kẻ địch gần đó hoảng sợ tối đa 4 giây. Sát thương có thể phá hiệu ứng. (tài năng Priest)',
+  'entities.abilities.inner_focus.name': 'Tập Trung Nội Tâm',
   'entities.abilities.inner_focus.description':
-    "Làm phép tiếp theo không tốn tài nguyên. Kéo dài 60 giây. (tài năng Priest)",
-  'entities.abilities.desperate_prayer.name': "Lời Cầu Tuyệt Vọng",
+    'Làm phép tiếp theo không tốn tài nguyên. Kéo dài 60 giây. (tài năng Priest)',
+  'entities.abilities.desperate_prayer.name': 'Lời Cầu Tuyệt Vọng',
   'entities.abilities.desperate_prayer.description':
-    "Chữa lành bạn ngay lập tức {damage}. (tài năng Priest)",
-  'entities.abilities.prayer_of_healing.name': "Lời Cầu Chữa Lành",
+    'Chữa lành bạn ngay lập tức {damage}. (tài năng Priest)',
+  'entities.abilities.prayer_of_healing.name': 'Lời Cầu Chữa Lành',
   'entities.abilities.prayer_of_healing.description':
-    "Chữa lành đồng minh gần đó {damage}. (tài năng Priest)",
-  'entities.abilities.mind_sear.name': "Thiêu Đốt Tâm Trí",
+    'Chữa lành đồng minh gần đó {damage}. (tài năng Priest)',
+  'entities.abilities.mind_sear.name': 'Thiêu Đốt Tâm Trí',
   'entities.abilities.mind_sear.description':
-    "Dẫn năng lượng Bóng Tối vào vùng mục tiêu, gây {damage} sát thương mỗi giây cho kẻ địch gần đó. (tài năng Priest)",
-  'entities.abilities.earthbind.name': "Trói Đất",
+    'Dẫn năng lượng Bóng Tối vào vùng mục tiêu, gây {damage} sát thương mỗi giây cho kẻ địch gần đó. (tài năng Priest)',
+  'entities.abilities.earthbind.name': 'Trói Đất',
   'entities.abilities.earthbind.description':
-    "Trói kẻ địch gần đó vào đất, giữ chân chúng trong 2 giây. (tài năng Shaman)",
-  'entities.abilities.healing_stream.name': "Dòng Chữa Lành",
+    'Trói kẻ địch gần đó vào đất, giữ chân chúng trong 2 giây. (tài năng Shaman)',
+  'entities.abilities.healing_stream.name': 'Dòng Chữa Lành',
   'entities.abilities.healing_stream.description':
-    "Hồi phục một mục tiêu thân thiện trong 12 giây. (tài năng Shaman)",
-  'entities.abilities.chain_lightning.name': "Sét Chuỗi",
+    'Hồi phục một mục tiêu thân thiện trong 12 giây. (tài năng Shaman)',
+  'entities.abilities.chain_lightning.name': 'Sét Chuỗi',
   'entities.abilities.chain_lightning.description':
-    "Phóng sét vào vùng mục tiêu, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Shaman)",
-  'entities.abilities.bloodlust.name': "Khát Máu",
+    'Phóng sét vào vùng mục tiêu, gây {damage} sát thương cho kẻ địch gần đó. (tài năng Shaman)',
+  'entities.abilities.bloodlust.name': 'Khát Máu',
   'entities.abilities.bloodlust.description':
-    "Kích động đồng minh gần đó, tăng tốc độ tấn công trong 15 giây. (tài năng Shaman)",
-  'entities.abilities.spell_lock.name': "Khóa Phép",
+    'Kích động đồng minh gần đó, tăng tốc độ tấn công trong 15 giây. (tài năng Shaman)',
+  'entities.abilities.spell_lock.name': 'Khóa Phép',
   'entities.abilities.spell_lock.description':
-    "Ngắt niệm phép và chặn phép thuộc trường đó trong 5 giây. (tài năng Warlock)",
-  'entities.abilities.howl_of_terror.name': "Tiếng Hú Kinh Hoàng",
+    'Ngắt niệm phép và chặn phép thuộc trường đó trong 5 giây. (tài năng Warlock)',
+  'entities.abilities.howl_of_terror.name': 'Tiếng Hú Kinh Hoàng',
   'entities.abilities.howl_of_terror.description':
-    "Làm kẻ địch gần đó hoảng sợ tối đa 3 giây. Sát thương có thể phá hiệu ứng. (tài năng Warlock)",
-  'entities.abilities.curse_of_exhaustion.name': "Lời Nguyền Kiệt Sức",
+    'Làm kẻ địch gần đó hoảng sợ tối đa 3 giây. Sát thương có thể phá hiệu ứng. (tài năng Warlock)',
+  'entities.abilities.curse_of_exhaustion.name': 'Lời Nguyền Kiệt Sức',
   'entities.abilities.curse_of_exhaustion.description':
-    "Nguyền rủa mục tiêu, giảm tốc độ di chuyển 30% trong 12 giây. (tài năng Warlock)",
-  'entities.abilities.death_coil.name': "Vòng Xoáy Tử Vong",
+    'Nguyền rủa mục tiêu, giảm tốc độ di chuyển 30% trong 12 giây. (tài năng Warlock)',
+  'entities.abilities.death_coil.name': 'Vòng Xoáy Tử Vong',
   'entities.abilities.death_coil.description':
-    "Đánh kẻ địch bằng {damage} sát thương Bóng Tối, rồi làm chúng kinh hoàng trong 3 giây. Phiên bản này không chữa cho người thi triển. (tài năng Warlock)",
-  'entities.abilities.chaos_bolt.name': "Tia Hỗn Mang",
+    'Đánh kẻ địch bằng {damage} sát thương Bóng Tối, rồi làm chúng kinh hoàng trong 3 giây. Phiên bản này không chữa cho người thi triển. (tài năng Warlock)',
+  'entities.abilities.chaos_bolt.name': 'Tia Hỗn Mang',
   'entities.abilities.chaos_bolt.description':
-    "Phóng tia lửa hỗn mang gây {damage} sát thương Lửa. (tài năng Warlock)",
-  'entities.abilities.metamorphosis.name': "Biến Hình",
+    'Phóng tia lửa hỗn mang gây {damage} sát thương Lửa. (tài năng Warlock)',
+  'entities.abilities.metamorphosis.name': 'Biến Hình',
   'entities.abilities.metamorphosis.description':
-    "Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)",
-  'entities.abilities.skull_bash.name': "Đập Sọ",
+    'Nhận sức mạnh ác quỷ, tăng giáp và sức tấn công trong 20 giây. (tài năng Warlock)',
+  'entities.abilities.skull_bash.name': 'Đập Sọ',
   'entities.abilities.skull_bash.description':
-    "Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Druid)",
-  'entities.abilities.innervate.name': "Tiếp Sức",
+    'Ngắt niệm phép và chặn phép thuộc trường đó trong 4 giây. (tài năng Druid)',
+  'entities.abilities.innervate.name': 'Tiếp Sức',
   'entities.abilities.innervate.description':
-    "Hồi ngay 200 tài nguyên hiện tại của bạn. (tài năng Druid)",
-  'entities.abilities.frenzied_regeneration.name': "Tái Sinh Cuồng Loạn",
+    'Hồi ngay 200 tài nguyên hiện tại của bạn. (tài năng Druid)',
+  'entities.abilities.frenzied_regeneration.name': 'Tái Sinh Cuồng Loạn',
   'entities.abilities.frenzied_regeneration.description':
-    "Hồi máu trong 10 giây. Chỉ trong Dạng Gấu. (tài năng Druid)",
-  'entities.abilities.berserk.name': "Cuồng Bạo",
-  'entities.abilities.berserk.description':
-    "Tăng sức tấn công trong 15 giây. (tài năng Druid)",
-  'entities.abilities.tranquility.name': "An Nhiên",
+    'Hồi máu trong 10 giây. Chỉ trong Dạng Gấu. (tài năng Druid)',
+  'entities.abilities.berserk.name': 'Cuồng Bạo',
+  'entities.abilities.berserk.description': 'Tăng sức tấn công trong 15 giây. (tài năng Druid)',
+  'entities.abilities.tranquility.name': 'An Nhiên',
   'entities.abilities.tranquility.description':
-    "Dẫn năng lượng hồi phục, chữa lành đồng minh gần đó mỗi giây. (tài năng Druid)",
+    'Dẫn năng lượng hồi phục, chữa lành đồng minh gần đó mỗi giây. (tài năng Druid)',
 };

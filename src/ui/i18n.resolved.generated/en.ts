@@ -4378,7 +4378,7 @@ export const en: EnTranslations = {
       },
       "ice_lance": {
         "name": "Ice Lance",
-        "description": "Hurls a shard of ice for {damage} Frost damage. Deals triple damage against rooted targets. (Mage talent)"
+        "description": "Hurls a shard of ice for {damage} Frost damage. Deals triple damage against rooted targets."
       },
       "presence_of_mind": {
         "name": "Presence of Mind",
@@ -4582,15 +4582,19 @@ export const en: EnTranslations = {
       },
       "arcane_power": {
         "name": "Arcane Power",
-        "description": "Fills you with arcane power, increasing spell power by 28 for 12 sec. (Arcane signature)"
+        "description": "Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signature)"
       },
       "combustion": {
         "name": "Combustion",
-        "description": "Focuses your fire magic so your next attack is a critical strike. (Fire signature)"
+        "description": "Increases spell critical chance by 50% for 15 sec. (Fire signature)"
+      },
+      "icy_veins": {
+        "name": "Icy Veins",
+        "description": "Increases spell haste by 30% and prevents cast interruption and pushback for 10 sec. (Frost signature)"
       },
       "cone_of_cold": {
         "name": "Cone of Cold",
-        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Frost signature)"
+        "description": "Blasts nearby enemies with frost for {damage} Frost damage. (Mage talent)"
       },
       "cold_blood": {
         "name": "Cold Blood",

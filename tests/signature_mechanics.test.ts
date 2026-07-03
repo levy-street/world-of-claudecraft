@@ -100,11 +100,121 @@ function resolved(
   };
 }
 
+function fixedDamageRes(
+  id: string,
+  cls: PlayerClass,
+  school: AbilityDef['school'],
+): ResolvedAbility {
+  return resolved(id, cls, school, [{ type: 'directDamage', min: 10, max: 10 }]);
+}
+
 function tickUntil(sim: TestSim, predicate: () => boolean, max = 200): void {
   for (let i = 0; i < max && !predicate(); i++) sim.tick();
 }
 
 describe('PR3 signature mechanics', () => {
+  it('buff_spellcrit is folded into the spellCrit accessor', () => {
+    const { sim, p } = makeSim('mage');
+    const readSpellCrit = (sim as unknown as { spellCrit(p: Entity): number }).spellCrit.bind(sim);
+    const before = readSpellCrit(p);
+    p.auras.push({ ...aura('buff_spellcrit', p.id, 'combustion'), value: 0.5 });
+    expect(readSpellCrit(p)).toBeCloseTo(before + 0.5);
+  });
+
+  it('buff_spellhaste shortens cast-time spells at cast start', () => {
+    const normal = makeSim('mage');
+    spawnTarget(normal.sim, normal.p);
+    normal.sim.castAbility('fireball');
+
+    const hasted = makeSim('mage');
+    spawnTarget(hasted.sim, hasted.p);
+    hasted.p.auras.push({ ...aura('buff_spellhaste', hasted.p.id, 'arcane_power'), value: 0.1 });
+    hasted.sim.castAbility('fireball');
+
+    expect(hasted.p.castTotal).toBeCloseTo(normal.p.castTotal / 1.1);
+    expect(hasted.p.castRemaining).toBeCloseTo(hasted.p.castTotal);
+  });
+
+  it('cast_shield blocks interrupt effects and damage pushback', () => {
+    const { sim, p } = makeSim('mage');
+    const rogueId = sim.addPlayer('rogue', 'Rogue');
+    sim.setPlayerLevel(20, rogueId);
+    const rogue = entityOf(sim, rogueId);
+    spawnTarget(sim, p);
+    p.auras.push({ ...aura('cast_shield', p.id, 'icy_veins'), value: 1 });
+    sim.castAbility('fireball');
+    const before = p.castRemaining;
+    sim.ctx.pushbackCast(p);
+    expect(p.castRemaining).toBe(before);
+
+    const interrupt = resolved('test_interrupt', 'rogue', 'physical', [
+      { type: 'interrupt', lockout: 4 },
+    ]);
+    runEffects(sim.ctx, rogue, metaOf(sim, rogue), p, interrupt);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.auras.some((a) => a.kind === 'lockout')).toBe(false);
+  });
+
+  it('hot streak triggers on exactly two consecutive spell crits and non-crits reset it', () => {
+    const { sim, p } = makeSim('mage');
+    const target = spawnTarget(sim, p);
+    metaOf(sim, p).talentMods.global.hotStreak = true;
+    const spell = fixedDamageRes('test_hot_streak', 'mage', 'fire');
+    p.stats.int = -62.5;
+    p.spellPower = 0;
+
+    p.auras.push({ ...aura('next_attack_crit', p.id), value: 1 });
+    runEffects(sim.ctx, p, metaOf(sim, p), target, spell);
+    expect(p.spellCritStreak).toBe(1);
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(false);
+
+    runEffects(sim.ctx, p, metaOf(sim, p), target, spell);
+    expect(p.spellCritStreak).toBe(0);
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(false);
+
+    p.auras.push({ ...aura('next_attack_crit', p.id), value: 1 });
+    runEffects(sim.ctx, p, metaOf(sim, p), target, spell);
+    p.auras.push({ ...aura('next_attack_crit', p.id), value: 1 });
+    runEffects(sim.ctx, p, metaOf(sim, p), target, spell);
+    expect(p.spellCritStreak).toBe(0);
+    expect(p.auras.some((a) => a.kind === 'next_cast_instant')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
+  });
+
+  it('targeted hostile spell casts require facing, channels cancel when turned away, and position casts are exempt', () => {
+    const { sim, p } = makeSim('mage');
+    const target = spawnTarget(sim, p, 10);
+    p.facing = Math.PI;
+    sim.castAbility('fireball');
+    expect(p.castingAbility).toBeNull();
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === 'You must be facing your target.'),
+    ).toBe(true);
+
+    p.resource = p.maxResource;
+    p.gcdRemaining = 0;
+    p.facing = Math.atan2(target.pos.x - p.pos.x, target.pos.z - p.pos.z);
+    sim.castAbility('arcane_missiles');
+    expect(p.channeling).toBe(true);
+    p.facing = Math.PI;
+    for (let i = 0; i < 25 && p.channeling; i++) sim.tick();
+    expect(p.channeling).toBe(false);
+
+    p.resource = p.maxResource;
+    p.gcdRemaining = 0;
+    p.cooldowns.clear();
+    p.facing = Math.PI;
+    sim.drainEvents();
+    sim.castAbilityAt('flamestrike', { x: target.pos.x, z: target.pos.z });
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === 'You must be facing your target.'),
+    ).toBe(false);
+  });
+
   it('aoeHeal heals the caster and nearby friendly targets, not hostiles, with spell power', () => {
     const { sim, p } = makeSim('priest');
     const friendId = sim.addPlayer('mage', 'Friend');

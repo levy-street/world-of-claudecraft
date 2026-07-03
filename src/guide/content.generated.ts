@@ -808,7 +808,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "frost",
         "name": "Frost",
         "role": "dps",
-        "signature": "cone_of_cold"
+        "signature": "icy_veins"
       }
     ],
     "signatureAbilities": [
@@ -877,6 +877,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "frost_nova",
         "name": "Frost Nova"
+      },
+      {
+        "id": "ice_lance",
+        "name": "Ice Lance"
       },
       {
         "id": "arcane_explosion",

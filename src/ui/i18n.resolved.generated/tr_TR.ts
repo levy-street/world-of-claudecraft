@@ -4378,7 +4378,7 @@ export const tr_TR: EnTranslations = {
       },
       "ice_lance": {
         "name": "Lanza de hielo",
-        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados. (Talento de mago)"
+        "description": "Lanza un fragmento de hielo que inflige {damage} de daño de Escarcha. Inflige triple daño a objetivos enraizados."
       },
       "presence_of_mind": {
         "name": "Presencia mental",
@@ -4582,15 +4582,19 @@ export const tr_TR: EnTranslations = {
       },
       "arcane_power": {
         "name": "Gizemli Güç",
-        "description": "Seni gizemli güçle doldurur, büyü gücünü 12 sn boyunca 28 artırır. (Gizem imzası)"
+        "description": "Büyü hasarını %20 ve büyü hızını %10 artırır, 10 sn sürer. (Gizem imza yeteneği)"
       },
       "combustion": {
         "name": "Yakma",
-        "description": "Ateş büyünü odaklar, böylece sonraki saldırın kritik vuruş olur. (Ateş imzası)"
+        "description": "Büyü kritik şansını %50 artırır, 15 sn sürer. (Ateş imza yeteneği)"
+      },
+      "icy_veins": {
+        "name": "Buzlu Damarlar",
+        "description": "Büyü hızını %30 artırır ve 10 sn boyunca büyü kesintisini ve geri itmeyi önler. (Buz imza yeteneği)"
       },
       "cone_of_cold": {
         "name": "Soğuk Konisi",
-        "description": "Yakındaki düşmanları buzla patlatır ve {damage} Buz hasarı verir. (Buz imzası)"
+        "description": "Yakındaki düşmanları buzla vurur ve {damage} Buz hasarı verir. (Büyücü yeteneği)"
       },
       "cold_blood": {
         "name": "Soğukkanlılık",

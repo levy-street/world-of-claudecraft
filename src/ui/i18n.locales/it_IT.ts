@@ -4167,20 +4167,20 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.tag.solo': 'Adatta al gioco in solitaria',
   'guide.talentsPage.heading': 'Talenti e specializzazioni',
   'guide.talentsPage.howBody':
-  "Le righe si sbloccano salendo di livello e le specializzazioni si aprono al livello 10. Scegli una specializzazione per la sua abilità distintiva e maestria, poi usa la scheda Scelte per selezionare un opzione da ogni riga sbloccata.",
+    'Le righe si sbloccano salendo di livello e le specializzazioni si aprono al livello 10. Scegli una specializzazione per la sua abilità distintiva e maestria, poi usa la scheda Scelte per selezionare un opzione da ogni riga sbloccata.',
   'guide.talentsPage.howHeading': 'Come funzionano',
   'guide.talentsPage.intro':
-  "I talenti sono il modo per rendere tua una classe. Sono opzionali, flessibili e facili da cambiare, quindi puoi sperimentare senza paura.",
+    'I talenti sono il modo per rendere tua una classe. Sono opzionali, flessibili e facili da cambiare, quindi puoi sperimentare senza paura.',
   'guide.talentsPage.resetNote':
-  "Puoi azzerare le scelte ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai una trappola. Prova, scopri cosa ti piace e cambia liberamente.",
+    'Puoi azzerare le scelte ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai una trappola. Prova, scopri cosa ti piace e cambia liberamente.',
   'guide.talentsPage.resetTitle': 'Niente è permanente',
   'guide.talentsPage.shareNote':
-  "Una build completata può essere copiata in un breve codice condivisibile e passata a un amico, che lo incolla nel proprio pannello talenti per caricarla.",
+    'Una build completata può essere copiata in un breve codice condivisibile e passata a un amico, che lo incolla nel proprio pannello talenti per caricarla.',
   'guide.talentsPage.specsBody':
-  "Ogni classe ha alcune specializzazioni, ognuna con un ruolo e un focus distintivo. Ecco la forma di tutte. Apri una classe per il kit completo.",
+    'Ogni classe ha alcune specializzazioni, ognuna con un ruolo e un focus distintivo. Ecco la forma di tutte. Apri una classe per il kit completo.',
   'guide.talentsPage.specsHeading': 'Specializzazioni per classe',
   'guide.talentsPage.whatBody':
-  "Salendo di livello si sbloccano righe di talenti con poche scelte. Ogni scelta aggiunge un miglioramento permanente ad abilità, statistiche o strumenti, modellando la sensazione della classe in combattimento.",
+    'Salendo di livello si sbloccano righe di talenti con poche scelte. Ogni scelta aggiunge un miglioramento permanente ad abilità, statistiche o strumenti, modellando la sensazione della classe in combattimento.',
   'guide.talentsPage.whatHeading': 'Cosa fanno i talenti',
   'guide.toc.heading': 'In questa pagina',
   'guide.wishPage.heading': 'Cose che avrei voluto sapere',
@@ -5200,13 +5200,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Punzecchia il nemico a distanza, incapacitandolo per un massimo di 4 s. Qualsiasi danno interrompe l’effetto. (firma Sopravvivenza)',
   'entities.abilities.arcane_power.name': 'Potere Arcano',
   'entities.abilities.arcane_power.description':
-    'Ti riempie di potere Arcano, aumentando la potenza magica di 28 per 12 s. (firma Arcano)',
+    'Aumenta i danni magici del 20% e la celerità magica del 10% per 10 s. (firma Arcano)',
   'entities.abilities.combustion.name': 'Combustione',
   'entities.abilities.combustion.description':
-    'Concentra la tua magia del fuoco, così il tuo prossimo attacco è un colpo critico. (firma Fuoco)',
+    'Aumenta la probabilità di critico magico del 50% per 15 s. (firma Fuoco)',
+  'entities.abilities.icy_veins.name': 'Vene Gelide',
+  'entities.abilities.icy_veins.description':
+    'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
   'entities.abilities.cone_of_cold.name': 'Cono di Freddo',
   'entities.abilities.cone_of_cold.description':
-    'Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (firma Gelo)',
+    'Investe i nemici vicini con il gelo, infliggendo {damage} danni da Gelo. (talento del mago)',
   'entities.abilities.cold_blood.name': 'Sangue Freddo',
   'entities.abilities.cold_blood.description':
     'Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)',
@@ -5278,7 +5281,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Contrasta il lancio nemico e impedisce di lanciare magie di quella scuola per 6 s. (Talento da mago)',
   'entities.abilities.ice_lance.name': 'Lancia di Ghiaccio',
   'entities.abilities.ice_lance.description':
-    'Scaglia una scheggia di ghiaccio che infligge {damage} danni da Gelo. Infligge danni tripli ai bersagli immobilizzati. (Talento da mago)',
+    'Scaglia una scheggia di ghiaccio che infligge {damage} danni da Gelo. Infligge danni tripli ai bersagli immobilizzati.',
   'entities.abilities.presence_of_mind.name': 'Presenza Mentale',
   'entities.abilities.presence_of_mind.description':
     'Rende istantaneo il tuo prossimo incantesimo con tempo di lancio. Dura 60 s. (Talento da mago)',
@@ -5296,118 +5299,117 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Fa cadere una meteora nell’area bersaglio, infliggendo {damage} danni da Fuoco e bruciando il terreno. (Talento da mago)',
   'entities.abilities.evocation.name': 'Evocazione',
   'entities.abilities.evocation.description': 'Rigenera rapidamente mana. (Talento da mago)',
-  'entities.abilities.rebuke.name': "Rimprovero",
+  'entities.abilities.rebuke.name': 'Rimprovero',
   'entities.abilities.rebuke.description':
-    "Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da paladino)",
-  'entities.abilities.crusader_strike.name': "Assalto del Crociato",
+    'Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da paladino)',
+  'entities.abilities.crusader_strike.name': 'Assalto del Crociato',
   'entities.abilities.crusader_strike.description':
-    "Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)",
-  'entities.abilities.holy_wrath.name': "Ira Sacra",
+    'Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)',
+  'entities.abilities.holy_wrath.name': 'Ira Sacra',
   'entities.abilities.holy_wrath.description':
-    "Scatena potere sacro, danneggiando i nemici vicini per {damage}. (talento da paladino)",
-  'entities.abilities.divine_shield.name': "Scudo Divino",
+    'Scatena potere sacro, danneggiando i nemici vicini per {damage}. (talento da paladino)',
+  'entities.abilities.divine_shield.name': 'Scudo Divino',
   'entities.abilities.divine_shield.description':
-    "Ti protegge con potere sacro, assorbendo un’enorme quantità di danni per 8 s. (talento da paladino)",
-  'entities.abilities.avenging_wrath.name': "Ira Vendicatrice",
+    'Ti protegge con potere sacro, assorbendo un’enorme quantità di danni per 8 s. (talento da paladino)',
+  'entities.abilities.avenging_wrath.name': 'Ira Vendicatrice',
   'entities.abilities.avenging_wrath.description':
-    "Richiama potere vendicativo, aumentando potenza d’attacco e potenza magica per 20 s. (talento da paladino)",
-  'entities.abilities.hammer_of_wrath.name': "Martello dell’Ira",
+    'Richiama potere vendicativo, aumentando potenza d’attacco e potenza magica per 20 s. (talento da paladino)',
+  'entities.abilities.hammer_of_wrath.name': 'Martello dell’Ira',
   'entities.abilities.hammer_of_wrath.description':
-    "Scaglia un martello sacro contro un nemico ferito, infliggendo {damage} danni sacri. Utilizzabile solo sotto il 20% di salute. (talento da paladino)",
-  'entities.abilities.counter_shot.name': "Tiro di Contrasto",
+    'Scaglia un martello sacro contro un nemico ferito, infliggendo {damage} danni sacri. Utilizzabile solo sotto il 20% di salute. (talento da paladino)',
+  'entities.abilities.counter_shot.name': 'Tiro di Contrasto',
   'entities.abilities.counter_shot.description':
-    "Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da cacciatore)",
-  'entities.abilities.frost_trap.name': "Trappola Gelida",
+    'Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da cacciatore)',
+  'entities.abilities.frost_trap.name': 'Trappola Gelida',
   'entities.abilities.frost_trap.description':
-    "Congela i nemici nell’area bersaglio per 3 s. (talento da cacciatore)",
-  'entities.abilities.mend_pet.name': "Cura Famiglio",
+    'Congela i nemici nell’area bersaglio per 3 s. (talento da cacciatore)',
+  'entities.abilities.mend_pet.name': 'Cura Famiglio',
   'entities.abilities.mend_pet.description':
-    "Cura un bersaglio amico di {damage} in 15 s. (talento da cacciatore)",
-  'entities.abilities.multi_shot.name': "Tiro Multiplo",
+    'Cura un bersaglio amico di {damage} in 15 s. (talento da cacciatore)',
+  'entities.abilities.multi_shot.name': 'Tiro Multiplo',
   'entities.abilities.multi_shot.description':
-    "Scaglia vari proiettili, colpendo i nemici vicini per {damage}. (talento da cacciatore)",
-  'entities.abilities.deterrence.name': "Deterrenza",
+    'Scaglia vari proiettili, colpendo i nemici vicini per {damage}. (talento da cacciatore)',
+  'entities.abilities.deterrence.name': 'Deterrenza',
   'entities.abilities.deterrence.description':
-    "Aumenta la tua probabilità di schivata del 50% per 10 s. (talento da cacciatore)",
-  'entities.abilities.aspect_of_the_wild.name': "Aspetto Selvaggio",
+    'Aumenta la tua probabilità di schivata del 50% per 10 s. (talento da cacciatore)',
+  'entities.abilities.aspect_of_the_wild.name': 'Aspetto Selvaggio',
   'entities.abilities.aspect_of_the_wild.description':
-    "Ispira gli alleati vicini con forza selvaggia, aumentando la potenza d’attacco per 5 min. (talento da cacciatore)",
-  'entities.abilities.kick.name': "Calcio",
+    'Ispira gli alleati vicini con forza selvaggia, aumentando la potenza d’attacco per 5 min. (talento da cacciatore)',
+  'entities.abilities.kick.name': 'Calcio',
   'entities.abilities.kick.description':
-    "Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da ladro)",
-  'entities.abilities.preparation.name': "Preparazione",
+    'Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da ladro)',
+  'entities.abilities.preparation.name': 'Preparazione',
   'entities.abilities.preparation.description':
-    "Termina il tempo di recupero di Scatto, Evasione e Sparizione. (talento da ladro)",
-  'entities.abilities.ghostly_strike.name': "Assalto Spettrale",
+    'Termina il tempo di recupero di Scatto, Evasione e Sparizione. (talento da ladro)',
+  'entities.abilities.ghostly_strike.name': 'Assalto Spettrale',
   'entities.abilities.ghostly_strike.description':
-    "Colpisce il nemico con danni dell’arma più {damage} e aumenta brevemente la schivata. Conferisce 1 punto combo. (talento da ladro)",
-  'entities.abilities.cloak_of_shadows.name': "Mantello d’Ombra",
+    'Colpisce il nemico con danni dell’arma più {damage} e aumenta brevemente la schivata. Conferisce 1 punto combo. (talento da ladro)',
+  'entities.abilities.cloak_of_shadows.name': 'Mantello d’Ombra',
   'entities.abilities.cloak_of_shadows.description':
-    "Ti avvolge nelle ombre, assorbendo danni per 5 s. (talento da ladro)",
-  'entities.abilities.shadowstep.name': "Passo d’Ombra",
+    'Ti avvolge nelle ombre, assorbendo danni per 5 s. (talento da ladro)',
+  'entities.abilities.shadowstep.name': 'Passo d’Ombra',
   'entities.abilities.shadowstep.description':
-    "Avanzi tra le ombre verso il tuo bersaglio. (talento da ladro)",
-  'entities.abilities.silence.name': "Silenzio",
-  'entities.abilities.silence.description':
-    "Silenzia il bersaglio per 4 s. (talento da sacerdote)",
-  'entities.abilities.psychic_scream.name': "Urlo Psichico",
+    'Avanzi tra le ombre verso il tuo bersaglio. (talento da ladro)',
+  'entities.abilities.silence.name': 'Silenzio',
+  'entities.abilities.silence.description': 'Silenzia il bersaglio per 4 s. (talento da sacerdote)',
+  'entities.abilities.psychic_scream.name': 'Urlo Psichico',
   'entities.abilities.psychic_scream.description':
-    "Spaventa i nemici vicini per un massimo di 4 s. I danni possono interrompere l’effetto. (talento da sacerdote)",
-  'entities.abilities.inner_focus.name': "Focus Interiore",
+    'Spaventa i nemici vicini per un massimo di 4 s. I danni possono interrompere l’effetto. (talento da sacerdote)',
+  'entities.abilities.inner_focus.name': 'Focus Interiore',
   'entities.abilities.inner_focus.description':
-    "Rende gratuito il tuo prossimo incantesimo. Dura 60 s. (talento da sacerdote)",
-  'entities.abilities.desperate_prayer.name': "Preghiera Disperata",
+    'Rende gratuito il tuo prossimo incantesimo. Dura 60 s. (talento da sacerdote)',
+  'entities.abilities.desperate_prayer.name': 'Preghiera Disperata',
   'entities.abilities.desperate_prayer.description':
-    "Ti cura istantaneamente di {damage}. (talento da sacerdote)",
-  'entities.abilities.prayer_of_healing.name': "Preghiera di Guarigione",
+    'Ti cura istantaneamente di {damage}. (talento da sacerdote)',
+  'entities.abilities.prayer_of_healing.name': 'Preghiera di Guarigione',
   'entities.abilities.prayer_of_healing.description':
-    "Cura gli alleati vicini di {damage}. (talento da sacerdote)",
-  'entities.abilities.mind_sear.name': "Tortura Mentale",
+    'Cura gli alleati vicini di {damage}. (talento da sacerdote)',
+  'entities.abilities.mind_sear.name': 'Tortura Mentale',
   'entities.abilities.mind_sear.description':
-    "Canalizza energia d’Ombra nell’area bersaglio, danneggiando i nemici vicini ogni secondo per {damage}. (talento da sacerdote)",
-  'entities.abilities.earthbind.name': "Vincolo della Terra",
+    'Canalizza energia d’Ombra nell’area bersaglio, danneggiando i nemici vicini ogni secondo per {damage}. (talento da sacerdote)',
+  'entities.abilities.earthbind.name': 'Vincolo della Terra',
   'entities.abilities.earthbind.description':
-    "Lega alla terra i nemici vicini e li immobilizza per 2 s. (talento da sciamano)",
-  'entities.abilities.healing_stream.name': "Flusso Curativo",
+    'Lega alla terra i nemici vicini e li immobilizza per 2 s. (talento da sciamano)',
+  'entities.abilities.healing_stream.name': 'Flusso Curativo',
   'entities.abilities.healing_stream.description':
-    "Rigenera un bersaglio amico per 12 s. (talento da sciamano)",
-  'entities.abilities.chain_lightning.name': "Catena di Fulmini",
+    'Rigenera un bersaglio amico per 12 s. (talento da sciamano)',
+  'entities.abilities.chain_lightning.name': 'Catena di Fulmini',
   'entities.abilities.chain_lightning.description':
-    "Scaglia fulmini nell’area bersaglio, danneggiando i nemici vicini per {damage}. (talento da sciamano)",
-  'entities.abilities.bloodlust.name': "Brama di Sangue",
+    'Scaglia fulmini nell’area bersaglio, danneggiando i nemici vicini per {damage}. (talento da sciamano)',
+  'entities.abilities.bloodlust.name': 'Brama di Sangue',
   'entities.abilities.bloodlust.description':
-    "Spinge gli alleati vicini alla frenesia, aumentando la velocità d’attacco per 15 s. (talento da sciamano)",
-  'entities.abilities.spell_lock.name': "Blocco Magico",
+    'Spinge gli alleati vicini alla frenesia, aumentando la velocità d’attacco per 15 s. (talento da sciamano)',
+  'entities.abilities.spell_lock.name': 'Blocco Magico',
   'entities.abilities.spell_lock.description':
-    "Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 5 s. (talento da stregone)",
-  'entities.abilities.howl_of_terror.name': "Ululato del Terrore",
+    'Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 5 s. (talento da stregone)',
+  'entities.abilities.howl_of_terror.name': 'Ululato del Terrore',
   'entities.abilities.howl_of_terror.description':
-    "Spaventa i nemici vicini per un massimo di 3 s. I danni possono interrompere l’effetto. (talento da stregone)",
-  'entities.abilities.curse_of_exhaustion.name': "Maledizione della Spossatezza",
+    'Spaventa i nemici vicini per un massimo di 3 s. I danni possono interrompere l’effetto. (talento da stregone)',
+  'entities.abilities.curse_of_exhaustion.name': 'Maledizione della Spossatezza',
   'entities.abilities.curse_of_exhaustion.description':
-    "Maledice il bersaglio, riducendo la velocità di movimento del 30% per 12 s. (talento da stregone)",
-  'entities.abilities.death_coil.name': "Spira della Morte",
+    'Maledice il bersaglio, riducendo la velocità di movimento del 30% per 12 s. (talento da stregone)',
+  'entities.abilities.death_coil.name': 'Spira della Morte',
   'entities.abilities.death_coil.description':
-    "Colpisce il nemico con {damage} danni d’Ombra, poi lo terrorizza per 3 s. Questa versione non cura l’incantatore. (talento da stregone)",
-  'entities.abilities.chaos_bolt.name': "Dardo del Caos",
+    'Colpisce il nemico con {damage} danni d’Ombra, poi lo terrorizza per 3 s. Questa versione non cura l’incantatore. (talento da stregone)',
+  'entities.abilities.chaos_bolt.name': 'Dardo del Caos',
   'entities.abilities.chaos_bolt.description':
-    "Scaglia un dardo di fuoco caotico per {damage} danni da Fuoco. (talento da stregone)",
-  'entities.abilities.metamorphosis.name': "Metamorfosi",
+    'Scaglia un dardo di fuoco caotico per {damage} danni da Fuoco. (talento da stregone)',
+  'entities.abilities.metamorphosis.name': 'Metamorfosi',
   'entities.abilities.metamorphosis.description':
-    "Assumi potere demoniaco, aumentando armatura e potenza d’attacco per 20 s. (talento da stregone)",
-  'entities.abilities.skull_bash.name': "Colpo di Teschio",
+    'Assumi potere demoniaco, aumentando armatura e potenza d’attacco per 20 s. (talento da stregone)',
+  'entities.abilities.skull_bash.name': 'Colpo di Teschio',
   'entities.abilities.skull_bash.description':
-    "Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da druido)",
-  'entities.abilities.innervate.name': "Innervazione",
+    'Interrompe il lancio di incantesimi e impedisce quelli della stessa scuola per 4 s. (talento da druido)',
+  'entities.abilities.innervate.name': 'Innervazione',
   'entities.abilities.innervate.description':
-    "Ripristina istantaneamente 200 della tua risorsa attuale. (talento da druido)",
-  'entities.abilities.frenzied_regeneration.name': "Rigenerazione Frenetica",
+    'Ripristina istantaneamente 200 della tua risorsa attuale. (talento da druido)',
+  'entities.abilities.frenzied_regeneration.name': 'Rigenerazione Frenetica',
   'entities.abilities.frenzied_regeneration.description':
-    "Rigenera salute per 10 s. Solo Forma d’Orso. (talento da druido)",
-  'entities.abilities.berserk.name': "Berserk",
+    'Rigenera salute per 10 s. Solo Forma d’Orso. (talento da druido)',
+  'entities.abilities.berserk.name': 'Berserk',
   'entities.abilities.berserk.description':
-    "Aumenta la potenza d’attacco per 15 s. (talento da druido)",
-  'entities.abilities.tranquility.name': "Tranquillità",
+    'Aumenta la potenza d’attacco per 15 s. (talento da druido)',
+  'entities.abilities.tranquility.name': 'Tranquillità',
   'entities.abilities.tranquility.description':
-    "Canalizza energia rigenerante, curando ogni secondo gli alleati vicini. (talento da druido)",
+    'Canalizza energia rigenerante, curando ogni secondo gli alleati vicini. (talento da druido)',
 };
