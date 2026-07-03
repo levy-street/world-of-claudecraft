@@ -4,7 +4,8 @@
 // PostOffice (src/sim/mail/post_office.ts) reads these tables directly.
 //
 // English here is the source of truth; the client localizes each letter by its
-// stable `letterId` (src/ui/mail_i18n.ts). Keep ids append-only: a delivered
+// stable `letterId` through the entity dictionary (src/ui/entity_i18n.ts kind
+// 'letter', sourced from src/ui/world_entity_i18n.ts). Keep ids append-only: a delivered
 // letter persists in the mail JSONB with its letterId, so renaming one orphans
 // the localized copy of every letter already sitting in a mailbox.
 

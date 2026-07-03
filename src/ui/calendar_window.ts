@@ -273,7 +273,10 @@ export class CalendarWindow {
         `<div class="cal-event guild" data-cal-event="${ev.id}"><span class="cal-dot guild"></span>` +
           `<span class="cal-event-text"><span class="cal-event-title">${esc(ev.title)} <span class="cal-event-when">${esc(when)}</span></span>` +
           (ev.note ? `<span class="cal-event-note">${esc(ev.note)}</span>` : '') +
-          `<span class="cal-event-by">${esc(t('hudChrome.calendar.bookedBy', { name: ev.createdBy }))}</span></span>` +
+          (ev.createdBy
+            ? `<span class="cal-event-by">${esc(t('hudChrome.calendar.bookedBy', { name: ev.createdBy }))}</span>`
+            : '') +
+          `</span>` +
           (manage
             ? `<button type="button" class="cal-event-del" data-cal-del="${ev.id}" aria-label="${esc(t('hudChrome.calendar.deleteAria', { title: ev.title }))}">${svgIcon('close')}</button>`
             : '') +

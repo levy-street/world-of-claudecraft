@@ -20,13 +20,7 @@ import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../content/letter
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import {
-  dist2d,
-  type Entity,
-  INTERACT_RANGE,
-  type InvSlot,
-  type MailResultCode,
-} from '../types';
+import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, type MailResultCode } from '../types';
 
 const MAIL_RANGE = INTERACT_RANGE + 2; // you must stand at a raven pillar to tend your post
 export const MAIL_POSTAGE = 30; // copper per letter
@@ -105,7 +99,12 @@ export class PostOffice {
         m.announced = true;
         const meta = this.metaByMailKey(m.recipientKey);
         if (meta) {
-          this.ctx.emit({ type: 'mailArrived', senderName: m.senderName, pid: meta.entityId });
+          this.ctx.emit({
+            type: 'mailArrived',
+            senderName: m.senderName,
+            letterId: m.letterId,
+            pid: meta.entityId,
+          });
         }
       }
       if (now >= m.expiresAt && m.items.length === 0 && m.copper <= 0) {
@@ -128,7 +127,11 @@ export class PostOffice {
 
   // Structured outcome (the lockpick convention: the sim emits data only, the
   // client renders every visible mail string from the code).
-  private result(pid: number, code: MailResultCode, extra?: { value?: number; name?: string }): void {
+  private result(
+    pid: number,
+    code: MailResultCode,
+    extra?: { value?: number; name?: string },
+  ): void {
     this.ctx.emit({ type: 'mailResult', code, ...extra, pid });
   }
 
@@ -157,9 +160,16 @@ export class PostOffice {
   }
 
   mailUnreadFor(pid: number): number {
+    // Runs on every snapshot for every player (the mailU self field), so it is
+    // a single allocation-free pass over the book, never a filtered copy.
     const meta = this.ctx.players.get(pid);
     if (!meta) return 0;
-    return this.deliveredFor(meta).reduce((n, m) => n + (m.read ? 0 : 1), 0);
+    const now = this.ctx.time;
+    let unread = 0;
+    for (const m of this.mail) {
+      if (!m.read && now >= m.deliverAt && this.belongsTo(m, meta)) unread++;
+    }
+    return unread;
   }
 
   // Offline/IWorld send path: resolve the recipient among live players (the

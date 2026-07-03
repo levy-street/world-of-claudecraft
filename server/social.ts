@@ -51,7 +51,7 @@ export interface GuildMemberEntry extends CharInfo {
   z?: number;
 }
 
-// One guild calendar event. `day` is 'YYYY-MM-DD'; `hour` is 0-23 realm-local
+// One guild calendar event. `day` is a UTC 'YYYY-MM-DD'; `hour` is 0-23 UTC
 // or null for an all-day event; `createdBy` is the author's display name.
 export interface GuildEventRow {
   id: number;

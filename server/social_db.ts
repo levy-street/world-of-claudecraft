@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS guild_members (
 CREATE INDEX IF NOT EXISTS guild_members_guild ON guild_members(guild_id);
 
 -- Guild calendar events (the in-game event calendar's guild lane). day is the
--- event's calendar date as 'YYYY-MM-DD'; hour is 0-23 realm-local, NULL for an
+-- event's UTC calendar date as 'YYYY-MM-DD'; hour is 0-23 UTC, NULL for an
 -- all-day event. created_by keeps the author for display and permissions.
 CREATE TABLE IF NOT EXISTS guild_events (
   id SERIAL PRIMARY KEY,

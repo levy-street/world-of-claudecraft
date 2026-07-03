@@ -5355,7 +5355,7 @@ export class Sim {
   }
 
   // -------------------------------------------------------------------------
-  // The Ravenpost — in-game mail
+  // The Ravenpost: in-game mail
   // -------------------------------------------------------------------------
 
   // Thin delegates to the PostOffice instance (this.postOffice), which owns the

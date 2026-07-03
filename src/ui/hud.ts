@@ -6584,12 +6584,15 @@ export class Hud {
           this.openMailbox();
           break;
         case 'mailArrived': {
-          // Player names splice verbatim; authored senders arrive pre-resolved
-          // (the sim ships the letter's English senderName, shown as-is in the
-          // banner; the window localizes it properly via the letterId).
+          // Player names splice verbatim; authored letters carry their
+          // letterId, so the sender localizes through the entity dictionary
+          // exactly like the mailbox window does.
+          const sender = ev.letterId
+            ? tEntity({ kind: 'letter', id: ev.letterId, field: 'sender' })
+            : ev.senderName;
           audio.whisper();
-          this.showBanner(t('hudChrome.mailbox.arrivedBanner', { name: ev.senderName }));
-          this.log(t('hudChrome.mailbox.arrivedLog', { name: ev.senderName }), '#c8f7c5');
+          this.showBanner(t('hudChrome.mailbox.arrivedBanner', { name: sender }));
+          this.log(t('hudChrome.mailbox.arrivedLog', { name: sender }), '#c8f7c5');
           this.lastMailUnread = -1; // force the envelope indicator to repaint
           break;
         }
