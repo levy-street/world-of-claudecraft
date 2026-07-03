@@ -568,7 +568,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     expect(names).toContain('Litany Pulse');
     expect(names).toContain('Web Snare');
     expect(names).toContain('Silt Hide');
-    expect(names).toContain('Frenzy');
+    expect(names).toContain('Feeding Frenzy');
     for (const name of names) {
       expect(localizeSimAuraName(name), `no aura matcher row for '${name}'`).not.toBeNull();
     }

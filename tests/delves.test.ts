@@ -1549,7 +1549,7 @@ describe('The Drowned Litany (Phase 4 enemy kits)', () => {
 
   it('the Deepfen Spearjaw is a frenzying skirmisher (fast + frenzyOnHit)', () => {
     const m = MOBS.deepfen_spearjaw;
-    expect(m.frenzyOnHit?.name).toBe('Frenzy');
+    expect(m.frenzyOnHit?.name).toBe('Feeding Frenzy');
     expect(m.frenzyOnHit?.hasteMult ?? 0).toBeGreaterThan(1);
     expect(m.moveSpeed).toBeGreaterThanOrEqual(8);
   });

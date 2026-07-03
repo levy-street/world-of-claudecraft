@@ -208,7 +208,7 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     // Mobile skirmisher: already the fastest marsh mob, and it whips itself into a
     // stacking frenzy the longer it stays on a target (the spearjaw's optional
     // frenzy; a true gap-close leap is a later mechanic).
-    frenzyOnHit: { chance: 0.3, hasteMult: 1.3, duration: 6, name: 'Frenzy' },
+    frenzyOnHit: { chance: 0.3, hasteMult: 1.3, duration: 6, name: 'Feeding Frenzy' },
     loot: [{ copper: 7, chance: 1 }],
     scale: 0.9,
     color: 0x3f5942,
