@@ -61,6 +61,7 @@ import {
   type LeaderboardEntry,
   type LeaderboardPage,
   type LockpickView,
+  type MailInfo,
   type MarketInfo,
   type OverheadEmoteId,
   type PartyInfo,
@@ -871,6 +872,10 @@ export class ClientWorld implements IWorld {
   // --- IWorldMarket: World Market view, mirrored from the snapshot self
   // (`s.market`, delta-omitted). ---
   marketInfo: MarketInfo | null = null;
+  // --- IWorldMail: Ravenpost mailbox view + unread badge, mirrored from the
+  // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
+  mailInfo: MailInfo | null = null;
+  mailUnread = 0;
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -1543,6 +1548,8 @@ export class ClientWorld implements IWorld {
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
       if (s.market !== undefined) this.marketInfo = s.market;
+      if (s.mail !== undefined) this.mailInfo = s.mail;
+      if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
@@ -2019,6 +2026,27 @@ export class ClientWorld implements IWorld {
   }
   marketCollect(): void {
     this.cmd({ cmd: 'market_collect' });
+  }
+  // --- IWorldMail: Ravenpost letter sends (snake_case wire strings). mailInfo /
+  // mailUnread are snapshot reads (mirror fields above). ---
+  mailSend(to: string, subject: string, body: string, copper: number, items: InvSlot[]): void {
+    this.cmd({
+      cmd: 'mail_send',
+      to,
+      subject,
+      body,
+      copper,
+      items: items.map((s) => ({ itemId: s.itemId, count: s.count })),
+    });
+  }
+  mailTake(mailId: number): void {
+    this.cmd({ cmd: 'mail_take', id: mailId });
+  }
+  mailDelete(mailId: number): void {
+    this.cmd({ cmd: 'mail_delete', id: mailId });
+  }
+  mailMarkRead(mailId: number): void {
+    this.cmd({ cmd: 'mail_read', id: mailId });
   }
   // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
   // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live

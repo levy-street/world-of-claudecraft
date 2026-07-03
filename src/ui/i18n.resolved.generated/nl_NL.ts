@@ -1005,6 +1005,54 @@ export const nl_NL: EnTranslations = {
       },
       "linkedAs": "Gekoppeld als {login}",
       "unlink": "GitHub ontkoppelen"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const nl_NL: EnTranslations = {
         "leaveText": "Je klimt terug omhoog naar Broeder Halven bij de reliekschrijnruïne."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "De Ravenpost",
+        "subject": "De raven vliegen nu voor jou",
+        "body": "Reiziger,\n\nde Ravenpost heeft haar roestplaatsen door de hele vallei geopend. Zoek de ravenzuilen in Eastbrook, Fenbridge en Highwatch: vanaf elke zuil kun je brieven, munten en goederen naar andere avonturiers sturen en ophalen wat de raven je brengen.\n\nBijgesloten een kleine attentie voor je eerste postzegel.\n\nVleugels omhoog,\nDe Ravenpost"
+      },
+      "letter_q_wolves": {
+        "sender": "Maarschalk Redbrook",
+        "subject": "De kralen zijn weer rustig",
+        "body": "De herders kunnen eindelijk weer met beide ogen dicht slapen, en dat is jouw verdienste. Ik heb de Ravenpost gevraagd je een kleinigheid uit de wachtkas te bezorgen.\n\nHoud je kling geolied.\n- Maarschalk Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Maarschalk Redbrook",
+        "subject": "Oude Grauwkaak, eindelijk",
+        "body": "Nieuws reist snel in zo’n klein stadje. De herders dronken gisteravond op je gezondheid, en Wilkes zweert dat de wolf zo groot was als een kar. Laat ze maar aandikken: je hebt het verdiend.\n\nEet een maaltijd op kosten van de wacht.\n- Maarschalk Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Broeder Aldric",
+        "subject": "Wat je in het donker hebt gedaan",
+        "body": "Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Kroongesmede gevechtsuitrusting",
@@ -6824,6 +6894,7 @@ export const nl_NL: EnTranslations = {
     "dungeonInstanceBusy": "Alle instanties van {name} zijn bezet. Probeer het zo weer.",
     "delveLockedChestInteract": "Druk op F om het slot te kraken",
     "delveRewardChestInteract": "Druk op F om de buit op te eisen",
-    "delveSurfaceExitInteract": "Druk op F om te klimmen"
+    "delveSurfaceExitInteract": "Druk op F om te klimmen",
+    "mailboxName": "Mailbox"
   }
 };

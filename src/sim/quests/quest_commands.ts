@@ -238,4 +238,7 @@ export function turnInQuestCore(
     color: '#ff0',
     pid: meta.entityId,
   });
+  // Quests with an authored Ravenpost letter have their giver write to the
+  // player a little while after the turn-in (mail/post_office.ts).
+  ctx.queueQuestLetter(questId, meta.entityId);
 }

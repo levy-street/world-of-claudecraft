@@ -973,6 +973,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         if (game.rekeyMarketSeller(characterId, character.name, c.name)) {
           await game.saveMarket();
         }
+        if (game.rekeyMailOwner(characterId, character.name, c.name)) {
+          await game.saveMail();
+        }
         return json(res, 200, {
           id: c.id,
           name: c.name,
@@ -1505,6 +1508,7 @@ async function main(): Promise<void> {
       `pruned ${prunedPerfReports} client perf report row(s) older than ${PERF_REPORT_RETENTION_DAYS} days`,
     );
   await game.loadMarket();
+  await game.loadMail();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
@@ -1760,6 +1764,7 @@ async function main(): Promise<void> {
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
+    await game.saveMail();
     await game.endAllPlaySessions();
     await game.chatLog.stop();
     await pool.end();

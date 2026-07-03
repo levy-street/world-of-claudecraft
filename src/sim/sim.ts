@@ -52,6 +52,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { MAILBOXES } from './content/mailboxes';
 import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
@@ -159,6 +160,7 @@ import {
   setPartyLootMaster as setPartyLootMasterImpl,
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
+import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
 import * as lifecycle from './mob/lifecycle';
@@ -196,6 +198,9 @@ import { createSimContext, type SimContext, type SimContextHost } from './sim_co
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
 
+// Same pattern for the Ravenpost mail book (server/db.ts persists it as a
+// per-realm world_state row alongside the market).
+export type { MailSave } from './mail/post_office';
 // Re-export so server/db.ts's `import type { MarketSave } from '../src/sim/sim'`
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
@@ -703,6 +708,9 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
+  // One-time Ravenpost welcome letter sent (persisted in CharacterState, so
+  // existing characters get the service announcement exactly once).
+  mailWelcomed: boolean;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
@@ -781,6 +789,9 @@ export interface CharacterState {
   companionUpgrades?: Record<string, number>;
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
+  // Ravenpost welcome letter already sent (optional so pre-mail saves load
+  // cleanly and receive the announcement letter once on their next login).
+  mailWelcomed?: boolean;
 }
 
 export interface PetState {
@@ -905,6 +916,10 @@ export class Sim {
   // keeps thin delegates + the `marketListings` getter below so server/IWorld/the
   // /listings readout call sites resolve unchanged.
   market!: Market;
+  // The Ravenpost (in-game mail): the PostOffice owns the world-scoped mail
+  // book, the id counter, and the mailbox entity ids; Sim keeps thin delegates
+  // (the market shape). Constructed in the ctor after the SimContext.
+  postOffice!: PostOffice;
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   private pendingMobRespawns: PendingMobRespawn[] = [];
@@ -939,6 +954,9 @@ export class Sim {
     // World Market (L2): owns its state; consumes the seam, so it is built right
     // after the SimContext. The NPC loop below sets its merchantId, then seed().
     this.market = new Market(this.ctx);
+    // Ravenpost mail: owns the mail book; consumes the seam. The mailbox object
+    // loop below (after ground objects) registers its mailbox entity ids.
+    this.postOffice = new PostOffice(this.ctx);
 
     // NPCs — nudged out of buildings and deep water if their data position is bad
     for (const npcDef of Object.values(NPCS)) {
@@ -985,6 +1003,18 @@ export class Sim {
         );
         this.addEntity(obj);
       }
+    }
+
+    // Ravenpost mailboxes: one interactable raven pillar per town (draws no
+    // rng; findSafePos is deterministic, so the camp draws above are unmoved).
+    for (const boxDef of MAILBOXES) {
+      const safe = this.findSafePos(boxDef.x, boxDef.z, WATER_LEVEL + 0.6);
+      const box = createGroundObject(this.nextId++, '', 'Mailbox', this.groundPos(safe.x, safe.z));
+      box.templateId = 'mailbox';
+      box.objectItemId = null;
+      box.lootable = true; // interactable
+      this.addEntity(box);
+      this.postOffice.mailboxIds.push(box.id);
     }
 
     // Dungeon entrances + their private instance slots
@@ -1200,6 +1230,7 @@ export class Sim {
       raidLockouts: new Map(),
       away: null,
       marketQuery: defaultMarketQuery(),
+      mailWelcomed: false,
       delveMarks: 0,
       delveClears: {},
       companionUpgrades: {},
@@ -1266,6 +1297,7 @@ export class Sim {
           if (Number.isFinite(until) && until > now) meta.raidLockouts.set(dungeonId, until);
         }
       }
+      meta.mailWelcomed = s.mailWelcomed === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -1310,6 +1342,13 @@ export class Sim {
     // use-gate (which reads potionCooldownUntil) still rejects the quaff.
     player.potionCdRemaining = Math.max(0, player.potionCooldownUntil - this.time);
     if (savedState?.pet) this.restorePet(player, savedState.pet);
+    // One-time Ravenpost welcome (doubles as the service announcement for
+    // characters saved before mail existed). Flipped before the send so a
+    // re-entrant save can never double-book the letter.
+    if (!meta.mailWelcomed) {
+      meta.mailWelcomed = true;
+      this.postOffice.sendWelcome(meta);
+    }
     return player.id;
   }
 
@@ -1476,6 +1515,7 @@ export class Sim {
         firstClearXp: [...meta.delveDaily.firstClearXp],
         markClears: meta.delveDaily.markClears,
       },
+      mailWelcomed: meta.mailWelcomed,
     };
     return sanitizeRemovedZone1Content(state).state;
   }
@@ -2263,6 +2303,7 @@ export class Sim {
       targetEntity: (id, pid) => sim.targetEntity(id, pid),
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
+      queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
     };
     return createSimContext(host);
   }
@@ -2497,6 +2538,7 @@ export class Sim {
     this.updateInstances();
     this.updateDelveRuns();
     this.market.update();
+    this.postOffice.update();
     drainDelayedEvents(this.ctx);
 
     // movement re-bucketing: queries during the next tick and the server's
@@ -5256,6 +5298,70 @@ export class Sim {
   }
 
   // -------------------------------------------------------------------------
+  // The Ravenpost — in-game mail
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the PostOffice instance (this.postOffice), which owns the
+  // mail book / id counter / mailbox entity ids (mail/post_office.ts, the
+  // market.ts shape). server/game.ts and the IWorld surface call these
+  // unchanged; the inventory hub stays on Sim, reached via the SimContext.
+
+  mailSend(
+    to: string,
+    subject: string,
+    body: string,
+    copper: number,
+    items: InvSlot[],
+    pid?: number,
+  ): void {
+    this.postOffice.mailSend(to, subject, body, copper, items, pid);
+  }
+
+  /** Server path: the recipient identity is resolved against the character DB. */
+  mailSendResolved(
+    recipient: { key: string; name: string },
+    subject: string,
+    body: string,
+    copper: number,
+    items: InvSlot[],
+    pid?: number,
+  ): void {
+    this.postOffice.mailSendResolved(recipient, subject, body, copper, items, pid);
+  }
+
+  mailTake(mailId: number, pid?: number): void {
+    this.postOffice.mailTake(mailId, pid);
+  }
+
+  mailDelete(mailId: number, pid?: number): void {
+    this.postOffice.mailDelete(mailId, pid);
+  }
+
+  mailMarkRead(mailId: number, pid?: number): void {
+    this.postOffice.mailMarkRead(mailId, pid);
+  }
+
+  mailInfoFor(pid: number): import('../world_api').MailInfo | null {
+    return this.postOffice.mailInfoFor(pid);
+  }
+
+  mailUnreadFor(pid: number): number {
+    return this.postOffice.mailUnreadFor(pid);
+  }
+
+  rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
+    return this.postOffice.rekeyMailOwner(characterId, oldName, newName);
+  }
+
+  serializeMail(): MailSave {
+    return this.postOffice.serializeMail();
+  }
+
+  loadMail(save: MailSave | null | undefined): void {
+    this.postOffice.loadMail(save);
+  }
+
+  // -------------------------------------------------------------------------
   // Dungeons: party-instanced elite content (the Hollow Crypt and friends)
   // -------------------------------------------------------------------------
 
@@ -5355,6 +5461,14 @@ export class Sim {
 
   get marketInfo(): import('../world_api').MarketInfo | null {
     return this.primaryId === -1 ? null : this.marketInfoFor(this.primaryId);
+  }
+
+  get mailInfo(): import('../world_api').MailInfo | null {
+    return this.primaryId === -1 ? null : this.mailInfoFor(this.primaryId);
+  }
+
+  get mailUnread(): number {
+    return this.primaryId === -1 ? 0 : this.mailUnreadFor(this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {

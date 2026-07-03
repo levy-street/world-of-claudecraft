@@ -49,6 +49,7 @@ import {
   closePlaySession,
   grantAccountMechChroma,
   insertChatLogs,
+  loadMailState,
   loadMarketState,
   markAccountQuestComplete,
   openPlaySession,
@@ -56,6 +57,7 @@ import {
   revokeAccountMechChroma,
   saveCharacterAndMarketState,
   saveCharacterState,
+  saveMailState,
   saveMarketState,
   walletForAccount,
 } from './db';
@@ -276,12 +278,18 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'market_buy',
   'market_cancel',
   'market_collect',
+  'mail_send',
+  'mail_take',
+  'mail_delete',
+  'mail_read',
   'pet_feed',
   'dev_give',
   'dev_level',
 ]);
 const HEAVY_SELF_EVENTS = new Set<string>([
   'loot',
+  'mailArrived',
+  'mailResult',
   'levelup',
   'virtualLevelUp',
   'milestoneUnlocked',
@@ -1054,6 +1062,7 @@ export class GameServer {
             this.saveTimer = 0;
             void this.saveAll('autosave');
             void this.saveMarket();
+            void this.saveMail();
           }
         },
         (err) => console.error('[tick] guarded tick body threw, skipping this tick:', err),
@@ -1681,6 +1690,7 @@ export class GameServer {
               state.level,
               state,
               this.sim.serializeMarket(),
+              this.sim.serializeMail(),
             ),
           );
         } else {
@@ -1746,8 +1756,31 @@ export class GameServer {
     }
   }
 
+  // The Ravenpost mail book: shared global state like the market, persisted as
+  // a single per-realm JSONB blob. Writes ride the market queue so a mail
+  // snapshot can never interleave with the atomic leave-path write.
+  async loadMail(): Promise<void> {
+    try {
+      this.sim.loadMail(await loadMailState());
+    } catch (err) {
+      console.error('failed to load mail:', err);
+    }
+  }
+
+  async saveMail(): Promise<void> {
+    try {
+      await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+    } catch (err) {
+      console.error('failed to save mail:', err);
+    }
+  }
+
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMarketSeller(characterId, oldName, newName);
+  }
+
+  rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
+    return this.sim.rekeyMailOwner(characterId, oldName, newName);
   }
 
   // Close every open play_sessions row; called on graceful shutdown so the
@@ -2707,6 +2740,92 @@ export class GameServer {
       case 'market_collect':
         sim.marketCollect(pid);
         break;
+      case 'mail_send': {
+        if (
+          typeof msg.to !== 'string' ||
+          typeof msg.subject !== 'string' ||
+          typeof msg.body !== 'string' ||
+          typeof msg.copper !== 'number' ||
+          !Number.isFinite(msg.copper) ||
+          !Array.isArray(msg.items) ||
+          msg.items.length > 8
+        )
+          break;
+        const items: { itemId: string; count: number }[] = [];
+        let itemsOk = true;
+        for (const raw of msg.items as unknown[]) {
+          const slot = raw as { itemId?: unknown; count?: unknown } | null;
+          if (
+            !slot ||
+            typeof slot.itemId !== 'string' ||
+            typeof slot.count !== 'number' ||
+            !Number.isFinite(slot.count)
+          ) {
+            itemsOk = false;
+            break;
+          }
+          items.push({ itemId: slot.itemId, count: Math.floor(slot.count) });
+        }
+        if (!itemsOk) break;
+        // Player-written subject/body flow through the same gates as chat
+        // (mute, rate limit, hard-word policy); authored system/NPC letters
+        // never come this way. The escrow itself resolves inside the Sim.
+        if (this.isChatMuted(session)) break;
+        if (!this.consumeChatToken(session)) break;
+        const subject = msg.subject.slice(0, 64);
+        const body = msg.body.slice(0, 600);
+        if (this.enforceChatPolicy(session, `${subject}\n${body}`)) break;
+        const to = msg.to.trim().slice(0, 32);
+        const copper = msg.copper;
+        const live = this.sessionByName(to);
+        if (live) {
+          sim.mailSendResolved(
+            { key: String(live.characterId), name: live.name },
+            subject,
+            body,
+            copper,
+            items,
+            pid,
+          );
+          break;
+        }
+        // Offline recipient: resolve against the character DB (realm-scoped),
+        // then book the letter on the loop's turn. Re-check the sender is
+        // still this session before touching the sim.
+        void this.socialDb
+          .findCharacterByName(to)
+          .then((target) => {
+            if (this.clients.get(pid) !== session) return;
+            if (!target) {
+              // Structured outcome, localized client-side (the sim's mailResult shape).
+              this.send(session, {
+                t: 'events',
+                list: [{ type: 'mailResult', code: 'noRecipient', pid }],
+              });
+              return;
+            }
+            sim.mailSendResolved(
+              { key: String(target.id), name: target.name },
+              subject,
+              body,
+              copper,
+              items,
+              pid,
+            );
+            session.selfHeavyDirty = true;
+          })
+          .catch((err) => console.error('mail send resolve failed:', err));
+        break;
+      }
+      case 'mail_take':
+        if (typeof msg.id === 'number') sim.mailTake(msg.id, pid);
+        break;
+      case 'mail_delete':
+        if (typeof msg.id === 'number') sim.mailDelete(msg.id, pid);
+        break;
+      case 'mail_read':
+        if (typeof msg.id === 'number') sim.mailMarkRead(msg.id, pid);
+        break;
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
       case 'dev_level': {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.level === 'number') {
@@ -3122,6 +3241,8 @@ export class GameServer {
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
+    maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).

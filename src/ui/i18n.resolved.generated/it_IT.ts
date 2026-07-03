@@ -1005,6 +1005,54 @@ export const it_IT: EnTranslations = {
       },
       "linkedAs": "Collegato come {login}",
       "unlink": "Scollega GitHub"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const it_IT: EnTranslations = {
         "leaveText": "Risali da Fratello Halven, alla rovina del reliquiario."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "La Posta dei Corvi",
+        "subject": "Ora i corvi volano per te",
+        "body": "Viandante,\n\nla Posta dei Corvi ha aperto i suoi trespoli in tutta la valle. Cerca i pilastri dei corvi a Eastbrook, Fenbridge e Highwatch: da ognuno di essi potrai inviare lettere, monete e oggetti agli altri avventurieri, e ritirare tutto ciò che i corvi ti portano.\n\nIn allegato un piccolo pensiero per il tuo primo francobollo.\n\nAli in alto,\nLa Posta dei Corvi"
+      },
+      "letter_q_wolves": {
+        "sender": "Maresciallo Redbrook",
+        "subject": "Nei recinti è tornata la quiete",
+        "body": "I pastori possono finalmente dormire sonni tranquilli, e il merito è tuo. Ho chiesto alla Posta dei Corvi di portarti un piccolo compenso dal fondo della guardia.\n\nTieni la lama oliata.\n- Maresciallo Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Maresciallo Redbrook",
+        "subject": "Il vecchio Grigiafauci, finalmente",
+        "body": "Le notizie corrono in una città così piccola. Ieri sera i pastori hanno brindato alla tua salute, e Wilkes giura che il lupo era grande quanto un carro. Lascia pure che ricamino: te lo sei guadagnato.\n\nConcediti un pasto a spese della guardia.\n- Maresciallo Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Fratello Aldric",
+        "subject": "Ciò che hai compiuto nel buio",
+        "body": "Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Tenuta da battaglia Forgiacorona",
@@ -6824,6 +6894,7 @@ export const it_IT: EnTranslations = {
     "dungeonInstanceBusy": "Tutte le istanze di {name} sono occupate. Riprova tra poco.",
     "delveLockedChestInteract": "Premi F per scassinare la serratura",
     "delveRewardChestInteract": "Premi F per reclamare il bottino",
-    "delveSurfaceExitInteract": "Premi F per risalire"
+    "delveSurfaceExitInteract": "Premi F per risalire",
+    "mailboxName": "Mailbox"
   }
 };

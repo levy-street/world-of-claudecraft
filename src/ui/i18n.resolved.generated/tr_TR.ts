@@ -1005,6 +1005,54 @@ export const tr_TR: EnTranslations = {
       },
       "linkedAs": "{login} olarak bağlandı",
       "unlink": "GitHub Bağlantısını Kaldır"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const tr_TR: EnTranslations = {
         "leaveText": "Emanetlik harabesinde Birader Halven'in yanına tırmanıp geri dönersin."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "Kuzgun Postası",
+        "subject": "Kuzgunlar artık senin için uçuyor",
+        "body": "Yolcu,\n\nKuzgun Postası tünek direklerini vadinin dört bir yanına kurdu. Eastbrook, Fenbridge ve Highwatch’taki kuzgun sütunlarını ara: herhangi birinden diğer maceracılara mektup, para ve eşya gönderebilir, kuzgunların sana getirdiklerini alabilirsin.\n\nİlk pulun için küçük bir armağan ekledik.\n\nKanatlar yukarı,\nKuzgun Postası"
+      },
+      "letter_q_wolves": {
+        "sender": "Mareşal Redbrook",
+        "subject": "Ağıllar yeniden sessiz",
+        "body": "Çobanlar nihayet rahat uyuyabiliyor ve bu senin sayende. Kuzgun Postası’ndan nöbet kasasından sana küçük bir şey ulaştırmasını istedim.\n\nKılıcını yağlı tut.\n- Mareşal Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Mareşal Redbrook",
+        "subject": "Yaşlı Bozçene, sonunda",
+        "body": "Böyle küçük bir kasabada haber tez yayılır. Çobanlar dün gece sağlığına kadeh kaldırdı, Wilkes ise kurdun bir araba kadar iri olduğuna yemin ediyor. Bırak abartsınlar: bunu hak ettin.\n\nNöbetçilerin hesabına bir yemek ye.\n- Mareşal Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Birader Aldric",
+        "subject": "Karanlıkta yaptıkların",
+        "body": "O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Taçdövme savaş takımı",
@@ -6824,6 +6894,7 @@ export const tr_TR: EnTranslations = {
     "dungeonInstanceBusy": "{name} zindanının tüm kopyaları dolu. Birazdan tekrar deneyin.",
     "delveLockedChestInteract": "Kilidi açmak için F'ye bas",
     "delveRewardChestInteract": "Ganimeti almak için F'ye bas",
-    "delveSurfaceExitInteract": "Tırmanmak için F'ye bas"
+    "delveSurfaceExitInteract": "Tırmanmak için F'ye bas",
+    "mailboxName": "Mailbox"
   }
 };

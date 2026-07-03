@@ -5119,4 +5119,17 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Nie teraz',
   'hudChrome.nativeUpdate.title': 'Dostępna aktualizacja',
   'hudChrome.nativeUpdate.update': 'Aktualizuj',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Krucza Poczta',
+  'entities.letters.ravenpost_welcome.subject': 'Kruki latają teraz dla ciebie',
+  'entities.letters.ravenpost_welcome.body': 'Wędrowcze,\n\nKrucza Poczta otworzyła swoje żerdzie w całej dolinie. Szukaj kruczych słupów w Eastbrook, Fenbridge i Highwatch: z każdego z nich możesz wysyłać listy, monety i towary innym poszukiwaczom przygód oraz odbierać wszystko, co przyniosą ci kruki.\n\nZałączamy drobiazg na twój pierwszy znaczek.\n\nSkrzydła w górę,\nKrucza Poczta',
+  'entities.letters.letter_q_wolves.sender': 'Marszałek Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'W zagrodach znów spokój',
+  'entities.letters.letter_q_wolves.body': 'Pasterze mogą wreszcie spać spokojnie i to twoja zasługa. Poprosiłem Kruczą Pocztę, by dostarczyła ci drobiazg z kasy straży.\n\nDbaj o ostrze.\n- Marszałek Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marszałek Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Stary Szaropaszcz, nareszcie',
+  'entities.letters.letter_q_greyjaw.body': 'Wieści szybko się niosą w tak małym miasteczku. Pasterze pili wczoraj za twoje zdrowie, a Wilkes przysięga, że wilk był wielki jak wóz. Niech sobie koloryzują: zasłużyłeś na to.\n\nZjedz posiłek na koszt straży.\n- Marszałek Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Brat Aldric',
+  'entities.letters.letter_q_hollow.subject': 'To, czego dokonałeś w mroku',
+  'entities.letters.letter_q_hollow.body': 'Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric',
 };

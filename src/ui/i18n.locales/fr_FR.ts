@@ -5223,4 +5223,17 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Pas maintenant',
   'hudChrome.nativeUpdate.title': 'Mise à jour disponible',
   'hudChrome.nativeUpdate.update': 'Mettre à jour',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'La Poste aux Corbeaux',
+  'entities.letters.ravenpost_welcome.subject': 'Les corbeaux volent désormais pour vous',
+  'entities.letters.ravenpost_welcome.body': 'Voyageur,\n\nla Poste aux Corbeaux a dressé ses perchoirs dans toute la vallée. Cherchez les piliers aux corbeaux à Eastbrook, Fenbridge et Highwatch : depuis chacun d’eux, vous pouvez envoyer lettres, pièces et objets aux autres aventuriers, et récupérer tout ce que les corbeaux vous apportent.\n\nCi-joint une petite attention pour votre premier timbre.\n\nHaut les ailes,\nLa Poste aux Corbeaux',
+  'entities.letters.letter_q_wolves.sender': 'Maréchal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Les enclos sont de nouveau calmes',
+  'entities.letters.letter_q_wolves.body': 'Les bergers peuvent enfin dormir sur leurs deux oreilles, et c’est grâce à vous. J’ai demandé à la Poste aux Corbeaux de vous porter un petit quelque chose pris sur la caisse du guet.\n\nGardez votre lame huilée.\n- Maréchal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Maréchal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Vieux Grisemâchoire, enfin',
+  'entities.letters.letter_q_greyjaw.body': 'Les nouvelles vont vite dans une si petite ville. Les bergers ont bu à votre santé hier soir, et Wilkes jure que le loup était grand comme une charrette. Laissez-les broder : vous l’avez mérité.\n\nPartagez un repas aux frais du guet.\n- Maréchal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Frère Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Ce que vous avez accompli dans le noir',
+  'entities.letters.letter_q_hollow.body': 'Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric',
 };

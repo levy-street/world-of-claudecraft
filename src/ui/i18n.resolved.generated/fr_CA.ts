@@ -1005,6 +1005,54 @@ export const fr_CA: EnTranslations = {
       },
       "linkedAs": "Lié en tant que {login}",
       "unlink": "Délier GitHub"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const fr_CA: EnTranslations = {
         "leaveText": "Vous remontez auprès du frère Halven, à la ruine du reliquaire."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "La Poste aux Corbeaux",
+        "subject": "Les corbeaux volent désormais pour vous",
+        "body": "Voyageur,\n\nla Poste aux Corbeaux a dressé ses perchoirs dans toute la vallée. Cherchez les piliers aux corbeaux à Eastbrook, Fenbridge et Highwatch : depuis chacun d’eux, vous pouvez envoyer lettres, pièces et objets aux autres aventuriers, et récupérer tout ce que les corbeaux vous apportent.\n\nCi-joint une petite attention pour votre premier timbre.\n\nHaut les ailes,\nLa Poste aux Corbeaux"
+      },
+      "letter_q_wolves": {
+        "sender": "Maréchal Redbrook",
+        "subject": "Les enclos sont de nouveau calmes",
+        "body": "Les bergers peuvent enfin dormir sur leurs deux oreilles, et c’est grâce à vous. J’ai demandé à la Poste aux Corbeaux de vous porter un petit quelque chose pris sur la caisse du guet.\n\nGardez votre lame huilée.\n- Maréchal Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Maréchal Redbrook",
+        "subject": "Vieux Grisemâchoire, enfin",
+        "body": "Les nouvelles vont vite dans une si petite ville. Les bergers ont bu à votre santé hier soir, et Wilkes jure que le loup était grand comme une charrette. Laissez-les broder : vous l’avez mérité.\n\nPartagez un repas aux frais du guet.\n- Maréchal Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Frère Aldric",
+        "subject": "Ce que vous avez accompli dans le noir",
+        "body": "Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Tenue de guerre Couronneforge",
@@ -6824,6 +6894,7 @@ export const fr_CA: EnTranslations = {
     "dungeonInstanceBusy": "Toutes les instances de {name} sont occupées. Réessayez bientôt.",
     "delveLockedChestInteract": "Appuyez sur F pour crocheter la serrure",
     "delveRewardChestInteract": "Appuyez sur F pour récupérer le butin",
-    "delveSurfaceExitInteract": "Appuyez sur F pour remonter"
+    "delveSurfaceExitInteract": "Appuyez sur F pour remonter",
+    "mailboxName": "Mailbox"
   }
 };

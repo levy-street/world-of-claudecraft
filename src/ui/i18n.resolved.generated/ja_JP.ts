@@ -1005,6 +1005,54 @@ export const ja_JP: EnTranslations = {
       },
       "linkedAs": "{login} として連携済み",
       "unlink": "GitHub の連携を解除"
+    },
+    "mailbox": {
+      "title": "メールボックス",
+      "subtitle": "レイヴンポスト",
+      "close": "メールボックスを閉じる",
+      "tabInbox": "受信箱",
+      "tabInboxWithCount": "受信箱（{count}）",
+      "tabSend": "Send",
+      "empty": "メールボックスは空です。",
+      "truncated": "全{total}通のうち最新の{shown}通を表示しています。",
+      "attachmentsBadge": "小包あり",
+      "unreadBadge": "未読",
+      "back": "Back",
+      "take": "添付品を受け取る",
+      "delete": "手紙を削除",
+      "deleteAria": "手紙「{subject}」を削除",
+      "openAria": "{name}からの手紙「{subject}」を読む",
+      "noSubject": "（件名なし）",
+      "toLabel": "To",
+      "toPlaceholder": "キャラクター名",
+      "subjectLabel": "件名",
+      "bodyLabel": "本文",
+      "coinLabel": "お金を添える",
+      "parcelsLabel": "小包",
+      "parcelsHint": "バッグ内のアイテムをクリックして添付します。",
+      "removeParcelAria": "手紙から{item}を取り除く",
+      "sendButton": "手紙を送る",
+      "postageNote": "郵送料：{amount}。ワタリガラスの飛行時間は約{seconds}秒です。",
+      "arrivedBanner": "ワタリガラスが到着：{name}からの手紙。",
+      "arrivedLog": "{name}から新しい手紙が届きました。",
+      "indicatorAria": "未読の手紙：{count}",
+      "indicatorTip": "未読の手紙が{count}通あります。メールボックスで読めます。",
+      "clickAttach": "クリックで手紙に添付します。",
+      "cannotMail": "これは郵送できません。",
+      "result": {
+        "sent": "ワタリガラスが{name}宛ての手紙を運んで飛び立ちました（郵送料{postage}）。",
+        "collected": "手紙から{amount}を受け取りました。",
+        "tooFar": "郵便を扱うにはメールボックスのそばにいる必要があります。",
+        "needRecipient": "手紙の宛先を指定してください。",
+        "noRecipient": "その名前のメールボックスの持ち主はいません。",
+        "tooManyParcels": "1通の手紙に添付できる小包は最大{count}個です。",
+        "noMailQuestItems": "クエストアイテムは郵送できません。",
+        "notEnoughItems": "送るのに十分な数を持っていません。",
+        "cantAffordPostage": "郵送料を支払えません。",
+        "recipientBoxFull": "相手のメールボックスは満杯です。",
+        "letterGone": "その手紙はもうメールボックスにありません。",
+        "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const ja_JP: EnTranslations = {
         "leaveText": "あなたは聖遺物庫の廃墟にいるハルヴェン修道士のもとへ登り戻る。"
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "レイヴンポスト",
+        "subject": "ワタリガラスはあなたのために飛ぶ",
+        "body": "旅人へ\n\nレイヴンポストは谷のあちこちに止まり木を設けました。イーストブルック、フェンブリッジ、ハイウォッチでワタリガラスの石柱を探してください。どの止まり木からでも、ほかの冒険者へ手紙やお金や品物を送れますし、ワタリガラスが運んできたものを受け取れます。\n\n最初の切手代として、ささやかな心づけを同封します。\n\n翼を高く、\nレイヴンポスト"
+      },
+      "letter_q_wolves": {
+        "sender": "レッドブルック元帥",
+        "subject": "囲いはまた静かになった",
+        "body": "牧夫たちがようやく安心して眠れるようになったのは、あなたのおかげです。見張り基金から、レイヴンポストに託してささやかな謝礼を送りました。\n\n刃の手入れを忘れずに。\n- レッドブルック元帥"
+      },
+      "letter_q_greyjaw": {
+        "sender": "レッドブルック元帥",
+        "subject": "オールド・グレイジョー、ついに",
+        "body": "小さな町では噂が早いものです。牧夫たちは昨夜あなたの健康に乾杯し、ウィルクスはあの狼が荷馬車ほどもあったと言い張っています。好きに尾ひれをつけさせておきなさい。あなたが勝ち取ったものです。\n\n見張り隊の分まで食事をどうぞ。\n- レッドブルック元帥"
+      },
+      "letter_q_hollow": {
+        "sender": "アルドリック修道士",
+        "subject": "あなたが暗闇で成したこと",
+        "body": "あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "冠鋳の戦装束",
@@ -6824,6 +6894,7 @@ export const ja_JP: EnTranslations = {
     "dungeonInstanceBusy": "{name}のインスタンスはすべて使用中です。少し待ってから再試行してください。",
     "delveLockedChestInteract": "Fで錠を開ける",
     "delveRewardChestInteract": "Fで戦利品を受け取る",
-    "delveSurfaceExitInteract": "Fで地上へ登る"
+    "delveSurfaceExitInteract": "Fで地上へ登る",
+    "mailboxName": "メールボックス"
   }
 };

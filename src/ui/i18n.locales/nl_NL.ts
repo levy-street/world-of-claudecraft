@@ -5150,4 +5150,17 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Niet nu',
   'hudChrome.nativeUpdate.title': 'Update beschikbaar',
   'hudChrome.nativeUpdate.update': 'Bijwerken',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'De Ravenpost',
+  'entities.letters.ravenpost_welcome.subject': 'De raven vliegen nu voor jou',
+  'entities.letters.ravenpost_welcome.body': 'Reiziger,\n\nde Ravenpost heeft haar roestplaatsen door de hele vallei geopend. Zoek de ravenzuilen in Eastbrook, Fenbridge en Highwatch: vanaf elke zuil kun je brieven, munten en goederen naar andere avonturiers sturen en ophalen wat de raven je brengen.\n\nBijgesloten een kleine attentie voor je eerste postzegel.\n\nVleugels omhoog,\nDe Ravenpost',
+  'entities.letters.letter_q_wolves.sender': 'Maarschalk Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'De kralen zijn weer rustig',
+  'entities.letters.letter_q_wolves.body': 'De herders kunnen eindelijk weer met beide ogen dicht slapen, en dat is jouw verdienste. Ik heb de Ravenpost gevraagd je een kleinigheid uit de wachtkas te bezorgen.\n\nHoud je kling geolied.\n- Maarschalk Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Maarschalk Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Oude Grauwkaak, eindelijk',
+  'entities.letters.letter_q_greyjaw.body': 'Nieuws reist snel in zo’n klein stadje. De herders dronken gisteravond op je gezondheid, en Wilkes zweert dat de wolf zo groot was als een kar. Laat ze maar aandikken: je hebt het verdiend.\n\nEet een maaltijd op kosten van de wacht.\n- Maarschalk Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Broeder Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Wat je in het donker hebt gedaan',
+  'entities.letters.letter_q_hollow.body': 'Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric',
 };

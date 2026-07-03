@@ -1005,6 +1005,54 @@ export const de_DE: EnTranslations = {
       },
       "linkedAs": "Verknüpft als {login}",
       "unlink": "GitHub trennen"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const de_DE: EnTranslations = {
         "leaveText": "Du kletterst zurück zu Bruder Halven bei der Reliquiarruine."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "Die Rabenpost",
+        "subject": "Die Raben fliegen nun für Euch",
+        "body": "Reisender,\n\ndie Rabenpost hat ihre Sitzstangen im ganzen Tal eröffnet. Sucht die Rabensäulen in Eastbrook, Fenbridge und Highwatch: Von jeder aus könnt Ihr anderen Abenteurern Briefe, Münzen und Waren schicken und abholen, was die Raben Euch bringen.\n\nAnbei eine kleine Aufmerksamkeit für Eure erste Briefmarke.\n\nSchwingen hoch,\nDie Rabenpost"
+      },
+      "letter_q_wolves": {
+        "sender": "Marschall Redbrook",
+        "subject": "In den Pferchen ist wieder Ruhe",
+        "body": "Die Hirten können endlich wieder ruhig schlafen, und das ist Euer Verdienst. Ich habe der Rabenpost aufgetragen, Euch eine Kleinigkeit aus der Wachkasse zu bringen.\n\nHaltet Eure Klinge geölt.\n- Marschall Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Marschall Redbrook",
+        "subject": "Der alte Graukiefer, endlich",
+        "body": "Neuigkeiten verbreiten sich schnell in einer so kleinen Stadt. Die Hirten haben gestern Abend auf Eure Gesundheit getrunken, und Wilkes schwört, der Wolf sei so groß wie ein Karren gewesen. Lasst sie ruhig übertreiben: Ihr habt es Euch verdient.\n\nGönnt Euch ein Mahl auf Kosten der Wache.\n- Marschall Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Bruder Aldric",
+        "subject": "Was Ihr im Dunkeln vollbracht habt",
+        "body": "Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Kronengeschmiedete Kriegstracht",
@@ -6824,6 +6894,7 @@ export const de_DE: EnTranslations = {
     "dungeonInstanceBusy": "Alle Instanzen von {name} sind belegt. Versuch es bald erneut.",
     "delveLockedChestInteract": "Drücke F, um das Schloss zu knacken",
     "delveRewardChestInteract": "Drücke F, um Beute zu beanspruchen",
-    "delveSurfaceExitInteract": "Drücke F, um hinaufzuklettern"
+    "delveSurfaceExitInteract": "Drücke F, um hinaufzuklettern",
+    "mailboxName": "Mailbox"
   }
 };

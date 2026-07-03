@@ -300,6 +300,8 @@ function makeCtx() {
     targetEntity: vi.fn(),
     partyCapacity: vi.fn(() => 5),
     marketListingBelongsTo: vi.fn(() => false),
+    // Ravenpost mail: the quest turn-in letter hook.
+    queueQuestLetter: vi.fn(),
   };
   const ctx = createSimContext(host);
   return {

@@ -17,6 +17,9 @@ export function npcDisplayName(npcId: string): string {
 }
 
 export function objectDisplayName(entity: Entity): string {
+  if (entity.templateId === 'mailbox') {
+    return t('worldContent.mailboxName');
+  }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
   }

@@ -1541,6 +1541,23 @@ export interface NythraxisEncounterState {
 
 export type ErrorReason = 'target_dead';
 
+// Ravenpost mail command outcomes. `sent`/`collected` are successes; the rest
+// are refusals. The client maps each code to its localized line (the sim never
+// emits mail text).
+export type MailResultCode =
+  | 'sent'
+  | 'collected'
+  | 'tooFar'
+  | 'needRecipient'
+  | 'noRecipient'
+  | 'tooManyParcels'
+  | 'noMailQuestItems'
+  | 'notEnoughItems'
+  | 'cantAffordPostage'
+  | 'recipientBoxFull'
+  | 'letterGone'
+  | 'takeParcelsFirst';
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -1596,6 +1613,16 @@ export type SimEvent = { pid?: number } & (
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
   | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }
+  // Ravenpost mail. Structured data only, the client builds every visible
+  // string (the lockpick convention). `mailbox` asks the client to open the
+  // mail window (the interact path at a mailbox object); `mailArrived` is the
+  // personal arrival cue (envelope toast + sound); `mailResult` reports a mail
+  // command's outcome (`sent` carries the recipient name + postage in copper,
+  // `collected` the coin taken, `tooManyParcels` the attachment cap). All
+  // always carry pid.
+  | { type: 'mailbox' }
+  | { type: 'mailArrived'; senderName: string }
+  | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is

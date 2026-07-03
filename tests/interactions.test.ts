@@ -228,6 +228,7 @@ describe('handlePickedEntity', () => {
       openLoot: () => {},
       openQuestDialog: () => {},
       openDelveBoard: () => {},
+      openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
     };
@@ -266,6 +267,7 @@ describe('handlePickedEntity', () => {
       openLoot: () => {},
       openQuestDialog: () => {},
       openDelveBoard: () => {},
+      openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
     };

@@ -20,6 +20,7 @@ export interface PickInteractionHud {
   openLoot(mobId: number, screenX: number, screenY: number): void;
   openQuestDialog(npcId: number): void;
   openDelveBoard(npcId: number): void;
+  openMailbox(): void;
   showError(text: string): void;
   closeContextMenu(): void;
 }
@@ -124,6 +125,7 @@ export function handlePickedEntity(
       }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
+      else if (e.templateId === 'mailbox') hud.openMailbox();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
@@ -147,6 +149,7 @@ export function handlePickedEntity(
       if (d > INTERACT_RANGE + 1) return;
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
+      else if (e.templateId === 'mailbox') hud.openMailbox();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       const d = dist2d(world.player.pos, e.pos);

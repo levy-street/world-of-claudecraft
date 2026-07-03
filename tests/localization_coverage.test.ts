@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { QUEST_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -538,6 +539,13 @@ describe('i18n Localization Key Coverage', () => {
         field: entry.field as 'name' | 'enterText' | 'leaveText',
       };
     }
+    if (entry.kind === 'letter') {
+      return {
+        kind: 'letter',
+        id: entry.id,
+        field: entry.field as 'sender' | 'subject' | 'body',
+      };
+    }
     throw new Error(`Unexpected entity kind: ${entry.kind}`);
   }
 
@@ -942,7 +950,9 @@ describe('i18n Localization Key Coverage', () => {
       ZONES.length * 2 +
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
-      Object.keys(DELVES).length * 3;
+      Object.keys(DELVES).length * 3 +
+      // Ravenpost authored letters: welcome + quest letters, 3 fields each.
+      (1 + Object.keys(QUEST_LETTERS).length) * 3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {

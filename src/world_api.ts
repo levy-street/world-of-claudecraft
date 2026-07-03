@@ -9,8 +9,8 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 21 domain facets (each IWorld member assigned exactly once; 145
-// total). One interface per file under ./world_api/; aux types travel with their
+// FACET MAP: the 22 domain facets (each IWorld member assigned exactly once).
+// One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
 //   entity_roster.ts    IWorldEntityRoster   cfg/entities/player/moveInput/realm reads
@@ -30,6 +30,7 @@
 //   duel_arena.ts       IWorldDuelArena      duels + ranked arena + 2v2 fiesta
 //   social_graph.ts     IWorldSocialGraph    friends/blocks/guild (online-only frames)
 //   market.ts           IWorldMarket         World Market browse/list/buy
+//   mail.ts             IWorldMail           Ravenpost mail send/take + unread badge
 //   dungeons.ts         IWorldDungeons       dungeon enter/leave + raid lockouts
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
 //   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
@@ -56,6 +57,7 @@ import type { IWorldEntityRoster } from './world_api/entity_roster';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
+import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
@@ -105,6 +107,7 @@ export type {
   FiestaScoreboardPlayer,
 } from './world_api/duel_arena';
 export type { RaidLockout } from './world_api/dungeons';
+export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberInfo } from './world_api/party';
 export type {
@@ -144,6 +147,7 @@ export interface IWorld
     IWorldDuelArena,
     IWorldSocialGraph,
     IWorldMarket,
+    IWorldMail,
     IWorldDungeons,
     IWorldDelves,
     IWorldDailyRewards,
@@ -281,6 +285,10 @@ export const COMMAND_NAMES = [
   'lockpick_abort',
   'collect_delve_chest_loot',
   'telemetry',
+  'mail_send',
+  'mail_take',
+  'mail_delete',
+  'mail_read',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -340,6 +348,7 @@ export type WorldFacet =
   | 'IWorldDuelArena'
   | 'IWorldSocialGraph'
   | 'IWorldMarket'
+  | 'IWorldMail'
   | 'IWorldDungeons'
   | 'IWorldDelves'
   | 'IWorldDailyRewards'
@@ -447,6 +456,12 @@ export const COMMAND_FACETS = {
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',
+  // IWorldMail: Ravenpost letters (snake_case wire strings, by design). mailInfo /
+  // mailUnread are snapshot reads (no send, untagged).
+  mail_send: 'IWorldMail',
+  mail_take: 'IWorldMail',
+  mail_delete: 'IWorldMail',
+  mail_read: 'IWorldMail',
   // IWorldDungeons: dungeon enter/leave. raidLockouts is a snapshot-derived read
   // (no send, untagged). enter_crypt/leave_crypt are legacy dispatch-only aliases
   // (untagged; on the DISPATCH_ONLY_COMMANDS allowlist), NOT IWorldDungeons.

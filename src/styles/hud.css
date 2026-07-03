@@ -3824,4 +3824,34 @@
   #spectate-badge[hidden] {
     display: none;
   }
+
+  /* ---------- Ravenpost envelope indicator ---------- */
+  /* Sits on the minimap disc rim (the raid-lockout button pattern): an envelope
+     glyph with an unread count, visible only while letters wait. */
+  #mail-indicator {
+    position: absolute;
+    left: 4px;
+    bottom: 4px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 7px;
+    background: #12100acc;
+    border: 1px solid #cc9a3c88;
+    border-radius: 12px;
+    color: var(--gold);
+    pointer-events: auto;
+  }
+  #mail-indicator[hidden] {
+    display: none;
+  }
+  #mail-indicator .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  .mail-indicator-count {
+    font: 700 11px var(--title-font);
+    letter-spacing: 0.4px;
+  }
 }

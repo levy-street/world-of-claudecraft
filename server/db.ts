@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
-import type { CharacterState, MarketSave } from '../src/sim/sim';
+import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
@@ -1821,18 +1821,20 @@ export async function saveCharacterState(
   );
 }
 
-// Persist a character row AND this realm's World Market blob in ONE transaction.
-// The two live in different tables (characters / world_state), but a Market
-// listing is an escrow: the item leaves the seller's bags (character state) and
-// becomes a listing (market state) in the same Sim action. Saving them as two
-// independent writes lets an unclean crash persist one half and not the other,
-// vaporising the item or duplicating it across bags and market. The leave path
-// uses this so a logout flush of bags can never tear away from the market.
+// Persist a character row AND this realm's World Market + Ravenpost mail blobs
+// in ONE transaction. They live in different tables (characters / world_state),
+// but a Market listing and a mail attachment are both escrows: the item leaves
+// the character's bags (character state) and becomes a listing / a letter
+// parcel (world state) in the same Sim action. Saving them as independent
+// writes lets an unclean crash persist one half and not the other, vaporising
+// the item or duplicating it across bags and book. The leave path uses this so
+// a logout flush of bags can never tear away from either escrow.
 export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
   state: CharacterState,
   market: MarketSave,
+  mail: MailSave,
 ): Promise<void> {
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
@@ -1849,6 +1851,11 @@ export async function saveCharacterAndMarketState(
       // flush must land where the market is read back, or the escrowed listing
       // is written to a key nothing loads and the item is stranded on next boot.
       [marketStateKey(REALM), JSON.stringify(market)],
+    );
+    await client.query(
+      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+      [mailStateKey(REALM), JSON.stringify(mail)],
     );
     await client.query('COMMIT');
   } catch (err) {
@@ -2226,6 +2233,20 @@ export async function loadMarketState(): Promise<MarketSave | null> {
 
 export async function saveMarketState(save: MarketSave): Promise<void> {
   await saveWorldState(marketStateKey(REALM), save);
+}
+
+// The Ravenpost mail book: realm-scoped like the market, one JSONB blob per
+// realm under `mail:<realm>`. Born realm-scoped, so no legacy migration.
+export function mailStateKey(realm: string): string {
+  return `mail:${realm}`;
+}
+
+export async function loadMailState(): Promise<MailSave | null> {
+  return loadWorldState<MailSave>(mailStateKey(REALM));
+}
+
+export async function saveMailState(save: MailSave): Promise<void> {
+  await saveWorldState(mailStateKey(REALM), save);
 }
 
 // ---------------------------------------------------------------------------

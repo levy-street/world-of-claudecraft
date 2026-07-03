@@ -1005,6 +1005,54 @@ export const ko_KR: EnTranslations = {
       },
       "linkedAs": "{login}(으)로 연결됨",
       "unlink": "GitHub 연결 해제"
+    },
+    "mailbox": {
+      "title": "우편함",
+      "subtitle": "레이븐포스트",
+      "close": "우편함 닫기",
+      "tabInbox": "받은 편지함",
+      "tabInboxWithCount": "받은 편지함 ({count})",
+      "tabSend": "Send",
+      "empty": "우편함이 비어 있습니다.",
+      "truncated": "전체 {total}통 중 최신 {shown}통을 표시합니다.",
+      "attachmentsBadge": "소포 첨부됨",
+      "unreadBadge": "읽지 않음",
+      "back": "Back",
+      "take": "첨부물 받기",
+      "delete": "편지 삭제",
+      "deleteAria": "편지 {subject} 삭제",
+      "openAria": "{name}이(가) 보낸 편지 {subject} 읽기",
+      "noSubject": "(제목 없음)",
+      "toLabel": "To",
+      "toPlaceholder": "캐릭터 이름",
+      "subjectLabel": "제목",
+      "bodyLabel": "내용",
+      "coinLabel": "동전 첨부",
+      "parcelsLabel": "소포",
+      "parcelsHint": "가방의 아이템을 클릭하면 첨부됩니다.",
+      "removeParcelAria": "편지에서 {item} 제거",
+      "sendButton": "편지 보내기",
+      "postageNote": "우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.",
+      "arrivedBanner": "까마귀가 도착했습니다: {name}의 우편.",
+      "arrivedLog": "{name}에게서 새 우편이 도착했습니다.",
+      "indicatorAria": "읽지 않은 우편: {count}",
+      "indicatorTip": "읽지 않은 편지가 {count}통 있습니다. 우편함에서 확인하세요.",
+      "clickAttach": "클릭하면 편지에 첨부됩니다.",
+      "cannotMail": "이 아이템은 우편으로 보낼 수 없습니다.",
+      "result": {
+        "sent": "까마귀가 {name}에게 보낼 편지를 물고 날아올랐습니다 (우편 요금 {postage}).",
+        "collected": "편지에서 {amount}을(를) 받았습니다.",
+        "tooFar": "우편을 처리하려면 우편함 옆에 있어야 합니다.",
+        "needRecipient": "편지의 수신인을 지정하세요.",
+        "noRecipient": "그 이름을 가진 우편함 주인이 없습니다.",
+        "tooManyParcels": "편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.",
+        "noMailQuestItems": "퀘스트 아이템은 우편으로 보낼 수 없습니다.",
+        "notEnoughItems": "보낼 수 있는 수량이 부족합니다.",
+        "cantAffordPostage": "우편 요금을 낼 수 없습니다.",
+        "recipientBoxFull": "상대의 우편함이 가득 찼습니다.",
+        "letterGone": "그 편지는 더 이상 우편함에 없습니다.",
+        "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const ko_KR: EnTranslations = {
         "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "레이븐포스트",
+        "subject": "이제 까마귀가 당신을 위해 날아갑니다",
+        "body": "여행자님,\n\n레이븐포스트가 골짜기 곳곳에 홰를 열었습니다. 이스트브룩, 펜브리지, 하이워치에서 까마귀 석주를 찾아보세요. 어느 곳에서든 다른 모험가에게 편지와 동전과 물건을 보낼 수 있고, 까마귀가 물어온 것들을 받을 수 있습니다.\n\n첫 우표값으로 쓸 작은 성의를 동봉합니다.\n\n날개를 활짝,\n레이븐포스트"
+      },
+      "letter_q_wolves": {
+        "sender": "레드브룩 원수",
+        "subject": "우리가 다시 조용해졌소",
+        "body": "목동들이 모처럼 두 다리 뻗고 잘 수 있게 된 것은 그대 덕분이오. 경비 기금에서 작은 성의를 레이븐포스트 편에 보냈소.\n\n칼날을 잘 벼려 두시오.\n- 레드브룩 원수"
+      },
+      "letter_q_greyjaw": {
+        "sender": "레드브룩 원수",
+        "subject": "늙은 회색이빨, 마침내",
+        "body": "이런 작은 마을에서는 소문이 빠르게 도는 법이오. 목동들은 어젯밤 그대의 건강을 위해 잔을 들었고, 윌크스는 그 늑대가 수레만 했다고 우기고 있소. 부풀리게 내버려 두시오. 그대가 얻어낸 명성이니.\n\n경비대를 대신해 식사 한 끼 하시오.\n- 레드브룩 원수"
+      },
+      "letter_q_hollow": {
+        "sender": "알드릭 수사",
+        "subject": "그대가 어둠 속에서 해낸 일",
+        "body": "그 구렁에 무엇이 묻혀 있었는지 아는 이는 거의 없고, 믿을 이는 더 적을 것입니다. 저는 알고 있고, 잊지 않겠습니다.\n\n그대의 길에 늘 빛이 함께하기를.\n- 알드릭 수사"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "왕관벼림 전투장비",
@@ -6824,6 +6894,7 @@ export const ko_KR: EnTranslations = {
     "dungeonInstanceBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하십시오.",
     "delveLockedChestInteract": "F를 눌러 자물쇠 따기",
     "delveRewardChestInteract": "F를 눌러 전리품 받기",
-    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기"
+    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기",
+    "mailboxName": "우편함"
   }
 };

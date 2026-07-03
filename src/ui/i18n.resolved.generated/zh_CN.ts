@@ -1005,6 +1005,54 @@ export const zh_CN: EnTranslations = {
       },
       "linkedAs": "已关联为 {login}",
       "unlink": "取消关联 GitHub"
+    },
+    "mailbox": {
+      "title": "邮箱",
+      "subtitle": "渡鸦邮驿",
+      "close": "关闭邮箱",
+      "tabInbox": "收件箱",
+      "tabInboxWithCount": "收件箱（{count}）",
+      "tabSend": "Send",
+      "empty": "你的邮箱是空的。",
+      "truncated": "显示最新的 {shown} 封信（共 {total} 封）。",
+      "attachmentsBadge": "附有包裹",
+      "unreadBadge": "未读",
+      "back": "Back",
+      "take": "领取附件",
+      "delete": "删除信件",
+      "deleteAria": "删除信件 {subject}",
+      "openAria": "阅读来自 {name} 的信件 {subject}",
+      "noSubject": "（无主题）",
+      "toLabel": "To",
+      "toPlaceholder": "角色名字",
+      "subjectLabel": "主题",
+      "bodyLabel": "内容",
+      "coinLabel": "附上钱币",
+      "parcelsLabel": "包裹",
+      "parcelsHint": "点击背包中的物品即可附上。",
+      "removeParcelAria": "从信件中移除 {item}",
+      "sendButton": "寄出信件",
+      "postageNote": "邮资：{amount}。渡鸦飞行约 {seconds} 秒。",
+      "arrivedBanner": "渡鸦已降落：来自 {name} 的邮件。",
+      "arrivedLog": "你收到了来自 {name} 的新邮件。",
+      "indicatorAria": "未读邮件：{count}",
+      "indicatorTip": "你有 {count} 封未读信件。请前往邮箱阅读。",
+      "clickAttach": "点击以附到信件上。",
+      "cannotMail": "该物品无法邮寄。",
+      "result": {
+        "sent": "渡鸦带着你给 {name} 的信起飞了（邮资 {postage}）。",
+        "collected": "你从信件中取出 {amount}。",
+        "tooFar": "你必须站在邮箱旁才能处理邮件。",
+        "needRecipient": "请写明信件的收件人。",
+        "noRecipient": "这里没有叫这个名字的邮箱主人。",
+        "tooManyParcels": "一封信最多可携带 {count} 个包裹。",
+        "noMailQuestItems": "你不能邮寄任务物品。",
+        "notEnoughItems": "你没有那么多可寄送的物品。",
+        "cantAffordPostage": "你付不起邮资。",
+        "recipientBoxFull": "对方的邮箱已满。",
+        "letterGone": "那封信已不在你的邮箱里。",
+        "takeParcelsFirst": "请先取出包裹再丢弃信件。"
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const zh_CN: EnTranslations = {
         "leaveText": "你攀回圣物库废墟旁的哈尔文修士身边。"
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "渡鸦邮驿",
+        "subject": "渡鸦如今为你飞翔",
+        "body": "旅人：\n\n渡鸦邮驿已在谷地各处设立栖架。请在东溪镇、沼桥镇和高望镇寻找渡鸦石柱：在任意一处，你都可以向其他冒险者寄送信件、钱币和物品，也可以领取渡鸦为你带来的一切。\n\n随信附上一点心意，作为你的第一枚邮票。\n\n展翅高飞，\n渡鸦邮驿"
+      },
+      "letter_q_wolves": {
+        "sender": "雷德布鲁克元帅",
+        "subject": "围栏又安静了",
+        "body": "牧人们总算能睡个安稳觉了，这都是你的功劳。我已托渡鸦邮驿从守备金里给你捎去一点谢意。\n\n保持你的刀刃锋利。\n- 雷德布鲁克元帅"
+      },
+      "letter_q_greyjaw": {
+        "sender": "雷德布鲁克元帅",
+        "subject": "老灰颚，终于倒下了",
+        "body": "小镇里消息传得快。牧人们昨晚为你的健康干杯，威尔克斯发誓那头狼有马车那么大。让他们添油加醋去吧：这是你应得的。\n\n请代守备队享用一顿好饭。\n- 雷德布鲁克元帅"
+      },
+      "letter_q_hollow": {
+        "sender": "奥德里克修士",
+        "subject": "你在黑暗中所做的一切",
+        "body": "很少有人会知道那处洼地里埋葬着什么，愿意相信的人更少。但我知道，而且我不会忘记。\n\n愿你的道路常明。\n- 奥德里克修士"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "铸冠战装",
@@ -6824,6 +6894,7 @@ export const zh_CN: EnTranslations = {
     "dungeonInstanceBusy": "{name}的所有副本都已被占用。请稍后再试。",
     "delveLockedChestInteract": "按 F 撬锁",
     "delveRewardChestInteract": "按 F 领取战利品",
-    "delveSurfaceExitInteract": "按 F 攀回地表"
+    "delveSurfaceExitInteract": "按 F 攀回地表",
+    "mailboxName": "邮箱"
   }
 };

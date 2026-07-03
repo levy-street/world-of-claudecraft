@@ -1005,6 +1005,54 @@ export const da_DK: EnTranslations = {
       },
       "linkedAs": "Tilknyttet som {login}",
       "unlink": "Fjern GitHub-tilknytning"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const da_DK: EnTranslations = {
         "leaveText": "Du klatrer tilbage til Broder Halven ved relikvariets ruin."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "Ravneposten",
+        "subject": "Ravnene flyver nu for dig",
+        "body": "Vejfarende,\n\nRavneposten har rejst sine siddepinde over hele dalen. Find ravnesøjlerne i Eastbrook, Fenbridge og Highwatch: fra enhver af dem kan du sende breve, mønter og varer til andre eventyrere og hente alt, hvad ravnene bringer dig.\n\nVedlagt en lille opmærksomhed til dit første frimærke.\n\nVingerne op,\nRavneposten"
+      },
+      "letter_q_wolves": {
+        "sender": "Marskal Redbrook",
+        "subject": "Der er ro ved foldene igen",
+        "body": "Hyrderne kan for en gangs skyld sove med begge øjne lukkede, og det er din fortjeneste. Jeg har bedt Ravneposten bringe dig en lille skilling fra vagtkassen.\n\nHold din klinge smurt.\n- Marskal Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Marskal Redbrook",
+        "subject": "Gamle Gråkæbe, endelig",
+        "body": "Rygter løber hurtigt i så lille en by. Hyrderne skålede for dit helbred i aftes, og Wilkes sværger, at ulven var stor som en kærre. Lad dem bare brodere: du har fortjent det.\n\nTag et måltid på vagtens regning.\n- Marskal Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Broder Aldric",
+        "subject": "Det, du gjorde i mørket",
+        "body": "Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Kronesmedet kampudstyr",
@@ -6824,6 +6894,7 @@ export const da_DK: EnTranslations = {
     "dungeonInstanceBusy": "Alle instanser af {name} er optaget. Prøv igen snart.",
     "delveLockedChestInteract": "Tryk på F for at dirke låsen op",
     "delveRewardChestInteract": "Tryk på F for at kræve byttet",
-    "delveSurfaceExitInteract": "Tryk på F for at klatre"
+    "delveSurfaceExitInteract": "Tryk på F for at klatre",
+    "mailboxName": "Mailbox"
   }
 };

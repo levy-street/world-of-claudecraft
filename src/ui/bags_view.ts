@@ -21,9 +21,12 @@ export interface BagItemInfo {
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
- *  effective mode (checked in priority order: trade, market-sell, vendor, pet-feed). */
+ *  effective mode (checked in priority order: trade, mail-attach, market-sell,
+ *  vendor, pet-feed). */
 export interface BagMode {
   tradeOpen: boolean;
+  /** The Ravenpost mailbox is open on its Send tab (clicks attach parcels). */
+  mailAttach: boolean;
   /** The World Market is open on its Sell tab. */
   marketSell: boolean;
   vendorOpen: boolean;
@@ -35,6 +38,8 @@ export interface BagMode {
  *  mean the click is rejected with an error toast (no dispatch). */
 export type BagAction =
   | 'trade'
+  | 'mailAttach'
+  | 'mailAttachBlocked'
   | 'marketSell'
   | 'marketSellBlockedQuest'
   | 'marketSellBlockedNoMarket'
@@ -56,12 +61,19 @@ export type BagTooltipHintKey =
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
   | 'itemUi.tooltip.clickUse'
+  | 'hudChrome.mailbox.clickAttach'
+  | 'hudChrome.mailbox.cannotMail'
   | '';
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
  *  priority order exactly: trade > market-sell > vendor > pet-feed > quest > use. */
 export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   if (mode.tradeOpen) return 'trade';
+  if (mode.mailAttach) {
+    // Mirrors the sim's mail escrow rule: quest and unmailable items refuse.
+    if (item.kind === 'quest' || item.noMarketList) return 'mailAttachBlocked';
+    return 'mailAttach';
+  }
   if (mode.marketSell) {
     if (item.kind === 'quest') return 'marketSellBlockedQuest';
     if (item.noMarketList) return 'marketSellBlockedNoMarket';
@@ -84,6 +96,11 @@ export function bagShiftLinks(mode: BagMode): boolean {
  *  mode-then-kind branch. Returns '' when no hint applies (e.g. a material). */
 export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipHintKey {
   if (mode.tradeOpen) return 'itemUi.tooltip.clickTradeOffer';
+  if (mode.mailAttach) {
+    return item.kind === 'quest' || item.noMarketList
+      ? 'hudChrome.mailbox.cannotMail'
+      : 'hudChrome.mailbox.clickAttach';
+  }
   if (mode.marketSell) {
     return item.kind === 'quest' || item.noMarketList
       ? 'itemUi.tooltip.cannotMarket'

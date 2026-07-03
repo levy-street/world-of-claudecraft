@@ -16,7 +16,13 @@ import {
 // ClientWorld-vs-Sim parity (the same inventory drives identical models
 // whether read off a Sim or a ClientWorld mirror).
 
-const NO_MODE: BagMode = { tradeOpen: false, marketSell: false, vendorOpen: false, petFeed: false };
+const NO_MODE: BagMode = {
+  tradeOpen: false,
+  mailAttach: false,
+  marketSell: false,
+  vendorOpen: false,
+  petFeed: false,
+};
 
 const ITEMS: Record<string, ItemDef> = {
   sword: { kind: 'weapon', name: 'Sword', quality: 'rare' } as ItemDef,

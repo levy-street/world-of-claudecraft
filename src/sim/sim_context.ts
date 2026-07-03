@@ -560,6 +560,11 @@ export interface SimContextCallbacks {
   targetEntity(id: number | null, pid?: number): void;
   partyCapacity(party: Party | null): number;
   marketListingBelongsTo(listing: MarketListing, meta: PlayerMeta): boolean;
+
+  // Ravenpost mail (mail/post_office.ts): the quest turn-in core
+  // (quests/quest_commands.ts) queues the giver's authored thank-you letter
+  // through this; the binding points at the PostOffice instance on Sim.
+  queueQuestLetter(questId: string, pid: number): void;
 }
 
 // The seam consumed by extracted modules.
@@ -893,5 +898,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     targetEntity: host.targetEntity,
     partyCapacity: host.partyCapacity,
     marketListingBelongsTo: host.marketListingBelongsTo,
+    // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
+    queueQuestLetter: host.queueQuestLetter,
   };
 }

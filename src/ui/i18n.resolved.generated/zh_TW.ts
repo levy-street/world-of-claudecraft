@@ -1005,6 +1005,54 @@ export const zh_TW: EnTranslations = {
       },
       "linkedAs": "已連結為 {login}",
       "unlink": "取消連結 GitHub"
+    },
+    "mailbox": {
+      "title": "郵箱",
+      "subtitle": "渡鴉郵驛",
+      "close": "關閉郵箱",
+      "tabInbox": "收件匣",
+      "tabInboxWithCount": "收件匣（{count}）",
+      "tabSend": "Send",
+      "empty": "你的郵箱是空的。",
+      "truncated": "顯示最新的 {shown} 封信（共 {total} 封）。",
+      "attachmentsBadge": "附有包裹",
+      "unreadBadge": "未讀",
+      "back": "Back",
+      "take": "領取附件",
+      "delete": "刪除信件",
+      "deleteAria": "刪除信件 {subject}",
+      "openAria": "閱讀來自 {name} 的信件 {subject}",
+      "noSubject": "（無主題）",
+      "toLabel": "To",
+      "toPlaceholder": "角色名字",
+      "subjectLabel": "主題",
+      "bodyLabel": "內容",
+      "coinLabel": "附上錢幣",
+      "parcelsLabel": "包裹",
+      "parcelsHint": "點擊背包中的物品即可附上。",
+      "removeParcelAria": "從信件中移除 {item}",
+      "sendButton": "寄出信件",
+      "postageNote": "郵資：{amount}。渡鴉飛行約 {seconds} 秒。",
+      "arrivedBanner": "渡鴉已降落：來自 {name} 的郵件。",
+      "arrivedLog": "你收到了來自 {name} 的新郵件。",
+      "indicatorAria": "未讀郵件：{count}",
+      "indicatorTip": "你有 {count} 封未讀信件。請前往郵箱閱讀。",
+      "clickAttach": "點擊以附到信件上。",
+      "cannotMail": "該物品無法郵寄。",
+      "result": {
+        "sent": "渡鴉帶著你給 {name} 的信起飛了（郵資 {postage}）。",
+        "collected": "你從信件中取出 {amount}。",
+        "tooFar": "你必須站在郵箱旁才能處理郵件。",
+        "needRecipient": "請寫明信件的收件人。",
+        "noRecipient": "這裡沒有叫這個名字的郵箱主人。",
+        "tooManyParcels": "一封信最多可攜帶 {count} 個包裹。",
+        "noMailQuestItems": "你不能郵寄任務物品。",
+        "notEnoughItems": "你沒有那麼多可寄送的物品。",
+        "cantAffordPostage": "你付不起郵資。",
+        "recipientBoxFull": "對方的郵箱已滿。",
+        "letterGone": "那封信已不在你的郵箱裡。",
+        "takeParcelsFirst": "請先取出包裹再丟棄信件。"
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你爬回聖物庫遺墟處的哈爾文修士身邊。"
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "渡鴉郵驛",
+        "subject": "渡鴉如今為你飛翔",
+        "body": "旅人：\n\n渡鴉郵驛已在谷地各處設立棲架。請在東溪鎮、沼橋鎮和高望鎮尋找渡鴉石柱：在任意一處，你都可以向其他冒險者寄送信件、錢幣和物品，也可以領取渡鴉為你帶來的一切。\n\n隨信附上一點心意，作為你的第一枚郵票。\n\n展翅高飛，\n渡鴉郵驛"
+      },
+      "letter_q_wolves": {
+        "sender": "雷德布魯克元帥",
+        "subject": "圍欄又安靜了",
+        "body": "牧人們總算能睡個安穩覺了，這都是你的功勞。我已託渡鴉郵驛從守備金裡給你捎去一點謝意。\n\n保持你的刀刃鋒利。\n- 雷德布魯克元帥"
+      },
+      "letter_q_greyjaw": {
+        "sender": "雷德布魯克元帥",
+        "subject": "老灰顎，終於倒下了",
+        "body": "小鎮裡消息傳得快。牧人們昨晚為你的健康乾杯，威爾克斯發誓那頭狼有馬車那麼大。讓他們添油加醋去吧：這是你應得的。\n\n請代守備隊享用一頓好飯。\n- 雷德布魯克元帥"
+      },
+      "letter_q_hollow": {
+        "sender": "奧德里克修士",
+        "subject": "你在黑暗中所做的一切",
+        "body": "很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "鑄冠戰裝",
@@ -6824,6 +6894,7 @@ export const zh_TW: EnTranslations = {
     "dungeonInstanceBusy": "{name}的所有副本都已被佔用。請稍後再試。",
     "delveLockedChestInteract": "按 F 撬鎖",
     "delveRewardChestInteract": "按 F 領取戰利品",
-    "delveSurfaceExitInteract": "按 F 攀回地表"
+    "delveSurfaceExitInteract": "按 F 攀回地表",
+    "mailboxName": "郵箱"
   }
 };

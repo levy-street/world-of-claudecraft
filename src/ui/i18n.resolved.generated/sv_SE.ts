@@ -1005,6 +1005,54 @@ export const sv_SE: EnTranslations = {
       },
       "linkedAs": "Länkad som {login}",
       "unlink": "Avlänka GitHub"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
     }
   },
   "guide": {
@@ -6779,6 +6827,28 @@ export const sv_SE: EnTranslations = {
         "leaveText": "Du klättrar tillbaka till broder Halven vid relikvarieruinen."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "Korpposten",
+        "subject": "Korparna flyger nu för dig",
+        "body": "Vandrare,\n\nKorpposten har rest sina sittpinnar över hela dalen. Leta efter korppelarna i Eastbrook, Fenbridge och Highwatch: från var och en av dem kan du skicka brev, mynt och varor till andra äventyrare och hämta allt som korparna bär till dig.\n\nBifogat finns en liten gåva till ditt första frimärke.\n\nVingarna upp,\nKorpposten"
+      },
+      "letter_q_wolves": {
+        "sender": "Marskalk Redbrook",
+        "subject": "Fållorna är lugna igen",
+        "body": "Herdarna kan äntligen sova med båda ögonen slutna, och det är din förtjänst. Jag har bett Korpposten föra dig en liten slant ur vaktkassan.\n\nHåll din klinga oljad.\n- Marskalk Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Marskalk Redbrook",
+        "subject": "Gamle Gråkäft, äntligen",
+        "body": "Nyheter färdas snabbt i en så liten stad. Herdarna skålade för din hälsa i går kväll, och Wilkes svär att vargen var stor som en kärra. Låt dem brodera ut det: du har förtjänat det.\n\nÄt en måltid på vaktens bekostnad.\n- Marskalk Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Broder Aldric",
+        "subject": "Det du gjorde i mörkret",
+        "body": "Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Kronsmidd stridsutrustning",
@@ -6824,6 +6894,7 @@ export const sv_SE: EnTranslations = {
     "dungeonInstanceBusy": "Alla instanser av {name} är upptagna. Försök igen snart.",
     "delveLockedChestInteract": "Tryck på F för att dyrka upp låset",
     "delveRewardChestInteract": "Tryck på F för att hämta bytet",
-    "delveSurfaceExitInteract": "Tryck på F för att klättra"
+    "delveSurfaceExitInteract": "Tryck på F för att klättra",
+    "mailboxName": "Mailbox"
   }
 };

@@ -5110,4 +5110,17 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Cập Nhật',
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Bưu Quạ',
+  'entities.letters.ravenpost_welcome.subject': 'Giờ đây bầy quạ bay vì bạn',
+  'entities.letters.ravenpost_welcome.body': 'Lữ khách,\n\nBưu Quạ đã dựng những trụ đậu khắp thung lũng. Hãy tìm các trụ quạ ở Eastbrook, Fenbridge và Highwatch: từ bất kỳ trụ nào, bạn có thể gửi thư, tiền và vật phẩm cho những nhà phiêu lưu khác, và nhận mọi thứ bầy quạ mang đến cho bạn.\n\nKèm theo là một món quà nhỏ cho con tem đầu tiên của bạn.\n\nTung cánh,\nBưu Quạ',
+  'entities.letters.letter_q_wolves.sender': 'Cảnh Trưởng Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Chuồng trại lại yên ắng',
+  'entities.letters.letter_q_wolves.body': 'Những người chăn cừu rốt cuộc đã có thể ngủ yên, và đó là công của bạn. Tôi đã nhờ Bưu Quạ mang đến bạn chút quà từ quỹ tuần tra.\n\nGiữ lưỡi kiếm luôn sắc bén.\n- Cảnh Trưởng Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Cảnh Trưởng Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Lão Hàm Xám, cuối cùng',
+  'entities.letters.letter_q_greyjaw.body': 'Tin tức lan nhanh trong một thị trấn nhỏ thế này. Đêm qua những người chăn cừu đã nâng cốc chúc sức khỏe bạn, còn Wilkes thề rằng con sói to bằng cả cỗ xe. Cứ để họ thêu dệt: bạn xứng đáng.\n\nHãy dùng một bữa do đội tuần tra khoản đãi.\n- Cảnh Trưởng Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Tu Huynh Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Điều bạn đã làm trong bóng tối',
+  'entities.letters.letter_q_hollow.body': 'Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric',
 };

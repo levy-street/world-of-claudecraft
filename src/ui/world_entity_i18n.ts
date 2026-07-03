@@ -1,3 +1,4 @@
+import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../sim/content/letters';
 import { DELVES, DUNGEONS, MOBS, NPCS, QUESTS, ZONES } from '../sim/data';
 
 // English world-entity names + narratives (mobs, NPCs, quests, zones, dungeons).
@@ -191,6 +192,14 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary'] as const;
+// Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter
+// plus every quest thank-you letter, keyed by letterId.
+const LETTER_IDS = [
+  'ravenpost_welcome',
+  'letter_q_wolves',
+  'letter_q_greyjaw',
+  'letter_q_hollow',
+] as const;
 
 type MobId = (typeof MOB_IDS)[number];
 type NpcId = (typeof NPC_IDS)[number];
@@ -198,6 +207,7 @@ type QuestId = (typeof QUEST_IDS)[number];
 type ZoneId = (typeof ZONE_IDS)[number];
 type DungeonId = (typeof DUNGEON_IDS)[number];
 type DelveId = (typeof DELVE_IDS)[number];
+type LetterId = (typeof LETTER_IDS)[number];
 
 type MobTranslations = Record<MobId, { name: string }>;
 type NpcTranslations = Record<NpcId, { name: string; title: string; greeting: string }>;
@@ -217,6 +227,7 @@ type DungeonTranslations = Record<
   { name: string; enterText: string; leaveText: string }
 >;
 type DelveTranslations = Record<DelveId, { name: string; enterText: string; leaveText: string }>;
+type LetterTranslations = Record<LetterId, { sender: string; subject: string; body: string }>;
 
 type WorldEntityTranslations = {
   worldContent: {
@@ -227,6 +238,7 @@ type WorldEntityTranslations = {
     delveLockedChestInteract: string;
     delveRewardChestInteract: string;
     delveSurfaceExitInteract: string;
+    mailboxName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -235,6 +247,7 @@ type WorldEntityTranslations = {
     zones: ZoneTranslations;
     dungeons: DungeonTranslations;
     delves: DelveTranslations;
+    letters: LetterTranslations;
   };
 };
 
@@ -313,6 +326,17 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     };
   });
 
+  const lettersById: Record<string, LetterDef> = { [WELCOME_LETTER.letterId]: WELCOME_LETTER };
+  for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
+  const letters = {} as LetterTranslations;
+  orderedValues(LETTER_IDS, lettersById).forEach((letter) => {
+    letters[letter.letterId as LetterId] = {
+      sender: letter.senderName,
+      subject: normalizeSourceText(letter.subject),
+      body: normalizeSourceText(letter.body),
+    };
+  });
+
   return {
     worldContent: {
       corpseName: '{name} (corpse)',
@@ -322,8 +346,9 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveLockedChestInteract: 'Press F to pick the lock',
       delveRewardChestInteract: 'Press F to claim spoils',
       delveSurfaceExitInteract: 'Press F to climb',
+      mailboxName: 'Mailbox',
     },
-    entities: { mobs, npcs, quests, zones, dungeons, delves },
+    entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };
 }
 

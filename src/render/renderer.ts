@@ -70,6 +70,7 @@ import {
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
+import { buildMailboxPillar } from './mailbox';
 import { buildMotes, type MotesView } from './motes';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { NameplatePainter } from './nameplate_painter';
@@ -3115,6 +3116,13 @@ export class Renderer {
       portal = built.portal;
       height = 4.6;
       objectMesh = body!;
+    } else if (e.kind === 'object' && e.templateId === 'mailbox') {
+      // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
+      // votive in the group is the per-viewer beacon, toggled in sync()).
+      const built = buildMailboxPillar(e.id);
+      body = built.group;
+      height = built.height;
+      objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
       // build a dedicated procedural mesh that matches the crypt aesthetic.
@@ -4045,6 +4053,16 @@ export class Renderer {
           v.portal.rotation.z = this.time * 1.4;
           (v.portal.material as THREE.MeshBasicMaterial).opacity =
             0.45 + Math.sin(this.time * 2.2 + e.id) * 0.15;
+        }
+        if (vis && e.templateId === 'mailbox') {
+          // The unread-mail votive: per-viewer beacon driven by the IWorld
+          // mirror (a cheap field online, a small filter offline; <=4 pillars).
+          const glow = v.group.userData.mailGlow as THREE.Object3D | undefined;
+          if (glow) {
+            const lit = this.sim.mailUnread > 0;
+            glow.visible = lit;
+            if (lit) glow.position.y = 1.56 + Math.sin(this.time * 2.4 + e.id) * 0.06;
+          }
         }
         continue;
       }

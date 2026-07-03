@@ -1705,6 +1705,10 @@ async function startGame(
         world.leaveDungeon();
         return;
       }
+      if (obj.templateId === 'mailbox') {
+        hud.openMailbox();
+        return;
+      }
       world.pickUpObject(bestObj);
       return;
     }

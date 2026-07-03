@@ -69,6 +69,7 @@ import type {
   EquipSlot,
   InvSlot,
   LootRollChoice,
+  MailResultCode,
   PetMode,
   PlayerClass,
   ResourceType,
@@ -225,6 +226,8 @@ import { lootSettingsView } from './loot_settings_view';
 import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
+import { mailIndicatorView } from './mailbox_view';
+import { MailboxWindow } from './mailbox_window';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import { MAP_MAX_ZOOM, mapWindowMode } from './map_window_view';
@@ -426,6 +429,23 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'abilityUi.resources.mana',
   rage: 'abilityUi.resources.rage',
   energy: 'abilityUi.resources.energy',
+};
+// Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
+// are successes rendered as chat-log lines in handleEvents, but they map here
+// too so every code resolves without a fallback.
+const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
+  sent: 'hudChrome.mailbox.result.sent',
+  collected: 'hudChrome.mailbox.result.collected',
+  tooFar: 'hudChrome.mailbox.result.tooFar',
+  needRecipient: 'hudChrome.mailbox.result.needRecipient',
+  noRecipient: 'hudChrome.mailbox.result.noRecipient',
+  tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
+  noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
+  notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
+  cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
+  recipientBoxFull: 'hudChrome.mailbox.result.recipientBoxFull',
+  letterGone: 'hudChrome.mailbox.result.letterGone',
+  takeParcelsFirst: 'hudChrome.mailbox.result.takeParcelsFirst',
 };
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
@@ -1031,6 +1051,9 @@ export class Hud {
   private meters: Meters;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
+  // Ravenpost envelope indicator (slow-band, value-diffed; see updateMailIndicator).
+  private mailIndicatorEl: HTMLElement | null = null;
+  private lastMailUnread = -1;
   private pendingPetFeed = false;
   private petModeMenuOpen = false;
   // Talents: the local staged allocation the user edits before committing it on save
@@ -1682,6 +1705,10 @@ export class Hud {
         break;
       case 'market-window':
         this.closeMarket();
+        break;
+      case 'mailbox-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.mailboxWindow.close();
         break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
@@ -2746,10 +2773,12 @@ export class Hud {
     vendorOpen: () => this.vendorOpen,
     tradeOpen: () => this.tradeOpen,
     isMarketSell: () => this.marketWindow.isSellTab,
+    isMailAttach: () => this.mailboxWindow.isSendTab,
     pendingPetFeed: () => this.pendingPetFeed,
     closeVendor: () => this.closeVendor(),
     addItemToTrade: (itemId) => this.addItemToTrade(itemId),
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
+    stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
@@ -2778,6 +2807,27 @@ export class Hud {
     ...this.windowFocus('#market-window'),
     showError: (text) => this.showError(text),
     slotName: (slot) => itemSlotName(slot),
+    syncBags: (open) => {
+      if (open) {
+        this.renderBags();
+        $('#bags').style.display = 'flex';
+      } else if ($('#bags').style.display !== 'none') {
+        this.renderBags();
+      }
+    },
+  });
+  // Ravenpost mailbox window painter (mailbox_view.ts core + mailbox_window.ts
+  // painter). It owns the mailbox view-state (tab, opened letter, staged
+  // parcels); the bags window rides alongside the Send tab and stages parcels
+  // through the same cross-window closures the market Sell tab uses.
+  private readonly mailboxWindow = new MailboxWindow({
+    ...this.presentationBag,
+    root: () => $('#mailbox-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#mailbox-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#mailbox-window'),
+    showError: (text) => this.showError(text),
     syncBags: (open) => {
       if (open) {
         this.renderBags();
@@ -5047,6 +5097,28 @@ export class Hud {
       if (!this.nearbyMarketNpc()) this.marketWindow.close();
       else this.marketWindow.refreshIfChanged();
     }
+    // The mailbox closes itself when the mail mirror goes null (walked away).
+    if (slowHud && this.mailboxWindow.isOpen) this.mailboxWindow.refreshIfChanged();
+    if (slowHud) this.updateMailIndicator();
+  }
+
+  // The envelope indicator by the minimap: visible while unread letters wait.
+  // Slow-band, value-diffed writes only (mailUnread changes rarely).
+  private updateMailIndicator(): void {
+    const el = this.mailIndicatorEl ?? ($('#mail-indicator') as HTMLElement | null);
+    if (!el) return;
+    this.mailIndicatorEl = el;
+    const view = mailIndicatorView(this.sim.mailUnread);
+    if (view.count === this.lastMailUnread) return;
+    this.lastMailUnread = view.count;
+    const count = formatNumber(view.count, { maximumFractionDigits: 0 });
+    el.hidden = !view.visible;
+    if (view.visible) {
+      const badge = el.querySelector<HTMLElement>('.mail-indicator-count');
+      if (badge) badge.textContent = count;
+      el.setAttribute('aria-label', t('hudChrome.mailbox.indicatorAria', { count }));
+      el.title = t('hudChrome.mailbox.indicatorTip', { count });
+    }
   }
 
   // Classic "low mana/energy" warning: pulse the player resource bar when power
@@ -6466,6 +6538,39 @@ export class Hud {
         case 'skinEvent':
           this.openSkinEvent(ev.rank, ev.catalog === 'mech' ? { mech: true } : undefined);
           break;
+        case 'mailbox':
+          // Keyboard/sim interact at a mailbox object: open the mail window.
+          this.openMailbox();
+          break;
+        case 'mailArrived': {
+          // Player names splice verbatim; authored senders arrive pre-resolved
+          // (the sim ships the letter's English senderName, shown as-is in the
+          // banner; the window localizes it properly via the letterId).
+          audio.whisper();
+          this.showBanner(t('hudChrome.mailbox.arrivedBanner', { name: ev.senderName }));
+          this.log(t('hudChrome.mailbox.arrivedLog', { name: ev.senderName }), '#c8f7c5');
+          this.lastMailUnread = -1; // force the envelope indicator to repaint
+          break;
+        }
+        case 'mailResult': {
+          const values = {
+            name: ev.name ?? '',
+            count: formatNumber(ev.value ?? 0, { maximumFractionDigits: 0 }),
+            amount: formatLocalizedMoney(ev.value ?? 0),
+            postage: formatLocalizedMoney(ev.value ?? 0),
+          };
+          if (ev.code === 'sent') {
+            audio.coin();
+            this.log(t('hudChrome.mailbox.result.sent', values), '#c8f7c5');
+          } else if (ev.code === 'collected') {
+            this.log(t('hudChrome.mailbox.result.collected', values), '#c8f7c5');
+          } else {
+            this.showError(t(MAIL_RESULT_ERROR_KEYS[ev.code], values));
+          }
+          this.mailboxWindow.onMailResult(ev.code);
+          this.lastMailUnread = -1;
+          break;
+        }
         case 'error':
           this.showError(this.localizeErrorText(ev.text));
           break;
@@ -8633,6 +8738,18 @@ export class Hud {
 
   get marketWindowOpen(): boolean {
     return this.marketWindow.isOpen;
+  }
+
+  openMailbox(): void {
+    this.mailboxWindow.open();
+  }
+
+  closeMailbox(): void {
+    this.mailboxWindow.close();
+  }
+
+  get mailboxWindowOpen(): boolean {
+    return this.mailboxWindow.isOpen;
   }
 
   private nearbyMarketNpc(): Entity | null {
