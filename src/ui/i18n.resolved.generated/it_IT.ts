@@ -177,6 +177,48 @@ export const it_IT: EnTranslations = {
       "title": "Emote",
       "done": "Fine"
     },
+    "dailyRewards": {
+      "title": "Ricompense giornaliere",
+      "close": "Chiudi ricompense giornaliere",
+      "loading": "Caricamento delle ricompense giornaliere...",
+      "error": "Impossibile caricare le ricompense giornaliere.",
+      "intro": "Detieni abbastanza WOC nel tuo portafoglio verificato per sbloccare le ricompense giornaliere. Guadagna punti con un giro giornaliero e incarichi a rotazione, poi scala la classifica giornaliera per aggiudicarti una parte del montepremi.",
+      "prize": "Montepremi",
+      "reset": "Azzeramento",
+      "endsIn": "Termina tra {time}",
+      "remainingLessThanMinute": "<1m",
+      "remainingMinutes": "{minutes}m",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "score": "Punteggio",
+      "walletValue": "Valore del portafoglio (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Sconosciuto",
+      "spinTitle": "Giro giornaliero",
+      "spinDialogTitle": "Giro della ricompensa giornaliera",
+      "spinClose": "Chiudi giro giornaliero",
+      "spinReady": "Un giro è pronto.",
+      "spinClaimed": "Ottenuti: +{points} punti.",
+      "spinResult": "+{points} punti",
+      "spinButton": "Gira",
+      "tasks": "Incarichi",
+      "leaderboard": "Classifica giornaliera",
+      "history": "Vincitori precedenti",
+      "noLeaders": "Ancora nessun punto.",
+      "noHistory": "Ancora nessun pagamento.",
+      "walletConnectTitle": "Verifica portafoglio",
+      "walletConnectBody": "Verifica un portafoglio Solana con WOC per sbloccare le ricompense giornaliere.",
+      "walletConnectButton": "Verifica portafoglio",
+      "walletHoldTitle": "Detieni WOC",
+      "walletHoldBody": "Detieni almeno {amount} USD in WOC per sbloccare le ricompense giornaliere.",
+      "walletPriceBody": "Il prezzo di WOC non è disponibile al momento. Ricontrolla a breve.",
+      "reason": {
+        "eligible": "Ricompense sbloccate.",
+        "no_wallet": "Collega un portafoglio con almeno 20 USD in WOC.",
+        "under_minimum": "Il portafoglio è sotto il minimo di 20 USD in WOC.",
+        "price_unavailable": "Il prezzo di WOC non è disponibile, le ricompense sono temporaneamente bloccate."
+      }
+    },
     "theme": {
       "preset": "Tema dell'interfaccia",
       "customColors": "Colori personalizzati",
@@ -265,6 +307,13 @@ export const it_IT: EnTranslations = {
       "heading": "Direzione",
       "minimapZoom": "Zoom minimappa"
     },
+    "nativeUpdate": {
+      "title": "Aggiornamento disponibile",
+      "body": "È disponibile una nuova versione di World of ClaudeCraft. Aggiorna ora per le ultime correzioni e migliorie.",
+      "bodyWithVersion": "La versione {version} di World of ClaudeCraft è disponibile. Aggiorna ora per le ultime correzioni e migliorie.",
+      "notNow": "Non ora",
+      "update": "Aggiorna"
+    },
     "castBar": {
       "playerAria": "La tua barra di lancio",
       "targetAria": "Barra di lancio del bersaglio"
@@ -340,6 +389,7 @@ export const it_IT: EnTranslations = {
       "uiScale": "Scala dell'interfaccia",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
+      "groundReticle": "Reticolo di puntamento a terra",
       "showItemLevel": "Mostra livello oggetto",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
@@ -2626,6 +2676,7 @@ export const it_IT: EnTranslations = {
       "usernameTaken": "Questo nome utente è già in uso.",
       "invalidCredentials": "Nome utente o password non validi.",
       "verificationFailed": "Verifica non riuscita. Riprova.",
+      "desktopCodeInvalid": "Il codice di accesso desktop non è valido o è scaduto. Riprova.",
       "invalidCharacterName": "Nome personaggio non valido. Usa 2-16 lettere.",
       "characterNameNotAllowed": "Questo nome personaggio non è consentito.",
       "invalidClass": "Classe non valida.",
@@ -2642,6 +2693,21 @@ export const it_IT: EnTranslations = {
       "takenOver": "Il tuo personaggio è stato preso in controllo da un'altra sessione.",
       "renameBeforeEntering": "Questo personaggio deve essere rinominato prima di entrare nel mondo.",
       "renameNotPermitted": "Non è consentito rinominare questo personaggio."
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "Download dell'aggiornamento {version} in corso...",
+      "ready": "L'aggiornamento {version} è pronto. Verrà installato alla chiusura, oppure riavvia ora.",
+      "restart": "Riavvia ora",
+      "later": "Più tardi"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "La vista di gioco ha smesso di funzionare. Ricaricarla?",
+      "reload": "Ricarica",
+      "quit": "Esci",
+      "fatalBody": "World of ClaudeCraft ha riscontrato un errore imprevisto e deve chiudersi."
     }
   },
   "realm": {
@@ -3692,6 +3758,26 @@ export const it_IT: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Ondata di Fiamme",
+        "description": "Evoca un'esplosione di fiamme sulla zona bersaglio, infliggendo {damage} danni da Fuoco ai nemici investiti dalla deflagrazione."
+      },
+      "rain_of_fire": {
+        "name": "Pioggia di Fuoco",
+        "description": "Fa piovere fuoco sulla zona bersaglio, bruciando i nemici per {damage} danni da Fuoco."
+      },
+      "volley": {
+        "name": "Scarica di Frecce",
+        "description": "Fa piovere frecce sulla zona bersaglio, infliggendo {damage} danni ai nemici colpiti."
+      },
+      "hurricane": {
+        "name": "Uragano",
+        "description": "Scatena un uragano sulla zona bersaglio, colpendo i nemici per {damage} danni della Natura."
+      },
+      "earthquake": {
+        "name": "Terremoto",
+        "description": "Scuote la zona bersaglio, colpendo i nemici per {damage} danni della Natura."
+      },
       "heroic_strike": {
         "name": "Colpo Eroico",
         "description": "Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo."

@@ -42,8 +42,10 @@ import {
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { characterSheet, type SheetRank } from './character_sheet';
+import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
   accountAndScopeForToken,
+  accountById,
   accountForToken,
   type CharacterRow,
   characterCountsByRealm,
@@ -86,6 +88,11 @@ import {
   touchLogin,
 } from './db';
 import {
+  type DesktopLoginRouteDeps,
+  handleDesktopLoginCreate,
+  handleDesktopLoginExchange,
+} from './desktop_login';
+import {
   handleDiscordCallback,
   handleDiscordLoginLink,
   handleDiscordLoginNew,
@@ -113,7 +120,7 @@ import {
   createPlayerReport,
   createSuspiciousRegistrationReport,
 } from './moderation_db';
-import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
+import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
@@ -137,29 +144,18 @@ import {
   requestIp,
   wocBalanceRateLimited,
 } from './ratelimit';
-import {
-  isPublicCorsPath,
-  publicOriginFromRequest,
-  REALM,
-  REALM_DIRECTORY,
-  REALM_ORIGINS,
-} from './realm';
+import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
-import { verifyTurnstile } from './turnstile';
+import { passesTurnstile } from './turnstile';
 import {
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
   handleWalletUnlink,
 } from './wallet';
-import {
-  isNativeAppRequest,
-  isWebClientRequest,
-  NATIVE_APP_ORIGINS,
-  webLoginEnforced,
-} from './web_login_guard';
+import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { bufferHandshakeMessages } from './ws_buffer';
 
@@ -503,18 +499,19 @@ function requestMetadata(req: http.IncomingMessage): { ip: string; userAgent: st
   };
 }
 
-// Gate account creation / login behind Cloudflare Turnstile. Returns true when
-// the request may proceed: trivially true when no secret is configured, else the
-// client-supplied token must verify. The English error is matched to a t() key
-// by userFacingApiError() in src/main.ts — keep the two strings in sync.
-async function passesTurnstile(
-  req: http.IncomingMessage,
-  body: Record<string, unknown>,
-): Promise<boolean> {
-  if (isNativeAppRequest(req)) return verifyNativeAttestation(req, body.nativeAttestation);
-  if (!TURNSTILE_SECRET) return true;
-  return verifyTurnstile(String(body.turnstileToken ?? ''), TURNSTILE_SECRET, requestIp(req));
-}
+// Host wiring for the desktop-login route handlers (server/desktop_login.ts):
+// the real db/auth implementations here, stubs in tests.
+const desktopLoginRouteDeps: DesktopLoginRouteDeps = {
+  bearerToken,
+  readBody,
+  json,
+  requestMetadata,
+  accountForToken,
+  accountById,
+  moderationStatusForAccount,
+  touchLogin,
+  saveToken,
+};
 
 const MIME: Record<string, string> = {
   '.html': 'text/html',
@@ -607,12 +604,12 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
 // ---------------------------------------------------------------------------
 
 // Cross-realm CORS: a client served by one realm may call another realm's API
-// after switching realms in the picker. Native Capacitor builds also call the
-// production origin from localhost-style WebView origins. Auth is via bearer
-// token (no cookies), so reflecting these specific origins is safe.
+// after switching realms in the picker. The native Capacitor and Electron
+// desktop shells also call the production origin from non-site origins. The
+// allow-list itself lives in allowedCorsOrigin (server/web_login_guard.ts).
 function maybeCors(req: http.IncomingMessage, res: http.ServerResponse): void {
-  const origin = req.headers.origin;
-  if (typeof origin === 'string' && (REALM_ORIGINS.has(origin) || NATIVE_APP_ORIGINS.has(origin))) {
+  const origin = allowedCorsOrigin(req.headers.origin);
+  if (origin !== null) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -662,9 +659,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     ) {
       return json(res, 403, { error: 'logins are only allowed from the game client' });
     }
+    // The desktop-login handoff shares the same per-IP budget: exchange is
+    // unauthenticated (defense in depth on top of the 160-bit single-use code)
+    // and create bounds how fast one authenticated client can grow the store.
     if (
       req.method === 'POST' &&
-      (url === '/api/register' || url === '/api/login') &&
+      (url === '/api/register' ||
+        url === '/api/login' ||
+        url === '/api/desktop-login/create' ||
+        url === '/api/desktop-login/exchange') &&
       rateLimited(req)
     ) {
       return json(res, 429, { error: 'too many attempts — wait a minute and try again' });
@@ -677,7 +680,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/register') {
       const body = await readBody(req);
-      if (!(await passesTurnstile(req, body)))
+      if (!(await passesTurnstile(req, body, TURNSTILE_SECRET)))
         return json(res, 403, { error: 'verification failed, please try again' });
       if (!validUsernameShape(body.username))
         return json(res, 400, { error: 'username must be 3-24 chars (letters, digits, _)' });
@@ -735,7 +738,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/login') {
       const body = await readBody(req);
-      if (!(await passesTurnstile(req, body)))
+      if (!(await passesTurnstile(req, body, TURNSTILE_SECRET)))
         return json(res, 403, { error: 'verification failed, please try again' });
       const username = typeof body.username === 'string' ? body.username : '';
       // Per-account brute-force throttle (#93). The message is identical to a
@@ -778,6 +781,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const token = newToken();
       await saveToken(token, account.id);
       return json(res, 200, { token, username: account.username });
+    }
+    if (req.method === 'POST' && url === '/api/desktop-login/create') {
+      return handleDesktopLoginCreate(req, res, desktopLoginRouteDeps);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-login/exchange') {
+      return handleDesktopLoginExchange(req, res, desktopLoginRouteDeps);
     }
     // Read-scoped "my characters" list: lets a companion holding a character:read
     // token (OAuth or a pasted companion token) discover its character ids so it
@@ -1427,6 +1436,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
     }
+    if (url.startsWith('/api/daily-rewards')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDailyRewardApi(req, res, accountId);
+    }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
       recordUsageMetric('card.publish.request');
@@ -1568,8 +1582,12 @@ async function main(): Promise<void> {
       res.end();
       return;
     }
-    if (url.startsWith('/internal/')) void handleInternalApi(req, res, game);
-    else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
+    if (url.startsWith('/internal/')) {
+      void (async () => {
+        if (await handleDailyRewardInternalApi(req, res)) return;
+        await handleInternalApi(req, res, game);
+      })();
+    } else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);
     else if (url.startsWith('/oauth/')) void handleOAuth(req, res);
     else if (req.method === 'GET' && url.startsWith('/p/')) void handleCardRoutes(req, res);

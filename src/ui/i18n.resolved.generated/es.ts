@@ -177,6 +177,48 @@ export const es: EnTranslations = {
       "title": "Emotes",
       "done": "Listo"
     },
+    "dailyRewards": {
+      "title": "Recompensas diarias",
+      "close": "Cerrar recompensas diarias",
+      "loading": "Cargando recompensas diarias...",
+      "error": "No se pudieron cargar las recompensas diarias.",
+      "intro": "Mantén suficiente WOC en tu cartera verificada para desbloquear las recompensas diarias. Gana puntos con un giro diario y tareas rotativas, y escala la clasificación diaria para llevarte una parte del fondo de premios.",
+      "prize": "Fondo de premios",
+      "reset": "Reinicio",
+      "endsIn": "Termina en {time}",
+      "remainingLessThanMinute": "<1min",
+      "remainingMinutes": "{minutes}min",
+      "remainingHoursMinutes": "{hours}h {minutes}min",
+      "score": "Puntuación",
+      "walletValue": "Valor de cartera (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Desconocido",
+      "spinTitle": "Giro diario",
+      "spinDialogTitle": "Giro de recompensa diaria",
+      "spinClose": "Cerrar giro diario",
+      "spinReady": "Tienes un giro disponible.",
+      "spinClaimed": "Reclamado: +{points} puntos.",
+      "spinResult": "+{points} puntos",
+      "spinButton": "Girar",
+      "tasks": "Tareas",
+      "leaderboard": "Clasificación diaria",
+      "history": "Ganadores anteriores",
+      "noLeaders": "Aún no hay puntos.",
+      "noHistory": "Aún no hay pagos.",
+      "walletConnectTitle": "Verificar cartera",
+      "walletConnectBody": "Verifica una cartera de Solana con WOC para desbloquear las recompensas diarias.",
+      "walletConnectButton": "Verificar cartera",
+      "walletHoldTitle": "Mantén WOC",
+      "walletHoldBody": "Mantén al menos {amount} USD en WOC para desbloquear las recompensas diarias.",
+      "walletPriceBody": "El precio de WOC no está disponible en este momento. Vuelve a consultarlo pronto.",
+      "reason": {
+        "eligible": "Recompensas desbloqueadas.",
+        "no_wallet": "Conecta una cartera con al menos $20 USD en WOC.",
+        "under_minimum": "La cartera está por debajo del mínimo de $20 USD en WOC.",
+        "price_unavailable": "El precio de WOC no está disponible; las recompensas están bloqueadas temporalmente."
+      }
+    },
     "theme": {
       "preset": "Tema de la interfaz",
       "customColors": "Colores personalizados",
@@ -265,6 +307,13 @@ export const es: EnTranslations = {
       "heading": "Rumbo",
       "minimapZoom": "Zoom del minimapa"
     },
+    "nativeUpdate": {
+      "title": "Actualización disponible",
+      "body": "Ya hay disponible una nueva versión de World of ClaudeCraft. Actualiza ahora para obtener las últimas correcciones y mejoras.",
+      "bodyWithVersion": "La versión {version} de World of ClaudeCraft ya está disponible. Actualiza ahora para obtener las últimas correcciones y mejoras.",
+      "notNow": "Ahora no",
+      "update": "Actualizar"
+    },
     "castBar": {
       "playerAria": "Tu barra de lanzamiento",
       "targetAria": "Barra de lanzamiento del objetivo"
@@ -340,6 +389,7 @@ export const es: EnTranslations = {
       "uiScale": "Escala de la interfaz",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
+      "groundReticle": "Retícula de objetivo terrestre",
       "showItemLevel": "Mostrar nivel de objeto",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
@@ -2626,6 +2676,7 @@ export const es: EnTranslations = {
       "usernameTaken": "Ese nombre de usuario ya está en uso.",
       "invalidCredentials": "Usuario o contraseña no válidos.",
       "verificationFailed": "La verificación falló. Inténtalo de nuevo.",
+      "desktopCodeInvalid": "El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.",
       "invalidCharacterName": "Nombre de personaje no válido. Usa 2-16 letras.",
       "characterNameNotAllowed": "Ese nombre de personaje no está permitido.",
       "invalidClass": "Clase no válida.",
@@ -2642,6 +2693,21 @@ export const es: EnTranslations = {
       "takenOver": "Otra sesión tomó el control de tu personaje.",
       "renameBeforeEntering": "Este personaje debe cambiar de nombre antes de entrar al mundo.",
       "renameNotPermitted": "No se permite cambiar el nombre de este personaje."
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "Descargando actualización {version}...",
+      "ready": "La actualización {version} está lista. Se instala al salir, o reinicia ahora.",
+      "restart": "Reiniciar ahora",
+      "later": "Más tarde"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "La vista del juego dejó de funcionar. ¿Recargarla?",
+      "reload": "Recargar",
+      "quit": "Salir",
+      "fatalBody": "World of ClaudeCraft tuvo un error inesperado y debe cerrarse."
     }
   },
   "realm": {
@@ -3692,6 +3758,26 @@ export const es: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Llamarada",
+        "description": "Invoca un estallido de fuego en el área objetivo que inflige {damage} de daño de Fuego a los enemigos alcanzados por la explosión."
+      },
+      "rain_of_fire": {
+        "name": "Lluvia de Fuego",
+        "description": "Hace caer una lluvia de fuego sobre el área objetivo, quemando a los enemigos e infligiendo {damage} de daño de Fuego."
+      },
+      "volley": {
+        "name": "Andanada",
+        "description": "Lanza una lluvia de flechas sobre el área objetivo, infligiendo {damage} de daño a los enemigos atrapados."
+      },
+      "hurricane": {
+        "name": "Huracán",
+        "description": "Desata un huracán sobre el área objetivo, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza."
+      },
+      "earthquake": {
+        "name": "Terremoto",
+        "description": "Sacude el área objetivo, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza."
+      },
       "heroic_strike": {
         "name": "Golpe heroico",
         "description": "Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe."

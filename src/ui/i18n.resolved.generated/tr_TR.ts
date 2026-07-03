@@ -177,6 +177,48 @@ export const tr_TR: EnTranslations = {
       "title": "İfadeler",
       "done": "Tamam"
     },
+    "dailyRewards": {
+      "title": "Günlük Ödüller",
+      "close": "Günlük ödülleri kapat",
+      "loading": "Günlük ödüller yükleniyor...",
+      "error": "Günlük ödüller yüklenemedi.",
+      "intro": "Günlük ödüllerin kilidini açmak için doğrulanmış cüzdanında yeterince WOC bulundur. Bir günlük çevirme ve dönüşümlü görevlerle puan kazan, ardından ödül havuzundan pay almak için günlük lider tablosunda yüksel.",
+      "prize": "Ödül Havuzu",
+      "reset": "Sıfırla",
+      "endsIn": "Bitmesine {time}",
+      "remainingLessThanMinute": "<1dk",
+      "remainingMinutes": "{minutes}dk",
+      "remainingHoursMinutes": "{hours}sa {minutes}dk",
+      "score": "Skor",
+      "walletValue": "Cüzdan Değeri (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Bilinmiyor",
+      "spinTitle": "Günlük Çevirme",
+      "spinDialogTitle": "Günlük Ödül Çevirmesi",
+      "spinClose": "Günlük çevirmeyi kapat",
+      "spinReady": "Bir çevirme hazır.",
+      "spinClaimed": "Alındı: +{points} puan.",
+      "spinResult": "+{points} puan",
+      "spinButton": "Çevir",
+      "tasks": "Görevler",
+      "leaderboard": "Günlük Lider Tablosu",
+      "history": "Geçmiş Kazananlar",
+      "noLeaders": "Henüz puan yok.",
+      "noHistory": "Henüz ödeme yok.",
+      "walletConnectTitle": "Cüzdanı Doğrula",
+      "walletConnectBody": "Günlük ödüllerin kilidini açmak için WOC bulunan bir Solana cüzdanını doğrula.",
+      "walletConnectButton": "Cüzdanı Doğrula",
+      "walletHoldTitle": "WOC Bulundur",
+      "walletHoldBody": "Günlük ödüllerin kilidini açmak için en az {amount} USD değerinde WOC bulundur.",
+      "walletPriceBody": "WOC fiyatı şu anda alınamıyor. Kısa süre sonra tekrar bak.",
+      "reason": {
+        "eligible": "Ödüllerin kilidi açıldı.",
+        "no_wallet": "En az 20 USD değerinde WOC bulunan bir cüzdan bağla.",
+        "under_minimum": "Cüzdan, 20 USD değerindeki WOC alt sınırının altında.",
+        "price_unavailable": "WOC fiyatı alınamıyor, ödüller geçici olarak kilitli."
+      }
+    },
     "theme": {
       "preset": "Arayüz Teması",
       "customColors": "Özel Renkler",
@@ -265,6 +307,13 @@ export const tr_TR: EnTranslations = {
       "heading": "Yön",
       "minimapZoom": "Mini harita yakınlaştırması"
     },
+    "nativeUpdate": {
+      "title": "Güncelleme Mevcut",
+      "body": "World of ClaudeCraft'ın yeni bir sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
+      "bodyWithVersion": "World of ClaudeCraft'ın {version} sürümü mevcut. En son düzeltmeler ve iyileştirmeler için şimdi güncelle.",
+      "notNow": "Şimdi Değil",
+      "update": "Güncelle"
+    },
     "castBar": {
       "playerAria": "Senin Büyü Çubuğun",
       "targetAria": "Birim Büyü Çubuğu"
@@ -340,6 +389,7 @@ export const tr_TR: EnTranslations = {
       "uiScale": "Arayüz Ölçeği",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
+      "groundReticle": "Yer hedefleme halkası",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
@@ -2626,6 +2676,7 @@ export const tr_TR: EnTranslations = {
       "usernameTaken": "Bu kullanıcı adı zaten alınmış.",
       "invalidCredentials": "Geçersiz kullanıcı adı veya parola.",
       "verificationFailed": "Doğrulama başarısız oldu. Lütfen tekrar deneyin.",
+      "desktopCodeInvalid": "Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.",
       "invalidCharacterName": "Geçersiz karakter adı. 2-16 harf kullanın.",
       "characterNameNotAllowed": "Bu karakter adına izin verilmiyor.",
       "invalidClass": "Geçersiz sınıf.",
@@ -2642,6 +2693,21 @@ export const tr_TR: EnTranslations = {
       "takenOver": "Karakteriniz başka bir oturum tarafından devralındı.",
       "renameBeforeEntering": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
       "renameNotPermitted": "Bu karakterin yeniden adlandırılmasına izin verilmiyor."
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "{version} güncellemesi indiriliyor...",
+      "ready": "{version} güncellemesi hazır. Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
+      "restart": "Şimdi Yeniden Başlat",
+      "later": "Daha Sonra"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "Oyun görünümü çalışmayı durdurdu. Yeniden yüklensin mi?",
+      "reload": "Yeniden Yükle",
+      "quit": "Çık",
+      "fatalBody": "World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor."
     }
   },
   "realm": {
@@ -3692,6 +3758,26 @@ export const tr_TR: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Alev Vuruşu",
+        "description": "Hedef alanda bir alev patlaması yaratır ve patlamaya yakalanan düşmanlara {damage} Ateş hasarı verir."
+      },
+      "rain_of_fire": {
+        "name": "Ateş Yağmuru",
+        "description": "Hedef alana ateş yağdırır ve düşmanları yakarak {damage} Ateş hasarı verir."
+      },
+      "volley": {
+        "name": "Ok Yağmuru",
+        "description": "Hedef alana ok yağdırır ve içindeki düşmanlara {damage} hasar verir."
+      },
+      "hurricane": {
+        "name": "Kasırga",
+        "description": "Hedef alana bir kasırga indirir ve düşmanlara {damage} Doğa hasarı verir."
+      },
+      "earthquake": {
+        "name": "Deprem",
+        "description": "Hedef alanı sarsar ve düşmanlara {damage} Doğa hasarı verir."
+      },
       "heroic_strike": {
         "name": "Kahramanca Vuruş",
         "description": "Yakın dövüş hasarını {damage} artıran güçlü bir saldırı. Bir sonraki vuruşunda etkinleşir."

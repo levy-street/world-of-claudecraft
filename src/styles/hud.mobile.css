@@ -513,7 +513,35 @@
     pointer-events: auto;
   }
   body.mobile-touch #side-buttons {
+    display: block;
+    right: max(8px, env(safe-area-inset-right));
+    top: calc(max(8px, env(safe-area-inset-top)) + 210px);
+    bottom: auto;
+    width: 70px;
+    z-index: 81;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-window-open #side-buttons {
+    z-index: 1;
+    pointer-events: none;
+  }
+  body.mobile-touch #side-buttons .micro-btn {
     display: none;
+  }
+  body.mobile-touch #daily-rewards-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 54px;
+    height: 50px;
+    pointer-events: auto;
+  }
+  body.mobile-touch #daily-rewards-button .daily-rewards-label {
+    display: none;
+  }
+  body.native-app.mobile-touch #daily-rewards-button,
+  body.native-app.mobile-touch #daily-rewards-window {
+    display: none !important;
   }
   body.mobile-touch #actionbar {
     display: flex;
@@ -863,6 +891,10 @@
   body.mobile-touch .window {
     max-width: calc(100vw - 20px);
     max-height: calc(100vh - 40px);
+  }
+  body.mobile-touch #leaderboard-window,
+  body.mobile-touch #daily-rewards-window {
+    z-index: 95;
   }
   body.mobile-touch.mobile-window-open #ui {
     z-index: 90;

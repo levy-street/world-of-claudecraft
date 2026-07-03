@@ -51,7 +51,7 @@ describe('hud.css - ambient loops gate on --fx-ambient-anim + --motion-scale', (
   it('gives every ambient loop a play-state token (paused at low/reduced)', () => {
     const playStates =
       hudCss.match(/animation-play-state: var\(--fx-ambient-anim, running\);/g) ?? [];
-    expect(playStates.length).toBe(5); // combat-flash, rest, talent, fiesta, party-badge
+    expect(playStates.length).toBe(7); // combat-flash, rest, talent, fiesta, party-badge, daily-rewards chest + icon
   });
 
   it('calms each ambient duration by --motion-scale (near-zero, never 0, under reduced-motion)', () => {

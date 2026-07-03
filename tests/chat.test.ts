@@ -1069,6 +1069,10 @@ describe('chat module (direct, no Sim)', () => {
       addItem: (id: string, n: number, pid?: number) => calls.push(['item', id, n, pid]),
       completeQuestForDev: (questId: string, pid?: number) => calls.push(['quest', questId, pid]),
       completeCurrentQuestsForDev: (pid?: number) => calls.push(['quests', pid]),
+      spawnDevBot: (name: string) => {
+        calls.push(['bot', name]);
+        return 7;
+      },
       emit: () => {},
       error: () => {},
       entities: new Map(),
@@ -1084,6 +1088,70 @@ describe('chat module (direct, no Sim)', () => {
     expect(calls).toContainEqual(['quest', 'q_wolves', 1]);
     expect(chatMod.handleDevChat(ctx, '/dev quests', 1)).toBe(null);
     expect(calls).toContainEqual(['quests', 1]);
+    expect(chatMod.handleDevChat(ctx, '/dev bot ASASAS', 1)).toBe(null);
+    expect(calls).toContainEqual(['bot', 'ASASAS']);
     expect(chatMod.handleDevChat(ctx, 'hello world', 1)).toBe(undefined);
+  });
+
+  it('handleDevChat: the /dev help fallback advertises every dev subcommand', () => {
+    let help = '';
+    const ctx = {
+      error: (_pid: number, text: string) => {
+        help = text;
+      },
+    } as unknown as SimContext;
+    // A bare "/dev" matches no specific cheat and falls through to the usage line.
+    expect(chatMod.handleDevChat(ctx, '/dev', 1)).toBe(null);
+    // Every subcommand the parser accepts must be listed, so the help can never
+    // silently drift behind the commands again (the "/dev bot" omission this pins).
+    for (const cmd of ['level', 'tp', 'give', 'quest', 'quests', 'bot'])
+      expect(help, `help omits /dev ${cmd}`).toContain(`/dev ${cmd}`);
+  });
+});
+
+describe('dev bot: a whisperable test dummy', () => {
+  it('spawnDevBot adds a unique dummy that a whisper auto-replies to', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const botPid = sim.spawnDevBot('ASASAS');
+    expect(botPid).toBeGreaterThanOrEqual(0);
+    const botMeta = sim.players.get(botPid)!;
+    expect(botMeta.name).toBe('ASASAS');
+    expect(botMeta.isDevBot).toBe(true);
+    // whisper resolution needs a unique name: a duplicate (any case) or blank is refused
+    expect(sim.spawnDevBot('asasas')).toBe(-1);
+    expect(sim.spawnDevBot('   ')).toBe(-1);
+
+    sim.chat('/w ASASAS hola', a);
+    const msgs = chatEvents(sim.tick());
+    // The bot gets NO recipient copy (no owning client; offline it would duplicate
+    // the sender's own line). Everything the human sees is addressed to Aleph.
+    expect(msgs.every((m) => m.pid === a)).toBe(true);
+    // exactly two lines: the sender echo, then the bot's auto-reply
+    const echo = msgs.find((m) => m.to === 'ASASAS')!;
+    expect(echo.channel).toBe('whisper');
+    expect(echo.from).toBe('Aleph');
+    expect(echo.text).toBe('hola');
+    const reply = msgs.find((m) => m.from === 'ASASAS')!;
+    expect(reply.channel).toBe('whisper');
+    expect(reply.text).toContain('hola');
+    expect(reply.to).toBeUndefined();
+    // Aleph can now /r the bot
+    expect(sim.players.get(a)!.lastWhisperFrom).toBe('ASASAS');
+  });
+
+  it('the /dev bot command spawns a bot only when dev commands are on', () => {
+    const on = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const a = on.addPlayer('warrior', 'Aleph');
+    on.chat('/dev bot ASASAS', a);
+    on.tick();
+    expect([...on.players.values()].find((m) => m.name === 'ASASAS')?.isDevBot).toBe(true);
+
+    // with dev commands off, "/dev bot" is inert (never spawns a player)
+    const off = makeWorld();
+    const a2 = off.addPlayer('warrior', 'Aleph');
+    off.chat('/dev bot NOPE', a2);
+    off.tick();
+    expect([...off.players.values()].some((m) => m.name === 'NOPE')).toBe(false);
   });
 });

@@ -177,6 +177,48 @@ export const nl_NL: EnTranslations = {
       "title": "Emotes",
       "done": "Klaar"
     },
+    "dailyRewards": {
+      "title": "Dagelijkse beloningen",
+      "close": "Dagelijkse beloningen sluiten",
+      "loading": "Dagelijkse beloningen worden geladen...",
+      "error": "Kon de dagelijkse beloningen niet laden.",
+      "intro": "Houd genoeg WOC in je geverifieerde portemonnee om dagelijkse beloningen te ontgrendelen. Verdien punten met één dagelijkse draai en wisselende taken, en klim daarna op in de dagelijkse ranglijst voor een deel van de prijzenpot.",
+      "prize": "Prijzenpot",
+      "reset": "Reset",
+      "endsIn": "Eindigt over {time}",
+      "remainingLessThanMinute": "<1 min",
+      "remainingMinutes": "{minutes} min",
+      "remainingHoursMinutes": "{hours} u {minutes} min",
+      "score": "Score",
+      "walletValue": "Portemonneewaarde (WOC)",
+      "usd": "{amount} USD",
+      "sol": "{amount} SOL",
+      "unknown": "Onbekend",
+      "spinTitle": "Dagelijkse draai",
+      "spinDialogTitle": "Dagelijkse beloningsdraai",
+      "spinClose": "Dagelijkse draai sluiten",
+      "spinReady": "Eén draai staat klaar.",
+      "spinClaimed": "Geclaimd: +{points} punten.",
+      "spinResult": "+{points} punten",
+      "spinButton": "Draaien",
+      "tasks": "Taken",
+      "leaderboard": "Dagelijkse ranglijst",
+      "history": "Eerdere winnaars",
+      "noLeaders": "Nog geen punten.",
+      "noHistory": "Nog geen uitbetalingen.",
+      "walletConnectTitle": "Portemonnee verifiëren",
+      "walletConnectBody": "Verifieer een Solana-portemonnee met WOC om dagelijkse beloningen te ontgrendelen.",
+      "walletConnectButton": "Portemonnee verifiëren",
+      "walletHoldTitle": "WOC aanhouden",
+      "walletHoldBody": "Houd minstens {amount} USD aan WOC om dagelijkse beloningen te ontgrendelen.",
+      "walletPriceBody": "WOC-prijzen zijn momenteel niet beschikbaar. Kom binnenkort terug.",
+      "reason": {
+        "eligible": "Beloningen ontgrendeld.",
+        "no_wallet": "Verbind een portemonnee met minstens $20 USD aan WOC.",
+        "under_minimum": "Portemonnee ligt onder het WOC-minimum van $20 USD.",
+        "price_unavailable": "WOC-prijs is niet beschikbaar, beloningen zijn tijdelijk vergrendeld."
+      }
+    },
     "theme": {
       "preset": "UI-thema",
       "customColors": "Aangepaste kleuren",
@@ -265,6 +307,13 @@ export const nl_NL: EnTranslations = {
       "heading": "Richting",
       "minimapZoom": "Minimapzoom"
     },
+    "nativeUpdate": {
+      "title": "Update beschikbaar",
+      "body": "Er is een nieuwe versie van World of ClaudeCraft beschikbaar. Werk nu bij voor de nieuwste oplossingen en verbeteringen.",
+      "bodyWithVersion": "Versie {version} van World of ClaudeCraft is beschikbaar. Werk nu bij voor de nieuwste oplossingen en verbeteringen.",
+      "notNow": "Niet nu",
+      "update": "Bijwerken"
+    },
     "castBar": {
       "playerAria": "Jouw Spreukbalk",
       "targetAria": "Spreukbalk van Doelwit"
@@ -340,6 +389,7 @@ export const nl_NL: EnTranslations = {
       "uiScale": "UI-schaal",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
+      "groundReticle": "Grondrichtkruis",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -2626,6 +2676,7 @@ export const nl_NL: EnTranslations = {
       "usernameTaken": "Die gebruikersnaam is al in gebruik.",
       "invalidCredentials": "Ongeldige gebruikersnaam of wachtwoord.",
       "verificationFailed": "Verificatie mislukt. Probeer het opnieuw.",
+      "desktopCodeInvalid": "Desktop-inlogcode is ongeldig of verlopen. Probeer het opnieuw.",
       "invalidCharacterName": "Ongeldige personagenaam. Gebruik 2-16 letters.",
       "characterNameNotAllowed": "Die personagenaam is niet toegestaan.",
       "invalidClass": "Ongeldige klasse.",
@@ -2642,6 +2693,21 @@ export const nl_NL: EnTranslations = {
       "takenOver": "Je personage is overgenomen door een andere sessie.",
       "renameBeforeEntering": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
       "renameNotPermitted": "Dit personage hernoemen is niet toegestaan."
+    }
+  },
+  "desktop": {
+    "update": {
+      "downloading": "Update {version} wordt gedownload...",
+      "ready": "Update {version} is klaar. Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.",
+      "restart": "Nu herstarten",
+      "later": "Later"
+    },
+    "crash": {
+      "title": "World of ClaudeCraft",
+      "body": "De spelweergave werkt niet meer. Opnieuw laden?",
+      "reload": "Opnieuw laden",
+      "quit": "Afsluiten",
+      "fatalBody": "World of ClaudeCraft is op een onverwachte fout gestuit en moet worden afgesloten."
     }
   },
   "realm": {
@@ -3692,6 +3758,26 @@ export const nl_NL: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "flamestrike": {
+        "name": "Vlammenslag",
+        "description": "Roept een vuurexplosie op in het doelgebied die vijanden in de explosie {damage} Vuurschade toebrengt."
+      },
+      "rain_of_fire": {
+        "name": "Vuurregen",
+        "description": "Laat een vuurregen neerdalen op het doelgebied en verbrandt vijanden voor {damage} Vuurschade."
+      },
+      "volley": {
+        "name": "Pijlenregen",
+        "description": "Laat een pijlenregen neerdalen op het doelgebied en richt {damage} schade aan bij vijanden erin."
+      },
+      "hurricane": {
+        "name": "Orkaan",
+        "description": "Ontketent een orkaan boven het doelgebied en treft vijanden voor {damage} Natuurschade."
+      },
+      "earthquake": {
+        "name": "Aardbeving",
+        "description": "Laat het doelgebied beven, treft vijanden voor {damage} Natuurschade."
+      },
       "heroic_strike": {
         "name": "Heroïsche Slag",
         "description": "Een sterke aanval die de slagschade met {damage} verhoogt. Activeert bij je volgende slag."

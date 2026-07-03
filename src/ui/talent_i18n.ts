@@ -9,7 +9,7 @@ import {
   type TalentEffect,
   type TalentNode,
 } from '../sim/content/talents';
-import { ABILITIES, CLASSES } from '../sim/data';
+import { ABILITIES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import { getLanguage, languageTag, type SupportedLanguage, t } from './i18n';
@@ -47,13 +47,14 @@ export interface TalentTranslationManifestEntry {
 
 type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
+type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted'>;
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
   // label ("+10% Agility"), so locales don't repeat them here.
   statLabels: Record<
     | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct'>
-    | GlobalKey
+    | DisplayGlobalKey
     | 'damage'
     | 'cost'
     | 'cooldown'
@@ -6776,6 +6777,7 @@ function effectDescription(
   const global = effect.global ?? {};
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
+    if (key === 'critVsRooted') continue;
     parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));
   }
 

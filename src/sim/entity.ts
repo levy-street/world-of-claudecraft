@@ -50,6 +50,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     castingAbility: null,
     castRemaining: 0,
     castTotal: 0,
+    castAim: null,
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,

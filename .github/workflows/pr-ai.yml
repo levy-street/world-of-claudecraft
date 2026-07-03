@@ -1,38 +1,57 @@
 name: PR AI assist
 
-# Two INFORMATIONAL, NON-BLOCKING jobs that help review a pull request. Neither is a
-# required check; they assist review, they do not gate merge. They live in their own
-# workflow so they never interfere with the CI gate in ci.yml.
+# Two INFORMATIONAL, NON-BLOCKING jobs that help review a pull request, plus an on-demand
+# comment trigger for the second one. None of this is a required check; it assists
+# review, it does not gate merge. Lives in its own workflow so it never interferes with
+# the CI gate in ci.yml.
 #
-#   screenshots  boots the Vite dev client headless, runs a fixed offline tour
-#                (character select, desktop HUD, mobile HUD), uploads the PNGs as an
-#                artifact, and links them in a sticky PR comment.
-#   ai-review    sends the PR diff to an OpenRouter model (free openrouter/owl-alpha by
-#                default) and posts the review as a sticky PR comment. No-ops without the
-#                OPENROUTER_API_KEY secret (for example on a fork PR), so it never blocks.
+#   screenshots        boots the Vite dev client headless, runs a fixed offline tour
+#                       (character select, desktop HUD, mobile HUD), uploads the PNGs as
+#                       an artifact, and links them in a sticky PR comment.
+#   ai-review           sends the PR diff to an OpenRouter model (free
+#                       nvidia/nemotron-3-ultra-550b-a55b:free by default) and posts the
+#                       review as a sticky PR comment. No-ops without the
+#                       OPENROUTER_API_KEY secret (for example on a fork PR), so it never
+#                       blocks.
+#   ai-review-comment   on demand: an OWNER/MEMBER/COLLABORATOR comments `/review` or
+#                       `/suggest <focus>` on the PR. Fetches the diff itself via the
+#                       GitHub API (no checkout of the PR head, so this stays safe to run
+#                       with repo secrets even against a fork PR) and posts a fresh reply
+#                       comment, keyed to the triggering comment rather than the sticky
+#                       review above.
 #
 # Setup (one time): add an OPENROUTER_API_KEY repo secret to enable ai-review. Optionally
-# set an OPENROUTER_MODEL repo variable to swap the model (owl-alpha is free but ephemeral).
-# See docs/ai-pr-bot.md, including the privacy note on the free owl-alpha tier logging prompts.
+# set an OPENROUTER_MODEL repo variable to swap the model (free models can change or
+# disappear at any time). See docs/ai-pr-bot.md, including the privacy note on free
+# OpenRouter models logging prompts.
 
 on:
   pull_request:
+  issue_comment:
+    types: [created]
   workflow_dispatch:
 
-# Needed to post the sticky review/screenshot comments. Fork PRs get a read-only token,
-# so the comment steps degrade to a no-op there (handled in the scripts).
+# Needed to post the sticky review/screenshot comments and read the PR diff via the API.
+# Fork PRs get a read-only token on the pull_request trigger, so the comment steps
+# degrade to a no-op there (handled in the scripts). issue_comment always runs with the
+# base repo's token and secrets regardless of whose PR it is, which is why
+# ai-review-comment additionally gates on the commenter's author_association.
 permissions:
   contents: read
   pull-requests: write
 
 concurrency:
-  group: pr-ai-${{ github.event.pull_request.number || github.ref }}
+  group: pr-ai-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   screenshots:
     name: Screenshots of changes
     runs-on: ubuntu-latest
+    # issue_comment fires this workflow on every comment on any issue or PR; without this
+    # guard the full checkout + npm ci + Vite boot + puppeteer run would fire on every
+    # comment too, even though nothing in this job reads the comment.
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -140,9 +159,42 @@ jobs:
       - name: Review with OpenRouter
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'openrouter/owl-alpha' }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           DIFF_FILE: pr.diff
+        run: node scripts/ai_review.mjs
+
+  ai-review-comment:
+    name: AI review (comment command)
+    runs-on: ubuntu-latest
+    # Only a PR conversation comment (not a plain issue), starting with /review or
+    # /suggest, from someone with write access to THIS repo. author_association is
+    # evaluated against the base repo regardless of whether the PR itself is from a
+    # fork, so a fork PR's own author cannot self-trigger this on their own comment.
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request != null &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
+      (startsWith(github.event.comment.body, '/review') || startsWith(github.event.comment.body, '/suggest'))
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Review with OpenRouter
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: node scripts/ai_review.mjs

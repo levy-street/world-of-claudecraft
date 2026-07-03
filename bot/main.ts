@@ -19,6 +19,7 @@ import { Gateway } from './gateway';
 import {
   allTierRoleNames,
   buildActivityMessage,
+  buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
   buildRelayMessage,
@@ -386,6 +387,28 @@ async function main(): Promise<void> {
     }
   };
 
+  let dailyRewardsChannelMissingLogged = false;
+  const pollDailyRewardWinners = async (): Promise<void> => {
+    if (!cfg.dailyRewardsChannelId) {
+      if (!dailyRewardsChannelMissingLogged) {
+        console.error(
+          '[bot] missing DISCORD_DAILY_REWARDS_CHANNEL_ID; skipping daily rewards winner announcements',
+        );
+        dailyRewardsChannelMissingLogged = true;
+      }
+      return;
+    }
+    const days = await server.dailyRewardWinners();
+    for (const day of days) {
+      try {
+        await discord.createMessage(cfg.dailyRewardsChannelId, buildDailyRewardWinnersMessage(day));
+        await server.markDailyRewardWinners(day.day);
+      } catch (e) {
+        console.error('[bot] daily rewards winners post failed', e);
+      }
+    }
+  };
+
   gateway.connect(false);
   setInterval(
     () => void syncAllOnlineRoles().catch((e) => console.error(e)),
@@ -397,6 +420,10 @@ async function main(): Promise<void> {
   ).unref();
   setInterval(() => void pollRelay().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
   setInterval(() => void pollActivity().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
+  setInterval(
+    () => void pollDailyRewardWinners().catch((e) => console.error(e)),
+    RELAY_POLL_MS,
+  ).unref();
   setInterval(() => {
     void refreshSpecialRoles()
       .then(() => pushAllMemberMeta())

@@ -211,7 +211,7 @@ export class Market {
   // List a stack from your bags for sale. The goods are escrowed (pulled from
   // your bags immediately) and held by the Merchant until bought or reclaimed.
   // Set the player's session-only World Market browse query (search + type/subtype/
-  // rarity filters + page). Purely a display/query narrowing — no gameplay effect — so
+  // rarity filters + page). Purely a display/query narrowing (no gameplay effect), so
   // it needs no proximity or liveness gate; the next marketInfoFor snapshot reflects it.
   marketSearch(query: MarketQuery, pid?: number): void {
     const r = this.ctx.resolve(pid);

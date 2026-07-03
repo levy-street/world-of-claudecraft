@@ -65,6 +65,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Ajustes de botín: botín maestro, repartidor {name}, umbral {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Umbral de botín fijado en {threshold}.',
   'hudChrome.options.showDevBadges': 'Mostrar insignias de desarrollador',
+  'hudChrome.options.groundReticle': 'Retícula de objetivo terrestre',
   'hudChrome.options.startAttackOnAbility': 'Ataque automático al usar habilidad',
   'hudChrome.party.promoteLeader': 'Promover a líder',
   'hudChrome.statInfo.desc.spellPower':
@@ -1700,6 +1701,21 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     'Provoca al objetivo: tu amenaza sube hasta igualar la de su enemigo más odiado y queda obligado a atacarte durante 3 s.',
   'entities.abilities.fireball.name': 'Bola de Fuego',
+  'entities.abilities.rain_of_fire.name': 'Lluvia de Fuego',
+  'entities.abilities.rain_of_fire.description':
+    'Hace caer una lluvia de fuego sobre el área objetivo, quemando a los enemigos e infligiendo {damage} de daño de Fuego.',
+  'entities.abilities.volley.name': 'Andanada',
+  'entities.abilities.volley.description':
+    'Lanza una lluvia de flechas sobre el área objetivo, infligiendo {damage} de daño a los enemigos atrapados.',
+  'entities.abilities.hurricane.name': 'Huracán',
+  'entities.abilities.hurricane.description':
+    'Desata un huracán sobre el área objetivo, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza.',
+  'entities.abilities.earthquake.name': 'Terremoto',
+  'entities.abilities.earthquake.description':
+    'Sacude el área objetivo, golpeando a los enemigos e infligiendo {damage} de daño de Naturaleza.',
+  'entities.abilities.flamestrike.name': 'Llamarada',
+  'entities.abilities.flamestrike.description':
+    'Invoca un estallido de fuego en el área objetivo que inflige {damage} de daño de Fuego a los enemigos alcanzados por la explosión.',
   'entities.abilities.fireball.description':
     'Lanza una bola ígnea que causa {damage} de daño de Fuego y daño adicional en el tiempo.',
   'entities.abilities.frost_armor.name': 'Armadura de Escarcha',
@@ -5111,4 +5127,67 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Necesito ayuda',
   'hudChrome.discord.relay.help.hint': 'Pide ayuda a la comunidad',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar barra de acción secundaria',
+  'errors.api.desktopCodeInvalid':
+    'El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.',
+  'desktop.crash.body': 'La vista del juego dejó de funcionar. ¿Recargarla?',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft tuvo un error inesperado y debe cerrarse.',
+  'desktop.crash.quit': 'Salir',
+  'desktop.crash.reload': 'Recargar',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.update.downloading': 'Descargando actualización {version}...',
+  'desktop.update.later': 'Más tarde',
+  'desktop.update.ready':
+    'La actualización {version} está lista. Se instala al salir, o reinicia ahora.',
+  'desktop.update.restart': 'Reiniciar ahora',
+  'hudChrome.dailyRewards.close': 'Cerrar recompensas diarias',
+  'hudChrome.dailyRewards.endsIn': 'Termina en {time}',
+  'hudChrome.dailyRewards.error': 'No se pudieron cargar las recompensas diarias.',
+  'hudChrome.dailyRewards.history': 'Ganadores anteriores',
+  'hudChrome.dailyRewards.intro':
+    'Mantén suficiente WOC en tu cartera verificada para desbloquear las recompensas diarias. Gana puntos con un giro diario y tareas rotativas, y escala la clasificación diaria para llevarte una parte del fondo de premios.',
+  'hudChrome.dailyRewards.leaderboard': 'Clasificación diaria',
+  'hudChrome.dailyRewards.loading': 'Cargando recompensas diarias...',
+  'hudChrome.dailyRewards.noHistory': 'Aún no hay pagos.',
+  'hudChrome.dailyRewards.noLeaders': 'Aún no hay puntos.',
+  'hudChrome.dailyRewards.prize': 'Fondo de premios',
+  'hudChrome.dailyRewards.reason.eligible': 'Recompensas desbloqueadas.',
+  'hudChrome.dailyRewards.reason.no_wallet': 'Conecta una cartera con al menos $20 USD en WOC.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'El precio de WOC no está disponible; las recompensas están bloqueadas temporalmente.',
+  'hudChrome.dailyRewards.reason.under_minimum':
+    'La cartera está por debajo del mínimo de $20 USD en WOC.',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}h {minutes}min',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1min',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}min',
+  'hudChrome.dailyRewards.reset': 'Reinicio',
+  'hudChrome.dailyRewards.score': 'Puntuación',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.spinButton': 'Girar',
+  'hudChrome.dailyRewards.spinClaimed': 'Reclamado: +{points} puntos.',
+  'hudChrome.dailyRewards.spinClose': 'Cerrar giro diario',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Giro de recompensa diaria',
+  'hudChrome.dailyRewards.spinReady': 'Tienes un giro disponible.',
+  'hudChrome.dailyRewards.spinResult': '+{points} puntos',
+  'hudChrome.dailyRewards.spinTitle': 'Giro diario',
+  'hudChrome.dailyRewards.tasks': 'Tareas',
+  'hudChrome.dailyRewards.title': 'Recompensas diarias',
+  'hudChrome.dailyRewards.unknown': 'Desconocido',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Verifica una cartera de Solana con WOC para desbloquear las recompensas diarias.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Verificar cartera',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Verificar cartera',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Mantén al menos {amount} USD en WOC para desbloquear las recompensas diarias.',
+  'hudChrome.dailyRewards.walletHoldTitle': 'Mantén WOC',
+  'hudChrome.dailyRewards.walletPriceBody':
+    'El precio de WOC no está disponible en este momento. Vuelve a consultarlo pronto.',
+  'hudChrome.dailyRewards.walletValue': 'Valor de cartera (WOC)',
+  'hudChrome.nativeUpdate.body':
+    'Ya hay disponible una nueva versión de World of ClaudeCraft. Actualiza ahora para obtener las últimas correcciones y mejoras.',
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    'La versión {version} de World of ClaudeCraft ya está disponible. Actualiza ahora para obtener las últimas correcciones y mejoras.',
+  'hudChrome.nativeUpdate.notNow': 'Ahora no',
+  'hudChrome.nativeUpdate.title': 'Actualización disponible',
+  'hudChrome.nativeUpdate.update': 'Actualizar',
 };

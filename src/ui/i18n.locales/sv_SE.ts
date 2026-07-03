@@ -55,6 +55,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Byteinställningar: Mästarbyte, bytesmästare {name}, tröskel {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Bytest. tröskel satt till {threshold}.',
   'hudChrome.options.showDevBadges': 'Visa utvecklarmärken',
+  'hudChrome.options.groundReticle': 'Markriktmedel',
   'hudChrome.options.startAttackOnAbility': 'Automatisk attack vid förmågeanvändning',
   'hudChrome.party.promoteLeader': 'Befordra till ledare',
   'hudChrome.plurals.playersMatching.few': 'Vilka: {count} spelare matchar "{query}" på {realm}.',
@@ -563,6 +564,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.description':
     'Slungar ett brinnande klot som vållar {damage} eldskada plus ytterligare skada över tid.',
   'entities.abilities.fireball.name': 'Eldklot',
+  'entities.abilities.rain_of_fire.name': 'Eldregn',
+  'entities.abilities.rain_of_fire.description':
+    'Låter ett eldregn falla över målområdet och bränner fiender för {damage} Eldskada.',
+  'entities.abilities.volley.name': 'Pilregn',
+  'entities.abilities.volley.description':
+    'Låter pilar regna över målområdet och vållar {damage} skada på fiender i det.',
+  'entities.abilities.hurricane.name': 'Orkan',
+  'entities.abilities.hurricane.description':
+    'Släpper lös en orkan över målområdet och slår fiender för {damage} Naturskada.',
+  'entities.abilities.earthquake.name': 'Jordbävning',
+  'entities.abilities.earthquake.description':
+    'Skakar målområdet och slår fiender för {damage} Naturskada.',
+  'entities.abilities.flamestrike.name': 'Flamslag',
+  'entities.abilities.flamestrike.description':
+    'Kallar ner en eldexplosion på målområdet som ger {damage} Eldskada till fiender som fångas i explosionen.',
   'entities.abilities.flame_shock.description':
     'Sveder målet med eld för 25 skada plus {damage} över 12 sek.',
   'entities.abilities.flame_shock.name': 'Flamchock',
@@ -5015,4 +5031,66 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Behöver hjälp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hjälp',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
+  'errors.api.desktopCodeInvalid':
+    'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',
+  'desktop.crash.body': 'Spelvyn slutade fungera. Ladda om den?',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft stötte på ett oväntat fel och måste stängas.',
+  'desktop.crash.quit': 'Avsluta',
+  'desktop.crash.reload': 'Ladda om',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.update.downloading': 'Laddar ner uppdatering {version}...',
+  'desktop.update.later': 'Senare',
+  'desktop.update.ready':
+    'Uppdatering {version} är klar. Den installeras när du avslutar, eller starta om nu.',
+  'desktop.update.restart': 'Starta om nu',
+  'hudChrome.dailyRewards.close': 'Stäng dagliga belöningar',
+  'hudChrome.dailyRewards.endsIn': 'Slutar om {time}',
+  'hudChrome.dailyRewards.error': 'Kunde inte ladda dagliga belöningar.',
+  'hudChrome.dailyRewards.history': 'Tidigare vinnare',
+  'hudChrome.dailyRewards.intro':
+    'Håll tillräckligt med WOC i din verifierade plånbok för att låsa upp dagliga belöningar. Tjäna poäng med ett dagligt snurr och roterande uppgifter, och klättra sedan på den dagliga topplistan för en andel av prispotten.',
+  'hudChrome.dailyRewards.leaderboard': 'Daglig topplista',
+  'hudChrome.dailyRewards.loading': 'Laddar dagliga belöningar...',
+  'hudChrome.dailyRewards.noHistory': 'Inga utbetalningar ännu.',
+  'hudChrome.dailyRewards.noLeaders': 'Inga poäng ännu.',
+  'hudChrome.dailyRewards.prize': 'Prispott',
+  'hudChrome.dailyRewards.reason.eligible': 'Belöningar upplåsta.',
+  'hudChrome.dailyRewards.reason.no_wallet': 'Anslut en plånbok med minst 20 USD i WOC.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'WOC-priset är otillgängligt, belöningar är tillfälligt låsta.',
+  'hudChrome.dailyRewards.reason.under_minimum': 'Plånboken är under WOC-miniminivån på 20 USD.',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours} h {minutes} min',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1 min',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes} min',
+  'hudChrome.dailyRewards.reset': 'Återställning',
+  'hudChrome.dailyRewards.score': 'Poäng',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.spinButton': 'Snurra',
+  'hudChrome.dailyRewards.spinClaimed': 'Hämtad: +{points} poäng.',
+  'hudChrome.dailyRewards.spinClose': 'Stäng dagligt snurr',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Dagligt belöningssnurr',
+  'hudChrome.dailyRewards.spinReady': 'Ett snurr är redo.',
+  'hudChrome.dailyRewards.spinResult': '+{points} poäng',
+  'hudChrome.dailyRewards.spinTitle': 'Dagligt snurr',
+  'hudChrome.dailyRewards.tasks': 'Uppgifter',
+  'hudChrome.dailyRewards.title': 'Dagliga belöningar',
+  'hudChrome.dailyRewards.unknown': 'Okänd',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Verifiera en Solana-plånbok med WOC för att låsa upp dagliga belöningar.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Verifiera plånbok',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Verifiera plånbok',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Håll minst {amount} USD i WOC för att låsa upp dagliga belöningar.',
+  'hudChrome.dailyRewards.walletHoldTitle': 'Håll WOC',
+  'hudChrome.dailyRewards.walletPriceBody':
+    'WOC-prissättningen är otillgänglig just nu. Kom tillbaka snart.',
+  'hudChrome.dailyRewards.walletValue': 'Plånbokens värde (WOC)',
+  'hudChrome.nativeUpdate.body':
+    'En ny version av World of ClaudeCraft är tillgänglig. Uppdatera nu för de senaste korrigeringarna och förbättringarna.',
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    'Version {version} av World of ClaudeCraft är tillgänglig. Uppdatera nu för de senaste korrigeringarna och förbättringarna.',
+  'hudChrome.nativeUpdate.notNow': 'Inte nu',
+  'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
+  'hudChrome.nativeUpdate.update': 'Uppdatera',
 };

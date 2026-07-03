@@ -10,6 +10,7 @@
 // numbers; they never walk the tree. See docs/prd/talents-and-specializations.md.
 // ---------------------------------------------------------------------------
 
+import type { AbilityEffect } from '../types';
 import { MAX_LEVEL, type PlayerClass } from '../types';
 import {
   DRUID_TALENTS,
@@ -63,6 +64,8 @@ export interface AbilityModEffect {
   cooldownPct?: number; // -0.50 = half cooldown
   castPct?: number; // -0.50 = half cast time
   buffPct?: number; // +0.20 = +20% to this ability's selfBuff/buffTarget value (e.g. Improved Devotion Aura)
+  castWhileMoving?: boolean; // the cast/channel survives the caster's own movement (Firestarter)
+  addEffects?: AbilityEffect[];
 }
 
 // Mastery-style global multipliers, applied to whole damage/heal schools when
@@ -72,6 +75,7 @@ export interface GlobalModEffect {
   spellDmgPct?: number; // magic ability damage
   healPct?: number; // healing done
   threatPct?: number; // bonus threat (tank role)
+  critVsRooted?: number; // additive spell crit chance against rooted targets
 }
 
 export interface TalentEffect {
@@ -155,6 +159,8 @@ export interface ResolvedAbilityMod {
   cooldownPct: number;
   castPct: number;
   buffPct: number;
+  castWhileMoving: boolean;
+  addEffects: AbilityEffect[];
 }
 
 // The flat precomputed struct read by the hot paths.
@@ -518,10 +524,19 @@ function zeroStats(): Required<StatModEffect> {
   };
 }
 function zeroGlobal(): Required<GlobalModEffect> {
-  return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0 };
+  return { meleeDmgPct: 0, spellDmgPct: 0, healPct: 0, threatPct: 0, critVsRooted: 0 };
 }
 function zeroAbilityMod(): ResolvedAbilityMod {
-  return { dmgPct: 0, flatDmg: 0, costPct: 0, cooldownPct: 0, castPct: 0, buffPct: 0 };
+  return {
+    dmgPct: 0,
+    flatDmg: 0,
+    costPct: 0,
+    cooldownPct: 0,
+    castPct: 0,
+    buffPct: 0,
+    castWhileMoving: false,
+    addEffects: [],
+  };
 }
 
 export function emptyModifiers(): TalentModifiers {
@@ -565,6 +580,7 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     g.spellDmgPct += (e.spellDmgPct ?? 0) * mult;
     g.healPct += (e.healPct ?? 0) * mult;
     g.threatPct += (e.threatPct ?? 0) * mult;
+    g.critVsRooted += (e.critVsRooted ?? 0) * mult;
   }
   for (const am of eff.ability ?? []) {
     let cur = mods.abilities[am.ability];
@@ -578,6 +594,9 @@ function accumulate(mods: TalentModifiers, eff: TalentEffect | undefined, mult: 
     cur.cooldownPct += (am.cooldownPct ?? 0) * mult;
     cur.castPct += (am.castPct ?? 0) * mult;
     cur.buffPct += (am.buffPct ?? 0) * mult;
+    if (am.castWhileMoving) cur.castWhileMoving = true;
+    // Added effects are rank-1 semantics, not multiplied by talent rank.
+    if (am.addEffects) cur.addEffects.push(...am.addEffects);
   }
   if (eff.grant) mods.grants.push({ ability: eff.grant.ability, rank: eff.grant.rank ?? 1 });
 }

@@ -58,6 +58,7 @@ export const shellStrings = {
         usernameTaken: 'That username is already taken.',
         invalidCredentials: 'Invalid username or password.',
         verificationFailed: 'Verification failed. Please try again.',
+        desktopCodeInvalid: 'Desktop login code is invalid or expired. Please try again.',
         invalidCharacterName: 'Invalid character name. Use 2-16 letters.',
         characterNameNotAllowed: 'That character name is not allowed.',
         invalidClass: 'Invalid class.',
@@ -74,6 +75,25 @@ export const shellStrings = {
         takenOver: 'Your character was taken over by another session.',
         renameBeforeEntering: 'This character must be renamed before entering the world.',
         renameNotPermitted: 'Renaming this character is not allowed.',
+      },
+    },
+    // Desktop (Electron) shell surfaces: the auto-update toast rendered by the
+    // renderer (src/ui/desktop_update_toast.ts) and the crash-dialog strings
+    // the renderer pushes to the main process (src/game/desktop_shell_strings.ts,
+    // mirrored by electron/shell_strings.cjs DEFAULT_SHELL_STRINGS in English).
+    desktop: {
+      update: {
+        downloading: 'Downloading update {version}...',
+        ready: 'Update {version} is ready. It installs when you quit, or restart now.',
+        restart: 'Restart now',
+        later: 'Later',
+      },
+      crash: {
+        title: 'World of ClaudeCraft',
+        body: 'The game view stopped working. Reload it?',
+        reload: 'Reload',
+        quit: 'Quit',
+        fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
       },
     },
     realm: {

@@ -54,6 +54,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Cài Đặt Chiến Lợi Phẩm: Chia Chủ Trì, Người Chia {name}, ngưỡng {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Ngưỡng chiến lợi phẩm được đặt thành {threshold}.',
   'hudChrome.options.showDevBadges': 'Hiện Huy Hiệu Nhà Phát Triển',
+  'hudChrome.options.groundReticle': 'Vòng ngắm mục tiêu mặt đất',
   'hudChrome.options.startAttackOnAbility': 'Tự Đánh Khi Dùng Kỹ Năng',
   'hudChrome.party.promoteLeader': 'Thăng Làm Đội Trưởng',
   'hudChrome.plurals.playersMatching.few': 'Ai: {count} người chơi khớp "{query}" trên {realm}.',
@@ -568,6 +569,21 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.description':
     'Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
   'entities.abilities.fireball.name': 'Cầu Lửa',
+  'entities.abilities.rain_of_fire.name': 'Mưa Lửa',
+  'entities.abilities.rain_of_fire.description':
+    'Trút một cơn mưa lửa xuống khu vực mục tiêu, thiêu đốt kẻ địch gây {damage} sát thương Lửa.',
+  'entities.abilities.volley.name': 'Loạt Tên',
+  'entities.abilities.volley.description':
+    'Trút mưa tên xuống khu vực mục tiêu, gây {damage} sát thương cho kẻ địch bên trong.',
+  'entities.abilities.hurricane.name': 'Cuồng Phong',
+  'entities.abilities.hurricane.description':
+    'Triệu hồi cuồng phong xuống khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên.',
+  'entities.abilities.earthquake.name': 'Động Đất',
+  'entities.abilities.earthquake.description':
+    'Làm rung chuyển khu vực mục tiêu, quật ngã kẻ địch gây {damage} sát thương Thiên Nhiên.',
+  'entities.abilities.flamestrike.name': 'Cú Đánh Lửa',
+  'entities.abilities.flamestrike.description':
+    'Gọi một vụ nổ lửa xuống khu vực mục tiêu, gây {damage} sát thương Lửa cho kẻ địch trong vụ nổ.',
   'entities.abilities.flame_shock.description':
     'Thiêu đốt mục tiêu bằng lửa gây 25 sát thương cộng thêm {damage} trong 12 giây.',
   'entities.abilities.flame_shock.name': 'Chấn Hỏa',
@@ -5033,4 +5049,65 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Cần Trợ Giúp',
   'hudChrome.discord.relay.help.hint': 'Nhờ cộng đồng giúp đỡ',
   'hudChrome.options.showSecondaryActionBar': 'Hiện Thanh Hành Động Phụ',
+  'desktop.crash.body': 'Khung trò chơi đã ngừng hoạt động. Tải lại chứ?',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại.',
+  'desktop.crash.quit': 'Thoát',
+  'desktop.crash.reload': 'Tải lại',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.update.downloading': 'Đang tải bản cập nhật {version}...',
+  'desktop.update.later': 'Để sau',
+  'desktop.update.ready':
+    'Bản cập nhật {version} đã sẵn sàng. Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.',
+  'desktop.update.restart': 'Khởi động lại ngay',
+  'hudChrome.dailyRewards.close': 'Đóng phần thưởng hằng ngày',
+  'hudChrome.dailyRewards.endsIn': 'Kết thúc sau {time}',
+  'hudChrome.dailyRewards.error': 'Không thể tải phần thưởng hằng ngày.',
+  'hudChrome.dailyRewards.history': 'Người Thắng Trước Đây',
+  'hudChrome.dailyRewards.intro':
+    'Giữ đủ WOC trong ví đã xác minh của bạn để mở khóa phần thưởng hằng ngày. Kiếm điểm bằng một lượt quay mỗi ngày và các nhiệm vụ luân phiên, rồi leo lên bảng xếp hạng hằng ngày để nhận phần chia từ quỹ giải thưởng.',
+  'hudChrome.dailyRewards.leaderboard': 'Bảng Xếp Hạng Hằng Ngày',
+  'hudChrome.dailyRewards.loading': 'Đang tải phần thưởng hằng ngày...',
+  'hudChrome.dailyRewards.noHistory': 'Chưa có khoản chi trả nào.',
+  'hudChrome.dailyRewards.noLeaders': 'Chưa có điểm nào.',
+  'hudChrome.dailyRewards.prize': 'Quỹ Giải Thưởng',
+  'hudChrome.dailyRewards.reason.eligible': 'Đã mở khóa phần thưởng.',
+  'hudChrome.dailyRewards.reason.no_wallet': 'Kết nối một ví có ít nhất 20 USD WOC.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'Giá WOC hiện không có sẵn, phần thưởng tạm thời bị khóa.',
+  'hudChrome.dailyRewards.reason.under_minimum': 'Ví thấp hơn mức tối thiểu 20 USD WOC.',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}h {minutes}p',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1p',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}p',
+  'hudChrome.dailyRewards.reset': 'Đặt Lại',
+  'hudChrome.dailyRewards.score': 'Điểm',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.spinButton': 'Quay',
+  'hudChrome.dailyRewards.spinClaimed': 'Đã nhận: +{points} điểm.',
+  'hudChrome.dailyRewards.spinClose': 'Đóng lượt quay hằng ngày',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Vòng Quay Phần Thưởng Hằng Ngày',
+  'hudChrome.dailyRewards.spinReady': 'Một lượt quay đã sẵn sàng.',
+  'hudChrome.dailyRewards.spinResult': '+{points} điểm',
+  'hudChrome.dailyRewards.spinTitle': 'Vòng Quay Hằng Ngày',
+  'hudChrome.dailyRewards.tasks': 'Nhiệm Vụ',
+  'hudChrome.dailyRewards.title': 'Phần Thưởng Hằng Ngày',
+  'hudChrome.dailyRewards.unknown': 'Không rõ',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Xác minh một ví Solana có WOC để mở khóa phần thưởng hằng ngày.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Xác Minh Ví',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Xác Minh Ví',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Giữ ít nhất {amount} USD WOC để mở khóa phần thưởng hằng ngày.',
+  'hudChrome.dailyRewards.walletHoldTitle': 'Giữ WOC',
+  'hudChrome.dailyRewards.walletPriceBody': 'Hiện chưa có giá WOC. Vui lòng quay lại sau ít phút.',
+  'hudChrome.dailyRewards.walletValue': 'Giá Trị Ví (WOC)',
+  'hudChrome.nativeUpdate.body':
+    'Đã có phiên bản mới của World of ClaudeCraft. Cập nhật ngay để nhận các bản sửa lỗi và cải tiến mới nhất.',
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    'Đã có phiên bản {version} của World of ClaudeCraft. Cập nhật ngay để nhận các bản sửa lỗi và cải tiến mới nhất.',
+  'hudChrome.nativeUpdate.notNow': 'Không phải bây giờ',
+  'hudChrome.nativeUpdate.title': 'Có Bản Cập Nhật',
+  'hudChrome.nativeUpdate.update': 'Cập Nhật',
+  'errors.api.desktopCodeInvalid':
+    'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
 };

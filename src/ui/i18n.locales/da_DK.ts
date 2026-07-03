@@ -52,6 +52,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bytteindstillinger: Mesterbytte, bytteleder {name}, tærskel {threshold}.',
   'hudChrome.masterLoot.thresholdSet': 'Byttetærskel sat til {threshold}.',
   'hudChrome.options.showDevBadges': 'Vis udviklermærker',
+  'hudChrome.options.groundReticle': 'Jordsigte-retikel',
   'hudChrome.options.startAttackOnAbility': 'Autoangreb ved brug af evne',
   'hudChrome.party.promoteLeader': 'Forfrem til leder',
   'hudChrome.plurals.playersMatching.few':
@@ -561,6 +562,21 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball.description':
     'Slynger en flammende kugle, der volder {damage} ildskade plus yderligere skade over tid.',
   'entities.abilities.fireball.name': 'Ildkugle',
+  'entities.abilities.rain_of_fire.name': 'Ildregn',
+  'entities.abilities.rain_of_fire.description':
+    'Nedkalder en ildregn over målområdet og brænder fjender for {damage} Ildskade.',
+  'entities.abilities.volley.name': 'Pileregn',
+  'entities.abilities.volley.description':
+    'Nedkalder en regn af pile over målområdet og påfører {damage} skade på fjender i det.',
+  'entities.abilities.hurricane.name': 'Orkan',
+  'entities.abilities.hurricane.description':
+    'Slipper en orkan løs over målområdet og rammer fjender for {damage} Naturskade.',
+  'entities.abilities.earthquake.name': 'Jordskælv',
+  'entities.abilities.earthquake.description':
+    'Ryster målområdet og rammer fjender for {damage} Naturskade.',
+  'entities.abilities.flamestrike.name': 'Flammeslag',
+  'entities.abilities.flamestrike.description':
+    'Nedkalder en flammeeksplosion på målområdet, der giver {damage} Ildskade til fjender fanget i eksplosionen.',
   'entities.abilities.flame_shock.description':
     'Svider målet med ild for 25 skade plus {damage} over 12 sek.',
   'entities.abilities.flame_shock.name': 'Flammechok',
@@ -5002,4 +5018,66 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Brug for hjælp',
   'hudChrome.discord.relay.help.hint': 'Bed fællesskabet om hjælp',
   'hudChrome.options.showSecondaryActionBar': 'Vis sekundær handlingslinje',
+  'desktop.crash.body': 'Spilvisningen holdt op med at virke. Genindlæs den?',
+  'desktop.crash.fatalBody': 'World of ClaudeCraft stødte på en uventet fejl og skal lukke.',
+  'desktop.crash.quit': 'Afslut',
+  'desktop.crash.reload': 'Genindlæs',
+  'desktop.crash.title': 'World of ClaudeCraft',
+  'desktop.update.downloading': 'Downloader opdatering {version}...',
+  'desktop.update.later': 'Senere',
+  'desktop.update.ready':
+    'Opdatering {version} er klar. Den installeres, når du afslutter, eller genstart nu.',
+  'desktop.update.restart': 'Genstart nu',
+  'hudChrome.dailyRewards.close': 'Luk daglige belønninger',
+  'hudChrome.dailyRewards.endsIn': 'Slutter om {time}',
+  'hudChrome.dailyRewards.error': 'Kunne ikke indlæse daglige belønninger.',
+  'hudChrome.dailyRewards.history': 'Tidligere vindere',
+  'hudChrome.dailyRewards.intro':
+    'Behold nok WOC i din verificerede wallet for at låse daglige belønninger op. Optjen point med én daglig drejning og skiftende opgaver, og klatr så op ad den daglige resultattavle for en andel af præmiepuljen.',
+  'hudChrome.dailyRewards.leaderboard': 'Daglig resultattavle',
+  'hudChrome.dailyRewards.loading': 'Indlæser daglige belønninger...',
+  'hudChrome.dailyRewards.noHistory': 'Ingen udbetalinger endnu.',
+  'hudChrome.dailyRewards.noLeaders': 'Ingen point endnu.',
+  'hudChrome.dailyRewards.prize': 'Præmiepulje',
+  'hudChrome.dailyRewards.reason.eligible': 'Belønninger låst op.',
+  'hudChrome.dailyRewards.reason.no_wallet': 'Forbind en wallet med mindst 20 USD i WOC.',
+  'hudChrome.dailyRewards.reason.price_unavailable':
+    'WOC-prisen er utilgængelig, belønninger er midlertidigt låst.',
+  'hudChrome.dailyRewards.reason.under_minimum': 'Wallet er under WOC-minimummet på 20 USD.',
+  'hudChrome.dailyRewards.remainingHoursMinutes': '{hours}t {minutes}m',
+  'hudChrome.dailyRewards.remainingLessThanMinute': '<1m',
+  'hudChrome.dailyRewards.remainingMinutes': '{minutes}m',
+  'hudChrome.dailyRewards.reset': 'Nulstil',
+  'hudChrome.dailyRewards.score': 'Score',
+  'hudChrome.dailyRewards.sol': '{amount} SOL',
+  'hudChrome.dailyRewards.spinButton': 'Drej',
+  'hudChrome.dailyRewards.spinClaimed': 'Indløst: +{points} point.',
+  'hudChrome.dailyRewards.spinClose': 'Luk daglig drejning',
+  'hudChrome.dailyRewards.spinDialogTitle': 'Daglig belønningsdrejning',
+  'hudChrome.dailyRewards.spinReady': 'Én drejning er klar.',
+  'hudChrome.dailyRewards.spinResult': '+{points} point',
+  'hudChrome.dailyRewards.spinTitle': 'Daglig drejning',
+  'hudChrome.dailyRewards.tasks': 'Opgaver',
+  'hudChrome.dailyRewards.title': 'Daglige belønninger',
+  'hudChrome.dailyRewards.unknown': 'Ukendt',
+  'hudChrome.dailyRewards.usd': '{amount} USD',
+  'hudChrome.dailyRewards.walletConnectBody':
+    'Verificer en Solana-wallet med WOC for at låse daglige belønninger op.',
+  'hudChrome.dailyRewards.walletConnectButton': 'Verificer wallet',
+  'hudChrome.dailyRewards.walletConnectTitle': 'Verificer wallet',
+  'hudChrome.dailyRewards.walletHoldBody':
+    'Behold mindst {amount} USD i WOC for at låse daglige belønninger op.',
+  'hudChrome.dailyRewards.walletHoldTitle': 'Behold WOC',
+  'hudChrome.dailyRewards.walletPriceBody':
+    'WOC-prissætning er utilgængelig lige nu. Kom tilbage om lidt.',
+  'hudChrome.dailyRewards.walletValue': 'Wallet-værdi (WOC)',
+  'hudChrome.nativeUpdate.body':
+    'En ny version af World of ClaudeCraft er tilgængelig. Opdater nu for de nyeste rettelser og forbedringer.',
+  'hudChrome.nativeUpdate.bodyWithVersion':
+    'Version {version} af World of ClaudeCraft er tilgængelig. Opdater nu for de nyeste rettelser og forbedringer.',
+  'hudChrome.nativeUpdate.notNow': 'Ikke nu',
+  'hudChrome.nativeUpdate.title': 'Opdatering tilgængelig',
+  'hudChrome.nativeUpdate.update': 'Opdater',
+  'errors.api.desktopCodeInvalid':
+    'Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.',
 };
