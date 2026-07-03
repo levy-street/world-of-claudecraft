@@ -19,7 +19,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 389,
+      "nextId": 441,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -33,9 +33,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 399,
-      "state": "92346510",
-      "events": "55115cfb",
+      "nextId": 451,
+      "state": "83a41c37",
+      "events": "1127c801",
       "rng": {
         "draws": 4,
         "digest": "9c74b095"
@@ -53,12 +53,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -76,12 +77,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -96,12 +98,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -116,12 +119,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -136,12 +140,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -157,7 +162,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.05,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -205,7 +210,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -252,7 +257,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -299,7 +304,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -346,7 +351,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -385,7 +390,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -394,7 +399,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 51239,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -430,7 +435,7 @@
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -445,8 +450,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 399,
-      "state": "624c03c1",
+      "nextId": 451,
+      "state": "6ca3301e",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -456,9 +461,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 399,
-      "state": "d49797a6",
-      "events": "741638a5",
+      "nextId": 451,
+      "state": "15ffb165",
+      "events": "90dbd9f0",
       "rng": {
         "draws": 4,
         "digest": "9c74b095"
@@ -467,9 +472,9 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 399,
-      "state": "b2801b16",
-      "events": "039953e8",
+      "nextId": 451,
+      "state": "24940cbf",
+      "events": "ddd25c13",
       "rng": {
         "draws": 5,
         "digest": "8541dce9"
@@ -478,8 +483,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 399,
-      "state": "c59b562c",
+      "nextId": 451,
+      "state": "4c1882a5",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -489,9 +494,9 @@
     {
       "tick": 42,
       "time": 2.1,
-      "nextId": 401,
-      "state": "e95af836",
-      "events": "4d86f7cf",
+      "nextId": 453,
+      "state": "884feb73",
+      "events": "3bffd937",
       "rng": {
         "draws": 11,
         "digest": "45e91248"
@@ -509,12 +514,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -532,12 +538,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -552,12 +559,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -572,12 +580,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -592,12 +601,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -614,7 +624,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 101.1,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -662,7 +672,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -709,7 +719,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -756,7 +766,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -803,7 +813,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -842,7 +852,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "combatTimer": 0.6,
           "critChance": 0.05,
@@ -852,7 +862,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 51239,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -886,14 +896,14 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 0.55,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -904,7 +914,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "chase",
           "combatTimer": 99.05,
           "critChance": 0.05,
@@ -914,7 +924,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -943,7 +953,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -954,7 +964,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "chase",
           "combatTimer": 99.05,
           "critChance": 0.05,
@@ -964,7 +974,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -993,7 +1003,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -1008,9 +1018,9 @@
     {
       "tick": 43,
       "time": 2.15,
-      "nextId": 402,
-      "state": "1b11dbf9",
-      "events": "8024e9a5",
+      "nextId": 454,
+      "state": "c48be39b",
+      "events": "d1ee43d4",
       "rng": {
         "draws": 15,
         "digest": "6407bd16"
@@ -1028,12 +1038,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -1051,12 +1062,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1071,12 +1083,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1091,12 +1104,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1111,12 +1125,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1135,7 +1150,7 @@
               "name": "War Stomp",
               "remaining": 21.5,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 0.65,
@@ -1144,7 +1159,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 101.15,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1194,7 +1209,7 @@
               "name": "War Stomp",
               "remaining": 21.5,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 101.15,
@@ -1203,7 +1218,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1252,7 +1267,7 @@
               "name": "War Stomp",
               "remaining": 21.5,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 101.15,
@@ -1261,7 +1276,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1310,7 +1325,7 @@
               "name": "War Stomp",
               "remaining": 21.5,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 101.15,
@@ -1319,7 +1334,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1368,7 +1383,7 @@
               "name": "War Stomp",
               "remaining": 21.5,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 101.15,
@@ -1377,7 +1392,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1416,7 +1431,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "auras": [
             {
@@ -1426,7 +1441,7 @@
               "name": "War Stomp",
               "remaining": 21.45,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 0.65,
@@ -1437,7 +1452,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 35354,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1473,14 +1488,14 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 0.55,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -1500,7 +1515,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -1510,7 +1525,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1548,7 +1563,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -1558,7 +1573,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1596,7 +1611,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -1606,7 +1621,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1635,7 +1650,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "chase",
           "auras": [
             {
@@ -1645,7 +1660,7 @@
               "name": "War Stomp",
               "remaining": 21.45,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 99.1,
@@ -1656,7 +1671,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1685,7 +1700,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -1696,7 +1711,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "chase",
           "auras": [
             {
@@ -1706,7 +1721,7 @@
               "name": "War Stomp",
               "remaining": 21.45,
               "school": "physical",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 99.1,
@@ -1717,7 +1732,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1746,7 +1761,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -1764,7 +1779,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1798,8 +1813,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 402,
-      "state": "0bebdac1",
+      "nextId": 454,
+      "state": "94e5f167",
       "events": "741638a5",
       "rng": {
         "draws": 37,
@@ -1809,8 +1824,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 402,
-      "state": "af4e8580",
+      "nextId": 454,
+      "state": "c8bf206e",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -1820,8 +1835,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 402,
-      "state": "f61b9d63",
+      "nextId": 454,
+      "state": "311dc66d",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -1831,9 +1846,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 402,
-      "state": "b2fea458",
-      "events": "1e095a5a",
+      "nextId": 454,
+      "state": "3f9393fa",
+      "events": "e6c64b59",
       "rng": {
         "draws": 166,
         "digest": "8e452b5f"
@@ -1842,9 +1857,9 @@
     {
       "tick": 90,
       "time": 4.5,
-      "nextId": 402,
-      "state": "aeb424f3",
-      "events": "3dd8954c",
+      "nextId": 454,
+      "state": "1737f1b9",
+      "events": "99117662",
       "rng": {
         "draws": 228,
         "digest": "4934231a"
@@ -1853,8 +1868,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 402,
-      "state": "8a323f52",
+      "nextId": 454,
+      "state": "4f68401c",
       "events": "741638a5",
       "rng": {
         "draws": 287,
@@ -1864,8 +1879,8 @@
     {
       "tick": 110,
       "time": 5.5,
-      "nextId": 402,
-      "state": "0ed2c7ee",
+      "nextId": 454,
+      "state": "b4d11f54",
       "events": "741638a5",
       "rng": {
         "draws": 341,
@@ -1875,8 +1890,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 402,
-      "state": "5f8acabf",
+      "nextId": 454,
+      "state": "6cba1169",
       "events": "741638a5",
       "rng": {
         "draws": 391,
@@ -1886,9 +1901,9 @@
     {
       "tick": 130,
       "time": 6.5,
-      "nextId": 402,
-      "state": "0dc45249",
-      "events": "86492e36",
+      "nextId": 454,
+      "state": "e0524521",
+      "events": "e96c79ee",
       "rng": {
         "draws": 452,
         "digest": "cce4f2c4"
@@ -1897,9 +1912,9 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 402,
-      "state": "1ace780e",
-      "events": "ff9fcc35",
+      "nextId": 454,
+      "state": "f0b2f130",
+      "events": "ea1a6587",
       "rng": {
         "draws": 517,
         "digest": "0a711af8"
@@ -1908,8 +1923,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 402,
-      "state": "394350a4",
+      "nextId": 454,
+      "state": "266d0cde",
       "events": "741638a5",
       "rng": {
         "draws": 558,
@@ -1919,8 +1934,8 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 402,
-      "state": "8d1fee65",
+      "nextId": 454,
+      "state": "42e5874f",
       "events": "741638a5",
       "rng": {
         "draws": 613,
@@ -1930,9 +1945,9 @@
     {
       "tick": 170,
       "time": 8.5,
-      "nextId": 402,
-      "state": "65b344a1",
-      "events": "3ca06530",
+      "nextId": 454,
+      "state": "70eb85c9",
+      "events": "34a0da43",
       "rng": {
         "draws": 684,
         "digest": "d88b1f24"
@@ -1941,9 +1956,9 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 402,
-      "state": "3b3d5056",
-      "events": "d5c33d24",
+      "nextId": 454,
+      "state": "04dbdc66",
+      "events": "19e23476",
       "rng": {
         "draws": 781,
         "digest": "e6aece32"
@@ -1952,9 +1967,9 @@
     {
       "tick": 190,
       "time": 9.5,
-      "nextId": 402,
-      "state": "34f8fbd1",
-      "events": "47540794",
+      "nextId": 454,
+      "state": "37106cc1",
+      "events": "0c3dbb17",
       "rng": {
         "draws": 856,
         "digest": "fab0fec8"
@@ -1963,8 +1978,8 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 402,
-      "state": "1c9fbaec",
+      "nextId": 454,
+      "state": "145a39d4",
       "events": "741638a5",
       "rng": {
         "draws": 922,
@@ -1974,8 +1989,8 @@
     {
       "tick": 203,
       "time": 10.15,
-      "nextId": 402,
-      "state": "ddbc5b4f",
+      "nextId": 454,
+      "state": "d0ea4061",
       "events": "741638a5",
       "rng": {
         "draws": 938,
@@ -1994,12 +2009,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -2017,12 +2033,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2037,12 +2054,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2057,12 +2075,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2077,12 +2096,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2099,7 +2119,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 109.15,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2149,7 +2169,7 @@
               "name": "Soul Rend",
               "remaining": 6.05,
               "school": "shadow",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 109.15,
@@ -2158,7 +2178,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2205,7 +2225,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2254,7 +2274,7 @@
               "name": "Soul Rend",
               "remaining": 6.05,
               "school": "shadow",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 109.15,
@@ -2263,7 +2283,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2312,7 +2332,7 @@
               "name": "Soul Rend",
               "remaining": 6.05,
               "school": "shadow",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 109.15,
@@ -2321,7 +2341,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2360,7 +2380,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "combatTimer": 1.1,
           "critChance": 0.05,
@@ -2370,7 +2390,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 35354,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2388,15 +2408,15 @@
             "raiseFallenTimer": 45,
             "soulRendMarks": [
               {
-                "playerId": 392,
+                "playerId": 444,
                 "remaining": 6.05
               },
               {
-                "playerId": 390,
+                "playerId": 442,
                 "remaining": 6.05
               },
               {
-                "playerId": 393,
+                "playerId": 445,
                 "remaining": 6.05
               }
             ],
@@ -2420,14 +2440,14 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 1.5,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -2447,7 +2467,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -2457,7 +2477,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2495,7 +2515,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -2505,7 +2525,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2543,7 +2563,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -2553,7 +2573,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2582,7 +2602,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "combatTimer": 1.35,
           "critChance": 0.05,
@@ -2592,7 +2612,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2622,7 +2642,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -2633,7 +2653,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "combatTimer": 1.35,
           "critChance": 0.05,
@@ -2643,7 +2663,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2673,7 +2693,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -2691,7 +2711,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2725,9 +2745,9 @@
     {
       "tick": 204,
       "time": 10.2,
-      "nextId": 402,
-      "state": "8a9bcf77",
-      "events": "5cea2cdc",
+      "nextId": 454,
+      "state": "bb03296f",
+      "events": "24f80fff",
       "rng": {
         "draws": 942,
         "digest": "b1fe43b0"
@@ -2745,12 +2765,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -2768,12 +2789,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2788,12 +2810,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2808,12 +2831,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2828,12 +2852,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167200,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -2850,7 +2875,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 109.2,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2900,7 +2925,7 @@
               "name": "Soul Rend",
               "remaining": 6,
               "school": "shadow",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 109.2,
@@ -2909,7 +2934,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2958,7 +2983,7 @@
               "name": "Soul Rend",
               "remaining": 8,
               "school": "shadow",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 109.2,
@@ -2967,7 +2992,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3016,7 +3041,7 @@
               "name": "Soul Rend",
               "remaining": 8,
               "school": "shadow",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 109.2,
@@ -3025,7 +3050,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3074,7 +3099,7 @@
               "name": "Soul Rend",
               "remaining": 8,
               "school": "shadow",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 109.2,
@@ -3083,7 +3108,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3122,7 +3147,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "combatTimer": 1.15,
           "critChance": 0.05,
@@ -3132,7 +3157,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 35354,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -3150,15 +3175,15 @@
             "raiseFallenTimer": 45,
             "soulRendMarks": [
               {
-                "playerId": 392,
+                "playerId": 444,
                 "remaining": 8
               },
               {
-                "playerId": 391,
+                "playerId": 443,
                 "remaining": 8
               },
               {
-                "playerId": 393,
+                "playerId": 445,
                 "remaining": 8
               }
             ],
@@ -3182,14 +3207,14 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 1.45,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -3209,7 +3234,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -3219,7 +3244,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3257,7 +3282,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -3267,7 +3292,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3305,7 +3330,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -3315,7 +3340,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3344,7 +3369,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "combatTimer": 1.4,
           "critChance": 0.05,
@@ -3354,7 +3379,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3384,7 +3409,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -3395,7 +3420,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "combatTimer": 1.4,
           "critChance": 0.05,
@@ -3405,7 +3430,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1569,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3435,7 +3460,7 @@
           "templateId": "nythraxis_skeleton_warrior",
           "threat": [
             [
-              389,
+              441,
               1
             ]
           ],
@@ -3453,7 +3478,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3487,8 +3512,8 @@
     {
       "tick": 210,
       "time": 10.5,
-      "nextId": 402,
-      "state": "86697823",
+      "nextId": 454,
+      "state": "420a9d43",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -3498,9 +3523,9 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 402,
-      "state": "25fbb149",
-      "events": "468735c2",
+      "nextId": 454,
+      "state": "25c04371",
+      "events": "91a64410",
       "rng": {
         "draws": 1005,
         "digest": "2f3c2dea"
@@ -3509,8 +3534,8 @@
     {
       "tick": 230,
       "time": 11.5,
-      "nextId": 402,
-      "state": "9a1245f6",
+      "nextId": 454,
+      "state": "b899843e",
       "events": "741638a5",
       "rng": {
         "draws": 1055,
@@ -3520,9 +3545,9 @@
     {
       "tick": 240,
       "time": 12,
-      "nextId": 402,
-      "state": "1176ebe6",
-      "events": "c980c9a9",
+      "nextId": 454,
+      "state": "31a44e26",
+      "events": "da3a6a0e",
       "rng": {
         "draws": 1101,
         "digest": "fd44a4e2"
@@ -3531,8 +3556,8 @@
     {
       "tick": 250,
       "time": 12.5,
-      "nextId": 402,
-      "state": "203d514e",
+      "nextId": 454,
+      "state": "3cdcb35e",
       "events": "741638a5",
       "rng": {
         "draws": 1139,
@@ -3542,8 +3567,8 @@
     {
       "tick": 260,
       "time": 13,
-      "nextId": 402,
-      "state": "73e7aba8",
+      "nextId": 454,
+      "state": "706000c0",
       "events": "741638a5",
       "rng": {
         "draws": 1190,
@@ -3553,9 +3578,9 @@
     {
       "tick": 270,
       "time": 13.5,
-      "nextId": 402,
-      "state": "65bb5bd6",
-      "events": "0c5fe52e",
+      "nextId": 454,
+      "state": "818eb15e",
+      "events": "ba6bea7c",
       "rng": {
         "draws": 1230,
         "digest": "3fea8dc1"
@@ -3564,8 +3589,8 @@
     {
       "tick": 280,
       "time": 14,
-      "nextId": 402,
-      "state": "2a0f8b37",
+      "nextId": 454,
+      "state": "849b46db",
       "events": "741638a5",
       "rng": {
         "draws": 1288,
@@ -3575,9 +3600,9 @@
     {
       "tick": 290,
       "time": 14.5,
-      "nextId": 402,
-      "state": "f634204a",
-      "events": "f181591e",
+      "nextId": 454,
+      "state": "f8875666",
+      "events": "68bb87fd",
       "rng": {
         "draws": 1345,
         "digest": "5124c1e4"
@@ -3586,8 +3611,8 @@
     {
       "tick": 300,
       "time": 15,
-      "nextId": 402,
-      "state": "33a70396",
+      "nextId": 454,
+      "state": "cacf8a92",
       "events": "741638a5",
       "rng": {
         "draws": 1387,
@@ -3597,9 +3622,9 @@
     {
       "tick": 310,
       "time": 15.5,
-      "nextId": 402,
-      "state": "39572691",
-      "events": "dea068c9",
+      "nextId": 454,
+      "state": "5b4516a1",
+      "events": "3105c60b",
       "rng": {
         "draws": 1447,
         "digest": "d5d6f706"
@@ -3608,8 +3633,8 @@
     {
       "tick": 320,
       "time": 16,
-      "nextId": 402,
-      "state": "1fc18493",
+      "nextId": 454,
+      "state": "32c2ee23",
       "events": "741638a5",
       "rng": {
         "draws": 1505,
@@ -3619,9 +3644,9 @@
     {
       "tick": 330,
       "time": 16.5,
-      "nextId": 402,
-      "state": "c27fc283",
-      "events": "4fbc2fbc",
+      "nextId": 454,
+      "state": "77934cf7",
+      "events": "acbd93fe",
       "rng": {
         "draws": 1538,
         "digest": "af6fa6c5"
@@ -3630,9 +3655,9 @@
     {
       "tick": 340,
       "time": 17,
-      "nextId": 402,
-      "state": "13ea7742",
-      "events": "603c98bc",
+      "nextId": 454,
+      "state": "6c071536",
+      "events": "65fcc64f",
       "rng": {
         "draws": 1583,
         "digest": "507f9a39"
@@ -3641,8 +3666,8 @@
     {
       "tick": 350,
       "time": 17.5,
-      "nextId": 402,
-      "state": "5e708873",
+      "nextId": 454,
+      "state": "99cb1d23",
       "events": "741638a5",
       "rng": {
         "draws": 1623,
@@ -3652,9 +3677,9 @@
     {
       "tick": 360,
       "time": 18,
-      "nextId": 402,
-      "state": "90bdc01b",
-      "events": "92223f93",
+      "nextId": 454,
+      "state": "115b690f",
+      "events": "0133ae55",
       "rng": {
         "draws": 1677,
         "digest": "0d767fc6"
@@ -3663,9 +3688,9 @@
     {
       "tick": 370,
       "time": 18.5,
-      "nextId": 402,
-      "state": "9a9711fe",
-      "events": "17d92e64",
+      "nextId": 454,
+      "state": "2c16c1c6",
+      "events": "f5e16ab6",
       "rng": {
         "draws": 1732,
         "digest": "6b590bb2"
@@ -3674,8 +3699,8 @@
     {
       "tick": 380,
       "time": 19,
-      "nextId": 402,
-      "state": "41775fa6",
+      "nextId": 454,
+      "state": "224830e2",
       "events": "741638a5",
       "rng": {
         "draws": 1798,
@@ -3685,9 +3710,9 @@
     {
       "tick": 386,
       "time": 19.3,
-      "nextId": 402,
-      "state": "63e7bb49",
-      "events": "461410ba",
+      "nextId": 454,
+      "state": "7d9cefa1",
+      "events": "63283f45",
       "rng": {
         "draws": 1825,
         "digest": "9323f156"
@@ -3708,12 +3733,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -3733,12 +3759,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3756,12 +3783,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3779,12 +3807,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3802,12 +3831,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -3824,7 +3854,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 118.3,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -3872,7 +3902,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3919,7 +3949,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -3967,7 +3997,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -4015,7 +4045,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -4055,7 +4085,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "castRemaining": 10,
           "castTotal": 10,
@@ -4068,7 +4098,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 35354,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -4091,15 +4121,15 @@
             "transitionStarted": true,
             "wardChannels": [
               {
-                "objectId": 395,
+                "objectId": 447,
                 "remaining": 5
               },
               {
-                "objectId": 396,
+                "objectId": 448,
                 "remaining": 5
               },
               {
-                "objectId": 397,
+                "objectId": 449,
                 "remaining": 5
               }
             ]
@@ -4120,14 +4150,14 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 0.35,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -4147,7 +4177,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -4157,7 +4187,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4195,7 +4225,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -4205,7 +4235,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4243,7 +4273,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -4253,7 +4283,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -4291,7 +4321,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -4301,11 +4331,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -4326,7 +4356,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -4344,7 +4374,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -4354,11 +4384,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -4379,7 +4409,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -4395,7 +4425,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4429,9 +4459,9 @@
     {
       "tick": 390,
       "time": 19.5,
-      "nextId": 402,
-      "state": "d0e0f8bf",
-      "events": "596991d4",
+      "nextId": 454,
+      "state": "196378a1",
+      "events": "45092c1c",
       "rng": {
         "draws": 1856,
         "digest": "5e883000"
@@ -4440,9 +4470,9 @@
     {
       "tick": 400,
       "time": 20,
-      "nextId": 402,
-      "state": "a5a0a1b2",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "dbdf1c6c",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 1908,
         "digest": "4206c27f"
@@ -4451,9 +4481,9 @@
     {
       "tick": 410,
       "time": 20.5,
-      "nextId": 402,
-      "state": "e79c1b2c",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "0b5e9a86",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 1947,
         "digest": "af49ca88"
@@ -4462,9 +4492,9 @@
     {
       "tick": 420,
       "time": 21,
-      "nextId": 402,
-      "state": "f4a53275",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "2f160283",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 2001,
         "digest": "10451f13"
@@ -4473,9 +4503,9 @@
     {
       "tick": 430,
       "time": 21.5,
-      "nextId": 402,
-      "state": "e4a74c05",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "9e875adb",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 2050,
         "digest": "5bccda1b"
@@ -4484,9 +4514,9 @@
     {
       "tick": 440,
       "time": 22,
-      "nextId": 402,
-      "state": "fdf09d60",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "fb5f318e",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 2112,
         "digest": "da3978b1"
@@ -4495,9 +4525,9 @@
     {
       "tick": 450,
       "time": 22.5,
-      "nextId": 402,
-      "state": "6c31c4a2",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "e73553c8",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 2158,
         "digest": "c3fd4752"
@@ -4506,9 +4536,9 @@
     {
       "tick": 460,
       "time": 23,
-      "nextId": 402,
-      "state": "a626c35b",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "5182d129",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 2195,
         "digest": "83270004"
@@ -4517,9 +4547,9 @@
     {
       "tick": 470,
       "time": 23.5,
-      "nextId": 402,
-      "state": "3a57525c",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "69b4fdaa",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 2241,
         "digest": "2e55ba3c"
@@ -4528,9 +4558,9 @@
     {
       "tick": 480,
       "time": 24,
-      "nextId": 402,
-      "state": "262948ad",
-      "events": "342b5477",
+      "nextId": 454,
+      "state": "adc2d903",
+      "events": "8b0ccb3f",
       "rng": {
         "draws": 2283,
         "digest": "9d7f43ef"
@@ -4539,9 +4569,9 @@
     {
       "tick": 490,
       "time": 24.5,
-      "nextId": 402,
-      "state": "ff43e93c",
-      "events": "04a7ee00",
+      "nextId": 454,
+      "state": "d60a0762",
+      "events": "06af97e2",
       "rng": {
         "draws": 2331,
         "digest": "5ad07f5d"
@@ -4550,8 +4580,8 @@
     {
       "tick": 500,
       "time": 25,
-      "nextId": 402,
-      "state": "d44a1b74",
+      "nextId": 454,
+      "state": "f845b8ce",
       "events": "741638a5",
       "rng": {
         "draws": 2383,
@@ -4561,8 +4591,8 @@
     {
       "tick": 506,
       "time": 25.3,
-      "nextId": 402,
-      "state": "5b732517",
+      "nextId": 454,
+      "state": "65ab6745",
       "events": "741638a5",
       "rng": {
         "draws": 2418,
@@ -4584,12 +4614,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -4609,12 +4640,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4632,12 +4664,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4655,12 +4688,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4678,12 +4712,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -4700,7 +4735,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 124.3,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -4749,7 +4784,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4797,7 +4832,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4845,7 +4880,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4892,7 +4927,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -4931,7 +4966,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "auras": [
             {
@@ -4941,7 +4976,7 @@
               "name": "Deathless Rage Interrupted",
               "remaining": 4,
               "school": "arcane",
-              "sourceId": 394
+              "sourceId": 446
             }
           ],
           "combatTimer": 7.05,
@@ -4952,7 +4987,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 35354,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -4976,18 +5011,18 @@
             "wardChannels": [
               {
                 "complete": true,
-                "objectId": 395,
-                "playerId": 390
+                "objectId": 447,
+                "playerId": 442
               },
               {
                 "complete": true,
-                "objectId": 396,
-                "playerId": 391
+                "objectId": 448,
+                "playerId": 443
               },
               {
                 "complete": true,
-                "objectId": 397,
-                "playerId": 392
+                "objectId": 449,
+                "playerId": 444
               }
             ]
           },
@@ -5007,14 +5042,14 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 0.35,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -5034,7 +5069,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -5044,7 +5079,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5082,7 +5117,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -5092,7 +5127,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5130,7 +5165,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -5140,7 +5175,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5178,7 +5213,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -5188,11 +5223,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -5213,7 +5248,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -5231,7 +5266,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -5241,11 +5276,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -5266,7 +5301,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -5282,7 +5317,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -5316,8 +5351,8 @@
     {
       "tick": 510,
       "time": 25.5,
-      "nextId": 402,
-      "state": "63ba484a",
+      "nextId": 454,
+      "state": "78adde04",
       "events": "741638a5",
       "rng": {
         "draws": 2433,
@@ -5327,8 +5362,8 @@
     {
       "tick": 520,
       "time": 26,
-      "nextId": 402,
-      "state": "c94f37d6",
+      "nextId": 454,
+      "state": "b37cc964",
       "events": "741638a5",
       "rng": {
         "draws": 2479,
@@ -5338,8 +5373,8 @@
     {
       "tick": 530,
       "time": 26.5,
-      "nextId": 402,
-      "state": "06b3cd1c",
+      "nextId": 454,
+      "state": "da67fc1e",
       "events": "741638a5",
       "rng": {
         "draws": 2536,
@@ -5349,8 +5384,8 @@
     {
       "tick": 540,
       "time": 27,
-      "nextId": 402,
-      "state": "5a7a634c",
+      "nextId": 454,
+      "state": "9e955cca",
       "events": "741638a5",
       "rng": {
         "draws": 2573,
@@ -5360,8 +5395,8 @@
     {
       "tick": 550,
       "time": 27.5,
-      "nextId": 402,
-      "state": "e868103e",
+      "nextId": 454,
+      "state": "e6d2e2d4",
       "events": "741638a5",
       "rng": {
         "draws": 2625,
@@ -5371,8 +5406,8 @@
     {
       "tick": 560,
       "time": 28,
-      "nextId": 402,
-      "state": "f20c42ea",
+      "nextId": 454,
+      "state": "5b3cbf1c",
       "events": "741638a5",
       "rng": {
         "draws": 2658,
@@ -5382,8 +5417,8 @@
     {
       "tick": 570,
       "time": 28.5,
-      "nextId": 402,
-      "state": "eb8880be",
+      "nextId": 454,
+      "state": "f4170eae",
       "events": "741638a5",
       "rng": {
         "draws": 2704,
@@ -5393,8 +5428,8 @@
     {
       "tick": 580,
       "time": 29,
-      "nextId": 402,
-      "state": "dd549f00",
+      "nextId": 454,
+      "state": "95175e58",
       "events": "741638a5",
       "rng": {
         "draws": 2763,
@@ -5404,9 +5439,9 @@
     {
       "tick": 590,
       "time": 29.5,
-      "nextId": 402,
-      "state": "0ec8f9d2",
-      "events": "bb4d1606",
+      "nextId": 454,
+      "state": "315130c0",
+      "events": "deceb8b0",
       "rng": {
         "draws": 2817,
         "digest": "00020e0e"
@@ -5415,9 +5450,9 @@
     {
       "tick": 600,
       "time": 30,
-      "nextId": 402,
-      "state": "74c54774",
-      "events": "eea19fcb",
+      "nextId": 454,
+      "state": "ae2327ba",
+      "events": "797c3d54",
       "rng": {
         "draws": 2860,
         "digest": "7c5d3231"
@@ -5426,8 +5461,8 @@
     {
       "tick": 610,
       "time": 30.5,
-      "nextId": 402,
-      "state": "e906566e",
+      "nextId": 454,
+      "state": "9bea1cf8",
       "events": "741638a5",
       "rng": {
         "draws": 2906,
@@ -5437,8 +5472,8 @@
     {
       "tick": 620,
       "time": 31,
-      "nextId": 402,
-      "state": "54291850",
+      "nextId": 454,
+      "state": "fcefb202",
       "events": "741638a5",
       "rng": {
         "draws": 2957,
@@ -5448,9 +5483,9 @@
     {
       "tick": 627,
       "time": 31.35,
-      "nextId": 402,
-      "state": "72e4519a",
-      "events": "e77e7089",
+      "nextId": 454,
+      "state": "bc96a656",
+      "events": "52c6b7be",
       "rng": {
         "draws": 2991,
         "digest": "dfc1b570"
@@ -5471,12 +5506,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -5496,12 +5532,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5519,12 +5556,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5542,12 +5580,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5565,12 +5604,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167366,
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -5587,7 +5627,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 130.35,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -5636,7 +5676,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -5684,7 +5724,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -5732,7 +5772,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -5779,7 +5819,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -5818,7 +5858,7 @@
           }
         },
         {
-          "aggroTargetId": 389,
+          "aggroTargetId": 441,
           "aiState": "attack",
           "auras": [
             {
@@ -5828,7 +5868,7 @@
               "name": "Final Stand",
               "remaining": 599.95,
               "school": "shadow",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1.45
             }
           ],
@@ -5841,7 +5881,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2049,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -5865,18 +5905,18 @@
             "wardChannels": [
               {
                 "complete": true,
-                "objectId": 395,
-                "playerId": 390
+                "objectId": 447,
+                "playerId": 442
               },
               {
                 "complete": true,
-                "objectId": 396,
-                "playerId": 391
+                "objectId": 448,
+                "playerId": 443
               },
               {
                 "complete": true,
-                "objectId": 397,
-                "playerId": 392
+                "objectId": 449,
+                "playerId": 444
               }
             ]
           },
@@ -5896,14 +5936,14 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 1.05,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "threat": [
             [
-              389,
+              441,
               1000
             ]
           ],
@@ -5923,7 +5963,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -5933,7 +5973,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -5971,7 +6011,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -5981,7 +6021,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6019,7 +6059,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -6029,7 +6069,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6067,7 +6107,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -6077,11 +6117,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -6102,7 +6142,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -6120,7 +6160,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -6130,11 +6170,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -6155,7 +6195,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -6171,7 +6211,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -6205,9 +6245,9 @@
     {
       "tick": 628,
       "time": 31.4,
-      "nextId": 402,
-      "state": "52976032",
-      "events": "da1da39a",
+      "nextId": 454,
+      "state": "958375d2",
+      "events": "9eb3d126",
       "rng": {
         "draws": 3002,
         "digest": "1aed0b18"
@@ -6228,12 +6268,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -6259,12 +6300,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -6288,12 +6330,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -6317,12 +6360,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -6346,12 +6390,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -6374,7 +6419,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 130.4,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -6423,7 +6468,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -6471,7 +6516,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -6519,7 +6564,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -6566,7 +6611,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -6615,7 +6660,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -6646,11 +6691,11 @@
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "lootable": true,
           "maxHp": 51239,
@@ -6673,18 +6718,18 @@
             "wardChannels": [
               {
                 "complete": true,
-                "objectId": 395,
-                "playerId": 390
+                "objectId": 447,
+                "playerId": 442
               },
               {
                 "complete": true,
-                "objectId": 396,
-                "playerId": 391
+                "objectId": 448,
+                "playerId": 443
               },
               {
                 "complete": true,
-                "objectId": 397,
-                "playerId": 392
+                "objectId": 449,
+                "playerId": 444
               }
             ]
           },
@@ -6705,11 +6750,11 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 1.05,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
             "max": 507,
@@ -6727,7 +6772,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -6737,7 +6782,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6775,7 +6820,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -6785,7 +6830,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6823,7 +6868,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -6833,7 +6878,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -6871,7 +6916,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -6881,11 +6926,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -6906,7 +6951,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -6924,7 +6969,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -6934,11 +6979,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -6959,7 +7004,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -6975,7 +7020,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -7009,8 +7054,8 @@
     {
       "tick": 630,
       "time": 31.5,
-      "nextId": 402,
-      "state": "51bc6507",
+      "nextId": 454,
+      "state": "66ce3307",
       "events": "741638a5",
       "rng": {
         "draws": 3009,
@@ -7020,8 +7065,8 @@
     {
       "tick": 640,
       "time": 32,
-      "nextId": 402,
-      "state": "5806f500",
+      "nextId": 454,
+      "state": "053571cc",
       "events": "741638a5",
       "rng": {
         "draws": 3055,
@@ -7031,8 +7076,8 @@
     {
       "tick": 650,
       "time": 32.5,
-      "nextId": 402,
-      "state": "64ef4900",
+      "nextId": 454,
+      "state": "a271efd4",
       "events": "741638a5",
       "rng": {
         "draws": 3091,
@@ -7042,8 +7087,8 @@
     {
       "tick": 660,
       "time": 33,
-      "nextId": 402,
-      "state": "11c3d39f",
+      "nextId": 454,
+      "state": "7cd31977",
       "events": "741638a5",
       "rng": {
         "draws": 3146,
@@ -7053,8 +7098,8 @@
     {
       "tick": 670,
       "time": 33.5,
-      "nextId": 402,
-      "state": "cfb838a5",
+      "nextId": 454,
+      "state": "7246153d",
       "events": "741638a5",
       "rng": {
         "draws": 3209,
@@ -7064,8 +7109,8 @@
     {
       "tick": 680,
       "time": 34,
-      "nextId": 402,
-      "state": "0d2bffbe",
+      "nextId": 454,
+      "state": "95de9772",
       "events": "741638a5",
       "rng": {
         "draws": 3263,
@@ -7075,9 +7120,9 @@
     {
       "tick": 688,
       "time": 34.4,
-      "nextId": 402,
-      "state": "dccf58b9",
-      "events": "17666c9a",
+      "nextId": 454,
+      "state": "7b133a5f",
+      "events": "567d5a9e",
       "rng": {
         "draws": 3299,
         "digest": "195346eb"
@@ -7098,12 +7143,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "questsDone": [
             "q_nythraxis_bound_guardian"
           ],
@@ -7129,12 +7175,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7158,12 +7205,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 443,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7187,12 +7235,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 444,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7216,12 +7265,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 445,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "lifetimeXp": 167449,
+          "mailWelcomed": true,
           "raidLockouts": [
             [
               "nythraxis_boss_arena",
@@ -7244,7 +7294,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 133.4,
           "hp": 812,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -7293,7 +7343,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
           "hp": 418,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -7341,7 +7391,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
           "hp": 418,
-          "id": 391,
+          "id": 443,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -7389,7 +7439,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
           "hp": 418,
-          "id": 392,
+          "id": 444,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -7436,7 +7486,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
           "hp": 418,
-          "id": 393,
+          "id": 445,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -7485,7 +7535,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 394,
+          "id": 446,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -7516,11 +7566,11 @@
           },
           "lootFfaTimer": 56.95,
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "lootable": true,
           "maxHp": 51239,
@@ -7543,18 +7593,18 @@
             "wardChannels": [
               {
                 "complete": true,
-                "objectId": 395,
-                "playerId": 390
+                "objectId": 447,
+                "playerId": 442
               },
               {
                 "complete": true,
-                "objectId": 396,
-                "playerId": 391
+                "objectId": 448,
+                "playerId": 443
               },
               {
                 "complete": true,
-                "objectId": 397,
-                "playerId": 392
+                "objectId": 449,
+                "playerId": 444
               }
             ]
           },
@@ -7575,11 +7625,11 @@
             "armor": 798
           },
           "summonedIds": [
-            399,
-            400
+            451,
+            452
           ],
           "swingTimer": 1.05,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
             "max": 507,
@@ -7597,7 +7647,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -7607,7 +7657,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 395,
+          "id": 447,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -7645,7 +7695,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -7655,7 +7705,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 396,
+          "id": 448,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -7693,7 +7743,7 @@
               "name": "Soul Ward",
               "remaining": 600,
               "school": "arcane",
-              "sourceId": 394,
+              "sourceId": 446,
               "value": 1
             }
           ],
@@ -7703,7 +7753,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 397,
+          "id": 449,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -7741,7 +7791,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 399,
+          "id": 451,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -7751,11 +7801,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -7776,7 +7826,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -7794,7 +7844,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 400,
+          "id": 452,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -7804,11 +7854,11 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "lootRecipientIds": [
-            389,
-            390,
-            391,
-            392,
-            393
+            441,
+            442,
+            443,
+            444,
+            445
           ],
           "maxHp": 1569,
           "moveSpeed": 10,
@@ -7829,7 +7879,7 @@
             "armor": 456
           },
           "swingTimer": 0.6,
-          "tappedById": 389,
+          "tappedById": 441,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
             "max": 248,
@@ -7845,7 +7895,7 @@
           "dodgeChance": 0.05,
           "fiveSecondRule": 99,
           "hp": 500,
-          "id": 401,
+          "id": 453,
           "kind": "npc",
           "level": 20,
           "lootFfaTimer": "Infinity",

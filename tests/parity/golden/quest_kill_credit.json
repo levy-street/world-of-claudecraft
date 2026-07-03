@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "969c1dc9",
+      "nextId": 442,
+      "state": "d6805978",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -34,11 +34,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -56,7 +57,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 389,
+          "id": 441,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -99,9 +100,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
-      "state": "fbb7708c",
-      "events": "d8fe6d87",
+      "nextId": 442,
+      "state": "ad16f899",
+      "events": "fc7b7fc5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -118,12 +119,13 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_wolves",
@@ -153,7 +155,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 389,
+          "id": 441,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -196,9 +198,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 398,
-      "state": "2b85e8a4",
-      "events": "68debff8",
+      "nextId": 450,
+      "state": "cf930f17",
+      "events": "ff892614",
       "rng": {
         "draws": 32,
         "digest": "4d504aff"
@@ -219,12 +221,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_wolves",
@@ -254,7 +257,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -298,9 +301,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 398,
-      "state": "3430e915",
-      "events": "d91c55b7",
+      "nextId": 450,
+      "state": "bf0ed93e",
+      "events": "4af69e5f",
       "rng": {
         "draws": 32,
         "digest": "4d504aff"
@@ -324,12 +327,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 27850,
+          "mailWelcomed": true,
           "questsDone": [
             "q_wolves"
           ],
@@ -351,7 +355,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -395,8 +399,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 398,
-      "state": "d0facdc1",
+      "nextId": 450,
+      "state": "606e30d2",
       "events": "741638a5",
       "rng": {
         "draws": 32,
@@ -421,12 +425,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "lifetimeXp": 27850,
+          "mailWelcomed": true,
           "questsDone": [
             "q_wolves"
           ],
@@ -448,7 +453,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 389,
+          "id": 441,
           "inCombat": true,
           "kind": "player",
           "level": 10,

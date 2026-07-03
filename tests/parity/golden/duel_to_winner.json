@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 389,
+      "nextId": 441,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 391,
-      "state": "b58e13b2",
-      "events": "4190db19",
+      "nextId": 443,
+      "state": "b55c86de",
+      "events": "33c8b231",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 391,
-      "state": "c9094722",
-      "events": "fb9f1bfd",
+      "nextId": 443,
+      "state": "47f6beae",
+      "events": "48b1a0b2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,9 +50,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 391,
-      "state": "46fbb90e",
-      "events": "6e4acb7f",
+      "nextId": 443,
+      "state": "8e1a3326",
+      "events": "a6275174",
       "rng": {
         "draws": 71,
         "digest": "6619b0ad"
@@ -61,9 +61,9 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 391,
-      "state": "d36092d8",
-      "events": "e4d70525",
+      "nextId": 443,
+      "state": "4a61947c",
+      "events": "2acbb121",
       "rng": {
         "draws": 78,
         "digest": "d52f266d"
@@ -80,11 +80,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -100,11 +101,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -122,7 +124,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 389,
+          "id": 441,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -169,7 +171,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 54,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -213,9 +215,9 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 391,
-      "state": "8eedfd2c",
-      "events": "519c1e15",
+      "nextId": 443,
+      "state": "57d4522e",
+      "events": "f2914188",
       "rng": {
         "draws": 78,
         "digest": "d52f266d"
@@ -232,11 +234,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -252,11 +255,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -274,7 +278,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 389,
+          "id": 441,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -321,7 +325,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 1,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -365,8 +369,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 391,
-      "state": "1c527180",
+      "nextId": 443,
+      "state": "abe7cec2",
       "events": "741638a5",
       "rng": {
         "draws": 150,
@@ -376,8 +380,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 391,
-      "state": "13a86464",
+      "nextId": 443,
+      "state": "6b7af3ba",
       "events": "741638a5",
       "rng": {
         "draws": 262,
@@ -387,8 +391,8 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 391,
-      "state": "453b4ce2",
+      "nextId": 443,
+      "state": "c51a4ea0",
       "events": "741638a5",
       "rng": {
         "draws": 263,
@@ -406,11 +410,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 389,
+          "entityId": 441,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -426,11 +431,12 @@
           "counters": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 442,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -448,7 +454,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 104.05,
           "hp": 90,
-          "id": 389,
+          "id": 441,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -495,7 +501,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 104.05,
           "hp": 7,
-          "id": 390,
+          "id": 442,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
