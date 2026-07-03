@@ -369,6 +369,17 @@ export function castAbility(
       }
     }
   }
+  // Self-cast preconditions that otherwise fail only inside runEffects, AFTER the GCD
+  // and resource are already committed. Check them up front so, e.g., a Life Tap you
+  // cannot afford (too little health) does not still eat the global cooldown with no
+  // effect. The effect-side check (effect_dispatch) stays as a backstop.
+  for (const eff of res.effects) {
+    if (eff.type === 'lifeTap' && p.hp <= eff.hp) {
+      ctx.error(p.id, 'Not enough health.');
+      return;
+    }
+  }
+
   // Ground-targeted abilities aim at a world point instead of an entity. The
   // client proposes the point; the server clamps it to the ability's range from
   // the caster (authoritative) and the cast's area effects center on it.

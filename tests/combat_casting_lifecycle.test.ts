@@ -150,3 +150,36 @@ describe('casting_lifecycle: determinism', () => {
     expect(run()).toEqual(run());
   });
 });
+
+describe('casting_lifecycle: Life Tap health guard', () => {
+  it('at too-low health, Life Tap errors and does not arm the GCD or spend anything', () => {
+    const { sim, p } = makeSim('warlock', 20);
+    const res = sim.ctx.resolvedAbility('life_tap', p.id)!;
+    const lifeTap = res.effects.find((e) => e.type === 'lifeTap') as { hp: number };
+    p.hp = lifeTap.hp; // p.hp <= eff.hp triggers the guard (Life Tap must not drop you to 0)
+    p.gcdRemaining = 0;
+    const mana0 = p.resource;
+    const events: Array<Record<string, unknown>> = [];
+    const orig = (sim as AnySim).emit.bind(sim);
+    (sim as AnySim).emit = (e: Record<string, unknown>) => {
+      events.push(e);
+      orig(e);
+    };
+    castAbility(sim.ctx, 'life_tap', p.id);
+    expect(events.some((e) => e.type === 'error' && e.text === 'Not enough health.')).toBe(true);
+    expect(p.gcdRemaining).toBe(0); // GCD not armed
+    expect(p.castingAbility).toBeNull(); // no cast started
+    expect(p.resource).toBe(mana0); // no mana gained
+  });
+
+  it('with enough health, Life Tap resolves (GCD armed, health spent for mana)', () => {
+    const { sim, p } = makeSim('warlock', 20);
+    p.hp = p.maxHp;
+    p.resource = 0;
+    p.gcdRemaining = 0;
+    castAbility(sim.ctx, 'life_tap', p.id);
+    expect(p.gcdRemaining).toBeGreaterThan(0); // GCD armed
+    expect(p.hp).toBeLessThan(p.maxHp); // health spent
+    expect(p.resource).toBeGreaterThan(0); // mana gained
+  });
+});
