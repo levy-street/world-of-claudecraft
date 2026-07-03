@@ -61,3 +61,42 @@ export function isConnectionRefused(input: {
   if (input.isAdmin) return false;
   return input.blocked || input.ipSessions >= input.hardLimit;
 }
+
+// Per-IP cap on IN-FLIGHT pre-auth WebSocket sockets (upgraded but not yet joined
+// a game session). The existing session cap (isConnectionRefused / countIpSessions)
+// only counts ESTABLISHED sessions and is checked AFTER several DB lookups in the
+// auth handshake, so without this an IP could open many sockets and force those
+// lookups unbounded. A socket is acquired at the upgrade event and released when it
+// authenticates (becoming a counted session) or its socket closes/errors/times out.
+// Pure + unit-testable: no timers, no socket refs, just the per-IP tally.
+export class PreAuthConnections {
+  private counts = new Map<string, number>();
+  constructor(private readonly cap: number) {}
+
+  // Reserve a slot for `ip`. Returns false (and reserves nothing) when the IP is
+  // already at the cap, so the caller destroys the socket before the handshake.
+  tryAcquire(ip: string): boolean {
+    const n = this.counts.get(ip) ?? 0;
+    if (n >= this.cap) return false;
+    this.counts.set(ip, n + 1);
+    return true;
+  }
+
+  // Free a slot. Safe to call more than once for the same socket and when the IP
+  // has no reservation (never drives the tally negative); the caller guards
+  // once-per-socket, this guards the map.
+  release(ip: string): void {
+    const n = this.counts.get(ip);
+    if (n === undefined) return;
+    if (n <= 1) this.counts.delete(ip);
+    else this.counts.set(ip, n - 1);
+  }
+
+  countFor(ip: string): number {
+    return this.counts.get(ip) ?? 0;
+  }
+
+  get size(): number {
+    return this.counts.size;
+  }
+}

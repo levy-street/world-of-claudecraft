@@ -124,7 +124,7 @@ import {
   readBody,
 } from './http_util';
 import { handleInternalApi } from './internal';
-import { isConnectionRefused } from './ip_block';
+import { isConnectionRefused, PreAuthConnections } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import {
   MAX_MAP_SAVE_BYTES,
@@ -227,6 +227,11 @@ const ADMIN_ONLINE_SAMPLE_MS = 60_000;
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET ?? '';
 // Hard WS connection limit per IP. Soft threshold (adds bot evidence) is in game.ts.
 const MAX_WS_PER_IP_HARD = Number(process.env.MAX_WS_PER_IP_HARD ?? '20');
+// Cap on concurrent in-flight PRE-AUTH sockets from one IP (upgraded but not yet
+// joined). Bounds the auth-handshake DB lookups an unauthenticated client can
+// force before the session cap applies. Set above MAX_WS_PER_IP_HARD so a legit
+// client reconnecting several characters is never caught by it.
+const MAX_WS_PREAUTH_PER_IP = Number(process.env.MAX_WS_PREAUTH_PER_IP ?? '30');
 // Each realm re-reads the blocklist on this interval so edits on another realm
 // process propagate and expired blocks fall out.
 const BLOCKED_IP_REFRESH_MS = 60_000;
@@ -1858,14 +1863,32 @@ async function main(): Promise<void> {
   // command; without this the ws default (~100 MiB) lets one socket force a
   // huge allocation + parse before any field-level validation runs
   const wss = new WebSocketServer({ noServer: true, maxPayload: 16 * 1024 });
+  const preAuth = new PreAuthConnections(MAX_WS_PREAUTH_PER_IP);
   server.on('upgrade', (req, socket, head) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
     if (url.pathname !== '/ws') {
       socket.destroy();
       return;
     }
+    // Reserve a pre-auth slot for this IP BEFORE the handshake (and its DB
+    // lookups). Over the cap: drop the socket immediately. The slot is freed once,
+    // whichever comes first: the socket closes/errors, or it authenticates and
+    // becomes a counted session (release passed into onConnection).
+    const ip = requestMetadata(req).ip;
+    if (!preAuth.tryAcquire(ip)) {
+      socket.destroy();
+      return;
+    }
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      preAuth.release(ip);
+    };
+    socket.on('close', release);
+    socket.on('error', release);
     wss.handleUpgrade(req, socket, head, (ws) => {
-      void onConnection(ws, req);
+      void onConnection(ws, req, release);
     });
   });
 
@@ -1873,6 +1896,7 @@ async function main(): Promise<void> {
     ws: WebSocket,
     raw: string,
     req: http.IncomingMessage,
+    onAuthenticated: () => void = () => {},
   ): Promise<void> {
     let msg: any;
     try {
@@ -1961,6 +1985,9 @@ async function main(): Promise<void> {
       return;
     }
     const session = result;
+    // Joined: this socket is now a counted session (countIpSessions), so free its
+    // pre-auth slot. The socket-close release is a no-op after this (idempotent).
+    onAuthenticated();
     console.log(`+ ${character.name} (${character.class}) joined — ${game.clients.size} online`);
     ws.on('message', (data) => {
       game.handleMessage(session, String(data));
@@ -1974,7 +2001,11 @@ async function main(): Promise<void> {
     });
   }
 
-  async function onConnection(ws: WebSocket, req: http.IncomingMessage): Promise<void> {
+  async function onConnection(
+    ws: WebSocket,
+    req: http.IncomingMessage,
+    onAuthenticated: () => void = () => {},
+  ): Promise<void> {
     const authTimer = setTimeout(() => {
       ws.send(JSON.stringify({ t: 'error', error: 'authentication timed out' }));
       ws.close();
@@ -2000,7 +2031,7 @@ async function main(): Promise<void> {
       // attached the permanent message handler. Without this the frames are
       // silently dropped (see ws_buffer.ts).
       const flush = bufferHandshakeMessages(ws);
-      void authenticateWebSocket(ws, String(data), req).finally(flush);
+      void authenticateWebSocket(ws, String(data), req, onAuthenticated).finally(flush);
     });
   }
 

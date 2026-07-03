@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { IpBlockList, cleanIp, parseBlockExpiry, isConnectionRefused } from '../server/ip_block';
+import {
+  cleanIp,
+  IpBlockList,
+  isConnectionRefused,
+  PreAuthConnections,
+  parseBlockExpiry,
+} from '../server/ip_block';
 import { normalizeIp } from '../server/ratelimit';
 
 const NOW = 1_000_000;
@@ -38,7 +44,10 @@ describe('IpBlockList', () => {
 
   it('ignores empty IPs', () => {
     const list = new IpBlockList();
-    list.setEntries([{ ip: '', expiresAtMs: null }, { ip: '9.9.9.9', expiresAtMs: null }]);
+    list.setEntries([
+      { ip: '', expiresAtMs: null },
+      { ip: '9.9.9.9', expiresAtMs: null },
+    ]);
     expect(list.isBlocked('', NOW)).toBe(false);
     expect(list.size).toBe(1);
   });
@@ -104,17 +113,66 @@ describe('parseBlockExpiry', () => {
 
 describe('isConnectionRefused', () => {
   it('refuses a blocked non-admin', () => {
-    expect(isConnectionRefused({ blocked: true, isAdmin: false, ipSessions: 0, hardLimit: 20 })).toBe(true);
+    expect(
+      isConnectionRefused({ blocked: true, isAdmin: false, ipSessions: 0, hardLimit: 20 }),
+    ).toBe(true);
   });
 
   it('lets a blocked admin through (full bypass)', () => {
-    expect(isConnectionRefused({ blocked: true, isAdmin: true, ipSessions: 0, hardLimit: 20 })).toBe(false);
-    expect(isConnectionRefused({ blocked: true, isAdmin: true, ipSessions: 999, hardLimit: 20 })).toBe(false);
+    expect(
+      isConnectionRefused({ blocked: true, isAdmin: true, ipSessions: 0, hardLimit: 20 }),
+    ).toBe(false);
+    expect(
+      isConnectionRefused({ blocked: true, isAdmin: true, ipSessions: 999, hardLimit: 20 }),
+    ).toBe(false);
   });
 
   it('enforces the hard per-IP cap on non-admins', () => {
-    expect(isConnectionRefused({ blocked: false, isAdmin: false, ipSessions: 20, hardLimit: 20 })).toBe(true);
-    expect(isConnectionRefused({ blocked: false, isAdmin: false, ipSessions: 19, hardLimit: 20 })).toBe(false);
+    expect(
+      isConnectionRefused({ blocked: false, isAdmin: false, ipSessions: 20, hardLimit: 20 }),
+    ).toBe(true);
+    expect(
+      isConnectionRefused({ blocked: false, isAdmin: false, ipSessions: 19, hardLimit: 20 }),
+    ).toBe(false);
+  });
+});
+
+describe('PreAuthConnections', () => {
+  it('acquires up to the cap per IP, then refuses without reserving', () => {
+    const p = new PreAuthConnections(2);
+    expect(p.tryAcquire('1.1.1.1')).toBe(true);
+    expect(p.tryAcquire('1.1.1.1')).toBe(true);
+    expect(p.countFor('1.1.1.1')).toBe(2);
+    // Over the cap: refused, and the tally does not grow.
+    expect(p.tryAcquire('1.1.1.1')).toBe(false);
+    expect(p.countFor('1.1.1.1')).toBe(2);
+  });
+
+  it('caps each IP independently', () => {
+    const p = new PreAuthConnections(1);
+    expect(p.tryAcquire('1.1.1.1')).toBe(true);
+    expect(p.tryAcquire('2.2.2.2')).toBe(true); // different IP unaffected
+    expect(p.tryAcquire('1.1.1.1')).toBe(false);
+    expect(p.size).toBe(2);
+  });
+
+  it('release frees a slot and lets a new acquire through', () => {
+    const p = new PreAuthConnections(1);
+    expect(p.tryAcquire('1.1.1.1')).toBe(true);
+    expect(p.tryAcquire('1.1.1.1')).toBe(false);
+    p.release('1.1.1.1');
+    expect(p.countFor('1.1.1.1')).toBe(0);
+    expect(p.tryAcquire('1.1.1.1')).toBe(true);
+  });
+
+  it('never drives the tally negative and drops the IP key at zero', () => {
+    const p = new PreAuthConnections(3);
+    p.tryAcquire('1.1.1.1');
+    p.release('1.1.1.1');
+    p.release('1.1.1.1'); // extra release (idempotent caller double-fire) is a no-op
+    p.release('9.9.9.9'); // releasing an unknown IP is a no-op
+    expect(p.countFor('1.1.1.1')).toBe(0);
+    expect(p.size).toBe(0); // key removed at zero, no leak
   });
 });
 
