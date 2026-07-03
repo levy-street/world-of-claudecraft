@@ -1424,7 +1424,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     backing.castShadow = true;
     group.add(backing);
 
-    // grimy canvas inscription on the town-facing (+z) surface
+    // grimy canvas inscription on the approach-facing surface (turns with the
+    // assembly via the faceSign flip, so it reads -z for the drowned delve)
     const CW = 512,
       CH = 96;
     const cv = document.createElement('canvas');

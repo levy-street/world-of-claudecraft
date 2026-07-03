@@ -63,8 +63,8 @@ const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
 // A live pet check fails while inside a delve even for owners with a valid
 // equipped pet (it is stowed for the run, see stowPetForDelve/restorePetFromDelveStash),
 // so the surfaced error must say why instead of implying the pet was lost.
-function noPetError(e: Entity): string {
-  return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.';
+function noPetError(e: Entity, fallback = 'You have no pet.'): string {
+  return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : fallback;
 }
 
 // -------------------------------------------------------------------------
@@ -526,7 +526,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living pet.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
@@ -549,7 +549,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living pet.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   if (pet.petTauntTimer > 0) {
@@ -587,7 +587,7 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living pet.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   const item = ITEMS[itemId];
@@ -641,7 +641,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living demon.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living demon.'));
     return;
   }
   if (pet.hp >= pet.maxHp) {

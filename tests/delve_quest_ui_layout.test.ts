@@ -18,10 +18,18 @@ const playHtml = readFileSync(join(repoRoot, 'play.html'), 'utf8');
 
 function wrapperMarkup(html: string): string {
   const start = html.indexOf('<div id="right-tracker-stack">');
-  // The wrapper's own closing tag is the SECOND </div> (the first closes the
-  // self-closing #quest-tracker child); a fixed lookahead window is enough
-  // since the two trackers + wrapper markup is only a few short lines.
-  return html.slice(start, start + 200);
+  if (start < 0) return '';
+  // Walk to the wrapper's own matching close so the slice cannot run past it
+  // into sibling markup (a fixed window would keep containing a tracker that
+  // was moved OUT of the wrapper to just below it, and pass falsely).
+  let depth = 0;
+  const token = /<div\b|<\/div>/g;
+  token.lastIndex = start;
+  for (let m = token.exec(html); m; m = token.exec(html)) {
+    depth += m[0] === '</div>' ? -1 : 1;
+    if (depth === 0) return html.slice(start, m.index + m[0].length);
+  }
+  return '';
 }
 
 describe('delves quest tracker layout', () => {

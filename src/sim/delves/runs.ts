@@ -396,9 +396,6 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   if (key.startsWith('solo:') && delve.autoCompanionId && !run.companion) {
     ctx.spawnDelveCompanion(run, r.meta.entityId, delve.autoCompanionId);
   }
-  console.log(
-    `[delve] pid=${r.meta.entityId} entered ${delveId}/${tierId} instance=${key} slot=${slotIndex}`,
-  );
   ctx.emit({ type: 'log', text: delve.enterText, color: '#b9f', pid: r.meta.entityId });
   ctx.emit({ type: 'delveEntered', delveId, tierId, pid: r.meta.entityId });
 }
@@ -465,9 +462,6 @@ export function claimDelveRun(
   clearDrownedLitanyRiteState(run);
   const origin = delveOriginOf(run);
   run.origin = { x: origin.x, z: origin.z };
-  console.log(
-    `[delve] claimed instance slot=${run.slot} for ${delveId}/${tierId} instance=${key} seed=${run.seed}`,
-  );
   spawnDelveModule(ctx, run);
 }
 

@@ -424,6 +424,24 @@ describe('delve pet stow', () => {
     ).toBe(true);
   });
 
+  it('a petless pet command in the overworld still says "You have no pet."', () => {
+    const sim = makeSim('warlock');
+    sim.setPlayerLevel(10);
+    expect(sim.petOf(sim.playerId)).toBeNull();
+    sim.drainEvents();
+    sim.setPetMode('aggressive');
+    const events = sim.drainEvents();
+    // The delve-aware arm must not leak outside: the plain message is the
+    // overworld contract (a regression making noPetError unconditional on the
+    // delve string would go uncaught without this arm).
+    expect(events.some((e) => e.type === 'error' && e.text === 'You have no pet.')).toBe(true);
+    expect(
+      events.some(
+        (e) => e.type === 'error' && e.text === 'Pets are not allowed inside the delves.',
+      ),
+    ).toBe(false);
+  });
+
   it('restorePetFromDelveStash keeps the stash entry if the owner entity is not yet registered', () => {
     const sim = makeSim('warlock');
     sim.setPlayerLevel(10);
@@ -622,6 +640,27 @@ describe('delve interactables and affixes', () => {
     expect(run.restlessPending.length).toBeGreaterThanOrEqual(1);
     for (let i = 0; i < 20 * 4; i++) sim.tick();
     expect(bonewalkers()).toBeGreaterThanOrEqual(1);
+    // The WRITE half of the no-infinite-chain fix: the affix path itself must tag
+    // what it raises (runs.ts tickDelveRestlessGraves sets affixSpawned), so a
+    // naturally raised Bonewalker's own death queues nothing. Without this pin,
+    // deleting that one line stays green while the shipped spawn chain returns.
+    const raised = [...sim.entities.values()].find(
+      (e) => e.templateId === 'reliquary_bonewalker' && !e.dead,
+    )!;
+    expect(raised.affixSpawned).toBe(true);
+    const pendingBefore = run.restlessPending.length;
+    (sim as any).dealDamage(
+      sim.player,
+      raised,
+      raised.maxHp + 1,
+      false,
+      'physical',
+      null,
+      'hit',
+      true,
+    );
+    sim.tick();
+    expect(run.restlessPending.length).toBe(pendingBefore);
   });
 
   it('killing an affix-spawned Raised Bonewalker does not re-trigger restless_graves (no infinite chain)', () => {
