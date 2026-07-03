@@ -1,13 +1,17 @@
-import { describe, it, expect } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { createMob } from '../src/sim/entity';
+import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 // Spawn a fresh Knight-Commander Olen (the seeded cleaver) at the origin and
 // register it with the sim. Returns the live entity.
 function spawnOlen(sim: Sim): Entity {
-  const mob = createMob((sim as any).nextId++, MOBS['knight_commander_olen'], 13, { x: 0, y: 0, z: 0 });
+  const mob = createMob((sim as any).nextId++, MOBS.knight_commander_olen, 13, {
+    x: 0,
+    y: 0,
+    z: 0,
+  });
   mob.hostile = true;
   mob.hp = mob.maxHp;
   (sim as any).addEntity(mob);
@@ -27,7 +31,11 @@ function placePlayer(sim: Sim, pid: number, x: number, z: number): Entity {
 
 describe('mob cleave', () => {
   it('Knight-Commander Olen is seeded with the Cleave mechanic', () => {
-    expect(MOBS['knight_commander_olen'].cleave).toEqual({ radius: 8, mult: 0.6, name: 'Cleave' });
+    expect(MOBS.knight_commander_olen.cleave).toEqual({
+      radius: 8,
+      mult: 0.6,
+      name: 'Reaping Arc',
+    });
   });
 
   it('a landed swing splashes onto a second player near the primary target', () => {
@@ -40,7 +48,10 @@ describe('mob cleave', () => {
 
     const events: SimEvent[] = [];
     const origEmit = (sim as any).emit.bind(sim);
-    (sim as any).emit = (ev: SimEvent) => { events.push(ev); return origEmit(ev); };
+    (sim as any).emit = (ev: SimEvent) => {
+      events.push(ev);
+      return origEmit(ev);
+    };
 
     // Force a guaranteed hit rather than relying on the swing RNG.
     for (let i = 0; i < 50; i++) {
@@ -49,7 +60,7 @@ describe('mob cleave', () => {
       const dmg = events.filter((e) => e.type === 'damage') as any[];
       const splash = dmg.find((e) => e.targetId === nearE.id && e.amount > 0);
       if (splash) {
-        expect(splash.ability).toBe('Cleave');
+        expect(splash.ability).toBe('Reaping Arc');
         return; // a hit landed and cleaved — done
       }
     }
@@ -66,10 +77,15 @@ describe('mob cleave', () => {
 
     const events: SimEvent[] = [];
     const origEmit = (sim as any).emit.bind(sim);
-    (sim as any).emit = (ev: SimEvent) => { events.push(ev); return origEmit(ev); };
+    (sim as any).emit = (ev: SimEvent) => {
+      events.push(ev);
+      return origEmit(ev);
+    };
 
     for (let i = 0; i < 50; i++) (sim as any).mobSwing(olen, mainE);
-    const splash = (events.filter((e) => e.type === 'damage') as any[]).find((e) => e.targetId === farE.id && e.amount > 0);
+    const splash = (events.filter((e) => e.type === 'damage') as any[]).find(
+      (e) => e.targetId === farE.id && e.amount > 0,
+    );
     expect(splash).toBeUndefined();
   });
 
@@ -78,18 +94,24 @@ describe('mob cleave', () => {
     const main = sim.addPlayer('warrior', 'Tank');
     const near = sim.addPlayer('warrior', 'Bystander');
     // A plain wolf has no cleave field.
-    const wolf = createMob((sim as any).nextId++, MOBS['forest_wolf'], 5, { x: 0, y: 0, z: 0 });
-    wolf.hostile = true; wolf.hp = wolf.maxHp;
+    const wolf = createMob((sim as any).nextId++, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 });
+    wolf.hostile = true;
+    wolf.hp = wolf.maxHp;
     (sim as any).addEntity(wolf);
     const mainE = placePlayer(sim, main, 1, 0);
     const nearE = placePlayer(sim, near, 1, 2);
 
     const events: SimEvent[] = [];
     const origEmit = (sim as any).emit.bind(sim);
-    (sim as any).emit = (ev: SimEvent) => { events.push(ev); return origEmit(ev); };
+    (sim as any).emit = (ev: SimEvent) => {
+      events.push(ev);
+      return origEmit(ev);
+    };
 
     for (let i = 0; i < 50; i++) (sim as any).mobSwing(wolf, mainE);
-    const splash = (events.filter((e) => e.type === 'damage') as any[]).find((e) => e.targetId === nearE.id && e.amount > 0);
+    const splash = (events.filter((e) => e.type === 'damage') as any[]).find(
+      (e) => e.targetId === nearE.id && e.amount > 0,
+    );
     expect(splash).toBeUndefined();
   });
 });

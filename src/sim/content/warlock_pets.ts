@@ -2,13 +2,14 @@ import type { MobTemplate } from '../types';
 
 // Warlock demon pets. Summoned (never tamed) demons owned by a warlock; they
 // follow/assist exactly like hunter pets (see Sim.updatePet) but never go feral
-// — a slain or dismissed demon unravels. The Imp is a ranged Firebolt damage
-// pet; the Voidwalker is a sturdy melee tank that taunts to hold threat. Created
-// at the owner's level (createMob reads the passed level, not minLevel/maxLevel).
+// — a slain or dismissed demon unravels. The Emberkin is a ranged Firebolt
+// damage pet; the Gloomshade is a sturdy melee tank that taunts to hold threat.
+// Created at the owner's level (createMob reads the passed level, not
+// minLevel/maxLevel).
 export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
-  imp: {
-    id: 'imp',
-    name: 'Imp',
+  emberkin: {
+    id: 'emberkin',
+    name: 'Emberkin',
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
@@ -26,9 +27,9 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     color: 0xff7a2a,
     petRanged: { range: 25, school: 'fire' },
   },
-  voidwalker: {
-    id: 'voidwalker',
-    name: 'Voidwalker',
+  gloomshade: {
+    id: 'gloomshade',
+    name: 'Gloomshade',
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
@@ -45,11 +46,11 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     scale: 1.15,
     color: 0x3a3a6e,
   },
-  // Glass-cannon melee seductress: hits hard and fast on a light frame, but
+  // Glass-cannon melee striker: hits hard and fast on a light frame, but
   // folds quickly under retaliation — the warlock's leveling DPS demon.
-  succubus: {
-    id: 'succubus',
-    name: 'Succubus',
+  duskborn: {
+    id: 'duskborn',
+    name: 'Duskborn',
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
@@ -65,11 +66,12 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     scale: 0.95,
     color: 0xc6469b,
   },
-  // Anti-caster hound: a ranged Shadow Bite skirmisher with the imp's reach but
-  // a sturdier body, the classic counter-pick against enemy spellcasters.
-  felhunter: {
-    id: 'felhunter',
-    name: 'Felhunter',
+  // Anti-caster hound: a ranged Shadow Bite skirmisher with the emberkin's
+  // reach but a sturdier body, the classic counter-pick against enemy
+  // spellcasters.
+  spellhound: {
+    id: 'spellhound',
+    name: 'Spellhound',
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
@@ -86,11 +88,11 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     color: 0x4a7d4a,
     petRanged: { range: 25, school: 'shadow' },
   },
-  // All-rounder felguard: deeper health and armor than the succubus with nearly
-  // her damage — the warlock's durable melee bruiser once it can be summoned.
-  felguard: {
-    id: 'felguard',
-    name: 'Felguard',
+  // All-rounder warfiend: deeper health and armor than the duskborn with nearly
+  // its damage — the warlock's durable melee bruiser once it can be summoned.
+  warfiend: {
+    id: 'warfiend',
+    name: 'Warfiend',
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
@@ -106,11 +108,12 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     scale: 1.25,
     color: 0x6e5a2a,
   },
-  // Bound infernal: a hulking, slow-swinging juggernaut with the deepest health
-  // and armor of any demon and crushing melee — a long-cooldown power summon.
-  infernal: {
-    id: 'infernal',
-    name: 'Infernal',
+  // Bound pyre colossus: a hulking, slow-swinging juggernaut with the deepest
+  // health and armor of any demon and crushing melee — a long-cooldown power
+  // summon.
+  pyre_colossus: {
+    id: 'pyre_colossus',
+    name: 'Pyre Colossus',
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
@@ -126,11 +129,11 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     scale: 1.7,
     color: 0xd24a2a,
   },
-  // Bound doomguard: an elite ranged Shadow caster that rains heavy damage from
-  // afar — the warlock's high-end nuke demon, summoned at great cost.
-  doomguard: {
-    id: 'doomguard',
-    name: 'Doomguard',
+  // Bound wraithborn: an elite ranged Shadow caster that rains heavy damage
+  // from afar — the warlock's high-end nuke demon, summoned at great cost.
+  wraithborn: {
+    id: 'wraithborn',
+    name: 'Wraithborn',
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',

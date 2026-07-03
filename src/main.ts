@@ -23,6 +23,7 @@ import {
 } from './game/click_move';
 import { getClientSeed } from './game/client_seed';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
+import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { Input } from './game/input';
@@ -95,12 +96,20 @@ import { navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS } from './sim/data';
+import { ITEMS, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
-import { DT, dist2d, INTERACT_RANGE, MELEE_RANGE, type PlayerClass, RUN_SPEED } from './sim/types';
+import {
+  DT,
+  dist2d,
+  INTERACT_RANGE,
+  MELEE_RANGE,
+  type PlayerClass,
+  RUN_SPEED,
+  type WorldContent,
+} from './sim/types';
 import { zoneBiomeAt } from './sim/world';
 import { startSitePresence } from './site_presence';
 import {
@@ -2649,14 +2658,24 @@ function sanitizeOfflineName(raw: string): string {
   return /^[A-Za-z][A-Za-z' -]{1,15}$/.test(stripped) ? stripped : 'Adventurer';
 }
 
-async function startOffline(playerClass: PlayerClass, name: string, skin = 0): Promise<void> {
+async function startOffline(
+  playerClass: PlayerClass,
+  name: string,
+  skin = 0,
+  world?: WorldContent,
+  seedOverride?: number,
+): Promise<void> {
   if (!(await prepareWorldEntry())) return;
   enterLoadingState(t('loading.world'));
+  // Editor play-test: route terrain + props at the custom world too (the renderer
+  // reaches it by module global), in addition to the Sim reading cfg.world.
+  if (world) setActiveWorldContent(world);
   const sim = new Sim({
-    seed: WORLD_SEED,
+    seed: seedOverride ?? WORLD_SEED,
     playerClass,
     playerName: name,
     devCommands: import.meta.env.DEV,
+    world,
   });
   sim.setPlayerSkin(sim.playerId, skin);
   // Dev convenience: ?mech drops an offline session straight into the Combat Mech
@@ -7627,6 +7646,21 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
   }
 })();
 
-startSitePresence('home');
-wireStartScreens();
-initHomepageMusic();
+// Editor play-test handoff: if the map editor stored a custom world and sent us
+// here, boot straight into that offline world and skip the start screen. Any
+// malformed/absent request falls through to the normal home flow.
+const editorPlaytest = takeEditorPlaytestRequest();
+if (editorPlaytest) {
+  startSitePresence('home');
+  void startOffline(
+    editorPlaytest.playerClass,
+    editorPlaytest.playerName,
+    0,
+    editorPlaytest.content,
+    editorPlaytest.seed,
+  );
+} else {
+  startSitePresence('home');
+  wireStartScreens();
+  initHomepageMusic();
+}

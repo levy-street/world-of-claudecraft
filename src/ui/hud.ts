@@ -571,7 +571,7 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
 // yards past a zone boundary before the crossing banner/welcome commits
 const ZONE_BANNER_DEADBAND = 5;
 const IGNORED_CHAT_NAMES_KEY = 'woc_ignored_chat_names';
-// WoW-style chat tabs: the ordered channel tabs the player has opened, and the
+// Classic-style chat tabs: the ordered channel tabs the player has opened, and the
 // tab that was active last session. The built-in `all`/`combat` views are
 // implicit and never stored.
 const CHAT_TABS_KEY = 'woc_chat_tabs';
@@ -630,8 +630,8 @@ const MAP_BG_RES = 480;
 const SFX_MOB_FAMILIES = new Set([
   'beast',
   'spider',
-  'murloc',
-  'kobold',
+  'mudfin',
+  'burrower',
   'humanoid',
   'undead',
   'troll',
@@ -791,7 +791,7 @@ export class Hud {
   // ./focus_manager. Escape is NOT handled here: it stays with the existing unified
   // dispatcher (main.ts game input -> hud.closeAll()), so there is one Escape path.
   private readonly focusManager = new FocusManager();
-  // WoW-style chat tabs. `chatTabs` are the player-added tabs (send-capable
+  // Classic-style chat tabs. `chatTabs` are the player-added tabs (send-capable
   // channels plus the optional filter-only whisper collector; the built-in
   // `all`/`combat` views are implicit); `activeChatTab` is the one currently
   // shown, and drives both the log filter and the send channel.
@@ -1229,7 +1229,7 @@ export class Hud {
       document.getElementById('mobile-controls')?.classList.remove('expanded');
       document.getElementById('mobile-more')?.classList.remove('active');
     });
-    // classic-WoW minimap clock: real local time under the minimap; click it to
+    // classic-style minimap clock: real local time under the minimap; click it to
     // flip between 12-hour (AM/PM) and 24-hour display. Real-time clocks are a
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
     // doesn't apply — cf. meters.ts using performance.now()).
@@ -1939,7 +1939,7 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
-  // Chat tabs (WoW-style): the built-in "Chat" (all) and "Combat Log" views,
+  // Chat tabs (classic-style): the built-in "Chat" (all) and "Combat Log" views,
   // plus player-added per-channel tabs. The active tab drives BOTH the log
   // filter (which messages show) and the send channel (what plain text targets),
   // so a player can chat in World/LFG/Party/etc. without retyping the command.
@@ -2330,7 +2330,7 @@ export class Hud {
     const i = this.chatTabs.indexOf(channel);
     if (i < 0) return;
     this.chatTabs.splice(i, 1);
-    // closing a tab does not /leave the channel (you stay subscribed, as in WoW)
+    // closing a tab does not /leave the channel (you stay subscribed, classic behavior)
     if (this.activeChatTab === channel) this.activeChatTab = 'all';
     this.renderChatTabs();
     this.selectChatTab(this.activeChatTab, true);
@@ -2766,7 +2766,7 @@ export class Hud {
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
   // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
   // projects the head anchor ONCE (screen-anchored, byte-faithful to the old fct() and to
-  // WoW combat text: the number rises in screen space, it does not chase the camera) and
+  // classic combat text: the number rises in screen space, it does not chase the camera) and
   // behind-culls; the every-frame tier of update() drives step(), which ONLY TTL-recycles
   // expired floaters (no per-frame reposition). It owns FCT_POOL_CAP pre-allocated #ui
   // children, projecting through renderer.worldToScreen and dividing by getUiScale into
@@ -3632,7 +3632,7 @@ export class Hud {
     return html;
   }
 
-  // Classic-WoW item comparison: when hovering an equippable item, append the
+  // Classic-style item comparison: when hovering an equippable item, append the
   // item currently worn in that slot plus the stat change you'd see if you
   // swapped to it (green = gain, red = loss). Reads IWorld.equipment, so it
   // works identically offline and online.
@@ -7964,18 +7964,18 @@ export class Hud {
     const key = exact[text];
     if (key) return t(key);
 
-    let match = /^You must be in (Bear|Wolf) Form\.$/.exec(text);
+    let match = /^You must be in (Bruin|Wolf) Form\.$/.exec(text);
     if (match)
       return t('hud.errors.requiresForm', {
-        form: t(match[1] === 'Bear' ? 'hud.errors.bear' : 'hud.errors.cat'),
+        form: t(match[1] === 'Bruin' ? 'hud.errors.bear' : 'hud.errors.cat'),
       });
-    match = /^You can't do that in (Bear|Wolf|Travel) Form\.$/.exec(text);
+    match = /^You can't do that in (Bruin|Wolf|Fleet) Form\.$/.exec(text);
     if (match)
       return t('hud.errors.cantInForm', {
         form: t(
-          match[1] === 'Bear'
+          match[1] === 'Bruin'
             ? 'hud.errors.bear'
-            : match[1] === 'Travel'
+            : match[1] === 'Fleet'
               ? 'hud.errors.travel'
               : 'hud.errors.cat',
         ),

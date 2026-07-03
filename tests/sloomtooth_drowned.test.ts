@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { MOBS, ITEMS, CAMPS } from '../src/sim/data';
+import { CAMPS, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 
 // Sloomtooth the Drowned — a rare elite murloc tyrant lurking by the Drowned
 // Chapel in Mirefen Marsh (content-integrity coverage for the new rare).
@@ -9,7 +9,7 @@ describe('Sloomtooth the Drowned (rare elite)', () => {
   it('is registered as a rare elite murloc at level 11', () => {
     const m = MOBS.sloomtooth_the_drowned;
     expect(m).toBeDefined();
-    expect(m.family).toBe('murloc');
+    expect(m.family).toBe('mudfin');
     expect(m.rare).toBe(true);
     expect(m.elite).toBe(true);
     expect(m.minLevel).toBe(11);

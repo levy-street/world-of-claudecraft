@@ -1,5 +1,5 @@
 // Economy & Trade overview: coin, vendors, the World Market, and player trading.
-// Systems and direction only, no prices or stock lists (WoW-style altitude).
+// Systems and direction only, no prices or stock lists (classic-guide altitude).
 
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';

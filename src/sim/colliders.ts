@@ -5,11 +5,11 @@ import {
   delveAt,
   delveModuleLocal,
   dungeonAt,
+  getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
   isDelvePos,
-  PROPS,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
@@ -21,6 +21,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import type { WorldContent } from './types';
 import { generateDecorations, groundHeight } from './world';
 
 // Static world collision. Prop placement comes from the per-zone content
@@ -81,6 +82,8 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
 
 function staticWorldColliders(seed: number): Collider[] {
   const out: Collider[] = [];
+  const content = getActiveWorldContent();
+  const PROPS = content.props;
 
   // Hideable render props are `camGhost`: they keep blocking movement but the
   // chase cam no longer pulls in for them; the renderer hides whichever one
@@ -208,6 +211,45 @@ function staticWorldColliders(seed: number): Collider[] {
       });
     }
   }
+
+  // Editor-placed assets with a collide footprint (custom maps only; the
+  // built-in world has no placements). The ONE placement record drives both the
+  // renderer and this collider, so what you see is what you collide with.
+  for (const p of content.placements ?? []) {
+    if (!p.collideRadius || p.collideRadius <= 0) continue;
+    out.push({
+      type: 'circle',
+      x: p.x,
+      z: p.z,
+      r: p.collideRadius,
+      cameraTopY: topY(seed, p.x, p.z, Math.max(2.5, p.collideRadius * 2)),
+      camGhost: true,
+    });
+  }
+
+  // Editor-authored invisible blocker walls (custom maps only): one fence-width
+  // OBB per segment, exactly the PROPS.fences math above, but NOT isFence (a
+  // jump never clears a blocker) and camGhost (there is no mesh, so the chase
+  // cam must never pull in for an invisible wall). Purely static data: no rng
+  // draws, no tick-order impact, and no render mesh in playtest.
+  for (const b of content.blockers ?? []) {
+    const dx = b.x2 - b.x1,
+      dz = b.z2 - b.z1;
+    const len = Math.hypot(dx, dz);
+    if (len < 1e-6) continue;
+    const x = (b.x1 + b.x2) / 2,
+      z = (b.z1 + b.z2) / 2;
+    out.push({
+      type: 'obb',
+      x,
+      z,
+      hw: len / 2 + FENCE_END_PAD,
+      hd: FENCE_HALF_DEPTH,
+      rot: Math.atan2(-dz, dx),
+      cameraTopY: topY(seed, x, z, BLOCKER_WALL_HEIGHT),
+      camGhost: true,
+    });
+  }
   return out;
 }
 
@@ -235,8 +277,13 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
 
 const GRID_CELL = 16;
 const MAX_BODY_RADIUS = 0.8; // largest mover we resolve for
-const FENCE_HALF_DEPTH = 0.35;
+/** Fence/blocker wall half-thickness (yards); the editor's blocker overlay
+ * reuses it so the drawn wall matches the collider exactly. */
+export const FENCE_HALF_DEPTH = 0.35;
 const FENCE_END_PAD = 0.35;
+/** Blocker walls are full-height (a jump never clears one, unlike a fence);
+ * this is only the camera-occlusion top for the record. */
+const BLOCKER_WALL_HEIGHT = 6;
 /** Rail height of a fence (yards), used for camera occlusion. A jump passes
  * through fences while airborne regardless (see sim `Entity.jumping`). */
 const FENCE_RAIL_HEIGHT = 2.8;
@@ -245,7 +292,16 @@ interface ColliderGrid {
   cells: Map<string, Collider[]>;
 }
 
-const gridCache = new Map<number, ColliderGrid>();
+// Grids are cached per (active world content, seed). The WeakMap keeps the
+// built-in world's grid warm forever and lets swapped-out custom maps be
+// collected; the editor invalidates explicitly after mutating placements.
+const gridCaches = new WeakMap<WorldContent, Map<number, ColliderGrid>>();
+
+/** Drop the cached collider grid for the ACTIVE world content (editor-only:
+ * call after mutating its placements/props in place). */
+export function invalidateStaticColliders(): void {
+  gridCaches.delete(getActiveWorldContent());
+}
 
 function colliderBounds(c: Collider): { minX: number; maxX: number; minZ: number; maxZ: number } {
   if (c.type === 'circle') {
@@ -256,7 +312,13 @@ function colliderBounds(c: Collider): { minX: number; maxX: number; minZ: number
 }
 
 function gridFor(seed: number): ColliderGrid {
-  let grid = gridCache.get(seed);
+  const content = getActiveWorldContent();
+  let perContent = gridCaches.get(content);
+  if (!perContent) {
+    perContent = new Map();
+    gridCaches.set(content, perContent);
+  }
+  let grid = perContent.get(seed);
   if (grid) return grid;
   grid = { cells: new Map() };
   for (const c of staticWorldColliders(seed)) {
@@ -274,7 +336,7 @@ function gridFor(seed: number): ColliderGrid {
       }
     }
   }
-  gridCache.set(seed, grid);
+  perContent.set(seed, grid);
   return grid;
 }
 
@@ -384,7 +446,7 @@ export function resolvePosition(
 }
 
 function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r: number): boolean {
-  for (const f of PROPS.fences) {
+  for (const f of getActiveWorldContent().props.fences) {
     const dx = f.x2 - f.x1,
       dz = f.z2 - f.z1;
     const len = Math.hypot(dx, dz);

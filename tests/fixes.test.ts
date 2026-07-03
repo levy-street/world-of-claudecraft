@@ -162,7 +162,7 @@ describe('collision & terrain', () => {
     for (const e of sim.entities.values()) {
       if (e.kind !== 'mob') continue;
       const h = groundHeight(e.pos.x, e.pos.z, SEED);
-      const canWade = MOBS[e.templateId].family === 'murloc' || MOBS[e.templateId].canSwim;
+      const canWade = MOBS[e.templateId].family === 'mudfin' || MOBS[e.templateId].canSwim;
       const min = canWade ? WATER_LEVEL - 0.55 : WATER_LEVEL + 0.35;
       expect(h, `${e.name} at ${e.pos.x.toFixed(0)},${e.pos.z.toFixed(0)}`).toBeGreaterThan(min);
     }

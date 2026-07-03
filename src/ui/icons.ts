@@ -2559,9 +2559,9 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   // mob families
   family_beast: r('earth', 'earthBrown', ['paw']),
   family_humanoid: r('steel', 'steel', ['sword']),
-  family_murloc: r('drink', 'sky', ['droplet']),
+  family_mudfin: r('drink', 'sky', ['droplet']),
   family_spider: r('shadow', 'silverWhite', ['web']),
-  family_kobold: r('earth', 'gold', ['candle']),
+  family_burrower: r('earth', 'gold', ['candle']),
   family_undead: r('shadow', 'bone', ['skull']),
   family_troll: r('junk', 'bone', ['bone']),
   family_ogre: r('fury', 'earthBrown', ['fist']),

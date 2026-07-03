@@ -14,7 +14,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // --- starting gear ---
   worn_sword: {
     id: 'worn_sword',
-    name: 'Worn Shortsword',
+    name: 'Pitted Shortsword',
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'common',
@@ -23,7 +23,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   gnarled_staff: {
     id: 'gnarled_staff',
-    name: 'Gnarled Staff',
+    name: 'Bogoak Staff',
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'common',
@@ -60,7 +60,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   recruit_tunic: {
     id: 'recruit_tunic',
-    name: "Recruit's Tunic",
+    name: "Levyman's Tunic",
     kind: 'armor',
     armorType: 'leather',
     slot: 'chest',
@@ -70,7 +70,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   apprentice_robe: {
     id: 'apprentice_robe',
-    name: "Apprentice's Robe",
+    name: 'Threadbare Robe',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'chest',
@@ -80,7 +80,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   footpad_jerkin: {
     id: 'footpad_jerkin',
-    name: "Footpad's Jerkin",
+    name: 'Cutpurse Jerkin',
     kind: 'armor',
     armorType: 'leather',
     slot: 'chest',
@@ -197,7 +197,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   bristleback_maul: {
     id: 'bristleback_maul',
-    name: 'Bristleback Maul',
+    name: 'Gallowglass Hammer',
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'uncommon',
@@ -383,7 +383,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // --- food & drink (vendor) ---
   baked_bread: {
     id: 'baked_bread',
-    name: 'Freshly Baked Bread',
+    name: 'Cottage Loaf',
     kind: 'food',
     quality: 'common',
     foodHp: 61,
@@ -392,7 +392,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   spring_water: {
     id: 'spring_water',
-    name: 'Refreshing Spring Water',
+    name: 'Cold Well Water',
     kind: 'drink',
     quality: 'common',
     drinkMana: 76,
@@ -553,7 +553,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   raw_stonescale_carp: {
     id: 'raw_stonescale_carp',
-    name: 'Raw Stonescale Carp',
+    name: 'Raw Slatefin Carp',
     kind: 'food',
     quality: 'common',
     foodHp: 117,
@@ -577,7 +577,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   roasted_boar: {
     id: 'roasted_boar',
-    name: 'Roasted Boar Meat',
+    name: 'Spitted Boar Haunch',
     kind: 'food',
     quality: 'common',
     foodHp: 117,
@@ -656,7 +656,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   conjured_water: {
     id: 'conjured_water',
-    name: 'Conjured Spring Water',
+    name: 'Conjured Rainwater',
     kind: 'drink',
     quality: 'common',
     drinkMana: 76,
@@ -664,7 +664,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   conjured_water2: {
     id: 'conjured_water2',
-    name: 'Conjured Mineral Water',
+    name: 'Conjured Wellwater',
     kind: 'drink',
     quality: 'common',
     drinkMana: 288,
@@ -672,7 +672,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   conjured_water3: {
     id: 'conjured_water3',
-    name: 'Conjured Sparkling Water',
+    name: 'Conjured Clearwater',
     kind: 'drink',
     quality: 'common',
     drinkMana: 672,
@@ -682,7 +682,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // conjured-water mana tiers above) ---
   conjured_bread: {
     id: 'conjured_bread',
-    name: 'Conjured Bread',
+    name: 'Conjured Oatcake',
     kind: 'food',
     quality: 'common',
     foodHp: 61,
@@ -690,7 +690,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   conjured_bread2: {
     id: 'conjured_bread2',
-    name: 'Conjured Pumpernickel',
+    name: 'Conjured Black Loaf',
     kind: 'food',
     quality: 'common',
     foodHp: 243,
@@ -698,7 +698,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   conjured_bread3: {
     id: 'conjured_bread3',
-    name: 'Conjured Sweet Roll',
+    name: 'Conjured Honeycake',
     kind: 'food',
     quality: 'common',
     foodHp: 552,
@@ -897,7 +897,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   cryptstalker_jerkin: {
     id: 'cryptstalker_jerkin',
-    name: 'Cryptstalker Jerkin',
+    name: 'Gravestalker Jerkin',
     kind: 'armor',
     armorType: 'leather',
     slot: 'chest',
@@ -1013,7 +1013,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   webwood_silk: {
     id: 'webwood_silk',
-    name: 'Webwood Silk Gland',
+    name: 'Sableweb Silk Gland',
     kind: 'quest',
     sellValue: 0,
     questId: 'q_spiders',
@@ -1108,7 +1108,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   tough_jerky: {
     id: 'tough_jerky',
-    name: 'Tough Jerky',
+    name: 'Salted Jerky',
     kind: 'food',
     quality: 'common',
     foodHp: 61,
@@ -1117,14 +1117,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   mudfin_scale: {
     id: 'mudfin_scale',
-    name: 'Slimy Murloc Scale',
+    name: 'Slimy Mudfin Scale',
     kind: 'junk',
     quality: 'poor',
     sellValue: 5,
   },
   tallow_candle: {
     id: 'tallow_candle',
-    name: 'Tallow Candle',
+    name: 'Greasy Tallow Lump',
     kind: 'junk',
     quality: 'poor',
     sellValue: 5,

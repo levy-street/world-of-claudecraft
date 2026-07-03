@@ -19,7 +19,7 @@ export interface BindAction {
   category: string;
   kind: BindKind;
   defaults: string[]; // 1 or 2 codes; index 0 = primary, 1 = secondary
-  // When true this action is exempt from the WoW-style "one code per action"
+  // When true this action is exempt from the classic-style "one code per action"
   // uniqueness sweep: its code may deliberately overlap another action's. Used
   // by Attack Move, whose default (A) intentionally shadows Turn Left while the
   // setting is on, so they can share a key without either stealing it from the
@@ -433,7 +433,7 @@ export class Keybinds {
     }
     // Second pass: for actions that kept their defaults, drop any code an
     // explicit stored binding already claimed so the same key can't drive two
-    // actions (preserving the WoW-style uniqueness invariant).
+    // actions (preserving the classic-style uniqueness invariant).
     for (const a of BIND_ACTIONS) {
       if (Array.isArray(obj[a.id])) continue;
       if (actionAllowsShared(a.id)) continue; // keep its (intentionally shared) default

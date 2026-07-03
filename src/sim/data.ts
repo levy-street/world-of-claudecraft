@@ -17,6 +17,7 @@ import type {
   PlayerClass,
   QuestDef,
   QuestState,
+  WorldContent,
   ZoneDef,
   ZonePropsDef,
 } from './types';
@@ -252,7 +253,7 @@ export function questRewardItem(quest: QuestDef, cls: PlayerClass): string | und
 
 export const questRewardItemId = questRewardItem;
 
-// Vanilla group XP multipliers by party size (1-5).
+// Classic-era group XP multipliers by party size (1-5).
 export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
 
 // ---------------------------------------------------------------------------
@@ -271,6 +272,45 @@ export const WORLD_MIN_Z = ZONES[0].zMin;
 export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
 
 export const PLAYER_START = { x: 2, z: -2 };
+
+// ---------------------------------------------------------------------------
+// Active world content registry.
+//
+// The terrain function (src/sim/world.ts) and the Sim spawn loop derive the
+// playable world from the spatial data below. To support custom maps (the editor)
+// without forking the engine, that data is reachable through a swappable bundle.
+// The DEFAULT bundle wraps the exact same arrays the built-in game has always
+// used, so with no custom map loaded everything is byte-identical.
+//
+// The editor's offline play-test calls setActiveWorldContent(map) before building
+// the Sim+renderer; the default game never touches it.
+// ---------------------------------------------------------------------------
+
+export const BUILTIN_WORLD: WorldContent = {
+  zones: ZONES,
+  camps: CAMPS,
+  npcs: NPCS,
+  groundObjects: GROUND_OBJECTS,
+  roads: ROADS,
+  props: PROPS,
+  playerStart: PLAYER_START,
+  // No terrainEdits: the built-in heightfield is the pure (x,z,seed) function.
+};
+
+let activeWorld: WorldContent = BUILTIN_WORLD;
+
+// The world content the terrain function and renderer should sample. Defaults to
+// the built-in 3-zone world; the editor swaps it for a custom map during play-test.
+export function getActiveWorldContent(): WorldContent {
+  return activeWorld;
+}
+
+// Swap in a custom world (editor play-test) or restore the built-in (pass nothing).
+// Affects terrain (world.ts), props (render/props.ts), and any consumer that reads
+// through getActiveWorldContent. Spawns come from SimConfig.world too (sim.ts ctor).
+export function setActiveWorldContent(world: WorldContent | null): void {
+  activeWorld = world ?? BUILTIN_WORLD;
+}
 
 // Zone containing a world position (overworld only; clamps to the strip ends).
 export function zoneAt(z: number): ZoneDef {

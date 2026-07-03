@@ -8,6 +8,7 @@
 // Each theme is a composed multi-track loop scheduled with a lookahead
 // timer; zone changes crossfade.
 
+import type { BiomeId } from '../sim/types';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
 
 export type MusicZone =
@@ -53,14 +54,23 @@ export function shouldResetMusicForDungeonEntry(
 /** Pick the soundtrack layer from world position context. */
 export function musicZoneForLocation(
   zoneId: string,
-  biome: 'vale' | 'marsh' | 'peaks',
+  biome: BiomeId,
   inHub: boolean,
   inDungeon: boolean,
   dungeonId: string | null = null,
 ): MusicZone {
+  // Paint-only biomes (custom maps) borrow the closest shipped theme.
+  const biomeMusic: MusicZone =
+    biome === 'vale' || biome === 'marsh' || biome === 'peaks'
+      ? biome
+      : biome === 'beach'
+        ? 'vale'
+        : biome === 'cave'
+          ? 'marsh'
+          : 'peaks';
   if (inDungeon) return dungeonId ? dungeonMusicZoneForDungeon(dungeonId) : 'dungeon_hollow_crypt';
-  if (inHub) return TOWN_MUSIC[zoneId] ?? biome;
-  return ZONE_MUSIC[zoneId] ?? biome;
+  if (inHub) return TOWN_MUSIC[zoneId] ?? biomeMusic;
+  return ZONE_MUSIC[zoneId] ?? biomeMusic;
 }
 
 type Inst =

@@ -84,7 +84,6 @@ import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   abilitiesKnownAt,
   arenaOrigin,
-  CAMPS,
   CLASSES,
   DEEPFEN_SHALLOWS_LAKE,
   DELVE_COMPANIONS,
@@ -97,14 +96,12 @@ import {
   dungeonAt,
   FISHING_RARE_ID,
   FISHING_TABLES,
-  GROUND_OBJECTS,
+  getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
   isDelvePos,
   MOBS,
-  NPCS,
-  PLAYER_START,
   QUESTS,
   zoneAt,
 } from './data';
@@ -348,7 +345,7 @@ import {
   nearSteepWalls,
   terrainDownhill,
   terrainSteepnessAt,
-  WATER_LEVEL,
+  waterLevel,
 } from './world';
 
 // TRIVIAL_LEVEL_GAP moved to mob/targeting.ts (used only by isTrivialTo).
@@ -374,7 +371,12 @@ const FLEE_DURATION = 5;
 // FLEE_RETURN_GRACE moved to mob/locomotion.ts (M2; used only by recoverFromFlee).
 // Only sentient, cowardly families flee; beasts/undead/elementals/dragonkin fight
 // to the death. Elites, rares, and bosses never flee regardless of family.
-const FLEEING_FAMILIES: ReadonlySet<MobFamily> = new Set(['humanoid', 'kobold', 'murloc', 'troll']);
+const FLEEING_FAMILIES: ReadonlySet<MobFamily> = new Set([
+  'humanoid',
+  'burrower',
+  'mudfin',
+  'troll',
+]);
 const GRAVITY = 16;
 const JUMP_VELOCITY = 6; // apex = v^2/2g ≈ 1.125 yd
 // Exported for social/chat_readouts.ts (the /falling readout shares the landing-damage
@@ -425,7 +427,7 @@ export const SAY_RANGE = 25;
 // chat() router; HARMFUL_AURA_KINDS/isHarmfulAura + NEARBY_RANGE/NEARBY_MAX moved to
 // social/chat_readouts.ts with the /targetbuffs + /nearby readouts.
 // CHAT_BURST / CHAT_REFILL moved to social/chat.ts (chatAllowed moved with them).
-// Max characters in a single chat line, matching classic WoW's 255-char editbox.
+// Max characters in a single chat line, matching the classic 255-char editbox.
 // Authoritative cap: enforced here in the deterministic core so every host agrees;
 // the client maxlength + server chat-log slices mirror it.
 export const MAX_CHAT_MESSAGE_LEN = 255;
@@ -471,11 +473,14 @@ const STEEP_SLIDE_SPEED = RUN_SPEED; // yd/s a player skids downhill off unwalka
 // POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
 const DEFAULT_SOCIAL_PULL_RADIUS = 5;
 const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
-  murloc: 8,
+  mudfin: 8,
 };
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
-const SWIM_SURFACE_Y = WATER_LEVEL - 0.75; // body bobs just below the water line
+// Body bobs just below the water line (a function: custom maps move the water).
+function swimSurfaceY(): number {
+  return waterLevel() - 0.75;
+}
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const SWIM_SPEED_MULT = 0.65;
 const FISHING_SAMPLE_DISTANCES = [4, 8, 12, 16, 20, 24];
@@ -914,7 +919,9 @@ function freshCounters(): RewardCounters {
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
 
 export class Sim {
-  cfg: Required<Omit<SimConfig, 'noPlayer'>>;
+  // `world` stays optional (a custom map for play-test, else undefined for the
+  // built-in world); everything else is defaulted to a concrete value below.
+  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -1017,6 +1024,9 @@ export class Sim {
       devCommands: this.devCommands,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
+      // Carried through so the renderer (which reaches the Sim as IWorld) can read
+      // the same custom world via sim.cfg.world. Undefined for the built-in world.
+      world: cfg.world,
     };
     this.rng = new Rng(cfg.seed);
     // S0b seam: the shared SimContext every extracted slice routes through. Built
@@ -1039,10 +1049,20 @@ export class Sim {
     // loop below (after ground objects) registers its mailbox entity ids.
     this.postOffice = new PostOffice(this.ctx);
 
+    // Spawn content: a custom world (editor play-test) or the built-in world.
+    // CAMPS order is a determinism contract; both bundles preserve it.
+    // INVARIANT: terrain/colliders/roads read ONLY the data.ts module global
+    // (getActiveWorldContent), never cfg.world. A caller that passes cfg.world
+    // MUST also setActiveWorldContent() with content whose terrain-relevant
+    // fields (zones, camps, roads, terrainEdits, biomePaint, waterLevel) are
+    // identical, or spawns and geometry silently fork. Placements MAY differ
+    // (render-only ownership; the editor viewport strips them from cfg.world).
+    const worldContent = this.cfg.world ?? getActiveWorldContent();
+
     // NPCs — nudged out of buildings and deep water if their data position is bad
-    for (const npcDef of Object.values(NPCS)) {
+    for (const npcDef of Object.values(worldContent.npcs)) {
       if (npcDef.dynamic) continue; // spawned on demand by its owning system, not surface-placed
-      const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, WATER_LEVEL + 0.6);
+      const safe = this.findSafePos(npcDef.pos.x, npcDef.pos.z, waterLevel() + 0.6);
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
@@ -1050,11 +1070,11 @@ export class Sim {
     this.market.seed();
 
     // Mobs from camps
-    for (const camp of CAMPS) {
+    for (const camp of worldContent.camps) {
       const template = MOBS[camp.mobId];
       // Aquatic/flagged swimmers may wade in the shallows; everyone else
       // still spawns on dry land even though combat movement can enter water.
-      const minHeight = this.mobCanSpawnInWater(template) ? WATER_LEVEL - 0.5 : WATER_LEVEL + 0.4;
+      const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
       for (let i = 0; i < camp.count; i++) {
         const ang = this.rng.range(0, Math.PI * 2);
         const r = Math.sqrt(this.rng.next()) * camp.radius;
@@ -1074,7 +1094,7 @@ export class Sim {
     }
 
     // Ground objects
-    for (const objDef of GROUND_OBJECTS) {
+    for (const objDef of worldContent.groundObjects) {
       for (const p of objDef.positions) {
         const obj = createGroundObject(
           this.nextId++,
@@ -1089,7 +1109,7 @@ export class Sim {
     // Ravenpost mailboxes: one interactable raven pillar per town (draws no
     // rng; findSafePos is deterministic, so the camp draws above are unmoved).
     for (const boxDef of MAILBOXES) {
-      const safe = this.findSafePos(boxDef.x, boxDef.z, WATER_LEVEL + 0.6);
+      const safe = this.findSafePos(boxDef.x, boxDef.z, waterLevel() + 0.6);
       const box = createGroundObject(this.nextId++, '', 'Mailbox', this.groundPos(safe.x, safe.z));
       box.templateId = 'mailbox';
       box.objectItemId = null;
@@ -1308,9 +1328,10 @@ export class Sim {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
     }
+    const playerStart = (this.cfg.world ?? getActiveWorldContent()).playerStart;
     const startPos = savedPos
       ? this.groundPos(savedPos.x, savedPos.z)
-      : this.groundPos(PLAYER_START.x, PLAYER_START.z);
+      : this.groundPos(playerStart.x, playerStart.z);
     const savedArena1v1: ArenaStanding = {
       rating: savedState?.arena1v1Rating ?? savedState?.arenaRating ?? arenaMod.ARENA_BASE_RATING,
       wins: savedState?.arena1v1Wins ?? savedState?.arenaWins ?? 0,
@@ -2765,7 +2786,7 @@ export class Sim {
   private mobCanSpawnInWater(
     template: { family?: string; canSwim?: boolean } | undefined,
   ): boolean {
-    return !!template && (template.canSwim === true || template.family === 'murloc');
+    return !!template && (template.canSwim === true || template.family === 'mudfin');
   }
   private isControlAura(kind: AuraKind): boolean {
     return kind === 'stun' || kind === 'root' || kind === 'incapacitate' || kind === 'polymorph';
@@ -2892,8 +2913,8 @@ export class Sim {
 
   isSwimming(e: Entity): boolean {
     return (
-      groundHeight(e.pos.x, e.pos.z, this.cfg.seed) < WATER_LEVEL - SWIM_DEPTH &&
-      e.pos.y <= SWIM_SURFACE_Y + 0.15
+      groundHeight(e.pos.x, e.pos.z, this.cfg.seed) < waterLevel() - SWIM_DEPTH &&
+      e.pos.y <= swimSurfaceY() + 0.15
     );
   }
 
@@ -2934,7 +2955,7 @@ export class Sim {
     // deep water and cliffs end the charge early rather than dragging the player in
     const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < WATER_LEVEL - SWIM_DEPTH) return done(false);
+    if (h1 < waterLevel() - SWIM_DEPTH) return done(false);
     if (
       h1 > h0 &&
       ((h1 - h0) / step > MAX_CLIMB_SLOPE ||
@@ -3002,7 +3023,7 @@ export class Sim {
     const nz = p.pos.z + Math.cos(p.facing) * step;
     const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < WATER_LEVEL - SWIM_DEPTH) return true; // don't trail into deep water
+    if (h1 < waterLevel() - SWIM_DEPTH) return true; // don't trail into deep water
     if (
       h1 > h0 &&
       step > 1e-5 &&
@@ -3154,10 +3175,10 @@ export class Sim {
 
     // Vertical: jumping, gravity, swimming, fall damage
     const ground = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
-    const deepWater = ground < WATER_LEVEL - SWIM_DEPTH;
-    if (deepWater && p.pos.y <= SWIM_SURFACE_Y + 0.05) {
+    const deepWater = ground < waterLevel() - SWIM_DEPTH;
+    if (deepWater && p.pos.y <= swimSurfaceY() + 0.05) {
       // treading water at the surface
-      p.pos.y = SWIM_SURFACE_Y;
+      p.pos.y = swimSurfaceY();
       p.vy = 0;
       p.vx = 0;
       p.vz = 0;
@@ -3186,9 +3207,9 @@ export class Sim {
       p.vy -= GRAVITY * DT;
       p.pos.y += p.vy * DT;
       p.fallStartY = Math.max(p.fallStartY, p.pos.y);
-      if (deepWater && p.pos.y <= SWIM_SURFACE_Y) {
+      if (deepWater && p.pos.y <= swimSurfaceY()) {
         // splashing into deep water breaks the fall
-        p.pos.y = SWIM_SURFACE_Y;
+        p.pos.y = swimSurfaceY();
         p.vy = 0;
         p.vx = 0;
         p.vz = 0;
@@ -3502,7 +3523,7 @@ export class Sim {
         nz = cz + uz * adv;
       const h0 = groundHeight(cx, cz, this.cfg.seed);
       const h1 = groundHeight(nx, nz, this.cfg.seed);
-      if (h1 < WATER_LEVEL - SWIM_DEPTH) break; // would land in deep water
+      if (h1 < waterLevel() - SWIM_DEPTH) break; // would land in deep water
       if (
         h1 > h0 &&
         ((h1 - h0) / adv > MAX_CLIMB_SLOPE ||
@@ -4216,7 +4237,7 @@ export class Sim {
       e.pos.x = nx;
       e.pos.z = nz;
       const g = groundHeight(nx, nz, this.cfg.seed);
-      e.pos.y = Math.max(g, SWIM_SURFACE_Y); // ride the surface while phasing, don't sink under terrain/water
+      e.pos.y = Math.max(g, swimSurfaceY()); // ride the surface while phasing, don't sink under terrain/water
       return d - step < 0.3;
     }
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
@@ -4228,14 +4249,15 @@ export class Sim {
       bestProgress = 1e-3;
     // Swimmers ride the water surface, so slope checks clamp submerged ground
     // to the waterline (a sloped lake bed is not a wall; see pathfind rideHeight).
-    const ride = (h: number): number => (canSwim && h < WATER_LEVEL ? WATER_LEVEL : h);
+    const wl = waterLevel();
+    const ride = (h: number): number => (canSwim && h < wl ? wl : h);
     let h0 = Number.NaN; // lazily sampled: only steep cells pay for heights
     for (const off of MOVE_SLIDE_FAN) {
       const a = desired + off;
       const nx = e.pos.x + Math.sin(a) * step;
       const nz = e.pos.z + Math.cos(a) * step;
       // landlocked creatures stop at the waterline instead of walking under it
-      if (!canSwim && groundHeight(nx, nz, this.cfg.seed) < WATER_LEVEL - SWIM_DEPTH) continue;
+      if (!canSwim && groundHeight(nx, nz, this.cfg.seed) < waterLevel() - SWIM_DEPTH) continue;
       // Mobs, pets, and feared players obey the wall rule too: no uphill step
       // onto unwalkably steep ground. Screened to the wall bands so the hot
       // open-world fan pays nothing; inside a band the memoized cell steepness
@@ -4258,7 +4280,7 @@ export class Sim {
     e.pos.x = bestX;
     e.pos.z = bestZ;
     const g = groundHeight(bestX, bestZ, this.cfg.seed);
-    e.pos.y = canSwim && g < WATER_LEVEL - SWIM_DEPTH ? SWIM_SURFACE_Y : g;
+    e.pos.y = canSwim && g < waterLevel() - SWIM_DEPTH ? swimSurfaceY() : g;
     return dist2d(e.pos, dest) < 0.3;
   }
 
@@ -4708,7 +4730,7 @@ export class Sim {
     return FISHING_SAMPLE_DISTANCES.some(
       (d) =>
         groundHeight(p.pos.x + sin * d, p.pos.z + cos * d, this.cfg.seed) <
-        WATER_LEVEL - SWIM_DEPTH,
+        waterLevel() - SWIM_DEPTH,
     );
   }
 

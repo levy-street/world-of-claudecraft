@@ -17,7 +17,7 @@ const QUESTS: TrackedQuest[] = [
     complete: true,
     objectives: [
       { label: 'Webwood Lurker slain', current: 6, total: 6 },
-      { label: 'Webwood Silk Gland', current: 4, total: 4 },
+      { label: 'Sableweb Silk Gland', current: 4, total: 4 },
     ],
   },
 ];

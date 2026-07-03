@@ -477,7 +477,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     'Talents updated.',
     'Talents reset.',
     'You cannot equip that.',
-    'Equipped Worn Shortsword.',
+    'Equipped Pitted Shortsword.',
     'You quaff Minor Healing Potion.',
     'No fish are biting.',
     'You sit down to eat.',
@@ -507,7 +507,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     'Forest Wolf calls for aid!',
     'Discarded Linen Scrap.',
     'Discarded Linen Scrap x3.',
-    'Aki wins Worn Shortsword (87)',
+    'Aki wins Pitted Shortsword (87)',
     'Aki leaves the party.',
     'Aki has left the party.',
     'Aki has been removed from the party.',
@@ -531,7 +531,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
 
   it('localizes embedded item and mob names inside sim text', () => {
     setLanguage('de_DE');
-    expect(localizeSimText('Equipped Worn Shortsword.')).not.toContain('Worn Shortsword');
+    expect(localizeSimText('Equipped Pitted Shortsword.')).not.toContain('Pitted Shortsword');
     expect(localizeSimText('Forest Wolf dies.')).not.toContain('Forest Wolf');
     setLanguage('en');
   });

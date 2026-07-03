@@ -106,8 +106,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 400,
-      "state": "52f24bea",
-      "events": "b9a16d31",
+      "state": "6dc952a8",
+      "events": "8f94b557",
       "rng": {
         "draws": 54,
         "digest": "d9836924"
@@ -117,8 +117,8 @@
       "tick": 40,
       "time": 2,
       "nextId": 400,
-      "state": "fc986783",
-      "events": "330d7fc3",
+      "state": "e528aba5",
+      "events": "ff4fe2c7",
       "rng": {
         "draws": 95,
         "digest": "43c2d2eb"
@@ -128,8 +128,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "e73a1b94",
-      "events": "7f50eb76",
+      "state": "b4d796e6",
+      "events": "e6de2a58",
       "rng": {
         "draws": 224,
         "digest": "22d4749f"
@@ -139,7 +139,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 400,
-      "state": "ee221926",
+      "state": "07f897cc",
       "events": "741638a5",
       "rng": {
         "draws": 224,
@@ -412,7 +412,7 @@
               "duration": 10,
               "id": "rampage_warlord_drogmar",
               "kind": "buff_ap",
-              "name": "Battle Fury",
+              "name": "Mounting Rage",
               "remaining": 9.65,
               "school": "physical",
               "sourceId": 397,
@@ -572,7 +572,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 400,
-      "state": "741e157b",
+      "state": "7bc41831",
       "events": "741638a5",
       "rng": {
         "draws": 244,
@@ -845,7 +845,7 @@
               "duration": 10,
               "id": "rampage_warlord_drogmar",
               "kind": "buff_ap",
-              "name": "Battle Fury",
+              "name": "Mounting Rage",
               "remaining": 9.45,
               "school": "physical",
               "sourceId": 397,

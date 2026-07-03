@@ -2422,14 +2422,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nhalia_mourner.name': 'Pranteadora de Nhalia',
   'entities.mobs.sister_nhalia.name': 'Irmã Nhalia',
   'entities.mobs.varkas_boneguard.name': 'Guardião dos ossos de Varkas',
-  'entities.mobs.imp.name': 'Diabrete',
-  'entities.mobs.voidwalker.name': 'Caminhante do Vazio',
-  'entities.mobs.succubus.name': 'Súcubo',
+  'entities.mobs.emberkin.name': 'Diabrete',
+  'entities.mobs.gloomshade.name': 'Caminhante do Vazio',
+  'entities.mobs.duskborn.name': 'Súcubo',
   'entities.mobs.grix_the_tunnelking.name': 'Grix o Rei dos Túneis',
-  'entities.mobs.felhunter.name': 'Caçador Vil',
-  'entities.mobs.felguard.name': 'Guarda Vil',
-  'entities.mobs.infernal.name': 'Infernal',
-  'entities.mobs.doomguard.name': 'Guarda Sinistro',
+  'entities.mobs.spellhound.name': 'Caçador Vil',
+  'entities.mobs.warfiend.name': 'Guarda Vil',
+  'entities.mobs.pyre_colossus.name': 'Infernal',
+  'entities.mobs.wraithborn.name': 'Guarda Sinistro',
   'entities.mobs.choirmother_selthe.name': 'Mãe-do-Coro Selthe',
   'entities.mobs.drowned_templeguard.name': 'Guarda do Templo Afogado',
   'entities.mobs.drowned_votary.name': 'Devoto Afogado',
@@ -3704,12 +3704,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Bandidos, cultistas e outros que escolheram o ofício errado. Eles lutam com táticas, não apenas com dentes.',
   'guide.family.humanoid.name': 'Humanoides',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Escavadores com vela na cabeça que infestam minas e tocas, guardando seu minério com ferocidade.',
-  'guide.family.kobold.name': 'Kobolds',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobolds',
+  'guide.family.mudfin.desc':
     'Habitantes anfíbios do pântano que enxameiam as águas rasas em bandos barulhentos e territoriais.',
-  'guide.family.murloc.name': 'Murlocs',
+  'guide.family.mudfin.name': 'Murlocs',
   'guide.family.ogre.desc':
     'Enormes, lerdos e perigosos. Eles acampam nas passagens altas e batem como um deslizamento de terra.',
   'guide.family.ogre.name': 'Ogros',
@@ -4141,17 +4141,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena e JcJ',
   'guide.nav.talents': 'Talentos',
   'guide.nav.wishIKnew': 'O que eu gostaria de saber',
-  'guide.petHook.doomguard': 'Um conjurador de elite que despeja sombra pesada à distância.',
-  'guide.petHook.felguard':
+  'guide.petHook.wraithborn': 'Um conjurador de elite que despeja sombra pesada à distância.',
+  'guide.petHook.warfiend':
     'Um brigão corpo a corpo resistente, o faz-tudo assim que você consegue invocá-lo.',
-  'guide.petHook.felhunter': 'Um combatente sombrio que persegue conjuradores inimigos.',
-  'guide.petHook.imp':
+  'guide.petHook.spellhound': 'Um combatente sombrio que persegue conjuradores inimigos.',
+  'guide.petHook.emberkin':
     'Um demônio de setas de fogo à distância que desgasta os inimigos de um ponto seguro.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Um colosso imponente de corpo a corpo esmagador, invocado pela força bruta.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Um demônio corpo a corpo rápido que acerta forte, mas cede sob pressão.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Um demônio robusto que provoca e absorve golpes para você conjurar em paz.',
   'guide.related': 'Relacionados',
   'guide.search.label': 'Buscar',

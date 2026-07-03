@@ -1,5 +1,5 @@
 // Pure derivation of the low-resource warning state for the player resource
-// bar. Classic WoW pulses the mana bar when power runs low; we extend that to
+// bar. Classic-era clients pulse the mana bar when power runs low; we extend that to
 // energy as well. Rage is intentionally excluded — it *builds* in combat, so a
 // low value is a normal state, not a warning.
 //
@@ -40,7 +40,7 @@ export function lowResourceView(input: LowResourceInput): LowResourceView {
   const tt = clamp01((LOW_RESOURCE_THRESHOLD - frac) / LOW_RESOURCE_THRESHOLD);
   // Ease the glow in (matches the low-health vignette feel) and keep a floor so
   // it's visible the instant it crosses the threshold.
-  const opacity = 0.4 + Math.pow(tt, 0.8) * 0.55;
+  const opacity = 0.4 + tt ** 0.8 * 0.55;
   // Breathe slowly when just-low (~1.4s), urgently when near-empty (~0.5s).
   const pulseSeconds = 1.4 - tt * 0.9;
   const label = resourceType === 'mana' ? t('game.hud.lowMana') : t('game.hud.lowEnergy');

@@ -2,6 +2,8 @@
 // name it in a comment). These assertions inspect the live events + final state of
 // a recorded run. If a future content change breaks a recipe, this fails loudly so
 // the golden never silently stops exercising a system.
+// Display-name literals follow the LOCKED NAME-MAP (authorized gate-text edit per the
+// OPERATOR RULING, 2026-07-02, ip-refactor/02-WORKING-MEMORY.md); ability/aura IDS are frozen.
 
 import { describe, expect, it } from 'vitest';
 import type { Recorder } from './record';
@@ -49,7 +51,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       (e) =>
         e.type === 'damage' &&
         typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('sinister'),
+        e.ability.toLowerCase().includes('wicked'),
     );
     const playerDealt = ev.some((e) => e.type === 'damage' && e.sourceId === pid);
     expect(sinister || playerDealt).toBe(true);
@@ -90,7 +92,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(
       ev.some((e) => e.type === 'damage' && e.sourceId === pet.id && e.school === 'fire'),
     ).toBe(true);
-    // hostile-mob arm (6776): wild imp's AI shoots the player
+    // hostile-mob arm (6776): wild fire demon's AI shoots the player
     const hostileImpId = rec.notes.hostileImpId;
     expect(
       ev.some(
@@ -117,16 +119,16 @@ describe('coverage: each scenario fires its subsystem', () => {
     ).toBe(true);
   });
 
-  it('pet_ai: imp fires petRangedAttack (fire bolt), melee pet pulls+swings, both heel', () => {
+  it('pet_ai: emberkin fires petRangedAttack (fire bolt), melee pet pulls+swings, both heel', () => {
     const rec = run('pet_ai');
     const ev = rec.allEvents as Ev[];
     const impId = rec.notes.impId as number;
     const tankId = rec.notes.tankId as number;
-    // petRangedAttack: the imp's only damage path is the fire bolt (no miss roll).
+    // petRangedAttack: the emberkin's only damage path is the fire bolt (no miss roll).
     expect(ev.some((e) => e.type === 'damage' && e.sourceId === impId && e.school === 'fire')).toBe(
       true,
     );
-    // melee arm: the voidwalker acquired a target via petPickTarget and swung it.
+    // melee arm: the gloomshade acquired a target via petPickTarget and swung it.
     expect(ev.some((e) => e.type === 'damage' && e.sourceId === tankId)).toBe(true);
     // heel transition: both pets dropped their target and follow the owner.
     const ents = entities(rec);
@@ -166,7 +168,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       (e) =>
         e.type === 'damage' &&
         typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('consecrat'),
+        e.ability.toLowerCase().includes('holy ground'),
     );
     // 1 immediate on-cast pulse (~4097) + >=1 deferred interval pulse (~3052).
     expect(hits.length).toBeGreaterThanOrEqual(2);
@@ -594,7 +596,7 @@ describe('coverage: each scenario fires its subsystem', () => {
           (e) =>
             e.type === 'damage' &&
             typeof e.ability === 'string' &&
-            e.ability.toLowerCase().includes('consecrat'),
+            e.ability.toLowerCase().includes('holy ground'),
         )
         .map((e) => e.targetId),
     );
@@ -690,7 +692,7 @@ describe('coverage: each scenario fires its subsystem', () => {
         e.type === 'damage' &&
         e.kind === 'miss' &&
         typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('sunder'),
+        e.ability.toLowerCase().includes('shear'),
     );
     expect(Boolean(warriorMob) || sunderMiss).toBe(true);
     // mage arcane_explosion: the per-target aoeDamage hit BOTH in-radius mobs.
@@ -746,7 +748,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(
       ev.some(
         (e) =>
-          e.type === 'damage' && (e.ability === 'Heroic Strike' || e.ability === 'Raptor Strike'),
+          e.type === 'damage' && (e.ability === 'Reaver Strike' || e.ability === 'Gutting Strike'),
       ),
     ).toBe(true);
   });
@@ -858,8 +860,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // Phase 1 raise-fallen wave + the three wardstones the transition lit.
     expect(n.addIds.length).toBe(2);
     expect(n.wardIds.length).toBe(3);
-    // Transition: War Stomp room stun + Brother Aldric spawned and still present.
-    expect(auras.some((e) => e.name === 'War Stomp')).toBe(true);
+    // Transition: Shuddering Stomp room stun + Brother Aldric spawned and still present.
+    expect(auras.some((e) => e.name === 'Shuddering Stomp')).toBe(true);
     expect(entities(rec).some((e) => e.templateId === 'brother_aldric_raid')).toBe(true);
     // Soul Rend marks pick (the rng.int callout) + Deathless Rage interrupt self-stun.
     expect(chats.some((e) => e.text === 'Your spirit belongs to me')).toBe(true);

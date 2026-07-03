@@ -1,13 +1,13 @@
-// "Banshee's Wail" elite mechanic: a mob with a `terrify` template field
+// "Keening Wail" elite mechanic: a mob with a `terrify` template field
 // periodically shrieks while in melee combat, fearing every player inside its
-// radius into a panicked flee. It is the fear analogue of War Stomp — timed and
+// radius into a panicked flee. It is the fear analogue of Shuddering Stomp — timed and
 // room-wide rather than on-hit like `dread` — and reuses the same `fear_incap`
 // aura the player-cast Fear applies. Telegraphed: the first wail only lands one
 // full interval after the fight begins, and the telegraph re-arms on evade.
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 function makeSim() {
@@ -25,11 +25,12 @@ function engagedWailer(sim: Sim): Entity {
   return mob;
 }
 
-const fearAura = (e: Entity) => e.auras.find((a) => a.id === 'fear_incap' && a.kind === 'incapacitate');
+const fearAura = (e: Entity) =>
+  e.auras.find((a) => a.id === 'fear_incap' && a.kind === 'incapacitate');
 
-describe("Banshee's Wail elite mechanic", () => {
-  it('Sister Nhalia carries a Banshee\'s Wail', () => {
-    expect(MOBS.sister_nhalia.terrify?.name).toBe("Banshee's Wail");
+describe('Keening Wail elite mechanic', () => {
+  it("Sister Nhalia carries a Banshee's Wail", () => {
+    expect(MOBS.sister_nhalia.terrify?.name).toBe('Keening Wail');
   });
 
   it('is telegraphed: a freshly spawned wailer waits one interval before its first scream', () => {
@@ -46,7 +47,7 @@ describe("Banshee's Wail elite mechanic", () => {
     (sim as any).updateMob(mob);
 
     const aura = fearAura(sim.player);
-    expect(aura?.name).toBe("Banshee's Wail");
+    expect(aura?.name).toBe('Keening Wail');
     expect(aura?.kind).toBe('incapacitate');
     expect(aura?.breaksOnDamage).toBe(true);
     expect(aura?.duration).toBe(MOBS.sister_nhalia.terrify!.duration); // mob source → full duration (DR is PvP-only)
@@ -82,8 +83,8 @@ describe("Banshee's Wail elite mechanic", () => {
     mob.terrifyTimer = 0.001;
     (sim as any).updateMob(mob);
 
-    expect(fearAura(sim.player)).toBeDefined();  // in radius → feared
-    expect(fearAura(far)).toBeUndefined();       // out of radius → spared
+    expect(fearAura(sim.player)).toBeDefined(); // in radius → feared
+    expect(fearAura(far)).toBeUndefined(); // out of radius → spared
   });
 
   it('does not scream before the timer elapses', () => {

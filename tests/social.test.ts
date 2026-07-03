@@ -290,8 +290,8 @@ describe('nine classes', () => {
         for (const e of evs) {
           // The 3-charge cap and 5s internal cooldown are shield-wide, not per-attacker
           // (a wandering low-level mob can also land a hit now that it connects >= 80%),
-          // so count every Lightning Shield reflect regardless of which attacker it hits.
-          if (e.type === 'damage' && e.ability === 'Lightning Shield') {
+          // so count every Thunder Ward reflect regardless of which attacker it hits.
+          if (e.type === 'damage' && e.ability === 'Thunder Ward') {
             reflects++;
             reflectTicks.push(i);
           }

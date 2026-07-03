@@ -1,6 +1,6 @@
 // Character & Stats: what the five primary attributes do, the secondary stats they
 // feed, and where to read them on the character sheet. Directional only, no formulas
-// or balance numbers, so there is nothing here to min-max (WoW-style altitude).
+// or balance numbers, so there is nothing here to min-max (classic-guide altitude).
 
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';

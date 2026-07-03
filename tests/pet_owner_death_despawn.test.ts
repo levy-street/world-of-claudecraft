@@ -65,7 +65,7 @@ describe('a dead owner does not leave an immortal pet', () => {
     sim.setPlayerLevel(12, wpid);
     const warlock = sim.entities.get(wpid) as AnyEntity;
     warlock.resource = warlock.maxResource;
-    (sim as any).summonPet(warlock, 'imp');
+    (sim as any).summonPet(warlock, 'emberkin');
     const imp = petOf(sim.ctx, wpid) as AnyEntity;
     expect(imp).toBeTruthy();
     expect(MOBS[imp.templateId].family).toBe('demon');

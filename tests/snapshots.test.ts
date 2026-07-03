@@ -480,7 +480,7 @@ describe('delta snapshots', () => {
     expect(row.auras).toContainEqual(
       expect.objectContaining({
         id: 'travel_form',
-        name: 'Travel Form',
+        name: 'Fleet Form',
         kind: 'form_travel',
         value: 1.4,
       }),
@@ -1254,7 +1254,7 @@ describe('client-side delta merge', () => {
     }
   });
 
-  it('reconstructs stacking-debuff stack counts from the wire (Sunder Armor)', () => {
+  it('reconstructs stacking-debuff stack counts from the wire (Armor Shear)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       ents: [
@@ -1273,7 +1273,7 @@ describe('client-side delta merge', () => {
           auras: [
             {
               id: 'sunder_armor',
-              name: 'Sunder Armor',
+              name: 'Armor Shear',
               kind: 'sunder',
               rem: 30,
               dur: 30,
@@ -1287,7 +1287,7 @@ describe('client-side delta merge', () => {
     expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
   });
 
-  it('reconstructs charge-limited aura charges from the wire (Lightning Shield)', () => {
+  it('reconstructs charge-limited aura charges from the wire (Thunder Ward)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       ents: [
@@ -1306,7 +1306,7 @@ describe('client-side delta merge', () => {
           auras: [
             {
               id: 'lightning_shield',
-              name: 'Lightning Shield',
+              name: 'Thunder Ward',
               kind: 'thorns',
               rem: 600,
               dur: 600,
@@ -2241,7 +2241,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   });
 
   it('sends a POSITIVE buff value so its tooltip shows the real magnitude, still a buff in both worlds', () => {
-    const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Arcane Intellect' };
+    const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Aether Insight' };
     const { wire, mirror } = roundTrip(buff);
     expect(wireAura(wire, 'arcane_intellect').value).toBe(40); // rides the wire now (was omitted)
     expect(mirror.value).toBe(40); // client mirrors the real magnitude (not the old hardcoded 0)
@@ -2252,7 +2252,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   it('sends a POSITIVE absorb value so the shield overlay and tooltip work online too', () => {
     const shield: Aura = {
       id: 'power_word_shield',
-      name: 'Power Word: Shield',
+      name: 'Psalm of Warding',
       kind: 'absorb',
       remaining: 12,
       duration: 12,
@@ -2275,7 +2275,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     // harmless. Classification stays KIND-based (DEBUFF_AURA_KINDS), identical in both worlds.
     const fear: Aura = {
       id: 'fear',
-      name: 'Fear',
+      name: 'Harrow',
       kind: 'incapacitate',
       remaining: 4,
       duration: 4,
@@ -2291,12 +2291,12 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(isAuraDebuff(mirror)).toBe(true);
   });
 
-  it('round-trips Aspect of the Hawk so its tooltip shows the real attack power, not 0 (the bug)', () => {
-    // The reported bug: online, Aspect of the Hawk read "Increases attack power by 0" because the
+  it("round-trips Harrier's Guise so its tooltip shows the real attack power, not 0 (the bug)", () => {
+    // The reported bug: online, Harrier's Guise read "Increases attack power by 0" because the
     // positive buff_ap magnitude never rode the wire. It now does, so offline == online.
     const hawk: Aura = {
       id: 'aspect_of_the_hawk',
-      name: 'Aspect of the Hawk',
+      name: "Harrier's Guise",
       kind: 'buff_ap',
       remaining: 1800,
       duration: 1800,
@@ -2316,7 +2316,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   it('round-trips a dot magnitude, tick cadence, and non-physical school for its tooltip', () => {
     const dot: Aura = {
       id: 'corruption',
-      name: 'Corruption',
+      name: 'Blackrot',
       kind: 'dot',
       remaining: 12,
       duration: 12,
@@ -2401,7 +2401,7 @@ describe('aura decode reuses records across snapshots (allocation fast path)', (
     void pid;
     mob.auras.push({
       id: 'corruption',
-      name: 'Corruption',
+      name: 'Blackrot',
       kind: 'dot',
       remaining: 12,
       duration: 12,
@@ -2481,7 +2481,7 @@ describe('aura decode fast-path guards (composition edge cases)', () => {
     mob.auras.push(
       {
         id: 'corruption',
-        name: 'Corruption',
+        name: 'Blackrot',
         kind: 'dot',
         remaining: 12,
         duration: 12,

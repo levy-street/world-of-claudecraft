@@ -11,14 +11,14 @@ export const shellStrings = {
     seo: {
       title: 'World of ClaudeCraft: Classic-Style Web MMO',
       description:
-        'Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!',
+        'Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!',
       genre: 'MMORPG',
       playMode: 'Multiplayer',
       applicationCategory: 'Game',
       operatingSystem: 'Web browser',
       officialLabel: 'Official World of ClaudeCraft website',
       officialBody:
-        'worldofclaudecraft.com is the official free browser MMO for the Claudemoon realm. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.',
+        'worldofclaudecraft.com is the official free browser MMO for the Claudemoon world. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.',
     },
     a11y: {
       goHome: 'Go to homepage',
@@ -34,7 +34,7 @@ export const shellStrings = {
       world: 'Loading world...',
       worldProgress: 'Loading world... {done}/{total}',
       enteringWorld: 'Entering the world...',
-      connectingRealm: 'Connecting to realm...',
+      connectingRealm: 'Connecting to world...',
       assetsFailed: 'Asset loading failed: try reloading. {error}',
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
@@ -97,12 +97,12 @@ export const shellStrings = {
       },
     },
     realm: {
-      noRealms: 'No realms available.',
-      loading: 'Loading realms...',
+      noRealms: 'No worlds available.',
+      loading: 'Loading worlds...',
       recommended: 'Recommended',
       checkingStatus: 'Checking status...',
       onlineNow: '{count} online now',
-      down: 'Realm is down',
+      down: 'World is down',
       offline: 'Offline',
       full: 'Full',
       high: 'High',
@@ -111,15 +111,15 @@ export const shellStrings = {
       popTipLow:
         'Low population: fewer than 15 players online right now. Plenty of room; great for a fresh start.',
       popTipMedium:
-        'Medium population: 15 to 39 players online right now. A healthy, active realm.',
+        'Medium population: 15 to 39 players online right now. A healthy, active world.',
       popTipHigh:
         'High population: 40 to 79 players online right now. Busy, with lots of players around.',
       popTipFull:
         'Full population: 80 or more players online right now. Very busy; you may wait in a login queue.',
-      popTipOffline: 'Offline: this realm is unreachable right now and cannot be joined.',
+      popTipOffline: 'Offline: this world is unreachable right now and cannot be joined.',
       characterCountOne: '{count} character',
       characterCountOther: '{count} characters',
-      selectedRealm: 'Realm: {name}',
+      selectedRealm: 'World: {name}',
       statsOffline: 'Offline',
       statsRealmOffline: '{realm} (Offline)',
     },
@@ -206,18 +206,18 @@ export const shellStrings = {
         warrior:
           'Warriors are battle-hardened melee fighters who build Rage as they deal or take damage. They absorb heavy hits or crush foes with powerful weapons.',
         paladin:
-          'Paladins are holy crusaders who support allies with blessings, heal wounds with Holy Light, and protect the weak in heavy armor.',
+          'Paladins are holy crusaders who support allies with blessings, heal wounds with Mending Light, and protect the weak in heavy armor.',
         hunter:
           'Hunters are ranged specialists who fight beside a tamed beast, peppering enemies with aimed and rapid shots, slowing them with stings and concussive fire, and shifting aspects to suit the moment.',
         rogue:
           'Rogues are stealthy assassins who spend Energy and Combo Points on backstabs and finishing moves from the shadows.',
         priest:
-          'Priests call on Holy Light to heal and shield allies, while Shadow magic lets them drain the life of their enemies.',
+          'Priests call on Mending Light to heal and shield allies, while Shadow magic lets them drain the life of their enemies.',
         shaman:
           'Shaman command the elements, imbuing weapons with power, shocking enemies with lightning, and restoring allies.',
-        mage: 'Mages bend Fire, Frost, and Arcane power to destroy enemies, conjure water, and freeze threats in place.',
+        mage: 'Mages bend Fire, Frost, and arcane force to destroy enemies, summon water, and freeze threats in place.',
         warlock:
-          'Warlocks summon demons, apply curses and damage-over-time magic, and drain life from enemies to endure.',
+          'Warlocks summon demons, apply curses and damage-over-time magic, and leech life from enemies to endure.',
         druid:
           'Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage.',
       },
@@ -247,10 +247,10 @@ export const shellStrings = {
         'Install or add this page to your Home screen for the best fullscreen mobile experience.',
     },
     serverUnavailable: {
-      title: 'World of ClaudeCraft - Realm Unavailable',
+      title: 'World of ClaudeCraft - World Unavailable',
       logoAlt: 'World of ClaudeCraft',
-      eyebrow: 'Realm maintenance',
-      heading: 'The realm is temporarily unavailable.',
+      eyebrow: 'World maintenance',
+      heading: 'The world is temporarily unavailable.',
       body: 'We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.',
       status: 'Back soon',
     },

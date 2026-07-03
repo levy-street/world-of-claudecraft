@@ -589,7 +589,7 @@
     text-shadow: 1px 1px 1px #000;
     z-index: 3;
   }
-  /* crossed-swords combat indicator on the player portrait (classic WoW) */
+  /* crossed-swords combat indicator on the player portrait (classic style) */
   .combat-flash {
     position: absolute;
     top: -4px;
@@ -1990,7 +1990,7 @@
       0 0 14px #000c,
       inset 0 0 20px #0008;
   }
-  /* Digital clock pinned to the bottom of the minimap ring, classic-WoW style. */
+  /* Digital clock pinned to the bottom of the minimap ring, classic style. */
   #minimap-clock {
     position: absolute;
     left: 50%;
@@ -2145,7 +2145,7 @@
     line-height: 0;
   }
   /* raid-lockout badge: a small satellite button hugging the bottom-left rim of
-     the round minimap (classic-WoW tracking-button placement). Dim when every
+     the round minimap (classic tracking-button placement). Dim when every
      raid is ready, gold + glow while a lockout is active. Hover/tap shows the panel. */
   #raid-lockout {
     position: absolute;

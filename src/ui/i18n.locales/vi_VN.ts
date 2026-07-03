@@ -1257,14 +1257,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Sát Thủ Tử Thần Voss',
   'entities.mobs.deepfen_murloc.name': 'Quái Đớp Đầm Sâu',
   'entities.mobs.deeprock_kobold.name': 'Kẻ Đào Hầm Thạch Sâu',
-  'entities.mobs.doomguard.name': 'Vệ Binh Diệt Vong',
+  'entities.mobs.wraithborn.name': 'Vệ Binh Diệt Vong',
   'entities.mobs.drowned_dead.name': 'Tử Thi Chết Chìm',
   'entities.mobs.drowned_templeguard.name': 'Vệ Đền Chết Chìm',
   'entities.mobs.drowned_thrall.name': 'Nô Lệ Chết Chìm',
   'entities.mobs.drowned_votary.name': 'Tín Đồ Chết Chìm',
   'entities.mobs.fallen_captain_aldren.name': 'Đội Trưởng Sa Ngã Aldren',
-  'entities.mobs.felguard.name': 'Vệ Binh Quỷ',
-  'entities.mobs.felhunter.name': 'Thợ Săn Quỷ',
+  'entities.mobs.warfiend.name': 'Vệ Binh Quỷ',
+  'entities.mobs.spellhound.name': 'Thợ Săn Quỷ',
   'entities.mobs.fen_troll.name': 'Troll Đầm Bùn',
   'entities.mobs.forest_wolf.name': 'Sói Rừng',
   'entities.mobs.glimmermere_wader.name': 'Kẻ Lội Hồ Lấp Lánh',
@@ -1277,8 +1277,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.grix_the_tunnelking.name': 'Grix Vua Đường Hầm',
   'entities.mobs.grubjaw.name': 'Grubjaw Phàm Ăn',
   'entities.mobs.hollow_acolyte.name': 'Tu Đồ Rỗng',
-  'entities.mobs.imp.name': 'Tiểu Quỷ',
-  'entities.mobs.infernal.name': 'Quỷ Hỏa Ngục',
+  'entities.mobs.emberkin.name': 'Tiểu Quỷ',
+  'entities.mobs.pyre_colossus.name': 'Quỷ Hỏa Ngục',
   'entities.mobs.ironvein_foreman.name': 'Quản Đốc Mạch Sắt',
   'entities.mobs.ironvein_sapper.name': 'Công Binh Mạch Sắt',
   'entities.mobs.knight_commander_olen.name': 'Hiệp Sĩ Chỉ Huy Olen',
@@ -1319,7 +1319,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Sơ Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtooth Kẻ Chết Chìm',
   'entities.mobs.stormcrag_elemental.name': 'Nguyên Tố Bão Nham',
-  'entities.mobs.succubus.name': 'Mỹ Quỷ',
+  'entities.mobs.duskborn.name': 'Mỹ Quỷ',
   'entities.mobs.thornpeak_ogre.name': 'Quỷ Khổng Lồ Đỉnh Gai',
   'entities.mobs.tidebound_acolyte.name': 'Tu Đồ Buộc Triều',
   'entities.mobs.tunnel_rat.name': 'Chuột Đào Hầm',
@@ -1329,7 +1329,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Ảo Ảnh Đội Trưởng Aldren',
   'entities.mobs.vision_deathstalker_voss.name': 'Ảo Ảnh Sát Thủ Hoàng Gia Voss',
   'entities.mobs.vision_malric_mage.name': 'Ảo Ảnh Đại Tu Sĩ Malric',
-  'entities.mobs.voidwalker.name': 'Quỷ Hư Không',
+  'entities.mobs.gloomshade.name': 'Quỷ Hư Không',
   'entities.mobs.voskar_emberwing.name': 'Voskar Cánh Tàn Lửa',
   'entities.mobs.warlock_imp.name': 'Quỷ Lửa',
   'entities.mobs.warlock_voidwalker.name': 'Quỷ Hư Không',
@@ -2554,12 +2554,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Cướp, tín đồ tà giáo, và những kẻ khác đã chọn sai nghề. Chúng chiến đấu bằng chiến thuật, không chỉ bằng nanh vuốt.',
   'guide.family.humanoid.name': 'Nhân Hình',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Những kẻ đào hang đầu mang nến tràn ngập các hầm mỏ và hang ổ, hung hãn bảo vệ quặng của chúng.',
-  'guide.family.kobold.name': 'Kobold',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobold',
+  'guide.family.mudfin.desc':
     'Cư dân đầm lầy lưỡng cư tràn ngập vùng nước nông trong những bầy ồn ào, giành lãnh thổ.',
-  'guide.family.murloc.name': 'Murloc',
+  'guide.family.mudfin.name': 'Murloc',
   'guide.family.ogre.desc':
     'Khổng lồ, chậm trí, và nguy hiểm. Chúng đóng trại nơi những con đèo cao và giáng đòn như một trận lở đất.',
   'guide.family.ogre.name': 'Ogre',
@@ -2904,16 +2904,17 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Trang bạn đang tìm không tồn tại hoặc có thể đã được chuyển đi.',
   'guide.notFound.home': 'Trở lại trang tổng quan',
   'guide.notFound.title': 'Chúng tôi không tìm thấy trang đó',
-  'guide.petHook.doomguard': 'Một pháp sư tinh nhuệ trút bóng tối nặng nề từ xa.',
-  'guide.petHook.felguard':
+  'guide.petHook.wraithborn': 'Một pháp sư tinh nhuệ trút bóng tối nặng nề từ xa.',
+  'guide.petHook.warfiend':
     'Một chiến binh cận chiến bền bỉ, lựa chọn toàn diện một khi bạn có thể triệu hồi nó.',
-  'guide.petHook.felhunter': 'Một kẻ tập kích bóng tối chuyên săn lùng các pháp sư của kẻ địch.',
-  'guide.petHook.imp': 'Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.',
-  'guide.petHook.infernal':
+  'guide.petHook.spellhound': 'Một kẻ tập kích bóng tối chuyên săn lùng các pháp sư của kẻ địch.',
+  'guide.petHook.emberkin':
+    'Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.',
+  'guide.petHook.pyre_colossus':
     'Một cỗ máy hủy diệt đồ sộ với đòn cận chiến nghiền nát, được triệu hồi vì sức mạnh thuần túy.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Một con quỷ cận chiến nhanh nhẹn, đánh rất mạnh nhưng dễ gục khi bị áp lực.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Một con quỷ vững chãi biết khiêu khích và hứng đòn để bạn có thể niệm phép yên ổn.',
   'guide.placeholder.note': 'Phần này của cẩm nang đang được hoàn thiện.',
   'guide.progression.bandLabel': 'Cấp {min} đến {max}',

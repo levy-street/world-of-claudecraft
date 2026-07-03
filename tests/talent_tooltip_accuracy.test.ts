@@ -228,8 +228,8 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     // numbers. Concussive Shot is a utility slow, so the talent cuts its cooldown (more
     // frequent slows) rather than buffing its negligible damage.
     const barrage = render('hunter', (e) => e.id === 'mm_barrage');
-    expect(barrage).toContain('Arcane Shot');
-    expect(barrage).toContain('Concussive Shot');
+    expect(barrage).toContain('Fell Shot');
+    expect(barrage).toContain('Rattling Shot');
     expect(barrage).toContain('cooldown');
     expect(barrage).toContain('10%');
     expect(barrage).not.toContain('15%');

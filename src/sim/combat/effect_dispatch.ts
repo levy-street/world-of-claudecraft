@@ -332,7 +332,7 @@ export function runEffects(
       case 'dot': {
         if (!target || target.dead) break;
         // Snapshot Spell Power (or Ranged AP) into the per-tick value at cast time,
-        // vanilla-style: the total DoT coefficient spread across its ticks. A DoT
+        // classic-style: the total DoT coefficient spread across its ticks. A DoT
         // that RIDES a direct/AoE nuke (Fireball, Pyroblast, Immolate) does NOT also
         // scale here: the direct component already took the cast-time coefficient, so
         // scaling the rider too would double-dip and over-reward hybrids. Only pure

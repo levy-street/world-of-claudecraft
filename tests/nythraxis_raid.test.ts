@@ -108,7 +108,7 @@ function summonImp(sim: Sim, pid: number): Entity {
     sim as unknown as {
       createDemonPet(owner: Entity, mobId: string, emit?: boolean): Entity | null;
     }
-  ).createDemonPet(owner, 'imp', false);
+  ).createDemonPet(owner, 'emberkin', false);
   if (!pet) throw new Error('expected warlock imp');
   return pet;
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
-import { CLASSES, ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import type { SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -24,9 +24,9 @@ describe('/abilities command', () => {
 
     const known = abilitiesKnownAt('warrior', sim.entities.get(a)!.level);
     expect(text).toContain(`Spellbook (${known.length}):`);
-    // a level-1 warrior knows Heroic Strike but not yet Charge (learnLevel 4)
-    expect(text).toContain('Heroic Strike (Rank 1)');
-    expect(text).not.toContain('Charge');
+    // a level-1 warrior knows Reaver Strike but not yet Charge (learnLevel 4)
+    expect(text).toContain('Reaver Strike (Rank 1)');
+    expect(text).not.toContain('Onrush');
     expect(text.endsWith('.')).toBe(true);
   });
 
@@ -40,9 +40,9 @@ describe('/abilities command', () => {
 
     const known = abilitiesKnownAt('warrior', 20);
     expect(text).toContain(`Spellbook (${known.length}):`);
-    // Heroic Strike reaches Rank 4 at level 20; Charge is now learned
-    expect(text).toContain('Heroic Strike (Rank 4)');
-    expect(text).toContain('Charge (Rank 1)');
+    // Reaver Strike reaches Rank 4 at level 20; Charge is now learned
+    expect(text).toContain('Reaver Strike (Rank 4)');
+    expect(text).toContain('Onrush (Rank 1)');
   });
 
   it('accepts the /spells and /spellbook aliases', () => {

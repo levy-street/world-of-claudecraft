@@ -1539,13 +1539,13 @@ export const ko_KR: EnTranslations = {
       "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다."
     },
     "petHook": {
-      "imp": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
-      "voidwalker": "도발하고 타격을 흡수해 주는 단단한 악마로, 안심하고 시전할 수 있게 합니다.",
-      "succubus": "강하게 때리지만 압박에는 쉽게 무너지는 빠른 근접 악마입니다.",
-      "felhunter": "적 시전자를 집요하게 쫓는 어둠의 척후형 악마입니다.",
-      "felguard": "단단한 근접 강타형 악마로, 소환할 수 있게 되면 다재다능한 만능 일꾼입니다.",
-      "infernal": "강력한 근접 공격을 지닌 거대한 돌격형 악마로, 순수한 힘을 위해 소환합니다.",
-      "doomguard": "멀리서 강력한 어둠 마법을 퍼붓는 정예 시전형 악마입니다."
+      "emberkin": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
+      "gloomshade": "도발하고 타격을 흡수해 주는 단단한 악마로, 안심하고 시전할 수 있게 합니다.",
+      "duskborn": "강하게 때리지만 압박에는 쉽게 무너지는 빠른 근접 악마입니다.",
+      "spellhound": "적 시전자를 집요하게 쫓는 어둠의 척후형 악마입니다.",
+      "warfiend": "단단한 근접 강타형 악마로, 소환할 수 있게 되면 다재다능한 만능 일꾼입니다.",
+      "pyre_colossus": "강력한 근접 공격을 지닌 거대한 돌격형 악마로, 순수한 힘을 위해 소환합니다.",
+      "wraithborn": "멀리서 강력한 어둠 마법을 퍼붓는 정예 시전형 악마입니다."
     },
     "bestiary": {
       "heading": "몬스터 도감",
@@ -1571,11 +1571,11 @@ export const ko_KR: EnTranslations = {
         "name": "거미",
         "desc": "어둡고 뒤엉킨 곳에 둥지를 트는 거미줄 짜는 자들과 독을 품은 잠복자들. 사냥꾼은 야수와 마찬가지로 이들을 길들일 수 있습니다."
       },
-      "murloc": {
+      "mudfin": {
         "name": "멀록",
         "desc": "시끄럽고 영역 의식이 강한 무리를 이루어 얕은 물가에 떼지어 모이는 양서류 늪지 거주자들."
       },
-      "kobold": {
+      "burrower": {
         "name": "코볼트",
         "desc": "광산과 굴을 들끓게 하며 자기네 광석을 사납게 지키는, 머리에 양초를 단 굴착꾼들."
       },
@@ -1967,6 +1967,430 @@ export const ko_KR: EnTranslations = {
       "title": "해당 페이지를 찾을 수 없습니다",
       "body": "찾으시는 페이지가 존재하지 않거나 이동되었을 수 있습니다.",
       "home": "개요로 돌아가기"
+    }
+  },
+  "editor": {
+    "appTitle": "맵 편집기",
+    "docTitle": "맵 편집기 - World of ClaudeCraft",
+    "untitledMap": "제목 없는 맵",
+    "playtestPlayerName": "지도제작자",
+    "topbar": {
+      "label": "편집기 동작",
+      "mapNameLabel": "맵 이름",
+      "dirty": "저장하지 않은 변경 사항",
+      "dirtyDot": "이 맵에 저장하지 않은 변경 사항이 있습니다",
+      "clean": "모든 변경 사항 저장됨",
+      "savedLocal": "이 브라우저에 저장됨",
+      "savedServer": "서버에 저장됨 (v{version})",
+      "saving": "저장 중...",
+      "neverSaved": "아직 저장되지 않음",
+      "new": "새로 만들기",
+      "newTitle": "기본 월드에서 새 맵 시작",
+      "open": "열기",
+      "openTitle": "저장된 맵 열기 (브라우저 또는 서버)",
+      "save": "저장",
+      "saveTitle": "이 브라우저에 저장하고, 로그인 상태면 서버에도 저장 (Ctrl+S)",
+      "saveAs": "다른 이름으로 저장",
+      "saveAsTitle": "새 이름으로 사본 저장",
+      "fork": "포크",
+      "forkTitle": "이 맵의 내 사본을 서버에 생성",
+      "forkDisabledTitle": "포크하려면 먼저 서버 맵을 여세요",
+      "import": "가져오기",
+      "importTitle": "JSON 파일에서 맵 가져오기",
+      "export": "내보내기",
+      "exportTitle": "이 맵을 JSON 파일로 다운로드",
+      "uploadAsset": "에셋 업로드",
+      "uploadAssetTitle": "맵에 배치할 GLB 모델(최대 8 MiB) 업로드",
+      "uploadAssetDisabledTitle": "에셋을 업로드하려면 게임에서 로그인하세요",
+      "playtest": "플레이테스트",
+      "playtestTitle": "이 맵에서 게임 실행 (오프라인, 현재 편집 내용 포함)",
+      "viewLabel": "보기 모드",
+      "view3d": "3D",
+      "view3dTitle": "렌더링된 월드에서 편집",
+      "view2d": "2D",
+      "view2dTitle": "기호로 표시된 조감도에서 편집",
+      "undoCount": "실행 취소: {count}",
+      "undoCountTitle": "{count}단계 되돌릴 수 있음 (Ctrl+Z 실행 취소, Ctrl+Y 다시 실행)",
+      "autosave": "자동 저장",
+      "autosaveTitle": "저장하지 않은 변경이 있는 동안 맵을 자동으로 저장합니다. 저장에 실패하면 자동으로 꺼집니다.",
+      "undo": "Undo",
+      "undoTitle": "마지막 변경 실행 취소 (Ctrl+Z)",
+      "redo": "Redo",
+      "redoTitle": "실행 취소한 변경 다시 실행 (Ctrl+Y)",
+      "offline": "오프라인",
+      "offlineTitle": "로그인하지 않음: 맵은 이 브라우저에만 저장됩니다. 온라인 저장하려면 게임에서 로그인하세요.",
+      "signIn": "로그인",
+      "signInTitle": "게임 로그인 화면을 새 탭에서 열기",
+      "help": "도움말",
+      "helpTitle": "편집기 가이드: 도구, 단축키, 튜토리얼"
+    },
+    "tool": {
+      "listLabel": "편집기 도구",
+      "keyHint": "{name} ({key})",
+      "select": "선택",
+      "raise": "올리기",
+      "lower": "내리기",
+      "smooth": "부드럽게",
+      "flatten": "평탄화",
+      "paint": "생태 칠하기",
+      "water": "수면",
+      "place": "에셋 배치",
+      "blocker": "차단벽",
+      "camp": "야영지",
+      "spawn": "시작 지점",
+      "region": "영역",
+      "erase": "지우기"
+    },
+    "inspector": {
+      "label": "도구 옵션"
+    },
+    "brush": {
+      "title": "브러시",
+      "size": "브러시 크기",
+      "strength": "강도",
+      "sizeHint": "단축키: [ 와 ] 로 브러시 크기, Shift+[ 와 Shift+] 로 강도 조절.",
+      "editCount": "지형 편집 수: {count} / {max}"
+    },
+    "biome": {
+      "title": "생태",
+      "paletteLabel": "칠할 생태",
+      "vale": "골짜기",
+      "marsh": "늪지",
+      "peaks": "산봉우리",
+      "beach": "해변",
+      "desert": "사막",
+      "volcano": "화산",
+      "cave": "동굴",
+      "erase": "칠 지우기",
+      "hint": "칠한 칸은 구역 생태를 덮어써 지형의 형태와 색을 바꿉니다.",
+      "clear": "생태 칠 전부 지우기",
+      "clearConfirm": "이 맵에서 칠한 생태 칸을 모두 제거할까요?"
+    },
+    "flatten": {
+      "hint": "평탄화는 드래그를 시작할 때 커서 아래의 높이로 지면을 고릅니다.",
+      "hardEdge": "경계 선명하게"
+    },
+    "water": {
+      "title": "수면 높이",
+      "level": "수면 높이",
+      "hint": "맵 전체의 수면 높이를 설정합니다 ({min}에서 {max} 야드까지).",
+      "reset": "기본 높이로 재설정"
+    },
+    "place": {
+      "title": "에셋 배치",
+      "scale": "크기",
+      "collide": "이동 차단",
+      "collideHint": "차단형 에셋에는 플레이어가 지나갈 수 없는 충돌 범위가 생깁니다.",
+      "randomRotation": "무작위 회전",
+      "chosen": "배치 중: {name}",
+      "none": "아래 브라우저에서 에셋을 고른 뒤 지면을 클릭해 배치하세요."
+    },
+    "blockerTool": {
+      "title": "차단벽",
+      "hint": "지면을 따라 드래그하면 플레이어가 걸어서도 뛰어서도 통과할 수 없는 보이지 않는 벽을 그립니다. 놓으면 설치됩니다. 반 야드보다 짧은 벽은 버려집니다.",
+      "count": "차단벽: {count} / {max}"
+    },
+    "camp": {
+      "title": "몬스터 야영지",
+      "mob": "몬스터",
+      "count": "수",
+      "radius": "반경",
+      "delete": "야영지 삭제",
+      "hint": "빈 땅을 클릭하면 야영지를 추가하고, 기존 야영지를 클릭하면 편집합니다.",
+      "playtestNote": "몬스터는 플레이테스트에서만 등장하며 편집기 화면에는 나타나지 않습니다.",
+      "selected": "야영지: {mob}",
+      "none": "선택된 야영지가 없습니다."
+    },
+    "spawn": {
+      "title": "시작 지점",
+      "hint": "지면을 클릭해 플레이테스트에서 플레이어가 시작할 위치를 설정하세요.",
+      "position": "시작 지점: {x}, {z}",
+      "unset": "기본 시작 위치를 사용합니다.",
+      "clear": "시작 지점 지우기"
+    },
+    "region": {
+      "title": "영역",
+      "hint": "상자를 드래그해 배치물과 지형 편집을 선택하세요. 복사 후 클릭하면 붙여넣습니다.",
+      "hint3d": "영역 상자는 2D 보기에서 그려지며, 복사와 붙여넣기는 두 보기 모두에서 동작합니다.",
+      "copy": "영역 복사",
+      "pasteBeside": "옆에 붙여넣기",
+      "copied": "에셋 {assets}개와 지형 편집 {edits}개를 복사했습니다.",
+      "pasted": "{count}개 항목을 붙여넣었습니다.",
+      "needBox": "먼저 영역 상자를 그리세요.",
+      "needClipboard": "먼저 영역을 복사하세요."
+    },
+    "eraseTool": {
+      "title": "지우기",
+      "hint": "배치된 에셋을 클릭하면 제거하고, 조각한 지면을 클릭하면 커서 아래의 가장 최근 스탬프를 제거합니다.",
+      "blockerHint": "차단벽 근처를 클릭하면 대신 그 벽이 제거됩니다."
+    },
+    "selection": {
+      "title": "선택 항목",
+      "none": "선택된 것이 없습니다. 선택 도구로 배치된 에셋을 클릭하세요.",
+      "asset": "에셋: {name}",
+      "x": "X",
+      "z": "Z",
+      "rotation": "회전",
+      "scale": "크기",
+      "collide": "이동 차단",
+      "radius": "충돌 반경",
+      "radiusAuto": "자동",
+      "radiusAutoTitle": "충돌 반경을 에셋 크기에 따라가도록 재설정",
+      "radiusHint": "'자동'은 에셋 크기에서 충돌 반경을 계산합니다. 슬라이더를 드래그하면 덮어쓸 수 있습니다.",
+      "footprints": "충돌 범위 표시",
+      "duplicate": "복제",
+      "delete": "삭제",
+      "deleteHint": "삭제하면 선택 항목이 제거됩니다. Ctrl+Z로 복구할 수 있습니다.",
+      "moveHint": "이동: 3D 뷰에서 애셋을 지면을 따라 드래그하거나 방향키로 미세 이동합니다(0.5야드, Shift를 누르면 2야드).",
+      "wheelHint": "Shift+스크롤은 회전, Alt+스크롤은 크기 조절, Ctrl+D는 복제합니다."
+    },
+    "marker": {
+      "title": "마커",
+      "reset": "위치 재설정",
+      "moved": "{count}개 마커가 기본 배치에서 이동했습니다."
+    },
+    "layers": {
+      "title": "레이어",
+      "hub": "거점",
+      "graveyard": "묘지",
+      "lake": "호수",
+      "poi": "관심 지점",
+      "camp": "야영지",
+      "npc": "NPC",
+      "object": "오브젝트",
+      "blocker": "차단벽"
+    },
+    "frame": {
+      "title": "화면 맞춤",
+      "all": "전체"
+    },
+    "procgen": {
+      "title": "절차적 생성",
+      "count": "수",
+      "scatter": "분류의 에셋 흩뿌리기",
+      "hills": "완만한 언덕 생성",
+      "scattered": "{category}에서 에셋 {count}개를 흩뿌렸습니다.",
+      "hillsAdded": "언덕 {count}개를 추가했습니다.",
+      "noAssets": "해당 분류에 에셋이 없습니다."
+    },
+    "assets": {
+      "title": "에셋 브라우저",
+      "label": "에셋 브라우저",
+      "search": "에셋 검색",
+      "searchPlaceholder": "에셋 검색...",
+      "empty": "일치하는 에셋이 없습니다.",
+      "uploadedTab": "업로드됨",
+      "uploadedEmpty": "업로드한 에셋이 아직 없습니다. 에셋 업로드로 GLB 모델(최대 8 MiB)을 추가하세요.",
+      "uploadedSignIn": "게임에서 로그인하면 자신의 GLB 모델을 업로드하고 배치할 수 있습니다.",
+      "uploadedLoadFailed": "업로드한 에셋을 불러오지 못했습니다.",
+      "deleteAsset": "업로드한 에셋 삭제",
+      "deleteAssetConfirm": "업로드한 에셋 \"{name}\"을(를) 삭제할까요? 이 에셋을 쓰는 맵에서 모델이 사라집니다.",
+      "pick": "{name} 배치",
+      "categoryTab": "{category} ({count})",
+      "category": {
+        "biome": "생태",
+        "chars": "캐릭터",
+        "creatures": "생물",
+        "dungeon": "던전",
+        "foliage": "식생",
+        "props": "소품",
+        "quest": "퀘스트",
+        "resources": "자원",
+        "tools": "도구",
+        "weapons": "무기"
+      }
+    },
+    "upload": {
+      "notGlb": ".glb 파일을 선택하세요.",
+      "tooLarge": "이 파일은 8 MiB 제한을 초과합니다.",
+      "uploading": "에셋 업로드 중...",
+      "uploaded": "에셋 업로드 완료: {name}",
+      "uploadedExisting": "이 모델은 이미 서버에 있어 재사용합니다.",
+      "deleted": "업로드한 에셋을 삭제했습니다."
+    },
+    "openDrawer": {
+      "title": "맵 열기",
+      "close": "닫기",
+      "tabLocal": "이 브라우저",
+      "tabMine": "내 서버 맵",
+      "tabPublic": "공개 맵",
+      "colName": "이름",
+      "colUpdated": "업데이트",
+      "colStatus": "상태",
+      "statusPublic": "공개",
+      "statusPrivate": "비공개",
+      "open": "열기",
+      "fork": "포크",
+      "publish": "공개하기",
+      "unpublish": "공개 해제",
+      "delete": "삭제",
+      "draft": "자동 저장된 초안",
+      "emptyLocal": "이 브라우저에 저장된 맵이 아직 없습니다. 저장하면 여기에 표시됩니다.",
+      "emptyMine": "서버에 맵이 아직 없습니다. 로그인한 상태로 저장하면 생성됩니다.",
+      "emptyPublic": "아직 공개 맵이 없습니다.",
+      "loading": "맵 불러오는 중...",
+      "loadFailed": "서버에서 맵을 불러오지 못했습니다.",
+      "signInHint": "게임에서 로그인하면 서버 맵을 둘러보고 저장하고 포크할 수 있습니다.",
+      "deleteLocalConfirm": "로컬 맵 \"{name}\"을(를) 삭제할까요?",
+      "deleteServerConfirm": "서버 맵 \"{name}\"을(를) 삭제할까요? 되돌릴 수 없습니다.",
+      "prev": "이전 페이지",
+      "next": "다음 페이지",
+      "page": "{page}페이지"
+    },
+    "status": {
+      "savedLocal": "\"{name}\"을(를) 이 브라우저에 저장했습니다.",
+      "savedServer": "\"{name}\"을(를) 서버에 저장했습니다 (v{version}).",
+      "savedLocalOnly": "\"{name}\"을(를) 이 브라우저에 저장했습니다. 로그인하면 온라인에 저장됩니다.",
+      "saveFailedLocal": "로컬 저장에 실패했습니다 (저장소가 차단됨).",
+      "opened": "\"{name}\"을(를) 열었습니다.",
+      "imported": "\"{name}\"을(를) 가져왔습니다.",
+      "importFailed": "가져오기가 취소되었거나 유효한 맵 파일이 아닙니다.",
+      "exported": "\"{name}\"을(를) 다운로드했습니다.",
+      "newMap": "기본 월드에서 새 맵을 시작했습니다.",
+      "forked": "\"{name}\"(으)로 포크했습니다. 이제 자신의 사본을 편집합니다.",
+      "published": "맵이 공개되었습니다. 누구나 찾아서 포크할 수 있습니다.",
+      "unpublished": "맵 공개가 해제되었습니다.",
+      "deleted": "맵이 삭제되었습니다.",
+      "assetPlacedFirst": "먼저 브라우저에서 에셋을 선택하세요.",
+      "loading3d": "월드 불러오는 중...",
+      "playtestLaunch": "플레이테스트 시작 중...",
+      "playtestFailed": "플레이테스트를 시작할 수 없습니다 (저장소가 차단됨).",
+      "draftSaved": "초안이 자동 저장되었습니다.",
+      "draftRestored": "자동 저장된 초안을 복원했습니다.",
+      "autosaveFailed": "자동 저장에 실패했습니다(브라우저 저장 공간이 가득 찼거나 차단됨). 백업을 위해 맵을 내보내세요.",
+      "terrainCapReached": "지형 편집 한도에 도달했습니다({max}). 초과된 스컬프트 스탬프는 추가되지 않았습니다.",
+      "placementCapReached": "배치 한도에 도달했습니다({max}). 초과된 에셋은 추가되지 않았습니다.",
+      "blockerCapReached": "차단벽 한도({max})에 도달했습니다. 새 벽이 추가되지 않았습니다.",
+      "autosaveOff": "자동 저장이 꺼졌습니다: {reason} 수동으로 저장한 뒤 다시 켜세요."
+    },
+    "confirm": {
+      "ok": "확인",
+      "cancel": "취소",
+      "discardTitle": "변경 사항을 버릴까요?",
+      "discardBody": "\"{name}\"에 저장하지 않은 변경 사항이 있습니다. 버릴까요?",
+      "discard": "버리기",
+      "conflictTitle": "저장 충돌",
+      "conflictBody": "이 맵은 연 이후 서버에서 변경되었습니다 (현재 v{version}). 내 버전을 새 사본으로 저장할까요?",
+      "conflictSaveCopy": "사본으로 저장"
+    },
+    "prompt": {
+      "saveAsTitle": "다른 이름으로 저장",
+      "nameLabel": "새 맵 이름"
+    },
+    "serverError": {
+      "invalid_map_name": "사용할 수 없는 맵 이름입니다. 글자, 숫자, 공백, 어포스트로피, 하이픈을 사용하세요.",
+      "map_name_not_allowed": "허용되지 않는 맵 이름입니다.",
+      "invalid_map_doc": "서버가 맵 문서를 거부했습니다.",
+      "invalid_version": "저장 요청이 잘못되었습니다. 새로고침 후 다시 시도하세요.",
+      "map_limit_reached": "서버 맵 개수 한도에 도달했습니다. 하나를 삭제해야 더 저장할 수 있습니다.",
+      "map_not_found": "그 맵은 더 이상 서버에 없습니다.",
+      "version_conflict": "이 맵은 연 이후 서버에서 변경되었습니다.",
+      "slug_unavailable": "그 이름으로 링크를 만들 수 없습니다. 다른 이름을 시도하세요.",
+      "map_too_large": "맵 문서가 너무 커서 서버에 저장할 수 없습니다.",
+      "invalid_glb": "유효한 GLB 모델 파일이 아닙니다.",
+      "asset_blocked": "이 에셋은 운영진에 의해 차단되었습니다.",
+      "asset_limit_reached": "업로드 에셋 개수 한도에 도달했습니다. 하나를 삭제해야 더 업로드할 수 있습니다.",
+      "asset_storage_limit_reached": "에셋 저장 공간이 가득 찼습니다. 먼저 하나를 삭제하세요.",
+      "asset_too_large": "이 모델은 업로드 크기 제한을 초과합니다.",
+      "asset_not_found": "그 에셋은 더 이상 서버에 없습니다.",
+      "rate_limited": "조금 천천히 다시 시도하세요.",
+      "unauthorized": "세션이 만료되었습니다. 게임에서 다시 로그인하세요.",
+      "network": "서버에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.",
+      "timeout": "서버 응답이 너무 오래 걸립니다. 다시 시도하세요.",
+      "unknown": "서버와 통신하는 중 문제가 발생했습니다."
+    },
+    "hints": {
+      "nav3d": "드래그로 회전, 스크롤로 확대/축소. 드래그 중 WASD로 비행, Q/E로 높이 조절.",
+      "nav2d": "드래그로 이동, 스크롤로 확대/축소."
+    },
+    "help": {
+      "title": "편집기 도움말",
+      "toolsTitle": "도구",
+      "shortcutsTitle": "키보드 단축키",
+      "mouseTitle": "마우스와 탐색",
+      "flowTitle": "저장과 플레이테스트",
+      "beginTutorial": "튜토리얼 시작",
+      "close": "닫기",
+      "tool": {
+        "select": "배치된 애셋을 선택해 이동, 회전, 크기 조절합니다. 2D 마커는 클릭해서 편집합니다.",
+        "raise": "브러시 아래의 지형을 올립니다.",
+        "lower": "브러시 아래의 지형을 낮춥니다.",
+        "smooth": "굴곡을 주변 평균 높이로 부드럽게 만듭니다.",
+        "flatten": "드래그를 시작한 지점의 높이로 지면을 평탄하게 만듭니다.",
+        "paint": "지역 기본값 위에 생태 지표를 칠합니다.",
+        "water": "맵 전체의 수면 높이를 설정합니다.",
+        "place": "카탈로그 또는 업로드한 애셋을 지면에 배치합니다.",
+        "blocker": "플레이테스트에서 이동을 막는 보이지 않는 벽을 드래그로 그립니다.",
+        "camp": "플레이테스트에서 생성되는 몹 캠프를 추가하고 편집합니다.",
+        "spawn": "플레이테스트에서 플레이어가 시작할 위치를 설정합니다.",
+        "region": "지형과 애셋을 상자로 선택해 복사하고 붙여넣습니다.",
+        "erase": "커서 아래의 배치된 애셋이나 조각 스탬프를 제거합니다."
+      },
+      "key": {
+        "tools": "모든 도구에는 한 글자 단축키가 있으며 도구 모음 버튼에 표시됩니다.",
+        "brush": "[ 와 ] 로 브러시 크기를, Shift+[ 와 Shift+] 로 강도를 조절합니다.",
+        "undo": "Ctrl+Z는 실행 취소, Ctrl+Y 또는 Ctrl+Shift+Z는 다시 실행합니다.",
+        "save": "Ctrl+S로 맵을 저장합니다.",
+        "duplicate": "Ctrl+D로 선택한 애셋을 복제합니다.",
+        "nudge": "방향키는 선택한 애셋을 0.5야드 이동합니다. Shift를 누르면 2야드입니다.",
+        "wheel": "Shift+스크롤은 선택한 애셋을 회전하고 Alt+스크롤은 크기를 조절합니다.",
+        "delete": "Delete는 선택한 애셋이나 캠프를 제거합니다.",
+        "escape": "Esc는 먼저 선택을 해제한 다음 선택 도구로 돌아갑니다."
+      },
+      "mouse": {
+        "orbit3d": "3D 뷰: 드래그로 회전, 스크롤로 확대/축소. 가운데 버튼 드래그 또는 Shift+드래그로 이동합니다.",
+        "fly3d": "3D에서 드래그를 유지하는 동안 WASD로 카메라를 비행시키고 Q/E로 높이를 바꿉니다.",
+        "move": "선택 도구가 켜져 있으면 배치된 애셋을 드래그해 지면 위에서 옮길 수 있습니다.",
+        "pan2d": "2D 뷰: 드래그로 이동, 스크롤로 확대/축소합니다."
+      },
+      "flow": {
+        "save": "저장은 이 브라우저에 맵을 저장하고, 로그인 상태라면 서버에도 저장합니다.",
+        "draft": "저장하지 않은 변경이 있는 동안 30초마다 초안이 자동 저장됩니다. 열기에서 복원할 수 있습니다.",
+        "playtest": "플레이테스트는 저장하지 않은 편집까지 포함해 이 맵에서 실제 게임을 실행합니다."
+      }
+    },
+    "tutorial": {
+      "title": "편집기 튜토리얼",
+      "back": "뒤로",
+      "next": "다음",
+      "finish": "완료",
+      "skip": "투어 건너뛰기",
+      "counter": "{total}단계 중 {current}단계",
+      "steps": {
+        "toolbar": {
+          "title": "도구 모음",
+          "body": "모든 편집 도구가 여기에 있습니다: 조각 브러시, 생태 페인트, 수면, 애셋 배치, 캠프 등. 각 도구에는 버튼 모서리에 표시되는 단일 키 단축키가 있습니다."
+        },
+        "stage": {
+          "title": "월드",
+          "body": "실제 게임 엔진으로 렌더링된 당신의 맵입니다. 드래그로 회전, 스크롤로 확대/축소, 가운데 버튼 드래그 또는 Shift+드래그로 이동합니다. 도구를 들고 지면을 클릭하면 편집됩니다."
+        },
+        "inspector": {
+          "title": "도구 옵션",
+          "body": "활성 도구의 옵션이 여기에 표시됩니다: 브러시 크기, 생태 팔레트, 애셋 크기, 캠프 설정, 그리고 선택한 대상의 속성입니다."
+        },
+        "viewToggle": {
+          "title": "3D와 2D",
+          "body": "렌더링된 3D 월드와 기호화된 상공 2D 맵 사이를 전환합니다. 2D 뷰는 지역 마커를 옮기고 넓은 영역을 보는 데 가장 좋습니다."
+        },
+        "save": {
+          "title": "작업 저장",
+          "body": "저장은 맵을 이 브라우저에, 로그인 상태라면 서버에도 저장합니다. 내보내기는 JSON 백업을 내려받고, 열기는 저장된 맵과 초안을 다시 불러옵니다."
+        },
+        "playtest": {
+          "title": "플레이테스트",
+          "body": "현재 편집을 포함해 언제든지 맵에서 실제 게임을 실행할 수 있습니다. 플레이테스트 탭을 닫으면 돌아와서 계속 편집할 수 있습니다."
+        },
+        "help": {
+          "title": "도움말이 있는 곳",
+          "body": "이것이 전체 흐름입니다. 전체 도구 목록과 모든 단축키를 보려면 언제든 도움말을 열고, 이 투어를 다시 실행할 수도 있습니다."
+        }
+      }
+    },
+    "a11y": {
+      "stage": "맵 뷰포트",
+      "toasts": "편집기 알림",
+      "dialog": "편집기 대화 상자"
     }
   },
   "skinEvent": {
@@ -6016,13 +6440,13 @@ export const ko_KR: EnTranslations = {
       "varkas_boneguard": {
         "name": "바르카스 뼈수호병"
       },
-      "imp": {
+      "emberkin": {
         "name": "임프"
       },
-      "voidwalker": {
+      "gloomshade": {
         "name": "공허추적자"
       },
-      "succubus": {
+      "duskborn": {
         "name": "서큐버스"
       },
       "grix_the_tunnelking": {
@@ -6046,16 +6470,16 @@ export const ko_KR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "영혼결속자 말드렉"
       },
-      "felhunter": {
+      "spellhound": {
         "name": "지옥사냥개"
       },
-      "felguard": {
+      "warfiend": {
         "name": "지옥수호병"
       },
-      "infernal": {
+      "pyre_colossus": {
         "name": "지옥불정령"
       },
-      "doomguard": {
+      "wraithborn": {
         "name": "파멸의 수호병"
       },
       "choirmother_selthe": {

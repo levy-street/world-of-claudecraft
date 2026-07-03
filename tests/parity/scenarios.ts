@@ -377,7 +377,7 @@ function mobSwingAffixes(): Scenario {
 }
 
 // Ranged pet spell path, BOTH callers of updateRangedPetAttack:
-//  - friendly arm (~8093): a ranged_dps pet (warlock_imp: petSpell Firebolt)
+//  - friendly arm (~8093): a ranged_dps pet (warlock_imp: petSpell Ashbolt)
 //    adopted onto the hunter.
 //  - hostile mob arm (~6776): a WILD warlock_imp (ownerId null) whose attack-state
 //    AI fires its petSpell at the player.
@@ -415,7 +415,7 @@ function hunterPet(): Scenario {
       rec.notes.hostileImpId = hostileImp.id;
       sim.targetEntity(target.id);
       sim.startAutoAttack();
-      rec.tick(120); // 6s: friendly Firebolt every 2s + hostile imp shoots the player
+      rec.tick(120); // 6s: friendly Ashbolt every 2s + hostile fire demon shoots the player
     },
   };
 }
@@ -497,9 +497,9 @@ function petAi(): Scenario {
       const p = sim.player as AnyEntity;
       beef(p);
 
-      // Imp (petRanged demon): pre-targeted on a beefed wolf inside bolt range so
+      // Emberkin (petRanged demon): pre-targeted on a beefed wolf inside bolt range so
       // updatePet runs the petRangedAttack arm (crit roll + AP-scaled fire damage).
-      const imp = spawnMob(sim, 'imp', 12, p.pos.x + 2, p.pos.y, p.pos.z);
+      const imp = spawnMob(sim, 'emberkin', 12, p.pos.x + 2, p.pos.y, p.pos.z);
       imp.ownerId = p.id;
       imp.hostile = false;
       imp.hp = imp.maxHp;
@@ -510,10 +510,10 @@ function petAi(): Scenario {
       imp.aggroTargetId = impTarget.id;
       rec.track(impTarget.id);
 
-      // Voidwalker (melee tank): NO pre-set target, so petPickTarget runs the
+      // Gloomshade (melee tank): NO pre-set target, so petPickTarget runs the
       // aggressive auto-pull to acquire a beefed wolf in range, then the melee arm
       // closes, auto-taunts the mob, and swings via mobSwing.
-      const tank = spawnMob(sim, 'voidwalker', 12, p.pos.x - 2, p.pos.y, p.pos.z);
+      const tank = spawnMob(sim, 'gloomshade', 12, p.pos.x - 2, p.pos.y, p.pos.z);
       tank.ownerId = p.id;
       tank.hostile = false;
       tank.hp = tank.maxHp;
@@ -651,7 +651,7 @@ function petCommands(): Scenario {
       warlock.resource = warlock.maxResource;
       rec.track(wpid);
 
-      (sim as any).summonPet(warlock, 'imp'); // createDemonPet -> "answers your summons"
+      (sim as any).summonPet(warlock, 'emberkin'); // createDemonPet -> "answers your summons"
       const imp = sim.petOf(wpid) as AnyEntity;
       rec.notes.impId = imp.id;
       rec.track(imp.id);
@@ -661,15 +661,15 @@ function petCommands(): Scenario {
       rec.tick(40); // applyDemonHealTick fires: heal2 + healingThreat
       rec.snapshot('demon-heal-tick');
 
-      (sim as any).summonPet(warlock, 'voidwalker'); // different template: despawnPersistentPet(imp) + "answers"
+      (sim as any).summonPet(warlock, 'gloomshade'); // different template: despawnPersistentPet(emberkin) + "answers"
       const vw = sim.petOf(wpid) as AnyEntity;
       rec.notes.voidId = vw.id;
       rec.track(vw.id);
-      (sim as any).summonPet(warlock, 'voidwalker'); // same template, alive: "fades back into the void" (no new pet)
+      (sim as any).summonPet(warlock, 'gloomshade'); // same template, alive: "fades back into the void" (no new pet)
       rec.snapshot('demon-faded');
 
       // despawnPet (demon hard despawn): re-summon, point a player target + mob threat at it, stow the demon.
-      (sim as any).summonPet(warlock, 'imp');
+      (sim as any).summonPet(warlock, 'emberkin');
       const imp2 = sim.petOf(wpid) as AnyEntity;
       rec.notes.imp2Id = imp2.id;
       rec.track(imp2.id);

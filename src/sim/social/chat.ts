@@ -239,7 +239,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   }
 
   // "/inspect name" — self-only readout of another online player's level,
-  // class, and health. The first cross-player readout; mirrors WoW's Inspect.
+  // class, and health. The first cross-player readout; a classic-style Inspect.
   const im = /^\/(?:inspect|ins|examine)(?:\s+([\s\S]+))?$/i.exec(raw);
   if (im) {
     const targetName = (im[1] ?? '').trim();
@@ -632,7 +632,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         return { channel: 'whisper', message: msg };
       }
     }
-    // classic-WoW "/r": the recipient's reply target is whoever last
+    // classic-style "/r": the recipient's reply target is whoever last
     // whispered them, so record it on the target (not the sender).
     target.lastWhisperFrom = r.meta.name;
     // The recipient's copy of the whisper. A dev bot ("/dev bot") has no owning

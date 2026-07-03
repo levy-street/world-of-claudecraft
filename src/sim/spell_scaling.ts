@@ -2,7 +2,7 @@
 // caster's Spell Power (or an attacker's Attack Power, for "attack spells") into
 // the flat damage added to a spell hit, channel tick, DoT tick, or AoE hit.
 //
-// Vanilla-style model:
+// Classic-era model:
 //   - direct nuke: coeff = clamp(castTime, 1.5, 7) / 3.5 (instants use the 1.5 floor)
 //   - channel:     coeff = clamp(channelDuration, 1.5, 7) / 3.5, split across ticks
 //   - DoT:         coeff = duration / 15 (total), split across ticks

@@ -11,7 +11,7 @@ const makeSim = () => new Sim({ seed: SEED, playerClass: 'warrior' });
 function woundAura(value: number, remaining = 6): Aura {
   return {
     id: 'mortal_wound_test',
-    name: 'Mortal Strike',
+    name: 'Maiming Strike',
     kind: 'mortal_wound',
     remaining,
     duration: 6,
@@ -26,7 +26,7 @@ function woundAura(value: number, remaining = 6): Aura {
 function primedHot(value: number): Aura {
   return {
     id: 'hot_test',
-    name: 'Renew',
+    name: 'Lingering Grace',
     kind: 'hot',
     remaining: 10,
     duration: 10,
@@ -38,7 +38,7 @@ function primedHot(value: number): Aura {
   };
 }
 
-describe('Mortal Strike healing-reduction debuff', () => {
+describe('Maiming Strike healing-reduction debuff', () => {
   it('reduces incoming healing by the debuff fraction', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
@@ -109,7 +109,7 @@ describe('Mortal Strike healing-reduction debuff', () => {
       }
       expect(applied).toBe(true);
       const a = p.auras.find((x) => x.kind === 'mortal_wound')!;
-      expect(a.name).toBe('Mortal Strike');
+      expect(a.name).toBe('Maiming Strike');
       expect(a.value).toBe(0.5);
     } finally {
       tmpl.mortalStrike!.chance = saved;

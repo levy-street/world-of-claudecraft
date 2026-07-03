@@ -665,8 +665,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.15,
   },
-  // warlock demon pets (imp/voidwalker) — one biped rig, the entity colour and
-  // the mob template's scale tell the little orange imp from the bulky voidwalker
+  // warlock demon pets (emberkin/gloomshade) — one biped rig, the entity colour and
+  // the mob template's scale tell the little orange emberkin from the bulky gloomshade
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
     height: 1.8,
@@ -943,9 +943,9 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
-  imp: 'mob_demon',
-  voidwalker: 'mob_demon',
-  succubus: 'mob_demon',
+  emberkin: 'mob_demon',
+  gloomshade: 'mob_demon',
+  duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
   wild_boar: 'mob_boar',
@@ -1007,9 +1007,9 @@ const MOB_KEYS: Record<string, string> = {
 const FAMILY_KEYS: Record<string, string> = {
   beast: 'mob_wolf',
   humanoid: 'mob_bandit',
-  murloc: 'mob_murloc',
+  mudfin: 'mob_murloc',
   spider: 'mob_spider',
-  kobold: 'mob_kobold',
+  burrower: 'mob_kobold',
   undead: 'skel_minion',
   troll: 'mob_troll',
   ogre: 'mob_ogre',

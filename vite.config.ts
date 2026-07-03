@@ -99,6 +99,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/support/', '/support.html'],
   ['/wiki', '/guide.html'],
   ['/wiki/', '/guide.html'],
+  ['/editor', '/editor.html'],
+  ['/editor/', '/editor.html'],
 ]);
 // The Guide is the site wiki: a client-routed SPA at /wiki. Deep paths like
 // /wiki/classes/warrior have no static file, so any extensionless /wiki* request falls
@@ -342,6 +344,7 @@ export default defineConfig({
         admin: fileURLToPath(new URL('admin.html', import.meta.url)),
         play: fileURLToPath(new URL('play.html', import.meta.url)),
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
+        editor: fileURLToPath(new URL('editor.html', import.meta.url)),
       },
     },
   },

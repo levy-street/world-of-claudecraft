@@ -1243,14 +1243,14 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Dødssniger Voss',
   'entities.mobs.deepfen_murloc.name': 'Dybmose-Snapper',
   'entities.mobs.deeprock_kobold.name': 'Dybsten-Tunnelgraver',
-  'entities.mobs.doomguard.name': 'Domsvogter',
+  'entities.mobs.wraithborn.name': 'Domsvogter',
   'entities.mobs.drowned_dead.name': 'Druknede Døde',
   'entities.mobs.drowned_templeguard.name': 'Druknet Tempelvogter',
   'entities.mobs.drowned_thrall.name': 'Druknet Træl',
   'entities.mobs.drowned_votary.name': 'Druknet Tilbeder',
   'entities.mobs.fallen_captain_aldren.name': 'Falden Kaptajn Aldren',
-  'entities.mobs.felguard.name': 'Felvogter',
-  'entities.mobs.felhunter.name': 'Feljæger',
+  'entities.mobs.warfiend.name': 'Felvogter',
+  'entities.mobs.spellhound.name': 'Feljæger',
   'entities.mobs.fen_troll.name': 'Mosekær-Trold',
   'entities.mobs.forest_wolf.name': 'Skovulv',
   'entities.mobs.glimmermere_wader.name': 'Glimmersø-Vader',
@@ -1263,8 +1263,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.grix_the_tunnelking.name': 'Grix Tunnelkongen',
   'entities.mobs.grubjaw.name': 'Larvekæft den Frådser',
   'entities.mobs.hollow_acolyte.name': 'Hul Akolyt',
-  'entities.mobs.imp.name': 'Imp',
-  'entities.mobs.infernal.name': 'Infernal',
+  'entities.mobs.emberkin.name': 'Imp',
+  'entities.mobs.pyre_colossus.name': 'Infernal',
   'entities.mobs.ironvein_foreman.name': 'Jernåre-Formand',
   'entities.mobs.ironvein_sapper.name': 'Jernåre-Minør',
   'entities.mobs.knight_commander_olen.name': 'Ridderkommandør Olen',
@@ -1305,7 +1305,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Søster Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtand den Druknede',
   'entities.mobs.stormcrag_elemental.name': 'Stormklippe-Elemental',
-  'entities.mobs.succubus.name': 'Succubus',
+  'entities.mobs.duskborn.name': 'Succubus',
   'entities.mobs.thornpeak_ogre.name': 'Tornetop-Ogre',
   'entities.mobs.tidebound_acolyte.name': 'Tidebunden Akolyt',
   'entities.mobs.tunnel_rat.name': 'Tunnelrotte-Graver',
@@ -1315,7 +1315,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Syn af Kaptajn Aldren',
   'entities.mobs.vision_deathstalker_voss.name': 'Syn af Kongelig Snigmorder Voss',
   'entities.mobs.vision_malric_mage.name': 'Syn af Ypperstepræst Malric',
-  'entities.mobs.voidwalker.name': 'Tomvandrer',
+  'entities.mobs.gloomshade.name': 'Tomvandrer',
   'entities.mobs.voskar_emberwing.name': 'Voskar Glødevinge',
   'entities.mobs.warlock_imp.name': 'Ilddæmon',
   'entities.mobs.warlock_voidwalker.name': 'Tomdæmon',
@@ -2529,12 +2529,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Banditter, kultister og andre, der valgte det forkerte erhverv. De kæmper med taktik, ikke kun tænder.',
   'guide.family.humanoid.name': 'Humanoider',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Stearinhovedede gravere, der hærger miner og huler og voldsomt vogter deres malm.',
-  'guide.family.kobold.name': 'Kobolder',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobolder',
+  'guide.family.mudfin.desc':
     'Amfibiske sumpbeboere, der sværmer i det lave vand i larmende, territoriale flokke.',
-  'guide.family.murloc.name': 'Murlocer',
+  'guide.family.mudfin.name': 'Murlocer',
   'guide.family.ogre.desc':
     'Enorme, langsomme i opfattelsen og farlige. De slår lejr i de høje pas og rammer som et jordskred.',
   'guide.family.ogre.name': 'Ogrer',
@@ -2872,15 +2872,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Den side, du ledte efter, findes ikke eller er måske flyttet.',
   'guide.notFound.home': 'Tilbage til oversigten',
   'guide.notFound.title': 'Vi kunne ikke finde den side',
-  'guide.petHook.doomguard': 'En elite-besværger, der regner tung skygge ned fra det fjerne.',
-  'guide.petHook.felguard':
+  'guide.petHook.wraithborn': 'En elite-besværger, der regner tung skygge ned fra det fjerne.',
+  'guide.petHook.warfiend':
     'En sejlivet nærkampskæmpe, altmuligmanden så snart du kan tilkalde den.',
-  'guide.petHook.felhunter': 'En skyggekriger der jager fjendtlige besværgere.',
-  'guide.petHook.imp': 'En fjernkamps-ildboltdæmon der pikker på fjender fra sikker afstand.',
-  'guide.petHook.infernal':
+  'guide.petHook.spellhound': 'En skyggekriger der jager fjendtlige besværgere.',
+  'guide.petHook.emberkin': 'En fjernkamps-ildboltdæmon der pikker på fjender fra sikker afstand.',
+  'guide.petHook.pyre_colossus':
     'En kæmpemæssig juggernaut med knusende nærkamp, tilkaldt for ren kraft.',
-  'guide.petHook.succubus': 'En hurtig nærkampsdæmon der slår hårdt, men knækker under pres.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.duskborn': 'En hurtig nærkampsdæmon der slår hårdt, men knækker under pres.',
+  'guide.petHook.gloomshade':
     'En robust dæmon der håner og opsuger slag, så du kan besværge i fred.',
   'guide.placeholder.note': 'Denne del af guiden er på vej.',
   'guide.progression.bandLabel': 'Niveau {min} til {max}',

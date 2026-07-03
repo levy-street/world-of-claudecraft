@@ -35,7 +35,7 @@ describe('/consumable command', () => {
     e.eating = { itemId: 'baked_bread', kind: 'food', hpPer2s: 7, manaPer2s: 0, remaining: 12 };
     e.drinking = { itemId: 'spring_water', kind: 'drink', hpPer2s: 0, manaPer2s: 8, remaining: 9 };
     expect(readout(sim, '/consumable', a)).toBe(
-      'You are eating Freshly Baked Bread (+7 HP/2s, 12s left) and drinking Refreshing Spring Water (+8 mana/2s, 9s left).',
+      'You are eating Cottage Loaf (+7 HP/2s, 12s left) and drinking Cold Well Water (+8 mana/2s, 9s left).',
     );
   });
 
@@ -46,7 +46,7 @@ describe('/consumable command', () => {
     const e = sim.entities.get(a)!;
     e.drinking = { itemId: 'spring_water', kind: 'drink', hpPer2s: 0, manaPer2s: 8, remaining: 5 };
     expect(readout(sim, '/consumable', a)).toBe(
-      'You are drinking Refreshing Spring Water (+8 mana/2s, 5s left).',
+      'You are drinking Cold Well Water (+8 mana/2s, 5s left).',
     );
   });
 
@@ -56,7 +56,7 @@ describe('/consumable command', () => {
     sim.tick();
     const e = sim.entities.get(a)!;
     e.eating = { itemId: 'baked_bread', kind: 'food', hpPer2s: 7, manaPer2s: 0, remaining: 0.3 };
-    expect(readout(sim, '/consumable', a)).toBe('You are eating Freshly Baked Bread (+7 HP/2s, 1s left).');
+    expect(readout(sim, '/consumable', a)).toBe('You are eating Cottage Loaf (+7 HP/2s, 1s left).');
   });
 
   it('responds to the /eat and /drink aliases', () => {

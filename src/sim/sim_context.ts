@@ -106,7 +106,8 @@ export interface SimContextPrimitives {
   // Backing fields stay on Sim. `duels` is also read per-attack by isHostileTo/
   // dealDamage (PvP hostility), so it stays Sim-owned (A2).
   readonly duels: Map<number, DuelState>;
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer'>>;
+  // `world` stays optional (custom play-test map, else undefined); the rest defaulted.
+  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
   // A2 duel + arena state. Live views: the backing fields stay on Sim (mutated in
   // place / reassigned), like E1's delayedEvents. The three queues are REASSIGNED by
   // the matchmaker's filter, so they are read-write; the maps/set and the match-id

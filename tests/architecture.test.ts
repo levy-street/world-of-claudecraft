@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
@@ -177,9 +177,15 @@ const UI_PURE_CORES = [
 // nameplate visibility / anchor / threat / combo model). Each emits state
 // from sim types with no Three import and no i18n, so a NameplatePainter /
 // cast_bar painter draws it and a Vitest drives it directly.
-const RENDER_PURE_CORES = ['src/render/cast_bar.ts', 'src/render/nameplate_view.ts'].map((rel) =>
-  join(repoRoot, rel),
-);
+// terrain_region_core (editor partial-rebuild chunk/texel selection math) and
+// water_core (the shore-depth sample shared by build + editor setLevel) follow
+// the same contract for the map editor's realtime terrain/water edits.
+const RENDER_PURE_CORES = [
+  'src/render/cast_bar.ts',
+  'src/render/nameplate_view.ts',
+  'src/render/terrain_region_core.ts',
+  'src/render/water_core.ts',
+].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
 // whose basename does NOT end in _view / _core, so the onDiskCores() sweep's

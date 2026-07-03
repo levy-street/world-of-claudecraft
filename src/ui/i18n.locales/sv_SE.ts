@@ -1245,14 +1245,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Dödssmygare Voss',
   'entities.mobs.deepfen_murloc.name': 'Djupkärrshuggare',
   'entities.mobs.deeprock_kobold.name': 'Djupbergsgrävare',
-  'entities.mobs.doomguard.name': 'Domsväktare',
+  'entities.mobs.wraithborn.name': 'Domsväktare',
   'entities.mobs.drowned_dead.name': 'Drunknad död',
   'entities.mobs.drowned_templeguard.name': 'Drunknad tempelvakt',
   'entities.mobs.drowned_thrall.name': 'Drunknad träl',
   'entities.mobs.drowned_votary.name': 'Drunknad dyrkare',
   'entities.mobs.fallen_captain_aldren.name': 'Fallne kapten Aldren',
-  'entities.mobs.felguard.name': 'Felvakt',
-  'entities.mobs.felhunter.name': 'Feljägare',
+  'entities.mobs.warfiend.name': 'Felvakt',
+  'entities.mobs.spellhound.name': 'Feljägare',
   'entities.mobs.fen_troll.name': 'Dykärrströll',
   'entities.mobs.forest_wolf.name': 'Skogsvarg',
   'entities.mobs.glimmermere_wader.name': 'Glimmertjärnsvadare',
@@ -1265,8 +1265,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.grix_the_tunnelking.name': 'Grix Tunnelkungen',
   'entities.mobs.grubjaw.name': 'Grubjaw den glupske',
   'entities.mobs.hollow_acolyte.name': 'Ihålig akolyt',
-  'entities.mobs.imp.name': 'Imp',
-  'entities.mobs.infernal.name': 'Inferno',
+  'entities.mobs.emberkin.name': 'Imp',
+  'entities.mobs.pyre_colossus.name': 'Inferno',
   'entities.mobs.ironvein_foreman.name': 'Järnådersförman',
   'entities.mobs.ironvein_sapper.name': 'Järnådersprängare',
   'entities.mobs.knight_commander_olen.name': 'Riddarkommendör Olen',
@@ -1307,7 +1307,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Syster Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtooth den drunknade',
   'entities.mobs.stormcrag_elemental.name': 'Stormklippselementar',
-  'entities.mobs.succubus.name': 'Succubus',
+  'entities.mobs.duskborn.name': 'Succubus',
   'entities.mobs.thornpeak_ogre.name': 'Törntoppsogre',
   'entities.mobs.tidebound_acolyte.name': 'Tidvattenbunden akolyt',
   'entities.mobs.tunnel_rat.name': 'Tunnelråttgrävare',
@@ -1317,7 +1317,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Vision av kapten Aldren',
   'entities.mobs.vision_deathstalker_voss.name': 'Vision av kunglig lönnmördare Voss',
   'entities.mobs.vision_malric_mage.name': 'Vision av överstepräst Malric',
-  'entities.mobs.voidwalker.name': 'Tomhetsvandrare',
+  'entities.mobs.gloomshade.name': 'Tomhetsvandrare',
   'entities.mobs.voskar_emberwing.name': 'Voskar Glödvingen',
   'entities.mobs.warlock_imp.name': 'Elddemon',
   'entities.mobs.warlock_voidwalker.name': 'Tomhetsdemon',
@@ -2536,12 +2536,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Banditer, kultister och andra som tagit upp fel yrke. De slåss med taktik, inte bara tänder.',
   'guide.family.humanoid.name': 'Humanoider',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Ljushuvade grävare som plågar gruvor och hålor och hetsigt vaktar sin malm.',
-  'guide.family.kobold.name': 'Koboldar',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Koboldar',
+  'guide.family.mudfin.desc':
     'Amfibiska träskbor som svärmar i grunden i högljudda, revirhävdande flockar.',
-  'guide.family.murloc.name': 'Murlocer',
+  'guide.family.mudfin.name': 'Murlocer',
   'guide.family.ogre.desc':
     'Enorma, trögtänkta och farliga. De slår läger i de höga passen och slår till som ett jordskred.',
   'guide.family.ogre.name': 'Ogrer',
@@ -2880,14 +2880,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Sidan du letade efter finns inte eller kan ha flyttats.',
   'guide.notFound.home': 'Tillbaka till översikten',
   'guide.notFound.title': 'Vi kunde inte hitta den sidan',
-  'guide.petHook.doomguard': 'En elitbesvärjare som regnar tunga skuggor på avstånd.',
-  'guide.petHook.felguard': 'En tålig närstridskämpe, allroundern när du väl kan frammana den.',
-  'guide.petHook.felhunter': 'En skuggstrejfare som jagar fiendens besvärjare.',
-  'guide.petHook.imp': 'En eldpilskastande demon på avstånd som naggar fiender från säkert håll.',
-  'guide.petHook.infernal':
+  'guide.petHook.wraithborn': 'En elitbesvärjare som regnar tunga skuggor på avstånd.',
+  'guide.petHook.warfiend': 'En tålig närstridskämpe, allroundern när du väl kan frammana den.',
+  'guide.petHook.spellhound': 'En skuggstrejfare som jagar fiendens besvärjare.',
+  'guide.petHook.emberkin':
+    'En eldpilskastande demon på avstånd som naggar fiender från säkert håll.',
+  'guide.petHook.pyre_colossus':
     'En massiv anfallsvagn med krossande närstrid, frammanad för ren styrka.',
-  'guide.petHook.succubus': 'En snabb närstridsdemon som slår hårt men viker sig under press.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.duskborn': 'En snabb närstridsdemon som slår hårt men viker sig under press.',
+  'guide.petHook.gloomshade':
     'En robust demon som hånar och absorberar slag så att du kan besvärja i lugn och ro.',
   'guide.placeholder.note': 'Den här delen av guiden är på väg.',
   'guide.progression.bandLabel': 'Nivå {min} till {max}',

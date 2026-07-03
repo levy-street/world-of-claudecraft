@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { PROPS, WORLD_MIN_Z } from '../sim/data';
+import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import { hash2 } from '../sim/rng';
-import { terrainHeight, WATER_LEVEL } from '../sim/world';
+import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
@@ -787,7 +787,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     inn: 7.6,
   };
 
-  for (const b of PROPS.buildings) {
+  for (const b of getActiveWorldContent().props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     // roof Y mirrors the camera collider height in colliders.ts
@@ -824,7 +824,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
-  PROPS.stalls.forEach((s, i) => {
+  getActiveWorldContent().props.stalls.forEach((s, i) => {
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -848,7 +848,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- wells ---------------------------------------------------------------
-  for (const w of PROPS.wells) {
+  for (const w of getActiveWorldContent().props.wells) {
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
@@ -862,7 +862,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const graveKinds: PropKey[] = lowProps
     ? ['graveRound']
     : ['graveRound', 'graveCross', 'graveBevel', 'graveDecor'];
-  for (const gy of PROPS.graveyards) {
+  for (const gy of getActiveWorldContent().props.graveyards) {
     for (let i = 0; i < 6; i++) {
       const gx = gy.x + (i % 3) * 2.2,
         gz = gy.z + Math.floor(i / 3) * 2.6;
@@ -883,7 +883,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- town fences: village fence module repeated along the run ------------
-  for (const f of PROPS.fences) {
+  for (const f of getActiveWorldContent().props.fences) {
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const n = Math.max(1, Math.round(len / 2.35));
     const dirx = (f.x2 - f.x1) / len,
@@ -919,7 +919,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     [0.001, 0.95],
   ].map(([r, y]) => new THREE.Vector2(r, y));
   const flameGeo = new THREE.LatheGeometry(flamePts, 7);
-  for (const [x, z] of PROPS.campfires) {
+  for (const [x, z] of getActiveWorldContent().props.campfires) {
     const y = ground(x, z);
     const g = new THREE.Group();
     addParts(g, 'bonfire', { y: -0.05, rot: propRand(x, z, 1) * Math.PI * 2, scale: 4.3 });
@@ -948,7 +948,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- bandit/war tents: Kenney ridge tents, opening on +z, hideable -------
-  for (const t of PROPS.tents) {
+  for (const t of getActiveWorldContent().props.tents) {
     const kind: PropKey = propRand(t.x, t.z, 2) < 0.55 ? 'tentOpen' : 'tentSmall';
     const a = propAsset(kind);
     const s = (3.0 * t.scale) / Math.max(a.size.x, a.size.z);
@@ -966,7 +966,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
-  PROPS.crates.forEach(([x, z], i) => {
+  getActiveWorldContent().props.crates.forEach(([x, z], i) => {
     const kind: PropKey = i % 3 === 2 ? 'barrel' : 'crateWooden';
     const s = kind === 'barrel' ? 1.25 : 1.3 + propRand(x, z, 5) * 0.15;
     const y = ground(x, z);
@@ -981,14 +981,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- murloc mud huts: giant swamp mushrooms, doorway facing camp center --
-  const hutCenter = PROPS.mudHuts.reduce(
+  const hutCenter = getActiveWorldContent().props.mudHuts.reduce(
     (acc, [hx, hz]) => ({
-      x: acc.x + hx / PROPS.mudHuts.length,
-      z: acc.z + hz / PROPS.mudHuts.length,
+      x: acc.x + hx / getActiveWorldContent().props.mudHuts.length,
+      z: acc.z + hz / getActiveWorldContent().props.mudHuts.length,
     }),
     { x: 0, z: 0 },
   );
-  for (const [x, z] of PROPS.mudHuts) {
+  for (const [x, z] of getActiveWorldContent().props.mudHuts) {
     const y = ground(x, z);
     const g = new THREE.Group();
     const sxz = 13 + propRand(x, z, 15) * 3;
@@ -1027,7 +1027,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- ruin rings: weathered monolith columns at the exact collider angles -
-  for (const r of PROPS.ruinRings) {
+  for (const r of getActiveWorldContent().props.ruinRings) {
     for (let i = 0; i < r.columns; i++) {
       const ang = (i / r.columns) * Math.PI * 2;
       const x = r.x + Math.sin(ang) * r.ringR,
@@ -1084,7 +1084,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- mine entrances: timber portal, rock mound, ore cart, lantern --------
-  for (const m of PROPS.mines) {
+  for (const m of getActiveWorldContent().props.mines) {
     const g = new THREE.Group();
     const abandonedCrypt = m.x < -140 && m.z > 590 && m.z < 630;
     for (const sx of [-1.45, 1.45]) {
@@ -1179,7 +1179,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- fishing docks: pirate-kit platforms, moored rowboat, stone hut ------
-  for (const d of PROPS.docks) {
+  for (const d of getActiveWorldContent().props.docks) {
     const y = ground(d.x, d.z);
     const g = new THREE.Group();
     const key = d.x * 3.3 + d.z * 1.7;
@@ -1220,11 +1220,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const boatWx = d.x + boatLx * Math.cos(d.rot) + boatLz * Math.sin(d.rot);
     const boatWz = d.z - boatLx * Math.sin(d.rot) + boatLz * Math.cos(d.rot);
     const boatGround = ground(boatWx, boatWz);
-    const isAfloat = boatGround < WATER_LEVEL - 0.1;
+    const wl = waterLevel();
+    const isAfloat = boatGround < wl - 0.1;
     addParts(g, 'rowboat', {
       x: boatLx,
       z: boatLz,
-      y: (isAfloat ? WATER_LEVEL + 0.18 : boatGround + 0.06) - y,
+      y: (isAfloat ? wl + 0.18 : boatGround + 0.06) - y,
       rot: 0.5 + (keyRand(key, 8) - 0.5) * 0.4,
       scale: 0.85,
       euler: isAfloat
@@ -1254,7 +1255,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // players enter by talking to Halven; leaveDelve drops them at doorPos.z - 4,
   // on the mouth side for both delves.
   const delvePortals: THREE.Mesh[] = [];
-  for (const dm of PROPS.delveMarkers ?? []) {
+  for (const dm of getActiveWorldContent().props.delveMarkers ?? []) {
     if (!loadedProps.has('delveEntrance2')) continue;
     const isDrowned = dm.delveId === 'drowned_litany';
     // The portal mouth faces the hub the players approach from: Reliquary Hill's

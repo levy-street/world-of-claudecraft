@@ -69,23 +69,23 @@ const CASTER_T2_BONUSES: SetBonusTier[] = [
 ];
 
 export const ITEM_SETS: Record<string, ItemSet> = {
-  [SET_DEATHLORD]: { id: SET_DEATHLORD, name: 'Deathlord Battlegear', bonuses: STRENGTH_BONUSES },
-  [SET_WYRMSHADOW]: { id: SET_WYRMSHADOW, name: 'Wyrmshadow Vestments', bonuses: AGILITY_BONUSES },
+  [SET_DEATHLORD]: { id: SET_DEATHLORD, name: 'Barrowlord Battlegear', bonuses: STRENGTH_BONUSES },
+  [SET_WYRMSHADOW]: { id: SET_WYRMSHADOW, name: 'Nightfang Vestments', bonuses: AGILITY_BONUSES },
   [SET_NECROMANCERS]: {
     id: SET_NECROMANCERS,
-    name: "Necromancer's Raiment",
+    name: 'Mournweave Raiment',
     bonuses: CASTER_T1_BONUSES,
   },
   [SET_CROWNFORGED]: {
     id: SET_CROWNFORGED,
-    name: 'Crownforged Regalia',
+    name: 'Bonewrought Regalia',
     bonuses: STRENGTH_BONUSES,
   },
-  [SET_NIGHTTALON]: { id: SET_NIGHTTALON, name: 'Nighttalon Pelt', bonuses: AGILITY_BONUSES },
-  [SET_SOULFLAME]: { id: SET_SOULFLAME, name: 'Soulflame Regalia', bonuses: CASTER_T2_BONUSES },
+  [SET_NIGHTTALON]: { id: SET_NIGHTTALON, name: 'Direfang Pelt', bonuses: AGILITY_BONUSES },
+  [SET_SOULFLAME]: { id: SET_SOULFLAME, name: 'Wraithfire Regalia', bonuses: CASTER_T2_BONUSES },
   [SET_STORMCALLERS]: {
     id: SET_STORMCALLERS,
-    name: "Stormcaller's Vestments",
+    name: 'Galecall Vestments',
     bonuses: CASTER_T2_BONUSES,
   },
 };

@@ -1,5 +1,5 @@
 import { isBlocked, pathCrossesFence, resolvePosition } from './colliders';
-import { groundHeight, WATER_LEVEL } from './world';
+import { groundHeight, waterLevel } from './world';
 
 // Local A* over a 1-yard grid, used for short forced moves (warrior Charge).
 // The search window is the start/goal bounding box plus a margin, so cost
@@ -25,7 +25,8 @@ export interface PathOpts {
 // swimming over submerged ground, the ground itself otherwise. Used only for
 // slope/climb gating so an uneven lake bed doesn't read as a cliff.
 function rideHeight(h: number, swim: boolean | undefined): number {
-  return swim && h < WATER_LEVEL ? WATER_LEVEL : h;
+  const wl = waterLevel();
+  return swim && h < wl ? wl : h;
 }
 
 const CELL = 1; // yards
@@ -59,7 +60,10 @@ function segmentWalkable(
     const z = from.z + dz * t;
     const h = groundHeight(x, z, o.seed);
     const isEnd = i === steps;
-    if ((!isEnd || !allowBlockedEnd) && (h < o.minGround || isBlocked(o.seed, x, z, o.bodyRadius, o.ignoreFences))) {
+    if (
+      (!isEnd || !allowBlockedEnd) &&
+      (h < o.minGround || isBlocked(o.seed, x, z, o.bodyRadius, o.ignoreFences))
+    ) {
       return false;
     }
     const ride = rideHeight(h, o.swim);
@@ -73,17 +77,17 @@ function segmentWalkable(
   return true;
 }
 
-function smoothPath(
-  points: { x: number; z: number }[],
-  o: PathOpts,
-): { x: number; z: number }[] {
+function smoothPath(points: { x: number; z: number }[], o: PathOpts): { x: number; z: number }[] {
   if (points.length <= 2) return points.slice(1);
 
   const out: { x: number; z: number }[] = [];
   let anchor = 0;
   while (anchor < points.length - 1) {
     let next = points.length - 1;
-    while (next > anchor + 1 && !segmentWalkable(points[anchor], points[next], o, next === points.length - 1)) {
+    while (
+      next > anchor + 1 &&
+      !segmentWalkable(points[anchor], points[next], o, next === points.length - 1)
+    ) {
       next--;
     }
     out.push(points[next]);
@@ -97,7 +101,9 @@ function smoothPath(
 // ending exactly at `to`. Falls back to [to] (straight line) when the window
 // is too large, the goal is unreachable, or start and goal share a cell.
 export function findPath(
-  from: { x: number; z: number }, to: { x: number; z: number }, o: PathOpts,
+  from: { x: number; z: number },
+  to: { x: number; z: number },
+  o: PathOpts,
 ): { x: number; z: number }[] {
   const minX = Math.min(from.x, to.x) - MARGIN;
   const minZ = Math.min(from.z, to.z) - MARGIN;
@@ -128,9 +134,11 @@ export function findPath(
     if (walk[i] === 0) {
       // the start and goal cells are always traversable: the mover is already
       // standing on one, and the slide in resolvePosition owns the last yard
-      const ok = i === startIdx || i === goalIdx
-        || (groundAt(i) >= o.minGround
-          && !isBlocked(o.seed, cx(i % W), cz((i / W) | 0), o.bodyRadius, o.ignoreFences));
+      const ok =
+        i === startIdx ||
+        i === goalIdx ||
+        (groundAt(i) >= o.minGround &&
+          !isBlocked(o.seed, cx(i % W), cz((i / W) | 0), o.bodyRadius, o.ignoreFences));
       walk[i] = ok ? 1 : -1;
     }
     return walk[i] === 1;
@@ -157,7 +165,8 @@ export function findPath(
       heap[0] = last;
       let i = 0;
       for (;;) {
-        const l = i * 2 + 1, r = l + 1;
+        const l = i * 2 + 1,
+          r = l + 1;
         let m = i;
         if (l < heap.length && heap[l][0] < heap[m][0]) m = l;
         if (r < heap.length && heap[r][0] < heap[m][0]) m = r;
@@ -169,7 +178,8 @@ export function findPath(
     return top;
   };
   const octile = (gx: number, gz: number): number => {
-    const dx = Math.abs(gx - goal.gx), dz = Math.abs(gz - goal.gz);
+    const dx = Math.abs(gx - goal.gx),
+      dz = Math.abs(gz - goal.gz);
     return (Math.max(dx, dz) + (Math.SQRT2 - 1) * Math.min(dx, dz)) * CELL;
   };
 
@@ -178,13 +188,18 @@ export function findPath(
   let found = false;
   while (heap.length > 0) {
     const [, cur] = heapPop();
-    if (cur === goalIdx) { found = true; break; }
-    const gx = cur % W, gz = (cur / W) | 0;
+    if (cur === goalIdx) {
+      found = true;
+      break;
+    }
+    const gx = cur % W,
+      gz = (cur / W) | 0;
     const hCur = rideHeight(groundAt(cur), o.swim);
     for (let dz = -1; dz <= 1; dz++) {
       for (let dx = -1; dx <= 1; dx++) {
         if (dx === 0 && dz === 0) continue;
-        const nx = gx + dx, nz = gz + dz;
+        const nx = gx + dx,
+          nz = gz + dz;
         if (nx < 0 || nx >= W || nz < 0 || nz >= H) continue;
         const n = nz * W + nx;
         if (!walkable(n)) continue;
@@ -233,18 +248,22 @@ export function findPlayerPath(
     // Players float on any depth (they tread water at the surface), so when
     // swimming is allowed no ground is "too deep" to enter — only colliders and
     // un-climbable banks stop them. Charge keeps the deep-water cutoff.
-    minGround: swim ? -Infinity : WATER_LEVEL - PLAYER_SWIM_DEPTH,
+    minGround: swim ? -Infinity : waterLevel() - PLAYER_SWIM_DEPTH,
     maxSpan,
     ignoreFences,
     swim,
   });
 }
 
-function playerDestinationWalkable(seed: number, p: { x: number; z: number }, swim: boolean): boolean {
+function playerDestinationWalkable(
+  seed: number,
+  p: { x: number; z: number },
+  swim: boolean,
+): boolean {
   if (isBlocked(seed, p.x, p.z, PLAYER_BODY_RADIUS)) return false;
   // Swimmers can stop on the water; walkers can't, so deep water is rejected and
   // the caller snaps to the nearest shore.
-  return swim || groundHeight(p.x, p.z, seed) >= WATER_LEVEL - PLAYER_SWIM_DEPTH;
+  return swim || groundHeight(p.x, p.z, seed) >= waterLevel() - PLAYER_SWIM_DEPTH;
 }
 
 export function resolvePlayerDestination(
@@ -269,7 +288,8 @@ export function resolvePlayerDestination(
       };
       const p = resolvePosition(seed, raw.x, raw.z, PLAYER_BODY_RADIUS);
       if (!playerDestinationWalkable(seed, p, swim)) continue;
-      const dx = p.x - target.x, dz = p.z - target.z;
+      const dx = p.x - target.x,
+        dz = p.z - target.z;
       const d2 = dx * dx + dz * dz;
       if (d2 < bestD2) {
         best = p;

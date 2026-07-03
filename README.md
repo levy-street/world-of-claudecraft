@@ -40,7 +40,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 
 ## Highlights
 
-- **Nine classic classes**, each with a real vanilla-style kit that gains ranks as you level, plus a full **talent system** (three specs per class, 27 specs in all).
+- **Nine classic classes**, each with a full classic-era-style kit that gains ranks as you level, plus a full **talent system** (three specs per class, 27 specs in all).
 - **Three open-world zones** from level 1 to 20, nearly 80 quests, and a single connected storyline about the Gravecaller conspiracy.
 - **Five instanced dungeons**, four of them five-player elite raids and one solo crypt, with elite scaling, AoE boss mechanics, and class-archetype loot.
 - **Scalable delves**, a small-group mode for one or two players plus an AI companion, rebuilt from randomized chambers each run across Normal and Heroic tiers.
@@ -60,7 +60,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 | ![Dusk at the Eastbrook campfire](docs/screenshots/eastbrook-dusk.jpg)<br>*Dusk at the Eastbrook campfire* | ![Elite pulls in the Hollow Crypt](docs/screenshots/hollow-crypt.jpg)<br>*Torch-lit elite pulls in the Hollow Crypt* |
 | ![The restless dead at the ruined chapel](docs/screenshots/restless-dead.jpg)<br>*The restless dead at the ruined chapel* | ![A brawl with Vale Bandits](docs/screenshots/vale-bandits.jpg)<br>*Outnumbered at the bandit camp* |
 | ![Old Greyjaw hunted down on the north road](docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, the rare spawn, run down on the north road* | ![Vendor and bags UI](docs/screenshots/vendor-and-bags.jpg)<br>*Gearing up at Trader Wilkes's, with the vendor and bags open* |
-| ![The moongate on the Glimmermere shore](docs/screenshots/glimmermere-moongate.jpg)<br>*The drowned climb out at the Glimmermere moongate* | ![Ysolei on the altar of the Drowned Temple](docs/screenshots/drowned-temple-altar.jpg)<br>*Moonfire and the altar of the Drowned Temple* |
+| ![The moongate on the Glimmermere shore](docs/screenshots/glimmermere-moongate.jpg)<br>*The drowned climb out at the Glimmermere moongate* | ![Ysolei on the altar of the Drowned Temple](docs/screenshots/drowned-temple-altar.jpg)<br>*Lunar Tempest and the altar of the Drowned Temple* |
 
 Weather is biome-driven and render-only, so it never touches the deterministic sim:
 
@@ -79,7 +79,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and click Play Offline
 ```
 
-Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by six hubs: wolf runs to the north, boar meadows east, the Webwood west, Mirror Lake northwest, a kobold copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
+Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by six hubs: wolf runs to the north, boar meadows east, the Webwood west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
 
 ### Online, with other players
 
@@ -181,19 +181,19 @@ More on the token at [worldofclaudecraft.com](https://worldofclaudecraft.com/).
 
 ### The nine classes
 
-Every class uses real vanilla-style mechanics and learns ranked spells across levels 1-20 (Lightning Bolt R2 at 8, R3 at 14, R4 at 20, with high-band abilities like Execute, Kidney Shot, Flash Heal, Stormstrike, and Starfire arriving on their classic level).
+Every class runs on classic-era MMO mechanics implemented from first principles, and learns ranked spells across levels 1-20 (Arc Bolt R2 at 8, R3 at 14, R4 at 20, with high-band abilities like Early Grave, Low Blow, Urgent Prayer, Ancestral Strike, and Skyfall arriving near the top of the band).
 
-- **Warrior**: rage, Heroic Strike (on-next-swing, off-GCD), Battle Shout, Charge, Rend, Thunder Clap, Hamstring, Bloodrage, Overpower (dodge proc).
-- **Paladin**: Seal of Righteousness unleashed by Judgement, Holy Light, Devotion Aura, Blessing of Might, Divine Protection (absorb), Hammer of Justice (stun), Lay on Hands.
-- **Hunter**: ranged Auto Shot (8-35 yd with the classic dead zone), Raptor Strike, Aspect of the Hawk, Serpent Sting, Arcane Shot, Concussive Shot, Mongoose Bite, Wing Clip, and a tameable pet from level 10.
-- **Rogue**: energy and combo points, Sinister Strike, Eviscerate, Backstab (behind, dagger), Gouge, Evasion, Slice and Dice, Sprint.
-- **Priest**: Smite, Lesser Heal, Power Word: Fortitude, Shadow Word: Pain, Power Word: Shield (absorb), Renew (HoT), Mind Blast.
-- **Shaman**: Lightning Bolt, Rockbiter Weapon (imbue), Healing Wave, Earth Shock, Lightning Shield (thorns), Flame Shock.
-- **Mage**: Fireball, Frost Armor, Arcane Intellect, Frostbolt, Conjure Water, Fire Blast, Arcane Missiles (channeled), Polymorph, Frost Nova.
-- **Warlock**: Shadow Bolt, Demon Skin, Immolate, Corruption, Life Tap, Curse of Agony, Drain Life, and seven summonable demons from Imp to Doomguard.
-- **Druid**: Wrath, Healing Touch, Mark of the Wild, Moonfire, Rejuvenation, Thorns, Entangling Roots, Bear Form at 10.
+- **Warrior**: rage, Reaver Strike (on-next-swing, off-GCD), Iron Bellow, Onrush, Deep Gash, Quaking Blow, Hobbling Cut, Blood Toll, Redhand (dodge proc).
+- **Paladin**: Oathbrand unleashed by Verdict, Mending Light, Steadfast Aura, Oath of Iron, Ward of Faith (absorb), Sundering Gavel (stun), Last Rite.
+- **Hunter**: ranged auto-attack (8-35 yd with a classic-style dead zone), Gutting Strike, Harrier's Guise, Venom Barb, Fell Shot, Rattling Shot, Counterfang, Fettering Slash, and a tameable pet from level 10.
+- **Rogue**: energy and combo points, Wicked Slash, Dirt Nap, Craven Thrust (behind, dagger), Eye Jab, Ghostfoot, Cutthroat Tempo, Swift Heels.
+- **Priest**: Smite, Whispered Prayer, Litany of Resolve, Dirge of Decay, Psalm of Warding (absorb), Lingering Grace (HoT), Mindfracture.
+- **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
+- **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (channeled), Bewitch, Icebind.
+- **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, and seven summonable demons from Emberkin to Wraithborn.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, Bruin Form at 10.
 
-Heals and buffs land on party members, healing can crit, and absorb shields soak damage before health. Spend points across **three talent specs per class** (Arms/Fury/Protection, Balance/Feral/Restoration, and so on); allocation is server-validated and exportable as a build string.
+Heals and buffs land on party members, healing can crit, and absorb shields soak damage before health. Spend points across **three talent specs per class** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, and so on); allocation is server-validated and exportable as a build string.
 
 ### Dungeons
 
@@ -201,7 +201,7 @@ The Gravecaller storyline runs through four five-player elite instances, and a s
 
 - **The Hollow Crypt** (5 players) beneath the Fallen Chapel: paired elite trash, the Sexton Marrow miniboss, and Morthen the Gravecaller, who drops a Shadow Pulse AoE every ten seconds. The crypt door teleports your party into a private instance copy that resets after five minutes empty.
 - **The Sunken Bastion** (5 players, around level 13, southeast Mirefen): Vael the Mistcaller summons waves of Drowned Thralls at 60% and 30% health.
-- **Gravewyrm Sanctum** (5 players, level 20, beneath Thornpeak): three chambers of elite boneguard and drakonid, Korgath the Bound (enrages below 30%), Grand Necromancer Velkhar, and Korzul the Gravewyrm, where epic weapons drop.
+- **Gravewyrm Sanctum** (5 players, level 20, beneath Thornpeak): three chambers of elite boneguard and scaleguard, Korgath the Bound (enrages below 30%), Grand Necromancer Velkhar, and Korzul the Gravewyrm, where epic weapons drop.
 - **The Drowned Temple** (5 players) through the Glimmermere moongate: a pale, moon-violet instance leading to Choirmother Selthe and then Ysolei, Avatar of the Drowned Moon, who pulses Lunar Tide every nine seconds and summons Moonspawn at 60% and 30%.
 - **The Abandoned Crypt** (solo) in Thornpeak: a quiet keystone-and-diary dive for one whose trail unseals the royal door to **Nythraxis, Scourge of Thornpeak**, a ten-player raid finale fought across three soul wardstones.
 
@@ -220,7 +220,7 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 ### Playing together
 
-- **Parties** up to 5: right-click a player and Invite to Party. Members share tap rights and quest credit, split XP with the real vanilla group bonuses (1.166 / 1.3 / 1.43 for 3/4/5), and show up as blips on the minimap. `/p` for party chat, `/roll` to settle loot.
+- **Parties** up to 5: right-click a player and Invite to Party. Members share tap rights and quest credit, split XP with the classic-era group bonuses (1.166 / 1.3 / 1.43 for 3/4/5), and show up as blips on the minimap. `/p` for party chat, `/roll` to settle loot.
 - **Trading**: right-click and Trade. Both sides stage items and money, both must accept, and the swap is atomic and server-validated. Quest items cannot be traded, and walking apart cancels.
 - **Duels**: right-click and Challenge to a Duel. A 3-second countdown, then fight until one side hits 1 hp; the winner is announced zone-wide and running 60 yards away forfeits.
 - **Tap rights and away status**: the first player to damage a mob owns its loot, XP, and quest credit; `/afk` and `/dnd` mark you away with an auto-reply to whispers.

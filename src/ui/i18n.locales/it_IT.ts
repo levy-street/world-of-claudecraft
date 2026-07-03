@@ -2423,14 +2423,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nhalia_mourner.name': 'Piangente di Nhalia',
   'entities.mobs.sister_nhalia.name': 'Sorella Nhalia',
   'entities.mobs.varkas_boneguard.name': "Guardia d'ossa di Varkas",
-  'entities.mobs.imp.name': 'Folletto',
-  'entities.mobs.voidwalker.name': 'Camminatore del Vuoto',
-  'entities.mobs.succubus.name': 'Succube',
+  'entities.mobs.emberkin.name': 'Folletto',
+  'entities.mobs.gloomshade.name': 'Camminatore del Vuoto',
+  'entities.mobs.duskborn.name': 'Succube',
   'entities.mobs.grix_the_tunnelking.name': 'Grix il Re dei Cunicoli',
-  'entities.mobs.felhunter.name': 'Segugio vile',
-  'entities.mobs.felguard.name': 'Guardia vile',
-  'entities.mobs.infernal.name': 'Infernale',
-  'entities.mobs.doomguard.name': 'Guardia del Terrore',
+  'entities.mobs.spellhound.name': 'Segugio vile',
+  'entities.mobs.warfiend.name': 'Guardia vile',
+  'entities.mobs.pyre_colossus.name': 'Infernale',
+  'entities.mobs.wraithborn.name': 'Guardia del Terrore',
   'entities.mobs.choirmother_selthe.name': 'Selthe Madre del Coro',
   'entities.mobs.drowned_templeguard.name': 'Guardiano del Tempio Annegato',
   'entities.mobs.drowned_votary.name': 'Devoto Annegato',
@@ -3706,12 +3706,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Banditi, cultisti e altri che hanno scelto il mestiere sbagliato. Combattono con tattica, non solo con i denti.',
   'guide.family.humanoid.name': 'Umanoidi',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Scavatori con la candela in testa che infestano miniere e cunicoli, difendendo ferocemente il loro minerale.',
-  'guide.family.kobold.name': 'Kobold',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobold',
+  'guide.family.mudfin.desc':
     'Abitanti anfibi della palude che brulicano nelle secche in branchi rumorosi e territoriali.',
-  'guide.family.murloc.name': 'Murloc',
+  'guide.family.mudfin.name': 'Murloc',
   'guide.family.ogre.desc':
     'Enormi, ottusi e pericolosi. Si accampano sui passi alti e colpiscono come una frana.',
   'guide.family.ogre.name': 'Ogre',
@@ -4149,18 +4149,18 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena e PvP',
   'guide.nav.talents': 'Talenti',
   'guide.nav.wishIKnew': 'Cose che avrei voluto sapere',
-  'guide.petHook.doomguard': "Un evocatore d'élite che fa piovere ombra pesante dalla distanza.",
-  'guide.petHook.felguard':
+  'guide.petHook.wraithborn': "Un evocatore d'élite che fa piovere ombra pesante dalla distanza.",
+  'guide.petHook.warfiend':
     'Un picchiatore resistente in mischia, il tuttofare una volta che riesci a evocarlo.',
-  'guide.petHook.felhunter':
+  'guide.petHook.spellhound':
     "Uno scaramucciatore d'ombra che dà la caccia agli incantatori nemici.",
-  'guide.petHook.imp':
+  'guide.petHook.emberkin':
     'Un demone che scaglia dardi di fuoco a distanza e fiacca i nemici da una distanza di sicurezza.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Un colosso massiccio dalla mischia devastante, evocato per pura potenza.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Un demone veloce in mischia che colpisce forte ma cede sotto pressione.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Un demone robusto che provoca e assorbe i colpi, così puoi lanciare in tranquillità.',
   'guide.related': 'Correlati',
   'guide.search.label': 'Cerca',

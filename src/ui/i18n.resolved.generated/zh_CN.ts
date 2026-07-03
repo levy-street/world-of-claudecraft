@@ -1539,13 +1539,13 @@ export const zh_CN: EnTranslations = {
       "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
     },
     "petHook": {
-      "imp": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
-      "voidwalker": "一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。",
-      "succubus": "一只快速的近战恶魔，输出凶猛，但承压能力很差。",
-      "felhunter": "一名暗影游击手，专门纠缠敌方施法者。",
-      "felguard": "一名耐打的近战猛士，能召唤它之后就是全能的选择。",
-      "infernal": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。",
-      "doomguard": "一只精英施法者，从远处倾泻沉重的暗影伤害。"
+      "emberkin": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
+      "gloomshade": "一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。",
+      "duskborn": "一只快速的近战恶魔，输出凶猛，但承压能力很差。",
+      "spellhound": "一名暗影游击手，专门纠缠敌方施法者。",
+      "warfiend": "一名耐打的近战猛士，能召唤它之后就是全能的选择。",
+      "pyre_colossus": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。",
+      "wraithborn": "一只精英施法者，从远处倾泻沉重的暗影伤害。"
     },
     "bestiary": {
       "heading": "怪物图鉴",
@@ -1571,11 +1571,11 @@ export const zh_CN: EnTranslations = {
         "name": "蜘蛛",
         "desc": "结网的织丝者与剧毒的潜伏者，盘踞在阴暗错综之地。猎人可以像驯服野兽那样驯服它们。"
       },
-      "murloc": {
+      "mudfin": {
         "name": "鱼人",
         "desc": "两栖的沼泽居民，成群涌入浅滩，吵闹而极具地盘意识。"
       },
-      "kobold": {
+      "burrower": {
         "name": "狗头人",
         "desc": "头顶蜡烛的掘地者，在矿洞与地穴中繁衍，凶狠地守护着自己的矿石。"
       },
@@ -1967,6 +1967,430 @@ export const zh_CN: EnTranslations = {
       "title": "我们找不到该页面",
       "body": "你寻找的页面不存在,或者可能已被移动。",
       "home": "返回概览"
+    }
+  },
+  "editor": {
+    "appTitle": "地图编辑器",
+    "docTitle": "地图编辑器 - World of ClaudeCraft",
+    "untitledMap": "未命名地图",
+    "playtestPlayerName": "制图师",
+    "topbar": {
+      "label": "编辑器操作",
+      "mapNameLabel": "地图名称",
+      "dirty": "有未保存的更改",
+      "dirtyDot": "此地图有未保存的更改",
+      "clean": "所有更改已保存",
+      "savedLocal": "已保存到此浏览器",
+      "savedServer": "已保存到服务器（v{version}）",
+      "saving": "保存中...",
+      "neverSaved": "尚未保存",
+      "new": "新建",
+      "newTitle": "基于内置世界新建一张地图",
+      "open": "打开",
+      "openTitle": "打开已保存的地图（浏览器或服务器）",
+      "save": "保存",
+      "saveTitle": "保存到此浏览器；已登录时同时保存到服务器（Ctrl+S）",
+      "saveAs": "另存为",
+      "saveAsTitle": "以新名称保存一份副本",
+      "fork": "派生",
+      "forkTitle": "在服务器上创建一份属于你的副本",
+      "forkDisabledTitle": "请先打开一张服务器地图再派生",
+      "import": "导入",
+      "importTitle": "从 JSON 文件导入地图",
+      "export": "导出",
+      "exportTitle": "将此地图下载为 JSON 文件",
+      "uploadAsset": "上传资源",
+      "uploadAssetTitle": "上传 GLB 模型（最大 8 MiB）以便放置到你的地图中",
+      "uploadAssetDisabledTitle": "请先在游戏中登录再上传资源",
+      "playtest": "试玩",
+      "playtestTitle": "在此地图上启动游戏（离线，包含当前编辑）",
+      "viewLabel": "视图模式",
+      "view3d": "3D",
+      "view3dTitle": "在渲染后的世界中编辑",
+      "view2d": "2D",
+      "view2dTitle": "在俯视示意图上编辑",
+      "undoCount": "撤销：{count}",
+      "undoCountTitle": "可撤销 {count} 步（Ctrl+Z 撤销，Ctrl+Y 重做）",
+      "autosave": "自动保存",
+      "autosaveTitle": "有未保存的更改时自动保存地图。保存失败时会自动关闭。",
+      "undo": "Undo",
+      "undoTitle": "撤销上一次更改（Ctrl+Z）",
+      "redo": "Redo",
+      "redoTitle": "重做上一次撤销的更改（Ctrl+Y）",
+      "offline": "离线",
+      "offlineTitle": "未登录：地图只保存到此浏览器。请在游戏中登录以在线保存。",
+      "signIn": "登录",
+      "signInTitle": "在新标签页中打开游戏登录界面",
+      "help": "帮助",
+      "helpTitle": "编辑器指南：工具、快捷键与教程"
+    },
+    "tool": {
+      "listLabel": "编辑器工具",
+      "keyHint": "{name}（{key}）",
+      "select": "选择",
+      "raise": "抬升",
+      "lower": "下压",
+      "smooth": "平滑",
+      "flatten": "压平",
+      "paint": "绘制生态",
+      "water": "水面",
+      "place": "放置资源",
+      "blocker": "空气墙",
+      "camp": "营地",
+      "spawn": "出生点",
+      "region": "区域",
+      "erase": "擦除"
+    },
+    "inspector": {
+      "label": "工具选项"
+    },
+    "brush": {
+      "title": "笔刷",
+      "size": "笔刷大小",
+      "strength": "强度",
+      "sizeHint": "快捷键：[ 和 ] 调整笔刷大小；Shift+[ 和 Shift+] 调整强度。",
+      "editCount": "地形编辑数：{count} / {max}"
+    },
+    "biome": {
+      "title": "生态",
+      "paletteLabel": "要绘制的生态",
+      "vale": "谷地",
+      "marsh": "沼泽",
+      "peaks": "山峰",
+      "beach": "海滩",
+      "desert": "沙漠",
+      "volcano": "火山",
+      "cave": "洞穴",
+      "erase": "擦除绘制",
+      "hint": "绘制的格子会覆盖区域生态，改变地形形状与颜色。",
+      "clear": "清除全部生态绘制",
+      "clearConfirm": "移除此地图上所有已绘制的生态格子？"
+    },
+    "flatten": {
+      "hint": "压平会将地面拉平到拖动开始时光标下的高度。",
+      "hardEdge": "硬边缘"
+    },
+    "water": {
+      "title": "水面高度",
+      "level": "水面高度",
+      "hint": "设置全图水面高度，范围 {min} 到 {max} 码。",
+      "reset": "重置为内置高度"
+    },
+    "place": {
+      "title": "放置资源",
+      "scale": "缩放",
+      "collide": "阻挡移动",
+      "collideHint": "阻挡型资源会生成玩家无法穿过的碰撞范围。",
+      "randomRotation": "随机旋转",
+      "chosen": "正在放置：{name}",
+      "none": "先在下方浏览器中选择一个资源，然后点击地面放置。"
+    },
+    "blockerTool": {
+      "title": "空气墙",
+      "hint": "沿地面拖动即可绘制一堵玩家无法穿过或跳过的隐形墙。松开即放置；短于半码的墙会被丢弃。",
+      "count": "空气墙：{count} / {max}"
+    },
+    "camp": {
+      "title": "怪物营地",
+      "mob": "怪物",
+      "count": "数量",
+      "radius": "半径",
+      "delete": "删除营地",
+      "hint": "点击空地新建营地，或点击已有营地进行编辑。",
+      "playtestNote": "怪物只在试玩中出现，编辑器视图中不会出现。",
+      "selected": "营地：{mob}",
+      "none": "未选中营地。"
+    },
+    "spawn": {
+      "title": "出生点",
+      "hint": "点击地面设置试玩时玩家的出生位置。",
+      "position": "出生点：{x}，{z}",
+      "unset": "使用内置的起始位置。",
+      "clear": "清除出生点"
+    },
+    "region": {
+      "title": "区域",
+      "hint": "拖出一个框以选中放置物与地形编辑。复制后点击即可粘贴。",
+      "hint3d": "区域框在 2D 视图中绘制；复制与粘贴在两种视图中都可用。",
+      "copy": "复制区域",
+      "pasteBeside": "在旁边粘贴",
+      "copied": "已复制 {assets} 个资源和 {edits} 个地形编辑。",
+      "pasted": "已粘贴 {count} 个项目。",
+      "needBox": "请先拖出一个区域框。",
+      "needClipboard": "请先复制一个区域。"
+    },
+    "eraseTool": {
+      "title": "擦除",
+      "hint": "点击已放置的资源可移除它；点击雕刻过的地面可移除光标下最新的印记。",
+      "blockerHint": "在空气墙附近点击会改为移除该墙。"
+    },
+    "selection": {
+      "title": "选中项",
+      "none": "未选中任何内容。使用“选择”工具点击已放置的资源。",
+      "asset": "资源：{name}",
+      "x": "X",
+      "z": "Z",
+      "rotation": "旋转",
+      "scale": "缩放",
+      "collide": "阻挡移动",
+      "radius": "碰撞半径",
+      "radiusAuto": "自动",
+      "radiusAutoTitle": "将碰撞半径重置为跟随资源缩放",
+      "radiusHint": "“自动”根据资源缩放推导碰撞半径；拖动滑块可覆盖它。",
+      "footprints": "显示碰撞范围",
+      "duplicate": "复制一份",
+      "delete": "删除",
+      "deleteHint": "删除会移除选中项；Ctrl+Z 可恢复。",
+      "moveHint": "移动：在 3D 视图中沿地面拖动资产，或用方向键微调（0.5 码，按住 Shift 为 2 码）。",
+      "wheelHint": "Shift+滚轮旋转资产，Alt+滚轮缩放资产，Ctrl+D 复制资产。"
+    },
+    "marker": {
+      "title": "标记",
+      "reset": "重置位置",
+      "moved": "{count} 个标记偏离了内置布局。"
+    },
+    "layers": {
+      "title": "图层",
+      "hub": "枢纽",
+      "graveyard": "墓地",
+      "lake": "湖泊",
+      "poi": "兴趣点",
+      "camp": "营地",
+      "npc": "NPC",
+      "object": "物件",
+      "blocker": "空气墙"
+    },
+    "frame": {
+      "title": "取景",
+      "all": "全部"
+    },
+    "procgen": {
+      "title": "程序生成",
+      "count": "数量",
+      "scatter": "散布该分类的资源",
+      "hills": "生成连绵丘陵",
+      "scattered": "已从 {category} 散布 {count} 个资源。",
+      "hillsAdded": "已添加 {count} 座丘陵。",
+      "noAssets": "该分类下没有资源。"
+    },
+    "assets": {
+      "title": "资源浏览器",
+      "label": "资源浏览器",
+      "search": "搜索资源",
+      "searchPlaceholder": "搜索资源...",
+      "empty": "没有匹配的资源。",
+      "uploadedTab": "已上传",
+      "uploadedEmpty": "还没有上传的资源。使用“上传资源”添加 GLB 模型（最大 8 MiB）。",
+      "uploadedSignIn": "在游戏中登录后即可上传并放置你自己的 GLB 模型。",
+      "uploadedLoadFailed": "无法加载你上传的资源。",
+      "deleteAsset": "删除已上传的资源",
+      "deleteAssetConfirm": "删除已上传的资源“{name}”？使用它的地图将丢失该模型。",
+      "pick": "放置{name}",
+      "categoryTab": "{category}（{count}）",
+      "category": {
+        "biome": "生态",
+        "chars": "角色",
+        "creatures": "生物",
+        "dungeon": "地下城",
+        "foliage": "植被",
+        "props": "道具",
+        "quest": "任务",
+        "resources": "资源点",
+        "tools": "工具",
+        "weapons": "武器"
+      }
+    },
+    "upload": {
+      "notGlb": "请选择一个 .glb 文件。",
+      "tooLarge": "该文件超过 8 MiB 上限。",
+      "uploading": "正在上传资源...",
+      "uploaded": "资源已上传：{name}",
+      "uploadedExisting": "该模型已在服务器上，直接复用。",
+      "deleted": "已删除上传的资源。"
+    },
+    "openDrawer": {
+      "title": "打开地图",
+      "close": "关闭",
+      "tabLocal": "此浏览器",
+      "tabMine": "我的服务器地图",
+      "tabPublic": "公开地图",
+      "colName": "名称",
+      "colUpdated": "更新时间",
+      "colStatus": "状态",
+      "statusPublic": "公开",
+      "statusPrivate": "私有",
+      "open": "打开",
+      "fork": "派生",
+      "publish": "发布",
+      "unpublish": "取消发布",
+      "delete": "删除",
+      "draft": "自动保存的草稿",
+      "emptyLocal": "此浏览器还没有保存的地图。保存一张后会显示在这里。",
+      "emptyMine": "服务器上还没有地图。登录后保存即可创建。",
+      "emptyPublic": "还没有公开地图。",
+      "loading": "正在加载地图...",
+      "loadFailed": "无法从服务器加载地图。",
+      "signInHint": "在游戏中登录后即可浏览、保存和派生服务器地图。",
+      "deleteLocalConfirm": "删除本地地图“{name}”？",
+      "deleteServerConfirm": "删除服务器地图“{name}”？此操作无法撤销。",
+      "prev": "上一页",
+      "next": "下一页",
+      "page": "第 {page} 页"
+    },
+    "status": {
+      "savedLocal": "已将“{name}”保存到此浏览器。",
+      "savedServer": "已将“{name}”保存到服务器（v{version}）。",
+      "savedLocalOnly": "已将“{name}”保存到此浏览器。登录后可在线保存。",
+      "saveFailedLocal": "本地保存失败（存储被阻止）。",
+      "opened": "已打开“{name}”。",
+      "imported": "已导入“{name}”。",
+      "importFailed": "导入已取消，或该文件不是有效的地图。",
+      "exported": "已下载“{name}”。",
+      "newMap": "已基于内置世界新建地图。",
+      "forked": "已派生为“{name}”。你现在编辑的是自己的副本。",
+      "published": "地图已发布。任何人都可以找到并派生它。",
+      "unpublished": "地图已取消发布。",
+      "deleted": "地图已删除。",
+      "assetPlacedFirst": "请先在浏览器中选择一个资源。",
+      "loading3d": "正在加载世界...",
+      "playtestLaunch": "正在启动试玩...",
+      "playtestFailed": "无法启动试玩（存储被阻止）。",
+      "draftSaved": "草稿已自动保存。",
+      "draftRestored": "已恢复自动保存的草稿。",
+      "autosaveFailed": "自动保存失败（浏览器存储已满或被禁用）。请导出地图以保留备份。",
+      "terrainCapReached": "已达到地形编辑上限（{max}）。多余的雕刻印记未被添加。",
+      "placementCapReached": "已达到放置上限（{max}）。多余的资源未被添加。",
+      "blockerCapReached": "已达到空气墙上限（{max}）。新墙未被添加。",
+      "autosaveOff": "自动保存已关闭：{reason} 请手动保存后再重新开启。"
+    },
+    "confirm": {
+      "ok": "确定",
+      "cancel": "取消",
+      "discardTitle": "放弃更改？",
+      "discardBody": "“{name}”上有未保存的更改。要放弃它们吗？",
+      "discard": "放弃",
+      "conflictTitle": "保存冲突",
+      "conflictBody": "自你打开以来，此地图在服务器上已被修改（当前为 v{version}）。要将你的版本另存为新副本吗？",
+      "conflictSaveCopy": "另存为副本"
+    },
+    "prompt": {
+      "saveAsTitle": "另存为",
+      "nameLabel": "新地图名称"
+    },
+    "serverError": {
+      "invalid_map_name": "该地图名称不可用。请使用字母、数字、空格、撇号或连字符。",
+      "map_name_not_allowed": "该地图名称不被允许。",
+      "invalid_map_doc": "服务器拒绝了该地图文档。",
+      "invalid_version": "保存请求格式有误。请刷新后重试。",
+      "map_limit_reached": "你已达到服务器地图数量上限。删除一张后才能继续保存。",
+      "map_not_found": "该地图已不在服务器上。",
+      "version_conflict": "自你打开以来，该地图在服务器上已被修改。",
+      "slug_unavailable": "服务器无法为该名称生成链接。请换一个名称。",
+      "map_too_large": "地图文档过大，无法保存到服务器。",
+      "invalid_glb": "该文件不是有效的 GLB 模型。",
+      "asset_blocked": "该资源已被管理员屏蔽。",
+      "asset_limit_reached": "你已达到上传资源数量上限。删除一个后才能继续上传。",
+      "asset_storage_limit_reached": "你的资源存储空间已用完。请先删除一个资源。",
+      "asset_too_large": "该模型超过上传大小上限。",
+      "asset_not_found": "该资源已不在服务器上。",
+      "rate_limited": "操作太快了，请稍后再试。",
+      "unauthorized": "你的会话已过期。请重新在游戏中登录。",
+      "network": "无法连接服务器。请检查网络后重试。",
+      "timeout": "服务器响应超时。请重试。",
+      "unknown": "与服务器通信时出了点问题。"
+    },
+    "hints": {
+      "nav3d": "拖动旋转视角，滚轮缩放。按住拖动时，WASD 飞行，Q/E 调整高度。",
+      "nav2d": "拖动平移，滚轮缩放。"
+    },
+    "help": {
+      "title": "编辑器帮助",
+      "toolsTitle": "工具",
+      "shortcutsTitle": "键盘快捷键",
+      "mouseTitle": "鼠标与导航",
+      "flowTitle": "保存与试玩",
+      "beginTutorial": "开始教程",
+      "close": "关闭",
+      "tool": {
+        "select": "选中已放置的资产以移动、旋转和缩放；点击 2D 标记可进行编辑。",
+        "raise": "抬高笔刷下方的地形。",
+        "lower": "降低笔刷下方的地形。",
+        "smooth": "将起伏平滑到局部平均高度。",
+        "flatten": "将地面推平到拖动起点的高度。",
+        "paint": "在区域默认地表上涂刷生态群系。",
+        "water": "设置全图水面高度。",
+        "place": "将目录资产或上传的资产放置到地面上。",
+        "blocker": "拖动绘制在试玩中阻挡移动的隐形墙。",
+        "camp": "添加并编辑在试玩中刷新的怪物营地。",
+        "spawn": "设置试玩时玩家的落点。",
+        "region": "框选地形和资产以复制粘贴。",
+        "erase": "移除光标下已放置的资产或雕刻印记。"
+      },
+      "key": {
+        "tools": "每个工具都有一个单字母快捷键，显示在工具栏按钮上。",
+        "brush": "[ 和 ] 调整笔刷大小；Shift+[ 和 Shift+] 调整强度。",
+        "undo": "Ctrl+Z 撤销上一步；Ctrl+Y 或 Ctrl+Shift+Z 重做。",
+        "save": "Ctrl+S 保存地图。",
+        "duplicate": "Ctrl+D 复制选中的资产。",
+        "nudge": "方向键将选中的资产微调 0.5 码；按住 Shift 为 2 码。",
+        "wheel": "Shift+滚轮旋转选中的资产；Alt+滚轮缩放。",
+        "delete": "Delete 移除选中的资产或营地。",
+        "escape": "Esc 先清除选择，然后返回选择工具。"
+      },
+      "mouse": {
+        "orbit3d": "3D 视图：拖动环绕视角，滚轮缩放；中键拖动或 Shift+拖动平移。",
+        "fly3d": "在 3D 中按住拖动时，WASD 飞行移动镜头，Q/E 调整高度。",
+        "move": "选择工具激活时，拖动已放置的资产可在地面上移动它。",
+        "pan2d": "2D 视图：拖动平移，滚轮缩放。"
+      },
+      "flow": {
+        "save": "保存会把地图存到此浏览器；登录后也会存到服务器。",
+        "draft": "有未保存的更改时，每 30 秒自动保存一份草稿；用打开可以恢复。",
+        "playtest": "试玩会在此地图上启动真实游戏，包含你未保存的编辑。"
+      }
+    },
+    "tutorial": {
+      "title": "编辑器教程",
+      "back": "上一步",
+      "next": "下一步",
+      "finish": "完成",
+      "skip": "跳过导览",
+      "counter": "第 {current} 步，共 {total} 步",
+      "steps": {
+        "toolbar": {
+          "title": "工具栏",
+          "body": "所有编辑工具都在这里：雕刻笔刷、生态群系涂刷、水面、资产放置、营地等。每个工具都有单键快捷键，显示在按钮角落。"
+        },
+        "stage": {
+          "title": "世界视图",
+          "body": "这是用真实游戏引擎渲染的你的地图。拖动环绕视角，滚轮缩放，中键拖动或 Shift+拖动平移。用工具点击地面即可编辑。"
+        },
+        "inspector": {
+          "title": "工具选项",
+          "body": "当前工具的选项显示在这里：笔刷大小、生态群系调色板、资产缩放、营地设置，以及所选对象的属性。"
+        },
+        "viewToggle": {
+          "title": "3D 与 2D",
+          "body": "在渲染的 3D 世界和符号化的俯视 2D 地图之间切换。2D 视图最适合移动区域标记和查看大范围。"
+        },
+        "save": {
+          "title": "保存你的作品",
+          "body": "保存会把地图存到此浏览器，登录后也会存到服务器。导出可下载 JSON 备份，打开可找回已保存的地图和草稿。"
+        },
+        "playtest": {
+          "title": "试玩",
+          "body": "随时在你的地图上启动真实游戏，包含当前的编辑。关闭试玩标签页即可回来继续编辑。"
+        },
+        "help": {
+          "title": "帮助就在这里",
+          "body": "这就是完整流程。随时打开帮助查看完整工具列表和所有快捷键，或再次运行本导览。"
+        }
+      }
+    },
+    "a11y": {
+      "stage": "地图视口",
+      "toasts": "编辑器通知",
+      "dialog": "编辑器对话框"
     }
   },
   "skinEvent": {
@@ -6016,13 +6440,13 @@ export const zh_CN: EnTranslations = {
       "varkas_boneguard": {
         "name": "瓦尔卡斯骨卫"
       },
-      "imp": {
+      "emberkin": {
         "name": "小鬼"
       },
-      "voidwalker": {
+      "gloomshade": {
         "name": "虚空行者"
       },
-      "succubus": {
+      "duskborn": {
         "name": "魅魔"
       },
       "grix_the_tunnelking": {
@@ -6046,16 +6470,16 @@ export const zh_CN: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "缚魂者玛尔德雷克"
       },
-      "felhunter": {
+      "spellhound": {
         "name": "地狱猎犬"
       },
-      "felguard": {
+      "warfiend": {
         "name": "恶魔卫士"
       },
-      "infernal": {
+      "pyre_colossus": {
         "name": "地狱火"
       },
-      "doomguard": {
+      "wraithborn": {
         "name": "末日守卫"
       },
       "choirmother_selthe": {

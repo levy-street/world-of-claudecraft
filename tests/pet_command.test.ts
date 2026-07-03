@@ -48,7 +48,7 @@ describe('/pet command', () => {
     first.setPlayerLevel(20, pid);
     first.castAbility('summon_voidwalker', pid);
     for (let i = 0; i < 20 * 6; i++) first.tick();
-    expect(first.petOf(pid)?.templateId).toBe('voidwalker');
+    expect(first.petOf(pid)?.templateId).toBe('gloomshade');
     const saved = first.serializeCharacter(pid)!;
     expect(saved.pet).toBeNull();
 

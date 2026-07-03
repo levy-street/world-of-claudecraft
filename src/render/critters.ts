@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
-import { terrainHeight, terrainSteepnessAt, WATER_LEVEL } from '../sim/world';
+import { terrainHeight, terrainSteepnessAt, waterLevel } from '../sim/world';
 import { GFX } from './gfx';
 
 export interface CritterField {
@@ -172,7 +172,7 @@ export function buildCritters(seed: number): CritterField {
     if (z < WORLD_MIN_Z + EDGE || z > WORLD_MAX_Z - EDGE) return false;
     if (x > DUNGEON_X_THRESHOLD - 24) return false;
     if (terrainSteepnessAt(x, z, seed) > MAX_WALK_SLOPE) return false;
-    return terrainHeight(x, z, seed) > WATER_LEVEL + 0.8;
+    return terrainHeight(x, z, seed) > waterLevel() + 0.8;
   };
 
   const relocate = (c: Critter, px: number, pz: number): void => {

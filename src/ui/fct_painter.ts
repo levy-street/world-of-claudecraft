@@ -8,12 +8,12 @@
 // bound. This ring caps the live node count at FCT_POOL_CAP and never allocates a node
 // after construction.
 //
-// SCREEN-ANCHORED, byte-faithful to the old fct() and to WoW-style combat text: spawn()
+// SCREEN-ANCHORED, byte-faithful to the old fct() and to classic-style combat text: spawn()
 // projects the head anchor ONCE (renderer.worldToScreen + the getUiScale author-space
 // divide), writes left / top a single time, and leaves the number at that screen position
 // for its ~1.25s life while the CSS @keyframes float it straight up. It does NOT re-project
 // per frame, so a number pops over the unit and rises in SCREEN space (it does not slide
-// with the camera) -- exactly how the classic / WoW damage numbers read, and identical to
+// with the camera) -- exactly how the classic-era damage numbers read, and identical to
 // the old fct(). step() therefore only ages out expired slots; there is no per-frame
 // position write, so an unchanged frame costs nothing.
 //

@@ -12,10 +12,11 @@ import {
 import type { BiomeId } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import {
+  biomeAt,
   generateDecorations,
   roadDistance,
   terrainHeight,
-  WATER_LEVEL,
+  waterLevel,
   zoneBiomeAt,
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -110,13 +111,61 @@ for (const urls of Object.values(MODEL_URLS)) {
 // Desaturated biome tints riding instanceColor. The textured models carry
 // their own hue, so tints are lerped most of the way to white before use
 // (raw tints multiply into the albedo and read as grime).
-const PINE_TINT: Record<BiomeId, number> = { vale: 0x9bb48d, marsh: 0x87966b, peaks: 0x6f8a7a };
-const OAK_TINT: Record<BiomeId, number> = { vale: 0xa7b886, marsh: 0x8d9865, peaks: 0x92a37f };
-const ROCK_TINT: Record<BiomeId, number> = { vale: 0x8d8d85, marsh: 0x565c4e, peaks: 0x878e99 };
-const TRUNK_TINT: Record<BiomeId, number> = { vale: 0xffffff, marsh: 0xd2d8bc, peaks: 0xd9dde4 };
-const GRASS_TINT: Record<BiomeId, number> = { vale: 0xdde4c0, marsh: 0xbfc492, peaks: 0xc2cec8 };
+const PINE_TINT: Record<BiomeId, number> = {
+  vale: 0x9bb48d,
+  marsh: 0x87966b,
+  peaks: 0x6f8a7a,
+  beach: 0xa8b878,
+  desert: 0xa8a468,
+  volcano: 0x6a5f52,
+  cave: 0x77837a,
+};
+const OAK_TINT: Record<BiomeId, number> = {
+  vale: 0xa7b886,
+  marsh: 0x8d9865,
+  peaks: 0x92a37f,
+  beach: 0xb2bd7e,
+  desert: 0xb0a468,
+  volcano: 0x74624f,
+  cave: 0x84907f,
+};
+const ROCK_TINT: Record<BiomeId, number> = {
+  vale: 0x8d8d85,
+  marsh: 0x565c4e,
+  peaks: 0x878e99,
+  beach: 0xb0a894,
+  desert: 0xb08d6a,
+  volcano: 0x4a4038,
+  cave: 0x6a6a66,
+};
+const TRUNK_TINT: Record<BiomeId, number> = {
+  vale: 0xffffff,
+  marsh: 0xd2d8bc,
+  peaks: 0xd9dde4,
+  beach: 0xf2e4c8,
+  desert: 0xe6d2ac,
+  volcano: 0xb8a394,
+  cave: 0xc4c8c2,
+};
+const GRASS_TINT: Record<BiomeId, number> = {
+  vale: 0xdde4c0,
+  marsh: 0xbfc492,
+  peaks: 0xc2cec8,
+  beach: 0xe8e2b0,
+  desert: 0xdcc890,
+  volcano: 0x8a7a68,
+  cave: 0xa2a89c,
+};
 const SWAMP_CANOPY_TINT = 0x7e8b58;
-const DRESS_TINT: Record<BiomeId, number> = { vale: 0xaebf8e, marsh: 0x8d9865, peaks: 0x93a78f };
+const DRESS_TINT: Record<BiomeId, number> = {
+  vale: 0xaebf8e,
+  marsh: 0x8d9865,
+  peaks: 0x93a78f,
+  beach: 0xc2c188,
+  desert: 0xc0aa74,
+  volcano: 0x7a6a58,
+  cave: 0x8a948a,
+};
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
 const BARK_TINT_SOFTEN = 0.85;
@@ -1045,7 +1094,15 @@ interface DressingSpot {
 
 const DRESS_STEP_HIGH = 12;
 const DRESS_STEP_LOW = 10;
-const DRESS_DENSITY: Record<BiomeId, number> = { vale: 0.26, marsh: 0.26, peaks: 0.15 };
+const DRESS_DENSITY: Record<BiomeId, number> = {
+  vale: 0.26,
+  marsh: 0.26,
+  peaks: 0.15,
+  beach: 0.1,
+  desert: 0.07,
+  volcano: 0.05,
+  cave: 0.08,
+};
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
 const DRESS_TINT_SOFTEN_LOW = 0.56;
@@ -1066,6 +1123,9 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
     if (r < 0.62) return 'fern';
     return 'mushroom';
   }
+  if (biome === 'beach' || biome === 'desert') return 'bush';
+  if (biome === 'cave') return r < 0.5 ? 'mushroom' : 'fern';
+  if (biome === 'volcano') return 'bush';
   return r < 0.62 ? 'bush' : 'fern';
 }
 
@@ -1113,7 +1173,7 @@ function generateDressing(seed: number): DressingSpot[] {
       }
       if (blocked) continue;
       if (roadDistance(x, z) < 4) continue;
-      if (terrainHeight(x, z, seed) < WATER_LEVEL + 1.2) continue;
+      if (terrainHeight(x, z, seed) < waterLevel() + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
       const kind = dressKindFor(biome, hashAt(gx, gz, 44));
       const [sMin, sRange] = DRESS_SCALE[kind];
@@ -1437,7 +1497,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
           continue;
         const h = terrainHeight(x, z, seed);
-        if (h < WATER_LEVEL + 1.6) continue;
+        if (h < waterLevel() + 1.6) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
         let nearHub = false;
@@ -1453,7 +1513,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         q.setFromAxisAngle(up, r * 12.4);
         m.compose(v.set(x, h, z), q, sv.set(s, s, s));
         im.setMatrixAt(n, m);
-        c.setHex(GRASS_TINT[zoneBiomeAt(z)]);
+        c.setHex(GRASS_TINT[biomeAt(x, z)]);
         c.offsetHSL(
           (hashAt(i, j, 3) - 0.5) * 0.05,
           (hashAt(i, j, 4) - 0.5) * 0.12,

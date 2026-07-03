@@ -1266,14 +1266,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Doodsbesluiper Voss',
   'entities.mobs.deepfen_murloc.name': 'Diepveen-Bijter',
   'entities.mobs.deeprock_kobold.name': 'Dieprots-Tunnelaar',
-  'entities.mobs.doomguard.name': 'Doemwacht',
+  'entities.mobs.wraithborn.name': 'Doemwacht',
   'entities.mobs.drowned_dead.name': 'Verdronken Doden',
   'entities.mobs.drowned_templeguard.name': 'Verdronken Tempelwacht',
   'entities.mobs.drowned_thrall.name': 'Verdronken Lijfeigene',
   'entities.mobs.drowned_votary.name': 'Verdronken Aanbidder',
   'entities.mobs.fallen_captain_aldren.name': 'Gevallen Kapitein Aldren',
-  'entities.mobs.felguard.name': 'Felwacht',
-  'entities.mobs.felhunter.name': 'Feljager',
+  'entities.mobs.warfiend.name': 'Felwacht',
+  'entities.mobs.spellhound.name': 'Feljager',
   'entities.mobs.fen_troll.name': 'Slijkveentrol',
   'entities.mobs.forest_wolf.name': 'Boswolf',
   'entities.mobs.glimmermere_wader.name': 'Glimmermere-Waadvogel',
@@ -1286,8 +1286,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.grix_the_tunnelking.name': 'Grix de Tunnelkoning',
   'entities.mobs.grubjaw.name': 'Grubjaw de Veelvraat',
   'entities.mobs.hollow_acolyte.name': 'Holle Acoliet',
-  'entities.mobs.imp.name': 'Duiveltje',
-  'entities.mobs.infernal.name': 'Inferno',
+  'entities.mobs.emberkin.name': 'Duiveltje',
+  'entities.mobs.pyre_colossus.name': 'Inferno',
   'entities.mobs.ironvein_foreman.name': 'IJzerader-Voorman',
   'entities.mobs.ironvein_sapper.name': 'IJzerader-Sappeur',
   'entities.mobs.knight_commander_olen.name': 'Ridder-Commandant Olen',
@@ -1328,7 +1328,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Zuster Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtooth de Verdronkene',
   'entities.mobs.stormcrag_elemental.name': 'Stormrots-Elementaal',
-  'entities.mobs.succubus.name': 'Succubus',
+  'entities.mobs.duskborn.name': 'Succubus',
   'entities.mobs.thornpeak_ogre.name': 'Doorntop-Oger',
   'entities.mobs.tidebound_acolyte.name': 'Getijgebonden Acoliet',
   'entities.mobs.tunnel_rat.name': 'Tunnelrat-Graver',
@@ -1338,7 +1338,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Visioen van Kapitein Aldren',
   'entities.mobs.vision_deathstalker_voss.name': 'Visioen van Koninklijke Sluipmoordenaar Voss',
   'entities.mobs.vision_malric_mage.name': 'Visioen van Hogepriester Malric',
-  'entities.mobs.voidwalker.name': 'Leegteloper',
+  'entities.mobs.gloomshade.name': 'Leegteloper',
   'entities.mobs.voskar_emberwing.name': 'Voskar de Sintelvleugel',
   'entities.mobs.warlock_imp.name': 'Vuurdemon',
   'entities.mobs.warlock_voidwalker.name': 'Leegtedemon',
@@ -2573,12 +2573,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Bandieten, sekteleden en anderen die het verkeerde vak kozen. Ze vechten met tactiek, niet alleen met tanden.',
   'guide.family.humanoid.name': 'Mensachtigen',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Kaarskoppige gravers die mijnen en holen besmetten en hun erts fel bewaken.',
-  'guide.family.kobold.name': 'Kobolds',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobolds',
+  'guide.family.mudfin.desc':
     'Amfibische moerasbewoners die in luidruchtige, territoriale roedels de ondiepten overspoelen.',
-  'guide.family.murloc.name': 'Murlocs',
+  'guide.family.mudfin.name': 'Murlocs',
   'guide.family.ogre.desc':
     'Enorm, traag van geest en gevaarlijk. Ze kamperen in de hoge passen en slaan toe als een aardverschuiving.',
   'guide.family.ogre.name': 'Ogres',
@@ -2920,15 +2920,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'De pagina die je zocht bestaat niet of is mogelijk verplaatst.',
   'guide.notFound.home': 'Terug naar het overzicht',
   'guide.notFound.title': 'We konden die pagina niet vinden',
-  'guide.petHook.doomguard': 'Een elite-tovenaar die van veraf zware schaduw doet neerregenen.',
-  'guide.petHook.felguard': 'Een taaie melee-vechter, het allroundtype zodra je hem kunt oproepen.',
-  'guide.petHook.felhunter': 'Een schaduwschermutselaar die vijandelijke casters opjaagt.',
-  'guide.petHook.imp':
+  'guide.petHook.wraithborn': 'Een elite-tovenaar die van veraf zware schaduw doet neerregenen.',
+  'guide.petHook.warfiend': 'Een taaie melee-vechter, het allroundtype zodra je hem kunt oproepen.',
+  'guide.petHook.spellhound': 'Een schaduwschermutselaar die vijandelijke casters opjaagt.',
+  'guide.petHook.emberkin':
     'Een demon op afstand die met vuurbouten vijanden bestookt vanaf een veilige afstand.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Een kolossale moloch met verpletterende melee, opgeroepen voor pure kracht.',
-  'guide.petHook.succubus': 'Een snelle melee-demon die hard toeslaat maar bezwijkt onder druk.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.duskborn': 'Een snelle melee-demon die hard toeslaat maar bezwijkt onder druk.',
+  'guide.petHook.gloomshade':
     'Een stevige demon die provoceert en klappen opvangt zodat jij rustig kunt casten.',
   'guide.placeholder.note': 'Dit deel van de gids is onderweg.',
   'guide.progression.bandLabel': 'Niveaus {min} tot {max}',

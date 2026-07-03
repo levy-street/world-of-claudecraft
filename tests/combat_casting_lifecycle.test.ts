@@ -33,7 +33,7 @@ function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; 
 
 // An idle hostile target in range + faced, so an offensive cast passes its guards.
 function spawnTarget(sim: AnySim, p: AnyEntity, level = 1, dz = 6): AnyEntity {
-  const mob = createMob(sim.nextId++, MOBS['forest_wolf'], level, {
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + dz,
@@ -60,7 +60,7 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     const { sim, p, meta } = makeSim('priest', 12);
     p.hp = Math.max(1, p.maxHp - 500);
     const hp0 = p.hp;
-    // Lesser Heal (friendly, never misses) so finish -> applyAbility -> runEffects is observable.
+    // Whispered Prayer (friendly, never misses) so finish -> applyAbility -> runEffects is observable.
     castAbility(sim.ctx, 'lesser_heal', p.id);
     expect(p.castingAbility).toBe('lesser_heal');
     expect(p.castRemaining).toBeGreaterThan(0);
@@ -151,7 +151,7 @@ describe('casting_lifecycle: determinism', () => {
   });
 });
 
-describe('casting_lifecycle: physical ranged shots resolve on projectile impact (Aimed Shot)', () => {
+describe('casting_lifecycle: physical ranged shots resolve on projectile impact (Long Draw)', () => {
   it('deals no damage at cast completion; damage lands when the arrow arrives', () => {
     const { sim, p, meta } = makeSim('hunter', 20);
     p.resource = p.maxResource = 500;
@@ -172,6 +172,6 @@ describe('casting_lifecycle: physical ranged shots resolve on projectile impact 
     // Advance ticks so the arrow travels and connects.
     for (let i = 0; i < 60 && mob.hp === hp0; i++) sim.tick();
     expect(mob.hp).toBeLessThan(hp0);
-    expect(events.some((e) => e.type === 'damage' && e.ability === 'Aimed Shot')).toBe(true);
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Long Draw')).toBe(true);
   });
 });
