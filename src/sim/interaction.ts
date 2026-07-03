@@ -60,7 +60,10 @@ export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
     ctx.error(meta.entityId, "You don't have permission to loot that.");
     return;
   }
-  if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) {
+  // Match the interact/open radius (INTERACT_RANGE + 2, as used by interact() and every
+  // NPC / vendor / quest / market check) so a corpse you could open is never one you are
+  // then told you are "Too far away." to take from.
+  if (dist2d(p.pos, mob.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
@@ -93,7 +96,8 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void
   const { meta, e: p } = r;
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return;
-  if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
+  // Same open/reach radius as lootCorpse and interact() (INTERACT_RANGE + 2).
+  if (dist2d(p.pos, obj.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
