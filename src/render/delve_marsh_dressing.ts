@@ -7,6 +7,7 @@ import {
   type LitanyDressingAnchor,
   type LitanyModuleId,
   litanyModuleDressing,
+  litanyModuleGeometry,
 } from '../sim/delve_litany_layout';
 import type { DungeonLayout } from '../sim/dungeon_layout';
 import { polygonXAtZ } from '../sim/geometry2d';
@@ -248,7 +249,9 @@ function addSluicePost(group: THREE.Group, x: number, z: number, rot = 0): void 
     flatShading: !GFX.standardMaterials,
   });
   const ropeLen = 0.9 + hash2(z * 1.3, x, MARSH_SEED) * 0.5;
-  const ropeAngle = rot + beamLen / 2;
+  // Small hashed radian offset for the slack-rope skew (beamLen is a length in
+  // world units, not an angle).
+  const ropeAngle = rot + (hash2(x * 1.9, z, MARSH_SEED) - 0.5) * 0.8;
   const ropeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, ropeLen, 4), rope);
   ropeMesh.position.set(
     x + Math.sin(rot) * (beamLen / 2 - 0.1),
@@ -344,7 +347,8 @@ function placeDressingAnchor(group: THREE.Group, anchor: LitanyDressingAnchor): 
       addRootWall(group, anchor.x, anchor.z, rot);
       break;
     case 'bone_pile':
-      addShrineFragment(group, anchor.x, anchor.z, rot);
+      // Bones come from the KayKit props via the placement sink in
+      // placeLitanyMarshDressing (both marsh variants); no procedural mesh here.
       break;
   }
 }
@@ -370,12 +374,34 @@ export function placeLitanyMarshDressing(
 ): void {
   if (variant !== 'delve_marsh' && variant !== 'delve_marsh_apse') return;
   placeMarshDressingAnchors(group, moduleId);
-  if (variant === 'delve_marsh') {
-    for (const anchor of litanyModuleDressing(moduleId)) {
-      if (anchor.kind !== 'bone_pile') continue;
-      p.add('bone_A', anchor.x, 0.06, anchor.z, anchor.rot ?? 0, 1.5);
-      p.add('bone_B', anchor.x + 0.8, 0.04, anchor.z + 0.5, (anchor.rot ?? 0) * 2, 1.4);
-    }
+  // Bone piles are real KayKit bones in BOTH marsh variants (the apse included);
+  // they used to render as glowing shrine slabs there.
+  for (const anchor of litanyModuleDressing(moduleId)) {
+    if (anchor.kind !== 'bone_pile') continue;
+    p.add('bone_A', anchor.x, 0.06, anchor.z, anchor.rot ?? 0, 1.5);
+    p.add('bone_B', anchor.x + 0.8, 0.04, anchor.z + 0.5, (anchor.rot ?? 0) * 2, 1.4);
+  }
+}
+
+/** Dry stepping-stone islands drawn ABOVE the Blackwater pool overlays so the
+ * sim's dry-ground exemption (standingOnLitanyDryGround skips the damage tick on
+ * any island rect) is readable: safe ground must not read as lethal water. One
+ * flat opaque mud-stone platform per authored island rect, instance-local. */
+export function placeMarshDryIslands(group: THREE.Group, moduleId: LitanyModuleId): void {
+  const islands = litanyModuleGeometry(moduleId)?.islands ?? [];
+  if (!islands.length) return;
+  const stone = surfaceMat({
+    color: 0x574e3e,
+    roughness: 0.96,
+    flatShading: !GFX.standardMaterials,
+  });
+  for (const isle of islands) {
+    // Top face at y 0.2: above every pool overlay (max y 0.16) so the platform
+    // occludes the water exactly where the sim exempts the player, but low
+    // enough that entities standing at y 0 do not read sunk into the stone.
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(isle.hw * 2, 0.2, isle.hd * 2), stone);
+    mesh.position.set(isle.x, 0.1, isle.z);
+    group.add(mesh);
   }
 }
 

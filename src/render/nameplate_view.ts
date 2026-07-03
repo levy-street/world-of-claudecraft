@@ -101,7 +101,18 @@ export function nameplatePlanInto(
     e.templateId === 'delve_surface_exit' ||
     e.templateId === 'delve_drowned_reliquary' ||
     e.templateId === 'delve_drowned_reliquary_open' ||
-    e.templateId?.startsWith('delve_rite_shrine_');
+    e.templateId?.startsWith('delve_rite_shrine_') ||
+    // Marsh room puzzle interactables (and their spent variants): the plates
+    // carry the localized delveUi.object.* labels so the puzzles read at a
+    // glance, matching the rite shrines above.
+    e.templateId === 'delve_sluice_valve' ||
+    e.templateId === 'delve_sluice_valve_open' ||
+    e.templateId === 'delve_grave_tablet' ||
+    e.templateId === 'delve_grave_tablet_lit' ||
+    e.templateId === 'delve_corpse_candle' ||
+    e.templateId === 'delve_corpse_candle_lit' ||
+    e.templateId === 'delve_bell_rope' ||
+    e.templateId === 'delve_bell_rope_pulled';
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =

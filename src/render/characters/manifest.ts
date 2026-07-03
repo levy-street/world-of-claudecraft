@@ -967,6 +967,9 @@ const MOB_KEYS: Record<string, string> = {
   // gravecaller cult + necromancers: dark-robed casters
   gravecaller_cultist: 'mob_dark_caster',
   gravecaller_summoner: 'mob_dark_caster',
+  // BOTH Nhalias: the zone 2 overworld rare elite keeps her original template
+  // id; the Drowned Litany boss is a separate renamed template.
+  sister_nhalia: 'mob_dark_caster',
   sister_nhalia_drowned_canticle: 'mob_dark_caster',
   deacon_voss: 'mob_dark_caster',
   wyrmcult_necromancer: 'mob_dark_caster',

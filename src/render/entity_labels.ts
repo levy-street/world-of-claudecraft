@@ -46,6 +46,21 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'delve_rite_shrine_skull') {
     return t('worldContent.delveRiteShrineSkullInteract');
   }
+  // Marsh room puzzle interactables: the sim names these in English
+  // (createDelveObject); localize through the delveUi.object.* labels. Spent
+  // variants keep the same label (same object, triggered).
+  if (entity.templateId === 'delve_sluice_valve' || entity.templateId === 'delve_sluice_valve_open')
+    return t('delveUi.object.sluice_valve');
+  if (entity.templateId === 'delve_grave_tablet' || entity.templateId === 'delve_grave_tablet_lit')
+    return t('delveUi.object.grave_tablet');
+  if (
+    entity.templateId === 'delve_corpse_candle' ||
+    entity.templateId === 'delve_corpse_candle_lit'
+  )
+    return t('delveUi.object.corpse_candle');
+  if (entity.templateId === 'delve_bell_rope' || entity.templateId === 'delve_bell_rope_pulled') {
+    return t('delveUi.object.bell_rope');
+  }
   if (
     (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
     entity.dungeonId

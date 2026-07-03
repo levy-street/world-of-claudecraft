@@ -39,6 +39,7 @@ import {
   placeLitanyMarshDressing,
   placeMarshBlackwaterPools,
   placeMarshClutter,
+  placeMarshDryIslands,
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
@@ -694,6 +695,9 @@ export class DungeonInteriors {
     }
     if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
       if (opts?.moduleId && isLitanyModuleId(opts.moduleId)) {
+        // Dry islands render ON TOP of the pool overlays so the sim's
+        // dry-ground exemption is readable (safe ground must not read lethal).
+        placeMarshDryIslands(group, opts.moduleId);
         placeLitanyMarshDressing(p, group, opts.moduleId, layout, variant);
       }
     }
