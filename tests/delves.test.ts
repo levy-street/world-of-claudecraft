@@ -2548,6 +2548,72 @@ describe('The Drowned Litany (Phase 6 boss mechanics)', () => {
     };
     expect(runMark(42)).toEqual(runMark(42));
   });
+
+  it('an evade re-arms the encounter to fresh-pull state and despawns bells and adds', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    const boss = nhalia(sim);
+    boss.inCombat = true;
+
+    // First pull: below 70% fires the first Cantor phase; force a bell volley too.
+    boss.hp = Math.ceil(boss.maxHp * 0.69);
+    run.nhaliaBoss!.bellVolleyTimer = 0.001;
+    (sim as any).updateDelveRuns();
+    expect(run.nhaliaBoss?.firedCantorPhases).toBe(1);
+    const bellIds = run.nhaliaBoss!.bells.map((b) => b.entityId);
+    expect(bellIds.length).toBeGreaterThan(0);
+    const cantorIds = [...sim.entities.values()]
+      .filter((e) => e.templateId === 'drowned_cantor')
+      .map((e) => e.id);
+    expect(cantorIds.length).toBe(2);
+
+    // Kited past the leash: the evade arrival reset (same entry the wipe path uses).
+    (sim as any).resetEvadingMob(boss);
+
+    expect(boss.hp).toBe(boss.maxHp);
+    expect(boss.auras.some((a) => a.id === 'nhalia_cantor_shield')).toBe(false);
+    expect(run.nhaliaBoss?.firedCantorPhases).toBe(0);
+    expect(run.nhaliaBoss?.finalBellFired).toBe(false);
+    expect(run.nhaliaBoss?.marks).toEqual([]);
+    expect(run.nhaliaBoss?.bells).toEqual([]);
+    expect(run.nhaliaBoss?.cantorShieldAdds).toEqual([]);
+    for (const id of bellIds) expect(sim.entities.has(id)).toBe(false);
+    for (const id of cantorIds) expect(sim.entities.has(id)).toBe(false);
+  });
+
+  it('a re-pull after an evade fires the 70% phase and the Final Bell again', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    const boss = nhalia(sim);
+    boss.inCombat = true;
+    boss.hp = Math.ceil(boss.maxHp * 0.69);
+    (sim as any).updateDelveRuns();
+    expect(run.nhaliaBoss?.firedCantorPhases).toBe(1);
+
+    (sim as any).resetEvadingMob(boss);
+    expect(run.nhaliaBoss?.firedCantorPhases).toBe(0);
+
+    // Re-pull: the 70% Cantor phase fires again, shield and all.
+    boss.inCombat = true;
+    boss.hp = Math.ceil(boss.maxHp * 0.69);
+    (sim as any).updateDelveRuns();
+    expect(run.nhaliaBoss?.firedCantorPhases).toBe(1);
+    const cantors = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'drowned_cantor' && !e.dead,
+    );
+    expect(cantors.length).toBe(2);
+    expect(boss.auras.some((a) => a.id === 'nhalia_cantor_shield')).toBe(true);
+
+    // And the Final Bell still fires at 10% on the re-pull.
+    run.nhaliaBoss!.firedCantorPhases = 2;
+    boss.hp = Math.max(1, Math.round(boss.maxHp * 0.08));
+    (sim as any).updateDelveRuns();
+    expect(run.nhaliaBoss?.finalBellFired).toBe(true);
+    const thralls = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'choir_thrall' && !e.dead,
+    );
+    expect(thralls.length).toBeGreaterThanOrEqual(4);
+  });
 });
 
 describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
