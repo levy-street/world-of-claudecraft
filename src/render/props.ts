@@ -555,8 +555,12 @@ function drownVeilMaterial(src: THREE.Material): THREE.Material {
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <map_fragment>',
       `#include <map_fragment>
-      // recolor the baked red veil to a murky Blackwater blue; redness gates it so stone stays grey
-      float _veilRed = clamp(diffuseColor.r - max(diffuseColor.g, diffuseColor.b), 0.0, 1.0);
+      // recolor the baked red veil to a murky Blackwater blue; red-dominance gates it
+      // so stone stays grey. The gate must SATURATE (smoothstep, full recolor by 0.15):
+      // texels here are linear-space, where even a bright red fold only reaches ~0.5
+      // dominance, and the old linear-strength mix left half the red channel intact,
+      // so the veil still read red in-game. Stone dominance measures under 0.01.
+      float _veilRed = smoothstep(0.02, 0.15, diffuseColor.r - max(diffuseColor.g, diffuseColor.b));
       diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.04, 0.13, 0.2) * (0.4 + diffuseColor.r), _veilRed);
       `,
     );
