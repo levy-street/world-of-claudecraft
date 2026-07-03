@@ -1099,6 +1099,23 @@ describe('chat module (direct, no Sim)', () => {
     expect(chatMod.handleDevChat(ctx, 'hello world', 1)).toBe(undefined);
   });
 
+  it('a handled /dev command never falls through to the unknown-command error', () => {
+    // Repro for the live bug: /dev gold added the gold AND showed the red
+    // "Unknown command" toast, because chat()'s call site only returned early
+    // for a non-null SentChat while handleDevChat signals "handled" with null.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const pid = sim.addPlayer('warrior', 'Cheater');
+    sim.drainEvents();
+    sim.chat('/dev gold 5', pid);
+    const events = sim.drainEvents();
+    const errors = events.filter((e: any) => e.type === 'error').map((e: any) => e.text);
+    expect(errors.filter((t: string) => t.startsWith('Unknown command'))).toEqual([]);
+    expect(sim.meta(pid)?.copper).toBe(5 * 10000);
+    expect(
+      events.some((e: any) => e.type === 'log' && e.text === '[dev] Added 5g to your purse.'),
+    ).toBe(true);
+  });
+
   it('handleDevChat: the /dev help fallback advertises every dev subcommand', () => {
     let help = '';
     const ctx = {
