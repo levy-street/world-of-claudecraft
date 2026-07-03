@@ -136,11 +136,11 @@ export function buybackReadout(meta: PlayerMeta): string {
   });
   return `Vendor buyback (${slots.length}): ${parts.join(', ')}. Repurchase at any merchant.`;
 }
-export function comboReadout(ctx: SimContext, e: Entity): string {
+// Combo points are character-bound (retail-style), so the readout names no
+// target: the pool finishes on whatever the player targets next.
+export function comboReadout(e: Entity): string {
   if (e.comboPoints <= 0) return 'You have no combo points built up.';
-  const target = e.comboTargetId !== null ? ctx.entities.get(e.comboTargetId) : undefined;
-  const on = target ? ` on ${target.name}` : '';
-  return `Combo points: ${e.comboPoints}/5${on}.`;
+  return `Combo points: ${e.comboPoints}/5.`;
 }
 // Readout for "/combat": reads only the live Entity.inCombat / combatTimer
 // (no new fields). combatTimer is "time since last combat event"; a player

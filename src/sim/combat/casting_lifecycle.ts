@@ -247,7 +247,8 @@ export function castAbility(
     ctx.error(p.id, 'Your target must dodge first.');
     return;
   }
-  if (ability.spendsCombo && (p.comboPoints <= 0 || p.comboTargetId !== p.targetId)) {
+  // combo points are character-bound: any built points finish on the current target
+  if (ability.spendsCombo && p.comboPoints <= 0) {
     ctx.error(p.id, 'That ability requires combo points.');
     return;
   }

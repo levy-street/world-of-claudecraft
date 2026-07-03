@@ -106,6 +106,17 @@ export function updateTimers(p: Entity): void {
   }
 }
 
+// Combo points are character-bound (retail-style): they survive target swaps and
+// kills, so this per-tick check is the only passive decay. awardCombo (sim.ts)
+// restamps comboUntil on every point built; spending, player death, and the
+// arena/fiesta resets clear the pool explicitly.
+export function updateComboExpiry(ctx: SimContext, p: Entity): void {
+  if (p.comboPoints > 0 && ctx.time >= p.comboUntil) {
+    p.comboPoints = 0;
+    ctx.emit({ type: 'comboPoint', points: 0, pid: p.id });
+  }
+}
+
 export function cleanseFriendlyNpcAuras(ctx: SimContext, e: Entity): void {
   for (let i = e.auras.length - 1; i >= 0; i--) {
     const aura = e.auras[i];

@@ -159,6 +159,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   // map and fell back to the raw English BIND_ACTIONS labels).
   talents: 'game.talents.title',
   leaderboard: 'game.leaderboard.title',
+  calendar: 'hudChrome.calendar.keybindLabel',
 };
 
 /**
@@ -205,6 +206,8 @@ export interface OptionsWindowDeps {
   log(message: string): void;
   /** Reset the movable chat window to its default placement. */
   resetChatWindow(): void;
+  /** Reset the movable player + target unit frames to their stock spots. */
+  resetUnitFrames(): void;
   /** Chat-timestamp state (Hud owns it; the chat renderer reads the same fields). */
   getChatTimestamps(): boolean;
   setChatTimestamps(on: boolean): void;
@@ -915,6 +918,23 @@ export class OptionsWindow {
     });
     resetRow.append(resetName, resetBtn);
     body.append(resetRow);
+
+    // Reset the movable player + target unit frames back to their stock spots
+    // (forgets the saved drag positions and re-docks the player frame).
+    const framesRow = document.createElement('div');
+    framesRow.className = 'set-row';
+    const framesName = document.createElement('span');
+    framesName.className = 'set-name';
+    framesName.textContent = t('hudChrome.frameReset.label');
+    const framesBtn = document.createElement('button');
+    framesBtn.className = 'btn set-toggle';
+    framesBtn.textContent = t('hudChrome.chatWindow.resetAction');
+    framesBtn.addEventListener('click', () => {
+      audio.click();
+      this.deps.resetUnitFrames();
+    });
+    framesRow.append(framesName, framesBtn);
+    body.append(framesRow);
 
     const el = this.deps.root();
     const note = document.createElement('div');

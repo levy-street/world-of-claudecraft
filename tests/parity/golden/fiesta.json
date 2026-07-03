@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 390,
+      "nextId": 393,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 394,
-      "state": "ba456c3b",
-      "events": "d18028b7",
+      "nextId": 397,
+      "state": "d6bf343b",
+      "events": "9d7779bf",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,9 +40,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 394,
-      "state": "9fc96879",
-      "events": "837b63e1",
+      "nextId": 397,
+      "state": "2bc61445",
+      "events": "e78ed76d",
       "rng": {
         "draws": 36,
         "digest": "dbad5b7f"
@@ -51,9 +51,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 394,
-      "state": "78a5babb",
-      "events": "a8573b81",
+      "nextId": 397,
+      "state": "cf21abc3",
+      "events": "75eb9b15",
       "rng": {
         "draws": 120,
         "digest": "3ac728b9"
@@ -62,9 +62,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 394,
-      "state": "b0e14fb1",
-      "events": "c0ea7b91",
+      "nextId": 397,
+      "state": "02e130e9",
+      "events": "65764d55",
       "rng": {
         "draws": 230,
         "digest": "25e8f179"
@@ -73,9 +73,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 394,
-      "state": "136c0b21",
-      "events": "d3c0f0dc",
+      "nextId": 397,
+      "state": "57328f37",
+      "events": "97304d8f",
       "rng": {
         "draws": 384,
         "digest": "2255bc0e"
@@ -84,8 +84,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 394,
-      "state": "03d11cad",
+      "nextId": 397,
+      "state": "08947fcb",
       "events": "741638a5",
       "rng": {
         "draws": 543,
@@ -95,9 +95,9 @@
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 394,
-      "state": "e0e30dfa",
-      "events": "90ab9780",
+      "nextId": 397,
+      "state": "3a40754c",
+      "events": "57fe2880",
       "rng": {
         "draws": 608,
         "digest": "656f3686"
@@ -113,9 +113,10 @@
           "counters": {
             "kills": 1
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -128,6 +129,7 @@
             }
           },
           "gatheringProficiency": {},
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {
@@ -148,9 +150,10 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 391,
+          "entityId": 394,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -163,6 +166,7 @@
             }
           },
           "gatheringProficiency": {},
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {
@@ -185,9 +189,10 @@
           "counters": {
             "deaths": 1
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 392,
+          "entityId": 395,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -203,6 +208,7 @@
             }
           },
           "gatheringProficiency": {},
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {
@@ -223,9 +229,10 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 396,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -238,6 +245,7 @@
             }
           },
           "gatheringProficiency": {},
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {
@@ -257,12 +265,13 @@
           "aiState": "idle",
           "attackPower": 122,
           "combatTimer": 102.1,
+          "comboUntil": -1,
           "critChance": 0.0995,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0795,
           "fiveSecondRule": 107.15,
           "hp": 812,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -303,12 +312,13 @@
           "aiState": "idle",
           "attackPower": 22,
           "combatTimer": 102.1,
+          "comboUntil": -1,
           "critChance": 0.066,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 107.15,
           "hp": 418,
-          "id": 391,
+          "id": 394,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -350,13 +360,14 @@
           "aiState": "idle",
           "attackPower": 125,
           "combatTimer": 99.05,
+          "comboUntil": -1,
           "critChance": 0.1545,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.1345,
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 510,
-          "id": 392,
+          "id": 395,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -399,13 +410,14 @@
           "aiState": "idle",
           "attackPower": 141,
           "combatTimer": 102.1,
+          "comboUntil": -1,
           "critChance": 0.121,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.101,
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 848,
-          "id": 393,
+          "id": 396,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

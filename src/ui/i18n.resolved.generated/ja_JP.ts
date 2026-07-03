@@ -392,6 +392,8 @@ export const ja_JP: EnTranslations = {
       "showDevBadges": "開発者バッジを表示",
       "showOwnNameplate": "自分のネームプレートを表示",
       "uiScale": "UIスケール",
+      "playerFrameScale": "プレイヤーフレームの大きさ",
+      "targetFrameScale": "ターゲットフレームの大きさ",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "walkByAutoloot": "通りがかり自動ルート",
@@ -718,7 +720,8 @@ export const ja_JP: EnTranslations = {
       "summaryGroup": "分配設定：グループルート。"
     },
     "party": {
-      "promoteLeader": "パーティリーダーに指定"
+      "promoteLeader": "パーティリーダーに指定",
+      "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"
     },
     "lootSettings": {
       "title": "分配設定",
@@ -850,6 +853,13 @@ export const ja_JP: EnTranslations = {
     "targetFrame": {
       "unlock": "ターゲットフレームを移動",
       "lock": "ターゲットフレームを固定"
+    },
+    "playerFrame": {
+      "unlock": "プレイヤーフレームを移動",
+      "lock": "プレイヤーフレームを固定"
+    },
+    "frameReset": {
+      "label": "フレーム位置をリセット"
     },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}"
@@ -1025,6 +1035,112 @@ export const ja_JP: EnTranslations = {
       },
       "linkedAs": "{login} として連携済み",
       "unlink": "GitHub の連携を解除"
+    },
+    "mailbox": {
+      "title": "メールボックス",
+      "subtitle": "レイヴンポスト",
+      "close": "メールボックスを閉じる",
+      "tabInbox": "受信箱",
+      "tabInboxWithCount": "受信箱（{count}）",
+      "tabSend": "Send",
+      "empty": "メールボックスは空です。",
+      "truncated": "全{total}通のうち最新の{shown}通を表示しています。",
+      "attachmentsBadge": "小包あり",
+      "unreadBadge": "未読",
+      "back": "Back",
+      "take": "添付品を受け取る",
+      "delete": "手紙を削除",
+      "deleteAria": "手紙「{subject}」を削除",
+      "openAria": "{name}からの手紙「{subject}」を読む",
+      "noSubject": "（件名なし）",
+      "toLabel": "To",
+      "toPlaceholder": "キャラクター名",
+      "subjectLabel": "件名",
+      "bodyLabel": "本文",
+      "coinLabel": "お金を添える",
+      "parcelsLabel": "小包",
+      "parcelsHint": "バッグ内のアイテムをクリックして添付します。",
+      "removeParcelAria": "手紙から{item}を取り除く",
+      "sendButton": "手紙を送る",
+      "postageNote": "郵送料：{amount}。ワタリガラスの飛行時間は約{seconds}秒です。",
+      "arrivedBanner": "ワタリガラスが到着：{name}からの手紙。",
+      "arrivedLog": "{name}から新しい手紙が届きました。",
+      "indicatorAria": "未読の手紙：{count}",
+      "indicatorTip": "未読の手紙が{count}通あります。メールボックスで読めます。",
+      "clickAttach": "クリックで手紙に添付します。",
+      "cannotMail": "これは郵送できません。",
+      "result": {
+        "sent": "ワタリガラスが{name}宛ての手紙を運んで飛び立ちました（郵送料{postage}）。",
+        "collected": "手紙から{amount}を受け取りました。",
+        "tooFar": "郵便を扱うにはメールボックスのそばにいる必要があります。",
+        "needRecipient": "手紙の宛先を指定してください。",
+        "noRecipient": "その名前のメールボックスの持ち主はいません。",
+        "tooManyParcels": "1通の手紙に添付できる小包は最大{count}個です。",
+        "noMailQuestItems": "クエストアイテムは郵送できません。",
+        "notEnoughItems": "送るのに十分な数を持っていません。",
+        "cantAffordPostage": "郵送料を支払えません。",
+        "recipientBoxFull": "相手のメールボックスは満杯です。",
+        "letterGone": "その手紙はもうメールボックスにありません。",
+        "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
+      }
+    },
+    "calendar": {
+      "title": "イベントカレンダー",
+      "close": "カレンダーを閉じる",
+      "keybindLabel": "イベントカレンダー",
+      "prevMonth": "前の月",
+      "nextMonth": "次の月",
+      "dayAria": "{date}：イベント{count}件",
+      "noEvents": "この日に予定はありません。",
+      "allDay": "終日",
+      "bookedBy": "{name}が登録",
+      "deleteAria": "イベント「{title}」を削除",
+      "bookTitle": "ギルドイベントを登録",
+      "titlePlaceholder": "イベント名",
+      "notePlaceholder": "メモ（任意）",
+      "hourLabel": "時刻（UTC）",
+      "hourAllDay": "終日",
+      "addButton": "イベント登録",
+      "guildOnlyNote": "ギルドに加入すると一緒にイベントを計画できます。",
+      "result": {
+        "created": "イベントをギルドカレンダーに登録しました。",
+        "removed": "イベントをカレンダーから外しました。",
+        "notInGuild": "ギルドに所属していません。",
+        "notOfficer": "ギルドイベントを管理できるのは幹部とギルドマスターだけです。",
+        "badInput": "イベント名と有効な日付を入力してください。",
+        "calendarFull": "ギルドカレンダーは満杯です。",
+        "eventGone": "そのイベントはもうカレンダーにありません。"
+      },
+      "events": {
+        "raidCall": {
+          "title": "レイド招集",
+          "note": "守人が角笛を鳴らす。パーティーを集め、地下墓所とレイドへ。"
+        },
+        "marketDay": {
+          "title": "市の日",
+          "note": "商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。"
+        },
+        "fiestaNight": {
+          "title": "フィエスタナイト",
+          "note": "今夜の2v2フィエスタのリングは大賑わい。"
+        },
+        "arenaClash": {
+          "title": "アリーナ激突",
+          "note": "決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。"
+        },
+        "fishingDerby": {
+          "title": "フィッシングダービー",
+          "note": "釣り人が湖に並ぶ。竿を持って釣り話を交わそう。"
+        },
+        "delveDay": {
+          "title": "デルヴの日",
+          "note": "ハルヴェン修道士が海図に印を。崩落した聖遺物庫に挑む好日。"
+        },
+        "moongateCommunion": {
+          "title": "月門の集い",
+          "note": "月半ばの月の下、巡礼者が神殿の月門に集う。"
+        }
+      }
     }
   },
   "guide": {
@@ -5043,6 +5159,33 @@ export const ja_JP: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主の王冠"
       },
+      "copper_mining_pick": {
+        "name": "銅の採掘ピック"
+      },
+      "iron_mining_pick": {
+        "name": "鉄の採掘ピック"
+      },
+      "mithril_mining_pick": {
+        "name": "ミスリルの採掘ピック"
+      },
+      "handaxe": {
+        "name": "ハンドアックス"
+      },
+      "felling_axe": {
+        "name": "伐採斧"
+      },
+      "ironbark_axe": {
+        "name": "鉄皮の斧"
+      },
+      "gathering_sickle": {
+        "name": "採集の鎌"
+      },
+      "bronze_sickle": {
+        "name": "青銅の鎌"
+      },
+      "silverleaf_sickle": {
+        "name": "銀葉の鎌"
+      },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
       },
@@ -7069,6 +7212,28 @@ export const ja_JP: EnTranslations = {
         "leaveText": "あなたは沼地の果てへ登り、ハルヴェン修道士のもとへ戻る。"
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "レイヴンポスト",
+        "subject": "ワタリガラスはあなたのために飛ぶ",
+        "body": "旅人へ\n\nレイヴンポストは谷のあちこちに止まり木を設けました。イーストブルック、フェンブリッジ、ハイウォッチでワタリガラスの石柱を探してください。どの止まり木からでも、ほかの冒険者へ手紙やお金や品物を送れますし、ワタリガラスが運んできたものを受け取れます。\n\n最初の切手代として、ささやかな心づけを同封します。\n\n翼を高く、\nレイヴンポスト"
+      },
+      "letter_q_wolves": {
+        "sender": "レッドブルック元帥",
+        "subject": "囲いはまた静かになった",
+        "body": "牧夫たちがようやく安心して眠れるようになったのは、あなたのおかげです。見張り基金から、レイヴンポストに託してささやかな謝礼を送りました。\n\n刃の手入れを忘れずに。\n- レッドブルック元帥"
+      },
+      "letter_q_greyjaw": {
+        "sender": "レッドブルック元帥",
+        "subject": "オールド・グレイジョー、ついに",
+        "body": "小さな町では噂が早いものです。牧夫たちは昨夜あなたの健康に乾杯し、ウィルクスはあの狼が荷馬車ほどもあったと言い張っています。好きに尾ひれをつけさせておきなさい。あなたが勝ち取ったものです。\n\n見張り隊の分まで食事をどうぞ。\n- レッドブルック元帥"
+      },
+      "letter_q_hollow": {
+        "sender": "アルドリック修道士",
+        "subject": "あなたが暗闇で成したこと",
+        "body": "あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "冠鋳の戦装束",
@@ -7119,6 +7284,7 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineBellInteract": "鐘の祠：Fで鳴らす",
     "delveRiteShrineCandleInteract": "蝋燭の祠：Fで触れる",
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
-    "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる"
+    "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
+    "mailboxName": "メールボックス"
   }
 };

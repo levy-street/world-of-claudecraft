@@ -392,6 +392,8 @@ export const pl_PL: EnTranslations = {
       "showDevBadges": "Pokaż odznaki deweloperów",
       "showOwnNameplate": "Show My Nameplate",
       "uiScale": "Skala interfejsu",
+      "playerFrameScale": "Player Frame Scale",
+      "targetFrameScale": "Target Frame Scale",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -718,7 +720,8 @@ export const pl_PL: EnTranslations = {
       "summaryGroup": "Ustawienia łupów: Łup grupowy."
     },
     "party": {
-      "promoteLeader": "Mianuj przywódcą"
+      "promoteLeader": "Mianuj przywódcą",
+      "inviteUsage": "Invite whom? Usage: /invite <name>."
     },
     "lootSettings": {
       "title": "Ustawienia łupów",
@@ -850,6 +853,13 @@ export const pl_PL: EnTranslations = {
     "targetFrame": {
       "unlock": "Move target frame",
       "lock": "Lock target frame"
+    },
+    "playerFrame": {
+      "unlock": "Move player frame",
+      "lock": "Lock player frame"
+    },
+    "frameReset": {
+      "label": "Reset Frame Positions"
     },
     "itemTooltip": {
       "requiresLevel": "Wymaga poziomu {level}"
@@ -1025,6 +1035,112 @@ export const pl_PL: EnTranslations = {
       },
       "linkedAs": "Połączono jako {login}",
       "unlink": "Odłącz GitHub"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
+    },
+    "calendar": {
+      "title": "Event Calendar",
+      "close": "Close calendar",
+      "keybindLabel": "Event Calendar",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "dayAria": "{date}: {count} events",
+      "noEvents": "Nothing planned for this day.",
+      "allDay": "All day",
+      "bookedBy": "Booked by {name}",
+      "deleteAria": "Remove the event {title}",
+      "bookTitle": "Book a guild event",
+      "titlePlaceholder": "Event title",
+      "notePlaceholder": "Note (optional)",
+      "hourLabel": "Hour (UTC)",
+      "hourAllDay": "All day",
+      "addButton": "Book event",
+      "guildOnlyNote": "Join a guild to plan events together.",
+      "result": {
+        "created": "The event is on the guild calendar.",
+        "removed": "The event was taken off the calendar.",
+        "notInGuild": "You are not in a guild.",
+        "notOfficer": "Only officers and the Guild Master may manage guild events.",
+        "badInput": "Give the event a title and a valid day.",
+        "calendarFull": "The guild calendar is full.",
+        "eventGone": "That event is no longer on the calendar."
+      },
+      "events": {
+        "raidCall": {
+          "title": "Raid Call",
+          "note": "Wardens sound the horn: gather a party for the crypts and the raid."
+        },
+        "marketDay": {
+          "title": "Market Day",
+          "note": "The Merchant expects fresh stock. A fine day to browse the World Market."
+        },
+        "fiestaNight": {
+          "title": "Fiesta Night",
+          "note": "The 2v2 Fiesta ring draws its loudest crowds tonight."
+        },
+        "arenaClash": {
+          "title": "Arena Clash",
+          "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
+        },
+        "fishingDerby": {
+          "title": "Fishing Derby",
+          "note": "Anglers line the lakes. Bring a pole and swap fishing tales."
+        },
+        "delveDay": {
+          "title": "Delve Day",
+          "note": "Brother Halven marks his charts: a fine day to brave the Collapsed Reliquary."
+        },
+        "moongateCommunion": {
+          "title": "Moongate Communion",
+          "note": "Pilgrims gather at the temple moongate under the mid-month moon."
+        }
+      }
     }
   },
   "guide": {
@@ -5043,6 +5159,33 @@ export const pl_PL: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Korona monarchy"
       },
+      "copper_mining_pick": {
+        "name": "Miedziany Kilof Górniczy"
+      },
+      "iron_mining_pick": {
+        "name": "Żelazny Kilof Górniczy"
+      },
+      "mithril_mining_pick": {
+        "name": "Mithrilowy Kilof Górniczy"
+      },
+      "handaxe": {
+        "name": "Toporek"
+      },
+      "felling_axe": {
+        "name": "Siekiera Drwala"
+      },
+      "ironbark_axe": {
+        "name": "Toporek z Żelaznej Kory"
+      },
+      "gathering_sickle": {
+        "name": "Sierp do Zbioru"
+      },
+      "bronze_sickle": {
+        "name": "Brązowy Sierp"
+      },
+      "silverleaf_sickle": {
+        "name": "Sierp Srebrnolistny"
+      },
       "bristleback_maul": {
         "name": "Tłuk szczeciniastych"
       },
@@ -7069,6 +7212,28 @@ export const pl_PL: EnTranslations = {
         "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "Krucza Poczta",
+        "subject": "Kruki latają teraz dla ciebie",
+        "body": "Wędrowcze,\n\nKrucza Poczta otworzyła swoje żerdzie w całej dolinie. Szukaj kruczych słupów w Eastbrook, Fenbridge i Highwatch: z każdego z nich możesz wysyłać listy, monety i towary innym poszukiwaczom przygód oraz odbierać wszystko, co przyniosą ci kruki.\n\nZałączamy drobiazg na twój pierwszy znaczek.\n\nSkrzydła w górę,\nKrucza Poczta"
+      },
+      "letter_q_wolves": {
+        "sender": "Marszałek Redbrook",
+        "subject": "W zagrodach znów spokój",
+        "body": "Pasterze mogą wreszcie spać spokojnie i to twoja zasługa. Poprosiłem Kruczą Pocztę, by dostarczyła ci drobiazg z kasy straży.\n\nDbaj o ostrze.\n- Marszałek Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Marszałek Redbrook",
+        "subject": "Stary Szaropaszcz, nareszcie",
+        "body": "Wieści szybko się niosą w tak małym miasteczku. Pasterze pili wczoraj za twoje zdrowie, a Wilkes przysięga, że wilk był wielki jak wóz. Niech sobie koloryzują: zasłużyłeś na to.\n\nZjedz posiłek na koszt straży.\n- Marszałek Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Brat Aldric",
+        "subject": "To, czego dokonałeś w mroku",
+        "body": "Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Koronokuty rynsztunek bojowy",
@@ -7119,6 +7284,7 @@ export const pl_PL: EnTranslations = {
     "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
     "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
+    "mailboxName": "Mailbox"
   }
 };

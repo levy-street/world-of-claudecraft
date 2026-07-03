@@ -98,7 +98,8 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
 
 // Encounter reset: remove the adds a boss summoned this pull so retries
 // start clean (firedSummons re-fires a fresh wave per pull). Player
-// target/combo refs are cleared first, like freeInstance does.
+// target refs are cleared first, like freeInstance does (combo points are
+// character-bound, so a despawning combo target leaves them untouched).
 export function despawnSummonedAdds(ctx: SimContext, boss: Entity): void {
   if (boss.summonedIds.length === 0) return;
   for (const id of boss.summonedIds) {
@@ -106,10 +107,6 @@ export function despawnSummonedAdds(ctx: SimContext, boss: Entity): void {
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
       if (e?.targetId === id) e.targetId = null;
-      if (e?.comboTargetId === id) {
-        e.comboTargetId = null;
-        e.comboPoints = 0;
-      }
     }
     ctx.dropEntity(id);
   }

@@ -3165,6 +3165,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.brightwood_venison.name': 'Selvaggina di Brightwood',
   'entities.items.bramblehide_jerkin.name': 'Giubbotto di pelle di rovo',
   'entities.items.monarch_crown_helm.name': 'Corona del Monarca',
+  'entities.items.copper_mining_pick.name': 'Piccone di Rame',
+  'entities.items.iron_mining_pick.name': 'Piccone di Ferro',
+  'entities.items.mithril_mining_pick.name': 'Piccone di Mithril',
+  'entities.items.handaxe.name': 'Accetta',
+  'entities.items.felling_axe.name': 'Ascia da Taglio',
+  'entities.items.ironbark_axe.name': 'Ascia di Corteccia Ferrata',
+  'entities.items.gathering_sickle.name': 'Falcetto da Raccolta',
+  'entities.items.bronze_sickle.name': 'Falcetto di Bronzo',
+  'entities.items.silverleaf_sickle.name': 'Falcetto Fogliargento',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Aggiungi canale di chat',
   'hud.core.chatChannels.addTitle': 'Aggiungi canale',
@@ -5193,4 +5202,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Non ora',
   'hudChrome.nativeUpdate.title': 'Aggiornamento disponibile',
   'hudChrome.nativeUpdate.update': 'Aggiorna',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'La Posta dei Corvi',
+  'entities.letters.ravenpost_welcome.subject': 'Ora i corvi volano per te',
+  'entities.letters.ravenpost_welcome.body':
+    'Viandante,\n\nla Posta dei Corvi ha aperto i suoi trespoli in tutta la valle. Cerca i pilastri dei corvi a Eastbrook, Fenbridge e Highwatch: da ognuno di essi potrai inviare lettere, monete e oggetti agli altri avventurieri, e ritirare tutto ciò che i corvi ti portano.\n\nIn allegato un piccolo pensiero per il tuo primo francobollo.\n\nAli in alto,\nLa Posta dei Corvi',
+  'entities.letters.letter_q_wolves.sender': 'Maresciallo Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Nei recinti è tornata la quiete',
+  'entities.letters.letter_q_wolves.body':
+    'I pastori possono finalmente dormire sonni tranquilli, e il merito è tuo. Ho chiesto alla Posta dei Corvi di portarti un piccolo compenso dal fondo della guardia.\n\nTieni la lama oliata.\n- Maresciallo Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Maresciallo Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Il vecchio Grigiafauci, finalmente',
+  'entities.letters.letter_q_greyjaw.body':
+    'Le notizie corrono in una città così piccola. Ieri sera i pastori hanno brindato alla tua salute, e Wilkes giura che il lupo era grande quanto un carro. Lascia pure che ricamino: te lo sei guadagnato.\n\nConcediti un pasto a spese della guardia.\n- Maresciallo Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Fratello Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Ciò che hai compiuto nel buio',
+  'entities.letters.letter_q_hollow.body':
+    'Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric',
 };

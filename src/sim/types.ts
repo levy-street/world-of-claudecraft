@@ -1,5 +1,6 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
+import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 
 export const TICK_RATE = 20; // sim ticks per second
@@ -266,7 +267,12 @@ export type ItemUse =
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
-  | { type: 'skinSelect'; catalog?: SkinCatalog };
+  | { type: 'skinSelect'; catalog?: SkinCatalog }
+  // A base gathering tool (see #1123). `tier` gates which node/material tiers
+  // it can gather: see src/sim/professions/tools.ts (canGatherTier). This item
+  // type never carries a durability field (this repo has no durability
+  // mechanic anywhere), so a base tool can never become unusable.
+  | { type: 'gatherTool'; professionId: GatheringProfessionId; tier: number };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1459,8 +1465,8 @@ export interface Entity {
   queuedOnSwing: string | null; // heroic strike
   queuedOnSwingFree?: boolean; // next_cast_free consumed at queue time
   fiveSecondRule: number; // time since last mana spend
-  comboPoints: number;
-  comboTargetId: number | null;
+  comboPoints: number; // retail-style: character-bound, not anchored to a target
+  comboUntil: number; // sim-time until which unspent combo points persist
   overpowerUntil: number; // sim-time until which overpower is usable
   potionCooldownUntil: number; // sim-time until a combat potion can be used again (#103)
   // Same shared potion cooldown as REMAINING seconds, materialized per tick (like
@@ -1623,6 +1629,34 @@ export interface NythraxisEncounterState {
 
 export type ErrorReason = 'target_dead';
 
+// Ravenpost mail command outcomes. `sent`/`collected` are successes; the rest
+// are refusals. The client maps each code to its localized line (the sim never
+// emits mail text).
+export type MailResultCode =
+  | 'sent'
+  | 'collected'
+  | 'tooFar'
+  | 'needRecipient'
+  | 'noRecipient'
+  | 'tooManyParcels'
+  | 'noMailQuestItems'
+  | 'notEnoughItems'
+  | 'cantAffordPostage'
+  | 'recipientBoxFull'
+  | 'letterGone'
+  | 'takeParcelsFirst';
+
+// Guild calendar command outcomes (mirrors server/social.ts CalendarResultCode;
+// `created`/`removed` are successes, the rest refusals).
+export type CalendarResultCode =
+  | 'created'
+  | 'removed'
+  | 'notInGuild'
+  | 'notOfficer'
+  | 'badInput'
+  | 'calendarFull'
+  | 'eventGone';
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -1678,6 +1712,20 @@ export type SimEvent = { pid?: number } & (
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
   | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }
+  // Ravenpost mail. Structured data only, the client builds every visible
+  // string (the lockpick convention). `mailbox` asks the client to open the
+  // mail window (the interact path at a mailbox object); `mailArrived` is the
+  // personal arrival cue (envelope toast + sound); `mailResult` reports a mail
+  // command's outcome (`sent` carries the recipient name + postage in copper,
+  // `collected` the coin taken, `tooManyParcels` the attachment cap). All
+  // always carry pid.
+  | { type: 'mailbox' }
+  | { type: 'mailArrived'; senderName: string; letterId?: string }
+  | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
+  // Guild calendar outcome. Emitted only by the server's SocialService (the
+  // sim never books guild events); declared here so the one client event
+  // switch stays exhaustively typed.
+  | { type: 'calendarResult'; code: CalendarResultCode }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is
@@ -1953,7 +2001,7 @@ export const MAX_VIRTUAL_LEVEL = 200; // table bound; far beyond any reachable l
 
 // VLEVEL_CUM[v] = total lifetime XP required to *reach* virtual level v.
 // VLEVEL_CUM[1] = 0; index 0 is unused padding.
-const VLEVEL_CUM: number[] = (() => {
+function buildVlevelCum(): number[] {
   const cum: number[] = [0, 0];
   let total = 0;
   // real levels: 1→2 … 19→20 come straight from XP_TABLE
@@ -1969,7 +2017,18 @@ const VLEVEL_CUM: number[] = (() => {
     step *= POSTCAP_GROWTH;
   }
   return cum;
-})();
+}
+
+const VLEVEL_CUM: number[] = buildVlevelCum();
+
+// The cumulative table above is derived from XP_TABLE at module eval. A host
+// that mutates XP_TABLE (the game-config override layer, src/sim/game_config.ts)
+// must call this afterwards so virtual levels keep matching the live curve.
+export function refreshPostcapXpTable(): void {
+  const next = buildVlevelCum();
+  VLEVEL_CUM.length = 0;
+  VLEVEL_CUM.push(...next);
+}
 
 // Total lifetime XP needed to reach a given (virtual or real) level. Used to
 // backfill `lifetimeXp` for characters saved before the counter existed.

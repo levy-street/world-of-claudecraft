@@ -1060,6 +1060,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.moggers_shiv.name': 'Moggers dolk',
   'entities.items.moggers_stomper_boots.name': 'Moggers stampstövlar',
   'entities.items.monarch_crown_helm.name': 'Monarkens krona',
+  'entities.items.copper_mining_pick.name': 'Kopparhacka',
+  'entities.items.iron_mining_pick.name': 'Järnhacka',
+  'entities.items.mithril_mining_pick.name': 'Mithrilhacka',
+  'entities.items.handaxe.name': 'Handyxa',
+  'entities.items.felling_axe.name': 'Fällyxa',
+  'entities.items.ironbark_axe.name': 'Järnbarksyxa',
+  'entities.items.gathering_sickle.name': 'Skördeskära',
+  'entities.items.bronze_sickle.name': 'Bronsskära',
+  'entities.items.silverleaf_sickle.name': 'Silverbladsskära',
   'entities.items.moongate_rubbing.name': 'Skyddande avgnidning',
   'entities.items.moonpale_scale.name': 'Månblekt fjäll',
   'entities.items.moonscale_saber.name': 'Månfjällsabel',
@@ -5105,4 +5114,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Inte nu',
   'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
   'hudChrome.nativeUpdate.update': 'Uppdatera',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Korpposten',
+  'entities.letters.ravenpost_welcome.subject': 'Korparna flyger nu för dig',
+  'entities.letters.ravenpost_welcome.body':
+    'Vandrare,\n\nKorpposten har rest sina sittpinnar över hela dalen. Leta efter korppelarna i Eastbrook, Fenbridge och Highwatch: från var och en av dem kan du skicka brev, mynt och varor till andra äventyrare och hämta allt som korparna bär till dig.\n\nBifogat finns en liten gåva till ditt första frimärke.\n\nVingarna upp,\nKorpposten',
+  'entities.letters.letter_q_wolves.sender': 'Marskalk Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Fållorna är lugna igen',
+  'entities.letters.letter_q_wolves.body':
+    'Herdarna kan äntligen sova med båda ögonen slutna, och det är din förtjänst. Jag har bett Korpposten föra dig en liten slant ur vaktkassan.\n\nHåll din klinga oljad.\n- Marskalk Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marskalk Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Gamle Gråkäft, äntligen',
+  'entities.letters.letter_q_greyjaw.body':
+    'Nyheter färdas snabbt i en så liten stad. Herdarna skålade för din hälsa i går kväll, och Wilkes svär att vargen var stor som en kärra. Låt dem brodera ut det: du har förtjänat det.\n\nÄt en måltid på vaktens bekostnad.\n- Marskalk Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Broder Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Det du gjorde i mörkret',
+  'entities.letters.letter_q_hollow.body':
+    'Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric',
 };

@@ -392,6 +392,8 @@ export const vi_VN: EnTranslations = {
       "showDevBadges": "Hiện Huy Hiệu Nhà Phát Triển",
       "showOwnNameplate": "Show My Nameplate",
       "uiScale": "Tỷ Lệ Giao Diện",
+      "playerFrameScale": "Player Frame Scale",
+      "targetFrameScale": "Target Frame Scale",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -718,7 +720,8 @@ export const vi_VN: EnTranslations = {
       "summaryGroup": "Cài Đặt Chiến Lợi Phẩm: Chiến Lợi Phẩm Nhóm."
     },
     "party": {
-      "promoteLeader": "Thăng Làm Đội Trưởng"
+      "promoteLeader": "Thăng Làm Đội Trưởng",
+      "inviteUsage": "Invite whom? Usage: /invite <name>."
     },
     "lootSettings": {
       "title": "Cài Đặt Chiến Lợi Phẩm",
@@ -850,6 +853,13 @@ export const vi_VN: EnTranslations = {
     "targetFrame": {
       "unlock": "Move target frame",
       "lock": "Lock target frame"
+    },
+    "playerFrame": {
+      "unlock": "Move player frame",
+      "lock": "Lock player frame"
+    },
+    "frameReset": {
+      "label": "Reset Frame Positions"
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}"
@@ -1025,6 +1035,112 @@ export const vi_VN: EnTranslations = {
       },
       "linkedAs": "Đã liên kết với {login}",
       "unlink": "Hủy liên kết GitHub"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
+    },
+    "calendar": {
+      "title": "Event Calendar",
+      "close": "Close calendar",
+      "keybindLabel": "Event Calendar",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "dayAria": "{date}: {count} events",
+      "noEvents": "Nothing planned for this day.",
+      "allDay": "All day",
+      "bookedBy": "Booked by {name}",
+      "deleteAria": "Remove the event {title}",
+      "bookTitle": "Book a guild event",
+      "titlePlaceholder": "Event title",
+      "notePlaceholder": "Note (optional)",
+      "hourLabel": "Hour (UTC)",
+      "hourAllDay": "All day",
+      "addButton": "Book event",
+      "guildOnlyNote": "Join a guild to plan events together.",
+      "result": {
+        "created": "The event is on the guild calendar.",
+        "removed": "The event was taken off the calendar.",
+        "notInGuild": "You are not in a guild.",
+        "notOfficer": "Only officers and the Guild Master may manage guild events.",
+        "badInput": "Give the event a title and a valid day.",
+        "calendarFull": "The guild calendar is full.",
+        "eventGone": "That event is no longer on the calendar."
+      },
+      "events": {
+        "raidCall": {
+          "title": "Raid Call",
+          "note": "Wardens sound the horn: gather a party for the crypts and the raid."
+        },
+        "marketDay": {
+          "title": "Market Day",
+          "note": "The Merchant expects fresh stock. A fine day to browse the World Market."
+        },
+        "fiestaNight": {
+          "title": "Fiesta Night",
+          "note": "The 2v2 Fiesta ring draws its loudest crowds tonight."
+        },
+        "arenaClash": {
+          "title": "Arena Clash",
+          "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
+        },
+        "fishingDerby": {
+          "title": "Fishing Derby",
+          "note": "Anglers line the lakes. Bring a pole and swap fishing tales."
+        },
+        "delveDay": {
+          "title": "Delve Day",
+          "note": "Brother Halven marks his charts: a fine day to brave the Collapsed Reliquary."
+        },
+        "moongateCommunion": {
+          "title": "Moongate Communion",
+          "note": "Pilgrims gather at the temple moongate under the mid-month moon."
+        }
+      }
     }
   },
   "guide": {
@@ -5043,6 +5159,33 @@ export const vi_VN: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Vương Miện Quân Vương"
       },
+      "copper_mining_pick": {
+        "name": "Cuốc Khai Khoáng Đồng"
+      },
+      "iron_mining_pick": {
+        "name": "Cuốc Khai Khoáng Sắt"
+      },
+      "mithril_mining_pick": {
+        "name": "Cuốc Khai Khoáng Mithril"
+      },
+      "handaxe": {
+        "name": "Rìu Tay"
+      },
+      "felling_axe": {
+        "name": "Rìu Đốn Gỗ"
+      },
+      "ironbark_axe": {
+        "name": "Rìu Vỏ Sắt"
+      },
+      "gathering_sickle": {
+        "name": "Liềm Thu Hoạch"
+      },
+      "bronze_sickle": {
+        "name": "Liềm Đồng"
+      },
+      "silverleaf_sickle": {
+        "name": "Liềm Lá Bạc"
+      },
       "bristleback_maul": {
         "name": "Vồ Lưng Gai"
       },
@@ -7069,6 +7212,28 @@ export const vi_VN: EnTranslations = {
         "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "Bưu Quạ",
+        "subject": "Giờ đây bầy quạ bay vì bạn",
+        "body": "Lữ khách,\n\nBưu Quạ đã dựng những trụ đậu khắp thung lũng. Hãy tìm các trụ quạ ở Eastbrook, Fenbridge và Highwatch: từ bất kỳ trụ nào, bạn có thể gửi thư, tiền và vật phẩm cho những nhà phiêu lưu khác, và nhận mọi thứ bầy quạ mang đến cho bạn.\n\nKèm theo là một món quà nhỏ cho con tem đầu tiên của bạn.\n\nTung cánh,\nBưu Quạ"
+      },
+      "letter_q_wolves": {
+        "sender": "Cảnh Trưởng Redbrook",
+        "subject": "Chuồng trại lại yên ắng",
+        "body": "Những người chăn cừu rốt cuộc đã có thể ngủ yên, và đó là công của bạn. Tôi đã nhờ Bưu Quạ mang đến bạn chút quà từ quỹ tuần tra.\n\nGiữ lưỡi kiếm luôn sắc bén.\n- Cảnh Trưởng Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Cảnh Trưởng Redbrook",
+        "subject": "Lão Hàm Xám, cuối cùng",
+        "body": "Tin tức lan nhanh trong một thị trấn nhỏ thế này. Đêm qua những người chăn cừu đã nâng cốc chúc sức khỏe bạn, còn Wilkes thề rằng con sói to bằng cả cỗ xe. Cứ để họ thêu dệt: bạn xứng đáng.\n\nHãy dùng một bữa do đội tuần tra khoản đãi.\n- Cảnh Trưởng Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Tu Huynh Aldric",
+        "subject": "Điều bạn đã làm trong bóng tối",
+        "body": "Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Bộ chiến Crownforged",
@@ -7119,6 +7284,7 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
     "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
+    "mailboxName": "Mailbox"
   }
 };

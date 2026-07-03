@@ -67,6 +67,9 @@ describe('Settings', () => {
     expect(s.get('mouseCamera')).toBe(false);
     // walk-by autoloot is opt-in: auto-grabbing loot by walking past can feel jarring.
     expect(s.get('walkByAutoloot')).toBe(false);
+    // both unit frames ship at their stock size; the scale sliders are opt-in tuning.
+    expect(s.get('playerFrameScale')).toBe(1);
+    expect(s.get('targetFrameScale')).toBe(1);
     expect(s.get('joystickDeadzone')).toBe(SETTING_RANGES.joystickDeadzone.def);
     // Interface Mode defaults to Auto (0): detect desktop vs touch from the device.
     expect(s.get('interfaceMode')).toBe(SETTING_RANGES.interfaceMode.def);

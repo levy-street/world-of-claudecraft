@@ -38,6 +38,7 @@ import {
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
+import { handleHousekeepingApi } from './housekeeping_api';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import {
@@ -172,6 +173,9 @@ export async function handleAdminApi(
 
     const accountId = await adminAccountId(req);
     if (accountId === null) return fail(res, 401, 'admin authentication required');
+
+    // Housekeeping (game-config overrides) routes live in their own module.
+    if (await handleHousekeepingApi(path, req, res, game, accountId)) return;
 
     const actionMatch =
       /^\/admin\/api\/moderation\/accounts\/(\d+)\/(suspend|unsuspend|ban|unban)$/.exec(path);

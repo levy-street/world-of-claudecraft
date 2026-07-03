@@ -48,7 +48,6 @@ function viewer(overrides: Record<string, unknown> = {}): any {
     pos: { x: 0, y: 0, z: 0 },
     dead: false,
     targetId: null,
-    comboTargetId: null,
     comboPoints: 0,
     ...overrides,
   };
@@ -191,15 +190,14 @@ describe('nameplate_view - threat + combo (delegated to the narrow helpers)', ()
     expect(plan(ent({ aggroTargetId: PLAYER_ID, ownerId: PLAYER_ID })).threat).toBe(false); // my pet
   });
 
-  it('reports the combo pips the viewer has built on this exact entity', () => {
+  it('reports the banked combo pips over the viewer CURRENT target (character-bound)', () => {
     const foe = ent({ pos: { x: 0, y: 0, z: 5 } });
-    expect(plan(foe, viewer({ comboTargetId: foe.id, comboPoints: 3 })).comboPips).toBe(3);
-    expect(plan(foe, viewer({ comboTargetId: 999, comboPoints: 3 })).comboPips).toBe(0);
+    expect(plan(foe, viewer({ targetId: foe.id, comboPoints: 3 })).comboPips).toBe(3);
+    // the pool follows the target swap: not looking at this entity = no pips here
+    expect(plan(foe, viewer({ targetId: 999, comboPoints: 3 })).comboPips).toBe(0);
     expect(
-      plan(
-        { ...foe, dead: true, lootable: true },
-        viewer({ comboTargetId: foe.id, comboPoints: 3 }),
-      ).comboPips,
+      plan({ ...foe, dead: true, lootable: true }, viewer({ targetId: foe.id, comboPoints: 3 }))
+        .comboPips,
     ).toBe(0);
   });
 
@@ -233,7 +231,7 @@ describe('nameplate_view - allocation-light + determinism', () => {
 
   it('same input gives the same plan (pure)', () => {
     const e = ent({ pos: { x: 0, y: 0, z: 5 }, aggroTargetId: PLAYER_ID });
-    const p = viewer({ comboTargetId: e.id, comboPoints: 2, targetId: e.id });
+    const p = viewer({ comboPoints: 2, targetId: e.id });
     const a = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false);
     const b = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false);
     expect(a).toEqual(b);
@@ -251,7 +249,7 @@ describe('nameplate_view - Sim-vs-ClientWorld parity', () => {
     [
       'aggroed mob with combo',
       { kind: 'mob', pos: { x: 0, y: 0, z: 6 }, aggroTargetId: PLAYER_ID },
-      { comboTargetId: 2, comboPoints: 4, targetId: 2 },
+      { comboPoints: 4, targetId: 2 },
     ],
     [
       'friendly door object',

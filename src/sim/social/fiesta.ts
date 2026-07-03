@@ -293,7 +293,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
   e.comboPoints = 0;
-  e.comboTargetId = null;
+  e.comboUntil = -1;
   e.eating = null;
   e.drinking = null;
   e.sitting = false;

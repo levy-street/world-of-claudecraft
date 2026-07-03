@@ -3164,6 +3164,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.brightwood_venison.name': 'Carne de veado de Brightwood',
   'entities.items.bramblehide_jerkin.name': 'Gibão de couro de sarça',
   'entities.items.monarch_crown_helm.name': 'Coroa do Monarca',
+  'entities.items.copper_mining_pick.name': 'Picareta de Cobre',
+  'entities.items.iron_mining_pick.name': 'Picareta de Ferro',
+  'entities.items.mithril_mining_pick.name': 'Picareta de Mithril',
+  'entities.items.handaxe.name': 'Machadinha',
+  'entities.items.felling_axe.name': 'Machado de Corte',
+  'entities.items.ironbark_axe.name': 'Machado de Casca de Ferro',
+  'entities.items.gathering_sickle.name': 'Foice de Coleta',
+  'entities.items.bronze_sickle.name': 'Foice de Bronze',
+  'entities.items.silverleaf_sickle.name': 'Foice Folha de Prata',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Adicionar canal de chat',
   'hud.core.chatChannels.addTitle': 'Adicionar canal',
@@ -5182,4 +5191,21 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Agora não',
   'hudChrome.nativeUpdate.title': 'Atualização disponível',
   'hudChrome.nativeUpdate.update': 'Atualizar',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'O Correio dos Corvos',
+  'entities.letters.ravenpost_welcome.subject': 'Os corvos agora voam por você',
+  'entities.letters.ravenpost_welcome.body':
+    'Viajante,\n\no Correio dos Corvos abriu seus poleiros ao longo do vale. Procure os pilares dos corvos em Eastbrook, Fenbridge e Highwatch: de qualquer um deles você pode enviar cartas, moedas e itens a outros aventureiros, e recolher o que os corvos trouxerem para você.\n\nSegue anexa uma pequena lembrança para seu primeiro selo.\n\nAsas ao alto,\nO Correio dos Corvos',
+  'entities.letters.letter_q_wolves.sender': 'Marechal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Os currais estão calmos de novo',
+  'entities.letters.letter_q_wolves.body':
+    'Os pastores finalmente podem dormir tranquilos, e isso é obra sua. Pedi ao Correio dos Corvos que levasse a você uma lembrança do fundo da guarda.\n\nMantenha a lâmina azeitada.\n- Marechal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marechal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'O velho Mandíbula Cinzenta, enfim',
+  'entities.letters.letter_q_greyjaw.body':
+    'As notícias correm depressa numa cidade tão pequena. Ontem à noite os pastores brindaram à sua saúde, e Wilkes jura que o lobo era do tamanho de uma carroça. Deixe que aumentem a história: você mereceu.\n\nFaça uma refeição por conta da guarda.\n- Marechal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Irmão Aldric',
+  'entities.letters.letter_q_hollow.subject': 'O que você fez na escuridão',
+  'entities.letters.letter_q_hollow.body':
+    'Poucos saberão o que estava enterrado naquela baixada, e menos ainda acreditariam. Eu sei, e não vou esquecer.\n\nQue seu caminho continue iluminado.\n- Irmão Aldric',
 };

@@ -1,7 +1,8 @@
-// Minimal AI pull-request reviewer. Sends the PR diff to an OpenRouter model (default:
-// the free nvidia/nemotron-3-ultra-550b-a55b:free model) and posts the review as a
-// sticky comment on the PR. No new npm deps: Node 18+ global fetch + the GitHub REST
-// API.
+// Minimal AI pull-request reviewer, driven by the OpenAI Codex CLI authenticated with a
+// ChatGPT account (OAuth), not an API key. Runs `codex exec` non-interactively over the
+// PR diff (read-only sandbox, no network for the agent) and posts the review as a sticky
+// comment on the PR. No new npm deps: the Codex CLI is installed by the workflow, and
+// the GitHub side is plain REST via global fetch.
 //
 // Two ways to trigger it (both wired in .github/workflows/pr-ai.yml):
 //   - automatically on every push to the PR: DIFF_FILE points at a precomputed diff.
@@ -11,18 +12,22 @@
 //     head) and posts a fresh reply comment keyed to the triggering comment, separate
 //     from the sticky automatic review.
 //
-// It is best-effort and NON-BLOCKING: if OPENROUTER_API_KEY is absent (for example a
-// fork PR that cannot read repo secrets) it prints a notice and exits 0, so it never
-// gates a merge. The model is swappable via OPENROUTER_MODEL with zero workflow edits,
-// which matters because free OpenRouter models can disappear or change at any time.
+// AUTH (ChatGPT OAuth): run `codex login` once locally, which stores OAuth tokens in
+// ~/.codex/auth.json. In CI, put that file's contents in the CODEX_AUTH_JSON repo
+// secret; this script materializes it into a private CODEX_HOME for the run. Locally,
+// an existing `codex login` session is used as-is. If neither is present (for example a
+// fork PR that cannot read repo secrets), it prints a notice and exits 0: it is
+// best-effort and NON-BLOCKING, it never gates a merge.
 //
-// PRIVACY: free OpenRouter models commonly log prompts to improve the model, so the
-// diff you send may be retained by a third party. Check the model's Data Policy on
-// openrouter.ai, or point OPENROUTER_MODEL at a non-logging / paid model (or a
-// self-hosted one), before using this on code you cannot disclose.
+// PRIVACY: the diff is sent to OpenAI under the ChatGPT account that logged in. Whether
+// it is used for training follows that account's plan and data settings (check the
+// workspace's data controls); the agent itself runs sandboxed read-only with network
+// disabled, so it cannot exfiltrate beyond the model request itself.
 //
 // Env (set by the workflow):
-//   OPENROUTER_API_KEY  OpenRouter key (repo secret); absent -> skip, exit 0
+//   CODEX_AUTH_JSON     contents of a `codex login` auth.json (repo secret); when
+//                       absent, falls back to the ambient CODEX_HOME/~/.codex login,
+//                       and if there is none, skips with exit 0
 //   GITHUB_TOKEN        token with pull-requests:write (default Actions token)
 //   GITHUB_REPOSITORY   owner/repo
 //   PR_NUMBER           the pull request number
@@ -31,26 +36,49 @@
 //   COMMENT_BODY        the triggering comment's body (comment run only)
 //   COMMENT_ID          the triggering comment's id; keys its reply comment
 //   COMMENT_AUTHOR      the triggering comment's author; credited in the reply
-//   OPENROUTER_MODEL    model id (default nvidia/nemotron-3-ultra-550b-a55b:free)
+//   CODEX_MODEL         model id override; when absent the Codex CLI default is used
+//   CODEX_BIN           path to the codex binary (default: `codex` on PATH)
 //   MAX_DIFF_CHARS      cap on diff chars sent to the model (default 60000)
+//
+// A local .env is loaded best-effort (same pattern as the other scripts/ utilities), so
+// a local run can keep CODEX_MODEL there. Ambient environment variables (the ones the
+// workflow sets) always win: loadEnvFile never overwrites an existing process.env entry.
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { upsertStickyComment } from './gh_sticky_comment.mjs';
 
-const MODEL = process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free';
+try {
+  process.loadEnvFile();
+} catch {
+  /* no .env: rely on the ambient env */
+}
+
+const MODEL = process.env.CODEX_MODEL || '';
+const CODEX_BIN = process.env.CODEX_BIN || 'codex';
 const MAX_DIFF_CHARS = Number(process.env.MAX_DIFF_CHARS || 60000);
-const ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
 const GITHUB_API = process.env.GITHUB_API_URL ?? 'https://api.github.com';
 
-const key = process.env.OPENROUTER_API_KEY;
 const prNumber = process.env.PR_NUMBER;
 const diffFile = process.env.DIFF_FILE;
 const commentBody = process.env.COMMENT_BODY;
 const commentId = process.env.COMMENT_ID;
 const commentAuthor = process.env.COMMENT_AUTHOR;
 
-if (!key) {
-  console.log('[ai_review] OPENROUTER_API_KEY not set; skipping AI review (non-blocking).');
+// Resolve auth: a CI secret becomes a throwaway CODEX_HOME (also keeps the run's
+// session logs out of the real home dir); otherwise reuse the ambient `codex login`.
+const ambientHome = process.env.CODEX_HOME || path.join(os.homedir(), '.codex');
+let codexHome = ambientHome;
+if (process.env.CODEX_AUTH_JSON) {
+  codexHome = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-home-'));
+  fs.writeFileSync(path.join(codexHome, 'auth.json'), process.env.CODEX_AUTH_JSON, {
+    mode: 0o600,
+  });
+} else if (!fs.existsSync(path.join(ambientHome, 'auth.json'))) {
+  console.log(
+    '[ai_review] no CODEX_AUTH_JSON and no `codex login` session; skipping AI review (non-blocking).',
+  );
   process.exit(0);
 }
 
@@ -110,66 +138,23 @@ if (diff.length > MAX_DIFF_CHARS) {
   truncated = true;
 }
 
-// Give the model the file list of the directories this diff touches, so it stops
-// hallucinating that existing imports/helpers are "missing" (its top false positive).
-// Best-effort: empty string when not in a git checkout. On a comment-triggered run the
-// checkout is the base branch (no PR-head checkout, intentionally, see the module
-// comment), so a file the PR itself newly adds will not appear here; that is a known
-// false-positive risk specific to the /review and /suggest path.
-function listTouchedDirs(d) {
-  const files = [...d.matchAll(/^\+\+\+ b\/(.+)$/gm)]
-    .map((m) => m[1])
-    .filter((p) => p !== '/dev/null');
-  // Map each changed file to its parent dir; drop the repo root so a root-level file
-  // (e.g. .gitignore) does not expand `git ls-files` to the whole tree.
-  const dirs = [
-    ...new Set(
-      files
-        .map((f) => (f.includes('/') ? f.slice(0, f.lastIndexOf('/')) : '.'))
-        .filter((d) => d !== '.'),
-    ),
-  ];
-  if (!dirs.length) return '';
-  try {
-    const out = execFileSync('git', ['ls-files', '--', ...dirs], {
-      encoding: 'utf8',
-      maxBuffer: 8 * 1024 * 1024,
-    }).trim();
-    // Safety cap so a large touched directory cannot blow up the prompt.
-    const lines = out.split('\n');
-    return lines.length > 500
-      ? `${lines.slice(0, 500).join('\n')}\n... (${lines.length - 500} more)`
-      : out;
-  } catch {
-    return '';
-  }
-}
-const repoFiles = listTouchedDirs(diff);
-
-// Declared dependency names, so the model does not flag an imported package as "missing
-// from package.json" (a false positive it cannot otherwise verify from the diff).
-function declaredDeps() {
-  try {
-    const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-    return [...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.devDependencies ?? {})]
-      .sort()
-      .join(', ');
-  } catch {
-    return '';
-  }
-}
-const deps = declaredDeps();
-
-const system = `You are a precise, skeptical senior code reviewer for World of ClaudeCraft, a TypeScript
+// Unlike the old single-shot HTTP reviewer, Codex runs as an agent with READ-ONLY access
+// to the checkout, so instead of shipping it file lists to stop hallucinated "missing
+// import" findings, we tell it to verify against the working tree itself. One caveat is
+// preserved from the old design: on a comment-triggered run the checkout is the BASE
+// branch (no PR-head checkout, intentionally, see .github/workflows/pr-ai.yml), so a
+// file the PR itself adds exists only inside the diff text.
+const prompt = `You are a precise, skeptical senior code reviewer for World of ClaudeCraft, a TypeScript
 micro-MMO and reinforcement-learning environment built on one deterministic 20 Hz simulation core.
 
-You see ONLY a unified diff plus a list of files that ALREADY EXIST in the repository. Everything
-not shown in the diff already exists and works. Do NOT flag an imported module, helper, or
-referenced file as "missing" or "not in the diff": that is expected. If an import resolves to a path
-in the existing-files list, it is fine. You are also given the list of declared package.json
-dependencies; an import of any listed package is available, so NEVER say a dependency is missing
-from package.json. When you cannot verify something from what you were given, ask a one-line
-question at LOW severity instead of asserting a problem.
+Review the unified diff below. You have READ-ONLY access to a checkout of the repository; before
+flagging that an import, helper, or referenced file is missing or wrong, verify it against the
+working tree (and package.json for dependencies). Use lightweight inspection only: file reads,
+focused searches, and short static checks. Do not install packages, run network commands, run full
+builds, run full test suites, or run long typecheck commands. Note: the checkout may be the PR's
+BASE branch, so a file the diff itself adds may exist only in the diff text; that is expected,
+never a finding. When you cannot verify something, ask a one-line question at LOW severity instead
+of asserting a problem. Do not modify anything; produce a review only.
 
 Invariant scope, apply LITERALLY and do not generalize beyond it: these rules constrain application
 code under src/ ONLY.
@@ -184,75 +169,72 @@ or emojis" rule applies everywhere.
 
 Severity rubric, use it strictly:
 - high: a real bug, security issue, or src/ invariant violation that WILL break behavior or fail CI
-  AND that you can confirm from the diff alone.
+  AND that you confirmed from the diff plus the working tree.
 - medium: likely incorrect or risky, but not certain.
 - low: style, naming, maintainability, or a question.
-If you CANNOT verify a finding from the diff and the provided context, it is AT MOST low and MUST be
-phrased as a one-line question, never high or medium. Do not guess at repository state you were not
-given (CI pins, other files' contents): if you did not see it, do not assert it.
+If you CANNOT verify a finding, it is AT MOST low and MUST be phrased as a one-line question, never
+high or medium.
 
-Output rules: prefer FEW high-confidence findings over many. If you are not confident a finding is
-real, OMIT it. Do not pad with generic advice. Only mention missing tests when the diff changes src/
-or server logic that the repo actually tests. Do NOT add your own title or top-level heading (no
-"# ..." or "## AI review"); start directly with the first group. Group findings under Correctness,
-Invariants, Tests, Nits and tag each with its severity. If the change looks fine, say so in one line.
-Do not restate the diff. Output GitHub-flavored Markdown.`;
+Output rules: your FINAL message is posted verbatim as the PR review comment, so it must contain
+ONLY the review in GitHub-flavored Markdown, no preamble or meta commentary. Prefer FEW
+high-confidence findings over many; if you are not confident a finding is real, OMIT it. Do not pad
+with generic advice. Only mention missing tests when the diff changes src/ or server logic that the
+repo actually tests. Do NOT add your own title or top-level heading (no "# ..." or "## AI review");
+start directly with the first group. Group findings under Correctness, Invariants, Tests, Nits and
+tag each with its severity. If the change looks fine, say so in one line. Do not restate the diff.
 
-const user = [
-  truncated ? `Note: the diff was truncated to the first ${MAX_DIFF_CHARS} characters.\n` : '',
+${truncated ? `Note: the diff was truncated to the first ${MAX_DIFF_CHARS} characters.\n\n` : ''}${
   command?.focus
-    ? `The reviewer specifically asked (via a PR comment) to focus on:\n\n${command.focus}\n\nStill mention any other high-confidence finding, but prioritize this.\n`
-    : '',
-  repoFiles
-    ? `Files that already exist in the directories this diff touches (so you can resolve imports and must NOT flag these as missing):\n\n\`\`\`\n${repoFiles}\n\`\`\`\n`
-    : '',
-  deps
-    ? `Declared package.json dependencies (names only); any import of these is available, do NOT flag it as missing:\n\n${deps}\n`
-    : '',
-  `Unified diff to review:\n\n\`\`\`diff\n${diff}\n\`\`\``,
-]
-  .filter(Boolean)
-  .join('\n');
+    ? `The reviewer specifically asked (via a PR comment) to focus on:\n\n${command.focus}\n\nStill mention any other high-confidence finding, but prioritize this.\n\n`
+    : ''
+}Unified diff to review:
 
-async function review() {
-  const res = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/json',
-      'X-Title': 'WoCC PR review',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      temperature: 0.2,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: user },
-      ],
-    }),
+\`\`\`diff
+${diff}
+\`\`\``;
+
+function review() {
+  const outFile = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'codex-review-')), 'last.md');
+  const args = [
+    'exec',
+    '--sandbox',
+    'read-only',
+    '--skip-git-repo-check',
+    '--ignore-user-config',
+    '--ignore-rules',
+    '--output-last-message',
+    outFile,
+    ...(MODEL ? ['--model', MODEL] : []),
+    '-',
+  ];
+  // Progress goes to the workflow log (stderr/stdout inherited); the review itself is
+  // read back from --output-last-message so log noise can never leak into the comment.
+  execFileSync(CODEX_BIN, args, {
+    input: prompt,
+    stdio: ['pipe', 'inherit', 'inherit'],
+    env: { ...process.env, CODEX_HOME: codexHome },
+    timeout: 12 * 60 * 1000,
   });
-  if (!res.ok) {
-    throw new Error(`OpenRouter HTTP ${res.status}: ${(await res.text()).slice(0, 500)}`);
-  }
-  const data = await res.json();
-  const content = data?.choices?.[0]?.message?.content?.trim();
-  if (!content)
-    throw new Error(`OpenRouter returned no content: ${JSON.stringify(data).slice(0, 500)}`);
+  const content = fs.readFileSync(outFile, 'utf8').trim();
+  if (!content) throw new Error('Codex produced no final message');
   return content;
 }
 
+const modelLabel = MODEL ? `Codex, \`${MODEL}\`` : 'Codex';
 let reviewText;
 try {
-  reviewText = await review();
+  reviewText = review();
 } catch (e) {
-  // Non-blocking: a model/API failure leaves a short note rather than failing the job.
+  // Non-blocking: a CLI/auth/model failure leaves a short note rather than failing the
+  // job. Common cause: the CODEX_AUTH_JSON secret's OAuth session expired; re-run
+  // `codex login` locally and refresh the secret.
   console.log(`[ai_review] review failed (non-blocking): ${e.message}`);
-  reviewText = `_The automated review could not run this time (\`${MODEL}\`). See the workflow logs._`;
+  reviewText = `_The automated review could not run this time (${modelLabel}). See the workflow logs._`;
 }
 
 const heading = command
-  ? `## AI review (\`${MODEL}\`, requested by @${commentAuthor ?? 'a maintainer'} via \`/${command.command}\`)`
-  : `## AI review (\`${MODEL}\`)`;
+  ? `## AI review (${modelLabel}, requested by @${commentAuthor ?? 'a maintainer'} via \`/${command.command}\`)`
+  : `## AI review (${modelLabel})`;
 
 const body = [
   heading,
@@ -260,7 +242,7 @@ const body = [
   reviewText,
   truncated ? `\n<sub>Diff truncated to the first ${MAX_DIFF_CHARS} characters.</sub>` : '',
   '',
-  '<sub>Automated and non-blocking. May be wrong; a human review still decides. Free OpenRouter models commonly log prompts, so the diff may be retained by a third party.</sub>',
+  '<sub>Automated and non-blocking. May be wrong; a human review still decides. Generated by the OpenAI Codex CLI under the maintainer ChatGPT account; data handling follows that account plan and settings.</sub>',
 ].join('\n');
 
 // A comment-triggered run gets its own marker keyed to the triggering comment, so a

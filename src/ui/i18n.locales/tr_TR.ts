@@ -1066,6 +1066,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.moggers_shiv.name': "Mogger'ın Şişi",
   'entities.items.moggers_stomper_boots.name': "Mogger'ın Ezici Çizmeleri",
   'entities.items.monarch_crown_helm.name': "Hükümdar'ın Tacı",
+  'entities.items.copper_mining_pick.name': 'Bakır Maden Kazması',
+  'entities.items.iron_mining_pick.name': 'Demir Maden Kazması',
+  'entities.items.mithril_mining_pick.name': 'Mithril Maden Kazması',
+  'entities.items.handaxe.name': 'El Baltası',
+  'entities.items.felling_axe.name': 'Kesim Baltası',
+  'entities.items.ironbark_axe.name': 'Demir Kabuklu Balta',
+  'entities.items.gathering_sickle.name': 'Toplama Orağı',
+  'entities.items.bronze_sickle.name': 'Bronz Orak',
+  'entities.items.silverleaf_sickle.name': 'Gümüşyaprak Orağı',
   'entities.items.moongate_rubbing.name': 'Koruyucu İz Baskısı',
   'entities.items.moonpale_scale.name': 'Ay Solgunu Pul',
   'entities.items.moonscale_saber.name': 'Aypulu Pala',
@@ -5095,4 +5104,21 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Şimdi Değil',
   'hudChrome.nativeUpdate.title': 'Güncelleme Mevcut',
   'hudChrome.nativeUpdate.update': 'Güncelle',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Kuzgun Postası',
+  'entities.letters.ravenpost_welcome.subject': 'Kuzgunlar artık senin için uçuyor',
+  'entities.letters.ravenpost_welcome.body':
+    'Yolcu,\n\nKuzgun Postası tünek direklerini vadinin dört bir yanına kurdu. Eastbrook, Fenbridge ve Highwatch’taki kuzgun sütunlarını ara: herhangi birinden diğer maceracılara mektup, para ve eşya gönderebilir, kuzgunların sana getirdiklerini alabilirsin.\n\nİlk pulun için küçük bir armağan ekledik.\n\nKanatlar yukarı,\nKuzgun Postası',
+  'entities.letters.letter_q_wolves.sender': 'Mareşal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Ağıllar yeniden sessiz',
+  'entities.letters.letter_q_wolves.body':
+    'Çobanlar nihayet rahat uyuyabiliyor ve bu senin sayende. Kuzgun Postası’ndan nöbet kasasından sana küçük bir şey ulaştırmasını istedim.\n\nKılıcını yağlı tut.\n- Mareşal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Mareşal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Yaşlı Bozçene, sonunda',
+  'entities.letters.letter_q_greyjaw.body':
+    'Böyle küçük bir kasabada haber tez yayılır. Çobanlar dün gece sağlığına kadeh kaldırdı, Wilkes ise kurdun bir araba kadar iri olduğuna yemin ediyor. Bırak abartsınlar: bunu hak ettin.\n\nNöbetçilerin hesabına bir yemek ye.\n- Mareşal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Birader Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Karanlıkta yaptıkların',
+  'entities.letters.letter_q_hollow.body':
+    'O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric',
 };

@@ -60,7 +60,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     queuedOnSwing: null,
     fiveSecondRule: 99,
     comboPoints: 0,
-    comboTargetId: null,
+    comboUntil: -1,
     overpowerUntil: -1,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,

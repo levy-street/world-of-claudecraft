@@ -4,8 +4,8 @@
 // stored now so cross-realm friends/guilds need no migration later).
 
 import type { Pool } from 'pg';
-import type { CharInfo, CharRef, GuildRank, SocialDb } from './social';
 import { REALM } from './realm';
+import type { CharInfo, CharRef, GuildEventRow, GuildRank, SocialDb } from './social';
 
 // kept as an alias for the schema's column default; the live realm is REALM
 export const DEFAULT_REALM = REALM;
@@ -102,6 +102,21 @@ CREATE TABLE IF NOT EXISTS guild_members (
   joined_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS guild_members_guild ON guild_members(guild_id);
+
+-- Guild calendar events (the in-game event calendar's guild lane). day is the
+-- event's UTC calendar date as 'YYYY-MM-DD'; hour is 0-23 UTC, NULL for an
+-- all-day event. created_by keeps the author for display and permissions.
+CREATE TABLE IF NOT EXISTS guild_events (
+  id SERIAL PRIMARY KEY,
+  guild_id INT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+  day TEXT NOT NULL,
+  hour SMALLINT,
+  title TEXT NOT NULL,
+  note TEXT NOT NULL DEFAULT '',
+  created_by INT REFERENCES characters(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS guild_events_guild_day ON guild_events(guild_id, day);
 `;
 
 const CHAR_COLS = 'id, name, class AS cls, level, realm';
@@ -113,14 +128,23 @@ export class PgSocialDb implements SocialDb {
     // scoped to this realm: you can only friend/ignore/invite characters that
     // live on the same world as you. exact case wins; otherwise an unambiguous
     // case-insensitive match
-    const exact = await this.pool.query(`SELECT ${CHAR_COLS} FROM characters WHERE name = $1 AND realm = $2`, [name, REALM]);
+    const exact = await this.pool.query(
+      `SELECT ${CHAR_COLS} FROM characters WHERE name = $1 AND realm = $2`,
+      [name, REALM],
+    );
     if (exact.rows[0]) return exact.rows[0];
-    const ci = await this.pool.query(`SELECT ${CHAR_COLS} FROM characters WHERE lower(name) = lower($1) AND realm = $2 LIMIT 2`, [name, REALM]);
+    const ci = await this.pool.query(
+      `SELECT ${CHAR_COLS} FROM characters WHERE lower(name) = lower($1) AND realm = $2 LIMIT 2`,
+      [name, REALM],
+    );
     return ci.rows.length === 1 ? ci.rows[0] : null;
   }
 
   async getCharacter(id: number): Promise<CharInfo | null> {
-    const res = await this.pool.query(`SELECT ${CHAR_COLS} FROM characters WHERE id = $1 AND realm = $2`, [id, REALM]);
+    const res = await this.pool.query(
+      `SELECT ${CHAR_COLS} FROM characters WHERE id = $1 AND realm = $2`,
+      [id, REALM],
+    );
     return res.rows[0] ?? null;
   }
 
@@ -132,7 +156,10 @@ export class PgSocialDb implements SocialDb {
   }
 
   async removeFriend(charId: number, friendId: number): Promise<void> {
-    await this.pool.query('DELETE FROM friendships WHERE character_id = $1 AND friend_id = $2', [charId, friendId]);
+    await this.pool.query('DELETE FROM friendships WHERE character_id = $1 AND friend_id = $2', [
+      charId,
+      friendId,
+    ]);
   }
 
   async listFriends(charId: number): Promise<CharInfo[]> {
@@ -146,7 +173,9 @@ export class PgSocialDb implements SocialDb {
   }
 
   async whoFriended(charId: number): Promise<number[]> {
-    const res = await this.pool.query('SELECT character_id FROM friendships WHERE friend_id = $1', [charId]);
+    const res = await this.pool.query('SELECT character_id FROM friendships WHERE friend_id = $1', [
+      charId,
+    ]);
     return res.rows.map((r) => r.character_id);
   }
 
@@ -158,7 +187,10 @@ export class PgSocialDb implements SocialDb {
   }
 
   async removeBlock(charId: number, blockedId: number): Promise<void> {
-    await this.pool.query('DELETE FROM blocks WHERE character_id = $1 AND blocked_id = $2', [charId, blockedId]);
+    await this.pool.query('DELETE FROM blocks WHERE character_id = $1 AND blocked_id = $2', [
+      charId,
+      blockedId,
+    ]);
   }
 
   async listBlocks(charId: number): Promise<CharRef[]> {
@@ -171,17 +203,25 @@ export class PgSocialDb implements SocialDb {
   }
 
   async blockedIds(charId: number): Promise<number[]> {
-    const res = await this.pool.query('SELECT blocked_id FROM blocks WHERE character_id = $1', [charId]);
+    const res = await this.pool.query('SELECT blocked_id FROM blocks WHERE character_id = $1', [
+      charId,
+    ]);
     return res.rows.map((r) => r.blocked_id);
   }
 
-  async createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
+  async createGuildWithLeader(
+    name: string,
+    leaderId: number,
+  ): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
       let guildId: number;
       try {
-        const res = await client.query('INSERT INTO guilds (name, realm) VALUES ($1, $2) RETURNING id', [name, DEFAULT_REALM]);
+        const res = await client.query(
+          'INSERT INTO guilds (name, realm) VALUES ($1, $2) RETURNING id',
+          [name, DEFAULT_REALM],
+        );
         guildId = res.rows[0].id;
       } catch (err) {
         await client.query('ROLLBACK');
@@ -196,7 +236,10 @@ export class PgSocialDb implements SocialDb {
          ON CONFLICT (character_id) DO NOTHING`,
         [guildId, leaderId],
       );
-      if (mem.rowCount === 0) { await client.query('ROLLBACK'); return { error: 'already_in_guild' }; }
+      if (mem.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return { error: 'already_in_guild' };
+      }
       await client.query('COMMIT');
       return { guildId };
     } catch (err) {
@@ -211,7 +254,9 @@ export class PgSocialDb implements SocialDb {
     await this.pool.query('DELETE FROM guilds WHERE id = $1', [id]);
   }
 
-  async guildMembership(charId: number): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null> {
+  async guildMembership(
+    charId: number,
+  ): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null> {
     const res = await this.pool.query(
       `SELECT gm.guild_id, g.name AS guild_name, gm.rank
        FROM guild_members gm JOIN guilds g ON g.id = gm.guild_id
@@ -222,18 +267,37 @@ export class PgSocialDb implements SocialDb {
     return row ? { guildId: row.guild_id, guildName: row.guild_name, rank: row.rank } : null;
   }
 
-  async addGuildMemberAtomic(guildId: number, charId: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+  async addGuildMemberAtomic(
+    guildId: number,
+    charId: number,
+    rank: GuildRank,
+    limit: number,
+  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
       // lock the guild row so concurrent accepts serialize — without this the
       // count-then-insert races and N pending invitees can all pass the cap.
       const g = await client.query('SELECT id FROM guilds WHERE id = $1 FOR UPDATE', [guildId]);
-      if (g.rowCount === 0) { await client.query('ROLLBACK'); return 'no_guild'; }
-      const existing = await client.query('SELECT 1 FROM guild_members WHERE character_id = $1', [charId]);
-      if ((existing.rowCount ?? 0) > 0) { await client.query('ROLLBACK'); return 'already_member'; }
-      const cnt = await client.query('SELECT count(*)::int AS n FROM guild_members WHERE guild_id = $1', [guildId]);
-      if (cnt.rows[0].n >= limit) { await client.query('ROLLBACK'); return 'full'; }
+      if (g.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return 'no_guild';
+      }
+      const existing = await client.query('SELECT 1 FROM guild_members WHERE character_id = $1', [
+        charId,
+      ]);
+      if ((existing.rowCount ?? 0) > 0) {
+        await client.query('ROLLBACK');
+        return 'already_member';
+      }
+      const cnt = await client.query(
+        'SELECT count(*)::int AS n FROM guild_members WHERE guild_id = $1',
+        [guildId],
+      );
+      if (cnt.rows[0].n >= limit) {
+        await client.query('ROLLBACK');
+        return 'full';
+      }
       // ON CONFLICT guards the gap between the membership check above and this
       // insert: if the character joined a guild concurrently, the character_id
       // PK conflicts -> 0 rows -> report already_member instead of throwing.
@@ -242,7 +306,10 @@ export class PgSocialDb implements SocialDb {
          ON CONFLICT (character_id) DO NOTHING`,
         [guildId, charId, rank],
       );
-      if (ins.rowCount === 0) { await client.query('ROLLBACK'); return 'already_member'; }
+      if (ins.rowCount === 0) {
+        await client.query('ROLLBACK');
+        return 'already_member';
+      }
       await client.query('COMMIT');
       return 'ok';
     } catch (err) {
@@ -258,7 +325,10 @@ export class PgSocialDb implements SocialDb {
   }
 
   async setGuildRank(charId: number, rank: GuildRank): Promise<void> {
-    await this.pool.query('UPDATE guild_members SET rank = $2 WHERE character_id = $1', [charId, rank]);
+    await this.pool.query('UPDATE guild_members SET rank = $2 WHERE character_id = $1', [
+      charId,
+      rank,
+    ]);
   }
 
   async guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]> {
@@ -269,5 +339,62 @@ export class PgSocialDb implements SocialDb {
       [guildId],
     );
     return res.rows;
+  }
+
+  async guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]> {
+    const res = await this.pool.query(
+      `SELECT e.id, e.day, e.hour, e.title, e.note, COALESCE(c.name, '') AS created_by
+       FROM guild_events e LEFT JOIN characters c ON c.id = e.created_by
+       WHERE e.guild_id = $1 AND e.day >= $2
+       ORDER BY e.day, e.hour NULLS FIRST, e.id`,
+      [guildId, fromDay],
+    );
+    return res.rows.map((r) => ({
+      id: r.id,
+      day: r.day,
+      hour: r.hour === null ? null : Number(r.hour),
+      title: r.title,
+      note: r.note,
+      createdBy: r.created_by,
+    }));
+  }
+
+  async guildEventCount(guildId: number, fromDay: string): Promise<number> {
+    const res = await this.pool.query(
+      'SELECT count(*)::int AS n FROM guild_events WHERE guild_id = $1 AND day >= $2',
+      [guildId, fromDay],
+    );
+    return res.rows[0].n;
+  }
+
+  async createGuildEvent(
+    guildId: number,
+    creatorId: number,
+    day: string,
+    hour: number | null,
+    title: string,
+    note: string,
+  ): Promise<number> {
+    const res = await this.pool.query(
+      `INSERT INTO guild_events (guild_id, created_by, day, hour, title, note)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [guildId, creatorId, day, hour, title, note],
+    );
+    return res.rows[0].id;
+  }
+
+  async deleteGuildEvent(eventId: number, guildId: number): Promise<boolean> {
+    const res = await this.pool.query('DELETE FROM guild_events WHERE id = $1 AND guild_id = $2', [
+      eventId,
+      guildId,
+    ]);
+    return (res.rowCount ?? 0) > 0;
+  }
+
+  async pruneGuildEvents(guildId: number, beforeDay: string): Promise<void> {
+    await this.pool.query('DELETE FROM guild_events WHERE guild_id = $1 AND day < $2', [
+      guildId,
+      beforeDay,
+    ]);
   }
 }

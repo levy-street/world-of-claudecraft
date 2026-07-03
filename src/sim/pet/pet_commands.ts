@@ -417,16 +417,12 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
 }
 
 /** Remove a summoned demon from the world entirely, scrubbing any references
- *  (player targets/combo, other mobs' hate) the way boss adds are despawned. */
+ *  (player targets, other mobs' hate) the way boss adds are despawned. */
 export function despawnPet(ctx: SimContext, pet: Entity): void {
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e) continue;
     if (e.targetId === pet.id) e.targetId = null;
-    if (e.comboTargetId === pet.id) {
-      e.comboTargetId = null;
-      e.comboPoints = 0;
-    }
   }
   for (const m of ctx.entities.values()) {
     if (m.kind !== 'mob' || m.id === pet.id) continue;

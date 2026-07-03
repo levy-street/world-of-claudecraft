@@ -392,6 +392,8 @@ export const pt_BR: EnTranslations = {
       "showDevBadges": "Exibir Insígnias de Desenvolvedor",
       "showOwnNameplate": "Show My Nameplate",
       "uiScale": "Escala da interface",
+      "playerFrameScale": "Player Frame Scale",
+      "targetFrameScale": "Target Frame Scale",
       "highContrastBackground": "Fundo de alto contraste",
       "startAttackOnAbility": "Ataque Automático ao Usar Habilidade",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -718,7 +720,8 @@ export const pt_BR: EnTranslations = {
       "summaryGroup": "Configurações de Saque: Saque em Grupo."
     },
     "party": {
-      "promoteLeader": "Promover a Líder"
+      "promoteLeader": "Promover a Líder",
+      "inviteUsage": "Invite whom? Usage: /invite <name>."
     },
     "lootSettings": {
       "title": "Configurações de Saque",
@@ -850,6 +853,13 @@ export const pt_BR: EnTranslations = {
     "targetFrame": {
       "unlock": "Move target frame",
       "lock": "Lock target frame"
+    },
+    "playerFrame": {
+      "unlock": "Move player frame",
+      "lock": "Lock player frame"
+    },
+    "frameReset": {
+      "label": "Reset Frame Positions"
     },
     "itemTooltip": {
       "requiresLevel": "Requer Nível {level}"
@@ -1025,6 +1035,112 @@ export const pt_BR: EnTranslations = {
       },
       "linkedAs": "Vinculado como {login}",
       "unlink": "Desvincular GitHub"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
+    },
+    "calendar": {
+      "title": "Event Calendar",
+      "close": "Close calendar",
+      "keybindLabel": "Event Calendar",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "dayAria": "{date}: {count} events",
+      "noEvents": "Nothing planned for this day.",
+      "allDay": "All day",
+      "bookedBy": "Booked by {name}",
+      "deleteAria": "Remove the event {title}",
+      "bookTitle": "Book a guild event",
+      "titlePlaceholder": "Event title",
+      "notePlaceholder": "Note (optional)",
+      "hourLabel": "Hour (UTC)",
+      "hourAllDay": "All day",
+      "addButton": "Book event",
+      "guildOnlyNote": "Join a guild to plan events together.",
+      "result": {
+        "created": "The event is on the guild calendar.",
+        "removed": "The event was taken off the calendar.",
+        "notInGuild": "You are not in a guild.",
+        "notOfficer": "Only officers and the Guild Master may manage guild events.",
+        "badInput": "Give the event a title and a valid day.",
+        "calendarFull": "The guild calendar is full.",
+        "eventGone": "That event is no longer on the calendar."
+      },
+      "events": {
+        "raidCall": {
+          "title": "Raid Call",
+          "note": "Wardens sound the horn: gather a party for the crypts and the raid."
+        },
+        "marketDay": {
+          "title": "Market Day",
+          "note": "The Merchant expects fresh stock. A fine day to browse the World Market."
+        },
+        "fiestaNight": {
+          "title": "Fiesta Night",
+          "note": "The 2v2 Fiesta ring draws its loudest crowds tonight."
+        },
+        "arenaClash": {
+          "title": "Arena Clash",
+          "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
+        },
+        "fishingDerby": {
+          "title": "Fishing Derby",
+          "note": "Anglers line the lakes. Bring a pole and swap fishing tales."
+        },
+        "delveDay": {
+          "title": "Delve Day",
+          "note": "Brother Halven marks his charts: a fine day to brave the Collapsed Reliquary."
+        },
+        "moongateCommunion": {
+          "title": "Moongate Communion",
+          "note": "Pilgrims gather at the temple moongate under the mid-month moon."
+        }
+      }
     }
   },
   "guide": {
@@ -5043,6 +5159,33 @@ export const pt_BR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Coroa do Monarca"
       },
+      "copper_mining_pick": {
+        "name": "Picareta de Cobre"
+      },
+      "iron_mining_pick": {
+        "name": "Picareta de Ferro"
+      },
+      "mithril_mining_pick": {
+        "name": "Picareta de Mithril"
+      },
+      "handaxe": {
+        "name": "Machadinha"
+      },
+      "felling_axe": {
+        "name": "Machado de Corte"
+      },
+      "ironbark_axe": {
+        "name": "Machado de Casca de Ferro"
+      },
+      "gathering_sickle": {
+        "name": "Foice de Coleta"
+      },
+      "bronze_sickle": {
+        "name": "Foice de Bronze"
+      },
+      "silverleaf_sickle": {
+        "name": "Foice Folha de Prata"
+      },
       "bristleback_maul": {
         "name": "Malho Bristleback"
       },
@@ -7069,6 +7212,28 @@ export const pt_BR: EnTranslations = {
         "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "O Correio dos Corvos",
+        "subject": "Os corvos agora voam por você",
+        "body": "Viajante,\n\no Correio dos Corvos abriu seus poleiros ao longo do vale. Procure os pilares dos corvos em Eastbrook, Fenbridge e Highwatch: de qualquer um deles você pode enviar cartas, moedas e itens a outros aventureiros, e recolher o que os corvos trouxerem para você.\n\nSegue anexa uma pequena lembrança para seu primeiro selo.\n\nAsas ao alto,\nO Correio dos Corvos"
+      },
+      "letter_q_wolves": {
+        "sender": "Marechal Redbrook",
+        "subject": "Os currais estão calmos de novo",
+        "body": "Os pastores finalmente podem dormir tranquilos, e isso é obra sua. Pedi ao Correio dos Corvos que levasse a você uma lembrança do fundo da guarda.\n\nMantenha a lâmina azeitada.\n- Marechal Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Marechal Redbrook",
+        "subject": "O velho Mandíbula Cinzenta, enfim",
+        "body": "As notícias correm depressa numa cidade tão pequena. Ontem à noite os pastores brindaram à sua saúde, e Wilkes jura que o lobo era do tamanho de uma carroça. Deixe que aumentem a história: você mereceu.\n\nFaça uma refeição por conta da guarda.\n- Marechal Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Irmão Aldric",
+        "subject": "O que você fez na escuridão",
+        "body": "Poucos saberão o que estava enterrado naquela baixada, e menos ainda acreditariam. Eu sei, e não vou esquecer.\n\nQue seu caminho continue iluminado.\n- Irmão Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Traje de batalha Forjacoroa",
@@ -7119,6 +7284,7 @@ export const pt_BR: EnTranslations = {
     "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
     "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
+    "mailboxName": "Mailbox"
   }
 };

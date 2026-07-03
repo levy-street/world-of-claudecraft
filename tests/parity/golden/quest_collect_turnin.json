@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "f9c314cc",
+      "nextId": 394,
+      "state": "f23632b3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -31,14 +31,16 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -51,13 +53,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -100,9 +103,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "3f7898f4",
-      "events": "ca2e589b",
+      "nextId": 394,
+      "state": "bea41ba5",
+      "events": "4035c0ff",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -116,14 +119,16 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_boars",
@@ -148,13 +153,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -197,9 +203,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "df8d58f1",
-      "events": "0154d36a",
+      "nextId": 394,
+      "state": "f5409e30",
+      "events": "8397910a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -215,9 +221,10 @@
           "counters": {
             "questProgress": 5
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -229,6 +236,7 @@
               "itemId": "boar_hide"
             }
           ],
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_boars",
@@ -253,13 +261,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -302,9 +311,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "5f65515c",
-      "events": "34ca5ddb",
+      "nextId": 394,
+      "state": "a24a8b0b",
+      "events": "a55e782c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -320,9 +329,10 @@
           "counters": {
             "questProgress": 5
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -334,6 +344,7 @@
               "itemId": "boar_hide"
             }
           ],
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_boars",
@@ -358,13 +369,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -407,9 +419,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "510a443a",
-      "events": "7e586572",
+      "nextId": 394,
+      "state": "460e71e1",
+      "events": "63bb1ca6",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -425,9 +437,10 @@
           "counters": {
             "questProgress": 6
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -439,6 +452,7 @@
               "itemId": "boar_hide"
             }
           ],
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_boars",
@@ -463,13 +477,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -512,9 +527,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "038c85c9",
-      "events": "921a0d90",
+      "nextId": 394,
+      "state": "5ccfeec0",
+      "events": "1995b7c1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -533,15 +548,17 @@
             "questsCompleted": 1,
             "xpGained": 350
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "lifetimeXp": 350,
+          "mailWelcomed": true,
           "questsDone": [
             "q_boars"
           ],
@@ -558,13 +575,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -607,8 +625,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 391,
-      "state": "3cf76777",
+      "nextId": 394,
+      "state": "dd8db6be",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -628,15 +646,17 @@
             "questsCompleted": 1,
             "xpGained": 350
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "lifetimeXp": 350,
+          "mailWelcomed": true,
           "questsDone": [
             "q_boars"
           ],
@@ -653,13 +673,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99.1,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.1,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

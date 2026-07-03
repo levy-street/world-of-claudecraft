@@ -55,6 +55,12 @@ import {
   Settings,
 } from './game/settings';
 import { sfx } from './game/sfx';
+import {
+  recordSkipTap,
+  type SpawnCinematic,
+  spawnCinematicFor,
+  spawnCinematicPose,
+} from './game/spawn_cinematic';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
@@ -846,6 +852,7 @@ async function startGame(
   offlineSim: Sim | null,
   online: ClientWorld | null,
   keybindScope: string,
+  playIntro = false,
 ): Promise<void> {
   // Model/texture/HDRI fetches were kicked off at module import; the renderer
   // builds its scene synchronously, so everything must be resolved first.
@@ -1142,6 +1149,9 @@ async function startGame(
           case 'leaderboard':
             hud.toggleLeaderboard();
             break;
+          case 'calendar':
+            hud.toggleCalendar();
+            break;
           case 'discord':
             toggleDiscordPanel();
             break;
@@ -1270,6 +1280,9 @@ async function startGame(
         break;
       case 'leaderboard':
         hud.toggleLeaderboard();
+        break;
+      case 'calendar':
+        hud.toggleCalendar();
         break;
       case 'discord':
         toggleDiscordPanel();
@@ -1566,6 +1579,12 @@ async function startGame(
       case 'uiScale':
         document.documentElement.style.setProperty('--ui-scale', String(v));
         break;
+      case 'playerFrameScale':
+        document.documentElement.style.setProperty('--player-frame-scale', String(v));
+        break;
+      case 'targetFrameScale':
+        document.documentElement.style.setProperty('--target-frame-scale', String(v));
+        break;
       // Graphics-tier HUD effects follow the STATIC preset + the advanced
       // effectsQuality slider. The 3D renderer tier is resolved at renderer
       // construction (a reload); here we only re-publish the HUD effect profile
@@ -1711,6 +1730,10 @@ async function startGame(
       }
       if (obj.templateId === 'dungeon_exit') {
         world.leaveDungeon();
+        return;
+      }
+      if (obj.templateId === 'mailbox') {
+        hud.openMailbox();
         return;
       }
       world.pickUpObject(bestObj);
@@ -2258,8 +2281,9 @@ async function startGame(
     syncPerfOverlay(frameDt, now);
 
     // freeze movement while the game menu is up so WASD doesn't walk the
-    // character behind it (other windows stay non-modal, as before)
-    input.suspendMovement = !gameInputReady || hud.isModalOpen();
+    // character behind it (other windows stay non-modal, as before); the
+    // first-spawn intro cinematic holds movement the same way until it lands
+    input.suspendMovement = !gameInputReady || hud.isModalOpen() || intro !== null;
     perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
       frameDtMs: frameDt * 1000,
     });
@@ -2267,7 +2291,7 @@ async function startGame(
     perf.trace('input.hoverCursor', () => updateHoverCursor(), { active: input.hoverActive });
     perf.markInputFrame(performance.now());
 
-    const mouselook = input.isMouselookActive() && !world.player.dead;
+    const mouselook = intro === null && input.isMouselookActive() && !world.player.dead;
     const controllerFacing = input.controllerFacingOverride();
     const renderFacing = renderFacingOverride();
     // On the frame the camera lets go of the player's heading (classic mouselook
@@ -2336,6 +2360,7 @@ async function startGame(
           frameDtMs: frameDt * 1000,
         },
       );
+      introCameraTick(now);
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
@@ -2431,6 +2456,7 @@ async function startGame(
         lastSnapAge: net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1,
       },
     );
+    introCameraTick(now);
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
@@ -2472,6 +2498,87 @@ async function startGame(
       input.clearControllerMoveInput();
     },
   };
+  // First-spawn intro cinematic: a newly created character's first entry opens
+  // far out across the field and glides in toward the character; the HUD stays
+  // hidden until the camera lands. Escape (or a rapid tap burst on touch, which
+  // has no Escape key) skips straight to the end; other input is swallowed
+  // while it runs. Seen-state persists per character so it plays exactly once;
+  // reduce-motion players go straight to gameplay.
+  const INTRO_SEEN_KEY = `woc_spawn_intro_seen:${keybindScope}`;
+  let introSeen = true;
+  try {
+    introSeen = localStorage.getItem(INTRO_SEEN_KEY) === '1';
+  } catch {
+    // storage unavailable: the seen marker can't persist, so treat the intro as
+    // seen rather than replaying it on every boot
+  }
+  let intro: { cinematic: SpawnCinematic; startedAt: number | null } | null = null;
+  const setIntroUiHidden = (hidden: boolean): void => {
+    const display = hidden ? 'none' : '';
+    const ui = document.getElementById('ui');
+    if (ui) ui.style.display = display;
+    // The touch controls are a top-level layer OUTSIDE #ui, so they need their
+    // own toggle or the joysticks and combat buttons stay up during the intro
+    // on mobile. Clearing to '' hands display back to the stylesheet
+    // (body.mobile-touch.game-active shows it, desktop keeps it hidden).
+    const mobileControls = document.getElementById('mobile-controls');
+    if (mobileControls) mobileControls.style.display = display;
+    nameplates.style.display = display;
+  };
+  const finishIntro = (skipToEnd: boolean): void => {
+    if (!intro) return;
+    const end = intro.cinematic.end;
+    intro = null;
+    if (skipToEnd) {
+      input.camYaw = end.yaw;
+      input.camPitch = end.pitch;
+      input.camDist = end.dist;
+    }
+    setIntroUiHidden(false);
+    window.removeEventListener('keydown', skipIntro, true);
+    window.removeEventListener('pointerdown', skipIntro, true);
+    try {
+      localStorage.setItem(INTRO_SEEN_KEY, '1');
+    } catch {
+      // storage unavailable: worst case the intro replays next session
+    }
+  };
+  const introTaps: number[] = [];
+  const skipIntro = (e: Event): void => {
+    // Swallow gameplay input while the intro runs; only the skip gestures act.
+    e.stopPropagation();
+    if (e.type === 'keydown') {
+      if ((e as KeyboardEvent).key !== 'Escape') return;
+      e.preventDefault(); // skip only: the eaten Escape must not open the menu
+      finishIntro(true);
+      return;
+    }
+    if (recordSkipTap(introTaps, performance.now() / 1000)) finishIntro(true);
+  };
+  // Applied each frame between the follow-camera update and the renderer read,
+  // so the cinematic pose wins over mouse/follow input while it runs.
+  const introCameraTick = (now: number): void => {
+    if (!intro) return;
+    const elapsed = intro.startedAt === null ? 0 : (now - intro.startedAt) / 1000;
+    const pose = spawnCinematicPose(elapsed, intro.cinematic);
+    input.camYaw = pose.yaw;
+    input.camPitch = pose.pitch;
+    input.camDist = pose.dist;
+    if (pose.done) finishIntro(false);
+  };
+  if (playIntro && !introSeen && world.player.level <= 1 && !settings.get('reduceMotion')) {
+    intro = {
+      cinematic: spawnCinematicFor({
+        yaw: input.camYaw,
+        pitch: input.camPitch,
+        dist: input.camDist,
+      }),
+      startedAt: null,
+    };
+    setIntroUiHidden(true);
+    window.addEventListener('keydown', skipIntro, true);
+    window.addEventListener('pointerdown', skipIntro, true);
+  }
   input.suspendMovement = true;
   await nextPaint();
   try {
@@ -2486,6 +2593,9 @@ async function startGame(
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       hideLoadingScreen();
+      // Start the intro clock as the loading screen begins to fade: the camera
+      // holds the opening pose until now, so the fade doubles as the cut in.
+      if (intro) intro.startedAt = performance.now();
       window.setTimeout(() => {
         gameInputReady = true;
         perf.reset();
@@ -2588,7 +2698,7 @@ async function startOffline(playerClass: PlayerClass, name: string, skin = 0): P
   }
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
-  void startGame(sim, sim, null, `offline:${playerClass}:${name}`);
+  void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
 }
 
 // ---------------------------------------------------------------------------
@@ -3941,7 +4051,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   const poll = setInterval(() => {
     if (world.connected && world.entities.has(world.playerId)) {
       clearInterval(poll);
-      void startGame(world, null, world, `char:${c.id}`);
+      void startGame(world, null, world, `char:${c.id}`, true);
     } else if (Date.now() - waitStart > 10000) {
       clearInterval(poll);
       world.close();

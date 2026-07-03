@@ -186,7 +186,6 @@
         <div class="uf-name" id="tf-name"></div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
-        <div class="combo-row" id="combo-row"></div>
         <div class="uf-buffs" id="tf-debuffs"></div>
       </div>
     </div>
@@ -211,6 +210,9 @@
              accessible #map-window as the alternative, per the zone-label decision. -->
         <canvas id="minimap" width="162" height="162" aria-hidden="true"></canvas>
         <button id="raid-lockout" type="button" hidden data-i18n-title="hudChrome.raidLockout.title" data-i18n-aria="hudChrome.raidLockout.title" title="Raid Lockouts" aria-label="Raid Lockouts"></button>
+        <!-- Ravenpost envelope: visible while unread letters wait (role=status so
+             arrivals are announced; reading them still requires a mailbox). -->
+        <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
@@ -265,6 +267,7 @@
             </div>
             <div class="uf-bars">
               <div class="uf-name" id="pf-name"></div>
+              <div class="combo-row" id="combo-row"></div>
               <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
             </div>
@@ -336,6 +339,8 @@
     <div id="leaderboard-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
+    <div id="mailbox-window" class="window panel"></div>
+    <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
     <div id="emote-editor" class="window panel"></div>

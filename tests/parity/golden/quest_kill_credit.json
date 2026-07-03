@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "76a28989",
+      "nextId": 394,
+      "state": "0db86a02",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -32,14 +32,16 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
+          "mailWelcomed": true,
           "talents": {
             "choices": {},
             "ranks": {}
@@ -52,13 +54,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -101,9 +104,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 391,
-      "state": "14b8d688",
-      "events": "56fe5cab",
+      "nextId": 394,
+      "state": "192de711",
+      "events": "a19f7ba9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -118,15 +121,17 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_wolves",
@@ -151,13 +156,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 390,
+          "id": 393,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -200,9 +206,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 399,
-      "state": "161a36a0",
-      "events": "274fa6ec",
+      "nextId": 402,
+      "state": "2e8b9ccd",
+      "events": "ea40c5a4",
       "rng": {
         "draws": 32,
         "digest": "4d504aff"
@@ -221,15 +227,17 @@
             "kills": 8,
             "questProgress": 8
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
           "questLog": [
             [
               "q_wolves",
@@ -254,13 +262,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 0.05,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 390,
+          "id": 393,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -304,9 +313,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 399,
-      "state": "1451ec09",
-      "events": "82df21d7",
+      "nextId": 402,
+      "state": "85389b3e",
+      "events": "58a4592f",
       "rng": {
         "draws": 32,
         "digest": "4d504aff"
@@ -328,15 +337,17 @@
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27850,
+          "mailWelcomed": true,
           "questsDone": [
             "q_wolves"
           ],
@@ -353,13 +364,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 0.05,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 390,
+          "id": 393,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -403,8 +415,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 399,
-      "state": "7dee0fa5",
+      "nextId": 402,
+      "state": "4ce23936",
       "events": "741638a5",
       "rng": {
         "draws": 32,
@@ -427,15 +439,17 @@
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 390,
+          "entityId": 393,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "lifetimeXp": 27850,
+          "mailWelcomed": true,
           "questsDone": [
             "q_wolves"
           ],
@@ -452,13 +466,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 0.15,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 390,
+          "id": 393,
           "inCombat": true,
           "kind": "player",
           "level": 10,

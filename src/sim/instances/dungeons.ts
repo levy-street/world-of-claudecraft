@@ -253,10 +253,6 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
       if (e?.targetId === id) e.targetId = null;
-      if (e?.comboTargetId === id) {
-        e.comboTargetId = null;
-        e.comboPoints = 0;
-      }
     }
     ctx.dropEntity(id);
   }

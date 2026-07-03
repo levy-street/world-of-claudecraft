@@ -294,6 +294,9 @@ export interface SimContextCallbacks {
   // delegate; partyOf stays on Sim (A1's thin delegate -> social/party).
   clearEntityMarker(entityId: number): void;
   partyOf(pid: number): Party | null;
+  // Invite a player to the actor's party by pid (delegates to the PartyMachine);
+  // used by the chat "/invite <name>" command in social/chat.ts.
+  partyInvite(targetPid: number, pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
@@ -568,6 +571,11 @@ export interface SimContextCallbacks {
   targetEntity(id: number | null, pid?: number): void;
   partyCapacity(party: Party | null): number;
   marketListingBelongsTo(listing: MarketListing, meta: PlayerMeta): boolean;
+
+  // Ravenpost mail (mail/post_office.ts): the quest turn-in core
+  // (quests/quest_commands.ts) queues the giver's authored thank-you letter
+  // through this; the binding points at the PostOffice instance on Sim.
+  queueQuestLetter(questId: string, pid: number): void;
 }
 
 // The seam consumed by extracted modules.
@@ -778,6 +786,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     removeFungibleItem: host.removeFungibleItem,
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
+    partyInvite: host.partyInvite,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
     onMobKilledForQuests: host.onMobKilledForQuests,
@@ -904,5 +913,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     targetEntity: host.targetEntity,
     partyCapacity: host.partyCapacity,
     marketListingBelongsTo: host.marketListingBelongsTo,
+    // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
+    queueQuestLetter: host.queueQuestLetter,
   };
 }

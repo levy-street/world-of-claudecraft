@@ -814,11 +814,7 @@ function shouldTryAbility(caster: Entity, target: Entity, ability: string): bool
   if (TARGET_DEBUFF_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
   if (ability === 'demoralizing_roar' && auraActive(target, 'demoralizing_roar_ap', caster.id))
     return false;
-  if (
-    FIVE_COMBO_FINISHERS.has(ability) &&
-    (caster.comboTargetId !== target.id || caster.comboPoints < 5)
-  )
-    return false;
+  if (FIVE_COMBO_FINISHERS.has(ability) && caster.comboPoints < 5) return false;
   if ((ability === 'growl' || ability === 'taunt') && target.aggroTargetId === caster.id)
     return false;
   if ((ability === 'maul' || ability === 'heroic_strike') && caster.queuedOnSwing === ability)

@@ -120,11 +120,9 @@ function targetNameColor(e: Entity): string {
   return (e as unknown as TargetState).hostile ? 'var(--color-hostile)' : 'var(--color-friendly)';
 }
 
-// The inline combo-pip selection: combo points count only for the entity they were
-// built against (comboTargetId === target.id), else zero.
-function litComboPips(comboTargetId: number | null, comboPoints: number, targetId: number): number {
-  return comboTargetId === targetId ? comboPoints : 0;
-}
+// Combo points are character-bound (retail-style): the pips moved to the PLAYER
+// frame and light straight from the wire-mirrored `comboPoints` self field, so
+// there is no per-target pip selection left in the target frame to diverge.
 
 describe('target frame: Sim-vs-ClientWorld parity', () => {
   it('renders the wire-carried frame fields identically across hosts', () => {
@@ -173,14 +171,5 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // hardcast fill = 1 - remaining/total = 1 - 1.5/4 = 0.625; same on both hosts.
     expect(fromSim.fill).toBeCloseTo(0.625);
     expect(simTarget().castRemaining).toBe(clientTarget().castRemaining);
-  });
-
-  it('the combo-pip count matches across hosts and only counts for this target', () => {
-    // comboTargetId/comboPoints (self fields) are wired, so the selection matches.
-    expect(litComboPips(5, 3, simTarget().id)).toBe(litComboPips(5, 3, clientTarget().id));
-    expect(litComboPips(5, 3, 5)).toBe(3);
-    // points built against a DIFFERENT target (or none) do not light this target.
-    expect(litComboPips(9, 3, 5)).toBe(0);
-    expect(litComboPips(null, 3, 5)).toBe(0);
   });
 });

@@ -1055,6 +1055,7 @@ export const en = {
     },
     dungeons: { ...worldNames.en.entities.dungeons, ...mergeExtra.en.dungeons },
     delves: { ...worldNames.en.entities.delves },
+    letters: { ...worldNames.en.entities.letters },
   },
 };
 

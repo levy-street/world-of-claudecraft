@@ -68,9 +68,11 @@ import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targ
 import type { ResolvedAbility } from '../sim/sim';
 import type {
   AbilityDef,
+  CalendarResultCode,
   EquipSlot,
   InvSlot,
   LootRollChoice,
+  MailResultCode,
   PetMode,
   PlayerClass,
   ResourceType,
@@ -123,6 +125,7 @@ import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
 import { BagsWindow } from './bags_window';
+import { CalendarWindow } from './calendar_window';
 import { CastBarPainter } from './cast_bar_painter';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { CharWindow } from './char_window';
@@ -233,6 +236,8 @@ import { lootSettingsView } from './loot_settings_view';
 import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
+import { mailIndicatorView } from './mailbox_view';
+import { MailboxWindow } from './mailbox_window';
 import {
   mapQuestListView,
   parseUntrackedQuests,
@@ -261,6 +266,7 @@ import {
   nextMinimapZoom,
 } from './minimap_zoom';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
+import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
@@ -311,12 +317,6 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
-import {
-  clampTargetFramePos,
-  parseTargetFramePos,
-  serializeTargetFramePos,
-  type TargetFramePos,
-} from './target_frame_pos';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { TutorialOverlay } from './tutorial';
@@ -461,6 +461,33 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   rage: 'abilityUi.resources.rage',
   energy: 'abilityUi.resources.energy',
 };
+// Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
+// are successes rendered as chat-log lines in handleEvents, but they map here
+// too so every code resolves without a fallback.
+const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
+  sent: 'hudChrome.mailbox.result.sent',
+  collected: 'hudChrome.mailbox.result.collected',
+  tooFar: 'hudChrome.mailbox.result.tooFar',
+  needRecipient: 'hudChrome.mailbox.result.needRecipient',
+  noRecipient: 'hudChrome.mailbox.result.noRecipient',
+  tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
+  noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
+  notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
+  cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
+  recipientBoxFull: 'hudChrome.mailbox.result.recipientBoxFull',
+  letterGone: 'hudChrome.mailbox.result.letterGone',
+  takeParcelsFirst: 'hudChrome.mailbox.result.takeParcelsFirst',
+};
+// Guild calendar outcome lines (created/removed are chat-log successes).
+const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
+  created: 'hudChrome.calendar.result.created',
+  removed: 'hudChrome.calendar.result.removed',
+  notInGuild: 'hudChrome.calendar.result.notInGuild',
+  notOfficer: 'hudChrome.calendar.result.notOfficer',
+  badInput: 'hudChrome.calendar.result.badInput',
+  calendarFull: 'hudChrome.calendar.result.calendarFull',
+  eventGone: 'hudChrome.calendar.result.eventGone',
+};
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
   'hud.markers.names.circle',
@@ -552,7 +579,9 @@ const CHAT_ACTIVE_TAB_KEY = 'woc_chat_active_tab';
 // Persisted chat-window geometry (drag position + resize size). Desktop only —
 // the mobile layout owns its own placement and ignores this.
 const CHAT_GEOMETRY_KEY = 'woc_chat_geometry';
+// Persisted top-left for each movable unit frame (MovableFrame in movable_frame.ts).
 const TARGET_FRAME_POS_KEY = 'woc_target_frame_pos';
+const PLAYER_FRAME_POS_KEY = 'woc_player_frame_pos';
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   yell: 'hud.chat.templates.yell',
@@ -1047,13 +1076,11 @@ export class Hud {
         startH: number;
       }
     | null = null;
-  // Movable target frame: the persisted top-left (null = stock CSS default), the
-  // move/lock button, whether the frame is currently unlocked for dragging, and the
-  // in-progress drag gesture. See target_frame_pos.ts for the math.
-  private targetFramePos: TargetFramePos | null = null;
-  private targetFrameMoveBtn: HTMLButtonElement | null = null;
-  private targetFrameUnlocked = false;
-  private targetFrameGesture: { pointerId: number; grabX: number; grabY: number } | null = null;
+  // Movable unit frames (the shared MovableFrame controller, movable_frame.ts):
+  // the target frame and the player frame each get a corner move/lock button, a
+  // pointer drag, and a persisted top-left. Constructed once in initFrameMovers.
+  private targetFrameMover: MovableFrame | null = null;
+  private playerFrameMover: MovableFrame | null = null;
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
   private ignoredChatNames = new Set<string>();
@@ -1101,6 +1128,9 @@ export class Hud {
   private meters: Meters;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
+  // Ravenpost envelope indicator (slow-band, value-diffed; see updateMailIndicator).
+  private mailIndicatorEl: HTMLElement | null = null;
+  private lastMailUnread = -1;
   private pendingPetFeed = false;
   private petModeMenuOpen = false;
   // Talents: the local staged allocation the user edits before committing it on save
@@ -1116,7 +1146,7 @@ export class Hud {
     this.meters = new Meters(sim);
     this.initChatTabs();
     this.initChatBoxGeometry();
-    this.initTargetFrameDrag();
+    this.initFrameMovers();
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.loadSlotMap();
@@ -1845,6 +1875,14 @@ export class Hud {
       case 'market-window':
         this.closeMarket();
         break;
+      case 'mailbox-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.mailboxWindow.close();
+        break;
+      case 'calendar-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.calendarWindow.close();
+        break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
         // consistent with the toggle / X close path.
@@ -2128,155 +2166,65 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
-  // Movable / lockable target frame (desktop only). The pure position math
-  // (clamping, (de)serialization) lives in target_frame_pos.ts; this section is
-  // the DOM wiring: a small corner button that toggles the frame between locked
-  // (fixed) and unlocked (draggable), the pointer drag itself, and localStorage
-  // persistence of the chosen spot. The saved spot survives reloads; the lock
-  // state does not (the frame always loads locked so a stray drag never moves it).
-  // Mirrors the movable chat box above (its resize-less sibling).
+  // Movable / lockable unit frames (desktop only). The DOM wiring (corner
+  // move/lock button, pointer drag, localStorage persistence) lives in the
+  // shared MovableFrame controller (movable_frame.ts); the pure position math
+  // in target_frame_pos.ts. Two instances: the target frame keeps its stock
+  // look wherever it lands; the player frame DETACHES from the action-bar
+  // stack once moved (pf-detached: position fixed + the compact target-frame
+  // bar width), so it can sit anywhere and read like the target frame.
   // -------------------------------------------------------------------------
 
-  private initTargetFrameDrag(): void {
-    const frame = this.targetFrameEl;
-    if (!frame) return;
-
-    // The corner toggle. Built here (like the chat resize grip) so index.html
-    // stays untouched; its glyph + position are styled in hud.css.
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'tf-move-btn';
-    btn.setAttribute('aria-pressed', 'false');
-    frame.appendChild(btn);
-    this.targetFrameMoveBtn = btn;
-    this.refreshTargetFrameMoveBtn();
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      this.setTargetFrameUnlocked(!this.targetFrameUnlocked);
-    });
-
-    // touch-action:none (so a drag is not stolen by browser panning) is scoped to
-    // the unlocked state in CSS (#target-frame.tf-unlocked), never applied while
-    // locked so it cannot interfere with normal touch behaviour on the frame.
-    frame.addEventListener('pointerdown', (ev) => this.onTargetFrameMoveStart(ev));
-    document.addEventListener('pointermove', (ev) => this.onTargetFramePointerMove(ev));
-    const end = (ev: PointerEvent) => this.onTargetFramePointerEnd(ev);
-    document.addEventListener('pointerup', end);
-    document.addEventListener('pointercancel', end);
-    // Re-clamp into view when the viewport changes (mirrors the chat box logic).
-    window.addEventListener('resize', () => {
-      if (this.targetFramePos) this.applyTargetFramePos();
-    });
-
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(TARGET_FRAME_POS_KEY);
-    } catch {
-      /* storage unavailable */
+  private initFrameMovers(): void {
+    const isMobileLayout = () => this.isMobileLayout();
+    if (this.targetFrameEl) {
+      this.targetFrameMover = new MovableFrame({
+        frame: this.targetFrameEl,
+        storageKey: TARGET_FRAME_POS_KEY,
+        unlockLabelKey: 'hudChrome.targetFrame.unlock',
+        lockLabelKey: 'hudChrome.targetFrame.lock',
+        draggingBodyClass: 'target-frame-dragging',
+        fallbackSize: { w: 220, h: 92 },
+        isMobileLayout,
+      });
     }
-    this.targetFramePos = parseTargetFramePos(saved);
-    if (this.targetFramePos) this.applyTargetFramePos();
-  }
-
-  // The move button's accessible name / tooltip and pressed state track whether the
-  // frame is unlocked; the frame gets a class so the cursor + drag affordance show.
-  private refreshTargetFrameMoveBtn(): void {
-    const btn = this.targetFrameMoveBtn;
-    if (!btn) return;
-    const label = this.targetFrameUnlocked
-      ? t('hudChrome.targetFrame.lock')
-      : t('hudChrome.targetFrame.unlock');
-    btn.setAttribute('aria-pressed', this.targetFrameUnlocked ? 'true' : 'false');
-    btn.setAttribute('aria-label', label);
-    btn.title = label;
-    btn.classList.toggle('active', this.targetFrameUnlocked);
-    this.targetFrameEl.classList.toggle('tf-unlocked', this.targetFrameUnlocked);
-  }
-
-  private setTargetFrameUnlocked(unlocked: boolean): void {
-    this.targetFrameUnlocked = unlocked;
-    this.refreshTargetFrameMoveBtn();
-  }
-
-  // Seed targetFramePos from the live rect the first time a drag starts, so a frame
-  // still on its CSS default converts cleanly to explicit px coordinates.
-  private ensureTargetFramePos(): void {
-    if (this.targetFramePos) return;
-    const rect = this.targetFrameEl.getBoundingClientRect();
-    this.targetFramePos = { left: rect.left, top: rect.top };
-  }
-
-  private onTargetFrameMoveStart(ev: PointerEvent): void {
-    if (ev.button !== 0 || this.isMobileLayout() || !this.targetFrameUnlocked) return;
-    const target = ev.target as HTMLElement | null;
-    // The move button (and any debuff icon buttons) keep their own behaviour; only
-    // the frame body area initiates a drag.
-    if (!target || target.closest('button')) return;
-    ev.preventDefault();
-    this.ensureTargetFramePos();
-    const rect = this.targetFrameEl.getBoundingClientRect();
-    this.targetFrameGesture = {
-      pointerId: ev.pointerId,
-      grabX: ev.clientX - rect.left,
-      grabY: ev.clientY - rect.top,
-    };
-    document.body.classList.add('target-frame-dragging');
-    try {
-      this.targetFrameEl.setPointerCapture?.(ev.pointerId);
-    } catch {
-      /* synthetic pointer */
+    if (this.playerFrameEl) {
+      this.playerFrameMover = new MovableFrame({
+        frame: this.playerFrameEl,
+        storageKey: PLAYER_FRAME_POS_KEY,
+        unlockLabelKey: 'hudChrome.playerFrame.unlock',
+        lockLabelKey: 'hudChrome.playerFrame.lock',
+        draggingBodyClass: 'player-frame-dragging',
+        fallbackSize: { w: 260, h: 84 },
+        isMobileLayout,
+        onPositioned: (active) => this.setPlayerFrameDetached(active),
+      });
     }
   }
 
-  private onTargetFramePointerMove(ev: PointerEvent): void {
-    const g = this.targetFrameGesture;
-    if (!g || g.pointerId !== ev.pointerId) return;
-    ev.preventDefault();
-    this.targetFramePos = { left: ev.clientX - g.grabX, top: ev.clientY - g.grabY };
-    this.applyTargetFramePos();
+  // Public: snap both movable unit frames back to their stock CSS spots and
+  // forget the saved drags. Wired to the "Reset Frame Positions" interface option.
+  resetUnitFrames(): void {
+    this.targetFrameMover?.reset();
+    this.playerFrameMover?.reset();
   }
 
-  private onTargetFramePointerEnd(ev: PointerEvent): void {
-    const g = this.targetFrameGesture;
-    if (!g || g.pointerId !== ev.pointerId) return;
-    this.targetFrameGesture = null;
-    document.body.classList.remove('target-frame-dragging');
-    this.persistTargetFramePos();
-  }
-
-  private applyTargetFramePos(): void {
-    if (!this.targetFramePos) return;
-    // On the mobile layout the desktop-saved position must not apply. Clear any
-    // inline left/top/right/bottom (e.g. left over after a live desktop-to-mobile
-    // viewport shrink) so the mobile stylesheet owns the frame's position again.
-    if (this.isMobileLayout()) {
-      for (const prop of ['left', 'top', 'right', 'bottom'])
-        this.targetFrameEl.style.removeProperty(prop);
-      return;
-    }
-    const rect = this.targetFrameEl.getBoundingClientRect();
-    // The frame is display:none with no target (rect is 0x0); fall back to a nominal
-    // size so a saved spot still clamps sensibly and re-shows on-screen.
-    const size = { w: rect.width || 220, h: rect.height || 92 };
-    const clamped = clampTargetFramePos(
-      this.targetFramePos,
-      { w: window.innerWidth, h: window.innerHeight },
-      size,
-    );
-    this.targetFramePos = clamped;
-    this.targetFrameEl.style.left = `${clamped.left}px`;
-    this.targetFrameEl.style.top = `${clamped.top}px`;
-    this.targetFrameEl.style.right = 'auto';
-    this.targetFrameEl.style.bottom = 'auto';
-  }
-
-  private persistTargetFramePos(): void {
-    if (!this.targetFramePos) return;
-    try {
-      localStorage.setItem(TARGET_FRAME_POS_KEY, serializeTargetFramePos(this.targetFramePos));
-    } catch {
-      /* storage unavailable */
+  // The player frame docks inside #actionbar-stack, whose #bottom-bar ancestor
+  // carries a centering transform, and a transformed ancestor hijacks any
+  // fixed/absolute positioning (it becomes the containing block). Detaching
+  // therefore REPARENTS the frame to #ui, the target frame's own parent, so the
+  // saved left/top resolve in the same HUD coordinates the target frame uses;
+  // re-docking (the mobile layout) puts it back at the head of the stack. The
+  // painters' element refs (pf-hp etc.) are live nodes, so they survive the move.
+  private setPlayerFrameDetached(active: boolean): void {
+    const frame = this.playerFrameEl;
+    frame.classList.toggle('pf-detached', active);
+    if (active) {
+      const uiRoot = $('#ui');
+      if (frame.parentElement !== uiRoot) uiRoot.appendChild(frame);
+    } else {
+      const stack = $('#actionbar-stack');
+      if (frame.parentElement !== stack) stack.insertBefore(frame, stack.firstChild);
     }
   }
 
@@ -2885,8 +2833,8 @@ export class Hud {
   // `lastPortraitKey`). It passes NO resource group (the target has no power bar) and
   // NO `stateClasses` (the target carries its own `elite` class, painted at the call
   // site, not the party dead/out-of-range classes). The target-only concerns the
-  // family does not express (the elite class + tag, the hostile/friendly name color,
-  // the combo pips) route through the SAME elided writers in update() below.
+  // family does not express (the elite class + tag, the hostile/friendly name
+  // color) route through the SAME elided writers in update() below.
   private readonly targetFramePainter = new UnitFramePainter(
     this.writerFacet,
     {
@@ -3066,10 +3014,12 @@ export class Hud {
     vendorOpen: () => this.vendorOpen,
     tradeOpen: () => this.tradeOpen,
     isMarketSell: () => this.marketWindow.isSellTab,
+    isMailAttach: () => this.mailboxWindow.isSendTab,
     pendingPetFeed: () => this.pendingPetFeed,
     closeVendor: () => this.closeVendor(),
     addItemToTrade: (itemId) => this.addItemToTrade(itemId),
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
+    stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
@@ -3106,6 +3056,37 @@ export class Hud {
         this.renderBags();
       }
     },
+  });
+  // Ravenpost mailbox window painter (mailbox_view.ts core + mailbox_window.ts
+  // painter). It owns the mailbox view-state (tab, opened letter, staged
+  // parcels); the bags window rides alongside the Send tab and stages parcels
+  // through the same cross-window closures the market Sell tab uses.
+  private readonly mailboxWindow = new MailboxWindow({
+    ...this.presentationBag,
+    root: () => $('#mailbox-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#mailbox-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#mailbox-window'),
+    showError: (text) => this.showError(text),
+    syncBags: (open) => {
+      if (open) {
+        this.renderBags();
+        $('#bags').style.display = 'flex';
+      } else if ($('#bags').style.display !== 'none') {
+        this.renderBags();
+      }
+    },
+  });
+  // Event calendar window painter (calendar_view.ts month-grid core +
+  // calendar_window.ts painter). System events expand from data rules; guild
+  // events read the socialInfo mirror and book/remove through IWorld.
+  private readonly calendarWindow = new CalendarWindow({
+    root: () => $('#calendar-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#calendar-window'),
+    ...this.windowFocus('#calendar-window'),
+    showError: (text) => this.showError(text),
   });
   // Ashen Coliseum window painter (arena_window_view.ts offline/live model +
   // arena_window.ts painter). It owns the selected bracket, the all-time-ladder
@@ -3197,6 +3178,7 @@ export class Hud {
     // The gold log tint stays Hud-side so the painter carries no color literal.
     log: (message) => this.log(message, '#ffd100'),
     resetChatWindow: () => this.resetChatWindow(),
+    resetUnitFrames: () => this.resetUnitFrames(),
     getChatTimestamps: () => this.chatTimestamps,
     setChatTimestamps: (on) => {
       this.chatTimestamps = on;
@@ -3754,10 +3736,11 @@ export class Hud {
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
-    // The target-frame move/lock button's label is set once at construction + on
-    // toggle, so re-localize it in place on a language switch (same reason as the
-    // party rows above).
-    this.refreshTargetFrameMoveBtn();
+    // The unit-frame move/lock buttons' labels are set once at construction + on
+    // toggle, so re-localize them in place on a language switch (same reason as
+    // the party rows above).
+    this.targetFrameMover?.relocalize();
+    this.playerFrameMover?.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
@@ -5106,6 +5089,29 @@ export class Hud {
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
 
+    // combo points: character-bound (retail-style), so the row of pips rides the
+    // PLAYER frame (over the hp bar) and stays lit across target swaps until the
+    // points are spent or fade. The row is lazy-built ONCE (then only the `on`
+    // class is toggled per frame, through the elided writer), never rebuilt.
+    if (p.resourceType === 'energy') {
+      this.setDisplay(this.comboRowEl, 'flex');
+      if (this.comboRowEl.children.length !== COMBO_PIP_COUNT) {
+        this.comboRowEl.innerHTML = '';
+        for (let i = 0; i < COMBO_PIP_COUNT; i++) {
+          const pip = document.createElement('div');
+          pip.className = 'combo-pip';
+          this.comboRowEl.appendChild(pip);
+        }
+      }
+      // indexed walk over the live collection: no per-frame array copy
+      const pips = this.comboRowEl.children;
+      for (let i = 0; i < pips.length; i++) {
+        this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);
+      }
+    } else {
+      this.setDisplay(this.comboRowEl, 'none');
+    }
+
     // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
     // separate rows (classic layout) so a fresh debuff is never lost in a wall of long-lived
@@ -5122,8 +5128,8 @@ export class Hud {
     // target frame: the SECOND instance of the unit_frame family. The shared
     // frame (display/name/level/hp/absorb/portrait gate) goes through the family
     // painter; the target-only concerns (the elite class + tag, the hostile/friendly
-    // name color, and the combo pips) route through the SAME elided writers here, and
-    // the target debuffs + cast bar CONSUME the existing auras paint + the cast_bar
+    // name color) route through the SAME elided writers here, and the target
+    // debuffs + cast bar CONSUME the existing auras paint + the cast_bar
     // target instance. (Targeting a world object hides the frame, like no target.)
     const target = p.targetId !== null ? sim.entities.get(p.targetId) : null;
     if (target && target.kind !== 'object') {
@@ -5134,7 +5140,7 @@ export class Hud {
       // portrait refresh (~10Hz), while the SELF/player frame stays full-rate. A target
       // SWAP bypasses the throttle so selecting a new target updates immediately. The full
       // tiers return interval 0 (cadenceDue always true), so this paints every frame as
-      // before. The elite tag / name color / debuffs / cast bar / combo below stay
+      // before. The elite tag / name color / debuffs / cast bar below stay
       // full-rate (debuffs are separately tiered; the cast bar is a raid
       // mechanic indicator), so only the unit_frame body is throttled.
       const targetChanged = target.id !== this.lastTargetFrameId;
@@ -5222,27 +5228,6 @@ export class Hud {
         cast: castBarState(target),
         castRemaining: target.castRemaining,
       });
-      // combo points: the row of pips is lazy-built ONCE (then only the `on` class is
-      // toggled per frame, through the elided writer), never rebuilt per frame.
-      if (p.resourceType === 'energy') {
-        this.setDisplay(this.comboRowEl, 'flex');
-        if (this.comboRowEl.children.length !== COMBO_PIP_COUNT) {
-          this.comboRowEl.innerHTML = '';
-          for (let i = 0; i < COMBO_PIP_COUNT; i++) {
-            const pip = document.createElement('div');
-            pip.className = 'combo-pip';
-            this.comboRowEl.appendChild(pip);
-          }
-        }
-        const points = p.comboTargetId === target.id ? p.comboPoints : 0;
-        // indexed walk over the live collection: no per-frame array copy
-        const pips = this.comboRowEl.children;
-        for (let i = 0; i < pips.length; i++) {
-          this.toggleClass(pips[i] as HTMLElement, 'on', i < points);
-        }
-      } else {
-        this.setDisplay(this.comboRowEl, 'none');
-      }
     } else {
       // No target (or a world object): hide the frame. The painter also resets its
       // portrait gate here, so re-acquiring a target repaints (the old -999 reset). Reset
@@ -5471,6 +5456,29 @@ export class Hud {
     if (slowHud && this.marketWindow.isOpen) {
       if (!this.nearbyMarketNpc()) this.marketWindow.close();
       else this.marketWindow.refreshIfChanged();
+    }
+    // The mailbox closes itself when the mail mirror goes null (walked away).
+    if (slowHud && this.mailboxWindow.isOpen) this.mailboxWindow.refreshIfChanged();
+    if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
+    if (slowHud) this.updateMailIndicator();
+  }
+
+  // The envelope indicator by the minimap: visible while unread letters wait.
+  // Slow-band, value-diffed writes only (mailUnread changes rarely).
+  private updateMailIndicator(): void {
+    const el = this.mailIndicatorEl ?? ($('#mail-indicator') as HTMLElement | null);
+    if (!el) return;
+    this.mailIndicatorEl = el;
+    const view = mailIndicatorView(this.sim.mailUnread);
+    if (view.count === this.lastMailUnread) return;
+    this.lastMailUnread = view.count;
+    const count = formatNumber(view.count, { maximumFractionDigits: 0 });
+    el.hidden = !view.visible;
+    if (view.visible) {
+      const badge = el.querySelector<HTMLElement>('.mail-indicator-count');
+      if (badge) badge.textContent = count;
+      el.setAttribute('aria-label', t('hudChrome.mailbox.indicatorAria', { count }));
+      el.title = t('hudChrome.mailbox.indicatorTip', { count });
     }
   }
 
@@ -7083,6 +7091,51 @@ export class Hud {
         case 'skinEvent':
           this.openSkinEvent(ev.rank, ev.catalog === 'mech' ? { mech: true } : undefined);
           break;
+        case 'mailbox':
+          // Keyboard/sim interact at a mailbox object: open the mail window.
+          this.openMailbox();
+          break;
+        case 'mailArrived': {
+          // Player names splice verbatim; authored letters carry their
+          // letterId, so the sender localizes through the entity dictionary
+          // exactly like the mailbox window does.
+          const sender = ev.letterId
+            ? tEntity({ kind: 'letter', id: ev.letterId, field: 'sender' })
+            : ev.senderName;
+          audio.whisper();
+          this.showBanner(t('hudChrome.mailbox.arrivedBanner', { name: sender }));
+          this.log(t('hudChrome.mailbox.arrivedLog', { name: sender }), '#c8f7c5');
+          this.lastMailUnread = -1; // force the envelope indicator to repaint
+          break;
+        }
+        case 'mailResult': {
+          const values = {
+            name: ev.name ?? '',
+            count: formatNumber(ev.value ?? 0, { maximumFractionDigits: 0 }),
+            amount: formatLocalizedMoney(ev.value ?? 0),
+            postage: formatLocalizedMoney(ev.value ?? 0),
+          };
+          if (ev.code === 'sent') {
+            audio.coin();
+            this.log(t('hudChrome.mailbox.result.sent', values), '#c8f7c5');
+          } else if (ev.code === 'collected') {
+            this.log(t('hudChrome.mailbox.result.collected', values), '#c8f7c5');
+          } else {
+            this.showError(t(MAIL_RESULT_ERROR_KEYS[ev.code], values));
+          }
+          this.mailboxWindow.onMailResult(ev.code);
+          this.lastMailUnread = -1;
+          break;
+        }
+        case 'calendarResult': {
+          if (ev.code === 'created' || ev.code === 'removed') {
+            this.log(t(CALENDAR_RESULT_KEYS[ev.code]), '#c8f7c5');
+          } else {
+            this.showError(t(CALENDAR_RESULT_KEYS[ev.code]));
+          }
+          this.calendarWindow.onCalendarResult(ev.code);
+          break;
+        }
         case 'error':
           this.showError(this.localizeErrorText(ev.text));
           break;
@@ -7906,6 +7959,7 @@ export class Hud {
       'You have nothing to collect.': 'itemUi.errors.nothingToCollect',
       "You can't assist yourself.": 'hud.errors.assistSelf',
       'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
+      'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
     };
     const key = exact[text];
     if (key) return t(key);
@@ -9294,6 +9348,30 @@ export class Hud {
 
   get marketWindowOpen(): boolean {
     return this.marketWindow.isOpen;
+  }
+
+  openMailbox(): void {
+    this.mailboxWindow.open();
+  }
+
+  closeMailbox(): void {
+    this.mailboxWindow.close();
+  }
+
+  get mailboxWindowOpen(): boolean {
+    return this.mailboxWindow.isOpen;
+  }
+
+  toggleCalendar(): void {
+    this.calendarWindow.toggle();
+  }
+
+  closeCalendar(): void {
+    this.calendarWindow.close();
+  }
+
+  get calendarWindowOpen(): boolean {
+    return this.calendarWindow.isOpen;
   }
 
   private nearbyMarketNpc(): Entity | null {

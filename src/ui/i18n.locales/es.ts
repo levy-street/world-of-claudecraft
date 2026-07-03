@@ -306,6 +306,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnPlayerCard': 'Mostrar cartera en la tarjeta de jugador',
   'hudChrome.playerCard.showWalletBadge': 'Mostrar insignia de cartera',
   'hudChrome.options.uiScale': 'Escala de la interfaz',
+  'hudChrome.options.playerFrameScale': 'Escala del marco del jugador',
+  'hudChrome.options.targetFrameScale': 'Escala del marco del objetivo',
+  'hudChrome.playerFrame.unlock': 'Mover marco del jugador',
+  'hudChrome.playerFrame.lock': 'Fijar marco del jugador',
+  'hudChrome.frameReset.label': 'Restablecer posición de los marcos',
   'hudChrome.options.highContrastBackground': 'Fondo de alto contraste',
   'hudChrome.options.showItemLevel': 'Mostrar nivel de objeto',
   'hudChrome.options.itemLevelLine': 'Nivel de objeto {level}',
@@ -3181,6 +3186,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.brightwood_venison.name': 'Venado de Brightwood',
   'entities.items.bramblehide_jerkin.name': 'Jubón de piel de zarza',
   'entities.items.monarch_crown_helm.name': 'Corona del Monarca',
+  'entities.items.copper_mining_pick.name': 'Pico de Minería de Cobre',
+  'entities.items.iron_mining_pick.name': 'Pico de Minería de Hierro',
+  'entities.items.mithril_mining_pick.name': 'Pico de Minería de Mithril',
+  'entities.items.handaxe.name': 'Hacha de Mano',
+  'entities.items.felling_axe.name': 'Hacha de Tala',
+  'entities.items.ironbark_axe.name': 'Hacha de Corteza de Hierro',
+  'entities.items.gathering_sickle.name': 'Hoz de Recolección',
+  'entities.items.bronze_sickle.name': 'Hoz de Bronce',
+  'entities.items.silverleaf_sickle.name': 'Hoz de Hoja de Plata',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Añadir canal de chat',
   'hud.core.chatChannels.addTitle': 'Añadir canal',
@@ -5208,4 +5222,21 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Ahora no',
   'hudChrome.nativeUpdate.title': 'Actualización disponible',
   'hudChrome.nativeUpdate.update': 'Actualizar',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'El Correo del Cuervo',
+  'entities.letters.ravenpost_welcome.subject': 'Los cuervos ya vuelan por ti',
+  'entities.letters.ravenpost_welcome.body':
+    'Viajero:\n\nEl Correo del Cuervo ha abierto sus perchas a lo largo del valle. Busca los pilares del cuervo en Eastbrook, Fenbridge y Highwatch: desde cualquiera de ellos podrás enviar cartas, monedas y objetos a otros aventureros, y recoger lo que los cuervos te traigan.\n\nTe adjuntamos un pequeño detalle para tu primer sello.\n\nAlas arriba,\nEl Correo del Cuervo',
+  'entities.letters.letter_q_wolves.sender': 'Mariscal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Los rediles vuelven a estar en calma',
+  'entities.letters.letter_q_wolves.body':
+    'Los pastores por fin pueden dormir tranquilos, y eso es obra tuya. He pedido al Correo del Cuervo que te lleve un pequeño detalle del fondo de la guardia.\n\nMantén la hoja engrasada.\n- Mariscal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Mariscal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'El viejo Fauces Grises, por fin',
+  'entities.letters.letter_q_greyjaw.body':
+    'Las noticias vuelan en un pueblo tan pequeño. Anoche los pastores brindaron a tu salud, y Wilkes jura que el lobo era del tamaño de un carro. Deja que exageren: te lo has ganado.\n\nDate un banquete a cuenta de la guardia.\n- Mariscal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Hermano Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Lo que hiciste en la oscuridad',
+  'entities.letters.letter_q_hollow.body':
+    'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
 };

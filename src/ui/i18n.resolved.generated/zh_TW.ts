@@ -392,6 +392,8 @@ export const zh_TW: EnTranslations = {
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
       "uiScale": "介面縮放",
+      "playerFrameScale": "玩家框縮放",
+      "targetFrameScale": "目標框縮放",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
       "walkByAutoloot": "路過自動拾取",
@@ -718,7 +720,8 @@ export const zh_TW: EnTranslations = {
       "summaryGroup": "拾取設定：小隊拾取。"
     },
     "party": {
-      "promoteLeader": "提升為隊長"
+      "promoteLeader": "提升為隊長",
+      "inviteUsage": "邀請誰？用法：/invite <名稱>。"
     },
     "lootSettings": {
       "title": "拾取設定",
@@ -850,6 +853,13 @@ export const zh_TW: EnTranslations = {
     "targetFrame": {
       "unlock": "移動目標框",
       "lock": "鎖定目標框"
+    },
+    "playerFrame": {
+      "unlock": "移動玩家框",
+      "lock": "鎖定玩家框"
+    },
+    "frameReset": {
+      "label": "重置框體位置"
     },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}"
@@ -1025,6 +1035,112 @@ export const zh_TW: EnTranslations = {
       },
       "linkedAs": "已連結為 {login}",
       "unlink": "取消連結 GitHub"
+    },
+    "mailbox": {
+      "title": "郵箱",
+      "subtitle": "渡鴉郵驛",
+      "close": "關閉郵箱",
+      "tabInbox": "收件匣",
+      "tabInboxWithCount": "收件匣（{count}）",
+      "tabSend": "Send",
+      "empty": "你的郵箱是空的。",
+      "truncated": "顯示最新的 {shown} 封信（共 {total} 封）。",
+      "attachmentsBadge": "附有包裹",
+      "unreadBadge": "未讀",
+      "back": "Back",
+      "take": "領取附件",
+      "delete": "刪除信件",
+      "deleteAria": "刪除信件 {subject}",
+      "openAria": "閱讀來自 {name} 的信件 {subject}",
+      "noSubject": "（無主題）",
+      "toLabel": "To",
+      "toPlaceholder": "角色名字",
+      "subjectLabel": "主題",
+      "bodyLabel": "內容",
+      "coinLabel": "附上錢幣",
+      "parcelsLabel": "包裹",
+      "parcelsHint": "點擊背包中的物品即可附上。",
+      "removeParcelAria": "從信件中移除 {item}",
+      "sendButton": "寄出信件",
+      "postageNote": "郵資：{amount}。渡鴉飛行約 {seconds} 秒。",
+      "arrivedBanner": "渡鴉已降落：來自 {name} 的郵件。",
+      "arrivedLog": "你收到了來自 {name} 的新郵件。",
+      "indicatorAria": "未讀郵件：{count}",
+      "indicatorTip": "你有 {count} 封未讀信件。請前往郵箱閱讀。",
+      "clickAttach": "點擊以附到信件上。",
+      "cannotMail": "該物品無法郵寄。",
+      "result": {
+        "sent": "渡鴉帶著你給 {name} 的信起飛了（郵資 {postage}）。",
+        "collected": "你從信件中取出 {amount}。",
+        "tooFar": "你必須站在郵箱旁才能處理郵件。",
+        "needRecipient": "請寫明信件的收件人。",
+        "noRecipient": "這裡沒有叫這個名字的郵箱主人。",
+        "tooManyParcels": "一封信最多可攜帶 {count} 個包裹。",
+        "noMailQuestItems": "你不能郵寄任務物品。",
+        "notEnoughItems": "你沒有那麼多可寄送的物品。",
+        "cantAffordPostage": "你付不起郵資。",
+        "recipientBoxFull": "對方的郵箱已滿。",
+        "letterGone": "那封信已不在你的郵箱裡。",
+        "takeParcelsFirst": "請先取出包裹再丟棄信件。"
+      }
+    },
+    "calendar": {
+      "title": "活動日曆",
+      "close": "關閉日曆",
+      "keybindLabel": "活動日曆",
+      "prevMonth": "上個月",
+      "nextMonth": "下個月",
+      "dayAria": "{date}：{count} 個活動",
+      "noEvents": "這一天沒有安排。",
+      "allDay": "全天",
+      "bookedBy": "由 {name} 安排",
+      "deleteAria": "移除活動 {title}",
+      "bookTitle": "安排公會活動",
+      "titlePlaceholder": "活動名稱",
+      "notePlaceholder": "備註（可選）",
+      "hourLabel": "小時（UTC）",
+      "hourAllDay": "全天",
+      "addButton": "安排活動",
+      "guildOnlyNote": "加入公會即可一起計劃活動。",
+      "result": {
+        "created": "活動已列入公會日曆。",
+        "removed": "活動已從日曆中移除。",
+        "notInGuild": "你不在公會中。",
+        "notOfficer": "只有幹部和會長可以管理公會活動。",
+        "badInput": "請為活動填寫名稱和有效日期。",
+        "calendarFull": "公會日曆已滿。",
+        "eventGone": "該活動已不在日曆上。"
+      },
+      "events": {
+        "raidCall": {
+          "title": "團隊集結",
+          "note": "守衛吹響號角：組隊前往地穴與團隊副本。"
+        },
+        "marketDay": {
+          "title": "集市日",
+          "note": "商人正等著新貨。今天很適合逛逛世界市場。"
+        },
+        "fiestaNight": {
+          "title": "狂歡之夜",
+          "note": "今晚 2v2 狂歡擂台的人氣最旺。"
+        },
+        "arenaClash": {
+          "title": "競技場之戰",
+          "note": "決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。"
+        },
+        "fishingDerby": {
+          "title": "釣魚大賽",
+          "note": "釣手們在湖邊排開。帶上魚竿，交流釣魚趣聞。"
+        },
+        "delveDay": {
+          "title": "探窟日",
+          "note": "哈爾文修士在圖上做了標記：宜探坍塌聖物窖。"
+        },
+        "moongateCommunion": {
+          "title": "月門共禱",
+          "note": "朝聖者在月中之月下聚於神廟月門。"
+        }
+      }
     }
   },
   "guide": {
@@ -5043,6 +5159,33 @@ export const zh_TW: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主之冠"
       },
+      "copper_mining_pick": {
+        "name": "銅製採礦鎬"
+      },
+      "iron_mining_pick": {
+        "name": "鐵製採礦鎬"
+      },
+      "mithril_mining_pick": {
+        "name": "秘銀採礦鎬"
+      },
+      "handaxe": {
+        "name": "手斧"
+      },
+      "felling_axe": {
+        "name": "伐木斧"
+      },
+      "ironbark_axe": {
+        "name": "鐵樹皮斧"
+      },
+      "gathering_sickle": {
+        "name": "採集鐮刀"
+      },
+      "bronze_sickle": {
+        "name": "青銅鐮刀"
+      },
+      "silverleaf_sickle": {
+        "name": "銀葉鐮刀"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -7069,6 +7212,28 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你爬回沼澤邊緣，回到哈爾文修士身邊。"
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "渡鴉郵驛",
+        "subject": "渡鴉如今為你飛翔",
+        "body": "旅人：\n\n渡鴉郵驛已在谷地各處設立棲架。請在東溪鎮、沼橋鎮和高望鎮尋找渡鴉石柱：在任意一處，你都可以向其他冒險者寄送信件、錢幣和物品，也可以領取渡鴉為你帶來的一切。\n\n隨信附上一點心意，作為你的第一枚郵票。\n\n展翅高飛，\n渡鴉郵驛"
+      },
+      "letter_q_wolves": {
+        "sender": "雷德布魯克元帥",
+        "subject": "圍欄又安靜了",
+        "body": "牧人們總算能睡個安穩覺了，這都是你的功勞。我已託渡鴉郵驛從守備金裡給你捎去一點謝意。\n\n保持你的刀刃鋒利。\n- 雷德布魯克元帥"
+      },
+      "letter_q_greyjaw": {
+        "sender": "雷德布魯克元帥",
+        "subject": "老灰顎，終於倒下了",
+        "body": "小鎮裡消息傳得快。牧人們昨晚為你的健康乾杯，威爾克斯發誓那頭狼有馬車那麼大。讓他們添油加醋去吧：這是你應得的。\n\n請代守備隊享用一頓好飯。\n- 雷德布魯克元帥"
+      },
+      "letter_q_hollow": {
+        "sender": "奧德里克修士",
+        "subject": "你在黑暗中所做的一切",
+        "body": "很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "鑄冠戰裝",
@@ -7119,6 +7284,7 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineBellInteract": "銅鈴神龕：按 F 敲響",
     "delveRiteShrineCandleInteract": "燭火神龕：按 F 觸碰",
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
-    "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰"
+    "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
+    "mailboxName": "郵箱"
   }
 };

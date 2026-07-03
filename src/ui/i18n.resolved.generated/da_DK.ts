@@ -392,6 +392,8 @@ export const da_DK: EnTranslations = {
       "showDevBadges": "Vis udviklermærker",
       "showOwnNameplate": "Show My Nameplate",
       "uiScale": "UI-skala",
+      "playerFrameScale": "Player Frame Scale",
+      "targetFrameScale": "Target Frame Scale",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -718,7 +720,8 @@ export const da_DK: EnTranslations = {
       "summaryGroup": "Bytteindstillinger: Gruppebytte."
     },
     "party": {
-      "promoteLeader": "Forfrem til leder"
+      "promoteLeader": "Forfrem til leder",
+      "inviteUsage": "Invite whom? Usage: /invite <name>."
     },
     "lootSettings": {
       "title": "Bytteindstillinger",
@@ -850,6 +853,13 @@ export const da_DK: EnTranslations = {
     "targetFrame": {
       "unlock": "Move target frame",
       "lock": "Lock target frame"
+    },
+    "playerFrame": {
+      "unlock": "Move player frame",
+      "lock": "Lock player frame"
+    },
+    "frameReset": {
+      "label": "Reset Frame Positions"
     },
     "itemTooltip": {
       "requiresLevel": "Kræver niveau {level}"
@@ -1025,6 +1035,112 @@ export const da_DK: EnTranslations = {
       },
       "linkedAs": "Tilknyttet som {login}",
       "unlink": "Fjern GitHub-tilknytning"
+    },
+    "mailbox": {
+      "title": "Mailbox",
+      "subtitle": "The Ravenpost",
+      "close": "Close mailbox",
+      "tabInbox": "Inbox",
+      "tabInboxWithCount": "Inbox ({count})",
+      "tabSend": "Send",
+      "empty": "Your mailbox is empty.",
+      "truncated": "Showing the newest {shown} of {total} letters.",
+      "attachmentsBadge": "Parcel attached",
+      "unreadBadge": "Unread",
+      "back": "Back",
+      "take": "Take attachments",
+      "delete": "Delete letter",
+      "deleteAria": "Delete the letter {subject}",
+      "openAria": "Read the letter {subject} from {name}",
+      "noSubject": "(no subject)",
+      "toLabel": "To",
+      "toPlaceholder": "Character name",
+      "subjectLabel": "Subject",
+      "bodyLabel": "Message",
+      "coinLabel": "Attach coin",
+      "parcelsLabel": "Parcels",
+      "parcelsHint": "Click an item in your bags to attach it.",
+      "removeParcelAria": "Remove {item} from the letter",
+      "sendButton": "Send letter",
+      "postageNote": "Postage: {amount}. The raven flies for about {seconds}s.",
+      "arrivedBanner": "The raven has landed: mail from {name}.",
+      "arrivedLog": "You have new mail from {name}.",
+      "indicatorAria": "Unread mail: {count}",
+      "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
+      "clickAttach": "Click to attach to your letter.",
+      "cannotMail": "This cannot be mailed.",
+      "result": {
+        "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
+        "collected": "You collect {amount} from the letter.",
+        "tooFar": "You must be at a mailbox to tend your post.",
+        "needRecipient": "Name a recipient for your letter.",
+        "noRecipient": "No one by that name holds a mailbox here.",
+        "tooManyParcels": "A letter carries at most {count} parcels.",
+        "noMailQuestItems": "You cannot mail quest items.",
+        "notEnoughItems": "You do not have that many to send.",
+        "cantAffordPostage": "You cannot afford the postage.",
+        "recipientBoxFull": "Their mailbox is full.",
+        "letterGone": "That letter is no longer in your box.",
+        "takeParcelsFirst": "Take the parcels out before discarding the letter."
+      }
+    },
+    "calendar": {
+      "title": "Event Calendar",
+      "close": "Close calendar",
+      "keybindLabel": "Event Calendar",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "dayAria": "{date}: {count} events",
+      "noEvents": "Nothing planned for this day.",
+      "allDay": "All day",
+      "bookedBy": "Booked by {name}",
+      "deleteAria": "Remove the event {title}",
+      "bookTitle": "Book a guild event",
+      "titlePlaceholder": "Event title",
+      "notePlaceholder": "Note (optional)",
+      "hourLabel": "Hour (UTC)",
+      "hourAllDay": "All day",
+      "addButton": "Book event",
+      "guildOnlyNote": "Join a guild to plan events together.",
+      "result": {
+        "created": "The event is on the guild calendar.",
+        "removed": "The event was taken off the calendar.",
+        "notInGuild": "You are not in a guild.",
+        "notOfficer": "Only officers and the Guild Master may manage guild events.",
+        "badInput": "Give the event a title and a valid day.",
+        "calendarFull": "The guild calendar is full.",
+        "eventGone": "That event is no longer on the calendar."
+      },
+      "events": {
+        "raidCall": {
+          "title": "Raid Call",
+          "note": "Wardens sound the horn: gather a party for the crypts and the raid."
+        },
+        "marketDay": {
+          "title": "Market Day",
+          "note": "The Merchant expects fresh stock. A fine day to browse the World Market."
+        },
+        "fiestaNight": {
+          "title": "Fiesta Night",
+          "note": "The 2v2 Fiesta ring draws its loudest crowds tonight."
+        },
+        "arenaClash": {
+          "title": "Arena Clash",
+          "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
+        },
+        "fishingDerby": {
+          "title": "Fishing Derby",
+          "note": "Anglers line the lakes. Bring a pole and swap fishing tales."
+        },
+        "delveDay": {
+          "title": "Delve Day",
+          "note": "Brother Halven marks his charts: a fine day to brave the Collapsed Reliquary."
+        },
+        "moongateCommunion": {
+          "title": "Moongate Communion",
+          "note": "Pilgrims gather at the temple moongate under the mid-month moon."
+        }
+      }
     }
   },
   "guide": {
@@ -5043,6 +5159,33 @@ export const da_DK: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Monarkens Krone"
       },
+      "copper_mining_pick": {
+        "name": "Kobberminehakke"
+      },
+      "iron_mining_pick": {
+        "name": "Jernminehakke"
+      },
+      "mithril_mining_pick": {
+        "name": "Mithrilminehakke"
+      },
+      "handaxe": {
+        "name": "Håndøkse"
+      },
+      "felling_axe": {
+        "name": "Fældeøkse"
+      },
+      "ironbark_axe": {
+        "name": "Jernbarksøkse"
+      },
+      "gathering_sickle": {
+        "name": "Høstsegl"
+      },
+      "bronze_sickle": {
+        "name": "Bronzesegl"
+      },
+      "silverleaf_sickle": {
+        "name": "Sølvbladsegl"
+      },
       "bristleback_maul": {
         "name": "Børsterygs-Lemlæster"
       },
@@ -7069,6 +7212,28 @@ export const da_DK: EnTranslations = {
         "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "Ravneposten",
+        "subject": "Ravnene flyver nu for dig",
+        "body": "Vejfarende,\n\nRavneposten har rejst sine siddepinde over hele dalen. Find ravnesøjlerne i Eastbrook, Fenbridge og Highwatch: fra enhver af dem kan du sende breve, mønter og varer til andre eventyrere og hente alt, hvad ravnene bringer dig.\n\nVedlagt en lille opmærksomhed til dit første frimærke.\n\nVingerne op,\nRavneposten"
+      },
+      "letter_q_wolves": {
+        "sender": "Marskal Redbrook",
+        "subject": "Der er ro ved foldene igen",
+        "body": "Hyrderne kan for en gangs skyld sove med begge øjne lukkede, og det er din fortjeneste. Jeg har bedt Ravneposten bringe dig en lille skilling fra vagtkassen.\n\nHold din klinge smurt.\n- Marskal Redbrook"
+      },
+      "letter_q_greyjaw": {
+        "sender": "Marskal Redbrook",
+        "subject": "Gamle Gråkæbe, endelig",
+        "body": "Rygter løber hurtigt i så lille en by. Hyrderne skålede for dit helbred i aftes, og Wilkes sværger, at ulven var stor som en kærre. Lad dem bare brodere: du har fortjent det.\n\nTag et måltid på vagtens regning.\n- Marskal Redbrook"
+      },
+      "letter_q_hollow": {
+        "sender": "Broder Aldric",
+        "subject": "Det, du gjorde i mørket",
+        "body": "Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "Kronesmedet kampudstyr",
@@ -7119,6 +7284,7 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
     "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
+    "mailboxName": "Mailbox"
   }
 };

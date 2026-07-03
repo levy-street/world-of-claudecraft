@@ -1,10 +1,18 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import {
-  SocialService, validateGuildName,
-  type CharInfo, type CharRef, type GuildRank, type Presence,
-  type SocialDb, type SocialEvent, type SocialTransport,
-} from '../server/social';
 import { resolveRealm } from '../server/realm';
+import {
+  type CharInfo,
+  type CharRef,
+  type GuildEventRow,
+  type GuildRank,
+  type Presence,
+  type SocialDb,
+  type SocialEvent,
+  SocialService,
+  type SocialTransport,
+  validateGuildName,
+} from '../server/social';
+import { applyGameConfig } from '../src/sim/game_config';
 
 // ---------------------------------------------------------------------------
 // In-memory fakes — let us exercise the full SocialService logic (friends,
@@ -27,13 +35,21 @@ class FakeDb implements SocialDb {
     const trimmed = name.trim();
     const exact = [...this.chars.values()].find((c) => c.name === trimmed);
     if (exact) return exact;
-    const ci = [...this.chars.values()].filter((c) => c.name.toLowerCase() === trimmed.toLowerCase());
+    const ci = [...this.chars.values()].filter(
+      (c) => c.name.toLowerCase() === trimmed.toLowerCase(),
+    );
     return ci.length === 1 ? ci[0] : null;
   }
-  async getCharacter(id: number): Promise<CharInfo | null> { return this.chars.get(id) ?? null; }
+  async getCharacter(id: number): Promise<CharInfo | null> {
+    return this.chars.get(id) ?? null;
+  }
 
-  async addFriend(c: number, f: number): Promise<void> { (this.friends.get(c) ?? this.friends.set(c, new Set()).get(c)!).add(f); }
-  async removeFriend(c: number, f: number): Promise<void> { this.friends.get(c)?.delete(f); }
+  async addFriend(c: number, f: number): Promise<void> {
+    (this.friends.get(c) ?? this.friends.set(c, new Set()).get(c)!).add(f);
+  }
+  async removeFriend(c: number, f: number): Promise<void> {
+    this.friends.get(c)?.delete(f);
+  }
   async listFriends(c: number): Promise<CharInfo[]> {
     return [...(this.friends.get(c) ?? [])].map((id) => this.chars.get(id)!).filter(Boolean);
   }
@@ -41,15 +57,28 @@ class FakeDb implements SocialDb {
     return [...this.friends.entries()].filter(([, set]) => set.has(c)).map(([id]) => id);
   }
 
-  async addBlock(c: number, b: number): Promise<void> { (this.blocks.get(c) ?? this.blocks.set(c, new Set()).get(c)!).add(b); }
-  async removeBlock(c: number, b: number): Promise<void> { this.blocks.get(c)?.delete(b); }
-  async listBlocks(c: number): Promise<CharRef[]> {
-    return [...(this.blocks.get(c) ?? [])].map((id) => { const ch = this.chars.get(id)!; return { id: ch.id, name: ch.name }; });
+  async addBlock(c: number, b: number): Promise<void> {
+    (this.blocks.get(c) ?? this.blocks.set(c, new Set()).get(c)!).add(b);
   }
-  async blockedIds(c: number): Promise<number[]> { return [...(this.blocks.get(c) ?? [])]; }
+  async removeBlock(c: number, b: number): Promise<void> {
+    this.blocks.get(c)?.delete(b);
+  }
+  async listBlocks(c: number): Promise<CharRef[]> {
+    return [...(this.blocks.get(c) ?? [])].map((id) => {
+      const ch = this.chars.get(id)!;
+      return { id: ch.id, name: ch.name };
+    });
+  }
+  async blockedIds(c: number): Promise<number[]> {
+    return [...(this.blocks.get(c) ?? [])];
+  }
 
-  async createGuildWithLeader(name: string, leaderId: number): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
-    if ([...this.guilds.values()].some((n) => n.toLowerCase() === name.toLowerCase())) return { error: 'name_taken' };
+  async createGuildWithLeader(
+    name: string,
+    leaderId: number,
+  ): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }> {
+    if ([...this.guilds.values()].some((n) => n.toLowerCase() === name.toLowerCase()))
+      return { error: 'name_taken' };
     if (this.members.has(leaderId)) return { error: 'already_in_guild' };
     const id = this.nextGuildId++;
     this.guilds.set(id, name);
@@ -60,11 +89,18 @@ class FakeDb implements SocialDb {
     this.guilds.delete(id);
     for (const [cid, m] of [...this.members]) if (m.guildId === id) this.members.delete(cid);
   }
-  async guildMembership(c: number): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null> {
+  async guildMembership(
+    c: number,
+  ): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null> {
     const m = this.members.get(c);
     return m ? { guildId: m.guildId, guildName: this.guilds.get(m.guildId)!, rank: m.rank } : null;
   }
-  async addGuildMemberAtomic(guildId: number, c: number, rank: GuildRank, limit: number): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+  async addGuildMemberAtomic(
+    guildId: number,
+    c: number,
+    rank: GuildRank,
+    limit: number,
+  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
     if (!this.guilds.has(guildId)) return 'no_guild';
     if (this.members.has(c)) return 'already_member';
     const count = [...this.members.values()].filter((m) => m.guildId === guildId).length;
@@ -72,14 +108,58 @@ class FakeDb implements SocialDb {
     this.members.set(c, { guildId, rank });
     return 'ok';
   }
-  async removeGuildMember(c: number): Promise<void> { this.members.delete(c); }
-  async setGuildRank(c: number, rank: GuildRank): Promise<void> { const m = this.members.get(c); if (m) m.rank = rank; }
+  async removeGuildMember(c: number): Promise<void> {
+    this.members.delete(c);
+  }
+  async setGuildRank(c: number, rank: GuildRank): Promise<void> {
+    const m = this.members.get(c);
+    if (m) m.rank = rank;
+  }
   async guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]> {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
       .map(([cid, m]) => ({ ...this.chars.get(cid)!, rank: m.rank }));
   }
-  guildCount(): number { return this.guilds.size; } // test helper: detect orphaned guilds
+  guildCount(): number {
+    return this.guilds.size;
+  } // test helper: detect orphaned guilds
+
+  // guild calendar events
+  private events = new Map<number, GuildEventRow & { guildId: number }>();
+  private nextEventId = 1;
+  async guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]> {
+    return [...this.events.values()]
+      .filter((e) => e.guildId === guildId && e.day >= fromDay)
+      .sort((a, b) => a.day.localeCompare(b.day) || a.id - b.id)
+      .map(({ guildId: _g, ...row }) => row);
+  }
+  async guildEventCount(guildId: number, fromDay: string): Promise<number> {
+    return (await this.guildEvents(guildId, fromDay)).length;
+  }
+  async createGuildEvent(
+    guildId: number,
+    creatorId: number,
+    day: string,
+    hour: number | null,
+    title: string,
+    note: string,
+  ): Promise<number> {
+    const id = this.nextEventId++;
+    const createdBy = this.chars.get(creatorId)?.name ?? '';
+    this.events.set(id, { id, guildId, day, hour, title, note, createdBy });
+    return id;
+  }
+  async deleteGuildEvent(eventId: number, guildId: number): Promise<boolean> {
+    const e = this.events.get(eventId);
+    if (!e || e.guildId !== guildId) return false;
+    this.events.delete(eventId);
+    return true;
+  }
+  async pruneGuildEvents(guildId: number, beforeDay: string): Promise<void> {
+    for (const [id, e] of [...this.events]) {
+      if (e.guildId === guildId && e.day < beforeDay) this.events.delete(id);
+    }
+  }
 }
 
 class FakeTransport implements SocialTransport {
@@ -95,31 +175,57 @@ class FakeTransport implements SocialTransport {
     this.online.add(id);
     this.presence.set(id, p);
   }
-  setOffline(id: number): void { this.online.delete(id); this.presence.delete(id); }
+  setOffline(id: number): void {
+    this.online.delete(id);
+    this.presence.delete(id);
+  }
 
   charCache = new Map<number, CharInfo>();
   byCharacterId(id: number) {
-    const c = this.online.has(id) ? this.charCache.get(id) ?? null : null;
+    const c = this.online.has(id) ? (this.charCache.get(id) ?? null) : null;
     return c ? { characterId: c.id, name: c.name } : null;
   }
-  byName(_name: string) { return null; }
-  isOnline(id: number): boolean { return this.online.has(id); }
-  locationOf(id: number): Presence | null { return this.online.has(id) ? this.presence.get(id) ?? null : null; }
+  byName(_name: string) {
+    return null;
+  }
+  isOnline(id: number): boolean {
+    return this.online.has(id);
+  }
+  locationOf(id: number): Presence | null {
+    return this.online.has(id) ? (this.presence.get(id) ?? null) : null;
+  }
   deliver(id: number, events: SocialEvent[]): void {
     const arr = this.delivered.get(id) ?? [];
     arr.push(...events);
     this.delivered.set(id, arr);
   }
-  pushSnapshot(id: number): void { this.snapshotCount.set(id, (this.snapshotCount.get(id) ?? 0) + 1); }
-  onBlocksChanged(id: number, ids: number[]): void { this.blockSets.set(id, ids); }
+  pushSnapshot(id: number): void {
+    this.snapshotCount.set(id, (this.snapshotCount.get(id) ?? 0) + 1);
+  }
+  onBlocksChanged(id: number, ids: number[]): void {
+    this.blockSets.set(id, ids);
+  }
   isIgnoring(recipientId: number, senderCharacterId: number): boolean {
     return !!this.db.blocks.get(recipientId)?.has(senderCharacterId);
   }
 
-  eventsFor(id: number): SocialEvent[] { return this.delivered.get(id) ?? []; }
-  errorsFor(id: number): string[] { return this.eventsFor(id).filter((e) => e.type === 'error').map((e: any) => e.text); }
-  textFor(id: number): string[] { return this.eventsFor(id).filter((e) => e.type === 'log' || e.type === 'chat').map((e: any) => e.text ?? ''); }
-  clear(): void { this.delivered.clear(); this.snapshotCount.clear(); }
+  eventsFor(id: number): SocialEvent[] {
+    return this.delivered.get(id) ?? [];
+  }
+  errorsFor(id: number): string[] {
+    return this.eventsFor(id)
+      .filter((e) => e.type === 'error')
+      .map((e: any) => e.text);
+  }
+  textFor(id: number): string[] {
+    return this.eventsFor(id)
+      .filter((e) => e.type === 'log' || e.type === 'chat')
+      .map((e: any) => e.text ?? '');
+  }
+  clear(): void {
+    this.delivered.clear();
+    this.snapshotCount.clear();
+  }
 }
 
 // Test harness: characters 1..N, with helpers to flip presence.
@@ -131,13 +237,25 @@ function setup() {
   const actors = new Map<number, { characterId: number; name: string }>();
   const add = (id: number, name: string, opts: { cls?: string; level?: number } = {}) => {
     db.addChar(id, name, opts.cls, opts.level);
-    tx.charCache.set(id, { id, name, cls: opts.cls ?? 'warrior', level: opts.level ?? 10, realm: 'Claudemoon' });
+    tx.charCache.set(id, {
+      id,
+      name,
+      cls: opts.cls ?? 'warrior',
+      level: opts.level ?? 10,
+      realm: 'Claudemoon',
+    });
     actors.set(id, { characterId: id, name });
   };
   return {
-    db, tx, svc, actors, add,
+    db,
+    tx,
+    svc,
+    actors,
+    add,
     actor: (id: number) => actors.get(id)!,
-    advance: (ms: number) => { clock += ms; },
+    advance: (ms: number) => {
+      clock += ms;
+    },
   };
 }
 
@@ -171,7 +289,11 @@ describe('validateGuildName', () => {
 
 describe('friends', () => {
   let h: ReturnType<typeof setup>;
-  beforeEach(() => { h = setup(); h.add(1, 'Aleph'); h.add(2, 'Bet'); });
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+  });
 
   it('adds a friend and reflects it in the snapshot', async () => {
     await h.svc.friendAdd(h.actor(1), 'Bet');
@@ -241,7 +363,11 @@ describe('friends', () => {
 
 describe('ignore / block', () => {
   let h: ReturnType<typeof setup>;
-  beforeEach(() => { h = setup(); h.add(1, 'Aleph'); h.add(2, 'Bet'); });
+  beforeEach(() => {
+    h = setup();
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+  });
 
   it('blocks a player and surfaces the updated block set to the transport', async () => {
     await h.svc.blockAdd(h.actor(1), 'Bet');
@@ -290,8 +416,12 @@ describe('guilds', () => {
   let h: ReturnType<typeof setup>;
   beforeEach(() => {
     h = setup();
-    h.add(1, 'Aleph'); h.add(2, 'Bet'); h.add(3, 'Gimel');
-    h.tx.setOnline(1); h.tx.setOnline(2); h.tx.setOnline(3);
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+    h.add(3, 'Gimel');
+    h.tx.setOnline(1);
+    h.tx.setOnline(2);
+    h.tx.setOnline(3);
   });
 
   it('creates a guild with the founder as leader', async () => {
@@ -302,7 +432,7 @@ describe('guilds', () => {
     expect(snap.guild?.members.map((m) => m.name)).toEqual(['Aleph']);
   });
 
-  it('refreshes guildmates\' panels when a member comes online, even non-friends (#100)', async () => {
+  it("refreshes guildmates' panels when a member comes online, even non-friends (#100)", async () => {
     await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
     await h.svc.guildInvite(h.actor(1), 'Bet');
     await h.svc.guildAccept(h.actor(2));
@@ -374,7 +504,11 @@ describe('guilds', () => {
     // promote notice will not have been delivered by the time the call resolves.
     const realMembers = h.db.guildMembers.bind(h.db);
     h.db.guildMembers = (guildId: number) =>
-      new Promise((resolve) => { setTimeout(() => { void realMembers(guildId).then(resolve); }, 0); });
+      new Promise((resolve) => {
+        setTimeout(() => {
+          void realMembers(guildId).then(resolve);
+        }, 0);
+      });
     await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
     expect(h.tx.textFor(2).join()).toMatch(/Bet is now Officer/);
   });
@@ -419,7 +553,11 @@ describe('guilds', () => {
     h.tx.clear();
     const ok = await h.svc.guildChat(h.actor(1), 'hello guild');
     expect(ok).toBe(true);
-    expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.channel === 'guild' && e.text === 'hello guild')).toBe(true);
+    expect(
+      h.tx
+        .eventsFor(1)
+        .some((e) => e.type === 'chat' && e.channel === 'guild' && e.text === 'hello guild'),
+    ).toBe(true);
     expect(h.tx.eventsFor(2).some((e) => e.type === 'chat' && e.text === 'hello guild')).toBe(true);
     expect(h.tx.eventsFor(3)).toHaveLength(0); // Gimel is not in the guild
   });
@@ -506,7 +644,11 @@ describe('guilds', () => {
     await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
     h.tx.clear();
     expect(await h.svc.officerChat(h.actor(1), 'officers only')).toBe(true);
-    expect(h.tx.eventsFor(1).some((e) => e.type === 'chat' && e.channel === 'officer' && e.text === 'officers only')).toBe(true);
+    expect(
+      h.tx
+        .eventsFor(1)
+        .some((e) => e.type === 'chat' && e.channel === 'officer' && e.text === 'officers only'),
+    ).toBe(true);
     expect(h.tx.eventsFor(2).some((e) => e.type === 'chat' && e.channel === 'officer')).toBe(true);
   });
 
@@ -545,8 +687,10 @@ describe('guild atomicity (#149)', () => {
   let h: ReturnType<typeof setup>;
   beforeEach(() => {
     h = setup();
-    h.add(1, 'Aleph'); h.add(2, 'Bet');
-    h.tx.setOnline(1); h.tx.setOnline(2);
+    h.add(1, 'Aleph');
+    h.add(2, 'Bet');
+    h.tx.setOnline(1);
+    h.tx.setOnline(2);
   });
 
   it('two racing guild_create packets from one character leave no orphan guild', async () => {
@@ -587,5 +731,158 @@ describe('guild atomicity (#149)', () => {
     await h.svc.guildAccept(h.actor(2));
     expect(h.tx.errorsFor(2).join()).toMatch(/no longer exists/i);
     expect((await h.svc.snapshot(2)).guild).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Guild calendar events: officer-gated create/remove, validation, the snapshot
+// lane, and the structured calendarResult outcomes the client localizes.
+// ---------------------------------------------------------------------------
+
+describe('guild calendar events', () => {
+  // The fake clock starts at epoch 1000ms, so "today" is 1970-01-01.
+  const TODAY = '1970-01-01';
+  const NEXT_WEEK = '1970-01-08';
+
+  async function guildOf3() {
+    const h = setup();
+    h.add(1, 'Lead');
+    h.add(2, 'Officer');
+    h.add(3, 'Member');
+    await h.svc.guildCreate(h.actor(1), 'Night Watch');
+    await h.svc.guildInvite(h.actor(1), 'Officer');
+    // invites need the target online
+    return h;
+  }
+
+  async function seatedGuild() {
+    const h = setup();
+    h.add(1, 'Lead');
+    h.add(2, 'Officer');
+    h.add(3, 'Member');
+    h.tx.setOnline(2);
+    h.tx.setOnline(3);
+    await h.svc.guildCreate(h.actor(1), 'Night Watch');
+    await h.svc.guildInvite(h.actor(1), 'Officer');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.guildInvite(h.actor(1), 'Member');
+    await h.svc.guildAccept(h.actor(3));
+    await h.svc.guildSetRank(h.actor(1), 'Officer', 'officer');
+    h.tx.clear();
+    return h;
+  }
+
+  function resultsFor(h: Awaited<ReturnType<typeof seatedGuild>>, id: number): string[] {
+    return h.tx
+      .eventsFor(id)
+      .filter((e) => e.type === 'calendarResult')
+      .map((e: any) => e.code);
+  }
+
+  it('lets the leader and officers book events; members see them in the snapshot', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildEventCreate(h.actor(1), {
+      day: NEXT_WEEK,
+      hour: 20,
+      title: 'Crypt night',
+      note: 'Bring water.',
+    });
+    await h.svc.guildEventCreate(h.actor(2), {
+      day: TODAY,
+      hour: null,
+      title: 'Fishing derby',
+      note: '',
+    });
+    expect(resultsFor(h, 1)).toEqual(['created']);
+    expect(resultsFor(h, 2)).toEqual(['created']);
+    const snap = await h.svc.snapshot(3);
+    expect(snap.guild?.events.map((e) => e.title)).toEqual(['Fishing derby', 'Crypt night']);
+    expect(snap.guild?.events[1]).toMatchObject({ day: NEXT_WEEK, hour: 20, createdBy: 'Lead' });
+  });
+
+  it('refuses a plain member, a non-member, and bad input', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildEventCreate(h.actor(3), { day: NEXT_WEEK, hour: 20, title: 'X', note: '' });
+    expect(resultsFor(h, 3)).toEqual(['notOfficer']);
+    h.add(9, 'Loner');
+    await h.svc.guildEventCreate(h.actor(9), { day: NEXT_WEEK, hour: 20, title: 'X', note: '' });
+    expect(resultsFor(h, 9)).toEqual(['notInGuild']);
+    await h.svc.guildEventCreate(h.actor(1), { day: 'not-a-day', hour: 20, title: 'X', note: '' });
+    await h.svc.guildEventCreate(h.actor(1), { day: '1970-02-30', hour: 20, title: 'X', note: '' });
+    await h.svc.guildEventCreate(h.actor(1), { day: '1969-12-01', hour: 20, title: 'X', note: '' });
+    await h.svc.guildEventCreate(h.actor(1), { day: NEXT_WEEK, hour: 20, title: '   ', note: '' });
+    expect(resultsFor(h, 1)).toEqual(['badInput', 'badInput', 'badInput', 'badInput']);
+    expect((await h.svc.snapshot(1)).guild?.events).toHaveLength(0);
+  });
+
+  it('honors a housekeeping eventLimit override', async () => {
+    applyGameConfig({ calendar: { eventLimit: 2 } });
+    try {
+      const h = await seatedGuild();
+      for (let i = 0; i < 3; i++) {
+        await h.svc.guildEventCreate(h.actor(1), {
+          day: NEXT_WEEK,
+          hour: null,
+          title: `Event ${i}`,
+          note: '',
+        });
+      }
+      expect(resultsFor(h, 1).filter((c) => c === 'calendarFull')).toHaveLength(1);
+      expect((await h.svc.snapshot(1)).guild?.events).toHaveLength(2);
+    } finally {
+      applyGameConfig({});
+    }
+  });
+
+  it('caps the upcoming calendar and reports calendarFull', async () => {
+    const h = await seatedGuild();
+    for (let i = 0; i < 25; i++) {
+      await h.svc.guildEventCreate(h.actor(1), {
+        day: NEXT_WEEK,
+        hour: null,
+        title: `Event ${i}`,
+        note: '',
+      });
+    }
+    await h.svc.guildEventCreate(h.actor(1), {
+      day: NEXT_WEEK,
+      hour: null,
+      title: 'One too many',
+      note: '',
+    });
+    expect(resultsFor(h, 1).filter((c) => c === 'calendarFull')).toHaveLength(1);
+    expect((await h.svc.snapshot(1)).guild?.events).toHaveLength(25);
+  });
+
+  it('removes events (officer+ only) and reports eventGone for a stale id', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildEventCreate(h.actor(1), {
+      day: NEXT_WEEK,
+      hour: 19,
+      title: 'Raid',
+      note: '',
+    });
+    const evId = (await h.svc.snapshot(1)).guild?.events[0]?.id;
+    if (evId === undefined) throw new Error('event not created');
+    h.tx.clear();
+    await h.svc.guildEventRemove(h.actor(3), evId);
+    expect(resultsFor(h, 3)).toEqual(['notOfficer']);
+    await h.svc.guildEventRemove(h.actor(2), evId);
+    expect(resultsFor(h, 2)).toEqual(['removed']);
+    await h.svc.guildEventRemove(h.actor(2), evId);
+    expect(resultsFor(h, 2)).toEqual(['removed', 'eventGone']);
+    expect((await h.svc.snapshot(1)).guild?.events).toHaveLength(0);
+  });
+
+  it('pushes a fresh snapshot to online members after create and remove', async () => {
+    const h = await seatedGuild();
+    await h.svc.guildEventCreate(h.actor(2), {
+      day: NEXT_WEEK,
+      hour: null,
+      title: 'Meet',
+      note: '',
+    });
+    expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(0);
+    expect(h.tx.snapshotCount.get(3) ?? 0).toBeGreaterThan(0);
   });
 });

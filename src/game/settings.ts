@@ -108,6 +108,15 @@ export const SETTING_RANGES = {
   // fixed-px frame/label/button grows together — the global "fonts too small"
   // remedy that the per-element tooltip/chat/fct scales can't cover. 1.0 = stock.
   uiScale: { min: 0.85, max: 1.4, def: 1 },
+  // Scales just the player unit frame (portrait, name, hp/resource bars, combo
+  // pips) via --player-frame-scale, so it can shrink toward the target frame's
+  // compact read without touching the rest of the HUD. Pairs with the frame's
+  // move/lock button (MovableFrame): moved, it also adopts the target frame's
+  // narrow bar width. 1.0 = stock.
+  playerFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // The target frame's twin of playerFrameScale, via --target-frame-scale.
+  // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
+  targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
 } as const;
 
 export const BOOL_SETTINGS = {

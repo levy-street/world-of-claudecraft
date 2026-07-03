@@ -1822,13 +1822,13 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // `s.X ?? e.X` form for `stats`/`weapon`). This is the single most fragile codec
 // in the workstream, so we pin: (a) the exact 26-key set against drift, (b) the
 // terse-key -> IWorld-name rename map, (c) that every dirtied value round-trips
-// onto the correct decode target, and (d) that a no-op re-broadcast omits all 26
+// onto the correct decode target, and (d) that a no-op re-broadcast omits all 28
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 26 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 28 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 26th unregistered delta key reddens this gate.
+// 29th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
   'buyback',
@@ -1845,6 +1845,8 @@ const ALL_DELTA_KEYS = [
   'inv',
   'lockouts',
   'lroll',
+  'mail',
+  'mailU',
   'market',
   'marks',
   'milestones',
@@ -1881,6 +1883,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
   lxp: 'lifetimeXp',
+  mail: 'mailInfo',
+  mailU: 'mailUnread',
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
@@ -1948,6 +1952,11 @@ function dirtyEveryDeltaField(): {
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
   const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
+  // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
+  // player. `mailU` is already non-zero: every fresh character got the one-time
+  // Ravenpost welcome letter (delay 0) at join.
+  const mailbox = sim.entities.get(sim.postOffice.mailboxIds[0]);
+  if (mailbox) mailbox.pos = { ...p.pos };
 
   // Direct PlayerMeta fields.
   meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
@@ -2124,9 +2133,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 25 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(26);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(26);
+  it('ALL_DELTA_KEYS contains exactly 28 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(28);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(28);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2138,7 +2147,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(26);
+    expect(scraped.size).toBe(28);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

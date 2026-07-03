@@ -111,12 +111,16 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   tradeOpen(): boolean;
   /** The World Market is open on its Sell tab. */
   isMarketSell(): boolean;
+  /** The Ravenpost mailbox is open on its Send tab (clicks attach parcels). */
+  isMailAttach(): boolean;
   pendingPetFeed(): boolean;
   // Cross-window commands the bag click fans out to.
   closeVendor(): void;
   addItemToTrade(itemId: string): void;
   /** Stage a bag item for a Market listing (selects it + repaints the market). */
   stageMarketSell(itemId: string): void;
+  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab). */
+  stageMailParcel(itemId: string): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
   showError(text: string): void;
@@ -319,6 +323,12 @@ export class BagsWindow {
           case 'trade':
             this.deps.addItemToTrade(s.itemId);
             break;
+          case 'mailAttachBlocked':
+            this.deps.showError(t('hudChrome.mailbox.cannotMail'));
+            return;
+          case 'mailAttach':
+            this.deps.stageMailParcel(s.itemId);
+            break;
           case 'marketSellBlockedQuest':
             this.deps.showError(t('itemUi.errors.noQuestItems'));
             return;
@@ -398,6 +408,7 @@ export class BagsWindow {
   private bagMode(): BagMode {
     return {
       tradeOpen: this.deps.tradeOpen(),
+      mailAttach: this.deps.isMailAttach(),
       marketSell: this.deps.isMarketSell(),
       vendorOpen: this.deps.vendorOpen(),
       petFeed: this.deps.pendingPetFeed(),

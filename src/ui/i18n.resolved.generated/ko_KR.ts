@@ -392,6 +392,8 @@ export const ko_KR: EnTranslations = {
       "showDevBadges": "개발자 배지 표시",
       "showOwnNameplate": "내 이름표 표시",
       "uiScale": "UI 배율",
+      "playerFrameScale": "플레이어 프레임 크기",
+      "targetFrameScale": "대상 프레임 크기",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "walkByAutoloot": "지나가며 자동 획득",
@@ -718,7 +720,8 @@ export const ko_KR: EnTranslations = {
       "summaryGroup": "전리품 설정: 파티 분배."
     },
     "party": {
-      "promoteLeader": "파티장으로 지정"
+      "promoteLeader": "파티장으로 지정",
+      "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."
     },
     "lootSettings": {
       "title": "전리품 설정",
@@ -850,6 +853,13 @@ export const ko_KR: EnTranslations = {
     "targetFrame": {
       "unlock": "대상 프레임 이동",
       "lock": "대상 프레임 고정"
+    },
+    "playerFrame": {
+      "unlock": "플레이어 프레임 이동",
+      "lock": "플레이어 프레임 고정"
+    },
+    "frameReset": {
+      "label": "프레임 위치 초기화"
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}"
@@ -1025,6 +1035,112 @@ export const ko_KR: EnTranslations = {
       },
       "linkedAs": "{login}(으)로 연결됨",
       "unlink": "GitHub 연결 해제"
+    },
+    "mailbox": {
+      "title": "우편함",
+      "subtitle": "레이븐포스트",
+      "close": "우편함 닫기",
+      "tabInbox": "받은 편지함",
+      "tabInboxWithCount": "받은 편지함 ({count})",
+      "tabSend": "Send",
+      "empty": "우편함이 비어 있습니다.",
+      "truncated": "전체 {total}통 중 최신 {shown}통을 표시합니다.",
+      "attachmentsBadge": "소포 첨부됨",
+      "unreadBadge": "읽지 않음",
+      "back": "Back",
+      "take": "첨부물 받기",
+      "delete": "편지 삭제",
+      "deleteAria": "편지 {subject} 삭제",
+      "openAria": "{name}이(가) 보낸 편지 {subject} 읽기",
+      "noSubject": "(제목 없음)",
+      "toLabel": "To",
+      "toPlaceholder": "캐릭터 이름",
+      "subjectLabel": "제목",
+      "bodyLabel": "내용",
+      "coinLabel": "동전 첨부",
+      "parcelsLabel": "소포",
+      "parcelsHint": "가방의 아이템을 클릭하면 첨부됩니다.",
+      "removeParcelAria": "편지에서 {item} 제거",
+      "sendButton": "편지 보내기",
+      "postageNote": "우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.",
+      "arrivedBanner": "까마귀가 도착했습니다: {name}의 우편.",
+      "arrivedLog": "{name}에게서 새 우편이 도착했습니다.",
+      "indicatorAria": "읽지 않은 우편: {count}",
+      "indicatorTip": "읽지 않은 편지가 {count}통 있습니다. 우편함에서 확인하세요.",
+      "clickAttach": "클릭하면 편지에 첨부됩니다.",
+      "cannotMail": "이 아이템은 우편으로 보낼 수 없습니다.",
+      "result": {
+        "sent": "까마귀가 {name}에게 보낼 편지를 물고 날아올랐습니다 (우편 요금 {postage}).",
+        "collected": "편지에서 {amount}을(를) 받았습니다.",
+        "tooFar": "우편을 처리하려면 우편함 옆에 있어야 합니다.",
+        "needRecipient": "편지의 수신인을 지정하세요.",
+        "noRecipient": "그 이름을 가진 우편함 주인이 없습니다.",
+        "tooManyParcels": "편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.",
+        "noMailQuestItems": "퀘스트 아이템은 우편으로 보낼 수 없습니다.",
+        "notEnoughItems": "보낼 수 있는 수량이 부족합니다.",
+        "cantAffordPostage": "우편 요금을 낼 수 없습니다.",
+        "recipientBoxFull": "상대의 우편함이 가득 찼습니다.",
+        "letterGone": "그 편지는 더 이상 우편함에 없습니다.",
+        "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
+      }
+    },
+    "calendar": {
+      "title": "이벤트 달력",
+      "close": "달력 닫기",
+      "keybindLabel": "이벤트 달력",
+      "prevMonth": "이전 달",
+      "nextMonth": "다음 달",
+      "dayAria": "{date}: 이벤트 {count}건",
+      "noEvents": "이 날에는 일정이 없습니다.",
+      "allDay": "종일",
+      "bookedBy": "{name} 등록",
+      "deleteAria": "이벤트 {title} 삭제",
+      "bookTitle": "길드 이벤트 등록",
+      "titlePlaceholder": "이벤트 이름",
+      "notePlaceholder": "메모 (선택)",
+      "hourLabel": "시각 (UTC)",
+      "hourAllDay": "종일",
+      "addButton": "이벤트 등록",
+      "guildOnlyNote": "길드에 가입하면 함께 이벤트를 계획할 수 있습니다.",
+      "result": {
+        "created": "이벤트가 길드 달력에 등록되었습니다.",
+        "removed": "이벤트가 달력에서 삭제되었습니다.",
+        "notInGuild": "길드에 소속되어 있지 않습니다.",
+        "notOfficer": "길드 이벤트는 임원과 길드 마스터만 관리할 수 있습니다.",
+        "badInput": "이벤트 이름과 올바른 날짜를 입력하세요.",
+        "calendarFull": "길드 달력이 가득 찼습니다.",
+        "eventGone": "그 이벤트는 더 이상 달력에 없습니다."
+      },
+      "events": {
+        "raidCall": {
+          "title": "공격대 소집",
+          "note": "수비대가 뿔피리를 붑니다. 파티를 모아 지하 묘지와 공격대로."
+        },
+        "marketDay": {
+          "title": "장날",
+          "note": "상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날."
+        },
+        "fiestaNight": {
+          "title": "피에스타의 밤",
+          "note": "오늘 밤 2대2 피에스타 링이 가장 붐빕니다."
+        },
+        "arenaClash": {
+          "title": "투기장 격돌",
+          "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
+        },
+        "fishingDerby": {
+          "title": "낚시 대회",
+          "note": "낚시꾼들이 호숫가에 늘어섭니다. 낚싯대를 들고 이야기꽃을 피우세요."
+        },
+        "delveDay": {
+          "title": "탐굴의 날",
+          "note": "할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물고에 도전하기 좋은 날."
+        },
+        "moongateCommunion": {
+          "title": "달문 집회",
+          "note": "보름의 달 아래 순례자들이 사원의 달문에 모입니다."
+        }
+      }
     }
   },
   "guide": {
@@ -5043,6 +5159,33 @@ export const ko_KR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "군주의 왕관"
       },
+      "copper_mining_pick": {
+        "name": "구리 채광 곡괭이"
+      },
+      "iron_mining_pick": {
+        "name": "철 채광 곡괭이"
+      },
+      "mithril_mining_pick": {
+        "name": "미스릴 채광 곡괭이"
+      },
+      "handaxe": {
+        "name": "손도끼"
+      },
+      "felling_axe": {
+        "name": "벌목 도끼"
+      },
+      "ironbark_axe": {
+        "name": "철피 도끼"
+      },
+      "gathering_sickle": {
+        "name": "채집 낫"
+      },
+      "bronze_sickle": {
+        "name": "청동 낫"
+      },
+      "silverleaf_sickle": {
+        "name": "은엽 낫"
+      },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
       },
@@ -7069,6 +7212,28 @@ export const ko_KR: EnTranslations = {
         "leaveText": "그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다."
       }
     },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "레이븐포스트",
+        "subject": "이제 까마귀가 당신을 위해 날아갑니다",
+        "body": "여행자님,\n\n레이븐포스트가 골짜기 곳곳에 홰를 열었습니다. 이스트브룩, 펜브리지, 하이워치에서 까마귀 석주를 찾아보세요. 어느 곳에서든 다른 모험가에게 편지와 동전과 물건을 보낼 수 있고, 까마귀가 물어온 것들을 받을 수 있습니다.\n\n첫 우표값으로 쓸 작은 성의를 동봉합니다.\n\n날개를 활짝,\n레이븐포스트"
+      },
+      "letter_q_wolves": {
+        "sender": "레드브룩 원수",
+        "subject": "우리가 다시 조용해졌소",
+        "body": "목동들이 모처럼 두 다리 뻗고 잘 수 있게 된 것은 그대 덕분이오. 경비 기금에서 작은 성의를 레이븐포스트 편에 보냈소.\n\n칼날을 잘 벼려 두시오.\n- 레드브룩 원수"
+      },
+      "letter_q_greyjaw": {
+        "sender": "레드브룩 원수",
+        "subject": "늙은 회색이빨, 마침내",
+        "body": "이런 작은 마을에서는 소문이 빠르게 도는 법이오. 목동들은 어젯밤 그대의 건강을 위해 잔을 들었고, 윌크스는 그 늑대가 수레만 했다고 우기고 있소. 부풀리게 내버려 두시오. 그대가 얻어낸 명성이니.\n\n경비대를 대신해 식사 한 끼 하시오.\n- 레드브룩 원수"
+      },
+      "letter_q_hollow": {
+        "sender": "알드릭 수사",
+        "subject": "그대가 어둠 속에서 해낸 일",
+        "body": "그 구렁에 무엇이 묻혀 있었는지 아는 이는 거의 없고, 믿을 이는 더 적을 것입니다. 저는 알고 있고, 잊지 않겠습니다.\n\n그대의 길에 늘 빛이 함께하기를.\n- 알드릭 수사"
+      }
+    },
     "itemSets": {
       "crownforged": {
         "name": "왕관벼림 전투장비",
@@ -7119,6 +7284,7 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineBellInteract": "종 제단: F를 눌러 울리기",
     "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
-    "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기"
+    "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
+    "mailboxName": "우편함"
   }
 };

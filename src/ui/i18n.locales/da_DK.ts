@@ -1058,6 +1058,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.moggers_shiv.name': 'Moggers Dolk',
   'entities.items.moggers_stomper_boots.name': 'Moggers Trampestøvler',
   'entities.items.monarch_crown_helm.name': 'Monarkens Krone',
+  'entities.items.copper_mining_pick.name': 'Kobberminehakke',
+  'entities.items.iron_mining_pick.name': 'Jernminehakke',
+  'entities.items.mithril_mining_pick.name': 'Mithrilminehakke',
+  'entities.items.handaxe.name': 'Håndøkse',
+  'entities.items.felling_axe.name': 'Fældeøkse',
+  'entities.items.ironbark_axe.name': 'Jernbarksøkse',
+  'entities.items.gathering_sickle.name': 'Høstsegl',
+  'entities.items.bronze_sickle.name': 'Bronzesegl',
+  'entities.items.silverleaf_sickle.name': 'Sølvbladsegl',
   'entities.items.moongate_rubbing.name': 'Værneaftryk',
   'entities.items.moonpale_scale.name': 'Måneblegt Skæl',
   'entities.items.moonscale_saber.name': 'Måneskæl-Sabel',
@@ -5092,4 +5101,21 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Opdater',
   'errors.api.desktopCodeInvalid':
     'Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Ravneposten',
+  'entities.letters.ravenpost_welcome.subject': 'Ravnene flyver nu for dig',
+  'entities.letters.ravenpost_welcome.body':
+    'Vejfarende,\n\nRavneposten har rejst sine siddepinde over hele dalen. Find ravnesøjlerne i Eastbrook, Fenbridge og Highwatch: fra enhver af dem kan du sende breve, mønter og varer til andre eventyrere og hente alt, hvad ravnene bringer dig.\n\nVedlagt en lille opmærksomhed til dit første frimærke.\n\nVingerne op,\nRavneposten',
+  'entities.letters.letter_q_wolves.sender': 'Marskal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Der er ro ved foldene igen',
+  'entities.letters.letter_q_wolves.body':
+    'Hyrderne kan for en gangs skyld sove med begge øjne lukkede, og det er din fortjeneste. Jeg har bedt Ravneposten bringe dig en lille skilling fra vagtkassen.\n\nHold din klinge smurt.\n- Marskal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marskal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Gamle Gråkæbe, endelig',
+  'entities.letters.letter_q_greyjaw.body':
+    'Rygter løber hurtigt i så lille en by. Hyrderne skålede for dit helbred i aftes, og Wilkes sværger, at ulven var stor som en kærre. Lad dem bare brodere: du har fortjent det.\n\nTag et måltid på vagtens regning.\n- Marskal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Broder Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Det, du gjorde i mørket',
+  'entities.letters.letter_q_hollow.body':
+    'Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric',
 };

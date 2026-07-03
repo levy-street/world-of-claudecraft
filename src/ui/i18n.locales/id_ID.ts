@@ -1091,6 +1091,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.moggers_shiv.name': 'Belati Mogger',
   'entities.items.moggers_stomper_boots.name': 'Bot Penginjak Mogger',
   'entities.items.monarch_crown_helm.name': 'Mahkota Sang Raja',
+  'entities.items.copper_mining_pick.name': 'Beliung Tambang Tembaga',
+  'entities.items.iron_mining_pick.name': 'Beliung Tambang Besi',
+  'entities.items.mithril_mining_pick.name': 'Beliung Tambang Mithril',
+  'entities.items.handaxe.name': 'Kapak Tangan',
+  'entities.items.felling_axe.name': 'Kapak Tebang',
+  'entities.items.ironbark_axe.name': 'Kapak Kulit Besi',
+  'entities.items.gathering_sickle.name': 'Sabit Panen',
+  'entities.items.bronze_sickle.name': 'Sabit Perunggu',
+  'entities.items.silverleaf_sickle.name': 'Sabit Daun Perak',
   'entities.items.moongate_rubbing.name': 'Gosokan Penangkal',
   'entities.items.moonpale_scale.name': 'Sisik Pucat Bulan',
   'entities.items.moonscale_saber.name': 'Sabel Sisik Bulan',
@@ -5164,4 +5173,21 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jangan sekarang',
   'hudChrome.nativeUpdate.title': 'Pembaruan Tersedia',
   'hudChrome.nativeUpdate.update': 'Perbarui',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Pos Gagak',
+  'entities.letters.ravenpost_welcome.subject': 'Kini para gagak terbang untukmu',
+  'entities.letters.ravenpost_welcome.body':
+    'Pengelana,\n\nPos Gagak telah membuka tenggeran di seluruh lembah. Carilah pilar gagak di Eastbrook, Fenbridge, dan Highwatch: dari mana pun kau bisa mengirim surat, koin, dan barang kepada petualang lain, serta mengambil apa pun yang dibawa para gagak untukmu.\n\nTerlampir sedikit tanda mata untuk perangko pertamamu.\n\nKepakkan sayap,\nPos Gagak',
+  'entities.letters.letter_q_wolves.sender': 'Marsekal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Kandang kembali tenang',
+  'entities.letters.letter_q_wolves.body':
+    'Para gembala akhirnya bisa tidur nyenyak, dan itu berkat dirimu. Kuminta Pos Gagak mengantarkan sedikit imbalan dari kas penjaga.\n\nJaga bilahmu tetap terasah.\n- Marsekal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marsekal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Si Tua Rahang Kelabu, akhirnya',
+  'entities.letters.letter_q_greyjaw.body':
+    'Kabar cepat menyebar di kota sekecil ini. Semalam para gembala bersulang untuk kesehatanmu, dan Wilkes bersumpah serigala itu sebesar gerobak. Biarkan mereka melebih-lebihkan: kau pantas mendapatkannya.\n\nNikmati makan atas nama penjaga.\n- Marsekal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Apa yang kaulakukan dalam gelap',
+  'entities.letters.letter_q_hollow.body':
+    'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
 };

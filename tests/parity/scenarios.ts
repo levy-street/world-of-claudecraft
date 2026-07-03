@@ -3417,11 +3417,11 @@ function c4bEffectDispatch(): Scenario {
       sim.castAbility('sinister_strike', rogue); // weaponStrike -> meleeSwing + awardCombo latch
       ready(eRogue);
       eRogue.comboPoints = 3;
-      eRogue.comboTargetId = mobR.id;
+      eRogue.comboUntil = sim.time + 30; // character-bound pool, kept alive through ready()
       sim.castAbility('eviscerate', rogue); // finisherDamage range-then-chance + combo reset
       ready(eRogue);
       eRogue.comboPoints = 2;
-      eRogue.comboTargetId = mobR.id;
+      eRogue.comboUntil = sim.time + 30;
       sim.castAbility('kidney_shot', rogue); // finisherStun + combo-spend reset
       rec.snapshot('rogue-combo-finishers');
 
