@@ -1637,6 +1637,14 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     p.pos.z = run.origin.z + hz.zBase + 72;
     p.prevPos = { ...p.pos };
     expect(countBlackwaterHits(sim, 45)).toBe(0);
+    // Dais-ONLY annulus point: (11.5,72) is inside the dais (r 12) but off every
+    // island rect (the coincident (0,72,hw:11) island stops at |x|=11), so the
+    // dais branch of standingOnLitanyDryGround is pinned independently; the
+    // centre point above is also covered by that island.
+    p.pos.x = run.origin.x + 11.5;
+    p.pos.z = run.origin.z + hz.zBase + 72;
+    p.prevPos = { ...p.pos };
+    expect(countBlackwaterHits(sim, 45)).toBe(0);
     // Control: the west deep pocket (-12,22,r6) is genuinely wet.
     p.pos.x = run.origin.x - 12;
     p.pos.z = run.origin.z + hz.zBase + 22;
@@ -1952,6 +1960,29 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     expect(hatched.length).toBe(2);
     // widowling minLevel 12 + the Heroic enemyLevelBonus 3, same as the waves.
     for (const m of hatched) expect(m!.level).toBe(15);
+  });
+
+  it('hatched widowlings stay at base level on Normal (the bonus is tier-gated)', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = enterModule(sim, 'litany_baptistry');
+    run.litanyBaptistry!.wave = 2;
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob) mob.dead = true;
+    }
+    sim.tick();
+    const sac = sim.entities.get(run.litanyBaptistry!.eggSacIds[0]!)!;
+    sim.player.pos = { ...sac.pos };
+    sim.player.prevPos = { ...sac.pos };
+    (sim as any).dealDamage(sim.player, sac, 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+    const hatched = run.mobIds
+      .map((id) => sim.entities.get(id))
+      .filter((m) => m && !m.dead && m.templateId === 'mirefen_widowling');
+    expect(hatched.length).toBe(2);
+    // A regression applying the +3 bonus unconditionally fails here.
+    for (const m of hatched) expect(m!.level).toBe(12);
   });
 
   it('the sealed exit hints to destroy the spider sacs once they are up, generic otherwise', () => {
@@ -2511,6 +2542,9 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
 
   it('rite loot is owner-locked so a party member cannot front-run the collect', () => {
     const sim = makeSim('warrior');
+    const rival = sim.addPlayer('warrior', 'Frontrunner');
+    sim.partyInvite(rival, sim.playerId);
+    sim.partyAccept(rival);
     const run = enterLitanyApse(sim);
     killNhalia(sim);
     chooseRite(sim, 'easy');
@@ -2522,6 +2556,23 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     // Same guard the lockpick chest uses: collectDelveChestLoot refuses any
     // pid other than lootOwnerId while it is set.
     expect(state.lootOwnerId).toBe(sim.playerId);
+    // A partied run-mate standing ON the chest is refused by the owner guard,
+    // not the distance check; the refusal error proves the guard fired (a
+    // silent early return would leave pendingLoot untouched too).
+    const chest = sim.entities.get(chestId)!;
+    const rivalEnt = sim.entities.get(rival)!;
+    rivalEnt.pos = { ...chest.pos };
+    rivalEnt.prevPos = { ...chest.pos };
+    sim.drainEvents();
+    sim.collectDelveChestLoot(chestId, rival);
+    expect(state.pendingLoot!.length).toBeGreaterThan(0);
+    const refusals = sim.drainEvents().filter((e) => e.type === 'error');
+    expect(refusals.some((e) => /nothing left to take/i.test(e.text ?? ''))).toBe(true);
+    // The opener collects normally.
+    sim.player.pos = { ...chest.pos };
+    sim.player.prevPos = { ...chest.pos };
+    sim.collectDelveChestLoot(chestId);
+    expect(state.pendingLoot!.length).toBe(0);
   });
 
   it('Easy caps loot at low even with a flawless replay', () => {

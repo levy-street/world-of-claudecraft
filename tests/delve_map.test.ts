@@ -4,6 +4,8 @@ import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../src/sim/delve_layou
 import { isLitanyModuleId, litanyModuleGeometry } from '../src/sim/delve_litany_layout';
 import {
   delveAreaLabel,
+  delveCanvasScales,
+  delveLocalToCanvas,
   delveSchematicPlayer,
   delveSchematicStatic,
   playerDelveLocal,
@@ -131,6 +133,57 @@ describe('delveSchematicStatic', () => {
     );
     const firstIsland = prims.findIndex((p) => p.kind === 'rect' && p.fill === '#203026');
     expect(firstIsland).toBeGreaterThan(lastPool);
+  });
+
+  it('pool and island SIZES span exactly their position-mapped world extents', () => {
+    // The bug this pins: sizes drawn with a single min() scale (or the wrong
+    // axis) while positions map per-axis, so pools/islands rendered at a
+    // quarter to half the width the outline implied. Extents are asserted via
+    // delveLocalToCanvas of the world-space edges, so a size/position scale
+    // mismatch on either axis fails regardless of which side regressed.
+    const layout = DELVE_MODULE_LAYOUTS.litany_apse;
+    const geo = litanyModuleGeometry('litany_apse');
+    expect(geo).toBeDefined();
+    if (!geo) return;
+    const { sx, sz } = delveCanvasScales(layout, CANVAS_SIZE, PAD);
+    // The apse is genuinely anisotropic; a single-scale regression is only
+    // distinguishable from per-axis scales because sx != sz here.
+    expect(Math.abs(sx - sz)).toBeGreaterThan(0.5);
+    const at = (x: number, z: number) => delveLocalToCanvas(x, z, layout, CANVAS_SIZE, PAD);
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const pools = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'circle' }> =>
+        p.kind === 'circle' && p.fill === '#071512',
+    );
+    for (const hz of geo.hazards) {
+      const c = at(hz.x, hz.z);
+      // The moat is two CONCENTRIC hazards (shallow ring + deep core), so match
+      // by center then take the closest radius; the edge asserts below still
+      // fail on any size-scale regression because relative order is preserved.
+      const pool = pools
+        .filter((p) => Math.abs(p.cx - c.cx) < 0.01 && Math.abs(p.cy - c.cy) < 0.01)
+        .sort((a, b) => Math.abs(a.r - hz.r * sx) - Math.abs(b.r - hz.r * sx))[0];
+      expect(pool, `no pool prim at hazard (${hz.x},${hz.z})`).toBeDefined();
+      // X is mirrored, so the +x world edge is the smaller canvas x.
+      expect(pool!.cx - pool!.r).toBeCloseTo(at(hz.x + hz.r, hz.z).cx, 3);
+      expect(pool!.cy + (pool!.ry ?? pool!.r)).toBeCloseTo(at(hz.x, hz.z + hz.r).cy, 3);
+    }
+    const islands = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'rect' }> =>
+        p.kind === 'rect' && p.fill === '#203026',
+    );
+    expect(islands.length).toBe(geo.islands.length);
+    for (const isl of geo.islands) {
+      const c = at(isl.x, isl.z);
+      const rect = islands.find(
+        (p) => Math.abs(p.x + p.w / 2 - c.cx) < 0.01 && Math.abs(p.y + p.h / 2 - c.cy) < 0.01,
+      );
+      expect(rect, `no island rect at (${isl.x},${isl.z})`).toBeDefined();
+      expect(rect!.x).toBeCloseTo(at(isl.x + isl.hw, isl.z).cx, 3);
+      expect(rect!.x + rect!.w).toBeCloseTo(at(isl.x - isl.hw, isl.z).cx, 3);
+      expect(rect!.y).toBeCloseTo(at(isl.x, isl.z - isl.hd).cy, 3);
+      expect(rect!.y + rect!.h).toBeCloseTo(at(isl.x, isl.z + isl.hd).cy, 3);
+    }
   });
 
   it('litany_sluice draws irregular walkable geometry instead of one full room rectangle', () => {

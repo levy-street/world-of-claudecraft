@@ -2519,3 +2519,34 @@ describe('aura decode fast-path guards (composition edge cases)', () => {
     expect(rec.value2).toBeUndefined(); // not a stale 8
   });
 });
+
+describe('entity-anchored world event scoping', () => {
+  it('delivers delveRitePulse to sessions near its entityId anchor and not to far ones', () => {
+    // The rite pulse is a world event with no pid; eventAnchor must resolve its
+    // entityId to the shrine position and interest-scope delivery (EVENT_RADIUS).
+    // Pre-fix the field was shrineId, which eventAnchor did not recognize, so
+    // the pulse broadcast realm-wide and closed rite popups in unrelated runs.
+    const server = new GameServer();
+    const near = fakeWs();
+    const far = fakeWs();
+    const sNear = joinServer(server, near, 1, 'Nearena');
+    const sFar = joinServer(server, far, 2, 'Faraway');
+    const nearEnt = server.sim.entities.get(sNear.pid)!;
+    const farEnt = server.sim.entities.get(sFar.pid)!;
+    farEnt.pos.x = nearEnt.pos.x + 500;
+    farEnt.pos.z = nearEnt.pos.z + 500;
+    near.sent.length = 0;
+    far.sent.length = 0;
+    // Anchor on the near player's own entity: eventAnchor only reads a live
+    // entity's position, so any resolvable id pins the scoping semantics.
+    (server as any).routeEvents([
+      { type: 'delveRitePulse', entityId: nearEnt.id, shrineKind: 'rite_shrine_bell' },
+    ]);
+    const pulses = (fc: ReturnType<typeof fakeWs>) =>
+      fc.sent
+        .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
+        .filter((ev: { type: string }) => ev.type === 'delveRitePulse');
+    expect(pulses(near)).toHaveLength(1);
+    expect(pulses(far)).toHaveLength(0);
+  });
+});

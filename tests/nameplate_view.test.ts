@@ -95,6 +95,38 @@ describe('nameplate_view - visibility', () => {
     ).toBe(true);
   });
 
+  it('shows every marsh puzzle interactable (and its spent variant) near, hides it far', () => {
+    // The delve-interact allowlist gained the marsh puzzle objects so their
+    // delveUi.object.* labels render like the rite shrines; pin each template
+    // (fresh AND spent) both inside and outside the interact radius so a
+    // dropped or renamed allowlist row reddens here.
+    const puzzle = [
+      'delve_sluice_valve',
+      'delve_sluice_valve_open',
+      'delve_grave_tablet',
+      'delve_grave_tablet_lit',
+      'delve_corpse_candle',
+      'delve_corpse_candle_lit',
+      'delve_bell_rope',
+      'delve_bell_rope_pulled',
+    ];
+    for (const templateId of puzzle) {
+      expect(
+        plan(ent({ kind: 'object', templateId, pos: { x: 0, y: 0, z: 1 } })).hidden,
+        `${templateId} near`,
+      ).toBe(false);
+      expect(
+        plan(ent({ kind: 'object', templateId, pos: { x: 0, y: 0, z: 30 } })).hidden,
+        `${templateId} far`,
+      ).toBe(true);
+    }
+    // The gate stays an allowlist: an unlisted object is label-less even near.
+    expect(
+      plan(ent({ kind: 'object', templateId: 'delve_pressure_plate', pos: { x: 0, y: 0, z: 1 } }))
+        .hidden,
+    ).toBe(true);
+  });
+
   it('hides the sealed royal door inside the boss arena (it reads as back wall)', () => {
     expect(
       plan(ent({ kind: 'object', templateId: 'dungeon_door', dungeonId: 'nythraxis_boss_arena' }))
