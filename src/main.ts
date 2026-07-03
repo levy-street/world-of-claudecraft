@@ -91,8 +91,7 @@ import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
-import { playerMeleeRangeAgainstTarget } from './sim/mob_combat';
-import { DT, dist2d, INTERACT_RANGE, type PlayerClass, RUN_SPEED } from './sim/types';
+import { DT, dist2d, INTERACT_RANGE, MELEE_RANGE, type PlayerClass, RUN_SPEED } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
 import { startSitePresence } from './site_presence';
 import {
@@ -1853,7 +1852,7 @@ async function startGame(
       if (
         e &&
         isAttackableEntity(e, world.playerId, activePvpOpponentIds(world)) &&
-        dist2d(world.player.pos, e.pos) <= playerMeleeRangeAgainstTarget(e)
+        dist2d(world.player.pos, e.pos) <= MELEE_RANGE
       ) {
         if (attackMoveEngagedId !== chaseId) {
           world.targetEntity(chaseId);

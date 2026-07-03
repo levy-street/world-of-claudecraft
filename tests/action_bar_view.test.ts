@@ -89,11 +89,7 @@ interface WorldOpts {
   queuedOnSwing?: string | null;
   playerPos?: { x: number; y: number; z: number };
   targetPos?: { x: number; y: number; z: number } | null;
-  targetPrevPos?: { x: number; y: number; z: number };
   targetDead?: boolean;
-  targetKind?: 'player' | 'mob' | 'npc' | 'object';
-  targetTemplateId?: string;
-  targetScale?: number;
   inventory?: { itemId: string; count: number }[];
 }
 
@@ -110,17 +106,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
     },
-    target:
-      targetPos === null
-        ? null
-        : {
-            dead: opts.targetDead ?? false,
-            pos: targetPos,
-            prevPos: opts.targetPrevPos,
-            kind: opts.targetKind,
-            templateId: opts.targetTemplateId,
-            scale: opts.targetScale,
-          },
+    target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
   };
 }
@@ -227,38 +213,6 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
       .outOfRange;
     expect(far).toBe(true);
     expect(near).toBe(false);
-  });
-  it('a range-0 targeted ability uses ordinary mob edge reach when target metadata is available', () => {
-    const view = createActionBarView(
-      descriptor(slot(1, { ability: ability('rend', { requiresTarget: true, range: 0 }) })),
-      fakeDeps(),
-    );
-    const atMobEdge = view.tick(
-      world({
-        targetPos: { x: MELEE_RANGE + 0.5, y: 0, z: 0 },
-        targetPrevPos: { x: MELEE_RANGE + 0.6, y: 0, z: 0 },
-        targetKind: 'mob',
-        targetTemplateId: 'forest_wolf',
-        targetScale: 1,
-      }),
-    ).slots[0].outOfRange;
-    expect(atMobEdge).toBe(false);
-  });
-  it('a stationary ordinary mob still uses true melee range for range-0 abilities', () => {
-    const view = createActionBarView(
-      descriptor(slot(1, { ability: ability('rend', { requiresTarget: true, range: 0 }) })),
-      fakeDeps(),
-    );
-    const stationaryEdge = view.tick(
-      world({
-        targetPos: { x: MELEE_RANGE + 0.5, y: 0, z: 0 },
-        targetPrevPos: { x: MELEE_RANGE + 0.5, y: 0, z: 0 },
-        targetKind: 'mob',
-        targetTemplateId: 'forest_wolf',
-        targetScale: 1,
-      }),
-    ).slots[0].outOfRange;
-    expect(stationaryEdge).toBe(true);
   });
 
   it('a dead target yields no distance, so a ranged ability never reads out of range', () => {

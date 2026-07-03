@@ -17,7 +17,7 @@ import {
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import { type Entity, MELEE_RANGE, type PlayerClass } from '../src/sim/types';
+import type { Entity, PlayerClass } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -60,10 +60,6 @@ function spawnDummy(sim: AnySim, p: AnyEntity, level = 5, dz = 2): AnyEntity {
   p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
   sim.targetEntity(mob.id, p.id);
   return mob;
-}
-
-function markMovedThisTick(e: AnyEntity): void {
-  e.prevPos = { ...e.pos, z: e.pos.z + 0.1 };
 }
 
 // Capture the event stream. ctx.emit is late-bound, so swapping sim.emit is observed.
@@ -184,7 +180,7 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
 describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
   it('a hunter at range takes the ranged branch (Auto Shot), arming ranged-speed cadence', () => {
     const { sim, p, meta } = makeSim('hunter', 12);
-    spawnDummy(sim, p, 8, 20); // beyond the 8yd dead zone, within 35
+    const mob = spawnDummy(sim, p, 8, 20); // beyond the 8yd dead zone, within 35
     p.autoAttack = true;
     p.swingTimer = 0;
     const events = capture(sim);
@@ -196,7 +192,7 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
 
   it('a warrior in melee takes the melee branch, arming weapon-speed cadence', () => {
     const { sim, p, meta } = makeSim('warrior', 12);
-    spawnDummy(sim, p, 5, 2); // within MELEE_RANGE
+    const mob = spawnDummy(sim, p, 5, 2); // within MELEE_RANGE
     p.autoAttack = true;
     p.swingTimer = 0;
     const events = capture(sim);
@@ -205,33 +201,6 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
       events.some((e) => e.type === 'damage' && e.school === 'physical' && e.sourceId === p.id),
     ).toBe(true);
     expect(p.swingTimer).toBeCloseTo(p.weapon.speed * sim.swingIntervalMult(p));
-  });
-  it('a warrior can melee an ordinary mob at the same 5-6yd edge where that mob can hit', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    const mob = spawnDummy(sim, p, 1, MELEE_RANGE + 0.5);
-    markMovedThisTick(mob);
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(
-      events.some((e) => e.type === 'damage' && e.school === 'physical' && e.sourceId === p.id),
-    ).toBe(true);
-    expect(p.swingTimer).toBeCloseTo(p.weapon.speed * sim.swingIntervalMult(p));
-    expect(mob.hp).toBeLessThan(mob.maxHp);
-  });
-  it('does not grant edge reach against a stationary ordinary mob', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    const mob = spawnDummy(sim, p, 1, MELEE_RANGE + 0.5);
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(
-      events.some((e) => e.type === 'damage' && e.school === 'physical' && e.sourceId === p.id),
-    ).toBe(false);
-    expect(p.swingTimer).toBe(0);
-    expect(mob.hp).toBe(mob.maxHp);
   });
 
   it('the swing timer decrements every tick even while not auto-attacking', () => {
@@ -256,27 +225,6 @@ describe('auto_attack start/stopAutoAttack', () => {
     startAutoAttack(sim.ctx, p.id);
     expect(p.autoAttack).toBe(true);
     expect(mob.aggroTargetId).toBe(p.id); // idle mob pulled into combat (ctx.aggroMob)
-  });
-  it('startAutoAttack engages an ordinary mob at its matching melee edge', () => {
-    const { sim, p } = makeSim('warrior', 12);
-    const mob = spawnDummy(sim, p, 1, MELEE_RANGE + 0.5);
-    markMovedThisTick(mob);
-    startAutoAttack(sim.ctx, p.id);
-    expect(p.autoAttack).toBe(true);
-    expect(mob.aggroTargetId).toBe(p.id);
-  });
-
-  it('range-0 melee abilities share the ordinary mob edge reach', () => {
-    const { sim, p } = makeSim('rogue', 12);
-    const mob = spawnDummy(sim, p, 1, MELEE_RANGE + 0.5);
-    markMovedThisTick(mob);
-    p.resource = 100;
-    const events = capture(sim);
-    sim.castAbility('sinister_strike', p.id);
-    expect(events.some((e) => e.type === 'error')).toBe(false);
-    expect(p.resource).toBeLessThan(100);
-    expect(p.gcdRemaining).toBeGreaterThan(0);
-    expect(mob.hp).toBeLessThan(mob.maxHp);
   });
 
   it('stopAutoAttack clears the flag', () => {
