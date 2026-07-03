@@ -126,8 +126,7 @@ describe('Players pages', () => {
     auth.name = 'alice';
     render(App);
 
-    await screen.findByText('alice');
-    const accountLink = screen.getByRole('button', { name: '1' });
+    const accountLink = await screen.findByRole('button', { name: '1' });
     const accountRow = accountLink.closest('tr');
     if (!accountRow) throw new Error('account row not found');
     expect(screen.getByPlaceholderText(t('accounts.searchPlaceholder'))).toBeInTheDocument();
