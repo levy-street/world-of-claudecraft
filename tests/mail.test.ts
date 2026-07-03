@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
+import { HOMESTEAD_SLOT_COUNT } from '../src/sim/data';
 import {
   MAIL_DELIVERY_SECONDS,
   MAIL_MAX_ATTACHMENTS,
@@ -32,9 +33,9 @@ function tickFor(sim: Sim, seconds: number): SimEvent[] {
 }
 
 describe('mailboxes in the world', () => {
-  it('spawns one interactable mailbox object per town', () => {
+  it('spawns one interactable mailbox object per town plus one per plot', () => {
     const sim = makeWorld();
-    expect(sim.postOffice.mailboxIds).toHaveLength(MAILBOXES.length);
+    expect(sim.postOffice.mailboxIds).toHaveLength(MAILBOXES.length + HOMESTEAD_SLOT_COUNT);
     for (const id of sim.postOffice.mailboxIds) {
       const box = sim.entities.get(id);
       expect(box?.kind).toBe('object');

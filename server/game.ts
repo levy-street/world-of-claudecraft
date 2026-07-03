@@ -282,6 +282,9 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'mail_take',
   'mail_delete',
   'mail_read',
+  'housing_buy',
+  'housing_travel',
+  'housing_leave',
   'pet_feed',
   'dev_give',
   'dev_level',
@@ -2847,6 +2850,15 @@ export class GameServer {
       case 'mail_take':
         if (typeof msg.id === 'number') sim.mailTake(msg.id, pid);
         break;
+      case 'housing_buy':
+        sim.homesteadBuy(pid);
+        break;
+      case 'housing_travel':
+        sim.homesteadTravel(pid);
+        break;
+      case 'housing_leave':
+        sim.homesteadLeave(pid);
+        break;
       case 'mail_delete':
         if (typeof msg.id === 'number') sim.mailDelete(msg.id, pid);
         break;
@@ -3270,6 +3282,7 @@ export class GameServer {
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
+    maybe('homeO', this.sim.homesteadOwnedFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).

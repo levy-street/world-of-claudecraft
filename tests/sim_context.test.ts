@@ -205,6 +205,8 @@ const CALLBACK_KEYS = [
   'marketListingBelongsTo',
   // Ravenpost mail: the quest turn-in letter hook.
   'queueQuestLetter',
+  // Player housing: the Homestead Gate return teleport.
+  'homesteadLeave',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -438,6 +440,8 @@ function makeFakeHost() {
     marketListingBelongsTo: vi.fn(() => false),
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
+    // Player housing: the Homestead Gate return teleport.
+    homesteadLeave: vi.fn(),
   };
   return { host, rng, entities, clock };
 }

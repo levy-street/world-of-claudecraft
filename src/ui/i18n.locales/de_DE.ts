@@ -5220,4 +5220,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
   'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
   'entities.letters.letter_q_hollow.body': 'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Verwalter Fenwick',
+  'entities.npcs.land_steward.title': 'Landverwalter',
+  'entities.npcs.land_steward.greeting': 'Träumt Ihr von einem eigenen Herd? In den Heimstatt-Tälern liegt eine Parzelle bereit für jeden mit hundert Gold und einer Hand, die die Urkunde unterschreibt.',
+  'worldContent.homesteadGateName': 'Heimstatt-Tor',
 };

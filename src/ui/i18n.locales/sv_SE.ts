@@ -5106,4 +5106,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Broder Aldric',
   'entities.letters.letter_q_hollow.subject': 'Det du gjorde i mörkret',
   'entities.letters.letter_q_hollow.body': 'Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Förvaltare Fenwick',
+  'entities.npcs.land_steward.title': 'Jordförvaltare',
+  'entities.npcs.land_steward.greeting': 'Drömmer du om en egen härd? Hemmansdalarna håller en tomt redo för var och en med hundra guld och en hand att skriva under lagfarten med.',
+  'worldContent.homesteadGateName': 'Hemmansporten',
 };

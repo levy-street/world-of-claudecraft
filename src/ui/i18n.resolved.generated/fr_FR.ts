@@ -1111,6 +1111,28 @@ export const fr_FR: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const fr_FR: EnTranslations = {
         "title": "Gardien du reliquaire",
         "greeting": "Le reliquaire d'en bas a de nouveau bougé."
       },
+      "land_steward": {
+        "name": "Intendant Fenwick",
+        "title": "Intendant des Terres",
+        "greeting": "Vous rêvez d’un foyer bien à vous ? Les Vallons du Domaine gardent une parcelle prête pour quiconque a cent pièces d’or et une main pour signer l’acte."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Veille-marées",
@@ -6953,6 +6980,7 @@ export const fr_FR: EnTranslations = {
     "delveLockedChestInteract": "Appuyez sur F pour crocheter la serrure",
     "delveRewardChestInteract": "Appuyez sur F pour récupérer le butin",
     "delveSurfaceExitInteract": "Appuyez sur F pour remonter",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Porte du Domaine"
   }
 };

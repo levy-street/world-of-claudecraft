@@ -12,6 +12,7 @@ export interface PickInteractionWorld {
   targetEntity(id: number | null): void;
   enterDungeon(dungeonId: string): void;
   leaveDungeon(): void;
+  homesteadLeave(): void;
   pickUpObject(id: number): void;
   startAutoAttack(): void;
 }
@@ -125,6 +126,7 @@ export function handlePickedEntity(
       }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
+      else if (e.templateId === 'homestead_exit') world.homesteadLeave();
       else if (e.templateId === 'mailbox') hud.openMailbox();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
@@ -149,6 +151,7 @@ export function handlePickedEntity(
       if (d > INTERACT_RANGE + 1) return;
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
+      else if (e.templateId === 'homestead_exit') world.homesteadLeave();
       else if (e.templateId === 'mailbox') hud.openMailbox();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {

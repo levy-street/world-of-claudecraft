@@ -1111,6 +1111,28 @@ export const it_IT: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const it_IT: EnTranslations = {
         "title": "Custode del Reliquiario",
         "greeting": "Il reliquiario sottostante si è spostato di nuovo."
       },
+      "land_steward": {
+        "name": "Castaldo Fenwick",
+        "title": "Castaldo delle Terre",
+        "greeting": "Sogni un focolare tutto tuo? Le Valli del Podere tengono pronto un lotto per chiunque abbia cento monete d’oro e una mano per firmare l’atto."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Guardamarea",
@@ -6953,6 +6980,7 @@ export const it_IT: EnTranslations = {
     "delveLockedChestInteract": "Premi F per scassinare la serratura",
     "delveRewardChestInteract": "Premi F per reclamare il bottino",
     "delveSurfaceExitInteract": "Premi F per risalire",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Cancello del Podere"
   }
 };

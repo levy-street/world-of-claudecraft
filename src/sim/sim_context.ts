@@ -565,6 +565,11 @@ export interface SimContextCallbacks {
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
   // through this; the binding points at the PostOffice instance on Sim.
   queueQuestLetter(questId: string, pid: number): void;
+
+  // Player housing (housing/homestead.ts): the interact dispatcher routes the
+  // Homestead Gate object through this; the binding points at the Homestead
+  // instance on Sim. Append-only.
+  homesteadLeave(pid?: number): void;
 }
 
 // The seam consumed by extracted modules.
@@ -900,5 +905,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     marketListingBelongsTo: host.marketListingBelongsTo,
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
+    // Player housing: the Homestead Gate return teleport (points at the Homestead on Sim).
+    homesteadLeave: host.homesteadLeave,
   };
 }

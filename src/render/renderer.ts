@@ -67,6 +67,7 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
+import { buildHomestead, type HomesteadView } from './homestead';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
@@ -663,7 +664,10 @@ function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCateg
 
 function isPersistentPortalObject(e: Entity): boolean {
   return (
-    e.kind === 'object' && (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
+    e.kind === 'object' &&
+    (e.templateId === 'dungeon_door' ||
+      e.templateId === 'dungeon_exit' ||
+      e.templateId === 'homestead_exit')
   );
 }
 
@@ -825,6 +829,7 @@ export class Renderer {
   private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
   private terrainView: TerrainView;
+  private homesteadView!: HomesteadView;
   private foliage: FoliageView;
   private fish: FishView;
   private critters: CritterField;
@@ -1186,6 +1191,11 @@ export class Renderer {
     // Terrain chunks never move after build (the LOD update only toggles
     // visibility): stop their per-frame matrix recompose (static_matrix.ts).
     freezeStaticMatrices(this.terrainView.group);
+    // The Homestead Glens (player housing) live outside the overworld strip,
+    // so the band gets its own lazily-built ground + plot dressing.
+    this.homesteadView = buildHomestead(this.sim.cfg.seed);
+    setRenderCategory(this.homesteadView.group, 'terrain');
+    this.scene.add(this.homesteadView.group);
     this.waterView = buildWater(this.sim.cfg.seed);
     for (const mesh of this.waterView.meshes) {
       setRenderCategory(mesh, 'water');
@@ -2006,6 +2016,7 @@ export class Renderer {
     this.waterView.update(this.time);
     const fogFar = (this.scene.fog as THREE.Fog).far;
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.homesteadView.update(this.camera.position.x, this.camera.position.z);
     this.propsView.update(
       this.camera.position.x,
       this.camera.position.y,
@@ -3108,7 +3119,9 @@ export class Renderer {
     let portal: THREE.Mesh | undefined;
     if (
       e.kind === 'object' &&
-      (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
+      (e.templateId === 'dungeon_door' ||
+        e.templateId === 'dungeon_exit' ||
+        e.templateId === 'homestead_exit')
     ) {
       const entering = e.templateId === 'dungeon_door';
       const built = this.buildDoorBody(entering, e.dungeonId);
@@ -4430,6 +4443,7 @@ export class Renderer {
     // frustum; camera-ghost props hide against the current eye-to-camera ray.
     const fogFar = (this.scene.fog as THREE.Fog).far;
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.homesteadView.update(this.camera.position.x, this.camera.position.z);
     worldStart = markWorldPhase('terrain', worldStart);
     this.propsView.update(
       this.camera.position.x,

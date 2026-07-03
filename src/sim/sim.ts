@@ -52,6 +52,7 @@ import { isSpellResisted } from './combat/spell_resist';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { HOMESTEAD_EXIT_PORTAL, HOMESTEAD_MAILBOX } from './content/housing';
 import { MAILBOXES } from './content/mailboxes';
 import {
   classHasSkin,
@@ -94,9 +95,12 @@ import {
   FISHING_RARE_ID,
   FISHING_TABLES,
   GROUND_OBJECTS,
+  HOMESTEAD_SLOT_COUNT,
+  homesteadOrigin,
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isDelvePos,
+  isHomesteadPos,
   MOBS,
   NPCS,
   PLAYER_START,
@@ -134,6 +138,7 @@ import {
 import { canEquipItem } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import { Homestead } from './housing/homestead';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -711,6 +716,8 @@ export interface PlayerMeta {
   // One-time Ravenpost welcome letter sent (persisted in CharacterState, so
   // existing characters get the service announcement exactly once).
   mailWelcomed: boolean;
+  // Player housing: the homestead deed (persisted in CharacterState).
+  homesteadOwned: boolean;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
@@ -792,6 +799,8 @@ export interface CharacterState {
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
+  // Homestead deed owned (optional so pre-housing saves load cleanly).
+  homesteadOwned?: boolean;
 }
 
 export interface PetState {
@@ -920,6 +929,9 @@ export class Sim {
   // book, the id counter, and the mailbox entity ids; Sim keeps thin delegates
   // (the market shape). Constructed in the ctor after the SimContext.
   postOffice!: PostOffice;
+  // Player housing (the Homestead Glens): the Homestead owns slot occupancy
+  // and the Land Steward ids; the deed flag lives on PlayerMeta.
+  homestead!: Homestead;
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   private pendingMobRespawns: PendingMobRespawn[] = [];
@@ -957,6 +969,10 @@ export class Sim {
     // Ravenpost mail: owns the mail book; consumes the seam. The mailbox object
     // loop below (after ground objects) registers its mailbox entity ids.
     this.postOffice = new PostOffice(this.ctx);
+    // Player housing: owns Glens slot occupancy; consumes the seam. The NPC
+    // loop below registers the Land Steward; the Glens object loop (after the
+    // town mailboxes) spawns each plot's gate and mailbox.
+    this.homestead = new Homestead(this.ctx);
 
     // NPCs — nudged out of buildings and deep water if their data position is bad
     for (const npcDef of Object.values(NPCS)) {
@@ -965,6 +981,7 @@ export class Sim {
       const npc = createNpc(this.nextId++, npcDef, this.groundPos(safe.x, safe.z));
       this.addEntity(npc);
       if (npcDef.market) this.market.merchantIds.push(npc.id); // every auctioneer anchors the shared World Market
+      if (npcDef.housing) this.homestead.stewardIds.push(npc.id); // the Land Steward anchors player housing
     }
     this.market.seed();
 
@@ -1015,6 +1032,35 @@ export class Sim {
       box.lootable = true; // interactable
       this.addEntity(box);
       this.postOffice.mailboxIds.push(box.id);
+    }
+
+    // Homestead Glens plot furniture: every slot gets its return gate and a
+    // personal Ravenpost mailbox (fixed offsets from the shared blueprint;
+    // draws no rng, appended after every other spawn so existing entity ids
+    // and world-gen draws are untouched).
+    for (let slot = 0; slot < HOMESTEAD_SLOT_COUNT; slot++) {
+      const origin = homesteadOrigin(slot);
+      const gate = createGroundObject(
+        this.nextId++,
+        '',
+        'Homestead Gate',
+        this.groundPos(origin.x + HOMESTEAD_EXIT_PORTAL.x, origin.z + HOMESTEAD_EXIT_PORTAL.z),
+      );
+      gate.templateId = 'homestead_exit';
+      gate.objectItemId = null;
+      gate.lootable = true; // interactable
+      this.addEntity(gate);
+      const plotBox = createGroundObject(
+        this.nextId++,
+        '',
+        'Mailbox',
+        this.groundPos(origin.x + HOMESTEAD_MAILBOX.x, origin.z + HOMESTEAD_MAILBOX.z),
+      );
+      plotBox.templateId = 'mailbox';
+      plotBox.objectItemId = null;
+      plotBox.lootable = true; // interactable
+      this.addEntity(plotBox);
+      this.postOffice.mailboxIds.push(plotBox.id);
     }
 
     // Dungeon entrances + their private instance slots
@@ -1168,6 +1214,10 @@ export class Sim {
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
+    } else if (savedPos && isHomesteadPos(savedPos.x)) {
+      // Characters saved inside the Glens rejoin beside the Land Steward:
+      // their per-visit slot is gone (or someone else's) by now.
+      savedPos = this.homestead.townReturnPos();
     }
     const startPos = savedPos
       ? this.groundPos(savedPos.x, savedPos.z)
@@ -1231,6 +1281,7 @@ export class Sim {
       away: null,
       marketQuery: defaultMarketQuery(),
       mailWelcomed: false,
+      homesteadOwned: false,
       delveMarks: 0,
       delveClears: {},
       companionUpgrades: {},
@@ -1298,6 +1349,7 @@ export class Sim {
         }
       }
       meta.mailWelcomed = s.mailWelcomed === true;
+      meta.homesteadOwned = s.homesteadOwned === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -1516,6 +1568,7 @@ export class Sim {
         markClears: meta.delveDaily.markClears,
       },
       mailWelcomed: meta.mailWelcomed,
+      homesteadOwned: meta.homesteadOwned,
     };
     return sanitizeRemovedZone1Content(state).state;
   }
@@ -2304,6 +2357,7 @@ export class Sim {
       partyCapacity: (party) => sim.party.partyCapacity(party),
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
+      homesteadLeave: (pid) => sim.homestead.homesteadLeave(pid),
     };
     return createSimContext(host);
   }
@@ -2539,6 +2593,7 @@ export class Sim {
     this.updateDelveRuns();
     this.market.update();
     this.postOffice.update();
+    this.homestead.update();
     drainDelayedEvents(this.ctx);
 
     // movement re-bucketing: queries during the next tick and the server's
@@ -5361,6 +5416,33 @@ export class Sim {
 
   loadMail(save: MailSave | null | undefined): void {
     this.postOffice.loadMail(save);
+  }
+
+  // -------------------------------------------------------------------------
+  // Player housing (the Homestead Glens)
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the Homestead instance (this.homestead), which owns slot
+  // occupancy and the travel/purchase rules (housing/homestead.ts).
+
+  homesteadBuy(pid?: number): void {
+    this.homestead.homesteadBuy(pid);
+  }
+
+  homesteadTravel(pid?: number): void {
+    this.homestead.homesteadTravel(pid);
+  }
+
+  homesteadLeave(pid?: number): void {
+    this.homestead.homesteadLeave(pid);
+  }
+
+  homesteadOwnedFor(pid: number): boolean {
+    return this.players.get(pid)?.homesteadOwned === true;
+  }
+
+  get homesteadOwned(): boolean {
+    return this.primaryId !== -1 && this.homesteadOwnedFor(this.primaryId);
   }
 
   // -------------------------------------------------------------------------

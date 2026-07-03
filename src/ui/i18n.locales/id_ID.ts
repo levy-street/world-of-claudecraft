@@ -5170,4 +5170,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
   'entities.letters.letter_q_hollow.subject': 'Apa yang kaulakukan dalam gelap',
   'entities.letters.letter_q_hollow.body': 'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Pengurus Fenwick',
+  'entities.npcs.land_steward.title': 'Pengurus Tanah',
+  'entities.npcs.land_steward.greeting': 'Memimpikan perapian milikmu sendiri? Lembah Homestead menyiapkan sebidang tanah bagi siapa pun yang membawa seratus emas dan tangan untuk menandatangani aktanya.',
+  'worldContent.homesteadGateName': 'Gerbang Homestead',
 };

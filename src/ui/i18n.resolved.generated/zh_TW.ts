@@ -1111,6 +1111,28 @@ export const zh_TW: EnTranslations = {
           "note": "朝聖者在月中之月下聚於神廟月門。"
         }
       }
+    },
+    "housing": {
+      "buy": "購買家園地契（{price}）",
+      "buyAria": "以 {price} 購買家園地契",
+      "travel": "前往你的家園",
+      "travelAria": "傳送到家園谷地中你的家園",
+      "confirmTitle": "家園地契",
+      "confirmBuy": "花費 {price} 在谷地簽下屬於你的家園？",
+      "confirmOk": "簽署地契",
+      "confirmCancel": "再想想",
+      "purchasedBanner": "家園谷地在等你。",
+      "arrivedBanner": "你的家園",
+      "leftBanner": "東溪鎮",
+      "result": {
+        "purchased": "地契歸你了。找管家談談即可造訪你的家園。",
+        "alreadyOwned": "你已經持有家園地契。",
+        "cantAfford": "你買不起這份地契。",
+        "notOwned": "你還沒有家園地契。",
+        "tooFar": "你必須與土地管家當面交談。",
+        "glensFull": "谷地眼下有些擁擠。請稍後再試。",
+        "notHome": "你不在你的家園。"
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const zh_TW: EnTranslations = {
         "title": "聖物庫守護人",
         "greeting": "下方的聖物庫又移位了。"
       },
+      "land_steward": {
+        "name": "管家芬威克",
+        "title": "土地管家",
+        "greeting": "夢想擁有自己的爐火嗎？家園谷地為每一位備好一塊地，只要你帶著一百金幣，親手簽下地契。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
         "title": "守潮者",
@@ -6953,6 +6980,7 @@ export const zh_TW: EnTranslations = {
     "delveLockedChestInteract": "按 F 撬鎖",
     "delveRewardChestInteract": "按 F 領取戰利品",
     "delveSurfaceExitInteract": "按 F 攀回地表",
-    "mailboxName": "郵箱"
+    "mailboxName": "郵箱",
+    "homesteadGateName": "家園之門"
   }
 };

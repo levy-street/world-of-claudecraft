@@ -1111,6 +1111,28 @@ export const tr_TR: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const tr_TR: EnTranslations = {
         "title": "Emanetlik Bekçisi",
         "greeting": "Aşağıdaki kutsal emanetlik yine yer değiştirdi."
       },
+      "land_steward": {
+        "name": "Kahya Fenwick",
+        "title": "Toprak Kahyası",
+        "greeting": "Kendi ocağının hayalini mi kuruyorsun? Yurtluk Vadileri, yüz altını ve tapuyu imzalayacak eli olan herkes için bir arsa hazır tutuyor."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Gelgit Gözcüsü",
@@ -6953,6 +6980,7 @@ export const tr_TR: EnTranslations = {
     "delveLockedChestInteract": "Kilidi açmak için F'ye bas",
     "delveRewardChestInteract": "Ganimeti almak için F'ye bas",
     "delveSurfaceExitInteract": "Tırmanmak için F'ye bas",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Yurtluk Kapısı"
   }
 };

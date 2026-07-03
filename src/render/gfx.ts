@@ -702,6 +702,8 @@ export interface SurfaceMatOpts {
   emissive?: number;
   emissiveIntensity?: number;
   side?: THREE.Side;
+  /** per-vertex colors (needs a `color` attribute on the geometry) */
+  vertexColors?: boolean;
   /** subtle cool fresnel rim glow — sells silhouettes against dark ground */
   rim?: boolean;
 }
@@ -756,6 +758,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,
         side: opts.side ?? THREE.FrontSide,
+        vertexColors: opts.vertexColors ?? false,
       })
     : new THREE.MeshLambertMaterial({
         color: opts.color ?? 0xffffff,
@@ -764,6 +767,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,
         side: opts.side ?? THREE.FrontSide,
+        vertexColors: opts.vertexColors ?? false,
       });
   if (opts.rim && GFX.standardMaterials) addRimGlow(mat);
   matCache.set(key, mat);

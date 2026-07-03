@@ -1111,6 +1111,28 @@ export const vi_VN: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const vi_VN: EnTranslations = {
         "title": "Người Giữ Thánh Tích",
         "greeting": "Hầm thánh tích bên dưới lại dịch chuyển lần nữa."
       },
+      "land_steward": {
+        "name": "Quản Sự Fenwick",
+        "title": "Quản Sự Đất Đai",
+        "greeting": "Mơ về một mái ấm của riêng mình ư? Thung Lũng Trang Trại luôn sẵn một mảnh đất cho bất kỳ ai có trăm vàng và bàn tay ký vào địa khế."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Người Canh Thủy Triều",
@@ -6953,6 +6980,7 @@ export const vi_VN: EnTranslations = {
     "delveLockedChestInteract": "Nhấn F để cạy khóa",
     "delveRewardChestInteract": "Nhấn F để nhận chiến lợi phẩm",
     "delveSurfaceExitInteract": "Nhấn F để leo lên",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Cổng Trang Trại"
   }
 };

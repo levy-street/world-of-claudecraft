@@ -5132,4 +5132,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Brat Aldric',
   'entities.letters.letter_q_hollow.subject': 'To, czego dokonałeś w mroku',
   'entities.letters.letter_q_hollow.body': 'Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Włodarz Fenwick',
+  'entities.npcs.land_steward.title': 'Włodarz Ziemski',
+  'entities.npcs.land_steward.greeting': 'Marzysz o własnym ognisku? Doliny Zagród trzymają działkę dla każdego, kto ma sto sztuk złota i rękę do podpisania aktu.',
+  'worldContent.homesteadGateName': 'Brama Zagrody',
 };

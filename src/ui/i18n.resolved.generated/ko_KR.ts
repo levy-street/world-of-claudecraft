@@ -1111,6 +1111,28 @@ export const ko_KR: EnTranslations = {
           "note": "보름의 달 아래 순례자들이 사원의 달문에 모입니다."
         }
       }
+    },
+    "housing": {
+      "buy": "홈스테드 증서 구입 ({price})",
+      "buyAria": "{price}에 홈스테드 증서 구입",
+      "travel": "내 홈스테드로 이동",
+      "travelAria": "홈스테드 골짜기의 내 땅으로 순간이동",
+      "confirmTitle": "홈스테드 증서",
+      "confirmBuy": "{price}을(를) 내고 골짜기에 나만의 홈스테드를 마련할까요?",
+      "confirmOk": "증서에 서명",
+      "confirmCancel": "아직은 아니오",
+      "purchasedBanner": "홈스테드 골짜기가 당신을 기다립니다.",
+      "arrivedBanner": "나의 홈스테드",
+      "leftBanner": "이스트브룩",
+      "result": {
+        "purchased": "증서는 당신의 것입니다. 집사에게 말을 걸면 홈스테드를 방문할 수 있습니다.",
+        "alreadyOwned": "이미 홈스테드 증서를 갖고 있습니다.",
+        "cantAfford": "증서를 살 여유가 없습니다.",
+        "notOwned": "아직 홈스테드 증서가 없습니다.",
+        "tooFar": "토지 집사와 직접 이야기해야 합니다.",
+        "glensFull": "골짜기가 지금은 붐빕니다. 잠시 후 다시 시도하세요.",
+        "notHome": "홈스테드에 있지 않습니다."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const ko_KR: EnTranslations = {
         "title": "성물실 관리인",
         "greeting": "아래의 성물실이 또 움직였소."
       },
+      "land_steward": {
+        "name": "집사 펜윅",
+        "title": "토지 집사",
+        "greeting": "자신만의 난롯가를 꿈꾸는가? 홈스테드 골짜기에는 금화 백 닢과 증서에 서명할 손만 있으면 누구에게나 내어줄 터가 마련되어 있다네."
+      },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
         "title": "조수지기",
@@ -6953,6 +6980,7 @@ export const ko_KR: EnTranslations = {
     "delveLockedChestInteract": "F를 눌러 자물쇠 따기",
     "delveRewardChestInteract": "F를 눌러 전리품 받기",
     "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기",
-    "mailboxName": "우편함"
+    "mailboxName": "우편함",
+    "homesteadGateName": "홈스테드 문"
   }
 };

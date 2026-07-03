@@ -5099,4 +5099,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Birader Aldric',
   'entities.letters.letter_q_hollow.subject': 'Karanlıkta yaptıkların',
   'entities.letters.letter_q_hollow.body': 'O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Kahya Fenwick',
+  'entities.npcs.land_steward.title': 'Toprak Kahyası',
+  'entities.npcs.land_steward.greeting': 'Kendi ocağının hayalini mi kuruyorsun? Yurtluk Vadileri, yüz altını ve tapuyu imzalayacak eli olan herkes için bir arsa hazır tutuyor.',
+  'worldContent.homesteadGateName': 'Yurtluk Kapısı',
 };

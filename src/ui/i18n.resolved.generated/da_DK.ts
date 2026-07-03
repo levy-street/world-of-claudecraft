@@ -1111,6 +1111,28 @@ export const da_DK: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const da_DK: EnTranslations = {
         "title": "Relikvarievogter",
         "greeting": "Relikvariet nedenunder har flyttet sig igen."
       },
+      "land_steward": {
+        "name": "Forvalter Fenwick",
+        "title": "Jordforvalter",
+        "greeting": "Drømmer du om din egen arne? Homestead-dalene har en grund klar til enhver med hundrede guld og en hånd til at underskrive skødet."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidevogter",
@@ -6953,6 +6980,7 @@ export const da_DK: EnTranslations = {
     "delveLockedChestInteract": "Tryk på F for at dirke låsen op",
     "delveRewardChestInteract": "Tryk på F for at kræve byttet",
     "delveSurfaceExitInteract": "Tryk på F for at klatre",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Hjemstavnsport"
   }
 };

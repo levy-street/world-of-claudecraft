@@ -24,6 +24,7 @@ import {
 } from '../render/characters/portrait';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
+import { HOMESTEAD_DEED_COPPER } from '../sim/content/housing';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -68,6 +69,7 @@ import type {
   AbilityDef,
   CalendarResultCode,
   EquipSlot,
+  HousingResultCode,
   InvSlot,
   LootRollChoice,
   MailResultCode,
@@ -448,6 +450,18 @@ const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
   recipientBoxFull: 'hudChrome.mailbox.result.recipientBoxFull',
   letterGone: 'hudChrome.mailbox.result.letterGone',
   takeParcelsFirst: 'hudChrome.mailbox.result.takeParcelsFirst',
+};
+// Player-housing outcome lines (the successes render as banners in handleEvents).
+const HOUSING_RESULT_KEYS: Record<HousingResultCode, TranslationKey> = {
+  purchased: 'hudChrome.housing.result.purchased',
+  traveledHome: 'hudChrome.housing.arrivedBanner',
+  leftHome: 'hudChrome.housing.leftBanner',
+  alreadyOwned: 'hudChrome.housing.result.alreadyOwned',
+  cantAfford: 'hudChrome.housing.result.cantAfford',
+  notOwned: 'hudChrome.housing.result.notOwned',
+  tooFar: 'hudChrome.housing.result.tooFar',
+  glensFull: 'hudChrome.housing.result.glensFull',
+  notHome: 'hudChrome.housing.result.notHome',
 };
 // Guild calendar outcome lines (created/removed are chat-log successes).
 const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
@@ -6607,6 +6621,20 @@ export class Hud {
           this.calendarWindow.onCalendarResult(ev.code);
           break;
         }
+        case 'housingResult': {
+          if (ev.code === 'purchased') {
+            audio.coin();
+            this.log(t(HOUSING_RESULT_KEYS.purchased), '#c8f7c5');
+            this.showBanner(t('hudChrome.housing.purchasedBanner'));
+          } else if (ev.code === 'traveledHome') {
+            this.showSubzone(t('hudChrome.housing.arrivedBanner'));
+          } else if (ev.code === 'leftHome') {
+            this.showSubzone(t('hudChrome.housing.leftBanner'));
+          } else {
+            this.showError(t(HOUSING_RESULT_KEYS[ev.code]));
+          }
+          break;
+        }
         case 'error':
           this.showError(this.localizeErrorText(ev.text));
           break;
@@ -8144,6 +8172,13 @@ export class Hud {
     if (def?.market) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
+    if (def?.housing) {
+      if (this.sim.homesteadOwned) {
+        html += `<button type="button" class="qd-list-item" data-housing-travel="1" aria-label="${esc(t('hudChrome.housing.travelAria'))}"><span class="gold">${svgIcon('map')}</span> ${esc(t('hudChrome.housing.travel'))}</button>`;
+      } else {
+        html += `<button type="button" class="qd-list-item" data-housing-buy="1" aria-label="${esc(t('hudChrome.housing.buyAria', { price: formatLocalizedMoney(HOMESTEAD_DEED_COPPER) }))}"><span class="quest-complete">$</span> ${esc(t('hudChrome.housing.buy', { price: formatLocalizedMoney(HOMESTEAD_DEED_COPPER) }))}</button>`;
+      }
+    }
     if (Object.values(DELVES).some((d) => d.boardNpcId === npc.templateId)) {
       html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(t('delveUi.board.openDelve'))}</button>`;
     }
@@ -8167,6 +8202,24 @@ export class Hud {
     el.querySelector('[data-market]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
       this.openMarket();
+    });
+    el.querySelector('[data-housing-buy]')?.addEventListener('click', () => {
+      // Purchase runs through the shared confirm dialog: 100 gold is the
+      // biggest single spend in the game, so it never fires on a stray click.
+      this.confirmDialog(
+        t('hudChrome.housing.confirmTitle'),
+        t('hudChrome.housing.confirmBuy', { price: formatLocalizedMoney(HOMESTEAD_DEED_COPPER) }),
+        t('hudChrome.housing.confirmOk'),
+        t('hudChrome.housing.confirmCancel'),
+        () => {
+          this.sim.homesteadBuy();
+          this.closeQuestDialog(false);
+        },
+      );
+    });
+    el.querySelector('[data-housing-travel]')?.addEventListener('click', () => {
+      this.closeQuestDialog(false);
+      this.sim.homesteadTravel();
     });
     el.querySelector('[data-delve-board]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);

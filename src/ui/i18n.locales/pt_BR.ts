@@ -5176,4 +5176,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Irmão Aldric',
   'entities.letters.letter_q_hollow.subject': 'O que você fez na escuridão',
   'entities.letters.letter_q_hollow.body': 'Poucos saberão o que estava enterrado naquela baixada, e menos ainda acreditariam. Eu sei, e não vou esquecer.\n\nQue seu caminho continue iluminado.\n- Irmão Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Intendente Fenwick',
+  'entities.npcs.land_steward.title': 'Intendente de Terras',
+  'entities.npcs.land_steward.greeting': 'Sonha com uma lareira só sua? Os Vales do Casarão guardam um lote pronto para quem tiver cem de ouro e mão firme para assinar a escritura.',
+  'worldContent.homesteadGateName': 'Portão do Casarão',
 };

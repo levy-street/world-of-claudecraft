@@ -152,6 +152,10 @@ export function interact(ctx: SimContext, pid?: number): void {
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
         }
+        if (target.templateId === 'homestead_exit') {
+          ctx.homesteadLeave(p.id);
+          return;
+        }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
         pickUpObject(ctx, target.id, p.id);
         return;
@@ -201,6 +205,10 @@ export function interact(ctx: SimContext, pid?: number): void {
     }
     if (obj.templateId === 'mailbox') {
       ctx.emit({ type: 'mailbox', pid: p.id });
+      return;
+    }
+    if (obj.templateId === 'homestead_exit') {
+      ctx.homesteadLeave(p.id);
       return;
     }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;

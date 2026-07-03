@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 22 domain facets (each IWorld member assigned exactly once).
+// FACET MAP: the 23 domain facets (each IWorld member assigned exactly once).
 // One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
@@ -31,6 +31,7 @@
 //   social_graph.ts     IWorldSocialGraph    friends/blocks/guild (online-only frames)
 //   market.ts           IWorldMarket         World Market browse/list/buy
 //   mail.ts             IWorldMail           Ravenpost mail send/take + unread badge
+//   housing.ts          IWorldHousing        homestead deed + teleport travel
 //   dungeons.ts         IWorldDungeons       dungeon enter/leave + raid lockouts
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
 //   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
@@ -54,6 +55,7 @@ import type { IWorldDelves } from './world_api/delves';
 import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldHousing } from './world_api/housing';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
@@ -149,6 +151,7 @@ export interface IWorld
     IWorldSocialGraph,
     IWorldMarket,
     IWorldMail,
+    IWorldHousing,
     IWorldDungeons,
     IWorldDelves,
     IWorldDailyRewards,
@@ -292,6 +295,9 @@ export const COMMAND_NAMES = [
   'mail_read',
   'guild_event_create',
   'guild_event_remove',
+  'housing_buy',
+  'housing_travel',
+  'housing_leave',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -352,6 +358,7 @@ export type WorldFacet =
   | 'IWorldSocialGraph'
   | 'IWorldMarket'
   | 'IWorldMail'
+  | 'IWorldHousing'
   | 'IWorldDungeons'
   | 'IWorldDelves'
   | 'IWorldDailyRewards'
@@ -467,6 +474,11 @@ export const COMMAND_FACETS = {
   mail_take: 'IWorldMail',
   mail_delete: 'IWorldMail',
   mail_read: 'IWorldMail',
+  // IWorldHousing: homestead deed + travel (snake_case wire strings, by design).
+  // homesteadOwned is a snapshot read (no send, untagged).
+  housing_buy: 'IWorldHousing',
+  housing_travel: 'IWorldHousing',
+  housing_leave: 'IWorldHousing',
   // IWorldDungeons: dungeon enter/leave. raidLockouts is a snapshot-derived read
   // (no send, untagged). enter_crypt/leave_crypt are legacy dispatch-only aliases
   // (untagged; on the DISPATCH_ONLY_COMMANDS allowlist), NOT IWorldDungeons.

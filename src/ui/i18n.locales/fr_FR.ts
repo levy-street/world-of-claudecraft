@@ -5236,4 +5236,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Frère Aldric',
   'entities.letters.letter_q_hollow.subject': 'Ce que vous avez accompli dans le noir',
   'entities.letters.letter_q_hollow.body': 'Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Intendant Fenwick',
+  'entities.npcs.land_steward.title': 'Intendant des Terres',
+  'entities.npcs.land_steward.greeting': 'Vous rêvez d’un foyer bien à vous ? Les Vallons du Domaine gardent une parcelle prête pour quiconque a cent pièces d’or et une main pour signer l’acte.',
+  'worldContent.homesteadGateName': 'Porte du Domaine',
 };

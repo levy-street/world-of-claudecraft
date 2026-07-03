@@ -32,6 +32,7 @@ import {
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { LAND_STEWARD } from './content/housing';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -159,6 +160,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
+  land_steward: LAND_STEWARD,
 };
 
 export const QUESTS: Record<string, QuestDef> = {
@@ -459,6 +461,35 @@ export function delveSlotAt(delveIndex: number, z: number, modules: readonly str
     }
   }
   return best;
+}
+
+// ---------------------------------------------------------------------------
+// The Homestead Glens: player-housing plots in their own far-WEST x-band, the
+// mirror of the dungeon/arena/delve bands on the east side. Every plot shares
+// one blueprint (content/housing.ts); slots stack along z like dungeon
+// instance slots. x at/below HOMESTEAD_X_THRESHOLD is inside the Glens
+// (world.terrainHeight gives the band its own meadow heightfield).
+// ---------------------------------------------------------------------------
+
+export const HOMESTEAD_X = -900; // every plot shares this x; slots stack along z
+export const HOMESTEAD_X_THRESHOLD = -600; // x at/below this = inside the Glens
+export const HOMESTEAD_SLOT_COUNT = 24;
+const HOMESTEAD_Z0 = -1250;
+export const HOMESTEAD_SLOT_SPACING = 240; // plot bowl (~90u) + open meadow between neighbors
+
+export function homesteadOrigin(slot: number): { x: number; z: number } {
+  return { x: HOMESTEAD_X, z: HOMESTEAD_Z0 + slot * HOMESTEAD_SLOT_SPACING };
+}
+
+export function isHomesteadPos(x: number): boolean {
+  return x <= HOMESTEAD_X_THRESHOLD;
+}
+
+// Nearest homestead slot to a world-z (the terrain, collider, and renderer all
+// resolve a Glens position back to its plot this way; mirrors arenaOriginAt).
+export function homesteadSlotAt(z: number): number {
+  const raw = Math.round((z - HOMESTEAD_Z0) / HOMESTEAD_SLOT_SPACING);
+  return Math.max(0, Math.min(HOMESTEAD_SLOT_COUNT - 1, raw));
 }
 
 // Memoized: the default chain is a pure function of the static DELVES table, and

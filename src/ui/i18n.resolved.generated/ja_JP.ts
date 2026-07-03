@@ -1111,6 +1111,28 @@ export const ja_JP: EnTranslations = {
           "note": "月半ばの月の下、巡礼者が神殿の月門に集う。"
         }
       }
+    },
+    "housing": {
+      "buy": "ホームステッドの地券を購入（{price}）",
+      "buyAria": "{price}でホームステッドの地券を購入",
+      "travel": "自分のホームステッドへ行く",
+      "travelAria": "ホームステッドの谷にある自分の土地へテレポート",
+      "confirmTitle": "ホームステッドの地券",
+      "confirmBuy": "{price}で谷に自分のホームステッドを構えますか？",
+      "confirmOk": "地券に署名する",
+      "confirmCancel": "まだやめておく",
+      "purchasedBanner": "ホームステッドの谷が待っています。",
+      "arrivedBanner": "あなたのホームステッド",
+      "leftBanner": "イーストブルック",
+      "result": {
+        "purchased": "地券はあなたのものです。執事に話しかければホームステッドを訪れられます。",
+        "alreadyOwned": "すでにホームステッドの地券を持っています。",
+        "cantAfford": "地券を買う余裕がありません。",
+        "notOwned": "まだホームステッドの地券を持っていません。",
+        "tooFar": "土地執事と直接話す必要があります。",
+        "glensFull": "谷は今ちょうど混み合っています。しばらくしてからもう一度どうぞ。",
+        "notHome": "あなたはホームステッドにいません。"
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const ja_JP: EnTranslations = {
         "title": "聖遺物庫の番人",
         "greeting": "下の聖遺物庫がまた動いた。"
       },
+      "land_steward": {
+        "name": "執事フェンウィック",
+        "title": "土地執事",
+        "greeting": "自分だけの炉端を夢見ているのか？ホームステッドの谷には、金貨百枚と証書に署名する手を持つ者のために区画が用意されている。"
+      },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
@@ -6953,6 +6980,7 @@ export const ja_JP: EnTranslations = {
     "delveLockedChestInteract": "Fで錠を開ける",
     "delveRewardChestInteract": "Fで戦利品を受け取る",
     "delveSurfaceExitInteract": "Fで地上へ登る",
-    "mailboxName": "メールボックス"
+    "mailboxName": "メールボックス",
+    "homesteadGateName": "ホームステッドの門"
   }
 };

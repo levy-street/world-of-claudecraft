@@ -1111,6 +1111,28 @@ export const nl_NL: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const nl_NL: EnTranslations = {
         "title": "Reliekbewaarder",
         "greeting": "Het reliekschrijn beneden is opnieuw verschoven."
       },
+      "land_steward": {
+        "name": "Rentmeester Fenwick",
+        "title": "Landrentmeester",
+        "greeting": "Droom je van een eigen haard? De Hoevedalen houden een kavel klaar voor iedereen met honderd goud en een hand om de akte te tekenen."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tijwachter",
@@ -6953,6 +6980,7 @@ export const nl_NL: EnTranslations = {
     "delveLockedChestInteract": "Druk op F om het slot te kraken",
     "delveRewardChestInteract": "Druk op F om de buit op te eisen",
     "delveSurfaceExitInteract": "Druk op F om te klimmen",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Hoevepoort"
   }
 };

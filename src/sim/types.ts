@@ -1127,6 +1127,9 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  // The Land Steward: talking to this NPC offers the homestead deed purchase
+  // and the teleport to the owner's plot (player housing).
+  housing?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -1569,6 +1572,19 @@ export type CalendarResultCode =
   | 'calendarFull'
   | 'eventGone';
 
+// Player-housing command outcomes (`purchased`/`traveledHome`/`leftHome` are
+// successes; the rest refusals). The client renders every line from the code.
+export type HousingResultCode =
+  | 'purchased'
+  | 'traveledHome'
+  | 'leftHome'
+  | 'alreadyOwned'
+  | 'cantAfford'
+  | 'notOwned'
+  | 'tooFar'
+  | 'glensFull'
+  | 'notHome';
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -1638,6 +1654,8 @@ export type SimEvent = { pid?: number } & (
   // sim never books guild events); declared here so the one client event
   // switch stays exhaustively typed.
   | { type: 'calendarResult'; code: CalendarResultCode }
+  // Player housing outcome (structured data only, the lockpick convention).
+  | { type: 'housingResult'; code: HousingResultCode }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is

@@ -1711,6 +1711,10 @@ async function startGame(
         world.leaveDungeon();
         return;
       }
+      if (obj.templateId === 'homestead_exit') {
+        world.homesteadLeave();
+        return;
+      }
       if (obj.templateId === 'mailbox') {
         hud.openMailbox();
         return;

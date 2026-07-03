@@ -5163,4 +5163,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Broeder Aldric',
   'entities.letters.letter_q_hollow.subject': 'Wat je in het donker hebt gedaan',
   'entities.letters.letter_q_hollow.body': 'Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Rentmeester Fenwick',
+  'entities.npcs.land_steward.title': 'Landrentmeester',
+  'entities.npcs.land_steward.greeting': 'Droom je van een eigen haard? De Hoevedalen houden een kavel klaar voor iedereen met honderd goud en een hand om de akte te tekenen.',
+  'worldContent.homesteadGateName': 'Hoevepoort',
 };

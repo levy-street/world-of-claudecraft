@@ -107,6 +107,7 @@ const NPC_IDS = [
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
+  'land_steward',
 ] as const;
 
 const QUEST_IDS = [
@@ -239,6 +240,7 @@ type WorldEntityTranslations = {
     delveRewardChestInteract: string;
     delveSurfaceExitInteract: string;
     mailboxName: string;
+    homesteadGateName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -347,6 +349,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRewardChestInteract: 'Press F to claim spoils',
       delveSurfaceExitInteract: 'Press F to climb',
       mailboxName: 'Mailbox',
+      homesteadGateName: 'Homestead Gate',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

@@ -5123,4 +5123,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Tu Huynh Aldric',
   'entities.letters.letter_q_hollow.subject': 'Điều bạn đã làm trong bóng tối',
   'entities.letters.letter_q_hollow.body': 'Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Quản Sự Fenwick',
+  'entities.npcs.land_steward.title': 'Quản Sự Đất Đai',
+  'entities.npcs.land_steward.greeting': 'Mơ về một mái ấm của riêng mình ư? Thung Lũng Trang Trại luôn sẵn một mảnh đất cho bất kỳ ai có trăm vàng và bàn tay ký vào địa khế.',
+  'worldContent.homesteadGateName': 'Cổng Trang Trại',
 };

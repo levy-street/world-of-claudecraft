@@ -1111,6 +1111,28 @@ export const pl_PL: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const pl_PL: EnTranslations = {
         "title": "Strażnik Relikwiarza",
         "greeting": "Relikwiarz poniżej znów się przesunął."
       },
+      "land_steward": {
+        "name": "Włodarz Fenwick",
+        "title": "Włodarz Ziemski",
+        "greeting": "Marzysz o własnym ognisku? Doliny Zagród trzymają działkę dla każdego, kto ma sto sztuk złota i rękę do podpisania aktu."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Strażnik Przypływów",
@@ -6953,6 +6980,7 @@ export const pl_PL: EnTranslations = {
     "delveLockedChestInteract": "Naciśnij F, aby otworzyć zamek wytrychem",
     "delveRewardChestInteract": "Naciśnij F, aby zgarnąć łupy",
     "delveSurfaceExitInteract": "Naciśnij F, aby się wspiąć",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Brama Zagrody"
   }
 };

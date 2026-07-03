@@ -5189,4 +5189,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Fratello Aldric',
   'entities.letters.letter_q_hollow.subject': 'Ciò che hai compiuto nel buio',
   'entities.letters.letter_q_hollow.body': 'Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Castaldo Fenwick',
+  'entities.npcs.land_steward.title': 'Castaldo delle Terre',
+  'entities.npcs.land_steward.greeting': 'Sogni un focolare tutto tuo? Le Valli del Podere tengono pronto un lotto per chiunque abbia cento monete d’oro e una mano per firmare l’atto.',
+  'worldContent.homesteadGateName': 'Cancello del Podere',
 };

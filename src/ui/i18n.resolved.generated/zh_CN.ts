@@ -1111,6 +1111,28 @@ export const zh_CN: EnTranslations = {
           "note": "朝圣者在月中之月下聚于神庙月门。"
         }
       }
+    },
+    "housing": {
+      "buy": "购买家园地契（{price}）",
+      "buyAria": "以 {price} 购买家园地契",
+      "travel": "前往你的家园",
+      "travelAria": "传送到家园谷地中你的家园",
+      "confirmTitle": "家园地契",
+      "confirmBuy": "花费 {price} 在谷地签下属于你的家园？",
+      "confirmOk": "签署地契",
+      "confirmCancel": "再想想",
+      "purchasedBanner": "家园谷地在等你。",
+      "arrivedBanner": "你的家园",
+      "leftBanner": "东溪镇",
+      "result": {
+        "purchased": "地契归你了。找管家谈谈即可造访你的家园。",
+        "alreadyOwned": "你已经持有家园地契。",
+        "cantAfford": "你买不起这份地契。",
+        "notOwned": "你还没有家园地契。",
+        "tooFar": "你必须与土地管家当面交谈。",
+        "glensFull": "谷地眼下有些拥挤。请稍后再试。",
+        "notHome": "你不在你的家园。"
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const zh_CN: EnTranslations = {
         "title": "圣物库守护人",
         "greeting": "下方的圣物库又移位了。"
       },
+      "land_steward": {
+        "name": "管家芬威克",
+        "title": "土地管家",
+        "greeting": "梦想拥有自己的炉火吗？家园谷地为每一位备好一块地，只要你带着一百金币，亲手签下地契。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
@@ -6953,6 +6980,7 @@ export const zh_CN: EnTranslations = {
     "delveLockedChestInteract": "按 F 撬锁",
     "delveRewardChestInteract": "按 F 领取战利品",
     "delveSurfaceExitInteract": "按 F 攀回地表",
-    "mailboxName": "邮箱"
+    "mailboxName": "邮箱",
+    "homesteadGateName": "家园之门"
   }
 };

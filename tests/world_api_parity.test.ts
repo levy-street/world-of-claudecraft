@@ -48,6 +48,7 @@ import type { IWorldDelves } from '../src/world_api/delves';
 import type { IWorldDuelArena } from '../src/world_api/duel_arena';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
+import type { IWorldHousing } from '../src/world_api/housing';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
 import type { IWorldLoot } from '../src/world_api/loot';
@@ -70,8 +71,8 @@ interface IWorldMember {
   readonly kind: IWorldMemberKind;
 }
 
-// The 157 members of `interface IWorld`, in interface order (world_api.ts).
-// Partition: 38 `data` + 119 `method` (read-returning + command-void + async).
+// The 161 members of `interface IWorld`, in interface order (world_api.ts).
+// Partition: 39 `data` + 122 `method` (read-returning + command-void + async).
 // biome-ignore lint/suspicious/noExportsInTest: IWORLD_MEMBERS is the W0c pinned structural-parity contract (the authoritative IWorld member list)
 export const IWORLD_MEMBERS = [
   // --- core world / player roster + economy reads (data) ---
@@ -203,6 +204,11 @@ export const IWORLD_MEMBERS = [
   { name: 'mailTake', kind: 'method' },
   { name: 'mailDelete', kind: 'method' },
   { name: 'mailMarkRead', kind: 'method' },
+  // --- player housing (the Homestead Glens) reads + commands ---
+  { name: 'homesteadOwned', kind: 'data' },
+  { name: 'homesteadBuy', kind: 'method' },
+  { name: 'homesteadTravel', kind: 'method' },
+  { name: 'homesteadLeave', kind: 'method' },
   // --- dungeons + delves commands and reads ---
   { name: 'enterDungeon', kind: 'method' },
   { name: 'leaveDungeon', kind: 'method' },
@@ -341,9 +347,9 @@ beforeAll(() => {
 
 describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => {
   it('pins total / data / method counts', () => {
-    expect(IWORLD_MEMBERS.length).toBe(157);
-    expect(DATA_MEMBERS.length).toBe(38);
-    expect(METHOD_MEMBERS.length).toBe(119);
+    expect(IWORLD_MEMBERS.length).toBe(161);
+    expect(DATA_MEMBERS.length).toBe(39);
+    expect(METHOD_MEMBERS.length).toBe(122);
   });
 
   it('has no duplicate member names', () => {
@@ -353,7 +359,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 157', () => {
+  it('the full sorted member set is exactly the pinned 161', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -424,6 +430,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildPromote',
       'guildTransfer',
       'healPet',
+      'homesteadBuy',
+      'homesteadLeave',
+      'homesteadOwned',
+      'homesteadTravel',
       'interact',
       'inventory',
       'known',
@@ -515,7 +525,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted data-kind set is exactly the pinned 38', () => {
+  it('the sorted data-kind set is exactly the pinned 39', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountCosmetics',
       'activeLoadout',
@@ -530,6 +540,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'duelInfo',
       'entities',
       'equipment',
+      'homesteadOwned',
       'inventory',
       'known',
       'lifetimeXp',
@@ -558,7 +569,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 119', () => {
+  it('the sorted method-kind set is exactly the pinned 122', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -616,6 +627,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildPromote',
       'guildTransfer',
       'healPet',
+      'homesteadBuy',
+      'homesteadLeave',
+      'homesteadTravel',
       'interact',
       'leaderboard',
       'leaveDelve',
@@ -957,6 +971,14 @@ const FACET_MAIL = [
 ] as const satisfies readonly (keyof IWorldMail)[];
 type _ExhaustMail = AssertNever<Exclude<keyof IWorldMail, (typeof FACET_MAIL)[number]>>;
 
+const FACET_HOUSING = [
+  'homesteadOwned',
+  'homesteadBuy',
+  'homesteadTravel',
+  'homesteadLeave',
+] as const satisfies readonly (keyof IWorldHousing)[];
+type _ExhaustHousing = AssertNever<Exclude<keyof IWorldHousing, (typeof FACET_HOUSING)[number]>>;
+
 const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
@@ -1009,14 +1031,15 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   socialGraph: FACET_SOCIAL_GRAPH,
   market: FACET_MARKET,
   mail: FACET_MAIL,
+  housing: FACET_HOUSING,
   dungeons: FACET_DUNGEONS,
   delves: FACET_DELVES,
   telemetry: FACET_TELEMETRY,
 };
 
-describe('W1: aggregate IWorld member set equals the disjoint union of the 21 facets', () => {
-  it('pins the facet count at 21', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(21);
+describe('W1: aggregate IWorld member set equals the disjoint union of the 22 facets', () => {
+  it('pins the facet count at 22', () => {
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(22);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1026,7 +1049,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 21 fa
     }
   });
 
-  it('the 21 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the 22 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -1042,10 +1065,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 21 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 21 facets equals the pinned 157-member IWORLD_MEMBERS set', () => {
+  it('the union of the 22 facets equals the pinned 161-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(157);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(157);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(161);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(161);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

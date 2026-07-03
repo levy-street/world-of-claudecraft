@@ -876,6 +876,9 @@ export class ClientWorld implements IWorld {
   // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
   mailInfo: MailInfo | null = null;
   mailUnread = 0;
+  // --- IWorldHousing: homestead deed flag, mirrored from the snapshot self
+  // (`s.homeO`, delta-omitted). ---
+  homesteadOwned = false;
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -1550,6 +1553,7 @@ export class ClientWorld implements IWorld {
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
+      if (s.homeO !== undefined) this.homesteadOwned = s.homeO === true;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
@@ -2053,6 +2057,17 @@ export class ClientWorld implements IWorld {
   }
   mailMarkRead(mailId: number): void {
     this.cmd({ cmd: 'mail_read', id: mailId });
+  }
+  // --- IWorldHousing: homestead deed + travel sends (snake_case wire strings).
+  // homesteadOwned is a snapshot read (mirror field above). ---
+  homesteadBuy(): void {
+    this.cmd({ cmd: 'housing_buy' });
+  }
+  homesteadTravel(): void {
+    this.cmd({ cmd: 'housing_travel' });
+  }
+  homesteadLeave(): void {
+    this.cmd({ cmd: 'housing_leave' });
   }
   // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
   // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live

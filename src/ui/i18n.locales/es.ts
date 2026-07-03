@@ -5203,4 +5203,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.sender': 'Hermano Aldric',
   'entities.letters.letter_q_hollow.subject': 'Lo que hiciste en la oscuridad',
   'entities.letters.letter_q_hollow.body': 'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
+  // Player housing (Land Steward + Homestead Gate)
+  'entities.npcs.land_steward.name': 'Intendente Fenwick',
+  'entities.npcs.land_steward.title': 'Intendente de Tierras',
+  'entities.npcs.land_steward.greeting': '¿Sueñas con un hogar propio? Las Cañadas del Homestead tienen una parcela lista para quien traiga cien de oro y mano firme para firmar la escritura.',
+  'worldContent.homesteadGateName': 'Puerta del Homestead',
 };

@@ -1,3 +1,4 @@
+import { HOMESTEAD_HOUSE, HOMESTEAD_WELL } from './content/housing';
 import {
   arenaOriginAt,
   DUNGEON_X_THRESHOLD,
@@ -5,10 +6,13 @@ import {
   delveAt,
   delveModuleLocal,
   dungeonAt,
+  homesteadOrigin,
+  homesteadSlotAt,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
   isDelvePos,
+  isHomesteadPos,
   PROPS,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
@@ -218,6 +222,31 @@ const CRYPT_COLLIDERS: Collider[] = layoutColliders(CRYPT_LAYOUT);
 const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
+
+// The Homestead Glens: one plot-local collider set every slot shares (the
+// blueprint in content/housing.ts). The plot disc is flat at height 2, so the
+// camera tops are absolute like every other collider's. The fence ring is
+// render-only dressing (no collider) by design.
+const HOMESTEAD_COLLIDERS: Collider[] = [
+  {
+    type: 'obb',
+    x: HOMESTEAD_HOUSE.x,
+    z: HOMESTEAD_HOUSE.z,
+    hw: HOMESTEAD_HOUSE.w / 2,
+    hd: HOMESTEAD_HOUSE.d / 2,
+    rot: HOMESTEAD_HOUSE.rot,
+    cameraTopY: 2 + 8,
+    camGhost: true,
+  },
+  {
+    type: 'circle',
+    x: HOMESTEAD_WELL.x,
+    z: HOMESTEAD_WELL.z,
+    r: HOMESTEAD_WELL.radius,
+    cameraTopY: 2 + 3.7,
+    camGhost: true,
+  },
+];
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
 
 // Interior collider sets keyed by DungeonDef.interior.
@@ -374,6 +403,11 @@ export function resolvePosition(
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
     const local = resolveAgainst(colliders, x - ox, z - oz, r, ignoreFences);
     return { x: local.x + ox, z: local.z + oz };
+  }
+  if (isHomesteadPos(x)) {
+    const o = homesteadOrigin(homesteadSlotAt(z));
+    const local = resolveAgainst(HOMESTEAD_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
+    return { x: local.x + o.x, z: local.z + o.z };
   }
   const grid = gridFor(seed);
   const key = `${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`;
@@ -634,6 +668,20 @@ export function cameraOcclusion(
     const { ox, oz, interior } = instanceLocal(ax, az);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
     return sweepColliders(colliders, ax - ox, ay, az - oz, bx - ox, by, bz - oz, pad, true);
+  }
+  if (isHomesteadPos(ax)) {
+    const o = homesteadOrigin(homesteadSlotAt(az));
+    return sweepColliders(
+      HOMESTEAD_COLLIDERS,
+      ax - o.x,
+      ay,
+      az - o.z,
+      bx - o.x,
+      by,
+      bz - o.z,
+      pad,
+      true,
+    );
   }
   const grid = gridFor(seed);
   const gx0 = Math.floor(Math.min(ax, bx) / GRID_CELL),

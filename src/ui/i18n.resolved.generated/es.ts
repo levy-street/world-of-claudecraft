@@ -1111,6 +1111,28 @@ export const es: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "housing": {
+      "buy": "Buy a homestead deed ({price})",
+      "buyAria": "Buy a homestead deed for {price}",
+      "travel": "Travel to your homestead",
+      "travelAria": "Teleport to your homestead in the Homestead Glens",
+      "confirmTitle": "Homestead deed",
+      "confirmBuy": "Sign for your own homestead in the Glens for {price}?",
+      "confirmOk": "Sign the deed",
+      "confirmCancel": "Not yet",
+      "purchasedBanner": "The Homestead Glens await you.",
+      "arrivedBanner": "Your Homestead",
+      "leftBanner": "Eastbrook",
+      "result": {
+        "purchased": "The deed is yours. Speak to the Steward to visit your homestead.",
+        "alreadyOwned": "You already hold a homestead deed.",
+        "cantAfford": "You cannot afford the deed.",
+        "notOwned": "You do not hold a homestead deed yet.",
+        "tooFar": "You must speak with the Land Steward.",
+        "glensFull": "The Glens are crowded just now. Try again shortly.",
+        "notHome": "You are not at your homestead."
+      }
     }
   },
   "guide": {
@@ -5919,6 +5941,11 @@ export const es: EnTranslations = {
         "title": "Guardián del Relicario",
         "greeting": "El relicario de abajo ha vuelto a desplazarse."
       },
+      "land_steward": {
+        "name": "Intendente Fenwick",
+        "title": "Intendente de Tierras",
+        "greeting": "¿Sueñas con un hogar propio? Las Cañadas del Homestead tienen una parcela lista para quien traiga cien de oro y mano firme para firmar la escritura."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Vigía de la Marea",
@@ -6953,6 +6980,7 @@ export const es: EnTranslations = {
     "delveLockedChestInteract": "Pulsa F para forzar la cerradura",
     "delveRewardChestInteract": "Pulsa F para reclamar el botín",
     "delveSurfaceExitInteract": "Pulsa F para trepar",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "homesteadGateName": "Puerta del Homestead"
   }
 };
