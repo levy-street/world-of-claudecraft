@@ -2249,6 +2249,7 @@ export const tr_TR: EnTranslations = {
       "unknownTier": "Bilinmeyen delve kademesi.",
       "levelRequired": "{name} bölümüne girmek için {level}. seviyede olmalısın.",
       "levelRequiredTier": "{tier} kademesinde {name} bölümüne girmek için {level}. seviyede olmalısın.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "{name} için tüm örnekler dolu. Birazdan tekrar dene.",
       "runFailed": "{name} seferi başarısız oldu.",
       "complete": "{name} tamamlandı.",
@@ -2258,6 +2259,14 @@ export const tr_TR: EnTranslations = {
       "doorAlreadyOpen": "Kapı zaten açık.",
       "companionRankUp": "{name} {rank}. dereceye ulaşır.",
       "bossChest": "Patron düşer. Kürsüde mühürlü bir kutsal emanet sandığı yükselir. Ganimetini almak için kilidini aç.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
+      "riteSequencePlaying": "The shrines replay the rite. Wait.",
+      "riteCorrect": "A soft chime answers your touch.",
+      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
+      "riteReliquaryOpen": "The Drowned Reliquary opens.",
+      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
+      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Yüzeye çıkan bir merdiven açılır. Ayrılmak için merdivenlerde F'ye bas.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Odayı temizle.",
@@ -2265,6 +2274,13 @@ export const tr_TR: EnTranslations = {
       "tombstoneHint": "Oda temizlendiğinde kuzeye doğru bir mezar taşı geçidi açılır.",
       "tombstoneOpen": "Mühürlü bir mezar taşı geçidi kuzeye doğru gıcırdayarak açılır. Devam etmek için içine yürü.",
       "tombstoneInto": "Mezar taşından geçerek {name} içine girersin.",
+      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
+      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
+      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
+      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
+      "ropesSealed": "You should try pulling the bell ropes.",
+      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Sandık boş.",
       "notInDelve": "Bir delvede değilsin.",
       "cannotInteract": "Onunla etkileşime giremezsin.",
@@ -2283,9 +2299,12 @@ export const tr_TR: EnTranslations = {
       "passageSealed": "Geçit mühürlü.",
       "moveCloserPassage": "Geçide yaklaş.",
       "moveCloserChest": "Sandığa yaklaş.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Alınacak başka bir şey kalmadı.",
       "wayOutNotOpen": "Çıkış yolu henüz açık değil.",
-      "moveCloserStairs": "Merdivenlere yaklaş."
+      "moveCloserStairs": "Merdivenlere yaklaş.",
+      "nhaliaCantorShield": "Cantors, hold the note!",
+      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
     "lockpick": {
       "lockYields": "Kilit açılır! {tier} ganimet.",
@@ -2348,6 +2367,26 @@ export const tr_TR: EnTranslations = {
       "abandoned": "Maşaları yavaşça geri çekiyorsun. Kilit bekliyor."
     }
   },
+  "delveRiteUi": {
+    "title": "The Drowned Reliquary Rite",
+    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
+    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
+    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
+    "showsTimes": "Sequence shown {count} times",
+    "showsOnce": "Sequence shown once",
+    "symbols": "{count} symbols",
+    "tries": "{count} tries",
+    "reward": {
+      "easy": "Modest spoils",
+      "medium": "Rich spoils",
+      "hard": "Premium spoils"
+    },
+    "closeAria": "Close"
+  },
   "delveUi": {
     "board": {
       "title": "Mağara Panosu",
@@ -2357,6 +2396,7 @@ export const tr_TR: EnTranslations = {
       "openDelveAria": "{name} üzerinden Mağara Panosunu aç",
       "marks": "Mağara Nişanları: {count}",
       "minLevel": "Seviye {level} gerektirir",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Kahramanca"
@@ -2364,6 +2404,7 @@ export const tr_TR: EnTranslations = {
       "companion": {
         "pick": "Bir yoldaş seç",
         "tessa": "Çömez Tessa",
+        "edda": "Edda Reedhand",
         "rank": "Rütbe {rank}",
         "boon": "Dövüşler arasında grubu iyileştirir. 3. seviye, koşu başına bir kez düşmüş bir müttefiki diriltir.",
         "upgrade": "Rütbe {rank}'e yükselt ({marks} Nişan)",
@@ -2389,7 +2430,11 @@ export const tr_TR: EnTranslations = {
       "complete": "Tamamlandı",
       "marks": "Mağara Nişanları: {count}",
       "exitHintOpen": "Mezar taşı geçidine yürü (kuzey)",
-      "exitHintLocked": "Kuzeydeki geçidi açmak için çöp yaratıkları temizle"
+      "exitHintLocked": "Kuzeydeki geçidi açmak için çöp yaratıkları temizle",
+      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
+      "ritePlayback": "Watch the shrines: memorize the order they light up",
+      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
+      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
     },
     "objective": {
       "kill_boss": "{boss} adlı düşmanı öldür",
@@ -2410,27 +2455,54 @@ export const tr_TR: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Aşağıdaki kutsal mahzen yine kaydı. Gece yarısından sonra zeminin ardından ilahiler duyuyoruz ve Çömez Tessa defin defterlerinin kendi mürekkeplerini değiştirdiğine yemin ediyor. Yeterince cesaretin varsa, {playerName}, bir mum al ve aşağı in. Orada duyduğun her sese güvenme. Bazıları senin adını sen doğmadan önce biliyordu."
+      },
+      "halvenMarsh": {
+        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "Merdiven boşluğu soğuk ve karanlık. İniş boyunca kırık aziz taşları saçılı, nemli havada yumuşak bir çan notası asılı duruyor. Çömez Tessa fısıldar: \"Kutsal mahzen bu kadar açık olmamalıydı. Yakınımda kal, {playerName}.\"",
-      "heroic": "Kapılar arkandan inleyerek kapanır. İsimler tırnak gibi taşın üzerinde kazınır. Tessa'nın mumu mavi yanar. \"Artık ölüleri çağırmıyorlar, {playerName}. Bir şeye yanıt veriyorlar.\""
+      "heroic": "Kapılar arkandan inleyerek kapanır. İsimler tırnak gibi taşın üzerinde kazınır. Tessa'nın mumu mavi yanar. \"Artık ölüleri çağırmıyorlar, {playerName}. Bir şeye yanıt veriyorlar.\"",
+      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
+      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Su, defin raflarından sızarak gümüş-siyah dereler hâlinde eski külleri taşıyor.",
       "reliquary_bell_niche": "Düzinelerce el çanı sessizlik içinde asılı duruyor, her biri cenaze bezine bağlanmış.",
       "reliquary_saintless_hall": "Yüzleri özenli bir nefretle yontulup silinmiş heykeller.",
-      "reliquary_finale": "Gömülü çan botlarının altında bir kez çınlar."
+      "reliquary_finale": "Gömülü çan botlarının altında bir kez çınlar.",
+      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
+      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
+      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
+      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
+      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
+      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Batık Kemiklik",
       "reliquary_bell_niche": "Çan Hücresi",
       "reliquary_saintless_hall": "Azizsiz Salon",
-      "reliquary_finale": "Çan Gömülü Oda"
+      "reliquary_finale": "Çan Gömülü Oda",
+      "litany_sluice": "The Crescent Sluice",
+      "litany_ledger": "The Island Ledger",
+      "litany_ring": "The Ring Reliquary",
+      "litany_baptistry": "The Sinkhole Baptistry",
+      "litany_choir_loft": "The Reedsong Gallery",
+      "litany_causeway": "The Y-Split Causeway",
+      "litany_apse": "The Drowned Apse"
+    },
+    "object": {
+      "sluice_valve": "Sluice Valve",
+      "grave_tablet": "Grave Tablet",
+      "corpse_candle": "Corpse-Candle",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
+        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Ayağını sağlam bas, {playerName}. Ölüler burada huzursuz.",
         "low_hp": "Nefes al. Senin için hâlâ dualarım var.",
         "trap_spotted": "Dur. Zeminde bir şey ayak seslerini hatırlıyor.",
@@ -2442,6 +2514,20 @@ export const tr_TR: EnTranslations = {
           "3": "Kutsal Mahzen Çömezi",
           "4": "Mezarçağrısı Tanığı",
           "5": "Şapel Bekçisi"
+        }
+      },
+      "edda": {
+        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
+        "ally_revive": "Up, now. The marsh does not get you today.",
+        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "low_hp": "Steady. My lantern is not out yet.",
+        "trap_spotted": "Wait. The reeds are wrong here.",
+        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
+        "completion": "The fen can swallow its secrets for one more night.",
+        "rank": {
+          "1": "Lantern-Bearer",
+          "2": "Reed-Watcher",
+          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2485,7 +2571,10 @@ export const tr_TR: EnTranslations = {
       "flooded_paths": "Su Basmış Yollar",
       "grave_tax": "Mezar Vergisi",
       "unstable_roof": "Çökmeye Yakın Tavan",
-      "cult_remnants": "Tarikat Kalıntıları"
+      "cult_remnants": "Tarikat Kalıntıları",
+      "high_water": "High Water",
+      "lively_choir": "Lively Choir",
+      "belligerent_dead": "Belligerent Dead"
     },
     "blessing": {
       "chapel_candle": "Şapel Mumu: daha güvenli bir koşu, tamamlamada bir eksik İşaret."
@@ -5317,6 +5406,69 @@ export const tr_TR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varric'in Gölge Başlığı"
       },
+      "siltguard_helm": {
+        "name": "Siltguard Helm"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "Bulwark-Rusted Pauldrons"
+      },
+      "nhalias_bell_maul": {
+        "name": "Nhalia's Bell-Maul"
+      },
+      "reedstalker_jerkin": {
+        "name": "Reedstalker Jerkin"
+      },
+      "mirejaw_fang_knife": {
+        "name": "Mirejaw Fang-Knife"
+      },
+      "widow_silk_hood": {
+        "name": "Widow-Silk Hood"
+      },
+      "cantors_drowned_sash": {
+        "name": "Cantor's Drowned Sash"
+      },
+      "corpse_candle_focus": {
+        "name": "Corpse-Candle Focus"
+      },
+      "nhalias_litany_rod": {
+        "name": "Nhalia's Litany Rod"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      "siltstep_leggings": {
+        "name": "Siltstep Leggings"
+      },
+      "sunken_reliquary_hood": {
+        "name": "Sunken Reliquary Hood"
+      },
+      "litany_legs": {
+        "name": "Silt-Walker Greaves"
+      },
+      "litany_shoulder": {
+        "name": "Blackwater Drift Mantle"
+      },
+      "litany_gloves_rog": {
+        "name": "Reed-Bound Handwraps"
+      },
+      "litany_plate_chest": {
+        "name": "Sump-Warden Cuirass"
+      },
+      "litany_leather_chest": {
+        "name": "Silt-Deep Vestment"
+      },
+      "litany_cloth_chest": {
+        "name": "Choir-Drowned Raiment"
+      },
+      "litany_helm": {
+        "name": "Reliquant's Drowned Cowl"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "Sister Nhalia's Choir-Forged Plate"
+      },
+      "drowned_choir_fang": {
+        "name": "Drowned Choir-Fang"
+      },
       "the_codfather": {
         "name": "Morina Baba"
       },
@@ -5652,6 +5804,39 @@ export const tr_TR: EnTranslations = {
       "acolyte_tessa": {
         "name": "Çömez Tessa"
       },
+      "drowned_cantor": {
+        "name": "Drowned Cantor"
+      },
+      "reedbound_acolyte": {
+        "name": "Reedbound Acolyte"
+      },
+      "deepfen_spearjaw": {
+        "name": "Deepfen Spearjaw"
+      },
+      "mirefen_widowling": {
+        "name": "Mirefen Widowling"
+      },
+      "spider_egg_sac": {
+        "name": "Spider Egg-Sac"
+      },
+      "grave_silt_bulwark": {
+        "name": "Grave-Silt Bulwark"
+      },
+      "sump_troll_devourer": {
+        "name": "Sump Troll Devourer"
+      },
+      "choir_thrall": {
+        "name": "Bog Thrall"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "Sister Nhalia, the Drowned Canticle"
+      },
+      "edda_reedhand": {
+        "name": "Edda Reedhand"
+      },
+      "tolling_bell": {
+        "name": "Tolling Bell"
+      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, the Waking Peak"
       },
@@ -5877,6 +6062,11 @@ export const tr_TR: EnTranslations = {
         "name": "Birader Halven",
         "title": "Emanetlik Bekçisi",
         "greeting": "Aşağıdaki kutsal emanetlik yine yer değiştirdi."
+      },
+      "brother_halven_marsh": {
+        "name": "Brother Halven",
+        "title": "Reliquary Keeper",
+        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6872,6 +7062,11 @@ export const tr_TR: EnTranslations = {
         "name": "Çökmüş Emanetlik",
         "enterText": "Çökmüş emanetliğe inersin.",
         "leaveText": "Emanetlik harabesinde Birader Halven'in yanına tırmanıp geri dönersin."
+      },
+      "drowned_litany": {
+        "name": "The Drowned Litany",
+        "enterText": "You descend into the drowned shrine at the marsh's edge.",
+        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "itemSets": {
@@ -6919,6 +7114,11 @@ export const tr_TR: EnTranslations = {
     "dungeonInstanceBusy": "{name} zindanının tüm kopyaları dolu. Birazdan tekrar deneyin.",
     "delveLockedChestInteract": "Kilidi açmak için F'ye bas",
     "delveRewardChestInteract": "Ganimeti almak için F'ye bas",
-    "delveSurfaceExitInteract": "Tırmanmak için F'ye bas"
+    "delveSurfaceExitInteract": "Tırmanmak için F'ye bas",
+    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
+    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
+    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
+    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
   }
 };

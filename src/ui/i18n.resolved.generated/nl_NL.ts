@@ -2249,6 +2249,7 @@ export const nl_NL: EnTranslations = {
       "unknownTier": "Onbekende delve-tier.",
       "levelRequired": "Je moet niveau {level} zijn om {name} te betreden.",
       "levelRequiredTier": "Je moet niveau {level} zijn om {name} op {tier} te betreden.",
+      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Alle instanties van {name} zijn bezet. Probeer het binnenkort opnieuw.",
       "runFailed": "Run van {name} mislukt.",
       "complete": "{name} voltooid.",
@@ -2258,6 +2259,14 @@ export const nl_NL: EnTranslations = {
       "doorAlreadyOpen": "De deur is al open.",
       "companionRankUp": "{name} bereikt rang {rank}.",
       "bossChest": "De baas valt. Een betoverde relikwiekist verrijst op het podium. Forceer het slot om je buit op te eisen.",
+      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
+      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
+      "riteSequencePlaying": "The shrines replay the rite. Wait.",
+      "riteCorrect": "A soft chime answers your touch.",
+      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
+      "riteReliquaryOpen": "The Drowned Reliquary opens.",
+      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
+      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Een trap naar de oppervlakte opent zich. Druk op F bij de trap om te vertrekken.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Maak de kamer leeg.",
@@ -2265,6 +2274,13 @@ export const nl_NL: EnTranslations = {
       "tombstoneHint": "Een grafsteendoorgang opent zich naar het noorden zodra de kamer is opgeruimd.",
       "tombstoneOpen": "Een verzegelde grafsteendoorgang knarst open naar het noorden. Loop erin om verder te gaan.",
       "tombstoneInto": "Je gaat door de grafsteen naar {name}.",
+      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
+      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
+      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
+      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
+      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
+      "ropesSealed": "You should try pulling the bell ropes.",
+      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "De kist is leeg.",
       "notInDelve": "Je bevindt je niet in een delve.",
       "cannotInteract": "Je kunt daar niet mee interageren.",
@@ -2283,9 +2299,12 @@ export const nl_NL: EnTranslations = {
       "passageSealed": "De doorgang is verzegeld.",
       "moveCloserPassage": "Kom dichter bij de doorgang.",
       "moveCloserChest": "Kom dichter bij de kist.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Er is niets meer om te pakken.",
       "wayOutNotOpen": "De weg naar buiten is nog niet open.",
-      "moveCloserStairs": "Kom dichter bij de trap."
+      "moveCloserStairs": "Kom dichter bij de trap.",
+      "nhaliaCantorShield": "Cantors, hold the note!",
+      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
     },
     "lockpick": {
       "lockYields": "Het slot geeft toe! {tier} buit.",
@@ -2348,6 +2367,26 @@ export const nl_NL: EnTranslations = {
       "abandoned": "Je trekt de pennen weer voorzichtig terug. Het slot wacht."
     }
   },
+  "delveRiteUi": {
+    "title": "The Drowned Reliquary Rite",
+    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
+    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
+    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
+    "showsTimes": "Sequence shown {count} times",
+    "showsOnce": "Sequence shown once",
+    "symbols": "{count} symbols",
+    "tries": "{count} tries",
+    "reward": {
+      "easy": "Modest spoils",
+      "medium": "Rich spoils",
+      "hard": "Premium spoils"
+    },
+    "closeAria": "Close"
+  },
   "delveUi": {
     "board": {
       "title": "Delvebord",
@@ -2357,6 +2396,7 @@ export const nl_NL: EnTranslations = {
       "openDelveAria": "Open Delvebord bij {name}",
       "marks": "Delve-Tekens: {count}",
       "minLevel": "Vereist Niveau {level}",
+      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normaal",
         "heroic": "Heroïsch"
@@ -2364,6 +2404,7 @@ export const nl_NL: EnTranslations = {
       "companion": {
         "pick": "Kies een metgezel",
         "tessa": "Acoliet Tessa",
+        "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Geneest de groep tussen gevechten. Rang 3 doet eenmaal per tocht een gevallen bondgenoot herleven.",
         "upgrade": "Waardeer op naar Rang {rank} ({marks} Tekens)",
@@ -2389,7 +2430,11 @@ export const nl_NL: EnTranslations = {
       "complete": "Voltooid",
       "marks": "Delve-Tekens: {count}",
       "exitHintOpen": "Loop de grafsteendoorgang in (noord)",
-      "exitHintLocked": "Ruim de gewone vijanden op om de noordelijke doorgang te openen"
+      "exitHintLocked": "Ruim de gewone vijanden op om de noordelijke doorgang te openen",
+      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
+      "ritePlayback": "Watch the shrines: memorize the order they light up",
+      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
+      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
     },
     "objective": {
       "kill_boss": "Versla {boss}",
@@ -2410,27 +2455,54 @@ export const nl_NL: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Het reliekschrijn beneden is opnieuw verschoven. We horen na middernacht gezang door de vloer, en Acoliet Tessa zweert dat de grafregisters hun eigen inkt veranderen. Als je moed genoeg hebt, {playerName}, neem dan een kaars en ga naar beneden. Vertrouw niet elke stem die je daar beneden hoort. Sommige kenden jouw naam al voordat je geboren werd."
+      },
+      "halvenMarsh": {
+        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "De trappenkoker is koud en donker. Gebroken heiligenstenen bezaaien de afdaling, en een zachte klokslag hangt in de vochtige lucht. Acoliet Tessa fluistert: \"Het reliekschrijn zou niet zo ver open mogen zijn. Blijf dichtbij, {playerName}.\"",
-      "heroic": "De deuren kreunen achter je dicht. Namen schrapen over de steen als vingernagels. Tessa's kaars brandt blauw. \"Ze roepen nu niet de doden op, {playerName}. Ze geven gehoor aan iets.\""
+      "heroic": "De deuren kreunen achter je dicht. Namen schrapen over de steen als vingernagels. Tessa's kaars brandt blauw. \"Ze roepen nu niet de doden op, {playerName}. Ze geven gehoor aan iets.\"",
+      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
+      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Water sijpelt door de grafschappen en voert oude as mee in zilverzwarte stromen.",
       "reliquary_bell_niche": "Tientallen handbellen hangen in stilte, elk omwonden met rouwdoek.",
       "reliquary_saintless_hall": "Standbeelden met gezichten die met zorgvuldige haat zijn weggebeiteld.",
-      "reliquary_finale": "De begraven klok luidt eenmaal onder je laarzen."
+      "reliquary_finale": "De begraven klok luidt eenmaal onder je laarzen.",
+      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
+      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
+      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
+      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
+      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
+      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
+      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Het Verzonken Knekelhuis",
       "reliquary_bell_niche": "De Klokennis",
       "reliquary_saintless_hall": "De Heiligenloze Hal",
-      "reliquary_finale": "De Klokbegraven Kamer"
+      "reliquary_finale": "De Klokbegraven Kamer",
+      "litany_sluice": "The Crescent Sluice",
+      "litany_ledger": "The Island Ledger",
+      "litany_ring": "The Ring Reliquary",
+      "litany_baptistry": "The Sinkhole Baptistry",
+      "litany_choir_loft": "The Reedsong Gallery",
+      "litany_causeway": "The Y-Split Causeway",
+      "litany_apse": "The Drowned Apse"
+    },
+    "object": {
+      "sluice_valve": "Sluice Valve",
+      "grave_tablet": "Grave Tablet",
+      "corpse_candle": "Corpse-Candle",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
+        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Blijf op de been, {playerName}. De doden zijn hier rusteloos.",
         "low_hp": "Adem. Ik heb nog gebeden voor je over.",
         "trap_spotted": "Wacht. Iets in de vloer herinnert zich voetstappen.",
@@ -2442,6 +2514,20 @@ export const nl_NL: EnTranslations = {
           "3": "Reliekschrijn-Acoliet",
           "4": "Grafroep-Getuige",
           "5": "Kapelwachter"
+        }
+      },
+      "edda": {
+        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
+        "ally_revive": "Up, now. The marsh does not get you today.",
+        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
+        "low_hp": "Steady. My lantern is not out yet.",
+        "trap_spotted": "Wait. The reeds are wrong here.",
+        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
+        "completion": "The fen can swallow its secrets for one more night.",
+        "rank": {
+          "1": "Lantern-Bearer",
+          "2": "Reed-Watcher",
+          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2485,7 +2571,10 @@ export const nl_NL: EnTranslations = {
       "flooded_paths": "Ondergelopen Paden",
       "grave_tax": "Grafheffing",
       "unstable_roof": "Instabiel Dak",
-      "cult_remnants": "Cultusresten"
+      "cult_remnants": "Cultusresten",
+      "high_water": "High Water",
+      "lively_choir": "Lively Choir",
+      "belligerent_dead": "Belligerent Dead"
     },
     "blessing": {
       "chapel_candle": "Kapelkaars: veiligere tocht, één Markering minder bij voltooiing."
@@ -5317,6 +5406,69 @@ export const nl_NL: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics Schaduwkap"
       },
+      "siltguard_helm": {
+        "name": "Siltguard Helm"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "Bulwark-Rusted Pauldrons"
+      },
+      "nhalias_bell_maul": {
+        "name": "Nhalia's Bell-Maul"
+      },
+      "reedstalker_jerkin": {
+        "name": "Reedstalker Jerkin"
+      },
+      "mirejaw_fang_knife": {
+        "name": "Mirejaw Fang-Knife"
+      },
+      "widow_silk_hood": {
+        "name": "Widow-Silk Hood"
+      },
+      "cantors_drowned_sash": {
+        "name": "Cantor's Drowned Sash"
+      },
+      "corpse_candle_focus": {
+        "name": "Corpse-Candle Focus"
+      },
+      "nhalias_litany_rod": {
+        "name": "Nhalia's Litany Rod"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "Blackwater Vanguard Chestguard"
+      },
+      "siltstep_leggings": {
+        "name": "Siltstep Leggings"
+      },
+      "sunken_reliquary_hood": {
+        "name": "Sunken Reliquary Hood"
+      },
+      "litany_legs": {
+        "name": "Silt-Walker Greaves"
+      },
+      "litany_shoulder": {
+        "name": "Blackwater Drift Mantle"
+      },
+      "litany_gloves_rog": {
+        "name": "Reed-Bound Handwraps"
+      },
+      "litany_plate_chest": {
+        "name": "Sump-Warden Cuirass"
+      },
+      "litany_leather_chest": {
+        "name": "Silt-Deep Vestment"
+      },
+      "litany_cloth_chest": {
+        "name": "Choir-Drowned Raiment"
+      },
+      "litany_helm": {
+        "name": "Reliquant's Drowned Cowl"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "Sister Nhalia's Choir-Forged Plate"
+      },
+      "drowned_choir_fang": {
+        "name": "Drowned Choir-Fang"
+      },
       "the_codfather": {
         "name": "De Kabeljauwvader"
       },
@@ -5652,6 +5804,39 @@ export const nl_NL: EnTranslations = {
       "acolyte_tessa": {
         "name": "Acoliet Tessa"
       },
+      "drowned_cantor": {
+        "name": "Drowned Cantor"
+      },
+      "reedbound_acolyte": {
+        "name": "Reedbound Acolyte"
+      },
+      "deepfen_spearjaw": {
+        "name": "Deepfen Spearjaw"
+      },
+      "mirefen_widowling": {
+        "name": "Mirefen Widowling"
+      },
+      "spider_egg_sac": {
+        "name": "Spider Egg-Sac"
+      },
+      "grave_silt_bulwark": {
+        "name": "Grave-Silt Bulwark"
+      },
+      "sump_troll_devourer": {
+        "name": "Sump Troll Devourer"
+      },
+      "choir_thrall": {
+        "name": "Bog Thrall"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "Sister Nhalia, the Drowned Canticle"
+      },
+      "edda_reedhand": {
+        "name": "Edda Reedhand"
+      },
+      "tolling_bell": {
+        "name": "Tolling Bell"
+      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, the Waking Peak"
       },
@@ -5877,6 +6062,11 @@ export const nl_NL: EnTranslations = {
         "name": "Broeder Halven",
         "title": "Reliekbewaarder",
         "greeting": "Het reliekschrijn beneden is opnieuw verschoven."
+      },
+      "brother_halven_marsh": {
+        "name": "Brother Halven",
+        "title": "Reliquary Keeper",
+        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6872,6 +7062,11 @@ export const nl_NL: EnTranslations = {
         "name": "Het Ingestorte Reliekschrijn",
         "enterText": "Je daalt af in het ingestorte reliekschrijn.",
         "leaveText": "Je klimt terug omhoog naar Broeder Halven bij de reliekschrijnruïne."
+      },
+      "drowned_litany": {
+        "name": "The Drowned Litany",
+        "enterText": "You descend into the drowned shrine at the marsh's edge.",
+        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "itemSets": {
@@ -6919,6 +7114,11 @@ export const nl_NL: EnTranslations = {
     "dungeonInstanceBusy": "Alle instanties van {name} zijn bezet. Probeer het zo weer.",
     "delveLockedChestInteract": "Druk op F om het slot te kraken",
     "delveRewardChestInteract": "Druk op F om de buit op te eisen",
-    "delveSurfaceExitInteract": "Druk op F om te klimmen"
+    "delveSurfaceExitInteract": "Druk op F om te klimmen",
+    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
+    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
+    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
+    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
+    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
   }
 };
