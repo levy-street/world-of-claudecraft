@@ -141,3 +141,29 @@ describe('delve shop, delveShopOffers view', () => {
     expect(makeSim().delveShopOffers('no_such_delve')).toEqual([]);
   });
 });
+
+describe('Drowned Litany shop stock (data pins)', () => {
+  it('pins the Marks price ladder, gates, and item ids (2x the Reliquary slots)', () => {
+    // The whole stock as literals: a price, gate, or id change must be a
+    // deliberate edit here, not silent drift.
+    expect(DELVE_SHOPS.drowned_litany).toEqual([
+      { itemId: 'litany_legs', marks: 16, gate: 'available' },
+      { itemId: 'litany_shoulder', marks: 16, gate: 'available' },
+      { itemId: 'litany_gloves_rog', marks: 16, gate: 'available' },
+      { itemId: 'litany_cloth_chest', marks: 20, gate: 'available' },
+      { itemId: 'litany_leather_chest', marks: 20, gate: 'available' },
+      { itemId: 'litany_plate_chest', marks: 20, gate: 'available' },
+      { itemId: 'litany_helm', marks: 24, gate: 'clears:3' },
+      { itemId: 'sister_nhalia_choir_plate', marks: 56, gate: 'heroicClear' },
+      { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
+    ]);
+  });
+
+  it('every Litany slot costs exactly 2x its Collapsed Reliquary price tier', () => {
+    const reliquary = DELVE_SHOPS.collapsed_reliquary;
+    const litany = DELVE_SHOPS.drowned_litany;
+    const tiers = (entries: typeof reliquary) =>
+      [...new Set(entries.map((e) => e.marks))].sort((a, b) => a - b);
+    expect(tiers(litany)).toEqual(tiers(reliquary).map((m) => m * 2));
+  });
+});

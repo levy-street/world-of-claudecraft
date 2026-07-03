@@ -255,6 +255,9 @@ export const DELVE_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 1,
     color: 0xc8dcc0,
+    // A puzzle object that dies to any single hit: no kill XP (the hatched
+    // widowlings are the real fight and pay normally).
+    xpMult: 0,
   },
   grave_silt_bulwark: {
     id: 'grave_silt_bulwark',

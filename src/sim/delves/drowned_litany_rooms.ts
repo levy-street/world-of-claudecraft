@@ -142,11 +142,14 @@ function onEggSacBurst(ctx: SimContext, run: DelveRun, dead: Entity): void {
   }
   const tmpl = MOBS.mirefen_widowling;
   if (!tmpl) return;
+  // Hatchlings carry the same Heroic level bonus as the waves (and the sac
+  // itself), so they are not 3 levels grey under the rest of the room.
+  const enemyLevelBonus = run.tierId === 'heroic' ? 3 : 0;
   for (let i = 0; i < 2; i++) {
     const ang = ctx.rng.range(0, Math.PI * 2);
     const dist = ctx.rng.range(2, 4.5);
     const pos = ctx.groundPos(dead.pos.x + Math.sin(ang) * dist, dead.pos.z + Math.cos(ang) * dist);
-    const add = createMob(ctx.nextId++, tmpl, tmpl.minLevel, pos);
+    const add = createMob(ctx.nextId++, tmpl, tmpl.minLevel + enemyLevelBonus, pos);
     add.facing = Math.PI;
     ctx.addEntity(add);
     run.mobIds.push(add.id);

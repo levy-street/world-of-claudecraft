@@ -221,9 +221,35 @@ describe('Tolling Bells: bell movement', () => {
     const x1 = bellE.pos.x;
     const z1 = bellE.pos.z;
 
-    // At 8 yd/s and DT=0.05s the bell moves 0.4yd per tick.
+    // At 8 yd/s and DT=0.05s the bell moves exactly 0.4yd per tick (pinned as a
+    // literal so a speed regression fails, not just "moved at all").
     const dist = Math.hypot(x1 - x0, z1 - z0);
-    expect(dist).toBeGreaterThan(0.1);
+    expect(dist).toBeCloseTo(0.4, 5);
+  });
+
+  it('in-flight bells are removed the tick after Sister Nhalia dies', () => {
+    const sim = makeSim(42);
+    const run = enterLitanyFinale(sim, 'normal');
+    expect(run).not.toBeNull();
+    const boss = setupNhaliaCombat(sim, run);
+    expect(boss).not.toBeNull();
+
+    const st = run.nhaliaBoss;
+    st.bellVolleyTimer = DT * 0.5;
+    sim.tick(); // spawn a volley
+    expect(st.bells.length).toBeGreaterThan(0);
+
+    // Kill the boss with bells still in flight; the driver's dead-boss branch
+    // must drop them instead of leaving them frozen mid-air through the rite.
+    (sim as any).dealDamage(sim.player, boss, boss.maxHp + 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+    sim.tick();
+    expect(st.bells.length).toBe(0);
+    let liveBells = 0;
+    (sim as any).entities.forEach((e: any) => {
+      if (!e.dead && e.templateId === BELL_TEMPLATE_ID) liveBells++;
+    });
+    expect(liveBells).toBe(0);
   });
 });
 
@@ -256,8 +282,8 @@ describe('Tolling Bells: contact damage and knockback', () => {
 
     sim.tick(); // driver fires contact check
 
-    // Player should have taken nature damage (~12% maxHp).
-    expect(p.hp).toBeLessThan(hpBefore);
+    // Exactly 12% of maxHp (BELL_DMG_PCT), pinned as a literal.
+    expect(hpBefore - p.hp).toBe(Math.max(1, Math.round(p.maxHp * 0.12)));
     // Player should have been knocked back from the bell.
     const distFromBell = Math.hypot(p.pos.x - bellE.pos.x, p.pos.z - bellE.pos.z);
     expect(distFromBell).toBeGreaterThan(0.5);

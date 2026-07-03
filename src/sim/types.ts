@@ -477,6 +477,9 @@ export interface MobTemplate {
   rare?: boolean;
   // Elite scaling, vanilla-style: ~2.3x health, ~1.5x damage, double XP.
   elite?: boolean;
+  // Kill-XP multiplier (default 1). 0 marks a puzzle-object mob (e.g. the 1 HP
+  // spider egg-sac) that must not pay full kill XP for a single hit.
+  xpMult?: number;
   // Rare/miniboss controls.
   canSwim?: boolean;
   ccImmune?: boolean;
@@ -1710,7 +1713,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'delveComplete'; delveId: string; tierId: string }
   | { type: 'delveFailed'; delveId: string; tierId: string }
   | { type: 'delveLoreUnlock'; loreId: string }
-  | { type: 'companionBark'; barkId: string; pid?: number }
+  | { type: 'companionBark'; barkId: string; companionId: string; pid?: number }
   // Lockpicking minigame ("Tumbler's Path"). All personal (pid-scoped). The sim
   // emits structured data only, the client builds every visible string. Cells
   // are always limited to the fog window (anti-cheat: the full lock is never
@@ -1753,7 +1756,10 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'lockpickBonus'; tier: LootTier; marks: number; copper: number }
   | { type: 'delveChestLoot'; chestId: number; items: { itemId: string; count: number }[] }
-  | { type: 'delveRitePulse'; shrineId: number; shrineKind: RiteShrineKind }
+  // Carries the shrine as `entityId` so the server's eventAnchor interest-scopes
+  // the pulse to players near the apse instead of broadcasting it realm-wide
+  // (the HUD closes the rite popup on the first pulse).
+  | { type: 'delveRitePulse'; entityId: number; shrineKind: RiteShrineKind }
   | {
       type: 'delveRiteFeedback';
       shrineId: number;
@@ -2198,8 +2204,6 @@ export interface DelveObjectiveState {
 export interface DelveCompanionState {
   companionId: string;
   entityId: number;
-  /** Rank 3 boon: set once the once-per-run ally revive has been spent. */
-  reviveUsed?: boolean;
 }
 
 export interface DelveRun {
@@ -2227,6 +2231,10 @@ export interface DelveRun {
    * a player stands in a module hazard zone). Reset on run start / module change. */
   blackwaterTimer: number;
   companionBarks: string[];
+  /** Rank 3 boon: set once the once-per-run ally revive has been spent. Lives on
+   * the run (like companionBarks), not on the companion state, so leaving and
+   * re-entering mid-run cannot recharge it. */
+  companionReviveUsed: boolean;
   /** True when the current module exit portal is active (trash cleared + plate if any). */
   exitPortalOpen: boolean;
   /** §7.6, this run rolled Bountiful (ultra-rare): the reward chest is a purple

@@ -1054,6 +1054,7 @@ export class Sim {
           badAirTimer: 0,
           blackwaterTimer: 0,
           companionBarks: [],
+          companionReviveUsed: false,
           exitPortalOpen: false,
           bountiful: false,
           rewardChestId: null,
@@ -5684,7 +5685,9 @@ export class Sim {
   private maybeCompanionBark(run: DelveRun, pid: number, barkId: string): void {
     if (!run.companion || run.companionBarks.includes(barkId)) return;
     run.companionBarks.push(barkId);
-    this.emit({ type: 'companionBark', barkId, pid });
+    // Carry the speaker on the event so the HUD does not have to resolve it
+    // from mutable companionState (which can be momentarily null online).
+    this.emit({ type: 'companionBark', barkId, companionId: run.companion.companionId, pid });
   }
 
   delveInteract(objectId: number, pid?: number): void {

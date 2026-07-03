@@ -2832,7 +2832,7 @@ export class Renderer {
               : ev.shrineKind === 'rite_shrine_skull'
                 ? 'shadow'
                 : 'holy';
-        this.vfx.nova(ev.shrineId, school);
+        this.vfx.nova(ev.entityId, school);
         break;
       }
       case 'delveRiteFeedback':
@@ -4057,8 +4057,15 @@ export class Renderer {
       if (e.kind === 'object') {
         // The sim swaps delve interactable templates in place (pressure plate ->
         // triggered, bell rope -> pulled). Drop the stale view; the create pass
-        // rebuilds it from the new template within a frame.
-        if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
+        // rebuilds it from the new template within a frame. Only inside the
+        // create radius though: in the 80-96yd hysteresis band the create pass
+        // never runs, so removing here would make the object vanish entirely;
+        // keep the stale template until the player closes back in.
+        if (
+          v.builtTemplateId !== undefined &&
+          v.builtTemplateId !== e.templateId &&
+          d2 <= ENTITY_VIEW_CREATE_RANGE_SQ
+        ) {
           this.removeView(id);
           continue;
         }

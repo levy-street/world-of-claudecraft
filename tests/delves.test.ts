@@ -1513,13 +1513,19 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     for (let i = 0; i < 20; i++) sim.tick(); // exactly one 1s pulse
     expect(p.hp).toBeLessThan(hp0);
 
-    // Step out to the clear entry aisle: no further Blackwater damage.
-    const hpClear = p.hp;
+    // Step out to the clear entry aisle: no further Blackwater damage. Count
+    // the labelled damage events (an hp floor could be masked by regen).
     p.pos.x = hz.run.origin.x;
     p.pos.z = hz.run.origin.z + hz.zBase - 11; // entry spawn, away from all zones
     p.prevPos = { ...p.pos };
-    for (let i = 0; i < 60; i++) sim.tick();
-    expect(p.hp).toBeGreaterThanOrEqual(hpClear); // out-of-hazard hp only recovers
+    let clearHits = 0;
+    for (let i = 0; i < 60; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+          clearHits++;
+      }
+    }
+    expect(clearHits).toBe(0);
   });
 
   it('Heroic Blackwater hits harder than Normal', () => {
@@ -1554,6 +1560,118 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
       return hp0 - p.hp;
     };
     expect(run()).toBe(run());
+  });
+
+  // Blackwater damage events aimed at the player over `ticks` ticks; `pre`
+  // runs before each tick (e.g. to hold the player airborne).
+  function countBlackwaterHits(sim: Sim, ticks: number, pre?: () => void): number {
+    let hits = 0;
+    for (let i = 0; i < ticks; i++) {
+      pre?.();
+      for (const ev of sim.tick()) {
+        if (ev.type === 'damage' && ev.targetId === sim.playerId && ev.ability === 'Blackwater')
+          hits++;
+      }
+    }
+    return hits;
+  }
+
+  it('an airborne (jumping) player dodges the Blackwater tick entirely', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    enterModule(sim, 'litany_baptistry');
+    const hz = hazardWorld(sim, 'litany_baptistry');
+    const p = sim.player;
+    p.pos.x = hz.x;
+    p.pos.z = hz.z;
+    p.prevPos = { ...p.pos };
+    // Hold the player genuinely airborne across two-plus pulses: physics keeps
+    // `jumping` true while off the ground, and the boost prevents landing.
+    const airborneHits = countBlackwaterHits(sim, 45, () => {
+      p.onGround = false;
+      p.jumping = true;
+      p.vy = 3;
+    });
+    expect(airborneHits).toBe(0);
+    // Grounded control at the same spot: the pulse does land.
+    p.jumping = false;
+    p.vy = 0;
+    p.onGround = true;
+    p.pos.x = hz.x;
+    p.pos.z = hz.z;
+    p.prevPos = { ...p.pos };
+    expect(countBlackwaterHits(sim, 25)).toBeGreaterThan(0);
+  });
+
+  it('standing on a dry island inside a pool takes no damage; beside it, it does', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    enterModule(sim, 'litany_causeway');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const hz = hazardWorld(sim, 'litany_causeway');
+    const p = sim.player;
+    // The causeway's deep pool (0,22,r4) is centred on the 2x2 island (0,22):
+    // its centre is dry ground, its rim (off the island, inside the radius) is not.
+    p.pos.x = run.origin.x + 0;
+    p.pos.z = run.origin.z + hz.zBase + 22;
+    p.prevPos = { ...p.pos };
+    expect(countBlackwaterHits(sim, 45)).toBe(0);
+    p.pos.x = run.origin.x + 3.2; // off the island (hw 2), inside the pool (r 4)
+    p.pos.z = run.origin.z + hz.zBase + 22;
+    p.prevPos = { ...p.pos };
+    expect(countBlackwaterHits(sim, 25)).toBeGreaterThan(0);
+    expect(p.dead).toBe(false);
+  });
+
+  it('the apse dais is dry ground even though the deep pool radius covers it', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    enterModule(sim, 'litany_apse');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const hz = hazardWorld(sim, 'litany_apse');
+    // Clear the room so only the hazard could deal damage during the window.
+    for (const id of [...run.mobIds]) (sim as any).dropEntity(id);
+    const p = sim.player;
+    // Dais centre (0,72) sits inside the deep pool (0,56,r21): dry.
+    p.pos.x = run.origin.x + 0;
+    p.pos.z = run.origin.z + hz.zBase + 72;
+    p.prevPos = { ...p.pos };
+    expect(countBlackwaterHits(sim, 45)).toBe(0);
+    // Control: the west deep pocket (-12,22,r6) is genuinely wet.
+    p.pos.x = run.origin.x - 12;
+    p.pos.z = run.origin.z + hz.zBase + 22;
+    p.prevPos = { ...p.pos };
+    expect(countBlackwaterHits(sim, 25)).toBeGreaterThan(0);
+  });
+
+  it('pins the deep (2.0x) and shallow (0.35x) tier multipliers on the 4% Normal base', () => {
+    const pulse = (localX: number, localZ: number) => {
+      const sim = makeSim('warrior');
+      enterLitany(sim);
+      enterModule(sim, 'litany_sluice');
+      const run = sim.delveRunForPlayer(sim.playerId)!;
+      const hz = hazardWorld(sim, 'litany_sluice');
+      const p = sim.player;
+      p.pos.x = run.origin.x + localX;
+      p.pos.z = run.origin.z + hz.zBase + localZ;
+      p.prevPos = { ...p.pos };
+      let amount = 0;
+      for (let i = 0; i < 20 && amount === 0; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+            amount = ev.amount;
+        }
+      }
+      return { amount, maxHp: p.maxHp };
+    };
+    // Sluice pool pair at (-8,18): deep r5 inside shallow r8. The centre is
+    // deep water; 6.5yd out is shallow-only. Literal pins: 4% Normal base,
+    // 2.0x deep, 0.35x shallow.
+    const deep = pulse(-8, 18);
+    const shallow = pulse(-8 + 6.5, 18);
+    expect(deep.amount).toBe(Math.max(1, Math.round(deep.maxHp * 0.04 * 2.0)));
+    expect(shallow.amount).toBe(Math.max(1, Math.round(shallow.maxHp * 0.04 * 0.35)));
+    expect(deep.amount).toBeGreaterThan(shallow.amount);
   });
 });
 
@@ -1773,6 +1891,67 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
       (id) => sim.entities.get(id)?.templateId === 'mirefen_widowling',
     ).length;
     expect(widowlingsAfter - widowlingsBefore).toBe(2);
+  });
+
+  it('an egg-sac kill pays no XP while the hatched widowlings pay normally', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    const run = enterModule(sim, 'litany_baptistry');
+    run.litanyBaptistry!.wave = 2;
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob) mob.dead = true;
+    }
+    sim.tick();
+    const meta = (sim as any).players.get(sim.playerId);
+    const sac = sim.entities.get(run.litanyBaptistry!.eggSacIds[0]!)!;
+    sim.player.pos = { ...sac.pos };
+    sim.player.prevPos = { ...sac.pos };
+    const xpBeforeSac = meta.xp;
+    (sim as any).dealDamage(sim.player, sac, 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+    expect(sac.dead).toBe(true);
+    expect(meta.xp).toBe(xpBeforeSac); // xpMult 0: a one-hit puzzle object pays nothing
+    // The hatchlings are the real fight and pay kill XP through the normal path.
+    const widowling = run.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((m) => m && !m.dead && m.templateId === 'mirefen_widowling')!;
+    const xpBeforeWidow = meta.xp;
+    (sim as any).dealDamage(
+      sim.player,
+      widowling,
+      widowling.hp + 10,
+      false,
+      'physical',
+      null,
+      'hit',
+      true,
+    );
+    expect(widowling.dead).toBe(true);
+    expect(meta.xp).toBeGreaterThan(xpBeforeWidow);
+  });
+
+  it('hatched widowlings carry the Heroic level bonus like the waves', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim, 'heroic');
+    const run = enterModule(sim, 'litany_baptistry');
+    run.litanyBaptistry!.wave = 2;
+    for (const id of [...run.mobIds]) {
+      const mob = sim.entities.get(id);
+      if (mob) mob.dead = true;
+    }
+    sim.tick();
+    const sac = sim.entities.get(run.litanyBaptistry!.eggSacIds[0]!)!;
+    sim.player.pos = { ...sac.pos };
+    sim.player.prevPos = { ...sac.pos };
+    (sim as any).dealDamage(sim.player, sac, 1, false, 'physical', null, 'hit', true);
+    sim.tick();
+    const hatched = run.mobIds
+      .map((id) => sim.entities.get(id))
+      .filter((m) => m && !m.dead && m.templateId === 'mirefen_widowling');
+    expect(hatched.length).toBe(2);
+    // widowling minLevel 12 + the Heroic enemyLevelBonus 3, same as the waves.
+    for (const m of hatched) expect(m!.level).toBe(15);
   });
 
   it('the sealed exit hints to destroy the spider sacs once they are up, generic otherwise', () => {
@@ -2184,8 +2363,51 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
   }
 
   function chooseRite(sim: Sim, intensity: 'easy' | 'medium' | 'hard') {
+    // The difficulty commit is geo-gated to the reliquary (like the collect),
+    // so stand on it before choosing, the way a real player would.
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const reliquary = sim.entities.get(run.drownedLitanyRite!.reliquaryId)!;
+    sim.player.pos = { ...reliquary.pos };
+    sim.player.prevPos = { ...reliquary.pos };
     (sim as Sim).delveRiteChoose(intensity);
   }
+
+  it('rejects a rite difficulty commit from a player away from the reliquary', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(true);
+    const reliquary = sim.entities.get(run.drownedLitanyRite!.reliquaryId)!;
+    // Stand well outside the plate radius and try to commit remotely.
+    sim.player.pos = { x: reliquary.pos.x + 30, y: reliquary.pos.y, z: reliquary.pos.z + 30 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.delveRiteChoose('hard');
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(true); // still waiting
+    expect(run.drownedLitanyRite?.sequence.length).toBe(0);
+    // The prompt opens out to DELVE_INTERACT_RANGE (6yd), so a choose from
+    // inside that radius (but off the reliquary itself) must be accepted.
+    sim.player.pos = { x: reliquary.pos.x + 5.5, y: reliquary.pos.y, z: reliquary.pos.z };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.delveRiteChoose('hard');
+    expect(run.drownedLitanyRite?.awaitingChoice).toBe(false);
+    expect(run.drownedLitanyRite?.sequence.length).toBe(6);
+  });
+
+  it('rejects an unknown rite intensity outright (no medium coercion)', () => {
+    const sim = makeSim();
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    const reliquary = sim.entities.get(run.drownedLitanyRite!.reliquaryId)!;
+    sim.player.pos = { ...reliquary.pos };
+    sim.player.prevPos = { ...reliquary.pos };
+    // 'nightmare' is a plain unknown; 'toString'/'constructor' would pass a
+    // truthiness check via Object.prototype, hence the Object.hasOwn backstop.
+    for (const bogus of ['nightmare', 'toString', 'constructor']) {
+      sim.delveRiteChoose(bogus as never);
+      expect(run.drownedLitanyRite?.awaitingChoice).toBe(true);
+      expect(run.drownedLitanyRite?.sequence.length).toBe(0);
+    }
+  });
 
   it('awaits a difficulty choice after the boss dies (no playback yet)', () => {
     const sim = makeSim();
@@ -2285,6 +2507,21 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     expect(loot.length).toBeGreaterThanOrEqual(1);
     expect(['siltguard_helm', 'bulwark_rusted_pauldrons']).toContain(loot[0].itemId);
     if (loot.length > 1) expect(loot[1].itemId).toBe('nhalias_bell_maul');
+  });
+
+  it('rite loot is owner-locked so a party member cannot front-run the collect', () => {
+    const sim = makeSim('warrior');
+    const run = enterLitanyApse(sim);
+    killNhalia(sim);
+    chooseRite(sim, 'easy');
+    waitForRitePlayback(sim, run);
+    replaySequence(sim, run);
+    const chestId = run.rewardChestId!;
+    const state = run.objectState[chestId];
+    expect(state.pendingLoot!.length).toBeGreaterThan(0);
+    // Same guard the lockpick chest uses: collectDelveChestLoot refuses any
+    // pid other than lootOwnerId while it is set.
+    expect(state.lootOwnerId).toBe(sim.playerId);
   });
 
   it('Easy caps loot at low even with a flawless replay', () => {

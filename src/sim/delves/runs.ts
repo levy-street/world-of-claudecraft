@@ -428,6 +428,7 @@ export function claimDelveRun(
   run.badAirTimer = 0;
   run.blackwaterTimer = 0;
   run.companionBarks = [];
+  run.companionReviveUsed = false;
   run.companion = undefined;
   run.exitPortalOpen = false;
   run.rewardChestId = null;
@@ -551,6 +552,7 @@ export function freeDelveRun(ctx: SimContext, run: DelveRun): void {
   run.badAirTimer = 0;
   run.blackwaterTimer = 0;
   run.companionBarks = [];
+  run.companionReviveUsed = false;
   run.companion = undefined;
   run.exitPortalOpen = false;
   run.bountiful = false;
@@ -1425,6 +1427,17 @@ export function delveRiteChoose(ctx: SimContext, intensity: RiteIntensity, pid?:
   if (!r) return;
   const run = delveRunForPlayer(ctx, r.meta.entityId);
   if (!run) return;
+  // Geo-gate the shared difficulty commit to a player actually at the reliquary
+  // (the prompt only opens on interacting with it). Without this any party
+  // member anywhere in the run could commit the difficulty remotely. The gate
+  // matches DELVE_INTERACT_RANGE, the radius the prompt itself opens at, so a
+  // player who legitimately received the popup can always answer it.
+  const st = run.drownedLitanyRite;
+  const reliquary = st ? ctx.entities.get(st.reliquaryId) : undefined;
+  if (!reliquary || dist2d(r.e.pos, reliquary.pos) > DELVE_INTERACT_RANGE) {
+    ctx.error(r.meta.entityId, 'Move closer to the reliquary.');
+    return;
+  }
   chooseDrownedLitanyRiteIntensity(ctx, run, intensity);
 }
 

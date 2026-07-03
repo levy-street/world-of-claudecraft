@@ -568,7 +568,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
     if (meta && creditEntity) {
-      const eliteMult = MOBS[e.templateId]?.elite ? 2 : 1;
+      const tmpl = MOBS[e.templateId];
+      // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
+      // in one hit by design, so it must not pay full kill XP.
+      const eliteMult = (tmpl?.elite ? 2 : 1) * (tmpl?.xpMult ?? 1);
       // party play: kill credit, xp split and quest progress shared with
       // members nearby (classic group rules + group bonus). A member downed
       // during the fight still counts while their corpse is in range: classic

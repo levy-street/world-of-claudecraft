@@ -16,26 +16,12 @@ import {
   type RiteIntensity,
   type RiteShrineKind,
 } from '../types';
+import { RITE_INTENSITY } from './rite_tuning';
 import { grantDelveRewards, openDelveSurfaceExit } from './runs';
 
 const RITE_PLAYBACK_STEP = 0.6; // seconds between sequence lights
 const RITE_REPEAT_GAP = 1.2; // longer dark beat between repeat playbacks
 const RITE_WRONG_DMG_PCT = 0.03;
-
-// Player-chosen difficulty. Easy shows the sequence more times and grants more
-// tries but caps loot low; Hard shows it once, allows a single try, and is the only
-// path to premium. `ceiling` caps the mistake-derived tier, so difficulty is strictly
-// monotonic by reward. `tries` is the number of full attempts at repeating the
-// sequence; a wrong touch fails the current try, and the tolerated mistake count is
-// tries - 1 (the last try has no slack).
-const RITE_INTENSITY: Record<
-  RiteIntensity,
-  { length: number; tries: number; playbacks: number; ceiling: LootTier }
-> = {
-  easy: { length: 4, tries: 3, playbacks: 3, ceiling: 'low' },
-  medium: { length: 5, tries: 2, playbacks: 2, ceiling: 'medium' },
-  hard: { length: 6, tries: 1, playbacks: 1, ceiling: 'premium' },
-};
 
 const TIER_ORDER: Record<LootTier, number> = { low: 0, medium: 1, premium: 2 };
 
@@ -104,6 +90,26 @@ function grantRiteBonus(ctx: SimContext, run: DelveRun, tier: LootTier): void {
   }
 }
 
+/** Instance-local rite site positions derived from the module's dais: the
+ * reliquary south of the dais centre, the four shrines in a diamond around it.
+ * Pure and exported so the spawn-collision test pins the REAL spawn sites
+ * instead of a hand-copied set of offsets. */
+export function riteSiteLocalOffsets(dais: { x: number; z: number }): {
+  reliquary: { x: number; z: number };
+  shrines: Record<RiteShrineKind, { x: number; z: number }>;
+} {
+  const rz = dais.z - 12;
+  return {
+    reliquary: { x: dais.x, z: rz },
+    shrines: {
+      rite_shrine_bell: { x: dais.x, z: rz - 8 },
+      rite_shrine_candle: { x: dais.x, z: rz + 8 },
+      rite_shrine_reed: { x: dais.x - 8, z: rz },
+      rite_shrine_skull: { x: dais.x + 8, z: rz },
+    },
+  };
+}
+
 export function spawnDrownedLitanyRite(
   ctx: SimContext,
   run: DelveRun,
@@ -113,24 +119,21 @@ export function spawnDrownedLitanyRite(
   const moduleId = run.modules[run.moduleIndex] ?? 'litany_apse';
   const layout = DELVE_MODULE_LAYOUTS[moduleId as keyof typeof DELVE_MODULE_LAYOUTS];
   const dais = layout?.dais ?? { x: 0, z: 52 };
-  const reliquaryLocalZ = dais.z - 12;
-  const reliquaryPos = ctx.groundPos(run.origin.x + dais.x, run.origin.z + zBase + reliquaryLocalZ);
+  const sites = riteSiteLocalOffsets(dais);
+  const reliquaryPos = ctx.groundPos(
+    run.origin.x + sites.reliquary.x,
+    run.origin.z + zBase + sites.reliquary.z,
+  );
 
   const reliquary = createObject(ctx, run, 'drowned_reliquary', reliquaryPos);
   reliquary.facing = Math.PI;
   reliquary.prevFacing = Math.PI;
   run.rewardChestId = reliquary.id;
 
-  const shrineOffsets: Record<RiteShrineKind, { x: number; z: number }> = {
-    rite_shrine_bell: { x: 0, z: reliquaryLocalZ - 8 },
-    rite_shrine_candle: { x: 0, z: reliquaryLocalZ + 8 },
-    rite_shrine_reed: { x: -8, z: reliquaryLocalZ },
-    rite_shrine_skull: { x: 8, z: reliquaryLocalZ },
-  };
   const shrineEntityIds = {} as Record<RiteShrineKind, number>;
   for (const kind of RITE_SHRINE_KINDS) {
-    const off = shrineOffsets[kind];
-    const pos = ctx.groundPos(run.origin.x + dais.x + off.x, run.origin.z + zBase + off.z);
+    const off = sites.shrines[kind];
+    const pos = ctx.groundPos(run.origin.x + off.x, run.origin.z + zBase + off.z);
     const shrine = createObject(ctx, run, kind, pos);
     shrineEntityIds[kind] = shrine.id;
   }
@@ -173,7 +176,12 @@ export function chooseDrownedLitanyRiteIntensity(
 ): boolean {
   const st = run.drownedLitanyRite;
   if (!st || !st.awaitingChoice) return false;
-  const cfg = RITE_INTENSITY[intensity] ?? RITE_INTENSITY.medium;
+  // Reject unknown intensities outright (riteCeiling would crash on a raw
+  // string later); every caller validates, this is the shared backstop.
+  // Object.hasOwn so Object.prototype keys ('toString', 'constructor') cannot
+  // slip a garbage config through the truthiness check.
+  if (!Object.hasOwn(RITE_INTENSITY, intensity)) return false;
+  const cfg = RITE_INTENSITY[intensity];
   st.awaitingChoice = false;
   st.intensity = intensity;
   st.sequence = generateRiteSequence(run.seed, cfg.length);
@@ -215,6 +223,10 @@ function openDrownedReliquary(
     state.triggered = true;
     state.lootedTier = tier;
     state.pendingLoot = items.map((s) => ({ ...s }));
+    // Loot belongs to whoever completed the rite (it was rolled for their class);
+    // record it so another party member standing on the reliquary cannot
+    // front-run the collect. Mirrors lockpickSucceed's guard.
+    state.lootOwnerId = openerId;
   }
   if (obj) {
     obj.name = 'Opened Drowned Reliquary';
@@ -237,7 +249,9 @@ export function tickDrownedLitanyRite(ctx: SimContext, run: DelveRun): void {
   const kind = st.sequence[st.playbackIndex];
   if (kind) {
     const shrineId = st.shrineEntityIds[kind];
-    ctx.emit({ type: 'delveRitePulse', shrineId, shrineKind: kind });
+    // entityId (not a bespoke field name) so the server interest-scopes the
+    // pulse to the apse instead of broadcasting it to every online player.
+    ctx.emit({ type: 'delveRitePulse', entityId: shrineId, shrineKind: kind });
   }
   st.playbackIndex += 1;
   st.playbackTimer = RITE_PLAYBACK_STEP;

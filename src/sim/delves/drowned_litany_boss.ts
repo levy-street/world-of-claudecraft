@@ -445,7 +445,20 @@ export function tickDrownedLitanyBoss(ctx: SimContext, run: DelveRun): void {
   if (moduleId !== delve.finaleModuleId) return;
 
   const boss = findNhaliaBoss(ctx, run);
-  if (!boss) return;
+  if (!boss) {
+    // Sister Nhalia is dead (the lookup only returns a living boss) or not yet
+    // spawned: drop any in-flight bells so they do not linger frozen in the
+    // apse through the rite.
+    const st = run.nhaliaBoss;
+    if (st && st.bells.length > 0) {
+      for (const bell of st.bells) {
+        const be = ctx.entities.get(bell.entityId);
+        if (be && !be.dead) ctx.dropEntity(bell.entityId);
+      }
+      st.bells = [];
+    }
+    return;
+  }
 
   if (!run.nhaliaBoss) initDrownedLitanyBossState(run);
   const st = run.nhaliaBoss!;
@@ -458,16 +471,9 @@ export function tickDrownedLitanyBoss(ctx: SimContext, run: DelveRun): void {
   tickBlackwaterMarks(ctx, run, boss, st);
   // In-flight bells keep moving (and despawn past the walls) even while the
   // boss is out of combat or resetting; only NEW volleys need the combat gate.
+  // (Boss death is handled above: findNhaliaBoss only returns a living boss,
+  // so the !boss branch is where lingering bells are dropped.)
   tickBells(ctx, run, boss, st, zBase);
-  if (boss.dead) {
-    // Remove any lingering bell entities when the boss dies.
-    for (const bell of st.bells) {
-      const be = ctx.entities.get(bell.entityId);
-      if (be && !be.dead) ctx.dropEntity(bell.entityId);
-    }
-    st.bells = [];
-    return;
-  }
   if (!boss.inCombat && boss.aiState !== 'attack' && boss.aiState !== 'chase') return;
 
   tickCantorPhases(ctx, run, boss, st);

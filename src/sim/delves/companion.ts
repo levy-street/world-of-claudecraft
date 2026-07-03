@@ -52,7 +52,7 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
   // (owner first, then party-member order).
   const companionRank =
     ctx.players.get(owner.id)?.companionUpgrades[run.companion.companionId] ?? 1;
-  if (companionRank >= DELVE_COMPANION_MAX_RANK && !run.companion.reviveUsed) {
+  if (companionRank >= DELVE_COMPANION_MAX_RANK && !run.companionReviveUsed) {
     let fallen: Entity | null = owner.dead ? owner : null;
     if (!fallen && run.partyKey) {
       for (const pid of ctx.partyMembersForKey(run.partyKey)) {
@@ -64,7 +64,9 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
       }
     }
     if (fallen) {
-      run.companion.reviveUsed = true;
+      // Lives on the run (not the re-minted companion state) so leaving and
+      // re-entering mid-run cannot recharge the boon.
+      run.companionReviveUsed = true;
       fallen.dead = false;
       fallen.hp = Math.max(1, Math.round(fallen.maxHp * 0.5));
       if (fallen.resourceType === 'mana')

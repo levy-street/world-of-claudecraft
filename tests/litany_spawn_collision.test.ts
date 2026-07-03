@@ -5,6 +5,7 @@ import {
   litanyModuleGeometry,
   litanyModuleLosColliders,
 } from '../src/sim/delve_litany_layout';
+import { riteSiteLocalOffsets } from '../src/sim/delves/drowned_litany_rite';
 import { BAPTISTRY_WAVES } from '../src/sim/delves/drowned_litany_rooms';
 
 // Every authored Drowned Litany spawn (trash packs, baptistry waves, room
@@ -75,13 +76,16 @@ describe('The Drowned Litany: every authored spawn is on walkable floor', () => 
   it('the Drowned Reliquary Rite reliquary and four shrines clear the apse cover', () => {
     const geo = litanyModuleGeometry('litany_apse')!;
     const obstacles = litanyModuleLosColliders('litany_apse');
-    const rz = geo.dais.z - 12;
+    // The REAL spawn sites (shared with spawnDrownedLitanyRite), so a change to
+    // the rite offsets is re-checked here instead of silently drifting.
+    const sites = riteSiteLocalOffsets(geo.dais);
     const rite: Array<[string, number, number]> = [
-      ['reliquary', geo.dais.x, rz],
-      ['shrine_bell', geo.dais.x, rz - 8],
-      ['shrine_candle', geo.dais.x, rz + 8],
-      ['shrine_reed', geo.dais.x - 8, rz],
-      ['shrine_skull', geo.dais.x + 8, rz],
+      ['reliquary', sites.reliquary.x, sites.reliquary.z],
+      ...Object.entries(sites.shrines).map(([kind, off]): [string, number, number] => [
+        kind,
+        off.x,
+        off.z,
+      ]),
     ];
     const issues: string[] = [];
     for (const [name, x, z] of rite) {
