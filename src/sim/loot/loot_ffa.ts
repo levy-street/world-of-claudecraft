@@ -12,8 +12,9 @@
 // deterministic and unit-testable (reference: format_money.ts, threat.ts).
 
 // Seconds a tapped corpse stays owner-locked after it becomes lootable. After
-// this, any player may loot it. One minute, matching classic-era behavior.
-export const LOOT_FFA_DELAY = 60;
+// this, any player may loot it, so stray corpses no longer sit around as
+// confusing "permission denied" targets for other players.
+export const LOOT_FFA_DELAY = 10;
 
 /**
  * Has a lootable corpse's owner-lock lapsed? Drives the FFA flag from the

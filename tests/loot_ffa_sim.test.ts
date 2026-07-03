@@ -23,7 +23,9 @@ function setup() {
 
   // Both standing on the corpse so the interact-range gate is satisfied.
   for (const pid of [tapper, stranger]) {
-    const e = internals.entities.get(pid)!;
+    const e = internals.entities.get(pid);
+    expect(e).toBeDefined();
+    if (!e) throw new Error(`missing player entity ${pid}`);
     e.pos = { x: 0, y: 0, z: 0 };
     e.prevPos = { x: 0, y: 0, z: 0 };
   }
@@ -48,7 +50,7 @@ function setup() {
 
 const copperOf = (meta: PlayerMeta | undefined) => meta?.copper ?? 0;
 
-describe('loot goes FFA one minute after a corpse becomes lootable', () => {
+describe('loot goes FFA ten seconds after a corpse becomes lootable', () => {
   it('blocks a stranger while the corpse is still owner-locked', () => {
     const { sim, internals, stranger, mob } = setup();
     expect(mob.lootFfaTimer).toBeGreaterThan(0);
@@ -65,9 +67,23 @@ describe('loot goes FFA one minute after a corpse becomes lootable', () => {
     expect(copperOf(internals.players.get(tapper))).toBeGreaterThan(before);
   });
 
+  it('keeps the owner lock only for the ten-second cleanup window', () => {
+    const { sim, internals, stranger, mob } = setup();
+    const before = copperOf(internals.players.get(stranger));
+
+    for (let i = 0; i < 20 * (LOOT_FFA_DELAY - 1) && mob.lootFfaTimer > 1; i++) sim.tick();
+    expect(mob.lootFfaTimer).toBeGreaterThan(0);
+    sim.lootCorpse(mob.id, stranger);
+    expect(copperOf(internals.players.get(stranger))).toBe(before);
+
+    for (let i = 0; i < 20 * 2 && mob.lootFfaTimer > 0; i++) sim.tick();
+    expect(mob.lootFfaTimer).toBeLessThanOrEqual(0);
+    sim.lootCorpse(mob.id, stranger);
+    expect(copperOf(internals.players.get(stranger))).toBeGreaterThan(before);
+  });
   it('lets a stranger loot once the owner-lock has lapsed', () => {
     const { sim, internals, stranger, mob } = setup();
-    // Drive the dead-mob tick until the owner-lock lapses (just over one minute).
+    // Drive the dead-mob tick until the owner-lock lapses (just over ten seconds).
     for (let i = 0; i < 20 * (LOOT_FFA_DELAY + 1) && mob.lootFfaTimer > 0; i++) sim.tick();
     expect(mob.lootFfaTimer).toBeLessThanOrEqual(0);
     expect(mob.lootable).toBe(true); // corpse still present to be looted
