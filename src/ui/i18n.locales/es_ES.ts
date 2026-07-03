@@ -286,9 +286,4 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.school.shadow': 'Sombra',
   'hudChrome.auraEffect.school.holy': 'Sagrada',
   'hudChrome.auraEffect.school.nature': 'Natural',
-  'hudChrome.dailyRewards.pointsGained': '{points} puntos de recompensas diarias obtenidos.',
-  'hudChrome.dailyRewards.taskMultiplier': 'multiplicador x{multiplier}',
-  'hudChrome.dailyRewards.totalPlayer': '{count} jugador hoy',
-  'hudChrome.dailyRewards.totalPlayers': '{count} jugadores hoy',
-  'wallet.extensionHelp': 'Para ver una cartera aquí, mantén activa una extensión de cartera del navegador como Solflare Wallet.',
 };
