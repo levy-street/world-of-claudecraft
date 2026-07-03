@@ -5155,7 +5155,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.title': 'Update beschikbaar',
   'hudChrome.nativeUpdate.update': 'Bijwerken',
   'entities.abilities.holy_shock.name': "Heilige schok",
-  'entities.abilities.holy_shock.name': 'Heilige schok',
   'entities.abilities.holy_shock.description':
     'Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)',
   'entities.abilities.holy_shield.name': 'Heilig schild',

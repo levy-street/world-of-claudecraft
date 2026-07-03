@@ -5115,7 +5115,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
   'entities.abilities.holy_shock.name': "Sốc Thánh",
-  'entities.abilities.holy_shock.name': 'Sốc Thánh',
   'entities.abilities.holy_shock.description':
     'Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)',
   'entities.abilities.holy_shield.name': 'Khiên Thánh',

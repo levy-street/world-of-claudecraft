@@ -2260,11 +2260,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   insect_swarm: r('nature', 'leafGreen', ['tendrils'], ['sparkle']),
   tigers_fury: r('fire', 'ember', ['fang'], ['glow']),
   rip: r('blood', 'blood', ['claw_slash'], ['drips']),
-  flamestrike: r('fire', 'ember', ['flame', { p: 'sigil_rune', ...BR }], ['glow']),
-  rain_of_fire: r('fire', 'blood', ['meteor', { p: 'flame', ...TR }], ['drips']),
-  volley: r('steel', 'leafGreen', ['bow', { p: 'arrow', ...TR }], ['motion']),
-  hurricane: r('storm', 'silverWhite', ['tendrils', { p: 'lightning', ...BR }], ['arcs']),
-  earthquake: r('earth', 'earthBrown', ['mace', { p: 'sigil_rune', ...BR }], ['crack']),
   // --- formerly procedural-fallback abilities: unique hand-authored icons ---
   // warrior
   execute: r('blood', 'blood', ['axe'], ['glow']),

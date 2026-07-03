@@ -5091,7 +5091,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.title': 'Güncelleme Mevcut',
   'hudChrome.nativeUpdate.update': 'Güncelle',
   'entities.abilities.holy_shock.name': "Kutsal Şok",
-  'entities.abilities.holy_shock.name': 'Kutsal Şok',
   'entities.abilities.holy_shock.description':
     'Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)',
   'entities.abilities.holy_shield.name': 'Kutsal Kalkan',

@@ -5124,7 +5124,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.title': 'Dostępna aktualizacja',
   'hudChrome.nativeUpdate.update': 'Aktualizuj',
   'entities.abilities.holy_shock.name': "Święty wstrząs",
-  'entities.abilities.holy_shock.name': 'Święty wstrząs',
   'entities.abilities.holy_shock.description':
     'Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)',
   'entities.abilities.holy_shield.name': 'Święta tarcza',

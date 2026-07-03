@@ -5085,7 +5085,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'errors.api.desktopCodeInvalid':
     'Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.',
   'entities.abilities.holy_shock.name': "Hellig chok",
-  'entities.abilities.holy_shock.name': 'Hellig chok',
   'entities.abilities.holy_shock.description':
     'Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)',
   'entities.abilities.holy_shield.name': 'Hellig skjold',

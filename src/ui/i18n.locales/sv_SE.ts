@@ -5098,7 +5098,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
   'hudChrome.nativeUpdate.update': 'Uppdatera',
   'entities.abilities.holy_shock.name': "Helig chock",
-  'entities.abilities.holy_shock.name': 'Helig chock',
   'entities.abilities.holy_shock.description':
     'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
   'entities.abilities.holy_shield.name': 'Helig sköld',
