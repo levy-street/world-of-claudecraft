@@ -491,11 +491,24 @@ export const VISUALS: Record<string, VisualDef> = {
 
   // -- mob families --------------------------------------------------------
   mob_wolf: {
-    url: `${CREATURES}/wolf.glb`,
+    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton
+    // (same pipeline as greyjaw), clips renamed to the animal() names at bake
+    // time. Baked basecolor texture; keeps a light entity tint so this doubles
+    // as the beast-family fallback and each beast keeps its own colour.
+    url: `${CREATURES}/wolf_basic.glb`,
     height: 1.6,
     clips: animal(['Attack']),
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  greyjaw: {
+    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
+    // clips renamed to the animal() names at bake time. Baked texture, no tint.
+    // Old Greyjaw's model: 2.2 at scale 1 (his template scale 1.25 makes the
+    // rare ~2.75 in-world vs the 1.6 pack wolf).
+    url: `${CREATURES}/greyjaw.glb`,
+    height: 2.2,
+    clips: animal(['Attack']),
   },
   mob_boar: {
     url: `${CREATURES}/wild_boar.glb`,
@@ -841,6 +854,9 @@ const MOB_KEYS: Record<string, string> = {
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
   bog_bloat: 'mob_murloc',
+  // Old Greyjaw: the named rare wolf gets his own custom model (the pack
+  // wolves keep the light mob_wolf)
+  old_greyjaw: 'greyjaw',
   // gravecaller cult + necromancers: dark-robed casters
   gravecaller_cultist: 'mob_dark_caster',
   gravecaller_summoner: 'mob_dark_caster',

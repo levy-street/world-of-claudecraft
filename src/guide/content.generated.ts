@@ -1411,9 +1411,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 4,
         "rare": true,
         "templateId": "old_greyjaw",
-        "model": "mob_wolf",
-        "tint": "#566061",
-        "still": "/guide-stills/mob_wolf__566061.webp"
+        "model": "greyjaw",
+        "still": "/guide-stills/greyjaw.webp"
       },
       {
         "name": "Mire Prowler",
@@ -1894,10 +1893,15 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.35
   },
   "mob_wolf": {
-    "url": "models/creatures/wolf.glb",
+    "url": "models/creatures/wolf_basic.glb",
     "idle": "Idle",
     "height": 1.6,
     "tintStrength": 0.35
+  },
+  "greyjaw": {
+    "url": "models/creatures/greyjaw.glb",
+    "idle": "Idle",
+    "height": 2.2
   },
   "mob_boar": {
     "url": "models/creatures/wild_boar.glb",
