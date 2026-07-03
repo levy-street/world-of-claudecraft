@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
+import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES } from '../src/sim/data';
 import {
   da_DK,
@@ -540,6 +541,39 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
     expect(localizeSimAuraName('Tamed')).not.toBe('Tamed');
     expect(localizeSimAuraName('not-an-aura')).toBeNull();
+    setLanguage('en');
+  });
+
+  it('every delve mob aura-emitting proc name resolves through the aura matcher', () => {
+    // These five template fields all push a named, player-visible aura (a channel
+    // line, a player debuff, or a target-frame buff). A name with no matcher row
+    // renders raw English in every non-English locale: the exact Litany Pulse /
+    // Web Snare / Silt Hide / Frenzy drift class, which occurred four ways in one
+    // delve. Scan the content records so a rename on either side reddens this.
+    setLanguage('zh_CN');
+    const names: string[] = [];
+    for (const tmpl of Object.values(DELVE_MOBS)) {
+      for (const proc of [
+        tmpl.mendAlly,
+        tmpl.chillOnHit,
+        tmpl.stoneskin,
+        tmpl.wardAllies,
+        tmpl.frenzyOnHit,
+      ]) {
+        if (proc?.name) names.push(proc.name);
+      }
+    }
+    // Pin the scan itself: if a field is renamed in the template type, the scan
+    // silently goes blind without these.
+    expect(names).toContain('Litany Pulse');
+    expect(names).toContain('Web Snare');
+    expect(names).toContain('Silt Hide');
+    expect(names).toContain('Frenzy');
+    for (const name of names) {
+      expect(localizeSimAuraName(name), `no aura matcher row for '${name}'`).not.toBeNull();
+    }
+    // De-aliasing: Silt Hide and Silt Ward are distinct auras with distinct keys.
+    expect(localizeSimAuraName('Silt Hide')).not.toBe(localizeSimAuraName('Silt Ward'));
     setLanguage('en');
   });
 });
