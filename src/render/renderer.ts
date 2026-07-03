@@ -4056,17 +4056,14 @@ export class Renderer {
 
       if (e.kind === 'object') {
         // The sim swaps delve interactable templates in place (pressure plate ->
-        // triggered, bell rope -> pulled). Drop the stale view; the create pass
-        // rebuilds it from the new template within a frame. Only inside the
-        // create radius though: in the 80-96yd hysteresis band the create pass
-        // never runs, so removing here would make the object vanish entirely;
-        // keep the stale template until the player closes back in.
-        if (
-          v.builtTemplateId !== undefined &&
-          v.builtTemplateId !== e.templateId &&
-          d2 <= ENTITY_VIEW_CREATE_RANGE_SQ
-        ) {
+        // triggered, bell rope -> pulled). Rebuild the view from the new template
+        // right here rather than leaving it to the budgeted create pass: that
+        // pass never collects past the create radius, so a bare remove could
+        // strand the object invisible through the whole 80-96yd hysteresis band
+        // if the viewer retreats before the rebuild lands.
+        if (v.builtTemplateId !== undefined && v.builtTemplateId !== e.templateId) {
           this.removeView(id);
+          this.createView(e);
           continue;
         }
         const isPortalObject = isPersistentPortalObject(e);
