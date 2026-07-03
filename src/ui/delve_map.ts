@@ -21,12 +21,19 @@ export function delveAreaLabel(delveName: string, moduleName: string): string {
 // The helper returns plain data; hud.ts does the actual canvas.drawXxx calls.
 // ---------------------------------------------------------------------------
 
-/** A filled circle (pillar, dais, exit marker, player dot). */
+/** A filled circle (pillar, dais, exit marker, player dot). `ry` makes it an
+ * ellipse: the schematic maps x and z with different scales, so a world-space
+ * circle (a Blackwater pool) is an ellipse in canvas space. Defaults to `r`. */
 export interface SchematicCircle {
   kind: 'circle';
   cx: number;
   cy: number;
   r: number;
+  ry?: number;
+  /** Painted clipped to the module's outline polygon: authored pools bleed past
+   * the walkable boundary in the world (under walls), so their true-scale
+   * footprint can exceed the canvas; the outline bounds what actually paints. */
+  clipToOutline?: boolean;
   fill: string;
   stroke?: string;
   strokeWidth?: number;
@@ -39,6 +46,8 @@ export interface SchematicRect {
   y: number;
   w: number;
   h: number;
+  /** See SchematicCircle.clipToOutline. */
+  clipToOutline?: boolean;
   fill: string;
   stroke?: string;
   strokeWidth?: number;
@@ -48,6 +57,8 @@ export interface SchematicRect {
 export interface SchematicPolygon {
   kind: 'polygon';
   points: Array<{ cx: number; cy: number }>;
+  /** The module's walkable boundary: the clip shape for clipToOutline prims. */
+  isOutline?: boolean;
   fill: string;
   stroke?: string;
   strokeWidth?: number;
@@ -100,28 +111,38 @@ export function delveLocalToCanvas(
   canvasSize: number,
   pad: number,
 ): { cx: number; cy: number } {
+  const { sx, sz, halfWidth } = delveCanvasScales(layout, canvasSize, pad);
+  // Mirror X for map-left convention.
+  const cx = pad + (halfWidth - localX) * sx;
+  // localZ: zMin → top, zMax → bottom
+  const cy = pad + (localZ - layout.zMin) * sz;
+  return { cx, cy };
+}
+
+/** Per-axis canvas scales (px per world unit) for the schematic space, the SAME
+ * scales delveLocalToCanvas maps positions with: X from the authored outline's
+ * max |x| (an irregular outline can bow wider than wallX, e.g. the ring's
+ * root-wall flanks), Z from the room depth. Sizes drawn with these scales stay
+ * consistent with positions; a single min() scale drew pools and islands at a
+ * fraction of the width the walkable outline implied. */
+export function delveCanvasScales(
+  layout: DungeonLayout,
+  canvasSize: number,
+  pad: number,
+): { sx: number; sz: number; halfWidth: number } {
   const rawModuleId = (layout as { litanyModuleId?: string }).litanyModuleId;
   const litany =
     rawModuleId && isLitanyModuleId(rawModuleId) ? litanyModuleGeometry(rawModuleId) : null;
-  // When the module has an authored boundary polygon, size the canvas bounds
-  // from its actual max |x| (an irregular outline can bow wider than wallX,
-  // e.g. the ring's root-wall flanks) instead of the legacy rectangle width.
   const polyPoints = litany?.walkable[0]?.points;
   const polyMaxAbsX = polyPoints?.length
     ? polyPoints.reduce((m, p) => Math.max(m, Math.abs(p.x)), 0)
     : null;
   const halfWidth = polyMaxAbsX ?? litany?.wallX ?? 23;
-  const xMin = -halfWidth;
-  const xMax = halfWidth;
-  const roomW = xMax - xMin;
-  const roomD = layout.zMax - layout.zMin;
-  const drawW = canvasSize - pad * 2;
-  const drawH = canvasSize - pad * 2;
-  // Mirror X for map-left convention.
-  const cx = pad + ((xMax - localX) / roomW) * drawW;
-  // localZ: zMin → top, zMax → bottom
-  const cy = pad + ((localZ - layout.zMin) / roomD) * drawH;
-  return { cx, cy };
+  return {
+    sx: (canvasSize - pad * 2) / (halfWidth * 2),
+    sz: (canvasSize - pad * 2) / (layout.zMax - layout.zMin),
+    halfWidth,
+  };
 }
 
 /** The static schematic primitives for a module (floor + walls + pillars + tombs + dais + exit).
@@ -142,12 +163,18 @@ export function delveSchematicStatic(
   const litanyPrims =
     litanyModuleId !== undefined ? litanyModuleMapPrimitives(litanyModuleId) : undefined;
   if (litanyPrims && litanyModuleId !== undefined) {
-    const litany = litanyModuleGeometry(litanyModuleId);
-    const scale = Math.min(
-      (canvasSize - pad * 2) / ((litany?.wallX ?? 23) * 2),
-      (canvasSize - pad * 2) / (layout.zMax - layout.zMin),
-    );
-    for (const prim of litanyPrims) {
+    // Size primitives with the SAME per-axis scales positions map through, so a
+    // pool or island is exactly as wide on the map as the outline implies.
+    const { sx, sz } = delveCanvasScales(layout, canvasSize, pad);
+    // Islands paint AFTER the blackwater fills, like the 3D scene: the dry
+    // stepping stones must read on top of the pools they sit in.
+    const isIslandPrim = (pr: (typeof litanyPrims)[number]) =>
+      pr.kind === 'rect' && pr.role === 'island';
+    const paintOrder = [
+      ...litanyPrims.filter((pr) => !isIslandPrim(pr)),
+      ...litanyPrims.filter(isIslandPrim),
+    ];
+    for (const prim of paintOrder) {
       if (prim.kind === 'polygon') {
         const points = prim.points.map((pt) => {
           const { cx, cy } = delveLocalToCanvas(pt.x, pt.z, layout, canvasSize, pad);
@@ -156,6 +183,7 @@ export function delveSchematicStatic(
         prims.push({
           kind: 'polygon',
           points,
+          isOutline: true,
           fill: '#203026',
           stroke: '#58704c',
           strokeWidth: 1,
@@ -177,7 +205,11 @@ export function delveSchematicStatic(
             kind: 'circle',
             cx,
             cy,
-            r: Math.max(2, prim.r * scale),
+            r: Math.max(2, prim.r * sx),
+            ry: Math.max(2, prim.r * sz),
+            // Only pools bleed past the walkable outline by design; everything
+            // else is authored inside it.
+            clipToOutline: prim.role === 'blackwater',
             fill:
               prim.role === 'blackwater' ? '#071512' : prim.role === 'dais' ? '#2a2016' : '#2e2820',
             stroke: prim.role === 'blackwater' ? '#65a765' : '#4a4030',
@@ -186,8 +218,8 @@ export function delveSchematicStatic(
         }
       } else {
         const { cx, cy } = delveLocalToCanvas(prim.x, prim.z, layout, canvasSize, pad);
-        const sw = prim.hw * 2 * scale;
-        const sh = ((prim.hd * 2) / (layout.zMax - layout.zMin)) * (canvasSize - pad * 2);
+        const sw = prim.hw * 2 * sx;
+        const sh = prim.hd * 2 * sz;
         const isIsland = prim.role === 'island';
         prims.push({
           kind: 'rect',
@@ -195,6 +227,7 @@ export function delveSchematicStatic(
           y: cy - sh / 2,
           w: sw,
           h: sh,
+          clipToOutline: isIsland,
           fill: isIsland ? '#203026' : '#2e2820',
           stroke: isIsland ? '#58704c' : '#4a4030',
           strokeWidth: isIsland ? 1 : 0.5,

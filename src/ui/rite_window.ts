@@ -6,6 +6,7 @@
 // hud.ts owns open/close, focus, and routing the choice to IWorld; this module only
 // paints and reports the picked intensity through `deps`.
 
+import { RITE_INTENSITY, RITE_INTENSITY_ORDER } from '../sim/delves/rite_tuning';
 import type { RiteIntensity } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
@@ -20,17 +21,17 @@ export interface RiteWindowDeps {
 
 const NUM0 = { maximumFractionDigits: 0 } as const;
 
-// Display copy for each difficulty, in the same Easy -> Hard order the sim uses.
+// Display data derived from the sim's own tuning table (rite_tuning.ts), so the
+// popup's advertised numbers can never desync from what the rite actually does.
 const OPTIONS: {
   intensity: RiteIntensity;
   playbacks: number;
   symbols: number;
   tries: number;
-}[] = [
-  { intensity: 'easy', playbacks: 3, symbols: 4, tries: 3 },
-  { intensity: 'medium', playbacks: 2, symbols: 5, tries: 2 },
-  { intensity: 'hard', playbacks: 1, symbols: 6, tries: 1 },
-];
+}[] = RITE_INTENSITY_ORDER.map((intensity) => {
+  const cfg = RITE_INTENSITY[intensity];
+  return { intensity, playbacks: cfg.playbacks, symbols: cfg.length, tries: cfg.tries };
+});
 
 export class RiteWindow {
   constructor(private readonly deps: RiteWindowDeps) {}

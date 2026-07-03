@@ -61,10 +61,23 @@ describe('delveSchematicStatic', () => {
             expect(point.cy).toBeLessThanOrEqual(CANVAS_SIZE + 1);
           }
         } else if (prim.kind === 'circle') {
-          expect(prim.cx + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
-          expect(prim.cx - prim.r).toBeGreaterThanOrEqual(-1);
-          expect(prim.cy + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
-          expect(prim.cy - prim.r).toBeGreaterThanOrEqual(-1);
+          // True-scale pools can legitimately extend past the walkable outline
+          // (authored to bleed under walls); the painter clips them to the
+          // outline polygon, whose points are bounds-checked above. Only the
+          // CENTER must stay inside for a clipped prim; unclipped prims must
+          // fit whole (y extent uses ry: the schematic maps x/z anisotropically).
+          const ry = prim.ry ?? prim.r;
+          if (prim.clipToOutline) {
+            expect(prim.cx).toBeGreaterThanOrEqual(-1);
+            expect(prim.cx).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(prim.cy).toBeGreaterThanOrEqual(-1);
+            expect(prim.cy).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+          } else {
+            expect(prim.cx + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(prim.cx - prim.r).toBeGreaterThanOrEqual(-1);
+            expect(prim.cy + ry).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(prim.cy - ry).toBeGreaterThanOrEqual(-1);
+          }
         } else if (prim.kind === 'rect') {
           expect(prim.x).toBeLessThanOrEqual(CANVAS_SIZE);
           expect(prim.y).toBeLessThanOrEqual(CANVAS_SIZE);
@@ -90,6 +103,35 @@ describe('delveSchematicStatic', () => {
       expect(texts.length).toBeGreaterThanOrEqual(1); // 'N' exit label
     });
   }
+
+  it('flags the outline polygon and clips pool/island prims (the painter contract)', () => {
+    const layout = DELVE_MODULE_LAYOUTS.litany_apse;
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const outline = prims.find((p) => p.kind === 'polygon' && p.isOutline);
+    expect(outline).toBeDefined();
+    const pools = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'circle' }> =>
+        p.kind === 'circle' && p.fill === '#071512',
+    );
+    expect(pools.length).toBeGreaterThan(0);
+    for (const p of pools) {
+      expect(p.clipToOutline).toBe(true); // pools may bleed past the outline
+      expect(typeof p.ry).toBe('number'); // anisotropic: ellipse, not circle
+    }
+    const islands = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'rect' }> =>
+        p.kind === 'rect' && p.fill === '#203026',
+    );
+    expect(islands.length).toBeGreaterThan(0);
+    for (const p of islands) expect(p.clipToOutline).toBe(true);
+    // Islands paint after every pool so the dry stones read on top on the map.
+    const lastPool = prims.reduce(
+      (last, p, i) => (p.kind === 'circle' && p.fill === '#071512' ? i : last),
+      -1,
+    );
+    const firstIsland = prims.findIndex((p) => p.kind === 'rect' && p.fill === '#203026');
+    expect(firstIsland).toBeGreaterThan(lastPool);
+  });
 
   it('litany_sluice draws irregular walkable geometry instead of one full room rectangle', () => {
     const layout = DELVE_MODULE_LAYOUTS.litany_sluice;

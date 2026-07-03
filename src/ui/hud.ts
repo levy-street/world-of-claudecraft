@@ -5598,8 +5598,17 @@ export class Hud {
       this.lastDelveTrackerSig = '';
       if (el.innerHTML !== '') el.innerHTML = '';
       el.style.display = 'none';
+      // The run ended (walk-out, death release, completion teardown) while the
+      // difficulty popup could still be up; do not leave it floating over the
+      // outdoor world.
+      this.closeRitePanel(false);
       return;
     }
+    // State-driven close: the popup is only valid while the rite awaits a
+    // choice. The first pulse event also closes it, but that event is
+    // interest-scoped to the apse, so a party member elsewhere in the delve
+    // relies on this wire-state check instead.
+    if (run.rite && run.rite.phase !== 'choose') this.closeRitePanel(false);
     const sig = JSON.stringify([
       run.delveId,
       run.tierId,
@@ -6990,8 +6999,10 @@ export class Hud {
             'completion',
           ];
           if (!KNOWN_BARKS.includes(ev.barkId)) break;
-          const companionKey =
-            this.sim.companionState?.companionId === 'companion_edda' ? 'edda' : 'tessa';
+          // The event carries the speaker: companionState can be momentarily
+          // null online (event/snapshot ordering), which used to fall back to
+          // Tessa's name and lines during an Edda run.
+          const companionKey = ev.companionId === 'companion_edda' ? 'edda' : 'tessa';
           const line = t(`delveUi.companion.${companionKey}.${ev.barkId}` as TranslationKey, {
             playerName: this.sim.player.name,
           });
