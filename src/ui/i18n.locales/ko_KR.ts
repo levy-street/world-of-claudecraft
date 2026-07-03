@@ -5075,12 +5075,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.indicatorTip': '읽지 않은 편지가 {count}통 있습니다. 우편함에서 확인하세요.',
   'hudChrome.mailbox.clickAttach': '클릭하면 편지에 첨부됩니다.',
   'hudChrome.mailbox.cannotMail': '이 아이템은 우편으로 보낼 수 없습니다.',
-  'hudChrome.mailbox.result.sent': '까마귀가 {name}에게 보낼 편지를 물고 날아올랐습니다 (우편 요금 {postage}).',
+  'hudChrome.mailbox.result.sent':
+    '까마귀가 {name}에게 보낼 편지를 물고 날아올랐습니다 (우편 요금 {postage}).',
   'hudChrome.mailbox.result.collected': '편지에서 {amount}을(를) 받았습니다.',
   'hudChrome.mailbox.result.tooFar': '우편을 처리하려면 우편함 옆에 있어야 합니다.',
   'hudChrome.mailbox.result.needRecipient': '편지의 수신인을 지정하세요.',
   'hudChrome.mailbox.result.noRecipient': '그 이름을 가진 우편함 주인이 없습니다.',
-  'hudChrome.mailbox.result.tooManyParcels': '편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.',
+  'hudChrome.mailbox.result.tooManyParcels':
+    '편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.',
   'hudChrome.mailbox.result.noMailQuestItems': '퀘스트 아이템은 우편으로 보낼 수 없습니다.',
   'hudChrome.mailbox.result.notEnoughItems': '보낼 수 있는 수량이 부족합니다.',
   'hudChrome.mailbox.result.cantAffordPostage': '우편 요금을 낼 수 없습니다.',
@@ -5091,16 +5093,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Ravenpost authored letters (M16 non-Latin fill)
   'entities.letters.ravenpost_welcome.sender': '레이븐포스트',
   'entities.letters.ravenpost_welcome.subject': '이제 까마귀가 당신을 위해 날아갑니다',
-  'entities.letters.ravenpost_welcome.body': '여행자님,\n\n레이븐포스트가 골짜기 곳곳에 홰를 열었습니다. 이스트브룩, 펜브리지, 하이워치에서 까마귀 석주를 찾아보세요. 어느 곳에서든 다른 모험가에게 편지와 동전과 물건을 보낼 수 있고, 까마귀가 물어온 것들을 받을 수 있습니다.\n\n첫 우표값으로 쓸 작은 성의를 동봉합니다.\n\n날개를 활짝,\n레이븐포스트',
+  'entities.letters.ravenpost_welcome.body':
+    '여행자님,\n\n레이븐포스트가 골짜기 곳곳에 홰를 열었습니다. 이스트브룩, 펜브리지, 하이워치에서 까마귀 석주를 찾아보세요. 어느 곳에서든 다른 모험가에게 편지와 동전과 물건을 보낼 수 있고, 까마귀가 물어온 것들을 받을 수 있습니다.\n\n첫 우표값으로 쓸 작은 성의를 동봉합니다.\n\n날개를 활짝,\n레이븐포스트',
   'entities.letters.letter_q_wolves.sender': '레드브룩 원수',
   'entities.letters.letter_q_wolves.subject': '우리가 다시 조용해졌소',
-  'entities.letters.letter_q_wolves.body': '목동들이 모처럼 두 다리 뻗고 잘 수 있게 된 것은 그대 덕분이오. 경비 기금에서 작은 성의를 레이븐포스트 편에 보냈소.\n\n칼날을 잘 벼려 두시오.\n- 레드브룩 원수',
+  'entities.letters.letter_q_wolves.body':
+    '목동들이 모처럼 두 다리 뻗고 잘 수 있게 된 것은 그대 덕분이오. 경비 기금에서 작은 성의를 레이븐포스트 편에 보냈소.\n\n칼날을 잘 벼려 두시오.\n- 레드브룩 원수',
   'entities.letters.letter_q_greyjaw.sender': '레드브룩 원수',
   'entities.letters.letter_q_greyjaw.subject': '늙은 회색이빨, 마침내',
-  'entities.letters.letter_q_greyjaw.body': '이런 작은 마을에서는 소문이 빠르게 도는 법이오. 목동들은 어젯밤 그대의 건강을 위해 잔을 들었고, 윌크스는 그 늑대가 수레만 했다고 우기고 있소. 부풀리게 내버려 두시오. 그대가 얻어낸 명성이니.\n\n경비대를 대신해 식사 한 끼 하시오.\n- 레드브룩 원수',
+  'entities.letters.letter_q_greyjaw.body':
+    '이런 작은 마을에서는 소문이 빠르게 도는 법이오. 목동들은 어젯밤 그대의 건강을 위해 잔을 들었고, 윌크스는 그 늑대가 수레만 했다고 우기고 있소. 부풀리게 내버려 두시오. 그대가 얻어낸 명성이니.\n\n경비대를 대신해 식사 한 끼 하시오.\n- 레드브룩 원수',
   'entities.letters.letter_q_hollow.sender': '알드릭 수사',
   'entities.letters.letter_q_hollow.subject': '그대가 어둠 속에서 해낸 일',
-  'entities.letters.letter_q_hollow.body': '그 구렁에 무엇이 묻혀 있었는지 아는 이는 거의 없고, 믿을 이는 더 적을 것입니다. 저는 알고 있고, 잊지 않겠습니다.\n\n그대의 길에 늘 빛이 함께하기를.\n- 알드릭 수사',
+  'entities.letters.letter_q_hollow.body':
+    '그 구렁에 무엇이 묻혀 있었는지 아는 이는 거의 없고, 믿을 이는 더 적을 것입니다. 저는 알고 있고, 잊지 않겠습니다.\n\n그대의 길에 늘 빛이 함께하기를.\n- 알드릭 수사',
   // Event calendar (M16 non-Latin fill)
   'hudChrome.calendar.title': '이벤트 달력',
   'hudChrome.calendar.close': '달력 닫기',
@@ -5127,23 +5133,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.result.calendarFull': '길드 달력이 가득 찼습니다.',
   'hudChrome.calendar.result.eventGone': '그 이벤트는 더 이상 달력에 없습니다.',
   'hudChrome.calendar.events.raidCall.title': '공격대 소집',
-  'hudChrome.calendar.events.raidCall.note': '수비대가 뿔피리를 붑니다. 파티를 모아 지하 묘지와 공격대로.',
+  'hudChrome.calendar.events.raidCall.note':
+    '수비대가 뿔피리를 붑니다. 파티를 모아 지하 묘지와 공격대로.',
   'hudChrome.calendar.events.marketDay.title': '장날',
-  'hudChrome.calendar.events.marketDay.note': '상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날.',
+  'hudChrome.calendar.events.marketDay.note':
+    '상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날.',
   'hudChrome.calendar.events.fiestaNight.title': '피에스타의 밤',
   'hudChrome.calendar.events.fiestaNight.note': '오늘 밤 2대2 피에스타 링이 가장 붐빕니다.',
   'hudChrome.calendar.events.arenaClash.title': '투기장 격돌',
-  'hudChrome.calendar.events.arenaClash.note': '결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요.',
+  'hudChrome.calendar.events.arenaClash.note':
+    '결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요.',
   'hudChrome.calendar.events.fishingDerby.title': '낚시 대회',
-  'hudChrome.calendar.events.fishingDerby.note': '낚시꾼들이 호숫가에 늘어섭니다. 낚싯대를 들고 이야기꽃을 피우세요.',
+  'hudChrome.calendar.events.fishingDerby.note':
+    '낚시꾼들이 호숫가에 늘어섭니다. 낚싯대를 들고 이야기꽃을 피우세요.',
   'hudChrome.calendar.events.delveDay.title': '탐굴의 날',
-  'hudChrome.calendar.events.delveDay.note': '할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물고에 도전하기 좋은 날.',
+  'hudChrome.calendar.events.delveDay.note':
+    '할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물고에 도전하기 좋은 날.',
   'hudChrome.calendar.events.moongateCommunion.title': '달문 집회',
-  'hudChrome.calendar.events.moongateCommunion.note': '보름의 달 아래 순례자들이 사원의 달문에 모입니다.',
+  'hudChrome.calendar.events.moongateCommunion.note':
+    '보름의 달 아래 순례자들이 사원의 달문에 모입니다.',
   // Player housing (Land Steward + Homestead Gate)
   'entities.npcs.land_steward.name': '집사 펜윅',
   'entities.npcs.land_steward.title': '토지 집사',
-  'entities.npcs.land_steward.greeting': '자신만의 난롯가를 꿈꾸는가? 홈스테드 골짜기에는 금화 백 닢과 증서에 서명할 손만 있으면 누구에게나 내어줄 터가 마련되어 있다네.',
+  'entities.npcs.land_steward.greeting':
+    '자신만의 난롯가를 꿈꾸는가? 홈스테드 골짜기에는 금화 백 닢과 증서에 서명할 손만 있으면 누구에게나 내어줄 터가 마련되어 있다네.',
   'worldContent.homesteadGateName': '홈스테드 문',
   // Player housing (M16 non-Latin fill)
   'hudChrome.housing.buy': '홈스테드 증서 구입 ({price})',
@@ -5157,7 +5170,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.housing.purchasedBanner': '홈스테드 골짜기가 당신을 기다립니다.',
   'hudChrome.housing.arrivedBanner': '나의 홈스테드',
   'hudChrome.housing.leftBanner': '이스트브룩',
-  'hudChrome.housing.result.purchased': '증서는 당신의 것입니다. 집사에게 말을 걸면 홈스테드를 방문할 수 있습니다.',
+  'hudChrome.housing.result.purchased':
+    '증서는 당신의 것입니다. 집사에게 말을 걸면 홈스테드를 방문할 수 있습니다.',
   'hudChrome.housing.result.alreadyOwned': '이미 홈스테드 증서를 갖고 있습니다.',
   'hudChrome.housing.result.cantAfford': '증서를 살 여유가 없습니다.',
   'hudChrome.housing.result.notOwned': '아직 홈스테드 증서가 없습니다.',

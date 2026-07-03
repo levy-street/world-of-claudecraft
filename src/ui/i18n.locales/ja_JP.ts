@@ -5068,7 +5068,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.indicatorTip': '未読の手紙が{count}通あります。メールボックスで読めます。',
   'hudChrome.mailbox.clickAttach': 'クリックで手紙に添付します。',
   'hudChrome.mailbox.cannotMail': 'これは郵送できません。',
-  'hudChrome.mailbox.result.sent': 'ワタリガラスが{name}宛ての手紙を運んで飛び立ちました（郵送料{postage}）。',
+  'hudChrome.mailbox.result.sent':
+    'ワタリガラスが{name}宛ての手紙を運んで飛び立ちました（郵送料{postage}）。',
   'hudChrome.mailbox.result.collected': '手紙から{amount}を受け取りました。',
   'hudChrome.mailbox.result.tooFar': '郵便を扱うにはメールボックスのそばにいる必要があります。',
   'hudChrome.mailbox.result.needRecipient': '手紙の宛先を指定してください。',
@@ -5084,16 +5085,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Ravenpost authored letters (M16 non-Latin fill)
   'entities.letters.ravenpost_welcome.sender': 'レイヴンポスト',
   'entities.letters.ravenpost_welcome.subject': 'ワタリガラスはあなたのために飛ぶ',
-  'entities.letters.ravenpost_welcome.body': '旅人へ\n\nレイヴンポストは谷のあちこちに止まり木を設けました。イーストブルック、フェンブリッジ、ハイウォッチでワタリガラスの石柱を探してください。どの止まり木からでも、ほかの冒険者へ手紙やお金や品物を送れますし、ワタリガラスが運んできたものを受け取れます。\n\n最初の切手代として、ささやかな心づけを同封します。\n\n翼を高く、\nレイヴンポスト',
+  'entities.letters.ravenpost_welcome.body':
+    '旅人へ\n\nレイヴンポストは谷のあちこちに止まり木を設けました。イーストブルック、フェンブリッジ、ハイウォッチでワタリガラスの石柱を探してください。どの止まり木からでも、ほかの冒険者へ手紙やお金や品物を送れますし、ワタリガラスが運んできたものを受け取れます。\n\n最初の切手代として、ささやかな心づけを同封します。\n\n翼を高く、\nレイヴンポスト',
   'entities.letters.letter_q_wolves.sender': 'レッドブルック元帥',
   'entities.letters.letter_q_wolves.subject': '囲いはまた静かになった',
-  'entities.letters.letter_q_wolves.body': '牧夫たちがようやく安心して眠れるようになったのは、あなたのおかげです。見張り基金から、レイヴンポストに託してささやかな謝礼を送りました。\n\n刃の手入れを忘れずに。\n- レッドブルック元帥',
+  'entities.letters.letter_q_wolves.body':
+    '牧夫たちがようやく安心して眠れるようになったのは、あなたのおかげです。見張り基金から、レイヴンポストに託してささやかな謝礼を送りました。\n\n刃の手入れを忘れずに。\n- レッドブルック元帥',
   'entities.letters.letter_q_greyjaw.sender': 'レッドブルック元帥',
   'entities.letters.letter_q_greyjaw.subject': 'オールド・グレイジョー、ついに',
-  'entities.letters.letter_q_greyjaw.body': '小さな町では噂が早いものです。牧夫たちは昨夜あなたの健康に乾杯し、ウィルクスはあの狼が荷馬車ほどもあったと言い張っています。好きに尾ひれをつけさせておきなさい。あなたが勝ち取ったものです。\n\n見張り隊の分まで食事をどうぞ。\n- レッドブルック元帥',
+  'entities.letters.letter_q_greyjaw.body':
+    '小さな町では噂が早いものです。牧夫たちは昨夜あなたの健康に乾杯し、ウィルクスはあの狼が荷馬車ほどもあったと言い張っています。好きに尾ひれをつけさせておきなさい。あなたが勝ち取ったものです。\n\n見張り隊の分まで食事をどうぞ。\n- レッドブルック元帥',
   'entities.letters.letter_q_hollow.sender': 'アルドリック修道士',
   'entities.letters.letter_q_hollow.subject': 'あなたが暗闇で成したこと',
-  'entities.letters.letter_q_hollow.body': 'あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士',
+  'entities.letters.letter_q_hollow.body':
+    'あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士',
   // Event calendar (M16 non-Latin fill)
   'hudChrome.calendar.title': 'イベントカレンダー',
   'hudChrome.calendar.close': 'カレンダーを閉じる',
@@ -5115,28 +5120,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.result.created': 'イベントをギルドカレンダーに登録しました。',
   'hudChrome.calendar.result.removed': 'イベントをカレンダーから外しました。',
   'hudChrome.calendar.result.notInGuild': 'ギルドに所属していません。',
-  'hudChrome.calendar.result.notOfficer': 'ギルドイベントを管理できるのは幹部とギルドマスターだけです。',
+  'hudChrome.calendar.result.notOfficer':
+    'ギルドイベントを管理できるのは幹部とギルドマスターだけです。',
   'hudChrome.calendar.result.badInput': 'イベント名と有効な日付を入力してください。',
   'hudChrome.calendar.result.calendarFull': 'ギルドカレンダーは満杯です。',
   'hudChrome.calendar.result.eventGone': 'そのイベントはもうカレンダーにありません。',
   'hudChrome.calendar.events.raidCall.title': 'レイド招集',
-  'hudChrome.calendar.events.raidCall.note': '守人が角笛を鳴らす。パーティーを集め、地下墓所とレイドへ。',
+  'hudChrome.calendar.events.raidCall.note':
+    '守人が角笛を鳴らす。パーティーを集め、地下墓所とレイドへ。',
   'hudChrome.calendar.events.marketDay.title': '市の日',
-  'hudChrome.calendar.events.marketDay.note': '商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。',
+  'hudChrome.calendar.events.marketDay.note':
+    '商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。',
   'hudChrome.calendar.events.fiestaNight.title': 'フィエスタナイト',
   'hudChrome.calendar.events.fiestaNight.note': '今夜の2v2フィエスタのリングは大賑わい。',
   'hudChrome.calendar.events.arenaClash.title': 'アリーナ激突',
-  'hudChrome.calendar.events.arenaClash.note': '決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。',
+  'hudChrome.calendar.events.arenaClash.note':
+    '決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。',
   'hudChrome.calendar.events.fishingDerby.title': 'フィッシングダービー',
   'hudChrome.calendar.events.fishingDerby.note': '釣り人が湖に並ぶ。竿を持って釣り話を交わそう。',
   'hudChrome.calendar.events.delveDay.title': 'デルヴの日',
-  'hudChrome.calendar.events.delveDay.note': 'ハルヴェン修道士が海図に印を。崩落した聖遺物庫に挑む好日。',
+  'hudChrome.calendar.events.delveDay.note':
+    'ハルヴェン修道士が海図に印を。崩落した聖遺物庫に挑む好日。',
   'hudChrome.calendar.events.moongateCommunion.title': '月門の集い',
   'hudChrome.calendar.events.moongateCommunion.note': '月半ばの月の下、巡礼者が神殿の月門に集う。',
   // Player housing (Land Steward + Homestead Gate)
   'entities.npcs.land_steward.name': '執事フェンウィック',
   'entities.npcs.land_steward.title': '土地執事',
-  'entities.npcs.land_steward.greeting': '自分だけの炉端を夢見ているのか？ホームステッドの谷には、金貨百枚と証書に署名する手を持つ者のために区画が用意されている。',
+  'entities.npcs.land_steward.greeting':
+    '自分だけの炉端を夢見ているのか？ホームステッドの谷には、金貨百枚と証書に署名する手を持つ者のために区画が用意されている。',
   'worldContent.homesteadGateName': 'ホームステッドの門',
   // Player housing (M16 non-Latin fill)
   'hudChrome.housing.buy': 'ホームステッドの地券を購入（{price}）',
@@ -5150,11 +5161,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.housing.purchasedBanner': 'ホームステッドの谷が待っています。',
   'hudChrome.housing.arrivedBanner': 'あなたのホームステッド',
   'hudChrome.housing.leftBanner': 'イーストブルック',
-  'hudChrome.housing.result.purchased': '地券はあなたのものです。執事に話しかければホームステッドを訪れられます。',
+  'hudChrome.housing.result.purchased':
+    '地券はあなたのものです。執事に話しかければホームステッドを訪れられます。',
   'hudChrome.housing.result.alreadyOwned': 'すでにホームステッドの地券を持っています。',
   'hudChrome.housing.result.cantAfford': '地券を買う余裕がありません。',
   'hudChrome.housing.result.notOwned': 'まだホームステッドの地券を持っていません。',
   'hudChrome.housing.result.tooFar': '土地執事と直接話す必要があります。',
-  'hudChrome.housing.result.glensFull': '谷は今ちょうど混み合っています。しばらくしてからもう一度どうぞ。',
+  'hudChrome.housing.result.glensFull':
+    '谷は今ちょうど混み合っています。しばらくしてからもう一度どうぞ。',
   'hudChrome.housing.result.notHome': 'あなたはホームステッドにいません。',
 };

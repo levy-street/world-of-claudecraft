@@ -4829,16 +4829,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Ravenpost authored letters (M16 non-Latin fill)
   'entities.letters.ravenpost_welcome.sender': '渡鴉郵驛',
   'entities.letters.ravenpost_welcome.subject': '渡鴉如今為你飛翔',
-  'entities.letters.ravenpost_welcome.body': '旅人：\n\n渡鴉郵驛已在谷地各處設立棲架。請在東溪鎮、沼橋鎮和高望鎮尋找渡鴉石柱：在任意一處，你都可以向其他冒險者寄送信件、錢幣和物品，也可以領取渡鴉為你帶來的一切。\n\n隨信附上一點心意，作為你的第一枚郵票。\n\n展翅高飛，\n渡鴉郵驛',
+  'entities.letters.ravenpost_welcome.body':
+    '旅人：\n\n渡鴉郵驛已在谷地各處設立棲架。請在東溪鎮、沼橋鎮和高望鎮尋找渡鴉石柱：在任意一處，你都可以向其他冒險者寄送信件、錢幣和物品，也可以領取渡鴉為你帶來的一切。\n\n隨信附上一點心意，作為你的第一枚郵票。\n\n展翅高飛，\n渡鴉郵驛',
   'entities.letters.letter_q_wolves.sender': '雷德布魯克元帥',
   'entities.letters.letter_q_wolves.subject': '圍欄又安靜了',
-  'entities.letters.letter_q_wolves.body': '牧人們總算能睡個安穩覺了，這都是你的功勞。我已託渡鴉郵驛從守備金裡給你捎去一點謝意。\n\n保持你的刀刃鋒利。\n- 雷德布魯克元帥',
+  'entities.letters.letter_q_wolves.body':
+    '牧人們總算能睡個安穩覺了，這都是你的功勞。我已託渡鴉郵驛從守備金裡給你捎去一點謝意。\n\n保持你的刀刃鋒利。\n- 雷德布魯克元帥',
   'entities.letters.letter_q_greyjaw.sender': '雷德布魯克元帥',
   'entities.letters.letter_q_greyjaw.subject': '老灰顎，終於倒下了',
-  'entities.letters.letter_q_greyjaw.body': '小鎮裡消息傳得快。牧人們昨晚為你的健康乾杯，威爾克斯發誓那頭狼有馬車那麼大。讓他們添油加醋去吧：這是你應得的。\n\n請代守備隊享用一頓好飯。\n- 雷德布魯克元帥',
+  'entities.letters.letter_q_greyjaw.body':
+    '小鎮裡消息傳得快。牧人們昨晚為你的健康乾杯，威爾克斯發誓那頭狼有馬車那麼大。讓他們添油加醋去吧：這是你應得的。\n\n請代守備隊享用一頓好飯。\n- 雷德布魯克元帥',
   'entities.letters.letter_q_hollow.sender': '奧德里克修士',
   'entities.letters.letter_q_hollow.subject': '你在黑暗中所做的一切',
-  'entities.letters.letter_q_hollow.body': '很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士',
+  'entities.letters.letter_q_hollow.body':
+    '很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士',
   // Event calendar (M16 non-Latin fill)
   'hudChrome.calendar.title': '活動日曆',
   'hudChrome.calendar.close': '關閉日曆',
@@ -4881,7 +4885,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Player housing (Land Steward + Homestead Gate)
   'entities.npcs.land_steward.name': '管家芬威克',
   'entities.npcs.land_steward.title': '土地管家',
-  'entities.npcs.land_steward.greeting': '夢想擁有自己的爐火嗎？家園谷地為每一位備好一塊地，只要你帶著一百金幣，親手簽下地契。',
+  'entities.npcs.land_steward.greeting':
+    '夢想擁有自己的爐火嗎？家園谷地為每一位備好一塊地，只要你帶著一百金幣，親手簽下地契。',
   'worldContent.homesteadGateName': '家園之門',
   // Player housing (M16 non-Latin fill)
   'hudChrome.housing.buy': '購買家園地契（{price}）',

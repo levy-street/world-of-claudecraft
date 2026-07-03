@@ -5160,19 +5160,24 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Pos Gagak',
   'entities.letters.ravenpost_welcome.subject': 'Kini para gagak terbang untukmu',
-  'entities.letters.ravenpost_welcome.body': 'Pengelana,\n\nPos Gagak telah membuka tenggeran di seluruh lembah. Carilah pilar gagak di Eastbrook, Fenbridge, dan Highwatch: dari mana pun kau bisa mengirim surat, koin, dan barang kepada petualang lain, serta mengambil apa pun yang dibawa para gagak untukmu.\n\nTerlampir sedikit tanda mata untuk perangko pertamamu.\n\nKepakkan sayap,\nPos Gagak',
+  'entities.letters.ravenpost_welcome.body':
+    'Pengelana,\n\nPos Gagak telah membuka tenggeran di seluruh lembah. Carilah pilar gagak di Eastbrook, Fenbridge, dan Highwatch: dari mana pun kau bisa mengirim surat, koin, dan barang kepada petualang lain, serta mengambil apa pun yang dibawa para gagak untukmu.\n\nTerlampir sedikit tanda mata untuk perangko pertamamu.\n\nKepakkan sayap,\nPos Gagak',
   'entities.letters.letter_q_wolves.sender': 'Marsekal Redbrook',
   'entities.letters.letter_q_wolves.subject': 'Kandang kembali tenang',
-  'entities.letters.letter_q_wolves.body': 'Para gembala akhirnya bisa tidur nyenyak, dan itu berkat dirimu. Kuminta Pos Gagak mengantarkan sedikit imbalan dari kas penjaga.\n\nJaga bilahmu tetap terasah.\n- Marsekal Redbrook',
+  'entities.letters.letter_q_wolves.body':
+    'Para gembala akhirnya bisa tidur nyenyak, dan itu berkat dirimu. Kuminta Pos Gagak mengantarkan sedikit imbalan dari kas penjaga.\n\nJaga bilahmu tetap terasah.\n- Marsekal Redbrook',
   'entities.letters.letter_q_greyjaw.sender': 'Marsekal Redbrook',
   'entities.letters.letter_q_greyjaw.subject': 'Si Tua Rahang Kelabu, akhirnya',
-  'entities.letters.letter_q_greyjaw.body': 'Kabar cepat menyebar di kota sekecil ini. Semalam para gembala bersulang untuk kesehatanmu, dan Wilkes bersumpah serigala itu sebesar gerobak. Biarkan mereka melebih-lebihkan: kau pantas mendapatkannya.\n\nNikmati makan atas nama penjaga.\n- Marsekal Redbrook',
+  'entities.letters.letter_q_greyjaw.body':
+    'Kabar cepat menyebar di kota sekecil ini. Semalam para gembala bersulang untuk kesehatanmu, dan Wilkes bersumpah serigala itu sebesar gerobak. Biarkan mereka melebih-lebihkan: kau pantas mendapatkannya.\n\nNikmati makan atas nama penjaga.\n- Marsekal Redbrook',
   'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
   'entities.letters.letter_q_hollow.subject': 'Apa yang kaulakukan dalam gelap',
-  'entities.letters.letter_q_hollow.body': 'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
+  'entities.letters.letter_q_hollow.body':
+    'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
   // Player housing (Land Steward + Homestead Gate)
   'entities.npcs.land_steward.name': 'Pengurus Fenwick',
   'entities.npcs.land_steward.title': 'Pengurus Tanah',
-  'entities.npcs.land_steward.greeting': 'Memimpikan perapian milikmu sendiri? Lembah Homestead menyiapkan sebidang tanah bagi siapa pun yang membawa seratus emas dan tangan untuk menandatangani aktanya.',
+  'entities.npcs.land_steward.greeting':
+    'Memimpikan perapian milikmu sendiri? Lembah Homestead menyiapkan sebidang tanah bagi siapa pun yang membawa seratus emas dan tangan untuk menandatangani aktanya.',
   'worldContent.homesteadGateName': 'Gerbang Homestead',
 };

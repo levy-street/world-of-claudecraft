@@ -5083,19 +5083,24 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Ravneposten',
   'entities.letters.ravenpost_welcome.subject': 'Ravnene flyver nu for dig',
-  'entities.letters.ravenpost_welcome.body': 'Vejfarende,\n\nRavneposten har rejst sine siddepinde over hele dalen. Find ravnesøjlerne i Eastbrook, Fenbridge og Highwatch: fra enhver af dem kan du sende breve, mønter og varer til andre eventyrere og hente alt, hvad ravnene bringer dig.\n\nVedlagt en lille opmærksomhed til dit første frimærke.\n\nVingerne op,\nRavneposten',
+  'entities.letters.ravenpost_welcome.body':
+    'Vejfarende,\n\nRavneposten har rejst sine siddepinde over hele dalen. Find ravnesøjlerne i Eastbrook, Fenbridge og Highwatch: fra enhver af dem kan du sende breve, mønter og varer til andre eventyrere og hente alt, hvad ravnene bringer dig.\n\nVedlagt en lille opmærksomhed til dit første frimærke.\n\nVingerne op,\nRavneposten',
   'entities.letters.letter_q_wolves.sender': 'Marskal Redbrook',
   'entities.letters.letter_q_wolves.subject': 'Der er ro ved foldene igen',
-  'entities.letters.letter_q_wolves.body': 'Hyrderne kan for en gangs skyld sove med begge øjne lukkede, og det er din fortjeneste. Jeg har bedt Ravneposten bringe dig en lille skilling fra vagtkassen.\n\nHold din klinge smurt.\n- Marskal Redbrook',
+  'entities.letters.letter_q_wolves.body':
+    'Hyrderne kan for en gangs skyld sove med begge øjne lukkede, og det er din fortjeneste. Jeg har bedt Ravneposten bringe dig en lille skilling fra vagtkassen.\n\nHold din klinge smurt.\n- Marskal Redbrook',
   'entities.letters.letter_q_greyjaw.sender': 'Marskal Redbrook',
   'entities.letters.letter_q_greyjaw.subject': 'Gamle Gråkæbe, endelig',
-  'entities.letters.letter_q_greyjaw.body': 'Rygter løber hurtigt i så lille en by. Hyrderne skålede for dit helbred i aftes, og Wilkes sværger, at ulven var stor som en kærre. Lad dem bare brodere: du har fortjent det.\n\nTag et måltid på vagtens regning.\n- Marskal Redbrook',
+  'entities.letters.letter_q_greyjaw.body':
+    'Rygter løber hurtigt i så lille en by. Hyrderne skålede for dit helbred i aftes, og Wilkes sværger, at ulven var stor som en kærre. Lad dem bare brodere: du har fortjent det.\n\nTag et måltid på vagtens regning.\n- Marskal Redbrook',
   'entities.letters.letter_q_hollow.sender': 'Broder Aldric',
   'entities.letters.letter_q_hollow.subject': 'Det, du gjorde i mørket',
-  'entities.letters.letter_q_hollow.body': 'Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric',
+  'entities.letters.letter_q_hollow.body':
+    'Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric',
   // Player housing (Land Steward + Homestead Gate)
   'entities.npcs.land_steward.name': 'Forvalter Fenwick',
   'entities.npcs.land_steward.title': 'Jordforvalter',
-  'entities.npcs.land_steward.greeting': 'Drømmer du om din egen arne? Homestead-dalene har en grund klar til enhver med hundrede guld og en hånd til at underskrive skødet.',
+  'entities.npcs.land_steward.greeting':
+    'Drømmer du om din egen arne? Homestead-dalene har en grund klar til enhver med hundrede guld og en hånd til at underskrive skødet.',
   'worldContent.homesteadGateName': 'Hjemstavnsport',
 };

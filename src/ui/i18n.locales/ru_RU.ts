@@ -5173,7 +5173,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.arrivedBanner': 'Ворон прилетел: письмо от {name}.',
   'hudChrome.mailbox.arrivedLog': 'У вас новое письмо от {name}.',
   'hudChrome.mailbox.indicatorAria': 'Непрочитанных писем: {count}',
-  'hudChrome.mailbox.indicatorTip': 'У вас {count} непрочитанных писем. Загляните в почтовый ящик, чтобы прочитать их.',
+  'hudChrome.mailbox.indicatorTip':
+    'У вас {count} непрочитанных писем. Загляните в почтовый ящик, чтобы прочитать их.',
   'hudChrome.mailbox.clickAttach': 'Нажмите, чтобы приложить к письму.',
   'hudChrome.mailbox.cannotMail': 'Это нельзя отправить почтой.',
   'hudChrome.mailbox.result.sent': 'Ворон унёс ваше письмо для {name} (сбор {postage}).',
@@ -5192,16 +5193,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // Ravenpost authored letters (M16 non-Latin fill)
   'entities.letters.ravenpost_welcome.sender': 'Вороновая почта',
   'entities.letters.ravenpost_welcome.subject': 'Теперь вороны летают и для вас',
-  'entities.letters.ravenpost_welcome.body': 'Путник!\n\nВороновая почта открыла свои насесты по всей долине. Ищите вороньи столбы в Истбруке, Фенбридже и Хайуотче: с любого из них можно отправлять письма, монеты и вещи другим искателям приключений и забирать всё, что приносят вороны.\n\nПрилагаем небольшой подарок на вашу первую марку.\n\nВыше крылья,\nВороновая почта',
+  'entities.letters.ravenpost_welcome.body':
+    'Путник!\n\nВороновая почта открыла свои насесты по всей долине. Ищите вороньи столбы в Истбруке, Фенбридже и Хайуотче: с любого из них можно отправлять письма, монеты и вещи другим искателям приключений и забирать всё, что приносят вороны.\n\nПрилагаем небольшой подарок на вашу первую марку.\n\nВыше крылья,\nВороновая почта',
   'entities.letters.letter_q_wolves.sender': 'Маршал Редбрук',
   'entities.letters.letter_q_wolves.subject': 'В загонах снова тихо',
-  'entities.letters.letter_q_wolves.body': 'Пастухи наконец могут спать спокойно, и это ваша заслуга. Я велел Вороновой почте доставить вам кое-что из сторожевой казны.\n\nДержите клинок смазанным.\n- Маршал Редбрук',
+  'entities.letters.letter_q_wolves.body':
+    'Пастухи наконец могут спать спокойно, и это ваша заслуга. Я велел Вороновой почте доставить вам кое-что из сторожевой казны.\n\nДержите клинок смазанным.\n- Маршал Редбрук',
   'entities.letters.letter_q_greyjaw.sender': 'Маршал Редбрук',
   'entities.letters.letter_q_greyjaw.subject': 'Старый Серозуб, наконец-то',
-  'entities.letters.letter_q_greyjaw.body': 'В маленьком городке вести разносятся быстро. Вчера пастухи пили за ваше здоровье, а Уилкс клянётся, что волк был размером с телегу. Пусть приукрашивают: вы это заслужили.\n\nРазделите трапезу за счёт стражи.\n- Маршал Редбрук',
+  'entities.letters.letter_q_greyjaw.body':
+    'В маленьком городке вести разносятся быстро. Вчера пастухи пили за ваше здоровье, а Уилкс клянётся, что волк был размером с телегу. Пусть приукрашивают: вы это заслужили.\n\nРазделите трапезу за счёт стражи.\n- Маршал Редбрук',
   'entities.letters.letter_q_hollow.sender': 'Брат Алдрик',
   'entities.letters.letter_q_hollow.subject': 'То, что вы совершили во тьме',
-  'entities.letters.letter_q_hollow.body': 'Мало кто узнает, что было погребено в той лощине, и ещё меньше тех, кто поверит. Я знаю и не забуду.\n\nПусть ваша дорога будет светла.\n- Брат Алдрик',
+  'entities.letters.letter_q_hollow.body':
+    'Мало кто узнает, что было погребено в той лощине, и ещё меньше тех, кто поверит. Я знаю и не забуду.\n\nПусть ваша дорога будет светла.\n- Брат Алдрик',
   // Event calendar (M16 non-Latin fill)
   'hudChrome.calendar.title': 'Календарь событий',
   'hudChrome.calendar.close': 'Закрыть календарь',
@@ -5223,28 +5228,37 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.result.created': 'Событие внесено в календарь гильдии.',
   'hudChrome.calendar.result.removed': 'Событие убрано из календаря.',
   'hudChrome.calendar.result.notInGuild': 'Вы не состоите в гильдии.',
-  'hudChrome.calendar.result.notOfficer': 'Управлять событиями гильдии могут только офицеры и глава гильдии.',
+  'hudChrome.calendar.result.notOfficer':
+    'Управлять событиями гильдии могут только офицеры и глава гильдии.',
   'hudChrome.calendar.result.badInput': 'Укажите название события и корректный день.',
   'hudChrome.calendar.result.calendarFull': 'Календарь гильдии заполнен.',
   'hudChrome.calendar.result.eventGone': 'Этого события больше нет в календаре.',
   'hudChrome.calendar.events.raidCall.title': 'Рейдовый сбор',
-  'hudChrome.calendar.events.raidCall.note': 'Стражи трубят в рог: собирайте отряд в склепы и на рейд.',
+  'hudChrome.calendar.events.raidCall.note':
+    'Стражи трубят в рог: собирайте отряд в склепы и на рейд.',
   'hudChrome.calendar.events.marketDay.title': 'Ярмарочный день',
-  'hudChrome.calendar.events.marketDay.note': 'Торговец ждёт свежий товар. Отличный день, чтобы заглянуть на Мировой рынок.',
+  'hudChrome.calendar.events.marketDay.note':
+    'Торговец ждёт свежий товар. Отличный день, чтобы заглянуть на Мировой рынок.',
   'hudChrome.calendar.events.fiestaNight.title': 'Ночь фиесты',
-  'hudChrome.calendar.events.fiestaNight.note': 'Сегодня ринг фиесты 2 на 2 собирает самые шумные толпы.',
+  'hudChrome.calendar.events.fiestaNight.note':
+    'Сегодня ринг фиесты 2 на 2 собирает самые шумные толпы.',
   'hudChrome.calendar.events.arenaClash.title': 'Битва на арене',
-  'hudChrome.calendar.events.arenaClash.note': 'Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице.',
+  'hudChrome.calendar.events.arenaClash.note':
+    'Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице.',
   'hudChrome.calendar.events.fishingDerby.title': 'Рыбацкое дерби',
-  'hudChrome.calendar.events.fishingDerby.note': 'Рыбаки выстраиваются вдоль озёр. Берите удочку и делитесь байками.',
+  'hudChrome.calendar.events.fishingDerby.note':
+    'Рыбаки выстраиваются вдоль озёр. Берите удочку и делитесь байками.',
   'hudChrome.calendar.events.delveDay.title': 'День вылазки',
-  'hudChrome.calendar.events.delveDay.note': 'Брат Халвен сделал пометки на картах: славный день для Обрушенной реликварии.',
+  'hudChrome.calendar.events.delveDay.note':
+    'Брат Халвен сделал пометки на картах: славный день для Обрушенной реликварии.',
   'hudChrome.calendar.events.moongateCommunion.title': 'Единение у лунных врат',
-  'hudChrome.calendar.events.moongateCommunion.note': 'Паломники собираются у лунных врат храма под срединной луной.',
+  'hudChrome.calendar.events.moongateCommunion.note':
+    'Паломники собираются у лунных врат храма под срединной луной.',
   // Player housing (Land Steward + Homestead Gate)
   'entities.npcs.land_steward.name': 'Управляющий Фенвик',
   'entities.npcs.land_steward.title': 'Земельный управляющий',
-  'entities.npcs.land_steward.greeting': 'Мечтаете о собственном очаге? В Усадебных долах найдётся участок для всякого, у кого есть сто золотых и рука, чтобы подписать купчую.',
+  'entities.npcs.land_steward.greeting':
+    'Мечтаете о собственном очаге? В Усадебных долах найдётся участок для всякого, у кого есть сто золотых и рука, чтобы подписать купчую.',
   'worldContent.homesteadGateName': 'Усадебные врата',
   // Player housing (M16 non-Latin fill)
   'hudChrome.housing.buy': 'Купить купчую на усадьбу ({price})',
@@ -5258,7 +5272,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.housing.purchasedBanner': 'Усадебные долы ждут вас.',
   'hudChrome.housing.arrivedBanner': 'Ваша усадьба',
   'hudChrome.housing.leftBanner': 'Истбрук',
-  'hudChrome.housing.result.purchased': 'Купчая ваша. Поговорите с управляющим, чтобы посетить усадьбу.',
+  'hudChrome.housing.result.purchased':
+    'Купчая ваша. Поговорите с управляющим, чтобы посетить усадьбу.',
   'hudChrome.housing.result.alreadyOwned': 'У вас уже есть купчая на усадьбу.',
   'hudChrome.housing.result.cantAfford': 'Вам не по карману эта купчая.',
   'hudChrome.housing.result.notOwned': 'У вас ещё нет купчей на усадьбу.',

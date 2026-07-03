@@ -5210,19 +5210,24 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'Die Rabenpost',
   'entities.letters.ravenpost_welcome.subject': 'Die Raben fliegen nun für Euch',
-  'entities.letters.ravenpost_welcome.body': 'Reisender,\n\ndie Rabenpost hat ihre Sitzstangen im ganzen Tal eröffnet. Sucht die Rabensäulen in Eastbrook, Fenbridge und Highwatch: Von jeder aus könnt Ihr anderen Abenteurern Briefe, Münzen und Waren schicken und abholen, was die Raben Euch bringen.\n\nAnbei eine kleine Aufmerksamkeit für Eure erste Briefmarke.\n\nSchwingen hoch,\nDie Rabenpost',
+  'entities.letters.ravenpost_welcome.body':
+    'Reisender,\n\ndie Rabenpost hat ihre Sitzstangen im ganzen Tal eröffnet. Sucht die Rabensäulen in Eastbrook, Fenbridge und Highwatch: Von jeder aus könnt Ihr anderen Abenteurern Briefe, Münzen und Waren schicken und abholen, was die Raben Euch bringen.\n\nAnbei eine kleine Aufmerksamkeit für Eure erste Briefmarke.\n\nSchwingen hoch,\nDie Rabenpost',
   'entities.letters.letter_q_wolves.sender': 'Marschall Redbrook',
   'entities.letters.letter_q_wolves.subject': 'In den Pferchen ist wieder Ruhe',
-  'entities.letters.letter_q_wolves.body': 'Die Hirten können endlich wieder ruhig schlafen, und das ist Euer Verdienst. Ich habe der Rabenpost aufgetragen, Euch eine Kleinigkeit aus der Wachkasse zu bringen.\n\nHaltet Eure Klinge geölt.\n- Marschall Redbrook',
+  'entities.letters.letter_q_wolves.body':
+    'Die Hirten können endlich wieder ruhig schlafen, und das ist Euer Verdienst. Ich habe der Rabenpost aufgetragen, Euch eine Kleinigkeit aus der Wachkasse zu bringen.\n\nHaltet Eure Klinge geölt.\n- Marschall Redbrook',
   'entities.letters.letter_q_greyjaw.sender': 'Marschall Redbrook',
   'entities.letters.letter_q_greyjaw.subject': 'Der alte Graukiefer, endlich',
-  'entities.letters.letter_q_greyjaw.body': 'Neuigkeiten verbreiten sich schnell in einer so kleinen Stadt. Die Hirten haben gestern Abend auf Eure Gesundheit getrunken, und Wilkes schwört, der Wolf sei so groß wie ein Karren gewesen. Lasst sie ruhig übertreiben: Ihr habt es Euch verdient.\n\nGönnt Euch ein Mahl auf Kosten der Wache.\n- Marschall Redbrook',
+  'entities.letters.letter_q_greyjaw.body':
+    'Neuigkeiten verbreiten sich schnell in einer so kleinen Stadt. Die Hirten haben gestern Abend auf Eure Gesundheit getrunken, und Wilkes schwört, der Wolf sei so groß wie ein Karren gewesen. Lasst sie ruhig übertreiben: Ihr habt es Euch verdient.\n\nGönnt Euch ein Mahl auf Kosten der Wache.\n- Marschall Redbrook',
   'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
   'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
-  'entities.letters.letter_q_hollow.body': 'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
+  'entities.letters.letter_q_hollow.body':
+    'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
   // Player housing (Land Steward + Homestead Gate)
   'entities.npcs.land_steward.name': 'Verwalter Fenwick',
   'entities.npcs.land_steward.title': 'Landverwalter',
-  'entities.npcs.land_steward.greeting': 'Träumt Ihr von einem eigenen Herd? In den Heimstatt-Tälern liegt eine Parzelle bereit für jeden mit hundert Gold und einer Hand, die die Urkunde unterschreibt.',
+  'entities.npcs.land_steward.greeting':
+    'Träumt Ihr von einem eigenen Herd? In den Heimstatt-Tälern liegt eine Parzelle bereit für jeden mit hundert Gold und einer Hand, die die Urkunde unterschreibt.',
   'worldContent.homesteadGateName': 'Heimstatt-Tor',
 };
