@@ -95,6 +95,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.slotAria': 'Slot aksi {slot}: {ability}',
   'abilityUi.cast.demonHeal': 'Penyembuhan Iblis',
   'abilityUi.cast.fishing': 'Memancing',
+  'abilityUi.cast.thunzharrStormcall': 'Panggilan Badai',
   'abilityUi.forms.bear': 'Beruang',
   'abilityUi.forms.cat': 'Serigala',
   'abilityUi.resources.energy': 'Energi',
@@ -1090,6 +1091,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.moggers_shiv.name': 'Belati Mogger',
   'entities.items.moggers_stomper_boots.name': 'Bot Penginjak Mogger',
   'entities.items.monarch_crown_helm.name': 'Mahkota Sang Raja',
+  'entities.items.copper_mining_pick.name': 'Beliung Tambang Tembaga',
+  'entities.items.iron_mining_pick.name': 'Beliung Tambang Besi',
+  'entities.items.mithril_mining_pick.name': 'Beliung Tambang Mithril',
+  'entities.items.handaxe.name': 'Kapak Tangan',
+  'entities.items.felling_axe.name': 'Kapak Tebang',
+  'entities.items.ironbark_axe.name': 'Kapak Kulit Besi',
+  'entities.items.gathering_sickle.name': 'Sabit Panen',
+  'entities.items.bronze_sickle.name': 'Sabit Perunggu',
+  'entities.items.silverleaf_sickle.name': 'Sabit Daun Perak',
   'entities.items.moongate_rubbing.name': 'Gosokan Penangkal',
   'entities.items.moonpale_scale.name': 'Sisik Pucat Bulan',
   'entities.items.moonscale_saber.name': 'Sabel Sisik Bulan',
@@ -1188,6 +1198,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.steel_orange_armor_plate.name': 'Oranye Baja',
   'entities.items.storm_core.name': 'Inti Badai',
   'entities.items.stormcallers_crown.name': 'Mahkota Pemanggil Badai',
+  'entities.items.crownforged_gauntlets.name': 'Sarung Tangan Tempaan Mahkota',
+  'entities.items.nighttalon_grips.name': 'Cengkeraman Cakar Malam',
+  'entities.items.soulflame_gloves.name': 'Sarung Tangan Api Jiwa',
+  'entities.items.stormcallers_handguards.name': 'Pelindung Tangan Pemanggil Badai',
+  'entities.items.crownforged_girdle.name': 'Sabuk Tempaan Mahkota',
+  'entities.items.nighttalon_waistband.name': 'Ikat Pinggang Cakar Malam',
+  'entities.items.soulflame_cord.name': 'Tali Pinggang Api Jiwa',
+  'entities.items.stormcallers_waistguard.name': 'Pelindung Pinggang Pemanggil Badai',
   'entities.items.stormcallers_spaulders.name': 'Pelindung Bahu Pemanggil Badai',
   'entities.items.stormshard_leggings.name': 'Legging Serpihan Badai',
   'entities.items.sturdy_belt.name': 'Sabuk Pengembara Kokoh',
@@ -1229,6 +1247,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.widowfang_dirk.name': 'Belati Taring Janda',
   'entities.items.windguard_leggings.name': 'Legging Penjaga Angin',
   'entities.items.wolf_fang.name': 'Taring Serigala Retak',
+  'entities.items.linen_pouch.name': 'Kantong Linen',
+  'entities.items.travelers_knapsack.name': 'Ransel Pengelana',
+  'entities.items.wolfhide_satchel.name': 'Tas Kulit Serigala',
+  'entities.items.gravewoven_bag.name': 'Tas Tenunan Makam',
+  'entities.items.mistcallers_duffel.name': 'Tas Sang Pemanggil Kabut',
   'entities.items.worn_sword.name': 'Pedang Pendek Usang',
   'entities.items.woven_robe.name': 'Jubah Tenun Lembah',
   'entities.items.wyrmcult_grand_robe.name': 'Jubah Agung Sekte Wyrm',
@@ -1258,14 +1281,14 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Pembayang Maut Voss',
   'entities.mobs.deepfen_murloc.name': 'Penggigit Deepfen',
   'entities.mobs.deeprock_kobold.name': 'Penggali Terowongan Deeprock',
-  'entities.mobs.doomguard.name': 'Doomguard',
+  'entities.mobs.wraithborn.name': 'Doomguard',
   'entities.mobs.drowned_dead.name': 'Mayat Tenggelam',
   'entities.mobs.drowned_templeguard.name': 'Penjaga Kuil Tenggelam',
   'entities.mobs.drowned_thrall.name': 'Budak Tenggelam',
   'entities.mobs.drowned_votary.name': 'Pemuja Tenggelam',
   'entities.mobs.fallen_captain_aldren.name': 'Kapten Aldren yang Gugur',
-  'entities.mobs.felguard.name': 'Felguard',
-  'entities.mobs.felhunter.name': 'Felhunter',
+  'entities.mobs.warfiend.name': 'Felguard',
+  'entities.mobs.spellhound.name': 'Felhunter',
   'entities.mobs.fen_troll.name': 'Troll Mirefen',
   'entities.mobs.forest_wolf.name': 'Serigala Hutan',
   'entities.mobs.glimmermere_wader.name': 'Pengarung Glimmermere',
@@ -1278,8 +1301,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.grix_the_tunnelking.name': 'Grix sang Raja Terowongan',
   'entities.mobs.grubjaw.name': 'Grubjaw si Rakus',
   'entities.mobs.hollow_acolyte.name': 'Akolit Berongga',
-  'entities.mobs.imp.name': 'Imp',
-  'entities.mobs.infernal.name': 'Infernal',
+  'entities.mobs.emberkin.name': 'Imp',
+  'entities.mobs.pyre_colossus.name': 'Infernal',
   'entities.mobs.ironvein_foreman.name': 'Mandor Ironvein',
   'entities.mobs.ironvein_sapper.name': 'Peledak Ironvein',
   'entities.mobs.knight_commander_olen.name': 'Komandan Ksatria Olen',
@@ -1320,7 +1343,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Suster Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Sloomtooth sang Tenggelam',
   'entities.mobs.stormcrag_elemental.name': 'Elemental Stormcrag',
-  'entities.mobs.succubus.name': 'Succubus',
+  'entities.mobs.duskborn.name': 'Succubus',
   'entities.mobs.thornpeak_ogre.name': 'Ogre Thornpeak',
   'entities.mobs.tidebound_acolyte.name': 'Akolit Terikat Pasang',
   'entities.mobs.tunnel_rat.name': 'Tikus Penggali Terowongan',
@@ -1330,7 +1353,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Bayangan Kapten Aldren',
   'entities.mobs.vision_deathstalker_voss.name': 'Bayangan Pembunuh Kerajaan Voss',
   'entities.mobs.vision_malric_mage.name': 'Bayangan Pendeta Tinggi Malric',
-  'entities.mobs.voidwalker.name': 'Voidwalker',
+  'entities.mobs.gloomshade.name': 'Voidwalker',
   'entities.mobs.voskar_emberwing.name': 'Voskar sang Sayap Bara',
   'entities.mobs.warlock_imp.name': 'Iblis Api',
   'entities.mobs.warlock_voidwalker.name': 'Iblis Kehampaan',
@@ -2559,12 +2582,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Bandit, pemuja, dan lainnya yang menempuh jalan yang salah. Mereka bertarung dengan siasat, bukan sekadar taring.',
   'guide.family.humanoid.name': 'Humanoid',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Penggali berkepala lilin yang menjangkiti tambang dan liang, menjaga bijih mereka dengan garang.',
-  'guide.family.kobold.name': 'Kobold',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobold',
+  'guide.family.mudfin.desc':
     'Penghuni rawa amfibi yang menyerbu perairan dangkal dalam gerombolan berisik dan teritorial.',
-  'guide.family.murloc.name': 'Murloc',
+  'guide.family.mudfin.name': 'Murloc',
   'guide.family.ogre.desc':
     'Besar, berpikiran lamban, dan berbahaya. Mereka berkemah di celah gunung yang tinggi dan memukul bagai tanah longsor.',
   'guide.family.ogre.name': 'Ogre',
@@ -2908,16 +2931,16 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Halaman yang kamu cari tidak ada atau mungkin telah dipindahkan.',
   'guide.notFound.home': 'Kembali ke ikhtisar',
   'guide.notFound.title': 'Kami tidak dapat menemukan halaman itu',
-  'guide.petHook.doomguard': 'Perapal elite yang menghujankan bayangan berat dari kejauhan.',
-  'guide.petHook.felguard':
+  'guide.petHook.wraithborn': 'Perapal elite yang menghujankan bayangan berat dari kejauhan.',
+  'guide.petHook.warfiend':
     'Petarung jarak dekat yang tangguh, serba bisa begitu kamu mampu memanggilnya.',
-  'guide.petHook.felhunter': 'Penyerang bayangan yang memburu pemantra musuh.',
-  'guide.petHook.imp': 'Iblis pelontar api jarak jauh yang menggerus musuh dari jarak aman.',
-  'guide.petHook.infernal':
+  'guide.petHook.spellhound': 'Penyerang bayangan yang memburu pemantra musuh.',
+  'guide.petHook.emberkin': 'Iblis pelontar api jarak jauh yang menggerus musuh dari jarak aman.',
+  'guide.petHook.pyre_colossus':
     'Raksasa kekar dengan serangan jarak dekat yang menghancurkan, dipanggil demi kekuatan murni.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Iblis jarak dekat yang gesit, memukul keras tetapi mudah tumbang di bawah tekanan.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Iblis kokoh yang memprovokasi dan menahan serangan agar kamu bisa memantra dengan tenang.',
   'guide.placeholder.note': 'Bagian panduan ini sedang dalam pengerjaan.',
   'guide.progression.bandLabel': 'Level {min} sampai {max}',
@@ -4940,21 +4963,19 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.bonus2': 'Meningkatkan daya serang sebesar 40.',
   'entities.itemSets.deathlord.bonus3': 'Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15.',
   'entities.itemSets.necromancers.name': 'Jubah ahli nujum',
-  'entities.itemSets.necromancers.bonus2':
-    'Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.',
-  'entities.itemSets.necromancers.bonus3': 'Kerusakan yang diterima tidak menunda perapalan sihir.',
+  'entities.itemSets.necromancers.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.necromancers.bonus3':
+    'Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10.',
   'entities.itemSets.nighttalon.name': 'Perlengkapan kulit Cakar Malam',
   'entities.itemSets.nighttalon.bonus2': 'Meningkatkan daya serang sebesar 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%.',
   'entities.itemSets.soulflame.name': 'Jubah Api Jiwa',
-  'entities.itemSets.soulflame.bonus2':
-    'Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.',
-  'entities.itemSets.soulflame.bonus3': 'Kerusakan yang diterima tidak menunda perapalan sihir.',
+  'entities.itemSets.soulflame.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.soulflame.bonus3': 'Meningkatkan kecerdasan sebesar 15 dan roh sebesar 15.',
   'entities.itemSets.stormcallers.name': 'Jubah Pemanggil Badai',
-  'entities.itemSets.stormcallers.bonus2':
-    'Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.',
-  'entities.itemSets.stormcallers.bonus3': 'Kerusakan yang diterima tidak menunda perapalan sihir.',
+  'entities.itemSets.stormcallers.bonus2': 'Kamu tidak dapat terpental (ketahanan pentalan 100%).',
+  'entities.itemSets.stormcallers.bonus3': 'Meningkatkan kecerdasan sebesar 15 dan roh sebesar 15.',
   'entities.itemSets.wyrmshadow.name': 'Perlengkapan Bayangan Wyrm',
   'entities.itemSets.wyrmshadow.bonus2': 'Meningkatkan daya serang sebesar 40.',
   'entities.itemSets.wyrmshadow.bonus3':
@@ -5323,6 +5344,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinResult': '+{points} poin',
   'hudChrome.dailyRewards.spinTitle': 'Putaran Harian',
   'hudChrome.dailyRewards.tasks': 'Tugas',
+  'hudChrome.dailyRewards.showChestButton': 'Tampilkan Peti',
+  'hudChrome.dailyRewards.hideChestButton': 'Sembunyikan Peti',
   'hudChrome.dailyRewards.title': 'Hadiah Harian',
   'hudChrome.dailyRewards.unknown': 'Tidak diketahui',
   'hudChrome.dailyRewards.usd': '{amount} USD',
@@ -5343,4 +5366,21 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jangan sekarang',
   'hudChrome.nativeUpdate.title': 'Pembaruan Tersedia',
   'hudChrome.nativeUpdate.update': 'Perbarui',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Pos Gagak',
+  'entities.letters.ravenpost_welcome.subject': 'Kini para gagak terbang untukmu',
+  'entities.letters.ravenpost_welcome.body':
+    'Pengelana,\n\nPos Gagak telah membuka tenggeran di seluruh lembah. Carilah pilar gagak di Eastbrook, Fenbridge, dan Highwatch: dari mana pun kau bisa mengirim surat, koin, dan barang kepada petualang lain, serta mengambil apa pun yang dibawa para gagak untukmu.\n\nTerlampir sedikit tanda mata untuk perangko pertamamu.\n\nKepakkan sayap,\nPos Gagak',
+  'entities.letters.letter_q_wolves.sender': 'Marsekal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Kandang kembali tenang',
+  'entities.letters.letter_q_wolves.body':
+    'Para gembala akhirnya bisa tidur nyenyak, dan itu berkat dirimu. Kuminta Pos Gagak mengantarkan sedikit imbalan dari kas penjaga.\n\nJaga bilahmu tetap terasah.\n- Marsekal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marsekal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Si Tua Rahang Kelabu, akhirnya',
+  'entities.letters.letter_q_greyjaw.body':
+    'Kabar cepat menyebar di kota sekecil ini. Semalam para gembala bersulang untuk kesehatanmu, dan Wilkes bersumpah serigala itu sebesar gerobak. Biarkan mereka melebih-lebihkan: kau pantas mendapatkannya.\n\nNikmati makan atas nama penjaga.\n- Marsekal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Apa yang kaulakukan dalam gelap',
+  'entities.letters.letter_q_hollow.body':
+    'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
 };

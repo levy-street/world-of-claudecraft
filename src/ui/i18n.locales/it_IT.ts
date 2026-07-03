@@ -1393,9 +1393,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': 'orso',
   'abilityUi.forms.cat': 'lupo',
   'abilityUi.cast.fishing': 'Pesca',
+  'abilityUi.cast.thunzharrStormcall': 'Richiamo della tempesta',
   'abilityUi.cast.demonHeal': 'Cura demoniaca',
   'questUi.tracker.title': 'Missioni',
   'questUi.tracker.complete': 'Completata',
+
+  'questUi.tracker.showOnMap': 'Mostra {name} sulla mappa',
+
+  'questUi.tracker.hideFromMap': 'Nascondi {name} dalla mappa',
   'questUi.log.title': 'Registro missioni',
   'questUi.log.close': 'Chiudi registro missioni',
   'questUi.log.summary': 'Attive: {active} / Completate: {completed}',
@@ -2168,6 +2173,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.weathered_ledger_page.name': 'Pagina di registro logora',
   'entities.items.morthen_grimoire.name': 'Grimorio di Morthen',
   'entities.items.wolf_fang.name': 'Zanna di lupo incrinata',
+  'entities.items.linen_pouch.name': 'Borsello di lino',
+  'entities.items.travelers_knapsack.name': 'Zaino del viaggiatore',
+  'entities.items.wolfhide_satchel.name': 'Bisaccia di pelle di lupo',
+  'entities.items.gravewoven_bag.name': 'Borsa sepolcrale',
+  'entities.items.mistcallers_duffel.name': 'Sacca del Chiamanebbia',
   'entities.items.bandit_bandana.name': 'Bandana rossa',
   'entities.items.tough_jerky.name': 'Carne secca dura',
   'entities.items.mudfin_scale.name': 'Scaglia viscida di murloc',
@@ -2418,14 +2428,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nhalia_mourner.name': 'Piangente di Nhalia',
   'entities.mobs.sister_nhalia.name': 'Sorella Nhalia',
   'entities.mobs.varkas_boneguard.name': "Guardia d'ossa di Varkas",
-  'entities.mobs.imp.name': 'Folletto',
-  'entities.mobs.voidwalker.name': 'Camminatore del Vuoto',
-  'entities.mobs.succubus.name': 'Succube',
+  'entities.mobs.emberkin.name': 'Folletto',
+  'entities.mobs.gloomshade.name': 'Camminatore del Vuoto',
+  'entities.mobs.duskborn.name': 'Succube',
   'entities.mobs.grix_the_tunnelking.name': 'Grix il Re dei Cunicoli',
-  'entities.mobs.felhunter.name': 'Segugio vile',
-  'entities.mobs.felguard.name': 'Guardia vile',
-  'entities.mobs.infernal.name': 'Infernale',
-  'entities.mobs.doomguard.name': 'Guardia del Terrore',
+  'entities.mobs.spellhound.name': 'Segugio vile',
+  'entities.mobs.warfiend.name': 'Guardia vile',
+  'entities.mobs.pyre_colossus.name': 'Infernale',
+  'entities.mobs.wraithborn.name': 'Guardia del Terrore',
   'entities.mobs.choirmother_selthe.name': 'Selthe Madre del Coro',
   'entities.mobs.drowned_templeguard.name': 'Guardiano del Tempio Annegato',
   'entities.mobs.drowned_votary.name': 'Devoto Annegato',
@@ -3160,6 +3170,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.brightwood_venison.name': 'Selvaggina di Brightwood',
   'entities.items.bramblehide_jerkin.name': 'Giubbotto di pelle di rovo',
   'entities.items.monarch_crown_helm.name': 'Corona del Monarca',
+  'entities.items.copper_mining_pick.name': 'Piccone di Rame',
+  'entities.items.iron_mining_pick.name': 'Piccone di Ferro',
+  'entities.items.mithril_mining_pick.name': 'Piccone di Mithril',
+  'entities.items.handaxe.name': 'Accetta',
+  'entities.items.felling_axe.name': 'Ascia da Taglio',
+  'entities.items.ironbark_axe.name': 'Ascia di Corteccia Ferrata',
+  'entities.items.gathering_sickle.name': 'Falcetto da Raccolta',
+  'entities.items.bronze_sickle.name': 'Falcetto di Bronzo',
+  'entities.items.silverleaf_sickle.name': 'Falcetto Fogliargento',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Aggiungi canale di chat',
   'hud.core.chatChannels.addTitle': 'Aggiungi canale',
@@ -3408,6 +3427,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cowl.name': 'Cappuccio Fiammanima',
   'entities.items.soulflame_mantle.name': 'Manto Fiammanima',
   'entities.items.stormcallers_crown.name': 'Corona del Chiamatempeste',
+  'entities.items.crownforged_gauntlets.name': 'Manopole Forgiacorona',
+  'entities.items.nighttalon_grips.name': 'Prese Artiglio Notturno',
+  'entities.items.soulflame_gloves.name': 'Guanti Fiammanima',
+  'entities.items.stormcallers_handguards.name': 'Paramani del Chiamatempeste',
+  'entities.items.crownforged_girdle.name': 'Cintura Forgiacorona',
+  'entities.items.nighttalon_waistband.name': 'Fascia Artiglio Notturno',
+  'entities.items.soulflame_cord.name': 'Cordone Fiammanima',
+  'entities.items.stormcallers_waistguard.name': 'Guardacintura del Chiamatempeste',
+  'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, il Picco Risvegliato',
+  'entities.mobs.thunzharr_stormling.name': 'Elementale di tempesta ridestato',
+  'hudChrome.worldBoss.spawn': '{name} si erge sulle Alture di Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Spallacci del Chiamatempeste',
   'hud.chat.context.convertToRaid': 'Converti in incursione',
   'hud.chat.context.convertToParty': 'Converti in gruppo',
@@ -3681,12 +3711,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Banditi, cultisti e altri che hanno scelto il mestiere sbagliato. Combattono con tattica, non solo con i denti.',
   'guide.family.humanoid.name': 'Umanoidi',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Scavatori con la candela in testa che infestano miniere e cunicoli, difendendo ferocemente il loro minerale.',
-  'guide.family.kobold.name': 'Kobold',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobold',
+  'guide.family.mudfin.desc':
     'Abitanti anfibi della palude che brulicano nelle secche in branchi rumorosi e territoriali.',
-  'guide.family.murloc.name': 'Murloc',
+  'guide.family.mudfin.name': 'Murloc',
   'guide.family.ogre.desc':
     'Enormi, ottusi e pericolosi. Si accampano sui passi alti e colpiscono come una frana.',
   'guide.family.ogre.name': 'Ogre',
@@ -4124,18 +4154,18 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena e PvP',
   'guide.nav.talents': 'Talenti',
   'guide.nav.wishIKnew': 'Cose che avrei voluto sapere',
-  'guide.petHook.doomguard': "Un evocatore d'élite che fa piovere ombra pesante dalla distanza.",
-  'guide.petHook.felguard':
+  'guide.petHook.wraithborn': "Un evocatore d'élite che fa piovere ombra pesante dalla distanza.",
+  'guide.petHook.warfiend':
     'Un picchiatore resistente in mischia, il tuttofare una volta che riesci a evocarlo.',
-  'guide.petHook.felhunter':
+  'guide.petHook.spellhound':
     "Uno scaramucciatore d'ombra che dà la caccia agli incantatori nemici.",
-  'guide.petHook.imp':
+  'guide.petHook.emberkin':
     'Un demone che scaglia dardi di fuoco a distanza e fiacca i nemici da una distanza di sicurezza.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Un colosso massiccio dalla mischia devastante, evocato per pura potenza.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Un demone veloce in mischia che colpisce forte ma cede sotto pressione.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Un demone robusto che provoca e assorbe i colpi, così puoi lanciare in tranquillità.',
   'guide.related': 'Correlati',
   'guide.search.label': 'Cerca',
@@ -4958,20 +4988,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.bonus2': "Aumenta la potenza d'attacco di 40.",
   'entities.itemSets.deathlord.bonus3': 'Aumenta la forza di 15 e la vigoria di 15.',
   'entities.itemSets.necromancers.name': 'Vesti del negromante',
-  'entities.itemSets.necromancers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
-  'entities.itemSets.necromancers.bonus3':
-    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.necromancers.bonus2':
+    'Non puoi essere respinto (100% di resistenza alla respinta).',
+  'entities.itemSets.necromancers.bonus3': "Aumenta l'intelletto di 10 e la tempra di 10.",
   'entities.itemSets.nighttalon.name': 'Tenuta di cuoio Artiglio Notturno',
   'entities.itemSets.nighttalon.bonus2': "Aumenta la potenza d'attacco di 40.",
   'entities.itemSets.nighttalon.bonus3':
     'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
   'entities.itemSets.soulflame.name': 'Vesti Fiamma dell’Anima',
-  'entities.itemSets.soulflame.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
-  'entities.itemSets.soulflame.bonus3': 'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.soulflame.bonus2':
+    'Non puoi essere respinto (100% di resistenza alla respinta).',
+  'entities.itemSets.soulflame.bonus3': "Aumenta l'intelletto di 15 e lo spirito di 15.",
   'entities.itemSets.stormcallers.name': 'Vesti del Chiamatempeste',
-  'entities.itemSets.stormcallers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
-  'entities.itemSets.stormcallers.bonus3':
-    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.stormcallers.bonus2':
+    'Non puoi essere respinto (100% di resistenza alla respinta).',
+  'entities.itemSets.stormcallers.bonus3': "Aumenta l'intelletto di 15 e lo spirito di 15.",
   'entities.itemSets.wyrmshadow.name': 'Tenuta Ombra del Dragone',
   'entities.itemSets.wyrmshadow.bonus2': "Aumenta la potenza d'attacco di 40.",
   'entities.itemSets.wyrmshadow.bonus3':
@@ -5343,6 +5374,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinResult': '+{points} punti',
   'hudChrome.dailyRewards.spinTitle': 'Giro giornaliero',
   'hudChrome.dailyRewards.tasks': 'Incarichi',
+  'hudChrome.dailyRewards.showChestButton': 'Mostra forziere',
+  'hudChrome.dailyRewards.hideChestButton': 'Nascondi forziere',
   'hudChrome.dailyRewards.title': 'Ricompense giornaliere',
   'hudChrome.dailyRewards.unknown': 'Sconosciuto',
   'hudChrome.dailyRewards.usd': '{amount} USD',
@@ -5363,4 +5396,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Non ora',
   'hudChrome.nativeUpdate.title': 'Aggiornamento disponibile',
   'hudChrome.nativeUpdate.update': 'Aggiorna',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'La Posta dei Corvi',
+  'entities.letters.ravenpost_welcome.subject': 'Ora i corvi volano per te',
+  'entities.letters.ravenpost_welcome.body':
+    'Viandante,\n\nla Posta dei Corvi ha aperto i suoi trespoli in tutta la valle. Cerca i pilastri dei corvi a Eastbrook, Fenbridge e Highwatch: da ognuno di essi potrai inviare lettere, monete e oggetti agli altri avventurieri, e ritirare tutto ciò che i corvi ti portano.\n\nIn allegato un piccolo pensiero per il tuo primo francobollo.\n\nAli in alto,\nLa Posta dei Corvi',
+  'entities.letters.letter_q_wolves.sender': 'Maresciallo Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Nei recinti è tornata la quiete',
+  'entities.letters.letter_q_wolves.body':
+    'I pastori possono finalmente dormire sonni tranquilli, e il merito è tuo. Ho chiesto alla Posta dei Corvi di portarti un piccolo compenso dal fondo della guardia.\n\nTieni la lama oliata.\n- Maresciallo Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Maresciallo Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Il vecchio Grigiafauci, finalmente',
+  'entities.letters.letter_q_greyjaw.body':
+    'Le notizie corrono in una città così piccola. Ieri sera i pastori hanno brindato alla tua salute, e Wilkes giura che il lupo era grande quanto un carro. Lascia pure che ricamino: te lo sei guadagnato.\n\nConcediti un pasto a spese della guardia.\n- Maresciallo Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Fratello Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Ciò che hai compiuto nel buio',
+  'entities.letters.letter_q_hollow.body':
+    'Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric',
 };

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 
 const SEED = 42;
 const makeSim = () => new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
@@ -30,11 +30,11 @@ const swingTimes = (sim: Sim, mob: any, target: any, n: number) => {
   }
 };
 
-describe('mob Battle Fury (Rampage)', () => {
+describe('mob Mounting Rage (Rampage)', () => {
   it('Warlord Drogmar carries the rampage mechanic', () => {
     const r = MOBS.warlord_drogmar.rampage;
     expect(r).toBeDefined();
-    expect(r!.name).toBe('Battle Fury');
+    expect(r!.name).toBe('Mounting Rage');
     expect(r!.ap).toBeGreaterThan(0);
     expect(r!.maxStacks).toBeGreaterThan(1);
   });

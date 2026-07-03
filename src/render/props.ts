@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { PROPS, WORLD_MIN_Z } from '../sim/data';
+import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import { hash2 } from '../sim/rng';
-import { terrainHeight, WATER_LEVEL } from '../sim/world';
+import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
@@ -104,7 +104,8 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   lanternWall: { url: '/models/props/lantern_wall.glb', kit: 'qprops' },
   // Meshy-generated portal door used as the overworld Reliquary Hill marker;
   // has its own backing slab so the animated shader plane sits on the front face.
-  // yaw: Math.PI if the model loads backwards after inspecting in-game.
+  // No yaw here: the geometry is CACHED and shared by every delve marker, so a
+  // per-delve flip is applied to the placed group in buildProps, never baked.
   delveEntrance2: { url: '/models/dungeon/delve_entrance_2.glb', kit: 'dungeon' },
 };
 
@@ -466,6 +467,7 @@ const DELVE_PORTAL_FRAG = /* glsl */ `
   uniform float uTime;
   uniform vec3 uDim;
   uniform vec3 uBright;
+  uniform vec3 uRim;
   uniform float uHdr;
   varying vec2 vUv;
   varying vec3 vWPos;
@@ -488,18 +490,18 @@ const DELVE_PORTAL_FRAG = /* glsl */ `
     // slow ominous breathing pulse
     float pulse = 0.5 + 0.5 * sin(uTime * 0.85);
 
-    // hot crimson outer rim (baked, distinct from the purple mid-zone)
-    vec3 rimCol = vec3(0.85, 0.04, 0.10) * uHdr;
+    // hot outer rim (caller-tinted; crimson by default, watery cyan for the drowned shrine)
+    vec3 rimCol = uRim * uHdr;
 
-    // zone blending: void core (uDim) → purple swirl (uBright) → crimson rim
-    float toPurple  = smoothstep(0.06, 0.55, r);
-    float toCrimson = smoothstep(0.45, 0.85, r);
+    // zone blending: void core (uDim) → mid swirl (uBright) → rim
+    float toMid  = smoothstep(0.06, 0.55, r);
+    float toRim  = smoothstep(0.45, 0.85, r);
     float ringEnergy = vortex * churn * smoothstep(0.90, 0.05, r);
 
     vec3 col = uDim;
-    col = mix(col, uBright, toPurple  * (0.55 + 0.45 * ringEnergy));
-    col = mix(col, rimCol,  toCrimson * (0.45 + 0.55 * pulse));
-    col += uBright * smoothstep(0.28, 0.0, r) * 0.6 * uHdr; // purple core bloom
+    col = mix(col, uBright, toMid * (0.55 + 0.45 * ringEnergy));
+    col = mix(col, rimCol,  toRim * (0.45 + 0.55 * pulse));
+    col += uBright * smoothstep(0.28, 0.0, r) * 0.6 * uHdr; // core bloom
 
     // fill the whole opening as a dark solid portal; feather only the outer rim
     vec2 e = abs(p);
@@ -513,25 +515,60 @@ const DELVE_PORTAL_FRAG = /* glsl */ `
   }
 `;
 
-let delvePortalMat: THREE.ShaderMaterial | null = null;
-function delvePortalMaterial(): THREE.ShaderMaterial {
-  if (delvePortalMat) return delvePortalMat;
-  delvePortalMat = new THREE.ShaderMaterial({
+const delvePortalMatCache = new Map<string, THREE.ShaderMaterial>();
+function delvePortalMaterial(dim: number, bright: number, rim: number): THREE.ShaderMaterial {
+  const key = `${dim}_${bright}_${rim}`;
+  let mat = delvePortalMatCache.get(key);
+  if (mat) return mat;
+  mat = new THREE.ShaderMaterial({
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
       uTime: sharedUniforms.uTime,
-      uDim: { value: new THREE.Color(0x03000a) }, // near-void purple-black core
-      uBright: { value: new THREE.Color(0x6e0a85) }, // deep purple swirl
+      uDim: { value: new THREE.Color(dim) },
+      uBright: { value: new THREE.Color(bright) },
+      uRim: { value: new THREE.Color(rim) },
       uHdr: { value: GFX.composer ? 2.8 : 1.0 },
     },
     vertexShader: DELVE_PORTAL_VERT,
     fragmentShader: DELVE_PORTAL_FRAG,
     transparent: true,
     depthWrite: false,
-    side: THREE.FrontSide, // only the town-facing front glows; the dark vault sits behind it
+    side: THREE.FrontSide,
     fog: true,
   });
-  return delvePortalMat;
+  delvePortalMatCache.set(key, mat);
+  return mat;
+}
+
+// The delve-entrance GLB bakes its stone AND its hanging veil into one shared
+// texture (single unnamed material), so the veil can't be recolored by material
+// name. For the drowned shrine we want that red veil to read as water: clone the
+// converted material and inject a red→blue recolor that only touches reddish
+// texels (R dominant over G/B), leaving the grey stone untouched. Cloned per
+// asset-part material so the default (purple) entrance keeps the original red veil.
+const drowningVeilMatCache = new Map<THREE.Material, THREE.Material>();
+function drownVeilMaterial(src: THREE.Material): THREE.Material {
+  const cached = drowningVeilMatCache.get(src);
+  if (cached) return cached;
+  const m = src.clone();
+  m.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <map_fragment>',
+      `#include <map_fragment>
+      // recolor the baked red veil to a murky Blackwater blue; red-dominance gates it
+      // so stone stays grey. The gate must SATURATE (smoothstep, full recolor by 0.15):
+      // texels here are linear-space, where even a bright red fold only reaches ~0.5
+      // dominance, and the old linear-strength mix left half the red channel intact,
+      // so the veil still read red in-game. Stone dominance measures under 0.01.
+      float _veilRed = smoothstep(0.02, 0.15, diffuseColor.r - max(diffuseColor.g, diffuseColor.b));
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.04, 0.13, 0.2) * (0.4 + diffuseColor.r), _veilRed);
+      `,
+    );
+  };
+  // a distinct program key so three doesn't reuse the un-injected cached program
+  m.customProgramCacheKey = () => 'drownVeil';
+  drowningVeilMatCache.set(src, m);
+  return m;
 }
 
 // Embers drifting up out of the delve mouth, a deterministic point cloud whose
@@ -558,6 +595,8 @@ const DELVE_EMBER_VERT = /* glsl */ `
 `;
 const DELVE_EMBER_FRAG = /* glsl */ `
   uniform float uHdr;
+  uniform vec3 uCol1;
+  uniform vec3 uCol2;
   varying float vLife;
   void main() {
     vec2 c = gl_PointCoord - 0.5;
@@ -565,7 +604,7 @@ const DELVE_EMBER_FRAG = /* glsl */ `
     if (d > 0.5) discard;
     float soft = smoothstep(0.5, 0.0, d);
     float fade = sin(vLife * 3.14159);                   // fade in then out over life
-    vec3 col = mix(vec3(1.0, 0.16, 0.09), vec3(1.0, 0.5, 0.18), vLife) * uHdr;
+    vec3 col = mix(uCol1, uCol2, vLife) * uHdr;
     gl_FragColor = vec4(col, soft * fade * 0.85);
   }
 `;
@@ -576,6 +615,8 @@ function buildDelveEmbers(
   cz: number,
   halfW: number,
   riseY: number,
+  col1: [number, number, number] = [1.0, 0.16, 0.09],
+  col2: [number, number, number] = [1.0, 0.5, 0.18],
 ): THREE.Points {
   const N = GFX.standardMaterials ? 48 : 28; // lighter on low
   const positions = new Float32Array(N * 3);
@@ -605,6 +646,8 @@ function buildDelveEmbers(
       uTime: sharedUniforms.uTime,
       uRise: { value: riseY },
       uHdr: { value: GFX.composer ? 2.0 : 1.0 },
+      uCol1: { value: new THREE.Vector3(...col1) },
+      uCol2: { value: new THREE.Vector3(...col2) },
     },
     vertexShader: DELVE_EMBER_VERT,
     fragmentShader: DELVE_EMBER_FRAG,
@@ -744,7 +787,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     inn: 7.6,
   };
 
-  for (const b of PROPS.buildings) {
+  for (const b of getActiveWorldContent().props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
     // roof Y mirrors the camera collider height in colliders.ts
@@ -781,7 +824,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
-  PROPS.stalls.forEach((s, i) => {
+  getActiveWorldContent().props.stalls.forEach((s, i) => {
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -805,7 +848,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- wells ---------------------------------------------------------------
-  for (const w of PROPS.wells) {
+  for (const w of getActiveWorldContent().props.wells) {
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
@@ -819,7 +862,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const graveKinds: PropKey[] = lowProps
     ? ['graveRound']
     : ['graveRound', 'graveCross', 'graveBevel', 'graveDecor'];
-  for (const gy of PROPS.graveyards) {
+  for (const gy of getActiveWorldContent().props.graveyards) {
     for (let i = 0; i < 6; i++) {
       const gx = gy.x + (i % 3) * 2.2,
         gz = gy.z + Math.floor(i / 3) * 2.6;
@@ -840,7 +883,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- town fences: village fence module repeated along the run ------------
-  for (const f of PROPS.fences) {
+  for (const f of getActiveWorldContent().props.fences) {
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const n = Math.max(1, Math.round(len / 2.35));
     const dirx = (f.x2 - f.x1) / len,
@@ -876,7 +919,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     [0.001, 0.95],
   ].map(([r, y]) => new THREE.Vector2(r, y));
   const flameGeo = new THREE.LatheGeometry(flamePts, 7);
-  for (const [x, z] of PROPS.campfires) {
+  for (const [x, z] of getActiveWorldContent().props.campfires) {
     const y = ground(x, z);
     const g = new THREE.Group();
     addParts(g, 'bonfire', { y: -0.05, rot: propRand(x, z, 1) * Math.PI * 2, scale: 4.3 });
@@ -905,7 +948,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- bandit/war tents: Kenney ridge tents, opening on +z, hideable -------
-  for (const t of PROPS.tents) {
+  for (const t of getActiveWorldContent().props.tents) {
     const kind: PropKey = propRand(t.x, t.z, 2) < 0.55 ? 'tentOpen' : 'tentSmall';
     const a = propAsset(kind);
     const s = (3.0 * t.scale) / Math.max(a.size.x, a.size.z);
@@ -923,7 +966,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
-  PROPS.crates.forEach(([x, z], i) => {
+  getActiveWorldContent().props.crates.forEach(([x, z], i) => {
     const kind: PropKey = i % 3 === 2 ? 'barrel' : 'crateWooden';
     const s = kind === 'barrel' ? 1.25 : 1.3 + propRand(x, z, 5) * 0.15;
     const y = ground(x, z);
@@ -938,14 +981,14 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- murloc mud huts: giant swamp mushrooms, doorway facing camp center --
-  const hutCenter = PROPS.mudHuts.reduce(
+  const hutCenter = getActiveWorldContent().props.mudHuts.reduce(
     (acc, [hx, hz]) => ({
-      x: acc.x + hx / PROPS.mudHuts.length,
-      z: acc.z + hz / PROPS.mudHuts.length,
+      x: acc.x + hx / getActiveWorldContent().props.mudHuts.length,
+      z: acc.z + hz / getActiveWorldContent().props.mudHuts.length,
     }),
     { x: 0, z: 0 },
   );
-  for (const [x, z] of PROPS.mudHuts) {
+  for (const [x, z] of getActiveWorldContent().props.mudHuts) {
     const y = ground(x, z);
     const g = new THREE.Group();
     const sxz = 13 + propRand(x, z, 15) * 3;
@@ -984,7 +1027,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- ruin rings: weathered monolith columns at the exact collider angles -
-  for (const r of PROPS.ruinRings) {
+  for (const r of getActiveWorldContent().props.ruinRings) {
     for (let i = 0; i < r.columns; i++) {
       const ang = (i / r.columns) * Math.PI * 2;
       const x = r.x + Math.sin(ang) * r.ringR,
@@ -1041,7 +1084,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- mine entrances: timber portal, rock mound, ore cart, lantern --------
-  for (const m of PROPS.mines) {
+  for (const m of getActiveWorldContent().props.mines) {
     const g = new THREE.Group();
     const abandonedCrypt = m.x < -140 && m.z > 590 && m.z < 630;
     for (const sx of [-1.45, 1.45]) {
@@ -1136,7 +1179,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- fishing docks: pirate-kit platforms, moored rowboat, stone hut ------
-  for (const d of PROPS.docks) {
+  for (const d of getActiveWorldContent().props.docks) {
     const y = ground(d.x, d.z);
     const g = new THREE.Group();
     const key = d.x * 3.3 + d.z * 1.7;
@@ -1177,11 +1220,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const boatWx = d.x + boatLx * Math.cos(d.rot) + boatLz * Math.sin(d.rot);
     const boatWz = d.z - boatLx * Math.sin(d.rot) + boatLz * Math.cos(d.rot);
     const boatGround = ground(boatWx, boatWz);
-    const isAfloat = boatGround < WATER_LEVEL - 0.1;
+    const wl = waterLevel();
+    const isAfloat = boatGround < wl - 0.1;
     addParts(g, 'rowboat', {
       x: boatLx,
       z: boatLz,
-      y: (isAfloat ? WATER_LEVEL + 0.18 : boatGround + 0.06) - y,
+      y: (isAfloat ? wl + 0.18 : boatGround + 0.06) - y,
       rot: 0.5 + (keyRand(key, 8) - 0.5) * 0.4,
       scale: 0.85,
       euler: isAfloat
@@ -1203,43 +1247,60 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- delve entrance: Meshy portal-door + animated void + carved name lintel -
-  // Town/hub is +z (north) of Reliquary Hill. The portal-door model sits just
-  // south of Brother Halven facing +z; it has its own stone backing slab so the
-  // animated shader plane (FrontSide) reads as a solid void from the approach and
-  // is invisible from behind. The carved name slab rides the model's crown.
-  // All render-only, players enter by talking to Halven; leaveDelve drops them
-  // back at archZ (doorPos.z - 4).
+  // The portal-door model sits just behind Brother Halven, its mouth facing the
+  // hub players approach from (faceSign below: +z for Reliquary Hill, -z for the
+  // marsh); it has its own stone backing slab so the animated shader plane
+  // (FrontSide) reads as a solid void from the approach and is invisible from
+  // behind. The carved name slab rides the model's crown. All render-only,
+  // players enter by talking to Halven; leaveDelve drops them at doorPos.z - 4,
+  // on the mouth side for both delves.
   const delvePortals: THREE.Mesh[] = [];
-  for (const dm of PROPS.delveMarkers ?? []) {
+  for (const dm of getActiveWorldContent().props.delveMarkers ?? []) {
     if (!loadedProps.has('delveEntrance2')) continue;
-    const gy = ground(dm.x, dm.z);
+    const isDrowned = dm.delveId === 'drowned_litany';
+    // The portal mouth faces the hub the players approach from: Reliquary Hill's
+    // town is north (+z) of its door, Mirefen Marsh's hub (z~300) is SOUTH (-z)
+    // of the drowned door (z=505), so the whole assembly (arch, void plane,
+    // braziers, name slab) flips together for the drowned delve. The flip is on
+    // the placed group, never baked into the asset (its geometry is cached and
+    // shared by every marker).
+    const faceSign = isDrowned ? -1 : 1;
 
     // Portal-door model with its own backing slab, no separate vault sphere needed.
-    // Rotation 0 = portal face toward +z (town); add yaw: Math.PI to the asset def
-    // if the model loads backwards after inspecting in-game.
     const arch = propAsset('delveEntrance2');
     const SX = 3.6,
       SY = 3.6,
       SZ = 3.6;
-    const archZ = dm.z - 4; // south of Halven (also the leaveDelve drop: doorPos.z - 4)
+    // The arch sits on the far side of Halven from the approach, so he greets
+    // arrivals with the glowing mouth framed behind him. The leaveDelve drop
+    // (doorPos.z - 4) stays on the mouth side for both delves.
+    const archZ = dm.z - faceSign * 4;
+    // Sample ground height at the arch's OWN placement (archZ), not Halven's
+    // (dm.z): marsh terrain can slope/dip between the two, and sampling the
+    // wrong z left the model's normalized (min-y at 0) base floating above the
+    // real ground a few units away.
+    const gy = ground(dm.x, archZ);
     const ag = new THREE.Group();
     for (const part of arch.parts) {
-      const m = new THREE.Mesh(part.geo, part.mat);
+      // drowned shrine: recolor the baked red veil to water-blue (stone unaffected)
+      const mat = isDrowned ? drownVeilMaterial(part.mat) : part.mat;
+      const m = new THREE.Mesh(part.geo, mat);
       m.castShadow = true;
       m.receiveShadow = true;
       ag.add(m);
     }
     ag.scale.set(SX, SY, SZ);
     ag.position.set(dm.x, gy, archZ);
+    if (faceSign < 0) ag.rotation.y = Math.PI;
     group.add(ag);
 
     // portal opening: doorway is roughly half the model's width and a bit over
-    // half its height; the animated shader plane sits on the town-facing front face.
-    // Tune these fractions after seeing the model in-game.
+    // half its height; the animated shader plane sits on the approach-facing front
+    // face. Tune these fractions after seeing the model in-game.
     const openW = arch.size.x * SX * 0.5;
     const openH = arch.size.y * SY * 0.55;
     const openCY = gy + arch.size.y * SY * 0.32; // centre of the doorway opening
-    const townFaceZ = archZ + (arch.size.z * SZ) / 2; // model's +z front face
+    const faceZ = archZ + faceSign * ((arch.size.z * SZ) / 2); // approach-facing front face
 
     // opaque dark backsplash filling the doorway behind the void plane, so no
     // red leaks through from the rear and you can't see daylight through the
@@ -1247,29 +1308,53 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     // than the opening to cover the gap, recessed a touch into the model.
     const backsplash = new THREE.Mesh(
       new THREE.PlaneGeometry(openW * 1.1, openH * 1.1),
-      new THREE.MeshBasicMaterial({ color: 0x05030a, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({
+        color: isDrowned ? 0x01060f : 0x05030a, // deep blue-black for the drowned shrine
+        side: THREE.DoubleSide,
+      }),
     );
-    backsplash.position.set(dm.x, openCY, townFaceZ - 0.35);
+    backsplash.position.set(dm.x, openCY, faceZ - faceSign * 0.35);
     group.add(backsplash);
 
     // swirling void plane, FrontSide, drawn over the dark backsplash so the
     // animated vortex reads against true black from the town approach.
-    const portal = new THREE.Mesh(new THREE.PlaneGeometry(openW, openH), delvePortalMaterial());
-    portal.position.set(dm.x, openCY, townFaceZ - 0.05);
+    const portalMat = isDrowned
+      ? delvePortalMaterial(0x01060c, 0x0c2c3a, 0x176079) // murky marsh water: black-blue → deep teal → dim cyan rim
+      : delvePortalMaterial(0x03000a, 0x6e0a85, 0xd90a1a); // default: void → purple → crimson rim
+    const portal = new THREE.Mesh(new THREE.PlaneGeometry(openW, openH), portalMat);
+    portal.position.set(dm.x, openCY, faceZ - faceSign * 0.05);
+    // FrontSide plane natively faces +z; turn it with the assembly.
+    if (faceSign < 0) portal.rotation.y = Math.PI;
     portal.renderOrder = 3;
     group.add(portal);
     delvePortals.push(portal);
 
-    // deep purple glow spilling from the mouth, matches the new portal palette.
-    const mouthLight = new THREE.PointLight(0x7010b0, 8, 18, 2);
-    mouthLight.position.set(dm.x, gy + 2.4, townFaceZ + 0.4);
+    const mouthLightColor = isDrowned ? 0x1048c0 : 0x7010b0;
+    const mouthLight = new THREE.PointLight(mouthLightColor, 8, 18, 2);
+    mouthLight.position.set(dm.x, gy + 2.4, faceZ + faceSign * 0.4);
     mouthLight.userData.baseIntensity = 8;
     group.add(mouthLight);
     fireLights.push(mouthLight);
 
     // embers drifting up out of the mouth (self-animating; not a mesh, so the
     // static merge skips it automatically)
-    group.add(buildDelveEmbers(dm.x, gy + 1.0, townFaceZ + 0.2, openW * 0.34, openH * 0.85));
+    const emberCol1: [number, number, number] = isDrowned
+      ? [0.1, 0.35, 1.0] // blue sparks for the drowned shrine
+      : [1.0, 0.16, 0.09];
+    const emberCol2: [number, number, number] = isDrowned
+      ? [0.55, 0.8, 1.0] // pale blue-white fade
+      : [1.0, 0.5, 0.18];
+    group.add(
+      buildDelveEmbers(
+        dm.x,
+        gy + 1.0,
+        faceZ + faceSign * 0.2,
+        openW * 0.34,
+        openH * 0.85,
+        emberCol1,
+        emberCol2,
+      ),
+    );
 
     // two flaming braziers flanking the mouth, a tended-entrance read. Reuse
     // the campfire flame + fire-light pattern so the renderer flickers them and
@@ -1278,7 +1363,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const bowlMat = surfaceMat({ color: 0x191512, roughness: 1 });
     for (const side of [-1, 1]) {
       const bx = dm.x + side * (openW * 0.5 + 0.7);
-      const bz = townFaceZ + 0.5; // just in front of the mouth, on the town side
+      const bz = faceZ + faceSign * 0.5; // just in front of the mouth, on the approach side
       const by = ground(bx, bz);
       const bg = new THREE.Group();
       const postH = 2.0;
@@ -1321,16 +1406,16 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     ];
     for (const rb of rubble) {
       const rx = dm.x + rb.dx,
-        rz = archZ + rb.dz;
+        rz = archZ + faceSign * rb.dz;
       const rgrp = new THREE.Group();
       addParts(rgrp, rb.kind, { scale: rb.s, rot: rb.rot });
       rgrp.position.set(rx, ground(rx, rz) - 0.08, rz);
       group.add(shadowed(rgrp));
     }
 
-    // ---- carved name slab as the arch's town-facing lintel-sign ------------
+    // ---- carved name slab as the arch's approach-facing lintel-sign --------
     const slabY = gy + arch.size.y * SY * 0.8; // mounted on the crown, above the mouth
-    const slabZ = townFaceZ + 0.1; // proud of the town face so it never z-fights the arch
+    const slabZ = faceZ + faceSign * 0.1; // proud of the front face so it never z-fights the arch
 
     // stone backing box
     const backMat = surfaceMat({ color: 0x3a3530 });
@@ -1339,7 +1424,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     backing.castShadow = true;
     group.add(backing);
 
-    // grimy canvas inscription on the town-facing (+z) surface
+    // grimy canvas inscription on the approach-facing surface (turns with the
+    // assembly via the faceSign flip, so it reads -z for the drowned delve)
     const CW = 512,
       CH = 96;
     const cv = document.createElement('canvas');
@@ -1385,8 +1471,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const tex = new THREE.CanvasTexture(cv);
     const faceMat = new THREE.MeshBasicMaterial({ map: tex });
     const face = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.78), faceMat);
-    // sit flush on the town-facing face of the backing (PlaneGeometry faces +z)
-    face.position.set(dm.x, slabY, slabZ + 0.1);
+    // sit flush on the approach-facing face of the backing (PlaneGeometry faces
+    // +z, so it turns with the assembly)
+    face.position.set(dm.x, slabY, slabZ + faceSign * 0.1);
+    if (faceSign < 0) face.rotation.y = Math.PI;
     group.add(face);
   }
 

@@ -1,0 +1,1132 @@
+/* Map-editor stylesheet. Standalone entry (never in the game client bundle);
+   mirrors the game's design tokens (src/styles/tokens.css) as local custom
+   properties with the same resolved values, so the editor reads as part of the
+   product without importing the HUD layer stack. Dark, dense, tool-like. */
+
+:root {
+  color-scheme: dark;
+  /* Mirrored tokens (values match src/styles/tokens.css). */
+  --gold: #ffd100;
+  --gold-dim: #c8a838;
+  --color-bg-dark: #08080d;
+  --color-bg-input: #0a0a0f;
+  --color-border-default: #4e3d1d;
+  --color-border-focus: #c8a838;
+  --color-text-light: #f0ebd8;
+  --color-text-muted: #998d6a;
+  --color-text-error: #ff8f85;
+  --color-text-success: #7fdc4f;
+  --panel-base: #15151f;
+  /* Editor-local surfaces. */
+  --ed-bg: #0c0f14;
+  --ed-panel: #12171f;
+  --ed-panel-2: #161c26;
+  --ed-line: #222b36;
+  --ed-line-strong: #35424f;
+  --ed-text: #e8eef4;
+  --ed-muted: #8b97a5;
+  --ed-danger: #e0503c;
+  --ed-accent: var(--gold);
+  --ed-accent-ink: #1a1400;
+  --ed-focus: var(--color-border-focus);
+  --ed-radius: 6px;
+  --ed-topbar-h: 52px;
+  /* Per-tool hues: one color follows the active tool through the rail button,
+     the inspector header chip, and the slider accents, so "what am I holding"
+     is always answered by color. Idle rail stays monochrome; hue appears on
+     hover/active only. */
+  --hue-select: var(--gold);
+  --hue-sculpt: #cf9040; /* raise / lower / smooth / flatten: earth */
+  --hue-paint: #5aa850; /* biome moss */
+  --hue-water: #55a7e0;
+  --hue-place: #a985e8; /* world content: place / camp / spawn */
+  --hue-blocker: #e0503c; /* matches the red walls it draws */
+  --hue-region: #8fa8c8;
+  --hue-erase: #ff8f85;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--ed-bg);
+  color: var(--ed-text);
+  font:
+    13px / 1.45 -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+#editor-app,
+.ed-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- shared controls ------------------------------------------------------ */
+
+button {
+  background: #1c2530;
+  color: var(--ed-text);
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-radius);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--ed-line-strong);
+  background: #222d3a;
+}
+
+button:active:not(:disabled) {
+  background: #16202b;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--ed-accent);
+  color: var(--ed-accent-ink);
+  border-color: var(--ed-accent);
+  font-weight: 700;
+}
+
+button.primary:hover:not(:disabled) {
+  background: #ffde4d;
+  border-color: #ffde4d;
+}
+
+button.danger {
+  border-color: #5b2a24;
+  color: #ffb3a8;
+}
+
+button.danger:hover:not(:disabled) {
+  border-color: var(--ed-danger);
+  background: #2a1713;
+}
+
+button.small {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+button.active {
+  background: var(--ed-accent);
+  color: var(--ed-accent-ink);
+  border-color: var(--ed-accent);
+  font-weight: 600;
+}
+
+:is(button, input, select, textarea, a):focus-visible {
+  outline: 2px solid var(--ed-focus);
+  outline-offset: 2px;
+}
+
+input[type="text"],
+input[type="search"],
+input[type="number"],
+select {
+  background: var(--color-bg-input);
+  border: 1px solid var(--ed-line);
+  color: var(--ed-text);
+  border-radius: var(--ed-radius);
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--ed-accent);
+}
+
+/* ---- top bar --------------------------------------------------------------- */
+
+.ed-topbar {
+  height: var(--ed-topbar-h);
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: linear-gradient(180deg, #151b24 0%, #10151d 100%);
+  border-bottom: 1px solid var(--ed-line);
+}
+
+.ed-brand {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ed-accent);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ed-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ed-name {
+  width: 200px;
+  max-width: 26vw;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--ed-radius);
+  color: var(--ed-text);
+  padding: 5px 8px;
+  font-size: 13px;
+}
+
+.ed-name:hover {
+  border-color: var(--ed-line);
+}
+
+.ed-name:focus {
+  border-color: var(--ed-line-strong);
+  background: var(--color-bg-input);
+}
+
+.ed-dirty-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ed-accent);
+  flex: 0 0 auto;
+}
+
+.ed-save-state {
+  color: var(--ed-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.ed-undo-badge {
+  color: var(--ed-muted);
+  font-size: 11px;
+  border: 1px solid var(--ed-line);
+  border-radius: 10px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
+.ed-topbar-spacer {
+  flex: 1;
+}
+
+.ed-offline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #ffcf8a;
+  border: 1px solid #574222;
+  background: #241b0e;
+  border-radius: 10px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+.ed-offline a {
+  color: var(--ed-accent);
+  text-decoration: none;
+}
+
+.ed-offline a:hover {
+  text-decoration: underline;
+}
+
+.ed-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.ed-tb-sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 3px;
+  background: var(--ed-line);
+  flex: 0 0 auto;
+}
+
+/* Unsaved edits: the Save button carries the same amber signal as the dot. */
+.ed-actions button.attn:not(:disabled) {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+/* Autosave toggle: a status LED, gray when off, green when on (the gold block
+   the generic .active gives every other button would read as "pressed", not
+   "running"). */
+.ed-actions .ed-autosave::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: 1px;
+  background: #55606d;
+}
+
+.ed-actions .ed-autosave.active {
+  background: #16241a;
+  border-color: #3d6b41;
+  color: var(--color-text-success);
+  font-weight: 600;
+}
+
+.ed-actions .ed-autosave.active::before {
+  background: var(--color-text-success);
+}
+
+.ed-view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-radius);
+  overflow: hidden;
+}
+
+.ed-view-toggle button {
+  border: 0;
+  border-radius: 0;
+  padding: 6px 12px;
+}
+
+.ed-playtest {
+  padding: 7px 16px;
+}
+
+/* ---- main split ------------------------------------------------------------- */
+
+.ed-main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.ed-toolbar {
+  flex: 0 0 auto;
+  width: 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 0;
+  background: var(--ed-panel);
+  border-right: 1px solid var(--ed-line);
+  overflow-y: auto;
+}
+
+.ed-toolbar-sep {
+  width: 26px;
+  height: 1px;
+  margin: 3px 0;
+  background: var(--ed-line);
+  flex: 0 0 auto;
+}
+
+/* Each tool resolves its family hue; the rail, inspector chip, and slider
+   accents all read the same variable. */
+.ed-tool[data-tool="select"],
+.ed-inspector[data-tool="select"] {
+  --tool-hue: var(--hue-select);
+}
+.ed-tool[data-tool="raise"],
+.ed-tool[data-tool="lower"],
+.ed-tool[data-tool="smooth"],
+.ed-tool[data-tool="flatten"],
+.ed-inspector[data-tool="raise"],
+.ed-inspector[data-tool="lower"],
+.ed-inspector[data-tool="smooth"],
+.ed-inspector[data-tool="flatten"] {
+  --tool-hue: var(--hue-sculpt);
+}
+.ed-tool[data-tool="paint"],
+.ed-inspector[data-tool="paint"] {
+  --tool-hue: var(--hue-paint);
+}
+.ed-tool[data-tool="water"],
+.ed-inspector[data-tool="water"] {
+  --tool-hue: var(--hue-water);
+}
+.ed-tool[data-tool="place"],
+.ed-tool[data-tool="camp"],
+.ed-tool[data-tool="spawn"],
+.ed-inspector[data-tool="place"],
+.ed-inspector[data-tool="camp"],
+.ed-inspector[data-tool="spawn"] {
+  --tool-hue: var(--hue-place);
+}
+.ed-tool[data-tool="blocker"],
+.ed-inspector[data-tool="blocker"] {
+  --tool-hue: var(--hue-blocker);
+}
+.ed-tool[data-tool="region"],
+.ed-inspector[data-tool="region"] {
+  --tool-hue: var(--hue-region);
+}
+.ed-tool[data-tool="erase"],
+.ed-inspector[data-tool="erase"] {
+  --tool-hue: var(--hue-erase);
+}
+
+.ed-tool {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--ed-muted);
+  --tool-hue: var(--ed-accent);
+}
+
+.ed-tool:hover:not(:disabled) {
+  color: var(--tool-hue);
+  border-color: color-mix(in srgb, var(--tool-hue) 45%, transparent);
+  background: color-mix(in srgb, var(--tool-hue) 9%, #1c2530);
+}
+
+/* Active tool: hue-tinted fill + a left edge bar, instead of the generic gold
+   block every button shared before. */
+.ed-tool.active {
+  color: var(--tool-hue);
+  background: color-mix(in srgb, var(--tool-hue) 16%, var(--ed-panel));
+  border-color: color-mix(in srgb, var(--tool-hue) 55%, transparent);
+}
+
+.ed-tool.active::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--tool-hue);
+}
+
+.ed-tool-key {
+  position: absolute;
+  right: 3px;
+  bottom: 2px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  color: currentColor;
+  opacity: 0.75;
+}
+
+/* ---- stage ------------------------------------------------------------------- */
+
+.ed-stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  touch-action: none;
+  background: var(--ed-bg);
+}
+
+.editor-3d-host,
+.editor-2d-host {
+  position: absolute;
+  inset: 0;
+}
+
+.editor-3d-canvas,
+.editor-2d-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.editor-3d-nameplates {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Full-stage overlay while the 3D engine loads its assets. */
+.ed-3d-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--ed-bg);
+  color: var(--ed-text-dim, #b8b2a5);
+  z-index: 5;
+}
+
+.ed-3d-loading-spin {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.14);
+  border-top-color: var(--ed-accent, #e8b64f);
+  animation: ed-3d-loading-spin 0.9s linear infinite;
+}
+
+.ed-3d-loading-text {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+@keyframes ed-3d-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-3d-loading-spin {
+    animation: none;
+  }
+}
+
+/* ---- inspector ------------------------------------------------------------------ */
+
+.ed-inspector {
+  flex: 0 0 300px;
+  width: 300px;
+  background: var(--ed-panel);
+  border-left: 1px solid var(--ed-line);
+  overflow-y: auto;
+  padding: 10px 12px 24px;
+}
+
+.ed-section {
+  margin-bottom: 14px;
+}
+
+.ed-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ed-muted);
+  margin: 12px 0 8px;
+  border-bottom: 1px solid var(--ed-line);
+  padding-bottom: 4px;
+}
+
+/* The first (tool) section carries the active tool's hue as a small chip, the
+   other end of the color thread that starts on the rail button. */
+.ed-inspector > .ed-section:first-child > .ed-section-title::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--tool-hue, var(--ed-accent));
+  flex: 0 0 auto;
+}
+
+/* Sliders in the tool panel take the tool's hue too. */
+.ed-inspector input[type="range"] {
+  accent-color: var(--tool-hue, var(--ed-accent));
+}
+
+.ed-hint {
+  color: #75818f;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 4px 0 8px;
+}
+
+.ed-muted {
+  color: var(--ed-muted);
+}
+
+.ed-chosen {
+  color: var(--ed-accent);
+  font-weight: 600;
+  font-size: 12px;
+  margin: 4px 0 8px;
+  word-break: break-word;
+}
+
+.ed-row {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.ed-row.ed-wrap {
+  flex-wrap: wrap;
+}
+
+.ed-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--ed-muted);
+  margin: 6px 0;
+}
+
+.ed-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  cursor: pointer;
+  min-height: 24px;
+}
+
+.ed-check input {
+  accent-color: var(--ed-accent);
+}
+
+.ed-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.ed-field > span {
+  min-width: 14px;
+  color: var(--ed-muted);
+  font-family: ui-monospace, monospace;
+}
+
+.ed-field input,
+.ed-field select {
+  flex: 1;
+  min-width: 0;
+}
+
+.ed-layers {
+  display: flex;
+  flex-direction: column;
+}
+
+.ed-nav-hint {
+  margin-top: 16px;
+  border-top: 1px solid var(--ed-line);
+  padding-top: 8px;
+}
+
+/* Biome palette. */
+.ed-biomes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.ed-biome {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-align: left;
+  padding: 5px 8px;
+}
+
+.ed-biome-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.ed-biome-erase {
+  background: linear-gradient(45deg, transparent 42%, #c66 42%, #c66 58%, transparent 58%), #10151d;
+}
+
+/* ---- asset browser (bottom drawer over the stage) ----------------------------- */
+
+.ed-assets {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 260px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(14, 18, 25, 0.96);
+  border-top: 1px solid var(--ed-line-strong);
+  backdrop-filter: blur(4px);
+}
+
+.ed-assets-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 0;
+}
+
+.ed-assets-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ed-muted);
+  margin: 0;
+}
+
+.ed-assets-head input[type="search"] {
+  width: 220px;
+  margin-left: auto;
+}
+
+.ed-assets-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 6px 12px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.ed-assets-tab {
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: var(--ed-radius) var(--ed-radius) 0 0;
+  background: transparent;
+  color: var(--ed-muted);
+  white-space: nowrap;
+  padding: 5px 10px;
+}
+
+.ed-assets-tab:hover:not(:disabled) {
+  color: var(--ed-text);
+  background: transparent;
+  border-color: transparent;
+}
+
+.ed-assets-tab.active {
+  background: var(--ed-panel-2);
+  border-color: var(--ed-line);
+  color: var(--ed-text);
+  font-weight: 600;
+}
+
+.ed-assets-note {
+  color: var(--ed-muted);
+  font-size: 12px;
+  padding: 10px 14px;
+  margin: 0;
+}
+
+.ed-assets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+  padding: 8px 12px 12px;
+  overflow-y: auto;
+  background: var(--ed-panel-2);
+  border-top: 1px solid var(--ed-line);
+  min-height: 90px;
+}
+
+.ed-asset-cell {
+  position: relative;
+}
+
+.ed-asset {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+}
+
+.ed-asset canvas {
+  border-radius: 4px;
+  display: block;
+}
+
+.ed-asset-label {
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--ed-muted);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ed-asset.active .ed-asset-label {
+  color: inherit;
+}
+
+.ed-asset-del {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  line-height: 1;
+  border-radius: 50%;
+  color: #ffb3a8;
+}
+
+/* ---- toasts ---------------------------------------------------------------------- */
+
+.ed-toasts {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 60;
+  pointer-events: none;
+  max-width: min(480px, 90vw);
+}
+
+.ed-toast {
+  background: #101720f2;
+  border: 1px solid var(--ed-line-strong);
+  border-left: 3px solid var(--ed-muted);
+  border-radius: var(--ed-radius);
+  padding: 8px 14px;
+  font-size: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  opacity: 1;
+  transition: opacity 280ms ease;
+}
+
+.ed-toast-success {
+  border-left-color: var(--color-text-success);
+}
+
+.ed-toast-error {
+  border-left-color: var(--ed-danger);
+}
+
+.ed-toast-out {
+  opacity: 0;
+}
+
+/* ---- modals + the open drawer ------------------------------------------------------ */
+
+.ed-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 10, 0.66);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.ed-modal {
+  background: var(--ed-panel);
+  border: 1px solid var(--ed-line-strong);
+  border-radius: 8px;
+  min-width: 320px;
+  max-width: min(560px, 92vw);
+  padding: 16px 18px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+}
+
+.ed-modal-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--ed-accent);
+}
+
+.ed-modal-body {
+  margin: 0 0 14px;
+  color: var(--ed-text);
+}
+
+.ed-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ed-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: var(--ed-muted);
+}
+
+.ed-drawer {
+  width: min(760px, 94vw);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ed-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ed-drawer-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 6px 0 0;
+}
+
+.ed-drawer-tab {
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: var(--ed-radius) var(--ed-radius) 0 0;
+  background: transparent;
+  color: var(--ed-muted);
+}
+
+.ed-drawer-tab.active {
+  background: var(--ed-panel-2);
+  border-color: var(--ed-line);
+  color: var(--ed-text);
+  font-weight: 600;
+}
+
+.ed-drawer-body {
+  border: 1px solid var(--ed-line);
+  border-radius: 0 var(--ed-radius) var(--ed-radius) var(--ed-radius);
+  background: var(--ed-panel-2);
+  overflow-y: auto;
+  min-height: 180px;
+}
+
+.ed-drawer-note {
+  color: var(--ed-muted);
+  padding: 14px;
+  margin: 0;
+}
+
+.ed-drawer-note.ed-error {
+  color: var(--color-text-error);
+}
+
+.ed-map-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.ed-map-row {
+  display: grid;
+  grid-template-columns: 1fr 170px minmax(200px, auto);
+  gap: 8px;
+  align-items: center;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--ed-line);
+}
+
+/* Server "mine" rows carry a status column. */
+.ed-map-row.has-status {
+  grid-template-columns: 1fr 170px 90px minmax(200px, auto);
+}
+
+.ed-map-row:not(.ed-map-head):hover {
+  background: #1a212c;
+}
+
+.ed-map-head {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ed-muted);
+  position: sticky;
+  top: 0;
+  background: var(--ed-panel-2);
+}
+
+.ed-map-cell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ed-map-muted {
+  color: var(--ed-muted);
+  font-size: 11px;
+}
+
+.ed-map-status {
+  font-size: 11px;
+  color: var(--ed-muted);
+}
+
+.ed-map-status.is-public {
+  color: var(--color-text-success);
+}
+
+.ed-map-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  overflow: visible;
+}
+
+.ed-map-draft {
+  color: var(--ed-accent);
+}
+
+.ed-drawer-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px;
+}
+
+/* ---- help modal + tutorial tour ------------------------------------------------------ */
+
+.ed-help-modal {
+  width: min(640px, 92vw);
+  max-height: 84vh;
+  overflow-y: auto;
+}
+
+.ed-help-section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ed-muted);
+  margin: 14px 0 6px;
+  border-bottom: 1px solid var(--ed-line);
+  padding-bottom: 4px;
+}
+
+.ed-help-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ed-help-list li {
+  margin: 4px 0;
+  font-size: 12px;
+  color: var(--ed-text);
+}
+
+.ed-help-term {
+  color: var(--ed-accent);
+  font-weight: 600;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.ed-help-modal .ed-modal-actions {
+  margin-top: 14px;
+}
+
+/* Highlight ring: the huge shadow dims everything around the anchored region;
+   pointer-events stay off so the UI underneath remains usable. */
+.ed-tour-ring {
+  position: fixed;
+  z-index: 70;
+  border: 2px solid var(--ed-accent);
+  border-radius: 8px;
+  box-shadow: 0 0 0 200vmax rgba(4, 6, 10, 0.55);
+  pointer-events: none;
+  transition:
+    left 160ms ease,
+    top 160ms ease,
+    width 160ms ease,
+    height 160ms ease;
+}
+
+.ed-tour-card {
+  position: fixed;
+  z-index: 71;
+  width: min(340px, 88vw);
+  background: var(--ed-panel);
+  border: 1px solid var(--ed-line-strong);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+}
+
+.ed-tour-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--ed-accent);
+}
+
+.ed-tour-body {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--ed-text);
+}
+
+.ed-tour-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ed-tour-count {
+  color: var(--ed-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.ed-tour-spacer {
+  flex: 1;
+}
+
+/* ---- reduced motion ----------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-toast,
+  .ed-tour-ring,
+  .ed-tour-card,
+  button {
+    transition: none;
+  }
+}
+
+/* ---- narrow viewports ----------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .ed-actions button:not(.primary) {
+    padding: 6px 7px;
+  }
+
+  .ed-inspector {
+    flex-basis: 260px;
+    width: 260px;
+  }
+}
+
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

@@ -21,7 +21,8 @@
       "!**/*.svelte",
       "!**/*.min.js",
       "!docs/design/professions-system",
-      "!docs/design/professions-system.html"
+      "!docs/design/professions-system.html",
+      "!ip-refactor"
     ]
   },
   "formatter": {

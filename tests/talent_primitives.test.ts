@@ -417,7 +417,7 @@ describe('talent primitive P3: empower next', () => {
     expect(p.queuedOnSwingFree).toBeUndefined();
     expect(
       events.some(
-        (e) => e.type === 'damage' && e.sourceId === p.id && e.ability === 'Heroic Strike',
+        (e) => e.type === 'damage' && e.sourceId === p.id && e.ability === 'Reaver Strike',
       ),
     ).toBe(true);
   });

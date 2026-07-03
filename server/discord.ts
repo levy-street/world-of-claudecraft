@@ -18,6 +18,7 @@ import { hashPassword, newToken, offensiveName, validPassword, verifyPassword } 
 import {
   type AccountRow,
   accountById,
+  backfillAccountEmailIfEmpty,
   createAccount,
   findAccount,
   highestCharacterForAccount,
@@ -41,6 +42,7 @@ import {
   loadRewardState,
   peekDiscordPendingLogin,
   setDiscordGuildMember,
+  setDiscordLinkEmail,
   unlinkDiscord,
 } from './discord_db';
 import {
@@ -266,6 +268,18 @@ export async function handleDiscordCallback(
   }
 }
 
+// Seed the account's recovery email from a Discord grant, but only when the
+// account has none yet (never clobbering an owner-set address). A no-op when the
+// grant carried no email. email_verified_at is stamped only for a Discord-verified
+// address. Best-effort: shared by every Discord link/login path.
+async function captureDiscordEmail(
+  accountId: number,
+  email: string | null,
+  verified: boolean,
+): Promise<void> {
+  if (email) await backfillAccountEmailIfEmpty(accountId, email, verified);
+}
+
 // Link an authenticated session's account to the Discord identity.
 async function completeLink(
   res: http.ServerResponse,
@@ -279,12 +293,14 @@ async function completeLink(
     discordUserId: user.id,
     username: discordDisplayName(user),
     avatar: user.avatar,
+    email: user.email,
     guildMember,
   });
   if (!linked) {
     note('discord.link.conflict');
     return bouncePage(res, 409, { ok: false, mode, error: 'already_linked' });
   }
+  await captureDiscordEmail(accountId, user.email, user.emailVerified);
   await grantLinkRewards(accountId, guildMember);
   note('discord.link.success');
   return bouncePage(res, 200, { ok: true, mode, username: discordDisplayName(user) });
@@ -314,6 +330,8 @@ async function completeLogin(
       discordUserId: user.id,
       username: discordDisplayName(user),
       avatar: user.avatar,
+      email: user.email,
+      emailVerified: user.emailVerified,
       guildMember,
       ttlMinutes: PENDING_LOGIN_TTL_MINUTES,
     });
@@ -329,6 +347,10 @@ async function completeLogin(
   // Returning Discord user: keep membership + reward fresh, then mint a session.
   const acct = await accountById(accountId);
   await setDiscordGuildMember(pool, accountId, guildMember);
+  // Re-consent may have just granted the email scope for the first time: capture
+  // it onto the link and seed the account's recovery email if it still has none.
+  await setDiscordLinkEmail(pool, accountId, user.email);
+  await captureDiscordEmail(accountId, user.email, user.emailVerified);
   if (guildMember) await grantGuildReward(accountId);
   note('discord.login.returning');
   const status = await moderationStatusForAccount(accountId);
@@ -381,6 +403,8 @@ export async function handleDiscordLoginNew(
     username: pending.discord_username ?? '',
     globalName: pending.discord_username,
     avatar: pending.discord_avatar,
+    email: pending.discord_email,
+    emailVerified: pending.discord_email_verified,
   };
   try {
     // Defensive: if this Discord id is already linked (a rare double-submit / two-tab
@@ -393,6 +417,7 @@ export async function handleDiscordLoginNew(
         discordUserId: user.id,
         username: discordDisplayName(user),
         avatar: user.avatar,
+        email: user.email,
         guildMember: pending.guild_member,
       });
       if (!linked) {
@@ -411,8 +436,12 @@ export async function handleDiscordLoginNew(
     } else {
       username = (await accountById(accountId))?.username ?? 'player';
       await setDiscordGuildMember(pool, accountId, pending.guild_member);
+      await setDiscordLinkEmail(pool, accountId, user.email);
       if (pending.guild_member) await grantGuildReward(accountId);
     }
+    // Seed the recovery email from the captured Discord address (both a freshly
+    // provisioned account and the race-fallback owner). No-op when it has one.
+    await captureDiscordEmail(accountId, user.email, user.emailVerified);
     const status = await moderationStatusForAccount(accountId);
     if (status.locked) return json(res, 403, { error: status.message });
     const token = await issueDiscordSession(accountId, meta);
@@ -477,9 +506,13 @@ export async function handleDiscordLoginLink(
     discordUserId: consumed.discord_user_id,
     username: consumed.discord_username,
     avatar: consumed.discord_avatar,
+    email: consumed.discord_email,
     guildMember: consumed.guild_member,
   });
   if (!linked) return json(res, 409, { error: 'already_linked' });
+  // Seed the existing account's recovery email from the captured Discord address
+  // if it still has none (never overwrites an owner-set one).
+  await captureDiscordEmail(account.id, consumed.discord_email, consumed.discord_email_verified);
   await grantLinkRewards(account.id, consumed.guild_member);
   note('discord.login.linked_existing');
   const token = await issueDiscordSession(account.id, requestMeta(req));

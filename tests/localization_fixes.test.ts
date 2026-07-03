@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
+import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES } from '../src/sim/data';
 import {
   da_DK,
@@ -476,7 +477,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     'Talents updated.',
     'Talents reset.',
     'You cannot equip that.',
-    'Equipped Worn Shortsword.',
+    'Equipped Pitted Shortsword.',
     'You quaff Minor Healing Potion.',
     'No fish are biting.',
     'You sit down to eat.',
@@ -506,7 +507,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     'Forest Wolf calls for aid!',
     'Discarded Linen Scrap.',
     'Discarded Linen Scrap x3.',
-    'Aki wins Worn Shortsword (87)',
+    'Aki wins Pitted Shortsword (87)',
     'Aki leaves the party.',
     'Aki has left the party.',
     'Aki has been removed from the party.',
@@ -530,7 +531,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
 
   it('localizes embedded item and mob names inside sim text', () => {
     setLanguage('de_DE');
-    expect(localizeSimText('Equipped Worn Shortsword.')).not.toContain('Worn Shortsword');
+    expect(localizeSimText('Equipped Pitted Shortsword.')).not.toContain('Pitted Shortsword');
     expect(localizeSimText('Forest Wolf dies.')).not.toContain('Forest Wolf');
     setLanguage('en');
   });
@@ -540,6 +541,58 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
     expect(localizeSimAuraName('Tamed')).not.toBe('Tamed');
     expect(localizeSimAuraName('not-an-aura')).toBeNull();
+    setLanguage('en');
+  });
+
+  it('every delve mob aura-emitting proc name resolves through the aura matcher', () => {
+    // These five template fields all push a named, player-visible aura (a channel
+    // line, a player debuff, or a target-frame buff). A name with no matcher row
+    // renders raw English in every non-English locale: the exact Litany Pulse /
+    // Web Snare / Silt Hide / Frenzy drift class, which occurred four ways in one
+    // delve. Scan the content records so a rename on either side reddens this.
+    setLanguage('zh_CN');
+    const names: string[] = [];
+    for (const tmpl of Object.values(DELVE_MOBS)) {
+      for (const proc of [
+        tmpl.mendAlly,
+        tmpl.chillOnHit,
+        tmpl.stoneskin,
+        tmpl.wardAllies,
+        tmpl.frenzyOnHit,
+      ]) {
+        if (proc?.name) names.push(proc.name);
+      }
+    }
+    // Pin the scan itself: if a field is renamed in the template type, the scan
+    // silently goes blind without these.
+    expect(names).toContain('Litany Pulse');
+    expect(names).toContain('Web Snare');
+    expect(names).toContain('Silt Hide');
+    expect(names).toContain('Feeding Frenzy');
+    for (const name of names) {
+      expect(localizeSimAuraName(name), `no aura matcher row for '${name}'`).not.toBeNull();
+    }
+    // De-aliasing: Silt Hide and Silt Ward are distinct auras with distinct keys.
+    expect(localizeSimAuraName('Silt Hide')).not.toBe(localizeSimAuraName('Silt Ward'));
+    setLanguage('en');
+  });
+
+  it('helper-returned pet error strings resolve through the matcher (the S3 scanner cannot see them)', () => {
+    // noPetError (src/sim/pet/pet_commands.ts) builds its string inside a ternary,
+    // and the delve arm 'Pets are not allowed inside the delves.' is a literal in
+    // the HELPER, never a direct ctx.error(...) argument. The S3 emit scanner only
+    // enumerates literals at the emit call site, so it is structurally blind to
+    // these: pin them here explicitly so a future delve pet-error added the same
+    // way still needs a matcher row.
+    setLanguage('es');
+    for (const emitted of [
+      'You have no pet.',
+      'You have no living pet.',
+      'You have no living demon.',
+      'Pets are not allowed inside the delves.',
+    ]) {
+      expect(localizeSimText(emitted), `no sim matcher row for '${emitted}'`).not.toBe(emitted);
+    }
     setLanguage('en');
   });
 });
@@ -820,6 +873,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
+    // DL1: Drowned Litany boss/rite/rooms emit surfaces.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_boss.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rite.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rooms.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market.ts'), 'utf8'),
     // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).
     // The "Discarded"/"Equipped"/"Unequipped"/"You sit down to eat|drink"/"You quaff"/

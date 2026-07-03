@@ -14,8 +14,10 @@
 // at the emit site (the S3 i18n guard scans this file + chat_readouts.ts).
 
 import { type AssistCandidate, resolveAssist } from '../assist';
+import { GATHERING_PROFESSIONS } from '../content/professions';
 import { CLASSES, ITEMS, zoneAt } from '../data';
 import { graveyardReadout } from '../entity_roster';
+import { isGatheringProfessionId, queueGatheringGrant } from '../professions/gathering';
 import {
   type AwayStatus,
   JOINABLE_CHANNELS,
@@ -140,8 +142,10 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   }
 
   if (ctx.devCommands) {
+    // null means "handled, nothing to broadcast": returning it here is what
+    // keeps a dev command from falling through to the unknown-command error.
     const devHandled = handleDevChat(ctx, raw, r.meta.entityId);
-    if (devHandled !== undefined && devHandled !== null) return devHandled;
+    if (devHandled !== undefined) return devHandled;
   }
 
   if (/^\/who(?:\s|$)/i.test(raw)) {
@@ -235,7 +239,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   }
 
   // "/inspect name" — self-only readout of another online player's level,
-  // class, and health. The first cross-player readout; mirrors WoW's Inspect.
+  // class, and health. The first cross-player readout; a classic-style Inspect.
   const im = /^\/(?:inspect|ins|examine)(?:\s+([\s\S]+))?$/i.exec(raw);
   if (im) {
     const targetName = (im[1] ?? '').trim();
@@ -270,6 +274,46 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       return null;
     }
     ctx.error(r.meta.entityId, inspectReadout(target, te));
+    return null;
+  }
+
+  // "/invite name" — invite a player to your party by name, regardless of
+  // distance (party invites have no proximity check, unlike trade/duel). Name
+  // resolution mirrors /inspect (exact, then unambiguous case-insensitive); all
+  // party validation is delegated to partyInvite. (No "/inv" alias — that is
+  // /inventory.)
+  const invm = /^\/invite(?:\s+([\s\S]+))?$/i.exec(raw);
+  if (invm) {
+    const targetName = (invm[1] ?? '').trim();
+    if (!targetName) {
+      ctx.error(r.meta.entityId, 'Invite whom? Usage: /invite <name>.');
+      return null;
+    }
+    let target: PlayerMeta | null = null;
+    const ciMatches: PlayerMeta[] = [];
+    const wanted = targetName.toLowerCase();
+    for (const meta of ctx.players.values()) {
+      if (meta.name === targetName) {
+        target = meta;
+        break;
+      }
+      if (meta.name.toLowerCase() === wanted) ciMatches.push(meta);
+    }
+    if (!target) {
+      if (ciMatches.length === 1) target = ciMatches[0];
+      else if (ciMatches.length > 1) {
+        ctx.error(
+          r.meta.entityId,
+          `Several players match '${targetName}'. Use exact capitalization.`,
+        );
+        return null;
+      }
+    }
+    if (!target) {
+      ctx.error(r.meta.entityId, `There is no player named '${targetName}' online.`);
+      return null;
+    }
+    ctx.partyInvite(target.entityId, r.meta.entityId);
     return null;
   }
 
@@ -465,7 +509,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
   if (/^\/(?:combo|cp|combopoints)(?:\s|$)/i.test(raw)) {
-    ctx.error(r.meta.entityId, readouts.comboReadout(ctx, r.e));
+    ctx.error(r.meta.entityId, readouts.comboReadout(r.e));
     return null;
   }
   if (/^\/(?:combat|cb|incombat)(?:\s|$)/i.test(raw)) {
@@ -588,7 +632,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         return { channel: 'whisper', message: msg };
       }
     }
-    // classic-WoW "/r": the recipient's reply target is whoever last
+    // classic-style "/r": the recipient's reply target is whoever last
     // whispered them, so record it on the target (not the sender).
     target.lastWhisperFrom = r.meta.name;
     // The recipient's copy of the whisper. A dev bot ("/dev bot") has no owning
@@ -832,6 +876,16 @@ export function handleDevChat(
     ctx.addItem(itemId, count, pid);
     return null;
   }
+  const goldM = /^\/(?:dev\s+gold|devgold)\s+(\d+)\s*$/i.exec(raw);
+  if (goldM) {
+    const gold = Math.max(1, Math.min(100000, Number(goldM[1])));
+    const meta = ctx.players.get(pid);
+    if (meta) {
+      meta.copper += gold * 10000;
+      ctx.emit({ type: 'log', text: `[dev] Added ${gold}g to your purse.`, pid });
+    }
+    return null;
+  }
   const questM = /^\/(?:dev\s+quest|devquest)\s+(\S+)\s*$/i.exec(raw);
   if (questM) {
     ctx.completeQuestForDev(questM[1], pid);
@@ -840,6 +894,21 @@ export function handleDevChat(
   const questAllM = /^\/(?:dev\s+(?:quests|questall)|devquestall)\s*$/i.exec(raw);
   if (questAllM) {
     ctx.completeCurrentQuestsForDev(pid);
+    return null;
+  }
+  const gatherM = /^\/(?:dev\s+gather|devgather)\s+(\S+)(?:\s+(\d+))?\s*$/i.exec(raw);
+  if (gatherM) {
+    const professionId = gatherM[1].toLowerCase();
+    const amount = Math.max(1, Math.min(100, Number(gatherM[2] ?? 1)));
+    if (!isGatheringProfessionId(professionId)) {
+      ctx.error(
+        pid,
+        `[dev] Unknown gathering profession '${professionId}'. Options: ${Object.keys(GATHERING_PROFESSIONS).join(', ')}.`,
+      );
+      return null;
+    }
+    const meta = ctx.players.get(pid);
+    if (meta) queueGatheringGrant(meta, professionId, amount);
     return null;
   }
   const botM = /^\/(?:dev\s+bot|devbot)\s+(\S+)\s*$/i.exec(raw);
@@ -854,10 +923,18 @@ export function handleDevChat(
     else ctx.emit({ type: 'log', text: okText, pid });
     return null;
   }
+  if (/^\/(?:dev\s+(?:kill|die|suicide)|devkill)\s*$/i.test(raw)) {
+    // [dev] Instant self-kill for testing the death/ghost loop: routes through the real
+    // death teardown (handleDeath), so the death overlay, corpse, and The Keeper's Toll
+    // persistence all behave exactly as a combat death.
+    const e = ctx.entities.get(pid);
+    if (e && !e.dead) ctx.handleDeath(e, null);
+    return null;
+  }
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev quest questId, /dev quests, /dev bot name',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev gather professionId [amount], /dev bot name, /dev kill',
     );
     return null;
   }
@@ -959,7 +1036,7 @@ export function helpLines(): string[] {
   return [
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
+    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /afk, /dnd, /who.',
     'Character readouts: /played, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',
     'Combat readouts: /target, /targetbuffs, /range, /attack, /casting, /combat, /threat, /consider, /combo, /overpower.',

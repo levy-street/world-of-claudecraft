@@ -16,6 +16,7 @@ import {
   LAKE,
   MOBS,
   NPCS,
+  PROPS,
   QUESTS,
   zoneAt,
   zoneWelcomeText,
@@ -162,7 +163,7 @@ describe('collision & terrain', () => {
     for (const e of sim.entities.values()) {
       if (e.kind !== 'mob') continue;
       const h = groundHeight(e.pos.x, e.pos.z, SEED);
-      const canWade = MOBS[e.templateId].family === 'murloc' || MOBS[e.templateId].canSwim;
+      const canWade = MOBS[e.templateId].family === 'mudfin' || MOBS[e.templateId].canSwim;
       const min = canWade ? WATER_LEVEL - 0.55 : WATER_LEVEL + 0.35;
       expect(h, `${e.name} at ${e.pos.x.toFixed(0)},${e.pos.z.toFixed(0)}`).toBeGreaterThan(min);
     }
@@ -627,7 +628,7 @@ describe('boss loot and encounter resets', () => {
     expect(mob.loot).toBeNull();
   });
 
-  it('poor and common corpse drops are looted directly by the looter without need-greed rolls', () => {
+  it('poor and common corpse drops are awarded directly (round-robin) without need-greed rolls', () => {
     const sim = makeSim();
     const a = sim.playerId;
     const b = sim.addPlayer('mage', 'Bert');
@@ -651,10 +652,14 @@ describe('boss loot and encounter resets', () => {
     sim.events.length = 0;
     sim.lootCorpse(mob.id, a);
 
+    // Both drops are auto-awarded (no roll), but the default common-item
+    // strategy is round-robin, not looter-takes-all: the cursor advances once
+    // per item, so the two drops spread across the party rather than both
+    // landing on the looter.
     expect(sim.countItem('wolf_fang', a)).toBe(1);
-    expect(sim.countItem('raw_mirror_trout', a)).toBe(1);
+    expect(sim.countItem('raw_mirror_trout', b)).toBe(1);
     expect(sim.countItem('wolf_fang', b)).toBe(0);
-    expect(sim.countItem('raw_mirror_trout', b)).toBe(0);
+    expect(sim.countItem('raw_mirror_trout', a)).toBe(0);
     const prompts = sim.events.filter((e) => e.type === 'lootRoll');
     expect(prompts).toHaveLength(0);
     expect(mob.loot).toBeNull();
@@ -1836,6 +1841,23 @@ describe('spell visuals', () => {
 
     expect(p.castingAbility).toBe('fireball');
     expect(events.some((e) => e.type === 'castStart' && e.ability === 'fireball')).toBe(true);
+  });
+
+  it('a LOW prop (campfire) no longer blocks spell line of sight, buildings still do', () => {
+    const sim = makeSim('mage');
+    const seed = sim.cfg.seed;
+    // Straddle a world campfire: its collider sits on the ray (it still blocks
+    // MOVEMENT below), but its visual top (1.45) is under the eye line (1.6),
+    // so the cast sees straight over it.
+    const [cx, cz] = PROPS.campfires[0];
+    expect(isBlocked(seed, cx, cz, 0.5)).toBe(true); // movement still collides
+    expect(lineOfSightClear(seed, { x: cx - 3, z: cz }, { x: cx + 3, z: cz })).toBe(true);
+    // A building straddled through its center still blocks (top far above eyes).
+    const b = PROPS.buildings[0];
+    const span = b.w + b.d;
+    expect(lineOfSightClear(seed, { x: b.x - span, z: b.z }, { x: b.x + span, z: b.z })).toBe(
+      false,
+    );
   });
 
   it('ranged auto shot does not fire through dungeon walls', () => {

@@ -66,6 +66,12 @@ export interface DailyRewardDb {
   tasksForType(day: string, type: string): Promise<DailyRewardTaskRow[]>;
   scoreForAccount(day: string, accountId: number): Promise<number>;
   onlineMinutesForAccount(day: string, accountId: number): Promise<number>;
+  questTaskCompletionCount(
+    day: string,
+    accountId: number,
+    taskId: string,
+    questId: string,
+  ): Promise<number>;
   rankForAccount(day: string, accountId: number): Promise<number | null>;
   leaderboard(day: string, accountId: number, limit: number): Promise<DailyRewardScoreRow[]>;
   leaderboardRowForAccount(day: string, accountId: number): Promise<DailyRewardScoreRow | null>;
@@ -283,6 +289,26 @@ export class PgDailyRewardDb implements DailyRewardDb {
       [day, REALM, accountId],
     );
     return Number(res.rows[0]?.minutes ?? 0);
+  }
+
+  async questTaskCompletionCount(
+    day: string,
+    accountId: number,
+    taskId: string,
+    questId: string,
+  ): Promise<number> {
+    const res = await pool.query(
+      `SELECT COUNT(*) AS completions
+         FROM daily_reward_events
+        WHERE day = $1
+          AND realm = $2
+          AND account_id = $3
+          AND kind = 'task'
+          AND meta->>'taskId' = $4
+          AND meta->>'questId' = $5`,
+      [day, REALM, accountId, taskId, questId],
+    );
+    return Number(res.rows[0]?.completions ?? 0);
   }
 
   async rankForAccount(day: string, accountId: number): Promise<number | null> {

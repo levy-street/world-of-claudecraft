@@ -602,7 +602,7 @@ export function startNythraxisTransition(
   for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
     ctx.applyAura(e, {
       id: 'nythraxis_transition_stun',
-      name: 'War Stomp',
+      name: 'Shuddering Stomp',
       kind: 'stun',
       remaining: NYTHRAXIS_TRANSITION_STUN,
       duration: NYTHRAXIS_TRANSITION_STUN,
@@ -613,7 +613,7 @@ export function startNythraxisTransition(
   }
   ctx.applyAura(boss, {
     id: 'nythraxis_transition_pause',
-    name: 'War Stomp',
+    name: 'Shuddering Stomp',
     kind: 'stun',
     remaining: NYTHRAXIS_TRANSITION_STUN,
     duration: NYTHRAXIS_TRANSITION_STUN,

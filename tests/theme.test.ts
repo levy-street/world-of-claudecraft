@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import {
-  DEFAULT_THEME,
-  PRESET_ORDER,
-  THEME_KNOB_ORDER,
-  THEME_PRESETS,
   contrastRatio,
+  DEFAULT_THEME,
   ensureReadable,
   isValidHex,
   mixHex,
+  PRESET_ORDER,
   parseTheme,
   relativeLuminance,
   resolveTheme,
   rgba,
   serializeTheme,
+  THEME_KNOB_ORDER,
+  THEME_PRESETS,
   themeCssVars,
 } from '../src/ui/theme';
 
@@ -22,7 +22,7 @@ function wcagContrast(a: string, b: string): number {
   const lum = (hex: string) => {
     const ch = (i: number) => {
       const cs = parseInt(hex.slice(i, i + 2), 16) / 255;
-      return cs <= 0.03928 ? cs / 12.92 : Math.pow((cs + 0.055) / 1.055, 2.4);
+      return cs <= 0.03928 ? cs / 12.92 : ((cs + 0.055) / 1.055) ** 2.4;
     };
     return 0.2126 * ch(1) + 0.7152 * ch(3) + 0.0722 * ch(5);
   };
@@ -104,6 +104,18 @@ describe('theme pure core', () => {
     }
   });
 
+  it('High-Contrast Text outline flips to the opposite side of the panel lightness', () => {
+    for (const id of PRESET_ORDER) {
+      const vars = themeCssVars(resolveTheme({ preset: id, custom: {} }));
+      const panelIsLight = relativeLuminance(vars['--panel-base']) > 0.4;
+      const outlineIsLight = relativeLuminance(vars['--text-outline-color']) > 0.4;
+      // A light panel (Parchment) has dark body text, so the halo must be light
+      // to separate from the glyph instead of blurring into it; a dark panel is
+      // the reverse. Regression test for issue #1081.
+      expect(outlineIsLight, `${id} outline vs panel`).toBe(panelIsLight);
+    }
+  });
+
   it('overlay text token stays light regardless of preset (it floats over the world)', () => {
     for (const id of PRESET_ORDER) {
       const vars = themeCssVars(resolveTheme({ preset: id, custom: {} }));
@@ -114,7 +126,10 @@ describe('theme pure core', () => {
   });
 
   it('custom-override guard repairs a white-on-white text/panel pair', () => {
-    const knobs = resolveTheme({ preset: 'classic', custom: { text: '#ffffff', panel: '#ffffff' } });
+    const knobs = resolveTheme({
+      preset: 'classic',
+      custom: { text: '#ffffff', panel: '#ffffff' },
+    });
     expect(knobs.panel).toBe('#ffffff');
     // text must have been pulled away from white to clear AA on the white panel.
     expect(knobs.text).not.toBe('#ffffff');
@@ -122,7 +137,10 @@ describe('theme pure core', () => {
   });
 
   it('custom-override guard repairs black-on-black too', () => {
-    const knobs = resolveTheme({ preset: 'midnight', custom: { text: '#000000', panel: '#000000' } });
+    const knobs = resolveTheme({
+      preset: 'midnight',
+      custom: { text: '#000000', panel: '#000000' },
+    });
     expect(wcagContrast(knobs.text, knobs.panel)).toBeGreaterThanOrEqual(4.5);
   });
 

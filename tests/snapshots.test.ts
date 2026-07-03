@@ -7,6 +7,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
@@ -39,6 +40,7 @@ const DELTA_KEYS = [
   'party',
   'trade',
   'duel',
+  'corpse',
 ];
 
 interface FakeClient {
@@ -355,7 +357,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade); widened to all 25
+    // first snapshot (even the null-valued ones like party/trade); widened to all 26
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -418,7 +420,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     // This single-tick test stays on the decay-safe subset: cds and the timer-backed
     // keys (delve/arena timers, delveDaily) can re-emit after a real sim.tick(), so the
-    // widened all-25 omission is proven by the no-op re-broadcast test instead.
+    // widened all-26 omission is proven by the no-op re-broadcast test instead.
     for (const key of DELTA_KEYS) {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
@@ -480,7 +482,7 @@ describe('delta snapshots', () => {
     expect(row.auras).toContainEqual(
       expect.objectContaining({
         id: 'travel_form',
-        name: 'Travel Form',
+        name: 'Fleet Form',
         kind: 'form_travel',
         value: 1.4,
       }),
@@ -768,7 +770,7 @@ describe('delta snapshots', () => {
     joinServer(server, fc2, 2, 'Testb');
     broadcast(server);
     const snapNew = lastSnap(fc2.sent);
-    // a fresh session always receives the full self state: all 25 delta keys
+    // a fresh session always receives the full self state: all 26 delta keys
     for (const key of ALL_DELTA_KEYS) {
       expect(snapNew.self, `self.${key} missing for fresh session`).toHaveProperty(key);
     }
@@ -1254,7 +1256,7 @@ describe('client-side delta merge', () => {
     }
   });
 
-  it('reconstructs stacking-debuff stack counts from the wire (Sunder Armor)', () => {
+  it('reconstructs stacking-debuff stack counts from the wire (Armor Shear)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       ents: [
@@ -1273,7 +1275,7 @@ describe('client-side delta merge', () => {
           auras: [
             {
               id: 'sunder_armor',
-              name: 'Sunder Armor',
+              name: 'Armor Shear',
               kind: 'sunder',
               rem: 30,
               dur: 30,
@@ -1287,7 +1289,7 @@ describe('client-side delta merge', () => {
     expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
   });
 
-  it('reconstructs charge-limited aura charges from the wire (Lightning Shield)', () => {
+  it('reconstructs charge-limited aura charges from the wire (Thunder Ward)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       ents: [
@@ -1306,7 +1308,7 @@ describe('client-side delta merge', () => {
           auras: [
             {
               id: 'lightning_shield',
-              name: 'Lightning Shield',
+              name: 'Thunder Ward',
               kind: 'thorns',
               rem: 600,
               dur: 600,
@@ -1815,24 +1817,26 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // ---------------------------------------------------------------------------
 // W0a: full self-snapshot delta round-trip gate.
 //
-// `selfWireJson` (server/game.ts) emits 25 heavy "delta" fields through a
+// `selfWireJson` (server/game.ts) emits 26 heavy "delta" fields through a
 // `maybe(key, value)` closure that ships a key only when its serialized form
 // changed since this session last received it; `applySnapshot` (src/net/
 // online.ts) mirrors each with `if (s.X !== undefined)` (or the inline
 // `s.X ?? e.X` form for `stats`/`weapon`). This is the single most fragile codec
-// in the workstream, so we pin: (a) the exact 25-key set against drift, (b) the
+// in the workstream, so we pin: (a) the exact 26-key set against drift, (b) the
 // terse-key -> IWorld-name rename map, (c) that every dirtied value round-trips
-// onto the correct decode target, and (d) that a no-op re-broadcast omits all 25
+// onto the correct decode target, and (d) that a no-op re-broadcast omits all 28
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 25 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 28 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
-// 26th unregistered delta key reddens this gate.
+// 29th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
+  'bags',
   'buyback',
   'cds',
+  'corpse',
   'cosmetics',
   'dclears',
   'dcomp',
@@ -1845,10 +1849,13 @@ const ALL_DELTA_KEYS = [
   'inv',
   'lockouts',
   'lroll',
+  'mail',
+  'mailU',
   'market',
   'marks',
   'milestones',
   'party',
+  'prof',
   'qdone',
   'qlog',
   'stats',
@@ -1866,6 +1873,7 @@ const ALL_DELTA_KEYS = [
 // keep their name; tal fans out to several members and is asserted directly).
 const TERSE_TO_IWORLD: Record<string, string> = {
   arena: 'arenaInfo',
+  bags: 'bags',
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
@@ -1880,12 +1888,15 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   lockouts: 'selfLockouts',
   lroll: 'lootRollPrompts',
   lxp: 'lifetimeXp',
+  mail: 'mailInfo',
+  mailU: 'mailUnread',
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
   mres: 'maxResource',
   party: 'partyInfo',
   prk: 'prestigeRank',
+  prof: 'professionsState',
   qdone: 'questsDone',
   qlog: 'questLog',
   res: 'resource',
@@ -1946,6 +1957,11 @@ function dirtyEveryDeltaField(): {
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
   const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
+  // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
+  // player. `mailU` is already non-zero: every fresh character got the one-time
+  // Ravenpost welcome letter (delay 0) at join.
+  const mailbox = sim.entities.get(sim.postOffice.mailboxIds[0]);
+  if (mailbox) mailbox.pos = { ...p.pos };
 
   // Direct PlayerMeta fields.
   meta.inventory = [{ itemId: 'baked_bread', count: 3 }];
@@ -1961,6 +1977,7 @@ function dirtyEveryDeltaField(): {
   meta.delveMarks = 7;
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
+  meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
   meta.talentMods.spec = 'arms';
@@ -1979,6 +1996,9 @@ function dirtyEveryDeltaField(): {
   p.weapon = { ...p.weapon, min: 999 };
   p.resource = 42;
   p.maxResource = 150;
+  // corpse: the ghost-run body marker (self-only delta). Non-null = a ghost with a
+  // body to run back to; the encoder reads p.corpsePos via maybe('corpse', ...).
+  p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
 
   // Trade / duel / loot-roll: poke the exact collections the encoder reads.
   sim.trades.set(lp, {
@@ -2064,6 +2084,13 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
     expect(client.companionUpgrades).toEqual({ companion_tessa: 2 }); // dcomp -> companionUpgrades
+    expect(client.professionsState).toEqual({
+      skills: [
+        { professionId: 'mining', skill: 6, maxSkill: 300 },
+        { professionId: 'logging', skill: 0, maxSkill: 300 },
+        { professionId: 'herbalism', skill: 0, maxSkill: 300 },
+      ],
+    }); // prof -> professionsState
     expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
     expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
     // tal -> talents / talentSpec / loadouts / activeLoadout
@@ -2114,9 +2141,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 25 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(25);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(25);
+  it('ALL_DELTA_KEYS contains exactly 30 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(30);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(30);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2128,7 +2155,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(25);
+    expect(scraped.size).toBe(30);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2222,7 +2249,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   });
 
   it('sends a POSITIVE buff value so its tooltip shows the real magnitude, still a buff in both worlds', () => {
-    const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Arcane Intellect' };
+    const buff: Aura = { ...sapInt(40), id: 'arcane_intellect', name: 'Aether Insight' };
     const { wire, mirror } = roundTrip(buff);
     expect(wireAura(wire, 'arcane_intellect').value).toBe(40); // rides the wire now (was omitted)
     expect(mirror.value).toBe(40); // client mirrors the real magnitude (not the old hardcoded 0)
@@ -2233,7 +2260,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   it('sends a POSITIVE absorb value so the shield overlay and tooltip work online too', () => {
     const shield: Aura = {
       id: 'power_word_shield',
-      name: 'Power Word: Shield',
+      name: 'Psalm of Warding',
       kind: 'absorb',
       remaining: 12,
       duration: 12,
@@ -2256,7 +2283,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     // harmless. Classification stays KIND-based (DEBUFF_AURA_KINDS), identical in both worlds.
     const fear: Aura = {
       id: 'fear',
-      name: 'Fear',
+      name: 'Harrow',
       kind: 'incapacitate',
       remaining: 4,
       duration: 4,
@@ -2272,12 +2299,12 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(isAuraDebuff(mirror)).toBe(true);
   });
 
-  it('round-trips Aspect of the Hawk so its tooltip shows the real attack power, not 0 (the bug)', () => {
-    // The reported bug: online, Aspect of the Hawk read "Increases attack power by 0" because the
+  it("round-trips Harrier's Guise so its tooltip shows the real attack power, not 0 (the bug)", () => {
+    // The reported bug: online, Harrier's Guise read "Increases attack power by 0" because the
     // positive buff_ap magnitude never rode the wire. It now does, so offline == online.
     const hawk: Aura = {
       id: 'aspect_of_the_hawk',
-      name: 'Aspect of the Hawk',
+      name: "Harrier's Guise",
       kind: 'buff_ap',
       remaining: 1800,
       duration: 1800,
@@ -2297,7 +2324,7 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
   it('round-trips a dot magnitude, tick cadence, and non-physical school for its tooltip', () => {
     const dot: Aura = {
       id: 'corruption',
-      name: 'Corruption',
+      name: 'Blackrot',
       kind: 'dot',
       remaining: 12,
       duration: 12,
@@ -2382,7 +2409,7 @@ describe('aura decode reuses records across snapshots (allocation fast path)', (
     void pid;
     mob.auras.push({
       id: 'corruption',
-      name: 'Corruption',
+      name: 'Blackrot',
       kind: 'dot',
       remaining: 12,
       duration: 12,
@@ -2462,7 +2489,7 @@ describe('aura decode fast-path guards (composition edge cases)', () => {
     mob.auras.push(
       {
         id: 'corruption',
-        name: 'Corruption',
+        name: 'Blackrot',
         kind: 'dot',
         remaining: 12,
         duration: 12,
@@ -2517,5 +2544,36 @@ describe('aura decode fast-path guards (composition edge cases)', () => {
     expect(client.entities.get(mobId)!.auras[0]).toBe(rec); // fast path taken
     expect(rec.stacks).toBeUndefined(); // not a stale 3
     expect(rec.value2).toBeUndefined(); // not a stale 8
+  });
+});
+
+describe('entity-anchored world event scoping', () => {
+  it('delivers delveRitePulse to sessions near its entityId anchor and not to far ones', () => {
+    // The rite pulse is a world event with no pid; eventAnchor must resolve its
+    // entityId to the shrine position and interest-scope delivery (EVENT_RADIUS).
+    // Pre-fix the field was shrineId, which eventAnchor did not recognize, so
+    // the pulse broadcast realm-wide and closed rite popups in unrelated runs.
+    const server = new GameServer();
+    const near = fakeWs();
+    const far = fakeWs();
+    const sNear = joinServer(server, near, 1, 'Nearena');
+    const sFar = joinServer(server, far, 2, 'Faraway');
+    const nearEnt = server.sim.entities.get(sNear.pid)!;
+    const farEnt = server.sim.entities.get(sFar.pid)!;
+    farEnt.pos.x = nearEnt.pos.x + 500;
+    farEnt.pos.z = nearEnt.pos.z + 500;
+    near.sent.length = 0;
+    far.sent.length = 0;
+    // Anchor on the near player's own entity: eventAnchor only reads a live
+    // entity's position, so any resolvable id pins the scoping semantics.
+    (server as any).routeEvents([
+      { type: 'delveRitePulse', entityId: nearEnt.id, shrineKind: 'rite_shrine_bell' },
+    ]);
+    const pulses = (fc: ReturnType<typeof fakeWs>) =>
+      fc.sent
+        .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
+        .filter((ev: { type: string }) => ev.type === 'delveRitePulse');
+    expect(pulses(near)).toHaveLength(1);
+    expect(pulses(far)).toHaveLength(0);
   });
 });

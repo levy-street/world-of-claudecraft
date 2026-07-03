@@ -50,7 +50,7 @@ describe('buildAuthorizeUrl', () => {
     expect(url.searchParams.get('redirect_uri')).toBe(
       'https://worldofclaudecraft.com/api/auth/discord/callback',
     );
-    expect(url.searchParams.get('scope')).toBe('identify guilds');
+    expect(url.searchParams.get('scope')).toBe('identify email guilds');
     expect(url.searchParams.get('state')).toBe('nonce-abc');
     expect(url.searchParams.get('code_challenge')).toBe('chal');
     expect(url.searchParams.get('code_challenge_method')).toBe('S256');
@@ -97,9 +97,62 @@ describe('response parsers', () => {
         global_name: 'Nelly',
         avatar: 'abc',
       }),
-    ).toEqual({ id: '80351110224678912', username: 'nelly', globalName: 'Nelly', avatar: 'abc' });
+    ).toEqual({
+      id: '80351110224678912',
+      username: 'nelly',
+      globalName: 'Nelly',
+      avatar: 'abc',
+      email: null,
+      emailVerified: false,
+    });
     expect(parseDiscordUser({ id: 'not-a-snowflake', username: 'x' })).toBeNull();
     expect(parseDiscordUser({})).toBeNull();
+  });
+
+  it('captures a verified email from the email scope', () => {
+    const user = parseDiscordUser({
+      id: '80351110224678912',
+      username: 'nelly',
+      email: 'nelly@example.com',
+      verified: true,
+    });
+    expect(user?.email).toBe('nelly@example.com');
+    expect(user?.emailVerified).toBe(true);
+  });
+
+  it('keeps an unverified Discord email but does not mark it verified', () => {
+    const user = parseDiscordUser({
+      id: '80351110224678912',
+      username: 'nelly',
+      email: 'nelly@example.com',
+      verified: false,
+    });
+    expect(user?.email).toBe('nelly@example.com');
+    expect(user?.emailVerified).toBe(false);
+  });
+
+  it('drops a missing or malformed Discord email (email scope not granted)', () => {
+    // No email field (scope not granted): email is null, never verified.
+    const noScope = parseDiscordUser({ id: '80351110224678912', username: 'nelly' });
+    expect(noScope?.email).toBeNull();
+    expect(noScope?.emailVerified).toBe(false);
+    // A malformed address is rejected even if `verified` is true.
+    const bad = parseDiscordUser({
+      id: '80351110224678912',
+      username: 'nelly',
+      email: 'not-an-email',
+      verified: true,
+    });
+    expect(bad?.email).toBeNull();
+    expect(bad?.emailVerified).toBe(false);
+    // An over-254-char address is rejected (parity with the account validator cap).
+    const tooLong = parseDiscordUser({
+      id: '80351110224678912',
+      username: 'nelly',
+      email: `${'a'.repeat(250)}@example.com`,
+      verified: true,
+    });
+    expect(tooLong?.email).toBeNull();
   });
 
   it('prefers the global display name over the legacy username', () => {
@@ -126,9 +179,17 @@ describe('response parsers', () => {
 });
 
 describe('auto-join (guilds.join)', () => {
-  it('requests guilds.join only when auto-join is enabled', () => {
-    expect(discordScopes({ autoJoin: false })).toEqual(['identify', 'guilds']);
-    expect(discordScopes({ autoJoin: true })).toEqual(['identify', 'guilds', 'guilds.join']);
+  it('always requests the email scope, and guilds.join only when auto-join is enabled', () => {
+    expect(discordScopes({ autoJoin: false })).toEqual(['identify', 'email', 'guilds']);
+    expect(discordScopes({ autoJoin: true })).toEqual([
+      'identify',
+      'email',
+      'guilds',
+      'guilds.join',
+    ]);
+    // The email scope is present in both scope sets so every OAuth flow can capture it.
+    expect(discordScopes({ autoJoin: false })).toContain('email');
+    expect(DISCORD_SCOPES_WITH_JOIN).toContain('email');
     expect(DISCORD_SCOPES_WITH_JOIN).toContain(GUILD_JOIN_SCOPE);
   });
 
@@ -142,7 +203,13 @@ describe('auto-join (guilds.join)', () => {
         scopes: discordScopes({ autoJoin: true }),
       }),
     );
-    expect(url.searchParams.get('scope')).toBe('identify guilds guilds.join');
+    expect(url.searchParams.get('scope')).toBe('identify email guilds guilds.join');
+  });
+
+  it('detects the email scope in the granted-scope string (re-consent capture gate)', () => {
+    expect(grantedScope('identify email guilds', 'email')).toBe(true);
+    // A pre-email link (granted before the scope existed) reads as NOT granting email.
+    expect(grantedScope('identify guilds', 'email')).toBe(false);
   });
 
   it('detects a granted scope in the space-separated token scope string', () => {

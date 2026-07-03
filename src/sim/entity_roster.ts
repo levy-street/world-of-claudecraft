@@ -20,8 +20,9 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { dungeonAt, isDelvePos, zoneAt } from './data';
+import { dungeonAt, zoneAt } from './data';
 import { recalcPlayerStats } from './entity';
+import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
 import type { Entity, SimEvent, Vec3 } from './types';
 import { CAST_COMPLETE_EPS, DT } from './types';
@@ -156,39 +157,9 @@ export function tickGroundAoEs(ctx: SimContext): void {
 // Player death / respawn
 // -------------------------------------------------------------------------
 
-export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
-  const r = ctx.resolve(pid);
-  if (!r) return;
-  const { meta, e: p } = r;
-  if (!p.dead) return;
-  if (ctx.arenaMatches.has(p.id)) return;
-  if (isDelvePos(p.pos.x)) {
-    releaseSpiritInDelve(ctx, meta.entityId);
-    return;
-  }
-  p.dead = false;
-  // dying in a dungeon sends you to the graveyard of the zone its door is
-  // in; dying outdoors, to your current zone's graveyard
-  const dungeon = dungeonAt(p.pos.x);
-  const graveyard = zoneAt(dungeon ? dungeon.doorPos.z : p.pos.z).graveyard;
-  p.pos = ctx.groundPos(graveyard.x, graveyard.z);
-  p.prevPos = { ...p.pos };
-  rebucketEntity(ctx, p);
-  p.facing = 0;
-  p.auras = [];
-  p.ccDr.clear();
-  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta));
-  p.hp = p.maxHp;
-  p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
-  p.targetId = null;
-  p.autoAttack = false;
-  p.queuedOnSwing = null;
-  delete p.queuedOnSwingFree;
-  p.combatTimer = 99;
-  p.inCombat = false;
-  ctx.emit({ type: 'respawn', pid: meta.entityId });
-}
-
+// The outdoor/dungeon release-spirit flow MOVED to src/sim/spirit.ts (the WoW-style
+// ghost loop). The in-delve respawn stays here (delves keep their own bounded
+// death rules) and spirit.ts calls into it for delve positions.
 export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r?.e.dead) return;
@@ -208,7 +179,9 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.prevPos = { ...entry };
   rebucketEntity(ctx, p);
   p.facing = 0;
-  p.auras = [];
+  // The Keeper's Toll persists through a delve death too (see resurrection.ts); every
+  // other aura clears on respawn.
+  p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
   recalcPlayerStats(p, r.meta.cls, r.meta.equipment, r.meta.talentMods);
   p.hp = Math.max(1, Math.round(p.maxHp * 0.5));

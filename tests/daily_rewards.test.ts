@@ -76,6 +76,17 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async onlineMinutesForAccount(): Promise<number> {
     return this.events.filter((event) => event.kind === 'online').length;
   }
+  async questTaskCompletionCount(
+    _day: string,
+    _accountId: number,
+    taskId: string,
+    questId: string,
+  ): Promise<number> {
+    return this.events.filter(
+      (event) =>
+        event.kind === 'task' && event.meta.taskId === taskId && event.meta.questId === questId,
+    ).length;
+  }
   async rankForAccount(): Promise<number | null> {
     return this.score > 0 ? 1 : null;
   }
@@ -323,16 +334,53 @@ describe('daily rewards', () => {
         new Date(`2026-06-30T12:${String(minute).padStart(2, '0')}:00.000Z`),
       );
     }
-    await service.recordQuestCompletion(1, 'wolf_hunt', new Date('2026-06-30T13:00:00.000Z'));
-    await service.recordQuestCompletion(1, 'wolf_hunt', new Date('2026-06-30T13:01:00.000Z'));
+    await service.recordQuestCompletion(1, 101, 'wolf_hunt', new Date('2026-06-30T13:00:00.000Z'));
+    await service.recordQuestCompletion(1, 102, 'wolf_hunt', new Date('2026-06-30T13:01:00.000Z'));
     const taskEvents = db.events.filter((event) => event.kind === 'task');
-    expect(taskEvents).toHaveLength(1);
+    expect(taskEvents).toHaveLength(2);
     expect(taskEvents[0]).toMatchObject({
       points: 30,
-      key: 'task:quest_completion:quest:wolf_hunt',
-      meta: { questId: 'wolf_hunt', onlineMinutes: 60, multiplier: 3, basePoints: 10 },
+      key: 'task:quest_completion:quest:wolf_hunt:character:101',
+      meta: {
+        questId: 'wolf_hunt',
+        characterId: 101,
+        onlineMinutes: 60,
+        multiplier: 3,
+        basePoints: 10,
+        undiscountedPoints: 30,
+        repeatIndex: 0,
+      },
     });
-    expect(db.score).toBe(30);
+    expect(taskEvents[1]).toMatchObject({
+      points: 15,
+      key: 'task:quest_completion:quest:wolf_hunt:character:102',
+      meta: {
+        questId: 'wolf_hunt',
+        characterId: 102,
+        onlineMinutes: 60,
+        multiplier: 3,
+        basePoints: 10,
+        undiscountedPoints: 30,
+        repeatIndex: 1,
+      },
+    });
+    expect(db.score).toBe(45);
+  });
+
+  it('halves repeated quest task points per account down to one point', async () => {
+    const db = new FakeDailyRewardDb();
+    const service = new DailyRewardService(db);
+    await service.ensureActiveDay('2026-06-30');
+
+    await service.recordQuestCompletion(1, 101, 'wolf_hunt', new Date('2026-06-30T13:00:00.000Z'));
+    await service.recordQuestCompletion(1, 102, 'wolf_hunt', new Date('2026-06-30T13:01:00.000Z'));
+    await service.recordQuestCompletion(1, 103, 'wolf_hunt', new Date('2026-06-30T13:02:00.000Z'));
+    await service.recordQuestCompletion(1, 104, 'wolf_hunt', new Date('2026-06-30T13:03:00.000Z'));
+    await service.recordQuestCompletion(1, 105, 'wolf_hunt', new Date('2026-06-30T13:04:00.000Z'));
+
+    const points = db.events.filter((event) => event.kind === 'task').map((event) => event.points);
+    expect(points).toEqual([10, 5, 2, 1, 1]);
+    expect(db.score).toBe(19);
   });
 
   it('awards arena task points using win/loss base points and the online-time multiplier', async () => {

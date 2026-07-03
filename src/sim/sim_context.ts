@@ -106,7 +106,8 @@ export interface SimContextPrimitives {
   // Backing fields stay on Sim. `duels` is also read per-attack by isHostileTo/
   // dealDamage (PvP hostility), so it stays Sim-owned (A2).
   readonly duels: Map<number, DuelState>;
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer'>>;
+  // `world` stays optional (custom play-test map, else undefined); the rest defaulted.
+  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world'>> & Pick<SimConfig, 'world'>;
   // A2 duel + arena state. Live views: the backing fields stay on Sim (mutated in
   // place / reassigned), like E1's delayedEvents. The three queues are REASSIGNED by
   // the matchmaker's filter, so they are read-write; the maps/set and the match-id
@@ -236,6 +237,9 @@ export interface SimContextCallbacks {
   fiestaTakedown(match: ArenaMatch, killerPid: number, victim: Entity): void;
   fiestaDown(match: ArenaMatch, victim: Entity, killerPid: number | null): void;
   rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
+  // World-boss personal loot: an independent roll of the boss's loot table per
+  // contributor (gated once-per-day per boss). Owned by world_boss.ts.
+  rollWorldBossLoot(mob: Entity, contributors: PlayerMeta[]): void;
 
   // C2/C3/C4b heal, aura, knockback, and crowd-control surface.
   applyHeal(source: Entity, target: Entity, amount: number, ability: string): void;
@@ -291,6 +295,9 @@ export interface SimContextCallbacks {
   // delegate; partyOf stays on Sim (A1's thin delegate -> social/party).
   clearEntityMarker(entityId: number): void;
   partyOf(pid: number): Party | null;
+  // Invite a player to the actor's party by pid (delegates to the PartyMachine);
+  // used by the chat "/invite <name>" command in social/chat.ts.
+  partyInvite(targetPid: number, pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
@@ -565,6 +572,15 @@ export interface SimContextCallbacks {
   targetEntity(id: number | null, pid?: number): void;
   partyCapacity(party: Party | null): number;
   marketListingBelongsTo(listing: MarketListing, meta: PlayerMeta): boolean;
+  // B1 bags (src/sim/bags.ts): the capacity pre-check every blocking command
+  // path calls before granting (buy/loot/pickup/fish/conjure/collect/trade/
+  // turn-in). Stays on Sim next to the addItem/removeItem/countItem hub.
+  canAddItem(itemId: string, count: number, pid?: number): boolean;
+
+  // Ravenpost mail (mail/post_office.ts): the quest turn-in core
+  // (quests/quest_commands.ts) queues the giver's authored thank-you letter
+  // through this; the binding points at the PostOffice instance on Sim.
+  queueQuestLetter(questId: string, pid: number): void;
 }
 
 // The seam consumed by extracted modules.
@@ -754,6 +770,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     fiestaTakedown: host.fiestaTakedown,
     fiestaDown: host.fiestaDown,
     rollLoot: host.rollLoot,
+    rollWorldBossLoot: host.rollWorldBossLoot,
     applyHeal: host.applyHeal,
     spellCrit: host.spellCrit,
     applyAura: host.applyAura,
@@ -774,6 +791,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     removeFungibleItem: host.removeFungibleItem,
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
+    partyInvite: host.partyInvite,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
     onMobKilledForQuests: host.onMobKilledForQuests,
@@ -900,5 +918,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     targetEntity: host.targetEntity,
     partyCapacity: host.partyCapacity,
     marketListingBelongsTo: host.marketListingBelongsTo,
+    // B1 bags capacity pre-check (addItem/removeItem/countItem bound above; deduped).
+    canAddItem: host.canAddItem,
+    // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
+    queueQuestLetter: host.queueQuestLetter,
   };
 }

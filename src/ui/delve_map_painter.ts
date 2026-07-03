@@ -239,17 +239,51 @@ export class DelveMapPainter {
     prims: SchematicPrimitive[],
     outline: string,
   ): void {
+    // True-scale pools/islands can bleed past the walkable boundary (they do in
+    // the world too, under walls); prims flagged clipToOutline paint only inside
+    // the module's outline polygon.
+    let outlinePath: Path2D | null = null;
+    for (const prim of prims) {
+      if (prim.kind === 'polygon' && prim.isOutline && prim.points.length) {
+        outlinePath = new Path2D();
+        outlinePath.moveTo(prim.points[0].cx, prim.points[0].cy);
+        for (let i = 1; i < prim.points.length; i++)
+          outlinePath.lineTo(prim.points[i].cx, prim.points[i].cy);
+        outlinePath.closePath();
+        break;
+      }
+    }
     for (const prim of prims) {
       ctx.save();
+      if ((prim.kind === 'circle' || prim.kind === 'rect') && prim.clipToOutline && outlinePath) {
+        ctx.clip(outlinePath);
+      }
       if (prim.kind === 'circle') {
         ctx.beginPath();
-        ctx.arc(prim.cx, prim.cy, prim.r, 0, Math.PI * 2);
+        // ry makes it an ellipse (anisotropic schematic space); equal radii is
+        // exactly the old arc.
+        ctx.ellipse(prim.cx, prim.cy, prim.r, prim.ry ?? prim.r, 0, 0, Math.PI * 2);
         ctx.fillStyle = prim.fill;
         ctx.fill();
         if (prim.stroke) {
           ctx.strokeStyle = prim.stroke;
           ctx.lineWidth = prim.strokeWidth ?? DEFAULT_STROKE_WIDTH;
           ctx.stroke();
+        }
+      } else if (prim.kind === 'polygon') {
+        if (prim.points.length) {
+          ctx.beginPath();
+          ctx.moveTo(prim.points[0].cx, prim.points[0].cy);
+          for (let i = 1; i < prim.points.length; i++)
+            ctx.lineTo(prim.points[i].cx, prim.points[i].cy);
+          ctx.closePath();
+          ctx.fillStyle = prim.fill;
+          ctx.fill();
+          if (prim.stroke) {
+            ctx.strokeStyle = prim.stroke;
+            ctx.lineWidth = prim.strokeWidth ?? DEFAULT_STROKE_WIDTH;
+            ctx.stroke();
+          }
         }
       } else if (prim.kind === 'rect') {
         ctx.fillStyle = prim.fill;

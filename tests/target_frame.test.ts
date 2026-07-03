@@ -50,6 +50,9 @@ interface TargetState {
   castTotal: number;
   castRemaining: number;
   channeling: boolean;
+  resourceType: 'mana' | 'rage' | 'energy' | null;
+  resource: number;
+  maxResource: number;
 }
 
 const GAMEPLAY: TargetState = {
@@ -67,6 +70,12 @@ const GAMEPLAY: TargetState = {
   castTotal: 4,
   castRemaining: 1.5,
   channeling: false,
+  // The wire now carries rtype/res/mres for any entity that HAS a resource
+  // (server/game.ts dynamicFields; online.ts decodes them), so the target's
+  // power bar derives identically across hosts. Nythraxis is a caster.
+  resourceType: 'mana',
+  resource: 350,
+  maxResource: 500,
 };
 
 // Build a Sim-shaped entity: the offline core's live fields plus Sim-only extras
@@ -102,9 +111,9 @@ function targetDescriptor(e: Entity): UnitFrameDescriptor {
     present: true,
     hpFrac: t.hp / Math.max(1, t.maxHp),
     hpText: t.dead ? 'Dead' : `${t.hp} / ${t.maxHp}`,
-    resourceKind: 'none',
-    resFrac: 0,
-    resText: '',
+    resourceKind: t.dead || !t.resourceType ? 'none' : t.resourceType,
+    resFrac: t.dead || !t.resourceType ? 0 : t.resource / Math.max(1, t.maxResource),
+    resText: t.dead || !t.resourceType ? '' : `${Math.round(t.resource)} / ${t.maxResource}`,
     levelText: t.boss ? BOSS_SKULL_GLYPH : String(t.level),
     name: t.displayName,
     portraitKey: String(t.id),
@@ -120,11 +129,9 @@ function targetNameColor(e: Entity): string {
   return (e as unknown as TargetState).hostile ? 'var(--color-hostile)' : 'var(--color-friendly)';
 }
 
-// The inline combo-pip selection: combo points count only for the entity they were
-// built against (comboTargetId === target.id), else zero.
-function litComboPips(comboTargetId: number | null, comboPoints: number, targetId: number): number {
-  return comboTargetId === targetId ? comboPoints : 0;
-}
+// Combo points are character-bound (retail-style): the pips moved to the PLAYER
+// frame and light straight from the wire-mirrored `comboPoints` self field, so
+// there is no per-target pip selection left in the target frame to diverge.
 
 describe('target frame: Sim-vs-ClientWorld parity', () => {
   it('renders the wire-carried frame fields identically across hosts', () => {
@@ -134,7 +141,12 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // the whole view is identical across hosts.
     expect(fromClient).toEqual(fromSim);
     expect(fromSim.levelText).toBe(BOSS_SKULL_GLYPH); // boss skull, not a number
-    expect(fromSim.resClass).toBe('none'); // a target has no resource bar
+    expect(fromSim.resClass).toBe('mana'); // a caster target shows its power bar
+    expect(fromSim.resText).toBe('350 / 500');
+    // A resource-less beast (rtype null) turns every type class off: the bar hides.
+    expect(
+      unitFrameView(targetDescriptor(simTarget({ resourceType: null, resource: 0 }))).resClass,
+    ).toBe('none');
     // the hostile name color is a pure function of the mirrored `hostile` field:
     expect(targetNameColor(simTarget())).toBe(targetNameColor(clientTarget()));
     expect(targetNameColor(simTarget())).toBe('var(--color-hostile)');
@@ -173,14 +185,5 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // hardcast fill = 1 - remaining/total = 1 - 1.5/4 = 0.625; same on both hosts.
     expect(fromSim.fill).toBeCloseTo(0.625);
     expect(simTarget().castRemaining).toBe(clientTarget().castRemaining);
-  });
-
-  it('the combo-pip count matches across hosts and only counts for this target', () => {
-    // comboTargetId/comboPoints (self fields) are wired, so the selection matches.
-    expect(litComboPips(5, 3, simTarget().id)).toBe(litComboPips(5, 3, clientTarget().id));
-    expect(litComboPips(5, 3, 5)).toBe(3);
-    // points built against a DIFFERENT target (or none) do not light this target.
-    expect(litComboPips(9, 3, 5)).toBe(0);
-    expect(litComboPips(null, 3, 5)).toBe(0);
   });
 });

@@ -19,6 +19,7 @@ import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS } from '
 import { createGroundObject, createMob } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { resurrectOnInstanceReentry } from '../spirit';
 import {
   dist2d,
   type Entity,
@@ -73,7 +74,11 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
 export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   const dungeon = DUNGEONS[dungeonId];
-  if (!r || !dungeon || r.e.dead) return;
+  if (!r || !dungeon) return;
+  // A living player enters normally; a ghost that has run its spirit back re-enters to
+  // resurrect at the entrance (below). A fresh corpse (dead, spirit not yet released)
+  // cannot move, so it never reaches the door.
+  if (r.e.dead && !r.e.ghost) return;
   const party = ctx.partyOf(r.meta.entityId);
   const raidAllowed = RAID_ALLOWED_DUNGEON_IDS.has(dungeonId);
   const raidRequired = RAID_REQUIRED_DUNGEON_IDS.has(dungeonId);
@@ -129,6 +134,10 @@ export function enterDungeon(ctx: SimContext, dungeonId: string, pid?: number): 
   p.targetId = null;
   p.autoAttack = false;
   inst.emptyFor = 0;
+  // A ghost that ran its spirit back and re-entered resurrects at the entrance,
+  // penalty-free: the re-entry IS the corpse run under the instance death model (no
+  // Spirit Healer inside an instance).
+  if (p.ghost) resurrectOnInstanceReentry(ctx, r.meta, p, p.pos);
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
 }
 
@@ -244,6 +253,9 @@ function claimInstance(ctx: SimContext, inst: InstanceSlot, key: string): void {
   exit.lootable = true;
   ctx.addEntity(exit);
   inst.exitId = exit.id;
+  // No Spirit Healer is spawned inside an instance: a ghost releases at the OUTDOOR
+  // graveyard nearest the door and runs its spirit back to re-enter and resurrect at
+  // the entrance (see enterDungeon / spirit.ts ghostGraveyard).
 }
 
 function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
@@ -253,10 +265,6 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
       if (e?.targetId === id) e.targetId = null;
-      if (e?.comboTargetId === id) {
-        e.comboTargetId = null;
-        e.comboPoints = 0;
-      }
     }
     ctx.dropEntity(id);
   }
@@ -308,4 +316,23 @@ export function instanceInfoAt(
     }
   }
   return null;
+}
+
+// Authoritative: is `pos` physically inside one of the two Nythraxis raid
+// instances (the crypt approach or the boss arena), regardless of raid-GROUP
+// membership. Used to silently gate walk-by autoloot (interaction.ts): a rogue
+// looter leaving the raid, or a raid party staging pre-pull in the open world,
+// must not trigger it.
+export function isInRaidInstance(ctx: SimContext, pos: Vec3): boolean {
+  const id = instanceInfoAt(ctx, pos)?.dungeonId;
+  return id != null && RAID_ALLOWED_DUNGEON_IDS.has(id);
+}
+
+// Client-safe mirror of isInRaidInstance: no SimContext needed, so it is
+// coarser (x-band only, via dungeonAt) by design. Best-effort only, used to
+// avoid spamming the autoloot command from src/game/autoloot.ts; the sim's
+// isInRaidInstance gate above stays the single source of truth.
+export function isRaidInstancePos(pos: Vec3): boolean {
+  const id = dungeonAt(pos.x)?.id;
+  return id != null && RAID_ALLOWED_DUNGEON_IDS.has(id);
 }

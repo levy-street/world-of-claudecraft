@@ -161,10 +161,10 @@ describe('pet_commands module (P1b)', () => {
     warlock.resource = warlock.maxResource;
 
     // Summon an imp.
-    summonPet(sim.ctx, warlock, 'imp');
+    summonPet(sim.ctx, warlock, 'emberkin');
     const imp = petOf(sim.ctx, wpid) as AnyEntity;
     expect(imp).toBeTruthy();
-    expect(imp.templateId).toBe('imp');
+    expect(imp.templateId).toBe('emberkin');
 
     // Demon Heal channel tick heals the wounded demon (the channel driver feeds it).
     imp.hp = Math.floor(imp.maxHp * 0.4);
@@ -175,14 +175,14 @@ describe('pet_commands module (P1b)', () => {
     expect(imp.hp).toBeGreaterThan(before);
 
     // Swap to a DIFFERENT demon: the imp is despawned, a voidwalker answers.
-    summonPet(sim.ctx, warlock, 'voidwalker');
+    summonPet(sim.ctx, warlock, 'gloomshade');
     const vw = petOf(sim.ctx, wpid) as AnyEntity;
-    expect(vw.templateId).toBe('voidwalker');
+    expect(vw.templateId).toBe('gloomshade');
     expect(vw.id).not.toBe(imp.id);
     expect(sim.entities.has(imp.id)).toBe(false); // old demon hard-gone
 
     // Swap to the SAME demon while alive: it fades into the void, leaving NO pet.
-    summonPet(sim.ctx, warlock, 'voidwalker');
+    summonPet(sim.ctx, warlock, 'gloomshade');
     expect(petOf(sim.ctx, wpid, true)).toBeNull();
   });
 

@@ -154,6 +154,11 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "death": {
+      "resurrectAtCorpse": "亡骸で復活",
+      "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
+      "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
+    },
     "emotes": {
       "wave": "手を振る",
       "laugh": "大笑い",
@@ -202,6 +207,10 @@ export const ja_JP: EnTranslations = {
       "spinResult": "+{points} ポイント",
       "spinButton": "スピン",
       "tasks": "タスク",
+      "taskMultiplier": "{multiplier}倍倍率",
+      "pointsGained": "{points} デイリー報酬ポイントを獲得しました。",
+      "showChestButton": "宝箱を表示",
+      "hideChestButton": "宝箱を隠す",
       "leaderboard": "デイリーランキング",
       "totalPlayer": "本日のプレイヤー {count} 人",
       "totalPlayers": "本日のプレイヤー {count} 人",
@@ -282,7 +291,10 @@ export const ja_JP: EnTranslations = {
       "targetAnnounce": "ターゲット：{name}",
       "partyLabel": "あなたのパーティ",
       "partyGroup": "グループ {n}",
-      "durationUnitSeconds": "秒"
+      "durationUnitSeconds": "秒",
+      "durationUnitMinutes": "分",
+      "durationUnitHours": "時",
+      "durationUnitDays": "日"
     },
     "character": {
       "modelPreview": "キャラクターモデルプレビュー"
@@ -400,14 +412,20 @@ export const ja_JP: EnTranslations = {
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
       "showDevBadges": "開発者バッジを表示",
+      "showOwnNameplate": "自分のネームプレートを表示",
       "uiScale": "UIスケール",
+      "playerFrameScale": "プレイヤーフレームの大きさ",
+      "targetFrameScale": "ターゲットフレームの大きさ",
+      "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
+      "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
-      "showSecondaryActionBar": "セカンダリアクションバーを表示"
+      "showSecondaryActionBar": "セカンダリアクションバーを表示",
+      "showDailyRewardsChest": "デイリー報酬の宝箱を表示"
     },
     "controller": {
       "title": "コントローラー",
@@ -726,7 +744,8 @@ export const ja_JP: EnTranslations = {
       "summaryGroup": "分配設定：グループルート。"
     },
     "party": {
-      "promoteLeader": "パーティリーダーに指定"
+      "promoteLeader": "パーティリーダーに指定",
+      "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"
     },
     "lootSettings": {
       "title": "分配設定",
@@ -753,7 +772,13 @@ export const ja_JP: EnTranslations = {
       "sortName": "名前",
       "searchPlaceholder": "アイテムを検索",
       "searchAria": "名前でバッグのアイテムを検索",
-      "noMatch": "条件に一致するアイテムはありません。"
+      "noMatch": "条件に一致するアイテムはありません。",
+      "capacity": "{used}/{total}",
+      "capacityAria": "使用中のバッグスロット: {total}個中{used}個",
+      "backpack": "バックパック",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "空のバッグスロット",
+      "unequipHint": "クリックしてこのバッグを外す"
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -796,6 +821,7 @@ export const ja_JP: EnTranslations = {
         "spi": "精神力を{value}低下させる",
         "allStats": "すべての能力値を{value}低下させる"
       },
+      "allStatsPctReduce": "すべての能力値を{pct}%低下させる",
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
       "armorFlat": "防御力を{value}低下させる",
@@ -835,6 +861,9 @@ export const ja_JP: EnTranslations = {
         "nature": "自然"
       }
     },
+    "worldBoss": {
+      "spawn": "{name}がソーンピーク高地に立ち上がった！"
+    },
     "loot": {
       "chestTitle": "宝箱"
     },
@@ -845,6 +874,23 @@ export const ja_JP: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "レベル{level} {family}",
+      "familyDemon": "デーモン",
+      "hostile": "敵対",
+      "friendly": "味方"
+    },
+    "targetFrame": {
+      "unlock": "ターゲットフレームを移動",
+      "lock": "ターゲットフレームを固定"
+    },
+    "playerFrame": {
+      "unlock": "プレイヤーフレームを移動",
+      "lock": "プレイヤーフレームを固定"
+    },
+    "frameReset": {
+      "label": "フレーム位置をリセット"
     },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}"
@@ -927,6 +973,7 @@ export const ja_JP: EnTranslations = {
       "memberSinceDays": "Discord加入{days}日",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "管理者",
         "devs": "開発者",
         "mods": "モデレーター",
         "artists": "アーティスト"
@@ -1019,6 +1066,116 @@ export const ja_JP: EnTranslations = {
       },
       "linkedAs": "{login} として連携済み",
       "unlink": "GitHub の連携を解除"
+    },
+    "mailbox": {
+      "title": "メールボックス",
+      "subtitle": "レイヴンポスト",
+      "close": "メールボックスを閉じる",
+      "tabInbox": "受信箱",
+      "tabInboxWithCount": "受信箱（{count}）",
+      "tabSend": "Send",
+      "empty": "メールボックスは空です。",
+      "truncated": "全{total}通のうち最新の{shown}通を表示しています。",
+      "attachmentsBadge": "小包あり",
+      "unreadBadge": "未読",
+      "back": "Back",
+      "take": "添付品を受け取る",
+      "delete": "手紙を削除",
+      "deleteAria": "手紙「{subject}」を削除",
+      "openAria": "{name}からの手紙「{subject}」を読む",
+      "noSubject": "（件名なし）",
+      "toLabel": "To",
+      "toPlaceholder": "キャラクター名",
+      "subjectLabel": "件名",
+      "bodyLabel": "本文",
+      "coinLabel": "お金を添える",
+      "parcelsLabel": "小包",
+      "parcelsHint": "バッグ内のアイテムをクリックして添付します。",
+      "removeParcelAria": "手紙から{item}を取り除く",
+      "sendButton": "手紙を送る",
+      "postageNote": "郵送料：{amount}。ワタリガラスの飛行時間は約{seconds}秒です。",
+      "arrivedBanner": "ワタリガラスが到着：{name}からの手紙。",
+      "arrivedLog": "{name}から新しい手紙が届きました。",
+      "indicatorAria": "未読の手紙：{count}",
+      "indicatorTip": "未読の手紙が{count}通あります。メールボックスで読めます。",
+      "clickAttach": "クリックで手紙に添付します。",
+      "cannotMail": "これは郵送できません。",
+      "result": {
+        "sent": "ワタリガラスが{name}宛ての手紙を運んで飛び立ちました（郵送料{postage}）。",
+        "collected": "手紙から{amount}を受け取りました。",
+        "tooFar": "郵便を扱うにはメールボックスのそばにいる必要があります。",
+        "needRecipient": "手紙の宛先を指定してください。",
+        "noRecipient": "その名前のメールボックスの持ち主はいません。",
+        "tooManyParcels": "1通の手紙に添付できる小包は最大{count}個です。",
+        "noMailQuestItems": "クエストアイテムは郵送できません。",
+        "notEnoughItems": "送るのに十分な数を持っていません。",
+        "cantAffordPostage": "郵送料を支払えません。",
+        "recipientBoxFull": "相手のメールボックスは満杯です。",
+        "letterGone": "その手紙はもうメールボックスにありません。",
+        "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
+      }
+    },
+    "calendar": {
+      "title": "イベントカレンダー",
+      "close": "カレンダーを閉じる",
+      "keybindLabel": "イベントカレンダー",
+      "prevMonth": "前の月",
+      "nextMonth": "次の月",
+      "dayAria": "{date}：イベント{count}件",
+      "noEvents": "この日に予定はありません。",
+      "allDay": "終日",
+      "bookedBy": "{name}が登録",
+      "deleteAria": "イベント「{title}」を削除",
+      "bookTitle": "ギルドイベントを登録",
+      "titlePlaceholder": "イベント名",
+      "notePlaceholder": "メモ（任意）",
+      "hourLabel": "時刻（UTC）",
+      "hourAllDay": "終日",
+      "addButton": "イベント登録",
+      "guildOnlyNote": "ギルドに加入すると一緒にイベントを計画できます。",
+      "result": {
+        "created": "イベントをギルドカレンダーに登録しました。",
+        "removed": "イベントをカレンダーから外しました。",
+        "notInGuild": "ギルドに所属していません。",
+        "notOfficer": "ギルドイベントを管理できるのは幹部とギルドマスターだけです。",
+        "badInput": "イベント名と有効な日付を入力してください。",
+        "calendarFull": "ギルドカレンダーは満杯です。",
+        "eventGone": "そのイベントはもうカレンダーにありません。"
+      },
+      "events": {
+        "raidCall": {
+          "title": "レイド招集",
+          "note": "守人が角笛を鳴らす。パーティーを集め、地下墓所とレイドへ。"
+        },
+        "marketDay": {
+          "title": "市の日",
+          "note": "商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。"
+        },
+        "fiestaNight": {
+          "title": "フィエスタナイト",
+          "note": "今夜の2v2フィエスタのリングは大賑わい。"
+        },
+        "arenaClash": {
+          "title": "アリーナ激突",
+          "note": "決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。"
+        },
+        "fishingDerby": {
+          "title": "フィッシングダービー",
+          "note": "釣り人が湖に並ぶ。竿を持って釣り話を交わそう。"
+        },
+        "delveDay": {
+          "title": "デルヴの日",
+          "note": "ハルヴェン修道士が海図に印を。崩落した聖遺物庫に挑む好日。"
+        },
+        "moongateCommunion": {
+          "title": "月門の集い",
+          "note": "月半ばの月の下、巡礼者が神殿の月門に集う。"
+        }
+      }
+    },
+    "social": {
+      "lastSeen": "最終ログイン: {when}",
+      "lastSeenNever": "なし"
     }
   },
   "guide": {
@@ -1417,13 +1574,13 @@ export const ja_JP: EnTranslations = {
       "thorns": "味方を守り、近接で攻撃してきた相手に反射ダメージを与えます。"
     },
     "petHook": {
-      "imp": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
-      "voidwalker": "挑発して攻撃を受け止める頑丈なデーモンで、安心して詠唱できるようにします。",
-      "succubus": "素早い近接のデーモンで、大きなダメージを与えますが打たれ弱いです。",
-      "felhunter": "敵のキャスターに食らいつくシャドウのスカーミッシャーです。",
-      "felguard": "頑丈な近接のブルーザーで、召喚できるようになればオールラウンドにこなせます。",
-      "infernal": "強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。",
-      "doomguard": "遠くから重いシャドウを降らせるエリートのキャスターです。"
+      "emberkin": "安全な距離から敵を削る、ファイアボルトを放つ遠距離のデーモンです。",
+      "gloomshade": "挑発して攻撃を受け止める頑丈なデーモンで、安心して詠唱できるようにします。",
+      "duskborn": "素早い近接のデーモンで、大きなダメージを与えますが打たれ弱いです。",
+      "spellhound": "敵のキャスターに食らいつくシャドウのスカーミッシャーです。",
+      "warfiend": "頑丈な近接のブルーザーで、召喚できるようになればオールラウンドにこなせます。",
+      "pyre_colossus": "強力な近接を持つ巨大なジャガーノートで、純粋な力を求めて召喚します。",
+      "wraithborn": "遠くから重いシャドウを降らせるエリートのキャスターです。"
     },
     "bestiary": {
       "heading": "モンスター図鑑",
@@ -1449,11 +1606,11 @@ export const ja_JP: EnTranslations = {
         "name": "クモ",
         "desc": "暗く入り組んだ場所に巣を張る、糸を操る毒持ちの待ち伏せ屋たち。ハンターは野獣と同じように手なずけることができます。"
       },
-      "murloc": {
+      "mudfin": {
         "name": "マーロック",
         "desc": "浅瀬に群がる水陸両生の沼地の住人。騒がしく、縄張り意識の強い群れをなします。"
       },
-      "kobold": {
+      "burrower": {
         "name": "コボルド",
         "desc": "頭にろうそくを掲げた採掘者たち。鉱山や巣穴にはびこり、自らの鉱石を必死に守ります。"
       },
@@ -1847,6 +2004,430 @@ export const ja_JP: EnTranslations = {
       "home": "概要に戻る"
     }
   },
+  "editor": {
+    "appTitle": "マップエディター",
+    "docTitle": "マップエディター - World of ClaudeCraft",
+    "untitledMap": "無題のマップ",
+    "playtestPlayerName": "マップ職人",
+    "topbar": {
+      "label": "エディター操作",
+      "mapNameLabel": "マップ名",
+      "dirty": "未保存の変更があります",
+      "dirtyDot": "このマップには未保存の変更があります",
+      "clean": "すべての変更を保存済み",
+      "savedLocal": "このブラウザーに保存済み",
+      "savedServer": "サーバーに保存済み（v{version}）",
+      "saving": "保存中...",
+      "neverSaved": "まだ保存されていません",
+      "new": "新規",
+      "newTitle": "内蔵ワールドから新しいマップを作成",
+      "open": "開く",
+      "openTitle": "保存済みマップを開く（ブラウザーまたはサーバー）",
+      "save": "保存",
+      "saveTitle": "このブラウザーに保存。ログイン中はサーバーにも保存（Ctrl+S）",
+      "saveAs": "名前を付けて保存",
+      "saveAsTitle": "新しい名前でコピーを保存",
+      "fork": "フォーク",
+      "forkTitle": "このマップの自分用コピーをサーバー上に作成",
+      "forkDisabledTitle": "フォークするには先にサーバーマップを開いてください",
+      "import": "インポート",
+      "importTitle": "JSON ファイルからマップをインポート",
+      "export": "エクスポート",
+      "exportTitle": "このマップを JSON ファイルとしてダウンロード",
+      "uploadAsset": "アセットをアップロード",
+      "uploadAssetTitle": "マップに配置できる GLB モデル（最大 8 MiB）をアップロード",
+      "uploadAssetDisabledTitle": "アセットをアップロードするにはゲームでログインしてください",
+      "playtest": "プレイテスト",
+      "playtestTitle": "このマップでゲームを起動（オフライン、現在の編集を含む）",
+      "viewLabel": "表示モード",
+      "view3d": "3D",
+      "view3dTitle": "レンダリングされたワールドで編集",
+      "view2d": "2D",
+      "view2dTitle": "俯瞰の記号マップで編集",
+      "undoCount": "元に戻す：{count}",
+      "undoCountTitle": "{count} 手戻せます（Ctrl+Z で元に戻す、Ctrl+Y でやり直し）",
+      "autosave": "自動保存",
+      "autosaveTitle": "未保存の変更がある間、マップを自動保存します。保存に失敗すると自動的にオフになります。",
+      "undo": "Undo",
+      "undoTitle": "直前の変更を元に戻す（Ctrl+Z）",
+      "redo": "Redo",
+      "redoTitle": "元に戻した変更をやり直す（Ctrl+Y）",
+      "offline": "オフライン",
+      "offlineTitle": "未ログイン：マップはこのブラウザーにのみ保存されます。オンライン保存するにはゲームでログインしてください。",
+      "signIn": "ログイン",
+      "signInTitle": "ゲームのログイン画面を新しいタブで開く",
+      "help": "ヘルプ",
+      "helpTitle": "エディターガイド：ツール、ショートカット、チュートリアル"
+    },
+    "tool": {
+      "listLabel": "エディターツール",
+      "keyHint": "{name}（{key}）",
+      "select": "選択",
+      "raise": "隆起",
+      "lower": "沈降",
+      "smooth": "なめらか",
+      "flatten": "平坦化",
+      "paint": "バイオーム塗り",
+      "water": "水面",
+      "place": "アセット配置",
+      "blocker": "ブロッカー壁",
+      "camp": "キャンプ",
+      "spawn": "スポーン地点",
+      "region": "範囲",
+      "erase": "消去"
+    },
+    "inspector": {
+      "label": "ツールオプション"
+    },
+    "brush": {
+      "title": "ブラシ",
+      "size": "ブラシサイズ",
+      "strength": "強さ",
+      "sizeHint": "キー：[ と ] でブラシサイズ、Shift+[ と Shift+] で強さを調整。",
+      "editCount": "地形編集数：{count} / {max}"
+    },
+    "biome": {
+      "title": "バイオーム",
+      "paletteLabel": "塗るバイオーム",
+      "vale": "谷",
+      "marsh": "湿地",
+      "peaks": "山岳",
+      "beach": "砂浜",
+      "desert": "砂漠",
+      "volcano": "火山",
+      "cave": "洞窟",
+      "erase": "塗りを消す",
+      "hint": "塗ったマスはゾーンのバイオームを上書きし、地形の形状と色を変えます。",
+      "clear": "バイオーム塗りをすべて消去",
+      "clearConfirm": "このマップの塗られたバイオームのマスをすべて削除しますか？"
+    },
+    "flatten": {
+      "hint": "平坦化は、ドラッグ開始時のカーソル下の高さに地面をならします。",
+      "hardEdge": "ハードエッジ"
+    },
+    "water": {
+      "title": "水面の高さ",
+      "level": "水面の高さ",
+      "hint": "マップ全体の水面の高さを設定します（{min} から {max} ヤード）。",
+      "reset": "既定の高さに戻す"
+    },
+    "place": {
+      "title": "アセット配置",
+      "scale": "スケール",
+      "collide": "移動をブロック",
+      "collideHint": "ブロックするアセットには、プレイヤーが通れない当たり判定が付きます。",
+      "randomRotation": "ランダム回転",
+      "chosen": "配置中：{name}",
+      "none": "下のブラウザーでアセットを選び、地面をクリックして配置します。"
+    },
+    "blockerTool": {
+      "title": "ブロッカー壁",
+      "hint": "地面に沿ってドラッグすると、プレイヤーが歩いても跳んでも通れない見えない壁を描けます。離すと設置されます。半ヤード未満の壁は破棄されます。",
+      "count": "ブロッカー壁：{count} / {max}"
+    },
+    "camp": {
+      "title": "モンスターキャンプ",
+      "mob": "モンスター",
+      "count": "数",
+      "radius": "半径",
+      "delete": "キャンプを削除",
+      "hint": "空き地をクリックでキャンプを追加、既存のキャンプをクリックで編集します。",
+      "playtestNote": "モンスターはプレイテストでのみ出現し、エディター画面には現れません。",
+      "selected": "キャンプ：{mob}",
+      "none": "キャンプが選択されていません。"
+    },
+    "spawn": {
+      "title": "スポーン地点",
+      "hint": "地面をクリックして、プレイテストでプレイヤーが降り立つ場所を設定します。",
+      "position": "スポーン：{x}、{z}",
+      "unset": "内蔵の開始位置を使用します。",
+      "clear": "スポーン地点をクリア"
+    },
+    "region": {
+      "title": "範囲",
+      "hint": "ボックスをドラッグして配置物と地形編集を選択。コピー後、クリックで貼り付け。",
+      "hint3d": "範囲ボックスは 2D 表示で描かれます。コピーと貼り付けはどちらの表示でも使えます。",
+      "copy": "範囲をコピー",
+      "pasteBeside": "隣に貼り付け",
+      "copied": "アセット {assets} 個と地形編集 {edits} 個をコピーしました。",
+      "pasted": "{count} 個の項目を貼り付けました。",
+      "needBox": "先に範囲ボックスをドラッグしてください。",
+      "needClipboard": "先に範囲をコピーしてください。"
+    },
+    "eraseTool": {
+      "title": "消去",
+      "hint": "配置済みアセットをクリックで削除、彫刻した地面をクリックでカーソル下の最新のスタンプを削除します。",
+      "blockerHint": "ブロッカー壁の近くをクリックすると、代わりにその壁を削除します。"
+    },
+    "selection": {
+      "title": "選択",
+      "none": "何も選択されていません。「選択」ツールで配置済みアセットをクリックしてください。",
+      "asset": "アセット：{name}",
+      "x": "X",
+      "z": "Z",
+      "rotation": "回転",
+      "scale": "スケール",
+      "collide": "移動をブロック",
+      "radius": "衝突半径",
+      "radiusAuto": "自動",
+      "radiusAutoTitle": "衝突半径をアセットのスケールに追従するようリセット",
+      "radiusHint": "「自動」はアセットのスケールから衝突半径を導きます。スライダーをドラッグすると上書きできます。",
+      "footprints": "当たり判定の範囲を表示",
+      "duplicate": "複製",
+      "delete": "削除",
+      "deleteHint": "削除は選択を取り除きます。Ctrl+Z で元に戻せます。",
+      "moveHint": "移動：3D ビューで地面に沿ってアセットをドラッグするか、矢印キーで微調整します（0.5 ヤード、Shift で 2 ヤード）。",
+      "wheelHint": "Shift+スクロールで回転、Alt+スクロールで拡大縮小、Ctrl+D で複製します。"
+    },
+    "marker": {
+      "title": "マーカー",
+      "reset": "位置をリセット",
+      "moved": "{count} 個のマーカーが内蔵レイアウトから移動しています。"
+    },
+    "layers": {
+      "title": "レイヤー",
+      "hub": "拠点",
+      "graveyard": "墓地",
+      "lake": "湖",
+      "poi": "注目ポイント",
+      "camp": "キャンプ",
+      "npc": "NPC",
+      "object": "オブジェクト",
+      "blocker": "ブロッカー壁"
+    },
+    "frame": {
+      "title": "フレーム",
+      "all": "すべて"
+    },
+    "procgen": {
+      "title": "自動生成",
+      "count": "数",
+      "scatter": "カテゴリーのアセットを散布",
+      "hills": "なだらかな丘を生成",
+      "scattered": "{category} からアセットを {count} 個散布しました。",
+      "hillsAdded": "丘を {count} 個追加しました。",
+      "noAssets": "そのカテゴリーにアセットがありません。"
+    },
+    "assets": {
+      "title": "アセットブラウザー",
+      "label": "アセットブラウザー",
+      "search": "アセットを検索",
+      "searchPlaceholder": "アセットを検索...",
+      "empty": "一致するアセットがありません。",
+      "uploadedTab": "アップロード済み",
+      "uploadedEmpty": "アップロードしたアセットはまだありません。「アセットをアップロード」で GLB モデル（最大 8 MiB）を追加してください。",
+      "uploadedSignIn": "ゲームでログインすると、自分の GLB モデルをアップロードして配置できます。",
+      "uploadedLoadFailed": "アップロード済みアセットを読み込めませんでした。",
+      "deleteAsset": "アップロード済みアセットを削除",
+      "deleteAssetConfirm": "アップロード済みアセット「{name}」を削除しますか？使用中のマップからモデルが消えます。",
+      "pick": "{name}を配置",
+      "categoryTab": "{category}（{count}）",
+      "category": {
+        "biome": "バイオーム",
+        "chars": "キャラクター",
+        "creatures": "クリーチャー",
+        "dungeon": "ダンジョン",
+        "foliage": "植生",
+        "props": "小物",
+        "quest": "クエスト",
+        "resources": "資源",
+        "tools": "ツール",
+        "weapons": "武器"
+      }
+    },
+    "upload": {
+      "notGlb": ".glb ファイルを選択してください。",
+      "tooLarge": "そのファイルは 8 MiB の上限を超えています。",
+      "uploading": "アセットをアップロード中...",
+      "uploaded": "アセットをアップロードしました：{name}",
+      "uploadedExisting": "そのモデルは既にサーバーにあるため、再利用します。",
+      "deleted": "アップロード済みアセットを削除しました。"
+    },
+    "openDrawer": {
+      "title": "マップを開く",
+      "close": "閉じる",
+      "tabLocal": "このブラウザー",
+      "tabMine": "自分のサーバーマップ",
+      "tabPublic": "公開マップ",
+      "colName": "名前",
+      "colUpdated": "更新日時",
+      "colStatus": "状態",
+      "statusPublic": "公開",
+      "statusPrivate": "非公開",
+      "open": "開く",
+      "fork": "フォーク",
+      "publish": "公開する",
+      "unpublish": "公開を停止",
+      "delete": "削除",
+      "draft": "自動保存の下書き",
+      "emptyLocal": "このブラウザーに保存されたマップはまだありません。保存するとここに表示されます。",
+      "emptyMine": "サーバー上にマップはまだありません。ログインして保存すると作成されます。",
+      "emptyPublic": "公開マップはまだありません。",
+      "loading": "マップを読み込み中...",
+      "loadFailed": "サーバーからマップを読み込めませんでした。",
+      "signInHint": "ゲームでログインすると、サーバーマップの閲覧、保存、フォークができます。",
+      "deleteLocalConfirm": "ローカルマップ「{name}」を削除しますか？",
+      "deleteServerConfirm": "サーバーマップ「{name}」を削除しますか？この操作は取り消せません。",
+      "prev": "前のページ",
+      "next": "次のページ",
+      "page": "ページ {page}"
+    },
+    "status": {
+      "savedLocal": "「{name}」をこのブラウザーに保存しました。",
+      "savedServer": "「{name}」をサーバーに保存しました（v{version}）。",
+      "savedLocalOnly": "「{name}」をこのブラウザーに保存しました。ログインするとオンライン保存できます。",
+      "saveFailedLocal": "ローカル保存に失敗しました（ストレージがブロックされています）。",
+      "opened": "「{name}」を開きました。",
+      "imported": "「{name}」をインポートしました。",
+      "importFailed": "インポートがキャンセルされたか、ファイルが有効なマップではありません。",
+      "exported": "「{name}」をダウンロードしました。",
+      "newMap": "内蔵ワールドから新しいマップを開始しました。",
+      "forked": "「{name}」としてフォークしました。今は自分のコピーを編集しています。",
+      "published": "マップを公開しました。誰でも見つけてフォークできます。",
+      "unpublished": "マップの公開を停止しました。",
+      "deleted": "マップを削除しました。",
+      "assetPlacedFirst": "先にブラウザーでアセットを選んでください。",
+      "loading3d": "ワールドを読み込み中...",
+      "playtestLaunch": "プレイテストを起動中...",
+      "playtestFailed": "プレイテストを開始できませんでした（ストレージがブロックされています）。",
+      "draftSaved": "下書きを自動保存しました。",
+      "draftRestored": "自動保存の下書きを復元しました。",
+      "autosaveFailed": "自動保存に失敗しました（ブラウザのストレージが満杯かブロックされています）。バックアップとしてマップをエクスポートしてください。",
+      "terrainCapReached": "地形編集の上限に達しました（{max}）。超過分のスカルプトは追加されませんでした。",
+      "placementCapReached": "配置数の上限に達しました（{max}）。超過分のアセットは追加されませんでした。",
+      "blockerCapReached": "ブロッカー壁の上限（{max}）に達しました。新しい壁は追加されませんでした。",
+      "autosaveOff": "自動保存をオフにしました：{reason} 手動で保存してから、再度オンにしてください。"
+    },
+    "confirm": {
+      "ok": "OK",
+      "cancel": "キャンセル",
+      "discardTitle": "変更を破棄しますか？",
+      "discardBody": "「{name}」に未保存の変更があります。破棄しますか？",
+      "discard": "破棄",
+      "conflictTitle": "保存の競合",
+      "conflictBody": "このマップは開いた後にサーバー上で変更されました（現在 v{version}）。あなたの版を新しいコピーとして保存しますか？",
+      "conflictSaveCopy": "コピーとして保存"
+    },
+    "prompt": {
+      "saveAsTitle": "名前を付けて保存",
+      "nameLabel": "新しいマップ名"
+    },
+    "serverError": {
+      "invalid_map_name": "そのマップ名は使用できません。文字、数字、スペース、アポストロフィ、ハイフンを使ってください。",
+      "map_name_not_allowed": "そのマップ名は許可されていません。",
+      "invalid_map_doc": "サーバーがマップドキュメントを拒否しました。",
+      "invalid_version": "保存リクエストが不正です。再読み込みしてやり直してください。",
+      "map_limit_reached": "サーバーのマップ数上限に達しました。保存するにはどれかを削除してください。",
+      "map_not_found": "そのマップはもうサーバーにありません。",
+      "version_conflict": "そのマップは開いた後にサーバー上で変更されました。",
+      "slug_unavailable": "その名前のリンクを作成できませんでした。別の名前を試してください。",
+      "map_too_large": "マップドキュメントが大きすぎてサーバーに保存できません。",
+      "invalid_glb": "そのファイルは有効な GLB モデルではありません。",
+      "asset_blocked": "そのアセットはモデレーションによりブロックされています。",
+      "asset_limit_reached": "アップロード数の上限に達しました。どれかを削除してからアップロードしてください。",
+      "asset_storage_limit_reached": "アセットの保存容量を使い切りました。先にどれかを削除してください。",
+      "asset_too_large": "そのモデルはアップロードサイズの上限を超えています。",
+      "asset_not_found": "そのアセットはもうサーバーにありません。",
+      "rate_limited": "少し間をおいて、もう一度お試しください。",
+      "unauthorized": "セッションの有効期限が切れました。ゲームでもう一度ログインしてください。",
+      "network": "サーバーに接続できませんでした。接続を確認してやり直してください。",
+      "timeout": "サーバーの応答がタイムアウトしました。もう一度お試しください。",
+      "unknown": "サーバーとの通信で問題が発生しました。"
+    },
+    "hints": {
+      "nav3d": "ドラッグで旋回、スクロールでズーム。ドラッグ中は WASD で飛行、Q/E で高さを変更。",
+      "nav2d": "ドラッグで移動、スクロールでズーム。"
+    },
+    "help": {
+      "title": "エディターヘルプ",
+      "toolsTitle": "ツール",
+      "shortcutsTitle": "キーボードショートカット",
+      "mouseTitle": "マウスとナビゲーション",
+      "flowTitle": "保存とプレイテスト",
+      "beginTutorial": "チュートリアルを開始",
+      "close": "閉じる",
+      "tool": {
+        "select": "配置済みアセットを選択して移動、回転、拡大縮小します。2D マーカーはクリックで編集できます。",
+        "raise": "ブラシの下の地形を盛り上げます。",
+        "lower": "ブラシの下の地形を下げます。",
+        "smooth": "起伏を周囲の平均の高さへならします。",
+        "flatten": "ドラッグ開始地点の高さに地面を平らにします。",
+        "paint": "ゾーンの既定の上にバイオームの地表を塗ります。",
+        "water": "マップ全体の水面の高さを設定します。",
+        "place": "カタログまたはアップロードしたアセットを地面に配置します。",
+        "blocker": "プレイテストで移動を妨げる見えない壁をドラッグで描きます。",
+        "camp": "プレイテストで出現するモブキャンプを追加、編集します。",
+        "spawn": "プレイテストでプレイヤーが降り立つ場所を設定します。",
+        "region": "地形とアセットをボックス選択してコピー、貼り付けします。",
+        "erase": "カーソル下の配置済みアセットや彫刻スタンプを取り除きます。"
+      },
+      "key": {
+        "tools": "すべてのツールには 1 文字のショートカットがあり、ツールレールのボタンに表示されます。",
+        "brush": "[ と ] でブラシサイズを変更、Shift+[ と Shift+] で強さを変更します。",
+        "undo": "Ctrl+Z で元に戻す、Ctrl+Y または Ctrl+Shift+Z でやり直します。",
+        "save": "Ctrl+S でマップを保存します。",
+        "duplicate": "Ctrl+D で選択中のアセットを複製します。",
+        "nudge": "矢印キーで選択中のアセットを 0.5 ヤード動かします。Shift を押しながらで 2 ヤードです。",
+        "wheel": "Shift+スクロールで選択中のアセットを回転、Alt+スクロールで拡大縮小します。",
+        "delete": "Delete で選択中のアセットまたはキャンプを削除します。",
+        "escape": "Esc はまず選択を解除し、その後選択ツールに戻ります。"
+      },
+      "mouse": {
+        "orbit3d": "3D ビュー：ドラッグで旋回、スクロールでズーム。中ボタンドラッグまたは Shift+ドラッグでパンします。",
+        "fly3d": "3D でドラッグしている間、WASD でカメラが飛行し、Q/E で高さを変えます。",
+        "move": "選択ツールが有効なとき、配置済みアセットをドラッグして地面の上を移動できます。",
+        "pan2d": "2D ビュー：ドラッグでパン、スクロールでズームします。"
+      },
+      "flow": {
+        "save": "保存はこのブラウザーにマップを保存し、サインイン中はサーバーにも保存します。",
+        "draft": "未保存の変更がある間、30 秒ごとに下書きが自動保存されます。開くから復元できます。",
+        "playtest": "プレイテストは未保存の編集も含めて、このマップで実際のゲームを起動します。"
+      }
+    },
+    "tutorial": {
+      "title": "エディターチュートリアル",
+      "back": "戻る",
+      "next": "次へ",
+      "finish": "完了",
+      "skip": "ツアーをスキップ",
+      "counter": "ステップ {current} / {total}",
+      "steps": {
+        "toolbar": {
+          "title": "ツールレール",
+          "body": "すべての編集ツールがここにあります：彫刻ブラシ、バイオームペイント、水面、アセット配置、キャンプなど。各ツールには単キーのショートカットがあり、ボタンの隅に表示されます。"
+        },
+        "stage": {
+          "title": "ワールド",
+          "body": "実際のゲームエンジンで描画されたあなたのマップです。ドラッグで旋回、スクロールでズーム、中ボタンドラッグまたは Shift+ドラッグでパン。ツールを選んで地面をクリックすると編集できます。"
+        },
+        "inspector": {
+          "title": "ツールオプション",
+          "body": "有効なツールのオプションがここに表示されます：ブラシサイズ、バイオームパレット、アセットの拡大縮小、キャンプ設定、そして選択中のもののプロパティです。"
+        },
+        "viewToggle": {
+          "title": "3D と 2D",
+          "body": "描画された 3D ワールドと記号的な俯瞰 2D マップを切り替えます。2D ビューはゾーンマーカーの移動や広い範囲の確認に最適です。"
+        },
+        "save": {
+          "title": "作品を保存",
+          "body": "保存はマップをこのブラウザーに、サインイン中はサーバーにも保存します。エクスポートで JSON バックアップをダウンロードし、開くから保存済みマップや下書きを呼び出せます。"
+        },
+        "playtest": {
+          "title": "プレイテスト",
+          "body": "現在の編集を含めて、いつでもマップ上で実際のゲームを起動できます。プレイテストのタブを閉じれば戻って編集を続けられます。"
+        },
+        "help": {
+          "title": "ヘルプはここに",
+          "body": "これで一連の流れは終わりです。完全なツール一覧とすべてのショートカットを見るには、いつでもヘルプを開いてください。このツアーももう一度実行できます。"
+        }
+      }
+    },
+    "a11y": {
+      "stage": "マップビューポート",
+      "toasts": "エディター通知",
+      "dialog": "エディターダイアログ"
+    }
+  },
   "skinEvent": {
     "title": "装いの宝箱",
     "subtitle": "{rank}の報酬を解除しました — それ以下のスキンを自由に選べます。",
@@ -1967,6 +2548,9 @@ export const ja_JP: EnTranslations = {
     "password": "パスワード",
     "passwordError": "パスワードを入力してください。",
     "passwordPlaceholder": "パスワードを入力",
+    "email": "メールアドレス",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "有効なメールアドレスを入力してください。",
     "showPassword": "パスワードを表示",
     "hidePassword": "パスワードを非表示",
     "logIn": "ログイン",
@@ -1992,7 +2576,15 @@ export const ja_JP: EnTranslations = {
     "create": "作成",
     "twoFactorLabel": "認証コード",
     "twoFactorPlaceholder": "6桁のコードまたはリカバリーコード",
-    "twoFactorHint": "認証アプリに表示されたコード、またはリカバリーコードのいずれかを入力してください。"
+    "twoFactorHint": "認証アプリに表示されたコード、またはリカバリーコードのいずれかを入力してください。",
+    "recovery": {
+      "title": "復旧用メールアドレスを追加",
+      "body": "メールアドレスを設定すると、アカウントを復旧できるようになります。パスワードのリセットが必要になった際に、このアカウントの所有者であることを確認するためだけに使用します。",
+      "save": "メールを保存",
+      "logOut": "Log out",
+      "invalid": "有効なメールアドレスを入力してください。",
+      "failed": "メールアドレスを保存できませんでした。もう一度お試しください。"
+    }
   },
   "wallet": {
     "label": "$WOC ウォレット",
@@ -2046,6 +2638,7 @@ export const ja_JP: EnTranslations = {
     "helpLinkedWithBalance": "ホルダー特典が有効です。このブラウザでウォレットアプリが接続されています。",
     "helpLinkedDisconnected": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
     "helpLinkedDisconnectedWithBalance": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
+    "extensionHelp": "ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。",
     "flowConnect": "ウォレットを選択してください。認証は自動的に続行されます。",
     "flowSign": "ウォレットアプリで認証メッセージに署名してください。トランザクションや SOL は不要です。",
     "flowVerify": "ウォレット所有権を認証中...",
@@ -2288,6 +2881,7 @@ export const ja_JP: EnTranslations = {
       "unknownTier": "不明なデルヴの難易度だ。",
       "levelRequired": "{name}に入るにはレベル{level}でなければならない。",
       "levelRequiredTier": "{tier}で{name}に入るにはレベル{level}が必要だ。",
+      "partyTooLarge": "{name}はソロまたはデュオ専用だ。{max}人以上のパーティーは入れない。",
       "instancesBusy": "{name}のすべてのインスタンスが使用中だ。しばらくしてからもう一度試せ。",
       "runFailed": "{name}の攻略に失敗した。",
       "complete": "{name}を踏破した。",
@@ -2297,6 +2891,14 @@ export const ja_JP: EnTranslations = {
       "doorAlreadyOpen": "扉はすでに開いている。",
       "companionRankUp": "{name}がランク{rank}に達した。",
       "bossChest": "ボスが倒れる。守りの聖遺物庫の宝箱が祭壇にせり上がる。錠を開けて戦利品を手に入れろ。",
+      "drownedLitanyReliquaryRise": "修道女ナリアが沈黙する。溺れし聖遺物匣が黒水から浮かび上がる。近づいて儀式を始めよ。",
+      "riteSequenceReady": "祠が闇に沈む。順序を繰り返せ。",
+      "riteSequencePlaying": "祠が儀式を再生している。待て。",
+      "riteCorrect": "柔らかな鐘の音がお前の手に応える。",
+      "riteWrong": "耳障りな鐘の破裂音。黒水が足元で跳ねる。",
+      "riteReliquaryOpen": "溺れし聖遺物匣が開く。",
+      "riteReliquaryLocked": "聖遺物匣を開くには祠の儀式を完了せよ。",
+      "riteReliquaryEmpty": "聖遺物匣は空だ。",
       "surfaceStairs": "地上への階段が開く。階段でFを押して出よ。",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "部屋を制圧せよ。",
@@ -2304,6 +2906,13 @@ export const ja_JP: EnTranslations = {
       "tombstoneHint": "部屋を制圧すると、北へ墓石の通路が開く。",
       "tombstoneOpen": "封じられた墓石の通路が北へきしみながら開く。中へ歩み入って進め。",
       "tombstoneInto": "あなたは墓石を抜けて{name}へ入る。",
+      "bellRopeShock": "鐘の縄がピンと張り詰める。溺れし詠唱者たちが衝撃によろめく。",
+      "eggSacBurst": "卵嚢が破裂する。蜘蛛の子らが洗礼堂の縁を散り散りに這い出す。",
+      "baptistryEggs": "洗礼堂が静まり返る。蜘蛛の卵嚢が縁に湿った音を立てて張り付く。",
+      "baptistrySpidersSealed": "蜘蛛の卵嚢を破壊してみるべきだ。",
+      "puzzleSealed": "部屋のどこかに圧力をかけて封印を解く必要がある。",
+      "ropesSealed": "鐘の縄を引いてみるべきだ。",
+      "baptistryWave": "洗礼堂の黒い水の中で何かが蠢く。",
       "chestEmpty": "宝箱は空だ。",
       "notInDelve": "あなたはデルヴの中にいない。",
       "cannotInteract": "それとは関われない。",
@@ -2322,9 +2931,12 @@ export const ja_JP: EnTranslations = {
       "passageSealed": "通路は封じられている。",
       "moveCloserPassage": "通路にもっと近づけ。",
       "moveCloserChest": "宝箱にもっと近づけ。",
+      "moveCloserReliquary": "聖遺物匣にもっと近づけ。",
       "nothingToTake": "もう取れるものは何も残っていない。",
       "wayOutNotOpen": "出口はまだ開いていない。",
-      "moveCloserStairs": "階段にもっと近づけ。"
+      "moveCloserStairs": "階段にもっと近づけ。",
+      "nhaliaCantorShield": "詠唱者たちよ、音を保て！",
+      "nhaliaBlackwaterMark": "{name}が{player}に黒水の刻印を刻む！"
     },
     "lockpick": {
       "lockYields": "錠が開いた! {tier}の戦利品だ。",
@@ -2387,6 +2999,26 @@ export const ja_JP: EnTranslations = {
       "abandoned": "あなたはピックをそっと引き抜く。錠は待っている。"
     }
   },
+  "delveRiteUi": {
+    "title": "溺れし聖遺物の儀式",
+    "blurb": "祠は順番に光る。各祠を順に起動して順序を繰り返せ。誤った接触は試みを失敗させ順序を再生する。完璧な試みは最も豊かな戦利品を得て、試行回数を使い果たすと聖遺物匣は最も貧しい形で開く。儀式がお前をどう試すか選べ。",
+    "easy": "Easy",
+    "medium": "普通",
+    "hard": "Hard",
+    "guideWatch": "選択すると、4つの祠が順番に光ります。順番を覚えてください。",
+    "guideRepeat": "祠が暗くなったら、同じ順番で各祠まで歩きFキー（インタラクト）を押してください。",
+    "guideStakes": "間違った祠に触れると黒水を浴び、挑戦回数を1回失います。順番を最後までなぞれば聖遺物匣が開きます。",
+    "showsTimes": "順序を{count}回表示",
+    "showsOnce": "順序は一度だけ表示",
+    "symbols": "{count}個の記号",
+    "tries": "{count}回の試行",
+    "reward": {
+      "easy": "控えめな戦利品",
+      "medium": "豊かな戦利品",
+      "hard": "極上の戦利品"
+    },
+    "closeAria": "閉じる"
+  },
   "delveUi": {
     "board": {
       "title": "デルヴボード",
@@ -2396,6 +3028,7 @@ export const ja_JP: EnTranslations = {
       "openDelveAria": "{name}からデルヴボードを開く",
       "marks": "デルヴの刻印: {count}",
       "minLevel": "必要レベル{level}",
+      "partyTooLarge": "ソロまたはデュオ専用（最大{max}人）",
       "tier": {
         "normal": "ノーマル",
         "heroic": "ヒロイック"
@@ -2403,6 +3036,7 @@ export const ja_JP: EnTranslations = {
       "companion": {
         "pick": "仲間を選ぶ",
         "tessa": "侍祭テッサ",
+        "edda": "エッダ・リードハンド",
         "rank": "ランク{rank}",
         "boon": "戦闘の合間にパーティを回復する。ランク3ではデルヴごとに一度、倒れた仲間を蘇生する。",
         "upgrade": "ランク{rank}に強化（刻印{marks}個）",
@@ -2428,7 +3062,11 @@ export const ja_JP: EnTranslations = {
       "complete": "完了",
       "marks": "デルヴの刻印: {count}",
       "exitHintOpen": "墓石の通路へ歩み入れ(北)",
-      "exitHintLocked": "雑魚を一掃して北の通路を開け"
+      "exitHintLocked": "雑魚を一掃して北の通路を開け",
+      "riteChoose": "沈んだ聖遺物匣に近づき、Fで儀式を始める",
+      "ritePlayback": "祠を見よ：光る順番を覚えること",
+      "riteInput": "光った順に各祠の前でFを押す（{current}/{total}）",
+      "riteOpen": "聖遺物匣が開いた：Fで戦利品を受け取る"
     },
     "objective": {
       "kill_boss": "{boss}を討て",
@@ -2449,27 +3087,54 @@ export const ja_JP: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "下の聖遺物庫がまた動いた。真夜中を過ぎると床越しに詠唱が聞こえ、侍祭テッサは埋葬台帳が自らインクを書き換えていると言って譲らぬ。勇気があるなら、{playerName}、蝋燭を持って下りてくれ。そこで聞こえる声をすべて信じるな。その中には、お前が生まれる前からお前の名を知っていた者もいる。"
+      },
+      "halvenMarsh": {
+        "greeting": "道は北の沼地へ続いていた、{playerName}。また聖遺物庫が黒い水の底で歌い、溺れし死者が鐘に応える。信徒エッダはこの葦のことを私よりよく知っている、彼女の灯りのそばを離れるな。難易度を選べ、お前が戻るまで縄を握っていよう。"
       }
     },
     "intro": {
       "normal": "階段は冷たく暗い。砕けた聖人の石が下りの道に散らばり、湿った空気にかすかな鐘の音が漂う。侍祭テッサがささやく。「聖遺物庫がこんな下まで開いているはずがありません。離れずに、{playerName}。」",
-      "heroic": "扉があなたの背後でうめきながら閉じる。名前が爪のように石を引っかいていく。テッサの蝋燭が青く燃える。「今、彼らが呼んでいるのは死者ではありません、{playerName}。何かに応えているのです。」"
+      "heroic": "扉があなたの背後でうめきながら閉じる。名前が爪のように石を引っかいていく。テッサの蝋燭が青く燃える。「今、彼らが呼んでいるのは死者ではありません、{playerName}。何かに応えているのです。」",
+      "litanyNormal": "葦に埋もれた階段がフェンブリッジの下へと落ちていく。エッダ・リードハンドがランタンを掲げる。「沼は溺れさせた者たちの名をすべて覚えている、{playerName}。光の中にいなさい。」",
+      "litanyHeroic": "黒水が土手道の石を舐める。エッダの炎が緑色に揺らめく。「奴らはまた下で歌っている、{playerName}。聖歌隊に応えるな。」"
     },
     "module": {
       "reliquary_sunken_ossuary": "水が埋葬棚から染み出し、古い灰を銀黒の流れとなって運んでいく。",
       "reliquary_bell_niche": "数十の手鐘が静寂の中に吊られ、それぞれに葬儀の布が結ばれている。",
       "reliquary_saintless_hall": "丹念な憎しみで顔を削り取られた像の数々。",
-      "reliquary_finale": "埋もれた鐘が、あなたのブーツの下で一度だけ鳴る。"
+      "reliquary_finale": "埋もれた鐘が、あなたのブーツの下で一度だけ鳴る。",
+      "litany_sluice": "苔むした水門から黒水が滴り、古き聖歌隊の納骨堂へと落ちる。",
+      "litany_ledger": "記帳の島々が水没した水路から浮かび上がり、インクが沼へと滲み出す。",
+      "litany_ring": "聖遺物の環が、封じられた黒水の中央泉を取り囲む。",
+      "litany_baptistry": "陥没した洗礼堂が、ひび割れた聖者石と卵嚢の下で口を開ける。",
+      "litany_choir_loft": "扇状に広がる聖歌隊席に、縄で吊るされた鐘の音が響き、決して止まることはない。",
+      "litany_causeway": "Y字に分かれた土手道が、腰まで浸かる沼水の上で分岐する。",
+      "litany_apse": "溺れし後陣が、修道女ナリアの祭壇の島へと開ける。"
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "沈んだ納骨堂",
       "reliquary_bell_niche": "鐘の壁龕",
       "reliquary_saintless_hall": "聖人なき広間",
-      "reliquary_finale": "鐘を埋めし聖堂"
+      "reliquary_finale": "鐘を埋めし聖堂",
+      "litany_sluice": "三日月水門",
+      "litany_ledger": "島の記帳簿",
+      "litany_ring": "聖遺物の環",
+      "litany_baptistry": "陥没洗礼堂",
+      "litany_choir_loft": "扇形聖歌隊席",
+      "litany_causeway": "Y字分岐の土手道",
+      "litany_apse": "溺れし後陣"
+    },
+    "object": {
+      "sluice_valve": "水門弁",
+      "grave_tablet": "墓碑板",
+      "corpse_candle": "死体蝋燭",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "蝋燭も名簿も持ちました、{playerName}。先へどうぞ。",
+        "ally_revive": "立って。今夜の名簿にあなたの名前はありません。",
         "combat_start": "足元に気をつけて、{playerName}。ここの死者は安らいでいません。",
         "low_hp": "息をして。あなたのための祈りはまだ残っています。",
         "trap_spotted": "待って。床の何かが足音を覚えています。",
@@ -2481,6 +3146,20 @@ export const ja_JP: EnTranslations = {
           "3": "聖遺物庫の侍祭",
           "4": "墓呼びの証人",
           "5": "礼拝堂の守護者"
+        }
+      },
+      "edda": {
+        "run_start": "板の道を外れるな、{playerName}。泥は驕った足から呑む。",
+        "ally_revive": "さあ立て。今日は沼に渡さない。",
+        "combat_start": "黒水に気をつけろ、{playerName}。沼が聞いている。",
+        "low_hp": "落ち着け。私のランタンはまだ消えていない。",
+        "trap_spotted": "待て。ここの葦がおかしい。",
+        "boss_pull": "あの聖歌はお前の名を知っている、{playerName}。歌い返すな。",
+        "completion": "沼はもう一晩、その秘密を飲み込んでいられる。",
+        "rank": {
+          "1": "ランタン持ち",
+          "2": "葦の見張り",
+          "3": "フェンブリッジの信徒"
         }
       }
     },
@@ -2524,7 +3203,10 @@ export const ja_JP: EnTranslations = {
       "flooded_paths": "水没した通路",
       "grave_tax": "墓の徴収",
       "unstable_roof": "崩れかけた天井",
-      "cult_remnants": "カルトの残党"
+      "cult_remnants": "カルトの残党",
+      "high_water": "増水",
+      "lively_choir": "活発な聖歌隊",
+      "belligerent_dead": "好戦的な死者"
     },
     "blessing": {
       "chapel_candle": "礼拝堂の蝋燭。より安全な攻略になるが、踏破時の刻印が1つ減る。"
@@ -3537,13 +4219,16 @@ export const ja_JP: EnTranslations = {
     },
     "cast": {
       "fishing": "釣り",
-      "demonHeal": "悪魔の治癒"
+      "demonHeal": "悪魔の治癒",
+      "thunzharrStormcall": "嵐の呼び声"
     }
   },
   "questUi": {
     "tracker": {
       "title": "クエスト",
-      "complete": "完了"
+      "complete": "完了",
+      "showOnMap": "{name}をマップに表示",
+      "hideFromMap": "{name}をマップから隠す"
     },
     "log": {
       "title": "クエストログ",
@@ -3646,7 +4331,8 @@ export const ja_JP: EnTranslations = {
       "drink": "飲み物",
       "tool": "道具",
       "potion": "ポーション",
-      "elixir": "エリクサー"
+      "elixir": "エリクサー",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "防御力",
@@ -3688,7 +4374,8 @@ export const ja_JP: EnTranslations = {
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
-      "clickBuyback": "クリックして買い戻す"
+      "clickBuyback": "クリックして買い戻す",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "バッグ",
@@ -5545,6 +6232,48 @@ export const ja_JP: EnTranslations = {
       "conjured_water6": {
         "name": "魔法の山の水"
       },
+      "linen_pouch": {
+        "name": "亜麻のポーチ"
+      },
+      "travelers_knapsack": {
+        "name": "旅人のナップサック"
+      },
+      "wolfhide_satchel": {
+        "name": "狼皮のサッチェル"
+      },
+      "gravewoven_bag": {
+        "name": "墓織りのバッグ"
+      },
+      "mistcallers_duffel": {
+        "name": "ミストコーラーのダッフル"
+      },
+      "copper_mining_pick": {
+        "name": "銅の採掘ピック"
+      },
+      "iron_mining_pick": {
+        "name": "鉄の採掘ピック"
+      },
+      "mithril_mining_pick": {
+        "name": "ミスリルの採掘ピック"
+      },
+      "handaxe": {
+        "name": "ハンドアックス"
+      },
+      "felling_axe": {
+        "name": "伐採斧"
+      },
+      "ironbark_axe": {
+        "name": "鉄皮の斧"
+      },
+      "gathering_sickle": {
+        "name": "採集の鎌"
+      },
+      "bronze_sickle": {
+        "name": "青銅の鎌"
+      },
+      "silverleaf_sickle": {
+        "name": "銀葉の鎌"
+      },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
       },
@@ -5908,6 +6637,69 @@ export const ja_JP: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "ヴァリックの影のフード"
       },
+      "siltguard_helm": {
+        "name": "泥衛の兜"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "防壁の錆びた肩当て"
+      },
+      "nhalias_bell_maul": {
+        "name": "ナリアの鐘槌"
+      },
+      "reedstalker_jerkin": {
+        "name": "葦忍びの上着"
+      },
+      "mirejaw_fang_knife": {
+        "name": "泥顎の牙ナイフ"
+      },
+      "widow_silk_hood": {
+        "name": "未亡人絹のフード"
+      },
+      "cantors_drowned_sash": {
+        "name": "詠唱者の溺れし飾り帯"
+      },
+      "corpse_candle_focus": {
+        "name": "死体蝋燭の集中具"
+      },
+      "nhalias_litany_rod": {
+        "name": "ナリアの連祷の杖"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "黒水先鋒の胸当て"
+      },
+      "siltstep_leggings": {
+        "name": "泥歩の脚甲"
+      },
+      "sunken_reliquary_hood": {
+        "name": "沈める聖遺物のフード"
+      },
+      "litany_legs": {
+        "name": "泥歩きの脛当て"
+      },
+      "litany_shoulder": {
+        "name": "黒水漂流のマント"
+      },
+      "litany_gloves_rog": {
+        "name": "葦縛りの手甲"
+      },
+      "litany_plate_chest": {
+        "name": "沼番の胸当て"
+      },
+      "litany_leather_chest": {
+        "name": "深淤の胴着"
+      },
+      "litany_cloth_chest": {
+        "name": "聖歌隊溺れのローブ"
+      },
+      "litany_helm": {
+        "name": "聖遺物狩人の溺れずきん"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "ナリア修道女の聖歌鍛造鎧"
+      },
+      "drowned_choir_fang": {
+        "name": "溺れた聖歌の牙"
+      },
       "the_codfather": {
         "name": "タラのゴッドファーザー"
       },
@@ -6027,6 +6819,30 @@ export const ja_JP: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "ヴァンガードクローム"
+      },
+      "crownforged_gauntlets": {
+        "name": "冠鍛えのガントレット"
+      },
+      "nighttalon_grips": {
+        "name": "夜爪の握り"
+      },
+      "soulflame_gloves": {
+        "name": "魂炎のグローブ"
+      },
+      "stormcallers_handguards": {
+        "name": "嵐呼びの手甲"
+      },
+      "crownforged_girdle": {
+        "name": "冠鍛えのベルト"
+      },
+      "nighttalon_waistband": {
+        "name": "夜爪の腰帯"
+      },
+      "soulflame_cord": {
+        "name": "魂炎の腰紐"
+      },
+      "stormcallers_waistguard": {
+        "name": "嵐呼びの腰当て"
       }
     },
     "mobs": {
@@ -6510,6 +7326,45 @@ export const ja_JP: EnTranslations = {
       "frosthelm_icehowler": {
         "name": "Frosthelm Icehowler"
       },
+      "drowned_cantor": {
+        "name": "溺れた聖歌者"
+      },
+      "reedbound_acolyte": {
+        "name": "葦縛りの信徒"
+      },
+      "deepfen_spearjaw": {
+        "name": "深淵沼の槍顎"
+      },
+      "mirefen_widowling": {
+        "name": "泥沼の未亡人蜘蛛"
+      },
+      "spider_egg_sac": {
+        "name": "蜘蛛の卵嚢"
+      },
+      "grave_silt_bulwark": {
+        "name": "墓泥の防壁"
+      },
+      "sump_troll_devourer": {
+        "name": "汚水トロールの貪り屋"
+      },
+      "choir_thrall": {
+        "name": "聖歌隊の隷属者"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "修道女ナリア、溺れし聖歌"
+      },
+      "edda_reedhand": {
+        "name": "エッダ・リードハンド"
+      },
+      "tolling_bell": {
+        "name": "鳴り響く鐘"
+      },
+      "thunzharr_waking_peak": {
+        "name": "サンザール、目覚めし峰"
+      },
+      "thunzharr_stormling": {
+        "name": "目覚めた嵐の精"
+      },
       "ironvein_foreman": {
         "name": "鉄脈の現場監督"
       },
@@ -6540,13 +7395,13 @@ export const ja_JP: EnTranslations = {
       "varkas_boneguard": {
         "name": "ヴァーカスの骨衛兵"
       },
-      "imp": {
+      "emberkin": {
         "name": "インプ"
       },
-      "voidwalker": {
+      "gloomshade": {
         "name": "ヴォイドウォーカー"
       },
-      "succubus": {
+      "duskborn": {
         "name": "サキュバス"
       },
       "grix_the_tunnelking": {
@@ -6570,16 +7425,16 @@ export const ja_JP: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "魂縛りマルドレク"
       },
-      "felhunter": {
+      "spellhound": {
         "name": "フェルハンター"
       },
-      "felguard": {
+      "warfiend": {
         "name": "フェルガード"
       },
-      "infernal": {
+      "pyre_colossus": {
         "name": "インファーナル"
       },
-      "doomguard": {
+      "wraithborn": {
         "name": "ドゥームガード"
       },
       "choirmother_selthe": {
@@ -6869,6 +7724,16 @@ export const ja_JP: EnTranslations = {
         "name": "Huntmaster Roderic",
         "title": "Wolfsward Huntmaster",
         "greeting": "The Empire hunts by charter and quota, {className}, and the quota is behind. Fetch your bow or fetch excuses; I only file one of them."
+      },
+      "brother_halven_marsh": {
+        "name": "ハルヴェン修道士",
+        "title": "聖遺物庫の番人",
+        "greeting": "道は北へ続いていた。また聖遺物庫、また儀式。難易度を選べ、お前が戻るまで縄を握っていよう。"
+      },
+      "spirit_healer": {
+        "name": "霊魂の癒し手",
+        "title": "死者の番人",
+        "greeting": "安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
@@ -7309,6 +8174,36 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "尾根の追跡者の毛皮"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "追跡者、再び",
+        "text": "十二頭倒しても、尾根の追跡者はむしろ増えています、{playerName}。獣が飢えだけで壁に挑むはずがありません。高い尾根の何かが追い下ろしているのです。正体が知れるまで、狩りは続きます。あと十四頭。",
+        "completion": "さらに十四頭。それでも朝ごとに新しい足跡が見つかります。高い尾根から戻った斥候は雪線のように蒼白でした。盾ほどの足跡と、追跡者では有り得ない獲物の残骸があったと。上を歩くものは、ただの猫ではありません。",
+        "objectives": {
+          "0": {
+            "label": "尾根の追跡者を討伐"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "見張りの外套",
+        "text": "八枚の毛皮で士官の外套を裏打ちしたら、壁の兵がみな同じものを欲しがっています、{playerName}。当然の望みです。冬はまず指を奪い、詫びは聞きません。門の南の尾根であと十枚。それで見張り全員が暖かく眠れます。",
+        "completion": "十枚とも上等な毛皮……いや、これを見てください、{playerName}。半分は裂けています。刃や槍の傷ではありません。私の手ほど幅のある爪痕が、冬毛を貫いている。あの尾根の何かが、同族を食い荒らしているのです。",
+        "objectives": {
+          "0": {
+            "label": "尾根の追跡者の毛皮"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "老いたるクラッグモウ",
+        "text": "山の民は、斥候が見つけた足跡の主を知っていました。老いたるクラッグモウ。傷だらけの毛皮をまとい、群れの三世代を生き延びた暴君の大猫です。追跡者が街道に溢れるのはこいつのせいです、{playerName}。ねぐらは南街道を見下ろす西の尾根。仲間を連れて、あの老いた悪魔を仕留めてください。",
+        "completion": "ついに倒れましたか。山の民は、あの猫は壁より長生きすると誓っていたものです。これで追跡者は高い雪に留まるでしょう、{playerName}。巡察も血を流さずに街道を歩けます。あなたの働きで、尾根全体が静かになりました。",
+        "objectives": {
+          "0": {
+            "label": "老いたるクラッグモウを討伐"
           }
         }
       },
@@ -9018,6 +9913,33 @@ export const ja_JP: EnTranslations = {
         "name": "崩れた聖遺物庫",
         "enterText": "あなたは崩れた聖遺物庫へと降りていく。",
         "leaveText": "あなたは聖遺物庫の廃墟にいるハルヴェン修道士のもとへ登り戻る。"
+      },
+      "drowned_litany": {
+        "name": "溺れし連祷",
+        "enterText": "あなたは沼地の果てへ、溺れし神殿へと降りていく。",
+        "leaveText": "あなたは沼地の果てへ登り、ハルヴェン修道士のもとへ戻る。"
+      }
+    },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "レイヴンポスト",
+        "subject": "ワタリガラスはあなたのために飛ぶ",
+        "body": "旅人へ\n\nレイヴンポストは谷のあちこちに止まり木を設けました。イーストブルック、フェンブリッジ、ハイウォッチでワタリガラスの石柱を探してください。どの止まり木からでも、ほかの冒険者へ手紙やお金や品物を送れますし、ワタリガラスが運んできたものを受け取れます。\n\n最初の切手代として、ささやかな心づけを同封します。\n\n翼を高く、\nレイヴンポスト"
+      },
+      "letter_q_wolves": {
+        "sender": "レッドブルック元帥",
+        "subject": "囲いはまた静かになった",
+        "body": "牧夫たちがようやく安心して眠れるようになったのは、あなたのおかげです。見張り基金から、レイヴンポストに託してささやかな謝礼を送りました。\n\n刃の手入れを忘れずに。\n- レッドブルック元帥"
+      },
+      "letter_q_greyjaw": {
+        "sender": "レッドブルック元帥",
+        "subject": "オールド・グレイジョー、ついに",
+        "body": "小さな町では噂が早いものです。牧夫たちは昨夜あなたの健康に乾杯し、ウィルクスはあの狼が荷馬車ほどもあったと言い張っています。好きに尾ひれをつけさせておきなさい。あなたが勝ち取ったものです。\n\n見張り隊の分まで食事をどうぞ。\n- レッドブルック元帥"
+      },
+      "letter_q_hollow": {
+        "sender": "アルドリック修道士",
+        "subject": "あなたが暗闇で成したこと",
+        "body": "あの窪地に何が葬られていたのかを知る者はごくわずかで、信じる者はさらに少ないでしょう。私は知っています。そして忘れません。\n\nあなたの道に光がありますように。\n- アルドリック修道士"
       }
     },
     "itemSets": {
@@ -9033,8 +9955,8 @@ export const ja_JP: EnTranslations = {
       },
       "necromancers": {
         "name": "死霊術師の法衣",
-        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
-        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+        "bonus2": "ノックバックされなくなります（ノックバック耐性100%）。",
+        "bonus3": "知力が10、スタミナが10上昇します。"
       },
       "nighttalon": {
         "name": "夜爪の革装束",
@@ -9043,13 +9965,13 @@ export const ja_JP: EnTranslations = {
       },
       "soulflame": {
         "name": "魂炎の法衣",
-        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
-        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+        "bonus2": "ノックバックされなくなります（ノックバック耐性100%）。",
+        "bonus3": "知力が15、精神力が15上昇します。"
       },
       "stormcallers": {
         "name": "嵐呼びの法衣",
-        "bonus2": "ダメージによる詠唱押し戻しを50%軽減します。",
-        "bonus3": "詠唱中にダメージを受けても押し戻されません。"
+        "bonus2": "ノックバックされなくなります（ノックバック耐性100%）。",
+        "bonus3": "知力が15、精神力が15上昇します。"
       },
       "wyrmshadow": {
         "name": "竜影の装束",
@@ -9065,6 +9987,12 @@ export const ja_JP: EnTranslations = {
     "dungeonInstanceBusy": "{name}のインスタンスはすべて使用中です。少し待ってから再試行してください。",
     "delveLockedChestInteract": "Fで錠を開ける",
     "delveRewardChestInteract": "Fで戦利品を受け取る",
-    "delveSurfaceExitInteract": "Fで地上へ登る"
+    "delveSurfaceExitInteract": "Fで地上へ登る",
+    "delveReliquaryInteract": "沈んだ聖遺物匣：Fで儀式を始める",
+    "delveRiteShrineBellInteract": "鐘の祠：Fで鳴らす",
+    "delveRiteShrineCandleInteract": "蝋燭の祠：Fで触れる",
+    "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
+    "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
+    "mailboxName": "メールボックス"
   }
 };

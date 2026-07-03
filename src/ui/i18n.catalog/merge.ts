@@ -100,9 +100,9 @@ const MERGE_MOB_IDS = [
   'nhalia_mourner',
   'sister_nhalia',
   'varkas_boneguard',
-  'imp',
-  'voidwalker',
-  'succubus',
+  'emberkin',
+  'gloomshade',
+  'duskborn',
   'grix_the_tunnelking',
   'brutok_skullsmasher',
   'captain_verlan',
@@ -110,10 +110,10 @@ const MERGE_MOB_IDS = [
   'sloomtooth_the_drowned',
   'voskar_emberwing',
   'wraithbinder_maldrec',
-  'felhunter',
-  'felguard',
-  'infernal',
-  'doomguard',
+  'spellhound',
+  'warfiend',
+  'pyre_colossus',
+  'wraithborn',
 ] as const;
 
 type MergeNameTranslations<TId extends string> = Record<TId, { name: string }>;
@@ -482,7 +482,7 @@ const mergePetHud = {
 const mergeStringsEn = {
   abilityUi: {
     ...abilityStrings.en.abilityUi,
-    cast: { fishing: 'Fishing', demonHeal: 'Demon Heal' },
+    cast: { fishing: 'Fishing', demonHeal: 'Demon Heal', thunzharrStormcall: 'Stormcall' },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
       clearHint: 'Shift-right-click or Shift-Delete to clear',
@@ -492,7 +492,13 @@ const mergeStringsEn = {
   },
   itemUi: {
     ...itemNames.en.itemUi,
-    kind: { ...itemNames.en.itemUi.kind, tool: 'Tool', potion: 'Potion', elixir: 'Elixir' },
+    kind: {
+      ...itemNames.en.itemUi.kind,
+      tool: 'Tool',
+      potion: 'Potion',
+      elixir: 'Elixir',
+      bag: 'Bag',
+    },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
       useFishing: 'Use: Fish in nearby waters.',
@@ -502,6 +508,7 @@ const mergeStringsEn = {
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
       clickBuyback: 'Click to buy back',
+      bagSlots: '{slots} Slot Bag',
     },
     vendor: {
       ...itemNames.en.itemUi.vendor,
@@ -648,7 +655,11 @@ export const mergeStrings = {
   es: {
     abilityUi: {
       ...abilityStrings.es.abilityUi,
-      cast: { fishing: 'Pesca', demonHeal: 'Sanación demoníaca' },
+      cast: {
+        fishing: 'Pesca',
+        demonHeal: 'Sanación demoníaca',
+        thunzharrStormcall: 'Llamada de la tormenta',
+      },
       actionBar: {
         ...abilityStrings.es.abilityUi.actionBar,
         clearHint: 'Mayús-clic derecho o Mayús-Supr para vaciar',
@@ -663,6 +674,7 @@ export const mergeStrings = {
         tool: 'Herramienta',
         potion: 'Poción',
         elixir: 'Elixir',
+        bag: 'Bolsa',
       },
       tooltip: {
         ...itemNames.es.itemUi.tooltip,
@@ -674,6 +686,7 @@ export const mergeStrings = {
         clickUseInstant: 'Haz clic para usar al instante en combate',
         clickUse: 'Haz clic para usar',
         clickBuyback: 'Haz clic para recomprar',
+        bagSlots: 'Bolsa de {slots} huecos',
       },
       vendor: {
         ...itemNames.es.itemUi.vendor,
@@ -810,7 +823,11 @@ export const mergeStrings = {
   fr_FR: {
     abilityUi: {
       ...abilityStrings.fr_FR.abilityUi,
-      cast: { fishing: 'Pêche', demonHeal: 'Soin démoniaque' },
+      cast: {
+        fishing: 'Pêche',
+        demonHeal: 'Soin démoniaque',
+        thunzharrStormcall: 'Appel de la tempête',
+      },
       actionBar: {
         ...abilityStrings.fr_FR.abilityUi.actionBar,
         clearHint: 'Maj-clic droit ou Maj-Suppr pour vider',
@@ -820,7 +837,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.fr_FR.itemUi,
-      kind: { ...itemNames.fr_FR.itemUi.kind, tool: 'Outil', potion: 'Potion', elixir: 'Élixir' },
+      kind: {
+        ...itemNames.fr_FR.itemUi.kind,
+        tool: 'Outil',
+        potion: 'Potion',
+        elixir: 'Élixir',
+        bag: 'Sac',
+      },
       tooltip: {
         ...itemNames.fr_FR.itemUi.tooltip,
         useFishing: 'Utiliser : pêcher dans les eaux proches.',
@@ -831,6 +854,7 @@ export const mergeStrings = {
         clickUseInstant: 'Cliquer pour utiliser instantanément en combat',
         clickUse: 'Cliquer pour utiliser',
         clickBuyback: 'Cliquer pour racheter',
+        bagSlots: 'Sac de {slots} emplacements',
       },
       vendor: {
         ...itemNames.fr_FR.itemUi.vendor,
@@ -968,7 +992,11 @@ export const mergeStrings = {
   it_IT: {
     abilityUi: {
       ...abilityStrings.it_IT.abilityUi,
-      cast: { fishing: 'Pesca', demonHeal: 'Cura demoniaca' },
+      cast: {
+        fishing: 'Pesca',
+        demonHeal: 'Cura demoniaca',
+        thunzharrStormcall: 'Richiamo della tempesta',
+      },
       actionBar: {
         ...abilityStrings.it_IT.abilityUi.actionBar,
         clearHint: 'Maiusc-clic destro o Maiusc-Canc per svuotare',
@@ -983,6 +1011,7 @@ export const mergeStrings = {
         tool: 'Strumento',
         potion: 'Pozione',
         elixir: 'Elisir',
+        bag: 'Borsa',
       },
       tooltip: {
         ...itemNames.it_IT.itemUi.tooltip,
@@ -994,6 +1023,7 @@ export const mergeStrings = {
         clickUseInstant: 'Clicca per usare subito in combattimento',
         clickUse: 'Clicca per usare',
         clickBuyback: 'Clicca per ricomprare',
+        bagSlots: 'Borsa da {slots} scomparti',
       },
       vendor: {
         ...itemNames.it_IT.itemUi.vendor,
@@ -1128,7 +1158,7 @@ export const mergeStrings = {
   de_DE: {
     abilityUi: {
       ...abilityStrings.de_DE.abilityUi,
-      cast: { fishing: 'Angeln', demonHeal: 'Dämonenheilung' },
+      cast: { fishing: 'Angeln', demonHeal: 'Dämonenheilung', thunzharrStormcall: 'Sturmruf' },
       actionBar: {
         ...abilityStrings.de_DE.abilityUi.actionBar,
         clearHint: 'Umschalt-Rechtsklick oder Umschalt-Entf zum Leeren',
@@ -1143,6 +1173,7 @@ export const mergeStrings = {
         tool: 'Werkzeug',
         potion: 'Trank',
         elixir: 'Elixier',
+        bag: 'Tasche',
       },
       tooltip: {
         ...itemNames.de_DE.itemUi.tooltip,
@@ -1154,6 +1185,7 @@ export const mergeStrings = {
         clickUseInstant: 'Zum sofortigen Benutzen im Kampf klicken',
         clickUse: 'Zum Benutzen klicken',
         clickBuyback: 'Zum Rückkaufen klicken',
+        bagSlots: 'Tasche mit {slots} Plätzen',
       },
       vendor: {
         ...itemNames.de_DE.itemUi.vendor,
@@ -1288,7 +1320,7 @@ export const mergeStrings = {
   zh_CN: {
     abilityUi: {
       ...abilityStrings.zh_CN.abilityUi,
-      cast: { fishing: '钓鱼', demonHeal: '恶魔治疗' },
+      cast: { fishing: '钓鱼', demonHeal: '恶魔治疗', thunzharrStormcall: '风暴召唤' },
       actionBar: {
         ...abilityStrings.zh_CN.abilityUi.actionBar,
         clearHint: 'Shift-右键或 Shift-Delete 清除',
@@ -1298,7 +1330,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_CN.itemUi,
-      kind: { ...itemNames.zh_CN.itemUi.kind, tool: '工具', potion: '药水', elixir: '药剂' },
+      kind: {
+        ...itemNames.zh_CN.itemUi.kind,
+        tool: '工具',
+        potion: '药水',
+        elixir: '药剂',
+        bag: '背包',
+      },
       tooltip: {
         ...itemNames.zh_CN.itemUi.tooltip,
         useFishing: '使用：在附近水域钓鱼。',
@@ -1307,6 +1345,7 @@ export const mergeStrings = {
         clickUseInstant: '点击在战斗中立即使用',
         clickUse: '点击使用',
         clickBuyback: '点击回购',
+        bagSlots: '{slots}格背包',
       },
       vendor: {
         ...itemNames.zh_CN.itemUi.vendor,
@@ -1440,7 +1479,7 @@ export const mergeStrings = {
   zh_TW: {
     abilityUi: {
       ...abilityStrings.zh_TW.abilityUi,
-      cast: { fishing: '釣魚', demonHeal: '惡魔治療' },
+      cast: { fishing: '釣魚', demonHeal: '惡魔治療', thunzharrStormcall: '風暴召喚' },
       actionBar: {
         ...abilityStrings.zh_TW.abilityUi.actionBar,
         clearHint: 'Shift-右鍵或 Shift-Delete 清除',
@@ -1450,7 +1489,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_TW.itemUi,
-      kind: { ...itemNames.zh_TW.itemUi.kind, tool: '工具', potion: '藥水', elixir: '藥劑' },
+      kind: {
+        ...itemNames.zh_TW.itemUi.kind,
+        tool: '工具',
+        potion: '藥水',
+        elixir: '藥劑',
+        bag: '背包',
+      },
       tooltip: {
         ...itemNames.zh_TW.itemUi.tooltip,
         useFishing: '使用：在附近水域釣魚。',
@@ -1459,6 +1504,7 @@ export const mergeStrings = {
         clickUseInstant: '點擊在戰鬥中立即使用',
         clickUse: '點擊使用',
         clickBuyback: '點擊買回',
+        bagSlots: '{slots}格背包',
       },
       vendor: {
         ...itemNames.zh_TW.itemUi.vendor,
@@ -1592,7 +1638,7 @@ export const mergeStrings = {
   ko_KR: {
     abilityUi: {
       ...abilityStrings.ko_KR.abilityUi,
-      cast: { fishing: '낚시', demonHeal: '악마 치유' },
+      cast: { fishing: '낚시', demonHeal: '악마 치유', thunzharrStormcall: '폭풍의 부름' },
       actionBar: {
         ...abilityStrings.ko_KR.abilityUi.actionBar,
         clearHint: 'Shift-우클릭 또는 Shift-Delete로 비우기',
@@ -1602,7 +1648,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ko_KR.itemUi,
-      kind: { ...itemNames.ko_KR.itemUi.kind, tool: '도구', potion: '물약', elixir: '비약' },
+      kind: {
+        ...itemNames.ko_KR.itemUi.kind,
+        tool: '도구',
+        potion: '물약',
+        elixir: '비약',
+        bag: '가방',
+      },
       tooltip: {
         ...itemNames.ko_KR.itemUi.tooltip,
         useFishing: '사용: 가까운 물가에서 낚시합니다.',
@@ -1613,6 +1665,7 @@ export const mergeStrings = {
         clickUseInstant: '클릭하여 전투 중 즉시 사용',
         clickUse: '클릭하여 사용',
         clickBuyback: '클릭하여 되사기',
+        bagSlots: '{slots}칸 가방',
       },
       vendor: {
         ...itemNames.ko_KR.itemUi.vendor,
@@ -1747,7 +1800,7 @@ export const mergeStrings = {
   ja_JP: {
     abilityUi: {
       ...abilityStrings.ja_JP.abilityUi,
-      cast: { fishing: '釣り', demonHeal: '悪魔の治癒' },
+      cast: { fishing: '釣り', demonHeal: '悪魔の治癒', thunzharrStormcall: '嵐の呼び声' },
       actionBar: {
         ...abilityStrings.ja_JP.abilityUi.actionBar,
         clearHint: 'Shift-右クリックまたはShift-Deleteで消去',
@@ -1762,6 +1815,7 @@ export const mergeStrings = {
         tool: '道具',
         potion: 'ポーション',
         elixir: 'エリクサー',
+        bag: 'バッグ',
       },
       tooltip: {
         ...itemNames.ja_JP.itemUi.tooltip,
@@ -1772,6 +1826,7 @@ export const mergeStrings = {
         clickUseInstant: 'クリックして戦闘中に即使用',
         clickUse: 'クリックして使用',
         clickBuyback: 'クリックして買い戻す',
+        bagSlots: '{slots}スロットバッグ',
       },
       vendor: {
         ...itemNames.ja_JP.itemUi.vendor,
@@ -1906,7 +1961,11 @@ export const mergeStrings = {
   pt_BR: {
     abilityUi: {
       ...abilityStrings.pt_BR.abilityUi,
-      cast: { fishing: 'Pesca', demonHeal: 'Cura demoníaca' },
+      cast: {
+        fishing: 'Pesca',
+        demonHeal: 'Cura demoníaca',
+        thunzharrStormcall: 'Chamado da Tempestade',
+      },
       actionBar: {
         ...abilityStrings.pt_BR.abilityUi.actionBar,
         clearHint: 'Shift-clique direito ou Shift-Delete para limpar',
@@ -1921,6 +1980,7 @@ export const mergeStrings = {
         tool: 'Ferramenta',
         potion: 'Poção',
         elixir: 'Elixir',
+        bag: 'Bolsa',
       },
       tooltip: {
         ...itemNames.pt_BR.itemUi.tooltip,
@@ -1932,6 +1992,7 @@ export const mergeStrings = {
         clickUseInstant: 'Clique para usar instantaneamente em combate',
         clickUse: 'Clique para usar',
         clickBuyback: 'Clique para recomprar',
+        bagSlots: 'Bolsa de {slots} espaços',
       },
       vendor: {
         ...itemNames.pt_BR.itemUi.vendor,
@@ -2067,7 +2128,11 @@ export const mergeStrings = {
   ru_RU: {
     abilityUi: {
       ...abilityStrings.ru_RU.abilityUi,
-      cast: { fishing: 'Рыбная ловля', demonHeal: 'Исцеление демона' },
+      cast: {
+        fishing: 'Рыбная ловля',
+        demonHeal: 'Исцеление демона',
+        thunzharrStormcall: 'Зов бури',
+      },
       actionBar: {
         ...abilityStrings.ru_RU.abilityUi.actionBar,
         clearHint: 'Shift-правый щелчок или Shift-Delete, чтобы очистить',
@@ -2082,6 +2147,7 @@ export const mergeStrings = {
         tool: 'Инструмент',
         potion: 'Зелье',
         elixir: 'Эликсир',
+        bag: 'Сумка',
       },
       tooltip: {
         ...itemNames.ru_RU.itemUi.tooltip,
@@ -2093,6 +2159,7 @@ export const mergeStrings = {
         clickUseInstant: 'Нажмите, чтобы мгновенно использовать в бою',
         clickUse: 'Нажмите, чтобы использовать',
         clickBuyback: 'Нажмите, чтобы выкупить',
+        bagSlots: 'Сумка на {slots} ячеек',
       },
       vendor: {
         ...itemNames.ru_RU.itemUi.vendor,
@@ -2236,13 +2303,13 @@ const mergeEntitiesEn = {
   items: mergeNameTranslations(
     MERGE_ITEM_IDS,
     [
-      'Bristleback Maul',
+      'Gallowglass Hammer',
       "Broodmother's Silk Robe",
       'Cryptbone Greaves',
-      'Cryptstalker Jerkin',
-      'Deathlord Legguards',
-      'Deathlord Sabatons',
-      'Deathlord Warplate',
+      'Gravestalker Jerkin',
+      'Barrowlord Legguards',
+      'Barrowlord Sabatons',
+      'Barrowlord Warplate',
       "Drogmar's Warboots",
       'Drowned Prayer Leggings',
       'Drowned Prayer Sandals',
@@ -2268,9 +2335,9 @@ const mergeEntitiesEn = {
       "Mogger's Copper Cudgel",
       "Mogger's Shiv",
       "Mogger's Stomper Boots",
-      "Necromancer's Legwraps",
-      "Necromancer's Soulsteps",
-      "Necromancer's Starshroud",
+      'Mournweave Legwraps',
+      'Mournweave Soulsteps',
+      'Mournweave Starshroud',
       "Nhalia's Dirgeblade",
       "Nhalia's Funeral Wraps",
       'Raw Mirror Trout',
@@ -2282,15 +2349,15 @@ const mergeEntitiesEn = {
       'Valeborn Spellblade',
       "Voss's Sanctified Mace",
       'Wyrmcult Soulsteps',
-      'Wyrmshadow Harness',
-      'Wyrmshadow Legguards',
-      'Wyrmshadow Treads',
+      'Nightfang Harness',
+      'Nightfang Legguards',
+      'Nightfang Treads',
       'Glimmerfin Koi',
       'Raw Bog Eel',
       'Raw Frostgill Trout',
       'Raw Marsh Pike',
       'Raw River Perch',
-      'Raw Stonescale Carp',
+      'Raw Slatefin Carp',
       'Soggy Boot',
       'Elixir of the Bear',
       'Lesser Healing Potion',
@@ -2332,9 +2399,9 @@ const mergeEntitiesEn = {
       'Nhalia Mourner',
       'Sister Nhalia',
       'Varkas Boneguard',
-      'Imp',
-      'Voidwalker',
-      'Succubus',
+      'Emberkin',
+      'Gloomshade',
+      'Duskborn',
       'Grix the Tunnelking',
       'Brutok Skullsmasher',
       'Captain Verlan',
@@ -2342,10 +2409,10 @@ const mergeEntitiesEn = {
       'Sloomtooth the Drowned',
       'Voskar the Emberwing',
       'Wraithbinder Maldrec',
-      'Felhunter',
-      'Felguard',
-      'Infernal',
-      'Doomguard',
+      'Spellhound',
+      'Warfiend',
+      'Pyre Colossus',
+      'Wraithborn',
     ],
     'mob',
   ),
@@ -3683,22 +3750,22 @@ const mergeExtraEn = {
   abilities: abilityTranslations([
     [
       'bear_charge',
-      'Bear Charge',
-      'Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bear Form only.',
+      'Bruin Rush',
+      'Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only.',
     ],
     [
       'demoralizing_roar',
-      'Demoralizing Roar',
-      'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bear Form only.',
+      'Craven Roar',
+      'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bruin Form only.',
     ],
     [
       'prowl',
-      'Prowl',
+      'Stalk',
       'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
     ],
     [
       'rake',
-      'Rake',
+      'Flense',
       'A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
     ],
     ['revive_pet', 'Revive Pet', 'Revives your dead pet and returns it to your side.'],
@@ -3718,9 +3785,9 @@ const mergeExtraEn = {
         'Warding Rubbing',
         'Moonpale Scale',
         'Moonscale Saber',
-        'Moonshroud Breastplate',
-        'Moonshroud Robe',
-        'Moonshroud Tunic',
+        'Moonwrack Breastplate',
+        'Moonwrack Robe',
+        'Moonwrack Tunic',
         'Pale Pearl',
         "Sethrael's Heartscale",
         'Palecoil Rod',
@@ -3735,13 +3802,13 @@ const mergeExtraEn = {
     boundstone_helm: { name: 'Boundstone Helm' },
     cryptbone_helm: { name: 'Cryptbone Helm' },
     cryptbone_pauldrons: { name: 'Cryptbone Pauldrons' },
-    deathlords_dread_visage: { name: "Deathlord's Dread Visage" },
+    deathlords_dread_visage: { name: "Barrowlord's Dread Visage" },
     gravewyrm_gauntlets: { name: 'Gravewyrm Gauntlets' },
     gravewyrm_mantle: { name: 'Gravewyrm Mantle' },
     mistveil_cord: { name: 'Mistveil Cord' },
     mistveil_grips: { name: 'Mistveil Grips' },
-    necromancers_soulspire_mantle: { name: "Necromancer's Soulspire Mantle" },
-    wyrmshadow_talongrips: { name: 'Wyrmshadow Talongrips' },
+    necromancers_soulspire_mantle: { name: 'Mournweave Soulspire Mantle' },
+    wyrmshadow_talongrips: { name: 'Nightfang Talongrips' },
   },
   mobs: mergeNameTranslations(
     DROWNED_MOB_IDS,

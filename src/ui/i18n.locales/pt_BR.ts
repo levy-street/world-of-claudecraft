@@ -1395,9 +1395,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': 'urso',
   'abilityUi.forms.cat': 'lobo',
   'abilityUi.cast.fishing': 'Pesca',
+  'abilityUi.cast.thunzharrStormcall': 'Chamado da Tempestade',
   'abilityUi.cast.demonHeal': 'Cura demoníaca',
   'questUi.tracker.title': 'Missões',
   'questUi.tracker.complete': 'Concluída',
+
+  'questUi.tracker.showOnMap': 'Mostrar {name} no mapa',
+
+  'questUi.tracker.hideFromMap': 'Ocultar {name} do mapa',
   'questUi.log.title': 'Registro de missões',
   'questUi.log.close': 'Fechar registro de missões',
   'questUi.log.summary': 'Ativas: {active} / Concluídas: {completed}',
@@ -2167,6 +2172,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.weathered_ledger_page.name': 'Página de livro-caixa gasta',
   'entities.items.morthen_grimoire.name': 'Grimório de Morthen',
   'entities.items.wolf_fang.name': 'Presa de lobo rachada',
+  'entities.items.linen_pouch.name': 'Bolsa de linho',
+  'entities.items.travelers_knapsack.name': 'Mochila do viajante',
+  'entities.items.wolfhide_satchel.name': 'Sacola de pele de lobo',
+  'entities.items.gravewoven_bag.name': 'Bolsa tecida-tumular',
+  'entities.items.mistcallers_duffel.name': 'Mala do Chamador da Névoa',
   'entities.items.bandit_bandana.name': 'Bandana vermelha',
   'entities.items.tough_jerky.name': 'Charque duro',
   'entities.items.mudfin_scale.name': 'Escama viscosa de murloc',
@@ -2417,14 +2427,14 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nhalia_mourner.name': 'Pranteadora de Nhalia',
   'entities.mobs.sister_nhalia.name': 'Irmã Nhalia',
   'entities.mobs.varkas_boneguard.name': 'Guardião dos ossos de Varkas',
-  'entities.mobs.imp.name': 'Diabrete',
-  'entities.mobs.voidwalker.name': 'Caminhante do Vazio',
-  'entities.mobs.succubus.name': 'Súcubo',
+  'entities.mobs.emberkin.name': 'Diabrete',
+  'entities.mobs.gloomshade.name': 'Caminhante do Vazio',
+  'entities.mobs.duskborn.name': 'Súcubo',
   'entities.mobs.grix_the_tunnelking.name': 'Grix o Rei dos Túneis',
-  'entities.mobs.felhunter.name': 'Caçador Vil',
-  'entities.mobs.felguard.name': 'Guarda Vil',
-  'entities.mobs.infernal.name': 'Infernal',
-  'entities.mobs.doomguard.name': 'Guarda Sinistro',
+  'entities.mobs.spellhound.name': 'Caçador Vil',
+  'entities.mobs.warfiend.name': 'Guarda Vil',
+  'entities.mobs.pyre_colossus.name': 'Infernal',
+  'entities.mobs.wraithborn.name': 'Guarda Sinistro',
   'entities.mobs.choirmother_selthe.name': 'Mãe-do-Coro Selthe',
   'entities.mobs.drowned_templeguard.name': 'Guarda do Templo Afogado',
   'entities.mobs.drowned_votary.name': 'Devoto Afogado',
@@ -3159,6 +3169,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.brightwood_venison.name': 'Carne de veado de Brightwood',
   'entities.items.bramblehide_jerkin.name': 'Gibão de couro de sarça',
   'entities.items.monarch_crown_helm.name': 'Coroa do Monarca',
+  'entities.items.copper_mining_pick.name': 'Picareta de Cobre',
+  'entities.items.iron_mining_pick.name': 'Picareta de Ferro',
+  'entities.items.mithril_mining_pick.name': 'Picareta de Mithril',
+  'entities.items.handaxe.name': 'Machadinha',
+  'entities.items.felling_axe.name': 'Machado de Corte',
+  'entities.items.ironbark_axe.name': 'Machado de Casca de Ferro',
+  'entities.items.gathering_sickle.name': 'Foice de Coleta',
+  'entities.items.bronze_sickle.name': 'Foice de Bronze',
+  'entities.items.silverleaf_sickle.name': 'Foice Folha de Prata',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Adicionar canal de chat',
   'hud.core.chatChannels.addTitle': 'Adicionar canal',
@@ -3408,6 +3427,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cowl.name': "Capuz Chama d'Alma",
   'entities.items.soulflame_mantle.name': "Manto Chama d'Alma",
   'entities.items.stormcallers_crown.name': 'Coroa do Chamatormenta',
+  'entities.items.crownforged_gauntlets.name': 'Manoplas Forjacoroa',
+  'entities.items.nighttalon_grips.name': 'Pegas Garra Noturna',
+  'entities.items.soulflame_gloves.name': "Luvas Chama d'Alma",
+  'entities.items.stormcallers_handguards.name': 'Protetores de mão do Chamatormenta',
+  'entities.items.crownforged_girdle.name': 'Cinturão Forjacoroa',
+  'entities.items.nighttalon_waistband.name': 'Cinta Garra Noturna',
+  'entities.items.soulflame_cord.name': "Cordão Chama d'Alma",
+  'entities.items.stormcallers_waistguard.name': 'Guarda-cintura do Chamatormentas',
+  'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, o Pico Desperto',
+  'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta desperto',
+  'hudChrome.worldBoss.spawn': '{name} ergue-se sobre as Alturas de Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Espaldares do Chamatormenta',
   'hud.chat.context.convertToRaid': 'Converter em raide',
   'hud.chat.context.convertToParty': 'Converter em grupo',
@@ -3679,12 +3709,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Bandidos, cultistas e outros que escolheram o ofício errado. Eles lutam com táticas, não apenas com dentes.',
   'guide.family.humanoid.name': 'Humanoides',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Escavadores com vela na cabeça que infestam minas e tocas, guardando seu minério com ferocidade.',
-  'guide.family.kobold.name': 'Kobolds',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobolds',
+  'guide.family.mudfin.desc':
     'Habitantes anfíbios do pântano que enxameiam as águas rasas em bandos barulhentos e territoriais.',
-  'guide.family.murloc.name': 'Murlocs',
+  'guide.family.mudfin.name': 'Murlocs',
   'guide.family.ogre.desc':
     'Enormes, lerdos e perigosos. Eles acampam nas passagens altas e batem como um deslizamento de terra.',
   'guide.family.ogre.name': 'Ogros',
@@ -4116,17 +4146,17 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena e JcJ',
   'guide.nav.talents': 'Talentos',
   'guide.nav.wishIKnew': 'O que eu gostaria de saber',
-  'guide.petHook.doomguard': 'Um conjurador de elite que despeja sombra pesada à distância.',
-  'guide.petHook.felguard':
+  'guide.petHook.wraithborn': 'Um conjurador de elite que despeja sombra pesada à distância.',
+  'guide.petHook.warfiend':
     'Um brigão corpo a corpo resistente, o faz-tudo assim que você consegue invocá-lo.',
-  'guide.petHook.felhunter': 'Um combatente sombrio que persegue conjuradores inimigos.',
-  'guide.petHook.imp':
+  'guide.petHook.spellhound': 'Um combatente sombrio que persegue conjuradores inimigos.',
+  'guide.petHook.emberkin':
     'Um demônio de setas de fogo à distância que desgasta os inimigos de um ponto seguro.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Um colosso imponente de corpo a corpo esmagador, invocado pela força bruta.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Um demônio corpo a corpo rápido que acerta forte, mas cede sob pressão.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Um demônio robusto que provoca e absorve golpes para você conjurar em paz.',
   'guide.related': 'Relacionados',
   'guide.search.label': 'Buscar',
@@ -4949,17 +4979,20 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.bonus2': 'Aumenta o poder de ataque em 40.',
   'entities.itemSets.deathlord.bonus3': 'Aumenta a força em 15 e o vigor em 15.',
   'entities.itemSets.necromancers.name': 'Vestes do necromante',
-  'entities.itemSets.necromancers.bonus2': 'Reduz em 50% o atraso de conjuração causado por dano.',
-  'entities.itemSets.necromancers.bonus3': 'Dano recebido não atrasa suas conjurações.',
+  'entities.itemSets.necromancers.bonus2':
+    'Você não pode ser repelido (100% de resistência a repulsão).',
+  'entities.itemSets.necromancers.bonus3': 'Aumenta o intelecto em 10 e o vigor em 10.',
   'entities.itemSets.nighttalon.name': 'Traje de couro Garranoite',
   'entities.itemSets.nighttalon.bonus2': 'Aumenta o poder de ataque em 40.',
   'entities.itemSets.nighttalon.bonus3': 'Aumenta a agilidade em 15 e a chance de crítico em 2%.',
   'entities.itemSets.soulflame.name': 'Vestes de Chama da Alma',
-  'entities.itemSets.soulflame.bonus2': 'Reduz em 50% o atraso de conjuração causado por dano.',
-  'entities.itemSets.soulflame.bonus3': 'Dano recebido não atrasa suas conjurações.',
+  'entities.itemSets.soulflame.bonus2':
+    'Você não pode ser repelido (100% de resistência a repulsão).',
+  'entities.itemSets.soulflame.bonus3': 'Aumenta o intelecto em 15 e o espírito em 15.',
   'entities.itemSets.stormcallers.name': 'Vestes do Chamatormentas',
-  'entities.itemSets.stormcallers.bonus2': 'Reduz em 50% o atraso de conjuração causado por dano.',
-  'entities.itemSets.stormcallers.bonus3': 'Dano recebido não atrasa suas conjurações.',
+  'entities.itemSets.stormcallers.bonus2':
+    'Você não pode ser repelido (100% de resistência a repulsão).',
+  'entities.itemSets.stormcallers.bonus3': 'Aumenta o intelecto em 15 e o espírito em 15.',
   'entities.itemSets.wyrmshadow.name': 'Traje Sombraverme',
   'entities.itemSets.wyrmshadow.bonus2': 'Aumenta o poder de ataque em 40.',
   'entities.itemSets.wyrmshadow.bonus3': 'Aumenta a agilidade em 15 e a chance de crítico em 2%.',
@@ -5329,6 +5362,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinResult': '+{points} pontos',
   'hudChrome.dailyRewards.spinTitle': 'Giro Diário',
   'hudChrome.dailyRewards.tasks': 'Tarefas',
+  'hudChrome.dailyRewards.showChestButton': 'Mostrar Baú',
+  'hudChrome.dailyRewards.hideChestButton': 'Ocultar Baú',
   'hudChrome.dailyRewards.title': 'Recompensas Diárias',
   'hudChrome.dailyRewards.unknown': 'Desconhecido',
   'hudChrome.dailyRewards.usd': '{amount} USD',
@@ -5349,4 +5384,21 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Agora não',
   'hudChrome.nativeUpdate.title': 'Atualização disponível',
   'hudChrome.nativeUpdate.update': 'Atualizar',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'O Correio dos Corvos',
+  'entities.letters.ravenpost_welcome.subject': 'Os corvos agora voam por você',
+  'entities.letters.ravenpost_welcome.body':
+    'Viajante,\n\no Correio dos Corvos abriu seus poleiros ao longo do vale. Procure os pilares dos corvos em Eastbrook, Fenbridge e Highwatch: de qualquer um deles você pode enviar cartas, moedas e itens a outros aventureiros, e recolher o que os corvos trouxerem para você.\n\nSegue anexa uma pequena lembrança para seu primeiro selo.\n\nAsas ao alto,\nO Correio dos Corvos',
+  'entities.letters.letter_q_wolves.sender': 'Marechal Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'Os currais estão calmos de novo',
+  'entities.letters.letter_q_wolves.body':
+    'Os pastores finalmente podem dormir tranquilos, e isso é obra sua. Pedi ao Correio dos Corvos que levasse a você uma lembrança do fundo da guarda.\n\nMantenha a lâmina azeitada.\n- Marechal Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marechal Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'O velho Mandíbula Cinzenta, enfim',
+  'entities.letters.letter_q_greyjaw.body':
+    'As notícias correm depressa numa cidade tão pequena. Ontem à noite os pastores brindaram à sua saúde, e Wilkes jura que o lobo era do tamanho de uma carroça. Deixe que aumentem a história: você mereceu.\n\nFaça uma refeição por conta da guarda.\n- Marechal Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Irmão Aldric',
+  'entities.letters.letter_q_hollow.subject': 'O que você fez na escuridão',
+  'entities.letters.letter_q_hollow.body':
+    'Poucos saberão o que estava enterrado naquela baixada, e menos ainda acreditariam. Eu sei, e não vou esquecer.\n\nQue seu caminho continue iluminado.\n- Irmão Aldric',
 };

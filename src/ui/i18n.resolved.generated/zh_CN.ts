@@ -154,6 +154,11 @@ export const zh_CN: EnTranslations = {
     "spectate": {
       "banner": "正在观察 {name}"
     },
+    "death": {
+      "resurrectAtCorpse": "在尸体旁复活",
+      "resurrectAtHealer": "灵魂医者（复活后遗症）",
+      "spiritHealerAlive": "灵魂医者只看护逝者。你仍是生者。"
+    },
     "emotes": {
       "wave": "挥手",
       "laugh": "大笑",
@@ -202,6 +207,10 @@ export const zh_CN: EnTranslations = {
       "spinResult": "+{points} 积分",
       "spinButton": "转动",
       "tasks": "任务",
+      "taskMultiplier": "{multiplier}倍倍率",
+      "pointsGained": "已获得 {points} 每日奖励积分。",
+      "showChestButton": "显示宝箱",
+      "hideChestButton": "隐藏宝箱",
       "leaderboard": "每日排行榜",
       "totalPlayer": "今天 {count} 名玩家",
       "totalPlayers": "今天 {count} 名玩家",
@@ -282,7 +291,10 @@ export const zh_CN: EnTranslations = {
       "targetAnnounce": "目标：{name}",
       "partyLabel": "你的队伍",
       "partyGroup": "小队 {n}",
-      "durationUnitSeconds": "秒"
+      "durationUnitSeconds": "秒",
+      "durationUnitMinutes": "分",
+      "durationUnitHours": "时",
+      "durationUnitDays": "天"
     },
     "character": {
       "modelPreview": "角色模型预览"
@@ -400,14 +412,20 @@ export const zh_CN: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "showDevBadges": "显示开发者徽章",
+      "showOwnNameplate": "显示我的姓名板",
       "uiScale": "界面缩放",
+      "playerFrameScale": "玩家框缩放",
+      "targetFrameScale": "目标框缩放",
+      "aurasOnPlayerFrame": "增益显示在玩家框",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
+      "walkByAutoloot": "路过自动拾取",
       "groundReticle": "地面瞄准指示圈",
       "showItemLevel": "显示物品等级",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
-      "showSecondaryActionBar": "显示副动作条"
+      "showSecondaryActionBar": "显示副动作条",
+      "showDailyRewardsChest": "显示每日奖励宝箱"
     },
     "controller": {
       "title": "手柄",
@@ -726,7 +744,8 @@ export const zh_CN: EnTranslations = {
       "summaryGroup": "拾取设置：小队拾取。"
     },
     "party": {
-      "promoteLeader": "提升为队长"
+      "promoteLeader": "提升为队长",
+      "inviteUsage": "邀请谁？用法：/invite <名称>。"
     },
     "lootSettings": {
       "title": "拾取设置",
@@ -753,7 +772,13 @@ export const zh_CN: EnTranslations = {
       "sortName": "名称",
       "searchPlaceholder": "搜索物品",
       "searchAria": "按名称搜索背包物品",
-      "noMatch": "没有符合筛选条件的物品。"
+      "noMatch": "没有符合筛选条件的物品。",
+      "capacity": "{used}/{total}",
+      "capacityAria": "背包格已用：{used}/{total}",
+      "backpack": "背包",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "空背包栏位",
+      "unequipHint": "点击移除此背包"
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",
@@ -796,6 +821,7 @@ export const zh_CN: EnTranslations = {
         "spi": "精神降低 {value}",
         "allStats": "所有属性降低 {value}"
       },
+      "allStatsPctReduce": "所有属性降低 {pct}%",
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
       "armorFlat": "护甲降低 {value}",
@@ -835,6 +861,9 @@ export const zh_CN: EnTranslations = {
         "nature": "自然"
       }
     },
+    "worldBoss": {
+      "spawn": "{name}在荆峰高地崛起！"
+    },
     "loot": {
       "chestTitle": "宝箱"
     },
@@ -845,6 +874,23 @@ export const zh_CN: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "等级 {level} {family}",
+      "familyDemon": "恶魔",
+      "hostile": "敌对",
+      "friendly": "友方"
+    },
+    "targetFrame": {
+      "unlock": "移动目标框",
+      "lock": "锁定目标框"
+    },
+    "playerFrame": {
+      "unlock": "移动玩家框",
+      "lock": "锁定玩家框"
+    },
+    "frameReset": {
+      "label": "重置框体位置"
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}"
@@ -927,6 +973,7 @@ export const zh_CN: EnTranslations = {
       "memberSinceDays": "已加入 Discord {days} 天",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "管理员",
         "devs": "开发者",
         "mods": "管理员",
         "artists": "画师"
@@ -1019,6 +1066,116 @@ export const zh_CN: EnTranslations = {
       },
       "linkedAs": "已关联为 {login}",
       "unlink": "取消关联 GitHub"
+    },
+    "mailbox": {
+      "title": "邮箱",
+      "subtitle": "渡鸦邮驿",
+      "close": "关闭邮箱",
+      "tabInbox": "收件箱",
+      "tabInboxWithCount": "收件箱（{count}）",
+      "tabSend": "Send",
+      "empty": "你的邮箱是空的。",
+      "truncated": "显示最新的 {shown} 封信（共 {total} 封）。",
+      "attachmentsBadge": "附有包裹",
+      "unreadBadge": "未读",
+      "back": "Back",
+      "take": "领取附件",
+      "delete": "删除信件",
+      "deleteAria": "删除信件 {subject}",
+      "openAria": "阅读来自 {name} 的信件 {subject}",
+      "noSubject": "（无主题）",
+      "toLabel": "To",
+      "toPlaceholder": "角色名字",
+      "subjectLabel": "主题",
+      "bodyLabel": "内容",
+      "coinLabel": "附上钱币",
+      "parcelsLabel": "包裹",
+      "parcelsHint": "点击背包中的物品即可附上。",
+      "removeParcelAria": "从信件中移除 {item}",
+      "sendButton": "寄出信件",
+      "postageNote": "邮资：{amount}。渡鸦飞行约 {seconds} 秒。",
+      "arrivedBanner": "渡鸦已降落：来自 {name} 的邮件。",
+      "arrivedLog": "你收到了来自 {name} 的新邮件。",
+      "indicatorAria": "未读邮件：{count}",
+      "indicatorTip": "你有 {count} 封未读信件。请前往邮箱阅读。",
+      "clickAttach": "点击以附到信件上。",
+      "cannotMail": "该物品无法邮寄。",
+      "result": {
+        "sent": "渡鸦带着你给 {name} 的信起飞了（邮资 {postage}）。",
+        "collected": "你从信件中取出 {amount}。",
+        "tooFar": "你必须站在邮箱旁才能处理邮件。",
+        "needRecipient": "请写明信件的收件人。",
+        "noRecipient": "这里没有叫这个名字的邮箱主人。",
+        "tooManyParcels": "一封信最多可携带 {count} 个包裹。",
+        "noMailQuestItems": "你不能邮寄任务物品。",
+        "notEnoughItems": "你没有那么多可寄送的物品。",
+        "cantAffordPostage": "你付不起邮资。",
+        "recipientBoxFull": "对方的邮箱已满。",
+        "letterGone": "那封信已不在你的邮箱里。",
+        "takeParcelsFirst": "请先取出包裹再丢弃信件。"
+      }
+    },
+    "calendar": {
+      "title": "活动日历",
+      "close": "关闭日历",
+      "keybindLabel": "活动日历",
+      "prevMonth": "上个月",
+      "nextMonth": "下个月",
+      "dayAria": "{date}：{count} 个活动",
+      "noEvents": "这一天没有安排。",
+      "allDay": "全天",
+      "bookedBy": "由 {name} 安排",
+      "deleteAria": "移除活动 {title}",
+      "bookTitle": "安排公会活动",
+      "titlePlaceholder": "活动名称",
+      "notePlaceholder": "备注（可选）",
+      "hourLabel": "小时（UTC）",
+      "hourAllDay": "全天",
+      "addButton": "安排活动",
+      "guildOnlyNote": "加入公会即可一起计划活动。",
+      "result": {
+        "created": "活动已列入公会日历。",
+        "removed": "活动已从日历中移除。",
+        "notInGuild": "你不在公会中。",
+        "notOfficer": "只有官员和会长可以管理公会活动。",
+        "badInput": "请为活动填写名称和有效日期。",
+        "calendarFull": "公会日历已满。",
+        "eventGone": "该活动已不在日历上。"
+      },
+      "events": {
+        "raidCall": {
+          "title": "团队集结",
+          "note": "守卫吹响号角：组队前往地穴与团队副本。"
+        },
+        "marketDay": {
+          "title": "集市日",
+          "note": "商人正等着新货。今天很适合逛逛世界市场。"
+        },
+        "fiestaNight": {
+          "title": "狂欢之夜",
+          "note": "今晚 2v2 狂欢擂台的人气最旺。"
+        },
+        "arenaClash": {
+          "title": "竞技场之战",
+          "note": "决斗者涌向灰烬斗兽场。排队开打，向天梯进发。"
+        },
+        "fishingDerby": {
+          "title": "钓鱼大赛",
+          "note": "钓手们在湖边排开。带上鱼竿，交流钓鱼趣闻。"
+        },
+        "delveDay": {
+          "title": "探窟日",
+          "note": "哈尔文修士在图上做了标记：宜探坍塌圣物窖。"
+        },
+        "moongateCommunion": {
+          "title": "月门共祷",
+          "note": "朝圣者在月中之月下聚于神庙月门。"
+        }
+      }
+    },
+    "social": {
+      "lastSeen": "最后在线: {when}",
+      "lastSeenNever": "从未"
     }
   },
   "guide": {
@@ -1417,13 +1574,13 @@ export const zh_CN: EnTranslations = {
       "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
     },
     "petHook": {
-      "imp": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
-      "voidwalker": "一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。",
-      "succubus": "一只快速的近战恶魔，输出凶猛，但承压能力很差。",
-      "felhunter": "一名暗影游击手，专门纠缠敌方施法者。",
-      "felguard": "一名耐打的近战猛士，能召唤它之后就是全能的选择。",
-      "infernal": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。",
-      "doomguard": "一只精英施法者，从远处倾泻沉重的暗影伤害。"
+      "emberkin": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
+      "gloomshade": "一只结实的恶魔，能嘲讽并吸收伤害，让你安心施法。",
+      "duskborn": "一只快速的近战恶魔，输出凶猛，但承压能力很差。",
+      "spellhound": "一名暗影游击手，专门纠缠敌方施法者。",
+      "warfiend": "一名耐打的近战猛士，能召唤它之后就是全能的选择。",
+      "pyre_colossus": "一头近战极具破坏力的庞然巨兽，为追求纯粹的力量而召唤。",
+      "wraithborn": "一只精英施法者，从远处倾泻沉重的暗影伤害。"
     },
     "bestiary": {
       "heading": "怪物图鉴",
@@ -1449,11 +1606,11 @@ export const zh_CN: EnTranslations = {
         "name": "蜘蛛",
         "desc": "结网的织丝者与剧毒的潜伏者，盘踞在阴暗错综之地。猎人可以像驯服野兽那样驯服它们。"
       },
-      "murloc": {
+      "mudfin": {
         "name": "鱼人",
         "desc": "两栖的沼泽居民，成群涌入浅滩，吵闹而极具地盘意识。"
       },
-      "kobold": {
+      "burrower": {
         "name": "狗头人",
         "desc": "头顶蜡烛的掘地者，在矿洞与地穴中繁衍，凶狠地守护着自己的矿石。"
       },
@@ -1847,6 +2004,430 @@ export const zh_CN: EnTranslations = {
       "home": "返回概览"
     }
   },
+  "editor": {
+    "appTitle": "地图编辑器",
+    "docTitle": "地图编辑器 - World of ClaudeCraft",
+    "untitledMap": "未命名地图",
+    "playtestPlayerName": "制图师",
+    "topbar": {
+      "label": "编辑器操作",
+      "mapNameLabel": "地图名称",
+      "dirty": "有未保存的更改",
+      "dirtyDot": "此地图有未保存的更改",
+      "clean": "所有更改已保存",
+      "savedLocal": "已保存到此浏览器",
+      "savedServer": "已保存到服务器（v{version}）",
+      "saving": "保存中...",
+      "neverSaved": "尚未保存",
+      "new": "新建",
+      "newTitle": "基于内置世界新建一张地图",
+      "open": "打开",
+      "openTitle": "打开已保存的地图（浏览器或服务器）",
+      "save": "保存",
+      "saveTitle": "保存到此浏览器；已登录时同时保存到服务器（Ctrl+S）",
+      "saveAs": "另存为",
+      "saveAsTitle": "以新名称保存一份副本",
+      "fork": "派生",
+      "forkTitle": "在服务器上创建一份属于你的副本",
+      "forkDisabledTitle": "请先打开一张服务器地图再派生",
+      "import": "导入",
+      "importTitle": "从 JSON 文件导入地图",
+      "export": "导出",
+      "exportTitle": "将此地图下载为 JSON 文件",
+      "uploadAsset": "上传资源",
+      "uploadAssetTitle": "上传 GLB 模型（最大 8 MiB）以便放置到你的地图中",
+      "uploadAssetDisabledTitle": "请先在游戏中登录再上传资源",
+      "playtest": "试玩",
+      "playtestTitle": "在此地图上启动游戏（离线，包含当前编辑）",
+      "viewLabel": "视图模式",
+      "view3d": "3D",
+      "view3dTitle": "在渲染后的世界中编辑",
+      "view2d": "2D",
+      "view2dTitle": "在俯视示意图上编辑",
+      "undoCount": "撤销：{count}",
+      "undoCountTitle": "可撤销 {count} 步（Ctrl+Z 撤销，Ctrl+Y 重做）",
+      "autosave": "自动保存",
+      "autosaveTitle": "有未保存的更改时自动保存地图。保存失败时会自动关闭。",
+      "undo": "Undo",
+      "undoTitle": "撤销上一次更改（Ctrl+Z）",
+      "redo": "Redo",
+      "redoTitle": "重做上一次撤销的更改（Ctrl+Y）",
+      "offline": "离线",
+      "offlineTitle": "未登录：地图只保存到此浏览器。请在游戏中登录以在线保存。",
+      "signIn": "登录",
+      "signInTitle": "在新标签页中打开游戏登录界面",
+      "help": "帮助",
+      "helpTitle": "编辑器指南：工具、快捷键与教程"
+    },
+    "tool": {
+      "listLabel": "编辑器工具",
+      "keyHint": "{name}（{key}）",
+      "select": "选择",
+      "raise": "抬升",
+      "lower": "下压",
+      "smooth": "平滑",
+      "flatten": "压平",
+      "paint": "绘制生态",
+      "water": "水面",
+      "place": "放置资源",
+      "blocker": "空气墙",
+      "camp": "营地",
+      "spawn": "出生点",
+      "region": "区域",
+      "erase": "擦除"
+    },
+    "inspector": {
+      "label": "工具选项"
+    },
+    "brush": {
+      "title": "笔刷",
+      "size": "笔刷大小",
+      "strength": "强度",
+      "sizeHint": "快捷键：[ 和 ] 调整笔刷大小；Shift+[ 和 Shift+] 调整强度。",
+      "editCount": "地形编辑数：{count} / {max}"
+    },
+    "biome": {
+      "title": "生态",
+      "paletteLabel": "要绘制的生态",
+      "vale": "谷地",
+      "marsh": "沼泽",
+      "peaks": "山峰",
+      "beach": "海滩",
+      "desert": "沙漠",
+      "volcano": "火山",
+      "cave": "洞穴",
+      "erase": "擦除绘制",
+      "hint": "绘制的格子会覆盖区域生态，改变地形形状与颜色。",
+      "clear": "清除全部生态绘制",
+      "clearConfirm": "移除此地图上所有已绘制的生态格子？"
+    },
+    "flatten": {
+      "hint": "压平会将地面拉平到拖动开始时光标下的高度。",
+      "hardEdge": "硬边缘"
+    },
+    "water": {
+      "title": "水面高度",
+      "level": "水面高度",
+      "hint": "设置全图水面高度，范围 {min} 到 {max} 码。",
+      "reset": "重置为内置高度"
+    },
+    "place": {
+      "title": "放置资源",
+      "scale": "缩放",
+      "collide": "阻挡移动",
+      "collideHint": "阻挡型资源会生成玩家无法穿过的碰撞范围。",
+      "randomRotation": "随机旋转",
+      "chosen": "正在放置：{name}",
+      "none": "先在下方浏览器中选择一个资源，然后点击地面放置。"
+    },
+    "blockerTool": {
+      "title": "空气墙",
+      "hint": "沿地面拖动即可绘制一堵玩家无法穿过或跳过的隐形墙。松开即放置；短于半码的墙会被丢弃。",
+      "count": "空气墙：{count} / {max}"
+    },
+    "camp": {
+      "title": "怪物营地",
+      "mob": "怪物",
+      "count": "数量",
+      "radius": "半径",
+      "delete": "删除营地",
+      "hint": "点击空地新建营地，或点击已有营地进行编辑。",
+      "playtestNote": "怪物只在试玩中出现，编辑器视图中不会出现。",
+      "selected": "营地：{mob}",
+      "none": "未选中营地。"
+    },
+    "spawn": {
+      "title": "出生点",
+      "hint": "点击地面设置试玩时玩家的出生位置。",
+      "position": "出生点：{x}，{z}",
+      "unset": "使用内置的起始位置。",
+      "clear": "清除出生点"
+    },
+    "region": {
+      "title": "区域",
+      "hint": "拖出一个框以选中放置物与地形编辑。复制后点击即可粘贴。",
+      "hint3d": "区域框在 2D 视图中绘制；复制与粘贴在两种视图中都可用。",
+      "copy": "复制区域",
+      "pasteBeside": "在旁边粘贴",
+      "copied": "已复制 {assets} 个资源和 {edits} 个地形编辑。",
+      "pasted": "已粘贴 {count} 个项目。",
+      "needBox": "请先拖出一个区域框。",
+      "needClipboard": "请先复制一个区域。"
+    },
+    "eraseTool": {
+      "title": "擦除",
+      "hint": "点击已放置的资源可移除它；点击雕刻过的地面可移除光标下最新的印记。",
+      "blockerHint": "在空气墙附近点击会改为移除该墙。"
+    },
+    "selection": {
+      "title": "选中项",
+      "none": "未选中任何内容。使用“选择”工具点击已放置的资源。",
+      "asset": "资源：{name}",
+      "x": "X",
+      "z": "Z",
+      "rotation": "旋转",
+      "scale": "缩放",
+      "collide": "阻挡移动",
+      "radius": "碰撞半径",
+      "radiusAuto": "自动",
+      "radiusAutoTitle": "将碰撞半径重置为跟随资源缩放",
+      "radiusHint": "“自动”根据资源缩放推导碰撞半径；拖动滑块可覆盖它。",
+      "footprints": "显示碰撞范围",
+      "duplicate": "复制一份",
+      "delete": "删除",
+      "deleteHint": "删除会移除选中项；Ctrl+Z 可恢复。",
+      "moveHint": "移动：在 3D 视图中沿地面拖动资产，或用方向键微调（0.5 码，按住 Shift 为 2 码）。",
+      "wheelHint": "Shift+滚轮旋转资产，Alt+滚轮缩放资产，Ctrl+D 复制资产。"
+    },
+    "marker": {
+      "title": "标记",
+      "reset": "重置位置",
+      "moved": "{count} 个标记偏离了内置布局。"
+    },
+    "layers": {
+      "title": "图层",
+      "hub": "枢纽",
+      "graveyard": "墓地",
+      "lake": "湖泊",
+      "poi": "兴趣点",
+      "camp": "营地",
+      "npc": "NPC",
+      "object": "物件",
+      "blocker": "空气墙"
+    },
+    "frame": {
+      "title": "取景",
+      "all": "全部"
+    },
+    "procgen": {
+      "title": "程序生成",
+      "count": "数量",
+      "scatter": "散布该分类的资源",
+      "hills": "生成连绵丘陵",
+      "scattered": "已从 {category} 散布 {count} 个资源。",
+      "hillsAdded": "已添加 {count} 座丘陵。",
+      "noAssets": "该分类下没有资源。"
+    },
+    "assets": {
+      "title": "资源浏览器",
+      "label": "资源浏览器",
+      "search": "搜索资源",
+      "searchPlaceholder": "搜索资源...",
+      "empty": "没有匹配的资源。",
+      "uploadedTab": "已上传",
+      "uploadedEmpty": "还没有上传的资源。使用“上传资源”添加 GLB 模型（最大 8 MiB）。",
+      "uploadedSignIn": "在游戏中登录后即可上传并放置你自己的 GLB 模型。",
+      "uploadedLoadFailed": "无法加载你上传的资源。",
+      "deleteAsset": "删除已上传的资源",
+      "deleteAssetConfirm": "删除已上传的资源“{name}”？使用它的地图将丢失该模型。",
+      "pick": "放置{name}",
+      "categoryTab": "{category}（{count}）",
+      "category": {
+        "biome": "生态",
+        "chars": "角色",
+        "creatures": "生物",
+        "dungeon": "地下城",
+        "foliage": "植被",
+        "props": "道具",
+        "quest": "任务",
+        "resources": "资源点",
+        "tools": "工具",
+        "weapons": "武器"
+      }
+    },
+    "upload": {
+      "notGlb": "请选择一个 .glb 文件。",
+      "tooLarge": "该文件超过 8 MiB 上限。",
+      "uploading": "正在上传资源...",
+      "uploaded": "资源已上传：{name}",
+      "uploadedExisting": "该模型已在服务器上，直接复用。",
+      "deleted": "已删除上传的资源。"
+    },
+    "openDrawer": {
+      "title": "打开地图",
+      "close": "关闭",
+      "tabLocal": "此浏览器",
+      "tabMine": "我的服务器地图",
+      "tabPublic": "公开地图",
+      "colName": "名称",
+      "colUpdated": "更新时间",
+      "colStatus": "状态",
+      "statusPublic": "公开",
+      "statusPrivate": "私有",
+      "open": "打开",
+      "fork": "派生",
+      "publish": "发布",
+      "unpublish": "取消发布",
+      "delete": "删除",
+      "draft": "自动保存的草稿",
+      "emptyLocal": "此浏览器还没有保存的地图。保存一张后会显示在这里。",
+      "emptyMine": "服务器上还没有地图。登录后保存即可创建。",
+      "emptyPublic": "还没有公开地图。",
+      "loading": "正在加载地图...",
+      "loadFailed": "无法从服务器加载地图。",
+      "signInHint": "在游戏中登录后即可浏览、保存和派生服务器地图。",
+      "deleteLocalConfirm": "删除本地地图“{name}”？",
+      "deleteServerConfirm": "删除服务器地图“{name}”？此操作无法撤销。",
+      "prev": "上一页",
+      "next": "下一页",
+      "page": "第 {page} 页"
+    },
+    "status": {
+      "savedLocal": "已将“{name}”保存到此浏览器。",
+      "savedServer": "已将“{name}”保存到服务器（v{version}）。",
+      "savedLocalOnly": "已将“{name}”保存到此浏览器。登录后可在线保存。",
+      "saveFailedLocal": "本地保存失败（存储被阻止）。",
+      "opened": "已打开“{name}”。",
+      "imported": "已导入“{name}”。",
+      "importFailed": "导入已取消，或该文件不是有效的地图。",
+      "exported": "已下载“{name}”。",
+      "newMap": "已基于内置世界新建地图。",
+      "forked": "已派生为“{name}”。你现在编辑的是自己的副本。",
+      "published": "地图已发布。任何人都可以找到并派生它。",
+      "unpublished": "地图已取消发布。",
+      "deleted": "地图已删除。",
+      "assetPlacedFirst": "请先在浏览器中选择一个资源。",
+      "loading3d": "正在加载世界...",
+      "playtestLaunch": "正在启动试玩...",
+      "playtestFailed": "无法启动试玩（存储被阻止）。",
+      "draftSaved": "草稿已自动保存。",
+      "draftRestored": "已恢复自动保存的草稿。",
+      "autosaveFailed": "自动保存失败（浏览器存储已满或被禁用）。请导出地图以保留备份。",
+      "terrainCapReached": "已达到地形编辑上限（{max}）。多余的雕刻印记未被添加。",
+      "placementCapReached": "已达到放置上限（{max}）。多余的资源未被添加。",
+      "blockerCapReached": "已达到空气墙上限（{max}）。新墙未被添加。",
+      "autosaveOff": "自动保存已关闭：{reason} 请手动保存后再重新开启。"
+    },
+    "confirm": {
+      "ok": "确定",
+      "cancel": "取消",
+      "discardTitle": "放弃更改？",
+      "discardBody": "“{name}”上有未保存的更改。要放弃它们吗？",
+      "discard": "放弃",
+      "conflictTitle": "保存冲突",
+      "conflictBody": "自你打开以来，此地图在服务器上已被修改（当前为 v{version}）。要将你的版本另存为新副本吗？",
+      "conflictSaveCopy": "另存为副本"
+    },
+    "prompt": {
+      "saveAsTitle": "另存为",
+      "nameLabel": "新地图名称"
+    },
+    "serverError": {
+      "invalid_map_name": "该地图名称不可用。请使用字母、数字、空格、撇号或连字符。",
+      "map_name_not_allowed": "该地图名称不被允许。",
+      "invalid_map_doc": "服务器拒绝了该地图文档。",
+      "invalid_version": "保存请求格式有误。请刷新后重试。",
+      "map_limit_reached": "你已达到服务器地图数量上限。删除一张后才能继续保存。",
+      "map_not_found": "该地图已不在服务器上。",
+      "version_conflict": "自你打开以来，该地图在服务器上已被修改。",
+      "slug_unavailable": "服务器无法为该名称生成链接。请换一个名称。",
+      "map_too_large": "地图文档过大，无法保存到服务器。",
+      "invalid_glb": "该文件不是有效的 GLB 模型。",
+      "asset_blocked": "该资源已被管理员屏蔽。",
+      "asset_limit_reached": "你已达到上传资源数量上限。删除一个后才能继续上传。",
+      "asset_storage_limit_reached": "你的资源存储空间已用完。请先删除一个资源。",
+      "asset_too_large": "该模型超过上传大小上限。",
+      "asset_not_found": "该资源已不在服务器上。",
+      "rate_limited": "操作太快了，请稍后再试。",
+      "unauthorized": "你的会话已过期。请重新在游戏中登录。",
+      "network": "无法连接服务器。请检查网络后重试。",
+      "timeout": "服务器响应超时。请重试。",
+      "unknown": "与服务器通信时出了点问题。"
+    },
+    "hints": {
+      "nav3d": "拖动旋转视角，滚轮缩放。按住拖动时，WASD 飞行，Q/E 调整高度。",
+      "nav2d": "拖动平移，滚轮缩放。"
+    },
+    "help": {
+      "title": "编辑器帮助",
+      "toolsTitle": "工具",
+      "shortcutsTitle": "键盘快捷键",
+      "mouseTitle": "鼠标与导航",
+      "flowTitle": "保存与试玩",
+      "beginTutorial": "开始教程",
+      "close": "关闭",
+      "tool": {
+        "select": "选中已放置的资产以移动、旋转和缩放；点击 2D 标记可进行编辑。",
+        "raise": "抬高笔刷下方的地形。",
+        "lower": "降低笔刷下方的地形。",
+        "smooth": "将起伏平滑到局部平均高度。",
+        "flatten": "将地面推平到拖动起点的高度。",
+        "paint": "在区域默认地表上涂刷生态群系。",
+        "water": "设置全图水面高度。",
+        "place": "将目录资产或上传的资产放置到地面上。",
+        "blocker": "拖动绘制在试玩中阻挡移动的隐形墙。",
+        "camp": "添加并编辑在试玩中刷新的怪物营地。",
+        "spawn": "设置试玩时玩家的落点。",
+        "region": "框选地形和资产以复制粘贴。",
+        "erase": "移除光标下已放置的资产或雕刻印记。"
+      },
+      "key": {
+        "tools": "每个工具都有一个单字母快捷键，显示在工具栏按钮上。",
+        "brush": "[ 和 ] 调整笔刷大小；Shift+[ 和 Shift+] 调整强度。",
+        "undo": "Ctrl+Z 撤销上一步；Ctrl+Y 或 Ctrl+Shift+Z 重做。",
+        "save": "Ctrl+S 保存地图。",
+        "duplicate": "Ctrl+D 复制选中的资产。",
+        "nudge": "方向键将选中的资产微调 0.5 码；按住 Shift 为 2 码。",
+        "wheel": "Shift+滚轮旋转选中的资产；Alt+滚轮缩放。",
+        "delete": "Delete 移除选中的资产或营地。",
+        "escape": "Esc 先清除选择，然后返回选择工具。"
+      },
+      "mouse": {
+        "orbit3d": "3D 视图：拖动环绕视角，滚轮缩放；中键拖动或 Shift+拖动平移。",
+        "fly3d": "在 3D 中按住拖动时，WASD 飞行移动镜头，Q/E 调整高度。",
+        "move": "选择工具激活时，拖动已放置的资产可在地面上移动它。",
+        "pan2d": "2D 视图：拖动平移，滚轮缩放。"
+      },
+      "flow": {
+        "save": "保存会把地图存到此浏览器；登录后也会存到服务器。",
+        "draft": "有未保存的更改时，每 30 秒自动保存一份草稿；用打开可以恢复。",
+        "playtest": "试玩会在此地图上启动真实游戏，包含你未保存的编辑。"
+      }
+    },
+    "tutorial": {
+      "title": "编辑器教程",
+      "back": "上一步",
+      "next": "下一步",
+      "finish": "完成",
+      "skip": "跳过导览",
+      "counter": "第 {current} 步，共 {total} 步",
+      "steps": {
+        "toolbar": {
+          "title": "工具栏",
+          "body": "所有编辑工具都在这里：雕刻笔刷、生态群系涂刷、水面、资产放置、营地等。每个工具都有单键快捷键，显示在按钮角落。"
+        },
+        "stage": {
+          "title": "世界视图",
+          "body": "这是用真实游戏引擎渲染的你的地图。拖动环绕视角，滚轮缩放，中键拖动或 Shift+拖动平移。用工具点击地面即可编辑。"
+        },
+        "inspector": {
+          "title": "工具选项",
+          "body": "当前工具的选项显示在这里：笔刷大小、生态群系调色板、资产缩放、营地设置，以及所选对象的属性。"
+        },
+        "viewToggle": {
+          "title": "3D 与 2D",
+          "body": "在渲染的 3D 世界和符号化的俯视 2D 地图之间切换。2D 视图最适合移动区域标记和查看大范围。"
+        },
+        "save": {
+          "title": "保存你的作品",
+          "body": "保存会把地图存到此浏览器，登录后也会存到服务器。导出可下载 JSON 备份，打开可找回已保存的地图和草稿。"
+        },
+        "playtest": {
+          "title": "试玩",
+          "body": "随时在你的地图上启动真实游戏，包含当前的编辑。关闭试玩标签页即可回来继续编辑。"
+        },
+        "help": {
+          "title": "帮助就在这里",
+          "body": "这就是完整流程。随时打开帮助查看完整工具列表和所有快捷键，或再次运行本导览。"
+        }
+      }
+    },
+    "a11y": {
+      "stage": "地图视口",
+      "toasts": "编辑器通知",
+      "dialog": "编辑器对话框"
+    }
+  },
   "skinEvent": {
     "title": "外观宝箱",
     "subtitle": "你解锁了一份{rank}级奖励——可选择不高于该等级的任意皮肤。",
@@ -1967,6 +2548,9 @@ export const zh_CN: EnTranslations = {
     "password": "密码",
     "passwordError": "请输入密码。",
     "passwordPlaceholder": "请输入密码",
+    "email": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "请输入有效的邮箱地址。",
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
     "logIn": "登录",
@@ -1992,7 +2576,15 @@ export const zh_CN: EnTranslations = {
     "create": "创建",
     "twoFactorLabel": "验证码",
     "twoFactorPlaceholder": "6 位验证码或恢复码",
-    "twoFactorHint": "请输入身份验证器应用中的验证码，或一个恢复码。"
+    "twoFactorHint": "请输入身份验证器应用中的验证码，或一个恢复码。",
+    "recovery": {
+      "title": "添加找回邮箱",
+      "body": "设置一个邮箱地址，以便您可以找回自己的账户。我们仅在您需要重置密码时，用它来确认您是本账户的所有者。",
+      "save": "保存邮箱",
+      "logOut": "Log out",
+      "invalid": "请输入有效的邮箱地址。",
+      "failed": "无法保存您的邮箱，请重试。"
+    }
   },
   "wallet": {
     "label": "$WOC 钱包",
@@ -2046,6 +2638,7 @@ export const zh_CN: EnTranslations = {
     "helpLinkedWithBalance": "持有者特权已启用。钱包应用已在此浏览器中连接。",
     "helpLinkedDisconnected": "持有者特权已启用。需要签名或消费时请连接应用。",
     "helpLinkedDisconnectedWithBalance": "持有者特权已启用。需要签名或消费时请连接应用。",
+    "extensionHelp": "若要在此处看到钱包，请保持 Solflare Wallet 等浏览器钱包扩展处于启用状态。",
     "flowConnect": "选择一个钱包。验证会自动继续。",
     "flowSign": "在钱包应用中签署验证消息。无需交易或 SOL。",
     "flowVerify": "正在验证钱包所有权...",
@@ -2288,6 +2881,7 @@ export const zh_CN: EnTranslations = {
       "unknownTier": "未知的探秘难度。",
       "levelRequired": "你必须达到 {level} 级才能进入{name}。",
       "levelRequiredTier": "你必须达到 {level} 级才能以{tier}难度进入{name}。",
+      "partyTooLarge": "{name}仅限单人或双人探索。{max}人及以上的队伍不得进入。",
       "instancesBusy": "{name}的所有副本都已占用。请稍后再试。",
       "runFailed": "{name}探秘失败。",
       "complete": "{name}已完成。",
@@ -2297,6 +2891,14 @@ export const zh_CN: EnTranslations = {
       "doorAlreadyOpen": "门已经开着了。",
       "companionRankUp": "{name}晋升至 {rank} 级。",
       "bossChest": "首领倒下了。一只设有结界的圣物库宝箱在祭坛上升起，撬开它的锁来取得你的战利品。",
+      "drownedLitanyReliquaryRise": "娜哈莉亚修女陷入沉默。溺亡圣髑匣从黑水中升起。靠近它以开始仪式。",
+      "riteSequenceReady": "神龛陷入黑暗。重复顺序。",
+      "riteSequencePlaying": "神龛正在重演仪式。请等待。",
+      "riteCorrect": "一声轻柔的钟鸣回应了你的触碰。",
+      "riteWrong": "刺耳的钟裂声。黑水在你脚边溅起。",
+      "riteReliquaryOpen": "溺亡圣髑匣打开了。",
+      "riteReliquaryLocked": "完成神龛仪式以打开圣髑匣。",
+      "riteReliquaryEmpty": "圣髑匣是空的。",
       "surfaceStairs": "一道通往地面的楼梯开启了。在楼梯处按 F 即可离开。",
       "moduleEnter": "{name}：{objective}",
       "objectiveClearRoom": "清空房间。",
@@ -2304,6 +2906,13 @@ export const zh_CN: EnTranslations = {
       "tombstoneHint": "房间清空后，一条墓碑通道将向北敞开。",
       "tombstoneOpen": "一条封闭的墓碑通道向北轰然开启。走进去即可继续前行。",
       "tombstoneInto": "你穿过墓碑进入{name}。",
+      "bellRopeShock": "钟绳猛然绷紧。溺亡诵经者们因震荡而踉跄。",
+      "eggSacBurst": "卵囊破裂了。蜘蛛幼体四散逃窜过洗礼堂的边缘。",
+      "baptistryEggs": "洗礼堂归于寂静。蜘蛛卵囊湿漉漉地附着在边缘。",
+      "baptistrySpidersSealed": "你应该试着摧毁那些蜘蛛卵囊。",
+      "puzzleSealed": "你需要在房间里某处施加压力来解开封印。",
+      "ropesSealed": "你应该试着拉动那些钟绳。",
+      "baptistryWave": "洗礼堂的黑水中有什么东西在搅动。",
       "chestEmpty": "宝箱是空的。",
       "notInDelve": "你不在探秘之中。",
       "cannotInteract": "你无法与之互动。",
@@ -2322,9 +2931,12 @@ export const zh_CN: EnTranslations = {
       "passageSealed": "通道被封住了。",
       "moveCloserPassage": "靠近通道一些。",
       "moveCloserChest": "靠近宝箱一些。",
+      "moveCloserReliquary": "靠近圣物匣一些。",
       "nothingToTake": "这里已经没有可拿的东西了。",
       "wayOutNotOpen": "出路尚未开启。",
-      "moveCloserStairs": "靠近楼梯一些。"
+      "moveCloserStairs": "靠近楼梯一些。",
+      "nhaliaCantorShield": "诵经者们，稳住音符！",
+      "nhaliaBlackwaterMark": "{name}用黑水标记了{player}！"
     },
     "lockpick": {
       "lockYields": "锁开了！{tier}战利品。",
@@ -2387,6 +2999,26 @@ export const zh_CN: EnTranslations = {
       "abandoned": "你将撬锁器轻轻抽了出来。锁还在等着。"
     }
   },
+  "delveRiteUi": {
+    "title": "溺亡圣髑仪式",
+    "blurb": "神龛将依序亮起。依次激活每一座神龛以重复顺序。触碰错误会导致本次尝试失败并重演顺序，完美无误的尝试将赢得最丰厚的战利品，而用尽尝试次数则会以最寒酸的方式打开圣髑匣。选择仪式将如何考验你。",
+    "easy": "Easy",
+    "medium": "中等",
+    "hard": "Hard",
+    "guideWatch": "选择后，四座神龛会依次亮起。记住顺序。",
+    "guideRepeat": "神龛熄灭后，按同样的顺序走到每座神龛前按 F（互动）。",
+    "guideStakes": "按错神龛会被黑水泼溅并损失一次尝试。完成整个顺序即可开启圣物匣。",
+    "showsTimes": "顺序展示{count}次",
+    "showsOnce": "顺序仅展示一次",
+    "symbols": "{count}个符号",
+    "tries": "{count}次尝试",
+    "reward": {
+      "easy": "普通战利品",
+      "medium": "丰厚战利品",
+      "hard": "顶级战利品"
+    },
+    "closeAria": "关闭"
+  },
   "delveUi": {
     "board": {
       "title": "探秘面板",
@@ -2396,6 +3028,7 @@ export const zh_CN: EnTranslations = {
       "openDelveAria": "从{name}打开探秘面板",
       "marks": "探秘印记：{count}",
       "minLevel": "需要等级 {level}",
+      "partyTooLarge": "仅限单人或双人（最多 {max} 人）",
       "tier": {
         "normal": "普通",
         "heroic": "英雄"
@@ -2403,6 +3036,7 @@ export const zh_CN: EnTranslations = {
       "companion": {
         "pick": "选择一名同伴",
         "tessa": "侍僧泰莎",
+        "edda": "艾达·芦手",
         "rank": "等级 {rank}",
         "boon": "在战斗间隙治疗队伍。3级时每次探秘可复活一名倒下的队友一次。",
         "upgrade": "升级到 {rank} 级（{marks} 印记）",
@@ -2428,7 +3062,11 @@ export const zh_CN: EnTranslations = {
       "complete": "已完成",
       "marks": "探秘印记：{count}",
       "exitHintOpen": "走进墓碑通道（北面）",
-      "exitHintLocked": "清空杂兵以开启向北的通道"
+      "exitHintLocked": "清空杂兵以开启向北的通道",
+      "riteChoose": "靠近沉溺圣物匣并按 F 开始仪式",
+      "ritePlayback": "注视神龛：记住它们亮起的顺序",
+      "riteInput": "按亮起的顺序在每座神龛前按 F（{current}/{total}）",
+      "riteOpen": "圣物匣已开启：在它面前按 F 领取战利品"
     },
     "objective": {
       "kill_boss": "击杀{boss}",
@@ -2449,27 +3087,54 @@ export const zh_CN: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "下方的圣物库又移位了。每到午夜过后，我们便能透过地板听见诵唱，侍僧泰莎更发誓说葬礼名册正在自行改写墨迹。若你有足够的勇气，{playerName}，就拿上一支蜡烛下去吧。别相信下面听到的每一个声音。它们中有些，早在你出生之前就知道你的名字了。"
+      },
+      "halvenMarsh": {
+        "greeting": "小径向北通往沼泽，{playerName}。又一座圣物库在黑水下歌唱，溺亡者应和着钟声。见习信徒艾达比我更懂这片芦苇，紧跟她的灯笼。选择你的难度，我会握紧绳索，直到你归来。"
       }
     },
     "intro": {
       "normal": "楼梯井又冷又暗。破碎的圣徒石散落在下行的台阶上，潮湿的空气中悬着一缕轻柔的钟音。侍僧泰莎低声道：“圣物库不该开到这么深的地方。靠紧些，{playerName}。”",
-      "heroic": "门在你身后呻吟着合上。一个个名字像指甲般刮过石面。泰莎的烛火燃成幽蓝。“他们如今召唤的已不是亡者了，{playerName}。他们是在回应某种东西。”"
+      "heroic": "门在你身后呻吟着合上。一个个名字像指甲般刮过石面。泰莎的烛火燃成幽蓝。“他们如今召唤的已不是亡者了，{playerName}。他们是在回应某种东西。”",
+      "litanyNormal": "芦苇堵塞的阶梯没入芬桥之下。艾达·芦手举起她的提灯。\"沼泽记得每一个被淹死之人的名字，{playerName}。留在光中。\"",
+      "litanyHeroic": "黑水拍打着堤道的石头。艾达的火焰闪烁成绿色。\"他们又在下面歌唱了，{playerName}。不要回应那唱诗队。\""
     },
     "module": {
       "reliquary_sunken_ossuary": "水从葬架间渗出，挟着陈年灰烬汇成银黑色的细流。",
       "reliquary_bell_niche": "数十口手钟静默地悬着，每一口都系着丧葬布。",
       "reliquary_saintless_hall": "一座座雕像的脸面被人以审慎的仇恨凿去。",
-      "reliquary_finale": "埋藏的钟在你脚下鸣响了一声。"
+      "reliquary_finale": "埋藏的钟在你脚下鸣响了一声。",
+      "litany_sluice": "长满苔藓的水闸滴落着黑水，落入古老的唱诗队墓室。",
+      "litany_ledger": "账簿岛屿从被淹没的水道中浮现，墨迹渗入沼泽。",
+      "litany_ring": "一圈圣髑环绕着一处被封印的黑水中央圣泉。",
+      "litany_baptistry": "一处天坑洗礼堂在破裂的圣者石与卵囊之下张开大口。",
+      "litany_choir_loft": "展开的唱诗楼回响着绳索悬挂的钟声，从未真正停歇。",
+      "litany_causeway": "一条Y形分岔的堤道横跨齐腰深的沼泽水。",
+      "litany_apse": "溺亡的后殿通向娜哈莉亚修女的祭坛岛。"
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "沉没的藏骨堂",
       "reliquary_bell_niche": "鸣钟壁龛",
       "reliquary_saintless_hall": "无圣之厅",
-      "reliquary_finale": "埋钟之厅"
+      "reliquary_finale": "埋钟之厅",
+      "litany_sluice": "新月水闸",
+      "litany_ledger": "岛屿账簿",
+      "litany_ring": "圣髑之环",
+      "litany_baptistry": "天坑洗礼堂",
+      "litany_choir_loft": "扇形唱诗楼",
+      "litany_causeway": "Y形分岔堤道",
+      "litany_apse": "溺亡后殿"
+    },
+    "object": {
+      "sluice_valve": "水闸阀门",
+      "grave_tablet": "墓碑石板",
+      "corpse_candle": "尸烛",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}：{line}",
       "tessa": {
+        "run_start": "蜡烛和名册我都带上了，{playerName}。带路吧。",
+        "ally_revive": "起来。今夜的名册上没有你的名字。",
         "combat_start": "站稳了，{playerName}。这里的亡者并不安分。",
         "low_hp": "深呼吸。我还有为你准备的祷词。",
         "trap_spotted": "等等，地板里有什么东西记得脚步声。",
@@ -2481,6 +3146,20 @@ export const zh_CN: EnTranslations = {
           "3": "圣物库侍僧",
           "4": "唤墓见证者",
           "5": "礼拜堂守护者"
+        }
+      },
+      "edda": {
+        "run_start": "沿着木板走，{playerName}。淤泥专吞骄傲的脚步。",
+        "ally_revive": "快起来。今天沼泽带不走你。",
+        "combat_start": "小心黑水，{playerName}。沼泽在倾听。",
+        "low_hp": "稳住。我的提灯还没熄灭。",
+        "trap_spotted": "等等。这里的芦苇不对劲。",
+        "boss_pull": "那圣歌知道你的名字，{playerName}。不要回唱。",
+        "completion": "沼泽还能再吞下它的秘密一晚。",
+        "rank": {
+          "1": "提灯者",
+          "2": "芦苇守望者",
+          "3": "芬桥信徒"
         }
       }
     },
@@ -2524,7 +3203,10 @@ export const zh_CN: EnTranslations = {
       "flooded_paths": "水淹通道",
       "grave_tax": "墓葬税",
       "unstable_roof": "不稳的顶棚",
-      "cult_remnants": "教派残党"
+      "cult_remnants": "教派残党",
+      "high_water": "水位高涨",
+      "lively_choir": "活跃唱诗队",
+      "belligerent_dead": "好战亡者"
     },
     "blessing": {
       "chapel_candle": "礼拜堂烛火：旅程更安全，但通关时少得一枚印记。"
@@ -3537,13 +4219,16 @@ export const zh_CN: EnTranslations = {
     },
     "cast": {
       "fishing": "钓鱼",
-      "demonHeal": "恶魔治疗"
+      "demonHeal": "恶魔治疗",
+      "thunzharrStormcall": "风暴召唤"
     }
   },
   "questUi": {
     "tracker": {
       "title": "任务",
-      "complete": "完成"
+      "complete": "完成",
+      "showOnMap": "在地图上显示{name}",
+      "hideFromMap": "在地图上隐藏{name}"
     },
     "log": {
       "title": "任务日志",
@@ -3646,7 +4331,8 @@ export const zh_CN: EnTranslations = {
       "drink": "饮料",
       "tool": "工具",
       "potion": "药水",
-      "elixir": "药剂"
+      "elixir": "药剂",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "护甲",
@@ -3688,7 +4374,8 @@ export const zh_CN: EnTranslations = {
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
-      "clickBuyback": "点击回购"
+      "clickBuyback": "点击回购",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "背包",
@@ -5545,6 +6232,48 @@ export const zh_CN: EnTranslations = {
       "conjured_water6": {
         "name": "魔法山泉水"
       },
+      "linen_pouch": {
+        "name": "亚麻小袋"
+      },
+      "travelers_knapsack": {
+        "name": "旅行者背囊"
+      },
+      "wolfhide_satchel": {
+        "name": "狼皮挎包"
+      },
+      "gravewoven_bag": {
+        "name": "墓织袋"
+      },
+      "mistcallers_duffel": {
+        "name": "唤雾者行囊"
+      },
+      "copper_mining_pick": {
+        "name": "铜制采矿镐"
+      },
+      "iron_mining_pick": {
+        "name": "铁制采矿镐"
+      },
+      "mithril_mining_pick": {
+        "name": "秘银采矿镐"
+      },
+      "handaxe": {
+        "name": "手斧"
+      },
+      "felling_axe": {
+        "name": "伐木斧"
+      },
+      "ironbark_axe": {
+        "name": "铁树皮斧"
+      },
+      "gathering_sickle": {
+        "name": "采集镰刀"
+      },
+      "bronze_sickle": {
+        "name": "青铜镰刀"
+      },
+      "silverleaf_sickle": {
+        "name": "银叶镰刀"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -5908,6 +6637,69 @@ export const zh_CN: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "瓦里克的暗影兜帽"
       },
+      "siltguard_helm": {
+        "name": "淤卫头盔"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "壁垒锈蚀肩甲"
+      },
+      "nhalias_bell_maul": {
+        "name": "娜哈莉亚的钟槌"
+      },
+      "reedstalker_jerkin": {
+        "name": "芦丛潜行皮甲"
+      },
+      "mirejaw_fang_knife": {
+        "name": "泥颚獠牙匕首"
+      },
+      "widow_silk_hood": {
+        "name": "寡妇丝兜帽"
+      },
+      "cantors_drowned_sash": {
+        "name": "诵经者的溺水腰带"
+      },
+      "corpse_candle_focus": {
+        "name": "尸烛法器"
+      },
+      "nhalias_litany_rod": {
+        "name": "娜哈莉亚的连祷杖"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "黑水先锋胸甲"
+      },
+      "siltstep_leggings": {
+        "name": "淤步护腿"
+      },
+      "sunken_reliquary_hood": {
+        "name": "沉没圣髑兜帽"
+      },
+      "litany_legs": {
+        "name": "淤行者护胫"
+      },
+      "litany_shoulder": {
+        "name": "黑水浮肩甲"
+      },
+      "litany_gloves_rog": {
+        "name": "苇缚护手"
+      },
+      "litany_plate_chest": {
+        "name": "沼卫胸甲"
+      },
+      "litany_leather_chest": {
+        "name": "深淤皮衣"
+      },
+      "litany_cloth_chest": {
+        "name": "唱诗溺袍"
+      },
+      "litany_helm": {
+        "name": "圣物猎人的溺兜"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "娜哈莉亚修女的唱诗锻甲"
+      },
+      "drowned_choir_fang": {
+        "name": "溺水唱诗獠牙"
+      },
       "the_codfather": {
         "name": "鳕鱼教父"
       },
@@ -6027,6 +6819,30 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "先锋铬银"
+      },
+      "crownforged_gauntlets": {
+        "name": "铸冠护手"
+      },
+      "nighttalon_grips": {
+        "name": "夜爪握套"
+      },
+      "soulflame_gloves": {
+        "name": "魂焰手套"
+      },
+      "stormcallers_handguards": {
+        "name": "唤雷者手甲"
+      },
+      "crownforged_girdle": {
+        "name": "铸冠腰带"
+      },
+      "nighttalon_waistband": {
+        "name": "夜爪束带"
+      },
+      "soulflame_cord": {
+        "name": "魂焰腰绳"
+      },
+      "stormcallers_waistguard": {
+        "name": "唤雷者腰甲"
       }
     },
     "mobs": {
@@ -6510,6 +7326,45 @@ export const zh_CN: EnTranslations = {
       "frosthelm_icehowler": {
         "name": "Frosthelm Icehowler"
       },
+      "drowned_cantor": {
+        "name": "溺亡诵经者"
+      },
+      "reedbound_acolyte": {
+        "name": "芦苇缚信徒"
+      },
+      "deepfen_spearjaw": {
+        "name": "深沼枪颚兽"
+      },
+      "mirefen_widowling": {
+        "name": "泥沼寡妇蛛"
+      },
+      "spider_egg_sac": {
+        "name": "蜘蛛卵囊"
+      },
+      "grave_silt_bulwark": {
+        "name": "墓淤壁垒"
+      },
+      "sump_troll_devourer": {
+        "name": "污水巨魔吞噬者"
+      },
+      "choir_thrall": {
+        "name": "唱诗奴仆"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "娜哈莉亚修女，溺亡的圣歌"
+      },
+      "edda_reedhand": {
+        "name": "艾达·芦手"
+      },
+      "tolling_bell": {
+        "name": "鸣钟"
+      },
+      "thunzharr_waking_peak": {
+        "name": "桑扎尔，觉醒之峰"
+      },
+      "thunzharr_stormling": {
+        "name": "被惊醒的风暴元素"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -6540,13 +7395,13 @@ export const zh_CN: EnTranslations = {
       "varkas_boneguard": {
         "name": "瓦尔卡斯骨卫"
       },
-      "imp": {
+      "emberkin": {
         "name": "小鬼"
       },
-      "voidwalker": {
+      "gloomshade": {
         "name": "虚空行者"
       },
-      "succubus": {
+      "duskborn": {
         "name": "魅魔"
       },
       "grix_the_tunnelking": {
@@ -6570,16 +7425,16 @@ export const zh_CN: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "缚魂者玛尔德雷克"
       },
-      "felhunter": {
+      "spellhound": {
         "name": "地狱猎犬"
       },
-      "felguard": {
+      "warfiend": {
         "name": "恶魔卫士"
       },
-      "infernal": {
+      "pyre_colossus": {
         "name": "地狱火"
       },
-      "doomguard": {
+      "wraithborn": {
         "name": "末日守卫"
       },
       "choirmother_selthe": {
@@ -6869,6 +7724,16 @@ export const zh_CN: EnTranslations = {
         "name": "Huntmaster Roderic",
         "title": "Wolfsward Huntmaster",
         "greeting": "The Empire hunts by charter and quota, {className}, and the quota is behind. Fetch your bow or fetch excuses; I only file one of them."
+      },
+      "brother_halven_marsh": {
+        "name": "哈尔文修士",
+        "title": "圣物库守护人",
+        "greeting": "小径向北延伸。又一座圣物库，又一场仪式。选择你的难度，我会为你守住绳索，直到你归来。"
+      },
+      "spirit_healer": {
+        "name": "灵魂医者",
+        "title": "亡者的守护者",
+        "greeting": "安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -7309,6 +8174,36 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "山脊潜猎者毛皮"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "潜猎者去而复返",
+        "text": "死了十二只，山脊上的潜猎者反而更多了，{playerName}。野兽不会因为饥饿就往城墙上扑，是高脊上有什么东西把它们赶下来。查清之前，猎杀不停。再杀十四只。",
+        "completion": "又杀了十四只，可巡逻队每天清晨仍数得出新的足迹。我的斥候从高脊回来时脸白得像雪线：她说那些爪印有盾牌那么大，还有潜猎者绝不会留下的猎杀痕迹。在上面游荡的绝不是普通的山猫。",
+        "objectives": {
+          "0": {
+            "label": "击败山脊潜猎者"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "守望者的披风",
+        "text": "八张皮给军官的披风加了衬，现在墙上每个士兵都想要一件，{playerName}。他们想得没错：寒冬先夺手指，从不听道歉。再从大门以南的山脊取十张皮，整支守望队都能睡个暖觉。",
+        "completion": "十张好皮，厚实得没话说……不对，你看这些，{playerName}。一半都撕裂了，可不是刀枪的痕迹。爪痕有我手掌那么宽，直接穿透了冬毛。山脊上有什么东西在残杀自己的同类。",
+        "objectives": {
+          "0": {
+            "label": "山脊潜猎者毛皮"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "老裂颚",
+        "text": "山民给我斥候找到的爪印起过名字：老裂颚，一只满身伤疤的暴君巨猫，熬死了自己族群的三代。潜猎者涌上我的道路，就是因为它，{playerName}。它的巢穴在南路上方的西侧山脊。带个帮手去，了结那老魔头。",
+        "completion": "它终于倒下了。山民曾发誓那只猫会比城墙活得还久。如今潜猎者会守在高处的雪原了，{playerName}，我的巡逻队走这条路也不必再流血。整条山脊都因你安静了下来。",
+        "objectives": {
+          "0": {
+            "label": "击败老裂颚"
           }
         }
       },
@@ -9018,6 +9913,33 @@ export const zh_CN: EnTranslations = {
         "name": "坍塌的圣物库",
         "enterText": "你向下深入坍塌的圣物库。",
         "leaveText": "你攀回圣物库废墟旁的哈尔文修士身边。"
+      },
+      "drowned_litany": {
+        "name": "溺亡连祷",
+        "enterText": "你潜入沼泽边缘，进入那座溺亡的神殿。",
+        "leaveText": "你爬回沼泽边缘，回到哈尔文修士身边。"
+      }
+    },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "渡鸦邮驿",
+        "subject": "渡鸦如今为你飞翔",
+        "body": "旅人：\n\n渡鸦邮驿已在谷地各处设立栖架。请在东溪镇、沼桥镇和高望镇寻找渡鸦石柱：在任意一处，你都可以向其他冒险者寄送信件、钱币和物品，也可以领取渡鸦为你带来的一切。\n\n随信附上一点心意，作为你的第一枚邮票。\n\n展翅高飞，\n渡鸦邮驿"
+      },
+      "letter_q_wolves": {
+        "sender": "雷德布鲁克元帅",
+        "subject": "围栏又安静了",
+        "body": "牧人们总算能睡个安稳觉了，这都是你的功劳。我已托渡鸦邮驿从守备金里给你捎去一点谢意。\n\n保持你的刀刃锋利。\n- 雷德布鲁克元帅"
+      },
+      "letter_q_greyjaw": {
+        "sender": "雷德布鲁克元帅",
+        "subject": "老灰颚，终于倒下了",
+        "body": "小镇里消息传得快。牧人们昨晚为你的健康干杯，威尔克斯发誓那头狼有马车那么大。让他们添油加醋去吧：这是你应得的。\n\n请代守备队享用一顿好饭。\n- 雷德布鲁克元帅"
+      },
+      "letter_q_hollow": {
+        "sender": "奥德里克修士",
+        "subject": "你在黑暗中所做的一切",
+        "body": "很少有人会知道那处洼地里埋葬着什么，愿意相信的人更少。但我知道，而且我不会忘记。\n\n愿你的道路常明。\n- 奥德里克修士"
       }
     },
     "itemSets": {
@@ -9033,8 +9955,8 @@ export const zh_CN: EnTranslations = {
       },
       "necromancers": {
         "name": "死灵法师法衣",
-        "bonus2": "受到伤害造成的施法延退降低 50%。",
-        "bonus3": "施法时不会因受到伤害而被延退。"
+        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus3": "智力提高 10 点，耐力提高 10 点。"
       },
       "nighttalon": {
         "name": "夜爪皮甲",
@@ -9043,13 +9965,13 @@ export const zh_CN: EnTranslations = {
       },
       "soulflame": {
         "name": "魂焰法衣",
-        "bonus2": "受到伤害造成的施法延退降低 50%。",
-        "bonus3": "施法时不会因受到伤害而被延退。"
+        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus3": "智力提高 15 点，精神提高 15 点。"
       },
       "stormcallers": {
         "name": "唤雷者法衣",
-        "bonus2": "受到伤害造成的施法延退降低 50%。",
-        "bonus3": "施法时不会因受到伤害而被延退。"
+        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus3": "智力提高 15 点，精神提高 15 点。"
       },
       "wyrmshadow": {
         "name": "龙影外衣",
@@ -9065,6 +9987,12 @@ export const zh_CN: EnTranslations = {
     "dungeonInstanceBusy": "{name}的所有副本都已被占用。请稍后再试。",
     "delveLockedChestInteract": "按 F 撬锁",
     "delveRewardChestInteract": "按 F 领取战利品",
-    "delveSurfaceExitInteract": "按 F 攀回地表"
+    "delveSurfaceExitInteract": "按 F 攀回地表",
+    "delveReliquaryInteract": "沉溺圣物匣：按 F 开始仪式",
+    "delveRiteShrineBellInteract": "铜铃神龛：按 F 敲响",
+    "delveRiteShrineCandleInteract": "烛火神龛：按 F 触碰",
+    "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
+    "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰",
+    "mailboxName": "邮箱"
   }
 };

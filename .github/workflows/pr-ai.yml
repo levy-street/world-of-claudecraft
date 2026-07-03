@@ -8,11 +8,11 @@ name: PR AI assist
 #   screenshots        boots the Vite dev client headless, runs a fixed offline tour
 #                       (character select, desktop HUD, mobile HUD), uploads the PNGs as
 #                       an artifact, and links them in a sticky PR comment.
-#   ai-review           sends the PR diff to an OpenRouter model (free
-#                       nvidia/nemotron-3-ultra-550b-a55b:free by default) and posts the
-#                       review as a sticky PR comment. No-ops without the
-#                       OPENROUTER_API_KEY secret (for example on a fork PR), so it never
-#                       blocks.
+#   ai-review           reviews the PR diff with the OpenAI Codex CLI, authenticated via
+#                       ChatGPT OAuth (the CODEX_AUTH_JSON secret holds a `codex login`
+#                       auth.json), and posts the review as a sticky PR comment. The
+#                       agent runs sandboxed read-only. No-ops without the secret (for
+#                       example on a fork PR), so it never blocks.
 #   ai-review-comment   on demand: an OWNER/MEMBER/COLLABORATOR comments `/review` or
 #                       `/suggest <focus>` on the PR. Fetches the diff itself via the
 #                       GitHub API (no checkout of the PR head, so this stays safe to run
@@ -20,10 +20,10 @@ name: PR AI assist
 #                       comment, keyed to the triggering comment rather than the sticky
 #                       review above.
 #
-# Setup (one time): add an OPENROUTER_API_KEY repo secret to enable ai-review. Optionally
-# set an OPENROUTER_MODEL repo variable to swap the model (free models can change or
-# disappear at any time). See docs/ai-pr-bot.md, including the privacy note on free
-# OpenRouter models logging prompts.
+# Setup (one time): run `codex login` locally and store ~/.codex/auth.json in the
+# CODEX_AUTH_JSON repo secret to enable ai-review. Optionally set a CODEX_MODEL repo
+# variable to override the Codex CLI's default model. See docs/ai-pr-bot.md, including
+# the data-handling note and how to refresh an expired OAuth session.
 
 on:
   pull_request:
@@ -134,9 +134,10 @@ jobs:
         run: node scripts/pr_comment_shots.mjs
 
   ai-review:
-    name: AI review (OpenRouter)
+    name: AI review (Codex)
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -148,6 +149,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install the Codex CLI
+        run: npm install -g @openai/codex
+
       - name: Compute PR diff
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -156,10 +160,10 @@ jobs:
           git diff --no-color "$BASE_SHA" "$HEAD_SHA" > pr.diff || true
           echo "diff bytes: $(wc -c < pr.diff)"
 
-      - name: Review with OpenRouter
+      - name: Review with Codex
         env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
+          CODEX_AUTH_JSON: ${{ secrets.CODEX_AUTH_JSON }}
+          CODEX_MODEL: ${{ vars.CODEX_MODEL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -178,6 +182,7 @@ jobs:
       github.event.issue.pull_request != null &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
       (startsWith(github.event.comment.body, '/review') || startsWith(github.event.comment.body, '/suggest'))
+    timeout-minutes: 20
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -187,10 +192,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Review with OpenRouter
+      - name: Install the Codex CLI
+        run: npm install -g @openai/codex
+
+      - name: Review with Codex
         env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || 'nvidia/nemotron-3-ultra-550b-a55b:free' }}
+          CODEX_AUTH_JSON: ${{ secrets.CODEX_AUTH_JSON }}
+          CODEX_MODEL: ${{ vars.CODEX_MODEL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.issue.number }}

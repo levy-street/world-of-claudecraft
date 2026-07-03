@@ -11,7 +11,7 @@
 <meta name="screen-orientation" content="landscape" />
 <meta name="orientation" content="landscape" />
 <title data-i18n="seo.title">World of ClaudeCraft: Classic-Style Web MMO</title>
-<meta name="description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta name="description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="manifest" href="/manifest.webmanifest" />
 
@@ -86,14 +86,14 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="World of ClaudeCraft" />
 <meta property="og:title" data-i18n-content="seo.title" content="World of ClaudeCraft: Classic-Style Web MMO" />
-<meta property="og:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta property="og:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!" />
 <meta property="og:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
 <meta property="og:url" content="https://worldofclaudecraft.com/" />
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" data-i18n-content="seo.title" content="World of ClaudeCraft: Classic-Style Web MMO" />
-<meta name="twitter:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta name="twitter:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!" />
 <meta name="twitter:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
 
 <!-- Structured Data (Schema.org JSON-LD) -->
@@ -108,7 +108,7 @@
       "alternateName": "World of Claudecraft",
       "url": "https://worldofclaudecraft.com/",
       "inLanguage": "en",
-      "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!",
+      "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!",
       "publisher": { "@id": "https://worldofclaudecraft.com/#organization" }
     },
     {
@@ -138,7 +138,7 @@
       "operatingSystem": "Web Browser",
       "url": "https://worldofclaudecraft.com/",
       "image": "https://worldofclaudecraft.com/woc_logo_square.webp",
-      "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!",
+      "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared world, level up classes, and defeat enemies!",
       "inLanguage": "en",
       "publisher": { "@id": "https://worldofclaudecraft.com/#organization" },
       "sameAs": [
@@ -235,11 +235,11 @@
       <div class="uf-bars">
         <div class="uf-name" id="tf-name"></div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
+        <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
-        <div class="combo-row" id="combo-row"></div>
-        <div class="uf-buffs" id="tf-debuffs"></div>
       </div>
+      <div class="uf-buffs" id="tf-debuffs"></div>
     </div>
 
     <div id="party-frames" role="group" data-i18n-aria="hudChrome.unitFrame.partyLabel" aria-label="Your Band"></div>
@@ -263,6 +263,9 @@
              accessible #map-window as the alternative, per the zone-label decision. -->
         <canvas id="minimap" width="162" height="162" aria-hidden="true"></canvas>
         <button id="raid-lockout" type="button" hidden data-i18n-title="hudChrome.raidLockout.title" data-i18n-aria="hudChrome.raidLockout.title" title="Raid Lockouts" aria-label="Raid Lockouts"></button>
+        <!-- Ravenpost envelope: visible while unread letters wait (role=status so
+             arrivals are announced; reading them still requires a mailbox). -->
+        <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" role="status" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
@@ -300,8 +303,10 @@
       </details>
     </nav>
 
-    <div id="quest-tracker"></div>
-    <div id="delve-tracker"></div>
+    <div id="right-tracker-stack">
+      <div id="quest-tracker"></div>
+      <div id="delve-tracker"></div>
+    </div>
 
     <div id="bottom-bar">
       <div id="actionbar-row">
@@ -315,6 +320,7 @@
             </div>
             <div class="uf-bars">
               <div class="uf-name" id="pf-name"></div>
+              <div class="combo-row" id="combo-row"></div>
               <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
             </div>
@@ -361,6 +367,7 @@
     <div id="quest-dialog" class="window panel"></div>
     <div id="delve-board" class="window panel"></div>
     <div id="lockpick-panel" class="window panel"></div>
+    <div id="delve-rite-panel" class="window panel"></div>
     <div id="loot-window" class="window panel"></div>
     <div id="bags" class="window panel"></div>
     <div id="char-window" class="window panel"></div>
@@ -378,11 +385,15 @@
       </div>
       <canvas id="map-canvas" width="560" height="560" role="img" data-i18n-aria="hud.core.mapCanvasLabel" aria-label="Map"></canvas>
       <span id="map-summary" class="visually-hidden" role="status" aria-live="polite"></span>
+      <button type="button" id="map-quests-toggle" data-i18n-title="questUi.tracker.title" data-i18n-aria="questUi.tracker.title" title="Quests" aria-label="Quests" aria-expanded="false" aria-controls="map-quests" hidden></button>
+      <div id="map-quests" class="panel" role="group" data-i18n-aria="questUi.tracker.title" aria-label="Quests"></div>
     </div>
     <div id="arena-window" class="window panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
+    <div id="mailbox-window" class="window panel"></div>
+    <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
     <div id="options-menu" class="window panel"></div>
     <div id="emote-editor" class="window panel"></div>
@@ -406,6 +417,7 @@
     <div id="tooltip" class="panel"></div>
 
     <div id="error-msg"></div>
+    <div id="quest-banner" aria-hidden="true"></div>
     <div id="banner"></div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner"></div>
@@ -422,6 +434,12 @@
     <div id="death-overlay">
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>
       <button type="button" class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+    </div>
+    <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
+         only when in reach of the corpse or the Pale Keeper. -->
+    <div id="ghost-prompt">
+      <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
+      <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
   </div>
 
@@ -466,6 +484,25 @@
       <div class="confirm-actions">
         <button type="button" class="btn btn-secondary" id="btn-discord-keep-cancel" data-i18n="hudChrome.discord.keep.cancel">Cancel</button>
         <button type="button" class="btn btn-danger" id="btn-discord-keep-submit" data-i18n="hudChrome.discord.keep.submit">Set password and unlink</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mandatory recovery-email capture: shown on sign-in when the account has no
+       email on file yet. Not dismissable except by logging out; setting an address
+       is required to continue into the realm. -->
+  <div id="recovery-email-modal" class="modal-backdrop" hidden>
+    <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="recovery-email-title">
+      <h2 id="recovery-email-title" data-i18n="auth.recovery.title">Add a recovery email</h2>
+      <p data-i18n="auth.recovery.body">Set an email address so you can recover your account. We only use it to confirm you own this account if you ever need to reset your password.</p>
+      <div class="auth-field">
+        <label for="recovery-email-input" class="auth-label" data-i18n="auth.email">Email</label>
+        <input id="recovery-email-input" type="email" maxlength="254" autocomplete="email" data-i18n-placeholder="auth.emailPlaceholder" placeholder="you@example.com" />
+      </div>
+      <div id="recovery-email-error" class="auth-error" aria-live="polite"></div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" id="btn-recovery-email-logout" data-i18n="auth.recovery.logOut">Log out</button>
+        <button type="button" class="btn btn-primary" id="btn-recovery-email-submit" data-i18n="auth.recovery.save">Save email</button>
       </div>
     </div>
   </div>
@@ -547,17 +584,17 @@
 
         <section class="official-site-copy" aria-labelledby="official-site-copy-heading">
           <p class="official-site-copy__label" id="official-site-copy-heading" data-i18n="seo.officialLabel">Official World of ClaudeCraft website</p>
-          <p class="official-site-copy__body" data-i18n="seo.officialBody">worldofclaudecraft.com is the official free browser MMO for the Claudemoon realm. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.</p>
+          <p class="official-site-copy__body" data-i18n="seo.officialBody">worldofclaudecraft.com is the official free browser MMO for the Claudemoon world. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.</p>
         </section>
 
         <div id="mode-select">
           <div class="play-console">
-            <!-- Realm selector: a themed dropdown that defaults to Online and can switch to Offline.
+            <!-- World selector: a themed dropdown that defaults to Online and can switch to Offline.
                  It only chooses the destination; the Play button below commits. -->
             <div class="server-select" id="server-select" data-mode="online">
               <button type="button" class="server-select-trigger" id="server-select-trigger"
                 aria-haspopup="listbox" aria-expanded="false" aria-controls="server-select-menu"
-                data-i18n-aria="mode.serverAria" aria-label="Select realm: Online or Offline">
+                data-i18n-aria="mode.serverAria" aria-label="Select world: Online or Offline">
                 <span class="server-dot" data-mode="online" aria-hidden="true"></span>
                 <span class="server-select-text">
                   <span class="server-select-value" id="server-select-value" data-i18n="mode.serverOnline">Online</span>
@@ -570,12 +607,12 @@
                 </span>
                 <svg class="server-select-chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </button>
-              <div class="server-select-menu" id="server-select-menu" role="listbox" data-i18n-aria="mode.serverAria" aria-label="Select realm: Online or Offline" hidden>
+              <div class="server-select-menu" id="server-select-menu" role="listbox" data-i18n-aria="mode.serverAria" aria-label="Select world: Online or Offline" hidden>
                 <div class="server-select-option is-selected" id="server-opt-online" role="option" data-mode="online" tabindex="-1" aria-selected="true">
                   <span class="server-dot" data-mode="online" aria-hidden="true"></span>
                   <span class="server-opt-text">
                     <span class="server-opt-name" data-i18n="mode.serverOnline">Online</span>
-                    <span class="server-opt-desc" data-i18n="mode.onlineDesc">Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.</span>
+                    <span class="server-opt-desc" data-i18n="mode.onlineDesc">Log in to the world. Your characters live on the server and you share the world with everyone else who's on.</span>
                     <span class="server-opt-stats">
                       <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
                     </span>
@@ -623,7 +660,7 @@
         </div>
 
         <form id="login-panel" class="panel auth-panel auth-panel-premium" data-auth-mode="login" hidden novalidate>
-          <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the Realm</h2>
+          <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the World</h2>
 
           <!-- First-class onboarding: Continue with Discord at the top of the form. -->
           <button type="button" class="btn" id="btn-login-discord" hidden style="width:100%;margin:4px 0 12px;background:linear-gradient(180deg,#5865f2,#404ac4);border-color:#2a2f7a;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
@@ -673,6 +710,23 @@
             </div>
           </div>
 
+          <!-- Email is captured at signup as the account recovery address. Shown in
+               register mode only; setAuthMode toggles its visibility + required. -->
+          <div class="auth-field" id="login-email-field" hidden>
+            <label for="login-email" class="auth-label" data-i18n="auth.email">Email</label>
+            <div id="login-email-error" class="auth-field-error" aria-live="polite" data-i18n="auth.emailError">Please enter a valid email address.</div>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              maxlength="254"
+              data-i18n-placeholder="auth.emailPlaceholder"
+              placeholder="you@example.com"
+              autocomplete="email"
+              aria-describedby="login-email-error"
+            />
+          </div>
+
           <!-- Cloudflare Turnstile widget mounts here when configured (src/main.ts). -->
           <div id="cf-turnstile-container" class="auth-turnstile"></div>
 
@@ -690,7 +744,7 @@
             <button type="submit" class="btn btn-primary" id="btn-login" data-i18n="auth.logIn">Log In</button>
           </div>
           <p class="auth-switch">
-            <span id="auth-switch-prompt" data-i18n="auth.noAccountPrompt">New to the realm?</span>
+            <span id="auth-switch-prompt" data-i18n="auth.noAccountPrompt">New to the world?</span>
             <button type="button" class="auth-link" id="btn-auth-toggle" data-i18n="auth.createAccount">Create Account</button>
           </p>
         </form>
@@ -733,25 +787,25 @@
         </div>
 
         <div id="realm-panel" class="panel auth-panel auth-panel-premium" hidden>
-          <h2 class="auth-title"><span data-i18n="auth.realmList">Realm List</span> <span id="realm-list-user" class="cs-realm"></span></h2>
-          <div id="realm-list"><div class="realm-loading" data-i18n="auth.loadingRealms">Loading realms...</div></div>
+          <h2 class="auth-title"><span data-i18n="auth.realmList">World List</span> <span id="realm-list-user" class="cs-realm"></span></h2>
+          <div id="realm-list"><div class="realm-loading" data-i18n="auth.loadingRealms">Loading worlds...</div></div>
           <div class="auth-actions auth-actions-split">
             <button type="button" class="btn btn-secondary" id="btn-realm-back" data-i18n="auth.back">Back</button>
           </div>
         </div>
 
-        <div id="charselect-panel" class="panel charselect-screen" hidden>
+        <div id="charselect-panel" class="panel charselect-screen cs-wow" hidden>
           <header class="cs-head">
             <h2 class="auth-title cs-title"><span data-i18n="auth.characters">Characters:</span> <span id="charselect-user" class="gold"></span></h2>
             <div class="cs-head-row">
               <div class="cs-controls">
                 <div class="cs-realm-switch">
-                  <button type="button" id="btn-change-realm" class="cs-realm-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="auth.changeRealm" aria-label="Change Realm">
-                    <span class="cs-realm-caption" data-i18n="auth.realm">Realm</span>
+                  <button type="button" id="btn-change-realm" class="cs-realm-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="auth.changeRealm" aria-label="Change World">
+                    <span class="cs-realm-caption" data-i18n="auth.realm">World</span>
                     <span id="charselect-realm" class="cs-realm-name"></span>
                     <svg class="cs-realm-caret" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
                   </button>
-                  <div id="cs-realm-menu" class="cs-realm-menu" role="listbox" data-i18n-aria="auth.realmList" aria-label="Realm List" hidden></div>
+                  <div id="cs-realm-menu" class="cs-realm-menu" role="listbox" data-i18n-aria="auth.realmList" aria-label="World List" hidden></div>
                 </div>
                 <div class="cs-sort-switch">
                   <button type="button" id="cs-sort-btn" class="cs-realm-btn cs-sort-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="character.sortByLabel" aria-label="Sort characters">
@@ -830,7 +884,7 @@
           </div>
         </div>
 
-        <div id="charcreate-panel" class="panel charselect-screen" hidden>
+        <div id="charcreate-panel" class="panel charselect-screen cs-wow" hidden>
           <header class="cs-head">
             <h2 class="auth-title cs-title" data-i18n="auth.createCharacter">Create a Character</h2>
           </header>
@@ -902,12 +956,11 @@
           </div>
         </div>
 
-        <div id="offline-select" class="panel charselect-screen" hidden>
-          <header class="cs-head">
-            <h2 class="auth-title cs-title" data-i18n="auth.offlineCharacter">Offline Character</h2>
-          </header>
-          <div class="cs-body cs-body-create">
-            <div class="cs-create-col">
+        <div id="offline-select" class="panel auth-panel auth-panel-premium cs-wow" hidden>
+          <h2 class="auth-title" data-i18n="auth.offlineCharacter">Offline Character</h2>
+          <div class="charselect-layout">
+            <!-- Left Column: Character Name & Class Chips & Actions -->
+            <div class="charselect-col-left">
               <div class="char-create">
                 <div class="cs-section-header" data-i18n="auth.characterName">Character Name</div>
                 <div class="char-input-group">
@@ -983,7 +1036,7 @@
             </svg>
           </div>
           <h2 class="skeleton-title" data-i18n="highscores.title">High Scores Leaderboard</h2>
-          <p class="skeleton-desc" data-i18n="game.leaderboard.globalSubtitle">Top champions across all realms</p>
+          <p class="skeleton-desc" data-i18n="game.leaderboard.globalSubtitle">Top champions across all worlds</p>
           <div id="hs-leaderboard" class="hs-leaderboard" aria-live="polite">
             <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
           </div>

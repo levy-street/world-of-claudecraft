@@ -739,7 +739,7 @@ export const CONTESTED_NORTH_MOBS: Record<string, MobTemplate> = {
     name: 'Claim-Jumper Sapper',
     minLevel: 45,
     maxLevel: 48,
-    family: 'kobold',
+    family: 'burrower',
     hpBase: 108,
     hpPerLevel: 33,
     dmgBase: 21,

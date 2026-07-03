@@ -11,6 +11,14 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
+  // button and "You have died." title reuse the hud.core.* keys; these are the
+  // ghost-state additions shown once the spirit has been released.
+  death: {
+    resurrectAtCorpse: 'Resurrect at Corpse',
+    resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
+    spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
+  },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
   // bubble text). Source ids/order mirror OVERHEAD_EMOTES in world_api.ts.
   emotes: {
@@ -62,6 +70,10 @@ export const hudChromeStrings = {
     spinResult: '+{points} points',
     spinButton: 'Spin',
     tasks: 'Tasks',
+    taskMultiplier: 'x{multiplier} multiplier',
+    pointsGained: '{points} daily rewards points gained.',
+    showChestButton: 'Show Chest',
+    hideChestButton: 'Hide Chest',
     leaderboard: 'Daily Leaderboard',
     totalPlayer: '{count} player today',
     totalPlayers: '{count} players today',
@@ -178,12 +190,16 @@ export const hudChromeStrings = {
     // ru_RU) carry real fills, the Latin overlays stay pending. Title Case does not help
     // (M16 is per-word consecutive-lowercase, not word count).
     partyGroup: 'Group {n}',
-    // durationUnitSeconds is the unit suffix appended to an aura's remaining-seconds count on
-    // the buff/debuff strip (e.g. "5s"). The auras core (auras_view.ts) renders it via the
-    // injected durationUnitSuffix() dep so an in-game language switch lands next tick. A single
-    // char (non-wordy: no four-plus consecutive-lowercase run), so an English-filled non-Latin
-    // overlay does not trip the M16 untranslated-leak guard; the maintainer localizes at release.
+    // The unit suffixes appended to an aura's compact remaining-duration label on the
+    // buff/debuff strips (e.g. "20s", "5m", "1h", "2d"). The auras core (auras_view.ts)
+    // renders them via the injected durationUnits() dep so an in-game language switch
+    // lands next tick. Single chars (non-wordy: no four-plus consecutive-lowercase run),
+    // so an English-filled non-Latin overlay does not trip the M16 untranslated-leak
+    // guard; the maintainer localizes at release.
     durationUnitSeconds: 's',
+    durationUnitMinutes: 'm',
+    durationUnitHours: 'h',
+    durationUnitDays: 'd',
   },
   // Character sheet (#char-window) accessible names. modelPreview names the role=img 3D
   // turntable HOST distinctly from the title's level/class subtitle (the canvas pixels
@@ -375,13 +391,27 @@ export const hudChromeStrings = {
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',
+    // Interface panel toggle: render your own overhead nameplate the way other
+    // players see it (on by default).
+    showOwnNameplate: 'Show My Nameplate',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
+    // Interface panel sliders: scale just the player / target unit frame
+    // (wordy, M16: the five non-Latin fills land in the same change as each).
+    playerFrameScale: 'Player Frame Scale',
+    targetFrameScale: 'Target Frame Scale',
+    // Interface panel toggle: anchor the player's own buff row to the movable
+    // player frame (the debuff row then slides up beside the minimap) instead
+    // of the classic two-row top-right corner (wordy, M16: the five non-Latin
+    // fills land in this same change).
+    aurasOnPlayerFrame: 'Buffs on the Player Frame',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
     startAttackOnAbility: 'Auto-Attack on Ability Use',
+    // Interface panel toggle: loot corpses by walking past them (off by default).
+    walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
@@ -390,6 +420,7 @@ export const hudChromeStrings = {
     // Interface panel toggle that reveals the optional second action bar row (off
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',
+    showDailyRewardsChest: 'Show Daily Rewards Chest',
   },
   // Controller / gamepad options panel (Options > Controller). Player-facing
   // chrome, so every label is a key here; the live numbers run through
@@ -569,7 +600,7 @@ export const hudChromeStrings = {
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.
   tips: {
-    joinChannels: 'Tip: type /join world or /join lfg to chat with players across the realm.',
+    joinChannels: 'Tip: type /join world or /join lfg to chat with players across the world.',
   },
   // Item-set (tier set) tooltip block. The set name and per-tier bonus text come
   // from content/item_sets.ts via entity_i18n; these two are the surrounding
@@ -638,7 +669,7 @@ export const hudChromeStrings = {
   // position/screenshot plus a free-text description and posts to the server.
   bugReport: {
     menuButton: 'Report a Bug',
-    realm: 'Realm',
+    realm: 'World',
     character: 'Character',
     position: 'Position',
     unknown: 'Unknown',
@@ -789,6 +820,9 @@ export const hudChromeStrings = {
   // itself is a sim emit re-localized through localizeSystemText (hud.logs.partyLeader).
   party: {
     promoteLeader: 'Promote to Leader',
+    // The global "/invite <name>" usage hint shown when the command is typed
+    // without a name (the invite itself has no proximity gate).
+    inviteUsage: 'Invite whom? Usage: /invite <name>.',
   },
   lootSettings: {
     title: 'Loot Settings',
@@ -818,6 +852,15 @@ export const hudChromeStrings = {
     searchPlaceholder: 'Search items',
     searchAria: 'Search bag items by name',
     noMatch: 'No items match your filters.',
+    // The bag bar (backpack + 4 equip sockets) and the used/capacity counter.
+    capacity: '{used}/{total}',
+    capacityAria: 'Bag slots used: {used} of {total}',
+    backpack: 'Backpack',
+    // Accessible name for a bag-bar socket: '{name}: {slots}' where {slots} is
+    // the already-localized 'N Slot Bag' phrase, so no code-side concatenation.
+    bagSocketAria: '{name}: {slots}',
+    socketEmpty: 'Empty bag slot',
+    unequipHint: 'Click to remove this bag',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing
@@ -872,6 +915,7 @@ export const hudChromeStrings = {
       spi: 'Reduces Spirit by {value}',
       allStats: 'Reduces all attributes by {value}',
     },
+    allStatsPctReduce: 'Reduces all attributes by {pct}%',
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
     armorFlat: 'Reduces armor by {value}',
@@ -892,13 +936,13 @@ export const hudChromeStrings = {
     disarm: 'Disarmed: cannot use weapon attacks',
     lockout: 'Spell school locked out',
     imbue: 'Weapon imbued with bonus effects',
-    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on judgement',
+    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
     stealth: 'Concealed; movement speed reduced by {pct}%',
-    formBear: 'Bear Form: increased health and armor',
+    formBear: 'Bruin Form: increased health and armor',
     formCat: 'Cat Form: melee damage and energy',
-    formTravel: 'Travel Form: movement speed increased by {pct}%',
-    defensiveStance: 'Defensive Stance: reduced damage taken, more threat',
-    righteousFury: 'Righteous Fury: greatly increased threat from Holy damage',
+    formTravel: 'Fleet Form: movement speed increased by {pct}%',
+    defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
+    righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
     // Localized damage-school names spliced into {school} above.
@@ -911,6 +955,12 @@ export const hudChromeStrings = {
       holy: 'Holy',
       nature: 'Nature',
     },
+  },
+  // World-boss spawn announcement. The sim emits this server-wide in English when a
+  // world boss rises; src/ui/sim_i18n.ts re-localizes it through this key, splicing
+  // the localized boss name. English-only domain so an English-only PR compiles.
+  worldBoss: {
+    spawn: '{name} rises over Thornpeak Heights!',
   },
   // Loot window title shown only when the chest entity is missing (the normal path
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
@@ -931,6 +981,44 @@ export const hudChromeStrings = {
   nameplate: {
     mob: '[{level}] {name}',
     mobElite: '[{level}+] {name}',
+  },
+  // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
+  // name (colored by the nameplate con-color), then "Level N <type>" ({family}
+  // reuses the existing guide.family.<id>.name bestiary labels), then a
+  // Friendly/Hostile reaction line (green/red, from Entity.hostile). All three
+  // values below are wordy (M16): filled in the five non-Latin locales in this
+  // same change.
+  mobTooltip: {
+    levelFamily: 'Level {level} {family}',
+    // The one MobFamily with no guide.family.* bestiary entry (demons are
+    // warlock-pet / zone encounter mobs, out of scope for the public wiki
+    // bestiary generator), so it needs its own word here.
+    familyDemon: 'Demon',
+    hostile: 'Hostile',
+    friendly: 'Friendly',
+  },
+  // Movable target frame: the small corner toggle that unlocks the frame for
+  // dragging and locks it back in place (target_frame_pos.ts + hud.ts wiring).
+  // The one button swaps its accessible name with its pressed state; both values
+  // are wordy (M16), filled in the five non-Latin locales in this same change.
+  targetFrame: {
+    // aria-label / title while LOCKED (aria-pressed=false): press to move it.
+    unlock: 'Move target frame',
+    // aria-label / title while UNLOCKED (aria-pressed=true): press to fix it.
+    lock: 'Lock target frame',
+  },
+  // Movable player frame: the same MovableFrame corner toggle on #player-frame
+  // (movable_frame.ts). Same shape as targetFrame above; both values are wordy
+  // (M16), filled in the five non-Latin locales in this same change.
+  playerFrame: {
+    unlock: 'Move player frame',
+    lock: 'Lock player frame',
+  },
+  // Interface panel row: snap both movable unit frames back to their stock
+  // spots (the button reuses chatWindow.resetAction). Wordy (M16): the five
+  // non-Latin fills land in this same change.
+  frameReset: {
+    label: 'Reset Frame Positions',
   },
   // Item tooltip: the minimum character level needed to equip a piece (classic
   // "Requires Level N"). Shown red when the viewer is below it. {level} runs
@@ -1022,6 +1110,7 @@ export const hudChromeStrings = {
     memberSinceDays: '{days}d in the Discord',
     roleTag: {
       levyst: 'Levy St',
+      admin: 'Admin',
       devs: 'Dev',
       mods: 'Mod',
       artists: 'Artist',
@@ -1110,5 +1199,123 @@ export const hudChromeStrings = {
     },
     linkedAs: 'Linked as {login}',
     unlink: 'Unlink GitHub',
+  },
+  // The Ravenpost mailbox window + envelope indicator. Authored letter
+  // sender/subject/body localize via entities.letters.* (world_entity_i18n),
+  // not here; these are the window chrome and the structured mailResult lines.
+  mailbox: {
+    title: 'Mailbox',
+    subtitle: 'The Ravenpost',
+    close: 'Close mailbox',
+    tabInbox: 'Inbox',
+    tabInboxWithCount: 'Inbox ({count})',
+    tabSend: 'Send',
+    empty: 'Your mailbox is empty.',
+    truncated: 'Showing the newest {shown} of {total} letters.',
+    attachmentsBadge: 'Parcel attached',
+    unreadBadge: 'Unread',
+    back: 'Back',
+    take: 'Take attachments',
+    delete: 'Delete letter',
+    deleteAria: 'Delete the letter {subject}',
+    openAria: 'Read the letter {subject} from {name}',
+    noSubject: '(no subject)',
+    toLabel: 'To',
+    toPlaceholder: 'Character name',
+    subjectLabel: 'Subject',
+    bodyLabel: 'Message',
+    coinLabel: 'Attach coin',
+    parcelsLabel: 'Parcels',
+    parcelsHint: 'Click an item in your bags to attach it.',
+    removeParcelAria: 'Remove {item} from the letter',
+    sendButton: 'Send letter',
+    postageNote: 'Postage: {amount}. The raven flies for about {seconds}s.',
+    arrivedBanner: 'The raven has landed: mail from {name}.',
+    arrivedLog: 'You have new mail from {name}.',
+    indicatorAria: 'Unread mail: {count}',
+    indicatorTip: 'You have {count} unread letters. Visit a mailbox to read them.',
+    clickAttach: 'Click to attach to your letter.',
+    cannotMail: 'This cannot be mailed.',
+    result: {
+      sent: 'A raven takes wing with your letter to {name} ({postage} postage).',
+      collected: 'You collect {amount} from the letter.',
+      tooFar: 'You must be at a mailbox to tend your post.',
+      needRecipient: 'Name a recipient for your letter.',
+      noRecipient: 'No one by that name holds a mailbox here.',
+      tooManyParcels: 'A letter carries at most {count} parcels.',
+      noMailQuestItems: 'You cannot mail quest items.',
+      notEnoughItems: 'You do not have that many to send.',
+      cantAffordPostage: 'You cannot afford the postage.',
+      recipientBoxFull: 'Their mailbox is full.',
+      letterGone: 'That letter is no longer in your box.',
+      takeParcelsFirst: 'Take the parcels out before discarding the letter.',
+    },
+  },
+  // The event calendar window: recurring system events plus the guild lane
+  // (booked by officers and the Guild Master, mirrored via socialInfo).
+  calendar: {
+    title: 'Event Calendar',
+    close: 'Close calendar',
+    keybindLabel: 'Event Calendar',
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    dayAria: '{date}: {count} events',
+    noEvents: 'Nothing planned for this day.',
+    allDay: 'All day',
+    bookedBy: 'Booked by {name}',
+    deleteAria: 'Remove the event {title}',
+    bookTitle: 'Book a guild event',
+    titlePlaceholder: 'Event title',
+    notePlaceholder: 'Note (optional)',
+    hourLabel: 'Hour (UTC)',
+    hourAllDay: 'All day',
+    addButton: 'Book event',
+    guildOnlyNote: 'Join a guild to plan events together.',
+    result: {
+      created: 'The event is on the guild calendar.',
+      removed: 'The event was taken off the calendar.',
+      notInGuild: 'You are not in a guild.',
+      notOfficer: 'Only officers and the Guild Master may manage guild events.',
+      badInput: 'Give the event a title and a valid day.',
+      calendarFull: 'The guild calendar is full.',
+      eventGone: 'That event is no longer on the calendar.',
+    },
+    events: {
+      raidCall: {
+        title: 'Raid Call',
+        note: 'Wardens sound the horn: gather a party for the crypts and the raid.',
+      },
+      marketDay: {
+        title: 'Market Day',
+        note: 'The Merchant expects fresh stock. A fine day to browse the World Market.',
+      },
+      fiestaNight: {
+        title: 'Fiesta Night',
+        note: 'The 2v2 Fiesta ring draws its loudest crowds tonight.',
+      },
+      arenaClash: {
+        title: 'Arena Clash',
+        note: 'Duelists flock to the Ashen Coliseum. Queue up and climb the ladder.',
+      },
+      fishingDerby: {
+        title: 'Fishing Derby',
+        note: 'Anglers line the lakes. Bring a pole and swap fishing tales.',
+      },
+      delveDay: {
+        title: 'Delve Day',
+        note: 'Brother Halven marks his charts: a fine day to brave the Collapsed Reliquary.',
+      },
+      moongateCommunion: {
+        title: 'Moongate Communion',
+        note: 'Pilgrims gather at the temple moongate under the mid-month moon.',
+      },
+    },
+  },
+  // Guild roster: a member's last world-entry time, shown on offline rows. {when}
+  // is a locale-formatted date/time, or the "never" leaf when the character has no
+  // recorded login.
+  social: {
+    lastSeen: 'Last seen: {when}',
+    lastSeenNever: 'never',
   },
 };

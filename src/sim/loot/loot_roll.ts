@@ -309,14 +309,41 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
   return true;
 }
 
+// Rotates a common/junk drop over the kill-time eligible party members
+// (`partyLootCandidatesForMob`, backed by `mob.lootRecipientIds`), never the
+// loot-time in-range set: that is the fairness point. Mirrors
+// tryAwardCopperByFairSplit's shape (strategy check, candidate-count guard,
+// party lookup) but advances a per-party cursor instead of a Fisher-Yates split.
+function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity): boolean {
+  if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'round-robin') return false;
+  const candidates = partyLootCandidatesForMob(ctx, mob);
+  if (candidates.length <= 1) return false;
+  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  if (!party) return false;
+  const winner = candidates[party.lootTurn % candidates.length];
+  party.lootTurn++;
+  ctx.addItem(itemId, 1, winner.entityId);
+  return true;
+}
+
+// Returns true when the item was consumed off the corpse (a roll started, a
+// round-robin winner took it, or it landed in the looter's bags); false when
+// the looter-takes-all direct grant found the looter's bags full, so the
+// caller leaves it on the corpse. The roll and round-robin paths are not
+// capacity-gated: those grants force-add (items are never destroyed, and the
+// looter cannot free space on the winner's behalf).
 export function awardSharedLootItem(
   ctx: SimContext,
   itemId: string,
   mob: Entity,
   looter: PlayerMeta,
-): void {
-  if (startMasterLootRoll(ctx, itemId, mob)) return;
-  if (!startNeedGreedRoll(ctx, itemId, mob)) ctx.addItem(itemId, 1, looter.entityId);
+): boolean {
+  if (startMasterLootRoll(ctx, itemId, mob)) return true;
+  if (startNeedGreedRoll(ctx, itemId, mob)) return true;
+  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
+  if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
+  ctx.addItem(itemId, 1, looter.entityId);
+  return true;
 }
 
 // Open need-greed rolls the given player may still answer. Mirrors the

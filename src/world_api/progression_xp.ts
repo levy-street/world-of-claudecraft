@@ -53,6 +53,11 @@ export interface IWorldProgressionXp {
   unlockedMilestones: string[];
   // Classic Rested XP pool (inn-rested kill-XP bonus); 0 when not rested.
   restedXp: number;
+  // Flat per-craft skill tracking (#1126): one independent, additive-only skill
+  // value for each of the ten crafts on the professions ring, keyed by craft id
+  // (see src/sim/content/professions.ts and src/sim/professions/wheel.ts). No
+  // conserved-mass economy yet, so this is a plain read of the persisted counters.
+  craftSkills: Record<string, number>;
   // Post-cap progression: the realm-scoped lifetime-XP leaderboard, and the
   // opt-in cosmetic prestige action. Paged server-side (a realm can hold far
   // more than one page of max-level players); page is 0-based.

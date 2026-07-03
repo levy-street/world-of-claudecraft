@@ -25,6 +25,8 @@
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
+import { tunedXpAmount } from '../game_config';
+import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
@@ -43,6 +45,7 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
+import { WORLD_BOSS_CORPSE_SECONDS, worldBossContributors } from '../world_boss';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -50,7 +53,7 @@ const CORPSE_DURATION = 60;
 // Self attack-speed buff a wounded frenzyOnHit mob gains; sole user maybeFrenzyOnHit.
 const BLOOD_FRENZY_AURA_ID = 'blood_frenzy';
 
-// A handful of casts ignore vanilla spell pushback (e.g. ghost_wolf). Sole user is
+// A handful of casts ignore classic-era spell pushback (e.g. ghost_wolf). Sole user is
 // the dealDamage pushback branch, so the predicate lives here with it.
 function ignoresDamagePushback(abilityId: string): boolean {
   return abilityId === 'ghost_wolf';
@@ -351,7 +354,7 @@ export function dealDamage(
       target.drinking = null;
     }
     if (target.sitting) target.sitting = false;
-    // vanilla spell pushback: a landed hit delays the cast rather than
+    // classic-era spell pushback: a landed hit delays the cast rather than
     // cancelling it (misses and fully absorbed hits don't push back)
     if (
       target.castingAbility &&
@@ -474,7 +477,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);
-  e.auras = [];
+  // The Keeper's Toll (Resurrection Sickness) is the one debuff that survives death: it
+  // must not be sheddable by dying and releasing the spirit. Only a player ever carries
+  // it, so mobs still clear fully.
+  e.auras = aurasSurvivingDeath(e.auras);
   e.ccDr.clear();
   e.castingAbility = null;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
@@ -536,7 +542,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       run.objective.complete = true;
       ctx.onDelveBossDefeated(run);
     }
-    if (run?.affixes.includes('restless_graves') && template && !template.boss && !template.elite) {
+    if (
+      run?.affixes.includes('restless_graves') &&
+      template &&
+      !template.boss &&
+      !template.elite &&
+      !e.affixSpawned
+    ) {
       run.restlessPending.push({
         at: ctx.time + 3,
         x: e.pos.x,
@@ -548,6 +560,19 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer = ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    // World bosses: snapshot the contributor set from the hate table BEFORE it is
+    // cleared below, keep a long lootable-corpse window so every contributor can
+    // loot, and never auto-respawn in place: the world-boss scheduler is the sole
+    // respawner (it drops the corpse once the window elapses). Summoned adds
+    // collapse with the boss: leaving them alive would harass looters for the
+    // whole window, and a slain add's in-place respawn timer would revive it
+    // mid-window (only fires for worldBoss templates, so no parity rng change).
+    const worldBossContribs = template?.worldBoss ? worldBossContributors(ctx, e) : null;
+    if (template?.worldBoss) {
+      e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
+      e.respawnTimer = Infinity;
+      ctx.despawnSummonedAdds(e);
+    }
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
@@ -568,7 +593,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
     if (meta && creditEntity) {
-      const eliteMult = MOBS[e.templateId]?.elite ? 2 : 1;
+      const tmpl = MOBS[e.templateId];
+      // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
+      // in one hit by design, so it must not pay full kill XP.
+      const eliteMult = (tmpl?.elite ? 2 : 1) * (tmpl?.xpMult ?? 1);
       // party play: kill credit, xp split and quest progress shared with
       // members nearby (classic group rules + group bonus). A member downed
       // during the fight still counts while their corpse is in range: classic
@@ -589,11 +617,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
 
       meta.counters.kills++;
       if (creditEntity.targetId === e.id) creditEntity.autoAttack = false;
-      if (creditEntity.comboTargetId === e.id) {
-        creditEntity.comboPoints = 0;
-        creditEntity.comboTargetId = null;
-        ctx.emit({ type: 'comboPoint', points: 0, pid: creditEntity.id });
-      }
+      // combo points are character-bound: unspent points survive the kill and
+      // carry to the next target (they fade on their own via updateComboExpiry)
       for (const member of eligible) {
         const mE = ctx.entities.get(member.entityId);
         if (!mE) continue;
@@ -606,8 +631,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
       }
-      ctx.rollLoot(e, meta, eligible);
+      // World bosses use PERSONAL loot for every contributor (rolled below from the
+      // hate-table snapshot), not the tapper/party shared-corpse roll.
+      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible);
     }
+    // Personal loot is independent of tap/party kill credit: it goes to everyone who
+    // damaged the boss, so it rolls outside the credited-player block above.
+    if (worldBossContribs) ctx.rollWorldBossLoot(e, worldBossContribs);
   }
 }
 
@@ -619,7 +649,12 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
-  // Rested XP bonus: classic vanilla only doubles KILL xp (not quests), and
+  // Operator XP rate (game_config override layer). Identity at the default 1,
+  // so unconfigured hosts keep the exact classic-era awards. Applied before the
+  // rested draw-down so the rested bonus scales with the same knob.
+  amount = tunedXpAmount(amount);
+  if (amount <= 0) return;
+  // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.
   let restedBonus = 0;

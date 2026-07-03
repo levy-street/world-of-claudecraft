@@ -185,7 +185,7 @@ export const VETH_MOBS: Record<string, MobTemplate> = {
     name: 'Blackriver Skulker',
     minLevel: 28,
     maxLevel: 30,
-    family: 'murloc',
+    family: 'mudfin',
     canSwim: true,
     hpBase: 85,
     hpPerLevel: 26,

@@ -14,12 +14,14 @@ export interface PickInteractionWorld {
   leaveDungeon(): void;
   pickUpObject(id: number): void;
   startAutoAttack(): void;
+  resurrectAtSpiritHealer(): void;
 }
 
 export interface PickInteractionHud {
   openLoot(mobId: number, screenX: number, screenY: number): void;
   openQuestDialog(npcId: number): void;
   openDelveBoard(npcId: number): void;
+  openMailbox(): void;
   showError(text: string): void;
   closeContextMenu(): void;
 }
@@ -124,13 +126,20 @@ export function handlePickedEntity(
       }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
+      else if (e.templateId === 'mailbox') hud.openMailbox();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
       else hud.showError(t('questUi.errors.tooFar'));
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
-        if (e.templateId === 'brother_halven') hud.openDelveBoard(id);
+        if (e.templateId === 'spirit_healer') {
+          // The Spirit Healer resurrects a ghost in place (with Resurrection
+          // Sickness). To the living it offers only watchful flavor.
+          if (world.player.ghost) world.resurrectAtSpiritHealer();
+          else hud.showError(t('hudChrome.death.spiritHealerAlive'));
+        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+          hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
     } else if ((e.kind === 'mob' && !e.dead && e.hostile) || isActivePvpOpponent(world, e)) {
@@ -147,6 +156,7 @@ export function handlePickedEntity(
       if (d > INTERACT_RANGE + 1) return;
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
+      else if (e.templateId === 'mailbox') hud.openMailbox();
       else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       const d = dist2d(world.player.pos, e.pos);
@@ -156,7 +166,8 @@ export function handlePickedEntity(
       // out of range it just targets (no error spam while exploring)
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 2) {
-        if (e.templateId === 'brother_halven') hud.openDelveBoard(id);
+        if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+          hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       }
     }

@@ -1052,6 +1052,113 @@ const PRIMITIVES = {
     ctx.quadraticCurveTo(-12, -2, -10, 8);
     ctx.stroke();
   },
+  // Drawstring bag/pouch: a plump sack body cinched at a gathered neck with a
+  // knotted rope, stitched bottom seam and a soft ground shadow, for the bag
+  // items (Linen Pouch ... Mistcaller's Duffel) and the backpack.
+  sack(ctx, pal) {
+    // the pouch is drawn in a compact ~44-unit box; scale it up to fill the
+    // icon like the weapon/armor primitives do
+    ctx.save();
+    ctx.scale(1.32, 1.32);
+    // ground shadow so the bag sits instead of floating
+    noShadow(ctx);
+    ctx.fillStyle = 'rgba(0,0,0,0.32)';
+    ctx.beginPath();
+    ctx.ellipse(0, 21, 16, 3.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // plump body: wide hips, waist pulled in toward the cinch
+    ctx.beginPath();
+    ctx.moveTo(-6.5, -13);
+    ctx.bezierCurveTo(-15, -12, -20, -3, -19.5, 6);
+    ctx.bezierCurveTo(-19, 16, -10, 21, 0, 21);
+    ctx.bezierCurveTo(10, 21, 19, 16, 19.5, 6);
+    ctx.bezierCurveTo(20, -3, 15, -12, 6.5, -13);
+    ctx.closePath();
+    ctx.fillStyle = rad(ctx, -6, -2, 30, [
+      [0, pal.light],
+      [0.45, pal.base],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+    edge(ctx, pal.dark, 1.8);
+    // gathered neck flaring above the tie, with pleat cuts
+    ctx.beginPath();
+    ctx.moveTo(-7, -12);
+    ctx.quadraticCurveTo(-8.5, -19, -11, -23);
+    ctx.quadraticCurveTo(-3.5, -20.5, 0, -21.5);
+    ctx.quadraticCurveTo(3.5, -20.5, 11, -23);
+    ctx.quadraticCurveTo(8.5, -19, 7, -12);
+    ctx.closePath();
+    ctx.fillStyle = lin(ctx, -8, -23, 8, -12, [
+      [0, pal.base],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+    edge(ctx, pal.dark, 1.4);
+    noShadow(ctx);
+    // pleats in the gathered neck
+    ctx.strokeStyle = withAlpha(pal.dark, 0.4);
+    ctx.lineWidth = 1;
+    for (const x of [-4.5, 0, 4.5]) {
+      ctx.beginPath();
+      ctx.moveTo(x * 0.9, -20);
+      ctx.lineTo(x, -13);
+      ctx.stroke();
+    }
+    // knotted rope tie: dark strand + light strand + knot bead and hanging tail
+    ctx.strokeStyle = pal.dark;
+    ctx.lineWidth = 3.4;
+    ctx.beginPath();
+    ctx.moveTo(-8.5, -13.5);
+    ctx.quadraticCurveTo(0, -9.5, 8.5, -13.5);
+    ctx.stroke();
+    ctx.strokeStyle = withAlpha(pal.light, 0.75);
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-8, -14);
+    ctx.quadraticCurveTo(0, -10.2, 8, -14);
+    ctx.stroke();
+    ctx.fillStyle = pal.dark;
+    ctx.beginPath();
+    ctx.arc(8.2, -12.6, 2.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = pal.dark;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(8.6, -11);
+    ctx.quadraticCurveTo(10.5, -6, 9.2, -1.5);
+    ctx.stroke();
+    // two soft cloth folds falling from the cinch (kept faint so the bag does
+    // not read as a striped vase at 40px)
+    ctx.strokeStyle = withAlpha(pal.dark, 0.28);
+    ctx.lineWidth = 1.6;
+    for (const x of [-5.5, 4]) {
+      ctx.beginPath();
+      ctx.moveTo(x * 0.5, -9);
+      ctx.quadraticCurveTo(x * 1.35, 5, x * 0.8, 16);
+      ctx.stroke();
+    }
+    // stitched bottom seam: short dashes following the belly curve
+    ctx.strokeStyle = withAlpha(pal.light, 0.55);
+    ctx.lineWidth = 1.3;
+    for (let i = -3; i <= 3; i++) {
+      const a = Math.PI / 2 + i * 0.19;
+      const cx = Math.cos(a) * 16.4;
+      const cy = 3.2 + Math.sin(a) * 16.2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 1.4, cy - 0.4);
+      ctx.lineTo(cx + 1.4, cy + 0.4);
+      ctx.stroke();
+    }
+    // top-left sheen following the body curve
+    ctx.strokeStyle = withAlpha(pal.light, 0.6);
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.moveTo(-12.5, -7);
+    ctx.quadraticCurveTo(-16.5, 2, -12, 13);
+    ctx.stroke();
+    ctx.restore();
+  },
   droplet(ctx, pal) {
     ctx.beginPath();
     ctx.moveTo(0, -20);
@@ -2332,6 +2439,25 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
+  // Bags (+ the implicit backpack the bag bar shows). Palettes step up with
+  // the quality tier so the bag reads richer as it grows.
+  backpack: r('leather', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  linen_pouch: r('cloth', 'cloth', [{ p: 'sack', pal: 'cloth' }]),
+  travelers_knapsack: r('leather', 'leather', [{ p: 'sack', pal: 'leather' }]),
+  wolfhide_satchel: r('leather', 'earthBrown', [
+    { p: 'sack', pal: 'earthBrown' },
+    { p: 'paw', ...BR },
+  ]),
+  gravewoven_bag: r('shadow', 'shadowPurple', [{ p: 'sack', pal: 'shadowPurple' }], ['glow']),
+  mistcallers_duffel: r(
+    'arcane',
+    'sky',
+    [
+      { p: 'sack', pal: 'sky' },
+      { p: 'gem', ...TR },
+    ],
+    ['sparkle'],
+  ),
   worn_sword: r('steel', 'steel', ['sword']),
   gnarled_staff: r('wood', 'earthBrown', [{ p: 'staff', pal: 'earthBrown' }]),
   rusty_dagger: r('steel', 'earthBrown', [{ p: 'dagger', pal: 'earthBrown' }]),
@@ -2447,6 +2573,61 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ['crack'],
   ),
   linen_scrap: r('junk', 'silverWhite', [{ p: 'pelt', pal: 'silverWhite' }]),
+  // --- The Drowned Litany (Drowned Reliquary Rite loot) ---
+  siltguard_helm: r('earth', 'earthBrown', [
+    { p: 'helm', pal: 'earthBrown' },
+    { p: 'droplet', ...BR, pal: 'venom' },
+  ]),
+  bulwark_rusted_pauldrons: r(
+    'earth',
+    'earthBrown',
+    [{ p: 'pauldron', pal: 'earthBrown' }],
+    ['crack'],
+  ),
+  nhalias_bell_maul: r(
+    'shadow',
+    'bone',
+    ['mace', { p: 'sunburst', ...TR, pal: 'bone' }],
+    ['glow', 'arcs'],
+  ),
+  reedstalker_jerkin: r('leather', 'leafGreen', [{ p: 'chestplate', pal: 'leafGreen' }]),
+  mirejaw_fang_knife: r('earth', 'venom', ['dagger', { p: 'fang', ...BR, pal: 'bone' }]),
+  widow_silk_hood: r(
+    'shadow',
+    'shadowPurple',
+    [
+      { p: 'helm', pal: 'shadowPurple' },
+      { p: 'web', ...TR },
+    ],
+    ['glow'],
+  ),
+  cantors_drowned_sash: r('drink', 'sky', [{ p: 'belt', pal: 'sky' }]),
+  corpse_candle_focus: r('shadow', 'bone', [{ p: 'candle', pal: 'bone' }], ['drips']),
+  nhalias_litany_rod: r(
+    'shadow',
+    'bone',
+    ['staff', { p: 'sunburst', ...TR, pal: 'bone' }],
+    ['glow'],
+  ),
+  blackwater_vanguard_chest: r(
+    'steel',
+    'steel',
+    [
+      { p: 'chestplate', pal: 'steel' },
+      { p: 'droplet', ...BR, pal: 'sky' },
+    ],
+    ['glow', 'sparkle'],
+  ),
+  siltstep_leggings: r('leather', 'earthBrown', ['trousers'], ['glow', 'sparkle']),
+  sunken_reliquary_hood: r(
+    'cloth',
+    'arcanePink',
+    [
+      { p: 'helm', pal: 'arcanePink' },
+      { p: 'gem', ...TR },
+    ],
+    ['glow', 'sparkle'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -2504,9 +2685,9 @@ const CREST_RECIPES: Record<string, IconRecipe> = {
   // mob families
   family_beast: r('earth', 'earthBrown', ['paw']),
   family_humanoid: r('steel', 'steel', ['sword']),
-  family_murloc: r('drink', 'sky', ['droplet']),
+  family_mudfin: r('drink', 'sky', ['droplet']),
   family_spider: r('shadow', 'silverWhite', ['web']),
-  family_kobold: r('earth', 'gold', ['candle']),
+  family_burrower: r('earth', 'gold', ['candle']),
   family_undead: r('shadow', 'bone', ['skull']),
   family_troll: r('junk', 'bone', ['bone']),
   family_ogre: r('fury', 'earthBrown', ['fist']),
@@ -2722,6 +2903,10 @@ function itemFallback(id: string): IconRecipe | null {
   if (it.kind === 'tool') {
     const prim: PrimitiveName = has(name, ['pole', 'rod', 'staff']) ? 'staff' : 'mace';
     return r('wood', 'earthBrown', [prim], fx);
+  }
+  if (it.kind === 'bag') {
+    const isCloth = has(name, ['linen', 'silk', 'woven', 'cloth', 'wool']);
+    return r(isCloth ? 'cloth' : 'leather', isCloth ? 'cloth' : 'leather', ['sack'], fx);
   }
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);

@@ -58,6 +58,10 @@ const BIOME_THEME: Record<BiomeId, MusicZone> = {
   vale: 'vale',
   marsh: 'marsh',
   peaks: 'peaks',
+  // paint-only biomes (custom maps) borrow the closest shipped theme
+  beach: 'vale',
+  volcano: 'peaks',
+  cave: 'marsh',
   desert: 'vale',
   shadowwood: 'marsh',
   highlands: 'vale',

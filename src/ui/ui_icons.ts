@@ -48,7 +48,8 @@ export type UiIconName =
   | 'autorun'
   | 'nameplates'
   | 'vibrate'
-  | 'lock';
+  | 'lock'
+  | 'mail';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -117,6 +118,9 @@ const ICONS: Record<UiIconName, string> = {
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
   // hand-authored padlock — shackle over a solid body (nonzero fill merges them)
   lock: '<path d="M256 96a72 72 0 0 0-72 72v64h40v-64a32 32 0 0 1 64 0v64h40v-64a72 72 0 0 0-72-72zM150 224a26 26 0 0 0-26 26v140a26 26 0 0 0 26 26h212a26 26 0 0 0 26-26V250a26 26 0 0 0-26-26z"/>',
+  // hand-authored sealed envelope (frame + flap V), distinct from the solid
+  // `whisper` glyph so mail chrome and whisper actions stay tellable apart
+  mail: '<path d="M48 128a32 32 0 0 1 32-32h352a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H80a32 32 0 0 1-32-32V128zm52 8 156 122 156-122H100zm312 50L288 296a52 52 0 0 1-64 0L100 186v190h312V186z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

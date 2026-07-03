@@ -425,6 +425,11 @@ function questCompletionPoints(
   return { points: Math.max(0, Math.floor(basePoints * multiplier)), multiplier };
 }
 
+function repeatQuestPoints(points: number, priorCompletions: number): number {
+  if (points <= 0) return 0;
+  return Math.max(1, Math.floor(points / 2 ** Math.max(0, priorCompletions)));
+}
+
 function onlineMultiplierPoints(
   basePoints: number,
   config: Record<string, unknown>,
@@ -441,6 +446,18 @@ function onlineMultiplierPoints(
     minMultiplier + Math.floor(Math.max(0, onlineMinutes) / minutesPerMultiplier),
   );
   return { points: Math.max(0, Math.floor(basePoints * multiplier)), multiplier };
+}
+
+function currentTaskMultiplier(
+  task: { type: string; points: number; basePoints: number; config: Record<string, unknown> },
+  onlineMinutes: number,
+): number | null {
+  if (task.type === 'quest_completion')
+    return questCompletionPoints(task, onlineMinutes).multiplier;
+  if (task.type === 'arena_result')
+    return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
+      .multiplier;
+  return null;
 }
 
 export class DailyRewardService {
@@ -463,13 +480,14 @@ export class DailyRewardService {
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
     const eligibility = await dailyRewardEligibility(accountId, config);
-    const [score, rank, spin, tasks, leaders, leaderboardTotal] = await Promise.all([
+    const [score, rank, spin, tasks, leaders, leaderboardTotal, onlineMinutes] = await Promise.all([
       this.db.scoreForAccount(day, accountId),
       this.db.rankForAccount(day, accountId),
       this.db.spinForAccount(day, accountId),
       this.db.tasksForAccount(day, accountId),
       this.db.leaderboard(day, accountId, 10),
       this.db.leaderboardTotal(day),
+      this.db.onlineMinutesForAccount(day, accountId),
     ]);
     const leaderboardRows = [...leaders];
     if (rank !== null && rank > 10) {
@@ -492,7 +510,12 @@ export class DailyRewardService {
             claimedAt: spin.createdAt,
           }
         : { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-      tasks: tasks.map((task) => ({ ...task, id: task.taskId, locked: !eligibility.eligible })),
+      tasks: tasks.map((task) => ({
+        ...task,
+        id: task.taskId,
+        multiplier: currentTaskMultiplier(task, onlineMinutes),
+        locked: !eligibility.eligible,
+      })),
       leaderboard: leaderboardView(leaderboardRows, accountId),
       leaderboardTotal,
     };
@@ -548,37 +571,51 @@ export class DailyRewardService {
 
   async recordQuestCompletion(
     accountId: number,
+    characterId: number | null,
     questId: string,
     completedAt: Date = new Date(),
-  ): Promise<void> {
-    if (!questId) return;
+  ): Promise<number> {
+    if (!questId) return 0;
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
     const eligibility = await dailyRewardEligibility(accountId, config);
-    if (!eligibility.eligible) return;
+    if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'quest_completion');
-    if (tasks.length === 0) return;
+    if (tasks.length === 0) return 0;
     const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
     for (const task of tasks) {
       const { points, multiplier } = questCompletionPoints(task, onlineMinutes);
       if (points <= 0) continue;
-      await this.db.addPoints(
+      const priorCompletions = await this.db.questTaskCompletionCount(
+        day,
+        accountId,
+        task.taskId,
+        questId,
+      );
+      const awarded = repeatQuestPoints(points, priorCompletions);
+      const recorded = await this.db.addPoints(
         day,
         accountId,
         'task',
-        points,
-        `task:${task.taskId}:quest:${questId}`,
+        awarded,
+        `task:${task.taskId}:quest:${questId}:character:${characterId ?? 'account'}`,
         {
           taskId: task.taskId,
           taskType: task.type,
           questId,
+          characterId,
           onlineMinutes,
           multiplier,
           basePoints: task.basePoints,
+          undiscountedPoints: points,
+          repeatIndex: priorCompletions,
         },
       );
+      if (recorded) awardedPoints += awarded;
     }
+    return awardedPoints;
   }
 
   async recordArenaResult(
@@ -590,16 +627,17 @@ export class DailyRewardService {
       ratingAfter: number;
       completedAt?: Date;
     },
-  ): Promise<void> {
+  ): Promise<number> {
     const completedAt = result.completedAt ?? new Date();
     const { day, config } = await dailyRewardClock(completedAt);
     await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
     await this.db.seedTasks(day, config.tasks);
     const eligibility = await dailyRewardEligibility(accountId, config);
-    if (!eligibility.eligible) return;
+    if (!eligibility.eligible) return 0;
     const tasks = await this.db.tasksForType(day, 'arena_result');
-    if (tasks.length === 0) return;
+    if (tasks.length === 0) return 0;
     const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
     for (const task of tasks) {
       const taskConfig = task.config ?? {};
       const basePoints = result.won
@@ -607,7 +645,7 @@ export class DailyRewardService {
         : numberConfig(taskConfig, 'lossBasePoints', 10);
       const { points, multiplier } = onlineMultiplierPoints(basePoints, taskConfig, onlineMinutes);
       if (points <= 0) continue;
-      await this.db.addPoints(
+      const recorded = await this.db.addPoints(
         day,
         accountId,
         'task',
@@ -625,7 +663,9 @@ export class DailyRewardService {
           ratingAfter: result.ratingAfter,
         },
       );
+      if (recorded) awardedPoints += points;
     }
+    return awardedPoints;
   }
 
   async history(limit = 30): Promise<DailyRewardHistory> {

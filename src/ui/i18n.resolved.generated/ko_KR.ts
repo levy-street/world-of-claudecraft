@@ -154,6 +154,11 @@ export const ko_KR: EnTranslations = {
     "spectate": {
       "banner": "{name} 관전 중"
     },
+    "death": {
+      "resurrectAtCorpse": "시신에서 부활",
+      "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
+      "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다."
+    },
     "emotes": {
       "wave": "손인사",
       "laugh": "ㅋㅋ",
@@ -202,6 +207,10 @@ export const ko_KR: EnTranslations = {
       "spinResult": "+{points} 포인트",
       "spinButton": "돌리기",
       "tasks": "과제",
+      "taskMultiplier": "{multiplier}배 배율",
+      "pointsGained": "{points} 일일 보상 포인트를 획득했습니다.",
+      "showChestButton": "보물상자 표시",
+      "hideChestButton": "보물상자 숨기기",
       "leaderboard": "일일 순위표",
       "totalPlayer": "오늘 플레이어 {count}명",
       "totalPlayers": "오늘 플레이어 {count}명",
@@ -282,7 +291,10 @@ export const ko_KR: EnTranslations = {
       "targetAnnounce": "대상: {name}",
       "partyLabel": "내 파티",
       "partyGroup": "{n}번 그룹",
-      "durationUnitSeconds": "초"
+      "durationUnitSeconds": "초",
+      "durationUnitMinutes": "분",
+      "durationUnitHours": "시",
+      "durationUnitDays": "일"
     },
     "character": {
       "modelPreview": "캐릭터 모델 미리보기"
@@ -400,14 +412,20 @@ export const ko_KR: EnTranslations = {
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
       "showDevBadges": "개발자 배지 표시",
+      "showOwnNameplate": "내 이름표 표시",
       "uiScale": "UI 배율",
+      "playerFrameScale": "플레이어 프레임 크기",
+      "targetFrameScale": "대상 프레임 크기",
+      "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
+      "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
-      "showSecondaryActionBar": "보조 액션 바 표시"
+      "showSecondaryActionBar": "보조 액션 바 표시",
+      "showDailyRewardsChest": "일일 보상 보물상자 표시"
     },
     "controller": {
       "title": "컨트롤러",
@@ -726,7 +744,8 @@ export const ko_KR: EnTranslations = {
       "summaryGroup": "전리품 설정: 파티 분배."
     },
     "party": {
-      "promoteLeader": "파티장으로 지정"
+      "promoteLeader": "파티장으로 지정",
+      "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."
     },
     "lootSettings": {
       "title": "전리품 설정",
@@ -753,7 +772,13 @@ export const ko_KR: EnTranslations = {
       "sortName": "이름",
       "searchPlaceholder": "아이템 검색",
       "searchAria": "이름으로 가방 아이템 검색",
-      "noMatch": "필터와 일치하는 아이템이 없습니다."
+      "noMatch": "필터와 일치하는 아이템이 없습니다.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "사용 중인 가방 칸: {total}칸 중 {used}칸",
+      "backpack": "배낭",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "빈 가방 칸",
+      "unequipHint": "클릭하여 이 가방을 해제"
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -796,6 +821,7 @@ export const ko_KR: EnTranslations = {
         "spi": "정신력을 {value} 감소시킵니다",
         "allStats": "모든 능력치를 {value} 감소시킵니다"
       },
+      "allStatsPctReduce": "모든 능력치를 {pct}% 감소시킵니다",
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
@@ -835,6 +861,9 @@ export const ko_KR: EnTranslations = {
         "nature": "자연"
       }
     },
+    "worldBoss": {
+      "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
+    },
     "loot": {
       "chestTitle": "상자"
     },
@@ -845,6 +874,23 @@ export const ko_KR: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "{level}레벨 {family}",
+      "familyDemon": "악마",
+      "hostile": "적대",
+      "friendly": "아군"
+    },
+    "targetFrame": {
+      "unlock": "대상 프레임 이동",
+      "lock": "대상 프레임 고정"
+    },
+    "playerFrame": {
+      "unlock": "플레이어 프레임 이동",
+      "lock": "플레이어 프레임 고정"
+    },
+    "frameReset": {
+      "label": "프레임 위치 초기화"
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}"
@@ -927,6 +973,7 @@ export const ko_KR: EnTranslations = {
       "memberSinceDays": "Discord 가입 {days}일",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "관리자",
         "devs": "개발자",
         "mods": "운영자",
         "artists": "아티스트"
@@ -1019,6 +1066,116 @@ export const ko_KR: EnTranslations = {
       },
       "linkedAs": "{login}(으)로 연결됨",
       "unlink": "GitHub 연결 해제"
+    },
+    "mailbox": {
+      "title": "우편함",
+      "subtitle": "레이븐포스트",
+      "close": "우편함 닫기",
+      "tabInbox": "받은 편지함",
+      "tabInboxWithCount": "받은 편지함 ({count})",
+      "tabSend": "Send",
+      "empty": "우편함이 비어 있습니다.",
+      "truncated": "전체 {total}통 중 최신 {shown}통을 표시합니다.",
+      "attachmentsBadge": "소포 첨부됨",
+      "unreadBadge": "읽지 않음",
+      "back": "Back",
+      "take": "첨부물 받기",
+      "delete": "편지 삭제",
+      "deleteAria": "편지 {subject} 삭제",
+      "openAria": "{name}이(가) 보낸 편지 {subject} 읽기",
+      "noSubject": "(제목 없음)",
+      "toLabel": "To",
+      "toPlaceholder": "캐릭터 이름",
+      "subjectLabel": "제목",
+      "bodyLabel": "내용",
+      "coinLabel": "동전 첨부",
+      "parcelsLabel": "소포",
+      "parcelsHint": "가방의 아이템을 클릭하면 첨부됩니다.",
+      "removeParcelAria": "편지에서 {item} 제거",
+      "sendButton": "편지 보내기",
+      "postageNote": "우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.",
+      "arrivedBanner": "까마귀가 도착했습니다: {name}의 우편.",
+      "arrivedLog": "{name}에게서 새 우편이 도착했습니다.",
+      "indicatorAria": "읽지 않은 우편: {count}",
+      "indicatorTip": "읽지 않은 편지가 {count}통 있습니다. 우편함에서 확인하세요.",
+      "clickAttach": "클릭하면 편지에 첨부됩니다.",
+      "cannotMail": "이 아이템은 우편으로 보낼 수 없습니다.",
+      "result": {
+        "sent": "까마귀가 {name}에게 보낼 편지를 물고 날아올랐습니다 (우편 요금 {postage}).",
+        "collected": "편지에서 {amount}을(를) 받았습니다.",
+        "tooFar": "우편을 처리하려면 우편함 옆에 있어야 합니다.",
+        "needRecipient": "편지의 수신인을 지정하세요.",
+        "noRecipient": "그 이름을 가진 우편함 주인이 없습니다.",
+        "tooManyParcels": "편지 하나에는 소포를 최대 {count}개까지 담을 수 있습니다.",
+        "noMailQuestItems": "퀘스트 아이템은 우편으로 보낼 수 없습니다.",
+        "notEnoughItems": "보낼 수 있는 수량이 부족합니다.",
+        "cantAffordPostage": "우편 요금을 낼 수 없습니다.",
+        "recipientBoxFull": "상대의 우편함이 가득 찼습니다.",
+        "letterGone": "그 편지는 더 이상 우편함에 없습니다.",
+        "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
+      }
+    },
+    "calendar": {
+      "title": "이벤트 달력",
+      "close": "달력 닫기",
+      "keybindLabel": "이벤트 달력",
+      "prevMonth": "이전 달",
+      "nextMonth": "다음 달",
+      "dayAria": "{date}: 이벤트 {count}건",
+      "noEvents": "이 날에는 일정이 없습니다.",
+      "allDay": "종일",
+      "bookedBy": "{name} 등록",
+      "deleteAria": "이벤트 {title} 삭제",
+      "bookTitle": "길드 이벤트 등록",
+      "titlePlaceholder": "이벤트 이름",
+      "notePlaceholder": "메모 (선택)",
+      "hourLabel": "시각 (UTC)",
+      "hourAllDay": "종일",
+      "addButton": "이벤트 등록",
+      "guildOnlyNote": "길드에 가입하면 함께 이벤트를 계획할 수 있습니다.",
+      "result": {
+        "created": "이벤트가 길드 달력에 등록되었습니다.",
+        "removed": "이벤트가 달력에서 삭제되었습니다.",
+        "notInGuild": "길드에 소속되어 있지 않습니다.",
+        "notOfficer": "길드 이벤트는 임원과 길드 마스터만 관리할 수 있습니다.",
+        "badInput": "이벤트 이름과 올바른 날짜를 입력하세요.",
+        "calendarFull": "길드 달력이 가득 찼습니다.",
+        "eventGone": "그 이벤트는 더 이상 달력에 없습니다."
+      },
+      "events": {
+        "raidCall": {
+          "title": "공격대 소집",
+          "note": "수비대가 뿔피리를 붑니다. 파티를 모아 지하 묘지와 공격대로."
+        },
+        "marketDay": {
+          "title": "장날",
+          "note": "상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날."
+        },
+        "fiestaNight": {
+          "title": "피에스타의 밤",
+          "note": "오늘 밤 2대2 피에스타 링이 가장 붐빕니다."
+        },
+        "arenaClash": {
+          "title": "투기장 격돌",
+          "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
+        },
+        "fishingDerby": {
+          "title": "낚시 대회",
+          "note": "낚시꾼들이 호숫가에 늘어섭니다. 낚싯대를 들고 이야기꽃을 피우세요."
+        },
+        "delveDay": {
+          "title": "탐굴의 날",
+          "note": "할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물고에 도전하기 좋은 날."
+        },
+        "moongateCommunion": {
+          "title": "달문 집회",
+          "note": "보름의 달 아래 순례자들이 사원의 달문에 모입니다."
+        }
+      }
+    },
+    "social": {
+      "lastSeen": "마지막 접속: {when}",
+      "lastSeenNever": "없음"
     }
   },
   "guide": {
@@ -1417,13 +1574,13 @@ export const ko_KR: EnTranslations = {
       "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다."
     },
     "petHook": {
-      "imp": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
-      "voidwalker": "도발하고 타격을 흡수해 주는 단단한 악마로, 안심하고 시전할 수 있게 합니다.",
-      "succubus": "강하게 때리지만 압박에는 쉽게 무너지는 빠른 근접 악마입니다.",
-      "felhunter": "적 시전자를 집요하게 쫓는 어둠의 척후형 악마입니다.",
-      "felguard": "단단한 근접 강타형 악마로, 소환할 수 있게 되면 다재다능한 만능 일꾼입니다.",
-      "infernal": "강력한 근접 공격을 지닌 거대한 돌격형 악마로, 순수한 힘을 위해 소환합니다.",
-      "doomguard": "멀리서 강력한 어둠 마법을 퍼붓는 정예 시전형 악마입니다."
+      "emberkin": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
+      "gloomshade": "도발하고 타격을 흡수해 주는 단단한 악마로, 안심하고 시전할 수 있게 합니다.",
+      "duskborn": "강하게 때리지만 압박에는 쉽게 무너지는 빠른 근접 악마입니다.",
+      "spellhound": "적 시전자를 집요하게 쫓는 어둠의 척후형 악마입니다.",
+      "warfiend": "단단한 근접 강타형 악마로, 소환할 수 있게 되면 다재다능한 만능 일꾼입니다.",
+      "pyre_colossus": "강력한 근접 공격을 지닌 거대한 돌격형 악마로, 순수한 힘을 위해 소환합니다.",
+      "wraithborn": "멀리서 강력한 어둠 마법을 퍼붓는 정예 시전형 악마입니다."
     },
     "bestiary": {
       "heading": "몬스터 도감",
@@ -1449,11 +1606,11 @@ export const ko_KR: EnTranslations = {
         "name": "거미",
         "desc": "어둡고 뒤엉킨 곳에 둥지를 트는 거미줄 짜는 자들과 독을 품은 잠복자들. 사냥꾼은 야수와 마찬가지로 이들을 길들일 수 있습니다."
       },
-      "murloc": {
+      "mudfin": {
         "name": "멀록",
         "desc": "시끄럽고 영역 의식이 강한 무리를 이루어 얕은 물가에 떼지어 모이는 양서류 늪지 거주자들."
       },
-      "kobold": {
+      "burrower": {
         "name": "코볼트",
         "desc": "광산과 굴을 들끓게 하며 자기네 광석을 사납게 지키는, 머리에 양초를 단 굴착꾼들."
       },
@@ -1847,6 +2004,430 @@ export const ko_KR: EnTranslations = {
       "home": "개요로 돌아가기"
     }
   },
+  "editor": {
+    "appTitle": "맵 편집기",
+    "docTitle": "맵 편집기 - World of ClaudeCraft",
+    "untitledMap": "제목 없는 맵",
+    "playtestPlayerName": "지도제작자",
+    "topbar": {
+      "label": "편집기 동작",
+      "mapNameLabel": "맵 이름",
+      "dirty": "저장하지 않은 변경 사항",
+      "dirtyDot": "이 맵에 저장하지 않은 변경 사항이 있습니다",
+      "clean": "모든 변경 사항 저장됨",
+      "savedLocal": "이 브라우저에 저장됨",
+      "savedServer": "서버에 저장됨 (v{version})",
+      "saving": "저장 중...",
+      "neverSaved": "아직 저장되지 않음",
+      "new": "새로 만들기",
+      "newTitle": "기본 월드에서 새 맵 시작",
+      "open": "열기",
+      "openTitle": "저장된 맵 열기 (브라우저 또는 서버)",
+      "save": "저장",
+      "saveTitle": "이 브라우저에 저장하고, 로그인 상태면 서버에도 저장 (Ctrl+S)",
+      "saveAs": "다른 이름으로 저장",
+      "saveAsTitle": "새 이름으로 사본 저장",
+      "fork": "포크",
+      "forkTitle": "이 맵의 내 사본을 서버에 생성",
+      "forkDisabledTitle": "포크하려면 먼저 서버 맵을 여세요",
+      "import": "가져오기",
+      "importTitle": "JSON 파일에서 맵 가져오기",
+      "export": "내보내기",
+      "exportTitle": "이 맵을 JSON 파일로 다운로드",
+      "uploadAsset": "에셋 업로드",
+      "uploadAssetTitle": "맵에 배치할 GLB 모델(최대 8 MiB) 업로드",
+      "uploadAssetDisabledTitle": "에셋을 업로드하려면 게임에서 로그인하세요",
+      "playtest": "플레이테스트",
+      "playtestTitle": "이 맵에서 게임 실행 (오프라인, 현재 편집 내용 포함)",
+      "viewLabel": "보기 모드",
+      "view3d": "3D",
+      "view3dTitle": "렌더링된 월드에서 편집",
+      "view2d": "2D",
+      "view2dTitle": "기호로 표시된 조감도에서 편집",
+      "undoCount": "실행 취소: {count}",
+      "undoCountTitle": "{count}단계 되돌릴 수 있음 (Ctrl+Z 실행 취소, Ctrl+Y 다시 실행)",
+      "autosave": "자동 저장",
+      "autosaveTitle": "저장하지 않은 변경이 있는 동안 맵을 자동으로 저장합니다. 저장에 실패하면 자동으로 꺼집니다.",
+      "undo": "Undo",
+      "undoTitle": "마지막 변경 실행 취소 (Ctrl+Z)",
+      "redo": "Redo",
+      "redoTitle": "실행 취소한 변경 다시 실행 (Ctrl+Y)",
+      "offline": "오프라인",
+      "offlineTitle": "로그인하지 않음: 맵은 이 브라우저에만 저장됩니다. 온라인 저장하려면 게임에서 로그인하세요.",
+      "signIn": "로그인",
+      "signInTitle": "게임 로그인 화면을 새 탭에서 열기",
+      "help": "도움말",
+      "helpTitle": "편집기 가이드: 도구, 단축키, 튜토리얼"
+    },
+    "tool": {
+      "listLabel": "편집기 도구",
+      "keyHint": "{name} ({key})",
+      "select": "선택",
+      "raise": "올리기",
+      "lower": "내리기",
+      "smooth": "부드럽게",
+      "flatten": "평탄화",
+      "paint": "생태 칠하기",
+      "water": "수면",
+      "place": "에셋 배치",
+      "blocker": "차단벽",
+      "camp": "야영지",
+      "spawn": "시작 지점",
+      "region": "영역",
+      "erase": "지우기"
+    },
+    "inspector": {
+      "label": "도구 옵션"
+    },
+    "brush": {
+      "title": "브러시",
+      "size": "브러시 크기",
+      "strength": "강도",
+      "sizeHint": "단축키: [ 와 ] 로 브러시 크기, Shift+[ 와 Shift+] 로 강도 조절.",
+      "editCount": "지형 편집 수: {count} / {max}"
+    },
+    "biome": {
+      "title": "생태",
+      "paletteLabel": "칠할 생태",
+      "vale": "골짜기",
+      "marsh": "늪지",
+      "peaks": "산봉우리",
+      "beach": "해변",
+      "desert": "사막",
+      "volcano": "화산",
+      "cave": "동굴",
+      "erase": "칠 지우기",
+      "hint": "칠한 칸은 구역 생태를 덮어써 지형의 형태와 색을 바꿉니다.",
+      "clear": "생태 칠 전부 지우기",
+      "clearConfirm": "이 맵에서 칠한 생태 칸을 모두 제거할까요?"
+    },
+    "flatten": {
+      "hint": "평탄화는 드래그를 시작할 때 커서 아래의 높이로 지면을 고릅니다.",
+      "hardEdge": "경계 선명하게"
+    },
+    "water": {
+      "title": "수면 높이",
+      "level": "수면 높이",
+      "hint": "맵 전체의 수면 높이를 설정합니다 ({min}에서 {max} 야드까지).",
+      "reset": "기본 높이로 재설정"
+    },
+    "place": {
+      "title": "에셋 배치",
+      "scale": "크기",
+      "collide": "이동 차단",
+      "collideHint": "차단형 에셋에는 플레이어가 지나갈 수 없는 충돌 범위가 생깁니다.",
+      "randomRotation": "무작위 회전",
+      "chosen": "배치 중: {name}",
+      "none": "아래 브라우저에서 에셋을 고른 뒤 지면을 클릭해 배치하세요."
+    },
+    "blockerTool": {
+      "title": "차단벽",
+      "hint": "지면을 따라 드래그하면 플레이어가 걸어서도 뛰어서도 통과할 수 없는 보이지 않는 벽을 그립니다. 놓으면 설치됩니다. 반 야드보다 짧은 벽은 버려집니다.",
+      "count": "차단벽: {count} / {max}"
+    },
+    "camp": {
+      "title": "몬스터 야영지",
+      "mob": "몬스터",
+      "count": "수",
+      "radius": "반경",
+      "delete": "야영지 삭제",
+      "hint": "빈 땅을 클릭하면 야영지를 추가하고, 기존 야영지를 클릭하면 편집합니다.",
+      "playtestNote": "몬스터는 플레이테스트에서만 등장하며 편집기 화면에는 나타나지 않습니다.",
+      "selected": "야영지: {mob}",
+      "none": "선택된 야영지가 없습니다."
+    },
+    "spawn": {
+      "title": "시작 지점",
+      "hint": "지면을 클릭해 플레이테스트에서 플레이어가 시작할 위치를 설정하세요.",
+      "position": "시작 지점: {x}, {z}",
+      "unset": "기본 시작 위치를 사용합니다.",
+      "clear": "시작 지점 지우기"
+    },
+    "region": {
+      "title": "영역",
+      "hint": "상자를 드래그해 배치물과 지형 편집을 선택하세요. 복사 후 클릭하면 붙여넣습니다.",
+      "hint3d": "영역 상자는 2D 보기에서 그려지며, 복사와 붙여넣기는 두 보기 모두에서 동작합니다.",
+      "copy": "영역 복사",
+      "pasteBeside": "옆에 붙여넣기",
+      "copied": "에셋 {assets}개와 지형 편집 {edits}개를 복사했습니다.",
+      "pasted": "{count}개 항목을 붙여넣었습니다.",
+      "needBox": "먼저 영역 상자를 그리세요.",
+      "needClipboard": "먼저 영역을 복사하세요."
+    },
+    "eraseTool": {
+      "title": "지우기",
+      "hint": "배치된 에셋을 클릭하면 제거하고, 조각한 지면을 클릭하면 커서 아래의 가장 최근 스탬프를 제거합니다.",
+      "blockerHint": "차단벽 근처를 클릭하면 대신 그 벽이 제거됩니다."
+    },
+    "selection": {
+      "title": "선택 항목",
+      "none": "선택된 것이 없습니다. 선택 도구로 배치된 에셋을 클릭하세요.",
+      "asset": "에셋: {name}",
+      "x": "X",
+      "z": "Z",
+      "rotation": "회전",
+      "scale": "크기",
+      "collide": "이동 차단",
+      "radius": "충돌 반경",
+      "radiusAuto": "자동",
+      "radiusAutoTitle": "충돌 반경을 에셋 크기에 따라가도록 재설정",
+      "radiusHint": "'자동'은 에셋 크기에서 충돌 반경을 계산합니다. 슬라이더를 드래그하면 덮어쓸 수 있습니다.",
+      "footprints": "충돌 범위 표시",
+      "duplicate": "복제",
+      "delete": "삭제",
+      "deleteHint": "삭제하면 선택 항목이 제거됩니다. Ctrl+Z로 복구할 수 있습니다.",
+      "moveHint": "이동: 3D 뷰에서 애셋을 지면을 따라 드래그하거나 방향키로 미세 이동합니다(0.5야드, Shift를 누르면 2야드).",
+      "wheelHint": "Shift+스크롤은 회전, Alt+스크롤은 크기 조절, Ctrl+D는 복제합니다."
+    },
+    "marker": {
+      "title": "마커",
+      "reset": "위치 재설정",
+      "moved": "{count}개 마커가 기본 배치에서 이동했습니다."
+    },
+    "layers": {
+      "title": "레이어",
+      "hub": "거점",
+      "graveyard": "묘지",
+      "lake": "호수",
+      "poi": "관심 지점",
+      "camp": "야영지",
+      "npc": "NPC",
+      "object": "오브젝트",
+      "blocker": "차단벽"
+    },
+    "frame": {
+      "title": "화면 맞춤",
+      "all": "전체"
+    },
+    "procgen": {
+      "title": "절차적 생성",
+      "count": "수",
+      "scatter": "분류의 에셋 흩뿌리기",
+      "hills": "완만한 언덕 생성",
+      "scattered": "{category}에서 에셋 {count}개를 흩뿌렸습니다.",
+      "hillsAdded": "언덕 {count}개를 추가했습니다.",
+      "noAssets": "해당 분류에 에셋이 없습니다."
+    },
+    "assets": {
+      "title": "에셋 브라우저",
+      "label": "에셋 브라우저",
+      "search": "에셋 검색",
+      "searchPlaceholder": "에셋 검색...",
+      "empty": "일치하는 에셋이 없습니다.",
+      "uploadedTab": "업로드됨",
+      "uploadedEmpty": "업로드한 에셋이 아직 없습니다. 에셋 업로드로 GLB 모델(최대 8 MiB)을 추가하세요.",
+      "uploadedSignIn": "게임에서 로그인하면 자신의 GLB 모델을 업로드하고 배치할 수 있습니다.",
+      "uploadedLoadFailed": "업로드한 에셋을 불러오지 못했습니다.",
+      "deleteAsset": "업로드한 에셋 삭제",
+      "deleteAssetConfirm": "업로드한 에셋 \"{name}\"을(를) 삭제할까요? 이 에셋을 쓰는 맵에서 모델이 사라집니다.",
+      "pick": "{name} 배치",
+      "categoryTab": "{category} ({count})",
+      "category": {
+        "biome": "생태",
+        "chars": "캐릭터",
+        "creatures": "생물",
+        "dungeon": "던전",
+        "foliage": "식생",
+        "props": "소품",
+        "quest": "퀘스트",
+        "resources": "자원",
+        "tools": "도구",
+        "weapons": "무기"
+      }
+    },
+    "upload": {
+      "notGlb": ".glb 파일을 선택하세요.",
+      "tooLarge": "이 파일은 8 MiB 제한을 초과합니다.",
+      "uploading": "에셋 업로드 중...",
+      "uploaded": "에셋 업로드 완료: {name}",
+      "uploadedExisting": "이 모델은 이미 서버에 있어 재사용합니다.",
+      "deleted": "업로드한 에셋을 삭제했습니다."
+    },
+    "openDrawer": {
+      "title": "맵 열기",
+      "close": "닫기",
+      "tabLocal": "이 브라우저",
+      "tabMine": "내 서버 맵",
+      "tabPublic": "공개 맵",
+      "colName": "이름",
+      "colUpdated": "업데이트",
+      "colStatus": "상태",
+      "statusPublic": "공개",
+      "statusPrivate": "비공개",
+      "open": "열기",
+      "fork": "포크",
+      "publish": "공개하기",
+      "unpublish": "공개 해제",
+      "delete": "삭제",
+      "draft": "자동 저장된 초안",
+      "emptyLocal": "이 브라우저에 저장된 맵이 아직 없습니다. 저장하면 여기에 표시됩니다.",
+      "emptyMine": "서버에 맵이 아직 없습니다. 로그인한 상태로 저장하면 생성됩니다.",
+      "emptyPublic": "아직 공개 맵이 없습니다.",
+      "loading": "맵 불러오는 중...",
+      "loadFailed": "서버에서 맵을 불러오지 못했습니다.",
+      "signInHint": "게임에서 로그인하면 서버 맵을 둘러보고 저장하고 포크할 수 있습니다.",
+      "deleteLocalConfirm": "로컬 맵 \"{name}\"을(를) 삭제할까요?",
+      "deleteServerConfirm": "서버 맵 \"{name}\"을(를) 삭제할까요? 되돌릴 수 없습니다.",
+      "prev": "이전 페이지",
+      "next": "다음 페이지",
+      "page": "{page}페이지"
+    },
+    "status": {
+      "savedLocal": "\"{name}\"을(를) 이 브라우저에 저장했습니다.",
+      "savedServer": "\"{name}\"을(를) 서버에 저장했습니다 (v{version}).",
+      "savedLocalOnly": "\"{name}\"을(를) 이 브라우저에 저장했습니다. 로그인하면 온라인에 저장됩니다.",
+      "saveFailedLocal": "로컬 저장에 실패했습니다 (저장소가 차단됨).",
+      "opened": "\"{name}\"을(를) 열었습니다.",
+      "imported": "\"{name}\"을(를) 가져왔습니다.",
+      "importFailed": "가져오기가 취소되었거나 유효한 맵 파일이 아닙니다.",
+      "exported": "\"{name}\"을(를) 다운로드했습니다.",
+      "newMap": "기본 월드에서 새 맵을 시작했습니다.",
+      "forked": "\"{name}\"(으)로 포크했습니다. 이제 자신의 사본을 편집합니다.",
+      "published": "맵이 공개되었습니다. 누구나 찾아서 포크할 수 있습니다.",
+      "unpublished": "맵 공개가 해제되었습니다.",
+      "deleted": "맵이 삭제되었습니다.",
+      "assetPlacedFirst": "먼저 브라우저에서 에셋을 선택하세요.",
+      "loading3d": "월드 불러오는 중...",
+      "playtestLaunch": "플레이테스트 시작 중...",
+      "playtestFailed": "플레이테스트를 시작할 수 없습니다 (저장소가 차단됨).",
+      "draftSaved": "초안이 자동 저장되었습니다.",
+      "draftRestored": "자동 저장된 초안을 복원했습니다.",
+      "autosaveFailed": "자동 저장에 실패했습니다(브라우저 저장 공간이 가득 찼거나 차단됨). 백업을 위해 맵을 내보내세요.",
+      "terrainCapReached": "지형 편집 한도에 도달했습니다({max}). 초과된 스컬프트 스탬프는 추가되지 않았습니다.",
+      "placementCapReached": "배치 한도에 도달했습니다({max}). 초과된 에셋은 추가되지 않았습니다.",
+      "blockerCapReached": "차단벽 한도({max})에 도달했습니다. 새 벽이 추가되지 않았습니다.",
+      "autosaveOff": "자동 저장이 꺼졌습니다: {reason} 수동으로 저장한 뒤 다시 켜세요."
+    },
+    "confirm": {
+      "ok": "확인",
+      "cancel": "취소",
+      "discardTitle": "변경 사항을 버릴까요?",
+      "discardBody": "\"{name}\"에 저장하지 않은 변경 사항이 있습니다. 버릴까요?",
+      "discard": "버리기",
+      "conflictTitle": "저장 충돌",
+      "conflictBody": "이 맵은 연 이후 서버에서 변경되었습니다 (현재 v{version}). 내 버전을 새 사본으로 저장할까요?",
+      "conflictSaveCopy": "사본으로 저장"
+    },
+    "prompt": {
+      "saveAsTitle": "다른 이름으로 저장",
+      "nameLabel": "새 맵 이름"
+    },
+    "serverError": {
+      "invalid_map_name": "사용할 수 없는 맵 이름입니다. 글자, 숫자, 공백, 어포스트로피, 하이픈을 사용하세요.",
+      "map_name_not_allowed": "허용되지 않는 맵 이름입니다.",
+      "invalid_map_doc": "서버가 맵 문서를 거부했습니다.",
+      "invalid_version": "저장 요청이 잘못되었습니다. 새로고침 후 다시 시도하세요.",
+      "map_limit_reached": "서버 맵 개수 한도에 도달했습니다. 하나를 삭제해야 더 저장할 수 있습니다.",
+      "map_not_found": "그 맵은 더 이상 서버에 없습니다.",
+      "version_conflict": "이 맵은 연 이후 서버에서 변경되었습니다.",
+      "slug_unavailable": "그 이름으로 링크를 만들 수 없습니다. 다른 이름을 시도하세요.",
+      "map_too_large": "맵 문서가 너무 커서 서버에 저장할 수 없습니다.",
+      "invalid_glb": "유효한 GLB 모델 파일이 아닙니다.",
+      "asset_blocked": "이 에셋은 운영진에 의해 차단되었습니다.",
+      "asset_limit_reached": "업로드 에셋 개수 한도에 도달했습니다. 하나를 삭제해야 더 업로드할 수 있습니다.",
+      "asset_storage_limit_reached": "에셋 저장 공간이 가득 찼습니다. 먼저 하나를 삭제하세요.",
+      "asset_too_large": "이 모델은 업로드 크기 제한을 초과합니다.",
+      "asset_not_found": "그 에셋은 더 이상 서버에 없습니다.",
+      "rate_limited": "조금 천천히 다시 시도하세요.",
+      "unauthorized": "세션이 만료되었습니다. 게임에서 다시 로그인하세요.",
+      "network": "서버에 연결할 수 없습니다. 연결을 확인하고 다시 시도하세요.",
+      "timeout": "서버 응답이 너무 오래 걸립니다. 다시 시도하세요.",
+      "unknown": "서버와 통신하는 중 문제가 발생했습니다."
+    },
+    "hints": {
+      "nav3d": "드래그로 회전, 스크롤로 확대/축소. 드래그 중 WASD로 비행, Q/E로 높이 조절.",
+      "nav2d": "드래그로 이동, 스크롤로 확대/축소."
+    },
+    "help": {
+      "title": "편집기 도움말",
+      "toolsTitle": "도구",
+      "shortcutsTitle": "키보드 단축키",
+      "mouseTitle": "마우스와 탐색",
+      "flowTitle": "저장과 플레이테스트",
+      "beginTutorial": "튜토리얼 시작",
+      "close": "닫기",
+      "tool": {
+        "select": "배치된 애셋을 선택해 이동, 회전, 크기 조절합니다. 2D 마커는 클릭해서 편집합니다.",
+        "raise": "브러시 아래의 지형을 올립니다.",
+        "lower": "브러시 아래의 지형을 낮춥니다.",
+        "smooth": "굴곡을 주변 평균 높이로 부드럽게 만듭니다.",
+        "flatten": "드래그를 시작한 지점의 높이로 지면을 평탄하게 만듭니다.",
+        "paint": "지역 기본값 위에 생태 지표를 칠합니다.",
+        "water": "맵 전체의 수면 높이를 설정합니다.",
+        "place": "카탈로그 또는 업로드한 애셋을 지면에 배치합니다.",
+        "blocker": "플레이테스트에서 이동을 막는 보이지 않는 벽을 드래그로 그립니다.",
+        "camp": "플레이테스트에서 생성되는 몹 캠프를 추가하고 편집합니다.",
+        "spawn": "플레이테스트에서 플레이어가 시작할 위치를 설정합니다.",
+        "region": "지형과 애셋을 상자로 선택해 복사하고 붙여넣습니다.",
+        "erase": "커서 아래의 배치된 애셋이나 조각 스탬프를 제거합니다."
+      },
+      "key": {
+        "tools": "모든 도구에는 한 글자 단축키가 있으며 도구 모음 버튼에 표시됩니다.",
+        "brush": "[ 와 ] 로 브러시 크기를, Shift+[ 와 Shift+] 로 강도를 조절합니다.",
+        "undo": "Ctrl+Z는 실행 취소, Ctrl+Y 또는 Ctrl+Shift+Z는 다시 실행합니다.",
+        "save": "Ctrl+S로 맵을 저장합니다.",
+        "duplicate": "Ctrl+D로 선택한 애셋을 복제합니다.",
+        "nudge": "방향키는 선택한 애셋을 0.5야드 이동합니다. Shift를 누르면 2야드입니다.",
+        "wheel": "Shift+스크롤은 선택한 애셋을 회전하고 Alt+스크롤은 크기를 조절합니다.",
+        "delete": "Delete는 선택한 애셋이나 캠프를 제거합니다.",
+        "escape": "Esc는 먼저 선택을 해제한 다음 선택 도구로 돌아갑니다."
+      },
+      "mouse": {
+        "orbit3d": "3D 뷰: 드래그로 회전, 스크롤로 확대/축소. 가운데 버튼 드래그 또는 Shift+드래그로 이동합니다.",
+        "fly3d": "3D에서 드래그를 유지하는 동안 WASD로 카메라를 비행시키고 Q/E로 높이를 바꿉니다.",
+        "move": "선택 도구가 켜져 있으면 배치된 애셋을 드래그해 지면 위에서 옮길 수 있습니다.",
+        "pan2d": "2D 뷰: 드래그로 이동, 스크롤로 확대/축소합니다."
+      },
+      "flow": {
+        "save": "저장은 이 브라우저에 맵을 저장하고, 로그인 상태라면 서버에도 저장합니다.",
+        "draft": "저장하지 않은 변경이 있는 동안 30초마다 초안이 자동 저장됩니다. 열기에서 복원할 수 있습니다.",
+        "playtest": "플레이테스트는 저장하지 않은 편집까지 포함해 이 맵에서 실제 게임을 실행합니다."
+      }
+    },
+    "tutorial": {
+      "title": "편집기 튜토리얼",
+      "back": "뒤로",
+      "next": "다음",
+      "finish": "완료",
+      "skip": "투어 건너뛰기",
+      "counter": "{total}단계 중 {current}단계",
+      "steps": {
+        "toolbar": {
+          "title": "도구 모음",
+          "body": "모든 편집 도구가 여기에 있습니다: 조각 브러시, 생태 페인트, 수면, 애셋 배치, 캠프 등. 각 도구에는 버튼 모서리에 표시되는 단일 키 단축키가 있습니다."
+        },
+        "stage": {
+          "title": "월드",
+          "body": "실제 게임 엔진으로 렌더링된 당신의 맵입니다. 드래그로 회전, 스크롤로 확대/축소, 가운데 버튼 드래그 또는 Shift+드래그로 이동합니다. 도구를 들고 지면을 클릭하면 편집됩니다."
+        },
+        "inspector": {
+          "title": "도구 옵션",
+          "body": "활성 도구의 옵션이 여기에 표시됩니다: 브러시 크기, 생태 팔레트, 애셋 크기, 캠프 설정, 그리고 선택한 대상의 속성입니다."
+        },
+        "viewToggle": {
+          "title": "3D와 2D",
+          "body": "렌더링된 3D 월드와 기호화된 상공 2D 맵 사이를 전환합니다. 2D 뷰는 지역 마커를 옮기고 넓은 영역을 보는 데 가장 좋습니다."
+        },
+        "save": {
+          "title": "작업 저장",
+          "body": "저장은 맵을 이 브라우저에, 로그인 상태라면 서버에도 저장합니다. 내보내기는 JSON 백업을 내려받고, 열기는 저장된 맵과 초안을 다시 불러옵니다."
+        },
+        "playtest": {
+          "title": "플레이테스트",
+          "body": "현재 편집을 포함해 언제든지 맵에서 실제 게임을 실행할 수 있습니다. 플레이테스트 탭을 닫으면 돌아와서 계속 편집할 수 있습니다."
+        },
+        "help": {
+          "title": "도움말이 있는 곳",
+          "body": "이것이 전체 흐름입니다. 전체 도구 목록과 모든 단축키를 보려면 언제든 도움말을 열고, 이 투어를 다시 실행할 수도 있습니다."
+        }
+      }
+    },
+    "a11y": {
+      "stage": "맵 뷰포트",
+      "toasts": "편집기 알림",
+      "dialog": "편집기 대화 상자"
+    }
+  },
   "skinEvent": {
     "title": "장식 상자",
     "subtitle": "{rank} 등급 보상을 잠금 해제했습니다 — 그 이하의 스킨을 자유롭게 고르세요.",
@@ -1967,6 +2548,9 @@ export const ko_KR: EnTranslations = {
     "password": "비밀번호",
     "passwordError": "비밀번호를 입력해 주세요.",
     "passwordPlaceholder": "비밀번호 입력",
+    "email": "이메일",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "유효한 이메일 주소를 입력하세요.",
     "showPassword": "비밀번호 표시",
     "hidePassword": "비밀번호 숨기기",
     "logIn": "로그인",
@@ -1992,7 +2576,15 @@ export const ko_KR: EnTranslations = {
     "create": "생성",
     "twoFactorLabel": "인증 코드",
     "twoFactorPlaceholder": "6자리 또는 복구 코드",
-    "twoFactorHint": "인증 앱에 표시된 코드 또는 복구 코드 중 하나를 입력하세요."
+    "twoFactorHint": "인증 앱에 표시된 코드 또는 복구 코드 중 하나를 입력하세요.",
+    "recovery": {
+      "title": "복구 이메일 추가",
+      "body": "계정을 복구할 수 있도록 이메일 주소를 설정하세요. 비밀번호를 재설정해야 할 경우 이 계정의 소유자임을 확인하는 용도로만 사용됩니다.",
+      "save": "이메일 저장",
+      "logOut": "Log out",
+      "invalid": "유효한 이메일 주소를 입력하세요.",
+      "failed": "이메일을 저장하지 못했습니다. 다시 시도해 주세요."
+    }
   },
   "wallet": {
     "label": "$WOC 지갑",
@@ -2046,6 +2638,7 @@ export const ko_KR: EnTranslations = {
     "helpLinkedWithBalance": "보유자 혜택이 활성화되었습니다. 이 브라우저에 지갑 앱이 연결되어 있습니다.",
     "helpLinkedDisconnected": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
     "helpLinkedDisconnectedWithBalance": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
+    "extensionHelp": "여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.",
     "flowConnect": "지갑을 선택하세요. 인증은 자동으로 계속됩니다.",
     "flowSign": "지갑 앱에서 인증 메시지에 서명하세요. 트랜잭션이나 SOL은 필요 없습니다.",
     "flowVerify": "지갑 소유권 인증 중...",
@@ -2288,6 +2881,7 @@ export const ko_KR: EnTranslations = {
       "unknownTier": "알 수 없는 탐굴 등급입니다.",
       "levelRequired": "{name}에 진입하려면 레벨 {level} 이상이어야 합니다.",
       "levelRequiredTier": "{tier} 난이도로 {name}에 진입하려면 레벨 {level}이(가) 필요합니다.",
+      "partyTooLarge": "{name}은(는) 솔로 또는 듀오 전용입니다. {max}명 이상의 파티는 입장할 수 없습니다.",
       "instancesBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하세요.",
       "runFailed": "{name} 진행에 실패했습니다.",
       "complete": "{name} 완료.",
@@ -2297,6 +2891,14 @@ export const ko_KR: EnTranslations = {
       "doorAlreadyOpen": "문이 이미 열려 있습니다.",
       "companionRankUp": "{name}이(가) {rank}등급에 도달했습니다.",
       "bossChest": "우두머리가 쓰러집니다. 봉인된 성물실 상자가 단상 위로 솟아오릅니다. 자물쇠를 따서 전리품을 차지하세요.",
+      "drownedLitanyReliquaryRise": "나할리아 수녀가 침묵한다. 익사한 유물함이 흑수에서 떠오른다. 다가가 의식을 시작하라.",
+      "riteSequenceReady": "성소들이 어둠에 잠긴다. 순서를 반복하라.",
+      "riteSequencePlaying": "성소들이 의식을 재생하고 있다. 기다려라.",
+      "riteCorrect": "부드러운 종소리가 그대의 손길에 응답한다.",
+      "riteWrong": "귀에 거슬리는 종의 균열음. 흑수가 발치에서 튄다.",
+      "riteReliquaryOpen": "익사한 유물함이 열린다.",
+      "riteReliquaryLocked": "유물함을 열려면 성소 의식을 완료하라.",
+      "riteReliquaryEmpty": "유물함이 비어 있다.",
       "surfaceStairs": "지상으로 향하는 계단이 열립니다. 계단에서 F 키를 눌러 나가세요.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "방을 정리하세요.",
@@ -2304,6 +2906,13 @@ export const ko_KR: EnTranslations = {
       "tombstoneHint": "방을 정리하면 북쪽으로 묘비 통로가 열립니다.",
       "tombstoneOpen": "봉인된 묘비 통로가 북쪽으로 갈리며 열립니다. 그 안으로 걸어 들어가 계속 진행하세요.",
       "tombstoneInto": "묘비를 통과해 {name}(으)로 들어갑니다.",
+      "bellRopeShock": "종줄이 팽팽하게 당겨진다. 익사한 영창자들이 충격에 비틀거린다.",
+      "eggSacBurst": "알집이 터진다. 거미 새끼들이 세례당 가장자리로 흩어져 달아난다.",
+      "baptistryEggs": "세례당이 고요해진다. 거미 알집이 축축하게 가장자리에 들러붙어 있다.",
+      "baptistrySpidersSealed": "거미 알집을 파괴해 보아야 할 것이다.",
+      "puzzleSealed": "방 안 어딘가에 압력을 가해 봉인을 풀어야 한다.",
+      "ropesSealed": "종줄을 당겨 보아야 할 것이다.",
+      "baptistryWave": "세례당의 검은 물속에서 무언가가 꿈틀거린다.",
       "chestEmpty": "상자가 비어 있습니다.",
       "notInDelve": "탐굴 중이 아닙니다.",
       "cannotInteract": "그것과는 상호작용할 수 없습니다.",
@@ -2322,9 +2931,12 @@ export const ko_KR: EnTranslations = {
       "passageSealed": "통로가 봉인되어 있습니다.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
+      "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",
       "nothingToTake": "이제 가져갈 것이 없습니다.",
       "wayOutNotOpen": "나가는 길이 아직 열리지 않았습니다.",
-      "moveCloserStairs": "계단에 더 가까이 다가가세요."
+      "moveCloserStairs": "계단에 더 가까이 다가가세요.",
+      "nhaliaCantorShield": "영창자들이여, 음을 유지하라!",
+      "nhaliaBlackwaterMark": "{name}이(가) {player}에게 흑수 표식을 남긴다!"
     },
     "lockpick": {
       "lockYields": "자물쇠가 열립니다! {tier} 전리품.",
@@ -2387,6 +2999,26 @@ export const ko_KR: EnTranslations = {
       "abandoned": "도구를 도로 빼냅니다. 자물쇠가 기다립니다."
     }
   },
+  "delveRiteUi": {
+    "title": "익사한 유물 의식",
+    "blurb": "성소들이 순서대로 빛난다. 각 성소를 차례로 활성화하여 순서를 반복하라. 잘못된 접촉은 시도를 실패시키고 순서를 다시 재생한다. 완벽한 시도는 가장 풍성한 전리품을 얻고, 시도 횟수를 모두 소진하면 유물함이 가장 초라한 상태로 열린다. 의식이 그대를 어떻게 시험할지 선택하라.",
+    "easy": "Easy",
+    "medium": "보통",
+    "hard": "Hard",
+    "guideWatch": "선택하면 네 개의 제단이 차례로 빛납니다. 순서를 기억하세요.",
+    "guideRepeat": "제단이 어두워지면 같은 순서로 각 제단에 걸어가 F(상호작용)를 누르세요.",
+    "guideStakes": "잘못된 제단을 만지면 검은 물을 뒤집어쓰고 시도 횟수를 잃습니다. 순서를 완성하면 성물함이 열립니다.",
+    "showsTimes": "순서를 {count}회 표시",
+    "showsOnce": "순서를 한 번만 표시",
+    "symbols": "기호 {count}개",
+    "tries": "시도 {count}회",
+    "reward": {
+      "easy": "소박한 전리품",
+      "medium": "풍성한 전리품",
+      "hard": "최상급 전리품"
+    },
+    "closeAria": "닫기"
+  },
   "delveUi": {
     "board": {
       "title": "탐굴 게시판",
@@ -2396,6 +3028,7 @@ export const ko_KR: EnTranslations = {
       "openDelveAria": "{name}에서 탐굴 게시판 열기",
       "marks": "탐굴 증표: {count}",
       "minLevel": "필요 레벨 {level}",
+      "partyTooLarge": "솔로 또는 듀오 전용 (최대 {max}명)",
       "tier": {
         "normal": "일반",
         "heroic": "영웅"
@@ -2403,6 +3036,7 @@ export const ko_KR: EnTranslations = {
       "companion": {
         "pick": "동료 선택",
         "tessa": "수련사제 테사",
+        "edda": "에다 리드핸드",
         "rank": "{rank}등급",
         "boon": "전투 사이에 파티를 치유합니다. 3랭크에서는 탐굴마다 한 번 쓰러진 아군을 부활시킵니다.",
         "upgrade": "{rank}랭크로 강화 (증표 {marks}개)",
@@ -2428,7 +3062,11 @@ export const ko_KR: EnTranslations = {
       "complete": "완료",
       "marks": "탐굴 증표: {count}",
       "exitHintOpen": "묘비 통로로 걸어 들어가세요 (북쪽)",
-      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요"
+      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요",
+      "riteChoose": "가라앉은 성물함에 다가가 F를 눌러 의식을 시작하세요",
+      "ritePlayback": "제단을 지켜보세요: 빛나는 순서를 기억하세요",
+      "riteInput": "빛난 순서대로 각 제단에서 F를 누르세요 ({current}/{total})",
+      "riteOpen": "성물함이 열렸습니다: F를 눌러 전리품을 획득하세요"
     },
     "objective": {
       "kill_boss": "{boss} 처치",
@@ -2449,27 +3087,54 @@ export const ko_KR: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "아래의 성물실이 또 움직였소. 자정이 지나면 바닥 너머로 영창 소리가 들리고, 수련사제 테사는 매장 명부가 스스로 잉크를 바꾼다고 단언하오. 용기가 있다면, {playerName}, 촛불을 들고 아래로 내려가시오. 거기서 들리는 모든 목소리를 믿지는 마시오. 그중 몇은 그대가 태어나기도 전에 그대의 이름을 알고 있었으니."
+      },
+      "halvenMarsh": {
+        "greeting": "오솔길이 북쪽 늪지로 이어졌다, {playerName}. 또 다른 성물실이 검은 물 아래서 노래하고, 익사한 자들이 종소리에 화답한다. 신도 에다가 나보다 이 갈대밭을 더 잘 안다, 그녀의 등불 곁에 머물러라. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
       }
     },
     "intro": {
       "normal": "계단은 차갑고 어둡습니다. 부서진 성인석이 내려가는 길에 흩어져 있고, 부드러운 종소리가 축축한 공기 속에 맴돕니다. 수련사제 테사가 속삭입니다. \"성물실이 이렇게까지 열려 있어선 안 돼요. 가까이 붙어 있어요, {playerName}.\"",
-      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\""
+      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\"",
+      "litanyNormal": "갈대로 막힌 계단이 펜브릿지 아래로 떨어진다. 에다 리드핸드가 등불을 들어올린다. \"늪은 익사시킨 모든 자의 이름을 기억한다, {playerName}. 빛 속에 머물러라.\"",
+      "litanyHeroic": "흑수가 둑길의 돌을 핥는다. 에다의 불꽃이 녹색으로 일렁인다. \"그들이 아래서 다시 노래하고 있다, {playerName}. 성가대에 응답하지 마라.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "물이 매장 선반 사이로 스며들며 은빛 검은 줄기로 오래된 재를 실어 나릅니다.",
       "reliquary_bell_niche": "수십 개의 손종이 침묵 속에 매달려 있고, 저마다 장례 천으로 묶여 있습니다.",
       "reliquary_saintless_hall": "정성스러운 증오로 얼굴이 깎여 나간 조각상들.",
-      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다."
+      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다.",
+      "litany_sluice": "이끼로 뒤덮인 수문에서 흑수가 방울져 떨어져 오래된 성가대 지하실로 흘러든다.",
+      "litany_ledger": "장부의 섬들이 물에 잠긴 수로에서 솟아오르고, 잉크가 늪으로 번져 나간다.",
+      "litany_ring": "유물의 고리가 봉인된 흑수의 중앙 성수반을 둘러싼다.",
+      "litany_baptistry": "싱크홀 세례당이 갈라진 성자석과 알주머니 아래로 아가리를 벌리고 있다.",
+      "litany_choir_loft": "부채꼴로 펼쳐진 성가대석에 밧줄에 매달린 종소리가 결코 멈추지 않고 울려 퍼진다.",
+      "litany_causeway": "Y자로 갈라진 둑길이 허리 깊이의 늪물 위로 갈라진다.",
+      "litany_apse": "익사한 후진이 나할리아 수녀의 제단 섬으로 열린다."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "물에 잠긴 납골당",
       "reliquary_bell_niche": "종의 감실",
       "reliquary_saintless_hall": "성인 없는 회랑",
-      "reliquary_finale": "종이 묻힌 방"
+      "reliquary_finale": "종이 묻힌 방",
+      "litany_sluice": "초승달 수문",
+      "litany_ledger": "섬의 장부",
+      "litany_ring": "유물의 고리",
+      "litany_baptistry": "싱크홀 세례당",
+      "litany_choir_loft": "부채꼴 성가대석",
+      "litany_causeway": "Y자 갈림길 둑길",
+      "litany_apse": "익사한 후진"
+    },
+    "object": {
+      "sluice_valve": "수문 밸브",
+      "grave_tablet": "무덤 석판",
+      "corpse_candle": "시체양초",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
+        "run_start": "초와 명부는 챙겼어요, {playerName}. 앞장서 주세요.",
+        "ally_revive": "일어나요. 오늘 밤 명부에 당신의 이름은 없어요.",
         "combat_start": "발을 단단히 디뎌요, {playerName}. 이곳의 죽은 자들은 잠들지 못했어요.",
         "low_hp": "숨을 고르세요. 당신을 위한 기도가 아직 남아 있어요.",
         "trap_spotted": "멈춰요, 바닥에 있는 무언가가 발소리를 기억하고 있어요.",
@@ -2481,6 +3146,20 @@ export const ko_KR: EnTranslations = {
           "3": "성물실 수련사제",
           "4": "무덤부름의 목격자",
           "5": "예배당 수호자"
+        }
+      },
+      "edda": {
+        "run_start": "널빤지 길을 따라가라, {playerName}. 진창은 오만한 발걸음부터 삼킨다.",
+        "ally_revive": "어서 일어나라. 오늘은 늪이 그대를 데려가지 못한다.",
+        "combat_start": "흑수를 조심해라, {playerName}. 늪이 듣고 있다.",
+        "low_hp": "침착해라. 내 등불은 아직 꺼지지 않았다.",
+        "trap_spotted": "잠깐. 여기 갈대가 이상하다.",
+        "boss_pull": "저 성가가 그대의 이름을 알고 있다, {playerName}. 노래로 답하지 마라.",
+        "completion": "늪은 하룻밤 더 그 비밀을 삼킬 수 있다.",
+        "rank": {
+          "1": "등불지기",
+          "2": "갈대 감시자",
+          "3": "펜브릿지 신도"
         }
       }
     },
@@ -2524,7 +3203,10 @@ export const ko_KR: EnTranslations = {
       "flooded_paths": "침수된 길",
       "grave_tax": "무덤의 대가",
       "unstable_roof": "불안정한 천장",
-      "cult_remnants": "교단의 잔당"
+      "cult_remnants": "교단의 잔당",
+      "high_water": "불어난 물",
+      "lively_choir": "활기찬 성가대",
+      "belligerent_dead": "호전적인 사자"
     },
     "blessing": {
       "chapel_candle": "예배당 촛불: 더 안전한 진행, 완료 시 탐굴 증표 1개 감소."
@@ -3537,13 +4219,16 @@ export const ko_KR: EnTranslations = {
     },
     "cast": {
       "fishing": "낚시",
-      "demonHeal": "악마 치유"
+      "demonHeal": "악마 치유",
+      "thunzharrStormcall": "폭풍의 부름"
     }
   },
   "questUi": {
     "tracker": {
       "title": "퀘스트",
-      "complete": "완료"
+      "complete": "완료",
+      "showOnMap": "{name} 지도에 표시",
+      "hideFromMap": "{name} 지도에서 숨기기"
     },
     "log": {
       "title": "퀘스트 기록",
@@ -3646,7 +4331,8 @@ export const ko_KR: EnTranslations = {
       "drink": "음료",
       "tool": "도구",
       "potion": "물약",
-      "elixir": "비약"
+      "elixir": "비약",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "방어도",
@@ -3688,7 +4374,8 @@ export const ko_KR: EnTranslations = {
       "useManaPotion": "사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
-      "clickBuyback": "클릭하여 되사기"
+      "clickBuyback": "클릭하여 되사기",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "가방",
@@ -5545,6 +6232,48 @@ export const ko_KR: EnTranslations = {
       "conjured_water6": {
         "name": "마법 산악수"
       },
+      "linen_pouch": {
+        "name": "아마천 주머니"
+      },
+      "travelers_knapsack": {
+        "name": "여행자의 배낭"
+      },
+      "wolfhide_satchel": {
+        "name": "늑대가죽 가방"
+      },
+      "gravewoven_bag": {
+        "name": "무덤결 가방"
+      },
+      "mistcallers_duffel": {
+        "name": "안개소환사의 더플백"
+      },
+      "copper_mining_pick": {
+        "name": "구리 채광 곡괭이"
+      },
+      "iron_mining_pick": {
+        "name": "철 채광 곡괭이"
+      },
+      "mithril_mining_pick": {
+        "name": "미스릴 채광 곡괭이"
+      },
+      "handaxe": {
+        "name": "손도끼"
+      },
+      "felling_axe": {
+        "name": "벌목 도끼"
+      },
+      "ironbark_axe": {
+        "name": "철피 도끼"
+      },
+      "gathering_sickle": {
+        "name": "채집 낫"
+      },
+      "bronze_sickle": {
+        "name": "청동 낫"
+      },
+      "silverleaf_sickle": {
+        "name": "은엽 낫"
+      },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
       },
@@ -5908,6 +6637,69 @@ export const ko_KR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "바릭의 그림자 두건"
       },
+      "siltguard_helm": {
+        "name": "진흙수호 투구"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "방벽의 녹슨 어깨보호구"
+      },
+      "nhalias_bell_maul": {
+        "name": "나할리아의 종메"
+      },
+      "reedstalker_jerkin": {
+        "name": "갈대추적자 조끼"
+      },
+      "mirejaw_fang_knife": {
+        "name": "진흙턱 송곳니검"
+      },
+      "widow_silk_hood": {
+        "name": "과부실 후드"
+      },
+      "cantors_drowned_sash": {
+        "name": "영창자의 익사한 허리띠"
+      },
+      "corpse_candle_focus": {
+        "name": "시체양초 집중구"
+      },
+      "nhalias_litany_rod": {
+        "name": "나할리아의 연도 지팡이"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "흑수 선봉대 흉갑"
+      },
+      "siltstep_leggings": {
+        "name": "진흙보 각반"
+      },
+      "sunken_reliquary_hood": {
+        "name": "침몰한 유물함 후드"
+      },
+      "litany_legs": {
+        "name": "진흙보행자 각반"
+      },
+      "litany_shoulder": {
+        "name": "흑수 표류 망토"
+      },
+      "litany_gloves_rog": {
+        "name": "갈대묶음 손보호구"
+      },
+      "litany_plate_chest": {
+        "name": "늪지기 흉갑"
+      },
+      "litany_leather_chest": {
+        "name": "깊은진흙 겉옷"
+      },
+      "litany_cloth_chest": {
+        "name": "익사한 성가대 예복"
+      },
+      "litany_helm": {
+        "name": "성물사냥꾼의 익사 두건"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "나할리아 수녀의 성가 단조 판금"
+      },
+      "drowned_choir_fang": {
+        "name": "익사한 성가대의 송곳니"
+      },
       "the_codfather": {
         "name": "대구 대부"
       },
@@ -6027,6 +6819,30 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "선봉대 크롬"
+      },
+      "crownforged_gauntlets": {
+        "name": "왕관벼림 건틀릿"
+      },
+      "nighttalon_grips": {
+        "name": "밤발톱 손아귀"
+      },
+      "soulflame_gloves": {
+        "name": "영혼불꽃 장갑"
+      },
+      "stormcallers_handguards": {
+        "name": "폭풍소환사의 손보호구"
+      },
+      "crownforged_girdle": {
+        "name": "왕관벼림 허리띠"
+      },
+      "nighttalon_waistband": {
+        "name": "밤발톱 허리싸개"
+      },
+      "soulflame_cord": {
+        "name": "영혼불꽃 허리끈"
+      },
+      "stormcallers_waistguard": {
+        "name": "폭풍소환사의 허리보호구"
       }
     },
     "mobs": {
@@ -6510,6 +7326,45 @@ export const ko_KR: EnTranslations = {
       "frosthelm_icehowler": {
         "name": "Frosthelm Icehowler"
       },
+      "drowned_cantor": {
+        "name": "익사한 영창자"
+      },
+      "reedbound_acolyte": {
+        "name": "갈대에 묶인 신도"
+      },
+      "deepfen_spearjaw": {
+        "name": "깊은늪 창턱"
+      },
+      "mirefen_widowling": {
+        "name": "진창늪 과부거미"
+      },
+      "spider_egg_sac": {
+        "name": "거미 알집"
+      },
+      "grave_silt_bulwark": {
+        "name": "무덤진흙 방벽"
+      },
+      "sump_troll_devourer": {
+        "name": "오물트롤 포식자"
+      },
+      "choir_thrall": {
+        "name": "성가대 노예"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "나할리아 수녀, 익사한 성가"
+      },
+      "edda_reedhand": {
+        "name": "에다 리드핸드"
+      },
+      "tolling_bell": {
+        "name": "울리는 종"
+      },
+      "thunzharr_waking_peak": {
+        "name": "천자르, 깨어나는 봉우리"
+      },
+      "thunzharr_stormling": {
+        "name": "깨어난 폭풍 정령"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -6540,13 +7395,13 @@ export const ko_KR: EnTranslations = {
       "varkas_boneguard": {
         "name": "바르카스 뼈수호병"
       },
-      "imp": {
+      "emberkin": {
         "name": "임프"
       },
-      "voidwalker": {
+      "gloomshade": {
         "name": "공허추적자"
       },
-      "succubus": {
+      "duskborn": {
         "name": "서큐버스"
       },
       "grix_the_tunnelking": {
@@ -6570,16 +7425,16 @@ export const ko_KR: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "영혼결속자 말드렉"
       },
-      "felhunter": {
+      "spellhound": {
         "name": "지옥사냥개"
       },
-      "felguard": {
+      "warfiend": {
         "name": "지옥수호병"
       },
-      "infernal": {
+      "pyre_colossus": {
         "name": "지옥불정령"
       },
-      "doomguard": {
+      "wraithborn": {
         "name": "파멸의 수호병"
       },
       "choirmother_selthe": {
@@ -6869,6 +7724,16 @@ export const ko_KR: EnTranslations = {
         "name": "Huntmaster Roderic",
         "title": "Wolfsward Huntmaster",
         "greeting": "The Empire hunts by charter and quota, {className}, and the quota is behind. Fetch your bow or fetch excuses; I only file one of them."
+      },
+      "brother_halven_marsh": {
+        "name": "브라더 할벤",
+        "title": "성물실 관리인",
+        "greeting": "오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소."
+      },
+      "spirit_healer": {
+        "name": "영혼 치유사",
+        "title": "죽은 자의 수호자",
+        "greeting": "편히 쉬게, 영혼이여. 그대를 육신으로 돌려보낼 수 있으나, 돌아오는 길은 그대를 약하게 만들 것이네."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -7309,6 +8174,36 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "산등성이 추적자 가죽"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "추적자들의 귀환",
+        "text": "열두 마리를 잡았는데도 산등성이는 처음보다 더 들끓습니다, {playerName}. 짐승이 굶주림만으로 성벽에 몸을 던질 리 없습니다. 높은 산마루의 무언가가 그들을 몰아내리고 있습니다. 정체를 알기 전까지 사냥은 계속됩니다. 열네 마리 더.",
+        "completion": "열네 마리를 더 잡았는데도 순찰대는 아침마다 새 발자국을 셉니다. 높은 산마루에서 돌아온 정찰병은 설선처럼 하얗게 질려 있었습니다. 방패만 한 발자국에, 추적자라면 절대 남기지 않을 사냥 흔적이 있었다고 합니다. 저 위를 걷는 것은 평범한 고양이가 아닙니다.",
+        "objectives": {
+          "0": {
+            "label": "산등성이 추적자 처치"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "경비대의 망토",
+        "text": "가죽 여덟 장으로 장교들 망토를 덧댔더니, 이제 성벽의 병사 모두가 같은 것을 원합니다, {playerName}. 당연한 바람입니다. 겨울은 손가락부터 앗아 가고 사과는 듣지 않으니까요. 성문 남쪽 산등성이에서 열 장만 더 구해 오면 경비대 전원이 따뜻하게 잘 수 있습니다.",
+        "completion": "좋은 가죽 열 장, 더없이 두툼한... 아니, 이걸 보십시오, {playerName}. 절반이 찢겨 있는데 칼이나 창의 흔적이 아닙니다. 내 손바닥만 한 발톱 자국이 겨울 털가죽을 꿰뚫었습니다. 그 산등성이의 무언가가 제 동족을 물어뜯고 있습니다.",
+        "objectives": {
+          "0": {
+            "label": "산등성이 추적자 가죽"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "늙은 크래그모",
+        "text": "산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 서편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.",
+        "completion": "마침내 쓰러졌군요. 산사람들은 그 고양이가 성벽보다 오래 살 거라 장담했었습니다. 이제 추적자들은 높은 설원에 머물 겁니다, {playerName}. 내 순찰대도 피 흘리지 않고 길을 걷겠지요. 당신 덕분에 산등성이 전체가 조용해졌습니다.",
+        "objectives": {
+          "0": {
+            "label": "늙은 크래그모 처치"
           }
         }
       },
@@ -9018,6 +9913,33 @@ export const ko_KR: EnTranslations = {
         "name": "무너진 성물실",
         "enterText": "무너진 성물실로 내려갑니다.",
         "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
+      },
+      "drowned_litany": {
+        "name": "익사한 연도",
+        "enterText": "그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.",
+        "leaveText": "그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다."
+      }
+    },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "레이븐포스트",
+        "subject": "이제 까마귀가 당신을 위해 날아갑니다",
+        "body": "여행자님,\n\n레이븐포스트가 골짜기 곳곳에 홰를 열었습니다. 이스트브룩, 펜브리지, 하이워치에서 까마귀 석주를 찾아보세요. 어느 곳에서든 다른 모험가에게 편지와 동전과 물건을 보낼 수 있고, 까마귀가 물어온 것들을 받을 수 있습니다.\n\n첫 우표값으로 쓸 작은 성의를 동봉합니다.\n\n날개를 활짝,\n레이븐포스트"
+      },
+      "letter_q_wolves": {
+        "sender": "레드브룩 원수",
+        "subject": "우리가 다시 조용해졌소",
+        "body": "목동들이 모처럼 두 다리 뻗고 잘 수 있게 된 것은 그대 덕분이오. 경비 기금에서 작은 성의를 레이븐포스트 편에 보냈소.\n\n칼날을 잘 벼려 두시오.\n- 레드브룩 원수"
+      },
+      "letter_q_greyjaw": {
+        "sender": "레드브룩 원수",
+        "subject": "늙은 회색이빨, 마침내",
+        "body": "이런 작은 마을에서는 소문이 빠르게 도는 법이오. 목동들은 어젯밤 그대의 건강을 위해 잔을 들었고, 윌크스는 그 늑대가 수레만 했다고 우기고 있소. 부풀리게 내버려 두시오. 그대가 얻어낸 명성이니.\n\n경비대를 대신해 식사 한 끼 하시오.\n- 레드브룩 원수"
+      },
+      "letter_q_hollow": {
+        "sender": "알드릭 수사",
+        "subject": "그대가 어둠 속에서 해낸 일",
+        "body": "그 구렁에 무엇이 묻혀 있었는지 아는 이는 거의 없고, 믿을 이는 더 적을 것입니다. 저는 알고 있고, 잊지 않겠습니다.\n\n그대의 길에 늘 빛이 함께하기를.\n- 알드릭 수사"
       }
     },
     "itemSets": {
@@ -9033,8 +9955,8 @@ export const ko_KR: EnTranslations = {
       },
       "necromancers": {
         "name": "강령술사의 의복",
-        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
-        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+        "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
+        "bonus3": "지능이 10, 체력이 10만큼 증가합니다."
       },
       "nighttalon": {
         "name": "밤발톱 가죽장비",
@@ -9043,13 +9965,13 @@ export const ko_KR: EnTranslations = {
       },
       "soulflame": {
         "name": "영혼불꽃 의복",
-        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
-        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+        "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
+        "bonus3": "지능이 15, 정신력이 15만큼 증가합니다."
       },
       "stormcallers": {
         "name": "폭풍소환사의 의복",
-        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
-        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+        "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
+        "bonus3": "지능이 15, 정신력이 15만큼 증가합니다."
       },
       "wyrmshadow": {
         "name": "고룡그림자 의복",
@@ -9065,6 +9987,12 @@ export const ko_KR: EnTranslations = {
     "dungeonInstanceBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하십시오.",
     "delveLockedChestInteract": "F를 눌러 자물쇠 따기",
     "delveRewardChestInteract": "F를 눌러 전리품 받기",
-    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기"
+    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기",
+    "delveReliquaryInteract": "가라앉은 성물함: F를 눌러 의식 시작",
+    "delveRiteShrineBellInteract": "종 제단: F를 눌러 울리기",
+    "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
+    "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
+    "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
+    "mailboxName": "우편함"
   }
 };

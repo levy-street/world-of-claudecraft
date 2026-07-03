@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import type { BiomeId } from '../sim/types';
-import { terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
 import { GFX } from './gfx';
 
 // ---------------------------------------------------------------------------
@@ -24,6 +24,9 @@ const MOTE_TINT: Record<BiomeId, number> = {
   vale: 0xf4e6a0,
   marsh: 0xb8d28a,
   peaks: 0xdce8f2,
+  beach: 0xf6e8b0,
+  volcano: 0xe8a070,
+  cave: 0xa8c4b8,
   desert: 0xf0dca0, // sun-struck dust
   shadowwood: 0x9fb8d8, // pale wisp glimmers in the twilight
   highlands: 0xf4e6a0,
@@ -95,7 +98,7 @@ export function buildMotes(seed: number): MotesView {
     const z = pz + Math.sin(ang) * r;
     if (Math.abs(x) > WORLD_MAX_X - 8 || z < WORLD_MIN_Z + 8 || z > WORLD_MAX_Z - 8) return false;
     const h = terrainHeight(x, z, seed);
-    if (h < WATER_LEVEL + 0.5) return false; // no motes hovering over open water
+    if (h < waterLevel() + 0.5) return false; // no motes hovering over open water
     homeX[i] = x;
     homeZ[i] = z;
     baseY[i] = h;

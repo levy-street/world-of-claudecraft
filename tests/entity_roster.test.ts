@@ -4,7 +4,7 @@
 // exercised against a real Sim.ctx (so resolve/recalcPlayerStats/groundPos are real).
 
 import { describe, expect, it, vi } from 'vitest';
-import { DELVES, isDelvePos, MOBS } from '../src/sim/data';
+import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   addEntityToRoster,
@@ -13,12 +13,10 @@ import {
   type GroundAoE,
   graveyardReadout,
   rebucketEntity,
-  releasePlayerSpirit,
   runDespawnDecay,
   tickGroundAoEs,
 } from '../src/sim/entity_roster';
 import { Rng } from '../src/sim/rng';
-import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { SpatialGrid } from '../src/sim/spatial';
 import type { Entity } from '../src/sim/types';
@@ -149,6 +147,7 @@ function makeCtx() {
     fiestaTakedown: vi.fn(),
     fiestaDown: vi.fn(),
     rollLoot: vi.fn(),
+    rollWorldBossLoot: vi.fn(),
     applyHeal: vi.fn(),
     spellCrit: vi.fn(() => 0.05),
     applyAura: vi.fn(),
@@ -166,6 +165,7 @@ function makeCtx() {
     // elsewhere in this host - deduped).
     spendResource: vi.fn(),
     removeItem: vi.fn(),
+    canAddItem: vi.fn(() => true),
     removeFungibleItem: vi.fn(),
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
@@ -270,6 +270,7 @@ function makeCtx() {
     isHostileTo: vi.fn(() => false),
     lineOfSightBlocked: vi.fn(() => false),
     stopFollow: vi.fn(),
+    partyInvite: vi.fn(),
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),
@@ -302,6 +303,8 @@ function makeCtx() {
     targetEntity: vi.fn(),
     partyCapacity: vi.fn(() => 5),
     marketListingBelongsTo: vi.fn(() => false),
+    // Ravenpost mail: the quest turn-in letter hook.
+    queueQuestLetter: vi.fn(),
   };
   const ctx = createSimContext(host);
   return {
@@ -496,75 +499,5 @@ describe('entity_roster: graveyardReadout (pure)', () => {
   });
 });
 
-describe('entity_roster: release-spirit (real Sim.ctx)', () => {
-  const makeSim = (cls: 'warrior' | 'rogue' = 'warrior', seed = 42) =>
-    new Sim({ seed, playerClass: cls, autoEquip: true }) as any;
-
-  it('outdoor release respawns at the zone graveyard at FULL hp, out of combat', () => {
-    const sim = makeSim();
-    sim.setPlayerLevel(10);
-    const p = sim.player as AnyEntity;
-    p.hp = 1;
-    p.inCombat = true;
-    p.dead = true;
-    releasePlayerSpirit(sim.ctx, sim.playerId);
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBe(p.maxHp); // FULL hp
-    expect(p.inCombat).toBe(false);
-    expect(p.auras).toEqual([]);
-    expect(isDelvePos(p.pos.x)).toBe(false);
-  });
-
-  it('a not-dead player early-bails (no respawn side effects)', () => {
-    const sim = makeSim();
-    sim.setPlayerLevel(10);
-    const p = sim.player as AnyEntity;
-    const posBefore = { ...p.pos };
-    p.dead = false;
-    releasePlayerSpirit(sim.ctx, sim.playerId);
-    expect(p.pos).toEqual(posBefore); // untouched
-  });
-
-  it('in-delve first death respawns at 50% hp; a second death fails the run', () => {
-    const sim = makeSim('rogue', 99);
-    const reliquary = DELVES.collapsed_reliquary;
-    sim.setPlayerLevel(reliquary.minLevel);
-    const p = sim.player as AnyEntity;
-    p.pos = { x: reliquary.doorPos.x, y: 0, z: reliquary.doorPos.z };
-    p.prevPos = { ...p.pos };
-    sim.rebucket(p);
-    sim.enterDelve('collapsed_reliquary', 'normal');
-    const run = sim.delveRunForPlayer(sim.playerId);
-    expect(run, 'delve run started').toBeTruthy();
-    run.modules = ['reliquary_finale'];
-    run.moduleIndex = 0;
-    (sim as any).spawnDelveModule(run);
-
-    // First death -> 50% hp at the module entry (delve pos).
-    p.dead = true;
-    releasePlayerSpirit(sim.ctx, sim.playerId);
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBe(Math.max(1, Math.round(p.maxHp * 0.5)));
-    expect(isDelvePos(p.pos.x)).toBe(true);
-
-    // Second in-run death -> run fails, player ejected out of the delve.
-    const e2 = sim.entities.get(sim.playerId) as AnyEntity;
-    e2.dead = true;
-    releasePlayerSpirit(sim.ctx, sim.playerId);
-    const events = sim.tick();
-    expect(events.some((ev: any) => ev.type === 'delveFailed')).toBe(true);
-    expect(isDelvePos((sim.entities.get(sim.playerId) as AnyEntity).pos.x)).toBe(false);
-  });
-
-  it('is deterministic: same seed + same death -> identical graveyard outcome', () => {
-    const outcome = () => {
-      const sim = makeSim('warrior', 7);
-      sim.setPlayerLevel(10);
-      const p = sim.player as AnyEntity;
-      p.dead = true;
-      releasePlayerSpirit(sim.ctx, sim.playerId);
-      return { hp: p.hp, maxHp: p.maxHp, pos: { ...p.pos } };
-    };
-    expect(outcome()).toEqual(outcome());
-  });
-});
+// The release-spirit / ghost-loop tests moved to tests/spirit.test.ts (the flow now
+// lives in src/sim/spirit.ts). graveyardReadout (above) stays here with the roster.

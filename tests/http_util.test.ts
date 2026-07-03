@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
-import { describe, expect, it } from 'vitest';
 import type * as http from 'node:http';
-import { readBody, isUniqueViolation, readBinaryBody, isPng } from '../server/http_util';
+import { describe, expect, it } from 'vitest';
+import { isPng, isUniqueViolation, readBinaryBody, readBody } from '../server/http_util';
 
 // Minimal IncomingMessage stand-in: an emitter that records whether the
 // request was destroyed so we can assert readBody stops reading the socket.
@@ -36,6 +36,19 @@ describe('readBody', () => {
     req.emit('data', '{ not json');
     req.emit('end');
     await expect(promise).rejects.toThrow('bad json');
+  });
+
+  it('rejects non-object JSON bodies (null, arrays, primitives) as bad json', async () => {
+    // A literal `null` body used to resolve, then crash route handlers on
+    // property access (500); every route reads properties, so only an object
+    // body is valid. Arrays and primitives are rejected the same way.
+    for (const body of ['null', '[1,2,3]', '"a string"', '42', 'true']) {
+      const req = fakeReq();
+      const promise = readBody(req);
+      req.emit('data', body);
+      req.emit('end');
+      await expect(promise, body).rejects.toThrow('bad json');
+    }
   });
 
   it('rejects and destroys the request when the body exceeds 64KB', async () => {
@@ -112,7 +125,10 @@ describe('isPng', () => {
 describe('isUniqueViolation', () => {
   it('matches a Postgres unique-constraint error by SQLSTATE code', () => {
     // what node-postgres throws for a UNIQUE index conflict
-    const err = Object.assign(new Error('duplicate key value violates unique constraint "accounts_username_key"'), { code: '23505' });
+    const err = Object.assign(
+      new Error('duplicate key value violates unique constraint "accounts_username_key"'),
+      { code: '23505' },
+    );
     expect(isUniqueViolation(err)).toBe(true);
   });
 
@@ -121,7 +137,9 @@ describe('isUniqueViolation', () => {
   });
 
   it('ignores unrelated errors and non-errors', () => {
-    expect(isUniqueViolation(Object.assign(new Error('connection reset'), { code: '08006' }))).toBe(false);
+    expect(isUniqueViolation(Object.assign(new Error('connection reset'), { code: '08006' }))).toBe(
+      false,
+    );
     expect(isUniqueViolation(new Error('boom'))).toBe(false);
     expect(isUniqueViolation(null)).toBe(false);
     expect(isUniqueViolation(undefined)).toBe(false);

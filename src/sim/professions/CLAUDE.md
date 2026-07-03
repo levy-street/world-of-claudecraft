@@ -1,4 +1,4 @@
-<!-- src/sim/professions/: professions subsystem contracts (types + stub IWorld
+<!-- src/sim/professions/: professions subsystem contracts (types + IWorld
      read-surface). Don't repeat root / src/sim CLAUDE.md, reference them. -->
 
 # src/sim/professions/: professions contracts
@@ -23,16 +23,17 @@ game data itself.
 ## IWorld facet
 The read-surface facet (`IWorldProfessions`) lives at `src/world_api/professions.ts`,
 alongside the other 21 facets under `src/world_api/` (see the FACET MAP in
-`src/world_api.ts`). It is a stub as of #1164: `professionsState` returns an
-empty `PlayerProfessionsView` on both `Sim` and `ClientWorld` until #1119/#1120
-land the real mechanics. Extend `IWorldProfessions` first, then implement in
-BOTH worlds, per the root CLAUDE.md "IWorld is the only seam" rule.
+`src/world_api.ts`). Stubbed empty by #1164; #1119 landed the gathering read, so
+`professionsState` now returns the Mining/Logging/Herbalism skills on `Sim` and
+is mirrored onto `ClientWorld` from the `prof` wire delta. Crafting/secondary
+professions still contribute nothing until #1120/#1125/#1126/#1140. Extend
+`IWorldProfessions` first, then implement in BOTH worlds, per the root CLAUDE.md
+"IWorld is the only seam" rule.
 
-## Settled contract names (for #1119/#1120/#1125/#1126/#1140)
-- Wire/snapshot key: not wired yet (the facet getter is not part of the
-  `ALL_DELTA_KEYS` snapshot-delta set). When a future issue wires it, use the
-  terse token `prof` for `self.prof` on the WS snapshot, mapped to
-  `professionsState` in `TERSE_TO_IWORLD` (see `tests/snapshots.test.ts`).
+## Settled contract names (landed by #1119, reused by #1120/#1125/#1126/#1140)
+- Wire/snapshot key: `prof` for `self.prof` on the WS snapshot, mapped to
+  `professionsState` in `TERSE_TO_IWORLD` and listed in `ALL_DELTA_KEYS` (see
+  `tests/snapshots.test.ts`). Diff-sent, so it ships only when the view changes.
 - Persistence JSONB key: `professions` on the character save row (parallel to
   the existing `delveDaily`/`companionUpgrades` keys persisted in
   `server/db.ts`).

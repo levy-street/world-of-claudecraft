@@ -4,6 +4,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   loadMarketState: vi.fn(async () => ({ listings: [], collections: new Map() })),
@@ -12,9 +13,9 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { GameServer, ClientSession } from '../server/game';
-import { groundHeight } from '../src/sim/world';
+import { type ClientSession, GameServer } from '../server/game';
 import type { PlayerClass } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 interface FakeClient {
   sent: unknown[];
@@ -95,7 +96,10 @@ describe('arena: online integration (GameServer)', () => {
     }
 
     for (const session of sessions) {
-      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'arena_queue', format: '2v2' }));
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'arena_queue', format: '2v2' }),
+      );
     }
     advance(server);
 

@@ -550,9 +550,6 @@
     height: 50px;
     pointer-events: auto;
   }
-  body.mobile-touch #daily-rewards-button .daily-rewards-label {
-    display: none;
-  }
   body.native-app.mobile-touch #daily-rewards-button,
   body.native-app.mobile-touch #daily-rewards-window {
     display: none !important;
@@ -848,10 +845,12 @@
     transform: scale(0.72);
     transform-origin: right top;
   }
-  body.mobile-touch #quest-tracker {
+  body.mobile-touch #right-tracker-stack {
     right: max(10px, env(safe-area-inset-right));
     top: max(150px, env(safe-area-inset-top));
     width: 190px;
+  }
+  body.mobile-touch #quest-tracker {
     font-size: 11px;
   }
   body.mobile-touch #meters-window {
@@ -1429,6 +1428,24 @@
   /* the map +/- zoom buttons are touch controls on mobile; raise them to the
      40x40 floor (desktop is 32x32). box-sizing keeps the 2px border inside the box. */
   body.mobile-touch .map-zoom-btn {
+    min-width: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* the quest side list has no room beside the small mobile map: flow it
+     under the canvas inside the window instead, and raise its track toggle
+     to the 40x40 touch floor */
+  body.mobile-touch #map-quests {
+    position: static;
+    width: auto;
+    max-height: 26vh;
+    margin-top: 8px;
+  }
+  body.mobile-touch #map-quests-toggle {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch .mapq-track {
     min-width: 40px;
     min-height: 40px;
     box-sizing: border-box;
@@ -2033,7 +2050,7 @@
     #community-hud {
       top: auto;
     }
-    #quest-tracker {
+    #right-tracker-stack {
       top: 260px;
       right: 12px;
       width: 190px;

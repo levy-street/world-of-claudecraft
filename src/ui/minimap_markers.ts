@@ -65,6 +65,8 @@ export type MinimapMarker =
   | { kind: 'mob'; mx: number; my: number; aggro: boolean }
   // A lootable corpse (mob).
   | { kind: 'mob-loot'; mx: number; my: number }
+  // The local player's own body while a ghost (the corpse run target), a skull marker.
+  | { kind: 'corpse'; mx: number; my: number }
   // An on-map party member: a proximity-scaled disc, class-colored, with an inner pip
   // when alive.
   | {
@@ -164,6 +166,25 @@ export function createMinimapMarkers(): MinimapMarkers {
           markers.push({ kind: 'mob', mx, my, aggro: e.aggroTargetId === p.id });
         } else if (e.kind === 'mob' && e.lootable) {
           markers.push({ kind: 'mob-loot', mx, my });
+        }
+      }
+
+      // The local player's own corpse while a ghost: a skull marker so the corpse run
+      // is navigable. Clamped to the rim when the body is off the minimap, so it always
+      // points the way back (like a party-arrow).
+      if (p.ghost && p.corpsePos) {
+        const dx = -(p.corpsePos.x - p.pos.x) * pxPerYard;
+        const dz = -(p.corpsePos.z - p.pos.z) * pxPerYard;
+        const dist = Math.hypot(dx, dz);
+        if (dist > rim) {
+          const ang = Math.atan2(dz, dx);
+          markers.push({
+            kind: 'corpse',
+            mx: half + Math.cos(ang) * rim,
+            my: half + Math.sin(ang) * rim,
+          });
+        } else {
+          markers.push({ kind: 'corpse', mx: half + dx, my: half + dz });
         }
       }
 

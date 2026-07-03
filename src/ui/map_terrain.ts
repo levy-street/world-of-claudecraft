@@ -7,7 +7,7 @@
 // The colours sample the SAME `terrainHeight`/`roadDistance` the renderer and
 // sim use, so the map always matches the real world, do not diverge them.
 import { ZONES } from '../sim/data';
-import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { roadDistance, terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
 
 export interface MapRegion {
   minX: number;
@@ -36,6 +36,10 @@ export function paintTerrainRows(
 ): void {
   const spanX = region.maxX - region.minX;
   const spanZ = region.maxZ - region.minZ;
+  // The ACTIVE water surface (custom map override aware), hoisted per call:
+  // rows are chunked, so each chunk re-reads it and a mid-paint level change
+  // still lands on the next chunk.
+  const wl = waterLevel();
   for (let iy = y0; iy < y1; iy++) {
     let prevH = 0; // height of the left-neighbour pixel, for free hillshade
     for (let ix = 0; ix < W; ix++) {
@@ -82,7 +86,7 @@ export function paintTerrainRows(
       // ridge band goes rock+snow (the mid-height rocky/dry-grass overrides
       // are green-biome shading and would repaint dunes and salt as grass)
       const arid = biome === 'desert' || biome === 'salt' || biome === 'scorched';
-      if (h < WATER_LEVEL) {
+      if (h < wl) {
         r = 38;
         g = 84;
         b = 138;
@@ -111,7 +115,7 @@ export function paintTerrainRows(
         r = 125;
         g = 100;
         b = 66;
-      } else if (h >= WATER_LEVEL && roadDistance(x, z) < 2.4) {
+      } else if (h >= wl && roadDistance(x, z) < 2.4) {
         r = 138;
         g = 111;
         b = 71;
@@ -120,7 +124,7 @@ export function paintTerrainRows(
       // left-neighbour height so it costs no extra terrainHeight() calls
       const left = ix === 0 ? h : prevH;
       prevH = h;
-      if (h >= WATER_LEVEL) {
+      if (h >= wl) {
         const shade = Math.max(0.74, Math.min(1.28, 1 + (h - left) * 0.16));
         r = Math.min(255, r * shade);
         g = Math.min(255, g * shade);

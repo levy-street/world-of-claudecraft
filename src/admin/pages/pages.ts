@@ -7,10 +7,20 @@ export type AdminPage =
   | 'characters'
   | 'moderation'
   | 'suspicious-players'
+  | 'detection-calibration'
   | 'shared-ips'
   | 'chat-filter'
   | 'blocked-ips'
-  | 'bug-reports';
+  | 'bug-reports'
+  | 'housekeeping'
+  | 'housekeeping-rates'
+  | 'housekeeping-calendar'
+  | 'housekeeping-mobs'
+  | 'housekeeping-spawns'
+  | 'housekeeping-quests'
+  | 'housekeeping-npcs'
+  | 'housekeeping-items'
+  | 'housekeeping-world';
 
 export interface AdminNavItem {
   id: AdminPage;
@@ -51,10 +61,18 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     defaultPage: 'moderation',
     items: [
       { id: 'moderation', labelKey: 'nav.reports' },
-      { id: 'suspicious-players', labelKey: 'nav.suspiciousPlayers' },
       { id: 'shared-ips', labelKey: 'nav.sharedIps' },
       { id: 'blocked-ips', labelKey: 'nav.blockedIps' },
       { id: 'chat-filter', labelKey: 'nav.chatFilter' },
+    ],
+  },
+  {
+    id: 'bot-detector',
+    labelKey: 'nav.botDetector',
+    defaultPage: 'suspicious-players',
+    items: [
+      { id: 'suspicious-players', labelKey: 'nav.liveEvidence' },
+      { id: 'detection-calibration', labelKey: 'nav.calibration' },
     ],
   },
   {
@@ -62,6 +80,22 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     labelKey: 'nav.support',
     defaultPage: 'bug-reports',
     items: [{ id: 'bug-reports', labelKey: 'nav.bugReports' }],
+  },
+  {
+    id: 'housekeeping',
+    labelKey: 'nav.housekeeping',
+    defaultPage: 'housekeeping',
+    items: [
+      { id: 'housekeeping', labelKey: 'nav.hkOverview' },
+      { id: 'housekeeping-rates', labelKey: 'nav.hkRates' },
+      { id: 'housekeeping-calendar', labelKey: 'nav.hkCalendar' },
+      { id: 'housekeeping-mobs', labelKey: 'nav.hkMobs' },
+      { id: 'housekeeping-spawns', labelKey: 'nav.hkSpawns' },
+      { id: 'housekeeping-quests', labelKey: 'nav.hkQuests' },
+      { id: 'housekeeping-npcs', labelKey: 'nav.hkNpcs' },
+      { id: 'housekeeping-items', labelKey: 'nav.hkItems' },
+      { id: 'housekeeping-world', labelKey: 'nav.hkWorld' },
+    ],
   },
 ];
 

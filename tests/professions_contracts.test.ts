@@ -1,6 +1,8 @@
-// #1164: professions contracts + IWorld facet stub. Asserts the new facet
-// exists on both worlds and returns the settled empty shape, and that the
-// shared types are importable from the barrel without duplication.
+// #1164: professions contracts + IWorld facet. Asserts the facet exists on
+// both worlds and (as of #1119) returns the real gathering-profession skills
+// on a fresh Sim (all-zero, but present, not the pre-#1119 empty stub); the
+// stub-empty shape survives only on ClientWorld before a snapshot lands, and
+// the shared types are importable from the barrel without duplication.
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import type { ProfessionRecord } from '../src/sim/professions';
@@ -50,12 +52,18 @@ function makeClientWorld(): ClientWorld {
 }
 
 describe('professions contracts (#1164)', () => {
-  it('IWorldProfessions.professionsState is a stub empty view on Sim', () => {
+  it('IWorldProfessions.professionsState carries the three all-zero gathering skills on a fresh Sim', () => {
     const sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
-    expect(sim.professionsState).toEqual({ skills: [] });
+    expect(sim.professionsState).toEqual({
+      skills: [
+        { professionId: 'mining', skill: 0, maxSkill: 300 },
+        { professionId: 'logging', skill: 0, maxSkill: 300 },
+        { professionId: 'herbalism', skill: 0, maxSkill: 300 },
+      ],
+    });
   });
 
-  it('IWorldProfessions.professionsState is a stub empty view on ClientWorld', () => {
+  it('IWorldProfessions.professionsState is a stub empty view on ClientWorld (not yet mirrored from a snapshot)', () => {
     const client = makeClientWorld();
     expect(client.professionsState).toEqual({ skills: [] });
   });

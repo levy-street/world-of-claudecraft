@@ -90,6 +90,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.slotAria': 'Pole akcji {slot}: {ability}',
   'abilityUi.cast.demonHeal': 'Demoniczne leczenie',
   'abilityUi.cast.fishing': 'Wędkarstwo',
+  'abilityUi.cast.thunzharrStormcall': 'Zew burzy',
   'abilityUi.forms.bear': 'Niedźwiedź',
   'abilityUi.forms.cat': 'Wilk',
   'abilityUi.resources.energy': 'Energia',
@@ -1067,6 +1068,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.moggers_shiv.name': 'Nóż Moggera',
   'entities.items.moggers_stomper_boots.name': 'Tupiące buty Moggera',
   'entities.items.monarch_crown_helm.name': 'Korona monarchy',
+  'entities.items.copper_mining_pick.name': 'Miedziany Kilof Górniczy',
+  'entities.items.iron_mining_pick.name': 'Żelazny Kilof Górniczy',
+  'entities.items.mithril_mining_pick.name': 'Mithrilowy Kilof Górniczy',
+  'entities.items.handaxe.name': 'Toporek',
+  'entities.items.felling_axe.name': 'Siekiera Drwala',
+  'entities.items.ironbark_axe.name': 'Toporek z Żelaznej Kory',
+  'entities.items.gathering_sickle.name': 'Sierp do Zbioru',
+  'entities.items.bronze_sickle.name': 'Brązowy Sierp',
+  'entities.items.silverleaf_sickle.name': 'Sierp Srebrnolistny',
   'entities.items.moongate_rubbing.name': 'Odbitka ochronnego znaku',
   'entities.items.moonpale_scale.name': 'Księżycowoblada łuska',
   'entities.items.moonscale_saber.name': 'Szabla z księżycowej łuski',
@@ -1165,6 +1175,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.steel_orange_armor_plate.name': 'Stalowa pomarańcza',
   'entities.items.storm_core.name': 'Rdzeń burzy',
   'entities.items.stormcallers_crown.name': 'Korona przywoływacza burz',
+  'entities.items.crownforged_gauntlets.name': 'Koronokute rękawice',
+  'entities.items.nighttalon_grips.name': 'Chwyty nocnego szpona',
+  'entities.items.soulflame_gloves.name': 'Rękawice duszopłomienia',
+  'entities.items.stormcallers_handguards.name': 'Karwasze przywoływacza burz',
+  'entities.items.crownforged_girdle.name': 'Koronokuty pas',
+  'entities.items.nighttalon_waistband.name': 'Pas nocnego szpona',
+  'entities.items.soulflame_cord.name': 'Sznur duszopłomienia',
+  'entities.items.stormcallers_waistguard.name': 'Ochraniacz pasa przywoływacza burz',
   'entities.items.stormcallers_spaulders.name': 'Naramienniki przywoływacza burz',
   'entities.items.stormshard_leggings.name': 'Nogawice burzowego odłamka',
   'entities.items.sturdy_belt.name': 'Solidny pas podróżnika',
@@ -1206,6 +1224,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.widowfang_dirk.name': 'Sztylet kła wdowy',
   'entities.items.windguard_leggings.name': 'Nogawice strażnika wiatru',
   'entities.items.wolf_fang.name': 'Pęknięty kieł wilka',
+  'entities.items.linen_pouch.name': 'Lniana sakiewka',
+  'entities.items.travelers_knapsack.name': 'Plecak podróżnika',
+  'entities.items.wolfhide_satchel.name': 'Torba z wilczej skóry',
+  'entities.items.gravewoven_bag.name': 'Grobowo tkana torba',
+  'entities.items.mistcallers_duffel.name': 'Worek Przyzywacza Mgły',
   'entities.items.worn_sword.name': 'Zużyty krótki miecz',
   'entities.items.woven_robe.name': 'Szata tkana w dolinie',
   'entities.items.wyrmcult_grand_robe.name': 'Wspaniała szata kultu żmija',
@@ -1235,14 +1258,14 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deathstalker_voss.name': 'Śmiercioczaj Voss',
   'entities.mobs.deepfen_murloc.name': 'Głębotopielny Kąsacz',
   'entities.mobs.deeprock_kobold.name': 'Głęboskalny Drążyciel',
-  'entities.mobs.doomguard.name': 'Strażnik Zagłady',
+  'entities.mobs.wraithborn.name': 'Strażnik Zagłady',
   'entities.mobs.drowned_dead.name': 'Utopiony Trup',
   'entities.mobs.drowned_templeguard.name': 'Utopiony Strażnik Świątyni',
   'entities.mobs.drowned_thrall.name': 'Utopiony Niewolnik',
   'entities.mobs.drowned_votary.name': 'Utopiony Wyznawca',
   'entities.mobs.fallen_captain_aldren.name': 'Poległy Kapitan Aldren',
-  'entities.mobs.felguard.name': 'Plugawy Strażnik',
-  'entities.mobs.felhunter.name': 'Plugawy Łowca',
+  'entities.mobs.warfiend.name': 'Plugawy Strażnik',
+  'entities.mobs.spellhound.name': 'Plugawy Łowca',
   'entities.mobs.fen_troll.name': 'Troll z Mokrzawia',
   'entities.mobs.forest_wolf.name': 'Leśny Wilk',
   'entities.mobs.glimmermere_wader.name': 'Brodziciel z Migotliwego Jeziora',
@@ -1255,8 +1278,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.grix_the_tunnelking.name': 'Grix Tunelowy Król',
   'entities.mobs.grubjaw.name': 'Larwopaszczy Żarłok',
   'entities.mobs.hollow_acolyte.name': 'Wydrążony Akolita',
-  'entities.mobs.imp.name': 'Chochlik',
-  'entities.mobs.infernal.name': 'Piekielnik',
+  'entities.mobs.emberkin.name': 'Chochlik',
+  'entities.mobs.pyre_colossus.name': 'Piekielnik',
   'entities.mobs.ironvein_foreman.name': 'Sztygar z Żelaznej Żyły',
   'entities.mobs.ironvein_sapper.name': 'Saper z Żelaznej Żyły',
   'entities.mobs.knight_commander_olen.name': 'Komandor Rycerzy Olen',
@@ -1297,7 +1320,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia.name': 'Siostra Nhalia',
   'entities.mobs.sloomtooth_the_drowned.name': 'Mulząb Utopiony',
   'entities.mobs.stormcrag_elemental.name': 'Żywiołak Burzowej Turni',
-  'entities.mobs.succubus.name': 'Sukkub',
+  'entities.mobs.duskborn.name': 'Sukkub',
   'entities.mobs.thornpeak_ogre.name': 'Ogr z Ciernistego Szczytu',
   'entities.mobs.tidebound_acolyte.name': 'Akolita Spętany Przypływem',
   'entities.mobs.tunnel_rat.name': 'Tunelowy Szczur Kopacz',
@@ -1307,7 +1330,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.vision_aldren_warrior.name': 'Zjawa Kapitana Aldrena',
   'entities.mobs.vision_deathstalker_voss.name': 'Zjawa Królewskiego Zabójcy Vossa',
   'entities.mobs.vision_malric_mage.name': 'Zjawa Najwyższego Kapłana Malrica',
-  'entities.mobs.voidwalker.name': 'Wędrowiec Pustki',
+  'entities.mobs.gloomshade.name': 'Wędrowiec Pustki',
   'entities.mobs.voskar_emberwing.name': 'Voskar Żaroskrzydły',
   'entities.mobs.warlock_imp.name': 'Ognisty Demon',
   'entities.mobs.warlock_voidwalker.name': 'Demon Pustki',
@@ -2524,12 +2547,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Bandyci, kultyści i inni, którzy obrali zły fach. Walczą taktyką, nie tylko kłami.',
   'guide.family.humanoid.name': 'Humanoidy',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Świecogłowi kopacze, którzy zarażają kopalnie i nory, zaciekle strzegąc swojej rudy.',
-  'guide.family.kobold.name': 'Kobold',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobold',
+  'guide.family.mudfin.desc':
     'Ziemnowodni mieszkańcy bagien, którzy zalewają płycizny w hałaśliwych, terytorialnych watahach.',
-  'guide.family.murloc.name': 'Murloki',
+  'guide.family.mudfin.name': 'Murloki',
   'guide.family.ogre.desc':
     'Ogromne, tępe i niebezpieczne. Obozują na wysokich przełęczach i uderzają jak lawina.',
   'guide.family.ogre.name': 'Ogry',
@@ -2873,18 +2896,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.notFound.body': 'Strona, której szukasz, nie istnieje lub mogła zostać przeniesiona.',
   'guide.notFound.home': 'Powrót do przeglądu',
   'guide.notFound.title': 'Nie udało nam się znaleźć tej strony',
-  'guide.petHook.doomguard':
+  'guide.petHook.wraithborn':
     'Elitarny rzucający zaklęcia, który z oddali sprowadza ciężki ostrzał cienia.',
-  'guide.petHook.felguard':
+  'guide.petHook.warfiend':
     'Wytrzymały zabijaka walczący wręcz, uniwersalny towarzysz, gdy już zdołasz go przyzwać.',
-  'guide.petHook.felhunter': 'Cienisty harcownik, który tropi wrogich rzucających zaklęcia.',
-  'guide.petHook.imp':
+  'guide.petHook.spellhound': 'Cienisty harcownik, który tropi wrogich rzucających zaklęcia.',
+  'guide.petHook.emberkin':
     'Demon ciskający ognistymi pociskami z bezpiecznej odległości, podgryzający wrogów na dystans.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Potężny kolos miażdżący wrogów w zwarciu, przyzywany dla czystej siły.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Szybki demon walczący wręcz, który zadaje potężne ciosy, lecz łatwo pada pod naporem.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Wytrzymały demon, który prowokuje i przyjmuje ciosy na siebie, byś mógł spokojnie rzucać zaklęcia.',
   'guide.placeholder.note': 'Ta część przewodnika jest już w drodze.',
   'guide.progression.bandLabel': 'Poziomy od {min} do {max}',
@@ -4907,18 +4930,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.bonus2': 'Zwiększa siłę ataku o 40.',
   'entities.itemSets.deathlord.bonus3': 'Zwiększa siłę o 15 i wytrzymałość o 15.',
   'entities.itemSets.necromancers.name': 'Szaty nekromanty',
-  'entities.itemSets.necromancers.bonus2': 'Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.',
-  'entities.itemSets.necromancers.bonus3': 'Otrzymywane obrażenia nie opóźniają rzucania zaklęć.',
+  'entities.itemSets.necromancers.bonus2':
+    'Nie można cię odrzucić (100% odporności na odrzucenie).',
+  'entities.itemSets.necromancers.bonus3': 'Zwiększa intelekt o 10 i wytrzymałość o 10.',
   'entities.itemSets.nighttalon.name': 'Skórzany rynsztunek Nocnego Szpona',
   'entities.itemSets.nighttalon.bonus2': 'Zwiększa siłę ataku o 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Zwiększa zręczność o 15 i szansę na trafienie krytyczne o 2%.',
   'entities.itemSets.soulflame.name': 'Szaty Płomienia Duszy',
-  'entities.itemSets.soulflame.bonus2': 'Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.',
-  'entities.itemSets.soulflame.bonus3': 'Otrzymywane obrażenia nie opóźniają rzucania zaklęć.',
+  'entities.itemSets.soulflame.bonus2': 'Nie można cię odrzucić (100% odporności na odrzucenie).',
+  'entities.itemSets.soulflame.bonus3': 'Zwiększa intelekt o 15 i ducha o 15.',
   'entities.itemSets.stormcallers.name': 'Szaty Przyzywacza Burz',
-  'entities.itemSets.stormcallers.bonus2': 'Zmniejsza opóźnianie zaklęć przez obrażenia o 50%.',
-  'entities.itemSets.stormcallers.bonus3': 'Otrzymywane obrażenia nie opóźniają rzucania zaklęć.',
+  'entities.itemSets.stormcallers.bonus2':
+    'Nie można cię odrzucić (100% odporności na odrzucenie).',
+  'entities.itemSets.stormcallers.bonus3': 'Zwiększa intelekt o 15 i ducha o 15.',
   'entities.itemSets.wyrmshadow.name': 'Rynsztunek Cienia Żmija',
   'entities.itemSets.wyrmshadow.bonus2': 'Zwiększa siłę ataku o 40.',
   'entities.itemSets.wyrmshadow.bonus3':
@@ -5285,6 +5310,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinResult': '+{points} pkt',
   'hudChrome.dailyRewards.spinTitle': 'Codzienne losowanie',
   'hudChrome.dailyRewards.tasks': 'Zadania',
+  'hudChrome.dailyRewards.showChestButton': 'Pokaż skrzynię',
+  'hudChrome.dailyRewards.hideChestButton': 'Ukryj skrzynię',
   'hudChrome.dailyRewards.title': 'Codzienne nagrody',
   'hudChrome.dailyRewards.unknown': 'Nieznane',
   'hudChrome.dailyRewards.usd': '{amount} USD',
@@ -5305,4 +5332,21 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Nie teraz',
   'hudChrome.nativeUpdate.title': 'Dostępna aktualizacja',
   'hudChrome.nativeUpdate.update': 'Aktualizuj',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Krucza Poczta',
+  'entities.letters.ravenpost_welcome.subject': 'Kruki latają teraz dla ciebie',
+  'entities.letters.ravenpost_welcome.body':
+    'Wędrowcze,\n\nKrucza Poczta otworzyła swoje żerdzie w całej dolinie. Szukaj kruczych słupów w Eastbrook, Fenbridge i Highwatch: z każdego z nich możesz wysyłać listy, monety i towary innym poszukiwaczom przygód oraz odbierać wszystko, co przyniosą ci kruki.\n\nZałączamy drobiazg na twój pierwszy znaczek.\n\nSkrzydła w górę,\nKrucza Poczta',
+  'entities.letters.letter_q_wolves.sender': 'Marszałek Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'W zagrodach znów spokój',
+  'entities.letters.letter_q_wolves.body':
+    'Pasterze mogą wreszcie spać spokojnie i to twoja zasługa. Poprosiłem Kruczą Pocztę, by dostarczyła ci drobiazg z kasy straży.\n\nDbaj o ostrze.\n- Marszałek Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marszałek Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Stary Szaropaszcz, nareszcie',
+  'entities.letters.letter_q_greyjaw.body':
+    'Wieści szybko się niosą w tak małym miasteczku. Pasterze pili wczoraj za twoje zdrowie, a Wilkes przysięga, że wilk był wielki jak wóz. Niech sobie koloryzują: zasłużyłeś na to.\n\nZjedz posiłek na koszt straży.\n- Marszałek Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Brat Aldric',
+  'entities.letters.letter_q_hollow.subject': 'To, czego dokonałeś w mroku',
+  'entities.letters.letter_q_hollow.body':
+    'Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric',
 };

@@ -4,38 +4,85 @@
   import AccountLink from '../components/AccountLink.svelte';
   import IpLink from '../components/IpLink.svelte';
   import Panel from '../components/Panel.svelte';
+  import { fmtDate } from '../format';
   import { adminLanguageTag, t } from '../i18n';
   import { auth } from '../state/auth.svelte';
-  import { LIVE_REFRESH_MS } from '../state/poll';
-  import type { SuspiciousPlayersData } from '../types';
+  import { buildSuspiciousSessionsExport } from '../suspicious_sessions_export';
+  import type { SuspiciousPlayer, SuspiciousPlayersData } from '../types';
 
-  type SortColumn = 'score' | 'evidence';
+  type SortColumn = 'observed' | 'score' | 'evidence';
   type SortDirection = 'asc' | 'desc';
 
   const AUTO_REFRESH_STORAGE_KEY = 'claudecraft_admin_suspicious_auto_refresh';
+  const AUTO_REFRESH_MS = 30_000;
 
   let data = $state<SuspiciousPlayersData | null>(null);
   let failed = $state(false);
-  let sort = $state<SortColumn>('score');
+  let sort = $state<SortColumn>('observed');
   let direction = $state<SortDirection>('desc');
+  let query = $state('');
   let autoRefresh = $state(true);
   let mounted = $state(false);
   let requestId = 0;
 
   const sortedPlayers = $derived.by(() => {
     if (!data) return [];
+    const normalizedQuery = normalizeSearch(query);
+    const filtered = normalizedQuery
+      ? data.players.filter((player) => matchesSearch(player, normalizedQuery))
+      : data.players;
     const multiplier = direction === 'asc' ? 1 : -1;
-    return [...data.players].sort((a, b) => {
+    return [...filtered].sort((a, b) => {
+      if (sort === 'observed') {
+        const left = a.snapshot?.capturedAt;
+        const right = b.snapshot?.capturedAt;
+        if (left === undefined && right !== undefined) return 1;
+        if (left !== undefined && right === undefined) return -1;
+        if (left !== undefined && right !== undefined && left !== right) {
+          return (left - right) * multiplier;
+        }
+        return b.score - a.score || a.ref.accountId - b.ref.accountId;
+      }
       const left = sort === 'score' ? a.score : a.evidence.length;
       const right = sort === 'score' ? b.score : b.evidence.length;
       return (left - right) * multiplier || b.score - a.score || a.ref.accountId - b.ref.accountId;
     });
   });
 
+  function normalizeSearch(value: string): string {
+    return value
+      .normalize('NFKD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLocaleLowerCase(adminLanguageTag())
+      .trim();
+  }
+
+  function matchesSearch(player: SuspiciousPlayer, normalizedQuery: string): boolean {
+    return [
+      player.ref.name,
+      player.ref.ip,
+      ...player.evidence.flatMap((evidence) => [evidence.kind, evidence.detail]),
+    ].some((value) => normalizeSearch(value).includes(normalizedQuery));
+  }
+
   function formatScore(value: number): string {
     return new Intl.NumberFormat(adminLanguageTag(), {
       maximumFractionDigits: 2,
     }).format(value);
+  }
+
+  function resultCountLabel(count: number): string {
+    const formatted = new Intl.NumberFormat(adminLanguageTag()).format(count);
+    return t(
+      count === 1
+        ? 'suspiciousPlayers.resultCountOne'
+        : 'suspiciousPlayers.resultCountMany',
+      { count: formatted },
+    );
+  }
+
+  function formatTimestamp(value: number): string {
+    return fmtDate(new Date(value).toISOString());
   }
 
   async function refresh(): Promise<void> {
@@ -48,6 +95,26 @@
     } catch (err) {
       if (currentRequest !== requestId) return;
       if (!auth.handleAuthFailure(err)) failed = true;
+    }
+  }
+
+  function downloadJson(): void {
+    if (data === null) return;
+    const file = buildSuspiciousSessionsExport(data);
+    const url = URL.createObjectURL(
+      new Blob([file.contents], {
+        type: 'application/json',
+      }),
+    );
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file.filename;
+    document.body.append(link);
+    try {
+      link.click();
+    } finally {
+      link.remove();
+      URL.revokeObjectURL(url);
     }
   }
 
@@ -66,7 +133,7 @@
 
   function sortArrow(column: SortColumn): string {
     if (sort !== column) return '';
-    return direction === 'asc' ? ' ▲' : ' ▼';
+    return direction === 'asc' ? '▲' : '▼';
   }
 
   function changeAutoRefresh(event: Event): void {
@@ -77,7 +144,7 @@
 
   $effect(() => {
     if (!mounted || !autoRefresh) return;
-    const id = setInterval(() => void refresh(), LIVE_REFRESH_MS);
+    const id = setInterval(() => void refresh(), AUTO_REFRESH_MS);
     return () => clearInterval(id);
   });
 
@@ -94,27 +161,49 @@
 <div class="suspicious-page">
   <Panel>
     <div class="page-controls">
-      <p class="description">{t('suspiciousPlayers.description')}</p>
-      <label class="auto-refresh">
-        <input type="checkbox" checked={autoRefresh} onchange={changeAutoRefresh} />
-        <span class="switch-track" aria-hidden="true"><span></span></span>
-        <span>
-          {t('suspiciousPlayers.autoRefresh', { seconds: LIVE_REFRESH_MS / 1000 })}
-        </span>
+      <div class="description-row">
+        <p class="description">{t('suspiciousPlayers.sessionDescription')}</p>
+        <div class="control-actions">
+          <label class="auto-refresh">
+            <input type="checkbox" checked={autoRefresh} onchange={changeAutoRefresh} />
+            <span class="switch-track" aria-hidden="true"><span></span></span>
+            <span>
+              {t('suspiciousPlayers.autoRefresh', { seconds: AUTO_REFRESH_MS / 1000 })}
+            </span>
+          </label>
+          <button type="button" disabled={data === null} onclick={downloadJson}>
+            {t('suspiciousPlayers.downloadJson')}
+          </button>
+        </div>
+      </div>
+      <label class="search">
+        <span class="visually-hidden">{t('suspiciousPlayers.searchLabel')}</span>
+        <input
+          type="search"
+          bind:value={query}
+          placeholder={t('suspiciousPlayers.searchPlaceholder')}
+        />
       </label>
     </div>
+
+    <p class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+      {data === null ? '' : resultCountLabel(sortedPlayers.length)}
+    </p>
 
     {#if failed}
       <div class="empty">{t('suspiciousPlayers.loadFailed')}</div>
     {:else if data === null}
       <div class="empty">{t('suspiciousPlayers.loading')}</div>
+    {:else if data.players.length === 0}
+      <div class="empty">{t('suspiciousPlayers.sessionEmpty')}</div>
     {:else if sortedPlayers.length === 0}
-      <div class="empty">{t('suspiciousPlayers.empty')}</div>
+      <div class="empty">{t('suspiciousPlayers.filteredEmpty')}</div>
     {:else}
       <div class="table-scroll">
         <table>
           <colgroup>
             <col />
+            <col class="observed-column" />
             <col class="evidence-column" />
             <col class="score-column" />
           </colgroup>
@@ -122,20 +211,29 @@
             <tr>
               <th>
                 <span class="visually-hidden">{t('suspiciousPlayers.colName')}</span>
+                <span aria-hidden="true">{resultCountLabel(sortedPlayers.length)}</span>
+              </th>
+              <th class="sortable" aria-sort={ariaSort('observed')}>
+                <button type="button" onclick={() => changeSort('observed')}>
+                  {t('suspiciousPlayers.colObserved')}
+                  <span class="sort-arrow" aria-hidden="true">{sortArrow('observed')}</span>
+                </button>
               </th>
               <th class="num sortable" aria-sort={ariaSort('evidence')}>
                 <button type="button" onclick={() => changeSort('evidence')}>
-                  {t('suspiciousPlayers.colEvidence')}{sortArrow('evidence')}
+                  {t('suspiciousPlayers.colEvidence')}
+                  <span class="sort-arrow" aria-hidden="true">{sortArrow('evidence')}</span>
                 </button>
               </th>
               <th class="num sortable" aria-sort={ariaSort('score')}>
                 <button type="button" onclick={() => changeSort('score')}>
-                  {t('suspiciousPlayers.colScore')}{sortArrow('score')}
+                  {t('suspiciousPlayers.colScore')}
+                  <span class="sort-arrow" aria-hidden="true">{sortArrow('score')}</span>
                 </button>
               </th>
             </tr>
           </thead>
-          {#each sortedPlayers as player (player.ref.characterId)}
+          {#each sortedPlayers as player}
             <tbody class="player-group">
               <tr class="player-row">
                 <td>
@@ -145,11 +243,18 @@
                     <IpLink ip={player.ref.ip} />
                   </div>
                 </td>
+                <td>
+                  {#if player.snapshot}
+                    {formatTimestamp(player.snapshot.capturedAt)}
+                  {:else}
+                    {t('suspiciousPlayers.snapshotUnavailable')}
+                  {/if}
+                </td>
                 <td class="num">{player.evidence.length}</td>
                 <td class="num score">{formatScore(player.score)}</td>
               </tr>
               <tr class="evidence-row">
-                <td colspan="3">
+                <td colspan="4">
                   <div class="evidence-heading">
                     {t('suspiciousPlayers.evidenceList', { name: player.ref.name })}
                   </div>
@@ -188,10 +293,25 @@
 
   .page-controls {
     display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .description-row {
+    display: flex;
+    width: 100%;
     align-items: center;
     justify-content: space-between;
     gap: 12px 24px;
-    margin-bottom: 14px;
+  }
+
+  .control-actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 12px;
   }
 
   .auto-refresh {
@@ -211,16 +331,6 @@
     width: 1px;
     height: 1px;
     opacity: 0;
-  }
-
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 
   .switch-track {
@@ -257,6 +367,24 @@
     outline-offset: 2px;
   }
 
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .search input {
+    width: min(360px, 80vw);
+  }
+
+  .observed-column {
+    width: 180px;
+  }
+
   table {
     border-collapse: separate;
     border-spacing: 0;
@@ -284,13 +412,17 @@
     cursor: pointer;
     font: inherit;
     letter-spacing: inherit;
-    text-align: right;
+    text-align: inherit;
     text-transform: inherit;
   }
 
   th.sortable button:focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: -2px;
+  }
+
+  .sort-arrow {
+    margin-left: 4px;
   }
 
   .player-row td {
@@ -396,10 +528,19 @@
   }
 
   @media (max-width: 700px) {
-    .page-controls {
+    .description-row {
       align-items: flex-start;
       flex-direction: column;
-      gap: 4px;
+      gap: 8px;
+    }
+
+    .control-actions {
+      flex-wrap: wrap;
+    }
+
+    .search,
+    .search input {
+      width: 100%;
     }
   }
 </style>

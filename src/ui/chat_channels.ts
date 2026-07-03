@@ -1,4 +1,4 @@
-// Pure model for the WoW-style chat channel tabs (no DOM, no Three). The HUD
+// Pure model for the classic-style chat channel tabs (no DOM, no Three). The HUD
 // (hud.ts) owns the tab DOM and wiring; this module owns the *rules*: which
 // channels a tab can bind to, the slash prefix each one prepends to plain text,
 // and the localStorage parse/serialize. Keeping it DOM-free lets the logic be

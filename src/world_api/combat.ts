@@ -14,5 +14,10 @@ export interface IWorldCombat {
   cancelAura(auraId: string): void;
   startAutoAttack(): void;
   stopAutoAttack(): void;
+  // Death loop: releaseSpirit leaves the body and rises as a ghost at the nearest
+  // graveyard; resurrectAtCorpse revives at the body (no penalty, must be in range);
+  // resurrectAtSpiritHealer revives at the angel with Resurrection Sickness.
   releaseSpirit(): void;
+  resurrectAtCorpse(): void;
+  resurrectAtSpiritHealer(): void;
 }

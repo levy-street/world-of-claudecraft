@@ -108,6 +108,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return flatStat('spi', a.value);
     case 'buff_allstats':
       return flatStat('allStats', a.value);
+    case 'buff_allstats_pct':
+      // Percentage drain on the whole stat block (The Keeper's Toll / Resurrection
+      // Sickness: value -0.75 -> "Reduces all attributes by 75%"). Always a drain.
+      return { key: `${KEY}.allStatsPctReduce`, nums: { pct: pctFromFrac(a.value) } };
     case 'buff_dodge':
       // The staggerHit mob affix rides buff_dodge with a NEGATIVE value, so the
       // sign picks the direction (mirrors flatStat).

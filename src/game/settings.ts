@@ -108,6 +108,15 @@ export const SETTING_RANGES = {
   // fixed-px frame/label/button grows together — the global "fonts too small"
   // remedy that the per-element tooltip/chat/fct scales can't cover. 1.0 = stock.
   uiScale: { min: 0.85, max: 1.4, def: 1 },
+  // Scales just the player unit frame (portrait, name, hp/resource bars, combo
+  // pips) via --player-frame-scale, so it can shrink toward the target frame's
+  // compact read without touching the rest of the HUD. Pairs with the frame's
+  // move/lock button (MovableFrame): moved, it also adopts the target frame's
+  // narrow bar width. 1.0 = stock.
+  playerFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // The target frame's twin of playerFrameScale, via --target-frame-scale.
+  // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
+  targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
 } as const;
 
 export const BOOL_SETTINGS = {
@@ -145,10 +154,23 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default: walk-by proximity autoloot (loot corpses just by walking
+  // past them). Auto-grabbing loot can feel jarring, so it is opt-in and classic
+  // deliberate looting stays the default. Gates the client AutoLoot pass in
+  // main.ts; the sim's authoritative gate and the raid-instance gate are separate.
+  walkByAutoloot: { def: false },
   // on by default: desktop ground-targeted spells open a terrain reticle before
   // casting. Touch keeps the instant target-feet fallback because there is no
   // persistent cursor to preview.
   groundReticle: { def: true },
+  // off by default: anchor the player's own BUFF row to the movable player
+  // frame instead of the classic top-right corner. hud.ts reparents the buff
+  // bar into #player-frame (above it while docked over the action bars, below
+  // it once the frame is moved), so it follows the frame's spot and scale; the
+  // debuff row stays put in the DOM and slides up beside the minimap (the
+  // vacated top spot) so incoming debuffs keep one glanceable classic corner.
+  // Desktop only; the mobile layout keeps its own aura placement.
+  aurasOnPlayerFrame: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
   // off by default: drop every HUD cross-fade / panel animation, for players
@@ -180,6 +202,11 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
+  // off by default (the classic self-view keeps no plate over your head): when
+  // on, render your OWN overhead nameplate (name, level, guild, hp, $WOC holder
+  // tier, dev badge, linked-Discord PFP) exactly as other players see it, so you
+  // can see how your character presents. Purely a local display preference.
+  showOwnNameplate: { def: false },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },
@@ -214,6 +241,9 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
+  // it only removes the shortcut; rewards, eligibility, and the panel remain available.
+  showDailyRewardsChest: { def: true },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and

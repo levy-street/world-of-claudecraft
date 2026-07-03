@@ -6,7 +6,7 @@
   "author": "levy-street",
   "type": "module",
   "main": "electron/main.cjs",
-  "description": "World of Claudecraft: a WoW-Classic-style micro-MMO + headless RL training environment",
+  "description": "World of Claudecraft: a classic-style micro-MMO + headless RL training environment",
   "scripts": {
     "dev": "vite",
     "version:sync": "node scripts/version_sync.mjs",

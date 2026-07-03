@@ -40,7 +40,19 @@
   .spectrum-bar { width: 100%; height: 46px; border-radius: 8px; overflow: hidden; display: flex; }
   .spectrum-bar > div { display: flex; align-items: center; justify-content: center; font-size: 12.5px; color: #0c0e13; font-weight: 600; padding: 0 6px; text-align: center; }
   .toc { font-size: 14.5px; }
-  .toc a { color: var(--teal); text-decoration: none; }
+  .toc a { display: block; color: var(--teal); text-decoration: none; padding: 1px 0; }
+  .toc a.t1 { margin-top: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; font-weight: 700; }
+  .toc a.t3 { padding-left: 20px; font-size: 13.5px; }
+  .part { margin: 64px 0 0; padding-top: 20px; border-top: 2px solid var(--line); color: var(--muted); font-size: 13px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
+  .part-note { color: var(--muted); font-size: 14px; margin: 6px 0 0; max-width: 72ch; }
+  .part + h2 { margin-top: 24px; }
+  .figref { color: var(--teal); }
+  .return-pill { position: fixed; bottom: 18px; right: 18px; background: var(--panel); color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 8px 14px; font: 600 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; cursor: pointer; }
+  .return-pill[hidden] { display: none; }
+  h4 { font-size: 15px; margin: 24px 0 8px; color: #fff; }
+  details.fold { margin: 14px 0; }
+  details.fold summary, details.callout summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
   label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
   .hbtn { display: block; width: 100%; text-align: left; background: #11131a; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; margin: 5px 0; cursor: pointer; font-size: 13px; }
   .hbtn.active { border-color: var(--rare); color: #fff; background: #131c2a; }
@@ -50,25 +62,54 @@
 <body>
 <main>
   <h1>Professions System</h1>
-  <p class="lede">High-level design for gathering and crafting in World of ClaudeCraft. It deliberately deviates from classic WoW: everyone gathers everything, and a crafting specialty emerges from what you make rather than from a class you pick at the start.</p>
-  <span class="status">Status: draft. Date: 2026-06-29 (revised 2026-06-30)</span>
+  <p class="lede">High-level design for gathering and crafting in World of ClaudeCraft. It deliberately deviates from the classic-era template: everyone gathers everything, and a crafting specialty emerges from what you make rather than from a class you pick at the start.</p>
+  <span class="status">Status: draft. Date: 2026-06-29 (revised 2026-07-01)</span>
 
   <h2>Contents</h2>
   <div class="toc">
-    <a href="#glance">How it works at a glance</a><br/>
-    <a href="#production">The production wheel</a><br/>
-    <a href="#outputs">Craft outputs and weapons</a><br/>
-    <a href="#gear">Crafted gear: quality and power</a><br/>
-    <a href="#gathering">Gathering professions (universal)</a><br/>
-    <a href="#monster">Monster Harvesting (single-use corpses) and focus</a><br/>
-    <a href="#tools">Tools</a><br/>
-    <a href="#fragility">Fragility: why the wheel resists new crafts</a><br/>
-    <a href="#discarded">Considered and discarded</a><br/>
-    <a href="#future">Future and esoteric skills</a><br/>
-    <a href="#arch">Architecture (how it lands in this repo)</a><br/>
-    <a href="#slices">Build order (slices)</a><br/>
-    <a href="#tbd">Open questions / TBD</a><br/>
+    <a class="t1" href="#part-design">Part I: The design</a>
+    <a class="t2" href="#glance">How it works at a glance</a>
+    <a class="t2" href="#production">The production wheel</a>
+    <a class="t3" href="#ladder">The tier ladder and the at-most-two cap</a>
+    <a class="t3" href="#archetypes">Archetypes and attunement: two majors, a hobby, a title</a>
+    <a class="t3" href="#combos">Combo-specific recipes (archetype-exclusive)</a>
+    <a class="t3" href="#legibility">Legibility: nudges while crafting, the full picture at attunement</a>
+    <a class="t3" href="#jack">Jack of All Trades (the breadth build)</a>
+    <a class="t2" href="#outputs">Craft outputs and weapons</a>
+    <a class="t2" href="#gear">Crafted gear: quality and power</a>
+    <a class="t3" href="#gear-power">Where crafted combat gear sits</a>
+    <a class="t3" href="#binding">Binding: gear crafted for a recipient</a>
+    <a class="t3" href="#commissions">Commissioning bound gear</a>
+    <a class="t3" href="#perks">Specialization perks (beyond raw output)</a>
+    <a class="t2" href="#gathering">Gathering professions (universal)</a>
+    <a class="t3" href="#nodes">World-spawn nodes (Mining / Logging / Herbalism)</a>
+    <a class="t2" href="#monster">Monster Harvesting (single-use corpses) and focus</a>
+    <a class="t3" href="#focus">Focus: additive allocation (voluntary)</a>
+    <a class="t3" href="#respec">Re-spec cost: time, coins, or materials</a>
+    <a class="t3" href="#signed">Signed materials and the self-gathered bonus</a>
+    <a class="t3" href="#alts">Why account-level breadth does not break exclusivity</a>
+    <a class="t2" href="#tools">Tools</a>
+    <a class="t3" href="#base-tools">Base tool: tier, infinite durability</a>
+    <a class="t3" href="#tool-effects">Effects: durable, rechargeable bonuses</a>
+    <a class="t1" href="#part-contributors">Part II: For contributors</a>
+    <a class="t2" href="#fragility">Fragility: why the wheel resists new crafts</a>
+    <a class="t2" href="#discarded">Considered and discarded</a>
+    <a class="t2" href="#future">Future and esoteric skills</a>
+    <a class="t3" href="#future-gathering">Gathering skills (add freely)</a>
+    <a class="t3" href="#off-wheel">A second, off-wheel system for non-combat crafts (if needed)</a>
+    <a class="t3" href="#sub-disciplines">Sub-disciplines that fold under existing crafts</a>
+    <a class="t3" href="#battlefield">Battlefield Experience: production skill from observed item use (committed, later phase)</a>
+    <a class="t2" href="#arch">Architecture (how it lands in this repo)</a>
+    <a class="t3" href="#arch-invariants">Determinism and authority (hard invariants)</a>
+    <a class="t3" href="#arch-content">Content-as-code (src/sim/content/, merged by data.ts)</a>
+    <a class="t3" href="#arch-instances">Per-item-instance model (a foundation, built early)</a>
+    <a class="t3" href="#arch-sim">New sim system behind the SimContext seam (src/sim/professions/)</a>
+    <a class="t3" href="#arch-client">The IWorld seam, client, persistence</a>
+    <a class="t2" href="#slices">Build order (slices)</a>
+    <a class="t2" href="#tbd">Open questions / TBD</a>
   </div>
+
+  <h1 id="part-design" class="part">Part I: The design</h1>
 
   <h2 id="glance">How it works at a glance</h2>
   <p>The system has two activities. Read these first, because everything below builds on them.</p>
@@ -86,11 +127,39 @@
   <table>
     <tr><th></th><th>Production</th><th>Gathering</th></tr>
     <tr><td><strong>Math</strong></td><td>Conserved (one active specialty at a time)</td><td>Additive (a floor that only gains bonuses)</td></tr>
-    <tr><td><strong>How it changes</strong></td><td>Emerges from crafting, switched by attunement</td><td>You set a focus in town</td></tr>
+    <tr><td><strong>How it changes</strong></td><td>Emerges from crafting, switched by attunement</td><td>Proficiency grows by use; Monster Harvesting adds a town-set focus</td></tr>
     <tr><td><strong>Effect on the rest</strong></td><td>Only the active specialty is empowered</td><td>Focusing one never weakens another</td></tr>
     <tr><td><strong>The fantasy</strong></td><td>Master of a small cluster of crafts</td><td>Pick what you harvest best</td></tr>
   </table>
-  <p>The document follows that split: production first (the wheel, the ten crafts, how a specialty emerges, and what it lets you make), then gathering, then the supporting systems.</p>
+  <div class="callout">
+    <strong>The rules card.</strong> The whole production model in six lines; every section below unpacks one of them.
+    <ul>
+      <li><strong>Majors:</strong> an attunement empowers 2 adjacent crafts to the legendary ceiling.</li>
+      <li><strong>Hobby:</strong> plus 1 of the two crafts opposite your majors, capped at rare.</li>
+      <li><strong>Floor:</strong> every other craft still crafts at common; skill is never lost, only dormant.</li>
+      <li><strong>Before a first attunement:</strong> any craft can climb its tier quests to rare, which is where the game offers a title.</li>
+      <li><strong>Switching:</strong> by attunement quest (a lore quest the first time, an escalating make-amends quest on a return), never by re-grinding.</li>
+      <li><strong>The exception:</strong> Jack of All Trades, the breadth attunement: all ten crafts live at a mid tier, no legendary, no signature combos.</li>
+    </ul>
+  </div>
+  <details class="fold">
+    <summary>Glossary: the terms of art</summary>
+    <table>
+      <tr><td class="name">craft</td><td>one of the ten production skills on the wheel (for example Tailoring)</td></tr>
+      <tr><td class="name">practitioner</td><td>a person who works a craft (a Tailor)</td></tr>
+      <tr><td class="name">archetype</td><td>the named identity of an adjacent pair of crafts (Smith, Trapper)</td></tr>
+      <tr><td class="name">majors</td><td>the two adjacent crafts an attunement empowers to the top</td></tr>
+      <tr><td class="name">hobby</td><td>the single opposite craft empowered up to rare alongside the majors</td></tr>
+      <tr><td class="name">attunement</td><td>the quest that sets which specialty is active</td></tr>
+      <tr><td class="name">tier quest</td><td>the per-craft quest that unlocks the next rarity tier's recipes and ceiling</td></tr>
+      <tr><td class="name">the common floor</td><td>common-tier crafting, free for everyone, never in competition</td></tr>
+      <tr><td class="name">focus</td><td>the town-set, additive Monster Harvesting component bonus</td></tr>
+      <tr><td class="name">signed material</td><td>a rare or better monster material stamped with its gatherer's name</td></tr>
+      <tr><td class="name">base tool / effect</td><td>an infinite-durability gathering tool, and the rechargeable bonuses slotted onto it</td></tr>
+      <tr><td class="name">Jack of All Trades</td><td>the breadth attunement: everything at a mid tier, nothing at the top</td></tr>
+    </table>
+  </details>
+  <p>The document follows that split in two parts. Part I is the design: production first (the wheel, the ten crafts, how a specialty emerges, and what it lets you make), then gathering and the supporting systems. Part II is for contributors: structural warnings, history, architecture, build order, and open questions.</p>
 
   <h2 id="production">The production wheel</h2>
   <p>Production is a ring of <strong>ten crafts</strong>. You get better at a craft by making things with it, and because production is conserved (above), your active specialty sits in a small region of the ring rather than spread evenly across it. Two facts follow from the ring's geometry, and the rest of this section unpacks them:</p>
@@ -98,9 +167,9 @@
     <li><strong>Adjacent crafts are partners.</strong> Neighbours on the ring go together, so a specialist ends up strong in a pair of adjacent crafts.</li>
     <li><strong>Opposite crafts are complements.</strong> The craft directly across the ring tends to make the very sub-component your main craft consumes, which matters once we reach hobbies.</li>
   </ul>
-  <p>Two words of vocabulary, used consistently from here on: a <strong>craft</strong> is one of the ten production skills (its skill-form name labels the wheel, for example <em>Tailoring</em>); a <strong>practitioner</strong> is a person who works it (for example a <em>Tailor</em>). The ten crafts are Armorcrafting, Weaponcrafting, Tailoring, Leatherworking, Alchemy, Cooking, Inscription, Enchanting, Engineering, and Jewelcrafting.</p>
+  <p>Two words of vocabulary, used consistently from here on: a <strong>craft</strong> is one of the ten production skills (its skill-form name labels the wheel, for example <em>Tailoring</em>); a <strong>practitioner</strong> is a person who works it (for example a <em>Tailor</em>). The ten crafts, in ring order: Engineering, Alchemy, Cooking, Leatherworking, Tailoring, Inscription, Enchanting, Jewelcrafting, Weaponcrafting, and Armorcrafting.</p>
 
-  <div class="figure">
+  <div class="figure" id="fig1">
     <h4>Figure 1. The ten-craft wheel</h4>
     <p class="cap">The ten crafts in ring order. The gold arc marks one example pair of adjacent crafts (Armorcrafting and Engineering); the blue dots mark that pair's two opposite crafts (Tailoring and Inscription), which become its hobby options later. Any of the ten adjacent pairs is a possible specialty.</p>
     <div class="row">
@@ -114,18 +183,20 @@
     </div>
   </div>
 
-  <h3>Conserved mass: one active specialty and the at-most-two rule</h3>
-  <p>Skill is learned additively: every craft has a level that only ever grows as you work it, and nothing you learn is ever taken away. What is conserved is not the skill total but your <strong>active specialty</strong>. At any moment only one cluster of the ring is empowered to the top tiers; every other craft sits on the common floor regardless of what you have dabbled in. You can broaden your knowledge as much as you like over a character's life, but you can keep only one specialty live at a time.</p>
+  <h3 id="ladder">The tier ladder and the at-most-two cap</h3>
+  <p>Skill is learned additively: every craft has a level that only ever grows as you work it, and nothing you learn is ever taken away. It climbs through the game's five craftable rarity tiers (common, uncommon, rare, epic, legendary; the poor tier below common exists on items but is never a crafting tier), and each step is quest-gated: crafting raises a craft to the top of the tier it is at, and a <strong>per-tier quest</strong> unlocks the next tier's recipes and its higher ceiling. So a craft is really a ladder of quest-gated tiers, not one smooth bar.</p>
+  <p>What is conserved is not the skill total but your <strong>active specialty</strong>. Once you are attuned, only your specialty's cluster of the ring is empowered to the top tiers (the rules card above); every craft outside it sits dormant at the common floor regardless of what you have dabbled in, ready the moment you attune back. That cap is the heart of the design: it is what a specialist has and a dabbler does not.</p>
   <ul>
-    <li>The active specialty is <strong>at most two adjacent crafts</strong> empowered to their ceiling (plus a single opposite hobby up to rare, detailed under Archetypes below). That cap is the heart of the design: it is what a specialist has and a dabbler does not.</li>
-    <li>The craft directly opposite your majors is not empowered, which is what stops anyone wielding both sides of the ring at once. The one carve-out is the hobby: the single opposite craft you take stays empowered up to the rare tier, while the rest of the opposite side stays at the floor.</li>
-    <li>There is no skill loss and no respec fee. You switch which specialty is active through <strong>attunement</strong> (see How it's experienced), not by grinding the old one away. Your previous specialty's skill stays on the books, dormant at the floor, ready the moment you attune back.</li>
-    <li>This pressure only applies from the <strong>uncommon tier upward</strong>; common-tier crafting is a free floor that never competes (see Tiered mastery, next).</li>
+    <li><strong>Common is a free floor.</strong> Any craft's common recipes can be made by anyone at no cost to specialization, so a master alchemist can still bang out a basic (common) sword without affecting their alchemy. The cap only applies at <strong>uncommon and above</strong>, and dabbling at common across many crafts never commits you to anything. (A common recipe names the ladder rung, not the output's power; see Crafted gear.)</li>
+    <li><strong>At-tier crafting is what advances you.</strong> Crafting below your current capability gives diminishing returns, and a craft two tiers under your capability gives nothing. Above your current ceiling the excess xp is simply lost until the next tier quest; this holds at every boundary, including common to uncommon.</li>
+    <li><strong>The ceiling has two identical causes.</strong> A craft can be capped because it is outside your active specialty, or just because you have not done its next tier quest yet. Both behave the same way: skill to the cap, lose the rest.</li>
+    <li><strong>Before your first attunement, the ladder still climbs.</strong> An unattuned craft can rise through its tier quests as far as the rare tier, which is exactly where the game offers you a title (next section). Epic and legendary are reachable only by an active specialty's majors, so the at-most-two cap is really about who may climb past rare.</li>
+    <li><strong>Switching costs a quest, never a re-grind.</strong> You change which specialty is active through <strong>attunement</strong> (next section); a previous specialty's skill stays on the books, dormant at the floor. And <strong>Jack of All Trades is the one sanctioned exception</strong> to the cap: the breadth attunement keeps every craft live up to a mid-tier ceiling instead of empowering a pair to the top.</li>
   </ul>
 
-  <div class="figure">
+  <div class="figure" id="fig2">
     <h4>Figure 2. Specialist vs generalist</h4>
-    <p class="cap">The specialist (a Smith) has attuned to one archetype: two adjacent crafts empowered to the top, a little in the flanks, the opposite side at the floor. The generalist never attuned and stays competent everywhere, master of nothing. Both may have learned just as widely; only the specialist has a live specialty.</p>
+    <p class="cap">The specialist (a Smith) has attuned to one archetype: two adjacent crafts empowered to the top, one opposite hobby at the rare cap, every other craft at the common floor. The generalist never attuned and stays competent everywhere, master of nothing. Both may have learned just as widely; only the specialist has a live specialty.</p>
     <div class="row">
       <div class="col"><svg id="radar-specialist" viewBox="-92 -10 544 380" role="img" aria-label="Specialist radar peaked on two adjacent crafts"></svg></div>
       <div class="col"><svg id="radar-generalist" viewBox="-92 -10 544 380" role="img" aria-label="Generalist radar, evenly spread and low"></svg></div>
@@ -137,19 +208,9 @@
     </div>
   </div>
 
-  <h3>Tiered mastery and the common-tier floor</h3>
-  <p>Skill in each craft climbs through the game's item rarity tiers (common, uncommon, rare, epic, legendary), but only up to the ceiling of your current tier: crafting raises a craft to the top of the tier it is at, and a <strong>per-tier quest</strong> is what unlocks the next tier's recipes and its higher ceiling. So the wheel is really a ladder of quest-gated tiers, not one smooth bar.</p>
-  <ul>
-    <li><strong>Common is a free floor.</strong> Any craft's common recipes can be made by anyone at no cost to specialization, so a master alchemist can still bang out a basic (common) sword without affecting their alchemy. The at-most-two cap only applies at <strong>uncommon and above</strong>.</li>
-    <li><strong>At-tier crafting is what advances you.</strong> Crafting below your current capability gives diminishing returns, and a craft two tiers under your capability gives nothing. A rare-capable alchemist gains zero from common potions; they have to work at their tier to progress.</li>
-    <li><strong>Above the ceiling, the xp is lost.</strong> If you craft while already at the top of your current tier, the excess skill is not banked; it is simply lost until you unlock the next tier by completing that craft's tier quest. This holds at every boundary, including common to uncommon.</li>
-    <li><strong>The ceiling has two identical causes.</strong> A craft can be capped either because it is not in your active archetype (attunement has not empowered it), or just because you have not done its next tier quest yet. Both behave the same way: skill to the cap, lose the rest. The tier-quest ladder is how any craft climbs, and attunement is which crafts you are allowed to climb to the top.</li>
-    <li><strong>Only uncommon-and-up commits you.</strong> Pushing a craft to uncommon or higher is what builds toward an active specialty; dabbling at common across many crafts never commits you to anything.</li>
-  </ul>
-
-  <div class="figure">
+  <div class="figure" id="fig3">
     <h4>Figure 3. Tiered reach: the common floor and the specialization window</h4>
-    <p class="cap">The rings are the rarity tiers. The inner teal ring is the common-tier floor, which every craft reaches for free. Above common, your reachable tier narrows to a window: a Smith's two adjacent crafts climb to legendary, their flanks reach about rare, and the opposite side stays at the common floor while this specialty is active.</p>
+    <p class="cap">The rings are the rarity tiers. The inner teal ring is the common-tier floor, which every craft reaches for free. Above common, your reachable tier narrows to the attuned shape: a Smith's two majors climb to legendary, the one opposite hobby reaches the rare cap, and every other craft stays at the common floor while this specialty is active.</p>
     <div class="row">
       <div class="col"><svg id="radar-tiers" viewBox="-92 -10 544 380" role="img" aria-label="Tiered radar with a common floor and a reachable envelope peaking on two adjacent crafts"></svg></div>
       <div class="col">
@@ -161,17 +222,26 @@
       </div>
     </div>
   </div>
-  <div class="callout">
-    Worked example. A new player crafts 20 healing potions and tops out common-tier alchemy, then completes its tier quest to become uncommon-capable. Further common potions now give less, and once a later tier quest makes them rare-capable, common potions give zero, so progress means working at their tier. They then craft 20 basic (common) swords and pick up weaponcrafting too; nothing they learned in alchemy is lost. As they push weapons into uncommon and beyond, they are building a second specialty. They can keep only one specialty active at a time, so when they attune as a weaponcrafter their alchemy knowledge stays on the books, dormant at the floor, until they attune back.
-  </div>
+  <details class="callout">
+    <summary>Worked example</summary>
+    <p>A new player crafts 20 healing potions and tops out common-tier alchemy, then completes its tier quest to become uncommon-capable. Further common potions now give less, and once a later tier quest makes them rare-capable, common potions give zero, so progress means working at their tier. They then take up smithing: basic swords, then basic armor, pushing both weaponcrafting and armorcrafting up the same ladder; nothing they learned in alchemy is lost. When those two adjacent crafts climb into rare, the game offers the <strong>Smith</strong> attunement (attunement is always to an archetype, a pair of adjacent crafts, never to a single craft). Attuning as a Smith empowers weapons and armor; their alchemy knowledge stays on the books, dormant at the floor, until they later attune to an archetype that includes it (Apothecary or Bombardier).</p>
+  </details>
 
-  <h3>Archetypes: your two majors and a hobby</h3>
-  <p>Because the active specialty empowers only two adjacent crafts, every specialist ends up defined by a <strong>pair of adjacent crafts</strong>, their two <strong>majors</strong>. Each of the ten adjacent pairs around the ring is a recognizable identity, so there are ten named <strong>archetypes</strong> (Smith, Outfitter, Apothecary, Arcanist, and so on).</p>
+  <h3 id="archetypes">Archetypes and attunement: two majors, a hobby, a title</h3>
+  <p>Because the active specialty empowers two adjacent crafts, every specialist is defined by a pair of adjacent <strong>majors</strong>, and each of the ten adjacent pairs around the ring is a named <strong>archetype</strong> (Smith, Outfitter, Apothecary, Arcanist, and so on). On top of the majors you get a <strong>hobby</strong>: one craft from the pair sitting directly opposite your majors, empowered up to the <strong>rare</strong> tier while the rest of the opposite side stays at the floor. The rare cap is what keeps a dabbler from ever matching a real specialist and keeps high-tier crafting interdependent; and because opposite crafts are complements, the hobby doubles as a self-supply line: a Smith (Weaponcrafting plus Armorcrafting) takes Leatherworking or Tailoring, exactly the straps and cloth padding a full set of gear needs.</p>
+  <p>None of this is picked from a menu. You craft freely, your crafting trends toward an adjacent pair, and the game offers to name and attune you to it: "Smith" is a title granted for making swords and armor, not a class you chose. The system reveals itself in steps, each tied to the mechanic that triggers it:</p>
   <ul>
-    <li>On top of the two majors you also get a <strong>hobby</strong>: one craft from the pair sitting directly opposite your majors, worked up to the <strong>rare</strong> tier. This is the carve-out from the at-most-two rule: the opposite side is otherwise unempowered, but the single opposite craft you take as a hobby is empowered up to rare. Like the majors, the hobby is part of your attunement: it emerges from what you craft, and you switch it to the other opposite when you re-attune, not by grinding the first away. The rare cap is what keeps a dabbler from ever matching a real specialist, and keeps high-tier crafting interdependent.</li>
-    <li>The opposite-as-hobby doubles as a self-supply line, because opposite crafts are complements: a Smith (Armorcrafting plus Weaponcrafting) takes Tailoring or Leatherworking as a hobby, exactly the cloth padding and leather straps a full set of gear needs.</li>
+    <li><strong>Common tier:</strong> craft anything with no pressure (common is the free floor). The skill radar is visible but flat.</li>
+    <li><strong>Each tier is quest-gated:</strong> the first tier quest (common to uncommon) is the moment specialties start to matter, and a one-time tutorial panel explains the cap and the radar exactly when the mechanic first bites. Attunement is a ladder, not a single event: each step deeper into an archetype is its own tier quest.</li>
+    <li><strong>Two adjacent crafts climb into rare:</strong> a specialty has unmistakably emerged. The tier quest at this point grants the <strong>title</strong>, empowers your two majors, and reveals your hobby.</li>
   </ul>
-  <p>You do not pick any of this from a menu; it emerges from what you craft (explained in How it's experienced, below). The explorer below lets you tour the ten outcomes: click an archetype on the ring to see its majors fill to legendary and its hobby cap at rare.</p>
+  <p>Switching specialties is also an attunement quest, which keeps the cost diegetic and out of the live economy's moving prices, and gives the game a natural place to spell out exactly what attuning will change on your character:</p>
+  <ul>
+    <li><strong>The first time into any given archetype</strong>, whether or not you have ever held one, is a <strong>lore quest</strong>: an earned, satisfying first step into that identity rather than a tax.</li>
+    <li><strong>Returning to a specialty you previously held</strong> is a distinct repeatable <strong>make-amends quest</strong> whose cost escalates with how many times you have done it; a quest can carry anything (a time delay, a coin or material cost, more lore). Your old skill is untouched, so the cost is the quest, never a re-grind.</li>
+    <li><strong>The hobby can switch too:</strong> as part of a full re-attune, or on its own, keeping your majors and taking the other opposite craft. A standalone hobby switch is expected to follow the same attunement-quest pattern at a lower cost than an archetype switch, but it must stay costly enough that flipping between the two opposites never becomes a de-facto second hobby. The old hobby goes dormant and the new one is empowered up to rare; no grind erases the first, and there is no pin or menu to manage.</li>
+  </ul>
+  <p>The explorer below lets you tour the ten outcomes: click an archetype on the ring to see its majors fill to legendary and its hobby cap at rare. The catalog is a designer's view of the ten outcomes, not an in-game list.</p>
 
   <div class="figure">
     <div class="row">
@@ -194,28 +264,16 @@
     </div>
   </div>
 
-  <h3>How it's experienced: emergence, attunement, and switching</h3>
-  <p>You never pick an archetype from a menu. You craft freely, your crafting trends toward an adjacent pair, and the game offers to name and attune you to it. The archetype catalog above is a designer's view of the ten outcomes, not an in-game list: "Smith" is a title the game grants you for making swords and armor, not a class you chose.</p>
-  <p>The system reveals itself in steps, each tied to the mechanic that triggers it:</p>
-  <ul>
-    <li><strong>Common tier:</strong> craft anything with no pressure (common is the free floor). The skill radar is visible but flat.</li>
-    <li><strong>Each tier is quest-gated:</strong> crafting raises a craft to the top of its current tier, and a <strong>tier quest</strong> unlocks the next tier's recipes and ceiling. The first of these (common to uncommon) is the moment specialties start to matter, and a one-time tutorial panel explains the at-most-two rule and the radar exactly when the mechanic first bites. So attunement is a ladder, not a single event: each step deeper into an archetype is its own tier quest.</li>
-    <li><strong>Two adjacent crafts climb into rare</strong> (a specialty has unmistakably emerged): the tier quest at this point also grants the <strong>title</strong>, empowers your two majors, and reveals your hobby.</li>
-  </ul>
-  <p>Switching specialties is done by attunement, not by grinding the old one away. Because you learn additively, nothing you have earned is ever lost; instead, your active archetype is set by a quest, which keeps the switch cost diegetic and out of the live economy's moving prices, and gives the game a natural place to spell out exactly what attuning will change on your character.</p>
-  <ul>
-    <li><strong>The first time into any given archetype</strong>, whether or not you have ever held one, is a <strong>lore quest</strong>: an earned, satisfying first step into that identity rather than a tax.</li>
-    <li><strong>Returning to a specialty you previously held</strong> is a distinct <strong>repeatable quest</strong> where you make amends for your lack of loyalty. Its cost escalates with how many times you have done it, and a quest can carry anything: a time delay, a coin or material cost, more lore. Your old skill is untouched, so the cost is the quest, never a re-grind.</li>
-  </ul>
-
-  <h3>Combo-specific recipes (archetype-exclusive)</h3>
+  <h3 id="combos">Combo-specific recipes (archetype-exclusive)</h3>
   <p>Some recipes require <strong>both</strong> crafts of a specific adjacent pair, so they belong to exactly one archetype, a signature line nobody else can make. A baited bear trap (Trapper: Leatherworking plus Cooking) is unavailable to an Outfitter (who has the leather but not the cooking) or an Apothecary (who has the cooking but not the leather).</p>
   <ul>
-    <li><strong>Exclusivity scales with tier, for free.</strong> Only your active archetype has both crafts of an adjacent pair empowered, so a high-tier combo (a rare or epic reinforced trap) is exclusive to whoever is attuned to that pair. A crafter mid-migration, holding a third adjacent craft at a reduced tier, might make the basic version, so low-tier combos are semi-open and top-tier combos are locked.</li>
+    <li><strong>Exclusive at every tier above common.</strong> A combo recipe requires the attunement itself, not just skill in both crafts: only the archetype attuned to that adjacent pair can craft its line, at any tier. A broad crafter who happens to hold both skills (a Jack of All Trades, or someone who has not yet attuned) cannot make them, which is also part of what makes attuning worth it.</li>
     <li><strong>Respects the common floor.</strong> Signature combos live at uncommon and above, so they never break "anyone can craft common basics".</li>
     <li><strong>The hobby cannot cheat it.</strong> Your hobby is the opposite craft (capped at rare, not adjacent to either major), so it never unlocks a combo recipe.</li>
     <li><strong>Deepens the economy.</strong> Each archetype is the sole high-tier source of its line, exactly the interdependence the design is chasing.</li>
   </ul>
+  <details class="fold">
+    <summary>The ten signature lines</summary>
   <table>
     <tr><th>Archetype</th><th>Majors</th><th>Signature combo line</th></tr>
     <tr><td class="name">Smith</td><td>Weaponcrafting + Armorcrafting</td><td>matched plate-and-weapon sets, full harnesses with set bonuses</td></tr>
@@ -229,96 +287,81 @@
     <tr><td class="name">Gembinder</td><td>Enchanting + Jewelcrafting</td><td>enchanted gems, magical jewelry, socketable runed foci</td></tr>
     <tr><td class="name">Bladewright</td><td>Jewelcrafting + Weaponcrafting</td><td>gem-inlaid weapons, jeweled and gem-socketed blades</td></tr>
   </table>
+  </details>
 
-  <h3>Legibility: nudges while crafting, the full picture at attunement</h3>
+  <h3 id="legibility">Legibility: nudges while crafting, the full picture at attunement</h3>
   <p>Legibility rests on one rule: <strong>never punish a craft, always explain a switch</strong>. Because crafting only ever adds skill, the act of crafting never costs you another craft and never needs a blocking warning. Legibility instead lives in two calmer places: gentle nudges while you craft, and the full explanation at the moment you actually change something, the attunement quest.</p>
-  <p><strong>While crafting,</strong> the game informs, it does not warn. Common-tier crafting is silent. Crafting toward an adjacent pair surfaces an informational nudge ("you are trending toward Cogsmith; see a trainer to attune"), and nothing you craft ever lowers another skill, so there is no Cancel / Ignore dialog to dismiss.</p>
+  <p><strong>While crafting,</strong> the game informs, it does not warn. Common-tier crafting is silent. Crafting toward an adjacent pair surfaces an informational nudge ("you are trending toward Cogsmith; its attunement quest is available"), and nothing you craft ever lowers another skill, so there is no Cancel / Ignore dialog to dismiss. The nudges can ship first as plain info messages in the chat log, but should grow lore-friendly over time: a letter from the local Crafting Guild saying they have noticed your aptitude, or a courier who runs up to tell you the Guild Master wants a word.</p>
   <p><strong>At attunement,</strong> the quest spells out the whole picture before you commit: which crafts become empowered, what your title becomes, that any previously active specialty will go dormant (not lost) until you attune back, and, for a return, the escalating make-amends cost. This is the one place the system asks you to confirm a real change, and it does so in the quest, not a popup.</p>
-  <p>The two tricky edge cases resolve the same calm way:</p>
-  <ul>
-    <li><strong>Two non-adjacent high crafts</strong> (Inscription to rare, then Leatherworking to rare): nothing fails and nothing drops. You simply have no adjacent pair to attune, so you remain (or attune as) a Jack of All Trades (below), with a hint on how an adjacent pair would form an archetype.</li>
-    <li><strong>Switching your hobby:</strong> take the other opposite craft as part of re-attuning. The old hobby goes dormant and the new one is empowered up to rare; no grind erases the first, and there is no pin or menu to manage.</li>
-  </ul>
+  <p>The one tricky edge case resolves the same calm way: <strong>two non-adjacent high crafts</strong> (Inscription to rare, then Leatherworking to rare) fail nothing and drop nothing. You simply have no adjacent pair to attune, so you remain (or attune as) a Jack of All Trades (below), with a hint on how an adjacent pair would form an archetype.</p>
 
-  <h3>Jack of All Trades (the breadth build)</h3>
-  <p>If your two highest crafts are not adjacent you do not form an archetype: you become a <strong>Jack of All Trades</strong> (subtitle "master of none..."). It is a legitimate build, not a penalty. Where an archetype goes deep and narrow, a Jack goes broad and shallow.</p>
+  <h3 id="jack">Jack of All Trades (the breadth build)</h3>
+  <p>If your two highest crafts are not adjacent you do not form an archetype: you become a <strong>Jack of All Trades</strong> (subtitle "master of none..."). It is a legitimate build, not a penalty, and it is the one sanctioned exception to the at-most-two rule: instead of empowering a pair to the top, the Jack attunement keeps breadth live. Where an archetype goes deep and narrow, a Jack goes broad and shallow.</p>
   <ul>
     <li><strong>Breadth ceiling:</strong> a Jack can level <em>every</em> craft to a mid tier (uncommon or rare, TBD) but none to legendary, so a Jack is the only crafter who can make decent versions of all ten lines, where a specialist is stuck at the common floor on seven of them.</li>
     <li><strong>Improviser's perks:</strong> a random chance to produce a better or worse version of what you craft, and reduced material cost from synergistic cross-craft knowledge.</li>
-    <li><strong>No combos:</strong> signature combo recipes need an adjacent pair, so a Jack trades the exclusive high-tier lines for versatility.</li>
+    <li><strong>No combos:</strong> signature combo recipes require an archetype's attunement, not just skill in both crafts, so a Jack trades the exclusive lines for versatility.</li>
   </ul>
   <p>Titles are earned, not default: a brand-new crafter has none, every title is granted by doing. But no one who has specialized is left in limbo. Once you reach the rare tier the game offers you a title to attune to, an archetype if your two highest crafts are adjacent, Jack of All Trades if not, so there is never a confusing "high crafts but no recognized identity" gap.</p>
+  <p>Switching between Jack of All Trades and an archetype (in either direction) is expected to follow the same attunement-quest pattern as every other switch; the exact mechanics and costs are open (see TBD). The specialize direction is where the lore leans hardest, in the spirit of: "In order to truly specialize in this path, you must focus all of your energy and give up your dabblings in the other crafts." The UI keeps showing the knowledge you hold in those other crafts; what the switch changes is that your ability to produce in them is limited to the common tier (or wherever the floor threshold lands).</p>
   <div class="callout">
-    Tier distribution is TBD tuning against itemization. The working numbers: a specialist reaches legendary on the 2 majors, rare on the 1 hobby, and common on the other 7; depending on how items are tiered this may shift up to legendary, epic, and uncommon (2, 1, 7). A Jack reaches uncommon (or rare) across all ten, never legendary. The exact ceilings, and whether the hobby caps at rare or epic, are open. (Figure 3 above is an illustrative reachable envelope, not a specific spend.)
+    Tier distribution is TBD tuning against itemization. The working numbers: a specialist reaches legendary on the 2 majors, rare on the 1 hobby, and common on the other 7; depending on how items are tiered this may shift up to legendary, epic, and uncommon (2, 1, 7). A Jack reaches uncommon (or rare) across all ten, never legendary. The exact ceilings, and whether the hobby caps at rare or epic, are open. (<a class="figref" href="#fig3">Figure 3</a> illustrates the attuned ceilings, not skill actually earned.)
   </div>
-
-  <h3>Battlefield Experience: production skill from observed item use (exploratory, later phase)</h3>
-  <p>Production skill could also grow from <strong>Battlefield Experience</strong>, not just crafting: watching crafted items get used in combat grants a small trickle of specialization xp toward the craft that makes them, when that craft is part of your active archetype. A weapon that lands a killing blow or armor worn while a monster dies feeds xp to a Smith; a potion drunk or meal eaten feeds nothing unless alchemy or cooking is your specialty.</p>
-  <ul>
-    <li><strong>Only your active archetype.</strong> Battlefield Experience credits only the crafts in your current specialty (your two majors, and your hobby up to its cap). It never advances a craft outside your archetype, so witnessing a wide variety of items in combat cannot quietly make you better at everything. This also closes the alt loophole: each character earns Battlefield Experience only for its own active archetype, so holding several archetypes across alts never lets one account skirt the at-most-two-active rule.</li>
-    <li><strong>Additive only, never a cost.</strong> Because you do not control what you witness, Battlefield Experience can only add; it never reduces another craft and never shifts your attunement. It is a separate channel that feeds your active specialty alongside deliberate crafting.</li>
-    <li><strong>Uncommon or rare tier and above only</strong> (the exact floor is tuning), so it never touches the common free floor and only kicks in at the tiers where specialization actually matters.</li>
-    <li><strong>Scope is a server-cost question, and a fairness question.</strong> Ideally anything within your view counts, with party and raid members counting for more, and observing strangers worth less and more distance-constrained than observing your own group. This maps onto the server's existing player and event interest scope (roughly 90 yards; the 120-yard radius is NPC-only). Whether 90 yards is enough, and whether group Battlefield Experience credit should reach farther than stranger credit, is a playtest question.</li>
-    <li><strong>Consumables improve the recipe; equipment improves the item.</strong> Battlefield Experience splits on the consumable-versus-equipment axis. For a <strong>consumable</strong>, it accrues to the <strong>recipe</strong>, so witnessing your potions, food, or bombs used in combat makes every future craft of that recipe a little better (a healing potion that restores +10 more HP). For a piece of <strong>equipment</strong>, it accrues to the <strong>specific item</strong>, so after a dungeon run you can make improvements to that exact piece, effectively an extra armor-kit-style enhancement slot (the full power and effect menu is TBD). Any crafter can apply an equipment improvement, but the one who originally made it improves it most (like the original-crafter recharge discount), rewarding getting your gear from the friends you play with.</li>
-  </ul>
-  <div class="callout">
-    Worked example. A guild's master armorcrafter forges a set for a member, then comes along on the dungeon. Over a dungeon's worth of fights they observe that armor taking and surviving hits, and afterward they can take it back and improve it a little for its owner. This is why a guild may prefer to bring its master crafters on raids rather than just hauling materials back to a crafter who never leaves town.
-  </div>
-  <p class="muted">An idea, not a committed mechanic. It needs careful tuning and would land much later, after the core systems are proven.</p>
 
   <h2 id="outputs">Craft outputs and weapons</h2>
-  <p>Each material craft pairs a durable main line with a consumable or enhancement sideline, so every archetype reaches both permanent and consumable items. Weapon-making is split four ways, so every weapon class has a maker and no single craft monopolizes weapons.</p>
+  <p>Most crafts pair a durable main line with a consumable or enhancement sideline, so nearly every archetype reaches both permanent and consumable items (the one deliberate exception is called out below). Weapon-making is split four ways, so every weapon class has a maker and no single craft monopolizes weapons.</p>
   <table>
-    <tr><th>Craft</th><th>Permanent</th><th>Consumable / enhancement</th><th>Weapons</th></tr>
-    <tr><td class="name">Armorcrafting</td><td>plate and metal armor, shields</td><td>armor kits, temporary plating</td><td>-</td></tr>
-    <tr><td class="name">Weaponcrafting</td><td>-</td><td>whetstones, weapon oils</td><td>metal melee and thrown</td></tr>
-    <tr><td class="name">Tailoring</td><td>cloth armor, bags</td><td>bandages</td><td>-</td></tr>
-    <tr><td class="name">Leatherworking</td><td>leather armor, bags</td><td>armor kits, splints and braces, snares and nets</td><td>bows, slings, arrows, quivers</td></tr>
-    <tr><td class="name">Jewelcrafting</td><td>rings, necklaces, cut gems</td><td>(gem reagents)</td><td>-</td></tr>
-    <tr><td class="name">Engineering</td><td>gadgets, devices, goggles</td><td>bombs, dynamite, ammo, mechanical traps and mines</td><td>crossbows, firearms</td></tr>
-    <tr><td class="name">Alchemy</td><td>-</td><td>potions, elixirs, flasks, oils, poisons</td><td>-</td></tr>
-    <tr><td class="name">Cooking</td><td>-</td><td>food, feasts</td><td>-</td></tr>
-    <tr><td class="name">Inscription</td><td>tomes, off-hands</td><td>scrolls, glyphs, inks</td><td>-</td></tr>
-    <tr><td class="name">Enchanting</td><td>wands, staves, orbs</td><td>weapon and armor enchants</td><td>wands, staves (magical)</td></tr>
+    <tr><th>Craft</th><th>Permanent</th><th>Consumable / enhancement</th></tr>
+    <tr><td class="name">Armorcrafting</td><td>plate and metal armor, shields</td><td>armor kits, temporary plating</td></tr>
+    <tr><td class="name">Weaponcrafting</td><td>metal melee and thrown weapons</td><td>whetstones, weapon oils</td></tr>
+    <tr><td class="name">Tailoring</td><td>cloth armor, bags</td><td>bandages</td></tr>
+    <tr><td class="name">Leatherworking</td><td>leather armor, bags, bows, slings, quivers</td><td>armor kits, splints and braces, snares and nets, arrows</td></tr>
+    <tr><td class="name">Jewelcrafting</td><td>rings, necklaces, cut gems</td><td>(gem reagents)</td></tr>
+    <tr><td class="name">Engineering</td><td>gadgets, devices, goggles, crossbows, firearms</td><td>bombs, dynamite, ammo, mechanical traps and mines</td></tr>
+    <tr><td class="name">Alchemy</td><td>-</td><td>potions, elixirs, flasks, oils, poisons</td></tr>
+    <tr><td class="name">Cooking</td><td>-</td><td>food, feasts</td></tr>
+    <tr><td class="name">Inscription</td><td>tomes, off-hands</td><td>scrolls, glyphs, inks</td></tr>
+    <tr><td class="name">Enchanting</td><td>wands, staves, orbs and off-hand foci</td><td>weapon and armor enchants</td></tr>
   </table>
-  <p class="muted">Bows, staves, and shields find homes among the ten: bows to Leatherworking (the bowyer-fletcher), shields to Armorcrafting, magical staves and wands to Enchanting, mechanical ranged (crossbows, firearms) to Engineering, metal melee to Weaponcrafting. Jewelcrafting is the one pure-permanent craft, but it only ever pairs with Enchanting or Weaponcrafting, both of which carry consumables, so no archetype is left without both.</p>
+  <p class="muted">Bows, staves, and shields find homes among the ten: bows to Leatherworking (the bowyer-fletcher), shields to Armorcrafting, magical staves and wands to Enchanting, mechanical ranged (crossbows, firearms) to Engineering, metal melee to Weaponcrafting. Jewelcrafting is the nearest thing to a pure-permanent craft (its cut gems are reagents for other crafts rather than true consumables), but it only ever pairs with Enchanting or Weaponcrafting, both of which carry consumables. The Apothecary (Alchemy plus Cooking) is the deliberate mirror case: an all-consumable archetype with no permanent line of its own. Its permanent reach comes from its hobby (Enchanting or Jewelcrafting, up to the rare cap), and in exchange it is the game's consumables powerhouse.</p>
 
   <h2 id="gear">Crafted gear: quality and power</h2>
-  <p>Recipes consume materials and require the relevant craft skill. Each crafted result rolls a <strong>quality</strong> on the game's existing item rarity tiers (poor, common, uncommon, rare, epic, legendary), which scales the stat roll within the item's item-level budget. Average quality rises with proficiency and material tier; individual rolls still vary.</p>
+  <p>Recipes consume materials and require the relevant craft skill. Each crafted result rolls a <strong>quality</strong> on the game's item rarity tiers (common through legendary; a crafted result never rolls the poor tier), which scales the stat roll within the item's item-level budget. Average quality rises with proficiency and material tier; individual rolls still vary.</p>
+  <p>One vocabulary note: a recipe's tier names its rung on the crafting ladder, not the finished item's power. Common-tier crafted equipment is not bottom-of-the-barrel gear; it will likely sit closer to the uncommon-tier quest and monster drops of its level, which is exactly what keeps the free floor worth using.</p>
 
-  <h3>Where crafted combat gear sits</h3>
+  <h3 id="gear-power">Where crafted combat gear sits</h3>
   <p>Crafting is a genuine path to strong gear, not a strictly capped sideline. The position on the power curve scales with specialization concentration and material tier:</p>
   <ul>
     <li>An <strong>average crafter</strong> (using lots of materials but not epic-tier) makes gear on par with rare to epic normal dungeon drops.</li>
-    <li>A <strong>peaked specialist</strong> using <strong>epic or better materials</strong> can make gear equal to, or in places better than, some dungeon drops.</li>
+    <li>A <strong>peaked specialist</strong> using <strong>epic or better materials</strong> can make gear equal to, and in places better than, all but the top dungeon and raid drops.</li>
     <li>Beyond raw item level, crafting carries <strong>unique effects available only through crafting</strong> (procs, utility, set-style bonuses) that give crafted gear its own identity.</li>
   </ul>
 
-  <div class="figure">
+  <div class="figure" id="fig4">
     <h4>Figure 4. Crafted power, two levers</h4>
     <p class="cap">Item-level budget (the horizontal band) overlaps with dungeon drops at the high end for specialists with epic materials, rather than being hard-capped below them. Crafting-only effects are an orthogonal axis: even where item level matches a drop, the crafted piece can do something a drop cannot.</p>
     <div class="spectrum-bar" id="spectrum"></div>
     <svg id="effects-axis" viewBox="0 0 720 70" role="img" aria-label="Orthogonal axis showing crafting-only unique effects"></svg>
   </div>
 
-  <h3>Binding: gear crafted for a recipient</h3>
+  <h3 id="binding">Binding: gear crafted for a recipient</h3>
   <p>The game has no binding today, and crafted gear is where we introduce it, because the fantasy is that the piece was made for you. Binding is a per-recipe decision along one axis:</p>
   <ul>
     <li><strong>Low-tier gear is unbound.</strong> It crafts like any item and anyone can pick it up and use it, which preserves the common-floor promise that a level 1 can hammer out armor for a friend.</li>
-    <li><strong>High-tier gear is bound to a recipient.</strong> Only the named character can equip it, but the item is still freely tradable. To keep this distinct from classic bind-on-pickup or bind-on-equip, the item's binding field is <code>equipBoundTo</code> (bound to a character for equipping, not for trading). Such a piece can go back to its crafter for enhancement, or off to a salvager once its owner is done with it; it simply cannot be worn by anyone but the person it was made for.</li>
+    <li><strong>High-tier gear is bound to a recipient.</strong> Only the named character can equip it, but the item is still freely tradable. To keep this distinct from classic bind-on-pickup or bind-on-equip, the item's binding field is <code>boundTo</code> (bound to a character for equipping, not for trading). Such a piece can go back to its crafter for enhancement, or off to a salvager once its owner is done with it; it simply cannot be worn by anyone but the person it was made for.</li>
   </ul>
   <p>Bind-to-recipient does the interdependence work without flooding the auction house with top-tier gear: a specialist stays the real supplier, and demand routes to a named crafter rather than the cheapest anonymous listing. It also opens the lore the system is reaching for, a warrior claims a trophy from a beast (monster harvest, signed material) and brings it to a master crafter to be forged into their weapon or armor. Some required materials can be tied to the intended recipient, reinforcing that the piece is genuinely theirs (a later extension, since it needs order-time escrow).</p>
 
-  <h3>Commissioning bound gear</h3>
+  <h3 id="commissions">Commissioning bound gear</h3>
   <p>Because a high-tier piece is made for a named recipient, it is produced through a <strong>commission workflow</strong> rather than crafted speculatively, and the recipient is the person who placed the order, so no one can mistype a name and brick an expensive item. There is a lot of room to iterate on the UX; the shape:</p>
   <ul>
     <li>A player places an <strong>order</strong> for the item they want, scoped either open to any capable crafter, or narrowed to their guild, their friends list, or a specific crafter.</li>
     <li>Orders can be <strong>canceled</strong> any time before a crafter accepts one.</li>
     <li>Crafters browse an <strong>orders list</strong> with search and filters and pick up an order they want to fulfill.</li>
-    <li>The flow is deliberately <strong>multi-step</strong> (accept, craft, deliver), so a high-cost item is never lost to a single misclick, and the <code>equipBoundTo</code> recipient is set from the order, not typed by the crafter.</li>
+    <li>The flow is deliberately <strong>multi-step</strong> (accept, craft, deliver), so a high-cost item is never lost to a single misclick, and the <code>boundTo</code> recipient is set from the order, not typed by the crafter.</li>
   </ul>
 
-  <h3>Specialization perks (beyond raw output)</h3>
+  <h3 id="perks">Specialization perks (beyond raw output)</h3>
   <p>Pushing far into one region of the wheel unlocks perks, not just a higher item-level ceiling. Examples (exact set is tuning):</p>
   <ul>
     <li><strong>Reduced resource usage:</strong> recipes in your specialized crafts cost fewer materials.</li>
@@ -327,9 +370,9 @@
   </ul>
 
   <h2 id="gathering">Gathering professions (universal)</h2>
-  <p>Everyone can perform all gathering, and gathering one thing must <strong>never</strong> reduce skill at gathering another (no conserved mass here). Proficiency per profession grows independently by use and raises the <strong>rarity</strong> of materials obtained; higher-rarity materials are the primary input that lets production reach higher output tiers. The higher-rarity nodes live out in the higher and more dangerous zones, not in a safe in-town loop, so the top of gathering has its own soft risk gate; depth curves with the zones. Starter set (extensible): Mining, Logging, Herbalism, Monster Harvesting.</p>
+  <p>Everyone can perform all gathering, and gathering one thing must <strong>never</strong> reduce skill at gathering another (nothing is conserved here). Proficiency per profession grows independently by use and raises the <strong>rarity</strong> of materials obtained; higher-rarity materials are the primary input that lets production reach higher output tiers. The higher-rarity nodes live out in the higher and more dangerous zones, not in a safe in-town loop, so the top of gathering has its own soft risk gate; depth curves with the zones. Starter set (extensible): Mining, Logging, Herbalism, Monster Harvesting.</p>
 
-  <h3>World-spawn nodes (Mining / Logging / Herbalism)</h3>
+  <h3 id="nodes">World-spawn nodes (Mining / Logging / Herbalism)</h3>
   <ul>
     <li>Nodes are permanent fixtures of the world.</li>
     <li>Harvest state respawns <strong>per player</strong>. Each player has their own respawn timer on a given node; one player harvesting it does not deny it to anyone else.</li>
@@ -346,16 +389,16 @@
     <li>At the corpse, the UI lets the player focus on a single component type or several at once. Fewer components yields higher tier; spreading across many yields lower tier each.</li>
   </ul>
 
-  <div class="figure">
+  <div class="figure" id="fig5">
     <h4>Figure 5. Per-corpse extraction tradeoff</h4>
     <p class="cap">A drake corpse tagged with three component types. Concentrating extraction on one component returns a high tier; splitting across all three returns a lower tier of each. The persistent town focus shifts these tiers further up for your specialized components.</p>
     <svg id="corpse-diagram" viewBox="0 0 720 230" role="img" aria-label="Extraction tradeoff bars"></svg>
   </div>
 
-  <h3>Focus: additive allocation (voluntary)</h3>
+  <h3 id="focus">Focus: additive allocation (voluntary)</h3>
   <p>On top of the per-corpse choice, a player sets a persistent <strong>focus</strong> in town. Focus is additive: every component starts at a guaranteed baseline that is never penalized, and focus points <em>add</em> rarity/yield bonuses to chosen components only. The only cost is opportunity. This lets a group divide the work: each member focuses different components so the party covers more high-tier materials between them.</p>
 
-  <div class="figure">
+  <div class="figure" id="fig6">
     <h4>Figure 6. Additive focus: the baseline never drops</h4>
     <p class="cap">Monster Harvesting focus over component types. The inner solid ring is the guaranteed baseline for every component. Focus points add the outer band on chosen components only (here a venom specialist boosting venom sacs and glands). Unfocused components stay at baseline, never below. Contrast the production wheel, where only one specialty is empowered at a time rather than every axis at once.</p>
     <div class="row">
@@ -370,7 +413,7 @@
     </div>
   </div>
 
-  <h3>Re-spec cost: time, coins, or materials</h3>
+  <h3 id="respec">Re-spec cost: time, coins, or materials</h3>
   <p>Re-aiming your focus draws on three resources, and you choose which one or two to spend:</p>
   <table>
     <tr><th>Pay with</th><th>Speed</th><th>Cost</th></tr>
@@ -380,26 +423,26 @@
   </table>
   <p>The deeper and more peaked your focus, the larger the budget of whichever resources you use, so a casual rebalance is cheap and a hard pivot is a real commitment. (Gathering focus is additive and has no attunement gate, so unlike a production specialty there is no structural cost to switching, hence this explicit re-spec to keep a hard pivot meaningful.) Exact curves are tuning, deferred.</p>
 
-  <h3>Signed materials and the self-gathered bonus</h3>
+  <h3 id="signed">Signed materials and the self-gathered bonus</h3>
   <ul>
     <li>Gathering a <strong>rare or better</strong> monster material stamps the item with the <strong>gatherer's name</strong> (a signed material).</li>
     <li>Using a material <strong>you gathered yourself</strong> in a craft grants a bonus: either a small lift to the output's item-level budget, or a reduction in the quantity of that material the recipe requires.</li>
     <li>This rewards the player who does both halves, and turns a signed material from someone else into a mark of provenance rather than a transferable mechanical bonus.</li>
   </ul>
 
-  <h3>Why account-level breadth does not break exclusivity</h3>
-  <p>An account can hold many characters, so a dedicated player can in principle spread the archetypes across alts and cover the whole wheel over time. That does not collapse the design, because <strong>the top of crafting is gated behind adventuring, not just crafting</strong>. The best materials come from Monster Harvesting, which means killing higher-tier monsters, and later Battlefield Experience (the channel above, still exploratory) improves what you craft. Both require a character that actually fights, so a combat level 1 crafting alt is never prevented from crafting but is capped well below an adventurer-crafter. Monster Harvesting alone carries this gate today; Battlefield Experience only deepens it. This is the pillar that negates the one-alt-per-craft pattern that guts crafting value in so many MMOs.</p>
-  <p>Two further inputs reinforce it. Contested single-use corpses are an always-on friction no one can multibox. And a recipe that requires a material <strong>signed by its recipient</strong> removes the shared-gatherer-alt shortcut for bound gear, because the wearer has to have gathered it themselves. A bare signature on its own is only provenance, not an anti-alt lever (each alt signs its own materials); the exclusivity comes from the adventuring gate and the contested and recipient-bound inputs, not the signature. You can only ever play one or two characters at once, so you can never bring the top of every archetype to bear at the same time. Specialization stays per-character.</p>
+  <h3 id="alts">Why account-level breadth does not break exclusivity</h3>
+  <p>An account can hold many characters, so a dedicated player can in principle spread the archetypes across alts and cover the whole wheel over time. That does not collapse the design, because <strong>the top of crafting is gated behind adventuring, not just crafting</strong>. The best materials come from Monster Harvesting, which means killing higher-tier monsters, and later Battlefield Experience (committed concept, later phase; see Part II: Future) improves what you craft. Both require a character that actually fights, so a combat level 1 crafting alt is never prevented from crafting but is capped well below an adventurer-crafter. Monster Harvesting alone carries this gate today; Battlefield Experience only deepens it. This is the pillar that negates the one-alt-per-craft pattern that guts crafting value in so many MMOs.</p>
+  <p>Two further inputs reinforce it. Contested single-use corpses are an always-on friction no one can multibox. And a recipe that requires a material <strong>signed by its recipient</strong> removes the shared-gatherer-alt shortcut for bound gear, because the wearer has to have gathered it themselves. A bare signature on its own is only provenance, not an anti-alt lever (each alt signs its own materials); the exclusivity comes from the adventuring gate and the contested and recipient-bound inputs, not the signature. You can only ever play one or two characters at once, so you can never bring the top of every archetype to bear at the same time. Specialization stays per-character, and a fully rewarding pure-skiller route is an explicit non-goal for now.</p>
 
   <h2 id="tools">Tools</h2>
   <p>A gathering tool is two layers: a durable base tool plus consumable effects slotted onto it.</p>
-  <h3>Base tool: tier, infinite durability</h3>
+  <h3 id="base-tools">Base tool: tier, infinite durability</h3>
   <ul>
     <li>Each base tool has a <strong>tier</strong>. Your gathering skill gates which tier you can use; the tool's tier in turn gates which <strong>nodes</strong> (and which monster materials) you can gather at all.</li>
     <li>The base tool has <strong>infinite durability</strong>, so you are never stranded in the wild unable to gather. Basic base tools are sold by vendors; higher tiers are crafted.</li>
     <li>A base tool also carries a <strong>rarity</strong> on the standard item tiers. Rarity does not change tier gating; it drives how often effects spend durability (see below).</li>
   </ul>
-  <h3>Effects: durable, rechargeable bonuses</h3>
+  <h3 id="tool-effects">Effects: durable, rechargeable bonuses</h3>
   <ul>
     <li><strong>Effects</strong> are the bonuses (quantity, quality, respawn speed), slotted onto a base tool and produced by a production craft. Effects have their own <strong>durability</strong> and deplete with use; when an effect runs out the base tool keeps working at tier, just without that bonus.</li>
     <li>Effects are <strong>rechargeable</strong>. Two ways: the production craft that created the effect, or an Enchanter / Scribe. Recharging through the <strong>original crafter of the tool</strong> is cheaper and faster.</li>
@@ -410,6 +453,9 @@
   <div class="callout">
     Tuning guardrail: effect costs should be meaningful but never so high that they discourage use or cost more than the materials being gathered are worth. The rarity-scaled consumption is part of that, so a high-end tool sips charges on trivial targets and saves them for valuable ones.
   </div>
+
+  <h1 id="part-contributors" class="part">Part II: For contributors</h1>
+  <p class="part-note">Everything below is for people changing or building the system, not learning it: structural warnings, design history, architecture, build order, and the open questions.</p>
 
   <h2 id="fragility">Fragility: why the wheel resists new crafts</h2>
   <div class="callout warn">
@@ -429,6 +475,9 @@
   <p>Only grow the wheel itself in deliberate, planned <strong>opposite pairs</strong>, and only for genuinely new combat-relevant gear/consumable domains. A 12-craft construction variant (Carpenter + Mason) was prototyped and works, but it forces two stretch archetypes and a full re-lay of the ring, so it is deferred (see Discarded and Future).</p>
 
   <h2 id="discarded">Considered and discarded</h2>
+  <p>Kept so settled ideas are not relitigated. Each was explored seriously before the current design won.</p>
+  <details class="fold">
+    <summary>The discarded ideas and why</summary>
   <table>
     <tr><th>Idea</th><th>Why discarded</th></tr>
     <tr><td>Free 1-plus-1 hobby (any creative craft plus any tradition craft)</td><td>Dilutes interdependence and becomes a solved min-max. Replaced by the capped, geometry-determined opposite hobby.</td></tr>
@@ -439,11 +488,12 @@
     <tr><td>Single-craft "bridge" specs (a lone Tinker or Lapidary)</td><td>A lone master has only one opposite, so it cannot offer the two hobby candidates an adjacent pair does. Every craft masters as part of a pair instead.</td></tr>
     <tr><td>Capped opposite-affinity carve-out (a second hobby on the opposite side)</td><td>Interesting but an extra system; the single opposite-hobby already delivers the "people can be both" fantasy within the cap.</td></tr>
   </table>
+  </details>
 
   <h2 id="future">Future and esoteric skills</h2>
-  <p>Two safe expansion lanes, neither of which touches the production wheel.</p>
+  <p>Two safe expansion lanes, neither of which touches the production wheel, and one committed but later-phase mechanic parked here until the core systems are proven.</p>
 
-  <h3>Gathering skills (add freely)</h3>
+  <h3 id="future-gathering">Gathering skills (add freely)</h3>
   <p>Each feeds an existing craft, so they cost the wheel nothing. A menu we brainstormed:</p>
   <table>
     <tr><th>Skill</th><th>Yields</th><th>Feeds</th></tr>
@@ -462,8 +512,8 @@
     <tr><td>Graverobbing / Essence-reaping</td><td>bones, grave dust, soul shards</td><td>Alchemy, Enchanting, bonecraft (dark / risky)</td></tr>
   </table>
 
-  <h3>A second, off-wheel system for non-combat crafts (if needed)</h3>
-  <p>If the ten ever feel too limited, cosmetic and housing crafts can live in a <strong>separate, simpler system</strong> (a second wheel or a flat skill set) that feeds purely cosmetics and player housing and does <strong>not</strong> participate in the conserved-mass opposite/hobby structure. Candidates:</p>
+  <h3 id="off-wheel">A second, off-wheel system for non-combat crafts (if needed)</h3>
+  <p>If the ten ever feel too limited, cosmetic and housing crafts can live in a <strong>separate, simpler system</strong> (a second wheel or a flat skill set) that feeds purely cosmetics and player housing and does <strong>not</strong> participate in the wheel's opposite/hobby structure. Candidates:</p>
   <ul>
     <li><strong>Carpenter</strong> (wood: furniture, housing frames, ships, instruments) and <strong>Mason</strong> (stone: walls, foundations, statues, runestones), the construction pair that did not fit cleanly on the combat wheel.</li>
     <li>Housing-appropriate gathering and tending skills from the menu above, especially <strong>Shepherd</strong>, <strong>Beekeeping</strong>, and <strong>Stargazing</strong>.</li>
@@ -471,19 +521,34 @@
   </ul>
   <p class="muted">Not built now. This lane exists so housing and cosmetics never pressure the combat wheel.</p>
 
-  <h3>Sub-disciplines that fold under existing crafts</h3>
+  <h3 id="sub-disciplines">Sub-disciplines that fold under existing crafts</h3>
   <p class="muted">Poisoncraft and Perfumery under Alchemy; Glassblowing under Engineering or Jewelcrafting; Runecarving and Golemcraft under Enchanting; Bookbinding and Cartography under Inscription; Trapmaking under Engineering; Bonecarving under Jewelcrafting or Leatherworking. None of these is a new wheel axis.</p>
+
+  <h3 id="battlefield">Battlefield Experience: production skill from observed item use (committed, later phase)</h3>
+  <p>Production skill could also grow from <strong>Battlefield Experience</strong>, not just crafting: watching crafted items get used in combat grants a small trickle of specialization xp toward the craft that makes them, when that craft is part of your active archetype. A weapon that lands a killing blow or armor worn while a monster dies feeds xp to a Smith; a potion drunk or meal eaten feeds nothing unless alchemy or cooking is your specialty.</p>
+  <ul>
+    <li><strong>Only your active archetype.</strong> Battlefield Experience credits only the crafts in your current specialty (your two majors, and your hobby up to its cap). It never advances a craft outside your archetype, so witnessing a wide variety of items in combat cannot quietly make you better at everything. This also closes the alt loophole: each character earns Battlefield Experience only for its own active archetype, so holding several archetypes across alts never lets one account skirt the at-most-two-active rule.</li>
+    <li><strong>Additive only, never a cost.</strong> Because you do not control what you witness, Battlefield Experience can only add; it never reduces another craft and never shifts your attunement. It is a separate channel that feeds your active specialty alongside deliberate crafting.</li>
+    <li><strong>Uncommon or rare tier and above only</strong> (the exact floor is tuning), so it never touches the common free floor and only kicks in at the tiers where specialization actually matters.</li>
+    <li><strong>Scope is a server-cost question, and a fairness question.</strong> Ideally anything within your view counts, with party and raid members counting for more, and observing strangers worth less and more distance-constrained than observing your own group. This maps onto the server's existing player and event interest scope (roughly 90 yards; the 120-yard radius is NPC-only). Whether 90 yards is enough, and whether group Battlefield Experience credit should reach farther than stranger credit, is a playtest question.</li>
+    <li><strong>Consumables improve the recipe; equipment improves the item.</strong> Battlefield Experience splits on the consumable-versus-equipment axis. For a <strong>consumable</strong>, it accrues to the <strong>recipe</strong>, so witnessing your potions, food, or bombs used in combat makes every future craft of that recipe a little better (a healing potion that restores +10 more HP). For a piece of <strong>equipment</strong>, it accrues to the <strong>specific item</strong>, so after a dungeon run you can make improvements to that exact piece, effectively an extra armor-kit-style enhancement slot (the full power and effect menu is TBD). Any crafter can apply an equipment improvement, but the one who originally made it improves it most (like the original-crafter recharge discount), rewarding getting your gear from the friends you play with.</li>
+  </ul>
+  <details class="callout">
+    <summary>Worked example</summary>
+    <p>A guild's master armorcrafter forges a set for a member, then comes along on the dungeon. Over a dungeon's worth of fights they observe that armor taking and surviving hits, and afterward they can take it back and improve it a little for its owner. This is why a guild may prefer to bring its master crafters on raids rather than just hauling materials back to a crafter who never leaves town.</p>
+  </details>
+  <p class="muted">Committed as a concept, deliberately last: it needs careful tuning and is not needed until the core systems (gathering, crafting, tools, Monster Harvesting) are in and proven.</p>
 
   <h2 id="arch">Architecture (how it lands in this repo)</h2>
   <p>The system follows the repo's existing seams. Nothing below invents a new one.</p>
 
-  <h3>Determinism and authority (hard invariants)</h3>
+  <h3 id="arch-invariants">Determinism and authority (hard invariants)</h3>
   <ul>
     <li>All gathering and crafting logic lives in <code>src/sim/</code> and obeys the sim invariants: no DOM/Three imports, all randomness through <code>Rng</code>, fixed 20 Hz tick, no <code>Math.random</code> / <code>Date.now</code> / <code>performance.now</code>. Per-player node respawn timers, corpse-harvest state, effect durability/recharge, mobile crafting stations, and re-spec timers advance on the sim clock.</li>
     <li>The server is authoritative. Harvest rolls, quality rolls, recipe resolution, material consumption, the self-gathered bonus, signed-material stamping, effect-durability consumption rolls, effect recharge, focus re-spec, and skill changes resolve server-side. The client streams intent and renders results.</li>
   </ul>
 
-  <h3>Content-as-code (<code>src/sim/content/</code>, merged by <code>data.ts</code>)</h3>
+  <h3 id="arch-content">Content-as-code (<code>src/sim/content/</code>, merged by <code>data.ts</code>)</h3>
   <ul>
     <li><code>professions.ts</code>: the ten-craft wheel (the ring order and the per-slot tier ceilings), the archetype names, craft outputs (permanent / consumable / weapon lines), gathering profession definitions, focus and component-type configuration, specialization perks, base tool tiers, and the effect catalog.</li>
     <li><code>recipes.ts</code>: recipe records (inputs, craft + skill requirement, output, base ilvl budget, crafting-only effects, per-recipe binding policy).</li>
@@ -492,64 +557,89 @@
     <li>Fungible materials and base tools are item records, so they flow through the existing inventory, vendor, and market systems unchanged.</li>
   </ul>
 
-  <h3>Per-item-instance model (a foundation, built early)</h3>
-  <p>Inventory today is <code>itemId + count</code> and items carry no identity. Signed materials, charged tools, rolled-quality crafted gear, and bind-to-recipient gear all need per-item identity: an instance id plus a payload (gatherer signature, per-effect charges, rolled quality/stats, the <code>equipBoundTo</code> recipient). This is cross-cutting (inventory, equipment, trade, market, vendor, the interest-scoped snapshot, the wire encoder, and JSONB load/save) and is spec'd as its own early slice before tools, monster harvesting, and crafted gear. Fungible stacks (raw materials, infinite-durability base tools) keep flowing as <code>itemId + count</code> and do not need it.</p>
+  <h3 id="arch-instances">Per-item-instance model (a foundation, built early)</h3>
+  <p>Inventory today is <code>itemId + count</code> and items carry no identity. Signed materials, charged tools, rolled-quality crafted gear, and bind-to-recipient gear all need per-item identity: an instance id plus a payload (gatherer signature, per-effect charges, rolled quality/stats, the <code>boundTo</code> recipient). This is cross-cutting (inventory, equipment, trade, market, vendor, the interest-scoped snapshot, the wire encoder, and JSONB load/save) and is spec'd as its own early slice before tools, monster harvesting, and crafted gear. Fungible stacks (raw materials, infinite-durability base tools) keep flowing as <code>itemId + count</code> and do not need it.</p>
 
-  <h3>New sim system behind the <code>SimContext</code> seam (<code>src/sim/professions/</code>)</h3>
+  <h3 id="arch-sim">New sim system behind the <code>SimContext</code> seam (<code>src/sim/professions/</code>)</h3>
   <ul>
     <li><code>gathering.ts</code>: node harvest, per-player respawn state, corpse harvest, proficiency gain and rarity rolls.</li>
     <li><code>crafting.ts</code>: recipe resolution, material consumption, quality roll, ilvl budget computation, crafting-only effect application.</li>
-    <li><code>wheel.ts</code>: the conserved-mass mastery model (additive skill gain, the at-most-two active cap, the active archetype and attunement, the adjacent-pair majors and capped opposite hobby, specialization-concentration readout). Attunement switching is quest-driven (see Production core), not decay.</li>
+    <li><code>wheel.ts</code>: the one-active-specialty mastery model (additive skill gain, the at-most-two active cap, the active archetype and attunement, the adjacent-pair majors and capped opposite hobby, specialization-concentration readout). Attunement switching is quest-driven (see Production core), not decay.</li>
     <li><code>focus.ts</code>: the additive gathering focus allocation plus the time/coin/material re-spec.</li>
     <li><code>tools.ts</code>: base-tool tier gating plus effect application, depletion, and recharge.</li>
   </ul>
   <p class="muted">Per the seam rules, these modules hold functions; backing state (per-player craft skills, the active archetype and attunement history, the current hobby, focus allocations, respawn timers, corpse flags, re-spec timers) lives on <code>Sim</code> as live <code>ctx</code> views, with thin same-named delegates where a foreign caller resolves a method.</p>
 
-  <h3>The <code>IWorld</code> seam, client, persistence</h3>
+  <h3 id="arch-client">The <code>IWorld</code> seam, client, persistence</h3>
   <ul>
     <li><strong>IWorld</strong> (<code>src/world_api.ts</code>): extend first, implement in both <code>Sim</code> and <code>ClientWorld</code>, then consume from render/ui. New surface: read craft skills and the wheel, current majors/hobby, specialization perks, focus allocation, node availability, corpse component options, recipe lists and craft results, tool tier and effect charges.</li>
     <li><strong>Client (render / ui):</strong> a professions/wheel HUD window following the module-first UI rules. All player-visible strings are <code>t()</code> keys; numbers/money through the formatters. Sim/server emit stable keys plus values re-localized by the matcher.</li>
     <li><strong>Guide / wiki:</strong> player-facing professions, gathering, and recipe content feeds <code>/wiki</code>; add <code>guide.*</code> prose keys and run <code>npm run wiki:content</code>.</li>
-    <li><strong>Persistence (<code>server/</code>):</strong> per-player craft skills, the active archetype, attunement history (which archetypes have been entered and the make-amends count per archetype), current hobby, focus allocations, and learned recipes persist (JSONB on the character) with additive back-compat load. Signed-material gatherer names, per-effect charges, rolled quality/stats, and the <code>equipBoundTo</code> recipient persist on item instances. Respawn timers and mobile stations are sim runtime state.</li>
+    <li><strong>Persistence (<code>server/</code>):</strong> per-player craft skills, the active archetype, attunement history (which archetypes have been entered and the make-amends count per archetype), current hobby, focus allocations, and learned recipes persist (JSONB on the character) with additive back-compat load. Signed-material gatherer names, per-effect charges, rolled quality/stats, and the <code>boundTo</code> recipient persist on item instances. Respawn timers and mobile stations are sim runtime state.</li>
   </ul>
 
   <h2 id="slices">Build order (slices)</h2>
   <p>Each slice is its own spec, plan, and implementation cycle.</p>
   <ol>
-    <li><strong>Gathering foundation (suggested first slice):</strong> universal gathering skills, proficiency to material rarity, materials as items, vendor tools, world-node spawn plus per-player harvest/respawn. Kept fully fungible, so it does not need the item-instance model. No wheel yet. <span class="muted">Note: shipping gathering well ahead of crafting lets players stockpile raw materials and speed-level the early crafting tiers when crafting lands. The later tiers gate on signed materials and Battlefield Experience that cannot be stockpiled, so this is a feel concern, not a balance break. Two cheap mitigations that also fit the depth-curves-with-the-zones principle: keep zone-1 gathering to common and low-tier materials (rare and up nodes ship later with their higher zones and their crafting), and ship a handful of common recipes or a vendor sink alongside this slice so materials have an immediate use rather than piling up.</span></li>
-    <li><strong>Per-item-instance foundation:</strong> an instance id plus payload (signer, charges, rolled quality/stats, the <code>equipBoundTo</code> recipient) across inventory, equipment, trade, market, vendor, the snapshot, the wire, and persistence. Cross-cutting, and it must land before tools, harvesting, and crafted gear, which all carry item identity. <span class="muted">Note: only higher-tier crafts carry item identity, so common-tier crafting can ship fungibly before this slice; the instance model gates the high-tier work, not the first playable crafting.</span></li>
-    <li><strong>Production core:</strong> the ten crafts and their outputs, recipes, crafting, the conserved-mass wheel (additive skill, the at-most-two active cap, adjacent-pair majors, capped opposite hobby), attunement (the per-tier quest ladder: the first-time lore quest and the repeatable make-amends switch quest), tiered mastery (the per-tier quest gate, xp lost above the current ceiling, diminishing returns below capability), combo-specific signature recipes, rarity-tier quality, ilvl-budget plus crafting-only effects, bind-to-recipient (<code>equipBoundTo</code>) on high-tier gear with its commission/order workflow, and the first specialization perks. Start with low-stakes consumables, then enhancements, then gear.</li>
+    <li><strong>Gathering foundation (suggested first slice):</strong> universal gathering skills, proficiency to material rarity, materials as items, vendor tools, world-node spawn plus per-player harvest/respawn. Kept fully fungible, so it does not need the item-instance model. No wheel yet. <span class="muted">Note: shipping gathering well ahead of crafting lets players stockpile raw materials and speed-level the early crafting tiers when crafting lands. The later tiers need higher-rarity inputs that only arrive with later zones and Monster Harvesting, so a zone-1 stockpile cannot carry a crafter far up the ladder; a feel concern, not a balance break. Two cheap mitigations that also fit the depth-curves-with-the-zones principle: keep zone-1 gathering to common and low-tier materials (rare and up nodes ship later with their higher zones and their crafting), and ship a handful of common recipes or a vendor sink alongside this slice so materials have an immediate use rather than piling up.</span></li>
+    <li><strong>Per-item-instance foundation:</strong> an instance id plus payload (signer, charges, rolled quality/stats, the <code>boundTo</code> recipient) across inventory, equipment, trade, market, vendor, the snapshot, the wire, and persistence. Cross-cutting, and it must land before tools, harvesting, and crafted gear, which all carry item identity. <span class="muted">Note: only higher-tier crafts carry item identity, so common-tier crafting can ship fungibly before this slice; the instance model gates the high-tier work, not the first playable crafting.</span></li>
+    <li><strong>Production core:</strong> the ten crafts and their outputs, recipes, crafting, the one-active-specialty wheel (additive skill, the at-most-two active cap, adjacent-pair majors, capped opposite hobby), attunement (the per-tier quest ladder: the first-time lore quest and the repeatable make-amends switch quest), tiered mastery (the per-tier quest gate, xp lost above the current ceiling, diminishing returns below capability), combo-specific signature recipes, rarity-tier quality, ilvl-budget plus crafting-only effects, bind-to-recipient (<code>boundTo</code>) on high-tier gear with its commission/order workflow, and the first specialization perks. Start with low-stakes consumables, then enhancements, then gear.</li>
     <li><strong>Crafted tools:</strong> base tool tiers (infinite durability) plus slotted effects with durability and craft-aligned recharge.</li>
     <li><strong>Monster Harvesting plus focus:</strong> single-use corpses, component-type tags, per-corpse focus picker, the additive town focus, the time/coin/material re-spec, and signed rare+ materials with the self-gathered craft bonus.</li>
     <li><strong>Cosmetics / market integration, wiki polish, balance.</strong></li>
   </ol>
-  <p class="muted">Much later, exploratory: Battlefield Experience (observed item use); and a possible off-wheel cosmetic/housing system (Carpenter, Mason, and tending skills) if the ten feel too limited.</p>
+  <p class="muted">Much later: Battlefield Experience (observed item use; committed as a concept, not needed until the core is proven); and a possible off-wheel cosmetic/housing system (Carpenter, Mason, and tending skills) if the ten feel too limited.</p>
 
   <h2 id="tbd">Open questions / TBD</h2>
+  <p>Only genuinely open questions live here; decided points are stated in the body text where they apply.</p>
+
+  <h4>Wheel, tiers, and archetypes</h4>
   <ul>
-    <li>Production wheel: confirm the exact ring order, the per-slot tier ceilings (majors, hobby, others) that realize the at-most-two-adjacent rule, and the attunement cost curve.</li>
-    <li>Tiered mastery: crafts-per-tier counts (the example uses about 20), the diminishing-returns curve below capability (zero at a two-tier delta), and which recipes each tier unlocks. Decided: the at-most-two cap applies at uncommon and up, common is a free floor.</li>
-    <li>Hobby cap: confirm the ceiling tier (rare, possibly epic per itemization). Switching is decided: the hobby switches as part of re-attuning, with no skill loss.</li>
-    <li>Tier distribution (itemization tuning): a specialist's working spend is 2 majors legendary, 1 hobby rare, 7 crafts common, which may shift to legendary / epic / uncommon (2 / 1 / 7). The Jack of All Trades ceiling (uncommon vs rare across all ten) and whether it gets a higher combined ceiling to afford that breadth are open.</li>
-    <li>Attunement quests: the design of the per-tier quest ladder (the first-time lore quest and each deeper tier quest) and the repeatable make-amends switch quest, and how the make-amends cost escalates with repeat switches (time, coin, materials, lore) while staying cheap enough early to let a player try a couple of archetypes; whether the hobby's cap is a hard cap. Decided: escalation is tuning, carried through quest flavor text.</li>
-    <li>Leveling and the tier ladder. Decided: crafts climb through a per-tier quest ladder; crafting above your current tier ceiling loses the excess xp; the ceiling is set either by attunement (a craft outside your active archetype) or by an incomplete tier quest, both identically; and learned skill is retained and re-empowered on re-attune, never re-earned. Open: the exact tier-quest designs, and whether a non-active craft still produces at the floor while capped.</li>
+    <li>Tiered mastery tuning: crafts-per-tier counts (the example uses about 20), the diminishing-returns curve below capability (zero at a two-tier delta), and which recipes each tier unlocks.</li>
+    <li>The hobby ceiling: rare, possibly epic per itemization; whether the hobby's cap is a hard cap; and the standalone hobby-switch quest cost (lower than an archetype switch, but high enough that flipping between the two opposites never becomes a de-facto second hobby).</li>
+    <li>Tier distribution against itemization: whether the specialist's working distribution (2 majors legendary, 1 hobby rare, 7 common) shifts to legendary / epic / uncommon, and the Jack of All Trades ceiling (uncommon vs rare across all ten) plus whether a Jack gets a higher combined ceiling to afford the breadth.</li>
     <li>Jack of All Trades perks: the magnitude of the better/worse output variance and the material-saving bonus.</li>
-    <li>Attunement legibility: the in-craft trend nudges, and the wording of the attunement quest's what-changes summary.</li>
-    <li>Binding: the per-recipe bind-to-recipient policy (which output classes bind via <code>equipBoundTo</code>, which tier threshold triggers it, and which required materials tie to the recipient). Decided: the recipient is set from the commission order, not typed by the crafter. Open: the commission/order UX (order scope to open, guild, friends, or a specific crafter; cancel-before-accept; the crafter orders list; the multi-step accept, craft, deliver flow).</li>
-    <li>Per-item-instance model: instance id + payload (signer, charges, rolled stats, the <code>equipBoundTo</code> recipient); how two rolled crafted items stack, list, and persist; and its slice sequencing before the higher-tier crafts (tools, harvesting, crafted gear), which is what carries item identity.</li>
-    <li>Economy: an output throttle for a maxed specialist, and a real gold sink in proportion to the new material faucet (the 5 percent market cut is the only sink today).</li>
-    <li>Alts. Decided: specialization stays per-character, and exclusivity is anchored by the adventuring gate (the crafting ceiling needs Monster Harvesting materials and Battlefield Experience, which cap a combat level 1 crafting alt below an adventurer-crafter), backed by contested corpses and recipient-signed materials, not by character slots. A fully rewarding pure-skiller route is an explicit non-goal for now; revisit only with its own brainstorm.</li>
-    <li>Gathering-first sequencing: whether to accept material stockpiling before crafting ships, or add a soft mitigation.</li>
-    <li>Battlefield Experience (exploratory): separate channel scoped to the active archetype only (no skirting the at-most-two rule via breadth or alts), observation radius (the 90-yard player scope, and whether group credit should reach farther than stranger credit), per-item attribution, and the tier floor (uncommon or rare and above) tuning.</li>
-    <li>Battlefield Experience and Jack of All Trades: whether a Jack (who has no active archetype) benefits from Battlefield Experience at all, and if so for which crafts (all ten, none, or only their highest few), so the active-archetype gate has a defined answer for the breadth build.</li>
-    <li>Gathering focus: skill tree vs additive radar, focus granularity, and the re-spec cost curves.</li>
+  </ul>
+
+  <h4>Attunement quests and legibility</h4>
+  <ul>
+    <li>The exact quest designs: the per-tier quest ladder (the first-time lore quest and each deeper tier quest) and the repeatable make-amends switch quest, and how its cost escalates with repeat switches (time, coin, materials, lore) while staying cheap enough early to let a player try a couple of archetypes.</li>
+    <li>Switching between an archetype and Jack of All Trades, in both directions: presumably the same attunement-quest pattern, but the mechanics, costs, and how the specialize direction's give-up-your-dabblings moment is staged are open.</li>
+    <li>The in-craft trend nudges (plain chat-log messages first, then lore-friendly delivery: guild mail, a courier), and the wording of the attunement quest's what-changes summary.</li>
+  </ul>
+
+  <h4>Items, binding, and commissions</h4>
+  <ul>
+    <li>The per-recipe bind-to-recipient policy: which output classes bind via <code>boundTo</code>, which tier threshold triggers it, and which required materials tie to the recipient.</li>
+    <li>The commission/order UX: order scope (open, guild, friends, or a specific crafter), cancel-before-accept, the crafter orders list, and the multi-step accept, craft, deliver flow.</li>
+    <li>Per-item-instance model: instance id + payload (signer, charges, rolled stats, the <code>boundTo</code> recipient), and how two rolled crafted items stack, list, and persist.</li>
+  </ul>
+
+  <h4>Output tuning</h4>
+  <ul>
     <li>Output quality and ilvl budget: how the rarity-tier roll maps to stat rolls, and the exact curve over concentration, material tier, and skill.</li>
     <li>Crafting-only effects: the design space and how they are balanced against item level.</li>
     <li>Specialization perks: the exact perk set and the thresholds that unlock them.</li>
+  </ul>
+
+  <h4>Economy and sequencing</h4>
+  <ul>
+    <li>An output throttle for a maxed specialist, and a real gold sink in proportion to the new material faucet (the 5 percent market cut is the only recurring sink today).</li>
+    <li>Gathering-first sequencing: whether to accept material stockpiling before crafting ships, or add a soft mitigation.</li>
+  </ul>
+
+  <h4>Gathering, tools, and monster harvesting</h4>
+  <ul>
+    <li>Gathering focus: skill tree vs additive radar, focus granularity, and the re-spec cost curves.</li>
     <li>Monster-tier to item-tier mapping: the shared rarity scale that the rarity-scaled effect consumption and tool gating read from.</li>
-    <li>Tool effects: the effect catalog, depletion rates, the rarity-scaled consumption curve, and recharge material costs (base tool durability is decided: infinite).</li>
-    <li>Signed materials: confirm rare+ monster materials sign, and the size of the self-gathered craft bonus.</li>
+    <li>Tool effects: the effect catalog, depletion rates, the rarity-scaled consumption curve, and recharge material costs.</li>
+    <li>Signed materials: the size of the self-gathered craft bonus.</li>
     <li>Node density and dynamic / location-based respawn (explicitly future); persistence scope for respawn state across restarts.</li>
+  </ul>
+
+  <h4>Exploratory</h4>
+  <ul>
+    <li>Battlefield Experience: the observation radius (the 90-yard player scope, and whether group credit should reach farther than stranger credit), per-item attribution, the tier floor (uncommon or rare and above), and whether a Jack (who has no archetype majors) benefits at all, and if so for which crafts.</li>
     <li>Whether and when to build the off-wheel cosmetic/housing system.</li>
   </ul>
 
@@ -626,11 +716,11 @@
   function buildHobby() { const box = document.getElementById("hobbyBtns"); if (!box) return; box.innerHTML = ""; const A = ARCH[cur]; A.hobbies.forEach((h, k) => { const b = document.createElement("button"); b.className = "hbtn" + (k === hob ? " active" : ""); b.textContent = CRAFTS[h] + " (rare cap)"; b.onclick = () => { hob = k; buildHobby(); drawLive(); }; box.appendChild(b); }); }
   if (document.getElementById("liveRadar")) { buildHobby(); drawLive(); }
 
-  // Figure 2: specialist vs generalist (Smith peaked on Weaponcrafting + Armorcrafting).
-  (function () { const svg = document.getElementById("radar-specialist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, [46, 10, 9, 8, 8, 10, 12, 46, 90, 96], COL.gold, "rgba(217,178,90,0.22)", 112); })();
-  (function () { const svg = document.getElementById("radar-generalist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, new Array(N).fill(34), COL.blue, "rgba(111,168,255,0.18)", 112); })();
+  // Figure 2: specialist vs generalist (Smith: majors legendary, hobby Leatherworking at rare, rest at the common floor).
+  (function () { const svg = document.getElementById("radar-specialist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, [20, 20, 20, 60, 20, 20, 20, 20, 100, 100], COL.gold, "rgba(217,178,90,0.22)", 112); })();
+  (function () { const svg = document.getElementById("radar-generalist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, new Array(N).fill(40), COL.blue, "rgba(111,168,255,0.18)", 112); })();
 
-  // Figure 3: tiered radar. Reach envelope peaks on Weaponcrafting + Armorcrafting.
+  // Figure 3: tiered radar. Majors at legendary, hobby Leatherworking at rare, rest at the common floor.
   (function () {
     const svg = document.getElementById("radar-tiers"); if (!svg) return;
     const cx = 170, cy = 170, R = 112, n = N;
@@ -638,7 +728,7 @@
     for (let i = 0; i < n; i++) { const a = angAt(i, n); el("line", { x1: cx, y1: cy, x2: cx + R * Math.cos(a), y2: cy + R * Math.sin(a), stroke: COL.line, "stroke-width": 1 }, svg); const lr = R + 16, lx = cx + lr * Math.cos(a), ly = cy + lr * Math.sin(a); const t = el("text", { x: lx.toFixed(1), y: (ly + 3).toFixed(1), fill: COL.muted, "font-size": 10.5, "text-anchor": anchorFor(a) }, svg); t.textContent = CRAFTS[i]; }
     for (let g = 1; g <= RINGS; g++) { const t = el("text", { x: cx + 5, y: (cy - R * g / RINGS - 2).toFixed(1), fill: COL.muted, "font-size": 8.5 }, svg); t.textContent = TIERS[g - 1]; }
     // ring units order [Engineering, Alchemy, Cooking, Leatherworking, Tailoring, Inscription, Enchanting, Jewelcrafting, Weaponcrafting, Armorcrafting]
-    const reach = [3, 2, 1, 1, 1, 1, 2, 3, 5, 5].map(r => r * 100 / RINGS);
+    const reach = [1, 1, 1, 3, 1, 1, 1, 1, 5, 5].map(r => r * 100 / RINGS);
     valuePoly(svg, reach, COL.gold, "rgba(217,178,90,0.14)", R);
     valuePoly(svg, new Array(n).fill(100 / RINGS), COL.teal, "rgba(79,208,192,0.30)", R);
   })();
@@ -684,6 +774,20 @@
     el("polygon", { points: "700,40 690,35 690,45", fill: COL.muted }, svg);
     const t = el("text", { x: 20, y: 22, fill: COL.gold, "font-size": 12, "font-weight": "600" }, svg); t.textContent = "Crafting-only effects (orthogonal to item level)";
     ["proc on hit", "set-style bonus", "utility / movement", "no drop equivalent"].forEach((it, i) => { const x = 70 + i * 165; el("circle", { cx: x, cy: 40, r: 5, fill: COL.gold }, svg); const lt = el("text", { x: x, y: 60, fill: COL.muted, "font-size": 11, "text-anchor": "middle" }, svg); lt.textContent = it; });
+  })();
+
+  // In-text figure references (a.figref): jump to the figure, leave a floating pill to return.
+  (function () {
+    const refs = document.querySelectorAll("a.figref");
+    if (!refs.length) return;
+    const pill = document.createElement("button");
+    pill.className = "return-pill";
+    pill.textContent = "Back to where you were";
+    pill.hidden = true;
+    document.body.appendChild(pill);
+    let backY = 0;
+    refs.forEach(a => a.addEventListener("click", () => { backY = window.scrollY; pill.hidden = false; }));
+    pill.addEventListener("click", () => { window.scrollTo({ top: backY }); pill.hidden = true; });
   })();
 })();
 </script>

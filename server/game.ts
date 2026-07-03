@@ -14,6 +14,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { TUNING } from '../src/sim/game_config';
 import type { PickAction } from '../src/sim/lockpick';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
@@ -28,6 +29,7 @@ import {
   type EquipSlot,
   emptyMoveInput,
   MAX_LEVEL,
+  PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
   type SimEvent,
 } from '../src/sim/types';
@@ -40,6 +42,10 @@ import type {
   SessionRuntimeSnapshot,
   SuspiciousPlayer,
 } from './bot_detector/contract';
+import {
+  buildDetectionCalibrationSnapshot,
+  type DetectionCalibrationSnapshot,
+} from './calibration_snapshot';
 import { ChatFilter } from './chat_filter';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
@@ -49,6 +55,7 @@ import {
   closePlaySession,
   grantAccountMechChroma,
   insertChatLogs,
+  loadMailState,
   loadMarketState,
   markAccountQuestComplete,
   openPlaySession,
@@ -56,7 +63,9 @@ import {
   revokeAccountMechChroma,
   saveCharacterAndMarketState,
   saveCharacterState,
+  saveMailState,
   saveMarketState,
+  touchCharacterLogin,
   walletForAccount,
 } from './db';
 import { enqueueActivity } from './discord_activity';
@@ -76,6 +85,7 @@ import {
   recordInGameAction,
 } from './moderation_db';
 import { type ModerationHost, ModerationService } from './moderation_service';
+import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createSerialWriter } from './serial_writer';
@@ -251,6 +261,8 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'unequip_item',
+  'equip_bag',
+  'unequip_bag',
   'use',
   'discard',
   'buy',
@@ -276,12 +288,18 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'market_buy',
   'market_cancel',
   'market_collect',
+  'mail_send',
+  'mail_take',
+  'mail_delete',
+  'mail_read',
   'pet_feed',
   'dev_give',
   'dev_level',
 ]);
 const HEAVY_SELF_EVENTS = new Set<string>([
   'loot',
+  'mailArrived',
+  'mailResult',
   'levelup',
   'virtualLevelUp',
   'milestoneUnlocked',
@@ -332,6 +350,10 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
+  // Global inbound-message token bucket (#978): covers every frame (input,
+  // cast, cmd, ...), separate from the chat-only bucket above, so a client
+  // flooding non-chat frames is throttled/kicked instead of processed unconditionally.
+  msgRate: MsgRateBucketState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -549,8 +571,19 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     mhp: e.maxHp,
   };
   if (e.dead) out.dead = 1;
+  if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
+  // The target frame's resource bar: type + current/max, sent only for entities
+  // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
+  // three and the frame hides its bar). The rounded res keeps an idle entity's
+  // serialized record byte-stable so the per-entity dyn cache keeps eliding; the
+  // SELF record still overrides with its own precise res/mres/rtype fields.
+  if (e.resourceType) {
+    out.rtype = e.resourceType;
+    out.res = Math.round(e.resource);
+    out.mres = e.maxResource;
+  }
   if (e.castingAbility) {
     out.cast = e.castingAbility;
     out.castRem = round2(e.castRemaining);
@@ -757,9 +790,13 @@ export class GameServer {
 
   constructor() {
     this.sim = new Sim({
-      seed: WORLD_SEED,
+      // The housekeeping override layer (applied in main() before this ctor
+      // runs) may retarget the seed and the mob respawn base; the TUNING
+      // defaults reproduce the historical values exactly.
+      seed: TUNING.worldSeed ?? WORLD_SEED,
       playerClass: 'warrior',
       noPlayer: true,
+      respawnSeconds: TUNING.respawnSeconds,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
@@ -1055,6 +1092,7 @@ export class GameServer {
             this.saveTimer = 0;
             void this.saveAll('autosave');
             void this.saveMarket();
+            void this.saveMail();
           }
         },
         (err) => console.error('[tick] guarded tick body threw, skipping this tick:', err),
@@ -1488,6 +1526,7 @@ export class GameServer {
       chatLastRateError: 0,
       chatRateViolations: 0,
       chatCooldownUntil: 0,
+      msgRate: createMsgRateBucket(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -1513,6 +1552,11 @@ export class GameServer {
     this.sessionsByCharacterId.set(characterId, session);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
+    // Stamp this character's last world-entry time for the guild-roster "last
+    // seen" readout. Best-effort: a failed write must never block joining.
+    void touchCharacterLogin(characterId).catch((err) =>
+      console.error('failed to stamp character last_login:', err),
+    );
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
         session.dbSessionId = id;
@@ -1682,6 +1726,7 @@ export class GameServer {
               state.level,
               state,
               this.sim.serializeMarket(),
+              this.sim.serializeMail(),
             ),
           );
         } else {
@@ -1747,8 +1792,31 @@ export class GameServer {
     }
   }
 
+  // The Ravenpost mail book: shared global state like the market, persisted as
+  // a single per-realm JSONB blob. Writes ride the market queue so a mail
+  // snapshot can never interleave with the atomic leave-path write.
+  async loadMail(): Promise<void> {
+    try {
+      this.sim.loadMail(await loadMailState());
+    } catch (err) {
+      console.error('failed to load mail:', err);
+    }
+  }
+
+  async saveMail(): Promise<void> {
+    try {
+      await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+    } catch (err) {
+      console.error('failed to save mail:', err);
+    }
+  }
+
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMarketSeller(characterId, oldName, newName);
+  }
+
+  rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
+    return this.sim.rekeyMailOwner(characterId, oldName, newName);
   }
 
   // Close every open play_sessions row; called on graceful shutdown so the
@@ -1765,6 +1833,12 @@ export class GameServer {
   // -------------------------------------------------------------------------
   // Admin dashboard views (read-only)
   // -------------------------------------------------------------------------
+
+  // World facts the housekeeping overview shows (the seed actually in use and
+  // whether dev commands are on).
+  housekeepingSummary(): { worldSeed: number; devCommands: boolean } {
+    return { worldSeed: this.sim.cfg.seed, devCommands: this.sim.devCommands };
+  }
 
   adminStats(): AdminServerStats {
     const mem = process.memoryUsage();
@@ -1810,6 +1884,14 @@ export class GameServer {
 
   suspiciousPlayers(): SuspiciousPlayer[] {
     return this.botDetector.listSuspiciousPlayers();
+  }
+
+  detectionCalibration(): DetectionCalibrationSnapshot {
+    return buildDetectionCalibrationSnapshot(
+      this.botDetector.listCalibrationHistograms(),
+      this.startedAt,
+      Date.now(),
+    );
   }
 
   private liveLocationFor(e: Entity): AdminLiveLocation {
@@ -2112,6 +2194,12 @@ export class GameServer {
 
   handleMessage(session: ClientSession, raw: string): void {
     const receivedAtMs = Date.now();
+    const verdict = consumeMsgToken(session.msgRate, receivedAtMs / 1000);
+    if (verdict === 'kick') {
+      void this.kickSession(session, 'rejected by server', 'moderation action');
+      return;
+    }
+    if (verdict === 'drop') return;
     let msg: unknown;
     try {
       msg = JSON.parse(raw);
@@ -2171,7 +2259,10 @@ export class GameServer {
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
       }
-      if (frame.facing !== null && !e.dead) {
+      // A released spirit turns with the camera like the living; only a corpse that
+      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
+      // this the server drops the ghost's mouselook facing and its run feels inverted.
+      if (frame.facing !== null && (!e.dead || e.ghost)) {
         e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
@@ -2263,6 +2354,9 @@ export class GameServer {
       case 'loot':
         if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid);
         break;
+      case 'autoloot':
+        if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
+        break;
       case 'lootRoll':
         if (
           typeof msg.rollId === 'number' &&
@@ -2287,7 +2381,10 @@ export class GameServer {
           const afterDone = sim.meta(pid)?.questsDone.has(msg.quest) ?? false;
           if (!beforeDone && afterDone) {
             void dailyRewardService
-              .recordQuestCompletion(session.accountId, msg.quest)
+              .recordQuestCompletion(session.accountId, session.characterId, msg.quest)
+              .then((points) => {
+                if (points > 0) this.sendDailyRewardPointsGained(session, points);
+              })
               .catch((err) => console.error('daily reward quest task failed:', err));
             if (msg.quest === ALDRIC_METEOR_QUEST_ID) {
               this.noteAccountQuestComplete(session, msg.quest);
@@ -2342,6 +2439,18 @@ export class GameServer {
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
+      case 'equip_bag':
+        if (typeof msg.item === 'string') {
+          const socket =
+            typeof msg.socket === 'number' && Number.isInteger(msg.socket) ? msg.socket : undefined;
+          sim.equipBag(msg.item, socket, pid);
+        }
+        break;
+      case 'unequip_bag':
+        if (typeof msg.socket === 'number' && Number.isInteger(msg.socket)) {
+          sim.unequipBag(msg.socket, pid);
+        }
+        break;
       case 'change_skin':
         if (typeof msg.skin === 'number') {
           if (msg.catalog === 'mech') {
@@ -2370,6 +2479,12 @@ export class GameServer {
         break;
       case 'release':
         sim.releaseSpirit(pid);
+        break;
+      case 'resurrect_corpse':
+        sim.resurrectAtCorpse(pid);
+        break;
+      case 'resurrect_healer':
+        sim.resurrectAtSpiritHealer(pid);
         break;
       case 'challengeResponse':
         if (typeof msg.n === 'string' && typeof msg.r === 'string' && typeof msg.sig === 'string') {
@@ -2631,6 +2746,33 @@ export class GameServer {
       case 'guild_disband':
         void this.social.guildDisband(this.actorFor(session)).catch(logSocialErr);
         break;
+      case 'guild_event_create':
+        // Guild calendar booking: title/note are player text, so they flow
+        // through the same mute + rate + hard-word gates as chat before the
+        // service applies its own officer/date/cap validation.
+        if (
+          typeof msg.day === 'string' &&
+          typeof msg.title === 'string' &&
+          typeof msg.note === 'string' &&
+          (msg.hour === null || typeof msg.hour === 'number')
+        ) {
+          if (this.isChatMuted(session)) break;
+          if (!this.consumeChatToken(session)) break;
+          if (this.enforceChatPolicy(session, `${msg.title}\n${msg.note}`)) break;
+          void this.social
+            .guildEventCreate(this.actorFor(session), {
+              day: msg.day,
+              hour: msg.hour === null ? null : msg.hour,
+              title: msg.title,
+              note: msg.note,
+            })
+            .catch(logSocialErr);
+        }
+        break;
+      case 'guild_event_remove':
+        if (typeof msg.id === 'number')
+          void this.social.guildEventRemove(this.actorFor(session), msg.id).catch(logSocialErr);
+        break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
         const fmt = msg.format === '2v2' ? '2v2' : msg.format === 'fiesta' ? 'fiesta' : '1v1';
@@ -2707,6 +2849,92 @@ export class GameServer {
         break;
       case 'market_collect':
         sim.marketCollect(pid);
+        break;
+      case 'mail_send': {
+        if (
+          typeof msg.to !== 'string' ||
+          typeof msg.subject !== 'string' ||
+          typeof msg.body !== 'string' ||
+          typeof msg.copper !== 'number' ||
+          !Number.isFinite(msg.copper) ||
+          !Array.isArray(msg.items) ||
+          msg.items.length > 3 // MAIL_MAX_ATTACHMENTS; the Sim re-validates
+        )
+          break;
+        const items: { itemId: string; count: number }[] = [];
+        let itemsOk = true;
+        for (const raw of msg.items as unknown[]) {
+          const slot = raw as { itemId?: unknown; count?: unknown } | null;
+          if (
+            !slot ||
+            typeof slot.itemId !== 'string' ||
+            typeof slot.count !== 'number' ||
+            !Number.isFinite(slot.count)
+          ) {
+            itemsOk = false;
+            break;
+          }
+          items.push({ itemId: slot.itemId, count: Math.floor(slot.count) });
+        }
+        if (!itemsOk) break;
+        // Player-written subject/body flow through the same gates as chat
+        // (mute, rate limit, hard-word policy); authored system/NPC letters
+        // never come this way. The escrow itself resolves inside the Sim.
+        if (this.isChatMuted(session)) break;
+        if (!this.consumeChatToken(session)) break;
+        const subject = msg.subject.slice(0, 64);
+        const body = msg.body.slice(0, 600);
+        if (this.enforceChatPolicy(session, `${subject}\n${body}`)) break;
+        const to = msg.to.trim().slice(0, 32);
+        const copper = msg.copper;
+        const live = this.sessionByName(to);
+        if (live) {
+          sim.mailSendResolved(
+            { key: String(live.characterId), name: live.name },
+            subject,
+            body,
+            copper,
+            items,
+            pid,
+          );
+          break;
+        }
+        // Offline recipient: resolve against the character DB (realm-scoped),
+        // then book the letter on the loop's turn. Re-check the sender is
+        // still this session before touching the sim.
+        void this.socialDb
+          .findCharacterByName(to)
+          .then((target) => {
+            if (this.clients.get(pid) !== session) return;
+            if (!target) {
+              // Structured outcome, localized client-side (the sim's mailResult shape).
+              this.send(session, {
+                t: 'events',
+                list: [{ type: 'mailResult', code: 'noRecipient', pid }],
+              });
+              return;
+            }
+            sim.mailSendResolved(
+              { key: String(target.id), name: target.name },
+              subject,
+              body,
+              copper,
+              items,
+              pid,
+            );
+            session.selfHeavyDirty = true;
+          })
+          .catch((err) => console.error('mail send resolve failed:', err));
+        break;
+      }
+      case 'mail_take':
+        if (typeof msg.id === 'number') sim.mailTake(msg.id, pid);
+        break;
+      case 'mail_delete':
+        if (typeof msg.id === 'number') sim.mailDelete(msg.id, pid);
+        break;
+      case 'mail_read':
+        if (typeof msg.id === 'number') sim.mailMarkRead(msg.id, pid);
         break;
       // dev/ops commands, only when ALLOW_DEV_COMMANDS=1 (never in production)
       case 'dev_level': {
@@ -2821,6 +3049,12 @@ export class GameServer {
         const delve = Object.values(DELVES).find((d) => d.autoCompanionId === msg.companionId);
         if (!delve || Math.hypot(e.pos.x - delve.doorPos.x, e.pos.z - delve.doorPos.z) > 12) break;
         sim.companionUpgrade(msg.companionId, pid);
+        break;
+      }
+      case 'delve_rite_choose': {
+        if (msg.intensity !== 'easy' && msg.intensity !== 'medium' && msg.intensity !== 'hard')
+          break;
+        sim.delveRiteChoose(msg.intensity, pid);
         break;
       }
       case 'delve_buy': {
@@ -3069,7 +3303,6 @@ export class GameServer {
       pcd: round2(p.potionCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
-      comboTgt: p.comboTargetId,
       target: p.targetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,
@@ -3109,6 +3342,10 @@ export class GameServer {
       'lockouts',
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
+    // Where the player's corpse lies while their spirit is a ghost (null otherwise).
+    // Delta-guarded: ships on death-release and clears on resurrect. The client
+    // draws the corpse marker and gates the resurrect-at-corpse button on it.
+    maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
@@ -3123,6 +3360,8 @@ export class GameServer {
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
+    maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     // open need-greed rolls this player can still answer, so a client that
     // missed the transient lootRoll event re-shows the prompt from state. Stays
     // per-tick (it's interactive state that appears from others' actions).
@@ -3133,6 +3372,11 @@ export class GameServer {
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
     maybe('dclears', this.sim.delveClearsFor(anchorSession.pid));
     maybe('delveDaily', this.sim.delveDailyWire(anchorSession.pid));
+    // Gathering profession proficiency (Mining/Logging/Herbalism), a small
+    // per-player read, so kept per-tick like the other small maps above. Wire
+    // key `prof` and IWorld member `professionsState` are the settled names
+    // for the professions facet (#1164, src/sim/professions/CLAUDE.md).
+    maybe('prof', this.sim.professionsStateFor(anchorSession.pid));
     // stats + weapon stay per-tick: recalcPlayerStats re-derives them on every
     // stat-affecting aura gain/loss (Bear/Cat Form, shouts, debuffs, elixir
     // wear-off, a buff cast on you by someone else), none of which mark this
@@ -3154,6 +3398,7 @@ export class GameServer {
       session.selfHeavyDirty = false;
       session.lastWireRev = meta.wireRev;
       maybe('inv', meta.inventory);
+      maybe('bags', meta.bags);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('cosmetics', anchorSession.accountCosmetics);
@@ -3200,6 +3445,15 @@ export class GameServer {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
+                // The mini aura strip under the member's party row (mirrors
+                // Sim.partyInfo): first N in aura order, id + kind + sap flag
+                // only, no countdown, so this payload changes only when the
+                // aura SET changes and the party delta elision keeps working.
+                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
+                  id: a.id,
+                  kind: a.kind,
+                  ...(a.value < 0 ? { neg: 1 } : {}),
+                })),
               }
             : null;
         })
@@ -3319,6 +3573,9 @@ export class GameServer {
             format: ev.format,
             ratingBefore: ev.ratingBefore,
             ratingAfter: ev.ratingAfter,
+          })
+          .then((points) => {
+            if (points > 0) this.sendDailyRewardPointsGained(s, points);
           })
           .catch((err) => console.error('daily reward arena task failed:', err));
         if (!ev.won) continue;
@@ -3552,6 +3809,19 @@ export class GameServer {
 
   private sendSystemNotice(session: ClientSession, text: string): void {
     this.send(session, { t: 'events', list: [{ type: 'log', text, color: '#ffd100' }] });
+  }
+
+  private sendDailyRewardPointsGained(session: ClientSession, points: number): void {
+    this.send(session, {
+      t: 'events',
+      list: [
+        {
+          type: 'log',
+          text: `${Math.max(0, Math.floor(points))} daily rewards points gained.`,
+          color: '#ffe27a',
+        },
+      ],
+    });
   }
 
   /**

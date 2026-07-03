@@ -43,6 +43,7 @@ describe('bot-detector stub (open-source no-op)', () => {
     detector.observeProtocolAnomaly(ctx, 'unknown_command', '{"t":"cmd","cmd":"x"}', Date.now());
     expect(detector.handleTick(ctx, Date.now(), true, snapshot)).toBe('none');
     expect(detector.listSuspiciousPlayers()).toEqual([]);
+    expect(detector.listCalibrationHistograms()).toEqual([]);
 
     detector.releaseTrackingContext(ctx);
   });

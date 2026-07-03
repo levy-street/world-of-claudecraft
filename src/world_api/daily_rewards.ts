@@ -3,6 +3,7 @@ export interface DailyRewardTaskView {
   title: string;
   description: string;
   points: number;
+  multiplier?: number | null;
   completed: boolean;
   locked: boolean;
 }

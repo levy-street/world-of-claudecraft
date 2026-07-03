@@ -27,7 +27,7 @@
 // DOM/Three/render/ui/game/net, no Math.random/Date.now), enforced by
 // tests/architecture.test.ts.
 
-import { ITEMS, MOBS } from '../data';
+import { ITEMS, isDelvePos, MOBS } from '../data';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -247,7 +247,8 @@ export function castAbility(
     ctx.error(p.id, 'Your target must dodge first.');
     return;
   }
-  if (ability.spendsCombo && (p.comboPoints <= 0 || p.comboTargetId !== p.targetId)) {
+  // combo points are character-bound: any built points finish on the current target
+  if (ability.spendsCombo && p.comboPoints <= 0) {
     ctx.error(p.id, 'That ability requires combo points.');
     return;
   }
@@ -259,7 +260,7 @@ export function castAbility(
   if (ability.requiresForm) {
     const need = ability.requiresForm === 'bear' ? 'form_bear' : 'form_cat';
     if (!form || form.kind !== need) {
-      ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bear' : 'Wolf'} Form.`);
+      ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bruin' : 'Wolf'} Form.`);
       return;
     }
   } else if (form && !isFormToggle(ability)) {
@@ -604,23 +605,36 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   const billableCost = (): number =>
     res.cost > 0 && !togglingOff && consumeNextCastFree(ctx, p) ? 0 : res.cost;
   if (ability.id === 'conjure_water') {
-    spendResource(p, billableCost());
     // higher ranks conjure better water (falls back if the item isn't defined)
     const tiered = `conjured_water${res.rank}`;
-    ctx.addItem(res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_water', 2, p.id);
+    const waterId = res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_water';
+    if (!ctx.canAddItem(waterId, 2, p.id)) {
+      ctx.error(p.id, 'Your bags are full.');
+      return;
+    }
+    spendResource(p, billableCost());
+    ctx.addItem(waterId, 2, p.id);
     return;
   }
   if (ability.id === 'conjure_food') {
-    spendResource(p, billableCost());
     // higher ranks conjure heartier fare (falls back if the item isn't defined)
     const tiered = `conjured_bread${res.rank}`;
-    ctx.addItem(res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_bread', 2, p.id);
+    const foodId = res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_bread';
+    if (!ctx.canAddItem(foodId, 2, p.id)) {
+      ctx.error(p.id, 'Your bags are full.');
+      return;
+    }
+    spendResource(p, billableCost());
+    ctx.addItem(foodId, 2, p.id);
     return;
   }
   if (ability.id === 'revive_pet') {
     const pet = ctx.petOf(p.id, true);
     if (!pet) {
-      ctx.error(p.id, 'You have no pet.');
+      ctx.error(
+        p.id,
+        isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+      );
       return;
     }
     if (!pet.dead) {
@@ -677,7 +691,15 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     return;
   }
 
-  if (target && ability.school !== 'physical') {
+  // A ranged attack travels as a projectile, so its damage/effects resolve when the
+  // bolt LANDS, not at cast completion. Every non-physical spell is a bolt by
+  // convention (school proxy); a physical ranged shot (hunter Aimed / Concussive Shot)
+  // opts in with projectile:true. Without this a physical shot deals its damage
+  // instantly while the arrow is still visibly in flight (health drops, or the mob
+  // dies, before it arrives).
+  const firesProjectile = ability.school !== 'physical' || ability.projectile === true;
+  if (target && firesProjectile) {
+    const isSpell = ability.school !== 'physical';
     spendAbilityCost(p, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.emit({
@@ -689,11 +711,12 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the
     // target (projectile_travel), not this tick. A target that dies before impact
-    // takes nothing (the drain fizzles the projectile). Spells never "miss" like a
-    // physical attack; a target can only fully RESIST them (classic-era semantics),
-    // so the on-impact roll uses isSpellResisted and emits a 'resist', not a 'miss'.
+    // takes nothing (the fizzle is handled by scheduleProjectile). Spells never "miss"
+    // like a physical attack; a target can only fully RESIST them (classic-era
+    // semantics), so a spell's on-impact roll uses isSpellResisted and emits a 'resist'.
+    // A physical shot has no resist roll; its hit/crit resolve inside runEffects.
     scheduleProjectile(ctx, p, target, (src, tgt) => {
-      if (isSpellResisted(ctx.rng, src.level, tgt.level)) {
+      if (isSpell && isSpellResisted(ctx.rng, src.level, tgt.level)) {
         ctx.emit({
           type: 'damage',
           sourceId: src.id,

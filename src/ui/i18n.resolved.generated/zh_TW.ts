@@ -154,6 +154,11 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "death": {
+      "resurrectAtCorpse": "在屍體旁復活",
+      "resurrectAtHealer": "靈魂醫者（復活虛弱）",
+      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
+    },
     "emotes": {
       "wave": "揮手",
       "laugh": "大笑",
@@ -202,6 +207,10 @@ export const zh_TW: EnTranslations = {
       "spinResult": "+{points} 點",
       "spinButton": "轉動",
       "tasks": "任務",
+      "taskMultiplier": "{multiplier}倍倍率",
+      "pointsGained": "已獲得 {points} 每日獎勵點數。",
+      "showChestButton": "顯示寶箱",
+      "hideChestButton": "隱藏寶箱",
       "leaderboard": "每日排行榜",
       "totalPlayer": "今天 {count} 名玩家",
       "totalPlayers": "今天 {count} 名玩家",
@@ -282,7 +291,10 @@ export const zh_TW: EnTranslations = {
       "targetAnnounce": "目標：{name}",
       "partyLabel": "你的隊伍",
       "partyGroup": "小隊 {n}",
-      "durationUnitSeconds": "秒"
+      "durationUnitSeconds": "秒",
+      "durationUnitMinutes": "分",
+      "durationUnitHours": "時",
+      "durationUnitDays": "天"
     },
     "character": {
       "modelPreview": "角色模型預覽"
@@ -400,14 +412,20 @@ export const zh_TW: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色畫面顯示錢包",
       "showWalletOnPlayerCard": "在玩家卡片顯示錢包",
       "showDevBadges": "顯示開發者徽章",
+      "showOwnNameplate": "顯示我的姓名板",
       "uiScale": "介面縮放",
+      "playerFrameScale": "玩家框縮放",
+      "targetFrameScale": "目標框縮放",
+      "aurasOnPlayerFrame": "增益顯示在玩家框",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
+      "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
-      "showSecondaryActionBar": "顯示副動作列"
+      "showSecondaryActionBar": "顯示副動作列",
+      "showDailyRewardsChest": "顯示每日獎勵寶箱"
     },
     "controller": {
       "title": "手把",
@@ -726,7 +744,8 @@ export const zh_TW: EnTranslations = {
       "summaryGroup": "拾取設定：小隊拾取。"
     },
     "party": {
-      "promoteLeader": "提升為隊長"
+      "promoteLeader": "提升為隊長",
+      "inviteUsage": "邀請誰？用法：/invite <名稱>。"
     },
     "lootSettings": {
       "title": "拾取設定",
@@ -753,7 +772,13 @@ export const zh_TW: EnTranslations = {
       "sortName": "名稱",
       "searchPlaceholder": "搜尋物品",
       "searchAria": "依名稱搜尋背包物品",
-      "noMatch": "沒有符合篩選條件的物品。"
+      "noMatch": "沒有符合篩選條件的物品。",
+      "capacity": "{used}/{total}",
+      "capacityAria": "背包格已用：{used}/{total}",
+      "backpack": "背包",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "空背包欄位",
+      "unequipHint": "點擊移除此背包"
     },
     "raidConvert": {
       "toPartyDone": "你的團隊已轉換回隊伍。",
@@ -796,6 +821,7 @@ export const zh_TW: EnTranslations = {
         "spi": "精神降低 {value}",
         "allStats": "所有屬性降低 {value}"
       },
+      "allStatsPctReduce": "所有屬性降低 {pct}%",
       "dodge": "閃躲機率提高 {pct}%",
       "dodgeReduce": "閃避機率降低 {pct}%",
       "armorFlat": "護甲降低 {value}",
@@ -835,6 +861,9 @@ export const zh_TW: EnTranslations = {
         "nature": "自然"
       }
     },
+    "worldBoss": {
+      "spawn": "{name}在荊峰高地崛起！"
+    },
     "loot": {
       "chestTitle": "寶箱"
     },
@@ -845,6 +874,23 @@ export const zh_TW: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "等級 {level} {family}",
+      "familyDemon": "惡魔",
+      "hostile": "敵對",
+      "friendly": "友方"
+    },
+    "targetFrame": {
+      "unlock": "移動目標框",
+      "lock": "鎖定目標框"
+    },
+    "playerFrame": {
+      "unlock": "移動玩家框",
+      "lock": "鎖定玩家框"
+    },
+    "frameReset": {
+      "label": "重置框體位置"
     },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}"
@@ -927,6 +973,7 @@ export const zh_TW: EnTranslations = {
       "memberSinceDays": "已加入 Discord {days} 天",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "管理員",
         "devs": "開發者",
         "mods": "管理員",
         "artists": "美術"
@@ -1019,6 +1066,116 @@ export const zh_TW: EnTranslations = {
       },
       "linkedAs": "已連結為 {login}",
       "unlink": "取消連結 GitHub"
+    },
+    "mailbox": {
+      "title": "郵箱",
+      "subtitle": "渡鴉郵驛",
+      "close": "關閉郵箱",
+      "tabInbox": "收件匣",
+      "tabInboxWithCount": "收件匣（{count}）",
+      "tabSend": "Send",
+      "empty": "你的郵箱是空的。",
+      "truncated": "顯示最新的 {shown} 封信（共 {total} 封）。",
+      "attachmentsBadge": "附有包裹",
+      "unreadBadge": "未讀",
+      "back": "Back",
+      "take": "領取附件",
+      "delete": "刪除信件",
+      "deleteAria": "刪除信件 {subject}",
+      "openAria": "閱讀來自 {name} 的信件 {subject}",
+      "noSubject": "（無主題）",
+      "toLabel": "To",
+      "toPlaceholder": "角色名字",
+      "subjectLabel": "主題",
+      "bodyLabel": "內容",
+      "coinLabel": "附上錢幣",
+      "parcelsLabel": "包裹",
+      "parcelsHint": "點擊背包中的物品即可附上。",
+      "removeParcelAria": "從信件中移除 {item}",
+      "sendButton": "寄出信件",
+      "postageNote": "郵資：{amount}。渡鴉飛行約 {seconds} 秒。",
+      "arrivedBanner": "渡鴉已降落：來自 {name} 的郵件。",
+      "arrivedLog": "你收到了來自 {name} 的新郵件。",
+      "indicatorAria": "未讀郵件：{count}",
+      "indicatorTip": "你有 {count} 封未讀信件。請前往郵箱閱讀。",
+      "clickAttach": "點擊以附到信件上。",
+      "cannotMail": "該物品無法郵寄。",
+      "result": {
+        "sent": "渡鴉帶著你給 {name} 的信起飛了（郵資 {postage}）。",
+        "collected": "你從信件中取出 {amount}。",
+        "tooFar": "你必須站在郵箱旁才能處理郵件。",
+        "needRecipient": "請寫明信件的收件人。",
+        "noRecipient": "這裡沒有叫這個名字的郵箱主人。",
+        "tooManyParcels": "一封信最多可攜帶 {count} 個包裹。",
+        "noMailQuestItems": "你不能郵寄任務物品。",
+        "notEnoughItems": "你沒有那麼多可寄送的物品。",
+        "cantAffordPostage": "你付不起郵資。",
+        "recipientBoxFull": "對方的郵箱已滿。",
+        "letterGone": "那封信已不在你的郵箱裡。",
+        "takeParcelsFirst": "請先取出包裹再丟棄信件。"
+      }
+    },
+    "calendar": {
+      "title": "活動日曆",
+      "close": "關閉日曆",
+      "keybindLabel": "活動日曆",
+      "prevMonth": "上個月",
+      "nextMonth": "下個月",
+      "dayAria": "{date}：{count} 個活動",
+      "noEvents": "這一天沒有安排。",
+      "allDay": "全天",
+      "bookedBy": "由 {name} 安排",
+      "deleteAria": "移除活動 {title}",
+      "bookTitle": "安排公會活動",
+      "titlePlaceholder": "活動名稱",
+      "notePlaceholder": "備註（可選）",
+      "hourLabel": "小時（UTC）",
+      "hourAllDay": "全天",
+      "addButton": "安排活動",
+      "guildOnlyNote": "加入公會即可一起計劃活動。",
+      "result": {
+        "created": "活動已列入公會日曆。",
+        "removed": "活動已從日曆中移除。",
+        "notInGuild": "你不在公會中。",
+        "notOfficer": "只有幹部和會長可以管理公會活動。",
+        "badInput": "請為活動填寫名稱和有效日期。",
+        "calendarFull": "公會日曆已滿。",
+        "eventGone": "該活動已不在日曆上。"
+      },
+      "events": {
+        "raidCall": {
+          "title": "團隊集結",
+          "note": "守衛吹響號角：組隊前往地穴與團隊副本。"
+        },
+        "marketDay": {
+          "title": "集市日",
+          "note": "商人正等著新貨。今天很適合逛逛世界市場。"
+        },
+        "fiestaNight": {
+          "title": "狂歡之夜",
+          "note": "今晚 2v2 狂歡擂台的人氣最旺。"
+        },
+        "arenaClash": {
+          "title": "競技場之戰",
+          "note": "決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。"
+        },
+        "fishingDerby": {
+          "title": "釣魚大賽",
+          "note": "釣手們在湖邊排開。帶上魚竿，交流釣魚趣聞。"
+        },
+        "delveDay": {
+          "title": "探窟日",
+          "note": "哈爾文修士在圖上做了標記：宜探坍塌聖物窖。"
+        },
+        "moongateCommunion": {
+          "title": "月門共禱",
+          "note": "朝聖者在月中之月下聚於神廟月門。"
+        }
+      }
+    },
+    "social": {
+      "lastSeen": "最後上線: {when}",
+      "lastSeenNever": "從未"
     }
   },
   "guide": {
@@ -1417,13 +1574,13 @@ export const zh_TW: EnTranslations = {
       "thorns": "守護友方，讓近戰攻擊者每次出手都會傷到自己。"
     },
     "petHook": {
-      "imp": "一隻遠程的火焰箭惡魔，從安全距離外慢慢削弱敵人。",
-      "voidwalker": "一隻堅實的惡魔，會嘲諷並吸收攻擊，讓你能安心施法。",
-      "succubus": "一隻快速的近戰惡魔，攻擊兇猛但承受壓力時容易倒下。",
-      "felhunter": "一隻暗影游擊手，專門糾纏敵方施法者。",
-      "felguard": "一隻耐打的近戰猛將，是你能召喚後的全能型寵物。",
-      "infernal": "一隻龐大的巨獸，擁有摧枯拉朽的近戰，為純粹的力量而召喚。",
-      "doomguard": "一隻精英施法者，從遠處降下沉重的暗影傷害。"
+      "emberkin": "一隻遠程的火焰箭惡魔，從安全距離外慢慢削弱敵人。",
+      "gloomshade": "一隻堅實的惡魔，會嘲諷並吸收攻擊，讓你能安心施法。",
+      "duskborn": "一隻快速的近戰惡魔，攻擊兇猛但承受壓力時容易倒下。",
+      "spellhound": "一隻暗影游擊手，專門糾纏敵方施法者。",
+      "warfiend": "一隻耐打的近戰猛將，是你能召喚後的全能型寵物。",
+      "pyre_colossus": "一隻龐大的巨獸，擁有摧枯拉朽的近戰，為純粹的力量而召喚。",
+      "wraithborn": "一隻精英施法者，從遠處降下沉重的暗影傷害。"
     },
     "bestiary": {
       "heading": "生物圖鑑",
@@ -1449,11 +1606,11 @@ export const zh_TW: EnTranslations = {
         "name": "蜘蛛",
         "desc": "在黑暗糾結之地築巢的織網者與毒蟲。獵人能像馴服野獸一樣馴服牠們。"
       },
-      "murloc": {
+      "mudfin": {
         "name": "魚人",
         "desc": "兩棲的沼澤居民，成群聚集於淺灘，喧鬧且強烈護衛地盤。"
       },
-      "kobold": {
+      "burrower": {
         "name": "狗頭人",
         "desc": "頭頂蠟燭的挖掘者，盤踞於礦坑與洞穴中，凶猛地守衛著礦石。"
       },
@@ -1847,6 +2004,430 @@ export const zh_TW: EnTranslations = {
       "home": "返回總覽"
     }
   },
+  "editor": {
+    "appTitle": "地圖編輯器",
+    "docTitle": "地圖編輯器 - World of ClaudeCraft",
+    "untitledMap": "未命名地圖",
+    "playtestPlayerName": "製圖師",
+    "topbar": {
+      "label": "編輯器操作",
+      "mapNameLabel": "地圖名稱",
+      "dirty": "有未儲存的變更",
+      "dirtyDot": "此地圖有未儲存的變更",
+      "clean": "所有變更已儲存",
+      "savedLocal": "已儲存到此瀏覽器",
+      "savedServer": "已儲存到伺服器（v{version}）",
+      "saving": "儲存中...",
+      "neverSaved": "尚未儲存",
+      "new": "新增",
+      "newTitle": "以內建世界新增一張地圖",
+      "open": "開啟",
+      "openTitle": "開啟已儲存的地圖（瀏覽器或伺服器）",
+      "save": "儲存",
+      "saveTitle": "儲存到此瀏覽器；已登入時同時儲存到伺服器（Ctrl+S）",
+      "saveAs": "另存新檔",
+      "saveAsTitle": "以新名稱儲存一份副本",
+      "fork": "分支",
+      "forkTitle": "在伺服器上建立一份屬於你的副本",
+      "forkDisabledTitle": "請先開啟一張伺服器地圖再建立分支",
+      "import": "匯入",
+      "importTitle": "從 JSON 檔案匯入地圖",
+      "export": "匯出",
+      "exportTitle": "將此地圖下載為 JSON 檔案",
+      "uploadAsset": "上傳資源",
+      "uploadAssetTitle": "上傳 GLB 模型（最大 8 MiB）以放置到你的地圖中",
+      "uploadAssetDisabledTitle": "請先在遊戲中登入再上傳資源",
+      "playtest": "試玩",
+      "playtestTitle": "在此地圖上啟動遊戲（離線，包含目前的編輯）",
+      "viewLabel": "檢視模式",
+      "view3d": "3D",
+      "view3dTitle": "在渲染後的世界中編輯",
+      "view2d": "2D",
+      "view2dTitle": "在俯視示意圖上編輯",
+      "undoCount": "復原：{count}",
+      "undoCountTitle": "可復原 {count} 步（Ctrl+Z 復原，Ctrl+Y 重做）",
+      "autosave": "自動儲存",
+      "autosaveTitle": "有未儲存的變更時自動儲存地圖。儲存失敗時會自動關閉。",
+      "undo": "Undo",
+      "undoTitle": "復原上一次變更（Ctrl+Z）",
+      "redo": "Redo",
+      "redoTitle": "重做上一次復原的變更（Ctrl+Y）",
+      "offline": "離線",
+      "offlineTitle": "未登入：地圖只會儲存到此瀏覽器。請在遊戲中登入以線上儲存。",
+      "signIn": "登入",
+      "signInTitle": "在新分頁開啟遊戲登入畫面",
+      "help": "說明",
+      "helpTitle": "編輯器指南：工具、快捷鍵與教學"
+    },
+    "tool": {
+      "listLabel": "編輯器工具",
+      "keyHint": "{name}（{key}）",
+      "select": "選取",
+      "raise": "抬升",
+      "lower": "下壓",
+      "smooth": "平滑",
+      "flatten": "壓平",
+      "paint": "繪製生態",
+      "water": "水面",
+      "place": "放置資源",
+      "blocker": "空氣牆",
+      "camp": "營地",
+      "spawn": "出生點",
+      "region": "區域",
+      "erase": "擦除"
+    },
+    "inspector": {
+      "label": "工具選項"
+    },
+    "brush": {
+      "title": "筆刷",
+      "size": "筆刷大小",
+      "strength": "強度",
+      "sizeHint": "快捷鍵：[ 和 ] 調整筆刷大小；Shift+[ 和 Shift+] 調整強度。",
+      "editCount": "地形編輯數：{count} / {max}"
+    },
+    "biome": {
+      "title": "生態",
+      "paletteLabel": "要繪製的生態",
+      "vale": "谷地",
+      "marsh": "沼澤",
+      "peaks": "山峰",
+      "beach": "海灘",
+      "desert": "沙漠",
+      "volcano": "火山",
+      "cave": "洞穴",
+      "erase": "擦除繪製",
+      "hint": "繪製的格子會覆蓋區域生態，改變地形形狀與顏色。",
+      "clear": "清除全部生態繪製",
+      "clearConfirm": "移除此地圖上所有已繪製的生態格子？"
+    },
+    "flatten": {
+      "hint": "壓平會把地面拉平到拖曳開始時游標下的高度。",
+      "hardEdge": "硬邊緣"
+    },
+    "water": {
+      "title": "水面高度",
+      "level": "水面高度",
+      "hint": "設定全圖水面高度，範圍 {min} 到 {max} 碼。",
+      "reset": "重設為內建高度"
+    },
+    "place": {
+      "title": "放置資源",
+      "scale": "縮放",
+      "collide": "阻擋移動",
+      "collideHint": "阻擋型資源會產生玩家無法穿過的碰撞範圍。",
+      "randomRotation": "隨機旋轉",
+      "chosen": "正在放置：{name}",
+      "none": "先在下方瀏覽器中選擇一個資源，然後點擊地面放置。"
+    },
+    "blockerTool": {
+      "title": "空氣牆",
+      "hint": "沿地面拖曳即可繪製一堵玩家無法穿過或跳過的隱形牆。放開即放置；短於半碼的牆會被捨棄。",
+      "count": "空氣牆：{count} / {max}"
+    },
+    "camp": {
+      "title": "怪物營地",
+      "mob": "怪物",
+      "count": "數量",
+      "radius": "半徑",
+      "delete": "刪除營地",
+      "hint": "點擊空地新增營地，或點擊既有營地進行編輯。",
+      "playtestNote": "怪物只會在試玩中出現，編輯器畫面中不會出現。",
+      "selected": "營地：{mob}",
+      "none": "未選取營地。"
+    },
+    "spawn": {
+      "title": "出生點",
+      "hint": "點擊地面設定試玩時玩家的出生位置。",
+      "position": "出生點：{x}，{z}",
+      "unset": "使用內建的起始位置。",
+      "clear": "清除出生點"
+    },
+    "region": {
+      "title": "區域",
+      "hint": "拖出一個框以選取放置物與地形編輯。複製後點擊即可貼上。",
+      "hint3d": "區域框在 2D 檢視中繪製；複製與貼上在兩種檢視都可用。",
+      "copy": "複製區域",
+      "pasteBeside": "貼在旁邊",
+      "copied": "已複製 {assets} 個資源和 {edits} 個地形編輯。",
+      "pasted": "已貼上 {count} 個項目。",
+      "needBox": "請先拖出一個區域框。",
+      "needClipboard": "請先複製一個區域。"
+    },
+    "eraseTool": {
+      "title": "擦除",
+      "hint": "點擊已放置的資源可移除它；點擊雕塑過的地面可移除游標下最新的印記。",
+      "blockerHint": "在空氣牆附近點擊會改為移除該牆。"
+    },
+    "selection": {
+      "title": "選取項目",
+      "none": "未選取任何內容。使用「選取」工具點擊已放置的資源。",
+      "asset": "資源：{name}",
+      "x": "X",
+      "z": "Z",
+      "rotation": "旋轉",
+      "scale": "縮放",
+      "collide": "阻擋移動",
+      "radius": "碰撞半徑",
+      "radiusAuto": "自動",
+      "radiusAutoTitle": "將碰撞半徑重設為跟隨資源縮放",
+      "radiusHint": "「自動」依資源縮放推導碰撞半徑；拖曳滑桿可覆寫它。",
+      "footprints": "顯示碰撞範圍",
+      "duplicate": "再複製一份",
+      "delete": "刪除",
+      "deleteHint": "刪除會移除選取項目；Ctrl+Z 可復原。",
+      "moveHint": "移動：在 3D 檢視中沿地面拖曳資產，或用方向鍵微調（0.5 碼，按住 Shift 為 2 碼）。",
+      "wheelHint": "Shift+滾輪旋轉資產，Alt+滾輪縮放資產，Ctrl+D 複製資產。"
+    },
+    "marker": {
+      "title": "標記",
+      "reset": "重設位置",
+      "moved": "{count} 個標記偏離了內建配置。"
+    },
+    "layers": {
+      "title": "圖層",
+      "hub": "樞紐",
+      "graveyard": "墓地",
+      "lake": "湖泊",
+      "poi": "興趣點",
+      "camp": "營地",
+      "npc": "NPC",
+      "object": "物件",
+      "blocker": "空氣牆"
+    },
+    "frame": {
+      "title": "取景",
+      "all": "全部"
+    },
+    "procgen": {
+      "title": "程序生成",
+      "count": "數量",
+      "scatter": "散布該分類的資源",
+      "hills": "生成連綿丘陵",
+      "scattered": "已從 {category} 散布 {count} 個資源。",
+      "hillsAdded": "已加入 {count} 座丘陵。",
+      "noAssets": "該分類下沒有資源。"
+    },
+    "assets": {
+      "title": "資源瀏覽器",
+      "label": "資源瀏覽器",
+      "search": "搜尋資源",
+      "searchPlaceholder": "搜尋資源...",
+      "empty": "沒有符合的資源。",
+      "uploadedTab": "已上傳",
+      "uploadedEmpty": "還沒有上傳的資源。使用「上傳資源」加入 GLB 模型（最大 8 MiB）。",
+      "uploadedSignIn": "在遊戲中登入後即可上傳並放置你自己的 GLB 模型。",
+      "uploadedLoadFailed": "無法載入你上傳的資源。",
+      "deleteAsset": "刪除已上傳的資源",
+      "deleteAssetConfirm": "刪除已上傳的資源「{name}」？使用它的地圖會失去該模型。",
+      "pick": "放置{name}",
+      "categoryTab": "{category}（{count}）",
+      "category": {
+        "biome": "生態",
+        "chars": "角色",
+        "creatures": "生物",
+        "dungeon": "地城",
+        "foliage": "植被",
+        "props": "道具",
+        "quest": "任務",
+        "resources": "資源點",
+        "tools": "工具",
+        "weapons": "武器"
+      }
+    },
+    "upload": {
+      "notGlb": "請選擇一個 .glb 檔案。",
+      "tooLarge": "該檔案超過 8 MiB 上限。",
+      "uploading": "正在上傳資源...",
+      "uploaded": "資源已上傳：{name}",
+      "uploadedExisting": "該模型已在伺服器上，直接沿用。",
+      "deleted": "已刪除上傳的資源。"
+    },
+    "openDrawer": {
+      "title": "開啟地圖",
+      "close": "關閉",
+      "tabLocal": "此瀏覽器",
+      "tabMine": "我的伺服器地圖",
+      "tabPublic": "公開地圖",
+      "colName": "名稱",
+      "colUpdated": "更新時間",
+      "colStatus": "狀態",
+      "statusPublic": "公開",
+      "statusPrivate": "私人",
+      "open": "開啟",
+      "fork": "分支",
+      "publish": "發布",
+      "unpublish": "取消發布",
+      "delete": "刪除",
+      "draft": "自動儲存的草稿",
+      "emptyLocal": "此瀏覽器還沒有已儲存的地圖。儲存一張後會顯示在這裡。",
+      "emptyMine": "伺服器上還沒有地圖。登入後儲存即可建立。",
+      "emptyPublic": "還沒有公開地圖。",
+      "loading": "正在載入地圖...",
+      "loadFailed": "無法從伺服器載入地圖。",
+      "signInHint": "在遊戲中登入後即可瀏覽、儲存和分支伺服器地圖。",
+      "deleteLocalConfirm": "刪除本機地圖「{name}」？",
+      "deleteServerConfirm": "刪除伺服器地圖「{name}」？此操作無法復原。",
+      "prev": "上一頁",
+      "next": "下一頁",
+      "page": "第 {page} 頁"
+    },
+    "status": {
+      "savedLocal": "已將「{name}」儲存到此瀏覽器。",
+      "savedServer": "已將「{name}」儲存到伺服器（v{version}）。",
+      "savedLocalOnly": "已將「{name}」儲存到此瀏覽器。登入後可線上儲存。",
+      "saveFailedLocal": "本機儲存失敗（儲存空間遭封鎖）。",
+      "opened": "已開啟「{name}」。",
+      "imported": "已匯入「{name}」。",
+      "importFailed": "匯入已取消，或該檔案不是有效的地圖。",
+      "exported": "已下載「{name}」。",
+      "newMap": "已以內建世界新增地圖。",
+      "forked": "已分支為「{name}」。你現在編輯的是自己的副本。",
+      "published": "地圖已發布。任何人都能找到並分支它。",
+      "unpublished": "地圖已取消發布。",
+      "deleted": "地圖已刪除。",
+      "assetPlacedFirst": "請先在瀏覽器中選擇一個資源。",
+      "loading3d": "正在載入世界...",
+      "playtestLaunch": "正在啟動試玩...",
+      "playtestFailed": "無法啟動試玩（儲存空間遭封鎖）。",
+      "draftSaved": "草稿已自動儲存。",
+      "draftRestored": "已還原自動儲存的草稿。",
+      "autosaveFailed": "自動儲存失敗（瀏覽器儲存空間已滿或被封鎖）。請匯出地圖以保留備份。",
+      "terrainCapReached": "已達到地形編輯上限（{max}）。多餘的雕刻印記未被加入。",
+      "placementCapReached": "已達到放置上限（{max}）。多餘的資源未被加入。",
+      "blockerCapReached": "已達到空氣牆上限（{max}）。新牆未被加入。",
+      "autosaveOff": "自動儲存已關閉：{reason} 請手動儲存後再重新開啟。"
+    },
+    "confirm": {
+      "ok": "確定",
+      "cancel": "取消",
+      "discardTitle": "捨棄變更？",
+      "discardBody": "「{name}」上有未儲存的變更。要捨棄它們嗎？",
+      "discard": "捨棄",
+      "conflictTitle": "儲存衝突",
+      "conflictBody": "自你開啟以來，此地圖在伺服器上已被修改（目前為 v{version}）。要將你的版本另存為新副本嗎？",
+      "conflictSaveCopy": "另存為副本"
+    },
+    "prompt": {
+      "saveAsTitle": "另存新檔",
+      "nameLabel": "新地圖名稱"
+    },
+    "serverError": {
+      "invalid_map_name": "該地圖名稱不可用。請使用字母、數字、空格、撇號或連字號。",
+      "map_name_not_allowed": "該地圖名稱不被允許。",
+      "invalid_map_doc": "伺服器拒絕了該地圖文件。",
+      "invalid_version": "儲存請求格式有誤。請重新整理後再試。",
+      "map_limit_reached": "你已達到伺服器地圖數量上限。刪除一張後才能繼續儲存。",
+      "map_not_found": "該地圖已不在伺服器上。",
+      "version_conflict": "自你開啟以來，該地圖在伺服器上已被修改。",
+      "slug_unavailable": "伺服器無法為該名稱產生連結。請換一個名稱。",
+      "map_too_large": "地圖文件過大，無法儲存到伺服器。",
+      "invalid_glb": "該檔案不是有效的 GLB 模型。",
+      "asset_blocked": "該資源已被管理員封鎖。",
+      "asset_limit_reached": "你已達到上傳資源數量上限。刪除一個後才能繼續上傳。",
+      "asset_storage_limit_reached": "你的資源儲存空間已用完。請先刪除一個資源。",
+      "asset_too_large": "該模型超過上傳大小上限。",
+      "asset_not_found": "該資源已不在伺服器上。",
+      "rate_limited": "操作太快了，請稍後再試。",
+      "unauthorized": "你的工作階段已過期。請重新在遊戲中登入。",
+      "network": "無法連線到伺服器。請檢查網路後再試。",
+      "timeout": "伺服器回應逾時。請再試一次。",
+      "unknown": "與伺服器通訊時發生問題。"
+    },
+    "hints": {
+      "nav3d": "拖曳旋轉視角，滾輪縮放。按住拖曳時，WASD 飛行，Q/E 調整高度。",
+      "nav2d": "拖曳平移，滾輪縮放。"
+    },
+    "help": {
+      "title": "編輯器說明",
+      "toolsTitle": "工具",
+      "shortcutsTitle": "鍵盤快捷鍵",
+      "mouseTitle": "滑鼠與導覽",
+      "flowTitle": "儲存與試玩",
+      "beginTutorial": "開始教學",
+      "close": "關閉",
+      "tool": {
+        "select": "選取已放置的資產以移動、旋轉和縮放；點擊 2D 標記可進行編輯。",
+        "raise": "抬高筆刷下方的地形。",
+        "lower": "降低筆刷下方的地形。",
+        "smooth": "將起伏平滑到局部平均高度。",
+        "flatten": "將地面整平到拖曳起點的高度。",
+        "paint": "在區域預設地表上塗刷生態域。",
+        "water": "設定全圖水面高度。",
+        "place": "將目錄資產或上傳的資產放置到地面上。",
+        "blocker": "拖曳繪製在試玩中阻擋移動的隱形牆。",
+        "camp": "新增並編輯在試玩中重生的怪物營地。",
+        "spawn": "設定試玩時玩家的落點。",
+        "region": "框選地形和資產以複製貼上。",
+        "erase": "移除游標下已放置的資產或雕刻印記。"
+      },
+      "key": {
+        "tools": "每個工具都有一個單字母快捷鍵，顯示在工具列按鈕上。",
+        "brush": "[ 和 ] 調整筆刷大小；Shift+[ 和 Shift+] 調整強度。",
+        "undo": "Ctrl+Z 復原上一步；Ctrl+Y 或 Ctrl+Shift+Z 重做。",
+        "save": "Ctrl+S 儲存地圖。",
+        "duplicate": "Ctrl+D 複製選取的資產。",
+        "nudge": "方向鍵將選取的資產微調 0.5 碼；按住 Shift 為 2 碼。",
+        "wheel": "Shift+滾輪旋轉選取的資產；Alt+滾輪縮放。",
+        "delete": "Delete 移除選取的資產或營地。",
+        "escape": "Esc 先清除選取，然後返回選取工具。"
+      },
+      "mouse": {
+        "orbit3d": "3D 檢視：拖曳環繞視角，滾輪縮放；中鍵拖曳或 Shift+拖曳平移。",
+        "fly3d": "在 3D 中按住拖曳時，WASD 飛行移動鏡頭，Q/E 調整高度。",
+        "move": "選取工具啟用時，拖曳已放置的資產可在地面上移動它。",
+        "pan2d": "2D 檢視：拖曳平移，滾輪縮放。"
+      },
+      "flow": {
+        "save": "儲存會把地圖存到此瀏覽器；登入後也會存到伺服器。",
+        "draft": "有未儲存的變更時，每 30 秒自動儲存一份草稿；用開啟可以還原。",
+        "playtest": "試玩會在此地圖上啟動真實遊戲，包含你未儲存的編輯。"
+      }
+    },
+    "tutorial": {
+      "title": "編輯器教學",
+      "back": "上一步",
+      "next": "下一步",
+      "finish": "完成",
+      "skip": "跳過導覽",
+      "counter": "第 {current} 步，共 {total} 步",
+      "steps": {
+        "toolbar": {
+          "title": "工具列",
+          "body": "所有編輯工具都在這裡：雕刻筆刷、生態域塗刷、水面、資產放置、營地等。每個工具都有單鍵快捷鍵，顯示在按鈕角落。"
+        },
+        "stage": {
+          "title": "世界檢視",
+          "body": "這是用真實遊戲引擎算繪的你的地圖。拖曳環繞視角，滾輪縮放，中鍵拖曳或 Shift+拖曳平移。用工具點擊地面即可編輯。"
+        },
+        "inspector": {
+          "title": "工具選項",
+          "body": "目前工具的選項顯示在這裡：筆刷大小、生態域調色盤、資產縮放、營地設定，以及所選物件的屬性。"
+        },
+        "viewToggle": {
+          "title": "3D 與 2D",
+          "body": "在算繪的 3D 世界和符號化的俯視 2D 地圖之間切換。2D 檢視最適合移動區域標記和查看大範圍。"
+        },
+        "save": {
+          "title": "儲存你的作品",
+          "body": "儲存會把地圖存到此瀏覽器，登入後也會存到伺服器。匯出可下載 JSON 備份，開啟可找回已儲存的地圖和草稿。"
+        },
+        "playtest": {
+          "title": "試玩",
+          "body": "隨時在你的地圖上啟動真實遊戲，包含目前的編輯。關閉試玩分頁即可回來繼續編輯。"
+        },
+        "help": {
+          "title": "說明就在這裡",
+          "body": "這就是完整流程。隨時開啟說明查看完整工具清單和所有快捷鍵，或再次執行本導覽。"
+        }
+      }
+    },
+    "a11y": {
+      "stage": "地圖檢視區",
+      "toasts": "編輯器通知",
+      "dialog": "編輯器對話方塊"
+    }
+  },
   "skinEvent": {
     "title": "外觀寶箱",
     "subtitle": "你解鎖了一份{rank}級獎勵 — 可任選不高於該等級的造型。",
@@ -1967,6 +2548,9 @@ export const zh_TW: EnTranslations = {
     "password": "密碼",
     "passwordError": "請輸入密碼。",
     "passwordPlaceholder": "請輸入密碼",
+    "email": "電子郵件",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "請輸入有效的電子郵件地址。",
     "showPassword": "顯示密碼",
     "hidePassword": "隱藏密碼",
     "logIn": "登入",
@@ -1992,7 +2576,15 @@ export const zh_TW: EnTranslations = {
     "create": "建立",
     "twoFactorLabel": "驗證碼",
     "twoFactorPlaceholder": "6 位數驗證碼或復原碼",
-    "twoFactorHint": "請輸入驗證器應用程式顯示的驗證碼，或其中一組復原碼。"
+    "twoFactorHint": "請輸入驗證器應用程式顯示的驗證碼，或其中一組復原碼。",
+    "recovery": {
+      "title": "新增復原電子郵件",
+      "body": "設定一個電子郵件地址，以便您可以復原自己的帳號。我們僅在您需要重設密碼時，用它來確認您是本帳號的擁有者。",
+      "save": "儲存電子郵件",
+      "logOut": "Log out",
+      "invalid": "請輸入有效的電子郵件地址。",
+      "failed": "無法儲存您的電子郵件，請重試。"
+    }
   },
   "wallet": {
     "label": "$WOC 錢包",
@@ -2046,6 +2638,7 @@ export const zh_TW: EnTranslations = {
     "helpLinkedWithBalance": "持有者特權已啟用。錢包應用程式已在此瀏覽器中連線。",
     "helpLinkedDisconnected": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
     "helpLinkedDisconnectedWithBalance": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
+    "extensionHelp": "若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。",
     "flowConnect": "選擇一個錢包。驗證會自動繼續。",
     "flowSign": "在錢包應用程式中簽署驗證訊息。無需交易或 SOL。",
     "flowVerify": "正在驗證錢包所有權...",
@@ -2288,6 +2881,7 @@ export const zh_TW: EnTranslations = {
       "unknownTier": "未知的秘探難度。",
       "levelRequired": "你必須達到等級 {level} 才能進入 {name}。",
       "levelRequiredTier": "你必須達到 {level} 級才能以{tier}難度進入{name}。",
+      "partyTooLarge": "{name}僅限單人或雙人探索。{max} 人以上的隊伍不得進入。",
       "instancesBusy": "所有 {name} 的副本都正忙碌中。請稍後再試。",
       "runFailed": "{name} 旅程失敗。",
       "complete": "{name} 完成。",
@@ -2297,6 +2891,14 @@ export const zh_TW: EnTranslations = {
       "doorAlreadyOpen": "門已經開了。",
       "companionRankUp": "{name} 達到第 {rank} 階。",
       "bossChest": "首領倒下了。一只受守護的聖物庫寶箱自祭壇升起，撬開它的鎖以取得你的戰利品。",
+      "drownedLitanyReliquaryRise": "娜哈莉亞修女陷入沉默。溺亡聖髑匣從黑水中升起。靠近它以開始儀式。",
+      "riteSequenceReady": "神龕陷入黑暗。重複順序。",
+      "riteSequencePlaying": "神龕正在重演儀式。請等待。",
+      "riteCorrect": "一聲輕柔的鐘鳴回應了你的觸碰。",
+      "riteWrong": "刺耳的鐘裂聲。黑水在你腳邊濺起。",
+      "riteReliquaryOpen": "溺亡聖髑匣打開了。",
+      "riteReliquaryLocked": "完成神龕儀式以打開聖髑匣。",
+      "riteReliquaryEmpty": "聖髑匣是空的。",
       "surfaceStairs": "一道通往地面的階梯開啟了。在階梯處按 F 離開。",
       "moduleEnter": "{name}：{objective}",
       "objectiveClearRoom": "清空房間。",
@@ -2304,6 +2906,13 @@ export const zh_TW: EnTranslations = {
       "tombstoneHint": "房間清空後，一條墓碑通道會在北方開啟。",
       "tombstoneOpen": "一條被封的墓碑通道在北方軋軋開啟。走進其中以繼續前進。",
       "tombstoneInto": "你穿過墓碑進入 {name}。",
+      "bellRopeShock": "鐘繩猛然繃緊。溺亡誦經者們因震盪而踉蹌。",
+      "eggSacBurst": "卵囊破裂了。蜘蛛幼體四散逃竄過洗禮堂的邊緣。",
+      "baptistryEggs": "洗禮堂歸於寂靜。蜘蛛卵囊濕漉漉地附著在邊緣。",
+      "baptistrySpidersSealed": "你應該試著摧毀那些蜘蛛卵囊。",
+      "puzzleSealed": "你需要在房間裡某處施加壓力來解開封印。",
+      "ropesSealed": "你應該試著拉動那些鐘繩。",
+      "baptistryWave": "洗禮堂的黑水中有什麼東西在攪動。",
       "chestEmpty": "寶箱是空的。",
       "notInDelve": "你並不在秘探之中。",
       "cannotInteract": "你無法與其互動。",
@@ -2322,9 +2931,12 @@ export const zh_TW: EnTranslations = {
       "passageSealed": "通道被封住了。",
       "moveCloserPassage": "再靠近通道一些。",
       "moveCloserChest": "再靠近寶箱一些。",
+      "moveCloserReliquary": "再靠近聖物匣一些。",
       "nothingToTake": "這裡已沒有任何可拿取之物了。",
       "wayOutNotOpen": "出路尚未開啟。",
-      "moveCloserStairs": "再靠近階梯一些。"
+      "moveCloserStairs": "再靠近階梯一些。",
+      "nhaliaCantorShield": "誦經者們，穩住音符！",
+      "nhaliaBlackwaterMark": "{name}用黑水標記了{player}！"
     },
     "lockpick": {
       "lockYields": "鎖開了！{tier}戰利品。",
@@ -2387,6 +2999,26 @@ export const zh_TW: EnTranslations = {
       "abandoned": "你把撬棒輕輕抽了回來。鎖仍在等待。"
     }
   },
+  "delveRiteUi": {
+    "title": "溺亡聖髑儀式",
+    "blurb": "神龕將依序亮起。依次啟動每一座神龕以重複順序。觸碰錯誤會導致本次嘗試失敗並重演順序，完美無誤的嘗試將贏得最豐厚的戰利品，而用盡嘗試次數則會以最寒酸的方式打開聖髑匣。選擇儀式將如何考驗你。",
+    "easy": "Easy",
+    "medium": "中等",
+    "hard": "Hard",
+    "guideWatch": "選擇後，四座神龕會依序亮起。記住順序。",
+    "guideRepeat": "神龕熄滅後，按同樣的順序走到每座神龕前按 F（互動）。",
+    "guideStakes": "按錯神龕會被黑水潑濺並損失一次嘗試。完成整個順序即可開啟聖物匣。",
+    "showsTimes": "順序展示{count}次",
+    "showsOnce": "順序僅展示一次",
+    "symbols": "{count}個符號",
+    "tries": "{count}次嘗試",
+    "reward": {
+      "easy": "普通戰利品",
+      "medium": "豐厚戰利品",
+      "hard": "頂級戰利品"
+    },
+    "closeAria": "關閉"
+  },
   "delveUi": {
     "board": {
       "title": "秘探看板",
@@ -2396,6 +3028,7 @@ export const zh_TW: EnTranslations = {
       "openDelveAria": "從 {name} 開啟秘探看板",
       "marks": "秘探印記：{count}",
       "minLevel": "需要等級 {level}",
+      "partyTooLarge": "僅限單人或雙人（最多 {max} 人）",
       "tier": {
         "normal": "普通",
         "heroic": "英雄"
@@ -2403,6 +3036,7 @@ export const zh_TW: EnTranslations = {
       "companion": {
         "pick": "選擇一名同伴",
         "tessa": "侍僧泰莎",
+        "edda": "艾達·蘆手",
         "rank": "第 {rank} 階",
         "boon": "在戰鬥間隙治療隊伍。3級時每次秘探可復活一名倒下的隊友一次。",
         "upgrade": "升級到 {rank} 級（{marks} 印記）",
@@ -2428,7 +3062,11 @@ export const zh_TW: EnTranslations = {
       "complete": "完成",
       "marks": "秘探印記：{count}",
       "exitHintOpen": "走進墓碑通道（北方）",
-      "exitHintLocked": "清除雜兵以開啟北方通道"
+      "exitHintLocked": "清除雜兵以開啟北方通道",
+      "riteChoose": "靠近沉溺聖物匣並按 F 開始儀式",
+      "ritePlayback": "注視神龕：記住它們亮起的順序",
+      "riteInput": "按亮起的順序在每座神龕前按 F（{current}/{total}）",
+      "riteOpen": "聖物匣已開啟：在它面前按 F 領取戰利品"
     },
     "objective": {
       "kill_boss": "擊殺 {boss}",
@@ -2449,27 +3087,54 @@ export const zh_TW: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "下方的聖物庫又移位了。午夜過後我們會聽見地板底下傳來吟誦聲，而侍僧泰莎敢發誓那些葬儀名冊正自行改寫墨跡。若你有足夠的勇氣，{playerName}，就拿上一根蠟燭下去吧。別輕信你在下面聽見的每一個聲音。其中有些在你出生之前就知道你的名字了。"
+      },
+      "halvenMarsh": {
+        "greeting": "小徑向北通往沼澤，{playerName}。又一座聖物庫在黑水下歌唱，溺亡者應和著鐘聲。見習信徒艾達比我更懂這片蘆葦，緊跟她的燈籠。選擇你的難度，我會握緊繩索，直到你歸來。"
       }
     },
     "intro": {
       "normal": "樓梯間又冷又暗。碎裂的聖徒石散落在下行的階梯上，一絲柔和的鐘音懸在潮濕的空氣中。侍僧泰莎低語：「聖物庫不該開到這麼深處。靠緊我，{playerName}。」",
-      "heroic": "大門在你身後呻吟著緊閉。一個個名字如指甲般刮過石面。泰莎的燭火燃起藍光。「他們現在召喚的不是亡者，{playerName}。他們是在回應某種存在。」"
+      "heroic": "大門在你身後呻吟著緊閉。一個個名字如指甲般刮過石面。泰莎的燭火燃起藍光。「他們現在召喚的不是亡者，{playerName}。他們是在回應某種存在。」",
+      "litanyNormal": "蘆葦堵塞的階梯沒入芬橋之下。艾達·蘆手舉起她的提燈。\"沼澤記得每一個被淹死之人的名字，{playerName}。留在光中。\"",
+      "litanyHeroic": "黑水拍打著堤道的石頭。艾達的火焰閃爍成綠色。\"他們又在下面歌唱了，{playerName}。不要回應那唱詩隊。\""
     },
     "module": {
       "reliquary_sunken_ossuary": "水滲過葬骨架，以銀黑相間的細流帶走陳年的灰燼。",
       "reliquary_bell_niche": "數十口手鈴靜默地懸掛著，每一口都繫著喪葬之布。",
       "reliquary_saintless_hall": "一尊尊雕像，面容被以細心的憎恨鑿去。",
-      "reliquary_finale": "那口埋藏的鐘在你的靴底之下鳴響了一聲。"
+      "reliquary_finale": "那口埋藏的鐘在你的靴底之下鳴響了一聲。",
+      "litany_sluice": "長滿苔蘚的水閘滴落著黑水，落入古老的唱詩隊墓室。",
+      "litany_ledger": "帳簿島嶼從被淹沒的水道中浮現，墨跡滲入沼澤。",
+      "litany_ring": "一圈聖髑環繞著一處被封印的黑水中央聖泉。",
+      "litany_baptistry": "一處天坑洗禮堂在破裂的聖者石與卵囊之下張開大口。",
+      "litany_choir_loft": "展開的唱詩樓迴響著繩索懸掛的鐘聲，從未真正停歇。",
+      "litany_causeway": "一條Y形分岔的堤道橫跨齊腰深的沼澤水。",
+      "litany_apse": "溺亡的後殿通向娜哈莉亞修女的祭壇島。"
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "沉沒葬骨堂",
       "reliquary_bell_niche": "鳴鐘壁龕",
       "reliquary_saintless_hall": "無聖之廳",
-      "reliquary_finale": "埋鐘之室"
+      "reliquary_finale": "埋鐘之室",
+      "litany_sluice": "新月水閘",
+      "litany_ledger": "島嶼帳簿",
+      "litany_ring": "聖髑之環",
+      "litany_baptistry": "天坑洗禮堂",
+      "litany_choir_loft": "扇形唱詩樓",
+      "litany_causeway": "Y形分岔堤道",
+      "litany_apse": "溺亡後殿"
+    },
+    "object": {
+      "sluice_valve": "水閘閥門",
+      "grave_tablet": "墓碑石板",
+      "corpse_candle": "屍燭",
+      "bell_rope": "Bell Rope"
     },
     "companion": {
       "barkLine": "{name}：{line}",
       "tessa": {
+        "run_start": "蠟燭和名冊我都帶上了，{playerName}。帶路吧。",
+        "ally_revive": "起來。今夜的名冊上沒有你的名字。",
         "combat_start": "站穩，{playerName}。此處的亡者並不安寧。",
         "low_hp": "深呼吸。我還留有為你準備的禱詞。",
         "trap_spotted": "停下，地板裡有東西記得腳步聲。",
@@ -2481,6 +3146,20 @@ export const zh_TW: EnTranslations = {
           "3": "聖物庫侍僧",
           "4": "喚墓見證者",
           "5": "禮拜堂守護者"
+        }
+      },
+      "edda": {
+        "run_start": "沿著木板走，{playerName}。淤泥專吞驕傲的腳步。",
+        "ally_revive": "快起來。今天沼澤帶不走你。",
+        "combat_start": "小心黑水，{playerName}。沼澤在傾聽。",
+        "low_hp": "穩住。我的提燈還沒熄滅。",
+        "trap_spotted": "等等。這裡的蘆葦不對勁。",
+        "boss_pull": "那聖歌知道你的名字，{playerName}。不要回唱。",
+        "completion": "沼澤還能再吞下它的秘密一晚。",
+        "rank": {
+          "1": "提燈者",
+          "2": "蘆葦守望者",
+          "3": "芬橋信徒"
         }
       }
     },
@@ -2524,7 +3203,10 @@ export const zh_TW: EnTranslations = {
       "flooded_paths": "淹水通道",
       "grave_tax": "墓稅",
       "unstable_roof": "不穩屋頂",
-      "cult_remnants": "邪教殘黨"
+      "cult_remnants": "邪教殘黨",
+      "high_water": "水位高漲",
+      "lively_choir": "活躍唱詩隊",
+      "belligerent_dead": "好戰亡者"
     },
     "blessing": {
       "chapel_candle": "禮拜堂之燭：旅程更安全，完成時少獲得一枚秘探印記。"
@@ -3537,13 +4219,16 @@ export const zh_TW: EnTranslations = {
     },
     "cast": {
       "fishing": "釣魚",
-      "demonHeal": "惡魔治療"
+      "demonHeal": "惡魔治療",
+      "thunzharrStormcall": "風暴召喚"
     }
   },
   "questUi": {
     "tracker": {
       "title": "任務",
-      "complete": "完成"
+      "complete": "完成",
+      "showOnMap": "在地圖上顯示{name}",
+      "hideFromMap": "在地圖上隱藏{name}"
     },
     "log": {
       "title": "任務日誌",
@@ -3646,7 +4331,8 @@ export const zh_TW: EnTranslations = {
       "drink": "飲料",
       "tool": "工具",
       "potion": "藥水",
-      "elixir": "藥劑"
+      "elixir": "藥劑",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "護甲",
@@ -3688,7 +4374,8 @@ export const zh_TW: EnTranslations = {
       "useManaPotion": "使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。",
       "clickUseInstant": "點擊在戰鬥中立即使用",
       "clickUse": "點擊使用",
-      "clickBuyback": "點擊買回"
+      "clickBuyback": "點擊買回",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "背包",
@@ -5545,6 +6232,48 @@ export const zh_TW: EnTranslations = {
       "conjured_water6": {
         "name": "魔法山泉水"
       },
+      "linen_pouch": {
+        "name": "亞麻小袋"
+      },
+      "travelers_knapsack": {
+        "name": "旅行者背囊"
+      },
+      "wolfhide_satchel": {
+        "name": "狼皮挎包"
+      },
+      "gravewoven_bag": {
+        "name": "墓織袋"
+      },
+      "mistcallers_duffel": {
+        "name": "喚霧者行囊"
+      },
+      "copper_mining_pick": {
+        "name": "銅製採礦鎬"
+      },
+      "iron_mining_pick": {
+        "name": "鐵製採礦鎬"
+      },
+      "mithril_mining_pick": {
+        "name": "秘銀採礦鎬"
+      },
+      "handaxe": {
+        "name": "手斧"
+      },
+      "felling_axe": {
+        "name": "伐木斧"
+      },
+      "ironbark_axe": {
+        "name": "鐵樹皮斧"
+      },
+      "gathering_sickle": {
+        "name": "採集鐮刀"
+      },
+      "bronze_sickle": {
+        "name": "青銅鐮刀"
+      },
+      "silverleaf_sickle": {
+        "name": "銀葉鐮刀"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -5908,6 +6637,69 @@ export const zh_TW: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "瓦瑞克的暗影兜帽"
       },
+      "siltguard_helm": {
+        "name": "淤衛頭盔"
+      },
+      "bulwark_rusted_pauldrons": {
+        "name": "壁壘鏽蝕肩甲"
+      },
+      "nhalias_bell_maul": {
+        "name": "娜哈莉亞的鐘槌"
+      },
+      "reedstalker_jerkin": {
+        "name": "蘆叢潛行皮甲"
+      },
+      "mirejaw_fang_knife": {
+        "name": "泥顎獠牙匕首"
+      },
+      "widow_silk_hood": {
+        "name": "寡婦絲兜帽"
+      },
+      "cantors_drowned_sash": {
+        "name": "誦經者的溺水腰帶"
+      },
+      "corpse_candle_focus": {
+        "name": "屍燭法器"
+      },
+      "nhalias_litany_rod": {
+        "name": "娜哈莉亞的連禱杖"
+      },
+      "blackwater_vanguard_chest": {
+        "name": "黑水先鋒胸甲"
+      },
+      "siltstep_leggings": {
+        "name": "淤步護腿"
+      },
+      "sunken_reliquary_hood": {
+        "name": "沉沒聖髑兜帽"
+      },
+      "litany_legs": {
+        "name": "淤行者護脛"
+      },
+      "litany_shoulder": {
+        "name": "黑水浮肩甲"
+      },
+      "litany_gloves_rog": {
+        "name": "葦縛護手"
+      },
+      "litany_plate_chest": {
+        "name": "沼衛胸甲"
+      },
+      "litany_leather_chest": {
+        "name": "深淤皮衣"
+      },
+      "litany_cloth_chest": {
+        "name": "唱詩溺袍"
+      },
+      "litany_helm": {
+        "name": "聖物獵人的溺兜"
+      },
+      "sister_nhalia_choir_plate": {
+        "name": "娜哈莉亞修女的唱詩鍛甲"
+      },
+      "drowned_choir_fang": {
+        "name": "溺水唱詩獠牙"
+      },
       "the_codfather": {
         "name": "鱈魚教父"
       },
@@ -6027,6 +6819,30 @@ export const zh_TW: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "先鋒鉻銀"
+      },
+      "crownforged_gauntlets": {
+        "name": "鑄冠護手"
+      },
+      "nighttalon_grips": {
+        "name": "夜爪握套"
+      },
+      "soulflame_gloves": {
+        "name": "魂焰手套"
+      },
+      "stormcallers_handguards": {
+        "name": "喚雷者手甲"
+      },
+      "crownforged_girdle": {
+        "name": "鑄冠腰帶"
+      },
+      "nighttalon_waistband": {
+        "name": "夜爪束帶"
+      },
+      "soulflame_cord": {
+        "name": "魂焰腰繩"
+      },
+      "stormcallers_waistguard": {
+        "name": "喚雷者腰甲"
       }
     },
     "mobs": {
@@ -6510,6 +7326,45 @@ export const zh_TW: EnTranslations = {
       "frosthelm_icehowler": {
         "name": "Frosthelm Icehowler"
       },
+      "drowned_cantor": {
+        "name": "溺亡誦經者"
+      },
+      "reedbound_acolyte": {
+        "name": "蘆葦縛信徒"
+      },
+      "deepfen_spearjaw": {
+        "name": "深沼槍顎獸"
+      },
+      "mirefen_widowling": {
+        "name": "泥沼寡婦蛛"
+      },
+      "spider_egg_sac": {
+        "name": "蜘蛛卵囊"
+      },
+      "grave_silt_bulwark": {
+        "name": "墓淤壁壘"
+      },
+      "sump_troll_devourer": {
+        "name": "污水巨魔吞噬者"
+      },
+      "choir_thrall": {
+        "name": "唱詩奴僕"
+      },
+      "sister_nhalia_drowned_canticle": {
+        "name": "娜哈莉亞修女，溺亡的聖歌"
+      },
+      "edda_reedhand": {
+        "name": "艾達·蘆手"
+      },
+      "tolling_bell": {
+        "name": "鳴鐘"
+      },
+      "thunzharr_waking_peak": {
+        "name": "桑扎爾，覺醒之峰"
+      },
+      "thunzharr_stormling": {
+        "name": "被驚醒的風暴元素"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
@@ -6540,13 +7395,13 @@ export const zh_TW: EnTranslations = {
       "varkas_boneguard": {
         "name": "瓦爾卡斯骨衛"
       },
-      "imp": {
+      "emberkin": {
         "name": "小鬼"
       },
-      "voidwalker": {
+      "gloomshade": {
         "name": "虛空行者"
       },
-      "succubus": {
+      "duskborn": {
         "name": "魅魔"
       },
       "grix_the_tunnelking": {
@@ -6570,16 +7425,16 @@ export const zh_TW: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "縛魂者瑪爾德雷克"
       },
-      "felhunter": {
+      "spellhound": {
         "name": "地獄獵犬"
       },
-      "felguard": {
+      "warfiend": {
         "name": "惡魔守衛"
       },
-      "infernal": {
+      "pyre_colossus": {
         "name": "地獄火"
       },
-      "doomguard": {
+      "wraithborn": {
         "name": "末日守衛"
       },
       "choirmother_selthe": {
@@ -6869,6 +7724,16 @@ export const zh_TW: EnTranslations = {
         "name": "Huntmaster Roderic",
         "title": "Wolfsward Huntmaster",
         "greeting": "The Empire hunts by charter and quota, {className}, and the quota is behind. Fetch your bow or fetch excuses; I only file one of them."
+      },
+      "brother_halven_marsh": {
+        "name": "哈爾文修士",
+        "title": "聖物庫守護人",
+        "greeting": "小徑向北延伸。又一座聖物庫，又一場儀式。選擇你的難度，我會為你守住繩索，直到你歸來。"
+      },
+      "spirit_healer": {
+        "name": "靈魂醫者",
+        "title": "亡者的守護者",
+        "greeting": "安息吧，靈魂。我可以讓你重返軀體，但歸途會讓你變得虛弱。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
@@ -7309,6 +8174,36 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "山脊潛獵者毛皮"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "潛獵者去而復返",
+        "text": "死了十二隻，山脊上的潛獵者反而更多了，{playerName}。野獸不會因為飢餓就往城牆上撲，是高脊上有什麼東西把牠們趕下來。查清之前，獵殺不停。再殺十四隻。",
+        "completion": "又殺了十四隻，可巡邏隊每天清晨仍數得出新的足跡。我的斥候從高脊回來時臉白得像雪線：她說那些爪印有盾牌那麼大，還有潛獵者絕不會留下的獵殺痕跡。在上面遊蕩的絕不是普通的山貓。",
+        "objectives": {
+          "0": {
+            "label": "擊敗山脊潛獵者"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "守望者的披風",
+        "text": "八張皮給軍官的披風加了襯，現在牆上每個士兵都想要一件，{playerName}。他們想得沒錯：寒冬先奪手指，從不聽道歉。再從大門以南的山脊取十張皮，整支守望隊都能睡個暖覺。",
+        "completion": "十張好皮，厚實得沒話說……不對，你看這些，{playerName}。一半都撕裂了，可不是刀槍的痕跡。爪痕有我手掌那麼寬，直接穿透了冬毛。山脊上有什麼東西在殘殺自己的同類。",
+        "objectives": {
+          "0": {
+            "label": "山脊潛獵者毛皮"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "老裂顎",
+        "text": "山民給我斥候找到的爪印起過名字：老裂顎，一隻滿身傷疤的暴君巨貓，熬死了自己族群的三代。潛獵者湧上我的道路，就是因為牠，{playerName}。牠的巢穴在南路上方的西側山脊。帶個幫手去，了結那老魔頭。",
+        "completion": "牠終於倒下了。山民曾發誓那隻貓會比城牆活得還久。如今潛獵者會守在高處的雪原了，{playerName}，我的巡邏隊走這條路也不必再流血。整條山脊都因你安靜了下來。",
+        "objectives": {
+          "0": {
+            "label": "擊敗老裂顎"
           }
         }
       },
@@ -9018,6 +9913,33 @@ export const zh_TW: EnTranslations = {
         "name": "崩塌的聖物庫",
         "enterText": "你向下深入崩塌的聖物庫。",
         "leaveText": "你爬回聖物庫遺墟處的哈爾文修士身邊。"
+      },
+      "drowned_litany": {
+        "name": "溺亡連禱",
+        "enterText": "你潛入沼澤邊緣，進入那座溺亡的神殿。",
+        "leaveText": "你爬回沼澤邊緣，回到哈爾文修士身邊。"
+      }
+    },
+    "letters": {
+      "ravenpost_welcome": {
+        "sender": "渡鴉郵驛",
+        "subject": "渡鴉如今為你飛翔",
+        "body": "旅人：\n\n渡鴉郵驛已在谷地各處設立棲架。請在東溪鎮、沼橋鎮和高望鎮尋找渡鴉石柱：在任意一處，你都可以向其他冒險者寄送信件、錢幣和物品，也可以領取渡鴉為你帶來的一切。\n\n隨信附上一點心意，作為你的第一枚郵票。\n\n展翅高飛，\n渡鴉郵驛"
+      },
+      "letter_q_wolves": {
+        "sender": "雷德布魯克元帥",
+        "subject": "圍欄又安靜了",
+        "body": "牧人們總算能睡個安穩覺了，這都是你的功勞。我已託渡鴉郵驛從守備金裡給你捎去一點謝意。\n\n保持你的刀刃鋒利。\n- 雷德布魯克元帥"
+      },
+      "letter_q_greyjaw": {
+        "sender": "雷德布魯克元帥",
+        "subject": "老灰顎，終於倒下了",
+        "body": "小鎮裡消息傳得快。牧人們昨晚為你的健康乾杯，威爾克斯發誓那頭狼有馬車那麼大。讓他們添油加醋去吧：這是你應得的。\n\n請代守備隊享用一頓好飯。\n- 雷德布魯克元帥"
+      },
+      "letter_q_hollow": {
+        "sender": "奧德里克修士",
+        "subject": "你在黑暗中所做的一切",
+        "body": "很少有人會知道那處窪地裡埋葬著什麼，願意相信的人更少。但我知道，而且我不會忘記。\n\n願你的道路常明。\n- 奧德里克修士"
       }
     },
     "itemSets": {
@@ -9033,8 +9955,8 @@ export const zh_TW: EnTranslations = {
       },
       "necromancers": {
         "name": "死靈法師法衣",
-        "bonus2": "受到傷害造成的施法延退降低 50%。",
-        "bonus3": "施法時不會因受到傷害而被延退。"
+        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus3": "智力提高 10 點，耐力提高 10 點。"
       },
       "nighttalon": {
         "name": "夜爪皮甲",
@@ -9043,13 +9965,13 @@ export const zh_TW: EnTranslations = {
       },
       "soulflame": {
         "name": "魂焰法衣",
-        "bonus2": "受到傷害造成的施法延退降低 50%。",
-        "bonus3": "施法時不會因受到傷害而被延退。"
+        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus3": "智力提高 15 點，精神提高 15 點。"
       },
       "stormcallers": {
         "name": "喚雷者法衣",
-        "bonus2": "受到傷害造成的施法延退降低 50%。",
-        "bonus3": "施法時不會因受到傷害而被延退。"
+        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus3": "智力提高 15 點，精神提高 15 點。"
       },
       "wyrmshadow": {
         "name": "龍影外衣",
@@ -9065,6 +9987,12 @@ export const zh_TW: EnTranslations = {
     "dungeonInstanceBusy": "{name}的所有副本都已被佔用。請稍後再試。",
     "delveLockedChestInteract": "按 F 撬鎖",
     "delveRewardChestInteract": "按 F 領取戰利品",
-    "delveSurfaceExitInteract": "按 F 攀回地表"
+    "delveSurfaceExitInteract": "按 F 攀回地表",
+    "delveReliquaryInteract": "沉溺聖物匣：按 F 開始儀式",
+    "delveRiteShrineBellInteract": "銅鈴神龕：按 F 敲響",
+    "delveRiteShrineCandleInteract": "燭火神龕：按 F 觸碰",
+    "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
+    "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
+    "mailboxName": "郵箱"
   }
 };

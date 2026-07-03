@@ -186,12 +186,16 @@ describe('master loot', () => {
     sim.setPartyLootMaster(true, 0, 'uncommon', a);
     sim.lootCorpse(mob.id, a);
     const prompt = sim.events.find((e) => e.type === 'masterLoot')!;
+    const expiresAt = (prompt as { expiresAt: number }).expiresAt;
     // The master looter's curate window is 5 minutes (300s) from now.
-    expect((prompt as { expiresAt: number }).expiresAt).toBeCloseTo(sim.time + 300, 5);
-    // A still-open master roll has NOT fallen back to need/greed at 4 minutes.
+    expect(expiresAt).toBeCloseTo(sim.time + 300, 5);
+    // The expiry is an absolute deadline checked per tick (sim.ts), so jump to just shy
+    // of it rather than ticking 6000 times: a still-open master roll has NOT fallen back
+    // to need/greed while sim.time < expiresAt.
     const rollId = prompt.rollId;
+    sim.time = expiresAt - 1;
     let convertedEarly = false;
-    for (let i = 0; i < 20 * 240; i++) {
+    for (let i = 0; i < 10; i++) {
       for (const e of sim.tick())
         if (e.type === 'lootRoll' && e.rollId === rollId) convertedEarly = true;
     }
@@ -203,12 +207,16 @@ describe('master loot', () => {
     const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
     sim.setPartyLootMaster(true, 0, 'uncommon', a);
     sim.lootCorpse(mob.id, a);
-    const rollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
+    const prompt = sim.events.find((e) => e.type === 'masterLoot')!;
+    const rollId = prompt.rollId;
+    const expiresAt = (prompt as { expiresAt: number }).expiresAt;
 
-    // Run past the 300s (5-minute) curate timeout, collecting events from each tick
-    // (the sim drains its event buffer per tick, so capture the returns).
+    // Jump to the edge of the 300s curate window, then tick past it (the expiry is an
+    // absolute deadline checked per tick), instead of ticking through all 6000: the
+    // uncurated master roll converts to a need/greed roll for every candidate.
+    sim.time = expiresAt - 0.5;
     const rolls: number[] = [];
-    for (let i = 0; i < 20 * 301; i++) {
+    for (let i = 0; i < 40; i++) {
       for (const e of sim.tick())
         if (e.type === 'lootRoll' && e.rollId === rollId && e.pid !== undefined) rolls.push(e.pid);
     }

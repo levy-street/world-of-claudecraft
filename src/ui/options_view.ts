@@ -352,6 +352,8 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
 export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     slider(s, 'uiScale', 'hudChrome.options.uiScale'),
+    slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
+    slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
     slider(s, 'fctScale', 'hud.options.fctScale'),
@@ -364,12 +366,16 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
     boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
     boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
+    boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
     boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
     boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+    boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
     boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
+    boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
     boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
+    boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
   ];
 }
 

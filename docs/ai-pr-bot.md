@@ -18,11 +18,15 @@ them is a required check.
      lives in `scripts/pr_shot_targets.mjs`; add coverage with one entry there.
    - **Fixed tour** (no diff or no matched target): a consistent baseline, character
      select, desktop HUD, mobile HUD. Keep all recipes offline and quick.
-2. **AI review** (`ai-review` job). Sends the PR diff to an OpenRouter model and posts a
-   short review as a sticky PR comment, grouped into Correctness / Invariants / Tests /
-   Nits with severity tags. The reviewer is `scripts/ai_review.mjs`; the GitHub comment
-   helper is `scripts/gh_sticky_comment.mjs`. No new npm dependencies: it uses Node's
-   built-in `fetch` and the GitHub REST API.
+2. **AI review** (`ai-review` job). Reviews the PR diff with the OpenAI Codex CLI,
+   authenticated with a ChatGPT account via OAuth (no API key), and posts a short review
+   as a sticky PR comment, grouped into Correctness / Invariants / Tests / Nits with
+   severity tags. Codex runs as an agent with READ-ONLY access to the checkout (sandboxed,
+   no network for the agent itself), so it can verify imports and helpers against the real
+   tree instead of guessing from the diff. The reviewer is `scripts/ai_review.mjs`; the
+   GitHub comment helper is `scripts/gh_sticky_comment.mjs`. No new npm dependencies in
+   the repo: the workflow installs `@openai/codex` globally on the runner, and the GitHub
+   side is Node's built-in `fetch` against the REST API.
 3. **AI review on demand** (`ai-review-comment` job). An OWNER, MEMBER, or COLLABORATOR
    of this repo can comment `/review` or `/suggest <focus>` on a PR (for example
    `/suggest check the null handling around the new cache`) to re-run the same reviewer
@@ -34,18 +38,29 @@ them is a required check.
 ## Enabling the AI review
 
 The screenshots job needs no configuration. The AI review (automatic and on-demand) is
-opt-in:
+opt-in and authenticates with a ChatGPT account through OAuth, not an API key:
 
-- Add a repository **secret** `OPENROUTER_API_KEY` (Settings -> Secrets and variables ->
-  Actions). Get a key at https://openrouter.ai. Without it the `ai-review` and
+- On any machine, install the Codex CLI (`npm install -g @openai/codex`) and run
+  `codex login`. Complete the browser OAuth flow with the ChatGPT account whose plan
+  should pay for the reviews. This writes `~/.codex/auth.json` (OAuth access + refresh
+  tokens).
+- Add a repository **secret** `CODEX_AUTH_JSON` (Settings -> Secrets and variables ->
+  Actions) containing that file's exact contents. The workflow materializes it into a
+  throwaway `CODEX_HOME` for each run. Without the secret the `ai-review` and
   `ai-review-comment` jobs run but no-op and exit green, so the workflow is safe to merge
-  before the key exists.
-- Optional repository **variable** `OPENROUTER_MODEL` to override the model. The default is
-  `nvidia/nemotron-3-ultra-550b-a55b:free` (NVIDIA Nemotron 3 Ultra). It is free **for
-  now**: OpenRouter free tiers can change pricing, rate limits, or be pulled at any time
-  (the previous default, `openrouter/owl-alpha`, was pulled), so treat this as a
-  prototype default and switch the variable when it goes away. Swapping the model is a
-  one-line change with no workflow edit.
+  before the secret exists. Treat the secret like a password: it is a login to the
+  ChatGPT account.
+- If reviews start failing with an auth error in the workflow logs, the OAuth session
+  has expired or been revoked: re-run `codex login` and refresh the secret.
+- Optional repository **variable** `CODEX_MODEL` to override the model; when unset, the
+  Codex CLI's own default model is used. Swapping the model is a one-line change with no
+  workflow edit.
+- For a **local run** of `node scripts/ai_review.mjs`, your normal `codex login` session
+  is used directly (no secret needed), and `CODEX_MODEL` can live in the repo-root
+  `.env` (see `.env.example`); the script loads it best-effort. Variables already set in
+  the environment always take precedence, so the CI values are never overridden.
+- Reviews consume the ChatGPT plan's Codex usage quota; a burst of PR pushes can hit the
+  plan's rate limits, in which case the job posts the non-blocking fallback note instead.
 
 ## Requesting a review on demand
 
@@ -58,19 +73,17 @@ time contributor cannot self-trigger it on their own fork PR by commenting on it
 gate exists because, unlike the automatic `pull_request`-triggered job, a comment trigger
 always runs with this repo's secrets available, even against a fork PR: the job never
 checks out or executes the PR's own code, it only reads the diff as text through the
-GitHub API, but the trust gate keeps it from being invoked, and the OpenRouter budget
-spent, by an untrusted commenter.
+GitHub API, but the trust gate keeps it from being invoked, and the ChatGPT plan's Codex
+quota spent, by an untrusted commenter. Codex itself additionally runs in a read-only
+sandbox with network access disabled, so even a malicious diff crafted as a prompt
+injection cannot make the agent modify the checkout or call out anywhere.
 
 ## Privacy: read before enabling on private code
 
-Free OpenRouter models commonly **log prompts to improve the model**, which means the PR
-diff you send may be retained by a third party; check the model's Data Policy tab on
-openrouter.ai. Do not enable the AI review on code you cannot disclose while it points at
-a free model. Safer options:
-
-- Point `OPENROUTER_MODEL` at a paid / non-logging OpenRouter model.
-- Run a local model (the same script pattern works against any OpenAI-compatible endpoint;
-  change `ENDPOINT` in `scripts/ai_review.mjs`).
+The PR diff (and whatever the agent reads from the checkout) is sent to OpenAI under the
+ChatGPT account that ran `codex login`. Whether that data can be used for training
+follows the account's plan and data-control settings, so review those settings on the
+account behind `CODEX_AUTH_JSON` before enabling this on code you cannot disclose.
 
 The screenshots job sends nothing to a third party; it only renders your own client.
 
@@ -78,7 +91,7 @@ The screenshots job sends nothing to a third party; it only renders your own cli
 
 Pull requests from forks get a read-only `GITHUB_TOKEN` and cannot read repo secrets on
 the `pull_request` trigger. Both comment steps and the automatic AI review degrade to a
-no-op there (the scripts detect the missing write access / key and skip), so the workflow
+no-op there (the scripts detect the missing write access / auth and skip), so the workflow
 never errors on a fork PR. Screenshots are still captured and uploaded as an artifact.
 
 The on-demand `/review` and `/suggest` comment trigger is different: `issue_comment`

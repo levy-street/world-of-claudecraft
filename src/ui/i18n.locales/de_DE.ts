@@ -1399,9 +1399,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': 'Bären',
   'abilityUi.forms.cat': 'Wolfs',
   'abilityUi.cast.fishing': 'Angeln',
+  'abilityUi.cast.thunzharrStormcall': 'Sturmruf',
   'abilityUi.cast.demonHeal': 'Dämonenheilung',
   'questUi.tracker.title': 'Quests',
   'questUi.tracker.complete': 'Abgeschlossen',
+
+  'questUi.tracker.showOnMap': '{name} auf der Karte anzeigen',
+
+  'questUi.tracker.hideFromMap': '{name} auf der Karte ausblenden',
   'questUi.log.title': 'Questlog',
   'questUi.log.close': 'Questlog schließen',
   'questUi.log.summary': 'Aktiv: {active} / Abgeschlossen: {completed}',
@@ -2178,6 +2183,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.weathered_ledger_page.name': 'Verwitterte Buchseite',
   'entities.items.morthen_grimoire.name': 'Morthens Grimoire',
   'entities.items.wolf_fang.name': 'Gesprungener Wolfszahn',
+  'entities.items.linen_pouch.name': 'Leinenbeutel',
+  'entities.items.travelers_knapsack.name': 'Rucksack des Reisenden',
+  'entities.items.wolfhide_satchel.name': 'Wolfsledertasche',
+  'entities.items.gravewoven_bag.name': 'Grabgewebte Tasche',
+  'entities.items.mistcallers_duffel.name': 'Seesack des Nebelrufers',
   'entities.items.bandit_bandana.name': 'Rotes Halstuch',
   'entities.items.tough_jerky.name': 'Zähes Dörrfleisch',
   'entities.items.mudfin_scale.name': 'Schleimige Murlocschuppe',
@@ -2428,14 +2438,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.nhalia_mourner.name': 'Nhalia-Trauernde',
   'entities.mobs.sister_nhalia.name': 'Schwester Nhalia',
   'entities.mobs.varkas_boneguard.name': "Varkas' Knochenwache",
-  'entities.mobs.imp.name': 'Wichtel',
-  'entities.mobs.voidwalker.name': 'Leerwandler',
-  'entities.mobs.succubus.name': 'Sukkubus',
+  'entities.mobs.emberkin.name': 'Wichtel',
+  'entities.mobs.gloomshade.name': 'Leerwandler',
+  'entities.mobs.duskborn.name': 'Sukkubus',
   'entities.mobs.grix_the_tunnelking.name': 'Grix der Tunnelkönig',
-  'entities.mobs.felhunter.name': 'Teufelsjäger',
-  'entities.mobs.felguard.name': 'Teufelswache',
-  'entities.mobs.infernal.name': 'Inferno',
-  'entities.mobs.doomguard.name': 'Schreckenswache',
+  'entities.mobs.spellhound.name': 'Teufelsjäger',
+  'entities.mobs.warfiend.name': 'Teufelswache',
+  'entities.mobs.pyre_colossus.name': 'Inferno',
+  'entities.mobs.wraithborn.name': 'Schreckenswache',
   'entities.mobs.choirmother_selthe.name': 'Chormutter Selthe',
   'entities.mobs.drowned_templeguard.name': 'Ertränkte Tempelwache',
   'entities.mobs.drowned_votary.name': 'Ertränkter Andächtiger',
@@ -3178,6 +3188,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.brightwood_venison.name': 'Hellholz-Wildbret',
   'entities.items.bramblehide_jerkin.name': 'Dornhaut-Wams',
   'entities.items.monarch_crown_helm.name': 'Krone des Monarchen',
+  'entities.items.copper_mining_pick.name': 'Kupfer-Grabpickel',
+  'entities.items.iron_mining_pick.name': 'Eisen-Grabpickel',
+  'entities.items.mithril_mining_pick.name': 'Mithril-Grabpickel',
+  'entities.items.handaxe.name': 'Handaxt',
+  'entities.items.felling_axe.name': 'Fällaxt',
+  'entities.items.ironbark_axe.name': 'Eisenrinden-Axt',
+  'entities.items.gathering_sickle.name': 'Erntesichel',
+  'entities.items.bronze_sickle.name': 'Bronzesichel',
+  'entities.items.silverleaf_sickle.name': 'Silberblatt-Sichel',
   // v0.10.0 release fill (Fiesta / skin-select / NPC voices / chat channels / Brightwood Glade)
   'hud.core.chatChannels.add': 'Chatkanal hinzufügen',
   'hud.core.chatChannels.addTitle': 'Kanal hinzufügen',
@@ -3431,6 +3450,17 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cowl.name': 'Seelenflammenkapuze',
   'entities.items.soulflame_mantle.name': 'Seelenflammenmantel',
   'entities.items.stormcallers_crown.name': 'Krone des Sturmrufers',
+  'entities.items.crownforged_gauntlets.name': 'Kronengeschmiedete Stulpen',
+  'entities.items.nighttalon_grips.name': 'Nachtklauengriffe',
+  'entities.items.soulflame_gloves.name': 'Seelenflammenhandschuhe',
+  'entities.items.stormcallers_handguards.name': 'Handschützer des Sturmrufers',
+  'entities.items.crownforged_girdle.name': 'Kronengeschmiedeter Gürtel',
+  'entities.items.nighttalon_waistband.name': 'Nachtklauengurt',
+  'entities.items.soulflame_cord.name': 'Seelenflammenkordel',
+  'entities.items.stormcallers_waistguard.name': 'Gürtelschutz des Sturmrufers',
+  'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, der Erwachende Gipfel',
+  'entities.mobs.thunzharr_stormling.name': 'Geweckter Sturmling',
+  'hudChrome.worldBoss.spawn': '{name} erhebt sich über den Thornpeak-Höhen!',
   'entities.items.stormcallers_spaulders.name': 'Schulterplatten des Sturmrufers',
   'hud.chat.context.convertToRaid': 'In Schlachtzug umwandeln',
   'hud.chat.context.convertToParty': 'In Gruppe umwandeln',
@@ -3707,12 +3737,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.family.humanoid.desc':
     'Banditen, Kultisten und andere, die das falsche Gewerbe ergriffen haben. Sie kämpfen mit Taktik, nicht nur mit Zähnen.',
   'guide.family.humanoid.name': 'Humanoide',
-  'guide.family.kobold.desc':
+  'guide.family.burrower.desc':
     'Kerzenköpfige Schaufler, die Minen und Höhlen verseuchen und ihr Erz erbittert verteidigen.',
-  'guide.family.kobold.name': 'Kobolde',
-  'guide.family.murloc.desc':
+  'guide.family.burrower.name': 'Kobolde',
+  'guide.family.mudfin.desc':
     'Amphibische Moorbewohner, die in lärmenden, territorialen Rudeln das Seichte überschwemmen.',
-  'guide.family.murloc.name': 'Murlocs',
+  'guide.family.mudfin.name': 'Murlocs',
   'guide.family.ogre.desc':
     'Riesig, schwerfällig und gefährlich. Sie lagern an den hohen Pässen und schlagen zu wie ein Erdrutsch.',
   'guide.family.ogre.name': 'Oger',
@@ -4148,18 +4178,18 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.nav.arena': 'Arena und PvP',
   'guide.nav.talents': 'Talente',
   'guide.nav.wishIKnew': 'Was ich gern früher gewusst hätte',
-  'guide.petHook.doomguard':
+  'guide.petHook.wraithborn':
     'Ein Elite-Zauberwirker, der aus der Ferne schweren Schatten regnen lässt.',
-  'guide.petHook.felguard':
+  'guide.petHook.warfiend':
     'Ein robuster Nahkampfschläger, der Allrounder, sobald du ihn beschwören kannst.',
-  'guide.petHook.felhunter': 'Ein Schattenplänkler, der gegnerischen Zauberwirkern zusetzt.',
-  'guide.petHook.imp':
+  'guide.petHook.spellhound': 'Ein Schattenplänkler, der gegnerischen Zauberwirkern zusetzt.',
+  'guide.petHook.emberkin':
     'Ein Feuerblitz-Dämon für die Distanz, der Gegner aus sicherer Entfernung abträgt.',
-  'guide.petHook.infernal':
+  'guide.petHook.pyre_colossus':
     'Ein massiger Koloss mit zermalmendem Nahkampf, beschworen für rohe Kraft.',
-  'guide.petHook.succubus':
+  'guide.petHook.duskborn':
     'Ein schneller Nahkampfdämon, der hart zuschlägt, aber unter Druck einknickt.',
-  'guide.petHook.voidwalker':
+  'guide.petHook.gloomshade':
     'Ein robuster Dämon, der verspottet und Treffer absorbiert, sodass du in Ruhe zaubern kannst.',
   'guide.related': 'Verwandtes',
   'guide.search.label': 'Suche',
@@ -4989,18 +5019,21 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.bonus2': 'Erhöht Angriffskraft um 40.',
   'entities.itemSets.deathlord.bonus3': 'Erhöht Stärke um 15 und Ausdauer um 15.',
   'entities.itemSets.necromancers.name': 'Gewänder des Nekromanten',
-  'entities.itemSets.necromancers.bonus2': 'Verringert Zauberrückstoß durch Schaden um 50%.',
-  'entities.itemSets.necromancers.bonus3': 'Erlittener Schaden verzögert das Zauberwirken nicht.',
+  'entities.itemSets.necromancers.bonus2':
+    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+  'entities.itemSets.necromancers.bonus3': 'Erhöht Intelligenz um 10 und Ausdauer um 10.',
   'entities.itemSets.nighttalon.name': 'Nachtkrallen-Ledertracht',
   'entities.itemSets.nighttalon.bonus2': 'Erhöht Angriffskraft um 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%.',
   'entities.itemSets.soulflame.name': 'Seelenflammengewänder',
-  'entities.itemSets.soulflame.bonus2': 'Verringert Zauberrückstoß durch Schaden um 50%.',
-  'entities.itemSets.soulflame.bonus3': 'Erlittener Schaden verzögert das Zauberwirken nicht.',
+  'entities.itemSets.soulflame.bonus2':
+    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+  'entities.itemSets.soulflame.bonus3': 'Erhöht Intelligenz um 15 und Willenskraft um 15.',
   'entities.itemSets.stormcallers.name': 'Gewänder des Sturmrufers',
-  'entities.itemSets.stormcallers.bonus2': 'Verringert Zauberrückstoß durch Schaden um 50%.',
-  'entities.itemSets.stormcallers.bonus3': 'Erlittener Schaden verzögert das Zauberwirken nicht.',
+  'entities.itemSets.stormcallers.bonus2':
+    'Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).',
+  'entities.itemSets.stormcallers.bonus3': 'Erhöht Intelligenz um 15 und Willenskraft um 15.',
   'entities.itemSets.wyrmshadow.name': 'Wyrmschattentracht',
   'entities.itemSets.wyrmshadow.bonus2': 'Erhöht Angriffskraft um 40.',
   'entities.itemSets.wyrmshadow.bonus3':
@@ -5374,6 +5407,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.spinResult': '+{points} Punkte',
   'hudChrome.dailyRewards.spinTitle': 'Täglicher Dreh',
   'hudChrome.dailyRewards.tasks': 'Aufgaben',
+  'hudChrome.dailyRewards.showChestButton': 'Truhe anzeigen',
+  'hudChrome.dailyRewards.hideChestButton': 'Truhe ausblenden',
   'hudChrome.dailyRewards.title': 'Tägliche Belohnungen',
   'hudChrome.dailyRewards.unknown': 'Unbekannt',
   'hudChrome.dailyRewards.usd': '{amount} USD',
@@ -5394,4 +5429,21 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jetzt nicht',
   'hudChrome.nativeUpdate.title': 'Update verfügbar',
   'hudChrome.nativeUpdate.update': 'Aktualisieren',
+  // Ravenpost authored letters
+  'entities.letters.ravenpost_welcome.sender': 'Die Rabenpost',
+  'entities.letters.ravenpost_welcome.subject': 'Die Raben fliegen nun für Euch',
+  'entities.letters.ravenpost_welcome.body':
+    'Reisender,\n\ndie Rabenpost hat ihre Sitzstangen im ganzen Tal eröffnet. Sucht die Rabensäulen in Eastbrook, Fenbridge und Highwatch: Von jeder aus könnt Ihr anderen Abenteurern Briefe, Münzen und Waren schicken und abholen, was die Raben Euch bringen.\n\nAnbei eine kleine Aufmerksamkeit für Eure erste Briefmarke.\n\nSchwingen hoch,\nDie Rabenpost',
+  'entities.letters.letter_q_wolves.sender': 'Marschall Redbrook',
+  'entities.letters.letter_q_wolves.subject': 'In den Pferchen ist wieder Ruhe',
+  'entities.letters.letter_q_wolves.body':
+    'Die Hirten können endlich wieder ruhig schlafen, und das ist Euer Verdienst. Ich habe der Rabenpost aufgetragen, Euch eine Kleinigkeit aus der Wachkasse zu bringen.\n\nHaltet Eure Klinge geölt.\n- Marschall Redbrook',
+  'entities.letters.letter_q_greyjaw.sender': 'Marschall Redbrook',
+  'entities.letters.letter_q_greyjaw.subject': 'Der alte Graukiefer, endlich',
+  'entities.letters.letter_q_greyjaw.body':
+    'Neuigkeiten verbreiten sich schnell in einer so kleinen Stadt. Die Hirten haben gestern Abend auf Eure Gesundheit getrunken, und Wilkes schwört, der Wolf sei so groß wie ein Karren gewesen. Lasst sie ruhig übertreiben: Ihr habt es Euch verdient.\n\nGönnt Euch ein Mahl auf Kosten der Wache.\n- Marschall Redbrook',
+  'entities.letters.letter_q_hollow.sender': 'Bruder Aldric',
+  'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
+  'entities.letters.letter_q_hollow.body':
+    'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
 };
