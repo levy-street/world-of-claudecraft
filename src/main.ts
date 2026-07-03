@@ -43,6 +43,7 @@ import {
   useTouchInterface,
 } from './game/mobile_controls';
 import { mouselookReleaseFacing } from './game/mouselook_release';
+import { visualFacingForMove } from './game/movement_visual';
 import { music } from './game/music';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
@@ -190,6 +191,7 @@ const CLICK_MOVE_PROGRESS_EPSILON = 1.5; // yards of travel that counts as progr
 const CLICK_MOVE_LATENCY_STOP_CAP_MS = 240; // avoid overshooting hosted click-move targets while preserving offline precision
 const CLICK_MOVE_LATENCY_STOP_MAX_EXTRA = 1.6; // yards; cap high-latency stop padding so clicks do not end obviously short
 const CLICK_MOVE_LATENCY_WAYPOINT_MAX_EXTRA = 0.8; // yards; helps online A* corners roll through despite input echo delay
+const OFFLINE_SELF_RENDER_ALPHA_LEAD = 0.18; // small local lead trims 20Hz tick latency without making camera motion swim
 const ONLINE_SELF_RENDER_ALPHA_LEAD = 0.65; // fraction of a snapshot interval to reduce local-player visual delay online
 const ATTACK_MOVE_MELEE_STOP = 3.5; // yards; how close an attack-move approach stops from its target (inside melee)
 const ATTACK_MOVE_ACQUIRE_RANGE = 12; // yards; an attack-move toward open ground auto-targets a hostile this near
@@ -2189,7 +2191,7 @@ async function startGame(
     );
   }
 
-  function renderFacingOverride(): number | null {
+  function movementFacingOverride(): number | null {
     if (input.isMouseCameraMode()) {
       return cameraMoveActive() ? input.camYaw : null;
     }
@@ -2200,6 +2202,11 @@ async function startGame(
     if (!input.isMouseCameraMode()) return false;
     const mi = input.readMoveInput();
     return !!(mi.forward || mi.back || mi.strafeLeft || mi.strafeRight) && !world.player.dead;
+  }
+
+  function renderFacingOverride(baseFacing: number | null): number | null {
+    const visualBaseFacing = baseFacing ?? world.player.facing;
+    return visualFacingForMove(input.readMoveInput(), visualBaseFacing) ?? baseFacing;
   }
 
   // Feed the frame meter every frame (so stats stay warm even when hidden) and,
@@ -2246,21 +2253,22 @@ async function startGame(
 
     const mouselook = input.isMouselookActive() && !world.player.dead;
     const controllerFacing = input.controllerFacingOverride();
-    const renderFacing = renderFacingOverride();
+    const movementFacingIntent = movementFacingOverride();
     // On the frame mouselook is released, latch the final camera yaw so the player
     // facing ends exactly where the camera ended; otherwise the last slice of the
     // turn is dropped and the character lags the camera. The render/controller
     // overrides take precedence and reclaim the heading, clearing any stale latch.
     const edgeReleaseFacing = mouselookReleaseFacing(prevMouselook, mouselook, input.camYaw);
     prevMouselook = mouselook;
-    if (renderFacing !== null || controllerFacing !== null) {
+    if (movementFacingIntent !== null || controllerFacing !== null) {
       pendingReleaseFacing = null;
     } else if (edgeReleaseFacing !== null) {
       pendingReleaseFacing = edgeReleaseFacing;
     }
     const movementFacing = !world.player.dead
-      ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
+      ? (movementFacingIntent ?? controllerFacing ?? pendingReleaseFacing)
       : null;
+    const visualFacing = !world.player.dead ? renderFacingOverride(movementFacing) : null;
 
     if (offlineSim) {
       acc += frameDt;
@@ -2308,11 +2316,15 @@ async function startGame(
       syncGroundAimReticle();
       perf.setNetwork(null);
       perf.time('renderer', () =>
-        perf.trace('renderer.sync', () => renderer.sync(acc / DT, frameDt, movementFacing), {
-          mode: 'offline',
-          views: renderer.views.size,
-          alpha: acc / DT,
-        }),
+        perf.trace(
+          'renderer.sync',
+          () => renderer.sync(acc / DT, frameDt, visualFacing, OFFLINE_SELF_RENDER_ALPHA_LEAD),
+          {
+            mode: 'offline',
+            views: renderer.views.size,
+            alpha: acc / DT,
+          },
+        ),
       );
       perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
       perf.markInputVisible(performance.now());
@@ -2407,7 +2419,7 @@ async function startGame(
           renderer.sync(
             alpha,
             frameDt,
-            net.spectating === null ? movementFacing : null,
+            net.spectating === null ? visualFacing : null,
             ONLINE_SELF_RENDER_ALPHA_LEAD,
           ),
         {
