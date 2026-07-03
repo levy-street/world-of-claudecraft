@@ -5110,4 +5110,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Cập Nhật',
   'errors.api.desktopCodeInvalid':
     'Mã đăng nhập máy tính không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.',
+  'hudChrome.dailyRewards.pointsGained': 'Đã nhận {points} điểm thưởng hằng ngày.',
+  'hudChrome.dailyRewards.taskMultiplier': 'hệ số x{multiplier}',
+  'hudChrome.dailyRewards.totalPlayer': '{count} người chơi hôm nay',
+  'hudChrome.dailyRewards.totalPlayers': '{count} người chơi hôm nay',
+  'wallet.extensionHelp': 'Để thấy ví ở đây, hãy giữ tiện ích ví trình duyệt như Solflare Wallet hoạt động.',
 };

@@ -9,108 +9,24 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "es_ES": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "fr_FR": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "fr_CA": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "de_DE": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "nl_NL": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "pl_PL": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "id_ID": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "tr_TR": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "sv_SE": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "vi_VN": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ],
-  "da_DK": [
-    "hudChrome.dailyRewards.pointsGained",
-    "hudChrome.dailyRewards.taskMultiplier",
-    "hudChrome.dailyRewards.totalPlayer",
-    "hudChrome.dailyRewards.totalPlayers",
-    "wallet.extensionHelp"
-  ]
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

@@ -5080,4 +5080,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.update': 'Opdater',
   'errors.api.desktopCodeInvalid':
     'Desktop-loginkoden er ugyldig eller udløbet. Prøv venligst igen.',
+  'hudChrome.dailyRewards.pointsGained': '{points} daglige belønningspoint optjent.',
+  'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} multiplikator',
+  'hudChrome.dailyRewards.totalPlayer': '{count} spiller i dag',
+  'hudChrome.dailyRewards.totalPlayers': '{count} spillere i dag',
+  'wallet.extensionHelp': 'For at se en wallet her skal du holde en browser-wallet-udvidelse som Solflare Wallet aktiv.',
 };

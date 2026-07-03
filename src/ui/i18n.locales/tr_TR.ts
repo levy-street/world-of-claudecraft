@@ -5086,4 +5086,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Şimdi Değil',
   'hudChrome.nativeUpdate.title': 'Güncelleme Mevcut',
   'hudChrome.nativeUpdate.update': 'Güncelle',
+  'hudChrome.dailyRewards.pointsGained': '{points} günlük ödül puanı kazanıldı.',
+  'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} çarpanı',
+  'hudChrome.dailyRewards.totalPlayer': '{count} oyuncu bugün',
+  'hudChrome.dailyRewards.totalPlayers': '{count} oyuncu bugün',
+  'wallet.extensionHelp': 'Burada bir cüzdan görmek için Solflare Wallet gibi bir tarayıcı cüzdan uzantısını etkin tut.',
 };

@@ -5176,4 +5176,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Non ora',
   'hudChrome.nativeUpdate.title': 'Aggiornamento disponibile',
   'hudChrome.nativeUpdate.update': 'Aggiorna',
+  'hudChrome.dailyRewards.pointsGained': '{points} punti ricompense giornaliere ottenuti.',
+  'hudChrome.dailyRewards.taskMultiplier': 'moltiplicatore x{multiplier}',
+  'hudChrome.dailyRewards.totalPlayer': '{count} giocatore oggi',
+  'hudChrome.dailyRewards.totalPlayers': '{count} giocatori oggi',
+  'wallet.extensionHelp': 'Per vedere un portafoglio qui, mantieni attiva un\'estensione wallet del browser come Solflare Wallet.',
 };

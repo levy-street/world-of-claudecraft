@@ -5150,4 +5150,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Niet nu',
   'hudChrome.nativeUpdate.title': 'Update beschikbaar',
   'hudChrome.nativeUpdate.update': 'Bijwerken',
+  'hudChrome.dailyRewards.pointsGained': '{points} dagelijkse beloningspunten verdiend.',
+  'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} vermenigvuldiger',
+  'hudChrome.dailyRewards.totalPlayer': '{count} speler vandaag',
+  'hudChrome.dailyRewards.totalPlayers': '{count} spelers vandaag',
+  'wallet.extensionHelp': 'Houd een browser-wallet-extensie zoals Solflare Wallet actief om hier een wallet te zien.',
 };

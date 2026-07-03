@@ -5157,4 +5157,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Jangan sekarang',
   'hudChrome.nativeUpdate.title': 'Pembaruan Tersedia',
   'hudChrome.nativeUpdate.update': 'Perbarui',
+  'hudChrome.dailyRewards.pointsGained': '{points} poin hadiah harian diperoleh.',
+  'hudChrome.dailyRewards.taskMultiplier': 'pengali x{multiplier}',
+  'hudChrome.dailyRewards.totalPlayer': '{count} pemain hari ini',
+  'hudChrome.dailyRewards.totalPlayers': '{count} pemain hari ini',
+  'wallet.extensionHelp': 'Untuk melihat dompet di sini, biarkan ekstensi dompet browser seperti Solflare Wallet tetap aktif.',
 };

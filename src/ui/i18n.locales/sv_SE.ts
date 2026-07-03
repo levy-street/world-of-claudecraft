@@ -5093,4 +5093,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Inte nu',
   'hudChrome.nativeUpdate.title': 'Uppdatering tillgänglig',
   'hudChrome.nativeUpdate.update': 'Uppdatera',
+  'hudChrome.dailyRewards.pointsGained': '{points} dagliga belöningspoäng erhållna.',
+  'hudChrome.dailyRewards.taskMultiplier': 'x{multiplier} multiplikator',
+  'hudChrome.dailyRewards.totalPlayer': '{count} spelare idag',
+  'hudChrome.dailyRewards.totalPlayers': '{count} spelare idag',
+  'wallet.extensionHelp': 'För att se en plånbok här, håll ett webbläsarplånbokstillägg som Solflare Wallet aktivt.',
 };
