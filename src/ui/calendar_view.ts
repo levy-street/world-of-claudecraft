@@ -43,10 +43,6 @@ export interface CalendarMonthView {
   cells: CalendarCell[];
 }
 
-function isoOf(year: number, month: number, day: number): string {
-  return new Date(Date.UTC(year, month, day)).toISOString().slice(0, 10);
-}
-
 export function monthOfIso(iso: string): { year: number; month: number } {
   const d = new Date(`${iso}T00:00:00Z`);
   return { year: d.getUTCFullYear(), month: d.getUTCMonth() };
