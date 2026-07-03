@@ -1300,7 +1300,8 @@ export const pl_PL: EnTranslations = {
     "resourceName": {
       "rage": "Wściekłość",
       "mana": "Mana",
-      "energy": "Energia"
+      "energy": "Energia",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Wszystkie klasy",
@@ -1404,7 +1405,18 @@ export const pl_PL: EnTranslations = {
       "mark_of_the_wild": "Trwałe błogosławieństwo, które nakładasz na siebie lub sojusznika przed walką.",
       "moonfire": "Trafia natychmiast i pozostawia płonący cel, dobre w ruchu.",
       "rejuvenation": "Rzucane natychmiast, leczy sojusznika z czasem, byś mógł działać dalej.",
-      "thorns": "Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu."
+      "thorns": "Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu.",
+      "demon_bite": "Your reliable builder: bite in with your weapons and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard chaotic melee strike.",
+      "vengeful_retreat": "Leap back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target at range and slow it long enough to catch up.",
+      "fel_rush": "Close a gap quickly and land with a burst of Chaos damage.",
+      "immolation_aura": "Light up nearby enemies while your attacks hit harder.",
+      "blur": "A defensive movement button for dodging through danger.",
+      "blade_dance": "Spend Fury to cut through enemies around you.",
+      "sigil_of_flame": "Place a burning sigil to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused blast of fel energy into your target.",
+      "metamorphosis": "Turn a fight with a short demonic power window."
     },
     "petHook": {
       "imp": "Demon ciskający ognistymi pociskami z bezpiecznej odległości, podgryzający wrogów na dystans.",
@@ -2182,6 +2194,7 @@ export const pl_PL: EnTranslations = {
     "mage": "Mag",
     "warlock": "Czarnoksiężnik",
     "druid": "Druid",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Klasa Wojownik",
     "paladinAria": "Klasa Paladyn",
     "hunterAria": "Klasa Łowca",
@@ -2190,7 +2203,8 @@ export const pl_PL: EnTranslations = {
     "shamanAria": "Klasa Szaman",
     "mageAria": "Klasa Mag",
     "warlockAria": "Klasa Czarnoksiężnik",
-    "druidAria": "Klasa Druid"
+    "druidAria": "Klasa Druid",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Przewodnik sterowania",
@@ -2801,7 +2815,8 @@ export const pl_PL: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energia",
-      "rage": "Wściekłość"
+      "rage": "Wściekłość",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Tank / DPS wręcz",
@@ -2812,7 +2827,8 @@ export const pl_PL: EnTranslations = {
       "shaman": "Uzdrowiciel / Walka wręcz lub dystansowa DPS",
       "mage": "Dystansowy DPS",
       "warlock": "Dystansowy DPS",
-      "druid": "Tank / Uzdrowiciel / Walka wręcz lub dystansowa DPS"
+      "druid": "Tank / Uzdrowiciel / Walka wręcz lub dystansowa DPS",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Kolczuga, Skóra, Tkanina",
@@ -2836,7 +2852,8 @@ export const pl_PL: EnTranslations = {
       "shaman": "Szamani rozkazują żywiołom, napełniając oręż mocą, rażąc wrogów błyskawicami i przywracając siły sojusznikom.",
       "mage": "Magowie naginają moc Ognia, Mrozu i Arkanów, by niszczyć wrogów, przyzywać wodę i zamrażać zagrożenia w miejscu.",
       "warlock": "Czarnoksiężnicy przyzywają demony, rzucają klątwy i magię obrażeń w czasie oraz wysysają życie z wrogów, by przetrwać.",
-      "druid": "Druidzi czerpią z natury, lecząc rany, pętając wrogów i przemieniając się w postacie zwierząt dla obrony lub zadawania obrażeń."
+      "druid": "Druidzi czerpią z natury, lecząc rany, pętając wrogów i przemieniając się w postacie zwierząt dla obrony lub zadawania obrażeń.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "Szczegóły klasy {className}: rola {role}. Statystyki początkowe: Siła {str}, Zręczność {agi}, Wytrzymałość {sta}, Intelekt {int}, Duch {spi}.",
     "statBarAria": "{stat}: {value} z 25"
@@ -3176,6 +3193,7 @@ export const pl_PL: EnTranslations = {
       "abilityNotReady": "Ta umiejętność nie jest jeszcze gotowa.",
       "notEnoughRage": "Za mało wściekłości!",
       "notEnoughEnergy": "Za mało energii!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Za mało many!",
       "notEnoughResource": "Za mało: {resource}!",
       "notEnoughHealth": "Za mało zdrowia.",
@@ -3474,7 +3492,8 @@ export const pl_PL: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Wściekłość",
-      "energy": "Energia"
+      "energy": "Energia",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Niedźwiedź",
@@ -4333,6 +4352,50 @@ export const pl_PL: EnTranslations = {
       "rip": {
         "name": "Rozszarpanie",
         "description": "Cios kończący zadający obrażenia od Krwawienia w ciągu 12 sek. Zużywa punkty kombinacji. Tylko w Postaci wilka."
+      },
+      "demon_bite": {
+        "name": "Demon Bite",
+        "description": "A quick strike that deals weapon damage plus {damage} and generates Fury."
+      },
+      "chaos_strike": {
+        "name": "Chaos Strike",
+        "description": "Slash the target with chaotic energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Vengeful Retreat",
+        "description": "Spring backward in a burst of fel momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Throw Glaive",
+        "description": "Throw a fel-edged glaive for {damage} Chaos damage and a brief snare."
+      },
+      "fel_rush": {
+        "name": "Fel Rush",
+        "description": "Rush through a distant enemy, closing the gap and dealing {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Immolation Aura",
+        "description": "Ignite yourself with fel fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Blur",
+        "description": "Blur into motion, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Unleash a sweeping dance of blades for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Sigil of Flame",
+        "description": "Carve a fel sigil into the ground, burning enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Eye Beam",
+        "description": "Channel a beam of chaotic fel energy, dealing {damage} Chaos damage each pulse."
+      },
+      "metamorphosis": {
+        "name": "Metamorphosis",
+        "description": "Unleash your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Śmiertelne uderzenie",

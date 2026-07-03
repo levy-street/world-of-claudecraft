@@ -24,6 +24,7 @@ export const CLASS_CHIPS: ClassChip[] = [
   { id: 'mage', nameKey: 'classes.mage', color: '#69ccf0' },
   { id: 'warlock', nameKey: 'classes.warlock', color: '#9482c9' },
   { id: 'druid', nameKey: 'classes.druid', color: '#ff7d0a' },
+  { id: 'demon_hunter', nameKey: 'classes.demon_hunter', color: '#a330c9' },
 ];
 
 export interface ZoneTeaser {

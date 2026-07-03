@@ -237,7 +237,9 @@ export function castAbility(
         ? 'Not enough rage!'
         : p.resourceType === 'energy'
           ? 'Not enough energy!'
-          : 'Not enough mana!',
+          : p.resourceType === 'fury'
+            ? 'Not enough Fury!'
+            : 'Not enough mana!',
     );
     return;
   }
@@ -560,7 +562,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     sourceId: p.id,
     targetId: target.id,
     school: res.def.school,
-    fx: 'projectile',
+    fx: res.def.id === 'eye_beam' ? 'beam' : 'projectile',
   });
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).

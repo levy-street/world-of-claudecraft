@@ -3,7 +3,7 @@ import type { ArmorType, ItemDef, PlayerClass } from './types';
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
 
 const MAIL_CLASSES = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
-const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'hunter']);
+const LEATHER_CLASSES = new Set<PlayerClass>(['druid', 'rogue', 'hunter', 'demon_hunter']);
 const WARRIOR_WEAPON_CLASSES = new Set<PlayerClass>([
   'warrior',
   'rogue',
@@ -19,7 +19,7 @@ const CASTER_WEAPON_CLASSES = new Set<PlayerClass>([
   'paladin',
   'druid',
 ]);
-const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter']);
+const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter', 'demon_hunter']);
 const OLD_WARRIOR_WEAPON_ARCHETYPE = new Set<PlayerClass>(['warrior', 'paladin', 'shaman']);
 const OLD_CASTER_WEAPON_ARCHETYPE = new Set<PlayerClass>(['mage', 'priest', 'warlock', 'druid']);
 

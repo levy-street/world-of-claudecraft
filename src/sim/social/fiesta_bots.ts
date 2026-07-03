@@ -162,7 +162,7 @@ function pickBotAbility(meta: PlayerMeta): string | null {
     const def = k.def;
     if (def.targetType === 'friendly' || !def.requiresTarget) continue;
     const dealsDamage = def.effects.some(
-      (ef) => ef.type === 'directDamage' || ef.type === 'weaponDamage' || ef.type === 'dot',
+      (ef) => ef.type === 'directDamage' || ef.type === 'weaponDamage' || ef.type === 'weaponHit' || ef.type === 'dot',
     );
     if (dealsDamage) return def.id;
   }

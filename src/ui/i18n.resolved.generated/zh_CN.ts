@@ -1300,7 +1300,8 @@ export const zh_CN: EnTranslations = {
     "resourceName": {
       "rage": "怒气",
       "mana": "法力",
-      "energy": "能量"
+      "energy": "能量",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "所有职业",
@@ -1404,7 +1405,18 @@ export const zh_CN: EnTranslations = {
       "mark_of_the_wild": "开战前为自己或盟友施加的持续祝福。",
       "moonfire": "瞬间命中并让目标持续燃烧，移动时也很好用。",
       "rejuvenation": "瞬发施放，持续治疗盟友，让你可以继续行动。",
-      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。"
+      "thorns": "守护盟友，让近战攻击者在打击时反伤自己。",
+      "demon_bite": "恶魔猎手技巧。",
+      "chaos_strike": "恶魔猎手技巧。",
+      "vengeful_retreat": "恶魔猎手技巧。",
+      "throw_glaive": "恶魔猎手技巧。",
+      "fel_rush": "恶魔猎手技巧。",
+      "immolation_aura": "恶魔猎手技巧。",
+      "blur": "恶魔猎手技巧。",
+      "blade_dance": "恶魔猎手技巧。",
+      "sigil_of_flame": "恶魔猎手技巧。",
+      "eye_beam": "恶魔猎手技巧。",
+      "metamorphosis": "恶魔猎手技巧。"
     },
     "petHook": {
       "imp": "一只远程火焰箭恶魔，从安全距离外消磨敌人。",
@@ -2182,6 +2194,7 @@ export const zh_CN: EnTranslations = {
     "mage": "法师",
     "warlock": "术士",
     "druid": "德鲁伊",
+    "demon_hunter": "恶魔猎手",
     "warriorAria": "战士职业",
     "paladinAria": "圣骑士职业",
     "hunterAria": "猎人职业",
@@ -2190,7 +2203,8 @@ export const zh_CN: EnTranslations = {
     "shamanAria": "萨满祭司职业",
     "mageAria": "法师职业",
     "warlockAria": "术士职业",
-    "druidAria": "德鲁伊职业"
+    "druidAria": "德鲁伊职业",
+    "demon_hunterAria": "恶魔猎手职业"
   },
   "controls": {
     "title": "操作指南",
@@ -2801,7 +2815,8 @@ export const zh_CN: EnTranslations = {
     "resources": {
       "mana": "法力",
       "energy": "能量",
-      "rage": "怒气"
+      "rage": "怒气",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "坦克 / 近战 DPS",
@@ -2812,7 +2827,8 @@ export const zh_CN: EnTranslations = {
       "shaman": "治疗 / 近战或远程 DPS",
       "mage": "远程 DPS",
       "warlock": "远程 DPS",
-      "druid": "坦克 / 治疗 / 近战或远程 DPS"
+      "druid": "坦克 / 治疗 / 近战或远程 DPS",
+      "demon_hunter": "恶魔猎手"
     },
     "armor": {
       "chainLeatherCloth": "锁甲、皮甲、布甲",
@@ -2836,7 +2852,8 @@ export const zh_CN: EnTranslations = {
       "shaman": "萨满掌控元素，强化武器，以闪电震击敌人，并恢复盟友。",
       "mage": "法师操纵火焰、冰霜与奥术来毁灭敌人，召唤清水，并冻结威胁。",
       "warlock": "术士召唤恶魔，施放诅咒和持续伤害魔法，并吸取生命来维持自身。",
-      "druid": "德鲁伊引导自然之力，治疗伤口，缠绕敌人，并变形成动物来防御或输出。"
+      "druid": "德鲁伊引导自然之力，治疗伤口，缠绕敌人，并变形成动物来防御或输出。",
+      "demon_hunter": "恶魔猎手技能。"
     },
     "aria": "{className} 职业详情：职责 {role}。初始属性：力量 {str}，敏捷 {agi}，耐力 {sta}，智力 {int}，精神 {spi}。",
     "statBarAria": "{stat}：{value}/25"
@@ -3176,6 +3193,7 @@ export const zh_CN: EnTranslations = {
       "abilityNotReady": "该技能尚未准备好。",
       "notEnoughRage": "怒气不足！",
       "notEnoughEnergy": "能量不足！",
+      "notEnoughFury": "怒能不足！",
       "notEnoughMana": "法力不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
@@ -3474,7 +3492,8 @@ export const zh_CN: EnTranslations = {
     "resources": {
       "mana": "法力",
       "rage": "怒气",
-      "energy": "能量"
+      "energy": "能量",
+      "fury": "怒能"
     },
     "forms": {
       "bear": "熊",
@@ -4333,6 +4352,50 @@ export const zh_CN: EnTranslations = {
       "rip": {
         "name": "割裂",
         "description": "终结技，在 12 秒内造成流血伤害。消耗连击点。仅限狼形态。"
+      },
+      "demon_bite": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "chaos_strike": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "vengeful_retreat": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。"
+      },
+      "throw_glaive": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "fel_rush": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "immolation_aura": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "blur": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。"
+      },
+      "blade_dance": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "sigil_of_flame": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "eye_beam": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。 {damage}"
+      },
+      "metamorphosis": {
+        "name": "恶魔猎手",
+        "description": "恶魔猎手技能。"
       },
       "mortal_strike": {
         "name": "致死打击",

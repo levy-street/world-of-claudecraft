@@ -1300,7 +1300,8 @@ export const ko_KR: EnTranslations = {
     "resourceName": {
       "rage": "분노",
       "mana": "마나",
-      "energy": "기력"
+      "energy": "기력",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "전체 직업",
@@ -1404,7 +1405,18 @@ export const ko_KR: EnTranslations = {
       "mark_of_the_wild": "전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.",
       "moonfire": "즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.",
       "rejuvenation": "즉시 시전되어 아군을 지속적으로 치유하므로, 계속 행동할 수 있습니다.",
-      "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다."
+      "thorns": "아군을 보호해, 근접 공격자가 칠 때마다 스스로 피해를 입게 합니다.",
+      "demon_bite": "악마사냥꾼 기술입니다.",
+      "chaos_strike": "악마사냥꾼 기술입니다.",
+      "vengeful_retreat": "악마사냥꾼 기술입니다.",
+      "throw_glaive": "악마사냥꾼 기술입니다.",
+      "fel_rush": "악마사냥꾼 기술입니다.",
+      "immolation_aura": "악마사냥꾼 기술입니다.",
+      "blur": "악마사냥꾼 기술입니다.",
+      "blade_dance": "악마사냥꾼 기술입니다.",
+      "sigil_of_flame": "악마사냥꾼 기술입니다.",
+      "eye_beam": "악마사냥꾼 기술입니다.",
+      "metamorphosis": "악마사냥꾼 기술입니다."
     },
     "petHook": {
       "imp": "안전한 거리에서 적을 조금씩 깎는 원거리 화염 화살 악마입니다.",
@@ -2182,6 +2194,7 @@ export const ko_KR: EnTranslations = {
     "mage": "마법사",
     "warlock": "흑마법사",
     "druid": "드루이드",
+    "demon_hunter": "악마사냥꾼",
     "warriorAria": "전사 직업",
     "paladinAria": "성기사 직업",
     "hunterAria": "사냥꾼 직업",
@@ -2190,7 +2203,8 @@ export const ko_KR: EnTranslations = {
     "shamanAria": "주술사 직업",
     "mageAria": "마법사 직업",
     "warlockAria": "흑마법사 직업",
-    "druidAria": "드루이드 직업"
+    "druidAria": "드루이드 직업",
+    "demon_hunterAria": "악마사냥꾼직업"
   },
   "controls": {
     "title": "조작 가이드",
@@ -2801,7 +2815,8 @@ export const ko_KR: EnTranslations = {
     "resources": {
       "mana": "마나",
       "energy": "기력",
-      "rage": "분노"
+      "rage": "분노",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "탱커 / 근접 DPS",
@@ -2812,7 +2827,8 @@ export const ko_KR: EnTranslations = {
       "shaman": "치유 / 근접 또는 원거리 DPS",
       "mage": "원거리 DPS",
       "warlock": "원거리 DPS",
-      "druid": "탱커 / 치유 / 근접 또는 원거리 DPS"
+      "druid": "탱커 / 치유 / 근접 또는 원거리 DPS",
+      "demon_hunter": "악마사냥꾼"
     },
     "armor": {
       "chainLeatherCloth": "사슬, 가죽, 천",
@@ -2836,7 +2852,8 @@ export const ko_KR: EnTranslations = {
       "shaman": "주술사는 정령을 다루고 무기에 힘을 불어넣으며 번개로 적을 충격시키고 아군을 회복시킵니다.",
       "mage": "마법사는 화염, 냉기, 비전의 힘으로 적을 파괴하고 물을 만들어내며 위협을 얼립니다.",
       "warlock": "흑마법사는 악마를 소환하고 저주와 지속 피해 마법을 걸며 생명력을 흡수해 버팁니다.",
-      "druid": "드루이드는 자연의 힘으로 치유하고 적을 묶으며 동물 형태로 변신해 방어하거나 피해를 줍니다."
+      "druid": "드루이드는 자연의 힘으로 치유하고 적을 묶으며 동물 형태로 변신해 방어하거나 피해를 줍니다.",
+      "demon_hunter": "악마사냥꾼 기술입니다."
     },
     "aria": "{className} 직업 세부 정보: 역할 {role}. 시작 능력치: 힘 {str}, 민첩 {agi}, 체력 {sta}, 지능 {int}, 정신력 {spi}.",
     "statBarAria": "{stat}: {value}/25"
@@ -3176,6 +3193,7 @@ export const ko_KR: EnTranslations = {
       "abilityNotReady": "그 능력은 아직 준비되지 않았습니다.",
       "notEnoughRage": "분노가 부족합니다!",
       "notEnoughEnergy": "기력이 부족합니다!",
+      "notEnoughFury": "격노가 부족합니다!",
       "notEnoughMana": "마나가 부족합니다!",
       "notEnoughResource": "{resource}이 부족합니다!",
       "notEnoughHealth": "생명력이 부족합니다.",
@@ -3474,7 +3492,8 @@ export const ko_KR: EnTranslations = {
     "resources": {
       "mana": "마나",
       "rage": "분노",
-      "energy": "기력"
+      "energy": "기력",
+      "fury": "격노"
     },
     "forms": {
       "bear": "곰",
@@ -4333,6 +4352,50 @@ export const ko_KR: EnTranslations = {
       "rip": {
         "name": "찢기",
         "description": "12초에 걸쳐 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용."
+      },
+      "demon_bite": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "chaos_strike": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "vengeful_retreat": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다."
+      },
+      "throw_glaive": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "fel_rush": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "immolation_aura": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "blur": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다."
+      },
+      "blade_dance": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "sigil_of_flame": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "eye_beam": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다. {damage}"
+      },
+      "metamorphosis": {
+        "name": "악마사냥꾼",
+        "description": "악마사냥꾼 기술입니다."
       },
       "mortal_strike": {
         "name": "죽음의 일격",

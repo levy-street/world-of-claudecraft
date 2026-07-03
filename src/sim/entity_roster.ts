@@ -31,6 +31,9 @@ import { CAST_COMPLETE_EPS, DT } from './types';
 // they take damage (that reset still lives on Sim in the damage path, C1).
 export const DAMAGE_IDLE_DESPAWN_SECONDS = 60;
 export const DAMAGE_IDLE_DESPAWN_MOB_IDS = new Set(['varkas_boneguard', 'bound_guardian']);
+const BLADE_DANCE_STEPS = 3;
+const BLADE_DANCE_STEP_INTERVAL = 0.12;
+const BLADE_DANCE_FULL_TURN = Math.PI * 2;
 
 // A ticking ground hazard (e.g. Consecration). Scheduled by the damage/effect path
 // (C1/C4b, still on Sim) and drained here by tickGroundAoEs.
@@ -64,6 +67,61 @@ function copyPos(
   dst.z = src.z;
 }
 
+function setBladeDancePosition(ctx: SimContext, p: Entity, pos: Vec3, facing: number): void {
+  p.chargeTargetId = null;
+  p.chargePath = [];
+  p.chargeTimeLeft = 0;
+  p.abilityDashRemaining = 0;
+  p.abilityDashSpeed = 0;
+  p.abilityDashX = 0;
+  p.abilityDashZ = 0;
+  p.vx = 0;
+  p.vz = 0;
+  p.vy = 0;
+  p.onGround = true;
+  p.jumping = false;
+  p.pos = ctx.groundPos(pos.x, pos.z);
+  p.prevPos = { ...p.pos };
+  p.fallStartY = p.pos.y;
+  p.facing = facing;
+  p.prevFacing = facing;
+  rebucketEntity(ctx, p);
+}
+
+function bladeDanceSpotAround(target: Entity, radius: number, angle: number): Vec3 {
+  return {
+    x: target.pos.x + Math.sin(angle) * radius,
+    y: target.pos.y,
+    z: target.pos.z + Math.cos(angle) * radius,
+  };
+}
+
+function updateBladeDanceSequence(ctx: SimContext, p: Entity): void {
+  const seq = p.bladeDanceSeq;
+  if (!seq) return;
+  const target = ctx.entities.get(seq.targetId);
+  if (p.dead || !target) {
+    setBladeDancePosition(ctx, p, seq.origin, seq.originFacing);
+    p.bladeDanceSeq = undefined;
+    return;
+  }
+  if (seq.step < BLADE_DANCE_STEPS && ctx.time >= seq.nextAt) {
+    const angle =
+      seq.startAngle + seq.side * ((seq.step + 1) * (BLADE_DANCE_FULL_TURN / BLADE_DANCE_STEPS));
+    const pos = bladeDanceSpotAround(target, seq.radius, angle);
+    const facing = Math.atan2(target.pos.x - pos.x, target.pos.z - pos.z);
+    setBladeDancePosition(ctx, p, pos, facing);
+    ctx.emit({ type: 'bladeDanceBlink', sourceId: p.id, targetId: target.id, school: seq.school });
+    seq.step += 1;
+    seq.nextAt = ctx.time + BLADE_DANCE_STEP_INTERVAL;
+    if (seq.step >= BLADE_DANCE_STEPS) seq.returnAt = ctx.time + BLADE_DANCE_STEP_INTERVAL;
+    return;
+  }
+  if (seq.step >= BLADE_DANCE_STEPS && ctx.time >= seq.returnAt) {
+    setBladeDancePosition(ctx, p, seq.origin, seq.originFacing);
+    p.bladeDanceSeq = undefined;
+  }
+}
 // -------------------------------------------------------------------------
 // Entity roster: every add/remove/teleport goes through these so the
 // spatial indexes always match the entities map
@@ -88,6 +146,12 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
 export function rebucketEntity(ctx: SimContext, e: Entity): void {
   ctx.grid.update(e);
   if (e.kind === 'player') ctx.playerGrid.update(e);
+}
+
+export function tickBladeDanceSequences(ctx: SimContext): void {
+  for (const e of ctx.entities.values()) {
+    if (e.bladeDanceSeq) updateBladeDanceSequence(ctx, e);
+  }
 }
 
 // -------------------------------------------------------------------------
@@ -160,11 +224,18 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
-  if (!p.dead) return;
+  if (!p.dead && p.hp > 0) return;
+  p.dead = true;
   if (ctx.arenaMatches.has(p.id)) return;
   if (isDelvePos(p.pos.x)) {
-    releaseSpiritInDelve(ctx, meta.entityId);
-    return;
+    const run = ctx.delveRunForPlayer(meta.entityId);
+    if (run) {
+      releaseSpiritInDelve(ctx, meta.entityId);
+      return;
+    }
+    // If a character is orphaned in the delve coordinate band (stale save,
+    // failed run teardown, or dev reload), don't strand the release button.
+    // Fall through to the normal graveyard flow below.
   }
   p.dead = false;
   // dying in a dungeon sends you to the graveyard of the zone its door is

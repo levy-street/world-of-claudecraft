@@ -81,4 +81,18 @@ describe('ability tooltip data reflects selected talents', () => {
     };
     expect(primary.max).toBeGreaterThan(basePrimary!.max);
   });
+  it('a damage talent raises self-centered aura tick damage', () => {
+    const base = resolved('demon_hunter', 'immolation_aura', emptyModifiers())!;
+    const baseAura = base.effects.find((e) => e.type === 'selfAoeDot') as
+      | { min: number; max: number }
+      | undefined;
+    expect(baseAura).toBeDefined();
+    const known = resolved('demon_hunter', 'immolation_aura', modsFor('immolation_aura', { dmgPct: 0.12 }))!;
+    const aura = known.effects.find((e) => e.type === 'selfAoeDot') as {
+      min: number;
+      max: number;
+    };
+    expect(aura.min).toBe(Math.round(baseAura!.min * 1.12));
+    expect(aura.max).toBe(Math.round(baseAura!.max * 1.12));
+  });
 });

@@ -156,6 +156,7 @@ export const SCHOOL_COLORS: Record<string, number> = {
   shadow: 0x9a5df0,
   holy: 0xffe9a0,
   nature: 0x86e86a,
+  chaos: 0x7dff4a,
   // warm steel-spark — near-white crossed the bloom threshold colorlessly and
   // melee hits read as faint white noise
   physical: 0xffd28a,
@@ -175,9 +176,9 @@ interface Projectile {
 
 // fire reads as flame tongues; everything else as sparkling magic
 function projectileSprites(school: string): { core: number; trail: number } {
-  return school === 'fire'
-    ? { core: SPR.firePuff, trail: SPR.flame }
-    : { core: SPR.glowCore, trail: SPR.sparkle };
+  if (school === 'fire') return { core: SPR.firePuff, trail: SPR.flame };
+  if (school === 'chaos') return { core: SPR.magicRune, trail: SPR.flame };
+  return { core: SPR.glowCore, trail: SPR.sparkle };
 }
 
 export type EntityAnchor = (id: number, heightFrac: number) => THREE.Vector3 | null;
@@ -521,6 +522,22 @@ export class Vfx {
         SPR.magicWisp,
       );
     }
+  }
+
+  bladeDance(targetId: number, school: string): void {
+    const at = this.anchor(targetId, 0.48);
+    if (!at) return;
+    const c = new THREE.Color(SCHOOL_COLORS[school] ?? SCHOOL_COLORS.physical).multiplyScalar(hdr(2.0));
+    const count = this.scaledCount(7);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
+      const r = 0.5 + (i % 3) * 0.28;
+      const x = at.x + Math.sin(a) * r;
+      const z = at.z + Math.cos(a) * r;
+      this.spawn(x, at.y + 0.12 + (i % 2) * 0.2, z, 0, 0.45, 0, c, 1.05, 0.2, 0, SPR.slash, -a);
+      this.spawn(x, at.y + 0.2, z, Math.sin(a) * 2.8, 0.8, Math.cos(a) * 2.8, c, 0.34, 0.35, 1.5, SPR.sparkBurst);
+    }
+    this.burst(at, school, 16, 0.9);
   }
 
   meleeSpark(targetId: number, crit: boolean): void {

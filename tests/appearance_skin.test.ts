@@ -1,10 +1,12 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
+import { SKINS } from '../src/render/characters/manifest';
 import type { IWorld } from '../src/world_api';
 
 const characterAssetsSource = readFileSync(new URL('../src/render/characters/assets.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+const characterManifestSource = readFileSync(new URL('../src/render/characters/manifest.ts', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 
 describe('appearance skin selection', () => {
   it('updates offline player skin through the world contract', () => {
@@ -56,6 +58,21 @@ describe('appearance skin selection', () => {
     expect(sent).toEqual([{ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }]);
   });
 
+  it('uses dedicated fel Demon Hunter skin atlases instead of rogue chromas plus tint', () => {
+    expect(SKINS.player_demon_hunter).toEqual([
+      'textures/skins/demon_hunter/base.png',
+      'textures/skins/demon_hunter/alt_a.png',
+      'textures/skins/demon_hunter/alt_b.png',
+      'textures/skins/demon_hunter/alt_c.png',
+    ]);
+    for (const url of SKINS.player_demon_hunter ?? []) {
+      expect(url).toBeTruthy();
+      const skinUrl = url ?? '';
+      expect(existsSync(new URL(`../public/${skinUrl}`, import.meta.url)), skinUrl).toBe(true);
+    }
+    const demonHunterVisual = characterManifestSource.match(/player_demon_hunter: \{[\s\S]*?\n  \},/)?.[0] ?? '';
+    expect(demonHunterVisual).not.toContain('tint: 0x7dff4a');
+  });
   it('loads alternate skin atlases on low graphics so previews keep distinct colours', () => {
     expect(characterAssetsSource).toContain('These load on every tier so skin');
     expect(characterAssetsSource).toContain('for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));');

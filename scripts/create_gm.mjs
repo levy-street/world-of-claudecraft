@@ -24,7 +24,7 @@ try {
 const username = process.argv[2];
 const clsIdx = process.argv.indexOf('--class');
 const cls = clsIdx > 0 ? process.argv[clsIdx + 1] : 'paladin';
-const VALID = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'];
+const VALID = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid', 'demon_hunter'];
 
 if (!username || username.startsWith('--') || !VALID.includes(cls)) {
   console.error('usage: node scripts/create_gm.mjs <username> [--class <class>]');

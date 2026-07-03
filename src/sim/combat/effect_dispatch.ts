@@ -15,7 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
-import { ABILITIES } from '../data';
+import { ABILITIES, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
@@ -30,12 +30,75 @@ import {
 import { stunDrCategory } from '../stun_dr';
 import { addThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
-import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
-import { isRooted } from './cc';
+import { armorReduction, FISHING_CAST_ID, meleeMissChance, swingMissChance } from '../types';
+import { blindMissBonus, isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { exclusiveAuraConflicts } from './exclusive_aura';
+import { baseSwingSpeed } from './form_swing';
+import { applyThornsReaction } from './thorns_charge';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
+const RETREAT_LEAP_GRAVITY = 16; // mirrors sim.ts jump gravity for ability-launched arcs
+
+function clearChargeState(p: Entity): void {
+  p.chargeTargetId = null;
+  p.chargePath = [];
+  p.chargeTimeLeft = 0;
+}
+
+function clearAbilityDash(p: Entity): void {
+  p.abilityDashRemaining = 0;
+  p.abilityDashSpeed = 0;
+  p.abilityDashX = 0;
+  p.abilityDashZ = 0;
+}
+
+function launchAbilityArc(
+  p: Entity,
+  facing: number,
+  distance: number,
+  height: number,
+  duration: number,
+): void {
+  const d = Math.max(0.1, duration);
+  const speed = Math.max(0, distance) / d;
+  clearChargeState(p);
+  clearAbilityDash(p);
+  p.vx = Math.sin(facing) * speed;
+  p.vz = Math.cos(facing) * speed;
+  p.vy = Math.max(p.vy, Math.sqrt(Math.max(0, 2 * RETREAT_LEAP_GRAVITY * height)));
+  p.onGround = false;
+  p.jumping = true;
+  p.fallStartY = Math.max(p.fallStartY, p.pos.y);
+}
+
+function launchGroundDash(p: Entity, facing: number, distance: number, duration: number): void {
+  const d = Math.max(0.1, duration);
+  clearChargeState(p);
+  p.followTargetId = null;
+  p.abilityDashRemaining = Math.max(0, distance);
+  p.abilityDashSpeed = Math.max(0, distance) / d;
+  p.abilityDashX = Math.sin(facing);
+  p.abilityDashZ = Math.cos(facing);
+  p.vx = p.abilityDashX * p.abilityDashSpeed;
+  p.vz = p.abilityDashZ * p.abilityDashSpeed;
+  if (p.onGround) {
+    p.vy = 0;
+    p.jumping = false;
+  }
+}
+
+function selectedHostile(
+  ctx: SimContext,
+  p: Entity,
+  target: Entity | null,
+  radius: number,
+): Entity | null {
+  if (target && !target.dead && ctx.isHostileTo(p, target)) return target;
+  const selected = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+  if (selected && !selected.dead && ctx.isHostileTo(p, selected)) return selected;
+  return ctx.hostilesInRadius(p, p.pos, radius).find((m) => !m.dead) ?? null;
+}
 
 function isStealthToggle(ability: AbilityDef): boolean {
   return ability.effects.some((e) => e.type === 'selfBuff' && e.kind === 'stealth');
@@ -45,6 +108,103 @@ function preservesStealth(ability: AbilityDef): boolean {
   return isStealthToggle(ability) || ability.id === 'sprint';
 }
 
+function instantWeaponHit(
+  ctx: SimContext,
+  attacker: Entity,
+  target: Entity,
+  ability: AbilityDef,
+  bonus: number,
+  opts: {
+    cannotBeDodged?: boolean;
+    weaponMult?: number;
+    threatFlat?: number;
+    threatMult?: number;
+  },
+): boolean {
+  const missChance = swingMissChance(attacker, target) + blindMissBonus(attacker);
+  const dodgeChance = opts.cannotBeDodged
+    ? 0
+    : target.kind === 'player'
+      ? target.dodgeChance
+      : 0.05 + Math.max(0, target.level - attacker.level) * 0.005;
+  const roll = ctx.rng.next();
+  if (roll < missChance) {
+    ctx.emit({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: target.id,
+      amount: 0,
+      crit: false,
+      school: ability.school,
+      ability: ability.name,
+      kind: 'miss',
+    });
+    ctx.enterCombat(attacker, target);
+    return false;
+  }
+  if (roll < missChance + dodgeChance) {
+    ctx.emit({
+      type: 'damage',
+      sourceId: attacker.id,
+      targetId: target.id,
+      amount: 0,
+      crit: false,
+      school: ability.school,
+      ability: ability.name,
+      kind: 'dodge',
+    });
+    ctx.enterCombat(attacker, target);
+    if (attacker.kind === 'player') attacker.overpowerUntil = ctx.time + 5;
+    return false;
+  }
+
+  let imbueBonus = 0;
+  for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
+  let dmg =
+    (ctx.rng.range(attacker.weapon.min, attacker.weapon.max) +
+      (ctx.effectiveAttackPower(attacker) / 14) * baseSwingSpeed(attacker)) *
+      (opts.weaponMult ?? 1) +
+    bonus +
+    imbueBonus;
+  const critChance = Math.max(
+    0.005,
+    attacker.critChance - Math.max(0, target.level - attacker.level) * 0.002,
+  );
+  const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, attacker) ? 1 : critChance);
+  if (crit) dmg *= 2;
+  if (ability.school === 'physical') dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
+  ctx.dealDamage(
+    attacker,
+    target,
+    Math.max(1, Math.round(dmg)),
+    crit,
+    ability.school,
+    ability.name,
+    'hit',
+    false,
+    { flat: opts.threatFlat ?? 0, mult: opts.threatMult ?? 1 },
+  );
+
+  if (!attacker.dead) {
+    applyThornsReaction(ctx, target, attacker);
+    const spikes = MOBS[target.templateId]?.thorns;
+    if (spikes && !attacker.dead) {
+      ctx.dealDamage(
+        target,
+        attacker,
+        spikes.value,
+        false,
+        spikes.school ?? 'physical',
+        spikes.name ?? 'Spiked Hide',
+        'hit',
+        true,
+        undefined,
+        false,
+      );
+    }
+  }
+  return true;
+}
 export function runEffects(
   ctx: SimContext,
   p: Entity,
@@ -56,6 +216,7 @@ export function runEffects(
   const isSpell = ability.school !== 'physical';
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
   let comboAwarded = false;
+  const selfBuffEffectCount = res.effects.filter((e) => e.type === 'selfBuff').length;
   // acting breaks stealth (the opener itself still lands first inside the swing).
   // Stealth toggles and Rogue Sprint are allowed while remaining hidden.
   if (!preservesStealth(ability)) ctx.breakStealth(p);
@@ -78,8 +239,27 @@ export function runEffects(
         if (ability.requiresDodgeProc) p.overpowerUntil = -1;
         break;
       }
+      case 'weaponHit': {
+        if (!target) break;
+        instantWeaponHit(ctx, p, target, ability, eff.bonus, {
+          cannotBeDodged: eff.cannotBeDodged,
+          weaponMult: eff.weaponMult ?? 1,
+          threatFlat: res.threatFlat,
+          threatMult: res.threatMult,
+        });
+        break;
+      }
       case 'directDamage': {
         if (!target) break;
+        if (ability.id === 'eye_beam') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: target.id,
+            school: ability.school,
+            fx: 'beam',
+          });
+        }
         const rooted = isRooted(target);
         const critChance =
           isSpell && rooted
@@ -459,6 +639,24 @@ export function runEffects(
         ctx.enterCombat(p, target);
         break;
       }
+      case 'selfAoeDot': {
+        ctx.applyAura(p, {
+          id: `${ability.id}_burn`,
+          name: ability.name,
+          kind: 'aoe_dot',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: eff.min,
+          value2: eff.max,
+          value3: eff.radius,
+          tickInterval: eff.interval,
+          tickTimer: eff.interval,
+          sourceId: p.id,
+          school: ability.school,
+        });
+        ctx.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: ability.school, fx: 'nova' });
+        break;
+      }
       case 'aoeDamage': {
         // Ground-targeted casts blast where they were aimed; others detonate on
         // the caster. The fx follows the same center (a world-anchored burst for
@@ -528,7 +726,17 @@ export function runEffects(
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
           spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
         };
-        if (p.castAim) {
+        if (ability.class === 'demon_hunter') {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+            duration: eff.duration,
+          });
+        } else if (p.castAim) {
           ctx.emit({
             type: 'spellfxAt',
             x: zoneCenter.x,
@@ -626,8 +834,9 @@ export function runEffects(
           eff.kind === 'defensive_stance' ||
           eff.kind === 'stealth' ||
           ability.id === 'ghost_wolf';
+        const auraId = selfBuffEffectCount > 1 && !isToggle ? ability.id + '_' + eff.kind : ability.id;
         if (isToggle) {
-          const existing = p.auras.findIndex((a) => a.id === ability.id);
+          const existing = p.auras.findIndex((a) => a.id === auraId);
           if (existing >= 0) {
             p.auras.splice(existing, 1);
             if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
@@ -662,7 +871,7 @@ export function runEffects(
           ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
         }
         ctx.applyAura(p, {
-          id: ability.id,
+          id: auraId,
           name: ability.name,
           kind: eff.kind,
           remaining: eff.duration,
@@ -706,6 +915,75 @@ export function runEffects(
         p.chargePath = ctx.findChargePath(p, target);
         if (p.resourceType === 'rage') p.resource = Math.min(p.maxResource, p.resource + 9);
         ctx.enterCombat(p, target);
+        break;
+      }
+      case 'retreatLeap': {
+        if (isRooted(p)) break;
+        launchAbilityArc(p, p.facing + Math.PI, eff.distance, eff.height, eff.duration);
+        break;
+      }
+      case 'forwardRush': {
+        if (isRooted(p)) break;
+        launchGroundDash(p, p.facing, eff.distance, eff.duration);
+        ctx.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: ability.school, fx: 'nova' });
+        break;
+      }
+      case 'bladeDanceDash': {
+        if (isRooted(p)) break;
+        const danceTarget = selectedHostile(ctx, p, target, eff.radius);
+        if (danceTarget) {
+          const origin = { ...p.pos };
+          const originFacing = p.facing;
+          let dx = p.pos.x - danceTarget.pos.x;
+          let dz = p.pos.z - danceTarget.pos.z;
+          let len = Math.hypot(dx, dz);
+          if (len < 0.1) {
+            dx = Math.sin(p.facing);
+            dz = Math.cos(p.facing);
+            len = 1;
+          }
+          const side = ctx.rng.chance(0.5) ? 1 : -1;
+          const blinkRadius = Math.max(2.2, Math.min(3.4, eff.distance * 0.22));
+          const startAngle = Math.atan2(dx, dz);
+          const blinkAngle = startAngle + side * ((Math.PI * 2) / 3);
+          const blinkPos = {
+            x: danceTarget.pos.x + Math.sin(blinkAngle) * blinkRadius,
+            y: danceTarget.pos.y,
+            z: danceTarget.pos.z + Math.cos(blinkAngle) * blinkRadius,
+          };
+          p.chargeTargetId = null;
+          p.chargePath = [];
+          p.chargeTimeLeft = 0;
+          clearAbilityDash(p);
+          p.vx = 0;
+          p.vz = 0;
+          p.vy = 0;
+          p.onGround = true;
+          p.jumping = false;
+          p.pos = ctx.groundPos(blinkPos.x, blinkPos.z);
+          p.prevPos = { ...p.pos };
+          p.fallStartY = p.pos.y;
+          p.facing = Math.atan2(danceTarget.pos.x - p.pos.x, danceTarget.pos.z - p.pos.z);
+          p.prevFacing = p.facing;
+          ctx.rebucket(p);
+          p.bladeDanceSeq = {
+            targetId: danceTarget.id,
+            origin,
+            originFacing,
+            radius: blinkRadius,
+            side,
+            startAngle,
+            step: 1,
+            nextAt: ctx.time + 0.12,
+            returnAt: ctx.time + 0.36,
+            school: ability.school,
+          };
+          ctx.emit({ type: 'bladeDanceBlink', sourceId: p.id, targetId: danceTarget.id, school: ability.school });
+          ctx.enterCombat(p, danceTarget);
+        } else {
+          launchAbilityArc(p, p.facing, eff.distance * 0.45, eff.height, eff.duration);
+          ctx.emit({ type: 'spellfx', sourceId: p.id, targetId: p.id, school: ability.school, fx: 'nova' });
+        }
         break;
       }
       case 'sunder': {

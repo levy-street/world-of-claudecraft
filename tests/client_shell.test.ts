@@ -1338,6 +1338,26 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('seeds a stale empty Demon Hunter bar once from the class kit', () => {
+    expect(hudTs).toContain("this.sim.cfg.playerClass !== 'demon_hunter'");
+    expect(hudTs).toContain('seedClassBarIfNeeded(stored, parsed)');
+    expect(hudTs).toContain("_class_seeded_v2");
+    expect(hudTs).toContain("this.formKitAbilityIds('normal')");
+  });
+
+  it('does not keep the temporary level-20 Demon Hunter test shortcut', () => {
+    const startOfflineBody = mainTs.slice(
+      mainTs.indexOf('async function startOffline'),
+      mainTs.indexOf('// ---------------------------------------------------------------------------', mainTs.indexOf('async function startOffline')),
+    );
+    expect(startOfflineBody).not.toContain("playerClass === 'demon_hunter'");
+    expect(startOfflineBody).not.toContain('setPlayerLevel(20)');
+  });
+
+  it('keeps Release Spirit as a command-only UI action', () => {
+    expect(hudTs).not.toContain('this.sim.player.dead = true');
+    expect(hudTs).toContain("this.setDisplay(this.deathOverlayEl, p.dead ? 'flex' : 'none');");
+  });
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
     expect(hudTs).toContain('_seeded');
     expect(hudTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');

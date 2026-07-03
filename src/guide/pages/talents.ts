@@ -1,5 +1,5 @@
 // Talents and Specializations: a concept explainer plus a spoiler-safe specializations
-// overview for all nine classes (name, role, one-liner, mastery name, from talent_i18n).
+// overview for all ten classes (name, role, one-liner, mastery name, from talent_i18n).
 // Deliberately no numeric talent trees or point allocations: that is build-guide territory
 // our guide does not ship. The spec cards reuse the shared class_view component.
 

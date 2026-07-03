@@ -4,7 +4,7 @@
 // exercised against a real Sim.ctx (so resolve/recalcPlayerStats/groundPos are real).
 
 import { describe, expect, it, vi } from 'vitest';
-import { DELVES, isDelvePos, MOBS } from '../src/sim/data';
+import { DELVES, DELVE_X_MIN, isDelvePos, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   addEntityToRoster,
@@ -21,7 +21,7 @@ import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { SpatialGrid } from '../src/sim/spatial';
-import type { Entity } from '../src/sim/types';
+import type { Entity, PlayerClass } from '../src/sim/types';
 
 type AnyEntity = Entity & Record<string, any>;
 
@@ -497,7 +497,7 @@ describe('entity_roster: graveyardReadout (pure)', () => {
 });
 
 describe('entity_roster: release-spirit (real Sim.ctx)', () => {
-  const makeSim = (cls: 'warrior' | 'rogue' = 'warrior', seed = 42) =>
+  const makeSim = (cls: PlayerClass = 'warrior', seed = 42) =>
     new Sim({ seed, playerClass: cls, autoEquip: true }) as any;
 
   it('outdoor release respawns at the zone graveyard at FULL hp, out of combat', () => {
@@ -515,6 +515,34 @@ describe('entity_roster: release-spirit (real Sim.ctx)', () => {
     expect(isDelvePos(p.pos.x)).toBe(false);
   });
 
+  it('orphaned Demon Hunter deaths in the delve band can still release to a graveyard', () => {
+    const sim = makeSim('demon_hunter', 101);
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.pos = { x: DELVE_X_MIN, y: 0, z: 12 };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    p.hp = 0;
+    p.dead = true;
+
+    releasePlayerSpirit(sim.ctx, sim.playerId);
+
+    expect(p.dead).toBe(false);
+    expect(p.hp).toBe(p.maxHp);
+    expect(isDelvePos(p.pos.x)).toBe(false);
+  });
+  it('releases a zero-health player even if the dead flag is stale', () => {
+    const sim = makeSim('demon_hunter', 102);
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    p.dead = false;
+    p.hp = 0;
+
+    releasePlayerSpirit(sim.ctx, sim.playerId);
+
+    expect(p.dead).toBe(false);
+    expect(p.hp).toBe(p.maxHp);
+  });
   it('a not-dead player early-bails (no respawn side effects)', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);

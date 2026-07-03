@@ -630,6 +630,9 @@
   .energy .bar-fill {
     background-color: var(--color-energy);
   }
+  .fury .bar-fill {
+    background-color: var(--color-fury);
+  }
   /* Damage-absorb shield overlay (Power Word: Shield, Ice Barrier, …): a hatched
      translucent segment laid over the health bar, extending past current health. */
   .bar-absorb {
@@ -673,6 +676,11 @@
       0 0 5px 1px rgba(255, 225, 110, var(--lr-opacity)),
       inset 0 0 4px rgba(255, 245, 200, 0.9);
   }
+  .bar.fury.low .bar-fill {
+    box-shadow:
+      0 0 5px 1px rgba(166, 120, 255, var(--lr-opacity)),
+      inset 0 0 4px rgba(224, 205, 255, 0.9);
+  }
   .low-resource-label {
     display: none;
     position: absolute;
@@ -692,6 +700,9 @@
   }
   .bar.energy.low .low-resource-label {
     color: #fff3c2;
+  }
+  .bar.fury.low .low-resource-label {
+    color: #e2d2ff;
   }
   @keyframes low-resource-pulse {
     0%,

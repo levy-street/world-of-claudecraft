@@ -17,7 +17,7 @@ function serialize(id: string): string {
 }
 
 describe('ability icons', () => {
-  it('has at least the nine classes worth of abilities', () => {
+  it('has at least the ten classes worth of abilities', () => {
     expect(abilityIds.length).toBeGreaterThan(140);
   });
 

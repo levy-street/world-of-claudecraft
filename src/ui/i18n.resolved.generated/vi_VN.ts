@@ -1300,7 +1300,8 @@ export const vi_VN: EnTranslations = {
     "resourceName": {
       "rage": "Cuồng Nộ",
       "mana": "Mana",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Tất cả lớp nhân vật",
@@ -1404,7 +1405,18 @@ export const vi_VN: EnTranslations = {
       "mark_of_the_wild": "Một phúc lành lâu dài bạn ban cho bản thân hoặc đồng đội trước trận đấu.",
       "moonfire": "Giáng đòn tức thời và khiến mục tiêu cháy âm ỉ, hữu dụng khi đang di chuyển.",
       "rejuvenation": "Niệm tức thời và hồi máu cho đồng đội theo thời gian, để bạn cứ tiếp tục hành động.",
-      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn."
+      "thorns": "Bảo hộ đồng đội để kẻ tấn công cận chiến tự làm mình bị thương khi ra đòn.",
+      "demon_bite": "Your reliable builder: bite in with your weapons and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard chaotic melee strike.",
+      "vengeful_retreat": "Leap back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target at range and slow it long enough to catch up.",
+      "fel_rush": "Close a gap quickly and land with a burst of Chaos damage.",
+      "immolation_aura": "Light up nearby enemies while your attacks hit harder.",
+      "blur": "A defensive movement button for dodging through danger.",
+      "blade_dance": "Spend Fury to cut through enemies around you.",
+      "sigil_of_flame": "Place a burning sigil to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused blast of fel energy into your target.",
+      "metamorphosis": "Turn a fight with a short demonic power window."
     },
     "petHook": {
       "imp": "Một con quỷ bắn cầu lửa từ xa, gặm dần kẻ địch từ khoảng cách an toàn.",
@@ -2182,6 +2194,7 @@ export const vi_VN: EnTranslations = {
     "mage": "Pháp Sư",
     "warlock": "Thuật Sĩ Hắc Ám",
     "druid": "Druid",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Lớp nhân vật Chiến Binh",
     "paladinAria": "Lớp nhân vật Thánh Kỵ Sĩ",
     "hunterAria": "Lớp nhân vật Thợ Săn",
@@ -2190,7 +2203,8 @@ export const vi_VN: EnTranslations = {
     "shamanAria": "Lớp nhân vật Shaman",
     "mageAria": "Lớp nhân vật Pháp Sư",
     "warlockAria": "Lớp nhân vật Thuật Sĩ Hắc Ám",
-    "druidAria": "Lớp nhân vật Druid"
+    "druidAria": "Lớp nhân vật Druid",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Hướng Dẫn Điều Khiển",
@@ -2801,7 +2815,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Năng Lượng",
-      "rage": "Nộ Khí"
+      "rage": "Nộ Khí",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Đỡ Đòn / DPS Cận Chiến",
@@ -2812,7 +2827,8 @@ export const vi_VN: EnTranslations = {
       "shaman": "Trị Liệu / DPS Cận Chiến hoặc Tầm Xa",
       "mage": "DPS Tầm Xa",
       "warlock": "DPS Tầm Xa",
-      "druid": "Đỡ Đòn / Trị Liệu / DPS Cận Chiến hoặc Tầm Xa"
+      "druid": "Đỡ Đòn / Trị Liệu / DPS Cận Chiến hoặc Tầm Xa",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Giáp Xích, Giáp Da, Giáp Vải",
@@ -2836,7 +2852,8 @@ export const vi_VN: EnTranslations = {
       "shaman": "Shaman điều khiển các nguyên tố, ban sức mạnh cho vũ khí, gây choáng kẻ thù bằng sấm sét, và hồi phục cho đồng minh.",
       "mage": "Pháp Sư điều khiển sức mạnh Hỏa, Băng và Bí Thuật để tiêu diệt kẻ thù, tạo ra nước, và đóng băng các mối đe dọa tại chỗ.",
       "warlock": "Thuật Sĩ Hắc Ám triệu hồi quỷ dữ, gieo lời nguyền và ma thuật sát thương theo thời gian, và hút sinh lực từ kẻ thù để trường tồn.",
-      "druid": "Druid khơi dẫn sức mạnh thiên nhiên, chữa lành vết thương, trói buộc kẻ thù, và biến hình thành các dạng thú để phòng thủ hoặc gây sát thương."
+      "druid": "Druid khơi dẫn sức mạnh thiên nhiên, chữa lành vết thương, trói buộc kẻ thù, và biến hình thành các dạng thú để phòng thủ hoặc gây sát thương.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "Chi tiết lớp {className}: vai trò {role}. Chỉ số khởi đầu: Sức Mạnh {str}, Nhanh Nhẹn {agi}, Sức Bền {sta}, Trí Tuệ {int}, Tinh Thần {spi}.",
     "statBarAria": "{stat}: {value} trên 25"
@@ -3176,6 +3193,7 @@ export const vi_VN: EnTranslations = {
       "abilityNotReady": "Kỹ năng đó chưa sẵn sàng.",
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Không đủ mana!",
       "notEnoughResource": "Không đủ {resource}!",
       "notEnoughHealth": "Không đủ sinh lực.",
@@ -3474,7 +3492,8 @@ export const vi_VN: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Nộ Khí",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Gấu",
@@ -4333,6 +4352,50 @@ export const vi_VN: EnTranslations = {
       "rip": {
         "name": "Xé Rách",
         "description": "Đòn kết liễu gây sát thương Chảy Máu trong 12 giây. Tiêu hao điểm liên hoàn. Chỉ dùng được ở Hình Sói."
+      },
+      "demon_bite": {
+        "name": "Demon Bite",
+        "description": "A quick strike that deals weapon damage plus {damage} and generates Fury."
+      },
+      "chaos_strike": {
+        "name": "Chaos Strike",
+        "description": "Slash the target with chaotic energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Vengeful Retreat",
+        "description": "Spring backward in a burst of fel momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Throw Glaive",
+        "description": "Throw a fel-edged glaive for {damage} Chaos damage and a brief snare."
+      },
+      "fel_rush": {
+        "name": "Fel Rush",
+        "description": "Rush through a distant enemy, closing the gap and dealing {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Immolation Aura",
+        "description": "Ignite yourself with fel fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Blur",
+        "description": "Blur into motion, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Unleash a sweeping dance of blades for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Sigil of Flame",
+        "description": "Carve a fel sigil into the ground, burning enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Eye Beam",
+        "description": "Channel a beam of chaotic fel energy, dealing {damage} Chaos damage each pulse."
+      },
+      "metamorphosis": {
+        "name": "Metamorphosis",
+        "description": "Unleash your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Đòn Trí Mạng",

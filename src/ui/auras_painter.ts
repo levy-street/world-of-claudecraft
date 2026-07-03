@@ -121,7 +121,7 @@ export class AurasPainter {
 
   constructor(
     private readonly writers: PainterHostWriters,
-    private readonly container: HTMLElement,
+    private readonly container: HTMLElement | null,
     private readonly deps: AurasPainterDeps,
     // Injectable so a Node test can drive the pool without a global document.
     private readonly doc: Document = document,
@@ -134,6 +134,7 @@ export class AurasPainter {
   /** Reconcile the pool to this frame's active auras and repaint each in place. Runs
    *  every frame; the elided writers make an unchanged frame cost no DOM mutation. */
   paint(state: AurasState): void {
+    if (!this.container) return;
     this.frame++;
     const { slots, count } = state;
     // On low, cap the number of rendered auras; auras beyond the cap are
@@ -269,6 +270,7 @@ export class AurasPainter {
   // already detached in paint(), and new / recycled records are detached, so every move
   // here is a deliberate (re)insert; an unchanged order touches the DOM not at all.
   private reconcileOrder(): void {
+    if (!this.container) return;
     let ref: ChildNode | null = this.container.firstChild;
     for (const rec of this.ordered) {
       if (rec.el === ref) {

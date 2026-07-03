@@ -52,6 +52,7 @@ const abilityStringsEn = {
       mana: 'Mana',
       rage: 'Rage',
       energy: 'Energy',
+      fury: 'Fury',
     },
     forms: {
       bear: 'Bear',
@@ -1104,6 +1105,57 @@ const classAbilityNamesEn = {
         'rip',
         'Rip',
         'Finishing move that causes Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
+      ],
+      [
+        'demon_bite',
+        'Demon Bite',
+        'A quick strike that deals weapon damage plus {damage} and generates Fury.',
+      ],
+      [
+        'chaos_strike',
+        'Chaos Strike',
+        'Slash the target with chaotic energy for weapon damage plus {damage}.',
+      ],
+      [
+        'vengeful_retreat',
+        'Vengeful Retreat',
+        'Spring backward in a burst of fel momentum, gaining Fury and briefly increasing speed and dodge.',
+      ],
+      [
+        'throw_glaive',
+        'Throw Glaive',
+        'Throw a fel-edged glaive for {damage} Chaos damage and a brief snare.',
+      ],
+      [
+        'fel_rush',
+        'Fel Rush',
+        'Rush through a distant enemy, closing the gap and dealing {damage} Chaos damage.',
+      ],
+      [
+        'immolation_aura',
+        'Immolation Aura',
+        'Ignite yourself with fel fire, burning nearby enemies for {damage} and empowering your attacks.',
+      ],
+      ['blur', 'Blur', 'Blur into motion, increasing dodge chance and movement speed for 10 sec.'],
+      [
+        'blade_dance',
+        'Blade Dance',
+        'Unleash a sweeping dance of blades for {damage} damage to nearby enemies.',
+      ],
+      [
+        'sigil_of_flame',
+        'Sigil of Flame',
+        'Carve a fel sigil into the ground, burning enemies standing in it for {damage} Chaos damage.',
+      ],
+      [
+        'eye_beam',
+        'Eye Beam',
+        'Channel a beam of chaotic fel energy, dealing {damage} Chaos damage each pulse.',
+      ],
+      [
+        'metamorphosis',
+        'Metamorphosis',
+        'Unleash your demonic form, generating Fury and greatly increasing offense, armor, and speed.',
       ],
       [
         'mortal_strike',

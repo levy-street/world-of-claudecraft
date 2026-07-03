@@ -70,7 +70,7 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
     }
   } else if (p.resourceType === 'energy') {
     p.resource = Math.min(p.maxResource, p.resource + 20);
-  } else if (p.resourceType === 'rage' && !p.inCombat) {
+  } else if ((p.resourceType === 'rage' || p.resourceType === 'fury') && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
   if (!p.inCombat && p.hp < p.maxHp && !p.eating) {
@@ -131,7 +131,37 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
-        if (a.kind === 'dot') {
+        if (a.kind === 'aoe_dot') {
+          const source = ctx.entities.get(a.sourceId) ?? e;
+          if (!source.dead) {
+            ctx.emit({
+              type: 'spellfx',
+              sourceId: source.id,
+              targetId: source.id,
+              school: a.school,
+              fx: 'tick',
+            });
+            const radius = a.value3 ?? 0;
+            const min = a.value;
+            const max = a.value2 ?? a.value;
+            for (const target of ctx.hostilesInRadius(source, source.pos, radius)) {
+              if (!ctx.hasLineOfSight(source, target)) continue;
+              ctx.dealDamage(
+                source,
+                target,
+                Math.round(ctx.rng.range(min, max)),
+                false,
+                a.school,
+                a.name,
+                'hit',
+                false,
+                undefined,
+                false,
+              );
+              if (target.dead && target.id === e.id) return;
+            }
+          }
+        } else if (a.kind === 'dot') {
           ctx.emit({
             type: 'spellfx',
             sourceId: a.sourceId,

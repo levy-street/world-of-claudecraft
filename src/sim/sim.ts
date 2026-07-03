@@ -130,6 +130,7 @@ import {
   releasePlayerSpirit,
   releaseSpiritInDelve as releaseSpiritInDelveImpl,
   runDespawnDecay,
+  tickBladeDanceSequences,
   tickGroundAoEs,
 } from './entity_roster';
 import { canEquipItem } from './equipment_rules';
@@ -2533,6 +2534,7 @@ export class Sim {
     this.updateDelveRuns();
     this.market.update();
     drainDelayedEvents(this.ctx);
+    tickBladeDanceSequences(this.ctx);
 
     // movement re-bucketing: queries during the next tick and the server's
     // snapshot broadcast right after this one see fresh cells
@@ -2719,6 +2721,78 @@ export class Sim {
     }));
   }
 
+  private updateAbilityDashMovement(p: Entity): boolean {
+    if (p.abilityDashRemaining <= 0) return false;
+    if (isRooted(p) || isStunned(p)) {
+      p.abilityDashRemaining = 0;
+      p.abilityDashSpeed = 0;
+      p.abilityDashX = 0;
+      p.abilityDashZ = 0;
+      p.vx = 0;
+      p.vz = 0;
+      return false;
+    }
+    if (p.sitting) this.standUp(p);
+    const step = Math.min(p.abilityDashSpeed * DT, p.abilityDashRemaining);
+    if (step <= 1e-5) {
+      p.abilityDashRemaining = 0;
+      p.vx = 0;
+      p.vz = 0;
+      return false;
+    }
+    p.facing = Math.atan2(p.abilityDashX, p.abilityDashZ);
+    const nx = p.pos.x + p.abilityDashX * step;
+    const nz = p.pos.z + p.abilityDashZ * step;
+    const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
+    const h1 = groundHeight(nx, nz, this.cfg.seed);
+    if (p.onGround) {
+      if (h1 < WATER_LEVEL - SWIM_DEPTH) {
+        p.abilityDashRemaining = 0;
+        p.vx = 0;
+        p.vz = 0;
+        return true;
+      }
+      if (
+        h1 > h0 &&
+        ((h1 - h0) / step > MAX_CLIMB_SLOPE ||
+          terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)
+      ) {
+        p.abilityDashRemaining = 0;
+        p.vx = 0;
+        p.vz = 0;
+        return true;
+      }
+    } else if (h1 > p.pos.y) {
+      p.abilityDashRemaining = 0;
+      p.vx = 0;
+      p.vz = 0;
+      return true;
+    }
+    const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p, !p.onGround && p.jumping);
+    const moved = Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z);
+    p.pos.x = resolved.x;
+    p.pos.z = resolved.z;
+    if (p.onGround) {
+      p.pos.y = groundHeight(resolved.x, resolved.z, this.cfg.seed);
+      p.vy = 0;
+      p.jumping = false;
+      p.fallStartY = p.pos.y;
+    }
+    p.abilityDashRemaining = Math.max(0, p.abilityDashRemaining - moved);
+    if (moved < step * 0.25 || p.abilityDashRemaining <= 0.01) {
+      p.abilityDashRemaining = 0;
+      p.abilityDashSpeed = 0;
+      p.abilityDashX = 0;
+      p.abilityDashZ = 0;
+      p.vx = 0;
+      p.vz = 0;
+    } else {
+      p.vx = p.abilityDashX * p.abilityDashSpeed;
+      p.vz = p.abilityDashZ * p.abilityDashSpeed;
+    }
+    return true;
+  }
+
   // Charge in flight: forced movement toward the target along the pathfound
   // route. Returns true while it owns the player's movement this tick.
   private updateChargeMovement(p: Entity): boolean {
@@ -2849,6 +2923,7 @@ export class Sim {
     ) {
       meta.lastActiveTick = this.tickCount;
     }
+    if (this.updateAbilityDashMovement(p)) return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;
@@ -3934,7 +4009,7 @@ export class Sim {
     target: Entity,
     spell: {
       name: string;
-      school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+      school: import('./types').MagicSchool;
       min: number;
       max: number;
       range: number;

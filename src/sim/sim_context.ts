@@ -379,7 +379,7 @@ export interface SimContextCallbacks {
     target: Entity,
     spell: {
       name: string;
-      school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+      school: import('./types').MagicSchool;
       min: number;
       max: number;
       range: number;

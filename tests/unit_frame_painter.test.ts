@@ -117,6 +117,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'mana', true] },
+      { m: 'toggleClass', args: [RES_CONTAINER, 'fury', false] },
       { m: 'setTransform', args: [RES_FILL, 'scaleX(0.8)'] },
       { m: 'setText', args: [RES_TEXT, '80 / 100'] },
     ]);

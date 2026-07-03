@@ -62,6 +62,7 @@ const LOOT_ARCHETYPE: Record<PlayerClass, 'WAR' | 'ROG' | 'MAG'> = {
   paladin: 'WAR',
   shaman: 'WAR',
   rogue: 'ROG',
+  demon_hunter: 'ROG',
   hunter: 'ROG',
   mage: 'MAG',
   priest: 'MAG',

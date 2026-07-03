@@ -269,7 +269,7 @@ export const guideStrings = {
       'Armor softens physical hits, so better armor is your main source of staying power in melee. Magic is another matter: you weather spells with a deeper health pool and the chance to resist one outright, not with armor. Heavier armor classes shrug off more, but nothing makes you untouchable.',
     resourcesTitle: 'Every class has its own rhythm',
     resourcesBody:
-      'Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, and casters manage a pool of Mana. Learning your resource is half of playing your class well.',
+      'Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, demon hunters generate Fury, and casters manage a pool of Mana. Learning your resource is half of playing your class well.',
     growTitle: 'You grow stronger every level',
     growBody:
       'Each level makes you tougher and unlocks new abilities, all the way to the cap of level {cap}. Questing is the fastest way up; dungeons and exploration round it out.',
@@ -355,7 +355,7 @@ export const guideStrings = {
     q4: 'Can I play offline or solo?',
     a4: 'Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons and the raid.',
     q5: 'How many classes are there?',
-    a5: 'Nine, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.',
+    a5: 'Ten, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, energy, or fury) and its own signature abilities.',
     q6: 'What is the level cap?',
     a6: 'Level {cap}, reached across three connected zones of quests, dungeons, and exploration.',
     q7: 'Will my character be saved?',
@@ -372,7 +372,7 @@ export const guideStrings = {
 
   // Classes index + per-class pages.
   classList: {
-    heading: 'The nine classes',
+    heading: 'The ten classes',
     sub: 'Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents.',
   },
   role: {
@@ -384,6 +384,7 @@ export const guideStrings = {
     rage: 'Rage',
     mana: 'Mana',
     energy: 'Energy',
+    fury: 'Fury',
   },
   classPage: {
     back: 'All classes',
@@ -433,7 +434,7 @@ export const guideStrings = {
     goodFirst: 'Great first class',
   },
 
-  // The class chooser on the Classes index: filter the nine by how you want to play.
+  // The class chooser on the Classes index: filter the ten by how you want to play.
   chooser: {
     heading: 'Find your class',
     intro:
@@ -506,6 +507,17 @@ export const guideStrings = {
     moonfire: 'Hits instantly and leaves the target burning, good while moving.',
     rejuvenation: 'Casts instantly and heals an ally over time, so you can keep acting.',
     thorns: 'Wards an ally so melee attackers hurt themselves for striking.',
+    demon_bite: 'Your reliable builder: bite in with your weapons and generate Fury.',
+    chaos_strike: 'Spend Fury on a hard chaotic melee strike.',
+    vengeful_retreat: 'Leap back from danger while gaining Fury for your next strike.',
+    throw_glaive: 'Tag a fleeing target at range and slow it long enough to catch up.',
+    fel_rush: 'Close a gap quickly and land with a burst of Chaos damage.',
+    immolation_aura: 'Light up nearby enemies while your attacks hit harder.',
+    blur: 'A defensive movement button for dodging through danger.',
+    blade_dance: 'Spend Fury to cut through enemies around you.',
+    sigil_of_flame: 'Place a burning sigil to punish enemies that stand in it.',
+    eye_beam: 'Channel a focused blast of fel energy into your target.',
+    metamorphosis: 'Turn a fight with a short demonic power window.',
   },
 
   // Warlock demon roster flavor, keyed by pet id.
@@ -886,7 +898,7 @@ export const guideStrings = {
       'Most of the world is soloable. Team up for dungeons and the raid, or just when you want some company.',
     i7Title: 'Learn your resource',
     i7Body:
-      'Rage, mana, or energy, managing it well is half of playing your class. Watch that bar, not only your cooldowns.',
+      'Rage, mana, energy, or fury, managing it well is half of playing your class. Watch that bar, not only your cooldowns.',
     i8Title: 'Rest between fights',
     i8Body:
       'Eat and drink to recover quickly, especially as a caster. A few seconds now saves a death later.',
@@ -1151,7 +1163,7 @@ export const guideStrings = {
       'Stamina is your staying power. More Stamina means a larger health pool, and it speeds the health you recover while resting out of combat. Every class wants some.',
     intTitle: 'Intellect',
     intBody:
-      "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
+      "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage, Energy, or Fury class it does little.",
     spiTitle: 'Spirit',
     spiBody:
       "Spirit governs how quickly a caster's mana returns while out of combat. Like Intellect, it serves the mana classes and means little to the others.",

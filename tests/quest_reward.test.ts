@@ -8,7 +8,7 @@ import { QUESTS, questRewardItemId, REWARD_ARCHETYPE } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
-const ALL_CLASSES: PlayerClass[] = ['warrior', 'paladin', 'shaman', 'rogue', 'hunter', 'mage', 'priest', 'warlock', 'druid'];
+const ALL_CLASSES: PlayerClass[] = ['warrior', 'paladin', 'shaman', 'rogue', 'hunter', 'mage', 'priest', 'warlock', 'druid', 'demon_hunter'];
 
 describe('quest reward preview matches turn-in (#98)', () => {
   it('resolves the archetype fallback for classes without an explicit reward', () => {

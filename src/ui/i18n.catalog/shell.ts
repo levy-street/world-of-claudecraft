@@ -177,6 +177,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        fury: 'Fury',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -188,6 +189,7 @@ export const shellStrings = {
         mage: 'Ranged DPS',
         warlock: 'Ranged DPS',
         druid: 'Tank / Healer / Melee or Ranged DPS',
+        demon_hunter: 'Mobile melee DPS',
       },
       armor: {
         chainLeatherCloth: 'Chainmail, Leather, Cloth',
@@ -220,6 +222,8 @@ export const shellStrings = {
           'Warlocks summon demons, apply curses and damage-over-time magic, and drain life from enemies to endure.',
         druid:
           'Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage.',
+        demon_hunter:
+          'Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations.',
       },
       aria: 'Class details for {className}: role {role}. Starting stats: Strength {str}, Agility {agi}, Stamina {sta}, Intellect {int}, Spirit {spi}.',
       statBarAria: '{stat}: {value} out of 25',
@@ -784,6 +788,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        fury: 'Fury',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -988,6 +993,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        fury: 'Fury',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -1204,6 +1210,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        fury: 'Fury',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -1215,6 +1222,7 @@ export const shellStrings = {
         mage: 'Ranged DPS',
         warlock: 'Ranged DPS',
         druid: 'Tank / Healer / Melee or Ranged DPS',
+        demon_hunter: 'Mobile melee DPS',
       },
       armor: {
         chainLeatherCloth: 'Chainmail, Leather, Cloth',

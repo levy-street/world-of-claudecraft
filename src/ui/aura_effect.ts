@@ -18,7 +18,7 @@
 //     value is a 0..1 fraction shown as a percent.
 import type { AuraKind } from '../sim/types';
 
-export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature' | 'chaos';
 
 // Structural subset of Aura the descriptor needs; keeps this module decoupled from
 // the full sim Aura shape so a Vitest can drive it with plain literals.

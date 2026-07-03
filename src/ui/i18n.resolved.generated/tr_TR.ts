@@ -1300,7 +1300,8 @@ export const tr_TR: EnTranslations = {
     "resourceName": {
       "rage": "Öfke",
       "mana": "Mana",
-      "energy": "Enerji"
+      "energy": "Enerji",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Tüm sınıflar",
@@ -1404,7 +1405,18 @@ export const tr_TR: EnTranslations = {
       "mark_of_the_wild": "Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.",
       "moonfire": "Anında vurur ve hedefi yanar halde bırakır, hareket halindeyken iyidir.",
       "rejuvenation": "Anında okunur ve bir dostu zamanla iyileştirir, böylece harekete devam edebilirsin.",
-      "thorns": "Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir."
+      "thorns": "Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir.",
+      "demon_bite": "Your reliable builder: bite in with your weapons and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard chaotic melee strike.",
+      "vengeful_retreat": "Leap back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target at range and slow it long enough to catch up.",
+      "fel_rush": "Close a gap quickly and land with a burst of Chaos damage.",
+      "immolation_aura": "Light up nearby enemies while your attacks hit harder.",
+      "blur": "A defensive movement button for dodging through danger.",
+      "blade_dance": "Spend Fury to cut through enemies around you.",
+      "sigil_of_flame": "Place a burning sigil to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused blast of fel energy into your target.",
+      "metamorphosis": "Turn a fight with a short demonic power window."
     },
     "petHook": {
       "imp": "Düşmanları güvenli bir mesafeden ateş oklarıyla hırpalayan menzilli bir iblis.",
@@ -2182,6 +2194,7 @@ export const tr_TR: EnTranslations = {
     "mage": "Büyücü",
     "warlock": "Karabüyücü",
     "druid": "Druid",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Savaşçı sınıfı",
     "paladinAria": "Paladin sınıfı",
     "hunterAria": "Avcı sınıfı",
@@ -2190,7 +2203,8 @@ export const tr_TR: EnTranslations = {
     "shamanAria": "Şaman sınıfı",
     "mageAria": "Büyücü sınıfı",
     "warlockAria": "Karabüyücü sınıfı",
-    "druidAria": "Druid sınıfı"
+    "druidAria": "Druid sınıfı",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Kontrol Kılavuzu",
@@ -2801,7 +2815,8 @@ export const tr_TR: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Enerji",
-      "rage": "Öfke"
+      "rage": "Öfke",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Tank / Yakın DPS",
@@ -2812,7 +2827,8 @@ export const tr_TR: EnTranslations = {
       "shaman": "Şifacı / Yakın veya Menzilli DPS",
       "mage": "Menzilli DPS",
       "warlock": "Menzilli DPS",
-      "druid": "Tank / Şifacı / Yakın veya Menzilli DPS"
+      "druid": "Tank / Şifacı / Yakın veya Menzilli DPS",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Zincir Zırh, Deri, Kumaş",
@@ -2836,7 +2852,8 @@ export const tr_TR: EnTranslations = {
       "shaman": "Şamanlar elementlere komuta eder; silahlara güç katar, düşmanları yıldırımla sarsar ve müttefikleri iyileştirir.",
       "mage": "Büyücüler Ateş, Buz ve Gizem gücünü bükerek düşmanları yok eder, su çağırır ve tehditleri olduğu yerde dondurur.",
       "warlock": "Karabüyücüler şeytanlar çağırır, lanetler ve süregelen hasar büyüleri uygular ve dayanmak için düşmanlardan can emer.",
-      "druid": "Druidler doğayı yönlendirir; yaraları iyileştirir, düşmanları kıskaca alır ve savunma ya da hasar için hayvan formlarına bürünür."
+      "druid": "Druidler doğayı yönlendirir; yaraları iyileştirir, düşmanları kıskaca alır ve savunma ya da hasar için hayvan formlarına bürünür.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "{className} sınıf ayrıntıları: rol {role}. Başlangıç nitelikleri: Kuvvet {str}, Çeviklik {agi}, Dayanıklılık {sta}, Zeka {int}, Ruh {spi}.",
     "statBarAria": "{stat}: 25 üzerinden {value}"
@@ -3176,6 +3193,7 @@ export const tr_TR: EnTranslations = {
       "abilityNotReady": "O yetenek henüz hazır değil.",
       "notEnoughRage": "Yeterli öfke yok!",
       "notEnoughEnergy": "Yeterli enerji yok!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Yeterli mana yok!",
       "notEnoughResource": "Yeterli {resource} yok!",
       "notEnoughHealth": "Yeterli can yok.",
@@ -3474,7 +3492,8 @@ export const tr_TR: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Öfke",
-      "energy": "Enerji"
+      "energy": "Enerji",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Ayı",
@@ -4333,6 +4352,50 @@ export const tr_TR: EnTranslations = {
       "rip": {
         "name": "Parçalama",
         "description": "12 saniye boyunca kanama hasarı veren bitirici hamle. Kombo puanlarını tüketir. Yalnızca Kurt Formu."
+      },
+      "demon_bite": {
+        "name": "Demon Bite",
+        "description": "A quick strike that deals weapon damage plus {damage} and generates Fury."
+      },
+      "chaos_strike": {
+        "name": "Chaos Strike",
+        "description": "Slash the target with chaotic energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Vengeful Retreat",
+        "description": "Spring backward in a burst of fel momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Throw Glaive",
+        "description": "Throw a fel-edged glaive for {damage} Chaos damage and a brief snare."
+      },
+      "fel_rush": {
+        "name": "Fel Rush",
+        "description": "Rush through a distant enemy, closing the gap and dealing {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Immolation Aura",
+        "description": "Ignite yourself with fel fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Blur",
+        "description": "Blur into motion, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Blade Dance",
+        "description": "Unleash a sweeping dance of blades for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Sigil of Flame",
+        "description": "Carve a fel sigil into the ground, burning enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Eye Beam",
+        "description": "Channel a beam of chaotic fel energy, dealing {damage} Chaos damage each pulse."
+      },
+      "metamorphosis": {
+        "name": "Metamorphosis",
+        "description": "Unleash your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Ölümcül Darbe",

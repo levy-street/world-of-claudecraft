@@ -22,6 +22,7 @@ import {
   SHAMAN_TALENTS,
   WARLOCK_TALENTS,
 } from './talents_classic';
+import { DEMON_HUNTER_TALENTS } from './talents_demon_hunter';
 import { WARRIOR_TALENTS } from './talents_warrior';
 
 export type TalentTree = 'class' | 'spec';
@@ -187,6 +188,7 @@ export const TALENTS: Partial<Record<PlayerClass, ClassTalents>> = {
   mage: MAGE_TALENTS,
   warlock: WARLOCK_TALENTS,
   druid: DRUID_TALENTS,
+  demon_hunter: DEMON_HUNTER_TALENTS,
 };
 
 export function talentsFor(cls: PlayerClass): ClassTalents | null {

@@ -40,7 +40,7 @@ For the online client path, build a `ClientWorld` with `Object.create(ClientWorl
 transport (see `social_system.test.ts`) rather than mocking.
 
 ## Coverage & guards
-One test area per subsystem (combat/AI, the 9 classes, progression/xp, talents, social/guilds,
+One test area per subsystem (combat/AI, the 10 classes, progression/xp, talents, social/guilds,
 snapshots/bandwidth/interest, security/auth, keybinds/mobile, admin/moderation, i18n); `ls tests/`
 to find the file for an area.
 `architecture.test.ts` is the `src/sim` purity backstop: it scans every sim file and fails on a

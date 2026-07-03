@@ -44,7 +44,7 @@ try {
   check('home hides the docs sidebar', await page.$eval('#guide-sidebar', (el) => el.hidden));
   check('html lang set', (await page.$eval('html', (el) => el.lang)).length > 0);
   check('what-it-is pillars (3)', (await page.$$('.guide-pillar')).length === 3);
-  check('nine class chips', (await page.$$('.guide-class-chip')).length === 9);
+  check('ten class chips', (await page.$$('.guide-class-chip')).length === 10);
   check('three zone cards', (await page.$$('.guide-zone-card')).length === 3);
   check('faq disclosures (>=4)', (await page.$$('.guide-faq-item')).length >= 4);
   check('single h1 on the page', (await page.$$('.guide-main h1')).length === 1);
@@ -90,7 +90,7 @@ try {
   // Classes index + a class detail page.
   await page.goto(`${BASE}/wiki/classes`, { waitUntil: 'networkidle0' });
   await page.waitForSelector('.guide-class-card');
-  check('classes index lists nine classes', (await page.$$('.guide-class-card')).length === 9);
+  check('classes index lists ten classes', (await page.$$('.guide-class-card')).length === 10);
   const cardImg = await page.$eval('.guide-class-card img', (el) => el.getAttribute('src') || '');
   check(
     'class card shows the character still (crest fallback)',
@@ -153,7 +153,7 @@ try {
     '.guide-class-card',
     (els) => els.filter((e) => !e.hidden).length,
   );
-  check('chooser clear restores all nine', allVisible === 9);
+  check('chooser clear restores all nine', allVisible === 10);
 
   // Site search.
   await page.type('#guide-search-input', 'warrior');

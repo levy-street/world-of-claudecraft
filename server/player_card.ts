@@ -84,7 +84,8 @@ type PlayerClassKey =
   | 'shaman'
   | 'mage'
   | 'warlock'
-  | 'druid';
+  | 'druid'
+  | 'demon_hunter';
 
 export interface PublicCardCopy {
   gameName: string;
@@ -109,6 +110,7 @@ const EN_CLASSES: Record<PlayerClassKey, string> = {
   mage: 'Mage',
   warlock: 'Warlock',
   druid: 'Druid',
+  demon_hunter: 'Demon Hunter',
 };
 
 export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
@@ -144,6 +146,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Mago',
       warlock: 'Brujo',
       druid: 'Druida',
+      demon_hunter: 'Demon Hunter',
     },
   },
   es_ES: {
@@ -166,6 +169,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Mago',
       warlock: 'Brujo',
       druid: 'Druida',
+      demon_hunter: 'Demon Hunter',
     },
   },
   fr_FR: {
@@ -188,6 +192,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Mage',
       warlock: 'Démoniste',
       druid: 'Druide',
+      demon_hunter: 'Demon Hunter',
     },
   },
   fr_CA: {
@@ -210,6 +215,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Mage',
       warlock: 'Démoniste',
       druid: 'Druide',
+      demon_hunter: 'Demon Hunter',
     },
   },
   en_CA: {
@@ -244,6 +250,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Mago',
       warlock: 'Stregone',
       druid: 'Druido',
+      demon_hunter: 'Demon Hunter',
     },
   },
   de_DE: {
@@ -266,6 +273,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Magier',
       warlock: 'Hexenmeister',
       druid: 'Druide',
+      demon_hunter: 'Demon Hunter',
     },
   },
   zh_CN: {
@@ -288,6 +296,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: '法师',
       warlock: '术士',
       druid: '德鲁伊',
+      demon_hunter: 'Demon Hunter',
     },
   },
   zh_TW: {
@@ -310,6 +319,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: '法師',
       warlock: '術士',
       druid: '德魯伊',
+      demon_hunter: 'Demon Hunter',
     },
   },
   ko_KR: {
@@ -333,6 +343,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: '마법사',
       warlock: '흑마법사',
       druid: '드루이드',
+      demon_hunter: 'Demon Hunter',
     },
   },
   ja_JP: {
@@ -355,6 +366,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'メイジ',
       warlock: 'ウォーロック',
       druid: 'ドルイド',
+      demon_hunter: 'Demon Hunter',
     },
   },
   pt_BR: {
@@ -377,6 +389,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Mago',
       warlock: 'Bruxo',
       druid: 'Druida',
+      demon_hunter: 'Demon Hunter',
     },
   },
   ru_RU: {
@@ -399,6 +412,7 @@ export const PUBLIC_CARD_COPY: Record<PublicCardLocale, PublicCardCopy> = {
       mage: 'Маг',
       warlock: 'Чернокнижник',
       druid: 'Друид',
+      demon_hunter: 'Demon Hunter',
     },
   },
   ...PLAYERCARD_NEW,

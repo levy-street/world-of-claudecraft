@@ -235,6 +235,7 @@ const RESOURCE_KEYS = {
   mana: 'classDetails.resources.mana',
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
+  fury: 'classDetails.resources.fury',
 } satisfies Record<string, TranslationKey>;
 
 function classDisplayDescription(className: PlayerClass): string {
@@ -2718,8 +2719,9 @@ function updatePreviewContainer(panelId: string): void {
     // The selected roster row drives the showcase (class + that character's chroma).
     const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
     const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
+    const skin = Number(row?.dataset.skin ?? 0) || 0;
+    characterPreview.setSkin(skin);
     characterPreview.setClass(cls);
-    characterPreview.setSkin(Number(row?.dataset.skin ?? 0) || 0);
     syncPreviewAfterPanelLayout();
     return;
   }
@@ -2731,6 +2733,7 @@ function updatePreviewContainer(panelId: string): void {
   const selEl = document.querySelector(selSelector) as HTMLElement | null;
   if (selEl) {
     const cls = selEl.dataset.class as PlayerClass;
+    characterPreview.setSkin(0);
     characterPreview.setClass(cls);
     if (panelId === '#charcreate-panel') refreshOnlineSkins(cls);
     else refreshOfflineSkins(cls);
@@ -3948,6 +3951,7 @@ function renderClassDetails(panelId: string, className: PlayerClass): void {
   currentlyRenderedClass[panelId] = className;
 
   if (characterPreview) {
+    characterPreview.setSkin(0);
     characterPreview.setClass(className);
   }
 
@@ -4049,6 +4053,7 @@ function renderClassDetails(panelId: string, className: PlayerClass): void {
           eff.type === 'heal' ||
           eff.type === 'weaponDamage' ||
           eff.type === 'weaponStrike' ||
+          eff.type === 'weaponHit' ||
           eff.type === 'aoeDamage' ||
           eff.type === 'aoeRoot' ||
           eff.type === 'finisherDamage' ||
@@ -4063,7 +4068,7 @@ function renderClassDetails(panelId: string, className: PlayerClass): void {
           primaryEffect.type === 'drainTick'
         ) {
           dmgText = classDetailAmountRange(primaryEffect.min, primaryEffect.max);
-        } else if (primaryEffect.type === 'weaponDamage' || primaryEffect.type === 'weaponStrike') {
+        } else if (primaryEffect.type === 'weaponDamage' || primaryEffect.type === 'weaponStrike' || primaryEffect.type === 'weaponHit') {
           dmgText = formatClassDetailNumber(primaryEffect.bonus);
         } else if (primaryEffect.type === 'finisherDamage') {
           dmgText = t('abilityUi.tooltip.finisherDamage', {
@@ -7428,6 +7433,7 @@ function wireStartScreens(): void {
           : '#charcreate-panel .mini-class.sel';
       const selEl = document.querySelector(selSelector) as HTMLElement | null;
       const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
+      characterPreview.setSkin(0);
       characterPreview.setClass(cls);
     }
     decorateClassChips();

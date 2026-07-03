@@ -313,6 +313,7 @@ const hudStringsEn = {
       abilityNotReady: 'That ability is not ready yet.',
       notEnoughRage: 'Not enough rage!',
       notEnoughEnergy: 'Not enough energy!',
+      notEnoughFury: 'Not enough Fury!',
       notEnoughMana: 'Not enough mana!',
       notEnoughResource: 'Not enough {resource}!',
       notEnoughHealth: 'Not enough health.',

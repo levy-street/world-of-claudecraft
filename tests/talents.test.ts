@@ -92,7 +92,7 @@ describe('talent tree validation (load-time)', () => {
   });
 
   it('derives painted icons for the release v0.7 class talent trees', () => {
-    const affected = ['shaman', 'hunter', 'druid', 'paladin', 'rogue', 'mage', 'warlock'] as const;
+    const affected = ['shaman', 'hunter', 'druid', 'paladin', 'rogue', 'mage', 'warlock', 'demon_hunter'] as const;
     for (const cls of affected) {
       const ct = talentsFor(cls)!;
       for (const node of ct.nodes) {

@@ -505,6 +505,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.sitting = false;
     e.chargeTargetId = null;
     e.chargePath = [];
+    e.abilityDashRemaining = 0;
+    e.abilityDashSpeed = 0;
+    e.abilityDashX = 0;
+    e.abilityDashZ = 0;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
     for (const m of ctx.entities.values()) {

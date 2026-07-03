@@ -1,4 +1,4 @@
-// Classes: the index (a filterable chooser over all nine, with crests, role badges, and
+// Classes: the index (a filterable chooser over all ten, with crests, role badges, and
 // the canonical class description) and the rich per-class page (/guide/classes/<id>).
 //
 // Data sources, all live from the project so nothing drifts:
@@ -60,6 +60,7 @@ const FILTER_GROUPS: {
       { value: 'rage', labelKey: 'guide.resourceName.rage' },
       { value: 'mana', labelKey: 'guide.resourceName.mana' },
       { value: 'energy', labelKey: 'guide.resourceName.energy' },
+      { value: 'fury', labelKey: 'guide.resourceName.fury' },
     ],
   },
   {

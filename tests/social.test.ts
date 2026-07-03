@@ -79,7 +79,7 @@ function nearestMob(
   return best;
 }
 
-describe('nine classes', () => {
+describe('ten classes', () => {
   it('every class spawns with a working kit and stats', () => {
     for (const cls of ALL_CLASSES) {
       const sim = new Sim({ seed: 42, playerClass: cls });
@@ -98,6 +98,7 @@ describe('nine classes', () => {
       // resource type sane
       if (cls === 'warrior') expect(p.resourceType).toBe('rage');
       else if (cls === 'rogue') expect(p.resourceType).toBe('energy');
+      else if (cls === 'demon_hunter') expect(p.resourceType).toBe('fury');
       else expect(p.resourceType).toBe('mana');
     }
   });

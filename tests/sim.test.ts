@@ -186,7 +186,246 @@ describe('classic formulas', () => {
     const m8 = abilitiesKnownAt('mage', 8).map((k) => k.def.id);
     expect(m8).toContain('polymorph');
     expect(m8).not.toContain('frost_nova'); // level 10
+    const dh1 = abilitiesKnownAt('demon_hunter', 1).map((k) => k.def.id);
+    expect(dh1).toEqual(['demon_bite', 'chaos_strike', 'vengeful_retreat']);
+    const dh20 = abilitiesKnownAt('demon_hunter', 20).map((k) => k.def.id);
+    expect(dh20).toEqual([
+      'demon_bite',
+      'chaos_strike',
+      'vengeful_retreat',
+      'throw_glaive',
+      'fel_rush',
+      'immolation_aura',
+      'blur',
+      'blade_dance',
+      'sigil_of_flame',
+      'eye_beam',
+      'metamorphosis',
+    ]);
   });
+
+  it('Vengeful Retreat launches Demon Hunters backward into the air', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    const p = sim.player;
+    p.facing = 0;
+    p.prevFacing = 0;
+    const startZ = p.pos.z;
+
+    sim.castAbility('vengeful_retreat');
+    expect(p.vz).toBeLessThan(0);
+    expect(Math.abs(p.vx)).toBeLessThan(0.001);
+
+    sim.tick();
+
+    expect(p.onGround).toBe(false);
+    expect(p.jumping).toBe(true);
+
+    for (let i = 0; i < 40 && !p.onGround; i++) sim.tick();
+    expect(p.pos.z).toBeLessThan(startZ - 8);
+  });
+
+  it('Demon Bite resolves immediately without waiting for an auto-attack swing', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = 1;
+    teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
+    sim.targetEntity(wolf.id);
+    facePlayerAt(sim, wolf);
+
+    const p = sim.player;
+    p.resource = 0;
+    p.autoAttack = true;
+    p.swingTimer = 2;
+
+    sim.castAbility('demon_bite');
+
+    expect(p.resource).toBeGreaterThan(0);
+    expect(p.queuedOnSwing).toBeNull();
+    expect(p.swingTimer).toBe(2);
+  });
+
+  it('Fel Rush dashes horizontally without adding a jump', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    sim.setPlayerLevel(20);
+    teleportTo(sim, 20, 20);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    p.targetId = null;
+    p.facing = 0;
+    p.prevFacing = 0;
+    const start = { ...p.pos };
+
+    sim.castAbility('fel_rush');
+
+    expect(p.vz).toBeGreaterThan(0);
+    expect(Math.abs(p.vx)).toBeLessThan(0.001);
+    expect(p.onGround).toBe(true);
+    expect(p.jumping).toBe(false);
+    expect(p.vy).toBe(0);
+    expect(p.abilityDashRemaining).toBeGreaterThan(19);
+
+    for (let i = 0; i < 80 && p.abilityDashRemaining > 0; i++) {
+      sim.tick();
+      expect(p.onGround).toBe(true);
+      expect(p.jumping).toBe(false);
+    }
+
+    const rushDistance = dist2d(start, p.pos);
+    expect(rushDistance).toBeGreaterThan(18);
+    expect(rushDistance).toBeLessThan(22);
+  });
+
+  it('Fel Rush preserves the current height if cast while airborne', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    sim.setPlayerLevel(20);
+    teleportTo(sim, 20, 20);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    p.targetId = null;
+    p.facing = 0;
+    p.prevFacing = 0;
+    p.onGround = false;
+    p.jumping = true;
+    p.pos.y += 10;
+    p.prevPos = { ...p.pos };
+    p.vy = 0;
+    const startY = p.pos.y;
+    const startZ = p.pos.z;
+
+    sim.castAbility('fel_rush');
+
+    expect(p.onGround).toBe(false);
+    expect(p.jumping).toBe(true);
+    expect(p.vy).toBe(0);
+    sim.tick();
+    expect(p.pos.y).toBeCloseTo(startY, 4);
+    expect(p.pos.z).toBeGreaterThan(startZ);
+  });
+
+  it('Metamorphosis applies the demon form aura used by the renderer', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    p.resource = p.maxResource;
+
+    sim.castAbility('metamorphosis');
+
+    expect(p.auras).toContainEqual(expect.objectContaining({ kind: 'form_demon' }));
+    expect(p.auras).toContainEqual(expect.objectContaining({ kind: 'buff_ap' }));
+    expect(p.auras).toContainEqual(expect.objectContaining({ kind: 'buff_armor' }));
+    expect(p.auras).toContainEqual(expect.objectContaining({ kind: 'buff_speed' }));
+  });
+
+  it('Sigil of Flame emits a duration-carrying ground ring cue', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    sim.setPlayerLevel(20);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    const aim = { x: p.pos.x + 4, z: p.pos.z + 3 };
+
+    sim.castAbilityAt('sigil_of_flame', aim);
+
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfxAt',
+        x: aim.x,
+        z: aim.z,
+        radius: 7,
+        duration: 6,
+        school: 'chaos',
+      }),
+    );
+  });
+
+  it('Immolation Aura deals its damage over time around the Demon Hunter', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = 1;
+    teleportTo(sim, wolf.pos.x + 3, wolf.pos.z);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    const hpBefore = wolf.hp;
+
+    sim.castAbility('immolation_aura');
+
+    expect(wolf.hp).toBe(hpBefore);
+    expect(p.auras).toContainEqual(expect.objectContaining({ id: 'immolation_aura_burn', kind: 'aoe_dot' }));
+
+    let tickDamage = 0;
+    for (let i = 0; i < 25; i++) {
+      tickDamage += sim.tick().filter(
+        (ev) => ev.type === 'damage' && ev.ability === 'Immolation Aura' && ev.amount > 0,
+      ).length;
+    }
+
+    expect(tickDamage).toBeGreaterThan(0);
+    expect(wolf.hp).toBeLessThan(hpBefore);
+  });
+
+  it('Eye Beam emits a beam visual while channeling', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = 1;
+    teleportTo(sim, wolf.pos.x + 10, wolf.pos.z);
+    sim.targetEntity(wolf.id);
+    facePlayerAt(sim, wolf);
+    const p = sim.player;
+    p.resource = p.maxResource;
+
+    sim.castAbility('eye_beam');
+
+    let sawBeam = false;
+    for (let i = 0; i < 20 && !sawBeam; i++) {
+      sawBeam = sim.tick().some(
+        (ev) => ev.type === 'spellfx' && ev.fx === 'beam' && ev.sourceId === p.id && ev.targetId === wolf.id,
+      );
+    }
+
+    expect(sawBeam).toBe(true);
+  });
+
+  it('Blade Dance blinks around the selected enemy three times and returns to the cast point', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'demon_hunter', playerName: 'Illidari' });
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = 1;
+    teleportTo(sim, wolf.pos.x + 3, wolf.pos.z);
+    sim.targetEntity(wolf.id);
+    facePlayerAt(sim, wolf);
+    const p = sim.player;
+    p.resource = p.maxResource;
+    const origin = { ...p.pos };
+    const originFacing = p.facing;
+    const blinkPositions = new Set<string>();
+    let blinkEvents = 0;
+
+    sim.castAbility('blade_dance');
+
+    expect(p.onGround).toBe(true);
+    expect(dist2d(p.pos, wolf.pos)).toBeLessThan(3.6);
+    expect(Math.hypot(p.vx, p.vz)).toBe(0);
+    blinkEvents += sim.events.filter((ev) => ev.type === 'bladeDanceBlink').length;
+    blinkPositions.add(`${p.pos.x.toFixed(2)},${p.pos.z.toFixed(2)}`);
+
+    for (let i = 0; i < 20 && p.bladeDanceSeq; i++) {
+      sim.events = [];
+      const events = sim.tick();
+      const blinks = events.filter((ev) => ev.type === 'bladeDanceBlink');
+      if (blinks.length > 0) {
+        blinkEvents += blinks.length;
+        blinkPositions.add(`${p.pos.x.toFixed(2)},${p.pos.z.toFixed(2)}`);
+      }
+    }
+
+    expect(blinkEvents).toBe(3);
+    expect(blinkPositions.size).toBe(3);
+    expect(p.bladeDanceSeq).toBeUndefined();
+    expect(dist2d(p.pos, origin)).toBeLessThan(0.1);
+    expect(p.facing).toBeCloseTo(originFacing);
+  });
+
 
   it('ranks and new abilities carry the kit through the 10-20 band', () => {
     // warrior: heroic strike rank 4 at 20; execute unlocks at 14, not before

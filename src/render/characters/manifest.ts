@@ -292,6 +292,12 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/rogue/alt_b.png`,
     `${SKINS_DIR}/rogue/alt_c.png`,
   ],
+  player_demon_hunter: [
+    `${SKINS_DIR}/demon_hunter/base.png`,
+    `${SKINS_DIR}/demon_hunter/alt_a.png`,
+    `${SKINS_DIR}/demon_hunter/alt_b.png`,
+    `${SKINS_DIR}/demon_hunter/alt_c.png`,
+  ],
   player_priest: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
@@ -441,7 +447,17 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
   },
-
+  player_demon_hunter: {
+    url: `${PLAYERS}/rogue_hooded.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['Dualwield_Melee_Attack_Chop']),
+    show: ['Rogue_Hood', 'Rogue_Cape'],
+    attach: [
+      { url: `${WEAPONS}/sword_g.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/sword_g.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
+  },
   // -- cosmetic body skin (class-agnostic; both the skin preview and a live
   //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
   player_mech: {
@@ -487,6 +503,14 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/chicken_cow.glb`,
     height: 2.3,
     clips: CHICKEN_COW,
+  },
+
+  form_demon: {
+    url: `${CREATURES}/demonalt.glb`,
+    height: 2.35,
+    clips: BIPED14,
+    tint: 0x7dff4a,
+    tintStrength: 0.35,
   },
 
   // -- mob families --------------------------------------------------------

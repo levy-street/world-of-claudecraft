@@ -1,5 +1,5 @@
 // Regenerates the /guide URL block of public/sitemap.xml from the Guide's route table
-// (src/guide/routes.ts) and the nine class pages (src/guide/content.generated.ts), so the
+// (src/guide/routes.ts) and the ten class pages (src/guide/content.generated.ts), so the
 // sitemap never drifts from the actual crawlable routes. Mirrors the esbuild-bundle
 // pattern in scripts/wiki/build_content.mjs (never import raw .ts): routes.ts pulls a
 // type-only import from ui/i18n, which esbuild erases, so the bundle is data-only.

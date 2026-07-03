@@ -165,6 +165,17 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(s.cdText).toBe('3');
   });
 
+  it('ability cooldown countdown stays visible below one second', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('blade_dance', { cooldown: 8 }) })),
+      fakeDeps(),
+    );
+    const s = view.tick(world({ cooldowns: new Map([['blade_dance', 0.8]]) })).slots[0];
+    expect(s.cooldownRemaining).toBe(0.8);
+    expect(s.cooldownPercent).toBeCloseTo(10);
+    expect(s.cdText).toBe('0.8');
+  });
+
   it('the GCD sweep uses the GCD denominator and shows no countdown', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('smite', { cooldown: 0, offGcd: false }) })),

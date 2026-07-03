@@ -37,7 +37,7 @@ module and spreads it into the flat tables the engine reads (`ITEMS`, `MOBS`,
 
 ## Vanilla fidelity (YOU MUST)
 Abilities gain ranks at **real vanilla learn levels** with real values. The
-canonical table for levels 1 to 20, all 9 classes, is `docs/design/spell-ranks.md`:
+canonical table for levels 1 to 20, all 10 classes, is `docs/design/spell-ranks.md`:
 cross-reference it; do not invent costs/levels/damage.
 
 ## How to add a class ability or a new rank
@@ -125,7 +125,7 @@ content you add here should reach it in the same change:
 - **Authoring a class tree:** copy an existing tree (Class nodes + per-spec nodes
   with `specId`/`row`/`col`/`requires`/`pointsGate`, `kind: passive|active|choice`,
   + `SpecDef`s with `signature`/`mastery`), then register it in `TALENTS` in talents.ts.
-  **All 9 classes are already registered** (warrior in `talents_warrior.ts`, the other
+  **All 10 classes are already registered** (warrior in `talents_warrior.ts`, the other
   8 in `talents_classic.ts`). `validateTalentTree` runs at import and **throws on a
   malformed tree** (dup ids, bad prereqs, cycles, unreachable gates): a broken tree
   won't load.

@@ -823,6 +823,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           'mage',
           'warlock',
           'druid',
+          'demon_hunter',
         ];
         if (!validClasses.includes(body.class)) return json(res, 400, { error: 'invalid class' });
         const skin = Math.max(

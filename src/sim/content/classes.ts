@@ -1,4 +1,4 @@
-import type { AbilityDef, AbilityEffect, PlayerClass, Stats, WeaponInfo } from '../types';
+import type { AbilityDef, AbilityEffect, MagicSchool, PlayerClass, ResourceType, Stats, WeaponInfo } from '../types';
 import type { TalentModifiers } from './talents';
 
 // ---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ export interface ClassDef {
   hpPerLevel: number;
   baseMana: number;
   manaPerLevel: number;
-  resourceType: 'rage' | 'mana' | 'energy';
+  resourceType: ResourceType;
   startWeapon: string;
   startChest: string;
   // hunters: auto shot (8yd deadzone). casters: wand (wand:true → no deadzone,
@@ -25,7 +25,7 @@ export interface ClassDef {
     maxRange: number;
     minRange: number;
     wand?: boolean;
-    school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+    school?: MagicSchool;
   };
   abilities: string[]; // full kit, in learn order
   color: number;
@@ -132,6 +132,33 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'stealth',
     ],
     color: 0xfff569,
+  },
+  demon_hunter: {
+    id: 'demon_hunter',
+    name: 'Demon Hunter',
+    baseStats: { str: 18, agi: 25, sta: 19, int: 12, spi: 10, armor: 42 },
+    statsPerLevel: { str: 1, agi: 3, sta: 2, int: 0, spi: 0, armor: 9 },
+    baseHp: 48,
+    hpPerLevel: 16,
+    baseMana: 100, // fury cap
+    manaPerLevel: 0,
+    resourceType: 'fury',
+    startWeapon: 'rusty_dagger',
+    startChest: 'footpad_jerkin',
+    abilities: [
+      'demon_bite',
+      'chaos_strike',
+      'vengeful_retreat',
+      'throw_glaive',
+      'fel_rush',
+      'immolation_aura',
+      'blur',
+      'blade_dance',
+      'sigil_of_flame',
+      'eye_beam',
+      'metamorphosis',
+    ],
+    color: 0xa330c9,
   },
   paladin: {
     id: 'paladin',
@@ -3503,7 +3530,241 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Finishing move that causes Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
   },
-
+  // ====================== DEMON HUNTER ======================
+  demon_bite: {
+    id: 'demon_bite',
+    name: 'Demon Bite',
+    class: 'demon_hunter',
+    learnLevel: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [{ type: 'weaponHit', bonus: 4, weaponMult: 0.65 }, { type: 'gainResource', amount: 25 }],
+    ranks: [
+      { rank: 2, level: 8, cost: 0, effects: [{ type: 'weaponHit', bonus: 9, weaponMult: 0.7 }, { type: 'gainResource', amount: 28 }] },
+      { rank: 3, level: 16, cost: 0, effects: [{ type: 'weaponHit', bonus: 16, weaponMult: 0.75 }, { type: 'gainResource', amount: 30 }] },
+    ],
+    description: 'A quick strike that deals weapon damage plus $d and generates Fury.',
+  },
+  chaos_strike: {
+    id: 'chaos_strike',
+    name: 'Chaos Strike',
+    class: 'demon_hunter',
+    learnLevel: 1,
+    cost: 35,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'chaos',
+    requiresTarget: true,
+    effects: [{ type: 'weaponHit', bonus: 18, weaponMult: 1.0 }],
+    ranks: [
+      { rank: 2, level: 10, cost: 35, effects: [{ type: 'weaponHit', bonus: 31, weaponMult: 1.05 }] },
+      { rank: 3, level: 18, cost: 35, effects: [{ type: 'weaponHit', bonus: 48, weaponMult: 1.1 }] },
+    ],
+    description: 'Slash the target with chaotic energy for weapon damage plus $d.',
+  },
+  vengeful_retreat: {
+    id: 'vengeful_retreat',
+    name: 'Vengeful Retreat',
+    class: 'demon_hunter',
+    learnLevel: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 20,
+    range: 0,
+    school: 'chaos',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'retreatLeap', distance: 20, height: 4.2, duration: 0.9 },
+      { type: 'gainResource', amount: 20 },
+      { type: 'selfBuff', kind: 'buff_speed', value: 1.25, duration: 2 },
+      { type: 'selfBuff', kind: 'buff_dodge', value: 0.2, duration: 3 },
+    ],
+    description:
+      'Spring backward in a burst of fel momentum, gaining Fury and briefly increasing speed and dodge.',
+  },
+  throw_glaive: {
+    id: 'throw_glaive',
+    name: 'Throw Glaive',
+    class: 'demon_hunter',
+    learnLevel: 4,
+    cost: 15,
+    castTime: 0,
+    cooldown: 6,
+    range: 25,
+    school: 'chaos',
+    requiresTarget: true,
+    effects: [{ type: 'directDamage', min: 18, max: 23 }, { type: 'slow', mult: 0.7, duration: 4 }],
+    ranks: [
+      { rank: 2, level: 12, cost: 15, effects: [{ type: 'directDamage', min: 31, max: 39 }, { type: 'slow', mult: 0.7, duration: 4 }] },
+      { rank: 3, level: 20, cost: 15, effects: [{ type: 'directDamage', min: 50, max: 62 }, { type: 'slow', mult: 0.7, duration: 4 }] },
+    ],
+    description: 'Throw a fel-edged glaive for $d Chaos damage and a brief snare.',
+  },
+  fel_rush: {
+    id: 'fel_rush',
+    name: 'Fel Rush',
+    class: 'demon_hunter',
+    learnLevel: 6,
+    cost: 0,
+    castTime: 0,
+    cooldown: 15,
+    range: 0,
+    school: 'chaos',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'forwardRush', distance: 20, height: 0, duration: 0.9 },
+      { type: 'aoeDamage', min: 14, max: 18, radius: 5 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 16,
+        cost: 0,
+        effects: [
+          { type: 'forwardRush', distance: 20, height: 0, duration: 0.9 },
+          { type: 'aoeDamage', min: 30, max: 38, radius: 5 },
+        ],
+      },
+    ],
+    description: 'Rush forward in a burst of fel momentum, damaging nearby enemies for $d Chaos damage.',
+  },
+  immolation_aura: {
+    id: 'immolation_aura',
+    name: 'Immolation Aura',
+    class: 'demon_hunter',
+    learnLevel: 8,
+    cost: 20,
+    castTime: 0,
+    cooldown: 12,
+    range: 0,
+    school: 'chaos',
+    requiresTarget: false,
+    effects: [
+      { type: 'selfAoeDot', min: 10, max: 13, radius: 7, duration: 6, interval: 1 },
+      { type: 'selfBuff', kind: 'buff_ap', value: 12, duration: 6 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 20,
+        effects: [
+          { type: 'selfAoeDot', min: 18, max: 23, radius: 7, duration: 6, interval: 1 },
+          { type: 'selfBuff', kind: 'buff_ap', value: 18, duration: 6 },
+        ],
+      },
+    ],
+    description: 'Ignite yourself with fel fire, burning nearby enemies for $d each second and empowering your attacks.',
+  },
+  blur: {
+    id: 'blur',
+    name: 'Blur',
+    class: 'demon_hunter',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 60,
+    range: 0,
+    school: 'chaos',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'selfBuff', kind: 'buff_dodge', value: 0.35, duration: 10 },
+      { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 10 },
+    ],
+    description: 'Blur into motion, increasing dodge chance and movement speed for 10 sec.',
+  },
+  blade_dance: {
+    id: 'blade_dance',
+    name: 'Blade Dance',
+    class: 'demon_hunter',
+    learnLevel: 12,
+    cost: 35,
+    castTime: 0,
+    cooldown: 8,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [
+      { type: 'bladeDanceDash', distance: 12, height: 0.9, duration: 0.5, radius: 8 },
+      { type: 'aoeDamage', min: 32, max: 42, radius: 6 },
+      { type: 'selfBuff', kind: 'buff_dodge', value: 0.12, duration: 2 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 35,
+        effects: [
+          { type: 'bladeDanceDash', distance: 12, height: 0.9, duration: 0.5, radius: 8 },
+          { type: 'aoeDamage', min: 55, max: 72, radius: 6 },
+          { type: 'selfBuff', kind: 'buff_dodge', value: 0.12, duration: 2 },
+        ],
+      },
+    ],
+    description: 'Unleash a sweeping dance of blades for $d damage to nearby enemies.',
+  },
+  sigil_of_flame: {
+    id: 'sigil_of_flame',
+    name: 'Sigil of Flame',
+    class: 'demon_hunter',
+    learnLevel: 14,
+    cost: 30,
+    castTime: 0,
+    cooldown: 12,
+    range: 25,
+    school: 'chaos',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'groundAoE', min: 12, max: 16, radius: 7, duration: 6, interval: 1.5 }],
+    description: 'Carve a fel sigil into the ground, burning enemies standing in it for $d Chaos damage.',
+  },
+  eye_beam: {
+    id: 'eye_beam',
+    name: 'Eye Beam',
+    class: 'demon_hunter',
+    learnLevel: 16,
+    cost: 30,
+    castTime: 0,
+    channel: { duration: 2, ticks: 4 },
+    cooldown: 20,
+    range: 20,
+    school: 'chaos',
+    requiresTarget: true,
+    effects: [{ type: 'directDamage', min: 16, max: 20 }],
+    ranks: [
+      { rank: 2, level: 20, cost: 30, effects: [{ type: 'directDamage', min: 24, max: 30 }] },
+    ],
+    description: 'Channel a beam of chaotic fel energy, dealing $d Chaos damage each pulse.',
+  },
+  metamorphosis: {
+    id: 'metamorphosis',
+    name: 'Metamorphosis',
+    class: 'demon_hunter',
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'chaos',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'gainResource', amount: 40 },
+      { type: 'selfBuff', kind: 'form_demon', value: 0, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_ap', value: 60, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_armor', value: 120, duration: 20 },
+      { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 20 },
+    ],
+    description: 'Unleash your demonic form, generating Fury and greatly increasing offense, armor, and speed.',
+  },
   // ============== TALENT-GRANTED (Warrior) ==============
   // Not in CLASSES.warrior.abilities — unlocked only via talent grants (spec
   // signatures + active nodes), so abilitiesKnownAt adds them by `mods.grants`.
@@ -3612,6 +3873,7 @@ function scaleEffect(
     case 'weaponDamage':
       return { ...eff, bonus: Math.round(eff.bonus * dmgMult + flat) };
     case 'weaponStrike':
+    case 'weaponHit':
       return { ...eff, bonus: Math.round(eff.bonus * dmgMult + flat) };
     case 'directDamage':
       return {
@@ -3622,6 +3884,7 @@ function scaleEffect(
     case 'dot':
       return { ...eff, total: Math.round(eff.total * dmgMult + flat) };
     case 'aoeDamage':
+    case 'selfAoeDot':
       return {
         ...eff,
         min: Math.round(eff.min * dmgMult + flat),

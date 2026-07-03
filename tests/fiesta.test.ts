@@ -292,7 +292,7 @@ describe('fiesta: augment catalog integrity', () => {
   });
 
   it('every class can be offered three augments at every tier', () => {
-    const classes: PlayerClass[] = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'];
+    const classes: PlayerClass[] = ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid', 'demon_hunter'];
     for (const cls of classes) {
       for (const tier of ['silver', 'gold', 'prismatic'] as const) {
         // role null is the worst case (healer-only augments excluded)

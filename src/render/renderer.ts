@@ -171,6 +171,7 @@ function crowdLodScaleSq(visibleRigs: number): number {
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
 // `onGround`, so the flag alone never fires the jump clip for the mirrored world.
 const AIRBORNE_EPS = 0.4;
+const DEMON_HUNTER_RETREAT_FLIP_SPEED = 1.75; // full backward somersaults per second
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
 const SFX_MOVE_RANGE_SQ = 42 * 42;
@@ -455,7 +456,8 @@ interface AoeRingSlot {
   ring: THREE.Mesh;
   mat: THREE.MeshBasicMaterial;
   radius: number; // blast radius in yards this flash represents
-  elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
+  elapsed: number; // seconds since spawn; >= lifetime means free
+  lifetime: number;
 }
 
 interface GroundAimReticle {
@@ -475,6 +477,7 @@ export interface EntityView {
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
+  demonVisual: CharacterVisual | null; // demon hunter metamorphosis form, built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
@@ -530,6 +533,7 @@ export interface EntityView {
   // latches for jump/land/water-entry detection.
   stepAccum: number;
   wasAirborne: boolean;
+  retreatFlipPhase: number;
   wasSwimming: boolean;
 }
 
@@ -801,6 +805,7 @@ export class Renderer {
     casting: false,
     swimming: false,
     sitting: false,
+    retreatFlip: 0,
   };
   private selfRenderPosition = new THREE.Vector3();
   private selfRenderPositionReady = false;
@@ -1358,7 +1363,7 @@ export class Renderer {
       ring.renderOrder = 3; // over terrain decals, like the click marker
       setRenderCategory(ring, 'ui3d');
       this.scene.add(ring);
-      this.aoeRings.push({ ring, mat, radius: 1, elapsed: AOE_RING_LIFETIME });
+      this.aoeRings.push({ ring, mat, radius: 1, elapsed: AOE_RING_LIFETIME, lifetime: AOE_RING_LIFETIME });
     }
 
     // particle system: projectiles, impacts, heal glows, ambience
@@ -2789,9 +2794,13 @@ export class Renderer {
         const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
         const at = new THREE.Vector3(ev.x, gy + 0.4, ev.z);
         this.vfx.burst(at, ev.school, ev.fx === 'nova' ? 34 : 22, ev.fx === 'nova' ? 1.4 : 1);
-        if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school);
+        if (ev.radius) this.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, ev.duration);
         break;
       }
+      case 'bladeDanceBlink':
+        this.triggerAttack(ev.sourceId);
+        this.vfx.bladeDance(ev.targetId, ev.school);
+        break;
       case 'damage':
         // every melee/ranged swing animates the attacker for all to see
         if (ev.school === 'physical' && ev.sourceId !== -1) this.triggerAttack(ev.sourceId);
@@ -3332,6 +3341,7 @@ export class Renderer {
       bearVisual: null,
       catVisual: null,
       travelVisual: null,
+      demonVisual: null,
       height,
       clickTarget,
       nameplate: np,
@@ -3378,6 +3388,7 @@ export class Renderer {
       loco: newLocoTrack(),
       stepAccum: 0,
       wasAirborne: false,
+      retreatFlipPhase: 0,
       wasSwimming: false,
     });
     const view = this.views.get(e.id);
@@ -3420,6 +3431,7 @@ export class Renderer {
     if (v.bearVisual?.root.visible) return v.bearVisual;
     if (v.catVisual?.root.visible) return v.catVisual;
     if (v.travelVisual?.root.visible) return v.travelVisual;
+    if (v.demonVisual?.root.visible) return v.demonVisual;
     return v.visual;
   }
 
@@ -3737,6 +3749,7 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
+      v.demonVisual?.dispose();
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, { group: v.objectMesh, height: v.height });
@@ -3921,6 +3934,8 @@ export class Renderer {
       let hasGhostWolf = false;
       let hasCatForm = false;
       let hasTravelForm = false;
+      let hasDemonForm = false;
+      let hasBlur = false;
       let hasStealth = false;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
@@ -3928,6 +3943,8 @@ export class Renderer {
         if (a.id === 'ghost_wolf') hasGhostWolf = true;
         if (a.kind === 'form_cat') hasCatForm = true;
         if (a.kind === 'form_travel') hasTravelForm = true;
+        if (a.kind === 'form_demon') hasDemonForm = true;
+        if (a.id === 'blur' || a.id.startsWith('blur_')) hasBlur = true;
         if (a.kind === 'stealth') hasStealth = true;
       }
       const polyed = hasPoly;
@@ -3935,6 +3952,7 @@ export class Renderer {
       const ghostWolf = !polyed && !bear && hasGhostWolf;
       const cat = !polyed && !bear && (ghostWolf || hasCatForm);
       const travel = !polyed && !bear && !cat && hasTravelForm;
+      const demon = !polyed && !bear && !cat && !travel && hasDemonForm;
       const _stealthed = hasStealth;
       // distance cull: far rigs are invisible specks but cost real draw calls
       const cdx = e.pos.x - p.pos.x,
@@ -3974,7 +3992,7 @@ export class Renderer {
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
-            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel,
+            !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel && !demon,
           );
           // sheep/forms keep articulated shadows through the whole proxy band —
           // a frozen humanoid proxy silhouette would be wrong under a form
@@ -3983,6 +4001,7 @@ export class Renderer {
           v.bearVisual?.setShadow(wantFormShadow);
           v.catVisual?.setShadow(wantFormShadow);
           v.travelVisual?.setShadow(wantFormShadow);
+          v.demonVisual?.setShadow(wantFormShadow);
         } else if (wantShadow !== v.shadowOn) {
           v.shadowOn = wantShadow;
           for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
@@ -4108,10 +4127,15 @@ export class Renderer {
         v.travelVisual = createCharacterVisual(e, 'form_travel');
         v.group.add(v.travelVisual.root);
       }
+      if (demon && !v.demonVisual) {
+        v.demonVisual = createCharacterVisual(e, 'form_demon');
+        v.group.add(v.demonVisual.root);
+      }
       if (v.sheepVisual) v.sheepVisual.root.visible = polyed;
       if (v.bearVisual) v.bearVisual.root.visible = bear;
       if (v.catVisual) v.catVisual.root.visible = cat;
       if (v.travelVisual) v.travelVisual.root.visible = travel;
+      if (v.demonVisual) v.demonVisual.root.visible = demon;
       const active =
         polyed && v.sheepVisual
           ? v.sheepVisual
@@ -4121,12 +4145,20 @@ export class Renderer {
               ? v.catVisual
               : travel && v.travelVisual
                 ? v.travelVisual
-                : v.visual;
+                : demon && v.demonVisual
+                  ? v.demonVisual
+                  : v.visual;
       const ghost =
         ghostWolf ||
         shouldRenderStealthGhost(this.sim.playerId, e) ||
         e.templateId.startsWith('vision_');
       active.setGhost(ghost);
+      v.visual.setBlurred(active === v.visual && hasBlur);
+      v.sheepVisual?.setBlurred(active === v.sheepVisual && hasBlur);
+      v.bearVisual?.setBlurred(active === v.bearVisual && hasBlur);
+      v.catVisual?.setBlurred(active === v.catVisual && hasBlur);
+      v.travelVisual?.setBlurred(active === v.travelVisual && hasBlur);
+      v.demonVisual?.setBlurred(active === v.demonVisual && hasBlur);
       active.setSoulRend(characterSoulRendActive(e));
       v.visual.root.visible = active === v.visual;
       // distant rigs swap to the single-draw baked idle-pose mesh
@@ -4170,6 +4202,20 @@ export class Renderer {
       st.casting = e.castingAbility !== null && !visuallyDead;
       st.swimming = swimming;
       st.sitting = e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
+      const backwardAirborneDot = loco.speed > 1e-4
+        ? (vx * Math.sin(facing) + vz * Math.cos(facing)) / Math.max(1e-4, Math.hypot(vx, vz))
+        : 0;
+      const retreatFlipping =
+        airborne &&
+        e.kind === 'player' &&
+        (e.templateId === 'demon_hunter' || hasDemonForm) &&
+        backwardAirborneDot < -0.45;
+      if (retreatFlipping) {
+        v.retreatFlipPhase = Math.min(1, v.retreatFlipPhase + dt * DEMON_HUNTER_RETREAT_FLIP_SPEED);
+      } else if (!airborne) {
+        v.retreatFlipPhase = 0;
+      }
+      st.retreatFlip = retreatFlipping ? v.retreatFlipPhase : 0;
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -5014,7 +5060,7 @@ export class Renderer {
 
   // Flash a school-colored AoE ring on the terrain at a ground-targeted blast's
   // landing spot, sized to the blast radius (see aoe_ring.ts for the curves).
-  spawnAoeRing(x: number, z: number, radius: number, school: string): void {
+  spawnAoeRing(x: number, z: number, radius: number, school: string, duration?: number): void {
     if (this.aoeRings.length === 0) return;
     const slot = this.aoeRings[this.aoeRingNext];
     this.aoeRingNext = (this.aoeRingNext + 1) % this.aoeRings.length;
@@ -5047,15 +5093,26 @@ export class Renderer {
 
   private updateAoeRings(dt: number): void {
     for (const slot of this.aoeRings) {
-      if (slot.elapsed >= AOE_RING_LIFETIME) continue;
+      if (slot.elapsed >= slot.lifetime) continue;
       slot.elapsed += dt;
-      const a = aoeRingAnim(slot.elapsed);
-      if (!a.active) {
+      if (slot.elapsed >= slot.lifetime) {
         slot.ring.visible = false;
         continue;
       }
-      slot.ring.scale.setScalar(slot.radius * a.ringScale);
-      slot.mat.opacity = a.ringAlpha;
+      if (slot.lifetime <= AOE_RING_LIFETIME || slot.elapsed < 0.25) {
+        const a = aoeRingAnim(slot.elapsed);
+        if (!a.active) {
+          slot.ring.visible = false;
+          continue;
+        }
+        slot.ring.scale.setScalar(slot.radius * a.ringScale);
+        slot.mat.opacity = a.ringAlpha;
+        continue;
+      }
+      const remaining = slot.lifetime - slot.elapsed;
+      const fade = Math.min(1, remaining / 0.45);
+      slot.ring.scale.setScalar(slot.radius);
+      slot.mat.opacity = (0.42 + Math.sin(this.time * 7) * 0.08) * fade;
     }
   }
 

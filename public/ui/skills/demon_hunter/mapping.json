@@ -1,0 +1,114 @@
+{
+  "class": "demon_hunter",
+  "license": "Generated in-repo raster atlas by Codex/OpenAI image generation for World of ClaudeCraft; project-owned generated bitmap assets.",
+  "iconSize": 128,
+  "sourceAtlas": "scripts/assets/demon_hunter_skill_atlas.png",
+  "runtimeDir": "public/ui/skills/demon_hunter",
+  "grid": {
+    "columns": 4,
+    "rows": 3,
+    "sourceWidth": 1448,
+    "sourceHeight": 1086
+  },
+  "abilities": [
+    {
+      "abilityId": "demon_bite",
+      "sourceCell": {
+        "column": 0,
+        "row": 0
+      },
+      "output": "demon_bite.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "chaos_strike",
+      "sourceCell": {
+        "column": 1,
+        "row": 0
+      },
+      "output": "chaos_strike.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "throw_glaive",
+      "sourceCell": {
+        "column": 2,
+        "row": 0
+      },
+      "output": "throw_glaive.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "fel_rush",
+      "sourceCell": {
+        "column": 3,
+        "row": 0
+      },
+      "output": "fel_rush.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "immolation_aura",
+      "sourceCell": {
+        "column": 0,
+        "row": 1
+      },
+      "output": "immolation_aura.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "blur",
+      "sourceCell": {
+        "column": 1,
+        "row": 1
+      },
+      "output": "blur.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "blade_dance",
+      "sourceCell": {
+        "column": 2,
+        "row": 1
+      },
+      "output": "blade_dance.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "sigil_of_flame",
+      "sourceCell": {
+        "column": 3,
+        "row": 1
+      },
+      "output": "sigil_of_flame.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "eye_beam",
+      "sourceCell": {
+        "column": 0,
+        "row": 2
+      },
+      "output": "eye_beam.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "metamorphosis",
+      "sourceCell": {
+        "column": 1,
+        "row": 2
+      },
+      "output": "metamorphosis.webp",
+      "source": "scripts/assets/demon_hunter_skill_atlas.png"
+    },
+    {
+      "abilityId": "vengeful_retreat",
+      "sourceCell": {
+        "column": 2,
+        "row": 2
+      },
+      "output": "vengeful_retreat.webp",
+      "source": "scripts/assets/vengeful_retreat_icon.png"
+    }
+  ]
+}

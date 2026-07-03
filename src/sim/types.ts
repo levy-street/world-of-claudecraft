@@ -71,7 +71,8 @@ export type PlayerClass =
   | 'shaman'
   | 'mage'
   | 'warlock'
-  | 'druid';
+  | 'druid'
+  | 'demon_hunter';
 
 // Classes that command a persistent pet (hunter beast, warlock demon). Pure
 // predicate, here so the pet-command slice imports it without a sim.ts cycle.
@@ -105,8 +106,10 @@ export const ALL_CLASSES: PlayerClass[] = [
   'mage',
   'warlock',
   'druid',
+  'demon_hunter',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy';
+export type MagicSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature' | 'chaos';
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'fury';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',
@@ -136,6 +139,7 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
 export type AuraKind =
   | 'dot'
+  | 'aoe_dot'
   | 'slow'
   | 'stun'
   | 'root'
@@ -160,6 +164,7 @@ export type AuraKind =
   | 'form_bear'
   | 'form_cat'
   | 'form_travel'
+  | 'form_demon'
   | 'stealth'
   | 'defensive_stance'
   | 'righteous_fury'
@@ -198,7 +203,7 @@ export interface Aura {
   tickInterval?: number;
   tickTimer?: number;
   sourceId: number;
-  school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  school: MagicSchool;
   breaksOnDamage?: boolean;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
@@ -924,7 +929,7 @@ export interface MobTemplate {
   petRole?: PetRole;
   petSpell?: {
     name: string;
-    school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+    school: MagicSchool;
     min: number;
     max: number;
     range: number;
@@ -1035,6 +1040,12 @@ export type AbilityEffect =
       requiresBehind?: boolean;
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
+  | {
+      type: 'weaponHit';
+      bonus: number;
+      cannotBeDodged?: boolean;
+      weaponMult?: number;
+    } // instant weapon-scaling hit that never queues or waits for white swings
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
   | { type: 'interrupt'; lockout: number }
   | { type: 'heal'; min: number; max: number } // friendly target (or self)
@@ -1053,6 +1064,7 @@ export type AbilityEffect =
   | { type: 'incapacitate'; duration: number } // gouge: breaks on damage
   | { type: 'polymorph'; duration: number } // sheep: breaks on damage, target heals
   | { type: 'aoeDamage'; min: number; max: number; radius: number }
+  | { type: 'selfAoeDot'; min: number; max: number; radius: number; duration: number; interval: number }
   | {
       type: 'groundAoE';
       min: number;
@@ -1079,6 +1091,9 @@ export type AbilityEffect =
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
   | { type: 'charge' }
+  | { type: 'retreatLeap'; distance: number; height: number; duration: number }
+  | { type: 'forwardRush'; distance: number; height: number; duration: number }
+  | { type: 'bladeDanceDash'; distance: number; height: number; duration: number; radius: number }
   | { type: 'sunder'; armor: number; maxStacks: number } // sunder armor: stacking armor debuff + flat threat
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
@@ -1110,7 +1125,7 @@ export interface AbilityDef {
   cooldown: number; // seconds, 0 = none (GCD only)
   range: number; // yards; 0 = melee range
   minRange?: number;
-  school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  school: MagicSchool;
   // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
   // non-physical damage scales with Spell Power; physical damage scales with melee
   // Attack Power (on top of the weapon/finisher paths, which already carry AP).
@@ -1350,6 +1365,19 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
   return e.eating !== null || e.drinking !== null;
 }
 
+export interface BladeDanceSequence {
+  targetId: number;
+  origin: Vec3;
+  originFacing: number;
+  radius: number;
+  side: 1 | -1;
+  startAngle: number;
+  step: number;
+  nextAt: number;
+  returnAt: number;
+  school: string;
+}
+
 export interface Entity {
   id: number;
   kind: EntityKind;
@@ -1431,6 +1459,11 @@ export interface Entity {
   chargeTargetId: number | null;
   chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
   chargePath: Vec3[]; // waypoints consumed front-to-back; last leg homes on the live target
+  abilityDashRemaining: number; // yards left in a ground dash such as Fel Rush
+  abilityDashSpeed: number;
+  abilityDashX: number;
+  abilityDashZ: number;
+  bladeDanceSeq?: BladeDanceSequence;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   sitting: boolean;
@@ -1726,6 +1759,7 @@ export type SimEvent = { pid?: number } & (
       school: string;
       fx: 'projectile' | 'beam' | 'tick' | 'nova';
     }
+  | { type: 'bladeDanceBlink'; sourceId: number; targetId: number; school: string }
   // visual-only cue anchored to a WORLD POINT rather than an entity: a
   // ground-targeted spell's impact (the burst/nova lands where it was aimed, not
   // on the caster). The renderer drapes it onto the terrain at (x, z).
@@ -1738,6 +1772,8 @@ export type SimEvent = { pid?: number } & (
       // blast radius in yards; when set the renderer flashes a terrain-draped
       // AoE ring of this size under the burst so the impact area reads clearly
       radius?: number;
+      // optional linger time for persistent ground effects such as sigils
+      duration?: number;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide

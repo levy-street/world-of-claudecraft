@@ -13,7 +13,7 @@ export { CharacterVisual } from './visual';
 /** Build the visual for an entity (or an explicit shapeshift/polymorph form key). */
 export function createCharacterVisual(
   e: Entity,
-  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel',
+  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_demon',
 ): CharacterVisual {
   // forms (sheep/bear/cat/travel) are their own models — skins and held weapons
   // only apply to the base body

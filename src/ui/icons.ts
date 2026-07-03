@@ -2169,6 +2169,36 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ),
   polymorph: r('arcane', 'pink', ['sheep_head'], ['sparkle']),
   frost_nova: r('frost', 'ice', ['snowflake'], ['arcs', 'glow']),
+  // demon hunter
+  demon_bite: r('shadow', 'blood', ['fang', { p: 'dagger', ...BR }], ['glow']),
+  chaos_strike: r(
+    'shadow',
+    'arcanePink',
+    [
+      { p: 'dagger', x: -7, s: 0.86, rot: -0.55 },
+      { p: 'dagger', x: 7, s: 0.86, rot: 0.55 },
+      { p: 'sunburst', ...BIG },
+    ],
+    ['glow'],
+  ),
+  vengeful_retreat: r('fury', 'arcanePink', ['boot', { p: 'wing', ...BIG }], ['motion']),
+  throw_glaive: r('shadow', 'leafGreen', [{ p: 'dagger', rot: Math.PI * 0.5 }, { p: 'sigil_rune', ...BIG }], ['motion']),
+  fel_rush: r('fury', 'leafGreen', ['boot', { p: 'flame', ...BR }], ['motion']),
+  immolation_aura: r('fire', 'leafGreen', ['flame', { p: 'sunburst', ...BIG }], ['glow', 'arcs']),
+  blur: r('storm', 'arcanePink', ['eye', { p: 'sigil_rune', ...BIG }], ['motion']),
+  blade_dance: r(
+    'shadow',
+    'steel',
+    [
+      { p: 'dagger', x: -9, s: 0.82, rot: -0.75 },
+      { p: 'dagger', x: 9, s: 0.82, rot: 0.75 },
+      { p: 'sigil_rune', ...BIG },
+    ],
+    ['motion'],
+  ),
+  sigil_of_flame: r('fire', 'leafGreen', ['sigil_rune', { p: 'flame', ...BR }], ['glow']),
+  eye_beam: r('shadow', 'leafGreen', ['eye', { p: 'bolt', ...BR }], ['glow']),
+  metamorphosis: r('shadow', 'arcanePink', ['skull', { p: 'wing', ...BIG }], ['glow']),
   // rogue
   sinister_strike: r('steel', 'steel', ['dagger'], ['glow']),
   eviscerate: r('blood', 'blood', ['dagger'], ['drips']),
@@ -2915,6 +2945,18 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'summon_doomguard',
   'life_tap',
   'searing_pain',
+  // demon hunter (generated bespoke SVG/WebP set, see mapping.json)
+  'demon_bite',
+  'chaos_strike',
+  'vengeful_retreat',
+  'throw_glaive',
+  'fel_rush',
+  'immolation_aura',
+  'blur',
+  'blade_dance',
+  'sigil_of_flame',
+  'eye_beam',
+  'metamorphosis',
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind
   // have no fitting art (no garrote-wire, blackjack, armor-shred, or eye-powder) — procedural.
   'sinister_strike',

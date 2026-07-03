@@ -52,9 +52,10 @@ export const ABILITY_ICON_PREFIX = 'ability:';
 // the former inline `Math.min(100, (shown / Math.max(0.01, denom)) * 100)`).
 const MAX_COOLDOWN_PERCENT = 100;
 const COOLDOWN_DENOM_FLOOR = 0.01;
-// The numeric countdown ("3", "2", "1") shows only while more than one second
-// remains, matching the former `cd > 1 ? Math.ceil(cd) : ''`.
-const COOLDOWN_TEXT_THRESHOLD = 1;
+// Ability cooldowns stay visible below one second so short cooldowns do not look
+// ready while the sweep is still finishing. Pure GCD text remains hidden.
+const COOLDOWN_TEXT_THRESHOLD = 0;
+const COOLDOWN_DECIMAL_THRESHOLD = 1;
 // The container gets the 'many-spells' class once more than this many slots are
 // bound (the former `hotbarActions.filter(a => a !== null).length > 10`).
 const MANY_SPELLS_THRESHOLD = 10;
@@ -333,7 +334,12 @@ export function createActionBarView(
                 (shown / Math.max(COOLDOWN_DENOM_FLOOR, denom)) * MAX_COOLDOWN_PERCENT,
               )
             : 0;
-        slot.cdText = cd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(cd)) : '';
+        slot.cdText =
+          cd > COOLDOWN_TEXT_THRESHOLD
+            ? cd < COOLDOWN_DECIMAL_THRESHOLD
+              ? cd.toFixed(1)
+              : deps.formatCount(Math.ceil(cd))
+            : '';
         slot.count = '';
         slot.usable = !(player.resource < ability.cost);
         slot.outOfRange =
