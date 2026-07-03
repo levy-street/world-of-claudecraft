@@ -848,10 +848,12 @@
     transform: scale(0.72);
     transform-origin: right top;
   }
-  body.mobile-touch #quest-tracker {
+  body.mobile-touch #right-tracker-stack {
     right: max(10px, env(safe-area-inset-right));
     top: max(150px, env(safe-area-inset-top));
     width: 190px;
+  }
+  body.mobile-touch #quest-tracker {
     font-size: 11px;
   }
   body.mobile-touch #meters-window {
@@ -2051,7 +2053,7 @@
     #community-hud {
       top: auto;
     }
-    #quest-tracker {
+    #right-tracker-stack {
       top: 260px;
       right: 12px;
       width: 190px;

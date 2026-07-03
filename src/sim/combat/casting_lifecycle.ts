@@ -27,7 +27,7 @@
 // DOM/Three/render/ui/game/net, no Math.random/Date.now), enforced by
 // tests/architecture.test.ts.
 
-import { ITEMS, MOBS } from '../data';
+import { isDelvePos, ITEMS, MOBS } from '../data';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -620,7 +620,7 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   if (ability.id === 'revive_pet') {
     const pet = ctx.petOf(p.id, true);
     if (!pet) {
-      ctx.error(p.id, 'You have no pet.');
+      ctx.error(p.id, isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.');
       return;
     }
     if (!pet.dead) {

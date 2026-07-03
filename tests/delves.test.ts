@@ -296,6 +296,39 @@ describe('delve lifecycle', () => {
     expect(sim.delveRunForPlayer(sim.playerId)).not.toBeNull();
   });
 
+  it('a duo entering the same delve does not land on top of each other', () => {
+    const sim = makeSim();
+    const p2 = sim.addPlayer('warrior', 'Duoist');
+    sim.partyInvite(p2, sim.playerId);
+    sim.partyAccept(p2);
+    for (const pid of [sim.playerId, p2]) {
+      sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, pid);
+    }
+    sim.enterDelve('collapsed_reliquary', 'normal', sim.playerId);
+    sim.enterDelve('collapsed_reliquary', 'normal', p2);
+    const p1Pos = sim.player.pos;
+    const p2Pos = sim.entities.get(p2)!.pos;
+    expect(Math.hypot(p1Pos.x - p2Pos.x, p1Pos.z - p2Pos.z)).toBeGreaterThan(0.5);
+  });
+
+  it('a party member who never walked through the door is not pulled into the run', () => {
+    const sim = makeSim();
+    const afk = sim.addPlayer('warrior', 'AwayFromKeyboard');
+    sim.partyInvite(afk, sim.playerId);
+    sim.partyAccept(afk);
+    // afk stays out in the overworld, never calling enterDelve.
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    const afkEntry = sim.entities.get(afk)!;
+    const afkStartPos = { ...afkEntry.pos };
+    expect(isDelvePos(afkEntry.pos.x)).toBe(false);
+    // Advance far enough to open/traverse a module boundary if reachable; the afk
+    // member must never be teleported in by a party-wide delve transition.
+    (sim as any).advanceDelveModule(run);
+    expect(afkEntry.pos).toEqual(afkStartPos);
+    expect(isDelvePos(afkEntry.pos.x)).toBe(false);
+  });
+
   it('enter and leave toggle delve position band', () => {
     const sim = makeSim();
     enterReliquary(sim);
@@ -369,6 +402,45 @@ describe('delve pet stow', () => {
     sim.leaveDelve();
     expect(sim.petOf(sim.playerId)).not.toBeNull();
     expect(sim.petOf(sim.playerId)?.templateId).toBe('imp');
+  });
+
+  it('trying to summon a stowed pet inside a delve explains why, instead of "you have no pet"', () => {
+    const sim = makeSim('warlock');
+    sim.setPlayerLevel(10);
+    castAndFinish(sim, 'summon_imp');
+    expect(sim.petOf(sim.playerId)).not.toBeNull();
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    expect(sim.petOf(sim.playerId)).toBeNull();
+    sim.drainEvents();
+    sim.setPetMode('aggressive');
+    const events = sim.drainEvents();
+    expect(events.some((e) => e.type === 'error' && e.text === 'You have no pet.')).toBe(false);
+    expect(
+      events.some(
+        (e) => e.type === 'error' && e.text === 'Pets are not allowed inside the delves.',
+      ),
+    ).toBe(true);
+  });
+
+  it('restorePetFromDelveStash keeps the stash entry if the owner entity is not yet registered', () => {
+    const sim = makeSim('warlock');
+    sim.setPlayerLevel(10);
+    castAndFinish(sim, 'summon_imp');
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    expect((sim as any).delvePetStash.has(sim.playerId)).toBe(true);
+    const removed = (sim as any).entities.get(sim.playerId);
+    (sim as any).entities.delete(sim.playerId);
+    (sim as any).restorePetFromDelveStash(sim.playerId);
+    // The stash entry must survive since the entity wasn't there to restore onto.
+    expect((sim as any).delvePetStash.has(sim.playerId)).toBe(true);
+    (sim as any).entities.set(sim.playerId, removed);
+    (sim as any).restorePetFromDelveStash(sim.playerId);
+    expect((sim as any).delvePetStash.has(sim.playerId)).toBe(false);
+    expect(sim.petOf(sim.playerId)).not.toBeNull();
   });
 });
 
@@ -550,6 +622,37 @@ describe('delve interactables and affixes', () => {
     expect(run.restlessPending.length).toBeGreaterThanOrEqual(1);
     for (let i = 0; i < 20 * 4; i++) sim.tick();
     expect(bonewalkers()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('killing an affix-spawned Raised Bonewalker does not re-trigger restless_graves (no infinite chain)', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.affixes = ['restless_graves'];
+    const origin = run.origin;
+    // Simulate an affix-spawned Bonewalker directly (as tickDelveRestlessGraves
+    // would create it): it must carry affixSpawned so its own death cannot
+    // queue another one.
+    const bonewalker = createMob(920002, MOBS.reliquary_bonewalker, 7, {
+      x: origin.x,
+      y: 0,
+      z: origin.z + 10,
+    });
+    bonewalker.affixSpawned = true;
+    (sim as any).addEntity(bonewalker);
+    run.mobIds.push(bonewalker.id);
+    (sim as any).dealDamage(
+      sim.player,
+      bonewalker,
+      bonewalker.maxHp + 1,
+      false,
+      'physical',
+      null,
+      'hit',
+      true,
+    );
+    sim.tick();
+    expect(run.restlessPending.length).toBe(0);
   });
 
   it('bad_air affix applies a periodic Bad Air DoT to the party (PRD §6.7)', () => {
@@ -2607,6 +2710,11 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     sim.partyInvite(rival, sim.playerId);
     sim.partyAccept(rival);
     const run = enterLitanyApse(sim);
+    // Party membership alone is not "in this delve run": the rival must
+    // actually be inside the instance (not AFK elsewhere) to share in loot.
+    const rivalEnt = sim.entities.get(rival)!;
+    rivalEnt.pos = { ...sim.player.pos };
+    rivalEnt.prevPos = { ...rivalEnt.pos };
     killNhalia(sim);
     // Hard flawless guarantees a premium (non-empty) roll for both members, unlike
     // low tier's 50% chance at nothing, so this test isn't seed-flaky.
@@ -2620,7 +2728,6 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     expect(state.partyLoot![rival]!.length).toBeGreaterThan(0);
     // A run-mate standing ON the chest collects their OWN slice, not the opener's.
     const chest = sim.entities.get(chestId)!;
-    const rivalEnt = sim.entities.get(rival)!;
     rivalEnt.pos = { ...chest.pos };
     rivalEnt.prevPos = { ...chest.pos };
     sim.drainEvents();

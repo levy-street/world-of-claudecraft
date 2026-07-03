@@ -537,7 +537,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       run.objective.complete = true;
       ctx.onDelveBossDefeated(run);
     }
-    if (run?.affixes.includes('restless_graves') && template && !template.boss && !template.elite) {
+    if (
+      run?.affixes.includes('restless_graves') &&
+      template &&
+      !template.boss &&
+      !template.elite &&
+      !e.affixSpawned
+    ) {
       run.restlessPending.push({
         at: ctx.time + 3,
         x: e.pos.x,

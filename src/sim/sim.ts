@@ -5776,10 +5776,17 @@ export class Sim {
     return runsMod.delveRunForMob(this.ctx, mobId);
   }
 
+  // Party membership alone is NOT "in this delve run": a party member who never
+  // walked through the door (e.g. AFK back in town) must not be swept into
+  // module-advance / eject / reward teleports meant for players who are actually
+  // inside. Every caller of this is delve-scoped, so gate on physical presence.
   private partyMembersForKey(key: string): number[] {
     const out: number[] = [];
     for (const meta of this.players.values()) {
-      if (this.instanceKeyFor(meta.entityId) === key) out.push(meta.entityId);
+      if (this.instanceKeyFor(meta.entityId) !== key) continue;
+      const e = this.entities.get(meta.entityId);
+      if (!e || !isDelvePos(e.pos.x)) continue;
+      out.push(meta.entityId);
     }
     return out;
   }

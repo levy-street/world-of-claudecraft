@@ -1675,12 +1675,23 @@
     border-radius: 4px;
   }
 
-  /* ---------- quest tracker ---------- */
-  #quest-tracker {
+  /* ---------- right tracker stack (quest tracker + delve tracker) ----------
+     One absolutely-positioned flex column so the delve tracker always stacks
+     BELOW the quest tracker's actual rendered height instead of a hardcoded
+     top offset that could collide with a long quest list. */
+  #right-tracker-stack {
     position: absolute;
     right: 14px;
     top: 262px;
     width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    pointer-events: none;
+  }
+  /* ---------- quest tracker ---------- */
+  #quest-tracker {
+    width: 100%;
     font-size: 12px;
     color: var(--color-text-overlay);
     text-shadow: 1px 1px 2px #000;
@@ -1777,10 +1788,7 @@
 
   /* ---------- delve tracker ---------- */
   #delve-tracker {
-    position: absolute;
-    right: 14px;
-    top: 380px;
-    width: 240px;
+    width: 100%;
     font-size: 12px;
     color: var(--gold);
     text-shadow: 1px 1px 2px #000;

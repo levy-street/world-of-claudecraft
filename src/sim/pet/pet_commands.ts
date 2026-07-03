@@ -35,7 +35,7 @@
 // directly (already pure); everything that touches not-yet-extracted Sim state
 // routes through the seam.
 
-import { DUNGEON_X_THRESHOLD, ITEMS, MOBS } from '../data';
+import { DUNGEON_X_THRESHOLD, isDelvePos, ITEMS, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { PetState } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -59,6 +59,13 @@ const DEMON_HEAL_DURATION = 5;
 const DEMON_HEAL_TICK = 1;
 const TAMED_TARGET_RESPAWN_SECONDS = 60;
 const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
+
+// A live pet check fails while inside a delve even for owners with a valid
+// equipped pet (it is stowed for the run, see stowPetForDelve/restorePetFromDelveStash),
+// so the surfaced error must say why instead of implying the pet was lost.
+function noPetError(e: Entity): string {
+  return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.';
+}
 
 // -------------------------------------------------------------------------
 // Non-player stat-aura HP bookkeeping (shared: the Sim applyAura/aura-expiry +
@@ -442,7 +449,7 @@ export function abandonPet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   ctx.emit({ type: 'log', text: `You abandon ${pet.name}.`, color: '#f66', pid: r.e.id });
@@ -458,7 +465,7 @@ export function renamePet(ctx: SimContext, name: string, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   const clean = cleanPetName(name);
@@ -482,7 +489,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   if (!pet.dead) {
@@ -681,7 +688,7 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   pet.petMode = mode;
@@ -704,7 +711,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   pet.petAutoTaunt = enabled;
@@ -762,8 +769,12 @@ export function stowPetForDelve(ctx: SimContext, pid: number): void {
 export function restorePetFromDelveStash(ctx: SimContext, pid: number): void {
   const state = ctx.delvePetStash.get(pid);
   if (!state) return;
-  ctx.delvePetStash.delete(pid);
   const e = ctx.entities.get(pid);
-  if (!e || petOf(ctx, pid, true)) return;
+  // If the owner entity is not registered yet (transfer/load ordering), leave the
+  // stash entry in place so a later call (e.g. the next tick) can still restore it
+  // instead of silently losing the pet.
+  if (!e) return;
+  ctx.delvePetStash.delete(pid);
+  if (petOf(ctx, pid, true)) return;
   restorePet(ctx, e, state);
 }

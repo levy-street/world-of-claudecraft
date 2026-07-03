@@ -1520,6 +1520,10 @@ export interface Entity {
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
   gm?: boolean;
+  /** True for a mob spawned BY a delve affix (e.g. Restless Graves' Raised
+   *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
+   *  own death can never re-trigger the same affix (would otherwise chain forever). */
+  affixSpawned?: boolean;
   respawnTimer: number;
   corpseTimer: number;
   lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it

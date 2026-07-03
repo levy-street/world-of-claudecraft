@@ -257,6 +257,20 @@ export function delveModuleEntry(ctx: SimContext, run: DelveRun): Vec3 {
   return ctx.groundPos(run.origin.x + entry.x, run.origin.z + zBase + entry.z);
 }
 
+// Party members placed at a shared entry/door point are spread around it so they
+// never land coincident (stacked hitboxes read as "glitched into each other" and
+// let one player's movement visually drag another's overlapping model).
+const DELVE_MEMBER_SPAWN_SPREAD = 2.2;
+
+export function delveMemberSpawnPos(ctx: SimContext, entry: Vec3, slotIndex: number): Vec3 {
+  if (slotIndex <= 0) return entry;
+  const angle = (slotIndex * Math.PI * 2) / 6;
+  return ctx.groundPos(
+    entry.x + Math.cos(angle) * DELVE_MEMBER_SPAWN_SPREAD,
+    entry.z + Math.sin(angle) * DELVE_MEMBER_SPAWN_SPREAD,
+  );
+}
+
 export function delveRunForPlayer(ctx: SimContext, pid: number): DelveRun | null {
   const e = ctx.entities.get(pid);
   if (!e) return null;
@@ -369,9 +383,11 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   }
   stowPetForDelve(ctx, r.meta.entityId);
   const entry = delveModuleEntry(ctx, run);
+  const slotIndex = ctx.partyMembersForKey(key).length;
+  const pos = delveMemberSpawnPos(ctx, entry, slotIndex);
   const p = r.e;
-  p.pos = entry;
-  p.prevPos = { ...entry };
+  p.pos = pos;
+  p.prevPos = { ...pos };
   ctx.rebucket(p);
   p.facing = 0;
   p.targetId = null;
@@ -380,6 +396,9 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   if (key.startsWith('solo:') && delve.autoCompanionId && !run.companion) {
     ctx.spawnDelveCompanion(run, r.meta.entityId, delve.autoCompanionId);
   }
+  console.log(
+    `[delve] pid=${r.meta.entityId} entered ${delveId}/${tierId} instance=${key} slot=${slotIndex}`,
+  );
   ctx.emit({ type: 'log', text: delve.enterText, color: '#b9f', pid: r.meta.entityId });
   ctx.emit({ type: 'delveEntered', delveId, tierId, pid: r.meta.entityId });
 }
@@ -446,6 +465,9 @@ export function claimDelveRun(
   clearDrownedLitanyRiteState(run);
   const origin = delveOriginOf(run);
   run.origin = { x: origin.x, z: origin.z };
+  console.log(
+    `[delve] claimed instance slot=${run.slot} for ${delveId}/${tierId} instance=${key} seed=${run.seed}`,
+  );
   spawnDelveModule(ctx, run);
 }
 
@@ -605,12 +627,18 @@ export function updateDelveRuns(ctx: SimContext): void {
   }
 }
 
-export function ejectToDelveDoor(ctx: SimContext, pid: number, delve: DelveDef): void {
+export function ejectToDelveDoor(
+  ctx: SimContext,
+  pid: number,
+  delve: DelveDef,
+  slotIndex = 0,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
   p.dead = false;
-  p.pos = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  const door = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
@@ -628,12 +656,12 @@ export function ejectToDelveDoor(ctx: SimContext, pid: number, delve: DelveDef):
 export function failDelveRun(ctx: SimContext, run: DelveRun): void {
   const delve = DELVES[run.delveId];
   const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
-  for (const pid of members) {
+  members.forEach((pid, i) => {
     restorePetFromDelveStash(ctx, pid);
-    ejectToDelveDoor(ctx, pid, delve);
+    ejectToDelveDoor(ctx, pid, delve, i);
     ctx.emit({ type: 'delveFailed', delveId: run.delveId, tierId: run.tierId, pid });
     ctx.emit({ type: 'log', text: `${delve.name} run failed.`, color: '#f66', pid });
-  }
+  });
   freeDelveRun(ctx, run);
 }
 
@@ -960,11 +988,12 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
   const entry = delveModuleEntry(ctx, run);
   const modId = run.modules[run.moduleIndex];
   const modName = modId ? (DELVE_MODULE_NAMES[modId] ?? modId) : 'the next chamber';
-  for (const pid of members) {
+  members.forEach((pid, i) => {
     const p = ctx.entities.get(pid);
-    if (!p || p.dead) continue;
-    p.pos = entry;
-    p.prevPos = { ...entry };
+    if (!p || p.dead) return;
+    const pos = delveMemberSpawnPos(ctx, entry, i);
+    p.pos = pos;
+    p.prevPos = { ...pos };
     ctx.rebucket(p);
     p.facing = 0;
     ctx.emit({
@@ -973,7 +1002,7 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
       color: '#b9f',
       pid,
     });
-  }
+  });
 }
 
 export function tickDelveModuleExit(ctx: SimContext, run: DelveRun): void {
@@ -1175,6 +1204,7 @@ export function tickDelveRestlessGraves(ctx: SimContext, run: DelveRun): void {
       ctx.groundPos(spawn.x, spawn.z),
     );
     mob.facing = Math.PI;
+    mob.affixSpawned = true;
     ctx.addEntity(mob);
     run.mobIds.push(mob.id);
   }
@@ -1393,10 +1423,10 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
     }
     const delve = DELVES[run.delveId];
     const members = run.partyKey ? ctx.partyMembersForKey(run.partyKey) : [];
-    for (const pid of members) {
+    members.forEach((pid, i) => {
       restorePetFromDelveStash(ctx, pid);
-      ejectToDelveDoor(ctx, pid, delve);
-    }
+      ejectToDelveDoor(ctx, pid, delve, i);
+    });
     freeDelveRun(ctx, run);
     return;
   }

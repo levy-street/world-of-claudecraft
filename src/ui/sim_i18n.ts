@@ -187,6 +187,7 @@ const baseEnTable = {
 
 const petEnTable = {
   'error.noPet': 'You have no pet.',
+  'error.petsNotAllowedInDelves': 'Pets are not allowed inside the delves.',
   'error.petAlreadyAlive': 'Your pet is already alive.',
   'error.permanentPetAbandonFrame': 'Permanent pets can only be abandoned from the pet frame.',
   'error.summonUnavailable': 'That summon is unavailable.',
@@ -2360,6 +2361,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
 
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
   'error.noPet': 'You have no pet.',
+  'error.petsNotAllowedInDelves': 'Pets are not allowed inside the delves.',
   'error.petAlreadyAlive': 'Your pet is already alive.',
   'error.permanentPetAbandonFrame': 'Permanent pets can only be abandoned from the pet frame.',
   'error.summonUnavailable': 'That summon is unavailable.',
@@ -2403,6 +2405,7 @@ const PET_DICT_EN: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_ES: Record<PetSimMessageKey, string> = {
   'error.noPet': 'No tienes una mascota.',
+  'error.petsNotAllowedInDelves': 'No se permiten mascotas dentro de las expediciones.',
   'error.petAlreadyAlive': 'Tu mascota ya está viva.',
   'error.permanentPetAbandonFrame':
     'Las mascotas permanentes solo se pueden abandonar desde el marco de mascota.',
@@ -2448,6 +2451,7 @@ const PET_DICT_ES: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_FR: Record<PetSimMessageKey, string> = {
   'error.noPet': "Vous n'avez pas de familier.",
+  'error.petsNotAllowedInDelves': "Les familiers ne sont pas autorisés dans les plongées.",
   'error.petAlreadyAlive': 'Votre familier est déjà en vie.',
   'error.permanentPetAbandonFrame':
     'Les familiers permanents ne peuvent être abandonnés que depuis le cadre du familier.',
@@ -2493,6 +2497,7 @@ const PET_DICT_FR: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_IT: Record<PetSimMessageKey, string> = {
   'error.noPet': 'Non hai una mascotte.',
+  'error.petsNotAllowedInDelves': 'Le mascotte non sono ammesse nelle incursioni.',
   'error.petAlreadyAlive': 'La tua mascotte è già viva.',
   'error.permanentPetAbandonFrame':
     'Le mascotte permanenti possono essere abbandonate solo dal riquadro della mascotte.',
@@ -2539,6 +2544,7 @@ const PET_DICT_IT: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_DE: Record<PetSimMessageKey, string> = {
   'error.noPet': 'Du hast kein Begleittier.',
+  'error.petsNotAllowedInDelves': 'Begleittiere sind in Tiefgängen nicht erlaubt.',
   'error.petAlreadyAlive': 'Dein Begleittier lebt bereits.',
   'error.permanentPetAbandonFrame':
     'Dauerhafte Begleiter können nur über das Begleiterfenster aufgegeben werden.',
@@ -2585,6 +2591,7 @@ const PET_DICT_DE: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_ZH_CN: Record<PetSimMessageKey, string> = {
   'error.noPet': '你没有宠物。',
+  'error.petsNotAllowedInDelves': '探秘中不允许携带宠物。',
   'error.petAlreadyAlive': '你的宠物已经活着。',
   'error.permanentPetAbandonFrame': '永久宠物只能从宠物框架中放弃。',
   'error.summonUnavailable': '该召唤不可用。',
@@ -2627,6 +2634,7 @@ const PET_DICT_ZH_CN: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_ZH_TW: Record<PetSimMessageKey, string> = {
   'error.noPet': '你沒有寵物。',
+  'error.petsNotAllowedInDelves': '秘探中不允許攜帶寵物。',
   'error.petAlreadyAlive': '你的寵物已經活著。',
   'error.permanentPetAbandonFrame': '永久寵物只能從寵物框架中放棄。',
   'error.summonUnavailable': '該召喚不可用。',
@@ -2669,6 +2677,7 @@ const PET_DICT_ZH_TW: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_KO: Record<PetSimMessageKey, string> = {
   'error.noPet': '소환수가 없습니다.',
+  'error.petsNotAllowedInDelves': '탐굴 안에서는 펫을 데려갈 수 없습니다.',
   'error.petAlreadyAlive': '소환수가 이미 살아 있습니다.',
   'error.permanentPetAbandonFrame': '영구 소환수는 소환수 창에서만 포기할 수 있습니다.',
   'error.summonUnavailable': '그 소환은 사용할 수 없습니다.',
@@ -2713,6 +2722,7 @@ const PET_DICT_KO: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_JA: Record<PetSimMessageKey, string> = {
   'error.noPet': 'ペットがいません。',
+  'error.petsNotAllowedInDelves': 'デルヴの中ではペットを連れて行けません。',
   'error.petAlreadyAlive': 'ペットはすでに生きています。',
   'error.permanentPetAbandonFrame': '永続ペットはペットフレームからのみ放棄できます。',
   'error.summonUnavailable': 'その召喚は使用できません。',
@@ -2756,6 +2766,7 @@ const PET_DICT_JA: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_PT: Record<PetSimMessageKey, string> = {
   'error.noPet': 'Você não tem mascote.',
+  'error.petsNotAllowedInDelves': 'Mascotes não são permitidos dentro das incursões.',
   'error.petAlreadyAlive': 'Seu mascote já está vivo.',
   'error.permanentPetAbandonFrame':
     'Mascotes permanentes só podem ser abandonados pela moldura do mascote.',
@@ -2800,6 +2811,7 @@ const PET_DICT_PT: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_RU: Record<PetSimMessageKey, string> = {
   'error.noPet': 'У вас нет питомца.',
+  'error.petsNotAllowedInDelves': 'Питомцы не допускаются внутрь вылазок.',
   'error.petAlreadyAlive': 'Ваш питомец уже жив.',
   'error.permanentPetAbandonFrame':
     'Постоянных питомцев можно оставить только через рамку питомца.',

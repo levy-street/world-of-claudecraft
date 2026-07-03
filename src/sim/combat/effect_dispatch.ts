@@ -15,7 +15,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
-import { ABILITIES } from '../data';
+import { ABILITIES, isDelvePos } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
@@ -765,7 +765,7 @@ export function runEffects(
       case 'dismissPet': {
         const pet = ctx.petOf(p.id);
         if (!pet) {
-          ctx.error(p.id, 'You have no pet.');
+          ctx.error(p.id, isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.');
           break;
         }
         ctx.error(p.id, 'Permanent pets can only be abandoned from the pet frame.');
