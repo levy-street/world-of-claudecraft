@@ -1136,7 +1136,11 @@ export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
     for (const z of zones) {
       const dx = p.pos.x - (ox + z.x);
       const dz = p.pos.z - (oz + z.z);
-      if (dx * dx + dz * dz > z.r * z.r) continue;
+      // An authored ellipse (rx/rz, e.g. the apse moat) checks per-axis; a plain
+      // zone (rx/rz unset) falls back to the circular r/r check.
+      const rx = z.rx ?? z.r;
+      const rz = z.rz ?? z.r;
+      if ((dx * dx) / (rx * rx) + (dz * dz) / (rz * rz) > 1) continue;
       const zt = z.tier ?? 'deep';
       if (zt === 'deep') {
         worstTier = 'deep';

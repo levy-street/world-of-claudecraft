@@ -411,16 +411,31 @@ export function placeMarshDryIslands(group: THREE.Group, moduleId: LitanyModuleI
  */
 export function placeMarshBlackwaterPools(
   group: THREE.Group,
-  hazards: Array<{ x: number; z: number; r: number; tier?: 'shallow' | 'deep' }>,
+  hazards: Array<{
+    x: number;
+    z: number;
+    r: number;
+    rx?: number;
+    rz?: number;
+    tier?: 'shallow' | 'deep';
+  }>,
   addGlow: (x: number, z: number, color: number, y?: number, scale?: number) => void,
 ): void {
   for (const h of hazards) {
     const isShallow = h.tier === 'shallow';
     const r = h.r * 1.08;
+    // An authored ellipse (rx/rz, e.g. the apse moat) squashes every ring/circle
+    // by axis, applied to the local (pre-rotateX) geometry so it lands as a
+    // world-space X/Z squash after rotateX maps local Y onto world Z.
+    const sxr = (h.rx ?? h.r) / h.r;
+    const szr = (h.rz ?? h.r) / h.r;
     if (isShallow) {
       // Shallow: lighter teal, more translucent - reads as wading depth.
       const pool = new THREE.Mesh(
-        new THREE.CircleGeometry(r, 36).rotateX(-Math.PI / 2).translate(h.x, 0.1, h.z),
+        new THREE.CircleGeometry(r, 36)
+          .scale(sxr, szr, 1)
+          .rotateX(-Math.PI / 2)
+          .translate(h.x, 0.1, h.z),
         new THREE.MeshBasicMaterial({
           color: 0x1a5a6a,
           transparent: true,
@@ -432,6 +447,7 @@ export function placeMarshBlackwaterPools(
       group.add(pool);
       const rim = new THREE.Mesh(
         new THREE.RingGeometry(r * 0.8, r * 1.04, 40)
+          .scale(sxr, szr, 1)
           .rotateX(-Math.PI / 2)
           .translate(h.x, 0.13, h.z),
         new THREE.MeshBasicMaterial({
@@ -449,7 +465,10 @@ export function placeMarshBlackwaterPools(
     } else {
       // Deep (default): dark near-opaque navy/black - reads as drowning danger.
       const core = new THREE.Mesh(
-        new THREE.CircleGeometry(r * 0.72, 32).rotateX(-Math.PI / 2).translate(h.x, 0.1, h.z),
+        new THREE.CircleGeometry(r * 0.72, 32)
+          .scale(sxr, szr, 1)
+          .rotateX(-Math.PI / 2)
+          .translate(h.x, 0.1, h.z),
         new THREE.MeshBasicMaterial({
           color: 0x020a06,
           transparent: true,
@@ -460,7 +479,10 @@ export function placeMarshBlackwaterPools(
       core.renderOrder = 1;
       group.add(core);
       const pool = new THREE.Mesh(
-        new THREE.CircleGeometry(r, 36).rotateX(-Math.PI / 2).translate(h.x, 0.14, h.z),
+        new THREE.CircleGeometry(r, 36)
+          .scale(sxr, szr, 1)
+          .rotateX(-Math.PI / 2)
+          .translate(h.x, 0.14, h.z),
         new THREE.MeshBasicMaterial({
           color: 0x061812,
           transparent: true,
@@ -472,6 +494,7 @@ export function placeMarshBlackwaterPools(
       group.add(pool);
       const rim = new THREE.Mesh(
         new THREE.RingGeometry(r * 0.78, r * 1.02, 40)
+          .scale(sxr, szr, 1)
           .rotateX(-Math.PI / 2)
           .translate(h.x, 0.16, h.z),
         new THREE.MeshBasicMaterial({
@@ -487,6 +510,7 @@ export function placeMarshBlackwaterPools(
       group.add(rim);
       const outer = new THREE.Mesh(
         new THREE.RingGeometry(r * 1.02, r * 1.18, 36)
+          .scale(sxr, szr, 1)
           .rotateX(-Math.PI / 2)
           .translate(h.x, 0.13, h.z),
         new THREE.MeshBasicMaterial({

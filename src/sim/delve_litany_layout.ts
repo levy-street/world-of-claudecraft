@@ -9,6 +9,7 @@ import {
   TOMB_HW,
 } from './dungeon_layout';
 import type { Point2D } from './geometry2d';
+import type { DelveHazardZone } from './types';
 
 export type LitanyModuleId =
   | 'litany_sluice'
@@ -95,6 +96,10 @@ export type LitanyMapPrimitive =
       x: number;
       z: number;
       r: number;
+      // World-space ellipse radii (e.g. the apse moat); default to r/r for a
+      // plain circle. Independent of the map canvas's own per-axis scale.
+      rx?: number;
+      rz?: number;
       role: 'blackwater' | 'dais' | 'exit' | 'blocker';
     }
   | { kind: 'rect'; x: number; z: number; hw: number; hd: number; role: 'island' | 'blocker' };
@@ -886,12 +891,10 @@ export function litanyModuleLosColliders(moduleId: LitanyModuleId): Collider[] {
 }
 
 /** Blackwater hazard zones for module defs / tick (instance-local). */
-export function litanyModuleHazards(
-  moduleId: LitanyModuleId,
-): Array<{ x: number; z: number; r: number; tier?: 'shallow' | 'deep' }> {
+export function litanyModuleHazards(moduleId: LitanyModuleId): DelveHazardZone[] {
   const geo = litanyModuleGeometry(moduleId);
   if (!geo) return [];
-  return geo.hazards.map((h) => ({ x: h.x, z: h.z, r: h.r, tier: h.tier }));
+  return geo.hazards.map((h) => ({ x: h.x, z: h.z, r: h.r, rx: h.rx, rz: h.rz, tier: h.tier }));
 }
 
 export function litanyModuleDressing(moduleId: LitanyModuleId): LitanyDressingAnchor[] {
@@ -907,7 +910,15 @@ export function litanyModuleMapPrimitives(moduleId: LitanyModuleId): LitanyMapPr
     out.push({ kind: 'rect', x: isl.x, z: isl.z, hw: isl.hw, hd: isl.hd, role: 'island' });
   }
   for (const hz of geo.hazards) {
-    out.push({ kind: 'circle', x: hz.x, z: hz.z, r: hz.rx ?? hz.r, role: 'blackwater' });
+    out.push({
+      kind: 'circle',
+      x: hz.x,
+      z: hz.z,
+      r: hz.r,
+      rx: hz.rx,
+      rz: hz.rz,
+      role: 'blackwater',
+    });
   }
   for (const s of geo.stubs) {
     out.push({ kind: 'rect', x: s.x, z: s.z, hw: s.hw, hd: s.hd, role: 'blocker' });

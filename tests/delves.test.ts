@@ -1561,6 +1561,34 @@ describe('The Drowned Litany (Phase 3 static Blackwater hazard)', () => {
     expect(clearHits).toBe(0);
   });
 
+  it('the apse moat is a true ellipse: rz bounds it tighter than rx, not a circle of radius rx', () => {
+    const sim = makeSim('warrior');
+    enterLitany(sim);
+    enterModule(sim, 'litany_apse');
+    const hz = hazardWorld(sim, 'litany_apse', 0); // shallow: rx 24, rz 17, r 24
+    const p = sim.player;
+    const hitsAt = (dx: number, dz: number) => {
+      p.pos.x = hz.x + dx;
+      p.pos.z = hz.z + dz;
+      p.prevPos = { ...p.pos };
+      let hit = false;
+      for (let i = 0; i < 20; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.targetId === p.id && ev.ability === 'Blackwater')
+            hit = true;
+        }
+      }
+      return hit;
+    };
+    // dx=15,dz=15 sits inside a circle of radius rx=24 (15^2+15^2=450 <= 576) but
+    // outside the true ellipse (15^2/24^2 + 15^2/17^2 ~= 1.17 > 1): if the sim
+    // still used the old r-only circle check, this point would incorrectly hit.
+    expect(hitsAt(15, 15)).toBe(false);
+    // A pure-x offset well inside rx still hits: the moat is still a real (wide)
+    // hazard along x, not accidentally shrunk to nothing.
+    expect(hitsAt(20, 0)).toBe(true);
+  });
+
   it('Heroic Blackwater hits harder than Normal', () => {
     const pulseDamage = (tier: 'normal' | 'heroic') => {
       const sim = makeSim('warrior');

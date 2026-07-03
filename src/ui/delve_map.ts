@@ -201,12 +201,15 @@ export function delveSchematicStatic(
             strokeWidth: 1,
           });
         } else {
+          // World-space rx/rz (an authored ellipse, e.g. the apse moat) win over
+          // the uniform r on each axis independently, before the canvas's own
+          // per-axis scale (sx/sz) is applied.
           prims.push({
             kind: 'circle',
             cx,
             cy,
-            r: Math.max(2, prim.r * sx),
-            ry: Math.max(2, prim.r * sz),
+            r: Math.max(2, (prim.rx ?? prim.r) * sx),
+            ry: Math.max(2, (prim.rz ?? prim.r) * sz),
             // Only pools bleed past the walkable outline by design; everything
             // else is authored inside it.
             clipToOutline: prim.role === 'blackwater',

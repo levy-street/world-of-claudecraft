@@ -2157,6 +2157,11 @@ export interface DelveHazardZone {
   x: number;
   z: number;
   r: number;
+  // An authored ellipse (e.g. the apse moat, wider along x than z to fit
+  // between its flanking islands): rx/rz win over r for both the damage
+  // check and every visual (map, render). Omit for a plain circle of radius r.
+  rx?: number;
+  rz?: number;
   tier?: 'shallow' | 'deep';
 }
 

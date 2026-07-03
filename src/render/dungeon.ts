@@ -647,7 +647,14 @@ export class DungeonInteriors {
     opts?: {
       layout?: DungeonLayout;
       variant?: Variant;
-      hazards?: Array<{ x: number; z: number; r: number; tier?: 'shallow' | 'deep' }>;
+      hazards?: Array<{
+        x: number;
+        z: number;
+        r: number;
+        rx?: number;
+        rz?: number;
+        tier?: 'shallow' | 'deep';
+      }>;
       moduleId?: DelveModuleId;
     },
   ): Promise<void> {

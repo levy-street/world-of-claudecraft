@@ -160,13 +160,17 @@ describe('delveSchematicStatic', () => {
       // The moat is two CONCENTRIC hazards (shallow ring + deep core), so match
       // by center then take the closest radius; the edge asserts below still
       // fail on any size-scale regression because relative order is preserved.
+      // An authored ellipse (rx/rz, e.g. the apse moat) wins over the uniform r on
+      // each axis independently; a plain zone falls back to r/r.
+      const hzRx = hz.rx ?? hz.r;
+      const hzRz = hz.rz ?? hz.r;
       const pool = pools
         .filter((p) => Math.abs(p.cx - c.cx) < 0.01 && Math.abs(p.cy - c.cy) < 0.01)
-        .sort((a, b) => Math.abs(a.r - hz.r * sx) - Math.abs(b.r - hz.r * sx))[0];
+        .sort((a, b) => Math.abs(a.r - hzRx * sx) - Math.abs(b.r - hzRx * sx))[0];
       expect(pool, `no pool prim at hazard (${hz.x},${hz.z})`).toBeDefined();
       // X is mirrored, so the +x world edge is the smaller canvas x.
-      expect(pool!.cx - pool!.r).toBeCloseTo(at(hz.x + hz.r, hz.z).cx, 3);
-      expect(pool!.cy + (pool!.ry ?? pool!.r)).toBeCloseTo(at(hz.x, hz.z + hz.r).cy, 3);
+      expect(pool!.cx - pool!.r).toBeCloseTo(at(hz.x + hzRx, hz.z).cx, 3);
+      expect(pool!.cy + (pool!.ry ?? pool!.r)).toBeCloseTo(at(hz.x, hz.z + hzRz).cy, 3);
     }
     const islands = prims.filter(
       (p): p is Extract<(typeof prims)[number], { kind: 'rect' }> =>
