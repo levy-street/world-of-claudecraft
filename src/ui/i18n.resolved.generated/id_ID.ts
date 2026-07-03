@@ -2220,7 +2220,6 @@ export const id_ID: EnTranslations = {
       "instancesBusy": "Semua instansi {name} sedang sibuk. Coba lagi sebentar lagi.",
       "runFailed": "Penjelajahan {name} gagal.",
       "complete": "{name} selesai.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Sebuah mekanisme berbunyi terbuka di dekatmu. Sebuah lorong terbuka ke utara. Temukan portal keluar di depan.",
       "raiseDead": "{name} mulai membangkitkan yang mati.",
       "graveFalters": "Ritual kubur tersendat.",
@@ -2267,6 +2266,7 @@ export const id_ID: EnTranslations = {
       "passageSealed": "Lorong itu tersegel.",
       "moveCloserPassage": "Mendekatlah ke lorong.",
       "moveCloserChest": "Mendekatlah ke peti.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Tidak ada lagi yang bisa diambil.",
       "wayOutNotOpen": "Jalan keluar belum terbuka.",
       "moveCloserStairs": "Mendekatlah ke tangga.",
@@ -2346,7 +2346,6 @@ export const id_ID: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const id_ID: EnTranslations = {
       "enter": "Masuki Delve",
       "enterAria": "Masuki {delve} pada tingkat kesulitan {tier}",
       "openDelve": "Relikuari Runtuh",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Buka Papan Delve dari {name}",
       "marks": "Tanda Delve: {count}",
       "minLevel": "Membutuhkan Level {level}",
@@ -2464,7 +2462,6 @@ export const id_ID: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

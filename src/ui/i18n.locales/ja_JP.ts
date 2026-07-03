@@ -4699,6 +4699,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '近くで機構がカチリと開く。北へ通路が開いた。先にある出口のポータルを探せ。',
   'sim.delve.moduleEnter': '{name}: {objective}',
   'sim.delve.moveCloserChest': '宝箱にもっと近づけ。',
+  'sim.delve.moveCloserReliquary': '聖遺物匣にもっと近づけ。',
   'sim.delve.nothingToTake': 'もう取れるものは何も残っていない。',
   'sim.delve.moveCloserPassage': '通路にもっと近づけ。',
   'sim.delve.moveCloserStairs': '階段にもっと近づけ。',
@@ -5041,7 +5042,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
-  'sim.delve.mobChannels': '{name}が{mechanic}を発動している。',
   'sim.delve.drownedLitanyReliquaryRise':
     '修道女ナリアが沈黙する。溺れし聖遺物匣が黒水から浮かび上がる。近づいて儀式を始めよ。',
   'sim.delve.riteSequenceReady': '祠が闇に沈む。順序を繰り返せ。',
@@ -5072,13 +5072,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '間違った祠に触れると黒水を浴び、挑戦回数を1回失います。順番を最後までなぞれば聖遺物匣が開きます。',
   'delveRiteUi.showsOnce': '順序は一度だけ表示',
   'delveRiteUi.symbols': '{count}個の記号',
-  'delveRiteUi.mistakes': '{count}回の失敗が許容される',
   'delveRiteUi.tries': '{count}回の試行',
   'delveRiteUi.reward.easy': '控えめな戦利品',
   'delveRiteUi.reward.medium': '豊かな戦利品',
   'delveRiteUi.reward.hard': '極上の戦利品',
   'delveRiteUi.closeAria': '閉じる',
-  'delveUi.board.openDelveLitany': '溺れし連祷',
   'delveUi.board.companion.edda': 'エッダ・リードハンド',
   'delveUi.npc.halvenMarsh.greeting':
     '道は北の沼地へ続いていた、{playerName}。また聖遺物庫が黒い水の底で歌い、溺れし死者が鐘に応える。信徒エッダはこの葦のことを私よりよく知っている、彼女の灯りのそばを離れるな。難易度を選べ、お前が戻るまで縄を握っていよう。',
@@ -5105,7 +5103,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveUi.object.sluice_valve': '水門弁',
   'delveUi.object.grave_tablet': '墓碑板',
   'delveUi.object.corpse_candle': '死体蝋燭',
-  'delveUi.object.widow_egg_sac': '未亡人の卵嚢',
   'delveUi.companion.edda.combat_start': '黒水に気をつけろ、{playerName}。沼が聞いている。',
   'delveUi.companion.edda.low_hp': '落ち着け。私のランタンはまだ消えていない。',
   'delveUi.companion.edda.trap_spotted': '待て。ここの葦がおかしい。',
@@ -5158,8 +5155,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.brother_halven_marsh.greeting':
     '道は北へ続いていた。また聖遺物庫、また儀式。難易度を選べ、お前が戻るまで縄を握っていよう。',
   'entities.delves.drowned_litany.name': '溺れし連祷',
-  'entities.delves.drowned_litany.enterText':
-    'あなたは沼地の果てへ、溺れし神殿へと降りていく。',
+  'entities.delves.drowned_litany.enterText': 'あなたは沼地の果てへ、溺れし神殿へと降りていく。',
   'entities.delves.drowned_litany.leaveText':
     'あなたは沼地の果てへ登り、ハルヴェン修道士のもとへ戻る。',
   'hudChrome.dailyRewards.endsIn': '終了まで{time}',

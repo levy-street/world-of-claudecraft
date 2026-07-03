@@ -2220,7 +2220,6 @@ export const zh_CN: EnTranslations = {
       "instancesBusy": "{name}的所有副本都已占用。请稍后再试。",
       "runFailed": "{name}探秘失败。",
       "complete": "{name}已完成。",
-      "mobChannels": "{name}正在引导{mechanic}。",
       "mechanismOpen": "附近一处机关咔哒一声开启。一条通道向北敞开，前去寻找前方的出口传送门。",
       "raiseDead": "{name}开始施放亡者复生。",
       "graveFalters": "墓葬仪式被打断了。",
@@ -2267,6 +2266,7 @@ export const zh_CN: EnTranslations = {
       "passageSealed": "通道被封住了。",
       "moveCloserPassage": "靠近通道一些。",
       "moveCloserChest": "靠近宝箱一些。",
+      "moveCloserReliquary": "靠近圣物匣一些。",
       "nothingToTake": "这里已经没有可拿的东西了。",
       "wayOutNotOpen": "出路尚未开启。",
       "moveCloserStairs": "靠近楼梯一些。",
@@ -2346,7 +2346,6 @@ export const zh_CN: EnTranslations = {
     "showsTimes": "顺序展示{count}次",
     "showsOnce": "顺序仅展示一次",
     "symbols": "{count}个符号",
-    "mistakes": "允许{count}次错误",
     "tries": "{count}次尝试",
     "reward": {
       "easy": "普通战利品",
@@ -2361,7 +2360,6 @@ export const zh_CN: EnTranslations = {
       "enter": "进入探秘",
       "enterAria": "以{tier}难度进入{delve}",
       "openDelve": "坍塌的圣物库",
-      "openDelveLitany": "溺亡连祷",
       "openDelveAria": "从{name}打开探秘面板",
       "marks": "探秘印记：{count}",
       "minLevel": "需要等级 {level}",
@@ -2464,7 +2462,6 @@ export const zh_CN: EnTranslations = {
       "sluice_valve": "水闸阀门",
       "grave_tablet": "墓碑石板",
       "corpse_candle": "尸烛",
-      "widow_egg_sac": "寡妇卵囊",
       "bell_rope": "Bell Rope"
     },
     "companion": {

@@ -2220,7 +2220,6 @@ export const fr_FR: EnTranslations = {
       "instancesBusy": "Toutes les instances de {name} sont occupées. Réessayez bientôt.",
       "runFailed": "Plongée {name} échouée.",
       "complete": "{name} terminée.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Un mécanisme s'ouvre avec un déclic à proximité. Un passage s'ouvre au nord : trouvez le portail de sortie devant vous.",
       "raiseDead": "{name} commence à incanter Réveil des morts.",
       "graveFalters": "Le rite funéraire vacille.",
@@ -2267,6 +2266,7 @@ export const fr_FR: EnTranslations = {
       "passageSealed": "Le passage est scellé.",
       "moveCloserPassage": "Rapprochez-vous du passage.",
       "moveCloserChest": "Rapprochez-vous du coffre.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Il ne reste plus rien à prendre.",
       "wayOutNotOpen": "La sortie n'est pas encore ouverte.",
       "moveCloserStairs": "Rapprochez-vous de l'escalier.",
@@ -2346,7 +2346,6 @@ export const fr_FR: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const fr_FR: EnTranslations = {
       "enter": "Entrer dans la plongée",
       "enterAria": "Entrer dans {delve} en difficulté {tier}",
       "openDelve": "Reliquaire effondré",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Ouvrir le tableau des plongées depuis {name}",
       "marks": "Marques de plongée : {count}",
       "minLevel": "Niveau {level} requis",
@@ -2464,7 +2462,6 @@ export const fr_FR: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

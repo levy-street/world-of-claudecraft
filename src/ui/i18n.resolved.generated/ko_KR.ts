@@ -2220,7 +2220,6 @@ export const ko_KR: EnTranslations = {
       "instancesBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하세요.",
       "runFailed": "{name} 진행에 실패했습니다.",
       "complete": "{name} 완료.",
-      "mobChannels": "{name}이(가) {mechanic}을(를) 시전 중이다.",
       "mechanismOpen": "근처에서 기계 장치가 철컥 열립니다. 북쪽으로 통로가 열립니다. 앞쪽의 출구 차원문을 찾으세요.",
       "raiseDead": "{name}이(가) 죽음의 부활을 시전하기 시작합니다.",
       "graveFalters": "무덤의 의식이 흔들립니다.",
@@ -2267,6 +2266,7 @@ export const ko_KR: EnTranslations = {
       "passageSealed": "통로가 봉인되어 있습니다.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
+      "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",
       "nothingToTake": "이제 가져갈 것이 없습니다.",
       "wayOutNotOpen": "나가는 길이 아직 열리지 않았습니다.",
       "moveCloserStairs": "계단에 더 가까이 다가가세요.",
@@ -2346,7 +2346,6 @@ export const ko_KR: EnTranslations = {
     "showsTimes": "순서를 {count}회 표시",
     "showsOnce": "순서를 한 번만 표시",
     "symbols": "기호 {count}개",
-    "mistakes": "{count}회의 실수 허용",
     "tries": "시도 {count}회",
     "reward": {
       "easy": "소박한 전리품",
@@ -2361,7 +2360,6 @@ export const ko_KR: EnTranslations = {
       "enter": "탐굴 진입",
       "enterAria": "{tier} 난이도로 {delve} 진입",
       "openDelve": "무너진 성물실",
-      "openDelveLitany": "익사한 연도",
       "openDelveAria": "{name}에서 탐굴 게시판 열기",
       "marks": "탐굴 증표: {count}",
       "minLevel": "필요 레벨 {level}",
@@ -2464,7 +2462,6 @@ export const ko_KR: EnTranslations = {
       "sluice_valve": "수문 밸브",
       "grave_tablet": "무덤 석판",
       "corpse_candle": "시체양초",
-      "widow_egg_sac": "과부 알주머니",
       "bell_rope": "Bell Rope"
     },
     "companion": {

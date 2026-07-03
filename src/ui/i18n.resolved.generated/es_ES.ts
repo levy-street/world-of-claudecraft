@@ -2220,7 +2220,6 @@ export const es_ES: EnTranslations = {
       "instancesBusy": "Todas las instancias de {name} están ocupadas. Inténtalo de nuevo pronto.",
       "runFailed": "La incursión a {name} ha fracasado.",
       "complete": "{name} completada.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Un mecanismo se abre con un chasquido cerca. Se abre un pasaje hacia el norte. Busca el portal de salida más adelante.",
       "raiseDead": "{name} empieza a alzar a los muertos.",
       "graveFalters": "El rito sepulcral vacila.",
@@ -2267,6 +2266,7 @@ export const es_ES: EnTranslations = {
       "passageSealed": "El pasaje está sellado.",
       "moveCloserPassage": "Acércate más al pasaje.",
       "moveCloserChest": "Acércate más al cofre.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Ya no queda nada que llevarse.",
       "wayOutNotOpen": "La salida aún no está abierta.",
       "moveCloserStairs": "Acércate más a las escaleras.",
@@ -2346,7 +2346,6 @@ export const es_ES: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const es_ES: EnTranslations = {
       "enter": "Entrar en la Profundidad",
       "enterAria": "Entrar en {delve} en dificultad {tier}",
       "openDelve": "Relicario Hundido",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Abrir el Tablón de Profundidades desde {name}",
       "marks": "Marcas de Profundidad: {count}",
       "minLevel": "Requiere nivel {level}",
@@ -2464,7 +2462,6 @@ export const es_ES: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

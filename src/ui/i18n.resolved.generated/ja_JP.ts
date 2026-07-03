@@ -2220,7 +2220,6 @@ export const ja_JP: EnTranslations = {
       "instancesBusy": "{name}のすべてのインスタンスが使用中だ。しばらくしてからもう一度試せ。",
       "runFailed": "{name}の攻略に失敗した。",
       "complete": "{name}を踏破した。",
-      "mobChannels": "{name}が{mechanic}を発動している。",
       "mechanismOpen": "近くで機構がカチリと開く。北へ通路が開いた。先にある出口のポータルを探せ。",
       "raiseDead": "{name}が死者蘇生を唱え始める。",
       "graveFalters": "墓の儀式が乱れる。",
@@ -2267,6 +2266,7 @@ export const ja_JP: EnTranslations = {
       "passageSealed": "通路は封じられている。",
       "moveCloserPassage": "通路にもっと近づけ。",
       "moveCloserChest": "宝箱にもっと近づけ。",
+      "moveCloserReliquary": "聖遺物匣にもっと近づけ。",
       "nothingToTake": "もう取れるものは何も残っていない。",
       "wayOutNotOpen": "出口はまだ開いていない。",
       "moveCloserStairs": "階段にもっと近づけ。",
@@ -2346,7 +2346,6 @@ export const ja_JP: EnTranslations = {
     "showsTimes": "順序を{count}回表示",
     "showsOnce": "順序は一度だけ表示",
     "symbols": "{count}個の記号",
-    "mistakes": "{count}回の失敗が許容される",
     "tries": "{count}回の試行",
     "reward": {
       "easy": "控えめな戦利品",
@@ -2361,7 +2360,6 @@ export const ja_JP: EnTranslations = {
       "enter": "デルヴに入る",
       "enterAria": "{tier}難易度で{delve}に入る",
       "openDelve": "崩れた聖遺物庫",
-      "openDelveLitany": "溺れし連祷",
       "openDelveAria": "{name}からデルヴボードを開く",
       "marks": "デルヴの刻印: {count}",
       "minLevel": "必要レベル{level}",
@@ -2464,7 +2462,6 @@ export const ja_JP: EnTranslations = {
       "sluice_valve": "水門弁",
       "grave_tablet": "墓碑板",
       "corpse_candle": "死体蝋燭",
-      "widow_egg_sac": "未亡人の卵嚢",
       "bell_rope": "Bell Rope"
     },
     "companion": {

@@ -4798,6 +4798,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Рядом со щелчком открывается механизм. На севере открывается проход: найдите впереди выходной портал.',
   'sim.delve.moduleEnter': '{name}: {objective}',
   'sim.delve.moveCloserChest': 'Подойдите ближе к сундуку.',
+  'sim.delve.moveCloserReliquary': 'Подойдите ближе к реликварию.',
   'sim.delve.nothingToTake': 'Забирать больше нечего.',
   'sim.delve.moveCloserPassage': 'Подойдите ближе к проходу.',
   'sim.delve.moveCloserStairs': 'Подойдите ближе к лестнице.',
@@ -5151,7 +5152,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Выйти',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
-  'sim.delve.mobChannels': '{name} использует {mechanic}.',
   'sim.delve.drownedLitanyReliquaryRise':
     'Сестра Нхалия умолкает. Утонувший реликварий поднимается из чёрной воды. Подойдите, чтобы начать обряд.',
   'sim.delve.riteSequenceReady': 'Святилища гаснут. Повторите последовательность.',
@@ -5163,10 +5163,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.delve.riteReliquaryEmpty': 'Реликварий пуст.',
   'sim.delve.bellRopeShock':
     'Верёвка колокола резко натягивается. Утопших Канторов шатает от удара.',
-  'sim.delve.eggSacBurst':
-    'Яйцевой мешок лопается. Паучата разбегаются по краю крестильни.',
-  'sim.delve.baptistryEggs':
-    'Крестильня затихает. Паучьи яйцевые мешки влажно облепили край.',
+  'sim.delve.eggSacBurst': 'Яйцевой мешок лопается. Паучата разбегаются по краю крестильни.',
+  'sim.delve.baptistryEggs': 'Крестильня затихает. Паучьи яйцевые мешки влажно облепили край.',
   'sim.delve.baptistrySpidersSealed': 'Тебе стоит попытаться уничтожить паучьи коконы.',
   'sim.delve.puzzleSealed': 'Тебе нужно снять печать, воздействовав давлением где-то в комнате.',
   'sim.delve.ropesSealed': 'Тебе стоит попробовать потянуть за верёвки колоколов.',
@@ -5186,13 +5184,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ошибка окатит вас черной водой и отнимет попытку. Завершите последовательность, чтобы открыть реликварий.',
   'delveRiteUi.showsOnce': 'Последовательность показана один раз',
   'delveRiteUi.symbols': 'Символов: {count}',
-  'delveRiteUi.mistakes': 'Допустимо ошибок: {count}',
   'delveRiteUi.tries': 'Попыток: {count}',
   'delveRiteUi.reward.easy': 'Скромная добыча',
   'delveRiteUi.reward.medium': 'Богатая добыча',
   'delveRiteUi.reward.hard': 'Превосходная добыча',
   'delveRiteUi.closeAria': 'Закрыть',
-  'delveUi.board.openDelveLitany': 'Утонувшая Литания',
   'delveUi.board.companion.edda': 'Эдда Тростниковая Рука',
   'delveUi.npc.halvenMarsh.greeting':
     'Тропа вела на север, к топи, {playerName}. Ещё один реликварий поёт под чёрной водой, и утопшие мертвецы отвечают колоколам. Послушница Эдда знает эти тростники лучше меня, держись поближе к её фонарю. Выбери свой уровень, и я буду держать верёвку, пока ты не вернёшься.',
@@ -5223,7 +5219,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.object.sluice_valve': 'Шлюзовой Клапан',
   'delveUi.object.grave_tablet': 'Могильная Табличка',
   'delveUi.object.corpse_candle': 'Трупная Свеча',
-  'delveUi.object.widow_egg_sac': 'Яйцевой Мешок Вдовы',
   'delveUi.companion.edda.combat_start': 'Берегись чёрной воды, {playerName}. Болото слушает.',
   'delveUi.companion.edda.low_hp': 'Держись. Мой фонарь ещё не погас.',
   'delveUi.companion.edda.trap_spotted': 'Погоди. Тростник здесь какой-то не такой.',

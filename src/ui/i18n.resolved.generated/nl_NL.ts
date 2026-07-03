@@ -2220,7 +2220,6 @@ export const nl_NL: EnTranslations = {
       "instancesBusy": "Alle instanties van {name} zijn bezet. Probeer het binnenkort opnieuw.",
       "runFailed": "Run van {name} mislukt.",
       "complete": "{name} voltooid.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Een mechanisme klikt vlakbij open. Een doorgang opent zich naar het noorden. Vind de uitgangsportaal verderop.",
       "raiseDead": "{name} begint Doden Herrijzen.",
       "graveFalters": "Het graverituaal hapert.",
@@ -2267,6 +2266,7 @@ export const nl_NL: EnTranslations = {
       "passageSealed": "De doorgang is verzegeld.",
       "moveCloserPassage": "Kom dichter bij de doorgang.",
       "moveCloserChest": "Kom dichter bij de kist.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Er is niets meer om te pakken.",
       "wayOutNotOpen": "De weg naar buiten is nog niet open.",
       "moveCloserStairs": "Kom dichter bij de trap.",
@@ -2346,7 +2346,6 @@ export const nl_NL: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const nl_NL: EnTranslations = {
       "enter": "Betreed Delve",
       "enterAria": "Betreed {delve} op moeilijkheid {tier}",
       "openDelve": "Ingestort Reliekschrijn",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Open Delvebord bij {name}",
       "marks": "Delve-Tekens: {count}",
       "minLevel": "Vereist Niveau {level}",
@@ -2464,7 +2462,6 @@ export const nl_NL: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

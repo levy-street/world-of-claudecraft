@@ -2220,7 +2220,6 @@ export const tr_TR: EnTranslations = {
       "instancesBusy": "{name} için tüm örnekler dolu. Birazdan tekrar dene.",
       "runFailed": "{name} seferi başarısız oldu.",
       "complete": "{name} tamamlandı.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Yakınlarda bir mekanizma açılır. Kuzeye doğru bir geçit açılır. İlerideki çıkış portalını bul.",
       "raiseDead": "{name} Ölü Diriltme'ye başlar.",
       "graveFalters": "Mezar ayini sekteye uğrar.",
@@ -2267,6 +2266,7 @@ export const tr_TR: EnTranslations = {
       "passageSealed": "Geçit mühürlü.",
       "moveCloserPassage": "Geçide yaklaş.",
       "moveCloserChest": "Sandığa yaklaş.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Alınacak başka bir şey kalmadı.",
       "wayOutNotOpen": "Çıkış yolu henüz açık değil.",
       "moveCloserStairs": "Merdivenlere yaklaş.",
@@ -2346,7 +2346,6 @@ export const tr_TR: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const tr_TR: EnTranslations = {
       "enter": "Mağaraya Gir",
       "enterAria": "{delve} mağarasına {tier} zorlukta gir",
       "openDelve": "Çökmüş Kutsal Mahzen",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "{name} üzerinden Mağara Panosunu aç",
       "marks": "Mağara Nişanları: {count}",
       "minLevel": "Seviye {level} gerektirir",
@@ -2464,7 +2462,6 @@ export const tr_TR: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

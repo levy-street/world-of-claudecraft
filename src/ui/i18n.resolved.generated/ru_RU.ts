@@ -2220,7 +2220,6 @@ export const ru_RU: EnTranslations = {
       "instancesBusy": "Все копии {name} заняты. Попробуйте чуть позже.",
       "runFailed": "Вылазка {name} провалена.",
       "complete": "{name}: завершено.",
-      "mobChannels": "{name} использует {mechanic}.",
       "mechanismOpen": "Рядом со щелчком открывается механизм. На севере открывается проход: найдите впереди выходной портал.",
       "raiseDead": "{name} начинает Поднятие мёртвых.",
       "graveFalters": "Могильный обряд сорван.",
@@ -2267,6 +2266,7 @@ export const ru_RU: EnTranslations = {
       "passageSealed": "Проход запечатан.",
       "moveCloserPassage": "Подойдите ближе к проходу.",
       "moveCloserChest": "Подойдите ближе к сундуку.",
+      "moveCloserReliquary": "Подойдите ближе к реликварию.",
       "nothingToTake": "Забирать больше нечего.",
       "wayOutNotOpen": "Выход ещё не открыт.",
       "moveCloserStairs": "Подойдите ближе к лестнице.",
@@ -2346,7 +2346,6 @@ export const ru_RU: EnTranslations = {
     "showsTimes": "Последовательность показана {count} раз(а)",
     "showsOnce": "Последовательность показана один раз",
     "symbols": "Символов: {count}",
-    "mistakes": "Допустимо ошибок: {count}",
     "tries": "Попыток: {count}",
     "reward": {
       "easy": "Скромная добыча",
@@ -2361,7 +2360,6 @@ export const ru_RU: EnTranslations = {
       "enter": "Войти в Вылазку",
       "enterAria": "Войти в {delve} на сложности {tier}",
       "openDelve": "Обрушившийся Реликварий",
-      "openDelveLitany": "Утонувшая Литания",
       "openDelveAria": "Открыть доску Вылазок у {name}",
       "marks": "Метки Вылазок: {count}",
       "minLevel": "Требуется уровень {level}",
@@ -2464,7 +2462,6 @@ export const ru_RU: EnTranslations = {
       "sluice_valve": "Шлюзовой Клапан",
       "grave_tablet": "Могильная Табличка",
       "corpse_candle": "Трупная Свеча",
-      "widow_egg_sac": "Яйцевой Мешок Вдовы",
       "bell_rope": "Bell Rope"
     },
     "companion": {

@@ -2220,7 +2220,6 @@ export const sv_SE: EnTranslations = {
       "instancesBusy": "Alla instanser av {name} är upptagna. Försök igen snart.",
       "runFailed": "{name}-körningen misslyckades.",
       "complete": "{name} slutförd.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "En mekanism klickar upp i närheten. En passage öppnas mot norr. Hitta utgångsportalen längre fram.",
       "raiseDead": "{name} börjar Väck de döda.",
       "graveFalters": "Gravriten sviktar.",
@@ -2267,6 +2266,7 @@ export const sv_SE: EnTranslations = {
       "passageSealed": "Passagen är förseglad.",
       "moveCloserPassage": "Gå närmare passagen.",
       "moveCloserChest": "Gå närmare kistan.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Det finns inget kvar att ta.",
       "wayOutNotOpen": "Vägen ut är inte öppen ännu.",
       "moveCloserStairs": "Gå närmare trappan.",
@@ -2346,7 +2346,6 @@ export const sv_SE: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const sv_SE: EnTranslations = {
       "enter": "Gå in i delven",
       "enterAria": "Gå in i {delve} på svårighetsgraden {tier}",
       "openDelve": "Det rasade relikvariet",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Öppna delve-tavlan från {name}",
       "marks": "Delve-märken: {count}",
       "minLevel": "Kräver nivå {level}",
@@ -2464,7 +2462,6 @@ export const sv_SE: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

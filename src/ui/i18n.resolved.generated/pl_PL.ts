@@ -2220,7 +2220,6 @@ export const pl_PL: EnTranslations = {
       "instancesBusy": "Wszystkie instancje {name} są zajęte. Spróbuj ponownie wkrótce.",
       "runFailed": "Wyprawa {name} nie powiodła się.",
       "complete": "{name} ukończone.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Nieopodal otwiera się mechanizm z kliknięciem. Na północy otwiera się przejście. Znajdź portal wyjściowy przed sobą.",
       "raiseDead": "{name} rozpoczyna Wskrzeszenie zmarłych.",
       "graveFalters": "Grobowy rytuał zawodzi.",
@@ -2267,6 +2266,7 @@ export const pl_PL: EnTranslations = {
       "passageSealed": "Przejście jest zapieczętowane.",
       "moveCloserPassage": "Podejdź bliżej przejścia.",
       "moveCloserChest": "Podejdź bliżej skrzyni.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Nie ma już nic do zabrania.",
       "wayOutNotOpen": "Droga wyjścia jeszcze się nie otworzyła.",
       "moveCloserStairs": "Podejdź bliżej schodów.",
@@ -2346,7 +2346,6 @@ export const pl_PL: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const pl_PL: EnTranslations = {
       "enter": "Wejdź do Wyprawy",
       "enterAria": "Wejdź do {delve} na poziomie trudności {tier}",
       "openDelve": "Zawalone Relikwiarium",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Otwórz Tablicę Wypraw od {name}",
       "marks": "Znaki Wypraw: {count}",
       "minLevel": "Wymaga poziomu {level}",
@@ -2464,7 +2462,6 @@ export const pl_PL: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

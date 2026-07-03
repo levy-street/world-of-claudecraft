@@ -2220,7 +2220,6 @@ export const es: EnTranslations = {
       "instancesBusy": "Todas las instancias de {name} están ocupadas. Inténtalo de nuevo pronto.",
       "runFailed": "La incursión de {name} ha fracasado.",
       "complete": "{name} completado.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Un mecanismo se abre con un chasquido cerca. Un pasaje se abre al norte: busca el portal de salida más adelante.",
       "raiseDead": "{name} comienza a Alzar a los Muertos.",
       "graveFalters": "El rito de la tumba se quiebra.",
@@ -2267,6 +2266,7 @@ export const es: EnTranslations = {
       "passageSealed": "El pasaje está sellado.",
       "moveCloserPassage": "Acércate al pasaje.",
       "moveCloserChest": "Acércate al cofre.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Ya no queda nada que llevarse.",
       "wayOutNotOpen": "La salida aún no está abierta.",
       "moveCloserStairs": "Acércate a las escaleras.",
@@ -2346,7 +2346,6 @@ export const es: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const es: EnTranslations = {
       "enter": "Entrar a la Expedición",
       "enterAria": "Entrar a {delve} en dificultad {tier}",
       "openDelve": "Relicario Hundido",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Abrir el Tablón de Expediciones desde {name}",
       "marks": "Marcas de Expedición: {count}",
       "minLevel": "Requiere nivel {level}",
@@ -2464,7 +2462,6 @@ export const es: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

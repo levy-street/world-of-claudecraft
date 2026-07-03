@@ -2220,7 +2220,6 @@ export const vi_VN: EnTranslations = {
       "instancesBusy": "Tất cả các phiên bản của {name} đều đang bận. Hãy thử lại sớm.",
       "runFailed": "Lượt chạy {name} thất bại.",
       "complete": "Đã hoàn thành {name}.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Một cơ quan bật mở gần đây. Một lối đi mở ra về phía bắc. Hãy tìm cổng thoát ở phía trước.",
       "raiseDead": "{name} bắt đầu Triệu Hồi Tử Thi.",
       "graveFalters": "Nghi lễ tử thần chững lại.",
@@ -2267,6 +2266,7 @@ export const vi_VN: EnTranslations = {
       "passageSealed": "Lối đi đã bị niêm phong.",
       "moveCloserPassage": "Hãy lại gần lối đi hơn.",
       "moveCloserChest": "Hãy lại gần chiếc rương hơn.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Không còn gì để lấy.",
       "wayOutNotOpen": "Lối ra vẫn chưa mở.",
       "moveCloserStairs": "Hãy lại gần cầu thang hơn.",
@@ -2346,7 +2346,6 @@ export const vi_VN: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const vi_VN: EnTranslations = {
       "enter": "Vào Hang Sâu",
       "enterAria": "Vào {delve} ở độ khó {tier}",
       "openDelve": "Hộp Thánh Tích Đổ Nát",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Mở Bảng Hang Sâu từ {name}",
       "marks": "Huy Hiệu Hang Sâu: {count}",
       "minLevel": "Yêu cầu Cấp {level}",
@@ -2464,7 +2462,6 @@ export const vi_VN: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

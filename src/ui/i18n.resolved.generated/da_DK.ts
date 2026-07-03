@@ -2220,7 +2220,6 @@ export const da_DK: EnTranslations = {
       "instancesBusy": "Alle instanser af {name} er optaget. Prøv igen snart.",
       "runFailed": "{name}-forsøg mislykkedes.",
       "complete": "{name} fuldført.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "En mekanisme klikker op i nærheden. En passage åbner mod nord. Find udgangsportalen forude.",
       "raiseDead": "{name} begynder Væk de Døde.",
       "graveFalters": "Graveritualet svigter.",
@@ -2267,6 +2266,7 @@ export const da_DK: EnTranslations = {
       "passageSealed": "Passagen er forseglet.",
       "moveCloserPassage": "Gå tættere på passagen.",
       "moveCloserChest": "Gå tættere på kisten.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Der er ikke mere at tage.",
       "wayOutNotOpen": "Vejen ud er endnu ikke åben.",
       "moveCloserStairs": "Gå tættere på trappen.",
@@ -2346,7 +2346,6 @@ export const da_DK: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const da_DK: EnTranslations = {
       "enter": "Træd ind i Delve",
       "enterAria": "Træd ind i {delve} på {tier} sværhedsgrad",
       "openDelve": "Sammenstyrtet Relikvarie",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Åbn Delve-Tavlen fra {name}",
       "marks": "Delve-Mærker: {count}",
       "minLevel": "Kræver Niveau {level}",
@@ -2464,7 +2462,6 @@ export const da_DK: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

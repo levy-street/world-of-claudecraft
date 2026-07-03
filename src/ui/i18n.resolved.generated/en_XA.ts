@@ -2220,7 +2220,6 @@ export const en_XA: EnTranslations = {
       "instancesBusy": "[Áļļ íñšţáñçéš óƒ {name} áŕé ƀúšý. Ţŕý áĝáíñ šóóñ.]",
       "runFailed": "[{name} ŕúñ ƒáíļéð.]",
       "complete": "[{name} çóɱþļéţé.]",
-      "mobChannels": "[{name} çĥáññéļš {mechanic}.]",
       "mechanismOpen": "[Á ɱéçĥáñíšɱ çļíçķš óþéñ ñéáŕƀý. Á þáššáĝé óþéñš ţó ţĥé ñóŕţĥ. Ƒíñð ţĥé éẋíţ þóŕţáļ áĥéáð.]",
       "raiseDead": "[{name} ƀéĝíñš Ŕáíšé Ðéáð.]",
       "graveFalters": "[Ţĥé ĝŕáʋé ŕíţé ƒáļţéŕš.]",
@@ -2267,6 +2266,7 @@ export const en_XA: EnTranslations = {
       "passageSealed": "[Ţĥé þáššáĝé íš šéáļéð.]",
       "moveCloserPassage": "[Ɱóʋé çļóšéŕ ţó ţĥé þáššáĝé.]",
       "moveCloserChest": "[Ɱóʋé çļóšéŕ ţó ţĥé çĥéšţ.]",
+      "moveCloserReliquary": "[Ɱóʋé çļóšéŕ ţó ţĥé ŕéļíɋúáŕý.]",
       "nothingToTake": "[Ţĥéŕé íš ñóţĥíñĝ ļéƒţ ţó ţáķé.]",
       "wayOutNotOpen": "[Ţĥé ŵáý óúţ íš ñóţ ýéţ óþéñ.]",
       "moveCloserStairs": "[Ɱóʋé çļóšéŕ ţó ţĥé šţáíŕš.]",
@@ -2346,7 +2346,6 @@ export const en_XA: EnTranslations = {
     "showsTimes": "[Šéɋúéñçé šĥóŵñ {count} ţíɱéš]",
     "showsOnce": "[Šéɋúéñçé šĥóŵñ óñçé]",
     "symbols": "[{count} šýɱƀóļš]",
-    "mistakes": "[{count} ɱíšţáķéš áļļóŵéð]",
     "tries": "[{count} ţŕíéš]",
     "reward": {
       "easy": "[Ɱóðéšţ šþóíļš]",
@@ -2361,7 +2360,6 @@ export const en_XA: EnTranslations = {
       "enter": "[Éñţéŕ Ðéļʋé]",
       "enterAria": "[Éñţéŕ {delve} óñ {tier} ðíƒƒíçúļţý]",
       "openDelve": "[Çóļļáþšéð Ŕéļíɋúáŕý]",
-      "openDelveLitany": "[Ţĥé Ðŕóŵñéð Ļíţáñý]",
       "openDelveAria": "[Óþéñ Ðéļʋé Ɓóáŕð ƒŕóɱ {name}]",
       "marks": "[Ðéļʋé Ɱáŕķš: {count}]",
       "minLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
@@ -2464,7 +2462,6 @@ export const en_XA: EnTranslations = {
       "sluice_valve": "[Šļúíçé Ʋáļʋé]",
       "grave_tablet": "[Ĝŕáʋé Ţáƀļéţ]",
       "corpse_candle": "[Çóŕþšé-Çáñðļé]",
-      "widow_egg_sac": "[Ŵíðóŵ Éĝĝ-Šáç]",
       "bell_rope": "[Ɓéļļ Ŕóþé]"
     },
     "companion": {

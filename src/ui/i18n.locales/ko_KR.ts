@@ -4707,6 +4707,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '근처에서 기계 장치가 철컥 열립니다. 북쪽으로 통로가 열립니다. 앞쪽의 출구 차원문을 찾으세요.',
   'sim.delve.moduleEnter': '{name}: {objective}',
   'sim.delve.moveCloserChest': '상자에 더 가까이 다가가세요.',
+  'sim.delve.moveCloserReliquary': '성물함에 더 가까이 다가가세요.',
   'sim.delve.nothingToTake': '이제 가져갈 것이 없습니다.',
   'sim.delve.moveCloserPassage': '통로에 더 가까이 다가가세요.',
   'sim.delve.moveCloserStairs': '계단에 더 가까이 다가가세요.',
@@ -5048,7 +5049,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '다시 불러오기',
   'desktop.crash.quit': '종료',
   'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
-  'sim.delve.mobChannels': '{name}이(가) {mechanic}을(를) 시전 중이다.',
   'sim.delve.drownedLitanyReliquaryRise':
     '나할리아 수녀가 침묵한다. 익사한 유물함이 흑수에서 떠오른다. 다가가 의식을 시작하라.',
   'sim.delve.riteSequenceReady': '성소들이 어둠에 잠긴다. 순서를 반복하라.',
@@ -5079,13 +5079,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '잘못된 제단을 만지면 검은 물을 뒤집어쓰고 시도 횟수를 잃습니다. 순서를 완성하면 성물함이 열립니다.',
   'delveRiteUi.showsOnce': '순서를 한 번만 표시',
   'delveRiteUi.symbols': '기호 {count}개',
-  'delveRiteUi.mistakes': '{count}회의 실수 허용',
   'delveRiteUi.tries': '시도 {count}회',
   'delveRiteUi.reward.easy': '소박한 전리품',
   'delveRiteUi.reward.medium': '풍성한 전리품',
   'delveRiteUi.reward.hard': '최상급 전리품',
   'delveRiteUi.closeAria': '닫기',
-  'delveUi.board.openDelveLitany': '익사한 연도',
   'delveUi.board.companion.edda': '에다 리드핸드',
   'delveUi.npc.halvenMarsh.greeting':
     '오솔길이 북쪽 늪지로 이어졌다, {playerName}. 또 다른 성물실이 검은 물 아래서 노래하고, 익사한 자들이 종소리에 화답한다. 신도 에다가 나보다 이 갈대밭을 더 잘 안다, 그녀의 등불 곁에 머물러라. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다.',
@@ -5114,7 +5112,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'delveUi.object.sluice_valve': '수문 밸브',
   'delveUi.object.grave_tablet': '무덤 석판',
   'delveUi.object.corpse_candle': '시체양초',
-  'delveUi.object.widow_egg_sac': '과부 알주머니',
   'delveUi.companion.edda.combat_start': '흑수를 조심해라, {playerName}. 늪이 듣고 있다.',
   'delveUi.companion.edda.low_hp': '침착해라. 내 등불은 아직 꺼지지 않았다.',
   'delveUi.companion.edda.trap_spotted': '잠깐. 여기 갈대가 이상하다.',
@@ -5169,8 +5166,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.brother_halven_marsh.greeting':
     '오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소.',
   'entities.delves.drowned_litany.name': '익사한 연도',
-  'entities.delves.drowned_litany.enterText':
-    '그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.',
+  'entities.delves.drowned_litany.enterText': '그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.',
   'entities.delves.drowned_litany.leaveText':
     '그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다.',
   'hudChrome.dailyRewards.endsIn': '{time} 후 종료',

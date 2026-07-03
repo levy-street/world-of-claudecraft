@@ -432,7 +432,6 @@ export const en = {
       instancesBusy: 'All instances of {name} are busy. Try again soon.',
       runFailed: '{name} run failed.',
       complete: '{name} complete.',
-      mobChannels: '{name} channels {mechanic}.',
       mechanismOpen:
         'A mechanism clicks open nearby. A passage opens to the north. Find the exit portal ahead.',
       raiseDead: '{name} begins Raise Dead.',
@@ -484,6 +483,7 @@ export const en = {
       passageSealed: 'The passage is sealed.',
       moveCloserPassage: 'Move closer to the passage.',
       moveCloserChest: 'Move closer to the chest.',
+      moveCloserReliquary: 'Move closer to the reliquary.',
       nothingToTake: 'There is nothing left to take.',
       wayOutNotOpen: 'The way out is not yet open.',
       moveCloserStairs: 'Move closer to the stairs.',
@@ -574,7 +574,6 @@ export const en = {
     showsTimes: 'Sequence shown {count} times',
     showsOnce: 'Sequence shown once',
     symbols: '{count} symbols',
-    mistakes: '{count} mistakes allowed',
     tries: '{count} tries',
     reward: {
       easy: 'Modest spoils',
@@ -592,7 +591,6 @@ export const en = {
       enter: 'Enter Delve',
       enterAria: 'Enter {delve} on {tier} difficulty',
       openDelve: 'Collapsed Reliquary',
-      openDelveLitany: 'The Drowned Litany',
       openDelveAria: 'Open Delve Board from {name}',
       marks: 'Delve Marks: {count}',
       minLevel: 'Requires Level {level}',
@@ -702,7 +700,6 @@ export const en = {
       sluice_valve: 'Sluice Valve',
       grave_tablet: 'Grave Tablet',
       corpse_candle: 'Corpse-Candle',
-      widow_egg_sac: 'Widow Egg-Sac',
       bell_rope: 'Bell Rope',
     },
     companion: {

@@ -2220,7 +2220,6 @@ export const pt_BR: EnTranslations = {
       "instancesBusy": "Todas as instâncias de {name} estão ocupadas. Tente novamente em breve.",
       "runFailed": "A incursão {name} falhou.",
       "complete": "{name} concluída.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Um mecanismo se destrava com um clique por perto. Uma passagem se abre ao norte: encontre o portal de saída adiante.",
       "raiseDead": "{name} começa a Erguer os Mortos.",
       "graveFalters": "O rito sepulcral vacila.",
@@ -2267,6 +2266,7 @@ export const pt_BR: EnTranslations = {
       "passageSealed": "A passagem está selada.",
       "moveCloserPassage": "Aproxime-se da passagem.",
       "moveCloserChest": "Aproxime-se do baú.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Não resta nada para levar.",
       "wayOutNotOpen": "A saída ainda não está aberta.",
       "moveCloserStairs": "Aproxime-se das escadas.",
@@ -2346,7 +2346,6 @@ export const pt_BR: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const pt_BR: EnTranslations = {
       "enter": "Entrar na Incursão",
       "enterAria": "Entrar em {delve} na dificuldade {tier}",
       "openDelve": "Relicário Desmoronado",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Abrir o Quadro de Incursões a partir de {name}",
       "marks": "Selos de Incursão: {count}",
       "minLevel": "Requer nível {level}",
@@ -2464,7 +2462,6 @@ export const pt_BR: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

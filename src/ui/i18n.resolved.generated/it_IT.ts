@@ -2220,7 +2220,6 @@ export const it_IT: EnTranslations = {
       "instancesBusy": "Tutte le istanze di {name} sono occupate. Riprova tra poco.",
       "runFailed": "Incursione di {name} fallita.",
       "complete": "{name} completata.",
-      "mobChannels": "{name} channels {mechanic}.",
       "mechanismOpen": "Un meccanismo scatta aprendosi nelle vicinanze. Un passaggio si apre a nord: trova il portale d'uscita più avanti.",
       "raiseDead": "{name} inizia a evocare i morti.",
       "graveFalters": "Il rito sepolcrale vacilla.",
@@ -2267,6 +2266,7 @@ export const it_IT: EnTranslations = {
       "passageSealed": "Il passaggio è sigillato.",
       "moveCloserPassage": "Avvicinati al passaggio.",
       "moveCloserChest": "Avvicinati allo scrigno.",
+      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Non è rimasto nulla da prendere.",
       "wayOutNotOpen": "La via d'uscita non è ancora aperta.",
       "moveCloserStairs": "Avvicinati alle scale.",
@@ -2346,7 +2346,6 @@ export const it_IT: EnTranslations = {
     "showsTimes": "Sequence shown {count} times",
     "showsOnce": "Sequence shown once",
     "symbols": "{count} symbols",
-    "mistakes": "{count} mistakes allowed",
     "tries": "{count} tries",
     "reward": {
       "easy": "Modest spoils",
@@ -2361,7 +2360,6 @@ export const it_IT: EnTranslations = {
       "enter": "Entra nell'Incursione",
       "enterAria": "Entra in {delve} a difficoltà {tier}",
       "openDelve": "Reliquiario Crollato",
-      "openDelveLitany": "The Drowned Litany",
       "openDelveAria": "Apri il Tabellone delle Incursioni da {name}",
       "marks": "Sigilli d'Incursione: {count}",
       "minLevel": "Richiede il livello {level}",
@@ -2464,7 +2462,6 @@ export const it_IT: EnTranslations = {
       "sluice_valve": "Sluice Valve",
       "grave_tablet": "Grave Tablet",
       "corpse_candle": "Corpse-Candle",
-      "widow_egg_sac": "Widow Egg-Sac",
       "bell_rope": "Bell Rope"
     },
     "companion": {

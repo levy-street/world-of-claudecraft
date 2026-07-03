@@ -2220,7 +2220,6 @@ export const zh_TW: EnTranslations = {
       "instancesBusy": "所有 {name} 的副本都正忙碌中。請稍後再試。",
       "runFailed": "{name} 旅程失敗。",
       "complete": "{name} 完成。",
-      "mobChannels": "{name}正在引導{mechanic}。",
       "mechanismOpen": "附近有一處機關喀噠開啟。一條通往北方的通道開啟了，往前找到出口傳送門。",
       "raiseDead": "{name} 開始施放喚醒亡者。",
       "graveFalters": "葬墓儀式中斷了。",
@@ -2267,6 +2266,7 @@ export const zh_TW: EnTranslations = {
       "passageSealed": "通道被封住了。",
       "moveCloserPassage": "再靠近通道一些。",
       "moveCloserChest": "再靠近寶箱一些。",
+      "moveCloserReliquary": "再靠近聖物匣一些。",
       "nothingToTake": "這裡已沒有任何可拿取之物了。",
       "wayOutNotOpen": "出路尚未開啟。",
       "moveCloserStairs": "再靠近階梯一些。",
@@ -2346,7 +2346,6 @@ export const zh_TW: EnTranslations = {
     "showsTimes": "順序展示{count}次",
     "showsOnce": "順序僅展示一次",
     "symbols": "{count}個符號",
-    "mistakes": "允許{count}次錯誤",
     "tries": "{count}次嘗試",
     "reward": {
       "easy": "普通戰利品",
@@ -2361,7 +2360,6 @@ export const zh_TW: EnTranslations = {
       "enter": "進入秘探",
       "enterAria": "以 {tier} 難度進入 {delve}",
       "openDelve": "崩塌的聖物庫",
-      "openDelveLitany": "溺亡連禱",
       "openDelveAria": "從 {name} 開啟秘探看板",
       "marks": "秘探印記：{count}",
       "minLevel": "需要等級 {level}",
@@ -2464,7 +2462,6 @@ export const zh_TW: EnTranslations = {
       "sluice_valve": "水閘閥門",
       "grave_tablet": "墓碑石板",
       "corpse_candle": "屍燭",
-      "widow_egg_sac": "寡婦卵囊",
       "bell_rope": "Bell Rope"
     },
     "companion": {
