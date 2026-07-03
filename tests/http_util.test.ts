@@ -38,6 +38,25 @@ describe('readBody', () => {
     await expect(promise).rejects.toThrow('bad json');
   });
 
+  it('decodes a multi-byte UTF-8 character split across two chunks', async () => {
+    // A 4-byte emoji plus CJK/accented text inside a JSON string. TCP/HTTP can
+    // split a chunk mid-character; decoding each chunk to a string independently
+    // corrupts the boundary character into replacement chars. The body must be
+    // buffered and decoded once.
+    const obj = { name: 'Ünïcödé \u{1F409} 名前' };
+    const buf = Buffer.from(JSON.stringify(obj), 'utf8');
+    const dragon = buf.indexOf(0xf0); // first byte of the 4-byte emoji
+    expect(dragon).toBeGreaterThan(-1); // pin the mid-character split (guard vs a future ASCII-only payload)
+    const first = buf.subarray(0, dragon + 2); // split INSIDE the emoji
+    const second = buf.subarray(dragon + 2);
+    const req = fakeReq();
+    const promise = readBody(req);
+    req.emit('data', first);
+    req.emit('data', second);
+    req.emit('end');
+    await expect(promise).resolves.toEqual(obj);
+  });
+
   it('rejects non-object JSON bodies (null, arrays, primitives) as bad json', async () => {
     // A literal `null` body used to resolve, then crash route handlers on
     // property access (500); every route reads properties, so only an object

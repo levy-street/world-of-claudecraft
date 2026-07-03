@@ -59,17 +59,24 @@ export function readBody(
   maxBytes = DEFAULT_JSON_BODY_MAX_BYTES,
 ): Promise<any> {
   return new Promise((resolve, reject) => {
-    let data = '';
+    // Collect raw bytes and decode ONCE at the end. Concatenating each chunk onto
+    // a string (`data += c`) decodes every chunk independently, which mangles a
+    // multi-byte UTF-8 character split across a chunk boundary into replacement
+    // characters. Same buffer-then-decode-once strategy as readBinaryBody; the cap
+    // ordering here matches the old readBody (push the chunk, then check the cap),
+    // not readBinaryBody (which rejects before pushing an over-cap chunk).
+    const chunks: Buffer[] = [];
     let bytes = 0;
     let aborted = false;
     req.on('data', (c: Buffer | string) => {
       if (aborted) return;
-      bytes += typeof c === 'string' ? Buffer.byteLength(c) : c.byteLength;
-      data += c;
+      const chunk = typeof c === 'string' ? Buffer.from(c) : c;
+      bytes += chunk.byteLength;
+      chunks.push(chunk);
       if (bytes > maxBytes) {
         // Rejecting the promise does not pause the socket, so without
         // destroying the request a client could keep streaming unbounded
-        // data into `data`. Stop reading and ignore any further chunks.
+        // data into memory. Stop reading and ignore any further chunks.
         aborted = true;
         req.destroy();
         reject(new Error('body too large'));
@@ -77,6 +84,7 @@ export function readBody(
     });
     req.on('end', () => {
       if (aborted) return;
+      const data = Buffer.concat(chunks).toString('utf8');
       try {
         // Every route reads properties off the body, so only a JSON object is
         // a valid request body: a literal null, an array, or a primitive is
