@@ -23,10 +23,22 @@ export interface LookDelta {
 // pads that report mapping === 'standard'.
 export const STANDARD_BUTTON_COUNT = 17;
 export const GP = {
-  A: 0, B: 1, X: 2, Y: 3,
-  LB: 4, RB: 5, LT: 6, RT: 7,
-  BACK: 8, START: 9, L3: 10, R3: 11,
-  DPAD_UP: 12, DPAD_DOWN: 13, DPAD_LEFT: 14, DPAD_RIGHT: 15,
+  A: 0,
+  B: 1,
+  X: 2,
+  Y: 3,
+  LB: 4,
+  RB: 5,
+  LT: 6,
+  RT: 7,
+  BACK: 8,
+  START: 9,
+  L3: 10,
+  R3: 11,
+  DPAD_UP: 12,
+  DPAD_DOWN: 13,
+  DPAD_LEFT: 14,
+  DPAD_RIGHT: 15,
   GUIDE: 16,
 } as const;
 export const AXIS = { LEFT_X: 0, LEFT_Y: 1, RIGHT_X: 2, RIGHT_Y: 3 } as const;
@@ -34,11 +46,23 @@ export const AXIS = { LEFT_X: 0, LEFT_Y: 1, RIGHT_X: 2, RIGHT_Y: 3 } as const;
 // Analog triggers report a 0..1 value; treat them as pressed past this point.
 export const TRIGGER_THRESHOLD = 0.5;
 
+// D-pad arrows are identical across every brand; defined once here and spread into
+// the generic combined set below and each per-brand set, so the four glyphs have a
+// single source of truth and cannot drift between the label tables.
+const DPAD_LABELS: Record<number, string> = {
+  [GP.DPAD_UP]: 'D-pad ↑',
+  [GP.DPAD_DOWN]: 'D-pad ↓',
+  [GP.DPAD_LEFT]: 'D-pad ←',
+  [GP.DPAD_RIGHT]: 'D-pad →',
+};
+
 // Hardware glyphs for the bindable buttons, shown in the Controller options panel.
 // These are physical button names (silk-screened on the pad) and d-pad arrows,
 // language-neutral by convention, so they render as-is and are deliberately not
-// t() keys (see the hud_chrome.ts controller note). Order is the panel's display
-// order. Guide/home (16) is intentionally omitted, the OS usually swallows it.
+// t() keys (see the hud_chrome.ts controller note). This brand-neutral combined
+// set is the fallback when the connected pad's brand is unknown. Order is the
+// panel's display order. Guide/home (16) is intentionally omitted, the OS usually
+// swallows it.
 export const GAMEPAD_BUTTON_LABELS: Record<number, string> = {
   [GP.A]: 'A / Cross',
   [GP.B]: 'B / Circle',
@@ -52,15 +76,113 @@ export const GAMEPAD_BUTTON_LABELS: Record<number, string> = {
   [GP.START]: 'Start / Options',
   [GP.L3]: 'L3',
   [GP.R3]: 'R3',
-  [GP.DPAD_UP]: 'D-pad ↑',
-  [GP.DPAD_DOWN]: 'D-pad ↓',
-  [GP.DPAD_LEFT]: 'D-pad ←',
-  [GP.DPAD_RIGHT]: 'D-pad →',
+  ...DPAD_LABELS,
 };
 
 export const BINDABLE_BUTTONS: number[] = Object.keys(GAMEPAD_BUTTON_LABELS)
   .map(Number)
   .sort((a, b) => a - b);
+
+// --- Per-brand button glyphs ---------------------------------------------
+// The W3C standard mapping keys buttons by physical POSITION, not silk-screen:
+// index 0 is always the bottom face button, 1 the right, 2 the left, 3 the top.
+// That position is stable across pads, but the letter printed on it is not, so a
+// single "A / Cross" label misleads a player looking at their actual controller,
+// most sharply on Nintendo pads, whose A/B and X/Y are mirror-swapped versus an
+// Xbox pad (the bottom button reads "B" on a Switch pad, "A" on an Xbox pad).
+// We detect the brand from Gamepad.id and label each button with the glyph that
+// player sees. Bindings stay position-indexed, so the DEFAULT layout is
+// unchanged: "bottom face button = jump" holds on every pad; only the shown text
+// differs. Like GAMEPAD_BUTTON_LABELS these are hardware names, not t() keys.
+export type GamepadKind = 'xbox' | 'playstation' | 'nintendo' | 'generic';
+
+export const GAMEPAD_BUTTON_LABELS_BY_KIND: Record<GamepadKind, Record<number, string>> = {
+  generic: GAMEPAD_BUTTON_LABELS,
+  xbox: {
+    [GP.A]: 'A',
+    [GP.B]: 'B',
+    [GP.X]: 'X',
+    [GP.Y]: 'Y',
+    [GP.LB]: 'LB',
+    [GP.RB]: 'RB',
+    [GP.LT]: 'LT',
+    [GP.RT]: 'RT',
+    [GP.BACK]: 'View',
+    [GP.START]: 'Menu',
+    [GP.L3]: 'L3',
+    [GP.R3]: 'R3',
+    ...DPAD_LABELS,
+  },
+  playstation: {
+    [GP.A]: 'Cross',
+    [GP.B]: 'Circle',
+    [GP.X]: 'Square',
+    [GP.Y]: 'Triangle',
+    [GP.LB]: 'L1',
+    [GP.RB]: 'R1',
+    [GP.LT]: 'L2',
+    [GP.RT]: 'R2',
+    // DualShock 4 silk-screens "Share"; DualSense renamed it "Create". Both report
+    // as this one 'playstation' kind, so show both to cover either generation.
+    [GP.BACK]: 'Share / Create',
+    [GP.START]: 'Options',
+    [GP.L3]: 'L3',
+    [GP.R3]: 'R3',
+    ...DPAD_LABELS,
+  },
+  // Face buttons carry the Nintendo silk-screen for each POSITION: the bottom
+  // button (index 0) reads B, the right (1) A, the left (2) Y, the top (3) X.
+  nintendo: {
+    [GP.A]: 'B',
+    [GP.B]: 'A',
+    [GP.X]: 'Y',
+    [GP.Y]: 'X',
+    [GP.LB]: 'L',
+    [GP.RB]: 'R',
+    [GP.LT]: 'ZL',
+    [GP.RT]: 'ZR',
+    [GP.BACK]: 'Minus',
+    [GP.START]: 'Plus',
+    [GP.L3]: 'L Stick',
+    [GP.R3]: 'R Stick',
+    ...DPAD_LABELS,
+  },
+};
+
+// USB vendor ids for the three console brands.
+const VENDOR_ID: Record<string, GamepadKind> = {
+  '054c': 'playstation', // Sony
+  '045e': 'xbox', // Microsoft
+  '057e': 'nintendo', // Nintendo
+};
+
+// Classify a controller from its Gamepad.id string. Product-NAME keywords are the
+// primary signal: they are unambiguous and appear in both the Chrome format
+// ("DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)")
+// and the Firefox format ("054c-0ce6-DualSense Wireless Controller"). Only if no
+// name matches do we fall back to the USB VENDOR id, read from its specific field
+// so a matching PRODUCT id cannot be mistaken for a vendor (Chrome's "Vendor: XXXX"
+// or Firefox's leading "XXXX-YYYY-" pair). Anything unrecognized returns 'generic'
+// so the brand-neutral combined labels are shown.
+export function detectGamepadKind(id: string): GamepadKind {
+  const s = id.toLowerCase();
+  if (/dualsense|dualshock|playstation/.test(s)) return 'playstation';
+  if (/xbox|x-box|xinput/.test(s)) return 'xbox';
+  if (/switch|joy-?con|pro controller/.test(s)) return 'nintendo';
+  const vendor =
+    /vendor:\s*([0-9a-f]{4})/.exec(s)?.[1] ?? /^([0-9a-f]{4})-[0-9a-f]{4}-/.exec(s)?.[1];
+  return (vendor && VENDOR_ID[vendor]) || 'generic';
+}
+
+// Label for a button on a given brand, falling back to the generic combined
+// label and finally to a raw index so every bindable button always renders.
+export function gamepadButtonLabel(button: number, kind: GamepadKind): string {
+  return (
+    GAMEPAD_BUTTON_LABELS_BY_KIND[kind][button] ??
+    GAMEPAD_BUTTON_LABELS_BY_KIND.generic[button] ??
+    `#${button}`
+  );
+}
 
 // Action ids reuse the keyboard Keybinds registry ids (so the gamepad dispatches
 // through the same InputCallbacks) plus two specials Keybinds doesn't model:

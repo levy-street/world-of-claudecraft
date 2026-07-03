@@ -46,6 +46,9 @@ export interface FriendEntry extends CharInfo {
 
 export interface GuildMemberEntry extends CharInfo {
   rank: GuildRank;
+  // ISO-8601 timestamp of the member's most recent world-entry, or null if never
+  // recorded. Serialized server-side (server/social_db.ts) and shown in the roster.
+  lastLogin: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
@@ -113,7 +116,9 @@ export interface SocialDb {
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'>;
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
-  guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]>;
+  guildMembers(
+    guildId: number,
+  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]>;
   // guild calendar events (the event calendar's guild lane)
   guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]>;
   guildEventCount(guildId: number, fromDay: string): Promise<number>;

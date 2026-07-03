@@ -6,14 +6,15 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { Sim } from '../src/sim/sim';
 import { GameServer } from '../server/game';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 // Raid marker ids (0..7), the classic raid-marker order: Star, Circle, Diamond, Triangle, Moon,
@@ -188,7 +189,10 @@ describe('target markers — sim layer', () => {
 
       sim.setMarker(mob.id, SKULL, a);
       // respawnMob reuses the same entity id, so the mark must be cleared on death
-      (sim as unknown as { handleDeath(e: Entity, killer: Entity | null): void }).handleDeath(mob, null);
+      (sim as unknown as { handleDeath(e: Entity, killer: Entity | null): void }).handleDeath(
+        mob,
+        null,
+      );
 
       expect(sim.markersFor(a)).toEqual({});
     });
@@ -212,7 +216,12 @@ describe('target markers — sim layer', () => {
       const b = sim.addPlayer('mage', 'Bet');
       makeParty(sim, hunter, b);
       const wolf = [...sim.entities.values()].find(
-        (e) => e.kind === 'mob' && !e.dead && e.hostile && e.ownerId === null && e.templateId === 'forest_wolf',
+        (e) =>
+          e.kind === 'mob' &&
+          !e.dead &&
+          e.hostile &&
+          e.ownerId === null &&
+          e.templateId === 'forest_wolf',
       );
       if (!wolf) throw new Error('expected a tameable forest_wolf in the overworld');
       const hunterE = sim.entities.get(hunter)!;
@@ -221,7 +230,10 @@ describe('target markers — sim layer', () => {
       sim.setMarker(wolf.id, SKULL, hunter);
       expect(sim.markersFor(hunter)).toEqual({ [wolf.id]: SKULL });
 
-      (sim as unknown as { completeTame(p: Entity, target: Entity): void }).completeTame(hunterE, wolf);
+      (sim as unknown as { completeTame(p: Entity, target: Entity): void }).completeTame(
+        hunterE,
+        wolf,
+      );
 
       const pet = sim.petOf(hunter);
       expect(pet?.ownerId).toBe(hunter); // it created an owned pet copy
@@ -288,9 +300,12 @@ describe('target markers — server self-wire', () => {
 
   it('delivers a mark to the whole party via the self-wire, and not to outsiders', () => {
     const server = new GameServer();
-    const fcA = fakeWs(); const sA = join(server, fcA, 1, 'Aleph');
-    const fcB = fakeWs(); const sB = join(server, fcB, 2, 'Bet');
-    const fcC = fakeWs(); join(server, fcC, 3, 'Gimel'); // outsider, never in a party
+    const fcA = fakeWs();
+    const sA = join(server, fcA, 1, 'Aleph');
+    const fcB = fakeWs();
+    const sB = join(server, fcB, 2, 'Bet');
+    const fcC = fakeWs();
+    join(server, fcC, 3, 'Gimel'); // outsider, never in a party
     cmd(server, sA, { cmd: 'pinvite', id: sB.pid });
     cmd(server, sB, { cmd: 'paccept' });
     const mob = serverMob(server);
@@ -305,8 +320,10 @@ describe('target markers — server self-wire', () => {
 
   it('sends a clear (null) when the party disbands', () => {
     const server = new GameServer();
-    const fcA = fakeWs(); const sA = join(server, fcA, 1, 'Aleph');
-    const fcB = fakeWs(); const sB = join(server, fcB, 2, 'Bet');
+    const fcA = fakeWs();
+    const sA = join(server, fcA, 1, 'Aleph');
+    const fcB = fakeWs();
+    const sB = join(server, fcB, 2, 'Bet');
     cmd(server, sA, { cmd: 'pinvite', id: sB.pid });
     cmd(server, sB, { cmd: 'paccept' });
     const mob = serverMob(server);

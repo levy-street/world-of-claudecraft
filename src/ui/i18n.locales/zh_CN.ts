@@ -14,6 +14,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  // Guild roster last-seen (M16 non-Latin fill)
+  'hudChrome.social.lastSeen': '最后在线: {when}',
+  'hudChrome.social.lastSeenNever': '从未',
   // Daily rewards (M16 non-Latin fill)
   'hudChrome.dailyRewards.title': '每日奖励',
   'hudChrome.dailyRewards.close': '关闭每日奖励',
@@ -71,6 +74,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.frameReset.label': '重置框体位置',
   'hudChrome.options.playerFrameScale': '玩家框缩放',
   'hudChrome.options.targetFrameScale': '目标框缩放',
+  'hudChrome.options.aurasOnPlayerFrame': '增益显示在玩家框',
   'hud.core.mapCanvasLabel': '地图',
   'hud.core.mapSummary': '{zone}的地图。',
   'hudChrome.castBar.playerAria': '你的施法条',
@@ -78,6 +82,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.skipLinks.chat': '跳转到聊天',
   'hudChrome.skipLinks.mainHud': '跳转到主界面',
   'hudChrome.unitFrame.durationUnitSeconds': '秒',
+  'hudChrome.unitFrame.durationUnitMinutes': '分',
+  'hudChrome.unitFrame.durationUnitHours': '时',
+  'hudChrome.unitFrame.durationUnitDays': '天',
   'hudChrome.unitFrame.partyLabel': '你的队伍',
   'hudChrome.unitFrame.playerLabel': '你的角色',
   'hudChrome.unitFrame.targetAnnounce': '目标：{name}',
@@ -2099,6 +2106,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.weathered_ledger_page.name': '风化账页',
   'entities.items.morthen_grimoire.name': '莫森的魔典',
   'entities.items.wolf_fang.name': '裂开的狼牙',
+  'entities.items.linen_pouch.name': '亚麻小袋',
+  'entities.items.travelers_knapsack.name': '旅行者背囊',
+  'entities.items.wolfhide_satchel.name': '狼皮挎包',
+  'entities.items.gravewoven_bag.name': '墓织袋',
+  'entities.items.mistcallers_duffel.name': '唤雾者行囊',
   'entities.items.bandit_bandana.name': '红色面巾',
   'entities.items.tough_jerky.name': '硬肉干',
   'entities.items.mudfin_scale.name': '黏滑鱼人鳞片',
@@ -2369,6 +2381,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_imp.name': '火焰恶魔',
   'entities.mobs.warlock_voidwalker.name': '虚空恶魔',
   'entities.mobs.ysolei.name': '伊索蕾，溺月化身',
+  'hudChrome.death.resurrectAtCorpse': '在尸体旁复活',
+  'hudChrome.death.resurrectAtHealer': '灵魂医者（复活后遗症）',
+  'hudChrome.death.spiritHealerAlive': '灵魂医者只看护逝者。你仍是生者。',
+  'entities.npcs.spirit_healer.name': '灵魂医者',
+  'entities.npcs.spirit_healer.title': '亡者的守护者',
+  'entities.npcs.spirit_healer.greeting':
+    '安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。',
   'entities.npcs.the_merchant.name': '商人',
   'entities.npcs.the_merchant.title': '世界市场守护者',
   'entities.npcs.the_merchant.greeting':
@@ -3482,6 +3501,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.searchPlaceholder': '搜索物品',
   'hudChrome.bags.searchAria': '按名称搜索背包物品',
   'hudChrome.bags.noMatch': '没有符合筛选条件的物品。',
+  'hudChrome.bags.capacityAria': '背包格已用：{used}/{total}',
+  'hudChrome.bags.backpack': '背包',
+  'hudChrome.bags.socketEmpty': '空背包栏位',
+  'hudChrome.bags.unequipHint': '点击移除此背包',
   // Guide (/guide) localization.
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -4574,7 +4597,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.companion.upgradeAria': '用 {marks} 枚探秘印记将{name}升级到 {rank} 级',
   'delveUi.board.companion.maxRank': '已满级',
   'delveUi.board.tabShop': '商店',
-  // Modular bag filtering controls (hudChrome.bags.*).,
   'lockpickUi.pickTitle': '撬开锁',
   'lockpickUi.cofferTitle': '丰饶宝匣',
   'lockpickUi.cache': '{tier}储藏',
@@ -4645,6 +4667,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.reduce.sta': '耐力降低 {value}',
   'hudChrome.auraEffect.reduce.spi': '精神降低 {value}',
   'hudChrome.auraEffect.reduce.allStats': '所有属性降低 {value}',
+  'hudChrome.auraEffect.allStatsPctReduce': '所有属性降低 {pct}%',
   'hudChrome.auraEffect.dodge': '躲闪几率提高 {pct}%',
   'hudChrome.auraEffect.dodgeReduce': '躲闪几率降低 {pct}%',
   'hudChrome.auraEffect.armorFlat': '护甲降低 {value}',

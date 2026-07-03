@@ -14,6 +14,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  // Guild roster last-seen (M16 non-Latin fill)
+  'hudChrome.social.lastSeen': '마지막 접속: {when}',
+  'hudChrome.social.lastSeenNever': '없음',
   // Daily rewards (M16 non-Latin fill)
   'hudChrome.dailyRewards.title': '일일 보상',
   'hudChrome.dailyRewards.close': '일일 보상 닫기',
@@ -75,6 +78,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.frameReset.label': '프레임 위치 초기화',
   'hudChrome.options.playerFrameScale': '플레이어 프레임 크기',
   'hudChrome.options.targetFrameScale': '대상 프레임 크기',
+  'hudChrome.options.aurasOnPlayerFrame': '버프를 플레이어 프레임에 표시',
   'hud.core.mapCanvasLabel': '지도',
   'hud.core.mapSummary': '{zone}의 지도.',
   'hudChrome.castBar.playerAria': '내 시전 막대',
@@ -82,6 +86,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.skipLinks.chat': '채팅으로 건너뛰기',
   'hudChrome.skipLinks.mainHud': '메인 HUD로 건너뛰기',
   'hudChrome.unitFrame.durationUnitSeconds': '초',
+  'hudChrome.unitFrame.durationUnitMinutes': '분',
+  'hudChrome.unitFrame.durationUnitHours': '시',
+  'hudChrome.unitFrame.durationUnitDays': '일',
   'hudChrome.unitFrame.partyLabel': '내 파티',
   'hudChrome.unitFrame.playerLabel': '내 캐릭터',
   'hudChrome.unitFrame.targetAnnounce': '대상: {name}',
@@ -2199,6 +2206,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.weathered_ledger_page.name': '풍화된 장부 페이지',
   'entities.items.morthen_grimoire.name': '모르덴의 마법서',
   'entities.items.wolf_fang.name': '갈라진 늑대 송곳니',
+  'entities.items.linen_pouch.name': '아마천 주머니',
+  'entities.items.travelers_knapsack.name': '여행자의 배낭',
+  'entities.items.wolfhide_satchel.name': '늑대가죽 가방',
+  'entities.items.gravewoven_bag.name': '무덤결 가방',
+  'entities.items.mistcallers_duffel.name': '안개소환사의 더플백',
   'entities.items.bandit_bandana.name': '붉은 두건',
   'entities.items.tough_jerky.name': '질긴 육포',
   'entities.items.mudfin_scale.name': '끈적한 멀록 비늘',
@@ -2469,6 +2481,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_imp.name': '화염 악마',
   'entities.mobs.warlock_voidwalker.name': '공허 악마',
   'entities.mobs.ysolei.name': '이솔레이, 익사한 달의 화신',
+  'hudChrome.death.resurrectAtCorpse': '시신에서 부활',
+  'hudChrome.death.resurrectAtHealer': '영혼 치유사 (부활의 후유증)',
+  'hudChrome.death.spiritHealerAlive': '영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.',
+  'entities.npcs.spirit_healer.name': '영혼 치유사',
+  'entities.npcs.spirit_healer.title': '죽은 자의 수호자',
+  'entities.npcs.spirit_healer.greeting':
+    '편히 쉬게, 영혼이여. 그대를 육신으로 돌려보낼 수 있으나, 돌아오는 길은 그대를 약하게 만들 것이네.',
   'entities.npcs.the_merchant.name': '상인',
   'entities.npcs.the_merchant.title': '세계 시장 관리자',
   'entities.npcs.the_merchant.greeting':
@@ -3645,6 +3664,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.searchPlaceholder': '아이템 검색',
   'hudChrome.bags.searchAria': '이름으로 가방 아이템 검색',
   'hudChrome.bags.noMatch': '필터와 일치하는 아이템이 없습니다.',
+  'hudChrome.bags.capacityAria': '사용 중인 가방 칸: {total}칸 중 {used}칸',
+  'hudChrome.bags.backpack': '배낭',
+  'hudChrome.bags.socketEmpty': '빈 가방 칸',
+  'hudChrome.bags.unequipHint': '클릭하여 이 가방을 해제',
   // Guide (/guide) localization.
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -4832,7 +4855,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.companion.upgradeAria': '탐굴 증표 {marks}개로 {name}을(를) {rank}랭크로 강화',
   'delveUi.board.companion.maxRank': '최대 강화',
   'delveUi.board.tabShop': '상점',
-  // Modular bag filtering controls (hudChrome.bags.*).,
   'lockpickUi.pickTitle': '자물쇠 따기',
   'lockpickUi.cofferTitle': '풍요의 금고',
   'lockpickUi.cache': '{tier} 상자',
@@ -4903,6 +4925,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.reduce.sta': '체력을 {value} 감소시킵니다',
   'hudChrome.auraEffect.reduce.spi': '정신력을 {value} 감소시킵니다',
   'hudChrome.auraEffect.reduce.allStats': '모든 능력치를 {value} 감소시킵니다',
+  'hudChrome.auraEffect.allStatsPctReduce': '모든 능력치를 {pct}% 감소시킵니다',
   'hudChrome.auraEffect.dodge': '회피 확률을 {pct}% 증가시킵니다',
   'hudChrome.auraEffect.dodgeReduce': '회피 확률을 {pct}% 감소시킵니다',
   'hudChrome.auraEffect.armorFlat': '방어도를 {value} 감소시킵니다',

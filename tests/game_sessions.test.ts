@@ -21,6 +21,7 @@ vi.mock('../server/db', () => ({
   saveCharacterState: vi.fn(async () => {}),
   saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: (...args: unknown[]) => openPlaySession(...(args as [])),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: (...args: unknown[]) => closePlaySession(...(args as [])),
   insertChatLogs: vi.fn(async () => {}),
   markAccountQuestComplete: (...args: unknown[]) =>

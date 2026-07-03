@@ -154,6 +154,11 @@ export const en_XA: EnTranslations = {
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },
+    "death": {
+      "resurrectAtCorpse": "[Ŕéšúŕŕéçţ áţ Çóŕþšé]",
+      "resurrectAtHealer": "[Ţĥé Þáļé Ķééþéŕ (Ķééþéŕ'š Ţóļļ)]",
+      "spiritHealerAlive": "[Ţĥé Þáļé Ķééþéŕ ŵáţçĥéš óʋéŕ ţĥé ðéáð. Ýóú áŕé šţíļļ áɱóñĝ ţĥé ļíʋíñĝ.]"
+    },
     "emotes": {
       "wave": "[Ŵáʋé]",
       "laugh": "[ĻÓĻ]",
@@ -280,7 +285,10 @@ export const en_XA: EnTranslations = {
       "targetAnnounce": "[Ɱáŕķ {name}]",
       "partyLabel": "[Ýóúŕ Ɓáñð]",
       "partyGroup": "[Ĝŕóúþ {n}]",
-      "durationUnitSeconds": "[š]"
+      "durationUnitSeconds": "[š]",
+      "durationUnitMinutes": "[ɱ]",
+      "durationUnitHours": "[ĥ]",
+      "durationUnitDays": "[ð]"
     },
     "character": {
       "modelPreview": "[Çĥáŕáçţéŕ Ɱóðéļ Þŕéʋíéŵ]"
@@ -394,6 +402,7 @@ export const en_XA: EnTranslations = {
       "uiScale": "[ÚÍ Šçáļé]",
       "playerFrameScale": "[Þļáýéŕ Ƒŕáɱé Šçáļé]",
       "targetFrameScale": "[Ţáŕĝéţ Ƒŕáɱé Šçáļé]",
+      "aurasOnPlayerFrame": "[Ɓúƒƒš óñ ţĥé Þļáýéŕ Ƒŕáɱé]",
       "highContrastBackground": "[Ĥíĝĥ-Çóñţŕášţ Ɓáçķĝŕóúñð]",
       "startAttackOnAbility": "[Áúţó-Áţţáçķ óñ Áƀíļíţý Úšé]",
       "walkByAutoloot": "[Ŵáļķ-ƀý Áúţóļóóţ]",
@@ -748,7 +757,13 @@ export const en_XA: EnTranslations = {
       "sortName": "[Ñáɱé]",
       "searchPlaceholder": "[Šéáŕçĥ íţéɱš]",
       "searchAria": "[Šéáŕçĥ ƀáĝ íţéɱš ƀý ñáɱé]",
-      "noMatch": "[Ñó íţéɱš ɱáţçĥ ýóúŕ ƒíļţéŕš.]"
+      "noMatch": "[Ñó íţéɱš ɱáţçĥ ýóúŕ ƒíļţéŕš.]",
+      "capacity": "[{used}/{total}]",
+      "capacityAria": "[Ɓáĝ šļóţš úšéð: {used} óƒ {total}]",
+      "backpack": "[Ɓáçķþáçķ]",
+      "bagSocketAria": "[{name}: {slots}]",
+      "socketEmpty": "[Éɱþţý ƀáĝ šļóţ]",
+      "unequipHint": "[Çļíçķ ţó ŕéɱóʋé ţĥíš ƀáĝ]"
     },
     "raidConvert": {
       "toPartyDone": "[Ýóúŕ ŕáíð ĥáš çóñʋéŕţéð ƀáçķ ţó á þáŕţý.]",
@@ -791,6 +806,7 @@ export const en_XA: EnTranslations = {
         "spi": "[Ŕéðúçéš Šþíŕíţ ƀý {value}]",
         "allStats": "[Ŕéðúçéš áļļ áţţŕíƀúţéš ƀý {value}]"
       },
+      "allStatsPctReduce": "[Ŕéðúçéš áļļ áţţŕíƀúţéš ƀý {pct}%]",
       "dodge": "[Íñçŕéášéš ðóðĝé çĥáñçé ƀý {pct}%]",
       "dodgeReduce": "[Ŕéðúçéš ðóðĝé çĥáñçé ƀý {pct}%]",
       "armorFlat": "[Ŕéðúçéš áŕɱóŕ ƀý {value}]",
@@ -1141,6 +1157,10 @@ export const en_XA: EnTranslations = {
           "note": "[Þíļĝŕíɱš ĝáţĥéŕ áţ ţĥé ţéɱþļé ɱóóñĝáţé úñðéŕ ţĥé ɱíð-ɱóñţĥ ɱóóñ.]"
         }
       }
+    },
+    "social": {
+      "lastSeen": "[Ļášţ šééñ: {when}]",
+      "lastSeenNever": "[ñéʋéŕ]"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const en_XA: EnTranslations = {
       "drink": "[Ðŕíñķ]",
       "tool": "[Ţóóļ]",
       "potion": "[Þóţíóñ]",
-      "elixir": "[Éļíẋíŕ]"
+      "elixir": "[Éļíẋíŕ]",
+      "bag": "[Ɓáĝ]"
     },
     "stats": {
       "armor": "[Áŕɱóŕ]",
@@ -4281,7 +4302,8 @@ export const en_XA: EnTranslations = {
       "useManaPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ɱáñá. Úšáƀļé íñ çóɱƀáţ. 2 ɱíñ çóóļðóŵñ.]",
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
-      "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]"
+      "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]",
+      "bagSlots": "[{slots} Šļóţ Ɓáĝ]"
     },
     "bags": {
       "title": "[Ɓáĝš]",
@@ -5583,6 +5605,21 @@ export const en_XA: EnTranslations = {
       "monarch_crown_helm": {
         "name": "[Ɱóñáŕçĥ'š Çŕóŵñ]"
       },
+      "linen_pouch": {
+        "name": "[Ļíñéñ Þóúçĥ]"
+      },
+      "travelers_knapsack": {
+        "name": "[Ţŕáʋéļéŕ'š Ķñáþšáçķ]"
+      },
+      "wolfhide_satchel": {
+        "name": "[Ŵóļƒĥíðé Šáţçĥéļ]"
+      },
+      "gravewoven_bag": {
+        "name": "[Ĝŕáʋéŵóʋéñ Ɓáĝ]"
+      },
+      "mistcallers_duffel": {
+        "name": "[Ɱíšţçáļļéŕ'š Ðúƒƒéļ]"
+      },
       "copper_mining_pick": {
         "name": "[Çóþþéŕ Ɱíñíñĝ Þíçķ]"
       },
@@ -6634,6 +6671,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ɓŕóţĥéŕ Ĥáļʋéñ]",
         "title": "[Ŕéļíɋúáŕý Ķééþéŕ]",
         "greeting": "[Ţĥé ţŕáíļ ļéð ñóŕţĥ. Áñóţĥéŕ ŕéļíɋúáŕý, áñóţĥéŕ ŕíţé. Çĥóóšé ýóúŕ ţíéŕ, áñð Í'ļļ ĥóļð ţĥé ŕóþé úñţíļ ýóú ŕéţúŕñ.]"
+      },
+      "spirit_healer": {
+        "name": "[Ţĥé Þáļé Ķééþéŕ]",
+        "title": "[Ŵáŕðéñ óƒ ţĥé Ðéáð]",
+        "greeting": "[Ŕéšţ ñóŵ, šþíŕíţ. Í çáñ ŕéţúŕñ ýóú ţó ýóúŕ ƀóðý, ƀúţ ţĥé çŕóššíñĝ ƀáçķ ļéáʋéš ýóú ŵéáķ.]"
       },
       "tidewatcher_ondrel": {
         "name": "[Óñðŕéļ Ʋáñé]",

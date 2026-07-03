@@ -387,7 +387,7 @@ describe('combat', () => {
     expect(sim.player.resource).toBeCloseTo(1, 5);
   });
 
-  it('mob can kill the player; release respawns at graveyard', () => {
+  it('mob can kill the player; release rises as a ghost, healer resurrects', () => {
     const sim = makeSim('mage');
     const boss = nearestMob(sim, 'gorrak');
     teleportTo(sim, boss.pos.x + 2, boss.pos.z);
@@ -398,10 +398,15 @@ describe('combat', () => {
       if (events.some((e) => e.type === 'playerDeath')) died = true;
     }
     expect(died).toBe(true);
+    // release rises as a ghost at a graveyard (still dead, but a spirit that can move)
     sim.releaseSpirit();
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.ghost).toBe(true);
+    expect(sim.player.corpsePos).not.toBeNull();
+    // a Spirit Healer hovers at the graveyard, so the ghost can resurrect there
+    sim.resurrectAtSpiritHealer();
     expect(sim.player.dead).toBe(false);
-    expect(sim.player.hp).toBe(sim.player.maxHp);
-    expect(dist2d(sim.player.pos, { x: -12, y: 0, z: -14 })).toBeLessThan(2);
+    expect(sim.player.ghost).toBe(false);
   });
 
   it('mobs leash, evade, and reset to full health', () => {

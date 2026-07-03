@@ -11,6 +11,14 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
+  // button and "You have died." title reuse the hud.core.* keys; these are the
+  // ghost-state additions shown once the spirit has been released.
+  death: {
+    resurrectAtCorpse: 'Resurrect at Corpse',
+    resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
+    spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
+  },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
   // bubble text). Source ids/order mirror OVERHEAD_EMOTES in world_api.ts.
   emotes: {
@@ -173,12 +181,16 @@ export const hudChromeStrings = {
     // ru_RU) carry real fills, the Latin overlays stay pending. Title Case does not help
     // (M16 is per-word consecutive-lowercase, not word count).
     partyGroup: 'Group {n}',
-    // durationUnitSeconds is the unit suffix appended to an aura's remaining-seconds count on
-    // the buff/debuff strip (e.g. "5s"). The auras core (auras_view.ts) renders it via the
-    // injected durationUnitSuffix() dep so an in-game language switch lands next tick. A single
-    // char (non-wordy: no four-plus consecutive-lowercase run), so an English-filled non-Latin
-    // overlay does not trip the M16 untranslated-leak guard; the maintainer localizes at release.
+    // The unit suffixes appended to an aura's compact remaining-duration label on the
+    // buff/debuff strips (e.g. "20s", "5m", "1h", "2d"). The auras core (auras_view.ts)
+    // renders them via the injected durationUnits() dep so an in-game language switch
+    // lands next tick. Single chars (non-wordy: no four-plus consecutive-lowercase run),
+    // so an English-filled non-Latin overlay does not trip the M16 untranslated-leak
+    // guard; the maintainer localizes at release.
     durationUnitSeconds: 's',
+    durationUnitMinutes: 'm',
+    durationUnitHours: 'h',
+    durationUnitDays: 'd',
   },
   // Character sheet (#char-window) accessible names. modelPreview names the role=img 3D
   // turntable HOST distinctly from the title's level/class subtitle (the canvas pixels
@@ -369,6 +381,11 @@ export const hudChromeStrings = {
     // (wordy, M16: the five non-Latin fills land in the same change as each).
     playerFrameScale: 'Player Frame Scale',
     targetFrameScale: 'Target Frame Scale',
+    // Interface panel toggle: anchor the player's own buff row to the movable
+    // player frame (the debuff row then slides up beside the minimap) instead
+    // of the classic two-row top-right corner (wordy, M16: the five non-Latin
+    // fills land in this same change).
+    aurasOnPlayerFrame: 'Buffs on the Player Frame',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
@@ -814,6 +831,15 @@ export const hudChromeStrings = {
     searchPlaceholder: 'Search items',
     searchAria: 'Search bag items by name',
     noMatch: 'No items match your filters.',
+    // The bag bar (backpack + 4 equip sockets) and the used/capacity counter.
+    capacity: '{used}/{total}',
+    capacityAria: 'Bag slots used: {used} of {total}',
+    backpack: 'Backpack',
+    // Accessible name for a bag-bar socket: '{name}: {slots}' where {slots} is
+    // the already-localized 'N Slot Bag' phrase, so no code-side concatenation.
+    bagSocketAria: '{name}: {slots}',
+    socketEmpty: 'Empty bag slot',
+    unequipHint: 'Click to remove this bag',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing
@@ -868,6 +894,7 @@ export const hudChromeStrings = {
       spi: 'Reduces Spirit by {value}',
       allStats: 'Reduces all attributes by {value}',
     },
+    allStatsPctReduce: 'Reduces all attributes by {pct}%',
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
     armorFlat: 'Reduces armor by {value}',
@@ -1262,5 +1289,12 @@ export const hudChromeStrings = {
         note: 'Pilgrims gather at the temple moongate under the mid-month moon.',
       },
     },
+  },
+  // Guild roster: a member's last world-entry time, shown on offline rows. {when}
+  // is a locale-formatted date/time, or the "never" leaf when the character has no
+  // recorded login.
+  social: {
+    lastSeen: 'Last seen: {when}',
+    lastSeenNever: 'never',
   },
 };

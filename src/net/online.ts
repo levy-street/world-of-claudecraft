@@ -6,6 +6,7 @@ import {
   runtimeApiOrigin,
   runtimeWebSocketUrl,
 } from '../runtime';
+import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -835,6 +836,8 @@ function blankEntity(id: number): Entity {
     objectItemId: null,
     dungeonId: null,
     dead: false,
+    ghost: false,
+    corpsePos: null,
     scale: 1,
     color: 0xffffff,
     skinCatalog: 'class',
@@ -860,6 +863,9 @@ export class ClientWorld implements IWorld {
   known: ResolvedAbility[] = [];
   realm = '';
   inventory: InvSlot[] = [];
+  // Equipped bag sockets, mirrored from snapshot self ('bags'); capacity is
+  // derived locally from the shared item data (same math as the sim's bags.ts).
+  bags: (string | null)[] = [null, null, null, null];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
   copper = 0;
@@ -1373,11 +1379,19 @@ export class ClientWorld implements IWorld {
       e.facing = w.f;
       e.hp = w.hp;
       e.maxHp = w.mhp;
+      // Resource (the target frame's bar): the wire sends it only for entities
+      // that have one, so a missing rtype keeps the blank defaults (no bar).
+      if (w.rtype !== undefined) {
+        e.resourceType = w.rtype;
+        e.resource = w.res;
+        e.maxResource = w.mres;
+      }
       e.rangedPower = w.rp ?? 0;
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;
       e.overheadEmoteUntil = e.overheadEmoteId ? Number.POSITIVE_INFINITY : 0;
       if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
       e.dead = nowDead;
+      e.ghost = !!w.gh; // released spirit: rendered translucent, runs faster
       e.lootable = !!w.loot;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
@@ -1496,6 +1510,9 @@ export class ClientWorld implements IWorld {
       e.resourceType = s.rtype;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
+      // corpse position while a ghost (null once resurrected). Delta-guarded: kept
+      // unchanged when the server omits it; drives the corpse marker + resurrect button.
+      if (s.corpse !== undefined) e.corpsePos = s.corpse ?? null;
       if (s.cds !== undefined) {
         // in-place rebuild (same result as `new Map(Object.entries(...))`): no
         // intermediate entry arrays and no Map churn on the 20 Hz self record
@@ -1542,6 +1559,10 @@ export class ClientWorld implements IWorld {
       }
       if (s.buyback !== undefined) {
         this.vendorBuyback = s.buyback;
+        this.invChanged = true;
+      }
+      if (s.bags !== undefined) {
+        this.bags = s.bags;
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
@@ -1721,6 +1742,12 @@ export class ClientWorld implements IWorld {
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });
   }
+  resurrectAtCorpse(): void {
+    this.cmd({ cmd: 'resurrect_corpse' });
+  }
+  resurrectAtSpiritHealer(): void {
+    this.cmd({ cmd: 'resurrect_healer' });
+  }
 
   // --- IWorldTargeting: target selection + tab cycling ---
   targetEntity(id: number | null): void {
@@ -1796,6 +1823,15 @@ export class ClientWorld implements IWorld {
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
+  }
+  get bagCapacity(): number {
+    return bagCapacity(this.bags);
+  }
+  equipBag(itemId: string, socket?: number): void {
+    this.cmd({ cmd: 'equip_bag', item: itemId, socket });
+  }
+  unequipBag(socket: number): void {
+    this.cmd({ cmd: 'unequip_bag', socket });
   }
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });

@@ -154,6 +154,11 @@ export const ko_KR: EnTranslations = {
     "spectate": {
       "banner": "{name} 관전 중"
     },
+    "death": {
+      "resurrectAtCorpse": "시신에서 부활",
+      "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
+      "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다."
+    },
     "emotes": {
       "wave": "손인사",
       "laugh": "ㅋㅋ",
@@ -280,7 +285,10 @@ export const ko_KR: EnTranslations = {
       "targetAnnounce": "대상: {name}",
       "partyLabel": "내 파티",
       "partyGroup": "{n}번 그룹",
-      "durationUnitSeconds": "초"
+      "durationUnitSeconds": "초",
+      "durationUnitMinutes": "분",
+      "durationUnitHours": "시",
+      "durationUnitDays": "일"
     },
     "character": {
       "modelPreview": "캐릭터 모델 미리보기"
@@ -394,6 +402,7 @@ export const ko_KR: EnTranslations = {
       "uiScale": "UI 배율",
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
+      "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "walkByAutoloot": "지나가며 자동 획득",
@@ -748,7 +757,13 @@ export const ko_KR: EnTranslations = {
       "sortName": "이름",
       "searchPlaceholder": "아이템 검색",
       "searchAria": "이름으로 가방 아이템 검색",
-      "noMatch": "필터와 일치하는 아이템이 없습니다."
+      "noMatch": "필터와 일치하는 아이템이 없습니다.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "사용 중인 가방 칸: {total}칸 중 {used}칸",
+      "backpack": "배낭",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "빈 가방 칸",
+      "unequipHint": "클릭하여 이 가방을 해제"
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -791,6 +806,7 @@ export const ko_KR: EnTranslations = {
         "spi": "정신력을 {value} 감소시킵니다",
         "allStats": "모든 능력치를 {value} 감소시킵니다"
       },
+      "allStatsPctReduce": "모든 능력치를 {pct}% 감소시킵니다",
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
@@ -1141,6 +1157,10 @@ export const ko_KR: EnTranslations = {
           "note": "보름의 달 아래 순례자들이 사원의 달문에 모입니다."
         }
       }
+    },
+    "social": {
+      "lastSeen": "마지막 접속: {when}",
+      "lastSeenNever": "없음"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const ko_KR: EnTranslations = {
       "drink": "음료",
       "tool": "도구",
       "potion": "물약",
-      "elixir": "비약"
+      "elixir": "비약",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "방어도",
@@ -4281,7 +4302,8 @@ export const ko_KR: EnTranslations = {
       "useManaPotion": "사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
-      "clickBuyback": "클릭하여 되사기"
+      "clickBuyback": "클릭하여 되사기",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "가방",
@@ -5583,6 +5605,21 @@ export const ko_KR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "군주의 왕관"
       },
+      "linen_pouch": {
+        "name": "아마천 주머니"
+      },
+      "travelers_knapsack": {
+        "name": "여행자의 배낭"
+      },
+      "wolfhide_satchel": {
+        "name": "늑대가죽 가방"
+      },
+      "gravewoven_bag": {
+        "name": "무덤결 가방"
+      },
+      "mistcallers_duffel": {
+        "name": "안개소환사의 더플백"
+      },
       "copper_mining_pick": {
         "name": "구리 채광 곡괭이"
       },
@@ -6634,6 +6671,11 @@ export const ko_KR: EnTranslations = {
         "name": "브라더 할벤",
         "title": "성물실 관리인",
         "greeting": "오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소."
+      },
+      "spirit_healer": {
+        "name": "영혼 치유사",
+        "title": "죽은 자의 수호자",
+        "greeting": "편히 쉬게, 영혼이여. 그대를 육신으로 돌려보낼 수 있으나, 돌아오는 길은 그대를 약하게 만들 것이네."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",

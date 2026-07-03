@@ -8,7 +8,9 @@
 import type { GamepadBindings } from './gamepad_bindings';
 import {
   AXIS,
+  detectGamepadKind,
   GAMEPAD_NONE,
+  type GamepadKind,
   GP,
   risingEdges,
   STANDARD_BUTTON_COUNT,
@@ -30,12 +32,16 @@ export interface GamepadCallbacks {
   isPointerMode(): boolean;
   // Current local-player health, for rumble-on-damage. Optional.
   getPlayerHealth?(): number;
+  // A pad connected or disconnected, so the detected brand (and thus the button
+  // glyphs shown in the Controller options panel) may have changed. Optional.
+  onConnectionChange?(): void;
 }
 
 const CURSOR_SPEED = 900; // px/sec at full stick deflection in UI cursor mode
 
 export class GamepadManager {
   private index: number | null = null;
+  private kind: GamepadKind = 'generic';
   private prevPressed: boolean[] = new Array(STANDARD_BUTTON_COUNT).fill(false);
   private deadzone = 0.18;
   private camSpeed = 2.4;
@@ -59,10 +65,13 @@ export class GamepadManager {
     if (typeof navigator === 'undefined' || typeof navigator.getGamepads !== 'function') return;
     window.addEventListener('gamepadconnected', this.boundConnect);
     window.addEventListener('gamepaddisconnected', this.boundDisconnect);
-    // Pick up a pad that was already connected before we started listening.
+    // Pick up a pad that was already connected before we started listening (e.g.
+    // the Controller setting toggled on while a pad is plugged in). Notify so an
+    // open Controller panel re-labels to the detected brand; a no-op otherwise.
     for (const pad of navigator.getGamepads()) {
       if (pad?.connected) {
-        this.index = pad.index;
+        this.acquire(pad);
+        this.cb.onConnectionChange?.();
         break;
       }
     }
@@ -77,6 +86,7 @@ export class GamepadManager {
     // camera, and edge buttons after the Controller setting is turned off. start()
     // re-acquires an already-connected pad on re-enable.
     this.index = null;
+    this.kind = 'generic';
     this.prevPressed.fill(false);
     this.input.clearGamepadMove();
     this.hideCursor();
@@ -99,16 +109,33 @@ export class GamepadManager {
     return this.index !== null;
   }
 
+  /** Detected brand of the connected pad, for glyph labeling; 'generic' when
+   *  none is connected or the pad's id is unrecognized. */
+  getKind(): GamepadKind {
+    return this.index === null ? 'generic' : this.kind;
+  }
+
+  // Latch a pad as the active one and classify its brand from the id string.
+  private acquire(pad: Gamepad): void {
+    this.index = pad.index;
+    this.kind = detectGamepadKind(pad.id);
+  }
+
   private onConnect(e: GamepadEvent): void {
-    if (this.index === null) this.index = e.gamepad.index;
+    if (this.index === null) {
+      this.acquire(e.gamepad);
+      this.cb.onConnectionChange?.();
+    }
   }
 
   private onDisconnect(e: GamepadEvent): void {
     if (this.index === e.gamepad.index) {
       this.index = null;
+      this.kind = 'generic';
       this.prevPressed.fill(false);
       this.input.clearGamepadMove();
       this.hideCursor();
+      this.cb.onConnectionChange?.();
     }
   }
 

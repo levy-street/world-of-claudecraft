@@ -492,7 +492,13 @@ const mergeStringsEn = {
   },
   itemUi: {
     ...itemNames.en.itemUi,
-    kind: { ...itemNames.en.itemUi.kind, tool: 'Tool', potion: 'Potion', elixir: 'Elixir' },
+    kind: {
+      ...itemNames.en.itemUi.kind,
+      tool: 'Tool',
+      potion: 'Potion',
+      elixir: 'Elixir',
+      bag: 'Bag',
+    },
     tooltip: {
       ...itemNames.en.itemUi.tooltip,
       useFishing: 'Use: Fish in nearby waters.',
@@ -502,6 +508,7 @@ const mergeStringsEn = {
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
       clickBuyback: 'Click to buy back',
+      bagSlots: '{slots} Slot Bag',
     },
     vendor: {
       ...itemNames.en.itemUi.vendor,
@@ -667,6 +674,7 @@ export const mergeStrings = {
         tool: 'Herramienta',
         potion: 'Poción',
         elixir: 'Elixir',
+        bag: 'Bolsa',
       },
       tooltip: {
         ...itemNames.es.itemUi.tooltip,
@@ -678,6 +686,7 @@ export const mergeStrings = {
         clickUseInstant: 'Haz clic para usar al instante en combate',
         clickUse: 'Haz clic para usar',
         clickBuyback: 'Haz clic para recomprar',
+        bagSlots: 'Bolsa de {slots} huecos',
       },
       vendor: {
         ...itemNames.es.itemUi.vendor,
@@ -828,7 +837,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.fr_FR.itemUi,
-      kind: { ...itemNames.fr_FR.itemUi.kind, tool: 'Outil', potion: 'Potion', elixir: 'Élixir' },
+      kind: {
+        ...itemNames.fr_FR.itemUi.kind,
+        tool: 'Outil',
+        potion: 'Potion',
+        elixir: 'Élixir',
+        bag: 'Sac',
+      },
       tooltip: {
         ...itemNames.fr_FR.itemUi.tooltip,
         useFishing: 'Utiliser : pêcher dans les eaux proches.',
@@ -839,6 +854,7 @@ export const mergeStrings = {
         clickUseInstant: 'Cliquer pour utiliser instantanément en combat',
         clickUse: 'Cliquer pour utiliser',
         clickBuyback: 'Cliquer pour racheter',
+        bagSlots: 'Sac de {slots} emplacements',
       },
       vendor: {
         ...itemNames.fr_FR.itemUi.vendor,
@@ -995,6 +1011,7 @@ export const mergeStrings = {
         tool: 'Strumento',
         potion: 'Pozione',
         elixir: 'Elisir',
+        bag: 'Borsa',
       },
       tooltip: {
         ...itemNames.it_IT.itemUi.tooltip,
@@ -1006,6 +1023,7 @@ export const mergeStrings = {
         clickUseInstant: 'Clicca per usare subito in combattimento',
         clickUse: 'Clicca per usare',
         clickBuyback: 'Clicca per ricomprare',
+        bagSlots: 'Borsa da {slots} scomparti',
       },
       vendor: {
         ...itemNames.it_IT.itemUi.vendor,
@@ -1155,6 +1173,7 @@ export const mergeStrings = {
         tool: 'Werkzeug',
         potion: 'Trank',
         elixir: 'Elixier',
+        bag: 'Tasche',
       },
       tooltip: {
         ...itemNames.de_DE.itemUi.tooltip,
@@ -1166,6 +1185,7 @@ export const mergeStrings = {
         clickUseInstant: 'Zum sofortigen Benutzen im Kampf klicken',
         clickUse: 'Zum Benutzen klicken',
         clickBuyback: 'Zum Rückkaufen klicken',
+        bagSlots: 'Tasche mit {slots} Plätzen',
       },
       vendor: {
         ...itemNames.de_DE.itemUi.vendor,
@@ -1310,7 +1330,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_CN.itemUi,
-      kind: { ...itemNames.zh_CN.itemUi.kind, tool: '工具', potion: '药水', elixir: '药剂' },
+      kind: {
+        ...itemNames.zh_CN.itemUi.kind,
+        tool: '工具',
+        potion: '药水',
+        elixir: '药剂',
+        bag: '背包',
+      },
       tooltip: {
         ...itemNames.zh_CN.itemUi.tooltip,
         useFishing: '使用：在附近水域钓鱼。',
@@ -1319,6 +1345,7 @@ export const mergeStrings = {
         clickUseInstant: '点击在战斗中立即使用',
         clickUse: '点击使用',
         clickBuyback: '点击回购',
+        bagSlots: '{slots}格背包',
       },
       vendor: {
         ...itemNames.zh_CN.itemUi.vendor,
@@ -1462,7 +1489,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.zh_TW.itemUi,
-      kind: { ...itemNames.zh_TW.itemUi.kind, tool: '工具', potion: '藥水', elixir: '藥劑' },
+      kind: {
+        ...itemNames.zh_TW.itemUi.kind,
+        tool: '工具',
+        potion: '藥水',
+        elixir: '藥劑',
+        bag: '背包',
+      },
       tooltip: {
         ...itemNames.zh_TW.itemUi.tooltip,
         useFishing: '使用：在附近水域釣魚。',
@@ -1471,6 +1504,7 @@ export const mergeStrings = {
         clickUseInstant: '點擊在戰鬥中立即使用',
         clickUse: '點擊使用',
         clickBuyback: '點擊買回',
+        bagSlots: '{slots}格背包',
       },
       vendor: {
         ...itemNames.zh_TW.itemUi.vendor,
@@ -1614,7 +1648,13 @@ export const mergeStrings = {
     },
     itemUi: {
       ...itemNames.ko_KR.itemUi,
-      kind: { ...itemNames.ko_KR.itemUi.kind, tool: '도구', potion: '물약', elixir: '비약' },
+      kind: {
+        ...itemNames.ko_KR.itemUi.kind,
+        tool: '도구',
+        potion: '물약',
+        elixir: '비약',
+        bag: '가방',
+      },
       tooltip: {
         ...itemNames.ko_KR.itemUi.tooltip,
         useFishing: '사용: 가까운 물가에서 낚시합니다.',
@@ -1625,6 +1665,7 @@ export const mergeStrings = {
         clickUseInstant: '클릭하여 전투 중 즉시 사용',
         clickUse: '클릭하여 사용',
         clickBuyback: '클릭하여 되사기',
+        bagSlots: '{slots}칸 가방',
       },
       vendor: {
         ...itemNames.ko_KR.itemUi.vendor,
@@ -1774,6 +1815,7 @@ export const mergeStrings = {
         tool: '道具',
         potion: 'ポーション',
         elixir: 'エリクサー',
+        bag: 'バッグ',
       },
       tooltip: {
         ...itemNames.ja_JP.itemUi.tooltip,
@@ -1784,6 +1826,7 @@ export const mergeStrings = {
         clickUseInstant: 'クリックして戦闘中に即使用',
         clickUse: 'クリックして使用',
         clickBuyback: 'クリックして買い戻す',
+        bagSlots: '{slots}スロットバッグ',
       },
       vendor: {
         ...itemNames.ja_JP.itemUi.vendor,
@@ -1937,6 +1980,7 @@ export const mergeStrings = {
         tool: 'Ferramenta',
         potion: 'Poção',
         elixir: 'Elixir',
+        bag: 'Bolsa',
       },
       tooltip: {
         ...itemNames.pt_BR.itemUi.tooltip,
@@ -1948,6 +1992,7 @@ export const mergeStrings = {
         clickUseInstant: 'Clique para usar instantaneamente em combate',
         clickUse: 'Clique para usar',
         clickBuyback: 'Clique para recomprar',
+        bagSlots: 'Bolsa de {slots} espaços',
       },
       vendor: {
         ...itemNames.pt_BR.itemUi.vendor,
@@ -2102,6 +2147,7 @@ export const mergeStrings = {
         tool: 'Инструмент',
         potion: 'Зелье',
         elixir: 'Эликсир',
+        bag: 'Сумка',
       },
       tooltip: {
         ...itemNames.ru_RU.itemUi.tooltip,
@@ -2113,6 +2159,7 @@ export const mergeStrings = {
         clickUseInstant: 'Нажмите, чтобы мгновенно использовать в бою',
         clickUse: 'Нажмите, чтобы использовать',
         clickBuyback: 'Нажмите, чтобы выкупить',
+        bagSlots: 'Сумка на {slots} ячеек',
       },
       vendor: {
         ...itemNames.ru_RU.itemUi.vendor,

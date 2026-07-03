@@ -154,6 +154,11 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "death": {
+      "resurrectAtCorpse": "在屍體旁復活",
+      "resurrectAtHealer": "靈魂醫者（復活虛弱）",
+      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
+    },
     "emotes": {
       "wave": "揮手",
       "laugh": "大笑",
@@ -280,7 +285,10 @@ export const zh_TW: EnTranslations = {
       "targetAnnounce": "目標：{name}",
       "partyLabel": "你的隊伍",
       "partyGroup": "小隊 {n}",
-      "durationUnitSeconds": "秒"
+      "durationUnitSeconds": "秒",
+      "durationUnitMinutes": "分",
+      "durationUnitHours": "時",
+      "durationUnitDays": "天"
     },
     "character": {
       "modelPreview": "角色模型預覽"
@@ -394,6 +402,7 @@ export const zh_TW: EnTranslations = {
       "uiScale": "介面縮放",
       "playerFrameScale": "玩家框縮放",
       "targetFrameScale": "目標框縮放",
+      "aurasOnPlayerFrame": "增益顯示在玩家框",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
       "walkByAutoloot": "路過自動拾取",
@@ -748,7 +757,13 @@ export const zh_TW: EnTranslations = {
       "sortName": "名稱",
       "searchPlaceholder": "搜尋物品",
       "searchAria": "依名稱搜尋背包物品",
-      "noMatch": "沒有符合篩選條件的物品。"
+      "noMatch": "沒有符合篩選條件的物品。",
+      "capacity": "{used}/{total}",
+      "capacityAria": "背包格已用：{used}/{total}",
+      "backpack": "背包",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "空背包欄位",
+      "unequipHint": "點擊移除此背包"
     },
     "raidConvert": {
       "toPartyDone": "你的團隊已轉換回隊伍。",
@@ -791,6 +806,7 @@ export const zh_TW: EnTranslations = {
         "spi": "精神降低 {value}",
         "allStats": "所有屬性降低 {value}"
       },
+      "allStatsPctReduce": "所有屬性降低 {pct}%",
       "dodge": "閃躲機率提高 {pct}%",
       "dodgeReduce": "閃避機率降低 {pct}%",
       "armorFlat": "護甲降低 {value}",
@@ -1141,6 +1157,10 @@ export const zh_TW: EnTranslations = {
           "note": "朝聖者在月中之月下聚於神廟月門。"
         }
       }
+    },
+    "social": {
+      "lastSeen": "最後上線: {when}",
+      "lastSeenNever": "從未"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const zh_TW: EnTranslations = {
       "drink": "飲料",
       "tool": "工具",
       "potion": "藥水",
-      "elixir": "藥劑"
+      "elixir": "藥劑",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "護甲",
@@ -4281,7 +4302,8 @@ export const zh_TW: EnTranslations = {
       "useManaPotion": "使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。",
       "clickUseInstant": "點擊在戰鬥中立即使用",
       "clickUse": "點擊使用",
-      "clickBuyback": "點擊買回"
+      "clickBuyback": "點擊買回",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "背包",
@@ -5583,6 +5605,21 @@ export const zh_TW: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主之冠"
       },
+      "linen_pouch": {
+        "name": "亞麻小袋"
+      },
+      "travelers_knapsack": {
+        "name": "旅行者背囊"
+      },
+      "wolfhide_satchel": {
+        "name": "狼皮挎包"
+      },
+      "gravewoven_bag": {
+        "name": "墓織袋"
+      },
+      "mistcallers_duffel": {
+        "name": "喚霧者行囊"
+      },
       "copper_mining_pick": {
         "name": "銅製採礦鎬"
       },
@@ -6634,6 +6671,11 @@ export const zh_TW: EnTranslations = {
         "name": "哈爾文修士",
         "title": "聖物庫守護人",
         "greeting": "小徑向北延伸。又一座聖物庫，又一場儀式。選擇你的難度，我會為你守住繩索，直到你歸來。"
+      },
+      "spirit_healer": {
+        "name": "靈魂醫者",
+        "title": "亡者的守護者",
+        "greeting": "安息吧，靈魂。我可以讓你重返軀體，但歸途會讓你變得虛弱。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",

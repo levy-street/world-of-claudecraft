@@ -14,6 +14,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  // Guild roster last-seen (M16 non-Latin fill)
+  'hudChrome.social.lastSeen': '最終ログイン: {when}',
+  'hudChrome.social.lastSeenNever': 'なし',
   // Daily rewards (M16 non-Latin fill)
   'hudChrome.dailyRewards.title': 'デイリー報酬',
   'hudChrome.dailyRewards.close': 'デイリー報酬を閉じる',
@@ -77,6 +80,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.frameReset.label': 'フレーム位置をリセット',
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
+  'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',
   'hud.core.mapCanvasLabel': 'マップ',
   'hud.core.mapSummary': '{zone}のマップ。',
   'hudChrome.castBar.playerAria': 'あなたの詠唱バー',
@@ -84,6 +88,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.skipLinks.chat': 'チャットへスキップ',
   'hudChrome.skipLinks.mainHud': 'メインHUDへスキップ',
   'hudChrome.unitFrame.durationUnitSeconds': '秒',
+  'hudChrome.unitFrame.durationUnitMinutes': '分',
+  'hudChrome.unitFrame.durationUnitHours': '時',
+  'hudChrome.unitFrame.durationUnitDays': '日',
   'hudChrome.unitFrame.partyLabel': 'あなたのパーティ',
   'hudChrome.unitFrame.playerLabel': 'あなたのキャラクター',
   'hudChrome.unitFrame.targetAnnounce': 'ターゲット：{name}',
@@ -2206,6 +2213,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.weathered_ledger_page.name': '風化した帳簿のページ',
   'entities.items.morthen_grimoire.name': 'モーセンの魔導書',
   'entities.items.wolf_fang.name': '割れた狼の牙',
+  'entities.items.linen_pouch.name': '亜麻のポーチ',
+  'entities.items.travelers_knapsack.name': '旅人のナップサック',
+  'entities.items.wolfhide_satchel.name': '狼皮のサッチェル',
+  'entities.items.gravewoven_bag.name': '墓織りのバッグ',
+  'entities.items.mistcallers_duffel.name': 'ミストコーラーのダッフル',
   'entities.items.bandit_bandana.name': '赤いバンダナ',
   'entities.items.tough_jerky.name': '硬い干し肉',
   'entities.items.mudfin_scale.name': 'ぬめるマーロックの鱗',
@@ -2476,6 +2488,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_imp.name': '炎の魔物',
   'entities.mobs.warlock_voidwalker.name': '虚無の魔物',
   'entities.mobs.ysolei.name': 'イソレイ、溺月の化身',
+  'hudChrome.death.resurrectAtCorpse': '亡骸で復活',
+  'hudChrome.death.resurrectAtHealer': '霊魂の癒し手（復活の後遺症）',
+  'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
+  'entities.npcs.spirit_healer.name': '霊魂の癒し手',
+  'entities.npcs.spirit_healer.title': '死者の番人',
+  'entities.npcs.spirit_healer.greeting':
+    '安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。',
   'entities.npcs.the_merchant.name': '商人',
   'entities.npcs.the_merchant.title': '世界市場の守り手',
   'entities.npcs.the_merchant.greeting':
@@ -3643,6 +3662,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.searchPlaceholder': 'アイテムを検索',
   'hudChrome.bags.searchAria': '名前でバッグのアイテムを検索',
   'hudChrome.bags.noMatch': '条件に一致するアイテムはありません。',
+  'hudChrome.bags.capacityAria': '使用中のバッグスロット: {total}個中{used}個',
+  'hudChrome.bags.backpack': 'バックパック',
+  'hudChrome.bags.socketEmpty': '空のバッグスロット',
+  'hudChrome.bags.unequipHint': 'クリックしてこのバッグを外す',
   // Guide (/guide) localization.
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -4822,7 +4845,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.companion.upgradeAria': 'デルヴの刻印{marks}個で{name}をランク{rank}に強化',
   'delveUi.board.companion.maxRank': '最大ランク',
   'delveUi.board.tabShop': 'ショップ',
-  // Modular bag filtering controls (hudChrome.bags.*).,
   'lockpickUi.pickTitle': '錠を開ける',
   'lockpickUi.cofferTitle': '豊穣の宝庫',
   'lockpickUi.cache': '{tier}の宝庫',
@@ -4894,6 +4916,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.reduce.sta': '耐久力を{value}低下させる',
   'hudChrome.auraEffect.reduce.spi': '精神力を{value}低下させる',
   'hudChrome.auraEffect.reduce.allStats': 'すべての能力値を{value}低下させる',
+  'hudChrome.auraEffect.allStatsPctReduce': 'すべての能力値を{pct}%低下させる',
   'hudChrome.auraEffect.dodge': '回避率を{pct}%上昇させる',
   'hudChrome.auraEffect.dodgeReduce': '回避率を{pct}%低下させる',
   'hudChrome.auraEffect.armorFlat': '防御力を{value}低下させる',

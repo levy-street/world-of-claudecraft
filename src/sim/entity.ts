@@ -117,6 +117,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     objectItemId: null,
     dungeonId: null,
     dead: false,
+    ghost: false,
+    corpsePos: null,
     scale: 1,
     color: 0xffffff,
     skinCatalog: 'class',
@@ -231,7 +233,18 @@ export function recalcPlayerStats(
       s.int += a.value;
       s.spi += a.value;
     } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
-    else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    else if (a.kind === 'buff_allstats_pct') {
+      // Percentage drain on the whole stat block (Resurrection Sickness: value
+      // -0.75 leaves stats at 25%). Applied to the base + gear total gathered so
+      // far; the only aura that ever carries this kind is player-only, so it never
+      // stacks with another pct drain in practice.
+      const m = 1 + a.value;
+      s.str = Math.round(s.str * m);
+      s.agi = Math.round(s.agi * m);
+      s.sta = Math.round(s.sta * m);
+      s.int = Math.round(s.int * m);
+      s.spi = Math.round(s.spi * m);
+    } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;

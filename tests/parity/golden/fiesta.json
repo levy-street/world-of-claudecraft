@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 393,
+      "nextId": 400,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 397,
-      "state": "d6bf343b",
-      "events": "9d7779bf",
+      "nextId": 404,
+      "state": "88ff4a07",
+      "events": "d1d54493",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,9 +40,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 397,
-      "state": "2bc61445",
-      "events": "e78ed76d",
+      "nextId": 404,
+      "state": "8b93d561",
+      "events": "6e60008d",
       "rng": {
         "draws": 36,
         "digest": "dbad5b7f"
@@ -51,9 +51,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 397,
-      "state": "cf21abc3",
-      "events": "75eb9b15",
+      "nextId": 404,
+      "state": "3f261b87",
+      "events": "9b3dbf7d",
       "rng": {
         "draws": 120,
         "digest": "3ac728b9"
@@ -62,9 +62,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 397,
-      "state": "02e130e9",
-      "events": "65764d55",
+      "nextId": 404,
+      "state": "58f327f9",
+      "events": "e324e10d",
       "rng": {
         "draws": 230,
         "digest": "25e8f179"
@@ -73,9 +73,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 397,
-      "state": "57328f37",
-      "events": "97304d8f",
+      "nextId": 404,
+      "state": "ab41060d",
+      "events": "5461e684",
       "rng": {
         "draws": 384,
         "digest": "2255bc0e"
@@ -84,8 +84,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 397,
-      "state": "08947fcb",
+      "nextId": 404,
+      "state": "d658c2e5",
       "events": "741638a5",
       "rng": {
         "draws": 543,
@@ -95,9 +95,9 @@
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 397,
-      "state": "3a40754c",
-      "events": "57fe2880",
+      "nextId": 404,
+      "state": "511ae8fa",
+      "events": "e6734fa8",
       "rng": {
         "draws": 608,
         "digest": "656f3686"
@@ -108,6 +108,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
@@ -116,7 +122,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 400,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -147,13 +153,19 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 394,
+          "entityId": 401,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -184,6 +196,12 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
@@ -192,7 +210,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 395,
+          "entityId": 402,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -226,13 +244,19 @@
           "activeLoadout": -1,
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 396,
+          "entityId": 403,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -271,7 +295,7 @@
           "dodgeChance": 0.0795,
           "fiveSecondRule": 107.15,
           "hp": 812,
-          "id": 393,
+          "id": 400,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -318,7 +342,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 107.15,
           "hp": 418,
-          "id": 394,
+          "id": 401,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -367,7 +391,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 510,
-          "id": 395,
+          "id": 402,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -417,7 +441,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 848,
-          "id": 396,
+          "id": 403,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

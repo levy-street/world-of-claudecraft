@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 394,
-      "state": "ac23dd75",
+      "nextId": 401,
+      "state": "e879a5f6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -28,13 +28,19 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 400,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -60,7 +66,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 393,
+          "id": 400,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -105,9 +111,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 403,
-      "state": "66dbfd72",
-      "events": "87d6e750",
+      "nextId": 410,
+      "state": "5f428d19",
+      "events": "23be8555",
       "rng": {
         "draws": 1,
         "digest": "8d59a9d6"
@@ -119,13 +125,19 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 400,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -152,7 +164,7 @@
           "fallStartY": 2.077747,
           "fiveSecondRule": 99,
           "hp": 93,
-          "id": 393,
+          "id": 400,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -196,9 +208,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 403,
-      "state": "1c113a93",
-      "events": "455bbb56",
+      "nextId": 410,
+      "state": "35af7534",
+      "events": "c2d0b576",
       "rng": {
         "draws": 1,
         "digest": "8d59a9d6"
@@ -210,13 +222,19 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 400,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -243,7 +261,7 @@
           "fallStartY": 2.353205,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 393,
+          "id": 400,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -288,8 +306,8 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 403,
-      "state": "1c113a93",
+      "nextId": 410,
+      "state": "35af7534",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -302,13 +320,19 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 393,
+          "entityId": 400,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -335,7 +359,7 @@
           "fallStartY": 2.353205,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 393,
+          "id": 400,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

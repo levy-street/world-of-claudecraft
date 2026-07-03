@@ -380,6 +380,52 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 72, str: 5, sta: 4 },
     sellValue: 390,
   },
+  // --- bags (kind:'bag', equip into one of the 4 bag sockets for +bagSlots
+  // pooled inventory capacity; the 16-slot backpack is implicit). Tiered by
+  // quality: common bags are vendor goods, uncommon drops from beasts, rare
+  // and epic from dungeon bosses. See src/sim/bags.ts for the capacity rules. ---
+  linen_pouch: {
+    id: 'linen_pouch',
+    name: 'Linen Pouch',
+    kind: 'bag',
+    quality: 'common',
+    bagSlots: 6,
+    sellValue: 60,
+    buyValue: 250,
+  },
+  travelers_knapsack: {
+    id: 'travelers_knapsack',
+    name: "Traveler's Knapsack",
+    kind: 'bag',
+    quality: 'common',
+    bagSlots: 8,
+    sellValue: 500,
+    buyValue: 2000,
+  },
+  wolfhide_satchel: {
+    id: 'wolfhide_satchel',
+    name: 'Wolfhide Satchel',
+    kind: 'bag',
+    quality: 'uncommon',
+    bagSlots: 10,
+    sellValue: 1200,
+  },
+  gravewoven_bag: {
+    id: 'gravewoven_bag',
+    name: 'Gravewoven Bag',
+    kind: 'bag',
+    quality: 'rare',
+    bagSlots: 12,
+    sellValue: 3500,
+  },
+  mistcallers_duffel: {
+    id: 'mistcallers_duffel',
+    name: "Mistcaller's Duffel",
+    kind: 'bag',
+    quality: 'epic',
+    bagSlots: 14,
+    sellValue: 9000,
+  },
   // --- food & drink (vendor) ---
   baked_bread: {
     id: 'baked_bread',

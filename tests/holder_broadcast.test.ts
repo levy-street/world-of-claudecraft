@@ -6,15 +6,16 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { GameServer, ClientSession } from '../server/game';
+import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
-import { type PlayerClass } from '../src/sim/types';
+import type { PlayerClass } from '../src/sim/types';
 
 interface FakeClient {
   sent: any[];
@@ -33,7 +34,13 @@ function lastSnap(sent: any[]): any {
   return null;
 }
 
-function joinServer(server: GameServer, fc: FakeClient, characterId: number, name: string, cls: PlayerClass = 'warrior'): ClientSession {
+function joinServer(
+  server: GameServer,
+  fc: FakeClient,
+  characterId: number,
+  name: string,
+  cls: PlayerClass = 'warrior',
+): ClientSession {
   const session = server.join(fc.ws, characterId, characterId, name, cls, null);
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
@@ -140,7 +147,7 @@ describe('holder-tier identity broadcast round-trip', () => {
     expect(snap.self).not.toHaveProperty('hb');
   });
 
-  it('round-trips a second player\'s ht/hb through the full entity record both clients see', () => {
+  it("round-trips a second player's ht/hb through the full entity record both clients see", () => {
     // both players spawn together, so each appears in the other's interest set
     const fc2 = fakeWs();
     const other = joinServer(server, fc2, 2, 'Whaley', 'mage');
@@ -169,8 +176,19 @@ describe('holder-tier identity broadcast round-trip', () => {
   it('decodes ht/hb into holderTier and holderBalance on the client entity', () => {
     const client = bareClient(99);
     const wire = {
-      id: 42, k: 'player', tid: 'player', nm: 'Sovereign', lv: 60,
-      x: 0, y: 0, z: 0, f: 0, hp: 100, mhp: 100, ht: 7, hb: 1234567,
+      id: 42,
+      k: 'player',
+      tid: 'player',
+      nm: 'Sovereign',
+      lv: 60,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+      ht: 7,
+      hb: 1234567,
     };
 
     (client as any).applySnapshot({ t: 'snap', ents: [wire] });
@@ -184,8 +202,17 @@ describe('holder-tier identity broadcast round-trip', () => {
     const client = bareClient(99);
     // a full identity record with no holder flair (the common case)
     const wire = {
-      id: 43, k: 'mob', tid: 'forest_wolf', nm: 'Forest Wolf', lv: 1,
-      x: 0, y: 0, z: 0, f: 0, hp: 45, mhp: 45,
+      id: 43,
+      k: 'mob',
+      tid: 'forest_wolf',
+      nm: 'Forest Wolf',
+      lv: 1,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 45,
+      mhp: 45,
     };
 
     (client as any).applySnapshot({ t: 'snap', ents: [wire] });
@@ -199,8 +226,18 @@ describe('holder-tier identity broadcast round-trip', () => {
     const client = bareClient(99);
     // server drops hb when balance is 0 but keeps ht for a pinned/dev tier
     const wire = {
-      id: 44, k: 'player', tid: 'player', nm: 'Tierless', lv: 12,
-      x: 0, y: 0, z: 0, f: 0, hp: 100, mhp: 100, ht: 4,
+      id: 44,
+      k: 'player',
+      tid: 'player',
+      nm: 'Tierless',
+      lv: 12,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+      ht: 4,
     };
 
     (client as any).applySnapshot({ t: 'snap', ents: [wire] });

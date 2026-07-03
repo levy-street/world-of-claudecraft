@@ -7,6 +7,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
@@ -39,6 +40,7 @@ const DELTA_KEYS = [
   'party',
   'trade',
   'duel',
+  'corpse',
 ];
 
 interface FakeClient {
@@ -1831,8 +1833,10 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // 29th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
   'arena',
+  'bags',
   'buyback',
   'cds',
+  'corpse',
   'cosmetics',
   'dclears',
   'dcomp',
@@ -1869,6 +1873,7 @@ const ALL_DELTA_KEYS = [
 // keep their name; tal fans out to several members and is asserted directly).
 const TERSE_TO_IWORLD: Record<string, string> = {
   arena: 'arenaInfo',
+  bags: 'bags',
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
@@ -1991,6 +1996,9 @@ function dirtyEveryDeltaField(): {
   p.weapon = { ...p.weapon, min: 999 };
   p.resource = 42;
   p.maxResource = 150;
+  // corpse: the ghost-run body marker (self-only delta). Non-null = a ghost with a
+  // body to run back to; the encoder reads p.corpsePos via maybe('corpse', ...).
+  p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
 
   // Trade / duel / loot-roll: poke the exact collections the encoder reads.
   sim.trades.set(lp, {
@@ -2133,9 +2141,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 28 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(28);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(28);
+  it('ALL_DELTA_KEYS contains exactly 30 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(30);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(30);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2147,7 +2155,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(28);
+    expect(scraped.size).toBe(30);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

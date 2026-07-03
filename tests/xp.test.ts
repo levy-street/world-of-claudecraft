@@ -14,22 +14,32 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { Sim, CharacterState } from '../src/sim/sim';
-import {
-  MAX_LEVEL, MILESTONES, mobXpValue, virtualLevel, virtualLevelProgress,
-  xpForLevel, xpToReachLevel, zeroDiff,
-  PRESTIGE_XP_PER_RANK, maxPrestigeRank, canPrestige, xpUntilNextPrestige,
-} from '../src/sim/types';
-import { xpBarView, formatXp } from '../src/ui/xp_bar';
 import { GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
+import { type CharacterState, Sim } from '../src/sim/sim';
+import {
+  canPrestige,
+  MAX_LEVEL,
+  MILESTONES,
+  maxPrestigeRank,
+  mobXpValue,
+  PRESTIGE_XP_PER_RANK,
+  virtualLevel,
+  virtualLevelProgress,
+  xpForLevel,
+  xpToReachLevel,
+  xpUntilNextPrestige,
+  zeroDiff,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { formatXp, xpBarView } from '../src/ui/xp_bar';
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42): Sim {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -37,18 +47,25 @@ function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42): Sim 
 
 function nearestMob(sim: Sim) {
   const p = sim.player;
-  let best: any = null, bestD = Infinity;
+  let best: any = null,
+    bestD = Infinity;
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead) continue;
-    const dx = p.pos.x - e.pos.x, dz = p.pos.z - e.pos.z;
+    const dx = p.pos.x - e.pos.x,
+      dz = p.pos.z - e.pos.z;
     const d = Math.hypot(dx, dz);
-    if (d < bestD) { bestD = d; best = e; }
+    if (d < bestD) {
+      bestD = d;
+      best = e;
+    }
   }
   return best;
 }
 
 function teleport(sim: Sim, e: any, x: number, z: number) {
-  e.pos.x = x; e.pos.z = z; e.pos.y = terrainHeight(x, z, sim.cfg.seed);
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = terrainHeight(x, z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
 }
 
@@ -60,7 +77,8 @@ describe('virtual-level curve', () => {
   it('below the cap, virtual level equals the real level', () => {
     for (let level = 1; level <= MAX_LEVEL; level++) {
       // lifetime XP to *reach* this level, plus a little into the bar
-      const lifetime = xpToReachLevel(level) + (level < MAX_LEVEL ? Math.floor(xpForLevel(level) / 2) : 0);
+      const lifetime =
+        xpToReachLevel(level) + (level < MAX_LEVEL ? Math.floor(xpForLevel(level) / 2) : 0);
       expect(virtualLevel(lifetime)).toBe(level);
     }
   });
@@ -123,7 +141,10 @@ describe('solo grantXp at the cap', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     let expected = sim.lifetimeXp;
-    for (let i = 0; i < 50; i++) { sim.grantXp(1000); expected += 1000; }
+    for (let i = 0; i < 50; i++) {
+      sim.grantXp(1000);
+      expected += 1000;
+    }
     expect(sim.lifetimeXp).toBe(expected);
     expect(virtualLevel(sim.lifetimeXp)).toBeGreaterThan(MAX_LEVEL);
   });
@@ -238,7 +259,9 @@ describe('cosmetic milestones', () => {
     sim.events.length = 0;
     sim.grantXp(first.lifetimeXp + 1);
     expect(sim.unlockedMilestones).toContain(first.id);
-    expect(sim.events.some((e: any) => e.type === 'milestoneUnlocked' && e.milestoneId === first.id)).toBe(true);
+    expect(
+      sim.events.some((e: any) => e.type === 'milestoneUnlocked' && e.milestoneId === first.id),
+    ).toBe(true);
   });
 
   it('does not re-unlock a milestone already earned', () => {
@@ -298,22 +321,22 @@ describe('prestige anti-abuse gate (server-locked rank)', () => {
     // simulate a hacked client hammering the prestige command 100×
     let successes = 0;
     for (let i = 0; i < 100; i++) if (sim.prestige()) successes++;
-    expect(successes).toBe(3);          // only as many as the earned XP supports
-    expect(sim.prestigeRank).toBe(3);   // never beyond the XP-backed cap
+    expect(successes).toBe(3); // only as many as the earned XP supports
+    expect(sim.prestigeRank).toBe(3); // never beyond the XP-backed cap
     expect(sim.lifetimeXp).toBeGreaterThanOrEqual(xpToReachLevel(MAX_LEVEL)); // lifetime untouched by prestige
   });
 
   it('unlocks the next rank only after earning another full bar', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
-    sim.grantXp(PRESTIGE_XP_PER_RANK);     // exactly one bar
-    expect(sim.prestige()).toBe(true);     // rank 1
-    expect(sim.prestige()).toBe(false);    // no XP left for rank 2
+    sim.grantXp(PRESTIGE_XP_PER_RANK); // exactly one bar
+    expect(sim.prestige()).toBe(true); // rank 1
+    expect(sim.prestige()).toBe(false); // no XP left for rank 2
     expect(sim.prestigeRank).toBe(1);
     expect(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank)).toBe(PRESTIGE_XP_PER_RANK);
-    sim.grantXp(PRESTIGE_XP_PER_RANK);     // earn another bar
+    sim.grantXp(PRESTIGE_XP_PER_RANK); // earn another bar
     expect(canPrestige(MAX_LEVEL, sim.lifetimeXp, sim.prestigeRank)).toBe(true);
-    expect(sim.prestige()).toBe(true);     // rank 2
+    expect(sim.prestige()).toBe(true); // rank 2
     expect(sim.prestigeRank).toBe(2);
   });
 
@@ -370,9 +393,16 @@ describe('xp-bar label states', () => {
   });
 
   it('at-cap with overflow shows the virtual-level bar starting at +0', () => {
-    const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: xpToReachLevel(MAX_LEVEL), showOverflow: true });
+    const v = xpBarView({
+      level: MAX_LEVEL,
+      xp: 0,
+      lifetimeXp: xpToReachLevel(MAX_LEVEL),
+      showOverflow: true,
+    });
     expect(v.postCap).toBe(true);
-    expect(v.label).toBe(`Lv 20 (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`);
+    expect(v.label).toBe(
+      `Lv 20 (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`,
+    );
   });
 
   it('post-cap shows virtual level, total, and percent to next', () => {
@@ -385,13 +415,23 @@ describe('xp-bar label states', () => {
   it('post-cap fill fraction advances within the virtual level', () => {
     const base = xpToReachLevel(27);
     const span = xpToReachLevel(28) - xpToReachLevel(27);
-    const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: base + Math.floor(span * 0.5), showOverflow: true });
+    const v = xpBarView({
+      level: MAX_LEVEL,
+      xp: 0,
+      lifetimeXp: base + Math.floor(span * 0.5),
+      showOverflow: true,
+    });
     expect(v.fillFrac).toBeCloseTo(0.5, 1);
-    expect(v.label).toMatch(/Lv 20 \(\+7\)  ·  .* total XP  ·  \d+% to next/);
+    expect(v.label).toMatch(/Lv 20 \(\+7\) {2}· {2}.* total XP {2}· {2}\d+% to next/);
   });
 
   it('classic "MAX LEVEL" when overflow display is turned off', () => {
-    const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: xpToReachLevel(25), showOverflow: false });
+    const v = xpBarView({
+      level: MAX_LEVEL,
+      xp: 0,
+      lifetimeXp: xpToReachLevel(25),
+      showOverflow: false,
+    });
     expect(v.postCap).toBe(false);
     expect(v.label).toBe(`MAX LEVEL  ·  ${formatXp(xpToReachLevel(25))} total XP`);
   });
@@ -440,7 +480,10 @@ describe('online ClientWorld path', () => {
   });
 
   it('post-cap lifetimeXp and prestige reach the client via snapshot', () => {
-    const fc = { sent: [] as any[], ws: { readyState: 1, send: (p: string) => fc.sent.push(JSON.parse(p)) } };
+    const fc = {
+      sent: [] as any[],
+      ws: { readyState: 1, send: (p: string) => fc.sent.push(JSON.parse(p)) },
+    };
     const session = server.join(fc.ws as any, 1, 1, 'Hilda', 'warrior', null);
     if ('error' in session) throw new Error(session.error);
 

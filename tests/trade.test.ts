@@ -52,7 +52,15 @@ function makeTradeCtx() {
       bag(pid!).set(itemId, Math.max(0, (bag(pid!).get(itemId) ?? 0) - count)),
   } as unknown as SimContext;
   function addPlayer(pid: number, name: string, x: number, copper: number) {
-    players.set(pid, { entityId: pid, name, copper });
+    // inventory/bags are the real PlayerMeta fields the capacity gate reads at
+    // tradeConfirm (the swap simulation); the hub Map above stays the item store.
+    players.set(pid, {
+      entityId: pid,
+      name,
+      copper,
+      inventory: [],
+      bags: [null, null, null, null],
+    });
     entities.set(pid, { id: pid, pos: { x, y: 0, z: 0 }, dead: false });
   }
   return {

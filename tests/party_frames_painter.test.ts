@@ -8,7 +8,12 @@
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PainterHostWriters } from '../src/ui/painter_host';
-import { createPartyRow, type PartyRowSlot, partyRowHandlers } from '../src/ui/party_frame_row';
+import {
+  createPartyRow,
+  type PartyRowAuraDeps,
+  type PartyRowSlot,
+  partyRowHandlers,
+} from '../src/ui/party_frame_row';
 import type { PartyFrameMember } from '../src/ui/party_frames';
 import { PartyFramesPainter } from '../src/ui/party_frames_painter';
 
@@ -220,6 +225,23 @@ function recordingFacet() {
   return { calls, writers };
 }
 
+// Deterministic aura deps for the rows' mini strips: icon key = the aura id,
+// name echoed, no i18n/icon runtime (the real host injects the Hud's deps).
+const auraDeps: PartyRowAuraDeps = {
+  view: {
+    iconId: (a) => a.id,
+    auraName: (a) => a.name,
+    formatStacks: (n) => String(n),
+    durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
+    auraEffectHtml: () => '',
+  },
+  painter: {
+    resolveIconUrl: (k) => `url(${k})`,
+    renderTooltip: (name) => name,
+    attachTooltip: () => {},
+  },
+};
+
 const member = (over: Partial<PartyFrameMember> & { pid: number }): PartyFrameMember => ({
   name: `P${over.pid}`,
   cls: 'priest',
@@ -245,6 +267,7 @@ describe('createPartyRow: decorative badges + relocalize hook (a11y + live langu
       recordingFacet().writers,
       { onTarget() {}, onContextMenu() {} },
       member({ pid: 1 }),
+      auraDeps,
     );
 
   it('builds a keyboard-focusable button row (role=button + tabindex 0) so the global focus ring + keydown apply', () => {
@@ -310,6 +333,7 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
           leftParty++;
         },
         leaveLabel: () => 'Leave Party',
+        partyAuras: auraDeps,
       },
       fakeDoc,
     );
@@ -346,6 +370,36 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rowB.listeners.click).toHaveLength(1); // NOT re-attached
     rowB.fire('click', {});
     expect(targeted).toEqual([9]); // the live slot, not the stale Alice (pid 2)
+  });
+
+  it('paints each member aura strip (one icon per wire aura) and re-syncs it on a set change', () => {
+    painter.sync(
+      [
+        member({
+          pid: 2,
+          auras: [
+            { id: 'power_word_shield', kind: 'absorb' },
+            { id: 'rend', kind: 'dot' },
+          ],
+        }),
+      ],
+      1,
+      false,
+    );
+    const row = rows()[0];
+    const strip = row.childNodes.find((c: FakeEl) =>
+      String(c.className).includes('pfm-auras'),
+    ) as FakeEl;
+    expect(strip).toBeTruthy();
+    const icons = () =>
+      strip.childNodes.filter((c: FakeEl) => String(c.className).includes('buff'));
+    expect(icons()).toHaveLength(2);
+    // the shield wears off: the strip's keyed pool detaches its node
+    painter.sync([member({ pid: 2, auras: [{ id: 'rend', kind: 'dot' }] })], 1, false);
+    expect(icons()).toHaveLength(1);
+    // a member with no auras (or an older server omitting the field) paints an empty strip
+    painter.sync([member({ pid: 2 })], 1, false);
+    expect(icons()).toHaveLength(0);
   });
 
   it('orders rows in member order with the leave button last', () => {

@@ -98,12 +98,19 @@ describe('i18n status registry: universe coverage', () => {
 
 describe('i18n status registry: enHash re-derivation (independent)', () => {
   it('each enHash == contentHash(englishText, sortedPlaceholders) recomputed from source', () => {
+    // Accumulate violations and assert ONCE: a per-row expect() over the ~5k-key
+    // universe costs seconds of matcher overhead and trips the default per-test
+    // timeout on a loaded runner, for identical semantics.
     const expected = expectedUniverse();
+    const violations: string[] = [];
     for (const [ck, enVal] of expected) {
       const row = registry.keys[ck];
-      expect(row.enHash, `${ck} enHash mismatch`).toBe(contentHash(enVal, placeholdersOf(enVal)));
-      expect(row.placeholders, `${ck} placeholders`).toEqual(placeholdersOf(enVal));
+      if (row.enHash !== contentHash(enVal, placeholdersOf(enVal)))
+        violations.push(`${ck} enHash mismatch`);
+      if (JSON.stringify(row.placeholders) !== JSON.stringify(placeholdersOf(enVal)))
+        violations.push(`${ck} placeholders`);
     }
+    expect(violations).toEqual([]);
   });
 });
 
@@ -169,12 +176,18 @@ describe('i18n status registry: states', () => {
   });
 
   it('every translated row is fresh (srcHash === enHash) and attributed (by human|agent)', () => {
-    for (const [, entry] of keyEntries())
-      for (const row of Object.values<any>(entry.locales)) {
+    // Accumulate violations and assert ONCE: this walks ~100k locale rows, and a
+    // per-row expect() pair (~200k matcher calls) took ~6s, past the default 5s
+    // per-test budget on a loaded runner (the flake seen in full-suite runs).
+    // Plain JS checks keep it in milliseconds with identical semantics.
+    const violations: string[] = [];
+    for (const [ck, entry] of keyEntries())
+      for (const [loc, row] of Object.entries<any>(entry.locales)) {
         if (row.state !== 'translated') continue;
-        expect(row.srcHash).toBe(entry.enHash);
-        expect(['human', 'agent']).toContain(row.by);
+        if (row.srcHash !== entry.enHash) violations.push(`${ck} ${loc} stale srcHash`);
+        if (row.by !== 'human' && row.by !== 'agent') violations.push(`${ck} ${loc} unattributed`);
       }
+    expect(violations).toEqual([]);
   });
 });
 
@@ -205,12 +218,16 @@ describe('i18n status registry: blocked rows are load-bearing (no over-allow)', 
   });
 
   it('only server/admin scopes carry blocked rows (main/sim carry none)', () => {
+    // Same accumulate-then-assert-once shape as the freshness walk above.
+    const violations: string[] = [];
     for (const [ck, entry] of keyEntries()) {
       const scope = ck.slice(0, ck.indexOf(':'));
       if (scope === 'server' || scope === 'admin') continue;
       for (const row of Object.values<any>(entry.locales))
-        expect(row.state, `${ck} unexpected blocked row in scope ${scope}`).not.toBe('blocked');
+        if (row.state === 'blocked')
+          violations.push(`${ck} unexpected blocked row in scope ${scope}`);
     }
+    expect(violations).toEqual([]);
   });
 
   it('every blockedSource entry is a unique sim-channel string with a reason', () => {

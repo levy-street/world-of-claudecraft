@@ -235,10 +235,12 @@
       <div class="uf-bars">
         <div class="uf-name" id="tf-name"></div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
+        <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
-        <div class="uf-buffs" id="tf-debuffs"></div>
+        <div class="combo-row" id="combo-row"></div>
       </div>
+      <div class="uf-buffs" id="tf-debuffs"></div>
     </div>
 
     <div id="party-frames" role="group" data-i18n-aria="hudChrome.unitFrame.partyLabel" aria-label="Your Band"></div>
@@ -416,6 +418,7 @@
     <div id="tooltip" class="panel"></div>
 
     <div id="error-msg"></div>
+    <div id="quest-banner" aria-hidden="true"></div>
     <div id="banner"></div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner"></div>
@@ -423,6 +426,12 @@
     <div id="death-overlay">
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>
       <button type="button" class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+    </div>
+    <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
+         only when in reach of the corpse or the Pale Keeper. -->
+    <div id="ghost-prompt">
+      <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
+      <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
   </div>
 

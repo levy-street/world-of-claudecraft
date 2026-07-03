@@ -21,7 +21,7 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
-import { GAMEPAD_BUTTON_LABELS, GAMEPAD_NONE } from '../game/gamepad_map';
+import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
 import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
@@ -271,6 +271,13 @@ export class OptionsWindow {
    *  normalized position into the open panel's sliders so they do not lag the drag. */
   onPerfOverlayMoved(x: number, y: number): void {
     this.perfSettings?.syncPosition(x, y);
+  }
+
+  /** Called by main.ts when a pad connects/disconnects: re-render the Controller
+   *  sub-view in place if it is open, so the button glyphs switch to the newly
+   *  detected brand without the player reopening the panel. A no-op otherwise. */
+  refreshControllerLabels(): void {
+    if (this.isOpen && this.view === 'controller') this.renderController();
   }
 
   // -------------------------------------------------------------------------
@@ -1190,12 +1197,13 @@ export class OptionsWindow {
 
     if (hooks) {
       const opts = this.gamepadActionOptions();
+      const kind = hooks.gamepad.kind();
       for (const { button, action } of hooks.gamepad.entries()) {
         const row = document.createElement('div');
         row.className = 'set-row';
         const name = document.createElement('span');
         name.className = 'set-name';
-        const buttonLabel = GAMEPAD_BUTTON_LABELS[button] ?? `#${button}`;
+        const buttonLabel = gamepadButtonLabel(button, kind);
         name.textContent = buttonLabel;
         // Name the remap listbox after the physical button it rebinds (WCAG 4.1.2):
         // the visible set-name span is not programmatically linked, so the dropdown

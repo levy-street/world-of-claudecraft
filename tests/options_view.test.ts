@@ -249,6 +249,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'startAttackOnAbilityUse',
       'walkByAutoloot',
       'groundReticle',
+      'aurasOnPlayerFrame',
       'showItemLevel',
       'showSecondaryActionBar',
     ]);

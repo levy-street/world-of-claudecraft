@@ -326,16 +326,24 @@ function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity):
   return true;
 }
 
+// Returns true when the item was consumed off the corpse (a roll started, a
+// round-robin winner took it, or it landed in the looter's bags); false when
+// the looter-takes-all direct grant found the looter's bags full, so the
+// caller leaves it on the corpse. The roll and round-robin paths are not
+// capacity-gated: those grants force-add (items are never destroyed, and the
+// looter cannot free space on the winner's behalf).
 export function awardSharedLootItem(
   ctx: SimContext,
   itemId: string,
   mob: Entity,
   looter: PlayerMeta,
-): void {
-  if (startMasterLootRoll(ctx, itemId, mob)) return;
-  if (startNeedGreedRoll(ctx, itemId, mob)) return;
-  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return;
+): boolean {
+  if (startMasterLootRoll(ctx, itemId, mob)) return true;
+  if (startNeedGreedRoll(ctx, itemId, mob)) return true;
+  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
+  if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
   ctx.addItem(itemId, 1, looter.entityId);
+  return true;
 }
 
 // Open need-greed rolls the given player may still answer. Mirrors the

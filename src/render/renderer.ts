@@ -696,6 +696,9 @@ function sleep(ms: number): Promise<void> {
 
 export class Renderer {
   scene = new THREE.Scene();
+  // A soft light pillar marking the local player's corpse during the ghost run.
+  // Built lazily on first death, then just repositioned/toggled (no per-frame alloc).
+  private corpseBeacon: THREE.Mesh | null = null;
   camera: THREE.PerspectiveCamera;
   webgl: THREE.WebGLRenderer;
   views = new Map<number, EntityView>();
@@ -4033,6 +4036,14 @@ export class Renderer {
         // hidden until its shaders finish linking off-thread (async-compile gate);
         // the object branch below may still re-hide loot
         v.group.visible = !v.compilePending;
+        // The graveyard resurrection angel is present only to a released spirit: hide
+        // it from the living local player. It stays in the sim for the ghost and for
+        // server-side resurrect-range checks, and other ghosts still see it. The
+        // continue also skips its holy shimmer and ghost pass below.
+        if (e.templateId === 'spirit_healer' && !p.ghost) {
+          v.group.visible = false;
+          continue;
+        }
         // mid-distance rigs keep rendering but leave the shadow pass
         const wantShadow = d2 < shadowRangeSq;
         const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
@@ -4215,7 +4226,9 @@ export class Renderer {
       const ghost =
         ghostWolf ||
         shouldRenderStealthGhost(this.sim.playerId, e) ||
-        e.templateId.startsWith('vision_');
+        e.templateId.startsWith('vision_') ||
+        e.ghost || // a released player spirit renders translucent (the ghost run)
+        e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
       active.setGhost(ghost);
       active.setSoulRend(characterSoulRendActive(e));
       v.visual.root.visible = active === v.visual;
@@ -4239,7 +4252,9 @@ export class Renderer {
       v.lastZ = az;
       const loco = updateLocomotion(v.loco, vx, vz, facing, dt);
       const moving = loco.moving;
-      const visuallyDead = isVisuallyDead(e);
+      // A released spirit is `dead` but should stand and run, not lie prone, so it
+      // animates as a living figure (only its translucent ghost material marks it).
+      const visuallyDead = isVisuallyDead(e) && !e.ghost;
       // `onGround` is authoritative offline but is never sent in online snapshots
       // (ClientWorld defaults it to true), so for players fall back to deriving the
       // airborne state from foot height vs terrain — keeps the jump pose working in
@@ -4336,6 +4351,8 @@ export class Renderer {
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
         this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
       }
+      // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
+      if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
       if (swimming) this.vfx.swimRipple(v.group.position, moving ? dt * 3 : dt);
 
       // skip the draw for off-screen rigs (pose/audio above already ran)
@@ -4443,6 +4460,33 @@ export class Renderer {
       }
     }
     markPhase('entities');
+
+    // Corpse beacon: a soft light pillar over the local player's body while their
+    // spirit runs back to it (the ghost run). Built once, then just repositioned.
+    {
+      const self = this.sim.player;
+      const corpse = self?.dead && self.ghost ? self.corpsePos : null;
+      if (corpse) {
+        if (!this.corpseBeacon) {
+          const geo = new THREE.CylinderGeometry(0.25, 0.25, 14, 8, 1, true);
+          const mat = new THREE.MeshBasicMaterial({
+            color: 0xbfe6ff,
+            transparent: true,
+            opacity: 0.3,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+            blending: THREE.AdditiveBlending,
+          });
+          this.corpseBeacon = new THREE.Mesh(geo, mat);
+          this.corpseBeacon.renderOrder = 2;
+          this.scene.add(this.corpseBeacon);
+        }
+        this.corpseBeacon.visible = true;
+        this.corpseBeacon.position.set(corpse.x, corpse.y + 7, corpse.z);
+      } else if (this.corpseBeacon) {
+        this.corpseBeacon.visible = false;
+      }
+    }
 
     let worldStart = performance.now();
 
@@ -5125,6 +5169,10 @@ export class Renderer {
           if (hitView && !hitView.group.visible) break;
           const e = this.sim.entities.get(id);
           if (e?.kind === 'object' && !e.lootable) return null;
+          // The graveyard angel is hidden from the living, so it must not be
+          // click-pickable either (the capsule proxy ignores `visible`): skip it
+          // unless the local player is a released spirit.
+          if (e?.templateId === 'spirit_healer' && !this.sim.player?.ghost) break;
           return id;
         }
         o = o.parent;

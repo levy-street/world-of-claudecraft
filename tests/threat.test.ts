@@ -1470,7 +1470,9 @@ describe('shaman travel and shock mechanics', () => {
 
     (sim as any).dealDamage(wolf, sim.player, sim.player.hp, false, 'physical', null, 'hit', true);
     expect(sim.player.dead).toBe(true);
+    // release rises as a ghost at a graveyard; the angel there resurrects to life
     sim.releaseSpirit();
+    sim.resurrectAtSpiritHealer();
     expect(sim.player.dead).toBe(false);
     expect(sim.player.autoAttack).toBe(false);
 

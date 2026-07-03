@@ -115,10 +115,20 @@ class FakeDb implements SocialDb {
     const m = this.members.get(c);
     if (m) m.rank = rank;
   }
-  async guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]> {
+  private lastLogins = new Map<number, string>();
+  setLastLogin(id: number, iso: string): void {
+    this.lastLogins.set(id, iso);
+  }
+  async guildMembers(
+    guildId: number,
+  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]> {
     return [...this.members.entries()]
       .filter(([, m]) => m.guildId === guildId)
-      .map(([cid, m]) => ({ ...this.chars.get(cid)!, rank: m.rank }));
+      .map(([cid, m]) => ({
+        ...this.chars.get(cid)!,
+        rank: m.rank,
+        lastLogin: this.lastLogins.get(cid) ?? null,
+      }));
   }
   guildCount(): number {
     return this.guilds.size;
@@ -430,6 +440,19 @@ describe('guilds', () => {
     expect(snap.guild?.name).toBe('Iron Vanguard');
     expect(snap.guild?.rank).toBe('leader');
     expect(snap.guild?.members.map((m) => m.name)).toEqual(['Aleph']);
+  });
+
+  it('carries each guild member last_login through the snapshot', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    const iso = '2026-07-03T12:00:00.000Z';
+    h.db.setLastLogin(2, iso);
+    const snap = await h.svc.snapshot(1);
+    const bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    const aleph = snap.guild?.members.find((m) => m.name === 'Aleph');
+    expect(bet?.lastLogin).toBe(iso);
+    expect(aleph?.lastLogin).toBeNull(); // never stamped
   });
 
   it("refreshes guildmates' panels when a member comes online, even non-friends (#100)", async () => {

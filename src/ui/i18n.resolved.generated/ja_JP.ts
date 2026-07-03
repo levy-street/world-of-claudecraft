@@ -154,6 +154,11 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "death": {
+      "resurrectAtCorpse": "亡骸で復活",
+      "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
+      "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
+    },
     "emotes": {
       "wave": "手を振る",
       "laugh": "大笑い",
@@ -280,7 +285,10 @@ export const ja_JP: EnTranslations = {
       "targetAnnounce": "ターゲット：{name}",
       "partyLabel": "あなたのパーティ",
       "partyGroup": "グループ {n}",
-      "durationUnitSeconds": "秒"
+      "durationUnitSeconds": "秒",
+      "durationUnitMinutes": "分",
+      "durationUnitHours": "時",
+      "durationUnitDays": "日"
     },
     "character": {
       "modelPreview": "キャラクターモデルプレビュー"
@@ -394,6 +402,7 @@ export const ja_JP: EnTranslations = {
       "uiScale": "UIスケール",
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
+      "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "walkByAutoloot": "通りがかり自動ルート",
@@ -748,7 +757,13 @@ export const ja_JP: EnTranslations = {
       "sortName": "名前",
       "searchPlaceholder": "アイテムを検索",
       "searchAria": "名前でバッグのアイテムを検索",
-      "noMatch": "条件に一致するアイテムはありません。"
+      "noMatch": "条件に一致するアイテムはありません。",
+      "capacity": "{used}/{total}",
+      "capacityAria": "使用中のバッグスロット: {total}個中{used}個",
+      "backpack": "バックパック",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "空のバッグスロット",
+      "unequipHint": "クリックしてこのバッグを外す"
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -791,6 +806,7 @@ export const ja_JP: EnTranslations = {
         "spi": "精神力を{value}低下させる",
         "allStats": "すべての能力値を{value}低下させる"
       },
+      "allStatsPctReduce": "すべての能力値を{pct}%低下させる",
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
       "armorFlat": "防御力を{value}低下させる",
@@ -1141,6 +1157,10 @@ export const ja_JP: EnTranslations = {
           "note": "月半ばの月の下、巡礼者が神殿の月門に集う。"
         }
       }
+    },
+    "social": {
+      "lastSeen": "最終ログイン: {when}",
+      "lastSeenNever": "なし"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const ja_JP: EnTranslations = {
       "drink": "飲み物",
       "tool": "道具",
       "potion": "ポーション",
-      "elixir": "エリクサー"
+      "elixir": "エリクサー",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "防御力",
@@ -4281,7 +4302,8 @@ export const ja_JP: EnTranslations = {
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
-      "clickBuyback": "クリックして買い戻す"
+      "clickBuyback": "クリックして買い戻す",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "バッグ",
@@ -5583,6 +5605,21 @@ export const ja_JP: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主の王冠"
       },
+      "linen_pouch": {
+        "name": "亜麻のポーチ"
+      },
+      "travelers_knapsack": {
+        "name": "旅人のナップサック"
+      },
+      "wolfhide_satchel": {
+        "name": "狼皮のサッチェル"
+      },
+      "gravewoven_bag": {
+        "name": "墓織りのバッグ"
+      },
+      "mistcallers_duffel": {
+        "name": "ミストコーラーのダッフル"
+      },
       "copper_mining_pick": {
         "name": "銅の採掘ピック"
       },
@@ -6634,6 +6671,11 @@ export const ja_JP: EnTranslations = {
         "name": "ハルヴェン修道士",
         "title": "聖遺物庫の番人",
         "greeting": "道は北へ続いていた。また聖遺物庫、また儀式。難易度を選べ、お前が戻るまで縄を握っていよう。"
+      },
+      "spirit_healer": {
+        "name": "霊魂の癒し手",
+        "title": "死者の番人",
+        "greeting": "安らかに、魂よ。亡骸に戻すことはできるが、戻る道のりで弱ってしまうだろう。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",

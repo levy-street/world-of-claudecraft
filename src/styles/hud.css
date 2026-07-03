@@ -463,6 +463,21 @@
   #target-frame > :not(.tf-move-btn) {
     zoom: var(--target-frame-scale, 1);
   }
+  /* The target's debuff strip hangs BELOW the frame (WoW-style) instead of
+     living inside the uf-bars panel, where every fresh debuff used to stretch
+     the frame taller. A direct #target-frame child (index.html), absolutely
+     anchored under the frame, wrapping left-to-right from its left edge, and
+     sharing the children-zoom scale above. */
+  #target-frame > #tf-debuffs {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 100%;
+    pointer-events: auto;
+  }
   /* Movable unit frames: the small corner toggle (built by MovableFrame in
      movable_frame.ts) that unlocks
      the frame for dragging and locks it back. Sits just outside the top-right
@@ -651,6 +666,10 @@
     left: auto;
     right: -3px;
   }
+  /* The target's power bar rail is ALWAYS present (classic WoW look): a
+     resource-less target (a plain beast) keeps every type class off, its fill
+     scales to zero, and the empty dark rail stays under the health bar, so the
+     frame never changes height between a caster and a beast. */
   /* "resting" zZz marker on the player portrait while seated / eating / drinking */
   .rest-indicator {
     position: absolute;
@@ -871,6 +890,48 @@
     gap: 4px;
     max-width: 320px;
     pointer-events: auto;
+  }
+  /* Buffs on the Player Frame (aurasOnPlayerFrame): hud.ts reparents the BUFF
+     row into #player-frame, where it inherits its position and children-zoom
+     scale. Docked, the row sits ABOVE the frame (the xp/action bars live
+     below); moved (pf-detached), it sits BELOW it, reading like the target
+     frame's debuff strip. The row runs left-to-right from the frame's left edge. */
+  #player-frame > #buff-bar {
+    right: auto;
+    left: 0;
+    top: auto;
+    bottom: calc(100% + 8px);
+    flex-direction: row;
+    max-width: 100%;
+  }
+  #player-frame.pf-detached > #buff-bar {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  /* With the buff row anchored to the frame, the player's own debuffs slide up
+     beside the minimap into the vacated top spot (classic WoW's debuff corner),
+     keeping the right-to-left stacking and wrapping downward from there. */
+  body.auras-on-frame #debuff-bar {
+    top: 14px;
+  }
+  /* Party member mini aura strip: each row's own buffs/debuffs (the compact
+     wire summaries) as small icons under the bars. The .buff nodes reuse the
+     aura pool's styling; sized down here, with the (always empty) duration and
+     stacks labels hidden so the icons stay square. */
+  .party-frame .pfm-auras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 2px;
+    pointer-events: auto;
+  }
+  .pfm-auras .buff {
+    width: 16px;
+    height: 16px;
+  }
+  .pfm-auras .buff .dur,
+  .pfm-auras .buff .stacks {
+    display: none;
   }
   .buff {
     width: 28px;
@@ -3488,6 +3549,36 @@
     letter-spacing: 1px;
     white-space: nowrap;
   }
+  /* The quest-progress flash (quest_progress_banner.ts): small yellow lines
+     stacked at the top-center, above the zone banner's slot, the classic
+     "Forest Wolf slain: 3/8" cue. Lines are appended by the banner module and
+     fade out on their own timers. */
+  #quest-banner {
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+    z-index: 7;
+  }
+  .quest-banner-line {
+    color: #ffd100;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow:
+      0 0 10px #00000088,
+      1px 1px 3px #000;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+  }
+  .quest-banner-line.fade {
+    opacity: 0;
+  }
   #subzone-banner {
     position: absolute;
     left: 50%;
@@ -3573,6 +3664,29 @@
     flex-direction: column;
     gap: 18px;
     z-index: 30;
+  }
+  /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
+     reach of its corpse or a Spirit Healer. pointer-events:none on the panel so a ghost
+     moves and clicks the world freely; only the buttons themselves are clickable. */
+  #ghost-prompt {
+    position: absolute;
+    left: 50%;
+    bottom: 22%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 30;
+    pointer-events: none;
+  }
+  #ghost-prompt .btn {
+    pointer-events: auto;
+  }
+  #death-overlay .btn[disabled],
+  #ghost-prompt .btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
   #death-overlay h2 {
     color: #ddd;

@@ -26,6 +26,7 @@ import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { tunedXpAmount } from '../game_config';
+import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
@@ -476,7 +477,10 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);
-  e.auras = [];
+  // The Keeper's Toll (Resurrection Sickness) is the one debuff that survives death: it
+  // must not be sheddable by dying and releasing the spirit. Only a player ever carries
+  // it, so mobs still clear fully.
+  e.auras = aurasSurvivingDeath(e.auras);
   e.ccDr.clear();
   e.castingAbility = null;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });

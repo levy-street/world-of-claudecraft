@@ -23,6 +23,7 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
+import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { questFallbackGrants } from '../quest_fallback';
@@ -194,6 +195,19 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
   if (!nearby.npc) {
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.');
     return;
+  }
+  // Capacity gate (classic): the reward must fit AFTER the collect items are
+  // handed in, so simulate the hand-in on a scratch copy before committing.
+  const rewardItem = questRewardItemId(quest, meta.cls);
+  if (rewardItem) {
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    for (const obj of quest.objectives) {
+      if (obj.type === 'collect' && obj.itemId) removeStacked(scratch, obj.itemId, obj.count);
+    }
+    if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
+      bagsFullError(ctx, meta.entityId);
+      return;
+    }
   }
 
   turnInQuestCore(ctx, questId, quest, meta);

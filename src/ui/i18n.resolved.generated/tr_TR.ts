@@ -154,6 +154,11 @@ export const tr_TR: EnTranslations = {
     "spectate": {
       "banner": "{name} izleniyor"
     },
+    "death": {
+      "resurrectAtCorpse": "Resurrect at Corpse",
+      "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
+      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
     "emotes": {
       "wave": "El Salla",
       "laugh": "LOL",
@@ -280,7 +285,10 @@ export const tr_TR: EnTranslations = {
       "targetAnnounce": "{name} hedefini işaretle",
       "partyLabel": "Takımın",
       "partyGroup": "Grup {n}",
-      "durationUnitSeconds": "sn"
+      "durationUnitSeconds": "sn",
+      "durationUnitMinutes": "m",
+      "durationUnitHours": "h",
+      "durationUnitDays": "d"
     },
     "character": {
       "modelPreview": "Karakter Modeli Önizlemesi"
@@ -394,6 +402,7 @@ export const tr_TR: EnTranslations = {
       "uiScale": "Arayüz Ölçeği",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
+      "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -748,7 +757,13 @@ export const tr_TR: EnTranslations = {
       "sortName": "Ad",
       "searchPlaceholder": "Öge ara",
       "searchAria": "Çanta ögelerini ada göre ara",
-      "noMatch": "Filtrelerinizle eşleşen öge yok."
+      "noMatch": "Filtrelerinizle eşleşen öge yok.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Akının yeniden gruba dönüştü.",
@@ -791,6 +806,7 @@ export const tr_TR: EnTranslations = {
         "spi": "Reduce el espíritu en {value}",
         "allStats": "Reduce todos los atributos en {value}"
       },
+      "allStatsPctReduce": "Reduces all attributes by {pct}%",
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
@@ -1141,6 +1157,10 @@ export const tr_TR: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "social": {
+      "lastSeen": "Last seen: {when}",
+      "lastSeenNever": "never"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const tr_TR: EnTranslations = {
       "drink": "İçecek",
       "tool": "Alet",
       "potion": "Şifa İksiri",
-      "elixir": "İksir"
+      "elixir": "İksir",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Zırh",
@@ -4281,7 +4302,8 @@ export const tr_TR: EnTranslations = {
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
-      "clickBuyback": "Geri satın almak için tıkla"
+      "clickBuyback": "Geri satın almak için tıkla",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Çantalar",
@@ -5583,6 +5605,21 @@ export const tr_TR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Hükümdar'ın Tacı"
       },
+      "linen_pouch": {
+        "name": "Keten Kese"
+      },
+      "travelers_knapsack": {
+        "name": "Gezginin Sırt Çantası"
+      },
+      "wolfhide_satchel": {
+        "name": "Kurt Derisi Çanta"
+      },
+      "gravewoven_bag": {
+        "name": "Mezar Dokuması Çanta"
+      },
+      "mistcallers_duffel": {
+        "name": "Sis Çağıranın Denizci Çantası"
+      },
       "copper_mining_pick": {
         "name": "Bakır Maden Kazması"
       },
@@ -6634,6 +6671,11 @@ export const tr_TR: EnTranslations = {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
         "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+      },
+      "spirit_healer": {
+        "name": "The Pale Keeper",
+        "title": "Warden of the Dead",
+        "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

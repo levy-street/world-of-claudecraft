@@ -154,6 +154,11 @@ export const de_DE: EnTranslations = {
     "spectate": {
       "banner": "{name} wird beobachtet"
     },
+    "death": {
+      "resurrectAtCorpse": "Resurrect at Corpse",
+      "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
+      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
     "emotes": {
       "wave": "Winken",
       "laugh": "Lachen",
@@ -280,7 +285,10 @@ export const de_DE: EnTranslations = {
       "targetAnnounce": "Ziel: {name}",
       "partyLabel": "Eure Gruppe",
       "partyGroup": "Gruppe {n}",
-      "durationUnitSeconds": "s"
+      "durationUnitSeconds": "s",
+      "durationUnitMinutes": "m",
+      "durationUnitHours": "h",
+      "durationUnitDays": "d"
     },
     "character": {
       "modelPreview": "Charaktermodell-Vorschau"
@@ -394,6 +402,7 @@ export const de_DE: EnTranslations = {
       "uiScale": "UI-Skalierung",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
+      "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -748,7 +757,13 @@ export const de_DE: EnTranslations = {
       "sortName": "Name",
       "searchPlaceholder": "Gegenstände durchsuchen",
       "searchAria": "Taschengegenstände nach Namen durchsuchen",
-      "noMatch": "Keine Gegenstände entsprechen Euren Filtern."
+      "noMatch": "Keine Gegenstände entsprechen Euren Filtern.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
@@ -791,6 +806,7 @@ export const de_DE: EnTranslations = {
         "spi": "Verringert Willenskraft um {value}",
         "allStats": "Verringert alle Attribute um {value}"
       },
+      "allStatsPctReduce": "Reduces all attributes by {pct}%",
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
@@ -1141,6 +1157,10 @@ export const de_DE: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "social": {
+      "lastSeen": "Last seen: {when}",
+      "lastSeenNever": "never"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const de_DE: EnTranslations = {
       "drink": "Getränk",
       "tool": "Werkzeug",
       "potion": "Trank",
-      "elixir": "Elixier"
+      "elixir": "Elixier",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Rüstung",
@@ -4281,7 +4302,8 @@ export const de_DE: EnTranslations = {
       "useManaPotion": "Benutzen: Stellt sofort {amount} Mana wieder her. Im Kampf nutzbar. 1 Min. Abklingzeit.",
       "clickUseInstant": "Zum sofortigen Benutzen im Kampf klicken",
       "clickUse": "Zum Benutzen klicken",
-      "clickBuyback": "Zum Rückkaufen klicken"
+      "clickBuyback": "Zum Rückkaufen klicken",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Taschen",
@@ -5583,6 +5605,21 @@ export const de_DE: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Krone des Monarchen"
       },
+      "linen_pouch": {
+        "name": "Leinenbeutel"
+      },
+      "travelers_knapsack": {
+        "name": "Rucksack des Reisenden"
+      },
+      "wolfhide_satchel": {
+        "name": "Wolfsledertasche"
+      },
+      "gravewoven_bag": {
+        "name": "Grabgewebte Tasche"
+      },
+      "mistcallers_duffel": {
+        "name": "Seesack des Nebelrufers"
+      },
       "copper_mining_pick": {
         "name": "Kupfer-Grabpickel"
       },
@@ -6634,6 +6671,11 @@ export const de_DE: EnTranslations = {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
         "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+      },
+      "spirit_healer": {
+        "name": "The Pale Keeper",
+        "title": "Warden of the Dead",
+        "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

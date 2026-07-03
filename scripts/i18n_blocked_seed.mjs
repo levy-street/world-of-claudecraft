@@ -211,7 +211,7 @@ export const V07_SLASH = [
   'Combat potion on cooldown — ready in 5s.',
   'Combo points: Aki/5.',
   'Completed quests (5): Aki.',
-  'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count]',
+  'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev quest questId, /dev quests, /dev kill',
   'Dungeons (5): Aki.',
   'Effects on Aki (5): Aki.',
   'If you fall here, your spirit returns to the Aki graveyard at (5, 5).',

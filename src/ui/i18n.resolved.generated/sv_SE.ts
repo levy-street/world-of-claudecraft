@@ -154,6 +154,11 @@ export const sv_SE: EnTranslations = {
     "spectate": {
       "banner": "Åskådar {name}"
     },
+    "death": {
+      "resurrectAtCorpse": "Resurrect at Corpse",
+      "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
+      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
     "emotes": {
       "wave": "Vinka",
       "laugh": "LOL",
@@ -280,7 +285,10 @@ export const sv_SE: EnTranslations = {
       "targetAnnounce": "Markera {name}",
       "partyLabel": "Ditt följe",
       "partyGroup": "Grupp {n}",
-      "durationUnitSeconds": "s"
+      "durationUnitSeconds": "s",
+      "durationUnitMinutes": "m",
+      "durationUnitHours": "h",
+      "durationUnitDays": "d"
     },
     "character": {
       "modelPreview": "Förhandsvisning av karaktärsmodell"
@@ -394,6 +402,7 @@ export const sv_SE: EnTranslations = {
       "uiScale": "Gränssnittsskala",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
+      "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -748,7 +757,13 @@ export const sv_SE: EnTranslations = {
       "sortName": "Namn",
       "searchPlaceholder": "Sök föremål",
       "searchAria": "Sök väskföremål efter namn",
-      "noMatch": "Inga föremål matchar dina filter."
+      "noMatch": "Inga föremål matchar dina filter.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Din raid har omvandlats tillbaka till en grupp.",
@@ -791,6 +806,7 @@ export const sv_SE: EnTranslations = {
         "spi": "Verringert Willenskraft um {value}",
         "allStats": "Verringert alle Attribute um {value}"
       },
+      "allStatsPctReduce": "Reduces all attributes by {pct}%",
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "armorFlat": "Verringert Rüstung um {value}",
@@ -1141,6 +1157,10 @@ export const sv_SE: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "social": {
+      "lastSeen": "Last seen: {when}",
+      "lastSeenNever": "never"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const sv_SE: EnTranslations = {
       "drink": "Dryck",
       "tool": "Verktyg",
       "potion": "Trolldryck",
-      "elixir": "Elixir"
+      "elixir": "Elixir",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Rustning",
@@ -4281,7 +4302,8 @@ export const sv_SE: EnTranslations = {
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
-      "clickBuyback": "Klicka för att köpa tillbaka"
+      "clickBuyback": "Klicka för att köpa tillbaka",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Väskor",
@@ -5583,6 +5605,21 @@ export const sv_SE: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Monarkens krona"
       },
+      "linen_pouch": {
+        "name": "Linnepung"
+      },
+      "travelers_knapsack": {
+        "name": "Resenärens ryggsäck"
+      },
+      "wolfhide_satchel": {
+        "name": "Vargskinnsväska"
+      },
+      "gravewoven_bag": {
+        "name": "Gravvävd väska"
+      },
+      "mistcallers_duffel": {
+        "name": "Dimkallarens sjösäck"
+      },
       "copper_mining_pick": {
         "name": "Kopparhacka"
       },
@@ -6634,6 +6671,11 @@ export const sv_SE: EnTranslations = {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
         "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+      },
+      "spirit_healer": {
+        "name": "The Pale Keeper",
+        "title": "Warden of the Dead",
+        "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

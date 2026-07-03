@@ -331,14 +331,21 @@ export class PgSocialDb implements SocialDb {
     ]);
   }
 
-  async guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]> {
+  async guildMembers(
+    guildId: number,
+  ): Promise<(CharInfo & { rank: GuildRank; lastLogin: string | null })[]> {
     const res = await this.pool.query(
-      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, gm.rank
+      `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, c.last_login AS "lastLogin", gm.rank
        FROM guild_members gm JOIN characters c ON c.id = gm.character_id
        WHERE gm.guild_id = $1 ORDER BY gm.joined_at`,
       [guildId],
     );
-    return res.rows;
+    // last_login is a TIMESTAMPTZ; serialize to an ISO string for the wire (never a
+    // raw Date), null when the character has never entered the world.
+    return res.rows.map((r) => ({
+      ...r,
+      lastLogin: r.lastLogin ? new Date(r.lastLogin).toISOString() : null,
+    }));
   }
 
   async guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]> {

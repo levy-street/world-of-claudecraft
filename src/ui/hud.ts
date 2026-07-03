@@ -1,4 +1,5 @@
 import { audio } from '../game/audio';
+import type { GamepadKind } from '../game/gamepad_map';
 import type { Keybinds } from '../game/keybinds';
 import { music, musicZoneForLocation, shouldResetMusicForDungeonEntry } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -269,6 +270,7 @@ import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
+import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
@@ -293,6 +295,7 @@ import { chatPlayerContextActions } from './player_context_menu';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { maskProfanity } from './profanity';
 import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link';
+import { QuestProgressBanner } from './quest_progress_banner';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 import { QuestLogWindow } from './questlog_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
@@ -380,6 +383,9 @@ export interface GamepadBindingsHooks {
   entries(): { button: number; action: string }[];
   bind(button: number, action: string): void;
   reset(): void;
+  // Detected brand of the connected pad, so the panel labels each button with the
+  // glyph printed on that controller ('generic' combined labels when none/unknown).
+  kind(): GamepadKind;
 }
 
 export interface ReportHooks {
@@ -415,6 +421,11 @@ const PLAYER_PORTRAIT_KEY = 'player';
 // paint carries no bare literal at the call site.
 const BOSS_SKULL_GLYPH = '☠';
 const COMBO_PIP_COUNT = 5;
+// The mob-hover tooltip's fixed bottom-right slot (the WoW default GameTooltip
+// corner), in author-space px: the right margin clears the sidebar icon rail,
+// the bottom margin the community-links row, both fixed right-edge chrome.
+const MOB_TOOLTIP_MARGIN_RIGHT = 56;
+const MOB_TOOLTIP_MARGIN_BOTTOM = 60;
 // The descriptor for a hidden target frame (no target, or a targeted world object).
 // unitFrameView reads only `present` when hiding, so the rest are no-op defaults; a
 // shared const avoids allocating a fresh descriptor for every hidden frame.
@@ -439,6 +450,12 @@ const trackMetaPixel = (eventName: string, data?: Record<string, unknown>): void
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
+// Ghost-mode display thresholds, mirroring src/sim/spirit.ts (CORPSE_REZ_RANGE and
+// SPIRIT_HEALER_RANGE). The server re-validates both ranges; these only decide whether
+// the death-overlay resurrect buttons are shown, so keep them in sync.
+const GHOST_CORPSE_REZ_RANGE = 35;
+const GHOST_HEALER_RANGE = 8;
+
 const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
@@ -541,6 +558,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   tool: 'itemUi.kind.tool',
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
+  bag: 'itemUi.kind.bag',
 };
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
@@ -799,6 +817,10 @@ export class Hud {
   private activeChatTab: ChatTabId = 'all';
   private errorEl = $('#error-msg');
   private bannerEl = $('#banner');
+  // The WoW-style quest-progress flash (quest_progress_banner.ts): yellow
+  // top-center lines fed by the questProgress event, aria-hidden decoration
+  // (the chat log + live region carry the announced copy).
+  private readonly questBanner = new QuestProgressBanner($('#quest-banner'));
   private subzoneEl = $('#subzone-banner');
   private tooltipEl = $('#tooltip');
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
@@ -837,6 +859,13 @@ export class Hud {
   // discipline). The unit_frame painter drives it through the elided
   // writers, exactly as the player frame drives its own absorb node.
   private targetAbsorbEl = $('#tf-absorb');
+  // The target's resource bar (mana / rage / energy), the classic target-frame
+  // power readout. The painter's type classes drive it; a target with no
+  // resource (a plain beast) keeps every type class off and the rail stays as
+  // an empty dark bar (classic WoW look: the frame never changes height).
+  private targetResourceEl = $('#tf-resource');
+  private targetResEl = $('#tf-res');
+  private targetResTextEl = $('#tf-res-text');
   private targetDebuffsEl = $('#tf-debuffs');
   // The target whose portrait the family painter's repaint gate redraws this frame.
   // The gate fires synchronously inside the targetFramePainter.paint() call below,
@@ -870,6 +899,9 @@ export class Hud {
   private swingLabelEl = this.swingbarEl.querySelector('.label') as HTMLElement;
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
+  private ghostPromptEl = $('#ghost-prompt');
+  private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
+  private resurrectHealerBtnEl = $('#resurrect-healer-btn');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
   private hotWriteCache = new Map<HTMLElement, string>();
@@ -1203,6 +1235,8 @@ export class Hud {
       if (this.sim.arenaInfo?.match) return;
       this.sim.releaseSpirit();
     });
+    this.resurrectCorpseBtnEl.addEventListener('click', () => this.sim.resurrectAtCorpse());
+    this.resurrectHealerBtnEl.addEventListener('click', () => this.sim.resurrectAtSpiritHealer());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -2177,6 +2211,9 @@ export class Hud {
 
   private initFrameMovers(): void {
     const isMobileLayout = () => this.isMobileLayout();
+    // A live desktop-to-mobile viewport flip must re-home the anchored aura
+    // bars (mobile owns its own aura placement), and the flip back re-anchors.
+    window.addEventListener('resize', () => this.applyAuraAnchor());
     if (this.targetFrameEl) {
       this.targetFrameMover = new MovableFrame({
         frame: this.targetFrameEl,
@@ -2189,6 +2226,15 @@ export class Hud {
       });
     }
     if (this.playerFrameEl) {
+      // Classic self-target: clicking the player frame body targets yourself.
+      // The corner move button stops its own propagation; buttons inside the
+      // frame and the anchored aura rows (aurasOnPlayerFrame) never self-target,
+      // so a buff right-click-cancel or a stray icon click stays what it was.
+      this.playerFrameEl.addEventListener('click', (ev) => {
+        const clicked = ev.target as HTMLElement | null;
+        if (clicked?.closest('button, #buff-bar, #debuff-bar')) return;
+        this.sim.targetEntity(this.sim.playerId);
+      });
       this.playerFrameMover = new MovableFrame({
         frame: this.playerFrameEl,
         storageKey: PLAYER_FRAME_POS_KEY,
@@ -2225,6 +2271,40 @@ export class Hud {
     } else {
       const stack = $('#actionbar-stack');
       if (frame.parentElement !== stack) stack.insertBefore(frame, stack.firstChild);
+    }
+  }
+
+  // Buffs on the Player Frame (aurasOnPlayerFrame): reparent the player's own
+  // BUFF row into #player-frame, where CSS anchors it to the frame (above it
+  // while docked over the action bars, below it once moved) and the frame's
+  // children-zoom scale applies. The DEBUFF row never rides the frame: with the
+  // option on it slides up beside the minimap into the spot the buff row
+  // vacated (body.auras-on-frame, hud.css), classic WoW's debuff corner, so
+  // incoming debuffs stay in one glanceable place. Off (or the mobile layout,
+  // which owns its stock aura placement) restores the classic two-row corner;
+  // the aura painters' element refs are live nodes, so they survive the moves.
+  private aurasOnPlayerFrame = false;
+  private buffBarHome: { parent: ParentNode; next: Node | null } | null = null;
+
+  setAurasOnPlayerFrame(on: boolean): void {
+    this.aurasOnPlayerFrame = on;
+    this.applyAuraAnchor();
+  }
+
+  private applyAuraAnchor(): void {
+    const on = this.aurasOnPlayerFrame && !this.isMobileLayout();
+    document.body.classList.toggle('auras-on-frame', on);
+    const frame = this.playerFrameEl;
+    // The buff bar's stock home: right before its sibling debuff bar (which
+    // stays put in the DOM; only its CSS spot shifts with the body class).
+    this.buffBarHome ??= {
+      parent: this.buffBarEl.parentNode as ParentNode,
+      next: this.debuffBarEl,
+    };
+    if (on) {
+      if (this.buffBarEl.parentElement !== frame) frame.appendChild(this.buffBarEl);
+    } else if (this.buffBarEl.parentElement === frame) {
+      this.buffBarHome.parent.insertBefore(this.buffBarEl, this.buffBarHome.next);
     }
   }
 
@@ -2844,6 +2924,11 @@ export class Hud {
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
+      resource: {
+        container: this.targetResourceEl,
+        fill: this.targetResEl,
+        text: this.targetResTextEl,
+      },
     },
     {
       shownDisplay: 'flex',
@@ -2855,6 +2940,27 @@ export class Hud {
   // castStop event (engage on success, drop on interrupt), so starting a Smite
   // never aggros the target before its damage lands.
   private pendingAutoAttackOnCastEnd = false;
+  // The party rows' mini aura strips share these deps (each row builds its own
+  // view + painter instance over them). The wire summaries carry no remaining
+  // time (Infinity reaches the core, so the duration label stays blank), which
+  // is why the tooltip here is NAME-ONLY: no seconds line, no effect summary.
+  private readonly partyAurasDeps: PartyRowAuraDeps = {
+    view: {
+      iconId: (a) => (ABILITIES[a.id] ? a.id : `aura_${a.kind}`),
+      auraName: (a) =>
+        ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
+      formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+      // Units are never rendered here (Infinity remaining -> blank label), so the
+      // shared container is returned unrefreshed.
+      durationUnits: () => this.auraDurationUnits,
+      auraEffectHtml: () => '',
+    },
+    painter: {
+      resolveIconUrl: (iconKey) => `url(${iconDataUrl('aura', iconKey)})`,
+      renderTooltip: (name) => `<div class="tt-title">${esc(name)}</div>`,
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+    },
+  };
   // The party frames are N further instances of the unit_frame family, one per
   // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
   // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
@@ -2869,6 +2975,7 @@ export class Hud {
       onContextMenu: (pid, name, x, y) => this.openContextMenu(pid, name, x, y),
       onLeave: () => this.sim.partyLeave(),
       leaveLabel: () => t('hud.social.leaveParty'),
+      partyAuras: this.partyAurasDeps,
     },
   );
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
@@ -2876,16 +2983,28 @@ export class Hud {
   private readonly mapPainter = new MapWindowPainter();
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
-  // 'all') and the target debuffs (#tf-debuffs, mode 'debuffs'). The shared deps fire
+  // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
+  // debuffs, classic target-frame behavior). The shared deps fire
   // the i18n lookups every frame (so a language switch lands on the next tick) and the
   // painter's tooltip closure reads the pool's LIVE record (Top risk 3, never a captured
   // aura). All closures are lazy, so these field initializers are safe.
+  // REUSED container for the per-frame durationUnits() dep (allocation-light
+  // contract): the values re-resolve through t() each frame so a language
+  // switch lands next tick, but the object itself is never reallocated.
+  private readonly auraDurationUnits = { s: 's', m: 'm', h: 'h', d: 'd' };
   private readonly aurasViewDeps: AurasDeps = {
     iconId: (a) => (ABILITIES[a.id] ? a.id : `aura_${a.kind}`),
     auraName: (a) =>
       ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : auraDisplayNameFromSource(a.name),
     formatStacks: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
-    durationUnitSuffix: () => t('hudChrome.unitFrame.durationUnitSeconds'),
+    durationUnits: () => {
+      const u = this.auraDurationUnits;
+      u.s = t('hudChrome.unitFrame.durationUnitSeconds');
+      u.m = t('hudChrome.unitFrame.durationUnitMinutes');
+      u.h = t('hudChrome.unitFrame.durationUnitHours');
+      u.d = t('hudChrome.unitFrame.durationUnitDays');
+      return u;
+    },
     auraEffectHtml: (a) => this.auraEffectTooltipHtml(a),
   };
   private readonly aurasPainterDeps: AurasPainterDeps = {
@@ -2898,7 +3017,11 @@ export class Hud {
   // #debuff-bar, so a fresh debuff is never buried under a wall of long-lived buffs.
   private readonly buffBarView = createAurasView('buffs', this.aurasViewDeps);
   private readonly debuffBarView = createAurasView('debuffs', this.aurasViewDeps);
-  private readonly targetDebuffsView = createAurasView('debuffs', this.aurasViewDeps);
+  // The target strip shows EVERY aura (classic target-frame behavior): a friendly
+  // target's buffs (the shield you just cast on an ally) alongside its debuffs, and
+  // an enemy's buffs (a mob's frenzy) alongside the DoTs you keep on it. The element
+  // keeps its historical #tf-debuffs id; only the view mode widened.
+  private readonly targetDebuffsView = createAurasView('all', this.aurasViewDeps);
   // The buff-bar painter alone gets attachCancel: right-clicking one of the local player's
   // own helpful buffs cancels it (classic convention). The debuff / target painters reuse
   // the shared deps (no cancel: a debuff or another entity's aura is never cancelable).
@@ -3429,22 +3552,21 @@ export class Hud {
     return { w: tw, h: th };
   }
 
-  // Anchors the mob-hover tooltip to a fixed screen slot instead of the cursor:
-  // just right of the player frame's health/resource bars, bottom-aligned with
-  // them. Unlike paintTooltipAt (cursor-relative), this reads the player frame's
-  // live rect so it tracks that frame's real position/size (desktop or mobile)
-  // instead of a hand-picked pixel offset.
-  private paintTooltipNearPlayerFrame(html: string): void {
+  // Anchors the mob-hover tooltip to the viewport's bottom-right corner (the WoW
+  // default GameTooltip slot) instead of the cursor. Bottom-anchored, so a taller
+  // tooltip (quest lines) grows UPWARD from the same baseline. Deliberately NOT
+  // tied to the player frame: that frame is player-movable (MovableFrame), and an
+  // anchor riding it wanders wherever the frame was dragged. The margins clear
+  // the fixed right-edge chrome (the sidebar icon rail and the community row).
+  private paintMobTooltipBottomRight(html: string): void {
     this.tooltipEl.classList.add('mob-tooltip');
     this.tooltipEl.innerHTML = html;
     this.tooltipEl.style.display = 'block';
     const z = getUiScale();
     const tw = this.tooltipEl.offsetWidth,
       th = this.tooltipEl.offsetHeight;
-    const pf = this.playerFrameEl.getBoundingClientRect();
-    const gap = 14;
-    const left = Math.max(8, Math.min(window.innerWidth / z - tw - 8, pf.right / z + gap));
-    const top = Math.max(8, Math.min(window.innerHeight / z - th - 8, pf.bottom / z - th));
+    const left = Math.max(8, window.innerWidth / z - tw - MOB_TOOLTIP_MARGIN_RIGHT);
+    const top = Math.max(8, window.innerHeight / z - th - MOB_TOOLTIP_MARGIN_BOTTOM);
     this.tooltipEl.style.left = `${left}px`;
     this.tooltipEl.style.top = `${top}px`;
   }
@@ -3456,8 +3578,8 @@ export class Hud {
   // moves the rendered model (the mob aggros so hostile flips, the mob or the
   // viewer dings a level so the con-color shifts) still repaints. Colored by the
   // tooltip's own classic con spread (mobTooltipConColor), deliberately independent
-  // of the overhead nameplate bands (mobNameColor). Shown at a fixed spot (right of
-  // the health bars, see paintTooltipNearPlayerFrame) rather than following the cursor.
+  // of the overhead nameplate bands (mobNameColor). Shown at a fixed spot (the
+  // bottom-right corner, see paintMobTooltipBottomRight) rather than following the cursor.
   showMobHoverTooltip(entity: Entity, pvpOpponents: ReadonlySet<number>): void {
     // Questie-style quest lines: the objectives this mob advances, with live
     // counts. They ride the rebuild key so a kill mid-hover repaints 3/8 -> 4/8.
@@ -3494,7 +3616,7 @@ export class Hud {
         ),
       })),
     };
-    this.paintTooltipNearPlayerFrame(mobTooltipHtml(model, MOB_TOOLTIP_VIEW_DEPS));
+    this.paintMobTooltipBottomRight(mobTooltipHtml(model, MOB_TOOLTIP_VIEW_DEPS));
   }
 
   // Clears the world-hover mob tooltip; a no-op if none is showing, so main.ts
@@ -3582,6 +3704,8 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
     if (item.kind === 'quest')
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
+    if (item.kind === 'bag' && item.bagSlots)
+      html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
     if (item.requiredClass && !armorTypeForItem(item) && !weaponArchetypeForItem(item)) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: item.requiredClass.map(classDisplayName).join(', ') }))}</div>`;
     }
@@ -5172,9 +5296,21 @@ export class Hud {
             present: true,
             hpFrac: target.hp / Math.max(1, target.maxHp),
             hpText: target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`,
-            resourceKind: 'none',
-            resFrac: 0,
-            resText: '',
+            // The target's power bar (classic target frame): players and caster
+            // mobs show their mana/rage/energy; a resource-less target (a plain
+            // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
+            // buckets null with mana), so every type class turns off and the
+            // rail renders EMPTY (zero fill, no text) but stays visible, the
+            // classic look where the frame never changes height. Dead: same.
+            resourceKind: target.dead || !target.resourceType ? 'none' : target.resourceType,
+            resFrac:
+              target.dead || !target.resourceType
+                ? 0
+                : target.resource / Math.max(1, target.maxResource),
+            resText:
+              target.dead || !target.resourceType
+                ? ''
+                : `${Math.round(target.resource)} / ${target.maxResource}`,
             levelText: isBoss ? BOSS_SKULL_GLYPH : String(target.level),
             name: entityDisplayName(target),
             // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
@@ -5297,9 +5433,34 @@ export class Hud {
     // returns immediately, so this costs nothing at steady state.
     this.fctPainter.step(now);
 
+    // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
+    // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
+    // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
+    // small non-blocking prompt appears only when in reach of its corpse or a Spirit
+    // Healer, carrying just the relevant button. The server re-checks both ranges.
+    const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
-    this.setDisplay(this.deathOverlayEl, p.dead ? 'flex' : 'none');
-    this.setDisplay(this.releaseSpiritBtnEl, deadInArena ? 'none' : '');
+    document.body.classList.toggle('spirit-mode', ghost);
+    this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
+    if (ghost) {
+      const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
+      let healerNearby = false;
+      for (const ent of this.sim.entities.values()) {
+        if (
+          ent.kind === 'npc' &&
+          ent.templateId === 'spirit_healer' &&
+          dist2d(ent.pos, p.pos) <= GHOST_HEALER_RANGE
+        ) {
+          healerNearby = true;
+          break;
+        }
+      }
+      this.setDisplay(this.ghostPromptEl, corpseInRange || healerNearby ? 'flex' : 'none');
+      this.setDisplay(this.resurrectCorpseBtnEl, corpseInRange ? '' : 'none');
+      this.setDisplay(this.resurrectHealerBtnEl, healerNearby ? '' : 'none');
+    } else {
+      this.setDisplay(this.ghostPromptEl, 'none');
+    }
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
     const currentZone = zoneAt(p.pos.z);
@@ -7143,10 +7304,15 @@ export class Hud {
           audio.questAccept();
           this.refreshGossip();
           break;
-        case 'questProgress':
-          this.log(this.localizeQuestProgressText(ev.questId, ev.text), '#dcd29f');
+        case 'questProgress': {
+          const progressText = this.localizeQuestProgressText(ev.questId, ev.text);
+          this.log(progressText, '#dcd29f');
+          // The classic yellow top-center flash ("Forest Wolf slain: 3/8"); the
+          // log line above stays the durable, announced copy.
+          this.questBanner.show(progressText);
           this.refreshGossip();
           break;
+        }
         case 'questReady': {
           this.showBanner(
             t('questUi.logs.ready', {
@@ -11864,6 +12030,12 @@ export class Hud {
    *  dropped normalized position to the options window's open performance panel. */
   onPerfOverlayMoved(x: number, y: number): void {
     this.optionsWindow.onPerfOverlayMoved(x, y);
+  }
+
+  /** Called by main.ts when a pad connects/disconnects: re-label the Controller
+   *  panel with the newly detected brand's glyphs if that panel is open. */
+  refreshControllerLabels(): void {
+    this.optionsWindow.refreshControllerLabels();
   }
 
   // -------------------------------------------------------------------------

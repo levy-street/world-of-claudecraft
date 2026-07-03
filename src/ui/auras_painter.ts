@@ -4,7 +4,7 @@
 // per aura key (the aura id), reused across frames, its tooltip attached ONCE and
 // reading a LIVE mutable record, data updated IN PLACE through the host's elided
 // writers. Same painter, two instances: the player buff bar
-// (#buff-bar, mode 'all') and the target debuffs (#tf-debuffs, mode 'debuffs').
+// (#buff-bar) and the target strip (#tf-debuffs, mode 'all': buffs AND debuffs).
 //
 // TOP RISK 3 (the load-bearing correctness rule): the pooled record is a MUTABLE
 // object. The tooltip closure attaches ONCE per node and reads `rec.name` / `rec.remaining`

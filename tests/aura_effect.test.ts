@@ -111,6 +111,13 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ kind: 'root', value: 0 })).toEqual({ key: 'hudChrome.auraEffect.root' });
   });
 
+  it('describes the all-stats percent drain (buff_allstats_pct)', () => {
+    expect(desc({ kind: 'buff_allstats_pct', value: -0.75 })).toEqual({
+      key: 'hudChrome.auraEffect.allStatsPctReduce',
+      nums: { pct: 75 },
+    });
+  });
+
   it('describes an imbue range when judgement min/max are present', () => {
     expect(desc({ kind: 'imbue', value: 0, value2: 10, value3: 20 })).toEqual({
       key: 'hudChrome.auraEffect.imbueRange',

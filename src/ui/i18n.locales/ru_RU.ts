@@ -14,6 +14,9 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  // Guild roster last-seen (M16 non-Latin fill)
+  'hudChrome.social.lastSeen': 'Последний вход: {when}',
+  'hudChrome.social.lastSeenNever': 'никогда',
   // Daily rewards (M16 non-Latin fill)
   'hudChrome.dailyRewards.title': 'Ежедневные награды',
   'hudChrome.dailyRewards.close': 'Закрыть ежедневные награды',
@@ -74,6 +77,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.frameReset.label': 'Сбросить положение рамок',
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
+  'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',
   'hud.core.mapCanvasLabel': 'Карта',
   'hud.core.mapSummary': 'Карта зоны {zone}.',
   'hudChrome.castBar.playerAria': 'Ваша полоса применения',
@@ -81,6 +85,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.skipLinks.chat': 'Перейти к чату',
   'hudChrome.skipLinks.mainHud': 'Перейти к основному интерфейсу',
   'hudChrome.unitFrame.durationUnitSeconds': 'с',
+  'hudChrome.unitFrame.durationUnitMinutes': 'м',
+  'hudChrome.unitFrame.durationUnitHours': 'ч',
+  'hudChrome.unitFrame.durationUnitDays': 'д',
   'hudChrome.unitFrame.partyLabel': 'Ваша группа',
   'hudChrome.unitFrame.playerLabel': 'Ваш персонаж',
   'hudChrome.unitFrame.targetAnnounce': 'Цель: {name}',
@@ -2236,6 +2243,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.weathered_ledger_page.name': 'Выветренная страница книги учета',
   'entities.items.morthen_grimoire.name': 'Гримуар Мортена',
   'entities.items.wolf_fang.name': 'Треснувший волчий клык',
+  'entities.items.linen_pouch.name': 'Льняной мешочек',
+  'entities.items.travelers_knapsack.name': 'Ранец путешественника',
+  'entities.items.wolfhide_satchel.name': 'Сумка из волчьей шкуры',
+  'entities.items.gravewoven_bag.name': 'Могильотканая сумка',
+  'entities.items.mistcallers_duffel.name': 'Вещмешок Призывателя туманов',
   'entities.items.bandit_bandana.name': 'Красная бандана',
   'entities.items.tough_jerky.name': 'Жесткое вяленое мясо',
   'entities.items.mudfin_scale.name': 'Слизистая чешуя мурлока',
@@ -2506,6 +2518,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.warlock_imp.name': 'Огненный демон',
   'entities.mobs.warlock_voidwalker.name': 'Демон Пустоты',
   'entities.mobs.ysolei.name': 'Изолея, Воплощение Утонувшей луны',
+  'hudChrome.death.resurrectAtCorpse': 'Воскреснуть у тела',
+  'hudChrome.death.resurrectAtHealer': 'Целитель душ (болезнь воскрешения)',
+  'hudChrome.death.spiritHealerAlive': 'Целитель душ оберегает мёртвых. Вы всё ещё среди живых.',
+  'entities.npcs.spirit_healer.name': 'Целитель душ',
+  'entities.npcs.spirit_healer.title': 'Хранитель мёртвых',
+  'entities.npcs.spirit_healer.greeting':
+    'Покойся, дух. Я могу вернуть тебя в тело, но обратный путь оставит тебя ослабленным.',
   'entities.npcs.the_merchant.name': 'Торговец',
   'entities.npcs.the_merchant.title': 'Хранитель мирового рынка',
   'entities.npcs.the_merchant.greeting':
@@ -3691,6 +3710,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.searchPlaceholder': 'Поиск предметов',
   'hudChrome.bags.searchAria': 'Поиск предметов в сумках по названию',
   'hudChrome.bags.noMatch': 'Нет предметов, соответствующих фильтрам.',
+  'hudChrome.bags.capacityAria': 'Занято ячеек сумок: {used} из {total}',
+  'hudChrome.bags.backpack': 'Рюкзак',
+  'hudChrome.bags.socketEmpty': 'Пустая ячейка для сумки',
+  'hudChrome.bags.unequipHint': 'Нажмите, чтобы снять эту сумку',
   // Guide (/guide) localization.
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
@@ -4923,7 +4946,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'delveUi.board.companion.upgradeAria': 'Улучшить {name} до ранга {rank} за {marks} Меток Вылазок',
   'delveUi.board.companion.maxRank': 'Полностью улучшено',
   'delveUi.board.tabShop': 'Магазин',
-  // Modular bag filtering controls (hudChrome.bags.*).,
   'lockpickUi.pickTitle': 'Вскройте замок',
   'lockpickUi.cofferTitle': 'Богатый ларец',
   'lockpickUi.cache': '{tier} тайник',
@@ -4995,6 +5017,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.reduce.sta': 'Снижает выносливость на {value}',
   'hudChrome.auraEffect.reduce.spi': 'Снижает дух на {value}',
   'hudChrome.auraEffect.reduce.allStats': 'Снижает все характеристики на {value}',
+  'hudChrome.auraEffect.allStatsPctReduce': 'Снижает все характеристики на {pct}%',
   'hudChrome.auraEffect.dodge': 'Повышает шанс уклонения на {pct}%',
   'hudChrome.auraEffect.dodgeReduce': 'Снижает шанс уклонения на {pct}%',
   'hudChrome.auraEffect.armorFlat': 'Снижает броню на {value}',

@@ -11,8 +11,9 @@
 // + leave-path + tick() call sites resolve unchanged; this module draws no rng.
 
 import type { TradeInfo } from '../../world_api';
+import { bagCapacity, fitsAll, removeStacked } from '../bags';
 import { ITEMS } from '../data';
-import type { TradeSession } from '../sim';
+import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type InvSlot } from '../types';
 
@@ -142,6 +143,22 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   if (!valid) {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: items or money no longer available.');
+    closeTrade(ctx, session);
+    return;
+  }
+  // capacity gate: each side must fit what they RECEIVE after what they GIVE
+  // leaves their bags (simulated on a scratch copy; nothing moved yet)
+  const fitsAfterSwap = (meta: PlayerMeta, gives: InvSlot[], receives: InvSlot[]): boolean => {
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    for (const s of gives) removeStacked(scratch, s.itemId, s.count);
+    return fitsAll(scratch, bagCapacity(meta.bags), receives);
+  };
+  if (
+    !fitsAfterSwap(metaA, session.offerA.items, session.offerB.items) ||
+    !fitsAfterSwap(metaB, session.offerB.items, session.offerA.items)
+  ) {
+    for (const tPid of [session.a, session.b])
+      ctx.error(tPid, 'Trade failed: not enough bag space.');
     closeTrade(ctx, session);
     return;
   }

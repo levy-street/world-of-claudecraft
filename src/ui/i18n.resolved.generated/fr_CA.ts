@@ -154,6 +154,11 @@ export const fr_CA: EnTranslations = {
     "spectate": {
       "banner": "Vous observez {name}"
     },
+    "death": {
+      "resurrectAtCorpse": "Resurrect at Corpse",
+      "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
+      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
     "emotes": {
       "wave": "Saluer de la main",
       "laugh": "MDR",
@@ -280,7 +285,10 @@ export const fr_CA: EnTranslations = {
       "targetAnnounce": "Cible : {name}",
       "partyLabel": "Votre groupe",
       "partyGroup": "Groupe {n}",
-      "durationUnitSeconds": "s"
+      "durationUnitSeconds": "s",
+      "durationUnitMinutes": "m",
+      "durationUnitHours": "h",
+      "durationUnitDays": "d"
     },
     "character": {
       "modelPreview": "Aperçu du modèle du personnage"
@@ -394,6 +402,7 @@ export const fr_CA: EnTranslations = {
       "uiScale": "Échelle de l’interface",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
+      "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -748,7 +757,13 @@ export const fr_CA: EnTranslations = {
       "sortName": "Nom",
       "searchPlaceholder": "Rechercher des objets",
       "searchAria": "Rechercher les objets du sac par nom",
-      "noMatch": "Aucun objet ne correspond à vos filtres."
+      "noMatch": "Aucun objet ne correspond à vos filtres.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",
@@ -791,6 +806,7 @@ export const fr_CA: EnTranslations = {
         "spi": "Diminue l'esprit de {value}",
         "allStats": "Diminue tous les attributs de {value}"
       },
+      "allStatsPctReduce": "Reduces all attributes by {pct}%",
       "dodge": "Accroît les chances d'esquive de {pct}%",
       "dodgeReduce": "Diminue les chances d'esquive de {pct}%",
       "armorFlat": "Diminue l'armure de {value}",
@@ -1141,6 +1157,10 @@ export const fr_CA: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "social": {
+      "lastSeen": "Last seen: {when}",
+      "lastSeenNever": "never"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const fr_CA: EnTranslations = {
       "drink": "Boisson",
       "tool": "Outil",
       "potion": "Potion",
-      "elixir": "Élixir"
+      "elixir": "Élixir",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Armure",
@@ -4281,7 +4302,8 @@ export const fr_CA: EnTranslations = {
       "useManaPotion": "Utiliser : rend instantanément {amount} mana. Utilisable en combat. Recharge de 1 min.",
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
-      "clickBuyback": "Cliquer pour racheter"
+      "clickBuyback": "Cliquer pour racheter",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Sacs",
@@ -5583,6 +5605,21 @@ export const fr_CA: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Couronne du Monarque"
       },
+      "linen_pouch": {
+        "name": "Pochette en lin"
+      },
+      "travelers_knapsack": {
+        "name": "Sac à dos du voyageur"
+      },
+      "wolfhide_satchel": {
+        "name": "Sacoche en peau de loup"
+      },
+      "gravewoven_bag": {
+        "name": "Sac sépulcral"
+      },
+      "mistcallers_duffel": {
+        "name": "Fourre-tout de l'Appelle-brume"
+      },
       "copper_mining_pick": {
         "name": "Pic de Minage en Cuivre"
       },
@@ -6634,6 +6671,11 @@ export const fr_CA: EnTranslations = {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
         "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+      },
+      "spirit_healer": {
+        "name": "The Pale Keeper",
+        "title": "Warden of the Dead",
+        "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

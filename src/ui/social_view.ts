@@ -87,6 +87,10 @@ export interface GuildRow {
   dot: string;
   status: string | undefined;
   zone: string | undefined;
+  /** ISO-8601 timestamp of the member's last world entry, or null if unknown.
+   *  The painter formats it (relative/date) and localizes; the core just
+   *  passes it through. */
+  lastLogin: string | null;
   /** This member's guild rank key ('leader' | 'officer' | 'member'). */
   rank: string;
   /** True when this row is the viewing player. */
@@ -128,6 +132,7 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       dot: socialDot(m.online, m.status),
       status: m.status,
       zone: m.zone,
+      lastLogin: m.lastLogin ?? null,
       rank: m.rank,
       self,
       canWhisper: m.online && !self,

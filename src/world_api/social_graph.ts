@@ -19,6 +19,9 @@ export interface FriendInfo {
 
 export interface GuildMemberInfo extends FriendInfo {
   rank: GuildRank;
+  // ISO-8601 timestamp of this member's last world entry, or null if never
+  // recorded. Rides the 'social' frame; drives the "last seen" roster readout.
+  lastLogin: string | null;
 }
 
 // One guild calendar event (the event calendar's guild lane). `day` is a UTC

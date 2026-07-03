@@ -112,7 +112,7 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
-export type { PartyInfo, PartyMemberInfo } from './world_api/party';
+export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type { PlayerProfessionsView } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
@@ -292,6 +292,8 @@ export const COMMAND_NAMES = [
   'collect_delve_chest_loot',
   'delve_rite_choose',
   'telemetry',
+  'equip_bag',
+  'unequip_bag',
   'mail_send',
   'mail_take',
   'mail_delete',
@@ -299,6 +301,8 @@ export const COMMAND_NAMES = [
   'guild_event_create',
   'guild_event_remove',
   'autoloot',
+  'resurrect_corpse',
+  'resurrect_healer',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -373,6 +377,10 @@ export const COMMAND_FACETS = {
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
+  // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
+  // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
+  resurrect_corpse: 'IWorldCombat',
+  resurrect_healer: 'IWorldCombat',
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',

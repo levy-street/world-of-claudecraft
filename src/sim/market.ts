@@ -323,6 +323,10 @@ export class Market {
       this.ctx.error(meta.entityId, 'You cannot afford that.');
       return;
     }
+    if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
+      this.ctx.error(meta.entityId, 'Your bags are full.');
+      return;
+    }
     meta.copper -= listing.price;
     this.ctx.addItem(listing.itemId, listing.count, meta.entityId);
     if (!listing.house) {
@@ -362,6 +366,10 @@ export class Market {
       this.ctx.error(meta.entityId, 'That is not your listing.');
       return;
     }
+    if (!this.ctx.canAddItem(listing.itemId, listing.count, meta.entityId)) {
+      this.ctx.error(meta.entityId, 'Your bags are full.');
+      return;
+    }
     this.marketListings.splice(idx, 1);
     this.ctx.addItem(listing.itemId, listing.count, meta.entityId);
     const def = ITEMS[listing.itemId];
@@ -395,8 +403,23 @@ export class Market {
         text: `You collect ${formatMoney(col.copper)} from the Merchant.`,
         pid: meta.entityId,
       });
+      col.copper = 0;
     }
-    for (const s of col.items) this.ctx.addItem(s.itemId, s.count, meta.entityId);
+    // Capacity gate: items that don't fit stay in the collection box (never
+    // destroyed); the gold above is always collected.
+    const kept: typeof col.items = [];
+    for (const s of col.items) {
+      if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
+        this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      } else {
+        kept.push(s);
+      }
+    }
+    if (kept.length > 0) {
+      col.items = kept;
+      this.ctx.error(meta.entityId, 'Your bags are full.');
+      return;
+    }
     this.marketCollections.delete(this.marketSellerKey(meta));
   }
 

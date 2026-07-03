@@ -16,6 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
+import { addStacked, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import { canEquipItem } from './equipment_rules';
@@ -86,13 +87,18 @@ export function equipItem(ctx: SimContext, itemId: string, pid?: number): void {
 
 // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike
 // equipItem (which only swaps in a replacement) this is the way to fully
-// unequip. Bags are uncapped, so the returned item never has nowhere to go.
+// unequip. Bags are capacity-capped, so the returned piece needs a free slot;
+// with none the unequip is refused (nothing is ever force-dropped).
 export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   const { meta, e: p } = r;
   const itemId = meta.equipment[slot];
   if (!itemId) return false;
+  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
+    return false;
+  }
   delete meta.equipment[slot];
   // addItemSilent (not addItem): returning a piece you already owned to bags is
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
@@ -210,6 +216,8 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
   } else if (def.kind === 'weapon' || def.kind === 'armor') {
     equipItem(ctx, itemId, meta.entityId);
+  } else if (def.kind === 'bag') {
+    equipBagCmd(ctx, itemId, undefined, meta.entityId);
   }
 }
 
@@ -242,6 +250,10 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   const cost = def.buyValue * qty;
   if (meta.copper < cost) {
     ctx.error(meta.entityId, 'Not enough money.');
+    return;
+  }
+  if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.copper -= cost;
@@ -374,6 +386,10 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
+  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
+    return;
+  }
   meta.copper -= def.sellValue;
   slot.count -= 1;
   if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
@@ -388,7 +404,5 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
 }
 
 function addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-  const existing = meta.inventory.find((s) => s.itemId === itemId);
-  if (existing) existing.count += count;
-  else meta.inventory.push({ itemId, count });
+  addStacked(meta.inventory, itemId, count);
 }

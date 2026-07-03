@@ -251,3 +251,19 @@ describe('allocation budget (the reused-reference proxy, wrapper floor)', () => 
     expect(() => assertAllocationStable(() => core.build(world, S, PPY))).not.toThrow();
   });
 });
+
+describe('minimap corpse marker (ghost run)', () => {
+  it('marks the body with a corpse skull only while the player is a ghost', () => {
+    const world = makeWorld('sim');
+    // alive (not a ghost): no corpse marker
+    expect(buildMarkers(world).some((m) => m.kind === 'corpse')).toBe(false);
+    // a ghost with a nearby body: a corpse marker appears at the body
+    (world.player as unknown as { ghost: boolean; corpsePos: unknown }).ghost = true;
+    (world.player as unknown as { ghost: boolean; corpsePos: unknown }).corpsePos = {
+      x: 3,
+      y: 0,
+      z: PZ,
+    };
+    expect(buildMarkers(world).some((m) => m.kind === 'corpse')).toBe(true);
+  });
+});

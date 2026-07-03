@@ -5,6 +5,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
@@ -42,8 +43,8 @@ describe('crowd bandwidth', () => {
           const snap = JSON.parse(payload);
           if (snap.t !== 'snap') return;
           // measure only the entity stream; self is identical in both protocols
-          holder.bytes += JSON.stringify(snap.ents).length
-            + (snap.keep ? JSON.stringify(snap.keep).length : 0);
+          holder.bytes +=
+            JSON.stringify(snap.ents).length + (snap.keep ? JSON.stringify(snap.keep).length : 0);
         },
       };
       const session = server.join(ws as any, i + 1, i + 1, `Walker${i}`, 'warrior', null);
@@ -84,10 +85,10 @@ describe('crowd bandwidth', () => {
     const seconds = MEASURE_TICKS / SNAPSHOTS_PER_SECOND;
     const perClient = (b: number) => b / PLAYERS / seconds / 1024;
     console.log(
-      `entity-stream bandwidth, ${PLAYERS} players walking in town: `
-      + `legacy ${perClient(legacyBytes).toFixed(1)} KB/s/client -> `
-      + `new ${perClient(newBytes).toFixed(1)} KB/s/client `
-      + `(${(100 - (newBytes / legacyBytes) * 100).toFixed(0)}% reduction)`,
+      `entity-stream bandwidth, ${PLAYERS} players walking in town: ` +
+        `legacy ${perClient(legacyBytes).toFixed(1)} KB/s/client -> ` +
+        `new ${perClient(newBytes).toFixed(1)} KB/s/client ` +
+        `(${(100 - (newBytes / legacyBytes) * 100).toFixed(0)}% reduction)`,
     );
 
     expect(newBytes).toBeLessThan(legacyBytes * 0.5);

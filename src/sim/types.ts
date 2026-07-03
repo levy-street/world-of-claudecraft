@@ -15,6 +15,11 @@ export const INTERACT_RANGE = 5;
 // Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
 export const YELL_RANGE = 100;
 export const OBJECT_RESPAWN = 30;
+// How many of a party member's auras ride the party wire (PartyMemberInfo.auras,
+// the mini icon strip under each party frame row). A cap, not a filter: the first
+// N in aura order, buffs and debuffs alike. Neutral const shared by Sim.partyInfo,
+// the server's partyWire, and the world_api shape, so it lives here.
+export const PARTY_MEMBER_AURA_CAP = 8;
 // Pet tuning shared between the pet-AI slice (src/sim/pet/pet_ai.ts) and code that
 // stays on Sim, so it lives in this neutral module (the slice-only PET_* consts live
 // in pet_ai.ts). PET_GROWL_INTERVAL is read by the moved updatePet auto-taunt arm AND
@@ -157,6 +162,10 @@ export type AuraKind =
   | 'imbue'
   | 'buff_sta'
   | 'buff_allstats'
+  // Percentage drain on the whole stat block (value is a signed fraction, e.g.
+  // -0.75 = stats reduced to 25%). Resurrection Sickness uses it; see
+  // src/sim/spirit.ts and recalcPlayerStats.
+  | 'buff_allstats_pct'
   | 'thorns'
   | 'form_bear'
   | 'form_cat'
@@ -289,7 +298,8 @@ type ItemKind =
   | 'drink'
   | 'tool'
   | 'potion'
-  | 'elixir';
+  | 'elixir'
+  | 'bag';
 
 interface BaseItemDef {
   id: string;
@@ -323,6 +333,12 @@ interface BaseItemDef {
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
+  // bags (kind:'bag'): extra inventory slots granted while equipped in one of
+  // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
+  bagSlots?: number;
+  // Max copies per inventory slot. When omitted the default is derived from
+  // `kind` (weapon/armor/bag/tool: 1, everything else: 20); see stackSizeOf.
+  stackSize?: number;
   requiredClass?: PlayerClass[];
   // Minimum character level needed to equip this piece. When omitted, the level
   // is DERIVED from `quality` (see src/sim/item_level_req.ts); set this only to
@@ -1547,6 +1563,15 @@ export interface Entity {
   dungeonId: string | null; // set on dungeon door/exit portals
   // misc
   dead: boolean;
+  // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.
+  // `ghost` is true once the player has released their spirit: `dead` stays true
+  // (a ghost still cannot fight or be attacked) but the spirit CAN move, runs at a
+  // boosted speed, and is rendered translucent. `corpsePos` marks where the body
+  // fell so the client can draw a corpse marker and the server can gate
+  // resurrect-at-corpse on range. Both inert (false / null) for the living and for
+  // every non-player entity. Owned by src/sim/spirit.ts.
+  ghost: boolean;
+  corpsePos: Vec3 | null;
   scale: number;
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.

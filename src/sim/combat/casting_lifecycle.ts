@@ -605,17 +605,27 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
   const billableCost = (): number =>
     res.cost > 0 && !togglingOff && consumeNextCastFree(ctx, p) ? 0 : res.cost;
   if (ability.id === 'conjure_water') {
-    spendResource(p, billableCost());
     // higher ranks conjure better water (falls back if the item isn't defined)
     const tiered = `conjured_water${res.rank}`;
-    ctx.addItem(res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_water', 2, p.id);
+    const waterId = res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_water';
+    if (!ctx.canAddItem(waterId, 2, p.id)) {
+      ctx.error(p.id, 'Your bags are full.');
+      return;
+    }
+    spendResource(p, billableCost());
+    ctx.addItem(waterId, 2, p.id);
     return;
   }
   if (ability.id === 'conjure_food') {
-    spendResource(p, billableCost());
     // higher ranks conjure heartier fare (falls back if the item isn't defined)
     const tiered = `conjured_bread${res.rank}`;
-    ctx.addItem(res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_bread', 2, p.id);
+    const foodId = res.rank > 1 && ITEMS[tiered] ? tiered : 'conjured_bread';
+    if (!ctx.canAddItem(foodId, 2, p.id)) {
+      ctx.error(p.id, 'Your bags are full.');
+      return;
+    }
+    spendResource(p, billableCost());
+    ctx.addItem(foodId, 2, p.id);
     return;
   }
   if (ability.id === 'revive_pet') {

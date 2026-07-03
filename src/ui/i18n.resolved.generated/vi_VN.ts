@@ -154,6 +154,11 @@ export const vi_VN: EnTranslations = {
     "spectate": {
       "banner": "Đang xem {name}"
     },
+    "death": {
+      "resurrectAtCorpse": "Resurrect at Corpse",
+      "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
+      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+    },
     "emotes": {
       "wave": "Vẫy Tay",
       "laugh": "Cười Lớn",
@@ -280,7 +285,10 @@ export const vi_VN: EnTranslations = {
       "targetAnnounce": "Đánh Dấu {name}",
       "partyLabel": "Đội Của Bạn",
       "partyGroup": "Nhóm {n}",
-      "durationUnitSeconds": "s"
+      "durationUnitSeconds": "s",
+      "durationUnitMinutes": "m",
+      "durationUnitHours": "h",
+      "durationUnitDays": "d"
     },
     "character": {
       "modelPreview": "Xem Trước Mô Hình Nhân Vật"
@@ -394,6 +402,7 @@ export const vi_VN: EnTranslations = {
       "uiScale": "Tỷ Lệ Giao Diện",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
+      "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "walkByAutoloot": "Walk-by Autoloot",
@@ -748,7 +757,13 @@ export const vi_VN: EnTranslations = {
       "sortName": "Tên",
       "searchPlaceholder": "Tìm vật phẩm",
       "searchAria": "Tìm vật phẩm trong túi theo tên",
-      "noMatch": "Không có vật phẩm nào khớp với bộ lọc của bạn."
+      "noMatch": "Không có vật phẩm nào khớp với bộ lọc của bạn.",
+      "capacity": "{used}/{total}",
+      "capacityAria": "Bag slots used: {used} of {total}",
+      "backpack": "Backpack",
+      "bagSocketAria": "{name}: {slots}",
+      "socketEmpty": "Empty bag slot",
+      "unequipHint": "Click to remove this bag"
     },
     "raidConvert": {
       "toPartyDone": "Raid của bạn đã chuyển trở lại thành tổ đội.",
@@ -791,6 +806,7 @@ export const vi_VN: EnTranslations = {
         "spi": "Reduce el espíritu en {value}",
         "allStats": "Reduce todos los atributos en {value}"
       },
+      "allStatsPctReduce": "Reduces all attributes by {pct}%",
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "armorFlat": "Reduce la armadura en {value}",
@@ -1141,6 +1157,10 @@ export const vi_VN: EnTranslations = {
           "note": "Pilgrims gather at the temple moongate under the mid-month moon."
         }
       }
+    },
+    "social": {
+      "lastSeen": "Last seen: {when}",
+      "lastSeenNever": "never"
     }
   },
   "guide": {
@@ -4239,7 +4259,8 @@ export const vi_VN: EnTranslations = {
       "drink": "Đồ Uống",
       "tool": "Dụng Cụ",
       "potion": "Thuốc",
-      "elixir": "Tiên Dược"
+      "elixir": "Tiên Dược",
+      "bag": "Bag"
     },
     "stats": {
       "armor": "Giáp",
@@ -4281,7 +4302,8 @@ export const vi_VN: EnTranslations = {
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
-      "clickBuyback": "Nhấp để mua lại"
+      "clickBuyback": "Nhấp để mua lại",
+      "bagSlots": "{slots} Slot Bag"
     },
     "bags": {
       "title": "Túi Đồ",
@@ -5583,6 +5605,21 @@ export const vi_VN: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Vương Miện Quân Vương"
       },
+      "linen_pouch": {
+        "name": "Túi vải lanh"
+      },
+      "travelers_knapsack": {
+        "name": "Ba lô lữ khách"
+      },
+      "wolfhide_satchel": {
+        "name": "Túi da sói"
+      },
+      "gravewoven_bag": {
+        "name": "Túi dệt mộ"
+      },
+      "mistcallers_duffel": {
+        "name": "Túi vải của Kẻ Gọi Sương"
+      },
       "copper_mining_pick": {
         "name": "Cuốc Khai Khoáng Đồng"
       },
@@ -6634,6 +6671,11 @@ export const vi_VN: EnTranslations = {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
         "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+      },
+      "spirit_healer": {
+        "name": "The Pale Keeper",
+        "title": "Warden of the Dead",
+        "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

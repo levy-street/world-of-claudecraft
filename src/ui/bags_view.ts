@@ -47,6 +47,7 @@ export type BagAction =
   | 'petFeed'
   | 'petFeedBlocked'
   | 'discardQuest'
+  | 'equipBag'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -82,6 +83,7 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   if (mode.vendorOpen) return 'vendorSell';
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
+  if (item.kind === 'bag') return 'equipBag';
   return 'use';
 }
 
@@ -109,7 +111,8 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
   if (mode.vendorOpen)
     return item.kind === 'quest' ? 'itemUi.tooltip.cannotVendor' : 'itemUi.tooltip.clickSell';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
-  if (item.kind === 'weapon' || item.kind === 'armor') return 'itemUi.tooltip.clickEquip';
+  if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'bag')
+    return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';
   if (item.kind === 'potion') return 'itemUi.tooltip.clickUseInstant';
   if (item.use) return 'itemUi.tooltip.clickUse';
@@ -131,19 +134,77 @@ export interface BagGridModel {
   state: BagGridState;
   /** The filtered, ordered slots to paint (empty unless state === 'items'). */
   visible: InvSlot[];
+  /** Free slot squares to paint after the items (0 while a filter/search is
+   *  active: a filtered view shows matches only, not the free space). */
+  emptyCells: number;
+  /** Stacks above the capacity budget (a legacy over-capacity save); the
+   *  painter surfaces it on the capacity counter. 0 when within budget. */
+  overflow: number;
+}
+
+/** True when the filter is showing everything (no category, no search), which
+ *  is the only view where the free-slot squares are meaningful. */
+export function bagFilterIsDefault(filter: BagFilterState): boolean {
+  return filter.category === 'all' && filter.search.trim() === '';
 }
 
 /** Build the filtered grid model from the raw inventory + filter state, reusing
- *  applyBagFilter (bag_filter.ts) for the filter/sort. An empty bag shows the
- *  "(empty)" line; a non-empty bag whose filter matches nothing shows the
- *  "no match" line; otherwise the ordered visible slots are painted. */
+ *  applyBagFilter (bag_filter.ts) for the filter/sort. An empty unfiltered bag
+ *  paints capacity empty squares (state 'empty' keeps the "(empty)" line for a
+ *  zero-capacity edge); a non-empty bag whose filter matches nothing shows the
+ *  "no match" line; otherwise the ordered visible slots are painted, padded
+ *  with the free-slot squares in the unfiltered view. */
 export function buildBagGrid(
   inventory: readonly InvSlot[],
   lookup: ItemLookup,
   filter: BagFilterState,
+  capacity = 0,
 ): BagGridModel {
-  if (inventory.length === 0) return { state: 'empty', visible: [] };
+  const showEmpties = bagFilterIsDefault(filter);
+  const emptyCells = showEmpties ? Math.max(0, capacity - inventory.length) : 0;
+  const overflow = Math.max(0, inventory.length - capacity);
+  if (inventory.length === 0) {
+    return emptyCells > 0
+      ? { state: 'items', visible: [], emptyCells, overflow }
+      : { state: 'empty', visible: [], emptyCells: 0, overflow };
+  }
   const visible = applyBagFilter(inventory, lookup, filter);
-  if (visible.length === 0) return { state: 'noMatch', visible: [] };
-  return { state: 'items', visible };
+  if (visible.length === 0) return { state: 'noMatch', visible: [], emptyCells: 0, overflow };
+  return { state: 'items', visible, emptyCells, overflow };
+}
+
+/** One socket of the bag bar: the equipped bag (with its slot count) or an
+ *  empty socket awaiting a bag item. */
+export interface BagSocketModel {
+  socket: number;
+  itemId: string | null;
+  slots: number;
+}
+
+/** The bag-bar model: the implicit backpack plus the 4 equip sockets, and the
+ *  used/capacity counter the header shows. Pure data; the painter renders it. */
+export interface BagBarModel {
+  backpackSlots: number;
+  sockets: BagSocketModel[];
+  used: number;
+  capacity: number;
+}
+
+export function buildBagBar(
+  bags: readonly (string | null)[],
+  used: number,
+  capacity: number,
+  backpackSlots: number,
+  bagSlotsOf: (itemId: string) => number,
+): BagBarModel {
+  return {
+    backpackSlots,
+    sockets: bags.map((itemId, socket) => ({
+      socket,
+      itemId,
+      slots: itemId ? bagSlotsOf(itemId) : 0,
+    })),
+    used,
+    capacity,
+  };
 }

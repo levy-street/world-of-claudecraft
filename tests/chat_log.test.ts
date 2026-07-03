@@ -5,6 +5,7 @@ vi.mock('../server/db', () => ({
   insertChatLogs: vi.fn(async () => {}),
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
@@ -46,7 +47,11 @@ describe('sent chat normalization', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.addPlayer('mage', 'Bet');
-    expect(sim.chat('/w bet psst', a)).toEqual({ channel: 'whisper', message: 'psst', target: 'Bet' });
+    expect(sim.chat('/w bet psst', a)).toEqual({
+      channel: 'whisper',
+      message: 'psst',
+      target: 'Bet',
+    });
     expect(sim.chat('/w nobody psst', a)).toBeNull();
   });
 
@@ -57,7 +62,10 @@ describe('sent chat normalization', () => {
     expect(sim.chat('/p before party', a)).toBeNull();
     sim.partyInvite(b, a);
     sim.partyAccept(b);
-    expect(sim.chat('/p inc on the left', a)).toEqual({ channel: 'party', message: 'inc on the left' });
+    expect(sim.chat('/p inc on the left', a)).toEqual({
+      channel: 'party',
+      message: 'inc on the left',
+    });
   });
 
   it('does not capture discarded, unknown, or throttled messages', () => {
@@ -108,7 +116,8 @@ describe('GameServer chat logging', () => {
     if ('error' in a || 'error' in b) throw new Error('join failed');
 
     const logSpy = vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
-    const sendChat = (text: string) => server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text }));
+    const sendChat = (text: string) =>
+      server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text }));
 
     sendChat('hello world');
     sendChat('/y Over here');
@@ -127,7 +136,11 @@ describe('GameServer chat logging', () => {
       { channel: 'whisper', message: 'psst' },
       { channel: 'party', message: 'party only' },
     ]);
-    expect(logSpy.mock.calls.every(([r]) => r.accountId === 11 && r.characterId === 101 && r.characterName === 'Aleph')).toBe(true);
+    expect(
+      logSpy.mock.calls.every(
+        ([r]) => r.accountId === 11 && r.characterId === 101 && r.characterName === 'Aleph',
+      ),
+    ).toBe(true);
   });
 
   it('routes /g through guild chat and remembers guild for plain follow-up messages', async () => {
@@ -138,7 +151,8 @@ describe('GameServer chat logging', () => {
 
     const guildSpy = vi.spyOn(server.social, 'guildChat').mockResolvedValue(true);
     const logSpy = vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
-    const sendChat = (text: string) => server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text }));
+    const sendChat = (text: string) =>
+      server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text }));
 
     sendChat('/g hello guild');
     sendChat('still guild');
@@ -160,7 +174,8 @@ describe('GameServer chat logging', () => {
     if ('error' in a || 'error' in b) throw new Error('join failed');
 
     const logSpy = vi.spyOn(server.chatLog, 'log').mockImplementation(() => {});
-    const sendChat = (text: string) => server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text }));
+    const sendChat = (text: string) =>
+      server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text }));
 
     sendChat('/w Bet first');
     sendChat('second');
@@ -185,10 +200,18 @@ describe('GameServer chat logging', () => {
     server.handleMessage(a, JSON.stringify({ t: 'cmd', cmd: 'chat', text: 'hello world' }));
 
     expect(logSpy).not.toHaveBeenCalled();
-    expect(aWs.sent.some((msg: any) =>
-      msg.t === 'events' &&
-      msg.list?.some((ev: any) => ev.type === 'error' && /muted from chat/i.test(ev.text) && /keep chat civil/i.test(ev.text)),
-    )).toBe(true);
+    expect(
+      aWs.sent.some(
+        (msg: any) =>
+          msg.t === 'events' &&
+          msg.list?.some(
+            (ev: any) =>
+              ev.type === 'error' &&
+              /muted from chat/i.test(ev.text) &&
+              /keep chat civil/i.test(ev.text),
+          ),
+      ),
+    ).toBe(true);
   });
 });
 
@@ -198,7 +221,9 @@ describe('ChatLogger', () => {
 
   it('batches rows and flushes on the timer', async () => {
     const writes: ChatLogRow[][] = [];
-    const logger = new ChatLogger(async (rows) => { writes.push(rows); });
+    const logger = new ChatLogger(async (rows) => {
+      writes.push(rows);
+    });
     logger.log(row('one'));
     logger.log(row('two'));
     expect(writes).toHaveLength(0); // nothing written yet
@@ -209,7 +234,9 @@ describe('ChatLogger', () => {
 
   it('flushes early once 100 rows are buffered', async () => {
     const writes: ChatLogRow[][] = [];
-    const logger = new ChatLogger(async (rows) => { writes.push(rows); });
+    const logger = new ChatLogger(async (rows) => {
+      writes.push(rows);
+    });
     for (let i = 0; i < 100; i++) logger.log(row(`m${i}`));
     await vi.advanceTimersByTimeAsync(0);
     expect(writes).toHaveLength(1);
@@ -218,7 +245,9 @@ describe('ChatLogger', () => {
 
   it('stop() flushes whatever is left', async () => {
     const writes: ChatLogRow[][] = [];
-    const logger = new ChatLogger(async (rows) => { writes.push(rows); });
+    const logger = new ChatLogger(async (rows) => {
+      writes.push(rows);
+    });
     logger.log(row('last words'));
     await logger.stop();
     expect(writes).toHaveLength(1);

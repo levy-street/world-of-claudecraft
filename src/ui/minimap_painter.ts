@@ -67,7 +67,38 @@ const NPC_GLYPH_FONT = 'bold 11px Georgia';
 const NPC_GLYPH_OFFSET_X = 2;
 const NPC_GLYPH_OFFSET_Y = 3;
 
+// Corpse marker (ghost run): a compact procedural skull, drawn from canvas
+// primitives (cranium + jaw in the corpse color, eye sockets and a nasal notch
+// punched in the outline color) so it reads as a skull at minimap scale without
+// shipping a text/emoji glyph. Centered on the marker point.
+const CORPSE_SKULL_CRANIUM_R = 4;
+const CORPSE_SKULL_JAW_HALF = 2.5;
+const CORPSE_SKULL_EYE_R = 1.1;
+
 const FULL_CIRCLE = Math.PI * 2;
+
+// Draw the corpse skull centered at (x, y): `fill` paints the bone, `socket` the
+// dark eye/nose hollows so the shape reads even over light terrain.
+function drawCorpseSkull(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  fill: string,
+  socket: string,
+): void {
+  ctx.fillStyle = fill;
+  ctx.beginPath();
+  ctx.arc(x, y - 1, CORPSE_SKULL_CRANIUM_R, 0, FULL_CIRCLE);
+  ctx.fill();
+  ctx.fillRect(x - CORPSE_SKULL_JAW_HALF, y + 1.5, CORPSE_SKULL_JAW_HALF * 2, 3);
+  ctx.fillStyle = socket;
+  ctx.beginPath();
+  ctx.arc(x - 1.7, y - 1, CORPSE_SKULL_EYE_R, 0, FULL_CIRCLE);
+  ctx.arc(x + 1.7, y - 1, CORPSE_SKULL_EYE_R, 0, FULL_CIRCLE);
+  ctx.fill();
+  // nasal notch + a tooth gap so the jaw does not read as a solid block
+  ctx.fillRect(x - 0.4, y + 1.5, 0.8, 3);
+}
 
 // The `--color-minimap-*` design tokens the painter resolves once and caches (they are
 // static; see resolveColors). These mirror the colors the inline overworld minimap used
@@ -81,6 +112,7 @@ const MINIMAP_COLOR_TOKENS = {
   mobAggro: '--color-minimap-mob-aggro',
   mob: '--color-minimap-mob',
   mobLoot: '--color-minimap-mob-loot',
+  corpse: '--color-minimap-corpse',
   partyDead: '--color-minimap-party-dead',
   partyPip: '--color-minimap-party-pip',
   player: '--color-minimap-player',
@@ -220,6 +252,10 @@ export class MinimapPainter {
             MARKER_RECT_SIZE,
             MARKER_RECT_SIZE,
           );
+          break;
+        case 'corpse':
+          // The local player's body during a ghost run: a procedural skull.
+          drawCorpseSkull(ctx, m.mx, m.my, colors.corpse, colors.outline);
           break;
         case 'party-disc': {
           ctx.fillStyle = m.dead ? colors.partyDead : this.classColor(m.cls);

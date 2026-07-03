@@ -123,6 +123,7 @@ const NPC_IDS = [
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
+  'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
 ] as const;
 
 const QUEST_IDS = [

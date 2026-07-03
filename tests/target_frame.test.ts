@@ -50,6 +50,9 @@ interface TargetState {
   castTotal: number;
   castRemaining: number;
   channeling: boolean;
+  resourceType: 'mana' | 'rage' | 'energy' | null;
+  resource: number;
+  maxResource: number;
 }
 
 const GAMEPLAY: TargetState = {
@@ -67,6 +70,12 @@ const GAMEPLAY: TargetState = {
   castTotal: 4,
   castRemaining: 1.5,
   channeling: false,
+  // The wire now carries rtype/res/mres for any entity that HAS a resource
+  // (server/game.ts dynamicFields; online.ts decodes them), so the target's
+  // power bar derives identically across hosts. Nythraxis is a caster.
+  resourceType: 'mana',
+  resource: 350,
+  maxResource: 500,
 };
 
 // Build a Sim-shaped entity: the offline core's live fields plus Sim-only extras
@@ -102,9 +111,9 @@ function targetDescriptor(e: Entity): UnitFrameDescriptor {
     present: true,
     hpFrac: t.hp / Math.max(1, t.maxHp),
     hpText: t.dead ? 'Dead' : `${t.hp} / ${t.maxHp}`,
-    resourceKind: 'none',
-    resFrac: 0,
-    resText: '',
+    resourceKind: t.dead || !t.resourceType ? 'none' : t.resourceType,
+    resFrac: t.dead || !t.resourceType ? 0 : t.resource / Math.max(1, t.maxResource),
+    resText: t.dead || !t.resourceType ? '' : `${Math.round(t.resource)} / ${t.maxResource}`,
     levelText: t.boss ? BOSS_SKULL_GLYPH : String(t.level),
     name: t.displayName,
     portraitKey: String(t.id),
@@ -132,7 +141,12 @@ describe('target frame: Sim-vs-ClientWorld parity', () => {
     // the whole view is identical across hosts.
     expect(fromClient).toEqual(fromSim);
     expect(fromSim.levelText).toBe(BOSS_SKULL_GLYPH); // boss skull, not a number
-    expect(fromSim.resClass).toBe('none'); // a target has no resource bar
+    expect(fromSim.resClass).toBe('mana'); // a caster target shows its power bar
+    expect(fromSim.resText).toBe('350 / 500');
+    // A resource-less beast (rtype null) turns every type class off: the bar hides.
+    expect(
+      unitFrameView(targetDescriptor(simTarget({ resourceType: null, resource: 0 }))).resClass,
+    ).toBe('none');
     // the hostile name color is a pure function of the mirrored `hostile` field:
     expect(targetNameColor(simTarget())).toBe(targetNameColor(clientTarget()));
     expect(targetNameColor(simTarget())).toBe('var(--color-hostile)');

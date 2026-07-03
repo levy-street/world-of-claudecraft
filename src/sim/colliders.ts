@@ -714,6 +714,51 @@ export function cameraOcclusion(
   return best;
 }
 
+// Eye height (yards above the ground) for the spell line-of-sight ray. An
+// open-world obstacle whose visual top (`cameraTopY`, the same precomputed top
+// the camera occlusion uses) sits at or below the sight line no longer blocks a
+// cast: a campfire (top 1.45), a crate (1.35), or a small rock is something you
+// see and cast OVER, while buildings, trees, tents, and fences still block.
+// Colliders without a known top (the interior wall layouts) always block, the
+// conservative default, and MOVEMENT collision is untouched everywhere.
+export const SIGHT_HEIGHT = 1.6;
+
+// Does any collider at (x,z) rise above `sightY` (absolute world Y of the
+// sight line at that sample)? Mirrors resolvePosition's zone routing so
+// interiors, delves and the arena keep their wall sets, but tests pure overlap
+// (no push-out) and applies the low-obstacle skip only where tops are known.
+function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: number): boolean {
+  const overlapsAny = (list: Collider[], lx: number, lz: number, skipLow: boolean): boolean => {
+    for (const c of list) {
+      if (skipLow && c.cameraTopY !== undefined && c.cameraTopY <= sightY) continue;
+      if (pushOut(c, lx, lz, r) !== null) return true;
+    }
+    return false;
+  };
+  if (isDelvePos(x)) {
+    const delve = delveAt(x);
+    const mods = delve ? defaultDelveModules(delve.id) : [];
+    const loc = delveModuleLocal(x, z, mods);
+    return overlapsAny(
+      delveModuleColliders(loc.moduleId as DelveModuleId),
+      loc.localX,
+      loc.localZ,
+      false,
+    );
+  }
+  if (isArenaPos(x)) {
+    const o = arenaOriginAt(z);
+    return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
+  }
+  if (x > DUNGEON_X_THRESHOLD) {
+    const { ox, oz, interior } = instanceLocal(x, z);
+    return overlapsAny(INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS, x - ox, z - oz, false);
+  }
+  const grid = gridFor(seed);
+  const list = grid.cells.get(`${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`);
+  return list ? overlapsAny(list, x, z, true) : false;
+}
+
 export function lineOfSightClear(
   seed: number,
   from: { x: number; z: number },
@@ -725,6 +770,10 @@ export function lineOfSightClear(
   const dz = to.z - from.z;
   const d = Math.hypot(dx, dz);
   if (d < 1e-6) return true;
+  // The sight line runs eye-to-eye: lerp the endpoint eye heights per sample so
+  // a low prop only blocks when its top actually crosses the line.
+  const eyeFrom = groundHeight(from.x, from.z, seed) + SIGHT_HEIGHT;
+  const eyeTo = groundHeight(to.x, to.z, seed) + SIGHT_HEIGHT;
   const steps = Math.max(2, Math.ceil(d / 0.5));
   if (isDelvePos(from.x)) {
     const delve = delveAt(from.x);
@@ -748,7 +797,7 @@ export function lineOfSightClear(
     const t = i / steps;
     const x = from.x + dx * t;
     const z = from.z + dz * t;
-    if (isBlocked(seed, x, z, r, false, delveModules)) return false;
+    if (sightBlockedAt(seed, x, z, r, eyeFrom + (eyeTo - eyeFrom) * t)) return false;
   }
   return true;
 }

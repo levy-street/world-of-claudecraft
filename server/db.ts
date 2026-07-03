@@ -78,6 +78,10 @@ CREATE TABLE IF NOT EXISTS characters (
 );
 CREATE INDEX IF NOT EXISTS characters_account ON characters(account_id);
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}';
+-- Last time this character entered the world (stamped on join). Drives the
+-- "last seen" readout on offline guild-roster rows. Nullable: a character that
+-- has never entered the world since this column was added reads NULL.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
 -- (cross-realm) home-page board.
@@ -813,6 +817,12 @@ export async function characterCountForAccount(accountId: number): Promise<numbe
     [accountId],
   );
   return res.rows[0]?.count ?? 0;
+}
+
+// Stamp a character's last world-entry time. Called best-effort on join; drives
+// the "last seen" readout on guild-roster rows.
+export async function touchCharacterLogin(characterId: number): Promise<void> {
+  await pool.query('UPDATE characters SET last_login = now() WHERE id = $1', [characterId]);
 }
 
 export async function updatePasswordHash(accountId: number, passwordHash: string): Promise<void> {

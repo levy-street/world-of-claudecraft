@@ -572,6 +572,10 @@ export interface SimContextCallbacks {
   targetEntity(id: number | null, pid?: number): void;
   partyCapacity(party: Party | null): number;
   marketListingBelongsTo(listing: MarketListing, meta: PlayerMeta): boolean;
+  // B1 bags (src/sim/bags.ts): the capacity pre-check every blocking command
+  // path calls before granting (buy/loot/pickup/fish/conjure/collect/trade/
+  // turn-in). Stays on Sim next to the addItem/removeItem/countItem hub.
+  canAddItem(itemId: string, count: number, pid?: number): boolean;
 
   // Ravenpost mail (mail/post_office.ts): the quest turn-in core
   // (quests/quest_commands.ts) queues the giver's authored thank-you letter
@@ -914,6 +918,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     targetEntity: host.targetEntity,
     partyCapacity: host.partyCapacity,
     marketListingBelongsTo: host.marketListingBelongsTo,
+    // B1 bags capacity pre-check (addItem/removeItem/countItem bound above; deduped).
+    canAddItem: host.canAddItem,
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
   };

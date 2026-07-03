@@ -29,6 +29,7 @@ import {
   type EquipSlot,
   emptyMoveInput,
   MAX_LEVEL,
+  PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
   type SimEvent,
 } from '../src/sim/types';
@@ -64,6 +65,7 @@ import {
   saveCharacterState,
   saveMailState,
   saveMarketState,
+  touchCharacterLogin,
   walletForAccount,
 } from './db';
 import { enqueueActivity } from './discord_activity';
@@ -259,6 +261,8 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'unequip_item',
+  'equip_bag',
+  'unequip_bag',
   'use',
   'discard',
   'buy',
@@ -566,8 +570,19 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     mhp: e.maxHp,
   };
   if (e.dead) out.dead = 1;
+  if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
+  // The target frame's resource bar: type + current/max, sent only for entities
+  // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
+  // three and the frame hides its bar). The rounded res keeps an idle entity's
+  // serialized record byte-stable so the per-entity dyn cache keeps eliding; the
+  // SELF record still overrides with its own precise res/mres/rtype fields.
+  if (e.resourceType) {
+    out.rtype = e.resourceType;
+    out.res = Math.round(e.resource);
+    out.mres = e.maxResource;
+  }
   if (e.castingAbility) {
     out.cast = e.castingAbility;
     out.castRem = round2(e.castRemaining);
@@ -1536,6 +1551,11 @@ export class GameServer {
     this.sessionsByCharacterId.set(characterId, session);
     this.peakOnline = Math.max(this.peakOnline, this.clients.size);
     void this.recordOnlineSnapshot();
+    // Stamp this character's last world-entry time for the guild-roster "last
+    // seen" readout. Best-effort: a failed write must never block joining.
+    void touchCharacterLogin(characterId).catch((err) =>
+      console.error('failed to stamp character last_login:', err),
+    );
     openPlaySession(accountId, characterId, name, meta)
       .then((id) => {
         session.dbSessionId = id;
@@ -2238,7 +2258,10 @@ export class GameServer {
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
       }
-      if (frame.facing !== null && !e.dead) {
+      // A released spirit turns with the camera like the living; only a corpse that
+      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
+      // this the server drops the ghost's mouselook facing and its run feels inverted.
+      if (frame.facing !== null && (!e.dead || e.ghost)) {
         e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
@@ -2415,6 +2438,18 @@ export class GameServer {
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
+      case 'equip_bag':
+        if (typeof msg.item === 'string') {
+          const socket =
+            typeof msg.socket === 'number' && Number.isInteger(msg.socket) ? msg.socket : undefined;
+          sim.equipBag(msg.item, socket, pid);
+        }
+        break;
+      case 'unequip_bag':
+        if (typeof msg.socket === 'number' && Number.isInteger(msg.socket)) {
+          sim.unequipBag(msg.socket, pid);
+        }
+        break;
       case 'change_skin':
         if (typeof msg.skin === 'number') {
           if (msg.catalog === 'mech') {
@@ -2443,6 +2478,12 @@ export class GameServer {
         break;
       case 'release':
         sim.releaseSpirit(pid);
+        break;
+      case 'resurrect_corpse':
+        sim.resurrectAtCorpse(pid);
+        break;
+      case 'resurrect_healer':
+        sim.resurrectAtSpiritHealer(pid);
         break;
       case 'challengeResponse':
         if (typeof msg.n === 'string' && typeof msg.r === 'string' && typeof msg.sig === 'string') {
@@ -3300,6 +3341,10 @@ export class GameServer {
       'lockouts',
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
+    // Where the player's corpse lies while their spirit is a ghost (null otherwise).
+    // Delta-guarded: ships on death-release and clears on resurrect. The client
+    // draws the corpse marker and gates the resurrect-at-corpse button on it.
+    maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
@@ -3352,6 +3397,7 @@ export class GameServer {
       session.selfHeavyDirty = false;
       session.lastWireRev = meta.wireRev;
       maybe('inv', meta.inventory);
+      maybe('bags', meta.bags);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('cosmetics', anchorSession.accountCosmetics);
@@ -3398,6 +3444,15 @@ export class GameServer {
                 dead: e.dead ? 1 : 0,
                 inCombat: e.inCombat ? 1 : 0,
                 group: party.raidGroups.get(mPid) ?? 1,
+                // The mini aura strip under the member's party row (mirrors
+                // Sim.partyInfo): first N in aura order, id + kind + sap flag
+                // only, no countdown, so this payload changes only when the
+                // aura SET changes and the party delta elision keeps working.
+                auras: e.auras.slice(0, PARTY_MEMBER_AURA_CAP).map((a) => ({
+                  id: a.id,
+                  kind: a.kind,
+                  ...(a.value < 0 ? { neg: 1 } : {}),
+                })),
               }
             : null;
         })
