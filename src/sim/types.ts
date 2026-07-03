@@ -1407,6 +1407,11 @@ export interface Entity {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
+  // The enemy target captured when a timed/channeled cast began. A single-target
+  // spell resolves on THIS entity, not whoever is targeted at completion, so
+  // switching targets mid-cast no longer redirects the spell (classic lock-to-target).
+  // null for instant casts (no window to switch) and non-targeted/self casts.
+  castTargetId: number | null;
   // Ground-targeted casting: the world point a `targetMode: 'position'` ability is
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.

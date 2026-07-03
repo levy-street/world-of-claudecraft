@@ -113,15 +113,16 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
-  // A hostile-targeted cast stops the instant its target dies (killed by a DoT, a party
-  // member, etc.), instead of finishing to a corpse and fizzling. Only a target that is
-  // present and dead cancels here; a merely-absent target (deselected, out of interest)
-  // is left to the existing resolution path. Friendly and self casts, ground-targeted
-  // casts, and the fishing cast are unaffected.
+  // A hostile-targeted cast stops the instant its (captured) target dies (killed by a
+  // DoT, a party member, etc.), instead of finishing to a corpse and fizzling. It is the
+  // ORIGINAL target that matters, not whoever is selected now (see castTargetId). Only a
+  // present-and-dead target cancels here; a merely-absent one is left to the resolution
+  // path. Friendly/self casts, ground-targeted casts, and the fishing cast are exempt.
   if (p.castingAbility !== FISHING_CAST_ID) {
     const cast = ctx.resolvedAbility(p.castingAbility, p.id);
     if (cast && cast.def.requiresTarget && cast.def.targetType !== 'friendly') {
-      const tgt = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+      const tid = p.castTargetId ?? p.targetId;
+      const tgt = tid !== null ? ctx.entities.get(tid) : null;
       if (tgt?.dead) {
         cancelCast(ctx, p);
         return;
@@ -144,6 +145,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     if (p.castRemaining <= CAST_COMPLETE_EPS) {
       p.castingAbility = null;
       p.channeling = false;
+      p.castTargetId = null;
       // completed ground-targeted channels drop their aim like every other
       // resolve path: castAim is always cleared on resolve
       p.castAim = null;
@@ -164,8 +166,10 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     const res = ctx.resolvedAbility(castId, p.id);
     if (res) applyAbility(ctx, p, meta, res);
     // the aim point is consumed by the resolved area effects; drop it so a later
-    // non-aimed cast can't inherit a stale target point.
+    // non-aimed cast can't inherit a stale target point. The captured cast target is
+    // cleared here too, AFTER applyAbility read it.
     p.castAim = null;
+    p.castTargetId = null;
   }
 }
 
@@ -173,6 +177,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.castingAbility = null;
   p.castRemaining = 0;
   p.channeling = false;
+  p.castTargetId = null;
   p.castAim = null;
   ctx.emit({ type: 'castStop', entityId: p.id, success: false });
 }
@@ -460,6 +465,7 @@ export function castAbility(
     spendResource(p, res.cost);
     armAbilityCooldown(p, ability.id, res.cooldown);
     p.castingAbility = ability.id;
+    p.castTargetId = target?.id ?? null; // lock the cast to the target chosen now
     p.castTotal = ability.channel.duration;
     p.castRemaining = ability.channel.duration;
     p.channeling = true;
@@ -479,6 +485,7 @@ export function castAbility(
     // Curse of Tongues stretches the resolved (already haste-adjusted) cast time.
     const stretchedCastTime = castTime * tonguesMult(p);
     p.castingAbility = ability.id;
+    p.castTargetId = target?.id ?? null; // lock the cast to the target chosen now
     p.castTotal = stretchedCastTime;
     p.castRemaining = stretchedCastTime;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
@@ -487,9 +494,15 @@ export function castAbility(
   }
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
+  // An instant cast captures its target too, so applyAbility never reads a STALE
+  // castTargetId left by a prior timed cast that ended without cancelCast (e.g. the
+  // caster died mid-cast: handleDeath nulls castingAbility but not castTargetId).
+  p.castTargetId = target?.id ?? null;
   applyAbility(ctx, p, meta, res);
-  // instant ground-targeted cast: its effects have consumed the aim point.
+  // instant ground-targeted cast: its effects have consumed the aim point, and the
+  // captured target is done being read.
   p.castAim = null;
+  p.castTargetId = null;
 }
 
 export function spendResource(p: Entity, cost: number): void {
@@ -565,7 +578,10 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
-  const target = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+  // Each channel tick resolves on the target captured at cast start, not whoever is
+  // selected now, so retargeting mid-channel does not redirect the bolts.
+  const tid = p.castTargetId ?? p.targetId;
+  const target = tid !== null ? ctx.entities.get(tid) : null;
   if (!target || target.dead || !ctx.isHostileTo(p, target)) {
     cancelCast(ctx, p);
     return;
@@ -672,7 +688,11 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       return;
     }
   } else if (ability.requiresTarget) {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    // Resolve on the target captured when the cast began (castTargetId), so switching
+    // targets mid-cast no longer redirects a single-target spell to the new one. Instant
+    // casts do not capture a target (no switch window), so they fall back to the live one.
+    const castTid = p.castTargetId ?? p.targetId;
+    target = castTid !== null ? (ctx.entities.get(castTid) ?? null) : null;
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
       ctx.error(p.id, 'You have no target.');
       return;

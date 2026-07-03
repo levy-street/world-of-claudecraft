@@ -216,3 +216,68 @@ describe('casting_lifecycle: a cast stops when its target dies', () => {
     expect(p.castingAbility).toBe('fireball'); // still going, target alive
   });
 });
+
+describe('casting_lifecycle: a single-target cast locks to its original target', () => {
+  it('resolves on the target chosen at cast start, not the one switched to mid-cast', () => {
+    const { sim, p, meta } = makeSim('mage', 20);
+    p.resource = p.maxResource = 3000;
+    const mobA = spawnTarget(sim, p, 20, 20); // targeted, in fireball range, faced
+    const mobB = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: p.pos.x + 3,
+      y: p.pos.y,
+      z: p.pos.z + 20,
+    }) as AnyEntity;
+    mobB.maxHp = 5000;
+    mobB.hp = 5000;
+    mobB.hostile = true;
+    mobB.aiState = 'idle';
+    sim.addEntity(mobB);
+    const aHp0 = mobA.hp;
+    const bHp0 = mobB.hp;
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castTargetId).toBe(mobA.id); // captured the original target
+    sim.targetEntity(mobB.id, p.id); // switch selection mid-cast
+    expect(p.targetId).toBe(mobB.id);
+    drainCast(sim, p, meta); // finish the cast -> launches at the ORIGINAL target A
+    for (let i = 0; i < 60 && mobA.hp === aHp0; i++) sim.tick(); // let the bolt land
+
+    expect(mobA.hp).toBeLessThan(aHp0); // the original target took the hit
+    expect(mobB.hp).toBe(bHp0); // the switched-to target did not
+  });
+});
+
+describe('casting_lifecycle: a stale captured target never misdirects a later cast', () => {
+  it('an instant cast after a death-interrupted timed cast hits the current target', () => {
+    const { sim, p } = makeSim('mage', 20);
+    p.resource = p.maxResource = 5000;
+    const mobA = spawnTarget(sim, p, 20, 15); // targeted; timed cast will capture it
+    const mobB = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: p.pos.x + 2,
+      y: p.pos.y,
+      z: p.pos.z + 15,
+    }) as AnyEntity;
+    mobB.maxHp = 5000;
+    mobB.hp = 5000;
+    mobB.hostile = true;
+    mobB.aiState = 'idle';
+    sim.addEntity(mobB);
+
+    castAbility(sim.ctx, 'fireball', p.id); // timed cast captures A
+    expect(p.castTargetId).toBe(mobA.id);
+    // Simulate the caster dying mid-cast then reviving: castingAbility is cleared without
+    // cancelCast (handleDeath does this), and the GCD has since expired.
+    p.castingAbility = null;
+    p.gcdRemaining = 0;
+
+    sim.targetEntity(mobB.id, p.id); // now target B
+    p.facing = Math.atan2(mobB.pos.x - p.pos.x, mobB.pos.z - p.pos.z);
+    const aHp0 = mobA.hp;
+    const bHp0 = mobB.hp;
+    castAbility(sim.ctx, 'fire_blast', p.id); // instant hostile spell
+    for (let i = 0; i < 60 && mobB.hp === bHp0 && mobA.hp === aHp0; i++) sim.tick();
+
+    expect(mobB.hp).toBeLessThan(bHp0); // hit the CURRENT target
+    expect(mobA.hp).toBe(aHp0); // not the stale captured one
+  });
+});
