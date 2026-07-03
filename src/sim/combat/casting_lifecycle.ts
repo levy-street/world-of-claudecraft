@@ -113,6 +113,21 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
+  // A hostile-targeted cast stops the instant its target dies (killed by a DoT, a party
+  // member, etc.), instead of finishing to a corpse and fizzling. Only a target that is
+  // present and dead cancels here; a merely-absent target (deselected, out of interest)
+  // is left to the existing resolution path. Friendly and self casts, ground-targeted
+  // casts, and the fishing cast are unaffected.
+  if (p.castingAbility !== FISHING_CAST_ID) {
+    const cast = ctx.resolvedAbility(p.castingAbility, p.id);
+    if (cast && cast.def.requiresTarget && cast.def.targetType !== 'friendly') {
+      const tgt = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+      if (tgt?.dead) {
+        cancelCast(ctx, p);
+        return;
+      }
+    }
+  }
   p.castRemaining -= DT;
 
   if (p.channeling) {

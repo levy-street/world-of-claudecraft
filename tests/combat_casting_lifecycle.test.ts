@@ -160,8 +160,8 @@ describe('casting_lifecycle: Life Tap health guard', () => {
     p.gcdRemaining = 0;
     const mana0 = p.resource;
     const events: Array<Record<string, unknown>> = [];
-    const orig = (sim as AnySim).emit.bind(sim);
-    (sim as AnySim).emit = (e: Record<string, unknown>) => {
+    const orig = (sim as any).emit.bind(sim);
+    (sim as any).emit = (e: Record<string, unknown>) => {
       events.push(e);
       orig(e);
     };
@@ -181,5 +181,38 @@ describe('casting_lifecycle: Life Tap health guard', () => {
     expect(p.gcdRemaining).toBeGreaterThan(0); // GCD armed
     expect(p.hp).toBeLessThan(p.maxHp); // health spent
     expect(p.resource).toBeGreaterThan(0); // mana gained
+  });
+});
+
+describe('casting_lifecycle: a cast stops when its target dies', () => {
+  it('cancels an in-progress offensive cast the tick its target dies', () => {
+    const { sim, p, meta } = makeSim('mage', 20);
+    p.resource = p.maxResource = 3000;
+    const mob = spawnTarget(sim, p, 20, 20); // hostile, in fireball range, faced, targeted
+    const events: Array<Record<string, unknown>> = [];
+    const orig = (sim as any).emit.bind(sim);
+    (sim as any).emit = (e: Record<string, unknown>) => {
+      events.push(e);
+      orig(e);
+    };
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    updateCasting(sim.ctx, p, meta); // still casting, target alive
+    expect(p.castingAbility).toBe('fireball');
+    mob.dead = true;
+    mob.hp = 0;
+    updateCasting(sim.ctx, p, meta); // this tick sees the dead target
+    expect(p.castingAbility).toBeNull(); // cancelled, not finished to a corpse
+    expect(events.some((e) => e.type === 'castStop' && e.success === false)).toBe(true);
+    expect(mob.hp).toBe(0); // no damage dealt (the cast never resolved)
+  });
+
+  it('keeps casting while the target stays alive', () => {
+    const { sim, p, meta } = makeSim('mage', 20);
+    p.resource = p.maxResource = 3000;
+    spawnTarget(sim, p, 20, 20);
+    castAbility(sim.ctx, 'fireball', p.id);
+    for (let i = 0; i < 5; i++) updateCasting(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe('fireball'); // still going, target alive
   });
 });
