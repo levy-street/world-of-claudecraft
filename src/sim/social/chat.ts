@@ -832,6 +832,16 @@ export function handleDevChat(
     ctx.addItem(itemId, count, pid);
     return null;
   }
+  const goldM = /^\/(?:dev\s+gold|devgold)\s+(\d+)\s*$/i.exec(raw);
+  if (goldM) {
+    const gold = Math.max(1, Math.min(100000, Number(goldM[1])));
+    const meta = ctx.players.get(pid);
+    if (meta) {
+      meta.copper += gold * 10000;
+      ctx.emit({ type: 'log', text: `[dev] Added ${gold}g to your purse.`, pid });
+    }
+    return null;
+  }
   const questM = /^\/(?:dev\s+quest|devquest)\s+(\S+)\s*$/i.exec(raw);
   if (questM) {
     ctx.completeQuestForDev(questM[1], pid);
@@ -857,7 +867,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev quest questId, /dev quests, /dev bot name',
+      'Dev commands: /dev level N, /dev tp X Z, /dev give itemId [count], /dev gold N, /dev quest questId, /dev quests, /dev bot name',
     );
     return null;
   }

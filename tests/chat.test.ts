@@ -1064,8 +1064,10 @@ describe('chat module (direct, no Sim)', () => {
 
   it('handleDevChat: parses dev cheats; returns undefined for non-dev input', () => {
     const calls: any[] = [];
+    const purse = { copper: 0 };
     const ctx = {
       setPlayerLevel: (lvl: number, pid?: number) => calls.push(['level', lvl, pid]),
+      players: new Map([[1, purse]]),
       addItem: (id: string, n: number, pid?: number) => calls.push(['item', id, n, pid]),
       completeQuestForDev: (questId: string, pid?: number) => calls.push(['quest', questId, pid]),
       completeCurrentQuestsForDev: (pid?: number) => calls.push(['quests', pid]),
@@ -1084,6 +1086,10 @@ describe('chat module (direct, no Sim)', () => {
     expect(calls).toContainEqual(['level', 5, 1]);
     expect(chatMod.handleDevChat(ctx, '/dev give wolf_fang 3', 1)).toBe(null);
     expect(calls).toContainEqual(['item', 'wolf_fang', 3, 1]);
+    expect(chatMod.handleDevChat(ctx, '/dev gold 250', 1)).toBe(null);
+    expect(purse.copper).toBe(250 * 10000);
+    expect(chatMod.handleDevChat(ctx, '/dev gold 9999999', 1)).toBe(null);
+    expect(purse.copper).toBe(250 * 10000 + 100000 * 10000); // clamped to 100000g
     expect(chatMod.handleDevChat(ctx, '/dev quest q_wolves', 1)).toBe(null);
     expect(calls).toContainEqual(['quest', 'q_wolves', 1]);
     expect(chatMod.handleDevChat(ctx, '/dev quests', 1)).toBe(null);
@@ -1104,7 +1110,7 @@ describe('chat module (direct, no Sim)', () => {
     expect(chatMod.handleDevChat(ctx, '/dev', 1)).toBe(null);
     // Every subcommand the parser accepts must be listed, so the help can never
     // silently drift behind the commands again (the "/dev bot" omission this pins).
-    for (const cmd of ['level', 'tp', 'give', 'quest', 'quests', 'bot'])
+    for (const cmd of ['level', 'tp', 'give', 'gold', 'quest', 'quests', 'bot'])
       expect(help, `help omits /dev ${cmd}`).toContain(`/dev ${cmd}`);
   });
 });

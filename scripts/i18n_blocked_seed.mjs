@@ -283,6 +283,7 @@ export const V07_SLASH = [
   'Your target Aki is 5yd away (Aki).',
   'Your vendor buyback list is empty.',
   'Zones (5): Aki.',
+  '[dev] Added Akig to your purse.',
   '[dev] Level set to 5.',
   '[dev] Teleported to Aki, Aki.',
   "[dev] Unknown item 'Aki'.",
