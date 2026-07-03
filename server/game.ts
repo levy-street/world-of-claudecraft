@@ -2778,7 +2778,7 @@ export class GameServer {
           typeof msg.copper !== 'number' ||
           !Number.isFinite(msg.copper) ||
           !Array.isArray(msg.items) ||
-          msg.items.length > 8
+          msg.items.length > 3 // MAIL_MAX_ATTACHMENTS; the Sim re-validates
         )
           break;
         const items: { itemId: string; count: number }[] = [];

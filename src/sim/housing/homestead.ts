@@ -13,7 +13,12 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). Housing draws NO rng.
 
-import { HOMESTEAD_ARRIVAL, HOMESTEAD_ARRIVAL_FACING, HOMESTEAD_DEED_COPPER, LAND_STEWARD } from '../content/housing';
+import {
+  HOMESTEAD_ARRIVAL,
+  HOMESTEAD_ARRIVAL_FACING,
+  HOMESTEAD_DEED_COPPER,
+  LAND_STEWARD,
+} from '../content/housing';
 import { HOMESTEAD_SLOT_COUNT, homesteadOrigin, isHomesteadPos } from '../data';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type HousingResultCode, INTERACT_RANGE } from '../types';
@@ -94,6 +99,9 @@ export class Homestead {
     p.prevPos = { ...p.pos };
     p.facing = HOMESTEAD_ARRIVAL_FACING;
     p.prevFacing = p.facing;
+    // Mirror enterDungeon: a teleport never carries a target or a swing along.
+    p.targetId = null;
+    p.autoAttack = false;
     this.ctx.rebucket(p);
     this.result(meta.entityId, 'traveledHome');
   }
@@ -109,6 +117,8 @@ export class Homestead {
     const back = this.townReturnPos();
     p.pos = this.ctx.groundPos(back.x, back.z);
     p.prevPos = { ...p.pos };
+    p.targetId = null;
+    p.autoAttack = false;
     this.ctx.rebucket(p);
     const slot = this.slots.indexOf(meta.entityId);
     if (slot >= 0) this.slots[slot] = null;
