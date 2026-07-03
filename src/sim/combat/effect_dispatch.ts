@@ -765,7 +765,10 @@ export function runEffects(
       case 'dismissPet': {
         const pet = ctx.petOf(p.id);
         if (!pet) {
-          ctx.error(p.id, isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.');
+          ctx.error(
+            p.id,
+            isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+          );
           break;
         }
         ctx.error(p.id, 'Permanent pets can only be abandoned from the pet frame.');

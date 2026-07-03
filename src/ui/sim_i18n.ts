@@ -2451,7 +2451,7 @@ const PET_DICT_ES: Record<PetSimMessageKey, string> = {
 
 const PET_DICT_FR: Record<PetSimMessageKey, string> = {
   'error.noPet': "Vous n'avez pas de familier.",
-  'error.petsNotAllowedInDelves': "Les familiers ne sont pas autorisés dans les plongées.",
+  'error.petsNotAllowedInDelves': 'Les familiers ne sont pas autorisés dans les plongées.',
   'error.petAlreadyAlive': 'Votre familier est déjà en vie.',
   'error.permanentPetAbandonFrame':
     'Les familiers permanents ne peuvent être abandonnés que depuis le cadre du familier.',
