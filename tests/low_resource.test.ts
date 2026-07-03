@@ -3,12 +3,18 @@ import { lowResourceView, LOW_RESOURCE_THRESHOLD } from '../src/ui/low_resource'
 
 describe('lowResourceView', () => {
   it('is inactive for rage (rage builds in combat — low is normal)', () => {
-    expect(lowResourceView({ resource: 0, maxResource: 100, resourceType: 'rage' }).active).toBe(false);
+    expect(lowResourceView({ resource: 0, maxResource: 100, resourceType: 'rage' }).active).toBe(
+      false,
+    );
   });
 
   it('is inactive with no resource type or a degenerate max', () => {
-    expect(lowResourceView({ resource: 0, maxResource: 0, resourceType: 'mana' }).active).toBe(false);
-    expect(lowResourceView({ resource: 5, maxResource: 100, resourceType: null }).active).toBe(false);
+    expect(lowResourceView({ resource: 0, maxResource: 0, resourceType: 'mana' }).active).toBe(
+      false,
+    );
+    expect(lowResourceView({ resource: 5, maxResource: 100, resourceType: null }).active).toBe(
+      false,
+    );
   });
 
   it('is inactive when above the threshold', () => {
@@ -18,9 +24,14 @@ describe('lowResourceView', () => {
   });
 
   it('activates just below the threshold for mana', () => {
-    const v = lowResourceView({ resource: LOW_RESOURCE_THRESHOLD * 100 - 1, maxResource: 100, resourceType: 'mana' });
+    const v = lowResourceView({
+      resource: LOW_RESOURCE_THRESHOLD * 100 - 1,
+      maxResource: 100,
+      resourceType: 'mana',
+    });
     expect(v.active).toBe(true);
     expect(v.label).toBe('Low Mana');
+    expect(v.critical).toBe(false);
     expect(v.opacity).toBeGreaterThan(0);
   });
 
@@ -28,6 +39,16 @@ describe('lowResourceView', () => {
     const v = lowResourceView({ resource: 10, maxResource: 100, resourceType: 'energy' });
     expect(v.active).toBe(true);
     expect(v.label).toBe('Low Energy');
+    expect(v.critical).toBe(false);
+  });
+
+  it('promotes empty mana to a critical center-screen warning', () => {
+    const v = lowResourceView({ resource: 0, maxResource: 100, resourceType: 'mana' });
+    expect(v.active).toBe(true);
+    expect(v.critical).toBe(true);
+    expect(v.label).toBe('Not enough mana!');
+    expect(v.opacity).toBe(1);
+    expect(v.pulseSeconds).toBeLessThan(0.5);
   });
 
   it('intensifies (more opaque, faster pulse) toward empty', () => {

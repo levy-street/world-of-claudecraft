@@ -681,7 +681,7 @@
     line-height: 15px;
     font-size: 9px;
     font-weight: bold;
-    letter-spacing: 0.5px;
+    letter-spacing: 0;
     color: #eaf4ff;
     text-shadow:
       0 0 3px #000,
@@ -689,6 +689,39 @@
     text-transform: uppercase;
     pointer-events: none;
     animation: low-resource-pulse var(--lr-pulse, 1s) ease-in-out infinite;
+  }
+  .bar.low.critical .bar-fill {
+    box-shadow:
+      0 0 9px 2px rgba(120, 210, 255, var(--lr-opacity)),
+      0 0 18px rgba(45, 135, 255, 0.65),
+      inset 0 0 6px rgba(235, 250, 255, 0.95);
+  }
+  .empty-mana-warning {
+    position: fixed;
+    top: 42%;
+    left: 50%;
+    z-index: 75;
+    transform: translate(-50%, -50%);
+    min-width: 210px;
+    padding: 8px 14px;
+    border: 1px solid rgba(150, 220, 255, 0.72);
+    border-radius: 4px;
+    background: rgba(6, 16, 30, 0.78);
+    box-shadow:
+      0 0 16px rgba(80, 185, 255, 0.55),
+      inset 0 0 10px rgba(150, 220, 255, 0.18);
+    color: #f2fbff;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+    letter-spacing: 0;
+    text-align: center;
+    text-shadow:
+      0 0 3px #000,
+      1px 1px 1px #000;
+    text-transform: uppercase;
+    pointer-events: none;
+    animation: low-resource-pulse var(--lr-pulse, 0.42s) ease-in-out infinite;
   }
   .bar.energy.low .low-resource-label {
     color: #fff3c2;
@@ -706,10 +739,12 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .bar.low .bar-fill,
-    .low-resource-label {
+    .low-resource-label,
+    .empty-mana-warning {
       animation: none;
     }
-    .low-resource-label {
+    .low-resource-label,
+    .empty-mana-warning {
       opacity: 1;
     }
   }

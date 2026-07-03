@@ -17,6 +17,7 @@ export interface LowResourceInput {
 
 export interface LowResourceView {
   active: boolean; // warning visible
+  critical: boolean; // empty mana state; rendered stronger than low-resource
   opacity: number; // 0..1 glow strength, intensifies toward empty
   pulseSeconds: number; // breathe period; shorter = more urgent
   label: string; // "Low Mana" / "Low Energy" ('' when inactive)
@@ -27,7 +28,13 @@ export const LOW_RESOURCE_THRESHOLD = 0.25;
 
 export function lowResourceView(input: LowResourceInput): LowResourceView {
   const { resource, maxResource, resourceType } = input;
-  const inactive: LowResourceView = { active: false, opacity: 0, pulseSeconds: 0, label: '' };
+  const inactive: LowResourceView = {
+    active: false,
+    critical: false,
+    opacity: 0,
+    pulseSeconds: 0,
+    label: '',
+  };
 
   // Only mana/energy warn; rage and resource-less/degenerate frames are silent.
   if (maxResource <= 0) return inactive;
@@ -35,17 +42,26 @@ export function lowResourceView(input: LowResourceInput): LowResourceView {
 
   const frac = clamp01(resource / maxResource);
   if (frac >= LOW_RESOURCE_THRESHOLD) return inactive;
+  if (resourceType === 'mana' && resource <= 0) {
+    return {
+      active: true,
+      critical: true,
+      opacity: 1,
+      pulseSeconds: 0.42,
+      label: t('hud.errors.notEnoughMana'),
+    };
+  }
 
   // t: 0 at the threshold, 1 at empty.
   const tt = clamp01((LOW_RESOURCE_THRESHOLD - frac) / LOW_RESOURCE_THRESHOLD);
   // Ease the glow in (matches the low-health vignette feel) and keep a floor so
   // it's visible the instant it crosses the threshold.
-  const opacity = 0.4 + Math.pow(tt, 0.8) * 0.55;
+  const opacity = 0.4 + tt ** 0.8 * 0.55;
   // Breathe slowly when just-low (~1.4s), urgently when near-empty (~0.5s).
   const pulseSeconds = 1.4 - tt * 0.9;
   const label = resourceType === 'mana' ? t('game.hud.lowMana') : t('game.hud.lowEnergy');
 
-  return { active: true, opacity, pulseSeconds, label };
+  return { active: true, critical: false, opacity, pulseSeconds, label };
 }
 
 function clamp01(v: number): number {

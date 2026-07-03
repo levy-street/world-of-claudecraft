@@ -747,6 +747,7 @@ export class Hud {
   private pfResEl = $('#pf-res');
   private pfResTextEl = $('#pf-res-text');
   private pfResourceEl = $('#pf-resource');
+  private emptyManaWarningEl = $('#empty-mana-warning');
   private pfAbsorbEl = $('#pf-absorb');
   private buffBarEl = $('#buff-bar');
   private debuffBarEl = $('#debuff-bar');
@@ -5064,17 +5065,26 @@ export class Hud {
     // is cheap and idempotent. Only the expensive style / label writes below are
     // diffed against the cached signature.
     bar.classList.toggle('low', v.active);
-    const sig = v.active ? `${v.opacity.toFixed(2)}|${v.pulseSeconds.toFixed(2)}|${v.label}` : '';
+    bar.classList.toggle('critical', v.active && v.critical);
+    const sig = v.active
+      ? `${v.critical ? 'critical' : 'low'}|${v.opacity.toFixed(2)}|${v.pulseSeconds.toFixed(2)}|${v.label}`
+      : '';
     if (sig === this.lastLowResourceSig) return;
     this.lastLowResourceSig = sig;
     const label = $('#pf-low-resource') as HTMLElement;
+    const center = this.emptyManaWarningEl as HTMLElement;
     if (v.active) {
       bar.style.setProperty('--lr-opacity', String(v.opacity));
       bar.style.setProperty('--lr-pulse', `${v.pulseSeconds}s`);
       label.textContent = v.label;
       label.style.display = 'block';
+      center.textContent = v.critical ? v.label : '';
+      center.hidden = !v.critical;
+      center.style.setProperty('--lr-pulse', `${v.pulseSeconds}s`);
     } else {
       label.style.display = 'none';
+      center.hidden = true;
+      center.textContent = '';
     }
   }
 
