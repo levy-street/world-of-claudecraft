@@ -6,12 +6,19 @@
 // no module-private seam. main.ts resolves the bearer account once and then
 // delegates here. All four routes are bearer-auth + account-scoped.
 import type http from 'node:http';
-import { hashPassword, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, verifyPassword } from './auth';
+import {
+  hashPassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  normalizeEmail,
+  verifyPassword,
+} from './auth';
 import {
   type AccountRow,
   accountById,
   accountByUnsubscribeToken,
   accountTwoFactorEnabled,
+  backfillAccountEmailIfEmpty,
   characterCountForAccount,
   claimTotpWindow,
   consumeEmailChangeRequest,
@@ -54,8 +61,6 @@ import {
 // Issuer label shown in the user's authenticator app next to the 6-digit code.
 const TOTP_ISSUER = 'World of ClaudeCraft';
 
-const EMAIL_MAX_LENGTH = 254;
-const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // How long an email-change verification link stays valid.
 const EMAIL_CHANGE_TTL_HOURS = 24;
 
@@ -83,6 +88,10 @@ export async function handleAccountWhoami(
   return json(res, 200, {
     username: acct.username,
     email: acct.email ?? '',
+    // True when the account has no recovery address yet: the client uses this to
+    // force the mandatory-email prompt (e.g. on a restored session that skipped
+    // the login response's emailMissing flag).
+    emailMissing: !(acct.email && acct.email.trim()),
     createdAt: acct.created_at,
     characterCount,
     twoFactorEnabled,
@@ -147,6 +156,38 @@ export async function handleAccountSetEmail(
   return json(res, 410, { error: 'use verified email change' });
 }
 
+// POST /api/account/email/set-initial: set the recovery email on an account that
+// has NONE yet. This is the mandatory-email backfill for accounts created before
+// email was required (and the fallback when a Discord login returned no address).
+// The bearer session IS the authorization: the caller just proved the password
+// (or a Discord grant) at login and there is no existing recovery address to
+// protect, so unlike the verified change flow it needs no password re-check. Once
+// an address exists it is a security address and can only move through
+// /api/account/email/change; calling this then is a 409.
+export async function handleAccountSetInitialEmail(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  accountId: number,
+): Promise<void> {
+  if (rateLimited(req)) return json(res, 429, { error: 'too many attempts, slow down' });
+  const body = await readBody(req);
+  const acct = await accountById(accountId);
+  if (!acct) return json(res, 404, { error: 'account not found' });
+  if (acct.email && acct.email.trim()) {
+    return json(res, 409, { error: 'use verified email change' });
+  }
+  const email = normalizeEmail(body.email);
+  if (!email) return json(res, 400, { error: 'enter a valid email address' });
+  // Atomic fill (the guard lives in the UPDATE's WHERE), so two concurrent
+  // set-initial calls, or one racing a Discord capture, cannot both write past the
+  // empty-email check above. The address is self-asserted here, so it is stored
+  // UNVERIFIED (verified=false). A false return means a concurrent writer already
+  // set an address: treat it exactly like the already-set case.
+  const filled = await backfillAccountEmailIfEmpty(accountId, email, false);
+  if (!filled) return json(res, 409, { error: 'use verified email change' });
+  return json(res, 200, { ok: true, email });
+}
+
 // POST /api/account/deactivate — re-confirm password + username, require all
 // characters offline, then lock the account and revoke ALL tokens. The lock is
 // reversible by an admin. After locking we deterministically tear down any
@@ -200,8 +241,8 @@ export async function handleAccountEmailChange(
     return json(res, 401, { error: 'password is incorrect' });
   }
   clearAuthFailures(acct.username);
-  const newEmail = typeof body.newEmail === 'string' ? body.newEmail.trim() : '';
-  if (newEmail.length > EMAIL_MAX_LENGTH || !EMAIL_SHAPE.test(newEmail)) {
+  const newEmail = normalizeEmail(body.newEmail);
+  if (!newEmail) {
     return json(res, 400, { error: 'enter a valid email address' });
   }
   if (newEmail.toLowerCase() === (acct.email ?? '').toLowerCase()) {

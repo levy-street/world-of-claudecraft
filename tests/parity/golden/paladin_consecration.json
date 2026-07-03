@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "b1f9813a",
+      "state": "d4293d72",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -38,10 +38,12 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -100,7 +102,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 392,
-      "state": "878a6957",
+      "state": "6355db63",
       "events": "c55ca94e",
       "rng": {
         "draws": 4,
@@ -111,7 +113,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 392,
-      "state": "1c463896",
+      "state": "6938276e",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -122,7 +124,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 392,
-      "state": "e1cd60a8",
+      "state": "1beea82c",
       "events": "be4151a8",
       "rng": {
         "draws": 80,
@@ -133,7 +135,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 392,
-      "state": "8f62090f",
+      "state": "a8d4e15b",
       "events": "741638a5",
       "rng": {
         "draws": 170,
@@ -144,7 +146,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 392,
-      "state": "4f8a3eb5",
+      "state": "076ffdbd",
       "events": "d38c64bb",
       "rng": {
         "draws": 270,
@@ -155,7 +157,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 392,
-      "state": "963fe214",
+      "state": "af2716e8",
       "events": "741638a5",
       "rng": {
         "draws": 387,
@@ -166,7 +168,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 392,
-      "state": "b85ebf04",
+      "state": "0d8471d8",
       "events": "fd894b83",
       "rng": {
         "draws": 501,
@@ -177,7 +179,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 392,
-      "state": "1926872e",
+      "state": "e852a9c6",
       "events": "741638a5",
       "rng": {
         "draws": 627,
@@ -188,7 +190,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 392,
-      "state": "855a6e10",
+      "state": "b46f3e74",
       "events": "8cab46ed",
       "rng": {
         "draws": 765,
@@ -199,7 +201,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 392,
-      "state": "2edad715",
+      "state": "b02a895d",
       "events": "741638a5",
       "rng": {
         "draws": 931,
@@ -210,7 +212,7 @@
       "tick": 201,
       "time": 10.05,
       "nextId": 392,
-      "state": "5d94829b",
+      "state": "a9fbe797",
       "events": "741638a5",
       "rng": {
         "draws": 932,
@@ -236,11 +238,13 @@
             "chest": "recruit_tunic",
             "mainhand": "training_mace"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 167200,
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [

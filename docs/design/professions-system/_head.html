@@ -40,7 +40,19 @@
   .spectrum-bar { width: 100%; height: 46px; border-radius: 8px; overflow: hidden; display: flex; }
   .spectrum-bar > div { display: flex; align-items: center; justify-content: center; font-size: 12.5px; color: #0c0e13; font-weight: 600; padding: 0 6px; text-align: center; }
   .toc { font-size: 14.5px; }
-  .toc a { color: var(--teal); text-decoration: none; }
+  .toc a { display: block; color: var(--teal); text-decoration: none; padding: 1px 0; }
+  .toc a.t1 { margin-top: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; font-weight: 700; }
+  .toc a.t3 { padding-left: 20px; font-size: 13.5px; }
+  .part { margin: 64px 0 0; padding-top: 20px; border-top: 2px solid var(--line); color: var(--muted); font-size: 13px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 700; }
+  .part-note { color: var(--muted); font-size: 14px; margin: 6px 0 0; max-width: 72ch; }
+  .part + h2 { margin-top: 24px; }
+  .figref { color: var(--teal); }
+  .return-pill { position: fixed; bottom: 18px; right: 18px; background: var(--panel); color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 8px 14px; font: 600 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; cursor: pointer; }
+  .return-pill[hidden] { display: none; }
+  h4 { font-size: 15px; margin: 24px 0 8px; color: #fff; }
+  details.fold { margin: 14px 0; }
+  details.fold summary, details.callout summary { cursor: pointer; color: var(--gold); font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
   label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
   .hbtn { display: block; width: 100%; text-align: left; background: #11131a; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; margin: 5px 0; cursor: pointer; font-size: 13px; }
   .hbtn.active { border-color: var(--rare); color: #fff; background: #131c2a; }

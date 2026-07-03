@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 21 domain facets (each IWorld member assigned exactly once; 145
+// FACET MAP: the 22 domain facets (each IWorld member assigned exactly once; 151
 // total). One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
@@ -34,13 +34,14 @@
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
 //   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
 //   telemetry.ts        IWorldTelemetry      fire-and-forget metrics sink
+//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (stub, #1164)
 //
 // THREE GATES pin this seam (run before any facet edit):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
 //                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
 //                                          subset-of dispatch-set; DISPATCH_ONLY (7).
-//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (145) present + same-kind on
+//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (151) present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
 //                                          union of the 21 facets.
 // ---------------------------------------------------------------------------
@@ -59,6 +60,7 @@ import type { IWorldLoot } from './world_api/loot';
 import type { IWorldMarket } from './world_api/market';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
+import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
 import type { IWorldSocialGraph } from './world_api/social_graph';
@@ -82,6 +84,7 @@ export type {
   DailyRewardEligibilityView,
   DailyRewardHistory,
   DailyRewardLeaderboardEntry,
+  DailyRewardLeaderboardPage,
   DailyRewardPayoutLogEntry,
   DailyRewardSpinResult,
   DailyRewardSpinView,
@@ -107,6 +110,7 @@ export type {
 export type { RaidLockout } from './world_api/dungeons';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberInfo } from './world_api/party';
+export type { PlayerProfessionsView } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
@@ -147,7 +151,8 @@ export interface IWorld
     IWorldDungeons,
     IWorldDelves,
     IWorldDailyRewards,
-    IWorldTelemetry {}
+    IWorldTelemetry,
+    IWorldProfessions {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -282,6 +287,7 @@ export const COMMAND_NAMES = [
   'collect_delve_chest_loot',
   'delve_rite_choose',
   'telemetry',
+  'autoloot',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

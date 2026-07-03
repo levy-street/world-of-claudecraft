@@ -1,8 +1,15 @@
-import { fbm2, hash2 } from './rng';
 import {
-  CAMPS, DUNGEON_FLOOR_Y, DUNGEON_X_THRESHOLD, ROADS, WORLD_MAX_X, WORLD_MAX_Z,
-  WORLD_MIN_X, WORLD_MIN_Z, ZONES,
+  CAMPS,
+  DUNGEON_FLOOR_Y,
+  DUNGEON_X_THRESHOLD,
+  ROADS,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+  ZONES,
 } from './data';
+import { fbm2, hash2 } from './rng';
 import type { BiomeId } from './types';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -30,8 +37,12 @@ const ZONE_RIDGES: { z: number; passX: number }[] = [];
 for (let i = 0; i + 1 < ZONES.length; i++) {
   ZONE_RIDGES.push({ z: ZONES[i].zMax, passX: 0 });
 }
-const RIDGE_HEIGHT = 22;
-const RIDGE_SIGMA = 18; // gaussian width of the wall
+// Tall and narrow on purpose: every crossing outside the road pass must be
+// steeper than the movement climb limit (rise/run 1.5, see sim.ts
+// MAX_CLIMB_SLOPE) so the walls are genuinely impassable, not scenery.
+// tests/terrain_walls.test.ts guards this.
+const RIDGE_HEIGHT = 40;
+const RIDGE_SIGMA = 10; // gaussian width of the wall
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
@@ -60,16 +71,16 @@ export function mirefenImpactCraterOffset(x: number, z: number): number {
   if (d >= MIREFEN_IMPACT_CRATER.radius) return 0;
 
   const bowlT = d / MIREFEN_IMPACT_CRATER.bowlRadius;
-  const bowl = d < MIREFEN_IMPACT_CRATER.bowlRadius
-    ? -MIREFEN_IMPACT_CRATER.depth * (1 - smoothstep(0, 1, bowlT))
-    : 0;
+  const bowl =
+    d < MIREFEN_IMPACT_CRATER.bowlRadius
+      ? -MIREFEN_IMPACT_CRATER.depth * (1 - smoothstep(0, 1, bowlT))
+      : 0;
 
   const rimStart = MIREFEN_IMPACT_CRATER.bowlRadius * 0.82;
   if (d <= rimStart) return bowl;
   const rimT = (d - rimStart) / (MIREFEN_IMPACT_CRATER.radius - rimStart);
-  const rim = MIREFEN_IMPACT_CRATER.rimHeight
-    * smoothstep(0, 0.35, rimT)
-    * (1 - smoothstep(0.72, 1, rimT));
+  const rim =
+    MIREFEN_IMPACT_CRATER.rimHeight * smoothstep(0, 0.35, rimT) * (1 - smoothstep(0.72, 1, rimT));
   return bowl + rim;
 }
 
@@ -90,11 +101,13 @@ function shapeAt(z: number): { hill: number; base: number } {
 
 function baseHeight(x: number, z: number, seed: number): number {
   const shape = shapeAt(z);
-  let h = (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
+  let h =
+    (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
   // Flatten each zone's hub settlement into a plateau
   for (const zone of ZONES) {
-    const dx = x - zone.hub.x, dz = z - zone.hub.z;
+    const dx = x - zone.hub.x,
+      dz = z - zone.hub.z;
     const dHub = Math.sqrt(dx * dx + dz * dz);
     if (dHub < zone.hub.radius * 1.6) {
       const blend = smoothstep(zone.hub.radius * 0.7, zone.hub.radius * 1.6, dHub);
@@ -128,7 +141,8 @@ export function terrainHeight(x: number, z: number, seed: number): number {
 
   // Flatten each camp a little so mobs don't stand on cliffs
   for (const camp of CAMPS) {
-    const dx = x - camp.center.x, dz = z - camp.center.z;
+    const dx = x - camp.center.x,
+      dz = z - camp.center.z;
     const d = Math.sqrt(dx * dx + dz * dz);
     if (d < camp.radius * 1.8) {
       const ch = baseHeight(camp.center.x, camp.center.z, seed);
@@ -143,20 +157,98 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     if (dz < RIDGE_SIGMA * 3) {
       const profile = Math.exp(-(dz * dz) / (2 * RIDGE_SIGMA * RIDGE_SIGMA));
       const pass = smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
-      // jagged crest so the wall reads as mountains, not a berm
-      const crest = 1 + (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.7;
+      // jagged crest so the wall reads as mountains, not a berm (variance kept
+      // tight so the lowest saddle still beats the climb limit)
+      const crest = 1 + (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4;
       h += RIDGE_HEIGHT * crest * profile * pass;
     }
   }
 
-  // Raise the world rim so the player naturally stays in bounds
-  const rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X, Math.abs(x));
-  const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z, z);
-  const rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z, z);
+  // Raise the world rim so the player naturally stays in bounds. Like the zone
+  // ridges, the rise is steeper than the climb limit everywhere (guarded by
+  // tests/terrain_walls.test.ts); it starts where it always did (30yd inside,
+  // the Mirefen impact site leans on that wall base) but peaks before the
+  // boundary so the whole climb happens in-world.
+  const rimX = smoothstep(WORLD_MAX_X - 30, WORLD_MAX_X - 6, Math.abs(x));
+  const rimS = smoothstep(WORLD_MIN_Z + 30, WORLD_MIN_Z + 6, z);
+  const rimN = smoothstep(WORLD_MAX_Z - 30, WORLD_MAX_Z - 6, z);
   const rim = Math.max(rimX, rimS, rimN);
-  h += rim * 40;
+  h += rim * 55;
   h += mirefenImpactCraterOffset(x, z);
   return h;
+}
+
+// Steepest local rise/run of the walkable heightfield at (x, z), independent of
+// travel direction. Movement gates on this (not just the slope along the step)
+// so a diagonal switchback approach cannot beat the straight-line climb limit.
+const STEEPNESS_SAMPLE = 0.35; // yards; about one movement tick of run
+export function terrainSteepness(x: number, z: number, seed: number): number {
+  const e = STEEPNESS_SAMPLE;
+  const hx = (groundHeight(x + e, z, seed) - groundHeight(x - e, z, seed)) / (2 * e);
+  const hz = (groundHeight(x, z + e, seed) - groundHeight(x, z - e, seed)) / (2 * e);
+  return Math.hypot(hx, hz);
+}
+
+// Memoized 1-yard-cell view of terrainSteepness for the per-tick movement
+// gates (every moving mob evaluates its step fan every tick; the exact helper
+// costs four heightfield samples). A cache over a pure function of
+// (cell, seed) stays fully deterministic; the cap just bounds memory on
+// long-running hosts. Cell granularity only shifts a gate line by under a
+// yard, far inside the walls' steepness margin (tests/terrain_walls.test.ts).
+const steepnessCache = new Map<number, Map<number, number>>(); // seed -> cell -> steepness
+const STEEPNESS_CACHE_MAX = 400_000; // cells per seed; ~the whole overworld
+const STEEPNESS_CACHE_MAX_SEEDS = 4; // hosts run one seed; only test runs see more
+const STEEPNESS_CELL_SPAN = 16384; // cells per axis in the packed key
+export function terrainSteepnessAt(x: number, z: number, seed: number): number {
+  // Instanced interiors (dungeons/arena/delves) are flat floors; skip the cache
+  // entirely so their far-off coordinates never enter (or overflow) the packed
+  // key space, which is sized for the overworld.
+  if (x > DUNGEON_X_THRESHOLD) return 0;
+  const cx = Math.round(x);
+  const cz = Math.round(z);
+  let bySeed = steepnessCache.get(seed);
+  if (!bySeed) {
+    if (steepnessCache.size >= STEEPNESS_CACHE_MAX_SEEDS) steepnessCache.clear();
+    bySeed = new Map();
+    steepnessCache.set(seed, bySeed);
+  }
+  const key = (cx + STEEPNESS_CELL_SPAN / 2) * STEEPNESS_CELL_SPAN + (cz + STEEPNESS_CELL_SPAN / 2);
+  let v = bySeed.get(key);
+  if (v === undefined) {
+    if (bySeed.size >= STEEPNESS_CACHE_MAX) bySeed.clear();
+    v = terrainSteepness(cx, cz, seed);
+    bySeed.set(key, v);
+  }
+  return v;
+}
+
+// True inside the terrain bands that hold the deliberate unwalkable walls: the
+// zone-ridge walls and the world rim (with margin). The per-tick mob movement
+// gate screens with this so the steepness memo never runs over the open world;
+// rare interior steep spots stay mob-walkable, exactly as they always were
+// (players get the full gate everywhere in sim.ts).
+export function nearSteepWalls(x: number, z: number): boolean {
+  if (x > DUNGEON_X_THRESHOLD) return false; // instanced interiors: flat floors
+  if (Math.abs(x) > WORLD_MAX_X - 40 || z < WORLD_MIN_Z + 40 || z > WORLD_MAX_Z - 40) return true;
+  for (const ridge of ZONE_RIDGES) {
+    if (Math.abs(z - ridge.z) < RIDGE_SIGMA * 4) return true;
+  }
+  return false;
+}
+
+// Unit downhill direction at (x, z), or null on (near-)flat ground. Drives the
+// slide that carries a player off ground steeper than the climb limit.
+export function terrainDownhill(
+  x: number,
+  z: number,
+  seed: number,
+): { x: number; z: number } | null {
+  const e = STEEPNESS_SAMPLE;
+  const hx = (groundHeight(x + e, z, seed) - groundHeight(x - e, z, seed)) / (2 * e);
+  const hz = (groundHeight(x, z + e, seed) - groundHeight(x, z - e, seed)) / (2 * e);
+  const mag = Math.hypot(hx, hz);
+  if (mag < 1e-6) return null;
+  return { x: -hx / mag, z: -hz / mag };
 }
 
 // Distance from (x,z) to the nearest road polyline segment.
@@ -164,12 +256,16 @@ export function roadDistance(x: number, z: number): number {
   let best = Infinity;
   for (const road of ROADS) {
     for (let i = 0; i < road.length - 1; i++) {
-      const a = road[i], b = road[i + 1];
-      const abx = b.x - a.x, abz = b.z - a.z;
-      const apx = x - a.x, apz = z - a.z;
+      const a = road[i],
+        b = road[i + 1];
+      const abx = b.x - a.x,
+        abz = b.z - a.z;
+      const apx = x - a.x,
+        apz = z - a.z;
       const len2 = abx * abx + abz * abz;
       const t = len2 > 0 ? Math.max(0, Math.min(1, (apx * abx + apz * abz) / len2)) : 0;
-      const dx = apx - abx * t, dz = apz - abz * t;
+      const dx = apx - abx * t,
+        dz = apz - abz * t;
       const d = Math.sqrt(dx * dx + dz * dz);
       if (d < best) best = d;
     }
@@ -191,12 +287,12 @@ export interface Decoration {
 }
 
 const DECORATION_EXCLUSION_RADIUS = 1.2;
-const DECORATION_EXCLUSIONS = [
-  { x: 2.456450840458274, z: 211.33819991815835 },
-];
+const DECORATION_EXCLUSIONS = [{ x: 2.456450840458274, z: 211.33819991815835 }];
 
 function isExcludedDecoration(x: number, z: number): boolean {
-  return DECORATION_EXCLUSIONS.some((p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS);
+  return DECORATION_EXCLUSIONS.some(
+    (p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS,
+  );
 }
 
 export function zoneBiomeAt(z: number): BiomeId {
@@ -218,35 +314,45 @@ export function generateDecorations(seed: number): Decoration[] {
       let kind: Decoration['kind'] | null = null;
       if (biome === 'vale') {
         if (r > 0.48) continue;
-        kind = r < 0.30 ? 'tree' : r < 0.40 ? 'tree2' : 'rock';
+        kind = r < 0.3 ? 'tree' : r < 0.4 ? 'tree2' : 'rock';
       } else if (biome === 'marsh') {
         if (r > 0.34) continue;
         kind = r < 0.08 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
       } else {
         if (r > 0.44) continue;
-        kind = r < 0.20 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
+        kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
       }
       const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * step;
       const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * step;
-      const x = gx + ox, z = gz + oz;
+      const x = gx + ox,
+        z = gz + oz;
       if (isExcludedDecoration(x, z)) continue;
       let inHub = false;
       for (const zone of ZONES) {
-        const dx = x - zone.hub.x, dz = z - zone.hub.z;
-        if (Math.sqrt(dx * dx + dz * dz) < zone.hub.radius + 4) { inHub = true; break; }
+        const dx = x - zone.hub.x,
+          dz = z - zone.hub.z;
+        if (Math.sqrt(dx * dx + dz * dz) < zone.hub.radius + 4) {
+          inHub = true;
+          break;
+        }
       }
       if (inHub) continue;
       if (terrainHeight(x, z, seed) < WATER_LEVEL + 1) continue;
       if (roadDistance(x, z) < 5) continue;
       let inCamp = false;
       for (const c of CAMPS) {
-        const dx = x - c.center.x, dz = z - c.center.z;
-        if (Math.sqrt(dx * dx + dz * dz) < c.radius + 3) { inCamp = true; break; }
+        const dx = x - c.center.x,
+          dz = z - c.center.z;
+        if (Math.sqrt(dx * dx + dz * dz) < c.radius + 3) {
+          inCamp = true;
+          break;
+        }
       }
       if (inCamp) continue;
       out.push({
         kind,
-        x, z,
+        x,
+        z,
         scale: 0.7 + hash2(Math.round(gx), Math.round(gz), seed + 13) * 0.9,
         variant: Math.floor(hash2(Math.round(gx), Math.round(gz), seed + 77) * 3),
         biome,

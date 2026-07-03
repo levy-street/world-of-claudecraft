@@ -7,7 +7,8 @@
 #   sections/*.html the content fragments, in any name; order comes from the manifest
 #   figures.js      (optional) JS inlined into a <script> after the content
 # A "<!--TOC-->" marker anywhere in the fragments is replaced by a table of contents
-# auto-generated from every <h2 id="..">Title</h2> in document order.
+# auto-generated from every <h1|h2|h3 id="..">Title</h> in document order (h1 entries
+# render as part separators, h3 entries indented; headings without an id are skipped).
 #
 # Output: ../<this-dir-name>.html  (override with: sh build.sh path/to/out.html)
 set -eu
@@ -23,9 +24,14 @@ while IFS= read -r f || [ -n "$f" ]; do
   cat "sections/$f" >> "$body"; printf '\n' >> "$body"
 done < manifest
 
-# 2. table of contents from <h2 id="..">Title</h2>, in document order
-grep -oE '<h2 id="[A-Za-z0-9_-]+">[^<]+' "$body" \
-  | sed -E 's@<h2 id="([^"]+)">(.+)@    <a href="#\1">\2</a><br/>@' > "$toc"
+# 2. table of contents from <h1|h2|h3 id="..">, in document order
+# (id must be the first attribute; nested markup like <code> is stripped from the entry)
+grep -oE '<h[123] id="[A-Za-z0-9_-]+"[^>]*>.*</h[123]>' "$body" \
+  | sed -E 's@<(h[123]) id="([^"]+)"[^>]*>(.*)</h[123]>@\1|\2|\3@' \
+  | sed -E 's@<[^>]*>@@g' \
+  | sed -E -e 's@^h1\|([^|]+)\|(.*)@    <a class="t1" href="#\1">\2</a>@' \
+           -e 's@^h2\|([^|]+)\|(.*)@    <a class="t2" href="#\1">\2</a>@' \
+           -e 's@^h3\|([^|]+)\|(.*)@    <a class="t3" href="#\1">\2</a>@' > "$toc"
 
 # 3. emit: head + body (TOC marker expanded) + optional inlined script + close
 {

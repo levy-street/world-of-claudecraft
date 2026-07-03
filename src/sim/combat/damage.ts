@@ -43,6 +43,7 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
+import { WORLD_BOSS_CORPSE_SECONDS, worldBossContributors } from '../world_boss';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
 // is handleDeath, so the constant lives here with the death-domain code.
@@ -548,6 +549,19 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     e.respawnTimer = ctx.cfg.respawnSeconds * (template?.respawnMult ?? (template?.rare ? 4 : 1));
+    // World bosses: snapshot the contributor set from the hate table BEFORE it is
+    // cleared below, keep a long lootable-corpse window so every contributor can
+    // loot, and never auto-respawn in place: the world-boss scheduler is the sole
+    // respawner (it drops the corpse once the window elapses). Summoned adds
+    // collapse with the boss: leaving them alive would harass looters for the
+    // whole window, and a slain add's in-place respawn timer would revive it
+    // mid-window (only fires for worldBoss templates, so no parity rng change).
+    const worldBossContribs = template?.worldBoss ? worldBossContributors(ctx, e) : null;
+    if (template?.worldBoss) {
+      e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
+      e.respawnTimer = Infinity;
+      ctx.despawnSummonedAdds(e);
+    }
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
@@ -609,8 +623,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
       }
-      ctx.rollLoot(e, meta, eligible);
+      // World bosses use PERSONAL loot for every contributor (rolled below from the
+      // hate-table snapshot), not the tapper/party shared-corpse roll.
+      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible);
     }
+    // Personal loot is independent of tap/party kill credit: it goes to everyone who
+    // damaged the boss, so it rolls outside the credited-player block above.
+    if (worldBossContribs) ctx.rollWorldBossLoot(e, worldBossContribs);
   }
 }
 

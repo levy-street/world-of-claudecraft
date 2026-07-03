@@ -67,11 +67,11 @@
   function buildHobby() { const box = document.getElementById("hobbyBtns"); if (!box) return; box.innerHTML = ""; const A = ARCH[cur]; A.hobbies.forEach((h, k) => { const b = document.createElement("button"); b.className = "hbtn" + (k === hob ? " active" : ""); b.textContent = CRAFTS[h] + " (rare cap)"; b.onclick = () => { hob = k; buildHobby(); drawLive(); }; box.appendChild(b); }); }
   if (document.getElementById("liveRadar")) { buildHobby(); drawLive(); }
 
-  // Figure 2: specialist vs generalist (Smith peaked on Weaponcrafting + Armorcrafting).
-  (function () { const svg = document.getElementById("radar-specialist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, [46, 10, 9, 8, 8, 10, 12, 46, 90, 96], COL.gold, "rgba(217,178,90,0.22)", 112); })();
-  (function () { const svg = document.getElementById("radar-generalist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, new Array(N).fill(34), COL.blue, "rgba(111,168,255,0.18)", 112); })();
+  // Figure 2: specialist vs generalist (Smith: majors legendary, hobby Leatherworking at rare, rest at the common floor).
+  (function () { const svg = document.getElementById("radar-specialist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, [20, 20, 20, 60, 20, 20, 20, 20, 100, 100], COL.gold, "rgba(217,178,90,0.22)", 112); })();
+  (function () { const svg = document.getElementById("radar-generalist"); if (!svg) return; gridAndAxes(svg, CRAFTS, 112); valuePoly(svg, new Array(N).fill(40), COL.blue, "rgba(111,168,255,0.18)", 112); })();
 
-  // Figure 3: tiered radar. Reach envelope peaks on Weaponcrafting + Armorcrafting.
+  // Figure 3: tiered radar. Majors at legendary, hobby Leatherworking at rare, rest at the common floor.
   (function () {
     const svg = document.getElementById("radar-tiers"); if (!svg) return;
     const cx = 170, cy = 170, R = 112, n = N;
@@ -79,7 +79,7 @@
     for (let i = 0; i < n; i++) { const a = angAt(i, n); el("line", { x1: cx, y1: cy, x2: cx + R * Math.cos(a), y2: cy + R * Math.sin(a), stroke: COL.line, "stroke-width": 1 }, svg); const lr = R + 16, lx = cx + lr * Math.cos(a), ly = cy + lr * Math.sin(a); const t = el("text", { x: lx.toFixed(1), y: (ly + 3).toFixed(1), fill: COL.muted, "font-size": 10.5, "text-anchor": anchorFor(a) }, svg); t.textContent = CRAFTS[i]; }
     for (let g = 1; g <= RINGS; g++) { const t = el("text", { x: cx + 5, y: (cy - R * g / RINGS - 2).toFixed(1), fill: COL.muted, "font-size": 8.5 }, svg); t.textContent = TIERS[g - 1]; }
     // ring units order [Engineering, Alchemy, Cooking, Leatherworking, Tailoring, Inscription, Enchanting, Jewelcrafting, Weaponcrafting, Armorcrafting]
-    const reach = [3, 2, 1, 1, 1, 1, 2, 3, 5, 5].map(r => r * 100 / RINGS);
+    const reach = [1, 1, 1, 3, 1, 1, 1, 1, 5, 5].map(r => r * 100 / RINGS);
     valuePoly(svg, reach, COL.gold, "rgba(217,178,90,0.14)", R);
     valuePoly(svg, new Array(n).fill(100 / RINGS), COL.teal, "rgba(79,208,192,0.30)", R);
   })();
@@ -125,5 +125,19 @@
     el("polygon", { points: "700,40 690,35 690,45", fill: COL.muted }, svg);
     const t = el("text", { x: 20, y: 22, fill: COL.gold, "font-size": 12, "font-weight": "600" }, svg); t.textContent = "Crafting-only effects (orthogonal to item level)";
     ["proc on hit", "set-style bonus", "utility / movement", "no drop equivalent"].forEach((it, i) => { const x = 70 + i * 165; el("circle", { cx: x, cy: 40, r: 5, fill: COL.gold }, svg); const lt = el("text", { x: x, y: 60, fill: COL.muted, "font-size": 11, "text-anchor": "middle" }, svg); lt.textContent = it; });
+  })();
+
+  // In-text figure references (a.figref): jump to the figure, leave a floating pill to return.
+  (function () {
+    const refs = document.querySelectorAll("a.figref");
+    if (!refs.length) return;
+    const pill = document.createElement("button");
+    pill.className = "return-pill";
+    pill.textContent = "Back to where you were";
+    pill.hidden = true;
+    document.body.appendChild(pill);
+    let backY = 0;
+    refs.forEach(a => a.addEventListener("click", () => { backY = window.scrollY; pill.hidden = false; }));
+    pill.addEventListener("click", () => { window.scrollTo({ top: backY }); pill.hidden = true; });
   })();
 })();

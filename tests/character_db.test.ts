@@ -13,6 +13,7 @@ vi.mock('pg', () => ({
 }));
 
 import {
+  backfillAccountEmailIfEmpty,
   createAccount,
   createCharacterCapped,
   deleteCharacter,
@@ -215,6 +216,25 @@ describe('account and session request metadata', () => {
     expect(sql).toMatch(/last_login_ip/);
     expect(sql).toMatch(/last_login_user_agent/);
     expect(params).toEqual([7, '203.0.113.5', 'Mozilla/5.0']);
+  });
+
+  it('backfills a recovery email only for accounts that have none (Discord capture)', async () => {
+    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    const filled = await backfillAccountEmailIfEmpty(7, 'from-discord@example.com', true);
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    // The guard is in the UPDATE (WHERE email IS NULL OR email = ''), never a
+    // read-then-write, and email_verified_at is stamped only when verified.
+    expect(sql).toMatch(/email IS NULL OR email = ''/);
+    expect(sql).toMatch(/email_verified_at = CASE WHEN/);
+    expect(params).toEqual([7, 'from-discord@example.com', true]);
+    expect(filled).toBe(true);
+  });
+
+  it('reports no backfill when the account already had a recovery email', async () => {
+    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    const filled = await backfillAccountEmailIfEmpty(7, 'from-discord@example.com', false);
+    expect(filled).toBe(false);
   });
 
   it('stores play session IP and user agent when entering the world', async () => {

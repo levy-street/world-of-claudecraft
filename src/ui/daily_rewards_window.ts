@@ -324,15 +324,23 @@ export class DailyRewardsWindow {
 
   private tasksHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
     const rows = view.status.tasks
-      .map(
-        (task) =>
-          `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small>${esc(task.description)}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`,
-      )
+      .map((task) => {
+        const multiplier =
+          typeof task.multiplier === 'number' && Number.isFinite(task.multiplier)
+            ? `<em>${esc(t('hudChrome.dailyRewards.taskMultiplier', { multiplier: formatNumber(task.multiplier, { maximumFractionDigits: 2 }) }))}</em>`
+            : '';
+        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(task.description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
+      })
       .join('');
     return `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.tasks'))}</h3><ul class="dr-tasks">${rows}</ul></section>`;
   }
 
   private leaderboardHtml(status: DailyRewardStatus): string {
+    const totalKey =
+      status.leaderboardTotal === 1
+        ? 'hudChrome.dailyRewards.totalPlayer'
+        : 'hudChrome.dailyRewards.totalPlayers';
+    const total = `<div class="dr-leaderboard-total">${esc(t(totalKey, { count: formatNumber(status.leaderboardTotal, { maximumFractionDigits: 0 }) }))}</div>`;
     const rows =
       status.leaderboard.length === 0
         ? `<div class="dr-empty">${esc(t('hudChrome.dailyRewards.noLeaders'))}</div>`
@@ -342,7 +350,7 @@ export class DailyRewardsWindow {
                 `<div class="dr-rank${row.me ? ' mine' : ''}"><span>${row.rank}</span><b>${esc(row.name)}</b><strong>${formatNumber(row.points, { maximumFractionDigits: 0 })}</strong></div>`,
             )
             .join('');
-    return `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.leaderboard'))}</h3><div class="dr-ranks">${rows}</div></section>`;
+    return `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.leaderboard'))}</h3>${total}<div class="dr-ranks">${rows}</div></section>`;
   }
 
   private historyHtml(history: DailyRewardHistory): string {

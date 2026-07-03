@@ -309,3 +309,22 @@ export function instanceInfoAt(
   }
   return null;
 }
+
+// Authoritative: is `pos` physically inside one of the two Nythraxis raid
+// instances (the crypt approach or the boss arena), regardless of raid-GROUP
+// membership. Used to silently gate walk-by autoloot (interaction.ts): a rogue
+// looter leaving the raid, or a raid party staging pre-pull in the open world,
+// must not trigger it.
+export function isInRaidInstance(ctx: SimContext, pos: Vec3): boolean {
+  const id = instanceInfoAt(ctx, pos)?.dungeonId;
+  return id != null && RAID_ALLOWED_DUNGEON_IDS.has(id);
+}
+
+// Client-safe mirror of isInRaidInstance: no SimContext needed, so it is
+// coarser (x-band only, via dungeonAt) by design. Best-effort only, used to
+// avoid spamming the autoloot command from src/game/autoloot.ts; the sim's
+// isInRaidInstance gate above stays the single source of truth.
+export function isRaidInstancePos(pos: Vec3): boolean {
+  const id = dungeonAt(pos.x)?.id;
+  return id != null && RAID_ALLOWED_DUNGEON_IDS.has(id);
+}

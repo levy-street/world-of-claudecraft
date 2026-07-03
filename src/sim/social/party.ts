@@ -164,6 +164,7 @@ export class PartyMachine {
         raid: false,
         raidGroups: new Map([[invite.fromPid, 1]]),
         lootStrategies: { ...DEFAULT_PARTY_LOOT_STRATEGIES },
+        lootTurn: 0,
       };
       this.parties.set(party.id, party);
       this.partyByPid.set(invite.fromPid, party.id);

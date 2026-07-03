@@ -75,7 +75,7 @@ import {
   overviewCounts,
   type PerfRawRow,
 } from '../server/admin_db';
-import type { SuspiciousPlayer } from '../server/bot_detector/contract';
+import type { CalibrationHistogram, SuspiciousPlayer } from '../server/bot_detector/contract';
 import {
   addFilterWord,
   chatModerationForAccount,
@@ -159,6 +159,13 @@ const fakeGameState = {
   }),
   liveSessions: () => [],
   suspiciousPlayers: vi.fn<() => SuspiciousPlayer[]>(() => []),
+  detectionCalibration: vi.fn(() => ({
+    schemaVersion: 1 as const,
+    capturedAt: '2026-07-03T10:15:30.000Z',
+    serverStartedAt: '2026-07-03T08:15:30.000Z',
+    uptimeSeconds: 7200,
+    histograms: [] as CalibrationHistogram[],
+  })),
   liveAccountIds: () => new Set([9]),
   liveSharedIps: vi.fn<() => LiveSharedIp[]>(() => []),
   disconnectAccount: vi.fn(),
@@ -177,6 +184,13 @@ beforeEach(() => {
   fakeGame.isIpBlocked.mockReturnValue(false);
   fakeGame.liveSharedIps.mockReturnValue([]);
   fakeGame.suspiciousPlayers.mockReturnValue([]);
+  fakeGame.detectionCalibration.mockReturnValue({
+    schemaVersion: 1,
+    capturedAt: '2026-07-03T10:15:30.000Z',
+    serverStartedAt: '2026-07-03T08:15:30.000Z',
+    uptimeSeconds: 7200,
+    histograms: [],
+  });
   // Default so the moderation-detail route (which now also loads chat state)
   // resolves; individual chat-filter tests override as needed.
   vi.mocked(chatModerationForAccount).mockResolvedValue({
@@ -313,6 +327,52 @@ describe('admin api auth', () => {
       }),
     );
     expect(fakeGame.suspiciousPlayers).toHaveBeenCalledOnce();
+  });
+
+  it('serves detection calibration histograms to an authenticated admin', async () => {
+    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    fakeGame.detectionCalibration.mockReturnValue({
+      schemaVersion: 1,
+      capturedAt: '2026-07-03T10:15:30.000Z',
+      serverStartedAt: '2026-07-03T08:15:30.000Z',
+      uptimeSeconds: 7200,
+      histograms: [
+        {
+          id: 'metric_a_ms',
+          count: 2,
+          min: 10,
+          max: 30,
+          sum: 40,
+          buckets: [
+            { le: 10, count: 1 },
+            { le: 50, count: 1 },
+          ],
+          overflowCount: 0,
+        },
+      ],
+    });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/detection-calibration' }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual(
+      expect.objectContaining({
+        schemaVersion: 1,
+        capturedAt: '2026-07-03T10:15:30.000Z',
+        serverStartedAt: '2026-07-03T08:15:30.000Z',
+        uptimeSeconds: 7200,
+      }),
+    );
+    expect(res.body.data.histograms[0]).toEqual(
+      expect.objectContaining({ id: 'metric_a_ms', count: 2 }),
+    );
+    expect(fakeGame.detectionCalibration).toHaveBeenCalledOnce();
   });
 
   it('rejects admin login for a non-admin account even with the right password', async () => {

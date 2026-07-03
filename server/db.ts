@@ -553,6 +553,9 @@ export interface AccountRow {
   id: number;
   username: string;
   password_hash: string;
+  // Recovery email (nullable): the login path selects it so the handler can tell
+  // the client whether a pre-existing account still needs to set one.
+  email?: string | null;
   // Present on the login path (findAccount): null/undefined when 2FA is off.
   totp_secret?: string | null;
   totp_enabled_at?: string | null;
@@ -685,7 +688,7 @@ export async function createAccount(
 
 export async function findAccount(username: string): Promise<AccountRow | null> {
   const res = await pool.query(
-    `SELECT id, username, password_hash, totp_secret, totp_enabled_at, totp_last_window
+    `SELECT id, username, password_hash, email, totp_secret, totp_enabled_at, totp_last_window
      FROM accounts WHERE username = $1`,
     [username],
   );
@@ -890,6 +893,28 @@ export async function revokeCompanionToken(accountId: number, prefix: string): P
 
 export async function setAccountEmail(accountId: number, email: string | null): Promise<void> {
   await pool.query('UPDATE accounts SET email = $2 WHERE id = $1', [accountId, email]);
+}
+
+// Fill the recovery email ONLY when the account has none yet, never overwriting an
+// address the owner already set (that can only change through the verified change
+// flow). Used by the Discord capture path: a Discord-verified address seeds the
+// recovery email + stamps email_verified_at, but a fresh Discord grant must never
+// clobber an existing one. Idempotent (the WHERE makes a second call a no-op) and
+// race-safe (the guard is in the UPDATE, not a read-then-write). Returns true when
+// a row was actually filled.
+export async function backfillAccountEmailIfEmpty(
+  accountId: number,
+  email: string,
+  verified: boolean,
+): Promise<boolean> {
+  const res = await pool.query(
+    `UPDATE accounts
+       SET email = $2,
+           email_verified_at = CASE WHEN $3 THEN now() ELSE email_verified_at END
+     WHERE id = $1 AND (email IS NULL OR email = '')`,
+    [accountId, email, verified],
+  );
+  return (res.rowCount ?? 0) > 0;
 }
 
 export async function setAccountDeactivated(

@@ -24,8 +24,9 @@ command calls**. DOM/WebAudio-only; runs in `main.ts`.
 
 ## Local invariants
 - **Never mutate sim state directly.** `input.ts` only records intent and fires
-  callbacks; only `interactions.ts` touches the world, and only through the
-  `IWorld`-shaped interfaces passed to it. Do not import `Sim`/`ClientWorld` here.
+  callbacks; only `interactions.ts` and `autoloot.ts` touch the world, and only
+  through the `IWorld`-shaped interfaces passed to them. Do not import
+  `Sim`/`ClientWorld` here.
 - **`audio.ts`/`music.ts` synthesize everything**, every procedural SFX and music
   note is built in code via WebAudio, with nothing to load. **`sfx.ts`/`voice.ts`
   are the exception:** they play pre-rendered clips under `public/audio/` (spatial

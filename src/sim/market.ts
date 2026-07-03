@@ -243,7 +243,10 @@ export class Market {
       return;
     }
     const want = Math.max(1, Math.floor(count));
-    if (this.ctx.countItem(itemId, meta.entityId) < want) {
+    // Per-instance copies (#1165: signer/charges/rolled/boundTo) are inert on the
+    // World Market for now: count and escrow only the fungible stock, so a signed
+    // or bound item is never swept into a listing. (#1146 wires real handling later.)
+    if (this.ctx.countFungibleItem(itemId, meta.entityId) < want) {
       this.ctx.error(meta.entityId, 'You do not have that many to sell.');
       return;
     }
@@ -268,7 +271,7 @@ export class Market {
       );
       return;
     }
-    this.ctx.removeItem(itemId, want, meta.entityId); // escrow
+    this.ctx.removeFungibleItem(itemId, want, meta.entityId); // escrow (fungible-only, #1165)
     this.marketListings.push({
       id: this.nextListingId++,
       sellerKey,

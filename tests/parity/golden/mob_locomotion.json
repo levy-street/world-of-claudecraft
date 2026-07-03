@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 392,
-      "state": "a719cd96",
+      "state": "a01990fe",
       "events": "f465b8cb",
       "rng": {
         "draws": 4,
@@ -56,10 +56,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -162,7 +164,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 393,
-      "state": "a1abf688",
+      "state": "c72f1b8c",
       "events": "8c84d087",
       "rng": {
         "draws": 8,
@@ -186,10 +188,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -346,7 +350,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "4412d76f",
+      "state": "ea99981b",
       "events": "5c8ff3f5",
       "rng": {
         "draws": 13,
@@ -370,10 +374,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -585,7 +591,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 395,
-      "state": "1b77d1d0",
+      "state": "c46e85ce",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -609,10 +615,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -825,7 +833,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -0.226092,
-          "fallStartY": 43.188532,
+          "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -840,13 +848,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.968616,
-            "y": 43.180156,
+            "y": 58.180156,
             "z": 300.136437
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 43.188532,
+            "y": 58.188532,
             "z": 300
           },
           "stats": {
@@ -855,7 +863,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 298.918529,
-            "y": 42.734603,
+            "y": 57.734603,
             "z": 304.70153
           },
           "wanderTimer": 30,
@@ -871,7 +879,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 396,
-      "state": "634cba9b",
+      "state": "6c570067",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -895,10 +903,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -1111,7 +1121,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -0.226092,
-          "fallStartY": 43.188532,
+          "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1126,13 +1136,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.968616,
-            "y": 43.180156,
+            "y": 58.180156,
             "z": 300.136437
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 43.188532,
+            "y": 58.188532,
             "z": 300
           },
           "stats": {
@@ -1141,7 +1151,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 298.918529,
-            "y": 42.734603,
+            "y": 57.734603,
             "z": 304.70153
           },
           "wanderTimer": 30,
@@ -1157,7 +1167,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 42.211832,
+          "fallStartY": 57.211832,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1172,13 +1182,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "stats": {
@@ -1198,7 +1208,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 397,
-      "state": "8b60fcff",
+      "state": "94739e47",
       "events": "1f51b9ed",
       "rng": {
         "draws": 16,
@@ -1222,10 +1232,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -1438,7 +1450,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -0.226092,
-          "fallStartY": 43.188532,
+          "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1453,13 +1465,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.968616,
-            "y": 43.180156,
+            "y": 58.180156,
             "z": 300.136437
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 43.188532,
+            "y": 58.188532,
             "z": 300
           },
           "stats": {
@@ -1468,7 +1480,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 298.918529,
-            "y": 42.734603,
+            "y": 57.734603,
             "z": 304.70153
           },
           "wanderTimer": 30,
@@ -1484,7 +1496,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 42.211832,
+          "fallStartY": 57.211832,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1499,13 +1511,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "stats": {
@@ -1569,7 +1581,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 397,
-      "state": "4a9e5776",
+      "state": "859504f2",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1593,10 +1605,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -1809,7 +1823,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -0.226092,
-          "fallStartY": 43.188532,
+          "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1824,13 +1838,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.968616,
-            "y": 43.180156,
+            "y": 58.180156,
             "z": 300.136437
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 43.188532,
+            "y": 58.188532,
             "z": 300
           },
           "stats": {
@@ -1839,7 +1853,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 298.918529,
-            "y": 42.734603,
+            "y": 57.734603,
             "z": 304.70153
           },
           "wanderTimer": 30,
@@ -1855,7 +1869,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 42.211832,
+          "fallStartY": 57.211832,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1870,13 +1884,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "stats": {
@@ -1941,7 +1955,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 397,
-      "state": "4a9e5776",
+      "state": "859504f2",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1965,10 +1979,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -2181,7 +2197,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -0.226092,
-          "fallStartY": 43.188532,
+          "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -2196,13 +2212,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.968616,
-            "y": 43.180156,
+            "y": 58.180156,
             "z": 300.136437
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 43.188532,
+            "y": 58.188532,
             "z": 300
           },
           "stats": {
@@ -2211,7 +2227,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 298.918529,
-            "y": 42.734603,
+            "y": 57.734603,
             "z": 304.70153
           },
           "wanderTimer": 30,
@@ -2227,7 +2243,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 42.211832,
+          "fallStartY": 57.211832,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -2242,13 +2258,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 42.211832,
+            "y": 57.211832,
             "z": 320
           },
           "stats": {

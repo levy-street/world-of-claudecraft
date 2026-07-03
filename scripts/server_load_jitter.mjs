@@ -135,7 +135,11 @@ class Client {
       );
     const reg = await api(
       '/api/register',
-      { username: `load_${this.index}_${uniq}`, password: 'hunter22' },
+      {
+        username: `load_${this.index}_${uniq}`,
+        password: 'hunter22',
+        email: `load_${this.index}_${uniq}@example.com`,
+      },
       null,
       this.ip,
     );

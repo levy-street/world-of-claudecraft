@@ -309,6 +309,23 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
   return true;
 }
 
+// Rotates a common/junk drop over the kill-time eligible party members
+// (`partyLootCandidatesForMob`, backed by `mob.lootRecipientIds`), never the
+// loot-time in-range set: that is the fairness point. Mirrors
+// tryAwardCopperByFairSplit's shape (strategy check, candidate-count guard,
+// party lookup) but advances a per-party cursor instead of a Fisher-Yates split.
+function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity): boolean {
+  if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'round-robin') return false;
+  const candidates = partyLootCandidatesForMob(ctx, mob);
+  if (candidates.length <= 1) return false;
+  const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  if (!party) return false;
+  const winner = candidates[party.lootTurn % candidates.length];
+  party.lootTurn++;
+  ctx.addItem(itemId, 1, winner.entityId);
+  return true;
+}
+
 export function awardSharedLootItem(
   ctx: SimContext,
   itemId: string,
@@ -316,7 +333,9 @@ export function awardSharedLootItem(
   looter: PlayerMeta,
 ): void {
   if (startMasterLootRoll(ctx, itemId, mob)) return;
-  if (!startNeedGreedRoll(ctx, itemId, mob)) ctx.addItem(itemId, 1, looter.entityId);
+  if (startNeedGreedRoll(ctx, itemId, mob)) return;
+  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return;
+  ctx.addItem(itemId, 1, looter.entityId);
 }
 
 // Open need-greed rolls the given player may still answer. Mirrors the

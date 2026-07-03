@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "d5b9becc",
+      "state": "f17a52d0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -38,10 +38,12 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -101,7 +103,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 400,
-      "state": "de5ef959",
+      "state": "90362921",
       "events": "33119524",
       "rng": {
         "draws": 1,
@@ -124,11 +126,13 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 11200,
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -187,7 +191,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 400,
-      "state": "07cac7c8",
+      "state": "6e9decdc",
       "events": "c99f821e",
       "rng": {
         "draws": 1,
@@ -210,11 +214,13 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 11200,
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -274,7 +280,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 400,
-      "state": "07cac7c8",
+      "state": "6e9decdc",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -297,11 +303,13 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 11200,
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [

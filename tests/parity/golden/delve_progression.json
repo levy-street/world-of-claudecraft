@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "3971bbe1",
+      "state": "76a28989",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -39,10 +39,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -100,7 +102,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 412,
-      "state": "d59f2153",
+      "state": "3f22386f",
       "events": "d6509b8b",
       "rng": {
         "draws": 1,
@@ -111,7 +113,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 412,
-      "state": "27b07b99",
+      "state": "e2988161",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -134,11 +136,13 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 11200,
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -194,7 +198,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 412,
-      "state": "f7680141",
+      "state": "3a185629",
       "events": "d9e58883",
       "rng": {
         "draws": 3,
@@ -224,11 +228,13 @@
             "legs": "reliquary_legs",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 11200,
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -284,7 +290,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 412,
-      "state": "8ac50193",
+      "state": "f6e0fdaf",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -314,11 +320,13 @@
             "legs": "reliquary_legs",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 11200,
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [

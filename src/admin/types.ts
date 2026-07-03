@@ -118,6 +118,31 @@ export interface SuspiciousPlayersData {
   players: SuspiciousPlayer[];
 }
 
+// Raw-value calibration histograms published by the bot detector. Histogram ids and
+// the measured quantities are decided server-side at runtime; the shape is generic.
+export interface CalibrationHistogramBucket {
+  le: number;
+  count: number;
+}
+
+export interface CalibrationHistogram {
+  id: string;
+  count: number;
+  min: number;
+  max: number;
+  sum: number;
+  buckets: CalibrationHistogramBucket[];
+  overflowCount: number;
+}
+
+export interface DetectionCalibrationData {
+  schemaVersion: 1;
+  capturedAt: string;
+  serverStartedAt: string;
+  uptimeSeconds: number;
+  histograms: CalibrationHistogram[];
+}
+
 export interface LivePlayerLocation {
   kind: 'overworld' | 'dungeon' | 'delve';
   zoneId: string | null;

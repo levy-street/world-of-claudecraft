@@ -329,7 +329,8 @@ interface BaseItemDef {
 // Item-set bonuses (classic "tier set" style). Flat effects fold into
 // recalcPlayerStats: primary stats feed the AP/crit/HP derivations, `ap`/`crit`
 // add at their derivation steps, and `castPushbackReduction` (0..1) scales the
-// damage-driven cast pushback in Sim.pushbackCast. Balance values are authored in
+// damage-driven cast pushback in combat/casting_lifecycle.ts. `knockbackResistance` (0..1)
+// scales on-hit knockback distance. Balance values are authored in
 // content/item_sets.ts, never inline in engine code.
 export interface SetBonusEffect {
   str?: number;
@@ -340,6 +341,7 @@ export interface SetBonusEffect {
   ap?: number; // flat attack power
   crit?: number; // flat crit chance, 0..1
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
+  knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
 }
 
 export interface SetBonusTier {
@@ -375,9 +377,45 @@ export interface OtherItemDef extends BaseItemDef {
 
 export type ItemDef = ArmorItemDef | WeaponItemDef | OtherItemDef;
 
+// Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
+// {itemId, count} with no instance payload (fungible, market-listable). A slot
+// carrying `instance` is non-fungible (signed, has rolled stats, or is
+// character-bound) and is kept in its own slot entry, never merged with a plain
+// stack of the same itemId. Inert in the World Market for now (blocked at list
+// time, see market.ts marketList); #1146 wires real market handling for
+// instanced items later.
+export interface ItemInstancePayload {
+  /** Player name that signed/crafted this specific copy, if any. */
+  signer?: string;
+  /** Remaining charges for a per-effect-limited item, keyed by effect id. */
+  charges?: Record<string, number>;
+  /** Rolled quality/stat values baked into this specific copy at creation time. */
+  rolled?: { quality?: string; stats?: Record<string, number> };
+  /** Player id (Entity id) this specific copy is bound to. */
+  boundTo?: number;
+}
+
 export interface InvSlot {
   itemId: string;
   count: number;
+  /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
+  instance?: ItemInstancePayload;
+}
+
+// A shallow `{ ...slot }` aliases `instance` (and its mutable `charges`/`rolled.stats`
+// maps) between the live slot and a serialized/loaded copy: decrementing a charge on
+// one would silently mutate the other. Deep-clone at every save/load boundary instead.
+export function cloneInvSlot<T extends InvSlot>(slot: T): T {
+  if (!slot.instance) return { ...slot };
+  const src = slot.instance;
+  const instance: ItemInstancePayload = { ...src };
+  if (src.charges) instance.charges = { ...src.charges };
+  if (src.rolled)
+    instance.rolled = {
+      ...src.rolled,
+      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
+    };
+  return { ...slot, instance };
 }
 
 export interface LootSlot extends InvSlot {
@@ -394,7 +432,7 @@ export interface CorpseLoot {
 
 export type CurrencyLootStrategy = 'looter-takes-all' | 'fair-split';
 export type LootRollChoice = 'need' | 'greed' | 'pass';
-export type ItemLootStrategy = 'looter-takes-all' | 'need-greed';
+export type ItemLootStrategy = 'looter-takes-all' | 'need-greed' | 'round-robin';
 
 // An open need-greed roll a player may still answer. Carried both on the
 // transient `lootRoll` SimEvent and (for reliable re-delivery) on the self
@@ -426,7 +464,7 @@ export interface LootStrategies {
 
 export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
   currency: 'fair-split',
-  commonItems: 'looter-takes-all',
+  commonItems: 'round-robin',
   premiumItems: 'need-greed',
   master: { enabled: false, looter: 0, threshold: 'uncommon' },
 };
@@ -475,6 +513,11 @@ export interface MobTemplate {
   color: number; // render hint
   boss?: boolean;
   rare?: boolean;
+  // World boss: a server-wide elite that spawns on a fixed cadence (not from a
+  // CAMP), announces itself when it rises, and drops PERSONAL loot to every player
+  // who damaged it (gated to once per day per boss). The spawn schedule + location
+  // live in src/sim/world_boss.ts; the loot roll runs through rollWorldBossLoot.
+  worldBoss?: boolean;
   // Elite scaling, vanilla-style: ~2.3x health, ~1.5x damage, double XP.
   elite?: boolean;
   // Kill-XP multiplier (default 1). 0 marks a puzzle-object mob (e.g. the 1 HP
@@ -494,6 +537,28 @@ export interface MobTemplate {
     school?: string;
     fx?: 'nova' | 'projectile';
   };
+  // Boss mechanic: a periodic telegraphed HARDCAST. Unlike the instant aoePulse,
+  // the mob shows a real cast bar (the entity casting fields carry castId) for
+  // `castTime` seconds, then the spell lands as an AoE nova on every living player
+  // within `radius`. The mob keeps meleeing while it casts (the bar is the
+  // telegraph healers react to, not a channel). `yell` is barked at cast start.
+  bigCast?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    radius: number;
+    min: number;
+    max: number;
+    school?: string;
+    yell?: string;
+  };
+  // Boss bark lines, broadcast as 'yell'-channel chat to every player within
+  // YELL_RANGE (mirroring the Nythraxis encounter yells; sim-emitted English by
+  // the variable-routed-chat precedent, see the S3 note in
+  // tests/localization_fixes.test.ts). engage fires once per pull on the first
+  // player aggro, summon on each add wave, enrage when the enrage turns on.
+  yells?: { engage?: string; summon?: string; enrage?: string };
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
   summonAdds?: { mobId: string; count: number; atHpPct: number[] };
   // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
@@ -1077,6 +1142,13 @@ export interface AbilityDef {
   cooldown: number; // seconds, 0 = none (GCD only)
   range: number; // yards; 0 = melee range
   minRange?: number;
+  // The attack travels to its target as a projectile, so its damage and effects
+  // resolve when the bolt LANDS (projectile_travel), not at cast completion. Every
+  // non-physical spell is a projectile by convention (keyed off school in
+  // casting_lifecycle); a PHYSICAL ranged shot (hunter Aimed / Concussive Shot) must
+  // set this explicitly, or it would deal its damage instantly while the arrow is
+  // still visibly in flight. Melee physical attacks leave it unset.
+  projectile?: boolean;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
   // non-physical damage scales with Spell Power; physical damage scales with melee
@@ -1357,6 +1429,7 @@ export interface Entity {
   critChance: number; // 0..1
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
+  knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
   moveSpeed: number;
   hostile: boolean;
   // combat
@@ -1421,6 +1494,8 @@ export interface Entity {
   petPathCooldown: number; // seconds until this pet may recompute its heel path again
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
+  bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
+  yelledEngage: boolean; // engage bark fired this pull (reset on evade/respawn)
   stoneskinTimer: number; // periodic self-absorb barrier countdown
   terrifyTimer: number; // Banshee's Wail fear-pulse countdown
   detonateTimer: number; // Death Throes fuse on a volatile corpse; Infinity = no pending detonation

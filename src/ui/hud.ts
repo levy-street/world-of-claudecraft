@@ -22,6 +22,7 @@ import {
   playerPortraitDataUrl,
   visualPortraitDataUrl,
 } from '../render/characters/portrait';
+import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import {
@@ -63,6 +64,7 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { PICK_ACTIONS } from '../sim/lockpick';
+import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import type {
   AbilityDef,
@@ -111,7 +113,11 @@ import {
   ITEM_ICON_PREFIX,
 } from './action_bar_view';
 import { ArenaWindow } from './arena_window';
-import { abilityStartsAutoAttack, hasAutoAttackTarget } from './attack_on_ability';
+import {
+  abilityStartsAutoAttack,
+  deferAutoAttackUntilCastEnd,
+  hasAutoAttackTarget,
+} from './attack_on_ability';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
@@ -206,6 +212,7 @@ import {
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
+  getLanguage,
   moneyParts,
   type SupportedLanguage,
   type TranslationKey,
@@ -226,9 +233,21 @@ import { lootSettingsView } from './loot_settings_view';
 import { renderLootSettingsWindow } from './loot_settings_window';
 import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
+import {
+  mapQuestListView,
+  parseUntrackedQuests,
+  serializeUntrackedQuests,
+} from './map_quest_list_view';
 import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
-import { MAP_MAX_ZOOM, mapWindowMode } from './map_window_view';
+import {
+  MAP_MAX_ZOOM,
+  type MapNpcMarker,
+  type MapQuestAreaMarker,
+  mapWindowMode,
+  npcMarkerAt,
+  questAreaObjectivesAt,
+} from './map_window_view';
 import { MarketWindow } from './market_window';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
@@ -241,6 +260,7 @@ import {
   minimapZoomValue,
   nextMinimapZoom,
 } from './minimap_zoom';
+import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
@@ -291,6 +311,12 @@ import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
 import { localizeTalentTitle, roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
+import {
+  clampTargetFramePos,
+  parseTargetFramePos,
+  serializeTargetFramePos,
+  type TargetFramePos,
+} from './target_frame_pos';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { TutorialOverlay } from './tutorial';
@@ -312,6 +338,7 @@ import {
   wocBalanceVerified,
 } from './wallet_balance';
 import { makeWindowFocus } from './window_focus';
+import { installWindowResize, markResizableWindow } from './window_resize';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 
@@ -416,9 +443,15 @@ const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
+// Same i18n + number-formatting surface, handed to the pure mob-hover tooltip view.
+const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
+  t: (key, params) => t(key as TranslationKey, params),
+  fmt: (value, opts) => formatNumber(value, opts),
+};
 const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
+  if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
 };
@@ -519,6 +552,7 @@ const CHAT_ACTIVE_TAB_KEY = 'woc_chat_active_tab';
 // Persisted chat-window geometry (drag position + resize size). Desktop only —
 // the mobile layout owns its own placement and ignores this.
 const CHAT_GEOMETRY_KEY = 'woc_chat_geometry';
+const TARGET_FRAME_POS_KEY = 'woc_target_frame_pos';
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   yell: 'hud.chat.templates.yell',
@@ -740,6 +774,13 @@ export class Hud {
   private tooltipEl = $('#tooltip');
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
+  // The mob whose world-hover tooltip is currently shown (showMobHoverTooltip),
+  // so main.ts's per-frame updateHoverCursor can call it every frame while the
+  // same mob stays hovered without rebuilding the tooltip HTML each time.
+  // A small composite key (id:level:hostile:playerLevel), not just the mob id, so
+  // the hover tooltip repaints when a mid-hover change moves its model. See
+  // showMobHoverTooltip.
+  private lastMobTooltipId: string | null = null;
   private errorTimer: number | undefined;
   private bannerTimer: number | undefined;
   private pfLevelEl = $('#pf-level');
@@ -972,6 +1013,20 @@ export class Hud {
     minZ: number;
     maxZ: number;
   } | null = null;
+  // The quest-objective areas of the last overworld map paint (canvas-pixel
+  // space), kept for the hover tooltip's hit-test. Empty in delve mode.
+  private mapQuestAreas: MapQuestAreaMarker[] = [];
+  // The quest-giver glyphs of the last overworld map paint, for the hover
+  // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
+  private mapNpcMarkers: MapNpcMarker[] = [];
+  // The map's quest side list: quests the player untracked (their blue areas
+  // are hidden), lazily loaded per character; and the render-skip signature so
+  // the 4Hz map cadence rebuilds the list DOM only when it actually changed.
+  private mapUntrackedQuests: Set<string> | null = null;
+  private mapQuestListSig = '';
+  // Whether the map's quest dropdown is unfolded (session-only; reopening the
+  // map keeps the last choice, a fresh session starts folded to a clean map).
+  private mapQuestsOpen = false;
   private windowDrag: {
     el: HTMLElement;
     pointerId: number;
@@ -992,6 +1047,13 @@ export class Hud {
         startH: number;
       }
     | null = null;
+  // Movable target frame: the persisted top-left (null = stock CSS default), the
+  // move/lock button, whether the frame is currently unlocked for dragging, and the
+  // in-progress drag gesture. See target_frame_pos.ts for the math.
+  private targetFramePos: TargetFramePos | null = null;
+  private targetFrameMoveBtn: HTMLButtonElement | null = null;
+  private targetFrameUnlocked = false;
+  private targetFrameGesture: { pointerId: number; grabX: number; grabY: number } | null = null;
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
   private ignoredChatNames = new Set<string>();
@@ -1054,6 +1116,7 @@ export class Hud {
     this.meters = new Meters(sim);
     this.initChatTabs();
     this.initChatBoxGeometry();
+    this.initTargetFrameDrag();
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.loadSlotMap();
@@ -1236,6 +1299,9 @@ export class Hud {
     // delegate on the stable container (the header is rebuilt on each render).
     $('#quest-tracker').addEventListener('click', (e) => {
       if ((e.target as HTMLElement).closest('.qt-header')) this.toggleQuestTrackerCollapsed();
+      // A quest row jumps to that quest's detail in the quest log window.
+      const row = (e.target as HTMLElement).closest<HTMLElement>('.qt-title');
+      if (row?.dataset.quest) this.questlogWindow.openWithQuest(row.dataset.quest);
     });
     // Keyboard activation: handle Enter/Space here and stop the event before it
     // bubbles to the window-level game keybinds (Enter is bound to Open Chat,
@@ -1244,19 +1310,30 @@ export class Hud {
     // overlay, so canUseGameKeys() stays true and those binds fire while it has
     // focus; stopping propagation here keeps the toggle reachable by keyboard.
     $('#quest-tracker').addEventListener('keydown', (e) => {
-      if (!(e.target as HTMLElement).closest('.qt-header')) return;
-      if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
+      const target = e.target as HTMLElement;
+      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
+      if (target.closest('.qt-header')) {
         e.preventDefault();
         e.stopPropagation();
         this.toggleQuestTrackerCollapsed();
+        return;
+      }
+      // Keyboard activation for the quest rows (role=button), stopped before
+      // the window-level game keybinds hijack Enter/Space (same as the header).
+      const row = target.closest<HTMLElement>('.qt-title');
+      if (row?.dataset.quest) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.questlogWindow.openWithQuest(row.dataset.quest);
       }
     });
-    // The delve board and lockpick panel are non-modal .window.panel overlays, so
+    // The delve board, lockpick panel, and map window are non-modal overlays, so
     // canUseGameKeys() stays true and the global jump (Space) / chat (Enter) binds
-    // would otherwise hijack those keys on a focused panel button. Stop propagation
-    // (but NOT the default, so the button's native activation still fires) when a
-    // panel button has focus, mirroring the quest-tracker guard above.
-    for (const panelId of ['#delve-board', '#lockpick-panel', '#delve-rite-panel']) {
+    // would otherwise hijack those keys on a focused panel button (the map's
+    // Quests toggle, per-quest track buttons, zoom, and close included). Stop
+    // propagation (but NOT the default, so the button's native activation still
+    // fires) when a panel button has focus, mirroring the quest-tracker guard above.
+    for (const panelId of ['#delve-board', '#lockpick-panel', '#delve-rite-panel', '#map-window']) {
       $(panelId).addEventListener('keydown', (e) => {
         if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
         if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
@@ -1307,6 +1384,83 @@ export class Hud {
     };
     mapCanvas.addEventListener('pointerup', endDrag);
     mapCanvas.addEventListener('pointercancel', endDrag);
+    // Hovering the map shows context tooltips (mouse only: touch pans the map,
+    // no hover). Priority: a quest-giver glyph ('!'/'?', quest names + level
+    // requirements) sits ON TOP of the blobs, so it wins; otherwise a
+    // quest-objective area shows its objectives with live tracker progress.
+    // Both hit-tests run against the markers of the last paint, scaled from
+    // CSS px to the canvas backing space the model projects into.
+    let mapAreaTipShown = false;
+    const hideMapAreaTip = (): void => {
+      if (!mapAreaTipShown) return;
+      mapAreaTipShown = false;
+      this.hideTooltip();
+    };
+    mapCanvas.addEventListener('pointermove', (ev) => {
+      if (
+        ev.pointerType !== 'mouse' ||
+        this.mapDrag ||
+        (this.mapQuestAreas.length === 0 && this.mapNpcMarkers.length === 0)
+      ) {
+        hideMapAreaTip();
+        return;
+      }
+      const rect = mapCanvas.getBoundingClientRect();
+      const cx = ((ev.clientX - rect.left) * mapCanvas.width) / rect.width;
+      const cy = ((ev.clientY - rect.top) * mapCanvas.height) / rect.height;
+      const glyph = npcMarkerAt(this.mapNpcMarkers, cx, cy);
+      const html = glyph
+        ? this.questGiverTooltipHtml(glyph)
+        : this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, cx, cy));
+      if (!html) {
+        hideMapAreaTip();
+        return;
+      }
+      // Paint the shared #tooltip beside the cursor (the attachTooltip
+      // mousemove idiom: map visual-space x/y into author space, then clamp
+      // the author-space tooltip box against the viewport).
+      this.tooltipEl.innerHTML = html;
+      this.tooltipEl.style.display = 'block';
+      const z = getUiScale();
+      const tw = this.tooltipEl.offsetWidth;
+      const th = this.tooltipEl.offsetHeight;
+      this.tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, ev.clientX / z + 14))}px`;
+      this.tooltipEl.style.top = `${Math.max(8, ev.clientY / z - th - 10)}px`;
+      mapAreaTipShown = true;
+    });
+    mapCanvas.addEventListener('pointerleave', hideMapAreaTip);
+    mapCanvas.addEventListener('pointerdown', hideMapAreaTip);
+    // The map's quest dropdown: the "Quests" button unfolds/folds the list.
+    $('#map-quests-toggle').addEventListener('click', () => {
+      this.mapQuestsOpen = !this.mapQuestsOpen;
+      this.mapQuestListSig = ''; // force the list render to re-apply visibility
+      this.updateMapWindow();
+    });
+    // The map's quest side list: one delegated click listener toggles a
+    // quest's tracking (whether its blue areas + numbered badge paint).
+    $('#map-quests').addEventListener('click', (ev) => {
+      const btn = (ev.target as HTMLElement).closest<HTMLElement>('.mapq-track');
+      const questId = btn?.dataset.quest;
+      if (!questId) return;
+      const untracked = this.untrackedQuestSet();
+      if (untracked.has(questId)) untracked.delete(questId);
+      else untracked.add(questId);
+      try {
+        localStorage.setItem(this.mapUntrackedKey(), serializeUntrackedQuests(untracked));
+      } catch {
+        /* storage unavailable */
+      }
+      // The rebuild below replaces #map-quests's children, destroying a focused
+      // track button; restore focus to the same quest's rebuilt button so keyboard
+      // toggling stays in place and the flipped aria-pressed is announced (the
+      // toggleQuestTrackerCollapsed refocus idiom).
+      const refocus = document.activeElement === btn;
+      this.updateMapWindow();
+      if (refocus)
+        $('#map-quests')
+          .querySelector<HTMLElement>(`.mapq-track[data-quest="${CSS.escape(questId)}"]`)
+          ?.focus();
+    });
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
     // Drop an equipped piece dragged out of the paperdoll onto the bags window.
     const bagsEl = $('#bags');
@@ -1443,6 +1597,9 @@ export class Hud {
         attributes: true,
         attributeFilter: ['class', 'style', 'hidden'],
       });
+      // Piggyback the resize-grip stamp on this one observer (window_resize.ts
+      // deliberately runs no body-wide observer of its own).
+      markResizableWindow(el);
     };
     this.windowObserver = new MutationObserver((mutations) => {
       for (const m of mutations) {
@@ -1507,6 +1664,10 @@ export class Hud {
     };
     document.addEventListener('pointerup', endDrag);
     document.addEventListener('pointercancel', endDrag);
+    installWindowResize({
+      getScale: () => getUiScale(),
+      pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
+    });
     window.addEventListener('resize', () => {
       document.querySelectorAll<HTMLElement>('.window.panel').forEach((el) => {
         if (!this.isWindowVisible(el) || el.dataset.windowMoved !== '1') return;
@@ -1531,6 +1692,13 @@ export class Hud {
     if (el.dataset.windowOpen !== '1') {
       el.dataset.windowOpen = '1';
       this.placeNewWindow(el);
+      // A window moved or resized at an earlier viewport keeps its inline
+      // left/top while hidden; the viewport-resize re-clamp skips hidden
+      // windows, so re-clamp at show time or it can reopen off-screen.
+      if (el.dataset.windowMoved === '1') {
+        const rect = el.getBoundingClientRect();
+        this.setWindowPixelPosition(el, rect.left, rect.top, rect);
+      }
       this.bringWindowToFront(el);
     }
     this.syncAnyWindowOpenState();
@@ -1956,6 +2124,159 @@ export class Hud {
       if (!el) continue;
       for (const prop of ['left', 'top', 'right', 'bottom', 'width', 'height'])
         el.style.removeProperty(prop);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Movable / lockable target frame (desktop only). The pure position math
+  // (clamping, (de)serialization) lives in target_frame_pos.ts; this section is
+  // the DOM wiring: a small corner button that toggles the frame between locked
+  // (fixed) and unlocked (draggable), the pointer drag itself, and localStorage
+  // persistence of the chosen spot. The saved spot survives reloads; the lock
+  // state does not (the frame always loads locked so a stray drag never moves it).
+  // Mirrors the movable chat box above (its resize-less sibling).
+  // -------------------------------------------------------------------------
+
+  private initTargetFrameDrag(): void {
+    const frame = this.targetFrameEl;
+    if (!frame) return;
+
+    // The corner toggle. Built here (like the chat resize grip) so index.html
+    // stays untouched; its glyph + position are styled in hud.css.
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tf-move-btn';
+    btn.setAttribute('aria-pressed', 'false');
+    frame.appendChild(btn);
+    this.targetFrameMoveBtn = btn;
+    this.refreshTargetFrameMoveBtn();
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.setTargetFrameUnlocked(!this.targetFrameUnlocked);
+    });
+
+    // touch-action:none (so a drag is not stolen by browser panning) is scoped to
+    // the unlocked state in CSS (#target-frame.tf-unlocked), never applied while
+    // locked so it cannot interfere with normal touch behaviour on the frame.
+    frame.addEventListener('pointerdown', (ev) => this.onTargetFrameMoveStart(ev));
+    document.addEventListener('pointermove', (ev) => this.onTargetFramePointerMove(ev));
+    const end = (ev: PointerEvent) => this.onTargetFramePointerEnd(ev);
+    document.addEventListener('pointerup', end);
+    document.addEventListener('pointercancel', end);
+    // Re-clamp into view when the viewport changes (mirrors the chat box logic).
+    window.addEventListener('resize', () => {
+      if (this.targetFramePos) this.applyTargetFramePos();
+    });
+
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(TARGET_FRAME_POS_KEY);
+    } catch {
+      /* storage unavailable */
+    }
+    this.targetFramePos = parseTargetFramePos(saved);
+    if (this.targetFramePos) this.applyTargetFramePos();
+  }
+
+  // The move button's accessible name / tooltip and pressed state track whether the
+  // frame is unlocked; the frame gets a class so the cursor + drag affordance show.
+  private refreshTargetFrameMoveBtn(): void {
+    const btn = this.targetFrameMoveBtn;
+    if (!btn) return;
+    const label = this.targetFrameUnlocked
+      ? t('hudChrome.targetFrame.lock')
+      : t('hudChrome.targetFrame.unlock');
+    btn.setAttribute('aria-pressed', this.targetFrameUnlocked ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+    btn.classList.toggle('active', this.targetFrameUnlocked);
+    this.targetFrameEl.classList.toggle('tf-unlocked', this.targetFrameUnlocked);
+  }
+
+  private setTargetFrameUnlocked(unlocked: boolean): void {
+    this.targetFrameUnlocked = unlocked;
+    this.refreshTargetFrameMoveBtn();
+  }
+
+  // Seed targetFramePos from the live rect the first time a drag starts, so a frame
+  // still on its CSS default converts cleanly to explicit px coordinates.
+  private ensureTargetFramePos(): void {
+    if (this.targetFramePos) return;
+    const rect = this.targetFrameEl.getBoundingClientRect();
+    this.targetFramePos = { left: rect.left, top: rect.top };
+  }
+
+  private onTargetFrameMoveStart(ev: PointerEvent): void {
+    if (ev.button !== 0 || this.isMobileLayout() || !this.targetFrameUnlocked) return;
+    const target = ev.target as HTMLElement | null;
+    // The move button (and any debuff icon buttons) keep their own behaviour; only
+    // the frame body area initiates a drag.
+    if (!target || target.closest('button')) return;
+    ev.preventDefault();
+    this.ensureTargetFramePos();
+    const rect = this.targetFrameEl.getBoundingClientRect();
+    this.targetFrameGesture = {
+      pointerId: ev.pointerId,
+      grabX: ev.clientX - rect.left,
+      grabY: ev.clientY - rect.top,
+    };
+    document.body.classList.add('target-frame-dragging');
+    try {
+      this.targetFrameEl.setPointerCapture?.(ev.pointerId);
+    } catch {
+      /* synthetic pointer */
+    }
+  }
+
+  private onTargetFramePointerMove(ev: PointerEvent): void {
+    const g = this.targetFrameGesture;
+    if (!g || g.pointerId !== ev.pointerId) return;
+    ev.preventDefault();
+    this.targetFramePos = { left: ev.clientX - g.grabX, top: ev.clientY - g.grabY };
+    this.applyTargetFramePos();
+  }
+
+  private onTargetFramePointerEnd(ev: PointerEvent): void {
+    const g = this.targetFrameGesture;
+    if (!g || g.pointerId !== ev.pointerId) return;
+    this.targetFrameGesture = null;
+    document.body.classList.remove('target-frame-dragging');
+    this.persistTargetFramePos();
+  }
+
+  private applyTargetFramePos(): void {
+    if (!this.targetFramePos) return;
+    // On the mobile layout the desktop-saved position must not apply. Clear any
+    // inline left/top/right/bottom (e.g. left over after a live desktop-to-mobile
+    // viewport shrink) so the mobile stylesheet owns the frame's position again.
+    if (this.isMobileLayout()) {
+      for (const prop of ['left', 'top', 'right', 'bottom'])
+        this.targetFrameEl.style.removeProperty(prop);
+      return;
+    }
+    const rect = this.targetFrameEl.getBoundingClientRect();
+    // The frame is display:none with no target (rect is 0x0); fall back to a nominal
+    // size so a saved spot still clamps sensibly and re-shows on-screen.
+    const size = { w: rect.width || 220, h: rect.height || 92 };
+    const clamped = clampTargetFramePos(
+      this.targetFramePos,
+      { w: window.innerWidth, h: window.innerHeight },
+      size,
+    );
+    this.targetFramePos = clamped;
+    this.targetFrameEl.style.left = `${clamped.left}px`;
+    this.targetFrameEl.style.top = `${clamped.top}px`;
+    this.targetFrameEl.style.right = 'auto';
+    this.targetFrameEl.style.bottom = 'auto';
+  }
+
+  private persistTargetFramePos(): void {
+    if (!this.targetFramePos) return;
+    try {
+      localStorage.setItem(TARGET_FRAME_POS_KEY, serializeTargetFramePos(this.targetFramePos));
+    } catch {
+      /* storage unavailable */
     }
   }
 
@@ -2581,6 +2902,11 @@ export class Hud {
       repaintPortrait: () => this.drawTargetPortrait(),
     },
   );
+  // Deferred "Auto-Attack on Ability Use" for TIMED casts: set by castSlot when
+  // the QoL would engage but the ability has a cast time, consumed by the
+  // castStop event (engage on success, drop on interrupt), so starting a Smite
+  // never aggros the target before its damage lands.
+  private pendingAutoAttackOnCastEnd = false;
   // The party frames are N further instances of the unit_frame family, one per
   // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
   // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
@@ -3049,16 +3375,10 @@ export class Hud {
       // Touch-only path: showing the tooltip means the held control is being
       // inspected, so the release click should peek, not fire its action.
       this.peekGuard.tooltipShown(trigger);
-      this.tooltipEl.innerHTML = html();
-      this.tooltipEl.style.display = 'block';
-      // offsetWidth/Height are author-space (zoom-immune) layout sizes, but x/y
-      // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
-      // before clamping against the author-space tooltip box + viewport.
-      const z = getUiScale();
-      ttW = this.tooltipEl.offsetWidth;
-      ttH = this.tooltipEl.offsetHeight;
-      this.tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - ttW - 8, x / z + 14))}px`;
-      this.tooltipEl.style.top = `${Math.max(8, y / z - ttH - 10)}px`;
+      const size = this.paintTooltipAt(html(), x, y);
+      // cache the measured box for the mousemove clamp below (no forced reflow)
+      ttW = size.w;
+      ttH = size.h;
     };
     const showNearElement = () => {
       const rect = el.getBoundingClientRect();
@@ -3103,6 +3423,104 @@ export class Hud {
 
   hideTooltip(): void {
     this.tooltipEl.style.display = 'none';
+    this.tooltipEl.classList.remove('mob-tooltip');
+  }
+
+  // Paints the shared #tooltip box at a screen point, used by attachTooltip's
+  // element-hover showAt (item/ability/stat tooltips). Drops the mob-tooltip
+  // size modifier so a leftover world-hover tooltip never leaks its bigger
+  // sizing onto one of these. Returns the measured author-space box size so the
+  // caller can cache it (attachTooltip's mousemove clamp reuses it instead of
+  // re-reading offsetWidth/Height, which would force a reflow per mousemove).
+  private paintTooltipAt(html: string, x: number, y: number): { w: number; h: number } {
+    this.tooltipEl.classList.remove('mob-tooltip');
+    this.tooltipEl.innerHTML = html;
+    this.tooltipEl.style.display = 'block';
+    // offsetWidth/Height are author-space (zoom-immune) layout sizes, but x/y
+    // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
+    // before clamping against the author-space tooltip box + viewport.
+    const z = getUiScale();
+    const tw = this.tooltipEl.offsetWidth,
+      th = this.tooltipEl.offsetHeight;
+    this.tooltipEl.style.left = `${Math.max(8, Math.min(window.innerWidth / z - tw - 8, x / z + 14))}px`;
+    this.tooltipEl.style.top = `${Math.max(8, y / z - th - 10)}px`;
+    return { w: tw, h: th };
+  }
+
+  // Anchors the mob-hover tooltip to a fixed screen slot instead of the cursor:
+  // just right of the player frame's health/resource bars, bottom-aligned with
+  // them. Unlike paintTooltipAt (cursor-relative), this reads the player frame's
+  // live rect so it tracks that frame's real position/size (desktop or mobile)
+  // instead of a hand-picked pixel offset.
+  private paintTooltipNearPlayerFrame(html: string): void {
+    this.tooltipEl.classList.add('mob-tooltip');
+    this.tooltipEl.innerHTML = html;
+    this.tooltipEl.style.display = 'block';
+    const z = getUiScale();
+    const tw = this.tooltipEl.offsetWidth,
+      th = this.tooltipEl.offsetHeight;
+    const pf = this.playerFrameEl.getBoundingClientRect();
+    const gap = 14;
+    const left = Math.max(8, Math.min(window.innerWidth / z - tw - 8, pf.right / z + gap));
+    const top = Math.max(8, Math.min(window.innerHeight / z - th - 8, pf.bottom / z - th));
+    this.tooltipEl.style.left = `${left}px`;
+    this.tooltipEl.style.top = `${top}px`;
+  }
+
+  // Shows the WoW-style mouseover tooltip (name / level / creature type) for a
+  // mob hovered in the 3D world. Called every frame main.ts's updateHoverCursor
+  // finds a hovered mob; gated on a small key (not just the id) so re-hovering the
+  // same mob each frame does not rebuild the HTML, yet a mid-hover change that
+  // moves the rendered model (the mob aggros so hostile flips, the mob or the
+  // viewer dings a level so the con-color shifts) still repaints. Colored by the
+  // tooltip's own classic con spread (mobTooltipConColor), deliberately independent
+  // of the overhead nameplate bands (mobNameColor). Shown at a fixed spot (right of
+  // the health bars, see paintTooltipNearPlayerFrame) rather than following the cursor.
+  showMobHoverTooltip(entity: Entity, pvpOpponents: ReadonlySet<number>): void {
+    // Questie-style quest lines: the objectives this mob advances, with live
+    // counts. They ride the rebuild key so a kill mid-hover repaints 3/8 -> 4/8.
+    const mobQuests = questObjectivesForMob(this.sim.questLog, entity.templateId);
+    const questKey = mobQuests
+      .map((q) => `${q.questId}#${q.objectiveIndex}:${q.current}/${q.total}`)
+      .join(',');
+    const key = `${entity.id}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
+    if (key === this.lastMobTooltipId) return;
+    this.lastMobTooltipId = key;
+    const template = MOBS[entity.templateId];
+    if (!template) {
+      this.hideTooltip();
+      return;
+    }
+    const diff = entity.level - this.sim.player.level;
+    const friendlyPet = isFriendlyPet(entity, this.sim.entities, (p) => pvpOpponents.has(p.id));
+    const familyLabel =
+      template.family === 'demon'
+        ? t('hudChrome.mobTooltip.familyDemon')
+        : t(`guide.family.${template.family}.name` as TranslationKey);
+    const model: MobTooltipModel = {
+      name: mobDisplayName(entity.templateId),
+      level: entity.level,
+      familyLabel,
+      color: mobTooltipConColor(diff, entity.dead, friendlyPet),
+      hostile: entity.hostile,
+      quests: mobQuests.map((q) => ({
+        title: questTitle(q.questId),
+        progress: this.questProgressText(
+          questObjectiveLabel(q.questId, q.objectiveIndex),
+          q.current,
+          q.total,
+        ),
+      })),
+    };
+    this.paintTooltipNearPlayerFrame(mobTooltipHtml(model, MOB_TOOLTIP_VIEW_DEPS));
+  }
+
+  // Clears the world-hover mob tooltip; a no-op if none is showing, so main.ts
+  // can call it unconditionally every frame nothing (or a non-mob) is hovered.
+  clearMobHoverTooltip(): void {
+    if (this.lastMobTooltipId === null) return;
+    this.lastMobTooltipId = null;
+    this.hideTooltip();
   }
 
   private itemTooltip(item: ItemDef, compare = true): string {
@@ -3336,6 +3754,10 @@ export class Hud {
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
+    // The target-frame move/lock button's label is set once at construction + on
+    // toggle, so re-localize it in place on a language switch (same reason as the
+    // party rows above).
+    this.refreshTargetFrameMoveBtn();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
     if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
@@ -3841,7 +4263,16 @@ export class Hud {
             abilityStartsAutoAttack(resolved.effects) &&
             hasAutoAttackTarget(target)
           ) {
-            this.sim.startAutoAttack();
+            // A TIMED cast must not engage yet: startAutoAttack aggros the target
+            // immediately, so engaging at cast start pulled the mob before any
+            // damage existed (the aggro-before-damage bug). Defer to the
+            // successful castStop (handled in the events switch); instants keep
+            // engaging at once since their damage lands this same tick.
+            if (deferAutoAttackUntilCastEnd(resolved.castTime)) {
+              this.pendingAutoAttackOnCastEnd = true;
+            } else {
+              this.sim.startAutoAttack();
+            }
           }
         }
         this.flashActionSlot(barSlot);
@@ -5120,6 +5551,8 @@ export class Hud {
       const quest = QUESTS[qp.questId];
       quests.push({
         id: qp.questId,
+        // acceptance-order number, the same one the map badges + side list show
+        number: quests.length + 1,
         title: questTitle(qp.questId),
         complete: qp.state === 'ready',
         objectives: quest.objectives.map((obj, i) => ({
@@ -5171,7 +5604,7 @@ export class Hud {
       `<span class="qt-h-label">${esc(t('questUi.tracker.title'))}</span>${count}</button>`;
     let rows = '';
     for (const q of view.quests) {
-      rows += `<div class="qt-title">${esc(q.title)}${q.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
+      rows += `<div class="qt-title" role="button" tabindex="0" data-quest="${esc(q.id)}"><span class="qt-num">${esc(this.questNumber(q.number))}</span>${esc(q.title)}${q.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
       for (const o of q.objectives) {
         rows += `<div class="qt-obj${o.done ? ' done' : ''}">- ${esc(this.questProgressText(o.label, o.current, o.total))}</div>`;
       }
@@ -6067,6 +6500,9 @@ export class Hud {
     if (mapWindowMode(this.sim) === 'delve') {
       // The delve painter owns the full world-map schematic render (the area
       // title is drawn on-canvas, since the world map has no DOM zone label).
+      this.mapQuestAreas = [];
+      this.mapNpcMarkers = [];
+      this.hideMapQuestList();
       this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const run = this.sim.delveRun;
       const area = run ? delveDisplayName(run.delveId) : '';
@@ -6087,10 +6523,140 @@ export class Hud {
       canvasSize: S,
       zoom: this.mapZoom,
       center: this.mapCenter,
+      untrackedQuestIds: this.untrackedQuestSet(),
     });
     this.mapView = result.view;
+    this.mapQuestAreas = result.questAreas;
+    this.mapNpcMarkers = result.npcs;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
+    this.renderMapQuestList();
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
+  }
+
+  // ---- the map's numbered quest side list (track/untrack the blue areas) ----
+
+  private mapUntrackedKey(): string {
+    return `woc_map_untracked_${this.sim.cfg.playerClass}_${this.sim.player.name}`;
+  }
+
+  private untrackedQuestSet(): Set<string> {
+    if (!this.mapUntrackedQuests) {
+      let raw: string | null = null;
+      try {
+        raw = localStorage.getItem(this.mapUntrackedKey());
+      } catch {
+        /* storage unavailable */
+      }
+      this.mapUntrackedQuests = parseUntrackedQuests(raw);
+    }
+    return this.mapUntrackedQuests;
+  }
+
+  private hideMapQuestList(): void {
+    if (this.mapQuestListSig === '') return;
+    this.mapQuestListSig = '';
+    const el = $('#map-quests');
+    el.classList.remove('on');
+    el.replaceChildren();
+    ($('#map-quests-toggle') as unknown as HTMLButtonElement).hidden = true;
+  }
+
+  // Rebuild the dropdown only when its content actually changed (the map
+  // repaints on the 4Hz cadence; the signature keeps the DOM quiet between
+  // real changes and covers a language switch via the current language salt).
+  // The "Quests" toggle button shows whenever the log has quests; the list
+  // itself only while the dropdown is unfolded.
+  private renderMapQuestList(): void {
+    const entries = mapQuestListView(this.sim.questLog, this.untrackedQuestSet());
+    if (entries.length === 0) {
+      this.hideMapQuestList();
+      return;
+    }
+    const sig = `${getLanguage()}|${this.mapQuestsOpen ? 1 : 0}|${entries
+      .map((e) => `${e.questId}:${e.number}:${e.ready ? 1 : 0}:${e.tracked ? 1 : 0}`)
+      .join('|')}`;
+    if (sig === this.mapQuestListSig) return;
+    this.mapQuestListSig = sig;
+    const toggle = $('#map-quests-toggle') as unknown as HTMLButtonElement;
+    toggle.hidden = false;
+    toggle.setAttribute('aria-expanded', this.mapQuestsOpen ? 'true' : 'false');
+    // U+25BE down / U+25B8 right triangle, the tracker header's chevron pair
+    toggle.textContent = `${this.mapQuestsOpen ? '▾' : '▸'} ${t('questUi.tracker.title')}`;
+    const listEl = $('#map-quests');
+    if (!this.mapQuestsOpen) {
+      listEl.classList.remove('on');
+      listEl.replaceChildren();
+      return;
+    }
+    const check = String.fromCharCode(0x2713); // escaped so no literal glyph in source
+    let html = `<div class="mapq-head">${esc(t('questUi.tracker.title'))}</div>`;
+    for (const e of entries) {
+      const title = questTitle(e.questId);
+      const label = t(e.tracked ? 'questUi.tracker.hideFromMap' : 'questUi.tracker.showOnMap', {
+        name: title,
+      });
+      html +=
+        `<div class="mapq-row${e.tracked ? '' : ' untracked'}">` +
+        `<span class="mapq-num">${esc(this.questNumber(e.number))}</span>` +
+        `<span class="mapq-title">${esc(title)}</span>` +
+        (e.ready
+          ? `<span class="mapq-complete">${esc(t('questUi.tracker.complete'))}</span>`
+          : '') +
+        `<button type="button" class="mapq-track" data-quest="${esc(e.questId)}" aria-pressed="${e.tracked}" title="${esc(label)}" aria-label="${esc(label)}">${e.tracked ? check : ''}</button>` +
+        `</div>`;
+    }
+    listEl.innerHTML = html;
+    listEl.classList.add('on');
+  }
+
+  // Tooltip body for a hovered quest-giver glyph on the world map: each quest
+  // behind the '!'/'?' shows its title (with the ready-to-turn-in tag on '?'
+  // quests) plus its level requirement when the quest declares one, all through
+  // existing questUi keys (no new i18n surface).
+  private questGiverTooltipHtml(marker: MapNpcMarker): string {
+    let html = '';
+    for (const ref of marker.quests) {
+      const quest = QUESTS[ref.questId];
+      if (!quest) continue;
+      const readyTag = ref.ready
+        ? ` <span class="quest-complete">(${esc(t('questUi.log.readyStatus'))})</span>`
+        : '';
+      html += `<div class="tt-title">${esc(questTitle(ref.questId))}${readyTag}</div>`;
+      if (quest.minLevel) {
+        html += `<div class="tt-quest-req">${esc(
+          t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }),
+        )}</div>`;
+      }
+    }
+    return html;
+  }
+
+  // Tooltip body for hovered quest-objective areas on the world map: per quest,
+  // its title plus each hovered objective's tracker-style "label current/total"
+  // line, all through the existing questUi keys + formatters (no new i18n
+  // surface). Empty string when nothing under the cursor resolves.
+  private questAreaTooltipHtml(refs: readonly QuestObjectiveRef[]): string {
+    const byQuest = new Map<string, number[]>();
+    for (const ref of refs) {
+      const list = byQuest.get(ref.questId);
+      if (list) list.push(ref.objectiveIndex);
+      else byQuest.set(ref.questId, [ref.objectiveIndex]);
+    }
+    let html = '';
+    for (const [questId, objectiveIndexes] of byQuest) {
+      const quest = QUESTS[questId];
+      const qp = this.sim.questLog.get(questId);
+      if (!quest || !qp) continue;
+      let lines = '';
+      for (const i of objectiveIndexes) {
+        const obj = quest.objectives[i];
+        if (!obj) continue;
+        const current = Math.min(qp.counts[i] ?? 0, obj.count);
+        lines += `<div>${esc(this.questProgressText(questObjectiveLabel(questId, i), current, obj.count))}</div>`;
+      }
+      if (lines) html += `<div class="tt-title">${esc(questTitle(questId))}</div>${lines}`;
+    }
+    return html;
   }
 
   // -------------------------------------------------------------------------
@@ -7059,6 +7625,19 @@ export class Hud {
         case 'castStart':
           break; // cast-loop SFX is spatial now (see playEventSfx)
         case 'castStop':
+          // Deferred "Auto-Attack on Ability Use" (timed casts): engage only when
+          // the player's own cast COMPLETES, so the aggro happens as the damage
+          // lands, never at cast start (the aggro-before-damage bug). An
+          // interrupted/canceled cast just drops the pending engage; the target
+          // is re-validated since the cast itself may have killed or cleared it.
+          if (ev.entityId === sim.playerId && this.pendingAutoAttackOnCastEnd) {
+            this.pendingAutoAttackOnCastEnd = false;
+            if (ev.success) {
+              const castTid = sim.player.targetId;
+              const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
+              if (hasAutoAttackTarget(castTarget)) this.sim.startAutoAttack();
+            }
+          }
           break;
         case 'aura': {
           const tgt = sim.entities.get(ev.targetId);
@@ -7498,6 +8077,11 @@ export class Hud {
         count: formatNumber(Number(match[2]), { maximumFractionDigits: 0 }),
       });
     }
+    match = /^(\d+) daily rewards points gained\.$/.exec(text);
+    if (match)
+      return t('hudChrome.dailyRewards.pointsGained', {
+        points: formatNumber(Number(match[1]), { maximumFractionDigits: 0 }),
+      });
     // Server-sent friends/guild/who/world messages arrive as 'log' events; fall
     // back to the shared server-message localizer (same as localizeErrorText /
     // localizeLootText) so they are not displayed in raw English.
@@ -10417,6 +11001,8 @@ export class Hud {
       switch (key) {
         case 'levyst':
           return t('hudChrome.discord.roleTag.levyst');
+        case 'admin':
+          return t('hudChrome.discord.roleTag.admin');
         case 'devs':
           return t('hudChrome.discord.roleTag.devs');
         case 'mods':
@@ -10494,6 +11080,8 @@ export class Hud {
       switch (key) {
         case 'levyst':
           return t('hudChrome.discord.roleTag.levyst');
+        case 'admin':
+          return t('hudChrome.discord.roleTag.admin');
         case 'devs':
           return t('hudChrome.discord.roleTag.devs');
         case 'mods':

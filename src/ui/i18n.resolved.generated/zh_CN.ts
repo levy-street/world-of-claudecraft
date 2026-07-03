@@ -202,7 +202,11 @@ export const zh_CN: EnTranslations = {
       "spinResult": "+{points} 积分",
       "spinButton": "转动",
       "tasks": "任务",
+      "taskMultiplier": "{multiplier}倍倍率",
+      "pointsGained": "已获得 {points} 每日奖励积分。",
       "leaderboard": "每日排行榜",
+      "totalPlayer": "今天 {count} 名玩家",
+      "totalPlayers": "今天 {count} 名玩家",
       "history": "往期获奖者",
       "noLeaders": "暂无积分。",
       "noHistory": "暂无派奖记录。",
@@ -386,9 +390,11 @@ export const zh_CN: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "showDevBadges": "显示开发者徽章",
+      "showOwnNameplate": "显示我的姓名板",
       "uiScale": "界面缩放",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
+      "walkByAutoloot": "路过自动拾取",
       "groundReticle": "地面瞄准指示圈",
       "showItemLevel": "显示物品等级",
       "itemLevelLine": "物品等级 {level}",
@@ -821,6 +827,9 @@ export const zh_CN: EnTranslations = {
         "nature": "自然"
       }
     },
+    "worldBoss": {
+      "spawn": "{name}在荆峰高地崛起！"
+    },
     "loot": {
       "chestTitle": "宝箱"
     },
@@ -831,6 +840,16 @@ export const zh_CN: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "等级 {level} {family}",
+      "familyDemon": "恶魔",
+      "hostile": "敌对",
+      "friendly": "友方"
+    },
+    "targetFrame": {
+      "unlock": "移动目标框",
+      "lock": "锁定目标框"
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}"
@@ -913,6 +932,7 @@ export const zh_CN: EnTranslations = {
       "memberSinceDays": "已加入 Discord {days} 天",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "管理员",
         "devs": "开发者",
         "mods": "管理员",
         "artists": "画师"
@@ -1953,6 +1973,9 @@ export const zh_CN: EnTranslations = {
     "password": "密码",
     "passwordError": "请输入密码。",
     "passwordPlaceholder": "请输入密码",
+    "email": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "请输入有效的邮箱地址。",
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
     "logIn": "登录",
@@ -1978,7 +2001,15 @@ export const zh_CN: EnTranslations = {
     "create": "创建",
     "twoFactorLabel": "验证码",
     "twoFactorPlaceholder": "6 位验证码或恢复码",
-    "twoFactorHint": "请输入身份验证器应用中的验证码，或一个恢复码。"
+    "twoFactorHint": "请输入身份验证器应用中的验证码，或一个恢复码。",
+    "recovery": {
+      "title": "添加找回邮箱",
+      "body": "设置一个邮箱地址，以便您可以找回自己的账户。我们仅在您需要重置密码时，用它来确认您是本账户的所有者。",
+      "save": "保存邮箱",
+      "logOut": "Log out",
+      "invalid": "请输入有效的邮箱地址。",
+      "failed": "无法保存您的邮箱，请重试。"
+    }
   },
   "wallet": {
     "label": "$WOC 钱包",
@@ -2032,6 +2063,7 @@ export const zh_CN: EnTranslations = {
     "helpLinkedWithBalance": "持有者特权已启用。钱包应用已在此浏览器中连接。",
     "helpLinkedDisconnected": "持有者特权已启用。需要签名或消费时请连接应用。",
     "helpLinkedDisconnectedWithBalance": "持有者特权已启用。需要签名或消费时请连接应用。",
+    "extensionHelp": "若要在此处看到钱包，请保持 Solflare Wallet 等浏览器钱包扩展处于启用状态。",
     "flowConnect": "选择一个钱包。验证会自动继续。",
     "flowSign": "在钱包应用中签署验证消息。无需交易或 SOL。",
     "flowVerify": "正在验证钱包所有权...",
@@ -2217,7 +2249,6 @@ export const zh_CN: EnTranslations = {
       "unknownTier": "未知的探秘难度。",
       "levelRequired": "你必须达到 {level} 级才能进入{name}。",
       "levelRequiredTier": "你必须达到 {level} 级才能以{tier}难度进入{name}。",
-      "partyTooLarge": "{name}仅限单人或双人探索。{max}人及以上的队伍不得进入。",
       "instancesBusy": "{name}的所有副本都已占用。请稍后再试。",
       "runFailed": "{name}探秘失败。",
       "complete": "{name}已完成。",
@@ -2227,14 +2258,6 @@ export const zh_CN: EnTranslations = {
       "doorAlreadyOpen": "门已经开着了。",
       "companionRankUp": "{name}晋升至 {rank} 级。",
       "bossChest": "首领倒下了。一只设有结界的圣物库宝箱在祭坛上升起，撬开它的锁来取得你的战利品。",
-      "drownedLitanyReliquaryRise": "娜哈莉亚修女陷入沉默。溺亡圣髑匣从黑水中升起。靠近它以开始仪式。",
-      "riteSequenceReady": "神龛陷入黑暗。重复顺序。",
-      "riteSequencePlaying": "神龛正在重演仪式。请等待。",
-      "riteCorrect": "一声轻柔的钟鸣回应了你的触碰。",
-      "riteWrong": "刺耳的钟裂声。黑水在你脚边溅起。",
-      "riteReliquaryOpen": "溺亡圣髑匣打开了。",
-      "riteReliquaryLocked": "完成神龛仪式以打开圣髑匣。",
-      "riteReliquaryEmpty": "圣髑匣是空的。",
       "surfaceStairs": "一道通往地面的楼梯开启了。在楼梯处按 F 即可离开。",
       "moduleEnter": "{name}：{objective}",
       "objectiveClearRoom": "清空房间。",
@@ -2242,13 +2265,6 @@ export const zh_CN: EnTranslations = {
       "tombstoneHint": "房间清空后，一条墓碑通道将向北敞开。",
       "tombstoneOpen": "一条封闭的墓碑通道向北轰然开启。走进去即可继续前行。",
       "tombstoneInto": "你穿过墓碑进入{name}。",
-      "bellRopeShock": "钟绳猛然绷紧。溺亡诵经者们因震荡而踉跄。",
-      "eggSacBurst": "卵囊破裂了。蜘蛛幼体四散逃窜过洗礼堂的边缘。",
-      "baptistryEggs": "洗礼堂归于寂静。蜘蛛卵囊湿漉漉地附着在边缘。",
-      "baptistrySpidersSealed": "你应该试着摧毁那些蜘蛛卵囊。",
-      "puzzleSealed": "你需要在房间里某处施加压力来解开封印。",
-      "ropesSealed": "你应该试着拉动那些钟绳。",
-      "baptistryWave": "洗礼堂的黑水中有什么东西在搅动。",
       "chestEmpty": "宝箱是空的。",
       "notInDelve": "你不在探秘之中。",
       "cannotInteract": "你无法与之互动。",
@@ -2267,12 +2283,9 @@ export const zh_CN: EnTranslations = {
       "passageSealed": "通道被封住了。",
       "moveCloserPassage": "靠近通道一些。",
       "moveCloserChest": "靠近宝箱一些。",
-      "moveCloserReliquary": "靠近圣物匣一些。",
       "nothingToTake": "这里已经没有可拿的东西了。",
       "wayOutNotOpen": "出路尚未开启。",
-      "moveCloserStairs": "靠近楼梯一些。",
-      "nhaliaCantorShield": "诵经者们，稳住音符！",
-      "nhaliaBlackwaterMark": "{name}用黑水标记了{player}！"
+      "moveCloserStairs": "靠近楼梯一些。"
     },
     "lockpick": {
       "lockYields": "锁开了！{tier}战利品。",
@@ -2335,26 +2348,6 @@ export const zh_CN: EnTranslations = {
       "abandoned": "你将撬锁器轻轻抽了出来。锁还在等着。"
     }
   },
-  "delveRiteUi": {
-    "title": "溺亡圣髑仪式",
-    "blurb": "神龛将依序亮起。依次激活每一座神龛以重复顺序。触碰错误会导致本次尝试失败并重演顺序，完美无误的尝试将赢得最丰厚的战利品，而用尽尝试次数则会以最寒酸的方式打开圣髑匣。选择仪式将如何考验你。",
-    "easy": "Easy",
-    "medium": "中等",
-    "hard": "Hard",
-    "guideWatch": "选择后，四座神龛会依次亮起。记住顺序。",
-    "guideRepeat": "神龛熄灭后，按同样的顺序走到每座神龛前按 F（互动）。",
-    "guideStakes": "按错神龛会被黑水泼溅并损失一次尝试。完成整个顺序即可开启圣物匣。",
-    "showsTimes": "顺序展示{count}次",
-    "showsOnce": "顺序仅展示一次",
-    "symbols": "{count}个符号",
-    "tries": "{count}次尝试",
-    "reward": {
-      "easy": "普通战利品",
-      "medium": "丰厚战利品",
-      "hard": "顶级战利品"
-    },
-    "closeAria": "关闭"
-  },
   "delveUi": {
     "board": {
       "title": "探秘面板",
@@ -2364,7 +2357,6 @@ export const zh_CN: EnTranslations = {
       "openDelveAria": "从{name}打开探秘面板",
       "marks": "探秘印记：{count}",
       "minLevel": "需要等级 {level}",
-      "partyTooLarge": "仅限单人或双人（最多 {max} 人）",
       "tier": {
         "normal": "普通",
         "heroic": "英雄"
@@ -2372,7 +2364,6 @@ export const zh_CN: EnTranslations = {
       "companion": {
         "pick": "选择一名同伴",
         "tessa": "侍僧泰莎",
-        "edda": "艾达·芦手",
         "rank": "等级 {rank}",
         "boon": "在战斗间隙治疗队伍。3级时每次探秘可复活一名倒下的队友一次。",
         "upgrade": "升级到 {rank} 级（{marks} 印记）",
@@ -2398,11 +2389,7 @@ export const zh_CN: EnTranslations = {
       "complete": "已完成",
       "marks": "探秘印记：{count}",
       "exitHintOpen": "走进墓碑通道（北面）",
-      "exitHintLocked": "清空杂兵以开启向北的通道",
-      "riteChoose": "靠近沉溺圣物匣并按 F 开始仪式",
-      "ritePlayback": "注视神龛：记住它们亮起的顺序",
-      "riteInput": "按亮起的顺序在每座神龛前按 F（{current}/{total}）",
-      "riteOpen": "圣物匣已开启：在它面前按 F 领取战利品"
+      "exitHintLocked": "清空杂兵以开启向北的通道"
     },
     "objective": {
       "kill_boss": "击杀{boss}",
@@ -2423,54 +2410,27 @@ export const zh_CN: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "下方的圣物库又移位了。每到午夜过后，我们便能透过地板听见诵唱，侍僧泰莎更发誓说葬礼名册正在自行改写墨迹。若你有足够的勇气，{playerName}，就拿上一支蜡烛下去吧。别相信下面听到的每一个声音。它们中有些，早在你出生之前就知道你的名字了。"
-      },
-      "halvenMarsh": {
-        "greeting": "小径向北通往沼泽，{playerName}。又一座圣物库在黑水下歌唱，溺亡者应和着钟声。见习信徒艾达比我更懂这片芦苇，紧跟她的灯笼。选择你的难度，我会握紧绳索，直到你归来。"
       }
     },
     "intro": {
       "normal": "楼梯井又冷又暗。破碎的圣徒石散落在下行的台阶上，潮湿的空气中悬着一缕轻柔的钟音。侍僧泰莎低声道：“圣物库不该开到这么深的地方。靠紧些，{playerName}。”",
-      "heroic": "门在你身后呻吟着合上。一个个名字像指甲般刮过石面。泰莎的烛火燃成幽蓝。“他们如今召唤的已不是亡者了，{playerName}。他们是在回应某种东西。”",
-      "litanyNormal": "芦苇堵塞的阶梯没入芬桥之下。艾达·芦手举起她的提灯。\"沼泽记得每一个被淹死之人的名字，{playerName}。留在光中。\"",
-      "litanyHeroic": "黑水拍打着堤道的石头。艾达的火焰闪烁成绿色。\"他们又在下面歌唱了，{playerName}。不要回应那唱诗队。\""
+      "heroic": "门在你身后呻吟着合上。一个个名字像指甲般刮过石面。泰莎的烛火燃成幽蓝。“他们如今召唤的已不是亡者了，{playerName}。他们是在回应某种东西。”"
     },
     "module": {
       "reliquary_sunken_ossuary": "水从葬架间渗出，挟着陈年灰烬汇成银黑色的细流。",
       "reliquary_bell_niche": "数十口手钟静默地悬着，每一口都系着丧葬布。",
       "reliquary_saintless_hall": "一座座雕像的脸面被人以审慎的仇恨凿去。",
-      "reliquary_finale": "埋藏的钟在你脚下鸣响了一声。",
-      "litany_sluice": "长满苔藓的水闸滴落着黑水，落入古老的唱诗队墓室。",
-      "litany_ledger": "账簿岛屿从被淹没的水道中浮现，墨迹渗入沼泽。",
-      "litany_ring": "一圈圣髑环绕着一处被封印的黑水中央圣泉。",
-      "litany_baptistry": "一处天坑洗礼堂在破裂的圣者石与卵囊之下张开大口。",
-      "litany_choir_loft": "展开的唱诗楼回响着绳索悬挂的钟声，从未真正停歇。",
-      "litany_causeway": "一条Y形分岔的堤道横跨齐腰深的沼泽水。",
-      "litany_apse": "溺亡的后殿通向娜哈莉亚修女的祭坛岛。"
+      "reliquary_finale": "埋藏的钟在你脚下鸣响了一声。"
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "沉没的藏骨堂",
       "reliquary_bell_niche": "鸣钟壁龛",
       "reliquary_saintless_hall": "无圣之厅",
-      "reliquary_finale": "埋钟之厅",
-      "litany_sluice": "新月水闸",
-      "litany_ledger": "岛屿账簿",
-      "litany_ring": "圣髑之环",
-      "litany_baptistry": "天坑洗礼堂",
-      "litany_choir_loft": "扇形唱诗楼",
-      "litany_causeway": "Y形分岔堤道",
-      "litany_apse": "溺亡后殿"
-    },
-    "object": {
-      "sluice_valve": "水闸阀门",
-      "grave_tablet": "墓碑石板",
-      "corpse_candle": "尸烛",
-      "bell_rope": "Bell Rope"
+      "reliquary_finale": "埋钟之厅"
     },
     "companion": {
       "barkLine": "{name}：{line}",
       "tessa": {
-        "run_start": "蜡烛和名册我都带上了，{playerName}。带路吧。",
-        "ally_revive": "起来。今夜的名册上没有你的名字。",
         "combat_start": "站稳了，{playerName}。这里的亡者并不安分。",
         "low_hp": "深呼吸。我还有为你准备的祷词。",
         "trap_spotted": "等等，地板里有什么东西记得脚步声。",
@@ -2482,20 +2442,6 @@ export const zh_CN: EnTranslations = {
           "3": "圣物库侍僧",
           "4": "唤墓见证者",
           "5": "礼拜堂守护者"
-        }
-      },
-      "edda": {
-        "run_start": "沿着木板走，{playerName}。淤泥专吞骄傲的脚步。",
-        "ally_revive": "快起来。今天沼泽带不走你。",
-        "combat_start": "小心黑水，{playerName}。沼泽在倾听。",
-        "low_hp": "稳住。我的提灯还没熄灭。",
-        "trap_spotted": "等等。这里的芦苇不对劲。",
-        "boss_pull": "那圣歌知道你的名字，{playerName}。不要回唱。",
-        "completion": "沼泽还能再吞下它的秘密一晚。",
-        "rank": {
-          "1": "提灯者",
-          "2": "芦苇守望者",
-          "3": "芬桥信徒"
         }
       }
     },
@@ -2539,10 +2485,7 @@ export const zh_CN: EnTranslations = {
       "flooded_paths": "水淹通道",
       "grave_tax": "墓葬税",
       "unstable_roof": "不稳的顶棚",
-      "cult_remnants": "教派残党",
-      "high_water": "水位高涨",
-      "lively_choir": "活跃唱诗队",
-      "belligerent_dead": "好战亡者"
+      "cult_remnants": "教派残党"
     },
     "blessing": {
       "chapel_candle": "礼拜堂烛火：旅程更安全，但通关时少得一枚印记。"
@@ -3555,13 +3498,16 @@ export const zh_CN: EnTranslations = {
     },
     "cast": {
       "fishing": "钓鱼",
-      "demonHeal": "恶魔治疗"
+      "demonHeal": "恶魔治疗",
+      "thunzharrStormcall": "风暴召唤"
     }
   },
   "questUi": {
     "tracker": {
       "title": "任务",
-      "complete": "完成"
+      "complete": "完成",
+      "showOnMap": "在地图上显示{name}",
+      "hideFromMap": "在地图上隐藏{name}"
     },
     "log": {
       "title": "任务日志",
@@ -5371,69 +5317,6 @@ export const zh_CN: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "瓦里克的暗影兜帽"
       },
-      "siltguard_helm": {
-        "name": "淤卫头盔"
-      },
-      "bulwark_rusted_pauldrons": {
-        "name": "壁垒锈蚀肩甲"
-      },
-      "nhalias_bell_maul": {
-        "name": "娜哈莉亚的钟槌"
-      },
-      "reedstalker_jerkin": {
-        "name": "芦丛潜行皮甲"
-      },
-      "mirejaw_fang_knife": {
-        "name": "泥颚獠牙匕首"
-      },
-      "widow_silk_hood": {
-        "name": "寡妇丝兜帽"
-      },
-      "cantors_drowned_sash": {
-        "name": "诵经者的溺水腰带"
-      },
-      "corpse_candle_focus": {
-        "name": "尸烛法器"
-      },
-      "nhalias_litany_rod": {
-        "name": "娜哈莉亚的连祷杖"
-      },
-      "blackwater_vanguard_chest": {
-        "name": "黑水先锋胸甲"
-      },
-      "siltstep_leggings": {
-        "name": "淤步护腿"
-      },
-      "sunken_reliquary_hood": {
-        "name": "沉没圣髑兜帽"
-      },
-      "litany_legs": {
-        "name": "淤行者护胫"
-      },
-      "litany_shoulder": {
-        "name": "黑水浮肩甲"
-      },
-      "litany_gloves_rog": {
-        "name": "苇缚护手"
-      },
-      "litany_plate_chest": {
-        "name": "沼卫胸甲"
-      },
-      "litany_leather_chest": {
-        "name": "深淤皮衣"
-      },
-      "litany_cloth_chest": {
-        "name": "唱诗溺袍"
-      },
-      "litany_helm": {
-        "name": "圣物猎人的溺兜"
-      },
-      "sister_nhalia_choir_plate": {
-        "name": "娜哈莉亚修女的唱诗锻甲"
-      },
-      "drowned_choir_fang": {
-        "name": "溺水唱诗獠牙"
-      },
       "the_codfather": {
         "name": "鳕鱼教父"
       },
@@ -5553,6 +5436,30 @@ export const zh_CN: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "先锋铬银"
+      },
+      "crownforged_gauntlets": {
+        "name": "铸冠护手"
+      },
+      "nighttalon_grips": {
+        "name": "夜爪握套"
+      },
+      "soulflame_gloves": {
+        "name": "魂焰手套"
+      },
+      "stormcallers_handguards": {
+        "name": "唤雷者手甲"
+      },
+      "crownforged_girdle": {
+        "name": "铸冠腰带"
+      },
+      "nighttalon_waistband": {
+        "name": "夜爪束带"
+      },
+      "soulflame_cord": {
+        "name": "魂焰腰绳"
+      },
+      "stormcallers_waistguard": {
+        "name": "唤雷者腰甲"
       }
     },
     "mobs": {
@@ -5745,38 +5652,11 @@ export const zh_CN: EnTranslations = {
       "acolyte_tessa": {
         "name": "侍僧泰莎"
       },
-      "drowned_cantor": {
-        "name": "溺亡诵经者"
+      "thunzharr_waking_peak": {
+        "name": "桑扎尔，觉醒之峰"
       },
-      "reedbound_acolyte": {
-        "name": "芦苇缚信徒"
-      },
-      "deepfen_spearjaw": {
-        "name": "深沼枪颚兽"
-      },
-      "mirefen_widowling": {
-        "name": "泥沼寡妇蛛"
-      },
-      "spider_egg_sac": {
-        "name": "蜘蛛卵囊"
-      },
-      "grave_silt_bulwark": {
-        "name": "墓淤壁垒"
-      },
-      "sump_troll_devourer": {
-        "name": "污水巨魔吞噬者"
-      },
-      "choir_thrall": {
-        "name": "唱诗奴仆"
-      },
-      "sister_nhalia_drowned_canticle": {
-        "name": "娜哈莉亚修女，溺亡的圣歌"
-      },
-      "edda_reedhand": {
-        "name": "艾达·芦手"
-      },
-      "tolling_bell": {
-        "name": "鸣钟"
+      "thunzharr_stormling": {
+        "name": "被惊醒的风暴元素"
       },
       "ironvein_foreman": {
         "name": "铁脉工头"
@@ -5997,11 +5877,6 @@ export const zh_CN: EnTranslations = {
         "name": "哈尔文修士",
         "title": "圣物库守护人",
         "greeting": "下方的圣物库又移位了。"
-      },
-      "brother_halven_marsh": {
-        "name": "哈尔文修士",
-        "title": "圣物库守护人",
-        "greeting": "小径向北延伸。又一座圣物库，又一场仪式。选择你的难度，我会为你守住绳索，直到你归来。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -6442,6 +6317,36 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "山脊潜猎者毛皮"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "潜猎者去而复返",
+        "text": "死了十二只，山脊上的潜猎者反而更多了，{playerName}。野兽不会因为饥饿就往城墙上扑，是高脊上有什么东西把它们赶下来。查清之前，猎杀不停。再杀十四只。",
+        "completion": "又杀了十四只，可巡逻队每天清晨仍数得出新的足迹。我的斥候从高脊回来时脸白得像雪线：她说那些爪印有盾牌那么大，还有潜猎者绝不会留下的猎杀痕迹。在上面游荡的绝不是普通的山猫。",
+        "objectives": {
+          "0": {
+            "label": "击败山脊潜猎者"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "守望者的披风",
+        "text": "八张皮给军官的披风加了衬，现在墙上每个士兵都想要一件，{playerName}。他们想得没错：寒冬先夺手指，从不听道歉。再从大门以南的山脊取十张皮，整支守望队都能睡个暖觉。",
+        "completion": "十张好皮，厚实得没话说……不对，你看这些，{playerName}。一半都撕裂了，可不是刀枪的痕迹。爪痕有我手掌那么宽，直接穿透了冬毛。山脊上有什么东西在残杀自己的同类。",
+        "objectives": {
+          "0": {
+            "label": "山脊潜猎者毛皮"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "老裂颚",
+        "text": "山民给我斥候找到的爪印起过名字：老裂颚，一只满身伤疤的暴君巨猫，熬死了自己族群的三代。潜猎者涌上我的道路，就是因为它，{playerName}。它的巢穴在南路上方的西侧山脊。带个帮手去，了结那老魔头。",
+        "completion": "它终于倒下了。山民曾发誓那只猫会比城墙活得还久。如今潜猎者会守在高处的雪原了，{playerName}，我的巡逻队走这条路也不必再流血。整条山脊都因你安静了下来。",
+        "objectives": {
+          "0": {
+            "label": "击败老裂颚"
           }
         }
       },
@@ -6967,11 +6872,6 @@ export const zh_CN: EnTranslations = {
         "name": "坍塌的圣物库",
         "enterText": "你向下深入坍塌的圣物库。",
         "leaveText": "你攀回圣物库废墟旁的哈尔文修士身边。"
-      },
-      "drowned_litany": {
-        "name": "溺亡连祷",
-        "enterText": "你潜入沼泽边缘，进入那座溺亡的神殿。",
-        "leaveText": "你爬回沼泽边缘，回到哈尔文修士身边。"
       }
     },
     "itemSets": {
@@ -6987,8 +6887,8 @@ export const zh_CN: EnTranslations = {
       },
       "necromancers": {
         "name": "死灵法师法衣",
-        "bonus2": "受到伤害造成的施法延退降低 50%。",
-        "bonus3": "施法时不会因受到伤害而被延退。"
+        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus3": "智力提高 10 点，耐力提高 10 点。"
       },
       "nighttalon": {
         "name": "夜爪皮甲",
@@ -6997,13 +6897,13 @@ export const zh_CN: EnTranslations = {
       },
       "soulflame": {
         "name": "魂焰法衣",
-        "bonus2": "受到伤害造成的施法延退降低 50%。",
-        "bonus3": "施法时不会因受到伤害而被延退。"
+        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus3": "智力提高 15 点，精神提高 15 点。"
       },
       "stormcallers": {
         "name": "唤雷者法衣",
-        "bonus2": "受到伤害造成的施法延退降低 50%。",
-        "bonus3": "施法时不会因受到伤害而被延退。"
+        "bonus2": "你不会被击退（击退抗性 100%）。",
+        "bonus3": "智力提高 15 点，精神提高 15 点。"
       },
       "wyrmshadow": {
         "name": "龙影外衣",
@@ -7019,11 +6919,6 @@ export const zh_CN: EnTranslations = {
     "dungeonInstanceBusy": "{name}的所有副本都已被占用。请稍后再试。",
     "delveLockedChestInteract": "按 F 撬锁",
     "delveRewardChestInteract": "按 F 领取战利品",
-    "delveSurfaceExitInteract": "按 F 攀回地表",
-    "delveReliquaryInteract": "沉溺圣物匣：按 F 开始仪式",
-    "delveRiteShrineBellInteract": "铜铃神龛：按 F 敲响",
-    "delveRiteShrineCandleInteract": "烛火神龛：按 F 触碰",
-    "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
-    "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰"
+    "delveSurfaceExitInteract": "按 F 攀回地表"
   }
 };

@@ -23,12 +23,13 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { ITEMS, QUESTS } from './data';
+import { ITEMS, MOBS, QUESTS } from './data';
 import {
   activateNythraxisRelic,
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { isInRaidInstance } from './instances/dungeons';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -38,25 +39,43 @@ import {
 } from './loot/loot_roll';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, OBJECT_RESPAWN } from './types';
+import { markWorldBossLooted } from './world_boss';
 
-export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
+// Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
+// walk-by `autoLootForParty`. The caller passes `ffaUnlocked` so the two paths can
+// diverge on the free-for-all rule: manual looting honors the FFA timer (a deliberate
+// click may take a stranger's corpse once its owner-lock lapses), but walk-by passes
+// false so a passive pass never auto-grabs a stranger's corpse just because it aged out.
+function corpseLootRights(
+  ctx: SimContext,
+  mob: Entity,
+  entityId: number,
+  ffaUnlocked: boolean,
+): { shared: boolean; personal: boolean; open: boolean } {
+  const tapperParty = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  const shared = computeSharedLootRights(
+    entityId,
+    mob.tappedById,
+    tapperParty?.members ?? null,
+    ffaUnlocked,
+  );
+  const personal = mob.loot?.items.some((s) => s.personalFor?.includes(entityId)) ?? false;
+  const open = mob.loot?.items.some((s) => s.openToAll && s.count > 0) ?? false;
+  return { shared, personal, open };
+}
+
+// `honorFfa` (default true) keeps manual looting honoring the owner-lock lapse; the
+// passive walk-by path passes false so it never grants a stranger's FFA corpse.
+export function lootCorpse(ctx: SimContext, mobId: number, pid?: number, honorFfa = true): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot) return;
-  const tapperParty = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
-  const ffaUnlocked = lootHasGoneFfa(mob.lootFfaTimer);
-  const hasSharedLootRights = computeSharedLootRights(
-    meta.entityId,
-    mob.tappedById,
-    tapperParty?.members ?? null,
-    ffaUnlocked,
-  );
-  const hasPersonalLoot = mob.loot.items.some((s) => s.personalFor?.includes(meta.entityId));
-  const hasOpenLoot = mob.loot.items.some((s) => s.openToAll && s.count > 0);
-  if (!hasSharedLootRights && !hasPersonalLoot && !hasOpenLoot) {
+  const ffaUnlocked = honorFfa && lootHasGoneFfa(mob.lootFfaTimer);
+  const rights = corpseLootRights(ctx, mob, meta.entityId, ffaUnlocked);
+  if (!rights.shared && !rights.personal && !rights.open) {
     ctx.error(meta.entityId, "You don't have permission to loot that.");
     return;
   }
@@ -64,7 +83,8 @@ export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
-  if (hasSharedLootRights) distributeLootCopper(ctx, mob, meta);
+  if (rights.shared) distributeLootCopper(ctx, mob, meta);
+  let tookPersonal = false;
   for (const s of [...mob.loot.items]) {
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
@@ -75,16 +95,50 @@ export function lootCorpse(ctx: SimContext, mobId: number, pid?: number): void {
     if (s.personalFor) {
       ctx.addItem(s.itemId, 1, meta.entityId);
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
+      tookPersonal = true;
       continue;
     }
-    if (!hasSharedLootRights) continue;
+    if (!rights.shared) continue;
     for (let i = 0; i < s.count; i++) {
       awardSharedLootItem(ctx, s.itemId, mob, meta);
     }
     s.count = 0;
   }
+  // World-boss daily lockout is consumed by LOOTING, not by the kill: taking any
+  // personal slot from the boss's corpse burns today's roll (rollWorldBossLoot
+  // checks eligibility when the next boss dies). A contributor who never reaches
+  // the corpse keeps their daily and can try again at the next spawn.
+  if (tookPersonal && MOBS[mob.templateId]?.worldBoss) {
+    markWorldBossLooted(meta, mob.templateId, ctx.utcDay);
+  }
   pruneCorpseLoot(ctx, mob);
   if (p.targetId === mobId) p.targetId = null;
+}
+
+// Walk-by autoloot: a silent eligibility pre-check, then a delegate to the existing
+// per-slot `lootCorpse` distribution. Two differences from a manual loot: a failed
+// check here must NOT emit a "no permission" / "too far" error (this fires passively
+// every frame as the trigger walks near a corpse), and it never honors the FFA
+// owner-lock lapse, so a passive pass never auto-grabs a stranger's aged-out corpse.
+export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: number): void {
+  const r = ctx.resolve(triggerPid);
+  if (!r || r.e.dead) return;
+  const { meta, e: trigger } = r;
+  if (isInRaidInstance(ctx, trigger.pos)) return; // silent: no error toast on a passive walk-by
+  const mob = ctx.entities.get(mobId);
+  if (!mob?.lootable || !mob.loot) return;
+  if (dist2d(trigger.pos, mob.pos) > INTERACT_RANGE) return;
+
+  // ffaUnlocked=false: walk-by may auto-loot the trigger's own tap, their party's tap,
+  // an untapped corpse, personal drops, or open-to-all, but NEVER a stranger's corpse
+  // just because its owner-lock lapsed into FFA. Auto-grabbing another player's loot
+  // reads as hostile, so an aged-out corpse is left for a deliberate manual loot click.
+  const rights = corpseLootRights(ctx, mob, meta.entityId, false);
+  if (!rights.shared && !rights.personal && !rights.open) return;
+
+  // honorFfa=false so the delegated distribution also refuses the FFA shared grant,
+  // matching the pre-check (which only keeps this pass silent on ineligibility).
+  lootCorpse(ctx, mobId, meta.entityId, false);
 }
 
 export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void {

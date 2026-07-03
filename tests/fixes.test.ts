@@ -627,7 +627,7 @@ describe('boss loot and encounter resets', () => {
     expect(mob.loot).toBeNull();
   });
 
-  it('poor and common corpse drops are looted directly by the looter without need-greed rolls', () => {
+  it('poor and common corpse drops are awarded directly (round-robin) without need-greed rolls', () => {
     const sim = makeSim();
     const a = sim.playerId;
     const b = sim.addPlayer('mage', 'Bert');
@@ -651,10 +651,14 @@ describe('boss loot and encounter resets', () => {
     sim.events.length = 0;
     sim.lootCorpse(mob.id, a);
 
+    // Both drops are auto-awarded (no roll), but the default common-item
+    // strategy is round-robin, not looter-takes-all: the cursor advances once
+    // per item, so the two drops spread across the party rather than both
+    // landing on the looter.
     expect(sim.countItem('wolf_fang', a)).toBe(1);
-    expect(sim.countItem('raw_mirror_trout', a)).toBe(1);
+    expect(sim.countItem('raw_mirror_trout', b)).toBe(1);
     expect(sim.countItem('wolf_fang', b)).toBe(0);
-    expect(sim.countItem('raw_mirror_trout', b)).toBe(0);
+    expect(sim.countItem('raw_mirror_trout', a)).toBe(0);
     const prompts = sim.events.filter((e) => e.type === 'lootRoll');
     expect(prompts).toHaveLength(0);
     expect(mob.loot).toBeNull();

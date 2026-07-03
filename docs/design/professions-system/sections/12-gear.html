@@ -1,39 +1,40 @@
   <h2 id="gear">Crafted gear: quality and power</h2>
-  <p>Recipes consume materials and require the relevant craft skill. Each crafted result rolls a <strong>quality</strong> on the game's existing item rarity tiers (poor, common, uncommon, rare, epic, legendary), which scales the stat roll within the item's item-level budget. Average quality rises with proficiency and material tier; individual rolls still vary.</p>
+  <p>Recipes consume materials and require the relevant craft skill. Each crafted result rolls a <strong>quality</strong> on the game's item rarity tiers (common through legendary; a crafted result never rolls the poor tier), which scales the stat roll within the item's item-level budget. Average quality rises with proficiency and material tier; individual rolls still vary.</p>
+  <p>One vocabulary note: a recipe's tier names its rung on the crafting ladder, not the finished item's power. Common-tier crafted equipment is not bottom-of-the-barrel gear; it will likely sit closer to the uncommon-tier quest and monster drops of its level, which is exactly what keeps the free floor worth using.</p>
 
-  <h3>Where crafted combat gear sits</h3>
+  <h3 id="gear-power">Where crafted combat gear sits</h3>
   <p>Crafting is a genuine path to strong gear, not a strictly capped sideline. The position on the power curve scales with specialization concentration and material tier:</p>
   <ul>
     <li>An <strong>average crafter</strong> (using lots of materials but not epic-tier) makes gear on par with rare to epic normal dungeon drops.</li>
-    <li>A <strong>peaked specialist</strong> using <strong>epic or better materials</strong> can make gear equal to, or in places better than, some dungeon drops.</li>
+    <li>A <strong>peaked specialist</strong> using <strong>epic or better materials</strong> can make gear equal to, and in places better than, all but the top dungeon and raid drops.</li>
     <li>Beyond raw item level, crafting carries <strong>unique effects available only through crafting</strong> (procs, utility, set-style bonuses) that give crafted gear its own identity.</li>
   </ul>
 
-  <div class="figure">
+  <div class="figure" id="fig4">
     <h4>Figure 4. Crafted power, two levers</h4>
     <p class="cap">Item-level budget (the horizontal band) overlaps with dungeon drops at the high end for specialists with epic materials, rather than being hard-capped below them. Crafting-only effects are an orthogonal axis: even where item level matches a drop, the crafted piece can do something a drop cannot.</p>
     <div class="spectrum-bar" id="spectrum"></div>
     <svg id="effects-axis" viewBox="0 0 720 70" role="img" aria-label="Orthogonal axis showing crafting-only unique effects"></svg>
   </div>
 
-  <h3>Binding: gear crafted for a recipient</h3>
+  <h3 id="binding">Binding: gear crafted for a recipient</h3>
   <p>The game has no binding today, and crafted gear is where we introduce it, because the fantasy is that the piece was made for you. Binding is a per-recipe decision along one axis:</p>
   <ul>
     <li><strong>Low-tier gear is unbound.</strong> It crafts like any item and anyone can pick it up and use it, which preserves the common-floor promise that a level 1 can hammer out armor for a friend.</li>
-    <li><strong>High-tier gear is bound to a recipient.</strong> Only the named character can equip it, but the item is still freely tradable. To keep this distinct from classic bind-on-pickup or bind-on-equip, the item's binding field is <code>equipBoundTo</code> (bound to a character for equipping, not for trading). Such a piece can go back to its crafter for enhancement, or off to a salvager once its owner is done with it; it simply cannot be worn by anyone but the person it was made for.</li>
+    <li><strong>High-tier gear is bound to a recipient.</strong> Only the named character can equip it, but the item is still freely tradable. To keep this distinct from classic bind-on-pickup or bind-on-equip, the item's binding field is <code>boundTo</code> (bound to a character for equipping, not for trading). Such a piece can go back to its crafter for enhancement, or off to a salvager once its owner is done with it; it simply cannot be worn by anyone but the person it was made for.</li>
   </ul>
   <p>Bind-to-recipient does the interdependence work without flooding the auction house with top-tier gear: a specialist stays the real supplier, and demand routes to a named crafter rather than the cheapest anonymous listing. It also opens the lore the system is reaching for, a warrior claims a trophy from a beast (monster harvest, signed material) and brings it to a master crafter to be forged into their weapon or armor. Some required materials can be tied to the intended recipient, reinforcing that the piece is genuinely theirs (a later extension, since it needs order-time escrow).</p>
 
-  <h3>Commissioning bound gear</h3>
+  <h3 id="commissions">Commissioning bound gear</h3>
   <p>Because a high-tier piece is made for a named recipient, it is produced through a <strong>commission workflow</strong> rather than crafted speculatively, and the recipient is the person who placed the order, so no one can mistype a name and brick an expensive item. There is a lot of room to iterate on the UX; the shape:</p>
   <ul>
     <li>A player places an <strong>order</strong> for the item they want, scoped either open to any capable crafter, or narrowed to their guild, their friends list, or a specific crafter.</li>
     <li>Orders can be <strong>canceled</strong> any time before a crafter accepts one.</li>
     <li>Crafters browse an <strong>orders list</strong> with search and filters and pick up an order they want to fulfill.</li>
-    <li>The flow is deliberately <strong>multi-step</strong> (accept, craft, deliver), so a high-cost item is never lost to a single misclick, and the <code>equipBoundTo</code> recipient is set from the order, not typed by the crafter.</li>
+    <li>The flow is deliberately <strong>multi-step</strong> (accept, craft, deliver), so a high-cost item is never lost to a single misclick, and the <code>boundTo</code> recipient is set from the order, not typed by the crafter.</li>
   </ul>
 
-  <h3>Specialization perks (beyond raw output)</h3>
+  <h3 id="perks">Specialization perks (beyond raw output)</h3>
   <p>Pushing far into one region of the wheel unlocks perks, not just a higher item-level ceiling. Examples (exact set is tuning):</p>
   <ul>
     <li><strong>Reduced resource usage:</strong> recipes in your specialized crafts cost fewer materials.</li>

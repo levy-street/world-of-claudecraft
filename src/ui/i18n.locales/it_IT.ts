@@ -1393,9 +1393,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': 'orso',
   'abilityUi.forms.cat': 'lupo',
   'abilityUi.cast.fishing': 'Pesca',
+  'abilityUi.cast.thunzharrStormcall': 'Richiamo della tempesta',
   'abilityUi.cast.demonHeal': 'Cura demoniaca',
   'questUi.tracker.title': 'Missioni',
   'questUi.tracker.complete': 'Completata',
+
+  'questUi.tracker.showOnMap': 'Mostra {name} sulla mappa',
+
+  'questUi.tracker.hideFromMap': 'Nascondi {name} dalla mappa',
   'questUi.log.title': 'Registro missioni',
   'questUi.log.close': 'Chiudi registro missioni',
   'questUi.log.summary': 'Attive: {active} / Completate: {completed}',
@@ -3408,6 +3413,17 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cowl.name': 'Cappuccio Fiammanima',
   'entities.items.soulflame_mantle.name': 'Manto Fiammanima',
   'entities.items.stormcallers_crown.name': 'Corona del Chiamatempeste',
+  'entities.items.crownforged_gauntlets.name': 'Manopole Forgiacorona',
+  'entities.items.nighttalon_grips.name': 'Prese Artiglio Notturno',
+  'entities.items.soulflame_gloves.name': 'Guanti Fiammanima',
+  'entities.items.stormcallers_handguards.name': 'Paramani del Chiamatempeste',
+  'entities.items.crownforged_girdle.name': 'Cintura Forgiacorona',
+  'entities.items.nighttalon_waistband.name': 'Fascia Artiglio Notturno',
+  'entities.items.soulflame_cord.name': 'Cordone Fiammanima',
+  'entities.items.stormcallers_waistguard.name': 'Guardacintura del Chiamatempeste',
+  'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, il Picco Risvegliato',
+  'entities.mobs.thunzharr_stormling.name': 'Elementale di tempesta ridestato',
+  'hudChrome.worldBoss.spawn': '{name} si erge sulle Alture di Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Spallacci del Chiamatempeste',
   'hud.chat.context.convertToRaid': 'Converti in incursione',
   'hud.chat.context.convertToParty': 'Converti in gruppo',
@@ -4958,20 +4974,21 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.bonus2': "Aumenta la potenza d'attacco di 40.",
   'entities.itemSets.deathlord.bonus3': 'Aumenta la forza di 15 e la vigoria di 15.',
   'entities.itemSets.necromancers.name': 'Vesti del negromante',
-  'entities.itemSets.necromancers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
-  'entities.itemSets.necromancers.bonus3':
-    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.necromancers.bonus2':
+    'Non puoi essere respinto (100% di resistenza alla respinta).',
+  'entities.itemSets.necromancers.bonus3': "Aumenta l'intelletto di 10 e la tempra di 10.",
   'entities.itemSets.nighttalon.name': 'Tenuta di cuoio Artiglio Notturno',
   'entities.itemSets.nighttalon.bonus2': "Aumenta la potenza d'attacco di 40.",
   'entities.itemSets.nighttalon.bonus3':
     'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
   'entities.itemSets.soulflame.name': 'Vesti Fiamma dell’Anima',
-  'entities.itemSets.soulflame.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
-  'entities.itemSets.soulflame.bonus3': 'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.soulflame.bonus2':
+    'Non puoi essere respinto (100% di resistenza alla respinta).',
+  'entities.itemSets.soulflame.bonus3': "Aumenta l'intelletto di 15 e lo spirito di 15.",
   'entities.itemSets.stormcallers.name': 'Vesti del Chiamatempeste',
-  'entities.itemSets.stormcallers.bonus2': 'Riduce del 50% il ritardo al lancio causato dai danni.',
-  'entities.itemSets.stormcallers.bonus3':
-    'I danni subiti non ritardano il lancio degli incantesimi.',
+  'entities.itemSets.stormcallers.bonus2':
+    'Non puoi essere respinto (100% di resistenza alla respinta).',
+  'entities.itemSets.stormcallers.bonus3': "Aumenta l'intelletto di 15 e lo spirito di 15.",
   'entities.itemSets.wyrmshadow.name': 'Tenuta Ombra del Dragone',
   'entities.itemSets.wyrmshadow.bonus2': "Aumenta la potenza d'attacco di 40.",
   'entities.itemSets.wyrmshadow.bonus3':

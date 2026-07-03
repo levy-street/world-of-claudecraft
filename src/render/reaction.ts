@@ -38,6 +38,11 @@ export function isFriendlyPet(
 // The classic level-difference ("con") color for a wild mob's nameplate, with a
 // friendly-pet override so an owned pet reads as friendly green rather than a
 // scary red. Kept here (pure) so the exact color thresholds are unit-tested.
+// These are the shipped NAMEPLATE bands and are left unchanged (levelDiff = mob
+// level - viewer level): red 3+ above, orange 1-2 above, yellow same level down to
+// 2 below, green 3 to 5 below, grey 6+ below (trivial). The mouseover tooltip uses
+// its own wider classic spread (mobTooltipConColor), so recoloring the tooltip
+// never touches the overhead nameplates.
 export const FRIENDLY = '#9fdc7f';
 export function mobNameColor(levelDiff: number, dead: boolean, friendly: boolean): string {
   if (dead) return '#999';
@@ -45,6 +50,26 @@ export function mobNameColor(levelDiff: number, dead: boolean, friendly: boolean
   return levelDiff >= 3
     ? '#ff4444'
     : levelDiff >= 1
+      ? '#ffaa33'
+      : levelDiff >= -2
+        ? '#ffe97a'
+        : levelDiff >= -5
+          ? '#7fdc4f'
+          : '#9d9d9d';
+}
+
+// The mob mouseover tooltip's con-color. Same corpse / friendly-pet overrides as
+// mobNameColor, but the classic con SPREAD the tooltip wants: a mob reads red only
+// when it out-levels the viewer by 5 or more, orange at 3-4 above, yellow across
+// the even band (+2 down to -2), green 3 to 5 below, and grey once the viewer
+// out-levels it by 6+ (trivial). Deliberately separate from the nameplate bands
+// above so the tooltip palette can differ without moving any overhead nameplate.
+export function mobTooltipConColor(levelDiff: number, dead: boolean, friendly: boolean): string {
+  if (dead) return '#999';
+  if (friendly) return FRIENDLY;
+  return levelDiff >= 5
+    ? '#ff4444'
+    : levelDiff >= 3
       ? '#ffaa33'
       : levelDiff >= -2
         ? '#ffe97a'

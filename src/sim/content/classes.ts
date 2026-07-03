@@ -1920,6 +1920,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'physical',
+    projectile: true, // a fired shot: damage/slow resolve when the bolt lands
     // A fired shot: its flat damage scales off Ranged AP like the other shots,
     // not melee AP, even though it is physical.
     scalesWith: 'ranged',
@@ -2012,6 +2013,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'physical',
+    projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 50, max: 62 }],

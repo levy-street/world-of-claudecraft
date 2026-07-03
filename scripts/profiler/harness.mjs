@@ -167,7 +167,11 @@ class Bot {
     const reg = await api(
       this.server,
       '/api/register',
-      { username: `prof_${this.uniq}_${this.i}`, password: 'hunter22' },
+      {
+        username: `prof_${this.uniq}_${this.i}`,
+        password: 'hunter22',
+        email: `prof_${this.uniq}_${this.i}@example.com`,
+      },
       undefined,
       xff,
     );
@@ -289,7 +293,7 @@ export class Profiler {
       await api(
         this.server,
         '/api/register',
-        { username: u, password: 'hunter22' },
+        { username: u, password: 'hunter22', email: `${u}@example.com` },
         undefined,
         '172.31.0.1',
       );

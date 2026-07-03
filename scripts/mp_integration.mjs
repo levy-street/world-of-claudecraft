@@ -5,11 +5,17 @@ import WebSocket from 'ws';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
-let pass = 0, fail = 0;
+let pass = 0,
+  fail = 0;
 
 function check(name, cond, extra = '') {
-  if (cond) { pass++; console.log(`OK   ${name}`); }
-  else { fail++; console.log(`FAIL ${name} ${extra}`); }
+  if (cond) {
+    pass++;
+    console.log(`OK   ${name}`);
+  } else {
+    fail++;
+    console.log(`FAIL ${name} ${extra}`);
+  }
 }
 
 async function api(path, opts = {}, token = null) {
@@ -27,7 +33,18 @@ async function api(path, opts = {}, token = null) {
 
 // heavy self fields (inventory, quests, party, ...) arrive only when they
 // changed; an absent field means "same as the previous snapshot"
-const DELTA_SELF_KEYS = ['inv', 'equip', 'qlog', 'qdone', 'cds', 'stats', 'weapon', 'party', 'trade', 'duel'];
+const DELTA_SELF_KEYS = [
+  'inv',
+  'equip',
+  'qlog',
+  'qdone',
+  'cds',
+  'stats',
+  'weapon',
+  'party',
+  'trade',
+  'duel',
+];
 function mergeSelf(prev, next) {
   if (prev) for (const k of DELTA_SELF_KEYS) if (!(k in next)) next[k] = prev[k];
   return next;
@@ -86,7 +103,10 @@ class Client {
           reject(new Error(msg.error));
         }
       });
-      this.ws.on('error', (e) => { clearTimeout(timeout); reject(e); });
+      this.ws.on('error', (e) => {
+        clearTimeout(timeout);
+        reject(e);
+      });
     });
   }
 
@@ -115,19 +135,35 @@ async function main() {
   check('server status', status.status === 200 && status.body.ok);
 
   // --- register two accounts
-  const u1 = `tester_${uniq}_a`, u2 = `tester_${uniq}_b`;
-  const r1 = await api('/api/register', { method: 'POST', body: JSON.stringify({ username: u1, password: 'hunter22' }) });
+  const u1 = `tester_${uniq}_a`,
+    u2 = `tester_${uniq}_b`;
+  const r1 = await api('/api/register', {
+    method: 'POST',
+    body: JSON.stringify({ username: u1, password: 'hunter22', email: `${u1}@example.com` }),
+  });
   check('register account 1', r1.status === 200 && r1.body.token);
-  const r2 = await api('/api/register', { method: 'POST', body: JSON.stringify({ username: u2, password: 'hunter22' }) });
+  const r2 = await api('/api/register', {
+    method: 'POST',
+    body: JSON.stringify({ username: u2, password: 'hunter22', email: `${u2}@example.com` }),
+  });
   check('register account 2', r2.status === 200 && r2.body.token);
 
-  const dup = await api('/api/register', { method: 'POST', body: JSON.stringify({ username: u1, password: 'hunter22' }) });
+  const dup = await api('/api/register', {
+    method: 'POST',
+    body: JSON.stringify({ username: u1, password: 'hunter22', email: `${u1}@example.com` }),
+  });
   check('duplicate username rejected', dup.status === 409);
 
-  const badLogin = await api('/api/login', { method: 'POST', body: JSON.stringify({ username: u1, password: 'wrongpw' }) });
+  const badLogin = await api('/api/login', {
+    method: 'POST',
+    body: JSON.stringify({ username: u1, password: 'wrongpw' }),
+  });
   check('wrong password rejected', badLogin.status === 401);
 
-  const login = await api('/api/login', { method: 'POST', body: JSON.stringify({ username: u1, password: 'hunter22' }) });
+  const login = await api('/api/login', {
+    method: 'POST',
+    body: JSON.stringify({ username: u1, password: 'hunter22' }),
+  });
   check('login works', login.status === 200 && login.body.token);
   const t1 = login.body.token;
   const t2 = r2.body.token;
@@ -135,11 +171,23 @@ async function main() {
   // --- characters
   const noAuth = await api('/api/characters');
   check('characters require auth', noAuth.status === 401);
-  const c1 = await api('/api/characters', { method: 'POST', body: JSON.stringify({ name: `Thorg${alpha}`, class: 'warrior' }) }, t1);
+  const c1 = await api(
+    '/api/characters',
+    { method: 'POST', body: JSON.stringify({ name: `Thorg${alpha}`, class: 'warrior' }) },
+    t1,
+  );
   check('create character 1', c1.status === 200 && c1.body.id > 0);
-  const c2 = await api('/api/characters', { method: 'POST', body: JSON.stringify({ name: `Zappy${alpha}`, class: 'mage' }) }, t2);
+  const c2 = await api(
+    '/api/characters',
+    { method: 'POST', body: JSON.stringify({ name: `Zappy${alpha}`, class: 'mage' }) },
+    t2,
+  );
   check('create character 2', c2.status === 200 && c2.body.id > 0);
-  const badName = await api('/api/characters', { method: 'POST', body: JSON.stringify({ name: '!!', class: 'warrior' }) }, t1);
+  const badName = await api(
+    '/api/characters',
+    { method: 'POST', body: JSON.stringify({ name: '!!', class: 'warrior' }) },
+    t1,
+  );
   check('bad character name rejected', badName.status === 400);
   const list1 = await api('/api/characters', {}, t1);
   check('list characters', list1.status === 200 && list1.body.characters.length === 1);
@@ -214,11 +262,17 @@ async function main() {
   const a2 = new Client();
   await a2.connect(t1, c1.body.id);
   await sleep(400);
-  check('reconnect restores xp/copper', a2.self.xp === beforeXp && a2.self.copper === beforeCopper,
-    `xp ${a2.self.xp} vs ${beforeXp}`);
+  check(
+    'reconnect restores xp/copper',
+    a2.self.xp === beforeXp && a2.self.copper === beforeCopper,
+    `xp ${a2.self.xp} vs ${beforeXp}`,
+  );
   const posDelta = Math.hypot(a2.self.x - beforePos.x, a2.self.z - beforePos.z);
   check('reconnect restores position', posDelta < 3, `delta=${posDelta.toFixed(1)}`);
-  check('aura state listed in quest log after reconnect', (a2.self.qlog ?? []).length === qlog.length);
+  check(
+    'aura state listed in quest log after reconnect',
+    (a2.self.qlog ?? []).length === qlog.length,
+  );
 
   // B should have seen A leave and rejoin
   await sleep(300);

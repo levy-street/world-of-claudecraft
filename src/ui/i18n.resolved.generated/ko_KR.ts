@@ -202,7 +202,11 @@ export const ko_KR: EnTranslations = {
       "spinResult": "+{points} 포인트",
       "spinButton": "돌리기",
       "tasks": "과제",
+      "taskMultiplier": "{multiplier}배 배율",
+      "pointsGained": "{points} 일일 보상 포인트를 획득했습니다.",
       "leaderboard": "일일 순위표",
+      "totalPlayer": "오늘 플레이어 {count}명",
+      "totalPlayers": "오늘 플레이어 {count}명",
       "history": "지난 당첨자",
       "noLeaders": "아직 포인트가 없습니다.",
       "noHistory": "아직 지급 내역이 없습니다.",
@@ -386,9 +390,11 @@ export const ko_KR: EnTranslations = {
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
       "showDevBadges": "개발자 배지 표시",
+      "showOwnNameplate": "내 이름표 표시",
       "uiScale": "UI 배율",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
+      "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
@@ -821,6 +827,9 @@ export const ko_KR: EnTranslations = {
         "nature": "자연"
       }
     },
+    "worldBoss": {
+      "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
+    },
     "loot": {
       "chestTitle": "상자"
     },
@@ -831,6 +840,16 @@ export const ko_KR: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "{level}레벨 {family}",
+      "familyDemon": "악마",
+      "hostile": "적대",
+      "friendly": "아군"
+    },
+    "targetFrame": {
+      "unlock": "대상 프레임 이동",
+      "lock": "대상 프레임 고정"
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}"
@@ -913,6 +932,7 @@ export const ko_KR: EnTranslations = {
       "memberSinceDays": "Discord 가입 {days}일",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "관리자",
         "devs": "개발자",
         "mods": "운영자",
         "artists": "아티스트"
@@ -1953,6 +1973,9 @@ export const ko_KR: EnTranslations = {
     "password": "비밀번호",
     "passwordError": "비밀번호를 입력해 주세요.",
     "passwordPlaceholder": "비밀번호 입력",
+    "email": "이메일",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "유효한 이메일 주소를 입력하세요.",
     "showPassword": "비밀번호 표시",
     "hidePassword": "비밀번호 숨기기",
     "logIn": "로그인",
@@ -1978,7 +2001,15 @@ export const ko_KR: EnTranslations = {
     "create": "생성",
     "twoFactorLabel": "인증 코드",
     "twoFactorPlaceholder": "6자리 또는 복구 코드",
-    "twoFactorHint": "인증 앱에 표시된 코드 또는 복구 코드 중 하나를 입력하세요."
+    "twoFactorHint": "인증 앱에 표시된 코드 또는 복구 코드 중 하나를 입력하세요.",
+    "recovery": {
+      "title": "복구 이메일 추가",
+      "body": "계정을 복구할 수 있도록 이메일 주소를 설정하세요. 비밀번호를 재설정해야 할 경우 이 계정의 소유자임을 확인하는 용도로만 사용됩니다.",
+      "save": "이메일 저장",
+      "logOut": "Log out",
+      "invalid": "유효한 이메일 주소를 입력하세요.",
+      "failed": "이메일을 저장하지 못했습니다. 다시 시도해 주세요."
+    }
   },
   "wallet": {
     "label": "$WOC 지갑",
@@ -2032,6 +2063,7 @@ export const ko_KR: EnTranslations = {
     "helpLinkedWithBalance": "보유자 혜택이 활성화되었습니다. 이 브라우저에 지갑 앱이 연결되어 있습니다.",
     "helpLinkedDisconnected": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
     "helpLinkedDisconnectedWithBalance": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
+    "extensionHelp": "여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.",
     "flowConnect": "지갑을 선택하세요. 인증은 자동으로 계속됩니다.",
     "flowSign": "지갑 앱에서 인증 메시지에 서명하세요. 트랜잭션이나 SOL은 필요 없습니다.",
     "flowVerify": "지갑 소유권 인증 중...",
@@ -2217,7 +2249,6 @@ export const ko_KR: EnTranslations = {
       "unknownTier": "알 수 없는 탐굴 등급입니다.",
       "levelRequired": "{name}에 진입하려면 레벨 {level} 이상이어야 합니다.",
       "levelRequiredTier": "{tier} 난이도로 {name}에 진입하려면 레벨 {level}이(가) 필요합니다.",
-      "partyTooLarge": "{name}은(는) 솔로 또는 듀오 전용입니다. {max}명 이상의 파티는 입장할 수 없습니다.",
       "instancesBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하세요.",
       "runFailed": "{name} 진행에 실패했습니다.",
       "complete": "{name} 완료.",
@@ -2227,14 +2258,6 @@ export const ko_KR: EnTranslations = {
       "doorAlreadyOpen": "문이 이미 열려 있습니다.",
       "companionRankUp": "{name}이(가) {rank}등급에 도달했습니다.",
       "bossChest": "우두머리가 쓰러집니다. 봉인된 성물실 상자가 단상 위로 솟아오릅니다. 자물쇠를 따서 전리품을 차지하세요.",
-      "drownedLitanyReliquaryRise": "나할리아 수녀가 침묵한다. 익사한 유물함이 흑수에서 떠오른다. 다가가 의식을 시작하라.",
-      "riteSequenceReady": "성소들이 어둠에 잠긴다. 순서를 반복하라.",
-      "riteSequencePlaying": "성소들이 의식을 재생하고 있다. 기다려라.",
-      "riteCorrect": "부드러운 종소리가 그대의 손길에 응답한다.",
-      "riteWrong": "귀에 거슬리는 종의 균열음. 흑수가 발치에서 튄다.",
-      "riteReliquaryOpen": "익사한 유물함이 열린다.",
-      "riteReliquaryLocked": "유물함을 열려면 성소 의식을 완료하라.",
-      "riteReliquaryEmpty": "유물함이 비어 있다.",
       "surfaceStairs": "지상으로 향하는 계단이 열립니다. 계단에서 F 키를 눌러 나가세요.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "방을 정리하세요.",
@@ -2242,13 +2265,6 @@ export const ko_KR: EnTranslations = {
       "tombstoneHint": "방을 정리하면 북쪽으로 묘비 통로가 열립니다.",
       "tombstoneOpen": "봉인된 묘비 통로가 북쪽으로 갈리며 열립니다. 그 안으로 걸어 들어가 계속 진행하세요.",
       "tombstoneInto": "묘비를 통과해 {name}(으)로 들어갑니다.",
-      "bellRopeShock": "종줄이 팽팽하게 당겨진다. 익사한 영창자들이 충격에 비틀거린다.",
-      "eggSacBurst": "알집이 터진다. 거미 새끼들이 세례당 가장자리로 흩어져 달아난다.",
-      "baptistryEggs": "세례당이 고요해진다. 거미 알집이 축축하게 가장자리에 들러붙어 있다.",
-      "baptistrySpidersSealed": "거미 알집을 파괴해 보아야 할 것이다.",
-      "puzzleSealed": "방 안 어딘가에 압력을 가해 봉인을 풀어야 한다.",
-      "ropesSealed": "종줄을 당겨 보아야 할 것이다.",
-      "baptistryWave": "세례당의 검은 물속에서 무언가가 꿈틀거린다.",
       "chestEmpty": "상자가 비어 있습니다.",
       "notInDelve": "탐굴 중이 아닙니다.",
       "cannotInteract": "그것과는 상호작용할 수 없습니다.",
@@ -2267,12 +2283,9 @@ export const ko_KR: EnTranslations = {
       "passageSealed": "통로가 봉인되어 있습니다.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
-      "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",
       "nothingToTake": "이제 가져갈 것이 없습니다.",
       "wayOutNotOpen": "나가는 길이 아직 열리지 않았습니다.",
-      "moveCloserStairs": "계단에 더 가까이 다가가세요.",
-      "nhaliaCantorShield": "영창자들이여, 음을 유지하라!",
-      "nhaliaBlackwaterMark": "{name}이(가) {player}에게 흑수 표식을 남긴다!"
+      "moveCloserStairs": "계단에 더 가까이 다가가세요."
     },
     "lockpick": {
       "lockYields": "자물쇠가 열립니다! {tier} 전리품.",
@@ -2335,26 +2348,6 @@ export const ko_KR: EnTranslations = {
       "abandoned": "도구를 도로 빼냅니다. 자물쇠가 기다립니다."
     }
   },
-  "delveRiteUi": {
-    "title": "익사한 유물 의식",
-    "blurb": "성소들이 순서대로 빛난다. 각 성소를 차례로 활성화하여 순서를 반복하라. 잘못된 접촉은 시도를 실패시키고 순서를 다시 재생한다. 완벽한 시도는 가장 풍성한 전리품을 얻고, 시도 횟수를 모두 소진하면 유물함이 가장 초라한 상태로 열린다. 의식이 그대를 어떻게 시험할지 선택하라.",
-    "easy": "Easy",
-    "medium": "보통",
-    "hard": "Hard",
-    "guideWatch": "선택하면 네 개의 제단이 차례로 빛납니다. 순서를 기억하세요.",
-    "guideRepeat": "제단이 어두워지면 같은 순서로 각 제단에 걸어가 F(상호작용)를 누르세요.",
-    "guideStakes": "잘못된 제단을 만지면 검은 물을 뒤집어쓰고 시도 횟수를 잃습니다. 순서를 완성하면 성물함이 열립니다.",
-    "showsTimes": "순서를 {count}회 표시",
-    "showsOnce": "순서를 한 번만 표시",
-    "symbols": "기호 {count}개",
-    "tries": "시도 {count}회",
-    "reward": {
-      "easy": "소박한 전리품",
-      "medium": "풍성한 전리품",
-      "hard": "최상급 전리품"
-    },
-    "closeAria": "닫기"
-  },
   "delveUi": {
     "board": {
       "title": "탐굴 게시판",
@@ -2364,7 +2357,6 @@ export const ko_KR: EnTranslations = {
       "openDelveAria": "{name}에서 탐굴 게시판 열기",
       "marks": "탐굴 증표: {count}",
       "minLevel": "필요 레벨 {level}",
-      "partyTooLarge": "솔로 또는 듀오 전용 (최대 {max}명)",
       "tier": {
         "normal": "일반",
         "heroic": "영웅"
@@ -2372,7 +2364,6 @@ export const ko_KR: EnTranslations = {
       "companion": {
         "pick": "동료 선택",
         "tessa": "수련사제 테사",
-        "edda": "에다 리드핸드",
         "rank": "{rank}등급",
         "boon": "전투 사이에 파티를 치유합니다. 3랭크에서는 탐굴마다 한 번 쓰러진 아군을 부활시킵니다.",
         "upgrade": "{rank}랭크로 강화 (증표 {marks}개)",
@@ -2398,11 +2389,7 @@ export const ko_KR: EnTranslations = {
       "complete": "완료",
       "marks": "탐굴 증표: {count}",
       "exitHintOpen": "묘비 통로로 걸어 들어가세요 (북쪽)",
-      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요",
-      "riteChoose": "가라앉은 성물함에 다가가 F를 눌러 의식을 시작하세요",
-      "ritePlayback": "제단을 지켜보세요: 빛나는 순서를 기억하세요",
-      "riteInput": "빛난 순서대로 각 제단에서 F를 누르세요 ({current}/{total})",
-      "riteOpen": "성물함이 열렸습니다: F를 눌러 전리품을 획득하세요"
+      "exitHintLocked": "북쪽 통로를 열려면 잡몹을 정리하세요"
     },
     "objective": {
       "kill_boss": "{boss} 처치",
@@ -2423,54 +2410,27 @@ export const ko_KR: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "아래의 성물실이 또 움직였소. 자정이 지나면 바닥 너머로 영창 소리가 들리고, 수련사제 테사는 매장 명부가 스스로 잉크를 바꾼다고 단언하오. 용기가 있다면, {playerName}, 촛불을 들고 아래로 내려가시오. 거기서 들리는 모든 목소리를 믿지는 마시오. 그중 몇은 그대가 태어나기도 전에 그대의 이름을 알고 있었으니."
-      },
-      "halvenMarsh": {
-        "greeting": "오솔길이 북쪽 늪지로 이어졌다, {playerName}. 또 다른 성물실이 검은 물 아래서 노래하고, 익사한 자들이 종소리에 화답한다. 신도 에다가 나보다 이 갈대밭을 더 잘 안다, 그녀의 등불 곁에 머물러라. 난이도를 선택하라, 그대가 돌아올 때까지 밧줄을 붙잡고 있겠다."
       }
     },
     "intro": {
       "normal": "계단은 차갑고 어둡습니다. 부서진 성인석이 내려가는 길에 흩어져 있고, 부드러운 종소리가 축축한 공기 속에 맴돕니다. 수련사제 테사가 속삭입니다. \"성물실이 이렇게까지 열려 있어선 안 돼요. 가까이 붙어 있어요, {playerName}.\"",
-      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\"",
-      "litanyNormal": "갈대로 막힌 계단이 펜브릿지 아래로 떨어진다. 에다 리드핸드가 등불을 들어올린다. \"늪은 익사시킨 모든 자의 이름을 기억한다, {playerName}. 빛 속에 머물러라.\"",
-      "litanyHeroic": "흑수가 둑길의 돌을 핥는다. 에다의 불꽃이 녹색으로 일렁인다. \"그들이 아래서 다시 노래하고 있다, {playerName}. 성가대에 응답하지 마라.\""
+      "heroic": "문이 당신 뒤로 신음하며 닫힙니다. 이름들이 손톱처럼 돌을 긁어 댑니다. 테사의 촛불이 푸르게 타오릅니다. \"이제 저들은 죽은 자를 부르는 게 아니에요, {playerName}. 무언가에 응답하고 있어요.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "물이 매장 선반 사이로 스며들며 은빛 검은 줄기로 오래된 재를 실어 나릅니다.",
       "reliquary_bell_niche": "수십 개의 손종이 침묵 속에 매달려 있고, 저마다 장례 천으로 묶여 있습니다.",
       "reliquary_saintless_hall": "정성스러운 증오로 얼굴이 깎여 나간 조각상들.",
-      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다.",
-      "litany_sluice": "이끼로 뒤덮인 수문에서 흑수가 방울져 떨어져 오래된 성가대 지하실로 흘러든다.",
-      "litany_ledger": "장부의 섬들이 물에 잠긴 수로에서 솟아오르고, 잉크가 늪으로 번져 나간다.",
-      "litany_ring": "유물의 고리가 봉인된 흑수의 중앙 성수반을 둘러싼다.",
-      "litany_baptistry": "싱크홀 세례당이 갈라진 성자석과 알주머니 아래로 아가리를 벌리고 있다.",
-      "litany_choir_loft": "부채꼴로 펼쳐진 성가대석에 밧줄에 매달린 종소리가 결코 멈추지 않고 울려 퍼진다.",
-      "litany_causeway": "Y자로 갈라진 둑길이 허리 깊이의 늪물 위로 갈라진다.",
-      "litany_apse": "익사한 후진이 나할리아 수녀의 제단 섬으로 열린다."
+      "reliquary_finale": "묻혀 있던 종이 당신의 발밑에서 한 번 울립니다."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "물에 잠긴 납골당",
       "reliquary_bell_niche": "종의 감실",
       "reliquary_saintless_hall": "성인 없는 회랑",
-      "reliquary_finale": "종이 묻힌 방",
-      "litany_sluice": "초승달 수문",
-      "litany_ledger": "섬의 장부",
-      "litany_ring": "유물의 고리",
-      "litany_baptistry": "싱크홀 세례당",
-      "litany_choir_loft": "부채꼴 성가대석",
-      "litany_causeway": "Y자 갈림길 둑길",
-      "litany_apse": "익사한 후진"
-    },
-    "object": {
-      "sluice_valve": "수문 밸브",
-      "grave_tablet": "무덤 석판",
-      "corpse_candle": "시체양초",
-      "bell_rope": "Bell Rope"
+      "reliquary_finale": "종이 묻힌 방"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "run_start": "초와 명부는 챙겼어요, {playerName}. 앞장서 주세요.",
-        "ally_revive": "일어나요. 오늘 밤 명부에 당신의 이름은 없어요.",
         "combat_start": "발을 단단히 디뎌요, {playerName}. 이곳의 죽은 자들은 잠들지 못했어요.",
         "low_hp": "숨을 고르세요. 당신을 위한 기도가 아직 남아 있어요.",
         "trap_spotted": "멈춰요, 바닥에 있는 무언가가 발소리를 기억하고 있어요.",
@@ -2482,20 +2442,6 @@ export const ko_KR: EnTranslations = {
           "3": "성물실 수련사제",
           "4": "무덤부름의 목격자",
           "5": "예배당 수호자"
-        }
-      },
-      "edda": {
-        "run_start": "널빤지 길을 따라가라, {playerName}. 진창은 오만한 발걸음부터 삼킨다.",
-        "ally_revive": "어서 일어나라. 오늘은 늪이 그대를 데려가지 못한다.",
-        "combat_start": "흑수를 조심해라, {playerName}. 늪이 듣고 있다.",
-        "low_hp": "침착해라. 내 등불은 아직 꺼지지 않았다.",
-        "trap_spotted": "잠깐. 여기 갈대가 이상하다.",
-        "boss_pull": "저 성가가 그대의 이름을 알고 있다, {playerName}. 노래로 답하지 마라.",
-        "completion": "늪은 하룻밤 더 그 비밀을 삼킬 수 있다.",
-        "rank": {
-          "1": "등불지기",
-          "2": "갈대 감시자",
-          "3": "펜브릿지 신도"
         }
       }
     },
@@ -2539,10 +2485,7 @@ export const ko_KR: EnTranslations = {
       "flooded_paths": "침수된 길",
       "grave_tax": "무덤의 대가",
       "unstable_roof": "불안정한 천장",
-      "cult_remnants": "교단의 잔당",
-      "high_water": "불어난 물",
-      "lively_choir": "활기찬 성가대",
-      "belligerent_dead": "호전적인 사자"
+      "cult_remnants": "교단의 잔당"
     },
     "blessing": {
       "chapel_candle": "예배당 촛불: 더 안전한 진행, 완료 시 탐굴 증표 1개 감소."
@@ -3555,13 +3498,16 @@ export const ko_KR: EnTranslations = {
     },
     "cast": {
       "fishing": "낚시",
-      "demonHeal": "악마 치유"
+      "demonHeal": "악마 치유",
+      "thunzharrStormcall": "폭풍의 부름"
     }
   },
   "questUi": {
     "tracker": {
       "title": "퀘스트",
-      "complete": "완료"
+      "complete": "완료",
+      "showOnMap": "{name} 지도에 표시",
+      "hideFromMap": "{name} 지도에서 숨기기"
     },
     "log": {
       "title": "퀘스트 기록",
@@ -5371,69 +5317,6 @@ export const ko_KR: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "바릭의 그림자 두건"
       },
-      "siltguard_helm": {
-        "name": "진흙수호 투구"
-      },
-      "bulwark_rusted_pauldrons": {
-        "name": "방벽의 녹슨 어깨보호구"
-      },
-      "nhalias_bell_maul": {
-        "name": "나할리아의 종메"
-      },
-      "reedstalker_jerkin": {
-        "name": "갈대추적자 조끼"
-      },
-      "mirejaw_fang_knife": {
-        "name": "진흙턱 송곳니검"
-      },
-      "widow_silk_hood": {
-        "name": "과부실 후드"
-      },
-      "cantors_drowned_sash": {
-        "name": "영창자의 익사한 허리띠"
-      },
-      "corpse_candle_focus": {
-        "name": "시체양초 집중구"
-      },
-      "nhalias_litany_rod": {
-        "name": "나할리아의 연도 지팡이"
-      },
-      "blackwater_vanguard_chest": {
-        "name": "흑수 선봉대 흉갑"
-      },
-      "siltstep_leggings": {
-        "name": "진흙보 각반"
-      },
-      "sunken_reliquary_hood": {
-        "name": "침몰한 유물함 후드"
-      },
-      "litany_legs": {
-        "name": "진흙보행자 각반"
-      },
-      "litany_shoulder": {
-        "name": "흑수 표류 망토"
-      },
-      "litany_gloves_rog": {
-        "name": "갈대묶음 손보호구"
-      },
-      "litany_plate_chest": {
-        "name": "늪지기 흉갑"
-      },
-      "litany_leather_chest": {
-        "name": "깊은진흙 겉옷"
-      },
-      "litany_cloth_chest": {
-        "name": "익사한 성가대 예복"
-      },
-      "litany_helm": {
-        "name": "성물사냥꾼의 익사 두건"
-      },
-      "sister_nhalia_choir_plate": {
-        "name": "나할리아 수녀의 성가 단조 판금"
-      },
-      "drowned_choir_fang": {
-        "name": "익사한 성가대의 송곳니"
-      },
       "the_codfather": {
         "name": "대구 대부"
       },
@@ -5553,6 +5436,30 @@ export const ko_KR: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "선봉대 크롬"
+      },
+      "crownforged_gauntlets": {
+        "name": "왕관벼림 건틀릿"
+      },
+      "nighttalon_grips": {
+        "name": "밤발톱 손아귀"
+      },
+      "soulflame_gloves": {
+        "name": "영혼불꽃 장갑"
+      },
+      "stormcallers_handguards": {
+        "name": "폭풍소환사의 손보호구"
+      },
+      "crownforged_girdle": {
+        "name": "왕관벼림 허리띠"
+      },
+      "nighttalon_waistband": {
+        "name": "밤발톱 허리싸개"
+      },
+      "soulflame_cord": {
+        "name": "영혼불꽃 허리끈"
+      },
+      "stormcallers_waistguard": {
+        "name": "폭풍소환사의 허리보호구"
       }
     },
     "mobs": {
@@ -5745,38 +5652,11 @@ export const ko_KR: EnTranslations = {
       "acolyte_tessa": {
         "name": "수련사제 테사"
       },
-      "drowned_cantor": {
-        "name": "익사한 영창자"
+      "thunzharr_waking_peak": {
+        "name": "천자르, 깨어나는 봉우리"
       },
-      "reedbound_acolyte": {
-        "name": "갈대에 묶인 신도"
-      },
-      "deepfen_spearjaw": {
-        "name": "깊은늪 창턱"
-      },
-      "mirefen_widowling": {
-        "name": "진창늪 과부거미"
-      },
-      "spider_egg_sac": {
-        "name": "거미 알집"
-      },
-      "grave_silt_bulwark": {
-        "name": "무덤진흙 방벽"
-      },
-      "sump_troll_devourer": {
-        "name": "오물트롤 포식자"
-      },
-      "choir_thrall": {
-        "name": "성가대 노예"
-      },
-      "sister_nhalia_drowned_canticle": {
-        "name": "나할리아 수녀, 익사한 성가"
-      },
-      "edda_reedhand": {
-        "name": "에다 리드핸드"
-      },
-      "tolling_bell": {
-        "name": "울리는 종"
+      "thunzharr_stormling": {
+        "name": "깨어난 폭풍 정령"
       },
       "ironvein_foreman": {
         "name": "철맥 감독관"
@@ -5997,11 +5877,6 @@ export const ko_KR: EnTranslations = {
         "name": "브라더 할벤",
         "title": "성물실 관리인",
         "greeting": "아래의 성물실이 또 움직였소."
-      },
-      "brother_halven_marsh": {
-        "name": "브라더 할벤",
-        "title": "성물실 관리인",
-        "greeting": "오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -6442,6 +6317,36 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "산등성이 추적자 가죽"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "추적자들의 귀환",
+        "text": "열두 마리를 잡았는데도 산등성이는 처음보다 더 들끓습니다, {playerName}. 짐승이 굶주림만으로 성벽에 몸을 던질 리 없습니다. 높은 산마루의 무언가가 그들을 몰아내리고 있습니다. 정체를 알기 전까지 사냥은 계속됩니다. 열네 마리 더.",
+        "completion": "열네 마리를 더 잡았는데도 순찰대는 아침마다 새 발자국을 셉니다. 높은 산마루에서 돌아온 정찰병은 설선처럼 하얗게 질려 있었습니다. 방패만 한 발자국에, 추적자라면 절대 남기지 않을 사냥 흔적이 있었다고 합니다. 저 위를 걷는 것은 평범한 고양이가 아닙니다.",
+        "objectives": {
+          "0": {
+            "label": "산등성이 추적자 처치"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "경비대의 망토",
+        "text": "가죽 여덟 장으로 장교들 망토를 덧댔더니, 이제 성벽의 병사 모두가 같은 것을 원합니다, {playerName}. 당연한 바람입니다. 겨울은 손가락부터 앗아 가고 사과는 듣지 않으니까요. 성문 남쪽 산등성이에서 열 장만 더 구해 오면 경비대 전원이 따뜻하게 잘 수 있습니다.",
+        "completion": "좋은 가죽 열 장, 더없이 두툼한... 아니, 이걸 보십시오, {playerName}. 절반이 찢겨 있는데 칼이나 창의 흔적이 아닙니다. 내 손바닥만 한 발톱 자국이 겨울 털가죽을 꿰뚫었습니다. 그 산등성이의 무언가가 제 동족을 물어뜯고 있습니다.",
+        "objectives": {
+          "0": {
+            "label": "산등성이 추적자 가죽"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "늙은 크래그모",
+        "text": "산사람들은 정찰병이 찾은 발자국의 주인을 알고 있었습니다. 늙은 크래그모, 제 무리의 세 세대를 먼저 보낸 흉터투성이 폭군 고양이입니다. 추적자들이 내 길로 쏟아지는 것도 그놈 때문입니다, {playerName}. 굴은 남쪽 길 위 서편 산등성이에 있습니다. 동료를 데리고 가서 그 늙은 악마를 처치하십시오.",
+        "completion": "마침내 쓰러졌군요. 산사람들은 그 고양이가 성벽보다 오래 살 거라 장담했었습니다. 이제 추적자들은 높은 설원에 머물 겁니다, {playerName}. 내 순찰대도 피 흘리지 않고 길을 걷겠지요. 당신 덕분에 산등성이 전체가 조용해졌습니다.",
+        "objectives": {
+          "0": {
+            "label": "늙은 크래그모 처치"
           }
         }
       },
@@ -6967,11 +6872,6 @@ export const ko_KR: EnTranslations = {
         "name": "무너진 성물실",
         "enterText": "무너진 성물실로 내려갑니다.",
         "leaveText": "성물실 폐허의 브라더 할벤에게로 다시 올라갑니다."
-      },
-      "drowned_litany": {
-        "name": "익사한 연도",
-        "enterText": "그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.",
-        "leaveText": "그대는 늪지의 끝자락으로 올라가 할벤 수사에게 돌아간다."
       }
     },
     "itemSets": {
@@ -6987,8 +6887,8 @@ export const ko_KR: EnTranslations = {
       },
       "necromancers": {
         "name": "강령술사의 의복",
-        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
-        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+        "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
+        "bonus3": "지능이 10, 체력이 10만큼 증가합니다."
       },
       "nighttalon": {
         "name": "밤발톱 가죽장비",
@@ -6997,13 +6897,13 @@ export const ko_KR: EnTranslations = {
       },
       "soulflame": {
         "name": "영혼불꽃 의복",
-        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
-        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+        "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
+        "bonus3": "지능이 15, 정신력이 15만큼 증가합니다."
       },
       "stormcallers": {
         "name": "폭풍소환사의 의복",
-        "bonus2": "피해로 인한 시전 밀림이 50% 감소합니다.",
-        "bonus3": "시전 중 피해를 받아도 밀려나지 않습니다."
+        "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
+        "bonus3": "지능이 15, 정신력이 15만큼 증가합니다."
       },
       "wyrmshadow": {
         "name": "고룡그림자 의복",
@@ -7019,11 +6919,6 @@ export const ko_KR: EnTranslations = {
     "dungeonInstanceBusy": "{name}의 모든 인스턴스가 사용 중입니다. 잠시 후 다시 시도하십시오.",
     "delveLockedChestInteract": "F를 눌러 자물쇠 따기",
     "delveRewardChestInteract": "F를 눌러 전리품 받기",
-    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기",
-    "delveReliquaryInteract": "가라앉은 성물함: F를 눌러 의식 시작",
-    "delveRiteShrineBellInteract": "종 제단: F를 눌러 울리기",
-    "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
-    "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
-    "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기"
+    "delveSurfaceExitInteract": "F를 눌러 지상으로 오르기"
   }
 };

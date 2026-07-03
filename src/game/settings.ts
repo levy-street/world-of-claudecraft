@@ -145,6 +145,11 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default: walk-by proximity autoloot (loot corpses just by walking
+  // past them). Auto-grabbing loot can feel jarring, so it is opt-in and classic
+  // deliberate looting stays the default. Gates the client AutoLoot pass in
+  // main.ts; the sim's authoritative gate and the raid-instance gate are separate.
+  walkByAutoloot: { def: false },
   // on by default: desktop ground-targeted spells open a terrain reticle before
   // casting. Touch keeps the instant target-feet fallback because there is no
   // persistent cursor to preview.
@@ -180,6 +185,11 @@ export const BOOL_SETTINGS = {
   // Purely a local display preference: the badge is still earned and broadcast
   // either way, this only controls whether THIS client renders it.
   showDevBadges: { def: true },
+  // off by default (the classic self-view keeps no plate over your head): when
+  // on, render your OWN overhead nameplate (name, level, guild, hp, $WOC holder
+  // tier, dev badge, linked-Discord PFP) exactly as other players see it, so you
+  // can see how your character presents. Purely a local display preference.
+  showOwnNameplate: { def: false },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },

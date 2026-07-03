@@ -34,6 +34,11 @@ CREATE TABLE IF NOT EXISTS discord_links (
 -- tag). Additive + idempotent so existing deployments upgrade on boot.
 ALTER TABLE discord_links ADD COLUMN IF NOT EXISTS discord_joined_at TIMESTAMPTZ;
 ALTER TABLE discord_links ADD COLUMN IF NOT EXISTS discord_role TEXT;
+-- The email captured from the Discord email scope, kept per-link as the record
+-- of what Discord returned (the account's own recovery email is backfilled from
+-- it separately, and may differ if the owner later sets their own). Additive +
+-- idempotent so existing deployments upgrade on boot.
+ALTER TABLE discord_links ADD COLUMN IF NOT EXISTS discord_email TEXT;
 -- Single-use, short-lived OAuth state rows. The PKCE verifier is stored
 -- server-side (never round-tripped through the browser); consuming a state row
 -- deletes it (replay + CSRF protection). account_id is set only for 'link' mode.
@@ -63,6 +68,11 @@ CREATE TABLE IF NOT EXISTS discord_pending_logins (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS discord_pending_logins_expires ON discord_pending_logins(expires_at);
+-- Carry the email captured at the OAuth callback through the first-time chooser so
+-- the create-new / link-existing endpoints can seed the account's recovery email.
+-- Additive + idempotent so existing deployments upgrade on boot.
+ALTER TABLE discord_pending_logins ADD COLUMN IF NOT EXISTS discord_email TEXT;
+ALTER TABLE discord_pending_logins ADD COLUMN IF NOT EXISTS discord_email_verified BOOLEAN NOT NULL DEFAULT FALSE;
 -- Authored, account-wide reward balance. points = spendable, lifetime_points =
 -- monotonic total that drives the status tier (status never drops on a spend).
 CREATE TABLE IF NOT EXISTS reward_points (
@@ -104,6 +114,7 @@ export interface DiscordLinkRow {
   discord_user_id: string;
   discord_username: string | null;
   discord_avatar: string | null;
+  discord_email: string | null;
   guild_member: boolean;
   linked_at: Date | string;
 }
@@ -113,7 +124,7 @@ export async function discordForAccount(
   accountId: number,
 ): Promise<DiscordLinkRow | null> {
   const res = await pool.query(
-    `SELECT account_id, discord_user_id, discord_username, discord_avatar, guild_member, linked_at
+    `SELECT account_id, discord_user_id, discord_username, discord_avatar, discord_email, guild_member, linked_at
        FROM discord_links WHERE account_id = $1`,
     [accountId],
   );
@@ -139,6 +150,7 @@ export async function linkDiscordToAccount(
     discordUserId: string;
     username: string | null;
     avatar: string | null;
+    email: string | null;
     guildMember: boolean;
   },
 ): Promise<boolean> {
@@ -146,15 +158,16 @@ export async function linkDiscordToAccount(
   if (owner !== null && owner !== accountId) return false;
   try {
     await pool.query(
-      `INSERT INTO discord_links (account_id, discord_user_id, discord_username, discord_avatar, guild_member)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO discord_links (account_id, discord_user_id, discord_username, discord_avatar, discord_email, guild_member)
+       VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (account_id) DO UPDATE SET
          discord_user_id = EXCLUDED.discord_user_id,
          discord_username = EXCLUDED.discord_username,
          discord_avatar = EXCLUDED.discord_avatar,
+         discord_email = COALESCE(EXCLUDED.discord_email, discord_links.discord_email),
          guild_member = EXCLUDED.guild_member,
          linked_at = now()`,
-      [accountId, info.discordUserId, info.username, info.avatar, info.guildMember],
+      [accountId, info.discordUserId, info.username, info.avatar, info.email, info.guildMember],
     );
   } catch (err) {
     // TOCTOU: another account claimed this discord_user_id between the check and
@@ -168,6 +181,22 @@ export async function linkDiscordToAccount(
 
 export async function unlinkDiscord(pool: Pool, accountId: number): Promise<void> {
   await pool.query('DELETE FROM discord_links WHERE account_id = $1', [accountId]);
+}
+
+// Update just the captured Discord email on an existing link, e.g. when a
+// returning user re-consents and grants the email scope for the first time. A
+// no-op when the grant carried no email, so it never wipes a previously captured
+// address (the account's own recovery email is handled separately).
+export async function setDiscordLinkEmail(
+  pool: Pool,
+  accountId: number,
+  email: string | null,
+): Promise<void> {
+  if (!email) return;
+  await pool.query('UPDATE discord_links SET discord_email = $2 WHERE account_id = $1', [
+    accountId,
+    email,
+  ]);
 }
 
 export async function setDiscordGuildMember(
@@ -241,6 +270,8 @@ export interface DiscordPendingLoginRow {
   discord_user_id: string;
   discord_username: string | null;
   discord_avatar: string | null;
+  discord_email: string | null;
+  discord_email_verified: boolean;
   guild_member: boolean;
 }
 
@@ -251,19 +282,23 @@ export async function createDiscordPendingLogin(
     discordUserId: string;
     username: string | null;
     avatar: string | null;
+    email: string | null;
+    emailVerified: boolean;
     guildMember: boolean;
     ttlMinutes: number;
   },
 ): Promise<void> {
   await pool.query(
     `INSERT INTO discord_pending_logins
-       (token, discord_user_id, discord_username, discord_avatar, guild_member, expires_at)
-     VALUES ($1, $2, $3, $4, $5, now() + ($6 || ' minutes')::interval)`,
+       (token, discord_user_id, discord_username, discord_avatar, discord_email, discord_email_verified, guild_member, expires_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, now() + ($8 || ' minutes')::interval)`,
     [
       params.token,
       params.discordUserId,
       params.username,
       params.avatar,
+      params.email,
+      params.emailVerified,
       params.guildMember,
       String(params.ttlMinutes),
     ],
@@ -280,7 +315,7 @@ export async function peekDiscordPendingLogin(
   token: string,
 ): Promise<DiscordPendingLoginRow | null> {
   const res = await pool.query(
-    `SELECT token, discord_user_id, discord_username, discord_avatar, guild_member
+    `SELECT token, discord_user_id, discord_username, discord_avatar, discord_email, discord_email_verified, guild_member
        FROM discord_pending_logins WHERE token = $1 AND expires_at > now()`,
     [token],
   );
@@ -295,7 +330,7 @@ export async function consumeDiscordPendingLogin(
   const res = await pool.query(
     `DELETE FROM discord_pending_logins
       WHERE token = $1 AND expires_at > now()
-      RETURNING token, discord_user_id, discord_username, discord_avatar, guild_member`,
+      RETURNING token, discord_user_id, discord_username, discord_avatar, discord_email, discord_email_verified, guild_member`,
     [token],
   );
   return res.rows[0] ?? null;
@@ -488,7 +523,7 @@ export interface DiscordFlair {
   name: string | null;
   /** Epoch ms the member joined the Discord server, or null (for "member since"). */
   joinedAtMs: number | null;
-  /** Top special-role key (levyst/devs/mods/artists), or null. */
+  /** Top special-role key (levyst/admin/devs/mods/artists), or null. */
   role: string | null;
 }
 

@@ -97,6 +97,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 60, chance: 1 },
       { itemId: 'ridge_stalker_pelt', chance: 0.6, questId: 'q_stalker_pelts' },
+      { itemId: 'ridge_stalker_pelt', chance: 0.6, questId: 'q_stalker_cloaks' },
     ],
     scale: 0.95,
     color: 0x8c8270,
@@ -787,6 +788,118 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     scale: 1.3,
     color: 0xe8702a,
   },
+  // Thunzharr, the Waking Peak: the world boss of Thornpeak Heights. The
+  // mountain at Stormcrag is no mountain at all: a primordial storm elemental the
+  // Gravecallers' chanting keeps stirring loose. It rises on a fixed cadence (see
+  // src/sim/world_boss.ts), bellows a server-wide warning, and rewards every player
+  // who helps bring it down with personal loot (once per day). A genuine raid-tier
+  // overworld fight: Thunderclap nova, a quaking stomp, summoned stormlings, a
+  // crushing heave, a mountain-hide barrier, and a hard enrage in the last fifth.
+  thunzharr_waking_peak: {
+    id: 'thunzharr_waking_peak',
+    name: 'Thunzharr, the Waking Peak',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    worldBoss: true,
+    boss: true,
+    elite: true,
+    canSwim: false,
+    ccImmune: true,
+    // Raid-tier health: ~20k base at level 20, ~44k after the elite multiplier, a
+    // sustained fight for a gathered raid, far above the solo/small-group rares
+    // (Varkas and Bound Guardian scale the same way from ~2k / ~1.3k base).
+    hpBase: 4000,
+    hpPerLevel: 800,
+    // Raid-tier melee, tuned to Nythraxis dps parity (content/dungeons.ts): at
+    // level 20 after createMob's 1.5x elite multiplier this averages ~375 per
+    // 2.4s swing vs Nythraxis ~406 per 2.6s, ~156 melee dps for both, so the
+    // pull needs a healed tank exactly like the raid.
+    dmgBase: 54,
+    dmgPerLevel: 10.3,
+    attackSpeed: 2.4,
+    armorPerLevel: 46,
+    moveSpeed: 5.8,
+    aggroRadius: 18,
+    aoePulse: {
+      min: 36,
+      max: 50,
+      radius: 12,
+      every: 8,
+      name: 'Thunderclap',
+      school: 'nature',
+      fx: 'nova',
+    },
+    stomp: {
+      radius: 11,
+      every: 16,
+      duration: 3,
+      min: 18,
+      max: 28,
+      name: 'Seismic Stomp',
+      school: 'nature',
+    },
+    summonAdds: { mobId: 'thunzharr_stormling', count: 2, atHpPct: [0.66, 0.33] },
+    knockback: { chance: 0.3, distance: 7, name: 'Tectonic Heave' },
+    stoneskin: { amount: 500, every: 18, duration: 9, name: 'Mountainhide', school: 'nature' },
+    // Stormcall: the telegraphed hardcast. A 3.5s cast bar the whole raid can see
+    // (and the yell announces), then a heavy nature nova on everyone within 30yd,
+    // roughly double a Thunderclap pulse on a much longer cadence.
+    bigCast: {
+      castId: 'thunzharr_stormcall',
+      name: 'Stormcall',
+      castTime: 3.5,
+      every: 25,
+      radius: 30,
+      min: 70,
+      max: 90,
+      school: 'nature',
+      yell: 'The storm answers my call!',
+    },
+    yells: {
+      engage: 'You wake the mountain? Then be buried by it!',
+      summon: 'Rise, stormlings! Tear them loose from my slopes!',
+      enrage: 'The peak breaks, and the sky falls with it!',
+    },
+    enrage: { belowHpPct: 0.2, dmgMult: 1.5, hasteMult: 1.25 },
+    // Personal loot table: rolled INDEPENDENTLY for every contributor (see
+    // rollWorldBossLoot). A guaranteed storm trophy, plus one epic Tier-2 set glove
+    // (~32%) and one epic Tier-2 set belt (~32%), each from its own mutually-exclusive
+    // roll group.
+    loot: [
+      { itemId: 'inert_storm_shard', chance: 1 },
+      { itemId: 'crownforged_gauntlets', chance: 0.08, rollGroup: 'thunzharr_t2' },
+      { itemId: 'nighttalon_grips', chance: 0.08, rollGroup: 'thunzharr_t2' },
+      { itemId: 'soulflame_gloves', chance: 0.08, rollGroup: 'thunzharr_t2' },
+      { itemId: 'stormcallers_handguards', chance: 0.08, rollGroup: 'thunzharr_t2' },
+      { itemId: 'crownforged_girdle', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
+      { itemId: 'nighttalon_waistband', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
+      { itemId: 'soulflame_cord', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
+      { itemId: 'stormcallers_waistguard', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
+    ],
+    scale: 1.7,
+    color: 0x7d8a99,
+  },
+  // Stormlings: lesser storm elementals Thunzharr tears loose from itself at the
+  // health thresholds above. Fast, fragile, and meant to split a raid's attention.
+  thunzharr_stormling: {
+    id: 'thunzharr_stormling',
+    name: 'Roused Stormling',
+    minLevel: 19,
+    maxLevel: 20,
+    family: 'elemental',
+    hpBase: 70,
+    hpPerLevel: 24,
+    dmgBase: 13,
+    dmgPerLevel: 2.9,
+    attackSpeed: 2.0,
+    armorPerLevel: 22,
+    moveSpeed: 7.4,
+    aggroRadius: 12,
+    loot: [],
+    scale: 0.95,
+    color: 0x9fb3c8,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -804,6 +917,8 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     questIds: [
       'q_highwatch_summons',
       'q_stalkers',
+      'q_stalkers_return',
+      'q_old_cragmaw',
       'q_ogre_bounty',
       'q_crushers',
       'q_drogmar',
@@ -875,7 +990,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     pos: { x: -5, z: 668 },
     facing: 1.6,
     color: 0xca8a2a,
-    questIds: ['q_stalker_pelts', 'q_glowing_wax'],
+    questIds: ['q_stalker_pelts', 'q_stalker_cloaks', 'q_glowing_wax'],
     vendorItems: [
       'trail_hardtack',
       'meltwater_flask',
@@ -984,6 +1099,57 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
       mage: 'ridgestalker_treads',
       rogue: 'ridgestalker_treads',
     },
+  },
+  q_stalkers_return: {
+    id: 'q_stalkers_return',
+    name: 'The Stalkers Return',
+    giverNpcId: 'captain_thessaly',
+    turnInNpcId: 'captain_thessaly',
+    text: 'Twelve dead, and the ridge crawls thicker than the day you started, $N. Beasts do not throw themselves at a wall out of hunger. Something on the high ridge is pushing them down, and until I know what, the culling does not stop. Fourteen more.',
+    completionText:
+      'Fourteen more, and still my patrols count fresh tracks by morning. My scout came back from the high ridge white as the snowline: prints the size of a shield, she says, and old kills no stalker would leave. Whatever walks up there is no ordinary cat.',
+    objectives: [
+      { type: 'kill', targetMobId: 'ridge_stalker', count: 14, label: 'Ridge Stalker slain' },
+    ],
+    xpReward: 2400,
+    copperReward: 1100,
+    itemRewards: {},
+    requiresQuest: 'q_stalkers',
+    minLevel: 13,
+  },
+  q_stalker_cloaks: {
+    id: 'q_stalker_cloaks',
+    name: 'Cloaks for the Watch',
+    giverNpcId: 'quartermaster_bree',
+    turnInNpcId: 'quartermaster_bree',
+    text: "Eight pelts lined the officers' cloaks, and now every soldier on the wall wants the same, $N. They are right to want it: winter takes fingers first and apologies never. Ten more pelts from the ridges south of the gate, and the whole watch sleeps warm.",
+    completionText:
+      'Ten good pelts, thick as any I have... no, look at these, $N. Torn, half of them, and by no blade or spear. Claw marks wide as my hand, right through the winter coat. Something on that ridge is savaging its own kind.',
+    objectives: [
+      { type: 'collect', itemId: 'ridge_stalker_pelt', count: 10, label: 'Ridge Stalker Pelt' },
+    ],
+    xpReward: 2400,
+    copperReward: 1200,
+    itemRewards: {},
+    requiresQuest: 'q_stalker_pelts',
+    minLevel: 13,
+  },
+  q_old_cragmaw: {
+    id: 'q_old_cragmaw',
+    name: 'Old Cragmaw',
+    giverNpcId: 'captain_thessaly',
+    turnInNpcId: 'captain_thessaly',
+    text: 'The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, $N. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.',
+    completionText:
+      'Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, $N, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.',
+    objectives: [
+      { type: 'kill', targetMobId: 'old_cragmaw', count: 1, label: 'Old Cragmaw slain' },
+    ],
+    xpReward: 2700,
+    copperReward: 1500,
+    itemRewards: {},
+    requiresQuest: 'q_stalkers_return',
+    suggestedPlayers: 2,
   },
   q_kobold_tunnels: {
     id: 'q_kobold_tunnels',
@@ -1539,6 +1705,9 @@ export const ZONE3_QUEST_ORDER = [
   'q_highwatch_summons',
   'q_stalkers',
   'q_stalker_pelts',
+  'q_stalkers_return',
+  'q_stalker_cloaks',
+  'q_old_cragmaw',
   'q_kobold_tunnels',
   'q_glowing_wax',
   'q_ogre_edges',
@@ -2410,6 +2579,107 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 110, agi: 9, sta: 4 },
     sellValue: 9000,
     requiredClass: ['rogue', 'hunter'],
+  },
+  // --- Thunzharr, the Waking Peak (world boss): epic GLOVES that extend the
+  // Tier-2 set families to a third piece. Named and stat-shaped to match each
+  // family's existing helm/shoulder. The `set` tag wires each into its family. ---
+  crownforged_gauntlets: {
+    id: 'crownforged_gauntlets',
+    name: 'Crownforged Gauntlets',
+    kind: 'armor',
+    slot: 'gloves',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 180, str: 6, sta: 7 },
+    sellValue: 3600,
+    requiredClass: ['warrior', 'paladin'],
+    set: 'crownforged', // 3rd Crownforged piece, unlocks the set's 3-piece bonus
+  },
+  nighttalon_grips: {
+    id: 'nighttalon_grips',
+    name: 'Nighttalon Grips',
+    kind: 'armor',
+    slot: 'gloves',
+    armorType: 'leather',
+    quality: 'epic',
+    stats: { armor: 110, agi: 8, sta: 5 },
+    sellValue: 3600,
+    requiredClass: ['rogue', 'hunter', 'druid'],
+    set: 'nighttalon', // 3rd Nighttalon piece, unlocks the set's 3-piece bonus
+  },
+  soulflame_gloves: {
+    id: 'soulflame_gloves',
+    name: 'Soulflame Gloves',
+    kind: 'armor',
+    slot: 'gloves',
+    armorType: 'cloth',
+    quality: 'epic',
+    stats: { armor: 60, int: 8, sta: 5 },
+    sellValue: 3600,
+    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    set: 'soulflame', // 3rd Soulflame piece, unlocks the set's 3-piece bonus
+  },
+  stormcallers_handguards: {
+    id: 'stormcallers_handguards',
+    name: "Stormcaller's Handguards",
+    kind: 'armor',
+    slot: 'gloves',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 130, int: 8, sta: 5 },
+    sellValue: 3600,
+    requiredClass: ['shaman'],
+    set: 'stormcallers', // 3rd Stormcaller's piece, unlocks the set's 3-piece bonus
+  },
+  // --- Thunzharr, the Waking Peak (world boss): epic BELTS, each family's fourth
+  // piece (helm, shoulder, glove, belt), alongside the glove drops above. ---
+  crownforged_girdle: {
+    id: 'crownforged_girdle',
+    name: 'Crownforged Girdle',
+    kind: 'armor',
+    slot: 'waist',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 150, str: 7, sta: 6 },
+    sellValue: 3600,
+    requiredClass: ['warrior', 'paladin'],
+    set: 'crownforged',
+  },
+  nighttalon_waistband: {
+    id: 'nighttalon_waistband',
+    name: 'Nighttalon Waistband',
+    kind: 'armor',
+    slot: 'waist',
+    armorType: 'leather',
+    quality: 'epic',
+    stats: { armor: 95, agi: 8, sta: 5 },
+    sellValue: 3600,
+    requiredClass: ['rogue', 'hunter', 'druid'],
+    set: 'nighttalon',
+  },
+  soulflame_cord: {
+    id: 'soulflame_cord',
+    name: 'Soulflame Cord',
+    kind: 'armor',
+    slot: 'waist',
+    armorType: 'cloth',
+    quality: 'epic',
+    stats: { armor: 50, int: 8, spi: 5 },
+    sellValue: 3600,
+    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    set: 'soulflame',
+  },
+  stormcallers_waistguard: {
+    id: 'stormcallers_waistguard',
+    name: "Stormcaller's Waistguard",
+    kind: 'armor',
+    slot: 'waist',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 110, int: 8, sta: 5 },
+    sellValue: 3600,
+    requiredClass: ['shaman'],
+    set: 'stormcallers',
   },
   deathless_heartwood: {
     id: 'deathless_heartwood',

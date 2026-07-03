@@ -16,7 +16,7 @@
   /* ---------- delve board ---------- */
   #delve-board {
     width: 360px;
-    padding: 14px;
+    --window-pad: 14px;
   }
   #delve-board .delve-board-name {
     font-family: var(--title-font);
@@ -213,7 +213,7 @@
   #delve-rite-panel {
     width: 420px;
     max-width: 92vw;
-    padding: 14px;
+    --window-pad: 14px;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -1228,6 +1228,12 @@
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
   }
+  .lb-total,
+  .dr-leaderboard-total {
+    margin: 2px 0 8px;
+    color: #b9ac82;
+    font-size: 12px;
+  }
   .lb-members {
     text-align: center;
     color: var(--color-text-muted);
@@ -1396,6 +1402,14 @@
   .dr-tasks small {
     color: var(--color-text-muted);
     font-size: 11px;
+  }
+  .dr-tasks small {
+    display: grid;
+    gap: 2px;
+  }
+  .dr-tasks small em {
+    color: #ffe27a;
+    font-style: normal;
   }
   .dr-intro {
     margin: 0 0 10px;
@@ -2478,7 +2492,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     width: 360px;
-    padding: 14px;
+    --window-pad: 14px;
     z-index: 60;
   }
   #confirm-dialog .cd-body {
@@ -3288,7 +3302,7 @@
   /* ---------- map ---------- */
   /* map */
   #map-window {
-    padding: 14px;
+    --window-pad: 14px;
   }
   /* zoom controls, matching the micro-menu button look */
   #map-zoom {
@@ -3332,7 +3346,7 @@
   /* ---------- Ashen Coliseum (arena) ---------- */
   #arena-window {
     width: 360px;
-    padding: 14px;
+    --window-pad: 14px;
   }
   .arena-sub {
     font-family: var(--title-font);
@@ -3997,6 +4011,116 @@
     outline: 1px solid #000;
     border-radius: 4px;
     touch-action: none;
+  }
+  /* the numbered quest list on the world map: a dropdown that unfolds from
+     the "Quests" button overlaying the map's top-left corner (never outside
+     the window, so it can't push the page into horizontal scrolling). Each
+     row's number matches the gold badge painted on the map, and the row's
+     toggle button tracks/untracks the quest's blue objective areas. */
+  #map-quests-toggle {
+    position: absolute;
+    left: 22px;
+    top: 22px;
+    z-index: 2;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+    font-weight: bold;
+    border: 2px solid #4a3d1d;
+    border-radius: 5px;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 2px 4px #0009;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  #map-quests-toggle:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  #map-quests-toggle[hidden] {
+    display: none;
+  }
+  #map-quests {
+    position: absolute;
+    left: 22px;
+    top: 60px;
+    z-index: 2;
+    width: 250px;
+    max-height: calc(100% - 76px);
+    overflow-y: auto;
+    padding: 10px;
+    display: none; /* shown while the toggle is expanded and the log has quests */
+  }
+  #map-quests.on {
+    display: block;
+  }
+  .mapq-head {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .mapq-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 3px 0;
+  }
+  .mapq-num {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-map-quest-badge-fill);
+    color: var(--color-map-quest-badge-text);
+    border: 1px solid #000;
+    font-weight: bold;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mapq-title {
+    flex: 1;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .mapq-complete {
+    flex: none;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .mapq-row.untracked .mapq-title {
+    color: var(--color-text-muted);
+  }
+  .mapq-row.untracked .mapq-num {
+    opacity: 0.45;
+  }
+  .mapq-track {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 2px solid #4a3d1d;
+    border-radius: 5px;
+    color: var(--gold);
+    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    cursor: var(--cursor-point);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .mapq-track:hover {
+    border-color: var(--gold-dim);
   }
 
   /* ---------- options / game menu (Esc) ---------- */

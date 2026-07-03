@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "f35e56d0",
+      "state": "ca6c8e18",
       "events": "44bd33fd",
       "rng": {
         "draws": 3,
@@ -54,10 +54,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -75,10 +77,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -96,10 +100,12 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -329,7 +335,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "69b4625b",
+      "state": "e70340af",
       "events": "d28af0d3",
       "rng": {
         "draws": 6,
@@ -353,10 +359,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -374,10 +382,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -395,10 +405,12 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -628,7 +640,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "1866efaf",
+      "state": "b393e8f7",
       "events": "d28af0d3",
       "rng": {
         "draws": 9,
@@ -652,10 +664,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -673,10 +687,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -694,10 +710,12 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -927,7 +945,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 394,
-      "state": "29606b70",
+      "state": "5029bb68",
       "events": "d28af0d3",
       "rng": {
         "draws": 12,
@@ -951,10 +969,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -972,10 +992,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -993,10 +1015,12 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -1226,7 +1250,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 394,
-      "state": "153dbf5c",
+      "state": "1697c8e4",
       "events": "8d7fbeb9",
       "rng": {
         "draws": 15,
@@ -1237,7 +1261,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 394,
-      "state": "ca9ed7ed",
+      "state": "42f17a11",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1248,7 +1272,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 394,
-      "state": "ca9ed7ed",
+      "state": "42f17a11",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1273,10 +1297,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1294,10 +1320,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1315,10 +1343,12 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [

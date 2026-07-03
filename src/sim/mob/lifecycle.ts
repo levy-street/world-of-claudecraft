@@ -78,6 +78,16 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
+  // A mid-flight bigCast dies with the pull: clear the bar, reseed the cadence,
+  // and let the next pull bark its engage line again.
+  const bigCastDef = MOBS[mob.templateId]?.bigCast;
+  mob.bigCastTimer = bigCastDef?.every ?? 0;
+  if (bigCastDef && mob.castingAbility === bigCastDef.castId) {
+    mob.castingAbility = null;
+    mob.castTotal = 0;
+    mob.castRemaining = 0;
+  }
+  mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   for (const meta of ctx.players.values()) {

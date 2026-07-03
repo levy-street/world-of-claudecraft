@@ -44,6 +44,7 @@ import {
 import { groundHeight, WATER_LEVEL } from '../world';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget, updateMobTarget } from './targeting';
+import { emitMobYell } from './yells';
 
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
@@ -380,6 +381,51 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           }
         }
       }
+      // Telegraphed hardcast (bigCast): a periodic big spell with a REAL cast bar.
+      // The cadence timer ticks like aoePulse; at zero the mob starts casting
+      // (castingAbility carries the castId, the same entity fields the Nythraxis
+      // Deathless Rage cast uses) and keeps meleeing while the bar fills, then the
+      // spell lands as an AoE nova on every living player in radius. All rng here
+      // draws only for templates that declare bigCast (today only the Thunzharr
+      // world boss), so the parity golden scenarios see no new draws. If the mob
+      // leaves the attack state mid-cast the bar freezes and resumes on return,
+      // matching how the sibling timers pause; evade/death clear it.
+      const bigCast = MOBS[mob.templateId]?.bigCast;
+      if (bigCast) {
+        if (mob.castingAbility === bigCast.castId) {
+          mob.castRemaining = Math.max(0, mob.castRemaining - DT);
+          if (mob.castRemaining <= 0) {
+            mob.castingAbility = null;
+            mob.castTotal = 0;
+            mob.castRemaining = 0;
+            const school = (bigCast.school ?? 'nature') as Aura['school'];
+            ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+            ctx.emit({
+              type: 'log',
+              text: `${mob.name} unleashes ${bigCast.name}!`,
+              color: '#ff9933',
+              entityId: mob.id,
+            });
+            for (const meta of ctx.players.values()) {
+              const pe = ctx.entities.get(meta.entityId);
+              if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= bigCast.radius) {
+                const dmg = Math.round(ctx.rng.range(bigCast.min, bigCast.max));
+                ctx.dealDamage(mob, pe, dmg, false, school, bigCast.name, 'hit', true);
+              }
+            }
+          }
+        } else {
+          mob.bigCastTimer -= DT;
+          if (mob.bigCastTimer <= 0) {
+            mob.bigCastTimer = bigCast.every + bigCast.castTime;
+            mob.castingAbility = bigCast.castId;
+            mob.castTotal = bigCast.castTime;
+            mob.castRemaining = bigCast.castTime;
+            mob.channeling = false;
+            if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
+          }
+        }
+      }
       // Stoneskin: a periodic self-absorb barrier. Telegraphed via createMob,
       // which seeds stoneskinTimer to one full interval so the first barrier
       // never snaps up the instant combat opens. Reuses the `absorb` aura,
@@ -544,6 +590,16 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
+  // A mid-flight bigCast dies with the pull: clear the bar, reseed the cadence,
+  // and let the next pull bark its engage line again.
+  const bigCastDef = MOBS[mob.templateId]?.bigCast;
+  mob.bigCastTimer = bigCastDef?.every ?? 0;
+  if (bigCastDef && mob.castingAbility === bigCastDef.castId) {
+    mob.castingAbility = null;
+    mob.castTotal = 0;
+    mob.castRemaining = 0;
+  }
+  mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
 }

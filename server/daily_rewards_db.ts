@@ -19,6 +19,14 @@ export interface DailyRewardScoreRow {
   rank: number;
 }
 
+export interface DailyRewardLeaderboardPageRow {
+  rows: DailyRewardScoreRow[];
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+}
+
 export interface DailyRewardSpinRow {
   outcomeKey: string;
   points: number;
@@ -60,6 +68,13 @@ export interface DailyRewardDb {
   onlineMinutesForAccount(day: string, accountId: number): Promise<number>;
   rankForAccount(day: string, accountId: number): Promise<number | null>;
   leaderboard(day: string, accountId: number, limit: number): Promise<DailyRewardScoreRow[]>;
+  leaderboardRowForAccount(day: string, accountId: number): Promise<DailyRewardScoreRow | null>;
+  leaderboardPage(
+    day: string,
+    page: number,
+    pageSize: number,
+  ): Promise<DailyRewardLeaderboardPageRow>;
+  leaderboardTotal(day: string): Promise<number>;
   spinForAccount(day: string, accountId: number): Promise<DailyRewardSpinRow | null>;
   recordSpin(day: string, accountId: number, outcomeKey: string, points: number): Promise<boolean>;
   addPoints(
@@ -125,6 +140,15 @@ function payoutRow(row: Record<string, unknown>): DailyRewardPayoutRow {
 function dateString(value: unknown): string | null {
   if (value instanceof Date) return value.toISOString();
   return optionalString(value);
+}
+
+function scoreRow(row: Record<string, unknown>): DailyRewardScoreRow {
+  return {
+    accountId: Number(row.account_id),
+    username: String(row.username),
+    points: Number(row.points),
+    rank: Number(row.rank),
+  };
 }
 
 export class PgDailyRewardDb implements DailyRewardDb {
@@ -290,12 +314,66 @@ export class PgDailyRewardDb implements DailyRewardDb {
         LIMIT $3`,
       [day, REALM, Math.max(1, Math.min(100, limit))],
     );
-    return res.rows.map((r) => ({
-      accountId: Number(r.account_id),
-      username: String(r.username),
-      points: Number(r.points),
-      rank: Number(r.rank),
-    }));
+    return res.rows.map(scoreRow);
+  }
+
+  async leaderboardRowForAccount(
+    day: string,
+    accountId: number,
+  ): Promise<DailyRewardScoreRow | null> {
+    const res = await pool.query(
+      `WITH ranked AS (
+         SELECT s.account_id, a.username, s.points,
+                row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
+           FROM daily_reward_scores s
+           JOIN accounts a ON a.id = s.account_id
+          WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
+       )
+       SELECT account_id, username, points, rank FROM ranked WHERE account_id = $3`,
+      [day, REALM, accountId],
+    );
+    return res.rows[0] ? scoreRow(res.rows[0]) : null;
+  }
+
+  async leaderboardTotal(day: string): Promise<number> {
+    const res = await pool.query(
+      `SELECT COUNT(*) AS total
+         FROM daily_reward_scores
+        WHERE day = $1 AND realm = $2 AND points > 0`,
+      [day, REALM],
+    );
+    return Number(res.rows[0]?.total ?? 0);
+  }
+
+  async leaderboardPage(
+    day: string,
+    page: number,
+    pageSize: number,
+  ): Promise<DailyRewardLeaderboardPageRow> {
+    const requestedPageSize = Number.isFinite(pageSize) ? Math.floor(pageSize) : 50;
+    const safePageSize = Math.max(1, Math.min(100, requestedPageSize));
+    const total = await this.leaderboardTotal(day);
+    const pageCount = Math.max(1, Math.ceil(total / safePageSize));
+    const requestedPage = Number.isFinite(page) ? Math.floor(page) : 0;
+    const safePage = Math.max(0, Math.min(pageCount - 1, requestedPage));
+    const res = await pool.query(
+      `SELECT s.account_id, a.username, s.points,
+              row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
+         FROM daily_reward_scores s
+         JOIN accounts a ON a.id = s.account_id
+        WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
+        ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC
+        OFFSET $3
+        LIMIT $4`,
+      [day, REALM, safePage * safePageSize, safePageSize],
+    );
+    return {
+      rows: res.rows.map(scoreRow),
+      page: safePage,
+      pageSize: safePageSize,
+      pageCount,
+      total,
+    };
   }
 
   async spinForAccount(day: string, accountId: number): Promise<DailyRewardSpinRow | null> {

@@ -1109,14 +1109,25 @@ describe('client HTML shell', () => {
       'max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));',
     );
     expect(hudMobileCss).toContain(
-      'max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
+      'max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    display: flex;\n    flex-direction: column;\n  }',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-controls .panel-title {\n    min-height: 32px;',
+    // Anchored to the drawer-header rule itself (not just the declarations,
+    // which any rule could carry): the 48px floor must stay on THIS selector.
+    const drawerTitleStart = hudMobileCss.indexOf(
+      'body.mobile-touch #mobile-extra-controls .panel-title {',
     );
+    expect(drawerTitleStart).toBeGreaterThan(-1);
+    const drawerTitleBody = hudMobileCss.slice(
+      drawerTitleStart,
+      hudMobileCss.indexOf('}', drawerTitleStart),
+    );
+    expect(drawerTitleBody).toContain('min-height: 48px;');
+    expect(drawerTitleBody).toContain('margin-bottom: 8px;');
+    expect(drawerTitleBody).toContain('padding-bottom: 6px;');
+    expect(drawerTitleBody).toContain('cursor: move;');
     expect(hudMobileCss).toContain(
       'width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));',
     );
@@ -1239,7 +1250,7 @@ describe('client HTML shell', () => {
     // and #market-body keeps a min-height floor; the window itself stays
     // overflow:hidden so #market-body remains the single scroll container.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(100vh - 20px);\n    overflow: hidden;',
+      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow: hidden;',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #market-body {\n    min-height: 96px;');
     expect(marketWindowTs).toContain('buildMarketView'); // pagination + filtering delegated to the core
@@ -1411,7 +1422,7 @@ describe('client HTML shell', () => {
       'body.mobile-touch.mobile-left-handed #mobile-extra-controls {\n    left: 50%;\n    right: auto;',
     );
     expect(hudMobileCss).toContain(
-      'max-height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
+      'max-height: calc(\n        var(--app-vh) -\n        28px -\n        env(safe-area-inset-top) -\n        env(safe-area-inset-bottom)\n      );',
     );
   });
 

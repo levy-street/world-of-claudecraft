@@ -236,6 +236,9 @@ export interface SimContextCallbacks {
   fiestaTakedown(match: ArenaMatch, killerPid: number, victim: Entity): void;
   fiestaDown(match: ArenaMatch, victim: Entity, killerPid: number | null): void;
   rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
+  // World-boss personal loot: an independent roll of the boss's loot table per
+  // contributor (gated once-per-day per boss). Owned by world_boss.ts.
+  rollWorldBossLoot(mob: Entity, contributors: PlayerMeta[]): void;
 
   // C2/C3/C4b heal, aura, knockback, and crowd-control surface.
   applyHeal(source: Entity, target: Entity, amount: number, ability: string): void;
@@ -280,6 +283,8 @@ export interface SimContextCallbacks {
   // (feedPet consumes the inventory hub; L2 dedupes when it adds the identical decl).
   spendResource(p: Entity, cost: number): void;
   removeItem(itemId: string, count: number, pid?: number): void;
+  // Fungible-only removal (#1165), skips instanced slots; market.ts escrows with this.
+  removeFungibleItem(itemId: string, count: number, pid?: number): void;
 
   // A1/T1 raid markers + party; Q1 quest-credit trio (kill/collect/turn-in credit,
   // foreign-called from handleDeath + the inventory hub + the interaction/crypt
@@ -296,6 +301,9 @@ export interface SimContextCallbacks {
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
   countItem(itemId: string, pid?: number): number;
+  // Fungible-only count (excludes per-instance slots, #1165); market.ts uses this
+  // instead of countItem so an instanced copy is never listed as a plain stack member.
+  countFungibleItem(itemId: string, pid?: number): number;
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
 
@@ -749,6 +757,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     fiestaTakedown: host.fiestaTakedown,
     fiestaDown: host.fiestaDown,
     rollLoot: host.rollLoot,
+    rollWorldBossLoot: host.rollWorldBossLoot,
     applyHeal: host.applyHeal,
     spellCrit: host.spellCrit,
     applyAura: host.applyAura,
@@ -766,6 +775,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // already passed through elsewhere - deduped, not re-added).
     spendResource: host.spendResource,
     removeItem: host.removeItem,
+    removeFungibleItem: host.removeFungibleItem,
     clearEntityMarker: host.clearEntityMarker,
     partyOf: host.partyOf,
     removeFromParty: host.removeFromParty,
@@ -774,6 +784,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     onInventoryChangedForQuests: host.onInventoryChangedForQuests,
     checkQuestReady: host.checkQuestReady,
     countItem: host.countItem,
+    countFungibleItem: host.countFungibleItem,
     completeQuestForDev: host.completeQuestForDev,
     completeCurrentQuestsForDev: host.completeCurrentQuestsForDev,
     addEntity: host.addEntity,

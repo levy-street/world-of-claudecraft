@@ -37,6 +37,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critChance: 0.05,
     dodgeChance: 0.05,
     castPushbackReduction: 0,
+    knockbackResistance: 0,
     moveSpeed: 7,
     hostile: false,
     targetId: null,
@@ -75,6 +76,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     tappedById: null,
     pulseTimer: 0,
     stompTimer: 0,
+    bigCastTimer: 0,
+    yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
     detonateTimer: Infinity,
@@ -197,7 +200,7 @@ export function recalcPlayerStats(
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
   // totals so they feed every derivation below; AP/crit/pushback fold in at
-  // their own steps (bonusAp, critChance, castPushbackReduction).
+  // their own steps (bonusAp, critChance, castPushbackReduction, knockbackResistance).
   const setEff = aggregateSetBonuses(setCounts);
   s.str += setEff.str;
   s.agi += setEff.agi;
@@ -313,6 +316,7 @@ export function recalcPlayerStats(
   // Crit: ~1% per 20 agi at low level
   e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
   e.castPushbackReduction = setEff.castPushbackReduction;
+  e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
 
@@ -417,6 +421,8 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.wardAllies) e.wardTimer = template.wardAllies.every;
   // Telegraph the first Stoneskin: one full interval after engage.
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
+  // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.
+  if (template.bigCast) e.bigCastTimer = template.bigCast.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.

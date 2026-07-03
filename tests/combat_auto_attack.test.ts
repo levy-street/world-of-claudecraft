@@ -235,6 +235,40 @@ describe('auto_attack start/stopAutoAttack', () => {
   });
 });
 
+describe('auto_attack startAutoAttack: ranged engage must not pre-aggro (issue #1)', () => {
+  // Casting a damaging spell engages the wand / auto-shot via the "Attack on Ability
+  // Use" QoL (default on). That must NOT aggro a distant mob the instant the cast
+  // starts: ranged threat comes from the shot LANDING (rangedSwing schedules a
+  // projectile), exactly like the spell it accompanies. Only melee, where a swing
+  // lands at once, seeds aggro on engage.
+  it('a wand caster engaging at ranged distance does NOT aggro an idle mob', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const mob = spawnDummy(sim, p, 12, 25); // 25yd: inside the 30yd wand range, beyond melee
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(true); // auto-attack still engages
+    expect(mob.aiState).toBe('idle'); // but the mob is NOT pulled at engage time
+    expect(mob.aggroTargetId).toBe(null);
+  });
+
+  it('melee engage still seeds aggro immediately (unchanged behavior)', () => {
+    const { sim, p } = makeSim('warrior', 12);
+    const mob = spawnDummy(sim, p, 12, 2); // 2yd: melee range, a swing lands at once
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(true);
+    expect(mob.aggroTargetId).toBe(p.id);
+  });
+
+  it('a wand caster still aggros the mob when the shot actually lands', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const mob = spawnDummy(sim, p, 12, 25);
+    const events = capture(sim);
+    startAutoAttack(sim.ctx, p.id);
+    expect(mob.aggroTargetId).toBe(null); // not at engage
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.sourceId === p.id, 60);
+    expect(mob.aggroTargetId).toBe(p.id); // aggroed on impact, the classic-correct moment
+  });
+});
+
 describe('auto_attack determinism', () => {
   it('identical seeds produce an identical swing-damage sequence (seeded replay)', () => {
     const run = (): number[] => {
@@ -258,5 +292,28 @@ describe('auto_attack determinism', () => {
     const b = run();
     expect(a.length).toBeGreaterThan(5); // actually produced swings
     expect(a).toEqual(b); // byte-identical across the replay
+  });
+});
+
+describe('startAutoAttack while casting (the aggro-before-damage bug)', () => {
+  it('a mid-cast Attack press queues the swing but does NOT aggro the untouched target', () => {
+    const { sim, p } = makeSim('priest', 10);
+    const mob = spawnDummy(sim, p, 5, 2);
+    sim.castAbility('smite', p.id); // timed cast in progress
+    expect(p.castingAbility).toBe('smite');
+    startAutoAttack(sim.ctx, p.id);
+    // the toggle still arms white swings for after the cast...
+    expect(p.autoAttack).toBe(true);
+    // ...but no damage has landed, so the idle mob must not come running
+    expect(mob.aiState).toBe('idle');
+    expect(mob.aggroTargetId).toBe(null);
+  });
+
+  it('outside a cast the toggle still pulls the idle target at once (unchanged)', () => {
+    const { sim, p } = makeSim('warrior', 10);
+    const mob = spawnDummy(sim, p, 5, 2);
+    startAutoAttack(sim.ctx, p.id);
+    expect(mob.aiState).not.toBe('idle');
+    expect(p.inCombat).toBe(true);
   });
 });

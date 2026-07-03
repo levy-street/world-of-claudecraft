@@ -19,6 +19,7 @@
 
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type {
+  DailyRewardLeaderboardPage,
   DailyRewardStatus,
   DevLeaderboardPage,
   GuildLeaderboardPage,
@@ -299,9 +300,9 @@ export class LeaderboardWindow {
     world: IWorld,
     focus: FocusTarget,
   ): Promise<void> {
-    let result: DailyRewardStatus | null = null;
+    let result: DailyRewardLeaderboardPage | null = null;
     try {
-      result = await world.dailyRewards();
+      result = await world.dailyRewardLeaderboard(this.page, LEADERBOARD_PAGE_SIZE);
     } catch {
       result = null;
     }
@@ -313,14 +314,29 @@ export class LeaderboardWindow {
       this.focusCloseAfterPage(focus);
       return;
     }
-    if (result.leaderboard.length === 0) {
-      body.innerHTML = `<div class="lb-empty">${esc(t('hudChrome.dailyRewards.noLeaders'))}</div>`;
+    if (result.leaders.length === 0) {
+      body.innerHTML =
+        this.dailyTotalHtml(result.total) +
+        `<div class="lb-empty">${esc(t('hudChrome.dailyRewards.noLeaders'))}</div>`;
       this.focusCloseAfterPage(focus);
       return;
     }
+    this.page = result.page;
     body.innerHTML =
-      this.dailyHeaderHtml() + result.leaderboard.map((r) => this.dailyRowHtml(r)).join('');
-    this.focusCloseAfterPage(focus);
+      this.dailyTotalHtml(result.total) +
+      this.dailyHeaderHtml() +
+      result.leaders.map((r) => this.dailyRowHtml(r)).join('') +
+      this.pagerHtml(
+        result.pageCount > 1
+          ? {
+              page: result.page,
+              pageCount: result.pageCount,
+              prevDisabled: result.page <= 0,
+              nextDisabled: result.page >= result.pageCount - 1,
+            }
+          : null,
+      );
+    this.wirePager(body as HTMLElement, focus);
   }
 
   // ---- HTML builders (the localized DOM the pure view-model drives) ----------
@@ -463,6 +479,12 @@ export class LeaderboardWindow {
       `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
       `<span class="lb-xp">${esc(t('hudChrome.dailyRewards.score'))}</span></div>`
     );
+  }
+
+  private dailyTotalHtml(total: number): string {
+    const key =
+      total === 1 ? 'hudChrome.dailyRewards.totalPlayer' : 'hudChrome.dailyRewards.totalPlayers';
+    return `<div class="lb-total">${esc(t(key, { count: formatNumber(total, { maximumFractionDigits: 0 }) }))}</div>`;
   }
 
   private dailyRowHtml(r: DailyRewardStatus['leaderboard'][number]): string {

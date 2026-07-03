@@ -4,10 +4,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  MAX_EMAIL_LENGTH,
   normalizeCharName,
+  normalizeEmail,
   offensiveName,
   offensiveUsername,
   validCharName,
+  validEmail,
   validUsername,
 } from '../server/auth';
 import {
@@ -889,5 +892,39 @@ describe('Turnstile gate policy (passesTurnstile)', () => {
     } finally {
       delete process.env.NATIVE_ATTESTATION_REQUIRED;
     }
+  });
+});
+
+describe('email address validator (recovery-email capture)', () => {
+  it('accepts a well-formed address and returns it trimmed', () => {
+    expect(normalizeEmail('user@example.com')).toBe('user@example.com');
+    expect(normalizeEmail('  user@example.com  ')).toBe('user@example.com');
+    expect(normalizeEmail('a.b+tag@sub.domain.co')).toBe('a.b+tag@sub.domain.co');
+    expect(validEmail('user@example.com')).toBe(true);
+  });
+
+  it('rejects missing, blank, or malformed addresses', () => {
+    for (const bad of [
+      '',
+      '   ',
+      'user',
+      'user@',
+      '@example.com',
+      'user@host',
+      'a b@example.com',
+    ]) {
+      expect(normalizeEmail(bad)).toBeNull();
+      expect(validEmail(bad)).toBe(false);
+    }
+  });
+
+  it('rejects non-strings and over-length addresses', () => {
+    expect(normalizeEmail(undefined)).toBeNull();
+    expect(normalizeEmail(null)).toBeNull();
+    expect(normalizeEmail(42)).toBeNull();
+    // 254 is the RFC 5321 cap; a local part that pushes past it is rejected.
+    const tooLong = `${'a'.repeat(MAX_EMAIL_LENGTH)}@example.com`;
+    expect(tooLong.length).toBeGreaterThan(MAX_EMAIL_LENGTH);
+    expect(normalizeEmail(tooLong)).toBeNull();
   });
 });

@@ -202,7 +202,11 @@ export const vi_VN: EnTranslations = {
       "spinResult": "+{points} điểm",
       "spinButton": "Quay",
       "tasks": "Nhiệm Vụ",
+      "taskMultiplier": "x{multiplier} multiplier",
+      "pointsGained": "{points} daily rewards points gained.",
       "leaderboard": "Bảng Xếp Hạng Hằng Ngày",
+      "totalPlayer": "{count} player today",
+      "totalPlayers": "{count} players today",
       "history": "Người Thắng Trước Đây",
       "noLeaders": "Chưa có điểm nào.",
       "noHistory": "Chưa có khoản chi trả nào.",
@@ -386,9 +390,11 @@ export const vi_VN: EnTranslations = {
       "showWalletOnCharacterScreen": "Hiện Ví Tiền Ở Màn Hình Nhân Vật",
       "showWalletOnPlayerCard": "Hiện Ví Tiền Trên Thẻ Người Chơi",
       "showDevBadges": "Hiện Huy Hiệu Nhà Phát Triển",
+      "showOwnNameplate": "Show My Nameplate",
       "uiScale": "Tỷ Lệ Giao Diện",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
+      "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
@@ -821,6 +827,9 @@ export const vi_VN: EnTranslations = {
         "nature": "Tự nhiên"
       }
     },
+    "worldBoss": {
+      "spawn": "{name} rises over Thornpeak Heights!"
+    },
     "loot": {
       "chestTitle": "Rương"
     },
@@ -831,6 +840,16 @@ export const vi_VN: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "Level {level} {family}",
+      "familyDemon": "Demon",
+      "hostile": "Hostile",
+      "friendly": "Friendly"
+    },
+    "targetFrame": {
+      "unlock": "Move target frame",
+      "lock": "Lock target frame"
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}"
@@ -913,6 +932,7 @@ export const vi_VN: EnTranslations = {
       "memberSinceDays": "{days} ngày trong Discord",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "Admin",
         "devs": "Lập Trình Viên",
         "mods": "Điều Hành Viên",
         "artists": "Họa Sĩ"
@@ -1953,6 +1973,9 @@ export const vi_VN: EnTranslations = {
     "password": "Mật Khẩu",
     "passwordError": "Vui lòng nhập mật khẩu của bạn.",
     "passwordPlaceholder": "Nhập mật khẩu",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "Please enter a valid email address.",
     "showPassword": "Hiện mật khẩu",
     "hidePassword": "Ẩn mật khẩu",
     "logIn": "Đăng Nhập",
@@ -1978,7 +2001,15 @@ export const vi_VN: EnTranslations = {
     "create": "Tạo",
     "twoFactorLabel": "Mã xác thực",
     "twoFactorPlaceholder": "Mã 6 chữ số hoặc mã khôi phục",
-    "twoFactorHint": "Nhập mã từ ứng dụng xác thực của bạn, hoặc một trong các mã khôi phục."
+    "twoFactorHint": "Nhập mã từ ứng dụng xác thực của bạn, hoặc một trong các mã khôi phục.",
+    "recovery": {
+      "title": "Add a recovery email",
+      "body": "Set an email address so you can recover your account. We only use it to confirm you own this account if you ever need to reset your password.",
+      "save": "Save email",
+      "logOut": "Log out",
+      "invalid": "Please enter a valid email address.",
+      "failed": "Could not save your email. Please try again."
+    }
   },
   "wallet": {
     "label": "Ví $WOC",
@@ -2032,6 +2063,7 @@ export const vi_VN: EnTranslations = {
     "helpLinkedWithBalance": "Đặc quyền chủ sở hữu đang hoạt động. Ứng dụng ví đã kết nối trên trình duyệt này.",
     "helpLinkedDisconnected": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
     "helpLinkedDisconnectedWithBalance": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
+    "extensionHelp": "To see a wallet here, keep a browser wallet extension such as Solflare Wallet active.",
     "flowConnect": "Chọn một ví. Quá trình xác minh sẽ tiếp tục tự động.",
     "flowSign": "Ký vào thông điệp xác minh trong ứng dụng ví của bạn. Không cần giao dịch hay SOL.",
     "flowVerify": "Đang xác minh quyền sở hữu ví...",
@@ -2217,7 +2249,6 @@ export const vi_VN: EnTranslations = {
       "unknownTier": "Cấp bậc hầm thám hiểm không xác định.",
       "levelRequired": "Bạn phải đạt cấp {level} để vào {name}.",
       "levelRequiredTier": "Bạn phải đạt cấp {level} để vào {name} ở {tier}.",
-      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Tất cả các phiên bản của {name} đều đang bận. Hãy thử lại sớm.",
       "runFailed": "Lượt chạy {name} thất bại.",
       "complete": "Đã hoàn thành {name}.",
@@ -2227,14 +2258,6 @@ export const vi_VN: EnTranslations = {
       "doorAlreadyOpen": "Cánh cửa đã mở rồi.",
       "companionRankUp": "{name} đạt tới hạng {rank}.",
       "bossChest": "Trùm gục ngã. Một rương thánh tích có ếm bùa trồi lên trên bệ đá. Hãy cạy khóa để giành chiến lợi phẩm.",
-      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
-      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
-      "riteSequencePlaying": "The shrines replay the rite. Wait.",
-      "riteCorrect": "A soft chime answers your touch.",
-      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
-      "riteReliquaryOpen": "The Drowned Reliquary opens.",
-      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
-      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Một cầu thang dẫn lên mặt đất mở ra. Nhấn F tại cầu thang để rời đi.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Quét sạch căn phòng.",
@@ -2242,13 +2265,6 @@ export const vi_VN: EnTranslations = {
       "tombstoneHint": "Một lối đi bia mộ mở ra về phía bắc khi căn phòng được quét sạch.",
       "tombstoneOpen": "Một lối đi bia mộ bị niêm phong rền rĩ mở ra về phía bắc. Hãy bước vào để tiếp tục.",
       "tombstoneInto": "Bạn đi xuyên qua bia mộ vào {name}.",
-      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
-      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
-      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
-      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
-      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
-      "ropesSealed": "You should try pulling the bell ropes.",
-      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Chiếc rương trống rỗng.",
       "notInDelve": "Bạn không ở trong một hầm thám hiểm.",
       "cannotInteract": "Bạn không thể tương tác với thứ đó.",
@@ -2267,12 +2283,9 @@ export const vi_VN: EnTranslations = {
       "passageSealed": "Lối đi đã bị niêm phong.",
       "moveCloserPassage": "Hãy lại gần lối đi hơn.",
       "moveCloserChest": "Hãy lại gần chiếc rương hơn.",
-      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Không còn gì để lấy.",
       "wayOutNotOpen": "Lối ra vẫn chưa mở.",
-      "moveCloserStairs": "Hãy lại gần cầu thang hơn.",
-      "nhaliaCantorShield": "Cantors, hold the note!",
-      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
+      "moveCloserStairs": "Hãy lại gần cầu thang hơn."
     },
     "lockpick": {
       "lockYields": "Ổ khóa bật mở! Chiến lợi phẩm {tier}.",
@@ -2335,26 +2348,6 @@ export const vi_VN: EnTranslations = {
       "abandoned": "Bạn nhẹ nhàng rút cây cạy ra. Ổ khóa vẫn chờ đó."
     }
   },
-  "delveRiteUi": {
-    "title": "The Drowned Reliquary Rite",
-    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
-    "easy": "Easy",
-    "medium": "Medium",
-    "hard": "Hard",
-    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
-    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
-    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
-    "showsTimes": "Sequence shown {count} times",
-    "showsOnce": "Sequence shown once",
-    "symbols": "{count} symbols",
-    "tries": "{count} tries",
-    "reward": {
-      "easy": "Modest spoils",
-      "medium": "Rich spoils",
-      "hard": "Premium spoils"
-    },
-    "closeAria": "Close"
-  },
   "delveUi": {
     "board": {
       "title": "Bảng Hang Sâu",
@@ -2364,7 +2357,6 @@ export const vi_VN: EnTranslations = {
       "openDelveAria": "Mở Bảng Hang Sâu từ {name}",
       "marks": "Huy Hiệu Hang Sâu: {count}",
       "minLevel": "Yêu cầu Cấp {level}",
-      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Thường",
         "heroic": "Anh Hùng"
@@ -2372,7 +2364,6 @@ export const vi_VN: EnTranslations = {
       "companion": {
         "pick": "Chọn một đồng hành",
         "tessa": "Tu Sinh Tessa",
-        "edda": "Edda Reedhand",
         "rank": "Cấp {rank}",
         "boon": "Chữa lành cho tổ đội giữa các trận đánh. Bậc 3 hồi sinh một đồng minh ngã xuống một lần mỗi lượt chạy.",
         "upgrade": "Nâng lên Cấp {rank} ({marks} Huy Hiệu)",
@@ -2398,11 +2389,7 @@ export const vi_VN: EnTranslations = {
       "complete": "Hoàn Thành",
       "marks": "Huy Hiệu Hang Sâu: {count}",
       "exitHintOpen": "Bước vào lối đi bia mộ (hướng bắc)",
-      "exitHintLocked": "Dọn sạch quái lính để mở lối đi về hướng bắc",
-      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
-      "ritePlayback": "Watch the shrines: memorize the order they light up",
-      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
-      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
+      "exitHintLocked": "Dọn sạch quái lính để mở lối đi về hướng bắc"
     },
     "objective": {
       "kill_boss": "Hạ gục {boss}",
@@ -2423,54 +2410,27 @@ export const vi_VN: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Hộp thánh tích bên dưới lại dịch chuyển lần nữa. Chúng tôi nghe tiếng tụng kinh xuyên qua nền nhà sau nửa đêm, và Tu Sinh Tessa thề rằng những cuốn sổ tang lễ đang tự thay đổi mực của chính chúng. Nếu ngươi đủ can đảm, {playerName}, hãy cầm một cây nến và đi xuống dưới. Đừng tin mọi giọng nói ngươi nghe thấy dưới đó. Một vài trong số chúng đã biết tên ngươi từ trước khi ngươi chào đời."
-      },
-      "halvenMarsh": {
-        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "Lối cầu thang lạnh lẽo và tối tăm. Những phiến đá thánh vỡ vụn rải khắp đường xuống, và một nốt chuông khẽ vang treo lơ lửng trong bầu không khí ẩm ướt. Tu Sinh Tessa thì thầm, \"Hộp thánh tích lẽ ra không nên mở rộng đến vậy. Bám sát ta nhé, {playerName}.\"",
-      "heroic": "Cánh cửa rên rỉ đóng sập sau lưng ngươi. Những cái tên cào lên đá như móng tay. Cây nến của Tessa cháy lên màu xanh lam. \"Giờ chúng không gọi kẻ chết nữa, {playerName}. Chúng đang đáp lại thứ gì đó.\"",
-      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
-      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
+      "heroic": "Cánh cửa rên rỉ đóng sập sau lưng ngươi. Những cái tên cào lên đá như móng tay. Cây nến của Tessa cháy lên màu xanh lam. \"Giờ chúng không gọi kẻ chết nữa, {playerName}. Chúng đang đáp lại thứ gì đó.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Nước rỉ qua những giá kệ chôn cất, cuốn theo tro tàn cổ xưa thành những dòng đen ánh bạc.",
       "reliquary_bell_niche": "Hàng chục chiếc chuông tay treo trong im lặng, mỗi chiếc buộc một dải vải tang.",
       "reliquary_saintless_hall": "Những bức tượng với khuôn mặt bị đục đi bằng sự căm hờn cẩn trọng.",
-      "reliquary_finale": "Chiếc chuông bị chôn ngân lên một lần dưới đôi ủng của ngươi.",
-      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
-      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
-      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
-      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
-      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
-      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
-      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
+      "reliquary_finale": "Chiếc chuông bị chôn ngân lên một lần dưới đôi ủng của ngươi."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Hầm Xương Chìm",
       "reliquary_bell_niche": "Hốc Chuông",
       "reliquary_saintless_hall": "Sảnh Không Thánh",
-      "reliquary_finale": "Căn Phòng Chôn Chuông",
-      "litany_sluice": "The Crescent Sluice",
-      "litany_ledger": "The Island Ledger",
-      "litany_ring": "The Ring Reliquary",
-      "litany_baptistry": "The Sinkhole Baptistry",
-      "litany_choir_loft": "The Reedsong Gallery",
-      "litany_causeway": "The Y-Split Causeway",
-      "litany_apse": "The Drowned Apse"
-    },
-    "object": {
-      "sluice_valve": "Sluice Valve",
-      "grave_tablet": "Grave Tablet",
-      "corpse_candle": "Corpse-Candle",
-      "bell_rope": "Bell Rope"
+      "reliquary_finale": "Căn Phòng Chôn Chuông"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
-        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Giữ vững chân, {playerName}. Kẻ chết nơi đây không yên nghỉ.",
         "low_hp": "Hít thở đi. Ta vẫn còn những lời nguyện cầu dành cho ngươi.",
         "trap_spotted": "Khoan đã. Có thứ gì đó trong nền nhà nhớ rõ tiếng bước chân.",
@@ -2482,20 +2442,6 @@ export const vi_VN: EnTranslations = {
           "3": "Tu Sinh Hộp Thánh Tích",
           "4": "Chứng Nhân Gọi Mồ",
           "5": "Người Trông Coi Giáo Đường"
-        }
-      },
-      "edda": {
-        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
-        "ally_revive": "Up, now. The marsh does not get you today.",
-        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
-        "low_hp": "Steady. My lantern is not out yet.",
-        "trap_spotted": "Wait. The reeds are wrong here.",
-        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
-        "completion": "The fen can swallow its secrets for one more night.",
-        "rank": {
-          "1": "Lantern-Bearer",
-          "2": "Reed-Watcher",
-          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2539,10 +2485,7 @@ export const vi_VN: EnTranslations = {
       "flooded_paths": "Lối Đi Ngập Nước",
       "grave_tax": "Thuế Mộ Phần",
       "unstable_roof": "Mái Vòm Bất Ổn",
-      "cult_remnants": "Tàn Dư Giáo Phái",
-      "high_water": "High Water",
-      "lively_choir": "Lively Choir",
-      "belligerent_dead": "Belligerent Dead"
+      "cult_remnants": "Tàn Dư Giáo Phái"
     },
     "blessing": {
       "chapel_candle": "Nến Nguyện Đường: lượt chạy an toàn hơn, giảm một Dấu Ấn khi hoàn thành."
@@ -3555,13 +3498,16 @@ export const vi_VN: EnTranslations = {
     },
     "cast": {
       "fishing": "Câu Cá",
-      "demonHeal": "Quỷ Trị Liệu"
+      "demonHeal": "Quỷ Trị Liệu",
+      "thunzharrStormcall": "Tiếng Gọi Bão"
     }
   },
   "questUi": {
     "tracker": {
       "title": "Nhiệm Vụ",
-      "complete": "Hoàn Thành"
+      "complete": "Hoàn Thành",
+      "showOnMap": "Show {name} on the map",
+      "hideFromMap": "Hide {name} from the map"
     },
     "log": {
       "title": "Nhật Ký Nhiệm Vụ",
@@ -5371,69 +5317,6 @@ export const vi_VN: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Mũ Trùm Bóng Tối của Varric"
       },
-      "siltguard_helm": {
-        "name": "Siltguard Helm"
-      },
-      "bulwark_rusted_pauldrons": {
-        "name": "Bulwark-Rusted Pauldrons"
-      },
-      "nhalias_bell_maul": {
-        "name": "Nhalia's Bell-Maul"
-      },
-      "reedstalker_jerkin": {
-        "name": "Reedstalker Jerkin"
-      },
-      "mirejaw_fang_knife": {
-        "name": "Mirejaw Fang-Knife"
-      },
-      "widow_silk_hood": {
-        "name": "Widow-Silk Hood"
-      },
-      "cantors_drowned_sash": {
-        "name": "Cantor's Drowned Sash"
-      },
-      "corpse_candle_focus": {
-        "name": "Corpse-Candle Focus"
-      },
-      "nhalias_litany_rod": {
-        "name": "Nhalia's Litany Rod"
-      },
-      "blackwater_vanguard_chest": {
-        "name": "Blackwater Vanguard Chestguard"
-      },
-      "siltstep_leggings": {
-        "name": "Siltstep Leggings"
-      },
-      "sunken_reliquary_hood": {
-        "name": "Sunken Reliquary Hood"
-      },
-      "litany_legs": {
-        "name": "Silt-Walker Greaves"
-      },
-      "litany_shoulder": {
-        "name": "Blackwater Drift Mantle"
-      },
-      "litany_gloves_rog": {
-        "name": "Reed-Bound Handwraps"
-      },
-      "litany_plate_chest": {
-        "name": "Sump-Warden Cuirass"
-      },
-      "litany_leather_chest": {
-        "name": "Silt-Deep Vestment"
-      },
-      "litany_cloth_chest": {
-        "name": "Choir-Drowned Raiment"
-      },
-      "litany_helm": {
-        "name": "Reliquant's Drowned Cowl"
-      },
-      "sister_nhalia_choir_plate": {
-        "name": "Sister Nhalia's Choir-Forged Plate"
-      },
-      "drowned_choir_fang": {
-        "name": "Drowned Choir-Fang"
-      },
       "the_codfather": {
         "name": "Cá Bố Già"
       },
@@ -5553,6 +5436,30 @@ export const vi_VN: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "Crôm Tiên Phong"
+      },
+      "crownforged_gauntlets": {
+        "name": "Găng Tay Rèn Vương Miện"
+      },
+      "nighttalon_grips": {
+        "name": "Bao Tay Dạ Trảo"
+      },
+      "soulflame_gloves": {
+        "name": "Găng Tay Hồn Hỏa"
+      },
+      "stormcallers_handguards": {
+        "name": "Hộ Thủ của Triệu Bão Sư"
+      },
+      "crownforged_girdle": {
+        "name": "Đai Lưng Rèn Vương Miện"
+      },
+      "nighttalon_waistband": {
+        "name": "Đai Lưng Dạ Trảo"
+      },
+      "soulflame_cord": {
+        "name": "Dây Lưng Hồn Hỏa"
+      },
+      "stormcallers_waistguard": {
+        "name": "Hộ Yêu của Triệu Bão Sư"
       }
     },
     "mobs": {
@@ -5745,38 +5652,11 @@ export const vi_VN: EnTranslations = {
       "acolyte_tessa": {
         "name": "Tế Đồ Tessa"
       },
-      "drowned_cantor": {
-        "name": "Drowned Cantor"
+      "thunzharr_waking_peak": {
+        "name": "Thunzharr, the Waking Peak"
       },
-      "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
-      },
-      "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
-      },
-      "mirefen_widowling": {
-        "name": "Mirefen Widowling"
-      },
-      "spider_egg_sac": {
-        "name": "Spider Egg-Sac"
-      },
-      "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
-      },
-      "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
-      },
-      "choir_thrall": {
-        "name": "Bog Thrall"
-      },
-      "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
-      },
-      "edda_reedhand": {
-        "name": "Edda Reedhand"
-      },
-      "tolling_bell": {
-        "name": "Tolling Bell"
+      "thunzharr_stormling": {
+        "name": "Roused Stormling"
       },
       "ironvein_foreman": {
         "name": "Quản Đốc Mạch Sắt"
@@ -5997,11 +5877,6 @@ export const vi_VN: EnTranslations = {
         "name": "Tu Huynh Halven",
         "title": "Người Giữ Thánh Tích",
         "greeting": "Hầm thánh tích bên dưới lại dịch chuyển lần nữa."
-      },
-      "brother_halven_marsh": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6442,6 +6317,36 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Da Thú Rình Sườn Núi"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "The Stalkers Return",
+        "text": "Twelve dead, and the ridge crawls thicker than the day you started, {playerName}. Beasts do not throw themselves at a wall out of hunger. Something on the high ridge is pushing them down, and until I know what, the culling does not stop. Fourteen more.",
+        "completion": "Fourteen more, and still my patrols count fresh tracks by morning. My scout came back from the high ridge white as the snowline: prints the size of a shield, she says, and old kills no stalker would leave. Whatever walks up there is no ordinary cat.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker slain"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "Cloaks for the Watch",
+        "text": "Eight pelts lined the officers' cloaks, and now every soldier on the wall wants the same, {playerName}. They are right to want it: winter takes fingers first and apologies never. Ten more pelts from the ridges south of the gate, and the whole watch sleeps warm.",
+        "completion": "Ten good pelts, thick as any I have... no, look at these, {playerName}. Torn, half of them, and by no blade or spear. Claw marks wide as my hand, right through the winter coat. Something on that ridge is savaging its own kind.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker Pelt"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "Old Cragmaw",
+        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.",
+        "completion": "Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, {playerName}, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.",
+        "objectives": {
+          "0": {
+            "label": "Old Cragmaw slain"
           }
         }
       },
@@ -6967,11 +6872,6 @@ export const vi_VN: EnTranslations = {
         "name": "Thánh Tích Sụp Đổ",
         "enterText": "Bạn đi xuống thánh tích sụp đổ.",
         "leaveText": "Bạn trèo trở lại chỗ Tu Huynh Halven tại tàn tích thánh tích."
-      },
-      "drowned_litany": {
-        "name": "The Drowned Litany",
-        "enterText": "You descend into the drowned shrine at the marsh's edge.",
-        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "itemSets": {
@@ -6987,8 +6887,8 @@ export const vi_VN: EnTranslations = {
       },
       "necromancers": {
         "name": "Áo choàng pháp sư gọi hồn",
-        "bonus2": "Giảm 50% độ lùi khi niệm phép do sát thương.",
-        "bonus3": "Sát thương nhận vào không làm chậm niệm phép."
+        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus3": "Tăng trí tuệ thêm 10 và thể lực thêm 10."
       },
       "nighttalon": {
         "name": "Bộ da Móng Đêm",
@@ -6997,13 +6897,13 @@ export const vi_VN: EnTranslations = {
       },
       "soulflame": {
         "name": "Áo choàng Lửa Linh Hồn",
-        "bonus2": "Giảm 50% độ lùi khi niệm phép do sát thương.",
-        "bonus3": "Sát thương nhận vào không làm chậm niệm phép."
+        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus3": "Tăng trí tuệ thêm 15 và tinh thần thêm 15."
       },
       "stormcallers": {
         "name": "Áo choàng Gọi Bão",
-        "bonus2": "Giảm 50% độ lùi khi niệm phép do sát thương.",
-        "bonus3": "Sát thương nhận vào không làm chậm niệm phép."
+        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus3": "Tăng trí tuệ thêm 15 và tinh thần thêm 15."
       },
       "wyrmshadow": {
         "name": "Bộ Bóng Wyrm",
@@ -7019,11 +6919,6 @@ export const vi_VN: EnTranslations = {
     "dungeonInstanceBusy": "Tất cả các phiên bản của {name} đang bận. Hãy thử lại sau.",
     "delveLockedChestInteract": "Nhấn F để cạy khóa",
     "delveRewardChestInteract": "Nhấn F để nhận chiến lợi phẩm",
-    "delveSurfaceExitInteract": "Nhấn F để leo lên",
-    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
-    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
-    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
-    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveSurfaceExitInteract": "Nhấn F để leo lên"
   }
 };

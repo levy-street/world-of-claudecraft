@@ -202,7 +202,11 @@ export const sv_SE: EnTranslations = {
       "spinResult": "+{points} poäng",
       "spinButton": "Snurra",
       "tasks": "Uppgifter",
+      "taskMultiplier": "x{multiplier} multiplier",
+      "pointsGained": "{points} daily rewards points gained.",
       "leaderboard": "Daglig topplista",
+      "totalPlayer": "{count} player today",
+      "totalPlayers": "{count} players today",
       "history": "Tidigare vinnare",
       "noLeaders": "Inga poäng ännu.",
       "noHistory": "Inga utbetalningar ännu.",
@@ -386,9 +390,11 @@ export const sv_SE: EnTranslations = {
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showDevBadges": "Visa utvecklarmärken",
+      "showOwnNameplate": "Show My Nameplate",
       "uiScale": "Gränssnittsskala",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
+      "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Markriktmedel",
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
@@ -821,6 +827,9 @@ export const sv_SE: EnTranslations = {
         "nature": "Natur"
       }
     },
+    "worldBoss": {
+      "spawn": "{name} rises over Thornpeak Heights!"
+    },
     "loot": {
       "chestTitle": "Kista"
     },
@@ -831,6 +840,16 @@ export const sv_SE: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "Level {level} {family}",
+      "familyDemon": "Demon",
+      "hostile": "Hostile",
+      "friendly": "Friendly"
+    },
+    "targetFrame": {
+      "unlock": "Move target frame",
+      "lock": "Lock target frame"
     },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}"
@@ -913,6 +932,7 @@ export const sv_SE: EnTranslations = {
       "memberSinceDays": "{days}d i Discord",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "Admin",
         "devs": "Utvecklare",
         "mods": "Moderator",
         "artists": "Konstnär"
@@ -1953,6 +1973,9 @@ export const sv_SE: EnTranslations = {
     "password": "Lösenord",
     "passwordError": "Ange ditt lösenord.",
     "passwordPlaceholder": "Ange lösenord",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "Please enter a valid email address.",
     "showPassword": "Visa lösenord",
     "hidePassword": "Dölj lösenord",
     "logIn": "Logga in",
@@ -1978,7 +2001,15 @@ export const sv_SE: EnTranslations = {
     "create": "Skapa",
     "twoFactorLabel": "Autentiseringskod",
     "twoFactorPlaceholder": "6-siffrig eller återställningskod",
-    "twoFactorHint": "Ange koden från din autentiseringsapp, eller en av dina återställningskoder."
+    "twoFactorHint": "Ange koden från din autentiseringsapp, eller en av dina återställningskoder.",
+    "recovery": {
+      "title": "Add a recovery email",
+      "body": "Set an email address so you can recover your account. We only use it to confirm you own this account if you ever need to reset your password.",
+      "save": "Save email",
+      "logOut": "Log out",
+      "invalid": "Please enter a valid email address.",
+      "failed": "Could not save your email. Please try again."
+    }
   },
   "wallet": {
     "label": "$WOC-plånbok",
@@ -2032,6 +2063,7 @@ export const sv_SE: EnTranslations = {
     "helpLinkedWithBalance": "Innehavarförmåner är aktiva. Plånboksappen är ansluten i den här webbläsaren.",
     "helpLinkedDisconnected": "Innehavarförmåner är aktiva. Anslut appen när du behöver signera eller spendera.",
     "helpLinkedDisconnectedWithBalance": "Innehavarförmåner är aktiva. Anslut appen när du behöver signera eller spendera.",
+    "extensionHelp": "To see a wallet here, keep a browser wallet extension such as Solflare Wallet active.",
     "flowConnect": "Välj en plånbok. Verifieringen fortsätter automatiskt.",
     "flowSign": "Signera verifieringsmeddelandet i din plånboksapp. Ingen transaktion eller SOL krävs.",
     "flowVerify": "Verifierar plånboksägande...",
@@ -2217,7 +2249,6 @@ export const sv_SE: EnTranslations = {
       "unknownTier": "Okänd fördjupningsnivå.",
       "levelRequired": "Du måste vara nivå {level} för att gå in i {name}.",
       "levelRequiredTier": "Du måste vara nivå {level} för att gå in i {name} på {tier}.",
-      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Alla instanser av {name} är upptagna. Försök igen snart.",
       "runFailed": "{name}-körningen misslyckades.",
       "complete": "{name} slutförd.",
@@ -2227,14 +2258,6 @@ export const sv_SE: EnTranslations = {
       "doorAlreadyOpen": "Dörren är redan öppen.",
       "companionRankUp": "{name} når rang {rank}.",
       "bossChest": "Bossen faller. En spärrad relikkista reser sig på podiet. Dyrka upp dess lås för att göra anspråk på ditt byte.",
-      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
-      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
-      "riteSequencePlaying": "The shrines replay the rite. Wait.",
-      "riteCorrect": "A soft chime answers your touch.",
-      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
-      "riteReliquaryOpen": "The Drowned Reliquary opens.",
-      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
-      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "En trappa till ytan öppnas. Tryck F vid trappan för att lämna.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Rensa rummet.",
@@ -2242,13 +2265,6 @@ export const sv_SE: EnTranslations = {
       "tombstoneHint": "En gravstenspassage öppnas mot norr när rummet är rensat.",
       "tombstoneOpen": "En förseglad gravstenspassage gnisslar upp mot norr. Gå in i den för att fortsätta.",
       "tombstoneInto": "Du passerar genom gravstenen in i {name}.",
-      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
-      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
-      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
-      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
-      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
-      "ropesSealed": "You should try pulling the bell ropes.",
-      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Kistan är tom.",
       "notInDelve": "Du befinner dig inte i en fördjupning.",
       "cannotInteract": "Du kan inte interagera med det.",
@@ -2267,12 +2283,9 @@ export const sv_SE: EnTranslations = {
       "passageSealed": "Passagen är förseglad.",
       "moveCloserPassage": "Gå närmare passagen.",
       "moveCloserChest": "Gå närmare kistan.",
-      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Det finns inget kvar att ta.",
       "wayOutNotOpen": "Vägen ut är inte öppen ännu.",
-      "moveCloserStairs": "Gå närmare trappan.",
-      "nhaliaCantorShield": "Cantors, hold the note!",
-      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
+      "moveCloserStairs": "Gå närmare trappan."
     },
     "lockpick": {
       "lockYields": "Låset ger vika! {tier} byte.",
@@ -2335,26 +2348,6 @@ export const sv_SE: EnTranslations = {
       "abandoned": "Du drar försiktigt ut dyrkarna igen. Låset väntar."
     }
   },
-  "delveRiteUi": {
-    "title": "The Drowned Reliquary Rite",
-    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
-    "easy": "Easy",
-    "medium": "Medium",
-    "hard": "Hard",
-    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
-    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
-    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
-    "showsTimes": "Sequence shown {count} times",
-    "showsOnce": "Sequence shown once",
-    "symbols": "{count} symbols",
-    "tries": "{count} tries",
-    "reward": {
-      "easy": "Modest spoils",
-      "medium": "Rich spoils",
-      "hard": "Premium spoils"
-    },
-    "closeAria": "Close"
-  },
   "delveUi": {
     "board": {
       "title": "Delve-tavla",
@@ -2364,7 +2357,6 @@ export const sv_SE: EnTranslations = {
       "openDelveAria": "Öppna delve-tavlan från {name}",
       "marks": "Delve-märken: {count}",
       "minLevel": "Kräver nivå {level}",
-      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroisk"
@@ -2372,7 +2364,6 @@ export const sv_SE: EnTranslations = {
       "companion": {
         "pick": "Välj en följeslagare",
         "tessa": "Akolyten Tessa",
-        "edda": "Edda Reedhand",
         "rank": "Rang {rank}",
         "boon": "Läker gruppen mellan strider. Rang 3 återupplivar en fallen allierad en gång per runda.",
         "upgrade": "Uppgradera till rang {rank} ({marks} Märken)",
@@ -2398,11 +2389,7 @@ export const sv_SE: EnTranslations = {
       "complete": "Slutförd",
       "marks": "Delve-märken: {count}",
       "exitHintOpen": "Gå in i gravstenspassagen (norrut)",
-      "exitHintLocked": "Rensa fiendepacket för att öppna passagen norrut",
-      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
-      "ritePlayback": "Watch the shrines: memorize the order they light up",
-      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
-      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
+      "exitHintLocked": "Rensa fiendepacket för att öppna passagen norrut"
     },
     "objective": {
       "kill_boss": "Dräp {boss}",
@@ -2423,54 +2410,27 @@ export const sv_SE: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Relikvariet där nere har förskjutits igen. Vi hör mässande genom golvet efter midnatt, och Akolyten Tessa svär på att begravningsliggarna ändrar sitt eget bläck. Om du har mod nog, {playerName}, ta ett ljus och gå ner. Lita inte på varje röst du hör där nere. Några av dem kände ditt namn innan du föddes."
-      },
-      "halvenMarsh": {
-        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "Trappuppgången är kall och mörk. Krossade helgonstenar täcker nedstigningen, och en mjuk klockton hänger i den fuktiga luften. Akolyten Tessa viskar: \"Relikvariet borde inte vara öppet så här långt ner. Håll dig nära, {playerName}.\"",
-      "heroic": "Dörrarna gnisslar igen bakom dig. Namn skrapar mot stenen som naglar. Tessas ljus brinner blått. \"De kallar inte på de döda nu, {playerName}. De svarar på något.\"",
-      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
-      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
+      "heroic": "Dörrarna gnisslar igen bakom dig. Namn skrapar mot stenen som naglar. Tessas ljus brinner blått. \"De kallar inte på de döda nu, {playerName}. De svarar på något.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Vatten sipprar genom gravhyllorna och bär gammal aska i silversvarta strömmar.",
       "reliquary_bell_niche": "Dussintals handklockor hänger i tystnad, var och en knuten med begravningstyg.",
       "reliquary_saintless_hall": "Statyer med ansikten bortmejslade med omsorgsfullt hat.",
-      "reliquary_finale": "Den begravda klockan ringer en gång under dina stövlar.",
-      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
-      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
-      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
-      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
-      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
-      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
-      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
+      "reliquary_finale": "Den begravda klockan ringer en gång under dina stövlar."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Det sjunkna benhuset",
       "reliquary_bell_niche": "Klocknischen",
       "reliquary_saintless_hall": "Den helgonlösa hallen",
-      "reliquary_finale": "Den klockbegravda kammaren",
-      "litany_sluice": "The Crescent Sluice",
-      "litany_ledger": "The Island Ledger",
-      "litany_ring": "The Ring Reliquary",
-      "litany_baptistry": "The Sinkhole Baptistry",
-      "litany_choir_loft": "The Reedsong Gallery",
-      "litany_causeway": "The Y-Split Causeway",
-      "litany_apse": "The Drowned Apse"
-    },
-    "object": {
-      "sluice_valve": "Sluice Valve",
-      "grave_tablet": "Grave Tablet",
-      "corpse_candle": "Corpse-Candle",
-      "bell_rope": "Bell Rope"
+      "reliquary_finale": "Den klockbegravda kammaren"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
-        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Håll fotfästet, {playerName}. De döda är rastlösa här.",
         "low_hp": "Andas. Jag har böner kvar åt dig.",
         "trap_spotted": "Vänta. Något i golvet minns fotsteg.",
@@ -2482,20 +2442,6 @@ export const sv_SE: EnTranslations = {
           "3": "Relikvarieakolyt",
           "4": "Gravropsvittne",
           "5": "Kapellväktare"
-        }
-      },
-      "edda": {
-        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
-        "ally_revive": "Up, now. The marsh does not get you today.",
-        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
-        "low_hp": "Steady. My lantern is not out yet.",
-        "trap_spotted": "Wait. The reeds are wrong here.",
-        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
-        "completion": "The fen can swallow its secrets for one more night.",
-        "rank": {
-          "1": "Lantern-Bearer",
-          "2": "Reed-Watcher",
-          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2539,10 +2485,7 @@ export const sv_SE: EnTranslations = {
       "flooded_paths": "Översvämmade gångar",
       "grave_tax": "Gravskatt",
       "unstable_roof": "Instabilt tak",
-      "cult_remnants": "Kultlämningar",
-      "high_water": "High Water",
-      "lively_choir": "Lively Choir",
-      "belligerent_dead": "Belligerent Dead"
+      "cult_remnants": "Kultlämningar"
     },
     "blessing": {
       "chapel_candle": "Kapelljus: säkrare runda, ett märke mindre vid slutförande."
@@ -3555,13 +3498,16 @@ export const sv_SE: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiske",
-      "demonHeal": "Demonläkning"
+      "demonHeal": "Demonläkning",
+      "thunzharrStormcall": "Stormrop"
     }
   },
   "questUi": {
     "tracker": {
       "title": "Uppdrag",
-      "complete": "Slutfört"
+      "complete": "Slutfört",
+      "showOnMap": "Show {name} on the map",
+      "hideFromMap": "Hide {name} from the map"
     },
     "log": {
       "title": "Uppdragslogg",
@@ -5371,69 +5317,6 @@ export const sv_SE: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Varrics skugghuva"
       },
-      "siltguard_helm": {
-        "name": "Siltguard Helm"
-      },
-      "bulwark_rusted_pauldrons": {
-        "name": "Bulwark-Rusted Pauldrons"
-      },
-      "nhalias_bell_maul": {
-        "name": "Nhalia's Bell-Maul"
-      },
-      "reedstalker_jerkin": {
-        "name": "Reedstalker Jerkin"
-      },
-      "mirejaw_fang_knife": {
-        "name": "Mirejaw Fang-Knife"
-      },
-      "widow_silk_hood": {
-        "name": "Widow-Silk Hood"
-      },
-      "cantors_drowned_sash": {
-        "name": "Cantor's Drowned Sash"
-      },
-      "corpse_candle_focus": {
-        "name": "Corpse-Candle Focus"
-      },
-      "nhalias_litany_rod": {
-        "name": "Nhalia's Litany Rod"
-      },
-      "blackwater_vanguard_chest": {
-        "name": "Blackwater Vanguard Chestguard"
-      },
-      "siltstep_leggings": {
-        "name": "Siltstep Leggings"
-      },
-      "sunken_reliquary_hood": {
-        "name": "Sunken Reliquary Hood"
-      },
-      "litany_legs": {
-        "name": "Silt-Walker Greaves"
-      },
-      "litany_shoulder": {
-        "name": "Blackwater Drift Mantle"
-      },
-      "litany_gloves_rog": {
-        "name": "Reed-Bound Handwraps"
-      },
-      "litany_plate_chest": {
-        "name": "Sump-Warden Cuirass"
-      },
-      "litany_leather_chest": {
-        "name": "Silt-Deep Vestment"
-      },
-      "litany_cloth_chest": {
-        "name": "Choir-Drowned Raiment"
-      },
-      "litany_helm": {
-        "name": "Reliquant's Drowned Cowl"
-      },
-      "sister_nhalia_choir_plate": {
-        "name": "Sister Nhalia's Choir-Forged Plate"
-      },
-      "drowned_choir_fang": {
-        "name": "Drowned Choir-Fang"
-      },
       "the_codfather": {
         "name": "Torskfadern"
       },
@@ -5553,6 +5436,30 @@ export const sv_SE: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "Förtrupp krom"
+      },
+      "crownforged_gauntlets": {
+        "name": "Kronsmidda handskar"
+      },
+      "nighttalon_grips": {
+        "name": "Nattklogrepp"
+      },
+      "soulflame_gloves": {
+        "name": "Själslågshandskar"
+      },
+      "stormcallers_handguards": {
+        "name": "Stormkallarens handskydd"
+      },
+      "crownforged_girdle": {
+        "name": "Kronsmitt bälte"
+      },
+      "nighttalon_waistband": {
+        "name": "Nattklobälte"
+      },
+      "soulflame_cord": {
+        "name": "Själslågssnöre"
+      },
+      "stormcallers_waistguard": {
+        "name": "Stormkallarens midjeskydd"
       }
     },
     "mobs": {
@@ -5745,38 +5652,11 @@ export const sv_SE: EnTranslations = {
       "acolyte_tessa": {
         "name": "Akolyten Tessa"
       },
-      "drowned_cantor": {
-        "name": "Drowned Cantor"
+      "thunzharr_waking_peak": {
+        "name": "Thunzharr, the Waking Peak"
       },
-      "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
-      },
-      "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
-      },
-      "mirefen_widowling": {
-        "name": "Mirefen Widowling"
-      },
-      "spider_egg_sac": {
-        "name": "Spider Egg-Sac"
-      },
-      "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
-      },
-      "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
-      },
-      "choir_thrall": {
-        "name": "Bog Thrall"
-      },
-      "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
-      },
-      "edda_reedhand": {
-        "name": "Edda Reedhand"
-      },
-      "tolling_bell": {
-        "name": "Tolling Bell"
+      "thunzharr_stormling": {
+        "name": "Roused Stormling"
       },
       "ironvein_foreman": {
         "name": "Järnådersförman"
@@ -5997,11 +5877,6 @@ export const sv_SE: EnTranslations = {
         "name": "Broder Halven",
         "title": "Relikvarievaktare",
         "greeting": "Relikvariet där nere har förskjutits igen."
-      },
-      "brother_halven_marsh": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6442,6 +6317,36 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Bergskamssmygarskinn"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "The Stalkers Return",
+        "text": "Twelve dead, and the ridge crawls thicker than the day you started, {playerName}. Beasts do not throw themselves at a wall out of hunger. Something on the high ridge is pushing them down, and until I know what, the culling does not stop. Fourteen more.",
+        "completion": "Fourteen more, and still my patrols count fresh tracks by morning. My scout came back from the high ridge white as the snowline: prints the size of a shield, she says, and old kills no stalker would leave. Whatever walks up there is no ordinary cat.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker slain"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "Cloaks for the Watch",
+        "text": "Eight pelts lined the officers' cloaks, and now every soldier on the wall wants the same, {playerName}. They are right to want it: winter takes fingers first and apologies never. Ten more pelts from the ridges south of the gate, and the whole watch sleeps warm.",
+        "completion": "Ten good pelts, thick as any I have... no, look at these, {playerName}. Torn, half of them, and by no blade or spear. Claw marks wide as my hand, right through the winter coat. Something on that ridge is savaging its own kind.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker Pelt"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "Old Cragmaw",
+        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.",
+        "completion": "Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, {playerName}, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.",
+        "objectives": {
+          "0": {
+            "label": "Old Cragmaw slain"
           }
         }
       },
@@ -6967,11 +6872,6 @@ export const sv_SE: EnTranslations = {
         "name": "Det rasade relikvariet",
         "enterText": "Du stiger ner i det rasade relikvariet.",
         "leaveText": "Du klättrar tillbaka till broder Halven vid relikvarieruinen."
-      },
-      "drowned_litany": {
-        "name": "The Drowned Litany",
-        "enterText": "You descend into the drowned shrine at the marsh's edge.",
-        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "itemSets": {
@@ -6987,8 +6887,8 @@ export const sv_SE: EnTranslations = {
       },
       "necromancers": {
         "name": "Nekromantikerns skrud",
-        "bonus2": "Minskar kastfördröjning från skada med 50%.",
-        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
+        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus3": "Ökar intellekt med 10 och uthållighet med 10."
       },
       "nighttalon": {
         "name": "Nattklo läderutrustning",
@@ -6997,13 +6897,13 @@ export const sv_SE: EnTranslations = {
       },
       "soulflame": {
         "name": "Själsflammans skrud",
-        "bonus2": "Minskar kastfördröjning från skada med 50%.",
-        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
+        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus3": "Ökar intellekt med 15 och ande med 15."
       },
       "stormcallers": {
         "name": "Stormkallarens skrud",
-        "bonus2": "Minskar kastfördröjning från skada med 50%.",
-        "bonus3": "Skada du tar fördröjer inte dina besvärjelser."
+        "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
+        "bonus3": "Ökar intellekt med 15 och ande med 15."
       },
       "wyrmshadow": {
         "name": "Wyrmskuggans utrustning",
@@ -7019,11 +6919,6 @@ export const sv_SE: EnTranslations = {
     "dungeonInstanceBusy": "Alla instanser av {name} är upptagna. Försök igen snart.",
     "delveLockedChestInteract": "Tryck på F för att dyrka upp låset",
     "delveRewardChestInteract": "Tryck på F för att hämta bytet",
-    "delveSurfaceExitInteract": "Tryck på F för att klättra",
-    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
-    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
-    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
-    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveSurfaceExitInteract": "Tryck på F för att klättra"
   }
 };

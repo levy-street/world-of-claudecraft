@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { MOBS } from '../src/sim/data';
+import { arenaOrigin, MOBS } from '../src/sim/data';
+import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 
 const SEED = 5150;
 const makeSim = () => new Sim({ seed: SEED, playerClass: 'warrior' });
@@ -14,7 +15,9 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     const p = sim.entities.get(sim.playerId)!;
     p.gm = true; // an L19 elite would otherwise grind the warrior down mid-loop
     // flat starting ground (Eastbrook town) so the shove isn't terrain-clamped
-    p.pos.x = 2; p.pos.z = 0; p.pos.y = 0;
+    p.pos.x = 2;
+    p.pos.z = 0;
+    p.pos.y = 0;
     const tmpl = MOBS.marrowlord_varkas;
     const saved = tmpl.knockback!.chance;
     tmpl.knockback!.chance = 1; // force the proc; misses/dodges still possible
@@ -39,7 +42,9 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
   it('applyKnockback shoves the exact distance over open ground and reports it', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    p.pos.x = 2; p.pos.z = 0; p.pos.y = 0;
+    p.pos.x = 2;
+    p.pos.z = 0;
+    p.pos.y = 0;
     const mob = createMob(900701, MOBS.marrowlord_varkas, p.level, { x: 0, y: 0, z: 0 });
     const moved = (sim as any).applyKnockback(mob, p, 6);
     expect(moved).toBeGreaterThan(0);
@@ -50,7 +55,10 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
   it('a friendly pet swing (hostile=false) never knocks its target back', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    p.gm = true; p.pos.x = 2; p.pos.z = 0; p.pos.y = 0;
+    p.gm = true;
+    p.pos.x = 2;
+    p.pos.z = 0;
+    p.pos.y = 0;
     const tmpl = MOBS.marrowlord_varkas;
     const saved = tmpl.knockback!.chance;
     tmpl.knockback!.chance = 1;
@@ -65,10 +73,35 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     }
   });
 
+  it('a knockback aimed at a thin arena wall cannot tunnel the victim outside the pit', () => {
+    const sim = makeSim();
+    const p = sim.entities.get(sim.playerId)!;
+    // instance-local coordinates near the arena's +x side wall (centreline at
+    // DUNGEON_WALL_X, half-thickness 1): the player stands just inside it.
+    const o = arenaOrigin(0);
+    p.pos.x = o.x + DUNGEON_WALL_X - 1.1;
+    p.pos.z = o.z + 0;
+    p.pos.y = 0;
+    // mob on the far (-x) side of the player so the shove drives it straight
+    // into and, pre-fix, through the wall.
+    const mob = createMob(900704, MOBS.marrowlord_varkas, p.level, {
+      x: o.x + DUNGEON_WALL_X - 5,
+      y: 0,
+      z: o.z,
+    });
+    (sim as any).applyKnockback(mob, p, 8);
+    // the wall's outer face sits at DUNGEON_WALL_X + 1; the victim must never
+    // land past it, no matter how large the shove.
+    expect(p.pos.x).toBeLessThan(o.x + DUNGEON_WALL_X + 1);
+  });
+
   it('a mob without knockback never displaces the player', () => {
     const sim = makeSim();
     const p = sim.entities.get(sim.playerId)!;
-    p.gm = true; p.pos.x = 2; p.pos.z = 0; p.pos.y = 0;
+    p.gm = true;
+    p.pos.x = 2;
+    p.pos.z = 0;
+    p.pos.y = 0;
     const mob = createMob(900703, MOBS.forest_wolf, p.level, { x: 0, y: 0, z: 0 });
     const startGap = dist2d(p.pos, mob.pos);
     for (let i = 0; i < 40; i++) (sim as any).mobSwing(mob, p);

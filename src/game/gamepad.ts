@@ -112,6 +112,14 @@ export class GamepadManager {
     }
   }
 
+  private windowFocused(): boolean {
+    try {
+      return typeof document === 'undefined' || document.hasFocus();
+    } catch {
+      return true;
+    }
+  }
+
   private activePad(): Gamepad | null {
     if (this.index === null || typeof navigator === 'undefined') return null;
     const pad = navigator.getGamepads()[this.index];
@@ -132,6 +140,17 @@ export class GamepadManager {
     };
     const cur: boolean[] = [];
     for (let i = 0; i < STANDARD_BUTTON_COUNT; i++) cur[i] = pressed(i);
+
+    // Match keyboard and mouse, which the browser only delivers to a focused
+    // window: an unfocused window takes no pad input. Consume the button state
+    // without dispatching so a button held across a refocus does not fire a
+    // stale edge on return.
+    if (!this.windowFocused()) {
+      this.input.clearGamepadMove();
+      this.hideCursor();
+      this.prevPressed = cur;
+      return;
+    }
 
     this.checkRumble();
 

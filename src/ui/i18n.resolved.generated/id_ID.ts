@@ -202,7 +202,11 @@ export const id_ID: EnTranslations = {
       "spinResult": "+{points} poin",
       "spinButton": "Putar",
       "tasks": "Tugas",
+      "taskMultiplier": "x{multiplier} multiplier",
+      "pointsGained": "{points} daily rewards points gained.",
       "leaderboard": "Papan Peringkat Harian",
+      "totalPlayer": "{count} player today",
+      "totalPlayers": "{count} players today",
       "history": "Pemenang Sebelumnya",
       "noLeaders": "Belum ada poin.",
       "noHistory": "Belum ada pembayaran.",
@@ -386,9 +390,11 @@ export const id_ID: EnTranslations = {
       "showWalletOnCharacterScreen": "Tampilkan Dompet di Layar Karakter",
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
       "showDevBadges": "Tampilkan Lencana Pengembang",
+      "showOwnNameplate": "Show My Nameplate",
       "uiScale": "Skala UI",
       "highContrastBackground": "Latar Kontras Tinggi",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
+      "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Retikel bidik darat",
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
@@ -821,6 +827,9 @@ export const id_ID: EnTranslations = {
         "nature": "Alam"
       }
     },
+    "worldBoss": {
+      "spawn": "{name} rises over Thornpeak Heights!"
+    },
     "loot": {
       "chestTitle": "Peti"
     },
@@ -831,6 +840,16 @@ export const id_ID: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "Level {level} {family}",
+      "familyDemon": "Demon",
+      "hostile": "Hostile",
+      "friendly": "Friendly"
+    },
+    "targetFrame": {
+      "unlock": "Move target frame",
+      "lock": "Lock target frame"
     },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}"
@@ -913,6 +932,7 @@ export const id_ID: EnTranslations = {
       "memberSinceDays": "{days}h di Discord",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "Admin",
         "devs": "Pengembang",
         "mods": "Moderator",
         "artists": "Seniman"
@@ -1953,6 +1973,9 @@ export const id_ID: EnTranslations = {
     "password": "Kata Sandi",
     "passwordError": "Silakan masukkan kata sandimu.",
     "passwordPlaceholder": "Masukkan kata sandi",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "Please enter a valid email address.",
     "showPassword": "Tampilkan kata sandi",
     "hidePassword": "Sembunyikan kata sandi",
     "logIn": "Masuk",
@@ -1978,7 +2001,15 @@ export const id_ID: EnTranslations = {
     "create": "Buat",
     "twoFactorLabel": "Kode autentikasi",
     "twoFactorPlaceholder": "Kode 6 digit atau pemulihan",
-    "twoFactorHint": "Masukkan kode dari aplikasi autentikatormu, atau salah satu kode pemulihanmu."
+    "twoFactorHint": "Masukkan kode dari aplikasi autentikatormu, atau salah satu kode pemulihanmu.",
+    "recovery": {
+      "title": "Add a recovery email",
+      "body": "Set an email address so you can recover your account. We only use it to confirm you own this account if you ever need to reset your password.",
+      "save": "Save email",
+      "logOut": "Log out",
+      "invalid": "Please enter a valid email address.",
+      "failed": "Could not save your email. Please try again."
+    }
   },
   "wallet": {
     "label": "Dompet $WOC",
@@ -2032,6 +2063,7 @@ export const id_ID: EnTranslations = {
     "helpLinkedWithBalance": "Manfaat pemegang aktif. Aplikasi dompet terhubung di peramban ini.",
     "helpLinkedDisconnected": "Manfaat pemegang aktif. Hubungkan aplikasi saat Anda perlu menandatangani atau membelanjakan.",
     "helpLinkedDisconnectedWithBalance": "Manfaat pemegang aktif. Hubungkan aplikasi saat Anda perlu menandatangani atau membelanjakan.",
+    "extensionHelp": "To see a wallet here, keep a browser wallet extension such as Solflare Wallet active.",
     "flowConnect": "Pilih sebuah dompet. Verifikasi berlanjut secara otomatis.",
     "flowSign": "Tanda tangani pesan verifikasi di aplikasi dompet Anda. Tidak perlu transaksi atau SOL.",
     "flowVerify": "Memverifikasi kepemilikan dompet...",
@@ -2217,7 +2249,6 @@ export const id_ID: EnTranslations = {
       "unknownTier": "Tingkat delve tak dikenal.",
       "levelRequired": "Kamu harus mencapai level {level} untuk memasuki {name}.",
       "levelRequiredTier": "Kamu harus mencapai level {level} untuk memasuki {name} pada {tier}.",
-      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Semua instansi {name} sedang sibuk. Coba lagi sebentar lagi.",
       "runFailed": "Penjelajahan {name} gagal.",
       "complete": "{name} selesai.",
@@ -2227,14 +2258,6 @@ export const id_ID: EnTranslations = {
       "doorAlreadyOpen": "Pintu itu sudah terbuka.",
       "companionRankUp": "{name} mencapai peringkat {rank}.",
       "bossChest": "Bos tumbang. Sebuah peti relikui berpengaman muncul di mimbar. Bobol kuncinya untuk merebut rampasanmu.",
-      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
-      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
-      "riteSequencePlaying": "The shrines replay the rite. Wait.",
-      "riteCorrect": "A soft chime answers your touch.",
-      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
-      "riteReliquaryOpen": "The Drowned Reliquary opens.",
-      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
-      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Sebuah tangga menuju permukaan terbuka. Tekan F di tangga untuk pergi.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Bersihkan ruangan.",
@@ -2242,13 +2265,6 @@ export const id_ID: EnTranslations = {
       "tombstoneHint": "Sebuah lorong batu nisan terbuka ke utara saat ruangan dibersihkan.",
       "tombstoneOpen": "Sebuah lorong batu nisan tersegel berderak terbuka ke utara. Masuklah ke dalamnya untuk melanjutkan.",
       "tombstoneInto": "Kamu menembus batu nisan menuju {name}.",
-      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
-      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
-      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
-      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
-      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
-      "ropesSealed": "You should try pulling the bell ropes.",
-      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "Peti itu kosong.",
       "notInDelve": "Kamu tidak berada di dalam delve.",
       "cannotInteract": "Kamu tidak dapat berinteraksi dengan itu.",
@@ -2267,12 +2283,9 @@ export const id_ID: EnTranslations = {
       "passageSealed": "Lorong itu tersegel.",
       "moveCloserPassage": "Mendekatlah ke lorong.",
       "moveCloserChest": "Mendekatlah ke peti.",
-      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Tidak ada lagi yang bisa diambil.",
       "wayOutNotOpen": "Jalan keluar belum terbuka.",
-      "moveCloserStairs": "Mendekatlah ke tangga.",
-      "nhaliaCantorShield": "Cantors, hold the note!",
-      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
+      "moveCloserStairs": "Mendekatlah ke tangga."
     },
     "lockpick": {
       "lockYields": "Kunci terbuka! Rampasan {tier}.",
@@ -2335,26 +2348,6 @@ export const id_ID: EnTranslations = {
       "abandoned": "Anda menarik pengait keluar perlahan. Kunci pun menanti."
     }
   },
-  "delveRiteUi": {
-    "title": "The Drowned Reliquary Rite",
-    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
-    "easy": "Easy",
-    "medium": "Medium",
-    "hard": "Hard",
-    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
-    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
-    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
-    "showsTimes": "Sequence shown {count} times",
-    "showsOnce": "Sequence shown once",
-    "symbols": "{count} symbols",
-    "tries": "{count} tries",
-    "reward": {
-      "easy": "Modest spoils",
-      "medium": "Rich spoils",
-      "hard": "Premium spoils"
-    },
-    "closeAria": "Close"
-  },
   "delveUi": {
     "board": {
       "title": "Papan Delve",
@@ -2364,7 +2357,6 @@ export const id_ID: EnTranslations = {
       "openDelveAria": "Buka Papan Delve dari {name}",
       "marks": "Tanda Delve: {count}",
       "minLevel": "Membutuhkan Level {level}",
-      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroik"
@@ -2372,7 +2364,6 @@ export const id_ID: EnTranslations = {
       "companion": {
         "pick": "Pilih seorang pendamping",
         "tessa": "Akolit Tessa",
-        "edda": "Edda Reedhand",
         "rank": "Tingkat {rank}",
         "boon": "Menyembuhkan party di antara pertarungan. Peringkat 3 menghidupkan kembali sekutu yang tumbang sekali per penjelajahan.",
         "upgrade": "Tingkatkan ke Tingkat {rank} ({marks} Tanda)",
@@ -2398,11 +2389,7 @@ export const id_ID: EnTranslations = {
       "complete": "Selesai",
       "marks": "Tanda Delve: {count}",
       "exitHintOpen": "Masuki lorong batu nisan (utara)",
-      "exitHintLocked": "Bersihkan gerombolan musuh untuk membuka lorong di utara",
-      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
-      "ritePlayback": "Watch the shrines: memorize the order they light up",
-      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
-      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
+      "exitHintLocked": "Bersihkan gerombolan musuh untuk membuka lorong di utara"
     },
     "objective": {
       "kill_boss": "Bunuh {boss}",
@@ -2423,54 +2410,27 @@ export const id_ID: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "Relikuari di bawah telah bergeser lagi. Kami mendengar nyanyian melalui lantai sesudah tengah malam, dan Akolit Tessa bersumpah buku catatan pemakaman mengubah tintanya sendiri. Jika kau cukup berani, {playerName}, ambillah sebuah lilin dan turunlah ke bawah. Jangan percaya setiap suara yang kau dengar di bawah sana. Sebagian dari mereka mengetahui namamu sebelum kau lahir."
-      },
-      "halvenMarsh": {
-        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "Tangga itu dingin dan gelap. Pecahan batu santo berserakan di sepanjang turunan, dan nada lonceng yang lembut menggantung di udara lembap. Akolit Tessa berbisik, \"Relikuari ini seharusnya tidak terbuka sejauh ini. Tetaplah dekat, {playerName}.\"",
-      "heroic": "Pintu-pintu mengerang menutup di belakangmu. Nama-nama tergores di batu bagai kuku jari. Lilin Tessa menyala biru. \"Mereka tidak memanggil para mati sekarang, {playerName}. Mereka sedang menjawab sesuatu.\"",
-      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
-      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
+      "heroic": "Pintu-pintu mengerang menutup di belakangmu. Nama-nama tergores di batu bagai kuku jari. Lilin Tessa menyala biru. \"Mereka tidak memanggil para mati sekarang, {playerName}. Mereka sedang menjawab sesuatu.\""
     },
     "module": {
       "reliquary_sunken_ossuary": "Air merembes melalui rak pemakaman, membawa abu tua dalam aliran perak kehitaman.",
       "reliquary_bell_niche": "Puluhan lonceng tangan tergantung dalam sunyi, masing-masing diikat dengan kain pemakaman.",
       "reliquary_saintless_hall": "Patung-patung dengan wajah yang dipahat hilang dengan kebencian yang cermat.",
-      "reliquary_finale": "Lonceng terkubur berdentang sekali di bawah sepatu botmu.",
-      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
-      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
-      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
-      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
-      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
-      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
-      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
+      "reliquary_finale": "Lonceng terkubur berdentang sekali di bawah sepatu botmu."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "Osuarium Tenggelam",
       "reliquary_bell_niche": "Relung Lonceng",
       "reliquary_saintless_hall": "Aula Tanpa Santo",
-      "reliquary_finale": "Ruang Terkubur Lonceng",
-      "litany_sluice": "The Crescent Sluice",
-      "litany_ledger": "The Island Ledger",
-      "litany_ring": "The Ring Reliquary",
-      "litany_baptistry": "The Sinkhole Baptistry",
-      "litany_choir_loft": "The Reedsong Gallery",
-      "litany_causeway": "The Y-Split Causeway",
-      "litany_apse": "The Drowned Apse"
-    },
-    "object": {
-      "sluice_valve": "Sluice Valve",
-      "grave_tablet": "Grave Tablet",
-      "corpse_candle": "Corpse-Candle",
-      "bell_rope": "Bell Rope"
+      "reliquary_finale": "Ruang Terkubur Lonceng"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
-        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Jaga pijakanmu, {playerName}. Para mati gelisah di sini.",
         "low_hp": "Tarik napas. Aku masih menyimpan doa untukmu.",
         "trap_spotted": "Tahan. Ada sesuatu di lantai yang mengingat langkah kaki.",
@@ -2482,20 +2442,6 @@ export const id_ID: EnTranslations = {
           "3": "Akolit Relikuari",
           "4": "Saksi Panggilan Kubur",
           "5": "Penjaga Kapel"
-        }
-      },
-      "edda": {
-        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
-        "ally_revive": "Up, now. The marsh does not get you today.",
-        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
-        "low_hp": "Steady. My lantern is not out yet.",
-        "trap_spotted": "Wait. The reeds are wrong here.",
-        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
-        "completion": "The fen can swallow its secrets for one more night.",
-        "rank": {
-          "1": "Lantern-Bearer",
-          "2": "Reed-Watcher",
-          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2539,10 +2485,7 @@ export const id_ID: EnTranslations = {
       "flooded_paths": "Jalur Tergenang",
       "grave_tax": "Pajak Kubur",
       "unstable_roof": "Atap Rapuh",
-      "cult_remnants": "Sisa-sisa Kultus",
-      "high_water": "High Water",
-      "lively_choir": "Lively Choir",
-      "belligerent_dead": "Belligerent Dead"
+      "cult_remnants": "Sisa-sisa Kultus"
     },
     "blessing": {
       "chapel_candle": "Lilin Kapel: penjelajahan lebih aman, satu Tanda lebih sedikit saat tuntas."
@@ -3555,13 +3498,16 @@ export const id_ID: EnTranslations = {
     },
     "cast": {
       "fishing": "Memancing",
-      "demonHeal": "Penyembuhan Iblis"
+      "demonHeal": "Penyembuhan Iblis",
+      "thunzharrStormcall": "Panggilan Badai"
     }
   },
   "questUi": {
     "tracker": {
       "title": "Misi",
-      "complete": "Selesai"
+      "complete": "Selesai",
+      "showOnMap": "Show {name} on the map",
+      "hideFromMap": "Hide {name} from the map"
     },
     "log": {
       "title": "Catatan Misi",
@@ -5371,69 +5317,6 @@ export const id_ID: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Tudung Bayangan Varric"
       },
-      "siltguard_helm": {
-        "name": "Siltguard Helm"
-      },
-      "bulwark_rusted_pauldrons": {
-        "name": "Bulwark-Rusted Pauldrons"
-      },
-      "nhalias_bell_maul": {
-        "name": "Nhalia's Bell-Maul"
-      },
-      "reedstalker_jerkin": {
-        "name": "Reedstalker Jerkin"
-      },
-      "mirejaw_fang_knife": {
-        "name": "Mirejaw Fang-Knife"
-      },
-      "widow_silk_hood": {
-        "name": "Widow-Silk Hood"
-      },
-      "cantors_drowned_sash": {
-        "name": "Cantor's Drowned Sash"
-      },
-      "corpse_candle_focus": {
-        "name": "Corpse-Candle Focus"
-      },
-      "nhalias_litany_rod": {
-        "name": "Nhalia's Litany Rod"
-      },
-      "blackwater_vanguard_chest": {
-        "name": "Blackwater Vanguard Chestguard"
-      },
-      "siltstep_leggings": {
-        "name": "Siltstep Leggings"
-      },
-      "sunken_reliquary_hood": {
-        "name": "Sunken Reliquary Hood"
-      },
-      "litany_legs": {
-        "name": "Silt-Walker Greaves"
-      },
-      "litany_shoulder": {
-        "name": "Blackwater Drift Mantle"
-      },
-      "litany_gloves_rog": {
-        "name": "Reed-Bound Handwraps"
-      },
-      "litany_plate_chest": {
-        "name": "Sump-Warden Cuirass"
-      },
-      "litany_leather_chest": {
-        "name": "Silt-Deep Vestment"
-      },
-      "litany_cloth_chest": {
-        "name": "Choir-Drowned Raiment"
-      },
-      "litany_helm": {
-        "name": "Reliquant's Drowned Cowl"
-      },
-      "sister_nhalia_choir_plate": {
-        "name": "Sister Nhalia's Choir-Forged Plate"
-      },
-      "drowned_choir_fang": {
-        "name": "Drowned Choir-Fang"
-      },
       "the_codfather": {
         "name": "Sang Bapak Kod"
       },
@@ -5553,6 +5436,30 @@ export const id_ID: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "Vanguard Krom"
+      },
+      "crownforged_gauntlets": {
+        "name": "Sarung Tangan Tempaan Mahkota"
+      },
+      "nighttalon_grips": {
+        "name": "Cengkeraman Cakar Malam"
+      },
+      "soulflame_gloves": {
+        "name": "Sarung Tangan Api Jiwa"
+      },
+      "stormcallers_handguards": {
+        "name": "Pelindung Tangan Pemanggil Badai"
+      },
+      "crownforged_girdle": {
+        "name": "Sabuk Tempaan Mahkota"
+      },
+      "nighttalon_waistband": {
+        "name": "Ikat Pinggang Cakar Malam"
+      },
+      "soulflame_cord": {
+        "name": "Tali Pinggang Api Jiwa"
+      },
+      "stormcallers_waistguard": {
+        "name": "Pelindung Pinggang Pemanggil Badai"
       }
     },
     "mobs": {
@@ -5745,38 +5652,11 @@ export const id_ID: EnTranslations = {
       "acolyte_tessa": {
         "name": "Akolit Tessa"
       },
-      "drowned_cantor": {
-        "name": "Drowned Cantor"
+      "thunzharr_waking_peak": {
+        "name": "Thunzharr, the Waking Peak"
       },
-      "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
-      },
-      "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
-      },
-      "mirefen_widowling": {
-        "name": "Mirefen Widowling"
-      },
-      "spider_egg_sac": {
-        "name": "Spider Egg-Sac"
-      },
-      "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
-      },
-      "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
-      },
-      "choir_thrall": {
-        "name": "Bog Thrall"
-      },
-      "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
-      },
-      "edda_reedhand": {
-        "name": "Edda Reedhand"
-      },
-      "tolling_bell": {
-        "name": "Tolling Bell"
+      "thunzharr_stormling": {
+        "name": "Roused Stormling"
       },
       "ironvein_foreman": {
         "name": "Mandor Ironvein"
@@ -5997,11 +5877,6 @@ export const id_ID: EnTranslations = {
         "name": "Bruder Halven",
         "title": "Penjaga Relikuari",
         "greeting": "Relikuari di bawah bergeser lagi."
-      },
-      "brother_halven_marsh": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6442,6 +6317,36 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Kulit Ridge Stalker"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "The Stalkers Return",
+        "text": "Twelve dead, and the ridge crawls thicker than the day you started, {playerName}. Beasts do not throw themselves at a wall out of hunger. Something on the high ridge is pushing them down, and until I know what, the culling does not stop. Fourteen more.",
+        "completion": "Fourteen more, and still my patrols count fresh tracks by morning. My scout came back from the high ridge white as the snowline: prints the size of a shield, she says, and old kills no stalker would leave. Whatever walks up there is no ordinary cat.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker slain"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "Cloaks for the Watch",
+        "text": "Eight pelts lined the officers' cloaks, and now every soldier on the wall wants the same, {playerName}. They are right to want it: winter takes fingers first and apologies never. Ten more pelts from the ridges south of the gate, and the whole watch sleeps warm.",
+        "completion": "Ten good pelts, thick as any I have... no, look at these, {playerName}. Torn, half of them, and by no blade or spear. Claw marks wide as my hand, right through the winter coat. Something on that ridge is savaging its own kind.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker Pelt"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "Old Cragmaw",
+        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.",
+        "completion": "Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, {playerName}, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.",
+        "objectives": {
+          "0": {
+            "label": "Old Cragmaw slain"
           }
         }
       },
@@ -6967,11 +6872,6 @@ export const id_ID: EnTranslations = {
         "name": "Reliquary yang Runtuh",
         "enterText": "Kau menuruni reliquary yang runtuh.",
         "leaveText": "Kau memanjat kembali menuju Bruder Halven di reruntuhan reliquary."
-      },
-      "drowned_litany": {
-        "name": "The Drowned Litany",
-        "enterText": "You descend into the drowned shrine at the marsh's edge.",
-        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "itemSets": {
@@ -6987,8 +6887,8 @@ export const id_ID: EnTranslations = {
       },
       "necromancers": {
         "name": "Jubah ahli nujum",
-        "bonus2": "Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.",
-        "bonus3": "Kerusakan yang diterima tidak menunda perapalan sihir."
+        "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
+        "bonus3": "Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10."
       },
       "nighttalon": {
         "name": "Perlengkapan kulit Cakar Malam",
@@ -6997,13 +6897,13 @@ export const id_ID: EnTranslations = {
       },
       "soulflame": {
         "name": "Jubah Api Jiwa",
-        "bonus2": "Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.",
-        "bonus3": "Kerusakan yang diterima tidak menunda perapalan sihir."
+        "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
+        "bonus3": "Meningkatkan kecerdasan sebesar 15 dan roh sebesar 15."
       },
       "stormcallers": {
         "name": "Jubah Pemanggil Badai",
-        "bonus2": "Mengurangi dorongan balik sihir akibat kerusakan sebesar 50%.",
-        "bonus3": "Kerusakan yang diterima tidak menunda perapalan sihir."
+        "bonus2": "Kamu tidak dapat terpental (ketahanan pentalan 100%).",
+        "bonus3": "Meningkatkan kecerdasan sebesar 15 dan roh sebesar 15."
       },
       "wyrmshadow": {
         "name": "Perlengkapan Bayangan Wyrm",
@@ -7019,11 +6919,6 @@ export const id_ID: EnTranslations = {
     "dungeonInstanceBusy": "Semua instansi {name} sedang sibuk. Coba lagi sebentar lagi.",
     "delveLockedChestInteract": "Tekan F untuk membuka kunci",
     "delveRewardChestInteract": "Tekan F untuk mengklaim rampasan",
-    "delveSurfaceExitInteract": "Tekan F untuk memanjat",
-    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
-    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
-    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
-    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveSurfaceExitInteract": "Tekan F untuk memanjat"
   }
 };

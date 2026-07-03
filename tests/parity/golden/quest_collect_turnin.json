@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "d4bdc0c8",
+      "state": "f9c314cc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -38,10 +38,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -99,7 +101,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "442e8858",
+      "state": "3f7898f4",
       "events": "ca2e589b",
       "rng": {
         "draws": 0,
@@ -121,6 +123,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "questLog": [
             [
               "q_boars",
@@ -136,7 +139,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -194,7 +198,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "a060e799",
+      "state": "df8d58f1",
       "events": "0154d36a",
       "rng": {
         "draws": 0,
@@ -218,6 +222,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "inventory": [
             {
               "count": 5,
@@ -239,7 +244,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -297,7 +303,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "253eae18",
+      "state": "5f65515c",
       "events": "34ca5ddb",
       "rng": {
         "draws": 0,
@@ -321,6 +327,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "inventory": [
             {
               "count": 4,
@@ -342,7 +349,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -400,7 +408,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "b8bfc882",
+      "state": "510a443a",
       "events": "7e586572",
       "rng": {
         "draws": 0,
@@ -424,6 +432,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "inventory": [
             {
               "count": 5,
@@ -445,7 +454,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -503,7 +513,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "db0d5fcd",
+      "state": "038c85c9",
       "events": "921a0d90",
       "rng": {
         "draws": 0,
@@ -530,6 +540,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 350,
           "questsDone": [
             "q_boars"
@@ -538,6 +549,7 @@
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 350
         }
       ],
@@ -596,7 +608,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 391,
-      "state": "287b0f67",
+      "state": "3cf76777",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -623,6 +635,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 350,
           "questsDone": [
             "q_boars"
@@ -631,6 +644,7 @@
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 350
         }
       ],

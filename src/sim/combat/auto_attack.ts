@@ -27,7 +27,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, MOBS } from '../data';
+import { CLASSES, isArenaPos, MOBS } from '../data';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -62,13 +62,21 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (p.sitting) ctx.standUp(p);
   p.autoAttack = true;
   r.meta.lastActiveTick = ctx.tickCount; // starting auto-attack is a deliberate action
+  // Engaging MELEE auto-attack seeds aggro at once, because the swing lands almost
+  // immediately. Ranged auto-attack (wand / auto shot, up to 30-35yd) must NOT pre-aggro
+  // at engage: its threat comes from the shot LANDING (rangedSwing schedules a projectile
+  // whose impact aggros, like the spell it accompanies). Otherwise the "Attack on Ability
+  // Use" QoL, which engages auto-attack when you cast a damaging spell, pulls a distant
+  // mob the instant the cast starts, before anything lands.
   const d = dist2d(p.pos, t.pos);
-  const ranged = CLASSES[r.meta.cls].ranged;
-  const inAutoAttackRange = ranged
-    ? d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange) && ctx.hasLineOfSight(p, t)
-    : d <= MELEE_RANGE;
+  // The melee seed is additionally gated on no cast in progress: the swing loop is
+  // paused while casting (updatePlayerAutoAttack bails on castingAbility), so a
+  // mid-cast Attack press must not aggro an untouched mob (the aggro-before-damage
+  // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
+  // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
-    inAutoAttackRange &&
+    d <= MELEE_RANGE &&
+    !p.castingAbility &&
     t.kind === 'mob' &&
     t.hostile &&
     t.ownerId === null &&
@@ -113,6 +121,11 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     return;
   }
   if (d > MELEE_RANGE) return;
+  // Melee normally skips line of sight (it's always point-blank), but the
+  // arena's thin enclosing walls sit inside MELEE_RANGE: without this a
+  // combatant pressed against a wall could swing through it. See sibling
+  // logic in Sim.abilityNeedsLineOfSight.
+  if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
   ctx.breakGhostWolf(p);
 
   let bonus = 0;

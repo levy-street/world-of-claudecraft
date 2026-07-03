@@ -1,23 +1,25 @@
 # Section order. Reorder these lines to reorder the document. '#' lines are comments.
 00-title.html
+# Part I: the design
+01-part-design.html
 01-glance.html
 02-wheel.html
-03-conserved.html
-04-tiers.html
+03-ladder.html
 05-archetypes.html
-06-emergence.html
 07-combos.html
 08-warning.html
 09-jack.html
-10-adventuring.html
 11-outputs.html
 12-gear.html
 13-gathering.html
 14-monster.html
 15-tools.html
+# Part II: for contributors
+16-part-contributors.html
 16-fragility.html
 17-discarded.html
 18-future.html
+10-adventuring.html
 19-arch.html
 20-slices.html
 21-tbd.html

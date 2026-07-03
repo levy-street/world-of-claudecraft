@@ -150,3 +150,28 @@ describe('casting_lifecycle: determinism', () => {
     expect(run()).toEqual(run());
   });
 });
+
+describe('casting_lifecycle: physical ranged shots resolve on projectile impact (Aimed Shot)', () => {
+  it('deals no damage at cast completion; damage lands when the arrow arrives', () => {
+    const { sim, p, meta } = makeSim('hunter', 20);
+    p.resource = p.maxResource = 500;
+    const mob = spawnTarget(sim, p, 20, 20); // 20yd: within 35yd range, beyond the 8yd deadzone
+    const events: Array<Record<string, any>> = [];
+    const orig = (sim as any).emit.bind(sim);
+    (sim as any).emit = (e: Record<string, any>) => {
+      events.push(e);
+      orig(e);
+    };
+    const hp0 = mob.hp;
+    castAbility(sim.ctx, 'aimed_shot', p.id);
+    expect(p.castingAbility).toBe('aimed_shot');
+    drainCast(sim, p, meta); // run the 3s cast to completion (updateCasting only, no projectile step)
+    // The shot is LAUNCHED at cast completion, not landed: no damage yet, a bolt is in flight.
+    expect(mob.hp).toBe(hp0);
+    expect(events.some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(true);
+    // Advance ticks so the arrow travels and connects.
+    for (let i = 0; i < 60 && mob.hp === hp0; i++) sim.tick();
+    expect(mob.hp).toBeLessThan(hp0);
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Aimed Shot')).toBe(true);
+  });
+});

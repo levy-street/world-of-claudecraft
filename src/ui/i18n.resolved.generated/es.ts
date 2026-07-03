@@ -202,7 +202,11 @@ export const es: EnTranslations = {
       "spinResult": "+{points} puntos",
       "spinButton": "Girar",
       "tasks": "Tareas",
+      "taskMultiplier": "x{multiplier} multiplier",
+      "pointsGained": "{points} daily rewards points gained.",
       "leaderboard": "Clasificación diaria",
+      "totalPlayer": "{count} player today",
+      "totalPlayers": "{count} players today",
       "history": "Ganadores anteriores",
       "noLeaders": "Aún no hay puntos.",
       "noHistory": "Aún no hay pagos.",
@@ -386,9 +390,11 @@ export const es: EnTranslations = {
       "showWalletOnCharacterScreen": "Mostrar cartera en la pantalla de personajes",
       "showWalletOnPlayerCard": "Mostrar cartera en la tarjeta de jugador",
       "showDevBadges": "Mostrar insignias de desarrollador",
+      "showOwnNameplate": "Show My Nameplate",
       "uiScale": "Escala de la interfaz",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
+      "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Retícula de objetivo terrestre",
       "showItemLevel": "Mostrar nivel de objeto",
       "itemLevelLine": "Nivel de objeto {level}",
@@ -821,6 +827,9 @@ export const es: EnTranslations = {
         "nature": "Naturaleza"
       }
     },
+    "worldBoss": {
+      "spawn": "¡{name} se alza sobre las Alturas de Thornpeak!"
+    },
     "loot": {
       "chestTitle": "Cofre"
     },
@@ -831,6 +840,16 @@ export const es: EnTranslations = {
     "nameplate": {
       "mob": "[{level}] {name}",
       "mobElite": "[{level}+] {name}"
+    },
+    "mobTooltip": {
+      "levelFamily": "Nivel {level} {family}",
+      "familyDemon": "Demonio",
+      "hostile": "Hostil",
+      "friendly": "Amistoso"
+    },
+    "targetFrame": {
+      "unlock": "Move target frame",
+      "lock": "Lock target frame"
     },
     "itemTooltip": {
       "requiresLevel": "Requiere nivel {level}"
@@ -913,6 +932,7 @@ export const es: EnTranslations = {
       "memberSinceDays": "{days}d en el Discord",
       "roleTag": {
         "levyst": "Levy St",
+        "admin": "Admin",
         "devs": "Dev",
         "mods": "Mod",
         "artists": "Artista"
@@ -1953,6 +1973,9 @@ export const es: EnTranslations = {
     "password": "Contraseña",
     "passwordError": "Por favor, introduce tu contraseña.",
     "passwordPlaceholder": "Introduce tu contraseña",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "emailError": "Please enter a valid email address.",
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "logIn": "Iniciar Sesión",
@@ -1978,7 +2001,15 @@ export const es: EnTranslations = {
     "create": "Crear",
     "twoFactorLabel": "Código de autenticación",
     "twoFactorPlaceholder": "Código de 6 dígitos o de recuperación",
-    "twoFactorHint": "Introduce el código de tu app de autenticación, o uno de tus códigos de recuperación."
+    "twoFactorHint": "Introduce el código de tu app de autenticación, o uno de tus códigos de recuperación.",
+    "recovery": {
+      "title": "Add a recovery email",
+      "body": "Set an email address so you can recover your account. We only use it to confirm you own this account if you ever need to reset your password.",
+      "save": "Save email",
+      "logOut": "Log out",
+      "invalid": "Please enter a valid email address.",
+      "failed": "Could not save your email. Please try again."
+    }
   },
   "wallet": {
     "label": "Cartera $WOC",
@@ -2032,6 +2063,7 @@ export const es: EnTranslations = {
     "helpLinkedWithBalance": "Las ventajas de titular están activas. La app de cartera está conectada en este navegador.",
     "helpLinkedDisconnected": "Las ventajas de titular están activas. Conecta la app cuando necesites firmar o gastar.",
     "helpLinkedDisconnectedWithBalance": "Las ventajas de titular están activas. Conecta la app cuando necesites firmar o gastar.",
+    "extensionHelp": "To see a wallet here, keep a browser wallet extension such as Solflare Wallet active.",
     "flowConnect": "Elige una cartera. La verificación continúa automáticamente.",
     "flowSign": "Firma el mensaje de verificación en tu app de cartera. No requiere transacción ni SOL.",
     "flowVerify": "Verificando la propiedad de la cartera...",
@@ -2217,7 +2249,6 @@ export const es: EnTranslations = {
       "unknownTier": "Nivel de expedición desconocido.",
       "levelRequired": "Debes ser nivel {level} para entrar a {name}.",
       "levelRequiredTier": "Debes ser nivel {level} para entrar a {name} en {tier}.",
-      "partyTooLarge": "{name} is meant for solo or duo delves. Parties of {max} or more may not enter.",
       "instancesBusy": "Todas las instancias de {name} están ocupadas. Inténtalo de nuevo pronto.",
       "runFailed": "La incursión de {name} ha fracasado.",
       "complete": "{name} completado.",
@@ -2227,14 +2258,6 @@ export const es: EnTranslations = {
       "doorAlreadyOpen": "La puerta ya está abierta.",
       "companionRankUp": "{name} alcanza el rango {rank}.",
       "bossChest": "El jefe cae. Un cofre de relicario protegido se alza sobre el estrado: fuerza su cerradura para reclamar tu botín.",
-      "drownedLitanyReliquaryRise": "Sister Nhalia falls silent. The Drowned Reliquary rises from the blackwater. Approach it to begin the rite.",
-      "riteSequenceReady": "The shrines fall dark. Repeat the sequence.",
-      "riteSequencePlaying": "The shrines replay the rite. Wait.",
-      "riteCorrect": "A soft chime answers your touch.",
-      "riteWrong": "A harsh bell crack. Black water splashes at your feet.",
-      "riteReliquaryOpen": "The Drowned Reliquary opens.",
-      "riteReliquaryLocked": "Complete the shrine rite to open the reliquary.",
-      "riteReliquaryEmpty": "The reliquary is empty.",
       "surfaceStairs": "Se abre una escalera hacia la superficie. Pulsa F en las escaleras para salir.",
       "moduleEnter": "{name}: {objective}",
       "objectiveClearRoom": "Despeja la sala.",
@@ -2242,13 +2265,6 @@ export const es: EnTranslations = {
       "tombstoneHint": "Un pasaje de lápida se abre al norte cuando la sala queda despejada.",
       "tombstoneOpen": "Un pasaje de lápida sellado se abre con un chirrido al norte. Camina hacia él para continuar.",
       "tombstoneInto": "Atraviesas la lápida hacia {name}.",
-      "bellRopeShock": "The bell rope snaps taut. Drowned Cantors reel from the shock.",
-      "eggSacBurst": "The egg-sac bursts. Spiderlings skitter free across the baptistry rim.",
-      "baptistryEggs": "The baptistry falls quiet. Spider egg-sacs cling wetly to the rim.",
-      "baptistrySpidersSealed": "You should try to destroy the spider sacs.",
-      "puzzleSealed": "You need to open the seal by applying pressure somewhere in the room.",
-      "ropesSealed": "You should try pulling the bell ropes.",
-      "baptistryWave": "Something stirs in the black baptistry water.",
       "chestEmpty": "El cofre está vacío.",
       "notInDelve": "No estás en una expedición.",
       "cannotInteract": "No puedes interactuar con eso.",
@@ -2267,12 +2283,9 @@ export const es: EnTranslations = {
       "passageSealed": "El pasaje está sellado.",
       "moveCloserPassage": "Acércate al pasaje.",
       "moveCloserChest": "Acércate al cofre.",
-      "moveCloserReliquary": "Move closer to the reliquary.",
       "nothingToTake": "Ya no queda nada que llevarse.",
       "wayOutNotOpen": "La salida aún no está abierta.",
-      "moveCloserStairs": "Acércate a las escaleras.",
-      "nhaliaCantorShield": "Cantors, hold the note!",
-      "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
+      "moveCloserStairs": "Acércate a las escaleras."
     },
     "lockpick": {
       "lockYields": "¡La cerradura cede! Botín {tier}.",
@@ -2335,26 +2348,6 @@ export const es: EnTranslations = {
       "abandoned": "Sacas las ganzúas con cuidado. La cerradura aguarda."
     }
   },
-  "delveRiteUi": {
-    "title": "The Drowned Reliquary Rite",
-    "blurb": "The shrines will light in order. Repeat the sequence by activating each shrine in turn. A wrong touch fails the attempt and replays the sequence, a flawless attempt earns the richest spoils, and running out of tries opens the reliquary on its meanest. Choose how the rite tests you.",
-    "easy": "Easy",
-    "medium": "Medium",
-    "hard": "Hard",
-    "guideWatch": "After you choose, the four shrines light up one at a time. Memorize the order.",
-    "guideRepeat": "When the shrines fall dark, walk to each shrine and press F (Interact) in that same order.",
-    "guideStakes": "A wrong shrine splashes you with blackwater and costs a try. Complete the sequence to open the reliquary.",
-    "showsTimes": "Sequence shown {count} times",
-    "showsOnce": "Sequence shown once",
-    "symbols": "{count} symbols",
-    "tries": "{count} tries",
-    "reward": {
-      "easy": "Modest spoils",
-      "medium": "Rich spoils",
-      "hard": "Premium spoils"
-    },
-    "closeAria": "Close"
-  },
   "delveUi": {
     "board": {
       "title": "Tablón de Expediciones",
@@ -2364,7 +2357,6 @@ export const es: EnTranslations = {
       "openDelveAria": "Abrir el Tablón de Expediciones desde {name}",
       "marks": "Marcas de Expedición: {count}",
       "minLevel": "Requiere nivel {level}",
-      "partyTooLarge": "Solo or duo only ({max} players max)",
       "tier": {
         "normal": "Normal",
         "heroic": "Heroico"
@@ -2372,7 +2364,6 @@ export const es: EnTranslations = {
       "companion": {
         "pick": "Elige un compañero",
         "tessa": "Acólita Tessa",
-        "edda": "Edda Reedhand",
         "rank": "Rango {rank}",
         "boon": "Cura al grupo entre combates. El rango 3 revive a un aliado caído una vez por incursión.",
         "upgrade": "Mejorar al rango {rank} ({marks} Marcas)",
@@ -2398,11 +2389,7 @@ export const es: EnTranslations = {
       "complete": "Completado",
       "marks": "Marcas de Expedición: {count}",
       "exitHintOpen": "Entra al pasaje de lápida (norte)",
-      "exitHintLocked": "Despeja a los enemigos para abrir el pasaje al norte",
-      "riteChoose": "Approach the Drowned Reliquary and press F to begin the rite",
-      "ritePlayback": "Watch the shrines: memorize the order they light up",
-      "riteInput": "Press F at each shrine in the order they lit ({current}/{total})",
-      "riteOpen": "The reliquary is open: press F on it to claim your spoils"
+      "exitHintLocked": "Despeja a los enemigos para abrir el pasaje al norte"
     },
     "objective": {
       "kill_boss": "Da muerte a {boss}",
@@ -2423,54 +2410,27 @@ export const es: EnTranslations = {
     "npc": {
       "halven": {
         "greeting": "El relicario de abajo ha vuelto a desplazarse. Oímos cánticos a través del suelo después de medianoche, y la Acólita Tessa jura que los registros funerarios cambian su propia tinta. Si tienes valor suficiente, {playerName}, toma una vela y baja. No confíes en cada voz que oigas allá abajo. Algunas conocían tu nombre antes de que nacieras."
-      },
-      "halvenMarsh": {
-        "greeting": "The trail led north to the marsh, {playerName}. Another reliquary sings under the black water, and the drowned dead answer the bells. Acolyte Edda knows these reeds better than I do, stay close to her lantern. Choose your tier, and I will hold the rope until you return."
       }
     },
     "intro": {
       "normal": "La escalera es fría y oscura. Piedras de santos rotas cubren el descenso, y una suave nota de campana flota en el aire húmedo. La Acólita Tessa susurra: «El relicario no debería estar abierto hasta tan abajo. Quédate cerca, {playerName}.»",
-      "heroic": "Las puertas se cierran con un quejido a tu espalda. Los nombres raspan la piedra como uñas. La vela de Tessa arde azul. «Ya no están llamando a los muertos, {playerName}. Están respondiéndole a algo.»",
-      "litanyNormal": "Reed-choked stairs drop beneath Fenbridge. Edda Reedhand lifts her lantern. \"The marsh remembers every name they drowned, {playerName}. Stay in the light.\"",
-      "litanyHeroic": "Blackwater laps the causeway stones. Edda's flame gutters green. \"They are singing again below, {playerName}. Do not answer the choir.\""
+      "heroic": "Las puertas se cierran con un quejido a tu espalda. Los nombres raspan la piedra como uñas. La vela de Tessa arde azul. «Ya no están llamando a los muertos, {playerName}. Están respondiéndole a algo.»"
     },
     "module": {
       "reliquary_sunken_ossuary": "El agua se filtra por los estantes funerarios, arrastrando ceniza vieja en regueros de plata y negro.",
       "reliquary_bell_niche": "Decenas de campanillas cuelgan en silencio, cada una atada con paño funerario.",
       "reliquary_saintless_hall": "Estatuas con los rostros cincelados con cuidadoso odio.",
-      "reliquary_finale": "La campana enterrada tañe una vez bajo tus botas.",
-      "litany_sluice": "Moss-choked sluice gates drip blackwater into the old choir crypt.",
-      "litany_ledger": "Ledger islands rise from flooded channels, ink bleeding into the marsh.",
-      "litany_ring": "A reliquary ring loops around a sealed central font of black water.",
-      "litany_baptistry": "A sinkhole baptistry yawns beneath cracked saint-stones and egg-sacs.",
-      "litany_choir_loft": "Fanning choir lofts echo with rope-hung bells that never quite stop.",
-      "litany_causeway": "A Y-split causeway forks over waist-deep fen water.",
-      "litany_apse": "The drowned apse opens onto Sister Nhalia's altar island."
+      "reliquary_finale": "La campana enterrada tañe una vez bajo tus botas."
     },
     "moduleName": {
       "reliquary_sunken_ossuary": "El Osario Hundido",
       "reliquary_bell_niche": "La Hornacina de la Campana",
       "reliquary_saintless_hall": "La Sala sin Santos",
-      "reliquary_finale": "La Cámara de la Campana Enterrada",
-      "litany_sluice": "The Crescent Sluice",
-      "litany_ledger": "The Island Ledger",
-      "litany_ring": "The Ring Reliquary",
-      "litany_baptistry": "The Sinkhole Baptistry",
-      "litany_choir_loft": "The Reedsong Gallery",
-      "litany_causeway": "The Y-Split Causeway",
-      "litany_apse": "The Drowned Apse"
-    },
-    "object": {
-      "sluice_valve": "Sluice Valve",
-      "grave_tablet": "Grave Tablet",
-      "corpse_candle": "Corpse-Candle",
-      "bell_rope": "Bell Rope"
+      "reliquary_finale": "La Cámara de la Campana Enterrada"
     },
     "companion": {
       "barkLine": "{name}: {line}",
       "tessa": {
-        "run_start": "I have my candle and my ledger, {playerName}. Lead on.",
-        "ally_revive": "Up now. Tonight's ledger does not carry your name.",
         "combat_start": "Mantén el equilibrio, {playerName}. Los muertos están inquietos aquí.",
         "low_hp": "Respira. Aún me quedan plegarias para ti.",
         "trap_spotted": "Quieto, algo en el suelo recuerda las pisadas.",
@@ -2482,20 +2442,6 @@ export const es: EnTranslations = {
           "3": "Acólita del Relicario",
           "4": "Testigo de la Llamada de Tumba",
           "5": "Guardiana de la capilla"
-        }
-      },
-      "edda": {
-        "run_start": "Keep to the plank-line, {playerName}. The silt takes the proud-footed.",
-        "ally_revive": "Up, now. The marsh does not get you today.",
-        "combat_start": "Mind the blackwater, {playerName}. The marsh listens.",
-        "low_hp": "Steady. My lantern is not out yet.",
-        "trap_spotted": "Wait. The reeds are wrong here.",
-        "boss_pull": "That canticle knows your name, {playerName}. Do not sing back.",
-        "completion": "The fen can swallow its secrets for one more night.",
-        "rank": {
-          "1": "Lantern-Bearer",
-          "2": "Reed-Watcher",
-          "3": "Fenbridge Acolyte"
         }
       }
     },
@@ -2539,10 +2485,7 @@ export const es: EnTranslations = {
       "flooded_paths": "Senderos Inundados",
       "grave_tax": "Tributo de Tumba",
       "unstable_roof": "Techo Inestable",
-      "cult_remnants": "Restos del Culto",
-      "high_water": "High Water",
-      "lively_choir": "Lively Choir",
-      "belligerent_dead": "Belligerent Dead"
+      "cult_remnants": "Restos del Culto"
     },
     "blessing": {
       "chapel_candle": "Vela de capilla: una incursión más segura, una Marca menos al completarla."
@@ -3555,13 +3498,16 @@ export const es: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
-      "demonHeal": "Sanación demoníaca"
+      "demonHeal": "Sanación demoníaca",
+      "thunzharrStormcall": "Llamada de la tormenta"
     }
   },
   "questUi": {
     "tracker": {
       "title": "Misiones",
-      "complete": "Completada"
+      "complete": "Completada",
+      "showOnMap": "Mostrar {name} en el mapa",
+      "hideFromMap": "Ocultar {name} del mapa"
     },
     "log": {
       "title": "Diario de misiones",
@@ -5371,69 +5317,6 @@ export const es: EnTranslations = {
       "varric_shadow_cowl": {
         "name": "Capucha sombría de Varric"
       },
-      "siltguard_helm": {
-        "name": "Siltguard Helm"
-      },
-      "bulwark_rusted_pauldrons": {
-        "name": "Bulwark-Rusted Pauldrons"
-      },
-      "nhalias_bell_maul": {
-        "name": "Nhalia's Bell-Maul"
-      },
-      "reedstalker_jerkin": {
-        "name": "Reedstalker Jerkin"
-      },
-      "mirejaw_fang_knife": {
-        "name": "Mirejaw Fang-Knife"
-      },
-      "widow_silk_hood": {
-        "name": "Widow-Silk Hood"
-      },
-      "cantors_drowned_sash": {
-        "name": "Cantor's Drowned Sash"
-      },
-      "corpse_candle_focus": {
-        "name": "Corpse-Candle Focus"
-      },
-      "nhalias_litany_rod": {
-        "name": "Nhalia's Litany Rod"
-      },
-      "blackwater_vanguard_chest": {
-        "name": "Blackwater Vanguard Chestguard"
-      },
-      "siltstep_leggings": {
-        "name": "Siltstep Leggings"
-      },
-      "sunken_reliquary_hood": {
-        "name": "Sunken Reliquary Hood"
-      },
-      "litany_legs": {
-        "name": "Silt-Walker Greaves"
-      },
-      "litany_shoulder": {
-        "name": "Blackwater Drift Mantle"
-      },
-      "litany_gloves_rog": {
-        "name": "Reed-Bound Handwraps"
-      },
-      "litany_plate_chest": {
-        "name": "Sump-Warden Cuirass"
-      },
-      "litany_leather_chest": {
-        "name": "Silt-Deep Vestment"
-      },
-      "litany_cloth_chest": {
-        "name": "Choir-Drowned Raiment"
-      },
-      "litany_helm": {
-        "name": "Reliquant's Drowned Cowl"
-      },
-      "sister_nhalia_choir_plate": {
-        "name": "Sister Nhalia's Choir-Forged Plate"
-      },
-      "drowned_choir_fang": {
-        "name": "Drowned Choir-Fang"
-      },
       "the_codfather": {
         "name": "El Bacaladrino"
       },
@@ -5553,6 +5436,30 @@ export const es: EnTranslations = {
       },
       "vanguard_chrome_armor_plate": {
         "name": "Vanguardia cromada"
+      },
+      "crownforged_gauntlets": {
+        "name": "Guanteletes Forjacorona"
+      },
+      "nighttalon_grips": {
+        "name": "Agarraderas Garra Nocturna"
+      },
+      "soulflame_gloves": {
+        "name": "Guantes Llama de Alma"
+      },
+      "stormcallers_handguards": {
+        "name": "Guardamanos del Invocatormentas"
+      },
+      "crownforged_girdle": {
+        "name": "Cinturón Forjacorona"
+      },
+      "nighttalon_waistband": {
+        "name": "Faja Garra Nocturna"
+      },
+      "soulflame_cord": {
+        "name": "Cordón Llama de Alma"
+      },
+      "stormcallers_waistguard": {
+        "name": "Guardacintura del Invocatormentas"
       }
     },
     "mobs": {
@@ -5745,38 +5652,11 @@ export const es: EnTranslations = {
       "acolyte_tessa": {
         "name": "Acólita Tessa"
       },
-      "drowned_cantor": {
-        "name": "Drowned Cantor"
+      "thunzharr_waking_peak": {
+        "name": "Thunzharr, el Pico Despierto"
       },
-      "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
-      },
-      "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
-      },
-      "mirefen_widowling": {
-        "name": "Mirefen Widowling"
-      },
-      "spider_egg_sac": {
-        "name": "Spider Egg-Sac"
-      },
-      "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
-      },
-      "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
-      },
-      "choir_thrall": {
-        "name": "Bog Thrall"
-      },
-      "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
-      },
-      "edda_reedhand": {
-        "name": "Edda Reedhand"
-      },
-      "tolling_bell": {
-        "name": "Tolling Bell"
+      "thunzharr_stormling": {
+        "name": "Elemental de tormenta despierto"
       },
       "ironvein_foreman": {
         "name": "Capataz Vena de Hierro"
@@ -5997,11 +5877,6 @@ export const es: EnTranslations = {
         "name": "Hermano Halven",
         "title": "Guardián del Relicario",
         "greeting": "El relicario de abajo ha vuelto a desplazarse."
-      },
-      "brother_halven_marsh": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -6442,6 +6317,36 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Piel de acechador de la cresta"
+          }
+        }
+      },
+      "q_stalkers_return": {
+        "title": "The Stalkers Return",
+        "text": "Twelve dead, and the ridge crawls thicker than the day you started, {playerName}. Beasts do not throw themselves at a wall out of hunger. Something on the high ridge is pushing them down, and until I know what, the culling does not stop. Fourteen more.",
+        "completion": "Fourteen more, and still my patrols count fresh tracks by morning. My scout came back from the high ridge white as the snowline: prints the size of a shield, she says, and old kills no stalker would leave. Whatever walks up there is no ordinary cat.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker slain"
+          }
+        }
+      },
+      "q_stalker_cloaks": {
+        "title": "Cloaks for the Watch",
+        "text": "Eight pelts lined the officers' cloaks, and now every soldier on the wall wants the same, {playerName}. They are right to want it: winter takes fingers first and apologies never. Ten more pelts from the ridges south of the gate, and the whole watch sleeps warm.",
+        "completion": "Ten good pelts, thick as any I have... no, look at these, {playerName}. Torn, half of them, and by no blade or spear. Claw marks wide as my hand, right through the winter coat. Something on that ridge is savaging its own kind.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Stalker Pelt"
+          }
+        }
+      },
+      "q_old_cragmaw": {
+        "title": "Old Cragmaw",
+        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.",
+        "completion": "Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, {playerName}, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.",
+        "objectives": {
+          "0": {
+            "label": "Old Cragmaw slain"
           }
         }
       },
@@ -6967,11 +6872,6 @@ export const es: EnTranslations = {
         "name": "El Relicario Hundido",
         "enterText": "Desciendes al relicario hundido.",
         "leaveText": "Subes de vuelta hasta el Hermano Halven, en la ruina del relicario."
-      },
-      "drowned_litany": {
-        "name": "The Drowned Litany",
-        "enterText": "You descend into the drowned shrine at the marsh's edge.",
-        "leaveText": "You climb back to Brother Halven at the marsh's edge."
       }
     },
     "itemSets": {
@@ -6987,8 +6887,8 @@ export const es: EnTranslations = {
       },
       "necromancers": {
         "name": "Vestiduras del nigromante",
-        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
-        "bonus3": "El daño recibido no retrasa tus lanzamientos."
+        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus3": "Aumenta el intelecto en 10 y el aguante en 10."
       },
       "nighttalon": {
         "name": "Atuendo de cuero Garra Nocturna",
@@ -6997,13 +6897,13 @@ export const es: EnTranslations = {
       },
       "soulflame": {
         "name": "Vestiduras de Llama de Alma",
-        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
-        "bonus3": "El daño recibido no retrasa tus lanzamientos."
+        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus3": "Aumenta el intelecto en 15 y el espíritu en 15."
       },
       "stormcallers": {
         "name": "Vestiduras del Invocatormentas",
-        "bonus2": "Reduce un 50% el retroceso de lanzamiento causado por daño.",
-        "bonus3": "El daño recibido no retrasa tus lanzamientos."
+        "bonus2": "No puedes ser empujado hacia atrás (100% de resistencia al empuje).",
+        "bonus3": "Aumenta el intelecto en 15 y el espíritu en 15."
       },
       "wyrmshadow": {
         "name": "Atuendo de Sombra de Vermis",
@@ -7019,11 +6919,6 @@ export const es: EnTranslations = {
     "dungeonInstanceBusy": "Todas las instancias de {name} están ocupadas. Inténtalo de nuevo pronto.",
     "delveLockedChestInteract": "Pulsa F para forzar la cerradura",
     "delveRewardChestInteract": "Pulsa F para reclamar el botín",
-    "delveSurfaceExitInteract": "Pulsa F para trepar",
-    "delveReliquaryInteract": "Drowned Reliquary: Press F to begin the rite",
-    "delveRiteShrineBellInteract": "Bell Shrine: Press F to ring it",
-    "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
-    "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
-    "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it"
+    "delveSurfaceExitInteract": "Pulsa F para trepar"
   }
 };

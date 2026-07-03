@@ -92,7 +92,11 @@ class Bot {
     const xff = `172.16.${Math.floor(this.i / 254)}.${(this.i % 254) + 1}`;
     const reg = await api(
       '/api/register',
-      { username: `crowd_${uniq}_${this.i}`, password: 'hunter22' },
+      {
+        username: `crowd_${uniq}_${this.i}`,
+        password: 'hunter22',
+        email: `crowd_${uniq}_${this.i}@example.com`,
+      },
       undefined,
       xff,
     );
@@ -152,7 +156,12 @@ async function enterWorld(page) {
   const u = `crowdcam_${uniq}`;
   // Register the account over REST (robust), then just LOG IN through the UI -
   // the auth panel defaults to login mode, so no fragile register-toggle needed.
-  await api('/api/register', { username: u, password: 'hunter22' }, undefined, '172.31.0.1');
+  await api(
+    '/api/register',
+    { username: u, password: 'hunter22', email: `${u}@example.com` },
+    undefined,
+    '172.31.0.1',
+  );
   // CROWD_GFX forces a tier (low|medium|high|ultra) for a branch-independent,
   // tier-consistent before/after; default lets the client auto-detect.
   const gfxQs = process.env.CROWD_GFX ? `&gfx=${process.env.CROWD_GFX}` : '';

@@ -528,7 +528,7 @@ describe('auto-join on link/login (guilds.join)', () => {
       accountId: 1,
     });
     expect(new URL(parse(withToken).data.url).searchParams.get('scope')).toBe(
-      'identify guilds guilds.join',
+      'identify email guilds guilds.join',
     );
 
     delete process.env.DISCORD_BOT_TOKEN;
@@ -537,7 +537,9 @@ describe('auto-join on link/login (guilds.join)', () => {
       mode: 'link',
       accountId: 1,
     });
-    expect(new URL(parse(without).data.url).searchParams.get('scope')).toBe('identify guilds');
+    expect(new URL(parse(without).data.url).searchParams.get('scope')).toBe(
+      'identify email guilds',
+    );
   });
 
   it('adds a non-member to the guild and records membership + reward on link', async () => {
@@ -556,9 +558,10 @@ describe('auto-join on link/login (guilds.join)', () => {
     expect(put[1].method).toBe('PUT');
     expect(put[1].headers.Authorization).toBe('Bot bot-token');
     expect(JSON.parse(put[1].body)).toEqual({ access_token: 'tok' });
-    // The link row records guild_member = true (param $5), and BOTH the link reward
-    // and the guild-member reward are granted (two ledger writes).
-    expect(linkInsert()?.[1]?.[4]).toBe(true);
+    // The link row records guild_member = true (param $6, after the added
+    // discord_email $5), and BOTH the link reward and the guild-member reward are
+    // granted (two ledger writes).
+    expect(linkInsert()?.[1]?.[5]).toBe(true);
     const ledger = dbMock.query.mock.calls.filter((c) =>
       String(c[0]).includes('INSERT INTO reward_ledger'),
     );
@@ -579,7 +582,7 @@ describe('auto-join on link/login (guilds.join)', () => {
       res,
     );
     expect(putCall(fetchSpy)).toBeTruthy();
-    expect(linkInsert()?.[1]?.[4]).toBe(true);
+    expect(linkInsert()?.[1]?.[5]).toBe(true);
   });
 
   it('skips the join when the user is already a guild member', async () => {
@@ -593,7 +596,7 @@ describe('auto-join on link/login (guilds.join)', () => {
       res,
     );
     expect(putCall(fetchSpy)).toBeFalsy(); // no add attempted, already in
-    expect(linkInsert()?.[1]?.[4]).toBe(true);
+    expect(linkInsert()?.[1]?.[5]).toBe(true);
   });
 
   it('does not attempt a join when no bot token is configured (membership only)', async () => {
@@ -607,7 +610,7 @@ describe('auto-join on link/login (guilds.join)', () => {
       res,
     );
     expect(putCall(fetchSpy)).toBeFalsy();
-    expect(linkInsert()?.[1]?.[4]).toBe(false);
+    expect(linkInsert()?.[1]?.[5]).toBe(false);
   });
 
   it('links best-effort even when the guild join call fails', async () => {
@@ -621,7 +624,7 @@ describe('auto-join on link/login (guilds.join)', () => {
       res,
     );
     // A failed add leaves them recorded as a non-member, but the link still succeeds.
-    expect(linkInsert()?.[1]?.[4]).toBe(false);
+    expect(linkInsert()?.[1]?.[5]).toBe(false);
     expect(res.body).toContain('"ok":true');
   });
 
@@ -637,7 +640,86 @@ describe('auto-join on link/login (guilds.join)', () => {
       res,
     );
     expect(putCall(fetchSpy)).toBeFalsy();
-    expect(linkInsert()?.[1]?.[4]).toBe(false);
+    expect(linkInsert()?.[1]?.[5]).toBe(false);
+  });
+});
+
+describe('recovery-email capture from the Discord email scope', () => {
+  const LINK_STATE = [
+    { state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null },
+  ];
+  const linkInsert = () =>
+    dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO discord_links'));
+  const backfill = () =>
+    dbMock.query.mock.calls.find((c) =>
+      String(c[0]).replace(/\s+/g, ' ').includes("email IS NULL OR email = ''"),
+    );
+
+  it('stores the address on the link and backfills a verified recovery email', async () => {
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    // /users/@me now returns a verified email (email scope was granted).
+    mockDiscordFetch(
+      {
+        id: '999999999999999999',
+        username: 'maxp',
+        global_name: 'Maxp',
+        avatar: null,
+        email: 'maxp@example.com',
+        verified: true,
+      },
+      true,
+    );
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    // The link row carries the captured email (param $5), and the account's empty
+    // recovery email is backfilled with verified=true.
+    expect(linkInsert()?.[1]?.[4]).toBe('maxp@example.com');
+    expect(backfill()?.[1]).toEqual([1, 'maxp@example.com', true]);
+    expect(res.body).toContain('"ok":true');
+  });
+
+  it('does not backfill the account email when Discord returned no address', async () => {
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    mockDiscordFetch(
+      { id: '999999999999999999', username: 'maxp', global_name: 'Maxp', avatar: null },
+      true,
+    );
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(linkInsert()?.[1]?.[4]).toBeNull();
+    expect(backfill()).toBeFalsy();
+  });
+
+  it('keeps an unverified Discord email but does not stamp it verified', async () => {
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    mockDiscordFetch(
+      {
+        id: '999999999999999999',
+        username: 'maxp',
+        global_name: 'Maxp',
+        avatar: null,
+        email: 'maxp@example.com',
+        verified: false,
+      },
+      true,
+    );
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    // Address captured, but the verified flag passed to the backfill is false.
+    expect(linkInsert()?.[1]?.[4]).toBe('maxp@example.com');
+    expect(backfill()?.[1]).toEqual([1, 'maxp@example.com', false]);
   });
 });
 

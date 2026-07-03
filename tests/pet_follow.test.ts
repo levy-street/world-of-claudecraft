@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { Entity, Vec3 } from '../src/sim/types';
 import { isBlocked } from '../src/sim/colliders';
+import { Sim } from '../src/sim/sim';
+import type { Entity, Vec3 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 // Pets heel by pathfinding around obstacles (like a warrior charge route) rather
@@ -25,7 +25,10 @@ function setup(petAt: Vec3, ownerAt: Vec3): { sim: Sim; pet: Entity; owner: Enti
   const owner = sim.entities.get(pid)!;
   let pet: Entity | null = null;
   for (const e of sim.entities.values()) {
-    if (e.kind === 'mob' && !e.dead && e.ownerId === null) { pet = e; break; }
+    if (e.kind === 'mob' && !e.dead && e.ownerId === null) {
+      pet = e;
+      break;
+    }
   }
   if (!pet) throw new Error('no wild mob to adopt');
   pet.ownerId = pid;
@@ -69,7 +72,10 @@ describe('pet heel pathfinding', () => {
     const trace = () => {
       const { sim, pet } = setup(PET, OWNER);
       const path: Vec3[] = [];
-      for (let i = 0; i < 20 * 6; i++) { sim.tick(); path.push({ ...pet.pos }); }
+      for (let i = 0; i < 20 * 6; i++) {
+        sim.tick();
+        path.push({ ...pet.pos });
+      }
       return path;
     };
     expect(trace()).toEqual(trace());
@@ -90,10 +96,12 @@ describe('pet heel pathfinding', () => {
 
   it('does not snap on a stale unreachable path when a route actually exists', () => {
     // Regression: the teleport must be confirmed by a FRESH A* attempt, not by a
-    // leftover single-waypoint cache. Owner is 62yd away with the line of sight
-    // blocked but a real route around exists, and the pet carries a stale "no
-    // route" cache with the throttle still active — it must path, never warp.
-    const { sim, pet, owner } = setup({ x: -138, y: 0, z: -160 }, { x: -200, y: 0, z: -160 });
+    // leftover single-waypoint cache. Owner is 62yd away on the far side of the
+    // spawn building (straight line blocked, real route around exists), and the
+    // pet carries a stale "no route" cache with the throttle still active: it
+    // must path, never warp. (This used to stage across the west rim mountains,
+    // which are now correctly unclimbable, so the route there no longer exists.)
+    const { sim, pet, owner } = setup({ x: 0, y: 0, z: -25 }, { x: 0, y: 0, z: 37 });
     expect(dist(pet.pos, owner.pos)).toBeGreaterThan(60);
     pet.petPath = [{ ...owner.pos }]; // stale single-waypoint (looks "unreachable")
     pet.petPathCooldown = 0.4; // throttle active: would skip recompute without the fresh-attempt guard

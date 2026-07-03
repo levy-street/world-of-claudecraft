@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 391,
-      "state": "d5b9becc",
+      "state": "f17a52d0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -39,10 +39,12 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -102,7 +104,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 404,
-      "state": "90129f76",
+      "state": "776bdd76",
       "events": "aaa93c9d",
       "rng": {
         "draws": 4,
@@ -113,7 +115,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 404,
-      "state": "944bd6d3",
+      "state": "e2ffb1ef",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -124,7 +126,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 404,
-      "state": "552af702",
+      "state": "32a38822",
       "events": "60b1bace",
       "rng": {
         "draws": 5,
@@ -135,7 +137,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 406,
-      "state": "45a98b06",
+      "state": "6ca554ba",
       "events": "f0cb5aa5",
       "rng": {
         "draws": 8,
@@ -174,11 +176,13 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 12098,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 898
         }
       ],
@@ -374,7 +378,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 406,
-      "state": "9cfc096f",
+      "state": "19667b33",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -385,7 +389,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 406,
-      "state": "9cfc096f",
+      "state": "19667b33",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -424,11 +428,13 @@
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 12098,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 898
         }
       ],

@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 393,
-      "state": "48606196",
+      "state": "1418e44e",
       "events": "4e8fad40",
       "rng": {
         "draws": 2,
@@ -50,6 +50,7 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "inventory": [
             {
               "count": 1,
@@ -59,7 +60,8 @@
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -75,10 +77,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [

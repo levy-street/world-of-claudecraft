@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 406,
-      "state": "a9fea95d",
+      "state": "b2f8f6d1",
       "events": "f1db41ab",
       "rng": {
         "draws": 35,
@@ -53,10 +53,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -72,10 +74,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -789,8 +793,8 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 406,
-      "state": "733046d3",
-      "events": "1dce5323",
+      "state": "af5ee726",
+      "events": "3fc41716",
       "rng": {
         "draws": 49,
         "digest": "1d1c5dad"
@@ -804,7 +808,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 110624,
+            "damageTaken": 163124,
             "deaths": 1
           },
           "delveClears": {},
@@ -814,10 +818,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -833,10 +839,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -895,7 +903,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 42.122741,
+          "fallStartY": 57.122741,
           "fiveSecondRule": 99.2,
           "hp": 50000,
           "id": 391,
@@ -1529,8 +1537,8 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 406,
-      "state": "b2bc7f7b",
-      "events": "d2aca781",
+      "state": "0e8a1ed5",
+      "events": "31b6edce",
       "rng": {
         "draws": 49,
         "digest": "1d1c5dad"
@@ -1540,7 +1548,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 406,
-      "state": "3671243d",
+      "state": "312682ff",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1551,7 +1559,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 406,
-      "state": "fefa1c25",
+      "state": "082f2487",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1562,7 +1570,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 406,
-      "state": "1073e504",
+      "state": "1a36246e",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1573,7 +1581,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 406,
-      "state": "c3fb0304",
+      "state": "274c626e",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1588,7 +1596,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 110624,
+            "damageTaken": 163124,
             "deaths": 1
           },
           "delveClears": {},
@@ -1598,10 +1606,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1610,7 +1620,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 110624,
+            "damageTaken": 163124,
             "deaths": 1
           },
           "delveClears": {},
@@ -1620,10 +1630,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [
@@ -1730,7 +1742,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 406,
-      "state": "c3fb0304",
+      "state": "274c626e",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -1745,7 +1757,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 110624,
+            "damageTaken": 163124,
             "deaths": 1
           },
           "delveClears": {},
@@ -1755,10 +1767,12 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         },
         {
           "activeLoadout": -1,
@@ -1767,7 +1781,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 110624,
+            "damageTaken": 163124,
             "deaths": 1
           },
           "delveClears": {},
@@ -1777,10 +1791,12 @@
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
+          "gatheringProficiency": {},
           "talents": {
             "choices": {},
             "ranks": {}
-          }
+          },
+          "worldBossDaily": {}
         }
       ],
       "entities": [

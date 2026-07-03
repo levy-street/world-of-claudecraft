@@ -82,6 +82,28 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async leaderboard(): Promise<DailyRewardScoreRow[]> {
     return this.score > 0 ? [{ accountId: 1, username: 'alice', points: this.score, rank: 1 }] : [];
   }
+  async leaderboardRowForAccount(): Promise<DailyRewardScoreRow | null> {
+    return this.score > 0 ? { accountId: 1, username: 'alice', points: this.score, rank: 1 } : null;
+  }
+  async leaderboardTotal(): Promise<number> {
+    return this.score > 0 ? 1 : 0;
+  }
+  async leaderboardPage(): Promise<{
+    rows: DailyRewardScoreRow[];
+    page: number;
+    pageSize: number;
+    pageCount: number;
+    total: number;
+  }> {
+    const rows = await this.leaderboard();
+    return {
+      rows,
+      page: 0,
+      pageSize: 20,
+      pageCount: 1,
+      total: rows.length,
+    };
+  }
   async spinForAccount(): Promise<DailyRewardSpinRow | null> {
     return this.spin;
   }
@@ -406,6 +428,7 @@ describe('daily rewards', () => {
         spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
         tasks: [],
         leaderboard: [],
+        leaderboardTotal: 0,
       },
     });
     expect(view).toMatchObject({ kind: 'ready', locked: true, lockReason: 'under_minimum' });

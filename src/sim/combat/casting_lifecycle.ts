@@ -677,7 +677,15 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     return;
   }
 
-  if (target && ability.school !== 'physical') {
+  // A ranged attack travels as a projectile, so its damage/effects resolve when the
+  // bolt LANDS, not at cast completion. Every non-physical spell is a bolt by
+  // convention (school proxy); a physical ranged shot (hunter Aimed / Concussive Shot)
+  // opts in with projectile:true. Without this a physical shot deals its damage
+  // instantly while the arrow is still visibly in flight (health drops, or the mob
+  // dies, before it arrives).
+  const firesProjectile = ability.school !== 'physical' || ability.projectile === true;
+  if (target && firesProjectile) {
+    const isSpell = ability.school !== 'physical';
     spendAbilityCost(p, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff);
     ctx.emit({
@@ -689,11 +697,12 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the
     // target (projectile_travel), not this tick. A target that dies before impact
-    // takes nothing (the drain fizzles the projectile). Spells never "miss" like a
-    // physical attack; a target can only fully RESIST them (classic-era semantics),
-    // so the on-impact roll uses isSpellResisted and emits a 'resist', not a 'miss'.
+    // takes nothing (the fizzle is handled by scheduleProjectile). Spells never "miss"
+    // like a physical attack; a target can only fully RESIST them (classic-era
+    // semantics), so a spell's on-impact roll uses isSpellResisted and emits a 'resist'.
+    // A physical shot has no resist roll; its hit/crit resolve inside runEffects.
     scheduleProjectile(ctx, p, target, (src, tgt) => {
-      if (isSpellResisted(ctx.rng, src.level, tgt.level)) {
+      if (isSpell && isSpellResisted(ctx.rng, src.level, tgt.level)) {
         ctx.emit({
           type: 'damage',
           sourceId: src.id,

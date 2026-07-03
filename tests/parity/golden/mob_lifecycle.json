@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 395,
-      "state": "d333cce8",
+      "state": "4054db20",
       "events": "4130272e",
       "rng": {
         "draws": 4,
@@ -57,11 +57,13 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 84,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 84
         }
       ],
@@ -345,7 +347,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 396,
-      "state": "6f295746",
+      "state": "2574de6a",
       "events": "e310cf52",
       "rng": {
         "draws": 7,
@@ -371,11 +373,13 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 198,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 198
         }
       ],
@@ -717,7 +721,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 396,
-      "state": "1e675bdf",
+      "state": "9802593b",
       "events": "d6e461a7",
       "rng": {
         "draws": 8,
@@ -744,11 +748,13 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 198,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 198
         }
       ],
@@ -1091,7 +1097,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 398,
-      "state": "e3d61213",
+      "state": "0f71b9d8",
       "events": "b0b6fb78",
       "rng": {
         "draws": 13,
@@ -1118,11 +1124,13 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 282,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 282
         }
       ],
@@ -1465,7 +1473,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 39.410541,
+          "fallStartY": 54.410541,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1480,14 +1488,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 300,
-            "y": 39.410541,
+            "y": 54.410541,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 300,
-            "y": 39.410541,
+            "y": 54.410541,
             "z": 300
           },
           "stats": {
@@ -1507,7 +1515,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 399,
-      "state": "b7bdde9f",
+      "state": "8202ded4",
       "events": "1c53c4a0",
       "rng": {
         "draws": 17,
@@ -1534,11 +1542,13 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 366,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 366
         }
       ],
@@ -1881,7 +1891,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 39.410541,
+          "fallStartY": 54.410541,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -1896,14 +1906,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 300,
-            "y": 39.410541,
+            "y": 54.410541,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 300,
-            "y": 39.410541,
+            "y": 54.410541,
             "z": 300
           },
           "stats": {
@@ -1924,7 +1934,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 41.399945,
+          "fallStartY": 56.399945,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 398,
@@ -1932,7 +1942,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": 700,
-            "y": 41.399945,
+            "y": 56.399945,
             "z": 300
           },
           "level": 5,
@@ -1950,14 +1960,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 700,
-            "y": 41.399945,
+            "y": 56.399945,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 700,
-            "y": 41.399945,
+            "y": 56.399945,
             "z": 300
           },
           "stats": {
@@ -1977,7 +1987,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 399,
-      "state": "b7bdde9f",
+      "state": "8202ded4",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -2004,11 +2014,13 @@
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
           "lifetimeXp": 366,
           "talents": {
             "choices": {},
             "ranks": {}
           },
+          "worldBossDaily": {},
           "xp": 366
         }
       ],
@@ -2351,7 +2363,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 39.410541,
+          "fallStartY": 54.410541,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 84,
@@ -2366,14 +2378,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 300,
-            "y": 39.410541,
+            "y": 54.410541,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 300,
-            "y": 39.410541,
+            "y": 54.410541,
             "z": 300
           },
           "stats": {
@@ -2394,7 +2406,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 41.399945,
+          "fallStartY": 56.399945,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 398,
@@ -2402,7 +2414,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": 700,
-            "y": 41.399945,
+            "y": 56.399945,
             "z": 300
           },
           "level": 5,
@@ -2420,14 +2432,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 700,
-            "y": 41.399945,
+            "y": 56.399945,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 700,
-            "y": 41.399945,
+            "y": 56.399945,
             "z": 300
           },
           "stats": {

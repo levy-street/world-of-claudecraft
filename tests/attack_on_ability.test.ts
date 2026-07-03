@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
 import type { AbilityEffect, Entity } from '../src/sim/types';
-import { abilityStartsAutoAttack, hasAutoAttackTarget } from '../src/ui/attack_on_ability';
+import {
+  abilityStartsAutoAttack,
+  deferAutoAttackUntilCastEnd,
+  hasAutoAttackTarget,
+} from '../src/ui/attack_on_ability';
 
 // Resolve a real ability's rank-1 effects by id, so the test pins behavior against
 // the actual content tables (not hand-mocked shapes that could drift).
@@ -85,5 +89,20 @@ describe('hasAutoAttackTarget', () => {
 
   it('is false for a non-hostile target (friendly NPC / player)', () => {
     expect(hasAutoAttackTarget(target({ hostile: false }))).toBe(false);
+  });
+});
+
+describe('deferAutoAttackUntilCastEnd (the aggro-before-damage bug)', () => {
+  it('defers for a timed cast so starting a Smite cannot pull the mob early', () => {
+    // any positive cast time waits for the successful castStop
+    expect(deferAutoAttackUntilCastEnd(2.5)).toBe(true);
+    expect(deferAutoAttackUntilCastEnd(0.1)).toBe(true);
+    // a real timed spell from content: the priest's smite carries a cast time
+    const smite = ABILITIES.smite;
+    if (smite) expect(deferAutoAttackUntilCastEnd(smite.castTime)).toBe(true);
+  });
+
+  it('engages immediately for instants (their damage lands the same tick)', () => {
+    expect(deferAutoAttackUntilCastEnd(0)).toBe(false);
   });
 });

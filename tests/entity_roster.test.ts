@@ -149,6 +149,7 @@ function makeCtx() {
     fiestaTakedown: vi.fn(),
     fiestaDown: vi.fn(),
     rollLoot: vi.fn(),
+    rollWorldBossLoot: vi.fn(),
     applyHeal: vi.fn(),
     spellCrit: vi.fn(() => 0.05),
     applyAura: vi.fn(),
@@ -166,6 +167,7 @@ function makeCtx() {
     // elsewhere in this host - deduped).
     spendResource: vi.fn(),
     removeItem: vi.fn(),
+    removeFungibleItem: vi.fn(),
     partyOf: vi.fn(() => null),
     removeFromParty: vi.fn(),
     dropPartyMarkers: vi.fn(),
@@ -173,6 +175,7 @@ function makeCtx() {
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
+    countFungibleItem: vi.fn(() => 0),
     completeQuestForDev: vi.fn(() => false),
     completeCurrentQuestsForDev: vi.fn(() => 0),
     lockoutNowMs: vi.fn(() => 0),

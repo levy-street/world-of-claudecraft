@@ -355,7 +355,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     // a fresh session has an empty lastSent, so EVERY maybe() delta key rides the
-    // first snapshot (even the null-valued ones like party/trade); widened to all 25
+    // first snapshot (even the null-valued ones like party/trade); widened to all 26
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
     }
@@ -418,7 +418,7 @@ describe('delta snapshots', () => {
     const snap = lastSnap(fc.sent);
     // This single-tick test stays on the decay-safe subset: cds and the timer-backed
     // keys (delve/arena timers, delveDaily) can re-emit after a real sim.tick(), so the
-    // widened all-25 omission is proven by the no-op re-broadcast test instead.
+    // widened all-26 omission is proven by the no-op re-broadcast test instead.
     for (const key of DELTA_KEYS) {
       expect(snap.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
@@ -768,7 +768,7 @@ describe('delta snapshots', () => {
     joinServer(server, fc2, 2, 'Testb');
     broadcast(server);
     const snapNew = lastSnap(fc2.sent);
-    // a fresh session always receives the full self state: all 25 delta keys
+    // a fresh session always receives the full self state: all 26 delta keys
     for (const key of ALL_DELTA_KEYS) {
       expect(snapNew.self, `self.${key} missing for fresh session`).toHaveProperty(key);
     }
@@ -1815,18 +1815,18 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // ---------------------------------------------------------------------------
 // W0a: full self-snapshot delta round-trip gate.
 //
-// `selfWireJson` (server/game.ts) emits 25 heavy "delta" fields through a
+// `selfWireJson` (server/game.ts) emits 26 heavy "delta" fields through a
 // `maybe(key, value)` closure that ships a key only when its serialized form
 // changed since this session last received it; `applySnapshot` (src/net/
 // online.ts) mirrors each with `if (s.X !== undefined)` (or the inline
 // `s.X ?? e.X` form for `stats`/`weapon`). This is the single most fragile codec
-// in the workstream, so we pin: (a) the exact 25-key set against drift, (b) the
+// in the workstream, so we pin: (a) the exact 26-key set against drift, (b) the
 // terse-key -> IWorld-name rename map, (c) that every dirtied value round-trips
-// onto the correct decode target, and (d) that a no-op re-broadcast omits all 25
+// onto the correct decode target, and (d) that a no-op re-broadcast omits all 26
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 25 `maybe(...)` delta keys, sorted. Cross-checked below
+// The pinned set of the 26 `maybe(...)` delta keys, sorted. Cross-checked below
 // against the live `maybe(...)` calls scraped from server/game.ts source, so a
 // 26th unregistered delta key reddens this gate.
 const ALL_DELTA_KEYS = [
@@ -1849,6 +1849,7 @@ const ALL_DELTA_KEYS = [
   'marks',
   'milestones',
   'party',
+  'prof',
   'qdone',
   'qlog',
   'stats',
@@ -1886,6 +1887,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   mres: 'maxResource',
   party: 'partyInfo',
   prk: 'prestigeRank',
+  prof: 'professionsState',
   qdone: 'questsDone',
   qlog: 'questLog',
   res: 'resource',
@@ -1961,6 +1963,7 @@ function dirtyEveryDeltaField(): {
   meta.delveMarks = 7;
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
+  meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0 };
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', ranks: {}, choices: {} };
   meta.talentMods.spec = 'arms';
@@ -2064,6 +2067,13 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.companionState?.companionId).toBe('companion_tessa'); // dcompanion -> companionState
     expect(client.delveMarks).toBe(7); // dmarks -> delveMarks
     expect(client.companionUpgrades).toEqual({ companion_tessa: 2 }); // dcomp -> companionUpgrades
+    expect(client.professionsState).toEqual({
+      skills: [
+        { professionId: 'mining', skill: 6, maxSkill: 300 },
+        { professionId: 'logging', skill: 0, maxSkill: 300 },
+        { professionId: 'herbalism', skill: 0, maxSkill: 300 },
+      ],
+    }); // prof -> professionsState
     expect(client.delveClears).toEqual({ 'collapsed_reliquary:heroic': 1 }); // dclears -> delveClears
     expect(client.delveDaily).toMatchObject({ markClears: 4 }); // delveDaily
     // tal -> talents / talentSpec / loadouts / activeLoadout
@@ -2115,8 +2125,8 @@ describe('full self-state snapshot delta fixture', () => {
 
 describe('delta-key contract pins (anti-drift)', () => {
   it('ALL_DELTA_KEYS contains exactly 25 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(25);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(25);
+    expect(ALL_DELTA_KEYS).toHaveLength(26);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(26);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2128,7 +2138,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(25);
+    expect(scraped.size).toBe(26);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
