@@ -127,7 +127,9 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
       }
     } else {
       companion.facing = angleTo(companion.pos, combatTarget.pos);
-      companion.swingTimer = (companion.swingTimer ?? 0) - DT;
+      // swingTimer is already advanced once per tick by the unconditional
+      // decrement above; do NOT decrement again here or the companion swings at
+      // double the weapon's cadence (mirrors pet_ai, which advances once).
       if (companion.swingTimer <= 0) {
         ctx.mobSwing(companion, combatTarget);
         companion.swingTimer = companion.weapon.speed * ctx.swingIntervalMult(companion);

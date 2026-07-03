@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { updateDelveCompanion } from '../src/sim/delves/companion';
 import { Sim } from '../src/sim/sim';
+import { DT } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 function makeSim(cls: 'hunter' | 'warrior' = 'warrior', seed = 42) {
@@ -339,6 +340,50 @@ describe('delve companions', () => {
     updateDelveCompanion((sim as any).ctx, companion);
     const d1 = Math.hypot(companion.pos.x - p.pos.x, companion.pos.z - p.pos.z);
     expect(d1).toBeLessThan(d0); // moved toward the owner via ctx.moveToward
+  });
+
+  it('(module) swings at the weapon cadence in melee range, not double speed', () => {
+    // Regression for the double-decrement bug: the swing timer was advanced once
+    // unconditionally AND again inside the in-reach branch, so an in-range companion
+    // swung ~2x too fast. The interval between swings must be weapon.speed / DT ticks.
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    teleport(sim, 0, 0);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['reliquary_sunken_ossuary'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const companion = sim.entities.get(run.companion!.entityId)!;
+    const mob = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.hostile && e.templateId !== 'acolyte_tessa',
+    )!;
+    expect(mob).toBeDefined();
+    // Keep the target alive across many swings and keep the companion in melee reach.
+    mob.hp = mob.maxHp = 1e9;
+    sim.player.targetId = mob.id;
+    companion.pos = { ...mob.pos };
+    companion.prevPos = { ...companion.pos };
+    companion.wanderTimer = 1e9; // keep the heal arm out of this
+    companion.swingTimer = 0;
+    const ctx = (sim as any).ctx;
+    // A swing resets swingTimer upward; record the call index of each reset.
+    const swingCalls: number[] = [];
+    let prev = companion.swingTimer;
+    for (let i = 0; i < 500 && swingCalls.length < 3; i++) {
+      updateDelveCompanion(ctx, companion);
+      if (companion.swingTimer > prev + 1e-9) swingCalls.push(i);
+      prev = companion.swingTimer;
+    }
+    expect(swingCalls.length).toBeGreaterThanOrEqual(2);
+    const interval = swingCalls[1] - swingCalls[0];
+    const resetVal = companion.weapon.speed * ctx.swingIntervalMult(companion);
+    const expectedTicks = Math.round(resetVal / DT);
+    // Pin the cadence on both sides (one DT per tick): the bug halved it to
+    // ~expectedTicks/2 (too fast), and the upper bound catches a future
+    // regression that made the companion swing too slowly.
+    expect(interval).toBeGreaterThanOrEqual(expectedTicks - 1);
+    expect(interval).toBeLessThanOrEqual(expectedTicks + 1);
   });
 
   it('(module) acquires the owner target and swings it via mobSwing', () => {

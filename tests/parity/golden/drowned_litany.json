@@ -9,8 +9,8 @@
     "Sister Nhalia driver: Blackwater Mark + Tolling Bells volley rng draws",
     "cantor phases + Final Bell + rite choose -> playback pulses"
   ],
-  "draws": 2473,
-  "drawDigest": "5bb7ae0e",
+  "draws": 2467,
+  "drawDigest": "0034a18a",
   "frames": [
     {
       "tick": 0,
@@ -682,10 +682,10 @@
       "time": 22,
       "nextId": 434,
       "state": "93c92f5d",
-      "events": "432010aa",
+      "events": "741638a5",
       "rng": {
-        "draws": 2164,
-        "digest": "63916ebe"
+        "draws": 2163,
+        "digest": "ad86ad62"
       }
     },
     {
@@ -695,8 +695,8 @@
       "state": "590c1c02",
       "events": "49cb59da",
       "rng": {
-        "draws": 2201,
-        "digest": "736738a0"
+        "draws": 2200,
+        "digest": "6861ade9"
       }
     },
     {
@@ -706,8 +706,8 @@
       "state": "317ba276",
       "events": "49cb59da",
       "rng": {
-        "draws": 2241,
-        "digest": "7bf6894f"
+        "draws": 2240,
+        "digest": "8db24eda"
       }
     },
     {
@@ -717,16 +717,16 @@
       "state": "d7899e05",
       "events": "5511d526",
       "rng": {
-        "draws": 2289,
-        "digest": "da051e9f"
+        "draws": 2287,
+        "digest": "aec10d40"
       }
     },
     {
       "tick": 480,
       "time": 24,
       "nextId": 434,
-      "state": "5342fdd1",
-      "events": "cd6b5243",
+      "state": "38e9f249",
+      "events": "d0a87a5f",
       "rng": {
         "draws": 2339,
         "digest": "8f897068"
@@ -736,33 +736,33 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 434,
-      "state": "deb1cfd3",
+      "state": "8958740b",
       "events": "ecba6d48",
       "rng": {
-        "draws": 2387,
-        "digest": "3e784604"
+        "draws": 2385,
+        "digest": "63f1f578"
       }
     },
     {
       "tick": 500,
       "time": 25,
       "nextId": 434,
-      "state": "48c4df4a",
-      "events": "5511d526",
+      "state": "d4c016ba",
+      "events": "501084cb",
       "rng": {
-        "draws": 2438,
-        "digest": "48402e87"
+        "draws": 2432,
+        "digest": "4e42381c"
       }
     },
     {
       "tick": 505,
       "time": 25.25,
       "nextId": 434,
-      "state": "cafa4ea8",
+      "state": "08aff1d8",
       "events": "49cb59da",
       "rng": {
-        "draws": 2465,
-        "digest": "3ca100a0"
+        "draws": 2460,
+        "digest": "6783ec9d"
       },
       "label": "rite-started",
       "players": [
@@ -781,7 +781,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 5586,
-            "damageTaken": 30950,
+            "damageTaken": 30954,
             "kills": 3,
             "xpGained": 488
           },
@@ -815,7 +815,7 @@
           "dodgeChance": 0.0665,
           "facing": -1.561597,
           "fiveSecondRule": 124.25,
-          "hp": 31495,
+          "hp": 31491,
           "id": 400,
           "inCombat": true,
           "kind": "player",
@@ -928,11 +928,11 @@
       "tick": 507,
       "time": 25.35,
       "nextId": 434,
-      "state": "c6e7cd89",
+      "state": "d5e0ade1",
       "events": "741638a5",
       "rng": {
-        "draws": 2473,
-        "digest": "5bb7ae0e"
+        "draws": 2467,
+        "digest": "0034a18a"
       },
       "label": "final",
       "players": [
@@ -951,7 +951,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 5586,
-            "damageTaken": 30950,
+            "damageTaken": 30954,
             "kills": 3,
             "xpGained": 488
           },
@@ -985,7 +985,7 @@
           "dodgeChance": 0.0665,
           "facing": -1.561597,
           "fiveSecondRule": 124.35,
-          "hp": 31495,
+          "hp": 31491,
           "id": 400,
           "inCombat": true,
           "kind": "player",

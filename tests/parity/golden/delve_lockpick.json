@@ -9,8 +9,8 @@
     "lockpick minigame (flawless solve)",
     "reward chest + delve marks"
   ],
-  "draws": 8,
-  "drawDigest": "20464699",
+  "draws": 7,
+  "drawDigest": "30365ad3",
   "frames": [
     {
       "tick": 0,
@@ -113,7 +113,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 414,
-      "state": "0ed452c0",
+      "state": "64dbd8da",
       "events": "a8af5cb6",
       "rng": {
         "draws": 4,
@@ -124,7 +124,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 414,
-      "state": "41d71413",
+      "state": "157a5cfe",
       "events": "b93c7dc5",
       "rng": {
         "draws": 4,
@@ -135,22 +135,22 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 414,
-      "state": "9762c258",
-      "events": "0b43bbc3",
+      "state": "5e601841",
+      "events": "741638a5",
       "rng": {
-        "draws": 5,
-        "digest": "0d1e87b1"
+        "draws": 4,
+        "digest": "e1f30e03"
       }
     },
     {
       "tick": 38,
       "time": 1.9,
       "nextId": 416,
-      "state": "95f47feb",
+      "state": "78295753",
       "events": "0a56b75f",
       "rng": {
-        "draws": 8,
-        "digest": "20464699"
+        "draws": 7,
+        "digest": "30365ad3"
       },
       "label": "delve-end",
       "players": [
@@ -167,7 +167,7 @@
           ],
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 21,
+          "copper": 25,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,
@@ -287,7 +287,7 @@
           "stats": {
             "armor": 24
           },
-          "swingTimer": 1.6,
+          "swingTimer": 0.35,
           "templateId": "acolyte_tessa",
           "wanderTimer": 1.1,
           "weapon": {
@@ -316,7 +316,7 @@
           },
           "level": 9,
           "loot": {
-            "copper": 439
+            "copper": 399
           },
           "lootFfaTimer": 59.6,
           "lootRecipientIds": [
@@ -399,22 +399,22 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "8a8329fa",
+      "state": "e6f2e0b4",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "20464699"
+        "draws": 7,
+        "digest": "30365ad3"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "8a8329fa",
+      "state": "e6f2e0b4",
       "events": "741638a5",
       "rng": {
-        "draws": 8,
-        "digest": "20464699"
+        "draws": 7,
+        "digest": "30365ad3"
       },
       "label": "final",
       "players": [
@@ -431,7 +431,7 @@
           ],
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 21,
+          "copper": 25,
           "counters": {
             "damageDealt": 1635,
             "kills": 1,
@@ -551,7 +551,7 @@
           "stats": {
             "armor": 24
           },
-          "swingTimer": 1.4,
+          "swingTimer": 0.15,
           "templateId": "acolyte_tessa",
           "wanderTimer": 1,
           "weapon": {
@@ -580,7 +580,7 @@
           },
           "level": 9,
           "loot": {
-            "copper": 439
+            "copper": 399
           },
           "lootFfaTimer": 59.5,
           "lootRecipientIds": [
