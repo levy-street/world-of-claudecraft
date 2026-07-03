@@ -1092,7 +1092,9 @@ export const CONTESTED_NORTH_CAMPS: CampDef[] = [
   { mobId: 'slag_ogre', center: { x: 55, z: 4022 }, radius: 16, count: 5 },
   { mobId: 'smeltjaw', center: { x: -40, z: 4024 }, radius: 5, count: 1 },
   // Redspire Pass (the rim rises past z 4200; nothing spawns above 4185)
-  { mobId: 'deserter_wraith', center: { x: -55, z: 4068 }, radius: 18, count: 7 },
+  // z 4086: clear of the Cindral Ridge wall base at z 4050 (the v0.20 walls
+  // are taller and steeper; the camp centre must sit on walkable ground)
+  { mobId: 'deserter_wraith', center: { x: -55, z: 4086 }, radius: 18, count: 7 },
   { mobId: 'deserter_wraith', center: { x: 60, z: 4075 }, radius: 16, count: 5 },
   { mobId: 'ridge_shrieker', center: { x: -60, z: 4105 }, radius: 18, count: 6 },
   { mobId: 'ridge_shrieker', center: { x: 65, z: 4118 }, radius: 16, count: 5 },

@@ -28,7 +28,9 @@ export const MAX_PLACEMENTS = 4000;
 export const MAX_CAMPS = 600;
 export const MAX_NPCS = 200;
 export const MAX_OBJECTS = 400;
-export const MAX_ZONES = 12;
+// 24: must hold at least the full built-in strip (17 zones with Valdris), so
+// "start from the built-in world" documents round-trip without dropping bands.
+export const MAX_ZONES = 24;
 export const MAX_ROADS = 64;
 export const MAX_ROAD_POINTS = 256;
 export const MAX_NAME_LENGTH = 60;

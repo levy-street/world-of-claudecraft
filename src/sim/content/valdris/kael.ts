@@ -428,7 +428,7 @@ export const KAEL_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 14,
     rally: { radius: 14, every: 12, ap: 60, duration: 10, name: 'Oathbroken Standard' },
-    mortalStrike: { chance: 0.25, healReduction: 0.5, duration: 6, name: 'Mortal Strike' },
+    mortalStrike: { chance: 0.25, healReduction: 0.5, duration: 6, name: 'Maiming Strike' },
     summonAdds: { mobId: 'broken_legion_deserter', count: 2, atHpPct: [0.5] },
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.2 },
     loot: [

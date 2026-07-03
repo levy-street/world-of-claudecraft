@@ -8,8 +8,8 @@
     "updateGroundAoEs first-in-tick (~2256)",
     "pulseGroundAoE both callers (immediate ~4097 + deferred ~3052)"
   ],
-  "draws": 3633,
-  "drawDigest": "b43c408c",
+  "draws": 3612,
+  "drawDigest": "7047325e",
   "frames": [
     {
       "tick": 0,
@@ -182,8 +182,8 @@
       "state": "ae9edab6",
       "events": "c5fa2020",
       "rng": {
-        "draws": 2062,
-        "digest": "e8737248"
+        "draws": 2061,
+        "digest": "0ae625ba"
       }
     },
     {
@@ -201,33 +201,33 @@
       "tick": 180,
       "time": 9,
       "nextId": 1372,
-      "state": "404a6203",
-      "events": "bac8d972",
+      "state": "267f2145",
+      "events": "adb6aeea",
       "rng": {
-        "draws": 3040,
-        "digest": "4854ac61"
+        "draws": 3047,
+        "digest": "1dfc0a1d"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 1372,
-      "state": "7c8622e4",
+      "state": "333f95fa",
       "events": "741638a5",
       "rng": {
-        "draws": 3620,
-        "digest": "b6422bed"
+        "draws": 3596,
+        "digest": "851573e8"
       }
     },
     {
       "tick": 201,
       "time": 10.05,
       "nextId": 1372,
-      "state": "def4ce4c",
+      "state": "74cff546",
       "events": "741638a5",
       "rng": {
-        "draws": 3633,
-        "digest": "b43c408c"
+        "draws": 3612,
+        "digest": "7047325e"
       },
       "label": "final",
       "players": [
@@ -246,7 +246,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 166,
-            "damageTaken": 29
+            "damageTaken": 22
           },
           "craftSkills": {},
           "delveClears": {},
@@ -271,14 +271,14 @@
         {
           "aiState": "idle",
           "attackPower": 120,
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.068,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49971,
+          "hp": 49978,
           "id": 1370,
           "inCombat": true,
           "kind": "player",
@@ -324,7 +324,7 @@
         {
           "aggroTargetId": 1370,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

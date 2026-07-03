@@ -83,7 +83,13 @@ function world(): WorldDerived {
 const RIDGE_HEIGHT = 40;
 const RIDGE_SIGMA = 10; // gaussian width of the wall
 const PASS_HALF_WIDTH = 10; // flat opening around the road
-const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
+// ...rising to full wall by this far from the pass. 28 (was 34): with the
+// full 16-ridge Valdris strip the crest noise can dip at an unlucky
+// (x, ridge) sample, and the wider shoulder left |x|=16 crossings under the
+// wall margin there; the steeper ramp keeps the whole 16..34 shoulder band a
+// real wall on every ridge (tests/terrain_walls.test.ts) while the flat pass
+// corridor (|x| < 10) is untouched.
+const PASS_SHOULDER = 28;
 
 export const MIREFEN_IMPACT_CRATER = {
   x: 149.5,

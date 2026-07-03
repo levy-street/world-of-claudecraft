@@ -2315,9 +2315,18 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
       p.pos.x = run.origin.x + h.x;
       p.pos.z = run.origin.z + zBase + h.z;
       p.prevPos = { ...p.pos };
-      const hp0 = p.hp;
-      for (let i = 0; i < 20; i++) sim.tick();
-      return hp0 - p.hp;
+      // Sum only the Blackwater hazard damage: the module's spawned mobs can
+      // reach melee within the window (their approach shifts with the global
+      // rng stream), and a raw hp delta would fold their hits into the ratio.
+      let total = 0;
+      for (let i = 0; i < 20; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.ability === 'Blackwater' && ev.targetId === p.id) {
+            total += ev.amount;
+          }
+        }
+      }
+      return total;
     };
     const base = pulse([]);
     const flooded = pulse(['high_water']);

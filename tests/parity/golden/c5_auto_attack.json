@@ -14,8 +14,8 @@
     "rangedSwing Wand (mage, arcane, no armor, no dead zone)",
     "stopAutoAttack public entry"
   ],
-  "draws": 1756,
-  "drawDigest": "444b6dfe",
+  "draws": 1757,
+  "drawDigest": "838cf36a",
   "frames": [
     {
       "tick": 0,
@@ -1062,8 +1062,8 @@
       "state": "126a7f58",
       "events": "3001aad3",
       "rng": {
-        "draws": 1725,
-        "digest": "7136e267"
+        "draws": 1726,
+        "digest": "970e924a"
       }
     },
     {
@@ -1073,8 +1073,8 @@
       "state": "3df2b5bc",
       "events": "741638a5",
       "rng": {
-        "draws": 1756,
-        "digest": "444b6dfe"
+        "draws": 1757,
+        "digest": "838cf36a"
       },
       "label": "after-stop",
       "players": [
@@ -1825,8 +1825,8 @@
       "state": "3df2b5bc",
       "events": "741638a5",
       "rng": {
-        "draws": 1756,
-        "digest": "444b6dfe"
+        "draws": 1757,
+        "digest": "838cf36a"
       },
       "label": "final",
       "players": [
