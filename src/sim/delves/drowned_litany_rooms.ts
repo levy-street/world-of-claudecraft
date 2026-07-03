@@ -1,7 +1,7 @@
 // The Drowned Litany room puzzle semantics (sim-only). Walk-on valves/tablets/
 // candles/ropes and destroyable baptistry egg-sacs gate the module exit.
 
-import { delveModuleZOffset as delveModuleZOffsetLayout, MOBS } from '../data';
+import { DELVES, delveModuleZOffset as delveModuleZOffsetLayout, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { SimContext } from '../sim_context';
 import { DELVE_PLATE_RADIUS, type DelveRun, dist2d, type Entity, type Vec3 } from '../types';
@@ -79,6 +79,11 @@ export function litanyPuzzleTriggeredTemplate(kind: string, triggered: boolean):
   }
 }
 
+function litanyEnemyLevelBonus(run: DelveRun): number {
+  const tier = DELVES[run.delveId]?.tiers.find((t) => t.id === run.tierId);
+  return tier?.enemyLevelBonus ?? 0;
+}
+
 function livingCantorsInRun(ctx: SimContext, run: DelveRun): Entity[] {
   const out: Entity[] = [];
   for (const id of run.mobIds) {
@@ -144,7 +149,7 @@ function onEggSacBurst(ctx: SimContext, run: DelveRun, dead: Entity): void {
   if (!tmpl) return;
   // Hatchlings carry the same Heroic level bonus as the waves (and the sac
   // itself), so they are not 3 levels grey under the rest of the room.
-  const enemyLevelBonus = run.tierId === 'heroic' ? 3 : 0;
+  const enemyLevelBonus = litanyEnemyLevelBonus(run);
   for (let i = 0; i < 2; i++) {
     const ang = ctx.rng.range(0, Math.PI * 2);
     const dist = ctx.rng.range(2, 4.5);
@@ -239,7 +244,7 @@ function spawnLitanyEggSacMob(
 function enableLitanyBaptistryEggSacs(ctx: SimContext, run: DelveRun, zBase: number): void {
   if (!run.litanyBaptistry || run.litanyBaptistry.eggsEnabled) return;
   run.litanyBaptistry.eggsEnabled = true;
-  const enemyLevelBonus = run.tierId === 'heroic' ? 3 : 0;
+  const enemyLevelBonus = litanyEnemyLevelBonus(run);
   for (const spot of BAPTISTRY_EGG_SAC_SPOTS) {
     const pos = ctx.groundPos(run.origin.x + spot.x, run.origin.z + zBase + spot.z);
     const id = spawnLitanyEggSacMob(ctx, run, pos, enemyLevelBonus);
