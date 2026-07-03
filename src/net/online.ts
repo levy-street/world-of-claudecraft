@@ -747,6 +747,7 @@ function blankEntity(id: number): Entity {
     castRemaining: 0,
     castTotal: 0,
     castAim: null,
+    castTargetId: null,
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,

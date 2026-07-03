@@ -132,6 +132,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // completed ground-targeted channels drop their aim like every other
       // resolve path: castAim is always cleared on resolve
       p.castAim = null;
+      p.castTargetId = null;
       ctx.emit({ type: 'castStop', entityId: p.id, success: true });
     }
     return;
@@ -139,15 +140,17 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
 
   if (p.castRemaining <= CAST_COMPLETE_EPS) {
     const castId = p.castingAbility;
+    const castTargetId = p.castTargetId;
     p.castingAbility = null;
     p.castRemaining = 0;
+    p.castTargetId = null;
     ctx.emit({ type: 'castStop', entityId: p.id, success: true });
     if (castId === FISHING_CAST_ID) {
       ctx.completeFishing(p, meta);
       return;
     }
     const res = ctx.resolvedAbility(castId, p.id);
-    if (res) applyAbility(ctx, p, meta, res);
+    if (res) applyAbility(ctx, p, meta, res, castTargetId);
     // the aim point is consumed by the resolved area effects; drop it so a later
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
@@ -159,6 +162,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.castRemaining = 0;
   p.channeling = false;
   p.castAim = null;
+  p.castTargetId = null;
   ctx.emit({ type: 'castStop', entityId: p.id, success: false });
 }
 
@@ -399,9 +403,12 @@ export function castAbility(
   // instant cast (resolved just below) and a cast-time spell (resolved on
   // completion in updateCasting). Cleared there / on cancel.
   p.castAim = aimPoint;
+  const castTargetId =
+    ability.requiresTarget && ability.targetType !== 'friendly' ? (target?.id ?? null) : null;
 
   // Heroic-strike style: queue on next swing, pay cost on the swing itself.
   if (ability.onNextSwing) {
+    p.castTargetId = null;
     const toggledOff = p.queuedOnSwing === ability.id;
     p.queuedOnSwing = toggledOff ? null : ability.id;
     if (!toggledOff && canCastFree && consumeNextCastFree(ctx, p)) {
@@ -434,6 +441,7 @@ export function castAbility(
     spendResource(p, res.cost);
     armAbilityCooldown(p, ability.id, res.cooldown);
     p.castingAbility = ability.id;
+    p.castTargetId = castTargetId;
     p.castTotal = ability.channel.duration;
     p.castRemaining = ability.channel.duration;
     p.channeling = true;
@@ -453,6 +461,7 @@ export function castAbility(
     // Curse of Tongues stretches the resolved (already haste-adjusted) cast time.
     const stretchedCastTime = castTime * tonguesMult(p);
     p.castingAbility = ability.id;
+    p.castTargetId = castTargetId;
     p.castTotal = stretchedCastTime;
     p.castRemaining = stretchedCastTime;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
@@ -461,6 +470,7 @@ export function castAbility(
   }
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
+  p.castTargetId = null;
   applyAbility(ctx, p, meta, res);
   // instant ground-targeted cast: its effects have consumed the aim point.
   p.castAim = null;
@@ -539,7 +549,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     return;
   }
 
-  const target = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
+  const target = p.castTargetId !== null ? ctx.entities.get(p.castTargetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(p, target)) {
     cancelCast(ctx, p);
     return;
@@ -595,7 +605,13 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   });
 }
 
-function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: ResolvedAbility): void {
+function applyAbility(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  res: ResolvedAbility,
+  castTargetId: number | null = null,
+): void {
   const ability = res.def;
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // The free charge is consumed exactly where a cost is actually billed; the
@@ -646,7 +662,8 @@ function applyAbility(ctx: SimContext, p: Entity, meta: PlayerMeta, res: Resolve
       return;
     }
   } else if (ability.requiresTarget) {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    const targetId = castTargetId ?? p.targetId;
+    target = targetId !== null ? (ctx.entities.get(targetId) ?? null) : null;
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
       ctx.error(p.id, 'You have no target.');
       return;

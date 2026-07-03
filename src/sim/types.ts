@@ -1411,6 +1411,9 @@ export interface Entity {
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
   castAim: Vec3 | null;
+  // Targeted hostile casting: the entity selected when a cast/channel begins, so
+  // completion/ticks resolve against that target even if the player changes target.
+  castTargetId: number | null;
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;

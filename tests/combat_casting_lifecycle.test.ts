@@ -70,6 +70,27 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(ticks).toBeGreaterThan(1); // actually progressed over multiple ticks
     expect(p.hp).toBeGreaterThan(hp0); // applyAbility ran the heal effect
   });
+
+  it('resolves a completed hostile cast against the target selected at cast start', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    const original = spawnTarget(sim, p, 1, 6);
+    const switched = spawnTarget(sim, p, 1, 8);
+    sim.targetEntity(original.id, p.id);
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+
+    p.targetId = switched.id;
+    const originalHp0 = original.hp;
+    const switchedHp0 = switched.hp;
+    drainCast(sim, p, meta);
+    for (let i = 0; i < 30 && original.hp === originalHp0 && switched.hp === switchedHp0; i++) {
+      sim.tick();
+    }
+
+    expect(original.hp).toBeLessThan(originalHp0);
+    expect(switched.hp).toBe(switchedHp0);
+  });
 });
 
 describe('casting_lifecycle: channel start -> tick -> finish', () => {
