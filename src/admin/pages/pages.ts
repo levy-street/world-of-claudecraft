@@ -11,7 +11,16 @@ export type AdminPage =
   | 'shared-ips'
   | 'chat-filter'
   | 'blocked-ips'
-  | 'bug-reports';
+  | 'bug-reports'
+  | 'housekeeping'
+  | 'housekeeping-rates'
+  | 'housekeeping-calendar'
+  | 'housekeeping-mobs'
+  | 'housekeeping-spawns'
+  | 'housekeeping-quests'
+  | 'housekeeping-npcs'
+  | 'housekeeping-items'
+  | 'housekeeping-world';
 
 export interface AdminNavItem {
   id: AdminPage;
@@ -71,6 +80,22 @@ export const NAV_SECTIONS: readonly AdminNavSection[] = [
     labelKey: 'nav.support',
     defaultPage: 'bug-reports',
     items: [{ id: 'bug-reports', labelKey: 'nav.bugReports' }],
+  },
+  {
+    id: 'housekeeping',
+    labelKey: 'nav.housekeeping',
+    defaultPage: 'housekeeping',
+    items: [
+      { id: 'housekeeping', labelKey: 'nav.hkOverview' },
+      { id: 'housekeeping-rates', labelKey: 'nav.hkRates' },
+      { id: 'housekeeping-calendar', labelKey: 'nav.hkCalendar' },
+      { id: 'housekeeping-mobs', labelKey: 'nav.hkMobs' },
+      { id: 'housekeeping-spawns', labelKey: 'nav.hkSpawns' },
+      { id: 'housekeeping-quests', labelKey: 'nav.hkQuests' },
+      { id: 'housekeeping-npcs', labelKey: 'nav.hkNpcs' },
+      { id: 'housekeeping-items', labelKey: 'nav.hkItems' },
+      { id: 'housekeeping-world', labelKey: 'nav.hkWorld' },
+    ],
   },
 ];
 

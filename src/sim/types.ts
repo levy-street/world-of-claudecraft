@@ -2122,7 +2122,7 @@ export const MAX_VIRTUAL_LEVEL = 200; // table bound; far beyond any reachable l
 
 // VLEVEL_CUM[v] = total lifetime XP required to *reach* virtual level v.
 // VLEVEL_CUM[1] = 0; index 0 is unused padding.
-const VLEVEL_CUM: number[] = (() => {
+function buildVlevelCum(): number[] {
   const cum: number[] = [0, 0];
   let total = 0;
   // real levels: 1→2 … 19→20 come straight from XP_TABLE
@@ -2138,7 +2138,18 @@ const VLEVEL_CUM: number[] = (() => {
     step *= POSTCAP_GROWTH;
   }
   return cum;
-})();
+}
+
+const VLEVEL_CUM: number[] = buildVlevelCum();
+
+// The cumulative table above is derived from XP_TABLE at module eval. A host
+// that mutates XP_TABLE (the game-config override layer, src/sim/game_config.ts)
+// must call this afterwards so virtual levels keep matching the live curve.
+export function refreshPostcapXpTable(): void {
+  const next = buildVlevelCum();
+  VLEVEL_CUM.length = 0;
+  VLEVEL_CUM.push(...next);
+}
 
 // Total lifetime XP needed to reach a given (virtual or real) level. Used to
 // backfill `lifetimeXp` for characters saved before the counter existed.

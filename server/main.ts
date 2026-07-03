@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 import { type WebSocket, WebSocketServer } from 'ws';
+import { TUNING } from '../src/sim/game_config';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -113,6 +114,8 @@ import {
 } from './github';
 import { topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { applyGameConfigAtBoot } from './housekeeping';
+import { loadGameConfigOverrides } from './housekeeping_db';
 import {
   contentLengthExceeds,
   isUniqueViolation,
@@ -228,7 +231,12 @@ const MAX_WS_PER_IP_HARD = Number(process.env.MAX_WS_PER_IP_HARD ?? '20');
 // process propagate and expired blocks fall out.
 const BLOCKED_IP_REFRESH_MS = 60_000;
 
-const game = new GameServer();
+// Constructed inside main() AFTER the housekeeping game-config overrides are
+// loaded and applied: the Sim ctor reads the content tables (spawns, rolled
+// levels), so the world must not be built before they are overridden. Nothing
+// touches `game` until main() has assigned it (routes, timers, and the WS
+// server are all wired later inside main()).
+let game!: GameServer;
 
 // Map editor persistence: the shared business rules (maps.ts / user_assets.ts)
 // wired to their Postgres backends, mirroring the SocialService/SocialDb split.
@@ -240,7 +248,10 @@ function initialCharacterState(
   name: string,
   skin: number,
 ): import('../src/sim/sim').CharacterState {
-  const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
+  // Deliberate: a worldSeed override retargets this template sim too, so new
+  // characters serialize against the same world the realm actually runs
+  // (historically a fixed 20061, independent of WORLD_SEED).
+  const sim = new Sim({ seed: TUNING.worldSeed ?? 20061, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');
@@ -1730,6 +1741,14 @@ async function main(): Promise<void> {
   }
   await ensureSchema();
   await seedOAuthClients();
+  // Housekeeping: load + apply this realm's game-config overrides BEFORE the
+  // world exists; the GameServer ctor builds the Sim from the content tables.
+  const storedOverrides = await loadGameConfigOverrides();
+  const overrideWarnings = applyGameConfigAtBoot(storedOverrides.data, new Date().toISOString());
+  for (const warning of overrideWarnings) {
+    console.warn(`game-config override dropped: ${warning}`);
+  }
+  game = new GameServer();
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
   const pruned = await pruneChatLogs(CHAT_LOG_RETENTION_DAYS);

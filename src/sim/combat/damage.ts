@@ -25,6 +25,7 @@
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
+import { tunedXpAmount } from '../game_config';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -649,6 +650,11 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
+  // Operator XP rate (game_config override layer). Identity at the default 1,
+  // so unconfigured hosts keep the exact classic-era awards. Applied before the
+  // rested draw-down so the rested bonus scales with the same knob.
+  amount = tunedXpAmount(amount);
+  if (amount <= 0) return;
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.

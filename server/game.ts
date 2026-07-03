@@ -14,6 +14,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { TUNING } from '../src/sim/game_config';
 import type { PickAction } from '../src/sim/lockpick';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
@@ -788,9 +789,13 @@ export class GameServer {
 
   constructor() {
     this.sim = new Sim({
-      seed: WORLD_SEED,
+      // The housekeeping override layer (applied in main() before this ctor
+      // runs) may retarget the seed and the mob respawn base; the TUNING
+      // defaults reproduce the historical values exactly.
+      seed: TUNING.worldSeed ?? WORLD_SEED,
       playerClass: 'warrior',
       noPlayer: true,
+      respawnSeconds: TUNING.respawnSeconds,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
@@ -1827,6 +1832,12 @@ export class GameServer {
   // -------------------------------------------------------------------------
   // Admin dashboard views (read-only)
   // -------------------------------------------------------------------------
+
+  // World facts the housekeeping overview shows (the seed actually in use and
+  // whether dev commands are on).
+  housekeepingSummary(): { worldSeed: number; devCommands: boolean } {
+    return { worldSeed: this.sim.cfg.seed, devCommands: this.sim.devCommands };
+  }
 
   adminStats(): AdminServerStats {
     const mem = process.memoryUsage();
