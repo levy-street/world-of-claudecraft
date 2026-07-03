@@ -319,7 +319,7 @@ const ADMIN_VALIDATION_FAILED = { success: false, data: null, error: 'validation
 // so the gate's fail-closed staff check is the one that must refuse it.
 function installNonAdminDb(): void {
   setAdminDbForTests({
-    accountForToken: async () => NON_ADMIN_ACCOUNT_ID,
+    accountAndScopeForToken: async () => ({ accountId: NON_ADMIN_ACCOUNT_ID, scope: 'full' as const }),
     adminRolesForAccount: async () => null,
   });
 }
@@ -329,7 +329,7 @@ function installNonAdminDb(): void {
 // operator identity.
 function installAdminDb(): void {
   setAdminDbForTests({
-    accountForToken: async () => CALLER_ACCOUNT_ID,
+    accountAndScopeForToken: async () => ({ accountId: CALLER_ACCOUNT_ID, scope: 'full' as const }),
     adminRolesForAccount: async () => ({ username: 'op', roles: ['superadmin'] }),
   });
 }

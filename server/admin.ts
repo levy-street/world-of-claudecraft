@@ -47,6 +47,7 @@ import {
   type WordTier,
 } from './chat_filter_db';
 import {
+  accountAndScopeForToken,
   accountById,
   accountForToken,
   accountMailTarget,
@@ -55,6 +56,7 @@ import {
   pool,
   revokeTokensExcept,
   saveToken,
+  scopeAllowsMutation,
   setAccountDeactivated,
   touchLogin,
   updatePasswordHash,
@@ -225,12 +227,17 @@ interface AdminIdentity {
 async function adminIdentity(req: http.IncomingMessage): Promise<AdminIdentity | null> {
   const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
   if (!m) return null;
-  const accountId = await accountForToken(m[1]);
-  if (accountId === null) return null;
-  const staff = await adminRolesForAccount(accountId);
+  const info = await accountAndScopeForToken(m[1]);
+  if (!info) return null;
+  // The whole admin API is privileged reads + mutations, so a read-scoped token
+  // (an OAuth / companion-app token) must never reach it, even on a staff account.
+  // Require a full-session token, matching scopeAllowsMutation elsewhere, before the
+  // role lookup.
+  if (!scopeAllowsMutation(info.scope)) return null;
+  const staff = await adminRolesForAccount(info.accountId);
   if (staff === null) return null;
   return {
-    accountId,
+    accountId: info.accountId,
     username: staff.username,
     roles: staff.roles,
     permissions: permissionsForRoles(staff.roles),
@@ -1037,6 +1044,9 @@ function makeRealAdminDb() {
     moderationReportsForAccount,
     muteAccountChat,
     accountForToken,
+    // The pipeline admin gate (createRequireAdmin) reads token scope so a read-scoped
+    // companion token of a staff account is rejected, matching the legacy adminIdentity fix.
+    accountAndScopeForToken,
     accountMailTarget,
     findAccount,
     // Target-account staff check (the "admin accounts cannot be suspended / banned /

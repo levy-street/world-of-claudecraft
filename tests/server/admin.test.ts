@@ -86,7 +86,7 @@ const allowedRateLimit = (): ReturnType<NonNullable<AdminDbBundle['rateLimited']
 // target reads as a normal account). Extra reads are layered per test.
 function authedAdminDb(overrides: DbOverrides = {}): void {
   setDb({
-    accountForToken: async () => ADMIN_ACCOUNT_ID,
+    accountAndScopeForToken: async () => ({ accountId: ADMIN_ACCOUNT_ID, scope: 'full' as const }),
     adminRolesForAccount: async (id: number) =>
       id === ADMIN_ACCOUNT_ID ? { username: 'op', roles: ['superadmin'] } : null,
     isAdminAccount: async (id: number) => id === ADMIN_ACCOUNT_ID,
@@ -271,28 +271,44 @@ describe('admin envelope contract (frozen)', () => {
 
 describe('requireAdmin gate', () => {
   it('401s a missing bearer DB-free with the legacy admin body', async () => {
-    const accountForToken = vi.fn(async () => ADMIN_ACCOUNT_ID);
+    const accountAndScopeForToken = vi.fn(async () => ({ accountId: ADMIN_ACCOUNT_ID, scope: 'full' as const }));
     const adminRolesForAccount = vi.fn(async () => ({ username: 'op', roles: ['superadmin'] }));
-    setDb({ accountForToken, adminRolesForAccount });
+    setDb({ accountAndScopeForToken, adminRolesForAccount });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview');
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
     // A missing bearer never reaches the token lookup.
-    expect(accountForToken).not.toHaveBeenCalled();
+    expect(accountAndScopeForToken).not.toHaveBeenCalled();
   });
 
   it('401s a valid bearer whose account is NOT staff (no roles)', async () => {
-    setDb({ accountForToken: async () => 42, adminRolesForAccount: async () => null });
+    setDb({ accountAndScopeForToken: async () => ({ accountId: 42, scope: 'full' as const }), adminRolesForAccount: async () => null });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
   });
 
+  it('401s a read-scoped token even on a staff account, before the role lookup (#1385)', async () => {
+    // A read-scoped companion / OAuth token of a staff account must never reach the
+    // admin API (all privileged mutations). The gate rejects on scope BEFORE the
+    // adminRolesForAccount lookup, so a read token never even resolves staff roles.
+    const adminRolesForAccount = vi.fn(async () => ({ username: 'op', roles: ['superadmin'] }));
+    setDb({
+      accountAndScopeForToken: async () => ({ accountId: ADMIN_ACCOUNT_ID, scope: 'read' as const }),
+      adminRolesForAccount,
+    });
+    installAdminRuntime();
+    const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
+    expect(adminRolesForAccount).not.toHaveBeenCalled();
+  });
+
   it('401s a bearer that resolves to no account', async () => {
     setDb({
-      accountForToken: async () => null,
+      accountAndScopeForToken: async () => null,
       adminRolesForAccount: async () => ({ username: 'op', roles: ['superadmin'] }),
     });
     installAdminRuntime();
@@ -1987,7 +2003,7 @@ describe('reset-password RouteDef handler (accounts.password)', () => {
     // The actor holds accounts.password via the plain admin role, but the target
     // reads as staff (isAdminAccount true), so the reset is refused.
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => ({ accountId: ADMIN_ACCOUNT_ID, scope: 'full' as const }),
       adminRolesForAccount: async (id: number) =>
         id === ADMIN_ACCOUNT_ID ? { username: 'op', roles: ['admin'] } : null,
       isAdminAccount: async () => true,
@@ -2012,7 +2028,7 @@ describe('reset-password RouteDef handler (accounts.password)', () => {
   it('is denied 403 by the central gate for a moderator (accounts.password not held)', async () => {
     const deps = resetDeps();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => ({ accountId: ADMIN_ACCOUNT_ID, scope: 'full' as const }),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       ...deps,
     });

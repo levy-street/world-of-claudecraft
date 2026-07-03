@@ -3,8 +3,10 @@
 // mirroring the account-owner seam (require_owned.ts) but for the OPERATOR scope:
 //
 //  - createRequireAdmin(getDb): the admin-auth gate. It mirrors the legacy
-//    adminIdentity(req) resolver EXACTLY (server/admin.ts): resolve the 64-hex
-//    bearer, look up the account, require at least one staff role
+//    adminIdentity(req) resolver (server/admin.ts): resolve the 64-hex bearer,
+//    require a full-session token scope (a read-scoped companion/OAuth token of a
+//    staff account is rejected, since the admin API is all privileged mutations),
+//    then require at least one staff role
 //    (staff_db.adminRolesForAccount, fail closed; roles are re-read on every
 //    request so a dashboard revocation applies to the next call). On ANY failure
 //    (absent/bad token, unknown account, non-staff account) it writes the legacy
@@ -53,6 +55,7 @@
 
 import { type AdminPermission, permissionsForRoles } from '../../admin_permissions';
 import { adminPathKnown, permissionForAdminRoute } from '../../admin_routes';
+import { scopeAllowsMutation, type TokenScope } from '../../db';
 import { json } from '../../http_util';
 import { num } from '../schema';
 import type { Ctx, Middleware, Next, RouteMeta } from '../types';
@@ -88,11 +91,18 @@ export interface AdminIdentity {
 /**
  * The two db reads the admin gate needs, bundled so a unit test can inject a fake
  * with no Postgres. The shape mirrors the real server exports the legacy
- * adminIdentity(req) resolver calls (db.accountForToken, staff_db.adminRolesForAccount).
+ * adminIdentity(req) resolver calls (db.accountAndScopeForToken, staff_db.adminRolesForAccount).
  */
 export interface AdminAuthDb {
-  /** Account id for a live bearer token, or null (mirrors db.accountForToken). */
-  accountForToken(token: string): Promise<number | null>;
+  /**
+   * Account id + token scope for a live bearer token, or null (mirrors
+   * db.accountAndScopeForToken). A read-scoped companion / OAuth token of a staff
+   * account resolves here but the gate rejects it: the whole admin API is
+   * privileged mutations, so only a full-session token may pass.
+   */
+  accountAndScopeForToken(
+    token: string,
+  ): Promise<{ accountId: number; scope: TokenScope } | null>;
   /** Staff username + roles, or null when not staff (mirrors staff_db.adminRolesForAccount). */
   adminRolesForAccount(accountId: number): Promise<{ username: string; roles: string[] } | null>;
 }
@@ -109,9 +119,18 @@ export function createRequireAdmin(getDb: () => AdminAuthDb): Middleware {
   return async (ctx: Ctx, next: Next) => {
     const token = bearerToken(ctx.req);
     const db = getDb();
-    const accountId = token === null ? null : await db.accountForToken(token);
-    const staff = accountId === null ? null : await db.adminRolesForAccount(accountId);
-    if (accountId === null || staff === null) {
+    const info = token === null ? null : await db.accountAndScopeForToken(token);
+    // A read-scoped companion / OAuth token of a staff account must never reach the
+    // admin API (all privileged mutations). Reject on scope BEFORE the role lookup,
+    // matching scopeAllowsMutation elsewhere and the legacy adminIdentity resolver.
+    // This is prod-critical: API_DISPATCH=new (the default) runs this pipeline arm.
+    if (info === null || !scopeAllowsMutation(info.scope)) {
+      json(ctx.res, 401, ADMIN_AUTH_REQUIRED);
+      return;
+    }
+    const accountId = info.accountId;
+    const staff = await db.adminRolesForAccount(accountId);
+    if (staff === null) {
       json(ctx.res, 401, ADMIN_AUTH_REQUIRED);
       return;
     }
@@ -151,11 +170,9 @@ export function createRequireAdmin(getDb: () => AdminAuthDb): Middleware {
       return;
     }
 
-    // NOMINAL stamp, not the token's real scope: the legacy gate never scope-checks
-    // an admin bearer (accountForToken ignores the scope column, so a read-scope
-    // companion token of a staff account passes too, parity-first). Today's admin
-    // handlers read only ctxAccountId; do NOT trust ctx.account.scope downstream of
-    // requireAdmin for a scope decision without resolving the token's actual scope.
+    // Truthful now: the gate rejected any non-full token above, so only a full-session
+    // staff token reaches here. (Previously a nominal parity-first stamp that a
+    // read-scope companion token could sail through; that hole is now closed.)
     ctx.account = { accountId, scope: 'full' };
     ctx.state.set(ADMIN_IDENTITY, identity);
     await next();
