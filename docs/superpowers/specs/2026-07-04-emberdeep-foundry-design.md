@@ -11,7 +11,7 @@ crags, relit by an ember cult. Pre-raid-best rewards: top-end rares plus one epi
 per class archetype from the final boss, slotting under Nythraxis raid loot.
 Built on the temple.ts pattern: one self-contained content module, a new interior
 layout, a new renderer interior variant reusing the temple liquid shader retinted
-to magma, a 6-quest surface chain, and full test coverage. No instance-system or
+to magma, a 7-quest surface chain, and full test coverage. No instance-system or
 sim-engine code changes.
 
 ## Decisions made in the brainstorm
