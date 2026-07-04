@@ -3335,8 +3335,6 @@ export class GameServer {
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
     maybe('cds', Object.fromEntries([...p.cooldowns.entries()].map(([k, v]) => [k, round2(v)])));
-    maybe('stats', p.stats);
-    maybe('weapon', p.weapon);
     maybe('party', this.partyWire(anchorSession.pid));
     maybe('marks', this.markersWire(anchorSession.pid));
     maybe('trade', this.tradeWire(anchorSession.pid));
