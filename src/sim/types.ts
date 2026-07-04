@@ -90,7 +90,7 @@ export function isPetClass(cls: PlayerClass): boolean {
 export type PlayerFaction = 'kael' | 'veth' | 'ossara';
 
 // Playable races, four per faction (see docs/design/valdris-continent.md).
-// Characters saved before races existed load as 'human' (Kael).
+// Characters saved before races existed load UNSWORN (race undefined) and choose at the Envoys' Hall.
 export type PlayerRace =
   | 'human'
   | 'dwarf'
@@ -127,7 +127,7 @@ export interface RacialEffects {
 
 // A playable race record (content/races.ts). A race picks the faction, a
 // cosmetic base aspect (body scale + a subtle model tint), and one passive
-// racial trait. Pre-race saves load as 'human', whose racial is rested-XP
+// racial trait. Pre-race saves load UNSWORN with no racial; the human racial is rested-XP
 // only, so a legacy character's combat numbers stay byte-identical.
 export interface RaceDef {
   id: PlayerRace;

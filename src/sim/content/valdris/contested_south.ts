@@ -1200,7 +1200,8 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
   },
 };
 
-// No quests in the contested strip: these bands are wilderness by design.
+// The contested strip carries faction-open quest packs (below) plus the two
+// engine-event exemplars; the wilderness feel comes from camp density, not emptiness.
 export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
   // Contested-south quest packs: faction-open work for any sworn traveler.
   // Grey Hollows: the Underway keeps its roads by paying in blood.

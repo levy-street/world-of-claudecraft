@@ -892,7 +892,7 @@ export interface CharacterState {
   resSickness?: number | null;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
-  // Playable race (JSONB; optional so pre-race saves load as 'human'/Kael).
+  // Playable race (JSONB; optional: absent means UNSWORN until the Envoys' Hall oath).
   race?: PlayerRace;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
   pendingSkinRank?: SkinRank | null;

@@ -5,7 +5,7 @@
 // tint the renderer applies), and ONE passive racial trait, WoW-style but
 // from our own lore. Racials are deliberately small (1-5%) so the race+class
 // combination flavors a build without ever being a mandatory min-max pick.
-// Characters saved before races existed load as 'human'; the human racial is
+// Characters saved before races existed load UNSWORN (no race); the human racial is
 // rested-XP only, so a legacy character's combat numbers stay byte-identical.
 // Racial names/descriptions are client-side i18n (races.racial* keys); the
 // effects here are the single source recalcPlayerStats and the rested-XP
