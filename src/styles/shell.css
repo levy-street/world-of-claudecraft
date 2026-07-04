@@ -2576,6 +2576,9 @@
   @media (max-width: 560px) {
     .mini-race-row {
       grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   /* WoW-style full-screen character screens (the offline panel plus the two
      online panels carry the cs-wow class). Desktop only: below 900px the
      classic card layout above stays, and the ONLINE panels additionally keep
