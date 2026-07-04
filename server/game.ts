@@ -17,6 +17,7 @@ import { parseRelayCommand } from '../src/sim/discord_relay';
 import type { PickAction } from '../src/sim/lockpick';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
+import { questObjectVisibleTo } from '../src/sim/quest_object_visibility';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
@@ -3211,6 +3212,13 @@ export class GameServer {
   }
 
   private canObserveEntity(viewer: Entity, e: Entity, d2: number): boolean {
+    // Ground quest objects are visible only to a viewer whose gating quest is
+    // active/ready; a non-quester never receives the entity at all. When
+    // spectating, `viewer` is the spectated player, so this matches their log.
+    if (e.kind === 'object') {
+      const vMeta = this.sim.meta(viewer.id);
+      return !vMeta || questObjectVisibleTo(vMeta.questLog, e);
+    }
     if (e.kind !== 'player' || !isStealthed(e)) return true;
     if (this.sim.isHostileTo(viewer, e)) return false;
     const party = this.sim.partyOf(viewer.id);
