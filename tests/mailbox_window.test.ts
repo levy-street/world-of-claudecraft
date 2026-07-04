@@ -41,6 +41,22 @@ describe('mailbox_window: mail outcomes repaint the inventory cluster', () => {
   });
 });
 
+describe('mailbox_window: staging a parcel must not reset the send form (issue #1443)', () => {
+  const stageParcel = painter.slice(
+    painter.indexOf('stageParcel('),
+    painter.indexOf('onMailResult('),
+  );
+
+  it('slices a real stageParcel body to guard against renames', () => {
+    expect(stageParcel.length).toBeGreaterThan(0);
+  });
+
+  it('repaints only the parcels row, never the whole window (a full render rebuilds the form innerHTML and wipes typed To/Subject/Message)', () => {
+    expect(stageParcel).toContain('this.renderParcels()');
+    expect(stageParcel).not.toContain('this.render()');
+  });
+});
+
 describe('mailbox_window: house style', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('\u2014'), 'em dash found').toBe(false);

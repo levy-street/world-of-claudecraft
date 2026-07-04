@@ -121,7 +121,9 @@ export class MailboxWindow {
     if (count < 1) return;
     this.attachments.push({ itemId, count });
     audio.click();
-    this.render();
+    // Repaint only the parcels row: a full render() rebuilds the send form's
+    // innerHTML and wipes the typed To/Subject/Message and coin fields.
+    this.renderParcels();
   }
 
   /** Mail command outcome relayed by the HUD (handleEvents). */
