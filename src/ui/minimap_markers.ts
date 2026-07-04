@@ -31,6 +31,7 @@
 // to a color, never the resolved color.
 
 import { isDelvePos, QUESTS, zoneAt } from '../sim/data';
+import { questObjectVisibleTo } from '../sim/quest_object_visibility';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
 
@@ -160,7 +161,9 @@ export function createMinimapMarkers(): MinimapMarkers {
           (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')
         ) {
           markers.push({ kind: 'portal', mx, my });
-        } else if (e.kind === 'object' && e.lootable) {
+        } else if (e.kind === 'object' && e.lootable && questObjectVisibleTo(world.questLog, e)) {
+          // A ground quest object the local player is not on is invisible, so it
+          // must not show a loot blip either (mirrors the sim/server/render gate).
           markers.push({ kind: 'object-loot', mx, my });
         } else if (e.kind === 'mob' && !e.dead) {
           markers.push({ kind: 'mob', mx, my, aggro: e.aggroTargetId === p.id });

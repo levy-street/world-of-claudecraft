@@ -267,3 +267,50 @@ describe('minimap corpse marker (ghost run)', () => {
     expect(buildMarkers(world).some((m) => m.kind === 'corpse')).toBe(true);
   });
 });
+
+describe('minimap ground quest object visibility', () => {
+  // gravecaller_sigil is a real ground quest collectible gated behind q_whispers.
+  const QUEST_ITEM = 'gravecaller_sigil';
+  const QUEST_ID = 'q_whispers';
+
+  // makeWorld already has one plain lootable object (id 10, no objectItemId) that
+  // always blips; add a quest-gated object (id 30) and drive its visibility via the
+  // local player's questLog.
+  function worldWithQuestObject(
+    questLog: Map<string, { questId: string; counts: number[]; state: string }>,
+  ): IWorld {
+    const w = makeWorld('sim') as unknown as {
+      entities: Map<number, unknown>;
+      questLog: unknown;
+    };
+    w.entities.set(30, {
+      id: 30,
+      kind: 'object',
+      lootable: true,
+      objectItemId: QUEST_ITEM,
+      templateId: `ground_${QUEST_ITEM}`,
+      dead: false,
+      aggroTargetId: null,
+      questIds: [],
+      pos: { x: 9, z: PZ },
+    });
+    w.questLog = questLog;
+    return w as unknown as IWorld;
+  }
+
+  it('omits the loot blip for a ground quest object the player is not on', () => {
+    const lootBlips = buildMarkers(worldWithQuestObject(new Map())).filter(
+      (m) => m.kind === 'object-loot',
+    );
+    // only the plain lootable object (id 10) blips; the hidden quest object (id 30) does not
+    expect(lootBlips).toHaveLength(1);
+  });
+
+  it('shows the loot blip once the gating quest is active', () => {
+    const questLog = new Map([[QUEST_ID, { questId: QUEST_ID, counts: [0], state: 'active' }]]);
+    const lootBlips = buildMarkers(worldWithQuestObject(questLog)).filter(
+      (m) => m.kind === 'object-loot',
+    );
+    expect(lootBlips).toHaveLength(2);
+  });
+});

@@ -27,6 +27,7 @@ import {
   ZONES,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
+import { questObjectVisibleTo } from '../sim/quest_object_visibility';
 import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevel, zoneBiomeAt } from '../sim/world';
@@ -1965,6 +1966,10 @@ export class Renderer {
     this.viewCandidates.length = 0;
     for (const e of this.sim.entities.values()) {
       if (this.views.has(e.id)) continue;
+      // ground quest objects are invisible unless the local player's gating
+      // quest is active/ready (kept visible until turn-in, not just until the
+      // collect count is met)
+      if (!questObjectVisibleTo(this.sim.questLog, e)) continue;
       const required = e.id === center.id || e.id === center.targetId;
       if (required && !includeRequired) continue;
       const d2 = distSqXZ(e, center);
@@ -3948,6 +3953,7 @@ export class Renderer {
       const e = sim.entities.get(id);
       if (
         !e ||
+        !questObjectVisibleTo(this.sim.questLog, e) ||
         (!isPersistentPortalObject(e) &&
           id !== p.id &&
           id !== p.targetId &&
