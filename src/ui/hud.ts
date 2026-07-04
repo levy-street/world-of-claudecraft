@@ -8074,6 +8074,8 @@ export class Hud {
         }
         case 'escortProgress': {
           if (ev.state === 'started') this.showBanner(t('hudChrome.escort.start'));
+          else if (ev.state === 'paused') this.showBanner(t('hudChrome.escort.paused'));
+          else if (ev.state === 'resumed') this.showBanner(t('hudChrome.escort.resumed'));
           else if (ev.state === 'failed') this.showBanner(t('hudChrome.escort.failed'));
           else if (ev.state === 'done') {
             this.showBanner(t('hudChrome.escort.done'));

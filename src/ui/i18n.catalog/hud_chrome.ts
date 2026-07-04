@@ -264,6 +264,8 @@ export const hudChromeStrings = {
   },
   escort: {
     start: 'The escort sets out. Stay close.',
+    paused: 'Your charge waits: nobody is close enough to guard the road.',
+    resumed: 'The escort moves again.',
     failed: 'Your charge has fallen. The road claims another.',
     done: 'Safe arrival. The escort thanks you.',
   },

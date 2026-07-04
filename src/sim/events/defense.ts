@@ -227,6 +227,7 @@ export function updateDefenseEvents(ctx: SimContext): void {
       // replace a dead defender with a fresh one at the post
       const ally = ctx.entities.get(state.allyEntityId);
       if (!ally || ally.dead) {
+        ctx.allyDirectives.delete(state.allyEntityId);
         if (ally) ctx.dropEntity(ally.id);
         const fresh = spawnAllyAt(
           ctx,
@@ -271,8 +272,9 @@ export function updateDefenseEvents(ctx: SimContext): void {
     if (alive) continue;
     releaseWaveCorpses(ctx, state);
     state.wave++;
-    // refresh the credit set with everyone holding the line right now
-    for (const meta of questHoldersInRadius(ctx, site)) state.participants.add(meta.entityId);
+    // the credit set is whoever holds the line RIGHT NOW: leavers stop earning
+    // (they may rejoin later waves), late joiners start from this wave's count
+    state.participants = new Set(questHoldersInRadius(ctx, site).map((m) => m.entityId));
     setParticipantCounts(ctx, site, state.wave);
     emitToParticipants(ctx, state, {
       type: 'defenseWave',

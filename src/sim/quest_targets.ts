@@ -8,7 +8,7 @@
 // mirror produce identical output, and (unlike world.entities) none of it is
 // interest-radius limited: a camp far across the zone still resolves.
 
-import { CAMPS, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
+import { CAMPS, DEFENSE_SITES, ESCORT_ROUTES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import type { QuestObjective, QuestProgress } from './types';
 
 /** Identity of one quest objective (the map tooltip resolves its localized
@@ -164,6 +164,13 @@ export function questObjectiveAreas(
       const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
+    } else if (obj.type === 'defend' && obj.siteId) {
+      const site = DEFENSE_SITES[obj.siteId];
+      if (site) push(ref, { x: site.pos.x, z: site.pos.z }, site.radius + CAMP_AREA_PAD);
+    } else if (obj.type === 'escort' && obj.escortId) {
+      // blob the route start (where the run begins); the walk itself is guided
+      const route = ESCORT_ROUTES[obj.escortId];
+      if (route) push(ref, { x: route.start.x, z: route.start.z }, POINT_AREA_RADIUS + 6);
     }
   }
   return out;

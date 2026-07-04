@@ -434,7 +434,8 @@ function characterListPayload(chars: CharacterRow[]): {
     class: PlayerClass;
     level: number;
     skin: number;
-    race: PlayerRace;
+    // absent = unsworn (the oath happens in-world at the Envoys' Hall)
+    race?: PlayerRace;
     online: boolean;
     forceRename: boolean;
     lastPlayed: string | null;
@@ -449,7 +450,8 @@ function characterListPayload(chars: CharacterRow[]): {
       class: c.class,
       level: c.level,
       skin: c.state?.skin ?? 0,
-      race: isPlayerRace(c.state?.race) ? c.state.race : 'human',
+      // unsworn/legacy characters carry no race: the roster must not invent one
+      ...(isPlayerRace(c.state?.race) ? { race: c.state.race } : {}),
       online: [...game.clients.values()].some((s) => s.characterId === c.id),
       forceRename: c.force_rename,
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
@@ -864,7 +866,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         );
         // Characters are created UNSWORN: faction and race are sworn in-world
         // at the Envoys' Hall (src/sim/envoys.ts), so creation accepts no race.
-        // A stray race field from an older client is rejected the same as any
+        // an INVALID race value 400s; a valid one is silently ignored (unsworn by design)
         // other junk rather than silently minting a faction.
         if (body.race !== undefined && !isPlayerRace(body.race))
           return json(res, 400, { error: 'invalid race' });

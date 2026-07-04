@@ -1,6 +1,15 @@
 import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
 import type { Sim } from './sim';
-import { angleTo, dist2d, type Entity, GCD, MAX_LEVEL, normAngle, xpForLevel } from './types';
+import {
+  ACTIVE_LEVEL_CAP,
+  angleTo,
+  dist2d,
+  type Entity,
+  GCD,
+  MAX_LEVEL,
+  normAngle,
+  xpForLevel,
+} from './types';
 
 // ---------------------------------------------------------------------------
 // Discrete action space for RL agents.
@@ -135,7 +144,8 @@ export function encodeObs(sim: Sim): number[] {
   obs.push(p.hp / Math.max(1, p.maxHp));
   obs.push(p.resource / Math.max(1, p.maxResource));
   obs.push(p.level / MAX_LEVEL);
-  obs.push(p.level >= MAX_LEVEL ? 1 : sim.xp / xpForLevel(p.level));
+  // saturate at the ACTIVE cap: the bar freezes there, so progress reads 1, not 0
+  obs.push(p.level >= ACTIVE_LEVEL_CAP ? 1 : sim.xp / xpForLevel(p.level));
   obs.push(clamp(p.pos.x / WORLD_MAX_X, -1, 1));
   obs.push(
     clamp((p.pos.z - (WORLD_MIN_Z + WORLD_MAX_Z) / 2) / ((WORLD_MAX_Z - WORLD_MIN_Z) / 2), -1, 1),

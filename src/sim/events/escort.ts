@@ -30,6 +30,8 @@ export interface EscortRunState {
   timer: number;
   ambushMobIds: number[];
   participants: Set<number>;
+  /** Stall failsafe: last observed position + seconds without progress. */
+  stall: { x: number; z: number; t: number };
 }
 
 function directiveFor(
@@ -65,6 +67,7 @@ export function spawnEscortRoutes(ctx: SimContext): void {
       timer: 0,
       ambushMobIds: [],
       participants: new Set(),
+      stall: { x: route.start.x, z: route.start.z, t: 0 },
     });
   }
 }
@@ -174,6 +177,7 @@ export function updateEscorts(ctx: SimContext): void {
     if (state.phase === 'cooldown') {
       state.timer -= DT;
       if (state.timer > 0) continue;
+      ctx.allyDirectives.delete(state.escorteeEntityId);
       if (escortee) ctx.dropEntity(escortee.id);
       const fresh = spawnAllyAt(
         ctx,
@@ -188,6 +192,7 @@ export function updateEscorts(ctx: SimContext): void {
       state.phase = 'waiting';
       state.wpIndex = 0;
       state.participants.clear();
+      state.stall = { x: route.start.x, z: route.start.z, t: 0 };
       continue;
     }
     if (!escortee || escortee.dead) continue; // death hook owns the transition
@@ -250,7 +255,25 @@ export function updateEscorts(ctx: SimContext): void {
       dir.post = { ...escortee.pos };
       dir.moveTo = escortee.inCombat ? dir.moveTo : { x: wp.x, y: 0, z: wp.z };
     }
-    if (dist2d(escortee.pos, { x: wp.x, y: 0, z: wp.z }) > WAYPOINT_ARRIVE) continue;
+    if (dist2d(escortee.pos, { x: wp.x, y: 0, z: wp.z }) > WAYPOINT_ARRIVE) {
+      // Stall failsafe: moveToward is a straight slide with no pathfinding, so
+      // a geometry snag out of combat could wedge the run forever (players
+      // cannot kill their own escortee to reset it). After 15s without
+      // progress, snap to the blocking waypoint; deterministic, draws no rng.
+      const moved = dist2d(escortee.pos, { x: state.stall.x, y: 0, z: state.stall.z });
+      if (moved > 0.25 || escortee.inCombat) {
+        state.stall = { x: escortee.pos.x, z: escortee.pos.z, t: 0 };
+      } else {
+        state.stall.t += DT;
+        if (state.stall.t >= 15) {
+          escortee.pos = ctx.groundPos(wp.x, wp.z);
+          escortee.prevPos = { ...escortee.pos };
+          ctx.rebucket(escortee);
+          state.stall = { x: wp.x, z: wp.z, t: 0 };
+        }
+      }
+      continue;
+    }
     spawnAmbush(ctx, route, state);
     state.wpIndex++;
     if (state.wpIndex < route.waypoints.length) {

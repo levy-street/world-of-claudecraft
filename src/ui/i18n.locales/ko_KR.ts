@@ -5392,6 +5392,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.defense.won': '진지를 지켰습니다. 잘 싸웠습니다.',
   'hudChrome.defense.lost': '수비대가 쓰러졌습니다. 전열을 가다듬으십시오.',
   'hudChrome.escort.start': '호위가 출발했습니다. 가까이 붙으십시오.',
+  'hudChrome.escort.paused': '호위 대상이 기다립니다. 길을 지킬 사람이 가까이에 없습니다.',
+  'hudChrome.escort.resumed': '호위가 다시 움직입니다.',
   'hudChrome.escort.failed': '호위 대상이 쓰러졌습니다. 길이 또 한 명을 데려갔습니다.',
   'hudChrome.escort.done': '무사히 도착했습니다. 호위 대상이 감사를 전합니다.',
   'entities.items.conjured_bread4.name': '마법 시나몬 롤',

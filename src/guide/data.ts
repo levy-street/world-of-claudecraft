@@ -3,9 +3,12 @@
 // derives the full per-class and per-zone dataset from the sim in a later phase, so
 // only the small bits the landing needs live here. Names reuse existing i18n keys.
 
+import { ACTIVE_LEVEL_CAP } from '../sim/types';
 import type { TranslationKey } from '../ui/i18n';
 
-export const LEVEL_CAP = 20;
+// The PLAYABLE cap shown across the wiki (FAQ JSON-LD, progression, combat):
+// the sim's active launch cap, not the MAX_LEVEL table ceiling.
+export const LEVEL_CAP = ACTIVE_LEVEL_CAP;
 
 export interface ClassChip {
   id: string;
@@ -34,8 +37,28 @@ export interface ZoneTeaser {
   max: number;
 }
 
+// The island teasers below stay accurate (1-20); the Valdris realm teasers are
+// maintainer follow-up copy (new guide.* prose keys) once launch copy is set.
 export const ZONE_TEASERS: ZoneTeaser[] = [
-  { id: 'vale', nameKey: 'guide.home.world.valeName', blurbKey: 'guide.home.world.valeBlurb', min: 1, max: 7 },
-  { id: 'marsh', nameKey: 'guide.home.world.marshName', blurbKey: 'guide.home.world.marshBlurb', min: 6, max: 13 },
-  { id: 'peaks', nameKey: 'guide.home.world.peaksName', blurbKey: 'guide.home.world.peaksBlurb', min: 13, max: 20 },
+  {
+    id: 'vale',
+    nameKey: 'guide.home.world.valeName',
+    blurbKey: 'guide.home.world.valeBlurb',
+    min: 1,
+    max: 7,
+  },
+  {
+    id: 'marsh',
+    nameKey: 'guide.home.world.marshName',
+    blurbKey: 'guide.home.world.marshBlurb',
+    min: 6,
+    max: 13,
+  },
+  {
+    id: 'peaks',
+    nameKey: 'guide.home.world.peaksName',
+    blurbKey: 'guide.home.world.peaksBlurb',
+    min: 13,
+    max: 20,
+  },
 ];

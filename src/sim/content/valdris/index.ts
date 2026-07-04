@@ -59,6 +59,8 @@ import {
 import { ENVOY_NPCS, ENVOY_PROPS, ENVOY_QUEST_ORDER, ENVOY_QUESTS } from './envoys';
 import {
   KAEL_CAMPS,
+  KAEL_DEFENSE_SITES,
+  KAEL_ESCORT_ROUTES,
   KAEL_ITEMS,
   KAEL_MOBS,
   KAEL_NPCS,
@@ -71,6 +73,8 @@ import {
 } from './kael';
 import {
   OSSARA_CAMPS,
+  OSSARA_DEFENSE_SITES,
+  OSSARA_ESCORT_ROUTES,
   OSSARA_ITEMS,
   OSSARA_MOBS,
   OSSARA_NPCS,
@@ -83,6 +87,8 @@ import {
 } from './ossara';
 import {
   VETH_CAMPS,
+  VETH_DEFENSE_SITES,
+  VETH_ESCORT_ROUTES,
   VETH_ITEMS,
   VETH_MOBS,
   VETH_NPCS,
@@ -185,10 +191,16 @@ export const VALDRIS_ROADS: { x: number; z: number }[][] = [
 
 export const VALDRIS_DEFENSE_SITES: Record<string, DefenseSiteDef> = {
   ...CONTESTED_SOUTH_DEFENSE_SITES,
+  ...OSSARA_DEFENSE_SITES,
+  ...VETH_DEFENSE_SITES,
+  ...KAEL_DEFENSE_SITES,
 };
 
 export const VALDRIS_ESCORT_ROUTES: Record<string, EscortRouteDef> = {
   ...CONTESTED_SOUTH_ESCORT_ROUTES,
+  ...OSSARA_ESCORT_ROUTES,
+  ...VETH_ESCORT_ROUTES,
+  ...KAEL_ESCORT_ROUTES,
 };
 
 export const VALDRIS_PROPS: ZonePropsDef = mergeValdrisProps([

@@ -87,7 +87,9 @@ const barrier = await page.evaluate(() => {
   });
 });
 check('the Landing exit rockslide blocks walking north', barrier < 901, `z=${barrier.toFixed(1)}`);
-await sleep(400);
+// frame the rockslide from a few paces south so the barricade reads in shot
+await tp(3, 882);
+await sleep(900);
 await page.screenshot({ path: `${OUT}/2_landing_barrier.png` });
 
 // --- 3. The Envoys' Hall oath + arrival + ferry back --------------------------

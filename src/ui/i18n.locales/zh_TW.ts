@@ -5130,6 +5130,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.defense.won': '陣地守住了。打得漂亮。',
   'hudChrome.defense.lost': '守衛者倒下了。重整旗鼓再來。',
   'hudChrome.escort.start': '護送啟程。跟緊了。',
+  'hudChrome.escort.paused': '你護送的人停下了：沒有人在近處護路。',
+  'hudChrome.escort.resumed': '護送繼續前進。',
   'hudChrome.escort.failed': '你護送的人倒下了。這條路又奪走一人。',
   'hudChrome.escort.done': '平安抵達。被護送者向你致謝。',
   'entities.items.conjured_bread4.name': '魔法肉桂捲',

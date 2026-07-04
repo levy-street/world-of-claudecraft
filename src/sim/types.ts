@@ -1705,7 +1705,7 @@ export interface Entity {
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
   // Playable race (players only; undefined otherwise). Identity + cosmetic body
   // scale + faction source, never stats. Synced in identity fields (terse `rc`);
-  // pre-race saves default to 'human' in addPlayer.
+  // pre-race saves load UNSWORN (race stays undefined until the oath).
   race?: PlayerRace;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
@@ -2263,7 +2263,7 @@ export function xpForLevel(level: number): number {
 // At the level cap, XP keeps accruing into a 64-bit lifetime counter that
 // drives a cosmetic *virtual level* so the XP bar keeps "leveling" forever.
 // The threshold table below is the cumulative lifetime XP needed to reach each
-// virtual level. Real levels 1..20 reuse XP_TABLE exactly (so below the cap
+// virtual level. Real levels reuse XP_TABLE exactly (so below the cap
 // `virtualLevel(lifetimeXp) === level`); past the cap the per-level cost keeps
 // growing geometrically (RuneScape-style ~10%/level) so the grind has a long
 // tail but the bar always visibly moves. Built once and cached.

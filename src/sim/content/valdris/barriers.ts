@@ -38,11 +38,15 @@ export const LANDING_EXIT_Z = 900;
 function rockslide(z: number): { x: number; z: number; scale: number }[] {
   const out: { x: number; z: number; scale: number }[] = [];
   const SCALES = [1.5, 1.1, 1.8, 1.25, 1.4];
-  let k = 0;
-  for (let x = -13; x <= 13; x += 1.3) {
+  // Integer counter: a float accumulator drifts past the bound by 4e-15 and
+  // drops the final +x column (caught by review). Rows span |x| <= 17: the
+  // road pass is |x| < 10 but the terrain climb gate only takes over around
+  // |x| ~ 17 on the shoulders, and the widened barrier sweep proved x = 16
+  // walkable with the old 13-wide rows.
+  for (let k = 0; k <= 26; k++) {
+    const x = -17 + k * 1.3;
     out.push({ x, z, scale: SCALES[k % SCALES.length] });
     out.push({ x: x + 0.65, z: z + 1.4, scale: SCALES[(k + 3) % SCALES.length] });
-    k++;
   }
   return out;
 }

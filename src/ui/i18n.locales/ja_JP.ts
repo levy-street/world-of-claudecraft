@@ -5385,6 +5385,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.defense.won': '陣地は守られた。見事な戦いだ。',
   'hudChrome.defense.lost': '守り手が倒れた。態勢を立て直せ。',
   'hudChrome.escort.start': '護衛が出発した。離れるな。',
+  'hudChrome.escort.paused': '護衛対象が待っている。道を守る者が近くにいない。',
+  'hudChrome.escort.resumed': '護衛が再び動き出した。',
   'hudChrome.escort.failed': '護衛対象が倒れた。道はまた一人を奪った。',
   'hudChrome.escort.done': '無事に到着した。護衛対象が感謝している。',
   'entities.items.conjured_bread4.name': '魔法のシナモンロール',

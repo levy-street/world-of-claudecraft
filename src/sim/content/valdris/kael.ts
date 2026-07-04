@@ -20,6 +20,8 @@
 
 import type {
   CampDef,
+  DefenseSiteDef,
+  EscortRouteDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -678,6 +680,49 @@ export const KAEL_MOBS: Record<string, MobTemplate> = {
     scale: 1.5,
     color: 0xc4a25e,
   },
+  // Warden Halvar: the Rimeshaft north-picket defender (src/sim/events/
+  // defense.ts). Ledgerwatch posts one warden up the Ascent track and books
+  // him as fixed plant; the shifts only move while his post holds.
+  rimeshaft_picket_warden: {
+    id: 'rimeshaft_picket_warden',
+    name: 'Warden Halvar',
+    minLevel: 37,
+    maxLevel: 37,
+    family: 'humanoid',
+    hpBase: 940,
+    hpPerLevel: 48,
+    dmgBase: 27,
+    dmgPerLevel: 3.5,
+    attackSpeed: 2.0,
+    armorPerLevel: 24,
+    moveSpeed: 8.6,
+    aggroRadius: 12,
+    loot: [],
+    scale: 1.05,
+    color: 0x566274,
+    allyOfPlayers: true,
+  },
+  // Porter Fenn: the recovery office's strongbox porter, the pay-road escort
+  // charge (src/sim/events/escort.ts).
+  paychest_porter: {
+    id: 'paychest_porter',
+    name: 'Porter Fenn',
+    minLevel: 34,
+    maxLevel: 34,
+    family: 'humanoid',
+    hpBase: 640,
+    hpPerLevel: 35,
+    dmgBase: 15,
+    dmgPerLevel: 2.3,
+    attackSpeed: 2.4,
+    armorPerLevel: 15,
+    moveSpeed: 6.8,
+    aggroRadius: 8,
+    loot: [],
+    scale: 1.0,
+    color: 0x8a7a5c,
+    allyOfPlayers: true,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -817,6 +862,7 @@ export const KAEL_NPCS: Record<string, NpcDef> = {
       'q_interest_on_arrears',
       'q_the_unremitted_assessor',
       'q_arrears_in_kind',
+      'q_ledgerwatch_payroll_escort',
     ],
     greeting:
       'Back pay of the Ninth Legion, frozen pending prosecution. If you are here to add to the evidence, $N, take a number: it is one.',
@@ -853,6 +899,7 @@ export const KAEL_NPCS: Record<string, NpcDef> = {
       'q_tallow_ledger',
       'q_clear_the_galleries',
       'q_shaft_three_reopens',
+      'q_rimeshaft_picket_defense',
     ],
     greeting:
       'Rimeshaft runs three shifts and loses two to weather, $C. If you can hold a pick, or kill what interrupts one, you are payroll.',
@@ -2142,6 +2189,54 @@ export const KAEL_QUESTS: Record<string, QuestDef> = {
     requiresQuest: 'q_quarter_end_closing',
     minLevel: 39,
   },
+  // The pay road: the zone's escort event (src/sim/events/escort.ts). Porter
+  // Fenn hauls the strongbox north while every quest-holder keeping pace
+  // shares the credit.
+  q_ledgerwatch_payroll_escort: {
+    id: 'q_ledgerwatch_payroll_escort',
+    name: 'The Pay Goes North',
+    giverNpcId: 'paymistress_serna',
+    turnInNpcId: 'paymistress_serna',
+    text: 'The Rimeshaft payroll is late twice over, $N: once to the weather and once to whoever keeps opening my couriers. Porter Fenn hauls the strongbox up the Tithe Road at the next bell. Walk beside him to the Rimeshaft milepost; the box arrives sealed, or somebody files a loss report, and it will not be me.',
+    completionText:
+      'Fenn made the milepost with the seal unbroken, and the miners get paid a quarter they had written off. The loss report dies unfiled, $N, which is the kindest end the paperwork offers anyone.',
+    objectives: [
+      {
+        type: 'escort',
+        escortId: 'ledgerwatch_payroll',
+        count: 1,
+        label: 'Porter Fenn escorted up the Tithe Road',
+      },
+    ],
+    xpReward: 18000,
+    copperReward: 8100,
+    itemRewards: {},
+    minLevel: 35,
+  },
+  // The north picket: the zone's defense event (src/sim/events/defense.ts).
+  // Talking to Ulla with the quest active arms the waves; every quest-holder
+  // inside the picket radius earns wave-by-wave credit.
+  q_rimeshaft_picket_defense: {
+    id: 'q_rimeshaft_picket_defense',
+    name: 'Hold the Picket',
+    giverNpcId: 'foreman_ulla',
+    turnInNpcId: 'foreman_ulla',
+    text: 'Shaft three let something out and the snow line sent it friends, $N. They come down off the Ascent at every shift bell, and Warden Halvar holds the north picket alone, which the safety ledger scores as one incident pending. Stand with him when I ring the shift down: three pushes, and the adits stay open.',
+    completionText:
+      'Three pushes broken, the picket standing, and the shift went down on time, $N. The safety ledger records zero incidents and one warden overdue for leave; Rimeshaft calls that a good day.',
+    objectives: [
+      {
+        type: 'defend',
+        siteId: 'rimeshaft_picket',
+        count: 3,
+        label: 'Waves repelled beside Warden Halvar',
+      },
+    ],
+    xpReward: 19500,
+    copperReward: 8800,
+    itemRewards: {},
+    minLevel: 37,
+  },
 };
 
 export const KAEL_QUEST_ORDER = [
@@ -2206,7 +2301,92 @@ export const KAEL_QUEST_ORDER = [
   'q_shaft_three_reopens',
   'q_apex_predation',
   'q_the_norths_books',
+  // Field events: the pay-road escort and the Rimeshaft picket defense
+  'q_ledgerwatch_payroll_escort',
+  'q_rimeshaft_picket_defense',
 ];
+
+// The zone's escort event: Porter Fenn hauls the Ninth's recovered pay up the
+// Tithe Road from the Fort Ledgerwatch gate to the Rimeshaft milepost, past
+// the bends where the road's regulars collect (src/sim/events/escort.ts).
+// Waypoints, ambush composition, offsets, and levels are fixed data (no rng).
+export const KAEL_ESCORT_ROUTES: Record<string, EscortRouteDef> = {
+  ledgerwatch_payroll: {
+    id: 'ledgerwatch_payroll',
+    escorteeTemplateId: 'paychest_porter',
+    escorteeLevel: 34,
+    start: { x: 12, z: 1930 },
+    waypoints: [
+      { x: 5, z: 1944 },
+      { x: -6, z: 1962 },
+      {
+        x: 0,
+        z: 1984,
+        ambush: [
+          { mobId: 'maren_house_duelist', level: 33, dx: 7, dz: 4 },
+          { mobId: 'maren_house_duelist', level: 33, dx: -7, dz: 5 },
+        ],
+      },
+      {
+        x: 4,
+        z: 2004,
+        ambush: [
+          { mobId: 'frosthelm_rimeclaw', level: 34, dx: 8, dz: 4 },
+          { mobId: 'frosthelm_rimeclaw', level: 34, dx: -8, dz: 4 },
+          { mobId: 'frosthelm_rimeclaw', level: 35, dx: 0, dz: 8 },
+        ],
+      },
+      { x: 0, z: 2020 },
+    ],
+    questId: 'q_ledgerwatch_payroll_escort',
+    objectiveIndex: 0,
+    engageRange: 26,
+    cooldownSeconds: 120,
+  },
+};
+
+// The zone's DefenseSiteDef: Warden Halvar holds the Rimeshaft north picket
+// against three fixed pushes down off the Frosthelm Ascent
+// (src/sim/events/defense.ts). Offsets/levels are data (no rng).
+export const KAEL_DEFENSE_SITES: Record<string, DefenseSiteDef> = {
+  rimeshaft_picket: {
+    id: 'rimeshaft_picket',
+    npcId: 'foreman_ulla',
+    allyTemplateId: 'rimeshaft_picket_warden',
+    allyLevel: 37,
+    pos: { x: 11, z: 2027 },
+    radius: 30,
+    questId: 'q_rimeshaft_picket_defense',
+    objectiveIndex: 0,
+    cooldownSeconds: 100,
+    waves: [
+      {
+        delaySeconds: 6,
+        spawns: [
+          { mobId: 'frosthelm_rimeclaw', level: 35, dx: -4, dz: 13 },
+          { mobId: 'frosthelm_rimeclaw', level: 35, dx: 0, dz: 16 },
+          { mobId: 'frosthelm_icehowler', level: 36, dx: 3, dz: 12 },
+        ],
+      },
+      {
+        delaySeconds: 7,
+        spawns: [
+          { mobId: 'frosthelm_rimeclaw', level: 36, dx: -3, dz: 15 },
+          { mobId: 'frosthelm_icehowler', level: 36, dx: 1, dz: 12 },
+          { mobId: 'frosthelm_icehowler', level: 37, dx: 3, dz: 15 },
+        ],
+      },
+      {
+        delaySeconds: 8,
+        spawns: [
+          { mobId: 'frosthelm_icehowler', level: 38, dx: -4, dz: 14 },
+          { mobId: 'frosthelm_icehowler', level: 38, dx: -1, dz: 17 },
+          { mobId: 'rimebound_elemental', level: 39, dx: 2, dz: 13 },
+        ],
+      },
+    ],
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Camps (spawn tables), merged AFTER every existing camp in data.ts, and in

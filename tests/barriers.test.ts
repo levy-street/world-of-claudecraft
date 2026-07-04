@@ -23,7 +23,7 @@ const BODY = 0.5; // player body radius (sim.ts BODY_RADIUS)
 // the sim (pinned by tests/terrain_walls.test.ts); resolveMovement only knows
 // colliders, so this sweep covers the span the boulders must close.
 function sweepBlocked(lineZ: number): void {
-  for (let x = -12; x <= 12; x += 0.5) {
+  for (let x = -16; x <= 16; x += 0.5) {
     let pos = { x, z: lineZ - 6 };
     // step in 1u hops like real movement (resolveMovement sub-steps internally)
     for (let i = 0; i < 12; i++) {

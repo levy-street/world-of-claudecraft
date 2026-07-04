@@ -11,7 +11,7 @@ import {
   RESURRECTION_SICKNESS_ID,
   resSicknessDuration,
 } from '../src/sim/resurrection';
-import { type Aura, MAX_LEVEL } from '../src/sim/types';
+import { ACTIVE_LEVEL_CAP, type Aura } from '../src/sim/types';
 
 // A minimal valid Aura carrying an id; the predicate reads only `id`, the rest satisfies
 // the type.
@@ -38,12 +38,12 @@ describe('resurrection: level-scaled sickness duration', () => {
     expect(resSicknessDuration(RES_SICKNESS_MIN_LEVEL)).toBe(RES_SICKNESS_MIN_DURATION);
   });
 
-  it('is the full duration at max level', () => {
-    expect(resSicknessDuration(MAX_LEVEL)).toBe(RES_SICKNESS_DURATION);
+  it('is the full duration at the active cap', () => {
+    expect(resSicknessDuration(ACTIVE_LEVEL_CAP)).toBe(RES_SICKNESS_DURATION);
   });
 
   it('scales linearly and monotonically between the bounds', () => {
-    const mid = (RES_SICKNESS_MIN_LEVEL + MAX_LEVEL) / 2;
+    const mid = (RES_SICKNESS_MIN_LEVEL + ACTIVE_LEVEL_CAP) / 2;
     const expected = Math.round(
       RES_SICKNESS_MIN_DURATION + 0.5 * (RES_SICKNESS_DURATION - RES_SICKNESS_MIN_DURATION),
     );
@@ -51,7 +51,7 @@ describe('resurrection: level-scaled sickness duration', () => {
     expect(resSicknessDuration(RES_SICKNESS_MIN_LEVEL + 1)).toBeGreaterThan(
       RES_SICKNESS_MIN_DURATION,
     );
-    expect(resSicknessDuration(MAX_LEVEL - 1)).toBeLessThan(RES_SICKNESS_DURATION);
+    expect(resSicknessDuration(ACTIVE_LEVEL_CAP - 1)).toBeLessThan(RES_SICKNESS_DURATION);
   });
 });
 

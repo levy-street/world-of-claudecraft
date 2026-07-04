@@ -22,6 +22,8 @@
 
 import type {
   CampDef,
+  DefenseSiteDef,
+  EscortRouteDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -646,6 +648,48 @@ export const VETH_MOBS: Record<string, MobTemplate> = {
     scale: 1.0,
     color: 0x584a72,
   },
+  // --- world-owned event allies (src/sim/ally.ts) ---
+  // The weir's toll is enforced, not requested. Roskan is the enforcement:
+  // the Greyweir defense-site defender (src/sim/events/defense.ts).
+  greyweir_bailiff: {
+    id: 'greyweir_bailiff',
+    name: 'Bailiff Roskan',
+    minLevel: 35,
+    maxLevel: 35,
+    family: 'humanoid',
+    hpBase: 900,
+    hpPerLevel: 46,
+    dmgBase: 26,
+    dmgPerLevel: 3.4,
+    attackSpeed: 2.0,
+    armorPerLevel: 22,
+    moveSpeed: 8.6,
+    aggroRadius: 12,
+    loot: [],
+    scale: 1.05,
+    color: 0x4c6076,
+    allyOfPlayers: true,
+  },
+  // Courier Yeska: the ledger-run escort charge (src/sim/events/escort.ts).
+  veth_ledger_courier: {
+    id: 'veth_ledger_courier',
+    name: 'Courier Yeska',
+    minLevel: 32,
+    maxLevel: 32,
+    family: 'humanoid',
+    hpBase: 620,
+    hpPerLevel: 34,
+    dmgBase: 14,
+    dmgPerLevel: 2.2,
+    attackSpeed: 2.4,
+    armorPerLevel: 14,
+    moveSpeed: 6.8,
+    aggroRadius: 8,
+    loot: [],
+    scale: 1.0,
+    color: 0x6a5c46,
+    allyOfPlayers: true,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -763,6 +807,7 @@ export const VETH_NPCS: Record<string, NpcDef> = {
       'q_veth_forged_passes',
       'q_veth_passage_sold',
       'q_veth_turncoats_price',
+      'q_veth_hold_the_weir',
     ],
     greeting:
       'The weir takes a toll from everything the river carries, $C. Lately the river carries knives, and knives pay in a different coin.',
@@ -790,7 +835,12 @@ export const VETH_NPCS: Record<string, NpcDef> = {
     pos: { x: 20, z: 1544 },
     facing: -0.8,
     color: 0x6e6250,
-    questIds: ['q_veth_stores_ledger', 'q_veth_toll_scrip', 'q_veth_dead_letters'],
+    questIds: [
+      'q_veth_stores_ledger',
+      'q_veth_toll_scrip',
+      'q_veth_dead_letters',
+      'q_veth_ledger_run',
+    ],
     vendorItems: [
       'nighthollow_black_bread',
       'pinefrost_tea',
@@ -1995,6 +2045,53 @@ export const VETH_QUESTS: Record<string, QuestDef> = {
     suggestedPlayers: 2,
     minLevel: 39,
   },
+  // --- event quests: the Greyweir defense site and the ledger-run escort ---
+  // Talking to Hesk with the quest active arms the waves (src/sim/events/defense.ts);
+  // every quest-holder inside the weir radius earns wave-by-wave credit.
+  q_veth_hold_the_weir: {
+    id: 'q_veth_hold_the_weir',
+    name: 'Hold the Weir',
+    giverNpcId: 'tollmaster_hesk',
+    turnInNpcId: 'tollmaster_hesk',
+    text: 'The Last Lodge has started testing my weir, $N: guildless knives first, to see what the gate costs, then Forsworn steel to see who pays it. Bailiff Roskan holds the north bank and I do not intend to replace him. Stand with him when I call it: three pushes, and the Lodge writes the Greyweir off as a bad investment.',
+    completionText:
+      'Three pushes priced, paid, and returned to sender, and Roskan still on his feet at the gate. The Lodge keeps accounts too, $N; tonight it enters a loss. The weir takes its toll from everything the river carries. Knives included.',
+    objectives: [
+      {
+        type: 'defend',
+        siteId: 'greyweir_tollhouse',
+        count: 3,
+        label: 'Waves repelled beside Bailiff Roskan',
+      },
+    ],
+    xpReward: 19200,
+    copperReward: 6300,
+    itemRewards: {},
+    minLevel: 35,
+  },
+  // The engine's escort in Veth: Yeska walks the quarter-ledger up the towpath
+  // (src/sim/events/escort.ts); staying near her sustains the walk.
+  q_veth_ledger_run: {
+    id: 'q_veth_ledger_run',
+    name: 'The Ledger Run',
+    giverNpcId: 'toll_clerk_odune',
+    turnInNpcId: 'toll_clerk_odune',
+    text: 'The quarter-ledger goes north tonight, $N: every toll the weir has taken since thaw, copied fair and bound for the Longwatch strongbox. Courier Yeska carries it, and the guildless and their smuggler partners would sooner it went into the river. Walk beside her up the towpath and see that the pages arrive still counting.',
+    completionText:
+      'Yeska signed in at the Longwatch with every page in order. Somewhere on the north road several investors are learning the robbery went unrecorded because it went undone. That arithmetic settles your fee, $N.',
+    objectives: [
+      {
+        type: 'escort',
+        escortId: 'greyweir_ledger_run',
+        count: 1,
+        label: 'Courier Yeska escorted up the north road',
+      },
+    ],
+    xpReward: 18000,
+    copperReward: 5800,
+    itemRewards: {},
+    minLevel: 33,
+  },
 };
 
 export const VETH_QUEST_ORDER = [
@@ -2054,7 +2151,93 @@ export const VETH_QUEST_ORDER = [
   'q_veth_high_ice',
   'q_veth_closing_the_lodge',
   'q_forsworn_master',
+  // event quests (33-35): the ledger-run escort and the Greyweir defense
+  'q_veth_ledger_run',
+  'q_veth_hold_the_weir',
 ];
+
+// The ledger run: Courier Yeska walks the weir's quarter-ledger up the north
+// towpath toward the Longwatch and the Kael border while the guildless test
+// the escort at two bends. Waypoints, ambush offsets, and levels are fixed
+// data (src/sim/events/escort.ts draws no rng).
+export const VETH_ESCORT_ROUTES: Record<string, EscortRouteDef> = {
+  greyweir_ledger_run: {
+    id: 'greyweir_ledger_run',
+    escorteeTemplateId: 'veth_ledger_courier',
+    escorteeLevel: 32,
+    start: { x: 10, z: 1534 },
+    waypoints: [
+      { x: 0, z: 1550 },
+      { x: -2, z: 1572 },
+      {
+        x: 0,
+        z: 1594,
+        ambush: [
+          { mobId: 'guildless_cutthroat', level: 31, dx: 8, dz: 4 },
+          { mobId: 'feralrun_smuggler', level: 31, dx: -5, dz: 4 },
+        ],
+      },
+      // the last leg hugs the east verge: the Lodge pickets hold the west bank
+      {
+        x: 5,
+        z: 1614,
+        ambush: [
+          { mobId: 'guildless_cutthroat', level: 32, dx: 7, dz: 4 },
+          { mobId: 'guildless_cutthroat', level: 32, dx: 2, dz: 5 },
+          { mobId: 'guildless_cutthroat', level: 33, dx: 0, dz: 8 },
+        ],
+      },
+      { x: 6, z: 1636 },
+    ],
+    questId: 'q_veth_ledger_run',
+    objectiveIndex: 0,
+    engageRange: 26,
+    cooldownSeconds: 120,
+  },
+};
+
+// The Greyweir defense: Bailiff Roskan holds the weir gate against three
+// scripted pushes off the north bank, hired knives first and Forsworn steel
+// behind them. Offsets and levels are fixed data (no rng).
+export const VETH_DEFENSE_SITES: Record<string, DefenseSiteDef> = {
+  greyweir_tollhouse: {
+    id: 'greyweir_tollhouse',
+    npcId: 'tollmaster_hesk',
+    allyTemplateId: 'greyweir_bailiff',
+    allyLevel: 35,
+    pos: { x: 21, z: 1554 },
+    radius: 30,
+    questId: 'q_veth_hold_the_weir',
+    objectiveIndex: 0,
+    cooldownSeconds: 100,
+    waves: [
+      {
+        delaySeconds: 6,
+        spawns: [
+          { mobId: 'guildless_cutthroat', level: 33, dx: 2, dz: 14 },
+          { mobId: 'guildless_cutthroat', level: 33, dx: 7, dz: 16 },
+          { mobId: 'guildless_cutthroat', level: 33, dx: 12, dz: 13 },
+        ],
+      },
+      {
+        delaySeconds: 7,
+        spawns: [
+          { mobId: 'guildless_cutthroat', level: 33, dx: 3, dz: 15 },
+          { mobId: 'guildless_cutthroat', level: 33, dx: 11, dz: 13 },
+          { mobId: 'forsworn_blade', level: 35, dx: 7, dz: 18 },
+        ],
+      },
+      {
+        delaySeconds: 8,
+        spawns: [
+          { mobId: 'guildless_cutthroat', level: 33, dx: 2, dz: 13 },
+          { mobId: 'guildless_cutthroat', level: 33, dx: 12, dz: 15 },
+          { mobId: 'forsworn_shadowcaster', level: 37, dx: 6, dz: 17 },
+        ],
+      },
+    ],
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Camps (spawn tables), merged AFTER every existing camp in data.ts and after

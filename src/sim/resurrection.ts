@@ -4,7 +4,7 @@
 // "which auras survive death" predicate and the level-scaled duration WITHOUT an import
 // cycle (spirit <-> entity_roster both need it).
 
-import { type Aura, MAX_LEVEL } from './types';
+import { ACTIVE_LEVEL_CAP, type Aura, MAX_LEVEL } from './types';
 
 export const RESURRECTION_SICKNESS_ID = 'resurrection_sickness';
 // Classic-era rule: no resurrection sickness below this level.
@@ -18,10 +18,12 @@ export const RES_SICKNESS_STAT_MULT = -0.75;
 
 // Seconds of Resurrection Sickness for a character of the given level. Zero below
 // RES_SICKNESS_MIN_LEVEL (classic exempts low levels); otherwise scales linearly from
-// RES_SICKNESS_MIN_DURATION at that level to RES_SICKNESS_DURATION at MAX_LEVEL.
+// RES_SICKNESS_MIN_DURATION at that level to the full classic duration at the ACTIVE
+// cap (a capped character always serves the whole sentence; anchoring to the 60-row
+// table ceiling would quietly soften it to 384s for the launch cap).
 export function resSicknessDuration(level: number): number {
   if (level < RES_SICKNESS_MIN_LEVEL) return 0;
-  const span = MAX_LEVEL - RES_SICKNESS_MIN_LEVEL;
+  const span = ACTIVE_LEVEL_CAP - RES_SICKNESS_MIN_LEVEL;
   const t = span > 0 ? (level - RES_SICKNESS_MIN_LEVEL) / span : 1;
   return Math.round(
     RES_SICKNESS_MIN_DURATION + t * (RES_SICKNESS_DURATION - RES_SICKNESS_MIN_DURATION),

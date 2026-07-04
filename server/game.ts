@@ -1492,7 +1492,7 @@ export class GameServer {
       // created without state, so the first join levels them up)
       this.sim.setGm(pid);
       const e = this.sim.entities.get(pid);
-      if (e && e.level < 20) this.sim.setPlayerLevel(20, pid);
+      if (e && e.level < ACTIVE_LEVEL_CAP) this.sim.setPlayerLevel(ACTIVE_LEVEL_CAP, pid);
     }
     const accountCosmetics = this.rememberAccountCosmetics(
       accountId,

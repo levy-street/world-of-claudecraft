@@ -16,6 +16,8 @@
 
 import type {
   CampDef,
+  DefenseSiteDef,
+  EscortRouteDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -629,6 +631,48 @@ export const OSSARA_MOBS: Record<string, MobTemplate> = {
     scale: 1.15,
     color: 0x9fb8c9,
   },
+  // Wellguard Nahir: the caravan ring's sworn guard at Last Water, the ally
+  // holding the north edge in the camp defense (src/sim/events/defense.ts).
+  lastwater_wellguard: {
+    id: 'lastwater_wellguard',
+    name: 'Wellguard Nahir',
+    minLevel: 34,
+    maxLevel: 34,
+    family: 'humanoid',
+    hpBase: 900,
+    hpPerLevel: 46,
+    dmgBase: 26,
+    dmgPerLevel: 3.4,
+    attackSpeed: 2.0,
+    armorPerLevel: 22,
+    moveSpeed: 8.6,
+    aggroRadius: 12,
+    loot: [],
+    scale: 1.05,
+    color: 0x8a6f3e,
+    allyOfPlayers: true,
+  },
+  // Water-Bearer Sitra: Neriah's carrier on the Seat water run, the escort
+  // charge walking the road to the Sunken Seat (src/sim/events/escort.ts).
+  seat_water_bearer: {
+    id: 'seat_water_bearer',
+    name: 'Water-Bearer Sitra',
+    minLevel: 31,
+    maxLevel: 31,
+    family: 'humanoid',
+    hpBase: 620,
+    hpPerLevel: 34,
+    dmgBase: 14,
+    dmgPerLevel: 2.2,
+    attackSpeed: 2.4,
+    armorPerLevel: 14,
+    moveSpeed: 6.8,
+    aggroRadius: 8,
+    loot: [],
+    scale: 1.0,
+    color: 0x5f8ea6,
+    allyOfPlayers: true,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -716,6 +760,7 @@ export const OSSARA_NPCS: Record<string, NpcDef> = {
       'q_mirage_stalkers',
       'q_mirage_eyes',
       'q_water_for_the_seat',
+      'q_the_water_walks',
     ],
     greeting:
       "Every drop Qesh Aram drinks walks in from the oasis on somebody's back, $C. Help me keep the road it walks.",
@@ -816,6 +861,7 @@ export const OSSARA_NPCS: Record<string, NpcDef> = {
       'q_water_ledger',
       'q_bones_on_the_road',
       'q_the_barrens_toll',
+      'q_hold_last_water',
       'q_raiders_at_last_water',
       'q_oathmarks_in_the_sand',
       'q_the_missing_manifests',
@@ -2184,6 +2230,53 @@ export const OSSARA_QUESTS: Record<string, QuestDef> = {
     itemRewards: {},
     minLevel: 36,
   },
+  // The Seat water run: Neriah's carrier walks the road to the Sunken Seat
+  // while the escort event (src/sim/events/escort.ts) runs the route.
+  q_the_water_walks: {
+    id: 'q_the_water_walks',
+    name: 'The Water Walks',
+    giverNpcId: 'oasis_keeper_neriah',
+    turnInNpcId: 'oasis_keeper_neriah',
+    text: "Every drop the Sunken Seat drinks walks there on somebody's back, $N, and the road has learned to bite the backs that carry it: the temple's stones walk their old rounds across it, and the heresy preaches that a court should thirst. Water-Bearer Sitra hauls the Seat's ration today. Keep beside her the whole way, and the water arrives.",
+    completionText:
+      "Sitra signaled from the Seat before dusk: the ration in Masut's stores and her own feet still under her. That is a good day on this road, $N, and the road did not give it; you did.",
+    objectives: [
+      {
+        type: 'escort',
+        escortId: 'seatward_water_run',
+        count: 1,
+        label: 'Water-Bearer Sitra escorted to the Sunken Seat',
+      },
+    ],
+    xpReward: 14200,
+    copperReward: 6800,
+    itemRewards: {},
+    minLevel: 32,
+  },
+  // The camp defense at Last Water: talking to Yesfa with the quest active
+  // arms the raider pushes (src/sim/events/defense.ts); every quest-holder
+  // inside the ring earns the credit wave by wave.
+  q_hold_last_water: {
+    id: 'q_hold_last_water',
+    name: 'Hold Last Water',
+    giverNpcId: 'caravan_mistress_yesfa',
+    turnInNpcId: 'caravan_mistress_yesfa',
+    text: 'The duskwater crews have stopped testing my wagons and started testing the camp itself, $N. Wellguard Nahir holds the north edge of the ring, and he holds it alone. Say the word when you stand beside him: three pushes are coming down off the marches, and I mean the well to be here when they are done.',
+    completionText:
+      'Three pushes broken on the ring and Nahir still on his feet. The crews will spend a season recounting what tonight cost them, $N; I already have it in my ledger, to the last copper.',
+    objectives: [
+      {
+        type: 'defend',
+        siteId: 'lastwater_ring',
+        count: 3,
+        label: 'Pushes repelled beside Wellguard Nahir',
+      },
+    ],
+    xpReward: 16000,
+    copperReward: 7600,
+    itemRewards: {},
+    minLevel: 34,
+  },
 };
 
 export const OSSARA_QUEST_ORDER = [
@@ -2255,7 +2348,96 @@ export const OSSARA_QUEST_ORDER = [
   'q_last_caravan_out',
   'q_sandmaw',
   'q_the_domain_endures',
+  // world events: the Seat water run and the Last Water camp defense
+  'q_the_water_walks',
+  'q_hold_last_water',
 ];
+
+// The Seat water run: Water-Bearer Sitra walks the caravan road from the Qesh
+// Aram gate up the spine and along the spur to the Sunken Seat. The heresy
+// tries her once on the open road; the temple's own sentinels cross her path
+// where the route skirts the outer temple field. Offsets/levels are fixed
+// data (no rng).
+export const OSSARA_ESCORT_ROUTES: Record<string, EscortRouteDef> = {
+  seatward_water_run: {
+    id: 'seatward_water_run',
+    escorteeTemplateId: 'seat_water_bearer',
+    escorteeLevel: 31,
+    start: { x: -2, z: 1030 },
+    waypoints: [
+      { x: 0, z: 1052 },
+      { x: 2, z: 1076 },
+      {
+        x: -2,
+        z: 1100,
+        ambush: [
+          { mobId: 'heretic_sandpriest', level: 30, dx: 8, dz: 5 },
+          { mobId: 'heretic_sandpriest', level: 30, dx: -7, dz: 4 },
+        ],
+      },
+      {
+        x: 2,
+        z: 1126,
+        ambush: [
+          { mobId: 'temple_sentinel', level: 31, dx: -9, dz: 4 },
+          { mobId: 'temple_sentinel', level: 31, dx: -6, dz: 7 },
+          { mobId: 'temple_sentinel', level: 32, dx: 8, dz: 5 },
+        ],
+      },
+      { x: 9, z: 1144 },
+      { x: 24, z: 1149 },
+    ],
+    questId: 'q_the_water_walks',
+    objectiveIndex: 0,
+    engageRange: 26,
+    cooldownSeconds: 120,
+  },
+};
+
+// The Last Water camp defense: Wellguard Nahir holds the caravan ring's north
+// edge against three duskwater pushes coming down off the dry marches, where
+// the raider camps sit west of the border road. Offsets/levels are fixed data
+// (no rng).
+export const OSSARA_DEFENSE_SITES: Record<string, DefenseSiteDef> = {
+  lastwater_ring: {
+    id: 'lastwater_ring',
+    npcId: 'caravan_mistress_yesfa',
+    allyTemplateId: 'lastwater_wellguard',
+    allyLevel: 34,
+    pos: { x: 10, z: 1262 },
+    radius: 30,
+    questId: 'q_hold_last_water',
+    objectiveIndex: 0,
+    cooldownSeconds: 120,
+    waves: [
+      {
+        delaySeconds: 6,
+        spawns: [
+          { mobId: 'duskwater_raider', level: 32, dx: -7, dz: 14 },
+          { mobId: 'duskwater_raider', level: 32, dx: 0, dz: 17 },
+          { mobId: 'duskwater_raider', level: 33, dx: 2, dz: 15 },
+        ],
+      },
+      {
+        delaySeconds: 7,
+        spawns: [
+          { mobId: 'duskwater_raider', level: 33, dx: -8, dz: 15 },
+          { mobId: 'bonewind_ravager', level: 34, dx: -3, dz: 18 },
+          { mobId: 'duskwater_raider', level: 34, dx: 2, dz: 13 },
+        ],
+      },
+      {
+        delaySeconds: 8,
+        spawns: [
+          { mobId: 'duskwater_raider', level: 34, dx: -6, dz: 16 },
+          { mobId: 'bonewind_ravager', level: 35, dx: -2, dz: 14 },
+          { mobId: 'duskwater_raider', level: 35, dx: 0, dz: 18 },
+          { mobId: 'duskwater_raider', level: 36, dx: 2, dz: 17 },
+        ],
+      },
+    ],
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Camps (spawn tables), merged AFTER every existing camp in data.ts, and in

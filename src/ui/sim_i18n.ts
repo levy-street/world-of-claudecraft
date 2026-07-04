@@ -4369,16 +4369,20 @@ const RULES: Rule[] = [
     build: (m) => tSim('error.xpAtCap', { level: m[1] }),
   },
   {
-    re: /^You have sworn your oath to (the Kael Empire|the Confederation of Veth|the Domain of Ossara)\.$/,
+    // open capture (not a faction alternation) so the S3 guard's synthetic
+    // interpolation token matches the shape; known factions localize, anything
+    // else splices verbatim
+    re: /^You have sworn your oath to (.+)\.$/,
     build: (m) =>
       tSim('log.oathSworn', {
-        faction: tSim(
+        faction:
           m[1] === 'the Kael Empire'
-            ? 'faction.kaelOath'
+            ? tSim('faction.kaelOath')
             : m[1] === 'the Confederation of Veth'
-              ? 'faction.vethOath'
-              : 'faction.ossaraOath',
-        ),
+              ? tSim('faction.vethOath')
+              : m[1] === 'the Domain of Ossara'
+                ? tSim('faction.ossaraOath')
+                : m[1],
       }),
   },
   {

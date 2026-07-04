@@ -5492,6 +5492,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.defense.won': 'Позиция удержана. Отличный бой.',
   'hudChrome.defense.lost': 'Защитники пали. Соберитесь и попробуйте снова.',
   'hudChrome.escort.start': 'Сопровождение выступило. Держитесь рядом.',
+  'hudChrome.escort.paused': 'Ваш подопечный ждёт: рядом некому охранять дорогу.',
+  'hudChrome.escort.resumed': 'Сопровождение снова в пути.',
   'hudChrome.escort.failed': 'Ваш подопечный пал. Дорога забрала ещё одного.',
   'hudChrome.escort.done': 'Благополучное прибытие. Подопечный благодарит вас.',
   'entities.items.conjured_bread4.name': 'Наколдованная булочка с корицей',

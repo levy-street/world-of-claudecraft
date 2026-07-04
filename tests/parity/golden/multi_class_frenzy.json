@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1569,
+      "nextId": 1575,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1573,
-      "state": "24db0ec2",
-      "events": "1808b3e0",
+      "nextId": 1579,
+      "state": "83e3105b",
+      "events": "9d5f0803",
       "rng": {
         "draws": 3,
         "digest": "1c8c3a13"
@@ -56,7 +56,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1569,
+          "entityId": 1575,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -87,7 +87,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1570,
+          "entityId": 1576,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -118,7 +118,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1571,
+          "entityId": 1577,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -143,7 +143,7 @@
           "fallStartY": 2.312838,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1569,
+          "id": 1575,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -192,7 +192,7 @@
           "fallStartY": 2.307095,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1570,
+          "id": 1576,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -242,7 +242,7 @@
           "fallStartY": 2.299474,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1571,
+          "id": 1577,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -284,7 +284,7 @@
           }
         },
         {
-          "aggroTargetId": 1569,
+          "aggroTargetId": 1575,
           "aiState": "chase",
           "auras": [
             {
@@ -294,7 +294,7 @@
               "name": "Blood Frenzy",
               "remaining": 8,
               "school": "physical",
-              "sourceId": 1572,
+              "sourceId": 1578,
               "value": 1.3
             }
           ],
@@ -306,7 +306,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199910,
-          "id": 1572,
+          "id": 1578,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -335,19 +335,19 @@
           "stats": {
             "armor": 80
           },
-          "tappedById": 1569,
+          "tappedById": 1575,
           "templateId": "old_greyjaw",
           "threat": [
             [
-              1569,
+              1575,
               31
             ],
             [
-              1570,
+              1576,
               30
             ],
             [
-              1571,
+              1577,
               30
             ]
           ],
@@ -362,9 +362,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1573,
-      "state": "c4b9b0d3",
-      "events": "5b7ff606",
+      "nextId": 1579,
+      "state": "230306f6",
+      "events": "be67f7f9",
       "rng": {
         "draws": 6,
         "digest": "44b72a17"
@@ -389,7 +389,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1569,
+          "entityId": 1575,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -420,7 +420,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1570,
+          "entityId": 1576,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -451,7 +451,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1571,
+          "entityId": 1577,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -476,7 +476,7 @@
           "fallStartY": 2.312838,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1569,
+          "id": 1575,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -525,7 +525,7 @@
           "fallStartY": 2.307095,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1570,
+          "id": 1576,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -575,7 +575,7 @@
           "fallStartY": 2.299474,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1571,
+          "id": 1577,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -617,7 +617,7 @@
           }
         },
         {
-          "aggroTargetId": 1569,
+          "aggroTargetId": 1575,
           "aiState": "chase",
           "auras": [
             {
@@ -627,7 +627,7 @@
               "name": "Blood Frenzy",
               "remaining": 8,
               "school": "physical",
-              "sourceId": 1572,
+              "sourceId": 1578,
               "value": 1.3
             }
           ],
@@ -639,7 +639,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199820,
-          "id": 1572,
+          "id": 1578,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -668,19 +668,19 @@
           "stats": {
             "armor": 80
           },
-          "tappedById": 1569,
+          "tappedById": 1575,
           "templateId": "old_greyjaw",
           "threat": [
             [
-              1569,
+              1575,
               61
             ],
             [
-              1570,
+              1576,
               60
             ],
             [
-              1571,
+              1577,
               60
             ]
           ],
@@ -695,9 +695,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1573,
-      "state": "8c214c29",
-      "events": "5b7ff606",
+      "nextId": 1579,
+      "state": "5f159ec4",
+      "events": "be67f7f9",
       "rng": {
         "draws": 9,
         "digest": "f9425913"
@@ -722,7 +722,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1569,
+          "entityId": 1575,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -753,7 +753,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1570,
+          "entityId": 1576,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -784,7 +784,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1571,
+          "entityId": 1577,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -809,7 +809,7 @@
           "fallStartY": 2.312838,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1569,
+          "id": 1575,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -858,7 +858,7 @@
           "fallStartY": 2.307095,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1570,
+          "id": 1576,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -908,7 +908,7 @@
           "fallStartY": 2.299474,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1571,
+          "id": 1577,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -950,7 +950,7 @@
           }
         },
         {
-          "aggroTargetId": 1569,
+          "aggroTargetId": 1575,
           "aiState": "chase",
           "auras": [
             {
@@ -960,7 +960,7 @@
               "name": "Blood Frenzy",
               "remaining": 8,
               "school": "physical",
-              "sourceId": 1572,
+              "sourceId": 1578,
               "value": 1.3
             }
           ],
@@ -972,7 +972,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199730,
-          "id": 1572,
+          "id": 1578,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1001,19 +1001,19 @@
           "stats": {
             "armor": 80
           },
-          "tappedById": 1569,
+          "tappedById": 1575,
           "templateId": "old_greyjaw",
           "threat": [
             [
-              1569,
+              1575,
               91
             ],
             [
-              1570,
+              1576,
               90
             ],
             [
-              1571,
+              1577,
               90
             ]
           ],
@@ -1028,9 +1028,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1573,
-      "state": "05bacf94",
-      "events": "5b7ff606",
+      "nextId": 1579,
+      "state": "c372a4f1",
+      "events": "be67f7f9",
       "rng": {
         "draws": 12,
         "digest": "139243ee"
@@ -1055,7 +1055,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1569,
+          "entityId": 1575,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1086,7 +1086,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1570,
+          "entityId": 1576,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1117,7 +1117,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1571,
+          "entityId": 1577,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1142,7 +1142,7 @@
           "fallStartY": 2.312838,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1569,
+          "id": 1575,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1191,7 +1191,7 @@
           "fallStartY": 2.307095,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1570,
+          "id": 1576,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1241,7 +1241,7 @@
           "fallStartY": 2.299474,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1571,
+          "id": 1577,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1283,7 +1283,7 @@
           }
         },
         {
-          "aggroTargetId": 1569,
+          "aggroTargetId": 1575,
           "aiState": "chase",
           "auras": [
             {
@@ -1293,7 +1293,7 @@
               "name": "Blood Frenzy",
               "remaining": 8,
               "school": "physical",
-              "sourceId": 1572,
+              "sourceId": 1578,
               "value": 1.3
             }
           ],
@@ -1305,7 +1305,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199640,
-          "id": 1572,
+          "id": 1578,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1334,19 +1334,19 @@
           "stats": {
             "armor": 80
           },
-          "tappedById": 1569,
+          "tappedById": 1575,
           "templateId": "old_greyjaw",
           "threat": [
             [
-              1569,
+              1575,
               121
             ],
             [
-              1570,
+              1576,
               120
             ],
             [
-              1571,
+              1577,
               120
             ]
           ],
@@ -1361,9 +1361,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1573,
-      "state": "c018dbae",
-      "events": "99844d6c",
+      "nextId": 1579,
+      "state": "f4bbd67f",
+      "events": "499ce793",
       "rng": {
         "draws": 13,
         "digest": "65d96403"
@@ -1372,8 +1372,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1573,
-      "state": "8a72c567",
+      "nextId": 1579,
+      "state": "9c73c57a",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -1383,8 +1383,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1573,
-      "state": "8a72c567",
+      "nextId": 1579,
+      "state": "9c73c57a",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -1410,7 +1410,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1569,
+          "entityId": 1575,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1441,7 +1441,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1570,
+          "entityId": 1576,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1472,7 +1472,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1571,
+          "entityId": 1577,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1498,7 +1498,7 @@
           "fallStartY": 2.312838,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 1569,
+          "id": 1575,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1548,7 +1548,7 @@
           "fallStartY": 2.307095,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 1570,
+          "id": 1576,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1599,7 +1599,7 @@
           "fallStartY": 2.299474,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 1571,
+          "id": 1577,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1641,7 +1641,7 @@
           }
         },
         {
-          "aggroTargetId": 1569,
+          "aggroTargetId": 1575,
           "aiState": "attack",
           "auras": [
             {
@@ -1651,7 +1651,7 @@
               "name": "Blood Frenzy",
               "remaining": 7.5,
               "school": "physical",
-              "sourceId": 1572,
+              "sourceId": 1578,
               "value": 1.3
             }
           ],
@@ -1665,7 +1665,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199640,
-          "id": 1572,
+          "id": 1578,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1695,19 +1695,19 @@
             "armor": 80
           },
           "swingTimer": 0.934615,
-          "tappedById": 1569,
+          "tappedById": 1575,
           "templateId": "old_greyjaw",
           "threat": [
             [
-              1569,
+              1575,
               121
             ],
             [
-              1570,
+              1576,
               120
             ],
             [
-              1571,
+              1577,
               120
             ]
           ],

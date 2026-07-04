@@ -1308,7 +1308,7 @@ export class ClientWorld implements IWorld {
         e.level = w.lv;
         e.skin = w.sk ?? 0;
         // playable race (players only; pre-race servers omit it -> undefined,
-        // which every consumer treats as Human/Kael)
+        // which every consumer treats as UNSWORN, no faction)
         e.race = typeof w.rc === 'string' ? (w.rc as Entity['race']) : undefined;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window

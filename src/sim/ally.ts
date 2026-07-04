@@ -155,7 +155,8 @@ export function updateWorldAlly(ctx: SimContext, ally: Entity): void {
     return;
   }
   if (ally.hp < ally.maxHp && ally.combatTimer > ALLY_MEND_OUT_OF_COMBAT_SECONDS) {
+    const healed = ally.maxHp - ally.hp;
     ally.hp = ally.maxHp;
-    ctx.emit({ type: 'heal', targetId: ally.id, amount: ally.maxHp });
+    ctx.emit({ type: 'heal', targetId: ally.id, amount: healed });
   }
 }

@@ -327,6 +327,8 @@ export const ja_JP: EnTranslations = {
     },
     "escort": {
       "start": "護衛が出発した。離れるな。",
+      "paused": "護衛対象が待っている。道を守る者が近くにいない。",
+      "resumed": "護衛が再び動き出した。",
       "failed": "護衛対象が倒れた。道はまた一人を奪った。",
       "done": "無事に到着した。護衛対象が感謝している。"
     },
@@ -7495,6 +7497,24 @@ export const ja_JP: EnTranslations = {
       "tollroad_carter": {
         "name": "Carter Odom"
       },
+      "lastwater_wellguard": {
+        "name": "Wellguard Nahir"
+      },
+      "seat_water_bearer": {
+        "name": "Water-Bearer Sitra"
+      },
+      "greyweir_bailiff": {
+        "name": "Bailiff Roskan"
+      },
+      "veth_ledger_courier": {
+        "name": "Courier Yeska"
+      },
+      "rimeshaft_picket_warden": {
+        "name": "Warden Halvar"
+      },
+      "paychest_porter": {
+        "name": "Porter Fenn"
+      },
       "thornwarped_stag": {
         "name": "Thorn-Warped Stag"
       },
@@ -9285,6 +9305,66 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Carter Odom escorted up the pass"
+          }
+        }
+      },
+      "q_hold_last_water": {
+        "title": "Hold Last Water",
+        "text": "The duskwater crews have stopped testing my wagons and started testing the camp itself, {playerName}. Wellguard Nahir holds the north edge of the ring, and he holds it alone. Say the word when you stand beside him: three pushes are coming down off the marches, and I mean the well to be here when they are done.",
+        "completion": "Three pushes broken on the ring and Nahir still on his feet. The crews will spend a season recounting what tonight cost them, {playerName}; I already have it in my ledger, to the last copper.",
+        "objectives": {
+          "0": {
+            "label": "Pushes repelled beside Wellguard Nahir"
+          }
+        }
+      },
+      "q_the_water_walks": {
+        "title": "The Water Walks",
+        "text": "Every drop the Sunken Seat drinks walks there on somebody's back, {playerName}, and the road has learned to bite the backs that carry it: the temple's stones walk their old rounds across it, and the heresy preaches that a court should thirst. Water-Bearer Sitra hauls the Seat's ration today. Keep beside her the whole way, and the water arrives.",
+        "completion": "Sitra signaled from the Seat before dusk: the ration in Masut's stores and her own feet still under her. That is a good day on this road, {playerName}, and the road did not give it; you did.",
+        "objectives": {
+          "0": {
+            "label": "Water-Bearer Sitra escorted to the Sunken Seat"
+          }
+        }
+      },
+      "q_veth_hold_the_weir": {
+        "title": "Hold the Weir",
+        "text": "The Last Lodge has started testing my weir, {playerName}: guildless knives first, to see what the gate costs, then Forsworn steel to see who pays it. Bailiff Roskan holds the north bank and I do not intend to replace him. Stand with him when I call it: three pushes, and the Lodge writes the Greyweir off as a bad investment.",
+        "completion": "Three pushes priced, paid, and returned to sender, and Roskan still on his feet at the gate. The Lodge keeps accounts too, {playerName}; tonight it enters a loss. The weir takes its toll from everything the river carries. Knives included.",
+        "objectives": {
+          "0": {
+            "label": "Waves repelled beside Bailiff Roskan"
+          }
+        }
+      },
+      "q_veth_ledger_run": {
+        "title": "The Ledger Run",
+        "text": "The quarter-ledger goes north tonight, {playerName}: every toll the weir has taken since thaw, copied fair and bound for the Longwatch strongbox. Courier Yeska carries it, and the guildless and their smuggler partners would sooner it went into the river. Walk beside her up the towpath and see that the pages arrive still counting.",
+        "completion": "Yeska signed in at the Longwatch with every page in order. Somewhere on the north road several investors are learning the robbery went unrecorded because it went undone. That arithmetic settles your fee, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Courier Yeska escorted up the north road"
+          }
+        }
+      },
+      "q_rimeshaft_picket_defense": {
+        "title": "Hold the Picket",
+        "text": "Shaft three let something out and the snow line sent it friends, {playerName}. They come down off the Ascent at every shift bell, and Warden Halvar holds the north picket alone, which the safety ledger scores as one incident pending. Stand with him when I ring the shift down: three pushes, and the adits stay open.",
+        "completion": "Three pushes broken, the picket standing, and the shift went down on time, {playerName}. The safety ledger records zero incidents and one warden overdue for leave; Rimeshaft calls that a good day.",
+        "objectives": {
+          "0": {
+            "label": "Waves repelled beside Warden Halvar"
+          }
+        }
+      },
+      "q_ledgerwatch_payroll_escort": {
+        "title": "The Pay Goes North",
+        "text": "The Rimeshaft payroll is late twice over, {playerName}: once to the weather and once to whoever keeps opening my couriers. Porter Fenn hauls the strongbox up the Tithe Road at the next bell. Walk beside him to the Rimeshaft milepost; the box arrives sealed, or somebody files a loss report, and it will not be me.",
+        "completion": "Fenn made the milepost with the seal unbroken, and the miners get paid a quarter they had written off. The loss report dies unfiled, {playerName}, which is the kindest end the paperwork offers anyone.",
+        "objectives": {
+          "0": {
+            "label": "Porter Fenn escorted up the Tithe Road"
           }
         }
       },

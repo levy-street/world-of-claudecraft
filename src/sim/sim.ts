@@ -302,6 +302,7 @@ import {
 import {
   type AbilityDef,
   type AbilityEffect,
+  ACTIVE_LEVEL_CAP,
   type ArenaCombatant,
   type ArenaFormat,
   type ArenaStanding,
@@ -1487,7 +1488,7 @@ export class Sim {
 
     if (savedState) {
       const s = savedState;
-      player.level = Math.max(1, Math.min(MAX_LEVEL, s.level));
+      player.level = Math.max(1, Math.min(ACTIVE_LEVEL_CAP, s.level));
       player.facing = s.facing;
       player.prevFacing = s.facing;
       meta.xp = s.xp;
@@ -1820,10 +1821,11 @@ export class Sim {
     return sanitizeRemovedZone1Content(state).state;
   }
 
-  /** Set a player's race (meta + entity). Creation-time only: race is the
-   *  character's identity (faction source) and never changes in play; the
-   *  server calls this while building a new character's initial state. The
-   *  cosmetic race body scale lands on the next recalcPlayerStats. */
+  /** Called by the Envoys' Hall oath (src/sim/envoys.ts) once per character
+   *  (also reachable from tests/dev tooling). The race is the character's
+   *  identity (faction source); the oath is one-shot, so a set race is never
+   *  overwritten in play. The cosmetic race body scale lands on the next
+   *  recalcPlayerStats. */
   setPlayerRace(pid: number, race: PlayerRace): boolean {
     const meta = this.players.get(pid);
     const e = this.entities.get(pid);
