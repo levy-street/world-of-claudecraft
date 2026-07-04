@@ -6186,7 +6186,7 @@ export const en_XA: EnTranslations = {
         "name": "[Çŕýþţƀóñé Þáúļðŕóñš]"
       },
       "deathlords_dread_visage": {
-        "name": "[Ɓáŕŕóŵļóŕð'š Ðŕéáð Ʋíšáĝé]"
+        "name": "[Ɓáŕŕóŵļóŕð Ðŕéáð Ʋíšáĝé]"
       },
       "gravewyrm_gauntlets": {
         "name": "[Ĝŕáʋéŵýŕɱ Ĝáúñţļéţš]"
@@ -6417,28 +6417,28 @@ export const en_XA: EnTranslations = {
         "name": "[Ʋáñĝúáŕð Çĥŕóɱé]"
       },
       "crownforged_gauntlets": {
-        "name": "[Çŕóŵñƒóŕĝéð Ĝáúñţļéţš]"
+        "name": "[Ɓóñéŵŕóúĝĥţ Ĝáúñţļéţš]"
       },
       "nighttalon_grips": {
-        "name": "[Ñíĝĥţţáļóñ Ĝŕíþš]"
+        "name": "[Ðíŕéƒáñĝ Ĝŕíþš]"
       },
       "soulflame_gloves": {
-        "name": "[Šóúļƒļáɱé Ĝļóʋéš]"
+        "name": "[Ŵŕáíţĥƒíŕé Ĝļóʋéš]"
       },
       "stormcallers_handguards": {
-        "name": "[Šţóŕɱçáļļéŕ'š Ĥáñðĝúáŕðš]"
+        "name": "[Ĝáļéçáļļ Ĥáñðĝúáŕðš]"
       },
       "crownforged_girdle": {
-        "name": "[Çŕóŵñƒóŕĝéð Ĝíŕðļé]"
+        "name": "[Ɓóñéŵŕóúĝĥţ Ĝíŕðļé]"
       },
       "nighttalon_waistband": {
-        "name": "[Ñíĝĥţţáļóñ Ŵáíšţƀáñð]"
+        "name": "[Ðíŕéƒáñĝ Ŵáíšţƀáñð]"
       },
       "soulflame_cord": {
-        "name": "[Šóúļƒļáɱé Çóŕð]"
+        "name": "[Ŵŕáíţĥƒíŕé Çóŕð]"
       },
       "stormcallers_waistguard": {
-        "name": "[Šţóŕɱçáļļéŕ'š Ŵáíšţĝúáŕð]"
+        "name": "[Ĝáļéçáļļ Ŵáíšţĝúáŕð]"
       }
     },
     "mobs": {

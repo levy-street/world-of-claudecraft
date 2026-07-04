@@ -2595,7 +2595,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   deathlords_dread_visage: {
     id: 'deathlords_dread_visage',
     set: 'deathlord',
-    name: "Barrowlord's Dread Visage",
+    name: 'Barrowlord Dread Visage',
     kind: 'armor',
     armorType: 'mail',
     slot: 'helmet',
@@ -2633,7 +2633,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // family's existing helm/shoulder. The `set` tag wires each into its family. ---
   crownforged_gauntlets: {
     id: 'crownforged_gauntlets',
-    name: 'Crownforged Gauntlets',
+    name: 'Bonewrought Gauntlets',
     kind: 'armor',
     slot: 'gloves',
     armorType: 'mail',
@@ -2645,7 +2645,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   nighttalon_grips: {
     id: 'nighttalon_grips',
-    name: 'Nighttalon Grips',
+    name: 'Direfang Grips',
     kind: 'armor',
     slot: 'gloves',
     armorType: 'leather',
@@ -2657,7 +2657,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   soulflame_gloves: {
     id: 'soulflame_gloves',
-    name: 'Soulflame Gloves',
+    name: 'Wraithfire Gloves',
     kind: 'armor',
     slot: 'gloves',
     armorType: 'cloth',
@@ -2669,7 +2669,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   stormcallers_handguards: {
     id: 'stormcallers_handguards',
-    name: "Stormcaller's Handguards",
+    name: 'Galecall Handguards',
     kind: 'armor',
     slot: 'gloves',
     armorType: 'mail',
@@ -2683,7 +2683,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // piece (helm, shoulder, glove, belt), alongside the glove drops above. ---
   crownforged_girdle: {
     id: 'crownforged_girdle',
-    name: 'Crownforged Girdle',
+    name: 'Bonewrought Girdle',
     kind: 'armor',
     slot: 'waist',
     armorType: 'mail',
@@ -2695,7 +2695,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   nighttalon_waistband: {
     id: 'nighttalon_waistband',
-    name: 'Nighttalon Waistband',
+    name: 'Direfang Waistband',
     kind: 'armor',
     slot: 'waist',
     armorType: 'leather',
@@ -2707,7 +2707,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   soulflame_cord: {
     id: 'soulflame_cord',
-    name: 'Soulflame Cord',
+    name: 'Wraithfire Cord',
     kind: 'armor',
     slot: 'waist',
     armorType: 'cloth',
@@ -2719,7 +2719,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   },
   stormcallers_waistguard: {
     id: 'stormcallers_waistguard',
-    name: "Stormcaller's Waistguard",
+    name: 'Galecall Waistguard',
     kind: 'armor',
     slot: 'waist',
     armorType: 'mail',
