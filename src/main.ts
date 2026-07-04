@@ -2689,7 +2689,6 @@ async function startOffline(
   playerClass: PlayerClass,
   name: string,
   skin = 0,
-  race: PlayerRace = 'human',
   world?: WorldContent,
   seedOverride?: number,
 ): Promise<void> {
@@ -2706,7 +2705,6 @@ async function startOffline(
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);
-  sim.setPlayerRace(sim.playerId, race);
   // Dev convenience: ?mech drops an offline session straight into the Combat Mech
   // cosmetic body holding a spread of class-usable weapons, to eyeball the held
   // weapon model on the mech (swap them in the bag to see each one). DEV builds
@@ -2769,9 +2767,7 @@ let activeTransitionCleanup: (() => void) | null = null;
 let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
-let offlineRace: PlayerRace = 'human'; // chosen race for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
-let onlineRace: PlayerRace = 'human'; // chosen race for new online characters (faction source)
 
 function releaseStartScreenPreview(): void {
   if (!characterPreview) return;
@@ -2910,7 +2906,7 @@ function updatePreviewContainer(panelId: string): void {
   }
 
   // creation panels: the turntable previews the picked race's aspect too
-  characterPreview.setRace(panelId === '#charcreate-panel' ? onlineRace : offlineRace);
+  characterPreview.setRace(null); // race is sworn in-world at the Envoys' Hall
   const selSelector =
     panelId === '#charcreate-panel'
       ? '#charcreate-panel .mini-class.sel'
@@ -3938,9 +3934,8 @@ async function refreshCharacters(): Promise<void> {
       row.setAttribute('aria-selected', 'false');
       row.dataset.class = c.class;
       row.dataset.skin = String(c.skin ?? 0);
-      row.dataset.race = c.race ?? 'human';
+      if (c.race) row.dataset.race = c.race;
       const className = classDisplayName(c.class);
-      const raceName = raceDisplayName(c.race ?? 'human');
       // Online characters explain themselves on their own hint line (below the
       // class) instead of the terse "(in world)" suffix, so the reason for the
       // Take Over button is unmissable.
@@ -3951,7 +3946,15 @@ async function refreshCharacters(): Promise<void> {
       row.innerHTML = `${portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm' })}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>
-          <span class="char-sub">${escapeHtml(t('races.levelRaceClass', { level: c.level, race: raceName, className }))}${escapeHtml(statusText)}</span>
+          <span class="char-sub">${escapeHtml(
+            c.race
+              ? t('races.levelRaceClass', {
+                  level: c.level,
+                  race: raceDisplayName(c.race),
+                  className,
+                })
+              : t('itemUi.equipment.levelClass', { level: c.level, className }),
+          )}${escapeHtml(statusText)}</span>
           ${inWorldHint}
         </div>
         ${
@@ -6418,7 +6421,7 @@ function wireStartScreens(): void {
     music.init();
     sfx.init();
     const name = sanitizeOfflineName(rawName);
-    void startOffline(cls, name, selectedSkin('#offline-skin-row', offlineSkin), offlineRace);
+    void startOffline(cls, name, selectedSkin('#offline-skin-row', offlineSkin));
   };
 
   const handleOfflineSelect = () => {
@@ -6909,50 +6912,6 @@ function wireStartScreens(): void {
     if (sortDropdownOpen && e.key === 'Escape') closeSortDropdown();
   });
 
-  // character creation: race picker (faction + race), one instance per panel
-  // (online create + offline quick-start). Selection is pure UI state; the
-  // server (or the offline Sim) re-validates the race id on create.
-  const wireRacePicker = (panelSel: string, onPick: (race: PlayerRace) => void) => {
-    const infoEl = document.querySelector(`${panelSel} .race-racial-info`);
-    const showRacial = (race: PlayerRace) => {
-      if (infoEl) infoEl.textContent = `${racialTraitName(race)}: ${racialTraitDesc(race)}`;
-    };
-    const selectedRace = (): PlayerRace =>
-      ((document.querySelector(`${panelSel} .mini-race.sel`) as HTMLElement | null)?.dataset
-        .race as PlayerRace) ?? 'human';
-    showRacial(selectedRace());
-    document.querySelectorAll(`${panelSel} .mini-race`).forEach((el) => {
-      const race = ((el as HTMLElement).dataset.race as PlayerRace) ?? 'human';
-      const selectRace = () => {
-        document.querySelectorAll(`${panelSel} .mini-race`).forEach((x) => {
-          x.classList.remove('sel');
-          x.setAttribute('aria-pressed', 'false');
-        });
-        el.classList.add('sel');
-        el.setAttribute('aria-pressed', 'true');
-        showRacial(race);
-        onPick(race);
-      };
-      el.addEventListener('click', selectRace);
-      el.addEventListener('keydown', (e) =>
-        handleKeyboardActivation(e as KeyboardEvent, selectRace),
-      );
-      // hover/focus peeks that race's racial trait; leaving restores the pick
-      el.addEventListener('mouseenter', () => showRacial(race));
-      el.addEventListener('focus', () => showRacial(race));
-      el.addEventListener('mouseleave', () => showRacial(selectedRace()));
-      el.addEventListener('blur', () => showRacial(selectedRace()));
-    });
-  };
-  wireRacePicker('#charcreate-panel', (race) => {
-    onlineRace = race;
-    characterPreview?.setRace(race);
-  });
-  wireRacePicker('#offline-select', (race) => {
-    offlineRace = race;
-    characterPreview?.setRace(race);
-  });
-
   // character creation
   document.querySelectorAll('#charcreate-panel .mini-class').forEach((el) => {
     const handleMiniClassSelect = () => {
@@ -7142,7 +7101,6 @@ function wireStartScreens(): void {
         name,
         clsEl.dataset.class as PlayerClass,
         selectedSkin('#online-skin-row', onlineSkin),
-        onlineRace,
       );
       newCharNameInput.value = '';
       charselectError.textContent = '';
@@ -7737,7 +7695,6 @@ if (editorPlaytest) {
     editorPlaytest.playerClass,
     editorPlaytest.playerName,
     0,
-    'human',
     editorPlaytest.content,
     editorPlaytest.seed,
   );

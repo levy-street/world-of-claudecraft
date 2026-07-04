@@ -75,7 +75,7 @@ describe('race persistence and back-compat', () => {
     expect(sim2.entities.get(pid2)!.race).toBe('dark_fae');
   });
 
-  it('a pre-race save loads as Human (Kael) without touching its position', () => {
+  it('a pre-race save loads UNSWORN without touching its position', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Old');
     const state = sim.serializeCharacter(pid)!;
@@ -85,13 +85,15 @@ describe('race persistence and back-compat', () => {
     const sim2 = makeSim();
     const pid2 = sim2.addPlayer('warrior', 'Old', { state });
     const meta = sim2.meta(pid2)!;
-    expect(meta.race).toBe('human');
-    expect(factionOfRace(meta.race)).toBe('kael');
+    // No silent Human/Kael: the existing character keeps the faction CHOICE
+    // (made in-world at the Envoys' Hall) instead of a default.
+    expect(meta.race).toBeUndefined();
     const e = sim2.entities.get(pid2)!;
+    expect(e.race).toBeUndefined();
     expect(e.pos.z).toBeCloseTo(300, 0);
   });
 
-  it('junk race values from a tampered payload fall back to Human', () => {
+  it('junk race values from a tampered payload load unsworn, never a faction', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('rogue', 'Tamper');
     const state = sim.serializeCharacter(pid)!;
@@ -99,7 +101,7 @@ describe('race persistence and back-compat', () => {
 
     const sim2 = makeSim();
     const pid2 = sim2.addPlayer('rogue', 'Tamper', { state: state });
-    expect(sim2.meta(pid2)!.race).toBe('human');
+    expect(sim2.meta(pid2)!.race).toBeUndefined();
   });
 
   it('a saved race wins over a creation-time race option', () => {
@@ -133,13 +135,18 @@ describe('racial passives', () => {
     return { h, r };
   };
 
-  it('human keeps the pre-race combat baseline (cosmetic scale 1, rested-only racial)', () => {
+  it('unsworn keeps the pre-race combat baseline, byte-identical to Human', () => {
+    // Human's racial is rested-XP only, so an unsworn character (no racial at
+    // all) has exactly the same combat stats: the legacy baseline survives
+    // both before and after the player swears at the Envoys' Hall as Human.
     expect(Object.keys(RACES.human.racial)).toEqual(['restedRatePct']);
     const sim = makeSim();
-    const pid = sim.addPlayer('warrior', 'Legacy');
-    const e = sim.entities.get(pid)!;
-    expect(sim.meta(pid)!.race).toBe('human');
-    expect(e.scale).toBe(1);
+    const un = sim.entities.get(sim.addPlayer('warrior', 'Legacy'))!;
+    const hu = sim.entities.get(sim.addPlayer('warrior', 'Sworn', { race: 'human' }))!;
+    expect(un.scale).toBe(1);
+    expect(un.stats).toEqual(hu.stats);
+    expect(un.maxHp).toBe(hu.maxHp);
+    expect(un.attackPower).toBe(hu.attackPower);
   });
 
   it('primary-attribute racials multiply the summed attribute', () => {

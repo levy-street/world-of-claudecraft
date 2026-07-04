@@ -240,11 +240,9 @@ function initialCharacterState(
   cls: PlayerClass,
   name: string,
   skin: number,
-  race: PlayerRace,
 ): import('../src/sim/sim').CharacterState {
   const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
-  sim.setPlayerRace(sim.playerId, race);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');
   return character;
@@ -864,19 +862,19 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           0,
           Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
         );
-        // Race is optional (older clients omit it and get Human/Kael), but a
-        // present value must be a real playable race: reject junk instead of
-        // silently coercing a tampered payload.
+        // Characters are created UNSWORN: faction and race are sworn in-world
+        // at the Envoys' Hall (src/sim/envoys.ts), so creation accepts no race.
+        // A stray race field from an older client is rejected the same as any
+        // other junk rather than silently minting a faction.
         if (body.race !== undefined && !isPlayerRace(body.race))
           return json(res, 400, { error: 'invalid race' });
-        const race: PlayerRace = isPlayerRace(body.race) ? body.race : 'human';
         const create = () =>
           createCharacterCapped(
             accountId,
             name,
             body.class,
             10,
-            initialCharacterState(body.class, name, skin, race),
+            initialCharacterState(body.class, name, skin),
           );
         const created = (c: NonNullable<Awaited<ReturnType<typeof createCharacterCapped>>>) =>
           json(res, 200, {
@@ -885,7 +883,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
             class: c.class,
             level: c.level,
             skin: c.state?.skin ?? skin,
-            race: isPlayerRace(c.state?.race) ? c.state.race : race,
+            ...(isPlayerRace(c.state?.race) ? { race: c.state.race } : {}),
             forceRename: c.force_rename,
           });
         try {

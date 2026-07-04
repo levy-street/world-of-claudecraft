@@ -26,6 +26,7 @@ import {
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
+import { factionOfRace } from '../sim/content/races';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -34,6 +35,7 @@ import {
   skinRankOrder,
 } from '../sim/content/skins';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
+import { ENVOY_NPC_IDS } from '../sim/content/valdris/envoys';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
@@ -179,6 +181,7 @@ import {
   zonePoiLabel,
 } from './entity_i18n';
 import { esc } from './esc';
+import { renderFactionChoice } from './faction_choice_window';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
@@ -1035,6 +1038,7 @@ export class Hud {
   private openQuestDetailId: string | null = null;
   private pendingChatLinks = new Map<string, string>(); // display "[Name]" -> [[q:id]]/[[i:id]] token
   private questDialogTrap: FocusTrapHandle | null = null;
+  private factionChoiceTrap: FocusTrapHandle | null = null;
   private questDialogOpenedAtMs = 0;
   // The NPC whose voice line is currently sounding, so update() can fade it by
   // distance as the player walks away. Outlives the dialog window (which closes at
@@ -2021,6 +2025,9 @@ export class Hud {
         break;
       case 'quest-dialog':
         this.closeQuestDialog();
+        break;
+      case 'faction-choice-window':
+        this.closeFactionChoice();
         break;
       case 'delve-board':
         this.closeDelveBoard();
@@ -9162,6 +9169,75 @@ export class Hud {
   // -------------------------------------------------------------------------
   // Quest dialog (gossip)
   // -------------------------------------------------------------------------
+
+  // --- Envoys' Hall: the faction oath window + ferry travel confirms -------
+
+  /** Route a click on an Envoy: the unsworn get the oath window; the sworn get
+   *  quest business first (an offer or a turn-in outranks the ferry pitch),
+   *  then their OWN Envoy offers passage, and a foreign one just talks. */
+  openEnvoyDialog(npcId: number): void {
+    const npc = this.sim.entities.get(npcId);
+    if (npc?.kind !== 'npc') return;
+    const race = this.sim.player.race;
+    if (!race) {
+      this.openFactionChoice();
+      return;
+    }
+    const business = npc.questIds.some((q) => {
+      const st = this.sim.questState(q);
+      return (
+        (st === 'available' && QUESTS[q].giverNpcId === npc.templateId) ||
+        (st === 'ready' && isQuestTurnInNpc(QUESTS[q], npc.templateId))
+      );
+    });
+    if (!business && ENVOY_NPC_IDS[factionOfRace(race)] === npc.templateId) {
+      this.confirmTravel();
+      return;
+    }
+    this.openQuestDialog(npcId);
+  }
+
+  /** Ferry (or own-Envoy) passage confirm; the sim validates and teleports. */
+  confirmTravel(): void {
+    this.confirmDialog(
+      t('hudChrome.envoys.travelTitle'),
+      t('hudChrome.envoys.travelBody'),
+      t('hudChrome.envoys.travelGo'),
+      t('hudChrome.envoys.travelStay'),
+      () => {
+        this.sim.travel();
+        audio.click();
+      },
+    );
+  }
+
+  openFactionChoice(): void {
+    const el = $('#faction-choice-window');
+    this.closeOtherWindows('#faction-choice-window');
+    renderFactionChoice({
+      root: () => el,
+      onChoose: (race) => {
+        // One command; the sim enforces every rule and answers with either the
+        // oath (race change + teleport) or an error toast.
+        this.sim.chooseRace(race);
+        audio.click();
+        this.closeFactionChoice();
+      },
+      onClose: () => this.closeFactionChoice(),
+    });
+    el.style.display = 'block';
+    el.dataset.windowOpen = '1';
+    this.factionChoiceTrap = this.focusManager.open({ root: () => el });
+  }
+
+  closeFactionChoice(): void {
+    const el = $('#faction-choice-window');
+    if (el.style.display !== 'block') return;
+    el.style.display = 'none';
+    delete el.dataset.windowOpen;
+    this.factionChoiceTrap?.release();
+    this.factionChoiceTrap = null;
+  }
 
   openQuestDialog(npcId: number): void {
     const npc = this.sim.entities.get(npcId);

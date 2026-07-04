@@ -224,6 +224,12 @@ const NPC_IDS = [
   // Valdris continent (v0.19)
   'frontier_warden_corvis',
   'frontier_warden_maerlys',
+  'envoy_marcus_vale',
+  'envoy_sylwen',
+  'envoy_amara',
+  'ferry_rhouma',
+  'ferry_neris',
+  'ferry_aldwin',
   'judge_saphira',
   'caravan_master_odai',
   'armorer_khet',
@@ -333,6 +339,7 @@ const QUEST_IDS = [
   'q_nythraxis_scourges_end',
   'q_mogger',
   // Valdris continent (v0.19)
+  'q_three_banners',
   'q_dune_prowlers',
   'q_dune_prowler_pelts',
   'q_glasswind_venom',

@@ -460,13 +460,10 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(
-    name: string,
-    cls: PlayerClass,
-    skin = 0,
-    race: PlayerRace = 'human',
-  ): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin, race });
+  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
+    // No race: characters are created UNSWORN and swear their faction and race
+    // in-world at the Envoys' Hall (src/sim/envoys.ts).
+    await this.post('/api/characters', { name, class: cls, skin });
   }
 
   async renameCharacter(characterId: number, name: string): Promise<void> {
@@ -1791,6 +1788,12 @@ export class ClientWorld implements IWorld {
   }
   interact(): void {
     this.cmd({ cmd: 'interact' });
+  }
+  chooseRace(race: string): void {
+    this.cmd({ cmd: 'chooseRace', race });
+  }
+  travel(): void {
+    this.cmd({ cmd: 'travel' });
   }
   lootCorpse(id: number): void {
     this.cmd({ cmd: 'loot', id });

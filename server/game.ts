@@ -2340,6 +2340,15 @@ export class GameServer {
       case 'interact':
         sim.interact(pid);
         break;
+      case 'chooseRace':
+        // The Envoys' Hall oath: the sim re-validates everything (a real race,
+        // still unsworn, the level gate, standing before an Envoy), so a forged
+        // payload can at most earn an error toast.
+        if (typeof msg.race === 'string') sim.chooseRace(msg.race, pid);
+        break;
+      case 'travel':
+        sim.travel(pid);
+        break;
       case 'loot':
         if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid);
         break;

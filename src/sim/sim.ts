@@ -136,6 +136,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
+import * as envoys from './envoys';
 import { canEquipItem } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
@@ -692,8 +693,9 @@ export interface PlayerMeta {
   cls: PlayerClass;
   name: string;
   // Playable race: identity + faction source + cosmetic body scale, never
-  // stats (see content/races.ts). Persisted; pre-race saves default to human.
-  race: PlayerRace;
+  // stats (see content/races.ts). Persisted. Undefined = UNSWORN: no faction
+  // chosen yet at the Envoys' Hall (also how every pre-race save loads).
+  race?: PlayerRace;
   // Dev-only test dummy spawned via "/dev bot <name>" (social/chat.ts, gated by
   // devCommands): a stationary player you can target and whisper to exercise social
   // features offline; a whisper to it auto-replies. Runtime-only, never serialized.
@@ -1393,15 +1395,17 @@ export class Sim {
     this.addEntity(player);
     const classDef = CLASSES[cls];
     // Saved race wins (it is the character's identity); a creation-time race
-    // applies to new characters only; anything else (pre-race saves, junk
-    // values from a tampered payload) falls back to Human (Kael).
+    // (dev/test convenience) applies to new characters only. NO default: a
+    // character without a chosen race is UNSWORN (undefined) until the Envoys'
+    // Hall choice, and every pre-race save loads the same way, so existing
+    // characters get the faction choice instead of a silent Human/Kael.
     const savedRace = savedState?.race;
     const optRace = opts?.race;
-    const race: PlayerRace = isPlayerRace(savedRace)
+    const race: PlayerRace | undefined = isPlayerRace(savedRace)
       ? savedRace
       : isPlayerRace(optRace)
         ? optRace
-        : 'human';
+        : undefined;
     const meta: PlayerMeta = {
       entityId: player.id,
       characterId: opts?.characterId,
@@ -2437,6 +2441,7 @@ export class Sim {
       resolve: sim.resolve.bind(sim),
       groundPos: sim.groundPos.bind(sim),
       playerMods: sim.playerMods.bind(sim),
+      setPlayerRace: sim.setPlayerRace.bind(sim),
       delveRunForPlayer: sim.delveRunForPlayer.bind(sim),
       delveModuleEntry: sim.delveModuleEntry.bind(sim),
       failDelveRun: sim.failDelveRun.bind(sim),
@@ -5051,6 +5056,17 @@ export class Sim {
 
   interact(pid?: number): void {
     interaction.interact(this.ctx, pid);
+  }
+
+  /** The Envoys' Hall oath: swear a faction (via its race) and travel to the
+   *  realm hub. Thin delegate into src/sim/envoys.ts (IWorld + server surface). */
+  chooseRace(race: string, pid?: number): boolean {
+    return envoys.chooseRaceAtEnvoy(this.ctx, race, pid);
+  }
+
+  /** Ferry/Envoy travel between the Landing and the sworn player's realm hub. */
+  travel(pid?: number): boolean {
+    return envoys.travelWithFerry(this.ctx, pid);
   }
 
   private isQuestInteractionEntity(e: Entity): boolean {

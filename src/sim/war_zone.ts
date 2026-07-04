@@ -20,9 +20,12 @@ export const WAR_ZONE_ID = 'the_breach';
 // registered, which keeps every check a no-op in stripped-down test worlds).
 const warZone: ZoneDef | null = ZONES.find((z) => z.id === WAR_ZONE_ID) ?? null;
 
-/** A player's faction: a pure function of race (pre-race saves are Human/Kael). */
-export function playerFaction(e: Entity): PlayerFaction {
-  return factionOfRace(e.race ?? 'human');
+/** A player's faction: a pure function of race. UNSWORN characters (no race
+ *  chosen yet at the Envoys' Hall, which is also how pre-race saves load) have
+ *  no faction and read as null: they are war-zone hostile to nobody and nobody
+ *  is war-zone hostile to them. */
+export function playerFaction(e: Entity): PlayerFaction | null {
+  return e.race ? factionOfRace(e.race) : null;
 }
 
 /** Inside the Last Bastion truce ground: the war-zone hub and its immediate
@@ -49,6 +52,8 @@ export function inEternalWarZone(pos: Vec3): boolean {
  *  factions differ and both stand in the open Breach. Callers handle duels,
  *  arena, and self/dead checks; this is only the eternal-war rule. */
 export function warZonePvpHostile(a: Entity, b: Entity): boolean {
-  if (playerFaction(a) === playerFaction(b)) return false;
+  const fa = playerFaction(a);
+  const fb = playerFaction(b);
+  if (!fa || !fb || fa === fb) return false;
   return inEternalWarZone(a.pos) && inEternalWarZone(b.pos);
 }

@@ -5544,4 +5544,18 @@
   .cal-add-btn:hover {
     filter: brightness(1.08);
   }
+
+  /* ---------- faction choice (Envoys' Hall) ---------- */
+  #faction-choice-window {
+    max-width: 460px;
+  }
+  #faction-choice-window .envoys-prompt {
+    margin: 8px 0 4px;
+    color: var(--color-text);
+  }
+  #faction-choice-window .envoys-warning {
+    margin: 10px 0 4px;
+    font-size: 12px;
+    color: var(--color-accent);
+  }
 }

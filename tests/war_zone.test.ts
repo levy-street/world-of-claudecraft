@@ -48,12 +48,14 @@ describe('war zone geometry', () => {
     expect(inEternalWarZone({ x: 0, y: 0, z: breach.zMax + 5 })).toBe(false);
   });
 
-  it('derives player faction with the Human default for pre-race entities', () => {
+  it('unsworn entities have no faction and are war-zone hostile to nobody', () => {
     const sim = makeSim();
     const e = sim.entities.get(sim.playerId)!;
-    expect(e.race).toBe('human');
-    expect(playerFaction(e)).toBe('kael');
-    e.race = undefined; // a mirrored entity from a pre-race server
+    // No creation-time race: the character is unsworn until the Envoys' Hall
+    // choice (also how every pre-race save loads).
+    expect(e.race).toBeUndefined();
+    expect(playerFaction(e)).toBeNull();
+    e.race = 'human';
     expect(playerFaction(e)).toBe('kael');
   });
 });

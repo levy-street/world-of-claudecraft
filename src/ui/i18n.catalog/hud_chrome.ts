@@ -254,6 +254,19 @@ export const hudChromeStrings = {
   // The world-map atlas levels (the WoW-style zoom-out views painted from the
   // Valdris cartography): level titles, the two group-region names, the level
   // band chip, and the navigation hints (map_atlas_painter.ts).
+  // The Envoys' Hall: the faction-and-race oath window and the ferry confirms
+  // (src/ui/faction_choice_window.ts + hud.ts openEnvoyDialog/confirmTravel).
+  envoys: {
+    title: 'The Envoys Hall',
+    prompt: 'Choose your faction, and the people you will stand among.',
+    permanent:
+      'This oath is permanent. Your faction decides your home, your allies, and your enemies in the eternal war.',
+    confirm: 'Swear the Oath',
+    travelTitle: 'Passage',
+    travelBody: 'Take passage now? The crossing is instant.',
+    travelGo: 'Travel',
+    travelStay: 'Stay',
+  },
   map: {
     worldTitle: 'Valdris, the Known World',
     theLanding: 'The Landing',

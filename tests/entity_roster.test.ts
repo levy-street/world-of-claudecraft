@@ -189,6 +189,7 @@ function makeCtx() {
     resolve: vi.fn(() => null),
     groundPos: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
     playerMods: vi.fn(),
+    setPlayerRace: vi.fn(() => true),
     delveRunForPlayer: vi.fn(() => null),
     delveModuleEntry: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
     failDelveRun: vi.fn(),

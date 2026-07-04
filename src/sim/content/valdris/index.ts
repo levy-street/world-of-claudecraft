@@ -52,6 +52,7 @@ import {
   CONTESTED_SOUTH_ROADS,
   CONTESTED_SOUTH_ZONES,
 } from './contested_south';
+import { ENVOY_NPCS, ENVOY_PROPS, ENVOY_QUEST_ORDER, ENVOY_QUESTS } from './envoys';
 import {
   KAEL_CAMPS,
   KAEL_ITEMS,
@@ -117,6 +118,7 @@ export const VALDRIS_NPCS: Record<string, NpcDef> = {
   ...BREACH_NPCS,
   ...CONTESTED_NORTH_NPCS,
   ...BARRIER_NPCS,
+  ...ENVOY_NPCS,
 };
 
 export const VALDRIS_QUESTS: Record<string, QuestDef> = {
@@ -126,6 +128,7 @@ export const VALDRIS_QUESTS: Record<string, QuestDef> = {
   ...CONTESTED_SOUTH_QUESTS,
   ...BREACH_QUESTS,
   ...CONTESTED_NORTH_QUESTS,
+  ...ENVOY_QUESTS,
 };
 
 export const VALDRIS_QUEST_ORDER: string[] = [
@@ -135,6 +138,7 @@ export const VALDRIS_QUEST_ORDER: string[] = [
   ...CONTESTED_SOUTH_QUEST_ORDER,
   ...BREACH_QUEST_ORDER,
   ...CONTESTED_NORTH_QUEST_ORDER,
+  ...ENVOY_QUEST_ORDER,
 ];
 
 // Appended AFTER every pre-Valdris camp in data.ts; order within this list is
@@ -183,6 +187,7 @@ export const VALDRIS_PROPS: ZonePropsDef = mergeValdrisProps([
   BREACH_PROPS,
   CONTESTED_NORTH_PROPS,
   BARRIER_PROPS,
+  ENVOY_PROPS,
 ]);
 
 function mergeValdrisProps(sets: ZonePropsDef[]): ZonePropsDef {

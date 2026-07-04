@@ -924,6 +924,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'q_drogmar',
       'q_revenants',
       'q_revenant_vanguard',
+      // The Valdris gateway breadcrumb (content/valdris/envoys.ts): points
+      // level-18 characters up the north road to the Envoys' Hall.
+      'q_three_banners',
     ],
     greeting:
       'Two hundred years this wall has held, $C. It will not break on my watch — but it groans.',

@@ -26,13 +26,15 @@ const inn = PROPS.buildings.find((b) => b.kind === 'inn')!;
 describe('rested XP — accrual', () => {
   it('accrues while resting inside an inn footprint', () => {
     const sim = makeSim();
+    // players start UNSWORN now; swear Human so this test keeps covering the
+    // Promise of the Landing racial (rested XP accrues 25% faster)
+    sim.setPlayerRace(sim.playerId, 'human');
     const meta = sim.meta(sim.playerId)!;
     teleport(sim, sim.player, inn.x, inn.z);
     expect(sim.restedXp).toBe(0);
     for (let i = 0; i < 100; i++) sim.tick();
-    // 5% of the level's XP per 8 in-game hours (= 8*60 sim seconds) for 100 ticks.
-    // default players are Human: the Promise of the Landing racial accrues
-    // rested XP 25% faster (see src/sim/content/races.ts)
+    // 5% of the level's XP per 8 in-game hours (= 8*60 sim seconds) for 100 ticks,
+    // 25% faster for the sworn Human (see src/sim/content/races.ts)
     const perSecond = ((0.05 * xpForLevel(sim.player.level)) / (8 * 60)) * 1.25;
     const expected = perSecond * DT * 100;
     expect(sim.restedXp).toBeCloseTo(expected, 4);

@@ -59,13 +59,14 @@ describe('progression/xp — isResting (inn footprint)', () => {
 describe('progression/xp — updateRested (accrual + cap)', () => {
   it('accrues a positive pool, paced off DT, while resting', () => {
     const sim = makeSim();
+    // players start UNSWORN now; swear Human so this test keeps covering the
+    // Promise of the Landing racial (rested XP accrues 25% faster)
+    sim.setPlayerRace(sim.playerId, 'human');
     const meta = sim.meta(sim.playerId)!;
     teleport(sim, sim.player, inn.x, inn.z);
     sim.player.inCombat = false;
     meta.restedXp = 0;
     updateRested(sim.player, meta);
-    // default players are Human: the Promise of the Landing racial accrues
-    // rested XP 25% faster (see src/sim/content/races.ts)
     const perSecond = ((0.05 * xpForLevel(sim.player.level)) / (8 * 60)) * 1.25;
     expect(meta.restedXp).toBeCloseTo(perSecond * DT, 6);
   });

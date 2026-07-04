@@ -319,6 +319,16 @@ export const ru_RU: EnTranslations = {
       "returnBodyTouch": "Задание выполнено. Вернитесь к маршалу Редбруку и нажмите кнопку «Использовать», чтобы сдать его.",
       "doneBodyTouch": "Основы освоены, {name}. Долина в вашем распоряжении: исследуйте её. Нажмите «Еще», затем «Журнал заданий», чтобы просмотреть свои задания в любой момент. Удачной охоты!"
     },
+    "envoys": {
+      "title": "Зал Посланников",
+      "prompt": "Выберите фракцию и народ, с которым встанете плечом к плечу.",
+      "permanent": "Эта клятва навсегда. Фракция определяет ваш дом, союзников и врагов в вечной войне.",
+      "confirm": "Принести клятву",
+      "travelTitle": "Переправа",
+      "travelBody": "Отправиться сейчас? Переход мгновенный.",
+      "travelGo": "В путь",
+      "travelStay": "Остаться"
+    },
     "map": {
       "worldTitle": "Валдрис: известный мир",
       "theLanding": "Пристань",
@@ -7598,6 +7608,36 @@ export const ru_RU: EnTranslations = {
         "title": "Legion Frontier Warden",
         "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
       },
+      "envoy_marcus_vale": {
+        "name": "Envoy Marcus Vale",
+        "title": "Voice of the Kael Empire",
+        "greeting": "The Empire keeps roads paved, granaries full, and ledgers exact. Swear to Kael and you will never stand alone, or unbilled."
+      },
+      "envoy_sylwen": {
+        "name": "Envoy Sylwen",
+        "title": "Voice of the Veth Confederation",
+        "greeting": "Veth wins no wars. It ends them. Swear to the Confederation and learn how much a quiet word outweighs a loud army."
+      },
+      "envoy_amara": {
+        "name": "Envoy Amara",
+        "title": "Voice of the Domain of Ossara",
+        "greeting": "Before your empires drew maps, Ossara kept the faith. Swear to the Domain and inherit what the sands remember."
+      },
+      "ferry_rhouma": {
+        "name": "Sandskiff Master Rhouma",
+        "title": "Passage to the Landing",
+        "greeting": "The skiff runs south to the Landing with the evening wind. Say the word."
+      },
+      "ferry_neris": {
+        "name": "Blackwater Pilot Neris",
+        "title": "Passage to the Landing",
+        "greeting": "The black rivers reach farther than most maps admit. The Landing is an easy run."
+      },
+      "ferry_aldwin": {
+        "name": "Coach Master Aldwin",
+        "title": "Passage to the Landing",
+        "greeting": "Imperial post runs to the Landing twice a bell. Papers, or coin, or a good story."
+      },
       "judge_saphira": {
         "name": "Judge Saphira",
         "title": "Judge of the Domain",
@@ -8534,6 +8574,22 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Моггер убит"
+          }
+        }
+      },
+      "q_three_banners": {
+        "title": "The Three Banners",
+        "text": "You have outgrown this island, {playerName}. Three Voices wait at the Envoys Hall up the north road: the Empire, the Confederation, the Domain. Hear all three before you weigh your oath. Loyalty and debt are the only currencies out there, so spend yours knowingly.",
+        "completion": "You have heard the three banners speak. When your heart is set, the choice is yours alone, and it is permanent.",
+        "objectives": {
+          "0": {
+            "label": "Hear the Voice of Kael"
+          },
+          "1": {
+            "label": "Hear the Voice of Veth"
+          },
+          "2": {
+            "label": "Hear the Voice of Ossara"
           }
         }
       },

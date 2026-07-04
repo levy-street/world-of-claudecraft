@@ -319,6 +319,16 @@ export const zh_CN: EnTranslations = {
       "returnBodyTouch": "任务已完成。返回雷德布鲁克元帅处并点击“使用”按钮交付任务。",
       "doneBodyTouch": "你已掌握基础，{name}。东溪谷任你探索。点击“更多”，再点击“任务日志”，随时查看你的任务日志。祝你狩猎顺利。"
     },
+    "envoys": {
+      "title": "使节大厅",
+      "prompt": "选择你的阵营，以及你将与之并肩的种族。",
+      "permanent": "此誓言不可更改。你的阵营决定你的家园、盟友，以及永恒之战中的敌人。",
+      "confirm": "立下誓言",
+      "travelTitle": "通行",
+      "travelBody": "现在启程吗？转瞬即达。",
+      "travelGo": "启程",
+      "travelStay": "留下"
+    },
     "map": {
       "worldTitle": "瓦尔德里斯：已知世界",
       "theLanding": "登陆之岛",
@@ -7598,6 +7608,36 @@ export const zh_CN: EnTranslations = {
         "title": "Legion Frontier Warden",
         "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
       },
+      "envoy_marcus_vale": {
+        "name": "Envoy Marcus Vale",
+        "title": "Voice of the Kael Empire",
+        "greeting": "The Empire keeps roads paved, granaries full, and ledgers exact. Swear to Kael and you will never stand alone, or unbilled."
+      },
+      "envoy_sylwen": {
+        "name": "Envoy Sylwen",
+        "title": "Voice of the Veth Confederation",
+        "greeting": "Veth wins no wars. It ends them. Swear to the Confederation and learn how much a quiet word outweighs a loud army."
+      },
+      "envoy_amara": {
+        "name": "Envoy Amara",
+        "title": "Voice of the Domain of Ossara",
+        "greeting": "Before your empires drew maps, Ossara kept the faith. Swear to the Domain and inherit what the sands remember."
+      },
+      "ferry_rhouma": {
+        "name": "Sandskiff Master Rhouma",
+        "title": "Passage to the Landing",
+        "greeting": "The skiff runs south to the Landing with the evening wind. Say the word."
+      },
+      "ferry_neris": {
+        "name": "Blackwater Pilot Neris",
+        "title": "Passage to the Landing",
+        "greeting": "The black rivers reach farther than most maps admit. The Landing is an easy run."
+      },
+      "ferry_aldwin": {
+        "name": "Coach Master Aldwin",
+        "title": "Passage to the Landing",
+        "greeting": "Imperial post runs to the Landing twice a bell. Papers, or coin, or a good story."
+      },
       "judge_saphira": {
         "name": "Judge Saphira",
         "title": "Judge of the Domain",
@@ -8534,6 +8574,22 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败莫格"
+          }
+        }
+      },
+      "q_three_banners": {
+        "title": "The Three Banners",
+        "text": "You have outgrown this island, {playerName}. Three Voices wait at the Envoys Hall up the north road: the Empire, the Confederation, the Domain. Hear all three before you weigh your oath. Loyalty and debt are the only currencies out there, so spend yours knowingly.",
+        "completion": "You have heard the three banners speak. When your heart is set, the choice is yours alone, and it is permanent.",
+        "objectives": {
+          "0": {
+            "label": "Hear the Voice of Kael"
+          },
+          "1": {
+            "label": "Hear the Voice of Veth"
+          },
+          "2": {
+            "label": "Hear the Voice of Ossara"
           }
         }
       },
