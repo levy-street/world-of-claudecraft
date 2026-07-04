@@ -886,7 +886,8 @@ export const pt_BR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} ergue-se sobre as Alturas de Thornpeak!"
+      "spawn": "{name} ergue-se sobre as Alturas de Thornpeak!",
+      "rises": "{name} rises over {location}!"
     },
     "loot": {
       "chestTitle": "Baú"
@@ -7116,6 +7117,24 @@ export const pt_BR: EnTranslations = {
       "veykar_the_forsworn": {
         "name": "Veykar the Forsworn"
       },
+      "twilight_moth": {
+        "name": "Twilight Moth"
+      },
+      "feralrun_smuggler": {
+        "name": "Feralrun Smuggler"
+      },
+      "vessik_the_turncoat": {
+        "name": "Vessik the Turncoat"
+      },
+      "frostpine_icecaller": {
+        "name": "Frostpine Icecaller"
+      },
+      "forsworn_blade": {
+        "name": "Forsworn Blade"
+      },
+      "forsworn_shadowcaster": {
+        "name": "Forsworn Shadowcaster"
+      },
       "wolfsward_packwolf": {
         "name": "Wolfsward Packwolf"
       },
@@ -7145,6 +7164,27 @@ export const pt_BR: EnTranslations = {
       },
       "commander_vaelis": {
         "name": "Commander Vaelis the Oathbroken"
+      },
+      "granary_militia_deserter": {
+        "name": "Granary Militia Deserter"
+      },
+      "maren_house_duelist": {
+        "name": "House Maren Duelist"
+      },
+      "frosthelm_rimeclaw": {
+        "name": "Frosthelm Rimeclaw"
+      },
+      "legion_oathguard_veteran": {
+        "name": "Legion Oathguard Veteran"
+      },
+      "rimebound_elemental": {
+        "name": "Rimebound Elemental"
+      },
+      "assessor_maldrek": {
+        "name": "Assessor Maldrek the Unremitted"
+      },
+      "purse_warden_grulk": {
+        "name": "Purse-Warden Grulk"
       },
       "hollow_lurker": {
         "name": "Hollow Lurker"
@@ -7685,6 +7725,36 @@ export const pt_BR: EnTranslations = {
         "title": "Dealer in Quiet Steel",
         "greeting": "Quiet steel for quiet work. If a blade of mine sings, I will refund the difference."
       },
+      "tollmaster_hesk": {
+        "name": "Tollmaster Hesk",
+        "title": "Keeper of the Greyweir",
+        "greeting": "The weir takes a toll from everything the river carries, {className}. Lately the river carries knives, and knives pay in a different coin."
+      },
+      "ferrywoman_szel": {
+        "name": "Ferrywoman Szel",
+        "title": "Mistress of the Weir Landing",
+        "greeting": "I pole the black water twice a day and I am owed for both crossings, {playerName}. The mere disagrees. We are negotiating."
+      },
+      "toll_clerk_odune": {
+        "name": "Toll Clerk Odune",
+        "title": "Purser of the Greyweir",
+        "greeting": "Bread, tea, and receipts, {className}. The first two keep you walking; the third keeps you honest. All three are priced accordingly."
+      },
+      "waykeeper_dral": {
+        "name": "Waykeeper Dral",
+        "title": "Warden of the North Road",
+        "greeting": "Everything north of this fire is trying to close the road, {className}: trolls, cats, weather. My job is a road that stays open. Yours can be too."
+      },
+      "arbiter_senna": {
+        "name": "Arbiter Senna",
+        "title": "The Guild's Quiet Word",
+        "greeting": "Across that dark stands the Last Lodge, {playerName}, and the guild does not go closer. You are not the guild. That is your entire value; try to keep it."
+      },
+      "sutler_kevish": {
+        "name": "Sutler Kevish",
+        "title": "Provisioner of the Longwatch",
+        "greeting": "Last hot meal before the ice, {className}, and the first one after it, if there is an after. I extend no credit past the tree line."
+      },
       "marshal_corvin": {
         "name": "Marshal Corvin",
         "title": "Marshal of the Northern March",
@@ -7694,6 +7764,36 @@ export const pt_BR: EnTranslations = {
         "name": "Quartermaster Hilde",
         "title": "Kaelspire Garrison Stores",
         "greeting": "Requisitions in triplicate or coin up front, {className}. Coin is faster, and the bread is fresher than the forms."
+      },
+      "castellan_odric": {
+        "name": "Castellan Odric",
+        "title": "Commandant, Fort Ledgerwatch",
+        "greeting": "Fort Ledgerwatch holds the border, and the border holds the paperwork, {className}. State your business in one line or less."
+      },
+      "paymistress_serna": {
+        "name": "Paymistress Serna",
+        "title": "Ninth Legion Recovery Office",
+        "greeting": "Back pay of the Ninth Legion, frozen pending prosecution. If you are here to add to the evidence, {playerName}, take a number: it is one."
+      },
+      "sutler_brama": {
+        "name": "Sutler Brama",
+        "title": "Licensed Fort Sutler",
+        "greeting": "Licensed sutler, prices as posted, receipts on request. The Empire audits me monthly, {playerName}, so the scale is honest."
+      },
+      "foreman_ulla": {
+        "name": "Foreman Ulla",
+        "title": "Rimeshaft Claims Office",
+        "greeting": "Rimeshaft runs three shifts and loses two to weather, {className}. If you can hold a pick, or kill what interrupts one, you are payroll."
+      },
+      "assayer_veck": {
+        "name": "Assayer Veck",
+        "title": "Imperial Assay, Frosthelm Division",
+        "greeting": "Every stone in this camp gets weighed twice, {playerName}. The mountain shorts no one; people are another matter."
+      },
+      "provisioner_edda": {
+        "name": "Provisioner Edda",
+        "title": "Rimeshaft Stores",
+        "greeting": "Stores are rationed by roster, and you are not on the roster, {className}. Coin amends the roster. Coin amends most things."
       },
       "armorer_ottokar": {
         "name": "Armorer Ottokar",
@@ -8627,6 +8727,733 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Carter Odom escorted up the pass"
+          }
+        }
+      },
+      "q_veth_quiet_introductions": {
+        "title": "Quiet Introductions",
+        "text": "Nighthollow does not give tours, {playerName}; it gives introductions, once. Factor Ilvane brokers the small debts, Isyra Coldwater sells the quiet steel, and Auditor Cress counts what the dark takes. Present yourself to each of them. After that, whatever you become here is on your own account.",
+        "completion": "So they have seen your face and written it down. Three ledgers now carry your name, {playerName}. Try to make every entry after this one a credit.",
+        "objectives": {
+          "0": {
+            "label": "Meet Factor Ilvane"
+          },
+          "1": {
+            "label": "Meet Isyra Coldwater"
+          },
+          "2": {
+            "label": "Meet Auditor Cress"
+          }
+        }
+      },
+      "q_veth_moth_lamps": {
+        "title": "Dust for the Lamps",
+        "text": "The twilight moths come off the Verge at dusk and eat my lamp oil down to the wick, {playerName}, and a dark market stall sells nothing. Thin them, ten or so, and shake eight measures of dust from their wings. There are buyers for the dust; I do not ask what they do with it.",
+        "completion": "Oil in the lamps and dust in the jars: two trades served by one errand. That is the kind of arithmetic Nighthollow respects, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Twilight Moth slain"
+          },
+          "1": {
+            "label": "Mothwing Dust"
+          }
+        }
+      },
+      "q_veth_verge_cull": {
+        "title": "Both Sides of the Trade",
+        "text": "The moths lay in the palewidow hollows and the widows fatten on the moths, {playerName}; left alone, the Verge exports nothing but appetite. Cut both sides of that trade: twelve moths, ten weavers. The Verge does not need to be safe, it needs to be profitable.",
+        "completion": "The silk lots report the hollows quieter and my stall keeps its stock. Nobody will call the Verge tame, but it is back to paying its way.",
+        "objectives": {
+          "0": {
+            "label": "Twilight Moth slain"
+          },
+          "1": {
+            "label": "Palewidow Weaver slain"
+          }
+        }
+      },
+      "q_veth_towpath_census": {
+        "title": "The Towpath Census",
+        "text": "A census, {playerName}: the towpath south of the gate hosts more widows and skulkers than my last count allows, and an uncounted thing is an unbilled thing. Reduce the surplus, ten of each, and the books will match the road again. Veth is only dangerous where it is accurate.",
+        "completion": "Ten and ten, which is what the margin said. The road now matches its own paperwork, {playerName}. You would be surprised how rarely that is true of anything.",
+        "objectives": {
+          "0": {
+            "label": "Palewidow Weaver slain"
+          },
+          "1": {
+            "label": "Blackriver Skulker slain"
+          }
+        }
+      },
+      "q_veth_silt_eels": {
+        "title": "The Eel Accounts",
+        "text": "The skulkers net the silt eels I smoke, and lately they keep the catch, {playerName}. Ten skulkers off the banks, and bring me eight eels out of their traps while you are in the water. Mind the chill; I sell the cure for it, which is tea.",
+        "completion": "Fat eels, barely bruised. They will hang in the smoke by morning and sell by noon. The skulkers can file a complaint with the river.",
+        "objectives": {
+          "0": {
+            "label": "Blackriver Skulker slain"
+          },
+          "1": {
+            "label": "Silt Eel"
+          }
+        }
+      },
+      "q_veth_wake_fees": {
+        "title": "Wake Fees",
+        "text": "Every barge that passes the Quays pays a wake fee, {playerName}, and every barge this month has paid it twice more: to skulkers in the shallows and to wisps drifting off the Wispwood bank. Competing tolls are bad for the brand. Twelve skulkers, ten wisps, and the river has one creditor again.",
+        "completion": "The pilots report clean water and a single, correct invoice. You have simplified the river, {playerName}; I will simplify your fee to match: here it is, in full.",
+        "objectives": {
+          "0": {
+            "label": "Blackriver Skulker slain"
+          },
+          "1": {
+            "label": "Feral Wisp slain"
+          }
+        }
+      },
+      "q_veth_greyweir_posting": {
+        "title": "The Greyweir Posting",
+        "text": "The Greyweir sits where the black river narrows north of the mere, {playerName}, and its toll-house keeps the middle country honest. Tollmaster Hesk holds the posting and is owed a capable pair of hands. Let Ferrywoman Szel count you aboard on the way; she records everything that crosses, and you are now something that crosses.",
+        "completion": "Vael sends a knife and calls it a clerk. Good; the weir needs both. You will find the middle river less patient than the south, {playerName}. Wages are posted, and collected in advance by nobody.",
+        "objectives": {
+          "0": {
+            "label": "Be counted by Ferrywoman Szel"
+          }
+        }
+      },
+      "q_veth_ferry_dues": {
+        "title": "Ferry Dues",
+        "text": "The drowned walk out of the mere and board my ferry like paying passengers, {playerName}, except they pay in old chits the Confederation retired thirty years ago. Put twelve of them back in the water and bring me eight of the chits. Somebody upstream is reissuing dead currency, and I intend to know who.",
+        "completion": "Retired chits, reissued wet. I will pass these to Hesk, who will pass them to someone whose name neither of us says aloud. Your fare is covered, {playerName}: both directions, once.",
+        "objectives": {
+          "0": {
+            "label": "Blackmere Drowned slain"
+          },
+          "1": {
+            "label": "Waterlogged Barge Chit"
+          }
+        }
+      },
+      "q_veth_lantern_motes": {
+        "title": "Light for the Crossing",
+        "text": "A ferry runs at night or it does not run, {playerName}, and my lanterns burn wisplight or nothing. The feral wisps off the Wispwood bank carry a steadier mote than any candle. Ten wisps culled and eight motes, unbroken; I pay by the lumen.",
+        "completion": "Steady light, cold as a fair price. The crossing will run all month on these. The forest can bill me, if it ever learns to write.",
+        "objectives": {
+          "0": {
+            "label": "Feral Wisp slain"
+          },
+          "1": {
+            "label": "Ferry Lantern Mote"
+          }
+        }
+      },
+      "q_veth_weir_nets": {
+        "title": "What the Nets Owe",
+        "text": "The weir nets catch everything the river owes us, and twice a week I haul them up cut, {playerName}. Smugglers cut from above; the drowned pull from below. Twelve of the one, ten of the other, and my nets come up whole and heavy.",
+        "completion": "Whole nets, full ledger. The river will find new ways to shortchange the weir, it always does, but this week it pays in full, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Feralrun Smuggler slain"
+          },
+          "1": {
+            "label": "Blackmere Drowned slain"
+          }
+        }
+      },
+      "q_veth_mere_charter": {
+        "title": "A Charter for the Landing",
+        "text": "The mere believes my landing belongs to it, {playerName}: the drowned take the pilings, the wisps take the lantern posts, and each morning I row out and repossess my own ferry. I have filed for a charter that says the landing is mine. Twelve drowned and ten wisps are the filing fee.",
+        "completion": "The landing stood empty at dawn for the first time since thaw. Charter granted, then, by the only authority the mere respects. You are a considerable filing fee, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Blackmere Drowned slain"
+          },
+          "1": {
+            "label": "Feral Wisp slain"
+          }
+        }
+      },
+      "q_veth_unlicensed_ferry": {
+        "title": "The Unlicensed Ferry",
+        "text": "There is one licensed crossing on this river, {playerName}, and I am standing at it. The feralrun gangs pole passengers past the weir at midnight and keep their accounts in knotted cord. Twelve smugglers out of business, eight tally knots for evidence; the Confederation likes its convictions pre-counted.",
+        "completion": "Knotted cord: crude bookkeeping, but honest, which is more than I can say for the clientele. The midnight trade will resume within a season. So will you, I expect.",
+        "objectives": {
+          "0": {
+            "label": "Feralrun Smuggler slain"
+          },
+          "1": {
+            "label": "Smuggler's Tally Knot"
+          }
+        }
+      },
+      "q_veth_forged_passes": {
+        "title": "Forged Passes",
+        "text": "Now the survivors sell forged weir passes, {playerName}: my seal, my signature, drawn by someone who has clearly met neither. Flattery, and also a hanging offense. Ten more smugglers, and pull eight forgeries out of circulation before some honest fool pays full price for one.",
+        "completion": "A fair hand, whoever draws these; I would offer them a clerkship if the position were not a noose. The forgeries go in the fire and your fee comes out of it, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Feralrun Smuggler slain"
+          },
+          "1": {
+            "label": "Forged Weir Pass"
+          }
+        }
+      },
+      "q_veth_passage_sold": {
+        "title": "Passage, Sold",
+        "text": "The guildless on the north road have gone into partnership with the feralrun gangs, {playerName}: steel above the bank, boats below it. Passage sold past my weir, toll-free, to anyone with coin and no questions. Break the partnership: twelve cutthroats, ten smugglers. Leave the wreckage where their next investors can see it.",
+        "completion": "The road and the river both report a sudden lack of competitors. The Greyweir thanks you in the only voice it has, {playerName}, which is the sound of tolls being paid.",
+        "objectives": {
+          "0": {
+            "label": "Guildless Cutthroat slain"
+          },
+          "1": {
+            "label": "Feralrun Smuggler slain"
+          }
+        }
+      },
+      "q_veth_turncoats_price": {
+        "title": "The Turncoat's Price",
+        "text": "Vessik kept the guild's books until he sold them, {playerName}: four buyers, one set of accounts, and a fifth copy for himself. He counts his coin by the weir under paid protection and believes the ledger cannot reach him. Take companions; he taught half this river how to kill, and the other half owes him money.",
+        "completion": "Then the fifth copy comes home and the account closes at last. The guild will not thank you and neither will the buyers, {playerName}. I will, quietly, once: thank you. That is the last time it is said.",
+        "objectives": {
+          "0": {
+            "label": "Vessik the Turncoat slain"
+          }
+        }
+      },
+      "q_veth_stores_ledger": {
+        "title": "The Stores Ledger",
+        "text": "Every ration tin in the toll-house stores is stamped and counted, {playerName}, and forty of them walked into the mere with the last supply barge. The drowned have no use for supper; they hoard out of habit. Ten of them settled and eight tins recovered, stamps legible, or the quartermaster's office bills ME.",
+        "completion": "Stamped, dented, and accounted for. The stores balance, the office is denied its little triumph, and you are paid, {playerName}. Everyone gets what they deserve; how rare.",
+        "objectives": {
+          "0": {
+            "label": "Blackmere Drowned slain"
+          },
+          "1": {
+            "label": "Sunken Ration Tin"
+          }
+        }
+      },
+      "q_veth_toll_scrip": {
+        "title": "A Second Issuer",
+        "text": "The Silent Court has begun issuing its own toll scrip on the west bank, {playerName}: paper from a state that does not exist, honored by travelers too frightened to argue. Fear is a currency the Confederation does not license. Twelve revenants retired, eight scrip withdrawn from circulation.",
+        "completion": "Paper from a dead court, still holding value through pure menace. I almost admire it. Into the fire it goes regardless, {playerName}; the Greyweir tolerates no second issuer.",
+        "objectives": {
+          "0": {
+            "label": "Hollow Revenant slain"
+          },
+          "1": {
+            "label": "Hollow Toll Scrip"
+          }
+        }
+      },
+      "q_veth_dead_letters": {
+        "title": "Dead Letters",
+        "text": "The Court's tollmen now carry correspondence, {playerName}: dead letters between the ruin and the guildless camps, arranging what I can only call commerce. The living half of that arrangement buys; the dead half enforces. End twelve revenants and eight of their couriers, and the mail stops.",
+        "completion": "No further correspondence. Whatever the ruin and the road were arranging, it is now a matter for historians, {playerName}, and Veth employs none. The file closes.",
+        "objectives": {
+          "0": {
+            "label": "Hollow Revenant slain"
+          },
+          "1": {
+            "label": "Guildless Cutthroat slain"
+          }
+        }
+      },
+      "q_veth_waystation_letters": {
+        "title": "Letters for the Longwatch",
+        "text": "A sealed case goes north to Arbiter Senna at the Longwatch, {playerName}: guild letters, and the guild does not use the post. Have Sutler Kevish sign for the freight when you arrive; his countersignature is the only receipt Senna accepts. Do not read the letters. That is not a warning, it is a professional courtesy.",
+        "completion": "Seals intact, countersigned, and you did not read them; I would know. Isyra chooses her couriers well, {playerName}. The Longwatch can always use hands that carry things and do not open them.",
+        "objectives": {
+          "0": {
+            "label": "Have Sutler Kevish sign for the case"
+          }
+        }
+      },
+      "q_veth_pine_line": {
+        "title": "Holding the Pine Line",
+        "text": "The Frostpine warbands push the tree line south a spear-length every night, {playerName}, and the rimeclaws hunt the gap they open. My road is in the gap. Twelve headhunters and eight cats, and the line goes back where the map says it is.",
+        "completion": "The line holds at the map again. The trolls will redraw it, the cats will follow, and I will hire you twice more before the thaw, {playerName}. That is not a complaint; it is a budget.",
+        "objectives": {
+          "0": {
+            "label": "Frostpine Headhunter slain"
+          },
+          "1": {
+            "label": "Rimeclaw Prowler slain"
+          }
+        }
+      },
+      "q_veth_meat_for_the_line": {
+        "title": "Meat for the Line",
+        "text": "Every guard on this watch eats twice a day or watches badly, {playerName}, and the terraces grow nothing but ice and appetite. Rimeclaw haunch keeps on the cold shelf for a month. Ten cats thinned, eight haunches dressed. The irony that the watch eats what hunts it is not lost on me; it seasons the stew.",
+        "completion": "Winter weight, well dressed. The line eats for a fortnight and owes you for all of it, {playerName}. I run the only kitchen for forty miles; my gratitude is legal tender.",
+        "objectives": {
+          "0": {
+            "label": "Rimeclaw Prowler slain"
+          },
+          "1": {
+            "label": "Rimeclaw Haunch"
+          }
+        }
+      },
+      "q_veth_rites_on_ice": {
+        "title": "Rites on the Ice",
+        "text": "The icecallers sing the rime down onto the terraces before a raid, {playerName}, so the climb is glass by the time the spears come. Each rite hangs on a carved fetish; no fetish, no weather. Ten icecallers silenced, eight fetishes off their cords.",
+        "completion": "Honest ice again, the kind that falls without being asked. Eight cancelled winters in eight fetishes, {playerName}. The road thanks you; I speak for it.",
+        "objectives": {
+          "0": {
+            "label": "Frostpine Icecaller slain"
+          },
+          "1": {
+            "label": "Rimebound Fetish"
+          }
+        }
+      },
+      "q_veth_white_ledger": {
+        "title": "The White Ledger",
+        "text": "The north keeps its own ledger, {playerName}, and it writes in white: every drift a debit, every thaw a payment deferred. This season the icecallers and the rimeclaws have overdrawn it. Twelve callers, ten cats. Balance the page.",
+        "completion": "Balanced, for a value of balanced that lasts until the next hard frost. That is the only kind of balanced the north offers, {playerName}, and I have learned to invoice accordingly.",
+        "objectives": {
+          "0": {
+            "label": "Frostpine Icecaller slain"
+          },
+          "1": {
+            "label": "Rimeclaw Prowler slain"
+          }
+        }
+      },
+      "q_veth_high_ice": {
+        "title": "The High Ice",
+        "text": "Above the terraces the ice stops pretending to be weather, {playerName}. The high shelves belong to the old cats and the coldest of the callers, and they have begun coming down at dusk with a purpose I do not like. Twelve rimeclaws, ten icecallers, up where the ropes are. Rope in; the ledger does not cover falls.",
+        "completion": "The dusk raids stop, the shelves go quiet, and the ropes come back with everyone who went up them. In the north that is a triumph, {playerName}; I will file it as one.",
+        "objectives": {
+          "0": {
+            "label": "Rimeclaw Prowler slain"
+          },
+          "1": {
+            "label": "Frostpine Icecaller slain"
+          }
+        }
+      },
+      "q_veth_tallow_accounts": {
+        "title": "The Tallow Accounts",
+        "text": "Frostpine tallow burns slow and hateful, {playerName}, and it is the only fat that keeps a lamp alive on the high terraces. The trolls render it for their war paint. Ten headhunters, eight jars of tallow, and the Longwatch lamps stay lit through the dark month.",
+        "completion": "Slow, hateful, and lit: exactly as specified. The dark month can come when it likes now, {playerName}. It will find the watch awake and the stew hot.",
+        "objectives": {
+          "0": {
+            "label": "Frostpine Headhunter slain"
+          },
+          "1": {
+            "label": "Frostpine Tallow"
+          }
+        }
+      },
+      "q_veth_road_north": {
+        "title": "The Road North",
+        "text": "The Kael border post buys my surplus and sells me flour, {playerName}, and this month the road between us is all rime-song and lodge steel. Commerce does not care whose knives they are. Twelve icecallers and six blades off the north mile, and the wagons roll before the flour riots do.",
+        "completion": "The wagons crossed at dawn: flour south, tallow north, everyone overcharged, everyone content. That is peace, {playerName}, as the border understands it.",
+        "objectives": {
+          "0": {
+            "label": "Frostpine Icecaller slain"
+          },
+          "1": {
+            "label": "Forsworn Blade slain"
+          }
+        }
+      },
+      "q_veth_watch_the_lodge": {
+        "title": "Watch the Lodge",
+        "text": "Across the towpath stands the Last Lodge, {playerName}, and Veykar's blades walk its bounds in pairs, in the old pattern, because he wrote the old pattern. Compare tallies with Waykeeper Dral before you start; his count of the patrols is better than mine, which offends me. Then remove ten blades from the rotation. Bring one knife you trust.",
+        "completion": "Ten gaps in a pattern the lodge believes is perfect. Veykar will notice, and he will know it was not the guild, and that will bother him more than the losses. Good. Bothered men make errors, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Compare tallies with Waykeeper Dral"
+          },
+          "1": {
+            "label": "Forsworn Blade slain"
+          }
+        }
+      },
+      "q_veth_oath_knives": {
+        "title": "The Oath Knives",
+        "text": "Every blade at the lodge still carries the oath knife the guild gave them, {playerName}, which is theft: an oath returned means the knife comes home. Twelve more blades, eight knives recovered. The guild does not care that they are dead; it cares that the cutlery is accounted for.",
+        "completion": "Eight knives, home to the drawer they swore on. Somewhere in the guild a list gets eight lines shorter, {playerName}, and lists are the only scripture we keep.",
+        "objectives": {
+          "0": {
+            "label": "Forsworn Blade slain"
+          },
+          "1": {
+            "label": "Forsworn Oath Knife"
+          }
+        }
+      },
+      "q_veth_ciphers_in_shadow": {
+        "title": "Ciphers in Shadow",
+        "text": "The lodge's ciphers were never written, {playerName}; they were taught, and the shadowcasters are where they live. Veykar is selling them a syllable at a time to whoever pays. Ten casters, and eight of the cipher-slates they train against. What a man cannot remember alone, he cannot sell.",
+        "completion": "Slates in the fire, casters in the ground, and a language dies solvent. There are perhaps four people alive who could mourn it, {playerName}. None of them will.",
+        "objectives": {
+          "0": {
+            "label": "Forsworn Shadowcaster slain"
+          },
+          "1": {
+            "label": "Shadowbound Cipher"
+          }
+        }
+      },
+      "q_veth_closing_the_lodge": {
+        "title": "Closing the Lodge",
+        "text": "The lodge is guttering, {playerName}: blades short-handed, casters hoarse, and Veykar pretending otherwise at the center of it. Put out the last of the light: ten blades, eight casters. When the perimeter is dark, the old man is just a name on a door, and Vael holds the contract for the door.",
+        "completion": "Dark, then. The Last Lodge stands empty around one man and his ledger of grudges. What happens next is above my desk, {playerName}, and for once I am glad of it. Take the boots; the towpath home is long.",
+        "objectives": {
+          "0": {
+            "label": "Forsworn Blade slain"
+          },
+          "1": {
+            "label": "Forsworn Shadowcaster slain"
+          }
+        }
+      },
+      "q_sign_the_garrison_book": {
+        "title": "The Garrison Book",
+        "text": "Kaelspire files you before it feeds you, {playerName}. Present yourself at the four offices of the garrison: stores, the smithy, the tithe desk, and the hunt charter. Sign each book legibly; the Empire has opinions about handwriting.",
+        "completion": "Four signatures, one of them nearly legible. You now exist in the eyes of the Empire, {playerName}, which is the only place existence is binding. Welcome to the northern march.",
+        "objectives": {
+          "0": {
+            "label": "Report to Quartermaster Hilde"
+          },
+          "1": {
+            "label": "Report to Armorer Ottokar"
+          },
+          "2": {
+            "label": "Report to Prefect Alina"
+          },
+          "3": {
+            "label": "Report to Huntmaster Roderic"
+          }
+        }
+      },
+      "q_forged_exemptions": {
+        "title": "Forged Exemptions",
+        "text": "The granary district owes the Empire a militia levy, and the levy has decided it would rather rob grain carts than guard them, {playerName}. Worse: they carry forged exemption papers, which is tax fraud stacked on desertion. Retire ten of them and bring me six forgeries for the evidence drawer.",
+        "completion": "Six forgeries, and the stamps are not even close; a child defrauds better. The levy rolls balance again, {playerName}. The fraud I can prosecute; the handwriting I can only mourn.",
+        "objectives": {
+          "0": {
+            "label": "Granary Militia Deserter slain"
+          },
+          "1": {
+            "label": "Forged Levy Papers"
+          }
+        }
+      },
+      "q_the_levy_answers": {
+        "title": "The Levy Answers",
+        "text": "The Prefect has her evidence; I have a district that watched its levy walk off and turn thief. That does not stand in an imperial province, {playerName}. Muster the truants out of the south fields: twelve, by the sword, since they declined the easier summons.",
+        "completion": "Twelve names struck and the fields quiet. The next levy will report on time, {playerName}; nothing recruits like precedent.",
+        "objectives": {
+          "0": {
+            "label": "Granary Militia Deserter slain"
+          }
+        }
+      },
+      "q_report_to_ledgerwatch": {
+        "title": "Report to Ledgerwatch",
+        "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
+        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "objectives": {
+          "0": {
+            "label": "Report to Castellan Odric"
+          }
+        }
+      },
+      "q_deserter_amnesty_rolls": {
+        "title": "The Amnesty Rolls",
+        "text": "The Crown offered the Ninth amnesty for any deserter who reported by spring; it is autumn, {playerName}, and they keep the petitions in their packs like souvenirs. An unfiled petition is a confession with better penmanship. Put down twelve deserters and recover six petitions. I file posthumously.",
+        "completion": "Six petitions, filed, stamped, and annotated deceased. The amnesty ledger balances either way, {playerName}; the Empire is flexible about which column you die in.",
+        "objectives": {
+          "0": {
+            "label": "Broken Legion Deserter slain"
+          },
+          "1": {
+            "label": "Unfiled Amnesty Petition"
+          }
+        }
+      },
+      "q_sutlers_kettles": {
+        "title": "Fort-Pattern Kettles",
+        "text": "When the Ninth mutinied they looted my predecessor down to the kettles, {playerName}: fort-pattern, triple-riveted, inventory items every one. I am contractually short ten kettles and the garrison is short its soup. Take them back from the deserter camps; dented is acceptable, absent is not.",
+        "completion": "Six kettles, dents and all, back on the manifest. The soup resumes tonight and my ledger closes clean for the first time this quarter. You have fed a fort, {playerName}, one line item at a time.",
+        "objectives": {
+          "0": {
+            "label": "Broken Legion Deserter slain"
+          },
+          "1": {
+            "label": "Fort-Pattern Kettle"
+          }
+        }
+      },
+      "q_interest_on_arrears": {
+        "title": "Interest on Arrears",
+        "text": "Every arbalist on that wall still draws stolen pay from the chests the Ninth carried off. I am garnishing it, {playerName}, at the rate of one pouch per corpse, which is the only rate they have honored yet. Twelve arbalists; bring me six pouches for the recovery account.",
+        "completion": "Six pouches, short-counted exactly as I expected: they were stealing from each other too. The recovery account grows, {playerName}, and arrears plus interest is a sum the Empire never forgets.",
+        "objectives": {
+          "0": {
+            "label": "Broken Legion Arbalist slain"
+          },
+          "1": {
+            "label": "Garnished Pay Pouch"
+          }
+        }
+      },
+      "q_terrace_undermining": {
+        "title": "Undermined",
+        "text": "The granite churns out of Ironhold have begun grinding through the deep terraces below my east wall, and a fort with no footing is a very orderly pile of stones, {playerName}. Break twelve of them and pull five cores from the fault line. My engineers want proof the ground has stopped arguing.",
+        "completion": "Five cores, and the engineers pronounce the east wall boring again, which from engineers is high praise. The fort stands on paperwork and bedrock, {playerName}; you have secured the second one.",
+        "objectives": {
+          "0": {
+            "label": "Granite Churn Elemental slain"
+          },
+          "1": {
+            "label": "Fault Line Core"
+          }
+        }
+      },
+      "q_duelling_permits": {
+        "title": "Unstamped Permits",
+        "text": "House Maren duels on imperial ground without stamped permits: they call it honor, and the fee schedule calls it forty silver a bout, {playerName}. Their blades have declined every summons my clerks delivered. Deliver the next ten summonses yourself and collect five unstamped permits as exhibits.",
+        "completion": "Five permits, unstamped, each one a fine the estate will pay with interest. House Maren is about to discover that honor is taxable, {playerName}. Everything is, eventually.",
+        "objectives": {
+          "0": {
+            "label": "House Maren Duelist slain"
+          },
+          "1": {
+            "label": "Unstamped Duelling Permit"
+          }
+        }
+      },
+      "q_boundary_survey": {
+        "title": "The Boundary Survey",
+        "text": "House Maren has moved its boundary stones three fields into imperial land, and their duelists stand on the new line daring my surveyors to object. I object, {playerName}. Walk the survey line and remove twelve of the objections; the stones go back where the map says.",
+        "completion": "The line surveyed, the stones returned, the objections withdrawn from the record. House Maren keeps what the map grants and not one furrow more, {playerName}. The map is the Empire's oldest weapon.",
+        "objectives": {
+          "0": {
+            "label": "House Maren Duelist slain"
+          }
+        }
+      },
+      "q_the_unremitted_assessor": {
+        "title": "The Unremitted Assessor",
+        "text": "Assessor Maldrek died on his collection route forty years ago and has not let that interrupt his rounds, {playerName}. He assesses travelers at swordpoint and issues receipts no office honors; the complaints file is two drawers now. His commission is revoked. Take witnesses when you deliver the revocation: he audits back.",
+        "completion": "The revocation delivered and the route closed after forty years of unauthorized collection. His receipts go to the archive as curiosities, {playerName}. Even death answers to the tax office; it merely files late.",
+        "objectives": {
+          "0": {
+            "label": "Assessor Maldrek the Unremitted slain"
+          }
+        }
+      },
+      "q_arrears_in_kind": {
+        "title": "Arrears in Kind",
+        "text": "The Ninth cannot repay what it stole; the coin is spent on ogres and the ogres are spent on us, {playerName}. Fine. The Crown accepts payment in kind: twelve of their hired ogres and twelve of the oathguard who spent the money. Debt collection is a blunt instrument this far north.",
+        "completion": "Twenty-four entries in the recovery ledger, paid in the only currency the Ninth has left, {playerName}. The account is not settled: but it is, for the first time, current.",
+        "objectives": {
+          "0": {
+            "label": "Sellsword Ogre slain"
+          },
+          "1": {
+            "label": "Legion Oathguard Veteran slain"
+          }
+        }
+      },
+      "q_report_to_rimeshaft": {
+        "title": "Report to Rimeshaft",
+        "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
+        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Report to Foreman Ulla"
+          }
+        }
+      },
+      "q_rimeclaw_denning": {
+        "title": "Denning Season",
+        "text": "Rimeclaw are denning in the spoil heaps, {playerName}, and a den in the spoil is a mauling on every shift change. The claims office classifies them as weather, which means no bounty, which is why I am paying you out of the tool budget. Twelve of them, before the denning finishes.",
+        "completion": "Twelve, and the shift bell rings without a scream for the first time in a month. The tool budget mourns, {playerName}, but shovels are cheaper than shovelers.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Rimeclaw slain"
+          }
+        }
+      },
+      "q_tallow_ledger": {
+        "title": "The Tallow Ledger",
+        "text": "The candle tax makes wax dearer than silver up here, so the lamps burn rimeclaw tallow, which the tax schedule has not discovered yet, {playerName}. Do not enlighten it. Ten rimeclaw, six good renderings of tallow, and the night shift keeps its light at a price the books can bear.",
+        "completion": "Six renderings, clean-burning, entered in the ledger as miscellaneous fats, {playerName}. If the tax office ever learns to read a mine ledger we are all ruined; happily, it never has.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Rimeclaw slain"
+          },
+          "1": {
+            "label": "Rimeclaw Tallow"
+          }
+        }
+      },
+      "q_marrow_for_the_kettles": {
+        "title": "Marrow for the Kettles",
+        "text": "The kettles want marrow, the miners want soup with a history of meat in it, and the rimeclaw want the miners, {playerName}. I propose we reverse the arrangement. Twelve rimeclaw, seven marrowbones, and the mess line stops writing letters home about the broth.",
+        "completion": "Seven marrowbones in the kettles and the broth achieves what the manual calls nutritive integrity, {playerName}. Morale is up two points. I measure it in second helpings.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Rimeclaw slain"
+          },
+          "1": {
+            "label": "Rimeclaw Marrowbone"
+          }
+        }
+      },
+      "q_quarter_end_closing": {
+        "title": "Quarter-End Closing",
+        "text": "The quarter closes in six days and three signatures are missing: the castellan at Ledgerwatch, the foreman at Rimeshaft, and the assayer beside her, {playerName}. The post road eats couriers lately, and attestations do not sign themselves. Collect all three, in person; the Empire stopped accepting seals by pigeon after the incident.",
+        "completion": "Three attestations, on time, in order. The north closes its quarter and the capital has nothing to complain about, which will not stop it, {playerName}. You have my thanks and the ledger's, and the ledger's is worth more.",
+        "objectives": {
+          "0": {
+            "label": "Collect the Ledgerwatch attestation"
+          },
+          "1": {
+            "label": "Collect the Rimeshaft attestation"
+          },
+          "2": {
+            "label": "Collect the assay attestation"
+          }
+        }
+      },
+      "q_the_oathguard": {
+        "title": "The Oathguard",
+        "text": "What is left of the Ninth's discipline stands in plate around the redoubt: the oathguard, the veterans who chose Vaelis over the Empire twice, {playerName}. Sentence was passed on them with their commander. Break twelve out of that line; no one reaches Vaelis through a wall that holds.",
+        "completion": "Twelve veterans down and the redoubt line thins. They were the best soldiers the Ninth had, {playerName}, which is precisely the charge against them.",
+        "objectives": {
+          "0": {
+            "label": "Legion Oathguard Veteran slain"
+          }
+        }
+      },
+      "q_oathguard_plate": {
+        "title": "Oathbroken Plate",
+        "text": "The oathguard wear imperial plate, forged on this bench before they disgraced it, {playerName}. Plate does not desert; it merely needs new owners. Twelve veterans, six salvageable sections, and I will hammer the shame of the Ninth back into the service of the Empire.",
+        "completion": "Six sections, my own maker's marks still under the soot. Refit and reissued, they will guard better men, {playerName}. Steel holds no grudges; that is what smiths are for.",
+        "objectives": {
+          "0": {
+            "label": "Legion Oathguard Veteran slain"
+          },
+          "1": {
+            "label": "Oathguard Plate Scrap"
+          }
+        }
+      },
+      "q_cold_store_restock": {
+        "title": "The Cold Store",
+        "text": "Rimeshaft eats by roster, and the roster says the cold store holds three weeks of meat; the cold store disagrees, {playerName}. Icehowler haunch freezes well and runs down its own delivery. Twelve howlers, eight haunches, and my inventory returns to a fiction the auditors will accept.",
+        "completion": "Eight haunches racked and the roster is honest again, or near enough for government work, {playerName}. The camp eats, the books balance, and nobody asks what miscellaneous protein means.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Icehowler slain"
+          },
+          "1": {
+            "label": "Icehowler Haunch"
+          }
+        }
+      },
+      "q_clear_the_galleries": {
+        "title": "Clear the Galleries",
+        "text": "When shaft three breached, wendigo moved into the east galleries like relatives who heard about the space, {playerName}. The shoring crews will not go down while anything in the dark eats faster than they timber. Clear twelve out of the workings; the mountain owes me a shift.",
+        "completion": "The galleries echo with hammers again instead of teeth, {playerName}. The crews are timbering as we speak, and the mountain resumes paying its taxes in silver.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Wendigo slain"
+          }
+        }
+      },
+      "q_rimebound_breach": {
+        "title": "The Rimebound Breach",
+        "text": "Shaft three broke into blue ice that walks, {playerName}: rimebound, the miners call them, and the claims office calls them a geological event to avoid paying hazard rates. My instruments call them ambulatory assets. Reduce twelve to a measurable state.",
+        "completion": "Twelve, reduced and measured. The hazard is reclassified from event to expense, {playerName}, and expenses can be budgeted. Science advances one line item at a time.",
+        "objectives": {
+          "0": {
+            "label": "Rimebound Elemental slain"
+          }
+        }
+      },
+      "q_core_ice_assay": {
+        "title": "The Core Ice Assay",
+        "text": "The rimebound carry cores of ice older than the Empire, which the Empire finds presumptuous, {playerName}. The assay office wants six cores: intact, cold, and weighed before they melt into ordinary water and lose all fiscal interest. Twelve rimebound should yield that.",
+        "completion": "Six cores, weighed at altitude, sealed in the cold box. Preliminary finding: the mountain has been hoarding assets for ten thousand years, {playerName}. The audit of the Frosthelm is going to be considerable.",
+        "objectives": {
+          "0": {
+            "label": "Rimebound Elemental slain"
+          },
+          "1": {
+            "label": "Rimebound Core Ice"
+          }
+        }
+      },
+      "q_rimebound_quench": {
+        "title": "The Glacier Quench",
+        "text": "A blade quenched in glacier ice takes an edge that laughs at winter, or so swears every smith north of the pass, {playerName}. The Rimeshaft breach put walking glaciers within reach for the first time in my career. Ten rimebound, six unmelted cores of quench ice, packed fast.",
+        "completion": "The quench hisses like an argument and the edge comes out singing, {playerName}. The old smiths were right, which I will admit exactly once, in writing, in this ledger nobody reads.",
+        "objectives": {
+          "0": {
+            "label": "Rimebound Elemental slain"
+          },
+          "1": {
+            "label": "Glacial Quench Ice"
+          }
+        }
+      },
+      "q_purse_warden_grulk": {
+        "title": "The Purse-Warden",
+        "text": "The ogres keep the Ninth's pay chest with a warden called Grulk, who never mastered counting but has fully mastered sitting on a box, {playerName}. That box is imperial bullion, and bullion is assay business. Bring companions: Grulk weighs more than his arithmetic.",
+        "completion": "The chest recovered, the warden retired, the bullion under seal for the capital. Final count: the Ninth stole exactly what Grulk failed to count, to the last coin, {playerName}. There is a lesson in that for somebody.",
+        "objectives": {
+          "0": {
+            "label": "Purse-Warden Grulk slain"
+          }
+        }
+      },
+      "q_shaft_three_reopens": {
+        "title": "Shaft Three Reopens",
+        "text": "Shaft three reopens on schedule, {playerName}, and the schedule does not care that the shaft is full of walking ice and hungry snow. Twelve rimebound, twelve wendigo, and the richest silver seam in the north goes back on the quarterly report where it belongs.",
+        "completion": "The seam is cut, the carts roll, and the quarterly report reads like a commendation, {playerName}. Rimeshaft remembers who reopened shaft three; more usefully, so does the payroll.",
+        "objectives": {
+          "0": {
+            "label": "Rimebound Elemental slain"
+          },
+          "1": {
+            "label": "Frosthelm Wendigo slain"
+          }
+        }
+      },
+      "q_apex_predation": {
+        "title": "Apex Predation",
+        "text": "The ridgeline has two apex predators this winter and the charter recognizes neither, {playerName}. Icehowlers hunt the passes, wendigo hunt the hunters, and my quota is somewhere underneath both. Cull twelve of each, and the mountain remembers who holds the charter.",
+        "completion": "Twelve and twelve, witnessed from the signal line. The passes hunt quiet, the quota stands filled, and the charter hangs where it always did, {playerName}: above everything else on the mountain.",
+        "objectives": {
+          "0": {
+            "label": "Frosthelm Icehowler slain"
+          },
+          "1": {
+            "label": "Frosthelm Wendigo slain"
+          }
+        }
+      },
+      "q_the_norths_books": {
+        "title": "The North's Books",
+        "text": "Vaelis burned the Ninth's muster rolls, but soldiers are sentimental, {playerName}: the oathguard carry salvaged pages like relics. Those pages are the last evidence of who the Ninth was before it broke. Twelve veterans, six rolls, and the north's books close on the whole sorry legion.",
+        "completion": "Six rolls, scorched but legible, every name recoverable. The Ninth is fully accounted for at last, {playerName}: mustered, mutinied, and closed. The Empire audits its dead, and today the dead balance.",
+        "objectives": {
+          "0": {
+            "label": "Legion Oathguard Veteran slain"
+          },
+          "1": {
+            "label": "Salvaged Muster Roll"
           }
         }
       },

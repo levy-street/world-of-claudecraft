@@ -3548,6 +3548,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'サンザール、目覚めし峰',
   'entities.mobs.thunzharr_stormling.name': '目覚めた嵐の精',
   'hudChrome.worldBoss.spawn': '{name}がソーンピーク高地に立ち上がった！',
+  'hudChrome.worldBoss.rises': '{name}が{location}に立ち上がった！',
   'entities.items.stormcallers_spaulders.name': '嵐呼びの肩当て',
   'hud.chat.context.convertToRaid': 'レイドに変換',
   'hud.chat.context.convertToParty': 'パーティに変換',

@@ -3552,6 +3552,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': '천자르, 깨어나는 봉우리',
   'entities.mobs.thunzharr_stormling.name': '깨어난 폭풍 정령',
   'hudChrome.worldBoss.spawn': '{name}이(가) 쏜피크 고지에 솟아올랐습니다!',
+  'hudChrome.worldBoss.rises': '{name}이(가) {location}에 솟아올랐습니다!',
   'entities.items.stormcallers_spaulders.name': '폭풍소환사의 어깨갑옷',
   'hud.chat.context.convertToRaid': '공격대로 전환',
   'hud.chat.context.convertToParty': '파티로 전환',

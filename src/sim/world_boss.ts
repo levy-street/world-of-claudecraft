@@ -37,6 +37,9 @@ export interface WorldBossDef {
   pos: { x: number; z: number };
   // Seconds of sim time between scheduled spawns.
   intervalSeconds: number;
+  // English place name spliced into the rise announce (localized by the
+  // sim_i18n rise RULE through the zone-name lookup).
+  announceLocation: string;
 }
 
 // The world bosses of the live world. One per entry; the scheduler tracks each
@@ -46,6 +49,7 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     templateId: 'thunzharr_waking_peak',
     pos: { x: 110, z: 760 },
     intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
+    announceLocation: 'Thornpeak Heights',
   },
 ];
 

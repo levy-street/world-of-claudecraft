@@ -623,7 +623,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       e.lootRecipientIds = eligible.map((member) => member.entityId);
       const bonus = GROUP_XP_BONUS[Math.min(eligible.length, GROUP_XP_BONUS.length) - 1];
 
-      meta.counters.kills++;
+      // World bosses credit kills/quests to the CONTRIBUTOR set below (exactly
+      // the personal-loot population); the tapper path stays byte-identical
+      // for every normal mob. XP deliberately keeps the tapped-party split:
+      // widening it would touch the pacing model and invite AFK contribution
+      // farming, while "the Slay quest completes for everyone who fought" is
+      // the fairness players actually need.
+      if (!worldBossContribs) meta.counters.kills++;
       if (creditEntity.targetId === e.id) creditEntity.autoAttack = false;
       // combo points are character-bound: unspent points survive the kill and
       // carry to the next target (they fade on their own via updateComboExpiry)
@@ -637,15 +643,23 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
           (mobXpValue(e.level, mE.level) * eliteMult * bonus) / eligible.length,
         );
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
-        ctx.onMobKilledForQuests(e, member);
+        if (!worldBossContribs) ctx.onMobKilledForQuests(e, member);
       }
       // World bosses use PERSONAL loot for every contributor (rolled below from the
       // hate-table snapshot), not the tapper/party shared-corpse roll.
       if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible);
     }
     // Personal loot is independent of tap/party kill credit: it goes to everyone who
-    // damaged the boss, so it rolls outside the credited-player block above.
-    if (worldBossContribs) ctx.rollWorldBossLoot(e, worldBossContribs);
+    // damaged the boss, so it rolls outside the credited-player block above. Kill and
+    // quest credit follow the SAME contributor set (sorted by entity id, so the emit
+    // order is deterministic): a world boss quest completes for everyone who fought.
+    if (worldBossContribs) {
+      for (const member of worldBossContribs) {
+        member.counters.kills++;
+        ctx.onMobKilledForQuests(e, member);
+      }
+      ctx.rollWorldBossLoot(e, worldBossContribs);
+    }
   }
 }
 

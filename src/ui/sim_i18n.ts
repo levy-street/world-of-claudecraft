@@ -11,7 +11,7 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
-import { ABILITIES, DELVES, ITEMS, MOBS } from '../sim/data';
+import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import { tEntity } from './entity_i18n';
 import {
@@ -3108,6 +3108,10 @@ function locMob(name: string): string {
   const id = mobNameToId.get(name);
   return id ? tEntity({ kind: 'mob', id, field: 'name' }) : name;
 }
+function locZone(name: string): string {
+  const zone = ZONES.find((z) => z.name === name);
+  return zone ? tEntity({ kind: 'zone', id: zone.id, field: 'name' }) : name;
+}
 function locAbility(name: string): string {
   const id = abilityNameToId.get(name);
   return id ? tEntity({ kind: 'ability', id, field: 'name' }) : name;
@@ -4337,6 +4341,12 @@ const RULES: Rule[] = [
   {
     re: /^(.+) rises over Thornpeak Heights!$/,
     build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]) }),
+  },
+  {
+    // Generic world-boss rise for every later location (the Thunzharr line above
+    // keeps its polished per-locale translations; ORDER matters: specific first).
+    re: /^(.+) rises over (.+)!$/,
+    build: (m) => t('hudChrome.worldBoss.rises', { name: locMob(m[1]), location: locZone(m[2]) }),
   },
   {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,

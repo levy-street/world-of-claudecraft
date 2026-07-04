@@ -991,6 +991,7 @@ export const hudChromeStrings = {
   // the localized boss name. English-only domain so an English-only PR compiles.
   worldBoss: {
     spawn: '{name} rises over Thornpeak Heights!',
+    rises: '{name} rises over {location}!',
   },
   // Loot window title shown only when the chest entity is missing (the normal path
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.

@@ -1350,10 +1350,11 @@ export class Sim {
     this.addEntity(mob);
     // Anchorless log (no pid, no entityId) => routeEvents broadcasts to every
     // connected player as a system notice. Localized by sim_i18n's worldBossSpawn
-    // RULE (matched on this exact literal shape).
+    // RULE (matched on this exact literal shape; the place name maps through the
+    // rule's location dictionary).
     this.emit({
       type: 'log',
-      text: `${template.name} rises over Thornpeak Heights!`,
+      text: `${template.name} rises over ${def.announceLocation}!`,
       color: '#ffd100',
     });
     return mob.id;

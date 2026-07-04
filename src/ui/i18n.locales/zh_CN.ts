@@ -3396,6 +3396,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': '桑扎尔，觉醒之峰',
   'entities.mobs.thunzharr_stormling.name': '被惊醒的风暴元素',
   'hudChrome.worldBoss.spawn': '{name}在荆峰高地崛起！',
+  'hudChrome.worldBoss.rises': '{name}在{location}崛起！',
   'entities.items.stormcallers_spaulders.name': '唤雷者肩甲',
   'hud.chat.context.convertToRaid': '转换为团队',
   'hud.chat.context.convertToParty': '转换为队伍',
