@@ -2225,14 +2225,26 @@
     display: inline-block;
     line-height: 0;
   }
-  /* raid-lockout badge: a small satellite button hugging the bottom-left rim of
-     the round minimap (classic tracking-button placement). Dim when every
-     raid is ready, gold + glow while a lockout is active. Hover/tap shows the panel. */
-  #raid-lockout {
+  /* Notifier rail: the satellite badges hugging the minimap's bottom-left rim lay
+     out in a row here so they never overlap. Hidden badges collapse out of the
+     flow, so the row stays gapless and a future notifier just slots in beside the
+     others. The rail itself is click-through (pointer-events: none); each badge
+     re-enables its own pointer events so the map stays clickable in the gaps. */
+  #minimap-notifiers {
     position: absolute;
     left: 10px;
     bottom: 10px;
     z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  /* raid-lockout badge: a small satellite button hugging the bottom-left rim of
+     the round minimap (classic tracking-button placement). Dim when every
+     raid is ready, gold + glow while a lockout is active. Hover/tap shows the panel. */
+  #raid-lockout {
+    pointer-events: auto;
     width: 26px;
     height: 26px;
     display: flex;
@@ -4132,13 +4144,11 @@
   }
 
   /* ---------- Ravenpost envelope indicator ---------- */
-  /* Sits on the minimap disc rim (the raid-lockout button pattern): an envelope
-     glyph with an unread count, visible only while letters wait. */
+  /* A badge in the minimap notifier rail (#minimap-notifiers), beside the
+     raid-lockout button: an envelope glyph with an unread count, visible only
+     while letters wait. The rail lays it out in a row, so it no longer overlaps
+     the raid-lockout badge the way a shared bottom-left corner anchor did. */
   #mail-indicator {
-    position: absolute;
-    left: 4px;
-    bottom: 4px;
-    z-index: 3;
     display: inline-flex;
     align-items: center;
     gap: 3px;

@@ -262,10 +262,16 @@
              surface is the adjacent #zone-label + #minimap-coords (role=status), with the fully
              accessible #map-window as the alternative, per the zone-label decision. -->
         <canvas id="minimap" width="162" height="162" aria-hidden="true"></canvas>
-        <button id="raid-lockout" type="button" hidden data-i18n-title="hudChrome.raidLockout.title" data-i18n-aria="hudChrome.raidLockout.title" title="Raid Lockouts" aria-label="Raid Lockouts"></button>
-        <!-- Ravenpost envelope: visible while unread letters wait (role=status so
-             arrivals are announced; reading them still requires a mailbox). -->
-        <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
+        <!-- Notifier rail: the satellite badges hugging the minimap's bottom-left
+             rim lay out in a row here so they never overlap each other. Hidden
+             badges collapse out of the flow, so the row stays gapless and a new
+             notifier just slots in beside the others. -->
+        <div id="minimap-notifiers">
+          <button id="raid-lockout" type="button" hidden data-i18n-title="hudChrome.raidLockout.title" data-i18n-aria="hudChrome.raidLockout.title" title="Raid Lockouts" aria-label="Raid Lockouts"></button>
+          <!-- Ravenpost envelope: visible while unread letters wait (role=status so
+               arrivals are announced; reading them still requires a mailbox). -->
+          <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
+        </div>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" role="status" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
