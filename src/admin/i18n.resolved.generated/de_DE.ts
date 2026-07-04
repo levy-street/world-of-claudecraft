@@ -454,6 +454,7 @@ export const de_DE: AdminTranslations = {
   "chatMod.resetChatStrikes": "Chat-Verwarnungen zurücksetzen",
   "report.confirmIgnore": "Bestätigen Sie die Ablehnung des Berichts",
   "error.cannotChatMuteAdmin": "Admin-Konten können nicht stummgeschaltet werden",
+  "error.cannotForceRenameAdmin": "admin characters cannot be force-renamed",
   "error.invalidWordTier": "Stufe muss \"soft\" oder \"hard\" sein",
   "error.wordEmptyAfterNormalization": "Wort ist nach der Normalisierung leer",
   "error.wordNotFound": "Wort nicht gefunden",

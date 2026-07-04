@@ -577,11 +577,21 @@ export async function forceCharacterRename(input: {
 }): Promise<{ accountId: number }> {
   const reason = cleanText(input.reason, ACTION_REASON_MAX);
   if (!reason) throw new Error('moderation reason is required');
-  const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
-    input.characterId,
-  ]);
-  const accountId = character.rows[0]?.account_id;
-  if (!accountId) throw new Error('character not found');
+  const character = await pool.query(
+    `SELECT c.account_id, a.is_admin
+       FROM characters c
+       JOIN accounts a ON a.id = c.account_id
+      WHERE c.id = $1`,
+    [input.characterId],
+  );
+  const row = character.rows[0];
+  if (!row?.account_id) throw new Error('character not found');
+  // Admin characters are protected from moderator actions, exactly as ban,
+  // suspend, and chat-mute refuse an admin account (server/admin.ts). Force-rename
+  // disconnects the account and forces a rename, so guard it the same way, before
+  // opening the transaction.
+  if (row.is_admin === true) throw new Error('admin characters cannot be force-renamed');
+  const accountId = row.account_id;
   // Pin a single pooled client so the whole transaction is atomic; see the note
   // in moderateAccount above.
   const client = await pool.connect();

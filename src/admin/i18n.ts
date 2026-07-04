@@ -197,6 +197,7 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
+  'admin characters cannot be force-renamed': 'error.cannotForceRenameAdmin',
   'tier must be "soft" or "hard"': 'error.invalidWordTier',
   'word is empty after normalization': 'error.wordEmptyAfterNormalization',
   'word not found': 'error.wordNotFound',

@@ -454,6 +454,7 @@ export const nl_NL: AdminTranslations = {
   "chatMod.resetChatStrikes": "Chatstrafpunten resetten",
   "report.confirmIgnore": "Bevestig de afwijzing van het rapport",
   "error.cannotChatMuteAdmin": "adminaccounts kunnen niet in chat gedempt worden",
+  "error.cannotForceRenameAdmin": "admin characters cannot be force-renamed",
   "error.invalidWordTier": "niveau moet \"soft\" of \"hard\" zijn",
   "error.wordEmptyAfterNormalization": "woord is leeg na normalisatie",
   "error.wordNotFound": "woord niet gevonden",

@@ -454,6 +454,7 @@ export const en_XA: AdminTranslations = {
   "chatMod.resetChatStrikes": "[Ŕéšéţ çĥáţ šţŕíķéš]",
   "report.confirmIgnore": "[Çóñƒíŕɱ ŕéþóŕţ ðíšɱíššáļ]",
   "error.cannotChatMuteAdmin": "[áðɱíñ áççóúñţš çáññóţ ƀé çĥáţ ɱúţéð]",
+  "error.cannotForceRenameAdmin": "[áðɱíñ çĥáŕáçţéŕš çáññóţ ƀé ƒóŕçé-ŕéñáɱéð]",
   "error.invalidWordTier": "[ţíéŕ ɱúšţ ƀé \"šóƒţ\" óŕ \"ĥáŕð\"]",
   "error.wordEmptyAfterNormalization": "[ŵóŕð íš éɱþţý áƒţéŕ ñóŕɱáļížáţíóñ]",
   "error.wordNotFound": "[ŵóŕð ñóţ ƒóúñð]",

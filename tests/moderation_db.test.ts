@@ -503,6 +503,20 @@ describe('moderation report helpers', () => {
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 
+  it('refuses to force-rename an admin character, before opening a transaction', async () => {
+    // Ban, suspend, and chat-mute all refuse an admin account (server/admin.ts);
+    // force-rename disconnects the account and forces a rename, so a moderator must
+    // not be able to use it against an admin's character either.
+    query.mockResolvedValueOnce(queryResult([{ account_id: 7, is_admin: true }]));
+
+    await expect(
+      forceCharacterRename({ characterId: 20, adminAccountId: 1, reason: 'offensive name' }),
+    ).rejects.toThrow(/admin/i);
+
+    // The guard runs on the initial lookup, so no rename transaction is opened.
+    expect(connect).not.toHaveBeenCalled();
+  });
+
   it('rolls back on the pinned client and releases it when a statement fails', async () => {
     query.mockResolvedValueOnce(queryResult([{ account_id: 2 }]));
     const client = clientStub();

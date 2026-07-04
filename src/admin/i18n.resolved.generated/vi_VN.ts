@@ -454,6 +454,7 @@ export const vi_VN: AdminTranslations = {
   "chatMod.resetChatStrikes": "Đặt lại điểm cảnh cáo chat",
   "report.confirmIgnore": "Xác nhận việc loại bỏ báo cáo",
   "error.cannotChatMuteAdmin": "không thể cấm chat tài khoản quản trị",
+  "error.cannotForceRenameAdmin": "admin characters cannot be force-renamed",
   "error.invalidWordTier": "cấp độ phải là \"soft\" hoặc \"hard\"",
   "error.wordEmptyAfterNormalization": "từ trống sau khi chuẩn hóa",
   "error.wordNotFound": "không tìm thấy từ",

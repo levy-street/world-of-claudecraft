@@ -454,6 +454,7 @@ export const ko_KR: AdminTranslations = {
   "chatMod.resetChatStrikes": "경고 초기화",
   "report.confirmIgnore": "신고 기각 확인",
   "error.cannotChatMuteAdmin": "관리자 계정은 채팅을 음소거할 수 없습니다",
+  "error.cannotForceRenameAdmin": "admin characters cannot be force-renamed",
   "error.invalidWordTier": "등급은 \"soft\" 또는 \"hard\"여야 합니다",
   "error.wordEmptyAfterNormalization": "정규화 후 단어가 비어 있습니다",
   "error.wordNotFound": "단어를 찾을 수 없습니다",

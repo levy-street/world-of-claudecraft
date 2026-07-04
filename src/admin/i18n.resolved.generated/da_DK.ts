@@ -454,6 +454,7 @@ export const da_DK: AdminTranslations = {
   "chatMod.resetChatStrikes": "Nulstil chat-anmærkninger",
   "report.confirmIgnore": "Bekræft anmeld afskedigelse",
   "error.cannotChatMuteAdmin": "admin-konti kan ikke chatdæmpes",
+  "error.cannotForceRenameAdmin": "admin characters cannot be force-renamed",
   "error.invalidWordTier": "niveau skal være \"soft\" eller \"hard\"",
   "error.wordEmptyAfterNormalization": "ordet er tomt efter normalisering",
   "error.wordNotFound": "ord ikke fundet",

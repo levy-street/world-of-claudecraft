@@ -462,6 +462,7 @@ export const en = {
   'chatMod.resetChatStrikes': 'Reset chat strikes',
   'report.confirmIgnore': 'Confirm report dismissal',
   'error.cannotChatMuteAdmin': 'admin accounts cannot be chat muted',
+  'error.cannotForceRenameAdmin': 'admin characters cannot be force-renamed',
   'error.invalidWordTier': 'tier must be "soft" or "hard"',
   'error.wordEmptyAfterNormalization': 'word is empty after normalization',
   'error.wordNotFound': 'word not found',

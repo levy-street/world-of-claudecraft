@@ -454,6 +454,7 @@ export const id_ID: AdminTranslations = {
   "chatMod.resetChatStrikes": "Setel ulang peringatan obrolan",
   "report.confirmIgnore": "Konfirmasi penolakan laporan",
   "error.cannotChatMuteAdmin": "akun admin tidak dapat dibisukan obrolannya",
+  "error.cannotForceRenameAdmin": "admin characters cannot be force-renamed",
   "error.invalidWordTier": "tingkat harus \"soft\" atau \"hard\"",
   "error.wordEmptyAfterNormalization": "kata kosong setelah normalisasi",
   "error.wordNotFound": "kata tidak ditemukan",

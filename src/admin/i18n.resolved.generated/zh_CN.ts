@@ -454,6 +454,7 @@ export const zh_CN: AdminTranslations = {
   "chatMod.resetChatStrikes": "重置聊天违规次数",
   "report.confirmIgnore": "确认报告驳回",
   "error.cannotChatMuteAdmin": "管理员账号无法被聊天禁言",
+  "error.cannotForceRenameAdmin": "admin characters cannot be force-renamed",
   "error.invalidWordTier": "类别必须为“soft”或“hard”",
   "error.wordEmptyAfterNormalization": "规范化后该词为空",
   "error.wordNotFound": "未找到该词",
