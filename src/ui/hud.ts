@@ -345,6 +345,8 @@ import { installWindowResize, markResizableWindow } from './window_resize';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 
+let lpAdvancedLast = -1;
+
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
 // (the customizable performance overlay's config seam) lives in
@@ -7826,12 +7828,31 @@ export class Hud {
           break;
         case 'lockpickSession':
           this.openLockpickBoard();
+          sfx.playUi('lockpick_begin');
           break;
-        case 'lockpickStep':
+        case 'lockpickStep': {
           this.lockpickWindow.onStep(ev.result);
+          switch (ev.result) {
+            case 'advanced': {
+              let pick = Math.floor(Math.random() * 4);
+              if (pick === lpAdvancedLast) pick = (pick + 1) % 4;
+              lpAdvancedLast = pick;
+              sfx.playUi(`lockpick_advanced_${pick + 1}`);
+              break;
+            }
+            case 'slip':        sfx.playUi('lockpick_slip');         break;
+            case 'bind':        sfx.playUi('lockpick_bind');         break;
+            case 'trap':        sfx.playUi('lockpick_trap');         break;
+            case 'pageCleared': sfx.playUi('lockpick_page_cleared'); break;
+            case 'retry':       sfx.playUi('lockpick_retry');        break;
+            case 'success':     sfx.playUi('lockpick_success');      break;
+            case 'fail':        sfx.playUi('lockpick_fail');         break;
+          }
           break;
+        }
         case 'lockpickEnd':
           this.endLockpick(ev.outcome, ev.lootTier);
+          if (ev.outcome === 'success') sfx.playUi('lockpick_end');
           break;
         case 'lockpickBonus': {
           const tier =
@@ -7841,6 +7862,7 @@ export class Hud {
                 ? t('sim.lockpick.tierMedium')
                 : t('sim.lockpick.tierLow');
           this.combatLog(t('sim.lockpick.lockYields', { tier }), '#ffdd88');
+          sfx.playUi('lockpick_bonus');
           break;
         }
         case 'delveRiteChoosePrompt':

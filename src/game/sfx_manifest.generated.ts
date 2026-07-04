@@ -374,5 +374,19 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
   "spell_nova": {
     "url": "/audio/sfx/spell_nova.mp3",
     "loop": false
-  }
+  },
+  "lockpick_advanced_1":  { "url": "/audio/sfx/lockpick_advanced_1.mp3",  "loop": false },
+  "lockpick_advanced_2":  { "url": "/audio/sfx/lockpick_advanced_2.mp3",  "loop": false },
+  "lockpick_advanced_3":  { "url": "/audio/sfx/lockpick_advanced_3.mp3",  "loop": false },
+  "lockpick_advanced_4":  { "url": "/audio/sfx/lockpick_advanced_4.mp3",  "loop": false },
+  "lockpick_begin":       { "url": "/audio/sfx/lockpick_begin.mp3",       "loop": false },
+  "lockpick_bind":        { "url": "/audio/sfx/lockpick_bind.mp3",        "loop": false },
+  "lockpick_bonus":       { "url": "/audio/sfx/lockpick_bonus.mp3",       "loop": false },
+  "lockpick_end":         { "url": "/audio/sfx/lockpick_end.mp3",         "loop": false },
+  "lockpick_fail":        { "url": "/audio/sfx/lockpick_fail.mp3",        "loop": false },
+  "lockpick_page_cleared":{ "url": "/audio/sfx/lockpick_page_cleared.mp3","loop": false },
+  "lockpick_retry":       { "url": "/audio/sfx/lockpick_retry.mp3",       "loop": false },
+  "lockpick_slip":        { "url": "/audio/sfx/lockpick_slip.mp3",        "loop": false },
+  "lockpick_success":     { "url": "/audio/sfx/lockpick_success.mp3",     "loop": false },
+  "lockpick_trap":        { "url": "/audio/sfx/lockpick_trap.mp3",        "loop": false }
 } as const;

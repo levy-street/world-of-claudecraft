@@ -67,6 +67,7 @@ const failed = [];
 
 for (const entry of SFX) {
   const dest = path.join(sfxDir, `${entry.key}.mp3`);
+  if (entry.custom) { skipped++; continue; } // custom recording, never regenerate via API
   if (existsSync(dest) && !force) { skipped++; continue; }
   process.stdout.write(`sfx  ${entry.key} (${entry.duration}s${entry.loop ? ', loop' : ''})… `);
   try {
