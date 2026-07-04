@@ -1392,6 +1392,11 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  // Authored boulders (the frontier rockslide barricades). Appended to the
+  // deterministic decoration field by world.ts generateDecorations, so they
+  // render AND collide through the same list as procedural rocks (circle
+  // collider r = 0.7 * scale for scale >= 0.8; circles are never jumpable).
+  boulders?: { x: number; z: number; scale: number }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {

@@ -325,7 +325,9 @@ export const ru_RU: EnTranslations = {
       "theBreachRing": "Разлом и спорное кольцо",
       "levelBand": "Lv {min}-{max}",
       "clickHint": "Щелкните по региону, чтобы открыть его карту",
-      "backHint": "Щелчок: открыть территорию. Правая кнопка: наверх"
+      "backHint": "Щелчок: открыть территорию. Правая кнопка: наверх",
+      "sealed": "Запечатано",
+      "sealedHint": "Линия фронта за этой точкой перекрыта."
     },
     "widgets": {
       "clockTitle": "Местное время — нажмите для переключения 12/24-часового формата",
@@ -7585,6 +7587,16 @@ export const ru_RU: EnTranslations = {
         "name": "Брат Хальвен",
         "title": "Хранитель Реликвария",
         "greeting": "Реликварий внизу снова сдвинулся."
+      },
+      "frontier_warden_corvis": {
+        "name": "Warden Corvis",
+        "title": "Legion Frontier Warden",
+        "greeting": "The old road is buried, and it stays buried. The continent receives you through the Envoys, not through rubble."
+      },
+      "frontier_warden_maerlys": {
+        "name": "Warden Maerlys",
+        "title": "Legion Frontier Warden",
+        "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
       },
       "judge_saphira": {
         "name": "Judge Saphira",

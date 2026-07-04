@@ -5368,6 +5368,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.map.theBreachRing': 'ブリーチと係争の環',
   'hudChrome.map.clickHint': '地域をクリックしてマップを開く',
   'hudChrome.map.backHint': '領地をクリックで開く。右クリックで一段戻る',
+  'hudChrome.map.sealed': '封鎖中',
+  'hudChrome.map.sealedHint': 'この先の戦線は封鎖されています。',
   'entities.items.conjured_bread4.name': '魔法のシナモンロール',
   'entities.items.conjured_bread5.name': '魔法のサワードウパン',
   'entities.items.conjured_bread6.name': '魔法の甘いケーキ',

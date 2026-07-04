@@ -15,7 +15,7 @@
 // draw model (shapes + labels in canvas pixels). The thin canvas consumer is
 // map_atlas_painter.ts; Hud orchestrates clicks and level state.
 
-import { ZONES } from '../sim/data';
+import { SEALED_FRONTIER_Z, ZONES } from '../sim/data';
 
 export type AtlasLevelId = 'world' | 'breach';
 
@@ -884,6 +884,22 @@ export function atlasHitTest(
   return null;
 }
 
+/** True when a zone lies past the sealed frontier of the level-40 launch (the
+ *  rockslide barricades, src/sim/content/valdris/barriers.ts): shown sealed on
+ *  the atlas and not openable. Derived from zone geometry, never a hand-list,
+ *  so it disappears by itself when the frontier moves at the cap raise. */
+export function atlasZoneSealed(zoneId: string): boolean {
+  const zone = ZONES.find((z) => z.id === zoneId);
+  return !!zone && zone.zMin >= SEALED_FRONTIER_Z;
+}
+
+/** A node is sealed when the zone it opens is sealed. Group targets (island,
+ *  a deeper level) stay browsable: the Breach REGION map still opens, its
+ *  southern territories are open content, only its sealed members grey out. */
+export function atlasNodeSealed(node: AtlasNode): boolean {
+  return node.target.kind === 'zone' && atlasZoneSealed(node.target.zoneId);
+}
+
 /** Level band a shape's label advertises, derived from the live zone table so
  *  the atlas can never drift from the sim's ranges. Group shapes span their
  *  member zones. */
@@ -912,6 +928,8 @@ export interface AtlasShapeModel {
   paths: { mx: number; my: number }[][];
   hover: boolean;
   playerHere: boolean;
+  /** Past the sealed frontier: painted muted, never opens. */
+  sealed: boolean;
 }
 
 /** A projected label chip: region title + level band. */
@@ -925,6 +943,8 @@ export interface AtlasLabelModel {
   min: number;
   max: number;
   playerHere: boolean;
+  /** Past the sealed frontier: the label carries the sealed tag. */
+  sealed: boolean;
 }
 
 export interface AtlasModel {
@@ -959,12 +979,14 @@ export function buildAtlasModel(input: AtlasModelInput): AtlasModel {
   const labels: AtlasLabelModel[] = [];
   for (const node of def.nodes) {
     const playerHere = here?.id === node.id;
+    const sealed = atlasNodeSealed(node);
     shapes.push({
       nodeId: node.id,
       accent: node.accent,
       paths: node.polys.map((poly) => poly.map(project)),
       hover: hoverNodeId === node.id,
       playerHere,
+      sealed,
     });
     const [min, max] = atlasNodeLevelRange(node);
     const { mx, my } = project(node.label);
@@ -976,6 +998,7 @@ export function buildAtlasModel(input: AtlasModelInput): AtlasModel {
       min,
       max,
       playerHere,
+      sealed,
     });
   }
   return { level, image: def.image, fit, shapes, labels };

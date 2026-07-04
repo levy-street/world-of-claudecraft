@@ -325,7 +325,9 @@ export const ja_JP: EnTranslations = {
       "theBreachRing": "ブリーチと係争の環",
       "levelBand": "Lv {min}-{max}",
       "clickHint": "地域をクリックしてマップを開く",
-      "backHint": "領地をクリックで開く。右クリックで一段戻る"
+      "backHint": "領地をクリックで開く。右クリックで一段戻る",
+      "sealed": "封鎖中",
+      "sealedHint": "この先の戦線は封鎖されています。"
     },
     "widgets": {
       "clockTitle": "現地時刻 - クリックで12/24時間表記を切り替え",
@@ -7585,6 +7587,16 @@ export const ja_JP: EnTranslations = {
         "name": "ハルヴェン修道士",
         "title": "聖遺物庫の番人",
         "greeting": "下の聖遺物庫がまた動いた。"
+      },
+      "frontier_warden_corvis": {
+        "name": "Warden Corvis",
+        "title": "Legion Frontier Warden",
+        "greeting": "The old road is buried, and it stays buried. The continent receives you through the Envoys, not through rubble."
+      },
+      "frontier_warden_maerlys": {
+        "name": "Warden Maerlys",
+        "title": "Legion Frontier Warden",
+        "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
       },
       "judge_saphira": {
         "name": "Judge Saphira",

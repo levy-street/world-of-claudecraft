@@ -15,6 +15,7 @@ import type {
   ZonePropsDef,
 } from '../../types';
 import { emptyZoneProps } from '../../types';
+import { BARRIER_NPCS, BARRIER_PROPS } from './barriers';
 import {
   BREACH_CAMPS,
   BREACH_ITEMS,
@@ -115,6 +116,7 @@ export const VALDRIS_NPCS: Record<string, NpcDef> = {
   ...CONTESTED_SOUTH_NPCS,
   ...BREACH_NPCS,
   ...CONTESTED_NORTH_NPCS,
+  ...BARRIER_NPCS,
 };
 
 export const VALDRIS_QUESTS: Record<string, QuestDef> = {
@@ -180,11 +182,13 @@ export const VALDRIS_PROPS: ZonePropsDef = mergeValdrisProps([
   CONTESTED_SOUTH_PROPS,
   BREACH_PROPS,
   CONTESTED_NORTH_PROPS,
+  BARRIER_PROPS,
 ]);
 
 function mergeValdrisProps(sets: ZonePropsDef[]): ZonePropsDef {
   const out = emptyZoneProps();
   out.delveMarkers = [];
+  out.boulders = [];
   for (const s of sets) {
     out.buildings.push(...s.buildings);
     out.wells.push(...s.wells);
@@ -199,6 +203,7 @@ function mergeValdrisProps(sets: ZonePropsDef[]): ZonePropsDef {
     out.fences.push(...s.fences);
     out.graveyards.push(...s.graveyards);
     out.delveMarkers.push(...(s.delveMarkers ?? []));
+    out.boulders.push(...(s.boulders ?? []));
   }
   return out;
 }

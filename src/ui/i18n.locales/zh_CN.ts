@@ -5113,6 +5113,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.map.theBreachRing': '裂隙与争夺之环',
   'hudChrome.map.clickHint': '点击区域打开其地图',
   'hudChrome.map.backHint': '点击领地进入。右键返回上一级',
+  'hudChrome.map.sealed': '已封锁',
+  'hudChrome.map.sealedHint': '前方战线已封锁，无法通行。',
   'entities.items.conjured_bread4.name': '魔法肉桂卷',
   'entities.items.conjured_bread5.name': '魔法酸面包',
   'entities.items.conjured_bread6.name': '魔法甜糕',

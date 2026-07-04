@@ -25,6 +25,9 @@ const SHAPE_LINE_WIDTH = 2;
 const SHAPE_FILL_ALPHA = 0.1;
 const SHAPE_FILL_ALPHA_HOVER = 0.3;
 const SHAPE_FILL_ALPHA_HERE = 0.18;
+const SHAPE_FILL_ALPHA_SEALED = 0.28; // muted grey wash over sealed regions
+const SEALED_STROKE_ALPHA = 0.55; // sealed outlines recede behind open ones
+const SEALED_TAG_OFFSET_Y = 27; // sealed tag drawn under the level band
 const HERE_DOT_RADIUS = 5;
 const HERE_DOT_OFFSET_Y = -26; // the "you are here" dot floats above the label
 const HINT_FONT = 'bold 11px Georgia';
@@ -42,6 +45,7 @@ const ATLAS_COLOR_TOKENS = {
   label: '--color-map-label',
   outline: '--color-map-outline',
   player: '--color-map-player',
+  sealed: '--color-map-sealed',
 } as const;
 
 type AtlasColors = Record<keyof typeof ATLAS_COLOR_TOKENS, string>;
@@ -94,6 +98,19 @@ export class MapAtlasPainter {
         for (let i = 1; i < ring.length; i++) path.lineTo(ring[i].mx, ring[i].my);
         path.closePath();
       }
+      if (shape.sealed) {
+        // Sealed regions: a steady grey wash and a receded outline. No hover
+        // brightening, they are not an invitation to click.
+        ctx.globalAlpha = SHAPE_FILL_ALPHA_SEALED;
+        ctx.fillStyle = colors.sealed;
+        ctx.fill(path);
+        ctx.globalAlpha = SEALED_STROKE_ALPHA;
+        ctx.strokeStyle = colors.sealed;
+        ctx.lineWidth = SHAPE_LINE_WIDTH;
+        ctx.stroke(path);
+        ctx.globalAlpha = 1;
+        continue;
+      }
       ctx.globalAlpha = shape.hover
         ? SHAPE_FILL_ALPHA_HOVER
         : shape.playerHere
@@ -121,6 +138,13 @@ export class MapAtlasPainter {
       ctx.font = LEVEL_FONT;
       ctx.strokeText(band, label.mx, label.my + LEVEL_OFFSET_Y);
       ctx.fillText(band, label.mx, label.my + LEVEL_OFFSET_Y);
+      if (label.sealed) {
+        const sealedTag = t('hudChrome.map.sealed');
+        ctx.strokeText(sealedTag, label.mx, label.my + SEALED_TAG_OFFSET_Y);
+        ctx.fillStyle = colors.sealed;
+        ctx.fillText(sealedTag, label.mx, label.my + SEALED_TAG_OFFSET_Y);
+        ctx.fillStyle = colors.label;
+      }
       if (label.playerHere) {
         ctx.beginPath();
         ctx.arc(label.mx, label.my + HERE_DOT_OFFSET_Y, HERE_DOT_RADIUS, 0, Math.PI * 2);

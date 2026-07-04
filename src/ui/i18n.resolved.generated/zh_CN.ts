@@ -325,7 +325,9 @@ export const zh_CN: EnTranslations = {
       "theBreachRing": "裂隙与争夺之环",
       "levelBand": "Lv {min}-{max}",
       "clickHint": "点击区域打开其地图",
-      "backHint": "点击领地进入。右键返回上一级"
+      "backHint": "点击领地进入。右键返回上一级",
+      "sealed": "已封锁",
+      "sealedHint": "前方战线已封锁，无法通行。"
     },
     "widgets": {
       "clockTitle": "本地时间 - 点击切换 12/24 小时制",
@@ -7585,6 +7587,16 @@ export const zh_CN: EnTranslations = {
         "name": "哈尔文修士",
         "title": "圣物库守护人",
         "greeting": "下方的圣物库又移位了。"
+      },
+      "frontier_warden_corvis": {
+        "name": "Warden Corvis",
+        "title": "Legion Frontier Warden",
+        "greeting": "The old road is buried, and it stays buried. The continent receives you through the Envoys, not through rubble."
+      },
+      "frontier_warden_maerlys": {
+        "name": "Warden Maerlys",
+        "title": "Legion Frontier Warden",
+        "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
       },
       "judge_saphira": {
         "name": "Judge Saphira",

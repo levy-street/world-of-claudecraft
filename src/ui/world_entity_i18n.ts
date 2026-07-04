@@ -222,6 +222,8 @@ const NPC_IDS = [
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'brother_halven', // Collapsed Reliquary delve board NPC
   // Valdris continent (v0.19)
+  'frontier_warden_corvis',
+  'frontier_warden_maerlys',
   'judge_saphira',
   'caravan_master_odai',
   'armorer_khet',

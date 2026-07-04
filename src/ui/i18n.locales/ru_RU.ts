@@ -5475,6 +5475,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.map.theBreachRing': 'Разлом и спорное кольцо',
   'hudChrome.map.clickHint': 'Щелкните по региону, чтобы открыть его карту',
   'hudChrome.map.backHint': 'Щелчок: открыть территорию. Правая кнопка: наверх',
+  'hudChrome.map.sealed': 'Запечатано',
+  'hudChrome.map.sealedHint': 'Линия фронта за этой точкой перекрыта.',
   'entities.items.conjured_bread4.name': 'Наколдованная булочка с корицей',
   'entities.items.conjured_bread5.name': 'Наколдованный хлеб на закваске',
   'entities.items.conjured_bread6.name': 'Наколдованный сладкий пирог',

@@ -105,6 +105,8 @@ import {
   isDelvePos,
   MOBS,
   QUESTS,
+  SEALED_FRONTIER_Z,
+  ZONES,
   zoneAt,
 } from './data';
 import * as companionMod from './delves/companion';
@@ -1365,6 +1367,13 @@ export class Sim {
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
+    } else if (savedPos && savedPos.z >= SEALED_FRONTIER_Z) {
+      // The launch play space ends at the sealed frontier (the level-40 release
+      // barricades). A save stranded past it (dev/test saves only; the band was
+      // never reachable live) reslots to the last open zone's graveyard.
+      const lastOpen = [...ZONES].reverse().find((z) => z.zMax <= SEALED_FRONTIER_Z);
+      const spot = lastOpen?.graveyard ?? lastOpen?.hub ?? { x: 2, z: -2 };
+      savedPos = { x: spot.x, z: spot.z };
     }
     const playerStart = (this.cfg.world ?? getActiveWorldContent()).playerStart;
     const startPos = savedPos

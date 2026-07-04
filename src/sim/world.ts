@@ -597,5 +597,22 @@ export function generateDecorations(seed: number): Decoration[] {
       });
     }
   }
+  // Authored barricade boulders (content props: the sealed-frontier rockslides).
+  // Appended AFTER the procedural field and deliberately exempt from the
+  // road/hub/camp exclusions above, because they sit exactly ON the road passes
+  // they close. Riding this list gives them the same renderer (foliage
+  // instancing) and the same collider (circle, r = 0.7 * scale) as every other
+  // rock: what you see is what you collide with. Deterministic: position and
+  // scale are data; only the mesh variant uses the position hash.
+  for (const b of w.content.props.boulders ?? []) {
+    out.push({
+      kind: 'rock',
+      x: b.x,
+      z: b.z,
+      scale: b.scale,
+      variant: Math.floor(hash2(Math.round(b.x * 7), Math.round(b.z * 7), seed + 77) * 3),
+      biome: biomeAt(b.x, b.z),
+    });
+  }
   return out;
 }

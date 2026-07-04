@@ -325,7 +325,9 @@ export const pl_PL: EnTranslations = {
       "theBreachRing": "The Breach and the Contested Ring",
       "levelBand": "Lv {min}-{max}",
       "clickHint": "Click a region to open its map",
-      "backHint": "Click a territory to open it. Right-click to zoom out"
+      "backHint": "Click a territory to open it. Right-click to zoom out",
+      "sealed": "Sealed",
+      "sealedHint": "The war front is sealed beyond this point."
     },
     "widgets": {
       "clockTitle": "Czas lokalny - kliknij, aby przełączyć format 12/24-godzinny",
@@ -7585,6 +7587,16 @@ export const pl_PL: EnTranslations = {
         "name": "Brat Halven",
         "title": "Strażnik Relikwiarza",
         "greeting": "Relikwiarz poniżej znów się przesunął."
+      },
+      "frontier_warden_corvis": {
+        "name": "Warden Corvis",
+        "title": "Legion Frontier Warden",
+        "greeting": "The old road is buried, and it stays buried. The continent receives you through the Envoys, not through rubble."
+      },
+      "frontier_warden_maerlys": {
+        "name": "Warden Maerlys",
+        "title": "Legion Frontier Warden",
+        "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
       },
       "judge_saphira": {
         "name": "Judge Saphira",

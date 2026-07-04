@@ -261,6 +261,8 @@ export const hudChromeStrings = {
     levelBand: 'Lv {min}-{max}',
     clickHint: 'Click a region to open its map',
     backHint: 'Click a territory to open it. Right-click to zoom out',
+    sealed: 'Sealed',
+    sealedHint: 'The war front is sealed beyond this point.',
   },
   // Minimap / compass / clock / coordinate widget tooltips and accessible names.
   widgets: {

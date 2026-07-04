@@ -266,6 +266,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
     delveMarkers: sets.flatMap((s) => s.delveMarkers ?? []),
+    boulders: sets.flatMap((s) => s.boulders ?? []),
   };
 }
 
@@ -313,6 +314,10 @@ export const WORLD_MIN_X = -WORLD_SIZE / 2;
 export const WORLD_MAX_X = WORLD_SIZE / 2;
 export const WORLD_MIN_Z = ZONES[0].zMin;
 export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
+// The level-40 launch seals the world at the Breach frontier; the barricade
+// content module owns the boundary, re-exported here beside the other
+// world-layout constants for sim/ui consumers.
+export { LANDING_EXIT_Z, SEALED_FRONTIER_Z } from './content/valdris/barriers';
 
 export const PLAYER_START = { x: 2, z: -2 };
 

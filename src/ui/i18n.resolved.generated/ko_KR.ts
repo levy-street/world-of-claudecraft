@@ -325,7 +325,9 @@ export const ko_KR: EnTranslations = {
       "theBreachRing": "균열과 분쟁의 고리",
       "levelBand": "Lv {min}-{max}",
       "clickHint": "지역을 클릭하면 지도가 열립니다",
-      "backHint": "영토를 클릭해 열기. 우클릭으로 한 단계 위로"
+      "backHint": "영토를 클릭해 열기. 우클릭으로 한 단계 위로",
+      "sealed": "봉쇄됨",
+      "sealedHint": "이 너머의 전선은 봉쇄되어 있습니다."
     },
     "widgets": {
       "clockTitle": "현지 시각 - 클릭하면 12/24시간제 전환",
@@ -7585,6 +7587,16 @@ export const ko_KR: EnTranslations = {
         "name": "브라더 할벤",
         "title": "성물실 관리인",
         "greeting": "아래의 성물실이 또 움직였소."
+      },
+      "frontier_warden_corvis": {
+        "name": "Warden Corvis",
+        "title": "Legion Frontier Warden",
+        "greeting": "The old road is buried, and it stays buried. The continent receives you through the Envoys, not through rubble."
+      },
+      "frontier_warden_maerlys": {
+        "name": "Warden Maerlys",
+        "title": "Legion Frontier Warden",
+        "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
       },
       "judge_saphira": {
         "name": "Judge Saphira",

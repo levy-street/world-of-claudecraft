@@ -245,6 +245,7 @@ import {
   atlasFit,
   atlasHitTest,
   atlasLevelUp,
+  atlasNodeSealed,
   atlasParentLevel,
   buildAtlasModel,
   MAP_ATLAS,
@@ -6915,6 +6916,12 @@ export class Hud {
     const fit = atlasFit(this.mapAtlasLevel, canvas.width, canvas.height);
     const node = atlasHitTest(this.mapAtlasLevel, canvasX, canvasY, fit);
     if (!node) return;
+    if (atlasNodeSealed(node)) {
+      // Sealed frontier region (the level-40 launch): browsable on the art,
+      // never openable. Mirrors the in-world barricades.
+      this.showError(t('hudChrome.map.sealedHint'));
+      return;
+    }
     const target = resolveAtlasTarget(node, this.mapPlayerZoneId());
     if (target.kind === 'level') {
       this.mapAtlasLevel = target.level;

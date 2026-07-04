@@ -130,6 +130,8 @@
     --color-map-accent-war: #ef4444;
     --color-map-accent-landing: #22c55e;
     --color-map-accent-contested: #f59e0b;
+    /* sealed-frontier regions of the level-40 launch: muted grey wash + tag */
+    --color-map-sealed: #6b7078;
 
     /* overworld minimap markers (resolved by minimap_painter.ts via getComputedStyle:
        a 2D canvas context cannot read a CSS var directly). Exact pre-existing values
