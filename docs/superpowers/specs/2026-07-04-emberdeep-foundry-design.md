@@ -38,7 +38,8 @@ existing war-camp POI and ties the dungeon into the zone's standing conflicts.
 ## 2. Registration (data only)
 
 - Dungeon id: emberdeep_foundry, display name "Emberdeep Foundry".
-- DUNGEON_DEFS entry: index 4 (next free instance x-band), doorPos near
+- DUNGEON_DEFS entry: index 6 (next free instance x-band; 4 and 5 are the
+  Nythraxis raid wings), doorPos near
   (-150, 770), entry/exitOffset following the temple's convention,
   suggestedPlayers 5, enterText/leaveText flavor lines.
 - Merged in src/sim/data.ts alongside TEMPLE_DUNGEON_DEFS. The instance system
@@ -84,7 +85,7 @@ summonAdds, enrage). No new engine mechanics, no scripted encounter module.
 - Slagheart Colossus: one epic per class archetype using the existing
   requiredClass archetype groups (WAR/MAG/ROG), on the same item budget as the
   already-shipped grindable T1 epics. Plus junk slag vendor trash.
-- Quest chain: 6 quests. Giver in Highwatch, a staging step at the war-camp
+- Quest chain: 7 quests (two parallel mid-chain branches). Giver in Highwatch, a staging step at the war-camp
   front, cult sabotage objectives inside the instance, finale "fell the
   Slagheart Colossus" (suggestedPlayers 5). Follows the temple chain's shape
   (requiresQuest links, minLevel gates).
