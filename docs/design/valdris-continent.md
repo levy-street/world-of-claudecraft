@@ -49,7 +49,62 @@ Deliberate compromises of the 1D strip:
 
 ## Level cap
 
-`MAX_LEVEL` is now 60. The XP table is the classic per-level formula
+### Launch scope: the active cap is 40
+
+`MAX_LEVEL` stays 60 as the content and table ceiling, but the LAUNCH gameplay
+cap is `ACTIVE_LEVEL_CAP = 40` (src/sim/types.ts): the level bar freezes at 40
+(kill and quest XP route to lifetime XP, exactly like the old level-20
+veterans), rested accrual stops, prestige gates and prices re-anchor to the
+39 to 40 step, and the headless env terminates and reports max_level at the
+active cap. Raising the cap later is a one-constant change.
+
+The over-40 world stays in the tree but physically out of reach:
+
+- Rockslide barricades (authored `props.boulders`, decoration-field boulders
+  that are BOTH rendered and collided) span the road pass at z=900 (the
+  Landing exit; the Envoys' Hall teleport is the only way north) and z=2970
+  (Pale Crossing to The Breach, sealing the war zone and the five northern
+  zones). Frontier Warden flavor NPCs dress each barricade.
+- The map atlas paints the sealed bands grey with a sealed tag and suppresses
+  drill-down (`atlasZoneSealed`, keyed on z >= SEALED_FRONTIER_Z).
+- A saved position inside a sealed band relocates to the last open graveyard
+  on load (dev saves only; no live player has crossed).
+
+### The realms are full parallel 20-40 paths
+
+Each faction realm re-banded from its original slice to a complete [20, 40]
+leveling home (south-to-north ramp, two quest sub-hubs each, around 50-65
+quests per realm with headroom 1.10-1.20 against xpNeeded(20,40)). The
+contested-south ring (Grey Hollows through Pale Crossing) is supplementary,
+faction-open content with quest packs in every zone; its bands still read
+28-50 for future headroom past the launch cap.
+
+### Encounter mechanics (launch)
+
+Three data-driven systems ship with the launch scope, all deterministic
+(fixed offsets and levels, zero new rng draws) and multiplayer-fair:
+
+- World-owned allies (`src/sim/ally.ts`, MobTemplate.allyOfPlayers): friendly
+  combat NPCs that fight for players; the substrate under the two event
+  systems.
+- Defense events (`src/sim/events/defense.ts`, DefenseSiteDef + the 'defend'
+  quest objective): talk to the site NPC with the quest active, hold the
+  position beside the defender ally through scripted waves; every
+  quest-holder in radius earns wave-by-wave credit. First site: the Wardens
+  Palisade on the Thornfen Border.
+- Escort runs (`src/sim/events/escort.ts`, EscortRouteDef + 'escort'): walk
+  the charge along fixed waypoints through scripted ambushes; pauses when
+  everyone falls behind, fails on the escortee's death. First route: the
+  Ironpass tollroad.
+- World bosses now credit kills and quest objectives to EVERY hate-table
+  contributor (the personal-loot population), so open crowds share the Slay
+  quest; `WorldBossDef.announceLocation` localizes the rise announce. Three
+  bosses ride the scheduler at launch: Thunzharr (20, Thornpeak), Veskal
+  (31, Grey Hollows), and Ghorvul the Mistfather (40, Emberveil).
+
+### The cap-60 table (unchanged, sealed behind the barriers)
+
+`MAX_LEVEL` is 60. The XP table is the classic per-level formula
 `round100((8L + Diff(L)) * (45 + 5L))`; rows 1-20 are byte-identical to the
 old table, rows 21-59 continue it. Consequences, all intentional:
 
@@ -66,6 +121,20 @@ old table, rows 21-59 continue it. Consequences, all intentional:
 
 ## Factions and races
 
+### The oath moved out of character creation
+
+Characters are created UNSWORN (no race, no faction): the pickers left the
+creation screens entirely. The choice happens in the world, at the Envoys'
+Hall in north Thornpeak Heights (z about 866), where the three faction envoys
+stand with a breadcrumb quest (The Three Banners, level 18) leading players
+to them. Swearing (the `chooseRace` command; level 18+, one-shot, validated
+server-side against envoy proximity) sets the race and teleports the player
+to that faction's realm hub. Each realm hub has a Landing Ferry NPC back to
+the Hall, and the sworn player's own envoy offers the return trip: travel is
+repeatable, the oath is permanent. Unsworn characters have no faction: war
+zone PvP treats them as neutral, and their sheet reads unsworn until the
+oath. (Persistence needs no new field: the presence of `race` IS the flag.)
+
 Three player factions (`PlayerFaction`), each with four playable races
 (`PlayerRace`, records in `src/sim/content/races.ts`):
 
@@ -78,12 +147,13 @@ model tint the renderer applies), and ONE passive racial trait in the classic
 1-5% band (`RacialEffects` on the race record, folded by `recalcPlayerStats`;
 see `src/sim/content/races.ts` for the twelve traits). The human racial is
 rested-XP only (Promise of the Landing: rested XP accrues 25% faster), a
-deliberate choice so pre-race characters, which load as Human, keep
-byte-identical combat numbers. Racial names/descriptions are client i18n
+deliberate choice so pre-race characters, which load UNSWORN with no racial
+at all, keep byte-identical combat numbers. Racial names/descriptions are client i18n
 (`races.racial*`). Faction is derived from race and never stored separately.
-Characters saved before races existed load as Human (Kael) via the standard
-optional-JSONB default in `addPlayer`; their saved position (the Landing) is
-untouched.
+Characters saved before races existed load UNSWORN (race undefined) via the
+standard optional-JSONB default in `addPlayer`; their saved position (the
+Landing) is untouched, and the Envoys' Hall gives them the same choice new
+characters get.
 
 Every new character of every race still spawns at The Landing's
 `PLAYER_START`: the lore's tutorial island is the shared first-spawn zone,
