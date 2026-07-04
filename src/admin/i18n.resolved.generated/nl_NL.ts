@@ -313,6 +313,7 @@ export const nl_NL: AdminTranslations = {
   "error.reportNotFound": "open melding niet gevonden",
   "error.accountNotFound": "account niet gevonden",
   "error.accountNotSuspended": "account is niet opgeschort",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "moderatieactie mislukt",
   "error.forceRenameFailed": "afdwingen hernoeming mislukt",
   "error.chatMuteFailed": "chatdemping mislukt",

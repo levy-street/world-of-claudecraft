@@ -313,6 +313,7 @@ export const en_XA: AdminTranslations = {
   "error.reportNotFound": "[óþéñ ŕéþóŕţ ñóţ ƒóúñð]",
   "error.accountNotFound": "[áççóúñţ ñóţ ƒóúñð]",
   "error.accountNotSuspended": "[áççóúñţ íš ñóţ šúšþéñðéð]",
+  "error.accountNotBanned": "[áççóúñţ íš ñóţ ƀáññéð]",
   "error.moderationFailed": "[ɱóðéŕáţíóñ áçţíóñ ƒáíļéð]",
   "error.forceRenameFailed": "[ƒóŕçé ŕéñáɱé ƒáíļéð]",
   "error.chatMuteFailed": "[çĥáţ ɱúţé ƒáíļéð]",

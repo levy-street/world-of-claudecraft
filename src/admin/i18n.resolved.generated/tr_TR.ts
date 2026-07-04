@@ -313,6 +313,7 @@ export const tr_TR: AdminTranslations = {
   "error.reportNotFound": "açık şikayet bulunamadı",
   "error.accountNotFound": "hesap bulunamadı",
   "error.accountNotSuspended": "hesap askıya alınmadı",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "moderasyon eylemi başarısız oldu",
   "error.forceRenameFailed": "ad değiştirme zorlaması başarısız oldu",
   "error.chatMuteFailed": "sohbet susturma başarısız oldu",

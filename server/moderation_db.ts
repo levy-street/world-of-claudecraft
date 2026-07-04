@@ -412,12 +412,19 @@ export async function moderateAccount(input: {
         [input.accountId, reason],
       );
     } else if (input.action === 'unban') {
-      await client.query(
+      // Guard on an actual standing ban, mirroring unsuspend below. Without it,
+      // unbanning a non-banned account silently "succeeds" and still runs the
+      // player_reports resolution below, wrongly actioning every open report
+      // against that account.
+      const updated = await client.query(
         `UPDATE accounts
          SET banned_at = NULL, suspended_until = NULL, moderation_reason = $2
-         WHERE id = $1`,
+         WHERE id = $1 AND banned_at IS NOT NULL`,
         [input.accountId, reason],
       );
+      if ((updated.rowCount ?? 0) === 0) {
+        throw new Error('account is not banned');
+      }
     } else if (input.action === 'unsuspend') {
       const updated = await client.query(
         `UPDATE accounts

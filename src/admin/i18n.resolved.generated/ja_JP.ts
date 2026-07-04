@@ -313,6 +313,7 @@ export const ja_JP: AdminTranslations = {
   "error.reportNotFound": "未処理の通報が見つかりません",
   "error.accountNotFound": "アカウントが見つかりません",
   "error.accountNotSuspended": "アカウントは停止されていません",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "モデレーション操作に失敗しました",
   "error.forceRenameFailed": "強制改名に失敗しました",
   "error.chatMuteFailed": "チャットミュートに失敗しました",

@@ -313,6 +313,7 @@ export const sv_SE: AdminTranslations = {
   "error.reportNotFound": "öppen anmälan hittades inte",
   "error.accountNotFound": "kontot hittades inte",
   "error.accountNotSuspended": "kontot är inte avstängt",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "modereringsåtgärden misslyckades",
   "error.forceRenameFailed": "tvingat namnbyte misslyckades",
   "error.chatMuteFailed": "chatt-tystning misslyckades",

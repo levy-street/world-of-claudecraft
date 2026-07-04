@@ -313,6 +313,7 @@ export const ru_RU: AdminTranslations = {
   "error.reportNotFound": "открытая жалоба не найдена",
   "error.accountNotFound": "учётная запись не найдена",
   "error.accountNotSuspended": "аккаунт не заблокирован",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "не удалось выполнить действие модерации",
   "error.forceRenameFailed": "не удалось принудительно переименовать",
   "error.chatMuteFailed": "не удалось замьютить чат",

@@ -316,6 +316,7 @@ export const en = {
   'error.reportNotFound': 'open report not found',
   'error.accountNotFound': 'account not found',
   'error.accountNotSuspended': 'account is not suspended',
+  'error.accountNotBanned': 'account is not banned',
   'error.moderationFailed': 'moderation action failed',
   'error.forceRenameFailed': 'force rename failed',
   'error.chatMuteFailed': 'chat mute failed',

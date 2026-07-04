@@ -313,6 +313,7 @@ export const id_ID: AdminTranslations = {
   "error.reportNotFound": "laporan terbuka tidak ditemukan",
   "error.accountNotFound": "akun tidak ditemukan",
   "error.accountNotSuspended": "akun tidak ditangguhkan",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "tindakan moderasi gagal",
   "error.forceRenameFailed": "paksa ganti nama gagal",
   "error.chatMuteFailed": "pembisuan obrolan gagal",

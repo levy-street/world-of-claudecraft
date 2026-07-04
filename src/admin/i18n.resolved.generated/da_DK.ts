@@ -313,6 +313,7 @@ export const da_DK: AdminTranslations = {
   "error.reportNotFound": "åben anmeldelse ikke fundet",
   "error.accountNotFound": "konto ikke fundet",
   "error.accountNotSuspended": "konto er ikke suspenderet",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "moderationshandling mislykkedes",
   "error.forceRenameFailed": "tvunget omdøbning mislykkedes",
   "error.chatMuteFailed": "chatdæmpning mislykkedes",

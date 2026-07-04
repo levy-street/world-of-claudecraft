@@ -313,6 +313,7 @@ export const zh_TW: AdminTranslations = {
   "error.reportNotFound": "找不到待處理的檢舉",
   "error.accountNotFound": "找不到帳號",
   "error.accountNotSuspended": "帳戶沒有被暫停",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "管理操作失敗",
   "error.forceRenameFailed": "強制改名失敗",
   "error.chatMuteFailed": "聊天禁言失敗",

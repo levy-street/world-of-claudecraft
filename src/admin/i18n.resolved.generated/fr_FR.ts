@@ -313,6 +313,7 @@ export const fr_FR: AdminTranslations = {
   "error.reportNotFound": "signalement ouvert introuvable",
   "error.accountNotFound": "compte introuvable",
   "error.accountNotSuspended": "le compte n'est pas suspendu",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "l'action de modération a échoué",
   "error.forceRenameFailed": "le renommage forcé a échoué",
   "error.chatMuteFailed": "la coupure du chat a échoué",

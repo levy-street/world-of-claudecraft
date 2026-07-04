@@ -313,6 +313,7 @@ export const ko_KR: AdminTranslations = {
   "error.reportNotFound": "처리 대기 중인 신고를 찾을 수 없습니다",
   "error.accountNotFound": "계정을 찾을 수 없습니다",
   "error.accountNotSuspended": "계정이 정지되지 않았습니다",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "관리 작업에 실패했습니다",
   "error.forceRenameFailed": "강제 이름 변경에 실패했습니다",
   "error.chatMuteFailed": "채팅 음소거에 실패했습니다",

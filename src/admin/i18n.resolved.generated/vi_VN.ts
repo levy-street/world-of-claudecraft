@@ -313,6 +313,7 @@ export const vi_VN: AdminTranslations = {
   "error.reportNotFound": "không tìm thấy báo cáo đang mở",
   "error.accountNotFound": "không tìm thấy tài khoản",
   "error.accountNotSuspended": "tài khoản không bị đình chỉ",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "hành động điều hành thất bại",
   "error.forceRenameFailed": "buộc đổi tên thất bại",
   "error.chatMuteFailed": "cấm chat thất bại",

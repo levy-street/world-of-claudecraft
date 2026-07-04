@@ -313,6 +313,7 @@ export const pl_PL: AdminTranslations = {
   "error.reportNotFound": "nie znaleziono otwartego zgłoszenia",
   "error.accountNotFound": "nie znaleziono konta",
   "error.accountNotSuspended": "konto nie jest zawieszone",
+  "error.accountNotBanned": "account is not banned",
   "error.moderationFailed": "akcja moderacyjna nie powiodła się",
   "error.forceRenameFailed": "wymuszenie zmiany imienia nie powiodło się",
   "error.chatMuteFailed": "wyciszenie czatu nie powiodło się",

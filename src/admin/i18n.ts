@@ -188,6 +188,7 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'open report not found': 'error.reportNotFound',
   'account not found': 'error.accountNotFound',
   'account is not suspended': 'error.accountNotSuspended',
+  'account is not banned': 'error.accountNotBanned',
   'moderation action failed': 'error.moderationFailed',
   'force rename failed': 'error.forceRenameFailed',
   'chat mute failed': 'error.chatMuteFailed',

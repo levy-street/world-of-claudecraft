@@ -338,8 +338,13 @@ describe('moderation report helpers', () => {
     expect(query).not.toHaveBeenCalled();
   });
 
-  it('unbans accounts and writes an audit action in one transaction', async () => {
+  it('unbans a banned account and writes an audit action in one transaction', async () => {
     const client = clientStub();
+    // BEGIN, then the guarded unban UPDATE matches one actually-banned row.
+    client.query
+      .mockResolvedValueOnce(queryResult([]))
+      .mockResolvedValueOnce(queryResult([], 1))
+      .mockResolvedValue(queryResult([]));
     connect.mockResolvedValue(client as unknown as PoolClient);
 
     await moderateAccount({
@@ -352,10 +357,38 @@ describe('moderation report helpers', () => {
     expect(connect).toHaveBeenCalledTimes(1);
     expect(client.query.mock.calls[0][0]).toBe('BEGIN');
     expect(client.query.mock.calls[1][0]).toMatch(/SET banned_at = NULL, suspended_until = NULL/);
+    // Only an actually-banned account is unbanned (mirrors the unsuspend guard).
+    expect(client.query.mock.calls[1][0]).toMatch(/banned_at IS NOT NULL/);
     expect(client.query.mock.calls[1][1]).toEqual([2, 'appeal accepted']);
     expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
     expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'unban', 'appeal accepted', null]);
     expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects unbanning an account that is not banned, resolving no reports', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 0)) // guarded UPDATE matches no banned row
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await expect(
+      moderateAccount({
+        accountId: 2,
+        adminAccountId: 1,
+        action: 'unban',
+        reason: 'appeal accepted',
+      }),
+    ).rejects.toThrow(/not banned/);
+
+    // The guard rolls back before the audit row OR the report-resolution UPDATE
+    // runs, so unbanning a non-banned account cannot silently action its open reports.
+    expect(client.query.mock.calls[2][0]).toBe('ROLLBACK');
+    const stmts = client.query.mock.calls.map((c) => c[0]);
+    expect(stmts).not.toContain('COMMIT');
+    expect(stmts.some((s) => /UPDATE player_reports/.test(s))).toBe(false);
     expect(client.release).toHaveBeenCalledTimes(1);
   });
 
