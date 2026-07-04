@@ -377,6 +377,7 @@
     <div id="talents-window" class="window panel"></div>
     <div id="quest-log-window" class="window panel"></div>
     <div id="vendor-window" class="window panel"></div>
+    <div id="faction-choice-window" class="window panel" role="dialog" aria-labelledby="envoys-title"></div>
     <div id="map-window" class="window panel">
       <button type="button" class="x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
       <div id="map-zoom">
@@ -421,6 +422,15 @@
     <div id="banner"></div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner"></div>
+    <!-- instance-transition veil: the loading curtain on dungeon/arena/delve
+         teleports (src/ui/zone_veil_painter.ts fills the text through t()).
+         aria-hidden is deliberate: the destination is already announced to
+         screen readers by the chat-log live region (the dungeon enterText /
+         enteringZone log lines), so the curtain stays decorative. -->
+    <div id="zone-veil" aria-hidden="true">
+      <div class="veil-sub"></div>
+      <div class="veil-name"></div>
+    </div>
 
     <div id="death-overlay">
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>

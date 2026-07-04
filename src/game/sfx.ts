@@ -388,15 +388,27 @@ class Sfx {
     nearWater: boolean,
   ): void {
     this.ambient('amb_dungeon', inDungeon ? 0.3 : 0);
-    this.ambient('amb_wind_vale', !inDungeon && (biome === 'vale' || biome === 'beach') ? 0.12 : 0);
+    // The Valdris biomes reuse the closest of the three composed wind beds:
+    // sunny vale for highlands/salt, the marsh bed for the twilight
+    // shadowwood, the peaks bed for the war-scarred scorched ring.
+    this.ambient(
+      'amb_wind_vale',
+      !inDungeon &&
+        (biome === 'vale' || biome === 'beach' || biome === 'highlands' || biome === 'salt')
+        ? 0.12
+        : 0,
+    );
     this.ambient('amb_birds', !inDungeon && biome === 'vale' ? 0.1 : 0);
     this.ambient(
       'amb_wind_marsh',
-      !inDungeon && (biome === 'marsh' || biome === 'cave') ? 0.13 : 0,
+      !inDungeon && (biome === 'marsh' || biome === 'cave' || biome === 'shadowwood') ? 0.13 : 0,
     );
     this.ambient(
       'amb_wind_peaks',
-      !inDungeon && (biome === 'peaks' || biome === 'desert' || biome === 'volcano') ? 0.18 : 0,
+      !inDungeon &&
+        (biome === 'peaks' || biome === 'desert' || biome === 'volcano' || biome === 'scorched')
+        ? 0.18
+        : 0,
     );
     this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip — kept very low
     this.ambient('amb_snow', precip === 'snow' ? 0.13 : 0);

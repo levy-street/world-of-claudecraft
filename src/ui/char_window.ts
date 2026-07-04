@@ -29,6 +29,7 @@ import { formatNumber, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { raceDisplayName, racialTraitDesc, racialTraitName } from './race_display';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
 
@@ -134,9 +135,14 @@ export class CharWindow {
     const p = world.player;
     const className = classDisplayName(world.cfg.playerClass);
     const level = formatNumber(p.level, { maximumFractionDigits: 0 });
+    // Subtitle carries the race when the entity has one ("Level 12 Dwarf
+    // Warrior"); a pre-race mirror falls back to the classic level-class line.
+    const subtitle = p.race
+      ? t('races.levelRaceClass', { level, race: raceDisplayName(p.race), className })
+      : t('itemUi.equipment.levelClass', { level, className });
     // WCAG 2.2 AA: name the focus-trapped root via the character title span.
     markDialogRoot(el, { labelledBy: 'char-title' });
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(subtitle)}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -146,6 +152,11 @@ export class CharWindow {
       <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
     html += `<div class="char-stats">${STAT_GRID.map((stat) => this.deps.statCellHtml(stat)).join('')}</div>`;
+    // Racial trait row: the race's passive, with its description on hover/focus
+    // (tabindex for keyboard users, mirroring the focusable stat cells).
+    if (p.race) {
+      html += `<div class="char-racial" id="char-racial" tabindex="0"><span class="char-racial-label">${esc(t('races.racialLabel'))}</span><span class="char-racial-name">${esc(racialTraitName(p.race))}</span></div>`;
+    }
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
@@ -164,6 +175,16 @@ export class CharWindow {
     const rightCol = el.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
+
+    const racialEl = el.querySelector<HTMLElement>('#char-racial');
+    if (racialEl && p.race) {
+      const race = p.race;
+      this.deps.attachTooltip(
+        racialEl,
+        () =>
+          `<b>${esc(racialTraitName(race))}</b><div class="tt-sub">${esc(racialTraitDesc(race))}</div>`,
+      );
+    }
 
     for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
       const stat = cell.dataset.stat as StatId;

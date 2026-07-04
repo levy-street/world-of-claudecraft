@@ -21,13 +21,13 @@ import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
+  ACTIVE_LEVEL_CAP,
   DT,
   dist2d,
   type Entity,
   EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
-  MAX_LEVEL,
   PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
   type SimEvent,
@@ -528,6 +528,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
+  if (e.race) out.rc = e.race; // playable race (players only): identity + war-zone faction
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
@@ -2339,6 +2340,15 @@ export class GameServer {
       case 'interact':
         sim.interact(pid);
         break;
+      case 'chooseRace':
+        // The Envoys' Hall oath: the sim re-validates everything (a real race,
+        // still unsworn, the level gate, standing before an Envoy), so a forged
+        // payload can at most earn an error toast.
+        if (typeof msg.race === 'string') sim.chooseRace(msg.race, pid);
+        break;
+      case 'travel':
+        sim.travel(pid);
+        break;
       case 'loot':
         if (typeof msg.id === 'number') sim.lootCorpse(msg.id, pid);
         break;
@@ -3492,7 +3502,7 @@ export class GameServer {
   private detectActivity(events: SimEvent[]): void {
     const now = Date.now();
     for (const ev of events) {
-      if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
+      if (ev.type === 'levelup' && ev.level === ACTIVE_LEVEL_CAP && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (!s) continue;
         enqueueActivity(

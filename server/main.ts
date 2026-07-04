@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
 import { type WebSocket, WebSocketServer } from 'ws';
+import { isPlayerRace } from '../src/sim/content/races';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -10,7 +11,7 @@ import {
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { PlayerClass, PlayerRace } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
 import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
 import {
@@ -433,6 +434,7 @@ function characterListPayload(chars: CharacterRow[]): {
     class: PlayerClass;
     level: number;
     skin: number;
+    race: PlayerRace;
     online: boolean;
     forceRename: boolean;
     lastPlayed: string | null;
@@ -447,6 +449,7 @@ function characterListPayload(chars: CharacterRow[]): {
       class: c.class,
       level: c.level,
       skin: c.state?.skin ?? 0,
+      race: isPlayerRace(c.state?.race) ? c.state.race : 'human',
       online: [...game.clients.values()].some((s) => s.characterId === c.id),
       forceRename: c.force_rename,
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
@@ -859,6 +862,12 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           0,
           Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
         );
+        // Characters are created UNSWORN: faction and race are sworn in-world
+        // at the Envoys' Hall (src/sim/envoys.ts), so creation accepts no race.
+        // A stray race field from an older client is rejected the same as any
+        // other junk rather than silently minting a faction.
+        if (body.race !== undefined && !isPlayerRace(body.race))
+          return json(res, 400, { error: 'invalid race' });
         const create = () =>
           createCharacterCapped(
             accountId,
@@ -874,6 +883,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
             class: c.class,
             level: c.level,
             skin: c.state?.skin ?? skin,
+            ...(isPlayerRace(c.state?.race) ? { race: c.state.race } : {}),
             forceRename: c.force_rename,
           });
         try {

@@ -175,10 +175,11 @@ describe('point economy', () => {
     expect(talentPointsAtLevel(FIRST_TALENT_LEVEL - 1)).toBe(0);
     expect(talentPointsAtLevel(1)).toBe(0);
   });
-  it('grants one point per level from the first talent level, 11 at cap', () => {
+  it('grants one point per level from the first talent level, 51 at cap', () => {
     expect(talentPointsAtLevel(FIRST_TALENT_LEVEL)).toBe(1);
     expect(talentPointsAtLevel(MAX_LEVEL)).toBe(MAX_LEVEL - FIRST_TALENT_LEVEL + 1);
-    expect(talentPointsAtLevel(MAX_LEVEL)).toBe(11);
+    // the classic formula (level minus 9) at the Valdris cap of 60
+    expect(talentPointsAtLevel(MAX_LEVEL)).toBe(51);
   });
 });
 

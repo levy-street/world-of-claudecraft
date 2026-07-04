@@ -190,6 +190,8 @@ export const COMMAND_NAMES = [
   'attack',
   'stopattack',
   'interact',
+  'chooseRace',
+  'travel',
   'loot',
   'lootRoll',
   'pickup',

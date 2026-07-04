@@ -12,9 +12,9 @@
 // Run `node dist-env/env_server.cjs --bench` for a throughput benchmark.
 
 import * as readline from 'node:readline';
-import { Sim, RewardCounters } from '../src/sim/sim';
-import { ACTIONS, NUM_ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
-import { ALL_CLASSES, MAX_LEVEL, PlayerClass } from '../src/sim/types';
+import { ACTIONS, applyAction, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
+import { type RewardCounters, Sim } from '../src/sim/sim';
+import { ACTIVE_LEVEL_CAP, ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 import { MAX_INPUT_LINE_LENGTH, validateAction, validatePlayerClass } from './protocol';
 
 interface EnvConfig {
@@ -61,7 +61,11 @@ class Env {
   stepCount = 0;
   prev: RewardCounters | null = null;
 
-  reset(seed: number, playerClass: PlayerClass, cfg: Partial<EnvConfig> & { rewards?: Partial<EnvConfig['rewards']> }): object {
+  reset(
+    seed: number,
+    playerClass: PlayerClass,
+    cfg: Partial<EnvConfig> & { rewards?: Partial<EnvConfig['rewards']> },
+  ): object {
     this.config = {
       ...DEFAULT_CONFIG,
       ...cfg,
@@ -102,7 +106,7 @@ class Env {
     this.prev = { ...c };
 
     const terminated =
-      (this.config.terminateOnDeath && died) || sim.player.level >= MAX_LEVEL;
+      (this.config.terminateOnDeath && died) || sim.player.level >= ACTIVE_LEVEL_CAP;
     const truncated = this.config.maxSteps > 0 && this.stepCount >= this.config.maxSteps;
 
     return {
@@ -169,7 +173,12 @@ function serve(): void {
     try {
       switch (msg.cmd) {
         case 'info':
-          send({ obs_size: obsSize(), num_actions: NUM_ACTIONS, actions: ACTIONS, max_level: MAX_LEVEL });
+          send({
+            obs_size: obsSize(),
+            num_actions: NUM_ACTIONS,
+            actions: ACTIONS,
+            max_level: ACTIVE_LEVEL_CAP,
+          });
           break;
         case 'reset':
           {

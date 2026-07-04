@@ -42,6 +42,7 @@ import type {
   Entity,
   ErrorReason,
   PlayerClass,
+  PlayerRace,
   QuestProgress,
   SimConfig,
   SimEvent,
@@ -330,6 +331,10 @@ export interface SimContextCallbacks {
   resolve(pid?: number): { meta: PlayerMeta; e: Entity } | null;
   groundPos(x: number, z: number): Vec3;
   playerMods(meta: PlayerMeta): TalentModifiers;
+  // Envoys' Hall slice (src/sim/envoys.ts): the oath setter stays on Sim (it is
+  // the creation-time race setter too); the module re-checks the oath rules and
+  // calls it to swear. Append-only.
+  setPlayerRace(pid: number, race: PlayerRace): boolean;
   delveRunForPlayer(pid: number): DelveRun | null;
   delveModuleEntry(run: DelveRun): Vec3;
   failDelveRun(run: DelveRun): void;
@@ -807,6 +812,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     resolve: host.resolve,
     groundPos: host.groundPos,
     playerMods: host.playerMods,
+    setPlayerRace: host.setPlayerRace,
     delveRunForPlayer: host.delveRunForPlayer,
     delveModuleEntry: host.delveModuleEntry,
     failDelveRun: host.failDelveRun,

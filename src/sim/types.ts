@@ -84,6 +84,58 @@ export type PlayerClass =
 export function isPetClass(cls: PlayerClass): boolean {
   return cls === 'hunter' || cls === 'warlock';
 }
+
+// The three great powers of Valdris. A player's faction is derived from their
+// race (see content/races.ts); it never changes after character creation.
+export type PlayerFaction = 'kael' | 'veth' | 'ossara';
+
+// Playable races, four per faction (see docs/design/valdris-continent.md).
+// Characters saved before races existed load as 'human' (Kael).
+export type PlayerRace =
+  | 'human'
+  | 'dwarf'
+  | 'gnome'
+  | 'elf_exile'
+  | 'elf'
+  | 'dark_fae'
+  | 'frost_kin'
+  | 'shadow_walker'
+  | 'desert_clan'
+  | 'sand_mage'
+  | 'nomad'
+  | 'stone_warden';
+
+// A race's passive trait, WoW-style: one small always-on bonus folded into
+// recalcPlayerStats (or, for restedRatePct, the rested-XP accrual). Values are
+// deliberately modest (1-5%): flavor that interacts with the class choice, not
+// a mandatory min-max pick. Names/descriptions live client-side in the i18n
+// catalog (races.racial*); the sim stays language-agnostic.
+export interface RacialEffects {
+  strPct?: number;
+  agiPct?: number;
+  staPct?: number;
+  intPct?: number;
+  spiPct?: number;
+  armorPct?: number;
+  maxHpPct?: number;
+  spellPowerPct?: number;
+  crit?: number; // additive crit chance (0.01 = +1%)
+  dodge?: number; // additive dodge chance
+  castPushbackReduction?: number; // 0.2 = pushback reduced 20%
+  restedRatePct?: number; // rested-XP accrues this much faster (human)
+}
+
+// A playable race record (content/races.ts). A race picks the faction, a
+// cosmetic base aspect (body scale + a subtle model tint), and one passive
+// racial trait. Pre-race saves load as 'human', whose racial is rested-XP
+// only, so a legacy character's combat numbers stay byte-identical.
+export interface RaceDef {
+  id: PlayerRace;
+  faction: PlayerFaction;
+  scale: number; // cosmetic body-size multiplier (render hint, like buff_scale)
+  tint: number; // cosmetic model tint (render hint; never feeds gameplay)
+  racial: RacialEffects;
+}
 // '1v1'/'2v2' are the ranked Ashen Coliseum ladders; 'fiesta' is the
 // dopamine-maxxed 2v2 party mode (score-based, respawns, augments, a shrinking
 // ring) — see docs/design and the Fiesta region of sim.ts.
@@ -1277,7 +1329,21 @@ export interface DungeonDef {
   leaveText: string;
 }
 
-export type BiomeId = 'vale' | 'marsh' | 'peaks' | 'beach' | 'desert' | 'volcano' | 'cave';
+export type BiomeId =
+  | 'vale'
+  | 'marsh'
+  | 'peaks'
+  // Map-editor paint biomes (v0.20): beach, volcano, cave.
+  | 'beach'
+  | 'volcano'
+  | 'cave'
+  // Valdris continent biomes (v0.19): Ossara dunes, Veth twilight forest, Kael
+  // highlands, the war-scarred Breach ring, and the Saltbone flats.
+  | 'desert'
+  | 'shadowwood'
+  | 'highlands'
+  | 'scorched'
+  | 'salt';
 
 export interface ZoneDef {
   id: string;
@@ -1326,6 +1392,11 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  // Authored boulders (the frontier rockslide barricades). Appended to the
+  // deterministic decoration field by world.ts generateDecorations, so they
+  // render AND collide through the same list as procedural rocks (circle
+  // collider r = 0.7 * scale for scale >= 0.8; circles are never jumpable).
+  boulders?: { x: number; z: number; scale: number }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -1582,6 +1653,10 @@ export interface Entity {
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // Playable race (players only; undefined otherwise). Identity + cosmetic body
+  // scale + faction source, never stats. Synced in identity fields (terse `rc`);
+  // pre-race saves default to 'human' in addPlayer.
+  race?: PlayerRace;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
@@ -2081,12 +2156,29 @@ export function normAngle(a: number): number {
 // Classic progression formulas
 // ---------------------------------------------------------------------------
 
-// XP required to go from level L to L+1 (classic-era curve values, levels 1..20)
+// XP required to go from level L to L+1 (classic-era curve values, levels 1..60;
+// the final at-cap row is the post-cap step that prices prestige ranks).
+// Every entry is round100((8*L + Diff(L)) * (45 + 5*L)) with the classic
+// difficulty ramp Diff(L) = 0 (L<=28), 1 (29), 3 (30), 6 (31), 5*(L-30) (L>=32);
+// the first 20 rows are the original table and are unchanged by the Valdris
+// level-cap raise (existing characters keep their exact XP curve to 20).
 export const XP_TABLE = [
   400, 900, 1400, 2100, 2800, 3600, 4500, 5400, 6500, 7600, 8800, 10100, 11400, 12900, 14400, 16000,
-  17700, 19400, 21300, 23200,
+  17700, 19400, 21300, 23200, 25200, 27300, 29400, 31700, 34000, 36400, 38900, 41400, 44300, 47400,
+  50800, 54500, 58600, 62800, 67100, 71600, 76100, 80800, 85700, 90700, 95800, 101000, 106300,
+  111800, 117500, 123200, 129100, 135100, 141200, 147500, 153900, 160400, 167100, 173900, 180800,
+  187900, 195000, 202300, 209800, 217400,
 ];
-export const MAX_LEVEL = 20;
+export const MAX_LEVEL = 60;
+// The ACTIVE leveling ceiling for this release: the level bar freezes here while
+// everything authored above it (XP_TABLE rows, spell ranks, the 40+ zones) stays
+// in the tree for the cap-raise release. MAX_LEVEL stays the CONTENT ceiling
+// (table length, item/dev clamps, obs normalization). Post-cap systems (rested
+// gate, lifetime XP virtual levels, prestige gate and pricing) treat THIS as
+// "the cap" so the live veteran loop continues at 40 exactly as it did at the
+// old cap of 20. Raising the cap later is this one constant: at 60 every
+// formula below degenerates to the pre-cap behavior byte-for-byte.
+export const ACTIVE_LEVEL_CAP = 40;
 
 // Shared sim constants relocated here (C1) so both sim.ts and the extracted damage
 // core (src/sim/combat/damage.ts) can import them without a sim.ts cycle.
@@ -2196,34 +2288,46 @@ export const MILESTONES: MilestoneDef[] = [
 // be spammed from a hacked client to inflate the (leaderboard-visible) rank —
 // the server caps rank at maxPrestigeRank(lifetimeXp) regardless of how many
 // prestige commands arrive.
-export const PRESTIGE_XP_PER_RANK = xpForLevel(MAX_LEVEL); // = 23,200
+export const PRESTIGE_XP_PER_RANK = xpForLevel(ACTIVE_LEVEL_CAP); // the at-active-cap step (90,700 at cap 40)
 
 // Highest prestige rank the given lifetime XP can support (post-cap XP / cost).
+// Measured from the ACTIVE cap: ranks earned under an earlier cap are preserved
+// as saved (the command only caps NEW ranks), the same rule the 20 to 60 raise
+// shipped with.
 export function maxPrestigeRank(lifetimeXp: number): number {
-  const earned = lifetimeXp - xpToReachLevel(MAX_LEVEL);
+  const earned = lifetimeXp - xpToReachLevel(ACTIVE_LEVEL_CAP);
   return earned <= 0 ? 0 : Math.floor(earned / PRESTIGE_XP_PER_RANK);
 }
 
-// Authoritative prestige eligibility: at the cap, and with enough unspent
+// Authoritative prestige eligibility: at the active cap, and with enough unspent
 // post-cap XP for the next rank. Used server-side (enforced) and client-side
-// (to enable/disable the button — display only).
+// (to enable/disable the button, display only).
 export function canPrestige(level: number, lifetimeXp: number, prestigeRank: number): boolean {
-  return level >= MAX_LEVEL && prestigeRank < maxPrestigeRank(lifetimeXp);
+  return level >= ACTIVE_LEVEL_CAP && prestigeRank < maxPrestigeRank(lifetimeXp);
 }
 
 // Lifetime XP still needed before the next prestige rank unlocks (0 if ready).
 export function xpUntilNextPrestige(lifetimeXp: number, prestigeRank: number): number {
-  const target = xpToReachLevel(MAX_LEVEL) + (prestigeRank + 1) * PRESTIGE_XP_PER_RANK;
+  const target = xpToReachLevel(ACTIVE_LEVEL_CAP) + (prestigeRank + 1) * PRESTIGE_XP_PER_RANK;
   return Math.max(0, target - lifetimeXp);
 }
 
 // Zero-difference band: how many levels below you a mob stops giving XP.
 // Classic-era rule: ZD = 5 for player level 1-7, 6 for 8-9, 7 for 10-11, ...
+// Levels 1..20 keep the pre-Valdris values exactly (existing characters see no
+// change); 21+ continues the classic ramp up the new 60 cap.
 export function zeroDiff(playerLevel: number): number {
   if (playerLevel <= 7) return 5;
   if (playerLevel <= 9) return 6;
   if (playerLevel <= 15) return 7;
-  return 8;
+  if (playerLevel <= 20) return 8;
+  if (playerLevel <= 29) return 10;
+  if (playerLevel <= 39) return 11;
+  if (playerLevel <= 44) return 12;
+  if (playerLevel <= 49) return 13;
+  if (playerLevel <= 54) return 14;
+  if (playerLevel <= 59) return 15;
+  return 16;
 }
 
 // Classic-era mob XP: base = 45 + 5 * mobLevel, scaled by level difference.
@@ -2313,10 +2417,13 @@ export function armorReduction(armor: number, attackerLevel: number): number {
 // Attack Power, mirroring the physical attack-power path. The pure coefficient
 // helpers live in src/sim/spell_scaling.ts; these are the tuning knobs.
 // ---------------------------------------------------------------------------
-// Spell Power gained per point of Intellect (1 Spell Power per 2 Intellect). Tuned
-// (see tests/spell_power.test.ts) so a fully-leveled caster gets a meaningful but
-// not dominant damage lift, scaling further as caster gear adds Int + Spell Power.
-export const SPELL_POWER_PER_INT = 0.5;
+// Spell Power gained per point of Intellect. Tuned (see tests/spell_power.test.ts)
+// so a fully-leveled caster gets a meaningful but not dominant damage lift, scaling
+// further as caster gear adds Int + Spell Power. Re-tuned 0.5 -> 0.45 with the
+// level-60 cap: Intellect now grows over 60 levels while spell base damage still
+// tops out at the level-20 ranks, which pushed the flagship-nuke share past the
+// dominance bound the balance-band test pins.
+export const SPELL_POWER_PER_INT = 0.45;
 // Direct nuke coefficient = clamp(castTime, MIN, MAX) / DIVISOR (classic-era 3.5). The
 // max equals the divisor so the direct coefficient caps at 1.0 (a 3.5s+ cast gets
 // full Spell Power; a 6s Pyroblast does not exceed it).

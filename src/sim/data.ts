@@ -54,6 +54,18 @@ import {
   TEMPLE_QUEST_ORDER,
   TEMPLE_QUESTS,
 } from './content/temple';
+import {
+  VALDRIS_CAMPS,
+  VALDRIS_ITEMS,
+  VALDRIS_MOBS,
+  VALDRIS_NPCS,
+  VALDRIS_OBJECTS,
+  VALDRIS_PROPS,
+  VALDRIS_QUEST_ORDER,
+  VALDRIS_QUESTS,
+  VALDRIS_ROADS,
+  VALDRIS_ZONES,
+} from './content/valdris';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import {
   GRAVEYARD_POS,
@@ -147,6 +159,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
   DELVE_ITEMS,
+  VALDRIS_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -161,6 +174,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
+  ...VALDRIS_MOBS,
 };
 
 export const NPCS: Record<string, NpcDef> = {
@@ -170,6 +184,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
   brother_halven_marsh: BROTHER_HALVEN_MARSH,
+  ...VALDRIS_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -185,6 +200,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
+  ...VALDRIS_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -192,12 +208,14 @@ export const QUEST_ORDER: string[] = [
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
+  ...VALDRIS_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
 // before others shifts their spawn positions. New rare-elite camps
-// (ZONE1_CHAPEL_CAMPS) and the Eastbrook rare Grix are appended LAST so every
-// existing zone camp keeps its exact draw order (determinism).
+// (ZONE1_CHAPEL_CAMPS), the Eastbrook rare Grix, and now the whole Valdris
+// continent are appended LAST so every existing zone camp keeps its exact
+// draw order (determinism).
 export const CAMPS: CampDef[] = [
   ...ZONE1_CAMPS,
   ...ZONE2_CAMPS,
@@ -205,6 +223,7 @@ export const CAMPS: CampDef[] = [
   ...TEMPLE_CAMPS,
   ...ZONE1_CHAPEL_CAMPS,
   { mobId: 'grix_the_tunnelking', center: { x: -95, z: -78 }, radius: 4, count: 1 },
+  ...VALDRIS_CAMPS,
 ];
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -212,15 +231,22 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE2_OBJECTS,
   ...ZONE3_OBJECTS,
   ...TEMPLE_OBJECTS,
+  ...VALDRIS_OBJECTS,
 ];
 
-export const ROADS: { x: number; z: number }[][] = [...ZONE1_ROADS, ...ZONE2_ROADS, ...ZONE3_ROADS];
+export const ROADS: { x: number; z: number }[][] = [
+  ...ZONE1_ROADS,
+  ...ZONE2_ROADS,
+  ...ZONE3_ROADS,
+  ...VALDRIS_ROADS,
+];
 
 export const PROPS: ZonePropsDef = mergeProps([
   ZONE1_PROPS,
   ZONE2_PROPS,
   ZONE3_PROPS,
   TEMPLE_PROPS,
+  VALDRIS_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -240,6 +266,7 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
     delveMarkers: sets.flatMap((s) => s.delveMarkers ?? []),
+    boulders: sets.flatMap((s) => s.boulders ?? []),
   };
 }
 
@@ -277,13 +304,20 @@ export const GROUP_XP_BONUS = [1, 1, 1.166, 1.3, 1.43];
 // graveyard, its lakes, and a biome palette the renderer keys off.
 // ---------------------------------------------------------------------------
 
-export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE];
+// The first three bands are The Landing, the shared tutorial island (levels
+// 1-20); the Valdris continent continues north from z=900 (see
+// docs/design/valdris-continent.md for the full strip plan).
+export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE, ...VALDRIS_ZONES];
 
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]
 export const WORLD_MIN_X = -WORLD_SIZE / 2;
 export const WORLD_MAX_X = WORLD_SIZE / 2;
 export const WORLD_MIN_Z = ZONES[0].zMin;
 export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
+// The level-40 launch seals the world at the Breach frontier; the barricade
+// content module owns the boundary, re-exported here beside the other
+// world-layout constants for sim/ui consumers.
+export { LANDING_EXIT_Z, SEALED_FRONTIER_Z } from './content/valdris/barriers';
 
 export const PLAYER_START = { x: 2, z: -2 };
 

@@ -26,6 +26,7 @@ import {
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
+import { factionOfRace } from '../sim/content/races';
 import {
   EVENT_SKIN_TIERS,
   MECH_CHROMAS,
@@ -34,6 +35,7 @@ import {
   skinRankOrder,
 } from '../sim/content/skins';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
+import { ENVOY_NPC_IDS } from '../sim/content/valdris/envoys';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
@@ -82,6 +84,7 @@ import type {
 } from '../sim/types';
 import {
   type AbilityEffect,
+  ACTIVE_LEVEL_CAP,
   CONSUME_DURATION,
   canPrestige,
   dist2d,
@@ -89,7 +92,6 @@ import {
   FISHING_CAST_ID,
   type ItemDef,
   isQuestTurnInNpc,
-  MAX_LEVEL,
   MILESTONES,
   type RiteIntensity,
   type SimEvent,
@@ -179,6 +181,7 @@ import {
   zonePoiLabel,
 } from './entity_i18n';
 import { esc } from './esc';
+import { renderFactionChoice } from './faction_choice_window';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
@@ -239,6 +242,18 @@ import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
+import { MapAtlasPainter } from './map_atlas_painter';
+import {
+  type AtlasLevelId,
+  atlasFit,
+  atlasHitTest,
+  atlasLevelUp,
+  atlasNodeSealed,
+  atlasParentLevel,
+  buildAtlasModel,
+  MAP_ATLAS,
+  resolveAtlasTarget,
+} from './map_atlas_view';
 import {
   mapQuestListView,
   parseUntrackedQuests,
@@ -298,6 +313,7 @@ import { encodeItemLink, encodeQuestLink, parseChatSegments } from './quest_link
 import { QuestProgressBanner } from './quest_progress_banner';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 import { QuestLogWindow } from './questlog_window';
+import { raceDisplayName, racialTraitDesc, racialTraitName } from './race_display';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { restView } from './rest_indicator';
@@ -344,6 +360,8 @@ import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { formatXp, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
+import { ZoneVeilPainter } from './zone_veil_painter';
+import { ZoneVeilCore } from './zone_veil_view';
 
 // hooks main wires after Input exists (the options menu drives input, audio,
 // graphics, and logout, all of which live outside the HUD). PerfOverlayHooks
@@ -1020,6 +1038,7 @@ export class Hud {
   private openQuestDetailId: string | null = null;
   private pendingChatLinks = new Map<string, string>(); // display "[Name]" -> [[q:id]]/[[i:id]] token
   private questDialogTrap: FocusTrapHandle | null = null;
+  private factionChoiceTrap: FocusTrapHandle | null = null;
   private questDialogOpenedAtMs = 0;
   // The NPC whose voice line is currently sounding, so update() can fade it by
   // distance as the player walks away. Outlives the dialog window (which closes at
@@ -1072,6 +1091,21 @@ export class Hud {
   private lastZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
+  // WoW-style hierarchical map: the painted zoom-out level currently shown
+  // (null = the procedural zone map), the atlas-picked zone being viewed (null
+  // = follow the player's committed zone), and the hovered atlas shape.
+  private mapAtlasLevel: AtlasLevelId | null = null;
+  private mapViewZoneId: string | null = null;
+  private mapAtlasHover: string | null = null;
+  // The painted level art, loaded on first use; a load-completion repaints the
+  // open map so the art pops in under the already-drawn shapes.
+  private readonly mapAtlasImages = new Map<AtlasLevelId, HTMLImageElement>();
+  // Zones waiting for an idle map-background prewarm (the whole world is
+  // queued at world entry; priority requests jump to the front).
+  private mapPrewarmQueue: string[] = [];
+  // Partially rendered prewarm jobs preempted by a priority request; each
+  // resumes from its parked row when its zone reaches the queue front again.
+  private readonly mapPrewarmParked = new Map<string, NonNullable<Hud['mapPrewarm']>>();
   private mapDrag: { px: number; py: number; cx: number; cz: number } | null = null;
   private mapView: {
     spanX: number;
@@ -1439,6 +1473,28 @@ export class Hud {
     );
     $('#map-zoom-in')?.addEventListener('click', () => this.zoomMap(1.4));
     $('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(1 / 1.4));
+    // WoW-style hierarchy: right-click zooms the map out one level (zone ->
+    // painted region -> world); on a painted level, click drills into the
+    // region under the cursor and pointer-move drives the hover highlight.
+    const mapCanvasPoint = (ev: MouseEvent): { x: number; y: number } => {
+      const rect = mapCanvas.getBoundingClientRect();
+      return {
+        x: ((ev.clientX - rect.left) * mapCanvas.width) / rect.width,
+        y: ((ev.clientY - rect.top) * mapCanvas.height) / rect.height,
+      };
+    };
+    mapCanvas.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault();
+      this.mapNavigateUp();
+    });
+    mapCanvas.addEventListener('click', (ev) => {
+      const { x, y } = mapCanvasPoint(ev);
+      this.mapAtlasClick(x, y);
+    });
+    mapCanvas.addEventListener('pointermove', (ev) => {
+      const { x, y } = mapCanvasPoint(ev);
+      this.mapAtlasHoverAt(x, y);
+    });
     // drag to pan (only meaningful while zoomed in; at zoom 1 the whole zone fits)
     mapCanvas.addEventListener('pointerdown', (ev) => {
       if (!this.mapView || this.mapZoom <= 1) return;
@@ -1594,7 +1650,25 @@ export class Hud {
     const startZone = zoneAt(sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
-    this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
+    // Prewarm the whole map surface during idle so neither the first open nor
+    // any atlas drill-down ever pays a render on the click: the spawn zone
+    // first, then every other zone trickles through the same idle queue, plus
+    // the painted atlas art (decoded ahead of the first draw) and the
+    // whole-world decoration cache the zoomed-in detail overlay reads.
+    this.prewarmMapBg(startZone.id, true);
+    for (const z of ZONES) this.prewarmMapBg(z.id);
+    this.mapAtlasImage('world');
+    this.mapAtlasImage('breach');
+    const idle = (
+      window as typeof window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }
+    ).requestIdleCallback;
+    const warmDecorations = () => this.mapPainter.prewarmDecorations(this.sim.cfg.seed);
+    // the timeout forces the warm-up through even on a saturated main thread,
+    // where pure idle slots may never arrive
+    if (idle) idle(warmDecorations, { timeout: 1500 });
+    else window.setTimeout(warmDecorations, 1500);
     this.showBanner(startZoneName);
     this.log(t('hud.core.welcomeZone', { zone: startZoneName }), '#ffd100');
     this.logZoneWelcome(startZone);
@@ -1951,6 +2025,9 @@ export class Hud {
         break;
       case 'quest-dialog':
         this.closeQuestDialog();
+        break;
+      case 'faction-choice-window':
+        this.closeFactionChoice();
         break;
       case 'delve-board':
         this.closeDelveBoard();
@@ -2890,6 +2967,17 @@ export class Hud {
     this.swingFillEl,
     this.swingLabelEl,
   );
+  // Instance-transition veil (the loading curtain on dungeon/arena/delve
+  // teleports): trigger detection + phase machine in the pure core, DOM via
+  // the same write-elision facet (the .show toggle and the two label writes
+  // land only on a phase change / a new trigger, so steady state is all skips).
+  private readonly zoneVeilCore = new ZoneVeilCore();
+  private readonly zoneVeilPainter = new ZoneVeilPainter(
+    this.writerFacet,
+    $('#zone-veil'),
+    $('#zone-veil .veil-sub'),
+    $('#zone-veil .veil-name'),
+  );
   // The per-frame FCT painter: the pooled-div ring that replaced the per-event
   // createElement + setTimeout fct() below. handleEvents + showSelfNote feed spawn(), which
   // projects the head anchor ONCE (screen-anchored, byte-faithful to the old fct() and to
@@ -3028,6 +3116,7 @@ export class Hud {
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
   // the cached whole-world decorations; redraws from the mediumHud band while open.
   private readonly mapPainter = new MapWindowPainter();
+  private readonly mapAtlasPainter = new MapAtlasPainter();
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
@@ -5255,6 +5344,9 @@ export class Hud {
       }
     }
     this.meters.update();
+    // Instance-transition veil: fed every frame (a teleport must be caught on
+    // the frame it lands, before the destination renders un-veiled).
+    this.zoneVeilPainter.paint(this.zoneVeilCore.update(p.pos.x, p.pos.z, now));
     this.lockpickWindow.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.reconcileLootRolls();
@@ -5564,7 +5656,9 @@ export class Hud {
             this.logZoneWelcome(currentZone);
           }
           this.lastZoneId = currentZone.id;
-          this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
+          // priority: the just-entered zone preempts the background trickle so
+          // its map bg is ready (or nearly so) before the player opens the map
+          this.prewarmMapBg(currentZone.id, true);
         }
       }
 
@@ -6402,29 +6496,57 @@ export class Hud {
     return { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
   }
 
-  // The cached terrain background for a zone, rendering it synchronously only if
-  // a prewarm hasn't already produced it. The synchronous path is the fallback
-  // for "opened the map the instant we entered a zone"; normally the idle
-  // prewarm has it ready and this is a Map hit.
-  private mapZoneBg(zone: ZoneDef): HTMLCanvasElement {
+  // The cached terrain background for a zone, or null while the idle prewarm
+  // is still producing it (the miss bumps that zone to the queue front and the
+  // finished render repaints the open map). Never renders synchronously: the
+  // old sync fallback was the ~200ms open/zone-change hitch.
+  private mapZoneBg(zone: ZoneDef): HTMLCanvasElement | null {
     const cached = this.mapBgCache.get(zone.id);
     if (cached) return cached;
-    const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
-    this.mapBgCache.set(zone.id, bg);
-    // a redundant in-flight prewarm for this same zone can be dropped now
-    if (this.mapPrewarm?.zoneId === zone.id) this.cancelMapPrewarm();
-    return bg;
+    this.prewarmMapBg(zone.id, true);
+    return null;
   }
 
-  // Kick off (or no-op) an idle, time-sliced render of a zone's map background
-  // so opening the map never pays the ~200ms terrain cost on the click. Called
-  // when the committed zone changes and once at startup for the spawn zone.
-  private prewarmMapBg(zoneId: string): void {
+  // Kick off (or queue) an idle, time-sliced render of a zone's map background
+  // so opening the map never pays the ~200ms terrain cost on the click. Every
+  // zone is queued once at world entry. A priority request (the zone being
+  // viewed, the player's zone on a border crossing) PREEMPTS the in-flight
+  // render: that job is parked with its progress intact and re-queued at the
+  // front, so the zone the player actually needs never waits behind a
+  // background trickle.
+  private prewarmMapBg(zoneId: string, priority = false): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
+    if (this.mapPrewarm) {
+      if (priority) {
+        const parked = this.mapPrewarm;
+        this.mapPrewarmParked.set(parked.zoneId, parked);
+        this.mapPrewarmQueue = this.mapPrewarmQueue.filter(
+          (id) => id !== parked.zoneId && id !== zoneId,
+        );
+        this.mapPrewarmQueue.unshift(parked.zoneId);
+        this.mapPrewarm = null;
+        this.cancelMapPrewarmTick();
+        this.startMapPrewarmJob(zoneId);
+        return;
+      }
+      if (!this.mapPrewarmQueue.includes(zoneId)) this.mapPrewarmQueue.push(zoneId);
+      return;
+    }
+    this.startMapPrewarmJob(zoneId);
+  }
+
+  private startMapPrewarmJob(zoneId: string): void {
+    // a preempted job resumes from the row it was parked at
+    const parked = this.mapPrewarmParked.get(zoneId);
+    if (parked) {
+      this.mapPrewarmParked.delete(zoneId);
+      this.mapPrewarm = parked;
+      this.scheduleMapPrewarm();
+      return;
+    }
     const zone = ZONES.find((z) => z.id === zoneId);
     if (!zone) return;
-    this.cancelMapPrewarm(); // drop any prewarm for a now-stale zone
     const region = this.mapZoneRegion(zone);
     const W = MAP_BG_RES;
     const H = mapCanvasHeight(W, region);
@@ -6445,24 +6567,27 @@ export class Hud {
     this.scheduleMapPrewarm();
   }
 
-  private cancelMapPrewarm(): void {
-    if (this.mapPrewarmHandle) {
-      // Cancel only with the scheduler that produced this handle (see
-      // mapPrewarmVia): the two id pools are separate per spec, so a cross
-      // canceller could clear an unrelated timer sharing the number. When the
-      // idle path lacks cancelIdleCallback there is nothing to call, but the
-      // pumpMapPrewarm `if (!job) return` guard makes the stale callback a no-op.
-      if (this.mapPrewarmVia === 'idle') {
-        const cancel = (window as typeof window & { cancelIdleCallback?: (h: number) => void })
-          .cancelIdleCallback;
-        if (cancel) cancel(this.mapPrewarmHandle);
-      } else {
-        clearTimeout(this.mapPrewarmHandle);
-      }
-      this.mapPrewarmHandle = 0;
-      this.mapPrewarmVia = null;
-    }
-    this.mapPrewarm = null;
+  // Cancel the pending pump tick (used by preemption so the freshly started
+  // priority job reschedules at its own, possibly urgent, cadence instead of
+  // waiting out a parked 500ms idle slot).
+  private cancelMapPrewarmTick(): void {
+    if (!this.mapPrewarmVia) return;
+    const w = window as typeof window & { cancelIdleCallback?: (handle: number) => void };
+    if (this.mapPrewarmVia === 'idle') w.cancelIdleCallback?.(this.mapPrewarmHandle);
+    else window.clearTimeout(this.mapPrewarmHandle);
+    this.mapPrewarmHandle = 0;
+    this.mapPrewarmVia = null;
+  }
+
+  /** True while the open zone map is waiting on the in-flight prewarm (it is
+   *  showing the placeholder backdrop), which upgrades the trickle cadence. */
+  private mapPrewarmUrgent(): boolean {
+    return (
+      $('#map-window').style.display === 'block' &&
+      !this.mapAtlasLevel &&
+      this.mapPrewarm !== null &&
+      !this.mapBgCache.has(this.mapPrewarm.zoneId)
+    );
   }
 
   private scheduleMapPrewarm(): void {
@@ -6472,38 +6597,56 @@ export class Hud {
         opts?: { timeout: number },
       ) => number;
     };
-    if (w.requestIdleCallback) {
-      this.mapPrewarmHandle = w.requestIdleCallback(this.pumpMapPrewarm, { timeout: 2000 });
-      this.mapPrewarmVia = 'idle';
-    } else {
+    // when the open map is waiting on this very render, pace with a fast timer
+    // instead of idle slots so the terrain pops in within a second or two even
+    // on a fully loaded main thread
+    if (this.mapPrewarmUrgent() || !w.requestIdleCallback) {
       this.mapPrewarmHandle = window.setTimeout(() => this.pumpMapPrewarm(), 16);
       this.mapPrewarmVia = 'timeout';
+      return;
     }
+    this.mapPrewarmHandle = w.requestIdleCallback(this.pumpMapPrewarm, { timeout: 500 });
+    this.mapPrewarmVia = 'idle';
   }
 
   // Paint a budgeted slice of the in-flight prewarm, then reschedule until the
   // zone is fully rendered. Whole rows per slice keeps it byte-identical to a
   // one-shot render (the only per-row state, hillshade, resets each row).
-  // With an idle deadline we paint as many slices as fit; without one (the
-  // setTimeout fallback) we paint a single slice and let the reschedule pace it,
-  // so the no-requestIdleCallback path stays sliced instead of rendering the
-  // whole canvas in one ~200ms hitch.
+  // Each callback paints for at least MIN_SLICE_MS even when the idle deadline
+  // reports no spare time (a saturated main thread otherwise starves the pump
+  // to one slice per forced-timeout callback and the queue never drains), and
+  // keeps consuming genuinely idle time beyond that.
   private pumpMapPrewarm = (deadline?: { timeRemaining(): number }): void => {
     const job = this.mapPrewarm;
     if (!job) return;
     const seed = this.sim.cfg.seed;
     const ROWS_PER_SLICE = 16; // ~6ms at MAP_BG_RES; one frame fits several
+    const MIN_SLICE_MS = this.mapPrewarmUrgent() ? 12 : 6;
+    const start = performance.now();
     do {
       const end = Math.min(job.H, job.row + ROWS_PER_SLICE);
       paintTerrainRows(job.img.data, job.W, job.H, job.region, seed, job.row, end);
       job.row = end;
-    } while (job.row < job.H && deadline !== undefined && deadline.timeRemaining() > 3);
+    } while (
+      job.row < job.H &&
+      (performance.now() - start < MIN_SLICE_MS ||
+        (deadline !== undefined && deadline.timeRemaining() > 3))
+    );
     if (job.row >= job.H) {
       job.ctx.putImageData(job.img, 0, 0);
       this.mapBgCache.set(job.zoneId, job.canvas);
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;
+      // if the open map is showing this zone with the placeholder backdrop,
+      // repaint so the finished terrain pops in
+      if ($('#map-window').style.display === 'block' && !this.mapAtlasLevel) {
+        this.updateMapWindow();
+      }
+      // trickle through the rest of the world during idle
+      const next = this.mapPrewarmQueue.find((id) => !this.mapBgCache.has(id));
+      this.mapPrewarmQueue = this.mapPrewarmQueue.filter((id) => id !== next);
+      if (next) this.startMapPrewarmJob(next);
       return;
     }
     this.scheduleMapPrewarm();
@@ -6719,13 +6862,115 @@ export class Hud {
     this.closeOtherWindows('#map-window');
     this.mapZoom = 1; // always open at the full-zone view, following the player
     this.mapCenter = null;
+    this.mapAtlasLevel = null; // WoW-style: the map opens at your own zone
+    this.mapViewZoneId = null;
+    this.mapAtlasHover = null;
     el.style.display = 'block';
     this.updateMapWindow();
   }
 
+  /** The zone the player counts as standing in for atlas highlights (inside an
+   *  instance that is the zone holding the dungeon's door). */
+  private mapPlayerZoneId(): string {
+    const p = this.sim.player;
+    const dungeon = dungeonAt(p.pos.x);
+    return (dungeon ? zoneAt(dungeon.doorPos.z) : zoneAt(p.pos.z)).id;
+  }
+
+  /** The painted art for an atlas level, or null while it loads (a completed
+   *  load repaints the open map). */
+  private mapAtlasImage(level: AtlasLevelId): HTMLImageElement | null {
+    let img = this.mapAtlasImages.get(level);
+    if (!img) {
+      img = new Image();
+      img.addEventListener('load', () => {
+        // pre-decode so the first drawImage never pays the decode hitch
+        img?.decode?.().catch(() => {});
+        if ($('#map-window').style.display === 'block') this.updateMapWindow();
+      });
+      img.src = MAP_ATLAS[level].image;
+      this.mapAtlasImages.set(level, img);
+    }
+    return img.complete && img.naturalWidth > 0 ? img : null;
+  }
+
+  /** Right-click: walk the map up one level (zone -> its painted region ->
+   *  world), WoW-style. A no-op at the world level and in the delve view. */
+  private mapNavigateUp(): void {
+    if (mapWindowMode(this.sim) === 'delve') return;
+    if (this.mapAtlasLevel) {
+      const up = atlasLevelUp(this.mapAtlasLevel);
+      if (up) {
+        this.mapAtlasLevel = up;
+        this.mapAtlasHover = null;
+        this.updateMapWindow();
+      }
+      return;
+    }
+    const zoneId = this.mapViewZoneId ?? (this.lastZoneId || this.mapPlayerZoneId());
+    this.mapAtlasLevel = atlasParentLevel(zoneId);
+    this.mapAtlasHover = null;
+    this.mapZoom = 1;
+    this.mapCenter = null;
+    this.updateMapWindow();
+  }
+
+  /** Left-click on a painted level: drill into the clicked region (a zone map,
+   *  or the Breach region level from the world map). */
+  private mapAtlasClick(canvasX: number, canvasY: number): void {
+    if (!this.mapAtlasLevel) return;
+    const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
+    const fit = atlasFit(this.mapAtlasLevel, canvas.width, canvas.height);
+    const node = atlasHitTest(this.mapAtlasLevel, canvasX, canvasY, fit);
+    if (!node) return;
+    if (atlasNodeSealed(node)) {
+      // Sealed frontier region (the level-40 launch): browsable on the art,
+      // never openable. Mirrors the in-world barricades.
+      this.showError(t('hudChrome.map.sealedHint'));
+      return;
+    }
+    const target = resolveAtlasTarget(node, this.mapPlayerZoneId());
+    if (target.kind === 'level') {
+      this.mapAtlasLevel = target.level;
+    } else {
+      this.mapAtlasLevel = null;
+      this.mapViewZoneId = target.zoneId;
+      this.mapZoom = 1;
+      this.mapCenter = null;
+      this.prewarmMapBg(target.zoneId);
+    }
+    this.mapAtlasHover = null;
+    this.updateMapWindow();
+  }
+
+  /** Pointer-move hover over the painted levels (repaints only on change). */
+  private mapAtlasHoverAt(canvasX: number, canvasY: number): void {
+    if (!this.mapAtlasLevel) return;
+    const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
+    const fit = atlasFit(this.mapAtlasLevel, canvas.width, canvas.height);
+    const node = atlasHitTest(this.mapAtlasLevel, canvasX, canvasY, fit);
+    const id = node ? node.id : null;
+    if (id !== this.mapAtlasHover) {
+      this.mapAtlasHover = id;
+      this.updateMapWindow();
+    }
+  }
+
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
+    // Painted levels have no free zoom: zooming out walks up a level (the
+    // touch/wheel path to the hierarchy); clicks/right-clicks do the rest.
+    if (this.mapAtlasLevel) {
+      if (factor < 1) this.mapNavigateUp();
+      return;
+    }
     const prev = this.mapZoom;
+    // WoW-style: zooming out past the full-zone view climbs to the painted
+    // parent level instead of clamping silently.
+    if (factor < 1 && prev === 1) {
+      this.mapNavigateUp();
+      return;
+    }
     this.mapZoom = Math.max(1, Math.min(MAP_MAX_ZOOM, this.mapZoom * factor));
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
     // follow view anchors the pan at the player so dragging starts from there
@@ -6761,13 +7006,46 @@ export class Hud {
       return;
     }
 
-    // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
-    // the instance x-band layout); outdoors, follow the committed zone so
-    // border-straddling can't thrash the cached terrain regen.
+    // painted zoom-out levels (world / Breach region): the atlas painter owns
+    // the whole draw; navigation stays with the click/contextmenu handlers.
+    if (this.mapAtlasLevel) {
+      const model = buildAtlasModel({
+        level: this.mapAtlasLevel,
+        canvasW: S,
+        canvasH: S,
+        playerZoneId: this.mapPlayerZoneId(),
+        hoverNodeId: this.mapAtlasHover,
+      });
+      this.mapAtlasPainter.paint(ctx, {
+        model,
+        image: this.mapAtlasImage(this.mapAtlasLevel),
+        canvasW: S,
+        canvasH: S,
+      });
+      this.mapView = null;
+      if (!this.mapDrag) canvas.style.cursor = this.mapAtlasHover ? 'pointer' : 'default';
+      this.setText(
+        summaryEl,
+        t('hud.core.mapSummary', {
+          zone:
+            this.mapAtlasLevel === 'world'
+              ? t('hudChrome.map.worldTitle')
+              : t('hudChrome.map.theBreachRing'),
+        }),
+      );
+      return;
+    }
+
+    // an atlas-picked zone wins; else inside an instance, show the zone the
+    // dungeon's door is in (dungeonAt owns the instance x-band layout);
+    // outdoors, follow the committed zone so border-straddling can't thrash
+    // the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
-    const zone: ZoneDef = dungeon
-      ? zoneAt(dungeon.doorPos.z)
-      : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+    const zone: ZoneDef =
+      (this.mapViewZoneId ? ZONES.find((z) => z.id === this.mapViewZoneId) : undefined) ??
+      (dungeon
+        ? zoneAt(dungeon.doorPos.z)
+        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z)));
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
       bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
@@ -8892,6 +9170,75 @@ export class Hud {
   // Quest dialog (gossip)
   // -------------------------------------------------------------------------
 
+  // --- Envoys' Hall: the faction oath window + ferry travel confirms -------
+
+  /** Route a click on an Envoy: the unsworn get the oath window; the sworn get
+   *  quest business first (an offer or a turn-in outranks the ferry pitch),
+   *  then their OWN Envoy offers passage, and a foreign one just talks. */
+  openEnvoyDialog(npcId: number): void {
+    const npc = this.sim.entities.get(npcId);
+    if (npc?.kind !== 'npc') return;
+    const race = this.sim.player.race;
+    if (!race) {
+      this.openFactionChoice();
+      return;
+    }
+    const business = npc.questIds.some((q) => {
+      const st = this.sim.questState(q);
+      return (
+        (st === 'available' && QUESTS[q].giverNpcId === npc.templateId) ||
+        (st === 'ready' && isQuestTurnInNpc(QUESTS[q], npc.templateId))
+      );
+    });
+    if (!business && ENVOY_NPC_IDS[factionOfRace(race)] === npc.templateId) {
+      this.confirmTravel();
+      return;
+    }
+    this.openQuestDialog(npcId);
+  }
+
+  /** Ferry (or own-Envoy) passage confirm; the sim validates and teleports. */
+  confirmTravel(): void {
+    this.confirmDialog(
+      t('hudChrome.envoys.travelTitle'),
+      t('hudChrome.envoys.travelBody'),
+      t('hudChrome.envoys.travelGo'),
+      t('hudChrome.envoys.travelStay'),
+      () => {
+        this.sim.travel();
+        audio.click();
+      },
+    );
+  }
+
+  openFactionChoice(): void {
+    const el = $('#faction-choice-window');
+    this.closeOtherWindows('#faction-choice-window');
+    renderFactionChoice({
+      root: () => el,
+      onChoose: (race) => {
+        // One command; the sim enforces every rule and answers with either the
+        // oath (race change + teleport) or an error toast.
+        this.sim.chooseRace(race);
+        audio.click();
+        this.closeFactionChoice();
+      },
+      onClose: () => this.closeFactionChoice(),
+    });
+    el.style.display = 'block';
+    el.dataset.windowOpen = '1';
+    this.factionChoiceTrap = this.focusManager.open({ root: () => el });
+  }
+
+  closeFactionChoice(): void {
+    const el = $('#faction-choice-window');
+    if (el.style.display !== 'block') return;
+    el.style.display = 'none';
+    delete el.dataset.windowOpen;
+    this.factionChoiceTrap?.release();
+    this.factionChoiceTrap = null;
+  }
+
   openQuestDialog(npcId: number): void {
     const npc = this.sim.entities.get(npcId);
     if (npc?.kind !== 'npc') return;
@@ -10769,7 +11116,7 @@ export class Hud {
       html += `<span>${t('game.progression.prestigeRank')}: <b>★ ${sim.prestigeRank}</b></span>`;
     html += `</div>`;
     html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
-    if (level >= MAX_LEVEL) {
+    if (level >= ACTIVE_LEVEL_CAP) {
       // The button reflects the server's authoritative prestige gate (post-cap
       // XP earned). It's disabled — and the requirement shown — until eligible;
       // the server re-checks regardless, so a forged click does nothing.
@@ -10787,7 +11134,7 @@ export class Hud {
     // Mirror the server's gate; the server enforces it authoritatively anyway.
     if (!canPrestige(p.level, this.sim.lifetimeXp, this.sim.prestigeRank)) {
       this.showError(
-        p.level < MAX_LEVEL
+        p.level < ACTIVE_LEVEL_CAP
           ? t('game.prestige.needCap')
           : `${formatXp(xpUntilNextPrestige(this.sim.lifetimeXp, this.sim.prestigeRank))} ${t('game.prestige.needXp')}`,
       );
@@ -11374,6 +11721,19 @@ export class Hud {
     if (e?.kind !== 'player') return;
     const cls = e.templateId as PlayerClass;
     const className = classDisplayName(cls);
+    // Race rides the identity wire (`rc`), so the inspected player's race and
+    // racial trait render fully client-side like the class does.
+    const inspectLevel = formatNumber(e.level, { maximumFractionDigits: 0 });
+    const inspectMeta = e.race
+      ? t('races.levelRaceClass', {
+          level: inspectLevel,
+          race: raceDisplayName(e.race),
+          className,
+        })
+      : t('itemUi.equipment.levelClass', { level: inspectLevel, className });
+    const racialHtml = e.race
+      ? `<div class="inspect-racial">${esc(t('races.racialLabel'))}: ${esc(racialTraitName(e.race))} (${esc(racialTraitDesc(e.race))})</div>`
+      : '';
     const el = $('#inspect-window');
     this.closeOtherWindows('#inspect-window');
     // $WOC holder-tier flair: cosmetic badge for a connected/holder wallet,
@@ -11462,7 +11822,8 @@ export class Hud {
       `<div class="inspect-card">` +
       portraitChipHtml({ cls, skin: e.skin ?? 0, name: e.name, variant: 'lg' }) +
       `<div class="inspect-name">${esc(e.name)}</div>` +
-      `<div class="inspect-meta">${esc(t('itemUi.equipment.levelClass', { level: formatNumber(e.level, { maximumFractionDigits: 0 }), className }))}</div>` +
+      `<div class="inspect-meta">${esc(inspectMeta)}</div>` +
+      racialHtml +
       holderHtml +
       discordHtml +
       devHtml +

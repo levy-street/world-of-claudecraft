@@ -32,15 +32,23 @@ const DOME_RADIUS = 560;
 // did. The dawn HDRI carries a huge horizon-level sun glow, so the peaks get
 // reined in harder or half the sky white-outs. The renderer's PMREM capture
 // samples the same shader, so IBL stays in step.
+// The five Valdris biomes reuse the closest existing sky set (no new HDRI art
+// ships with the continent; the asset loader parses each unique URL once):
+// sunny vale for desert/highlands/salt, overcast marsh for the twilight
+// shadowwood, ember dawn peaks for scorched.
 const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number }> = {
   vale: { gain: 0.6, clamp: 2.6 },
   marsh: { gain: 0.6, clamp: 2.2 },
   peaks: { gain: 0.48, clamp: 1.7 },
   // Paint-only biomes reuse the closest shipped sky (no new HDRI downloads).
   beach: { gain: 0.6, clamp: 2.6 },
-  desert: { gain: 0.55, clamp: 2.2 },
   volcano: { gain: 0.5, clamp: 2.0 },
   cave: { gain: 0.55, clamp: 2.0 },
+  desert: { gain: 0.6, clamp: 2.6 },
+  shadowwood: { gain: 0.6, clamp: 2.2 },
+  highlands: { gain: 0.6, clamp: 2.6 },
+  scorched: { gain: 0.48, clamp: 1.7 },
+  salt: { gain: 0.6, clamp: 2.6 },
 };
 
 const BIOME_HDRI_2K: Record<BiomeId, string> = {
@@ -48,9 +56,13 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   marsh: '/env/marsh_overcast_2k.hdr',
   peaks: '/env/peaks_dawn_2k.hdr',
   beach: '/env/vale_day_2k.hdr',
-  desert: '/env/peaks_dawn_2k.hdr',
   volcano: '/env/marsh_overcast_2k.hdr',
   cave: '/env/marsh_overcast_2k.hdr',
+  desert: '/env/vale_day_2k.hdr',
+  shadowwood: '/env/marsh_overcast_2k.hdr',
+  highlands: '/env/vale_day_2k.hdr',
+  scorched: '/env/peaks_dawn_2k.hdr',
+  salt: '/env/vale_day_2k.hdr',
 };
 
 const BIOME_HDRI_1K: Record<BiomeId, string> = {
@@ -58,9 +70,13 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   marsh: '/env/marsh_overcast_1k.hdr',
   peaks: '/env/peaks_dawn_1k.hdr',
   beach: '/env/vale_day_1k.hdr',
-  desert: '/env/peaks_dawn_1k.hdr',
   volcano: '/env/marsh_overcast_1k.hdr',
   cave: '/env/marsh_overcast_1k.hdr',
+  desert: '/env/vale_day_1k.hdr',
+  shadowwood: '/env/marsh_overcast_1k.hdr',
+  highlands: '/env/vale_day_1k.hdr',
+  scorched: '/env/peaks_dawn_1k.hdr',
+  salt: '/env/vale_day_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -88,9 +104,13 @@ const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
   marsh: '/env/marsh_backdrop.webp',
   peaks: '/env/peaks_backdrop.webp',
   beach: '/env/vale_backdrop.webp',
-  desert: '/env/peaks_backdrop.webp',
   volcano: '/env/peaks_backdrop.webp',
   cave: '/env/marsh_backdrop.webp',
+  desert: '/env/vale_backdrop.webp',
+  shadowwood: '/env/marsh_backdrop.webp',
+  highlands: '/env/vale_backdrop.webp',
+  scorched: '/env/peaks_backdrop.webp',
+  salt: '/env/vale_backdrop.webp',
 };
 
 const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
@@ -98,9 +118,13 @@ const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
   marsh: '/env/marsh_backdrop_4k.webp',
   peaks: '/env/peaks_backdrop_4k.webp',
   beach: '/env/vale_backdrop_4k.webp',
-  desert: '/env/peaks_backdrop_4k.webp',
   volcano: '/env/peaks_backdrop_4k.webp',
   cave: '/env/marsh_backdrop_4k.webp',
+  desert: '/env/vale_backdrop_4k.webp',
+  shadowwood: '/env/marsh_backdrop_4k.webp',
+  highlands: '/env/vale_backdrop_4k.webp',
+  scorched: '/env/peaks_backdrop_4k.webp',
+  salt: '/env/vale_backdrop_4k.webp',
 };
 
 const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
@@ -108,9 +132,13 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   marsh: 0,
   peaks: 0,
   beach: 0,
-  desert: 0,
   volcano: 0,
   cave: 0,
+  desert: 0,
+  shadowwood: 0,
+  highlands: 0,
+  scorched: 0,
+  salt: 0,
 };
 
 interface NetworkInformationLike {
@@ -164,9 +192,14 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   marsh: 0.657,
   peaks: 0.631,
   beach: 0.595,
-  desert: 0.631,
   volcano: 0.657,
   cave: 0.657,
+  // reused maps keep their measured sun azimuth
+  desert: 0.595,
+  shadowwood: 0.657,
+  highlands: 0.595,
+  scorched: 0.631,
+  salt: 0.595,
 };
 
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};

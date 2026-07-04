@@ -4,7 +4,7 @@ import type { BiomeId, HeightStamp, WorldContent } from './types';
 
 // Terrain is a pure function of (x, z, seed) for a given active world content:
 // both the sim (ground clamping) and the renderer (mesh) sample the same
-// heightfield, so they always agree. The active content is the built-in 3-zone
+// heightfield, so they always agree. The active content is the built-in
 // world by default (data.ts BUILTIN_WORLD); the editor swaps in a custom map for
 // play-testing via setActiveWorldContent. With the built-in world this file
 // behaves exactly as before (byte-identical heightfield).
@@ -36,9 +36,16 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   // Paint-only biomes (the editor's biome brush): never a zone band in the
   // built-in world, so these rows only shape painted cells on custom maps.
   beach: { hill: 5, base: -2.4, hubHeight: 0.8 },
-  desert: { hill: 15, base: 2.5, hubHeight: 2 },
   volcano: { hill: 42, base: 9, hubHeight: 6 },
   cave: { hill: 9, base: 1, hubHeight: 1 },
+  // Valdris biomes: rolling dunes, twilight forest valleys, fertile-to-alpine
+  // highlands, the cracked war-scarred Breach ring, and a blinding flat pan.
+  // (desert is BOTH the Ossara zone band and a paint id; the zone shape wins.)
+  desert: { hill: 16, base: 2, hubHeight: 3 },
+  shadowwood: { hill: 20, base: 1, hubHeight: 2 },
+  highlands: { hill: 24, base: 4, hubHeight: 5 },
+  scorched: { hill: 15, base: 3, hubHeight: 3.5 },
+  salt: { hill: 5, base: 1, hubHeight: 1.5 },
 };
 
 // Per-active-content derived terrain inputs: the ridge walls between zone bands
@@ -76,7 +83,13 @@ function world(): WorldDerived {
 const RIDGE_HEIGHT = 40;
 const RIDGE_SIGMA = 10; // gaussian width of the wall
 const PASS_HALF_WIDTH = 10; // flat opening around the road
-const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
+// ...rising to full wall by this far from the pass. 28 (was 34): with the
+// full 16-ridge Valdris strip the crest noise can dip at an unlucky
+// (x, ridge) sample, and the wider shoulder left |x|=16 crossings under the
+// wall margin there; the steeper ramp keeps the whole 16..34 shoulder band a
+// real wall on every ridge (tests/terrain_walls.test.ts) while the flat pass
+// corridor (|x| < 10) is untouched.
+const PASS_SHOULDER = 28;
 
 export const MIREFEN_IMPACT_CRATER = {
   x: 149.5,
@@ -243,6 +256,11 @@ export const BIOME_BY_ID: BiomeId[] = [
   'desert',
   'volcano',
   'cave',
+  // Valdris zone biomes, appended so a future brush can paint them too.
+  'shadowwood',
+  'highlands',
+  'scorched',
+  'salt',
 ];
 
 // The painted biome at (x,z), or null if unpainted / no paint layer. Cheap grid
@@ -277,6 +295,10 @@ function shapeAt(x: number, z: number): { hill: number; base: number } {
   let base = BIOME_SHAPE[zones[0].biome].base;
   for (let i = 0; i + 1 < zones.length; i++) {
     const boundary = zones[i].zMax;
+    // Boundaries are ascending: once one is fully north of the blend window,
+    // every later t is 0 too, so stop (identical output; with the full Valdris
+    // strip this loop is 17 zones long and this is a terrain hot path).
+    if (boundary - 30 > z) break;
     const t = smoothstep(boundary - 30, boundary + 35, z);
     const next = BIOME_SHAPE[zones[i + 1].biome];
     hill = lerp(hill, next.hill, t);
@@ -291,13 +313,18 @@ function baseHeight(x: number, z: number, seed: number): number {
   let h =
     (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
-  // Flatten each zone's hub settlement into a plateau
+  // Flatten each zone's hub settlement into a plateau. The cheap |dz| band
+  // check skips zones whose hub cannot influence this sample (identical
+  // output; with the full Valdris strip this loop is 17 zones long and this
+  // function is on the movement/render hot path).
   for (const zone of zones) {
-    const dx = x - zone.hub.x,
-      dz = z - zone.hub.z;
+    const dz = z - zone.hub.z;
+    const hubReach = zone.hub.radius * 1.6;
+    if (dz > hubReach || dz < -hubReach) continue;
+    const dx = x - zone.hub.x;
     const dHub = Math.sqrt(dx * dx + dz * dz);
-    if (dHub < zone.hub.radius * 1.6) {
-      const blend = smoothstep(zone.hub.radius * 0.7, zone.hub.radius * 1.6, dHub);
+    if (dHub < hubReach) {
+      const blend = smoothstep(zone.hub.radius * 0.7, hubReach, dHub);
       h = h * blend + BIOME_SHAPE[zone.biome].hubHeight * (1 - blend);
     }
   }
@@ -307,9 +334,12 @@ function baseHeight(x: number, z: number, seed: number): number {
   // ...except the carved lake basins
   for (const zone of zones) {
     for (const lake of zone.lakes) {
-      const dLake = Math.sqrt((x - lake.x) ** 2 + (z - lake.z) ** 2);
-      if (dLake < lake.radius * 1.6) {
-        const lakeBlend = smoothstep(lake.radius * 0.55, lake.radius * 1.6, dLake);
+      const dzLake = z - lake.z;
+      const lakeReach = lake.radius * 1.6;
+      if (dzLake > lakeReach || dzLake < -lakeReach) continue;
+      const dLake = Math.sqrt((x - lake.x) ** 2 + dzLake * dzLake);
+      if (dLake < lakeReach) {
+        const lakeBlend = smoothstep(lake.radius * 0.55, lakeReach, dLake);
         h = h * lakeBlend + (waterLevel() - 4) * (1 - lakeBlend);
       }
     }
@@ -327,14 +357,18 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const w = world();
   let h = baseHeight(x, z, seed);
 
-  // Flatten each camp a little so mobs don't stand on cliffs
+  // Flatten each camp a little so mobs don't stand on cliffs. The |dz| band
+  // check skips out-of-reach camps before the sqrt (identical output; the
+  // Valdris strip more than doubles the camp count and this is a hot path).
   for (const camp of w.content.camps) {
-    const dx = x - camp.center.x,
-      dz = z - camp.center.z;
+    const dz = z - camp.center.z;
+    const reach = camp.radius * 1.8;
+    if (dz > reach || dz < -reach) continue;
+    const dx = x - camp.center.x;
     const d = Math.sqrt(dx * dx + dz * dz);
-    if (d < camp.radius * 1.8) {
+    if (d < reach) {
       const ch = baseHeight(camp.center.x, camp.center.z, seed);
-      const blend = smoothstep(camp.radius * 0.8, camp.radius * 1.8, d);
+      const blend = smoothstep(camp.radius * 0.8, reach, d);
       h = h * blend + ch * (1 - blend);
     }
   }
@@ -476,6 +510,24 @@ export interface Decoration {
   biome: BiomeId;
 }
 
+// Per-biome decoration density gate + kind mix: below `tree` places a tree,
+// below `tree2` the second tree kind, else a rock; above `gate` nothing.
+// Thresholds for vale/marsh/peaks are the pre-Valdris values exactly; the
+// paint-only rows match the editor brush mixes they replace.
+const DECOR_MIX: Record<BiomeId, { gate: number; tree: number; tree2: number }> = {
+  vale: { gate: 0.48, tree: 0.3, tree2: 0.4 },
+  marsh: { gate: 0.34, tree: 0.08, tree2: 0.26 },
+  peaks: { gate: 0.44, tree: 0.2, tree2: 0.24 },
+  beach: { gate: 0.14, tree: 0.05, tree2: 0.08 },
+  volcano: { gate: 0.2, tree: 0, tree2: 0 },
+  cave: { gate: 0.16, tree: 0, tree2: 0 },
+  desert: { gate: 0.16, tree: 0, tree2: 0 }, // sparse rock outcrops in the dunes
+  shadowwood: { gate: 0.55, tree: 0.34, tree2: 0.48 }, // trees grow too close together
+  highlands: { gate: 0.46, tree: 0.24, tree2: 0.36 },
+  scorched: { gate: 0.22, tree: 0.04, tree2: 0.08 }, // burned snags and rubble
+  salt: { gate: 0.08, tree: 0, tree2: 0 }, // a blinding, nearly empty pan
+};
+
 const DECORATION_EXCLUSION_RADIUS = 1.2;
 const DECORATION_EXCLUSIONS = [{ x: 2.456450840458274, z: 211.33819991815835 }];
 
@@ -505,29 +557,9 @@ export function generateDecorations(seed: number): Decoration[] {
       // zone-band biome exactly (byte-identical built-in world).
       const biome = biomeAt(gx, gz);
       // density gate + kind mix per biome
-      let kind: Decoration['kind'] | null = null;
-      if (biome === 'vale') {
-        if (r > 0.48) continue;
-        kind = r < 0.3 ? 'tree' : r < 0.4 ? 'tree2' : 'rock';
-      } else if (biome === 'marsh') {
-        if (r > 0.34) continue;
-        kind = r < 0.08 ? 'tree' : r < 0.26 ? 'tree2' : 'rock';
-      } else if (biome === 'beach') {
-        if (r > 0.14) continue;
-        kind = r < 0.05 ? 'tree' : r < 0.08 ? 'tree2' : 'rock';
-      } else if (biome === 'desert') {
-        if (r > 0.1) continue;
-        kind = r < 0.025 ? 'tree2' : 'rock';
-      } else if (biome === 'volcano') {
-        if (r > 0.2) continue;
-        kind = 'rock';
-      } else if (biome === 'cave') {
-        if (r > 0.16) continue;
-        kind = 'rock';
-      } else {
-        if (r > 0.44) continue;
-        kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
-      }
+      const mix = DECOR_MIX[biome];
+      if (r > mix.gate) continue;
+      const kind: Decoration['kind'] = r < mix.tree ? 'tree' : r < mix.tree2 ? 'tree2' : 'rock';
       const ox = (hash2(Math.round(gx), Math.round(gz), seed + 57) - 0.5) * step;
       const oz = (hash2(Math.round(gx), Math.round(gz), seed + 91) - 0.5) * step;
       const x = gx + ox,
@@ -564,6 +596,23 @@ export function generateDecorations(seed: number): Decoration[] {
         biome,
       });
     }
+  }
+  // Authored barricade boulders (content props: the sealed-frontier rockslides).
+  // Appended AFTER the procedural field and deliberately exempt from the
+  // road/hub/camp exclusions above, because they sit exactly ON the road passes
+  // they close. Riding this list gives them the same renderer (foliage
+  // instancing) and the same collider (circle, r = 0.7 * scale) as every other
+  // rock: what you see is what you collide with. Deterministic: position and
+  // scale are data; only the mesh variant uses the position hash.
+  for (const b of w.content.props.boulders ?? []) {
+    out.push({
+      kind: 'rock',
+      x: b.x,
+      z: b.z,
+      scale: b.scale,
+      variant: Math.floor(hash2(Math.round(b.x * 7), Math.round(b.z * 7), seed + 77) * 3),
+      biome: biomeAt(b.x, b.z),
+    });
   }
   return out;
 }

@@ -38,6 +38,7 @@ import {
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
+  type PlayerRace,
   type QuestProgress,
   type QuestState,
   type RiteIntensity,
@@ -86,6 +87,8 @@ export interface CharacterSummary {
   class: PlayerClass;
   level: number;
   skin: number;
+  // Playable race; servers predating races omit it (treated as 'human').
+  race?: PlayerRace;
   online: boolean;
   forceRename: boolean;
   lastPlayed?: string | null;
@@ -458,6 +461,8 @@ export class Api {
   }
 
   async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
+    // No race: characters are created UNSWORN and swear their faction and race
+    // in-world at the Envoys' Hall (src/sim/envoys.ts).
     await this.post('/api/characters', { name, class: cls, skin });
   }
 
@@ -1302,6 +1307,9 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        // playable race (players only; pre-race servers omit it -> undefined,
+        // which every consumer treats as Human/Kael)
+        e.race = typeof w.rc === 'string' ? (w.rc as Entity['race']) : undefined;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
@@ -1780,6 +1788,12 @@ export class ClientWorld implements IWorld {
   }
   interact(): void {
     this.cmd({ cmd: 'interact' });
+  }
+  chooseRace(race: string): void {
+    this.cmd({ cmd: 'chooseRace', race });
+  }
+  travel(): void {
+    this.cmd({ cmd: 'travel' });
   }
   lootCorpse(id: number): void {
     this.cmd({ cmd: 'loot', id });

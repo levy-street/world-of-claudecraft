@@ -2505,6 +2505,80 @@
     box-shadow: 0 0 10px var(--class-color);
   }
 
+  /* ---------- Race picker (faction + race, character creation) ---------- */
+  .race-picker {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: var(--spacing-md);
+  }
+  .race-faction[data-faction="kael"] {
+    --faction-color: #e0b34a;
+  }
+  .race-faction[data-faction="veth"] {
+    --faction-color: #60a5fa;
+  }
+  .race-faction[data-faction="ossara"] {
+    --faction-color: #fb923c;
+  }
+  .race-faction-label {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--faction-color);
+    margin-bottom: 4px;
+    text-align: left;
+  }
+  .mini-race-row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .mini-race {
+    text-align: center;
+    padding: 8px 4px;
+    min-height: 40px;
+    border: 2px solid var(--color-border-default);
+    border-radius: 5px;
+    cursor: var(--cursor-point);
+    font-size: 11px;
+    color: var(--color-text-muted);
+    background: #15151f;
+    font-family: var(--font-heading);
+    transition:
+      border-color var(--transition-speed),
+      color var(--transition-speed),
+      box-shadow var(--transition-speed);
+  }
+  .mini-race:hover,
+  .mini-race:focus-visible {
+    border-color: var(--faction-color);
+    color: var(--color-text-light);
+    box-shadow: 0 0 8px var(--color-primary-glow);
+    outline: none;
+  }
+  .mini-race.sel {
+    border-color: var(--faction-color);
+    color: #fff;
+    box-shadow: 0 0 10px var(--faction-color);
+  }
+  /* Racial-trait readout under the race grid: shows the hovered/selected
+     race's passive so the pick is informed without a tooltip on touch. */
+  .race-racial-info {
+    margin-top: 8px;
+    min-height: 2.4em;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--color-text-muted);
+  }
+  @media (max-width: 560px) {
+    .mini-race-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   /* WoW-style full-screen character screens (the offline panel plus the two
      online panels carry the cs-wow class). Desktop only: below 900px the
      classic card layout above stays, and the ONLINE panels additionally keep
@@ -2717,6 +2791,42 @@
       width: 56px;
       height: 56px;
       aspect-ratio: auto;
+    }
+    /* Faction & race picker docks left (the classic race column), mirroring
+       the class summary panel on the right. It takes the left band, so the
+       offline skin swatches move to a centered strip above the class rail. */
+    #offline-select.cs-wow .race-picker {
+      position: absolute;
+      left: 26px;
+      top: 110px;
+      bottom: 140px;
+      width: 300px;
+      overflow-y: auto;
+      background: #0d0d16d9;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      z-index: 2;
+      margin-bottom: 0;
+    }
+    /* The picker heading lives inside the panel: undo the floating name-label
+       anchor that #offline-select.cs-wow .auth-label applies. */
+    #offline-select.cs-wow .race-picker .race-picker-title {
+      position: static;
+      transform: none;
+      display: block;
+      margin-bottom: 10px;
+      text-shadow: 0 1px 4px #000;
+    }
+    #offline-select.cs-wow .mini-race-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    #offline-select.cs-wow .skin-row {
+      left: 50%;
+      top: auto;
+      bottom: 150px;
+      transform: translateX(-50%);
+      flex-direction: row;
     }
     /* Class summary docks on the right, translucent so the stage shows through. */
     #offline-select.cs-wow .class-details-panel,
@@ -4366,7 +4476,7 @@
       width: min(1160px, 96vw) !important;
       max-width: none !important;
       height: min(640px, calc(100vh - 190px));
-      min-height: 520px;
+      min-height: 460px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -4876,6 +4986,29 @@
     padding-top: 0;
     align-items: stretch;
   }
+
+  /* Bound both create screens to the viewport on desktop so the form column
+     scrolls internally (the Faction & Race section made it taller than one
+     screen) and the Create/Enter World actions never fall below the fold. */
+  @media (min-width: 900px) {
+    body:not(.mobile-touch) #charcreate-panel,
+    body:not(.mobile-touch) #offline-select {
+      display: flex;
+      flex-direction: column;
+      height: min(760px, calc(100vh - 270px));
+      min-height: 460px;
+      overflow: hidden;
+    }
+    body:not(.mobile-touch) #charcreate-panel .cs-form-actions,
+    body:not(.mobile-touch) #offline-select .cs-form-actions {
+      /* keep the actions visible while the sections above scroll */
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(10, 10, 15, 0) 0%, rgba(10, 10, 15, 0.96) 30%);
+      padding-top: 14px;
+      margin-top: auto;
+    }
+  }
   .cs-create-col .char-input-group {
     max-width: none;
     width: 100%;
@@ -5202,6 +5335,12 @@
   .inspect-meta {
     font-size: 13px;
     color: var(--color-text-muted);
+  }
+  /* Race passive line under the inspected player's level/race/class. */
+  .inspect-racial {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
   }
   /* $WOC holder-tier flair badge in the inspect/profile window */
   .inspect-holder {

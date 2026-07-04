@@ -219,7 +219,6 @@ export const V07_SLASH = [
   'Invalid roll range. Use /roll, /roll N, or /roll M-N (1-5).',
   'Landmarks in Aki (5): Aki.',
   'Level 5 — Aki/Aki XP (Aki%), Aki to go.',
-  'Level 5 — maximum level reached.',
   'Mana regen is paused — resumes in Akis (you spent mana recently).',
   'Mana regeneration does not apply to your class.',
   'Movement speed: 100% of normal.',

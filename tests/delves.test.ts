@@ -734,7 +734,7 @@ describe('delve interactables and affixes', () => {
     }
     // 200 full Sim constructions: bump the timeout so it stays green under the
     // parallel-worker load of the whole suite (it runs well under this alone).
-  }, 15000);
+  }, 90_000);
 
   it('Deacon Varric enrages on Heroic but not on Normal (PRD §7.4)', () => {
     for (const tier of ['normal', 'heroic'] as const) {
@@ -762,7 +762,7 @@ describe('delve reward chest + surface exit flow', () => {
     enterReliquary(sim);
     const run = sim.delveRunForPlayer(sim.playerId)!;
     // Pin the normal (non-Bountiful) chest so these fixtures aren't at the mercy of
-    // the ultra-rare roll (seed 42 happens to roll Bountiful). The Bountiful-Coffer
+    // the ultra-rare roll (whatever the seed happened to roll). The Bountiful-Coffer
     // tests below opt back in explicitly with `run.bountiful = true`.
     run.bountiful = false;
     // Jump straight to the finale as the only module
@@ -928,7 +928,8 @@ describe('delve reward chest + surface exit flow', () => {
 
   it('the Bountiful roll is deterministic for a given seed', () => {
     // Read the raw roll via enterReliquary (enterFinale pins it false). Same seed
-    // ⇒ same outcome; seed 42 is known to roll Bountiful (drives the fixtures above).
+    // ⇒ same outcome; seed 7 is known to roll Bountiful under the Valdris world
+    // (world-gen consumes more ctor draws, so the old seed-42 roll moved).
     const rollFor = (seed: number) => {
       const s = makeSim('warrior', seed);
       s.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
@@ -936,7 +937,8 @@ describe('delve reward chest + surface exit flow', () => {
       return s.delveRunForPlayer(s.playerId)?.bountiful;
     };
     expect(rollFor(1234)).toBe(rollFor(1234));
-    expect(rollFor(42)).toBe(true);
+    expect(rollFor(42)).toBe(false);
+    expect(rollFor(7)).toBe(true);
   });
 
   it('a Bountiful Coffer refuses the lower antes and only opens at Hard-tier + Premium ante', () => {
@@ -2313,9 +2315,18 @@ describe('The Drowned Litany (Phase 7 heroic affixes)', () => {
       p.pos.x = run.origin.x + h.x;
       p.pos.z = run.origin.z + zBase + h.z;
       p.prevPos = { ...p.pos };
-      const hp0 = p.hp;
-      for (let i = 0; i < 20; i++) sim.tick();
-      return hp0 - p.hp;
+      // Sum only the Blackwater hazard damage: the module's spawned mobs can
+      // reach melee within the window (their approach shifts with the global
+      // rng stream), and a raw hp delta would fold their hits into the ratio.
+      let total = 0;
+      for (let i = 0; i < 20; i++) {
+        for (const ev of sim.tick()) {
+          if (ev.type === 'damage' && ev.ability === 'Blackwater' && ev.targetId === p.id) {
+            total += ev.amount;
+          }
+        }
+      }
+      return total;
     };
     const base = pulse([]);
     const flooded = pulse(['high_water']);

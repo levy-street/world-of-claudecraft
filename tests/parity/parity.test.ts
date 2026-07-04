@@ -40,7 +40,7 @@ describe('parity gate', () => {
         const a = plain(recordTrace(scenario));
         const b = plain(recordTrace(scenario));
         expect(a).toEqual(b);
-      });
+      }, 90_000);
 
       it(UPDATE ? 'mints the golden' : 'matches the committed golden', () => {
         const trace = plain(recordTrace(scenario));

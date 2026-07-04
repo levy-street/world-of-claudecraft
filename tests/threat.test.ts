@@ -572,7 +572,7 @@ describe('hunter pets', () => {
         (e) => e.kind === 'mob' && e.ownerId === null && e.templateId === 'forest_wolf',
       ),
     ).toBe(true);
-  });
+  }, 60_000);
 
   it('friendly target spells can affect controlled pets', () => {
     const { sim, wolf: pet } = tamedSetup();

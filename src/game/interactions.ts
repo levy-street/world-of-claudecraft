@@ -1,3 +1,4 @@
+import { ENVOY_NPC_IDS, FERRY_NPC_IDS } from '../sim/content/valdris/envoys';
 import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
 import { t } from '../ui/i18n';
 import type { IWorld } from '../world_api';
@@ -21,10 +22,17 @@ export interface PickInteractionHud {
   openLoot(mobId: number, screenX: number, screenY: number): void;
   openQuestDialog(npcId: number): void;
   openDelveBoard(npcId: number): void;
+  /** Envoys' Hall: the oath window (unsworn) or quest/ferry routing (sworn). */
+  openEnvoyDialog(npcId: number): void;
+  /** Ferry passage confirm (the sim validates and teleports). */
+  confirmTravel(): void;
   openMailbox(): void;
   showError(text: string): void;
   closeContextMenu(): void;
 }
+
+const ENVOY_IDS: ReadonlySet<string> = new Set(Object.values(ENVOY_NPC_IDS));
+const FERRY_IDS: ReadonlySet<string> = new Set(Object.values(FERRY_NPC_IDS));
 
 export function isAttackHoverTarget(e: Entity | undefined): boolean {
   return hoverCursorKind(e, -1, new Set()) === 'attack';
@@ -140,6 +148,8 @@ export function handlePickedEntity(
           else hud.showError(t('hudChrome.death.spiritHealerAlive'));
         } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
+        else if (ENVOY_IDS.has(e.templateId)) hud.openEnvoyDialog(id);
+        else if (FERRY_IDS.has(e.templateId)) hud.confirmTravel();
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
     } else if ((e.kind === 'mob' && !e.dead && e.hostile) || isActivePvpOpponent(world, e)) {
@@ -168,6 +178,8 @@ export function handlePickedEntity(
       if (d <= INTERACT_RANGE + 2) {
         if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
+        else if (ENVOY_IDS.has(e.templateId)) hud.openEnvoyDialog(id);
+        else if (FERRY_IDS.has(e.templateId)) hud.confirmTravel();
         else hud.openQuestDialog(id);
       }
     }

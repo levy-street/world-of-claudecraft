@@ -31,7 +31,7 @@ import {
   validateAllocation,
 } from '../sim/content/talents';
 import { ABILITIES } from '../sim/data';
-import { MAX_LEVEL, type PlayerClass } from '../sim/types';
+import { ACTIVE_LEVEL_CAP, type PlayerClass } from '../sim/types';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -186,7 +186,7 @@ export class TalentsWindow {
     el.innerHTML =
       `<div class="panel-title"><span>${t('game.talents.title')} <span style="color:${TAL_COLOR.classAccent};font-size:11px">${esc(classDisplayName(cls))}</span></span>${close}</div>` +
       `<div class="tal-head"><span>${t('game.talents.available')}: <b>${view.available}</b> / ${view.total}</span><span>${t('game.talents.spent')}: <b>${view.spent}</b></span></div>` +
-      `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(MAX_LEVEL)))}</div>` +
+      `<div class="tal-help">${esc(t('game.talents.pointSource').replace('{first}', String(FIRST_TALENT_LEVEL)).replace('{cap}', String(ACTIVE_LEVEL_CAP)))}</div>` +
       `<div class="tal-tabs" role="tablist" aria-label="${esc(t('game.talents.title'))}">` +
       `<div class="tal-tab${this.tab === 'class' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'class' ? '0' : '-1'}" aria-selected="${this.tab === 'class'}" aria-controls="tal-body" data-tab="class"><span class="tal-tab-label">${t('game.talents.classTab')}</span><span class="tt-pts">${view.classSpent}</span></div>` +
       `<div class="tal-tab${this.tab === 'spec' ? ' active' : ''}" role="tab" tabindex="${this.tab === 'spec' ? '0' : '-1'}" aria-selected="${this.tab === 'spec'}" aria-controls="tal-body" data-tab="spec"><span class="tal-tab-label">${t('game.talents.specTab')}</span><span class="tt-pts">${view.specSpent}</span></div>` +

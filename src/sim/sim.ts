@@ -105,6 +105,8 @@ import {
   isDelvePos,
   MOBS,
   QUESTS,
+  SEALED_FRONTIER_Z,
+  ZONES,
   zoneAt,
 } from './data';
 import * as companionMod from './delves/companion';
@@ -134,6 +136,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
+import * as envoys from './envoys';
 import { canEquipItem } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
@@ -269,6 +272,7 @@ import * as duelMod from './social/duel';
 // public path `import { Sim, eloDelta } from './sim'` (tests/arena.test.ts) holds.
 export { eloDelta } from './social/arena';
 
+import { isPlayerRace } from './content/races';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
 // by the fiestaMatchInfo presentation accessor (which STAYS on Sim).
@@ -337,6 +341,7 @@ import {
   PARTY_MEMBER_AURA_CAP,
   type PetMode,
   type PlayerClass,
+  type PlayerRace,
   type QuestProgress,
   type QuestState,
   type RiteIntensity,
@@ -351,6 +356,7 @@ import {
   virtualLevel,
   xpToReachLevel,
 } from './types';
+import { warZonePvpHostile } from './war_zone';
 import {
   groundHeight,
   nearSteepWalls,
@@ -686,6 +692,10 @@ export interface PlayerMeta {
   characterId?: number;
   cls: PlayerClass;
   name: string;
+  // Playable race: identity + faction source + cosmetic body scale, never
+  // stats (see content/races.ts). Persisted. Undefined = UNSWORN: no faction
+  // chosen yet at the Envoys' Hall (also how every pre-race save loads).
+  race?: PlayerRace;
   // Dev-only test dummy spawned via "/dev bot <name>" (social/chat.ts, gated by
   // devCommands): a stationary player you can target and whisper to exercise social
   // features offline; a whisper to it auto-replies. Runtime-only, never serialized.
@@ -878,6 +888,8 @@ export interface CharacterState {
   resSickness?: number | null;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
+  // Playable race (JSONB; optional so pre-race saves load as 'human'/Kael).
+  race?: PlayerRace;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
@@ -1340,7 +1352,7 @@ export class Sim {
   addPlayer(
     cls: PlayerClass,
     name: string,
-    opts?: { autoEquip?: boolean; state?: CharacterState; characterId?: number },
+    opts?: { autoEquip?: boolean; state?: CharacterState; characterId?: number; race?: PlayerRace },
   ): number {
     const savedState = opts?.state ? sanitizeRemovedZone1Content(opts.state).state : undefined;
     // Characters saved inside a dungeon instance rejoin at its entrance —
@@ -1357,6 +1369,13 @@ export class Sim {
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
+    } else if (savedPos && savedPos.z >= SEALED_FRONTIER_Z) {
+      // The launch play space ends at the sealed frontier (the level-40 release
+      // barricades). A save stranded past it (dev/test saves only; the band was
+      // never reachable live) reslots to the last open zone's graveyard.
+      const lastOpen = [...ZONES].reverse().find((z) => z.zMax <= SEALED_FRONTIER_Z);
+      const spot = lastOpen?.graveyard ?? lastOpen?.hub ?? { x: 2, z: -2 };
+      savedPos = { x: spot.x, z: spot.z };
     }
     const playerStart = (this.cfg.world ?? getActiveWorldContent()).playerStart;
     const startPos = savedPos
@@ -1375,11 +1394,24 @@ export class Sim {
     const player = createPlayer(this.nextId++, cls, startPos, name);
     this.addEntity(player);
     const classDef = CLASSES[cls];
+    // Saved race wins (it is the character's identity); a creation-time race
+    // (dev/test convenience) applies to new characters only. NO default: a
+    // character without a chosen race is UNSWORN (undefined) until the Envoys'
+    // Hall choice, and every pre-race save loads the same way, so existing
+    // characters get the faction choice instead of a silent Human/Kael.
+    const savedRace = savedState?.race;
+    const optRace = opts?.race;
+    const race: PlayerRace | undefined = isPlayerRace(savedRace)
+      ? savedRace
+      : isPlayerRace(optRace)
+        ? optRace
+        : undefined;
     const meta: PlayerMeta = {
       entityId: player.id,
       characterId: opts?.characterId,
       cls,
       name,
+      race,
       skin: savedState?.skin ?? 0,
       skinCatalog: savedState?.skinCatalog === 'mech' ? 'mech' : 'class',
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
@@ -1435,6 +1467,7 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    player.race = meta.race; // mirrored likewise (identity wire field + race body scale)
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -1749,6 +1782,7 @@ export class Sim {
       cooldowns: serializeCooldowns(e.cooldowns, e.potionCooldownUntil, this.time),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
+      race: meta.race,
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
@@ -1769,6 +1803,22 @@ export class Sim {
       },
     };
     return sanitizeRemovedZone1Content(state).state;
+  }
+
+  /** Set a player's race (meta + entity). Creation-time only: race is the
+   *  character's identity (faction source) and never changes in play; the
+   *  server calls this while building a new character's initial state. The
+   *  cosmetic race body scale lands on the next recalcPlayerStats. */
+  setPlayerRace(pid: number, race: PlayerRace): boolean {
+    const meta = this.players.get(pid);
+    const e = this.entities.get(pid);
+    if (!meta || !e || !isPlayerRace(race)) return false;
+    meta.race = race;
+    e.race = race;
+    // apply the racial passive (and cosmetic scale) immediately, not on the
+    // next incidental recalc
+    recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta));
+    return true;
   }
 
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer
@@ -2391,6 +2441,7 @@ export class Sim {
       resolve: sim.resolve.bind(sim),
       groundPos: sim.groundPos.bind(sim),
       playerMods: sim.playerMods.bind(sim),
+      setPlayerRace: sim.setPlayerRace.bind(sim),
       delveRunForPlayer: sim.delveRunForPlayer.bind(sim),
       delveModuleEntry: sim.delveModuleEntry.bind(sim),
       failDelveRun: sim.failDelveRun.bind(sim),
@@ -5007,6 +5058,17 @@ export class Sim {
     interaction.interact(this.ctx, pid);
   }
 
+  /** The Envoys' Hall oath: swear a faction (via its race) and travel to the
+   *  realm hub. Thin delegate into src/sim/envoys.ts (IWorld + server surface). */
+  chooseRace(race: string, pid?: number): boolean {
+    return envoys.chooseRaceAtEnvoy(this.ctx, race, pid);
+  }
+
+  /** Ferry/Envoy travel between the Landing and the sworn player's realm hub. */
+  travel(pid?: number): boolean {
+    return envoys.travelWithFerry(this.ctx, pid);
+  }
+
   private isQuestInteractionEntity(e: Entity): boolean {
     if (e.kind === 'npc') return true;
     return e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0;
@@ -5189,12 +5251,17 @@ export class Sim {
       )
         return true;
       const match = this.arenaMatches.get(attackerPlayer.id);
-      return (
-        !!match &&
+      if (
+        match &&
         match.state === 'active' &&
         !match.defeated.has(attackerPlayer.id) &&
         this.isArenaCrossTeam(match, attackerPlayer.id, target.id)
-      );
+      )
+        return true;
+      // The Breach, eternal war zone: cross-faction players are hostile while
+      // both stand in the open band (src/sim/war_zone.ts). Everywhere else in
+      // the open world players stay non-hostile exactly as before.
+      return warZonePvpHostile(attackerPlayer, target);
     }
     return false;
   }

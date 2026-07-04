@@ -51,6 +51,24 @@ export function shouldResetMusicForDungeonEntry(
   return nextDungeonId !== null && previousDungeonId !== nextDungeonId;
 }
 
+// The Valdris biomes reuse the closest composed theme until they get their
+// own: sunny vale for desert/highlands/salt, the marsh theme for the twilight
+// shadowwood, the peaks theme for the war-scarred scorched ring.
+const BIOME_THEME: Record<BiomeId, MusicZone> = {
+  vale: 'vale',
+  marsh: 'marsh',
+  peaks: 'peaks',
+  // paint-only biomes (custom maps) borrow the closest shipped theme
+  beach: 'vale',
+  volcano: 'peaks',
+  cave: 'marsh',
+  desert: 'vale',
+  shadowwood: 'marsh',
+  highlands: 'vale',
+  scorched: 'peaks',
+  salt: 'vale',
+};
+
 /** Pick the soundtrack layer from world position context. */
 export function musicZoneForLocation(
   zoneId: string,
@@ -59,18 +77,9 @@ export function musicZoneForLocation(
   inDungeon: boolean,
   dungeonId: string | null = null,
 ): MusicZone {
-  // Paint-only biomes (custom maps) borrow the closest shipped theme.
-  const biomeMusic: MusicZone =
-    biome === 'vale' || biome === 'marsh' || biome === 'peaks'
-      ? biome
-      : biome === 'beach'
-        ? 'vale'
-        : biome === 'cave'
-          ? 'marsh'
-          : 'peaks';
   if (inDungeon) return dungeonId ? dungeonMusicZoneForDungeon(dungeonId) : 'dungeon_hollow_crypt';
-  if (inHub) return TOWN_MUSIC[zoneId] ?? biomeMusic;
-  return ZONE_MUSIC[zoneId] ?? biomeMusic;
+  if (inHub) return TOWN_MUSIC[zoneId] ?? BIOME_THEME[biome];
+  return ZONE_MUSIC[zoneId] ?? BIOME_THEME[biome];
 }
 
 type Inst =

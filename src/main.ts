@@ -107,6 +107,7 @@ import {
   INTERACT_RANGE,
   MELEE_RANGE,
   type PlayerClass,
+  type PlayerRace,
   RUN_SPEED,
   type WorldContent,
 } from './sim/types';
@@ -176,6 +177,7 @@ import {
   setStandingProvider,
 } from './ui/player_card_share';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
+import { raceDisplayName, racialTraitDesc, racialTraitName } from './ui/race_display';
 import { tServer } from './ui/server_i18n';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { type PresetId, type ThemeKnob, ThemeStore } from './ui/theme';
@@ -2896,12 +2898,15 @@ function updatePreviewContainer(panelId: string): void {
     // The selected roster row drives the showcase (class + that character's chroma).
     const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
     const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
+    characterPreview.setRace((row?.dataset.race as PlayerRace | undefined) ?? null);
     characterPreview.setClass(cls);
     characterPreview.setSkin(Number(row?.dataset.skin ?? 0) || 0);
     syncPreviewAfterPanelLayout();
     return;
   }
 
+  // creation panels: the turntable previews the picked race's aspect too
+  characterPreview.setRace(null); // race is sworn in-world at the Envoys' Hall
   const selSelector =
     panelId === '#charcreate-panel'
       ? '#charcreate-panel .mini-class.sel'
@@ -3929,6 +3934,7 @@ async function refreshCharacters(): Promise<void> {
       row.setAttribute('aria-selected', 'false');
       row.dataset.class = c.class;
       row.dataset.skin = String(c.skin ?? 0);
+      if (c.race) row.dataset.race = c.race;
       const className = classDisplayName(c.class);
       // Online characters explain themselves on their own hint line (below the
       // class) instead of the terse "(in world)" suffix, so the reason for the
@@ -3940,7 +3946,15 @@ async function refreshCharacters(): Promise<void> {
       row.innerHTML = `${portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm' })}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>
-          <span class="char-sub">${escapeHtml(t('character.levelClass', { level: c.level, className }))}${escapeHtml(statusText)}</span>
+          <span class="char-sub">${escapeHtml(
+            c.race
+              ? t('races.levelRaceClass', {
+                  level: c.level,
+                  race: raceDisplayName(c.race),
+                  className,
+                })
+              : t('itemUi.equipment.levelClass', { level: c.level, className }),
+          )}${escapeHtml(statusText)}</span>
           ${inWorldHint}
         </div>
         ${

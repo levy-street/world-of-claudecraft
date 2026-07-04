@@ -337,7 +337,10 @@ describe('Nythraxis raid encounter', () => {
     boss.aiState = 'attack';
     boss.swingTimer = 0;
     const hp = tank.hp;
-    sim.tick();
+    // The encounter script may open on a scripted cast (rng-scheduled), during
+    // which swings pause, and any single swing can miss/dodge. "Keeps
+    // autoattacking" means a melee hit lands within a full mechanic window.
+    for (let i = 0; i < 200 && tank.hp === hp; i++) sim.tick();
     expect(tank.hp).toBeLessThan(hp);
   });
 

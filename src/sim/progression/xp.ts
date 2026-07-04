@@ -4,10 +4,11 @@
 // (`updateRested` / `isResting`), MOVED verbatim out of sim.ts behind SimContext
 // (move + import, not a rewrite). The XP curve formulas (xpForLevel / canPrestige)
 // stay pure in ../types and are imported here.
+import { RACES } from '../content/races';
 import { PROPS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { canPrestige, DT, type Entity, MAX_LEVEL, xpForLevel } from '../types';
+import { ACTIVE_LEVEL_CAP, canPrestige, DT, type Entity, xpForLevel } from '../types';
 
 // Rested-XP tuning. Consumed only by updateRested / isResting below.
 const RESTED_SECONDS_PER_GAME_HOUR = 60; // 1 in-game hour = 60 sim seconds
@@ -42,7 +43,7 @@ export function isResting(p: Entity): boolean {
 // XP-to-level per 8 in-game hours, clamped to 1.5 levels. Deterministic —
 // paced off DT, never wall-clock. No accrual at the cap (no level bar).
 export function updateRested(p: Entity, meta: PlayerMeta): void {
-  if (p.level >= MAX_LEVEL) return;
+  if (p.level >= ACTIVE_LEVEL_CAP) return;
   const cap = RESTED_CAP_LEVELS * xpForLevel(p.level);
   if (meta.restedXp >= cap) {
     meta.restedXp = cap;
@@ -50,7 +51,10 @@ export function updateRested(p: Entity, meta: PlayerMeta): void {
   }
   if (!isResting(p)) return;
   const fillSeconds = RESTED_FILL_HOURS * RESTED_SECONDS_PER_GAME_HOUR;
-  const perSecond = (RESTED_FILL_FRACTION * xpForLevel(p.level)) / fillSeconds;
+  // Racial: humans (Promise of the Landing) accrue rested XP faster. Rate-only
+  // and rng-free, so it never touches combat parity for pre-race saves.
+  const racialRate = 1 + (p.race ? (RACES[p.race].racial.restedRatePct ?? 0) : 0);
+  const perSecond = ((RESTED_FILL_FRACTION * xpForLevel(p.level)) / fillSeconds) * racialRate;
   meta.restedXp = Math.min(cap, meta.restedXp + perSecond * DT);
 }
 

@@ -42,7 +42,8 @@ per line via `node:readline`). Not a socket / WS / HTTP. The Python client in
 - **reward** = weighted sum of counter deltas (xp, damageDealt/Taken, kills,
   deaths, quests, levelUps) + `timePenalty`; weights in `DEFAULT_CONFIG.rewards`,
   overridable per-reset via `config.rewards`.
-- **terminated** = `terminateOnDeath && died`, or `level >= MAX_LEVEL`.
+- **terminated** = `terminateOnDeath && died`, or `level >= ACTIVE_LEVEL_CAP` (the
+  release's active leveling ceiling; `info.max_level` reports the same value).
   **truncated** = `maxSteps` reached (default 8000). `info` = level/xp/hp/kills/etc.
 
 ## Run

@@ -25,9 +25,13 @@ const MOTE_TINT: Record<BiomeId, number> = {
   marsh: 0xb8d28a,
   peaks: 0xdce8f2,
   beach: 0xf6e8b0,
-  desert: 0xecd9a0,
   volcano: 0xe8a070,
   cave: 0xa8c4b8,
+  desert: 0xf0dca0, // sun-struck dust
+  shadowwood: 0x9fb8d8, // pale wisp glimmers in the twilight
+  highlands: 0xf4e6a0,
+  scorched: 0xe8a26a, // drifting embers
+  salt: 0xf2efe0, // salt glitter
 };
 
 const RADIUS = 26; // motes live within this ring of the player
