@@ -6299,6 +6299,258 @@ export const zh_CN: EnTranslations = {
       "silverleaf_sickle": {
         "name": "银叶镰刀"
       },
+      "forged_levy_papers": {
+        "name": "伪造的征募文书"
+      },
+      "amnesty_petition": {
+        "name": "未归档的特赦请愿书"
+      },
+      "fort_pattern_kettle": {
+        "name": "要塞制式水壶"
+      },
+      "garnished_pay_pouch": {
+        "name": "被扣押的饷银袋"
+      },
+      "fault_line_core": {
+        "name": "断层核心"
+      },
+      "unstamped_duel_permit": {
+        "name": "未盖印的决斗许可证"
+      },
+      "rimeclaw_tallow": {
+        "name": "霜爪兽油脂"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "霜爪兽髓骨"
+      },
+      "oathguard_plate_scrap": {
+        "name": "誓卫板甲残片"
+      },
+      "ninth_muster_roll": {
+        "name": "抢救回的点名册"
+      },
+      "icehowler_haunch": {
+        "name": "冰嚎兽后腿肉"
+      },
+      "rimebound_core_ice": {
+        "name": "缚霜核心冰"
+      },
+      "glacial_quench_ice": {
+        "name": "冰川淬火冰"
+      },
+      "maren_calling_card": {
+        "name": "马伦家族名帖"
+      },
+      "maldreks_route_ledger": {
+        "name": "玛尔德雷克的路线账簿"
+      },
+      "grulks_iron_strongbox": {
+        "name": "格鲁尔克的铁保险箱"
+      },
+      "maren_duelling_mantle": {
+        "name": "马伦决斗披风"
+      },
+      "final_notice_wraps": {
+        "name": "最后通牒裹布"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "饷银典狱官护肩"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "霜井工头便帽"
+      },
+      "quarter_close_vestments": {
+        "name": "季末结算法衣"
+      },
+      "assessors_lead_greaves": {
+        "name": "估税官铅护胫"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "钱袋典狱官钱币腰带"
+      },
+      "mothwing_dust": {
+        "name": "蛾翼之尘"
+      },
+      "silt_eel": {
+        "name": "淤泥鳗"
+      },
+      "barge_chit": {
+        "name": "泡胀的驳船筹码"
+      },
+      "ferry_lantern_mote": {
+        "name": "渡船灯芒"
+      },
+      "smugglers_tally_knot": {
+        "name": "走私者的计数绳结"
+      },
+      "forged_weir_pass": {
+        "name": "伪造的堰坝通行证"
+      },
+      "sunken_ration_tin": {
+        "name": "沉没的口粮罐"
+      },
+      "hollow_toll_scrip": {
+        "name": "空头过路凭单"
+      },
+      "rimeclaw_haunch": {
+        "name": "霜爪兽后腿肉"
+      },
+      "rimebound_fetish": {
+        "name": "缚霜物神"
+      },
+      "frostpine_tallow": {
+        "name": "霜松油脂"
+      },
+      "forsworn_oath_knife": {
+        "name": "背誓者誓言之刃"
+      },
+      "shadowbound_cipher": {
+        "name": "缚影密文"
+      },
+      "vessiks_little_book": {
+        "name": "维西克的小册子"
+      },
+      "weirwatch_wraps": {
+        "name": "堰坝哨卫裹布"
+      },
+      "lodgewalk_boots": {
+        "name": "旅栈长靴"
+      },
+      "unbroken_wardstone": {
+        "name": "完好的守护石"
+      },
+      "vault_ward_core": {
+        "name": "地窖守护核心"
+      },
+      "temple_offering_bowl": {
+        "name": "神庙供碗"
+      },
+      "graven_name_stone": {
+        "name": "铭名石"
+      },
+      "stalker_haunch": {
+        "name": "潜猎者后腿肉"
+      },
+      "heretic_creed_page": {
+        "name": "烧焦的信条书页"
+      },
+      "heretic_brand_iron": {
+        "name": "异端烙铁"
+      },
+      "heretic_writ": {
+        "name": "异端判书"
+      },
+      "first_court_sigil": {
+        "name": "第一法庭印记"
+      },
+      "duneglass_heart": {
+        "name": "沙玻璃之心"
+      },
+      "unshattered_fulgurite": {
+        "name": "完整的闪电熔岩"
+      },
+      "flameseer_ash_creed": {
+        "name": "灰烬信条石板"
+      },
+      "flameseer_ember_phial": {
+        "name": "余烬小瓶"
+      },
+      "dawnward_censer": {
+        "name": "晨卫香炉"
+      },
+      "stolen_water_cask": {
+        "name": "封印的水桶"
+      },
+      "duskwater_oathmark": {
+        "name": "暮水誓印"
+      },
+      "caravan_toll_tally": {
+        "name": "封印的通行税筹"
+      },
+      "tyrant_spoor": {
+        "name": "暴君足迹铸模"
+      },
+      "oxbone_toll": {
+        "name": "牛骨税筹"
+      },
+      "cartographers_map": {
+        "name": "第一制图师的地图"
+      },
+      "templestone_shard": {
+        "name": "庙石碎片"
+      },
+      "fulgurite_splinter": {
+        "name": "闪电熔岩碎屑"
+      },
+      "charred_censer_chain": {
+        "name": "烧焦的香炉链"
+      },
+      "wardens_stone_heart": {
+        "name": "阿什克拉特的石心"
+      },
+      "first_meridian_compass": {
+        "name": "第一子午线罗盘"
+      },
+      "seatstone_flatbread": {
+        "name": "座石薄饼"
+      },
+      "seatwell_waterskin": {
+        "name": "座井水囊"
+      },
+      "lastwater_jerky": {
+        "name": "末水镇肉干"
+      },
+      "lastwater_skin": {
+        "name": "末水镇水囊"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "地窖看守人手甲"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "萨尔的苦修护腿"
+      },
+      "wardens_granite_edge": {
+        "name": "看守人的花岗岩之刃"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "沉没法庭之杖"
+      },
+      "duneglass_shiv": {
+        "name": "沙玻璃刺刀"
+      },
+      "lastwater_roadmail": {
+        "name": "末水镇行路锁甲"
+      },
+      "duskwatch_robe": {
+        "name": "暮色守望长袍"
+      },
+      "raiders_dust_jerkin": {
+        "name": "掠夺者的风尘皮甲"
+      },
+      "ashkerat_greaves": {
+        "name": "阿什克拉特的胫甲"
+      },
+      "cartographers_windwraps": {
+        "name": "制图师的御风裹布"
+      },
+      "unlit_silk_gland": {
+        "name": "无光丝腺"
+      },
+      "veskals_fang": {
+        "name": "维斯卡尔之牙"
+      },
+      "broodmother_carapace_guard": {
+        "name": "母巢甲壳护胸"
+      },
+      "condensed_mist_heart": {
+        "name": "凝结的雾之心"
+      },
+      "mistfathers_knot": {
+        "name": "雾父之结"
+      },
+      "fogwalker_treads": {
+        "name": "行雾者之靴"
+      },
       "bristleback_maul": {
         "name": "硬鬃重槌"
       },
@@ -8776,7 +9028,7 @@ export const zh_CN: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "Hold the Palisade",
         "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
         "objectives": {
           "0": {
             "label": "Waves repelled beside Warden Ilyen"
@@ -8796,7 +9048,7 @@ export const zh_CN: EnTranslations = {
       "q_the_mistfather": {
         "title": "What the Fog Wants",
         "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
         "objectives": {
           "0": {
             "label": "Ghorvul slain"
@@ -9717,7 +9969,7 @@ export const zh_CN: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "Report to Ledgerwatch",
         "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Castellan Odric"
@@ -9825,7 +10077,7 @@ export const zh_CN: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "Report to Rimeshaft",
         "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Foreman Ulla"

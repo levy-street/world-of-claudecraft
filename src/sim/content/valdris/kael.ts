@@ -1542,7 +1542,7 @@ export const KAEL_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'castellan_odric',
     text: 'Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, $N. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.',
     completionText:
-      'The Marshal sends one $C and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.',
+      'The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, $N.',
     objectives: [
       {
         type: 'interact',
@@ -1761,7 +1761,7 @@ export const KAEL_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'foreman_ulla',
     text: 'The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, $N. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.',
     completionText:
-      'Ledgerwatch sends a $C who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, $N.',
+      'Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, $N.',
     objectives: [
       { type: 'interact', targetNpcId: 'foreman_ulla', count: 1, label: 'Report to Foreman Ulla' },
     ],

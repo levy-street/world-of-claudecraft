@@ -6299,6 +6299,258 @@ export const ko_KR: EnTranslations = {
       "silverleaf_sickle": {
         "name": "은엽 낫"
       },
+      "forged_levy_papers": {
+        "name": "위조된 징집 서류"
+      },
+      "amnesty_petition": {
+        "name": "미접수 사면 청원서"
+      },
+      "fort_pattern_kettle": {
+        "name": "요새 규격 주전자"
+      },
+      "garnished_pay_pouch": {
+        "name": "압류된 급여 주머니"
+      },
+      "fault_line_core": {
+        "name": "단층 핵"
+      },
+      "unstamped_duel_permit": {
+        "name": "날인 없는 결투 허가증"
+      },
+      "rimeclaw_tallow": {
+        "name": "서리발톱 수지"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "서리발톱 골수뼈"
+      },
+      "oathguard_plate_scrap": {
+        "name": "서약수호대 판금 조각"
+      },
+      "ninth_muster_roll": {
+        "name": "회수한 소집 명부"
+      },
+      "icehowler_haunch": {
+        "name": "얼음울음꾼 뒷다리살"
+      },
+      "rimebound_core_ice": {
+        "name": "서리결속 핵빙"
+      },
+      "glacial_quench_ice": {
+        "name": "빙하 담금질 얼음"
+      },
+      "maren_calling_card": {
+        "name": "마렌 가문 방문패"
+      },
+      "maldreks_route_ledger": {
+        "name": "말드렉의 경로 장부"
+      },
+      "grulks_iron_strongbox": {
+        "name": "그룰크의 무쇠 금고"
+      },
+      "maren_duelling_mantle": {
+        "name": "마렌 결투 망토"
+      },
+      "final_notice_wraps": {
+        "name": "최후 통첩 손싸개"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "급여 감독관의 어깨보호구"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "라임샤프트 십장의 모자"
+      },
+      "quarter_close_vestments": {
+        "name": "분기 결산 예복"
+      },
+      "assessors_lead_greaves": {
+        "name": "사정관의 납 다리보호구"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "돈주머니 감독관의 동전 허리띠"
+      },
+      "mothwing_dust": {
+        "name": "나방날개 가루"
+      },
+      "silt_eel": {
+        "name": "침니 뱀장어"
+      },
+      "barge_chit": {
+        "name": "물에 분 바지선 표"
+      },
+      "ferry_lantern_mote": {
+        "name": "나룻배 등불 티끌"
+      },
+      "smugglers_tally_knot": {
+        "name": "밀수꾼의 계산 매듭"
+      },
+      "forged_weir_pass": {
+        "name": "위조된 보 통행증"
+      },
+      "sunken_ration_tin": {
+        "name": "가라앉은 배급 깡통"
+      },
+      "hollow_toll_scrip": {
+        "name": "부도난 통행세 어음"
+      },
+      "rimeclaw_haunch": {
+        "name": "서리발톱 뒷다리살"
+      },
+      "rimebound_fetish": {
+        "name": "서리결속 주물"
+      },
+      "frostpine_tallow": {
+        "name": "서리소나무 수지"
+      },
+      "forsworn_oath_knife": {
+        "name": "맹세를 저버린 자의 서약 칼"
+      },
+      "shadowbound_cipher": {
+        "name": "그림자결속 암호문"
+      },
+      "vessiks_little_book": {
+        "name": "베시크의 작은 책"
+      },
+      "weirwatch_wraps": {
+        "name": "보 감시대 손싸개"
+      },
+      "lodgewalk_boots": {
+        "name": "산장길 장화"
+      },
+      "unbroken_wardstone": {
+        "name": "온전한 수호석"
+      },
+      "vault_ward_core": {
+        "name": "금고 수호핵"
+      },
+      "temple_offering_bowl": {
+        "name": "신전 봉헌 그릇"
+      },
+      "graven_name_stone": {
+        "name": "이름 새긴 돌"
+      },
+      "stalker_haunch": {
+        "name": "잠복자 뒷다리살"
+      },
+      "heretic_creed_page": {
+        "name": "불탄 신조 낱장"
+      },
+      "heretic_brand_iron": {
+        "name": "이단자 낙인 인두"
+      },
+      "heretic_writ": {
+        "name": "이단 판결문"
+      },
+      "first_court_sigil": {
+        "name": "제1법정 인장"
+      },
+      "duneglass_heart": {
+        "name": "사구유리 심장"
+      },
+      "unshattered_fulgurite": {
+        "name": "온전한 섬전암"
+      },
+      "flameseer_ash_creed": {
+        "name": "재의 신조 석판"
+      },
+      "flameseer_ember_phial": {
+        "name": "불씨 약병"
+      },
+      "dawnward_censer": {
+        "name": "새벽 감시 향로"
+      },
+      "stolen_water_cask": {
+        "name": "봉인된 물통"
+      },
+      "duskwater_oathmark": {
+        "name": "황혼수 서약 표식"
+      },
+      "caravan_toll_tally": {
+        "name": "봉인된 통행세 부신"
+      },
+      "tyrant_spoor": {
+        "name": "폭군 발자국 주형"
+      },
+      "oxbone_toll": {
+        "name": "소뼈 통행세 부신"
+      },
+      "cartographers_map": {
+        "name": "첫 지도제작자의 지도"
+      },
+      "templestone_shard": {
+        "name": "신전석 조각"
+      },
+      "fulgurite_splinter": {
+        "name": "섬전암 파편"
+      },
+      "charred_censer_chain": {
+        "name": "그을린 향로 사슬"
+      },
+      "wardens_stone_heart": {
+        "name": "아쉬케라트의 돌심장"
+      },
+      "first_meridian_compass": {
+        "name": "제1자오선 나침반"
+      },
+      "seatstone_flatbread": {
+        "name": "좌석돌 납작빵"
+      },
+      "seatwell_waterskin": {
+        "name": "좌석우물 물주머니"
+      },
+      "lastwater_jerky": {
+        "name": "라스트워터 육포"
+      },
+      "lastwater_skin": {
+        "name": "라스트워터 물주머니"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "금고지기의 손싸개"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "사르의 고행 다리옷"
+      },
+      "wardens_granite_edge": {
+        "name": "감시자의 화강암 칼날"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "가라앉은 법정의 지팡이"
+      },
+      "duneglass_shiv": {
+        "name": "사구유리 단도"
+      },
+      "lastwater_roadmail": {
+        "name": "라스트워터 여행 사슬갑옷"
+      },
+      "duskwatch_robe": {
+        "name": "황혼 감시 로브"
+      },
+      "raiders_dust_jerkin": {
+        "name": "약탈자의 흙먼지 가죽옷"
+      },
+      "ashkerat_greaves": {
+        "name": "아쉬케라트의 다리보호구"
+      },
+      "cartographers_windwraps": {
+        "name": "지도제작자의 바람 손싸개"
+      },
+      "unlit_silk_gland": {
+        "name": "빛없는 명주샘"
+      },
+      "veskals_fang": {
+        "name": "베스칼의 송곳니"
+      },
+      "broodmother_carapace_guard": {
+        "name": "수렁어미 갑각 가슴막이"
+      },
+      "condensed_mist_heart": {
+        "name": "응축된 안개 심장"
+      },
+      "mistfathers_knot": {
+        "name": "안개아버지의 매듭"
+      },
+      "fogwalker_treads": {
+        "name": "안개걷는 자의 발걸음"
+      },
       "bristleback_maul": {
         "name": "뻣센등뼈 철퇴"
       },
@@ -8776,7 +9028,7 @@ export const ko_KR: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "Hold the Palisade",
         "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
         "objectives": {
           "0": {
             "label": "Waves repelled beside Warden Ilyen"
@@ -8796,7 +9048,7 @@ export const ko_KR: EnTranslations = {
       "q_the_mistfather": {
         "title": "What the Fog Wants",
         "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
         "objectives": {
           "0": {
             "label": "Ghorvul slain"
@@ -9717,7 +9969,7 @@ export const ko_KR: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "Report to Ledgerwatch",
         "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Castellan Odric"
@@ -9825,7 +10077,7 @@ export const ko_KR: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "Report to Rimeshaft",
         "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Foreman Ulla"

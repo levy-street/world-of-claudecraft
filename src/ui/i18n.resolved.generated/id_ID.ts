@@ -6299,6 +6299,258 @@ export const id_ID: EnTranslations = {
       "silverleaf_sickle": {
         "name": "Sabit Daun Perak"
       },
+      "forged_levy_papers": {
+        "name": "Forged Levy Papers"
+      },
+      "amnesty_petition": {
+        "name": "Unfiled Amnesty Petition"
+      },
+      "fort_pattern_kettle": {
+        "name": "Fort-Pattern Kettle"
+      },
+      "garnished_pay_pouch": {
+        "name": "Garnished Pay Pouch"
+      },
+      "fault_line_core": {
+        "name": "Fault Line Core"
+      },
+      "unstamped_duel_permit": {
+        "name": "Unstamped Duelling Permit"
+      },
+      "rimeclaw_tallow": {
+        "name": "Rimeclaw Tallow"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "Rimeclaw Marrowbone"
+      },
+      "oathguard_plate_scrap": {
+        "name": "Oathguard Plate Scrap"
+      },
+      "ninth_muster_roll": {
+        "name": "Salvaged Muster Roll"
+      },
+      "icehowler_haunch": {
+        "name": "Icehowler Haunch"
+      },
+      "rimebound_core_ice": {
+        "name": "Rimebound Core Ice"
+      },
+      "glacial_quench_ice": {
+        "name": "Glacial Quench Ice"
+      },
+      "maren_calling_card": {
+        "name": "House Maren Calling Card"
+      },
+      "maldreks_route_ledger": {
+        "name": "Maldrek's Route Ledger"
+      },
+      "grulks_iron_strongbox": {
+        "name": "Grulk's Iron Strongbox"
+      },
+      "maren_duelling_mantle": {
+        "name": "Maren Duelling Mantle"
+      },
+      "final_notice_wraps": {
+        "name": "Final Notice Wraps"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "Pay Warden's Shoulderguards"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "Rimeshaft Foreman's Cap"
+      },
+      "quarter_close_vestments": {
+        "name": "Quarter-Close Vestments"
+      },
+      "assessors_lead_greaves": {
+        "name": "Assessor's Lead Greaves"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "Purse-Warden's Coinbelt"
+      },
+      "mothwing_dust": {
+        "name": "Mothwing Dust"
+      },
+      "silt_eel": {
+        "name": "Silt Eel"
+      },
+      "barge_chit": {
+        "name": "Waterlogged Barge Chit"
+      },
+      "ferry_lantern_mote": {
+        "name": "Ferry Lantern Mote"
+      },
+      "smugglers_tally_knot": {
+        "name": "Smuggler's Tally Knot"
+      },
+      "forged_weir_pass": {
+        "name": "Forged Weir Pass"
+      },
+      "sunken_ration_tin": {
+        "name": "Sunken Ration Tin"
+      },
+      "hollow_toll_scrip": {
+        "name": "Hollow Toll Scrip"
+      },
+      "rimeclaw_haunch": {
+        "name": "Rimeclaw Haunch"
+      },
+      "rimebound_fetish": {
+        "name": "Rimebound Fetish"
+      },
+      "frostpine_tallow": {
+        "name": "Frostpine Tallow"
+      },
+      "forsworn_oath_knife": {
+        "name": "Forsworn Oath Knife"
+      },
+      "shadowbound_cipher": {
+        "name": "Shadowbound Cipher"
+      },
+      "vessiks_little_book": {
+        "name": "Vessik's Little Book"
+      },
+      "weirwatch_wraps": {
+        "name": "Weirwatch Wraps"
+      },
+      "lodgewalk_boots": {
+        "name": "Lodgewalk Boots"
+      },
+      "unbroken_wardstone": {
+        "name": "Unbroken Wardstone"
+      },
+      "vault_ward_core": {
+        "name": "Vault Ward-Core"
+      },
+      "temple_offering_bowl": {
+        "name": "Temple Offering Bowl"
+      },
+      "graven_name_stone": {
+        "name": "Graven Name-Stone"
+      },
+      "stalker_haunch": {
+        "name": "Stalker Haunch"
+      },
+      "heretic_creed_page": {
+        "name": "Burned Creed Page"
+      },
+      "heretic_brand_iron": {
+        "name": "Heretic Brand-Iron"
+      },
+      "heretic_writ": {
+        "name": "Heretic Writ"
+      },
+      "first_court_sigil": {
+        "name": "First Court Sigil"
+      },
+      "duneglass_heart": {
+        "name": "Duneglass Heart"
+      },
+      "unshattered_fulgurite": {
+        "name": "Unshattered Fulgurite"
+      },
+      "flameseer_ash_creed": {
+        "name": "Ash Creed Tablet"
+      },
+      "flameseer_ember_phial": {
+        "name": "Ember Phial"
+      },
+      "dawnward_censer": {
+        "name": "Dawnward Censer"
+      },
+      "stolen_water_cask": {
+        "name": "Sealed Water Cask"
+      },
+      "duskwater_oathmark": {
+        "name": "Duskwater Oathmark"
+      },
+      "caravan_toll_tally": {
+        "name": "Sealed Toll Tally"
+      },
+      "tyrant_spoor": {
+        "name": "Tyrant Spoor-Casting"
+      },
+      "oxbone_toll": {
+        "name": "Oxbone Toll-Tally"
+      },
+      "cartographers_map": {
+        "name": "The First Cartographer's Map"
+      },
+      "templestone_shard": {
+        "name": "Templestone Shard"
+      },
+      "fulgurite_splinter": {
+        "name": "Fulgurite Splinter"
+      },
+      "charred_censer_chain": {
+        "name": "Charred Censer Chain"
+      },
+      "wardens_stone_heart": {
+        "name": "Ashkerat's Stone Heart"
+      },
+      "first_meridian_compass": {
+        "name": "First Meridian Compass"
+      },
+      "seatstone_flatbread": {
+        "name": "Seatstone Flatbread"
+      },
+      "seatwell_waterskin": {
+        "name": "Seatwell Waterskin"
+      },
+      "lastwater_jerky": {
+        "name": "Last Water Jerky"
+      },
+      "lastwater_skin": {
+        "name": "Last Water Skin"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "Vaultkeeper's Handwraps"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "Sahr's Penitent Leggings"
+      },
+      "wardens_granite_edge": {
+        "name": "Warden's Granite Edge"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "Staff of the Sunken Court"
+      },
+      "duneglass_shiv": {
+        "name": "Duneglass Shiv"
+      },
+      "lastwater_roadmail": {
+        "name": "Last Water Roadmail"
+      },
+      "duskwatch_robe": {
+        "name": "Duskwatch Robe"
+      },
+      "raiders_dust_jerkin": {
+        "name": "Raider's Dust Jerkin"
+      },
+      "ashkerat_greaves": {
+        "name": "Ashkerat's Greaves"
+      },
+      "cartographers_windwraps": {
+        "name": "Cartographer's Windwraps"
+      },
+      "unlit_silk_gland": {
+        "name": "Unlit Silk Gland"
+      },
+      "veskals_fang": {
+        "name": "Veskal's Fang"
+      },
+      "broodmother_carapace_guard": {
+        "name": "Broodmother Carapace Guard"
+      },
+      "condensed_mist_heart": {
+        "name": "Condensed Mist Heart"
+      },
+      "mistfathers_knot": {
+        "name": "The Mistfather's Knot"
+      },
+      "fogwalker_treads": {
+        "name": "Fogwalker Treads"
+      },
       "bristleback_maul": {
         "name": "Cabikan Punggung Berbulu"
       },
@@ -8776,7 +9028,7 @@ export const id_ID: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "Hold the Palisade",
         "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
         "objectives": {
           "0": {
             "label": "Waves repelled beside Warden Ilyen"
@@ -8796,7 +9048,7 @@ export const id_ID: EnTranslations = {
       "q_the_mistfather": {
         "title": "What the Fog Wants",
         "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
         "objectives": {
           "0": {
             "label": "Ghorvul slain"
@@ -9717,7 +9969,7 @@ export const id_ID: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "Report to Ledgerwatch",
         "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Castellan Odric"
@@ -9825,7 +10077,7 @@ export const id_ID: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "Report to Rimeshaft",
         "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Foreman Ulla"

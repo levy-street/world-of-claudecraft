@@ -1196,7 +1196,7 @@ export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'lanternkeeper_ketta',
     text: 'The fog took two stilt-walkers this week and gave back their lanterns, polished, $N. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.',
     completionText:
-      'The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, $C.',
+      'The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, $N.',
     objectives: [
       { type: 'kill', targetMobId: 'mistfather_ghorvul', count: 1, label: 'Ghorvul slain' },
     ],
@@ -1237,7 +1237,7 @@ export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'quartermaster_senna',
     text: 'The thornwood tests our stakes every dusk, $N, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.',
     completionText:
-      'Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, $C.',
+      'Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, $N.',
     objectives: [
       {
         type: 'defend',

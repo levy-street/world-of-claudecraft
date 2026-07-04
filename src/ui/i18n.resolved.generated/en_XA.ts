@@ -6299,6 +6299,258 @@ export const en_XA: EnTranslations = {
       "silverleaf_sickle": {
         "name": "[Šíļʋéŕļéáƒ Šíçķļé]"
       },
+      "forged_levy_papers": {
+        "name": "[Ƒóŕĝéð Ļéʋý Þáþéŕš]"
+      },
+      "amnesty_petition": {
+        "name": "[Úñƒíļéð Áɱñéšţý Þéţíţíóñ]"
+      },
+      "fort_pattern_kettle": {
+        "name": "[Ƒóŕţ-Þáţţéŕñ Ķéţţļé]"
+      },
+      "garnished_pay_pouch": {
+        "name": "[Ĝáŕñíšĥéð Þáý Þóúçĥ]"
+      },
+      "fault_line_core": {
+        "name": "[Ƒáúļţ Ļíñé Çóŕé]"
+      },
+      "unstamped_duel_permit": {
+        "name": "[Úñšţáɱþéð Ðúéļļíñĝ Þéŕɱíţ]"
+      },
+      "rimeclaw_tallow": {
+        "name": "[Ŕíɱéçļáŵ Ţáļļóŵ]"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "[Ŕíɱéçļáŵ Ɱáŕŕóŵƀóñé]"
+      },
+      "oathguard_plate_scrap": {
+        "name": "[Óáţĥĝúáŕð Þļáţé Šçŕáþ]"
+      },
+      "ninth_muster_roll": {
+        "name": "[Šáļʋáĝéð Ɱúšţéŕ Ŕóļļ]"
+      },
+      "icehowler_haunch": {
+        "name": "[Íçéĥóŵļéŕ Ĥáúñçĥ]"
+      },
+      "rimebound_core_ice": {
+        "name": "[Ŕíɱéƀóúñð Çóŕé Íçé]"
+      },
+      "glacial_quench_ice": {
+        "name": "[Ĝļáçíáļ Ɋúéñçĥ Íçé]"
+      },
+      "maren_calling_card": {
+        "name": "[Ĥóúšé Ɱáŕéñ Çáļļíñĝ Çáŕð]"
+      },
+      "maldreks_route_ledger": {
+        "name": "[Ɱáļðŕéķ'š Ŕóúţé Ļéðĝéŕ]"
+      },
+      "grulks_iron_strongbox": {
+        "name": "[Ĝŕúļķ'š Íŕóñ Šţŕóñĝƀóẋ]"
+      },
+      "maren_duelling_mantle": {
+        "name": "[Ɱáŕéñ Ðúéļļíñĝ Ɱáñţļé]"
+      },
+      "final_notice_wraps": {
+        "name": "[Ƒíñáļ Ñóţíçé Ŵŕáþš]"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "[Þáý Ŵáŕðéñ'š Šĥóúļðéŕĝúáŕðš]"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "[Ŕíɱéšĥáƒţ Ƒóŕéɱáñ'š Çáþ]"
+      },
+      "quarter_close_vestments": {
+        "name": "[Ɋúáŕţéŕ-Çļóšé Ʋéšţɱéñţš]"
+      },
+      "assessors_lead_greaves": {
+        "name": "[Áššéššóŕ'š Ļéáð Ĝŕéáʋéš]"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "[Þúŕšé-Ŵáŕðéñ'š Çóíñƀéļţ]"
+      },
+      "mothwing_dust": {
+        "name": "[Ɱóţĥŵíñĝ Ðúšţ]"
+      },
+      "silt_eel": {
+        "name": "[Šíļţ Ééļ]"
+      },
+      "barge_chit": {
+        "name": "[Ŵáţéŕļóĝĝéð Ɓáŕĝé Çĥíţ]"
+      },
+      "ferry_lantern_mote": {
+        "name": "[Ƒéŕŕý Ļáñţéŕñ Ɱóţé]"
+      },
+      "smugglers_tally_knot": {
+        "name": "[Šɱúĝĝļéŕ'š Ţáļļý Ķñóţ]"
+      },
+      "forged_weir_pass": {
+        "name": "[Ƒóŕĝéð Ŵéíŕ Þášš]"
+      },
+      "sunken_ration_tin": {
+        "name": "[Šúñķéñ Ŕáţíóñ Ţíñ]"
+      },
+      "hollow_toll_scrip": {
+        "name": "[Ĥóļļóŵ Ţóļļ Šçŕíþ]"
+      },
+      "rimeclaw_haunch": {
+        "name": "[Ŕíɱéçļáŵ Ĥáúñçĥ]"
+      },
+      "rimebound_fetish": {
+        "name": "[Ŕíɱéƀóúñð Ƒéţíšĥ]"
+      },
+      "frostpine_tallow": {
+        "name": "[Ƒŕóšţþíñé Ţáļļóŵ]"
+      },
+      "forsworn_oath_knife": {
+        "name": "[Ƒóŕšŵóŕñ Óáţĥ Ķñíƒé]"
+      },
+      "shadowbound_cipher": {
+        "name": "[Šĥáðóŵƀóúñð Çíþĥéŕ]"
+      },
+      "vessiks_little_book": {
+        "name": "[Ʋéššíķ'š Ļíţţļé Ɓóóķ]"
+      },
+      "weirwatch_wraps": {
+        "name": "[Ŵéíŕŵáţçĥ Ŵŕáþš]"
+      },
+      "lodgewalk_boots": {
+        "name": "[Ļóðĝéŵáļķ Ɓóóţš]"
+      },
+      "unbroken_wardstone": {
+        "name": "[Úñƀŕóķéñ Ŵáŕðšţóñé]"
+      },
+      "vault_ward_core": {
+        "name": "[Ʋáúļţ Ŵáŕð-Çóŕé]"
+      },
+      "temple_offering_bowl": {
+        "name": "[Ţéɱþļé Óƒƒéŕíñĝ Ɓóŵļ]"
+      },
+      "graven_name_stone": {
+        "name": "[Ĝŕáʋéñ Ñáɱé-Šţóñé]"
+      },
+      "stalker_haunch": {
+        "name": "[Šţáļķéŕ Ĥáúñçĥ]"
+      },
+      "heretic_creed_page": {
+        "name": "[Ɓúŕñéð Çŕééð Þáĝé]"
+      },
+      "heretic_brand_iron": {
+        "name": "[Ĥéŕéţíç Ɓŕáñð-Íŕóñ]"
+      },
+      "heretic_writ": {
+        "name": "[Ĥéŕéţíç Ŵŕíţ]"
+      },
+      "first_court_sigil": {
+        "name": "[Ƒíŕšţ Çóúŕţ Šíĝíļ]"
+      },
+      "duneglass_heart": {
+        "name": "[Ðúñéĝļášš Ĥéáŕţ]"
+      },
+      "unshattered_fulgurite": {
+        "name": "[Úñšĥáţţéŕéð Ƒúļĝúŕíţé]"
+      },
+      "flameseer_ash_creed": {
+        "name": "[Ášĥ Çŕééð Ţáƀļéţ]"
+      },
+      "flameseer_ember_phial": {
+        "name": "[Éɱƀéŕ Þĥíáļ]"
+      },
+      "dawnward_censer": {
+        "name": "[Ðáŵñŵáŕð Çéñšéŕ]"
+      },
+      "stolen_water_cask": {
+        "name": "[Šéáļéð Ŵáţéŕ Çášķ]"
+      },
+      "duskwater_oathmark": {
+        "name": "[Ðúšķŵáţéŕ Óáţĥɱáŕķ]"
+      },
+      "caravan_toll_tally": {
+        "name": "[Šéáļéð Ţóļļ Ţáļļý]"
+      },
+      "tyrant_spoor": {
+        "name": "[Ţýŕáñţ Šþóóŕ-Çášţíñĝ]"
+      },
+      "oxbone_toll": {
+        "name": "[Óẋƀóñé Ţóļļ-Ţáļļý]"
+      },
+      "cartographers_map": {
+        "name": "[Ţĥé Ƒíŕšţ Çáŕţóĝŕáþĥéŕ'š Ɱáþ]"
+      },
+      "templestone_shard": {
+        "name": "[Ţéɱþļéšţóñé Šĥáŕð]"
+      },
+      "fulgurite_splinter": {
+        "name": "[Ƒúļĝúŕíţé Šþļíñţéŕ]"
+      },
+      "charred_censer_chain": {
+        "name": "[Çĥáŕŕéð Çéñšéŕ Çĥáíñ]"
+      },
+      "wardens_stone_heart": {
+        "name": "[Ášĥķéŕáţ'š Šţóñé Ĥéáŕţ]"
+      },
+      "first_meridian_compass": {
+        "name": "[Ƒíŕšţ Ɱéŕíðíáñ Çóɱþášš]"
+      },
+      "seatstone_flatbread": {
+        "name": "[Šéáţšţóñé Ƒļáţƀŕéáð]"
+      },
+      "seatwell_waterskin": {
+        "name": "[Šéáţŵéļļ Ŵáţéŕšķíñ]"
+      },
+      "lastwater_jerky": {
+        "name": "[Ļášţ Ŵáţéŕ Ĵéŕķý]"
+      },
+      "lastwater_skin": {
+        "name": "[Ļášţ Ŵáţéŕ Šķíñ]"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "[Ʋáúļţķééþéŕ'š Ĥáñðŵŕáþš]"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "[Šáĥŕ'š Þéñíţéñţ Ļéĝĝíñĝš]"
+      },
+      "wardens_granite_edge": {
+        "name": "[Ŵáŕðéñ'š Ĝŕáñíţé Éðĝé]"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "[Šţáƒƒ óƒ ţĥé Šúñķéñ Çóúŕţ]"
+      },
+      "duneglass_shiv": {
+        "name": "[Ðúñéĝļášš Šĥíʋ]"
+      },
+      "lastwater_roadmail": {
+        "name": "[Ļášţ Ŵáţéŕ Ŕóáðɱáíļ]"
+      },
+      "duskwatch_robe": {
+        "name": "[Ðúšķŵáţçĥ Ŕóƀé]"
+      },
+      "raiders_dust_jerkin": {
+        "name": "[Ŕáíðéŕ'š Ðúšţ Ĵéŕķíñ]"
+      },
+      "ashkerat_greaves": {
+        "name": "[Ášĥķéŕáţ'š Ĝŕéáʋéš]"
+      },
+      "cartographers_windwraps": {
+        "name": "[Çáŕţóĝŕáþĥéŕ'š Ŵíñðŵŕáþš]"
+      },
+      "unlit_silk_gland": {
+        "name": "[Úñļíţ Šíļķ Ĝļáñð]"
+      },
+      "veskals_fang": {
+        "name": "[Ʋéšķáļ'š Ƒáñĝ]"
+      },
+      "broodmother_carapace_guard": {
+        "name": "[Ɓŕóóðɱóţĥéŕ Çáŕáþáçé Ĝúáŕð]"
+      },
+      "condensed_mist_heart": {
+        "name": "[Çóñðéñšéð Ɱíšţ Ĥéáŕţ]"
+      },
+      "mistfathers_knot": {
+        "name": "[Ţĥé Ɱíšţƒáţĥéŕ'š Ķñóţ]"
+      },
+      "fogwalker_treads": {
+        "name": "[Ƒóĝŵáļķéŕ Ţŕéáðš]"
+      },
       "bristleback_maul": {
         "name": "[Ĝáļļóŵĝļášš Ĥáɱɱéŕ]"
       },
@@ -8776,7 +9028,7 @@ export const en_XA: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "[Ĥóļð ţĥé Þáļíšáðé]",
         "text": "[Ţĥé ţĥóŕñŵóóð ţéšţš óúŕ šţáķéš éʋéŕý ðúšķ, {playerName}, áñð Ŵáŕðéñ Íļýéñ ĥóļðš ţĥé ļíñé áļóñé. Šţáñð ŵíţĥ ĥíɱ ŵĥéñ Í šóúñð ţĥé çáļļ: ţĥŕéé þúšĥéš, áñð ţĥé ŵóóð ļéáŕñš íţš ļéššóñ ƒóŕ á ŵĥíļé.]",
-        "completion": "[Ţĥŕéé þúšĥéš ƀŕóķéñ áñð ţĥé Ŵáŕðéñ šţíļļ šţáñðíñĝ. Ţĥé ŵóóð ŵíļļ šúļķ ƒóŕ á ñíĝĥţ óŕ ţŵó. Ŵéļļ ƒóúĝĥţ, {className}.]",
+        "completion": "[Ţĥŕéé þúšĥéš ƀŕóķéñ áñð ţĥé Ŵáŕðéñ šţíļļ šţáñðíñĝ. Ţĥé ŵóóð ŵíļļ šúļķ ƒóŕ á ñíĝĥţ óŕ ţŵó. Ŵéļļ ƒóúĝĥţ, {playerName}.]",
         "objectives": {
           "0": {
             "label": "[Ŵáʋéš ŕéþéļļéð ƀéšíðé Ŵáŕðéñ Íļýéñ]"
@@ -8796,7 +9048,7 @@ export const en_XA: EnTranslations = {
       "q_the_mistfather": {
         "title": "[Ŵĥáţ ţĥé Ƒóĝ Ŵáñţš]",
         "text": "[Ţĥé ƒóĝ ţóóķ ţŵó šţíļţ-ŵáļķéŕš ţĥíš ŵééķ áñð ĝáʋé ƀáçķ ţĥéíŕ ļáñţéŕñš, þóļíšĥéð, {playerName}. Íţ íš çóúŕţíñĝ úš. Ĝáţĥéŕ éʋéŕýóñé ŵĥó óŵéš ýóú á ƒáʋóŕ áñð ţéáçĥ ţĥé Ɱíšţƒáţĥéŕ ţĥáţ ţĥé ļíĝĥţš šţáý ļíţ.]",
-        "completion": "[Ţĥé ƒóĝ ţĥíññéð ƒóŕ á ŵĥóļé ƀéļļ áƒţéŕ ýóú ƀŕóúĝĥţ ĥíɱ ðóŵñ. Ƒíŕšţ ţíɱé íñ ţĥíŕţý ýéáŕš. Ţĥé ļáñţéŕñš šţáý ļíţ, {className}.]",
+        "completion": "[Ţĥé ƒóĝ ţĥíññéð ƒóŕ á ŵĥóļé ƀéļļ áƒţéŕ ýóú ƀŕóúĝĥţ ĥíɱ ðóŵñ. Ƒíŕšţ ţíɱé íñ ţĥíŕţý ýéáŕš. Ţĥé ļáñţéŕñš šţáý ļíţ, {playerName}.]",
         "objectives": {
           "0": {
             "label": "[Ĝĥóŕʋúļ šļáíñ]"
@@ -9717,7 +9969,7 @@ export const en_XA: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "[Ŕéþóŕţ ţó Ļéðĝéŕŵáţçĥ]",
         "text": "[Ƒóŕţ Ļéðĝéŕŵáţçĥ ŵáţçĥéš ţĥé þíñé ƀéļţ áñð ţĥé Ɓŕóķéñ Ļéĝíóñ íñ íţ, áñð íţš çášţéļļáñ ŕéþóŕţš ţĥŕéé þŕóƀļéɱš ƒóŕ éʋéŕý šóļðíéŕ ĥé ĥáš. Ýóú áŕé óñé šóļðíéŕ ŵĥó šóļʋéš ţĥŕéé þŕóƀļéɱš, {playerName}. Ŕéþóŕţ ţó Çášţéļļáñ Óðŕíç; ţáķé ţĥé ñóŕţĥ ŕóáð áñð ţĥé ƒóŕţ íš óñ ýóúŕ ŕíĝĥţ ŵĥéŕé ţĥé þíñéš ƀéĝíñ.]",
-        "completion": "[Ţĥé Ɱáŕšĥáļ šéñðš óñé {className} áñð çáļļš íţ ŕéíñƒóŕçéɱéñţ. Ʋéŕý ŵéļļ; Í ĥáʋé ļéáŕñéð ţó ŕéɋúíšíţíóñ ɋúáļíţý óʋéŕ ɋúáñţíţý. Ŵéļçóɱé ţó Ļéðĝéŕŵáţçĥ.]",
+        "completion": "[Ţĥé Ɱáŕšĥáļ šéñðš óñé ƀļáðé áñð çáļļš íţ ŕéíñƒóŕçéɱéñţ. Ʋéŕý ŵéļļ; Í ĥáʋé ļéáŕñéð ţó ŕéɋúíšíţíóñ ɋúáļíţý óʋéŕ ɋúáñţíţý. Ŵéļçóɱé ţó Ļéðĝéŕŵáţçĥ, {playerName}.]",
         "objectives": {
           "0": {
             "label": "[Ŕéþóŕţ ţó Çášţéļļáñ Óðŕíç]"
@@ -9825,7 +10077,7 @@ export const en_XA: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "[Ŕéþóŕţ ţó Ŕíɱéšĥáƒţ]",
         "text": "[Ţĥé Ŕíɱéšĥáƒţ çáɱþ ðíĝš šíļʋéŕ áƀóʋé ţĥé šñóŵ ļíñé áñð ƒíļéš çášúáļţý ŕéþóŕţš ƒášţéŕ ţĥáñ óŕé ŕéţúŕñš, {playerName}. Ţĥé ƒóŕéɱáñ ĥóļðš šţáñðíñĝ áúţĥóŕíţý ţó ĥíŕé áñýţĥíñĝ ţĥáţ šúŕʋíʋéš ţĥé ŕóáð. Ŕéþóŕţ ţó Ƒóŕéɱáñ Úļļá áţ ţĥé çáɱþ ƀéļóŵ ţĥé Ƒŕóšţĥéļɱ Ášçéñţ, áñð ɱíñð ţĥé ŵéñðíĝó: ţĥéý áŕé ñóţ óñ ţĥé þáýŕóļļ.]",
-        "completion": "[Ļéðĝéŕŵáţçĥ šéñðš á {className} ŵĥó ŵáļķéð ţĥé šñóŵ ŕóáð áļóñé; ĝóóð. Ţĥé ļášţ ţĥŕéé ĥíŕéš áŕŕíʋéð áš á šéáŕçĥ éẋþéñšé. Ýóú áŕé óñ ţĥé ƀóóķš áš óƒ ţĥíš šĥíƒţ, {playerName}.]",
+        "completion": "[Ļéðĝéŕŵáţçĥ šéñðš ĥéļþ ţĥáţ ŵáļķéð ţĥé šñóŵ ŕóáð áļóñé; ĝóóð. Ţĥé ļášţ ţĥŕéé ĥíŕéš áŕŕíʋéð áš á šéáŕçĥ éẋþéñšé. Ýóú áŕé óñ ţĥé ƀóóķš áš óƒ ţĥíš šĥíƒţ, {playerName}.]",
         "objectives": {
           "0": {
             "label": "[Ŕéþóŕţ ţó Ƒóŕéɱáñ Úļļá]"

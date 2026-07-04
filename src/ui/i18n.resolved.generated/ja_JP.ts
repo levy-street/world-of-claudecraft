@@ -6299,6 +6299,258 @@ export const ja_JP: EnTranslations = {
       "silverleaf_sickle": {
         "name": "銀葉の鎌"
       },
+      "forged_levy_papers": {
+        "name": "偽造された徴募書類"
+      },
+      "amnesty_petition": {
+        "name": "未受理の恩赦請願書"
+      },
+      "fort_pattern_kettle": {
+        "name": "砦規格のやかん"
+      },
+      "garnished_pay_pouch": {
+        "name": "差し押さえられた給金袋"
+      },
+      "fault_line_core": {
+        "name": "断層の核"
+      },
+      "unstamped_duel_permit": {
+        "name": "未捺印の決闘許可証"
+      },
+      "rimeclaw_tallow": {
+        "name": "霜爪獣の獣脂"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "霜爪獣の髄骨"
+      },
+      "oathguard_plate_scrap": {
+        "name": "誓約衛士の板金片"
+      },
+      "ninth_muster_roll": {
+        "name": "回収された召集名簿"
+      },
+      "icehowler_haunch": {
+        "name": "氷咆哮獣のもも肉"
+      },
+      "rimebound_core_ice": {
+        "name": "霜縛りの核氷"
+      },
+      "glacial_quench_ice": {
+        "name": "氷河焼き入れの氷"
+      },
+      "maren_calling_card": {
+        "name": "マレン家の名刺"
+      },
+      "maldreks_route_ledger": {
+        "name": "マルドレクの経路台帳"
+      },
+      "grulks_iron_strongbox": {
+        "name": "グルルクの鉄金庫"
+      },
+      "maren_duelling_mantle": {
+        "name": "マレン決闘マント"
+      },
+      "final_notice_wraps": {
+        "name": "最終通告の巻き布"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "給金看守の肩当て"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "ライムシャフト現場頭の帽子"
+      },
+      "quarter_close_vestments": {
+        "name": "四半期決算の祭服"
+      },
+      "assessors_lead_greaves": {
+        "name": "査定官の鉛の脛当て"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "金袋看守の硬貨ベルト"
+      },
+      "mothwing_dust": {
+        "name": "蛾の羽の粉"
+      },
+      "silt_eel": {
+        "name": "泥ウナギ"
+      },
+      "barge_chit": {
+        "name": "ふやけたはしけの札"
+      },
+      "ferry_lantern_mote": {
+        "name": "渡し船の灯りの粒"
+      },
+      "smugglers_tally_knot": {
+        "name": "密輸人の勘定結び"
+      },
+      "forged_weir_pass": {
+        "name": "偽造された堰の通行証"
+      },
+      "sunken_ration_tin": {
+        "name": "沈んだ配給缶"
+      },
+      "hollow_toll_scrip": {
+        "name": "空手形の通行料切符"
+      },
+      "rimeclaw_haunch": {
+        "name": "霜爪獣のもも肉"
+      },
+      "rimebound_fetish": {
+        "name": "霜縛りの呪物"
+      },
+      "frostpine_tallow": {
+        "name": "霜松の獣脂"
+      },
+      "forsworn_oath_knife": {
+        "name": "背誓者の誓いの短刀"
+      },
+      "shadowbound_cipher": {
+        "name": "影縛りの暗号文"
+      },
+      "vessiks_little_book": {
+        "name": "ヴェシクの小さな帳面"
+      },
+      "weirwatch_wraps": {
+        "name": "堰見張りの巻き布"
+      },
+      "lodgewalk_boots": {
+        "name": "山荘路の長靴"
+      },
+      "unbroken_wardstone": {
+        "name": "無傷の守り石"
+      },
+      "vault_ward_core": {
+        "name": "地下庫の守り核"
+      },
+      "temple_offering_bowl": {
+        "name": "神殿の供物鉢"
+      },
+      "graven_name_stone": {
+        "name": "名を刻んだ石"
+      },
+      "stalker_haunch": {
+        "name": "忍び寄る者のもも肉"
+      },
+      "heretic_creed_page": {
+        "name": "焼けた信条の頁"
+      },
+      "heretic_brand_iron": {
+        "name": "異端者の焼き印ごて"
+      },
+      "heretic_writ": {
+        "name": "異端の判決文"
+      },
+      "first_court_sigil": {
+        "name": "第一法廷の印章"
+      },
+      "duneglass_heart": {
+        "name": "砂丘ガラスの心臓"
+      },
+      "unshattered_fulgurite": {
+        "name": "砕けていない閃電岩"
+      },
+      "flameseer_ash_creed": {
+        "name": "灰の信条の石板"
+      },
+      "flameseer_ember_phial": {
+        "name": "燠火の小瓶"
+      },
+      "dawnward_censer": {
+        "name": "暁警めの香炉"
+      },
+      "stolen_water_cask": {
+        "name": "封印された水樽"
+      },
+      "duskwater_oathmark": {
+        "name": "宵水の誓印"
+      },
+      "caravan_toll_tally": {
+        "name": "封印された通行料の割符"
+      },
+      "tyrant_spoor": {
+        "name": "暴君の足跡の鋳型"
+      },
+      "oxbone_toll": {
+        "name": "牛骨の通行料割符"
+      },
+      "cartographers_map": {
+        "name": "初代地図師の地図"
+      },
+      "templestone_shard": {
+        "name": "神殿石のかけら"
+      },
+      "fulgurite_splinter": {
+        "name": "閃電岩の破片"
+      },
+      "charred_censer_chain": {
+        "name": "焦げた香炉の鎖"
+      },
+      "wardens_stone_heart": {
+        "name": "アシュケラトの石の心臓"
+      },
+      "first_meridian_compass": {
+        "name": "第一子午線の羅針盤"
+      },
+      "seatstone_flatbread": {
+        "name": "座石の平パン"
+      },
+      "seatwell_waterskin": {
+        "name": "座井戸の水袋"
+      },
+      "lastwater_jerky": {
+        "name": "ラストウォーターの干し肉"
+      },
+      "lastwater_skin": {
+        "name": "ラストウォーターの水袋"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "地下庫番の手甲布"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "サールの苦行者レギンス"
+      },
+      "wardens_granite_edge": {
+        "name": "監視者の花崗岩の刃"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "沈んだ法廷の杖"
+      },
+      "duneglass_shiv": {
+        "name": "砂丘ガラスの刺し刀"
+      },
+      "lastwater_roadmail": {
+        "name": "ラストウォーターの旅路鎖帷子"
+      },
+      "duskwatch_robe": {
+        "name": "宵闇見張りのローブ"
+      },
+      "raiders_dust_jerkin": {
+        "name": "略奪者の砂塵胴衣"
+      },
+      "ashkerat_greaves": {
+        "name": "アシュケラトの脛当て"
+      },
+      "cartographers_windwraps": {
+        "name": "地図師の風巻き布"
+      },
+      "unlit_silk_gland": {
+        "name": "光なき絹腺"
+      },
+      "veskals_fang": {
+        "name": "ヴェスカルの牙"
+      },
+      "broodmother_carapace_guard": {
+        "name": "巣母の甲殻胸当て"
+      },
+      "condensed_mist_heart": {
+        "name": "凝縮した霧の心臓"
+      },
+      "mistfathers_knot": {
+        "name": "霧の父の結び目"
+      },
+      "fogwalker_treads": {
+        "name": "霧渡りの沓"
+      },
       "bristleback_maul": {
         "name": "ブリストルバックの大槌"
       },
@@ -8776,7 +9028,7 @@ export const ja_JP: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "Hold the Palisade",
         "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
         "objectives": {
           "0": {
             "label": "Waves repelled beside Warden Ilyen"
@@ -8796,7 +9048,7 @@ export const ja_JP: EnTranslations = {
       "q_the_mistfather": {
         "title": "What the Fog Wants",
         "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
         "objectives": {
           "0": {
             "label": "Ghorvul slain"
@@ -9717,7 +9969,7 @@ export const ja_JP: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "Report to Ledgerwatch",
         "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Castellan Odric"
@@ -9825,7 +10077,7 @@ export const ja_JP: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "Report to Rimeshaft",
         "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Foreman Ulla"

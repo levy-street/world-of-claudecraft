@@ -6299,6 +6299,258 @@ export const de_DE: EnTranslations = {
       "silverleaf_sickle": {
         "name": "Silberblatt-Sichel"
       },
+      "forged_levy_papers": {
+        "name": "Gefälschte Aushebungspapiere"
+      },
+      "amnesty_petition": {
+        "name": "Nicht abgelegtes Amnestiegesuch"
+      },
+      "fort_pattern_kettle": {
+        "name": "Kessel nach Fortmuster"
+      },
+      "garnished_pay_pouch": {
+        "name": "Gepfändeter Soldbeutel"
+      },
+      "fault_line_core": {
+        "name": "Verwerfungskern"
+      },
+      "unstamped_duel_permit": {
+        "name": "Ungestempelte Duellerlaubnis"
+      },
+      "rimeclaw_tallow": {
+        "name": "Reifkrallentalg"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "Reifkrallen-Markknochen"
+      },
+      "oathguard_plate_scrap": {
+        "name": "Plattenfragment der Eidwache"
+      },
+      "ninth_muster_roll": {
+        "name": "Geborgene Musterungsrolle"
+      },
+      "icehowler_haunch": {
+        "name": "Eisheuler-Keule"
+      },
+      "rimebound_core_ice": {
+        "name": "Reifgebundenes Kerneis"
+      },
+      "glacial_quench_ice": {
+        "name": "Gletscher-Abschreckeis"
+      },
+      "maren_calling_card": {
+        "name": "Visitenkarte des Hauses Maren"
+      },
+      "maldreks_route_ledger": {
+        "name": "Maldreks Routenbuch"
+      },
+      "grulks_iron_strongbox": {
+        "name": "Grulks Eisenschatulle"
+      },
+      "maren_duelling_mantle": {
+        "name": "Maren-Duellmantel"
+      },
+      "final_notice_wraps": {
+        "name": "Wickel der letzten Mahnung"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "Schulterschutz des Soldwarts"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "Kappe des Rimeshaft-Vorarbeiters"
+      },
+      "quarter_close_vestments": {
+        "name": "Gewänder des Quartalsabschlusses"
+      },
+      "assessors_lead_greaves": {
+        "name": "Bleierne Beinschienen des Schätzers"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "Münzgurt des Beutelwarts"
+      },
+      "mothwing_dust": {
+        "name": "Mottenflügelstaub"
+      },
+      "silt_eel": {
+        "name": "Schlickaal"
+      },
+      "barge_chit": {
+        "name": "Durchweichte Kahnmarke"
+      },
+      "ferry_lantern_mote": {
+        "name": "Fährlaternenfunke"
+      },
+      "smugglers_tally_knot": {
+        "name": "Zählknoten des Schmugglers"
+      },
+      "forged_weir_pass": {
+        "name": "Gefälschter Wehrpass"
+      },
+      "sunken_ration_tin": {
+        "name": "Versunkene Rationsdose"
+      },
+      "hollow_toll_scrip": {
+        "name": "Hohler Zollschein"
+      },
+      "rimeclaw_haunch": {
+        "name": "Reifkrallen-Keule"
+      },
+      "rimebound_fetish": {
+        "name": "Reifgebundener Fetisch"
+      },
+      "frostpine_tallow": {
+        "name": "Frostkieferntalg"
+      },
+      "forsworn_oath_knife": {
+        "name": "Eidmesser der Abgeschworenen"
+      },
+      "shadowbound_cipher": {
+        "name": "Schattengebundene Chiffre"
+      },
+      "vessiks_little_book": {
+        "name": "Vessiks Büchlein"
+      },
+      "weirwatch_wraps": {
+        "name": "Wickel der Wehrwacht"
+      },
+      "lodgewalk_boots": {
+        "name": "Logenstiefel"
+      },
+      "unbroken_wardstone": {
+        "name": "Unversehrter Wardstein"
+      },
+      "vault_ward_core": {
+        "name": "Gewölbe-Wardkern"
+      },
+      "temple_offering_bowl": {
+        "name": "Opferschale des Tempels"
+      },
+      "graven_name_stone": {
+        "name": "Gravierter Namensstein"
+      },
+      "stalker_haunch": {
+        "name": "Pirscher-Keule"
+      },
+      "heretic_creed_page": {
+        "name": "Verbrannte Credoseite"
+      },
+      "heretic_brand_iron": {
+        "name": "Ketzer-Brandeisen"
+      },
+      "heretic_writ": {
+        "name": "Ketzerschrift"
+      },
+      "first_court_sigil": {
+        "name": "Siegel des Ersten Hofes"
+      },
+      "duneglass_heart": {
+        "name": "Dünenglasherz"
+      },
+      "unshattered_fulgurite": {
+        "name": "Unzerbrochener Fulgurit"
+      },
+      "flameseer_ash_creed": {
+        "name": "Tafel des Aschencredos"
+      },
+      "flameseer_ember_phial": {
+        "name": "Glutphiole"
+      },
+      "dawnward_censer": {
+        "name": "Morgenwacht-Räuchergefäß"
+      },
+      "stolen_water_cask": {
+        "name": "Versiegeltes Wasserfass"
+      },
+      "duskwater_oathmark": {
+        "name": "Duskwater-Eidmarke"
+      },
+      "caravan_toll_tally": {
+        "name": "Versiegelte Zollkerbe"
+      },
+      "tyrant_spoor": {
+        "name": "Spurenabguss des Tyrannen"
+      },
+      "oxbone_toll": {
+        "name": "Ochsenknochen-Zollkerbe"
+      },
+      "cartographers_map": {
+        "name": "Die Karte des Ersten Kartographen"
+      },
+      "templestone_shard": {
+        "name": "Tempelsteinscherbe"
+      },
+      "fulgurite_splinter": {
+        "name": "Fulguritsplitter"
+      },
+      "charred_censer_chain": {
+        "name": "Verkohlte Räucherkette"
+      },
+      "wardens_stone_heart": {
+        "name": "Ashkerats Steinherz"
+      },
+      "first_meridian_compass": {
+        "name": "Kompass des Ersten Meridians"
+      },
+      "seatstone_flatbread": {
+        "name": "Fladenbrot des Sitzes"
+      },
+      "seatwell_waterskin": {
+        "name": "Wasserschlauch des Sitzbrunnens"
+      },
+      "lastwater_jerky": {
+        "name": "Letztwasser-Dörrfleisch"
+      },
+      "lastwater_skin": {
+        "name": "Letztwasser-Schlauch"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "Handwickel des Gewölbewarts"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "Sahrs Büßer-Beinlinge"
+      },
+      "wardens_granite_edge": {
+        "name": "Granitschneide des Wardens"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "Stab des Versunkenen Hofes"
+      },
+      "duneglass_shiv": {
+        "name": "Dünenglas-Schiene"
+      },
+      "lastwater_roadmail": {
+        "name": "Letztwasser-Wegkette"
+      },
+      "duskwatch_robe": {
+        "name": "Robe der Dämmerwacht"
+      },
+      "raiders_dust_jerkin": {
+        "name": "Staubiger Räuberwams"
+      },
+      "ashkerat_greaves": {
+        "name": "Ashkerats Beinschienen"
+      },
+      "cartographers_windwraps": {
+        "name": "Windwickel des Kartographen"
+      },
+      "unlit_silk_gland": {
+        "name": "Lichtlose Seidendrüse"
+      },
+      "veskals_fang": {
+        "name": "Veskals Fangzahn"
+      },
+      "broodmother_carapace_guard": {
+        "name": "Brutmutter-Panzerwehr"
+      },
+      "condensed_mist_heart": {
+        "name": "Verdichtetes Nebelherz"
+      },
+      "mistfathers_knot": {
+        "name": "Der Knoten des Nebelvaters"
+      },
+      "fogwalker_treads": {
+        "name": "Nebelgänger-Tritte"
+      },
       "bristleback_maul": {
         "name": "Bristleback-Schlägel"
       },
@@ -8776,7 +9028,7 @@ export const de_DE: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "Hold the Palisade",
         "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
         "objectives": {
           "0": {
             "label": "Waves repelled beside Warden Ilyen"
@@ -8796,7 +9048,7 @@ export const de_DE: EnTranslations = {
       "q_the_mistfather": {
         "title": "What the Fog Wants",
         "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
         "objectives": {
           "0": {
             "label": "Ghorvul slain"
@@ -9717,7 +9969,7 @@ export const de_DE: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "Report to Ledgerwatch",
         "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Castellan Odric"
@@ -9825,7 +10077,7 @@ export const de_DE: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "Report to Rimeshaft",
         "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Foreman Ulla"

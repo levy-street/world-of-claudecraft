@@ -6299,6 +6299,258 @@ export const ru_RU: EnTranslations = {
       "silverleaf_sickle": {
         "name": "Серебролистный серп"
       },
+      "forged_levy_papers": {
+        "name": "Поддельные призывные бумаги"
+      },
+      "amnesty_petition": {
+        "name": "Незарегистрированное прошение об амнистии"
+      },
+      "fort_pattern_kettle": {
+        "name": "Котелок фортового образца"
+      },
+      "garnished_pay_pouch": {
+        "name": "Арестованный кошель с жалованьем"
+      },
+      "fault_line_core": {
+        "name": "Ядро разлома"
+      },
+      "unstamped_duel_permit": {
+        "name": "Незаверенное дуэльное разрешение"
+      },
+      "rimeclaw_tallow": {
+        "name": "Жир инеекогтя"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "Мозговая кость инеекогтя"
+      },
+      "oathguard_plate_scrap": {
+        "name": "Обломок лат Стража Клятвы"
+      },
+      "ninth_muster_roll": {
+        "name": "Спасённый список призыва"
+      },
+      "icehowler_haunch": {
+        "name": "Окорок ледового ревуна"
+      },
+      "rimebound_core_ice": {
+        "name": "Скованный инеем сердцевинный лёд"
+      },
+      "glacial_quench_ice": {
+        "name": "Лёд ледниковой закалки"
+      },
+      "maren_calling_card": {
+        "name": "Визитная карточка дома Марен"
+      },
+      "maldreks_route_ledger": {
+        "name": "Путевая книга Малдрека"
+      },
+      "grulks_iron_strongbox": {
+        "name": "Железный сейф Грулка"
+      },
+      "maren_duelling_mantle": {
+        "name": "Дуэльная мантия Марен"
+      },
+      "final_notice_wraps": {
+        "name": "Обмотки последнего предупреждения"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "Наплечники смотрителя жалованья"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "Картуз десятника Раймшахты"
+      },
+      "quarter_close_vestments": {
+        "name": "Облачение квартального закрытия"
+      },
+      "assessors_lead_greaves": {
+        "name": "Свинцовые поножи оценщика"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "Монетный пояс смотрителя кошелей"
+      },
+      "mothwing_dust": {
+        "name": "Пыльца мотыльковых крыльев"
+      },
+      "silt_eel": {
+        "name": "Илистый угорь"
+      },
+      "barge_chit": {
+        "name": "Размокший баржевый жетон"
+      },
+      "ferry_lantern_mote": {
+        "name": "Искра паромного фонаря"
+      },
+      "smugglers_tally_knot": {
+        "name": "Счётный узел контрабандиста"
+      },
+      "forged_weir_pass": {
+        "name": "Поддельный пропуск через запруду"
+      },
+      "sunken_ration_tin": {
+        "name": "Затонувшая банка пайка"
+      },
+      "hollow_toll_scrip": {
+        "name": "Пустой дорожный вексель"
+      },
+      "rimeclaw_haunch": {
+        "name": "Окорок инеекогтя"
+      },
+      "rimebound_fetish": {
+        "name": "Скованный инеем фетиш"
+      },
+      "frostpine_tallow": {
+        "name": "Жир морозной сосны"
+      },
+      "forsworn_oath_knife": {
+        "name": "Клятвенный нож Отрёкшихся"
+      },
+      "shadowbound_cipher": {
+        "name": "Тенескованный шифр"
+      },
+      "vessiks_little_book": {
+        "name": "Книжица Вессика"
+      },
+      "weirwatch_wraps": {
+        "name": "Обмотки стражи запруды"
+      },
+      "lodgewalk_boots": {
+        "name": "Сапоги Приюта"
+      },
+      "unbroken_wardstone": {
+        "name": "Целый охранный камень"
+      },
+      "vault_ward_core": {
+        "name": "Охранное ядро хранилища"
+      },
+      "temple_offering_bowl": {
+        "name": "Храмовая чаша подношений"
+      },
+      "graven_name_stone": {
+        "name": "Камень с высеченными именами"
+      },
+      "stalker_haunch": {
+        "name": "Окорок ловчего"
+      },
+      "heretic_creed_page": {
+        "name": "Обгоревшая страница символа веры"
+      },
+      "heretic_brand_iron": {
+        "name": "Клеймо еретика"
+      },
+      "heretic_writ": {
+        "name": "Еретический указ"
+      },
+      "first_court_sigil": {
+        "name": "Печать Первого Суда"
+      },
+      "duneglass_heart": {
+        "name": "Сердце дюнного стекла"
+      },
+      "unshattered_fulgurite": {
+        "name": "Нерасколотый фульгурит"
+      },
+      "flameseer_ash_creed": {
+        "name": "Скрижаль Пепельного Символа"
+      },
+      "flameseer_ember_phial": {
+        "name": "Склянка углей"
+      },
+      "dawnward_censer": {
+        "name": "Кадило Рассветной Стражи"
+      },
+      "stolen_water_cask": {
+        "name": "Запечатанная бочка воды"
+      },
+      "duskwater_oathmark": {
+        "name": "Клятвенный знак Сумеречных Вод"
+      },
+      "caravan_toll_tally": {
+        "name": "Запечатанная пошлинная бирка"
+      },
+      "tyrant_spoor": {
+        "name": "Слепок следа Тирана"
+      },
+      "oxbone_toll": {
+        "name": "Пошлинная бирка из бычьей кости"
+      },
+      "cartographers_map": {
+        "name": "Карта Первого Картографа"
+      },
+      "templestone_shard": {
+        "name": "Осколок храмового камня"
+      },
+      "fulgurite_splinter": {
+        "name": "Щепка фульгурита"
+      },
+      "charred_censer_chain": {
+        "name": "Обугленная цепь кадила"
+      },
+      "wardens_stone_heart": {
+        "name": "Каменное сердце Ашкерата"
+      },
+      "first_meridian_compass": {
+        "name": "Компас Первого Меридиана"
+      },
+      "seatstone_flatbread": {
+        "name": "Лепёшка Престола"
+      },
+      "seatwell_waterskin": {
+        "name": "Бурдюк престольного колодца"
+      },
+      "lastwater_jerky": {
+        "name": "Вяленое мясо Последней Воды"
+      },
+      "lastwater_skin": {
+        "name": "Бурдюк Последней Воды"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "Наручи хранителя подвалов"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "Покаянные поножи Сахра"
+      },
+      "wardens_granite_edge": {
+        "name": "Гранитная кромка Стража"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "Посох Затонувшего Суда"
+      },
+      "duneglass_shiv": {
+        "name": "Заточка из дюнного стекла"
+      },
+      "lastwater_roadmail": {
+        "name": "Дорожная кольчуга Последней Воды"
+      },
+      "duskwatch_robe": {
+        "name": "Одеяние Сумеречного Дозора"
+      },
+      "raiders_dust_jerkin": {
+        "name": "Пропылённая куртка налётчика"
+      },
+      "ashkerat_greaves": {
+        "name": "Поножи Ашкерата"
+      },
+      "cartographers_windwraps": {
+        "name": "Ветровые обмотки Картографа"
+      },
+      "unlit_silk_gland": {
+        "name": "Беспросветная шёлковая железа"
+      },
+      "veskals_fang": {
+        "name": "Клык Вескала"
+      },
+      "broodmother_carapace_guard": {
+        "name": "Панцирный нагрудник Матери выводка"
+      },
+      "condensed_mist_heart": {
+        "name": "Сгущённое сердце тумана"
+      },
+      "mistfathers_knot": {
+        "name": "Узел Отца Туманов"
+      },
+      "fogwalker_treads": {
+        "name": "Поступь туманохода"
+      },
       "bristleback_maul": {
         "name": "Кувалда Щетиноспина"
       },
@@ -8776,7 +9028,7 @@ export const ru_RU: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "Hold the Palisade",
         "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
         "objectives": {
           "0": {
             "label": "Waves repelled beside Warden Ilyen"
@@ -8796,7 +9048,7 @@ export const ru_RU: EnTranslations = {
       "q_the_mistfather": {
         "title": "What the Fog Wants",
         "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
         "objectives": {
           "0": {
             "label": "Ghorvul slain"
@@ -9717,7 +9969,7 @@ export const ru_RU: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "Report to Ledgerwatch",
         "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Castellan Odric"
@@ -9825,7 +10077,7 @@ export const ru_RU: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "Report to Rimeshaft",
         "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Foreman Ulla"

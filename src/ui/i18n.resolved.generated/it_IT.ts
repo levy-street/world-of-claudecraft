@@ -6299,6 +6299,258 @@ export const it_IT: EnTranslations = {
       "silverleaf_sickle": {
         "name": "Falcetto Fogliargento"
       },
+      "forged_levy_papers": {
+        "name": "Documenti di leva falsificati"
+      },
+      "amnesty_petition": {
+        "name": "Petizione di amnistia non registrata"
+      },
+      "fort_pattern_kettle": {
+        "name": "Bollitore regolamentare del forte"
+      },
+      "garnished_pay_pouch": {
+        "name": "Borsa paga pignorata"
+      },
+      "fault_line_core": {
+        "name": "Nucleo di faglia"
+      },
+      "unstamped_duel_permit": {
+        "name": "Permesso di duello non timbrato"
+      },
+      "rimeclaw_tallow": {
+        "name": "Sego di artigelo"
+      },
+      "rimeclaw_marrowbone": {
+        "name": "Osso midollare di artigelo"
+      },
+      "oathguard_plate_scrap": {
+        "name": "Frammento di piastra del Guardagiuramento"
+      },
+      "ninth_muster_roll": {
+        "name": "Ruolo di adunata recuperato"
+      },
+      "icehowler_haunch": {
+        "name": "Coscio di ululaghiaccio"
+      },
+      "rimebound_core_ice": {
+        "name": "Ghiaccio del nucleo brinato"
+      },
+      "glacial_quench_ice": {
+        "name": "Ghiaccio di tempra glaciale"
+      },
+      "maren_calling_card": {
+        "name": "Biglietto da visita di Casa Maren"
+      },
+      "maldreks_route_ledger": {
+        "name": "Registro delle rotte di Maldrek"
+      },
+      "grulks_iron_strongbox": {
+        "name": "Forziere di ferro di Grulk"
+      },
+      "maren_duelling_mantle": {
+        "name": "Mantellina da duello Maren"
+      },
+      "final_notice_wraps": {
+        "name": "Fasce dell'ultimo avviso"
+      },
+      "pay_wardens_shoulderguards": {
+        "name": "Spallacci del custode delle paghe"
+      },
+      "rimeshaft_foremans_cap": {
+        "name": "Berretto del caposquadra di Rimeshaft"
+      },
+      "quarter_close_vestments": {
+        "name": "Paramenti di chiusura trimestre"
+      },
+      "assessors_lead_greaves": {
+        "name": "Gambali di piombo dell'assessore"
+      },
+      "purse_wardens_coinbelt": {
+        "name": "Cintura portamonete del custode delle borse"
+      },
+      "mothwing_dust": {
+        "name": "Polvere d'ala di falena"
+      },
+      "silt_eel": {
+        "name": "Anguilla di limo"
+      },
+      "barge_chit": {
+        "name": "Gettone di chiatta fradicio"
+      },
+      "ferry_lantern_mote": {
+        "name": "Bagliore di lanterna del traghetto"
+      },
+      "smugglers_tally_knot": {
+        "name": "Nodo di conteggio del contrabbandiere"
+      },
+      "forged_weir_pass": {
+        "name": "Lasciapassare della diga falsificato"
+      },
+      "sunken_ration_tin": {
+        "name": "Scatoletta di razioni sommersa"
+      },
+      "hollow_toll_scrip": {
+        "name": "Buono di pedaggio vuoto"
+      },
+      "rimeclaw_haunch": {
+        "name": "Coscio di artigelo"
+      },
+      "rimebound_fetish": {
+        "name": "Feticcio brinato"
+      },
+      "frostpine_tallow": {
+        "name": "Sego di pino brinato"
+      },
+      "forsworn_oath_knife": {
+        "name": "Coltello del giuramento Spergiuro"
+      },
+      "shadowbound_cipher": {
+        "name": "Cifrario legato all'ombra"
+      },
+      "vessiks_little_book": {
+        "name": "Libretto di Vessik"
+      },
+      "weirwatch_wraps": {
+        "name": "Fasce della Guardia della diga"
+      },
+      "lodgewalk_boots": {
+        "name": "Stivali della Loggia"
+      },
+      "unbroken_wardstone": {
+        "name": "Pietra di guardia integra"
+      },
+      "vault_ward_core": {
+        "name": "Nucleo di guardia della cripta"
+      },
+      "temple_offering_bowl": {
+        "name": "Ciotola delle offerte del tempio"
+      },
+      "graven_name_stone": {
+        "name": "Pietra dei nomi incisa"
+      },
+      "stalker_haunch": {
+        "name": "Coscio di predatore"
+      },
+      "heretic_creed_page": {
+        "name": "Pagina di credo bruciata"
+      },
+      "heretic_brand_iron": {
+        "name": "Ferro da marchio eretico"
+      },
+      "heretic_writ": {
+        "name": "Scritto eretico"
+      },
+      "first_court_sigil": {
+        "name": "Sigillo della Prima Corte"
+      },
+      "duneglass_heart": {
+        "name": "Cuore di vetro delle dune"
+      },
+      "unshattered_fulgurite": {
+        "name": "Fulgurite intatta"
+      },
+      "flameseer_ash_creed": {
+        "name": "Tavoletta del Credo di Cenere"
+      },
+      "flameseer_ember_phial": {
+        "name": "Fiala di braci"
+      },
+      "dawnward_censer": {
+        "name": "Turibolo dell'Alba"
+      },
+      "stolen_water_cask": {
+        "name": "Botte d'acqua sigillata"
+      },
+      "duskwater_oathmark": {
+        "name": "Marchio di giuramento di Acquabruna"
+      },
+      "caravan_toll_tally": {
+        "name": "Conteggio di pedaggio sigillato"
+      },
+      "tyrant_spoor": {
+        "name": "Calco di pista del Tiranno"
+      },
+      "oxbone_toll": {
+        "name": "Conteggio in osso di bue"
+      },
+      "cartographers_map": {
+        "name": "La mappa del Primo Cartografo"
+      },
+      "templestone_shard": {
+        "name": "Scheggia di pietra del tempio"
+      },
+      "fulgurite_splinter": {
+        "name": "Scheggia di fulgurite"
+      },
+      "charred_censer_chain": {
+        "name": "Catena di turibolo carbonizzata"
+      },
+      "wardens_stone_heart": {
+        "name": "Cuore di pietra di Ashkerat"
+      },
+      "first_meridian_compass": {
+        "name": "Bussola del Primo Meridiano"
+      },
+      "seatstone_flatbread": {
+        "name": "Focaccia della Sede"
+      },
+      "seatwell_waterskin": {
+        "name": "Otre del pozzo della Sede"
+      },
+      "lastwater_jerky": {
+        "name": "Carne secca di Ultima Acqua"
+      },
+      "lastwater_skin": {
+        "name": "Otre di Ultima Acqua"
+      },
+      "vaultkeepers_handwraps": {
+        "name": "Manopole del custode della cripta"
+      },
+      "sahrs_penitent_leggings": {
+        "name": "Gambali penitenti di Sahr"
+      },
+      "wardens_granite_edge": {
+        "name": "Filo di granito del Guardiano"
+      },
+      "staff_of_the_sunken_court": {
+        "name": "Bastone della Corte Sommersa"
+      },
+      "duneglass_shiv": {
+        "name": "Punteruolo di vetro delle dune"
+      },
+      "lastwater_roadmail": {
+        "name": "Maglia da strada di Ultima Acqua"
+      },
+      "duskwatch_robe": {
+        "name": "Tunica della Guardia del Crepuscolo"
+      },
+      "raiders_dust_jerkin": {
+        "name": "Farsetto impolverato del razziatore"
+      },
+      "ashkerat_greaves": {
+        "name": "Schinieri di Ashkerat"
+      },
+      "cartographers_windwraps": {
+        "name": "Fasce di vento del Cartografo"
+      },
+      "unlit_silk_gland": {
+        "name": "Ghiandola di seta spenta"
+      },
+      "veskals_fang": {
+        "name": "Zanna di Veskal"
+      },
+      "broodmother_carapace_guard": {
+        "name": "Guardia di carapace della Madre di covata"
+      },
+      "condensed_mist_heart": {
+        "name": "Cuore di nebbia condensata"
+      },
+      "mistfathers_knot": {
+        "name": "Il nodo del Padre delle Nebbie"
+      },
+      "fogwalker_treads": {
+        "name": "Calzari del camminanebbia"
+      },
       "bristleback_maul": {
         "name": "Maglio Bristleback"
       },
@@ -8776,7 +9028,7 @@ export const it_IT: EnTranslations = {
       "q_thornfen_palisade_defense": {
         "title": "Hold the Palisade",
         "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
         "objectives": {
           "0": {
             "label": "Waves repelled beside Warden Ilyen"
@@ -8796,7 +9048,7 @@ export const it_IT: EnTranslations = {
       "q_the_mistfather": {
         "title": "What the Fog Wants",
         "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
         "objectives": {
           "0": {
             "label": "Ghorvul slain"
@@ -9717,7 +9969,7 @@ export const it_IT: EnTranslations = {
       "q_report_to_ledgerwatch": {
         "title": "Report to Ledgerwatch",
         "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one {className} and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch.",
+        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Castellan Odric"
@@ -9825,7 +10077,7 @@ export const it_IT: EnTranslations = {
       "q_report_to_rimeshaft": {
         "title": "Report to Rimeshaft",
         "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends a {className} who walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
         "objectives": {
           "0": {
             "label": "Report to Foreman Ulla"
