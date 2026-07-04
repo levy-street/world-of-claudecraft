@@ -150,7 +150,7 @@ export class ModelViewer {
     return this.built?.clipNames ?? [];
   }
 
-  /** Play a specific clip on the loaded model (and keep the reference on idle). */
+  /** Play a specific clip on the loaded model. */
   setClip(name: string): void {
     this.built?.setClip(name);
   }
