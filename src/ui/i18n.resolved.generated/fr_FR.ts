@@ -1855,7 +1855,6 @@ export const fr_FR: EnTranslations = {
     "viewer": {
       "view3d": "Voir {name} en 3D",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "Voir en 3D",
       "loading": "Chargement du modèle...",
       "error": "Le modèle 3D n'a pas pu être chargé. L'illustration ci-dessus montre quand même ce {name}.",

@@ -1855,7 +1855,6 @@ export const pl_PL: EnTranslations = {
     "viewer": {
       "view3d": "Zobacz {name} w 3D",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "Zobacz w 3D",
       "loading": "Wczytywanie modelu...",
       "error": "Nie udało się wczytać modelu 3D. Grafika powyżej i tak pokazuje tę postać: {name}.",

@@ -1855,7 +1855,6 @@ export const sv_SE: EnTranslations = {
     "viewer": {
       "view3d": "Visa {name} i 3D",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "Visa i 3D",
       "loading": "Laddar modell...",
       "error": "3D-modellen kunde inte laddas. Konsten ovan visar fortfarande denna {name}.",

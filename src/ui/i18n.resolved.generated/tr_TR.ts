@@ -1855,7 +1855,6 @@ export const tr_TR: EnTranslations = {
     "viewer": {
       "view3d": "{name} ögesini 3B görüntüle",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "3B görüntüle",
       "loading": "Model yükleniyor...",
       "error": "3B model yüklenemedi. Yukarıdaki görsel yine de bu {name} ögesini gösteriyor.",

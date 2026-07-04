@@ -1855,7 +1855,6 @@ export const ru_RU: EnTranslations = {
     "viewer": {
       "view3d": "Посмотреть {name} в 3D",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "Посмотреть в 3D",
       "loading": "Загрузка модели...",
       "error": "Не удалось загрузить 3D-модель. Изображение выше всё ещё показывает этого: {name}.",

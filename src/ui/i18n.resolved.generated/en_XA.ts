@@ -1855,7 +1855,6 @@ export const en_XA: EnTranslations = {
     "viewer": {
       "view3d": "[Ʋíéŵ {name} íñ 3Ð]",
       "playClip": "[Þļáý ţĥé {name} áñíɱáţíóñ]",
-      "compare": "[Çóɱþáŕé šížé]",
       "view3dShort": "[Ʋíéŵ íñ 3Ð]",
       "loading": "[Ļóáðíñĝ ɱóðéļ...]",
       "error": "[Ţĥé 3Ð ɱóðéļ çóúļð ñóţ ƀé ļóáðéð. Ţĥé áŕţ áƀóʋé šţíļļ šĥóŵš ţĥíš {name}.]",

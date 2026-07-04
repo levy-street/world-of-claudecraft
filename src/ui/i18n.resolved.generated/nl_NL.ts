@@ -1855,7 +1855,6 @@ export const nl_NL: EnTranslations = {
     "viewer": {
       "view3d": "Bekijk {name} in 3D",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "Bekijk in 3D",
       "loading": "Model laden...",
       "error": "Het 3D-model kon niet worden geladen. De afbeelding hierboven toont nog steeds deze {name}.",

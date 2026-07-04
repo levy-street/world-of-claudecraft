@@ -1855,7 +1855,6 @@ export const vi_VN: EnTranslations = {
     "viewer": {
       "view3d": "Xem {name} ở dạng 3D",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "Xem ở dạng 3D",
       "loading": "Đang tải mô hình...",
       "error": "Không thể tải mô hình 3D. Hình minh họa phía trên vẫn cho thấy {name} này.",

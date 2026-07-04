@@ -58,22 +58,6 @@ export function wireInspector(fig: HTMLElement, stage: HTMLElement, viewer: Mode
       bar.appendChild(b);
     }
   }
-  const refSpec = GUIDE_MODELS.player_warrior;
-  if (refSpec) {
-    const toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'viewer-inspector-ref';
-    toggle.textContent = t('guide.viewer.compare');
-    toggle.setAttribute('aria-pressed', 'false');
-    let on = false;
-    toggle.addEventListener('click', () => {
-      on = !on;
-      toggle.setAttribute('aria-pressed', String(on));
-      toggle.classList.toggle('sel', on);
-      void viewer.setReference(on ? refSpec : null, null);
-    });
-    bar.appendChild(toggle);
-  }
   if (bar.childElementCount > 0) stage.insertAdjacentElement('afterend', bar);
 }
 

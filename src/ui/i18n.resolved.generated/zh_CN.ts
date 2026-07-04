@@ -1855,7 +1855,6 @@ export const zh_CN: EnTranslations = {
     "viewer": {
       "view3d": "以 3D 查看 {name}",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "以 3D 查看",
       "loading": "正在载入模型……",
       "error": "无法载入该 3D 模型。上方的美术图仍展示着这个 {name}。",

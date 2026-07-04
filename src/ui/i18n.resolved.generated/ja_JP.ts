@@ -1855,7 +1855,6 @@ export const ja_JP: EnTranslations = {
     "viewer": {
       "view3d": "{name}を3Dで見る",
       "playClip": "Play the {name} animation",
-      "compare": "Compare size",
       "view3dShort": "3Dで見る",
       "loading": "モデルを読み込み中...",
       "error": "3Dモデルを読み込めませんでした。上のアートでは、この{name}が今も表示されています。",
