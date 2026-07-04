@@ -63,10 +63,12 @@ import {
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  glitchAccountForInstall,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
+  linkGlitchAccount,
   listCharacters,
   listCompanionTokens,
   loadAccountCosmetics,
@@ -113,6 +115,7 @@ import {
 } from './github';
 import { topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { handleGlitchLogin, readGlitchServerConfig } from './glitch_auth';
 import {
   contentLengthExceeds,
   isUniqueViolation,
@@ -163,6 +166,7 @@ import {
   wocBalanceRateLimited,
 } from './ratelimit';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
+import { acquireRealmSingletonLock } from './realm_lock';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
@@ -671,6 +675,7 @@ function publicCors(res: http.ServerResponse): void {
 // Anti-bot: when enabled, /api/login + /api/register require a same-origin browser
 // request (a recognised Origin header), so only the web client can obtain a token.
 const REQUIRE_WEB_LOGIN = webLoginEnforced();
+const GLITCH_SERVER_CONFIG = readGlitchServerConfig();
 
 async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
   const url = (req.url ?? '').split('?')[0];
@@ -698,6 +703,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       req.method === 'POST' &&
       (url === '/api/register' ||
         url === '/api/login' ||
+        url === '/api/auth/glitch' ||
         url === '/api/desktop-login/create' ||
         url === '/api/desktop-login/exchange') &&
       rateLimited(req)
@@ -813,6 +819,28 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // recovery address, so it can force the mandatory-email prompt on sign-in.
       const emailMissing = !(account.email && account.email.trim());
       return json(res, 200, { token, username: account.username, emailMissing });
+    }
+    if (req.method === 'POST' && url === '/api/auth/glitch') {
+      return handleGlitchLogin(
+        req,
+        res,
+        {
+          realm: REALM,
+          config: GLITCH_SERVER_CONFIG,
+          requestMetadata,
+          initialCharacterState,
+          glitchAccountForInstall,
+          linkGlitchAccount,
+          createAccount,
+          touchLogin,
+          saveToken,
+          listCharacters,
+          createCharacterCapped,
+          isCharacterOnline: (characterId) =>
+            [...game.clients.values()].some((session) => session.characterId === characterId),
+        },
+        json,
+      );
     }
     if (req.method === 'POST' && url === '/api/desktop-login/create') {
       return handleDesktopLoginCreate(req, res, desktopLoginRouteDeps);
@@ -1729,6 +1757,8 @@ async function main(): Promise<void> {
     }
   }
   await ensureSchema();
+  const realmLock = await acquireRealmSingletonLock(pool, REALM);
+  if (realmLock) console.log(`acquired authoritative realm lock for "${REALM}"`);
   await seedOAuthClients();
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
@@ -2000,6 +2030,7 @@ async function main(): Promise<void> {
     await game.saveMail();
     await game.endAllPlaySessions();
     await game.chatLog.stop();
+    await realmLock?.release();
     await pool.end();
     process.exit(0);
   };

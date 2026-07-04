@@ -9,6 +9,7 @@
 // per-key cooldown, and a tiny pool of persistent looping sources for ambience
 // and sustained spell casts (cross-faded by gain, never restarted).
 
+import { publicAssetUrl } from '../runtime_assets';
 import type { BiomeId } from '../sim/types';
 import { SFX_CLIPS } from './sfx_manifest.generated';
 
@@ -96,7 +97,7 @@ class Sfx {
     await Promise.all(
       Object.entries(SFX_CLIPS).map(async ([key, entry]) => {
         try {
-          const res = await fetch(entry.url);
+          const res = await fetch(publicAssetUrl(entry.url));
           if (!res.ok) return;
           const buf = await ctx.decodeAudioData(await res.arrayBuffer());
           this.buffers.set(key, buf);

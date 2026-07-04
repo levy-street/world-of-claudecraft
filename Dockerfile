@@ -18,19 +18,30 @@ COPY public ./public
 COPY private ./private
 # Public client config is inlined into the bundle at build time (Vite reads
 # VITE_* from the environment). Empty defaults keep optional UI disabled:
-# Turnstile widget off. Passed through from compose build args.
+# Turnstile widget off. Passed through from compose/Glitch build args.
 ARG VITE_TURNSTILE_SITEKEY=""
+ARG VITE_GLITCH_ENABLED=""
+ARG VITE_GLITCH_TITLE_ID=""
+ARG VITE_GLITCH_TITLE_TOKEN=""
+ARG VITE_GLITCH_DEFAULT_CLASS=""
+ARG VITE_API_ORIGIN=""
 RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
+    VITE_GLITCH_ENABLED="$VITE_GLITCH_ENABLED" \
+    VITE_GLITCH_TITLE_ID="$VITE_GLITCH_TITLE_ID" \
+    VITE_GLITCH_TITLE_TOKEN="$VITE_GLITCH_TITLE_TOKEN" \
+    VITE_GLITCH_DEFAULT_CLASS="$VITE_GLITCH_DEFAULT_CLASS" \
+    VITE_API_ORIGIN="$VITE_API_ORIGIN" \
     npm run build && cp -a dist/media ./media-build && rm -rf dist/media && npm run build:server && npm run build:bot
 
 FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3000
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/media-build ./media-build
 COPY --from=build /app/dist-server ./dist-server
 COPY --from=build /app/dist-bot ./dist-bot
 RUN mkdir -p /app/dist/media && chown -R node:node /app/dist/media
-EXPOSE 8787
+EXPOSE 3000
 USER node
 CMD ["sh", "-c", "mkdir -p /app/dist/media && node -e \"require('fs').cpSync('/app/media-build', '/app/dist/media', { recursive: true, force: true })\" && node dist-server/server.cjs"]

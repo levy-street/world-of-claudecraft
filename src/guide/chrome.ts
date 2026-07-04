@@ -3,11 +3,16 @@
 // the footer. Pure DOM construction; the app owns routing and active-state updates.
 // All player-visible text is a t() key; all interpolated text passes through esc().
 
-import { t, getLanguage, languageTag, supportedLanguages, type SupportedLanguage } from '../ui/i18n';
+import { publicAssetUrl } from '../runtime_assets';
 import { esc } from '../ui/esc';
 import {
-  GUIDE_BASE, hrefFor, topbarRoutes, groupedRoutes, type GuideGroup,
-} from './routes';
+  getLanguage,
+  languageTag,
+  type SupportedLanguage,
+  supportedLanguages,
+  t,
+} from '../ui/i18n';
+import { GUIDE_BASE, type GuideGroup, groupedRoutes, hrefFor, topbarRoutes } from './routes';
 import { mountSearch } from './search';
 
 export interface GuideChrome {
@@ -35,7 +40,10 @@ function endonym(lang: SupportedLanguage): string {
 
 function topNavHtml(): string {
   const items = topbarRoutes()
-    .map((r) => `<li><a class="guide-nav-link" data-sub="${esc(r.sub)}" href="${esc(hrefFor(r.sub))}">${esc(t(r.navKey))}</a></li>`)
+    .map(
+      (r) =>
+        `<li><a class="guide-nav-link" data-sub="${esc(r.sub)}" href="${esc(hrefFor(r.sub))}">${esc(t(r.navKey))}</a></li>`,
+    )
     .join('');
   return `<ul class="guide-nav-list">${items}</ul>`;
 }
@@ -45,7 +53,10 @@ function sidebarHtml(): string {
     .map(({ group, routes }) => {
       const label = esc(t(`guide.groups.${group}` as `guide.groups.${GuideGroup}`));
       const links = routes
-        .map((r) => `<li><a class="guide-side-link" data-sub="${esc(r.sub)}" href="${esc(hrefFor(r.sub))}">${esc(t(r.navKey))}</a></li>`)
+        .map(
+          (r) =>
+            `<li><a class="guide-side-link" data-sub="${esc(r.sub)}" href="${esc(hrefFor(r.sub))}">${esc(t(r.navKey))}</a></li>`,
+        )
         .join('');
       return `<div class="guide-side-group"><h2 class="guide-side-heading">${label}</h2><ul>${links}</ul></div>`;
     })
@@ -67,7 +78,10 @@ function searchHtml(): string {
 function languagePickerHtml(): string {
   const current = getLanguage();
   const options = supportedLanguages
-    .map((lang) => `<option value="${esc(lang)}"${lang === current ? ' selected' : ''}>${esc(endonym(lang))}</option>`)
+    .map(
+      (lang) =>
+        `<option value="${esc(lang)}"${lang === current ? ' selected' : ''}>${esc(endonym(lang))}</option>`,
+    )
     .join('');
   return `
     <div class="guide-lang">
@@ -80,13 +94,17 @@ export interface ChromeOptions {
   onLanguageChange(lang: SupportedLanguage): void;
 }
 
-export function buildChrome(mount: HTMLElement, opts: ChromeOptions, signal: AbortSignal): GuideChrome {
+export function buildChrome(
+  mount: HTMLElement,
+  opts: ChromeOptions,
+  signal: AbortSignal,
+): GuideChrome {
   mount.innerHTML = `
     <a class="guide-skip" href="#guide-main">${esc(t('guide.skipToContent'))}</a>
     <header class="guide-header">
       <div class="guide-header-inner">
         <a class="guide-brand" href="${esc(GUIDE_BASE)}">
-          <img class="guide-brand-logo" src="/woc-logo-guide.webp" width="239" height="160" alt="${esc(t('guide.brand'))}" decoding="async" />
+          <img class="guide-brand-logo" src="${esc(publicAssetUrl('/woc-logo-guide.webp'))}" width="239" height="160" alt="${esc(t('guide.brand'))}" decoding="async" />
         </a>
         <button type="button" class="guide-menu-toggle" aria-expanded="false" aria-controls="guide-primary-nav" aria-label="${esc(t('guide.nav.openMenu'))}">
           <span class="guide-menu-bars" aria-hidden="true"></span>
@@ -137,20 +155,30 @@ export function buildChrome(mount: HTMLElement, opts: ChromeOptions, signal: Abo
     nav.classList.toggle('is-open', open);
     document.body.classList.toggle('guide-menu-open', open);
   };
-  menuToggle.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
+  menuToggle.addEventListener('click', () =>
+    setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'),
+  );
   // Document-level listeners use { signal } so a language switch (which rebuilds the
   // chrome) cleanly removes the old handlers instead of stacking duplicates.
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
-      setMenu(false);
-      menuToggle.focus();
-    }
-  }, { signal });
-  document.addEventListener('click', (e) => {
-    if (menuToggle.getAttribute('aria-expanded') !== 'true') return;
-    const target = e.target as Node;
-    if (!header.contains(target)) setMenu(false);
-  }, { signal });
+  document.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
+        setMenu(false);
+        menuToggle.focus();
+      }
+    },
+    { signal },
+  );
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (menuToggle.getAttribute('aria-expanded') !== 'true') return;
+      const target = e.target as Node;
+      if (!header.contains(target)) setMenu(false);
+    },
+    { signal },
+  );
 
   // Mobile "Topics" disclosure for the docs sidebar.
   topicsToggle.addEventListener('click', () => {

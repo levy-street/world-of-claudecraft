@@ -92,6 +92,13 @@ export interface CharacterSummary {
   playtimeSeconds?: number;
 }
 
+export interface GlitchLoginResult {
+  token: string;
+  username: string;
+  realm: string;
+  character: CharacterSummary;
+}
+
 function stringList(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')
@@ -103,6 +110,22 @@ function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
   return {
     completedQuestIds: stringList(src.completedQuestIds),
     mechChromaIds: stringList(src.mechChromaIds),
+  };
+}
+
+function normalizeCharacterSummary(value: unknown): CharacterSummary {
+  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  const cls = typeof src.class === 'string' && src.class in CLASSES ? src.class : 'warrior';
+  return {
+    id: Number(src.id ?? 0),
+    name: typeof src.name === 'string' ? src.name : 'Glitch Player',
+    class: cls as PlayerClass,
+    level: Math.max(1, Math.floor(typeof src.level === 'number' ? src.level : 1)),
+    skin: Math.max(0, Math.floor(typeof src.skin === 'number' ? src.skin : 0)),
+    online: src.online === true,
+    forceRename: src.forceRename === true,
+    lastPlayed: typeof src.lastPlayed === 'string' ? src.lastPlayed : null,
+    playtimeSeconds: typeof src.playtimeSeconds === 'number' ? src.playtimeSeconds : 0,
   };
 }
 
@@ -327,6 +350,25 @@ export class Api {
     const data = await this.post('/api/desktop-login/exchange', { code });
     this.token = data.token;
     this.username = data.username;
+  }
+
+  async glitchLogin(input: {
+    installId: string;
+    defaultClass: PlayerClass;
+  }): Promise<GlitchLoginResult> {
+    const data = await this.post('/api/auth/glitch', {
+      install_id: input.installId,
+      default_class: input.defaultClass,
+    });
+    this.token = typeof data.token === 'string' ? data.token : null;
+    this.username = typeof data.username === 'string' ? data.username : null;
+    if (typeof data.realm === 'string') this.realm = data.realm;
+    return {
+      token: this.token ?? '',
+      username: this.username ?? '',
+      realm: typeof data.realm === 'string' ? data.realm : '',
+      character: normalizeCharacterSummary(data.character),
+    };
   }
 
   // ── Persistent session (home-page account portal) ──────────────────────────

@@ -25,6 +25,7 @@ import {
 } from '../render/characters/portrait';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
+import { publicAssetUrl } from '../runtime_assets';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import {
   EVENT_SKIN_TIERS,
@@ -1307,8 +1308,7 @@ export class Hud {
       $('#daily-rewards-window').style.display = 'none';
     } else if (dailyRewardsButton) {
       this.dailyRewardsButtonEl = dailyRewardsButton;
-      dailyRewardsButton.innerHTML =
-        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+      dailyRewardsButton.innerHTML = `<img class="daily-rewards-icon" src="${esc(publicAssetUrl('/ui/daily-rewards/treasure_chest.webp'))}" alt="" draggable="false" decoding="async">`;
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
       dailyRewardsButton.addEventListener('pointerdown', (event) => {

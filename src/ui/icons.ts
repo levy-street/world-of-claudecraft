@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { publicAssetUrl } from '../runtime_assets';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
@@ -3020,7 +3021,7 @@ export const QUALITY_COLOR: Record<string, string> = {
 // CSS .q-* border), exactly like the procedural icons.
 // ---------------------------------------------------------------------------
 
-const WEAPON_ICON_DIR = '/ui/weapons';
+const WEAPON_ICON_DIR = publicAssetUrl('/ui/weapons');
 
 // Item id -> weapon variant key. Shared with the 3D held model so the bag icon
 // and the in-hand weapon always match (src/ui/weapon_variants.ts).
@@ -3042,7 +3043,7 @@ function weaponIconUrl(id: string): string | null {
 // own `class`, so adding a class is just listing its ability ids here. Abilities not listed
 // fall through to the procedural ABILITY_RECIPES below. ABILITY_IMAGE_IDS and abilityImageUrl
 // are exported for the gate in tests/skill_icons.test.ts.
-const SKILL_ICON_DIR = '/ui/skills';
+const SKILL_ICON_DIR = publicAssetUrl('/ui/skills');
 export const ABILITY_IMAGE_IDS = new Set<string>([
   // paladin (CraftPix premium "RPG Paladin skill icons" pack)
   'seal_of_righteousness',
@@ -3233,7 +3234,7 @@ export function abilityImageUrl(id: string): string | null {
 // for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Items not listed fall
 // through to the procedural ITEM_RECIPES below. WebP only, like the skill icons. Add art via
 // `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
-const ITEM_ICON_DIR = '/ui/items';
+const ITEM_ICON_DIR = publicAssetUrl('/ui/items');
 export const ITEM_IMAGE_IDS = new Set<string>([
   // food
   'baked_bread',

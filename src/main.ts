@@ -26,6 +26,14 @@ import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
+import {
+  bootstrapGlitchSession,
+  type GlitchSession,
+  parseGlitchLaunchInstallId,
+  readGlitchConfig,
+  readGlitchDefaultClass,
+  startGlitchInstallHeartbeat,
+} from './game/glitch';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import {
@@ -94,6 +102,7 @@ import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import { navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
+import { publicAssetUrl } from './runtime_assets';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
 import { ITEMS, setActiveWorldContent } from './sim/data';
@@ -494,6 +503,8 @@ function localizedSiteUrl(lang: SupportedLanguage): string {
 declare const __APP_VERSION__: string;
 declare const __APP_BUILD_ID__: string;
 declare const __APP_BUILD_DATE__: string;
+
+const GLITCH_CONFIG = readGlitchConfig(import.meta.env, __APP_VERSION__);
 
 function formatFooterVersion(version: string): string {
   return version.replace(/\.0$/, '');
@@ -2743,6 +2754,40 @@ async function startOffline(
   // Offline characters are not persisted (a fresh name is typed each session),
   // so the only stable handle is class + name. Keybinds scope to that pair.
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
+}
+
+async function startGlitchAuthenticatedGame(session: GlitchSession): Promise<void> {
+  const configuredClass = readGlitchDefaultClass(
+    import.meta.env,
+    Object.keys(CLASSES),
+  ) as PlayerClass;
+  const login = await api.glitchLogin({
+    installId: session.installId,
+    defaultClass: configuredClass,
+  });
+  startGlitchInstallHeartbeat({ session });
+  if (login.character.online) {
+    await api.takeoverCharacter(login.character.id);
+  }
+  await enterWorld({ ...login.character, online: false });
+}
+
+async function maybeStartGlitchLaunch(): Promise<boolean> {
+  if (!GLITCH_CONFIG.enabled || !parseGlitchLaunchInstallId(location.search)) return false;
+  enterLoadingState(t('loading.connectingRealm'));
+  try {
+    const session = await bootstrapGlitchSession({
+      config: GLITCH_CONFIG,
+      storage: window.localStorage,
+      search: location.search,
+    });
+    if (!session?.launchedByGlitch) return false;
+    await startGlitchAuthenticatedGame(session);
+    return true;
+  } catch (err) {
+    fatalOverlay(userFacingApiError(err));
+    return true;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -7617,7 +7662,7 @@ function wireStartScreens(): void {
 // playing through the loading screen and fades out once the game is on screen.
 function initHomepageMusic(): void {
   if (homepageMusic) return;
-  const el = new Audio('/audio/main-theme.mp3');
+  const el = new Audio(publicAssetUrl('/audio/main-theme.mp3'));
   el.loop = true;
   el.muted = homepageMusicMuted;
   el.preload = 'auto';
@@ -7671,21 +7716,27 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
   }
 })();
 
-// Editor play-test handoff: if the map editor stored a custom world and sent us
-// here, boot straight into that offline world and skip the start screen. Any
-// malformed/absent request falls through to the normal home flow.
-const editorPlaytest = takeEditorPlaytestRequest();
-if (editorPlaytest) {
+async function bootInitialFlow(): Promise<void> {
   startSitePresence('home');
-  void startOffline(
-    editorPlaytest.playerClass,
-    editorPlaytest.playerName,
-    0,
-    editorPlaytest.content,
-    editorPlaytest.seed,
-  );
-} else {
-  startSitePresence('home');
+  if (await maybeStartGlitchLaunch()) return;
+
+  // Editor play-test handoff: if the map editor stored a custom world and sent us
+  // here, boot straight into that offline world and skip the start screen. Any
+  // malformed/absent request falls through to the normal home flow.
+  const editorPlaytest = takeEditorPlaytestRequest();
+  if (editorPlaytest) {
+    void startOffline(
+      editorPlaytest.playerClass,
+      editorPlaytest.playerName,
+      0,
+      editorPlaytest.content,
+      editorPlaytest.seed,
+    );
+    return;
+  }
+
   wireStartScreens();
   initHomepageMusic();
 }
+
+void bootInitialFlow();

@@ -8,6 +8,7 @@
 // Each theme is a composed multi-track loop scheduled with a lookahead
 // timer; zone changes crossfade.
 
+import { publicAssetUrl } from '../runtime_assets';
 import type { BiomeId } from '../sim/types';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
 
@@ -39,6 +40,7 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
 };
+const BOSS_TRACK_URL = publicAssetUrl('/audio/dungeon-boss-fight.mp3');
 
 export function dungeonMusicZoneForDungeon(dungeonId: string): MusicZone {
   return DUNGEON_MUSIC[dungeonId] ?? 'dungeon_hollow_crypt';
@@ -2630,7 +2632,7 @@ export class MusicDirector {
   private ensureBossElement(): HTMLAudioElement | null {
     if (this.bossElement) return this.bossElement;
     if (typeof Audio !== 'function') return null;
-    const el = new Audio('/audio/dungeon-boss-fight.mp3');
+    const el = new Audio(BOSS_TRACK_URL);
     el.loop = true;
     el.preload = 'auto';
     this.bossElement = el;
@@ -2641,7 +2643,7 @@ export class MusicDirector {
     const ctx = this.ctx;
     if (!ctx || this.bossBuffer || this.bossLoading || typeof fetch !== 'function') return;
     this.bossLoading = true;
-    void fetch('/audio/dungeon-boss-fight.mp3')
+    void fetch(BOSS_TRACK_URL)
       .then((res) => res.arrayBuffer())
       .then((bytes) => ctx.decodeAudioData(bytes))
       .then((buffer) => {

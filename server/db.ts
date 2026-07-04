@@ -180,6 +180,17 @@ CREATE INDEX IF NOT EXISTS accounts_created_user_agent_created ON accounts(creat
 CREATE INDEX IF NOT EXISTS accounts_last_login_ip_login ON accounts(last_login_ip, last_login DESC);
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS is_gm BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS force_rename BOOLEAN NOT NULL DEFAULT FALSE;
+CREATE TABLE IF NOT EXISTS glitch_accounts (
+  title_id TEXT NOT NULL,
+  install_id TEXT NOT NULL,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  glitch_user_name TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (title_id, install_id),
+  UNIQUE (account_id)
+);
+CREATE INDEX IF NOT EXISTS glitch_accounts_account ON glitch_accounts(account_id);
 CREATE TABLE IF NOT EXISTS play_sessions (
   id SERIAL PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -718,6 +729,43 @@ export async function touchLogin(accountId: number, meta: RequestMetadata = {}):
      WHERE id = $1`,
     [accountId, cleanMetadataText(meta.ip, 128), cleanMetadataText(meta.userAgent, 512)],
   );
+}
+
+export interface GlitchAccountLinkRow {
+  title_id: string;
+  install_id: string;
+  account_id: number;
+  glitch_user_name: string | null;
+}
+
+export async function glitchAccountForInstall(
+  titleId: string,
+  installId: string,
+): Promise<GlitchAccountLinkRow | null> {
+  const res = await pool.query(
+    `SELECT title_id, install_id, account_id, glitch_user_name
+       FROM glitch_accounts
+      WHERE title_id = $1 AND install_id = $2`,
+    [titleId, installId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function linkGlitchAccount(
+  titleId: string,
+  installId: string,
+  accountId: number,
+  glitchUserName: string,
+): Promise<GlitchAccountLinkRow> {
+  const res = await pool.query(
+    `INSERT INTO glitch_accounts (title_id, install_id, account_id, glitch_user_name)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (title_id, install_id)
+     DO UPDATE SET glitch_user_name = EXCLUDED.glitch_user_name, updated_at = now()
+     RETURNING title_id, install_id, account_id, glitch_user_name`,
+    [titleId, installId, accountId, glitchUserName],
+  );
+  return res.rows[0];
 }
 
 // A bearer token's authority. 'full' is a normal web session; 'read' is a

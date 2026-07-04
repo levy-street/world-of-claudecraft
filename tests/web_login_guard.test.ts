@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   allowedCorsOrigin,
   DESKTOP_APP_ORIGINS,
+  GLITCH_APP_ORIGINS,
   isDesktopAppRequest,
   isNativeAppRequest,
   isWebClientRequest,
@@ -44,6 +45,12 @@ describe('web login guard (anti-bot)', () => {
     expect(
       isWebClientRequest(req({ origin: 'http://localhost:5173', host: '127.0.0.1:8787' })),
     ).toBe(true);
+  });
+
+  it('accepts Glitch iframe origins for the optional Glitch launch flow', () => {
+    for (const origin of GLITCH_APP_ORIGINS) {
+      expect(isWebClientRequest(req({ origin, host: 'worldofclaudecraft.com' }))).toBe(true);
+    }
   });
 
   it('accepts Capacitor native app origins', () => {
@@ -125,6 +132,17 @@ describe('API CORS reflection allow-list (allowedCorsOrigin)', () => {
     expect(allowedCorsOrigin('capacitor://localhost')).toBe('capacitor://localhost');
     expect(allowedCorsOrigin('http://localhost')).toBe('http://localhost');
     expect(allowedCorsOrigin('https://localhost')).toBe('https://localhost');
+  });
+
+  it('reflects Glitch iframe origins and explicit WEB_ORIGINS entries', () => {
+    for (const origin of GLITCH_APP_ORIGINS) {
+      expect(allowedCorsOrigin(origin)).toBe(origin);
+    }
+    expect(
+      allowedCorsOrigin('https://play.example.com', {
+        WEB_ORIGINS: 'https://play.example.com',
+      } as any),
+    ).toBe('https://play.example.com');
   });
 
   it('does not reflect look-alikes, unlisted origins, or a missing Origin', () => {
