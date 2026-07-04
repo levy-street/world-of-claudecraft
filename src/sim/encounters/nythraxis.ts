@@ -59,7 +59,7 @@ const _NYTHRAXIS_CRYPT_QUESTS = new Set(['q_nythraxis_sealed_crypt', 'q_nythraxi
 // the dungeon raid-door seal in instances/dungeons.ts also reads NYTHRAXIS_BOSS_ID).
 const NYTHRAXIS_ALDRIC_ID = 'brother_aldric_raid';
 const _NYTHRAXIS_FINAL_QUEST_ID = 'q_nythraxis_scourges_end';
-const NYTHRAXIS_WARDSTONE_ITEM_ID = 'bastion_ward_stone';
+const NYTHRAXIS_WARDSTONE_ITEM_ID = 'nythraxis_wardstone';
 // How far a wardstone may sit from the boss spawn and still belong to this
 // encounter. The three arena wards form a wide forward triangle (~54yd out), so
 // this must comfortably exceed that; far above any cross-instance false match.
@@ -956,10 +956,12 @@ export function tryStartNythraxisWardChannel(
       !e.dead &&
       dist2d(e.spawnPos, ward.pos) < NYTHRAXIS_WARDSTONE_RANGE,
   );
-  // No Nythraxis boss in range: this is not a raid wardstone but the overworld
-  // "Sunken Bastion" quest ward stone (same item id). Fall through so the normal
-  // quest pickup runs, instead of swallowing the interaction.
-  if (!boss) return false;
+  // A nythraxis_wardstone with no boss in range is a leftover raid wardstone
+  // (boss dead or reset). It is a use-object, never a pickup, so swallow the
+  // interaction rather than falling through to generic pickup. The overworld
+  // Sunken Bastion quest stone has a different id (bastion_ward_stone) and is
+  // already handled by the id guard above.
+  if (!boss) return true;
   if (!boss.nythraxis || boss.nythraxis.deathlessCastRemaining <= 0) return true;
   const channel = boss.nythraxis.wardChannels.find((c) => c.objectId === ward.id);
   if (!channel || channel.complete) return true;

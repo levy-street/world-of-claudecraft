@@ -7755,6 +7755,7 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineCandleInteract": "燭火神龕：按 F 觸碰",
     "delveRiteShrineReedInteract": "蘆葦神龕：按 F 觸碰",
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
-    "mailboxName": "郵箱"
+    "mailboxName": "郵箱",
+    "nythraxisWardstoneName": "靈魂護符石"
   }
 };

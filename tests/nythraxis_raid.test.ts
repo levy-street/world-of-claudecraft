@@ -87,7 +87,7 @@ function objects(sim: Sim, itemId: string, near?: { x: number; z: number }): Ent
 }
 
 function deathlessChannelObjects(sim: Sim, near: { x: number; z: number }): Entity[] {
-  return objects(sim, 'bastion_ward_stone', near).sort((a, b) => a.id - b.id);
+  return objects(sim, 'nythraxis_wardstone', near).sort((a, b) => a.id - b.id);
 }
 
 function engage(boss: Entity, tank: Entity) {
@@ -193,7 +193,7 @@ describe('Nythraxis raid encounter', () => {
     expect(visualKeyFor(boss)).toBe('skel_golem');
     expect(boss.scale).toBeGreaterThanOrEqual(3);
     expect(boss.facing).toBe(Math.PI);
-    const wards = objects(sim, 'bastion_ward_stone', origin);
+    const wards = objects(sim, 'nythraxis_wardstone', origin);
     const pillars = objects(sim, 'soulshard_pillar', origin);
     expect(wards).toHaveLength(3);
     expect(
@@ -2135,7 +2135,7 @@ describe('Nythraxis raid encounter', () => {
       true,
     );
     expect(channelers.every((pid) => sim.entities.get(pid)!.castingAbility === null)).toBe(true);
-    expect(objects(sim, 'bastion_ward_stone', origin)).toHaveLength(3);
+    expect(objects(sim, 'nythraxis_wardstone', origin)).toHaveLength(3);
     expect(objects(sim, 'soulshard_pillar', origin)).toHaveLength(0);
     expect(origin.x).toBeGreaterThan(3000);
   });
@@ -2167,7 +2167,7 @@ describe('Nythraxis raid encounter', () => {
     };
     sim.tick();
 
-    const ward = objects(sim, 'bastion_ward_stone', origin)[0];
+    const ward = objects(sim, 'nythraxis_wardstone', origin)[0];
     const pid = sim.addPlayer('priest', 'WardSpam');
     teleport(sim, pid, ward.pos.x, ward.pos.z);
     sim.targetEntity(ward.id, pid);
@@ -2212,7 +2212,7 @@ describe('Nythraxis raid encounter', () => {
     };
     sim.tick();
 
-    const ward = objects(sim, 'bastion_ward_stone', origin)[0];
+    const ward = objects(sim, 'nythraxis_wardstone', origin)[0];
     teleport(sim, tankPid, ward.pos.x, ward.pos.z);
     sim.targetEntity(ward.id, tankPid);
     sim.interact(tankPid);
@@ -2305,7 +2305,7 @@ describe('Nythraxis raid encounter', () => {
     };
     sim.tick();
 
-    const ward = objects(sim, 'bastion_ward_stone', origin)[0];
+    const ward = objects(sim, 'nythraxis_wardstone', origin)[0];
     const pid = sim.addPlayer('priest', 'Clicker');
     teleport(sim, pid, ward.pos.x, ward.pos.z);
     sim.pickUpObject(ward.id, pid);
@@ -2315,7 +2315,7 @@ describe('Nythraxis raid encounter', () => {
     expect(sim.entities.get(pid)!.castingAbility).toBe('nythraxis_ward_channel');
     expect(ward.lootable).toBe(true);
     expect(
-      sim.players.get(pid)!.inventory.some((slot) => slot?.itemId === 'bastion_ward_stone'),
+      sim.players.get(pid)!.inventory.some((slot) => slot?.itemId === 'nythraxis_wardstone'),
     ).toBe(false);
   });
 

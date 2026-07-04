@@ -7755,6 +7755,7 @@ export const en_XA: EnTranslations = {
     "delveRiteShrineCandleInteract": "[Çáñðļé Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineReedInteract": "[Ŕééð Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineSkullInteract": "[Šķúļļ Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
-    "mailboxName": "[Ɱáíļƀóẋ]"
+    "mailboxName": "[Ɱáíļƀóẋ]",
+    "nythraxisWardstoneName": "[Šóúļ Ŵáŕðšţóñé]"
   }
 };

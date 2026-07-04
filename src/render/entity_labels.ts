@@ -73,6 +73,9 @@ export function objectDisplayName(entity: Entity): string {
       ? t('worldContent.dungeonExitName', { name: dungeonName })
       : dungeonName;
   }
+  if (entity.templateId === 'ground_nythraxis_wardstone') {
+    return t('worldContent.nythraxisWardstoneName');
+  }
   // Collectible/quest ground objects carry the item id they grant; localize the
   // nameplate through the item dictionary instead of the raw English name.
   if (entity.objectItemId) return tEntity({ kind: 'item', id: entity.objectItemId, field: 'name' });

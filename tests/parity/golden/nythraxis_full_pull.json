@@ -1123,7 +1123,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 413,
-      "state": "da383bc0",
+      "state": "ac630f4e",
       "events": "96c02951",
       "rng": {
         "draws": 15,
@@ -1688,7 +1688,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1702,7 +1702,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -1737,7 +1737,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1751,7 +1751,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -1786,7 +1786,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1800,7 +1800,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -1975,7 +1975,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 413,
-      "state": "043520ae",
+      "state": "68c4318c",
       "events": "741638a5",
       "rng": {
         "draws": 37,
@@ -1986,7 +1986,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 413,
-      "state": "52151af3",
+      "state": "585e7aad",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -1997,7 +1997,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 413,
-      "state": "f57a16c0",
+      "state": "09b9d26a",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -2008,7 +2008,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 413,
-      "state": "5e4d1381",
+      "state": "a84c030b",
       "events": "d70c6b65",
       "rng": {
         "draws": 166,
@@ -2019,7 +2019,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 413,
-      "state": "6fa27866",
+      "state": "87828048",
       "events": "0e26bd94",
       "rng": {
         "draws": 228,
@@ -2030,7 +2030,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 413,
-      "state": "977b55a3",
+      "state": "9e35bdad",
       "events": "741638a5",
       "rng": {
         "draws": 287,
@@ -2041,7 +2041,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 413,
-      "state": "d01b8ecb",
+      "state": "ef671aad",
       "events": "741638a5",
       "rng": {
         "draws": 341,
@@ -2052,7 +2052,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 413,
-      "state": "6cd8aece",
+      "state": "26de1f98",
       "events": "741638a5",
       "rng": {
         "draws": 391,
@@ -2063,7 +2063,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 413,
-      "state": "bf35ca48",
+      "state": "3465e552",
       "events": "65057bf0",
       "rng": {
         "draws": 452,
@@ -2074,7 +2074,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 413,
-      "state": "39912a45",
+      "state": "e1e04d83",
       "events": "25dfc55b",
       "rng": {
         "draws": 517,
@@ -2085,7 +2085,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 413,
-      "state": "72ecdfd3",
+      "state": "c6f59ea9",
       "events": "741638a5",
       "rng": {
         "draws": 558,
@@ -2096,7 +2096,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 413,
-      "state": "bd489f16",
+      "state": "80144224",
       "events": "741638a5",
       "rng": {
         "draws": 613,
@@ -2107,7 +2107,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 413,
-      "state": "e2a07046",
+      "state": "48afc44c",
       "events": "c8ee4281",
       "rng": {
         "draws": 684,
@@ -2118,7 +2118,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 413,
-      "state": "9d553881",
+      "state": "28b746af",
       "events": "7b7262dc",
       "rng": {
         "draws": 781,
@@ -2129,7 +2129,7 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 413,
-      "state": "d709d562",
+      "state": "e749c160",
       "events": "941a7f97",
       "rng": {
         "draws": 856,
@@ -2140,7 +2140,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 413,
-      "state": "6f6e79a7",
+      "state": "5695ebe5",
       "events": "741638a5",
       "rng": {
         "draws": 922,
@@ -2151,7 +2151,7 @@
       "tick": 203,
       "time": 10.15,
       "nextId": 413,
-      "state": "60dda8d2",
+      "state": "f2d68be8",
       "events": "741638a5",
       "rng": {
         "draws": 938,
@@ -2697,7 +2697,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2711,7 +2711,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -2746,7 +2746,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2760,7 +2760,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -2795,7 +2795,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2809,7 +2809,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -2964,7 +2964,7 @@
       "tick": 204,
       "time": 10.2,
       "nextId": 413,
-      "state": "a319aa39",
+      "state": "6f954a97",
       "events": "9d903729",
       "rng": {
         "draws": 942,
@@ -3521,7 +3521,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -3535,7 +3535,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3570,7 +3570,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -3584,7 +3584,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3619,7 +3619,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -3633,7 +3633,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -3788,7 +3788,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 413,
-      "state": "007be11d",
+      "state": "eefed06b",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -3799,7 +3799,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 413,
-      "state": "b603c653",
+      "state": "ddbe0419",
       "events": "4cd7279a",
       "rng": {
         "draws": 1005,
@@ -3810,7 +3810,7 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 413,
-      "state": "25321f9c",
+      "state": "6ec9a5f2",
       "events": "741638a5",
       "rng": {
         "draws": 1055,
@@ -3821,7 +3821,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 413,
-      "state": "2399b438",
+      "state": "2ccd346e",
       "events": "eccb321a",
       "rng": {
         "draws": 1101,
@@ -3832,7 +3832,7 @@
       "tick": 250,
       "time": 12.5,
       "nextId": 413,
-      "state": "268b5ac8",
+      "state": "a44654a6",
       "events": "741638a5",
       "rng": {
         "draws": 1139,
@@ -3843,7 +3843,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 413,
-      "state": "58c19202",
+      "state": "c7789e88",
       "events": "741638a5",
       "rng": {
         "draws": 1190,
@@ -3854,7 +3854,7 @@
       "tick": 270,
       "time": 13.5,
       "nextId": 413,
-      "state": "c47e8920",
+      "state": "852c49e6",
       "events": "a481fd2e",
       "rng": {
         "draws": 1230,
@@ -3865,7 +3865,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 413,
-      "state": "158162b1",
+      "state": "2d2aa50f",
       "events": "741638a5",
       "rng": {
         "draws": 1288,
@@ -3876,7 +3876,7 @@
       "tick": 290,
       "time": 14.5,
       "nextId": 413,
-      "state": "9919f370",
+      "state": "8cc17cea",
       "events": "372a5a69",
       "rng": {
         "draws": 1345,
@@ -3887,7 +3887,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 413,
-      "state": "0603671c",
+      "state": "021c7506",
       "events": "741638a5",
       "rng": {
         "draws": 1387,
@@ -3898,7 +3898,7 @@
       "tick": 310,
       "time": 15.5,
       "nextId": 413,
-      "state": "386c77f9",
+      "state": "9138f953",
       "events": "6e107d71",
       "rng": {
         "draws": 1447,
@@ -3909,7 +3909,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 413,
-      "state": "e71c136f",
+      "state": "43d3b0b9",
       "events": "741638a5",
       "rng": {
         "draws": 1505,
@@ -3920,7 +3920,7 @@
       "tick": 330,
       "time": 16.5,
       "nextId": 413,
-      "state": "7f6ae6d8",
+      "state": "9d76d49a",
       "events": "c30af9bf",
       "rng": {
         "draws": 1538,
@@ -3931,7 +3931,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 413,
-      "state": "1481e129",
+      "state": "8e938e23",
       "events": "6bd9268f",
       "rng": {
         "draws": 1583,
@@ -3942,7 +3942,7 @@
       "tick": 350,
       "time": 17.5,
       "nextId": 413,
-      "state": "c4e8c798",
+      "state": "11ee8442",
       "events": "741638a5",
       "rng": {
         "draws": 1623,
@@ -3953,7 +3953,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 413,
-      "state": "0861caf4",
+      "state": "7645a1f6",
       "events": "67597a4b",
       "rng": {
         "draws": 1677,
@@ -3964,7 +3964,7 @@
       "tick": 370,
       "time": 18.5,
       "nextId": 413,
-      "state": "b6b7bb3f",
+      "state": "63072cd1",
       "events": "d2f50b34",
       "rng": {
         "draws": 1732,
@@ -3975,7 +3975,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 413,
-      "state": "8fd29e43",
+      "state": "2be03c5d",
       "events": "741638a5",
       "rng": {
         "draws": 1798,
@@ -3986,7 +3986,7 @@
       "tick": 386,
       "time": 19.3,
       "nextId": 413,
-      "state": "6628d359",
+      "state": "5207ad2f",
       "events": "95e82b3c",
       "rng": {
         "draws": 1825,
@@ -4521,7 +4521,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -4535,7 +4535,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -4570,7 +4570,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -4584,7 +4584,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -4619,7 +4619,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -4633,7 +4633,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -4792,7 +4792,7 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 413,
-      "state": "b7e9a5ec",
+      "state": "beb1d452",
       "events": "2d597b1e",
       "rng": {
         "draws": 1856,
@@ -4803,7 +4803,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 413,
-      "state": "3ebacdd1",
+      "state": "dd186797",
       "events": "1e22793b",
       "rng": {
         "draws": 1908,
@@ -4814,7 +4814,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 413,
-      "state": "2dea287f",
+      "state": "9ac237e5",
       "events": "1e22793b",
       "rng": {
         "draws": 1947,
@@ -4825,7 +4825,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 413,
-      "state": "5842cfda",
+      "state": "159cc5a0",
       "events": "1e22793b",
       "rng": {
         "draws": 2001,
@@ -4836,7 +4836,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 413,
-      "state": "6e7ef2c6",
+      "state": "a11adc34",
       "events": "1e22793b",
       "rng": {
         "draws": 2050,
@@ -4847,7 +4847,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 413,
-      "state": "1173fc43",
+      "state": "5377d961",
       "events": "1e22793b",
       "rng": {
         "draws": 2112,
@@ -4858,7 +4858,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 413,
-      "state": "3c736ac9",
+      "state": "62f8d597",
       "events": "1e22793b",
       "rng": {
         "draws": 2158,
@@ -4869,7 +4869,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 413,
-      "state": "3f807f58",
+      "state": "ade68afe",
       "events": "1e22793b",
       "rng": {
         "draws": 2195,
@@ -4880,7 +4880,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 413,
-      "state": "da1e9823",
+      "state": "3dba7d61",
       "events": "1e22793b",
       "rng": {
         "draws": 2241,
@@ -4891,7 +4891,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 413,
-      "state": "d4670d02",
+      "state": "2ac2ff28",
       "events": "1e22793b",
       "rng": {
         "draws": 2283,
@@ -4902,7 +4902,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 413,
-      "state": "63dcd250",
+      "state": "1b08034e",
       "events": "da62b8d5",
       "rng": {
         "draws": 2331,
@@ -4913,7 +4913,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 413,
-      "state": "74b07818",
+      "state": "7f3f26fe",
       "events": "741638a5",
       "rng": {
         "draws": 2383,
@@ -4924,7 +4924,7 @@
       "tick": 506,
       "time": 25.3,
       "nextId": 413,
-      "state": "c6ff0e73",
+      "state": "e2705d89",
       "events": "741638a5",
       "rng": {
         "draws": 2418,
@@ -5470,7 +5470,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -5484,7 +5484,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -5519,7 +5519,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -5533,7 +5533,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -5568,7 +5568,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -5582,7 +5582,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -5741,7 +5741,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 413,
-      "state": "358a170e",
+      "state": "4e15362c",
       "events": "741638a5",
       "rng": {
         "draws": 2433,
@@ -5752,7 +5752,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 413,
-      "state": "ba2f748e",
+      "state": "c913b25c",
       "events": "741638a5",
       "rng": {
         "draws": 2479,
@@ -5763,7 +5763,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 413,
-      "state": "5f3eb3ec",
+      "state": "69afa11a",
       "events": "741638a5",
       "rng": {
         "draws": 2536,
@@ -5774,7 +5774,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 413,
-      "state": "a81884c4",
+      "state": "a8fba7ea",
       "events": "741638a5",
       "rng": {
         "draws": 2573,
@@ -5785,7 +5785,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 413,
-      "state": "e7a6a26e",
+      "state": "75bfd45c",
       "events": "741638a5",
       "rng": {
         "draws": 2625,
@@ -5796,7 +5796,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 413,
-      "state": "823c904e",
+      "state": "71f2a06c",
       "events": "741638a5",
       "rng": {
         "draws": 2658,
@@ -5807,7 +5807,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 413,
-      "state": "8a9e92d4",
+      "state": "8b9fed1a",
       "events": "741638a5",
       "rng": {
         "draws": 2704,
@@ -5818,7 +5818,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 413,
-      "state": "d86af48e",
+      "state": "8aac247c",
       "events": "741638a5",
       "rng": {
         "draws": 2763,
@@ -5829,7 +5829,7 @@
       "tick": 590,
       "time": 29.5,
       "nextId": 413,
-      "state": "8a15a503",
+      "state": "48ff2271",
       "events": "4974233d",
       "rng": {
         "draws": 2817,
@@ -5840,7 +5840,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 413,
-      "state": "a5ddfdf9",
+      "state": "b122677b",
       "events": "0f474324",
       "rng": {
         "draws": 2860,
@@ -5851,7 +5851,7 @@
       "tick": 610,
       "time": 30.5,
       "nextId": 413,
-      "state": "613cbb55",
+      "state": "0a072fdf",
       "events": "741638a5",
       "rng": {
         "draws": 2905,
@@ -5862,7 +5862,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 413,
-      "state": "a81ec363",
+      "state": "00a8cdb5",
       "events": "741638a5",
       "rng": {
         "draws": 2956,
@@ -5873,7 +5873,7 @@
       "tick": 627,
       "time": 31.35,
       "nextId": 413,
-      "state": "3964e75a",
+      "state": "7472b39c",
       "events": "351e896e",
       "rng": {
         "draws": 2990,
@@ -6421,7 +6421,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -6435,7 +6435,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -6470,7 +6470,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -6484,7 +6484,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -6519,7 +6519,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -6533,7 +6533,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -6692,7 +6692,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 413,
-      "state": "898819ca",
+      "state": "451167a8",
       "events": "0e6a4daa",
       "rng": {
         "draws": 3001,
@@ -7287,7 +7287,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -7301,7 +7301,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7336,7 +7336,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -7350,7 +7350,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7385,7 +7385,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -7399,7 +7399,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -7558,7 +7558,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 413,
-      "state": "11d5d2c3",
+      "state": "2ad75519",
       "events": "741638a5",
       "rng": {
         "draws": 3009,
@@ -7569,7 +7569,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 413,
-      "state": "5f629768",
+      "state": "09c78776",
       "events": "741638a5",
       "rng": {
         "draws": 3055,
@@ -7580,7 +7580,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 413,
-      "state": "b665a03c",
+      "state": "b7f04fa2",
       "events": "741638a5",
       "rng": {
         "draws": 3091,
@@ -7591,7 +7591,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 413,
-      "state": "4eec3753",
+      "state": "3b0ed1e9",
       "events": "741638a5",
       "rng": {
         "draws": 3144,
@@ -7602,7 +7602,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 413,
-      "state": "ece96fb5",
+      "state": "5ea96c0b",
       "events": "741638a5",
       "rng": {
         "draws": 3207,
@@ -7613,7 +7613,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 413,
-      "state": "31d00662",
+      "state": "e2064460",
       "events": "741638a5",
       "rng": {
         "draws": 3263,
@@ -7624,7 +7624,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 413,
-      "state": "e35989d1",
+      "state": "f3458637",
       "events": "80bf9354",
       "rng": {
         "draws": 3302,
@@ -8219,7 +8219,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -8233,7 +8233,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -8268,7 +8268,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -8282,7 +8282,7 @@
             "z": -1171
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,
@@ -8317,7 +8317,7 @@
           "lootable": true,
           "maxHp": 1,
           "moveSpeed": 7,
-          "objectItemId": "bastion_ward_stone",
+          "objectItemId": "nythraxis_wardstone",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -8331,7 +8331,7 @@
             "z": -1187
           },
           "stats": {},
-          "templateId": "ground_bastion_ward_stone",
+          "templateId": "ground_nythraxis_wardstone",
           "weapon": {
             "max": 2,
             "min": 1,

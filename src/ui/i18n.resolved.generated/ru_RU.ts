@@ -7755,6 +7755,7 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineCandleInteract": "Святилище свечи: нажмите F, чтобы коснуться",
     "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
-    "mailboxName": "Почтовый ящик"
+    "mailboxName": "Почтовый ящик",
+    "nythraxisWardstoneName": "Обереговый камень души"
   }
 };

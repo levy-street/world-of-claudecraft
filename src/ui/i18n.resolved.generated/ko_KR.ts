@@ -7755,6 +7755,7 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
-    "mailboxName": "우편함"
+    "mailboxName": "우편함",
+    "nythraxisWardstoneName": "영혼 수호석"
   }
 };

@@ -247,6 +247,7 @@ const PREWARM_OBJECT_ITEM_IDS = [
   'fen_muster_order',
   'rusted_censer',
   'bastion_ward_stone',
+  'nythraxis_wardstone',
   'ogre_war_totem',
   'sanctum_key_shard',
   'gravewyrm_sigil',
@@ -4126,7 +4127,9 @@ export class Renderer {
         }
         if (
           vis &&
-          (e.objectItemId === 'bastion_ward_stone' || e.objectItemId === 'soulshard_pillar') &&
+          (e.objectItemId === 'bastion_ward_stone' ||
+            e.objectItemId === 'nythraxis_wardstone' ||
+            e.objectItemId === 'soulshard_pillar') &&
           e.auras.some((a) => a.id === 'nythraxis_wardstone_lit')
         ) {
           this.vfx.castSparkle(e.id, 'arcane', dt * 2.6);
