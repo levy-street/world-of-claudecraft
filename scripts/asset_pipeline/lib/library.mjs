@@ -503,8 +503,10 @@ export async function serveLibrary({ port = 5180 } = {}) {
   const http = await import('node:http');
   const { readFileSync: rf, existsSync: ex, statSync: st } = await import('node:fs');
   const { extname, join: pjoin, normalize: pnorm } = await import('node:path');
+  const wiz = await import('./wizard.mjs');
   const threeBundle = await buildThreeBundle();
   const liveModule = rf(join(REPO_ROOT, 'scripts/asset_pipeline/viewer_live.js'), 'utf8');
+  const wizardModule = rf(join(REPO_ROOT, 'scripts/asset_pipeline/wizard_ui.js'), 'utf8');
 
   // Only these repo subtrees are reachable via /repo/* (never .env, src, etc.).
   const ALLOWED = ['public/', 'tmp/asset_pipeline/'];
@@ -512,16 +514,55 @@ export async function serveLibrary({ port = 5180 } = {}) {
     res.writeHead(code, { 'Content-Type': type, 'Cache-Control': 'no-store' });
     res.end(body);
   };
+  const sendJson = (res, code, obj) => send(res, code, MIME['.json'], JSON.stringify(obj));
+  const readBody = (req) =>
+    new Promise((resolve) => {
+      let data = '';
+      req.on('data', (c) => {
+        data += c;
+        if (data.length > 1e6) req.destroy();
+      });
+      req.on('end', () => {
+        try {
+          resolve(data ? JSON.parse(data) : {});
+        } catch {
+          resolve({});
+        }
+      });
+      req.on('error', () => resolve({}));
+    });
+
+  // The wizard action layer: POST endpoints spawn a pipeline step (the browser
+  // polls status), GET /api/wizard/status reports progress + preview artifacts.
+  async function handleApi(req, res, url) {
+    if (req.method === 'GET' && url === '/api/wizard/status') {
+      const q = new URL(req.url, 'http://x').searchParams;
+      return sendJson(res, 200, wiz.wizardStatus(q.get('job') || ''));
+    }
+    if (req.method !== 'POST') return sendJson(res, 405, { error: 'method not allowed' });
+    const body = await readBody(req);
+    try {
+      if (url === '/api/wizard/model') return sendJson(res, 200, wiz.startModel(body));
+      if (url === '/api/wizard/finish') return sendJson(res, 200, wiz.finishAsset(body));
+      if (url === '/api/wizard/apply') return sendJson(res, 200, wiz.applyAsset(body));
+      return sendJson(res, 404, { error: 'unknown action' });
+    } catch (err) {
+      return sendJson(res, 400, { error: String(err.message ?? err) });
+    }
+  }
 
   const server = http.createServer((req, res) => {
     try {
       const url = decodeURIComponent((req.url || '/').split('?')[0]);
+      if (url.startsWith('/api/')) return void handleApi(req, res, url);
+      if (url === '/wizard_ui.js') return send(res, 200, MIME['.js'], wizardModule);
       if (url === '/' || url === '/index.html') {
         let html = rf(join(LIBRARY_DIR, 'index.html'), 'utf8');
         html = html.replace('window.__LIVE__ = false;', 'window.__LIVE__ = true;');
         html = html.replace(
           '</body>',
-          '<script type="module" src="/viewer_live.js"></script>\n</body>',
+          '<script type="module" src="/viewer_live.js"></script>\n' +
+            '<script type="module" src="/wizard_ui.js"></script>\n</body>',
         );
         return send(res, 200, MIME['.html'], html);
       }

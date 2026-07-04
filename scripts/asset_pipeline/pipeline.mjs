@@ -79,6 +79,30 @@ function flag(name) {
   return argv.includes(`--${name}`);
 }
 
+// Human-in-the-loop stop point: `--until generate` runs the concept + model
+// stages, renders a review preview of the raw model, and returns before rigging
+// / normalizing, so the web wizard (library --serve) can show the model and let
+// the operator approve it or regenerate (--redo generate) before spending more
+// credits. `--until preview` is implicit: a run without --apply already stops
+// after the previews, so the operator reviews the animated/finished asset there.
+const UNTIL = opt('until');
+async function reviewStop(job, step, glbForReview) {
+  if (UNTIL !== step) return false;
+  // Render the RAW model into its own preview_model/ dir (not the canonical
+  // preview/ that the library + final stage own), so the wizard can show the
+  // model-review shots distinctly from the finished/animated previews.
+  if (glbForReview) {
+    await job.step('preview_model', async () => {
+      const files = await renderPreviews(glbForReview, job.path('preview_model'), {
+        views: ['hero', 'front', 'right', 'back'],
+      });
+      return { files };
+    });
+  }
+  printReport(job, { stoppedAt: step, glb: glbForReview ?? null });
+  return true;
+}
+
 function help() {
   const src = readFileSync(new URL(import.meta.url), 'utf8');
   console.log(
@@ -340,7 +364,7 @@ async function cmdWeapon() {
         'sword, dagger, staff, hammer, axe, halberd, spear, scythe, wand (test contract), or pass --family',
     );
   }
-  const job = Job.open({ job: opt('job'), kind: 'weapon', name });
+  const job = Job.open({ job: opt('job'), kind: 'weapon', name, create: flag('new-job') });
   applyRedo(job, 'weapon');
   job.set('kind', 'weapon');
   job.set('name', name);
@@ -378,6 +402,7 @@ async function cmdWeapon() {
       faceLimit: faceLimitOpt(CATEGORY_SPECS.weapon.faceLimit),
     });
   }
+  if (await reviewStop(job, 'generate', gen.raw)) return;
 
   const flip = flag('flip');
   const roll = Number(opt('roll', 0)) || 0;
@@ -457,7 +482,7 @@ async function cmdProp() {
   const name = opt('name');
   const height = Number(opt('height'));
   if (!name || !height) throw new Error('prop needs --name and --height <world units>');
-  const job = Job.open({ job: opt('job'), kind: 'prop', name });
+  const job = Job.open({ job: opt('job'), kind: 'prop', name, create: flag('new-job') });
   applyRedo(job, 'prop');
   job.set('kind', 'prop');
   job.set('name', name);
@@ -474,6 +499,7 @@ async function cmdProp() {
     model: opt('model') === 'hifi' ? tripo.MODEL_HIFI : tripo.MODEL_LOWPOLY,
     faceLimit: faceLimitOpt(CATEGORY_SPECS.prop.faceLimit),
   });
+  if (await reviewStop(job, 'generate', gen.raw)) return;
 
   const built = job.path(`${name}.glb`);
   const rotateY = (Number(opt('rotate-y', 0)) * Math.PI) / 180;
@@ -519,7 +545,7 @@ async function cmdProp() {
 async function cmdCreature() {
   const name = opt('name');
   if (!name) throw new Error('creature needs --name <snake_case>');
-  const job = Job.open({ job: opt('job'), kind: 'creature', name });
+  const job = Job.open({ job: opt('job'), kind: 'creature', name, create: flag('new-job') });
   applyRedo(job, 'creature');
   job.set('kind', 'creature');
   job.set('name', name);
@@ -537,6 +563,7 @@ async function cmdCreature() {
     model: opt('model') === 'hifi' ? tripo.MODEL_HIFI : tripo.MODEL_LOWPOLY,
     faceLimit: faceLimitOpt(CATEGORY_SPECS.creature.faceLimit),
   });
+  if (await reviewStop(job, 'generate', gen.raw)) return;
 
   const rig = await job.step('rig', async () => {
     const prior = await reconnectTask(job, 'rig');
@@ -1241,14 +1268,28 @@ async function cmdLibrary() {
     console.log(
       '  drag to rotate, scroll to zoom, pick animations, toggle "vs player". Ctrl-C to stop.',
     );
-    const { spawn } = await import('node:child_process');
-    spawn('open', [url], { detached: true, stdio: 'ignore' }).unref();
+    await openInBrowser(url);
     return; // the http server keeps the process alive
   }
-  console.log(`open it with: open '${out}'`);
+  console.log(`open it with your browser: ${out}`);
   if (flag('open')) {
-    const { spawn } = await import('node:child_process');
-    spawn('open', [out], { detached: true, stdio: 'ignore' }).unref();
+    await openInBrowser(out);
+  }
+}
+
+// Open a URL/file in the OS browser without ever crashing the caller: the opener
+// binary is platform-specific and may be absent (headless Linux), so a missing
+// command must be swallowed (async 'error' event), not thrown.
+async function openInBrowser(target) {
+  const { spawn } = await import('node:child_process');
+  const cmd =
+    process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'start' : 'xdg-open';
+  try {
+    const child = spawn(cmd, [target], { detached: true, stdio: 'ignore' });
+    child.on('error', () => {});
+    child.unref();
+  } catch {
+    // no opener available; the URL/path is printed above for manual use
   }
 }
 

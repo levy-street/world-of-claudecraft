@@ -315,6 +315,7 @@ function openDetail(i) {
   document.getElementById('inspector').innerHTML = inspectorHtml(a);
   document.getElementById('overlay').classList.add('open');
   document.getElementById('inspector').scrollTop = 0;
+  if (window.WizardUI) window.WizardUI.onDetail(a);
 
   if (useLive) {
     big.style.display = 'none';

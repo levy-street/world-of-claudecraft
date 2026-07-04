@@ -220,6 +220,26 @@ esbuild-bundled to `/three.bundle.js`, `viewer_live.js` is the browser module, a
 `/repo/*` route serves GLBs/atlases from `public/` and `tmp/asset_pipeline/` only (never `.env`
 or `src/`). The server runs until Ctrl-C.
 
+### Web creation wizard (`--serve`, human-in-the-loop)
+The live viewer also hosts a step-by-step asset CREATOR so an operator can generate an asset
+from the browser without the CLI: a "+ Create asset" button (and a "Regenerate this asset"
+button on each generatable asset's detail) opens a modal that walks
+prompt -> model (review, keep or regenerate) -> animations/finish (review) -> save. Each step
+is human-gated: the operator sees the rendered result and only spends more credits on approve.
+Mechanics:
+- `wizard_ui.js` is the browser module (self-contained: injects its button + modal, exposes
+  `window.WizardUI.onDetail(asset)` for the grid's per-asset Regenerate button).
+- `lib/wizard.mjs` is the server action layer: the `/api/wizard/{model,finish,apply}` POST
+  routes each spawn ONE `pipeline.mjs` child (never a second per job), and
+  `/api/wizard/status?job=<id>` reports the step ledger + captured log + preview images the
+  browser polls. It shells out to the SAME CLI, never Tripo directly.
+- The model-review stop is the CLI flag `--until generate`: it runs concept + generate, renders
+  a review shot into the job's `preview_model/` dir, and returns before rigging/normalizing.
+  The wizard drives a DETERMINISTIC job id via `--job <id> --new-job` (`--new-job` lets
+  `Job.open` create that exact id; bare `--job` still requires an existing job so a mistyped
+  CLI id errors instead of forking). Regenerate re-runs a stage with `--redo` (model =
+  `--redo generate`, animations = `--redo retarget`). Save is the lane's normal `--apply`.
+
 ## Utility commands
 - `validate --file x.glb --kind weapon|prop|creature [--family sword] [--height n] [--clips ...]`
 - `preview --file x.glb [--out dir]`: turntable + per-clip PNGs, no API key needed. Preview

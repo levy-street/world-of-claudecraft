@@ -35,10 +35,13 @@ export class Job {
   }
 
   /** Open an existing job or create a new one named after the asset. */
-  static open({ job, kind, name }) {
+  static open({ job, kind, name, create = false }) {
     if (job) {
       const id = slug(job);
-      if (!existsSync(join(JOBS_ROOT, id, 'job.json'))) {
+      // `create` (the web wizard's --new-job) lets a caller pass an EXPLICIT,
+      // deterministic job id and create it if missing; the bare --job path still
+      // requires an existing job so a mistyped CLI id errors instead of forking.
+      if (!create && !existsSync(join(JOBS_ROOT, id, 'job.json'))) {
         throw new Error(`job "${id}" not found under tmp/asset_pipeline/`);
       }
       return new Job(id);
