@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1370,
+      "nextId": 1372,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,8 +30,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "fdb64a21",
+      "nextId": 1376,
+      "state": "80b1f9c3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,7 +55,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -85,7 +85,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -115,7 +115,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -142,7 +142,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -191,7 +191,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -242,7 +242,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -282,7 +282,7 @@
           }
         },
         {
-          "aggroTargetId": 1370,
+          "aggroTargetId": 1372,
           "aiState": "attack",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -293,7 +293,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -316,15 +316,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               50
             ],
             [
-              1372,
+              1374,
               50
             ]
           ],
@@ -339,8 +339,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "9c9b0fae",
+      "nextId": 1376,
+      "state": "88947c20",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -364,7 +364,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -394,7 +394,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -424,7 +424,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -451,7 +451,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -500,7 +500,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -551,7 +551,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -591,7 +591,7 @@
           }
         },
         {
-          "aggroTargetId": 1371,
+          "aggroTargetId": 1373,
           "aiState": "attack",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -602,7 +602,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -625,15 +625,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               120
             ],
             [
-              1372,
+              1374,
               50
             ]
           ],
@@ -648,8 +648,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "f618f39a",
+      "nextId": 1376,
+      "state": "f8d88df4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -673,7 +673,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -703,7 +703,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -733,7 +733,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -760,7 +760,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -809,7 +809,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -860,7 +860,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -900,7 +900,7 @@
           }
         },
         {
-          "aggroTargetId": 1370,
+          "aggroTargetId": 1372,
           "aiState": "attack",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -911,7 +911,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -934,15 +934,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               50
             ],
             [
-              1372,
+              1374,
               130
             ]
           ],
@@ -957,8 +957,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "288f7471",
+      "nextId": 1376,
+      "state": "7253533f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -982,7 +982,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1012,7 +1012,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1042,7 +1042,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1069,7 +1069,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1118,7 +1118,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1169,7 +1169,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1209,7 +1209,7 @@
           }
         },
         {
-          "aggroTargetId": 1372,
+          "aggroTargetId": 1374,
           "aiState": "attack",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -1220,7 +1220,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -1243,15 +1243,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               50
             ],
             [
-              1372,
+              1374,
               140
             ]
           ],
@@ -1266,8 +1266,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "a62a1882",
+      "nextId": 1376,
+      "state": "8008b60e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1291,7 +1291,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1321,7 +1321,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1351,7 +1351,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1378,7 +1378,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1427,7 +1427,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1478,7 +1478,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1518,7 +1518,7 @@
           }
         },
         {
-          "aggroTargetId": 1370,
+          "aggroTargetId": 1372,
           "aiState": "attack",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -1527,11 +1527,11 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "forcedTargetId": 1370,
+          "forcedTargetId": 1372,
           "forcedTargetTimer": 2.95,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -1554,15 +1554,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               50
             ],
             [
-              1372,
+              1374,
               140
             ]
           ],
@@ -1577,8 +1577,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "6f0bd69a",
+      "nextId": 1376,
+      "state": "a8beeb7e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1602,7 +1602,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1632,7 +1632,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1662,7 +1662,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1689,7 +1689,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1738,7 +1738,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1789,7 +1789,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1829,7 +1829,7 @@
           }
         },
         {
-          "aggroTargetId": 1370,
+          "aggroTargetId": 1372,
           "aiState": "attack",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -1838,11 +1838,11 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "forcedTargetId": 1370,
+          "forcedTargetId": 1372,
           "forcedTargetTimer": -0.025,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -1865,15 +1865,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               50
             ],
             [
-              1372,
+              1374,
               140
             ]
           ],
@@ -1888,8 +1888,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "3c158368",
+      "nextId": 1376,
+      "state": "ad64a326",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1913,7 +1913,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1943,7 +1943,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -1973,7 +1973,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2000,7 +2000,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2049,7 +2049,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2100,7 +2100,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2140,7 +2140,7 @@
           }
         },
         {
-          "aggroTargetId": 1372,
+          "aggroTargetId": 1374,
           "aiState": "attack",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -2152,7 +2152,7 @@
           "forcedTargetTimer": -0.025,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -2175,15 +2175,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               50
             ],
             [
-              1372,
+              1374,
               140
             ]
           ],
@@ -2198,8 +2198,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "029f98ba",
+      "nextId": 1376,
+      "state": "4347b464",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2223,7 +2223,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -2253,7 +2253,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -2283,7 +2283,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2310,7 +2310,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2359,7 +2359,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2410,7 +2410,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2450,7 +2450,7 @@
           }
         },
         {
-          "aggroTargetId": 1372,
+          "aggroTargetId": 1374,
           "aiState": "chase",
           "combatTimer": 99,
           "comboUntil": -1,
@@ -2462,7 +2462,7 @@
           "forcedTargetTimer": -0.025,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -2485,15 +2485,15 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1370,
+              1372,
               100
             ],
             [
-              1371,
+              1373,
               50
             ],
             [
-              1372,
+              1374,
               140
             ]
           ],
@@ -2508,8 +2508,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "333a2079",
+      "nextId": 1376,
+      "state": "9bf3d17f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2533,7 +2533,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -2563,7 +2563,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -2593,7 +2593,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2620,7 +2620,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2669,7 +2669,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2720,7 +2720,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2771,7 +2771,7 @@
           "forcedTargetTimer": -0.025,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -2803,8 +2803,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1374,
-      "state": "333a2079",
+      "nextId": 1376,
+      "state": "9bf3d17f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2828,7 +2828,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -2858,7 +2858,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1371,
+          "entityId": 1373,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -2888,7 +2888,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1374,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2915,7 +2915,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2964,7 +2964,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1371,
+          "id": 1373,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3015,7 +3015,7 @@
           "fallStartY": 1.601203,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 1372,
+          "id": 1374,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -3066,7 +3066,7 @@
           "forcedTargetTimer": -0.025,
           "hostile": true,
           "hp": 50000,
-          "id": 1373,
+          "id": 1375,
           "inCombat": true,
           "kind": "mob",
           "level": 5,

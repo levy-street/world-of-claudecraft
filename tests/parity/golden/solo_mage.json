@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1371,
-      "state": "732a9b65",
+      "nextId": 1373,
+      "state": "2c9b9fdd",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -67,7 +67,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -112,9 +112,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1372,
-      "state": "8227065e",
-      "events": "5111290e",
+      "nextId": 1374,
+      "state": "51926b30",
+      "events": "6cf7edf2",
       "rng": {
         "draws": 2,
         "digest": "cb48da64"
@@ -123,9 +123,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1372,
-      "state": "1282833e",
-      "events": "726650e7",
+      "nextId": 1374,
+      "state": "1b15c756",
+      "events": "1c8c2bcf",
       "rng": {
         "draws": 3,
         "digest": "7c0e5908"
@@ -134,9 +134,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1372,
-      "state": "fbae5b16",
-      "events": "3285f668",
+      "nextId": 1374,
+      "state": "d3d314d2",
+      "events": "a7fac8c2",
       "rng": {
         "draws": 283,
         "digest": "414b4056"
@@ -145,9 +145,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1372,
-      "state": "c0680a2a",
-      "events": "3285f668",
+      "nextId": 1374,
+      "state": "3a05a622",
+      "events": "a7fac8c2",
       "rng": {
         "draws": 641,
         "digest": "cd949397"
@@ -156,9 +156,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1372,
-      "state": "4bc2d43f",
-      "events": "99005f4d",
+      "nextId": 1374,
+      "state": "da5fb4bf",
+      "events": "77ace615",
       "rng": {
         "draws": 1032,
         "digest": "c8a7bc0b"
@@ -167,9 +167,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1372,
-      "state": "68544bfb",
-      "events": "3285f668",
+      "nextId": 1374,
+      "state": "2f67e15b",
+      "events": "a7fac8c2",
       "rng": {
         "draws": 1467,
         "digest": "e35ac6b5"
@@ -178,8 +178,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 1372,
-      "state": "a1013d02",
+      "nextId": 1374,
+      "state": "e18babce",
       "events": "741638a5",
       "rng": {
         "draws": 1645,
@@ -204,7 +204,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1370,
+          "entityId": 1372,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -234,7 +234,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 105.4,
           "hp": 50000,
-          "id": 1370,
+          "id": 1372,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -267,7 +267,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 1371,
+          "targetId": 1373,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -287,7 +287,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 9000,
-          "id": 1371,
+          "id": 1373,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
