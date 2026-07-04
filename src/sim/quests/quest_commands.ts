@@ -113,6 +113,11 @@ export function acceptQuest(ctx: SimContext, questId: string, pid?: number): voi
   if (!r) return;
   const quest = QUESTS[questId];
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot deal with quest givers.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   if (!quest) {
     ctx.error(meta.entityId, 'That quest is not available.');
     return;
@@ -177,6 +182,11 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot turn in quests.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   const quest = QUESTS[questId];
   if (!quest) {
     ctx.error(meta.entityId, 'That quest is not available.');

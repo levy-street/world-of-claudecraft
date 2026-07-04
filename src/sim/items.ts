@@ -239,6 +239,12 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
+  // Dead players (released ghosts included) cannot buy, matching the rest of
+  // the vendor family (sellItem / sellAllJunk / buyBackItem below).
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
     return;

@@ -23,7 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { ITEMS, MOBS, QUESTS } from './data';
+import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import {
   activateNythraxisRelic,
   interactObjectForQuests,
@@ -79,6 +79,13 @@ export function lootCorpse(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot loot; the same rejection the
+  // item family uses (src/sim/items.ts). The walk-by autoLootForParty path never
+  // reaches this: it silently drops a dead trigger before delegating here.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot) return;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
@@ -172,6 +179,11 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot pick up world objects.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return;
   if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
@@ -217,6 +229,30 @@ export function interact(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
+  if (p.dead) {
+    // A dead player or released spirit cannot interact with the world: no
+    // looting, object pickup, mailbox, or quest talk. The one exception is the
+    // Spirit Healer (talking to the angel is how a ghost reaches the healer
+    // resurrection), so route a nearby angel through the normal quest-NPC talk
+    // and refuse everything else. A ghost still re-enters its instance via the
+    // proximity door trigger (updateDoorTriggers), which never comes through here.
+    let bestHealer: Entity | null = null;
+    let bestHealerD2 = INTERACT_RANGE * INTERACT_RANGE;
+    ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
+      if (e.kind === 'npc' && e.templateId === SPIRIT_HEALER_NPC_ID && d2 < bestHealerD2) {
+        bestHealer = e;
+        bestHealerD2 = d2;
+      }
+    });
+    // re-read through a wider type: TS cannot see the closure assignment above
+    const healer = bestHealer as Entity | null;
+    if (healer) {
+      ctx.talkToNpc(healer.id, p.id);
+      return;
+    }
+    ctx.error(r.meta.entityId, "You can't do that while dead.");
+    return;
+  }
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
