@@ -30,6 +30,10 @@ const BODIES = [
   'mob_fog_horror',
   'valdris_carter',
   'valdris_warden',
+  // lote 3: open-zone stock-body regen
+  'mob_valdris_shade',
+  'mob_brine_skeleton',
+  'mob_valdris_raider',
 ];
 // Target durations (seconds); a clip already at or under target is left alone.
 const TARGETS = {
