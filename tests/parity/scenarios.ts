@@ -25,6 +25,7 @@ import { solveLockActions } from '../../src/sim/lockpick';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
 import {
+  ACTIVE_LEVEL_CAP,
   type Aura,
   DT,
   dist2d,
@@ -3782,9 +3783,12 @@ function g1bXpPrestige(): Scenario {
       sim.grantXp(xpForLevel(p.level) + 50, meta);
       rec.snapshot('ding');
 
-      // 4. Jump to the cap and earn one prestige bar of post-cap XP -> the award
-      //    overflows into lifetimeXp (the bar stays 0) and fires virtualLevelUp.
-      sim.setPlayerLevel(MAX_LEVEL);
+      // 4. Jump to the ACTIVE cap and earn one prestige bar of post-cap XP -> the
+      //    award overflows into lifetimeXp (the bar stays 0) and fires
+      //    virtualLevelUp. The active cap (not MAX_LEVEL) is what freezes the bar
+      //    and prices prestige, so the accept-then-reject coverage below needs the
+      //    baseline lifetimeXp to sit exactly at the active-cap threshold.
+      sim.setPlayerLevel(ACTIVE_LEVEL_CAP);
       sim.grantXp(PRESTIGE_XP_PER_RANK, meta);
       rec.snapshot('overflow');
 
