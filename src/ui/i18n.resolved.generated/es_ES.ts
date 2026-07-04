@@ -320,27 +320,27 @@ export const es_ES: EnTranslations = {
       "doneBodyTouch": "Ya dominas lo básico, {name}. El Valle es tuyo para explorar: toca Más y luego Diario de misiones para revisar tu diario de misiones en cualquier momento. ¡Buena caza!"
     },
     "defense": {
-      "start": "Hold the line! The defenders brace for the assault.",
-      "wave": "Wave {wave} of {total} repelled!",
-      "won": "The position holds. Well fought.",
-      "lost": "The defenders have fallen. Regroup and try again."
+      "start": "¡Mantened la línea! Los defensores se preparan para el asalto.",
+      "wave": "¡Oleada {wave} de {total} rechazada!",
+      "won": "La posición aguanta. Bien luchado.",
+      "lost": "Los defensores han caído. Reagrúpate e inténtalo de nuevo."
     },
     "escort": {
-      "start": "The escort sets out. Stay close.",
-      "paused": "Your charge waits: nobody is close enough to guard the road.",
-      "resumed": "The escort moves again.",
-      "failed": "Your charge has fallen. The road claims another.",
-      "done": "Safe arrival. The escort thanks you."
+      "start": "La escolta se pone en marcha. No te alejes.",
+      "paused": "Tu protegido espera: no hay nadie lo bastante cerca para guardar el camino.",
+      "resumed": "La escolta reanuda la marcha.",
+      "failed": "Tu protegido ha caído. El camino se cobra a otro más.",
+      "done": "Llegada sin percances. La escolta te lo agradece."
     },
     "envoys": {
-      "title": "The Envoys Hall",
-      "prompt": "Choose your faction, and the people you will stand among.",
-      "permanent": "This oath is permanent. Your faction decides your home, your allies, and your enemies in the eternal war.",
-      "confirm": "Swear the Oath",
-      "travelTitle": "Passage",
-      "travelBody": "Take passage now? The crossing is instant.",
-      "travelGo": "Travel",
-      "travelStay": "Stay"
+      "title": "El Salón de los Emisarios",
+      "prompt": "Elige tu facción, y a la gente entre la que te contarás.",
+      "permanent": "Este juramento es permanente. Tu facción decide tu hogar, tus aliados y tus enemigos en la guerra eterna.",
+      "confirm": "Prestar el Juramento",
+      "travelTitle": "Pasaje",
+      "travelBody": "¿Tomar pasaje ahora? La travesía es instantánea.",
+      "travelGo": "Viajar",
+      "travelStay": "Quedarse"
     },
     "map": {
       "worldTitle": "Valdris, the Known World",
@@ -349,8 +349,8 @@ export const es_ES: EnTranslations = {
       "levelBand": "Lv {min}-{max}",
       "clickHint": "Click a region to open its map",
       "backHint": "Click a territory to open it. Right-click to zoom out",
-      "sealed": "Sealed",
-      "sealedHint": "The war front is sealed beyond this point."
+      "sealed": "Sellado",
+      "sealedHint": "El frente de guerra está sellado más allá de este punto."
     },
     "widgets": {
       "clockTitle": "Hora local: haz clic para alternar 12/24 horas",
@@ -889,7 +889,7 @@ export const es_ES: EnTranslations = {
     },
     "worldBoss": {
       "spawn": "¡{name} se alza sobre las Alturas de Thornpeak!",
-      "rises": "{name} rises over {location}!"
+      "rises": "¡{name} se alza sobre {location}!"
     },
     "loot": {
       "chestTitle": "Cofre"
@@ -7342,25 +7342,25 @@ export const es_ES: EnTranslations = {
         "name": "Tirano Faucearena"
       },
       "temple_sentinel": {
-        "name": "Temple Sentinel"
+        "name": "Centinela del templo"
       },
       "heretic_sandpriest": {
-        "name": "Heretic Sand-Priest"
+        "name": "Sacerdote de arena hereje"
       },
       "ashkerat_the_warden": {
-        "name": "Ashkerat the Warden"
+        "name": "Ashkerat el Guardián"
       },
       "duneglass_colossus": {
-        "name": "Duneglass Colossus"
+        "name": "Coloso de vidrioduna"
       },
       "heretic_flameseer": {
-        "name": "Heretic Flameseer"
+        "name": "Vidente de llamas hereje"
       },
       "duskwater_raider": {
-        "name": "Duskwater Raider"
+        "name": "Asaltante de Aguaocaso"
       },
       "cartographers_shade": {
-        "name": "First Cartographer's Shade"
+        "name": "Sombra del Primer Cartógrafo"
       },
       "duskmane_stalker": {
         "name": "Acechador crinocaso"
@@ -7393,22 +7393,22 @@ export const es_ES: EnTranslations = {
         "name": "Veykar el Perjuro"
       },
       "twilight_moth": {
-        "name": "Twilight Moth"
+        "name": "Polilla crepuscular"
       },
       "feralrun_smuggler": {
-        "name": "Feralrun Smuggler"
+        "name": "Contrabandista de la Senda Feral"
       },
       "vessik_the_turncoat": {
-        "name": "Vessik the Turncoat"
+        "name": "Vessik el Cambiacapas"
       },
       "frostpine_icecaller": {
-        "name": "Frostpine Icecaller"
+        "name": "Llamahielos de Pino Escarcha"
       },
       "forsworn_blade": {
-        "name": "Forsworn Blade"
+        "name": "Hoja perjura"
       },
       "forsworn_shadowcaster": {
-        "name": "Forsworn Shadowcaster"
+        "name": "Lanzasombras perjuro"
       },
       "wolfsward_packwolf": {
         "name": "Lobo de manada de Guardialobos"
@@ -7441,25 +7441,25 @@ export const es_ES: EnTranslations = {
         "name": "Comandante Vaelis el Rompejuramentos"
       },
       "granary_militia_deserter": {
-        "name": "Granary Militia Deserter"
+        "name": "Desertor de la milicia de los graneros"
       },
       "maren_house_duelist": {
-        "name": "House Maren Duelist"
+        "name": "Duelista de la Casa Maren"
       },
       "frosthelm_rimeclaw": {
-        "name": "Frosthelm Rimeclaw"
+        "name": "Zarpa de escarcha de Yelmo de Escarcha"
       },
       "legion_oathguard_veteran": {
-        "name": "Legion Oathguard Veteran"
+        "name": "Veterano de la Guardia del Juramento"
       },
       "rimebound_elemental": {
-        "name": "Rimebound Elemental"
+        "name": "Elemental ceñido por la escarcha"
       },
       "assessor_maldrek": {
-        "name": "Assessor Maldrek the Unremitted"
+        "name": "Tasador Maldrek el Irremitido"
       },
       "purse_warden_grulk": {
-        "name": "Purse-Warden Grulk"
+        "name": "Guardabolsas Grulk"
       },
       "hollow_lurker": {
         "name": "Acechador de las cárcavas"
@@ -7480,40 +7480,40 @@ export const es_ES: EnTranslations = {
         "name": "Reptadora del Pantano Espinoso"
       },
       "palisade_warden": {
-        "name": "Warden Ilyen"
+        "name": "Guardián Ilyen"
       },
       "broodmother_veskal": {
-        "name": "Veskal, Mother of the Unlit Web"
+        "name": "Veskal, Madre de la Telaraña sin Luz"
       },
       "unlit_broodling": {
-        "name": "Unlit Broodling"
+        "name": "Cría de la nidada sin luz"
       },
       "mistfather_ghorvul": {
-        "name": "Ghorvul, the Mistfather"
+        "name": "Ghorvul, el Padre de la Niebla"
       },
       "mist_shamble": {
-        "name": "Mist Shamble"
+        "name": "Tambaleante de niebla"
       },
       "tollroad_carter": {
-        "name": "Carter Odom"
+        "name": "Carretero Odom"
       },
       "lastwater_wellguard": {
-        "name": "Wellguard Nahir"
+        "name": "Guardapozo Nahir"
       },
       "seat_water_bearer": {
-        "name": "Water-Bearer Sitra"
+        "name": "Portadora de agua Sitra"
       },
       "greyweir_bailiff": {
-        "name": "Bailiff Roskan"
+        "name": "Alguacil Roskan"
       },
       "veth_ledger_courier": {
-        "name": "Courier Yeska"
+        "name": "Mensajera Yeska"
       },
       "rimeshaft_picket_warden": {
-        "name": "Warden Halvar"
+        "name": "Guardián Halvar"
       },
       "paychest_porter": {
-        "name": "Porter Fenn"
+        "name": "Porteador Fenn"
       },
       "thornwarped_stag": {
         "name": "Ciervo deformado por espinas"
@@ -7702,37 +7702,37 @@ export const es_ES: EnTranslations = {
         "name": "Aullador de hielo de Yelmo de Escarcha"
       },
       "drowned_cantor": {
-        "name": "Drowned Cantor"
+        "name": "Chantre ahogado"
       },
       "reedbound_acolyte": {
-        "name": "Reedbound Acolyte"
+        "name": "Acólito atado a los juncos"
       },
       "deepfen_spearjaw": {
-        "name": "Deepfen Spearjaw"
+        "name": "Faucelanza de Deepfen"
       },
       "mirefen_widowling": {
-        "name": "Mirefen Widowling"
+        "name": "Cría de viuda de Mirefen"
       },
       "spider_egg_sac": {
-        "name": "Spider Egg-Sac"
+        "name": "Saco de huevos de araña"
       },
       "grave_silt_bulwark": {
-        "name": "Grave-Silt Bulwark"
+        "name": "Baluarte de limo sepulcral"
       },
       "sump_troll_devourer": {
-        "name": "Sump Troll Devourer"
+        "name": "Trol devorador del sumidero"
       },
       "choir_thrall": {
-        "name": "Bog Thrall"
+        "name": "Siervo del pantano"
       },
       "sister_nhalia_drowned_canticle": {
-        "name": "Sister Nhalia, the Drowned Canticle"
+        "name": "Hermana Nhalia, el Cántico Ahogado"
       },
       "edda_reedhand": {
-        "name": "Edda Reedhand"
+        "name": "Edda Manojunco"
       },
       "tolling_bell": {
-        "name": "Tolling Bell"
+        "name": "Campana doblante"
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, el Pico Despierto"
@@ -7961,44 +7961,44 @@ export const es_ES: EnTranslations = {
         "greeting": "El relicario de abajo ha vuelto a moverse."
       },
       "frontier_warden_corvis": {
-        "name": "Warden Corvis",
-        "title": "Legion Frontier Warden",
-        "greeting": "The old road is buried, and it stays buried. The continent receives you through the Envoys, not through rubble."
+        "name": "Guardián Corvis",
+        "title": "Guardián Fronterizo de la Legión",
+        "greeting": "El viejo camino está enterrado, y enterrado se queda. El continente te recibe a través de los Emisarios, no entre escombros."
       },
       "frontier_warden_maerlys": {
-        "name": "Warden Maerlys",
-        "title": "Legion Frontier Warden",
-        "greeting": "Past those stones lies the Breach, and the war knows no truce. The front stays sealed until the Legion says otherwise."
+        "name": "Guardiana Maerlys",
+        "title": "Guardiana Fronteriza de la Legión",
+        "greeting": "Pasadas esas piedras está la Brecha, y la guerra no conoce tregua. El frente sigue sellado hasta que la Legión diga lo contrario."
       },
       "envoy_marcus_vale": {
-        "name": "Envoy Marcus Vale",
-        "title": "Voice of the Kael Empire",
-        "greeting": "The Empire keeps roads paved, granaries full, and ledgers exact. Swear to Kael and you will never stand alone, or unbilled."
+        "name": "Emisario Marcus Vale",
+        "title": "Voz del Imperio de Kael",
+        "greeting": "El Imperio mantiene los caminos pavimentados, los graneros llenos y las cuentas exactas. Jura por Kael y nunca estarás solo, ni sin factura."
       },
       "envoy_sylwen": {
-        "name": "Envoy Sylwen",
-        "title": "Voice of the Veth Confederation",
-        "greeting": "Veth wins no wars. It ends them. Swear to the Confederation and learn how much a quiet word outweighs a loud army."
+        "name": "Emisaria Sylwen",
+        "title": "Voz de la Confederación de Veth",
+        "greeting": "Veth no gana guerras. Las termina. Jura por la Confederación y aprende cuánto pesa una palabra callada frente a un ejército ruidoso."
       },
       "envoy_amara": {
-        "name": "Envoy Amara",
-        "title": "Voice of the Domain of Ossara",
-        "greeting": "Before your empires drew maps, Ossara kept the faith. Swear to the Domain and inherit what the sands remember."
+        "name": "Emisaria Amara",
+        "title": "Voz del Dominio de Ossara",
+        "greeting": "Antes de que vuestros imperios dibujaran mapas, Ossara guardaba la fe. Jura por el Dominio y hereda lo que las arenas recuerdan."
       },
       "ferry_rhouma": {
-        "name": "Sandskiff Master Rhouma",
-        "title": "Passage to the Landing",
-        "greeting": "The skiff runs south to the Landing with the evening wind. Say the word."
+        "name": "Maestra del Esquife de Arena Rhouma",
+        "title": "Pasaje al Desembarco",
+        "greeting": "El esquife zarpa al sur, hacia el Desembarco, con el viento de la tarde. Tú dirás."
       },
       "ferry_neris": {
-        "name": "Blackwater Pilot Neris",
-        "title": "Passage to the Landing",
-        "greeting": "The black rivers reach farther than most maps admit. The Landing is an easy run."
+        "name": "Piloto de Aguanegra Neris",
+        "title": "Pasaje al Desembarco",
+        "greeting": "Los ríos negros llegan más lejos de lo que admiten casi todos los mapas. El Desembarco es una travesía fácil."
       },
       "ferry_aldwin": {
-        "name": "Coach Master Aldwin",
-        "title": "Passage to the Landing",
-        "greeting": "Imperial post runs to the Landing twice a bell. Papers, or coin, or a good story."
+        "name": "Maestro de Postas Aldwin",
+        "title": "Pasaje al Desembarco",
+        "greeting": "La posta imperial sale hacia el Desembarco dos veces por campana. Papeles, moneda o una buena historia."
       },
       "judge_saphira": {
         "name": "Juez Saphira",
@@ -8006,34 +8006,34 @@ export const es_ES: EnTranslations = {
         "greeting": "Ossara no pide héroes, {className}. Pide manos que terminen lo que empiezan. Enséñame las tuyas."
       },
       "judge_ivenna": {
-        "name": "Judge Ivenna",
-        "title": "Judge of the Sunken Seat",
-        "greeting": "The first court sat here before Qesh Aram had a well, {className}. We have come back to it. Sit, listen, and be of use."
+        "name": "Juez Ivenna",
+        "title": "Juez de la Sede Hundida",
+        "greeting": "La primera corte celebró sesión aquí antes de que Qesh Aram tuviera pozo, {className}. Hemos vuelto a ella. Siéntate, escucha y sé de utilidad."
       },
       "canon_sahr": {
-        "name": "Canon-Archivist Sahr",
-        "title": "Keeper of the Burned Verses",
-        "greeting": "Every verse we ever burned was copied first, {className}. That is the archive: the faith admits nothing and forgets less."
+        "name": "Canóniga Archivera Sahr",
+        "title": "Guardiana de los Versos Quemados",
+        "greeting": "Cada verso que quemamos se copió primero, {className}. Eso es el archivo: la fe no admite nada y olvida menos."
       },
       "provisioner_masut": {
-        "name": "Provisioner Masut",
-        "title": "Quartermaster of the Seat",
-        "greeting": "Judges eat like anyone else, {className}, they just quote scripture at the bill. Bread, water, and whatever the dunes owe me."
+        "name": "Proveedor Masut",
+        "title": "Intendente de la Sede",
+        "greeting": "Los jueces comen como cualquiera, {className}, solo que le recitan escritura a la cuenta. Pan, agua y lo que las dunas me deban."
       },
       "caravan_mistress_yesfa": {
-        "name": "Caravan Mistress Yesfa",
-        "title": "Mistress of Last Water",
-        "greeting": "Past this well there is no other water until the border stones, {className}. Everything the Domain still owes the road gets settled here."
+        "name": "Maestra de Caravanas Yesfa",
+        "title": "Señora de Última Agua",
+        "greeting": "Pasado este pozo no hay más agua hasta las piedras de la frontera, {className}. Cuanto el Dominio aún le debe al camino se salda aquí."
       },
       "outrider_dhalen": {
-        "name": "Outrider Dhalen",
-        "title": "Outrider of the Qesh Road",
-        "greeting": "I ride the last dunes so the maps stay honest, {className}. Lately the dunes ride back. Ask me what walks out there; I keep the list."
+        "name": "Batidor Dhalen",
+        "title": "Batidor del Camino de Qesh",
+        "greeting": "Cabalgo las últimas dunas para que los mapas digan la verdad, {className}. Últimamente las dunas devuelven la cabalgada. Pregúntame qué camina ahí fuera; yo llevo la lista."
       },
       "waterseller_ibbin": {
-        "name": "Waterseller Ibbin",
-        "title": "Waterseller of Last Water",
-        "greeting": "A skin of water costs copper, {className}. The same skin at the far end of the Barrens costs whatever the seller says it does. Buy here."
+        "name": "Aguador Ibbin",
+        "title": "Aguador de Última Agua",
+        "greeting": "Un odre de agua cuesta cobre, {className}. El mismo odre al otro extremo de los Baldíos cuesta lo que diga el vendedor. Compra aquí."
       },
       "caravan_master_odai": {
         "name": "Maestro de Caravanas Odai",
@@ -8061,34 +8061,34 @@ export const es_ES: EnTranslations = {
         "greeting": "Acero silencioso para trabajos silenciosos. Si una hoja mía canta, te devuelvo la diferencia."
       },
       "tollmaster_hesk": {
-        "name": "Tollmaster Hesk",
-        "title": "Keeper of the Greyweir",
-        "greeting": "The weir takes a toll from everything the river carries, {className}. Lately the river carries knives, and knives pay in a different coin."
+        "name": "Maestro de Peajes Hesk",
+        "title": "Guardián del Azud Gris",
+        "greeting": "El azud cobra peaje a cuanto arrastra el río, {className}. Últimamente el río arrastra cuchillos, y los cuchillos pagan en otra moneda."
       },
       "ferrywoman_szel": {
-        "name": "Ferrywoman Szel",
-        "title": "Mistress of the Weir Landing",
-        "greeting": "I pole the black water twice a day and I am owed for both crossings, {playerName}. The mere disagrees. We are negotiating."
+        "name": "Barquera Szel",
+        "title": "Señora del Embarcadero del Azud",
+        "greeting": "Cruzo a pértiga el agua negra dos veces al día y se me deben ambas travesías, {playerName}. El lago no está de acuerdo. Estamos negociando."
       },
       "toll_clerk_odune": {
-        "name": "Toll Clerk Odune",
-        "title": "Purser of the Greyweir",
-        "greeting": "Bread, tea, and receipts, {className}. The first two keep you walking; the third keeps you honest. All three are priced accordingly."
+        "name": "Escribiente de Peaje Odune",
+        "title": "Contador del Azud Gris",
+        "greeting": "Pan, té y recibos, {className}. Los dos primeros te mantienen en camino; el tercero te mantiene honrado. Los tres tienen su precio en consecuencia."
       },
       "waykeeper_dral": {
-        "name": "Waykeeper Dral",
-        "title": "Warden of the North Road",
-        "greeting": "Everything north of this fire is trying to close the road, {className}: trolls, cats, weather. My job is a road that stays open. Yours can be too."
+        "name": "Guardacaminos Dral",
+        "title": "Guardián del Camino del Norte",
+        "greeting": "Cuanto hay al norte de esta hoguera intenta cerrar el camino, {className}: troles, felinos, clima. Mi oficio es un camino que siga abierto. El tuyo también puede serlo."
       },
       "arbiter_senna": {
-        "name": "Arbiter Senna",
-        "title": "The Guild's Quiet Word",
-        "greeting": "Across that dark stands the Last Lodge, {playerName}, and the guild does not go closer. You are not the guild. That is your entire value; try to keep it."
+        "name": "Árbitra Senna",
+        "title": "La Palabra Callada del Gremio",
+        "greeting": "Al otro lado de esa oscuridad se alza el Último Refugio, {playerName}, y el gremio no se acerca más. Tú no eres el gremio. Ese es tu valor entero; procura conservarlo."
       },
       "sutler_kevish": {
-        "name": "Sutler Kevish",
-        "title": "Provisioner of the Longwatch",
-        "greeting": "Last hot meal before the ice, {className}, and the first one after it, if there is an after. I extend no credit past the tree line."
+        "name": "Vivandero Kevish",
+        "title": "Proveedor de la Larga Vigilia",
+        "greeting": "La última comida caliente antes del hielo, {className}, y la primera después, si hay un después. No fío más allá de la línea de árboles."
       },
       "marshal_corvin": {
         "name": "Mariscal Corvin",
@@ -8101,34 +8101,34 @@ export const es_ES: EnTranslations = {
         "greeting": "Requisiciones por triplicado o moneda por adelantado, {className}. La moneda es más rápida, y el pan está más fresco que los formularios."
       },
       "castellan_odric": {
-        "name": "Castellan Odric",
-        "title": "Commandant, Fort Ledgerwatch",
-        "greeting": "Fort Ledgerwatch holds the border, and the border holds the paperwork, {className}. State your business in one line or less."
+        "name": "Castellano Odric",
+        "title": "Comandante del Fuerte Guardacuentas",
+        "greeting": "El Fuerte Guardacuentas sostiene la frontera, y la frontera sostiene el papeleo, {className}. Expón tu asunto en una línea o menos."
       },
       "paymistress_serna": {
-        "name": "Paymistress Serna",
-        "title": "Ninth Legion Recovery Office",
-        "greeting": "Back pay of the Ninth Legion, frozen pending prosecution. If you are here to add to the evidence, {playerName}, take a number: it is one."
+        "name": "Pagadora Serna",
+        "title": "Oficina de Recuperación de la Novena Legión",
+        "greeting": "Pagas atrasadas de la Novena Legión, congeladas a la espera de juicio. Si vienes a sumar pruebas, {playerName}, coge número: es el uno."
       },
       "sutler_brama": {
-        "name": "Sutler Brama",
-        "title": "Licensed Fort Sutler",
-        "greeting": "Licensed sutler, prices as posted, receipts on request. The Empire audits me monthly, {playerName}, so the scale is honest."
+        "name": "Vivandera Brama",
+        "title": "Vivandera con Licencia del Fuerte",
+        "greeting": "Vivandera con licencia, precios según cartel, recibos a petición. El Imperio me audita cada mes, {playerName}, así que la balanza es honrada."
       },
       "foreman_ulla": {
-        "name": "Foreman Ulla",
-        "title": "Rimeshaft Claims Office",
-        "greeting": "Rimeshaft runs three shifts and loses two to weather, {className}. If you can hold a pick, or kill what interrupts one, you are payroll."
+        "name": "Capataz Ulla",
+        "title": "Oficina de Concesiones de Pozo Escarcha",
+        "greeting": "Pozo Escarcha trabaja a tres turnos y pierde dos por el clima, {className}. Si sabes sostener un pico, o matar lo que interrumpe uno, estás en nómina."
       },
       "assayer_veck": {
-        "name": "Assayer Veck",
-        "title": "Imperial Assay, Frosthelm Division",
-        "greeting": "Every stone in this camp gets weighed twice, {playerName}. The mountain shorts no one; people are another matter."
+        "name": "Ensayador Veck",
+        "title": "Ensaye Imperial, División de Yelmo de Escarcha",
+        "greeting": "Cada piedra de este campamento se pesa dos veces, {playerName}. La montaña no sisa a nadie; la gente es otro asunto."
       },
       "provisioner_edda": {
-        "name": "Provisioner Edda",
-        "title": "Rimeshaft Stores",
-        "greeting": "Stores are rationed by roster, and you are not on the roster, {className}. Coin amends the roster. Coin amends most things."
+        "name": "Proveedora Edda",
+        "title": "Almacenes de Pozo Escarcha",
+        "greeting": "Los almacenes se racionan por lista, y tú no estás en la lista, {className}. La moneda enmienda la lista. La moneda enmienda casi cualquier cosa."
       },
       "armorer_ottokar": {
         "name": "Armero Ottokar",
@@ -8231,14 +8231,14 @@ export const es_ES: EnTranslations = {
         "greeting": "El Imperio caza por carta y por cupo, {className}, y el cupo va atrasado. Trae tu arco o trae excusas; yo solo archivo una de las dos cosas."
       },
       "brother_halven_marsh": {
-        "name": "Brother Halven",
-        "title": "Reliquary Keeper",
-        "greeting": "The trail led north. Another reliquary, another rite. Choose your tier, and I'll hold the rope until you return."
+        "name": "Hermano Halven",
+        "title": "Guardián del Relicario",
+        "greeting": "El rastro llevaba al norte. Otro relicario, otro rito. Elige tu nivel y yo sujetaré la cuerda hasta que vuelvas."
       },
       "spirit_healer": {
-        "name": "The Pale Keeper",
-        "title": "Warden of the Dead",
-        "greeting": "Rest now, spirit. I can return you to your body, but the crossing back leaves you weak."
+        "name": "El Guardián Pálido",
+        "title": "Custodio de los Muertos",
+        "greeting": "Descansa, espíritu. Puedo devolverte a tu cuerpo, pero el regreso te deja débil."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -8683,32 +8683,32 @@ export const es_ES: EnTranslations = {
         }
       },
       "q_stalkers_return": {
-        "title": "The Stalkers Return",
-        "text": "Twelve dead, and the ridge crawls thicker than the day you started, {playerName}. Beasts do not throw themselves at a wall out of hunger. Something on the high ridge is pushing them down, and until I know what, the culling does not stop. Fourteen more.",
-        "completion": "Fourteen more, and still my patrols count fresh tracks by morning. My scout came back from the high ridge white as the snowline: prints the size of a shield, she says, and old kills no stalker would leave. Whatever walks up there is no ordinary cat.",
+        "title": "Los acechadores regresan",
+        "text": "Doce muertos, y la cresta hierve más espesa que el día en que empezaste, {playerName}. Las bestias no se lanzan contra un muro por hambre. Algo en la cresta alta las empuja hacia abajo, y hasta que sepa qué es, la matanza no se detiene. Catorce más.",
+        "completion": "Catorce más, y aun así mis patrullas cuentan huellas frescas cada mañana. Mi exploradora volvió de la cresta alta blanca como la línea de nieve: huellas del tamaño de un escudo, dice, y presas viejas que ningún acechador dejaría atrás. Lo que camina ahí arriba no es un felino corriente.",
         "objectives": {
           "0": {
-            "label": "Ridge Stalker slain"
+            "label": "Acechador de la cresta abatido"
           }
         }
       },
       "q_stalker_cloaks": {
-        "title": "Cloaks for the Watch",
-        "text": "Eight pelts lined the officers' cloaks, and now every soldier on the wall wants the same, {playerName}. They are right to want it: winter takes fingers first and apologies never. Ten more pelts from the ridges south of the gate, and the whole watch sleeps warm.",
-        "completion": "Ten good pelts, thick as any I have... no, look at these, {playerName}. Torn, half of them, and by no blade or spear. Claw marks wide as my hand, right through the winter coat. Something on that ridge is savaging its own kind.",
+        "title": "Capas para la guardia",
+        "text": "Ocho pieles forraron las capas de los oficiales, y ahora todos los soldados del muro quieren lo mismo, {playerName}. Hacen bien en quererlo: el invierno se lleva primero los dedos y jamás pide perdón. Diez pieles más de las crestas al sur de la puerta, y toda la guardia dormirá caliente.",
+        "completion": "Diez buenas pieles, gruesas como las que más... no, mira estas, {playerName}. Desgarradas, la mitad, y no por hoja ni lanza. Marcas de garra anchas como mi mano, a través del pelaje de invierno. Algo en esa cresta está destrozando a los de su propia especie.",
         "objectives": {
           "0": {
-            "label": "Ridge Stalker Pelt"
+            "label": "Piel de acechador de la cresta"
           }
         }
       },
       "q_old_cragmaw": {
-        "title": "Old Cragmaw",
-        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.",
-        "completion": "Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, {playerName}, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.",
+        "title": "El viejo Cragmaw",
+        "text": "La gente de la montaña le puso nombre a las huellas que encontró mi exploradora: el viejo Cragmaw, un tirano de pelaje cosido a cicatrices que ha sobrevivido a tres generaciones de su propia manada. Es la razón de que los acechadores inunden mi camino, {playerName}. Su guarida está en la cresta oeste, sobre el camino del sur. Llévate a un compañero y acaba con ese viejo demonio.",
+        "completion": "Abatido, por fin. La gente de la montaña juraba que ese felino sobreviviría al propio muro. Los acechadores se quedarán en sus nieves altas, {playerName}, y mis patrullas caminarán el camino sin sangrar por él. Toda la cresta está más tranquila gracias a tu trabajo.",
         "objectives": {
           "0": {
-            "label": "Old Cragmaw slain"
+            "label": "Viejo Cragmaw abatido"
           }
         }
       },
@@ -9030,1543 +9030,1543 @@ export const es_ES: EnTranslations = {
         }
       },
       "q_three_banners": {
-        "title": "The Three Banners",
-        "text": "You have outgrown this island, {playerName}. Three Voices wait at the Envoys Hall up the north road: the Empire, the Confederation, the Domain. Hear all three before you weigh your oath. Loyalty and debt are the only currencies out there, so spend yours knowingly.",
-        "completion": "You have heard the three banners speak. When your heart is set, the choice is yours alone, and it is permanent.",
+        "title": "Los tres estandartes",
+        "text": "Esta isla se te ha quedado pequeña, {playerName}. Tres Voces esperan en el Salón de los Emisarios, camino del norte arriba: el Imperio, la Confederación, el Dominio. Escucha a las tres antes de sopesar tu juramento. Ahí fuera la lealtad y la deuda son las únicas monedas, así que gasta las tuyas a sabiendas.",
+        "completion": "Has oído hablar a los tres estandartes. Cuando tu corazón se decida, la elección es solo tuya, y es permanente.",
         "objectives": {
           "0": {
-            "label": "Hear the Voice of Kael"
+            "label": "Escucha a la Voz de Kael"
           },
           "1": {
-            "label": "Hear the Voice of Veth"
+            "label": "Escucha a la Voz de Veth"
           },
           "2": {
-            "label": "Hear the Voice of Ossara"
+            "label": "Escucha a la Voz de Ossara"
           }
         }
       },
       "q_thornfen_palisade_defense": {
-        "title": "Hold the Palisade",
-        "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
-        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {playerName}.",
+        "title": "Defended la empalizada",
+        "text": "El bosque espinoso pone a prueba nuestras estacas cada anochecer, {playerName}, y el Guardián Ilyen sostiene la línea solo. Ponte a su lado cuando dé la llamada: tres embestidas, y el bosque aprende la lección por una temporada.",
+        "completion": "Tres embestidas rotas y el Guardián sigue en pie. El bosque se enfurruñará una noche o dos. Bien luchado, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Waves repelled beside Warden Ilyen"
+            "label": "Oleadas rechazadas junto al Guardián Ilyen"
           }
         }
       },
       "q_unlit_mother": {
-        "title": "The Mother Below",
-        "text": "Every tunnel my runners cut, the web takes back by morning, {playerName}. The Mother below the Hollows is no camp spider: bring every blade you can rent and put her down together.",
-        "completion": "The tunnels stay cut for a season, then. You did not fight her alone, and that is the only reason you are here to be paid.",
+        "title": "La Madre de abajo",
+        "text": "Cada túnel que abren mis correos, la telaraña lo reclama antes del amanecer, {playerName}. La Madre bajo las Cárcavas no es una araña de campamento: alquila todas las hojas que puedas y bajad a por ella juntos.",
+        "completion": "Los túneles seguirán abiertos una temporada, entonces. No luchaste contra ella a solas, y esa es la única razón de que estés aquí para cobrar.",
         "objectives": {
           "0": {
-            "label": "Veskal slain"
+            "label": "Veskal abatida"
           }
         }
       },
       "q_the_mistfather": {
-        "title": "What the Fog Wants",
-        "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
-        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {playerName}.",
+        "title": "Lo que quiere la niebla",
+        "text": "La niebla se llevó a dos vecinos de los palafitos esta semana y devolvió sus faroles, pulidos, {playerName}. Nos está cortejando. Reúne a cuantos te deban un favor y enseñadle al Padre de la Niebla que las luces siguen encendidas.",
+        "completion": "La niebla clareó durante una campana entera después de que lo derribarais. La primera vez en treinta años. Los faroles siguen encendidos, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ghorvul slain"
+            "label": "Ghorvul abatido"
           }
         }
       },
       "q_gh_lurkers_below": {
-        "title": "What the Mouths Swallow",
-        "text": "The Sunken Mouths east of here swallowed three runners this month, {playerName}, and the lurkers spit back only the boots. Thin them out; the Underway does not run on boots.",
-        "completion": "Three roads reopened by morning. You are cheaper than the funerals, {playerName}, and I mean that as high praise.",
+        "title": "Lo que tragan las Bocas",
+        "text": "Las Bocas Hundidas al este se tragaron a tres correos este mes, {playerName}, y los acechadores solo escupen las botas. Ralea sus filas; el Pasaje Subterráneo no funciona a base de botas.",
+        "completion": "Tres rutas reabiertas antes del amanecer. Sales más barato que los funerales, {playerName}, y lo digo como el mayor de los elogios.",
         "objectives": {
           "0": {
-            "label": "Hollow Lurker slain"
+            "label": "Acechador de las cárcavas abatido"
           }
         }
       },
       "q_gh_gnaw_culling": {
-        "title": "The Gnaw Warrens",
-        "text": "The gnawers breed faster than the warrens collapse, {playerName}, and they have started chewing the shoring timbers. Cull the warrens west of the Rest before the ceiling becomes the floor.",
-        "completion": "The timbers will hold another season. The gnawers will not thank you; neither will they bite, which is the arrangement I prefer.",
+        "title": "Las Madrigueras Roídas",
+        "text": "Los roedores crían más deprisa de lo que se derrumban las madrigueras, {playerName}, y han empezado a masticar los puntales. Limpia las madrigueras al oeste del Descanso antes de que el techo se convierta en el suelo.",
+        "completion": "Los puntales aguantarán otra temporada. Los roedores no te lo agradecerán; tampoco morderán, que es el arreglo que prefiero.",
         "objectives": {
           "0": {
-            "label": "Pale Gnawer slain"
+            "label": "Roedor pálido abatido"
           }
         }
       },
       "q_gh_shale_hearts": {
-        "title": "The Shale Gallery",
-        "text": "Something woke the shale in the deep gallery, {playerName}: the stone walks, and walking stone does not respect tunnel rights. Break the elementals before the gallery seals itself.",
-        "completion": "The gallery is quiet and the survey team stopped drinking on duty. Small victories stack, {playerName}.",
+        "title": "La Galería de Esquisto",
+        "text": "Algo despertó el esquisto en la galería profunda, {playerName}: la piedra camina, y la piedra que camina no respeta derechos de túnel. Quiebra a los elementales antes de que la galería se selle sola.",
+        "completion": "La galería está en silencio y el equipo de prospección ha dejado de beber en horas de trabajo. Las victorias pequeñas se acumulan, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Deep Shale Elemental broken"
+            "label": "Elemental de esquisto profundo quebrado"
           }
         }
       },
       "q_gh_renegade_tolls": {
-        "title": "Unlicensed Tolls",
-        "text": "Renegades are charging tolls on tunnels they do not own, {playerName}, which offends me professionally. The Underway has exactly one fence, and he is standing in front of you. Correct them.",
-        "completion": "Toll receipts are down and honest smuggling is up. The Hollows thank you in the only currency they respect.",
+        "title": "Peajes sin licencia",
+        "text": "Los renegados cobran peaje en túneles que no les pertenecen, {playerName}, lo cual me ofende profesionalmente. El Pasaje Subterráneo tiene exactamente un perista, y lo tienes delante. Corrígelos.",
+        "completion": "Los ingresos por peaje bajan y el contrabando honrado sube. Las Cárcavas te lo agradecen en la única moneda que respetan.",
         "objectives": {
           "0": {
-            "label": "Underway Renegade slain"
+            "label": "Renegado del Pasaje Subterráneo abatido"
           }
         }
       },
       "q_gh_smuggler_king": {
-        "title": "The Smuggler King",
-        "text": "Vask calls himself the Smuggler King now, {playerName}, and kings tax fences. Take friends into the Spoil; Vask keeps a court, and courts object to regicide.",
-        "completion": "No crown, no king, no tax. The Spoil will squabble over the succession for a year, and squabbling smugglers are cheap smugglers.",
+        "title": "El Rey Contrabandista",
+        "text": "Vask se hace llamar ahora el Rey Contrabandista, {playerName}, y los reyes cobran impuestos a los peristas. Llévate amigos al Botín; Vask mantiene una corte, y las cortes ponen reparos al regicidio.",
+        "completion": "Sin corona, sin rey, sin impuesto. El Botín se peleará por la sucesión durante un año, y los contrabandistas que se pelean son contrabandistas baratos.",
         "objectives": {
           "0": {
-            "label": "Vask the Smuggler King slain"
+            "label": "Vask el Rey Contrabandista abatido"
           }
         }
       },
       "q_tf_creeper_pruning": {
-        "title": "Pruning Season",
-        "text": "The creepers root closer to the stakes every dusk, {playerName}. The Wardens call it pruning season, which is gallows humor: prune twelve before they prune us.",
-        "completion": "Twelve stumps and the palisade line holds. Pruning season never ends out here; it only changes hands.",
+        "title": "Temporada de poda",
+        "text": "Las reptadoras echan raíces cada anochecer más cerca de las estacas, {playerName}. Los guardas lo llaman temporada de poda, que es humor de patíbulo: poda doce antes de que ellas nos poden a nosotros.",
+        "completion": "Doce tocones y la línea de la empalizada aguanta. Aquí fuera la temporada de poda no termina nunca; solo cambia de manos.",
         "objectives": {
           "0": {
-            "label": "Thornfen Creeper pruned"
+            "label": "Reptadora del Pantano Espinoso podada"
           }
         }
       },
       "q_tf_stag_bolts": {
-        "title": "The Moving Wood",
-        "text": "The stags in the Moving Wood are not stags anymore, {playerName}: the thorn rides them like a saddle. Put them down west of the palisade, and do not follow the antlers into the deep growth.",
-        "completion": "Eight beasts freed the only way left to free them. The Wardens mark your tally on the gate post; the wood marks it elsewhere.",
+        "title": "El Bosque que Camina",
+        "text": "Los ciervos del Bosque que Camina ya no son ciervos, {playerName}: la espina los monta como una silla. Abátelos al oeste de la empalizada, y no sigas las cornamentas hacia la espesura profunda.",
+        "completion": "Ocho bestias liberadas de la única manera que quedaba para liberarlas. Los guardas apuntan tu cuenta en el poste de la puerta; el bosque la apunta en otra parte.",
         "objectives": {
           "0": {
-            "label": "Thornwarped Stag felled"
+            "label": "Ciervo deformado por espinas abatido"
           }
         }
       },
       "q_tf_briarfather": {
-        "title": "The Briarfather",
-        "text": "Every thorn in this fen grows from one root, {playerName}, and the root has a name: the Briarfather, deep in the thicket. Bring blades you trust. Nobody prunes the Briarfather alone.",
-        "completion": "The thicket went quiet the hour he fell. It will not last, but a quiet hour on the Thornfen is a debt the Wardens do not forget.",
+        "title": "El Padre Zarzal",
+        "text": "Cada espina de esta ciénaga crece de una sola raíz, {playerName}, y la raíz tiene nombre: el Padre Zarzal, en lo hondo de la espesura. Trae hojas de confianza. Nadie poda al Padre Zarzal a solas.",
+        "completion": "La espesura enmudeció la hora en que cayó. No durará, pero una hora de silencio en el Pantano Espinoso es una deuda que los guardas no olvidan.",
         "objectives": {
           "0": {
-            "label": "Briarfather Yew felled"
+            "label": "Tejo Padre Zarzal talado"
           }
         }
       },
       "q_ip_raider_toll": {
-        "title": "The Raider Toll",
-        "text": "The raiders on the bluffs charge their own toll in blood and cargo, {playerName}, and mine is the only licensed booth on this pass. Reduce the competition.",
-        "completion": "Traffic is up, screaming is down. The pass almost pays for itself again, {playerName}.",
+        "title": "El peaje del asaltante",
+        "text": "Los asaltantes de los riscos cobran su propio peaje en sangre y carga, {playerName}, y la mía es la única caseta con licencia de este paso. Reduce la competencia.",
+        "completion": "El tráfico sube, los gritos bajan. El paso casi vuelve a pagarse solo, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Pass Raider slain"
+            "label": "Asaltante del paso abatido"
           }
         }
       },
       "q_ip_ogre_toll": {
-        "title": "The Ogre Toll",
-        "text": "The crag tollers sit on the east switchback and collect wagons whole, {playerName}. An ogre with a business model is still an ogre. Foreclose on them.",
-        "completion": "The switchback is passable and the ogres hold no further liens. I am writing that sentence into the ledger with real pleasure.",
+        "title": "El Peaje del Ogro",
+        "text": "Los peajeros del risco se sientan en la revuelta este y cobran carros enteros, {playerName}. Un ogro con modelo de negocio sigue siendo un ogro. Ejecuta su hipoteca.",
+        "completion": "La revuelta es transitable y los ogros no retienen más embargos. Escribo esta frase en el libro de cuentas con auténtico placer.",
         "objectives": {
           "0": {
-            "label": "Crag Toller felled"
+            "label": "Ogro peajero del risco derribado"
           }
         }
       },
       "q_ip_wyvern_eyries": {
-        "title": "The Eyrie Problem",
-        "text": "Wyverns nest above the high pass and have learned what a pack mule sounds like, {playerName}. Climb to the eyries and unteach them.",
-        "completion": "The sky over the pass is just sky again. Mules everywhere sleep easier, and so do their owners.",
+        "title": "El problema de los nidos",
+        "text": "Los guivernos anidan sobre el paso alto y han aprendido cómo suena una mula de carga, {playerName}. Sube a los nidos y hazles olvidar la lección.",
+        "completion": "El cielo sobre el paso vuelve a ser solo cielo. Las mulas de todas partes duermen más tranquilas, y sus dueños también.",
         "objectives": {
           "0": {
-            "label": "Ridge Wyvern brought down"
+            "label": "Guiverno de la cresta derribado"
           }
         }
       },
       "q_ip_warlord": {
-        "title": "Skarn Holds the Pass",
-        "text": "Warlord Skarn unified the bluffs, {playerName}, which is exactly as bad as it sounds. A unified pass answers to him, not to the tollhouse. Gather a company and dissolve the arrangement.",
-        "completion": "Skarn falls and the bluffs remember they hate each other. Divided raiders are a weather condition; united ones were a siege.",
+        "title": "Skarn domina el paso",
+        "text": "El señor de la guerra Skarn ha unificado los riscos, {playerName}, que es exactamente tan malo como suena. Un paso unificado le responde a él, no a la Casa de Peaje. Reúne una compañía y disuelve el arreglo.",
+        "completion": "Skarn cae y los riscos recuerdan que se odian entre sí. Los asaltantes divididos son un fenómeno del clima; unidos eran un asedio.",
         "objectives": {
           "0": {
-            "label": "Warlord Skarn slain"
+            "label": "Señor de la guerra Skarn abatido"
           }
         }
       },
       "q_ev_leech_burning": {
-        "title": "Leeches by Lanternlight",
-        "text": "The leeches climb the stilts at night and drink through the floorboards, {playerName}. Burn them out of the shallows while the lanterns still reach.",
-        "completion": "The stilts stand unbled for a week, maybe two. Out here that counts as a festival.",
+        "title": "Sanguijuelas a la luz del farol",
+        "text": "Las sanguijuelas trepan por los pilotes de noche y beben a través de las tablas del suelo, {playerName}. Quémalas fuera de los bajíos mientras los faroles aún alcancen.",
+        "completion": "Los palafitos llevan una semana sin sangrar, puede que dos. Aquí fuera eso cuenta como festival.",
         "objectives": {
           "0": {
-            "label": "Emberveil Leech burned"
+            "label": "Sanguijuela de Velo de Ascuas quemada"
           }
         }
       },
       "q_ev_bloat_popping": {
-        "title": "The Bloatwater Problem",
-        "text": "The bloats drift in from the shallows and burst against the pilings, {playerName}, and what they burst INTO eats the wood. Pop them at a distance, upwind, with my blessing.",
-        "completion": "The pilings will outlive the season. You smell terrible, {playerName}, and I say that with gratitude.",
+        "title": "El problema de los hinchados",
+        "text": "Los hinchados llegan a la deriva desde los bajíos y revientan contra los pilotes, {playerName}, y aquello EN LO QUE revientan se come la madera. Reviéntalos a distancia, contra el viento, con mi bendición.",
+        "completion": "Los pilotes sobrevivirán a la temporada. Hueles fatal, {playerName}, y lo digo con gratitud.",
         "objectives": {
           "0": {
-            "label": "Emberveil Bloat burst"
+            "label": "Hinchado de Velo de Ascuas reventado"
           }
         }
       },
       "q_ev_wraith_lights": {
-        "title": "False Lights",
-        "text": "The wraiths have started carrying lights, {playerName}: false lanterns, leading walkers off the causeway into the striders. Snuff the wraiths and the striders both; the fog only gets one trick at a time.",
-        "completion": "True lights only on the causeway tonight. Whatever teaches the fog its tricks will need a new lesson plan.",
+        "title": "Luces falsas",
+        "text": "Los espectros han empezado a llevar luces, {playerName}: faroles falsos que sacan a los caminantes de la calzada y los llevan hasta los zancudos. Apaga a los espectros y a los zancudos por igual; la niebla solo tiene derecho a un truco a la vez.",
+        "completion": "Esta noche, solo luces verdaderas en la calzada. Lo que sea que le enseña sus trucos a la niebla necesitará un nuevo plan de estudios.",
         "objectives": {
           "0": {
-            "label": "Fog Wraith snuffed"
+            "label": "Espectro de la niebla apagado"
           },
           "1": {
-            "label": "Mire Strider felled"
+            "label": "Zancudo del fango abatido"
           }
         }
       },
       "q_ev_colossus": {
-        "title": "What Walks the Fogwall",
-        "text": "Something the size of a barn walks the Fogwall at low tide, {playerName}, and the fog bends around it like a curtain. Take a full lantern crew. It has never noticed us; be the reason it never does again.",
-        "completion": "The Fogwall stands one tenant emptier. The stilts drink to you tonight, which is the highest honor we print.",
+        "title": "Lo que camina el Muro de Niebla",
+        "text": "Algo del tamaño de un granero camina el Muro de Niebla con la marea baja, {playerName}, y la niebla se pliega a su alrededor como una cortina. Llévate una cuadrilla de faroles al completo. Nunca ha reparado en nosotros; sé la razón de que no vuelva a hacerlo.",
+        "completion": "El Muro de Niebla tiene un inquilino menos. Los palafitos beben a tu salud esta noche, que es el mayor honor que imprimimos.",
         "objectives": {
           "0": {
-            "label": "Emberveil Colossus toppled"
+            "label": "Coloso de Velo de Ascuas derribado"
           }
         }
       },
       "q_ev_bridge_report": {
-        "title": "Word to Bridgewatch",
-        "text": "Bridgewatch asks after the fog like it asks after weather, {playerName}, and this season the honest answer is: worse. Carry my report up the causeway to Sutler Ives, and keep to the true lights.",
-        "completion": "Worse, she says. Ketta undersells; she always has. Stay a while, {playerName}: the bridge has work for anyone the fog could not keep.",
+        "title": "Aviso para la Vigía del Puente",
+        "text": "La Vigía del Puente pregunta por la niebla como quien pregunta por el tiempo, {playerName}, y esta temporada la respuesta honrada es: peor. Sube mi informe por la calzada hasta el vivandero Ives, y no te apartes de las luces verdaderas.",
+        "completion": "Peor, dice. Ketta se queda corta; siempre lo ha hecho. Quédate un tiempo, {playerName}: el puente tiene trabajo para cualquiera a quien la niebla no haya podido retener.",
         "objectives": {
           "0": {
-            "label": "Report delivered to Sutler Ives"
+            "label": "Informe entregado al vivandero Ives"
           }
         }
       },
       "q_pc_gull_bones": {
-        "title": "Gullpicked and Restless",
-        "text": "The bones on Gullwatch Rise stopped lying still, {playerName}. Gullpicked, salt-scoured, and walking: the rise is a graveyard that forgot its manners. Remind it.",
-        "completion": "The rise lies quiet and the gulls are back to honest scavenging. That is as close to peace as the Crossing sells.",
+        "title": "Picoteado e inquieto",
+        "text": "Los huesos del Alto de la Gaviota han dejado de quedarse quietos, {playerName}. Picoteados por las gaviotas, curtidos de sal y andando: el alto es un cementerio que olvidó sus modales. Recuérdaselos.",
+        "completion": "El alto yace en silencio y las gaviotas han vuelto a la carroña honrada. Eso es lo más parecido a la paz que vende el Cruce.",
         "objectives": {
           "0": {
-            "label": "Gullpicked Skeleton laid down"
+            "label": "Esqueleto picoteado por gaviotas sepultado"
           }
         }
       },
       "q_pc_drowned_banks": {
-        "title": "The Drowned Banks",
-        "text": "The river returns what it takes, {playerName}, eventually and angry. The revenants on the west banks drag at the ferry lines by night. Cut them down and let the river keep its dead.",
-        "completion": "The ferry lines held every night this week. The river and I have an understanding again, thanks to you.",
+        "title": "Las Riberas Ahogadas",
+        "text": "El río devuelve lo que se lleva, {playerName}, tarde y con rabia. Los renacidos de las riberas oeste tiran de las amarras de la barcaza por la noche. Derríbalos y deja que el río se quede con sus muertos.",
+        "completion": "Las amarras han aguantado todas las noches de esta semana. El río y yo volvemos a entendernos, gracias a ti.",
         "objectives": {
           "0": {
-            "label": "Riverbank Revenant put down"
+            "label": "Renacido de la ribera abatido"
           }
         }
       },
       "q_pc_bridge_cult": {
-        "title": "The Bridge Congregation",
-        "text": "The cultists on the Pale Bridge pray to the span itself, {playerName}, and lately the span answers. Nobody crosses while the congregation holds service. Disperse it, permanently.",
-        "completion": "The bridge stands empty and the crossing bell rang for the first time in a month. Whatever they woke is still listening; walk soft.",
+        "title": "La congregación del puente",
+        "text": "Los cultistas del Puente Pálido le rezan al propio puente, {playerName}, y últimamente el puente responde. Nadie cruza mientras la congregación oficia. Dispérsala, de forma permanente.",
+        "completion": "El puente está vacío y la campana del cruce ha sonado por primera vez en un mes. Lo que sea que despertaron sigue escuchando; pisa con cuidado.",
         "objectives": {
           "0": {
-            "label": "Bridge Cultist dispersed"
+            "label": "Cultista del puente dispersado"
           }
         }
       },
       "q_pc_pale_watchers": {
-        "title": "The Pale Watchers",
-        "text": "The watchers stand where the congregation fell, {playerName}, and they do not blink because they have nothing to blink with. They watch the bridge for something. Remove the audience.",
-        "completion": "Nothing watches the span tonight but my own tired eyes. I intend to keep it that way.",
+        "title": "Los vigilantes pálidos",
+        "text": "Los vigilantes se alzan donde cayó la congregación, {playerName}, y no parpadean porque no tienen con qué. Vigilan el puente esperando algo. Elimina al público.",
+        "completion": "Esta noche nada vigila el puente salvo mis propios ojos cansados. Pienso mantenerlo así.",
         "objectives": {
           "0": {
-            "label": "Pale Watcher removed"
+            "label": "Vigilante pálido eliminado"
           }
         }
       },
       "q_pc_bridgekeeper": {
-        "title": "The Bridgekeeper",
-        "text": "Every toll the cult collected went below the central pier, {playerName}, to the thing they called the Bridgekeeper. It has held the crossing since before Bridgewatch had walls. Bring a company; the bridge chooses who crosses, and it has never chosen us.",
-        "completion": "The Crossing is ours for the first time in living memory. The Bridgekeeper kept the bridge; you kept us. The difference matters.",
+        "title": "El Guardián del Puente",
+        "text": "Cada peaje que reunió el culto fue a parar bajo el pilar central, {playerName}, a la cosa que llamaban el Guardián del Puente. Domina el cruce desde antes de que la Vigía tuviera murallas. Trae una compañía; el puente elige quién cruza, y jamás nos ha elegido a nosotros.",
+        "completion": "El Cruce es nuestro por primera vez en memoria viva. El Guardián guardaba el puente; tú nos guardaste a nosotros. La diferencia importa.",
         "objectives": {
           "0": {
-            "label": "The Bridgekeeper felled"
+            "label": "El Guardián del Puente derribado"
           }
         }
       },
       "q_ironpass_tollroad_escort": {
-        "title": "The Toll Must Flow",
-        "text": "Carter Odom hauls the toll-silver up the pass tonight, {playerName}, and the raiders know the schedule better than my own clerks. Walk beside the wagon to the north bend and bring him back breathing.",
-        "completion": "Odom made the bend and the silver made the strongbox. The raiders will sulk about it, which is how I like them.",
+        "title": "El peaje debe fluir",
+        "text": "El carretero Odom sube esta noche la plata del peaje por el paso, {playerName}, y los asaltantes conocen el horario mejor que mis propios escribientes. Camina junto al carro hasta la curva norte y tráelo de vuelta respirando.",
+        "completion": "Odom llegó a la curva y la plata llegó a la caja fuerte. Los asaltantes se enfurruñarán, que es como me gustan.",
         "objectives": {
           "0": {
-            "label": "Carter Odom escorted up the pass"
+            "label": "Carretero Odom escoltado paso arriba"
           }
         }
       },
       "q_hold_last_water": {
-        "title": "Hold Last Water",
-        "text": "The duskwater crews have stopped testing my wagons and started testing the camp itself, {playerName}. Wellguard Nahir holds the north edge of the ring, and he holds it alone. Say the word when you stand beside him: three pushes are coming down off the marches, and I mean the well to be here when they are done.",
-        "completion": "Three pushes broken on the ring and Nahir still on his feet. The crews will spend a season recounting what tonight cost them, {playerName}; I already have it in my ledger, to the last copper.",
+        "title": "Defended Última Agua",
+        "text": "Las cuadrillas de Aguaocaso han dejado de tantear mis carros y han empezado a tantear el propio campamento, {playerName}. El guardapozo Nahir sostiene el borde norte del anillo, y lo sostiene solo. Da la voz cuando estés a su lado: tres embestidas bajan de las marcas, y quiero que el pozo siga aquí cuando terminen.",
+        "completion": "Tres embestidas rotas contra el anillo y Nahir sigue en pie. Las cuadrillas pasarán una temporada recontando lo que les costó esta noche, {playerName}; yo ya lo tengo en mi libro, hasta el último cobre.",
         "objectives": {
           "0": {
-            "label": "Pushes repelled beside Wellguard Nahir"
+            "label": "Embestidas rechazadas junto al guardapozo Nahir"
           }
         }
       },
       "q_the_water_walks": {
-        "title": "The Water Walks",
-        "text": "Every drop the Sunken Seat drinks walks there on somebody's back, {playerName}, and the road has learned to bite the backs that carry it: the temple's stones walk their old rounds across it, and the heresy preaches that a court should thirst. Water-Bearer Sitra hauls the Seat's ration today. Keep beside her the whole way, and the water arrives.",
-        "completion": "Sitra signaled from the Seat before dusk: the ration in Masut's stores and her own feet still under her. That is a good day on this road, {playerName}, and the road did not give it; you did.",
+        "title": "El agua camina",
+        "text": "Cada gota que bebe la Sede Hundida llega caminando a lomos de alguien, {playerName}, y el camino ha aprendido a morder las espaldas que la cargan: las piedras del templo recorren sus viejas rondas a través de él, y la herejía predica que una corte debe pasar sed. La portadora de agua Sitra acarrea hoy la ración de la Sede. No te separes de ella en el trayecto entero, y el agua llegará.",
+        "completion": "Sitra hizo señales desde la Sede antes del anochecer: la ración en los almacenes de Masut y sus propios pies aún debajo de ella. Eso es un buen día en este camino, {playerName}, y no lo regaló el camino; lo diste tú.",
         "objectives": {
           "0": {
-            "label": "Water-Bearer Sitra escorted to the Sunken Seat"
+            "label": "Portadora de agua Sitra escoltada hasta la Sede Hundida"
           }
         }
       },
       "q_veth_hold_the_weir": {
-        "title": "Hold the Weir",
-        "text": "The Last Lodge has started testing my weir, {playerName}: guildless knives first, to see what the gate costs, then Forsworn steel to see who pays it. Bailiff Roskan holds the north bank and I do not intend to replace him. Stand with him when I call it: three pushes, and the Lodge writes the Greyweir off as a bad investment.",
-        "completion": "Three pushes priced, paid, and returned to sender, and Roskan still on his feet at the gate. The Lodge keeps accounts too, {playerName}; tonight it enters a loss. The weir takes its toll from everything the river carries. Knives included.",
+        "title": "Defended el azud",
+        "text": "El Último Refugio ha empezado a tantear mi azud, {playerName}: primero cuchillos sin gremio, para ver cuánto cuesta la puerta, y luego acero perjuro para ver quién lo paga. El alguacil Roskan sostiene la orilla norte y no tengo intención de reemplazarlo. Ponte a su lado cuando dé la orden: tres embestidas, y el Refugio dará el Azud Gris por mala inversión.",
+        "completion": "Tres embestidas tasadas, pagadas y devueltas al remitente, y Roskan sigue en pie en la puerta. El Refugio también lleva cuentas, {playerName}; esta noche anota una pérdida. El azud cobra su peaje a cuanto arrastra el río. Cuchillos incluidos.",
         "objectives": {
           "0": {
-            "label": "Waves repelled beside Bailiff Roskan"
+            "label": "Oleadas rechazadas junto al alguacil Roskan"
           }
         }
       },
       "q_veth_ledger_run": {
-        "title": "The Ledger Run",
-        "text": "The quarter-ledger goes north tonight, {playerName}: every toll the weir has taken since thaw, copied fair and bound for the Longwatch strongbox. Courier Yeska carries it, and the guildless and their smuggler partners would sooner it went into the river. Walk beside her up the towpath and see that the pages arrive still counting.",
-        "completion": "Yeska signed in at the Longwatch with every page in order. Somewhere on the north road several investors are learning the robbery went unrecorded because it went undone. That arithmetic settles your fee, {playerName}.",
+        "title": "La carrera del libro",
+        "text": "El libro del trimestre va al norte esta noche, {playerName}: cada peaje que ha cobrado el azud desde el deshielo, copiado en limpio y con destino a la caja fuerte de la Larga Vigilia. La mensajera Yeska lo lleva, y los sin gremio y sus socios contrabandistas preferirían que acabara en el río. Camina a su lado por el camino de sirga y procura que las páginas lleguen contando todavía.",
+        "completion": "Yeska firmó su llegada a la Larga Vigilia con todas las páginas en orden. En algún punto del camino del norte, varios inversores están aprendiendo que el robo quedó sin registrar porque quedó sin hacer. Esa aritmética salda tus honorarios, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Courier Yeska escorted up the north road"
+            "label": "Mensajera Yeska escoltada por el camino del norte"
           }
         }
       },
       "q_rimeshaft_picket_defense": {
-        "title": "Hold the Picket",
-        "text": "Shaft three let something out and the snow line sent it friends, {playerName}. They come down off the Ascent at every shift bell, and Warden Halvar holds the north picket alone, which the safety ledger scores as one incident pending. Stand with him when I ring the shift down: three pushes, and the adits stay open.",
-        "completion": "Three pushes broken, the picket standing, and the shift went down on time, {playerName}. The safety ledger records zero incidents and one warden overdue for leave; Rimeshaft calls that a good day.",
+        "title": "Defended el piquete",
+        "text": "El pozo tres dejó salir algo y la línea de nieve le mandó amigos, {playerName}. Bajan del Ascenso con cada campana de turno, y el Guardián Halvar sostiene el piquete norte solo, cosa que el libro de seguridad anota como un incidente pendiente. Ponte a su lado cuando toque el cambio de turno: tres embestidas, y las bocaminas siguen abiertas.",
+        "completion": "Tres embestidas rotas, el piquete en pie y el turno bajó a su hora, {playerName}. El libro de seguridad registra cero incidentes y un guardián con el permiso atrasado; en Pozo Escarcha a eso lo llamamos un buen día.",
         "objectives": {
           "0": {
-            "label": "Waves repelled beside Warden Halvar"
+            "label": "Oleadas rechazadas junto al Guardián Halvar"
           }
         }
       },
       "q_ledgerwatch_payroll_escort": {
-        "title": "The Pay Goes North",
-        "text": "The Rimeshaft payroll is late twice over, {playerName}: once to the weather and once to whoever keeps opening my couriers. Porter Fenn hauls the strongbox up the Tithe Road at the next bell. Walk beside him to the Rimeshaft milepost; the box arrives sealed, or somebody files a loss report, and it will not be me.",
-        "completion": "Fenn made the milepost with the seal unbroken, and the miners get paid a quarter they had written off. The loss report dies unfiled, {playerName}, which is the kindest end the paperwork offers anyone.",
+        "title": "La paga va al norte",
+        "text": "La nómina de Pozo Escarcha llega tarde dos veces, {playerName}: una por el clima y otra por quien sea que sigue abriendo a mis correos. El porteador Fenn sube la caja fuerte por el Camino del Diezmo a la próxima campana. Camina a su lado hasta el mojón de Pozo Escarcha; la caja llega sellada, o alguien presenta un parte de pérdidas, y no seré yo.",
+        "completion": "Fenn llegó al mojón con el sello intacto, y los mineros cobran un trimestre que ya daban por perdido. El parte de pérdidas muere sin presentar, {playerName}, que es el final más amable que el papeleo le ofrece a nadie.",
         "objectives": {
           "0": {
-            "label": "Porter Fenn escorted up the Tithe Road"
+            "label": "Porteador Fenn escoltado por el Camino del Diezmo"
           }
         }
       },
       "q_the_sunken_seat": {
-        "title": "The Sunken Seat",
-        "text": "The faith has reopened the first court, {playerName}: a temple half swallowed by the dunes north of the tombs, where the Judges sat before Qesh Aram had a name. Judge Ivenna holds the Seat now. Go north up the road, present yourself, and do whatever she asks as if I had asked it.",
-        "completion": "Saphira sent you? Then she remembers where the Domain actually began. Welcome to the Sunken Seat, {playerName}; the sand gives up more work than I have hands for.",
+        "title": "La Sede Hundida",
+        "text": "La fe ha reabierto la primera corte, {playerName}: un templo medio tragado por las dunas al norte de las tumbas, donde los jueces celebraban sesión antes de que Qesh Aram tuviera nombre. La juez Ivenna ocupa ahora la Sede. Ve al norte por el camino, preséntate y haz cuanto te pida como si te lo hubiera pedido yo.",
+        "completion": "¿Te envía Saphira? Entonces recuerda dónde empezó de verdad el Dominio. Bienvenido a la Sede Hundida, {playerName}; la arena entrega más trabajo del que tengo manos.",
         "objectives": {
           "0": {
-            "label": "Speak with Judge Ivenna"
+            "label": "Habla con la juez Ivenna"
           }
         }
       },
       "q_the_last_water": {
-        "title": "Last Water",
-        "text": "Past the Rise and the terrace there is one well left before the Veth border stones, {playerName}, and everything I send north lives or dies by it. Yesfa runs the Last Water camp. Carry her my seal and my regards, and mind the dunes past the tombs; they have grown teeth I do not recognize.",
-        "completion": "Odai's seal, and still warm from the road. He only sends me people he cannot afford to lose, {playerName}, so I will spend you carefully.",
+        "title": "Última Agua",
+        "text": "Pasada la Loma y la terraza queda un solo pozo antes de las piedras fronterizas de Veth, {playerName}, y cuanto mando al norte vive o muere por él. Yesfa dirige el campamento de Última Agua. Llévale mi sello y mis saludos, y cuidado con las dunas pasadas las tumbas; les han crecido dientes que no reconozco.",
+        "completion": "El sello de Odai, y aún caliente del camino. Solo me envía a la gente que no puede permitirse perder, {playerName}, así que te gastaré con cuidado.",
         "objectives": {
           "0": {
-            "label": "Speak with Caravan Mistress Yesfa"
+            "label": "Habla con la maestra de caravanas Yesfa"
           }
         }
       },
       "q_stone_that_remembers": {
-        "title": "Stone That Remembers",
-        "text": "The sentinels walking the Sunken Seat are carved from templestone, {playerName}, and templestone holds an edge the way memory holds a grudge. Break eight of them and pry me five wardstones out whole. I have waited two ages of somebody else's history to work material like this.",
-        "completion": "Look at the grain: it remembers every blow that ever landed on it. Whatever I strike from this will not forget yours either, {playerName}.",
+        "title": "Piedra que recuerda",
+        "text": "Los centinelas que recorren la Sede Hundida están tallados en piedra de templo, {playerName}, y la piedra de templo conserva el filo como la memoria conserva un rencor. Quiebra a ocho y arráncame cinco piedras de guarda enteras. He esperado dos eras de la historia de otros para trabajar un material así.",
+        "completion": "Mira el grano: recuerda cada golpe que ha recibido. Lo que forje con esto tampoco olvidará los tuyos, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Temple Sentinel slain"
+            "label": "Centinela del templo abatido"
           },
           "1": {
-            "label": "Unbroken Wardstone"
+            "label": "Piedra de guarda intacta"
           }
         }
       },
       "q_glass_for_the_grindstone": {
-        "title": "Glass for the Grindstone",
-        "text": "The colossi walking the high dunes bleed fulgurite, {playerName}: lightning gone solid, harder than any whetstone south of Kael. The unshattered lengths are the prize. Bring me seven, and do not be under the colossus when it decides to kneel.",
-        "completion": "Seven lengths, and not a crack in one. My grindstone will sing for a year, {playerName}, and every blade in Qesh Aram will owe you its edge.",
+        "title": "Vidrio para la muela",
+        "text": "Los colosos que caminan las dunas altas sangran fulgurita, {playerName}: rayo hecho sólido, más duro que cualquier piedra de afilar al sur de Kael. Los tramos sin quebrar son el premio. Tráeme siete, y no estés debajo del coloso cuando decida arrodillarse.",
+        "completion": "Siete tramos, y ni una grieta. Mi muela cantará durante un año, {playerName}, y cada hoja de Qesh Aram te deberá su filo.",
         "objectives": {
           "0": {
-            "label": "Unshattered Fulgurite"
+            "label": "Fulgurita sin quebrar"
           }
         }
       },
       "q_water_for_the_seat": {
-        "title": "Water for the Seat",
-        "text": "The Judges have reopened the old temple north of the tombs, {playerName}, and courts drink like anyone else. Masut provisions them; he and I have an arrangement older than his ledgers admit. Walk the water tally up to the Sunken Seat and put it in his hands, not on his table.",
-        "completion": "Neriah's tally, hand to hand, the way she likes it. The Seat drinks because that woman never sleeps, {playerName}; remember that when the Judges take the credit.",
+        "title": "Agua para la Sede",
+        "text": "Los jueces han reabierto el viejo templo al norte de las tumbas, {playerName}, y las cortes beben como cualquiera. Masut las aprovisiona; él y yo tenemos un arreglo más viejo de lo que admiten sus libros. Sube el recuento del agua hasta la Sede Hundida y pónselo en las manos, no sobre la mesa.",
+        "completion": "El recuento de Neriah, de mano en mano, como a ella le gusta. La Sede bebe porque esa mujer no duerme jamás, {playerName}; recuérdalo cuando los jueces se lleven el mérito.",
         "objectives": {
           "0": {
-            "label": "Deliver the tally to Provisioner Masut"
+            "label": "Entrega el recuento al proveedor Masut"
           }
         }
       },
       "q_the_masks_answer": {
-        "title": "The Mask's Answer",
-        "text": "I have studied what Karn carried up, {playerName}, and the marks on his funeral mask are not tomb-script. They are archive-script: the burned verses, cut by a living hand. Canon Sahr at the Sunken Seat keeps what is left of that archive. Tell her what we buried, and tell no one else on the road.",
-        "completion": "Archive-script on a dead digger's mask... then someone taught the burned verses to the tombs, {playerName}. Temos was right to whisper this. So will we.",
+        "title": "La respuesta de la máscara",
+        "text": "He estudiado lo que Karn sacó a la superficie, {playerName}, y las marcas de su máscara funeraria no son escritura de tumba. Son escritura de archivo: los versos quemados, tallados por una mano viva. La canóniga Sahr, en la Sede Hundida, guarda lo que queda de ese archivo. Cuéntale lo que enterramos, y no se lo cuentes a nadie más en el camino.",
+        "completion": "Escritura de archivo en la máscara de un excavador muerto... entonces alguien les enseñó los versos quemados a las tumbas, {playerName}. Temos hizo bien en susurrarlo. Nosotras también lo haremos.",
         "objectives": {
           "0": {
-            "label": "Speak with Canon-Archivist Sahr"
+            "label": "Habla con la canóniga archivera Sahr"
           }
         }
       },
       "q_regalia_of_the_nameless": {
-        "title": "Regalia of the Nameless",
-        "text": "Saphira has her seals and I have my tablets, {playerName}, but the first court carried a third insignia no record names: a sigil worn under the regalia, against the skin. Put twelve of the terrace Judges to rest and search them for four. Whatever office it marked, the Domain forgot it on purpose.",
-        "completion": "Four sigils, and every one faces inward, toward the wearer. Not a rank, then: a penance. The first court judged itself hardest of all, {playerName}, and I intend to learn for what.",
+        "title": "Insignias de los Sin Nombre",
+        "text": "Saphira tiene sus sellos y yo mis tablillas, {playerName}, pero la primera corte llevaba una tercera insignia que ningún registro nombra: un sello llevado bajo las vestiduras, contra la piel. Da descanso a doce de los jueces de la terraza y regístralos en busca de cuatro. Fuera cual fuera el cargo que marcaba, el Dominio lo olvidó a propósito.",
+        "completion": "Cuatro sellos, y todos miran hacia dentro, hacia quien los llevaba. No era un rango, entonces: una penitencia. La primera corte se juzgaba a sí misma con más dureza que a nadie, {playerName}, y pienso averiguar por qué.",
         "objectives": {
           "0": {
-            "label": "Forsaken Judge slain"
+            "label": "Juez abandonado abatido"
           },
           "1": {
-            "label": "First Court Sigil"
+            "label": "Sello de la Primera Corte"
           }
         }
       },
       "q_the_domain_endures": {
-        "title": "The Domain Endures",
-        "text": "The Tyrant is down and the road runs whole from the Landing pass to the border stones, {playerName}, for the first time in living memory. Keep it that way one more season: sweep the Barrens packs and the duskwater knives off the last marches. Ossara does not celebrate; it endures. Help it endure.",
-        "completion": "The clans walk the Barrens and the caravans walk the road, and no one sings about it because nothing went wrong. That silence is the Domain's highest honor, {playerName}. Wear it.",
+        "title": "El Dominio perdura",
+        "text": "El Tirano ha caído y el camino corre entero desde el paso del Desembarco hasta las piedras fronterizas, {playerName}, por primera vez en memoria viva. Mantenlo así una temporada más: barre a las manadas de los Baldíos y a los cuchillos de Aguaocaso de las últimas marcas. Ossara no celebra; perdura. Ayúdala a perdurar.",
+        "completion": "Los clanes caminan los Baldíos y las caravanas caminan el camino, y nadie lo canta porque nada salió mal. Ese silencio es el mayor honor del Dominio, {playerName}. Llévalo puesto.",
         "objectives": {
           "0": {
-            "label": "Bonewind Ravager slain"
+            "label": "Devastador de Vientohueso abatido"
           },
           "1": {
-            "label": "Duskwater Raider slain"
+            "label": "Asaltante de Aguaocaso abatido"
           }
         }
       },
       "q_seat_of_the_first_court": {
-        "title": "Seat of the First Court",
-        "text": "We reopened the temple, {playerName}, and the temple noticed. The sentinels carved to serve the first court have taken the living for trespassers, and my clerks cannot carry a verdict ten paces without stone hands closing on them. Break ten of the sentinels between here and the lower stair.",
-        "completion": "Ten fewer, and the stair holds its peace this morning. The first court built well, {playerName}; that is precisely the problem with everything it left us.",
+        "title": "Sede de la Primera Corte",
+        "text": "Reabrimos el templo, {playerName}, y el templo se dio cuenta. Los centinelas tallados para servir a la primera corte han tomado a los vivos por intrusos, y mis escribientes no pueden llevar un veredicto diez pasos sin que unas manos de piedra se cierren sobre ellos. Quiebra a diez centinelas entre aquí y la escalera inferior.",
+        "completion": "Diez menos, y la escalera guarda la paz esta mañana. La primera corte construía bien, {playerName}; ese es precisamente el problema de cuanto nos dejó.",
         "objectives": {
           "0": {
-            "label": "Temple Sentinel slain"
+            "label": "Centinela del templo abatido"
           }
         }
       },
       "q_wardens_rounds": {
-        "title": "The Warden's Rounds",
-        "text": "A court is not a bench, {playerName}; it is everyone the bench leans on. Walk my rounds once so the Seat knows your face: hear what Canon Sahr will not put in writing, and let Masut weigh you against his ledgers. Then come back and tell me which of them complained about the other first.",
-        "completion": "Sahr first, and about the flour dust on her archive shelves. You have met the whole government of the Seat, {playerName}. Now you may work for it.",
+        "title": "Las rondas de la guardiana",
+        "text": "Una corte no es un estrado, {playerName}; es toda la gente en la que el estrado se apoya. Haz mis rondas una vez para que la Sede conozca tu cara: escucha lo que la canóniga Sahr no pondrá por escrito, y deja que Masut te pese contra sus libros. Luego vuelve y dime cuál de los dos se quejó del otro primero.",
+        "completion": "Sahr primero, y por el polvo de harina en las estanterías de su archivo. Ya conoces al gobierno entero de la Sede, {playerName}. Ahora puedes trabajar para él.",
         "objectives": {
           "0": {
-            "label": "Speak with Canon-Archivist Sahr"
+            "label": "Habla con la canóniga archivera Sahr"
           },
           "1": {
-            "label": "Speak with Provisioner Masut"
+            "label": "Habla con el proveedor Masut"
           }
         }
       },
       "q_seal_the_vaults": {
-        "title": "Seal the Vaults",
-        "text": "The sentinels do not wander, {playerName}; they patrol, and every route ends at a vault door we have not dared open. Each carries a ward-core keyed to its round. Fell eight more of them and bring me six cores intact, and the vaults stay sealed until the court is ready to answer for what is inside.",
-        "completion": "Six cores, six doors that stay shut. You have not sealed the vaults, {playerName}; you have sealed the argument about them, which is worth more.",
+        "title": "Sellad las cámaras",
+        "text": "Los centinelas no vagan, {playerName}; patrullan, y cada ruta termina en una puerta de cámara que no nos hemos atrevido a abrir. Cada uno lleva un núcleo de guarda ligado a su ronda. Derriba a ocho más y tráeme seis núcleos intactos, y las cámaras seguirán selladas hasta que la corte esté lista para responder de lo que hay dentro.",
+        "completion": "Seis núcleos, seis puertas que siguen cerradas. No has sellado las cámaras, {playerName}; has sellado la discusión sobre ellas, que vale más.",
         "objectives": {
           "0": {
-            "label": "Temple Sentinel slain"
+            "label": "Centinela del templo abatido"
           },
           "1": {
-            "label": "Vault Ward-Core"
+            "label": "Núcleo de guarda de cámara"
           }
         }
       },
       "q_dust_to_dust": {
-        "title": "Dust to Dust",
-        "text": "The shades drifting up from the tombs carry name-stones, {playerName}: the graven names they answered to in life, worn smooth on the walk out of death. The rites cannot re-bury a soul without its name. Put twelve shades to rest on the tomb paths and bring me five stones still legible.",
-        "completion": "Five names the sand almost took back. The court will read them aloud at dusk, {playerName}, and five of the Nameless will be nameless no longer.",
+        "title": "Polvo al polvo",
+        "text": "Las sombras que suben de las tumbas llevan piedras de nombre, {playerName}: los nombres grabados a los que respondían en vida, desgastados en el camino de salida de la muerte. Los ritos no pueden volver a enterrar un alma sin su nombre. Da descanso a doce sombras en las sendas de las tumbas y tráeme cinco piedras aún legibles.",
+        "completion": "Cinco nombres que la arena casi recupera. La corte los leerá en voz alta al anochecer, {playerName}, y cinco de los Sin Nombre dejarán de serlo.",
         "objectives": {
           "0": {
-            "label": "Sandbound Shade slain"
+            "label": "Sombra ligada a la arena abatida"
           },
           "1": {
-            "label": "Graven Name-Stone"
+            "label": "Piedra de nombre grabada"
           }
         }
       },
       "q_sentence_the_heretics": {
-        "title": "Sentence the Heretics",
-        "text": "The sand-priests at the Ashen Court were tried in absence and sentenced in writing, {playerName}, and they eat the writs when my bailiffs deliver them. Very well. Deliver twelve sentences the old way, and recover four writs unswallowed so the record shows the court's patience ran out lawfully.",
-        "completion": "Twelve sentences executed and four writs returned to file. The law is slow, {playerName}, but out here it is also armed. The Seat thanks you for being both.",
+        "title": "Sentenciad a los herejes",
+        "text": "Los sacerdotes de arena de la Corte Cenicienta fueron juzgados en ausencia y sentenciados por escrito, {playerName}, y se comen los mandamientos cuando mis alguaciles los entregan. Muy bien. Entrega doce sentencias a la vieja usanza, y recupera cuatro mandamientos sin tragar para que el registro muestre que la paciencia de la corte se agotó conforme a la ley.",
+        "completion": "Doce sentencias ejecutadas y cuatro mandamientos devueltos al archivo. La ley es lenta, {playerName}, pero aquí fuera también va armada. La Sede te agradece que seas ambas cosas.",
         "objectives": {
           "0": {
-            "label": "Heretic Sand-Priest slain"
+            "label": "Sacerdote de arena hereje abatido"
           },
           "1": {
-            "label": "Heretic Writ"
+            "label": "Mandamiento del hereje"
           }
         }
       },
       "q_warden_of_the_buried_court": {
-        "title": "Warden of the Buried Court",
-        "text": "Ashkerat was carved to hold the temple stair against the profane, {playerName}, and after two buried ages it has ruled everyone profane, the court included. I will not have the Seat besieged by its own doorkeeper. Take companions to the upper stair and bring the Warden down; the verdict is already written.",
-        "completion": "The stair is ours to the top for the first time since the sand came. We will carve no replacement, {playerName}. Some offices should stay empty.",
+        "title": "Guardián de la corte enterrada",
+        "text": "Ashkerat fue tallado para defender la escalera del templo contra los profanos, {playerName}, y tras dos eras enterrado ha dictaminado que todos somos profanos, la corte incluida. No consentiré que la Sede viva asediada por su propio portero. Sube con compañeros a la escalera superior y derribad al Guardián; el veredicto ya está escrito.",
+        "completion": "La escalera es nuestra hasta arriba por primera vez desde que llegó la arena. No tallaremos un sustituto, {playerName}. Algunos cargos deben quedar vacantes.",
         "objectives": {
           "0": {
-            "label": "Ashkerat the Warden slain"
+            "label": "Ashkerat el Guardián abatido"
           }
         }
       },
       "q_the_living_court": {
-        "title": "The Living Court",
-        "text": "Two courts claim this Domain, {playerName}: mine, which breathes, and the one on the terrace, which does not. While the dead Judges hold session no verdict of the Seat carries past the tombs. Climb to the terrace and adjourn twelve of them. Let the sand keep the gavel.",
-        "completion": "Twelve benches emptied on the terrace. The living court does not celebrate the dead one, {playerName}, but it will sleep considerably better above it.",
+        "title": "La corte viva",
+        "text": "Dos cortes reclaman este Dominio, {playerName}: la mía, que respira, y la de la terraza, que no. Mientras los jueces muertos celebren sesión, ningún veredicto de la Sede vale más allá de las tumbas. Sube a la terraza y levanta la sesión a doce de ellos. Que la arena se quede el mazo.",
+        "completion": "Doce estrados vaciados en la terraza. La corte viva no celebra la muerte de la muerta, {playerName}, pero dormirá bastante mejor encima de ella.",
         "objectives": {
           "0": {
-            "label": "Forsaken Judge slain"
+            "label": "Juez abandonado abatido"
           }
         }
       },
       "q_heresy_in_the_dunes": {
-        "title": "Heresy in the Dunes",
-        "text": "West of the road, {playerName}, former water-priests of this same faith have raised an Ashen Court and preach the verses we burned two generations ago. I archived those fires personally. Cull twelve of the sand-priests before their congregation outnumbers ours; the archive prefers its heresies past tense.",
-        "completion": "Twelve, and the ash court preaches quieter. Heresy is never killed, {playerName}, only re-filed. But re-filed will do.",
+        "title": "Herejía en las dunas",
+        "text": "Al oeste del camino, {playerName}, antiguos sacerdotes del agua de esta misma fe han levantado una Corte Cenicienta y predican los versos que quemamos hace dos generaciones. Yo archivé esos fuegos personalmente. Elimina a doce de los sacerdotes de arena antes de que su congregación supere a la nuestra; el archivo prefiere sus herejías en pasado.",
+        "completion": "Doce, y la corte de ceniza predica más bajo. La herejía nunca muere, {playerName}, solo se rearchiva. Pero rearchivada nos vale.",
         "objectives": {
           "0": {
-            "label": "Heretic Sand-Priest slain"
+            "label": "Sacerdote de arena hereje abatido"
           }
         }
       },
       "q_the_burned_creed": {
-        "title": "The Burned Creed",
-        "text": "The priests carry pages of the burned creed copied in a hand I do not recognize, {playerName}, which means the archive has a leak or the heresy has a scribe. Either answer frightens me. Bring me eight pages legible enough to compare against the sealed originals.",
-        "completion": "The hand is neither ours nor theirs... it is older than both, {playerName}. I filed these under 'resolved' once. I will not make that mistake twice.",
+        "title": "El credo quemado",
+        "text": "Los sacerdotes llevan páginas del credo quemado copiadas con una letra que no reconozco, {playerName}, lo que significa que el archivo tiene una fuga o que la herejía tiene un escriba. Cualquiera de las dos respuestas me asusta. Tráeme ocho páginas lo bastante legibles para compararlas con los originales sellados.",
+        "completion": "La letra no es nuestra ni suya... es más vieja que ambas, {playerName}. Una vez archivé esto como resuelto. No cometeré ese error dos veces.",
         "objectives": {
           "0": {
-            "label": "Burned Creed Page"
+            "label": "Página del credo quemado"
           }
         }
       },
       "q_word_to_the_domain": {
-        "title": "Word to the Domain",
-        "text": "What you recovered goes to Qesh Aram, {playerName}, in your mouth and nowhere else: the heresy has a scribe older than the heresy. Judge Saphira keeps the road; she must know what walks beside it. Say it plainly, watch her face, and do not write any of it down.",
-        "completion": "Sahr sends her fears by courier now... then they are worse than her letters. Thank you for carrying this, {playerName}. The Domain will act, quietly, as the Domain does.",
+        "title": "Aviso al Dominio",
+        "text": "Lo que recuperaste viaja a Qesh Aram, {playerName}, en tu boca y en ningún otro sitio: la herejía tiene un escriba más viejo que la propia herejía. La juez Saphira guarda el camino; debe saber qué camina a su lado. Dilo llanamente, obsérvale la cara y no escribas nada de esto.",
+        "completion": "¿Sahr manda ahora sus miedos por mensajero...? Entonces son peores que sus cartas. Gracias por traer esto, {playerName}. El Dominio actuará, en silencio, como actúa el Dominio.",
         "objectives": {
           "0": {
-            "label": "Carry word to Judge Saphira"
+            "label": "Lleva el aviso a la juez Saphira"
           }
         }
       },
       "q_the_brand_cold": {
-        "title": "The Brand, Cold",
-        "text": "Every convert to the ash creed is marked with a brand-iron, {playerName}, and every iron is cast from the same mother-mold. Collect six of the irons and I will read the mold marks; foundries keep records, and records are where heresies go to be caught. Take them cold. Do not oblige them by testing the edge.",
-        "completion": "Six irons, one mold, and the mold is Domain work. Someone inside the faith armed this heresy, {playerName}, and now the archive knows where to look.",
+        "title": "El hierro, frío",
+        "text": "Cada converso al credo de ceniza queda marcado con un hierro de marcar, {playerName}, y todos los hierros salen del mismo molde madre. Reúne seis hierros y leeré las marcas del molde; las fundiciones llevan registros, y en los registros es donde las herejías van a ser atrapadas. Cógelos fríos. No les hagas el favor de probar el filo.",
+        "completion": "Seis hierros, un molde, y el molde es obra del Dominio. Alguien dentro de la fe armó esta herejía, {playerName}, y ahora el archivo sabe dónde mirar.",
         "objectives": {
           "0": {
-            "label": "Heretic Brand-Iron"
+            "label": "Hierro de marcar hereje"
           }
         }
       },
       "q_embers_unanswered": {
-        "title": "Embers Unanswered",
-        "text": "The creed we could argue with, {playerName}. The flameseers are past argument: the inner circle carries coals from the first burned shrine north toward the border bluffs, preaching that the Nameless answer fire. Twelve of them walk the high dunes tonight. See that their question stays unanswered.",
-        "completion": "Twelve fires out on the bluffs, and no answer came for any of them. Perhaps the Nameless are wiser than their congregation, {playerName}. Perhaps they are only patient. File both.",
+        "title": "Ascuas sin respuesta",
+        "text": "Con el credo podíamos discutir, {playerName}. Los videntes de llamas están más allá de la discusión: el círculo interior lleva brasas del primer santuario quemado hacia el norte, hacia los riscos de la frontera, predicando que los Sin Nombre responden al fuego. Doce de ellos caminan esta noche por las dunas altas. Procura que su pregunta quede sin respuesta.",
+        "completion": "Doce fuegos apagados en los riscos, y no llegó respuesta para ninguno. Quizá los Sin Nombre sean más sabios que su congregación, {playerName}. Quizá solo sean pacientes. Archiva ambas.",
         "objectives": {
           "0": {
-            "label": "Heretic Flameseer slain"
+            "label": "Vidente de llamas hereje abatido"
           }
         }
       },
       "q_censer_of_the_first_dawn": {
-        "title": "Censer of the First Dawn",
-        "text": "The flameseers looted the dawnward censers from the first shrine before we could seal it, {playerName}: bronze bowls that held the morning rite when the faith still had mornings. Cull twelve more of the seers and recover five censers. The archive owes the first dawn a debt, and I mean to pay it.",
-        "completion": "Five bowls, and the soot wipes off to show the dawn-script whole. Some things survive their thieves, {playerName}. The rite will be sung at sunrise, first time in an age.",
+        "title": "Incensario del Primer Alba",
+        "text": "Los videntes de llamas saquearon los incensarios del alba del primer santuario antes de que pudiéramos sellarlo, {playerName}: cuencos de bronce que sostenían el rito de la mañana cuando la fe aún tenía mañanas. Elimina a doce videntes más y recupera cinco incensarios. El archivo tiene una deuda con el primer alba, y pienso pagarla.",
+        "completion": "Cinco cuencos, y el hollín se limpia hasta mostrar entera la escritura del alba. Algunas cosas sobreviven a sus ladrones, {playerName}. El rito se cantará al amanecer, por primera vez en una era.",
         "objectives": {
           "0": {
-            "label": "Heretic Flameseer slain"
+            "label": "Vidente de llamas hereje abatido"
           },
           "1": {
-            "label": "Dawnward Censer"
+            "label": "Incensario del alba"
           }
         }
       },
       "q_bowls_of_the_court": {
-        "title": "Bowls of the Court",
-        "text": "The sentinels carry the offering bowls the first court ate from, {playerName}, tucked in their stone fists like the meal is still coming. The Judges want ceremony; I want dishes. Bring me six bowls unbroken and everyone at the Seat gets what they want, which is rarer than rain here.",
-        "completion": "Six bowls, older than the Domain and not a chip on them. The Judges will bless them and I will fill them, {playerName}, and that is the whole faith working as intended.",
+        "title": "Cuencos de la corte",
+        "text": "Los centinelas llevan los cuencos de ofrendas en los que comía la primera corte, {playerName}, guardados en sus puños de piedra como si la comida aún estuviera por llegar. Los jueces quieren ceremonia; yo quiero vajilla. Tráeme seis cuencos sin romper y todos en la Sede tendremos lo que queremos, que aquí es más raro que la lluvia.",
+        "completion": "Seis cuencos, más viejos que el Dominio y sin una mella. Los jueces los bendecirán y yo los llenaré, {playerName}, y esa es la fe entera funcionando como debe.",
         "objectives": {
           "0": {
-            "label": "Temple Offering Bowl"
+            "label": "Cuenco de ofrendas del templo"
           }
         }
       },
       "q_the_rise_road": {
-        "title": "The Rise Road",
-        "text": "My flour and my lamp oil come up the west fork past Duststorm Rise, {playerName}, and the storms have taken to walking the road like they pay tax on it. Twelve of the elementals stand between the Seat and its next baking day. Scatter them back up the dunes.",
-        "completion": "The sledges came through white with flour and not with dust, which is the correct color. The Seat eats because you swung first, {playerName}. I record such debts.",
+        "title": "El camino de la Loma",
+        "text": "Mi harina y mi aceite de lámpara suben por el ramal oeste, pasada la Loma de la Tormenta de Polvo, {playerName}, y las tormentas han dado en recorrer el camino como si pagaran impuestos por él. Doce elementales se interponen entre la Sede y su próximo día de horneado. Dispérsalos dunas arriba.",
+        "completion": "Los trineos llegaron blancos de harina y no de polvo, que es el color correcto. La Sede come porque tú golpeaste primero, {playerName}. Yo registro esas deudas.",
         "objectives": {
           "0": {
-            "label": "Duststorm Elemental slain"
+            "label": "Elemental de tormenta de polvo abatido"
           }
         }
       },
       "q_meat_for_the_seat": {
-        "title": "Meat for the Seat",
-        "text": "Scripture feeds the soul, {playerName}, and my stores feed everything else, and the stores are down to salt and apology. Stalker haunch cures well and carries better. Bring me eight from the mirage beasts by the oasis, and mind the shimmer; I would rather have the meat and the hunter both.",
-        "completion": "Eight haunches, good weight, and you still cast one shadow. The smokehouse runs tonight, {playerName}, and tomorrow the court argues on a full stomach for once.",
+        "title": "Carne para la Sede",
+        "text": "La escritura alimenta el alma, {playerName}, y mis despensas alimentan lo demás, y las despensas están a base de sal y disculpas. El pernil de acechador se cura bien y viaja mejor. Tráeme ocho de las bestias de espejismo junto al oasis, y cuidado con el reflejo tembloroso; prefiero tener la carne y al cazador.",
+        "completion": "Ocho perniles, buen peso, y sigues proyectando una sola sombra. El ahumadero trabaja esta noche, {playerName}, y mañana la corte discutirá por una vez con el estómago lleno.",
         "objectives": {
           "0": {
-            "label": "Stalker Haunch"
+            "label": "Pernil de acechador"
           }
         }
       },
       "q_water_ledger": {
-        "title": "The Water Ledger",
-        "text": "Two men keep Last Water alive besides me, {playerName}: Ibbin, who sells the water and undercharges the desperate when he thinks I am not counting, and Dhalen, who rides the dunes and lies only about how close it was. Introduce yourself to both. Out here, being known is half of being safe.",
-        "completion": "Ibbin quoted you a fair price and Dhalen sized you for a grave, which means they both like you, {playerName}. Welcome to the last camp on the road.",
+        "title": "El libro del agua",
+        "text": "Dos hombres mantienen vivo Última Agua además de mí, {playerName}: Ibbin, que vende el agua y cobra de menos a los desesperados cuando cree que no cuento, y Dhalen, que cabalga las dunas y solo miente sobre lo cerca que estuvo. Preséntate a ambos. Aquí fuera, ser conocido es la mitad de estar a salvo.",
+        "completion": "Ibbin te dio un precio justo y Dhalen te tomó medidas para una tumba, lo que significa que les caes bien a los dos, {playerName}. Bienvenido al último campamento del camino.",
         "objectives": {
           "0": {
-            "label": "Speak with Waterseller Ibbin"
+            "label": "Habla con el aguador Ibbin"
           },
           "1": {
-            "label": "Speak with Outrider Dhalen"
+            "label": "Habla con el batidor Dhalen"
           }
         }
       },
       "q_bones_on_the_road": {
-        "title": "Bones on the Road",
-        "text": "The Barrens packs have learned the sound of a laden axle, {playerName}, and they strip a stalled wagon to bright bone before the driver finishes swearing. I lose more oxen to ravagers than to thirst, and thirst is the whole business of this camp. Break twelve of them off the east marches.",
-        "completion": "Twelve, and my drivers report the packs keeping to the bone fields again. The road eats enough without teeth on it, {playerName}.",
+        "title": "Huesos en el camino",
+        "text": "Las manadas de los Baldíos han aprendido el sonido de un eje cargado, {playerName}, y dejan un carro averiado en hueso brillante antes de que el carretero termine de maldecir. Pierdo más bueyes por los devastadores que por la sed, y la sed es el negocio entero de este campamento. Quiebra a doce en las marcas del este.",
+        "completion": "Doce, y mis carreteros informan de que las manadas vuelven a quedarse en los campos de huesos. El camino ya come bastante sin dientes encima, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Bonewind Ravager slain"
+            "label": "Devastador de Vientohueso abatido"
           }
         }
       },
       "q_the_barrens_toll": {
-        "title": "The Barrens Toll",
-        "text": "The clans nail oxbone tallies to the waymarkers for every beast the Barrens take, {playerName}: their count of what the road owes the sand. The ravagers carry the markers off to gnaw. Cull ten more of the packs and bring me six tallies back; I settle my accounts, even the superstitious ones.",
-        "completion": "Six tallies, back on the waymarkers by dusk. The clans will say the road paid its toll, {playerName}, and for one season the Barrens and I will agree on the arithmetic.",
+        "title": "El peaje de los Baldíos",
+        "text": "Los clanes clavan tarjas de hueso de buey en los mojones por cada bestia que se llevan los Baldíos, {playerName}: su cuenta de lo que el camino le debe a la arena. Los devastadores se llevan las tarjas para roerlas. Elimina a diez más de las manadas y tráeme seis tarjas; yo saldo mis cuentas, incluso las supersticiosas.",
+        "completion": "Seis tarjas, de vuelta en los mojones antes del anochecer. Los clanes dirán que el camino pagó su peaje, {playerName}, y durante una temporada los Baldíos y yo estaremos de acuerdo en la aritmética.",
         "objectives": {
           "0": {
-            "label": "Bonewind Ravager slain"
+            "label": "Devastador de Vientohueso abatido"
           },
           "1": {
-            "label": "Oxbone Toll-Tally"
+            "label": "Tarja de peaje de hueso de buey"
           }
         }
       },
       "q_raiders_at_last_water": {
-        "title": "Raiders at Last Water",
-        "text": "The duskwater crews were caravan guards once, {playerName}; I signed some of their contracts myself. Now they work the dry marches north of camp and bleed the wagons they swore to walk beside. Sentiment kept my hand closed too long. Open it: twelve raiders off my road.",
-        "completion": "Twelve, and two of the names I knew. I will not pretend it does not cost, {playerName}; I will only tell you the wagons rolled through this morning untouched, and that is the price paid where I can see it.",
+        "title": "Asaltantes en Última Agua",
+        "text": "Las cuadrillas de Aguaocaso fueron guardias de caravana, {playerName}; yo misma firmé algunos de sus contratos. Ahora trabajan las marcas secas al norte del campamento y desangran los carros que juraron custodiar. El sentimiento me mantuvo la mano cerrada demasiado tiempo. Ábrela: doce asaltantes fuera de mi camino.",
+        "completion": "Doce, y dos de los nombres los conocía. No fingiré que no cuesta, {playerName}; solo te diré que los carros pasaron esta mañana intactos, y ese es el precio pagado donde puedo verlo.",
         "objectives": {
           "0": {
-            "label": "Duskwater Raider slain"
+            "label": "Asaltante de Aguaocaso abatido"
           }
         }
       },
       "q_oathmarks_in_the_sand": {
-        "title": "Oathmarks in the Sand",
-        "text": "Every guard I ever hired carried an oathmark stamped with my seal, {playerName}, and the duskwater crews still wear theirs while they rob me under it. That insult I will not carry. Cut down eight more and bring me six oathmarks; I mean to retire them from the rolls with my own stylus.",
-        "completion": "Six marks, six lines struck from the ledger. An oath outlives the man who breaks it, {playerName}, but it does not outlive the woman who witnessed it. Take their kit; they forfeited it.",
+        "title": "Marcas de juramento en la arena",
+        "text": "Cada guardia que contraté llevaba una marca de juramento estampada con mi sello, {playerName}, y las cuadrillas de Aguaocaso aún llevan la suya mientras me roban bajo ella. Ese insulto no pienso cargarlo. Derriba a ocho más y tráeme seis marcas de juramento; pienso retirarlas de las listas con mi propio estilete.",
+        "completion": "Seis marcas, seis líneas tachadas del libro. Un juramento sobrevive al hombre que lo rompe, {playerName}, pero no sobrevive a la mujer que fue su testigo. Llévate su equipo; lo tienen confiscado.",
         "objectives": {
           "0": {
-            "label": "Duskwater Raider slain"
+            "label": "Asaltante de Aguaocaso abatido"
           },
           "1": {
-            "label": "Duskwater Oathmark"
+            "label": "Marca de juramento de Aguaocaso"
           }
         }
       },
       "q_the_missing_manifests": {
-        "title": "The Missing Manifests",
-        "text": "The raiders take the toll tallies along with the cargo, {playerName}, and without the manifests I cannot prove to the border clerks what crossed and what died. Veth clerks assume the worst; it is their whole craft. Hunt ten raiders on the north marches and bring back five tallies with the seals unbroken.",
-        "completion": "Five seals whole, and the border ledger balances for the first quarter in a year. You have no idea what a balanced ledger buys at a Veth toll-house, {playerName}. I do, and I am grateful.",
+        "title": "Los manifiestos perdidos",
+        "text": "Los asaltantes se llevan las tarjas de peaje junto con la carga, {playerName}, y sin los manifiestos no puedo demostrar a los escribientes de la frontera qué cruzó y qué murió. Los escribientes de Veth suponen lo peor; es su oficio entero. Caza a diez asaltantes en las marcas del norte y trae de vuelta cinco tarjas con los sellos intactos.",
+        "completion": "Cinco sellos enteros, y el libro de la frontera cuadra por primer trimestre en un año. No tienes idea de lo que compra un libro cuadrado en una casa de peaje de Veth, {playerName}. Yo sí, y estoy agradecida.",
         "objectives": {
           "0": {
-            "label": "Duskwater Raider slain"
+            "label": "Asaltante de Aguaocaso abatido"
           },
           "1": {
-            "label": "Sealed Toll Tally"
+            "label": "Tarja de peaje sellada"
           }
         }
       },
       "q_last_caravan_out": {
-        "title": "Last Caravan Out",
-        "text": "The season's last caravan rolls for the border pass at first light, {playerName}: forty souls, every water cask I can spare, and half the Domain's tithe in the strongbox. The duskwater crews know all three numbers. Walk ahead of the wagons tonight and clear the marches; fourteen raiders stand between here and the stones.",
-        "completion": "The outriders signaled from the border stones at dusk: forty souls counted twice, {playerName}. You will not see the caravan again, and it will never stop owing you. That is the shape of work out here.",
+        "title": "La última caravana",
+        "text": "La última caravana de la temporada parte hacia el paso de la frontera con la primera luz, {playerName}: cuarenta almas, cada cuba de agua que puedo ceder y la mitad del diezmo del Dominio en la caja fuerte. Las cuadrillas de Aguaocaso conocen las tres cifras. Camina esta noche por delante de los carros y limpia las marcas; catorce asaltantes se interponen entre aquí y las piedras.",
+        "completion": "Los batidores hicieron señales desde las piedras fronterizas al anochecer: cuarenta almas, contadas dos veces, {playerName}. No volverás a ver esa caravana, y nunca dejará de debértelo. Esa es la forma del trabajo aquí fuera.",
         "objectives": {
           "0": {
-            "label": "Duskwater Raider slain"
+            "label": "Asaltante de Aguaocaso abatido"
           }
         }
       },
       "q_glass_that_walks": {
-        "title": "Glass That Walks",
-        "text": "North of the Rise the lightning storms of two ages fused the dunes to glass, {playerName}, and lately the glass stands up. The colossi drink the deep wells dry and my horse will not go within a mile of one. Bring down ten so the well lines north of camp run wet again.",
-        "completion": "Ten heaps of quiet glass, and the north wells are filling. I rode past one of your kills at noon, {playerName}; it caught the sun like a chandelier. Prettiest thing I ever hated.",
+        "title": "Vidrio que camina",
+        "text": "Al norte de la Loma, las tormentas de rayos de dos eras fundieron las dunas en vidrio, {playerName}, y últimamente el vidrio se pone en pie. Los colosos beben los pozos profundos hasta secarlos y mi caballo no se acerca a una milla de ninguno. Derriba a diez para que las líneas de pozos al norte del campamento vuelvan a correr con agua.",
+        "completion": "Diez montones de vidrio quieto, y los pozos del norte se están llenando. Pasé a mediodía junto a una de tus piezas, {playerName}; atrapaba el sol como una lámpara de araña. La cosa más bonita que he odiado nunca.",
         "objectives": {
           "0": {
-            "label": "Duneglass Colossus slain"
+            "label": "Coloso de vidrioduna abatido"
           }
         }
       },
       "q_the_unmapped_dunes": {
-        "title": "The Unmapped Dunes",
-        "text": "My map of the north marches is wrong every morning, {playerName}: the colossi shoulder whole dunes aside as they walk, and a route I inked in spring is a wall by harvest. I cannot chart around that many tons of moving glass. Break twelve more and the sand will hold still long enough to draw.",
-        "completion": "Twelve down, and this morning the dunes were where I left them. A map that stays true for a season, {playerName}; out here that is the difference between a road and a rumor.",
+        "title": "Las dunas sin cartografiar",
+        "text": "Mi mapa de las marcas del norte amanece equivocado cada mañana, {playerName}: los colosos apartan dunas enteras a hombros al caminar, y una ruta que entinté en primavera es un muro para la cosecha. No puedo trazar rodeos alrededor de tantas toneladas de vidrio en movimiento. Quiebra a doce más y la arena se estará quieta lo bastante para dibujarla.",
+        "completion": "Doce abajo, y esta mañana las dunas estaban donde las dejé. Un mapa que dice la verdad durante una temporada, {playerName}; aquí fuera esa es la diferencia entre un camino y un rumor.",
         "objectives": {
           "0": {
-            "label": "Duneglass Colossus slain"
+            "label": "Coloso de vidrioduna abatido"
           }
         }
       },
       "q_spoor_of_the_tyrant": {
-        "title": "Spoor of the Tyrant",
-        "text": "Something under the Barrens moves the ravager packs like a hand under a blanket, {playerName}, and the packs carry its castings in their gullets: sand fused hot, scale-pressed. The clans call it the Sandmaw. I call it a map I have not drawn yet. Bring me six castings and I will chart where the ground is a mouth.",
-        "completion": "Six castings, and the pattern is a spiral closing on the east Barrens. Whatever the Sandmaw is, {playerName}, it is circling something, and now we know where. Ride wide of the center until you mean it.",
+        "title": "Rastro del Tirano",
+        "text": "Algo bajo los Baldíos mueve a las manadas de devastadores como una mano bajo una manta, {playerName}, y las manadas llevan sus vestigios en el buche: arena fundida en caliente, prensada de escamas. Los clanes lo llaman el Faucearena. Yo lo llamo un mapa que aún no he dibujado. Tráeme seis vestigios y trazaré dónde el suelo es una boca.",
+        "completion": "Seis vestigios, y el patrón es una espiral que se cierra sobre los Baldíos del este. Sea lo que sea el Faucearena, {playerName}, está rodeando algo, y ahora sabemos dónde. Cabalga lejos del centro hasta que vayas en serio.",
         "objectives": {
           "0": {
-            "label": "Tyrant Spoor-Casting"
+            "label": "Vestigio fundido del Tirano"
           }
         }
       },
       "q_flameseers_on_the_bluffs": {
-        "title": "Flameseers on the Bluffs",
-        "text": "There are fires on the tomb bluffs east of the road every night now, {playerName}, and they are not clan fires; clans bank their coals against the wind. The flameseers preach to the dark and the dark leans in to listen. Twelve of them hold the bluffs. I want the nights out there boring again.",
-        "completion": "Dark bluffs for three nights running, {playerName}. Boring is the finest word in an outrider's report, and you wrote it.",
+        "title": "Videntes en los riscos",
+        "text": "Hay fuegos en los riscos de las tumbas al este del camino todas las noches, {playerName}, y no son fuegos de clan; los clanes resguardan sus brasas del viento. Los videntes de llamas le predican a la oscuridad y la oscuridad se inclina a escuchar. Doce de ellos dominan los riscos. Quiero que las noches ahí fuera vuelvan a ser aburridas.",
+        "completion": "Riscos a oscuras tres noches seguidas, {playerName}. Aburrido es la palabra más hermosa del informe de un batidor, y la escribiste tú.",
         "objectives": {
           "0": {
-            "label": "Heretic Flameseer slain"
+            "label": "Vidente de llamas hereje abatido"
           }
         }
       },
       "q_creeds_of_ash": {
-        "title": "Creeds of Ash",
-        "text": "The seers carry their creed on ash-blacked tablets, {playerName}, and Canon Sahr at the Seat pays courier rates for anything the heresy writes down. I ride too fast to play librarian. Pull seven ash creeds off the bluffs and I will see they travel south with the next water run.",
-        "completion": "Seven tablets, packed in wool like they might bite. Sahr will read them by lamplight and frighten herself thoroughly, {playerName}, which I am told is how archivists say thank you.",
+        "title": "Credos de ceniza",
+        "text": "Los videntes llevan su credo en tablillas ennegrecidas de ceniza, {playerName}, y la canóniga Sahr, en la Sede, paga tarifa de mensajero por cualquier cosa que la herejía ponga por escrito. Yo cabalgo demasiado rápido para jugar a bibliotecario. Saca siete credos de ceniza de los riscos y me encargaré de que viajen al sur con la próxima remesa de agua.",
+        "completion": "Siete tablillas, envueltas en lana como si mordieran. Sahr las leerá a la luz de la lámpara y se asustará a conciencia, {playerName}, que según me dicen es como dan las gracias los archiveros.",
         "objectives": {
           "0": {
-            "label": "Ash Creed Tablet"
+            "label": "Tablilla del credo de ceniza"
           }
         }
       },
       "q_two_knives": {
-        "title": "Two Knives",
-        "text": "The border bleeds from two knives, {playerName}: duskwater steel on the road and heretic fire on the bluffs, and each swears it will outlast the other. I have stopped caring who is right. Ride the north marches with me on the map and take eight of each; the desert can referee what is left.",
-        "completion": "Eight and eight, and for one night the north marches held nothing but wind. Two knives, one quiet, {playerName}. I will take the arithmetic.",
+        "title": "Dos cuchillos",
+        "text": "La frontera sangra por dos cuchillos, {playerName}: acero de Aguaocaso en el camino y fuego hereje en los riscos, y cada uno jura que sobrevivirá al otro. He dejado de preocuparme por quién tiene razón. Recorre conmigo las marcas del norte sobre el mapa y llévate a ocho de cada; el desierto puede arbitrar lo que quede.",
+        "completion": "Ocho y ocho, y durante una noche las marcas del norte no contuvieron más que viento. Dos cuchillos, un silencio, {playerName}. Acepto la aritmética.",
         "objectives": {
           "0": {
-            "label": "Duskwater Raider slain"
+            "label": "Asaltante de Aguaocaso abatido"
           },
           "1": {
-            "label": "Heretic Flameseer slain"
+            "label": "Vidente de llamas hereje abatido"
           }
         }
       },
       "q_the_first_cartographer": {
-        "title": "The First Cartographer",
-        "text": "Every map of this Domain descends from one survey, {playerName}, drawn before the Domain had a name, and the surveyor never stopped walking. His shade paces the far Barrens corner with the original under one arm, and it unmakes my routes just by crossing them. Take companions, put the First Cartographer to rest, and bring the map home.",
-        "completion": "So this is the mother of every line I have ever drawn... it shows water where the Barrens are, {playerName}. Either the world moved or the map is patient. Both thoughts will keep me up for years, and I thank you for each.",
+        "title": "El Primer Cartógrafo",
+        "text": "Todos los mapas de este Dominio descienden de un único estudio, {playerName}, dibujado antes de que el Dominio tuviera nombre, y el agrimensor nunca dejó de caminar. Su sombra recorre el rincón lejano de los Baldíos con el original bajo el brazo, y deshace mis rutas con solo cruzarlas. Lleva compañeros, da descanso al Primer Cartógrafo y trae el mapa a casa.",
+        "completion": "Así que esta es la madre de cada línea que he dibujado... muestra agua donde están los Baldíos, {playerName}. O el mundo se movió o el mapa es paciente. Ambas ideas me quitarán el sueño durante años, y te agradezco cada una.",
         "objectives": {
           "0": {
-            "label": "First Cartographer's Shade slain"
+            "label": "Sombra del Primer Cartógrafo abatida"
           },
           "1": {
-            "label": "The First Cartographer's Map"
+            "label": "El mapa del Primer Cartógrafo"
           }
         }
       },
       "q_the_maps_edge": {
-        "title": "The Map's Edge",
-        "text": "The first map belongs to the faith, {playerName}, whatever my hands say about giving it up. Carry it south to Judge Ivenna at the Sunken Seat; her court sat when this ink was wet, and the Seat is the only vault I trust with it. Tell her the edge of the map reads: here the Judges stopped counting.",
-        "completion": "The first survey, home under the first roof. And the margin note is real: here the Judges stopped counting. We will not repeat that mistake, {playerName}. The court accepts the map, and the debt.",
+        "title": "El borde del mapa",
+        "text": "El primer mapa pertenece a la fe, {playerName}, diga lo que diga mi mano sobre soltarlo. Llévalo al sur, a la juez Ivenna en la Sede Hundida; su corte celebraba sesión cuando esta tinta estaba fresca, y la Sede es la única cámara a la que se lo confío. Dile que el borde del mapa dice: aquí los jueces dejaron de contar.",
+        "completion": "El primer estudio, en casa bajo el primer techo. Y la nota del margen es real: aquí los jueces dejaron de contar. No repetiremos ese error, {playerName}. La corte acepta el mapa, y la deuda.",
         "objectives": {
           "0": {
-            "label": "Bring the map to Judge Ivenna"
+            "label": "Lleva el mapa a la juez Ivenna"
           }
         }
       },
       "q_the_taken_casks": {
-        "title": "The Taken Casks",
-        "text": "The raiders do not steal coin out here, {playerName}; coin does not pour. They take my sealed casks, and every cask they hold is a family at the well come winter. Kill eight of the duskwater crews and bring back eight casks with the wax unbroken. Water sold twice is water stolen once.",
-        "completion": "Eight casks, seals whole, back in the cool-house where they belong. You did not carry water today, {playerName}; you carried the winter. Few can say it.",
+        "title": "Las cubas robadas",
+        "text": "Aquí fuera los asaltantes no roban moneda, {playerName}; la moneda no se vierte. Se llevan mis cubas selladas, y cada cuba en su poder es una familia junto al pozo cuando llegue el invierno. Mata a ocho de las cuadrillas de Aguaocaso y trae de vuelta ocho cubas con la cera intacta. Agua vendida dos veces es agua robada una.",
+        "completion": "Ocho cubas, sellos enteros, de vuelta en la casa fresca donde deben estar. Hoy no has cargado agua, {playerName}; has cargado el invierno. Pocos pueden decirlo.",
         "objectives": {
           "0": {
-            "label": "Duskwater Raider slain"
+            "label": "Asaltante de Aguaocaso abatido"
           },
           "1": {
-            "label": "Sealed Water Cask"
+            "label": "Cuba de agua sellada"
           }
         }
       },
       "q_hearts_of_duneglass": {
-        "title": "Hearts of Duneglass",
-        "text": "A colossus keeps a heart of fused glass, {playerName}, and the heart stays cold three days after the body stops. I line my deep cisterns with them and the water keeps sweet through high summer. Six hearts would see Last Water through the dry months. I will not pretend the getting is easy.",
-        "completion": "Six hearts, still cold enough to fog a blade. The cisterns will hold sweet till the rains, {playerName}, and every skin I sell this summer pours a little of your work.",
+        "title": "Corazones de vidrioduna",
+        "text": "Un coloso guarda un corazón de vidrio fundido, {playerName}, y el corazón sigue frío tres días después de que el cuerpo se detenga. Yo forro con ellos mis cisternas profundas y el agua se conserva dulce durante el pleno verano. Seis corazones sacarían a Última Agua de los meses secos. No fingiré que conseguirlos sea fácil.",
+        "completion": "Seis corazones, aún tan fríos que empañan una hoja. Las cisternas se conservarán dulces hasta las lluvias, {playerName}, y cada odre que venda este verano verterá un poco de tu trabajo.",
         "objectives": {
           "0": {
-            "label": "Duneglass Heart"
+            "label": "Corazón de vidrioduna"
           }
         }
       },
       "q_the_wells_between": {
-        "title": "The Wells Between",
-        "text": "Between here and the border stones there are nine wells, {playerName}, and the colossi have drunk four of them to mud. A dry well on that stretch is not an inconvenience; it is a grave with a rope. Break ten of the glass walkers off the well lines and give the ground back its water.",
-        "completion": "Two of the four wells are seeping again already. Nine wells between here and the stones, {playerName}, and tonight all nine have a chance. That is the whole shape of my religion.",
+        "title": "Los pozos de en medio",
+        "text": "Entre aquí y las piedras fronterizas hay nueve pozos, {playerName}, y los colosos han bebido cuatro hasta el barro. Un pozo seco en ese tramo no es una molestia; es una tumba con cuerda. Quiebra a diez de los caminantes de vidrio en las líneas de pozos y devuélvele al suelo su agua.",
+        "completion": "Dos de los cuatro pozos ya rezuman de nuevo. Nueve pozos entre aquí y las piedras, {playerName}, y esta noche los nueve tienen una oportunidad. Esa es la forma entera de mi religión.",
         "objectives": {
           "0": {
-            "label": "Duneglass Colossus slain"
+            "label": "Coloso de vidrioduna abatido"
           }
         }
       },
       "q_ash_in_the_wells": {
-        "title": "Ash in the Wells",
-        "text": "The flameseers bless my well lines now, {playerName}, if blessing is the word: they pour ember phials into the water and call the steam an answered prayer. Fouled wells on the last stretch kill quieter than any raider. Take six phials off the seers before the prayers reach the deep water.",
-        "completion": "Six phials, stoppered and drowned in sand where they can preach to no one. The wells run clear, {playerName}. Whatever the Nameless want of us, I refuse to believe it is boiled pilgrims.",
+        "title": "Ceniza en los pozos",
+        "text": "Los videntes de llamas bendicen ahora mis líneas de pozos, {playerName}, si bendecir es la palabra: vierten viales de ascuas en el agua y llaman al vapor una plegaria atendida. Los pozos envenenados en el último tramo matan más callados que cualquier asaltante. Quítales seis viales a los videntes antes de que las plegarias lleguen al agua profunda.",
+        "completion": "Seis viales, taponados y ahogados en arena donde no pueden predicarle a nadie. Los pozos corren limpios, {playerName}. Sea lo que sea lo que los Sin Nombre quieren de nosotros, me niego a creer que sean peregrinos hervidos.",
         "objectives": {
           "0": {
-            "label": "Ember Phial"
+            "label": "Vial de ascuas"
           }
         }
       },
       "q_veth_quiet_introductions": {
-        "title": "Quiet Introductions",
-        "text": "Nighthollow does not give tours, {playerName}; it gives introductions, once. Factor Ilvane brokers the small debts, Isyra Coldwater sells the quiet steel, and Auditor Cress counts what the dark takes. Present yourself to each of them. After that, whatever you become here is on your own account.",
-        "completion": "So they have seen your face and written it down. Three ledgers now carry your name, {playerName}. Try to make every entry after this one a credit.",
+        "title": "Presentaciones discretas",
+        "text": "Cárcavanoche no ofrece visitas guiadas, {playerName}; ofrece presentaciones, una vez. La factor Ilvane corre con las deudas menores, Isyra Aguafría vende el acero silencioso y la auditora Cress cuenta lo que se lleva la oscuridad. Preséntate ante las tres. Después de eso, lo que llegues a ser aquí corre de tu cuenta.",
+        "completion": "Así que te han visto la cara y la han anotado. Tres libros de cuentas llevan ahora tu nombre, {playerName}. Procura que cada asiento a partir de este sea un haber.",
         "objectives": {
           "0": {
-            "label": "Meet Factor Ilvane"
+            "label": "Conoce a la factor Ilvane"
           },
           "1": {
-            "label": "Meet Isyra Coldwater"
+            "label": "Conoce a Isyra Aguafría"
           },
           "2": {
-            "label": "Meet Auditor Cress"
+            "label": "Conoce a la auditora Cress"
           }
         }
       },
       "q_veth_moth_lamps": {
-        "title": "Dust for the Lamps",
-        "text": "The twilight moths come off the Verge at dusk and eat my lamp oil down to the wick, {playerName}, and a dark market stall sells nothing. Thin them, ten or so, and shake eight measures of dust from their wings. There are buyers for the dust; I do not ask what they do with it.",
-        "completion": "Oil in the lamps and dust in the jars: two trades served by one errand. That is the kind of arithmetic Nighthollow respects, {playerName}.",
+        "title": "Polvo para las lámparas",
+        "text": "Las polillas crepusculares bajan del Linde al anochecer y se comen mi aceite de lámpara hasta la mecha, {playerName}, y un puesto de mercado a oscuras no vende nada. Ralea unas diez y sacude de sus alas ocho medidas de polvo. Hay compradores para el polvo; no pregunto qué hacen con él.",
+        "completion": "Aceite en las lámparas y polvo en los tarros: dos negocios servidos con un solo recado. Esa es la clase de aritmética que Cárcavanoche respeta, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Twilight Moth slain"
+            "label": "Polilla crepuscular abatida"
           },
           "1": {
-            "label": "Mothwing Dust"
+            "label": "Polvo de ala de polilla"
           }
         }
       },
       "q_veth_verge_cull": {
-        "title": "Both Sides of the Trade",
-        "text": "The moths lay in the palewidow hollows and the widows fatten on the moths, {playerName}; left alone, the Verge exports nothing but appetite. Cut both sides of that trade: twelve moths, ten weavers. The Verge does not need to be safe, it needs to be profitable.",
-        "completion": "The silk lots report the hollows quieter and my stall keeps its stock. Nobody will call the Verge tame, but it is back to paying its way.",
+        "title": "Los dos lados del negocio",
+        "text": "Las polillas ponen en las Cárcavas de la Viuda Pálida y las viudas engordan con las polillas, {playerName}; dejado a su aire, el Linde no exporta más que apetito. Corta los dos lados de ese negocio: doce polillas, diez tejedoras. El Linde no necesita ser seguro, necesita ser rentable.",
+        "completion": "Los lotes de seda informan de que las cárcavas están más tranquilas y mi puesto conserva el género. Nadie llamará manso al Linde, pero vuelve a pagarse el sitio.",
         "objectives": {
           "0": {
-            "label": "Twilight Moth slain"
+            "label": "Polilla crepuscular abatida"
           },
           "1": {
-            "label": "Palewidow Weaver slain"
+            "label": "Tejedora viuda pálida abatida"
           }
         }
       },
       "q_veth_towpath_census": {
-        "title": "The Towpath Census",
-        "text": "A census, {playerName}: the towpath south of the gate hosts more widows and skulkers than my last count allows, and an uncounted thing is an unbilled thing. Reduce the surplus, ten of each, and the books will match the road again. Veth is only dangerous where it is accurate.",
-        "completion": "Ten and ten, which is what the margin said. The road now matches its own paperwork, {playerName}. You would be surprised how rarely that is true of anything.",
+        "title": "El censo del camino de sirga",
+        "text": "Un censo, {playerName}: el camino de sirga al sur de la puerta aloja más viudas y escurridizos de los que permite mi último recuento, y una cosa sin contar es una cosa sin facturar. Reduce el excedente, diez de cada, y los libros volverán a coincidir con el camino. Veth solo es peligrosa donde es exacta.",
+        "completion": "Diez y diez, que es lo que decía el margen. El camino vuelve a coincidir con su propio papeleo, {playerName}. Te sorprendería lo poco que eso se cumple en nada.",
         "objectives": {
           "0": {
-            "label": "Palewidow Weaver slain"
+            "label": "Tejedora viuda pálida abatida"
           },
           "1": {
-            "label": "Blackriver Skulker slain"
+            "label": "Escurridizo del río Negro abatido"
           }
         }
       },
       "q_veth_silt_eels": {
-        "title": "The Eel Accounts",
-        "text": "The skulkers net the silt eels I smoke, and lately they keep the catch, {playerName}. Ten skulkers off the banks, and bring me eight eels out of their traps while you are in the water. Mind the chill; I sell the cure for it, which is tea.",
-        "completion": "Fat eels, barely bruised. They will hang in the smoke by morning and sell by noon. The skulkers can file a complaint with the river.",
+        "title": "Las cuentas de las anguilas",
+        "text": "Los escurridizos pescan con red las anguilas de limo que yo ahúmo, y últimamente se quedan la captura, {playerName}. Diez escurridizos fuera de las orillas, y tráeme ocho anguilas de sus trampas ya que estás en el agua. Cuidado con el frío; yo vendo la cura, que es té.",
+        "completion": "Anguilas gordas, apenas magulladas. Colgarán del humo por la mañana y se venderán al mediodía. Los escurridizos pueden presentar su queja ante el río.",
         "objectives": {
           "0": {
-            "label": "Blackriver Skulker slain"
+            "label": "Escurridizo del río Negro abatido"
           },
           "1": {
-            "label": "Silt Eel"
+            "label": "Anguila de limo"
           }
         }
       },
       "q_veth_wake_fees": {
-        "title": "Wake Fees",
-        "text": "Every barge that passes the Quays pays a wake fee, {playerName}, and every barge this month has paid it twice more: to skulkers in the shallows and to wisps drifting off the Wispwood bank. Competing tolls are bad for the brand. Twelve skulkers, ten wisps, and the river has one creditor again.",
-        "completion": "The pilots report clean water and a single, correct invoice. You have simplified the river, {playerName}; I will simplify your fee to match: here it is, in full.",
+        "title": "Tasas de estela",
+        "text": "Cada barcaza que pasa los Muelles paga una tasa de estela, {playerName}, y cada barcaza de este mes la ha pagado dos veces de más: a los escurridizos de los bajíos y a los fatuos que derivan desde la orilla del Bosque de los Fatuos. Los peajes en competencia son malos para la marca. Doce escurridizos, diez fatuos, y el río vuelve a tener un solo acreedor.",
+        "completion": "Los pilotos informan de agua limpia y de una única factura correcta. Has simplificado el río, {playerName}; simplificaré tus honorarios a juego: aquí están, íntegros.",
         "objectives": {
           "0": {
-            "label": "Blackriver Skulker slain"
+            "label": "Escurridizo del río Negro abatido"
           },
           "1": {
-            "label": "Feral Wisp slain"
+            "label": "Fuego fatuo feral abatido"
           }
         }
       },
       "q_veth_greyweir_posting": {
-        "title": "The Greyweir Posting",
-        "text": "The Greyweir sits where the black river narrows north of the mere, {playerName}, and its toll-house keeps the middle country honest. Tollmaster Hesk holds the posting and is owed a capable pair of hands. Let Ferrywoman Szel count you aboard on the way; she records everything that crosses, and you are now something that crosses.",
-        "completion": "Vael sends a knife and calls it a clerk. Good; the weir needs both. You will find the middle river less patient than the south, {playerName}. Wages are posted, and collected in advance by nobody.",
+        "title": "El destino del Azud Gris",
+        "text": "El Azud Gris se asienta donde el río negro se estrecha al norte del lago, {playerName}, y su casa de peaje mantiene honrado el país de en medio. El maestro de peajes Hesk ocupa el destino y se le debe un par de manos capaces. Deja que la barquera Szel te cuente a bordo por el camino; registra cuanto cruza, y tú ahora eres algo que cruza.",
+        "completion": "Vael manda un cuchillo y lo llama escribiente. Bien; el azud necesita ambos. El río de en medio te parecerá menos paciente que el sur, {playerName}. Los salarios están en el tablón, y no los cobra nadie por adelantado.",
         "objectives": {
           "0": {
-            "label": "Be counted by Ferrywoman Szel"
+            "label": "Haz que la barquera Szel te cuente"
           }
         }
       },
       "q_veth_ferry_dues": {
-        "title": "Ferry Dues",
-        "text": "The drowned walk out of the mere and board my ferry like paying passengers, {playerName}, except they pay in old chits the Confederation retired thirty years ago. Put twelve of them back in the water and bring me eight of the chits. Somebody upstream is reissuing dead currency, and I intend to know who.",
-        "completion": "Retired chits, reissued wet. I will pass these to Hesk, who will pass them to someone whose name neither of us says aloud. Your fare is covered, {playerName}: both directions, once.",
+        "title": "Tarifas de barcaza",
+        "text": "Los ahogados salen del lago y suben a mi barcaza como pasajeros de pago, {playerName}, salvo que pagan con fichas viejas que la Confederación retiró hace treinta años. Devuelve a doce al agua y tráeme ocho fichas. Alguien río arriba está reemitiendo moneda muerta, y pienso saber quién.",
+        "completion": "Fichas retiradas, reemitidas y empapadas. Se las pasaré a Hesk, que se las pasará a alguien cuyo nombre ninguno de los dos dice en voz alta. Tu pasaje está cubierto, {playerName}: ambos sentidos, una vez.",
         "objectives": {
           "0": {
-            "label": "Blackmere Drowned slain"
+            "label": "Ahogado del Lago Negro abatido"
           },
           "1": {
-            "label": "Waterlogged Barge Chit"
+            "label": "Ficha de barcaza empapada"
           }
         }
       },
       "q_veth_lantern_motes": {
-        "title": "Light for the Crossing",
-        "text": "A ferry runs at night or it does not run, {playerName}, and my lanterns burn wisplight or nothing. The feral wisps off the Wispwood bank carry a steadier mote than any candle. Ten wisps culled and eight motes, unbroken; I pay by the lumen.",
-        "completion": "Steady light, cold as a fair price. The crossing will run all month on these. The forest can bill me, if it ever learns to write.",
+        "title": "Luz para el cruce",
+        "text": "Una barcaza navega de noche o no navega, {playerName}, y mis faroles arden con luz de fatuo o con nada. Los fatuos ferales de la orilla del Bosque de los Fatuos llevan una mota más firme que cualquier vela. Diez fatuos eliminados y ocho motas sin romper; pago por lumen.",
+        "completion": "Luz firme, fría como un precio justo. El cruce funcionará el mes entero con esto. El bosque puede pasarme la factura, si algún día aprende a escribir.",
         "objectives": {
           "0": {
-            "label": "Feral Wisp slain"
+            "label": "Fuego fatuo feral abatido"
           },
           "1": {
-            "label": "Ferry Lantern Mote"
+            "label": "Mota de farol de barcaza"
           }
         }
       },
       "q_veth_weir_nets": {
-        "title": "What the Nets Owe",
-        "text": "The weir nets catch everything the river owes us, and twice a week I haul them up cut, {playerName}. Smugglers cut from above; the drowned pull from below. Twelve of the one, ten of the other, and my nets come up whole and heavy.",
-        "completion": "Whole nets, full ledger. The river will find new ways to shortchange the weir, it always does, but this week it pays in full, {playerName}.",
+        "title": "Lo que deben las redes",
+        "text": "Las redes del azud atrapan cuanto el río nos debe, y dos veces por semana las subo cortadas, {playerName}. Los contrabandistas cortan desde arriba; los ahogados tiran desde abajo. Doce de los unos, diez de los otros, y mis redes subirán enteras y pesadas.",
+        "completion": "Redes enteras, libro lleno. El río encontrará nuevas maneras de escatimarle al azud, siempre lo hace, pero esta semana paga íntegro, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Feralrun Smuggler slain"
+            "label": "Contrabandista de la Senda Feral abatido"
           },
           "1": {
-            "label": "Blackmere Drowned slain"
+            "label": "Ahogado del Lago Negro abatido"
           }
         }
       },
       "q_veth_mere_charter": {
-        "title": "A Charter for the Landing",
-        "text": "The mere believes my landing belongs to it, {playerName}: the drowned take the pilings, the wisps take the lantern posts, and each morning I row out and repossess my own ferry. I have filed for a charter that says the landing is mine. Twelve drowned and ten wisps are the filing fee.",
-        "completion": "The landing stood empty at dawn for the first time since thaw. Charter granted, then, by the only authority the mere respects. You are a considerable filing fee, {playerName}.",
+        "title": "Una carta para el embarcadero",
+        "text": "El lago cree que mi embarcadero le pertenece, {playerName}: los ahogados se llevan los pilotes, los fatuos se llevan los postes de los faroles, y cada mañana remo hasta allí y recupero la posesión de mi propia barcaza. He solicitado una carta que diga que el embarcadero es mío. Doce ahogados y diez fatuos son la tasa de solicitud.",
+        "completion": "El embarcadero amaneció vacío por primera vez desde el deshielo. Carta concedida, entonces, por la única autoridad que el lago respeta. Eres una tasa de solicitud considerable, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Blackmere Drowned slain"
+            "label": "Ahogado del Lago Negro abatido"
           },
           "1": {
-            "label": "Feral Wisp slain"
+            "label": "Fuego fatuo feral abatido"
           }
         }
       },
       "q_veth_unlicensed_ferry": {
-        "title": "The Unlicensed Ferry",
-        "text": "There is one licensed crossing on this river, {playerName}, and I am standing at it. The feralrun gangs pole passengers past the weir at midnight and keep their accounts in knotted cord. Twelve smugglers out of business, eight tally knots for evidence; the Confederation likes its convictions pre-counted.",
-        "completion": "Knotted cord: crude bookkeeping, but honest, which is more than I can say for the clientele. The midnight trade will resume within a season. So will you, I expect.",
+        "title": "La barcaza sin licencia",
+        "text": "En este río hay un solo cruce con licencia, {playerName}, y estoy de pie en él. Las bandas de la Senda Feral pasan pasajeros a pértiga por delante del azud a medianoche y llevan sus cuentas en cuerda anudada. Doce contrabandistas fuera del negocio, ocho nudos de cuenta como prueba; a la Confederación le gustan sus condenas contadas de antemano.",
+        "completion": "Cuerda anudada: contabilidad tosca, pero honrada, que es más de lo que puedo decir de la clientela. El comercio de medianoche se reanudará en una temporada. Tú también, supongo.",
         "objectives": {
           "0": {
-            "label": "Feralrun Smuggler slain"
+            "label": "Contrabandista de la Senda Feral abatido"
           },
           "1": {
-            "label": "Smuggler's Tally Knot"
+            "label": "Nudo de cuenta de contrabandista"
           }
         }
       },
       "q_veth_forged_passes": {
-        "title": "Forged Passes",
-        "text": "Now the survivors sell forged weir passes, {playerName}: my seal, my signature, drawn by someone who has clearly met neither. Flattery, and also a hanging offense. Ten more smugglers, and pull eight forgeries out of circulation before some honest fool pays full price for one.",
-        "completion": "A fair hand, whoever draws these; I would offer them a clerkship if the position were not a noose. The forgeries go in the fire and your fee comes out of it, {playerName}.",
+        "title": "Pases falsificados",
+        "text": "Ahora los supervivientes venden pases del azud falsificados, {playerName}: mi sello, mi firma, trazados por alguien que claramente no conoce ninguno de los dos. Un halago, y también delito de horca. Diez contrabandistas más, y retira de la circulación ocho falsificaciones antes de que algún necio honrado pague una a precio íntegro.",
+        "completion": "Buena mano, quienquiera que las trace; le ofrecería una plaza de escribiente si el puesto no fuera una soga. Las falsificaciones van al fuego y tus honorarios salen de él, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Feralrun Smuggler slain"
+            "label": "Contrabandista de la Senda Feral abatido"
           },
           "1": {
-            "label": "Forged Weir Pass"
+            "label": "Pase del azud falsificado"
           }
         }
       },
       "q_veth_passage_sold": {
-        "title": "Passage, Sold",
-        "text": "The guildless on the north road have gone into partnership with the feralrun gangs, {playerName}: steel above the bank, boats below it. Passage sold past my weir, toll-free, to anyone with coin and no questions. Break the partnership: twelve cutthroats, ten smugglers. Leave the wreckage where their next investors can see it.",
-        "completion": "The road and the river both report a sudden lack of competitors. The Greyweir thanks you in the only voice it has, {playerName}, which is the sound of tolls being paid.",
+        "title": "Pasaje, vendido",
+        "text": "Los sin gremio del camino del norte se han asociado con las bandas de la Senda Feral, {playerName}: acero sobre la orilla, botes debajo. Pasaje vendido más allá de mi azud, libre de peaje, a cualquiera con moneda y sin preguntas. Rompe la sociedad: doce degolladores, diez contrabandistas. Deja los restos donde puedan verlos sus próximos inversores.",
+        "completion": "El camino y el río informan ambos de una súbita falta de competidores. El Azud Gris te lo agradece con la única voz que tiene, {playerName}, que es el sonido de los peajes al pagarse.",
         "objectives": {
           "0": {
-            "label": "Guildless Cutthroat slain"
+            "label": "Degollador sin gremio abatido"
           },
           "1": {
-            "label": "Feralrun Smuggler slain"
+            "label": "Contrabandista de la Senda Feral abatido"
           }
         }
       },
       "q_veth_turncoats_price": {
-        "title": "The Turncoat's Price",
-        "text": "Vessik kept the guild's books until he sold them, {playerName}: four buyers, one set of accounts, and a fifth copy for himself. He counts his coin by the weir under paid protection and believes the ledger cannot reach him. Take companions; he taught half this river how to kill, and the other half owes him money.",
-        "completion": "Then the fifth copy comes home and the account closes at last. The guild will not thank you and neither will the buyers, {playerName}. I will, quietly, once: thank you. That is the last time it is said.",
+        "title": "El precio del cambiacapas",
+        "text": "Vessik llevaba los libros del gremio hasta que los vendió, {playerName}: cuatro compradores, un solo juego de cuentas y una quinta copia para él. Cuenta su moneda junto al azud bajo protección pagada y cree que el libro no puede alcanzarlo. Lleva compañeros; enseñó a matar a la mitad de este río, y la otra mitad le debe dinero.",
+        "completion": "Entonces la quinta copia vuelve a casa y la cuenta se cierra al fin. El gremio no te lo agradecerá y los compradores tampoco, {playerName}. Yo sí, en voz baja, una vez: gracias. Es la última vez que se dice.",
         "objectives": {
           "0": {
-            "label": "Vessik the Turncoat slain"
+            "label": "Vessik el Cambiacapas abatido"
           }
         }
       },
       "q_veth_stores_ledger": {
-        "title": "The Stores Ledger",
-        "text": "Every ration tin in the toll-house stores is stamped and counted, {playerName}, and forty of them walked into the mere with the last supply barge. The drowned have no use for supper; they hoard out of habit. Ten of them settled and eight tins recovered, stamps legible, or the quartermaster's office bills ME.",
-        "completion": "Stamped, dented, and accounted for. The stores balance, the office is denied its little triumph, and you are paid, {playerName}. Everyone gets what they deserve; how rare.",
+        "title": "El libro de los almacenes",
+        "text": "Cada lata de raciones de los almacenes de la casa de peaje está estampada y contada, {playerName}, y cuarenta de ellas se marcharon al lago con la última barcaza de suministros. Los ahogados no tienen uso para la cena; acaparan por costumbre. Diez de ellos saldados y ocho latas recuperadas, con los estampados legibles, o la oficina del intendente me factura a MÍ.",
+        "completion": "Estampadas, abolladas y contabilizadas. Los almacenes cuadran, a la oficina se le niega su pequeño triunfo y tú cobras, {playerName}. Cada cual recibe lo que merece; qué rareza.",
         "objectives": {
           "0": {
-            "label": "Blackmere Drowned slain"
+            "label": "Ahogado del Lago Negro abatido"
           },
           "1": {
-            "label": "Sunken Ration Tin"
+            "label": "Lata de raciones hundida"
           }
         }
       },
       "q_veth_toll_scrip": {
-        "title": "A Second Issuer",
-        "text": "The Silent Court has begun issuing its own toll scrip on the west bank, {playerName}: paper from a state that does not exist, honored by travelers too frightened to argue. Fear is a currency the Confederation does not license. Twelve revenants retired, eight scrip withdrawn from circulation.",
-        "completion": "Paper from a dead court, still holding value through pure menace. I almost admire it. Into the fire it goes regardless, {playerName}; the Greyweir tolerates no second issuer.",
+        "title": "Un segundo emisor",
+        "text": "La Corte Silenciosa ha empezado a emitir sus propios vales de peaje en la orilla oeste, {playerName}: papel de un estado que no existe, honrado por viajeros demasiado asustados para discutir. El miedo es una moneda que la Confederación no licencia. Doce renacidos retirados, ocho vales fuera de circulación.",
+        "completion": "Papel de una corte muerta, que aún conserva su valor por pura amenaza. Casi lo admiro. Al fuego va de todos modos, {playerName}; el Azud Gris no tolera un segundo emisor.",
         "objectives": {
           "0": {
-            "label": "Hollow Revenant slain"
+            "label": "Renacido de la cárcava abatido"
           },
           "1": {
-            "label": "Hollow Toll Scrip"
+            "label": "Vale de peaje de la cárcava"
           }
         }
       },
       "q_veth_dead_letters": {
-        "title": "Dead Letters",
-        "text": "The Court's tollmen now carry correspondence, {playerName}: dead letters between the ruin and the guildless camps, arranging what I can only call commerce. The living half of that arrangement buys; the dead half enforces. End twelve revenants and eight of their couriers, and the mail stops.",
-        "completion": "No further correspondence. Whatever the ruin and the road were arranging, it is now a matter for historians, {playerName}, and Veth employs none. The file closes.",
+        "title": "Cartas muertas",
+        "text": "Los peajeros de la Corte llevan ahora correspondencia, {playerName}: cartas muertas entre la ruina y los campamentos sin gremio, concertando lo que solo puedo llamar comercio. La mitad viva de ese arreglo compra; la mitad muerta ejecuta. Acaba con doce renacidos y ocho de sus correos, y el correo se detiene.",
+        "completion": "No hay más correspondencia. Fuera lo que fuera lo que la ruina y el camino estaban concertando, ya es asunto de historiadores, {playerName}, y Veth no emplea ninguno. El expediente se cierra.",
         "objectives": {
           "0": {
-            "label": "Hollow Revenant slain"
+            "label": "Renacido de la cárcava abatido"
           },
           "1": {
-            "label": "Guildless Cutthroat slain"
+            "label": "Degollador sin gremio abatido"
           }
         }
       },
       "q_veth_waystation_letters": {
-        "title": "Letters for the Longwatch",
-        "text": "A sealed case goes north to Arbiter Senna at the Longwatch, {playerName}: guild letters, and the guild does not use the post. Have Sutler Kevish sign for the freight when you arrive; his countersignature is the only receipt Senna accepts. Do not read the letters. That is not a warning, it is a professional courtesy.",
-        "completion": "Seals intact, countersigned, and you did not read them; I would know. Isyra chooses her couriers well, {playerName}. The Longwatch can always use hands that carry things and do not open them.",
+        "title": "Cartas para la Larga Vigilia",
+        "text": "Un estuche sellado va al norte, a la árbitra Senna en la Larga Vigilia, {playerName}: cartas del gremio, y el gremio no usa el correo. Haz que el vivandero Kevish firme el flete a tu llegada; su contrafirma es el único recibo que Senna acepta. No leas las cartas. No es una advertencia, es una cortesía profesional.",
+        "completion": "Sellos intactos, contrafirmados, y no las leíste; lo sabría. Isyra elige bien a sus correos, {playerName}. La Larga Vigilia siempre tiene sitio para manos que llevan cosas y no las abren.",
         "objectives": {
           "0": {
-            "label": "Have Sutler Kevish sign for the case"
+            "label": "Haz que el vivandero Kevish firme el estuche"
           }
         }
       },
       "q_veth_pine_line": {
-        "title": "Holding the Pine Line",
-        "text": "The Frostpine warbands push the tree line south a spear-length every night, {playerName}, and the rimeclaws hunt the gap they open. My road is in the gap. Twelve headhunters and eight cats, and the line goes back where the map says it is.",
-        "completion": "The line holds at the map again. The trolls will redraw it, the cats will follow, and I will hire you twice more before the thaw, {playerName}. That is not a complaint; it is a budget.",
+        "title": "Sostened la línea de pinos",
+        "text": "Las bandas de guerra de Pino Escarcha empujan la línea de árboles un largo de lanza al sur cada noche, {playerName}, y las zarpas de escarcha cazan en el hueco que abren. Mi camino está en el hueco. Doce cazacabezas y ocho felinos, y la línea vuelve a donde dice el mapa.",
+        "completion": "La línea aguanta donde el mapa manda. Los troles la volverán a trazar, los felinos los seguirán y yo te contrataré dos veces más antes del deshielo, {playerName}. No es una queja; es un presupuesto.",
         "objectives": {
           "0": {
-            "label": "Frostpine Headhunter slain"
+            "label": "Cazacabezas de Pino Escarcha abatido"
           },
           "1": {
-            "label": "Rimeclaw Prowler slain"
+            "label": "Merodeador zarpa de escarcha abatido"
           }
         }
       },
       "q_veth_meat_for_the_line": {
-        "title": "Meat for the Line",
-        "text": "Every guard on this watch eats twice a day or watches badly, {playerName}, and the terraces grow nothing but ice and appetite. Rimeclaw haunch keeps on the cold shelf for a month. Ten cats thinned, eight haunches dressed. The irony that the watch eats what hunts it is not lost on me; it seasons the stew.",
-        "completion": "Winter weight, well dressed. The line eats for a fortnight and owes you for all of it, {playerName}. I run the only kitchen for forty miles; my gratitude is legal tender.",
+        "title": "Carne para la línea",
+        "text": "Cada guardia de esta vigilia come dos veces al día o vigila mal, {playerName}, y las terrazas no crían más que hielo y apetito. El pernil de zarpa de escarcha aguanta un mes en el estante frío. Diez felinos raleados, ocho perniles preparados. La ironía de que la vigilia coma lo que la caza no se me escapa; sazona el guiso.",
+        "completion": "Peso de invierno, bien preparado. La línea come dos semanas y te debe cada bocado, {playerName}. Llevo la única cocina en cuarenta millas; mi gratitud es moneda de curso legal.",
         "objectives": {
           "0": {
-            "label": "Rimeclaw Prowler slain"
+            "label": "Merodeador zarpa de escarcha abatido"
           },
           "1": {
-            "label": "Rimeclaw Haunch"
+            "label": "Pernil de zarpa de escarcha"
           }
         }
       },
       "q_veth_rites_on_ice": {
-        "title": "Rites on the Ice",
-        "text": "The icecallers sing the rime down onto the terraces before a raid, {playerName}, so the climb is glass by the time the spears come. Each rite hangs on a carved fetish; no fetish, no weather. Ten icecallers silenced, eight fetishes off their cords.",
-        "completion": "Honest ice again, the kind that falls without being asked. Eight cancelled winters in eight fetishes, {playerName}. The road thanks you; I speak for it.",
+        "title": "Ritos sobre el hielo",
+        "text": "Los llamahielos cantan la escarcha sobre las terrazas antes de una incursión, {playerName}, para que la subida sea vidrio cuando lleguen las lanzas. Cada rito pende de un fetiche tallado; sin fetiche, no hay clima. Diez llamahielos silenciados, ocho fetiches fuera de sus cordeles.",
+        "completion": "Hielo honrado otra vez, del que cae sin que se lo pidan. Ocho inviernos cancelados en ocho fetiches, {playerName}. El camino te lo agradece; yo hablo en su nombre.",
         "objectives": {
           "0": {
-            "label": "Frostpine Icecaller slain"
+            "label": "Llamahielos de Pino Escarcha abatido"
           },
           "1": {
-            "label": "Rimebound Fetish"
+            "label": "Fetiche ceñido por la escarcha"
           }
         }
       },
       "q_veth_white_ledger": {
-        "title": "The White Ledger",
-        "text": "The north keeps its own ledger, {playerName}, and it writes in white: every drift a debit, every thaw a payment deferred. This season the icecallers and the rimeclaws have overdrawn it. Twelve callers, ten cats. Balance the page.",
-        "completion": "Balanced, for a value of balanced that lasts until the next hard frost. That is the only kind of balanced the north offers, {playerName}, and I have learned to invoice accordingly.",
+        "title": "El libro blanco",
+        "text": "El norte lleva su propio libro de cuentas, {playerName}, y escribe en blanco: cada ventisquero un cargo, cada deshielo un pago aplazado. Esta temporada los llamahielos y las zarpas de escarcha lo han dejado en números rojos. Doce llamahielos, diez felinos. Cuadra la página.",
+        "completion": "Cuadrada, para un valor de cuadrada que dura hasta la próxima helada fuerte. Es la única clase de cuadrada que ofrece el norte, {playerName}, y he aprendido a facturar en consecuencia.",
         "objectives": {
           "0": {
-            "label": "Frostpine Icecaller slain"
+            "label": "Llamahielos de Pino Escarcha abatido"
           },
           "1": {
-            "label": "Rimeclaw Prowler slain"
+            "label": "Merodeador zarpa de escarcha abatido"
           }
         }
       },
       "q_veth_high_ice": {
-        "title": "The High Ice",
-        "text": "Above the terraces the ice stops pretending to be weather, {playerName}. The high shelves belong to the old cats and the coldest of the callers, and they have begun coming down at dusk with a purpose I do not like. Twelve rimeclaws, ten icecallers, up where the ropes are. Rope in; the ledger does not cover falls.",
-        "completion": "The dusk raids stop, the shelves go quiet, and the ropes come back with everyone who went up them. In the north that is a triumph, {playerName}; I will file it as one.",
+        "title": "El hielo alto",
+        "text": "Por encima de las terrazas, el hielo deja de fingir que es clima, {playerName}. Las repisas altas pertenecen a los felinos viejos y a los más fríos de los llamahielos, y han empezado a bajar al anochecer con un propósito que no me gusta. Doce zarpas de escarcha, diez llamahielos, allá arriba donde están las cuerdas. Encuérdate; el libro no cubre las caídas.",
+        "completion": "Las incursiones del anochecer cesan, las repisas enmudecen y las cuerdas vuelven con todos los que subieron por ellas. En el norte eso es un triunfo, {playerName}; lo archivaré como tal.",
         "objectives": {
           "0": {
-            "label": "Rimeclaw Prowler slain"
+            "label": "Merodeador zarpa de escarcha abatido"
           },
           "1": {
-            "label": "Frostpine Icecaller slain"
+            "label": "Llamahielos de Pino Escarcha abatido"
           }
         }
       },
       "q_veth_tallow_accounts": {
-        "title": "The Tallow Accounts",
-        "text": "Frostpine tallow burns slow and hateful, {playerName}, and it is the only fat that keeps a lamp alive on the high terraces. The trolls render it for their war paint. Ten headhunters, eight jars of tallow, and the Longwatch lamps stay lit through the dark month.",
-        "completion": "Slow, hateful, and lit: exactly as specified. The dark month can come when it likes now, {playerName}. It will find the watch awake and the stew hot.",
+        "title": "Las cuentas del sebo",
+        "text": "El sebo de Pino Escarcha arde lento y rencoroso, {playerName}, y es la única grasa que mantiene viva una lámpara en las terrazas altas. Los troles lo funden para su pintura de guerra. Diez cazacabezas, ocho tarros de sebo, y las lámparas de la Larga Vigilia siguen encendidas durante el mes oscuro.",
+        "completion": "Lento, rencoroso y encendido: exactamente según lo especificado. El mes oscuro puede venir cuando quiera, {playerName}. Encontrará a la vigilia despierta y el guiso caliente.",
         "objectives": {
           "0": {
-            "label": "Frostpine Headhunter slain"
+            "label": "Cazacabezas de Pino Escarcha abatido"
           },
           "1": {
-            "label": "Frostpine Tallow"
+            "label": "Sebo de Pino Escarcha"
           }
         }
       },
       "q_veth_road_north": {
-        "title": "The Road North",
-        "text": "The Kael border post buys my surplus and sells me flour, {playerName}, and this month the road between us is all rime-song and lodge steel. Commerce does not care whose knives they are. Twelve icecallers and six blades off the north mile, and the wagons roll before the flour riots do.",
-        "completion": "The wagons crossed at dawn: flour south, tallow north, everyone overcharged, everyone content. That is peace, {playerName}, as the border understands it.",
+        "title": "El camino del norte",
+        "text": "El puesto fronterizo de Kael compra mi excedente y me vende harina, {playerName}, y este mes el camino entre nosotros es puro canto de escarcha y acero del Refugio. Al comercio no le importa de quién sean los cuchillos. Doce llamahielos y seis hojas fuera de la milla norte, y los carros ruedan antes que los motines de la harina.",
+        "completion": "Los carros cruzaron al alba: harina al sur, sebo al norte, cada cual cobrando de más, cada cual contento. Eso es la paz, {playerName}, tal como la entiende la frontera.",
         "objectives": {
           "0": {
-            "label": "Frostpine Icecaller slain"
+            "label": "Llamahielos de Pino Escarcha abatido"
           },
           "1": {
-            "label": "Forsworn Blade slain"
+            "label": "Hoja perjura abatida"
           }
         }
       },
       "q_veth_watch_the_lodge": {
-        "title": "Watch the Lodge",
-        "text": "Across the towpath stands the Last Lodge, {playerName}, and Veykar's blades walk its bounds in pairs, in the old pattern, because he wrote the old pattern. Compare tallies with Waykeeper Dral before you start; his count of the patrols is better than mine, which offends me. Then remove ten blades from the rotation. Bring one knife you trust.",
-        "completion": "Ten gaps in a pattern the lodge believes is perfect. Veykar will notice, and he will know it was not the guild, and that will bother him more than the losses. Good. Bothered men make errors, {playerName}.",
+        "title": "Vigilad el Refugio",
+        "text": "Al otro lado del camino de sirga se alza el Último Refugio, {playerName}, y las hojas de Veykar recorren sus lindes en parejas, según el viejo patrón, porque el viejo patrón lo escribió él. Compara recuentos con el guardacaminos Dral antes de empezar; su cuenta de las patrullas es mejor que la mía, cosa que me ofende. Luego retira diez hojas de la rotación. Trae un cuchillo de confianza.",
+        "completion": "Diez huecos en un patrón que el Refugio cree perfecto. Veykar lo notará, y sabrá que no fue el gremio, y eso lo inquietará más que las bajas. Bien. Los hombres inquietos cometen errores, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Compare tallies with Waykeeper Dral"
+            "label": "Compara recuentos con el guardacaminos Dral"
           },
           "1": {
-            "label": "Forsworn Blade slain"
+            "label": "Hoja perjura abatida"
           }
         }
       },
       "q_veth_oath_knives": {
-        "title": "The Oath Knives",
-        "text": "Every blade at the lodge still carries the oath knife the guild gave them, {playerName}, which is theft: an oath returned means the knife comes home. Twelve more blades, eight knives recovered. The guild does not care that they are dead; it cares that the cutlery is accounted for.",
-        "completion": "Eight knives, home to the drawer they swore on. Somewhere in the guild a list gets eight lines shorter, {playerName}, and lists are the only scripture we keep.",
+        "title": "Los cuchillos del juramento",
+        "text": "Cada hoja del Refugio conserva el cuchillo de juramento que el gremio le entregó, {playerName}, lo cual es hurto: un juramento devuelto significa que el cuchillo vuelve a casa. Doce hojas más, ocho cuchillos recuperados. Al gremio no le importa que estén muertos; le importa que la cubertería esté contabilizada.",
+        "completion": "Ocho cuchillos, de vuelta al cajón sobre el que juraron. En algún lugar del gremio una lista pierde ocho líneas, {playerName}, y las listas son la única escritura que guardamos.",
         "objectives": {
           "0": {
-            "label": "Forsworn Blade slain"
+            "label": "Hoja perjura abatida"
           },
           "1": {
-            "label": "Forsworn Oath Knife"
+            "label": "Cuchillo de juramento perjuro"
           }
         }
       },
       "q_veth_ciphers_in_shadow": {
-        "title": "Ciphers in Shadow",
-        "text": "The lodge's ciphers were never written, {playerName}; they were taught, and the shadowcasters are where they live. Veykar is selling them a syllable at a time to whoever pays. Ten casters, and eight of the cipher-slates they train against. What a man cannot remember alone, he cannot sell.",
-        "completion": "Slates in the fire, casters in the ground, and a language dies solvent. There are perhaps four people alive who could mourn it, {playerName}. None of them will.",
+        "title": "Cifras en la sombra",
+        "text": "Las cifras del Refugio nunca se escribieron, {playerName}; se enseñaron, y los lanzasombras son donde viven. Veykar las está vendiendo sílaba a sílaba a quien pague. Diez lanzasombras, y ocho de las pizarras de cifrado con las que se adiestran. Lo que un hombre no puede recordar solo, no puede venderlo.",
+        "completion": "Pizarras al fuego, lanzasombras bajo tierra, y una lengua muere solvente. Quedan quizá cuatro personas vivas capaces de llorarla, {playerName}. Ninguna lo hará.",
         "objectives": {
           "0": {
-            "label": "Forsworn Shadowcaster slain"
+            "label": "Lanzasombras perjuro abatido"
           },
           "1": {
-            "label": "Shadowbound Cipher"
+            "label": "Cifra ligada a las sombras"
           }
         }
       },
       "q_veth_closing_the_lodge": {
-        "title": "Closing the Lodge",
-        "text": "The lodge is guttering, {playerName}: blades short-handed, casters hoarse, and Veykar pretending otherwise at the center of it. Put out the last of the light: ten blades, eight casters. When the perimeter is dark, the old man is just a name on a door, and Vael holds the contract for the door.",
-        "completion": "Dark, then. The Last Lodge stands empty around one man and his ledger of grudges. What happens next is above my desk, {playerName}, and for once I am glad of it. Take the boots; the towpath home is long.",
+        "title": "El cierre del Refugio",
+        "text": "El Refugio se apaga, {playerName}: hojas escasas, lanzasombras roncos y Veykar fingiendo lo contrario en el centro mismo. Apaga lo que queda de la luz: diez hojas, ocho lanzasombras. Cuando el perímetro esté a oscuras, el viejo será solo un nombre en una puerta, y Vael tiene el contrato de la puerta.",
+        "completion": "A oscuras, entonces. El Último Refugio se alza vacío alrededor de un hombre y su libro de rencores. Lo que ocurra ahora queda por encima de mi mesa, {playerName}, y por una vez me alegro. Llévate las botas; el camino de sirga de vuelta es largo.",
         "objectives": {
           "0": {
-            "label": "Forsworn Blade slain"
+            "label": "Hoja perjura abatida"
           },
           "1": {
-            "label": "Forsworn Shadowcaster slain"
+            "label": "Lanzasombras perjuro abatido"
           }
         }
       },
       "q_sign_the_garrison_book": {
-        "title": "The Garrison Book",
-        "text": "Kaelspire files you before it feeds you, {playerName}. Present yourself at the four offices of the garrison: stores, the smithy, the tithe desk, and the hunt charter. Sign each book legibly; the Empire has opinions about handwriting.",
-        "completion": "Four signatures, one of them nearly legible. You now exist in the eyes of the Empire, {playerName}, which is the only place existence is binding. Welcome to the northern march.",
+        "title": "El libro de la guarnición",
+        "text": "Aguja de Kael te archiva antes de darte de comer, {playerName}. Preséntate en las cuatro oficinas de la guarnición: almacenes, la herrería, la mesa del diezmo y la carta de caza. Firma cada libro con letra legible; el Imperio tiene opiniones sobre la caligrafía.",
+        "completion": "Cuatro firmas, una de ellas casi legible. Ahora existes a ojos del Imperio, {playerName}, que es el único lugar donde la existencia es vinculante. Bienvenido a la marca del norte.",
         "objectives": {
           "0": {
-            "label": "Report to Quartermaster Hilde"
+            "label": "Preséntate ante la intendente Hilde"
           },
           "1": {
-            "label": "Report to Armorer Ottokar"
+            "label": "Preséntate ante el armero Ottokar"
           },
           "2": {
-            "label": "Report to Prefect Alina"
+            "label": "Preséntate ante la prefecta Alina"
           },
           "3": {
-            "label": "Report to Huntmaster Roderic"
+            "label": "Preséntate ante el maestro de caza Roderic"
           }
         }
       },
       "q_forged_exemptions": {
-        "title": "Forged Exemptions",
-        "text": "The granary district owes the Empire a militia levy, and the levy has decided it would rather rob grain carts than guard them, {playerName}. Worse: they carry forged exemption papers, which is tax fraud stacked on desertion. Retire ten of them and bring me six forgeries for the evidence drawer.",
-        "completion": "Six forgeries, and the stamps are not even close; a child defrauds better. The levy rolls balance again, {playerName}. The fraud I can prosecute; the handwriting I can only mourn.",
+        "title": "Exenciones falsificadas",
+        "text": "El distrito de los graneros le debe al Imperio una leva de milicia, y la leva ha decidido que prefiere robar carros de grano a custodiarlos, {playerName}. Peor: llevan papeles de exención falsificados, que es fraude fiscal apilado sobre deserción. Retira a diez y tráeme seis falsificaciones para el cajón de pruebas.",
+        "completion": "Seis falsificaciones, y los sellos ni se acercan; un niño defrauda mejor. Las listas de la leva vuelven a cuadrar, {playerName}. El fraude puedo procesarlo; la caligrafía solo puedo llorarla.",
         "objectives": {
           "0": {
-            "label": "Granary Militia Deserter slain"
+            "label": "Desertor de la milicia de los graneros abatido"
           },
           "1": {
-            "label": "Forged Levy Papers"
+            "label": "Papeles de leva falsificados"
           }
         }
       },
       "q_the_levy_answers": {
-        "title": "The Levy Answers",
-        "text": "The Prefect has her evidence; I have a district that watched its levy walk off and turn thief. That does not stand in an imperial province, {playerName}. Muster the truants out of the south fields: twelve, by the sword, since they declined the easier summons.",
-        "completion": "Twelve names struck and the fields quiet. The next levy will report on time, {playerName}; nothing recruits like precedent.",
+        "title": "La leva responde",
+        "text": "La prefecta tiene sus pruebas; yo tengo un distrito que vio a su leva marcharse y hacerse ladrona. Eso no se sostiene en una provincia imperial, {playerName}. Recluta a los prófugos de los campos del sur: doce, por la espada, ya que declinaron la citación más amable.",
+        "completion": "Doce nombres tachados y los campos en silencio. La próxima leva se presentará puntual, {playerName}; nada recluta como un precedente.",
         "objectives": {
           "0": {
-            "label": "Granary Militia Deserter slain"
+            "label": "Desertor de la milicia de los graneros abatido"
           }
         }
       },
       "q_report_to_ledgerwatch": {
-        "title": "Report to Ledgerwatch",
-        "text": "Fort Ledgerwatch watches the pine belt and the Broken Legion in it, and its castellan reports three problems for every soldier he has. You are one soldier who solves three problems, {playerName}. Report to Castellan Odric; take the north road and the fort is on your right where the pines begin.",
-        "completion": "The Marshal sends one blade and calls it reinforcement. Very well; I have learned to requisition quality over quantity. Welcome to Ledgerwatch, {playerName}.",
+        "title": "Preséntate en Guardacuentas",
+        "text": "El Fuerte Guardacuentas vigila el cinturón de pinos y a la Legión Rota que lo habita, y su castellano informa de tres problemas por cada soldado que tiene. Tú eres un soldado que resuelve tres problemas, {playerName}. Preséntate ante el castellano Odric; toma el camino del norte y el fuerte queda a tu derecha donde empiezan los pinos.",
+        "completion": "El mariscal envía una sola hoja y lo llama refuerzos. Muy bien; he aprendido a requisar calidad antes que cantidad. Bienvenido a Guardacuentas, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Report to Castellan Odric"
+            "label": "Preséntate ante el castellano Odric"
           }
         }
       },
       "q_deserter_amnesty_rolls": {
-        "title": "The Amnesty Rolls",
-        "text": "The Crown offered the Ninth amnesty for any deserter who reported by spring; it is autumn, {playerName}, and they keep the petitions in their packs like souvenirs. An unfiled petition is a confession with better penmanship. Put down twelve deserters and recover six petitions. I file posthumously.",
-        "completion": "Six petitions, filed, stamped, and annotated deceased. The amnesty ledger balances either way, {playerName}; the Empire is flexible about which column you die in.",
+        "title": "Las listas de amnistía",
+        "text": "La Corona ofreció amnistía a la Novena para cualquier desertor que se presentara antes de la primavera; estamos en otoño, {playerName}, y guardan las peticiones en los petates como recuerdos. Una petición sin presentar es una confesión con mejor caligrafía. Abate a doce desertores y recupera seis peticiones. Yo archivo a título póstumo.",
+        "completion": "Seis peticiones, archivadas, selladas y anotadas como difunto. El libro de la amnistía cuadra de ambas maneras, {playerName}; el Imperio es flexible sobre en qué columna mueres.",
         "objectives": {
           "0": {
-            "label": "Broken Legion Deserter slain"
+            "label": "Desertor de la Legión Rota abatido"
           },
           "1": {
-            "label": "Unfiled Amnesty Petition"
+            "label": "Petición de amnistía sin presentar"
           }
         }
       },
       "q_sutlers_kettles": {
-        "title": "Fort-Pattern Kettles",
-        "text": "When the Ninth mutinied they looted my predecessor down to the kettles, {playerName}: fort-pattern, triple-riveted, inventory items every one. I am contractually short ten kettles and the garrison is short its soup. Take them back from the deserter camps; dented is acceptable, absent is not.",
-        "completion": "Six kettles, dents and all, back on the manifest. The soup resumes tonight and my ledger closes clean for the first time this quarter. You have fed a fort, {playerName}, one line item at a time.",
+        "title": "Marmitas de patrón del fuerte",
+        "text": "Cuando la Novena se amotinó, saqueó a mi predecesor hasta las marmitas, {playerName}: patrón del fuerte, triple remache, artículos de inventario todas y cada una. Estoy contractualmente corta de diez marmitas y la guarnición está corta de sopa. Recupéralas de los campamentos de desertores; abolladas es aceptable, ausentes no.",
+        "completion": "Seis marmitas, abolladuras incluidas, de vuelta en el manifiesto. La sopa se reanuda esta noche y mi libro cierra limpio por primera vez en el trimestre. Has dado de comer a un fuerte, {playerName}, línea a línea.",
         "objectives": {
           "0": {
-            "label": "Broken Legion Deserter slain"
+            "label": "Desertor de la Legión Rota abatido"
           },
           "1": {
-            "label": "Fort-Pattern Kettle"
+            "label": "Marmita de patrón del fuerte"
           }
         }
       },
       "q_interest_on_arrears": {
-        "title": "Interest on Arrears",
-        "text": "Every arbalist on that wall still draws stolen pay from the chests the Ninth carried off. I am garnishing it, {playerName}, at the rate of one pouch per corpse, which is the only rate they have honored yet. Twelve arbalists; bring me six pouches for the recovery account.",
-        "completion": "Six pouches, short-counted exactly as I expected: they were stealing from each other too. The recovery account grows, {playerName}, and arrears plus interest is a sum the Empire never forgets.",
+        "title": "Intereses de demora",
+        "text": "Cada ballestero de ese muro sigue cobrando paga robada de los cofres que se llevó la Novena. La estoy embargando, {playerName}, a razón de una bolsa por cadáver, que es la única tarifa que han honrado hasta la fecha. Doce ballesteros; tráeme seis bolsas para la cuenta de recuperación.",
+        "completion": "Seis bolsas, con la cuenta corta exactamente como esperaba: también se robaban entre ellos. La cuenta de recuperación crece, {playerName}, y atrasos más intereses es una suma que el Imperio jamás olvida.",
         "objectives": {
           "0": {
-            "label": "Broken Legion Arbalist slain"
+            "label": "Ballestero de la Legión Rota abatido"
           },
           "1": {
-            "label": "Garnished Pay Pouch"
+            "label": "Bolsa de paga embargada"
           }
         }
       },
       "q_terrace_undermining": {
-        "title": "Undermined",
-        "text": "The granite churns out of Ironhold have begun grinding through the deep terraces below my east wall, and a fort with no footing is a very orderly pile of stones, {playerName}. Break twelve of them and pull five cores from the fault line. My engineers want proof the ground has stopped arguing.",
-        "completion": "Five cores, and the engineers pronounce the east wall boring again, which from engineers is high praise. The fort stands on paperwork and bedrock, {playerName}; you have secured the second one.",
+        "title": "Socavados",
+        "text": "Los elementales de granito salidos de Fortaleza Férrea han empezado a moler las terrazas profundas bajo mi muro este, y un fuerte sin cimientos es un montón de piedras muy ordenado, {playerName}. Quiebra a doce y arranca cinco núcleos de la línea de falla. Mis ingenieros quieren pruebas de que el suelo ha dejado de discutir.",
+        "completion": "Cinco núcleos, y los ingenieros declaran que el muro este vuelve a ser aburrido, lo que viniendo de ingenieros es un gran elogio. El fuerte se sostiene sobre papeleo y lecho de roca, {playerName}; tú has asegurado el segundo.",
         "objectives": {
           "0": {
-            "label": "Granite Churn Elemental slain"
+            "label": "Elemental de granito agitado abatido"
           },
           "1": {
-            "label": "Fault Line Core"
+            "label": "Núcleo de la línea de falla"
           }
         }
       },
       "q_duelling_permits": {
-        "title": "Unstamped Permits",
-        "text": "House Maren duels on imperial ground without stamped permits: they call it honor, and the fee schedule calls it forty silver a bout, {playerName}. Their blades have declined every summons my clerks delivered. Deliver the next ten summonses yourself and collect five unstamped permits as exhibits.",
-        "completion": "Five permits, unstamped, each one a fine the estate will pay with interest. House Maren is about to discover that honor is taxable, {playerName}. Everything is, eventually.",
+        "title": "Permisos sin sellar",
+        "text": "La Casa Maren se bate en duelo en suelo imperial sin permisos sellados: ellos lo llaman honor, y el arancel lo llama cuarenta platas por asalto, {playerName}. Sus hojas han declinado todas las citaciones que entregaron mis escribientes. Entrega tú las diez próximas citaciones y recoge cinco permisos sin sellar como prueba documental.",
+        "completion": "Cinco permisos, sin sellar, cada uno una multa que la hacienda de la Casa pagará con intereses. La Casa Maren está a punto de descubrir que el honor tributa, {playerName}. Tarde o temprano, tributa cuanto existe.",
         "objectives": {
           "0": {
-            "label": "House Maren Duelist slain"
+            "label": "Duelista de la Casa Maren abatido"
           },
           "1": {
-            "label": "Unstamped Duelling Permit"
+            "label": "Permiso de duelo sin sellar"
           }
         }
       },
       "q_boundary_survey": {
-        "title": "The Boundary Survey",
-        "text": "House Maren has moved its boundary stones three fields into imperial land, and their duelists stand on the new line daring my surveyors to object. I object, {playerName}. Walk the survey line and remove twelve of the objections; the stones go back where the map says.",
-        "completion": "The line surveyed, the stones returned, the objections withdrawn from the record. House Maren keeps what the map grants and not one furrow more, {playerName}. The map is the Empire's oldest weapon.",
+        "title": "El deslinde",
+        "text": "La Casa Maren ha movido sus mojones tres campos hacia dentro de tierra imperial, y sus duelistas se plantan en la nueva línea desafiando a mis agrimensores a objetar. Yo objeto, {playerName}. Recorre la línea del deslinde y elimina doce de las objeciones; los mojones vuelven a donde dice el mapa.",
+        "completion": "La línea deslindada, los mojones devueltos, las objeciones retiradas del registro. La Casa Maren se queda con lo que el mapa le concede y ni un surco más, {playerName}. El mapa es el arma más antigua del Imperio.",
         "objectives": {
           "0": {
-            "label": "House Maren Duelist slain"
+            "label": "Duelista de la Casa Maren abatido"
           }
         }
       },
       "q_the_unremitted_assessor": {
-        "title": "The Unremitted Assessor",
-        "text": "Assessor Maldrek died on his collection route forty years ago and has not let that interrupt his rounds, {playerName}. He assesses travelers at swordpoint and issues receipts no office honors; the complaints file is two drawers now. His commission is revoked. Take witnesses when you deliver the revocation: he audits back.",
-        "completion": "The revocation delivered and the route closed after forty years of unauthorized collection. His receipts go to the archive as curiosities, {playerName}. Even death answers to the tax office; it merely files late.",
+        "title": "El tasador irremitido",
+        "text": "El tasador Maldrek murió en su ruta de cobro hace cuarenta años y no ha dejado que eso interrumpa sus rondas, {playerName}. Tasa a los viajeros a punta de espada y emite recibos que ninguna oficina honra; el expediente de quejas ya ocupa dos cajones. Su comisión queda revocada. Lleva testigos cuando entregues la revocación: él audita de vuelta.",
+        "completion": "La revocación entregada y la ruta cerrada tras cuarenta años de cobro no autorizado. Sus recibos van al archivo como curiosidades, {playerName}. Hasta la muerte responde ante la oficina fiscal; simplemente presenta tarde.",
         "objectives": {
           "0": {
-            "label": "Assessor Maldrek the Unremitted slain"
+            "label": "Tasador Maldrek el Irremitido abatido"
           }
         }
       },
       "q_arrears_in_kind": {
-        "title": "Arrears in Kind",
-        "text": "The Ninth cannot repay what it stole; the coin is spent on ogres and the ogres are spent on us, {playerName}. Fine. The Crown accepts payment in kind: twelve of their hired ogres and twelve of the oathguard who spent the money. Debt collection is a blunt instrument this far north.",
-        "completion": "Twenty-four entries in the recovery ledger, paid in the only currency the Ninth has left, {playerName}. The account is not settled: but it is, for the first time, current.",
+        "title": "Atrasos en especie",
+        "text": "La Novena no puede devolver lo que robó; la moneda está gastada en ogros y los ogros están gastados en nosotros, {playerName}. Bien. La Corona acepta el pago en especie: doce de sus ogros a sueldo y doce de la guardia del juramento que gastó el dinero. El cobro de deudas es un instrumento romo tan al norte.",
+        "completion": "Veinticuatro asientos en el libro de recuperación, pagados en la única moneda que le queda a la Novena, {playerName}. La cuenta no está saldada: pero está, por primera vez, al día.",
         "objectives": {
           "0": {
-            "label": "Sellsword Ogre slain"
+            "label": "Ogro mercenario abatido"
           },
           "1": {
-            "label": "Legion Oathguard Veteran slain"
+            "label": "Veterano de la Guardia del Juramento abatido"
           }
         }
       },
       "q_report_to_rimeshaft": {
-        "title": "Report to Rimeshaft",
-        "text": "The Rimeshaft camp digs silver above the snow line and files casualty reports faster than ore returns, {playerName}. The foreman holds standing authority to hire anything that survives the road. Report to Foreman Ulla at the camp below the Frosthelm Ascent, and mind the wendigo: they are not on the payroll.",
-        "completion": "Ledgerwatch sends help that walked the snow road alone; good. The last three hires arrived as a search expense. You are on the books as of this shift, {playerName}.",
+        "title": "Preséntate en Pozo Escarcha",
+        "text": "El campamento de Pozo Escarcha extrae plata por encima de la línea de nieve y presenta partes de bajas más deprisa que retornos de mineral, {playerName}. La capataz tiene autoridad permanente para contratar a cualquier cosa que sobreviva al camino. Preséntate ante la capataz Ulla en el campamento bajo el Ascenso de Yelmo de Escarcha, y cuidado con los wendigos: no están en nómina.",
+        "completion": "Guardacuentas manda ayuda que recorrió sola el camino de nieve; bien. Las tres últimas contrataciones llegaron como gasto de búsqueda. Estás en los libros desde este turno, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Report to Foreman Ulla"
+            "label": "Preséntate ante la capataz Ulla"
           }
         }
       },
       "q_rimeclaw_denning": {
-        "title": "Denning Season",
-        "text": "Rimeclaw are denning in the spoil heaps, {playerName}, and a den in the spoil is a mauling on every shift change. The claims office classifies them as weather, which means no bounty, which is why I am paying you out of the tool budget. Twelve of them, before the denning finishes.",
-        "completion": "Twelve, and the shift bell rings without a scream for the first time in a month. The tool budget mourns, {playerName}, but shovels are cheaper than shovelers.",
+        "title": "Temporada de guaridas",
+        "text": "Las zarpas de escarcha están haciendo guarida en las escombreras, {playerName}, y una guarida en la escombrera es un zarpazo en cada cambio de turno. La oficina de concesiones las clasifica como clima, lo que significa que no hay recompensa, y por eso te pago del presupuesto de herramientas. Doce, antes de que terminen las guaridas.",
+        "completion": "Doce, y la campana de turno suena sin un grito por primera vez en un mes. El presupuesto de herramientas está de luto, {playerName}, pero las palas salen más baratas que los paleros.",
         "objectives": {
           "0": {
-            "label": "Frosthelm Rimeclaw slain"
+            "label": "Zarpa de escarcha de Yelmo de Escarcha abatida"
           }
         }
       },
       "q_tallow_ledger": {
-        "title": "The Tallow Ledger",
-        "text": "The candle tax makes wax dearer than silver up here, so the lamps burn rimeclaw tallow, which the tax schedule has not discovered yet, {playerName}. Do not enlighten it. Ten rimeclaw, six good renderings of tallow, and the night shift keeps its light at a price the books can bear.",
-        "completion": "Six renderings, clean-burning, entered in the ledger as miscellaneous fats, {playerName}. If the tax office ever learns to read a mine ledger we are all ruined; happily, it never has.",
+        "title": "El libro del sebo",
+        "text": "El impuesto de las velas hace que aquí arriba la cera cueste más que la plata, así que las lámparas queman sebo de zarpa de escarcha, que el arancel todavía no ha descubierto, {playerName}. No lo ilustres. Diez zarpas de escarcha, seis buenas fundiciones de sebo, y el turno de noche conserva su luz a un precio que los libros pueden soportar.",
+        "completion": "Seis fundiciones, de llama limpia, asentadas en el libro como grasas varias, {playerName}. Si la oficina fiscal aprende algún día a leer un libro de mina, estamos todos arruinados; por suerte, nunca ha aprendido.",
         "objectives": {
           "0": {
-            "label": "Frosthelm Rimeclaw slain"
+            "label": "Zarpa de escarcha de Yelmo de Escarcha abatida"
           },
           "1": {
-            "label": "Rimeclaw Tallow"
+            "label": "Sebo de zarpa de escarcha"
           }
         }
       },
       "q_marrow_for_the_kettles": {
-        "title": "Marrow for the Kettles",
-        "text": "The kettles want marrow, the miners want soup with a history of meat in it, and the rimeclaw want the miners, {playerName}. I propose we reverse the arrangement. Twelve rimeclaw, seven marrowbones, and the mess line stops writing letters home about the broth.",
-        "completion": "Seven marrowbones in the kettles and the broth achieves what the manual calls nutritive integrity, {playerName}. Morale is up two points. I measure it in second helpings.",
+        "title": "Tuétano para las marmitas",
+        "text": "Las marmitas piden tuétano, los mineros piden una sopa con historial de carne, y las zarpas de escarcha piden mineros, {playerName}. Propongo invertir el arreglo. Doce zarpas de escarcha, siete huesos de tuétano, y la fila del rancho deja de escribir cartas a casa sobre el caldo.",
+        "completion": "Siete huesos de tuétano en las marmitas y el caldo alcanza lo que el manual llama integridad nutritiva, {playerName}. La moral sube dos puntos. La mido en segundas raciones.",
         "objectives": {
           "0": {
-            "label": "Frosthelm Rimeclaw slain"
+            "label": "Zarpa de escarcha de Yelmo de Escarcha abatida"
           },
           "1": {
-            "label": "Rimeclaw Marrowbone"
+            "label": "Hueso de tuétano de zarpa de escarcha"
           }
         }
       },
       "q_quarter_end_closing": {
-        "title": "Quarter-End Closing",
-        "text": "The quarter closes in six days and three signatures are missing: the castellan at Ledgerwatch, the foreman at Rimeshaft, and the assayer beside her, {playerName}. The post road eats couriers lately, and attestations do not sign themselves. Collect all three, in person; the Empire stopped accepting seals by pigeon after the incident.",
-        "completion": "Three attestations, on time, in order. The north closes its quarter and the capital has nothing to complain about, which will not stop it, {playerName}. You have my thanks and the ledger's, and the ledger's is worth more.",
+        "title": "Cierre de trimestre",
+        "text": "El trimestre cierra en seis días y faltan tres firmas: el castellano de Guardacuentas, la capataz de Pozo Escarcha y el ensayador junto a ella, {playerName}. El camino de postas se come a los correos últimamente, y las certificaciones no se firman solas. Reúne las tres, en persona; el Imperio dejó de aceptar sellos por paloma después del incidente.",
+        "completion": "Tres certificaciones, a tiempo, en orden. El norte cierra su trimestre y la capital no tiene nada de qué quejarse, lo que no la detendrá, {playerName}. Tienes mi agradecimiento y el del libro, y el del libro vale más.",
         "objectives": {
           "0": {
-            "label": "Collect the Ledgerwatch attestation"
+            "label": "Reúne la certificación de Guardacuentas"
           },
           "1": {
-            "label": "Collect the Rimeshaft attestation"
+            "label": "Reúne la certificación de Pozo Escarcha"
           },
           "2": {
-            "label": "Collect the assay attestation"
+            "label": "Reúne la certificación del ensaye"
           }
         }
       },
       "q_the_oathguard": {
-        "title": "The Oathguard",
-        "text": "What is left of the Ninth's discipline stands in plate around the redoubt: the oathguard, the veterans who chose Vaelis over the Empire twice, {playerName}. Sentence was passed on them with their commander. Break twelve out of that line; no one reaches Vaelis through a wall that holds.",
-        "completion": "Twelve veterans down and the redoubt line thins. They were the best soldiers the Ninth had, {playerName}, which is precisely the charge against them.",
+        "title": "La Guardia del Juramento",
+        "text": "Lo que queda de la disciplina de la Novena forma con placas alrededor del reducto: la Guardia del Juramento, los veteranos que eligieron a Vaelis por encima del Imperio dos veces, {playerName}. Su sentencia se dictó junto con la de su comandante. Abre doce brechas en esa línea; nadie llega hasta Vaelis a través de un muro que aguanta.",
+        "completion": "Doce veteranos caídos y la línea del reducto clarea. Eran los mejores soldados que tuvo la Novena, {playerName}, que es precisamente el cargo en su contra.",
         "objectives": {
           "0": {
-            "label": "Legion Oathguard Veteran slain"
+            "label": "Veterano de la Guardia del Juramento abatido"
           }
         }
       },
       "q_oathguard_plate": {
-        "title": "Oathbroken Plate",
-        "text": "The oathguard wear imperial plate, forged on this bench before they disgraced it, {playerName}. Plate does not desert; it merely needs new owners. Twelve veterans, six salvageable sections, and I will hammer the shame of the Ninth back into the service of the Empire.",
-        "completion": "Six sections, my own maker's marks still under the soot. Refit and reissued, they will guard better men, {playerName}. Steel holds no grudges; that is what smiths are for.",
+        "title": "Placas perjuras",
+        "text": "La Guardia del Juramento viste placas imperiales, forjadas en este banco antes de deshonrarlo, {playerName}. Las placas no desertan; solo necesitan nuevos dueños. Doce veteranos, seis secciones aprovechables, y devolveré a martillazos la vergüenza de la Novena al servicio del Imperio.",
+        "completion": "Seis secciones, con mis propias marcas de forja aún bajo el hollín. Reajustadas y reexpedidas, protegerán a hombres mejores, {playerName}. El acero no guarda rencores; para eso están los herreros.",
         "objectives": {
           "0": {
-            "label": "Legion Oathguard Veteran slain"
+            "label": "Veterano de la Guardia del Juramento abatido"
           },
           "1": {
-            "label": "Oathguard Plate Scrap"
+            "label": "Fragmento de placas de la Guardia del Juramento"
           }
         }
       },
       "q_cold_store_restock": {
-        "title": "The Cold Store",
-        "text": "Rimeshaft eats by roster, and the roster says the cold store holds three weeks of meat; the cold store disagrees, {playerName}. Icehowler haunch freezes well and runs down its own delivery. Twelve howlers, eight haunches, and my inventory returns to a fiction the auditors will accept.",
-        "completion": "Eight haunches racked and the roster is honest again, or near enough for government work, {playerName}. The camp eats, the books balance, and nobody asks what miscellaneous protein means.",
+        "title": "La cámara fría",
+        "text": "Pozo Escarcha come por lista, y la lista dice que la cámara fría guarda tres semanas de carne; la cámara fría discrepa, {playerName}. El pernil de aullador de hielo congela bien y persigue su propia entrega. Doce aulladores, ocho perniles, y mi inventario regresa a una ficción que los auditores aceptarán.",
+        "completion": "Ocho perniles colgados y la lista vuelve a ser honrada, o lo bastante para trabajo de gobierno, {playerName}. El campamento come, los libros cuadran y nadie pregunta qué significa proteína varia.",
         "objectives": {
           "0": {
-            "label": "Frosthelm Icehowler slain"
+            "label": "Aullador de hielo de Yelmo de Escarcha abatido"
           },
           "1": {
-            "label": "Icehowler Haunch"
+            "label": "Pernil de aullador de hielo"
           }
         }
       },
       "q_clear_the_galleries": {
-        "title": "Clear the Galleries",
-        "text": "When shaft three breached, wendigo moved into the east galleries like relatives who heard about the space, {playerName}. The shoring crews will not go down while anything in the dark eats faster than they timber. Clear twelve out of the workings; the mountain owes me a shift.",
-        "completion": "The galleries echo with hammers again instead of teeth, {playerName}. The crews are timbering as we speak, and the mountain resumes paying its taxes in silver.",
+        "title": "Despejad las galerías",
+        "text": "Cuando el pozo tres se abrió, los wendigos se mudaron a las galerías del este como parientes que se enteraron de que sobraba sitio, {playerName}. Las cuadrillas de apuntalado no bajarán mientras algo en la oscuridad coma más deprisa de lo que ellas entiban. Despeja doce de las labores; la montaña me debe un turno.",
+        "completion": "Las galerías vuelven a resonar con martillos y no con dientes, {playerName}. Las cuadrillas están entibando mientras hablamos, y la montaña reanuda el pago de sus impuestos en plata.",
         "objectives": {
           "0": {
-            "label": "Frosthelm Wendigo slain"
+            "label": "Wendigo de Yelmo de Escarcha abatido"
           }
         }
       },
       "q_rimebound_breach": {
-        "title": "The Rimebound Breach",
-        "text": "Shaft three broke into blue ice that walks, {playerName}: rimebound, the miners call them, and the claims office calls them a geological event to avoid paying hazard rates. My instruments call them ambulatory assets. Reduce twelve to a measurable state.",
-        "completion": "Twelve, reduced and measured. The hazard is reclassified from event to expense, {playerName}, and expenses can be budgeted. Science advances one line item at a time.",
+        "title": "La brecha de la escarcha",
+        "text": "El pozo tres se abrió a hielo azul que camina, {playerName}: los ceñidos por la escarcha, los llaman los mineros, y la oficina de concesiones los llama fenómeno geológico para no pagar plus de peligro. Mis instrumentos los llaman activos ambulantes. Reduce doce a un estado mensurable.",
+        "completion": "Doce, reducidos y medidos. El peligro se reclasifica de fenómeno a gasto, {playerName}, y los gastos se pueden presupuestar. La ciencia avanza línea a línea.",
         "objectives": {
           "0": {
-            "label": "Rimebound Elemental slain"
+            "label": "Elemental ceñido por la escarcha abatido"
           }
         }
       },
       "q_core_ice_assay": {
-        "title": "The Core Ice Assay",
-        "text": "The rimebound carry cores of ice older than the Empire, which the Empire finds presumptuous, {playerName}. The assay office wants six cores: intact, cold, and weighed before they melt into ordinary water and lose all fiscal interest. Twelve rimebound should yield that.",
-        "completion": "Six cores, weighed at altitude, sealed in the cold box. Preliminary finding: the mountain has been hoarding assets for ten thousand years, {playerName}. The audit of the Frosthelm is going to be considerable.",
+        "title": "El ensaye del hielo de núcleo",
+        "text": "Los ceñidos por la escarcha llevan núcleos de hielo más viejos que el Imperio, cosa que el Imperio encuentra presuntuosa, {playerName}. La oficina de ensayes quiere seis núcleos: intactos, fríos y pesados antes de que se fundan en agua corriente y pierdan cualquier interés fiscal. Doce ceñidos deberían rendir eso.",
+        "completion": "Seis núcleos, pesados en altura, sellados en la caja fría. Conclusión preliminar: la montaña lleva diez mil años acaparando activos, {playerName}. La auditoría del Yelmo de Escarcha va a ser considerable.",
         "objectives": {
           "0": {
-            "label": "Rimebound Elemental slain"
+            "label": "Elemental ceñido por la escarcha abatido"
           },
           "1": {
-            "label": "Rimebound Core Ice"
+            "label": "Núcleo de hielo ceñido por la escarcha"
           }
         }
       },
       "q_rimebound_quench": {
-        "title": "The Glacier Quench",
-        "text": "A blade quenched in glacier ice takes an edge that laughs at winter, or so swears every smith north of the pass, {playerName}. The Rimeshaft breach put walking glaciers within reach for the first time in my career. Ten rimebound, six unmelted cores of quench ice, packed fast.",
-        "completion": "The quench hisses like an argument and the edge comes out singing, {playerName}. The old smiths were right, which I will admit exactly once, in writing, in this ledger nobody reads.",
+        "title": "El temple del glaciar",
+        "text": "Una hoja templada en hielo de glaciar toma un filo que se ríe del invierno, o eso jura cada herrero al norte del paso, {playerName}. La brecha de Pozo Escarcha puso glaciares andantes a mi alcance por primera vez en mi carrera. Diez ceñidos por la escarcha, seis núcleos de hielo de temple sin fundir, embalados rápido.",
+        "completion": "El temple silba como una discusión y el filo sale cantando, {playerName}. Los viejos herreros tenían razón, cosa que admitiré exactamente una vez, por escrito, en este libro que nadie lee.",
         "objectives": {
           "0": {
-            "label": "Rimebound Elemental slain"
+            "label": "Elemental ceñido por la escarcha abatido"
           },
           "1": {
-            "label": "Glacial Quench Ice"
+            "label": "Hielo de temple glacial"
           }
         }
       },
       "q_purse_warden_grulk": {
-        "title": "The Purse-Warden",
-        "text": "The ogres keep the Ninth's pay chest with a warden called Grulk, who never mastered counting but has fully mastered sitting on a box, {playerName}. That box is imperial bullion, and bullion is assay business. Bring companions: Grulk weighs more than his arithmetic.",
-        "completion": "The chest recovered, the warden retired, the bullion under seal for the capital. Final count: the Ninth stole exactly what Grulk failed to count, to the last coin, {playerName}. There is a lesson in that for somebody.",
+        "title": "El Guardabolsas",
+        "text": "Los ogros custodian el cofre de la paga de la Novena con un guardián llamado Grulk, que nunca dominó el contar pero domina por completo el sentarse en una caja, {playerName}. Esa caja son lingotes imperiales, y los lingotes son asunto del ensaye. Trae compañeros: Grulk pesa más que su aritmética.",
+        "completion": "El cofre recuperado, el guardián jubilado, los lingotes bajo sello rumbo a la capital. Recuento final: la Novena robó exactamente lo que Grulk no supo contar, hasta la última moneda, {playerName}. Ahí hay una lección para alguien.",
         "objectives": {
           "0": {
-            "label": "Purse-Warden Grulk slain"
+            "label": "Guardabolsas Grulk abatido"
           }
         }
       },
       "q_shaft_three_reopens": {
-        "title": "Shaft Three Reopens",
-        "text": "Shaft three reopens on schedule, {playerName}, and the schedule does not care that the shaft is full of walking ice and hungry snow. Twelve rimebound, twelve wendigo, and the richest silver seam in the north goes back on the quarterly report where it belongs.",
-        "completion": "The seam is cut, the carts roll, and the quarterly report reads like a commendation, {playerName}. Rimeshaft remembers who reopened shaft three; more usefully, so does the payroll.",
+        "title": "El pozo tres reabre",
+        "text": "El pozo tres reabre según calendario, {playerName}, y al calendario no le importa que el pozo esté lleno de hielo andante y nieve hambrienta. Doce ceñidos por la escarcha, doce wendigos, y la veta de plata más rica del norte vuelve al informe trimestral, que es donde debe estar.",
+        "completion": "La veta cortada, las vagonetas ruedan y el informe trimestral se lee como una condecoración, {playerName}. Pozo Escarcha recuerda quién reabrió el pozo tres; más útil aún, la nómina también.",
         "objectives": {
           "0": {
-            "label": "Rimebound Elemental slain"
+            "label": "Elemental ceñido por la escarcha abatido"
           },
           "1": {
-            "label": "Frosthelm Wendigo slain"
+            "label": "Wendigo de Yelmo de Escarcha abatido"
           }
         }
       },
       "q_apex_predation": {
-        "title": "Apex Predation",
-        "text": "The ridgeline has two apex predators this winter and the charter recognizes neither, {playerName}. Icehowlers hunt the passes, wendigo hunt the hunters, and my quota is somewhere underneath both. Cull twelve of each, and the mountain remembers who holds the charter.",
-        "completion": "Twelve and twelve, witnessed from the signal line. The passes hunt quiet, the quota stands filled, and the charter hangs where it always did, {playerName}: above everything else on the mountain.",
+        "title": "Depredación suprema",
+        "text": "La cresta tiene dos depredadores supremos este invierno y la carta de caza no reconoce a ninguno, {playerName}. Los aulladores de hielo cazan en los pasos, los wendigos cazan a los cazadores, y mi cupo está en algún lugar debajo de ambos. Elimina doce de cada, y la montaña recordará quién tiene la carta.",
+        "completion": "Doce y doce, atestiguado desde la línea de señales. Los pasos cazan en silencio, el cupo queda cubierto y la carta cuelga donde siempre, {playerName}: por encima de cuanto hay en la montaña.",
         "objectives": {
           "0": {
-            "label": "Frosthelm Icehowler slain"
+            "label": "Aullador de hielo de Yelmo de Escarcha abatido"
           },
           "1": {
-            "label": "Frosthelm Wendigo slain"
+            "label": "Wendigo de Yelmo de Escarcha abatido"
           }
         }
       },
       "q_the_norths_books": {
-        "title": "The North's Books",
-        "text": "Vaelis burned the Ninth's muster rolls, but soldiers are sentimental, {playerName}: the oathguard carry salvaged pages like relics. Those pages are the last evidence of who the Ninth was before it broke. Twelve veterans, six rolls, and the north's books close on the whole sorry legion.",
-        "completion": "Six rolls, scorched but legible, every name recoverable. The Ninth is fully accounted for at last, {playerName}: mustered, mutinied, and closed. The Empire audits its dead, and today the dead balance.",
+        "title": "Los libros del norte",
+        "text": "Vaelis quemó las listas de revista de la Novena, pero los soldados son sentimentales, {playerName}: la Guardia del Juramento lleva páginas rescatadas como reliquias. Esas páginas son la última prueba de quién fue la Novena antes de romperse. Doce veteranos, seis listas, y los libros del norte se cierran sobre toda esa legión lamentable.",
+        "completion": "Seis listas, chamuscadas pero legibles, cada nombre recuperable. La Novena queda al fin contabilizada por completo, {playerName}: alistada, amotinada y cerrada. El Imperio audita a sus muertos, y hoy los muertos cuadran.",
         "objectives": {
           "0": {
-            "label": "Legion Oathguard Veteran slain"
+            "label": "Veterano de la Guardia del Juramento abatido"
           },
           "1": {
-            "label": "Salvaged Muster Roll"
+            "label": "Lista de revista rescatada"
           }
         }
       },
@@ -11590,19 +11590,19 @@ export const es_ES: EnTranslations = {
             "label": "Loma de la Tormenta de Polvo"
           },
           "8": {
-            "label": "Baldíos de Vientohueso"
+            "label": "La Sede Hundida"
           },
           "9": {
-            "label": "Terraza de los Jueces"
+            "label": "La Corte Cenicienta"
           },
           "10": {
-            "label": "Judges' Terrace"
+            "label": "Terraza de los Jueces"
           },
           "11": {
-            "label": "Bonewind Barrens"
+            "label": "Baldíos de Vientohueso"
           },
           "12": {
-            "label": "Last Water"
+            "label": "Última Agua"
           }
         }
       },
@@ -11641,13 +11641,13 @@ export const es_ES: EnTranslations = {
             "label": "El Último Refugio"
           },
           "10": {
-            "label": "Mothfall Verge"
+            "label": "Linde de Caepolillas"
           },
           "11": {
-            "label": "The Greyweir"
+            "label": "El Azud Gris"
           },
           "12": {
-            "label": "The Longwatch"
+            "label": "La Larga Vigilia"
           }
         }
       },
@@ -11683,10 +11683,10 @@ export const es_ES: EnTranslations = {
             "label": "Ascenso de Yelmo de Escarcha"
           },
           "9": {
-            "label": "Fort Ledgerwatch"
+            "label": "Fuerte Guardacuentas"
           },
           "10": {
-            "label": "Rimeshaft Camp"
+            "label": "Campamento de Pozo Escarcha"
           }
         }
       },

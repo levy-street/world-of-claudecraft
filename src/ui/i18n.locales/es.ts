@@ -5537,8 +5537,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.zones.ossara_domain.pois.5.label': 'Tumbas de los Sin Nombre',
   'entities.zones.ossara_domain.pois.6.label': 'Oasis del Espejismo',
   'entities.zones.ossara_domain.pois.7.label': 'Loma de la Tormenta de Polvo',
-  'entities.zones.ossara_domain.pois.8.label': 'Baldíos de Vientohueso',
-  'entities.zones.ossara_domain.pois.9.label': 'Terraza de los Jueces',
+  'entities.zones.ossara_domain.pois.8.label': 'La Sede Hundida',
+  'entities.zones.ossara_domain.pois.9.label': 'La Corte Cenicienta',
   'entities.mobs.duskmane_stalker.name': 'Acechador crinocaso',
   'entities.mobs.palefang_the_silent.name': 'Colmillo Pálido el Silencioso',
   'entities.mobs.palewidow_weaver.name': 'Tejedora viuda pálida',
@@ -5938,6 +5938,948 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Seis vales, contrafirmados y legibles. Las provisiones que amparan acabaron en barrigas de ogro, pero una pérdida certificada es una pérdida que el Imperio repone. El Ascenso come, {playerName}, porque el papeleo sobrevivió.',
   'entities.quests.q_stores_for_the_ascent.objectives.0.label': 'Ogro mercenario abatido',
   'entities.quests.q_stores_for_the_ascent.objectives.1.label': 'Vale de requisa de mercenario',
+  'entities.quests.q_stalkers_return.title': 'Los acechadores regresan',
+  'entities.quests.q_stalkers_return.text':
+    'Doce muertos, y la cresta hierve más espesa que el día en que empezaste, {playerName}. Las bestias no se lanzan contra un muro por hambre. Algo en la cresta alta las empuja hacia abajo, y hasta que sepa qué es, la matanza no se detiene. Catorce más.',
+  'entities.quests.q_stalkers_return.completion':
+    'Catorce más, y aun así mis patrullas cuentan huellas frescas cada mañana. Mi exploradora volvió de la cresta alta blanca como la línea de nieve: huellas del tamaño de un escudo, dice, y presas viejas que ningún acechador dejaría atrás. Lo que camina ahí arriba no es un felino corriente.',
+  'entities.quests.q_stalkers_return.objectives.0.label': 'Acechador de la cresta abatido',
+  'entities.quests.q_stalker_cloaks.title': 'Capas para la guardia',
+  'entities.quests.q_stalker_cloaks.text':
+    'Ocho pieles forraron las capas de los oficiales, y ahora todos los soldados del muro quieren lo mismo, {playerName}. Hacen bien en quererlo: el invierno se lleva primero los dedos y jamás pide perdón. Diez pieles más de las crestas al sur de la puerta, y toda la guardia dormirá caliente.',
+  'entities.quests.q_stalker_cloaks.completion':
+    'Diez buenas pieles, gruesas como las que más... no, mira estas, {playerName}. Desgarradas, la mitad, y no por hoja ni lanza. Marcas de garra anchas como mi mano, a través del pelaje de invierno. Algo en esa cresta está destrozando a los de su propia especie.',
+  'entities.quests.q_stalker_cloaks.objectives.0.label': 'Piel de acechador de la cresta',
+  'entities.quests.q_old_cragmaw.title': 'El viejo Cragmaw',
+  'entities.quests.q_old_cragmaw.text':
+    'La gente de la montaña le puso nombre a las huellas que encontró mi exploradora: el viejo Cragmaw, un tirano de pelaje cosido a cicatrices que ha sobrevivido a tres generaciones de su propia manada. Es la razón de que los acechadores inunden mi camino, {playerName}. Su guarida está en la cresta oeste, sobre el camino del sur. Llévate a un compañero y acaba con ese viejo demonio.',
+  'entities.quests.q_old_cragmaw.completion':
+    'Abatido, por fin. La gente de la montaña juraba que ese felino sobreviviría al propio muro. Los acechadores se quedarán en sus nieves altas, {playerName}, y mis patrullas caminarán el camino sin sangrar por él. Toda la cresta está más tranquila gracias a tu trabajo.',
+  'entities.quests.q_old_cragmaw.objectives.0.label': 'Viejo Cragmaw abatido',
+  'entities.quests.q_three_banners.title': 'Los tres estandartes',
+  'entities.quests.q_three_banners.text':
+    'Esta isla se te ha quedado pequeña, {playerName}. Tres Voces esperan en el Salón de los Emisarios, camino del norte arriba: el Imperio, la Confederación, el Dominio. Escucha a las tres antes de sopesar tu juramento. Ahí fuera la lealtad y la deuda son las únicas monedas, así que gasta las tuyas a sabiendas.',
+  'entities.quests.q_three_banners.completion':
+    'Has oído hablar a los tres estandartes. Cuando tu corazón se decida, la elección es solo tuya, y es permanente.',
+  'entities.quests.q_three_banners.objectives.0.label': 'Escucha a la Voz de Kael',
+  'entities.quests.q_three_banners.objectives.1.label': 'Escucha a la Voz de Veth',
+  'entities.quests.q_three_banners.objectives.2.label': 'Escucha a la Voz de Ossara',
+  'entities.quests.q_thornfen_palisade_defense.title': 'Defended la empalizada',
+  'entities.quests.q_thornfen_palisade_defense.text':
+    'El bosque espinoso pone a prueba nuestras estacas cada anochecer, {playerName}, y el Guardián Ilyen sostiene la línea solo. Ponte a su lado cuando dé la llamada: tres embestidas, y el bosque aprende la lección por una temporada.',
+  'entities.quests.q_thornfen_palisade_defense.completion':
+    'Tres embestidas rotas y el Guardián sigue en pie. El bosque se enfurruñará una noche o dos. Bien luchado, {playerName}.',
+  'entities.quests.q_thornfen_palisade_defense.objectives.0.label':
+    'Oleadas rechazadas junto al Guardián Ilyen',
+  'entities.quests.q_unlit_mother.title': 'La Madre de abajo',
+  'entities.quests.q_unlit_mother.text':
+    'Cada túnel que abren mis correos, la telaraña lo reclama antes del amanecer, {playerName}. La Madre bajo las Cárcavas no es una araña de campamento: alquila todas las hojas que puedas y bajad a por ella juntos.',
+  'entities.quests.q_unlit_mother.completion':
+    'Los túneles seguirán abiertos una temporada, entonces. No luchaste contra ella a solas, y esa es la única razón de que estés aquí para cobrar.',
+  'entities.quests.q_unlit_mother.objectives.0.label': 'Veskal abatida',
+  'entities.quests.q_the_mistfather.title': 'Lo que quiere la niebla',
+  'entities.quests.q_the_mistfather.text':
+    'La niebla se llevó a dos vecinos de los palafitos esta semana y devolvió sus faroles, pulidos, {playerName}. Nos está cortejando. Reúne a cuantos te deban un favor y enseñadle al Padre de la Niebla que las luces siguen encendidas.',
+  'entities.quests.q_the_mistfather.completion':
+    'La niebla clareó durante una campana entera después de que lo derribarais. La primera vez en treinta años. Los faroles siguen encendidos, {playerName}.',
+  'entities.quests.q_the_mistfather.objectives.0.label': 'Ghorvul abatido',
+  'entities.quests.q_gh_lurkers_below.title': 'Lo que tragan las Bocas',
+  'entities.quests.q_gh_lurkers_below.text':
+    'Las Bocas Hundidas al este se tragaron a tres correos este mes, {playerName}, y los acechadores solo escupen las botas. Ralea sus filas; el Pasaje Subterráneo no funciona a base de botas.',
+  'entities.quests.q_gh_lurkers_below.completion':
+    'Tres rutas reabiertas antes del amanecer. Sales más barato que los funerales, {playerName}, y lo digo como el mayor de los elogios.',
+  'entities.quests.q_gh_lurkers_below.objectives.0.label': 'Acechador de las cárcavas abatido',
+  'entities.quests.q_gh_gnaw_culling.title': 'Las Madrigueras Roídas',
+  'entities.quests.q_gh_gnaw_culling.text':
+    'Los roedores crían más deprisa de lo que se derrumban las madrigueras, {playerName}, y han empezado a masticar los puntales. Limpia las madrigueras al oeste del Descanso antes de que el techo se convierta en el suelo.',
+  'entities.quests.q_gh_gnaw_culling.completion':
+    'Los puntales aguantarán otra temporada. Los roedores no te lo agradecerán; tampoco morderán, que es el arreglo que prefiero.',
+  'entities.quests.q_gh_gnaw_culling.objectives.0.label': 'Roedor pálido abatido',
+  'entities.quests.q_gh_shale_hearts.title': 'La Galería de Esquisto',
+  'entities.quests.q_gh_shale_hearts.text':
+    'Algo despertó el esquisto en la galería profunda, {playerName}: la piedra camina, y la piedra que camina no respeta derechos de túnel. Quiebra a los elementales antes de que la galería se selle sola.',
+  'entities.quests.q_gh_shale_hearts.completion':
+    'La galería está en silencio y el equipo de prospección ha dejado de beber en horas de trabajo. Las victorias pequeñas se acumulan, {playerName}.',
+  'entities.quests.q_gh_shale_hearts.objectives.0.label': 'Elemental de esquisto profundo quebrado',
+  'entities.quests.q_gh_renegade_tolls.title': 'Peajes sin licencia',
+  'entities.quests.q_gh_renegade_tolls.text':
+    'Los renegados cobran peaje en túneles que no les pertenecen, {playerName}, lo cual me ofende profesionalmente. El Pasaje Subterráneo tiene exactamente un perista, y lo tienes delante. Corrígelos.',
+  'entities.quests.q_gh_renegade_tolls.completion':
+    'Los ingresos por peaje bajan y el contrabando honrado sube. Las Cárcavas te lo agradecen en la única moneda que respetan.',
+  'entities.quests.q_gh_renegade_tolls.objectives.0.label':
+    'Renegado del Pasaje Subterráneo abatido',
+  'entities.quests.q_gh_smuggler_king.title': 'El Rey Contrabandista',
+  'entities.quests.q_gh_smuggler_king.text':
+    'Vask se hace llamar ahora el Rey Contrabandista, {playerName}, y los reyes cobran impuestos a los peristas. Llévate amigos al Botín; Vask mantiene una corte, y las cortes ponen reparos al regicidio.',
+  'entities.quests.q_gh_smuggler_king.completion':
+    'Sin corona, sin rey, sin impuesto. El Botín se peleará por la sucesión durante un año, y los contrabandistas que se pelean son contrabandistas baratos.',
+  'entities.quests.q_gh_smuggler_king.objectives.0.label': 'Vask el Rey Contrabandista abatido',
+  'entities.quests.q_tf_creeper_pruning.title': 'Temporada de poda',
+  'entities.quests.q_tf_creeper_pruning.text':
+    'Las reptadoras echan raíces cada anochecer más cerca de las estacas, {playerName}. Los guardas lo llaman temporada de poda, que es humor de patíbulo: poda doce antes de que ellas nos poden a nosotros.',
+  'entities.quests.q_tf_creeper_pruning.completion':
+    'Doce tocones y la línea de la empalizada aguanta. Aquí fuera la temporada de poda no termina nunca; solo cambia de manos.',
+  'entities.quests.q_tf_creeper_pruning.objectives.0.label':
+    'Reptadora del Pantano Espinoso podada',
+  'entities.quests.q_tf_stag_bolts.title': 'El Bosque que Camina',
+  'entities.quests.q_tf_stag_bolts.text':
+    'Los ciervos del Bosque que Camina ya no son ciervos, {playerName}: la espina los monta como una silla. Abátelos al oeste de la empalizada, y no sigas las cornamentas hacia la espesura profunda.',
+  'entities.quests.q_tf_stag_bolts.completion':
+    'Ocho bestias liberadas de la única manera que quedaba para liberarlas. Los guardas apuntan tu cuenta en el poste de la puerta; el bosque la apunta en otra parte.',
+  'entities.quests.q_tf_stag_bolts.objectives.0.label': 'Ciervo deformado por espinas abatido',
+  'entities.quests.q_tf_briarfather.title': 'El Padre Zarzal',
+  'entities.quests.q_tf_briarfather.text':
+    'Cada espina de esta ciénaga crece de una sola raíz, {playerName}, y la raíz tiene nombre: el Padre Zarzal, en lo hondo de la espesura. Trae hojas de confianza. Nadie poda al Padre Zarzal a solas.',
+  'entities.quests.q_tf_briarfather.completion':
+    'La espesura enmudeció la hora en que cayó. No durará, pero una hora de silencio en el Pantano Espinoso es una deuda que los guardas no olvidan.',
+  'entities.quests.q_tf_briarfather.objectives.0.label': 'Tejo Padre Zarzal talado',
+  'entities.quests.q_ip_raider_toll.title': 'El peaje del asaltante',
+  'entities.quests.q_ip_raider_toll.text':
+    'Los asaltantes de los riscos cobran su propio peaje en sangre y carga, {playerName}, y la mía es la única caseta con licencia de este paso. Reduce la competencia.',
+  'entities.quests.q_ip_raider_toll.completion':
+    'El tráfico sube, los gritos bajan. El paso casi vuelve a pagarse solo, {playerName}.',
+  'entities.quests.q_ip_raider_toll.objectives.0.label': 'Asaltante del paso abatido',
+  'entities.quests.q_ip_ogre_toll.title': 'El Peaje del Ogro',
+  'entities.quests.q_ip_ogre_toll.text':
+    'Los peajeros del risco se sientan en la revuelta este y cobran carros enteros, {playerName}. Un ogro con modelo de negocio sigue siendo un ogro. Ejecuta su hipoteca.',
+  'entities.quests.q_ip_ogre_toll.completion':
+    'La revuelta es transitable y los ogros no retienen más embargos. Escribo esta frase en el libro de cuentas con auténtico placer.',
+  'entities.quests.q_ip_ogre_toll.objectives.0.label': 'Ogro peajero del risco derribado',
+  'entities.quests.q_ip_wyvern_eyries.title': 'El problema de los nidos',
+  'entities.quests.q_ip_wyvern_eyries.text':
+    'Los guivernos anidan sobre el paso alto y han aprendido cómo suena una mula de carga, {playerName}. Sube a los nidos y hazles olvidar la lección.',
+  'entities.quests.q_ip_wyvern_eyries.completion':
+    'El cielo sobre el paso vuelve a ser solo cielo. Las mulas de todas partes duermen más tranquilas, y sus dueños también.',
+  'entities.quests.q_ip_wyvern_eyries.objectives.0.label': 'Guiverno de la cresta derribado',
+  'entities.quests.q_ip_warlord.title': 'Skarn domina el paso',
+  'entities.quests.q_ip_warlord.text':
+    'El señor de la guerra Skarn ha unificado los riscos, {playerName}, que es exactamente tan malo como suena. Un paso unificado le responde a él, no a la Casa de Peaje. Reúne una compañía y disuelve el arreglo.',
+  'entities.quests.q_ip_warlord.completion':
+    'Skarn cae y los riscos recuerdan que se odian entre sí. Los asaltantes divididos son un fenómeno del clima; unidos eran un asedio.',
+  'entities.quests.q_ip_warlord.objectives.0.label': 'Señor de la guerra Skarn abatido',
+  'entities.quests.q_ev_leech_burning.title': 'Sanguijuelas a la luz del farol',
+  'entities.quests.q_ev_leech_burning.text':
+    'Las sanguijuelas trepan por los pilotes de noche y beben a través de las tablas del suelo, {playerName}. Quémalas fuera de los bajíos mientras los faroles aún alcancen.',
+  'entities.quests.q_ev_leech_burning.completion':
+    'Los palafitos llevan una semana sin sangrar, puede que dos. Aquí fuera eso cuenta como festival.',
+  'entities.quests.q_ev_leech_burning.objectives.0.label': 'Sanguijuela de Velo de Ascuas quemada',
+  'entities.quests.q_ev_bloat_popping.title': 'El problema de los hinchados',
+  'entities.quests.q_ev_bloat_popping.text':
+    'Los hinchados llegan a la deriva desde los bajíos y revientan contra los pilotes, {playerName}, y aquello EN LO QUE revientan se come la madera. Reviéntalos a distancia, contra el viento, con mi bendición.',
+  'entities.quests.q_ev_bloat_popping.completion':
+    'Los pilotes sobrevivirán a la temporada. Hueles fatal, {playerName}, y lo digo con gratitud.',
+  'entities.quests.q_ev_bloat_popping.objectives.0.label': 'Hinchado de Velo de Ascuas reventado',
+  'entities.quests.q_ev_wraith_lights.title': 'Luces falsas',
+  'entities.quests.q_ev_wraith_lights.text':
+    'Los espectros han empezado a llevar luces, {playerName}: faroles falsos que sacan a los caminantes de la calzada y los llevan hasta los zancudos. Apaga a los espectros y a los zancudos por igual; la niebla solo tiene derecho a un truco a la vez.',
+  'entities.quests.q_ev_wraith_lights.completion':
+    'Esta noche, solo luces verdaderas en la calzada. Lo que sea que le enseña sus trucos a la niebla necesitará un nuevo plan de estudios.',
+  'entities.quests.q_ev_wraith_lights.objectives.0.label': 'Espectro de la niebla apagado',
+  'entities.quests.q_ev_wraith_lights.objectives.1.label': 'Zancudo del fango abatido',
+  'entities.quests.q_ev_colossus.title': 'Lo que camina el Muro de Niebla',
+  'entities.quests.q_ev_colossus.text':
+    'Algo del tamaño de un granero camina el Muro de Niebla con la marea baja, {playerName}, y la niebla se pliega a su alrededor como una cortina. Llévate una cuadrilla de faroles al completo. Nunca ha reparado en nosotros; sé la razón de que no vuelva a hacerlo.',
+  'entities.quests.q_ev_colossus.completion':
+    'El Muro de Niebla tiene un inquilino menos. Los palafitos beben a tu salud esta noche, que es el mayor honor que imprimimos.',
+  'entities.quests.q_ev_colossus.objectives.0.label': 'Coloso de Velo de Ascuas derribado',
+  'entities.quests.q_ev_bridge_report.title': 'Aviso para la Vigía del Puente',
+  'entities.quests.q_ev_bridge_report.text':
+    'La Vigía del Puente pregunta por la niebla como quien pregunta por el tiempo, {playerName}, y esta temporada la respuesta honrada es: peor. Sube mi informe por la calzada hasta el vivandero Ives, y no te apartes de las luces verdaderas.',
+  'entities.quests.q_ev_bridge_report.completion':
+    'Peor, dice. Ketta se queda corta; siempre lo ha hecho. Quédate un tiempo, {playerName}: el puente tiene trabajo para cualquiera a quien la niebla no haya podido retener.',
+  'entities.quests.q_ev_bridge_report.objectives.0.label': 'Informe entregado al vivandero Ives',
+  'entities.quests.q_pc_gull_bones.title': 'Picoteado e inquieto',
+  'entities.quests.q_pc_gull_bones.text':
+    'Los huesos del Alto de la Gaviota han dejado de quedarse quietos, {playerName}. Picoteados por las gaviotas, curtidos de sal y andando: el alto es un cementerio que olvidó sus modales. Recuérdaselos.',
+  'entities.quests.q_pc_gull_bones.completion':
+    'El alto yace en silencio y las gaviotas han vuelto a la carroña honrada. Eso es lo más parecido a la paz que vende el Cruce.',
+  'entities.quests.q_pc_gull_bones.objectives.0.label':
+    'Esqueleto picoteado por gaviotas sepultado',
+  'entities.quests.q_pc_drowned_banks.title': 'Las Riberas Ahogadas',
+  'entities.quests.q_pc_drowned_banks.text':
+    'El río devuelve lo que se lleva, {playerName}, tarde y con rabia. Los renacidos de las riberas oeste tiran de las amarras de la barcaza por la noche. Derríbalos y deja que el río se quede con sus muertos.',
+  'entities.quests.q_pc_drowned_banks.completion':
+    'Las amarras han aguantado todas las noches de esta semana. El río y yo volvemos a entendernos, gracias a ti.',
+  'entities.quests.q_pc_drowned_banks.objectives.0.label': 'Renacido de la ribera abatido',
+  'entities.quests.q_pc_bridge_cult.title': 'La congregación del puente',
+  'entities.quests.q_pc_bridge_cult.text':
+    'Los cultistas del Puente Pálido le rezan al propio puente, {playerName}, y últimamente el puente responde. Nadie cruza mientras la congregación oficia. Dispérsala, de forma permanente.',
+  'entities.quests.q_pc_bridge_cult.completion':
+    'El puente está vacío y la campana del cruce ha sonado por primera vez en un mes. Lo que sea que despertaron sigue escuchando; pisa con cuidado.',
+  'entities.quests.q_pc_bridge_cult.objectives.0.label': 'Cultista del puente dispersado',
+  'entities.quests.q_pc_pale_watchers.title': 'Los vigilantes pálidos',
+  'entities.quests.q_pc_pale_watchers.text':
+    'Los vigilantes se alzan donde cayó la congregación, {playerName}, y no parpadean porque no tienen con qué. Vigilan el puente esperando algo. Elimina al público.',
+  'entities.quests.q_pc_pale_watchers.completion':
+    'Esta noche nada vigila el puente salvo mis propios ojos cansados. Pienso mantenerlo así.',
+  'entities.quests.q_pc_pale_watchers.objectives.0.label': 'Vigilante pálido eliminado',
+  'entities.quests.q_pc_bridgekeeper.title': 'El Guardián del Puente',
+  'entities.quests.q_pc_bridgekeeper.text':
+    'Cada peaje que reunió el culto fue a parar bajo el pilar central, {playerName}, a la cosa que llamaban el Guardián del Puente. Domina el cruce desde antes de que la Vigía tuviera murallas. Trae una compañía; el puente elige quién cruza, y jamás nos ha elegido a nosotros.',
+  'entities.quests.q_pc_bridgekeeper.completion':
+    'El Cruce es nuestro por primera vez en memoria viva. El Guardián guardaba el puente; tú nos guardaste a nosotros. La diferencia importa.',
+  'entities.quests.q_pc_bridgekeeper.objectives.0.label': 'El Guardián del Puente derribado',
+  'entities.quests.q_ironpass_tollroad_escort.title': 'El peaje debe fluir',
+  'entities.quests.q_ironpass_tollroad_escort.text':
+    'El carretero Odom sube esta noche la plata del peaje por el paso, {playerName}, y los asaltantes conocen el horario mejor que mis propios escribientes. Camina junto al carro hasta la curva norte y tráelo de vuelta respirando.',
+  'entities.quests.q_ironpass_tollroad_escort.completion':
+    'Odom llegó a la curva y la plata llegó a la caja fuerte. Los asaltantes se enfurruñarán, que es como me gustan.',
+  'entities.quests.q_ironpass_tollroad_escort.objectives.0.label':
+    'Carretero Odom escoltado paso arriba',
+  'entities.quests.q_hold_last_water.title': 'Defended Última Agua',
+  'entities.quests.q_hold_last_water.text':
+    'Las cuadrillas de Aguaocaso han dejado de tantear mis carros y han empezado a tantear el propio campamento, {playerName}. El guardapozo Nahir sostiene el borde norte del anillo, y lo sostiene solo. Da la voz cuando estés a su lado: tres embestidas bajan de las marcas, y quiero que el pozo siga aquí cuando terminen.',
+  'entities.quests.q_hold_last_water.completion':
+    'Tres embestidas rotas contra el anillo y Nahir sigue en pie. Las cuadrillas pasarán una temporada recontando lo que les costó esta noche, {playerName}; yo ya lo tengo en mi libro, hasta el último cobre.',
+  'entities.quests.q_hold_last_water.objectives.0.label':
+    'Embestidas rechazadas junto al guardapozo Nahir',
+  'entities.quests.q_the_water_walks.title': 'El agua camina',
+  'entities.quests.q_the_water_walks.text':
+    'Cada gota que bebe la Sede Hundida llega caminando a lomos de alguien, {playerName}, y el camino ha aprendido a morder las espaldas que la cargan: las piedras del templo recorren sus viejas rondas a través de él, y la herejía predica que una corte debe pasar sed. La portadora de agua Sitra acarrea hoy la ración de la Sede. No te separes de ella en el trayecto entero, y el agua llegará.',
+  'entities.quests.q_the_water_walks.completion':
+    'Sitra hizo señales desde la Sede antes del anochecer: la ración en los almacenes de Masut y sus propios pies aún debajo de ella. Eso es un buen día en este camino, {playerName}, y no lo regaló el camino; lo diste tú.',
+  'entities.quests.q_the_water_walks.objectives.0.label':
+    'Portadora de agua Sitra escoltada hasta la Sede Hundida',
+  'entities.quests.q_veth_hold_the_weir.title': 'Defended el azud',
+  'entities.quests.q_veth_hold_the_weir.text':
+    'El Último Refugio ha empezado a tantear mi azud, {playerName}: primero cuchillos sin gremio, para ver cuánto cuesta la puerta, y luego acero perjuro para ver quién lo paga. El alguacil Roskan sostiene la orilla norte y no tengo intención de reemplazarlo. Ponte a su lado cuando dé la orden: tres embestidas, y el Refugio dará el Azud Gris por mala inversión.',
+  'entities.quests.q_veth_hold_the_weir.completion':
+    'Tres embestidas tasadas, pagadas y devueltas al remitente, y Roskan sigue en pie en la puerta. El Refugio también lleva cuentas, {playerName}; esta noche anota una pérdida. El azud cobra su peaje a cuanto arrastra el río. Cuchillos incluidos.',
+  'entities.quests.q_veth_hold_the_weir.objectives.0.label':
+    'Oleadas rechazadas junto al alguacil Roskan',
+  'entities.quests.q_veth_ledger_run.title': 'La carrera del libro',
+  'entities.quests.q_veth_ledger_run.text':
+    'El libro del trimestre va al norte esta noche, {playerName}: cada peaje que ha cobrado el azud desde el deshielo, copiado en limpio y con destino a la caja fuerte de la Larga Vigilia. La mensajera Yeska lo lleva, y los sin gremio y sus socios contrabandistas preferirían que acabara en el río. Camina a su lado por el camino de sirga y procura que las páginas lleguen contando todavía.',
+  'entities.quests.q_veth_ledger_run.completion':
+    'Yeska firmó su llegada a la Larga Vigilia con todas las páginas en orden. En algún punto del camino del norte, varios inversores están aprendiendo que el robo quedó sin registrar porque quedó sin hacer. Esa aritmética salda tus honorarios, {playerName}.',
+  'entities.quests.q_veth_ledger_run.objectives.0.label':
+    'Mensajera Yeska escoltada por el camino del norte',
+  'entities.quests.q_rimeshaft_picket_defense.title': 'Defended el piquete',
+  'entities.quests.q_rimeshaft_picket_defense.text':
+    'El pozo tres dejó salir algo y la línea de nieve le mandó amigos, {playerName}. Bajan del Ascenso con cada campana de turno, y el Guardián Halvar sostiene el piquete norte solo, cosa que el libro de seguridad anota como un incidente pendiente. Ponte a su lado cuando toque el cambio de turno: tres embestidas, y las bocaminas siguen abiertas.',
+  'entities.quests.q_rimeshaft_picket_defense.completion':
+    'Tres embestidas rotas, el piquete en pie y el turno bajó a su hora, {playerName}. El libro de seguridad registra cero incidentes y un guardián con el permiso atrasado; en Pozo Escarcha a eso lo llamamos un buen día.',
+  'entities.quests.q_rimeshaft_picket_defense.objectives.0.label':
+    'Oleadas rechazadas junto al Guardián Halvar',
+  'entities.quests.q_ledgerwatch_payroll_escort.title': 'La paga va al norte',
+  'entities.quests.q_ledgerwatch_payroll_escort.text':
+    'La nómina de Pozo Escarcha llega tarde dos veces, {playerName}: una por el clima y otra por quien sea que sigue abriendo a mis correos. El porteador Fenn sube la caja fuerte por el Camino del Diezmo a la próxima campana. Camina a su lado hasta el mojón de Pozo Escarcha; la caja llega sellada, o alguien presenta un parte de pérdidas, y no seré yo.',
+  'entities.quests.q_ledgerwatch_payroll_escort.completion':
+    'Fenn llegó al mojón con el sello intacto, y los mineros cobran un trimestre que ya daban por perdido. El parte de pérdidas muere sin presentar, {playerName}, que es el final más amable que el papeleo le ofrece a nadie.',
+  'entities.quests.q_ledgerwatch_payroll_escort.objectives.0.label':
+    'Porteador Fenn escoltado por el Camino del Diezmo',
+  'entities.quests.q_the_sunken_seat.title': 'La Sede Hundida',
+  'entities.quests.q_the_sunken_seat.text':
+    'La fe ha reabierto la primera corte, {playerName}: un templo medio tragado por las dunas al norte de las tumbas, donde los jueces celebraban sesión antes de que Qesh Aram tuviera nombre. La juez Ivenna ocupa ahora la Sede. Ve al norte por el camino, preséntate y haz cuanto te pida como si te lo hubiera pedido yo.',
+  'entities.quests.q_the_sunken_seat.completion':
+    '¿Te envía Saphira? Entonces recuerda dónde empezó de verdad el Dominio. Bienvenido a la Sede Hundida, {playerName}; la arena entrega más trabajo del que tengo manos.',
+  'entities.quests.q_the_sunken_seat.objectives.0.label': 'Habla con la juez Ivenna',
+  'entities.quests.q_the_last_water.title': 'Última Agua',
+  'entities.quests.q_the_last_water.text':
+    'Pasada la Loma y la terraza queda un solo pozo antes de las piedras fronterizas de Veth, {playerName}, y cuanto mando al norte vive o muere por él. Yesfa dirige el campamento de Última Agua. Llévale mi sello y mis saludos, y cuidado con las dunas pasadas las tumbas; les han crecido dientes que no reconozco.',
+  'entities.quests.q_the_last_water.completion':
+    'El sello de Odai, y aún caliente del camino. Solo me envía a la gente que no puede permitirse perder, {playerName}, así que te gastaré con cuidado.',
+  'entities.quests.q_the_last_water.objectives.0.label': 'Habla con la maestra de caravanas Yesfa',
+  'entities.quests.q_stone_that_remembers.title': 'Piedra que recuerda',
+  'entities.quests.q_stone_that_remembers.text':
+    'Los centinelas que recorren la Sede Hundida están tallados en piedra de templo, {playerName}, y la piedra de templo conserva el filo como la memoria conserva un rencor. Quiebra a ocho y arráncame cinco piedras de guarda enteras. He esperado dos eras de la historia de otros para trabajar un material así.',
+  'entities.quests.q_stone_that_remembers.completion':
+    'Mira el grano: recuerda cada golpe que ha recibido. Lo que forje con esto tampoco olvidará los tuyos, {playerName}.',
+  'entities.quests.q_stone_that_remembers.objectives.0.label': 'Centinela del templo abatido',
+  'entities.quests.q_stone_that_remembers.objectives.1.label': 'Piedra de guarda intacta',
+  'entities.quests.q_glass_for_the_grindstone.title': 'Vidrio para la muela',
+  'entities.quests.q_glass_for_the_grindstone.text':
+    'Los colosos que caminan las dunas altas sangran fulgurita, {playerName}: rayo hecho sólido, más duro que cualquier piedra de afilar al sur de Kael. Los tramos sin quebrar son el premio. Tráeme siete, y no estés debajo del coloso cuando decida arrodillarse.',
+  'entities.quests.q_glass_for_the_grindstone.completion':
+    'Siete tramos, y ni una grieta. Mi muela cantará durante un año, {playerName}, y cada hoja de Qesh Aram te deberá su filo.',
+  'entities.quests.q_glass_for_the_grindstone.objectives.0.label': 'Fulgurita sin quebrar',
+  'entities.quests.q_water_for_the_seat.title': 'Agua para la Sede',
+  'entities.quests.q_water_for_the_seat.text':
+    'Los jueces han reabierto el viejo templo al norte de las tumbas, {playerName}, y las cortes beben como cualquiera. Masut las aprovisiona; él y yo tenemos un arreglo más viejo de lo que admiten sus libros. Sube el recuento del agua hasta la Sede Hundida y pónselo en las manos, no sobre la mesa.',
+  'entities.quests.q_water_for_the_seat.completion':
+    'El recuento de Neriah, de mano en mano, como a ella le gusta. La Sede bebe porque esa mujer no duerme jamás, {playerName}; recuérdalo cuando los jueces se lleven el mérito.',
+  'entities.quests.q_water_for_the_seat.objectives.0.label':
+    'Entrega el recuento al proveedor Masut',
+  'entities.quests.q_the_masks_answer.title': 'La respuesta de la máscara',
+  'entities.quests.q_the_masks_answer.text':
+    'He estudiado lo que Karn sacó a la superficie, {playerName}, y las marcas de su máscara funeraria no son escritura de tumba. Son escritura de archivo: los versos quemados, tallados por una mano viva. La canóniga Sahr, en la Sede Hundida, guarda lo que queda de ese archivo. Cuéntale lo que enterramos, y no se lo cuentes a nadie más en el camino.',
+  'entities.quests.q_the_masks_answer.completion':
+    'Escritura de archivo en la máscara de un excavador muerto... entonces alguien les enseñó los versos quemados a las tumbas, {playerName}. Temos hizo bien en susurrarlo. Nosotras también lo haremos.',
+  'entities.quests.q_the_masks_answer.objectives.0.label': 'Habla con la canóniga archivera Sahr',
+  'entities.quests.q_regalia_of_the_nameless.title': 'Insignias de los Sin Nombre',
+  'entities.quests.q_regalia_of_the_nameless.text':
+    'Saphira tiene sus sellos y yo mis tablillas, {playerName}, pero la primera corte llevaba una tercera insignia que ningún registro nombra: un sello llevado bajo las vestiduras, contra la piel. Da descanso a doce de los jueces de la terraza y regístralos en busca de cuatro. Fuera cual fuera el cargo que marcaba, el Dominio lo olvidó a propósito.',
+  'entities.quests.q_regalia_of_the_nameless.completion':
+    'Cuatro sellos, y todos miran hacia dentro, hacia quien los llevaba. No era un rango, entonces: una penitencia. La primera corte se juzgaba a sí misma con más dureza que a nadie, {playerName}, y pienso averiguar por qué.',
+  'entities.quests.q_regalia_of_the_nameless.objectives.0.label': 'Juez abandonado abatido',
+  'entities.quests.q_regalia_of_the_nameless.objectives.1.label': 'Sello de la Primera Corte',
+  'entities.quests.q_the_domain_endures.title': 'El Dominio perdura',
+  'entities.quests.q_the_domain_endures.text':
+    'El Tirano ha caído y el camino corre entero desde el paso del Desembarco hasta las piedras fronterizas, {playerName}, por primera vez en memoria viva. Mantenlo así una temporada más: barre a las manadas de los Baldíos y a los cuchillos de Aguaocaso de las últimas marcas. Ossara no celebra; perdura. Ayúdala a perdurar.',
+  'entities.quests.q_the_domain_endures.completion':
+    'Los clanes caminan los Baldíos y las caravanas caminan el camino, y nadie lo canta porque nada salió mal. Ese silencio es el mayor honor del Dominio, {playerName}. Llévalo puesto.',
+  'entities.quests.q_the_domain_endures.objectives.0.label': 'Devastador de Vientohueso abatido',
+  'entities.quests.q_the_domain_endures.objectives.1.label': 'Asaltante de Aguaocaso abatido',
+  'entities.quests.q_seat_of_the_first_court.title': 'Sede de la Primera Corte',
+  'entities.quests.q_seat_of_the_first_court.text':
+    'Reabrimos el templo, {playerName}, y el templo se dio cuenta. Los centinelas tallados para servir a la primera corte han tomado a los vivos por intrusos, y mis escribientes no pueden llevar un veredicto diez pasos sin que unas manos de piedra se cierren sobre ellos. Quiebra a diez centinelas entre aquí y la escalera inferior.',
+  'entities.quests.q_seat_of_the_first_court.completion':
+    'Diez menos, y la escalera guarda la paz esta mañana. La primera corte construía bien, {playerName}; ese es precisamente el problema de cuanto nos dejó.',
+  'entities.quests.q_seat_of_the_first_court.objectives.0.label': 'Centinela del templo abatido',
+  'entities.quests.q_wardens_rounds.title': 'Las rondas de la guardiana',
+  'entities.quests.q_wardens_rounds.text':
+    'Una corte no es un estrado, {playerName}; es toda la gente en la que el estrado se apoya. Haz mis rondas una vez para que la Sede conozca tu cara: escucha lo que la canóniga Sahr no pondrá por escrito, y deja que Masut te pese contra sus libros. Luego vuelve y dime cuál de los dos se quejó del otro primero.',
+  'entities.quests.q_wardens_rounds.completion':
+    'Sahr primero, y por el polvo de harina en las estanterías de su archivo. Ya conoces al gobierno entero de la Sede, {playerName}. Ahora puedes trabajar para él.',
+  'entities.quests.q_wardens_rounds.objectives.0.label': 'Habla con la canóniga archivera Sahr',
+  'entities.quests.q_wardens_rounds.objectives.1.label': 'Habla con el proveedor Masut',
+  'entities.quests.q_seal_the_vaults.title': 'Sellad las cámaras',
+  'entities.quests.q_seal_the_vaults.text':
+    'Los centinelas no vagan, {playerName}; patrullan, y cada ruta termina en una puerta de cámara que no nos hemos atrevido a abrir. Cada uno lleva un núcleo de guarda ligado a su ronda. Derriba a ocho más y tráeme seis núcleos intactos, y las cámaras seguirán selladas hasta que la corte esté lista para responder de lo que hay dentro.',
+  'entities.quests.q_seal_the_vaults.completion':
+    'Seis núcleos, seis puertas que siguen cerradas. No has sellado las cámaras, {playerName}; has sellado la discusión sobre ellas, que vale más.',
+  'entities.quests.q_seal_the_vaults.objectives.0.label': 'Centinela del templo abatido',
+  'entities.quests.q_seal_the_vaults.objectives.1.label': 'Núcleo de guarda de cámara',
+  'entities.quests.q_dust_to_dust.title': 'Polvo al polvo',
+  'entities.quests.q_dust_to_dust.text':
+    'Las sombras que suben de las tumbas llevan piedras de nombre, {playerName}: los nombres grabados a los que respondían en vida, desgastados en el camino de salida de la muerte. Los ritos no pueden volver a enterrar un alma sin su nombre. Da descanso a doce sombras en las sendas de las tumbas y tráeme cinco piedras aún legibles.',
+  'entities.quests.q_dust_to_dust.completion':
+    'Cinco nombres que la arena casi recupera. La corte los leerá en voz alta al anochecer, {playerName}, y cinco de los Sin Nombre dejarán de serlo.',
+  'entities.quests.q_dust_to_dust.objectives.0.label': 'Sombra ligada a la arena abatida',
+  'entities.quests.q_dust_to_dust.objectives.1.label': 'Piedra de nombre grabada',
+  'entities.quests.q_sentence_the_heretics.title': 'Sentenciad a los herejes',
+  'entities.quests.q_sentence_the_heretics.text':
+    'Los sacerdotes de arena de la Corte Cenicienta fueron juzgados en ausencia y sentenciados por escrito, {playerName}, y se comen los mandamientos cuando mis alguaciles los entregan. Muy bien. Entrega doce sentencias a la vieja usanza, y recupera cuatro mandamientos sin tragar para que el registro muestre que la paciencia de la corte se agotó conforme a la ley.',
+  'entities.quests.q_sentence_the_heretics.completion':
+    'Doce sentencias ejecutadas y cuatro mandamientos devueltos al archivo. La ley es lenta, {playerName}, pero aquí fuera también va armada. La Sede te agradece que seas ambas cosas.',
+  'entities.quests.q_sentence_the_heretics.objectives.0.label': 'Sacerdote de arena hereje abatido',
+  'entities.quests.q_sentence_the_heretics.objectives.1.label': 'Mandamiento del hereje',
+  'entities.quests.q_warden_of_the_buried_court.title': 'Guardián de la corte enterrada',
+  'entities.quests.q_warden_of_the_buried_court.text':
+    'Ashkerat fue tallado para defender la escalera del templo contra los profanos, {playerName}, y tras dos eras enterrado ha dictaminado que todos somos profanos, la corte incluida. No consentiré que la Sede viva asediada por su propio portero. Sube con compañeros a la escalera superior y derribad al Guardián; el veredicto ya está escrito.',
+  'entities.quests.q_warden_of_the_buried_court.completion':
+    'La escalera es nuestra hasta arriba por primera vez desde que llegó la arena. No tallaremos un sustituto, {playerName}. Algunos cargos deben quedar vacantes.',
+  'entities.quests.q_warden_of_the_buried_court.objectives.0.label': 'Ashkerat el Guardián abatido',
+  'entities.quests.q_the_living_court.title': 'La corte viva',
+  'entities.quests.q_the_living_court.text':
+    'Dos cortes reclaman este Dominio, {playerName}: la mía, que respira, y la de la terraza, que no. Mientras los jueces muertos celebren sesión, ningún veredicto de la Sede vale más allá de las tumbas. Sube a la terraza y levanta la sesión a doce de ellos. Que la arena se quede el mazo.',
+  'entities.quests.q_the_living_court.completion':
+    'Doce estrados vaciados en la terraza. La corte viva no celebra la muerte de la muerta, {playerName}, pero dormirá bastante mejor encima de ella.',
+  'entities.quests.q_the_living_court.objectives.0.label': 'Juez abandonado abatido',
+  'entities.quests.q_heresy_in_the_dunes.title': 'Herejía en las dunas',
+  'entities.quests.q_heresy_in_the_dunes.text':
+    'Al oeste del camino, {playerName}, antiguos sacerdotes del agua de esta misma fe han levantado una Corte Cenicienta y predican los versos que quemamos hace dos generaciones. Yo archivé esos fuegos personalmente. Elimina a doce de los sacerdotes de arena antes de que su congregación supere a la nuestra; el archivo prefiere sus herejías en pasado.',
+  'entities.quests.q_heresy_in_the_dunes.completion':
+    'Doce, y la corte de ceniza predica más bajo. La herejía nunca muere, {playerName}, solo se rearchiva. Pero rearchivada nos vale.',
+  'entities.quests.q_heresy_in_the_dunes.objectives.0.label': 'Sacerdote de arena hereje abatido',
+  'entities.quests.q_the_burned_creed.title': 'El credo quemado',
+  'entities.quests.q_the_burned_creed.text':
+    'Los sacerdotes llevan páginas del credo quemado copiadas con una letra que no reconozco, {playerName}, lo que significa que el archivo tiene una fuga o que la herejía tiene un escriba. Cualquiera de las dos respuestas me asusta. Tráeme ocho páginas lo bastante legibles para compararlas con los originales sellados.',
+  'entities.quests.q_the_burned_creed.completion':
+    'La letra no es nuestra ni suya... es más vieja que ambas, {playerName}. Una vez archivé esto como resuelto. No cometeré ese error dos veces.',
+  'entities.quests.q_the_burned_creed.objectives.0.label': 'Página del credo quemado',
+  'entities.quests.q_word_to_the_domain.title': 'Aviso al Dominio',
+  'entities.quests.q_word_to_the_domain.text':
+    'Lo que recuperaste viaja a Qesh Aram, {playerName}, en tu boca y en ningún otro sitio: la herejía tiene un escriba más viejo que la propia herejía. La juez Saphira guarda el camino; debe saber qué camina a su lado. Dilo llanamente, obsérvale la cara y no escribas nada de esto.',
+  'entities.quests.q_word_to_the_domain.completion':
+    '¿Sahr manda ahora sus miedos por mensajero...? Entonces son peores que sus cartas. Gracias por traer esto, {playerName}. El Dominio actuará, en silencio, como actúa el Dominio.',
+  'entities.quests.q_word_to_the_domain.objectives.0.label': 'Lleva el aviso a la juez Saphira',
+  'entities.quests.q_the_brand_cold.title': 'El hierro, frío',
+  'entities.quests.q_the_brand_cold.text':
+    'Cada converso al credo de ceniza queda marcado con un hierro de marcar, {playerName}, y todos los hierros salen del mismo molde madre. Reúne seis hierros y leeré las marcas del molde; las fundiciones llevan registros, y en los registros es donde las herejías van a ser atrapadas. Cógelos fríos. No les hagas el favor de probar el filo.',
+  'entities.quests.q_the_brand_cold.completion':
+    'Seis hierros, un molde, y el molde es obra del Dominio. Alguien dentro de la fe armó esta herejía, {playerName}, y ahora el archivo sabe dónde mirar.',
+  'entities.quests.q_the_brand_cold.objectives.0.label': 'Hierro de marcar hereje',
+  'entities.quests.q_embers_unanswered.title': 'Ascuas sin respuesta',
+  'entities.quests.q_embers_unanswered.text':
+    'Con el credo podíamos discutir, {playerName}. Los videntes de llamas están más allá de la discusión: el círculo interior lleva brasas del primer santuario quemado hacia el norte, hacia los riscos de la frontera, predicando que los Sin Nombre responden al fuego. Doce de ellos caminan esta noche por las dunas altas. Procura que su pregunta quede sin respuesta.',
+  'entities.quests.q_embers_unanswered.completion':
+    'Doce fuegos apagados en los riscos, y no llegó respuesta para ninguno. Quizá los Sin Nombre sean más sabios que su congregación, {playerName}. Quizá solo sean pacientes. Archiva ambas.',
+  'entities.quests.q_embers_unanswered.objectives.0.label': 'Vidente de llamas hereje abatido',
+  'entities.quests.q_censer_of_the_first_dawn.title': 'Incensario del Primer Alba',
+  'entities.quests.q_censer_of_the_first_dawn.text':
+    'Los videntes de llamas saquearon los incensarios del alba del primer santuario antes de que pudiéramos sellarlo, {playerName}: cuencos de bronce que sostenían el rito de la mañana cuando la fe aún tenía mañanas. Elimina a doce videntes más y recupera cinco incensarios. El archivo tiene una deuda con el primer alba, y pienso pagarla.',
+  'entities.quests.q_censer_of_the_first_dawn.completion':
+    'Cinco cuencos, y el hollín se limpia hasta mostrar entera la escritura del alba. Algunas cosas sobreviven a sus ladrones, {playerName}. El rito se cantará al amanecer, por primera vez en una era.',
+  'entities.quests.q_censer_of_the_first_dawn.objectives.0.label':
+    'Vidente de llamas hereje abatido',
+  'entities.quests.q_censer_of_the_first_dawn.objectives.1.label': 'Incensario del alba',
+  'entities.quests.q_bowls_of_the_court.title': 'Cuencos de la corte',
+  'entities.quests.q_bowls_of_the_court.text':
+    'Los centinelas llevan los cuencos de ofrendas en los que comía la primera corte, {playerName}, guardados en sus puños de piedra como si la comida aún estuviera por llegar. Los jueces quieren ceremonia; yo quiero vajilla. Tráeme seis cuencos sin romper y todos en la Sede tendremos lo que queremos, que aquí es más raro que la lluvia.',
+  'entities.quests.q_bowls_of_the_court.completion':
+    'Seis cuencos, más viejos que el Dominio y sin una mella. Los jueces los bendecirán y yo los llenaré, {playerName}, y esa es la fe entera funcionando como debe.',
+  'entities.quests.q_bowls_of_the_court.objectives.0.label': 'Cuenco de ofrendas del templo',
+  'entities.quests.q_the_rise_road.title': 'El camino de la Loma',
+  'entities.quests.q_the_rise_road.text':
+    'Mi harina y mi aceite de lámpara suben por el ramal oeste, pasada la Loma de la Tormenta de Polvo, {playerName}, y las tormentas han dado en recorrer el camino como si pagaran impuestos por él. Doce elementales se interponen entre la Sede y su próximo día de horneado. Dispérsalos dunas arriba.',
+  'entities.quests.q_the_rise_road.completion':
+    'Los trineos llegaron blancos de harina y no de polvo, que es el color correcto. La Sede come porque tú golpeaste primero, {playerName}. Yo registro esas deudas.',
+  'entities.quests.q_the_rise_road.objectives.0.label': 'Elemental de tormenta de polvo abatido',
+  'entities.quests.q_meat_for_the_seat.title': 'Carne para la Sede',
+  'entities.quests.q_meat_for_the_seat.text':
+    'La escritura alimenta el alma, {playerName}, y mis despensas alimentan lo demás, y las despensas están a base de sal y disculpas. El pernil de acechador se cura bien y viaja mejor. Tráeme ocho de las bestias de espejismo junto al oasis, y cuidado con el reflejo tembloroso; prefiero tener la carne y al cazador.',
+  'entities.quests.q_meat_for_the_seat.completion':
+    'Ocho perniles, buen peso, y sigues proyectando una sola sombra. El ahumadero trabaja esta noche, {playerName}, y mañana la corte discutirá por una vez con el estómago lleno.',
+  'entities.quests.q_meat_for_the_seat.objectives.0.label': 'Pernil de acechador',
+  'entities.quests.q_water_ledger.title': 'El libro del agua',
+  'entities.quests.q_water_ledger.text':
+    'Dos hombres mantienen vivo Última Agua además de mí, {playerName}: Ibbin, que vende el agua y cobra de menos a los desesperados cuando cree que no cuento, y Dhalen, que cabalga las dunas y solo miente sobre lo cerca que estuvo. Preséntate a ambos. Aquí fuera, ser conocido es la mitad de estar a salvo.',
+  'entities.quests.q_water_ledger.completion':
+    'Ibbin te dio un precio justo y Dhalen te tomó medidas para una tumba, lo que significa que les caes bien a los dos, {playerName}. Bienvenido al último campamento del camino.',
+  'entities.quests.q_water_ledger.objectives.0.label': 'Habla con el aguador Ibbin',
+  'entities.quests.q_water_ledger.objectives.1.label': 'Habla con el batidor Dhalen',
+  'entities.quests.q_bones_on_the_road.title': 'Huesos en el camino',
+  'entities.quests.q_bones_on_the_road.text':
+    'Las manadas de los Baldíos han aprendido el sonido de un eje cargado, {playerName}, y dejan un carro averiado en hueso brillante antes de que el carretero termine de maldecir. Pierdo más bueyes por los devastadores que por la sed, y la sed es el negocio entero de este campamento. Quiebra a doce en las marcas del este.',
+  'entities.quests.q_bones_on_the_road.completion':
+    'Doce, y mis carreteros informan de que las manadas vuelven a quedarse en los campos de huesos. El camino ya come bastante sin dientes encima, {playerName}.',
+  'entities.quests.q_bones_on_the_road.objectives.0.label': 'Devastador de Vientohueso abatido',
+  'entities.quests.q_the_barrens_toll.title': 'El peaje de los Baldíos',
+  'entities.quests.q_the_barrens_toll.text':
+    'Los clanes clavan tarjas de hueso de buey en los mojones por cada bestia que se llevan los Baldíos, {playerName}: su cuenta de lo que el camino le debe a la arena. Los devastadores se llevan las tarjas para roerlas. Elimina a diez más de las manadas y tráeme seis tarjas; yo saldo mis cuentas, incluso las supersticiosas.',
+  'entities.quests.q_the_barrens_toll.completion':
+    'Seis tarjas, de vuelta en los mojones antes del anochecer. Los clanes dirán que el camino pagó su peaje, {playerName}, y durante una temporada los Baldíos y yo estaremos de acuerdo en la aritmética.',
+  'entities.quests.q_the_barrens_toll.objectives.0.label': 'Devastador de Vientohueso abatido',
+  'entities.quests.q_the_barrens_toll.objectives.1.label': 'Tarja de peaje de hueso de buey',
+  'entities.quests.q_raiders_at_last_water.title': 'Asaltantes en Última Agua',
+  'entities.quests.q_raiders_at_last_water.text':
+    'Las cuadrillas de Aguaocaso fueron guardias de caravana, {playerName}; yo misma firmé algunos de sus contratos. Ahora trabajan las marcas secas al norte del campamento y desangran los carros que juraron custodiar. El sentimiento me mantuvo la mano cerrada demasiado tiempo. Ábrela: doce asaltantes fuera de mi camino.',
+  'entities.quests.q_raiders_at_last_water.completion':
+    'Doce, y dos de los nombres los conocía. No fingiré que no cuesta, {playerName}; solo te diré que los carros pasaron esta mañana intactos, y ese es el precio pagado donde puedo verlo.',
+  'entities.quests.q_raiders_at_last_water.objectives.0.label': 'Asaltante de Aguaocaso abatido',
+  'entities.quests.q_oathmarks_in_the_sand.title': 'Marcas de juramento en la arena',
+  'entities.quests.q_oathmarks_in_the_sand.text':
+    'Cada guardia que contraté llevaba una marca de juramento estampada con mi sello, {playerName}, y las cuadrillas de Aguaocaso aún llevan la suya mientras me roban bajo ella. Ese insulto no pienso cargarlo. Derriba a ocho más y tráeme seis marcas de juramento; pienso retirarlas de las listas con mi propio estilete.',
+  'entities.quests.q_oathmarks_in_the_sand.completion':
+    'Seis marcas, seis líneas tachadas del libro. Un juramento sobrevive al hombre que lo rompe, {playerName}, pero no sobrevive a la mujer que fue su testigo. Llévate su equipo; lo tienen confiscado.',
+  'entities.quests.q_oathmarks_in_the_sand.objectives.0.label': 'Asaltante de Aguaocaso abatido',
+  'entities.quests.q_oathmarks_in_the_sand.objectives.1.label': 'Marca de juramento de Aguaocaso',
+  'entities.quests.q_the_missing_manifests.title': 'Los manifiestos perdidos',
+  'entities.quests.q_the_missing_manifests.text':
+    'Los asaltantes se llevan las tarjas de peaje junto con la carga, {playerName}, y sin los manifiestos no puedo demostrar a los escribientes de la frontera qué cruzó y qué murió. Los escribientes de Veth suponen lo peor; es su oficio entero. Caza a diez asaltantes en las marcas del norte y trae de vuelta cinco tarjas con los sellos intactos.',
+  'entities.quests.q_the_missing_manifests.completion':
+    'Cinco sellos enteros, y el libro de la frontera cuadra por primer trimestre en un año. No tienes idea de lo que compra un libro cuadrado en una casa de peaje de Veth, {playerName}. Yo sí, y estoy agradecida.',
+  'entities.quests.q_the_missing_manifests.objectives.0.label': 'Asaltante de Aguaocaso abatido',
+  'entities.quests.q_the_missing_manifests.objectives.1.label': 'Tarja de peaje sellada',
+  'entities.quests.q_last_caravan_out.title': 'La última caravana',
+  'entities.quests.q_last_caravan_out.text':
+    'La última caravana de la temporada parte hacia el paso de la frontera con la primera luz, {playerName}: cuarenta almas, cada cuba de agua que puedo ceder y la mitad del diezmo del Dominio en la caja fuerte. Las cuadrillas de Aguaocaso conocen las tres cifras. Camina esta noche por delante de los carros y limpia las marcas; catorce asaltantes se interponen entre aquí y las piedras.',
+  'entities.quests.q_last_caravan_out.completion':
+    'Los batidores hicieron señales desde las piedras fronterizas al anochecer: cuarenta almas, contadas dos veces, {playerName}. No volverás a ver esa caravana, y nunca dejará de debértelo. Esa es la forma del trabajo aquí fuera.',
+  'entities.quests.q_last_caravan_out.objectives.0.label': 'Asaltante de Aguaocaso abatido',
+  'entities.quests.q_glass_that_walks.title': 'Vidrio que camina',
+  'entities.quests.q_glass_that_walks.text':
+    'Al norte de la Loma, las tormentas de rayos de dos eras fundieron las dunas en vidrio, {playerName}, y últimamente el vidrio se pone en pie. Los colosos beben los pozos profundos hasta secarlos y mi caballo no se acerca a una milla de ninguno. Derriba a diez para que las líneas de pozos al norte del campamento vuelvan a correr con agua.',
+  'entities.quests.q_glass_that_walks.completion':
+    'Diez montones de vidrio quieto, y los pozos del norte se están llenando. Pasé a mediodía junto a una de tus piezas, {playerName}; atrapaba el sol como una lámpara de araña. La cosa más bonita que he odiado nunca.',
+  'entities.quests.q_glass_that_walks.objectives.0.label': 'Coloso de vidrioduna abatido',
+  'entities.quests.q_the_unmapped_dunes.title': 'Las dunas sin cartografiar',
+  'entities.quests.q_the_unmapped_dunes.text':
+    'Mi mapa de las marcas del norte amanece equivocado cada mañana, {playerName}: los colosos apartan dunas enteras a hombros al caminar, y una ruta que entinté en primavera es un muro para la cosecha. No puedo trazar rodeos alrededor de tantas toneladas de vidrio en movimiento. Quiebra a doce más y la arena se estará quieta lo bastante para dibujarla.',
+  'entities.quests.q_the_unmapped_dunes.completion':
+    'Doce abajo, y esta mañana las dunas estaban donde las dejé. Un mapa que dice la verdad durante una temporada, {playerName}; aquí fuera esa es la diferencia entre un camino y un rumor.',
+  'entities.quests.q_the_unmapped_dunes.objectives.0.label': 'Coloso de vidrioduna abatido',
+  'entities.quests.q_spoor_of_the_tyrant.title': 'Rastro del Tirano',
+  'entities.quests.q_spoor_of_the_tyrant.text':
+    'Algo bajo los Baldíos mueve a las manadas de devastadores como una mano bajo una manta, {playerName}, y las manadas llevan sus vestigios en el buche: arena fundida en caliente, prensada de escamas. Los clanes lo llaman el Faucearena. Yo lo llamo un mapa que aún no he dibujado. Tráeme seis vestigios y trazaré dónde el suelo es una boca.',
+  'entities.quests.q_spoor_of_the_tyrant.completion':
+    'Seis vestigios, y el patrón es una espiral que se cierra sobre los Baldíos del este. Sea lo que sea el Faucearena, {playerName}, está rodeando algo, y ahora sabemos dónde. Cabalga lejos del centro hasta que vayas en serio.',
+  'entities.quests.q_spoor_of_the_tyrant.objectives.0.label': 'Vestigio fundido del Tirano',
+  'entities.quests.q_flameseers_on_the_bluffs.title': 'Videntes en los riscos',
+  'entities.quests.q_flameseers_on_the_bluffs.text':
+    'Hay fuegos en los riscos de las tumbas al este del camino todas las noches, {playerName}, y no son fuegos de clan; los clanes resguardan sus brasas del viento. Los videntes de llamas le predican a la oscuridad y la oscuridad se inclina a escuchar. Doce de ellos dominan los riscos. Quiero que las noches ahí fuera vuelvan a ser aburridas.',
+  'entities.quests.q_flameseers_on_the_bluffs.completion':
+    'Riscos a oscuras tres noches seguidas, {playerName}. Aburrido es la palabra más hermosa del informe de un batidor, y la escribiste tú.',
+  'entities.quests.q_flameseers_on_the_bluffs.objectives.0.label':
+    'Vidente de llamas hereje abatido',
+  'entities.quests.q_creeds_of_ash.title': 'Credos de ceniza',
+  'entities.quests.q_creeds_of_ash.text':
+    'Los videntes llevan su credo en tablillas ennegrecidas de ceniza, {playerName}, y la canóniga Sahr, en la Sede, paga tarifa de mensajero por cualquier cosa que la herejía ponga por escrito. Yo cabalgo demasiado rápido para jugar a bibliotecario. Saca siete credos de ceniza de los riscos y me encargaré de que viajen al sur con la próxima remesa de agua.',
+  'entities.quests.q_creeds_of_ash.completion':
+    'Siete tablillas, envueltas en lana como si mordieran. Sahr las leerá a la luz de la lámpara y se asustará a conciencia, {playerName}, que según me dicen es como dan las gracias los archiveros.',
+  'entities.quests.q_creeds_of_ash.objectives.0.label': 'Tablilla del credo de ceniza',
+  'entities.quests.q_two_knives.title': 'Dos cuchillos',
+  'entities.quests.q_two_knives.text':
+    'La frontera sangra por dos cuchillos, {playerName}: acero de Aguaocaso en el camino y fuego hereje en los riscos, y cada uno jura que sobrevivirá al otro. He dejado de preocuparme por quién tiene razón. Recorre conmigo las marcas del norte sobre el mapa y llévate a ocho de cada; el desierto puede arbitrar lo que quede.',
+  'entities.quests.q_two_knives.completion':
+    'Ocho y ocho, y durante una noche las marcas del norte no contuvieron más que viento. Dos cuchillos, un silencio, {playerName}. Acepto la aritmética.',
+  'entities.quests.q_two_knives.objectives.0.label': 'Asaltante de Aguaocaso abatido',
+  'entities.quests.q_two_knives.objectives.1.label': 'Vidente de llamas hereje abatido',
+  'entities.quests.q_the_first_cartographer.title': 'El Primer Cartógrafo',
+  'entities.quests.q_the_first_cartographer.text':
+    'Todos los mapas de este Dominio descienden de un único estudio, {playerName}, dibujado antes de que el Dominio tuviera nombre, y el agrimensor nunca dejó de caminar. Su sombra recorre el rincón lejano de los Baldíos con el original bajo el brazo, y deshace mis rutas con solo cruzarlas. Lleva compañeros, da descanso al Primer Cartógrafo y trae el mapa a casa.',
+  'entities.quests.q_the_first_cartographer.completion':
+    'Así que esta es la madre de cada línea que he dibujado... muestra agua donde están los Baldíos, {playerName}. O el mundo se movió o el mapa es paciente. Ambas ideas me quitarán el sueño durante años, y te agradezco cada una.',
+  'entities.quests.q_the_first_cartographer.objectives.0.label':
+    'Sombra del Primer Cartógrafo abatida',
+  'entities.quests.q_the_first_cartographer.objectives.1.label': 'El mapa del Primer Cartógrafo',
+  'entities.quests.q_the_maps_edge.title': 'El borde del mapa',
+  'entities.quests.q_the_maps_edge.text':
+    'El primer mapa pertenece a la fe, {playerName}, diga lo que diga mi mano sobre soltarlo. Llévalo al sur, a la juez Ivenna en la Sede Hundida; su corte celebraba sesión cuando esta tinta estaba fresca, y la Sede es la única cámara a la que se lo confío. Dile que el borde del mapa dice: aquí los jueces dejaron de contar.',
+  'entities.quests.q_the_maps_edge.completion':
+    'El primer estudio, en casa bajo el primer techo. Y la nota del margen es real: aquí los jueces dejaron de contar. No repetiremos ese error, {playerName}. La corte acepta el mapa, y la deuda.',
+  'entities.quests.q_the_maps_edge.objectives.0.label': 'Lleva el mapa a la juez Ivenna',
+  'entities.quests.q_the_taken_casks.title': 'Las cubas robadas',
+  'entities.quests.q_the_taken_casks.text':
+    'Aquí fuera los asaltantes no roban moneda, {playerName}; la moneda no se vierte. Se llevan mis cubas selladas, y cada cuba en su poder es una familia junto al pozo cuando llegue el invierno. Mata a ocho de las cuadrillas de Aguaocaso y trae de vuelta ocho cubas con la cera intacta. Agua vendida dos veces es agua robada una.',
+  'entities.quests.q_the_taken_casks.completion':
+    'Ocho cubas, sellos enteros, de vuelta en la casa fresca donde deben estar. Hoy no has cargado agua, {playerName}; has cargado el invierno. Pocos pueden decirlo.',
+  'entities.quests.q_the_taken_casks.objectives.0.label': 'Asaltante de Aguaocaso abatido',
+  'entities.quests.q_the_taken_casks.objectives.1.label': 'Cuba de agua sellada',
+  'entities.quests.q_hearts_of_duneglass.title': 'Corazones de vidrioduna',
+  'entities.quests.q_hearts_of_duneglass.text':
+    'Un coloso guarda un corazón de vidrio fundido, {playerName}, y el corazón sigue frío tres días después de que el cuerpo se detenga. Yo forro con ellos mis cisternas profundas y el agua se conserva dulce durante el pleno verano. Seis corazones sacarían a Última Agua de los meses secos. No fingiré que conseguirlos sea fácil.',
+  'entities.quests.q_hearts_of_duneglass.completion':
+    'Seis corazones, aún tan fríos que empañan una hoja. Las cisternas se conservarán dulces hasta las lluvias, {playerName}, y cada odre que venda este verano verterá un poco de tu trabajo.',
+  'entities.quests.q_hearts_of_duneglass.objectives.0.label': 'Corazón de vidrioduna',
+  'entities.quests.q_the_wells_between.title': 'Los pozos de en medio',
+  'entities.quests.q_the_wells_between.text':
+    'Entre aquí y las piedras fronterizas hay nueve pozos, {playerName}, y los colosos han bebido cuatro hasta el barro. Un pozo seco en ese tramo no es una molestia; es una tumba con cuerda. Quiebra a diez de los caminantes de vidrio en las líneas de pozos y devuélvele al suelo su agua.',
+  'entities.quests.q_the_wells_between.completion':
+    'Dos de los cuatro pozos ya rezuman de nuevo. Nueve pozos entre aquí y las piedras, {playerName}, y esta noche los nueve tienen una oportunidad. Esa es la forma entera de mi religión.',
+  'entities.quests.q_the_wells_between.objectives.0.label': 'Coloso de vidrioduna abatido',
+  'entities.quests.q_ash_in_the_wells.title': 'Ceniza en los pozos',
+  'entities.quests.q_ash_in_the_wells.text':
+    'Los videntes de llamas bendicen ahora mis líneas de pozos, {playerName}, si bendecir es la palabra: vierten viales de ascuas en el agua y llaman al vapor una plegaria atendida. Los pozos envenenados en el último tramo matan más callados que cualquier asaltante. Quítales seis viales a los videntes antes de que las plegarias lleguen al agua profunda.',
+  'entities.quests.q_ash_in_the_wells.completion':
+    'Seis viales, taponados y ahogados en arena donde no pueden predicarle a nadie. Los pozos corren limpios, {playerName}. Sea lo que sea lo que los Sin Nombre quieren de nosotros, me niego a creer que sean peregrinos hervidos.',
+  'entities.quests.q_ash_in_the_wells.objectives.0.label': 'Vial de ascuas',
+  'entities.quests.q_veth_quiet_introductions.title': 'Presentaciones discretas',
+  'entities.quests.q_veth_quiet_introductions.text':
+    'Cárcavanoche no ofrece visitas guiadas, {playerName}; ofrece presentaciones, una vez. La factor Ilvane corre con las deudas menores, Isyra Aguafría vende el acero silencioso y la auditora Cress cuenta lo que se lleva la oscuridad. Preséntate ante las tres. Después de eso, lo que llegues a ser aquí corre de tu cuenta.',
+  'entities.quests.q_veth_quiet_introductions.completion':
+    'Así que te han visto la cara y la han anotado. Tres libros de cuentas llevan ahora tu nombre, {playerName}. Procura que cada asiento a partir de este sea un haber.',
+  'entities.quests.q_veth_quiet_introductions.objectives.0.label': 'Conoce a la factor Ilvane',
+  'entities.quests.q_veth_quiet_introductions.objectives.1.label': 'Conoce a Isyra Aguafría',
+  'entities.quests.q_veth_quiet_introductions.objectives.2.label': 'Conoce a la auditora Cress',
+  'entities.quests.q_veth_moth_lamps.title': 'Polvo para las lámparas',
+  'entities.quests.q_veth_moth_lamps.text':
+    'Las polillas crepusculares bajan del Linde al anochecer y se comen mi aceite de lámpara hasta la mecha, {playerName}, y un puesto de mercado a oscuras no vende nada. Ralea unas diez y sacude de sus alas ocho medidas de polvo. Hay compradores para el polvo; no pregunto qué hacen con él.',
+  'entities.quests.q_veth_moth_lamps.completion':
+    'Aceite en las lámparas y polvo en los tarros: dos negocios servidos con un solo recado. Esa es la clase de aritmética que Cárcavanoche respeta, {playerName}.',
+  'entities.quests.q_veth_moth_lamps.objectives.0.label': 'Polilla crepuscular abatida',
+  'entities.quests.q_veth_moth_lamps.objectives.1.label': 'Polvo de ala de polilla',
+  'entities.quests.q_veth_verge_cull.title': 'Los dos lados del negocio',
+  'entities.quests.q_veth_verge_cull.text':
+    'Las polillas ponen en las Cárcavas de la Viuda Pálida y las viudas engordan con las polillas, {playerName}; dejado a su aire, el Linde no exporta más que apetito. Corta los dos lados de ese negocio: doce polillas, diez tejedoras. El Linde no necesita ser seguro, necesita ser rentable.',
+  'entities.quests.q_veth_verge_cull.completion':
+    'Los lotes de seda informan de que las cárcavas están más tranquilas y mi puesto conserva el género. Nadie llamará manso al Linde, pero vuelve a pagarse el sitio.',
+  'entities.quests.q_veth_verge_cull.objectives.0.label': 'Polilla crepuscular abatida',
+  'entities.quests.q_veth_verge_cull.objectives.1.label': 'Tejedora viuda pálida abatida',
+  'entities.quests.q_veth_towpath_census.title': 'El censo del camino de sirga',
+  'entities.quests.q_veth_towpath_census.text':
+    'Un censo, {playerName}: el camino de sirga al sur de la puerta aloja más viudas y escurridizos de los que permite mi último recuento, y una cosa sin contar es una cosa sin facturar. Reduce el excedente, diez de cada, y los libros volverán a coincidir con el camino. Veth solo es peligrosa donde es exacta.',
+  'entities.quests.q_veth_towpath_census.completion':
+    'Diez y diez, que es lo que decía el margen. El camino vuelve a coincidir con su propio papeleo, {playerName}. Te sorprendería lo poco que eso se cumple en nada.',
+  'entities.quests.q_veth_towpath_census.objectives.0.label': 'Tejedora viuda pálida abatida',
+  'entities.quests.q_veth_towpath_census.objectives.1.label': 'Escurridizo del río Negro abatido',
+  'entities.quests.q_veth_silt_eels.title': 'Las cuentas de las anguilas',
+  'entities.quests.q_veth_silt_eels.text':
+    'Los escurridizos pescan con red las anguilas de limo que yo ahúmo, y últimamente se quedan la captura, {playerName}. Diez escurridizos fuera de las orillas, y tráeme ocho anguilas de sus trampas ya que estás en el agua. Cuidado con el frío; yo vendo la cura, que es té.',
+  'entities.quests.q_veth_silt_eels.completion':
+    'Anguilas gordas, apenas magulladas. Colgarán del humo por la mañana y se venderán al mediodía. Los escurridizos pueden presentar su queja ante el río.',
+  'entities.quests.q_veth_silt_eels.objectives.0.label': 'Escurridizo del río Negro abatido',
+  'entities.quests.q_veth_silt_eels.objectives.1.label': 'Anguila de limo',
+  'entities.quests.q_veth_wake_fees.title': 'Tasas de estela',
+  'entities.quests.q_veth_wake_fees.text':
+    'Cada barcaza que pasa los Muelles paga una tasa de estela, {playerName}, y cada barcaza de este mes la ha pagado dos veces de más: a los escurridizos de los bajíos y a los fatuos que derivan desde la orilla del Bosque de los Fatuos. Los peajes en competencia son malos para la marca. Doce escurridizos, diez fatuos, y el río vuelve a tener un solo acreedor.',
+  'entities.quests.q_veth_wake_fees.completion':
+    'Los pilotos informan de agua limpia y de una única factura correcta. Has simplificado el río, {playerName}; simplificaré tus honorarios a juego: aquí están, íntegros.',
+  'entities.quests.q_veth_wake_fees.objectives.0.label': 'Escurridizo del río Negro abatido',
+  'entities.quests.q_veth_wake_fees.objectives.1.label': 'Fuego fatuo feral abatido',
+  'entities.quests.q_veth_greyweir_posting.title': 'El destino del Azud Gris',
+  'entities.quests.q_veth_greyweir_posting.text':
+    'El Azud Gris se asienta donde el río negro se estrecha al norte del lago, {playerName}, y su casa de peaje mantiene honrado el país de en medio. El maestro de peajes Hesk ocupa el destino y se le debe un par de manos capaces. Deja que la barquera Szel te cuente a bordo por el camino; registra cuanto cruza, y tú ahora eres algo que cruza.',
+  'entities.quests.q_veth_greyweir_posting.completion':
+    'Vael manda un cuchillo y lo llama escribiente. Bien; el azud necesita ambos. El río de en medio te parecerá menos paciente que el sur, {playerName}. Los salarios están en el tablón, y no los cobra nadie por adelantado.',
+  'entities.quests.q_veth_greyweir_posting.objectives.0.label':
+    'Haz que la barquera Szel te cuente',
+  'entities.quests.q_veth_ferry_dues.title': 'Tarifas de barcaza',
+  'entities.quests.q_veth_ferry_dues.text':
+    'Los ahogados salen del lago y suben a mi barcaza como pasajeros de pago, {playerName}, salvo que pagan con fichas viejas que la Confederación retiró hace treinta años. Devuelve a doce al agua y tráeme ocho fichas. Alguien río arriba está reemitiendo moneda muerta, y pienso saber quién.',
+  'entities.quests.q_veth_ferry_dues.completion':
+    'Fichas retiradas, reemitidas y empapadas. Se las pasaré a Hesk, que se las pasará a alguien cuyo nombre ninguno de los dos dice en voz alta. Tu pasaje está cubierto, {playerName}: ambos sentidos, una vez.',
+  'entities.quests.q_veth_ferry_dues.objectives.0.label': 'Ahogado del Lago Negro abatido',
+  'entities.quests.q_veth_ferry_dues.objectives.1.label': 'Ficha de barcaza empapada',
+  'entities.quests.q_veth_lantern_motes.title': 'Luz para el cruce',
+  'entities.quests.q_veth_lantern_motes.text':
+    'Una barcaza navega de noche o no navega, {playerName}, y mis faroles arden con luz de fatuo o con nada. Los fatuos ferales de la orilla del Bosque de los Fatuos llevan una mota más firme que cualquier vela. Diez fatuos eliminados y ocho motas sin romper; pago por lumen.',
+  'entities.quests.q_veth_lantern_motes.completion':
+    'Luz firme, fría como un precio justo. El cruce funcionará el mes entero con esto. El bosque puede pasarme la factura, si algún día aprende a escribir.',
+  'entities.quests.q_veth_lantern_motes.objectives.0.label': 'Fuego fatuo feral abatido',
+  'entities.quests.q_veth_lantern_motes.objectives.1.label': 'Mota de farol de barcaza',
+  'entities.quests.q_veth_weir_nets.title': 'Lo que deben las redes',
+  'entities.quests.q_veth_weir_nets.text':
+    'Las redes del azud atrapan cuanto el río nos debe, y dos veces por semana las subo cortadas, {playerName}. Los contrabandistas cortan desde arriba; los ahogados tiran desde abajo. Doce de los unos, diez de los otros, y mis redes subirán enteras y pesadas.',
+  'entities.quests.q_veth_weir_nets.completion':
+    'Redes enteras, libro lleno. El río encontrará nuevas maneras de escatimarle al azud, siempre lo hace, pero esta semana paga íntegro, {playerName}.',
+  'entities.quests.q_veth_weir_nets.objectives.0.label': 'Contrabandista de la Senda Feral abatido',
+  'entities.quests.q_veth_weir_nets.objectives.1.label': 'Ahogado del Lago Negro abatido',
+  'entities.quests.q_veth_mere_charter.title': 'Una carta para el embarcadero',
+  'entities.quests.q_veth_mere_charter.text':
+    'El lago cree que mi embarcadero le pertenece, {playerName}: los ahogados se llevan los pilotes, los fatuos se llevan los postes de los faroles, y cada mañana remo hasta allí y recupero la posesión de mi propia barcaza. He solicitado una carta que diga que el embarcadero es mío. Doce ahogados y diez fatuos son la tasa de solicitud.',
+  'entities.quests.q_veth_mere_charter.completion':
+    'El embarcadero amaneció vacío por primera vez desde el deshielo. Carta concedida, entonces, por la única autoridad que el lago respeta. Eres una tasa de solicitud considerable, {playerName}.',
+  'entities.quests.q_veth_mere_charter.objectives.0.label': 'Ahogado del Lago Negro abatido',
+  'entities.quests.q_veth_mere_charter.objectives.1.label': 'Fuego fatuo feral abatido',
+  'entities.quests.q_veth_unlicensed_ferry.title': 'La barcaza sin licencia',
+  'entities.quests.q_veth_unlicensed_ferry.text':
+    'En este río hay un solo cruce con licencia, {playerName}, y estoy de pie en él. Las bandas de la Senda Feral pasan pasajeros a pértiga por delante del azud a medianoche y llevan sus cuentas en cuerda anudada. Doce contrabandistas fuera del negocio, ocho nudos de cuenta como prueba; a la Confederación le gustan sus condenas contadas de antemano.',
+  'entities.quests.q_veth_unlicensed_ferry.completion':
+    'Cuerda anudada: contabilidad tosca, pero honrada, que es más de lo que puedo decir de la clientela. El comercio de medianoche se reanudará en una temporada. Tú también, supongo.',
+  'entities.quests.q_veth_unlicensed_ferry.objectives.0.label':
+    'Contrabandista de la Senda Feral abatido',
+  'entities.quests.q_veth_unlicensed_ferry.objectives.1.label': 'Nudo de cuenta de contrabandista',
+  'entities.quests.q_veth_forged_passes.title': 'Pases falsificados',
+  'entities.quests.q_veth_forged_passes.text':
+    'Ahora los supervivientes venden pases del azud falsificados, {playerName}: mi sello, mi firma, trazados por alguien que claramente no conoce ninguno de los dos. Un halago, y también delito de horca. Diez contrabandistas más, y retira de la circulación ocho falsificaciones antes de que algún necio honrado pague una a precio íntegro.',
+  'entities.quests.q_veth_forged_passes.completion':
+    'Buena mano, quienquiera que las trace; le ofrecería una plaza de escribiente si el puesto no fuera una soga. Las falsificaciones van al fuego y tus honorarios salen de él, {playerName}.',
+  'entities.quests.q_veth_forged_passes.objectives.0.label':
+    'Contrabandista de la Senda Feral abatido',
+  'entities.quests.q_veth_forged_passes.objectives.1.label': 'Pase del azud falsificado',
+  'entities.quests.q_veth_passage_sold.title': 'Pasaje, vendido',
+  'entities.quests.q_veth_passage_sold.text':
+    'Los sin gremio del camino del norte se han asociado con las bandas de la Senda Feral, {playerName}: acero sobre la orilla, botes debajo. Pasaje vendido más allá de mi azud, libre de peaje, a cualquiera con moneda y sin preguntas. Rompe la sociedad: doce degolladores, diez contrabandistas. Deja los restos donde puedan verlos sus próximos inversores.',
+  'entities.quests.q_veth_passage_sold.completion':
+    'El camino y el río informan ambos de una súbita falta de competidores. El Azud Gris te lo agradece con la única voz que tiene, {playerName}, que es el sonido de los peajes al pagarse.',
+  'entities.quests.q_veth_passage_sold.objectives.0.label': 'Degollador sin gremio abatido',
+  'entities.quests.q_veth_passage_sold.objectives.1.label':
+    'Contrabandista de la Senda Feral abatido',
+  'entities.quests.q_veth_turncoats_price.title': 'El precio del cambiacapas',
+  'entities.quests.q_veth_turncoats_price.text':
+    'Vessik llevaba los libros del gremio hasta que los vendió, {playerName}: cuatro compradores, un solo juego de cuentas y una quinta copia para él. Cuenta su moneda junto al azud bajo protección pagada y cree que el libro no puede alcanzarlo. Lleva compañeros; enseñó a matar a la mitad de este río, y la otra mitad le debe dinero.',
+  'entities.quests.q_veth_turncoats_price.completion':
+    'Entonces la quinta copia vuelve a casa y la cuenta se cierra al fin. El gremio no te lo agradecerá y los compradores tampoco, {playerName}. Yo sí, en voz baja, una vez: gracias. Es la última vez que se dice.',
+  'entities.quests.q_veth_turncoats_price.objectives.0.label': 'Vessik el Cambiacapas abatido',
+  'entities.quests.q_veth_stores_ledger.title': 'El libro de los almacenes',
+  'entities.quests.q_veth_stores_ledger.text':
+    'Cada lata de raciones de los almacenes de la casa de peaje está estampada y contada, {playerName}, y cuarenta de ellas se marcharon al lago con la última barcaza de suministros. Los ahogados no tienen uso para la cena; acaparan por costumbre. Diez de ellos saldados y ocho latas recuperadas, con los estampados legibles, o la oficina del intendente me factura a MÍ.',
+  'entities.quests.q_veth_stores_ledger.completion':
+    'Estampadas, abolladas y contabilizadas. Los almacenes cuadran, a la oficina se le niega su pequeño triunfo y tú cobras, {playerName}. Cada cual recibe lo que merece; qué rareza.',
+  'entities.quests.q_veth_stores_ledger.objectives.0.label': 'Ahogado del Lago Negro abatido',
+  'entities.quests.q_veth_stores_ledger.objectives.1.label': 'Lata de raciones hundida',
+  'entities.quests.q_veth_toll_scrip.title': 'Un segundo emisor',
+  'entities.quests.q_veth_toll_scrip.text':
+    'La Corte Silenciosa ha empezado a emitir sus propios vales de peaje en la orilla oeste, {playerName}: papel de un estado que no existe, honrado por viajeros demasiado asustados para discutir. El miedo es una moneda que la Confederación no licencia. Doce renacidos retirados, ocho vales fuera de circulación.',
+  'entities.quests.q_veth_toll_scrip.completion':
+    'Papel de una corte muerta, que aún conserva su valor por pura amenaza. Casi lo admiro. Al fuego va de todos modos, {playerName}; el Azud Gris no tolera un segundo emisor.',
+  'entities.quests.q_veth_toll_scrip.objectives.0.label': 'Renacido de la cárcava abatido',
+  'entities.quests.q_veth_toll_scrip.objectives.1.label': 'Vale de peaje de la cárcava',
+  'entities.quests.q_veth_dead_letters.title': 'Cartas muertas',
+  'entities.quests.q_veth_dead_letters.text':
+    'Los peajeros de la Corte llevan ahora correspondencia, {playerName}: cartas muertas entre la ruina y los campamentos sin gremio, concertando lo que solo puedo llamar comercio. La mitad viva de ese arreglo compra; la mitad muerta ejecuta. Acaba con doce renacidos y ocho de sus correos, y el correo se detiene.',
+  'entities.quests.q_veth_dead_letters.completion':
+    'No hay más correspondencia. Fuera lo que fuera lo que la ruina y el camino estaban concertando, ya es asunto de historiadores, {playerName}, y Veth no emplea ninguno. El expediente se cierra.',
+  'entities.quests.q_veth_dead_letters.objectives.0.label': 'Renacido de la cárcava abatido',
+  'entities.quests.q_veth_dead_letters.objectives.1.label': 'Degollador sin gremio abatido',
+  'entities.quests.q_veth_waystation_letters.title': 'Cartas para la Larga Vigilia',
+  'entities.quests.q_veth_waystation_letters.text':
+    'Un estuche sellado va al norte, a la árbitra Senna en la Larga Vigilia, {playerName}: cartas del gremio, y el gremio no usa el correo. Haz que el vivandero Kevish firme el flete a tu llegada; su contrafirma es el único recibo que Senna acepta. No leas las cartas. No es una advertencia, es una cortesía profesional.',
+  'entities.quests.q_veth_waystation_letters.completion':
+    'Sellos intactos, contrafirmados, y no las leíste; lo sabría. Isyra elige bien a sus correos, {playerName}. La Larga Vigilia siempre tiene sitio para manos que llevan cosas y no las abren.',
+  'entities.quests.q_veth_waystation_letters.objectives.0.label':
+    'Haz que el vivandero Kevish firme el estuche',
+  'entities.quests.q_veth_pine_line.title': 'Sostened la línea de pinos',
+  'entities.quests.q_veth_pine_line.text':
+    'Las bandas de guerra de Pino Escarcha empujan la línea de árboles un largo de lanza al sur cada noche, {playerName}, y las zarpas de escarcha cazan en el hueco que abren. Mi camino está en el hueco. Doce cazacabezas y ocho felinos, y la línea vuelve a donde dice el mapa.',
+  'entities.quests.q_veth_pine_line.completion':
+    'La línea aguanta donde el mapa manda. Los troles la volverán a trazar, los felinos los seguirán y yo te contrataré dos veces más antes del deshielo, {playerName}. No es una queja; es un presupuesto.',
+  'entities.quests.q_veth_pine_line.objectives.0.label': 'Cazacabezas de Pino Escarcha abatido',
+  'entities.quests.q_veth_pine_line.objectives.1.label': 'Merodeador zarpa de escarcha abatido',
+  'entities.quests.q_veth_meat_for_the_line.title': 'Carne para la línea',
+  'entities.quests.q_veth_meat_for_the_line.text':
+    'Cada guardia de esta vigilia come dos veces al día o vigila mal, {playerName}, y las terrazas no crían más que hielo y apetito. El pernil de zarpa de escarcha aguanta un mes en el estante frío. Diez felinos raleados, ocho perniles preparados. La ironía de que la vigilia coma lo que la caza no se me escapa; sazona el guiso.',
+  'entities.quests.q_veth_meat_for_the_line.completion':
+    'Peso de invierno, bien preparado. La línea come dos semanas y te debe cada bocado, {playerName}. Llevo la única cocina en cuarenta millas; mi gratitud es moneda de curso legal.',
+  'entities.quests.q_veth_meat_for_the_line.objectives.0.label':
+    'Merodeador zarpa de escarcha abatido',
+  'entities.quests.q_veth_meat_for_the_line.objectives.1.label': 'Pernil de zarpa de escarcha',
+  'entities.quests.q_veth_rites_on_ice.title': 'Ritos sobre el hielo',
+  'entities.quests.q_veth_rites_on_ice.text':
+    'Los llamahielos cantan la escarcha sobre las terrazas antes de una incursión, {playerName}, para que la subida sea vidrio cuando lleguen las lanzas. Cada rito pende de un fetiche tallado; sin fetiche, no hay clima. Diez llamahielos silenciados, ocho fetiches fuera de sus cordeles.',
+  'entities.quests.q_veth_rites_on_ice.completion':
+    'Hielo honrado otra vez, del que cae sin que se lo pidan. Ocho inviernos cancelados en ocho fetiches, {playerName}. El camino te lo agradece; yo hablo en su nombre.',
+  'entities.quests.q_veth_rites_on_ice.objectives.0.label': 'Llamahielos de Pino Escarcha abatido',
+  'entities.quests.q_veth_rites_on_ice.objectives.1.label': 'Fetiche ceñido por la escarcha',
+  'entities.quests.q_veth_white_ledger.title': 'El libro blanco',
+  'entities.quests.q_veth_white_ledger.text':
+    'El norte lleva su propio libro de cuentas, {playerName}, y escribe en blanco: cada ventisquero un cargo, cada deshielo un pago aplazado. Esta temporada los llamahielos y las zarpas de escarcha lo han dejado en números rojos. Doce llamahielos, diez felinos. Cuadra la página.',
+  'entities.quests.q_veth_white_ledger.completion':
+    'Cuadrada, para un valor de cuadrada que dura hasta la próxima helada fuerte. Es la única clase de cuadrada que ofrece el norte, {playerName}, y he aprendido a facturar en consecuencia.',
+  'entities.quests.q_veth_white_ledger.objectives.0.label': 'Llamahielos de Pino Escarcha abatido',
+  'entities.quests.q_veth_white_ledger.objectives.1.label': 'Merodeador zarpa de escarcha abatido',
+  'entities.quests.q_veth_high_ice.title': 'El hielo alto',
+  'entities.quests.q_veth_high_ice.text':
+    'Por encima de las terrazas, el hielo deja de fingir que es clima, {playerName}. Las repisas altas pertenecen a los felinos viejos y a los más fríos de los llamahielos, y han empezado a bajar al anochecer con un propósito que no me gusta. Doce zarpas de escarcha, diez llamahielos, allá arriba donde están las cuerdas. Encuérdate; el libro no cubre las caídas.',
+  'entities.quests.q_veth_high_ice.completion':
+    'Las incursiones del anochecer cesan, las repisas enmudecen y las cuerdas vuelven con todos los que subieron por ellas. En el norte eso es un triunfo, {playerName}; lo archivaré como tal.',
+  'entities.quests.q_veth_high_ice.objectives.0.label': 'Merodeador zarpa de escarcha abatido',
+  'entities.quests.q_veth_high_ice.objectives.1.label': 'Llamahielos de Pino Escarcha abatido',
+  'entities.quests.q_veth_tallow_accounts.title': 'Las cuentas del sebo',
+  'entities.quests.q_veth_tallow_accounts.text':
+    'El sebo de Pino Escarcha arde lento y rencoroso, {playerName}, y es la única grasa que mantiene viva una lámpara en las terrazas altas. Los troles lo funden para su pintura de guerra. Diez cazacabezas, ocho tarros de sebo, y las lámparas de la Larga Vigilia siguen encendidas durante el mes oscuro.',
+  'entities.quests.q_veth_tallow_accounts.completion':
+    'Lento, rencoroso y encendido: exactamente según lo especificado. El mes oscuro puede venir cuando quiera, {playerName}. Encontrará a la vigilia despierta y el guiso caliente.',
+  'entities.quests.q_veth_tallow_accounts.objectives.0.label':
+    'Cazacabezas de Pino Escarcha abatido',
+  'entities.quests.q_veth_tallow_accounts.objectives.1.label': 'Sebo de Pino Escarcha',
+  'entities.quests.q_veth_road_north.title': 'El camino del norte',
+  'entities.quests.q_veth_road_north.text':
+    'El puesto fronterizo de Kael compra mi excedente y me vende harina, {playerName}, y este mes el camino entre nosotros es puro canto de escarcha y acero del Refugio. Al comercio no le importa de quién sean los cuchillos. Doce llamahielos y seis hojas fuera de la milla norte, y los carros ruedan antes que los motines de la harina.',
+  'entities.quests.q_veth_road_north.completion':
+    'Los carros cruzaron al alba: harina al sur, sebo al norte, cada cual cobrando de más, cada cual contento. Eso es la paz, {playerName}, tal como la entiende la frontera.',
+  'entities.quests.q_veth_road_north.objectives.0.label': 'Llamahielos de Pino Escarcha abatido',
+  'entities.quests.q_veth_road_north.objectives.1.label': 'Hoja perjura abatida',
+  'entities.quests.q_veth_watch_the_lodge.title': 'Vigilad el Refugio',
+  'entities.quests.q_veth_watch_the_lodge.text':
+    'Al otro lado del camino de sirga se alza el Último Refugio, {playerName}, y las hojas de Veykar recorren sus lindes en parejas, según el viejo patrón, porque el viejo patrón lo escribió él. Compara recuentos con el guardacaminos Dral antes de empezar; su cuenta de las patrullas es mejor que la mía, cosa que me ofende. Luego retira diez hojas de la rotación. Trae un cuchillo de confianza.',
+  'entities.quests.q_veth_watch_the_lodge.completion':
+    'Diez huecos en un patrón que el Refugio cree perfecto. Veykar lo notará, y sabrá que no fue el gremio, y eso lo inquietará más que las bajas. Bien. Los hombres inquietos cometen errores, {playerName}.',
+  'entities.quests.q_veth_watch_the_lodge.objectives.0.label':
+    'Compara recuentos con el guardacaminos Dral',
+  'entities.quests.q_veth_watch_the_lodge.objectives.1.label': 'Hoja perjura abatida',
+  'entities.quests.q_veth_oath_knives.title': 'Los cuchillos del juramento',
+  'entities.quests.q_veth_oath_knives.text':
+    'Cada hoja del Refugio conserva el cuchillo de juramento que el gremio le entregó, {playerName}, lo cual es hurto: un juramento devuelto significa que el cuchillo vuelve a casa. Doce hojas más, ocho cuchillos recuperados. Al gremio no le importa que estén muertos; le importa que la cubertería esté contabilizada.',
+  'entities.quests.q_veth_oath_knives.completion':
+    'Ocho cuchillos, de vuelta al cajón sobre el que juraron. En algún lugar del gremio una lista pierde ocho líneas, {playerName}, y las listas son la única escritura que guardamos.',
+  'entities.quests.q_veth_oath_knives.objectives.0.label': 'Hoja perjura abatida',
+  'entities.quests.q_veth_oath_knives.objectives.1.label': 'Cuchillo de juramento perjuro',
+  'entities.quests.q_veth_ciphers_in_shadow.title': 'Cifras en la sombra',
+  'entities.quests.q_veth_ciphers_in_shadow.text':
+    'Las cifras del Refugio nunca se escribieron, {playerName}; se enseñaron, y los lanzasombras son donde viven. Veykar las está vendiendo sílaba a sílaba a quien pague. Diez lanzasombras, y ocho de las pizarras de cifrado con las que se adiestran. Lo que un hombre no puede recordar solo, no puede venderlo.',
+  'entities.quests.q_veth_ciphers_in_shadow.completion':
+    'Pizarras al fuego, lanzasombras bajo tierra, y una lengua muere solvente. Quedan quizá cuatro personas vivas capaces de llorarla, {playerName}. Ninguna lo hará.',
+  'entities.quests.q_veth_ciphers_in_shadow.objectives.0.label': 'Lanzasombras perjuro abatido',
+  'entities.quests.q_veth_ciphers_in_shadow.objectives.1.label': 'Cifra ligada a las sombras',
+  'entities.quests.q_veth_closing_the_lodge.title': 'El cierre del Refugio',
+  'entities.quests.q_veth_closing_the_lodge.text':
+    'El Refugio se apaga, {playerName}: hojas escasas, lanzasombras roncos y Veykar fingiendo lo contrario en el centro mismo. Apaga lo que queda de la luz: diez hojas, ocho lanzasombras. Cuando el perímetro esté a oscuras, el viejo será solo un nombre en una puerta, y Vael tiene el contrato de la puerta.',
+  'entities.quests.q_veth_closing_the_lodge.completion':
+    'A oscuras, entonces. El Último Refugio se alza vacío alrededor de un hombre y su libro de rencores. Lo que ocurra ahora queda por encima de mi mesa, {playerName}, y por una vez me alegro. Llévate las botas; el camino de sirga de vuelta es largo.',
+  'entities.quests.q_veth_closing_the_lodge.objectives.0.label': 'Hoja perjura abatida',
+  'entities.quests.q_veth_closing_the_lodge.objectives.1.label': 'Lanzasombras perjuro abatido',
+  'entities.quests.q_sign_the_garrison_book.title': 'El libro de la guarnición',
+  'entities.quests.q_sign_the_garrison_book.text':
+    'Aguja de Kael te archiva antes de darte de comer, {playerName}. Preséntate en las cuatro oficinas de la guarnición: almacenes, la herrería, la mesa del diezmo y la carta de caza. Firma cada libro con letra legible; el Imperio tiene opiniones sobre la caligrafía.',
+  'entities.quests.q_sign_the_garrison_book.completion':
+    'Cuatro firmas, una de ellas casi legible. Ahora existes a ojos del Imperio, {playerName}, que es el único lugar donde la existencia es vinculante. Bienvenido a la marca del norte.',
+  'entities.quests.q_sign_the_garrison_book.objectives.0.label':
+    'Preséntate ante la intendente Hilde',
+  'entities.quests.q_sign_the_garrison_book.objectives.1.label':
+    'Preséntate ante el armero Ottokar',
+  'entities.quests.q_sign_the_garrison_book.objectives.2.label':
+    'Preséntate ante la prefecta Alina',
+  'entities.quests.q_sign_the_garrison_book.objectives.3.label':
+    'Preséntate ante el maestro de caza Roderic',
+  'entities.quests.q_forged_exemptions.title': 'Exenciones falsificadas',
+  'entities.quests.q_forged_exemptions.text':
+    'El distrito de los graneros le debe al Imperio una leva de milicia, y la leva ha decidido que prefiere robar carros de grano a custodiarlos, {playerName}. Peor: llevan papeles de exención falsificados, que es fraude fiscal apilado sobre deserción. Retira a diez y tráeme seis falsificaciones para el cajón de pruebas.',
+  'entities.quests.q_forged_exemptions.completion':
+    'Seis falsificaciones, y los sellos ni se acercan; un niño defrauda mejor. Las listas de la leva vuelven a cuadrar, {playerName}. El fraude puedo procesarlo; la caligrafía solo puedo llorarla.',
+  'entities.quests.q_forged_exemptions.objectives.0.label':
+    'Desertor de la milicia de los graneros abatido',
+  'entities.quests.q_forged_exemptions.objectives.1.label': 'Papeles de leva falsificados',
+  'entities.quests.q_the_levy_answers.title': 'La leva responde',
+  'entities.quests.q_the_levy_answers.text':
+    'La prefecta tiene sus pruebas; yo tengo un distrito que vio a su leva marcharse y hacerse ladrona. Eso no se sostiene en una provincia imperial, {playerName}. Recluta a los prófugos de los campos del sur: doce, por la espada, ya que declinaron la citación más amable.',
+  'entities.quests.q_the_levy_answers.completion':
+    'Doce nombres tachados y los campos en silencio. La próxima leva se presentará puntual, {playerName}; nada recluta como un precedente.',
+  'entities.quests.q_the_levy_answers.objectives.0.label':
+    'Desertor de la milicia de los graneros abatido',
+  'entities.quests.q_report_to_ledgerwatch.title': 'Preséntate en Guardacuentas',
+  'entities.quests.q_report_to_ledgerwatch.text':
+    'El Fuerte Guardacuentas vigila el cinturón de pinos y a la Legión Rota que lo habita, y su castellano informa de tres problemas por cada soldado que tiene. Tú eres un soldado que resuelve tres problemas, {playerName}. Preséntate ante el castellano Odric; toma el camino del norte y el fuerte queda a tu derecha donde empiezan los pinos.',
+  'entities.quests.q_report_to_ledgerwatch.completion':
+    'El mariscal envía una sola hoja y lo llama refuerzos. Muy bien; he aprendido a requisar calidad antes que cantidad. Bienvenido a Guardacuentas, {playerName}.',
+  'entities.quests.q_report_to_ledgerwatch.objectives.0.label':
+    'Preséntate ante el castellano Odric',
+  'entities.quests.q_deserter_amnesty_rolls.title': 'Las listas de amnistía',
+  'entities.quests.q_deserter_amnesty_rolls.text':
+    'La Corona ofreció amnistía a la Novena para cualquier desertor que se presentara antes de la primavera; estamos en otoño, {playerName}, y guardan las peticiones en los petates como recuerdos. Una petición sin presentar es una confesión con mejor caligrafía. Abate a doce desertores y recupera seis peticiones. Yo archivo a título póstumo.',
+  'entities.quests.q_deserter_amnesty_rolls.completion':
+    'Seis peticiones, archivadas, selladas y anotadas como difunto. El libro de la amnistía cuadra de ambas maneras, {playerName}; el Imperio es flexible sobre en qué columna mueres.',
+  'entities.quests.q_deserter_amnesty_rolls.objectives.0.label':
+    'Desertor de la Legión Rota abatido',
+  'entities.quests.q_deserter_amnesty_rolls.objectives.1.label':
+    'Petición de amnistía sin presentar',
+  'entities.quests.q_sutlers_kettles.title': 'Marmitas de patrón del fuerte',
+  'entities.quests.q_sutlers_kettles.text':
+    'Cuando la Novena se amotinó, saqueó a mi predecesor hasta las marmitas, {playerName}: patrón del fuerte, triple remache, artículos de inventario todas y cada una. Estoy contractualmente corta de diez marmitas y la guarnición está corta de sopa. Recupéralas de los campamentos de desertores; abolladas es aceptable, ausentes no.',
+  'entities.quests.q_sutlers_kettles.completion':
+    'Seis marmitas, abolladuras incluidas, de vuelta en el manifiesto. La sopa se reanuda esta noche y mi libro cierra limpio por primera vez en el trimestre. Has dado de comer a un fuerte, {playerName}, línea a línea.',
+  'entities.quests.q_sutlers_kettles.objectives.0.label': 'Desertor de la Legión Rota abatido',
+  'entities.quests.q_sutlers_kettles.objectives.1.label': 'Marmita de patrón del fuerte',
+  'entities.quests.q_interest_on_arrears.title': 'Intereses de demora',
+  'entities.quests.q_interest_on_arrears.text':
+    'Cada ballestero de ese muro sigue cobrando paga robada de los cofres que se llevó la Novena. La estoy embargando, {playerName}, a razón de una bolsa por cadáver, que es la única tarifa que han honrado hasta la fecha. Doce ballesteros; tráeme seis bolsas para la cuenta de recuperación.',
+  'entities.quests.q_interest_on_arrears.completion':
+    'Seis bolsas, con la cuenta corta exactamente como esperaba: también se robaban entre ellos. La cuenta de recuperación crece, {playerName}, y atrasos más intereses es una suma que el Imperio jamás olvida.',
+  'entities.quests.q_interest_on_arrears.objectives.0.label':
+    'Ballestero de la Legión Rota abatido',
+  'entities.quests.q_interest_on_arrears.objectives.1.label': 'Bolsa de paga embargada',
+  'entities.quests.q_terrace_undermining.title': 'Socavados',
+  'entities.quests.q_terrace_undermining.text':
+    'Los elementales de granito salidos de Fortaleza Férrea han empezado a moler las terrazas profundas bajo mi muro este, y un fuerte sin cimientos es un montón de piedras muy ordenado, {playerName}. Quiebra a doce y arranca cinco núcleos de la línea de falla. Mis ingenieros quieren pruebas de que el suelo ha dejado de discutir.',
+  'entities.quests.q_terrace_undermining.completion':
+    'Cinco núcleos, y los ingenieros declaran que el muro este vuelve a ser aburrido, lo que viniendo de ingenieros es un gran elogio. El fuerte se sostiene sobre papeleo y lecho de roca, {playerName}; tú has asegurado el segundo.',
+  'entities.quests.q_terrace_undermining.objectives.0.label':
+    'Elemental de granito agitado abatido',
+  'entities.quests.q_terrace_undermining.objectives.1.label': 'Núcleo de la línea de falla',
+  'entities.quests.q_duelling_permits.title': 'Permisos sin sellar',
+  'entities.quests.q_duelling_permits.text':
+    'La Casa Maren se bate en duelo en suelo imperial sin permisos sellados: ellos lo llaman honor, y el arancel lo llama cuarenta platas por asalto, {playerName}. Sus hojas han declinado todas las citaciones que entregaron mis escribientes. Entrega tú las diez próximas citaciones y recoge cinco permisos sin sellar como prueba documental.',
+  'entities.quests.q_duelling_permits.completion':
+    'Cinco permisos, sin sellar, cada uno una multa que la hacienda de la Casa pagará con intereses. La Casa Maren está a punto de descubrir que el honor tributa, {playerName}. Tarde o temprano, tributa cuanto existe.',
+  'entities.quests.q_duelling_permits.objectives.0.label': 'Duelista de la Casa Maren abatido',
+  'entities.quests.q_duelling_permits.objectives.1.label': 'Permiso de duelo sin sellar',
+  'entities.quests.q_boundary_survey.title': 'El deslinde',
+  'entities.quests.q_boundary_survey.text':
+    'La Casa Maren ha movido sus mojones tres campos hacia dentro de tierra imperial, y sus duelistas se plantan en la nueva línea desafiando a mis agrimensores a objetar. Yo objeto, {playerName}. Recorre la línea del deslinde y elimina doce de las objeciones; los mojones vuelven a donde dice el mapa.',
+  'entities.quests.q_boundary_survey.completion':
+    'La línea deslindada, los mojones devueltos, las objeciones retiradas del registro. La Casa Maren se queda con lo que el mapa le concede y ni un surco más, {playerName}. El mapa es el arma más antigua del Imperio.',
+  'entities.quests.q_boundary_survey.objectives.0.label': 'Duelista de la Casa Maren abatido',
+  'entities.quests.q_the_unremitted_assessor.title': 'El tasador irremitido',
+  'entities.quests.q_the_unremitted_assessor.text':
+    'El tasador Maldrek murió en su ruta de cobro hace cuarenta años y no ha dejado que eso interrumpa sus rondas, {playerName}. Tasa a los viajeros a punta de espada y emite recibos que ninguna oficina honra; el expediente de quejas ya ocupa dos cajones. Su comisión queda revocada. Lleva testigos cuando entregues la revocación: él audita de vuelta.',
+  'entities.quests.q_the_unremitted_assessor.completion':
+    'La revocación entregada y la ruta cerrada tras cuarenta años de cobro no autorizado. Sus recibos van al archivo como curiosidades, {playerName}. Hasta la muerte responde ante la oficina fiscal; simplemente presenta tarde.',
+  'entities.quests.q_the_unremitted_assessor.objectives.0.label':
+    'Tasador Maldrek el Irremitido abatido',
+  'entities.quests.q_arrears_in_kind.title': 'Atrasos en especie',
+  'entities.quests.q_arrears_in_kind.text':
+    'La Novena no puede devolver lo que robó; la moneda está gastada en ogros y los ogros están gastados en nosotros, {playerName}. Bien. La Corona acepta el pago en especie: doce de sus ogros a sueldo y doce de la guardia del juramento que gastó el dinero. El cobro de deudas es un instrumento romo tan al norte.',
+  'entities.quests.q_arrears_in_kind.completion':
+    'Veinticuatro asientos en el libro de recuperación, pagados en la única moneda que le queda a la Novena, {playerName}. La cuenta no está saldada: pero está, por primera vez, al día.',
+  'entities.quests.q_arrears_in_kind.objectives.0.label': 'Ogro mercenario abatido',
+  'entities.quests.q_arrears_in_kind.objectives.1.label':
+    'Veterano de la Guardia del Juramento abatido',
+  'entities.quests.q_report_to_rimeshaft.title': 'Preséntate en Pozo Escarcha',
+  'entities.quests.q_report_to_rimeshaft.text':
+    'El campamento de Pozo Escarcha extrae plata por encima de la línea de nieve y presenta partes de bajas más deprisa que retornos de mineral, {playerName}. La capataz tiene autoridad permanente para contratar a cualquier cosa que sobreviva al camino. Preséntate ante la capataz Ulla en el campamento bajo el Ascenso de Yelmo de Escarcha, y cuidado con los wendigos: no están en nómina.',
+  'entities.quests.q_report_to_rimeshaft.completion':
+    'Guardacuentas manda ayuda que recorrió sola el camino de nieve; bien. Las tres últimas contrataciones llegaron como gasto de búsqueda. Estás en los libros desde este turno, {playerName}.',
+  'entities.quests.q_report_to_rimeshaft.objectives.0.label': 'Preséntate ante la capataz Ulla',
+  'entities.quests.q_rimeclaw_denning.title': 'Temporada de guaridas',
+  'entities.quests.q_rimeclaw_denning.text':
+    'Las zarpas de escarcha están haciendo guarida en las escombreras, {playerName}, y una guarida en la escombrera es un zarpazo en cada cambio de turno. La oficina de concesiones las clasifica como clima, lo que significa que no hay recompensa, y por eso te pago del presupuesto de herramientas. Doce, antes de que terminen las guaridas.',
+  'entities.quests.q_rimeclaw_denning.completion':
+    'Doce, y la campana de turno suena sin un grito por primera vez en un mes. El presupuesto de herramientas está de luto, {playerName}, pero las palas salen más baratas que los paleros.',
+  'entities.quests.q_rimeclaw_denning.objectives.0.label':
+    'Zarpa de escarcha de Yelmo de Escarcha abatida',
+  'entities.quests.q_tallow_ledger.title': 'El libro del sebo',
+  'entities.quests.q_tallow_ledger.text':
+    'El impuesto de las velas hace que aquí arriba la cera cueste más que la plata, así que las lámparas queman sebo de zarpa de escarcha, que el arancel todavía no ha descubierto, {playerName}. No lo ilustres. Diez zarpas de escarcha, seis buenas fundiciones de sebo, y el turno de noche conserva su luz a un precio que los libros pueden soportar.',
+  'entities.quests.q_tallow_ledger.completion':
+    'Seis fundiciones, de llama limpia, asentadas en el libro como grasas varias, {playerName}. Si la oficina fiscal aprende algún día a leer un libro de mina, estamos todos arruinados; por suerte, nunca ha aprendido.',
+  'entities.quests.q_tallow_ledger.objectives.0.label':
+    'Zarpa de escarcha de Yelmo de Escarcha abatida',
+  'entities.quests.q_tallow_ledger.objectives.1.label': 'Sebo de zarpa de escarcha',
+  'entities.quests.q_marrow_for_the_kettles.title': 'Tuétano para las marmitas',
+  'entities.quests.q_marrow_for_the_kettles.text':
+    'Las marmitas piden tuétano, los mineros piden una sopa con historial de carne, y las zarpas de escarcha piden mineros, {playerName}. Propongo invertir el arreglo. Doce zarpas de escarcha, siete huesos de tuétano, y la fila del rancho deja de escribir cartas a casa sobre el caldo.',
+  'entities.quests.q_marrow_for_the_kettles.completion':
+    'Siete huesos de tuétano en las marmitas y el caldo alcanza lo que el manual llama integridad nutritiva, {playerName}. La moral sube dos puntos. La mido en segundas raciones.',
+  'entities.quests.q_marrow_for_the_kettles.objectives.0.label':
+    'Zarpa de escarcha de Yelmo de Escarcha abatida',
+  'entities.quests.q_marrow_for_the_kettles.objectives.1.label':
+    'Hueso de tuétano de zarpa de escarcha',
+  'entities.quests.q_quarter_end_closing.title': 'Cierre de trimestre',
+  'entities.quests.q_quarter_end_closing.text':
+    'El trimestre cierra en seis días y faltan tres firmas: el castellano de Guardacuentas, la capataz de Pozo Escarcha y el ensayador junto a ella, {playerName}. El camino de postas se come a los correos últimamente, y las certificaciones no se firman solas. Reúne las tres, en persona; el Imperio dejó de aceptar sellos por paloma después del incidente.',
+  'entities.quests.q_quarter_end_closing.completion':
+    'Tres certificaciones, a tiempo, en orden. El norte cierra su trimestre y la capital no tiene nada de qué quejarse, lo que no la detendrá, {playerName}. Tienes mi agradecimiento y el del libro, y el del libro vale más.',
+  'entities.quests.q_quarter_end_closing.objectives.0.label':
+    'Reúne la certificación de Guardacuentas',
+  'entities.quests.q_quarter_end_closing.objectives.1.label':
+    'Reúne la certificación de Pozo Escarcha',
+  'entities.quests.q_quarter_end_closing.objectives.2.label': 'Reúne la certificación del ensaye',
+  'entities.quests.q_the_oathguard.title': 'La Guardia del Juramento',
+  'entities.quests.q_the_oathguard.text':
+    'Lo que queda de la disciplina de la Novena forma con placas alrededor del reducto: la Guardia del Juramento, los veteranos que eligieron a Vaelis por encima del Imperio dos veces, {playerName}. Su sentencia se dictó junto con la de su comandante. Abre doce brechas en esa línea; nadie llega hasta Vaelis a través de un muro que aguanta.',
+  'entities.quests.q_the_oathguard.completion':
+    'Doce veteranos caídos y la línea del reducto clarea. Eran los mejores soldados que tuvo la Novena, {playerName}, que es precisamente el cargo en su contra.',
+  'entities.quests.q_the_oathguard.objectives.0.label':
+    'Veterano de la Guardia del Juramento abatido',
+  'entities.quests.q_oathguard_plate.title': 'Placas perjuras',
+  'entities.quests.q_oathguard_plate.text':
+    'La Guardia del Juramento viste placas imperiales, forjadas en este banco antes de deshonrarlo, {playerName}. Las placas no desertan; solo necesitan nuevos dueños. Doce veteranos, seis secciones aprovechables, y devolveré a martillazos la vergüenza de la Novena al servicio del Imperio.',
+  'entities.quests.q_oathguard_plate.completion':
+    'Seis secciones, con mis propias marcas de forja aún bajo el hollín. Reajustadas y reexpedidas, protegerán a hombres mejores, {playerName}. El acero no guarda rencores; para eso están los herreros.',
+  'entities.quests.q_oathguard_plate.objectives.0.label':
+    'Veterano de la Guardia del Juramento abatido',
+  'entities.quests.q_oathguard_plate.objectives.1.label':
+    'Fragmento de placas de la Guardia del Juramento',
+  'entities.quests.q_cold_store_restock.title': 'La cámara fría',
+  'entities.quests.q_cold_store_restock.text':
+    'Pozo Escarcha come por lista, y la lista dice que la cámara fría guarda tres semanas de carne; la cámara fría discrepa, {playerName}. El pernil de aullador de hielo congela bien y persigue su propia entrega. Doce aulladores, ocho perniles, y mi inventario regresa a una ficción que los auditores aceptarán.',
+  'entities.quests.q_cold_store_restock.completion':
+    'Ocho perniles colgados y la lista vuelve a ser honrada, o lo bastante para trabajo de gobierno, {playerName}. El campamento come, los libros cuadran y nadie pregunta qué significa proteína varia.',
+  'entities.quests.q_cold_store_restock.objectives.0.label':
+    'Aullador de hielo de Yelmo de Escarcha abatido',
+  'entities.quests.q_cold_store_restock.objectives.1.label': 'Pernil de aullador de hielo',
+  'entities.quests.q_clear_the_galleries.title': 'Despejad las galerías',
+  'entities.quests.q_clear_the_galleries.text':
+    'Cuando el pozo tres se abrió, los wendigos se mudaron a las galerías del este como parientes que se enteraron de que sobraba sitio, {playerName}. Las cuadrillas de apuntalado no bajarán mientras algo en la oscuridad coma más deprisa de lo que ellas entiban. Despeja doce de las labores; la montaña me debe un turno.',
+  'entities.quests.q_clear_the_galleries.completion':
+    'Las galerías vuelven a resonar con martillos y no con dientes, {playerName}. Las cuadrillas están entibando mientras hablamos, y la montaña reanuda el pago de sus impuestos en plata.',
+  'entities.quests.q_clear_the_galleries.objectives.0.label':
+    'Wendigo de Yelmo de Escarcha abatido',
+  'entities.quests.q_rimebound_breach.title': 'La brecha de la escarcha',
+  'entities.quests.q_rimebound_breach.text':
+    'El pozo tres se abrió a hielo azul que camina, {playerName}: los ceñidos por la escarcha, los llaman los mineros, y la oficina de concesiones los llama fenómeno geológico para no pagar plus de peligro. Mis instrumentos los llaman activos ambulantes. Reduce doce a un estado mensurable.',
+  'entities.quests.q_rimebound_breach.completion':
+    'Doce, reducidos y medidos. El peligro se reclasifica de fenómeno a gasto, {playerName}, y los gastos se pueden presupuestar. La ciencia avanza línea a línea.',
+  'entities.quests.q_rimebound_breach.objectives.0.label':
+    'Elemental ceñido por la escarcha abatido',
+  'entities.quests.q_core_ice_assay.title': 'El ensaye del hielo de núcleo',
+  'entities.quests.q_core_ice_assay.text':
+    'Los ceñidos por la escarcha llevan núcleos de hielo más viejos que el Imperio, cosa que el Imperio encuentra presuntuosa, {playerName}. La oficina de ensayes quiere seis núcleos: intactos, fríos y pesados antes de que se fundan en agua corriente y pierdan cualquier interés fiscal. Doce ceñidos deberían rendir eso.',
+  'entities.quests.q_core_ice_assay.completion':
+    'Seis núcleos, pesados en altura, sellados en la caja fría. Conclusión preliminar: la montaña lleva diez mil años acaparando activos, {playerName}. La auditoría del Yelmo de Escarcha va a ser considerable.',
+  'entities.quests.q_core_ice_assay.objectives.0.label': 'Elemental ceñido por la escarcha abatido',
+  'entities.quests.q_core_ice_assay.objectives.1.label': 'Núcleo de hielo ceñido por la escarcha',
+  'entities.quests.q_rimebound_quench.title': 'El temple del glaciar',
+  'entities.quests.q_rimebound_quench.text':
+    'Una hoja templada en hielo de glaciar toma un filo que se ríe del invierno, o eso jura cada herrero al norte del paso, {playerName}. La brecha de Pozo Escarcha puso glaciares andantes a mi alcance por primera vez en mi carrera. Diez ceñidos por la escarcha, seis núcleos de hielo de temple sin fundir, embalados rápido.',
+  'entities.quests.q_rimebound_quench.completion':
+    'El temple silba como una discusión y el filo sale cantando, {playerName}. Los viejos herreros tenían razón, cosa que admitiré exactamente una vez, por escrito, en este libro que nadie lee.',
+  'entities.quests.q_rimebound_quench.objectives.0.label':
+    'Elemental ceñido por la escarcha abatido',
+  'entities.quests.q_rimebound_quench.objectives.1.label': 'Hielo de temple glacial',
+  'entities.quests.q_purse_warden_grulk.title': 'El Guardabolsas',
+  'entities.quests.q_purse_warden_grulk.text':
+    'Los ogros custodian el cofre de la paga de la Novena con un guardián llamado Grulk, que nunca dominó el contar pero domina por completo el sentarse en una caja, {playerName}. Esa caja son lingotes imperiales, y los lingotes son asunto del ensaye. Trae compañeros: Grulk pesa más que su aritmética.',
+  'entities.quests.q_purse_warden_grulk.completion':
+    'El cofre recuperado, el guardián jubilado, los lingotes bajo sello rumbo a la capital. Recuento final: la Novena robó exactamente lo que Grulk no supo contar, hasta la última moneda, {playerName}. Ahí hay una lección para alguien.',
+  'entities.quests.q_purse_warden_grulk.objectives.0.label': 'Guardabolsas Grulk abatido',
+  'entities.quests.q_shaft_three_reopens.title': 'El pozo tres reabre',
+  'entities.quests.q_shaft_three_reopens.text':
+    'El pozo tres reabre según calendario, {playerName}, y al calendario no le importa que el pozo esté lleno de hielo andante y nieve hambrienta. Doce ceñidos por la escarcha, doce wendigos, y la veta de plata más rica del norte vuelve al informe trimestral, que es donde debe estar.',
+  'entities.quests.q_shaft_three_reopens.completion':
+    'La veta cortada, las vagonetas ruedan y el informe trimestral se lee como una condecoración, {playerName}. Pozo Escarcha recuerda quién reabrió el pozo tres; más útil aún, la nómina también.',
+  'entities.quests.q_shaft_three_reopens.objectives.0.label':
+    'Elemental ceñido por la escarcha abatido',
+  'entities.quests.q_shaft_three_reopens.objectives.1.label':
+    'Wendigo de Yelmo de Escarcha abatido',
+  'entities.quests.q_apex_predation.title': 'Depredación suprema',
+  'entities.quests.q_apex_predation.text':
+    'La cresta tiene dos depredadores supremos este invierno y la carta de caza no reconoce a ninguno, {playerName}. Los aulladores de hielo cazan en los pasos, los wendigos cazan a los cazadores, y mi cupo está en algún lugar debajo de ambos. Elimina doce de cada, y la montaña recordará quién tiene la carta.',
+  'entities.quests.q_apex_predation.completion':
+    'Doce y doce, atestiguado desde la línea de señales. Los pasos cazan en silencio, el cupo queda cubierto y la carta cuelga donde siempre, {playerName}: por encima de cuanto hay en la montaña.',
+  'entities.quests.q_apex_predation.objectives.0.label':
+    'Aullador de hielo de Yelmo de Escarcha abatido',
+  'entities.quests.q_apex_predation.objectives.1.label': 'Wendigo de Yelmo de Escarcha abatido',
+  'entities.quests.q_the_norths_books.title': 'Los libros del norte',
+  'entities.quests.q_the_norths_books.text':
+    'Vaelis quemó las listas de revista de la Novena, pero los soldados son sentimentales, {playerName}: la Guardia del Juramento lleva páginas rescatadas como reliquias. Esas páginas son la última prueba de quién fue la Novena antes de romperse. Doce veteranos, seis listas, y los libros del norte se cierran sobre toda esa legión lamentable.',
+  'entities.quests.q_the_norths_books.completion':
+    'Seis listas, chamuscadas pero legibles, cada nombre recuperable. La Novena queda al fin contabilizada por completo, {playerName}: alistada, amotinada y cerrada. El Imperio audita a sus muertos, y hoy los muertos cuadran.',
+  'entities.quests.q_the_norths_books.objectives.0.label':
+    'Veterano de la Guardia del Juramento abatido',
+  'entities.quests.q_the_norths_books.objectives.1.label': 'Lista de revista rescatada',
   'entities.zones.kael_empire.name': 'Imperio de Kael',
   'entities.zones.kael_empire.welcome':
     'El mariscal Corvin mantiene abierto el Camino del Diezmo desde Aguja de Kael; el Imperio espera que así siga.',
@@ -6099,6 +7041,49 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.spire_stalker.name': 'Acechador de las agujas',
   'entities.mobs.not_quite_man.name': 'Ya-No-Hombre',
   'entities.mobs.deserter_king.name': 'El Rey Desertor',
+  'entities.mobs.temple_sentinel.name': 'Centinela del templo',
+  'entities.mobs.heretic_sandpriest.name': 'Sacerdote de arena hereje',
+  'entities.mobs.ashkerat_the_warden.name': 'Ashkerat el Guardián',
+  'entities.mobs.duneglass_colossus.name': 'Coloso de vidrioduna',
+  'entities.mobs.heretic_flameseer.name': 'Vidente de llamas hereje',
+  'entities.mobs.duskwater_raider.name': 'Asaltante de Aguaocaso',
+  'entities.mobs.cartographers_shade.name': 'Sombra del Primer Cartógrafo',
+  'entities.mobs.twilight_moth.name': 'Polilla crepuscular',
+  'entities.mobs.feralrun_smuggler.name': 'Contrabandista de la Senda Feral',
+  'entities.mobs.vessik_the_turncoat.name': 'Vessik el Cambiacapas',
+  'entities.mobs.frostpine_icecaller.name': 'Llamahielos de Pino Escarcha',
+  'entities.mobs.forsworn_blade.name': 'Hoja perjura',
+  'entities.mobs.forsworn_shadowcaster.name': 'Lanzasombras perjuro',
+  'entities.mobs.granary_militia_deserter.name': 'Desertor de la milicia de los graneros',
+  'entities.mobs.maren_house_duelist.name': 'Duelista de la Casa Maren',
+  'entities.mobs.frosthelm_rimeclaw.name': 'Zarpa de escarcha de Yelmo de Escarcha',
+  'entities.mobs.legion_oathguard_veteran.name': 'Veterano de la Guardia del Juramento',
+  'entities.mobs.rimebound_elemental.name': 'Elemental ceñido por la escarcha',
+  'entities.mobs.assessor_maldrek.name': 'Tasador Maldrek el Irremitido',
+  'entities.mobs.purse_warden_grulk.name': 'Guardabolsas Grulk',
+  'entities.mobs.palisade_warden.name': 'Guardián Ilyen',
+  'entities.mobs.broodmother_veskal.name': 'Veskal, Madre de la Telaraña sin Luz',
+  'entities.mobs.unlit_broodling.name': 'Cría de la nidada sin luz',
+  'entities.mobs.mistfather_ghorvul.name': 'Ghorvul, el Padre de la Niebla',
+  'entities.mobs.mist_shamble.name': 'Tambaleante de niebla',
+  'entities.mobs.tollroad_carter.name': 'Carretero Odom',
+  'entities.mobs.lastwater_wellguard.name': 'Guardapozo Nahir',
+  'entities.mobs.seat_water_bearer.name': 'Portadora de agua Sitra',
+  'entities.mobs.greyweir_bailiff.name': 'Alguacil Roskan',
+  'entities.mobs.veth_ledger_courier.name': 'Mensajera Yeska',
+  'entities.mobs.rimeshaft_picket_warden.name': 'Guardián Halvar',
+  'entities.mobs.paychest_porter.name': 'Porteador Fenn',
+  'entities.mobs.drowned_cantor.name': 'Chantre ahogado',
+  'entities.mobs.reedbound_acolyte.name': 'Acólito atado a los juncos',
+  'entities.mobs.deepfen_spearjaw.name': 'Faucelanza de Deepfen',
+  'entities.mobs.mirefen_widowling.name': 'Cría de viuda de Mirefen',
+  'entities.mobs.spider_egg_sac.name': 'Saco de huevos de araña',
+  'entities.mobs.grave_silt_bulwark.name': 'Baluarte de limo sepulcral',
+  'entities.mobs.sump_troll_devourer.name': 'Trol devorador del sumidero',
+  'entities.mobs.choir_thrall.name': 'Siervo del pantano',
+  'entities.mobs.sister_nhalia_drowned_canticle.name': 'Hermana Nhalia, el Cántico Ahogado',
+  'entities.mobs.edda_reedhand.name': 'Edda Manojunco',
+  'entities.mobs.tolling_bell.name': 'Campana doblante',
   'entities.npcs.provisioner_hask.name': 'Proveedor Hask',
   'entities.npcs.provisioner_hask.title': 'Intendente de Reposo de Ascuas',
   'entities.npcs.provisioner_hask.greeting':
@@ -6119,6 +7104,118 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_odric.title': 'Guardián del Último Cruce',
   'entities.npcs.provisioner_odric.greeting':
     'Esta es la última hoguera antes del fin del mundo, {playerName}. Llena el zurrón; pasado el Cruce solo quedan los desertores y el viento.',
+  'entities.npcs.frontier_warden_corvis.name': 'Guardián Corvis',
+  'entities.npcs.frontier_warden_corvis.title': 'Guardián Fronterizo de la Legión',
+  'entities.npcs.frontier_warden_corvis.greeting':
+    'El viejo camino está enterrado, y enterrado se queda. El continente te recibe a través de los Emisarios, no entre escombros.',
+  'entities.npcs.frontier_warden_maerlys.name': 'Guardiana Maerlys',
+  'entities.npcs.frontier_warden_maerlys.title': 'Guardiana Fronteriza de la Legión',
+  'entities.npcs.frontier_warden_maerlys.greeting':
+    'Pasadas esas piedras está la Brecha, y la guerra no conoce tregua. El frente sigue sellado hasta que la Legión diga lo contrario.',
+  'entities.npcs.envoy_marcus_vale.name': 'Emisario Marcus Vale',
+  'entities.npcs.envoy_marcus_vale.title': 'Voz del Imperio de Kael',
+  'entities.npcs.envoy_marcus_vale.greeting':
+    'El Imperio mantiene los caminos pavimentados, los graneros llenos y las cuentas exactas. Jura por Kael y nunca estarás solo, ni sin factura.',
+  'entities.npcs.envoy_sylwen.name': 'Emisaria Sylwen',
+  'entities.npcs.envoy_sylwen.title': 'Voz de la Confederación de Veth',
+  'entities.npcs.envoy_sylwen.greeting':
+    'Veth no gana guerras. Las termina. Jura por la Confederación y aprende cuánto pesa una palabra callada frente a un ejército ruidoso.',
+  'entities.npcs.envoy_amara.name': 'Emisaria Amara',
+  'entities.npcs.envoy_amara.title': 'Voz del Dominio de Ossara',
+  'entities.npcs.envoy_amara.greeting':
+    'Antes de que vuestros imperios dibujaran mapas, Ossara guardaba la fe. Jura por el Dominio y hereda lo que las arenas recuerdan.',
+  'entities.npcs.ferry_rhouma.name': 'Maestra del Esquife de Arena Rhouma',
+  'entities.npcs.ferry_rhouma.title': 'Pasaje al Desembarco',
+  'entities.npcs.ferry_rhouma.greeting':
+    'El esquife zarpa al sur, hacia el Desembarco, con el viento de la tarde. Tú dirás.',
+  'entities.npcs.ferry_neris.name': 'Piloto de Aguanegra Neris',
+  'entities.npcs.ferry_neris.title': 'Pasaje al Desembarco',
+  'entities.npcs.ferry_neris.greeting':
+    'Los ríos negros llegan más lejos de lo que admiten casi todos los mapas. El Desembarco es una travesía fácil.',
+  'entities.npcs.ferry_aldwin.name': 'Maestro de Postas Aldwin',
+  'entities.npcs.ferry_aldwin.title': 'Pasaje al Desembarco',
+  'entities.npcs.ferry_aldwin.greeting':
+    'La posta imperial sale hacia el Desembarco dos veces por campana. Papeles, moneda o una buena historia.',
+  'entities.npcs.judge_ivenna.name': 'Juez Ivenna',
+  'entities.npcs.judge_ivenna.title': 'Juez de la Sede Hundida',
+  'entities.npcs.judge_ivenna.greeting':
+    'La primera corte celebró sesión aquí antes de que Qesh Aram tuviera pozo, {className}. Hemos vuelto a ella. Siéntate, escucha y sé de utilidad.',
+  'entities.npcs.canon_sahr.name': 'Canóniga Archivera Sahr',
+  'entities.npcs.canon_sahr.title': 'Guardiana de los Versos Quemados',
+  'entities.npcs.canon_sahr.greeting':
+    'Cada verso que quemamos se copió primero, {className}. Eso es el archivo: la fe no admite nada y olvida menos.',
+  'entities.npcs.provisioner_masut.name': 'Proveedor Masut',
+  'entities.npcs.provisioner_masut.title': 'Intendente de la Sede',
+  'entities.npcs.provisioner_masut.greeting':
+    'Los jueces comen como cualquiera, {className}, solo que le recitan escritura a la cuenta. Pan, agua y lo que las dunas me deban.',
+  'entities.npcs.caravan_mistress_yesfa.name': 'Maestra de Caravanas Yesfa',
+  'entities.npcs.caravan_mistress_yesfa.title': 'Señora de Última Agua',
+  'entities.npcs.caravan_mistress_yesfa.greeting':
+    'Pasado este pozo no hay más agua hasta las piedras de la frontera, {className}. Cuanto el Dominio aún le debe al camino se salda aquí.',
+  'entities.npcs.outrider_dhalen.name': 'Batidor Dhalen',
+  'entities.npcs.outrider_dhalen.title': 'Batidor del Camino de Qesh',
+  'entities.npcs.outrider_dhalen.greeting':
+    'Cabalgo las últimas dunas para que los mapas digan la verdad, {className}. Últimamente las dunas devuelven la cabalgada. Pregúntame qué camina ahí fuera; yo llevo la lista.',
+  'entities.npcs.waterseller_ibbin.name': 'Aguador Ibbin',
+  'entities.npcs.waterseller_ibbin.title': 'Aguador de Última Agua',
+  'entities.npcs.waterseller_ibbin.greeting':
+    'Un odre de agua cuesta cobre, {className}. El mismo odre al otro extremo de los Baldíos cuesta lo que diga el vendedor. Compra aquí.',
+  'entities.npcs.tollmaster_hesk.name': 'Maestro de Peajes Hesk',
+  'entities.npcs.tollmaster_hesk.title': 'Guardián del Azud Gris',
+  'entities.npcs.tollmaster_hesk.greeting':
+    'El azud cobra peaje a cuanto arrastra el río, {className}. Últimamente el río arrastra cuchillos, y los cuchillos pagan en otra moneda.',
+  'entities.npcs.ferrywoman_szel.name': 'Barquera Szel',
+  'entities.npcs.ferrywoman_szel.title': 'Señora del Embarcadero del Azud',
+  'entities.npcs.ferrywoman_szel.greeting':
+    'Cruzo a pértiga el agua negra dos veces al día y se me deben ambas travesías, {playerName}. El lago no está de acuerdo. Estamos negociando.',
+  'entities.npcs.toll_clerk_odune.name': 'Escribiente de Peaje Odune',
+  'entities.npcs.toll_clerk_odune.title': 'Contador del Azud Gris',
+  'entities.npcs.toll_clerk_odune.greeting':
+    'Pan, té y recibos, {className}. Los dos primeros te mantienen en camino; el tercero te mantiene honrado. Los tres tienen su precio en consecuencia.',
+  'entities.npcs.waykeeper_dral.name': 'Guardacaminos Dral',
+  'entities.npcs.waykeeper_dral.title': 'Guardián del Camino del Norte',
+  'entities.npcs.waykeeper_dral.greeting':
+    'Cuanto hay al norte de esta hoguera intenta cerrar el camino, {className}: troles, felinos, clima. Mi oficio es un camino que siga abierto. El tuyo también puede serlo.',
+  'entities.npcs.arbiter_senna.name': 'Árbitra Senna',
+  'entities.npcs.arbiter_senna.title': 'La Palabra Callada del Gremio',
+  'entities.npcs.arbiter_senna.greeting':
+    'Al otro lado de esa oscuridad se alza el Último Refugio, {playerName}, y el gremio no se acerca más. Tú no eres el gremio. Ese es tu valor entero; procura conservarlo.',
+  'entities.npcs.sutler_kevish.name': 'Vivandero Kevish',
+  'entities.npcs.sutler_kevish.title': 'Proveedor de la Larga Vigilia',
+  'entities.npcs.sutler_kevish.greeting':
+    'La última comida caliente antes del hielo, {className}, y la primera después, si hay un después. No fío más allá de la línea de árboles.',
+  'entities.npcs.castellan_odric.name': 'Castellano Odric',
+  'entities.npcs.castellan_odric.title': 'Comandante del Fuerte Guardacuentas',
+  'entities.npcs.castellan_odric.greeting':
+    'El Fuerte Guardacuentas sostiene la frontera, y la frontera sostiene el papeleo, {className}. Expón tu asunto en una línea o menos.',
+  'entities.npcs.paymistress_serna.name': 'Pagadora Serna',
+  'entities.npcs.paymistress_serna.title': 'Oficina de Recuperación de la Novena Legión',
+  'entities.npcs.paymistress_serna.greeting':
+    'Pagas atrasadas de la Novena Legión, congeladas a la espera de juicio. Si vienes a sumar pruebas, {playerName}, coge número: es el uno.',
+  'entities.npcs.sutler_brama.name': 'Vivandera Brama',
+  'entities.npcs.sutler_brama.title': 'Vivandera con Licencia del Fuerte',
+  'entities.npcs.sutler_brama.greeting':
+    'Vivandera con licencia, precios según cartel, recibos a petición. El Imperio me audita cada mes, {playerName}, así que la balanza es honrada.',
+  'entities.npcs.foreman_ulla.name': 'Capataz Ulla',
+  'entities.npcs.foreman_ulla.title': 'Oficina de Concesiones de Pozo Escarcha',
+  'entities.npcs.foreman_ulla.greeting':
+    'Pozo Escarcha trabaja a tres turnos y pierde dos por el clima, {className}. Si sabes sostener un pico, o matar lo que interrumpe uno, estás en nómina.',
+  'entities.npcs.assayer_veck.name': 'Ensayador Veck',
+  'entities.npcs.assayer_veck.title': 'Ensaye Imperial, División de Yelmo de Escarcha',
+  'entities.npcs.assayer_veck.greeting':
+    'Cada piedra de este campamento se pesa dos veces, {playerName}. La montaña no sisa a nadie; la gente es otro asunto.',
+  'entities.npcs.provisioner_edda.name': 'Proveedora Edda',
+  'entities.npcs.provisioner_edda.title': 'Almacenes de Pozo Escarcha',
+  'entities.npcs.provisioner_edda.greeting':
+    'Los almacenes se racionan por lista, y tú no estás en la lista, {className}. La moneda enmienda la lista. La moneda enmienda casi cualquier cosa.',
+  'entities.npcs.brother_halven_marsh.name': 'Hermano Halven',
+  'entities.npcs.brother_halven_marsh.title': 'Guardián del Relicario',
+  'entities.npcs.brother_halven_marsh.greeting':
+    'El rastro llevaba al norte. Otro relicario, otro rito. Elige tu nivel y yo sujetaré la cuerda hasta que vuelvas.',
+  'entities.npcs.spirit_healer.name': 'El Guardián Pálido',
+  'entities.npcs.spirit_healer.title': 'Custodio de los Muertos',
+  'entities.npcs.spirit_healer.greeting':
+    'Descansa, espíritu. Puedo devolverte a tu cuerpo, pero el regreso te deja débil.',
   'entities.zones.ashveil_wastes.name': 'Baldíos de Velo Ceniza',
   'entities.zones.ashveil_wastes.welcome':
     'Estos campos alimentaron medio reino. Una sola batalla los quemó durante años; Reposo de Ascuas es lo que volvió a crecer.',
@@ -6160,6 +7257,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.zones.redspire_pass.pois.2.label': 'Cárcavas del Desertor',
   'entities.zones.redspire_pass.pois.3.label': 'La Leva Silenciosa',
   'entities.zones.redspire_pass.pois.4.label': 'El Borde del Mundo',
+  'entities.zones.ossara_domain.pois.10.label': 'Terraza de los Jueces',
+  'entities.zones.ossara_domain.pois.11.label': 'Baldíos de Vientohueso',
+  'entities.zones.ossara_domain.pois.12.label': 'Última Agua',
+  'entities.zones.veth_confederation.pois.10.label': 'Linde de Caepolillas',
+  'entities.zones.veth_confederation.pois.11.label': 'El Azud Gris',
+  'entities.zones.veth_confederation.pois.12.label': 'La Larga Vigilia',
+  'entities.zones.kael_empire.pois.9.label': 'Fuerte Guardacuentas',
+  'entities.zones.kael_empire.pois.10.label': 'Campamento de Pozo Escarcha',
   'races.sectionTitle': 'Facción y raza',
   'races.factionKael': 'Imperio de Kael',
   'races.factionVeth': 'Confederación de Veth',
@@ -6370,6 +7475,28 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nativeUpdate.notNow': 'Ahora no',
   'hudChrome.nativeUpdate.title': 'Actualización disponible',
   'hudChrome.nativeUpdate.update': 'Actualizar',
+  'hudChrome.defense.start': '¡Mantened la línea! Los defensores se preparan para el asalto.',
+  'hudChrome.defense.wave': '¡Oleada {wave} de {total} rechazada!',
+  'hudChrome.defense.won': 'La posición aguanta. Bien luchado.',
+  'hudChrome.defense.lost': 'Los defensores han caído. Reagrúpate e inténtalo de nuevo.',
+  'hudChrome.escort.start': 'La escolta se pone en marcha. No te alejes.',
+  'hudChrome.escort.paused':
+    'Tu protegido espera: no hay nadie lo bastante cerca para guardar el camino.',
+  'hudChrome.escort.resumed': 'La escolta reanuda la marcha.',
+  'hudChrome.escort.failed': 'Tu protegido ha caído. El camino se cobra a otro más.',
+  'hudChrome.escort.done': 'Llegada sin percances. La escolta te lo agradece.',
+  'hudChrome.envoys.title': 'El Salón de los Emisarios',
+  'hudChrome.envoys.prompt': 'Elige tu facción, y a la gente entre la que te contarás.',
+  'hudChrome.envoys.permanent':
+    'Este juramento es permanente. Tu facción decide tu hogar, tus aliados y tus enemigos en la guerra eterna.',
+  'hudChrome.envoys.confirm': 'Prestar el Juramento',
+  'hudChrome.envoys.travelTitle': 'Pasaje',
+  'hudChrome.envoys.travelBody': '¿Tomar pasaje ahora? La travesía es instantánea.',
+  'hudChrome.envoys.travelGo': 'Viajar',
+  'hudChrome.envoys.travelStay': 'Quedarse',
+  'hudChrome.map.sealed': 'Sellado',
+  'hudChrome.map.sealedHint': 'El frente de guerra está sellado más allá de este punto.',
+  'hudChrome.worldBoss.rises': '¡{name} se alza sobre {location}!',
   // Ravenpost authored letters
   'entities.letters.ravenpost_welcome.sender': 'El Correo del Cuervo',
   'entities.letters.ravenpost_welcome.subject': 'Los cuervos ya vuelan por ti',
