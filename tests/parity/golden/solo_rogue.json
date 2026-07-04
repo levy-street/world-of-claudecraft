@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1576,
-      "state": "88f4dadd",
+      "nextId": 1584,
+      "state": "9fa3c8af",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1575,
+          "entityId": 1583,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -66,7 +66,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 1575,
+          "id": 1583,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -111,9 +111,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1577,
-      "state": "abfd9d84",
-      "events": "adb966b2",
+      "nextId": 1585,
+      "state": "cea301a4",
+      "events": "79ef8228",
       "rng": {
         "draws": 7,
         "digest": "4e605b3b"
@@ -122,9 +122,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1577,
-      "state": "b20e2fd2",
-      "events": "8e002e96",
+      "nextId": 1585,
+      "state": "ab58a952",
+      "events": "f1fdd2cf",
       "rng": {
         "draws": 13,
         "digest": "42cf86d5"
@@ -133,9 +133,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1577,
-      "state": "d926a5a1",
-      "events": "b183b941",
+      "nextId": 1585,
+      "state": "195640df",
+      "events": "6b689ad6",
       "rng": {
         "draws": 335,
         "digest": "22e89264"
@@ -144,8 +144,8 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1577,
-      "state": "77ea455d",
+      "nextId": 1585,
+      "state": "524dc831",
       "events": "741638a5",
       "rng": {
         "draws": 562,
@@ -173,7 +173,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1575,
+          "entityId": 1583,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -203,7 +203,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
           "hp": 49993,
-          "id": 1575,
+          "id": 1583,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -237,7 +237,7 @@
             "str": 26
           },
           "swingTimer": 0.05,
-          "targetId": 1576,
+          "targetId": 1584,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -247,7 +247,7 @@
           }
         },
         {
-          "aggroTargetId": 1575,
+          "aggroTargetId": 1583,
           "aiState": "attack",
           "combatTimer": 1.2,
           "comboUntil": -1,
@@ -259,7 +259,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8920,
-          "id": 1576,
+          "id": 1584,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -289,12 +289,12 @@
             "armor": 40
           },
           "swingTimer": 0.45,
-          "tappedById": 1575,
-          "targetId": 1575,
+          "tappedById": 1583,
+          "targetId": 1583,
           "templateId": "forest_wolf",
           "threat": [
             [
-              1575,
+              1583,
               81
             ]
           ],

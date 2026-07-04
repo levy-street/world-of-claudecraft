@@ -9,6 +9,8 @@
 // per-instance dungeon/raid healers in instances/dungeons.ts (claimInstance).
 
 import type { NpcDef } from '../types';
+import { VALDRIS_ZONES } from './valdris';
+import { SEALED_FRONTIER_Z } from './valdris/barriers';
 
 export interface GraveyardDef {
   id: string;
@@ -36,6 +38,16 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   { id: 'gy_thornpeak_east', name: 'East Ridge Graves', x: 141, z: 712 },
   { id: 'gy_thornpeak_south', name: 'Sanctum Approach Graves', x: 138, z: 838 },
   { id: 'gy_thornpeak_west', name: 'West Spire Graves', x: -139, z: 787 },
+  // Valdris: every OPEN zone contributes its declared graveyard, so no death
+  // past the island ever ghosts a player back to the tutorial maps. Sealed
+  // zones (z >= SEALED_FRONTIER_Z) stay off the list: no ghost anchors and no
+  // Spirit Healers behind the launch barricades.
+  ...VALDRIS_ZONES.filter((zone) => zone.zMin < SEALED_FRONTIER_Z).map((zone) => ({
+    id: `gy_${zone.id}`,
+    name: `${zone.name} Rest`,
+    x: zone.graveyard.x,
+    z: zone.graveyard.z,
+  })),
 ];
 
 // The Spirit Healer NPC id (one shared template; every spawned angel carries this
