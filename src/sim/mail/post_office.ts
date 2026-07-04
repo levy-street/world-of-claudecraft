@@ -86,11 +86,27 @@ export class PostOffice {
   // to tend your post.
   mailboxIds: number[] = [];
 
+  // Finding 4 (perf): a maintained count of delivered-and-unread letters per
+  // recipientKey (the same key deliveredFor/belongsTo match on). mailUnreadFor
+  // reads it in O(1) rather than scanning the whole book once per online session
+  // per tick. `undelivered` is the small set of still-in-flight letters, so a
+  // delivery transition updates the index at the exact tick the old scan would
+  // have counted it. Both are derived state, rebuilt from the book on load and
+  // never persisted.
+  private unreadIndex = new Map<string, number>();
+  private undelivered = new Set<MailMessage>();
+
   constructor(private readonly ctx: SimContext) {}
 
   // Public tick entry: the Sim tick calls this in the end-of-tick system block
   // (after market.update()). Once a second: land due letters, prune expired ones.
   update(): void {
+    // Every tick: fold any in-flight letter that has just reached its delivery
+    // time into the unread index, so mailUnreadFor stays byte-identical to the
+    // former per-call scan at the exact tick (never a per-second lag). Iterates
+    // only the small in-flight set, not the whole book, and touches no rng/event
+    // stream (the arrival toast keeps its own per-second cadence below).
+    this.deliverDue();
     if (this.ctx.tickCount % 20 !== 0) return;
     const now = this.ctx.time;
     for (let i = this.mail.length - 1; i >= 0; i--) {
@@ -108,6 +124,9 @@ export class PostOffice {
         }
       }
       if (now >= m.expiresAt && m.items.length === 0 && m.copper <= 0) {
+        // A delivered-and-unread letter that expires leaves the unread index.
+        if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
+        this.undelivered.delete(m);
         this.mail.splice(i, 1);
       }
     }
@@ -159,16 +178,66 @@ export class PostOffice {
     );
   }
 
+  private indexInc(key: string): void {
+    this.unreadIndex.set(key, (this.unreadIndex.get(key) ?? 0) + 1);
+  }
+
+  private indexDec(key: string): void {
+    const next = (this.unreadIndex.get(key) ?? 0) - 1;
+    if (next > 0) this.unreadIndex.set(key, next);
+    else this.unreadIndex.delete(key);
+  }
+
+  // Fold a freshly booked or loaded letter into the unread index and the
+  // in-flight set: an already-due letter counts as unread now (unless read); one
+  // still on the wing waits in `undelivered` until deliverDue lands it.
+  private trackDelivery(m: MailMessage): void {
+    if (this.ctx.time >= m.deliverAt) {
+      if (!m.read) this.indexInc(m.recipientKey);
+    } else {
+      this.undelivered.add(m);
+    }
+  }
+
+  // Per-tick: land any in-flight letter whose delivery time has arrived, moving
+  // it from `undelivered` into the unread index. Draws no rng and emits nothing
+  // (the arrival toast stays on its own per-second cadence in update()), so it
+  // never perturbs the deterministic event/rng stream. Correctness rests on the
+  // ordering invariant that update() (which calls this) runs to completion inside
+  // tick() before any mail command or mailUnreadFor observes a newly-due letter:
+  // tick() invokes no mail mutator mid-loop, and all commands/snapshots run
+  // between ticks, so a command's deliveredFor never sees a due-but-unfolded
+  // letter that indexDec could turn into a phantom under-count.
+  private deliverDue(): void {
+    if (this.undelivered.size === 0) return;
+    const now = this.ctx.time;
+    for (const m of this.undelivered) {
+      if (now < m.deliverAt) continue;
+      this.undelivered.delete(m);
+      if (!m.read) this.indexInc(m.recipientKey);
+    }
+  }
+
+  // Rebuild the unread index + in-flight set from the current book (used after a
+  // deserialize/load so neither is ever persisted).
+  private rebuildUnreadIndex(): void {
+    this.unreadIndex.clear();
+    this.undelivered.clear();
+    for (const m of this.mail) this.trackDelivery(m);
+  }
+
   mailUnreadFor(pid: number): number {
-    // Runs on every snapshot for every player (the mailU self field), so it is
-    // a single allocation-free pass over the book, never a filtered copy.
+    // Runs on every snapshot for every player (the mailU self field). Reads the
+    // maintained unread index in O(1) instead of scanning the whole book: each
+    // letter is counted under its recipientKey bucket, and belongsTo matches a
+    // player by EITHER their mail key OR their name, so we sum both buckets
+    // (guarding a double count when the name equals the key). Byte-identical to
+    // the former linear scan.
     const meta = this.ctx.players.get(pid);
     if (!meta) return 0;
-    const now = this.ctx.time;
-    let unread = 0;
-    for (const m of this.mail) {
-      if (!m.read && now >= m.deliverAt && this.belongsTo(m, meta)) unread++;
-    }
+    const key = this.mailKeyFor(meta);
+    let unread = this.unreadIndex.get(key) ?? 0;
+    if (meta.name !== key) unread += this.unreadIndex.get(meta.name) ?? 0;
     return unread;
   }
 
@@ -250,7 +319,11 @@ export class PostOffice {
       wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
     }
     for (const [itemId, count] of wanted) {
-      if (this.ctx.countItem(itemId, meta.entityId) < count) {
+      // Count only the fungible stock (#1165): an instanced copy (signer/charges/
+      // rolled/boundTo) is never swept into a letter, exactly as the World Market
+      // validates against countFungibleItem. A player whose only copies are
+      // instanced gets notEnoughItems, just like on the market.
+      if (this.ctx.countFungibleItem(itemId, meta.entityId) < count) {
         this.result(meta.entityId, 'notEnoughItems');
         return;
       }
@@ -263,9 +336,13 @@ export class PostOffice {
       this.result(meta.entityId, 'recipientBoxFull');
       return;
     }
-    // Escrow: coin and goods leave the sender now, ride with the raven.
+    // Escrow: coin and goods leave the sender now, ride with the raven. Remove
+    // the fungible stock only (#1165), matching the countFungibleItem check above
+    // so an instanced copy can never be consumed as a plain stack member and come
+    // back later as a generic copy.
     meta.copper -= coin + MAIL_POSTAGE;
-    for (const s of items) this.ctx.removeItem(s.itemId, Math.floor(s.count), meta.entityId);
+    for (const s of items)
+      this.ctx.removeFungibleItem(s.itemId, Math.floor(s.count), meta.entityId);
     this.book({
       recipientKey: recipient.key,
       recipientName: recipient.name,
@@ -295,15 +372,37 @@ export class PostOffice {
       this.result(meta.entityId, 'letterGone');
       return;
     }
+    // Coin is never capacity-gated: it always lands in the purse.
     if (m.copper > 0) {
       meta.copper += m.copper;
       this.result(meta.entityId, 'collected', { value: m.copper });
       m.copper = 0;
     }
-    for (const s of m.items) this.ctx.addItem(s.itemId, s.count, meta.entityId);
-    m.items = [];
-    m.read = true;
-    // An emptied letter starts its expiry clock if it never had one.
+    // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
+    // does not fit stays ATTACHED to the letter for a later take, never destroyed
+    // and never force-added past the bag budget. canAddItem is checked per stack
+    // against the live inventory, so cumulative capacity is honoured.
+    const kept: InvSlot[] = [];
+    for (const s of m.items) {
+      if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
+        this.ctx.addItem(s.itemId, s.count, meta.entityId);
+      } else {
+        kept.push(s);
+      }
+    }
+    m.items = kept;
+    // Tending the letter marks it read (drops it from the unread index once).
+    if (!m.read) {
+      this.indexDec(m.recipientKey);
+      m.read = true;
+    }
+    if (kept.length > 0) {
+      // Attachments remain: the expiry clock stays paused (Infinity) and the
+      // player is told to make room, exactly as the Merchant's collect does.
+      this.ctx.error(meta.entityId, 'Your bags are full.');
+      return;
+    }
+    // Fully emptied: start the expiry clock if it never had one.
     if (!Number.isFinite(m.expiresAt)) m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
   }
 
@@ -327,6 +426,8 @@ export class PostOffice {
       this.result(meta.entityId, 'takeParcelsFirst');
       return;
     }
+    // A delivered-and-unread letter deleted before it is read leaves the index.
+    if (!m.read) this.indexDec(m.recipientKey);
     this.mail.splice(idx, 1);
   }
 
@@ -334,7 +435,10 @@ export class PostOffice {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const m = this.deliveredFor(r.meta).find((x) => x.id === mailId);
-    if (m) m.read = true;
+    if (m && !m.read) {
+      this.indexDec(m.recipientKey);
+      m.read = true;
+    }
   }
 
   // Authored letters (system + NPC): no proximity, no postage, delivery after
@@ -383,7 +487,7 @@ export class PostOffice {
     delaySeconds: number;
   }): void {
     const hasAttachments = opts.copper > 0 || opts.items.length > 0;
-    this.mail.push({
+    const msg: MailMessage = {
       id: this.nextMailId++,
       recipientKey: opts.recipientKey,
       recipientName: opts.recipientName,
@@ -398,7 +502,9 @@ export class PostOffice {
       expiresAt: hasAttachments ? Infinity : this.ctx.time + MAIL_EXPIRY_SECONDS,
       read: false,
       announced: false,
-    });
+    };
+    this.mail.push(msg);
+    this.trackDelivery(msg);
   }
 
   mailInfoFor(pid: number): import('../../world_api').MailInfo | null {
@@ -439,6 +545,14 @@ export class PostOffice {
     for (const m of this.mail) {
       if (m.recipientKey === key || m.recipientKey === oldName || m.recipientKey === newName) {
         if (m.recipientKey !== key || m.recipientName !== newName) changed = true;
+        const oldKey = m.recipientKey;
+        // Move this letter's unread contribution from its old key bucket to the
+        // stable id key when the key actually changes (delivered-and-unread only,
+        // matching exactly what the index counts).
+        if (oldKey !== key && !m.read && this.ctx.time >= m.deliverAt) {
+          this.indexDec(oldKey);
+          this.indexInc(key);
+        }
         m.recipientKey = key;
         m.recipientName = newName;
       }
@@ -503,5 +617,8 @@ export class PostOffice {
     }
     const maxId = this.mail.reduce((mx, m) => Math.max(mx, m.id + 1), 1);
     this.nextMailId = Math.max(this.nextMailId, save.nextMailId ?? 1, maxId);
+    // The unread index is derived state, never persisted: rebuild it from the
+    // freshly loaded book.
+    this.rebuildUnreadIndex();
   }
 }

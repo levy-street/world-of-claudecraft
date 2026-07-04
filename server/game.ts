@@ -2877,6 +2877,16 @@ export class GameServer {
         const copper = msg.copper;
         const live = this.sessionByName(to);
         if (live) {
+          // A recipient who has blocked (== ignored) the sender never receives
+          // their letter. Refuse BEFORE the sim escrow so no copper, postage or
+          // items are taken, and reveal nothing more than "no such recipient".
+          if (live.blockedIds.has(session.characterId)) {
+            this.send(session, {
+              t: 'events',
+              list: [{ type: 'mailResult', code: 'noRecipient', pid }],
+            });
+            break;
+          }
           sim.mailSendResolved(
             { key: String(live.characterId), name: live.name },
             subject,
@@ -2892,10 +2902,21 @@ export class GameServer {
         // still this session before touching the sim.
         void this.socialDb
           .findCharacterByName(to)
-          .then((target) => {
+          .then(async (target) => {
             if (this.clients.get(pid) !== session) return;
             if (!target) {
               // Structured outcome, localized client-side (the sim's mailResult shape).
+              this.send(session, {
+                t: 'events',
+                list: [{ type: 'mailResult', code: 'noRecipient', pid }],
+              });
+              return;
+            }
+            // Offline recipient block check (same rule as the online path above):
+            // a sender the recipient has blocked is refused before any escrow.
+            const blockedBy = await this.socialDb.blockedIds(target.id);
+            if (this.clients.get(pid) !== session) return;
+            if (blockedBy.includes(session.characterId)) {
               this.send(session, {
                 t: 'events',
                 list: [{ type: 'mailResult', code: 'noRecipient', pid }],
