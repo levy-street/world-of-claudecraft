@@ -3802,7 +3802,7 @@ const mergeExtraEn = {
     boundstone_helm: { name: 'Boundstone Helm' },
     cryptbone_helm: { name: 'Cryptbone Helm' },
     cryptbone_pauldrons: { name: 'Cryptbone Pauldrons' },
-    deathlords_dread_visage: { name: "Barrowlord's Dread Visage" },
+    deathlords_dread_visage: { name: 'Barrowlord Dread Visage' },
     gravewyrm_gauntlets: { name: 'Gravewyrm Gauntlets' },
     gravewyrm_mantle: { name: 'Gravewyrm Mantle' },
     mistveil_cord: { name: 'Mistveil Cord' },

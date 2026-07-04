@@ -5971,7 +5971,7 @@ export const en: EnTranslations = {
         "name": "Cryptbone Pauldrons"
       },
       "deathlords_dread_visage": {
-        "name": "Barrowlord's Dread Visage"
+        "name": "Barrowlord Dread Visage"
       },
       "gravewyrm_gauntlets": {
         "name": "Gravewyrm Gauntlets"
@@ -6202,28 +6202,28 @@ export const en: EnTranslations = {
         "name": "Vanguard Chrome"
       },
       "crownforged_gauntlets": {
-        "name": "Crownforged Gauntlets"
+        "name": "Bonewrought Gauntlets"
       },
       "nighttalon_grips": {
-        "name": "Nighttalon Grips"
+        "name": "Direfang Grips"
       },
       "soulflame_gloves": {
-        "name": "Soulflame Gloves"
+        "name": "Wraithfire Gloves"
       },
       "stormcallers_handguards": {
-        "name": "Stormcaller's Handguards"
+        "name": "Galecall Handguards"
       },
       "crownforged_girdle": {
-        "name": "Crownforged Girdle"
+        "name": "Bonewrought Girdle"
       },
       "nighttalon_waistband": {
-        "name": "Nighttalon Waistband"
+        "name": "Direfang Waistband"
       },
       "soulflame_cord": {
-        "name": "Soulflame Cord"
+        "name": "Wraithfire Cord"
       },
       "stormcallers_waistguard": {
-        "name": "Stormcaller's Waistguard"
+        "name": "Galecall Waistguard"
       }
     },
     "mobs": {
