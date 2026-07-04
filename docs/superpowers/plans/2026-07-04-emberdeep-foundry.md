@@ -309,7 +309,7 @@ export const FOUNDRY_MOBS: Record<string, MobTemplate> = {
     name: 'Cinderhound',
     minLevel: 18,
     maxLevel: 19,
-    family: 'wolf',
+    family: 'beast',
     hpBase: 78,
     hpPerLevel: 23,
     dmgBase: 12,
@@ -409,7 +409,7 @@ export const FOUNDRY_DUNGEON_MOBS: Record<string, MobTemplate> = {
     name: 'Slag Hound',
     minLevel: 18,
     maxLevel: 19,
-    family: 'wolf',
+    family: 'beast',
     elite: true,
     hpBase: 60,
     hpPerLevel: 22,
@@ -838,7 +838,7 @@ export const FOUNDRY_ITEMS: Record<string, ItemDef> = {
     name: 'Forgehand Gauntlets',
     kind: 'armor',
     armorType: 'mail',
-    slot: 'hands',
+    slot: 'gloves',
     quality: 'rare',
     stats: { armor: 105, sta: 5, str: 3 },
     sellValue: 1600,
@@ -849,7 +849,7 @@ export const FOUNDRY_ITEMS: Record<string, ItemDef> = {
     name: 'Forgehand Handwraps',
     kind: 'armor',
     armorType: 'cloth',
-    slot: 'hands',
+    slot: 'gloves',
     quality: 'rare',
     stats: { armor: 40, int: 6, spi: 3 },
     sellValue: 1600,
@@ -860,7 +860,7 @@ export const FOUNDRY_ITEMS: Record<string, ItemDef> = {
     name: 'Forgehand Grips',
     kind: 'armor',
     armorType: 'leather',
-    slot: 'hands',
+    slot: 'gloves',
     quality: 'rare',
     stats: { armor: 72, agi: 7, sta: 2 },
     sellValue: 1600,
@@ -961,7 +961,7 @@ export const FOUNDRY_ITEMS: Record<string, ItemDef> = {
     name: 'Forgelord Warhelm',
     kind: 'armor',
     armorType: 'mail',
-    slot: 'head',
+    slot: 'helmet',
     quality: 'epic',
     stats: { armor: 230, str: 7, sta: 9 },
     sellValue: 9000,
@@ -972,7 +972,7 @@ export const FOUNDRY_ITEMS: Record<string, ItemDef> = {
     name: 'Emberweave Cowl',
     kind: 'armor',
     armorType: 'cloth',
-    slot: 'head',
+    slot: 'helmet',
     quality: 'epic',
     stats: { armor: 78, int: 10, spi: 6 },
     sellValue: 9000,
@@ -983,7 +983,7 @@ export const FOUNDRY_ITEMS: Record<string, ItemDef> = {
     name: 'Slagstalker Hood',
     kind: 'armor',
     armorType: 'leather',
-    slot: 'head',
+    slot: 'helmet',
     quality: 'epic',
     stats: { armor: 145, agi: 10, sta: 5 },
     sellValue: 9000,
@@ -1206,11 +1206,11 @@ These tests mirror `tests/temple.test.ts:46-141` and should pass with no further
     for (const l of colossus.loot) {
       if (l.itemId) expect(ITEMS[l.itemId], `loot item ${l.itemId}`).toBeTruthy();
     }
-    // pre-raid best: each rollGroup drop is an epic helm, one per archetype
+    // pre-raid best: each rollGroup drop is an epic helmet, one per archetype
     for (const l of group) {
       const item = ITEMS[l.itemId!];
       expect(item.quality).toBe('epic');
-      expect(item.slot).toBe('head');
+      expect(item.slot).toBe('helmet');
     }
   });
 
