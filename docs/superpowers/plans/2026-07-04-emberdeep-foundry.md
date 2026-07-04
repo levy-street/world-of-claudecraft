@@ -1492,3 +1492,9 @@ gh pr create --repo levy-street/world-of-claudecraft --base release/v0.21.0 --he
   were hardened to the retry-until-lands pattern per the 7e373ecb precedent.
 - tests/localization_coverage.test.ts and tests/guide.test.ts stay red until Task 6
   (i18n id registration + wiki regen); that ordering is intentional.
+- Index 6 was not actually free: its band origin (x = 4500) lands inside the reserved
+  Ashen Coliseum arena band, so dungeonAt() returned null there (leaveDungeon no-opped,
+  collision fell back to arena/crypt routing). The dungeon x-band sequence now resumes
+  at index 10 (origin x = 6900) past an explicit reserved arena/delve window
+  (DUNGEON_BAND_RESUME_X_MIN = 6600 in src/sim/data.ts), and the foundry registers at
+  index 10.

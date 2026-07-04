@@ -38,8 +38,9 @@ existing war-camp POI and ties the dungeon into the zone's standing conflicts.
 ## 2. Registration (data only)
 
 - Dungeon id: emberdeep_foundry, display name "Emberdeep Foundry".
-- DUNGEON_DEFS entry: index 6 (next free instance x-band; 4 and 5 are the
-  Nythraxis raid wings), doorPos near
+- DUNGEON_DEFS entry: index 10 (indexes 6-9 fall inside the reserved
+  arena/delve x-window [4200, 6600), so the dungeon band sequence resumes at
+  10; 4 and 5 are the Nythraxis raid wings), doorPos near
   (-150, 770), entry/exitOffset following the temple's convention,
   suggestedPlayers 5, enterText/leaveText flavor lines.
 - Merged in src/sim/data.ts alongside TEMPLE_DUNGEON_DEFS. The instance system
