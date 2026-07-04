@@ -1475,3 +1475,20 @@ gh pr create --repo levy-street/world-of-claudecraft --base release/v0.21.0 --he
 ```
 
 (No emojis in the PR body. The push runs the pre-push QA floor; `src/ui/i18n.status.json` must exist locally, so run `npm run i18n:gen` first if a fresh clone.)
+
+---
+
+## Deviations discovered during execution (authoritative over the task text above)
+
+- tests/item_level.test.ts enforces an EXACT primary-stat budget per item level and slot
+  (armor and weapon damage excluded). The stats objects written in Task 3 above were
+  corrected in a follow-up commit to the checker-exact budgets; the committed
+  src/sim/content/foundry.ts is the source of truth for item stats.
+- Every GROUND_OBJECTS itemId needs a custom GROUND_PICKUP_LINES entry
+  (src/sim/content/ground_pickup_lines.ts); warcamp_dispatch got one.
+- Adding overworld camps shifts the seeded rng stream: the parity goldens were
+  regenerated via UPDATE_PARITY=1 as a separate commit (sanctioned flow,
+  tests/parity/CLAUDE.md), and two rng-sensitive tests/pvp_safety.test.ts assertions
+  were hardened to the retry-until-lands pattern per the 7e373ecb precedent.
+- tests/localization_coverage.test.ts and tests/guide.test.ts stay red until Task 6
+  (i18n id registration + wiki regen); that ordering is intentional.
