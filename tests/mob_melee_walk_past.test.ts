@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { createMob } from '../src/sim/entity';
 import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import { MELEE_RANGE } from '../src/sim/types';
 
 // Regression for "excessive melee range on monsters": a STATIONARY mob used to gain a
@@ -11,7 +11,7 @@ import { MELEE_RANGE } from '../src/sim/types';
 // drive the real swing gate (Sim.tryMobMeleeSwingInRange) deterministically, with no
 // world spawners, so the HP delta reflects only the mob under test.
 
-const SEED = 7788;
+const SEED = 1; // first-swing hit under the launch world's ctor draw count
 let nextId = 9000;
 
 function makeSim() {

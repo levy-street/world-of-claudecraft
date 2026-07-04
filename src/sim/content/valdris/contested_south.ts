@@ -219,6 +219,155 @@ export const CONTESTED_SOUTH_MOBS: Record<string, MobTemplate> = {
   // Warden Ilyen: the palisade's defender (src/sim/events/defense.ts). A
   // world-owned ally (allyOfPlayers): friendly to every player, a real target
   // for the thornwood, never lootable, revived by the event cooldown.
+  // Veskal, Mother of the Unlit Web: the Grey Hollows world boss (level 31 raid
+  // tier; the world-boss scheduler is the only spawner). Personal loot per
+  // contributor (itemId + chance only, rollWorldBossLoot contract).
+  broodmother_veskal: {
+    id: 'broodmother_veskal',
+    name: 'Veskal, Mother of the Unlit Web',
+    minLevel: 31,
+    maxLevel: 31,
+    family: 'spider',
+    worldBoss: true,
+    boss: true,
+    elite: true,
+    ccImmune: true,
+    hpBase: 5200,
+    hpPerLevel: 940,
+    dmgBase: 62,
+    dmgPerLevel: 11,
+    attackSpeed: 2.2,
+    armorPerLevel: 44,
+    moveSpeed: 6.4,
+    aggroRadius: 18,
+    aoePulse: {
+      min: 44,
+      max: 60,
+      radius: 11,
+      every: 9,
+      name: 'Venom Burst',
+      school: 'nature',
+      fx: 'nova',
+    },
+    summonAdds: { mobId: 'unlit_broodling', count: 3, atHpPct: [0.7, 0.4, 0.15] },
+    yells: {
+      engage: 'The dark below has teeth, little lights.',
+      summon: 'Come, children. Dinner walked in.',
+      enrage: 'The web tightens. No one leaves the Hollows.',
+    },
+    enrage: { belowHpPct: 0.2, dmgMult: 1.4, hasteMult: 1.25 },
+    loot: [
+      { itemId: 'unlit_silk_gland', chance: 1 },
+      { itemId: 'veskals_fang', chance: 0.18, rollGroup: 'veskal_rare' },
+      { itemId: 'broodmother_carapace_guard', chance: 0.18, rollGroup: 'veskal_rare' },
+    ],
+    scale: 2.1,
+    color: 0xcfc4d8,
+  },
+  // Broodlings: fast fragile adds Veskal births at the health thresholds.
+  unlit_broodling: {
+    id: 'unlit_broodling',
+    name: 'Unlit Broodling',
+    minLevel: 30,
+    maxLevel: 31,
+    family: 'spider',
+    hpBase: 110,
+    hpPerLevel: 26,
+    dmgBase: 16,
+    dmgPerLevel: 3,
+    attackSpeed: 1.6,
+    armorPerLevel: 14,
+    moveSpeed: 9.4,
+    aggroRadius: 14,
+    loot: [{ copper: 210, chance: 1 }],
+    scale: 0.7,
+    color: 0xb9aecb,
+  },
+  // The Mistfather: the Emberveil Marshes world boss (level 40 raid tier). The
+  // fog that never lifts has a will, and this is it.
+  mistfather_ghorvul: {
+    id: 'mistfather_ghorvul',
+    name: 'Ghorvul, the Mistfather',
+    minLevel: 40,
+    maxLevel: 40,
+    family: 'elemental',
+    worldBoss: true,
+    boss: true,
+    elite: true,
+    canSwim: true,
+    ccImmune: true,
+    hpBase: 6400,
+    hpPerLevel: 1050,
+    dmgBase: 74,
+    dmgPerLevel: 12.4,
+    attackSpeed: 2.5,
+    armorPerLevel: 50,
+    moveSpeed: 5.6,
+    aggroRadius: 18,
+    aoePulse: {
+      min: 52,
+      max: 70,
+      radius: 12,
+      every: 8,
+      name: 'Choking Fog',
+      school: 'shadow',
+      fx: 'nova',
+    },
+    stomp: {
+      radius: 11,
+      every: 17,
+      duration: 3,
+      min: 24,
+      max: 34,
+      name: 'Rootquake',
+      school: 'nature',
+    },
+    summonAdds: { mobId: 'mist_shamble', count: 2, atHpPct: [0.66, 0.33] },
+    stoneskin: { amount: 700, every: 20, duration: 9, name: 'Bogbark', school: 'nature' },
+    bigCast: {
+      castId: 'ghorvul_exhale',
+      name: 'The Long Exhale',
+      castTime: 3.5,
+      every: 26,
+      radius: 30,
+      min: 92,
+      max: 118,
+      school: 'shadow',
+      yell: 'Breathe deep of the veil.',
+    },
+    yells: {
+      engage: 'The fog is not weather, little flames. It is a mouth.',
+      summon: 'Rise, drowned things. The marsh remembers you.',
+      enrage: 'The veil closes. Sleep now.',
+    },
+    enrage: { belowHpPct: 0.2, dmgMult: 1.5, hasteMult: 1.2 },
+    loot: [
+      { itemId: 'condensed_mist_heart', chance: 1 },
+      { itemId: 'mistfathers_knot', chance: 0.16, rollGroup: 'ghorvul_rare' },
+      { itemId: 'fogwalker_treads', chance: 0.16, rollGroup: 'ghorvul_rare' },
+    ],
+    scale: 2.0,
+    color: 0x9fb59a,
+  },
+  // Mist shambles: drowned wood the Mistfather pulls out of the bog.
+  mist_shamble: {
+    id: 'mist_shamble',
+    name: 'Mist Shamble',
+    minLevel: 39,
+    maxLevel: 40,
+    family: 'elemental',
+    hpBase: 150,
+    hpPerLevel: 30,
+    dmgBase: 20,
+    dmgPerLevel: 3.4,
+    attackSpeed: 2.0,
+    armorPerLevel: 20,
+    moveSpeed: 7.6,
+    aggroRadius: 14,
+    loot: [{ copper: 320, chance: 1 }],
+    scale: 0.95,
+    color: 0x7d8f7a,
+  },
   // Carter Odom: the tollroad escort charge (src/sim/events/escort.ts).
   tollroad_carter: {
     id: 'tollroad_carter',
@@ -968,7 +1117,7 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
     pos: { x: -27, z: 2117 },
     facing: -1.2,
     color: 0x6f5a3e,
-    questIds: [],
+    questIds: ['q_unlit_mother'],
     vendorItems: ['healing_potion', 'mana_potion', 'underway_hardtack', 'smugglers_black_brew'],
     greeting: 'No questions in the Underway, friend. Coin buys bread, and bread asks nothing.',
   },
@@ -1001,7 +1150,7 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
     pos: { x: 26, z: 2657 },
     facing: -0.6,
     color: 0x5f7d6b,
-    questIds: [],
+    questIds: ['q_the_mistfather'],
     vendorItems: ['healing_potion', 'mana_potion', 'lanternfen_eel_skewer', 'fogberry_tonic'],
     greeting:
       'Keep to the stilts and mind your lantern, $C. The fog eats light out here, and worse.',
@@ -1021,6 +1170,42 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
 
 // No quests in the contested strip: these bands are wilderness by design.
 export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
+  // World-boss kill quests: the extended credit rule completes them for every
+  // contributor, so an open crowd of ungrouped players can share the kill.
+  q_unlit_mother: {
+    id: 'q_unlit_mother',
+    name: 'The Mother Below',
+    giverNpcId: 'fence_odrik',
+    turnInNpcId: 'fence_odrik',
+    text: 'Every tunnel my runners cut, the web takes back by morning, $N. The Mother below the Hollows is no camp spider: bring every blade you can rent and put her down together.',
+    completionText:
+      'The tunnels stay cut for a season, then. You did not fight her alone, and that is the only reason you are here to be paid.',
+    objectives: [
+      { type: 'kill', targetMobId: 'broodmother_veskal', count: 1, label: 'Veskal slain' },
+    ],
+    xpReward: 14500,
+    copperReward: 9000,
+    itemRewards: {},
+    minLevel: 29,
+    suggestedPlayers: 5,
+  },
+  q_the_mistfather: {
+    id: 'q_the_mistfather',
+    name: 'What the Fog Wants',
+    giverNpcId: 'lanternkeeper_ketta',
+    turnInNpcId: 'lanternkeeper_ketta',
+    text: 'The fog took two stilt-walkers this week and gave back their lanterns, polished, $N. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.',
+    completionText:
+      'The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, $C.',
+    objectives: [
+      { type: 'kill', targetMobId: 'mistfather_ghorvul', count: 1, label: 'Ghorvul slain' },
+    ],
+    xpReward: 18500,
+    copperReward: 12000,
+    itemRewards: {},
+    minLevel: 37,
+    suggestedPlayers: 5,
+  },
   q_ironpass_tollroad_escort: {
     id: 'q_ironpass_tollroad_escort',
     name: 'The Toll Must Flow',
@@ -1068,6 +1253,8 @@ export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
   },
 };
 export const CONTESTED_SOUTH_QUEST_ORDER: string[] = [
+  'q_unlit_mother',
+  'q_the_mistfather',
   'q_thornfen_palisade_defense',
   'q_ironpass_tollroad_escort',
 ];
@@ -1216,6 +1403,60 @@ export const CONTESTED_SOUTH_OBJECTS: GroundObjectDef[] = [];
 // ---------------------------------------------------------------------------
 
 export const CONTESTED_SOUTH_ITEMS: Record<string, ItemDef> = {
+  unlit_silk_gland: {
+    id: 'unlit_silk_gland',
+    name: 'Unlit Silk Gland',
+    quality: 'rare',
+    kind: 'junk',
+    sellValue: 5200,
+  },
+  veskals_fang: {
+    id: 'veskals_fang',
+    name: "Veskal's Fang",
+    quality: 'epic',
+    kind: 'weapon',
+    slot: 'mainhand',
+    weapon: { min: 44, max: 66, speed: 1.8, dagger: true },
+    stats: { agi: 14, sta: 8 },
+    sellValue: 18800,
+  },
+  broodmother_carapace_guard: {
+    id: 'broodmother_carapace_guard',
+    name: 'Broodmother Carapace Guard',
+    quality: 'epic',
+    kind: 'armor',
+    slot: 'chest',
+    armorType: 'mail',
+    stats: { armor: 190, sta: 16, str: 10 },
+    sellValue: 17600,
+  },
+  condensed_mist_heart: {
+    id: 'condensed_mist_heart',
+    name: 'Condensed Mist Heart',
+    quality: 'rare',
+    kind: 'junk',
+    sellValue: 8400,
+  },
+  mistfathers_knot: {
+    id: 'mistfathers_knot',
+    name: "The Mistfather's Knot",
+    quality: 'epic',
+    kind: 'armor',
+    slot: 'waist',
+    armorType: 'cloth',
+    stats: { sta: 15, spi: 12, int: 10 },
+    sellValue: 21500,
+  },
+  fogwalker_treads: {
+    id: 'fogwalker_treads',
+    name: 'Fogwalker Treads',
+    quality: 'epic',
+    kind: 'armor',
+    slot: 'feet',
+    armorType: 'leather',
+    stats: { agi: 16, sta: 12 },
+    sellValue: 20400,
+  },
   // --- junk / flavor drops ---
   grey_shale_chip: {
     id: 'grey_shale_chip',

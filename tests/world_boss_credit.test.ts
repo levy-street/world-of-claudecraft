@@ -62,7 +62,7 @@ describe('world-boss credit', () => {
     const b = join(sim, 'Bravo');
     holdQuest(sim, a);
     holdQuest(sim, b);
-    const bossId = sim.spawnWorldBoss(BOSS)!;
+    const bossId = (sim as any).spawnWorldBoss(BOSS)!;
     const boss = sim.entities.get(bossId)!;
     const ea = sim.entities.get(a)!;
     const eb = sim.entities.get(b)!;
@@ -101,8 +101,10 @@ describe('world-boss credit', () => {
   it('announces the rise with the location from the def', () => {
     const sim = makeSim();
     sim.events.length = 0;
-    sim.spawnWorldBoss(BOSS);
-    const rise = sim.events.find((ev: any) => ev.type === 'log' && /rises over/.test(ev.text));
+    (sim as any).spawnWorldBoss(BOSS);
+    const rise = sim.events.find(
+      (ev: any) => ev.type === 'log' && /rises over/.test(ev.text),
+    ) as any;
     expect(rise).toBeTruthy();
     expect(rise.text).toBe(`${MOBS[BOSS.templateId].name} rises over ${BOSS.announceLocation}!`);
   });

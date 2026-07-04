@@ -347,6 +347,9 @@ describe('movement directions', () => {
 describe('combat', () => {
   it('player kills a wolf and gains xp + loot', () => {
     const sim = makeSim('warrior');
+    // Level 3: the level-1 duel with a level-2 wolf was seed-luck (the launch
+    // world's ctor draws shifted the stream and the old line turned lethal).
+    sim.setPlayerLevel(3);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);

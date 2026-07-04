@@ -51,6 +51,20 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
     announceLocation: 'Thornpeak Heights',
   },
+  // The sub-40 Valdris pair (content/valdris/contested_south.ts): the Unlit
+  // Mother under Grey Hollows and the Mistfather in the Emberveil fog.
+  {
+    templateId: 'broodmother_veskal',
+    pos: { x: -48, z: 2180 },
+    intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
+    announceLocation: 'Grey Hollows',
+  },
+  {
+    templateId: 'mistfather_ghorvul',
+    pos: { x: 44, z: 2712 },
+    intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
+    announceLocation: 'Emberveil Marshes',
+  },
 ];
 
 // Per-player daily loot record. `date` is the UTC day the `looted` set belongs to;

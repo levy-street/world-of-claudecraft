@@ -7087,6 +7087,27 @@ export const it_IT: EnTranslations = {
       "sandmaw_tyrant": {
         "name": "Sandmaw Tyrant"
       },
+      "temple_sentinel": {
+        "name": "Temple Sentinel"
+      },
+      "heretic_sandpriest": {
+        "name": "Heretic Sand-Priest"
+      },
+      "ashkerat_the_warden": {
+        "name": "Ashkerat the Warden"
+      },
+      "duneglass_colossus": {
+        "name": "Duneglass Colossus"
+      },
+      "heretic_flameseer": {
+        "name": "Heretic Flameseer"
+      },
+      "duskwater_raider": {
+        "name": "Duskwater Raider"
+      },
+      "cartographers_shade": {
+        "name": "First Cartographer's Shade"
+      },
       "duskmane_stalker": {
         "name": "Duskmane Stalker"
       },
@@ -7206,6 +7227,18 @@ export const it_IT: EnTranslations = {
       },
       "palisade_warden": {
         "name": "Warden Ilyen"
+      },
+      "broodmother_veskal": {
+        "name": "Veskal, Mother of the Unlit Web"
+      },
+      "unlit_broodling": {
+        "name": "Unlit Broodling"
+      },
+      "mistfather_ghorvul": {
+        "name": "Ghorvul, the Mistfather"
+      },
+      "mist_shamble": {
+        "name": "Mist Shamble"
       },
       "tollroad_carter": {
         "name": "Carter Odom"
@@ -7699,6 +7732,36 @@ export const it_IT: EnTranslations = {
         "name": "Judge Saphira",
         "title": "Judge of the Domain",
         "greeting": "Ossara does not ask for heroes, {className}. It asks for hands that finish what they start. Show me yours."
+      },
+      "judge_ivenna": {
+        "name": "Judge Ivenna",
+        "title": "Judge of the Sunken Seat",
+        "greeting": "The first court sat here before Qesh Aram had a well, {className}. We have come back to it. Sit, listen, and be of use."
+      },
+      "canon_sahr": {
+        "name": "Canon-Archivist Sahr",
+        "title": "Keeper of the Burned Verses",
+        "greeting": "Every verse we ever burned was copied first, {className}. That is the archive: the faith admits nothing and forgets less."
+      },
+      "provisioner_masut": {
+        "name": "Provisioner Masut",
+        "title": "Quartermaster of the Seat",
+        "greeting": "Judges eat like anyone else, {className}, they just quote scripture at the bill. Bread, water, and whatever the dunes owe me."
+      },
+      "caravan_mistress_yesfa": {
+        "name": "Caravan Mistress Yesfa",
+        "title": "Mistress of Last Water",
+        "greeting": "Past this well there is no other water until the border stones, {className}. Everything the Domain still owes the road gets settled here."
+      },
+      "outrider_dhalen": {
+        "name": "Outrider Dhalen",
+        "title": "Outrider of the Qesh Road",
+        "greeting": "I ride the last dunes so the maps stay honest, {className}. Lately the dunes ride back. Ask me what walks out there; I keep the list."
+      },
+      "waterseller_ibbin": {
+        "name": "Waterseller Ibbin",
+        "title": "Waterseller of Last Water",
+        "greeting": "A skin of water costs copper, {className}. The same skin at the far end of the Barrens costs whatever the seller says it does. Buy here."
       },
       "caravan_master_odai": {
         "name": "Caravan Master Odai",
@@ -8720,6 +8783,26 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_unlit_mother": {
+        "title": "The Mother Below",
+        "text": "Every tunnel my runners cut, the web takes back by morning, {playerName}. The Mother below the Hollows is no camp spider: bring every blade you can rent and put her down together.",
+        "completion": "The tunnels stay cut for a season, then. You did not fight her alone, and that is the only reason you are here to be paid.",
+        "objectives": {
+          "0": {
+            "label": "Veskal slain"
+          }
+        }
+      },
+      "q_the_mistfather": {
+        "title": "What the Fog Wants",
+        "text": "The fog took two stilt-walkers this week and gave back their lanterns, polished, {playerName}. It is courting us. Gather everyone who owes you a favor and teach the Mistfather that the lights stay lit.",
+        "completion": "The fog thinned for a whole bell after you brought him down. First time in thirty years. The lanterns stay lit, {className}.",
+        "objectives": {
+          "0": {
+            "label": "Ghorvul slain"
+          }
+        }
+      },
       "q_ironpass_tollroad_escort": {
         "title": "The Toll Must Flow",
         "text": "Carter Odom hauls the toll-silver up the pass tonight, {playerName}, and the raiders know the schedule better than my own clerks. Walk beside the wagon to the north bend and bring him back breathing.",
@@ -8727,6 +8810,481 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Carter Odom escorted up the pass"
+          }
+        }
+      },
+      "q_the_sunken_seat": {
+        "title": "The Sunken Seat",
+        "text": "The faith has reopened the first court, {playerName}: a temple half swallowed by the dunes north of the tombs, where the Judges sat before Qesh Aram had a name. Judge Ivenna holds the Seat now. Go north up the road, present yourself, and do whatever she asks as if I had asked it.",
+        "completion": "Saphira sent you? Then she remembers where the Domain actually began. Welcome to the Sunken Seat, {playerName}; the sand gives up more work than I have hands for.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Judge Ivenna"
+          }
+        }
+      },
+      "q_the_last_water": {
+        "title": "Last Water",
+        "text": "Past the Rise and the terrace there is one well left before the Veth border stones, {playerName}, and everything I send north lives or dies by it. Yesfa runs the Last Water camp. Carry her my seal and my regards, and mind the dunes past the tombs; they have grown teeth I do not recognize.",
+        "completion": "Odai's seal, and still warm from the road. He only sends me people he cannot afford to lose, {playerName}, so I will spend you carefully.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Caravan Mistress Yesfa"
+          }
+        }
+      },
+      "q_stone_that_remembers": {
+        "title": "Stone That Remembers",
+        "text": "The sentinels walking the Sunken Seat are carved from templestone, {playerName}, and templestone holds an edge the way memory holds a grudge. Break eight of them and pry me five wardstones out whole. I have waited two ages of somebody else's history to work material like this.",
+        "completion": "Look at the grain: it remembers every blow that ever landed on it. Whatever I strike from this will not forget yours either, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Temple Sentinel slain"
+          },
+          "1": {
+            "label": "Unbroken Wardstone"
+          }
+        }
+      },
+      "q_glass_for_the_grindstone": {
+        "title": "Glass for the Grindstone",
+        "text": "The colossi walking the high dunes bleed fulgurite, {playerName}: lightning gone solid, harder than any whetstone south of Kael. The unshattered lengths are the prize. Bring me seven, and do not be under the colossus when it decides to kneel.",
+        "completion": "Seven lengths, and not a crack in one. My grindstone will sing for a year, {playerName}, and every blade in Qesh Aram will owe you its edge.",
+        "objectives": {
+          "0": {
+            "label": "Unshattered Fulgurite"
+          }
+        }
+      },
+      "q_water_for_the_seat": {
+        "title": "Water for the Seat",
+        "text": "The Judges have reopened the old temple north of the tombs, {playerName}, and courts drink like anyone else. Masut provisions them; he and I have an arrangement older than his ledgers admit. Walk the water tally up to the Sunken Seat and put it in his hands, not on his table.",
+        "completion": "Neriah's tally, hand to hand, the way she likes it. The Seat drinks because that woman never sleeps, {playerName}; remember that when the Judges take the credit.",
+        "objectives": {
+          "0": {
+            "label": "Deliver the tally to Provisioner Masut"
+          }
+        }
+      },
+      "q_the_masks_answer": {
+        "title": "The Mask's Answer",
+        "text": "I have studied what Karn carried up, {playerName}, and the marks on his funeral mask are not tomb-script. They are archive-script: the burned verses, cut by a living hand. Canon Sahr at the Sunken Seat keeps what is left of that archive. Tell her what we buried, and tell no one else on the road.",
+        "completion": "Archive-script on a dead digger's mask... then someone taught the burned verses to the tombs, {playerName}. Temos was right to whisper this. So will we.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Canon-Archivist Sahr"
+          }
+        }
+      },
+      "q_regalia_of_the_nameless": {
+        "title": "Regalia of the Nameless",
+        "text": "Saphira has her seals and I have my tablets, {playerName}, but the first court carried a third insignia no record names: a sigil worn under the regalia, against the skin. Put twelve of the terrace Judges to rest and search them for four. Whatever office it marked, the Domain forgot it on purpose.",
+        "completion": "Four sigils, and every one faces inward, toward the wearer. Not a rank, then: a penance. The first court judged itself hardest of all, {playerName}, and I intend to learn for what.",
+        "objectives": {
+          "0": {
+            "label": "Forsaken Judge slain"
+          },
+          "1": {
+            "label": "First Court Sigil"
+          }
+        }
+      },
+      "q_the_domain_endures": {
+        "title": "The Domain Endures",
+        "text": "The Tyrant is down and the road runs whole from the Landing pass to the border stones, {playerName}, for the first time in living memory. Keep it that way one more season: sweep the Barrens packs and the duskwater knives off the last marches. Ossara does not celebrate; it endures. Help it endure.",
+        "completion": "The clans walk the Barrens and the caravans walk the road, and no one sings about it because nothing went wrong. That silence is the Domain's highest honor, {playerName}. Wear it.",
+        "objectives": {
+          "0": {
+            "label": "Bonewind Ravager slain"
+          },
+          "1": {
+            "label": "Duskwater Raider slain"
+          }
+        }
+      },
+      "q_seat_of_the_first_court": {
+        "title": "Seat of the First Court",
+        "text": "We reopened the temple, {playerName}, and the temple noticed. The sentinels carved to serve the first court have taken the living for trespassers, and my clerks cannot carry a verdict ten paces without stone hands closing on them. Break ten of the sentinels between here and the lower stair.",
+        "completion": "Ten fewer, and the stair holds its peace this morning. The first court built well, {playerName}; that is precisely the problem with everything it left us.",
+        "objectives": {
+          "0": {
+            "label": "Temple Sentinel slain"
+          }
+        }
+      },
+      "q_wardens_rounds": {
+        "title": "The Warden's Rounds",
+        "text": "A court is not a bench, {playerName}; it is everyone the bench leans on. Walk my rounds once so the Seat knows your face: hear what Canon Sahr will not put in writing, and let Masut weigh you against his ledgers. Then come back and tell me which of them complained about the other first.",
+        "completion": "Sahr first, and about the flour dust on her archive shelves. You have met the whole government of the Seat, {playerName}. Now you may work for it.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Canon-Archivist Sahr"
+          },
+          "1": {
+            "label": "Speak with Provisioner Masut"
+          }
+        }
+      },
+      "q_seal_the_vaults": {
+        "title": "Seal the Vaults",
+        "text": "The sentinels do not wander, {playerName}; they patrol, and every route ends at a vault door we have not dared open. Each carries a ward-core keyed to its round. Fell eight more of them and bring me six cores intact, and the vaults stay sealed until the court is ready to answer for what is inside.",
+        "completion": "Six cores, six doors that stay shut. You have not sealed the vaults, {playerName}; you have sealed the argument about them, which is worth more.",
+        "objectives": {
+          "0": {
+            "label": "Temple Sentinel slain"
+          },
+          "1": {
+            "label": "Vault Ward-Core"
+          }
+        }
+      },
+      "q_dust_to_dust": {
+        "title": "Dust to Dust",
+        "text": "The shades drifting up from the tombs carry name-stones, {playerName}: the graven names they answered to in life, worn smooth on the walk out of death. The rites cannot re-bury a soul without its name. Put twelve shades to rest on the tomb paths and bring me five stones still legible.",
+        "completion": "Five names the sand almost took back. The court will read them aloud at dusk, {playerName}, and five of the Nameless will be nameless no longer.",
+        "objectives": {
+          "0": {
+            "label": "Sandbound Shade slain"
+          },
+          "1": {
+            "label": "Graven Name-Stone"
+          }
+        }
+      },
+      "q_sentence_the_heretics": {
+        "title": "Sentence the Heretics",
+        "text": "The sand-priests at the Ashen Court were tried in absence and sentenced in writing, {playerName}, and they eat the writs when my bailiffs deliver them. Very well. Deliver twelve sentences the old way, and recover four writs unswallowed so the record shows the court's patience ran out lawfully.",
+        "completion": "Twelve sentences executed and four writs returned to file. The law is slow, {playerName}, but out here it is also armed. The Seat thanks you for being both.",
+        "objectives": {
+          "0": {
+            "label": "Heretic Sand-Priest slain"
+          },
+          "1": {
+            "label": "Heretic Writ"
+          }
+        }
+      },
+      "q_warden_of_the_buried_court": {
+        "title": "Warden of the Buried Court",
+        "text": "Ashkerat was carved to hold the temple stair against the profane, {playerName}, and after two buried ages it has ruled everyone profane, the court included. I will not have the Seat besieged by its own doorkeeper. Take companions to the upper stair and bring the Warden down; the verdict is already written.",
+        "completion": "The stair is ours to the top for the first time since the sand came. We will carve no replacement, {playerName}. Some offices should stay empty.",
+        "objectives": {
+          "0": {
+            "label": "Ashkerat the Warden slain"
+          }
+        }
+      },
+      "q_the_living_court": {
+        "title": "The Living Court",
+        "text": "Two courts claim this Domain, {playerName}: mine, which breathes, and the one on the terrace, which does not. While the dead Judges hold session no verdict of the Seat carries past the tombs. Climb to the terrace and adjourn twelve of them. Let the sand keep the gavel.",
+        "completion": "Twelve benches emptied on the terrace. The living court does not celebrate the dead one, {playerName}, but it will sleep considerably better above it.",
+        "objectives": {
+          "0": {
+            "label": "Forsaken Judge slain"
+          }
+        }
+      },
+      "q_heresy_in_the_dunes": {
+        "title": "Heresy in the Dunes",
+        "text": "West of the road, {playerName}, former water-priests of this same faith have raised an Ashen Court and preach the verses we burned two generations ago. I archived those fires personally. Cull twelve of the sand-priests before their congregation outnumbers ours; the archive prefers its heresies past tense.",
+        "completion": "Twelve, and the ash court preaches quieter. Heresy is never killed, {playerName}, only re-filed. But re-filed will do.",
+        "objectives": {
+          "0": {
+            "label": "Heretic Sand-Priest slain"
+          }
+        }
+      },
+      "q_the_burned_creed": {
+        "title": "The Burned Creed",
+        "text": "The priests carry pages of the burned creed copied in a hand I do not recognize, {playerName}, which means the archive has a leak or the heresy has a scribe. Either answer frightens me. Bring me eight pages legible enough to compare against the sealed originals.",
+        "completion": "The hand is neither ours nor theirs... it is older than both, {playerName}. I filed these under 'resolved' once. I will not make that mistake twice.",
+        "objectives": {
+          "0": {
+            "label": "Burned Creed Page"
+          }
+        }
+      },
+      "q_word_to_the_domain": {
+        "title": "Word to the Domain",
+        "text": "What you recovered goes to Qesh Aram, {playerName}, in your mouth and nowhere else: the heresy has a scribe older than the heresy. Judge Saphira keeps the road; she must know what walks beside it. Say it plainly, watch her face, and do not write any of it down.",
+        "completion": "Sahr sends her fears by courier now... then they are worse than her letters. Thank you for carrying this, {playerName}. The Domain will act, quietly, as the Domain does.",
+        "objectives": {
+          "0": {
+            "label": "Carry word to Judge Saphira"
+          }
+        }
+      },
+      "q_the_brand_cold": {
+        "title": "The Brand, Cold",
+        "text": "Every convert to the ash creed is marked with a brand-iron, {playerName}, and every iron is cast from the same mother-mold. Collect six of the irons and I will read the mold marks; foundries keep records, and records are where heresies go to be caught. Take them cold. Do not oblige them by testing the edge.",
+        "completion": "Six irons, one mold, and the mold is Domain work. Someone inside the faith armed this heresy, {playerName}, and now the archive knows where to look.",
+        "objectives": {
+          "0": {
+            "label": "Heretic Brand-Iron"
+          }
+        }
+      },
+      "q_embers_unanswered": {
+        "title": "Embers Unanswered",
+        "text": "The creed we could argue with, {playerName}. The flameseers are past argument: the inner circle carries coals from the first burned shrine north toward the border bluffs, preaching that the Nameless answer fire. Twelve of them walk the high dunes tonight. See that their question stays unanswered.",
+        "completion": "Twelve fires out on the bluffs, and no answer came for any of them. Perhaps the Nameless are wiser than their congregation, {playerName}. Perhaps they are only patient. File both.",
+        "objectives": {
+          "0": {
+            "label": "Heretic Flameseer slain"
+          }
+        }
+      },
+      "q_censer_of_the_first_dawn": {
+        "title": "Censer of the First Dawn",
+        "text": "The flameseers looted the dawnward censers from the first shrine before we could seal it, {playerName}: bronze bowls that held the morning rite when the faith still had mornings. Cull twelve more of the seers and recover five censers. The archive owes the first dawn a debt, and I mean to pay it.",
+        "completion": "Five bowls, and the soot wipes off to show the dawn-script whole. Some things survive their thieves, {playerName}. The rite will be sung at sunrise, first time in an age.",
+        "objectives": {
+          "0": {
+            "label": "Heretic Flameseer slain"
+          },
+          "1": {
+            "label": "Dawnward Censer"
+          }
+        }
+      },
+      "q_bowls_of_the_court": {
+        "title": "Bowls of the Court",
+        "text": "The sentinels carry the offering bowls the first court ate from, {playerName}, tucked in their stone fists like the meal is still coming. The Judges want ceremony; I want dishes. Bring me six bowls unbroken and everyone at the Seat gets what they want, which is rarer than rain here.",
+        "completion": "Six bowls, older than the Domain and not a chip on them. The Judges will bless them and I will fill them, {playerName}, and that is the whole faith working as intended.",
+        "objectives": {
+          "0": {
+            "label": "Temple Offering Bowl"
+          }
+        }
+      },
+      "q_the_rise_road": {
+        "title": "The Rise Road",
+        "text": "My flour and my lamp oil come up the west fork past Duststorm Rise, {playerName}, and the storms have taken to walking the road like they pay tax on it. Twelve of the elementals stand between the Seat and its next baking day. Scatter them back up the dunes.",
+        "completion": "The sledges came through white with flour and not with dust, which is the correct color. The Seat eats because you swung first, {playerName}. I record such debts.",
+        "objectives": {
+          "0": {
+            "label": "Duststorm Elemental slain"
+          }
+        }
+      },
+      "q_meat_for_the_seat": {
+        "title": "Meat for the Seat",
+        "text": "Scripture feeds the soul, {playerName}, and my stores feed everything else, and the stores are down to salt and apology. Stalker haunch cures well and carries better. Bring me eight from the mirage beasts by the oasis, and mind the shimmer; I would rather have the meat and the hunter both.",
+        "completion": "Eight haunches, good weight, and you still cast one shadow. The smokehouse runs tonight, {playerName}, and tomorrow the court argues on a full stomach for once.",
+        "objectives": {
+          "0": {
+            "label": "Stalker Haunch"
+          }
+        }
+      },
+      "q_water_ledger": {
+        "title": "The Water Ledger",
+        "text": "Two men keep Last Water alive besides me, {playerName}: Ibbin, who sells the water and undercharges the desperate when he thinks I am not counting, and Dhalen, who rides the dunes and lies only about how close it was. Introduce yourself to both. Out here, being known is half of being safe.",
+        "completion": "Ibbin quoted you a fair price and Dhalen sized you for a grave, which means they both like you, {playerName}. Welcome to the last camp on the road.",
+        "objectives": {
+          "0": {
+            "label": "Speak with Waterseller Ibbin"
+          },
+          "1": {
+            "label": "Speak with Outrider Dhalen"
+          }
+        }
+      },
+      "q_bones_on_the_road": {
+        "title": "Bones on the Road",
+        "text": "The Barrens packs have learned the sound of a laden axle, {playerName}, and they strip a stalled wagon to bright bone before the driver finishes swearing. I lose more oxen to ravagers than to thirst, and thirst is the whole business of this camp. Break twelve of them off the east marches.",
+        "completion": "Twelve, and my drivers report the packs keeping to the bone fields again. The road eats enough without teeth on it, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Bonewind Ravager slain"
+          }
+        }
+      },
+      "q_the_barrens_toll": {
+        "title": "The Barrens Toll",
+        "text": "The clans nail oxbone tallies to the waymarkers for every beast the Barrens take, {playerName}: their count of what the road owes the sand. The ravagers carry the markers off to gnaw. Cull ten more of the packs and bring me six tallies back; I settle my accounts, even the superstitious ones.",
+        "completion": "Six tallies, back on the waymarkers by dusk. The clans will say the road paid its toll, {playerName}, and for one season the Barrens and I will agree on the arithmetic.",
+        "objectives": {
+          "0": {
+            "label": "Bonewind Ravager slain"
+          },
+          "1": {
+            "label": "Oxbone Toll-Tally"
+          }
+        }
+      },
+      "q_raiders_at_last_water": {
+        "title": "Raiders at Last Water",
+        "text": "The duskwater crews were caravan guards once, {playerName}; I signed some of their contracts myself. Now they work the dry marches north of camp and bleed the wagons they swore to walk beside. Sentiment kept my hand closed too long. Open it: twelve raiders off my road.",
+        "completion": "Twelve, and two of the names I knew. I will not pretend it does not cost, {playerName}; I will only tell you the wagons rolled through this morning untouched, and that is the price paid where I can see it.",
+        "objectives": {
+          "0": {
+            "label": "Duskwater Raider slain"
+          }
+        }
+      },
+      "q_oathmarks_in_the_sand": {
+        "title": "Oathmarks in the Sand",
+        "text": "Every guard I ever hired carried an oathmark stamped with my seal, {playerName}, and the duskwater crews still wear theirs while they rob me under it. That insult I will not carry. Cut down eight more and bring me six oathmarks; I mean to retire them from the rolls with my own stylus.",
+        "completion": "Six marks, six lines struck from the ledger. An oath outlives the man who breaks it, {playerName}, but it does not outlive the woman who witnessed it. Take their kit; they forfeited it.",
+        "objectives": {
+          "0": {
+            "label": "Duskwater Raider slain"
+          },
+          "1": {
+            "label": "Duskwater Oathmark"
+          }
+        }
+      },
+      "q_the_missing_manifests": {
+        "title": "The Missing Manifests",
+        "text": "The raiders take the toll tallies along with the cargo, {playerName}, and without the manifests I cannot prove to the border clerks what crossed and what died. Veth clerks assume the worst; it is their whole craft. Hunt ten raiders on the north marches and bring back five tallies with the seals unbroken.",
+        "completion": "Five seals whole, and the border ledger balances for the first quarter in a year. You have no idea what a balanced ledger buys at a Veth toll-house, {playerName}. I do, and I am grateful.",
+        "objectives": {
+          "0": {
+            "label": "Duskwater Raider slain"
+          },
+          "1": {
+            "label": "Sealed Toll Tally"
+          }
+        }
+      },
+      "q_last_caravan_out": {
+        "title": "Last Caravan Out",
+        "text": "The season's last caravan rolls for the border pass at first light, {playerName}: forty souls, every water cask I can spare, and half the Domain's tithe in the strongbox. The duskwater crews know all three numbers. Walk ahead of the wagons tonight and clear the marches; fourteen raiders stand between here and the stones.",
+        "completion": "The outriders signaled from the border stones at dusk: forty souls counted twice, {playerName}. You will not see the caravan again, and it will never stop owing you. That is the shape of work out here.",
+        "objectives": {
+          "0": {
+            "label": "Duskwater Raider slain"
+          }
+        }
+      },
+      "q_glass_that_walks": {
+        "title": "Glass That Walks",
+        "text": "North of the Rise the lightning storms of two ages fused the dunes to glass, {playerName}, and lately the glass stands up. The colossi drink the deep wells dry and my horse will not go within a mile of one. Bring down ten so the well lines north of camp run wet again.",
+        "completion": "Ten heaps of quiet glass, and the north wells are filling. I rode past one of your kills at noon, {playerName}; it caught the sun like a chandelier. Prettiest thing I ever hated.",
+        "objectives": {
+          "0": {
+            "label": "Duneglass Colossus slain"
+          }
+        }
+      },
+      "q_the_unmapped_dunes": {
+        "title": "The Unmapped Dunes",
+        "text": "My map of the north marches is wrong every morning, {playerName}: the colossi shoulder whole dunes aside as they walk, and a route I inked in spring is a wall by harvest. I cannot chart around that many tons of moving glass. Break twelve more and the sand will hold still long enough to draw.",
+        "completion": "Twelve down, and this morning the dunes were where I left them. A map that stays true for a season, {playerName}; out here that is the difference between a road and a rumor.",
+        "objectives": {
+          "0": {
+            "label": "Duneglass Colossus slain"
+          }
+        }
+      },
+      "q_spoor_of_the_tyrant": {
+        "title": "Spoor of the Tyrant",
+        "text": "Something under the Barrens moves the ravager packs like a hand under a blanket, {playerName}, and the packs carry its castings in their gullets: sand fused hot, scale-pressed. The clans call it the Sandmaw. I call it a map I have not drawn yet. Bring me six castings and I will chart where the ground is a mouth.",
+        "completion": "Six castings, and the pattern is a spiral closing on the east Barrens. Whatever the Sandmaw is, {playerName}, it is circling something, and now we know where. Ride wide of the center until you mean it.",
+        "objectives": {
+          "0": {
+            "label": "Tyrant Spoor-Casting"
+          }
+        }
+      },
+      "q_flameseers_on_the_bluffs": {
+        "title": "Flameseers on the Bluffs",
+        "text": "There are fires on the tomb bluffs east of the road every night now, {playerName}, and they are not clan fires; clans bank their coals against the wind. The flameseers preach to the dark and the dark leans in to listen. Twelve of them hold the bluffs. I want the nights out there boring again.",
+        "completion": "Dark bluffs for three nights running, {playerName}. Boring is the finest word in an outrider's report, and you wrote it.",
+        "objectives": {
+          "0": {
+            "label": "Heretic Flameseer slain"
+          }
+        }
+      },
+      "q_creeds_of_ash": {
+        "title": "Creeds of Ash",
+        "text": "The seers carry their creed on ash-blacked tablets, {playerName}, and Canon Sahr at the Seat pays courier rates for anything the heresy writes down. I ride too fast to play librarian. Pull seven ash creeds off the bluffs and I will see they travel south with the next water run.",
+        "completion": "Seven tablets, packed in wool like they might bite. Sahr will read them by lamplight and frighten herself thoroughly, {playerName}, which I am told is how archivists say thank you.",
+        "objectives": {
+          "0": {
+            "label": "Ash Creed Tablet"
+          }
+        }
+      },
+      "q_two_knives": {
+        "title": "Two Knives",
+        "text": "The border bleeds from two knives, {playerName}: duskwater steel on the road and heretic fire on the bluffs, and each swears it will outlast the other. I have stopped caring who is right. Ride the north marches with me on the map and take eight of each; the desert can referee what is left.",
+        "completion": "Eight and eight, and for one night the north marches held nothing but wind. Two knives, one quiet, {playerName}. I will take the arithmetic.",
+        "objectives": {
+          "0": {
+            "label": "Duskwater Raider slain"
+          },
+          "1": {
+            "label": "Heretic Flameseer slain"
+          }
+        }
+      },
+      "q_the_first_cartographer": {
+        "title": "The First Cartographer",
+        "text": "Every map of this Domain descends from one survey, {playerName}, drawn before the Domain had a name, and the surveyor never stopped walking. His shade paces the far Barrens corner with the original under one arm, and it unmakes my routes just by crossing them. Take companions, put the First Cartographer to rest, and bring the map home.",
+        "completion": "So this is the mother of every line I have ever drawn... it shows water where the Barrens are, {playerName}. Either the world moved or the map is patient. Both thoughts will keep me up for years, and I thank you for each.",
+        "objectives": {
+          "0": {
+            "label": "First Cartographer's Shade slain"
+          },
+          "1": {
+            "label": "The First Cartographer's Map"
+          }
+        }
+      },
+      "q_the_maps_edge": {
+        "title": "The Map's Edge",
+        "text": "The first map belongs to the faith, {playerName}, whatever my hands say about giving it up. Carry it south to Judge Ivenna at the Sunken Seat; her court sat when this ink was wet, and the Seat is the only vault I trust with it. Tell her the edge of the map reads: here the Judges stopped counting.",
+        "completion": "The first survey, home under the first roof. And the margin note is real: here the Judges stopped counting. We will not repeat that mistake, {playerName}. The court accepts the map, and the debt.",
+        "objectives": {
+          "0": {
+            "label": "Bring the map to Judge Ivenna"
+          }
+        }
+      },
+      "q_the_taken_casks": {
+        "title": "The Taken Casks",
+        "text": "The raiders do not steal coin out here, {playerName}; coin does not pour. They take my sealed casks, and every cask they hold is a family at the well come winter. Kill eight of the duskwater crews and bring back eight casks with the wax unbroken. Water sold twice is water stolen once.",
+        "completion": "Eight casks, seals whole, back in the cool-house where they belong. You did not carry water today, {playerName}; you carried the winter. Few can say it.",
+        "objectives": {
+          "0": {
+            "label": "Duskwater Raider slain"
+          },
+          "1": {
+            "label": "Sealed Water Cask"
+          }
+        }
+      },
+      "q_hearts_of_duneglass": {
+        "title": "Hearts of Duneglass",
+        "text": "A colossus keeps a heart of fused glass, {playerName}, and the heart stays cold three days after the body stops. I line my deep cisterns with them and the water keeps sweet through high summer. Six hearts would see Last Water through the dry months. I will not pretend the getting is easy.",
+        "completion": "Six hearts, still cold enough to fog a blade. The cisterns will hold sweet till the rains, {playerName}, and every skin I sell this summer pours a little of your work.",
+        "objectives": {
+          "0": {
+            "label": "Duneglass Heart"
+          }
+        }
+      },
+      "q_the_wells_between": {
+        "title": "The Wells Between",
+        "text": "Between here and the border stones there are nine wells, {playerName}, and the colossi have drunk four of them to mud. A dry well on that stretch is not an inconvenience; it is a grave with a rope. Break ten of the glass walkers off the well lines and give the ground back its water.",
+        "completion": "Two of the four wells are seeping again already. Nine wells between here and the stones, {playerName}, and tonight all nine have a chance. That is the whole shape of my religion.",
+        "objectives": {
+          "0": {
+            "label": "Duneglass Colossus slain"
+          }
+        }
+      },
+      "q_ash_in_the_wells": {
+        "title": "Ash in the Wells",
+        "text": "The flameseers bless my well lines now, {playerName}, if blessing is the word: they pour ember phials into the water and call the steam an answered prayer. Fouled wells on the last stretch kill quieter than any raider. Take six phials off the seers before the prayers reach the deep water.",
+        "completion": "Six phials, stoppered and drowned in sand where they can preach to no one. The wells run clear, {playerName}. Whatever the Nameless want of us, I refuse to believe it is boiled pilgrims.",
+        "objectives": {
+          "0": {
+            "label": "Ember Phial"
           }
         }
       },

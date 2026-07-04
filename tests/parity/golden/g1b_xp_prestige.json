@@ -10,14 +10,14 @@
     "max-level overflow -> lifetimeXp / virtualLevelUp (accrueLifetimeXp, C1)",
     "cosmetic prestige accept + below-threshold reject (prestige, G1b)"
   ],
-  "draws": 313,
-  "drawDigest": "ce31f14a",
+  "draws": 367,
+  "drawDigest": "61a1275b",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1379,
-      "state": "a3a5f4b9",
+      "nextId": 1570,
+      "state": "014ec469",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -68,7 +68,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -111,9 +111,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1379,
-      "state": "435e77dd",
-      "events": "ccc3b9e2",
+      "nextId": 1570,
+      "state": "e1b09191",
+      "events": "2b69bffe",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -122,8 +122,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1379,
-      "state": "04871b8d",
+      "nextId": 1570,
+      "state": "d12c5841",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -133,23 +133,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "3f3a2bb3",
+      "nextId": 1570,
+      "state": "36acd437",
       "events": "741638a5",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "3f3a2bb3",
+      "nextId": 1570,
+      "state": "36acd437",
       "events": "741638a5",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       },
       "label": "rested-accrued",
       "players": [
@@ -170,7 +170,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -197,7 +197,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -240,12 +240,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "e03e5532",
-      "events": "14d9e615",
+      "nextId": 1570,
+      "state": "81f69d3a",
+      "events": "b5d494a9",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       },
       "label": "rested-consumed",
       "players": [
@@ -268,7 +268,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -297,7 +297,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 90,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -340,12 +340,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "4e148bcf",
-      "events": "4c4cb2af",
+      "nextId": 1570,
+      "state": "4b5672f7",
+      "events": "c5409793",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       },
       "label": "ding",
       "players": [
@@ -369,7 +369,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -398,7 +398,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 128,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -441,12 +441,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "820a579c",
-      "events": "bb822db6",
+      "nextId": 1570,
+      "state": "e817e960",
+      "events": "43cf20a6",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       },
       "label": "overflow",
       "players": [
@@ -470,7 +470,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -504,7 +504,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 1572,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 40,
           "lootFfaTimer": "Infinity",
@@ -547,12 +547,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "a1ac2d07",
-      "events": "64ccd5bc",
+      "nextId": 1570,
+      "state": "1d37a0e3",
+      "events": "d0fe1680",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       },
       "label": "prestige-accept",
       "players": [
@@ -576,7 +576,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -610,7 +610,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 1572,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 40,
           "lootFfaTimer": "Infinity",
@@ -653,12 +653,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "a1ac2d07",
+      "nextId": 1570,
+      "state": "1d37a0e3",
       "events": "741638a5",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       },
       "label": "prestige-reject",
       "players": [
@@ -682,7 +682,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -716,7 +716,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 1572,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 40,
           "lootFfaTimer": "Infinity",
@@ -759,12 +759,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1379,
-      "state": "a1ac2d07",
+      "nextId": 1570,
+      "state": "1d37a0e3",
       "events": "741638a5",
       "rng": {
-        "draws": 313,
-        "digest": "ce31f14a"
+        "draws": 367,
+        "digest": "61a1275b"
       },
       "label": "final",
       "players": [
@@ -788,7 +788,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1378,
+          "entityId": 1569,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -822,7 +822,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
           "hp": 1572,
-          "id": 1378,
+          "id": 1569,
           "kind": "player",
           "level": 40,
           "lootFfaTimer": "Infinity",

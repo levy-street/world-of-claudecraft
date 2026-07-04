@@ -101,7 +101,10 @@ describe('escort runs: the Ironpass tollroad', () => {
     expect(sim.questLog.get(ROUTE.questId)!.counts[ROUTE.objectiveIndex]).toBe(0);
     // step away so the fresh carter does not immediately restart the walk
     teleport(sim, sim.player, ROUTE.start.x - 150, ROUTE.start.z - 150);
-    for (let i = 0; i < 20 * (ROUTE.cooldownSeconds + 2); i++) sim.tick();
+    // shrink the cooldown timer in place: full 120s is 2400 ticks of dead time
+    // that pushed the test into the suite timeout under parallel load
+    state(sim).timer = 2;
+    for (let i = 0; i < 20 * 4; i++) sim.tick();
     expect(state(sim).phase).toBe('waiting');
     const fresh = escortee(sim);
     expect(fresh.dead).toBe(false);
