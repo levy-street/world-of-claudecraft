@@ -23,7 +23,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
-import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
+import { ACTIVE_LEVEL_CAP, ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
@@ -256,11 +256,34 @@ describe('xp pacing budget (no forced grinding)', () => {
     return sum;
   }
 
+  // The REQUIRED leveling paths of the launch: the Landing carries 1-20 and
+  // each faction realm carries its own faction 20-40 alone (the Envoys' Hall
+  // teleports a sworn character straight to their realm). These zones must
+  // cover their full band. Contested-ring zones are SUPPLEMENTARY shared
+  // content: their quests prove they carry real weight, but nobody is required
+  // to level there, so no full-coverage demand. Bands clamp to the active cap
+  // (sealed content above it ships without a leveling budget).
+  const REQUIRED_PATH_ZONE_IDS = new Set([
+    'eastbrook_vale',
+    'mirefen_marsh',
+    'thornpeak_heights',
+    'ossara_domain',
+    'veth_confederation',
+    'kael_empire',
+  ]);
+
   for (const zone of ZONES) {
     it(`${zone.id} covers levels ${zone.levelRange[0]}-${zone.levelRange[1]} with headroom`, () => {
       const budget = questsForZone(zone);
       if (budget.count === 0) return; // zone content not built yet
-      const [lo, hi] = zone.levelRange;
+      const [lo, hiRaw] = zone.levelRange;
+      const hi = Math.min(hiRaw, ACTIVE_LEVEL_CAP);
+      if (lo >= hi) return; // sealed band: no leveling budget applies
+      if (!REQUIRED_PATH_ZONE_IDS.has(zone.id)) {
+        // supplementary zone: quests exist and pay real XP, coverage is optional
+        expect(budget.xp, `${zone.id}: supplementary quests should pay XP`).toBeGreaterThan(0);
+        return;
+      }
       const needed = xpNeeded(lo, hi);
       const available = budget.xp + budget.killXp;
       const headroom = available / needed;

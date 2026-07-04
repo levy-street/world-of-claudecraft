@@ -104,6 +104,18 @@ describe('the Envoys Hall oath', () => {
     expect(fresh.travel()).toBe(false);
   });
 
+  it('refuses the dead (no oath, no passage, no teleport out of the ghost run)', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    atHall(sim);
+    sim.player.dead = true;
+    expect(sim.chooseRace('dwarf')).toBe(false);
+    expect(sim.meta(sim.playerId)!.race).toBeUndefined();
+    expect(sim.travel()).toBe(false);
+    sim.player.dead = false;
+    expect(sim.chooseRace('dwarf')).toBe(true);
+  });
+
   it('keeps the oath across a save/load round-trip', () => {
     const sim = makeSim();
     sim.setPlayerLevel(20);

@@ -177,6 +177,19 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// Tripo-generated creature rigs (scripts/asset_pipeline): the pipeline
+// retargets preset animations and renames every clip to this exact vocabulary,
+// so all generated bodies share one map (non-biped rigs reuse the walk preset
+// for the other slots, same names).
+const TRIPO8: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -615,6 +628,128 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: BIPED14,
     tint: 'entity',
     tintStrength: 0.35,
+  },
+  // Tripo-generated Valdris bestiary (scripts/asset_pipeline, CREDITS.md):
+  // bespoke bodies for the sub-40 families that shared launch-zone stock
+  // meshes. Entity tint keeps per-template variants distinct on shared bodies.
+  mob_ossara_judge: {
+    url: `${CREATURES}/mob_ossara_judge.glb`,
+    height: 1.9,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mob_sandmaw_tyrant: {
+    url: `${CREATURES}/mob_sandmaw_tyrant.glb`,
+    height: 2.6,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mob_dust_elemental: {
+    url: `${CREATURES}/mob_dust_elemental.glb`,
+    height: 2.0,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_granite_elemental: {
+    url: `${CREATURES}/mob_granite_elemental.glb`,
+    height: 2.2,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_veykar: {
+    url: `${CREATURES}/mob_veykar.glb`,
+    height: 2.0,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.15,
+  },
+  mob_commander_vaelis: {
+    url: `${CREATURES}/mob_commander_vaelis.glb`,
+    height: 2.1,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.15,
+  },
+  mob_tombrobber: {
+    url: `${CREATURES}/mob_tombrobber.glb`,
+    height: 1.7,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  mob_veth_cutthroat: {
+    url: `${CREATURES}/mob_veth_cutthroat.glb`,
+    height: 1.8,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mob_frost_troll: {
+    url: `${CREATURES}/mob_frost_troll.glb`,
+    height: 2.3,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_twilight_revenant: {
+    url: `${CREATURES}/mob_twilight_revenant.glb`,
+    height: 1.9,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_ironhold_burrower: {
+    url: `${CREATURES}/mob_ironhold_burrower.glb`,
+    height: 1.5,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_ember_cat: {
+    url: `${CREATURES}/mob_ember_cat.glb`,
+    height: 1.3,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  mob_pale_widow: {
+    url: `${CREATURES}/mob_pale_widow.glb`,
+    height: 1.1,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_river_skulker: {
+    url: `${CREATURES}/mob_river_skulker.glb`,
+    height: 1.6,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  mob_legion_deserter: {
+    url: `${CREATURES}/mob_legion_deserter.glb`,
+    height: 1.9,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  mob_highland_ogre: {
+    url: `${CREATURES}/mob_highland_ogre.glb`,
+    height: 2.5,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
+  mob_fog_horror: {
+    url: `${CREATURES}/mob_fog_horror.glb`,
+    height: 2.8,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.2,
   },
   // the two blob-head monsters (Orc_Blob / Yeti_Blob): gnashing horrors
   mob_maw: {
@@ -1061,6 +1196,33 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Tripo-generated Valdris bodies (scripts/asset_pipeline): one bespoke body
+  // per family; per-template MobTemplate.color tints differentiate siblings.
+  forsaken_judge: 'mob_ossara_judge',
+  karn_the_unburied: 'mob_ossara_judge',
+  sandmaw_tyrant: 'mob_sandmaw_tyrant',
+  duststorm_elemental: 'mob_dust_elemental',
+  granite_churn_elemental: 'mob_granite_elemental',
+  deep_shale_elemental: 'mob_granite_elemental',
+  ironpass_crag_elemental: 'mob_granite_elemental',
+  tombrobber_scavenger: 'mob_tombrobber',
+  guildless_cutthroat: 'mob_veth_cutthroat',
+  frostpine_headhunter: 'mob_frost_troll',
+  grelnok_the_hoarbound: 'mob_frost_troll',
+  thornfen_troll: 'mob_frost_troll',
+  ironhold_digger: 'mob_ironhold_burrower',
+  ironhold_geomancer: 'mob_ironhold_burrower',
+  overseer_kazrik: 'mob_ironhold_burrower',
+  emberjaw_matriarch: 'mob_ember_cat',
+  duskmane_stalker: 'mob_ember_cat',
+  palefang_the_silent: 'mob_ember_cat',
+  rimeclaw_prowler: 'mob_ember_cat',
+  blackriver_skulker: 'mob_river_skulker',
+  broken_legion_deserter: 'mob_legion_deserter',
+  sellsword_ogre: 'mob_highland_ogre',
+  crag_toller: 'mob_highland_ogre',
+  palewidow_weaver: 'mob_pale_widow',
+  thornfen_creeper: 'mob_pale_widow',
   emberkin: 'mob_demon',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',
@@ -1147,9 +1309,9 @@ const MOB_KEYS: Record<string, string> = {
   pale_gnawer: 'mob_gnawer',
   // wraiths, shades and wisps: the ghost body instead of robed-caster copies
   salt_wraith: 'mob_ghost',
-  fog_wraith: 'mob_ghost',
+  fog_wraith: 'mob_twilight_revenant',
   deserter_wraith: 'mob_ghost',
-  hollow_revenant: 'mob_ghost',
+  hollow_revenant: 'mob_twilight_revenant',
   ash_wraith: 'mob_ghost',
   sandbound_shade: 'mob_ghost',
   pale_watcher: 'mob_ghost',
@@ -1175,8 +1337,8 @@ const MOB_KEYS: Record<string, string> = {
   firstborn_of_the_crater: 'mob_colossus',
   magma_serpent: 'mob_dragonkin',
   // fallen-legion officers and their crossbowman
-  commander_vaelis: 'mob_fallen_knight',
-  veykar_the_forsworn: 'mob_fallen_knight',
+  commander_vaelis: 'mob_commander_vaelis',
+  veykar_the_forsworn: 'mob_veykar',
   broken_legion_arbalist: 'mob_arbalist',
   pass_raider: 'mob_bruiser',
   scavenger_king: 'mob_bruiser',

@@ -72,6 +72,11 @@ export function chooseRaceAtEnvoy(ctx: SimContext, race: string, pid?: number): 
   const r = ctx.resolve(pid);
   if (!r) return false;
   const { meta, e } = r;
+  if (e.dead) {
+    // The dead cannot swear (and must not teleport out of their ghost run).
+    ctx.error(e.id, 'You are dead.');
+    return false;
+  }
   if (meta.race) {
     ctx.error(e.id, 'Your oath is already sworn.');
     return false;
@@ -108,6 +113,10 @@ export function travelWithFerry(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
   const { meta, e } = r;
+  if (e.dead) {
+    ctx.error(e.id, 'You are dead.');
+    return false;
+  }
   if (liveNpcNear(ctx, e, Object.values(FERRY_NPC_IDS))) {
     teleport(ctx, e, 0, ENVOY_HALL_Z - 8);
     return true;
