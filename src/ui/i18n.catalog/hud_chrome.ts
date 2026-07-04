@@ -51,6 +51,8 @@ export const hudChromeStrings = {
     error: 'Could not load daily rewards.',
     intro:
       'Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.',
+    disclaimer:
+      'WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.',
     prize: 'Prize Pool',
     reset: 'Reset',
     endsIn: 'Ends in {time}',

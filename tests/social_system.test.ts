@@ -12,7 +12,6 @@ import {
   type SocialTransport,
   validateGuildName,
 } from '../server/social';
-import { applyGameConfig } from '../src/sim/game_config';
 
 // ---------------------------------------------------------------------------
 // In-memory fakes — let us exercise the full SocialService logic (friends,
@@ -836,25 +835,6 @@ describe('guild calendar events', () => {
     await h.svc.guildEventCreate(h.actor(1), { day: NEXT_WEEK, hour: 20, title: '   ', note: '' });
     expect(resultsFor(h, 1)).toEqual(['badInput', 'badInput', 'badInput', 'badInput']);
     expect((await h.svc.snapshot(1)).guild?.events).toHaveLength(0);
-  });
-
-  it('honors a housekeeping eventLimit override', async () => {
-    applyGameConfig({ calendar: { eventLimit: 2 } });
-    try {
-      const h = await seatedGuild();
-      for (let i = 0; i < 3; i++) {
-        await h.svc.guildEventCreate(h.actor(1), {
-          day: NEXT_WEEK,
-          hour: null,
-          title: `Event ${i}`,
-          note: '',
-        });
-      }
-      expect(resultsFor(h, 1).filter((c) => c === 'calendarFull')).toHaveLength(1);
-      expect((await h.svc.snapshot(1)).guild?.events).toHaveLength(2);
-    } finally {
-      applyGameConfig({});
-    }
   });
 
   it('caps the upcoming calendar and reports calendarFull', async () => {

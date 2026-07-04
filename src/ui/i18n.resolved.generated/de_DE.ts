@@ -188,6 +188,7 @@ export const de_DE: EnTranslations = {
       "loading": "Tägliche Belohnungen werden geladen...",
       "error": "Tägliche Belohnungen konnten nicht geladen werden.",
       "intro": "Halte genügend WOC in deiner verifizierten Wallet, um tägliche Belohnungen freizuschalten. Verdiene Punkte mit einem täglichen Dreh und wechselnden Aufgaben und klettere dann in der täglichen Rangliste nach oben, um einen Anteil am Preispool zu erhalten.",
+      "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Preispool",
       "reset": "Zurücksetzen",
       "endsIn": "Endet in {time}",

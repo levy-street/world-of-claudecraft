@@ -209,6 +209,7 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
+  boss.castTargetId = null;
   boss.channeling = false;
 }
 
@@ -583,6 +584,7 @@ export function startNythraxisTransition(
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
+  boss.castTargetId = null;
   const transitionLines = [
     { speaker: 'nythraxis' as const, text: 'Another priest...', delay: 0 },
     { speaker: 'aldric' as const, text: 'Your kingdom is gone, Nythraxis', delay: 3.0 },
@@ -790,6 +792,7 @@ export function startNythraxisDeathlessRage(
   boss.castingAbility = 'nythraxis_deathless_rage';
   boss.castTotal = NYTHRAXIS_DEATHLESS_CAST;
   boss.castRemaining = NYTHRAXIS_DEATHLESS_CAST;
+  boss.castTargetId = null;
   boss.channeling = false;
   nythraxisSay(ctx, boss, 'nythraxis', 'Witness true eternity!', true);
   ctx.emit({
@@ -810,12 +813,14 @@ export function updateNythraxisDeathlessRage(
   boss.castingAbility = 'nythraxis_deathless_rage';
   boss.castTotal = NYTHRAXIS_DEATHLESS_CAST;
   boss.castRemaining = st.deathlessCastRemaining;
+  boss.castTargetId = null;
   updateNythraxisWardChannels(ctx, boss, st);
   if (nythraxisWardstoneInterruptReady(st)) {
     st.deathlessCastRemaining = 0;
     boss.castingAbility = null;
     boss.castRemaining = 0;
     boss.castTotal = 0;
+    boss.castTargetId = null;
     st.deathlessStunRemaining = NYTHRAXIS_DEATHLESS_STUN;
     ctx.applyAura(boss, {
       id: 'nythraxis_deathless_stun',
@@ -840,6 +845,7 @@ export function updateNythraxisDeathlessRage(
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
+  boss.castTargetId = null;
   nythraxisSay(ctx, boss, 'nythraxis', 'You cannot stop what was promised..', true);
   ctx.emit({
     type: 'spellfx',
@@ -891,6 +897,7 @@ export function updateNythraxisWardChannels(
     p.channeling = true;
     p.castTotal = NYTHRAXIS_DEATHLESS_CHANNEL;
     p.castRemaining = channel.remaining;
+    p.castTargetId = null;
     ctx.emit({
       type: 'spellfx',
       sourceId: ward.id,
@@ -918,6 +925,7 @@ export function clearNythraxisWardChannelCast(p: Entity): void {
   p.channeling = false;
   p.castRemaining = 0;
   p.castTotal = 0;
+  p.castTargetId = null;
 }
 
 export function nythraxisWardstones(ctx: SimContext, boss: Entity): Entity[] {
@@ -963,6 +971,7 @@ export function tryStartNythraxisWardChannel(
   player.channeling = true;
   player.castTotal = NYTHRAXIS_DEATHLESS_CHANNEL;
   player.castRemaining = NYTHRAXIS_DEATHLESS_CHANNEL;
+  player.castTargetId = null;
   ctx.emit({
     type: 'spellfx',
     sourceId: ward.id,

@@ -120,11 +120,11 @@ describe('Input autorun', () => {
     input.toggleAutorun();
     expect(input.readMoveInput().forward).toBe(true);
 
-    input.suspendMovement = true; // mirrors main.ts setting it while the game menu is open
+    input.setSuspendMovement(true); // mirrors main.ts setting it while the game menu is open
     expect(input.autorun).toBe(true); // latch untouched by the menu
     expect(input.readMoveInput().forward).toBe(true); // keeps running while suspended
 
-    input.suspendMovement = false; // menu closed
+    input.setSuspendMovement(false); // menu closed
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true); // still running
   });
@@ -137,9 +137,41 @@ describe('Input autorun', () => {
     windowListeners.get('keydown')!({ code: 'KeyW', repeat: false }); // hold forward
     expect(input.readMoveInput().forward).toBe(true);
 
-    input.suspendMovement = true; // game menu / chat open
+    input.setSuspendMovement(true); // game menu / chat open
     expect(input.autorun).toBe(false);
     expect(input.readMoveInput().forward).toBe(false); // held key is suppressed
+  });
+
+  it('drops stale held forward and jump state when movement suspension begins', () => {
+    const { input, windowListeners } = makeInput();
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+    now += 1;
+
+    expect(input.debugState().keys).toEqual([]);
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+  });
+
+  it('keeps autorun latched when suspension clears stale held key state', () => {
+    const { input, windowListeners } = makeInput();
+    input.toggleAutorun();
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+
+    expect(input.autorun).toBe(true);
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.debugState().keys).toEqual([]);
   });
 });
 
@@ -533,6 +565,16 @@ describe('Input Escape handling', () => {
 
     windowListeners.get('keydown')!({ code: 'Escape', repeat: false });
     windowListeners.get('keydown')!({ code: 'KeyB', repeat: false });
+
+    expect(cb.onUiKey).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).toHaveBeenCalledWith('escape');
+  });
+
+  it('ignores repeated Escape keydown events so holding the menu key cannot retoggle', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: true });
 
     expect(cb.onUiKey).toHaveBeenCalledTimes(1);
     expect(cb.onUiKey).toHaveBeenCalledWith('escape');

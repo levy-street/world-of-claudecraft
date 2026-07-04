@@ -188,6 +188,7 @@ export const it_IT: EnTranslations = {
       "loading": "Caricamento delle ricompense giornaliere...",
       "error": "Impossibile caricare le ricompense giornaliere.",
       "intro": "Detieni abbastanza WOC nel tuo portafoglio verificato per sbloccare le ricompense giornaliere. Guadagna punti con un giro giornaliero e incarichi a rotazione, poi scala la classifica giornaliera per aggiudicarti una parte del montepremi.",
+      "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Montepremi",
       "reset": "Azzeramento",
       "endsIn": "Termina tra {time}",

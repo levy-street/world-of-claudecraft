@@ -2317,7 +2317,7 @@ async function startGame(
     // freeze movement while the game menu is up so WASD doesn't walk the
     // character behind it (other windows stay non-modal, as before); the
     // first-spawn intro cinematic holds movement the same way until it lands
-    input.suspendMovement = !gameInputReady || hud.isModalOpen() || intro !== null;
+    input.setSuspendMovement(!gameInputReady || hud.isModalOpen() || intro !== null);
     perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
       frameDtMs: frameDt * 1000,
     });
@@ -2615,7 +2615,7 @@ async function startGame(
     window.addEventListener('keydown', skipIntro, true);
     window.addEventListener('pointerdown', skipIntro, true);
   }
-  input.suspendMovement = true;
+  input.setSuspendMovement(true);
   await nextPaint();
   try {
     await renderer.prewarmInitialScene();

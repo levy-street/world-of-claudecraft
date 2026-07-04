@@ -656,6 +656,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
   r.e.castingAbility = DEMON_HEAL_CAST_ID;
   r.e.castTotal = DEMON_HEAL_DURATION;
   r.e.castRemaining = DEMON_HEAL_DURATION;
+  r.e.castTargetId = null;
   r.e.channeling = true;
   r.e.channelTickEvery = DEMON_HEAL_TICK;
   r.e.channelTickTimer = DEMON_HEAL_TICK;

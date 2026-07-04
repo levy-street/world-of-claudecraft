@@ -726,6 +726,11 @@
   body.mobile-touch #chatlog-tabs {
     transform: scale(0.92);
     transform-origin: left bottom;
+    /* The chat-box move gesture is desktop-only (onChatBoxMoveStart bails on mobile),
+       so allow a horizontal touch-pan here to reach tabs that overflow the strip
+       (its scrollbar is hidden for the classic look). */
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
   }
   body.mobile-touch #chat-input {
     left: max(10px, env(safe-area-inset-left));

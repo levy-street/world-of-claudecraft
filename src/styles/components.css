@@ -1436,6 +1436,12 @@
     font-size: 12px;
     line-height: 1.4;
   }
+  .dr-disclaimer {
+    margin: -4px 0 10px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
   .dr-summary strong {
     color: #ffe27a;
     font-size: 13px;

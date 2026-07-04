@@ -24,6 +24,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.error': 'デイリー報酬を読み込めませんでした。',
   'hudChrome.dailyRewards.intro':
     '認証済みウォレットに十分なWOCを保有すると、デイリー報酬が解放されます。1日1回のスピンとローテーションするタスクでポイントを獲得し、デイリーランキングを駆け上がって賞金プールの分け前を狙いましょう。',
+  'hudChrome.dailyRewards.disclaimer':
+    'WOC価格は大きく変動する場合があります。通常の価格変動で報酬がロックされないよう、$20 USDの最低額より多めに保有することをおすすめします。これは金融助言ではありません。',
   'hudChrome.dailyRewards.prize': '賞金プール',
   'hudChrome.dailyRewards.reset': 'リセット',
   'hudChrome.dailyRewards.score': 'スコア',

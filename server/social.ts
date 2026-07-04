@@ -8,8 +8,6 @@
 // whoever happens to be online without knowing about sockets). game.ts wires
 // the real Postgres + socket implementations in.
 
-import { CALENDAR_TUNING } from '../src/sim/game_config';
-
 export type GuildRank = 'leader' | 'officer' | 'member';
 
 // Where a character is and what they're doing, for friend/guild rosters.
@@ -183,10 +181,12 @@ const GUILD_MEMBER_LIMIT = 100;
 const GUILD_INVITE_TTL_MS = 60_000;
 const GUILD_MESSAGE_MAX = 200;
 // Guild calendar: caps + input bounds. Events are UTC-day keyed ('YYYY-MM-DD',
-// matching the sim's utcDay convention) and may be booked up to a year out by
-// default. The values live on CALENDAR_TUNING (src/sim/game_config.ts) so the
-// admin Housekeeping section can override them; read at each use site, never
-// captured at module load.
+// matching the sim's utcDay convention) and may be booked up to a year out.
+const GUILD_EVENT_LIMIT = 25; // upcoming events per guild
+const GUILD_EVENT_TITLE_MAX = 48;
+const GUILD_EVENT_NOTE_MAX = 160;
+const GUILD_EVENT_HORIZON_DAYS = 366;
+const GUILD_EVENT_KEEP_PAST_DAYS = 2; // yesterday stays visible across timezones
 
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -203,7 +203,7 @@ export function validateGuildEventDay(day: string, todayIso: string): string | n
   if (Number.isNaN(parsed.getTime())) return null;
   if (parsed.toISOString().slice(0, 10) !== day) return null; // e.g. 2026-02-30 rolls over
   if (day < shiftDay(todayIso, -1)) return null;
-  if (day > shiftDay(todayIso, CALENDAR_TUNING.horizonDays)) return null;
+  if (day > shiftDay(todayIso, GUILD_EVENT_HORIZON_DAYS)) return null;
   return day;
 }
 
@@ -246,7 +246,7 @@ export class SocialService {
     ]);
     let guild: GuildView | null = null;
     if (membership) {
-      const fromDay = shiftDay(this.todayIso(), -CALENDAR_TUNING.keepPastDays);
+      const fromDay = shiftDay(this.todayIso(), -GUILD_EVENT_KEEP_PAST_DAYS);
       const [members, events] = await Promise.all([
         this.db.guildMembers(membership.guildId),
         this.db.guildEvents(membership.guildId, fromDay),
@@ -799,10 +799,10 @@ export class SocialService {
     const day = validateGuildEventDay(String(input.day ?? ''), today);
     const title = String(input.title ?? '')
       .trim()
-      .slice(0, CALENDAR_TUNING.titleMax);
+      .slice(0, GUILD_EVENT_TITLE_MAX);
     const note = String(input.note ?? '')
       .trim()
-      .slice(0, CALENDAR_TUNING.noteMax);
+      .slice(0, GUILD_EVENT_NOTE_MAX);
     const hour =
       input.hour === null || !Number.isFinite(input.hour)
         ? null
@@ -814,10 +814,10 @@ export class SocialService {
     // Housekeeping: long-past events fall off whenever a new one is booked.
     await this.db.pruneGuildEvents(
       membership.guildId,
-      shiftDay(today, -CALENDAR_TUNING.keepPastDays),
+      shiftDay(today, -GUILD_EVENT_KEEP_PAST_DAYS),
     );
     const upcoming = await this.db.guildEventCount(membership.guildId, today);
-    if (upcoming >= CALENDAR_TUNING.eventLimit) {
+    if (upcoming >= GUILD_EVENT_LIMIT) {
       this.calendarResult(actor.characterId, 'calendarFull');
       return;
     }

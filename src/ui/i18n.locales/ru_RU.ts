@@ -24,6 +24,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.error': 'Не удалось загрузить ежедневные награды.',
   'hudChrome.dailyRewards.intro':
     'Держите достаточно WOC в подтвержденном кошельке, чтобы открыть ежедневные награды. Зарабатывайте очки за один ежедневный спин и сменяющиеся задания, затем поднимайтесь в ежедневной таблице лидеров ради доли призового фонда.',
+  'hudChrome.dailyRewards.disclaimer':
+    'Цена WOC может быстро меняться. Мы рекомендуем держать больше минимальных $20 USD, чтобы обычные колебания цены не заблокировали награды. Это не финансовый совет.',
   'hudChrome.dailyRewards.prize': 'Призовой фонд',
   'hudChrome.dailyRewards.reset': 'Сброс',
   'hudChrome.dailyRewards.score': 'Счёт',

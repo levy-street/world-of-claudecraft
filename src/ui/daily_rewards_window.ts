@@ -202,6 +202,7 @@ export class DailyRewardsWindow {
     const reason = reasonText(view.lockReason);
     return (
       `<p class="dr-intro">${esc(t('hudChrome.dailyRewards.intro'))}</p>` +
+      `<p class="dr-disclaimer">${esc(t('hudChrome.dailyRewards.disclaimer'))}</p>` +
       `<div class="dr-summary">` +
       `<div><span>${esc(t('hudChrome.dailyRewards.prize'))}</span><strong>${esc(prize)}</strong></div>` +
       `<div><span>${esc(t('hudChrome.dailyRewards.reset'))}</span><strong>${esc(reset)}</strong></div>` +

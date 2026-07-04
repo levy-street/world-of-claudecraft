@@ -188,6 +188,7 @@ export const id_ID: EnTranslations = {
       "loading": "Memuat hadiah harian...",
       "error": "Tidak dapat memuat hadiah harian.",
       "intro": "Simpan cukup WOC di dompet terverifikasimu untuk membuka hadiah harian. Kumpulkan poin lewat satu putaran harian dan tugas yang bergilir, lalu naiki papan peringkat harian untuk mendapat bagian dari kolam hadiah.",
+      "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Kolam Hadiah",
       "reset": "Atur Ulang",
       "endsIn": "Berakhir dalam {time}",

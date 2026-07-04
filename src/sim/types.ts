@@ -1535,6 +1535,12 @@ export interface Entity {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
+  // Entity-targeted casting: the target captured at cast start for entity-targeted
+  // casts (hostile and friendly) and channels. Timed casts and channel ticks resolve
+  // against this id, so retargeting mid-cast/mid-channel cannot redirect the spell,
+  // and clearing your target no longer cancels a channel. The channel still cancels
+  // if the locked target dies or turns non-hostile.
+  castTargetId: number | null;
   // Ground-targeted casting: the world point a `targetMode: 'position'` ability is
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
@@ -2194,7 +2200,7 @@ export const MAX_VIRTUAL_LEVEL = 200; // table bound; far beyond any reachable l
 
 // VLEVEL_CUM[v] = total lifetime XP required to *reach* virtual level v.
 // VLEVEL_CUM[1] = 0; index 0 is unused padding.
-function buildVlevelCum(): number[] {
+const VLEVEL_CUM: number[] = (() => {
   const cum: number[] = [0, 0];
   let total = 0;
   // real levels: 1→2 … 19→20 come straight from XP_TABLE
@@ -2210,18 +2216,7 @@ function buildVlevelCum(): number[] {
     step *= POSTCAP_GROWTH;
   }
   return cum;
-}
-
-const VLEVEL_CUM: number[] = buildVlevelCum();
-
-// The cumulative table above is derived from XP_TABLE at module eval. A host
-// that mutates XP_TABLE (the game-config override layer, src/sim/game_config.ts)
-// must call this afterwards so virtual levels keep matching the live curve.
-export function refreshPostcapXpTable(): void {
-  const next = buildVlevelCum();
-  VLEVEL_CUM.length = 0;
-  VLEVEL_CUM.push(...next);
-}
+})();
 
 // Total lifetime XP needed to reach a given (virtual or real) level. Used to
 // backfill `lifetimeXp` for characters saved before the counter existed.

@@ -24,15 +24,6 @@
   import BlockedIps from './pages/BlockedIps.svelte';
   import BugReports from './pages/BugReports.svelte';
   import IpAssociations from './pages/IpAssociations.svelte';
-  import Housekeeping from './pages/Housekeeping.svelte';
-  import HousekeepingRates from './pages/HousekeepingRates.svelte';
-import HousekeepingCalendar from './pages/HousekeepingCalendar.svelte';
-  import HousekeepingMobs from './pages/HousekeepingMobs.svelte';
-  import HousekeepingSpawns from './pages/HousekeepingSpawns.svelte';
-  import HousekeepingQuests from './pages/HousekeepingQuests.svelte';
-  import HousekeepingNpcs from './pages/HousekeepingNpcs.svelte';
-  import HousekeepingItems from './pages/HousekeepingItems.svelte';
-  import HousekeepingWorld from './pages/HousekeepingWorld.svelte';
 
   // Root of the admin SPA. Shows the login overlay until authed, then the shared
   // navigation shell and the routed page. The {#key session.locale} wrapper
@@ -52,15 +43,6 @@ import HousekeepingCalendar from './pages/HousekeepingCalendar.svelte';
     'chat-filter': ChatFilter,
     'blocked-ips': BlockedIps,
     'bug-reports': BugReports,
-    housekeeping: Housekeeping,
-    'housekeeping-rates': HousekeepingRates,
-    'housekeeping-calendar': HousekeepingCalendar,
-    'housekeeping-mobs': HousekeepingMobs,
-    'housekeeping-spawns': HousekeepingSpawns,
-    'housekeeping-quests': HousekeepingQuests,
-    'housekeeping-npcs': HousekeepingNpcs,
-    'housekeeping-items': HousekeepingItems,
-    'housekeeping-world': HousekeepingWorld,
   } satisfies Record<AdminPage, Component>;
   let Page = $derived(route.page === 'ip' ? null : PAGE_COMPONENTS[route.page]);
 

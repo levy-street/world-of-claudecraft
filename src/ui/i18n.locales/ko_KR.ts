@@ -24,6 +24,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.error': '일일 보상을 불러올 수 없습니다.',
   'hudChrome.dailyRewards.intro':
     '인증된 지갑에 충분한 WOC를 보유하여 일일 보상을 잠금 해제하세요. 하루 한 번의 스핀과 교체되는 과제로 포인트를 획득한 뒤, 일일 순위표를 올라 상금 풀의 일부를 차지하세요.',
+  'hudChrome.dailyRewards.disclaimer':
+    'WOC 가격은 빠르게 변동될 수 있습니다. 일반적인 가격 변동으로 보상이 잠기지 않도록 $20 USD 최소 기준보다 더 많이 보유하는 것을 권장합니다. 이는 금융 조언이 아닙니다.',
   'hudChrome.dailyRewards.prize': '상금 풀',
   'hudChrome.dailyRewards.reset': '초기화',
   'hudChrome.dailyRewards.score': '점수',

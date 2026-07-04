@@ -188,6 +188,7 @@ export const nl_NL: EnTranslations = {
       "loading": "Dagelijkse beloningen worden geladen...",
       "error": "Kon de dagelijkse beloningen niet laden.",
       "intro": "Houd genoeg WOC in je geverifieerde portemonnee om dagelijkse beloningen te ontgrendelen. Verdien punten met één dagelijkse draai en wisselende taken, en klim daarna op in de dagelijkse ranglijst voor een deel van de prijzenpot.",
+      "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Prijzenpot",
       "reset": "Reset",
       "endsIn": "Eindigt over {time}",

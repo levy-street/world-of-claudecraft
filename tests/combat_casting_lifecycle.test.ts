@@ -13,8 +13,10 @@ import {
   pushbackCast,
   updateCasting,
 } from '../src/sim/combat/casting_lifecycle';
+import { handleDeath } from '../src/sim/combat/damage';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
@@ -70,6 +72,53 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(ticks).toBeGreaterThan(1); // actually progressed over multiple ticks
     expect(p.hp).toBeGreaterThan(hp0); // applyAbility ran the heal effect
   });
+
+  it('resolves a completed hostile cast against the target selected at cast start', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    const firstTarget = spawnTarget(sim, p, 12, 6);
+    const firstHp0 = firstTarget.hp;
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castTargetId).toBe(firstTarget.id);
+
+    const secondTarget = spawnTarget(sim, p, 12, 8);
+    const secondHp0 = secondTarget.hp;
+    expect(p.targetId).toBe(secondTarget.id);
+    sim.rng.chance = () => true;
+    drainCast(sim, p, meta);
+
+    expect(p.castingAbility).toBeNull();
+    expect(p.castTargetId).toBeNull();
+    expect(sim.ctx.pendingProjectiles[0]?.targetId).toBe(firstTarget.id);
+    for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    expect(firstTarget.hp).toBeLessThan(firstHp0);
+    expect(secondTarget.hp).toBe(secondHp0);
+  });
+
+  it('resolves a completed friendly heal against the target locked at cast start', () => {
+    const { sim, p, meta } = makeSim('priest', 12);
+    const ally = sim.entities.get(sim.addPlayer('warrior', 'Ally')) as AnyEntity;
+    const bystander = sim.entities.get(sim.addPlayer('rogue', 'Bystander')) as AnyEntity;
+    ally.hp = Math.max(1, ally.maxHp - 500);
+    bystander.hp = Math.max(1, bystander.maxHp - 500);
+    const allyHp0 = ally.hp;
+    const bystanderHp0 = bystander.hp;
+
+    sim.targetEntity(ally.id, p.id);
+    castAbility(sim.ctx, 'lesser_heal', p.id);
+    expect(p.castingAbility).toBe('lesser_heal');
+    expect(p.castTargetId).toBe(ally.id);
+
+    sim.targetEntity(bystander.id, p.id); // retarget mid-cast
+    expect(p.targetId).toBe(bystander.id);
+    drainCast(sim, p, meta);
+
+    expect(p.castingAbility).toBeNull();
+    expect(p.castTargetId).toBeNull();
+    expect(ally.hp).toBeGreaterThan(allyHp0); // the heal landed on the locked target
+    expect(bystander.hp).toBe(bystanderHp0); // the current target got nothing
+  });
 });
 
 describe('casting_lifecycle: channel start -> tick -> finish', () => {
@@ -91,6 +140,81 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     for (let i = 0; i < 20 && mob.hp >= mobHp0; i++) sim.tick();
     expect(mob.hp).toBeLessThan(mobHp0); // applyChannelTick dealt drain damage
   });
+
+  it('keeps channel ticks on the target locked at channel start after retargeting', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    const first = spawnTarget(sim, p, 12, 6);
+    const firstHp0 = first.hp;
+    sim.drainEvents();
+    castAbility(sim.ctx, 'drain_life', p.id);
+    expect(p.channeling).toBe(true);
+    expect(p.castTargetId).toBe(first.id);
+
+    const second = spawnTarget(sim, p, 12, 8); // spawnTarget also retargets p to it
+    const secondHp0 = second.hp;
+    expect(p.targetId).toBe(second.id);
+    drainCast(sim, p, meta);
+
+    const stops = sim
+      .drainEvents()
+      .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
+    expect(stops.some((e: any) => e.success === false)).toBe(false); // never cancelled
+    for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    expect(first.hp).toBeLessThan(firstHp0); // ticks kept hitting the locked target
+    expect(second.hp).toBe(secondHp0); // the new current target was never drained
+  });
+
+  it('keeps a channel ticking when the current target is cleared mid-channel', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    const mob = spawnTarget(sim, p, 12, 6);
+    const mobHp0 = mob.hp;
+    sim.drainEvents();
+    castAbility(sim.ctx, 'drain_life', p.id);
+    expect(p.castTargetId).toBe(mob.id);
+
+    for (let i = 0; i < 25; i++) updateCasting(sim.ctx, p, meta); // past the 1s tick
+    sim.targetEntity(null, p.id); // clear the current target mid-channel
+    expect(p.targetId).toBeNull();
+    for (let i = 0; i < 25; i++) updateCasting(sim.ctx, p, meta); // crosses the 2s tick
+    expect(p.castingAbility).toBe('drain_life'); // NOT cancelled by the cleared target
+    expect(p.channeling).toBe(true);
+
+    drainCast(sim, p, meta);
+    const stops = sim
+      .drainEvents()
+      .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
+    expect(stops.some((e: any) => e.success === false)).toBe(false); // never cancelled
+    expect((stops.at(-1) as any)?.success).toBe(true); // ran to completion
+    for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    expect(mob.hp).toBeLessThan(mobHp0); // the locked target kept taking ticks
+  });
+
+  it('cancels the channel when the locked target dies mid-channel', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    const mob = spawnTarget(sim, p, 12, 6);
+    sim.drainEvents();
+    castAbility(sim.ctx, 'drain_life', p.id);
+    expect(p.castTargetId).toBe(mob.id);
+
+    for (let i = 0; i < 22; i++) updateCasting(sim.ctx, p, meta); // the 1s tick fired
+    expect(p.castingAbility).toBe('drain_life');
+    handleDeath(sim.ctx, mob, p); // the locked target dies mid-channel
+    for (let i = 0; i < 25 && p.castingAbility; i++) updateCasting(sim.ctx, p, meta);
+
+    expect(p.castingAbility).toBeNull(); // the 2s tick found a dead locked target
+    expect(p.channeling).toBe(false);
+    expect(p.castTargetId).toBeNull();
+    expect(p.castRemaining).toBe(0);
+    // cancelCast emitted castStop(success:false). (updateCasting's channel branch also
+    // emits a trailing success:true because the cancel zeroed castRemaining — a
+    // pre-existing quirk of mid-tick cancellation, so assert on the cancel event.)
+    const stops = sim
+      .drainEvents()
+      .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
+    expect(stops.some((e: any) => e.success === false)).toBe(true);
+  });
 });
 
 describe('casting_lifecycle: interrupt (cancelCast)', () => {
@@ -107,6 +231,15 @@ describe('casting_lifecycle: interrupt (cancelCast)', () => {
     const stop = sim.drainEvents().find((e: any) => e.type === 'castStop' && e.entityId === p.id);
     expect(stop).toBeTruthy();
     expect((stop as any).success).toBe(false);
+  });
+
+  it('clears the locked cast target on interrupt', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const mob = spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castTargetId).toBe(mob.id);
+    cancelCast(sim.ctx, p);
+    expect(p.castTargetId).toBeNull();
   });
 });
 

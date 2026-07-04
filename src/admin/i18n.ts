@@ -205,10 +205,6 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'block expiry must be in the future': 'error.blockExpiryFuture',
   'failed to block ip': 'error.blockFailed',
   'ip not found': 'error.blockNotFound',
-  'unknown override domain': 'error.hkUnknownDomain',
-  'an entry id is required': 'error.hkEntryIdRequired',
-  'nothing to save': 'error.hkNothingToSave',
-  'invalid override': 'error.hkInvalidOverride',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

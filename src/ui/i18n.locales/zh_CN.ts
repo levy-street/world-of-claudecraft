@@ -24,6 +24,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.error': '无法加载每日奖励。',
   'hudChrome.dailyRewards.intro':
     '在已验证的钱包中持有足够的 WOC 即可解锁每日奖励。通过每日一次转盘和轮换任务赚取积分，然后攀登每日排行榜，赢取奖池分成。',
+  'hudChrome.dailyRewards.disclaimer':
+    'WOC 价格可能快速波动。我们建议持有高于 $20 USD 最低要求的数量，避免正常价格波动导致奖励被锁定。这不是财务建议。',
   'hudChrome.dailyRewards.prize': '奖池',
   'hudChrome.dailyRewards.reset': '重置',
   'hudChrome.dailyRewards.score': '得分',

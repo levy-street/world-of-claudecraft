@@ -300,17 +300,6 @@ CREATE TABLE IF NOT EXISTS world_state (
   data JSONB NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
--- Housekeeping: per-realm operator overrides for game content and rates, one
--- JSONB document per realm (shape: src/sim/game_config.ts GameConfigOverrides,
--- validated before save AND before apply). Loaded at boot and applied to the
--- sim content tables before the world is constructed; admin-dashboard edits
--- land here and take effect on the next restart.
-CREATE TABLE IF NOT EXISTS game_config_overrides (
-  realm TEXT PRIMARY KEY DEFAULT '${REALM_SQL_DEFAULT}',
-  data JSONB NOT NULL DEFAULT '{}'::jsonb,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_by INT REFERENCES accounts(id) ON DELETE SET NULL
-);
 -- Chat moderation: per-account timed mute + running strike count for the
 -- hard-word (slur) enforcement ladder. A mute blocks chat only, never login.
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_muted_until TIMESTAMPTZ;

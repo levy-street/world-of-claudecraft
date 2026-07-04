@@ -21,8 +21,8 @@ type-checked by `npm run check:admin` (svelte-check over `tsconfig.admin.json`).
 - `state/`: runes singletons: `auth.svelte.ts` (token/name, login, logout, `handleAuthFailure`), `session.svelte.ts` (locale signal), `poll.ts` (interval helper + refresh constants).
 - `navigation.ts`: typed page/IP route parsing, URL serialization, History API interception, and optional navigation context for native links.
 - `components/`: shared UI: `Login`, `AdminShell`, `AdminNav`, `AccountModal`, `AccountLink`, `Panel`, `Badge`, `AccountIndicators`, `IpLink`, `StatCard`, `Pager`, `BarChart` (native SVG, no `{@html}`), `ConfirmDialog`, `ModerationActionPrompt`, `AccountModerationActions`, `ChatModerationControls`, `ModerationHistory`, `ScreenshotOverlay`, `OnlineTable`, `CharactersTable`, `ProviderUsage`, `WordList`, `ChatModeration`, `IpBlockSection`.
-- `pages/`: one per route: `Overview`, `Usage`, `Accounts`, `Characters`, `Moderation` (+ `ModerationDetail`), `SharedIps`, `ChatFilter`, `BlockedIps`, `BugReports`, plus the shared `AccountDetail`, and the Housekeeping section (`Housekeeping` overview + `HousekeepingRates`/`Mobs`/`Spawns`/`Quests`/`Npcs`/`Items`/`World`, sharing the `HkStatusBanner` + `HkFieldRows` components). `pages.ts` is the navigation tree.
-- Host-agnostic helpers (plain `.ts`, unit-tested directly): `moderation_actions.ts` (builds the suspend/ban/chat-mute/force-rename/ban-ip request + validation), `ip_block.ts` (`knownAccountIps`), `block_expiry.ts`, `labels.ts` (`reasonLabel`), `housekeeping.ts` (override form state + patch parsing for the Housekeeping pages).
+- `pages/`: one per route: `Overview`, `Usage`, `Accounts`, `Characters`, `Moderation` (+ `ModerationDetail`), `SharedIps`, `ChatFilter`, `BlockedIps`, `BugReports`, plus the shared `AccountDetail`. `pages.ts` is the navigation tree.
+- Host-agnostic helpers (plain `.ts`, unit-tested directly): `moderation_actions.ts` (builds the suspend/ban/chat-mute/force-rename/ban-ip request + validation), `ip_block.ts` (`knownAccountIps`), `block_expiry.ts`, `labels.ts` (`reasonLabel`).
 - Reused as-is: `api.ts` (fetch wrapper, `apiLogin/apiGet/apiPost`, `ApiError`, token in `localStorage`), `types.ts` (endpoint response shapes), `format.ts` (`fmtDuration/Date/Relative/Copper/Bytes/Number/Percent`), `i18n.ts` (+ `i18n.en.ts`, `i18n.locales/`, `i18n.resolved.generated/`).
 
 ## i18n: operators are users, so all rendered text routes through `t()`
@@ -41,15 +41,11 @@ All responses use the `{ success, data, error }` envelope (unwrapped in `api.ts`
 GET: `/overview`, `/online`, `/suspicious-players`, `/activity`, `/accounts?search&page`,
 `/accounts/:id`, `/shared-ips?sort&dir&online&page`, `/ip-associations?ip&page`,
 `/characters?sort&dir&page`, `/moderation/queue`, `/moderation/accounts/:id`, `/chat-filter`,
-`/blocked-ips`, `/bug-reports?page`, `/bug-reports/:id/screenshot`, and the housekeeping
-catalogs `/housekeeping/{overview,rates,mobs,quests,items,npcs,spawns,world}`.
+`/blocked-ips`, `/bug-reports?page`, `/bug-reports/:id/screenshot`.
 POST: `/login`, `/moderation/accounts/:id/{suspend,unsuspend,ban,unban,chat-mute,lift-mute,reset-strikes}`,
 `/moderation/characters/:id/force-rename`, `/moderation/reports/:id/ignore`,
 `/chat-filter/words`, `/chat-filter/words/:id/delete`, `/chat-filter/config`,
-`/blocked-ips`, `/blocked-ips/delete`, `/housekeeping/overrides` (replace one domain/entry),
-`/housekeeping/overrides/clear`. In dev, Vite proxies `/admin/api` to `:8787`.
-Saved housekeeping overrides take effect at the NEXT server restart (the pages show a
-restart-pending banner).
+`/blocked-ips`, `/blocked-ips/delete`. In dev, Vite proxies `/admin/api` to `:8787`.
 
 ## Auth: server-side, not client-side
 Login (`POST /admin/api/login`) and **every** endpoint are gated in `server/admin.ts`:
@@ -67,7 +63,7 @@ state.
    `auth.handleAuthFailure` (then `localizeAdminError`/an `alert.*` key). Live data uses
    `poll()` inside `onMount` so the timer is torn down on tab switch.
 4. Lift pure logic (request shaping, validation, id/state resolution) into a plain `.ts`
-   helper and unit-test it (see `moderation_actions.ts`, `ip_block.ts`, `housekeeping.ts`).
+   helper and unit-test it (see `moderation_actions.ts`, `ip_block.ts`).
 5. A new backend endpoint goes in `server/admin.ts` first (see server/CLAUDE.md).
 
 ## Gotchas / never do

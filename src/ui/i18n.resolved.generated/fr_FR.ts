@@ -188,6 +188,7 @@ export const fr_FR: EnTranslations = {
       "loading": "Chargement des récompenses quotidiennes...",
       "error": "Impossible de charger les récompenses quotidiennes.",
       "intro": "Détenez assez de WOC dans votre portefeuille vérifié pour débloquer les récompenses quotidiennes. Gagnez des points grâce à un tour quotidien et à des tâches en rotation, puis grimpez dans le classement quotidien pour remporter une part de la cagnotte.",
+      "disclaimer": "WOC price can move quickly. We recommend holding more than the $20 USD minimum so normal price swings do not lock you out. This is not financial advice.",
       "prize": "Cagnotte",
       "reset": "Réinitialisation",
       "endsIn": "Se termine dans {time}",

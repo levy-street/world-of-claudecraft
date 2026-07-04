@@ -354,6 +354,22 @@ export class Input {
     this.updateCursor();
   }
 
+  setSuspendMovement(on: boolean): void {
+    if (this.suspendMovement === on) return;
+    this.suspendMovement = on;
+    if (on) {
+      const hadEmoteWheel = this.emoteWheelHeldCodes.size > 0;
+      const hadHeldInput = this.keys.size > 0 || hadEmoteWheel || this.keyJumpUntil > 0;
+      this.keys.clear();
+      this.keyJumpUntil = 0;
+      if (hadEmoteWheel) {
+        this.emoteWheelHeldCodes.clear();
+        this.cb.onEmoteWheel(false);
+      }
+      if (hadHeldInput) this.noteIntent('move');
+    }
+  }
+
   captureNextKey(cb: (code: string | null) => void): void {
     this.captureCb = cb;
   }
