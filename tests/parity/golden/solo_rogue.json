@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "1404b8d3",
+      "nextId": 1379,
+      "state": "de1198bb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,14 +40,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
           },
           "gatheringProficiency": {},
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -67,7 +66,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -83,7 +82,6 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -113,9 +111,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1374,
-      "state": "f160fb65",
-      "events": "e44b7b76",
+      "nextId": 1380,
+      "state": "4bc460fd",
+      "events": "948fdb5a",
       "rng": {
         "draws": 7,
         "digest": "caa156cc"
@@ -124,9 +122,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1374,
-      "state": "bfa2032a",
-      "events": "067a34a7",
+      "nextId": 1380,
+      "state": "6f7cf0d8",
+      "events": "de5c42e7",
       "rng": {
         "draws": 11,
         "digest": "bd4c082f"
@@ -135,9 +133,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1374,
-      "state": "f4d56e3a",
-      "events": "fbd514fe",
+      "nextId": 1380,
+      "state": "d5a7962e",
+      "events": "be485784",
       "rng": {
         "draws": 292,
         "digest": "bdb584a5"
@@ -146,8 +144,8 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1374,
-      "state": "58b6c6d6",
+      "nextId": 1380,
+      "state": "eba997f4",
       "events": "741638a5",
       "rng": {
         "draws": 487,
@@ -175,7 +173,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger"
@@ -183,7 +181,6 @@
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -206,7 +203,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
           "hp": 49991,
-          "id": 1372,
+          "id": 1378,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -223,7 +220,6 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
@@ -241,7 +237,7 @@
             "str": 26
           },
           "swingTimer": 0.05,
-          "targetId": 1373,
+          "targetId": 1379,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -251,7 +247,7 @@
           }
         },
         {
-          "aggroTargetId": 1372,
+          "aggroTargetId": 1378,
           "aiState": "attack",
           "combatTimer": 1.2,
           "comboUntil": -1,
@@ -263,7 +259,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8937,
-          "id": 1373,
+          "id": 1379,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -293,12 +289,12 @@
             "armor": 40
           },
           "swingTimer": 0.45,
-          "tappedById": 1372,
-          "targetId": 1372,
+          "tappedById": 1378,
+          "targetId": 1378,
           "templateId": "forest_wolf",
           "threat": [
             [
-              1372,
+              1378,
               64
             ]
           ],

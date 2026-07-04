@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1372,
+      "nextId": 1378,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "20184740",
+      "nextId": 1379,
+      "state": "b1a1d3ee",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -60,14 +60,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -87,7 +86,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -103,7 +102,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -131,9 +129,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "67bd19f4",
-      "events": "2666ed93",
+      "nextId": 1379,
+      "state": "39d68e9a",
+      "events": "6bb1c71f",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -157,7 +155,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -178,7 +176,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -198,7 +195,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -214,7 +211,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -242,9 +238,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "3b791fb4",
-      "events": "847ee9fc",
+      "nextId": 1379,
+      "state": "1ad4d0da",
+      "events": "bdc04c9e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -268,7 +264,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -294,7 +290,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -314,7 +309,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -330,7 +325,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -358,9 +352,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "2d04bebe",
-      "events": "ea63f5a6",
+      "nextId": 1379,
+      "state": "c531b650",
+      "events": "fe84a080",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -384,7 +378,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -410,7 +404,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -430,7 +423,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 110,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -446,7 +439,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -474,9 +466,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "8fd50272",
-      "events": "6a4eb1a3",
+      "nextId": 1379,
+      "state": "02f73440",
+      "events": "149d8119",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -500,7 +492,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -529,7 +521,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -549,7 +540,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -565,7 +556,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -593,9 +583,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "0ce9b83f",
-      "events": "aa8af629",
+      "nextId": 1379,
+      "state": "ff47a58d",
+      "events": "9fb5751d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -619,7 +609,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -648,7 +638,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -680,7 +669,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -696,7 +685,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -725,9 +713,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "545611ee",
-      "events": "3a67fdf2",
+      "nextId": 1379,
+      "state": "a330a340",
+      "events": "d37da256",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -751,7 +739,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -776,7 +764,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -808,7 +795,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -824,7 +811,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": 120,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -853,9 +839,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "1f9e5dd6",
-      "events": "eb4926f3",
+      "nextId": 1379,
+      "state": "a0410644",
+      "events": "217eda3d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -879,7 +865,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -904,7 +890,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -924,7 +909,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1372,
+              "sourceId": 1378,
               "value": 12
             }
           ],
@@ -948,7 +933,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -964,7 +949,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": 120,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -993,9 +977,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "dd89073a",
-      "events": "12af74ea",
+      "nextId": 1379,
+      "state": "fd2b7b64",
+      "events": "32cc428a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1019,7 +1003,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1048,7 +1032,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1068,7 +1051,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1372,
+              "sourceId": 1378,
               "value": 12
             }
           ],
@@ -1092,7 +1075,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1108,7 +1091,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": 120,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1137,9 +1119,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "806fa1d7",
-      "events": "082f8720",
+      "nextId": 1379,
+      "state": "5131f9b3",
+      "events": "b32d5974",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1163,7 +1145,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1192,7 +1174,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1218,7 +1199,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1372,
+              "sourceId": 1378,
               "value": 12
             }
           ],
@@ -1242,7 +1223,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1258,7 +1239,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": 120,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1287,9 +1267,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "8e63a32c",
-      "events": "446e3f9c",
+      "nextId": 1379,
+      "state": "a7592d5c",
+      "events": "8ccad5c6",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1313,7 +1293,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1338,7 +1318,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1368,7 +1347,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1372,
+              "sourceId": 1378,
               "value": 12
             }
           ],
@@ -1392,7 +1371,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1408,7 +1387,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": 120,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1437,9 +1415,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "356712ca",
-      "events": "09836b4d",
+      "nextId": 1379,
+      "state": "f91b2680",
+      "events": "6070a67d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1463,7 +1441,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1492,7 +1470,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1522,7 +1499,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1372,
+              "sourceId": 1378,
               "value": 12
             }
           ],
@@ -1546,7 +1523,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1562,7 +1539,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": 120,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {
@@ -1591,8 +1567,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "356712ca",
+      "nextId": 1379,
+      "state": "f91b2680",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1617,7 +1593,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1646,7 +1622,6 @@
             }
           ],
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -1676,7 +1651,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 1372,
+              "sourceId": 1378,
               "value": 12
             }
           ],
@@ -1700,7 +1675,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 210,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1716,7 +1691,6 @@
             "z": 1.540014
           },
           "potionCooldownUntil": 120,
-          "race": "human",
           "resourceType": "rage",
           "sitting": true,
           "spawnPos": {

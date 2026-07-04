@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1372,
+      "nextId": 1378,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1374,
-      "state": "24bf4c93",
-      "events": "a570ed2e",
+      "nextId": 1380,
+      "state": "c7ec3971",
+      "events": "3c7f04d2",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1374,
-      "state": "80d4ff2b",
-      "events": "29758baa",
+      "nextId": 1380,
+      "state": "e9691423",
+      "events": "ffda413e",
       "rng": {
         "draws": 152,
         "digest": "e09025d0"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1374,
-      "state": "61aee813",
-      "events": "6ae283d0",
+      "nextId": 1380,
+      "state": "c92ab559",
+      "events": "326a0a20",
       "rng": {
         "draws": 590,
         "digest": "2fcf6f03"
@@ -61,9 +61,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1374,
-      "state": "7d3ea1e3",
-      "events": "ab85b3a6",
+      "nextId": 1380,
+      "state": "41671ab9",
+      "events": "eca0a05a",
       "rng": {
         "draws": 1122,
         "digest": "f19030e1"
@@ -72,9 +72,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1374,
-      "state": "98c316fc",
-      "events": "5bf7c023",
+      "nextId": 1380,
+      "state": "8de53622",
+      "events": "13cb9b35",
       "rng": {
         "draws": 1665,
         "digest": "6884b5cd"
@@ -83,8 +83,8 @@
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 1374,
-      "state": "146e9c78",
+      "nextId": 1380,
+      "state": "24a8f13c",
       "events": "741638a5",
       "rng": {
         "draws": 2078,
@@ -109,14 +109,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
           "gatheringProficiency": {},
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -142,14 +141,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1373,
+          "entityId": 1379,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -168,7 +166,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 106.1,
           "hp": 90,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -183,7 +181,6 @@
             "z": -1264
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -217,7 +214,7 @@
           "dodgeChance": 0.056,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 1373,
+          "id": 1379,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -232,7 +229,6 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {

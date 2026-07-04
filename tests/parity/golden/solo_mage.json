@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1373,
-      "state": "2c9b9fdd",
+      "nextId": 1379,
+      "state": "15ae1c43",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -40,14 +40,13 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "gatheringProficiency": {},
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -67,7 +66,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -83,7 +82,6 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resource": 195,
           "resourceType": "mana",
           "spawnPos": {
@@ -112,9 +110,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1374,
-      "state": "51926b30",
-      "events": "6cf7edf2",
+      "nextId": 1380,
+      "state": "4528020a",
+      "events": "0ae71cde",
       "rng": {
         "draws": 2,
         "digest": "cb48da64"
@@ -123,9 +121,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1374,
-      "state": "1b15c756",
-      "events": "1c8c2bcf",
+      "nextId": 1380,
+      "state": "ca01e68c",
+      "events": "7620d7e7",
       "rng": {
         "draws": 3,
         "digest": "7c0e5908"
@@ -134,9 +132,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1374,
-      "state": "d3d314d2",
-      "events": "a7fac8c2",
+      "nextId": 1380,
+      "state": "a00fef38",
+      "events": "0df2e930",
       "rng": {
         "draws": 283,
         "digest": "414b4056"
@@ -145,9 +143,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1374,
-      "state": "3a05a622",
-      "events": "a7fac8c2",
+      "nextId": 1380,
+      "state": "065af948",
+      "events": "0df2e930",
       "rng": {
         "draws": 641,
         "digest": "cd949397"
@@ -156,9 +154,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1374,
-      "state": "da5fb4bf",
-      "events": "77ace615",
+      "nextId": 1380,
+      "state": "6012dc1b",
+      "events": "d1ae2fcd",
       "rng": {
         "draws": 1032,
         "digest": "c8a7bc0b"
@@ -167,9 +165,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1374,
-      "state": "2f67e15b",
-      "events": "a7fac8c2",
+      "nextId": 1380,
+      "state": "ed040e13",
+      "events": "0df2e930",
       "rng": {
         "draws": 1467,
         "digest": "e35ac6b5"
@@ -178,8 +176,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 1374,
-      "state": "e18babce",
+      "nextId": 1380,
+      "state": "c444c4d0",
       "events": "741638a5",
       "rng": {
         "draws": 1645,
@@ -204,7 +202,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1372,
+          "entityId": 1378,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -212,7 +210,6 @@
           "gatheringProficiency": {},
           "lifetimeXp": 27600,
           "mailWelcomed": true,
-          "race": "human",
           "talents": {
             "choices": {},
             "ranks": {}
@@ -234,7 +231,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 105.4,
           "hp": 50000,
-          "id": 1372,
+          "id": 1378,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -250,7 +247,6 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "race": "human",
           "resource": 816,
           "resourceType": "mana",
           "spawnPos": {
@@ -267,7 +263,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 1373,
+          "targetId": 1379,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -287,7 +283,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 9000,
-          "id": 1373,
+          "id": 1379,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
