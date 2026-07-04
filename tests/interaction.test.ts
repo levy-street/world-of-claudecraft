@@ -110,6 +110,19 @@ describe('interaction.lootCorpse', () => {
     expect(sim.countItem('worn_sword', a)).toBe(0);
   });
 
+  it('loots a corpse standing where it could be opened (INTERACT_RANGE + 2)', () => {
+    const { sim, a } = twoPlayers();
+    // 6yd away: inside the range at which interact() opens the loot window, so the take
+    // must succeed rather than reject "Too far away." (the open/take radii must match).
+    const mob = corpse(sim, 20 + INTERACT_RANGE + 1, 20, 999999, [
+      { itemId: 'wolf_fang', count: 1, openToAll: true },
+    ]);
+    sim.events = [];
+    interaction.lootCorpse(ctxOf(sim), mob.id, a);
+    expect(errors(sim)).not.toContain('Too far away.');
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+  });
+
   it('awards an open-to-all slot to any looter and drains the count', () => {
     const { sim, a } = twoPlayers();
     const mob = corpse(sim, 20, 22, 999999, [{ itemId: 'wolf_fang', count: 2, openToAll: true }]);
@@ -185,6 +198,15 @@ describe('interaction.pickUpObject', () => {
     expect(errors(sim)).toContain('Too far away.');
     expect(sim.countItem('wolf_fang', a)).toBe(0);
     expect(obj.lootable).toBe(true);
+  });
+
+  it('picks up an object standing where it could be reached (INTERACT_RANGE + 2)', () => {
+    const { sim, a } = twoPlayers();
+    const obj = groundObj(sim, 'wolf_fang', 20 + INTERACT_RANGE + 1, 20); // 6yd
+    sim.events = [];
+    interaction.pickUpObject(ctxOf(sim), obj.id, a);
+    expect(errors(sim)).not.toContain('Too far away.');
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
   });
 });
 
