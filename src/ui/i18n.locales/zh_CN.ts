@@ -3793,6 +3793,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.levels': '等级 {min} 至 {max}',
   'guide.bestiary.levelsSame': '{min} 级',
   'guide.family.beast.name': '野兽',
+  'guide.family.demon.name': '恶魔',
+  'guide.family.demon.desc': '被裂隙与召唤法术束缚的恐怖造物。多数听命于术士主人，获得自由的则侍奉着更可怕的存在。',
   'guide.family.beast.desc':
     '森林与原野上的野生动物，从狼和野猪到捕食它们的猛兽。猎人可以驯服其中许多。',
   'guide.family.spider.name': '蜘蛛',
@@ -4394,6 +4396,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.dragHint': '拖动以转动模型。模型获得焦点时，可使用左右方向键。',
   'guide.viewer.error': '无法载入该 3D 模型。上方的美术图仍展示着这个 {name}。',
   'guide.viewer.loading': '正在载入模型……',
+  'guide.viewer.playClip': '播放{name}动画',
   'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '以 3D 查看 {name}',
   'guide.viewer.view3dShort': '以 3D 查看',

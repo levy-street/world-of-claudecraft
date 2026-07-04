@@ -39,6 +39,10 @@ const h = vi.hoisted(() => {
     setLabel(l: string): void {
       this.label = l;
     }
+    clipNames(): string[] {
+      return [];
+    }
+    setClip(): void {}
     // Stays pending until the test resolves OR fails it, so we can evict a viewer mid-load or
     // drive it down the error path.
     load(): Promise<void> {

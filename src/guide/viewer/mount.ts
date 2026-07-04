@@ -40,6 +40,7 @@ export async function createViewer(stage: HTMLElement, canvasLabel: string): Pro
  *  toggle that stands a player-height silhouette beside the subject. */
 export function wireInspector(fig: HTMLElement, stage: HTMLElement, viewer: ModelViewer): void {
   fig.querySelector('.viewer-inspector')?.remove();
+  if (typeof viewer.clipNames !== 'function') return;
   const clips = viewer.clipNames();
   const bar = document.createElement('div');
   bar.className = 'viewer-inspector';

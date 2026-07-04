@@ -4039,6 +4039,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.levels': 'Уровни с {min} по {max}',
   'guide.bestiary.levelsSame': 'Уровень {min}',
   'guide.family.beast.name': 'Звери',
+  'guide.family.demon.name': 'Демоны',
+  'guide.family.demon.desc': 'Порождения ужаса, связанные Разломом и искусством призыва. Большинство служит чернокнижнику, свободные служат чему-то похуже.',
   'guide.family.beast.desc':
     'Дикие животные лесов и полей, от волков и вепрей до тех, кто на них охотится. Многих из них могут приручить охотники.',
   'guide.family.spider.name': 'Пауки',
@@ -4724,6 +4726,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.error':
     'Не удалось загрузить 3D-модель. Изображение выше всё ещё показывает этого: {name}.',
   'guide.viewer.loading': 'Загрузка модели...',
+  'guide.viewer.playClip': 'Воспроизвести анимацию {name}',
   'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': 'Посмотреть {name} в 3D',
   'guide.viewer.view3dShort': 'Посмотреть в 3D',

@@ -37,6 +37,19 @@ provided as a courtesy.
 | Drowned Litany creature models (edda_reedhand, reedbound_acolyte, tolling_bell, spider_egg_sac in `public/models/creatures/`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; the humanoids rigged and animated), owned under the Meshy paid-plan license | Project asset |
 | Generated Valdris bestiary bodies (mob_ossara_judge, mob_sandmaw_tyrant, mob_dust_elemental, mob_granite_elemental, mob_veykar, mob_commander_vaelis, mob_tombrobber, mob_veth_cutthroat, mob_frost_troll, mob_twilight_revenant, mob_ironhold_burrower, mob_ember_cat, mob_pale_widow, mob_river_skulker, mob_legion_deserter, mob_highland_ogre, mob_fog_horror, valdris_carter, valdris_warden) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets; all 152 abilities across the 9 classes covered) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
+| Generated weapon model + icon (emberfang_sword) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated class skin-suit set "Prismatic Vanguard" (suit_prismatic, all classes) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset |
+| Generated class skin-suit set "Liquid Chrome" (suit_chrome, all classes) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (procedural gradient-map atlas) | Project asset |
+| Generated weapon model + icon (redskull_sword) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_dagger) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_staff) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_wand) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (redskull_hammer) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_sword) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_dagger) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_axe) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_staff) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated weapon model + icon (purple_wand) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not

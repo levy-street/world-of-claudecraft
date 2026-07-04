@@ -1626,8 +1626,8 @@ export const zh_TW: EnTranslations = {
     },
     "family": {
       "demon": {
-        "name": "Demons",
-        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+        "name": "惡魔",
+        "desc": "被裂隙與召喚法術束縛的恐怖造物。多數聽命於術士主人，獲得自由的則侍奉著更可怕的存在。"
       },
       "beast": {
         "name": "野獸",
@@ -1854,7 +1854,7 @@ export const zh_TW: EnTranslations = {
     },
     "viewer": {
       "view3d": "以3D檢視{name}",
-      "playClip": "Play the {name} animation",
+      "playClip": "播放{name}動畫",
       "view3dShort": "以3D檢視",
       "loading": "正在載入模型...",
       "error": "無法載入此3D模型。上方的圖像仍會顯示這個{name}。",

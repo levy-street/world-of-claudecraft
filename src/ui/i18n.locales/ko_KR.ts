@@ -3982,6 +3982,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.levels': '{min}~{max}레벨',
   'guide.bestiary.levelsSame': '{min}레벨',
   'guide.family.beast.name': '야수',
+  'guide.family.demon.name': '악마',
+  'guide.family.demon.desc': '균열과 소환술에 속박된 공포의 존재. 대부분은 흑마법사 주인을 섬기며, 자유로운 것들은 더 사악한 무언가를 섬긴다.',
   'guide.family.beast.desc':
     '늑대와 멧돼지부터 이들을 노리는 포식자까지, 숲과 들판의 야생 동물들. 사냥꾼은 그중 다수를 길들일 수 있습니다.',
   'guide.family.spider.name': '거미',
@@ -4636,6 +4638,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.error':
     '3D 모델을 불러올 수 없습니다. 위의 그림이 여전히 이 {name}을(를) 보여 줍니다.',
   'guide.viewer.loading': '모델 불러오는 중...',
+  'guide.viewer.playClip': '{name} 애니메이션 재생',
   'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '{name} 3D로 보기',
   'guide.viewer.view3dShort': '3D로 보기',

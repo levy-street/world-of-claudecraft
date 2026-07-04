@@ -3980,6 +3980,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.bestiary.levels': 'レベル{min}から{max}',
   'guide.bestiary.levelsSame': 'レベル{min}',
   'guide.family.beast.name': 'ビースト',
+  'guide.family.demon.name': 'デーモン',
+  'guide.family.demon.desc': '亀裂と召喚術に縛られた恐怖の存在。多くはウォーロックの主に仕え、自由なものはさらに悪しきものに仕える。',
   'guide.family.beast.desc':
     '森や野に生きる野生動物たち。オオカミやイノシシから、それらを狙う捕食者まで。ハンターはその多くをテイムできます。',
   'guide.family.spider.name': 'クモ',
@@ -4629,6 +4631,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.viewer.error':
     '3Dモデルを読み込めませんでした。上のアートでは、この{name}が今も表示されています。',
   'guide.viewer.loading': 'モデルを読み込み中...',
+  'guide.viewer.playClip': '{name}アニメーションを再生',
   'guide.viewer.posterAlt': '{name}',
   'guide.viewer.view3d': '{name}を3Dで見る',
   'guide.viewer.view3dShort': '3Dで見る',

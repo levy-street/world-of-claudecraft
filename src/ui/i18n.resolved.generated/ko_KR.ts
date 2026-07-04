@@ -1626,8 +1626,8 @@ export const ko_KR: EnTranslations = {
     },
     "family": {
       "demon": {
-        "name": "Demons",
-        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+        "name": "악마",
+        "desc": "균열과 소환술에 속박된 공포의 존재. 대부분은 흑마법사 주인을 섬기며, 자유로운 것들은 더 사악한 무언가를 섬긴다."
       },
       "beast": {
         "name": "야수",
@@ -1854,7 +1854,7 @@ export const ko_KR: EnTranslations = {
     },
     "viewer": {
       "view3d": "{name} 3D로 보기",
-      "playClip": "Play the {name} animation",
+      "playClip": "{name} 애니메이션 재생",
       "view3dShort": "3D로 보기",
       "loading": "모델 불러오는 중...",
       "error": "3D 모델을 불러올 수 없습니다. 위의 그림이 여전히 이 {name}을(를) 보여 줍니다.",
