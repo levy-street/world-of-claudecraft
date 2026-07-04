@@ -410,6 +410,7 @@ export const pl_PL: EnTranslations = {
       "playerFrameScale": "Skala ramki gracza",
       "targetFrameScale": "Skala ramki celu",
       "aurasOnPlayerFrame": "Wzmocnienia na ramce gracza",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "walkByAutoloot": "Automatyczny łup w przelocie",

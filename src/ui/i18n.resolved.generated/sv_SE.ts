@@ -410,6 +410,7 @@ export const sv_SE: EnTranslations = {
       "playerFrameScale": "Spelarramens skala",
       "targetFrameScale": "Målramens skala",
       "aurasOnPlayerFrame": "Förstärkningar på spelarramen",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
       "walkByAutoloot": "Automatisk plundring i förbifarten",

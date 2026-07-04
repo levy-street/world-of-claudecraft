@@ -410,6 +410,7 @@ export const da_DK: EnTranslations = {
       "playerFrameScale": "Spillerrammens skala",
       "targetFrameScale": "Målrammens skala",
       "aurasOnPlayerFrame": "Buffs på spillerrammen",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
       "walkByAutoloot": "Auto-plyndring i forbifarten",

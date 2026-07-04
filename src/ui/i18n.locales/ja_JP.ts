@@ -360,6 +360,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showOwnNameplate': '自分のネームプレートを表示',
   'hudChrome.playerCard.showWalletBadge': 'ウォレットバッジを表示',
   'hudChrome.options.uiScale': 'UIスケール',
+  'hudChrome.options.actionBarScale': 'アクションバーのサイズ',
   'hudChrome.options.highContrastBackground': '高コントラスト背景',
   'hudChrome.options.showItemLevel': 'アイテムレベルを表示',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',

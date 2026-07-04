@@ -370,6 +370,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showOwnNameplate': 'Показывать свою табличку с именем',
   'hudChrome.playerCard.showWalletBadge': 'Показывать значок кошелька',
   'hudChrome.options.uiScale': 'Масштаб интерфейса',
+  'hudChrome.options.actionBarScale': 'Размер панели действий',
   'hudChrome.options.highContrastBackground': 'Фон высокой контрастности',
   'hudChrome.options.showItemLevel': 'Показывать уровень предмета',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',

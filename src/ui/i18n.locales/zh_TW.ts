@@ -345,6 +345,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showOwnNameplate': '顯示我的姓名板',
   'hudChrome.playerCard.showWalletBadge': '顯示錢包徽章',
   'hudChrome.options.uiScale': '介面縮放',
+  'hudChrome.options.actionBarScale': '動作列大小',
   'hudChrome.options.highContrastBackground': '高對比度背景',
   'hudChrome.options.showItemLevel': '顯示物品等級',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',

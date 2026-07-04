@@ -117,6 +117,10 @@ export const SETTING_RANGES = {
   // The target frame's twin of playerFrameScale, via --target-frame-scale.
   // Same children-zoom trick (the frame itself is drag-positioned). 1.0 = stock.
   targetFrameScale: { min: 0.7, max: 1.15, def: 1 },
+  // Resizes just the action bar buttons (both bars) via CSS zoom on the bars, so
+  // players can shrink the hotbar without touching the rest of the HUD. 1.0 =
+  // stock; down to 0.4 for a very compact bar, up to 1.4 for bigger touch targets.
+  actionBarScale: { min: 0.4, max: 1.4, def: 1 },
 } as const;
 
 export const BOOL_SETTINGS = {

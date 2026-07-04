@@ -410,6 +410,7 @@ export const pt_BR: EnTranslations = {
       "playerFrameScale": "Escala do Quadro do Jogador",
       "targetFrameScale": "Escala do Quadro do Alvo",
       "aurasOnPlayerFrame": "Benefícios no Quadro do Jogador",
+      "actionBarScale": "Action bar size",
       "highContrastBackground": "Fundo de alto contraste",
       "startAttackOnAbility": "Ataque Automático ao Usar Habilidade",
       "walkByAutoloot": "Saque Automático ao Passar",

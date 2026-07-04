@@ -231,6 +231,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'uiScale',
       'playerFrameScale',
       'targetFrameScale',
+      'actionBarScale',
       'hudOpacity',
       'tooltipScale',
       'fctScale',

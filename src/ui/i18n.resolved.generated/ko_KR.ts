@@ -410,6 +410,7 @@ export const ko_KR: EnTranslations = {
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
+      "actionBarScale": "행동 단축바 크기",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "walkByAutoloot": "지나가며 자동 획득",

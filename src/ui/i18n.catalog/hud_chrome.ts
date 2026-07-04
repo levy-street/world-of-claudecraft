@@ -395,6 +395,8 @@ export const hudChromeStrings = {
     // of the classic two-row top-right corner (wordy, M16: the five non-Latin
     // fills land in this same change).
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
+    // Interface panel: resizes only the action bar(s) via CSS zoom, independent of UI Scale.
+    actionBarScale: 'Action bar size',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
