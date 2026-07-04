@@ -1443,6 +1443,27 @@ export interface DefenseSiteDef {
   }[];
 }
 
+// An escort route (src/sim/events/escort.ts): a world-owned ally walks fixed
+// waypoints while a quest-holder stays close; declared ambushes spawn at
+// waypoints (fixed offsets/levels: no rng).
+export interface EscortRouteDef {
+  id: string;
+  /** MobTemplate with allyOfPlayers: the charge being escorted. */
+  escorteeTemplateId: string;
+  escorteeLevel: number;
+  start: { x: number; z: number };
+  waypoints: {
+    x: number;
+    z: number;
+    ambush?: { mobId: string; level: number; dx: number; dz: number }[];
+  }[];
+  questId: string;
+  objectiveIndex: number;
+  /** Quest-holder proximity that starts and sustains the walk. */
+  engageRange: number;
+  cooldownSeconds: number;
+}
+
 export interface QuestObjective {
   type: 'kill' | 'collect' | 'interact' | 'defend' | 'escort';
   targetMobId?: string; // for kill

@@ -7167,6 +7167,9 @@ export const de_DE: EnTranslations = {
       "palisade_warden": {
         "name": "Warden Ilyen"
       },
+      "tollroad_carter": {
+        "name": "Carter Odom"
+      },
       "thornwarped_stag": {
         "name": "Thorn-Warped Stag"
       },
@@ -8617,6 +8620,16 @@ export const de_DE: EnTranslations = {
           }
         }
       },
+      "q_ironpass_tollroad_escort": {
+        "title": "The Toll Must Flow",
+        "text": "Carter Odom hauls the toll-silver up the pass tonight, {playerName}, and the raiders know the schedule better than my own clerks. Walk beside the wagon to the north bend and bring him back breathing.",
+        "completion": "Odom made the bend and the silver made the strongbox. The raiders will sulk about it, which is how I like them.",
+        "objectives": {
+          "0": {
+            "label": "Carter Odom escorted up the pass"
+          }
+        }
+      },
       "q_dune_prowlers": {
         "title": "The Road Bleeds",
         "text": "The prowler packs have learned the caravan bell means food, {playerName}. Every wagon we lose feeds them and starves Qesh Aram. Thin the packs on the dunes flanking the south road: twelve, to start.",
@@ -9637,10 +9650,19 @@ export const de_DE: EnTranslations = {
             "label": "Duststorm Rise"
           },
           "8": {
-            "label": "Judges' Terrace"
+            "label": "The Sunken Seat"
           },
           "9": {
+            "label": "The Ashen Court"
+          },
+          "10": {
+            "label": "Judges' Terrace"
+          },
+          "11": {
             "label": "Bonewind Barrens"
+          },
+          "12": {
+            "label": "Last Water"
           }
         }
       },

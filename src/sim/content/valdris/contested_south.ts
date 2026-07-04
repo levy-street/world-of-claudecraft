@@ -13,6 +13,7 @@
 import type {
   CampDef,
   DefenseSiteDef,
+  EscortRouteDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -218,6 +219,26 @@ export const CONTESTED_SOUTH_MOBS: Record<string, MobTemplate> = {
   // Warden Ilyen: the palisade's defender (src/sim/events/defense.ts). A
   // world-owned ally (allyOfPlayers): friendly to every player, a real target
   // for the thornwood, never lootable, revived by the event cooldown.
+  // Carter Odom: the tollroad escort charge (src/sim/events/escort.ts).
+  tollroad_carter: {
+    id: 'tollroad_carter',
+    name: 'Carter Odom',
+    minLevel: 32,
+    maxLevel: 32,
+    family: 'humanoid',
+    hpBase: 620,
+    hpPerLevel: 34,
+    dmgBase: 14,
+    dmgPerLevel: 2.2,
+    attackSpeed: 2.4,
+    armorPerLevel: 14,
+    moveSpeed: 6.8,
+    aggroRadius: 8,
+    loot: [],
+    scale: 1,
+    color: 0x9a7d52,
+    allyOfPlayers: true,
+  },
   palisade_warden: {
     id: 'palisade_warden',
     name: 'Warden Ilyen',
@@ -969,7 +990,7 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
     pos: { x: -17, z: 2477 },
     facing: 1.4,
     color: 0x8a6f4d,
-    questIds: [],
+    questIds: ['q_ironpass_tollroad_escort'],
     vendorItems: ['healing_potion', 'mana_potion', 'tollhouse_stew', 'ironpass_mulled_cider'],
     greeting: 'Everyone pays at Ironpass: raiders, banners, and you. Lucky for you, I take copper.',
   },
@@ -1000,6 +1021,27 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
 
 // No quests in the contested strip: these bands are wilderness by design.
 export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
+  q_ironpass_tollroad_escort: {
+    id: 'q_ironpass_tollroad_escort',
+    name: 'The Toll Must Flow',
+    giverNpcId: 'tollkeeper_brann',
+    turnInNpcId: 'tollkeeper_brann',
+    text: 'Carter Odom hauls the toll-silver up the pass tonight, $N, and the raiders know the schedule better than my own clerks. Walk beside the wagon to the north bend and bring him back breathing.',
+    completionText:
+      'Odom made the bend and the silver made the strongbox. The raiders will sulk about it, which is how I like them.',
+    objectives: [
+      {
+        type: 'escort',
+        escortId: 'ironpass_tollroad',
+        count: 1,
+        label: 'Carter Odom escorted up the pass',
+      },
+    ],
+    xpReward: 9800,
+    copperReward: 5600,
+    itemRewards: {},
+    minLevel: 31,
+  },
   // The palisade stands or falls with its warden: the engine's first defense
   // event (src/sim/events/defense.ts). Talking to Senna with the quest active
   // arms the waves; every quest-holder inside the stakes earns the credit.
@@ -1025,7 +1067,47 @@ export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
     minLevel: 30,
   },
 };
-export const CONTESTED_SOUTH_QUEST_ORDER: string[] = ['q_thornfen_palisade_defense'];
+export const CONTESTED_SOUTH_QUEST_ORDER: string[] = [
+  'q_thornfen_palisade_defense',
+  'q_ironpass_tollroad_escort',
+];
+
+// The engine's first escort: Carter Odom hauls toll-silver up the pass road
+// while the raiders test the wagon at two bends.
+export const CONTESTED_SOUTH_ESCORT_ROUTES: Record<string, EscortRouteDef> = {
+  ironpass_tollroad: {
+    id: 'ironpass_tollroad',
+    escorteeTemplateId: 'tollroad_carter',
+    escorteeLevel: 32,
+    start: { x: -14, z: 2470 },
+    waypoints: [
+      { x: -6, z: 2488 },
+      {
+        x: 0,
+        z: 2510,
+        ambush: [
+          { mobId: 'pass_raider', level: 32, dx: 8, dz: 4 },
+          { mobId: 'pass_raider', level: 32, dx: -8, dz: 5 },
+        ],
+      },
+      { x: 2, z: 2535 },
+      {
+        x: 0,
+        z: 2560,
+        ambush: [
+          { mobId: 'pass_raider', level: 33, dx: 7, dz: 4 },
+          { mobId: 'pass_raider', level: 33, dx: -7, dz: 4 },
+          { mobId: 'pass_raider', level: 34, dx: 0, dz: 8 },
+        ],
+      },
+      { x: -2, z: 2585 },
+    ],
+    questId: 'q_ironpass_tollroad_escort',
+    objectiveIndex: 0,
+    engageRange: 26,
+    cooldownSeconds: 120,
+  },
+};
 
 // The engine's first DefenseSiteDef: Warden Ilyen holds the Wardens Palisade
 // gate against three fixed thornwood pushes. Offsets/levels are data (no rng).

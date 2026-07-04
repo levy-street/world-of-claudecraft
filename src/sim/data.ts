@@ -11,6 +11,7 @@ import type {
   DelveDef,
   DelveModuleDef,
   DungeonDef,
+  EscortRouteDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -58,6 +59,7 @@ import {
 import {
   VALDRIS_CAMPS,
   VALDRIS_DEFENSE_SITES,
+  VALDRIS_ESCORT_ROUTES,
   VALDRIS_ITEMS,
   VALDRIS_MOBS,
   VALDRIS_NPCS,
@@ -317,6 +319,11 @@ export const WORLD_MAX_X = WORLD_SIZE / 2;
 // Defense sites (src/sim/events/defense.ts): the defendable positions.
 export const DEFENSE_SITES: Record<string, DefenseSiteDef> = {
   ...VALDRIS_DEFENSE_SITES,
+};
+
+// Escort routes (src/sim/events/escort.ts).
+export const ESCORT_ROUTES: Record<string, EscortRouteDef> = {
+  ...VALDRIS_ESCORT_ROUTES,
 };
 
 export const WORLD_MIN_Z = ZONES[0].zMin;

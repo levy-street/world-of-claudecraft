@@ -1220,6 +1220,7 @@ const MOB_KEYS: Record<string, string> = {
   blackriver_skulker: 'mob_river_skulker',
   broken_legion_deserter: 'mob_legion_deserter',
   palisade_warden: 'mob_legion_deserter',
+  tollroad_carter: 'mob_tombrobber',
   sellsword_ogre: 'mob_highland_ogre',
   crag_toller: 'mob_highland_ogre',
   palewidow_weaver: 'mob_pale_widow',

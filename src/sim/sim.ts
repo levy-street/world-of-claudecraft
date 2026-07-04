@@ -140,6 +140,7 @@ import {
 import * as envoys from './envoys';
 import { canEquipItem } from './equipment_rules';
 import * as defense from './events/defense';
+import * as escort from './events/escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
@@ -1048,6 +1049,8 @@ export class Sim {
   private allyDirectives = new Map<number, AllyDirective>();
   // Defense events (src/sim/events/defense.ts): per-site machines.
   private defenseEvents = new Map<string, defense.DefenseEventState>();
+  // Escort runs (src/sim/events/escort.ts): per-route machines.
+  private escortRuns = new Map<string, escort.EscortRunState>();
   private groundAoEs: GroundAoE[] = [];
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity
@@ -1210,6 +1213,7 @@ export class Sim {
     // Defense sites plant their defender allies here, in the documented
     // rng-free ctor slot (NPC-style spawns draw nothing).
     defense.spawnDefenseSites(this.ctx);
+    escort.spawnEscortRoutes(this.ctx);
 
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
@@ -2318,6 +2322,9 @@ export class Sim {
       get defenseEvents() {
         return sim.defenseEvents;
       },
+      get escortRuns() {
+        return sim.escortRuns;
+      },
       get pendingMobRespawns() {
         return sim.pendingMobRespawns;
       },
@@ -2895,6 +2902,7 @@ export class Sim {
     this.updateInstances();
     this.updateDelveRuns();
     defense.updateDefenseEvents(this.ctx);
+    escort.updateEscorts(this.ctx);
     this.market.update();
     this.postOffice.update();
     drainDelayedEvents(this.ctx);
@@ -5095,6 +5103,7 @@ export class Sim {
   private onAllyDeath(ally: Entity): void {
     // Fan out to every event system holding allies (append as they land).
     defense.onAllyDeathForDefense(this.ctx, ally);
+    escort.onAllyDeathForEscort(this.ctx, ally);
   }
 
   private isQuestInteractionEntity(e: Entity): boolean {

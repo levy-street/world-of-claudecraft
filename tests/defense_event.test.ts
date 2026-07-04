@@ -32,7 +32,7 @@ function sennaId(sim: AnySim): number {
 }
 
 function state(sim: AnySim) {
-  return sim.defenseEvents.get(SITE.id);
+  return (sim as any).defenseEvents.get(SITE.id)!;
 }
 
 function armEvent(sim: AnySim): void {
@@ -76,7 +76,7 @@ describe('defense events: the Thornfen palisade', () => {
     const st = state(sim);
     expect(st.phase).toBe('wave');
     expect(st.waveMobIds.length).toBe(SITE.waves[0].spawns.length);
-    const first = sim.entities.get(st.waveMobIds[0]);
+    const first = sim.entities.get(st.waveMobIds[0])!;
     expect(first.templateId).toBe(SITE.waves[0].spawns[0].mobId);
     expect(first.level).toBe(SITE.waves[0].spawns[0].level);
     expect(first.aggroTargetId).toBe(st.allyEntityId);
@@ -93,7 +93,7 @@ describe('defense events: the Thornfen palisade', () => {
     events.push(...origEmit);
     const st = state(sim);
     expect(st.phase).toBe('cooldown');
-    const qp = sim.questLog.get(SITE.questId);
+    const qp = sim.questLog.get(SITE.questId)!;
     expect(qp.counts[SITE.objectiveIndex]).toBe(SITE.waves.length);
     expect(qp.state).toBe('ready');
     // restart during cooldown is refused
@@ -106,18 +106,18 @@ describe('defense events: the Thornfen palisade', () => {
     armEvent(sim);
     for (let i = 0; i < 20 * (SITE.waves[0].delaySeconds + 1); i++) sim.tick();
     const st = state(sim);
-    const ally = sim.entities.get(st.allyEntityId);
-    const killer = sim.entities.get(st.waveMobIds[0]);
+    const ally = sim.entities.get(st.allyEntityId)!;
+    const killer = sim.entities.get(st.waveMobIds[0])!;
     sim.dealDamage(killer, ally, 9999999, false, 'physical', null, 'hit');
     expect(ally.dead).toBe(true);
     for (let i = 0; i < 5; i++) sim.tick();
     expect(state(sim).phase).toBe('cooldown');
-    expect(sim.questLog.get(SITE.questId).counts[SITE.objectiveIndex]).toBe(0);
+    expect(sim.questLog.get(SITE.questId)!.counts[SITE.objectiveIndex]).toBe(0);
     // cooldown elapses: a fresh warden stands at the post
     for (let i = 0; i < 20 * (SITE.cooldownSeconds + 2); i++) sim.tick();
     const after = state(sim);
     expect(after.phase).toBe('idle');
-    const fresh = sim.entities.get(after.allyEntityId);
+    const fresh = sim.entities.get(after.allyEntityId)!;
     expect(fresh.dead).toBe(false);
     expect(Math.hypot(fresh.pos.x - SITE.pos.x, fresh.pos.z - SITE.pos.z)).toBeLessThan(4);
   });
@@ -128,7 +128,7 @@ describe('defense events: the Thornfen palisade', () => {
     teleport(sim, sim.player, SITE.pos.x - 200, SITE.pos.z - 400); // walk away
     for (let i = 0; i < 20 * 3; i++) sim.tick();
     expect(state(sim).phase).toBe('cooldown');
-    expect(sim.questLog.get(SITE.questId).counts[SITE.objectiveIndex]).toBe(0);
+    expect(sim.questLog.get(SITE.questId)!.counts[SITE.objectiveIndex]).toBe(0);
   });
 
   it('is deterministic: two same-seed runs land the same final state', () => {
@@ -141,7 +141,7 @@ describe('defense events: the Thornfen palisade', () => {
       return {
         phase: st.phase,
         wave: st.wave,
-        counts: [...sim.questLog.get(SITE.questId).counts],
+        counts: [...sim.questLog.get(SITE.questId)!.counts],
         nextId: sim.ctx.nextId,
       };
     };

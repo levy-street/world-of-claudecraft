@@ -9,6 +9,7 @@ import {
   CLASSES,
   DEFENSE_SITES,
   DUNGEON_LIST,
+  ESCORT_ROUTES,
   GROUND_OBJECTS,
   ITEMS,
   MOBS,
@@ -47,6 +48,23 @@ describe('content referential integrity', () => {
         }
         if (obj.type === 'collect' && (!obj.itemId || !ITEMS[obj.itemId])) {
           problems.push(`${q.id}: collect item ${obj.itemId} missing`);
+        }
+        if (obj.type === 'escort') {
+          const route = obj.escortId ? ESCORT_ROUTES[obj.escortId] : undefined;
+          if (!route) problems.push(`${q.id}: escort route ${obj.escortId} missing`);
+          else {
+            if (obj.count !== 1) problems.push(`${q.id}: escort count must be 1`);
+            if (route.questId !== q.id || q.objectives[route.objectiveIndex] !== obj)
+              problems.push(`${q.id}: escort route ${route.id} backrefs do not round-trip`);
+            const tpl = MOBS[route.escorteeTemplateId];
+            if (!tpl?.allyOfPlayers)
+              problems.push(`${route.id}: escortee ${route.escorteeTemplateId} not allyOfPlayers`);
+            for (const wp of route.waypoints) {
+              for (const sp of wp.ambush ?? []) {
+                if (!MOBS[sp.mobId]) problems.push(`${route.id}: ambush mob ${sp.mobId} missing`);
+              }
+            }
+          }
         }
         if (obj.type === 'defend') {
           const site = obj.siteId ? DEFENSE_SITES[obj.siteId] : undefined;

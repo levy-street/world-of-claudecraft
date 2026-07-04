@@ -7167,6 +7167,9 @@ export const es: EnTranslations = {
       "palisade_warden": {
         "name": "Warden Ilyen"
       },
+      "tollroad_carter": {
+        "name": "Carter Odom"
+      },
       "thornwarped_stag": {
         "name": "Ciervo deformado por espinas"
       },
@@ -8617,6 +8620,16 @@ export const es: EnTranslations = {
           }
         }
       },
+      "q_ironpass_tollroad_escort": {
+        "title": "The Toll Must Flow",
+        "text": "Carter Odom hauls the toll-silver up the pass tonight, {playerName}, and the raiders know the schedule better than my own clerks. Walk beside the wagon to the north bend and bring him back breathing.",
+        "completion": "Odom made the bend and the silver made the strongbox. The raiders will sulk about it, which is how I like them.",
+        "objectives": {
+          "0": {
+            "label": "Carter Odom escorted up the pass"
+          }
+        }
+      },
       "q_dune_prowlers": {
         "title": "El camino sangra",
         "text": "Las manadas de merodeadores han aprendido que la campana de las caravanas significa comida, {playerName}. Cada carro que perdemos las alimenta a ellas y mata de hambre a Qesh Aram. Reduce las manadas en las dunas que flanquean el camino del sur: doce, para empezar.",
@@ -9641,6 +9654,15 @@ export const es: EnTranslations = {
           },
           "9": {
             "label": "Terraza de los Jueces"
+          },
+          "10": {
+            "label": "Judges' Terrace"
+          },
+          "11": {
+            "label": "Bonewind Barrens"
+          },
+          "12": {
+            "label": "Last Water"
           }
         }
       },

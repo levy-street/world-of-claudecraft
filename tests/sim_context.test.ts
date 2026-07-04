@@ -339,6 +339,7 @@ function makeFakeHost() {
     setPlayerRace: vi.fn(() => true),
     allyDirectives: new Map(),
     defenseEvents: new Map(),
+    escortRuns: new Map(),
     updateWorldAlly: vi.fn(),
     onAllyDeath: vi.fn(),
     delveRunForPlayer: vi.fn(() => null),

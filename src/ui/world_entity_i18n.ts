@@ -119,6 +119,7 @@ const MOB_IDS = [
   'vask_smuggler_king',
   'thornfen_creeper',
   'palisade_warden',
+  'tollroad_carter',
   'thornwarped_stag',
   'thornfen_troll',
   'briar_horror',
@@ -342,6 +343,7 @@ const QUEST_IDS = [
   // Valdris continent (v0.19)
   'q_three_banners',
   'q_thornfen_palisade_defense',
+  'q_ironpass_tollroad_escort',
   'q_dune_prowlers',
   'q_dune_prowler_pelts',
   'q_glasswind_venom',
