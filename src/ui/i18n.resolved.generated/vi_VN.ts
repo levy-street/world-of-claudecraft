@@ -9055,6 +9055,229 @@ export const vi_VN: EnTranslations = {
           }
         }
       },
+      "q_gh_lurkers_below": {
+        "title": "What the Mouths Swallow",
+        "text": "The Sunken Mouths east of here swallowed three runners this month, {playerName}, and the lurkers spit back only the boots. Thin them out; the Underway does not run on boots.",
+        "completion": "Three roads reopened by morning. You are cheaper than the funerals, {playerName}, and I mean that as high praise.",
+        "objectives": {
+          "0": {
+            "label": "Hollow Lurker slain"
+          }
+        }
+      },
+      "q_gh_gnaw_culling": {
+        "title": "The Gnaw Warrens",
+        "text": "The gnawers breed faster than the warrens collapse, {playerName}, and they have started chewing the shoring timbers. Cull the warrens west of the Rest before the ceiling becomes the floor.",
+        "completion": "The timbers will hold another season. The gnawers will not thank you; neither will they bite, which is the arrangement I prefer.",
+        "objectives": {
+          "0": {
+            "label": "Pale Gnawer slain"
+          }
+        }
+      },
+      "q_gh_shale_hearts": {
+        "title": "The Shale Gallery",
+        "text": "Something woke the shale in the deep gallery, {playerName}: the stone walks, and walking stone does not respect tunnel rights. Break the elementals before the gallery seals itself.",
+        "completion": "The gallery is quiet and the survey team stopped drinking on duty. Small victories stack, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Deep Shale Elemental broken"
+          }
+        }
+      },
+      "q_gh_renegade_tolls": {
+        "title": "Unlicensed Tolls",
+        "text": "Renegades are charging tolls on tunnels they do not own, {playerName}, which offends me professionally. The Underway has exactly one fence, and he is standing in front of you. Correct them.",
+        "completion": "Toll receipts are down and honest smuggling is up. The Hollows thank you in the only currency they respect.",
+        "objectives": {
+          "0": {
+            "label": "Underway Renegade slain"
+          }
+        }
+      },
+      "q_gh_smuggler_king": {
+        "title": "The Smuggler King",
+        "text": "Vask calls himself the Smuggler King now, {playerName}, and kings tax fences. Take friends into the Spoil; Vask keeps a court, and courts object to regicide.",
+        "completion": "No crown, no king, no tax. The Spoil will squabble over the succession for a year, and squabbling smugglers are cheap smugglers.",
+        "objectives": {
+          "0": {
+            "label": "Vask the Smuggler King slain"
+          }
+        }
+      },
+      "q_tf_creeper_pruning": {
+        "title": "Pruning Season",
+        "text": "The creepers root closer to the stakes every dusk, {playerName}. The Wardens call it pruning season, which is gallows humor: prune twelve before they prune us.",
+        "completion": "Twelve stumps and the palisade line holds. Pruning season never ends out here; it only changes hands.",
+        "objectives": {
+          "0": {
+            "label": "Thornfen Creeper pruned"
+          }
+        }
+      },
+      "q_tf_stag_bolts": {
+        "title": "The Moving Wood",
+        "text": "The stags in the Moving Wood are not stags anymore, {playerName}: the thorn rides them like a saddle. Put them down west of the palisade, and do not follow the antlers into the deep growth.",
+        "completion": "Eight beasts freed the only way left to free them. The Wardens mark your tally on the gate post; the wood marks it elsewhere.",
+        "objectives": {
+          "0": {
+            "label": "Thornwarped Stag felled"
+          }
+        }
+      },
+      "q_tf_briarfather": {
+        "title": "The Briarfather",
+        "text": "Every thorn in this fen grows from one root, {playerName}, and the root has a name: the Briarfather, deep in the thicket. Bring blades you trust. Nobody prunes the Briarfather alone.",
+        "completion": "The thicket went quiet the hour he fell. It will not last, but a quiet hour on the Thornfen is a debt the Wardens do not forget.",
+        "objectives": {
+          "0": {
+            "label": "Briarfather Yew felled"
+          }
+        }
+      },
+      "q_ip_raider_toll": {
+        "title": "The Raider Toll",
+        "text": "The raiders on the bluffs charge their own toll in blood and cargo, {playerName}, and mine is the only licensed booth on this pass. Reduce the competition.",
+        "completion": "Traffic is up, screaming is down. The pass almost pays for itself again, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Pass Raider slain"
+          }
+        }
+      },
+      "q_ip_ogre_toll": {
+        "title": "The Ogre Toll",
+        "text": "The crag tollers sit on the east switchback and collect wagons whole, {playerName}. An ogre with a business model is still an ogre. Foreclose on them.",
+        "completion": "The switchback is passable and the ogres hold no further liens. I am writing that sentence into the ledger with real pleasure.",
+        "objectives": {
+          "0": {
+            "label": "Crag Toller felled"
+          }
+        }
+      },
+      "q_ip_wyvern_eyries": {
+        "title": "The Eyrie Problem",
+        "text": "Wyverns nest above the high pass and have learned what a pack mule sounds like, {playerName}. Climb to the eyries and unteach them.",
+        "completion": "The sky over the pass is just sky again. Mules everywhere sleep easier, and so do their owners.",
+        "objectives": {
+          "0": {
+            "label": "Ridge Wyvern brought down"
+          }
+        }
+      },
+      "q_ip_warlord": {
+        "title": "Skarn Holds the Pass",
+        "text": "Warlord Skarn unified the bluffs, {playerName}, which is exactly as bad as it sounds. A unified pass answers to him, not to the tollhouse. Gather a company and dissolve the arrangement.",
+        "completion": "Skarn falls and the bluffs remember they hate each other. Divided raiders are a weather condition; united ones were a siege.",
+        "objectives": {
+          "0": {
+            "label": "Warlord Skarn slain"
+          }
+        }
+      },
+      "q_ev_leech_burning": {
+        "title": "Leeches by Lanternlight",
+        "text": "The leeches climb the stilts at night and drink through the floorboards, {playerName}. Burn them out of the shallows while the lanterns still reach.",
+        "completion": "The stilts stand unbled for a week, maybe two. Out here that counts as a festival.",
+        "objectives": {
+          "0": {
+            "label": "Emberveil Leech burned"
+          }
+        }
+      },
+      "q_ev_bloat_popping": {
+        "title": "The Bloatwater Problem",
+        "text": "The bloats drift in from the shallows and burst against the pilings, {playerName}, and what they burst INTO eats the wood. Pop them at a distance, upwind, with my blessing.",
+        "completion": "The pilings will outlive the season. You smell terrible, {playerName}, and I say that with gratitude.",
+        "objectives": {
+          "0": {
+            "label": "Emberveil Bloat burst"
+          }
+        }
+      },
+      "q_ev_wraith_lights": {
+        "title": "False Lights",
+        "text": "The wraiths have started carrying lights, {playerName}: false lanterns, leading walkers off the causeway into the striders. Snuff the wraiths and the striders both; the fog only gets one trick at a time.",
+        "completion": "True lights only on the causeway tonight. Whatever teaches the fog its tricks will need a new lesson plan.",
+        "objectives": {
+          "0": {
+            "label": "Fog Wraith snuffed"
+          },
+          "1": {
+            "label": "Mire Strider felled"
+          }
+        }
+      },
+      "q_ev_colossus": {
+        "title": "What Walks the Fogwall",
+        "text": "Something the size of a barn walks the Fogwall at low tide, {playerName}, and the fog bends around it like a curtain. Take a full lantern crew. It has never noticed us; be the reason it never does again.",
+        "completion": "The Fogwall stands one tenant emptier. The stilts drink to you tonight, which is the highest honor we print.",
+        "objectives": {
+          "0": {
+            "label": "Emberveil Colossus toppled"
+          }
+        }
+      },
+      "q_ev_bridge_report": {
+        "title": "Word to Bridgewatch",
+        "text": "Bridgewatch asks after the fog like it asks after weather, {playerName}, and this season the honest answer is: worse. Carry my report up the causeway to Sutler Ives, and keep to the true lights.",
+        "completion": "Worse, she says. Ketta undersells; she always has. Stay a while, {playerName}: the bridge has work for anyone the fog could not keep.",
+        "objectives": {
+          "0": {
+            "label": "Report delivered to Sutler Ives"
+          }
+        }
+      },
+      "q_pc_gull_bones": {
+        "title": "Gullpicked and Restless",
+        "text": "The bones on Gullwatch Rise stopped lying still, {playerName}. Gullpicked, salt-scoured, and walking: the rise is a graveyard that forgot its manners. Remind it.",
+        "completion": "The rise lies quiet and the gulls are back to honest scavenging. That is as close to peace as the Crossing sells.",
+        "objectives": {
+          "0": {
+            "label": "Gullpicked Skeleton laid down"
+          }
+        }
+      },
+      "q_pc_drowned_banks": {
+        "title": "The Drowned Banks",
+        "text": "The river returns what it takes, {playerName}, eventually and angry. The revenants on the west banks drag at the ferry lines by night. Cut them down and let the river keep its dead.",
+        "completion": "The ferry lines held every night this week. The river and I have an understanding again, thanks to you.",
+        "objectives": {
+          "0": {
+            "label": "Riverbank Revenant put down"
+          }
+        }
+      },
+      "q_pc_bridge_cult": {
+        "title": "The Bridge Congregation",
+        "text": "The cultists on the Pale Bridge pray to the span itself, {playerName}, and lately the span answers. Nobody crosses while the congregation holds service. Disperse it, permanently.",
+        "completion": "The bridge stands empty and the crossing bell rang for the first time in a month. Whatever they woke is still listening; walk soft.",
+        "objectives": {
+          "0": {
+            "label": "Bridge Cultist dispersed"
+          }
+        }
+      },
+      "q_pc_pale_watchers": {
+        "title": "The Pale Watchers",
+        "text": "The watchers stand where the congregation fell, {playerName}, and they do not blink because they have nothing to blink with. They watch the bridge for something. Remove the audience.",
+        "completion": "Nothing watches the span tonight but my own tired eyes. I intend to keep it that way.",
+        "objectives": {
+          "0": {
+            "label": "Pale Watcher removed"
+          }
+        }
+      },
+      "q_pc_bridgekeeper": {
+        "title": "The Bridgekeeper",
+        "text": "Every toll the cult collected went below the central pier, {playerName}, to the thing they called the Bridgekeeper. It has held the crossing since before Bridgewatch had walls. Bring a company; the bridge chooses who crosses, and it has never chosen us.",
+        "completion": "The Crossing is ours for the first time in living memory. The Bridgekeeper kept the bridge; you kept us. The difference matters.",
+        "objectives": {
+          "0": {
+            "label": "The Bridgekeeper felled"
+          }
+        }
+      },
       "q_ironpass_tollroad_escort": {
         "title": "The Toll Must Flow",
         "text": "Carter Odom hauls the toll-silver up the pass tonight, {playerName}, and the raiders know the schedule better than my own clerks. Walk beside the wagon to the north bend and bring him back breathing.",
