@@ -85,6 +85,7 @@ import {
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
+  topBattlegroundRatings,
   topGuilds,
   topLifetimeXp,
   touchLogin,
@@ -1178,6 +1179,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
       const format = params.get('format') === '2v2' ? '2v2' : '1v1';
       return json(res, 200, { format, leaders: await topArenaRatings(20, format) });
+    }
+    if (req.method === 'GET' && url === '/api/battleground/leaderboard') {
+      // public all-time Gravemarch ladder (top rated characters)
+      return json(res, 200, { leaders: await topBattlegroundRatings(20) });
     }
     if (req.method === 'GET' && url === '/api/leaderboard') {
       // lifetime-XP leaderboard (Max-Level XP Overflow), served from the

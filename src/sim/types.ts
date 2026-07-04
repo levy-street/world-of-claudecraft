@@ -101,6 +101,11 @@ export interface ArenaCombatant {
   cls: PlayerClass;
   level: number;
 }
+
+// The Gravemarch 5v5 battleground: transient match sides, arena-style
+// (docs/prd/battlegrounds.md). 'A' = Ember Company (south base), 'B' = Pale
+// Company (north base).
+export type BgTeam = 'A' | 'B';
 export const ALL_CLASSES: PlayerClass[] = [
   'warrior',
   'paladin',
@@ -1531,6 +1536,13 @@ export interface Entity {
   threat: Map<number, number>;
   forcedTargetId: number | null; // taunt/growl: attack this target while the timer runs
   forcedTargetTimer: number; // seconds left on the forced-attack window
+  // Gravemarch battleground entities (minions/structures/the Knell Warden):
+  // the owning match id and company. Set only by social/battleground.ts at
+  // spawn; the wild-mob AI, hostility, and damage arms key off these so no
+  // other system ever touches a battleground mob. bgTeam stays undefined for
+  // the neutral Knell Warden. Never persisted or wired.
+  bgMatchId?: number;
+  bgTeam?: BgTeam;
   ownerId: number | null; // controlled pets: owning player's entity id (null = wild)
   petMode: PetMode; // hunter pet behavior stance
   petTauntTimer: number; // controlled pet Growl cooldown
@@ -1853,6 +1865,52 @@ export type SimEvent = { pid?: number } & (
   // A fighter grabbed a ring power-up (world event so everyone sees the glow).
   // Whether it's "mine" is decided client-side (entityId === local player).
   | { type: 'fiestaPowerup'; entityId: number; defId: string; glow: number; duration: number }
+  // The Gravemarch 5v5 battleground (docs/prd/battlegrounds.md). All carry pid
+  // (personal, delivered to each fighter/spectator via the anchor session).
+  | { type: 'bgQueued'; position: number }
+  | { type: 'bgUnqueued' }
+  | {
+      type: 'bgFound';
+      team: BgTeam;
+      allies: ArenaCombatant[];
+      enemies: ArenaCombatant[];
+      rated: boolean;
+    }
+  | { type: 'bgCountdown'; seconds: number }
+  | { type: 'bgStart' }
+  // A champion takedown; tallies ride along so the HUD strip updates instantly.
+  | {
+      type: 'bgKill';
+      killerName: string;
+      victimName: string;
+      killerTeam: BgTeam;
+      killsA: number;
+      killsB: number;
+      mine: boolean;
+    }
+  | { type: 'bgDown'; seconds: number }
+  // A Bulwark or Warstone fell to byTeam.
+  | {
+      type: 'bgStructure';
+      structureId: string;
+      team: BgTeam;
+      kind: 'warstone' | 'bulwark';
+      byTeam: BgTeam;
+    }
+  // team silenced the Knell (felled the Knell Warden)
+  | { type: 'bgKnell'; team: BgTeam }
+  // your Warstone is taking damage (throttled)
+  | { type: 'bgWarstoneThreat' }
+  | {
+      type: 'bgEnd';
+      won: boolean;
+      draw: boolean;
+      rated: boolean;
+      killsA: number;
+      killsB: number;
+      ratingBefore: number;
+      ratingAfter: number;
+    }
   | {
       type: 'heal2';
       sourceId: number;

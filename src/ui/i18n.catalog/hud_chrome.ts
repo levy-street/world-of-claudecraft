@@ -341,6 +341,7 @@ export const hudChromeStrings = {
     targetFriendlyNext: 'Cycle Friendly Target',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
+    battleground: 'Battlegrounds (The Gravemarch)',
   },
   // Click-to-move mouse-button toggle labels (Key Bindings panel). The button id
   // 0/2 maps to these at the HUD render boundary.
@@ -1306,5 +1307,100 @@ export const hudChromeStrings = {
   social: {
     lastSeen: 'Last seen: {when}',
     lastSeenNever: 'never',
+  },
+  // The Gravemarch 5v5 battleground (docs/prd/battlegrounds.md): the persistent
+  // indicator, the Battlegrounds window, the in-match HUD, the event banners /
+  // kill-feed lines, and the four sim-emitted queue/spectate errors that
+  // sim_i18n.ts re-localizes through the bg.err.* keys. WORDY values here carry
+  // their five non-Latin fills (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU) in the same
+  // change (M16); the maintainer fills the remaining locales at release.
+  bg: {
+    zoneName: 'The Gravemarch',
+    teamA: 'The Ember Company',
+    teamB: 'The Pale Company',
+    // m:ss clock: punctuation + formatNumber digits only (locale-neutral).
+    time: '{m}:{s}',
+    // The mobile "More" tray caption (short, like Arena / Quests beside it).
+    mobileLabel: 'Battle',
+    indicator: {
+      queued: 'In Gravemarch queue',
+      queuedDetail: '{position} in line, {time} waiting',
+      queuedAria: 'In Gravemarch queue: {position} in line, {time} waiting. Open Battlegrounds.',
+      live: 'Gravemarch battle underway',
+      liveDetail: '{time}, {killsA} to {killsB}',
+      liveAria:
+        'A Gravemarch battle is underway: {time}, {killsA} to {killsB}. Open Battlegrounds to watch.',
+      watch: 'Watch',
+    },
+    window: {
+      title: 'Battlegrounds',
+      subtitle: 'The Gravemarch: two roads, four Bulwarks, one Warstone.',
+      close: 'Close battlegrounds',
+      offlineNote: 'The war camp is still mustering. Battlegrounds open once the realm answers.',
+      enterQueue: 'Join the Gravemarch',
+      leaveQueue: 'Leave Queue',
+      queued: '{position} in line, {time} waiting ({count} mustered)',
+      queueNote:
+        'Every champion fights at the field standard with their class default build. Queue solo or lead a party of up to five.',
+      partyNote: 'Your party of {count} will queue together.',
+      leaderNote: 'Only your party leader may queue the party.',
+      deserter: "The Deserter's Knell tolls for you. You may queue again in {time}.",
+      inMatch: 'The battle is joined.',
+      liveHeading: 'Battles underway',
+      matchLine: '{teamA} {killsA} to {teamB} {killsB}, {time}, {players} fighting',
+      watch: 'Watch',
+      watchAria: 'Watch the battle underway ({time})',
+      noLive: 'No battle rages right now.',
+      practice: 'Practice on the Gravemarch',
+      practiceNote: 'Muster a full field of drilled bots and learn the roads. Practice is unrated.',
+    },
+    spectate: {
+      stop: 'Stop watching',
+    },
+    hud: {
+      knellUp: 'The Knell Warden stands',
+      knellSpawns: 'Knell Warden in {time}',
+      knellSilenced: '{team} silenced the Knell, {seconds}s',
+      stripAria: '{teamA} {killsA}, {teamB} {killsB}, {time} remains',
+      countdownTitle: 'The dead form ranks',
+      respawnTitle: 'You fall.',
+      respawnSub: 'The field is not done with you.',
+      returning: 'Returning to the world in {seconds}s',
+    },
+    banner: {
+      found: 'A battle musters on the Gravemarch!',
+      countdown: 'The battle begins in {seconds}...',
+      start: 'The banners rise. Fight!',
+      bulwarkWestOuter: "{team}'s western outer Bulwark has fallen.",
+      bulwarkWestInner: "{team}'s western inner Bulwark has fallen.",
+      bulwarkEastOuter: "{team}'s eastern outer Bulwark has fallen.",
+      bulwarkEastInner: "{team}'s eastern inner Bulwark has fallen.",
+      warstoneDown: "{team}'s Warstone is shattered!",
+      knell: '{team} has silenced the Knell!',
+      warstoneThreat: 'Your Warstone is under attack!',
+    },
+    log: {
+      queued: 'You join the Gravemarch queue ({position} in line).',
+      unqueued: 'You leave the Gravemarch queue.',
+      roster: '{team} musters: {allies} against {enemies}.',
+      kill: '{killer} has slain {victim}!',
+      down: 'You fall. The field returns you to your Warstone in {seconds}s.',
+    },
+    end: {
+      win: 'Victory! The enemy Warstone is shattered.',
+      loss: 'Defeat. Your Warstone is shattered.',
+      draw: 'The field falls silent. A draw.',
+      rating: 'Rating {rating} ({delta}).',
+    },
+    // Sim-emitted queue/spectate/duel errors (exact English the sim emits verbatim;
+    // sim_i18n.ts matcher rules re-localize them through these keys).
+    err: {
+      level10: 'You must be at least level 10 to join the Gravemarch.',
+      deserter: "You cannot queue while the Deserter's Knell tolls.",
+      cannotSpectate: 'You cannot spectate right now.',
+      matchEnded: 'That battle has already ended.',
+      noDuel: 'You cannot duel on the Gravemarch.',
+      partyTooLarge: 'A Gravemarch company takes five at most.',
+    },
   },
 };

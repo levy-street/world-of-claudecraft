@@ -11,7 +11,7 @@
 import { CLASSES, DUNGEONS, ZONES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { getLanguage, type InterpolationValues, type SupportedLanguage, tPlural } from './i18n';
+import { getLanguage, type InterpolationValues, type SupportedLanguage, t, tPlural } from './i18n';
 import { SERVER_NEW } from './server_i18n.newlocales';
 import { IN_GAME_MODERATION_MESSAGES } from './server_i18n_moderation';
 
@@ -1531,6 +1531,9 @@ const dungeonNameToId = new Map<string, string>();
 for (const [id, d] of Object.entries(DUNGEONS)) dungeonNameToId.set(d.name, id);
 export function localizeZone(name: string): string {
   if (name === 'Unknown') return tServer('who.zoneUnknown');
+  // The Gravemarch battleground band: a presence zone name with no ZoneDef or
+  // DungeonDef record (server/game.ts instanceZoneName), localized directly.
+  if (name === 'The Gravemarch') return t('hudChrome.bg.zoneName');
   const zid = zoneNameToId.get(name);
   if (zid) return tEntity({ kind: 'zone', id: zid, field: 'name' });
   const did = dungeonNameToId.get(name);

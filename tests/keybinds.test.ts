@@ -67,6 +67,12 @@ describe('registry', () => {
     expect(discord?.category).toBe('Interface');
     expect(discord?.kind).toBe('edge');
     expect(discord?.defaults).toEqual(['KeyU']);
+    // Battlegrounds (the Gravemarch) is a rebindable Interface window toggle
+    // (default T; J, the natural pick, is taken by Cycle Friendly Target).
+    const battleground = BIND_ACTIONS.find((a) => a.id === 'battleground');
+    expect(battleground?.category).toBe('Interface');
+    expect(battleground?.kind).toBe('edge');
+    expect(battleground?.defaults).toEqual(['KeyT']);
   });
 });
 
@@ -94,6 +100,7 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyH')).toBe('targetFriendly');
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyU')).toBe('discord');
+    expect(kb.actionForCode('KeyT')).toBe('battleground');
     expect(kb.actionForCode('KeyZ')).toBe(null);
   });
 

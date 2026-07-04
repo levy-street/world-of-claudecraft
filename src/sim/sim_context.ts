@@ -33,6 +33,7 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { BgMatch, BgQueueUnit } from './social/battleground';
 import type { SpatialGrid } from './spatial';
 import type {
   AbilityDef,
@@ -118,6 +119,18 @@ export interface SimContextPrimitives {
   arenaQueueFiesta: ArenaQueueUnit[];
   readonly arenaBusySlots: Set<number>;
   nextArenaMatchId: number;
+  // Gravemarch battleground state (social/battleground.ts). Live views, the
+  // arena-state pattern: `bgQueue` and `bgBotPids` are REASSIGNED by the
+  // pruning filters (read-write); the matches map / busy-slot set / deserter
+  // lockout map are mutated in place; the match-id counter increments in place.
+  // Backing fields stay on Sim. `bgDeserters` maps a lower-cased character
+  // name to the sim.time its Deserter's Knell expires (in-memory, per-realm).
+  bgQueue: BgQueueUnit[];
+  readonly bgMatches: Map<number, BgMatch>;
+  readonly bgBusySlots: Set<number>;
+  nextBgMatchId: number;
+  readonly bgDeserters: Map<string, number>;
+  bgBotPids: number[];
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -236,6 +249,19 @@ export interface SimContextCallbacks {
   arenaAllPids(match: ArenaMatch): number[];
   fiestaTakedown(match: ArenaMatch, killerPid: number, victim: Entity): void;
   fiestaDown(match: ArenaMatch, victim: Entity, killerPid: number | null): void;
+  // Gravemarch battleground (social/battleground.ts). Consumed by the
+  // combat/damage.ts battleground arms (the fiesta arm pattern) and by
+  // targeting.ts's countdown-targeting candidate check. isBgCrossTeam mirrors
+  // isArenaCrossTeam; bgNotePlayerDamage records kill credit + the Bulwark
+  // punish rule on every cross-team player hit; bgPlayerDown benches a fighter
+  // who would hit 0 hp; bgMobKilled routes a battleground mob's death (no xp,
+  // no loot, module respawn bookkeeping); bgAdjustStructureDamage floors
+  // shielded-structure damage to 0 and applies the Knell/empowered bonuses.
+  isBgCrossTeam(match: BgMatch, attackerPid: number, targetPid: number): boolean;
+  bgNotePlayerDamage(match: BgMatch, victim: Entity, attackerPlayer: Entity): void;
+  bgPlayerDown(match: BgMatch, victim: Entity, source: Entity | null): void;
+  bgMobKilled(mob: Entity, source: Entity | null): void;
+  bgAdjustStructureDamage(target: Entity, source: Entity | null, amount: number): number;
   rollLoot(mob: Entity, meta: PlayerMeta, eligible?: PlayerMeta[]): void;
   // World-boss personal loot: an independent roll of the boss's loot table per
   // contributor (gated once-per-day per boss). Owned by world_boss.ts.
@@ -698,6 +724,33 @@ export function createSimContext(host: SimContextHost): SimContext {
     set nextArenaMatchId(v) {
       host.nextArenaMatchId = v;
     },
+    get bgQueue() {
+      return host.bgQueue;
+    },
+    set bgQueue(v) {
+      host.bgQueue = v;
+    },
+    get bgMatches() {
+      return host.bgMatches;
+    },
+    get bgBusySlots() {
+      return host.bgBusySlots;
+    },
+    get nextBgMatchId() {
+      return host.nextBgMatchId;
+    },
+    set nextBgMatchId(v) {
+      host.nextBgMatchId = v;
+    },
+    get bgDeserters() {
+      return host.bgDeserters;
+    },
+    get bgBotPids() {
+      return host.bgBotPids;
+    },
+    set bgBotPids(v) {
+      host.bgBotPids = v;
+    },
     get delveRuns() {
       return host.delveRuns;
     },
@@ -769,6 +822,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     arenaAllPids: host.arenaAllPids,
     fiestaTakedown: host.fiestaTakedown,
     fiestaDown: host.fiestaDown,
+    // Gravemarch battleground seam (consumed by combat/damage.ts + targeting.ts).
+    isBgCrossTeam: host.isBgCrossTeam,
+    bgNotePlayerDamage: host.bgNotePlayerDamage,
+    bgPlayerDown: host.bgPlayerDown,
+    bgMobKilled: host.bgMobKilled,
+    bgAdjustStructureDamage: host.bgAdjustStructureDamage,
     rollLoot: host.rollLoot,
     rollWorldBossLoot: host.rollWorldBossLoot,
     applyHeal: host.applyHeal,

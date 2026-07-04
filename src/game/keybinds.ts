@@ -179,6 +179,14 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyG'],
   },
+  // KeyJ (the suggested default) is taken by Cycle Friendly Target; T is free.
+  {
+    id: 'battleground',
+    label: 'Battlegrounds (The Gravemarch)',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['KeyT'],
+  },
   {
     id: 'leaderboard',
     label: 'Leaderboard',

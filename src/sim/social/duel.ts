@@ -30,6 +30,13 @@ export function duelRequest(ctx: SimContext, targetPid: number, pid?: number): v
     ctx.error(r.meta.entityId, 'You cannot duel in Nythraxis Raid Arena.');
     return;
   }
+  // A duel inside a Gravemarch match would fight the battleground's bench
+  // system (duel damage floors at 1 HP; bg lethal damage benches), so block it
+  // for fighters on either side.
+  if (ctx.bgMatches.has(r.meta.entityId) || ctx.bgMatches.has(targetPid)) {
+    ctx.error(r.meta.entityId, 'You cannot duel on the Gravemarch.');
+    return;
+  }
   if (ctx.duels.has(r.meta.entityId) || ctx.duels.has(targetPid)) {
     ctx.error(r.meta.entityId, 'A duel is already in progress.');
     return;
@@ -75,6 +82,11 @@ export function duelAccept(ctx: SimContext, pid?: number): void {
     ctx.entityInDungeon(otherE, 'nythraxis_boss_arena')
   ) {
     ctx.error(r.meta.entityId, 'You cannot duel in Nythraxis Raid Arena.');
+    return;
+  }
+  // Either party may have entered a Gravemarch match since the challenge.
+  if (ctx.bgMatches.has(r.meta.entityId) || ctx.bgMatches.has(invite.fromPid)) {
+    ctx.error(r.meta.entityId, 'You cannot duel on the Gravemarch.');
     return;
   }
   if (ctx.duels.has(invite.fromPid) || ctx.duels.has(r.meta.entityId)) {

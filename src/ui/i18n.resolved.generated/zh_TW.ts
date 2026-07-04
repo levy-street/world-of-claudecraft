@@ -382,7 +382,8 @@ export const zh_TW: EnTranslations = {
       "emoteWheel": "表情輪盤",
       "targetFriendly": "選取最近友方",
       "targetFriendlyNext": "切換友方目標",
-      "discord": "Discord"
+      "discord": "Discord",
+      "battleground": "戰場（墓行之原）"
     },
     "options": {
       "clickMoveLeft": "左鍵",
@@ -1169,6 +1170,89 @@ export const zh_TW: EnTranslations = {
     "social": {
       "lastSeen": "最後上線: {when}",
       "lastSeenNever": "從未"
+    },
+    "bg": {
+      "zoneName": "墓行之原",
+      "teamA": "餘燼戰團",
+      "teamB": "蒼白戰團",
+      "time": "{m}:{s}",
+      "mobileLabel": "戰場",
+      "indicator": {
+        "queued": "墓行之原排隊中",
+        "queuedDetail": "第 {position} 位，已等待 {time}",
+        "queuedAria": "墓行之原排隊中：第 {position} 位，已等待 {time}。開啟戰場面板。",
+        "live": "墓行之原戰鬥正酣",
+        "liveDetail": "{time}，{killsA} 比 {killsB}",
+        "liveAria": "墓行之原有一場戰鬥正在進行：{time}，{killsA} 比 {killsB}。開啟戰場面板觀戰。",
+        "watch": "觀戰"
+      },
+      "window": {
+        "title": "戰場",
+        "subtitle": "墓行之原：兩條大道，四座壁壘，一塊戰爭石。",
+        "close": "關閉戰場面板",
+        "offlineNote": "戰地營帳仍在集結。與伺服器連通後即可進入戰場。",
+        "enterQueue": "加入墓行之原",
+        "leaveQueue": "離開佇列",
+        "queued": "第 {position} 位，已等待 {time}（{count} 人集結）",
+        "queueNote": "每位勇士都以戰場標準等級和職業預設天賦作戰。可單人排隊，或由隊長率最多五人的隊伍排隊。",
+        "partyNote": "你的 {count} 人隊伍將一同排隊。",
+        "leaderNote": "只有隊長才能為隊伍排隊。",
+        "deserter": "逃兵喪鐘正為你敲響。{time} 後方可再次排隊。",
+        "inMatch": "戰鬥已經打響。",
+        "liveHeading": "進行中的戰鬥",
+        "matchLine": "{teamA} {killsA} 比 {teamB} {killsB}，{time}，{players} 人在戰",
+        "watch": "觀戰",
+        "watchAria": "觀看進行中的戰鬥（{time}）",
+        "noLive": "眼下沒有戰事。",
+        "practice": "在墓行之原練習",
+        "practiceNote": "召集一整隊操練有素的機器人，熟悉兩條大道。練習賽不計入天梯。"
+      },
+      "spectate": {
+        "stop": "停止觀戰"
+      },
+      "hud": {
+        "knellUp": "喪鐘守衛在場",
+        "knellSpawns": "喪鐘守衛將於 {time} 現身",
+        "knellSilenced": "{team}已封默喪鐘，{seconds}秒",
+        "stripAria": "{teamA} {killsA}，{teamB} {killsB}，剩餘 {time}",
+        "countdownTitle": "亡者列陣",
+        "respawnTitle": "你倒下了。",
+        "respawnSub": "戰場與你未了。",
+        "returning": "{seconds} 秒後返回世界"
+      },
+      "banner": {
+        "found": "墓行之原戰事集結！",
+        "countdown": "戰鬥將於 {seconds} 秒後開始……",
+        "start": "戰旗升起。開戰！",
+        "bulwarkWestOuter": "{team}的西路外層壁壘已陷落。",
+        "bulwarkWestInner": "{team}的西路內層壁壘已陷落。",
+        "bulwarkEastOuter": "{team}的東路外層壁壘已陷落。",
+        "bulwarkEastInner": "{team}的東路內層壁壘已陷落。",
+        "warstoneDown": "{team}的戰爭石已被擊碎！",
+        "knell": "{team}封默了喪鐘！",
+        "warstoneThreat": "你的戰爭石正遭受攻擊！"
+      },
+      "log": {
+        "queued": "你加入了墓行之原佇列（第 {position} 位）。",
+        "unqueued": "你離開了墓行之原佇列。",
+        "roster": "{team}集結：{allies} 對陣 {enemies}。",
+        "kill": "{killer} 擊殺了 {victim}！",
+        "down": "你倒下了。戰場將在 {seconds} 秒後把你送回戰爭石。"
+      },
+      "end": {
+        "win": "勝利！敵方戰爭石已被擊碎。",
+        "loss": "戰敗。我方戰爭石已被擊碎。",
+        "draw": "戰場歸於沉寂。平手。",
+        "rating": "積分 {rating}（{delta}）。"
+      },
+      "err": {
+        "level10": "你必須至少達到 10 級才能加入墓行之原。",
+        "deserter": "逃兵喪鐘敲響時你無法排隊。",
+        "cannotSpectate": "你現在無法觀戰。",
+        "matchEnded": "那場戰鬥已經結束。",
+        "noDuel": "你不能在墓行之原決鬥。",
+        "partyTooLarge": "墓行之原的戰團最多五人。"
+      }
     }
   },
   "guide": {
@@ -1199,6 +1283,7 @@ export const zh_TW: EnTranslations = {
       "combat": "戰鬥",
       "talents": "天賦",
       "arena": "競技場與PvP",
+      "battlegrounds": "戰場",
       "glossary": "詞彙表",
       "wishIKnew": "我希望早點知道的事",
       "faq": "常見問題",
@@ -1793,6 +1878,29 @@ export const zh_TW: EnTranslations = {
       "powerupsBody": "戰鬥進行到一半，發光的能量球也會落入競技場，誰先搶到就歸誰。它們刻意設計得誇張過火，且只持續短短一陣子：速度惡魔讓你瞬間飆出令人目眩的步伐，巨像讓你脹大成笨重的巨人，月靴帶來低重力的彈跳躍動，狂戰士則是一股突如其來的暴怒之潮。",
       "ladderHeading": "在天梯上攀升",
       "ladderBody": "排名對戰會長期記錄你的名次。查看排行榜便能看到自己的位置，以及誰穩坐王國之巔。"
+    },
+    "bgPage": {
+      "heading": "墓行之原",
+      "intro": "墓行之原是五對五的戰場：兩支勇士戰團各自率領復生士兵的縱隊沿兩條古道推進，摧毀敵方塔樓，擊碎讓對方大軍行進不止的戰爭石。隨處可排隊，其餘交給戰場。",
+      "storyHeading": "永不安息的戰場",
+      "storyBody": "墓龍聖所之下的亡魂原野，埋著最後一支進攻荊峰的大軍的先鋒。每到黃昏，舊日之戰便會甦醒；灰燼競技場的守衛者們發現，誰舉起戰旗，誰就統領旗下亡者。於是競技場批准了這場戰爭演習：在墓行之原無人真正死去，戰場本身不容許。",
+      "companiesHeading": "兩團各執一旗",
+      "companiesBody": "戰士為餘燼戰團或蒼白戰團舉旗。可以單人排隊，也可以帶上隊伍，戰場會把你編入五人戰團。陣營只是暫時的，和競技場一樣：沒有永久陣營，玩家對戰永遠出於自願。",
+      "fairNote": "墓行之原生來公平。每位勇士都以戰場標準等級和職業預設天賦作戰，比拼的是操作，而非裝備或等級。",
+      "fieldHeading": "讀懂戰場",
+      "fieldBody": "兩座基地之間，西有盾之路，東有矛之路，中間橫著殘破的墳丘地，戰場中心是坍毀的鐘禮拜堂。示意地圖會標出道路、塔樓、你的盟友與喪鐘。",
+      "roadsTitle": "兩條大道",
+      "roadsBody": "骨甲亡魂的縱隊沿各條大道向敵方基地行進。它們與攔路者作戰並猛攻防禦工事；與縱隊並肩推進才能奪取陣地。",
+      "bulwarksTitle": "壁壘",
+      "bulwarksBody": "每條大道都由沉重的守衛塔看護，每個戰團各有外層與內層一座。它們會懲戒欺凌其部眾的勇士，且外層不倒，內層無恙。打通一條大道，敵方戰爭石便無所遮蔽。",
+      "knellTitle": "喪鐘",
+      "knellBody": "禮拜堂中懸著喪鐘，喚醒這支大軍的鐘，以及它的看守者喪鐘守衛。擊倒守衛的戰團可令喪鐘短暫沉默，麾下縱隊因此行進更猛。",
+      "deathHeading": "倒在墓行之原",
+      "deathBody": "戰場不容死亡。倒下的勇士會短暫離場，然後在自家戰爭石旁甦醒，每次都稍慢一些。沒有跑屍，也沒有任何損失；代價只是離場的時間。",
+      "watchHeading": "觀戰",
+      "watchBody": "本伺服器上任何進行中的戰鬥都可以觀看。小地圖旁的徽章會通報戰事，戰場面板列出每場比賽並附觀戰按鈕。觀戰者隨一個戰團同行，可見比賽讀數，隨時可以停止觀戰。",
+      "ladderHeading": "天梯",
+      "ladderBody": "墓行之原的天梯賽像競技場一樣單獨計分。戰場面板會顯示你的積分、戰績，以及線上天梯勇士的排名。由機器人補位的對局不計分，離線練習同樣不計分。"
     },
     "wishPage": {
       "heading": "我希望早點知道的事",

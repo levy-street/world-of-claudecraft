@@ -46,6 +46,7 @@ import {
 import {
   type AccountCosmetics,
   type ArenaInfo,
+  type BgInfo,
   type CharacterSearchResult,
   type ClientCommand,
   type DailyRewardHistory,
@@ -852,6 +853,16 @@ function blankEntity(id: number): Entity {
   };
 }
 
+// The only commands a spectating client may still send: chat, plus the
+// battleground spectate controls so a watcher can hop followed fighters and
+// leave the match. Everything else stays blocked while spectating.
+const SPECTATOR_ALLOWED_CMDS: ReadonlySet<ClientCommand> = new Set<ClientCommand>([
+  'chat',
+  'bg_spectate',
+  'bg_spectate_next',
+  'bg_spectate_leave',
+]);
+
 export class ClientWorld implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
   // `player` getter lives below the ctor (it reads `entities`/`playerId`). `known`
@@ -906,6 +917,15 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldBattleground: Gravemarch queue/match/spectate state, mirrored from
+  // the snapshot self (`s.bg`, delta-omitted). The wire `spectating` field is
+  // always null (the self record is the anchored target's view); the mirror
+  // overrides it with the locally tracked match id below. ---
+  bgInfo: BgInfo | null = null;
+  // Match id this client asked to watch: set when bgSpectate(matchId) is sent,
+  // cleared by the spectate-clear frame or bgSpectateLeave, surfaced as
+  // bgInfo.spectating by the applySnapshot mirror override.
+  private bgSpectatingMatchId: number | null = null;
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
@@ -1130,8 +1150,11 @@ export class ClientWorld implements IWorld {
   // makes "every ClientWorld send is in the server's dispatch-set" a compile-time
   // guarantee rather than a runtime hope: a send of an unknown or dispatch-only
   // token fails `tsc`. The raw escape hatch (devCmd) stays untyped on purpose.
+  // While spectating every command is blocked except chat and the battleground
+  // spectate controls (so a watcher can hop targets and leave); the server
+  // ignores spectator commands regardless.
   private cmd(payload: { cmd: ClientCommand } & Record<string, unknown>): void {
-    if (typeof this.spectating === 'string' && payload.cmd !== 'chat') return;
+    if (typeof this.spectating === 'string' && !SPECTATOR_ALLOWED_CMDS.has(payload.cmd)) return;
     this.rawCmd(payload);
   }
 
@@ -1170,6 +1193,9 @@ export class ClientWorld implements IWorld {
       if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
+        // spectate ended (requested, match over, or target left): the next `bg`
+        // delta re-mirrors with spectating null
+        this.bgSpectatingMatchId = null;
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
@@ -1614,6 +1640,16 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      // --- IWorldBattleground: `bg` delta self-decode, a pass-through mirror
+      // like `arena` (omitted keeps the prior value, explicit null clears),
+      // except `spectating` is locally owned: the wire value from the anchored
+      // target is null, so the mirror overrides it with the tracked match id.
+      // (`?? null` also covers bare test instances built via Object.create,
+      // which skip field initializers.) ---
+      if (s.bg !== undefined) {
+        this.bgInfo =
+          s.bg === null ? null : { ...s.bg, spectating: this.bgSpectatingMatchId ?? null };
+      }
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
@@ -2030,6 +2066,30 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldBattleground: Gravemarch queue + spectate sends (bgInfo is a
+  // snapshot read; match transitions ride the events queue). ---
+  bgQueueJoin(): void {
+    this.cmd({ cmd: 'bg_queue' });
+  }
+  bgQueueLeave(): void {
+    this.cmd({ cmd: 'bg_leave' });
+  }
+  bgSpectate(matchId: number): void {
+    // locally owned spectate target: the wire never echoes it (the self record
+    // is the anchored fighter's view), so track it here for bgInfo.spectating
+    this.bgSpectatingMatchId = matchId;
+    this.cmd({ cmd: 'bg_spectate', matchId });
+  }
+  bgSpectateNext(): void {
+    this.cmd({ cmd: 'bg_spectate_next' });
+  }
+  bgSpectateLeave(): void {
+    this.bgSpectatingMatchId = null;
+    this.cmd({ cmd: 'bg_spectate_leave' });
+  }
+  bgPracticeStart(): void {
+    // offline-only affordance (fiesta practice precedent): a no-op online
   }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the

@@ -264,6 +264,26 @@ export function dealDamage(
     }
   }
 
+  // The Gravemarch battleground (social/battleground.ts). Three arms, every
+  // one early-bailing so non-battleground combat and the rng draw order stay
+  // untouched: (1) battleground-structure damage is gated (shielded Bulwarks
+  // and Warstones soak to zero; the Knell-silence and empowered-minion
+  // bonuses apply); (2) cross-team player damage is noted for kill credit and
+  // the Bulwark punish rule; (3) a fighter who would hit 0 hp is benched on a
+  // respawn timer (the fiesta pattern), never truly killed.
+  if (target.kind === 'mob' && target.bgMatchId !== undefined) {
+    amount = ctx.bgAdjustStructureDamage(target, source, amount);
+  }
+  const bgMatch = target.kind === 'player' ? ctx.bgMatches.get(target.id) : undefined;
+  if (bgMatch && bgMatch.state === 'active') {
+    if (sourcePlayer && amount > 0 && ctx.isBgCrossTeam(bgMatch, sourcePlayer.id, target.id)) {
+      ctx.bgNotePlayerDamage(bgMatch, target, sourcePlayer);
+    }
+    // The bench divert happens at the death ladder below (the fiesta shape):
+    // the killing blow runs the FULL damage pipeline (event emit, aura breaks,
+    // stealth break, combat entry) and only the death handling diverts.
+  }
+
   target.hp = Math.max(0, target.hp - amount);
   ctx.emit({
     type: 'damage',
@@ -383,6 +403,16 @@ export function dealDamage(
     const fmatch = target.kind === 'player' ? ctx.arenaMatches.get(target.id) : undefined;
     if (fmatch?.fiesta && fmatch.state === 'active' && !ctx.arenaIsDown(fmatch, target.id)) {
       ctx.fiestaDown(fmatch, target, null);
+    } else if (bgMatch && bgMatch.state === 'active') {
+      // Gravemarch fighters bench on a respawn timer, never truly die. An
+      // already-benched fighter bottoming out again (a friendly DoT tail)
+      // must ALSO never reach handleDeath; bgPlayerDown self-guards on the
+      // down set, so the swallow here is deliberate either way.
+      ctx.bgPlayerDown(bgMatch, target, source);
+    } else if (target.kind === 'mob' && target.bgMatchId !== undefined) {
+      // Battleground entities die through the module: no xp, no loot, no wild
+      // respawn; the match tracks its own corpses, waves, and win checks.
+      ctx.bgMobKilled(target, source);
     } else {
       handleDeath(ctx, target, source);
     }

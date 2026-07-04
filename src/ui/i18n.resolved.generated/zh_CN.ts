@@ -382,7 +382,8 @@ export const zh_CN: EnTranslations = {
       "emoteWheel": "表情轮盘",
       "targetFriendly": "选中最近友方",
       "targetFriendlyNext": "切换友方目标",
-      "discord": "Discord"
+      "discord": "Discord",
+      "battleground": "战场（墓行之原）"
     },
     "options": {
       "clickMoveLeft": "左键",
@@ -1169,6 +1170,89 @@ export const zh_CN: EnTranslations = {
     "social": {
       "lastSeen": "最后在线: {when}",
       "lastSeenNever": "从未"
+    },
+    "bg": {
+      "zoneName": "墓行之原",
+      "teamA": "余烬战团",
+      "teamB": "苍白战团",
+      "time": "{m}:{s}",
+      "mobileLabel": "战场",
+      "indicator": {
+        "queued": "墓行之原排队中",
+        "queuedDetail": "第 {position} 位，已等待 {time}",
+        "queuedAria": "墓行之原排队中：第 {position} 位，已等待 {time}。打开战场面板。",
+        "live": "墓行之原战斗正酣",
+        "liveDetail": "{time}，{killsA} 比 {killsB}",
+        "liveAria": "墓行之原有一场战斗正在进行：{time}，{killsA} 比 {killsB}。打开战场面板观战。",
+        "watch": "观战"
+      },
+      "window": {
+        "title": "战场",
+        "subtitle": "墓行之原：两条大道，四座壁垒，一块战争石。",
+        "close": "关闭战场面板",
+        "offlineNote": "战地营帐仍在集结。与服务器连通后即可进入战场。",
+        "enterQueue": "加入墓行之原",
+        "leaveQueue": "离开队列",
+        "queued": "第 {position} 位，已等待 {time}（{count} 人集结）",
+        "queueNote": "每位勇士都以战场标准等级和职业默认天赋作战。可单人排队，或由队长率最多五人的小队排队。",
+        "partyNote": "你的 {count} 人小队将一同排队。",
+        "leaderNote": "只有队长才能为小队排队。",
+        "deserter": "逃兵丧钟正为你敲响。{time} 后方可再次排队。",
+        "inMatch": "战斗已经打响。",
+        "liveHeading": "进行中的战斗",
+        "matchLine": "{teamA} {killsA} 比 {teamB} {killsB}，{time}，{players} 人在战",
+        "watch": "观战",
+        "watchAria": "观看进行中的战斗（{time}）",
+        "noLive": "眼下没有战事。",
+        "practice": "在墓行之原练习",
+        "practiceNote": "召集一整队操练有素的机器人，熟悉两条大道。练习赛不计入天梯。"
+      },
+      "spectate": {
+        "stop": "停止观战"
+      },
+      "hud": {
+        "knellUp": "丧钟守卫在场",
+        "knellSpawns": "丧钟守卫将于 {time} 现身",
+        "knellSilenced": "{team}已封默丧钟，{seconds}秒",
+        "stripAria": "{teamA} {killsA}，{teamB} {killsB}，剩余 {time}",
+        "countdownTitle": "亡者列阵",
+        "respawnTitle": "你倒下了。",
+        "respawnSub": "战场与你未了。",
+        "returning": "{seconds} 秒后返回世界"
+      },
+      "banner": {
+        "found": "墓行之原战事集结！",
+        "countdown": "战斗将于 {seconds} 秒后开始……",
+        "start": "战旗升起。开战！",
+        "bulwarkWestOuter": "{team}的西路外层壁垒已陷落。",
+        "bulwarkWestInner": "{team}的西路内层壁垒已陷落。",
+        "bulwarkEastOuter": "{team}的东路外层壁垒已陷落。",
+        "bulwarkEastInner": "{team}的东路内层壁垒已陷落。",
+        "warstoneDown": "{team}的战争石已被击碎！",
+        "knell": "{team}封默了丧钟！",
+        "warstoneThreat": "你的战争石正遭受攻击！"
+      },
+      "log": {
+        "queued": "你加入了墓行之原队列（第 {position} 位）。",
+        "unqueued": "你离开了墓行之原队列。",
+        "roster": "{team}集结：{allies} 对阵 {enemies}。",
+        "kill": "{killer} 击杀了 {victim}！",
+        "down": "你倒下了。战场将在 {seconds} 秒后把你送回战争石。"
+      },
+      "end": {
+        "win": "胜利！敌方战争石已被击碎。",
+        "loss": "战败。你方战争石已被击碎。",
+        "draw": "战场归于沉寂。平局。",
+        "rating": "等级分 {rating}（{delta}）。"
+      },
+      "err": {
+        "level10": "你必须至少达到 10 级才能加入墓行之原。",
+        "deserter": "逃兵丧钟敲响时你无法排队。",
+        "cannotSpectate": "你现在无法观战。",
+        "matchEnded": "那场战斗已经结束。",
+        "noDuel": "你不能在墓行之原决斗。",
+        "partyTooLarge": "墓行之原的战团最多五人。"
+      }
     }
   },
   "guide": {
@@ -1199,6 +1283,7 @@ export const zh_CN: EnTranslations = {
       "combat": "战斗",
       "talents": "天赋",
       "arena": "竞技场与 PvP",
+      "battlegrounds": "战场",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
       "faq": "常见问题",
@@ -1793,6 +1878,29 @@ export const zh_CN: EnTranslations = {
       "powerupsBody": "激战正酣时，发光的能量球还会落入竞技场，谁先抢到便归谁。它们刻意夸张到极致，且只持续片刻：极速恶魔让你瞬间快得令人目眩，巨像将你膨胀成步履蹒跚的庞然大物，月靴带来低重力的弹跳腾跃，狂战士则让你猛然涌起一股暴怒。",
       "ladderHeading": "攀登天梯",
       "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。"
+    },
+    "bgPage": {
+      "heading": "墓行之原",
+      "intro": "墓行之原是五对五的战场：两支勇士战团各自率领复生士兵的纵队沿两条古道推进，摧毁敌方塔楼，击碎让对方大军行进不止的战争石。随处可排队，其余交给战场。",
+      "storyHeading": "永不安息的战场",
+      "storyBody": "墓龙圣所之下的亡魂原野，埋着最后一支进攻荆峰的大军的先锋。每到黄昏，旧日之战便会苏醒；灰烬斗技场的守卫者们发现，谁举起战旗，谁就统领旗下亡者。于是斗技场批准了这场战争演习：在墓行之原无人真正死去，战场本身不容许。",
+      "companiesHeading": "两团各执一旗",
+      "companiesBody": "战士为余烬战团或苍白战团举旗。可以单人排队，也可以带上小队，战场会把你编入五人战团。阵营只是临时的，和竞技场一样：没有永久阵营，玩家对战永远出于自愿。",
+      "fairNote": "墓行之原生来公平。每位勇士都以战场标准等级和职业默认天赋作战，比拼的是操作，而非装备或等级。",
+      "fieldHeading": "读懂战场",
+      "fieldBody": "两座基地之间，西有盾之路，东有矛之路，中间横着残破的坟丘地，战场中心是坍毁的钟礼拜堂。示意地图会标出道路、塔楼、你的盟友与丧钟。",
+      "roadsTitle": "两条大道",
+      "roadsBody": "骨甲亡魂的纵队沿各条大道向敌方基地行进。它们与拦路者作战并猛攻防御工事；与纵队并肩推进才能夺取阵地。",
+      "bulwarksTitle": "壁垒",
+      "bulwarksBody": "每条大道都由沉重的守卫塔看护，每个战团各有外层与内层一座。它们会惩戒欺凌其部众的勇士，且外层不倒，内层无恙。打通一条大道，敌方战争石便无所遮蔽。",
+      "knellTitle": "丧钟",
+      "knellBody": "礼拜堂中悬着丧钟，唤醒这支大军的钟，以及它的看守者丧钟守卫。击倒守卫的战团可令丧钟短暂沉默，麾下纵队因此行进更猛。",
+      "deathHeading": "倒在墓行之原",
+      "deathBody": "战场不容死亡。倒下的勇士会短暂离场，然后在自家战争石旁苏醒，每次都稍慢一些。没有跑尸，也没有任何损失；代价只是离场的时间。",
+      "watchHeading": "观战",
+      "watchBody": "本服务器上任何进行中的战斗都可以观看。小地图旁的徽章会通报战事，战场面板列出每场比赛并附观战按钮。观战者随一个战团同行，可见比赛读数，随时可以停止观战。",
+      "ladderHeading": "天梯",
+      "ladderBody": "墓行之原的天梯赛像竞技场一样单独计分。战场面板会显示你的等级分、战绩，以及在线天梯勇士的排名。由机器人补位的对局不计分，离线练习同样不计分。"
     },
     "wishPage": {
       "heading": "我希望早点知道的事",

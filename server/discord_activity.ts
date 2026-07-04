@@ -7,7 +7,7 @@
 // drain endpoint resolves accountIds to Discord identities; this layer is just the
 // in-memory hand-off, mirroring discord_relay.ts.
 
-export type ActivityKind = 'levelup' | 'rareloot' | 'duel' | 'arena';
+export type ActivityKind = 'levelup' | 'rareloot' | 'duel' | 'arena' | 'battleground';
 
 export interface QueuedActivity {
   kind: ActivityKind;
@@ -25,7 +25,7 @@ export interface QueuedActivity {
   quality?: string; // rareloot ('epic' | 'legendary')
   winnerName?: string; // duel
   loserName?: string; // duel
-  ratingDelta?: number; // arena (signed)
+  ratingDelta?: number; // arena + battleground (signed)
 }
 
 const QUEUE: QueuedActivity[] = [];

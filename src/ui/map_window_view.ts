@@ -17,6 +17,7 @@
 
 import {
   DUNGEON_LIST,
+  isBattlegroundPos,
   isDelvePos,
   PROPS,
   QUESTS,
@@ -52,8 +53,9 @@ const CAMPFIRE_MIN_RADIUS = 1.4;
 const CAMPFIRE_RADIUS_PPU = 0.5;
 
 /** Which world-map surface a given world renders: the delve schematic (owned by
- *  delve_map_painter) or the overworld map (this core). */
-export type MapWindowMode = 'delve' | 'overworld';
+ *  delve_map_painter), the battleground schematic (battleground_map_painter),
+ *  or the overworld map (this core). */
+export type MapWindowMode = 'delve' | 'battleground' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
  *  internal `full` rect carries the full committed-zone spans (the whole world in
@@ -260,9 +262,12 @@ export interface OverworldMapInput {
 }
 
 /** Which world-map surface this world renders. Delve when the player stands in a
- *  delve band and a run is active (matches the inline guard); overworld otherwise. */
+ *  delve band and a run is active (matches the inline guard); battleground when they
+ *  stand in the Gravemarch band with a live match snapshot; overworld otherwise. */
 export function mapWindowMode(world: IWorld): MapWindowMode {
-  return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
+  if (isDelvePos(world.player.pos.x) && world.delveRun) return 'delve';
+  if (isBattlegroundPos(world.player.pos.x) && world.bgInfo?.match) return 'battleground';
+  return 'overworld';
 }
 
 /**

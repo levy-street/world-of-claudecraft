@@ -1,5 +1,7 @@
+import { battlegroundColliders } from './battleground_layout';
 import {
   arenaOriginAt,
+  battlegroundOriginAt,
   DUNGEON_X_THRESHOLD,
   defaultDelveModules,
   delveAt,
@@ -9,6 +11,7 @@ import {
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
+  isBattlegroundPos,
   isDelvePos,
 } from './data';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
@@ -262,6 +265,9 @@ const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
+// The Gravemarch battleground: one instance-local set derived from the same
+// battleground_layout data the renderer dresses, cached once like the sets above.
+const BATTLEGROUND_COLLIDERS: Collider[] = battlegroundColliders();
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
@@ -430,6 +436,11 @@ export function resolvePosition(
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
     const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
+    return { x: local.x + o.x, z: local.z + o.z };
+  }
+  if (isBattlegroundPos(x)) {
+    const o = battlegroundOriginAt(z);
+    const local = resolveAgainst(BATTLEGROUND_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
     return { x: local.x + o.x, z: local.z + o.z };
   }
   if (x > DUNGEON_X_THRESHOLD) {
@@ -694,6 +705,20 @@ export function cameraOcclusion(
       true,
     );
   }
+  if (isBattlegroundPos(ax)) {
+    const o = battlegroundOriginAt(az);
+    return sweepColliders(
+      BATTLEGROUND_COLLIDERS,
+      ax - o.x,
+      ay,
+      az - o.z,
+      bx - o.x,
+      by,
+      bz - o.z,
+      pad,
+      true,
+    );
+  }
   if (ax > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(ax, az);
     const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
@@ -749,6 +774,10 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
     return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
+  }
+  if (isBattlegroundPos(x)) {
+    const o = battlegroundOriginAt(z);
+    return overlapsAny(BATTLEGROUND_COLLIDERS, x - o.x, z - o.z, false);
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);

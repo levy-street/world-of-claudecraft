@@ -4554,6 +4554,34 @@ const RULES: Rule[] = [
     re: /^(.+) cannot queue from inside an instance\.$/,
     build: (m) => tArenaExtra('memberInstance', { name: m[1] }),
   },
+  // The Gravemarch battleground queue/spectate errors. The sim module
+  // (src/sim/social/battleground.ts) emits these four literals verbatim; they
+  // re-localize through t() against the hudChrome.bg.err.* keys (the delve-rule
+  // precedent below), whose non-Latin fills land with the keys themselves.
+  {
+    re: /^You must be at least level 10 to join the Gravemarch\.$/,
+    build: () => t('hudChrome.bg.err.level10'),
+  },
+  {
+    re: /^You cannot queue while the Deserter's Knell tolls\.$/,
+    build: () => t('hudChrome.bg.err.deserter'),
+  },
+  {
+    re: /^You cannot spectate right now\.$/,
+    build: () => t('hudChrome.bg.err.cannotSpectate'),
+  },
+  {
+    re: /^That battle has already ended\.$/,
+    build: () => t('hudChrome.bg.err.matchEnded'),
+  },
+  {
+    re: /^You cannot duel on the Gravemarch\.$/,
+    build: () => t('hudChrome.bg.err.noDuel'),
+  },
+  {
+    re: /^A Gravemarch company takes five at most\.$/,
+    build: () => t('hudChrome.bg.err.partyTooLarge'),
+  },
   // Delve / lockpicking sim text. Re-localized through t() against the sim.delve.* /
   // sim.lockpick.* keys (src/ui/i18n.catalog/index.ts). The module-enter banner is two
   // rules anchored on the fixed objective lines ("X: Clear the room." / "X: Defeat the

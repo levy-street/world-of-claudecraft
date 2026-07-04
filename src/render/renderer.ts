@@ -5,6 +5,8 @@ import {
   ABILITIES,
   ARENA_SLOT_COUNT,
   arenaOrigin,
+  BATTLEGROUND_SLOT_COUNT,
+  battlegroundOrigin,
   CLASSES,
   DELVE_MODULE_Z_START,
   DUNGEON_LIST,
@@ -19,6 +21,7 @@ import {
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
   isArenaPos,
+  isBattlegroundPos,
   isDelvePos,
   MOBS,
   NPCS,
@@ -36,6 +39,7 @@ import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { SpatialAudioSink, Surface } from './audio_sink';
+import { BattlegroundView } from './battleground';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
@@ -86,7 +90,7 @@ import { isOwnedPetHostile } from './reaction';
 import { RenderBudgetGovernor, type RenderBudgetState } from './render_budget';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
-import { buildClouds, buildSky, type SkyView } from './sky';
+import { buildClouds, buildSky, PLACE_SKY, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { shouldRenderStealthGhost } from './stealth';
@@ -882,6 +886,10 @@ export class Renderer {
   private envRTs = new Map<BiomeId, THREE.WebGLRenderTarget>();
   private envBiome: BiomeId = 'vale';
   private envOutdoorIntensity = ENV_INTENSITY;
+  // prefiltered night HDRI for the battleground's dusk sky override, plus
+  // whether the scene env currently holds it (see updateEnvBiome)
+  private envRTDusk: THREE.WebGLRenderTarget | null = null;
+  private envDusk = false;
   private time = 0;
   private frameIdx = 0;
   // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
@@ -1063,6 +1071,10 @@ export class Renderer {
         const eq = this.skyView.envTexture(b);
         if (eq) this.envRTs.set(b, pmrem.fromEquirectangular(eq));
       }
+      // the battleground's dusk override (night HDRI): materials must not
+      // read daylight-lit under the dark sky, so IBL swaps with the dome
+      const eqDusk = this.skyView.placeEnvTexture('bg_dusk');
+      if (eqDusk) this.envRTDusk = pmrem.fromEquirectangular(eqDusk);
       if (this.envRTs.size > 0) {
         this.envOutdoorIntensity = ENV_INTENSITY * IBL_RAW_SCALE;
         this.scene.environment = this.envRTs.get('vale')?.texture ?? null;
@@ -2066,14 +2078,14 @@ export class Renderer {
       this.sun.target.position.set(pp.x, pp.y, pp.z);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    this.sky.visible = this.fogState === 'outdoor';
+    this.sky.visible = this.openAirFog;
     if (this.sky.visible) {
       this.skyView.setCameraZ(this.camera.position.z, dt);
       this.updateEnvBiome(dt);
     }
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      sp.visible = this.openAirFog;
     }
     this.updateGodRays();
     this.nameplatePainter.update(true);
@@ -3259,6 +3271,24 @@ export class Renderer {
       sparkle.scale.set(0.9, 0.9, 1);
       sparkle.position.y = 1.35;
       group.add(sparkle);
+    } else if (e.templateId === 'bg_bulwark' || e.templateId === 'bg_warstone') {
+      // Gravemarch structures: the battlefield architecture in
+      // render/battleground.ts carries their visuals (tower, monolith, rubble
+      // state), so the entity contributes only an INVISIBLE pick volume sized
+      // to the structure. The raycaster ignores `visible`, so click-targeting
+      // and the nameplate/health bar keep working with zero draw cost. The
+      // group is scaled by e.scale below, so dimensions are pre-divided.
+      const tower = e.templateId === 'bg_bulwark';
+      const pick = new THREE.Mesh(
+        new THREE.CylinderGeometry(tower ? 0.85 : 1.0, tower ? 1.0 : 1.1, tower ? 3.75 : 2.3, 8),
+        new THREE.MeshBasicMaterial(),
+      );
+      pick.position.y = tower ? 1.9 : 1.2;
+      pick.visible = false;
+      const holder = new THREE.Group();
+      holder.add(pick);
+      body = holder;
+      height = tower ? 3.8 : 2.3;
     } else {
       const visualKey = visualKeyFor(e);
       if (visualKey === 'player_mech' && !mechAssetsReady()) {
@@ -3589,8 +3619,24 @@ export class Renderer {
   // Delve module interiors build asynchronously; track in-flight keys so a
   // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
   private pendingInteriors = new Set<string>();
-  private fogState: 'outdoor' | 'dungeon' | 'temple' | 'nythraxis' | 'delve' | 'underwater' =
-    'outdoor';
+  private fogState:
+    | 'outdoor'
+    | 'dungeon'
+    | 'temple'
+    | 'nythraxis'
+    | 'delve'
+    | 'battleground'
+    | 'underwater' = 'outdoor';
+  // The Gravemarch battleground dressing (src/render/battleground.ts), built
+  // lazily per slot like the other interiors. Unlike them it is OPEN AIR: the
+  // 'battleground' fog state keeps sun/sky/IBL (see openAirFog).
+  private battleground: BattlegroundView | null = null;
+
+  // Fog states that keep the daylight rig: sky dome, sun sprites, god rays,
+  // and weather all render for these (everything else is an interior).
+  private get openAirFog(): boolean {
+    return this.fogState === 'outdoor' || this.fogState === 'battleground';
+  }
 
   private buildInterior(interior: string, ox: number, oz: number): void {
     this.dungeons ??= new DungeonInteriors(this.scene, this.lowGfx, this.flames, this.fireLights);
@@ -3685,6 +3731,27 @@ export class Renderer {
     const pz = this.sim.player.pos.z;
     if (isDelvePos(px)) {
       this.ensureDelveInteriorsNear(px, pz);
+    } else if (inside && isBattlegroundPos(px)) {
+      // build the Gravemarch copy the player was matched into. Slot spacing
+      // (800) exceeds the z gate (320), so unlike the delve stacks the nearest
+      // slot cannot be mis-picked; the x/z gate covers the whole map footprint.
+      for (let i = 0; i < BATTLEGROUND_SLOT_COUNT; i++) {
+        const key = `bg:${i}`;
+        if (this.builtInteriors.has(key)) continue;
+        const o = battlegroundOrigin(i);
+        if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 320) {
+          this.builtInteriors.add(key);
+          this.battleground ??= new BattlegroundView(
+            this.scene,
+            this.sim,
+            this.lowGfx,
+            this.flames,
+            this.fireLights,
+            this.vfx,
+          );
+          this.battleground.buildSlot(i, o.x, o.z);
+        }
+      }
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -3715,23 +3782,31 @@ export class Renderer {
     // the Drowned Temple reads as submerged: a teal murk instead of the
     // crypt's near-black, so its flooded halls feel underwater, not just dark
     const inDelve = inside && isDelvePos(px);
-    const interior = inside && !inDelve && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+    const inBattleground = inside && isBattlegroundPos(px);
+    const interior =
+      inside && !inDelve && !inBattleground && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
-    const desired = inDelve
-      ? 'delve'
-      : inTemple
-        ? 'temple'
-        : inNythraxis
-          ? 'nythraxis'
-          : inside
-            ? 'dungeon'
-            : camY < waterLevel() - 0.05
-              ? 'underwater'
-              : 'outdoor';
+    const desired = inBattleground
+      ? 'battleground'
+      : inDelve
+        ? 'delve'
+        : inTemple
+          ? 'temple'
+          : inNythraxis
+            ? 'nythraxis'
+            : inside
+              ? 'dungeon'
+              : camY < waterLevel() - 0.05
+                ? 'underwater'
+                : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     if (desired !== this.fogState) {
       this.fogState = desired;
+      // the Gravemarch pins a dusk sky regardless of the biome band the
+      // camera z sits in (sky.ts eases the cross-fade; the low tier tints
+      // its gradient dome instead)
+      this.skyView.setPlaceOverride(desired === 'battleground' ? 'bg_dusk' : null);
       if (desired === 'dungeon') {
         fog.color.setHex(0x05060a);
         fog.near = 18;
@@ -3753,6 +3828,20 @@ export class Renderer {
         fog.color.setHex(0x0e0705);
         fog.near = 14;
         fog.far = 74;
+      } else if (desired === 'battleground') {
+        // the Gravemarch is OPEN AIR at dusk: ash-grey warm murk that keeps
+        // the sun/sky/IBL rig (see the underground check below), tuned so the
+        // far base still silhouettes through the haze on the 240yd field.
+        // Darker than the old pale-day value so distant geometry fogs into
+        // the dusk sky override instead of a bright white band.
+        fog.color.setHex(0x81725f);
+        if (this.lowGfx) {
+          fog.near = 60;
+          fog.far = 240;
+        } else {
+          fog.near = 70;
+          fog.far = 300;
+        }
       } else if (desired === 'underwater') {
         fog.color.setHex(0x17506e);
         fog.near = 2;
@@ -3766,17 +3855,32 @@ export class Renderer {
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead — silhouettes must split from the murk.
+      // The battleground stays open air but takes a dusk grade: the sun dims
+      // and warms toward a low amber so the team-tinted braziers and warstone
+      // glow own the mood (every other state restores the daylight values).
       if (!this.lowGfx) {
         const underground =
           desired === 'dungeon' ||
           desired === 'temple' ||
           desired === 'nythraxis' ||
           desired === 'delve';
-        this.sun.intensity = underground ? DUNGEON_SUN_INTENSITY : SUN_INTENSITY;
-        this.hemi.intensity = underground ? DUNGEON_HEMI_INTENSITY : HEMI_INTENSITY;
+        const dusk = desired === 'battleground';
+        this.sun.intensity = underground
+          ? DUNGEON_SUN_INTENSITY
+          : dusk
+            ? SUN_INTENSITY * 0.62
+            : SUN_INTENSITY;
+        this.sun.color.setHex(dusk ? 0xffbe86 : 0xffedd0);
+        this.hemi.intensity = underground
+          ? DUNGEON_HEMI_INTENSITY
+          : dusk
+            ? HEMI_INTENSITY * 0.7
+            : HEMI_INTENSITY;
         this.scene.environmentIntensity = underground
           ? DUNGEON_ENV_INTENSITY
-          : this.envOutdoorIntensity;
+          : dusk && this.envRTDusk
+            ? PLACE_SKY.bg_dusk.envIntensity
+            : this.envOutdoorIntensity;
         sharedUniforms.uRimBoost.value = underground ? DUNGEON_RIM_BOOST : 1;
       }
       return;
@@ -3795,7 +3899,28 @@ export class Renderer {
   // camera crosses zone bands (the dome cross-fades the same textures); a
   // brief intensity dip masks the hard texture swap, then eases back like fog.
   private updateEnvBiome(dt: number): void {
-    if (this.lowGfx || this.envRTs.size < 2) return;
+    if (this.lowGfx) return;
+    // the battleground pins the dusk IBL for as long as its fog state holds
+    if (this.fogState === 'battleground' && this.envRTDusk) {
+      if (!this.envDusk) {
+        this.envDusk = true;
+        this.scene.environment = this.envRTDusk.texture;
+        this.scene.environmentRotation.y = this.skyView.placeEnvRotationY('bg_dusk');
+      }
+      const kd = 1 - Math.exp(-dt * 1.5);
+      this.scene.environmentIntensity +=
+        (PLACE_SKY.bg_dusk.envIntensity - this.scene.environmentIntensity) * kd;
+      return;
+    }
+    if (this.envDusk) {
+      // leaving: restore the biome env here, because the swap branch below
+      // only fires on a biome CHANGE and returning to the same band is not one
+      this.envDusk = false;
+      this.scene.environment = this.envRTs.get(this.envBiome)?.texture ?? null;
+      this.scene.environmentRotation.y = this.skyView.envRotationY(this.envBiome);
+      this.scene.environmentIntensity = this.envOutdoorIntensity * 0.4;
+    }
+    if (this.envRTs.size < 2) return;
     const blend = this.skyView.biomeAt(this.camera.position.z);
     const dominant = blend.t < 0.5 ? blend.from : blend.to;
     if (dominant !== this.envBiome && this.envRTs.has(dominant)) {
@@ -4605,6 +4730,7 @@ export class Renderer {
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
+    this.battleground?.update();
     worldStart = markWorldPhase('fish', worldStart);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
     worldStart = markWorldPhase('ambience', worldStart);
@@ -4618,21 +4744,27 @@ export class Renderer {
     worldStart = markWorldPhase('shadows', worldStart);
     // sky dome + sun disc ride along with the camera
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    this.sky.visible = this.fogState === 'outdoor';
+    this.sky.visible = this.openAirFog;
     if (this.sky.visible) {
       this.skyView.setCameraZ(this.camera.position.z, dt);
       this.updateEnvBiome(dt);
     }
-    // precipitation only falls outdoors; indoors/underwater pass null to clear
+    // precipitation only falls outdoors; indoors/underwater pass null to clear.
+    // The battleground band is open air too: sparse drifting ash instead of
+    // the overworld's biome-driven snow/rain.
     this.weather.update(
       this.camera.position,
       dt,
-      this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.z) : null,
+      this.fogState === 'battleground'
+        ? 'ash'
+        : this.fogState === 'outdoor'
+          ? zoneBiomeAt(p.pos.z)
+          : null,
     );
     worldStart = markWorldPhase('sky', worldStart);
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
-      sp.visible = this.fogState === 'outdoor';
+      sp.visible = this.openAirFog;
     }
     worldStart = markWorldPhase('sunSprites', worldStart);
     this.updateGodRays();
@@ -4837,10 +4969,10 @@ export class Renderer {
     }
   }
 
-  // light shafts fade in as the camera turns toward the sun, outdoor only
+  // light shafts fade in as the camera turns toward the sun, open air only
   private updateGodRays(): void {
     if (this.godRays.length === 0) return;
-    const outdoor = this.fogState === 'outdoor';
+    const outdoor = this.openAirFog;
     // azimuth-only alignment — the chase cam always pitches down while the
     // sun sits high, so a full 3D dot product would never light the shafts
     this.camera.getWorldDirection(this.tmpV);

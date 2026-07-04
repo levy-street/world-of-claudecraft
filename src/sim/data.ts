@@ -453,8 +453,14 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
   return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
 }
 
+// East cap of the delve bands. Delve index bands are centred at
+// DELVE_X_MIN + index*600, so 9000 leaves room for indices 0..6 (the last
+// centred at 8400, its walls well clear of the cap) while keeping everything
+// at/after BATTLEGROUND_X_MIN from being misclassified as a delve.
+export const DELVE_BAND_X_MAX = 9000;
+
 export function isDelvePos(x: number): boolean {
-  return x >= DELVE_BAND_X_MIN;
+  return x >= DELVE_BAND_X_MIN && x < DELVE_BAND_X_MAX;
 }
 
 export function delveAt(x: number): DelveDef | null {
@@ -590,4 +596,44 @@ export function delveModuleLocal(
     localX: x - ox,
     localZ: relZ - zCursor,
   };
+}
+
+// ---------------------------------------------------------------------------
+// The Gravemarch, the 5v5 battleground (docs/prd/battlegrounds.md). Its match
+// instances live in their own flat-ground x-band EAST of the capped delve
+// bands (DELVE_BAND_X_MAX = 9000), so no classifier misreads them. Slots
+// stack along z like the arena's; the spacing must exceed the map's z extent
+// (2 * BG_HALF_Z = 240) plus the widest interest radius (130) with margin,
+// because battleground minions/structures are NPC entities.
+// ---------------------------------------------------------------------------
+
+export const BATTLEGROUND_X = 9900; // battleground instances share this x
+export const BATTLEGROUND_X_MIN = 9600; // x at/after this = a battleground instance
+export const BATTLEGROUND_X_MAX = 10200;
+export const BATTLEGROUND_SLOT_COUNT = 2; // concurrent 5v5 matches per realm
+const BATTLEGROUND_Z0 = -1250;
+const BATTLEGROUND_SLOT_SPACING = 800;
+
+export function battlegroundOrigin(slot: number): { x: number; z: number } {
+  return { x: BATTLEGROUND_X, z: BATTLEGROUND_Z0 + slot * BATTLEGROUND_SLOT_SPACING };
+}
+
+export function isBattlegroundPos(x: number): boolean {
+  return x >= BATTLEGROUND_X_MIN && x < BATTLEGROUND_X_MAX;
+}
+
+// Nearest battleground instance origin to a far-off position, matched by
+// z-band (the x is shared across slots). Mirrors arenaOriginAt.
+export function battlegroundOriginAt(z: number): { x: number; z: number; slot: number } {
+  let best = 0,
+    bestD = Infinity;
+  for (let i = 0; i < BATTLEGROUND_SLOT_COUNT; i++) {
+    const d = Math.abs(z - battlegroundOrigin(i).z);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  const o = battlegroundOrigin(best);
+  return { x: o.x, z: o.z, slot: best };
 }

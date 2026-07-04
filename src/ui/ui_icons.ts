@@ -35,6 +35,7 @@ export type UiIconName =
   | 'discord'
   | 'chest'
   // hand-authored geometrics
+  | 'battleground'
   | 'close'
   | 'prev'
   | 'next'
@@ -93,6 +94,9 @@ const ICONS: Record<UiIconName, string> = {
   chest:
     '<path d="M112 144h288v-24c0-31-25-56-56-56H168c-31 0-56 25-56 56v24zm32 0v-24c0-13 11-24 24-24h176c13 0 24 11 24 24v24H144zM72 176h368v96H72zM96 272h320v168H96zM232 176h48v264h-48zM216 256h80v72h-80z"/>',
   // ── hand-authored geometrics ─────────────────────────────────────────────
+  // war banner on a standard pole (the Gravemarch battleground: raise a banner,
+  // command its dead), matched to the weight of the other bar glyphs
+  battleground: '<path d="M148 56h32v400h-32zM180 84h220l-56 66 56 66H180zM128 456h72v24h-72z"/>',
   close:
     '<path d="M115 80 256 221 397 80 432 115 291 256 432 397 397 432 256 291 115 432 80 397 221 256 80 115Z"/>',
   prev: '<path d="M336 96 136 256 336 416Z"/>',

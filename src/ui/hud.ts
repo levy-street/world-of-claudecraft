@@ -25,6 +25,7 @@ import {
 } from '../render/characters/portrait';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
+import { bgStructure } from '../sim/battleground_layout';
 import { type AugmentCategory, augmentCategory } from '../sim/content/augments';
 import {
   EVENT_SKIN_TIERS,
@@ -47,6 +48,7 @@ import {
   delveAt,
   dungeonAt,
   ITEMS,
+  isBattlegroundPos,
   isDelvePos,
   MOBS,
   NPCS,
@@ -126,6 +128,11 @@ import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
 import { BagsWindow } from './bags_window';
+import { bgTeamName } from './battleground_format';
+import { BattlegroundHud } from './battleground_hud';
+import { BattlegroundIndicator } from './battleground_indicator';
+import { BattlegroundMapPainter } from './battleground_map_painter';
+import { BattlegroundWindow } from './battleground_window';
 import { CalendarWindow } from './calendar_window';
 import { CastBarPainter } from './cast_bar_painter';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
@@ -1054,6 +1061,7 @@ export class Hud {
   private wasLeaderOfParty = false;
   private lastArenaStatusSig = '';
   private arenaMatchSeen = false; // closes the queue panel once a bout starts
+  private bgMatchSeen = false; // closes the battlegrounds window once a match starts
   // 2v2 Fiesta UI state (all transient)
   private fiestaScoreSeen = { a: -1, b: -1 }; // last rendered tally (for score-ping)
   private fiestaOfferKey = ''; // identity of the currently-shown augment offer
@@ -1573,6 +1581,7 @@ export class Hud {
     $('#mm-social').addEventListener('click', () => this.toggleSocial());
     $('#mm-options')?.addEventListener('click', () => this.toggleOptionsMenu());
     $('#mm-arena').addEventListener('click', () => this.toggleArena());
+    $('#mm-battleground').addEventListener('click', () => this.toggleBattleground());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     const emoteBtn = $('#mm-emote');
     emoteBtn.addEventListener('click', (ev) => {
@@ -1942,6 +1951,10 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
         // consistent with the toggle / X close path.
         this.arenaWindow.close();
+        break;
+      case 'battleground-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.battlegroundWindow.close();
         break;
       case 'vendor-window':
         this.closeVendor();
@@ -2873,6 +2886,10 @@ export class Hud {
     },
   );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
+  // Gravemarch battleground schematic map painter (battleground_map_view.ts core
+  // + battleground_map_painter.ts): owns the minimap + world-map battleground
+  // branches, writing the '#zone-label' text through the same facet.
+  private readonly bgMapPainter = new BattlegroundMapPainter(this.writerFacet);
   // Per-frame XP + swing painters. Each caches its element refs once and
   // routes every write through the same six-writer facet, so their --xp-fill /
   // .rested / swing writes share the one skip-rate.
@@ -3267,6 +3284,32 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#arena-window'),
     ...this.windowFocus('#arena-window'),
+  });
+  // Battlegrounds (Gravemarch) window painter (battleground_window_view.ts model
+  // + battleground_window.ts painter): queue, live-match Watch list, ladder. Hud
+  // forwards the keybind toggle and drives render() from the mediumHud band.
+  private readonly battlegroundWindow = new BattlegroundWindow({
+    root: () => $('#battleground-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#battleground-window'),
+    ...this.windowFocus('#battleground-window'),
+  });
+  // The persistent Gravemarch indicator (battleground_indicator_view.ts core +
+  // battleground_indicator.ts painter): queue state / live-match badge by the
+  // minimap. mediumHud cadence, facet-routed writes, never tier-shed
+  // (queue state and a joinable match are actionable information).
+  private readonly bgIndicator = new BattlegroundIndicator(this.writerFacet, {
+    root: () => $('#bg-indicator'),
+    world: () => this.sim,
+    open: () => this.toggleBattleground(),
+  });
+  // The in-match Gravemarch HUD (battleground_hud_view.ts core +
+  // battleground_hud.ts painter): top strip, countdown, respawn overlay,
+  // aftermath banner. Snapshot-driven on the mediumHud band (self-heals on
+  // reconnect); one-shot juice rides the SimEvents in handleEvents.
+  private readonly bgHud = new BattlegroundHud({
+    world: () => this.sim,
+    uiRoot: () => document.getElementById('ui'),
   });
   // Character window painter (char_view.ts paperdoll core + char_window.ts painter).
   // It composes the presentation bag (icon/tooltip) for the equip slots and routes
@@ -3927,6 +3970,11 @@ export class Hud {
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
     // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
+    // Same contract for the battleground surfaces: text-independent sigs, so a
+    // language switch forces exactly one localized rebuild on each.
+    this.battlegroundWindow.relocalize();
+    this.bgIndicator.relocalize();
+    this.bgHud.relocalize();
     const dialog = $('#quest-dialog');
     if (dialog.style.display !== 'block' || this.openGossipNpcId === null) return;
     const npc = this.sim.entities.get(this.openGossipNpcId);
@@ -4820,6 +4868,7 @@ export class Hud {
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
       ['#mm-arena', 'arena', 'hud.core.mobileArena'],
+      ['#mm-battleground', 'battleground', 'hudChrome.bg.window.title'],
       ['#mm-leaderboard', 'leaderboard', 'game.leaderboard.title'],
       ['#mm-emote', 'emoteWheel', 'hudChrome.emoteWheel.label'],
       ['#mm-social', 'social', 'hud.social.friendsTab'],
@@ -5525,8 +5574,15 @@ export class Hud {
     // Healer, carrying just the relevant button. The server re-checks both ranges.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
+    // Battleground deaths are fiesta-style bench downs (dead is never set), so
+    // this arm is defensive parity with the arena: never show the Release
+    // overlay inside a Gravemarch match.
+    const deadInBg = p.dead && !!this.sim.bgInfo?.match;
     document.body.classList.toggle('spirit-mode', ghost);
-    this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
+    this.setDisplay(
+      this.deathOverlayEl,
+      p.dead && !ghost && !deadInArena && !deadInBg ? 'flex' : 'none',
+    );
     if (ghost) {
       const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
       let healerNearby = false;
@@ -5613,14 +5669,21 @@ export class Hud {
       const instanceId = inDelveBand
         ? (delveAt(p.pos.x)?.id ?? 'collapsed_reliquary')
         : (dungeon?.id ?? null);
-      const zone = musicZoneForLocation(
-        currentZone.id,
-        currentZone.biome,
-        inHub,
-        inDungeon || inNythraxisArena,
-        instanceId,
-      );
-      const musicDungeonId = inDungeon || inNythraxisArena ? instanceId : null;
+      // The Gravemarch battleground band sits past the dungeon x-threshold but is
+      // an open-air dusk battlefield, not a crypt: it plays the zone-3 peaks
+      // anthem (the Revenant Fields lie below Thornpeak), never the dungeon
+      // fallback theme, and never triggers a dungeon-entry music reset.
+      const inBgBand = isBattlegroundPos(p.pos.x);
+      const zone = inBgBand
+        ? 'peaks'
+        : musicZoneForLocation(
+            currentZone.id,
+            currentZone.biome,
+            inHub,
+            inDungeon || inNythraxisArena,
+            instanceId,
+          );
+      const musicDungeonId = !inBgBand && (inDungeon || inNythraxisArena) ? instanceId : null;
       if (shouldResetMusicForDungeonEntry(this.lastMusicDungeonId, musicDungeonId)) {
         music.resetForDungeonEntry(musicDungeonId);
       }
@@ -5653,8 +5716,15 @@ export class Hud {
       this.updateTradeWindow();
       this.updateArenaStatus();
       this.updateFiestaHud();
+      // Gravemarch battleground surfaces: the persistent indicator and the
+      // in-match HUD repaint on this band for EVERY tier (queue state, score,
+      // respawn are actionable information: gameplay-neutral graphics, never
+      // tier-shed); both sig-elide unchanged ticks.
+      this.bgIndicator.update();
+      this.bgHud.update();
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
+      if ($('#battleground-window').style.display === 'block') this.battlegroundWindow.render();
       if (this.openLootMobId !== null) {
         const mob = sim.entities.get(this.openLootMobId);
         if (!mob?.lootable || dist2d(p.pos, mob.pos) > 7) this.closeLoot();
@@ -5684,6 +5754,13 @@ export class Hud {
       this.arenaWindow.close();
     }
     this.arenaMatchSeen = inArenaMatch;
+    // Same for the Gravemarch: when a battleground match begins, get the queue
+    // window out of the way via the painter close() (focus-return, WCAG 2.4.3).
+    const inBgMatch = !!this.sim.bgInfo?.match;
+    if (inBgMatch && !this.bgMatchSeen && $('#battleground-window').style.display === 'block') {
+      this.battlegroundWindow.close();
+    }
+    this.bgMatchSeen = inBgMatch;
     if (fastHud) {
       // The minimap canvas redraw is the heaviest fastHud item; tier its
       // cadence (full tiers redraw every fastHud tick = ~10Hz; low throttles to ~3-4Hz).
@@ -6633,10 +6710,17 @@ export class Hud {
     // minimapMode (the minimap_markers core) is the single source of truth for the
     // delve-vs-overworld branch (the same isDelvePos + delveRun guard, lifted into the
     // core so hud and the painters never duplicate it).
-    if (minimapMode(this.sim) === 'delve') {
+    const mmMode = minimapMode(this.sim);
+    if (mmMode === 'delve') {
       // The delve painter owns the '#zone-label' text (written through the
       // write-elision facet) and the full minimap schematic render.
       this.delvePainter.paintMinimapDelve(ctx, this.sim, $('#zone-label'), MINIMAP_SIZE);
+      return;
+    }
+    if (mmMode === 'battleground') {
+      // The battleground painter owns the '#zone-label' text ("The Gravemarch")
+      // and the schematic render (lanes, structures, allies, Knell, self).
+      this.bgMapPainter.paintMinimap(ctx, this.sim, $('#zone-label'), MINIMAP_SIZE);
       return;
     }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
@@ -6665,6 +6749,19 @@ export class Hud {
   // band while open. The in-match auto-close + the pinned banner stay here.
   toggleArena(): void {
     this.arenaWindow.toggle();
+  }
+
+  // The Battlegrounds (Gravemarch) window is owned by battleground_window.ts +
+  // the pure battleground_window_view.ts. Hud stays the coordinator: it
+  // forwards the keybind / minimap-button / indicator toggle and drives the
+  // painter's redraw from the mediumHud band while open.
+  toggleBattleground(): void {
+    this.battlegroundWindow.toggle();
+  }
+
+  /** Offline only: wire the vs-bots Gravemarch practice hook (null online). */
+  setBgPracticeHook(fn: (() => void) | null): void {
+    this.battlegroundWindow.setPracticeHook(fn);
   }
 
   // The pinned in-match banner: opponent name + countdown / live match timer.
@@ -6751,7 +6848,8 @@ export class Hud {
     const p = this.sim.player;
     const summaryEl = $('#map-summary');
 
-    if (mapWindowMode(this.sim) === 'delve') {
+    const mapMode = mapWindowMode(this.sim);
+    if (mapMode === 'delve') {
       // The delve painter owns the full world-map schematic render (the area
       // title is drawn on-canvas, since the world map has no DOM zone label).
       this.mapQuestAreas = [];
@@ -6761,6 +6859,16 @@ export class Hud {
       const run = this.sim.delveRun;
       const area = run ? delveDisplayName(run.delveId) : '';
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: area }));
+      return;
+    }
+    if (mapMode === 'battleground') {
+      // The battleground painter owns the full world-map schematic render (the
+      // "The Gravemarch" title is drawn on-canvas, like the delve branch).
+      this.mapQuestAreas = [];
+      this.mapNpcMarkers = [];
+      this.hideMapQuestList();
+      this.bgMapPainter.paintWorldMap(ctx, this.sim, S);
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: t('hudChrome.bg.zoneName') }));
       return;
     }
 
@@ -7105,6 +7213,14 @@ export class Hud {
     // share a bornAt, and the pooled painter's step() evicts each once now - bornAt >= ttl.
     const now = performance.now();
     for (const ev of events) {
+      // A pid on an event means personal delivery (the server's routeEvents).
+      // Online the server only ever sends this player's own, but the OFFLINE
+      // drain hands over the whole sim batch, and practice bots (fiesta,
+      // battleground) are real players whose errors, queue lines, and banners
+      // would surface on this HUD. Drop other players' personal events so the
+      // offline experience matches the online one.
+      const evPid = (ev as { pid?: number }).pid;
+      if (evPid !== undefined && evPid !== sim.playerId) continue;
       // visual effects (swings, projectiles, glows) — for everyone nearby,
       // not just events involving this player
       this.renderer.handleEvent(ev);
@@ -7769,6 +7885,118 @@ export class Hud {
             );
             audio.death();
           }
+          break;
+        }
+        // ---- The Gravemarch 5v5 battleground (docs/prd/battlegrounds.md) ----
+        // One-shot juice only: the persistent readouts (indicator, strip,
+        // respawn, map) are snapshot-driven so they self-heal on reconnect.
+        case 'bgQueued':
+          this.log(
+            t('hudChrome.bg.log.queued', {
+              position: formatNumber(ev.position, { maximumFractionDigits: 0 }),
+            }),
+            '#ffa040',
+          );
+          break;
+        case 'bgUnqueued':
+          this.log(t('hudChrome.bg.log.unqueued'), '#ffa040');
+          break;
+        case 'bgFound': {
+          this.showBanner(t('hudChrome.bg.banner.found'));
+          this.log(
+            t('hudChrome.bg.log.roster', {
+              team: bgTeamName(ev.team),
+              allies: ev.allies.map((c) => c.name).join(', '),
+              enemies: ev.enemies.map((c) => c.name).join(', '),
+            }),
+            '#ffa040',
+          );
+          audio.duelChallenge();
+          break;
+        }
+        case 'bgCountdown':
+          this.showBanner(
+            t('hudChrome.bg.banner.countdown', {
+              seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
+            }),
+          );
+          audio.duelCountdownTick();
+          break;
+        case 'bgStart':
+          this.showBanner(t('hudChrome.bg.banner.start'));
+          audio.duelStart();
+          break;
+        case 'bgKill': {
+          // Kill-feed chat line in the killing company's color; the word pop is
+          // reserved for the player's own takedowns.
+          const color = ev.killerTeam === 'A' ? '#ff7a6a' : '#7fb6ff';
+          this.log(
+            t('hudChrome.bg.log.kill', { killer: ev.killerName, victim: ev.victimName }),
+            color,
+          );
+          if (ev.mine) this.fiestaWordPop(t('fiesta.word.kill'), '#ffd24a', 1);
+          break;
+        }
+        case 'bgDown':
+          this.log(
+            t('hudChrome.bg.log.down', {
+              seconds: formatNumber(ev.seconds, { maximumFractionDigits: 0 }),
+            }),
+            '#ff7a6a',
+          );
+          audio.fiestaDown();
+          break;
+        case 'bgStructure': {
+          const team = bgTeamName(ev.team);
+          const def = bgStructure(ev.structureId);
+          const text =
+            ev.kind === 'warstone'
+              ? t('hudChrome.bg.banner.warstoneDown', { team })
+              : def?.lane === 'west'
+                ? def.tier === 'outer'
+                  ? t('hudChrome.bg.banner.bulwarkWestOuter', { team })
+                  : t('hudChrome.bg.banner.bulwarkWestInner', { team })
+                : def?.tier === 'outer'
+                  ? t('hudChrome.bg.banner.bulwarkEastOuter', { team })
+                  : t('hudChrome.bg.banner.bulwarkEastInner', { team });
+          this.showBanner(text);
+          this.combatLog(text, ev.team === this.sim.bgInfo?.match?.team ? '#ff7a6a' : '#7fdc4f');
+          // Good news chimes, bad news growls (my structure fell).
+          if (ev.byTeam === this.sim.bgInfo?.match?.team) audio.fiestaWave();
+          else audio.aggro();
+          break;
+        }
+        case 'bgKnell':
+          this.showBanner(t('hudChrome.bg.banner.knell', { team: bgTeamName(ev.team) }));
+          if (ev.team === this.sim.bgInfo?.match?.team) audio.fiestaWave();
+          else audio.duelCountdownTick();
+          break;
+        case 'bgWarstoneThreat':
+          this.showBanner(t('hudChrome.bg.banner.warstoneThreat'));
+          audio.error();
+          break;
+        case 'bgEnd': {
+          const delta = ev.ratingAfter - ev.ratingBefore;
+          const sign = delta >= 0 ? '+' : '';
+          const ratingText = ev.rated
+            ? t('hudChrome.bg.end.rating', {
+                rating: formatNumber(ev.ratingAfter, { maximumFractionDigits: 0 }),
+                delta: `${sign}${formatNumber(delta, { maximumFractionDigits: 0 })}`,
+              })
+            : '';
+          const banner = ev.draw
+            ? t('hudChrome.bg.end.draw')
+            : ev.won
+              ? t('hudChrome.bg.end.win')
+              : t('hudChrome.bg.end.loss');
+          this.showBanner(ratingText ? `${banner} ${ratingText}` : banner);
+          this.combatLog(
+            ratingText ? `${banner} ${ratingText}` : banner,
+            ev.draw ? '#fa6' : ev.won ? '#7fdc4f' : '#ff7a6a',
+          );
+          if (ev.draw) audio.duelCountdownTick();
+          else if (ev.won) audio.duelEnd();
+          else audio.death();
           break;
         }
         case 'fiestaWord': {

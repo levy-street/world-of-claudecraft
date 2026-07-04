@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 23 domain facets (each IWorld member assigned exactly once; 159
+// FACET MAP: the 24 domain facets (each IWorld member assigned exactly once; 174
 // total). One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
@@ -28,6 +28,7 @@
 //   trade.ts            IWorldTrade          peer-to-peer trade window
 //   chat.ts             IWorldChat           chat router + emotes
 //   duel_arena.ts       IWorldDuelArena      duels + ranked arena + 2v2 fiesta
+//   battleground.ts     IWorldBattleground   the Gravemarch 5v5 queue + spectate
 //   social_graph.ts     IWorldSocialGraph    friends/blocks/guild (online-only frames)
 //   market.ts           IWorldMarket         World Market browse/list/buy
 //   mail.ts             IWorldMail           Ravenpost mail send/take + unread badge
@@ -39,14 +40,15 @@
 //
 // THREE GATES pin this seam (run before any facet edit):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
-//                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
+//                                          ALL_DELTA_KEYS (31) + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
-//                                          subset-of dispatch-set; DISPATCH_ONLY (7).
+//                                          subset-of dispatch-set; DISPATCH_ONLY (9).
 //   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (159) present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
-//                                          union of the 22 facets.
+//                                          union of the pinned facet arrays.
 // ---------------------------------------------------------------------------
 
+import type { IWorldBattleground } from './world_api/battleground';
 import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
 import type { IWorldCosmetics } from './world_api/cosmetics';
@@ -78,7 +80,18 @@ export type {
   LeaderboardPage,
 } from './sim/leaderboard_page';
 export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
-
+export type {
+  BgAllyPosition,
+  BgInfo,
+  BgKnellView,
+  BgLadderEntry,
+  BgLiveMatch,
+  BgMatchInfo,
+  BgScoreboardPlayer,
+  BgStanding,
+  BgStructureView,
+  BgTeamId,
+} from './world_api/battleground';
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type { AccountCosmetics } from './world_api/cosmetics';
@@ -150,6 +163,7 @@ export interface IWorld
     IWorldTrade,
     IWorldChat,
     IWorldDuelArena,
+    IWorldBattleground,
     IWorldSocialGraph,
     IWorldMarket,
     IWorldMail,
@@ -303,6 +317,11 @@ export const COMMAND_NAMES = [
   'autoloot',
   'resurrect_corpse',
   'resurrect_healer',
+  'bg_queue',
+  'bg_leave',
+  'bg_spectate',
+  'bg_spectate_next',
+  'bg_spectate_leave',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -360,6 +379,7 @@ export type WorldFacet =
   | 'IWorldTrade'
   | 'IWorldChat'
   | 'IWorldDuelArena'
+  | 'IWorldBattleground'
   | 'IWorldSocialGraph'
   | 'IWorldMarket'
   | 'IWorldMail'
@@ -503,4 +523,11 @@ export const COMMAND_FACETS = {
   lockpick_abort: 'IWorldDelves',
   collect_delve_chest_loot: 'IWorldDelves',
   delve_rite_choose: 'IWorldDelves',
+  // IWorldBattleground: the 5v5 Gravemarch queue + player spectate. bgInfo is a
+  // snapshot read (no send); bgPracticeStart is offline-only (no wire command).
+  bg_queue: 'IWorldBattleground',
+  bg_leave: 'IWorldBattleground',
+  bg_spectate: 'IWorldBattleground',
+  bg_spectate_next: 'IWorldBattleground',
+  bg_spectate_leave: 'IWorldBattleground',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

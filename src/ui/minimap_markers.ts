@@ -30,7 +30,7 @@
 // Markers carry the identity (the party class id) the painter resolves
 // to a color, never the resolved color.
 
-import { isDelvePos, QUESTS, zoneAt } from '../sim/data';
+import { isBattlegroundPos, isDelvePos, QUESTS, zoneAt } from '../sim/data';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
 
@@ -43,8 +43,9 @@ const PARTY_DISC_MAX_RADIUS = 6;
 const PARTY_DISC_RADIUS_RANGE = 3;
 
 /** Which minimap surface a world renders: the delve schematic (owned by
- *  delve_map_painter) or the overworld minimap (this core). */
-export type MinimapMode = 'delve' | 'overworld';
+ *  delve_map_painter), the battleground schematic (battleground_map_painter),
+ *  or the overworld minimap (this core). */
+export type MinimapMode = 'delve' | 'battleground' | 'overworld';
 
 /** The NPC quest glyph: turn-in ready ('?') wins over available ('!'), else neutral. */
 export type NpcGlyph = '?' | '!' | '•';
@@ -98,10 +99,14 @@ export interface MinimapMarkers {
 }
 
 /** Which minimap surface this world renders. Delve when the player stands in a delve
- *  band and a run is active (matches the inline guard); overworld otherwise. The delve
- *  branch is delve_map_painter's; the overworld branch is this core's. */
+ *  band and a run is active (matches the inline guard); battleground when they stand
+ *  in the Gravemarch band with a live match snapshot; overworld otherwise. The delve
+ *  branch is delve_map_painter's, the battleground branch battleground_map_painter's;
+ *  the overworld branch is this core's. */
 export function minimapMode(world: IWorld): MinimapMode {
-  return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
+  if (isDelvePos(world.player.pos.x) && world.delveRun) return 'delve';
+  if (isBattlegroundPos(world.player.pos.x) && world.bgInfo?.match) return 'battleground';
+  return 'overworld';
 }
 
 /**

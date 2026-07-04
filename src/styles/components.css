@@ -3712,6 +3712,319 @@
     margin-top: 4px;
   }
 
+  /* ---------- Gravemarch battleground ---------- */
+  /* The persistent indicator: a real button pinned under the minimap. Never
+     tier-shed (queue state / a joinable live match is actionable information);
+     >=40px touch target on every device. */
+  .bg-indicator {
+    position: absolute;
+    right: 12px;
+    top: 244px;
+    z-index: 18;
+    display: none; /* the painter shows it (flex) when there is something to say */
+    align-items: center;
+    gap: 8px;
+    min-width: 40px;
+    min-height: 40px;
+    max-width: 230px;
+    padding: 6px 12px;
+    text-align: left;
+    background: var(--panel-bg);
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+    pointer-events: auto;
+  }
+  .bg-indicator:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .bg-indicator .ui-icon {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    color: var(--color-accent);
+  }
+  .bg-indicator .bgi-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .bg-indicator .bgi-title {
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-accent);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bg-indicator .bgi-detail {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bg-indicator .bgi-watch {
+    font-family: var(--title-font);
+    font-size: 11px;
+    color: var(--color-bg-team-b);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex: none;
+  }
+
+  /* The Battlegrounds window (queue / live matches / ladder), arena-shaped. */
+  #battleground-window {
+    width: 380px;
+    --window-pad: 14px;
+  }
+  .bg-sub-title {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    font-family: Georgia, serif;
+    margin: 2px 0 4px;
+  }
+  .bg-sub {
+    font-family: var(--title-font);
+    color: var(--gold);
+    font-size: 12px;
+    margin: 12px 0 5px;
+    border-bottom: 1px solid #463a1c;
+    padding-bottom: 3px;
+  }
+  .bg-rank {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 2px 0 6px;
+  }
+  .bg-rank .rating {
+    font-family: var(--title-font);
+    font-size: 30px;
+    color: #ffb24a;
+    text-shadow:
+      0 0 10px #cc5a1466,
+      1px 1px 2px #000;
+  }
+  .bg-rank .wl {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .bg-note {
+    font-size: 11.5px;
+    color: #b6ad8c;
+    line-height: 1.45;
+    margin: 4px 0 2px;
+    font-family: Georgia, serif;
+  }
+  .bg-warn {
+    color: #ff9a7a;
+    border-left: 2px solid #aa4a28;
+    padding-left: 8px;
+  }
+  #battleground-window .btn {
+    width: 100%;
+    margin: 4px 0 0;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  #battleground-window .btn.leave {
+    background: linear-gradient(#5a4a18, #3a2f0d 55%, #2a2208);
+    color: #ffe6a8;
+  }
+  #battleground-window .btn.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.25);
+  }
+  .bg-queue-status {
+    font-size: 12px;
+    color: #ffd100;
+    margin-top: 6px;
+    text-align: center;
+  }
+  .bg-live-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 12px;
+    color: #e0d6b4;
+  }
+  .bg-live-row .bg-live-line {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #battleground-window .btn.bg-watch {
+    width: auto;
+    flex: none;
+    margin: 0;
+    padding: 6px 14px;
+    min-height: 30px;
+  }
+
+  /* In-match HUD: the top strip (kills : timer : kills, pips, Knell). */
+  #bg-hud-strip {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 18;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 240px;
+    padding: 5px 16px 6px;
+    background: var(--panel-bg);
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    pointer-events: none;
+    text-align: center;
+  }
+  #bg-hud-strip .bg-strip-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  #bg-hud-strip .bg-kills {
+    font-family: var(--title-font);
+    font-size: 22px;
+    text-shadow: 1px 1px 2px #000;
+  }
+  .bg-team-a {
+    color: var(--color-bg-team-a);
+  }
+  .bg-team-b {
+    color: var(--color-bg-team-b);
+  }
+  #bg-hud-strip .bg-kills.mine {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  #bg-hud-strip .bg-timer {
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--color-text-light);
+  }
+  #bg-hud-strip .bg-pips {
+    gap: 10px;
+  }
+  #bg-hud-strip .bg-pip-team {
+    display: inline-flex;
+    gap: 3px;
+    align-items: center;
+  }
+  .bg-pip {
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    background: currentcolor;
+    border: 1px solid var(--color-bg-dark);
+  }
+  .bg-pip.warstone {
+    transform: rotate(45deg);
+    width: 9px;
+    height: 9px;
+  }
+  .bg-pip.down {
+    background: transparent;
+    border-color: currentcolor;
+    opacity: 0.6;
+  }
+  #bg-hud-strip .bg-knell {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  #bg-hud-strip .bg-knell.silenced {
+    color: currentcolor;
+    font-weight: bold;
+  }
+
+  /* In-match countdown / respawn / aftermath overlays (fiesta-respawn shape). */
+  #bg-hud-countdown,
+  #bg-hud-respawn,
+  #bg-hud-aftermath {
+    position: absolute;
+    top: 26%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 19;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 26px 12px;
+    background: var(--panel-bg);
+    border: 1px solid var(--color-border-default);
+    border-radius: 10px;
+    pointer-events: none;
+    text-align: center;
+  }
+  #bg-hud-countdown .bgc-title,
+  #bg-hud-respawn .bgr-title {
+    font-family: var(--title-font);
+    font-size: 15px;
+    color: var(--color-accent);
+  }
+  #bg-hud-countdown .bgc-count,
+  #bg-hud-respawn .bgr-count {
+    font-family: var(--title-font);
+    font-size: 34px;
+    color: var(--color-text-light);
+    text-shadow: 1px 1px 3px #000;
+  }
+  #bg-hud-respawn .bgr-sub {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    font-family: Georgia, serif;
+  }
+  #bg-hud-aftermath .bga-title {
+    font-family: var(--title-font);
+    font-size: 24px;
+    text-shadow: 1px 1px 3px #000;
+  }
+  #bg-hud-aftermath .bga-title.win {
+    color: var(--color-text-success);
+  }
+  #bg-hud-aftermath .bga-title.loss {
+    color: var(--color-text-error);
+  }
+  #bg-hud-aftermath .bga-title.draw {
+    color: var(--color-text-light);
+  }
+  #bg-hud-aftermath .bga-sub {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  /* Spectate badge: the bg-only Stop watching button (>=40px touch target). */
+  #spectate-badge .spectate-stop {
+    margin-left: 10px;
+    min-height: 40px;
+    min-width: 40px;
+    padding: 4px 12px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--color-text-light);
+    background: linear-gradient(#5a4a18, #3a2f0d 55%, #2a2208);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    cursor: var(--cursor-point);
+    pointer-events: auto;
+  }
+  #spectate-badge .spectate-stop:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
   /* ---------- The World Market (the Merchant's auction house) ---------- */
   #market-window {
     width: 560px;

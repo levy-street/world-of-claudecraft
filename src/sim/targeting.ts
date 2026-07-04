@@ -126,10 +126,19 @@ export class Targeting {
     const attackerPlayer = this.ctx.pvpController(attacker);
     if (!attackerPlayer || attackerPlayer.dead) return false;
     const match = this.ctx.arenaMatches.get(attackerPlayer.id);
-    return (
-      !!match &&
+    if (
+      match &&
       match.state === 'countdown' &&
       this.ctx.isArenaCrossTeam(match, attackerPlayer.id, target.id)
+    )
+      return true;
+    // Gravemarch battleground: opponents are selectable during the countdown
+    // too (the arena precedent above); attacks stay gated on isHostileTo.
+    const bgMatch = this.ctx.bgMatches.get(attackerPlayer.id);
+    return (
+      !!bgMatch &&
+      bgMatch.state === 'countdown' &&
+      this.ctx.isBgCrossTeam(bgMatch, attackerPlayer.id, target.id)
     );
   }
 

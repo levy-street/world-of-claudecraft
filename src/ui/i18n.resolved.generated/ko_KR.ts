@@ -382,7 +382,8 @@ export const ko_KR: EnTranslations = {
       "emoteWheel": "감정 표현 휠",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환",
-      "discord": "Discord"
+      "discord": "Discord",
+      "battleground": "전장 (그레이브마치)"
     },
     "options": {
       "clickMoveLeft": "왼쪽 클릭",
@@ -1169,6 +1170,89 @@ export const ko_KR: EnTranslations = {
     "social": {
       "lastSeen": "마지막 접속: {when}",
       "lastSeenNever": "없음"
+    },
+    "bg": {
+      "zoneName": "그레이브마치",
+      "teamA": "잉걸불 부대",
+      "teamB": "창백한 부대",
+      "time": "{m}:{s}",
+      "mobileLabel": "전장",
+      "indicator": {
+        "queued": "그레이브마치 대기 중",
+        "queuedDetail": "{position}번째, {time} 대기",
+        "queuedAria": "그레이브마치 대기 중: {position}번째, {time} 대기. 전장 창을 엽니다.",
+        "live": "그레이브마치 전투 진행 중",
+        "liveDetail": "{time}, {killsA} 대 {killsB}",
+        "liveAria": "그레이브마치에서 전투가 진행 중입니다: {time}, {killsA} 대 {killsB}. 전장 창을 열어 관전하세요.",
+        "watch": "관전"
+      },
+      "window": {
+        "title": "전장",
+        "subtitle": "그레이브마치: 두 갈래 길, 네 개의 보루, 하나의 전쟁석.",
+        "close": "전장 창 닫기",
+        "offlineNote": "진영이 아직 집결 중입니다. 서버와 연결되면 전장이 열립니다.",
+        "enterQueue": "그레이브마치 참가",
+        "leaveQueue": "대기열 나가기",
+        "queued": "{position}번째, {time} 대기 ({count}명 집결)",
+        "queueNote": "모든 용사는 전장 표준 레벨과 직업 기본 특성으로 싸웁니다. 혼자 대기하거나, 최대 다섯 명의 파티를 파티장이 이끌고 대기하세요.",
+        "partyNote": "{count}명의 파티가 함께 대기열에 들어갑니다.",
+        "leaderNote": "파티장만 파티를 대기열에 넣을 수 있습니다.",
+        "deserter": "탈영병의 조종이 당신을 위해 울리고 있습니다. {time} 후에 다시 대기할 수 있습니다.",
+        "inMatch": "전투가 시작되었습니다.",
+        "liveHeading": "진행 중인 전투",
+        "matchLine": "{teamA} {killsA} 대 {teamB} {killsB}, {time}, {players}명 교전 중",
+        "watch": "관전",
+        "watchAria": "진행 중인 전투 관전 ({time})",
+        "noLive": "지금은 전투가 없습니다.",
+        "practice": "그레이브마치 연습",
+        "practiceNote": "훈련된 봇 전원을 소집해 길을 익히세요. 연습전은 점수에 반영되지 않습니다."
+      },
+      "spectate": {
+        "stop": "관전 중지"
+      },
+      "hud": {
+        "knellUp": "조종 수호자 등장 중",
+        "knellSpawns": "조종 수호자까지 {time}",
+        "knellSilenced": "{team}이(가) 조종을 잠재움, {seconds}초",
+        "stripAria": "{teamA} {killsA}, {teamB} {killsB}, {time} 남음",
+        "countdownTitle": "망자들이 대열을 갖춥니다",
+        "respawnTitle": "당신은 쓰러졌습니다.",
+        "respawnSub": "전장은 아직 당신을 놓아주지 않았습니다.",
+        "returning": "{seconds}초 후 세계로 귀환"
+      },
+      "banner": {
+        "found": "그레이브마치에 전투가 소집되었습니다!",
+        "countdown": "{seconds}초 후 전투 시작...",
+        "start": "군기가 오릅니다. 싸우세요!",
+        "bulwarkWestOuter": "{team}의 서쪽 길 외곽 보루가 무너졌습니다.",
+        "bulwarkWestInner": "{team}의 서쪽 길 내곽 보루가 무너졌습니다.",
+        "bulwarkEastOuter": "{team}의 동쪽 길 외곽 보루가 무너졌습니다.",
+        "bulwarkEastInner": "{team}의 동쪽 길 내곽 보루가 무너졌습니다.",
+        "warstoneDown": "{team}의 전쟁석이 산산이 부서졌습니다!",
+        "knell": "{team}이(가) 조종을 잠재웠습니다!",
+        "warstoneThreat": "아군 전쟁석이 공격받고 있습니다!"
+      },
+      "log": {
+        "queued": "그레이브마치 대기열에 들어갔습니다 ({position}번째).",
+        "unqueued": "그레이브마치 대기열에서 나왔습니다.",
+        "roster": "{team} 집결: {allies} 대 {enemies}.",
+        "kill": "{killer}이(가) {victim}을(를) 처치했습니다!",
+        "down": "당신은 쓰러졌습니다. 전장이 {seconds}초 후 전쟁석으로 되돌려 보냅니다."
+      },
+      "end": {
+        "win": "승리! 적의 전쟁석이 부서졌습니다.",
+        "loss": "패배. 아군의 전쟁석이 부서졌습니다.",
+        "draw": "전장이 침묵에 잠깁니다. 무승부.",
+        "rating": "점수 {rating} ({delta})."
+      },
+      "err": {
+        "level10": "그레이브마치에 참가하려면 최소 10레벨이어야 합니다.",
+        "deserter": "탈영병의 조종이 울리는 동안에는 대기할 수 없습니다.",
+        "cannotSpectate": "지금은 관전할 수 없습니다.",
+        "matchEnded": "그 전투는 이미 끝났습니다.",
+        "noDuel": "그레이브마치에서는 결투할 수 없습니다.",
+        "partyTooLarge": "그레이브마치 부대는 최대 5명까지입니다."
+      }
     }
   },
   "guide": {
@@ -1199,6 +1283,7 @@ export const ko_KR: EnTranslations = {
       "combat": "전투",
       "talents": "특성",
       "arena": "투기장과 PvP",
+      "battlegrounds": "전장",
       "glossary": "용어집",
       "wishIKnew": "미리 알았으면 좋았을 것들",
       "faq": "자주 묻는 질문",
@@ -1793,6 +1878,29 @@ export const ko_KR: EnTranslations = {
       "powerupsBody": "빛나는 구슬이 전투 도중 투기장 안으로 떨어지기도 하며, 먼저 닿는 사람이 임자입니다. 일부러 과장되게 만들어졌고 효과는 잠깐뿐입니다. 눈이 멀 듯한 속도를 주는 스피드 데몬, 굼뜬 거인으로 부풀어 오르는 콜로서스, 저중력으로 통통 튀어 오르게 하는 문 부츠, 그리고 분노가 한순간에 폭발하는 버서커가 있습니다.",
       "ladderHeading": "순위 올리기",
       "ladderBody": "등급전은 시간이 지나며 당신의 순위를 기록합니다. 순위표를 확인해 자신의 위치와 서버 정상에 오른 이가 누구인지 살펴보세요."
+    },
+    "bgPage": {
+      "heading": "그레이브마치",
+      "intro": "그레이브마치는 5 대 5 전장입니다. 두 용사 부대가 되살아난 병사들의 종대를 두 갈래 옛길로 진군시키고, 적의 탑을 부수고, 상대 군세를 계속 행군하게 하는 전쟁석을 산산조각 냅니다. 어디서든 대기열에 들어가면 나머지는 전장이 맡습니다.",
+      "storyHeading": "잠들지 않는 전장",
+      "storyBody": "무덤고룡 성소 아래 망령 벌판에는 쏜피크를 노린 마지막 군대의 선봉이 잠들어 있습니다. 해질녘마다 옛 전투가 깨어나고, 잿빛 콜로세움의 수호자들은 군기를 든 자가 그 죽은 자들을 부린다는 것을 알아냈습니다. 그래서 콜로세움은 전쟁 놀이를 승인했습니다. 그레이브마치에서는 누구도 진정으로 죽지 않습니다. 전장이 그것을 거부하기 때문입니다.",
+      "companiesHeading": "두 부대, 각자의 깃발",
+      "companiesBody": "용사들은 잉걸불 부대 또는 창백한 부대의 깃발을 듭니다. 혼자 대기하거나 파티로 참가하면 전장이 다섯 명의 부대로 편성합니다. 진영은 투기장처럼 일시적입니다. 영구적인 세력은 없으며, 플레이어 간 전투는 언제나 스스로 선택하는 것입니다.",
+      "fairNote": "그레이브마치는 설계부터 공정합니다. 모든 용사가 전장 표준 레벨과 직업 기본 특성으로 싸우므로, 승부는 장비나 레벨이 아니라 실력으로 갈립니다.",
+      "fieldHeading": "전장 읽기",
+      "fieldBody": "두 기지 사이에는 서쪽의 방패 길, 동쪽의 창 길, 그 사이 무너진 고분 지대가 펼쳐지고, 전장 한가운데에는 부서진 종 예배당이 서 있습니다. 도식 지도에는 길, 탑, 아군, 그리고 조종이 표시됩니다.",
+      "roadsTitle": "두 갈래 길",
+      "roadsBody": "뼈갑옷 망령의 종대가 각 길을 따라 적 기지로 진군합니다. 길을 막는 자와 싸우고 방어 시설을 두드립니다. 종대와 함께 진군하는 것이 곧 땅을 얻는 길입니다.",
+      "bulwarksTitle": "보루",
+      "bulwarksBody": "각 길은 육중한 탑 수호자가 지키며, 부대마다 외곽과 내곽 하나씩입니다. 제 식솔을 괴롭히는 용사를 응징하고, 외곽이 무너지기 전에는 내곽을 건드릴 수 없습니다. 길 하나를 열어젖히면 적의 전쟁석이 드러납니다.",
+      "knellTitle": "조종",
+      "knellBody": "예배당에는 이 군대를 깨운 종, 조종과 그 지킴이인 조종 수호자가 있습니다. 수호자를 쓰러뜨린 부대는 잠시 조종을 잠재우고, 그 종대는 한층 거세게 진군합니다.",
+      "deathHeading": "그레이브마치에서 쓰러지면",
+      "deathBody": "전장은 죽음을 거부합니다. 쓰러진 용사는 잠시 물러났다가 자신의 전쟁석에서 깨어나며, 깨어남은 매번 조금씩 느려집니다. 시체 달리기는 없고 잃는 것도 없습니다. 대가는 전장을 비우는 시간뿐입니다.",
+      "watchHeading": "전투 관전",
+      "watchBody": "서버에서 진행 중인 어떤 전투든 관전할 수 있습니다. 미니맵 옆 배지가 전투를 알리고, 전장 창에는 모든 경기와 관전 버튼이 나열됩니다. 관전자는 한 부대와 동행하며 경기 정보를 보고, 언제든 관전을 멈출 수 있습니다.",
+      "ladderHeading": "순위표",
+      "ladderBody": "점수제 그레이브마치는 투기장처럼 자체 순위를 유지합니다. 전장 창에는 당신의 점수와 전적, 접속 중인 점수제 용사들의 순위표가 표시됩니다. 봇으로 채워진 경기는 점수에 반영되지 않으며 오프라인 연습도 마찬가지입니다."
     },
     "wishPage": {
       "heading": "미리 알았으면 좋았을 것들",

@@ -148,6 +148,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.arenaPage.intro',
   },
   {
+    id: 'battlegrounds',
+    sub: 'battlegrounds',
+    navKey: 'guide.nav.battlegrounds',
+    group: 'compendium',
+    descKey: 'guide.bgPage.intro',
+  },
+  {
     id: 'controls',
     sub: 'reference/controls',
     navKey: 'guide.nav.controls',

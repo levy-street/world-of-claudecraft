@@ -900,7 +900,12 @@ async function startGame(
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
   }
-  const spectateBadge = createSpectateBadge();
+  // Battleground-spectate glue: while world.bgInfo.spectating is set the badge
+  // grows a Stop watching button (moderator spectate keeps its /unspectate flow).
+  const spectateBadge = createSpectateBadge({
+    isBgSpectate: () => world.bgInfo?.spectating != null,
+    onStop: () => world.bgSpectateLeave(),
+  });
   setLoadingStatus(t('loading.enteringWorld'));
   // Let the final status + full progress bar paint before the synchronous
   // Renderer/Hud build freezes the main thread for a beat.
@@ -989,6 +994,10 @@ async function startGame(
 
   // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
   if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
+  // Offline only: the Gravemarch vs-bots Practice button (fiesta precedent; the
+  // online world implements bgPracticeStart as a no-op and the hook stays null,
+  // which hides the affordance).
+  if (offlineSim) hud.setBgPracticeHook(() => world.bgPracticeStart());
 
   const chatInput = $('#chat-input') as unknown as HTMLTextAreaElement;
   const clickMoveMarker = $('#click-move-marker') as HTMLDivElement;
@@ -1155,6 +1164,9 @@ async function startGame(
           case 'arena':
             hud.toggleArena();
             break;
+          case 'battleground':
+            hud.toggleBattleground();
+            break;
           case 'leaderboard':
             hud.toggleLeaderboard();
             break;
@@ -1217,6 +1229,12 @@ async function startGame(
     onRecenterCamera: () => input.recenterCameraBehind(world.player.facing),
   });
   mobileControls.start();
+  // Battlegrounds tray entry: wired here beside the MobileControls callbacks
+  // (the tray button lives in index.html; MobileControls owns only the
+  // pre-existing button set, so this one binds directly to the Hud toggle).
+  document
+    .getElementById('mobile-battleground')
+    ?.addEventListener('click', () => hud.toggleBattleground());
   // reflect the current music state on the touch toggle (it may already be off
   // from a prior session, persisted in localStorage)
   document.getElementById('mobile-music')?.classList.toggle('mm-muted', !music.enabled);
@@ -1286,6 +1304,9 @@ async function startGame(
         break;
       case 'arena':
         hud.toggleArena();
+        break;
+      case 'battleground':
+        hud.toggleBattleground();
         break;
       case 'leaderboard':
         hud.toggleLeaderboard();

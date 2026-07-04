@@ -5913,4 +5913,110 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.moongateCommunion.title': 'Единение у лунных врат',
   'hudChrome.calendar.events.moongateCommunion.note':
     'Паломники собираются у лунных врат храма под срединной луной.',
+  // The Gravemarch battleground (M16 fills for the wordy English adds).
+  'hudChrome.keybinds.battleground': 'Поля боя (Могильный марш)',
+  'hudChrome.bg.zoneName': 'Могильный марш',
+  'hudChrome.bg.teamA': 'Рота Углей',
+  'hudChrome.bg.teamB': 'Бледная рота',
+  'hudChrome.bg.mobileLabel': 'Бой',
+  'hudChrome.bg.indicator.queued': 'В очереди на Могильный марш',
+  'hudChrome.bg.indicator.queuedDetail': '{position} в очереди, ожидание {time}',
+  'hudChrome.bg.indicator.queuedAria':
+    'В очереди на Могильный марш: {position} в очереди, ожидание {time}. Открыть окно полей боя.',
+  'hudChrome.bg.indicator.live': 'На Могильном марше идёт битва',
+  'hudChrome.bg.indicator.liveDetail': '{time}, {killsA} против {killsB}',
+  'hudChrome.bg.indicator.liveAria':
+    'На Могильном марше идёт битва: {time}, {killsA} против {killsB}. Откройте окно полей боя, чтобы посмотреть.',
+  'hudChrome.bg.indicator.watch': 'Смотреть',
+  'hudChrome.bg.window.title': 'Поля боя',
+  'hudChrome.bg.window.subtitle': 'Могильный марш: две дороги, четыре бастиона, один Камень войны.',
+  'hudChrome.bg.window.close': 'Закрыть окно полей боя',
+  'hudChrome.bg.window.offlineNote':
+    'Военный лагерь ещё собирается. Поля боя откроются, когда мир ответит.',
+  'hudChrome.bg.window.enterQueue': 'Вступить на Могильный марш',
+  'hudChrome.bg.window.leaveQueue': 'Покинуть очередь',
+  'hudChrome.bg.window.queued': '{position} в очереди, ожидание {time} (собрано {count})',
+  'hudChrome.bg.window.queueNote':
+    'Каждый боец сражается на полевом стандарте с базовой раскладкой талантов своего класса. Вставайте в очередь в одиночку или ведите группу до пяти человек.',
+  'hudChrome.bg.window.partyNote': 'Ваша группа из {count} человек встанет в очередь вместе.',
+  'hudChrome.bg.window.leaderNote': 'Только лидер группы может поставить её в очередь.',
+  'hudChrome.bg.window.deserter':
+    'Колокол дезертира звонит по вам. Снова встать в очередь можно через {time}.',
+  'hudChrome.bg.window.inMatch': 'Битва началась.',
+  'hudChrome.bg.window.liveHeading': 'Идущие битвы',
+  'hudChrome.bg.window.matchLine':
+    '{teamA} {killsA} против {teamB} {killsB}, {time}, сражаются {players}',
+  'hudChrome.bg.window.watch': 'Смотреть',
+  'hudChrome.bg.window.watchAria': 'Смотреть идущую битву ({time})',
+  'hudChrome.bg.window.noLive': 'Сейчас битв нет.',
+  'hudChrome.bg.window.practice': 'Тренировка на Могильном марше',
+  'hudChrome.bg.window.practiceNote':
+    'Соберите полный отряд вымуштрованных ботов и изучите дороги. Тренировочные бои не влияют на рейтинг.',
+  'hudChrome.bg.spectate.stop': 'Прекратить просмотр',
+  'hudChrome.bg.hud.knellUp': 'Страж колокола на посту',
+  'hudChrome.bg.hud.knellSpawns': 'Страж колокола через {time}',
+  'hudChrome.bg.hud.knellSilenced': '{team}: колокол умолк, {seconds} с',
+  'hudChrome.bg.hud.stripAria': '{teamA} {killsA}, {teamB} {killsB}, осталось {time}',
+  'hudChrome.bg.hud.countdownTitle': 'Мёртвые строятся в ряды',
+  'hudChrome.bg.hud.respawnTitle': 'Вы пали.',
+  'hudChrome.bg.hud.respawnSub': 'Поле с вами ещё не закончило.',
+  'hudChrome.bg.hud.returning': 'Возвращение в мир через {seconds} с',
+  'hudChrome.bg.banner.found': 'На Могильном марше собирается битва!',
+  'hudChrome.bg.banner.countdown': 'Битва начнётся через {seconds}...',
+  'hudChrome.bg.banner.start': 'Знамёна подняты. В бой!',
+  'hudChrome.bg.banner.bulwarkWestOuter': 'Западный внешний бастион роты «{team}» пал.',
+  'hudChrome.bg.banner.bulwarkWestInner': 'Западный внутренний бастион роты «{team}» пал.',
+  'hudChrome.bg.banner.bulwarkEastOuter': 'Восточный внешний бастион роты «{team}» пал.',
+  'hudChrome.bg.banner.bulwarkEastInner': 'Восточный внутренний бастион роты «{team}» пал.',
+  'hudChrome.bg.banner.warstoneDown': 'Камень войны роты «{team}» расколот!',
+  'hudChrome.bg.banner.knell': '{team} заставила колокол умолкнуть!',
+  'hudChrome.bg.banner.warstoneThreat': 'Ваш Камень войны атакуют!',
+  'hudChrome.bg.log.queued': 'Вы встали в очередь на Могильный марш ({position} в очереди).',
+  'hudChrome.bg.log.unqueued': 'Вы покинули очередь на Могильный марш.',
+  'hudChrome.bg.log.roster': '{team} собирается: {allies} против {enemies}.',
+  'hudChrome.bg.log.kill': '{killer} сразил {victim}!',
+  'hudChrome.bg.log.down': 'Вы пали. Поле вернёт вас к Камню войны через {seconds} с.',
+  'hudChrome.bg.end.win': 'Победа! Вражеский Камень войны расколот.',
+  'hudChrome.bg.end.loss': 'Поражение. Ваш Камень войны расколот.',
+  'hudChrome.bg.end.draw': 'Поле умолкло. Ничья.',
+  'hudChrome.bg.end.rating': 'Рейтинг {rating} ({delta}).',
+  'hudChrome.bg.err.level10': 'Чтобы вступить на Могильный марш, нужен как минимум 10-й уровень.',
+  'hudChrome.bg.err.deserter': 'Нельзя вставать в очередь, пока звонит Колокол дезертира.',
+  'hudChrome.bg.err.cannotSpectate': 'Сейчас вы не можете наблюдать.',
+  'hudChrome.bg.err.matchEnded': 'Та битва уже закончилась.',
+  'hudChrome.bg.err.noDuel': 'Нельзя вызывать на дуэль на Могильном марше.',
+  'hudChrome.bg.err.partyTooLarge': 'Отряд Могильного марша принимает не больше пяти бойцов.',
+  'guide.nav.battlegrounds': 'Поля боя',
+  'guide.bgPage.heading': 'Могильный марш',
+  'guide.bgPage.intro':
+    'Могильный марш - поле боя пять на пять: две роты бойцов ведут колонны поднятых солдат по двум старым дорогам, ломают вражеские башни и раскалывают Камень войны, что держит чужое войско на марше. Вставайте в очередь откуда угодно, остальное сделает поле.',
+  'guide.bgPage.storyHeading': 'Поле, что не знает покоя',
+  'guide.bgPage.storyBody':
+    'На Полях ревенантов под Святилищем Могильного Вирма лежит авангард последней армии, что шла на Терновые высоты. Каждые сумерки старая битва просыпается, и смотрители Пепельного Колизея открыли: кто поднимет боевое знамя, тот и командует его мёртвыми. Так Колизей узаконил военную игру: на Могильном марше никто не умирает по-настоящему, само поле этого не допускает.',
+  'guide.bgPage.companiesHeading': 'Две роты, у каждой своё знамя',
+  'guide.bgPage.companiesBody':
+    'Бойцы берут знамя Роты Углей или Бледной роты. Вставайте в очередь в одиночку или группой, и поле сведёт вас в роту из пяти. Стороны временные, как на арене: никаких постоянных фракций, а бой с игроками всегда остаётся вашим выбором.',
+  'guide.bgPage.fairNote':
+    'Могильный марш честен по замыслу. Каждый боец сражается на полевом стандарте с базовой раскладкой талантов своего класса, так что исход решает игра, а не снаряжение и уровни.',
+  'guide.bgPage.fieldHeading': 'Как читать поле',
+  'guide.bgPage.fieldBody':
+    'Между двумя базами лежат Щитовая дорога на западе, Копейная дорога на востоке и разбитые Курганы между ними, а в сердце поля - разрушенная колокольная часовня. Схематическая карта показывает дороги, башни, союзников и колокол.',
+  'guide.bgPage.roadsTitle': 'Две дороги',
+  'guide.bgPage.roadsBody':
+    'Колонны костепанцирных ревенантов маршируют по каждой дороге к вражеской базе. Они бьются с теми, кто встанет на пути, и осаждают укрепления; идти вместе с колонной - значит брать землю.',
+  'guide.bgPage.bulwarksTitle': 'Бастионы',
+  'guide.bgPage.bulwarksBody':
+    'Каждую дорогу стерегут тяжёлые башни-стражи, внешняя и внутренняя у каждой роты. Они карают бойцов, обижающих их подопечных, и пока не падёт внешняя, внутреннюю не тронуть. Вскройте одну дорогу, и вражеский Камень войны останется беззащитен.',
+  'guide.bgPage.knellTitle': 'Колокол',
+  'guide.bgPage.knellBody':
+    'В часовне висит колокол, поднявший это войско, и его хранитель - Страж колокола. Рота, сразившая Стража, на время заставляет колокол умолкнуть, и её колонны маршируют злее.',
+  'guide.bgPage.deathHeading': 'Пасть на Могильном марше',
+  'guide.bgPage.deathBody':
+    'Поле отвергает смерть. Павший боец ненадолго выбывает, затем просыпается у своего Камня войны, каждый раз чуть медленнее. Никакого бега за телом и никаких потерь; цена - лишь время вне поля.',
+  'guide.bgPage.watchHeading': 'Наблюдение за битвой',
+  'guide.bgPage.watchBody':
+    'Любую идущую в мире битву можно посмотреть. Значок у миникарты объявляет о живой битве, а окно полей боя перечисляет каждый матч с кнопкой просмотра. Зрители следуют за одной из рот, видят табло матча и могут прекратить просмотр в любой момент.',
+  'guide.bgPage.ladderHeading': 'Рейтинговая таблица',
+  'guide.bgPage.ladderBody':
+    'Рейтинговый Могильный марш ведёт собственный зачёт, как арена. Окно полей боя показывает ваш рейтинг, счёт побед и таблицу рейтинговых бойцов в сети. Матчи, дополненные ботами, не влияют на рейтинг, как и автономная тренировка.',
 };

@@ -338,12 +338,14 @@
       <div id="map-quests" class="panel" role="group" data-i18n-aria="questUi.tracker.title" aria-label="Quests"></div>
     </div>
     <div id="arena-window" class="window panel"></div>
+    <div id="battleground-window" class="window panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
     <div id="mailbox-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
+    <button type="button" id="bg-indicator" class="bg-indicator" data-i18n-aria="hudChrome.bg.window.title" aria-label="Battlegrounds"></button>
     <div id="options-menu" class="window panel"></div>
     <div id="emote-editor" class="window panel"></div>
     <div id="social-window" class="window panel"></div>
@@ -357,6 +359,7 @@
       <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
       <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
       <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
+      <button type="button" class="micro-btn" id="mm-battleground" data-i18n-title="hudChrome.keybinds.battleground" data-i18n-aria="hudChrome.keybinds.battleground" title="Battlegrounds (The Gravemarch)" aria-label="Battlegrounds (The Gravemarch)" data-icon="battleground"><span class="keybind">t</span></button>
       <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
       <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
       <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
@@ -924,6 +927,7 @@
           <button class="mobile-btn" id="mobile-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="mobile-label" data-i18n="hud.core.mobileSocial">Social</span></button>
           <button class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>
           <button class="mobile-btn" id="mobile-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="mobile-label" data-i18n="hud.core.mobileArena">Arena</span></button>
+          <button type="button" class="mobile-btn" id="mobile-battleground" data-i18n-title="hudChrome.keybinds.battleground" data-i18n-aria="hudChrome.keybinds.battleground" title="Battlegrounds (The Gravemarch)" aria-label="Battlegrounds (The Gravemarch)" data-icon="battleground"><span class="mobile-label" data-i18n="hudChrome.bg.mobileLabel">Battle</span></button>
           <button class="mobile-btn" id="mobile-menu" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="mobile-label" data-i18n="hud.core.mobileMenu">Menu</span></button>
           <button class="mobile-btn" id="mobile-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="mobile-label" data-i18n="questUi.log.title">Quests</span></button>
           <button class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>

@@ -382,7 +382,8 @@ export const pt_BR: EnTranslations = {
       "emoteWheel": "Roda de emotes",
       "targetFriendly": "Selecionar aliado mais próximo",
       "targetFriendlyNext": "Alternar alvo aliado",
-      "discord": "Discord"
+      "discord": "Discord",
+      "battleground": "Battlegrounds (The Gravemarch)"
     },
     "options": {
       "clickMoveLeft": "Clique esquerdo",
@@ -1169,6 +1170,89 @@ export const pt_BR: EnTranslations = {
     "social": {
       "lastSeen": "Visto por último: {when}",
       "lastSeenNever": "nunca"
+    },
+    "bg": {
+      "zoneName": "The Gravemarch",
+      "teamA": "The Ember Company",
+      "teamB": "The Pale Company",
+      "time": "{m}:{s}",
+      "mobileLabel": "Battle",
+      "indicator": {
+        "queued": "In Gravemarch queue",
+        "queuedDetail": "{position} in line, {time} waiting",
+        "queuedAria": "In Gravemarch queue: {position} in line, {time} waiting. Open Battlegrounds.",
+        "live": "Gravemarch battle underway",
+        "liveDetail": "{time}, {killsA} to {killsB}",
+        "liveAria": "A Gravemarch battle is underway: {time}, {killsA} to {killsB}. Open Battlegrounds to watch.",
+        "watch": "Watch"
+      },
+      "window": {
+        "title": "Battlegrounds",
+        "subtitle": "The Gravemarch: two roads, four Bulwarks, one Warstone.",
+        "close": "Close battlegrounds",
+        "offlineNote": "The war camp is still mustering. Battlegrounds open once the realm answers.",
+        "enterQueue": "Join the Gravemarch",
+        "leaveQueue": "Leave Queue",
+        "queued": "{position} in line, {time} waiting ({count} mustered)",
+        "queueNote": "Every champion fights at the field standard with their class default build. Queue solo or lead a party of up to five.",
+        "partyNote": "Your party of {count} will queue together.",
+        "leaderNote": "Only your party leader may queue the party.",
+        "deserter": "The Deserter's Knell tolls for you. You may queue again in {time}.",
+        "inMatch": "The battle is joined.",
+        "liveHeading": "Battles underway",
+        "matchLine": "{teamA} {killsA} to {teamB} {killsB}, {time}, {players} fighting",
+        "watch": "Watch",
+        "watchAria": "Watch the battle underway ({time})",
+        "noLive": "No battle rages right now.",
+        "practice": "Practice on the Gravemarch",
+        "practiceNote": "Muster a full field of drilled bots and learn the roads. Practice is unrated."
+      },
+      "spectate": {
+        "stop": "Stop watching"
+      },
+      "hud": {
+        "knellUp": "The Knell Warden stands",
+        "knellSpawns": "Knell Warden in {time}",
+        "knellSilenced": "{team} silenced the Knell, {seconds}s",
+        "stripAria": "{teamA} {killsA}, {teamB} {killsB}, {time} remains",
+        "countdownTitle": "The dead form ranks",
+        "respawnTitle": "You fall.",
+        "respawnSub": "The field is not done with you.",
+        "returning": "Returning to the world in {seconds}s"
+      },
+      "banner": {
+        "found": "A battle musters on the Gravemarch!",
+        "countdown": "The battle begins in {seconds}...",
+        "start": "The banners rise. Fight!",
+        "bulwarkWestOuter": "{team}'s western outer Bulwark has fallen.",
+        "bulwarkWestInner": "{team}'s western inner Bulwark has fallen.",
+        "bulwarkEastOuter": "{team}'s eastern outer Bulwark has fallen.",
+        "bulwarkEastInner": "{team}'s eastern inner Bulwark has fallen.",
+        "warstoneDown": "{team}'s Warstone is shattered!",
+        "knell": "{team} has silenced the Knell!",
+        "warstoneThreat": "Your Warstone is under attack!"
+      },
+      "log": {
+        "queued": "You join the Gravemarch queue ({position} in line).",
+        "unqueued": "You leave the Gravemarch queue.",
+        "roster": "{team} musters: {allies} against {enemies}.",
+        "kill": "{killer} has slain {victim}!",
+        "down": "You fall. The field returns you to your Warstone in {seconds}s."
+      },
+      "end": {
+        "win": "Victory! The enemy Warstone is shattered.",
+        "loss": "Defeat. Your Warstone is shattered.",
+        "draw": "The field falls silent. A draw.",
+        "rating": "Rating {rating} ({delta})."
+      },
+      "err": {
+        "level10": "You must be at least level 10 to join the Gravemarch.",
+        "deserter": "You cannot queue while the Deserter's Knell tolls.",
+        "cannotSpectate": "You cannot spectate right now.",
+        "matchEnded": "That battle has already ended.",
+        "noDuel": "You cannot duel on the Gravemarch.",
+        "partyTooLarge": "A Gravemarch company takes five at most."
+      }
     }
   },
   "guide": {
@@ -1199,6 +1283,7 @@ export const pt_BR: EnTranslations = {
       "combat": "Combate",
       "talents": "Talentos",
       "arena": "Arena e JcJ",
+      "battlegrounds": "Battlegrounds",
       "glossary": "Glossário",
       "wishIKnew": "O que eu gostaria de saber",
       "faq": "FAQ",
@@ -1793,6 +1878,29 @@ export const pt_BR: EnTranslations = {
       "powerupsBody": "Orbes brilhantes também caem na arena no meio da luta, livres para quem alcançá-los primeiro. Eles são deliberadamente exagerados e duram só um instante: Demônio da Velocidade para um lampejo de ritmo alucinante, Colosso para inchar até virar um gigante pesado, Botas Lunares para um salto saltitante de baixa gravidade, e Berserker para uma súbita explosão de fúria.",
       "ladderHeading": "Subindo no ranking",
       "ladderBody": "O jogo ranqueado acompanha sua classificação ao longo do tempo. Confira o placar para ver onde você está e quem domina o topo do reino."
+    },
+    "bgPage": {
+      "heading": "The Gravemarch",
+      "intro": "The Gravemarch is a five versus five battleground: two companies of champions lead columns of risen soldiers down two old roads, break the enemy towers, and shatter the Warstone that keeps the other host marching. Queue from anywhere and the field does the rest.",
+      "storyHeading": "The field that never rests",
+      "storyBody": "On the Revenant Fields below the Gravewyrm Sanctum lies the vanguard of the last army that tried to take Thornpeak. Each dusk the old battle wakes, and the wardens of the Ashen Coliseum found that whoever raises a war banner commands its dead. So the Coliseum sanctioned a war game: nobody truly dies on the Gravemarch, for the field itself refuses it.",
+      "companiesHeading": "Two companies, one banner each",
+      "companiesBody": "Fighters take up a banner for the Ember Company or the Pale Company. Queue alone or bring a party, and the field marshals you into a company of five. Sides are transient, like the arena: no lasting factions, and player versus player stays something you choose.",
+      "fairNote": "The Gravemarch is a fair fight by design. Every champion fights at the field standard with their class default build, so the contest is about play, not gear or levels.",
+      "fieldHeading": "Reading the field",
+      "fieldBody": "Between the two bases lie the Shield Road to the west, the Spear Road to the east, and the broken Barrows between them, with the ruined bell chapel at the heart of the field. Your schematic map shows the roads, the towers, your allies, and the Knell.",
+      "roadsTitle": "The two roads",
+      "roadsBody": "Columns of Boneclad Revenants march each road toward the enemy base. They fight what stands in their way and batter the defenses; marching with a column is how ground is taken.",
+      "bulwarksTitle": "The Bulwarks",
+      "bulwarksBody": "Each road is watched by heavy tower guardians, an outer and an inner per company. They punish champions who bully their charges, and the outer must fall before the inner can be touched. Break a road open and the enemy Warstone lies bare.",
+      "knellTitle": "The Knell",
+      "knellBody": "At the chapel hangs the Knell, the bell that raised this army, and its keeper, the Knell Warden. The company that fells the Warden silences the Knell for a time, and its columns march the harder for it.",
+      "deathHeading": "Falling on the Gravemarch",
+      "deathBody": "The field refuses death. A fallen champion is benched for a short while, then wakes at their Warstone, a little slower each time. There is no corpse run and nothing is lost; the cost is time off the field.",
+      "watchHeading": "Watching a battle",
+      "watchBody": "Any battle underway on the realm can be watched. A badge by the minimap announces a live battle, and the Battlegrounds window lists every match with a Watch button. Spectators ride along with a company, see the match readout, and can stop watching at any time.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Rated Gravemarch play keeps its own standing, arena-style. The Battlegrounds window shows your rating, your record, and the ladder of rated champions online. Bouts filled out with drilled bots are unrated, as is offline practice."
     },
     "wishPage": {
       "heading": "O que eu gostaria de saber",

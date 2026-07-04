@@ -138,6 +138,18 @@
     --color-minimap-player: #fff;
     --color-minimap-outline: #000;
 
+    /* Gravemarch battleground: the two company (team) colors plus the schematic
+       map surfaces (resolved by battleground_map_painter.ts via getComputedStyle:
+       a 2D canvas context cannot read a CSS var directly). The same team tokens
+       drive the .bg-* HUD chrome (kill counts, structure pips). */
+    --color-bg-team-a: #ff5a49; /* the Ember Company (red, south) */
+    --color-bg-team-b: #7fb6ff; /* the Pale Company (blue, north) */
+    --color-bg-map-ground: #14110d;
+    --color-bg-map-road: #4a4034;
+    --color-bg-map-wall: #6a5c48;
+    --color-bg-map-chapel: #8a7c60;
+    --color-bg-map-knell: #e8c26a;
+
     /* Talents window: tree arrows + tooltip accents (talents_window.ts references
        these via var() so the painter carries no raw hex). Exact pre-existing values. */
     --color-talent-arrow: #f5c843;

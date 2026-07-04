@@ -54,6 +54,7 @@ export interface InputCallbacks {
       | 'meters'
       | 'social'
       | 'arena'
+      | 'battleground'
       | 'leaderboard'
       | 'calendar'
       | 'discord',
@@ -758,6 +759,9 @@ export class Input {
         return;
       case 'arena':
         this.cb.onUiKey('arena');
+        return;
+      case 'battleground':
+        this.cb.onUiKey('battleground');
         return;
       case 'leaderboard':
         this.cb.onUiKey('leaderboard');

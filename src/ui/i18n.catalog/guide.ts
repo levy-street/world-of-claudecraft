@@ -42,6 +42,7 @@ export const guideStrings = {
     combat: 'Combat',
     talents: 'Talents',
     arena: 'Arena & PvP',
+    battlegrounds: 'Battlegrounds',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
     faq: 'FAQ',
@@ -859,6 +860,43 @@ export const guideStrings = {
     ladderHeading: 'Climbing the ladder',
     ladderBody:
       'Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm.',
+  },
+
+  // Battlegrounds: the Gravemarch 5v5 objective battleground. Spoiler-safe
+  // concepts and names only, no tuning numbers.
+  bgPage: {
+    heading: 'The Gravemarch',
+    intro:
+      'The Gravemarch is a five versus five battleground: two companies of champions lead columns of risen soldiers down two old roads, break the enemy towers, and shatter the Warstone that keeps the other host marching. Queue from anywhere and the field does the rest.',
+    storyHeading: 'The field that never rests',
+    storyBody:
+      'On the Revenant Fields below the Gravewyrm Sanctum lies the vanguard of the last army that tried to take Thornpeak. Each dusk the old battle wakes, and the wardens of the Ashen Coliseum found that whoever raises a war banner commands its dead. So the Coliseum sanctioned a war game: nobody truly dies on the Gravemarch, for the field itself refuses it.',
+    companiesHeading: 'Two companies, one banner each',
+    companiesBody:
+      'Fighters take up a banner for the Ember Company or the Pale Company. Queue alone or bring a party, and the field marshals you into a company of five. Sides are transient, like the arena: no lasting factions, and player versus player stays something you choose.',
+    fairNote:
+      'The Gravemarch is a fair fight by design. Every champion fights at the field standard with their class default build, so the contest is about play, not gear or levels.',
+    fieldHeading: 'Reading the field',
+    fieldBody:
+      'Between the two bases lie the Shield Road to the west, the Spear Road to the east, and the broken Barrows between them, with the ruined bell chapel at the heart of the field. Your schematic map shows the roads, the towers, your allies, and the Knell.',
+    roadsTitle: 'The two roads',
+    roadsBody:
+      'Columns of Boneclad Revenants march each road toward the enemy base. They fight what stands in their way and batter the defenses; marching with a column is how ground is taken.',
+    bulwarksTitle: 'The Bulwarks',
+    bulwarksBody:
+      'Each road is watched by heavy tower guardians, an outer and an inner per company. They punish champions who bully their charges, and the outer must fall before the inner can be touched. Break a road open and the enemy Warstone lies bare.',
+    knellTitle: 'The Knell',
+    knellBody:
+      'At the chapel hangs the Knell, the bell that raised this army, and its keeper, the Knell Warden. The company that fells the Warden silences the Knell for a time, and its columns march the harder for it.',
+    deathHeading: 'Falling on the Gravemarch',
+    deathBody:
+      'The field refuses death. A fallen champion is benched for a short while, then wakes at their Warstone, a little slower each time. There is no corpse run and nothing is lost; the cost is time off the field.',
+    watchHeading: 'Watching a battle',
+    watchBody:
+      'Any battle underway on the realm can be watched. A badge by the minimap announces a live battle, and the Battlegrounds window lists every match with a Watch button. Spectators ride along with a company, see the match readout, and can stop watching at any time.',
+    ladderHeading: 'The ladder',
+    ladderBody:
+      'Rated Gravemarch play keeps its own standing, arena-style. The Battlegrounds window shows your rating, your record, and the ladder of rated champions online. Bouts filled out with drilled bots are unrated, as is offline practice.',
   },
 
   // "Things I Wish I Knew" beginner page.

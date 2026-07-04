@@ -102,6 +102,7 @@ import {
   INSTANCE_SLOT_COUNT,
   ITEMS,
   isArenaPos,
+  isBattlegroundPos,
   isDelvePos,
   MOBS,
   QUESTS,
@@ -264,6 +265,13 @@ export { computeQuestState } from './quests/quest_commands';
 
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
+import type { BgMatch, BgQueueUnit } from './social/battleground';
+// The Gravemarch 5v5 battleground (docs/prd/battlegrounds.md): match/queue
+// logic in social/battleground.ts behind SimContext; the offline-practice +
+// online-backfill bot harness in social/battleground_bots.ts takes the Sim
+// directly (the fiesta_bots pattern).
+import * as bgMod from './social/battleground';
+import * as bgBotsMod from './social/battleground_bots';
 import * as duelMod from './social/duel';
 
 // A2: eloDelta (with ARENA_K_FACTOR) moved to social/arena.ts. Re-exported so the
@@ -751,6 +759,17 @@ export interface PlayerMeta {
   arena2v2Rating: number;
   arena2v2Wins: number;
   arena2v2Losses: number;
+  // Gravemarch battleground standings (Elo base 1500, floor 100). OPTIONAL and
+  // absent until a rated match first touches them: bgStanding() in
+  // social/battleground.ts supplies the 1500/0/0 defaults, so an untouched
+  // character samples identically in the parity goldens. Persisted in
+  // CharacterState once present.
+  bgRating?: number;
+  bgWins?: number;
+  bgLosses?: number;
+  // Scripted Gravemarch bot (practice squad / online backfill). Runtime-only,
+  // never serialized; set by social/battleground_bots.ts at spawn.
+  isBgBot?: boolean;
   // Talents & Specializations. `talents` is the active allocation; `talentMods`
   // is its precomputed flat struct — resolved only on allocation/respec/loadout
   // change (recomputeTalents), never walked on the combat or stat hot path.
@@ -858,6 +877,15 @@ export interface CharacterState {
   arena2v2Rating?: number;
   arena2v2Wins?: number;
   arena2v2Losses?: number;
+  // Gravemarch battleground standings (JSONB; optional so every pre-Gravemarch
+  // save loads cleanly, defaulting to unrated 1500/0/0 via bgStanding()).
+  bgRating?: number;
+  bgWins?: number;
+  bgLosses?: number;
+  // Where a mid-Gravemarch save should put the character back (the match's
+  // return position). `pos` already carries it; this fallback covers any save
+  // written with an in-band position (addPlayer's relocation arm reads it).
+  bgReturnPos?: { x: number; z: number } | null;
   // Talents & Specializations (JSONB; no schema migration). All optional so
   // characters saved before talents existed load cleanly (default: no points spent).
   talents?: TalentAllocation;
@@ -1007,6 +1035,17 @@ export class Sim {
   arenaMatches = new Map<number, ArenaMatch>(); // pid -> shared match (both pids)
   private arenaBusySlots = new Set<number>();
   private nextArenaMatchId = 1;
+  // The Gravemarch battleground (social/battleground.ts): queue units, live
+  // matches keyed by EVERY fighter pid, busy instance slots, the in-memory
+  // Deserter's Knell lockouts (lower-cased character name -> sim.time expiry;
+  // per-realm process, never persisted), and the live scripted-bot roster
+  // (social/battleground_bots.ts). All exposed as live SimContext views.
+  bgQueue: BgQueueUnit[] = [];
+  bgMatches = new Map<number, BgMatch>(); // pid -> shared match (all ten pids)
+  private bgBusySlots = new Set<number>();
+  private nextBgMatchId = 1;
+  bgDeserters = new Map<string, number>();
+  bgBotPids: number[] = [];
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -1357,7 +1396,14 @@ export class Sim {
     // branch's `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve
     // position and eject the player to a dungeon door instead of the board door
     // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
-    if (savedPos && isDelvePos(savedPos.x)) {
+    if (savedPos && isBattlegroundPos(savedPos.x)) {
+      // A character somehow saved inside the Gravemarch band rejoins at its
+      // persisted pre-queue spot (bgReturnPos), or the Highwatch hub. Checked
+      // before the dungeon branch, like the delve arm below, so the generic
+      // x > DUNGEON_X_THRESHOLD fallback never misroutes a battleground save.
+      const back = savedState?.bgReturnPos;
+      savedPos = back ? { x: back.x, z: back.z } : { x: 0, z: 660 };
+    } else if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
@@ -1535,6 +1581,13 @@ export class Sim {
           looted: new Set(s.worldBossDaily.looted),
         };
       }
+      // Gravemarch standings. The fields stay ABSENT (not defaulted) until a
+      // rated match touches them: bgStanding() supplies the 1500/0/0 defaults,
+      // and an untouched character keeps sampling identically in the parity
+      // goldens. Legacy-free: these keys first shipped with the battleground.
+      if (typeof s.bgRating === 'number') meta.bgRating = s.bgRating;
+      if (typeof s.bgWins === 'number') meta.bgWins = s.bgWins;
+      if (typeof s.bgLosses === 'number') meta.bgLosses = s.bgLosses;
     }
 
     // Resolve the flat talent struct once, before the stat pass + ability
@@ -1585,7 +1638,12 @@ export class Sim {
         ? this.groundPos(savedState.corpsePos.x, savedState.corpsePos.z)
         : null;
       player.hp = player.maxHp;
-    } else if (savedState?.dead && !isArenaPos(savedState.pos.x) && !isDelvePos(savedState.pos.x)) {
+    } else if (
+      savedState?.dead &&
+      !isArenaPos(savedState.pos.x) &&
+      !isDelvePos(savedState.pos.x) &&
+      !isBattlegroundPos(savedState.pos.x)
+    ) {
       // Auto-release-on-logout: a character saved dead but UNRELEASED resumes as
       // a released ghost rather than reviving in place at 1 hp (logging out must
       // not bypass the death loop). Put the body back at the death spot, then run
@@ -1661,6 +1719,12 @@ export class Sim {
       const team = this.arenaTeamOf(match, pid);
       this.endArenaMatch(match, team === 'A' ? 'B' : team === 'B' ? 'A' : null, 'forfeit');
     }
+    // battleground: leaving the queue is free; vanishing mid-match deserts it
+    // (benched forever, the loss delta on a rated match, the Deserter's Knell;
+    // the match plays on short-handed and forfeits only when a team empties).
+    bgMod.bgDequeue(this.ctx, pid);
+    const bgMatch = this.bgMatches.get(pid);
+    if (bgMatch) bgMod.bgHandleDesertion(this.ctx, bgMatch, pid);
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -1710,6 +1774,10 @@ export class Sim {
     // forces a fresh re-summon instead of laundering the summon cooldown for free.
     // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
     const petSnapshot = this.serializePet(pid);
+    // Mid-Gravemarch: persist the fighter's RETURN position (never the in-band
+    // one) plus a bgReturnPos fallback, and never save them dead or as a ghost
+    // (nobody truly dies on the Gravemarch; the match revives its own fallen).
+    const bgReturn = this.bgMatches.get(pid)?.returns.get(pid) ?? null;
     const state: CharacterState = {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
@@ -1729,13 +1797,13 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: { x: e.pos.x, z: e.pos.z },
-      facing: e.facing,
+      pos: bgReturn ? { x: bgReturn.x, z: bgReturn.z } : { x: e.pos.x, z: e.pos.z },
+      facing: bgReturn ? bgReturn.facing : e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
-      dead: e.dead,
-      ghost: e.ghost,
-      corpsePos: e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
+      dead: bgReturn ? false : e.dead,
+      ghost: bgReturn ? false : e.ghost,
+      corpsePos: bgReturn ? null : e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
       // The Keeper's Toll persists across logout (it cannot be shed by relogging).
       resSickness: e.auras.find((a) => a.id === RESURRECTION_SICKNESS_ID)?.remaining ?? null,
       equipment: { ...meta.equipment },
@@ -1790,6 +1858,12 @@ export class Sim {
         looted: [...meta.worldBossDaily.looted],
       },
     };
+    // Gravemarch standings, written only once a rated match has touched them
+    // (the fields stay absent otherwise; bgStanding() supplies the defaults).
+    if (meta.bgRating !== undefined) state.bgRating = meta.bgRating;
+    if (meta.bgWins !== undefined) state.bgWins = meta.bgWins;
+    if (meta.bgLosses !== undefined) state.bgLosses = meta.bgLosses;
+    if (bgReturn) state.bgReturnPos = { x: bgReturn.x, z: bgReturn.z };
     return sanitizeRemovedZone1Content(state).state;
   }
 
@@ -2265,6 +2339,36 @@ export class Sim {
       set nextArenaMatchId(v) {
         sim.nextArenaMatchId = v;
       },
+      // Gravemarch battleground state: live views (the arena-state pattern).
+      // bgQueue/bgBotPids are reassigned by the pruning filters (read-write);
+      // the maps/set and the match-id counter mutate in place.
+      get bgQueue() {
+        return sim.bgQueue;
+      },
+      set bgQueue(v) {
+        sim.bgQueue = v;
+      },
+      get bgMatches() {
+        return sim.bgMatches;
+      },
+      get bgBusySlots() {
+        return sim.bgBusySlots;
+      },
+      get nextBgMatchId() {
+        return sim.nextBgMatchId;
+      },
+      set nextBgMatchId(v) {
+        sim.nextBgMatchId = v;
+      },
+      get bgDeserters() {
+        return sim.bgDeserters;
+      },
+      get bgBotPids() {
+        return sim.bgBotPids;
+      },
+      set bgBotPids(v) {
+        sim.bgBotPids = v;
+      },
       get delveRuns() {
         return sim.delveRuns;
       },
@@ -2332,6 +2436,17 @@ export class Sim {
       endDuel: sim.endDuel.bind(sim),
       fiestaTakedown: sim.fiestaTakedown.bind(sim),
       fiestaDown: sim.fiestaDown.bind(sim),
+      // Gravemarch battleground callbacks (owned by social/battleground.ts;
+      // late-bound arrows so sim.ctx resolves at call time). Consumed by the
+      // combat/damage.ts battleground arms and targeting.ts.
+      isBgCrossTeam: (match, attackerPid, targetPid) =>
+        bgMod.isBgCrossTeam(match, attackerPid, targetPid),
+      bgNotePlayerDamage: (match, victim, attackerPlayer) =>
+        bgMod.bgNotePlayerDamage(sim.ctx, match, victim, attackerPlayer),
+      bgPlayerDown: (match, victim, source) => bgMod.bgPlayerDown(sim.ctx, match, victim, source),
+      bgMobKilled: (mob, source) => bgMod.bgMobKilled(sim.ctx, mob, source),
+      bgAdjustStructureDamage: (target, source, amount) =>
+        bgMod.bgAdjustStructureDamage(sim.ctx, target, source, amount),
       // A2: isArenaCrossTeam/arenaTeamOf/endArenaMatch/endDuel (above) now forward to
       // social/arena.ts + social/duel.ts via Sim's thin delegates. The block below is
       // what the moved code CONSUMES that stays on Sim (clearAurasFromSource has
@@ -2843,6 +2958,7 @@ export class Sim {
 
     this.updateDuels();
     this.updateArena();
+    this.updateBattlegrounds();
     this.updateTradesAndInvites();
     this.updateLootRolls();
     this.updateInstances();
@@ -3449,8 +3565,10 @@ export class Sim {
     // point-blank range), but the arena's thin enclosing walls sit well within
     // MELEE_RANGE: without this, a combatant pressed against a wall can swing
     // through it at an opponent on the far side. Ranked fairness requires every
-    // attack to respect the same walls movement does inside the pit.
-    return source !== undefined && isArenaPos(source.pos.x);
+    // attack to respect the same walls movement does inside the pit. The
+    // Gravemarch battleground band (base walls, chapel stubs) gets the same
+    // rule so nobody swings through its walls either.
+    return source !== undefined && (isArenaPos(source.pos.x) || isBattlegroundPos(source.pos.x));
   }
 
   private hasLineOfSight(source: Entity, target: Entity): boolean {
@@ -4187,6 +4305,11 @@ export class Sim {
   }
 
   private updateMob(mob: Entity): void {
+    // Gravemarch battleground entities (minions/structures/the Knell Warden)
+    // are driven exclusively by updateBattlegrounds (social/battleground.ts):
+    // the wild-mob AI (aggro scans, idle wander, leash) must never touch them,
+    // and its idle-wander rng draws must never enter the shared stream.
+    if (mob.bgMatchId !== undefined) return;
     updateMobFn(this.ctx, mob);
   }
 
@@ -5229,6 +5352,10 @@ export class Sim {
   isHostileTo(attacker: Entity, target: Entity): boolean {
     if (target.kind === 'mob') {
       if (target.templateId.startsWith('vision_')) return false;
+      // Gravemarch battleground entities are hostile only to the opposing
+      // company (and the neutral Knell Warden to both); everyone outside the
+      // match sees them as inert scenery.
+      if (target.bgMatchId !== undefined) return bgMod.isBgMobHostileTo(this.ctx, attacker, target);
       if (target.ownerId !== null) {
         const owner = this.entities.get(target.ownerId);
         return !!owner && owner.kind === 'player' && this.isHostileTo(attacker, owner);
@@ -5249,11 +5376,20 @@ export class Sim {
       )
         return true;
       const match = this.arenaMatches.get(attackerPlayer.id);
-      return (
-        !!match &&
+      if (
+        match &&
         match.state === 'active' &&
         !match.defeated.has(attackerPlayer.id) &&
         this.isArenaCrossTeam(match, attackerPlayer.id, target.id)
+      )
+        return true;
+      // Gravemarch: active-match cross-team fighters (benched fighters are
+      // neither valid attackers nor valid targets).
+      const bgMatch = this.bgMatches.get(attackerPlayer.id);
+      return (
+        !!bgMatch &&
+        bgMatch.state === 'active' &&
+        bgMod.isBgCrossTeam(bgMatch, attackerPlayer.id, target.id)
       );
     }
     return false;
@@ -5607,6 +5743,92 @@ export class Sim {
 
   updateFiestaBots(): void {
     fiestaBotsMod.updateFiestaBots(this);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Gravemarch, the 5v5 battleground (docs/prd/battlegrounds.md). Queue,
+  // matchmaking, the match lifecycle, and the module-driven battleground
+  // entities live in src/sim/social/battleground.ts behind SimContext; the
+  // offline practice + online backfill bots in social/battleground_bots.ts.
+  // Sim keeps thin same-named delegates for the IWorld facet
+  // (IWorldBattleground), the server helpers, and tests.
+  // -------------------------------------------------------------------------
+
+  bgQueueJoin(pid?: number): void {
+    bgMod.bgQueueJoin(this.ctx, pid);
+  }
+
+  bgQueueLeave(pid?: number): void {
+    bgMod.bgQueueLeave(this.ctx, pid);
+  }
+
+  // Player spectate needs the server to re-anchor a snapshot, so the offline
+  // world refuses it: the pinned literals below are what the client matcher
+  // localizes (the online world routes the commands to the server instead).
+  bgSpectate(matchId: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    if (!bgMod.bgLiveMatchIds(this.ctx).includes(matchId)) {
+      this.error(r.meta.entityId, 'That battle has already ended.');
+      return;
+    }
+    this.error(r.meta.entityId, 'You cannot spectate right now.');
+  }
+
+  bgSpectateNext(pid?: number): void {
+    const r = this.resolve(pid);
+    if (r) this.error(r.meta.entityId, 'You cannot spectate right now.');
+  }
+
+  bgSpectateLeave(pid?: number): void {
+    const r = this.resolve(pid);
+    if (r) this.error(r.meta.entityId, 'You cannot spectate right now.');
+  }
+
+  // Offline practice bout against and alongside scripted bots (the fiesta
+  // practice precedent): queues you plus nine bots; the next matchmaking pass
+  // seats the full 5v5 with no backfill wait.
+  bgPracticeStart(): void {
+    bgBotsMod.startBgPractice(this);
+  }
+
+  bgMatchFor(pid: number): BgMatch | null {
+    return bgMod.bgMatchFor(this.ctx, pid);
+  }
+
+  // Server helpers (spectate anchoring + the live-match wire field).
+  bgLiveMatchIds(): number[] {
+    return bgMod.bgLiveMatchIds(this.ctx);
+  }
+
+  /** Connected fighters of a live match, team A first. */
+  bgMatchPids(matchId: number): number[] {
+    return bgMod.bgMatchPids(this.ctx, matchId);
+  }
+
+  bgMatchOf(pid: number): number | null {
+    return this.bgMatches.get(pid)?.id ?? null;
+  }
+
+  // Server disconnect-ordering hook. saveCharacterOnLeave serializes BEFORE
+  // removePlayer, but a deserter's Elo loss and Deserter's Knell land in
+  // bgHandleDesertion during removePlayer, so a mid-match disconnect would
+  // save the pre-loss rating. The server calls this first; it is idempotent
+  // (removePlayer's own arm sees match.deserted and returns early).
+  bgResolveDesertion(pid: number): void {
+    const match = this.bgMatches.get(pid);
+    if (match) bgMod.bgHandleDesertion(this.ctx, match, pid);
+  }
+
+  bgInfoFor(pid: number): import('../world_api').BgInfo | null {
+    return bgMod.bgInfoFor(this.ctx, pid);
+  }
+
+  private updateBattlegrounds(): void {
+    // Bots first, so a backfill squad assembled this tick is seated by the
+    // module's matchmaker in the same pass; then the deterministic driver.
+    bgBotsMod.updateBgBots(this);
+    bgMod.updateBattlegrounds(this.ctx);
   }
 
   private fiestaMatchInfo(
@@ -6015,6 +6237,10 @@ export class Sim {
 
   get arenaInfo(): import('../world_api').ArenaInfo | null {
     return this.primaryId === -1 ? null : this.arenaInfoFor(this.primaryId);
+  }
+
+  get bgInfo(): import('../world_api').BgInfo | null {
+    return this.primaryId === -1 ? null : this.bgInfoFor(this.primaryId);
   }
 
   get marketInfo(): import('../world_api').MarketInfo | null {

@@ -454,7 +454,7 @@ function currentTaskMultiplier(
 ): number | null {
   if (task.type === 'quest_completion')
     return questCompletionPoints(task, onlineMinutes).multiplier;
-  if (task.type === 'arena_result')
+  if (task.type === 'arena_result' || task.type === 'battleground_result')
     return onlineMultiplierPoints(task.basePoints ?? task.points, task.config ?? {}, onlineMinutes)
       .multiplier;
   return null;
@@ -655,6 +655,58 @@ export class DailyRewardService {
           taskId: task.taskId,
           taskType: task.type,
           format: result.format,
+          won: result.won,
+          onlineMinutes,
+          multiplier,
+          basePoints,
+          ratingBefore: result.ratingBefore,
+          ratingAfter: result.ratingAfter,
+        },
+      );
+      if (recorded) awardedPoints += points;
+    }
+    return awardedPoints;
+  }
+
+  // The Gravemarch battleground sibling of recordArenaResult: separate
+  // win/loss base points (task type 'battleground_result', arena's numbers:
+  // winBasePoints defaults to the task's base, lossBasePoints to 10), the
+  // same online-minutes multiplier and eligibility gate.
+  async recordBattlegroundResult(
+    accountId: number,
+    result: {
+      won: boolean;
+      ratingBefore: number;
+      ratingAfter: number;
+      completedAt?: Date;
+    },
+  ): Promise<number> {
+    const completedAt = result.completedAt ?? new Date();
+    const { day, config } = await dailyRewardClock(completedAt);
+    await this.db.ensureDay(day, config.prizePoolUsd, config.wocUsdPrice);
+    await this.db.seedTasks(day, config.tasks);
+    const eligibility = await dailyRewardEligibility(accountId, config);
+    if (!eligibility.eligible) return 0;
+    const tasks = await this.db.tasksForType(day, 'battleground_result');
+    if (tasks.length === 0) return 0;
+    const onlineMinutes = await this.db.onlineMinutesForAccount(day, accountId);
+    let awardedPoints = 0;
+    for (const task of tasks) {
+      const taskConfig = task.config ?? {};
+      const basePoints = result.won
+        ? numberConfig(taskConfig, 'winBasePoints', task.basePoints ?? task.points)
+        : numberConfig(taskConfig, 'lossBasePoints', 10);
+      const { points, multiplier } = onlineMultiplierPoints(basePoints, taskConfig, onlineMinutes);
+      if (points <= 0) continue;
+      const recorded = await this.db.addPoints(
+        day,
+        accountId,
+        'task',
+        points,
+        `task:${task.taskId}:battleground:${result.won ? 'win' : 'loss'}:${completedAt.toISOString()}:${result.ratingBefore}:${result.ratingAfter}`,
+        {
+          taskId: task.taskId,
+          taskType: task.type,
           won: result.won,
           onlineMinutes,
           multiplier,

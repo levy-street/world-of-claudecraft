@@ -95,6 +95,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   const { meta, e: p } = r;
   if (!p.dead || p.ghost) return; // not dead, or already a spirit
   if (ctx.arenaMatches.has(p.id)) return; // arena/fiesta run their own respawn
+  if (ctx.bgMatches.has(p.id)) return; // the Gravemarch benches and revives its own fallen
   if (isDelvePos(p.pos.x)) {
     // Delves keep their own bounded respawn rules (see entity_roster), no ghost run.
     releaseSpiritInDelve(ctx, meta.entityId);

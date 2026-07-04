@@ -169,7 +169,54 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   cave: 0.657,
 };
 
+// ---------------------------------------------------------------------------
+// Per-PLACE sky override. Instanced content that lives inside a biome band
+// (the Gravemarch battleground parks at x 9600..10200 wherever its z lands)
+// can pin its own sky regardless of camera z: the override rides a third
+// shader slot cross-faded OVER the biome pair + backdrop, so entering eases
+// like a zone crossing. 'bg_dusk' is the Gravemarch's ashen dusk: the shipped
+// night HDRI at partial blend (full night crushed field silhouettes; the
+// residual day fraction lifts the floor), with the procedural sun glow dimmed
+// and warmed toward a low amber so it reads as afterglow, not noon.
+// ---------------------------------------------------------------------------
+export type PlaceSky = 'bg_dusk';
+
+export interface PlaceSkyDef {
+  hdri2k: string;
+  hdri1k: string;
+  /** shader blend target: 1 = full override, <1 keeps a day-sky floor */
+  mix: number;
+  /** radiance gain/clamp (HDRI_TUNE economics; night meanLum is ~0.066 vs
+   *  vale's 0.67, ~10x dimmer, so the gain runs far hotter than daylight) */
+  tune: { gain: number; clamp: number };
+  /** measured brightest-texel u (same tmp/analyze_hdr.mjs method as
+   *  HDRI_SUN_U) so the sky's brightest glow sits behind the anchor sun */
+  sunU: number;
+  /** absolute scene.environmentIntensity while the override holds: the raw
+   *  night equirect is ~10x dimmer, so IBL needs a boost or PBR materials
+   *  read unlit-black under the dark sky */
+  envIntensity: number;
+  /** low tier (gradient dome, no HDRIs): multiply tint on the dome material */
+  lowTint: number;
+}
+
+export const PLACE_SKY: Record<PlaceSky, PlaceSkyDef> = {
+  bg_dusk: {
+    hdri2k: '/env/night_2k.hdr',
+    hdri1k: '/env/night_1k.hdr',
+    mix: 0.85,
+    // clamp well under the day skies: the night HDR's horizon glow peaks at
+    // 216 raw, and anything past ~1.0 tonemaps to a white band that reads
+    // like daylight haze instead of dusk
+    tune: { gain: 2.0, clamp: 1.0 },
+    sunU: 0.342,
+    envIntensity: 1.1,
+    lowTint: 0x8f7a72,
+  },
+};
+
 const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
+const placeHdriStore: Partial<Record<PlaceSky, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
 // 2K HDRs are ~17MB on disk; 1K is ~4MB. Pick the lighter set for phone /
 // low-memory browser sessions before preload starts, and skip entirely when
@@ -177,6 +224,19 @@ const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
 // low tier can only be known after WebGL context creation, which happens after
 // preload, so this best-effort device gate keeps mobile out of the worst path.
 if (GFX.standardMaterials) {
+  // place-override HDRIs ride the same preload gate as the biome set (the
+  // gradient-dome tier never samples an equirect; it gets lowTint instead)
+  const liteHdri = shouldUseLiteHdri();
+  for (const id of Object.keys(PLACE_SKY) as PlaceSky[]) {
+    const def = PLACE_SKY[id];
+    registerPreload(
+      loadHdr(liteHdri ? def.hdri1k : def.hdri2k).then((tex) => {
+        tex.wrapS = THREE.RepeatWrapping;
+        placeHdriStore[id] = tex;
+        return tex;
+      }),
+    );
+  }
   for (const biome of Object.keys(BIOME_HDRI) as BiomeId[]) {
     registerPreload(
       loadHdr(BIOME_HDRI[biome]).then((tex) => {
@@ -219,6 +279,14 @@ export interface SkyView {
   envRotationY(biome: BiomeId): number;
   /** biome cross-fade state at a given camera z (from -> to by t in [0,1]) */
   biomeAt(z: number): BiomeBlend;
+  /** Per-place sky override (Gravemarch dusk): cross-fades a third HDRI slot
+   *  over the biome pair; null restores the biome sky. Eases in setCameraZ.
+   *  Low tier tints its gradient dome instead. */
+  setPlaceOverride(id: PlaceSky | null): void;
+  /** Raw override equirect for PMREM IBL; null while unloaded / low tier. */
+  placeEnvTexture(id: PlaceSky): THREE.DataTexture | null;
+  /** environmentRotation.y aligning the override IBL with the dome's sun */
+  placeEnvRotationY(id: PlaceSky): number;
 }
 
 export interface BiomeBlend {
@@ -249,6 +317,10 @@ const SKY_FRAG = /* glsl */ `
   uniform float uBackdropStrength;
   uniform float uBackdropBiasA;
   uniform float uBackdropBiasB;
+  uniform sampler2D uSkyO;  // per-place override sky (Gravemarch dusk)
+  uniform float uOverride;  // 0 = biome sky, >0 = override blend
+  uniform float uOffO;
+  uniform vec2 uTuneO;
   varying vec3 vDir;
 
   vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec2 tune) {
@@ -296,10 +368,20 @@ const SKY_FRAG = /* glsl */ `
     vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
     vec3 backdrop = mix(backA, backB, uMix);
     c = mix(c, backdrop, uBackdropStrength);
+    // per-place override: the dusk HDRI blends over whatever the biome pair
+    // (plus backdrop) shows; the residual day fraction keeps the horizon
+    // readable so field silhouettes never sink into true night
+    if (uOverride > 0.001) {
+      c = mix(c, sampleSky(uSkyO, dir, uOffO, uTuneO), uOverride);
+    }
+    // warm glow around the anchor sun; the override dims it and pulls it
+    // toward a low amber so the same anchor reads as dusk afterglow
+    float glowGain = 1.0 - uOverride * 0.55;
+    vec3 glowTint = mix(vec3(1.0, 0.85, 0.6), vec3(1.0, 0.56, 0.32), uOverride);
     float sunAmt = pow(max(dot(dir, uSunDir), 0.0), 8.0);
-    c += vec3(1.0, 0.85, 0.6) * sunAmt * 0.3;                        // warm glow around the anchor sun
+    c += glowTint * sunAmt * 0.3 * glowGain;
     float sunCore = pow(max(dot(dir, uSunDir), 0.0), 90.0);
-    c += vec3(1.0, 0.92, 0.75) * sunCore * 0.5;                      // tighter bright core
+    c += mix(vec3(1.0, 0.92, 0.75), vec3(1.0, 0.66, 0.42), uOverride) * sunCore * 0.5 * glowGain;
     gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -329,30 +411,47 @@ function biomeBlendAt(z: number): BiomeBlend {
   return { from, to, t };
 }
 
+// the anchor sun's azimuth in equirect u space
+function anchorSunU(sunDir: THREE.Vector3): number {
+  return Math.atan2(sunDir.z, sunDir.x) / (2 * Math.PI) + 0.5;
+}
+
 // u offset that moves a given HDRI's sun azimuth onto SUN_ANCHOR's azimuth
 function sunOffsetU(biome: BiomeId, sunDir: THREE.Vector3): number {
-  const sunU = Math.atan2(sunDir.z, sunDir.x) / (2 * Math.PI) + 0.5;
-  return HDRI_SUN_U[biome] - sunU;
+  return HDRI_SUN_U[biome] - anchorSunU(sunDir);
 }
 
 export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   if (lowGfx || !hasSkyHdriAssets()) {
-    const dome = new THREE.Mesh(
-      new THREE.SphereGeometry(DOME_RADIUS, 24, 16),
-      new THREE.MeshBasicMaterial({
-        map: skyTexture(),
-        side: THREE.BackSide,
-        fog: false,
-        depthWrite: false,
-      }),
-    );
+    const mat = new THREE.MeshBasicMaterial({
+      map: skyTexture(),
+      side: THREE.BackSide,
+      fog: false,
+      depthWrite: false,
+    });
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(DOME_RADIUS, 24, 16), mat);
     dome.renderOrder = -10;
+    // low tier has no equirects: the place override multiplies the gradient
+    // dome toward the place tint instead (eased per frame like the HDRI mix)
+    let lowOverride: PlaceSky | null = null;
+    const lowTarget = new THREE.Color();
     return {
       dome,
-      setCameraZ: () => {},
+      setCameraZ: (_z: number, dt: number) => {
+        lowTarget.setHex(lowOverride ? PLACE_SKY[lowOverride].lowTint : 0xffffff);
+        if (mat.color.equals(lowTarget)) return;
+        mat.color.lerp(lowTarget, 1 - Math.exp(-dt * 2.2));
+        // snap once within 8-bit so equals() ends the per-frame writes
+        if (mat.color.getHex() === lowTarget.getHex()) mat.color.copy(lowTarget);
+      },
       envTexture: () => null,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
+      setPlaceOverride: (id) => {
+        lowOverride = id;
+      },
+      placeEnvTexture: () => null,
+      placeEnvRotationY: () => 0,
     };
   }
 
@@ -377,6 +476,12 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
     uBackdropStrength: { value: backdropsReady ? 1 : 0 },
     uBackdropBiasA: { value: BACKDROP_Y_BIAS[start.from] },
     uBackdropBiasB: { value: BACKDROP_Y_BIAS[start.to] },
+    // place-override slot: bound to a valid texture at all times (sampling
+    // an unbound sampler is UB on some drivers); uOverride 0 hides it
+    uSkyO: { value: hdriStore[start.from] as THREE.Texture },
+    uOverride: { value: 0 },
+    uOffO: { value: 0 },
+    uTuneO: { value: new THREE.Vector2(1, 1) },
   };
   const material = new THREE.ShaderMaterial({
     uniforms,
@@ -390,9 +495,19 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
   dome.renderOrder = -10;
 
   let cur = start;
+  let override: PlaceSky | null = null;
   return {
     dome,
     setCameraZ(z: number, dt: number): void {
+      // ease the place-override blend independently of the biome pair (the
+      // pair swap below early-returns, and the override must keep easing)
+      const overTarget = override ? PLACE_SKY[override].mix : 0;
+      if (Math.abs(uniforms.uOverride.value - overTarget) > 0.001) {
+        const ko = 1 - Math.exp(-dt * 2.2);
+        uniforms.uOverride.value += (overTarget - uniforms.uOverride.value) * ko;
+      } else {
+        uniforms.uOverride.value = overTarget;
+      }
       const next = biomeBlendAt(z);
       if (next.from !== cur.from || next.to !== cur.to) {
         uniforms.uSkyA.value = hdriStore[next.from] as THREE.Texture;
@@ -427,6 +542,26 @@ export function buildSky(lowGfx: boolean, sunDir: THREE.Vector3): SkyView {
       return sunOffsetU(biome, sun) * 2 * Math.PI;
     },
     biomeAt: biomeBlendAt,
+    setPlaceOverride(id: PlaceSky | null): void {
+      // an unloaded HDR keeps the biome sky (uOverride stays easing to 0)
+      const tex = id ? placeHdriStore[id] : null;
+      const next = id && tex ? id : null;
+      if (next === override) return;
+      override = next;
+      if (next && tex) {
+        const def = PLACE_SKY[next];
+        uniforms.uSkyO.value = tex;
+        uniforms.uOffO.value = def.sunU - anchorSunU(sun);
+        uniforms.uTuneO.value.set(def.tune.gain, def.tune.clamp);
+      }
+    },
+    placeEnvTexture(id: PlaceSky): THREE.DataTexture | null {
+      return placeHdriStore[id] ?? null;
+    },
+    placeEnvRotationY(id: PlaceSky): number {
+      // same r165 sign convention as envRotationY above
+      return (PLACE_SKY[id].sunU - anchorSunU(sun)) * 2 * Math.PI;
+    },
   };
 }
 

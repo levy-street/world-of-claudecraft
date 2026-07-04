@@ -9,6 +9,7 @@ import {
   DUNGEONS,
   delveAt,
   dungeonAt,
+  isBattlegroundPos,
   isDelvePos,
   zoneAt,
 } from '../src/sim/data';
@@ -158,6 +159,15 @@ const STALE_INPUT_SECONDS = 0.75;
 const TICK_EMA_ALPHA = 0.05;
 const ARENA_WIRE_HZ = 0.1;
 const ARENA_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * ARENA_WIRE_HZ)));
+// The Gravemarch battleground self readout re-evaluates at 2 Hz (10 ticks):
+// the arena throttle pattern, but fast enough that the queue badge and the
+// spectator match HUD track timers; instant transitions ride the bg* events.
+const BG_WIRE_HZ = 2;
+const BG_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * BG_WIRE_HZ)));
+// The overworld English name a battleground position reports through the
+// presence path (friend/guild rosters, /who), like DUNGEONS[..].name for
+// dungeons. The client re-localizes it in localizeZone (hudChrome.bg.zoneName).
+const BATTLEGROUND_ZONE_NAME = 'The Gravemarch';
 
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
@@ -187,6 +197,7 @@ type ClientMessage = Record<string, unknown> & {
   itemId?: string;
   level?: number;
   marker?: number;
+  matchId?: number;
   mi?: unknown;
   mode?: string;
   n?: string;
@@ -321,6 +332,33 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonDemon',
 ]);
 
+// Privacy: a Gravemarch match spectator's snapshot `self` is the ANCHORED
+// FIGHTER's record (the moderator-spectate anchor swap), so the fighter's
+// private heavy fields are withheld from player spectators: the heavy block
+// (inv/bags/buyback/equip/cosmetics/qlog/qdone/milestones/tal) plus mail,
+// mailU, market, trade, and prof. Spectators keep the dynamic scalars,
+// cds/lockouts/corpse/stats/weapon, party, arena, and above all the 'bg' key
+// that drives the spectator match HUD. One skip set consulted INSIDE the
+// maybe() encoder (values gated, call sites untouched) so the W0a literal
+// scrape in tests/snapshots.test.ts still sees every delta key exactly once.
+// Moderator spectate (admin-gated) keeps the full record, unchanged.
+const SPECTATOR_PRIVATE_SELF_KEYS = new Set<string>([
+  'inv',
+  'bags',
+  'buyback',
+  'equip',
+  'cosmetics',
+  'qlog',
+  'qdone',
+  'milestones',
+  'tal',
+  'mail',
+  'mailU',
+  'market',
+  'trade',
+  'prof',
+]);
+
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
 // read is served from the woc_balance.ts cache (CACHE_TTL_MS), which is the real
 // freshness floor; keeping this loop at/under that TTL means a token change shows
@@ -378,6 +416,8 @@ export interface ClientSession {
   lastSent: Record<string, string>;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
+  // battleground readout is reconciled at 2 Hz (BG_WIRE_INTERVAL_TICKS)
+  lastBgWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -402,13 +442,32 @@ export interface ClientSession {
   clientSeed: string;
   // Behavioral bot-detection state. Ephemeral — reset on every join.
   botTrackingContext: BotTrackingContext;
-  spectating: {
-    characterId: number;
-    name: string;
-    savedPos: { x: number; y: number; z: number };
-    priorGm: boolean;
-    stowedPet: PetState | null;
-  } | null;
+  // Anchor-swap spectate state. Two modes share the parked-entity fields
+  // (savedPos/priorGm/stowedPet drive the restore + save/presence carve-outs):
+  // 'moderator' is the admin /spectate flow (GM grant, follows one character);
+  // 'match' is the player-facing Gravemarch spectate (NO GM grant, anchored on
+  // a match fighter by pid, auto-retargets/exits with the match lifecycle).
+  // characterId/name always describe the CURRENT anchor target.
+  spectating:
+    | {
+        mode: 'moderator';
+        characterId: number;
+        name: string;
+        savedPos: { x: number; y: number; z: number };
+        priorGm: boolean;
+        stowedPet: PetState | null;
+      }
+    | {
+        mode: 'match';
+        matchId: number;
+        anchorPid: number;
+        characterId: number;
+        name: string;
+        savedPos: { x: number; y: number; z: number };
+        priorGm: boolean;
+        stowedPet: PetState | null;
+      }
+    | null;
 }
 
 interface SentEntityVersions {
@@ -869,9 +928,22 @@ export class GameServer {
     const moderatorEntity = this.sim.entities.get(moderator.pid);
     if (!moderatorEntity) return;
 
-    if (moderator.spectating) {
+    if (moderator.spectating?.mode === 'moderator') {
       moderator.spectating.characterId = target.characterId;
       moderator.spectating.name = target.name;
+    } else if (moderator.spectating) {
+      // An admin hopping from a Gravemarch match spectate to /spectate: the
+      // entity is already parked, so keep the saved restore state and add the
+      // moderator grant the match mode deliberately withheld.
+      this.sim.setGm(moderator.pid);
+      moderator.spectating = {
+        mode: 'moderator',
+        characterId: target.characterId,
+        name: target.name,
+        savedPos: moderator.spectating.savedPos,
+        priorGm: moderator.spectating.priorGm,
+        stowedPet: moderator.spectating.stowedPet,
+      };
     } else {
       const savedPos = { ...moderatorEntity.pos };
       const priorGm = !!moderatorEntity.gm;
@@ -885,6 +957,7 @@ export class GameServer {
       const meta = this.sim.meta(moderator.pid);
       if (meta) Object.assign(meta.moveInput, emptyMoveInput());
       moderator.spectating = {
+        mode: 'moderator',
         characterId: target.characterId,
         name: target.name,
         savedPos,
@@ -895,6 +968,7 @@ export class GameServer {
 
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    moderator.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
@@ -918,9 +992,191 @@ export class GameServer {
     moderator.spectating = null;
     moderator.lastSent = {};
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    moderator.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
+  }
+
+  // ---------------------------------------------------------------------------
+  // Gravemarch match spectate (docs/prd/battlegrounds.md): the moderator
+  // anchor-swap mechanism, player-gated and WITHOUT the GM grant. The anchor
+  // is a connected fighter of a live match (pid-keyed via this.clients, the
+  // same path broadcastSnapshots resolves sessions by); bots never have a
+  // session and are skipped. selfWireJson withholds the anchored fighter's
+  // private heavy fields (SPECTATOR_PRIVATE_SELF_KEYS).
+  // ---------------------------------------------------------------------------
+
+  /** The live session of a battleground fighter pid, or null (bots and
+   *  disconnected fighters have none). */
+  private liveBgFighterSession(pid: number): ClientSession | null {
+    const s = this.clients.get(pid);
+    if (!s || s.left) return null;
+    if (!this.sim.entities.get(pid) || !this.sim.meta(pid)) return null;
+    return s;
+  }
+
+  /** The next connected fighter after afterPid in the match's team-A-first
+   *  roster, wrapping around. Pass afterPid = -1 for the first connected
+   *  fighter. Null when no fighter of the match has a live session. */
+  private nextLiveBgFighterSession(matchId: number, afterPid: number): ClientSession | null {
+    const pids = this.sim.bgMatchPids(matchId);
+    if (pids.length === 0) return null;
+    const at = pids.indexOf(afterPid);
+    for (let step = 1; step <= pids.length; step++) {
+      const candidate = pids[(at + step + pids.length) % pids.length];
+      const s = this.liveBgFighterSession(candidate);
+      if (s) return s;
+    }
+    return null;
+  }
+
+  /** Point an active match spectate at another connected fighter: update the
+   *  stored anchor, clear the per-session wire caches (the self record now
+   *  serializes a different entity), and re-send the {t:'spectate'} frame so
+   *  the client banner tracks the new name. announce=false for the silent
+   *  auto-retarget when the previous anchor left. */
+  private retargetMatchSpectate(
+    session: ClientSession,
+    target: ClientSession,
+    announce: boolean,
+  ): void {
+    const st = session.spectating;
+    if (!st || st.mode !== 'match') return;
+    st.anchorPid = target.pid;
+    st.characterId = target.characterId;
+    st.name = target.name;
+    session.lastSent = {};
+    session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+    session.sentEnts.clear();
+    this.send(session, { t: 'spectate', name: target.name });
+    if (announce) this.sendSystemNotice(session, `Now spectating ${target.name}.`);
+  }
+
+  /** bg_spectate: watch a live Gravemarch match (or retarget an ongoing match
+   *  spectate to another match). Validations reuse already-matched literals. */
+  private enterMatchSpectate(session: ClientSession, matchId: number): void {
+    const entity = this.sim.entities.get(session.pid);
+    if (!entity) return;
+    // moderator spectate keeps its own flow; its command gate blocks bg_spectate
+    // anyway, so this only guards a direct call
+    if (session.spectating && session.spectating.mode !== 'match') return;
+    if (!this.sim.bgLiveMatchIds().includes(matchId)) {
+      this.sendChatNotice(session, 'That battle has already ended.');
+      return;
+    }
+    if (!session.spectating) {
+      // Watch only while idle in the overworld: fighters, queued players, the
+      // dead, and anyone inside an instance band (dungeon/delve/arena/
+      // battleground x-bands) cannot spectate. An already-spectating session
+      // skips these: its entity is parked in limbo and was validated on entry.
+      if (
+        entity.dead ||
+        entity.pos.x > DUNGEON_X_THRESHOLD ||
+        this.sim.bgMatchOf(session.pid) !== null ||
+        this.sim.bgInfoFor(session.pid)?.queued === true
+      ) {
+        this.sendChatNotice(session, 'You cannot spectate right now.');
+        return;
+      }
+    }
+    const anchor = this.nextLiveBgFighterSession(matchId, -1);
+    if (!anchor) {
+      // a live match with no connected fighter (bots finishing it out) has
+      // nothing to anchor a snapshot on
+      this.sendChatNotice(session, 'You cannot spectate right now.');
+      return;
+    }
+    if (session.spectating) {
+      session.spectating.matchId = matchId;
+      this.retargetMatchSpectate(session, anchor, true);
+      return;
+    }
+    // Park exactly like enterSpectate, minus the GM grant: a player spectator
+    // must never gain invulnerability or moderator visibility.
+    const savedPos = { ...entity.pos };
+    const priorGm = !!entity.gm;
+    const stowedPet = this.sim.stowPetForSpectate(session.pid);
+    const limbo = this.sim.groundPos(SPECTATE_LIMBO_X, SPECTATE_LIMBO_Z);
+    entity.pos = limbo;
+    entity.prevPos = { ...limbo };
+    this.sim.grid.update(entity);
+    this.sim.playerGrid.update(entity);
+    const meta = this.sim.meta(session.pid);
+    if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    session.spectating = {
+      mode: 'match',
+      matchId,
+      anchorPid: anchor.pid,
+      characterId: anchor.characterId,
+      name: anchor.name,
+      savedPos,
+      priorGm,
+      stowedPet,
+    };
+    session.lastSent = {};
+    session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
+    session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+    session.sentEnts.clear();
+    this.send(session, { t: 'spectate', name: anchor.name });
+    this.sendSystemNotice(session, `Now spectating ${anchor.name}.`);
+  }
+
+  /** bg_spectate_next: cycle the followed fighter (wrap around, bots and
+   *  disconnected fighters skipped). No-op unless match-spectating. */
+  private matchSpectateNext(session: ClientSession): void {
+    const st = session.spectating;
+    if (!st || st.mode !== 'match') return;
+    if (!this.sim.bgLiveMatchIds().includes(st.matchId)) {
+      this.exitSpectate(session, false);
+      this.sendChatNotice(session, 'That battle has already ended.');
+      return;
+    }
+    const next = this.nextLiveBgFighterSession(st.matchId, st.anchorPid);
+    if (!next) {
+      this.exitSpectate(session, false);
+      this.sendChatNotice(session, `${st.name} is no longer online; spectate ended.`);
+      return;
+    }
+    this.retargetMatchSpectate(session, next, true);
+  }
+
+  /** Resolve the live session a spectator's snapshot anchors on, applying the
+   *  per-mode auto behaviors: moderator spectate ends when its target logs
+   *  off; match spectate silently retargets to the next connected fighter
+   *  when the anchor leaves, and auto-exits when the match is no longer live
+   *  (or no fighter remains connected). Returns null when the spectate ended
+   *  this tick, so the caller snapshots the session's own restored entity. */
+  private resolveSpectateAnchorSession(session: ClientSession): ClientSession | null {
+    const st = session.spectating;
+    if (!st) return null;
+    if (st.mode === 'moderator') {
+      const target = this.sessionByCharacterId(st.characterId);
+      const targetEntity = target ? this.sim.entities.get(target.pid) : null;
+      const targetMeta = target ? this.sim.meta(target.pid) : null;
+      if (!target || target.left || !targetEntity || !targetMeta) {
+        this.exitSpectate(session, false);
+        this.sendChatNotice(session, `${st.name} is no longer online; spectate ended.`);
+        return null;
+      }
+      return target;
+    }
+    if (!this.sim.bgLiveMatchIds().includes(st.matchId)) {
+      this.exitSpectate(session, false);
+      this.sendChatNotice(session, 'That battle has already ended.');
+      return null;
+    }
+    const current = this.liveBgFighterSession(st.anchorPid);
+    if (current) return current;
+    const next = this.nextLiveBgFighterSession(st.matchId, st.anchorPid);
+    if (!next) {
+      this.exitSpectate(session, false);
+      this.sendChatNotice(session, `${st.name} is no longer online; spectate ended.`);
+      return null;
+    }
+    this.retargetMatchSpectate(session, next, false);
+    return next;
   }
 
   // The instance (dungeon OR delve) an entity is inside, named as its own zone,
@@ -934,6 +1190,10 @@ export class GameServer {
   private instanceZoneName(e: Entity, pos: { x: number; z: number } = e.pos): string | null {
     if (e.dungeonId) return DUNGEONS[e.dungeonId]?.name ?? e.dungeonId;
     if (isDelvePos(pos.x)) return delveAt(pos.x)?.name ?? null;
+    // The Gravemarch battleground band, checked before the generic dungeon
+    // fallback (dungeonAt returns null there, which would misreport the
+    // overworld zone the far-off coordinates happen to fall under).
+    if (isBattlegroundPos(pos.x)) return BATTLEGROUND_ZONE_NAME;
     if (pos.x > DUNGEON_X_THRESHOLD) return dungeonAt(pos.x)?.name ?? null;
     return null;
   }
@@ -1535,6 +1795,7 @@ export class GameServer {
       lastInputAt: this.sim.time,
       lastSent: {},
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
+      lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -1664,6 +1925,11 @@ export class GameServer {
         console.error('failed to close play session:', err),
       );
     }
+    // A mid-match Gravemarch disconnect is a desertion: apply the deserter's
+    // Elo loss + lockout BEFORE the leave save serializes the character, so
+    // the post-loss bgRating persists (idempotent; removePlayer's own
+    // desertion arm sees the match already resolved and returns early).
+    this.sim.bgResolveDesertion(session.pid);
     await this.saveCharacterOnLeave(session);
     this.sessionsByCharacterId.delete(session.characterId);
     this.sim.removePlayer(session.pid);
@@ -2269,12 +2535,22 @@ export class GameServer {
       return;
     }
     if (session.spectating) {
-      if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
-      const text = msg.text.trim();
-      if (session.isAdmin && this.moderation.handleChatCommand(session, text)) return;
-      if (this.isSpectateLocalChat(session, text)) {
-        this.sendChatNotice(session, 'Local chat is unavailable while spectating.');
-        return;
+      // A Gravemarch match spectator may still retarget (bg_spectate), cycle
+      // the followed fighter (bg_spectate_next), and leave (bg_spectate_leave);
+      // everything else stays chat-only. Moderator spectate is unchanged.
+      const matchSpectatorCmd =
+        session.spectating.mode === 'match' &&
+        (msg.cmd === 'bg_spectate' ||
+          msg.cmd === 'bg_spectate_next' ||
+          msg.cmd === 'bg_spectate_leave');
+      if (!matchSpectatorCmd) {
+        if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
+        const text = msg.text.trim();
+        if (session.isAdmin && this.moderation.handleChatCommand(session, text)) return;
+        if (this.isSpectateLocalChat(session, text)) {
+          this.sendChatNotice(session, 'Local chat is unavailable while spectating.');
+          return;
+        }
       }
     }
     this.botDetector.observeCommand(
@@ -2778,6 +3054,24 @@ export class GameServer {
           sim.arenaAugmentPick(msg.augment, pid);
         break;
       }
+      // The Gravemarch battleground (queue rules resolve in the sim; spectate
+      // is a host-layer anchor swap, docs/prd/battlegrounds.md)
+      case 'bg_queue':
+        sim.bgQueueJoin(pid);
+        break;
+      case 'bg_leave':
+        sim.bgQueueLeave(pid);
+        break;
+      case 'bg_spectate':
+        if (typeof msg.matchId === 'number' && Number.isFinite(msg.matchId))
+          this.enterMatchSpectate(session, msg.matchId | 0);
+        break;
+      case 'bg_spectate_next':
+        this.matchSpectateNext(session);
+        break;
+      case 'bg_spectate_leave':
+        if (session.spectating?.mode === 'match') this.exitSpectate(session);
+        break;
 
       // post-cap cosmetic prestige (Max-Level XP Overflow)
       case 'prestige':
@@ -3142,14 +3436,14 @@ export class GameServer {
         let anchorMeta = meta;
         let anchorSession = session;
         if (session.spectating) {
-          const spectateName = session.spectating.name;
-          const target = this.sessionByCharacterId(session.spectating.characterId);
+          // resolveSpectateAnchorSession applies the per-mode auto behaviors
+          // (moderator target-offline exit; match retarget/auto-exit) and
+          // returns null when the spectate ended, so this snapshot falls back
+          // to the session's own, freshly restored, entity.
+          const target = this.resolveSpectateAnchorSession(session);
           const targetEntity = target ? this.sim.entities.get(target.pid) : null;
           const targetMeta = target ? this.sim.meta(target.pid) : null;
-          if (!target || target.left || !targetEntity || !targetMeta) {
-            this.exitSpectate(session, false);
-            this.sendChatNotice(session, `${spectateName} is no longer online; spectate ended.`);
-          } else {
+          if (target && targetEntity && targetMeta) {
             anchorEntity = targetEntity;
             anchorMeta = targetMeta;
             anchorSession = target;
@@ -3328,13 +3622,30 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
     });
+    // Match spectators must not see the anchored fighter's private economy or
+    // progression scalars. These ride the always-serialized base object, so the
+    // SPECTATOR_PRIVATE_SELF_KEYS maybe() skip set cannot catch them; strip
+    // them here (moderator spectate keeps the full record).
+    if (session.spectating?.mode === 'match') {
+      const s = self as Record<string, unknown>;
+      delete s.copper;
+      delete s.xp;
+      delete s.lxp;
+      delete s.rxp;
+      delete s.prk;
+    }
     const json = JSON.stringify(self);
     // heavy, rarely-changing fields ride along only when their serialized
     // form differs from what this session last received; the client treats
     // an absent field as "unchanged" (a fresh session always gets them all)
     const sent = session.lastSent;
+    // Gravemarch match spectators get a privacy-reduced record: the anchored
+    // fighter's private heavy keys are omitted entirely (never serialized,
+    // never remembered), see SPECTATOR_PRIVATE_SELF_KEYS.
+    const privateSkip = session.spectating?.mode === 'match' ? SPECTATOR_PRIVATE_SELF_KEYS : null;
     let extra = '';
     const maybe = (key: string, value: unknown): void => {
+      if (privateSkip?.has(key)) return;
       const s = JSON.stringify(value ?? null);
       if (sent[key] !== s) {
         sent[key] = s;
@@ -3369,6 +3680,15 @@ export class GameServer {
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));
+    }
+    // The Gravemarch battleground readout (standing, queue state, my match,
+    // live matches, ladder): re-evaluated at 2 Hz (BG_WIRE_HZ) with the usual
+    // delta elision; the instant transitions ride the pid-scoped bg* events.
+    // Anchored, so a match spectator receives the FIGHTER's view and with it
+    // the spectator match HUD data.
+    if (this.sim.tickCount - session.lastBgWireTick >= BG_WIRE_INTERVAL_TICKS) {
+      session.lastBgWireTick = this.sim.tickCount;
+      maybe('bg', this.sim.bgInfoFor(anchorSession.pid));
     }
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
@@ -3604,6 +3924,36 @@ export class GameServer {
           `arena:${s.accountId}:${ev.ratingAfter}`,
           now,
         );
+      } else if (ev.type === 'bgEnd' && !ev.draw && ev.pid !== undefined) {
+        // The Gravemarch battleground: daily-reward credit for every decided
+        // result (the arena pattern; bots have no session and fall out here),
+        // and an activity card for RATED wins only (an unrated backfill stomp
+        // is not significant activity and its rating delta is zero).
+        const s = this.clients.get(ev.pid);
+        if (!s) continue;
+        void dailyRewardService
+          .recordBattlegroundResult(s.accountId, {
+            won: ev.won,
+            ratingBefore: ev.ratingBefore,
+            ratingAfter: ev.ratingAfter,
+          })
+          .then((points) => {
+            if (points > 0) this.sendDailyRewardPointsGained(s, points);
+          })
+          .catch((err) => console.error('daily reward battleground task failed:', err));
+        if (!ev.won || !ev.rated) continue;
+        enqueueActivity(
+          {
+            kind: 'battleground',
+            accountIds: [s.accountId],
+            names: [s.name],
+            realm: REALM,
+            profileUrl: this.profileUrlFor(s.name),
+            ratingDelta: ev.ratingAfter - ev.ratingBefore,
+          },
+          `battleground:${s.accountId}:${ev.ratingAfter}`,
+          now,
+        );
       }
     }
   }
@@ -3625,7 +3975,13 @@ export class GameServer {
         let anchorPid = session.pid;
         let anchorPos = p.pos;
         if (session.spectating) {
-          const target = this.sessionByCharacterId(session.spectating.characterId);
+          // Anchor gone (moderator target offline, or a match anchor that
+          // left): skip this tick's events; broadcastSnapshots owns the
+          // retarget/auto-exit so events resume on the new anchor next tick.
+          const target =
+            session.spectating.mode === 'moderator'
+              ? this.sessionByCharacterId(session.spectating.characterId)
+              : this.liveBgFighterSession(session.spectating.anchorPid);
           const targetEntity = target ? this.sim.entities.get(target.pid) : null;
           if (!target || target.left || !targetEntity) return;
           anchorPid = target.pid;

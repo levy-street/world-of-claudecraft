@@ -5,6 +5,7 @@
 import { esc } from '../../ui/esc';
 import { t } from '../../ui/i18n';
 import { arena } from './arena';
+import { battlegrounds } from './battlegrounds';
 import { bestiary } from './bestiary';
 import { classes } from './classes';
 import { combat } from './combat';
@@ -44,6 +45,7 @@ const PAGES: Record<string, GuidePage> = {
   dungeons,
   delves,
   arena,
+  battlegrounds,
   combat,
   stats,
   progression,

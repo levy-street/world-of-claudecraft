@@ -995,6 +995,15 @@ const MOB_KEYS: Record<string, string> = {
   grand_necromancer_velkhar: 'mob_dark_caster',
   gorrak: 'mob_bruiser',
   mogger: 'mob_bruiser',
+  // The Gravemarch battleground columns (content/battleground.ts lives outside
+  // the merged MOBS table, so the family fallback cannot see these; without an
+  // override they would render as bandits). Structures (bg_bulwark/bg_warstone)
+  // are NOT listed: the renderer gives them an invisible pick volume and the
+  // battlefield architecture (render/battleground.ts) carries their visuals.
+  bg_footman: 'skel_minion',
+  bg_arbalist: 'skel_rogue',
+  bg_sergeant: 'skel_warrior',
+  bg_knell_warden: 'delve_skel_ringer',
   // undead variants by role
   boneclad_revenant: 'skel_warrior',
   marrowlord_varkas: 'skel_warrior',
