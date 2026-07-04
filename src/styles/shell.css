@@ -2792,6 +2792,42 @@
       height: 56px;
       aspect-ratio: auto;
     }
+    /* Faction & race picker docks left (the classic race column), mirroring
+       the class summary panel on the right. It takes the left band, so the
+       offline skin swatches move to a centered strip above the class rail. */
+    #offline-select.cs-wow .race-picker {
+      position: absolute;
+      left: 26px;
+      top: 110px;
+      bottom: 140px;
+      width: 300px;
+      overflow-y: auto;
+      background: #0d0d16d9;
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      z-index: 2;
+      margin-bottom: 0;
+    }
+    /* The picker heading lives inside the panel: undo the floating name-label
+       anchor that #offline-select.cs-wow .auth-label applies. */
+    #offline-select.cs-wow .race-picker .race-picker-title {
+      position: static;
+      transform: none;
+      display: block;
+      margin-bottom: 10px;
+      text-shadow: 0 1px 4px #000;
+    }
+    #offline-select.cs-wow .mini-race-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    #offline-select.cs-wow .skin-row {
+      left: 50%;
+      top: auto;
+      bottom: 150px;
+      transform: translateX(-50%);
+      flex-direction: row;
+    }
     /* Class summary docks on the right, translucent so the stage shows through. */
     #offline-select.cs-wow .class-details-panel,
     body:not(.mobile-touch) #charcreate-panel.cs-wow .class-details-panel {
