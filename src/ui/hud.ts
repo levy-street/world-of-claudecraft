@@ -8053,6 +8053,34 @@ export class Hud {
           audio.fiestaWord(tier);
           break;
         }
+        case 'defenseWave': {
+          // Wave 0 = the event arming (the defenders brace); later waves are
+          // repelled pushes. Banner only: the quest tracker carries the counts.
+          this.showBanner(
+            ev.wave === 0
+              ? t('hudChrome.defense.start')
+              : t('hudChrome.defense.wave', {
+                  wave: formatNumber(ev.wave, { maximumFractionDigits: 0 }),
+                  total: formatNumber(ev.totalWaves, { maximumFractionDigits: 0 }),
+                }),
+          );
+          audio.questAccept();
+          break;
+        }
+        case 'defenseResult': {
+          this.showBanner(ev.won ? t('hudChrome.defense.won') : t('hudChrome.defense.lost'));
+          if (ev.won) audio.questAccept();
+          break;
+        }
+        case 'escortProgress': {
+          if (ev.state === 'started') this.showBanner(t('hudChrome.escort.start'));
+          else if (ev.state === 'failed') this.showBanner(t('hudChrome.escort.failed'));
+          else if (ev.state === 'done') {
+            this.showBanner(t('hudChrome.escort.done'));
+            audio.questAccept();
+          }
+          break;
+        }
         case 'fiestaWave': {
           this.showBanner(
             t('fiesta.banner.wave', {

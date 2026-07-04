@@ -1219,6 +1219,7 @@ const MOB_KEYS: Record<string, string> = {
   rimeclaw_prowler: 'mob_ember_cat',
   blackriver_skulker: 'mob_river_skulker',
   broken_legion_deserter: 'mob_legion_deserter',
+  palisade_warden: 'mob_legion_deserter',
   sellsword_ogre: 'mob_highland_ogre',
   crag_toller: 'mob_highland_ogre',
   palewidow_weaver: 'mob_pale_widow',

@@ -12,6 +12,7 @@
 
 import type {
   CampDef,
+  DefenseSiteDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -214,6 +215,28 @@ export const CONTESTED_SOUTH_ROADS: { x: number; z: number }[][] = [
 // ---------------------------------------------------------------------------
 
 export const CONTESTED_SOUTH_MOBS: Record<string, MobTemplate> = {
+  // Warden Ilyen: the palisade's defender (src/sim/events/defense.ts). A
+  // world-owned ally (allyOfPlayers): friendly to every player, a real target
+  // for the thornwood, never lootable, revived by the event cooldown.
+  palisade_warden: {
+    id: 'palisade_warden',
+    name: 'Warden Ilyen',
+    minLevel: 33,
+    maxLevel: 33,
+    family: 'humanoid',
+    hpBase: 900,
+    hpPerLevel: 46,
+    dmgBase: 26,
+    dmgPerLevel: 3.4,
+    attackSpeed: 2.0,
+    armorPerLevel: 22,
+    moveSpeed: 8.6,
+    aggroRadius: 12,
+    loot: [],
+    scale: 1.05,
+    color: 0x4e6b45,
+    allyOfPlayers: true,
+  },
   // --- Grey Hollows (28-45) ---
   hollow_lurker: {
     id: 'hollow_lurker',
@@ -935,7 +958,7 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
     pos: { x: 20.5, z: 2296.5 },
     facing: 0.8,
     color: 0x4e6b45,
-    questIds: [],
+    questIds: ['q_thornfen_palisade_defense'],
     vendorItems: ['healing_potion', 'mana_potion', 'thornberry_loaf', 'palisade_pine_tea'],
     greeting: 'Stay inside the stakes after dark, $C. The wood does not stay where we left it.',
   },
@@ -976,8 +999,75 @@ export const CONTESTED_SOUTH_NPCS: Record<string, NpcDef> = {
 };
 
 // No quests in the contested strip: these bands are wilderness by design.
-export const CONTESTED_SOUTH_QUESTS = {} as Record<string, QuestDef>;
-export const CONTESTED_SOUTH_QUEST_ORDER: string[] = [];
+export const CONTESTED_SOUTH_QUESTS: Record<string, QuestDef> = {
+  // The palisade stands or falls with its warden: the engine's first defense
+  // event (src/sim/events/defense.ts). Talking to Senna with the quest active
+  // arms the waves; every quest-holder inside the stakes earns the credit.
+  q_thornfen_palisade_defense: {
+    id: 'q_thornfen_palisade_defense',
+    name: 'Hold the Palisade',
+    giverNpcId: 'quartermaster_senna',
+    turnInNpcId: 'quartermaster_senna',
+    text: 'The thornwood tests our stakes every dusk, $N, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.',
+    completionText:
+      'Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, $C.',
+    objectives: [
+      {
+        type: 'defend',
+        siteId: 'thornfen_palisade',
+        count: 3,
+        label: 'Waves repelled beside Warden Ilyen',
+      },
+    ],
+    xpReward: 9200,
+    copperReward: 5200,
+    itemRewards: {},
+    minLevel: 30,
+  },
+};
+export const CONTESTED_SOUTH_QUEST_ORDER: string[] = ['q_thornfen_palisade_defense'];
+
+// The engine's first DefenseSiteDef: Warden Ilyen holds the Wardens Palisade
+// gate against three fixed thornwood pushes. Offsets/levels are data (no rng).
+export const CONTESTED_SOUTH_DEFENSE_SITES: Record<string, DefenseSiteDef> = {
+  thornfen_palisade: {
+    id: 'thornfen_palisade',
+    npcId: 'quartermaster_senna',
+    allyTemplateId: 'palisade_warden',
+    allyLevel: 33,
+    pos: { x: 25, z: 2305 },
+    radius: 32,
+    questId: 'q_thornfen_palisade_defense',
+    objectiveIndex: 0,
+    cooldownSeconds: 90,
+    waves: [
+      {
+        delaySeconds: 6,
+        spawns: [
+          { mobId: 'thornfen_creeper', level: 31, dx: -10, dz: 14 },
+          { mobId: 'thornfen_creeper', level: 31, dx: -6, dz: 16 },
+          { mobId: 'thornfen_creeper', level: 32, dx: 8, dz: 15 },
+        ],
+      },
+      {
+        delaySeconds: 8,
+        spawns: [
+          { mobId: 'thornfen_creeper', level: 32, dx: -9, dz: 15 },
+          { mobId: 'thornfen_creeper', level: 32, dx: 0, dz: 18 },
+          { mobId: 'thornwarped_stag', level: 33, dx: 7, dz: 16 },
+        ],
+      },
+      {
+        delaySeconds: 8,
+        spawns: [
+          { mobId: 'thornfen_creeper', level: 33, dx: -8, dz: 14 },
+          { mobId: 'thornwarped_stag', level: 34, dx: -2, dz: 17 },
+          { mobId: 'thornfen_troll', level: 35, dx: 6, dz: 16 },
+        ],
+      },
+    ],
+  },
+};
 
 // ---------------------------------------------------------------------------
 // Camps, ordered south to north across all five zones. Southern camps in each

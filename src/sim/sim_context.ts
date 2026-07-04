@@ -15,6 +15,7 @@
 import type { AllyDirective } from './ally';
 import type { TalentModifiers } from './content/talents';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
+import type { DefenseEventState } from './events/defense';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { PendingProjectile } from './projectile_travel';
@@ -62,6 +63,8 @@ export interface SimContextPrimitives {
   readonly entities: Map<number, Entity>;
   /** Ally substrate: per-ally behavior directives (src/sim/ally.ts). */
   readonly allyDirectives: Map<number, AllyDirective>;
+  /** Defense events: per-site machines (src/sim/events/defense.ts). */
+  readonly defenseEvents: Map<string, DefenseEventState>;
   // Live player roster (keyed by entity id). Stays a Sim field; exposed here so the
   // moved party machine (A1) resolves member names/metas through the seam.
   readonly players: Map<number, PlayerMeta>;
@@ -722,6 +725,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get allyDirectives() {
       return host.allyDirectives;
+    },
+    get defenseEvents() {
+      return host.defenseEvents;
     },
     get pendingMobRespawns() {
       return host.pendingMobRespawns;

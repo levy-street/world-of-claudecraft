@@ -7,6 +7,7 @@
 import { BASE_ITEMS, FISHING_RARE_ID, FISHING_TABLES } from './content/items';
 import type {
   CampDef,
+  DefenseSiteDef,
   DelveDef,
   DelveModuleDef,
   DungeonDef,
@@ -56,6 +57,7 @@ import {
 } from './content/temple';
 import {
   VALDRIS_CAMPS,
+  VALDRIS_DEFENSE_SITES,
   VALDRIS_ITEMS,
   VALDRIS_MOBS,
   VALDRIS_NPCS,
@@ -312,6 +314,11 @@ export const ZONES: ZoneDef[] = [ZONE1_ZONE, ZONE2_ZONE, ZONE3_ZONE, ...VALDRIS_
 export const WORLD_SIZE = 360; // world width: x spans [-180, 180]
 export const WORLD_MIN_X = -WORLD_SIZE / 2;
 export const WORLD_MAX_X = WORLD_SIZE / 2;
+// Defense sites (src/sim/events/defense.ts): the defendable positions.
+export const DEFENSE_SITES: Record<string, DefenseSiteDef> = {
+  ...VALDRIS_DEFENSE_SITES,
+};
+
 export const WORLD_MIN_Z = ZONES[0].zMin;
 export const WORLD_MAX_Z = ZONES[ZONES.length - 1].zMax;
 // The level-40 launch seals the world at the Breach frontier; the barricade

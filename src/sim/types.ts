@@ -1419,10 +1419,36 @@ export function emptyZoneProps(): ZonePropsDef {
   };
 }
 
+// A defendable position (src/sim/events/defense.ts): an allied NPC-mob holds a
+// site; talking to the site NPC with the linked quest active starts scripted
+// enemy waves. Spawn offsets and levels are fixed data: wave spawning draws NO
+// rng, so events never perturb the shared world-gen stream.
+export interface DefenseSiteDef {
+  id: string;
+  /** The event-starter NPC (usually also the quest giver). */
+  npcId: string;
+  /** MobTemplate with allyOfPlayers: the defender holding the post. */
+  allyTemplateId: string;
+  allyLevel: number;
+  pos: { x: number; z: number };
+  /** Participation and abandon radius around pos. */
+  radius: number;
+  questId: string;
+  /** Index of the defend objective inside that quest. */
+  objectiveIndex: number;
+  cooldownSeconds: number;
+  waves: {
+    delaySeconds: number;
+    spawns: { mobId: string; level: number; dx: number; dz: number }[];
+  }[];
+}
+
 export interface QuestObjective {
-  type: 'kill' | 'collect' | 'interact';
+  type: 'kill' | 'collect' | 'interact' | 'defend' | 'escort';
   targetMobId?: string; // for kill
   itemId?: string; // for collect
+  siteId?: string; // for defend: the DefenseSiteDef id; count = waves to repel
+  escortId?: string; // for escort: the EscortRouteDef id; count = 1
   targetObjectItemId?: string; // for interactable ground objects
   targetNpcId?: string; // for interactable NPC objectives
   count: number;
@@ -1810,6 +1836,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }
   | { type: 'questProgress'; questId: string; text: string }
+  // Defense events (src/sim/events/defense.ts): pid-scoped, text-free (the
+  // client renders every visible string from its own keys).
+  | { type: 'defenseWave'; siteId: string; wave: number; totalWaves: number }
+  | { type: 'defenseResult'; siteId: string; won: boolean }
+  // Escort runs (src/sim/events/escort.ts): pid-scoped, text-free.
+  | {
+      type: 'escortProgress';
+      routeId: string;
+      state: 'started' | 'paused' | 'resumed' | 'failed' | 'done';
+    }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
   | { type: 'aura'; targetId: number; name: string; gained: boolean }

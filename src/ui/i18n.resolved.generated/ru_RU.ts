@@ -319,6 +319,17 @@ export const ru_RU: EnTranslations = {
       "returnBodyTouch": "Задание выполнено. Вернитесь к маршалу Редбруку и нажмите кнопку «Использовать», чтобы сдать его.",
       "doneBodyTouch": "Основы освоены, {name}. Долина в вашем распоряжении: исследуйте её. Нажмите «Еще», затем «Журнал заданий», чтобы просмотреть свои задания в любой момент. Удачной охоты!"
     },
+    "defense": {
+      "start": "Держать строй! Защитники готовятся к натиску.",
+      "wave": "Волна {wave} из {total} отбита!",
+      "won": "Позиция удержана. Отличный бой.",
+      "lost": "Защитники пали. Соберитесь и попробуйте снова."
+    },
+    "escort": {
+      "start": "Сопровождение выступило. Держитесь рядом.",
+      "failed": "Ваш подопечный пал. Дорога забрала ещё одного.",
+      "done": "Благополучное прибытие. Подопечный благодарит вас."
+    },
     "envoys": {
       "title": "Зал Посланников",
       "prompt": "Выберите фракцию и народ, с которым встанете плечом к плечу.",
@@ -7153,6 +7164,9 @@ export const ru_RU: EnTranslations = {
       "thornfen_creeper": {
         "name": "Thornfen Creeper"
       },
+      "palisade_warden": {
+        "name": "Warden Ilyen"
+      },
       "thornwarped_stag": {
         "name": "Thorn-Warped Stag"
       },
@@ -8593,6 +8607,16 @@ export const ru_RU: EnTranslations = {
           }
         }
       },
+      "q_thornfen_palisade_defense": {
+        "title": "Hold the Palisade",
+        "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "objectives": {
+          "0": {
+            "label": "Waves repelled beside Warden Ilyen"
+          }
+        }
+      },
       "q_dune_prowlers": {
         "title": "The Road Bleeds",
         "text": "The prowler packs have learned the caravan bell means food, {playerName}. Every wagon we lose feeds them and starves Qesh Aram. Thin the packs on the dunes flanking the south road: twelve, to start.",
@@ -9653,6 +9677,15 @@ export const ru_RU: EnTranslations = {
           },
           "9": {
             "label": "The Last Lodge"
+          },
+          "10": {
+            "label": "Mothfall Verge"
+          },
+          "11": {
+            "label": "The Greyweir"
+          },
+          "12": {
+            "label": "The Longwatch"
           }
         }
       },
@@ -9686,6 +9719,12 @@ export const ru_RU: EnTranslations = {
           },
           "8": {
             "label": "Frosthelm Ascent"
+          },
+          "9": {
+            "label": "Fort Ledgerwatch"
+          },
+          "10": {
+            "label": "Rimeshaft Camp"
           }
         }
       },

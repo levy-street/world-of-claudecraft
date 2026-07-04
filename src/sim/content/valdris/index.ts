@@ -6,6 +6,7 @@
 
 import type {
   CampDef,
+  DefenseSiteDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -42,6 +43,7 @@ import {
 } from './contested_north';
 import {
   CONTESTED_SOUTH_CAMPS,
+  CONTESTED_SOUTH_DEFENSE_SITES,
   CONTESTED_SOUTH_ITEMS,
   CONTESTED_SOUTH_MOBS,
   CONTESTED_SOUTH_NPCS,
@@ -178,6 +180,10 @@ export const VALDRIS_ROADS: { x: number; z: number }[][] = [
   ...BREACH_ROADS,
   ...CONTESTED_NORTH_ROADS,
 ];
+
+export const VALDRIS_DEFENSE_SITES: Record<string, DefenseSiteDef> = {
+  ...CONTESTED_SOUTH_DEFENSE_SITES,
+};
 
 export const VALDRIS_PROPS: ZonePropsDef = mergeValdrisProps([
   OSSARA_PROPS,

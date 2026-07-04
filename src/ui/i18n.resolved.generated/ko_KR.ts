@@ -319,6 +319,17 @@ export const ko_KR: EnTranslations = {
       "returnBodyTouch": "임무를 마쳤습니다. 레드브룩 원수에게 돌아가 사용 버튼을 눌러 완료하세요.",
       "doneBodyTouch": "기본기를 익혔습니다, {name}. 이제 골짜기를 자유롭게 누비세요. 더보기를 누른 뒤 퀘스트 기록을 눌러 언제든 퀘스트를 확인할 수 있습니다. 좋은 사냥 되세요."
     },
+    "defense": {
+      "start": "전선을 사수하라! 수비대가 대비하고 있습니다.",
+      "wave": "{total}차 중 {wave}차 공세 격퇴!",
+      "won": "진지를 지켰습니다. 잘 싸웠습니다.",
+      "lost": "수비대가 쓰러졌습니다. 전열을 가다듬으십시오."
+    },
+    "escort": {
+      "start": "호위가 출발했습니다. 가까이 붙으십시오.",
+      "failed": "호위 대상이 쓰러졌습니다. 길이 또 한 명을 데려갔습니다.",
+      "done": "무사히 도착했습니다. 호위 대상이 감사를 전합니다."
+    },
     "envoys": {
       "title": "사절의 전당",
       "prompt": "진영과, 함께 설 종족을 선택하십시오.",
@@ -7153,6 +7164,9 @@ export const ko_KR: EnTranslations = {
       "thornfen_creeper": {
         "name": "Thornfen Creeper"
       },
+      "palisade_warden": {
+        "name": "Warden Ilyen"
+      },
       "thornwarped_stag": {
         "name": "Thorn-Warped Stag"
       },
@@ -8593,6 +8607,16 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_thornfen_palisade_defense": {
+        "title": "Hold the Palisade",
+        "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "objectives": {
+          "0": {
+            "label": "Waves repelled beside Warden Ilyen"
+          }
+        }
+      },
       "q_dune_prowlers": {
         "title": "The Road Bleeds",
         "text": "The prowler packs have learned the caravan bell means food, {playerName}. Every wagon we lose feeds them and starves Qesh Aram. Thin the packs on the dunes flanking the south road: twelve, to start.",
@@ -9653,6 +9677,15 @@ export const ko_KR: EnTranslations = {
           },
           "9": {
             "label": "The Last Lodge"
+          },
+          "10": {
+            "label": "Mothfall Verge"
+          },
+          "11": {
+            "label": "The Greyweir"
+          },
+          "12": {
+            "label": "The Longwatch"
           }
         }
       },
@@ -9686,6 +9719,12 @@ export const ko_KR: EnTranslations = {
           },
           "8": {
             "label": "Frosthelm Ascent"
+          },
+          "9": {
+            "label": "Fort Ledgerwatch"
+          },
+          "10": {
+            "label": "Rimeshaft Camp"
           }
         }
       },

@@ -319,6 +319,17 @@ export const ja_JP: EnTranslations = {
       "returnBodyTouch": "依頼は完了しました。レッドブルック元帥のもとへ戻り、「使用」ボタンをタップして納品しましょう。",
       "doneBodyTouch": "基本は覚えましたね、{name}。イーストブルック渓谷はあなたのもの、自由に探索しましょう。いつでも「その他」から「クエストログ」をタップしてクエストログを確認できます。よい狩りを！"
     },
+    "defense": {
+      "start": "戦線を守れ！守り手が構えている。",
+      "wave": "第{wave}波を撃退（全{total}波）！",
+      "won": "陣地は守られた。見事な戦いだ。",
+      "lost": "守り手が倒れた。態勢を立て直せ。"
+    },
+    "escort": {
+      "start": "護衛が出発した。離れるな。",
+      "failed": "護衛対象が倒れた。道はまた一人を奪った。",
+      "done": "無事に到着した。護衛対象が感謝している。"
+    },
     "envoys": {
       "title": "使節の広間",
       "prompt": "陣営と、共に立つ民を選べ。",
@@ -7153,6 +7164,9 @@ export const ja_JP: EnTranslations = {
       "thornfen_creeper": {
         "name": "Thornfen Creeper"
       },
+      "palisade_warden": {
+        "name": "Warden Ilyen"
+      },
       "thornwarped_stag": {
         "name": "Thorn-Warped Stag"
       },
@@ -8593,6 +8607,16 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_thornfen_palisade_defense": {
+        "title": "Hold the Palisade",
+        "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "objectives": {
+          "0": {
+            "label": "Waves repelled beside Warden Ilyen"
+          }
+        }
+      },
       "q_dune_prowlers": {
         "title": "The Road Bleeds",
         "text": "The prowler packs have learned the caravan bell means food, {playerName}. Every wagon we lose feeds them and starves Qesh Aram. Thin the packs on the dunes flanking the south road: twelve, to start.",
@@ -9653,6 +9677,15 @@ export const ja_JP: EnTranslations = {
           },
           "9": {
             "label": "The Last Lodge"
+          },
+          "10": {
+            "label": "Mothfall Verge"
+          },
+          "11": {
+            "label": "The Greyweir"
+          },
+          "12": {
+            "label": "The Longwatch"
           }
         }
       },
@@ -9686,6 +9719,12 @@ export const ja_JP: EnTranslations = {
           },
           "8": {
             "label": "Frosthelm Ascent"
+          },
+          "9": {
+            "label": "Fort Ledgerwatch"
+          },
+          "10": {
+            "label": "Rimeshaft Camp"
           }
         }
       },

@@ -191,6 +191,7 @@ function makeCtx() {
     playerMods: vi.fn(),
     setPlayerRace: vi.fn(() => true),
     allyDirectives: new Map(),
+    defenseEvents: new Map(),
     updateWorldAlly: vi.fn(),
     onAllyDeath: vi.fn(),
     delveRunForPlayer: vi.fn(() => null),

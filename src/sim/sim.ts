@@ -139,6 +139,7 @@ import {
 } from './entity_roster';
 import * as envoys from './envoys';
 import { canEquipItem } from './equipment_rules';
+import * as defense from './events/defense';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
@@ -1045,6 +1046,8 @@ export class Sim {
   // Ally substrate (src/sim/ally.ts): per-ally behavior directives, exposed to
   // the event modules as a live ctx view.
   private allyDirectives = new Map<number, AllyDirective>();
+  // Defense events (src/sim/events/defense.ts): per-site machines.
+  private defenseEvents = new Map<string, defense.DefenseEventState>();
   private groundAoEs: GroundAoE[] = [];
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity
@@ -1204,6 +1207,9 @@ export class Sim {
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx);
+    // Defense sites plant their defender allies here, in the documented
+    // rng-free ctor slot (NPC-style spawns draw nothing).
+    defense.spawnDefenseSites(this.ctx);
 
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
@@ -2309,6 +2315,9 @@ export class Sim {
       get allyDirectives() {
         return sim.allyDirectives;
       },
+      get defenseEvents() {
+        return sim.defenseEvents;
+      },
       get pendingMobRespawns() {
         return sim.pendingMobRespawns;
       },
@@ -2885,6 +2894,7 @@ export class Sim {
     this.updateLootRolls();
     this.updateInstances();
     this.updateDelveRuns();
+    defense.updateDefenseEvents(this.ctx);
     this.market.update();
     this.postOffice.update();
     drainDelayedEvents(this.ctx);
@@ -5082,9 +5092,9 @@ export class Sim {
 
   /** Ally-death fan-out (src/sim/ally.ts): the owning event modules (defense
    *  sites, escorts) hook their failure paths here as they land. */
-  private onAllyDeath(_ally: Entity): void {
-    // No standing event systems yet: the substrate parks the corpse and the
-    // future defense/escort modules take over from this hook.
+  private onAllyDeath(ally: Entity): void {
+    // Fan out to every event system holding allies (append as they land).
+    defense.onAllyDeathForDefense(this.ctx, ally);
   }
 
   private isQuestInteractionEntity(e: Entity): boolean {
@@ -5098,6 +5108,9 @@ export class Sim {
     const { meta } = r;
     const npc = this.entities.get(npcId);
     if (!npc || !this.isQuestInteractionEntity(npc)) return;
+    // Defense sites: talking to the site NPC with the linked quest active arms
+    // the waves (src/sim/events/defense.ts) and consumes the interaction.
+    if (defense.tryStartSiteEvent(this.ctx, npc, meta)) return;
     if (this.interactNpcForQuests(npc, meta)) return;
     for (const qid of npc.questIds) {
       const quest = QUESTS[qid];

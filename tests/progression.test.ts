@@ -7,6 +7,7 @@ import {
   ABILITIES,
   CAMPS,
   CLASSES,
+  DEFENSE_SITES,
   DUNGEON_LIST,
   GROUND_OBJECTS,
   ITEMS,
@@ -46,6 +47,25 @@ describe('content referential integrity', () => {
         }
         if (obj.type === 'collect' && (!obj.itemId || !ITEMS[obj.itemId])) {
           problems.push(`${q.id}: collect item ${obj.itemId} missing`);
+        }
+        if (obj.type === 'defend') {
+          const site = obj.siteId ? DEFENSE_SITES[obj.siteId] : undefined;
+          if (!site) problems.push(`${q.id}: defend site ${obj.siteId} missing`);
+          else {
+            if (obj.count !== site.waves.length)
+              problems.push(`${q.id}: defend count ${obj.count} != ${site.waves.length} waves`);
+            if (site.questId !== q.id || q.objectives[site.objectiveIndex] !== obj)
+              problems.push(`${q.id}: defend site ${site.id} backrefs do not round-trip`);
+            if (!NPCS[site.npcId]) problems.push(`${site.id}: npc ${site.npcId} missing`);
+            const allyTpl = MOBS[site.allyTemplateId];
+            if (!allyTpl?.allyOfPlayers)
+              problems.push(`${site.id}: ally ${site.allyTemplateId} missing or not allyOfPlayers`);
+            for (const w of site.waves) {
+              for (const sp of w.spawns) {
+                if (!MOBS[sp.mobId]) problems.push(`${site.id}: wave mob ${sp.mobId} missing`);
+              }
+            }
+          }
         }
       }
     }

@@ -319,6 +319,17 @@ export const zh_TW: EnTranslations = {
       "returnBodyTouch": "任務已完成。返回雷德布魯克元帥處並點按「使用」按鈕繳交任務。",
       "doneBodyTouch": "你已掌握基礎，{name}。東溪谷任你探索。點按「更多」再選「任務日誌」即可隨時查看任務。祝你狩獵順利。"
     },
+    "defense": {
+      "start": "守住陣線！守衛者嚴陣以待。",
+      "wave": "已擊退第{wave}波，共{total}波！",
+      "won": "陣地守住了。打得漂亮。",
+      "lost": "守衛者倒下了。重整旗鼓再來。"
+    },
+    "escort": {
+      "start": "護送啟程。跟緊了。",
+      "failed": "你護送的人倒下了。這條路又奪走一人。",
+      "done": "平安抵達。被護送者向你致謝。"
+    },
     "envoys": {
       "title": "使節大廳",
       "prompt": "選擇你的陣營，以及你將與之並肩的種族。",
@@ -7153,6 +7164,9 @@ export const zh_TW: EnTranslations = {
       "thornfen_creeper": {
         "name": "Thornfen Creeper"
       },
+      "palisade_warden": {
+        "name": "Warden Ilyen"
+      },
       "thornwarped_stag": {
         "name": "Thorn-Warped Stag"
       },
@@ -8593,6 +8607,16 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_thornfen_palisade_defense": {
+        "title": "Hold the Palisade",
+        "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "objectives": {
+          "0": {
+            "label": "Waves repelled beside Warden Ilyen"
+          }
+        }
+      },
       "q_dune_prowlers": {
         "title": "The Road Bleeds",
         "text": "The prowler packs have learned the caravan bell means food, {playerName}. Every wagon we lose feeds them and starves Qesh Aram. Thin the packs on the dunes flanking the south road: twelve, to start.",
@@ -9653,6 +9677,15 @@ export const zh_TW: EnTranslations = {
           },
           "9": {
             "label": "The Last Lodge"
+          },
+          "10": {
+            "label": "Mothfall Verge"
+          },
+          "11": {
+            "label": "The Greyweir"
+          },
+          "12": {
+            "label": "The Longwatch"
           }
         }
       },
@@ -9686,6 +9719,12 @@ export const zh_TW: EnTranslations = {
           },
           "8": {
             "label": "Frosthelm Ascent"
+          },
+          "9": {
+            "label": "Fort Ledgerwatch"
+          },
+          "10": {
+            "label": "Rimeshaft Camp"
           }
         }
       },

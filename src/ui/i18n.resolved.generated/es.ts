@@ -319,6 +319,17 @@ export const es: EnTranslations = {
       "returnBodyTouch": "Tu tarea está hecha. Vuelve con el mariscal Redbrook y toca el botón Usar para entregarla.",
       "doneBodyTouch": "Ya dominas lo básico, {name}. El Valle es tuyo para explorar: toca Más y luego Diario de misiones para revisar tu diario de misiones en cualquier momento. ¡Buena caza!"
     },
+    "defense": {
+      "start": "Hold the line! The defenders brace for the assault.",
+      "wave": "Wave {wave} of {total} repelled!",
+      "won": "The position holds. Well fought.",
+      "lost": "The defenders have fallen. Regroup and try again."
+    },
+    "escort": {
+      "start": "The escort sets out. Stay close.",
+      "failed": "Your charge has fallen. The road claims another.",
+      "done": "Safe arrival. The escort thanks you."
+    },
     "envoys": {
       "title": "The Envoys Hall",
       "prompt": "Choose your faction, and the people you will stand among.",
@@ -7153,6 +7164,9 @@ export const es: EnTranslations = {
       "thornfen_creeper": {
         "name": "Reptadora del Pantano Espinoso"
       },
+      "palisade_warden": {
+        "name": "Warden Ilyen"
+      },
       "thornwarped_stag": {
         "name": "Ciervo deformado por espinas"
       },
@@ -8593,6 +8607,16 @@ export const es: EnTranslations = {
           }
         }
       },
+      "q_thornfen_palisade_defense": {
+        "title": "Hold the Palisade",
+        "text": "The thornwood tests our stakes every dusk, {playerName}, and Warden Ilyen holds the line alone. Stand with him when I sound the call: three pushes, and the wood learns its lesson for a while.",
+        "completion": "Three pushes broken and the Warden still standing. The wood will sulk for a night or two. Well fought, {className}.",
+        "objectives": {
+          "0": {
+            "label": "Waves repelled beside Warden Ilyen"
+          }
+        }
+      },
       "q_dune_prowlers": {
         "title": "El camino sangra",
         "text": "Las manadas de merodeadores han aprendido que la campana de las caravanas significa comida, {playerName}. Cada carro que perdemos las alimenta a ellas y mata de hambre a Qesh Aram. Reduce las manadas en las dunas que flanquean el camino del sur: doce, para empezar.",
@@ -9653,6 +9677,15 @@ export const es: EnTranslations = {
           },
           "9": {
             "label": "El Último Refugio"
+          },
+          "10": {
+            "label": "Mothfall Verge"
+          },
+          "11": {
+            "label": "The Greyweir"
+          },
+          "12": {
+            "label": "The Longwatch"
           }
         }
       },
@@ -9686,6 +9719,12 @@ export const es: EnTranslations = {
           },
           "8": {
             "label": "Ascenso de Yelmo de Escarcha"
+          },
+          "9": {
+            "label": "Fort Ledgerwatch"
+          },
+          "10": {
+            "label": "Rimeshaft Camp"
           }
         }
       },

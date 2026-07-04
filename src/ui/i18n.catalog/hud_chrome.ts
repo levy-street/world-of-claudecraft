@@ -254,6 +254,19 @@ export const hudChromeStrings = {
   // The world-map atlas levels (the WoW-style zoom-out views painted from the
   // Valdris cartography): level titles, the two group-region names, the level
   // band chip, and the navigation hints (map_atlas_painter.ts).
+  // Defense events + escorts (src/sim/events/): the top banners; the quest
+  // tracker itself carries the objective counts.
+  defense: {
+    start: 'Hold the line! The defenders brace for the assault.',
+    wave: 'Wave {wave} of {total} repelled!',
+    won: 'The position holds. Well fought.',
+    lost: 'The defenders have fallen. Regroup and try again.',
+  },
+  escort: {
+    start: 'The escort sets out. Stay close.',
+    failed: 'Your charge has fallen. The road claims another.',
+    done: 'Safe arrival. The escort thanks you.',
+  },
   // The Envoys' Hall: the faction-and-race oath window and the ferry confirms
   // (src/ui/faction_choice_window.ts + hud.ts openEnvoyDialog/confirmTravel).
   envoys: {
