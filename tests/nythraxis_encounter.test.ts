@@ -88,7 +88,7 @@ describe('Nythraxis encounter module (N1)', () => {
     const wards = [...ctx.entities.values()].filter(
       (e) =>
         e.kind === 'object' &&
-        e.objectItemId === 'bastion_ward_stone' &&
+        e.objectItemId === 'nythraxis_wardstone' &&
         dist2d(e.pos, boss.spawnPos) < 100,
     );
     expect(wards.length).toBe(3);
@@ -123,7 +123,7 @@ describe('Nythraxis encounter module (N1)', () => {
       .filter(
         (e) =>
           e.kind === 'object' &&
-          e.objectItemId === 'bastion_ward_stone' &&
+          e.objectItemId === 'nythraxis_wardstone' &&
           dist2d(e.pos, boss.spawnPos) < 100,
       )
       .sort((a, b) => a.id - b.id) as AnyEntity[];
@@ -145,8 +145,9 @@ describe('Nythraxis encounter module (N1)', () => {
 
   it('a wardstone with no boss in range falls through (overworld Sunken Bastion stone)', () => {
     const { ctx, dps } = setup();
-    // A lone ward stone far from any Nythraxis boss: tryStart must return false so the
-    // normal quest pickup runs (same objectItemId, not a raid wardstone).
+    // A lone overworld Sunken Bastion quest ward stone (objectItemId
+    // 'bastion_ward_stone', distinct from the raid's 'nythraxis_wardstone'):
+    // tryStart must return false via the id-mismatch guard so normal quest pickup runs.
     const lone = {
       kind: 'object',
       objectItemId: 'bastion_ward_stone',

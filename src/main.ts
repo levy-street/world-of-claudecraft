@@ -99,6 +99,7 @@ import { ABILITIES, CLASSES } from './sim/content/classes';
 import { ITEMS, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
+import { questObjectVisibleTo } from './sim/quest_object_visibility';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
@@ -1729,7 +1730,15 @@ async function startGame(
           bestDelve = e.id;
           bestDelveD = d;
         }
-      } else if (e.kind === 'object' && e.lootable && d < bestObjD) {
+      } else if (
+        e.kind === 'object' &&
+        e.lootable &&
+        questObjectVisibleTo(world.questLog, e) &&
+        d < bestObjD
+      ) {
+        // Mirror the sim/server gate: a ground quest object the local player is
+        // not on is invisible (no mesh, Task 4), so the F-key must not select it
+        // and emit pickUpObject's deny toast that would name the hidden object.
         bestObj = e.id;
         bestObjD = d;
       }

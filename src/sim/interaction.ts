@@ -37,6 +37,7 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import { questObjectVisibleTo } from './quest_object_visibility';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, OBJECT_RESPAWN } from './types';
 import { markWorldBossLooted } from './world_boss';
@@ -216,7 +217,7 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void
 export function interact(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
-  const p = r.e;
+  const { meta, e: p } = r;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
@@ -238,6 +239,7 @@ export function interact(ctx: SimContext, pid?: number): void {
           return;
         }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
+        if (!questObjectVisibleTo(meta.questLog, target)) return;
         pickUpObject(ctx, target.id, p.id);
         return;
       }
@@ -258,7 +260,12 @@ export function interact(ctx: SimContext, pid?: number): void {
       bestCorpse = e;
       bestCorpseD2 = d2;
     }
-    if (e.kind === 'object' && e.lootable && d2 < bestObjD2) {
+    if (
+      e.kind === 'object' &&
+      e.lootable &&
+      questObjectVisibleTo(meta.questLog, e) &&
+      d2 < bestObjD2
+    ) {
       bestObj = e;
       bestObjD2 = d2;
     }

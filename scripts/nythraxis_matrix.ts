@@ -1243,7 +1243,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
         .filter(
           (e) =>
             e.kind === 'object' &&
-            e.objectItemId === 'bastion_ward_stone' &&
+            e.objectItemId === 'nythraxis_wardstone' &&
             dist2d(e.pos, boss.spawnPos) < 140,
         )
         .sort((a, b) => a.id - b.id);

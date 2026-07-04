@@ -2798,7 +2798,7 @@ function nythraxisFullPull(): Scenario {
         [...sim.entities.values()].filter(
           (e: AnyEntity) =>
             e.kind === 'object' &&
-            e.objectItemId === 'bastion_ward_stone' &&
+            e.objectItemId === 'nythraxis_wardstone' &&
             dist2d(e.pos, boss.spawnPos) < 100,
         ) as AnyEntity[]
       ).sort((a, b) => a.id - b.id);

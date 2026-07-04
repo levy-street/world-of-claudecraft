@@ -601,7 +601,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "es_ES": [
     "auth.email",
@@ -1195,7 +1196,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "fr_FR": [
     "auth.email",
@@ -1802,7 +1804,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "fr_CA": [
     "auth.email",
@@ -2409,7 +2412,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "en_CA": [],
   "it_IT": [
@@ -3017,7 +3021,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "de_DE": [
     "auth.email",
@@ -3624,7 +3629,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "zh_CN": [
     "auth.emailPlaceholder",
@@ -4295,7 +4301,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "ru_RU": [
     "auth.emailPlaceholder",
@@ -4923,7 +4930,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "pl_PL": [
     "auth.email",
@@ -5535,7 +5543,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "id_ID": [
     "auth.email",
@@ -6147,7 +6156,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "tr_TR": [
     "auth.email",
@@ -6759,7 +6769,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "sv_SE": [
     "auth.email",
@@ -7371,7 +7382,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "vi_VN": [
     "auth.email",
@@ -7983,7 +7995,8 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ],
   "da_DK": [
     "auth.email",
@@ -8595,6 +8608,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.delveRiteShrineCandleInteract",
     "worldContent.delveRiteShrineReedInteract",
     "worldContent.delveRiteShrineSkullInteract",
-    "worldContent.mailboxName"
+    "worldContent.mailboxName",
+    "worldContent.nythraxisWardstoneName"
   ]
 };

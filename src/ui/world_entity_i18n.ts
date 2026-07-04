@@ -264,6 +264,7 @@ type WorldEntityTranslations = {
     delveRiteShrineReedInteract: string;
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
+    nythraxisWardstoneName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -377,6 +378,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineReedInteract: 'Reed Shrine: Press F to touch it',
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
+      nythraxisWardstoneName: 'Soul Wardstone',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };
