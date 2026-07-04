@@ -1625,6 +1625,10 @@ export const da_DK: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Bæster",
         "desc": "Vilde dyr fra skov og mark, fra ulve og vildsvin til de ting, der jager dem. Jægere kan tæmme mange af dem."
@@ -1850,6 +1854,8 @@ export const da_DK: EnTranslations = {
     },
     "viewer": {
       "view3d": "Se {name} i 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Se i 3D",
       "loading": "Indlæser model...",
       "error": "3D-modellen kunne ikke indlæses. Illustrationen ovenfor viser stadig denne {name}.",

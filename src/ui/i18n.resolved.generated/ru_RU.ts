@@ -1625,6 +1625,10 @@ export const ru_RU: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Звери",
         "desc": "Дикие животные лесов и полей, от волков и вепрей до тех, кто на них охотится. Многих из них могут приручить охотники."
@@ -1850,6 +1854,8 @@ export const ru_RU: EnTranslations = {
     },
     "viewer": {
       "view3d": "Посмотреть {name} в 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Посмотреть в 3D",
       "loading": "Загрузка модели...",
       "error": "Не удалось загрузить 3D-модель. Изображение выше всё ещё показывает этого: {name}.",

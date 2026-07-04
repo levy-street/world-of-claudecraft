@@ -807,6 +807,37 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2,
   },
+  // Tripo lote 3 (open-zone stock-body regen): bespoke shared bodies for the
+  // templates that still rendered with launch-zone stock meshes in the open
+  // Valdris zones (ossara/veth/kael/contested_south). One body per silhouette
+  // group; per-template MobTemplate.color tints differentiate siblings.
+  mob_valdris_shade: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
+    url: `${CREATURES}/mob_valdris_shade.glb`,
+    height: 1.9,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  mob_brine_skeleton: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
+    url: `${CREATURES}/mob_brine_skeleton.glb`,
+    height: 2.5,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  mob_valdris_raider: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
+    url: `${CREATURES}/mob_valdris_raider.glb`,
+    height: HUMANOID_H,
+    clips: TRIPO8,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
   // the two blob-head monsters (Orc_Blob / Yeti_Blob): gnashing horrors
   mob_maw: {
     url: `${CREATURES}/orcenemy.glb`,
@@ -1377,8 +1408,8 @@ const MOB_KEYS: Record<string, string> = {
   ridge_shrieker: 'mob_demon_flying',
   thornwarped_stag: 'mob_stag',
   bridge_cultist: 'mob_dark_caster',
-  riverbank_revenant: 'skel_warrior',
-  the_bridgekeeper: 'skel_boss',
+  riverbank_revenant: 'mob_brine_skeleton',
+  the_bridgekeeper: 'mob_brine_skeleton',
   deserter_king: 'skel_boss',
   ember_revenant: 'skel_warrior',
   burnfield_revenant: 'skel_warrior',
@@ -1391,7 +1422,7 @@ const MOB_KEYS: Record<string, string> = {
   // breach brutes: the scavenger keeps its ogre-family giant; the human
   // brutes take the barbarian bruiser with their own tints
   butcher_vhorlan: 'mob_bruiser',
-  warlord_skarn: 'mob_bruiser',
+  warlord_skarn: 'mob_valdris_raider',
   // gnashing blob-head horrors: the two unused monster heads
   breach_horror: 'mob_maw',
   pale_gnawer: 'mob_gnawer',
@@ -1401,9 +1432,9 @@ const MOB_KEYS: Record<string, string> = {
   deserter_wraith: 'mob_ghost',
   hollow_revenant: 'mob_twilight_revenant',
   ash_wraith: 'mob_ghost',
-  sandbound_shade: 'mob_ghost',
-  pale_watcher: 'mob_ghost',
-  feral_wisp: 'mob_ghost',
+  sandbound_shade: 'mob_valdris_shade',
+  pale_watcher: 'mob_valdris_shade',
+  feral_wisp: 'mob_valdris_shade',
   // briar horrors and the Not-Quite-Man: the floating masked totem-spirit
   briar_horror: 'mob_tribal',
   briarfather_yew: 'mob_tribal',
@@ -1428,11 +1459,16 @@ const MOB_KEYS: Record<string, string> = {
   commander_vaelis: 'mob_commander_vaelis',
   veykar_the_forsworn: 'mob_veykar',
   broken_legion_arbalist: 'mob_arbalist',
-  pass_raider: 'mob_bruiser',
+  pass_raider: 'mob_valdris_raider',
   scavenger_king: 'mob_bruiser',
   // split the shoreline skeletons off the warrior-revenant body
   ash_ghoul: 'skel_rogue',
-  gullpicked_skeleton: 'skel_minion',
+  gullpicked_skeleton: 'mob_brine_skeleton',
+  // Tripo lote 3: open-zone templates that previously fell back to a family
+  // stock body and had no MOB_KEYS row.
+  blackmere_drowned: 'mob_brine_skeleton',
+  underway_renegade: 'mob_valdris_raider',
+  vask_smuggler_king: 'mob_valdris_raider',
 };
 
 const FAMILY_KEYS: Record<string, string> = {

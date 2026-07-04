@@ -1625,6 +1625,10 @@ export const pt_BR: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Feras",
         "desc": "Animais selvagens de floresta e campo, de lobos e javalis às coisas que os caçam. Caçadores podem domar muitos deles."
@@ -1850,6 +1854,8 @@ export const pt_BR: EnTranslations = {
     },
     "viewer": {
       "view3d": "Ver {name} em 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Ver em 3D",
       "loading": "Carregando modelo...",
       "error": "O modelo 3D não pôde ser carregado. A arte acima ainda mostra este {name}.",

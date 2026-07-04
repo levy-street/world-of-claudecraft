@@ -1625,6 +1625,10 @@ export const vi_VN: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Mãnh Thú",
         "desc": "Thú hoang của rừng và đồng, từ sói và lợn lòi đến những kẻ săn mồi chúng. Thợ Săn có thể thuần hóa nhiều trong số chúng."
@@ -1850,6 +1854,8 @@ export const vi_VN: EnTranslations = {
     },
     "viewer": {
       "view3d": "Xem {name} ở dạng 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Xem ở dạng 3D",
       "loading": "Đang tải mô hình...",
       "error": "Không thể tải mô hình 3D. Hình minh họa phía trên vẫn cho thấy {name} này.",

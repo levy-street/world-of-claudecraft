@@ -1625,6 +1625,10 @@ export const fr_FR: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Bêtes",
         "desc": "Animaux sauvages des forêts et des champs, des loups et des sangliers aux créatures qui les chassent. Les Chasseurs peuvent en apprivoiser beaucoup."
@@ -1850,6 +1854,8 @@ export const fr_FR: EnTranslations = {
     },
     "viewer": {
       "view3d": "Voir {name} en 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Voir en 3D",
       "loading": "Chargement du modèle...",
       "error": "Le modèle 3D n'a pas pu être chargé. L'illustration ci-dessus montre quand même ce {name}.",

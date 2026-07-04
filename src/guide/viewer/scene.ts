@@ -29,6 +29,7 @@ export class ModelViewer {
   private readonly teardown: Array<() => void> = [];
 
   private built: Awaited<ReturnType<typeof buildModel>> | null = null;
+  private reference: Awaited<ReturnType<typeof buildModel>> | null = null;
   /** Posed bounds of the current model, for re-framing on aspect change without re-measuring. */
   private posedBounds: Bounds3 | null = null;
   private raf: number | null = null;
@@ -129,6 +130,11 @@ export class ModelViewer {
       this.built = null;
       this.posedBounds = null;
     }
+    if (this.reference) {
+      this.turntable.remove(this.reference.root);
+      this.reference.dispose();
+      this.reference = null;
+    }
     this.turntable.rotation.y = 0;
     const built = await buildModel(spec, tint);
     // Evicted/destroyed while the GLB was in flight: drop the just-built model (its tint
@@ -143,6 +149,45 @@ export class ModelViewer {
     this.turntable.add(this.built.root);
     this.frameToPosedBounds();
     if (this.raf === null) this.animate();
+  }
+
+  /** Clip names of the loaded model (empty until load resolves). */
+  clipNames(): string[] {
+    return this.built?.clipNames ?? [];
+  }
+
+  /** Play a specific clip on the loaded model (and keep the reference on idle). */
+  setClip(name: string): void {
+    this.built?.setClip(name);
+  }
+
+  /** Show or hide a size-reference model beside the subject (a player-height
+   *  silhouette), so generated bodies can be eyeballed against the game scale.
+   *  The reference shares the turntable and the posed-bounds framing. */
+  async setReference(spec: GuideModelSpec | null, tint: number | null): Promise<void> {
+    if (this.reference) {
+      this.turntable.remove(this.reference.root);
+      this.reference.dispose();
+      this.reference = null;
+    }
+    if (!spec) {
+      this.frameToPosedBounds();
+      return;
+    }
+    const ref = await buildModel(spec, tint);
+    if (this.destroyed || !this.built) {
+      ref.dispose();
+      return;
+    }
+    this.reference = ref;
+    // stand shoulder to shoulder: offset by both posed half-widths plus a gap
+    const subject = skinAwareBounds(this.built.root);
+    const own = skinAwareBounds(ref.root);
+    const dx = (subject.max.x - subject.min.x) / 2 + (own.max.x - own.min.x) / 2 + 0.35;
+    ref.root.position.x +=
+      subject.getCenter(new THREE.Vector3()).x + dx - own.getCenter(new THREE.Vector3()).x;
+    this.turntable.add(ref.root);
+    this.frameToPosedBounds();
   }
 
   /** Pause rendering while the viewer is scrolled offscreen (saves battery/GPU). */
@@ -162,6 +207,7 @@ export class ModelViewer {
   private frameToPosedBounds(): void {
     if (!this.built) return;
     const built = this.built;
+    // (the reference, when present, is included via the union below)
 
     // Disable frustum culling: three culls a SkinnedMesh by its BIND-pose bounding sphere,
     // which for a flung rig sits off the posed mesh and would blank it even when framed.
@@ -185,6 +231,13 @@ export class ModelViewer {
     built.mixer?.update(POSE_TIME);
     this.scene.updateMatrixWorld(true);
     const posed = skinAwareBounds(built.root);
+    if (this.reference) {
+      this.reference.root.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.isMesh) m.frustumCulled = false;
+      });
+      posed.union(skinAwareBounds(this.reference.root));
+    }
 
     // Degenerate bound (no drawable vertices): fall back to the bind sphere at the origin.
     const bounds = posed.isEmpty()
@@ -296,6 +349,7 @@ export class ModelViewer {
     const dt = Math.min(this.clock.getDelta(), 0.1);
     if (!this.reduceMotion.matches && !this.dragging) this.rotateBy(AUTO_SPIN * dt);
     this.built?.mixer?.update(dt);
+    this.reference?.mixer?.update(dt);
     if (this.onscreen) this.renderer.render(this.scene, this.camera);
   };
 
@@ -314,6 +368,7 @@ export class ModelViewer {
     if (this.built) {
       this.turntable.remove(this.built.root);
       this.built.dispose();
+      this.reference?.dispose();
       this.built = null;
     }
     // forceContextLoss() hands the GL context back immediately; dispose() alone only frees

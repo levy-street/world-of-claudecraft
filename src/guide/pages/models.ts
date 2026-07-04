@@ -14,6 +14,7 @@ import {
 } from '../content.generated';
 import { hrefFor } from '../routes';
 import { createViewer, hasWebGL, type ModelViewer } from '../viewer';
+import { wireInspector } from '../viewer/mount';
 import type { GuidePage } from './types';
 import { lead, related } from './ui';
 
@@ -247,6 +248,8 @@ export const models: GuidePage = {
           // Keep the still up if the context died mid-load: load() resolves over a dead
           // context but renders nothing, so hiding the poster would blank the stage.
           hidePoster();
+          const holder = stage.parentElement ?? stage;
+          wireInspector(holder, stage, viewer);
         }
       } catch (err) {
         // eslint-disable-next-line no-console

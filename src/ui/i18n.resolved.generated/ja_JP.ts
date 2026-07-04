@@ -1625,6 +1625,10 @@ export const ja_JP: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "ビースト",
         "desc": "森や野に生きる野生動物たち。オオカミやイノシシから、それらを狙う捕食者まで。ハンターはその多くをテイムできます。"
@@ -1850,6 +1854,8 @@ export const ja_JP: EnTranslations = {
     },
     "viewer": {
       "view3d": "{name}を3Dで見る",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "3Dで見る",
       "loading": "モデルを読み込み中...",
       "error": "3Dモデルを読み込めませんでした。上のアートでは、この{name}が今も表示されています。",

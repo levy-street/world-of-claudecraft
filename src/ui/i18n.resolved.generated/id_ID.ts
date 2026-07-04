@@ -1625,6 +1625,10 @@ export const id_ID: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Binatang Buas",
         "desc": "Hewan liar hutan dan padang, dari serigala dan babi hutan hingga makhluk yang memangsa mereka. Pemburu bisa menjinakkan banyak di antaranya."
@@ -1850,6 +1854,8 @@ export const id_ID: EnTranslations = {
     },
     "viewer": {
       "view3d": "Lihat {name} dalam 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Lihat dalam 3D",
       "loading": "Memuat model...",
       "error": "Model 3D tidak dapat dimuat. Gambar di atas tetap menampilkan {name} ini.",

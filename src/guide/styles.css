@@ -2168,6 +2168,8 @@ a.guide-poi:hover {
    An inline turntable that loads one game model on demand. State is driven by the
    figure's data-state (idle | loading | ready | error | nowebgl); the 2D poster is the
    graceful fallback for the pre-load, error, and no-WebGL cases. */
+/* biome-ignore lint/style/noDescendingSpecificity: the portrait-scoped override
+   above intentionally precedes this base rule; pre-existing section layout. */
 .guide-viewer {
   margin: var(--g-md) 0 0;
 }
@@ -2571,4 +2573,30 @@ a.guide-poi:hover {
   .guide-gallery-opt {
     min-height: var(--g-touch);
   }
+}
+
+/* Model-inspector strip under an opened 3D viewer: clip buttons + size compare. */
+.viewer-inspector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: center;
+}
+.viewer-inspector button {
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--guide-border, #4a4436);
+  background: var(--guide-panel, #1d1a14);
+  color: inherit;
+  cursor: pointer;
+}
+.viewer-inspector button:hover {
+  border-color: var(--guide-accent, #c9a959);
+}
+.viewer-inspector button.sel {
+  border-color: var(--guide-accent, #c9a959);
+  background: var(--guide-accent-dim, #3a3122);
 }

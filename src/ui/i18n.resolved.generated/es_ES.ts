@@ -1625,6 +1625,10 @@ export const es_ES: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Bestias",
         "desc": "Animales salvajes del bosque y el campo, desde lobos y jabalíes hasta las criaturas que les dan caza. Los Cazadores pueden domesticar a muchos de ellos."
@@ -1850,6 +1854,8 @@ export const es_ES: EnTranslations = {
     },
     "viewer": {
       "view3d": "Ver {name} en 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Ver en 3D",
       "loading": "Cargando modelo...",
       "error": "No se pudo cargar el modelo 3D. El arte de arriba sigue mostrando este {name}.",

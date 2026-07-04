@@ -35,6 +35,48 @@ export async function createViewer(stage: HTMLElement, canvasLabel: string): Pro
   return new ModelViewer(stage, canvasLabel);
 }
 
+/** The model-inspector strip under an opened viewer: one button per baked clip
+ *  (labels are the clip identifiers, verbatim by design) plus a size-reference
+ *  toggle that stands a player-height silhouette beside the subject. */
+export function wireInspector(fig: HTMLElement, stage: HTMLElement, viewer: ModelViewer): void {
+  fig.querySelector('.viewer-inspector')?.remove();
+  const clips = viewer.clipNames();
+  const bar = document.createElement('div');
+  bar.className = 'viewer-inspector';
+  if (clips.length > 1) {
+    for (const name of clips) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'viewer-inspector-clip';
+      b.textContent = name; // clip identifier, verbatim by design
+      b.setAttribute('aria-label', t('guide.viewer.playClip', { name }));
+      b.addEventListener('click', () => {
+        viewer.setClip(name);
+        for (const x of bar.querySelectorAll('.viewer-inspector-clip')) x.classList.remove('sel');
+        b.classList.add('sel');
+      });
+      bar.appendChild(b);
+    }
+  }
+  const refSpec = GUIDE_MODELS.player_warrior;
+  if (refSpec) {
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'viewer-inspector-ref';
+    toggle.textContent = t('guide.viewer.compare');
+    toggle.setAttribute('aria-pressed', 'false');
+    let on = false;
+    toggle.addEventListener('click', () => {
+      on = !on;
+      toggle.setAttribute('aria-pressed', String(on));
+      toggle.classList.toggle('sel', on);
+      void viewer.setReference(on ? refSpec : null, null);
+    });
+    bar.appendChild(toggle);
+  }
+  if (bar.childElementCount > 0) stage.insertAdjacentElement('afterend', bar);
+}
+
 interface WireOptions {
   /** Cap on simultaneously-live viewers; opening more evicts the oldest (LRU). Guards the
    *  browser's ~16-context WebGL limit on a long page like the bestiary. */
@@ -151,6 +193,7 @@ export function wireModelViewers(root: HTMLElement, opts: WireOptions = {}): () 
         if (myGen !== loadGen) return;
         fig.dataset.state = 'ready';
         setStatus(''); // hidden on success; clear so the loading message is not left to announce
+        wireInspector(fig, stage, built);
         const v = built;
         io = new IntersectionObserver(
           (entries) => {

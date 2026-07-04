@@ -1625,6 +1625,10 @@ export const zh_TW: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "野獸",
         "desc": "森林與原野中的野生動物，從狼與野豬到捕食牠們的猛獸。獵人能馴服其中許多。"
@@ -1850,6 +1854,8 @@ export const zh_TW: EnTranslations = {
     },
     "viewer": {
       "view3d": "以3D檢視{name}",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "以3D檢視",
       "loading": "正在載入模型...",
       "error": "無法載入此3D模型。上方的圖像仍會顯示這個{name}。",

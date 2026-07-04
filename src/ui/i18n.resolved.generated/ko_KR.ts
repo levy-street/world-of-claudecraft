@@ -1625,6 +1625,10 @@ export const ko_KR: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "야수",
         "desc": "늑대와 멧돼지부터 이들을 노리는 포식자까지, 숲과 들판의 야생 동물들. 사냥꾼은 그중 다수를 길들일 수 있습니다."
@@ -1850,6 +1854,8 @@ export const ko_KR: EnTranslations = {
     },
     "viewer": {
       "view3d": "{name} 3D로 보기",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "3D로 보기",
       "loading": "모델 불러오는 중...",
       "error": "3D 모델을 불러올 수 없습니다. 위의 그림이 여전히 이 {name}을(를) 보여 줍니다.",

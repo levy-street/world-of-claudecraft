@@ -2205,9 +2205,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 34,
         "rare": false,
         "templateId": "pass_raider",
-        "model": "mob_bruiser",
+        "model": "mob_valdris_raider",
         "tint": "#7d5b48",
-        "still": "/guide-stills/mob_bruiser__7d5b48.webp"
+        "still": "/guide-stills/mob_valdris_raider__7d5b48.webp"
       },
       {
         "name": "Underway Renegade",
@@ -2215,9 +2215,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 34,
         "rare": false,
         "templateId": "underway_renegade",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_valdris_raider",
+        "tint": "#6b5a44",
+        "still": "/guide-stills/mob_valdris_raider__6b5a44.webp"
       },
       {
         "name": "Guildless Cutthroat",
@@ -2490,9 +2490,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 28,
         "rare": false,
         "templateId": "sandbound_shade",
-        "model": "mob_ghost",
+        "model": "mob_valdris_shade",
         "tint": "#d8cdb0",
-        "still": "/guide-stills/mob_ghost__d8cdb0.webp"
+        "still": "/guide-stills/mob_valdris_shade__d8cdb0.webp"
       },
       {
         "name": "Blackmere Drowned",
@@ -2500,9 +2500,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 30,
         "rare": false,
         "templateId": "blackmere_drowned",
-        "model": "skel_minion",
+        "model": "mob_brine_skeleton",
         "tint": "#46605a",
-        "still": "/guide-stills/skel_minion__46605a.webp"
+        "still": "/guide-stills/mob_brine_skeleton__46605a.webp"
       },
       {
         "name": "Forsaken Judge",
@@ -2540,9 +2540,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 41,
         "rare": false,
         "templateId": "gullpicked_skeleton",
-        "model": "skel_minion",
+        "model": "mob_brine_skeleton",
         "tint": "#d6d0bd",
-        "still": "/guide-stills/skel_minion__d6d0bd.webp"
+        "still": "/guide-stills/mob_brine_skeleton__d6d0bd.webp"
       },
       {
         "name": "Rubble Haunt",
@@ -2570,9 +2570,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 46,
         "rare": false,
         "templateId": "riverbank_revenant",
-        "model": "skel_warrior",
+        "model": "mob_brine_skeleton",
         "tint": "#7c95a0",
-        "still": "/guide-stills/skel_warrior__7c95a0.webp"
+        "still": "/guide-stills/mob_brine_skeleton__7c95a0.webp"
       },
       {
         "name": "Fog Wraith",
@@ -2645,9 +2645,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 28,
         "rare": false,
         "templateId": "feral_wisp",
-        "model": "mob_ghost",
+        "model": "mob_valdris_shade",
         "tint": "#9fd4e8",
-        "still": "/guide-stills/mob_ghost__9fd4e8.webp"
+        "still": "/guide-stills/mob_valdris_shade__9fd4e8.webp"
       },
       {
         "name": "Temple Sentinel",
@@ -2765,9 +2765,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 50,
         "rare": false,
         "templateId": "pale_watcher",
-        "model": "mob_ghost",
+        "model": "mob_valdris_shade",
         "tint": "#dfe4e8",
-        "still": "/guide-stills/mob_ghost__dfe4e8.webp"
+        "still": "/guide-stills/mob_valdris_shade__dfe4e8.webp"
       },
       {
         "name": "Magma Elemental",
@@ -3164,12 +3164,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "yaw": -1.5707963267948966,
     "tintStrength": 0.25
   },
-  "mob_ghost": {
-    "url": "models/creatures/ghost.glb",
-    "idle": "Flying_Idle",
+  "mob_valdris_shade": {
+    "url": "models/creatures/mob_valdris_shade.glb",
+    "idle": "Idle",
     "height": 1.9,
-    "hover": 0.35,
-    "tintStrength": 0.35
+    "yaw": -1.5707963267948966,
+    "tintStrength": 0.25
   },
   "mob_dust_elemental": {
     "url": "models/creatures/mob_dust_elemental.glb",
@@ -3240,6 +3240,13 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
+  "mob_brine_skeleton": {
+    "url": "models/creatures/mob_brine_skeleton.glb",
+    "idle": "Idle",
+    "height": 2.5,
+    "yaw": -1.5707963267948966,
+    "tintStrength": 0.25
+  },
   "mob_ironhold_burrower": {
     "url": "models/creatures/mob_ironhold_burrower.glb",
     "idle": "Idle",
@@ -3279,6 +3286,13 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.3,
     "tintStrength": 0.35
   },
+  "mob_valdris_raider": {
+    "url": "models/creatures/mob_valdris_raider.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966,
+    "tintStrength": 0.2
+  },
   "mob_gnawer": {
     "url": "models/creatures/yeti.glb",
     "idle": "Idle",
@@ -3298,21 +3312,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "hover": 0.25,
     "tintStrength": 0.35
   },
-  "mob_bruiser": {
-    "url": "models/chars/players/barbarian.glb",
-    "idle": "Idle",
-    "height": 2.6,
-    "show": [
-      "Barbarian_BearHat"
-    ],
-    "attach": [
-      {
-        "url": "models/weapons/axe_2handed.glb",
-        "bone": "handslot.r"
-      }
-    ],
-    "tintStrength": 0.3
-  },
   "mob_ooze": {
     "url": "models/creatures/glubevolved.glb",
     "idle": "Flying_Idle",
@@ -3325,6 +3324,13 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 1.6,
     "tintStrength": 0.3
+  },
+  "mob_ghost": {
+    "url": "models/creatures/ghost.glb",
+    "idle": "Flying_Idle",
+    "height": 1.9,
+    "hover": 0.35,
+    "tintStrength": 0.35
   },
   "mob_demon_flying": {
     "url": "models/creatures/demon.glb",

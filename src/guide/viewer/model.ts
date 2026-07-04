@@ -18,6 +18,10 @@ export interface BuiltModel {
    *  frames by `radius`; we do not scale the rig, which would break skinning). */
   root: THREE.Object3D;
   mixer: THREE.AnimationMixer | null;
+  /** Every clip baked in the GLB, for the animation picker. */
+  clipNames: string[];
+  /** Switch the playing clip by name (no-op on unknown names / clipless props). */
+  setClip: (name: string) => void;
   /** Skin-aware bounding-sphere radius, for camera framing. */
   radius: number;
   /** Skin-aware height (world units), for camera aim. */
@@ -187,6 +191,13 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
   // Idle animation (or the first clip the rig ships).
   let mixer: THREE.AnimationMixer | null = null;
   const clips = gltf.animations ?? [];
+  const setClip = (name: string): void => {
+    if (!mixer) return;
+    const clip = THREE.AnimationClip.findByName(clips, name);
+    if (!clip) return;
+    mixer.stopAllAction();
+    mixer.clipAction(clip).reset().play();
+  };
   if (clips.length > 0) {
     mixer = new THREE.AnimationMixer(model);
     const idle = (spec.idle && THREE.AnimationClip.findByName(clips, spec.idle)) || clips[0];
@@ -214,5 +225,13 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
   // Clamp the framing radius off zero: a degenerate (empty) bound would collapse scene.ts's
   // far plane to <= near (radius 0 -> dist 0) and draw nothing. Real rigs are radius ~1 to 3,
   // so this floor only ever guards the pathological case.
-  return { root, mixer, radius: Math.max(sphere.radius, 0.05), height, dispose };
+  return {
+    root,
+    mixer,
+    clipNames: clips.map((c) => c.name),
+    setClip,
+    radius: Math.max(sphere.radius, 0.05),
+    height,
+    dispose,
+  };
 }

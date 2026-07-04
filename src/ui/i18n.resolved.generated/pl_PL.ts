@@ -1625,6 +1625,10 @@ export const pl_PL: EnTranslations = {
       }
     },
     "family": {
+      "demon": {
+        "name": "Demons",
+        "desc": "Bound horrors of the Breach and the summoning arts. Most serve a warlock master; the free ones serve something worse."
+      },
       "beast": {
         "name": "Bestie",
         "desc": "Dzikie zwierzęta lasu i pola, od wilków i dzików po stworzenia, które na nie polują. Łowcy mogą wiele z nich oswoić."
@@ -1850,6 +1854,8 @@ export const pl_PL: EnTranslations = {
     },
     "viewer": {
       "view3d": "Zobacz {name} w 3D",
+      "playClip": "Play the {name} animation",
+      "compare": "Compare size",
       "view3dShort": "Zobacz w 3D",
       "loading": "Wczytywanie modelu...",
       "error": "Nie udało się wczytać modelu 3D. Grafika powyżej i tak pokazuje tę postać: {name}.",
