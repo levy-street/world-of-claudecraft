@@ -23,6 +23,7 @@
 // sibling targeting module are imported directly (already pure); everything that
 // touches not-yet-extracted Sim state routes through the seam.
 
+import { isWorldAlly } from '../ally';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
@@ -114,6 +115,15 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       return;
     }
     ctx.updatePet(mob);
+    return;
+  }
+
+  // World-owned allies (src/sim/ally.ts) dispatch out BEFORE the hostility
+  // safety net below, exactly like the vision_/bell exemptions: an ally is the
+  // one legitimate owner-less non-hostile mob.
+  if (isWorldAlly(mob)) {
+    if (ctx.isStunned(mob)) return;
+    ctx.updateWorldAlly(mob);
     return;
   }
 

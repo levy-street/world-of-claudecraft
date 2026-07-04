@@ -12,6 +12,7 @@
 // game/net/DOM/Three, no `Math.random`/`Date.now`), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import type { AllyDirective } from './ally';
 import type { TalentModifiers } from './content/talents';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
 import type { PendingLootRoll } from './loot/loot_roll';
@@ -59,6 +60,8 @@ export interface SimContextPrimitives {
   readonly time: number;
   readonly tickCount: number;
   readonly entities: Map<number, Entity>;
+  /** Ally substrate: per-ally behavior directives (src/sim/ally.ts). */
+  readonly allyDirectives: Map<number, AllyDirective>;
   // Live player roster (keyed by entity id). Stays a Sim field; exposed here so the
   // moved party machine (A1) resolves member names/metas through the seam.
   readonly players: Map<number, PlayerMeta>;
@@ -335,6 +338,11 @@ export interface SimContextCallbacks {
   // the creation-time race setter too); the module re-checks the oath rules and
   // calls it to swear. Append-only.
   setPlayerRace(pid: number, race: PlayerRace): boolean;
+  // Ally substrate (src/sim/ally.ts): the per-ally behavior directives live on
+  // Sim as a primitive view; the brain runs from the updateMob dispatch and the
+  // death hook fans out to the owning event modules. Append-only.
+  updateWorldAlly(ally: Entity): void;
+  onAllyDeath(ally: Entity): void;
   delveRunForPlayer(pid: number): DelveRun | null;
   delveModuleEntry(run: DelveRun): Vec3;
   failDelveRun(run: DelveRun): void;
@@ -712,6 +720,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get utcDay() {
       return host.utcDay;
     },
+    get allyDirectives() {
+      return host.allyDirectives;
+    },
     get pendingMobRespawns() {
       return host.pendingMobRespawns;
     },
@@ -813,6 +824,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     groundPos: host.groundPos,
     playerMods: host.playerMods,
     setPlayerRace: host.setPlayerRace,
+    updateWorldAlly: host.updateWorldAlly,
+    onAllyDeath: host.onAllyDeath,
     delveRunForPlayer: host.delveRunForPlayer,
     delveModuleEntry: host.delveModuleEntry,
     failDelveRun: host.failDelveRun,

@@ -1,3 +1,4 @@
+import { MOBS } from '../sim/data';
 import type { Entity } from '../sim/types';
 
 // How the renderer decides whether a *targetable* unit reads as hostile (red) or
@@ -33,6 +34,15 @@ export function isFriendlyPet(
   isPlayerHostile: (p: Entity) => boolean,
 ): boolean {
   return e.kind === 'mob' && e.ownerId !== null && !isOwnedPetHostile(e, entities, isPlayerHostile);
+}
+
+// World-owned allies (src/sim/ally.ts): owner-less mobs flagged allyOfPlayers
+// read as friendly green for EVERY viewer, same treatment as a friendly pet.
+// Pure data read (MOBS is static content), so the verdict matches the sim's.
+export function isFriendlyWorldAlly(e: Entity): boolean {
+  return (
+    e.kind === 'mob' && e.ownerId === null && !e.hostile && !!MOBS[e.templateId]?.allyOfPlayers
+  );
 }
 
 // The classic level-difference ("con") color for a wild mob's nameplate, with a

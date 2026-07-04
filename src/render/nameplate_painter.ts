@@ -57,7 +57,7 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
-import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
+import { FRIENDLY, isFriendlyPet, isFriendlyWorldAlly, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
@@ -273,9 +273,10 @@ export class NameplatePainter {
         const template = MOBS[e.templateId];
         const elite = !!template?.elite;
         const boss = !!template?.boss;
-        // A friendly controlled pet reads as friendly green; wild mobs keep the
-        // classic level-difference ("con") color.
-        const friendlyPet = isFriendlyPet(e, world.entities, this.isHostilePlayer);
+        // A friendly controlled pet or a world-owned ally reads as friendly
+        // green; wild mobs keep the classic level-difference ("con") color.
+        const friendlyPet =
+          isFriendlyPet(e, world.entities, this.isHostilePlayer) || isFriendlyWorldAlly(e);
         const color = mobNameColor(diff, e.dead, friendlyPet);
         const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
         const name = e.dead

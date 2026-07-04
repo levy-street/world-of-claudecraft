@@ -9,6 +9,7 @@ import type {
   LockpickView,
   PlayerProfessionsView,
 } from '../world_api';
+import { type AllyDirective, isWorldAlly, updateWorldAlly as updateWorldAllyImpl } from './ally';
 import * as bagsMod from './bags';
 import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
@@ -1041,6 +1042,9 @@ export class Sim {
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
   private pendingMobRespawns: PendingMobRespawn[] = [];
+  // Ally substrate (src/sim/ally.ts): per-ally behavior directives, exposed to
+  // the event modules as a live ctx view.
+  private allyDirectives = new Map<number, AllyDirective>();
   private groundAoEs: GroundAoE[] = [];
   // World-boss scheduler, one slot per WORLD_BOSSES entry. `nextAt` is the next
   // sim-time (seconds) a boss is due to rise; `entityId` is the live boss entity
@@ -2302,6 +2306,9 @@ export class Sim {
       get utcDay() {
         return sim.utcDay;
       },
+      get allyDirectives() {
+        return sim.allyDirectives;
+      },
       get pendingMobRespawns() {
         return sim.pendingMobRespawns;
       },
@@ -2442,6 +2449,8 @@ export class Sim {
       groundPos: sim.groundPos.bind(sim),
       playerMods: sim.playerMods.bind(sim),
       setPlayerRace: sim.setPlayerRace.bind(sim),
+      updateWorldAlly: (ally: Entity) => updateWorldAllyImpl(sim.ctx, ally),
+      onAllyDeath: sim.onAllyDeath.bind(sim),
       delveRunForPlayer: sim.delveRunForPlayer.bind(sim),
       delveModuleEntry: sim.delveModuleEntry.bind(sim),
       failDelveRun: sim.failDelveRun.bind(sim),
@@ -3958,8 +3967,10 @@ export class Sim {
     b.combatTimer = 0;
     a.inCombat = true;
     b.inCombat = true;
-    // players and their pets pull wild mobs; pets never run wild-mob AI
-    const aAttacker = a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null);
+    // players, their pets, and world-owned allies pull wild mobs; pets and
+    // allies never run wild-mob AI
+    const aAttacker =
+      a.kind === 'player' || (a.kind === 'mob' && a.ownerId !== null) || isWorldAlly(a);
     if (b.kind === 'mob' && b.ownerId === null && !b.dead && aAttacker && b.aiState !== 'evade') {
       if (b.aiState === 'idle') this.aggroMob(b, a, true);
       else if (b.aggroTargetId === null) b.aggroTargetId = a.id;
@@ -5069,6 +5080,13 @@ export class Sim {
     return envoys.travelWithFerry(this.ctx, pid);
   }
 
+  /** Ally-death fan-out (src/sim/ally.ts): the owning event modules (defense
+   *  sites, escorts) hook their failure paths here as they land. */
+  private onAllyDeath(_ally: Entity): void {
+    // No standing event systems yet: the substrate parks the corpse and the
+    // future defense/escort modules take over from this hook.
+  }
+
   private isQuestInteractionEntity(e: Entity): boolean {
     if (e.kind === 'npc') return true;
     return e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0;
@@ -5268,6 +5286,8 @@ export class Sim {
 
   private isFriendlyTo(caster: Entity, target: Entity): boolean {
     if (target.kind === 'player') return !this.isHostileTo(caster, target);
+    // World-owned allies (src/sim/ally.ts): heal-able by players and their pets.
+    if (isWorldAlly(target)) return caster.kind === 'player' || caster.ownerId !== null;
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.entities.get(target.ownerId);
       return !!owner && owner.kind === 'player' && !this.isHostileTo(caster, owner);

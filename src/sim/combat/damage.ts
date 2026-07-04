@@ -22,6 +22,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { ALLY_CORPSE_SECONDS, isWorldAlly } from '../ally';
 import { DELVES, GROUP_XP_BONUS, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
@@ -310,7 +311,7 @@ export function dealDamage(
     source.id !== target.id &&
     target.kind === 'mob' &&
     target.hostile &&
-    (source.kind === 'player' || source.ownerId !== null)
+    (source.kind === 'player' || source.ownerId !== null || isWorldAlly(source))
   ) {
     const threat =
       (amount * (threatOpts?.mult ?? 1) + (threatOpts?.flat ?? 0)) * ctx.threatMod(source, school);
@@ -572,6 +573,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       e.corpseTimer = WORLD_BOSS_CORPSE_SECONDS;
       e.respawnTimer = Infinity;
       ctx.despawnSummonedAdds(e);
+    }
+    // World-owned allies never revive through respawnMob (it restores hostile):
+    // park the corpse and hand the respawn to the owning event module.
+    if (isWorldAlly(e)) {
+      e.corpseTimer = ALLY_CORPSE_SECONDS;
+      e.respawnTimer = Infinity;
+      ctx.onAllyDeath(e);
     }
     e.aggroTargetId = null;
     clearThreat(e);
