@@ -22,8 +22,8 @@ import type { Entity, LootSlot } from './types';
 
 // Sim-time cadence: a fresh boss rises this many seconds after the previous one
 // was scheduled. On the live server the sim runs at wall-clock speed (20 Hz), so
-// this is "every 3 hours". Lives here with the system that uses it.
-export const WORLD_BOSS_INTERVAL_SECONDS = 3 * 3600;
+// this is "every hour". Lives here with the system that uses it.
+export const WORLD_BOSS_INTERVAL_SECONDS = 1 * 3600;
 
 // How long a slain world boss's lootable corpse lingers before it is removed. Much
 // longer than a normal corpse so every contributor has time to walk over and loot
