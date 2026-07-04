@@ -131,6 +131,41 @@ describe('defense events: the Thornfen palisade', () => {
     expect(sim.questLog.get(SITE.questId)!.counts[SITE.objectiveIndex]).toBe(0);
   });
 
+  it('credits BOTH of two ungrouped players holding the line (multiplayer fairness)', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true }) as AnySim;
+    const a = sim.addPlayer('warrior', 'Aegis', { autoEquip: true });
+    const b = sim.addPlayer('warrior', 'Lumen', { autoEquip: true });
+    for (const pid of [a, b]) {
+      sim.setPlayerLevel(40, pid);
+      const e = sim.entities.get(pid)!;
+      teleport(sim, e, SITE.pos.x - 3, SITE.pos.z - 3);
+      sim.acceptQuest(SITE.questId, pid);
+      expect(sim.questState(SITE.questId, pid)).toBe('active');
+    }
+    sim.talkToNpc(sennaId(sim), a);
+    expect(state(sim).phase).toBe('prep');
+    // player A burns every wave; B just holds the line inside the radius
+    for (let w = 0; w < SITE.waves.length; w++) {
+      for (let guard = 0; guard < 20 * 60; guard++) {
+        sim.tick();
+        const st = state(sim);
+        if (st.phase === 'wave' && st.waveMobIds.length > 0) {
+          for (const id of [...st.waveMobIds]) {
+            const m = sim.entities.get(id);
+            if (m && !m.dead)
+              sim.dealDamage(sim.entities.get(a)!, m, 9999999, false, 'physical', null, 'hit');
+          }
+          break;
+        }
+        if (st.phase !== 'prep' && st.phase !== 'wave') break;
+      }
+    }
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(sim.meta(a)!.questLog.get(SITE.questId)!.state).toBe('ready');
+    expect(sim.meta(b)!.questLog.get(SITE.questId)!.state).toBe('ready');
+    expect(sim.meta(b)!.questLog.get(SITE.questId)!.counts[0]).toBe(SITE.waves.length);
+  });
+
   it('is deterministic: two same-seed runs land the same final state', () => {
     const run = () => {
       const sim = makeSim();

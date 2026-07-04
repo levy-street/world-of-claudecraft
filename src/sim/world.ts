@@ -508,6 +508,9 @@ export interface Decoration {
   scale: number;
   variant: number;
   biome: BiomeId;
+  /** Authored gameplay decoration (barricade boulders): colliding, so every
+   *  graphics tier MUST render it (an invisible wall is actionable info). */
+  authored?: boolean;
 }
 
 // Per-biome decoration density gate + kind mix: below `tree` places a tree,
@@ -612,6 +615,7 @@ export function generateDecorations(seed: number): Decoration[] {
       scale: b.scale,
       variant: Math.floor(hash2(Math.round(b.x * 7), Math.round(b.z * 7), seed + 77) * 3),
       biome: biomeAt(b.x, b.z),
+      authored: true,
     });
   }
   return out;

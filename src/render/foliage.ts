@@ -903,6 +903,9 @@ function buildTrees(
   const sourceDecos = !GFX.leanFoliage
     ? decos
     : decos.filter((d) => {
+        // authored barricade boulders COLLIDE: culling one on a lean tier
+        // would leave an invisible wall (graphics must stay gameplay-neutral)
+        if (d.authored) return true;
         const keep = GFX.standardMaterials
           ? d.kind === 'rock'
             ? 0.74
