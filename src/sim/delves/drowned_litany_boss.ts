@@ -77,6 +77,24 @@ export function clearDrownedLitanyBossState(run: DelveRun): void {
   run.nhaliaBoss = undefined;
 }
 
+// Evade/leash reset: when Sister Nhalia goes home (kited past the leash or a
+// party wipe), her encounter re-arms to the exact fresh-pull state, so the
+// re-pull fires the Cantor phases and the Final Bell again. The generic
+// resetEvadingMob already full-heals her, clears her auras (the Cantor shield),
+// and despawns her summonedIds (Cantor and thrall adds); bells are deliberately
+// NOT summoned adds, so drop the in-flight ones here before re-initializing.
+export function resetDrownedLitanyBossEncounter(ctx: SimContext, boss: Entity): void {
+  const run = ctx.delveRunForMob(boss.id);
+  if (!run || run.delveId !== 'drowned_litany') return;
+  const st = run.nhaliaBoss;
+  if (!st) return;
+  for (const bell of st.bells) {
+    const be = ctx.entities.get(bell.entityId);
+    if (be && !be.dead) ctx.dropEntity(bell.entityId);
+  }
+  initDrownedLitanyBossState(run);
+}
+
 function findNhaliaBoss(ctx: SimContext, run: DelveRun): Entity | null {
   for (const id of run.mobIds) {
     const e = ctx.entities.get(id);

@@ -1522,14 +1522,30 @@
   }
   #chatlog-tabs {
     display: flex;
-    flex-wrap: wrap;
+    /* Stay a single clean row as tabs are added: never wrap the "+" to its own
+       line. When the tabs outgrow the strip they scroll horizontally instead
+       (the scrollbar is hidden for the classic look; wheel-to-horizontal is
+       wired in renderChatTabs, and the "+" stays pinned via position: sticky). */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    /* Desktop: the empty strip is a chat-box move handle (a touch-drag moves the
+       box), so suppress the browser's own touch gesture here. Mobile has no move
+       gesture and overrides this to pan-x so overflowed tabs stay swipeable. */
+    touch-action: none;
     gap: 2px;
     margin-left: 6px;
     margin-bottom: -1px;
     position: relative;
     z-index: 2;
   }
+  #chatlog-tabs::-webkit-scrollbar {
+    display: none;
+  }
   .chat-tab {
+    /* keep each tab its natural width and let the strip scroll, never squish */
+    flex: 0 0 auto;
     height: 22px;
     padding: 0 12px;
     border: 1px solid #3a321d;
@@ -1547,8 +1563,12 @@
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
   }
-  /* "add channel" (+) tab: square, icon-only, slightly de-emphasised */
+  /* "add channel" (+) tab: square, icon-only, slightly de-emphasised. Sticks to
+     the right edge so it stays inline and reachable even when the tabs scroll. */
   .chat-tab-add {
+    flex: 0 0 auto;
+    position: sticky;
+    right: 0;
     padding: 0;
     width: 26px;
     font-size: 15px;

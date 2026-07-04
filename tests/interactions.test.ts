@@ -279,6 +279,97 @@ describe('handlePickedEntity', () => {
   });
 });
 
+describe('handlePickedEntity while dead (the ghost/death loop)', () => {
+  // Shared rig: a player stub, a nearby entity, and call-recording world + hud.
+  function rig(playerPartial: Partial<Entity>, target: Entity) {
+    const player = stubEntity({ id: 1, kind: 'player', ...playerPartial });
+    const calls: string[] = [];
+    const world: any = {
+      playerId: 1,
+      player,
+      entities: new Map([
+        [1, player],
+        [target.id, target],
+      ]),
+      duelInfo: null,
+      arenaInfo: null,
+      targetEntity: () => {},
+      enterDungeon: () => calls.push('enterDungeon'),
+      leaveDungeon: () => {},
+      pickUpObject: () => calls.push('pickUpObject'),
+      startAutoAttack: () => {},
+      resurrectAtSpiritHealer: () => calls.push('resurrectAtSpiritHealer'),
+    };
+    const hud = {
+      openLoot: () => calls.push('openLoot'),
+      openQuestDialog: () => calls.push('openQuestDialog'),
+      openDelveBoard: () => calls.push('openDelveBoard'),
+      openMailbox: () => calls.push('openMailbox'),
+      showError: () => calls.push('showError'),
+      closeContextMenu: () => {},
+    };
+    return { world, hud, calls };
+  }
+
+  const questNpc = () =>
+    stubEntity({ id: 2, kind: 'npc', templateId: 'elder_maren', pos: { x: 3, y: 0, z: 0 } });
+
+  it('a ghost right-clicking a quest NPC does not open the quest dialog', () => {
+    const { world, hud, calls } = rig({ dead: true, ghost: true }, questNpc());
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(calls).not.toContain('openQuestDialog');
+    expect(calls).not.toContain('openDelveBoard');
+    expect(calls).toContain('showError');
+  });
+
+  it('a ghost left-clicking a quest NPC does not open the quest dialog', () => {
+    const { world, hud, calls } = rig({ dead: true, ghost: true }, questNpc());
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).not.toContain('openQuestDialog');
+    expect(calls).not.toContain('openDelveBoard');
+  });
+
+  it('a dead-unreleased player clicking a quest NPC does not open the quest dialog', () => {
+    const { world, hud, calls } = rig({ dead: true, ghost: false }, questNpc());
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(calls).not.toContain('openQuestDialog');
+  });
+
+  it('a ghost right-clicking the Spirit Healer still takes the healer res', () => {
+    const healer = stubEntity({
+      id: 2,
+      kind: 'npc',
+      templateId: 'spirit_healer',
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    const { world, hud, calls } = rig({ dead: true, ghost: true }, healer);
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(calls).toContain('resurrectAtSpiritHealer');
+    expect(calls).not.toContain('openQuestDialog');
+  });
+
+  it('a ghost clicking a mailbox does not open it', () => {
+    const mailbox = stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'mailbox',
+      lootable: true,
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    const { world, hud, calls } = rig({ dead: true, ghost: true }, mailbox);
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(calls).not.toContain('openMailbox');
+    handlePickedEntity(world, hud, 2, 0, 10, 20);
+    expect(calls).not.toContain('openMailbox');
+  });
+
+  it('an alive player clicking a quest NPC still opens the quest dialog', () => {
+    const { world, hud, calls } = rig({}, questNpc());
+    handlePickedEntity(world, hud, 2, 2, 10, 20);
+    expect(calls).toContain('openQuestDialog');
+  });
+});
+
 describe('HoverPickGate', () => {
   it('picks on first call and then throttles a stationary pointer', () => {
     const gate = new HoverPickGate();

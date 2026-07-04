@@ -363,6 +363,7 @@ export class PostOffice {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
+    if (p.dead) return; // same silent dead-gate as mailSendResolved above
     if (!this.nearMailbox(p)) {
       this.result(meta.entityId, 'tooFar');
       return;
@@ -410,6 +411,7 @@ export class PostOffice {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
+    if (p.dead) return; // same silent dead-gate as mailSendResolved above
     if (!this.nearMailbox(p)) {
       this.result(meta.entityId, 'tooFar');
       return;

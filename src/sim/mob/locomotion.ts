@@ -24,6 +24,7 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { clearThreat, stealthDetectionRadius } from '../threat';
@@ -38,6 +39,7 @@ import {
   MELEE_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  SISTER_NHALIA_BOSS_ID,
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
@@ -605,6 +607,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
 }
 
 // Cowardly mobs panic once per pull at low HP, then recover their nerve and turn to

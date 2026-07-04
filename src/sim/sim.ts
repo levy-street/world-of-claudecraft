@@ -105,6 +105,7 @@ import {
   isDelvePos,
   MOBS,
   QUESTS,
+  SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
 import * as companionMod from './delves/companion';
@@ -873,6 +874,11 @@ export interface CharacterState {
   // still marked, rather than free-resurrecting on relog. See src/sim/spirit.ts.
   ghost?: boolean;
   corpsePos?: { x: number; z: number } | null;
+  // True when the character was saved dead (JSONB; optional so older saves load
+  // alive exactly as before). A dead-but-UNRELEASED logout resumes as a released
+  // ghost on relog (auto-release-on-logout), so logging out cannot bypass the
+  // death loop. See the addPlayer ghost block + src/sim/spirit.ts.
+  dead?: boolean;
   // The Keeper's Toll (Resurrection Sickness) remaining seconds (JSONB; optional/null when
   // none). Persisted so the penalty cannot be shed by logging out and back in.
   resSickness?: number | null;
@@ -1579,6 +1585,20 @@ export class Sim {
         ? this.groundPos(savedState.corpsePos.x, savedState.corpsePos.z)
         : null;
       player.hp = player.maxHp;
+    } else if (savedState?.dead && !isArenaPos(savedState.pos.x) && !isDelvePos(savedState.pos.x)) {
+      // Auto-release-on-logout: a character saved dead but UNRELEASED resumes as
+      // a released ghost rather than reviving in place at 1 hp (logging out must
+      // not bypass the death loop). Put the body back at the death spot, then run
+      // the normal release path so the corpse marker and graveyard choice
+      // (including the instance rule: a dungeon corpse releases to the outdoor
+      // graveyard nearest the door) cannot drift from spirit.ts. Delve, arena,
+      // and fiesta deaths keep their own bounded respawn rules and never enter
+      // the ghost loop, so those positions load exactly as before.
+      player.pos = this.groundPos(savedState.pos.x, savedState.pos.z);
+      player.prevPos = { ...player.pos };
+      this.rebucket(player);
+      player.dead = true;
+      releasePlayerSpirit(this.ctx, player.id);
     }
     if (savedState?.pet) this.restorePet(player, savedState.pet);
     // One-time Ravenpost welcome (doubles as the service announcement for
@@ -1711,7 +1731,9 @@ export class Sim {
       ),
       pos: { x: e.pos.x, z: e.pos.z },
       facing: e.facing,
-      // Ghost state, so a logged-out spirit resumes its corpse run on relog.
+      // Death state: a released spirit resumes its corpse run on relog, and a
+      // dead-but-unreleased corpse auto-releases on load (see addPlayer).
+      dead: e.dead,
       ghost: e.ghost,
       corpsePos: e.corpsePos ? { x: e.corpsePos.x, z: e.corpsePos.z } : null,
       // The Keeper's Toll persists across logout (it cannot be shed by relogging).
@@ -5015,9 +5037,16 @@ export class Sim {
   talkToNpc(npcId: number, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
-    const { meta } = r;
+    const { meta, e: p } = r;
     const npc = this.entities.get(npcId);
     if (!npc || !this.isQuestInteractionEntity(npc)) return;
+    // Dead players (released ghosts included) cannot talk to quest NPCs. The
+    // Spirit Healer is the one exception: talking to the angel is how a ghost
+    // reaches its resurrection offer (the res itself is resurrectAtSpiritHealer).
+    if (p.dead && npc.templateId !== SPIRIT_HEALER_NPC_ID) {
+      this.error(meta.entityId, "You can't do that while dead.");
+      return;
+    }
     if (this.interactNpcForQuests(npc, meta)) return;
     for (const qid of npc.questIds) {
       const quest = QUESTS[qid];
