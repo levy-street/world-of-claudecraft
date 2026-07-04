@@ -403,9 +403,22 @@ export function dungeonByIndex(index: number): DungeonDef | null {
   return DUNGEON_LIST.find((d) => d.index === index) ?? null;
 }
 
-// Which dungeon a far-off instance position belongs to, by x-band.
+// Where the dungeon x-band sequence RESUMES past the reserved arena+delve
+// window. Dungeon indexes 0-5 band up to ARENA_X_MIN (4200); the window
+// [ARENA_X_MIN, DUNGEON_BAND_RESUME_X_MIN) is reserved for the Ashen Coliseum
+// arena (band [4200, 4773)) and the delves (band [4773, ...); rooms at
+// DELVE_X_MIN + index*600, so delve indexes 0-2 fit with their wall footprints
+// under 6600). 6600 is the west edge of the index-10 band under dungeonAt's
+// round() math ([6600, 7200), origin x = 6900), so dungeon indexes resume at
+// 10, leaving 6-9 unusable inside the window on purpose.
+export const DUNGEON_BAND_RESUME_X_MIN = 6600;
+
+// Which dungeon a far-off instance position belongs to, by x-band. The
+// reserved arena/delve window (see DUNGEON_BAND_RESUME_X_MIN) is never a
+// dungeon; bands resume past it.
 export function dungeonAt(x: number): DungeonDef | null {
-  if (x <= DUNGEON_X_THRESHOLD || x >= ARENA_X_MIN) return null;
+  if (x <= DUNGEON_X_THRESHOLD) return null;
+  if (x >= ARENA_X_MIN && x < DUNGEON_BAND_RESUME_X_MIN) return null;
   return dungeonByIndex(Math.round((x - 900) / 600));
 }
 
@@ -483,8 +496,11 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
   return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
 }
 
+// Double-bounded like isArenaPos: the delve band ends where the dungeon band
+// sequence resumes (DUNGEON_BAND_RESUME_X_MIN), so a resumed-band dungeon
+// position (index 10+, x >= 6600) is never classified as a delve.
 export function isDelvePos(x: number): boolean {
-  return x >= DELVE_BAND_X_MIN;
+  return x >= DELVE_BAND_X_MIN && x < DUNGEON_BAND_RESUME_X_MIN;
 }
 
 export function delveAt(x: number): DelveDef | null {

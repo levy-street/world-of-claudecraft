@@ -800,7 +800,7 @@ export const FOUNDRY_DUNGEON_DEFS: Record<string, DungeonDef> = {
   emberdeep_foundry: {
     id: 'emberdeep_foundry',
     name: 'The Emberdeep Foundry',
-    index: 6, // instance origin x = 900 + 6*600 = 4500 (4 and 5 are the raid wings)
+    index: 10, // instance origin x = 900 + 10*600 = 6900 (bands 6-9 are the reserved arena/delve window)
     doorPos: { ...FOUNDRY_DOOR_POS },
     entry: { x: 0, z: 4 },
     exitOffset: { x: 0, z: -6 },
