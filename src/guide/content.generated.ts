@@ -3160,7 +3160,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "mob_tombrobber": {
     "url": "models/creatures/mob_tombrobber.glb",
     "idle": "Idle",
-    "height": 1.7,
+    "height": 2.4,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.25
   },
   "mob_ghost": {
@@ -3173,13 +3174,15 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "mob_dust_elemental": {
     "url": "models/creatures/mob_dust_elemental.glb",
     "idle": "Idle",
-    "height": 2,
+    "height": 2.2,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
   "mob_ossara_judge": {
     "url": "models/creatures/mob_ossara_judge.glb",
     "idle": "Idle",
-    "height": 1.9,
+    "height": 2.6,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.2
   },
   "mob_bull": {
@@ -3191,55 +3194,64 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "mob_granite_elemental": {
     "url": "models/creatures/mob_granite_elemental.glb",
     "idle": "Idle",
-    "height": 2.2,
+    "height": 2.4,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
   "mob_veth_cutthroat": {
     "url": "models/creatures/mob_veth_cutthroat.glb",
     "idle": "Idle",
-    "height": 1.8,
+    "height": 2.5,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.2
   },
   "mob_ember_cat": {
     "url": "models/creatures/mob_ember_cat.glb",
     "idle": "Idle",
-    "height": 1.3,
+    "height": 1.6,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.35
   },
   "mob_pale_widow": {
     "url": "models/creatures/mob_pale_widow.glb",
     "idle": "Idle",
-    "height": 1.1,
+    "height": 1.4,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
   "mob_river_skulker": {
     "url": "models/creatures/mob_river_skulker.glb",
     "idle": "Idle",
-    "height": 1.6,
+    "height": 2.2,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.25
   },
   "mob_twilight_revenant": {
     "url": "models/creatures/mob_twilight_revenant.glb",
     "idle": "Idle",
-    "height": 1.9,
+    "height": 2.5,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
   "mob_frost_troll": {
     "url": "models/creatures/mob_frost_troll.glb",
     "idle": "Idle",
-    "height": 2.3,
+    "height": 2.4,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
   "mob_ironhold_burrower": {
     "url": "models/creatures/mob_ironhold_burrower.glb",
     "idle": "Idle",
-    "height": 1.5,
+    "height": 2,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
   "mob_legion_deserter": {
     "url": "models/creatures/mob_legion_deserter.glb",
     "idle": "Idle",
-    "height": 1.9,
+    "height": 2.6,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.2
   },
   "mob_arbalist": {
@@ -3257,7 +3269,8 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "mob_highland_ogre": {
     "url": "models/creatures/mob_highland_ogre.glb",
     "idle": "Idle",
-    "height": 2.5,
+    "height": 2.8,
+    "yaw": -1.5707963267948966,
     "tintStrength": 0.3
   },
   "mob_yeti": {

@@ -635,6 +635,8 @@ export const VISUALS: Record<string, VisualDef> = {
   // bespoke bodies for the sub-40 families that shared launch-zone stock
   // meshes. Entity tint keeps per-template variants distinct on shared bodies.
   mob_ossara_judge: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_ossara_judge.glb`,
     height: 2.6,
     clips: TRIPO8,
@@ -642,6 +644,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   mob_sandmaw_tyrant: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_sandmaw_tyrant.glb`,
     height: 3.0,
     clips: TRIPO8,
@@ -649,6 +653,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   mob_dust_elemental: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_dust_elemental.glb`,
     height: 2.2,
     clips: TRIPO8,
@@ -656,6 +662,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   mob_granite_elemental: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_granite_elemental.glb`,
     height: 2.4,
     clips: TRIPO8,
@@ -663,6 +671,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   mob_veykar: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_veykar.glb`,
     height: 2.7,
     clips: TRIPO8,
@@ -670,6 +680,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.15,
   },
   mob_commander_vaelis: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_commander_vaelis.glb`,
     height: 2.8,
     clips: TRIPO8,
@@ -679,6 +691,8 @@ export const VISUALS: Record<string, VisualDef> = {
   // The two allied-NPC bodies (Tripo lote 2): the escortees and the event
   // defenders across every realm share them, tinted per template.
   valdris_carter: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/valdris_carter.glb`,
     height: 2.4,
     clips: TRIPO8,
@@ -686,6 +700,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   valdris_warden: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/valdris_warden.glb`,
     height: 2.5,
     clips: TRIPO8,
@@ -693,6 +709,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   mob_tombrobber: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_tombrobber.glb`,
     height: 2.4,
     clips: TRIPO8,
@@ -700,6 +718,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.25,
   },
   mob_veth_cutthroat: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_veth_cutthroat.glb`,
     height: 2.5,
     clips: TRIPO8,
@@ -707,6 +727,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   mob_frost_troll: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_frost_troll.glb`,
     height: 2.4,
     clips: TRIPO8,
@@ -714,6 +736,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   mob_twilight_revenant: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_twilight_revenant.glb`,
     height: 2.5,
     clips: TRIPO8,
@@ -721,6 +745,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   mob_ironhold_burrower: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_ironhold_burrower.glb`,
     height: 2.0,
     clips: TRIPO8,
@@ -728,6 +754,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   mob_ember_cat: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_ember_cat.glb`,
     height: 1.6,
     clips: TRIPO8,
@@ -735,6 +763,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.35,
   },
   mob_pale_widow: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_pale_widow.glb`,
     height: 1.4,
     clips: TRIPO8,
@@ -742,6 +772,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   mob_river_skulker: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_river_skulker.glb`,
     height: 2.2,
     clips: TRIPO8,
@@ -749,6 +781,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.25,
   },
   mob_legion_deserter: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_legion_deserter.glb`,
     height: 2.6,
     clips: TRIPO8,
@@ -756,6 +790,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   mob_highland_ogre: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_highland_ogre.glb`,
     height: 2.8,
     clips: TRIPO8,
@@ -763,6 +799,8 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.3,
   },
   mob_fog_horror: {
+    // Tripo rigs export facing +X; the game convention is +Z
+    yaw: -Math.PI / 2,
     url: `${CREATURES}/mob_fog_horror.glb`,
     height: 3.0,
     clips: TRIPO8,
