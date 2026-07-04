@@ -81,6 +81,10 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: 'The ritual circle lies cold and dormant.',
     enough: 'The circle has nothing more to give you.',
   },
+  warcamp_dispatch: {
+    deny: 'The dispatch is nailed fast to the picket post.',
+    enough: 'You already have an Emberpact dispatch.',
+  },
 };
 
 export function groundPickupDeny(itemId: string, itemName: string): string {
