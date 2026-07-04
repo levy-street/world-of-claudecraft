@@ -21,13 +21,13 @@ import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
+  ACTIVE_LEVEL_CAP,
   DT,
   dist2d,
   type Entity,
   EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
-  MAX_LEVEL,
   PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
   type SimEvent,
@@ -3493,7 +3493,7 @@ export class GameServer {
   private detectActivity(events: SimEvent[]): void {
     const now = Date.now();
     for (const ev of events) {
-      if (ev.type === 'levelup' && ev.level === MAX_LEVEL && ev.pid !== undefined) {
+      if (ev.type === 'levelup' && ev.level === ACTIVE_LEVEL_CAP && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (!s) continue;
         enqueueActivity(

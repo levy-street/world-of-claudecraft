@@ -2,7 +2,7 @@
 // system. Kept UI-framework-free (no DOM) so the label states can be snapshot
 // tested directly. All display strings route through i18n's t().
 
-import { MAX_LEVEL, virtualLevelProgress, xpForLevel } from '../sim/types';
+import { ACTIVE_LEVEL_CAP, virtualLevelProgress, xpForLevel } from '../sim/types';
 import { formatNumber, t } from './i18n';
 
 export interface XpBarInput {
@@ -37,7 +37,7 @@ function formatPercent(frac: number): string {
 
 export function xpBarView(input: XpBarInput): XpBarView {
   const { level, xp, lifetimeXp, showOverflow } = input;
-  const atCap = level >= MAX_LEVEL;
+  const atCap = level >= ACTIVE_LEVEL_CAP;
 
   if (!atCap) {
     const need = xpForLevel(level);
@@ -69,10 +69,10 @@ export function xpBarView(input: XpBarInput): XpBarView {
 
   // At/after the cap with overflow on: fill toward the next virtual level.
   const prog = virtualLevelProgress(lifetimeXp);
-  const extra = prog.level - MAX_LEVEL;
+  const extra = Math.max(0, prog.level - ACTIVE_LEVEL_CAP);
   // FR-3.3 format: "Lv 20 (+7)  ·  1,284,500 total XP  ·  62% to next"
   const label =
-    `${t('game.xp.lv')} ${MAX_LEVEL} (+${extra})  ·  ` +
+    `${t('game.xp.lv')} ${ACTIVE_LEVEL_CAP} (+${extra})  ·  ` +
     `${formatXp(lifetimeXp)} ${t('game.xp.totalXp')}  ·  ` +
     `${formatPercent(prog.into / prog.span)} ${t('game.xp.toNext')}`;
   return { fillFrac: clamp01(prog.into / prog.span), restedFrac: 0, label, postCap: true };

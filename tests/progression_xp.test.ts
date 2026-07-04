@@ -9,7 +9,13 @@ import { describe, expect, it } from 'vitest';
 import { PROPS } from '../src/sim/data';
 import { isResting, prestige, updateRested } from '../src/sim/progression/xp';
 import { Sim } from '../src/sim/sim';
-import { DT, MAX_LEVEL, PRESTIGE_XP_PER_RANK, xpForLevel } from '../src/sim/types';
+import {
+  ACTIVE_LEVEL_CAP,
+  DT,
+  MAX_LEVEL,
+  PRESTIGE_XP_PER_RANK,
+  xpForLevel,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 type AnySim = Sim & Record<string, any>;
@@ -126,7 +132,7 @@ describe('progression/xp — prestige (cap-gated, cosmetic)', () => {
 
   it('refuses a second prestige below the threshold and mutates nothing', () => {
     const sim = makeSim();
-    sim.setPlayerLevel(MAX_LEVEL);
+    sim.setPlayerLevel(ACTIVE_LEVEL_CAP);
     sim.grantXp(PRESTIGE_XP_PER_RANK); // one bar -> first prestige succeeds
     expect(prestige(sim.ctx, sim.playerId)).toBe(true);
     const meta = sim.meta(sim.playerId)!;

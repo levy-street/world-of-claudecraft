@@ -25,6 +25,7 @@ import { GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import {
+  ACTIVE_LEVEL_CAP,
   canPrestige,
   MAX_LEVEL,
   MILESTONES,
@@ -154,11 +155,11 @@ describe('solo grantXp at the cap', () => {
 
   it('a level-up into the cap keeps the overflow remainder in lifetimeXp', () => {
     const sim = makeSim('warrior');
-    sim.setPlayerLevel(MAX_LEVEL - 1); // level 19
+    sim.setPlayerLevel(ACTIVE_LEVEL_CAP - 1); // one level below the active cap
     const lifeBefore = sim.lifetimeXp;
-    const need = xpForLevel(MAX_LEVEL - 1); // 19 → 20
-    sim.grantXp(need + 7777); // dings to 20 with a big overflow remainder
-    expect(sim.player.level).toBe(MAX_LEVEL);
+    const need = xpForLevel(ACTIVE_LEVEL_CAP - 1); // the ding into the cap
+    sim.grantXp(need + 7777); // dings to the cap with a big overflow remainder
+    expect(sim.player.level).toBe(ACTIVE_LEVEL_CAP);
     expect(sim.xp).toBe(0); // bar cleared on reaching cap…
     expect(sim.lifetimeXp).toBe(lifeBefore + need + 7777); // …but nothing was lost
   });
@@ -310,7 +311,7 @@ describe('prestige', () => {
 describe('prestige anti-abuse gate (server-locked rank)', () => {
   it('refuses prestige at the cap with no post-cap XP earned', () => {
     const sim = makeSim('warrior');
-    sim.setPlayerLevel(MAX_LEVEL); // lifetimeXp == cap threshold, nothing earned past it
+    sim.setPlayerLevel(ACTIVE_LEVEL_CAP); // lifetimeXp == cap threshold, nothing earned past it
     expect(maxPrestigeRank(sim.lifetimeXp)).toBe(0);
     expect(sim.prestige()).toBe(false);
     expect(sim.prestigeRank).toBe(0);
@@ -318,7 +319,7 @@ describe('prestige anti-abuse gate (server-locked rank)', () => {
 
   it('caps rank at earned post-cap XP — spamming the command cannot inflate it', () => {
     const sim = makeSim('warrior');
-    sim.setPlayerLevel(MAX_LEVEL);
+    sim.setPlayerLevel(ACTIVE_LEVEL_CAP);
     // earn exactly 3 prestige bars of post-cap XP
     sim.grantXp(PRESTIGE_XP_PER_RANK * 3);
     const allowed = maxPrestigeRank(sim.lifetimeXp);
@@ -328,25 +329,25 @@ describe('prestige anti-abuse gate (server-locked rank)', () => {
     for (let i = 0; i < 100; i++) if (sim.prestige()) successes++;
     expect(successes).toBe(3); // only as many as the earned XP supports
     expect(sim.prestigeRank).toBe(3); // never beyond the XP-backed cap
-    expect(sim.lifetimeXp).toBeGreaterThanOrEqual(xpToReachLevel(MAX_LEVEL)); // lifetime untouched by prestige
+    expect(sim.lifetimeXp).toBeGreaterThanOrEqual(xpToReachLevel(ACTIVE_LEVEL_CAP)); // lifetime untouched by prestige
   });
 
   it('unlocks the next rank only after earning another full bar', () => {
     const sim = makeSim('warrior');
-    sim.setPlayerLevel(MAX_LEVEL);
+    sim.setPlayerLevel(ACTIVE_LEVEL_CAP);
     sim.grantXp(PRESTIGE_XP_PER_RANK); // exactly one bar
     expect(sim.prestige()).toBe(true); // rank 1
     expect(sim.prestige()).toBe(false); // no XP left for rank 2
     expect(sim.prestigeRank).toBe(1);
     expect(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank)).toBe(PRESTIGE_XP_PER_RANK);
     sim.grantXp(PRESTIGE_XP_PER_RANK); // earn another bar
-    expect(canPrestige(MAX_LEVEL, sim.lifetimeXp, sim.prestigeRank)).toBe(true);
+    expect(canPrestige(ACTIVE_LEVEL_CAP, sim.lifetimeXp, sim.prestigeRank)).toBe(true);
     expect(sim.prestige()).toBe(true); // rank 2
     expect(sim.prestigeRank).toBe(2);
   });
 
   it('canPrestige is false below the cap regardless of lifetime XP', () => {
-    expect(canPrestige(MAX_LEVEL - 1, 9_999_999, 0)).toBe(false);
+    expect(canPrestige(ACTIVE_LEVEL_CAP - 1, 9_999_999, 0)).toBe(false);
   });
 });
 
@@ -399,36 +400,43 @@ describe('xp-bar label states', () => {
 
   it('at-cap with overflow shows the virtual-level bar starting at +0', () => {
     const v = xpBarView({
-      level: MAX_LEVEL,
+      level: ACTIVE_LEVEL_CAP,
       xp: 0,
-      lifetimeXp: xpToReachLevel(MAX_LEVEL),
+      lifetimeXp: xpToReachLevel(ACTIVE_LEVEL_CAP),
       showOverflow: true,
     });
     expect(v.postCap).toBe(true);
     expect(v.label).toBe(
-      `Lv ${MAX_LEVEL} (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`,
+      `Lv ${ACTIVE_LEVEL_CAP} (+0)  ·  ${formatXp(xpToReachLevel(ACTIVE_LEVEL_CAP))} total XP  ·  0% to next`,
     );
   });
 
   it('post-cap shows virtual level, total, and percent to next', () => {
-    const lifetime = xpToReachLevel(MAX_LEVEL + 7); // start of virtual level cap+7
-    const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: lifetime, showOverflow: true });
+    const lifetime = xpToReachLevel(ACTIVE_LEVEL_CAP + 7); // start of virtual level cap+7
+    const v = xpBarView({
+      level: ACTIVE_LEVEL_CAP,
+      xp: 0,
+      lifetimeXp: lifetime,
+      showOverflow: true,
+    });
     expect(v.postCap).toBe(true);
-    expect(v.label).toBe(`Lv ${MAX_LEVEL} (+7)  ·  ${formatXp(lifetime)} total XP  ·  0% to next`);
+    expect(v.label).toBe(
+      `Lv ${ACTIVE_LEVEL_CAP} (+7)  ·  ${formatXp(lifetime)} total XP  ·  0% to next`,
+    );
   });
 
   it('post-cap fill fraction advances within the virtual level', () => {
-    const base = xpToReachLevel(MAX_LEVEL + 7);
-    const span = xpToReachLevel(MAX_LEVEL + 8) - xpToReachLevel(MAX_LEVEL + 7);
+    const base = xpToReachLevel(ACTIVE_LEVEL_CAP + 7);
+    const span = xpToReachLevel(ACTIVE_LEVEL_CAP + 8) - xpToReachLevel(ACTIVE_LEVEL_CAP + 7);
     const v = xpBarView({
-      level: MAX_LEVEL,
+      level: ACTIVE_LEVEL_CAP,
       xp: 0,
       lifetimeXp: base + Math.floor(span * 0.5),
       showOverflow: true,
     });
     expect(v.fillFrac).toBeCloseTo(0.5, 1);
     expect(v.label).toMatch(
-      new RegExp(`Lv ${MAX_LEVEL} \\(\\+7\\)  ·  .* total XP  ·  \\d+% to next`),
+      new RegExp(`Lv ${ACTIVE_LEVEL_CAP} \\(\\+7\\)  ·  .* total XP  ·  \\d+% to next`),
     );
   });
 

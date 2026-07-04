@@ -82,6 +82,7 @@ import type {
 } from '../sim/types';
 import {
   type AbilityEffect,
+  ACTIVE_LEVEL_CAP,
   CONSUME_DURATION,
   canPrestige,
   dist2d,
@@ -89,7 +90,6 @@ import {
   FISHING_CAST_ID,
   type ItemDef,
   isQuestTurnInNpc,
-  MAX_LEVEL,
   MILESTONES,
   type RiteIntensity,
   type SimEvent,
@@ -11033,7 +11033,7 @@ export class Hud {
       html += `<span>${t('game.progression.prestigeRank')}: <b>★ ${sim.prestigeRank}</b></span>`;
     html += `</div>`;
     html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
-    if (level >= MAX_LEVEL) {
+    if (level >= ACTIVE_LEVEL_CAP) {
       // The button reflects the server's authoritative prestige gate (post-cap
       // XP earned). It's disabled — and the requirement shown — until eligible;
       // the server re-checks regardless, so a forged click does nothing.
@@ -11051,7 +11051,7 @@ export class Hud {
     // Mirror the server's gate; the server enforces it authoritatively anyway.
     if (!canPrestige(p.level, this.sim.lifetimeXp, this.sim.prestigeRank)) {
       this.showError(
-        p.level < MAX_LEVEL
+        p.level < ACTIVE_LEVEL_CAP
           ? t('game.prestige.needCap')
           : `${formatXp(xpUntilNextPrestige(this.sim.lifetimeXp, this.sim.prestigeRank))} ${t('game.prestige.needXp')}`,
       );

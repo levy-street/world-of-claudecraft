@@ -10,6 +10,7 @@ import {
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { Sim } from '../src/sim/sim';
 import {
+  ACTIVE_LEVEL_CAP,
   dist2d,
   FISHING_CAST_ID,
   FISHING_CAST_TIME,
@@ -1419,10 +1420,10 @@ describe('leveling', () => {
     expect(sim.known.map((k) => k.def.id)).toContain('rend');
   });
 
-  it('caps at max level', () => {
+  it('caps at the active level cap', () => {
     const sim = makeSim('warrior');
     (sim as any).grantXp(99999999);
-    expect(sim.player.level).toBe(MAX_LEVEL);
+    expect(sim.player.level).toBe(ACTIVE_LEVEL_CAP);
   });
 });
 

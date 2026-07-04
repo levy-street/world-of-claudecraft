@@ -2165,6 +2165,15 @@ export const XP_TABLE = [
   187900, 195000, 202300, 209800, 217400,
 ];
 export const MAX_LEVEL = 60;
+// The ACTIVE leveling ceiling for this release: the level bar freezes here while
+// everything authored above it (XP_TABLE rows, spell ranks, the 40+ zones) stays
+// in the tree for the cap-raise release. MAX_LEVEL stays the CONTENT ceiling
+// (table length, item/dev clamps, obs normalization). Post-cap systems (rested
+// gate, lifetime XP virtual levels, prestige gate and pricing) treat THIS as
+// "the cap" so the live veteran loop continues at 40 exactly as it did at the
+// old cap of 20. Raising the cap later is this one constant: at 60 every
+// formula below degenerates to the pre-cap behavior byte-for-byte.
+export const ACTIVE_LEVEL_CAP = 40;
 
 // Shared sim constants relocated here (C1) so both sim.ts and the extracted damage
 // core (src/sim/combat/damage.ts) can import them without a sim.ts cycle.
@@ -2274,24 +2283,27 @@ export const MILESTONES: MilestoneDef[] = [
 // be spammed from a hacked client to inflate the (leaderboard-visible) rank —
 // the server caps rank at maxPrestigeRank(lifetimeXp) regardless of how many
 // prestige commands arrive.
-export const PRESTIGE_XP_PER_RANK = xpForLevel(MAX_LEVEL); // = 217,400 (the at-cap step)
+export const PRESTIGE_XP_PER_RANK = xpForLevel(ACTIVE_LEVEL_CAP); // the at-active-cap step (90,700 at cap 40)
 
 // Highest prestige rank the given lifetime XP can support (post-cap XP / cost).
+// Measured from the ACTIVE cap: ranks earned under an earlier cap are preserved
+// as saved (the command only caps NEW ranks), the same rule the 20 to 60 raise
+// shipped with.
 export function maxPrestigeRank(lifetimeXp: number): number {
-  const earned = lifetimeXp - xpToReachLevel(MAX_LEVEL);
+  const earned = lifetimeXp - xpToReachLevel(ACTIVE_LEVEL_CAP);
   return earned <= 0 ? 0 : Math.floor(earned / PRESTIGE_XP_PER_RANK);
 }
 
-// Authoritative prestige eligibility: at the cap, and with enough unspent
+// Authoritative prestige eligibility: at the active cap, and with enough unspent
 // post-cap XP for the next rank. Used server-side (enforced) and client-side
-// (to enable/disable the button — display only).
+// (to enable/disable the button, display only).
 export function canPrestige(level: number, lifetimeXp: number, prestigeRank: number): boolean {
-  return level >= MAX_LEVEL && prestigeRank < maxPrestigeRank(lifetimeXp);
+  return level >= ACTIVE_LEVEL_CAP && prestigeRank < maxPrestigeRank(lifetimeXp);
 }
 
 // Lifetime XP still needed before the next prestige rank unlocks (0 if ready).
 export function xpUntilNextPrestige(lifetimeXp: number, prestigeRank: number): number {
-  const target = xpToReachLevel(MAX_LEVEL) + (prestigeRank + 1) * PRESTIGE_XP_PER_RANK;
+  const target = xpToReachLevel(ACTIVE_LEVEL_CAP) + (prestigeRank + 1) * PRESTIGE_XP_PER_RANK;
   return Math.max(0, target - lifetimeXp);
 }
 

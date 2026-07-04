@@ -35,6 +35,7 @@ import { FALL_SAFE_DISTANCE, type PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { threatEntries } from '../threat';
 import {
+  ACTIVE_LEVEL_CAP,
   type ArenaFormat,
   type Aura,
   type AuraKind,
@@ -42,7 +43,6 @@ import {
   type Entity,
   type EquipSlot,
   FISHING_CAST_ID,
-  MAX_LEVEL,
   MELEE_RANGE,
   xpForLevel,
 } from '../types';
@@ -362,10 +362,10 @@ export function targetReadout(t: Entity): string {
   const health = t.dead ? 'dead' : `${Math.round((t.hp / t.maxHp) * 100)}% HP`;
   return `Target: ${t.name} (level ${t.level} ${kind}) — ${health}.`;
 }
-// One-line leveling summary for the /xp readout. At MAX_LEVEL there is no
-// "next level" so we avoid the percent/remaining math (xpForLevel is 0 there).
+// One-line leveling summary for the /xp readout. At the active cap there is no
+// "next level" so we avoid the percent/remaining math.
 export function xpReadout(meta: PlayerMeta, level: number): string {
-  if (level >= MAX_LEVEL) return `Level ${MAX_LEVEL} — maximum level reached.`;
+  if (level >= ACTIVE_LEVEL_CAP) return `Level ${level}: maximum level reached.`;
   const need = xpForLevel(level);
   const have = Math.max(0, Math.min(meta.xp, need));
   const pct = Math.floor((have / need) * 100);
