@@ -1140,6 +1140,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh.',
   'download.title': 'Unduh Peluncur Desktop',
+  'download.macCta': 'Unduh untuk macOS',
+  'download.windowsPending': 'Build Windows tertunda.',
   'entities.abilities.adrenaline_rush.description':
     'Darahmu mendidih, seketika memulihkan 60 energi.',
   'entities.abilities.adrenaline_rush.name': 'Darah Terpacu',
