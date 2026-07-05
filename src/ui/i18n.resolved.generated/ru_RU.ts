@@ -2487,6 +2487,7 @@ export const ru_RU: EnTranslations = {
     "wiki": "Вики",
     "news": "Новости",
     "download": "Скачать",
+    "devs": "Devs",
     "loginRegister": "Войти / Зарегистрироваться",
     "account": "Аккаунт",
     "logout": "Выйти",
@@ -2535,6 +2536,9 @@ export const ru_RU: EnTranslations = {
     "desc": "Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.",
     "macCta": "Скачать для macOS",
     "windowsPending": "Сборка для Windows готовится."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Скоро...",

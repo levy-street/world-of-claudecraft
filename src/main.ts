@@ -2953,7 +2953,14 @@ const hoverTimeouts: Record<string, number | null> = {
 };
 
 function switchMainView(targetId: string): void {
-  const views = ['#hero-view', '#highscores-view', '#news-view', '#download-view', '#account-view'];
+  const views = [
+    '#hero-view',
+    '#highscores-view',
+    '#news-view',
+    '#download-view',
+    '#devs-view',
+    '#account-view',
+  ];
   const currentViewId = views.find((id) => {
     const el = $(id);
     return el && !el.hasAttribute('hidden');
@@ -2966,6 +2973,7 @@ function switchMainView(targetId: string): void {
     '#highscores-view': 'nav-btn-highscores',
     '#news-view': 'nav-btn-news',
     '#download-view': 'nav-btn-download',
+    '#devs-view': 'nav-btn-devs',
     '#account-view': 'nav-btn-account',
   };
 
@@ -7199,6 +7207,7 @@ function wireStartScreens(): void {
   const navBtnWiki = $('#nav-btn-wiki');
   const navBtnNews = $('#nav-btn-news');
   const navBtnDownload = $('#nav-btn-download');
+  const navBtnDevs = $('#nav-btn-devs');
   const navBtnLogin = $('#nav-btn-login');
 
   const deleteConfirmInput = $('#delete-character-confirm') as HTMLInputElement;
@@ -7291,6 +7300,23 @@ function wireStartScreens(): void {
     void loadNews();
   });
   setupNavBtn(navBtnDownload, '#download-view');
+  // Devs portal — a native React-in-Vite app (src/devs/**), part of this repo,
+  // that turns GitHub contributions into in-game progression + $WOC. It mounts
+  // into #devs-portal-root and talks to the WOC server's /api/devs/* routes with
+  // the player's session token. Dynamically imported on first open so React
+  // ships in its own chunk and costs nothing during normal play.
+  let devsPortalMounted = false;
+  setupNavBtn(navBtnDevs, '#devs-view', () => {
+    switchMainView('#devs-view');
+    if (devsPortalMounted) return;
+    devsPortalMounted = true;
+    const root = $('#devs-portal-root');
+    if (root) {
+      void import('./devs/mount').then(({ mountDevsPortal }) => {
+        mountDevsPortal(root as HTMLElement, { getToken: () => api.token, base: api.base });
+      }).catch((err) => console.error('Devs portal failed to load:', err));
+    }
+  });
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });

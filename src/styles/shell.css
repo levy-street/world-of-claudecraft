@@ -795,6 +795,30 @@
     transform: translateY(8px);
   }
 
+  /* Devs portal - a native React-in-Vite app (src/devs/**) mounted into
+     #devs-portal-root. This shell is just the container + pre-mount loading. */
+  #devs-view {
+    padding: 0 16px 24px;
+    width: 100%;
+  }
+  .devs-portal-shell {
+    position: relative;
+    width: 100%;
+    max-width: min(1200px, 96vw);
+    margin: 0 auto;
+    min-height: 60vh;
+  }
+  .devs-portal-loading {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbb46a;
+    font-family: var(--title-font, serif);
+    letter-spacing: 0.06em;
+    font-size: 15px;
+  }
+
   /* Account portal (logged-in "Account" nav tab) */
   .account-portal {
     width: 100%;

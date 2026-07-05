@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -24,9 +25,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "es_ES": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -41,9 +44,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "fr_FR": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -58,9 +63,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "fr_CA": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -75,10 +82,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "en_CA": [],
   "it_IT": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -93,9 +102,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "de_DE": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -110,13 +121,27 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "devs.loading",
+    "nav.devs"
+  ],
+  "zh_TW": [
+    "devs.loading",
+    "nav.devs"
+  ],
+  "ko_KR": [
+    "devs.loading",
+    "nav.devs"
+  ],
+  "ja_JP": [
+    "devs.loading",
+    "nav.devs"
+  ],
   "pt_BR": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -131,10 +156,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "devs.loading",
+    "nav.devs"
+  ],
   "nl_NL": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -149,9 +179,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "pl_PL": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -166,9 +198,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "id_ID": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -183,9 +217,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "tr_TR": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -200,9 +236,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "sv_SE": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -217,9 +255,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "vi_VN": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -234,9 +274,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ],
   "da_DK": [
+    "devs.loading",
     "hudChrome.corpseHarvest.alreadyHarvested",
     "hudChrome.corpseHarvest.componentAria",
     "hudChrome.corpseHarvest.components.claw",
@@ -251,6 +293,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.corpseHarvest.harvestButton",
     "hudChrome.corpseHarvest.title",
     "hudChrome.mobile.hotbarPage",
-    "hudChrome.mobile.hotbarPageAria"
+    "hudChrome.mobile.hotbarPageAria",
+    "nav.devs"
   ]
 };

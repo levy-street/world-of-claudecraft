@@ -2487,6 +2487,7 @@ export const id_ID: EnTranslations = {
     "wiki": "Wiki",
     "news": "Berita",
     "download": "Unduh",
+    "devs": "Devs",
     "loginRegister": "Masuk/Daftar",
     "account": "Akun",
     "logout": "Keluar",
@@ -2535,6 +2536,9 @@ export const id_ID: EnTranslations = {
     "desc": "Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh.",
     "macCta": "Unduh untuk macOS",
     "windowsPending": "Build Windows tertunda."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Segera Hadir...",

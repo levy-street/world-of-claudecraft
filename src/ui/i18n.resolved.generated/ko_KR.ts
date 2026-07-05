@@ -2487,6 +2487,7 @@ export const ko_KR: EnTranslations = {
     "wiki": "위키",
     "news": "새소식",
     "download": "다운로드",
+    "devs": "Devs",
     "loginRegister": "로그인/회원가입",
     "account": "계정",
     "logout": "로그아웃",
@@ -2535,6 +2536,9 @@ export const ko_KR: EnTranslations = {
     "desc": "최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.",
     "macCta": "macOS용 다운로드",
     "windowsPending": "Windows 빌드는 준비 중입니다."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "준비 중...",

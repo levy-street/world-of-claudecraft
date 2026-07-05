@@ -123,6 +123,7 @@ export const en = {
     wiki: 'Wiki',
     news: 'News',
     download: 'Download',
+    devs: 'Devs',
     loginRegister: 'Login/Register',
     account: 'Account',
     logout: 'Logout',
@@ -171,6 +172,9 @@ export const en = {
     desc: 'Get the standalone launcher for optimized performance and full-screen play.',
     macCta: 'Download for macOS',
     windowsPending: 'Windows build pending.',
+  },
+  devs: {
+    loading: 'Loading the Devs portal…',
   },
   comingSoon: {
     placeholder: 'Coming Soon...',

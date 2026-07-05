@@ -2487,6 +2487,7 @@ export const da_DK: EnTranslations = {
     "wiki": "Wiki",
     "news": "Nyheder",
     "download": "Hent",
+    "devs": "Devs",
     "loginRegister": "Log ind/Opret",
     "account": "Konto",
     "logout": "Log ud",
@@ -2535,6 +2536,9 @@ export const da_DK: EnTranslations = {
     "desc": "Hent den selvstændige launcher for optimeret ydeevne og fuldskærmsspil.",
     "macCta": "Download til macOS",
     "windowsPending": "Windows-build afventer."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Kommer snart...",

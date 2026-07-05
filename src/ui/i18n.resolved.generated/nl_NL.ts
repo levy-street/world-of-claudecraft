@@ -2487,6 +2487,7 @@ export const nl_NL: EnTranslations = {
     "wiki": "Wiki",
     "news": "Nieuws",
     "download": "Downloaden",
+    "devs": "Devs",
     "loginRegister": "Inloggen/Registreren",
     "account": "Account",
     "logout": "Uitloggen",
@@ -2535,6 +2536,9 @@ export const nl_NL: EnTranslations = {
     "desc": "Download de losse launcher voor optimale prestaties en schermvullend spelen.",
     "macCta": "Download voor macOS",
     "windowsPending": "Windows-build volgt later."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Binnenkort beschikbaar...",

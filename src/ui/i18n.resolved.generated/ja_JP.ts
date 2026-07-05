@@ -2487,6 +2487,7 @@ export const ja_JP: EnTranslations = {
     "wiki": "Wiki",
     "news": "ニュース",
     "download": "ダウンロード",
+    "devs": "Devs",
     "loginRegister": "ログイン/登録",
     "account": "アカウント",
     "logout": "ログアウト",
@@ -2535,6 +2536,9 @@ export const ja_JP: EnTranslations = {
     "desc": "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。",
     "macCta": "macOS版をダウンロード",
     "windowsPending": "Windows版は準備中です。"
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "近日公開...",

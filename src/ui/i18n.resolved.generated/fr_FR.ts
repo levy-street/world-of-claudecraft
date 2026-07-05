@@ -2487,6 +2487,7 @@ export const fr_FR: EnTranslations = {
     "wiki": "Wiki",
     "news": "Actualités",
     "download": "Télécharger",
+    "devs": "Devs",
     "loginRegister": "Se connecter/S'inscrire",
     "account": "Compte",
     "logout": "Déconnexion",
@@ -2535,6 +2536,9 @@ export const fr_FR: EnTranslations = {
     "desc": "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.",
     "macCta": "Telecharger pour macOS",
     "windowsPending": "Build Windows en attente."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Bientôt disponible...",

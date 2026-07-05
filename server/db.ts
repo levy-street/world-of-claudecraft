@@ -577,6 +577,47 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- Devs portal: link a GitHub identity (contributions -> in-game progression) and
+-- a Solana wallet (for $WOC balance / rewards) to a player account.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS github_username TEXT;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS solana_address TEXT;
+-- GitHub ownership proof: a one-time code the player drops in their GitHub bio,
+-- verified server-side before contributions/leaderboard/rewards count.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS github_verify_code TEXT;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS github_verified BOOLEAN NOT NULL DEFAULT FALSE;
+-- Cached contribution score per linked account, refreshed when a player loads
+-- their Devs profile. Lets the leaderboard rank without re-hitting GitHub.
+CREATE TABLE IF NOT EXISTS devs_contribution_score (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  github_username TEXT NOT NULL,
+  points INT NOT NULL DEFAULT 0,
+  level INT NOT NULL DEFAULT 1,
+  prs_merged INT NOT NULL DEFAULT 0,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS devs_contribution_score_points ON devs_contribution_score(points DESC);
+-- $WOC reward ledger (reserve-then-pay): how many base units this contributor
+-- has already been paid, plus the last on-chain signature. Append-only advance.
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS claimed_base_units BIGINT NOT NULL DEFAULT 0;
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS last_claim_sig TEXT;
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS last_claim_at TIMESTAMPTZ;
+-- Contribution XP already written to character_grants (so growing contributions
+-- only ever grant the delta, never re-grant).
+ALTER TABLE devs_contribution_score ADD COLUMN IF NOT EXISTS granted_xp BIGINT NOT NULL DEFAULT 0;
+-- Out-of-game character rewards (e.g. Devs-portal contribution XP), applied
+-- authoritatively by the game server on character load. Append-only; never write
+-- characters.state directly while a player is online.
+CREATE TABLE IF NOT EXISTS character_grants (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  amount BIGINT NOT NULL,
+  reason TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  applied_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS character_grants_pending ON character_grants(character_id) WHERE applied_at IS NULL;
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -1960,6 +2001,37 @@ export async function saveCharacterAndMarketState(
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Apply-on-load: sum a character's unapplied XP grants in a row-locked tx that
+// stamps them applied, returning the total to award through the sim. Locking the
+// rows (then summing in JS — Postgres forbids FOR UPDATE with aggregates) means a
+// concurrent join can never apply the same grants twice. Errs toward under-
+// granting (a crash after the stamp loses that award), which is operator-fixable.
+export async function takePendingXpGrants(characterId: number): Promise<number> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const locked = await client.query(
+      `SELECT id, amount FROM character_grants
+        WHERE character_id = $1 AND kind = 'xp' AND applied_at IS NULL FOR UPDATE`,
+      [characterId],
+    );
+    const total = locked.rows.reduce((sum, row) => sum + Number(row.amount), 0);
+    if (locked.rows.length > 0) {
+      await client.query(
+        `UPDATE character_grants SET applied_at = now() WHERE id = ANY($1::bigint[])`,
+        [locked.rows.map((r) => r.id)],
+      );
+    }
+    await client.query('COMMIT');
+    return total;
+  } catch (err) {
+    await client.query('ROLLBACK');
     throw err;
   } finally {
     client.release();

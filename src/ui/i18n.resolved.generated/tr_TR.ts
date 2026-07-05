@@ -2487,6 +2487,7 @@ export const tr_TR: EnTranslations = {
     "wiki": "Wiki",
     "news": "Haberler",
     "download": "İndir",
+    "devs": "Devs",
     "loginRegister": "Giriş/Kayıt",
     "account": "Hesap",
     "logout": "Çıkış Yap",
@@ -2535,6 +2536,9 @@ export const tr_TR: EnTranslations = {
     "desc": "Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.",
     "macCta": "macOS için indir",
     "windowsPending": "Windows derlemesi beklemede."
+  },
+  "devs": {
+    "loading": "Loading the Devs portal…"
   },
   "comingSoon": {
     "placeholder": "Yakında...",
