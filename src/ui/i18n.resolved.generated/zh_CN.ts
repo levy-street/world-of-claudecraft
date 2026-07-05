@@ -1051,6 +1051,35 @@ export const zh_CN: EnTranslations = {
         }
       }
     },
+    "voiceNpc": {
+      "title": "语音 NPC (WIP)",
+      "wipBanner": "WIP 草稿,并非最终 HUD 窗口。",
+      "intro": "燃烧 $WOC,把你的声音克隆成一个小小的游戏内 NPC。",
+      "priceLabel": "价格: {price} $WOC",
+      "disabled": "语音 NPC 解锁功能暂未开放。",
+      "displayNameLabel": "NPC 显示名称",
+      "displayNamePlaceholder": "给你的回声起个名字吧?",
+      "consentLabel": "我同意由第三方 AI 语音服务克隆我录制的声音。",
+      "recordStart": "录制样本",
+      "recordStop": "停止录音",
+      "burnLabel": "燃烧 $WOC 并确认",
+      "recordingHint": "录音中......自然地说话,最长 30 秒。",
+      "micError": "无法访问你的麦克风。",
+      "uploadError": "无法上传语音样本。",
+      "needConsent": "录制或上传样本前必须先同意。",
+      "needWallet": "请先连接 Solana 钱包。",
+      "needName": "请输入 NPC 的显示名称。",
+      "quoteError": "无法获取报价。",
+      "burnNotWired": "此草稿版本尚未接入链上燃烧签名。",
+      "confirmError": "无法确认付款。",
+      "statusPendingSample": "样本已录制。可以报价并燃烧 $WOC 了。",
+      "statusPendingClone": "付款已确认。等待语音克隆开始。",
+      "statusCloning": "正在克隆你的声音......",
+      "statusGenerating": "正在生成对白......",
+      "statusReady": "你的语音 NPC 已就绪!",
+      "statusFailed": "出了点问题: {error}",
+      "statusPollFailed": "无法查询状态。请重新打开此面板。"
+    },
     "devBadge": {
       "title": "开发者",
       "tiers": {
@@ -6720,6 +6749,11 @@ export const zh_CN: EnTranslations = {
         "title": "圣物库守护人",
         "greeting": "下方的圣物库又移位了。"
       },
+      "voice_echo_npc": {
+        "name": "Echo",
+        "title": "被铭记的声音",
+        "greeting": "篝火彼端传来的声音......是啊,我记得自己曾经也是这样的嗓音。"
+      },
       "brother_halven_marsh": {
         "name": "哈尔文修士",
         "title": "圣物库守护人",
@@ -7516,6 +7550,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败莫格"
+          }
+        }
+      },
+      "q_echo_of_you": {
+        "title": "Echo of You",
+        "text": "我有件东西丢在了附近。你愿意替我去找回来吗?",
+        "completion": "你找到了。真心感谢你愿意听我说完。",
+        "objectives": {
+          "0": {
+            "label": "再次与回声交谈"
           }
         }
       },

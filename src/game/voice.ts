@@ -79,9 +79,21 @@ class GameVoice {
     if (!this.enabled) return;
     const src = VOICE_LINES[lineKey];
     if (!src) return;
+    this.playUrl(src, opts);
+  }
+
+  /**
+   * Play a clip by direct URL rather than a manifest lookup, for per-player
+   * runtime-generated audio that isn't in the build-time manifest (the voice-NPC
+   * feature's cloned dialogue clips, served from /audio/voice_npc/<accountId>/).
+   * Same HTMLAudioElement machinery as play(); a missing/unreachable clip is a
+   * silent no-op, same as a missing manifest entry.
+   */
+  playUrl(url: string, opts?: { gain?: number }): void {
+    if (!this.enabled || !url) return;
     this.stop();
     if (!this.el) this.el = new Audio();
-    this.el.src = src;
+    this.el.src = url;
     this.playGain = opts?.gain ?? 1;
     this.distanceGain = 1; // a fresh line starts at full: you just clicked the NPC, you are close
     this.applyVolume();

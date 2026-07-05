@@ -1051,6 +1051,35 @@ export const ja_JP: EnTranslations = {
         }
       }
     },
+    "voiceNpc": {
+      "title": "ボイスNPC (WIP)",
+      "wipBanner": "WIPドラフト版、最終的なHUDウィンドウではありません。",
+      "intro": "$WOCをバーンして、あなたの声を小さなゲーム内NPCにクローンしよう。",
+      "priceLabel": "価格: {price} $WOC",
+      "disabled": "ボイスNPCの解放はまだ利用できません。",
+      "displayNameLabel": "NPCの表示名",
+      "displayNamePlaceholder": "あなたのエコーの名前は?",
+      "consentLabel": "録音した自分の声がサードパーティのAI音声サービスによってクローンされることに同意します。",
+      "recordStart": "サンプルを録音",
+      "recordStop": "録音を停止",
+      "burnLabel": "$WOCをバーンして確定",
+      "recordingHint": "録音中...最大30秒間、自然に話してください。",
+      "micError": "マイクにアクセスできませんでした。",
+      "uploadError": "音声サンプルをアップロードできませんでした。",
+      "needConsent": "サンプルの録音やアップロードの前に同意が必要です。",
+      "needWallet": "まずSolanaウォレットを接続してください。",
+      "needName": "NPCの表示名を入力してください。",
+      "quoteError": "価格の見積もりを取得できませんでした。",
+      "burnNotWired": "このドラフトビルドではオンチェーンのバーン署名はまだ実装されていません。",
+      "confirmError": "支払いを確認できませんでした。",
+      "statusPendingSample": "サンプルを録音しました。見積もりと$WOCのバーンの準備ができました。",
+      "statusPendingClone": "支払いを確認しました。ボイスクローンの開始を待っています。",
+      "statusCloning": "あなたの声をクローンしています...",
+      "statusGenerating": "セリフを生成しています...",
+      "statusReady": "あなたのボイスNPCが完成しました!",
+      "statusFailed": "問題が発生しました: {error}",
+      "statusPollFailed": "ステータスを確認できませんでした。このパネルを開き直してください。"
+    },
     "devBadge": {
       "title": "開発者",
       "tiers": {
@@ -6720,6 +6749,11 @@ export const ja_JP: EnTranslations = {
         "title": "聖遺物庫の番人",
         "greeting": "下の聖遺物庫がまた動いた。"
       },
+      "voice_echo_npc": {
+        "name": "Echo",
+        "title": "思い出された声",
+        "greeting": "焚き火の向こうから響く声...そうだ、かつての私はあんな声だった。"
+      },
       "brother_halven_marsh": {
         "name": "ハルヴェン修道士",
         "title": "聖遺物庫の番人",
@@ -7516,6 +7550,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "モガーを討伐"
+          }
+        }
+      },
+      "q_echo_of_you": {
+        "title": "Echo of You",
+        "text": "近くで私の大切なものを失くしてしまった。探してきてくれないか?",
+        "completion": "見つけてくれたのか。私の話を聞いてくれて、本当にありがとう。",
+        "objectives": {
+          "0": {
+            "label": "もう一度エコーと話す"
           }
         }
       },

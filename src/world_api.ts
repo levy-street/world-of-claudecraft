@@ -295,6 +295,7 @@ export const COMMAND_NAMES = [
   'collect_delve_chest_loot',
   'delve_rite_choose',
   'telemetry',
+  'grant_voice_npc',
   'equip_bag',
   'unequip_bag',
   'mail_send',
@@ -317,7 +318,9 @@ export type CommandName = (typeof COMMAND_NAMES)[number];
 // `enter_crypt`/`leave_crypt` are legacy aliases that fall through to the
 // dungeon cases; `social_refresh` is a server-push refresh path; `targetNearest`
 // is called directly on the Sim by the headless RL action layer, never over the
-// wire. Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
+// wire; `grant_voice_npc` is a one-time server-initiated grant fired on login
+// once a player's voice_npc_grants row is 'ready' (see server/game.ts), never
+// sent by the client. Each must be a member of COMMAND_NAMES (the `satisfies` enforces it).
 export const DISPATCH_ONLY_COMMANDS = [
   'dev_level',
   'dev_teleport',
@@ -328,6 +331,7 @@ export const DISPATCH_ONLY_COMMANDS = [
   'leave_crypt',
   'social_refresh',
   'targetNearest',
+  'grant_voice_npc',
 ] as const satisfies readonly CommandName[];
 
 export type DispatchOnlyCommand = (typeof DISPATCH_ONLY_COMMANDS)[number];

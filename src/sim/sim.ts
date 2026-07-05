@@ -226,6 +226,7 @@ import {
   resurrectAtSpiritHealer,
   spawnOverworldSpiritHealers,
 } from './spirit';
+import { spawnVoiceNpcEcho } from './voice_npc_spawn';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
@@ -4816,6 +4817,14 @@ export class Sim {
     let n = 0;
     for (const s of r.meta.inventory) if (s.itemId === itemId) n += s.count;
     return n;
+  }
+
+  // Spawns the caller's voice-echo NPC (docs/prd/woc/voice-npc.md), once their
+  // server-side grant is ready. Thin delegate into voice_npc_spawn.ts, mirroring
+  // how onBossDeath delegates into encounters/nythraxis.ts. The caller
+  // (server/game.ts, fired once per character on join) owns idempotency.
+  grantVoiceNpc(pid: number, grant: { displayName: string; clipBaseUrl: string }): void {
+    spawnVoiceNpcEcho(this.ctx, pid, grant);
   }
 
   // Fungible-only count for `itemId` (excludes per-instance slots, #1165). The

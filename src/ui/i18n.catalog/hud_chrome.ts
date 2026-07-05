@@ -1173,6 +1173,37 @@ export const hudChromeStrings = {
       help: { label: 'Need Help', hint: 'Ask the community for help' },
     },
   },
+  // Voice-NPC draft scaffold (docs/prd/woc/voice-npc.md): a minimal, explicitly
+  // WIP record-and-burn entry point, not the final HUD window.
+  voiceNpc: {
+    title: 'Voice NPC (WIP)',
+    wipBanner: 'WIP draft, not a final HUD window.',
+    intro: 'Burn $WOC to clone your voice into a small in-game NPC.',
+    priceLabel: 'Price: {price} $WOC',
+    disabled: 'Voice NPC unlocking is not available yet.',
+    displayNameLabel: 'NPC display name',
+    displayNamePlaceholder: 'What should your echo be called?',
+    consentLabel: 'I consent to my recorded voice being cloned by a third-party AI voice service.',
+    recordStart: 'Record sample',
+    recordStop: 'Stop recording',
+    burnLabel: 'Burn $WOC & Confirm',
+    recordingHint: 'Recording... speak naturally for up to 30 seconds.',
+    micError: 'Could not access your microphone.',
+    uploadError: 'Could not upload the voice sample.',
+    needConsent: 'You must consent before recording or uploading a sample.',
+    needWallet: 'Connect a Solana wallet first.',
+    needName: 'Enter a display name for your NPC.',
+    quoteError: 'Could not get a price quote.',
+    burnNotWired: 'On-chain burn signing is not wired up yet in this draft build.',
+    confirmError: 'Could not confirm the payment.',
+    statusPendingSample: 'Sample recorded. Ready to quote and burn $WOC.',
+    statusPendingClone: 'Payment confirmed. Waiting for voice cloning to start.',
+    statusCloning: 'Cloning your voice...',
+    statusGenerating: 'Generating dialogue lines...',
+    statusReady: 'Your voice NPC is ready!',
+    statusFailed: 'Something went wrong: {error}',
+    statusPollFailed: "Couldn't check status. Please reopen this panel.",
+  },
   // Developer badge: a cosmetic honor for contributors by landed-commit count
   // (the ladder lives in src/sim/dev_tier.ts; the data is sourced from a verified
   // GitHub-OAuth link plus the repo's contributor stats). Shown on the player

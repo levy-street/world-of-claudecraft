@@ -56,6 +56,7 @@ import {
   TEMPLE_QUEST_ORDER,
   TEMPLE_QUESTS,
 } from './content/temple';
+import { VOICE_ECHO_NPCS, VOICE_ECHO_QUEST_ID, VOICE_ECHO_QUESTS } from './content/voice_npc';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
 import {
   GRAVEYARD_POS,
@@ -174,6 +175,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
   brother_halven: BROTHER_HALVEN,
+  ...VOICE_ECHO_NPCS,
   brother_halven_marsh: BROTHER_HALVEN_MARSH,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
@@ -190,6 +192,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
+  ...VOICE_ECHO_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -197,6 +200,7 @@ export const QUEST_ORDER: string[] = [
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
+  VOICE_ECHO_QUEST_ID,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
