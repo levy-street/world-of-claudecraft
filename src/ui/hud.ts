@@ -164,6 +164,8 @@ import {
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
 import { formatMinimapCoords } from './coords';
+import { corpseHarvestView } from './corpse_harvest_view';
+import { renderCorpseHarvestPicker } from './corpse_harvest_window';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import { DelveMapPainter } from './delve_map_painter';
 import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
@@ -733,6 +735,12 @@ export class Hud {
   // keybind dispatch all work across both with no per-bar bookkeeping.
   private static readonly PRIMARY_BAR_ABILITY_SLOTS = 11;
   private static readonly BAR_ABILITY_SLOTS = 22;
+  // Mobile hotbar: exactly two pages of 5 visible spell buttons (slots 1-5,
+  // then 6-10), toggled by one page-switch button. Slot 11 has no mobile
+  // page and is reachable only on the desktop bar.
+  private static readonly MOBILE_HOTBAR_PAGE_SIZE = 5;
+  private static readonly MOBILE_HOTBAR_SLOTS = 10;
+  private mobileHotbarPage = 0;
   private static readonly PET_AUTOCAST_TOUCH_HOLD_MS = 2000;
   private static ddSeq = 0; // monotonic id source for buildDropdown listbox/option ARIA wiring
   private static readonly FORM_TOGGLE_IDS = new Set(['bear_form', 'cat_form', 'travel_form']); // shift toggles, castable in any form
@@ -4700,6 +4708,37 @@ export class Hud {
       },
       (iconKey) => this.actionBarIconBg(iconKey),
     );
+    this.applyMobileHotbarPage();
+  }
+
+  /** Cycles which of the mobile hotbar's two 5-slot pages is showing (the
+   *  #mobile-hotbar-page toggle button). Event-driven, not per-frame, so it
+   *  writes the DOM directly rather than through the elided writer facet. */
+  cycleMobileHotbarPage(): void {
+    const pages = Math.ceil(Hud.MOBILE_HOTBAR_SLOTS / Hud.MOBILE_HOTBAR_PAGE_SIZE);
+    this.mobileHotbarPage = (this.mobileHotbarPage + 1) % pages;
+    this.applyMobileHotbarPage();
+  }
+
+  /** Shows only this.mobileHotbarPage's slice of ability slots (each assigned
+   *  a fixed position within the page via a hotbar-ring-N class), hiding the
+   *  rest: page 1 is slots 1-5, page 2 is slots 6-10. Hidden slots stay fully
+   *  live (cooldowns keep ticking, aura/proc state is untouched) -- paging
+   *  only toggles which buttons are painted, never which abilities exist. */
+  private applyMobileHotbarPage(): void {
+    const size = Hud.MOBILE_HOTBAR_PAGE_SIZE;
+    for (let slot = 1; slot <= Hud.MOBILE_HOTBAR_SLOTS; slot++) {
+      const btn = this.abilityButtons[slot]?.btn;
+      if (!btn) continue;
+      const index = slot - 1;
+      const page = Math.floor(index / size);
+      const ringPos = index % size;
+      btn.classList.toggle('mobile-hotbar-page-hidden', page !== this.mobileHotbarPage);
+      for (let r = 0; r < size; r++) btn.classList.toggle(`hotbar-ring-${r}`, r === ringPos);
+    }
+    // Slot 11 has no mobile page: always hidden on the touch hotbar.
+    const overflow = this.abilityButtons[Hud.MOBILE_HOTBAR_SLOTS + 1]?.btn;
+    overflow?.classList.add('mobile-hotbar-page-hidden');
   }
 
   // Resolve a core icon key to the slot label's background-image value. Kept on the
@@ -9487,17 +9526,20 @@ export class Hud {
 
   openLoot(mobId: number, screenX: number, screenY: number): void {
     const mob = this.sim.entities.get(mobId);
-    if (!mob?.loot) return;
-    const visibleItems = mob.loot.items.filter(
-      (s) => !s.personalFor || s.personalFor.includes(this.sim.playerId),
-    );
-    if (mob.loot.copper <= 0 && visibleItems.length === 0) return;
+    if (!mob) return;
+    const componentTags = MOBS[mob.templateId]?.componentTags;
+    const harvestable = !!componentTags?.length && mob.harvestClaimedBy === null;
+    const visibleItems = mob.loot
+      ? mob.loot.items.filter((s) => !s.personalFor || s.personalFor.includes(this.sim.playerId))
+      : [];
+    const hasLoot = !!mob.loot && (mob.loot.copper > 0 || visibleItems.length > 0);
+    if (!hasLoot && !harvestable) return;
     this.closeOtherWindows('#loot-window');
     this.openLootMobId = mobId;
     this.openLootChestId = null;
     const el = $('#loot-window');
     let html = `<div class="panel-title"><span>${esc(entityDisplayName(mob))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
-    if (mob.loot.copper > 0) {
+    if (mob.loot && mob.loot.copper > 0) {
       html += `<div class="loot-item"><img class="item-icon q-common" src="${iconDataUrl('item', 'coin_gold')}" alt="" draggable="false"><span>${this.moneyHtml(mob.loot.copper)}</span></div>`;
     }
     for (const s of visibleItems) {
@@ -9509,14 +9551,24 @@ export class Hud {
       const itemId = (row as HTMLElement).dataset.item ?? '';
       this.attachTooltip(row as HTMLElement, () => this.itemTooltip(ITEMS[itemId]));
     });
-    const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.textContent = t('itemUi.loot.takeAll');
-    btn.addEventListener('click', () => {
-      this.sim.lootCorpse(mobId);
-      this.closeLoot();
-    });
-    el.appendChild(btn);
+    if (hasLoot) {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.textContent = t('itemUi.loot.takeAll');
+      btn.addEventListener('click', () => {
+        this.sim.lootCorpse(mobId);
+        this.closeLoot();
+      });
+      el.appendChild(btn);
+    }
+    if (harvestable && componentTags) {
+      renderCorpseHarvestPicker(el, corpseHarvestView(componentTags, new Set()), {
+        onHarvest: (chosen) => {
+          this.sim.harvestCorpse(mobId, chosen);
+          this.closeLoot();
+        },
+      });
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeLoot());
     this.placePopupAt(el, screenX - 115, screenY - 30, 260, 280, 10, 10);
     el.style.transform = 'none'; // loot pops at the cursor, not the centred slot

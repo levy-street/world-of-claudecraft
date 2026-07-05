@@ -713,6 +713,37 @@
   .loot-item:hover {
     background: #ffffff10;
   }
+  .corpse-harvest {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border-default);
+  }
+  .corpse-harvest-title {
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .corpse-harvest-hint {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-bottom: 6px;
+  }
+  .corpse-harvest-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .corpse-harvest-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .corpse-harvest-btn {
+    width: 100%;
+  }
   #loot-rolls {
     position: fixed;
     right: max(14px, env(safe-area-inset-right));
@@ -5224,6 +5255,30 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
     border-color: var(--color-border-focus);
+  }
+  /* Recipient field autocomplete: relative wrapper anchors the listbox below the
+     input. Reuses .soc-sugg-item / .soc-suggest visual tokens from the social panel
+     so no new design-system surface is introduced. */
+  .mail-to-wrap {
+    position: relative;
+  }
+  .mail-to-suggest {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 3px);
+    display: none;
+    z-index: 30;
+    background: #14110d;
+    border: 1px solid #6f5a2a;
+    border-radius: 5px;
+    max-height: 210px;
+    overflow-y: auto;
+    box-shadow: 0 6px 18px #000a;
+  }
+  .mail-to-suggest.up {
+    top: auto;
+    bottom: calc(100% + 3px);
   }
   .mail-coin-row {
     flex-direction: row;

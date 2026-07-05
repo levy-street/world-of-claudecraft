@@ -19,6 +19,14 @@
    here, so neither leaks across entries. The shared #start-screen/#mobile-preflight
    game-active hide and the base/styling of #rotate-device stay here. */
 @layer hud-mobile {
+  /* Endfield-inspired glass chrome tokens: dark-fantasy gold-brown palette kept,
+     but permanent chrome (action row, quick-access rail, the More tray) reads as
+     translucent glass over the world instead of solid opaque wood/stone panels. */
+  body.mobile-touch {
+    --mobile-glass-bg: linear-gradient(160deg, #201d13b8, #0b0a08c7);
+    --mobile-glass-border: #cba43d8c;
+    --mobile-glass-blur: 8px;
+  }
   /* ---------- mobile touch controls (runtime-gated with body.mobile-touch + game-active) ---------- */
   #mobile-controls {
     display: none;
@@ -116,12 +124,18 @@
     height: 0;
     display: none;
   }
+  /* Move-only joystick: the camera/look joystick is hidden entirely (see
+     #mobile-camera-joystick below) -- looking around is swipe-drag-anywhere on
+     the canvas (onSwipeLookDown/Move/End in mobile_controls.ts), the way most
+     modern touch action games do it, so a second literal control surface was
+     redundant. What's left is a single, SMALLER pad (76px, was 122px): "the
+     smaller joystick is enough, no need the bigger outer ring." */
   body.mobile-touch .mobile-joystick {
     position: absolute;
-    left: max(18px, env(safe-area-inset-left));
-    bottom: calc(26px + env(safe-area-inset-bottom));
-    width: 122px;
-    height: 122px;
+    left: max(28px, calc(env(safe-area-inset-left) + 14px));
+    bottom: calc(22px + env(safe-area-inset-bottom));
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
     pointer-events: auto;
     touch-action: none;
@@ -146,13 +160,6 @@
     body.mobile-touch .mobile-joystick {
       transition: none;
     }
-  }
-  body.mobile-touch .mobile-joystick::before {
-    content: "";
-    position: absolute;
-    inset: 28px;
-    border-radius: 50%;
-    border: 1px solid #ffffff18;
   }
   /* Floating move joystick: a lower-left capture zone lets the thumb land
      anywhere; the joystick rests dimmed at home until touched, then springs to
@@ -190,43 +197,21 @@
       inset 0 0 26px #0008,
       0 0 16px 3px #e3c66a55;
   }
+  /* The camera/look joystick UI is removed: swipe-drag on the canvas already
+     provides full camera control (see the comment above), so a second visual
+     control surface was redundant screen furniture. Its double-tap-to-recenter
+     gesture moved to the canvas swipe-look path instead (mobile_controls.ts),
+     so the feature survives even though this control doesn't. */
   body.mobile-touch #mobile-camera-joystick {
-    left: auto;
-    right: max(18px, env(safe-area-inset-right));
-    transform-origin: right bottom;
-  }
-  body.mobile-touch #mobile-camera-joystick.recentering {
-    animation: mobile-recenter-pulse 0.22s ease-out;
-  }
-  @keyframes mobile-recenter-pulse {
-    0% {
-      box-shadow:
-        0 3px 18px #0008,
-        inset 0 1px 0 #ffffff12,
-        inset 0 0 26px #0008;
-      border-color: #b7a35a80;
-    }
-    45% {
-      box-shadow:
-        0 0 22px 4px #e3d47588,
-        inset 0 0 26px #0008;
-      border-color: #e3d475e0;
-    }
-    100% {
-      box-shadow:
-        0 3px 18px #0008,
-        inset 0 1px 0 #ffffff12,
-        inset 0 0 26px #0008;
-      border-color: #b7a35a80;
-    }
+    display: none;
   }
   body.mobile-touch .mobile-stick {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 54px;
-    height: 54px;
-    margin: -27px 0 0 -27px;
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
     border-radius: 50%;
     border: 2px solid #e3d475b8;
     background: radial-gradient(circle at 35% 30%, #867ab6aa, #1d1d2b9a 70%);
@@ -245,25 +230,61 @@
     color: #c8b888;
     text-shadow: 1px 1px 2px #000;
   }
+  /* Corner-anchored, thumb-reach layout (not a dead-center strip): the core
+     verbs cluster right above the camera/look joystick, in the same corner the
+     right thumb already rests in to look around, the way action-RPG gacha
+     mobile HUDs (Genshin/Star Rail/Wuthering Waves/Endfield-style) keep the
+     lower-middle of the screen clear and put frequent taps in a tight
+     bottom-corner cluster instead of a wide centered row. Attack spans the top
+     row (the single most-pressed action, biggest target); Jump/Target/Use
+     auto-fill the row below it. bottom offset clears the 122px camera
+     joystick (26px anchor + 122px + ~8px gap).
+     #mobile-combat-controls is just a positioning anchor (no transform): its
+     other children, #mobile-autorun/#mobile-chat/#mobile-more, are pulled out
+     to a top-corner row (see their own rules below) via position: fixed, and a
+     transform on an ANCESTOR creates a new containing block for fixed/absolute
+     DESCENDANTS -- if the btn-scale transform stayed here, those three would
+     be positioned relative to this bottom-right box instead of the viewport.
+     The actual grid + scale transform live on the inner #mobile-combat-grid,
+     which holds only the 4 real cluster buttons. */
   body.mobile-touch #mobile-combat-controls {
     position: absolute;
-    left: 50%;
-    bottom: calc(3px + env(safe-area-inset-bottom));
-    transform: translateX(-50%) scale(var(--btn-scale, 1));
-    transform-origin: center bottom;
-    display: grid;
-    grid-template-columns: 124px repeat(6, 58px);
-    gap: 8px;
-    pointer-events: auto;
-    align-items: end;
+    left: auto;
+    right: max(32px, calc(env(safe-area-inset-right) + 18px));
+    bottom: calc(22px + env(safe-area-inset-bottom));
     z-index: 30;
+  }
+  /* Flat row, not an orbit: Attack (the "sun" the ability ring below orbits)
+     sits at the very corner, with Jump/Target/Use laid out flat to its left
+     along the same bottom row -- simpler and unambiguous to reach than
+     packing them into the ring geometry too. */
+  body.mobile-touch #mobile-combat-grid {
+    position: relative;
+    width: 236px;
+    height: 64px;
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: right bottom;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-combat-grid .mobile-btn {
+    position: absolute;
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-combat-controls {
+    right: auto;
+    left: max(32px, calc(env(safe-area-inset-left) + 18px));
+  }
+  body.mobile-touch.mobile-left-handed #mobile-combat-grid {
+    transform-origin: left bottom;
   }
   body.mobile-touch .mobile-btn {
     width: 58px;
     height: 54px;
-    border: 2px solid #4a3d1d;
-    border-radius: 8px;
-    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 50%;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
     color: #eee8ff;
     cursor: var(--cursor-point);
     font-size: 22px;
@@ -277,29 +298,108 @@
     align-items: center;
     justify-content: center;
     gap: 1px;
+    transition: opacity 0.35s ease;
+  }
+  /* Icon-only: the always-visible cluster drops its permanent text label (the
+     fuller "More" tray keeps its labels, it's a browsed menu, not a glanceable
+     HUD strip). The accessible name survives via title/aria-label (already
+     set in index.html), so this is presentation-only. */
+  body.mobile-touch #mobile-combat-controls .mobile-btn {
+    width: 50px;
+    height: 50px;
+  }
+  body.mobile-touch #mobile-combat-controls .mobile-btn .mobile-label {
+    display: none;
   }
   body.mobile-touch .mobile-btn .ui-icon {
     width: 22px;
     height: 22px;
   }
   body.mobile-touch #mobile-attack-nearest {
-    width: 124px;
+    /* Slightly bigger than the other cluster buttons (was 58px): it's the
+       single most-pressed button, worth the extra thumb target. */
+    width: 64px;
+    height: 64px;
+    right: 0;
+    bottom: 0;
     color: #ffdf9c;
     border-color: #8b4e2c;
   }
+  body.mobile-touch #mobile-interact {
+    width: 50px;
+    height: 50px;
+    right: 70px;
+    bottom: 4px;
+  }
+  body.mobile-touch #mobile-target {
+    width: 50px;
+    height: 50px;
+    right: 126px;
+    bottom: 4px;
+  }
+  body.mobile-touch #mobile-jump {
+    width: 50px;
+    height: 50px;
+    right: 182px;
+    bottom: 4px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-attack-nearest {
+    right: auto;
+    left: 0;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-interact {
+    right: auto;
+    left: 70px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-target {
+    right: auto;
+    left: 126px;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-jump {
+    right: auto;
+    left: 182px;
+  }
+  /* Autorun/Chat/More are the low-frequency verbs (a travel toggle and two
+     menu-openers, never a split-second combat tap), so they move out of the
+     thumb-reach cluster entirely into a small top-corner row -- the same
+     "secondary actions cost a reach, core actions don't" split these games use.
+     They stay real DOM children of #mobile-combat-controls (idle-fade's
+     descendant selector still reaches them) but position:fixed removes them
+     from its CSS Grid flow, so the grid above only ever lays out the 4 core
+     buttons. Anchored to the MOVE-joystick side (left by default), mirrored in
+     left-handed mode below, since that's the thumb NOT busy holding the
+     camera/look joystick. */
+  body.mobile-touch #mobile-autorun,
+  body.mobile-touch #mobile-chat,
   body.mobile-touch #mobile-more {
-    position: static;
-    z-index: 19;
+    position: fixed;
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
+    top: calc(max(8px, env(safe-area-inset-top)) + 104px);
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+    z-index: 30;
+    pointer-events: auto;
+  }
+  body.mobile-touch #mobile-chat {
+    /* 60px pitch (was 48, a 4px gap on 44px-tall buttons that read as
+       touching/overlapping under the glass blur/glow), giving each button a
+       clean 16px gap from its neighbor. */
+    top: calc(max(8px, env(safe-area-inset-top)) + 164px);
+  }
+  body.mobile-touch #mobile-more {
+    top: calc(max(8px, env(safe-area-inset-top)) + 224px);
+  }
+  body.mobile-touch.mobile-left-handed #mobile-autorun,
+  body.mobile-touch.mobile-left-handed #mobile-chat,
+  body.mobile-touch.mobile-left-handed #mobile-more {
+    left: auto;
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
   }
   body.mobile-touch .mobile-btn:active {
     transform: translateY(1px);
     border-color: var(--gold);
     color: #fff;
-  }
-  body.mobile-touch #mobile-autorun {
-    position: static;
-    pointer-events: auto;
-    z-index: 19;
   }
   body.mobile-touch #mobile-autorun.active {
     border-color: var(--gold);
@@ -333,13 +433,15 @@
     bottom: auto;
     transform: translateX(-50%);
     display: none;
-    width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
     --window-pad: 10px;
     pointer-events: auto;
     z-index: 100;
-    border: 2px solid #5b4618;
+    border: 1px solid var(--mobile-glass-border);
     border-radius: 10px;
-    background: linear-gradient(170deg, #15151ff2, #08080df8);
+    background: var(--mobile-glass-bg);
+    -webkit-backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
+    backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
     box-shadow:
       0 8px 28px #000d,
       inset 0 1px 0 #ffffff12;
@@ -379,28 +481,34 @@
   body.mobile-touch #mobile-extra-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: 42px;
-    gap: 7px;
+    grid-auto-rows: 36px;
+    gap: 6px;
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn {
     width: 100%;
-    height: 42px;
+    height: 36px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    padding: 0 10px;
-    font-size: 17px;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 8px;
+    font-size: 14px;
+    /* The base .mobile-btn's border-radius: 50% is meant for the near-square
+       combat/hotbar buttons; on this wide row it computes a squashed oval
+       (elliptical corner radii bigger than the box is tall). A pill needs the
+       radius capped at half the height so the ends are true semicircles and
+       the sides stay straight. */
+    border-radius: 18px;
   }
   body.mobile-touch #mobile-extra-controls .mobile-label {
     display: inline;
     margin: 0;
-    font-size: 10px;
+    font-size: 9px;
     color: #e6d8ae;
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {
-    flex: 0 0 22px;
+    flex: 0 0 18px;
   }
   /* A toggle tray button (e.g. Nameplates) glows gold while its feature is on. */
   body.mobile-touch #mobile-extra-controls .mobile-btn.active {
@@ -526,14 +634,20 @@
     z-index: 28;
     pointer-events: auto;
   }
+  /* top offset gives >=24px clearance below #community-hud's bottom edge
+     (158px + 44px tall = 202px): the daily-rewards chest's icon art is 64x64
+     inside a smaller button box (overflow: visible, for its glow/pulse FX),
+     so it visually overflows above its own box -- too little clearance here
+     reads as the chest overlapping the community button above it. */
   body.mobile-touch #side-buttons {
     display: block;
-    right: max(8px, env(safe-area-inset-right));
-    top: calc(max(8px, env(safe-area-inset-top)) + 210px);
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
+    top: calc(max(8px, env(safe-area-inset-top)) + 226px);
     bottom: auto;
     width: 70px;
     z-index: 81;
     pointer-events: none;
+    transition: opacity 0.35s ease;
   }
   body.mobile-touch.mobile-window-open #side-buttons {
     z-index: 1;
@@ -554,34 +668,154 @@
   body.native-app.mobile-touch #daily-rewards-window {
     display: none !important;
   }
+  /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
+     stretch of no touch): recedes the action row + quick-access rail, instantly
+     restored on the next touch. Deliberately excludes the Attack button and both
+     joysticks -- cosmetic declutter only, never the actionable info the graphics
+     fairness rule protects (HP/target/cast bars aren't in this selector list). */
+  body.mobile-touch.mobile-chrome-idle #mobile-combat-controls
+    .mobile-btn:not(#mobile-attack-nearest),
+  body.mobile-touch.mobile-chrome-idle #community-hud .community-toggle,
+  body.mobile-touch.mobile-chrome-idle #side-buttons {
+    opacity: 0.5;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-combat-controls .mobile-btn,
+    body.mobile-touch #community-hud,
+    body.mobile-touch #side-buttons {
+      transition: none;
+    }
+  }
+  /* The hotbar is a paged ROW of Hud.MOBILE_HOTBAR_PAGE_SIZE (5) spell
+     buttons stacked directly above the combat cluster, plus the large Attack
+     button in the cluster below it. The #mobile-hotbar-page toggle
+     (Hud.cycleMobileHotbarPage) pages between the two 5-slot pages (slots
+     1-5, then 6-10) -- a simple left-to-right row is unambiguous to scan and
+     impossible to mis-space the way the earlier orbit/ring layouts were.
+     #actionbar shares the same right anchor as #mobile-combat-controls so
+     the row lines up with Attack's corner without duplicating the anchor
+     math. Existing drag-to-reorder (bindMobileActionDrag) is unaffected: it
+     hit-tests via elementFromPoint, which does not care how slots are
+     laid out. */
   body.mobile-touch #actionbar {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 4px;
-    padding: 4px;
-    width: 100%;
-    max-width: 100%;
-    min-height: 50px;
+    position: fixed;
+    right: max(32px, calc(env(safe-area-inset-right) + 18px));
+    bottom: calc(22px + env(safe-area-inset-bottom) + 76px);
+    left: auto;
+    display: block;
+    width: 260px;
+    height: 44px;
+    padding: 0;
     box-sizing: border-box;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    background: linear-gradient(170deg, #15151fc8, #08080dd8);
+    overflow: visible;
+    background: none;
+    pointer-events: none;
+    z-index: 29;
+    /* #actionbar is a plain .panel on desktop (bordered frame around the bar);
+       on mobile it is only a positioning wrapper for individually-drawn round
+       slot buttons, so the inherited panel chrome (border/outline/shadow/
+       radius) must be stripped or a useless bordered square renders behind
+       the hotbar. */
+    border: none;
+    outline: none;
+    border-radius: 0;
+    box-shadow: none;
   }
-  body.mobile-touch #actionbar.many-spells {
-    grid-template-columns: none;
+  body.mobile-touch.mobile-left-handed #actionbar {
+    right: auto;
+    left: max(32px, calc(env(safe-area-inset-left) + 18px));
   }
-  /* The second action bar is desktop-only; the mobile hotbar stays a single scroll row. */
+  /* The second action bar is desktop-only; the mobile hotbar is the one row. */
   body.mobile-touch #actionbar2 {
     display: none;
   }
   body.mobile-touch .action-btn {
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
-    border-radius: 7px;
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    bottom: 0;
+    border-radius: 50%;
+    pointer-events: auto;
+    /* Off-row until Hud.applyMobileHotbarPage assigns a hotbar-ring-N class;
+       an unassigned slot (beyond the 10 slots shown on mobile) never appears. */
+    display: none;
+  }
+  body.mobile-touch .action-btn.mobile-hotbar-page-hidden {
+    display: none;
+  }
+  body.mobile-touch .action-btn.hotbar-ring-0:not(.mobile-hotbar-page-hidden):not(.empty) {
+    display: flex;
+    right: 0;
+  }
+  body.mobile-touch .action-btn.hotbar-ring-1:not(.mobile-hotbar-page-hidden):not(.empty) {
+    display: flex;
+    right: 48px;
+  }
+  body.mobile-touch .action-btn.hotbar-ring-2:not(.mobile-hotbar-page-hidden):not(.empty) {
+    display: flex;
+    right: 96px;
+  }
+  body.mobile-touch .action-btn.hotbar-ring-3:not(.mobile-hotbar-page-hidden):not(.empty) {
+    display: flex;
+    right: 144px;
+  }
+  body.mobile-touch .action-btn.hotbar-ring-4:not(.mobile-hotbar-page-hidden):not(.empty) {
+    display: flex;
+    right: 192px;
+  }
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-0:not(.mobile-hotbar-page-hidden):not(.empty),
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-1:not(.mobile-hotbar-page-hidden):not(.empty),
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-2:not(.mobile-hotbar-page-hidden):not(.empty),
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-3:not(.mobile-hotbar-page-hidden):not(.empty),
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-4:not(.mobile-hotbar-page-hidden):not(.empty) {
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-0:not(.mobile-hotbar-page-hidden):not(.empty) {
+    left: 0;
+  }
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-1:not(.mobile-hotbar-page-hidden):not(.empty) {
+    left: 48px;
+  }
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-2:not(.mobile-hotbar-page-hidden):not(.empty) {
+    left: 96px;
+  }
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-3:not(.mobile-hotbar-page-hidden):not(.empty) {
+    left: 144px;
+  }
+  body.mobile-touch.mobile-left-handed
+    .action-btn.hotbar-ring-4:not(.mobile-hotbar-page-hidden):not(.empty) {
+    left: 192px;
+  }
+  /* The page toggle sits just left of the row, distinct from its 5 slots.
+     #mobile-combat-controls .mobile-btn (the icon-only 50x50 rule) outranks
+     a bare ID selector on specificity, so the size here must be pinned via
+     the same #mobile-combat-controls prefix or it silently loses to 50x50 --
+     the same specificity trap the left-handed joystick swap hit earlier in
+     this file. */
+  body.mobile-touch #mobile-combat-controls #mobile-hotbar-page {
+    position: fixed;
+    right: calc(max(32px, env(safe-area-inset-right) + 18px) + 240px);
+    bottom: calc(22px + env(safe-area-inset-bottom) + 80px);
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    z-index: 29;
+    /* #mobile-controls is click-through by default (pointer-events: none);
+       every interactive child re-enables it individually. */
+    pointer-events: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-combat-controls #mobile-hotbar-page {
+    right: auto;
+    left: calc(max(32px, env(safe-area-inset-left) + 18px) + 240px);
   }
   body.mobile-touch.mobile-hotbar-dragging #actionbar {
     touch-action: none;
@@ -596,7 +830,7 @@
     border-color: #4a3d1d;
   }
   body.mobile-touch .action-btn .icon-label {
-    border-radius: 6px;
+    border-radius: 50%;
   }
   body.mobile-touch .action-btn .cd-text {
     font-size: 13px;
@@ -610,13 +844,18 @@
   body.mobile-touch .action-btn.empty {
     display: none;
   }
+  /* Quick-access rail: the community toggle and the daily-rewards chest were two
+     independently absolutely-positioned buttons that happened to sit near each
+     other; unify their spacing (48px apart, was 52) and glass finish so they read
+     as one rail below the minimap instead of two unrelated floating badges. */
   body.mobile-touch #community-hud {
-    right: max(8px, env(safe-area-inset-right));
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
     top: calc(max(8px, env(safe-area-inset-top)) + 158px);
     bottom: auto;
     width: 70px;
     padding: 0;
     display: block;
+    transition: opacity 0.35s ease;
   }
   body.mobile-touch #community-menu {
     display: block;
@@ -637,9 +876,11 @@
     align-items: center;
     justify-content: center;
     color: var(--color-text-muted);
-    border: 2px solid #4a3d1d;
+    border: 1px solid var(--mobile-glass-border);
     border-radius: 8px;
-    background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
+    background: var(--mobile-glass-bg);
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur));
+    backdrop-filter: blur(var(--mobile-glass-blur));
     box-shadow:
       inset 0 1px 0 #ffffff18,
       0 2px 4px #0009;
@@ -740,17 +981,28 @@
     box-sizing: border-box;
     font-size: 16px;
   }
+  /* Own HP/mana lives bottom-center, the one part of the screen every other
+     mobile element deliberately leaves empty (move joystick bottom-left,
+     combat cluster + hotbar bottom-right, low-frequency verbs + minimap rail
+     top corners) -- keeping the HUD as unobtrusive as possible while still
+     putting the player's own vitals where the thumb never has to look away
+     from center to check them. justify-content stays flex-start (not
+     centered): the container itself is centered on screen via left/transform,
+     but internally the portrait must stay flush at the container's own
+     origin, since the XP ring (#player-frame::before) is positioned relative
+     to that origin, not to the portrait element. */
   body.mobile-touch #player-frame {
     position: fixed;
-    left: max(8px, env(safe-area-inset-left));
-    top: max(8px, env(safe-area-inset-top));
+    left: 50%;
+    top: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom));
     z-index: 21;
     width: 300px;
     margin: 0;
     display: flex;
     justify-content: flex-start;
-    transform: scale(0.82);
-    transform-origin: left top;
+    transform: translateX(-50%) scale(0.82);
+    transform-origin: center bottom;
   }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
@@ -763,14 +1015,14 @@
     flex: none;
   }
   body.mobile-touch #target-frame {
-    left: max(8px, env(safe-area-inset-left));
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
     top: calc(max(8px, env(safe-area-inset-top)) + 72px);
     transform: scale(0.82);
     transform-origin: left top;
   }
   body.mobile-touch #party-frames {
     position: fixed;
-    left: max(8px, env(safe-area-inset-left));
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
     top: calc(max(8px, env(safe-area-inset-top)) + 74px);
     gap: 0;
     z-index: 5;
@@ -840,12 +1092,12 @@
     max-width: 180px;
   }
   body.mobile-touch #debuff-bar {
-    right: max(10px, env(safe-area-inset-right));
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
     top: calc(max(140px, env(safe-area-inset-top)) + 36px);
     max-width: 180px;
   }
   body.mobile-touch #minimap-wrap {
-    right: max(8px, env(safe-area-inset-right));
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
     top: max(8px, env(safe-area-inset-top));
     transform: scale(0.72);
     transform-origin: right top;
@@ -870,20 +1122,13 @@
     overflow: hidden;
     z-index: 25;
   }
-  /* Left-handed mirror: swap the two thumb joysticks (and the bottom HUD that
-     hugs them) so the movement stick sits under the right thumb. Opt-in via the
-     "Left-handed Touch" toggle in Key Bindings; centred combat buttons stay put. */
+  /* Left-handed mirror: swap the move joystick (and the corner-anchored HUD
+     that hugs it -- see #mobile-combat-controls/#mobile-autorun/#mobile-chat/
+     #mobile-more above) so it sits under the right thumb. Opt-in via the
+     "Left-handed Touch" toggle in Key Bindings. */
   body.mobile-touch.mobile-left-handed .mobile-joystick {
     left: auto;
-    right: max(18px, env(safe-area-inset-right));
-  }
-  body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
-    right: auto;
-    left: max(18px, env(safe-area-inset-left));
-  }
-  body.mobile-touch.mobile-left-handed #mobile-more {
-    left: auto;
-    right: auto;
+    right: max(28px, calc(env(safe-area-inset-right) + 14px));
   }
   body.mobile-touch.mobile-left-handed #mobile-extra-controls {
     left: 50%;
@@ -1662,17 +1907,14 @@
   }
 
   @media (orientation: portrait) {
-    body.mobile-touch #mobile-combat-controls {
-      grid-template-columns: 96px repeat(6, 42px);
+    body.mobile-touch #mobile-combat-grid {
+      grid-template-columns: repeat(3, 42px);
       gap: 4px;
     }
     body.mobile-touch .mobile-btn {
       width: 42px;
       height: 44px;
       font-size: 16px;
-    }
-    body.mobile-touch #mobile-attack-nearest {
-      width: 96px;
     }
     body.mobile-touch #community-hud {
       /* var(--app-vh), not dvh: viewport units resolve against the initial
@@ -1686,29 +1928,26 @@
         calc(var(--app-vh) * 0.44 / var(--ui-scale, 1)),
         calc(var(--app-vh) / var(--ui-scale, 1) - 230px)
       );
-      right: max(8px, env(safe-area-inset-right));
+      right: max(20px, calc(env(safe-area-inset-right) + 10px));
       bottom: auto;
       width: 70px;
     }
   }
 
-  /* Narrow-portrait phones (320-384px: iPhone SE, small Androids): the portrait
-     combat row above is 372px wide (96 + 6x42 + gaps), so centred it clips both
-     the Attack and More buttons off-screen. Shrink the row to 312px so the whole
-     strip always fits with a margin. 36px-wide buttons are below the 40px touch
-     floor, the documented infeasible case (7 targets across a 320px screen); the
-     44px height keeps each target at WCAG size. */
+  /* Narrow-portrait phones (320-384px: iPhone SE, small Androids): the corner
+     cluster above is only 3 columns wide now (no longer a 7-across row), so it
+     already clears these widths comfortably; still shave the buttons down a
+     touch so the cluster doesn't crowd the camera joystick beneath it. 36px is
+     below the 40px touch floor, the documented infeasible case, on the
+     narrowest phones; 44px height keeps each target at WCAG size. */
   @media (orientation: portrait) and (max-width: 384px) {
-    body.mobile-touch #mobile-combat-controls {
-      grid-template-columns: 78px repeat(6, 36px);
+    body.mobile-touch #mobile-combat-grid {
+      grid-template-columns: repeat(3, 36px);
       gap: 3px;
     }
     body.mobile-touch .mobile-btn {
       width: 36px;
       font-size: 14px;
-    }
-    body.mobile-touch #mobile-attack-nearest {
-      width: 78px;
     }
   }
 
@@ -1793,25 +2032,28 @@
       font-size: 20px;
     }
     body.mobile-touch .mobile-joystick {
-      width: 100px;
-      height: 100px;
-      bottom: calc(15px + env(safe-area-inset-bottom));
+      width: 64px;
+      height: 64px;
+      bottom: calc(13px + env(safe-area-inset-bottom));
       opacity: 0.72;
       border-color: #d2bd6a66;
     }
     body.mobile-touch #mobile-move-joystick {
-      left: max(20px, env(safe-area-inset-left));
+      left: max(24px, calc(env(safe-area-inset-left) + 12px));
     }
-    body.mobile-touch #mobile-camera-joystick {
-      right: max(20px, env(safe-area-inset-right));
-    }
-    body.mobile-touch .mobile-joystick::before {
-      inset: 23px;
+    /* #mobile-move-joystick is an ID selector, which outranks the class-based
+       left-handed swap rule (.mobile-left-handed .mobile-joystick) on
+       specificity alone -- without this override the joystick silently never
+       swaps sides in landscape (pre-existing bug, fixed here since it's the
+       same rule this pass already touches). */
+    body.mobile-touch.mobile-left-handed #mobile-move-joystick {
+      left: auto;
+      right: max(24px, calc(env(safe-area-inset-right) + 12px));
     }
     body.mobile-touch .mobile-stick {
-      width: 44px;
-      height: 44px;
-      margin: -22px 0 0 -22px;
+      width: 30px;
+      height: 30px;
+      margin: -15px 0 0 -15px;
     }
     body.mobile-touch .mobile-joy-label {
       bottom: -15px;
@@ -1819,8 +2061,9 @@
       color: #d7c987aa;
     }
     body.mobile-touch #mobile-combat-controls {
-      bottom: calc(2px + env(safe-area-inset-bottom));
-      grid-template-columns: 115px repeat(6, 54px);
+      bottom: calc(13px + env(safe-area-inset-bottom));
+    }
+    body.mobile-touch #mobile-combat-grid {
       gap: 7px;
     }
     body.mobile-touch .mobile-btn {
@@ -1828,9 +2071,6 @@
       height: 48px;
       font-size: 20px;
       background: radial-gradient(circle at 35% 30%, #2d3048bf, #11121ec2 72%);
-    }
-    body.mobile-touch #mobile-attack-nearest {
-      width: 115px;
     }
     body.mobile-touch #mobile-extra-controls {
       left: 50%;
@@ -1847,8 +2087,8 @@
     }
     body.mobile-touch #mobile-extra-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-rows: 40px;
-      gap: 6px;
+      grid-auto-rows: 34px;
+      gap: 5px;
     }
     body.mobile-touch.mobile-left-handed #mobile-extra-controls {
       left: 50%;
@@ -1856,30 +2096,26 @@
     }
     body.mobile-touch #mobile-extra-controls .mobile-btn {
       width: 100%;
-      height: 40px;
-      font-size: 16px;
-      padding: 0 9px;
+      height: 34px;
+      font-size: 13px;
+      padding: 0 7px;
+      border-radius: 17px;
     }
     body.mobile-touch #mobile-extra-controls .mobile-label {
       font-size: 9px;
     }
-    body.mobile-touch #bottom-bar {
-      left: calc(max(20px, env(safe-area-inset-left)) + 136px);
-      right: calc(max(20px, env(safe-area-inset-right)) + 136px);
-      bottom: calc(57px + env(safe-area-inset-bottom));
-    }
+    /* Keep the same 76px gap above the combat cluster as the default rule
+       (#mobile-combat-controls also drops from 22px to 13px here) -- this
+       breakpoint is always active during real landscape gameplay, so a stale
+       offset here overlaps the hotbar with the orbital/flat combat cluster. */
     body.mobile-touch #actionbar {
-      gap: 4px;
-      padding: 4px;
-      background: linear-gradient(170deg, #15151fa8, #08080db8);
+      bottom: calc(13px + env(safe-area-inset-bottom) + 76px);
+    }
+    body.mobile-touch #mobile-combat-controls #mobile-hotbar-page {
+      bottom: calc(13px + env(safe-area-inset-bottom) + 80px);
     }
     body.mobile-touch #actionbar.many-spells {
       grid-template-columns: none;
-    }
-    body.mobile-touch .action-btn {
-      width: 40px;
-      height: 40px;
-      flex-basis: 40px;
     }
     body.mobile-touch #xpbar {
       display: none;
@@ -1899,8 +2135,13 @@
     body.mobile-touch #castbar {
       left: calc(max(20px, env(safe-area-inset-left)) + 112px);
       bottom: calc(15px + env(safe-area-inset-bottom));
-      width: min(160px, calc(50vw - 166px));
-      min-width: 100px;
+      /* Capped so the right edge stays clear of the bottom-center
+         #player-frame (50vw minus its 90px half-width at scale(0.6), minus a
+         16px gap): 50vw - 238px. The old cap (50vw - 166px) did not account
+         for the frame's own half-width, so it overlapped the frame on
+         narrower landscape phones (down to 800px wide). */
+      width: min(160px, calc(50vw - 238px));
+      min-width: 40px;
       height: 5px;
     }
     body.mobile-touch #petbar {
@@ -1940,10 +2181,11 @@
       width: min(330px, 44vw);
     }
     body.mobile-touch #player-frame {
-      left: max(6px, env(safe-area-inset-left));
-      top: max(6px, env(safe-area-inset-top));
+      left: 50%;
+      top: auto;
+      bottom: calc(10px + env(safe-area-inset-bottom));
       width: 300px;
-      transform: scale(0.6);
+      transform: translateX(-50%) scale(0.6);
     }
     body.mobile-touch #player-frame .uf-bars {
       width: 224px;
