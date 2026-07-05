@@ -1,0 +1,19 @@
+{
+  "name": "@woc/plugin-claudecraft",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "STUB (RFC) — elizaOS plugin letting an agent play World of Claudecraft as a player or pet familiar.",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "echo 'TODO(eliza): tsup ESM + dts'",
+    "test": "echo 'TODO(eliza): vitest worldMirror + steering'"
+  },
+  "peerDependencies": {
+    "@elizaos/core": "^2.0.0-beta"
+  },
+  "dependencies": {
+    "ws": "^8.21.0"
+  },
+  "comment": "STUB PACKAGE — not wired into the root workspace/build/CI yet. See docs/prd/eliza-agents.md."
+}
