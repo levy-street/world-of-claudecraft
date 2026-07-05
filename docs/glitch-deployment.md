@@ -52,7 +52,7 @@ export VITE_GLITCH_DEFAULT_CLASS=warrior
 export GLITCH_TITLE_ID=8254e0f9-6c3a-4c94-8a16-570157b9df3b
 export GLITCH_TITLE_TOKEN="<deploy token>"
 export GLITCH_DEPLOYMENT_TYPE=node
-export GLITCH_ENTRY_POINT=package.json
+export GLITCH_ENTRY_POINT=index.html
 export DATABASE_URL="<shared postgres url>"
 export GLITCH_ENABLED=1
 export GLITCH_SERVER_TITLE_TOKEN="<runtime title token>"
@@ -66,6 +66,13 @@ The normal Glitch deploy type for this repo is `node`. This game is an MMO with 
 Node server, `/api`, `/ws`, and Postgres persistence, so the Glitch build must run
 the server container for players to share the same live world. The Dockerfile
 listens on port 3000 as required by Glitch's Node runtime.
+
+Glitch's Node runtime builds the client inside Docker. Because Vite inlines
+`VITE_*` values at build time, the repo includes `glitch.public.env` as a blank
+public Docker-build template. `npm run deploy:glitch` replaces only that file
+inside the upload ZIP with public client values (`VITE_GLITCH_*`) before upload.
+The generated file is not written to the working tree and does not contain the
+deploy token, database URL, or server runtime token.
 
 Use the other deployment types only for these cases:
 
@@ -110,7 +117,7 @@ The script:
 1. Loads `.env` and `.env.local` if present.
 2. Clones or updates the Glitch CLI deploy tool under the system temp directory.
 3. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
-4. Uploads the archive with `entry=package.json`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
+4. Uploads the archive with `entry=index.html`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
 5. Waits for the Glitch deployment job to complete.
 
 Useful overrides:
@@ -119,7 +126,7 @@ Useful overrides:
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch
-GLITCH_DEPLOY_VERSION=0.20.2 npm run deploy:glitch
+GLITCH_DEPLOY_VERSION=0.20.5 npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=iframe npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=wasm npm run deploy:glitch
 GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch

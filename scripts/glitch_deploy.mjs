@@ -2,7 +2,7 @@
 
 import { spawn } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +22,7 @@ const version = env.GLITCH_DEPLOY_VERSION || readPackageVersion();
 const deploymentType = env.GLITCH_DEPLOYMENT_TYPE || 'node';
 const nodeDeployment = deploymentType === 'node';
 const staticClientDeployment = deploymentType === 'iframe' || deploymentType === 'wasm';
-const entryPoint = nodeDeployment ? 'package.json' : env.GLITCH_ENTRY_POINT || 'index.html';
+const entryPoint = env.GLITCH_ENTRY_POINT || 'index.html';
 const gameApiOrigin =
   env.VITE_API_ORIGIN || env.GLITCH_GAME_API_ORIGIN || 'https://worldofclaudecraft.com';
 const dryRun = env.GLITCH_DEPLOY_DRY_RUN === '1';
@@ -141,10 +141,38 @@ async function prepareNodeSourceArchive() {
     ],
     env,
   );
+  const publicBuildEnv = nodePublicBuildEnv(env);
+  if (publicBuildEnv) {
+    const publicEnvPath = path.join(tempDir, 'glitch.public.env');
+    await writeFile(publicEnvPath, publicBuildEnv);
+    await run('zip', ['-q', archivePath, 'glitch.public.env'], env, tempDir);
+  }
   return {
     archivePath,
     cleanup: () => rm(tempDir, { recursive: true, force: true }),
   };
+}
+
+function nodePublicBuildEnv(sourceEnv) {
+  const vars = new Map([
+    ['VITE_GLITCH_ENABLED', '1'],
+    [
+      'VITE_GLITCH_TITLE_ID',
+      sourceEnv.VITE_GLITCH_TITLE_ID || sourceEnv.GLITCH_TITLE_ID || TITLE_ID,
+    ],
+    ['VITE_GLITCH_TITLE_TOKEN', clientTitleToken],
+    ['VITE_GLITCH_DEFAULT_CLASS', sourceEnv.VITE_GLITCH_DEFAULT_CLASS || 'warrior'],
+  ]);
+  if (sourceEnv.VITE_GLITCH_API_BASE_URL) {
+    vars.set('VITE_GLITCH_API_BASE_URL', sourceEnv.VITE_GLITCH_API_BASE_URL);
+  }
+  if (sourceEnv.VITE_TURNSTILE_SITEKEY) {
+    vars.set('VITE_TURNSTILE_SITEKEY', sourceEnv.VITE_TURNSTILE_SITEKEY);
+  }
+  if (sourceEnv.GLITCH_NODE_EXTERNAL_API_ORIGIN === '1' && sourceEnv.VITE_API_ORIGIN) {
+    vars.set('VITE_API_ORIGIN', sourceEnv.VITE_API_ORIGIN);
+  }
+  return `${[...vars].map(([key, value]) => `${key}=${JSON.stringify(String(value))}`).join('\n')}\n`;
 }
 
 function customVariables(sourceEnv) {
