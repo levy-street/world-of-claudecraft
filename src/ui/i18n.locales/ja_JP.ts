@@ -3148,6 +3148,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': 'ナイスラクシスのレイドアリーナ',
   'entities.dungeons.nythraxis_boss_arena.enterText': '封印された王家の扉を通り抜けます。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': 'ソーンピークの冷たい空気へ戻ります。',
+  'entities.dungeons.emberdeep_foundry.name': 'エンバーディープ鋳造場',
+  'entities.dungeons.emberdeep_foundry.enterText':
+    '鍛冶場の扉をくぐります。山が頭上で閉じ、再び灯されたエンバーディープの熱が通路を這い上がってきます。',
+  'entities.dungeons.emberdeep_foundry.leaveText': '鍛冶場の扉を出て、岩崖の冷気の中へ戻ります。',
   'entities.quests.q_nythraxis_restless_dead.title': '骨原の異変',
   'entities.quests.q_nythraxis_restless_dead.text':
     'ソーンピーク高地で何かが変わりました、{playerName}。死者たちはもはや当てもなくさまよっていません。ハイウォッチの北、古い戦場と崖道が交わる骨原で集まり、行軍しています。そこへ向かい、骨鎧の亡者たちの異変を調べ、彼らを動かしているものの証拠を持ち帰ってください。',
@@ -3184,6 +3188,49 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_scourges_end.completion':
     'これで王冠はついに沈黙しました。ソーンピークはなお死者を抱えるでしょうが、山の下の王が彼らを再び戦へ呼ぶことはありません。あなたは、アルドレン、マルリック、そしてヴォスが封じることしかできなかったものを終わらせました。',
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': 'ニスラクシスを撃破',
+  'entities.quests.q_foundry_smoke.title': '岩崖に立つ煙',
+  'entities.quests.q_foundry_smoke.text':
+    'エンバーディープは元々わたしたちの鍛冶場だったのだ、{playerName}。氏族たちがそれを埋め、冷たく眠らせると誓う前はな。それが今また煙を上げている。ドログマールのオーガどもは、まるで叩かれた犬のように鍛冶場の外に座り込んでいる。何かが奴らを外へ追い出したのだ。戦線を越え、野営地の先にある包囲線まで行き、カルト信者たちが標柱に打ちつけている急使便を一枚持ち帰ってくれ。わたしの祖母の炉を再び灯した者が誰なのか、知っておかねばならない。',
+  'entities.quests.q_foundry_smoke.completion':
+    '「エンバーパクト」……熾火に祈りを捧げるカルトか。そして、{playerName}、この下端にある印章。これはエンバーディープそのものの古い鍛冶紋だ。奴らはただ鍛冶場に居座っているのではない。鍛冶場を稼働させているのだ。',
+  'entities.quests.q_foundry_smoke.objectives.0.label': 'エンバーパクトの急使便を入手',
+  'entities.quests.q_foundry_pickets.title': '包囲線を薄くせよ',
+  'entities.quests.q_foundry_pickets.text':
+    'エンバーパクトは狂信者の哨戒隊で岩崖への道を押さえており、奴らが立っている限り誰も鍛冶場の扉には辿り着けない。{playerName}、奴らはオーガを追い出したのだぞ。オーガをだ。狂信者を十体狩れば、その戦列は崩れる。',
+  'entities.quests.q_foundry_pickets.completion':
+    '熾火に祈る声がまた十だけ静まった。包囲線は薄くなり、扉はもう手の届くところにある。',
+  'entities.quests.q_foundry_pickets.objectives.0.label': 'エンバーパクトの狂信者を討伐',
+  'entities.quests.q_foundry_hounds.title': '窯の猟犬',
+  'entities.quests.q_foundry_hounds.text':
+    'カルトは岩崖の小道に猟犬を放っている、鉱滓がその毛皮の下で冷え固まった獣どもだ。八体を殺し、その体内で脈打つ鉱滓の心臓を六つ切り出してくれ。あんなものを生み出せるほど鍛冶場が熱いのなら、祖母がかつて灯していた炉よりもずっと熱いということだ。',
+  'entities.quests.q_foundry_hounds.completion':
+    'まだ温かい。{playerName}、鉱滓の心臓が鍛冶場の熱を保てるのはせいぜい一日だ。エンバーディープはただ灯っているのではない。燃え盛っているのだ。',
+  'entities.quests.q_foundry_hounds.objectives.0.label': '燠火の猟犬を仕留める',
+  'entities.quests.q_foundry_hounds.objectives.1.label': '鉱滓の心臓',
+  'entities.quests.q_foundry_sigils.title': 'エンバーパクトの印章',
+  'entities.quests.q_foundry_sigils.text':
+    'あの戦線に立つ狂信者は皆、焼き固めた粘土の印章を身につけている。扉の結界を通り抜けるための鍵だ。六枚持ってきてくれ。焼き印の跡が読めれば、奴らが何基のるつぼを稼働させているか分かるはずだ。',
+  'entities.quests.q_foundry_sigils.completion':
+    '六枚の印章、そして六つの異なるるつぼの焼き印。{playerName}、エンバーディープにはるつぼが七基ある。奴らは鍛冶場を全稼働させているのだ。そして七つ目の焼き印は、大るつぼ、鉱滓心臓のものだ。',
+  'entities.quests.q_foundry_sigils.objectives.0.label': 'エンバーパクトの印章',
+  'entities.quests.q_foundry_ashmaw.title': '窯生まれのアッシュマウ',
+  'entities.quests.q_foundry_ashmaw.text':
+    'あの戦線にいる一体だけは、カルト信者でも猟犬でもない。冷え固まりゆく鉱滓の姿をしたものが高い小道を歩き、それは再び灯された鍛冶場が最初に鋳込んだものだ。哨戒隊はまるで軍旗のようにそれに従っている。窯生まれのアッシュマウを討ち、その核を持ち帰ってくれ、{playerName}。あれが歩いている限り、戦線は何度でも立て直される。',
+  'entities.quests.q_foundry_ashmaw.completion':
+    '核はまだ光を放っている。{playerName}、鋳込まれた鉱滓が生きているはずはない。あの鍛冶場を世話する者は、氏族たちがわざと埋めた何かを学び直したのだ。',
+  'entities.quests.q_foundry_ashmaw.objectives.0.label': 'アッシュマウの核',
+  'entities.quests.q_foundry_kilnmaster.title': '窯師',
+  'entities.quests.q_foundry_kilnmaster.text':
+    '印章がその主の名を告げている。窯師ヴォール、エンバーディープが冷えているのを見出し、熾火に祈り返すことを教えた者だ。奴は組立場の先にある鋳造の間を占拠している。仲間を連れて扉をくぐり、奴を仕留めてくれ、{playerName}。これは一人でこなせる依頼ではない。',
+  'entities.quests.q_foundry_kilnmaster.completion':
+    'ヴォールは自らの広間で灰と化した。だが、{playerName}、その法衣に残る焼き印を見るに……奴は鍛冶場の主ではなかった。奴はただの「ふいご」だったのだ。もっと深いところで、まだ何かが息をしている。',
+  'entities.quests.q_foundry_kilnmaster.objectives.0.label': '窯師ヴォールを討伐',
+  'entities.quests.q_foundry_slagheart.title': '鉱滓心臓の巨像',
+  'entities.quests.q_foundry_slagheart.text':
+    '最後の焼き印を読み解いた、{playerName}。ようやくエンバーパクトが何を鍛えているのか分かった。何もない、というのが答えだ。鍛冶場は自分自身の体を鍛えているのだ。大るつぼはひと季節をかけて一つの鋳造を注ぎ続け、今や鍛冶場の中心にある鉄床の壇上に立ち、最後の焼き入れを待っている。それが壇を降りて歩き出せば、この先どんな戦が来ようと山はそれに抗えない。最強の仲間を集め、鉱滓心臓の巨像が完全に目覚める前に打ち砕いてくれ。',
+  'entities.quests.q_foundry_slagheart.completion':
+    'ついに冷えた。そして今度こそ冷えたままにしてやる。祖母がわたしに教えたやり方で、この炉は自らの手で封じよう。山は、あと少しで自分の足元から何が歩き出そうとしていたか、決して知ることはないだろう、{playerName}。だがわたしは知っている。そしてお前もだ。',
+  'entities.quests.q_foundry_slagheart.objectives.0.label': '鉱滓心臓の巨像を打ち砕く',
   'hud.errors.silenced': '沈黙状態です！',
   'hud.pet.noPetFood': 'ペットに与える食べ物がありません。',
   'hud.pet.petEatsFoodOnly': 'ペットは食べ物しか食べられません。',
@@ -5672,6 +5719,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '聖遺物狩人の溺れずきん',
   'entities.items.sister_nhalia_choir_plate.name': 'ナリア修道女の聖歌鍛造鎧',
   'entities.items.drowned_choir_fang.name': '溺れた聖歌の牙',
+  'entities.items.warcamp_dispatch.name': 'エンバーパクトの急使便',
+  'entities.items.slag_heart.name': '鉱滓の心臓',
+  'entities.items.emberpact_sigil.name': 'エンバーパクトの印章',
+  'entities.items.kilnborn_core.name': 'アッシュマウの核',
+  'entities.items.forgehand_gauntlets.name': '鍛冶手のガントレット',
+  'entities.items.forgehand_handwraps.name': '鍛冶手の手布',
+  'entities.items.forgehand_grips.name': '鍛冶手の握り手甲',
+  'entities.items.emberstep_warboots.name': '燠火歩みの戦靴',
+  'entities.items.emberstep_slippers.name': '燠火歩みのスリッパ',
+  'entities.items.emberstep_treads.name': '燠火歩みのトレッド',
+  'entities.items.slagrend_cleaver.name': '鉱滓断ちの大割斧',
+  'entities.items.slagfire_scepter.name': '鉱滓火の錫杖',
+  'entities.items.slagglass_shiv.name': '鉱滓硝子の刃物',
+  'entities.items.vorrs_kilnplates.name': 'ヴォールの窯板鎧',
+  'entities.items.slagforged_legguards.name': '鉱滓鍛えの脚甲',
+  'entities.items.forgelord_warhelm.name': '鍛冶卿の戦兜',
+  'entities.items.emberweave_cowl.name': '燠火織りの頭巾',
+  'entities.items.slagstalker_hood.name': '鉱滓忍びのフード',
+  'entities.items.slag_chunk.name': '鉱滓の塊',
+  'entities.items.ember_grit.name': '燠火の燼灰',
+  'entities.items.cult_brand.name': 'エンバーパクトの烙印',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -5683,10 +5751,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '修道女ナリア、溺れし聖歌',
   'entities.mobs.edda_reedhand.name': 'エッダ・リードハンド',
   'entities.mobs.tolling_bell.name': '鳴り響く鐘',
+  'entities.mobs.emberpact_zealot.name': 'エンバーパクトの狂信者',
+  'entities.mobs.cinderhound.name': '燠火の猟犬',
+  'entities.mobs.ashmaw_kilnborn.name': '窯生まれのアッシュマウ',
+  'entities.mobs.emberpact_cinderpriest.name': 'エンバーパクトの燼灰司祭',
+  'entities.mobs.emberpact_kiln_acolyte.name': 'エンバーパクトの窯見習い',
+  'entities.mobs.slag_hound.name': '鉱滓の猟犬',
+  'entities.mobs.ash_revenant.name': '灰の亡霊',
+  'entities.mobs.emberbound_custodian.name': '燠火に縛られし守衛',
+  'entities.mobs.forgeguard_sentinel.name': '鍛冶守りの哨兵',
+  'entities.mobs.molten_crucible_tender.name': '溶鉱るつぼの番人',
+  'entities.mobs.cinder_wisp.name': '燠火の鬼火',
+  'entities.mobs.kilnmaster_vorr.name': '窯師ヴォール',
+  'entities.mobs.slagheart_colossus.name': '鉱滓心臓の巨像',
   'entities.npcs.brother_halven_marsh.name': 'ハルヴェン修道士',
   'entities.npcs.brother_halven_marsh.title': '聖遺物庫の番人',
   'entities.npcs.brother_halven_marsh.greeting':
     '道は北へ続いていた。また聖遺物庫、また儀式。難易度を選べ、お前が戻るまで縄を握っていよう。',
+  'entities.npcs.forgewright_brenna.name': 'ブレンナ・コールライト',
+  'entities.npcs.forgewright_brenna.title': '鍛冶匠',
+  'entities.npcs.forgewright_brenna.greeting':
+    '南西の岩崖に煙が上がっている、{className}。あの炉は祖母が自らの手で封じ、冷たく眠らせると誓ったものだ。冷えた炉は煙を吐かない。',
   'entities.delves.drowned_litany.name': '溺れし連祷',
   'entities.delves.drowned_litany.enterText': 'あなたは沼地の果てへ、溺れし神殿へと降りていく。',
   'entities.delves.drowned_litany.leaveText':

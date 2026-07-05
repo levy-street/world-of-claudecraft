@@ -6250,6 +6250,69 @@ export const ko_KR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
+      },
+      "warcamp_dispatch": {
+        "name": "잉걸언약 전갈"
+      },
+      "slag_heart": {
+        "name": "용재 심장"
+      },
+      "emberpact_sigil": {
+        "name": "잉걸언약 인장"
+      },
+      "kilnborn_core": {
+        "name": "잿턱의 핵"
+      },
+      "forgehand_gauntlets": {
+        "name": "대장손 건틀릿"
+      },
+      "forgehand_handwraps": {
+        "name": "대장손 손싸개"
+      },
+      "forgehand_grips": {
+        "name": "대장손 손보호구"
+      },
+      "emberstep_warboots": {
+        "name": "잉걸걸음 전쟁장화"
+      },
+      "emberstep_slippers": {
+        "name": "잉걸걸음 슬리퍼"
+      },
+      "emberstep_treads": {
+        "name": "잉걸걸음 밟이"
+      },
+      "slagrend_cleaver": {
+        "name": "용재가르개"
+      },
+      "slagfire_scepter": {
+        "name": "용재불꽃 홀"
+      },
+      "slagglass_shiv": {
+        "name": "용재유리 단도"
+      },
+      "vorrs_kilnplates": {
+        "name": "보르의 가마판금"
+      },
+      "slagforged_legguards": {
+        "name": "용재벼림 다리보호구"
+      },
+      "forgelord_warhelm": {
+        "name": "대장군주의 전쟁투구"
+      },
+      "emberweave_cowl": {
+        "name": "잉걸직조 두건"
+      },
+      "slagstalker_hood": {
+        "name": "용재추적자의 후드"
+      },
+      "slag_chunk": {
+        "name": "용재 덩어리"
+      },
+      "ember_grit": {
+        "name": "잉걸 잔재"
+      },
+      "cult_brand": {
+        "name": "잉걸언약 낙인"
       }
     },
     "mobs": {
@@ -6481,6 +6544,45 @@ export const ko_KR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
       },
+      "emberpact_zealot": {
+        "name": "잉걸언약 광신도"
+      },
+      "cinderhound": {
+        "name": "잉걸사냥개"
+      },
+      "ashmaw_kilnborn": {
+        "name": "가마출생 잿턱"
+      },
+      "emberpact_cinderpriest": {
+        "name": "잉걸언약 잿불사제"
+      },
+      "emberpact_kiln_acolyte": {
+        "name": "잉걸언약 가마신도"
+      },
+      "slag_hound": {
+        "name": "용재사냥개"
+      },
+      "ash_revenant": {
+        "name": "잿더미 원혼"
+      },
+      "emberbound_custodian": {
+        "name": "잉걸속박 관리자"
+      },
+      "forgeguard_sentinel": {
+        "name": "대장간수호 파수병"
+      },
+      "molten_crucible_tender": {
+        "name": "용융도가니 관리인"
+      },
+      "cinder_wisp": {
+        "name": "잉걸도깨비불"
+      },
+      "kilnmaster_vorr": {
+        "name": "가마장 보르"
+      },
+      "slagheart_colossus": {
+        "name": "용재심장 거상"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -6710,6 +6812,11 @@ export const ko_KR: EnTranslations = {
         "name": "영혼 치유사",
         "title": "죽은 자의 수호자",
         "greeting": "편히 쉬게, 영혼이여. 그대를 육신으로 돌려보낼 수 있으나, 돌아오는 길은 그대를 약하게 만들 것이네."
+      },
+      "forgewright_brenna": {
+        "name": "브렌나 콜라이트",
+        "title": "단조공",
+        "greeting": "남서쪽 절벽 너머로 연기가 피어오르오, {className}. 내 할머니가 몸소 저 대장간을 다지고 차갑게 봉하겠다 맹세하셨소. 식은 화로에서는 연기가 나지 않는 법이오."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -7500,6 +7607,79 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_foundry_smoke": {
+        "title": "절벽 너머의 연기",
+        "text": "엠버딥은 원래 우리의 대장간이었소, {playerName}. 씨족들이 그것을 묻고 차갑게 봉하겠다 맹세하기 전까지는 말이오. 이제 다시 연기가 나고, 드로그마르의 오우거들은 매 맞은 개처럼 그 앞에 웅크리고 있소. 무언가가 그들을 몰아냈소. 전초선 너머 공성 진지로 가서 광신도들이 말뚝에 박아 놓은 전언 하나를 가져오시오. 내 할머니의 불을 누가 다시 지폈는지 알아야겠소.",
+        "completion": "\"잉걸언약.\" 꺼진 숯덩이에 기도를 올리는 교단이라. 그리고 바닥에 있는 이 인장, {playerName}, 이것은 엠버딥 본래의 옛 단조 표식이오. 저들은 대장간에 무단으로 눌러앉은 게 아니오. 저들이 그것을 직접 돌리고 있소.",
+        "objectives": {
+          "0": {
+            "label": "잉걸언약 전언 획득"
+          }
+        }
+      },
+      "q_foundry_pickets": {
+        "title": "공성선을 얇게",
+        "text": "잉걸언약은 광신도 전초병들로 절벽 진입로를 지키고 있고, 저들이 버티는 한 아무도 대장간 문에 이르지 못하오. 오우거들마저 몰아냈소, {playerName}. 오우거들을 말이오. 광신도 열을 처치하면 전선이 무너질 것이오.",
+        "completion": "숯덩이에 기도 올리던 목소리가 열 개 줄었소. 전초선이 얇아지고 있으니, 이제 문이 손에 닿을 듯하오.",
+        "objectives": {
+          "0": {
+            "label": "잉걸언약 광신도 처치"
+          }
+        }
+      },
+      "q_foundry_hounds": {
+        "title": "가마의 사냥개들",
+        "text": "교단은 절벽 길을 따라 사냥개들을 풀어놓았는데, 그 가죽 속에서 용재가 식어가는 짐승들이오. 여덟 마리를 죽이고, 그 안에서 뛰는 용재심장 여섯을 도려내시오. 대장간이 저런 것을 낳을 만큼 뜨겁다면, 내 할머니가 감히 돌리던 화력보다 더 뜨거운 것이오.",
+        "completion": "아직도 따뜻하군. {playerName}, 용재심장은 길어야 하루치 화력을 품소. 엠버딥은 그저 불이 붙은 정도가 아니오. 지금 포효하고 있소.",
+        "objectives": {
+          "0": {
+            "label": "잉걸사냥개 처치"
+          },
+          "1": {
+            "label": "용재심장"
+          }
+        }
+      },
+      "q_foundry_sigils": {
+        "title": "잉걸언약의 문장",
+        "text": "그 전선의 광신도는 저마다 구운 점토 문장을 지니고 있소, 문 결계를 지나는 저들의 열쇠요. 여섯 개를 가져오시오. 나는 그 소성 표식을 읽을 줄 아니, 그것으로 저들이 도가니를 몇 개나 돌리고 있는지 알아낼 수 있을 것이오.",
+        "completion": "문장 여섯 개에 도가니 표식이 저마다 다르군. {playerName}, 엠버딥에는 도가니가 일곱 개요. 저들은 대장간 전체를 돌리고 있고, 일곱 번째 표식은 큰 도가니, 즉 용재심장의 것이오.",
+        "objectives": {
+          "0": {
+            "label": "잉걸언약 문장"
+          }
+        }
+      },
+      "q_foundry_ashmaw": {
+        "title": "가마출생 잿턱",
+        "text": "그 전선에는 광신도도 사냥개도 아닌 것이 하나 있소. 식어가는 용재 형상이 높은 길을 걸으며, 다시 지펴진 대장간이 처음으로 부어낸 것인데, 전초병들은 그것을 깃발처럼 따르오. 가마출생 잿턱을 죽이고 그 핵을 가져오시오, {playerName}. 그것이 걷는 한 전선은 언제나 다시 세워질 것이오.",
+        "completion": "핵이 아직도 빛나는군. {playerName}, 부어낸 용재는 살아 있어서는 안 되오. 저 대장간을 돌보는 자가 누구든, 씨족들이 일부러 묻어버린 무언가를 다시 익힌 것이오.",
+        "objectives": {
+          "0": {
+            "label": "잿턱의 핵"
+          }
+        }
+      },
+      "q_foundry_kilnmaster": {
+        "title": "가마장",
+        "text": "문장들이 그 주인의 이름을 알려주오: 가마장 보르, 식어 있던 엠버딥을 찾아내 숯덩이에게 다시 기도를 가르친 자요. 그는 조립 바닥 너머 주조 회당을 차지하고 있소. 동료들을 데리고 문을 지나 그를 끝장내시오, {playerName}. 이는 홀로 나설 임무가 아니오.",
+        "completion": "보르는 제 회당에서 재가 되었소. 하나, {playerName}, 그의 로브에 남은 소성 표식을 보니... 그는 단조 대사가 아니었소. 그는 풀무였을 뿐이오. 더 깊은 무언가가 아직도 숨을 쉬고 있소.",
+        "objectives": {
+          "0": {
+            "label": "가마장 보르 처치"
+          }
+        }
+      },
+      "q_foundry_slagheart": {
+        "title": "용재심장 거상",
+        "text": "마지막 소성 표식을 읽어냈소, {playerName}. 이제 잉걸언약이 무엇을 벼리는지 알겠소: 아무것도 아니오. 대장간은 스스로에게 몸을 벼려주고 있소. 큰 도가니는 한 철 내내 하나의 주조물을 부어왔고, 지금은 대장간 심장부의 모루 단 위에 서서 마지막 담금질만을 기다리고 있소. 그것이 그 단에서 내려서는 순간, 다음에 올 어떤 전쟁이든 이 산은 패할 것이오. 가장 강한 자들을 모아 용재심장 거상이 완전히 깨어나기 전에 부수시오.",
+        "completion": "마침내 식었고, 이번에는 정말로 그대로 남을 것이오: 내 할머니가 가르쳐준 대로 내 손으로 저 대장간을 봉하겠소. 산은 제 발밑에서 무엇이 걸어 나올 뻔했는지 결코 알지 못할 것이오, {playerName}. 하나 나는 알 것이오. 그리고 그대도 알겠지.",
+        "objectives": {
+          "0": {
+            "label": "용재심장 거상 파괴"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -7693,6 +7873,11 @@ export const ko_KR: EnTranslations = {
         "name": "니트락시스 공격대 투기장",
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
+      },
+      "emberdeep_foundry": {
+        "name": "엠버딥 제련소",
+        "enterText": "단조의 문을 지나 들어섭니다. 산이 머리 위로 닫히고, 다시 지펴진 엠버딥의 열기가 통로를 타고 밀려와 그대를 맞이합니다.",
+        "leaveText": "단조의 문을 나와 절벽의 냉기 속으로 나섭니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

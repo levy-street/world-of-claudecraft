@@ -97,6 +97,20 @@ const MOB_IDS = [
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
   'thunzharr_stormling',
+  // Emberdeep Foundry
+  'emberpact_zealot',
+  'cinderhound',
+  'ashmaw_kilnborn',
+  'emberpact_cinderpriest',
+  'emberpact_kiln_acolyte',
+  'slag_hound',
+  'ash_revenant',
+  'emberbound_custodian',
+  'forgeguard_sentinel',
+  'molten_crucible_tender',
+  'cinder_wisp',
+  'kilnmaster_vorr',
+  'slagheart_colossus',
 ] as const;
 
 const NPC_IDS = [
@@ -124,6 +138,7 @@ const NPC_IDS = [
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
+  'forgewright_brenna',
 ] as const;
 
 const QUEST_IDS = [
@@ -201,6 +216,13 @@ const QUEST_IDS = [
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
   'q_mogger',
+  'q_foundry_smoke',
+  'q_foundry_pickets',
+  'q_foundry_hounds',
+  'q_foundry_sigils',
+  'q_foundry_ashmaw',
+  'q_foundry_kilnmaster',
+  'q_foundry_slagheart',
 ] as const;
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
@@ -210,6 +232,7 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
+  'emberdeep_foundry',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

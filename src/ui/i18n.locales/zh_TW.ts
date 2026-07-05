@@ -3013,6 +3013,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': '尼思拉克西斯團隊競技場',
   'entities.dungeons.nythraxis_boss_arena.enterText': '你穿過封印的王室之門。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '你回到荊峰的寒冷空氣中。',
+  'entities.dungeons.emberdeep_foundry.name': '餘燼深淵鑄爐',
+  'entities.dungeons.emberdeep_foundry.enterText':
+    '你踏入鑄爐之門。山體在你頭頂闔攏，重燃的餘燼深淵散發的熱浪迎面撲來。',
+  'entities.dungeons.emberdeep_foundry.leaveText': '你踏出鑄爐之門，回到崖壁的寒意之中。',
   'entities.quests.q_nythraxis_restless_dead.title': '骨原的異動',
   'entities.quests.q_nythraxis_restless_dead.text':
     '荊峰高地出事了，{playerName}。亡者不再漫無目的地遊蕩。他們在高望以北的骨原集結並行軍，那裡是舊戰場與峭壁道路交會之處。去那裡調查骨甲亡魂的異動，並帶回任何能說明是什麼驅使它們的證據。',
@@ -3049,6 +3053,49 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_scourges_end.completion':
     '王冠終於沉默了。索恩峰仍會背負它的亡者，但山下再沒有國王能召他們重返戰爭。你完成了奧德倫、馬爾里克和沃斯只能暫時封住的事。',
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': '擊敗尼思拉克西斯',
+  'entities.quests.q_foundry_smoke.title': '崖壁上的煙',
+  'entities.quests.q_foundry_smoke.text':
+    '餘燼深淵曾是我們的鑄爐，{playerName}，在部族將它埋起、發誓永不再燃之前。如今它又冒煙了，德羅格瑪的食人魔像挨了打的狗一樣蹲在外頭。有什麼東西把牠們趕出來了。去圍攻戰線那邊，穿過食人魔的營地，帶一份異教徒釘在崗哨上的公文回來給我。我要知道是誰重燃了我祖母的爐火。',
+  'entities.quests.q_foundry_smoke.completion':
+    '「餘燼盟。」一個向著封熄煤炭祈禱的教派。而底下這個印記，{playerName}：那是餘燼深淵本身的舊鑄爐印。他們不是佔據了這座鑄爐，這麼簡單，他們是在運作它。',
+  'entities.quests.q_foundry_smoke.objectives.0.label': '取得的餘燼盟公文',
+  'entities.quests.q_foundry_pickets.title': '削減圍攻戰線',
+  'entities.quests.q_foundry_pickets.text':
+    '餘燼盟以狂信者崗哨守著崖壁的通道，只要崗哨還在，就沒人能到鑄爐的門前。他們把食人魔都趕走了，{playerName}。食人魔啊。清除十名狂信者，防線就會崩潰。',
+  'entities.quests.q_foundry_pickets.completion':
+    '對著煤炭祈禱的聲音又少了十個。防線正在瓦解，鑄爐之門已幾乎近在咫尺。',
+  'entities.quests.q_foundry_pickets.objectives.0.label': '擊殺餘燼盟狂信者',
+  'entities.quests.q_foundry_hounds.title': '窯爐的獵犬',
+  'entities.quests.q_foundry_hounds.text':
+    '這個教派在崖壁小徑上放養獵犬，那些野獸的皮下藏著仍在冷卻的爐渣。殺死八隻，並從其中六隻體內取出跳動的爐渣之心。如果那座鑄爐熱到能孕育出這種東西，它比我祖母當年運作時還要熾熱。',
+  'entities.quests.q_foundry_hounds.completion':
+    '還是溫的。{playerName}，一顆爐渣之心最多只能保留一天的爐火餘熱。餘燼深淵不只是重新點燃了，它正熊熊燃燒著。',
+  'entities.quests.q_foundry_hounds.objectives.0.label': '擊倒餘燼獵犬',
+  'entities.quests.q_foundry_hounds.objectives.1.label': '爐渣之心',
+  'entities.quests.q_foundry_sigils.title': '餘燼盟印記',
+  'entities.quests.q_foundry_sigils.text':
+    '那道防線上的每個狂信者都帶著一枚燒製的陶土印記，是他們通過門戶結界的鑰匙。給我帶六枚回來。我能辨讀燒製的紋路，那些紋路會告訴我他們運轉著多少座坩堝。',
+  'entities.quests.q_foundry_sigils.completion':
+    '六枚印記，六種不同的坩堝紋路。{playerName}，餘燼深淵有七座坩堝。他們正在全力運轉整座鑄爐，而第七個紋路屬於那座最大的坩堝：爐渣之心。',
+  'entities.quests.q_foundry_sigils.objectives.0.label': '餘燼盟印記',
+  'entities.quests.q_foundry_ashmaw.title': '窯生的灰顎',
+  'entities.quests.q_foundry_ashmaw.text':
+    '那道防線上有樣東西，既不是異教徒也不是獵犬。一個冷卻中的爐渣形體行走在高處小徑，是重燃鑄爐澆鑄出的第一件成品，那些崗哨像追隨旗幟一樣追隨著它。殺死窯生的灰顎，把它的核心帶回來給我，{playerName}。只要它還在行走，防線就永遠會重新集結。',
+  'entities.quests.q_foundry_ashmaw.completion':
+    '核心還在發光。澆鑄的爐渣不該是活的，{playerName}。不管是誰在看管那座鑄爐，都學會了部族刻意埋藏起來的東西。',
+  'entities.quests.q_foundry_ashmaw.objectives.0.label': '灰顎的核心',
+  'entities.quests.q_foundry_kilnmaster.title': '窯爐大師',
+  'entities.quests.q_foundry_kilnmaster.text':
+    '那些印記指出了他們的主人：窯爐大師沃爾，是他發現冷卻的餘燼深淵，並教會了煤炭如何回應祈禱。他守在裝配層之後的鑄造大廳裡。帶上同伴穿過那道門，終結他，{playerName}。這不是能獨自完成的差事。',
+  'entities.quests.q_foundry_kilnmaster.completion':
+    '沃爾已在自己的大廳中化為灰燼。但他長袍上的燒製紋路……他並不是鑄爐大師，{playerName}。他只是風箱。有更深處的東西仍在呼吸。',
+  'entities.quests.q_foundry_kilnmaster.objectives.0.label': '擊敗窯爐大師沃爾',
+  'entities.quests.q_foundry_slagheart.title': '爐渣之心巨像',
+  'entities.quests.q_foundry_slagheart.text':
+    '我讀完了最後的燒製紋路，{playerName}，終於明白餘燼盟在鑄造的是什麼：什麼都不是。這座鑄爐是在為自己鑄造一具軀體。那座最大的坩堝已經澆鑄同一件鑄件整整一季，如今它立在鑄爐核心的鐵砧台上，等待最後的淬火。一旦它踏下那座台子，這座山無論面對接下來的什麼戰爭都會落敗。召集你能找到的最強者，在爐渣之心巨像完全甦醒之前將它擊碎。',
+  'entities.quests.q_foundry_slagheart.completion':
+    '終於冷卻了，而這次它會一直冷下去：我會親手封熄那座鑄爐，用我祖母教我的方法。這座山永遠不會知道，方才有什麼東西差點從它腳下走出來，{playerName}。但我會知道。你也會知道。',
+  'entities.quests.q_foundry_slagheart.objectives.0.label': '擊碎爐渣之心巨像',
   'hud.errors.silenced': '你已被沉默！',
   'hud.pet.noPetFood': '你沒有可餵食寵物的食物。',
   'hud.pet.petEatsFoodOnly': '你的寵物只能吃食物。',
@@ -5367,6 +5414,27 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '聖物獵人的溺兜',
   'entities.items.sister_nhalia_choir_plate.name': '娜哈莉亞修女的唱詩鍛甲',
   'entities.items.drowned_choir_fang.name': '溺水唱詩獠牙',
+  'entities.items.warcamp_dispatch.name': '餘燼盟公文',
+  'entities.items.slag_heart.name': '爐渣之心',
+  'entities.items.emberpact_sigil.name': '餘燼盟印記',
+  'entities.items.kilnborn_core.name': '灰顎之核',
+  'entities.items.forgehand_gauntlets.name': '鑄手鐵手甲',
+  'entities.items.forgehand_handwraps.name': '鑄手護手',
+  'entities.items.forgehand_grips.name': '鑄手皮握手甲',
+  'entities.items.emberstep_warboots.name': '餘燼步戰靴',
+  'entities.items.emberstep_slippers.name': '餘燼步軟鞋',
+  'entities.items.emberstep_treads.name': '餘燼步皮靴',
+  'entities.items.slagrend_cleaver.name': '爐渣裂刃',
+  'entities.items.slagfire_scepter.name': '爐渣火焰權杖',
+  'entities.items.slagglass_shiv.name': '爐渣玻璃短刃',
+  'entities.items.vorrs_kilnplates.name': '沃爾的窯爐鎧甲',
+  'entities.items.slagforged_legguards.name': '爐渣鍛護腿',
+  'entities.items.forgelord_warhelm.name': '鑄爐領主戰盔',
+  'entities.items.emberweave_cowl.name': '餘燼織兜帽',
+  'entities.items.slagstalker_hood.name': '爐渣潛行者兜帽',
+  'entities.items.slag_chunk.name': '爐渣塊',
+  'entities.items.ember_grit.name': '餘燼灰粒',
+  'entities.items.cult_brand.name': '餘燼盟烙印',
   'entities.mobs.drowned_cantor.name': '溺亡誦經者',
   'entities.mobs.reedbound_acolyte.name': '蘆葦縛信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼槍顎獸',
@@ -5378,10 +5446,27 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '娜哈莉亞修女，溺亡的聖歌',
   'entities.mobs.edda_reedhand.name': '艾達·蘆手',
   'entities.mobs.tolling_bell.name': '鳴鐘',
+  'entities.mobs.emberpact_zealot.name': '餘燼盟狂信者',
+  'entities.mobs.cinderhound.name': '餘燼獵犬',
+  'entities.mobs.ashmaw_kilnborn.name': '窯生的灰顎',
+  'entities.mobs.emberpact_cinderpriest.name': '餘燼盟灰燼祭司',
+  'entities.mobs.emberpact_kiln_acolyte.name': '餘燼盟窯爐信徒',
+  'entities.mobs.slag_hound.name': '爐渣獵犬',
+  'entities.mobs.ash_revenant.name': '灰燼亡魂',
+  'entities.mobs.emberbound_custodian.name': '縛燼守護者',
+  'entities.mobs.forgeguard_sentinel.name': '鑄爐衛哨',
+  'entities.mobs.molten_crucible_tender.name': '熔爐坩堝看守者',
+  'entities.mobs.cinder_wisp.name': '餘燼精魂',
+  'entities.mobs.kilnmaster_vorr.name': '窯爐大師沃爾',
+  'entities.mobs.slagheart_colossus.name': '爐渣之心巨像',
   'entities.npcs.brother_halven_marsh.name': '哈爾文修士',
   'entities.npcs.brother_halven_marsh.title': '聖物庫守護人',
   'entities.npcs.brother_halven_marsh.greeting':
     '小徑向北延伸。又一座聖物庫，又一場儀式。選擇你的難度，我會為你守住繩索，直到你歸來。',
+  'entities.npcs.forgewright_brenna.name': '布蕾娜·煤爐',
+  'entities.npcs.forgewright_brenna.title': '鑄爐匠',
+  'entities.npcs.forgewright_brenna.greeting':
+    '西南崖壁那邊冒煙了，{className}。我祖母親手封熄了那座熔爐，還發誓它不會再燒。熄滅的熔爐不該冒煙。',
   'entities.delves.drowned_litany.name': '溺亡連禱',
   'entities.delves.drowned_litany.enterText': '你潛入沼澤邊緣，進入那座溺亡的神殿。',
   'entities.delves.drowned_litany.leaveText': '你爬回沼澤邊緣，回到哈爾文修士身邊。',

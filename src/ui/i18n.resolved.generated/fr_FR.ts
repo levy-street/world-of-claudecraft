@@ -6250,6 +6250,69 @@ export const fr_FR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Protège-taille d'Appel-tempête"
+      },
+      "warcamp_dispatch": {
+        "name": "Emberpact Dispatch"
+      },
+      "slag_heart": {
+        "name": "Slag Heart"
+      },
+      "emberpact_sigil": {
+        "name": "Emberpact Sigil"
+      },
+      "kilnborn_core": {
+        "name": "Ashmaw's Core"
+      },
+      "forgehand_gauntlets": {
+        "name": "Forgehand Gauntlets"
+      },
+      "forgehand_handwraps": {
+        "name": "Forgehand Handwraps"
+      },
+      "forgehand_grips": {
+        "name": "Forgehand Grips"
+      },
+      "emberstep_warboots": {
+        "name": "Emberstep Warboots"
+      },
+      "emberstep_slippers": {
+        "name": "Emberstep Slippers"
+      },
+      "emberstep_treads": {
+        "name": "Emberstep Treads"
+      },
+      "slagrend_cleaver": {
+        "name": "Slagrend Cleaver"
+      },
+      "slagfire_scepter": {
+        "name": "Slagfire Scepter"
+      },
+      "slagglass_shiv": {
+        "name": "Slagglass Shiv"
+      },
+      "vorrs_kilnplates": {
+        "name": "Vorr's Kilnplates"
+      },
+      "slagforged_legguards": {
+        "name": "Slagforged Legguards"
+      },
+      "forgelord_warhelm": {
+        "name": "Forgelord Warhelm"
+      },
+      "emberweave_cowl": {
+        "name": "Emberweave Cowl"
+      },
+      "slagstalker_hood": {
+        "name": "Slagstalker Hood"
+      },
+      "slag_chunk": {
+        "name": "Slag Chunk"
+      },
+      "ember_grit": {
+        "name": "Ember Grit"
+      },
+      "cult_brand": {
+        "name": "Emberpact Brand"
       }
     },
     "mobs": {
@@ -6481,6 +6544,45 @@ export const fr_FR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Élémentaire de tempête éveillé"
       },
+      "emberpact_zealot": {
+        "name": "Emberpact Zealot"
+      },
+      "cinderhound": {
+        "name": "Cinderhound"
+      },
+      "ashmaw_kilnborn": {
+        "name": "Ashmaw the Kilnborn"
+      },
+      "emberpact_cinderpriest": {
+        "name": "Emberpact Cinderpriest"
+      },
+      "emberpact_kiln_acolyte": {
+        "name": "Emberpact Kiln Acolyte"
+      },
+      "slag_hound": {
+        "name": "Slag Hound"
+      },
+      "ash_revenant": {
+        "name": "Ash Revenant"
+      },
+      "emberbound_custodian": {
+        "name": "Emberbound Custodian"
+      },
+      "forgeguard_sentinel": {
+        "name": "Forgeguard Sentinel"
+      },
+      "molten_crucible_tender": {
+        "name": "Molten Crucible-Tender"
+      },
+      "cinder_wisp": {
+        "name": "Cinder Wisp"
+      },
+      "kilnmaster_vorr": {
+        "name": "Kilnmaster Vorr"
+      },
+      "slagheart_colossus": {
+        "name": "The Slagheart Colossus"
+      },
       "ironvein_foreman": {
         "name": "Contremaître Veinefer"
       },
@@ -6710,6 +6812,11 @@ export const fr_FR: EnTranslations = {
         "name": "Le Veilleur pâle",
         "title": "Gardien des morts",
         "greeting": "Repose-toi maintenant, esprit. Je peux te rendre à ton corps, mais la traversée du retour te laisse affaibli."
+      },
+      "forgewright_brenna": {
+        "name": "Brenna Coalwright",
+        "title": "Forgewright",
+        "greeting": "Smoke over the southwest crags, {className}. My grandmother banked that forge herself and swore it cold. Cold forges do not smoke."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -7500,6 +7607,79 @@ export const fr_FR: EnTranslations = {
           }
         }
       },
+      "q_foundry_smoke": {
+        "title": "Smoke Over the Crags",
+        "text": "The Emberdeep was OUR forge, {playerName}, before the clans buried it and swore it cold. Now it smokes again, and Drogmar's ogres sit outside it like whipped dogs. Something drove them OUT. Go to the siege line past the war-camp and bring me one of the dispatches the cultists nail to their posts. I would know who relit my grandmother's fire.",
+        "completion": "\"The Emberpact.\" A cult that prays to a banked coal. And this seal at the bottom, {playerName}: the old forgemark of the Emberdeep itself. They are not squatting in the forge. They are RUNNING it.",
+        "objectives": {
+          "0": {
+            "label": "Emberpact Dispatch taken"
+          }
+        }
+      },
+      "q_foundry_pickets": {
+        "title": "Thin the Siege Line",
+        "text": "The Emberpact holds the crag approach with zealot pickets, and while they stand no one reaches the forge door. They drove out ogres, {playerName}. OGRES. Cull ten zealots and the line breaks.",
+        "completion": "Ten fewer voices praying at the coal. The pickets are thinning, and the door is almost in reach.",
+        "objectives": {
+          "0": {
+            "label": "Emberpact Zealot slain"
+          }
+        }
+      },
+      "q_foundry_hounds": {
+        "title": "Hounds of the Kiln",
+        "text": "The cult runs hounds along the crag paths, beasts with slag cooling in their hides. Kill eight, and cut out six of the slag hearts that beat in them. If the forge is hot enough to birth THOSE, it is hotter than my grandmother ever dared run it.",
+        "completion": "Still warm. {playerName}, a slag heart holds forge-heat for a day at most. The Emberdeep is not just lit. It is roaring.",
+        "objectives": {
+          "0": {
+            "label": "Cinderhound put down"
+          },
+          "1": {
+            "label": "Slag Heart"
+          }
+        }
+      },
+      "q_foundry_sigils": {
+        "title": "The Emberpact Sigils",
+        "text": "Every zealot on that line carries a fired-clay sigil, their key past the door wards. Bring me six. I can read the firing marks, and the marks will tell me how many crucibles they have running.",
+        "completion": "Six sigils, six different crucible marks. {playerName}, the Emberdeep has SEVEN crucibles. They are running the full forge, and the seventh mark belongs to the great crucible: the Slagheart.",
+        "objectives": {
+          "0": {
+            "label": "Emberpact Sigil"
+          }
+        }
+      },
+      "q_foundry_ashmaw": {
+        "title": "Ashmaw the Kilnborn",
+        "text": "One thing on that line is no cultist and no hound. A shape of cooling slag walks the high path, the first thing the relit forge ever poured, and the pickets follow it like a banner. Kill Ashmaw the Kilnborn and bring me its core, {playerName}. While it walks, the line will always reform.",
+        "completion": "The core still glows. Poured slag should not LIVE, {playerName}. Whoever tends that forge has learned something the clans buried on purpose.",
+        "objectives": {
+          "0": {
+            "label": "Ashmaw's Core"
+          }
+        }
+      },
+      "q_foundry_kilnmaster": {
+        "title": "The Kilnmaster",
+        "text": "The sigils name their master: Kilnmaster Vorr, who found the Emberdeep cold and taught the coal to pray back. He holds the casting halls past the assembly floor. Take companions through the door and end him, {playerName}. This is no errand for a lone blade.",
+        "completion": "Vorr is ash in his own halls. But the firing marks on his robes... he was not the forgemaster, {playerName}. He was the BELLOWS. Something deeper is still drawing breath.",
+        "objectives": {
+          "0": {
+            "label": "Kilnmaster Vorr slain"
+          }
+        }
+      },
+      "q_foundry_slagheart": {
+        "title": "The Slagheart Colossus",
+        "text": "I read the last of the firing marks, {playerName}, and I finally understand what the Emberpact is forging: nothing. The forge is forging ITSELF a body. The great crucible has been pouring one casting for a season, and it stands now on the anvil dais at the forge heart, waiting for its final quench. When it steps off that dais, the mountain loses whatever war comes next. Gather the strongest you can find and shatter the Slagheart Colossus before it wakes fully.",
+        "completion": "Cold at last, and this time it will STAY cold: I will bank that forge myself, the way my grandmother taught me. The mountain will never know what almost walked out from under it, {playerName}. But I will. And so will you.",
+        "objectives": {
+          "0": {
+            "label": "The Slagheart Colossus shattered"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Le Chœur noyé",
         "text": "Les pataugeurs n'agissent pas seuls. Parmi eux marchent les Dévots noyés — la secte qui a sombré avec le temple, encore vêtue de ses ornements putréfiés, chantant toujours la prière depuis les rochers du rivage. Réduis-en huit au silence et rapporte-moi six des offrandes qu'ils portent. Je veux savoir ce qu'ils comptent donner à leur déesse.",
@@ -7693,6 +7873,11 @@ export const fr_FR: EnTranslations = {
         "name": "Arène de raid de Nythraxis",
         "enterText": "Vous franchissez la porte royale scellée.",
         "leaveText": "Vous retrouvez l'air froid de Thornpeak."
+      },
+      "emberdeep_foundry": {
+        "name": "The Emberdeep Foundry",
+        "enterText": "You step through the forge door. The mountain closes overhead, and the heat of the relit Emberdeep rolls up the passage to meet you.",
+        "leaveText": "You step out of the forge door into the cold of the crags."
       },
       "drowned_temple": {
         "name": "Le Temple noyé",

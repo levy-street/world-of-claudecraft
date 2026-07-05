@@ -180,12 +180,26 @@ describe('PvP control abilities in active duels', () => {
     { cls: 'druid', ability: 'entangling_roots', aura: 'root' },
   ])('$ability works on hostile players', ({ cls, ability, aura }) => {
     const { sim, aPid, b } = startDuel(cls, 'warrior');
-    if (ability === 'polymorph') b.hp = Math.max(1, b.maxHp - 120);
 
-    sim.castAbility(ability, aPid);
-    finishCast(sim, aPid);
+    // The spell-hit roll can resist any of these casts, so retry until the aura
+    // actually lands (same bounded-retry pattern as the DR tests below): reset GCD
+    // and resource and clear the aura between attempts. This keeps the assertion
+    // stable regardless of where the shared world RNG stream happens to sit (new
+    // content shifts it).
+    let landed = false;
+    for (let attempt = 0; attempt < 50 && !landed; attempt++) {
+      if (ability === 'polymorph') b.hp = Math.max(1, b.maxHp - 120);
+      b.auras = b.auras.filter((au) => au.kind !== aura);
+      const caster = sim.entities.get(aPid)!;
+      caster.gcdRemaining = 0;
+      caster.resource = caster.maxResource;
+      caster.cooldowns.delete(ability);
+      sim.castAbility(ability, aPid);
+      finishCast(sim, aPid);
+      landed = b.auras.some((au) => au.kind === aura);
+    }
 
-    expect(b.auras.some((au) => au.kind === aura)).toBe(true);
+    expect(landed).toBe(true);
     if (ability === 'polymorph') expect(b.hp).toBe(b.maxHp);
   });
 
@@ -238,10 +252,19 @@ describe('PvP control abilities in active duels', () => {
     const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
 
     const start = pos(b);
-    sim.castAbility('fear', aPid);
-    finishCast(sim, aPid);
-
-    const fear = b.auras.find((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate');
+    // A resisted Fear applies nothing, so retry until the cast lands (same bounded
+    // retry pattern as the DR tests below) before asserting on the resulting aura.
+    let fear: Entity['auras'][number] | undefined;
+    for (let attempt = 0; attempt < 50 && !fear; attempt++) {
+      b.auras = b.auras.filter((aura) => aura.id !== 'fear_incap');
+      const warlock = sim.entities.get(aPid)!;
+      warlock.gcdRemaining = 0;
+      warlock.resource = warlock.maxResource;
+      warlock.cooldowns.delete('fear');
+      sim.castAbility('fear', aPid);
+      finishCast(sim, aPid);
+      fear = b.auras.find((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate');
+    }
     expect(fear?.duration).toBe(8);
 
     for (let i = 0; i < 20; i++) sim.tick();

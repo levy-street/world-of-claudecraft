@@ -36,6 +36,17 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import {
+  FOUNDRY_CAMPS,
+  FOUNDRY_DUNGEON_DEFS,
+  FOUNDRY_DUNGEON_MOBS,
+  FOUNDRY_ITEMS,
+  FOUNDRY_MOBS,
+  FOUNDRY_NPCS,
+  FOUNDRY_OBJECTS,
+  FOUNDRY_QUEST_ORDER,
+  FOUNDRY_QUESTS,
+} from './content/foundry';
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
@@ -151,6 +162,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   ZONE2_ITEMS,
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
+  FOUNDRY_ITEMS,
   DELVE_ITEMS,
 );
 
@@ -165,6 +177,8 @@ export const MOBS: Record<string, MobTemplate> = {
   ...WARLOCK_PET_MOBS,
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
+  ...FOUNDRY_MOBS,
+  ...FOUNDRY_DUNGEON_MOBS,
   ...DELVE_MOBS,
 };
 
@@ -173,6 +187,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...ZONE2_NPCS,
   ...ZONE3_NPCS,
   ...TEMPLE_NPCS,
+  ...FOUNDRY_NPCS,
   brother_halven: BROTHER_HALVEN,
   brother_halven_marsh: BROTHER_HALVEN_MARSH,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
@@ -190,6 +205,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
   ...TEMPLE_QUESTS,
+  ...FOUNDRY_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -197,6 +213,7 @@ export const QUEST_ORDER: string[] = [
   ...ZONE2_QUEST_ORDER,
   ...ZONE3_QUEST_ORDER,
   ...TEMPLE_QUEST_ORDER,
+  ...FOUNDRY_QUEST_ORDER,
 ];
 
 // Camps spawn in array order, each drawing world-gen RNG, so an entry inserted
@@ -208,6 +225,7 @@ export const CAMPS: CampDef[] = [
   ...ZONE2_CAMPS,
   ...ZONE3_CAMPS,
   ...TEMPLE_CAMPS,
+  ...FOUNDRY_CAMPS,
   ...ZONE1_CHAPEL_CAMPS,
   { mobId: 'grix_the_tunnelking', center: { x: -95, z: -78 }, radius: 4, count: 1 },
 ];
@@ -217,6 +235,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...ZONE2_OBJECTS,
   ...ZONE3_OBJECTS,
   ...TEMPLE_OBJECTS,
+  ...FOUNDRY_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
@@ -372,7 +391,11 @@ export function instanceOrigin(dungeonIndex: number, slot: number): { x: number;
   return { x: 900 + dungeonIndex * 600, z: -1250 + slot * 500 };
 }
 
-export const DUNGEONS: Record<string, DungeonDef> = { ...DUNGEON_DEFS, ...TEMPLE_DUNGEON_DEFS };
+export const DUNGEONS: Record<string, DungeonDef> = {
+  ...DUNGEON_DEFS,
+  ...TEMPLE_DUNGEON_DEFS,
+  ...FOUNDRY_DUNGEON_DEFS,
+};
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
@@ -380,9 +403,22 @@ export function dungeonByIndex(index: number): DungeonDef | null {
   return DUNGEON_LIST.find((d) => d.index === index) ?? null;
 }
 
-// Which dungeon a far-off instance position belongs to, by x-band.
+// Where the dungeon x-band sequence RESUMES past the reserved arena+delve
+// window. Dungeon indexes 0-5 band up to ARENA_X_MIN (4200); the window
+// [ARENA_X_MIN, DUNGEON_BAND_RESUME_X_MIN) is reserved for the Ashen Coliseum
+// arena (band [4200, 4773)) and the delves (band [4773, ...); rooms at
+// DELVE_X_MIN + index*600, so delve indexes 0-2 fit with their wall footprints
+// under 6600). 6600 is the west edge of the index-10 band under dungeonAt's
+// round() math ([6600, 7200), origin x = 6900), so dungeon indexes resume at
+// 10, leaving 6-9 unusable inside the window on purpose.
+export const DUNGEON_BAND_RESUME_X_MIN = 6600;
+
+// Which dungeon a far-off instance position belongs to, by x-band. The
+// reserved arena/delve window (see DUNGEON_BAND_RESUME_X_MIN) is never a
+// dungeon; bands resume past it.
 export function dungeonAt(x: number): DungeonDef | null {
-  if (x <= DUNGEON_X_THRESHOLD || x >= ARENA_X_MIN) return null;
+  if (x <= DUNGEON_X_THRESHOLD) return null;
+  if (x >= ARENA_X_MIN && x < DUNGEON_BAND_RESUME_X_MIN) return null;
   return dungeonByIndex(Math.round((x - 900) / 600));
 }
 
@@ -460,8 +496,11 @@ export function delveOrigin(delveIndex: number, slot: number): { x: number; z: n
   return { x: DELVE_X_MIN + delveIndex * 600, z: DELVE_Z0 + slot * DELVE_SLOT_SPACING };
 }
 
+// Double-bounded like isArenaPos: the delve band ends where the dungeon band
+// sequence resumes (DUNGEON_BAND_RESUME_X_MIN), so a resumed-band dungeon
+// position (index 10+, x >= 6600) is never classified as a delve.
 export function isDelvePos(x: number): boolean {
-  return x >= DELVE_BAND_X_MIN;
+  return x >= DELVE_BAND_X_MIN && x < DUNGEON_BAND_RESUME_X_MIN;
 }
 
 export function delveAt(x: number): DelveDef | null {

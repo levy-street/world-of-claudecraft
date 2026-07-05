@@ -1376,10 +1376,11 @@ export class Sim {
     // their old instance is gone (or belongs to someone else) by now.
     let savedPos = savedState?.pos ?? null;
     // Delve must be checked BEFORE the dungeon branch: dungeonAt() returns null
-    // for any x >= ARENA_X_MIN (which includes the delve band), so the dungeon
-    // branch's `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve
-    // position and eject the player to a dungeon door instead of the board door
-    // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
+    // inside the reserved arena/delve window [ARENA_X_MIN, DUNGEON_BAND_RESUME_X_MIN)
+    // (which includes the delve band), so the dungeon branch's `?? DUNGEON_LIST[0]`
+    // fallback would otherwise swallow a delve position and eject the player to a
+    // dungeon door instead of the board door (FR-1.6). The two bands are disjoint,
+    // so `else if` keeps dungeon handling intact.
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };

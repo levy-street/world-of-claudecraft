@@ -164,6 +164,34 @@ export const TEMPLE_LAYOUT: DungeonLayout = (() => {
   };
 })();
 
+// The Emberdeep Foundry (interior 'foundry'): a three-chamber forge gauntlet.
+// An assembly hall, then the casting halls behind a chamber-waist stub at z 48
+// (Kilnmaster Vorr holds the far end), then the forge heart behind a second
+// stub at z 96 with the Slagheart Colossus on the great anvil dais. Side walls
+// at |x|=23 like the crypt so the KayKit wall modules fit unchanged; wall-side
+// slots carry dormant crucibles (rendered with magma channel strips alongside).
+export const FOUNDRY_LAYOUT: DungeonLayout = (() => {
+  const pillars: GridPoint[] = [];
+  for (const z of [10, 25, 40, 60, 75, 90, 110]) {
+    for (const x of [-14, 14]) pillars.push({ x, z });
+  }
+  const stubs: WallStub[] = [];
+  for (const sx of [-14, 14]) {
+    stubs.push({ x: sx, z: 48, hw: 9, hd: 4 }); // assembly hall -> casting halls
+    stubs.push({ x: sx, z: 96, hw: 9, hd: 4 }); // casting halls -> forge heart
+  }
+  return {
+    zMin: -19,
+    zMax: 132,
+    sideWallZ: 56.5,
+    sideWallHd: 76.5,
+    pillars,
+    tombs: grid(16, 82, 22, [-19, 19]), // dormant crucibles hugging the walls
+    stubs,
+    dais: { x: 0, z: 116, r: 10.5 },
+  };
+})();
+
 // The Ashen Coliseum (interior 'arena'): a compact, fully-enclosed square pit
 // — no door, no aisle (combatants are teleported in by matchmaking). Side
 // walls at |x|=23 like the crypt so the KayKit wall modules fit unchanged;

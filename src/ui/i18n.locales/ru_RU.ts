@@ -3180,6 +3180,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы проходите через запечатанную королевскую дверь.',
   'entities.dungeons.nythraxis_boss_arena.leaveText':
     'Вы возвращаетесь в холодный воздух Терновых высот.',
+  'entities.dungeons.emberdeep_foundry.name': 'Кузня Пылающей Бездны',
+  'entities.dungeons.emberdeep_foundry.enterText':
+    'Вы переступаете порог кузнечных врат. Гора смыкается над головой, и жар вновь разожженной Пылающей Бездны поднимается вам навстречу по проходу.',
+  'entities.dungeons.emberdeep_foundry.leaveText':
+    'Вы выходите из кузнечных врат на холод скалистых круч.',
   'entities.quests.q_nythraxis_restless_dead.title': 'Беспокойство на костяных полях',
   'entities.quests.q_nythraxis_restless_dead.text':
     'Что-то изменилось в Терновых высотах, {playerName}. Мертвые больше не бродят бесцельно. Они собираются и маршируют по северным костяным полям за Хайвотчем, где старое поле битвы выходит к дороге у утеса. Идите туда, расследуйте беспокойство среди костяных ревенантов и принесите любое доказательство того, что ими движет.',
@@ -3219,6 +3224,49 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_scourges_end.completion':
     'Теперь корона наконец молчит. Торнпик все еще будет хранить своих мертвых, но ни один король под горой больше не призовет их на войну. Вы завершили то, что Олдрен, Малрик и Восс смогли лишь сдержать.',
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': 'Нитраксис побежден',
+  'entities.quests.q_foundry_smoke.title': 'Дым над кручами',
+  'entities.quests.q_foundry_smoke.text':
+    'Пылающая Бездна была НАШЕЙ кузней, {playerName}, прежде чем кланы завалили ее и поклялись, что она остыла. Теперь она снова дымит, а огры Дрогмара сидят у входа, поджав хвосты, точно битые псы. Что-то выгнало их ВОН. Иди к осадной линии за военным лагерем и принеси мне одно из донесений, что культисты прибивают к своим кольям. Хочу знать, кто разжег огонь моей бабки заново.',
+  'entities.quests.q_foundry_smoke.completion':
+    '"Пылающий Завет". Культ, что молится тлеющему угольку. А эта печать внизу, {playerName}: старое клеймо самой Пылающей Бездны. Они не просто засели в кузне. Они ею УПРАВЛЯЮТ.',
+  'entities.quests.q_foundry_smoke.objectives.0.label': 'Донесение Пылающего Завета изъято',
+  'entities.quests.q_foundry_pickets.title': 'Проредить осадную линию',
+  'entities.quests.q_foundry_pickets.text':
+    'Пылающий Завет держит подступы к кручам заслонами зелотов, и пока они стоят, никто не подойдет к дверям кузни. Они выгнали огров, {playerName}. ОГРОВ. Убей десятерых зелотов, и линия рухнет.',
+  'entities.quests.q_foundry_pickets.completion':
+    'Десятью голосами меньше молится тлеющему угольку. Заслоны редеют, и дверь почти в пределах досягаемости.',
+  'entities.quests.q_foundry_pickets.objectives.0.label': 'Зелот Пылающего Завета убит',
+  'entities.quests.q_foundry_hounds.title': 'Псы Печи',
+  'entities.quests.q_foundry_hounds.text':
+    'Культ пускает по горным тропам псов - тварей, в чьих шкурах стынет шлак. Убей восьмерых и вырежи шесть шлаковых сердец, что бьются в них. Если печь достаточно горяча, чтобы породить ТАКОЕ, значит она горячее, чем моя бабка когда-либо смела ее разжигать.',
+  'entities.quests.q_foundry_hounds.completion':
+    'Все еще теплое. {playerName}, шлаковое сердце держит жар печи от силы день. Пылающая Бездна не просто разожжена. Она полыхает вовсю.',
+  'entities.quests.q_foundry_hounds.objectives.0.label': 'Пепложар повержен',
+  'entities.quests.q_foundry_hounds.objectives.1.label': 'Шлаковое сердце',
+  'entities.quests.q_foundry_sigils.title': 'Печати Пылающего Завета',
+  'entities.quests.q_foundry_sigils.text':
+    'Каждый зелот на той линии носит обожженную глиняную печать - свой ключ мимо дверных оберегов. Принеси мне шесть. Я умею читать клейма обжига, и они скажут мне, сколько тиглей у них работает.',
+  'entities.quests.q_foundry_sigils.completion':
+    'Шесть печатей, шесть разных клейм тигля. {playerName}, в Пылающей Бездне СЕМЬ тиглей. Они разожгли всю кузню целиком, а седьмое клеймо принадлежит великому тиглю: Шлаковому Сердцу.',
+  'entities.quests.q_foundry_sigils.objectives.0.label': 'Печать Пылающего Завета',
+  'entities.quests.q_foundry_ashmaw.title': 'Пепложуй Печерожденный',
+  'entities.quests.q_foundry_ashmaw.text':
+    'Одно существо на той линии - не культист и не пес. Фигура из стынущего шлака бродит по верхней тропе, первое, что когда-либо отлила вновь разожженная печь, и заслоны идут за ней, точно за знаменем. Убей Пепложуя Печерожденного и принеси мне его сердцевину, {playerName}. Пока он ходит, линия будет восстанавливаться снова и снова.',
+  'entities.quests.q_foundry_ashmaw.completion':
+    'Сердцевина все еще светится. Отлитый шлак не должен ЖИТЬ, {playerName}. Кто бы ни поддерживал эту печь, он узнал то, что кланы похоронили намеренно.',
+  'entities.quests.q_foundry_ashmaw.objectives.0.label': 'Сердцевина Пепложуя',
+  'entities.quests.q_foundry_kilnmaster.title': 'Печемастер',
+  'entities.quests.q_foundry_kilnmaster.text':
+    'Печати называют своего хозяина: Печемастер Ворр, что нашел Пылающую Бездну остывшей и научил уголь молиться в ответ. Он держит литейные залы за сборочным двором. Возьми спутников и войди в те двери, чтобы покончить с ним, {playerName}. Это не дело для одинокого клинка.',
+  'entities.quests.q_foundry_kilnmaster.completion':
+    'Ворр - пепел в собственных залах. Но клейма обжига на его робах... он не был кузнечным мастером, {playerName}. Он был МЕХАМИ. Что-то более глубокое все еще переводит дух.',
+  'entities.quests.q_foundry_kilnmaster.objectives.0.label': 'Печемастер Ворр убит',
+  'entities.quests.q_foundry_slagheart.title': 'Колосс Шлаковое Сердце',
+  'entities.quests.q_foundry_slagheart.text':
+    'Я прочла последние из клейм обжига, {playerName}, и наконец поняла, что кует Пылающий Завет: ничего. Печь кует ТЕЛО для самой себя. Великий тигль уже сезон выливает одну-единственную отливку, и теперь она стоит на наковальном помосте в сердце кузни, ожидая последней закалки. Если она сойдет с этого помоста, гора проиграет любую войну, что грянет следом. Собери сильнейших, кого сможешь найти, и разбей Колосса Шлаковое Сердце прежде, чем он пробудится полностью.',
+  'entities.quests.q_foundry_slagheart.completion':
+    'Наконец остыла, и на этот раз она ОСТАНЕТСЯ холодной: я запечатаю эту печь сама, так, как учила меня бабка. Гора никогда не узнает, что чуть не вышло у нее из-под ног, {playerName}. Но я буду знать. И ты тоже.',
+  'entities.quests.q_foundry_slagheart.objectives.0.label': 'Колосс Шлаковое Сердце повержен',
   'hud.errors.silenced': 'Вы лишены дара речи!',
   'hud.pet.noPetFood': 'У вас нет пищи, чтобы покормить питомца.',
   'hud.pet.petEatsFoodOnly': 'Ваш питомец ест только пищу.',
@@ -5788,6 +5836,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': 'Капюшон Утопшего Реликвария',
   'entities.items.sister_nhalia_choir_plate.name': 'Хоровая Кованая Броня Сестры Нхалии',
   'entities.items.drowned_choir_fang.name': 'Клык Утопшего Хора',
+  'entities.items.warcamp_dispatch.name': 'Донесение Пылающего Завета',
+  'entities.items.slag_heart.name': 'Шлаковое Сердце',
+  'entities.items.emberpact_sigil.name': 'Сигил Пылающего Завета',
+  'entities.items.kilnborn_core.name': 'Сердцевина Пепложуя',
+  'entities.items.forgehand_gauntlets.name': 'Кузнечные Рукавицы',
+  'entities.items.forgehand_handwraps.name': 'Кузнечные Обмотки',
+  'entities.items.forgehand_grips.name': 'Кузнечные Захваты',
+  'entities.items.emberstep_warboots.name': 'Огнеступные Боевые Сапоги',
+  'entities.items.emberstep_slippers.name': 'Огнеступные Туфли',
+  'entities.items.emberstep_treads.name': 'Огнеступная Поступь',
+  'entities.items.slagrend_cleaver.name': 'Шлакорвущий Тесак',
+  'entities.items.slagfire_scepter.name': 'Шлакопламенный Скипетр',
+  'entities.items.slagglass_shiv.name': 'Шлакостеклянный Шив',
+  'entities.items.vorrs_kilnplates.name': 'Печные Латы Ворра',
+  'entities.items.slagforged_legguards.name': 'Шлакокованые Поножи',
+  'entities.items.forgelord_warhelm.name': 'Боевой Шлем Кузнечного Лорда',
+  'entities.items.emberweave_cowl.name': 'Капюшон Огненного Плетения',
+  'entities.items.slagstalker_hood.name': 'Капюшон Шлакового Ловчего',
+  'entities.items.slag_chunk.name': 'Кусок Шлака',
+  'entities.items.ember_grit.name': 'Пепельная Крошка',
+  'entities.items.cult_brand.name': 'Клеймо Пылающего Завета',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -5799,10 +5868,27 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': 'Сестра Нхалия, Утонувшая Песнь',
   'entities.mobs.edda_reedhand.name': 'Эдда Тростниковая Рука',
   'entities.mobs.tolling_bell.name': 'Звонящий Колокол',
+  'entities.mobs.emberpact_zealot.name': 'Зелот Пылающего Завета',
+  'entities.mobs.cinderhound.name': 'Пепложар',
+  'entities.mobs.ashmaw_kilnborn.name': 'Пепложуй Печерожденный',
+  'entities.mobs.emberpact_cinderpriest.name': 'Пепложрец Пылающего Завета',
+  'entities.mobs.emberpact_kiln_acolyte.name': 'Послушник Печи Пылающего Завета',
+  'entities.mobs.slag_hound.name': 'Шлаковый Пес',
+  'entities.mobs.ash_revenant.name': 'Пепельный Ревенант',
+  'entities.mobs.emberbound_custodian.name': 'Хранитель, Скованный Углями',
+  'entities.mobs.forgeguard_sentinel.name': 'Страж Кузни',
+  'entities.mobs.molten_crucible_tender.name': 'Смотритель Расплавленного Тигля',
+  'entities.mobs.cinder_wisp.name': 'Пепельный Дух',
+  'entities.mobs.kilnmaster_vorr.name': 'Печемастер Ворр',
+  'entities.mobs.slagheart_colossus.name': 'Колосс Шлаковое Сердце',
   'entities.npcs.brother_halven_marsh.name': 'Брат Хальвен',
   'entities.npcs.brother_halven_marsh.title': 'Хранитель Реликвария',
   'entities.npcs.brother_halven_marsh.greeting':
     'Тропа вела на север. Ещё один реликварий, ещё один обряд. Выбирай уровень, и я буду держать верёвку, пока ты не вернёшься.',
+  'entities.npcs.forgewright_brenna.name': 'Бренна Углекузнец',
+  'entities.npcs.forgewright_brenna.title': 'Кузнечных дел мастер',
+  'entities.npcs.forgewright_brenna.greeting':
+    'Дым над юго-западными скалами, {className}. Моя бабка сама запечатала ту печь и поклялась, что она остыла навсегда. Остывшие печи не дымят.',
   'entities.delves.drowned_litany.name': 'Утонувшая Литания',
   'entities.delves.drowned_litany.enterText': 'Вы спускаетесь в утонувшее святилище на краю топи.',
   'entities.delves.drowned_litany.leaveText':

@@ -16,6 +16,7 @@ import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layou
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
+  FOUNDRY_LAYOUT,
   layoutColliders,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
@@ -262,6 +263,7 @@ const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
+const FOUNDRY_COLLIDERS: Collider[] = layoutColliders(FOUNDRY_LAYOUT);
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
@@ -269,6 +271,7 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   sanctum: SANCTUM_COLLIDERS,
   temple: TEMPLE_COLLIDERS,
   nythraxis: NYTHRAXIS_COLLIDERS,
+  foundry: FOUNDRY_COLLIDERS,
 };
 
 // ---------------------------------------------------------------------------

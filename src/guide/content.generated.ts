@@ -1313,6 +1313,14 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "The Drowned Temple"
   },
   {
+    "id": "emberdeep_foundry",
+    "isRaid": false,
+    "suggestedPlayers": 5,
+    "min": 18,
+    "max": 20,
+    "name": "The Emberdeep Foundry"
+  },
+  {
     "id": "gravewyrm_sanctum",
     "isRaid": false,
     "suggestedPlayers": 5,
