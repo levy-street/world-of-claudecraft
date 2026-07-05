@@ -4,19 +4,20 @@
 //
 // Lives in src/net/ and is never imported by src/sim/: the deterministic core
 // stays free of network/wallet dependencies.
+
+import { isSolanaChain } from '@solana/wallet-standard-chains';
+import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
 import { getWallets, type Wallets } from '@wallet-standard/app';
 import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
 import {
   StandardConnect,
-  StandardDisconnect,
-  StandardEvents,
   type StandardConnectFeature,
+  StandardDisconnect,
   type StandardDisconnectFeature,
+  StandardEvents,
   type StandardEventsChangeProperties,
   type StandardEventsFeature,
 } from '@wallet-standard/features';
-import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
 import bs58 from 'bs58';
 
 export interface WalletState {
@@ -32,7 +33,10 @@ export interface WalletOption {
 }
 
 type CompatibleWallet = Wallet & StandardConnectFeature & SolanaSignMessageFeature;
-type WalletPicker = (wallets: readonly WalletOption[], selectedId: string | null) => Promise<string | null>;
+type WalletPicker = (
+  wallets: readonly WalletOption[],
+  selectedId: string | null,
+) => Promise<string | null>;
 type ConnectApi = StandardConnectFeature[typeof StandardConnect];
 type DisconnectApi = StandardDisconnectFeature[typeof StandardDisconnect];
 type EventsApi = StandardEventsFeature[typeof StandardEvents];
@@ -108,11 +112,13 @@ function connectFeature(wallet: CompatibleWallet): ConnectApi {
 }
 
 function disconnectFeature(wallet: Wallet): DisconnectApi | null {
-  return hasDisconnectFeature(wallet) ? wallet.features[StandardDisconnect] as DisconnectApi : null;
+  return hasDisconnectFeature(wallet)
+    ? (wallet.features[StandardDisconnect] as DisconnectApi)
+    : null;
 }
 
 function eventsFeature(wallet: Wallet): EventsApi | null {
-  return hasEventsFeature(wallet) ? wallet.features[StandardEvents] as EventsApi : null;
+  return hasEventsFeature(wallet) ? (wallet.features[StandardEvents] as EventsApi) : null;
 }
 
 function signMessageFeature(wallet: CompatibleWallet): SignMessageApi {
@@ -124,7 +130,10 @@ function accountSupportsSolanaSignMessage(account: WalletAccount): boolean {
 }
 
 function walletSupportsSolana(wallet: Wallet): boolean {
-  return wallet.chains.some(isSolanaChain) || wallet.accounts.some((account) => account.chains.some(isSolanaChain));
+  return (
+    wallet.chains.some(isSolanaChain) ||
+    wallet.accounts.some((account) => account.chains.some(isSolanaChain))
+  );
 }
 
 function isCompatibleWallet(wallet: Wallet): wallet is CompatibleWallet {
@@ -136,7 +145,10 @@ function compatibleWallets(): CompatibleWallet[] {
   return registry?.get().filter(isCompatibleWallet) ?? [];
 }
 
-function chooseAccount(wallet: CompatibleWallet, accounts: readonly WalletAccount[] = wallet.accounts): WalletAccount | null {
+function chooseAccount(
+  wallet: CompatibleWallet,
+  accounts: readonly WalletAccount[] = wallet.accounts,
+): WalletAccount | null {
   return accounts.find(accountSupportsSolanaSignMessage) ?? null;
 }
 
@@ -156,7 +168,11 @@ function setPickerOpen(open: boolean): void {
   for (const cb of modalListeners) cb(open);
 }
 
-function setSelected(wallet: CompatibleWallet | null, account: WalletAccount | null, persist: boolean): void {
+function setSelected(
+  wallet: CompatibleWallet | null,
+  account: WalletAccount | null,
+  persist: boolean,
+): void {
   const previousAddress = selectedAccount?.address ?? null;
   selectedWallet = wallet;
   selectedAccount = account;
@@ -201,8 +217,11 @@ function findWallet(id: string): CompatibleWallet | null {
 function selectAuthorizedWallet(): boolean {
   const storedName = readStoredWalletName();
   const wallets = compatibleWallets();
-  const storedWallet = storedName ? wallets.find((wallet) => wallet.name === storedName) ?? null : null;
-  const walletWithAccount = storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
+  const storedWallet = storedName
+    ? (wallets.find((wallet) => wallet.name === storedName) ?? null)
+    : null;
+  const walletWithAccount =
+    storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
   if (!walletWithAccount) return false;
   const account = chooseAccount(walletWithAccount);
   attachSelectedWalletEvents(walletWithAccount);
@@ -225,7 +244,8 @@ function trySilentReconnect(): void {
     return;
   }
   selectedWallet = wallet;
-  connectFeature(wallet).connect({ silent: true })
+  connectFeature(wallet)
+    .connect({ silent: true })
     .then((result) => {
       if (selectedWallet !== wallet) return;
       setSelected(wallet, chooseAccount(wallet, result.accounts), true);
@@ -239,7 +259,10 @@ function attachRegistryEvents(): void {
   if (!registry || registryOff || registryUnregisterOff) return;
   registryOff = registry.on('register', (...wallets) => {
     const currentId = selectedWallet ? walletId(selectedWallet) : null;
-    if (currentId && wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))) {
+    if (
+      currentId &&
+      wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))
+    ) {
       trySilentReconnect();
     } else if (!selectedAccount) {
       selectAuthorizedWallet();
@@ -355,8 +378,10 @@ export async function signMessageBase58(message: string): Promise<string> {
   const messageBytes = new TextEncoder().encode(message);
   const results = await signMessageFeature(wallet).signMessage({ account, message: messageBytes });
   const result = results[0];
-  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
-  if (!bytesEqual(result.signedMessage, messageBytes)) throw new Error('wallet modified the message before signing');
+  if (!result || !(result.signature instanceof Uint8Array))
+    throw new Error('wallet returned an invalid signature');
+  if (!bytesEqual(result.signedMessage, messageBytes))
+    throw new Error('wallet modified the message before signing');
   return bs58.encode(result.signature);
 }
 
@@ -377,6 +402,44 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
     return typeof data.balance === 'number' ? data.balance : null;
   } catch (err) {
     console.error('[wallet] $WOC balance read failed', err);
+    return null;
+  }
+}
+
+// ── $WOC reward season ────────────────────────────────────────────────────────
+// Read of the server's flow-ledger season state (GET /api/woc/season): the
+// current reward season + its pool (verified sinks − emissions). Public + cheap.
+// The shape is kept structurally identical to ui/woc_season.ts `WocSeasonPayload`
+// (the wire contract); main.ts pushes the result into that UI state holder.
+export interface WocSeasonInfo {
+  seasonId: number;
+  label: string;
+  status: 'active' | 'closed' | 'finalized';
+  openedAt: string;
+  endsAt: string | null;
+  sinkBase: string;
+  emissionBase: string;
+  poolBase: string;
+}
+export interface WocSeasonStanding {
+  rank: number;
+  name: string;
+  rating: number;
+  rewardBase: string; // base-unit decimal string
+}
+export interface WocSeasonResponse {
+  season: WocSeasonInfo | null;
+  standings: WocSeasonStanding[];
+  decimals: number;
+}
+
+export async function fetchWocSeason(): Promise<WocSeasonResponse | null> {
+  try {
+    const res = await fetch('/api/woc/season');
+    if (!res.ok) return null;
+    return (await res.json()) as WocSeasonResponse;
+  } catch (err) {
+    console.error('[wallet] $WOC season read failed', err);
     return null;
   }
 }

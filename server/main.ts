@@ -106,6 +106,7 @@ import {
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
+import { activeSeasonStatus, closeSeason, openSeason } from './flow_ledger_db';
 import { GameServer } from './game';
 import {
   handleGitHubCallback,
@@ -142,6 +143,8 @@ import {
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
+import { withPayoutKeeperLock } from './payout_db';
+import { buildPayoutKeeper } from './payout_keeper';
 import { handlePerfReport } from './perf_report';
 import {
   captureReferral,
@@ -167,6 +170,7 @@ import {
 } from './ratelimit';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
+import { rewardTierBpsFromEnv } from './reward_tiers';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
@@ -186,9 +190,25 @@ import {
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { WOC_DECIMALS } from './woc_config';
+import { SeasonBodyCache } from './woc_season_api';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
+// How often the buyback keeper ticks. Its own policy decides whether a tick does
+// anything (threshold / cadence / fee floor), so this is just the poll interval.
+const PAYOUT_KEEPER_TICK_MS = Number(process.env.BUYBACK_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+// /api/woc/season is public and polled by every client; SeasonBodyCache keeps the
+// (cheap) read off the DB hot path with a short TTL. Season + pool change slowly,
+// so a few seconds of staleness is fine.
+const seasonBody = new SeasonBodyCache({
+  fetchSeason: activeSeasonStatus,
+  fetchLadder: (limit) => topArenaRatings(limit, '1v1'),
+  tierBps: rewardTierBpsFromEnv,
+  decimals: WOC_DECIMALS,
+  now: () => Date.now(),
+  ttlMs: 5000,
+});
 const STATIC_DIR = path.join(__dirname, '..', 'dist');
 // Pretty URLs that serve standalone static HTML pages.
 const STATIC_PAGE_ALIASES = new Map([
@@ -1493,6 +1513,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
     }
+    // Public read of the current $WOC reward season + its pool (verified sinks −
+    // emissions = $WOC available to pay out this season). Derived from
+    // on-chain-verified flows; { season: null } when no season is open.
+    if (req.method === 'GET' && url === '/api/woc/season') {
+      // Season + pool, plus the projected per-player rewards (the realm's top
+      // arena-1v1 ladder split by the tier schedule: a projection of "if the
+      // season closed now"; the actual payout at close is the deferred escrow
+      // path). Built + short-TTL-cached by seasonBody (woc_season_api.ts).
+      return json(res, 200, await seasonBody.get());
+    }
     if (url.startsWith('/api/daily-rewards')) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -1769,6 +1799,7 @@ async function main(): Promise<void> {
   await game.loadMail();
   await game.loadChatFilter();
   await game.loadBlockedIps();
+  await game.bootArenaWager();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
     .then((count) => recordSitePresenceSample(count))
@@ -1827,6 +1858,36 @@ async function main(): Promise<void> {
   };
   warmLeaderboards();
   setInterval(warmLeaderboards, LEADERBOARD_TTL_MS).unref();
+
+  // Buyback keeper: drain the marketplace USDC vault on a cadence — swap to $WOC,
+  // then BURN it (deflationary) or TOP UP the #480 reward pool (recorded as a
+  // verified buyback inflow on the flow ledger). runCycle recovers any in-flight
+  // batch first, so the boot call resolves a crash mid-settle before new work.
+  // No-op unless configured (BUYBACK_VAULT + its signing secret; top_up also needs
+  // REWARD_POOL_VAULT + BUYBACK_SEASON_ID).
+  const payoutKeeper = buildPayoutKeeper();
+  if (payoutKeeper) {
+    // Two layers of mutual exclusion so the vault is never swapped twice at once:
+    // (1) keeperBusy — in-process single-flight, so a slow cycle can't overlap its
+    //     own next interval tick; (2) withPayoutKeeperLock — a cross-process
+    //     Postgres advisory lock, so sibling realm processes sharing this vault +
+    //     DB don't each run a cycle. Either layer alone leaves a double-swap window.
+    let keeperBusy = false;
+    const tick = async () => {
+      if (keeperBusy) return;
+      keeperBusy = true;
+      try {
+        await withPayoutKeeperLock(() => payoutKeeper.runCycle());
+      } catch (err) {
+        console.error('buyback keeper cycle failed:', err);
+      } finally {
+        keeperBusy = false;
+      }
+    };
+    void tick();
+    setInterval(() => void tick(), PAYOUT_KEEPER_TICK_MS).unref();
+    console.log('buyback keeper enabled');
+  }
   console.log('database ready');
 
   const server = http.createServer((req, res) => {
@@ -1847,7 +1908,7 @@ async function main(): Promise<void> {
     if (url.startsWith('/internal/')) {
       void (async () => {
         if (await handleDailyRewardInternalApi(req, res)) return;
-        await handleInternalApi(req, res, game);
+        await handleInternalApi(req, res, game, { openSeason, closeSeason });
       })();
     } else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);

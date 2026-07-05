@@ -3,13 +3,16 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import { WAGER_MATCH_SCHEMA } from './arena_wager_db';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { DISCORD_SCHEMA } from './discord_db';
+import { FLOW_LEDGER_SCHEMA } from './flow_ledger_db';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
 import { OAUTH_SCHEMA } from './oauth_db';
+import { BUYBACK_BATCHES_SCHEMA } from './payout_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
@@ -592,6 +595,9 @@ export async function ensureSchema(): Promise<void> {
     await client.query(SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(OAUTH_SCHEMA);
+    await client.query(FLOW_LEDGER_SCHEMA);
+    await client.query(BUYBACK_BATCHES_SCHEMA);
+    await client.query(WAGER_MATCH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
     // economy). FK-references accounts(id), so it runs after SCHEMA. Applied
     // unconditionally (idempotent) so the tables exist before the feature is

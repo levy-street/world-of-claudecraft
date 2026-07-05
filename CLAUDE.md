@@ -226,6 +226,26 @@ correct.
   <file>`, `npm test`, `npm run build`, `tests/architecture.test.ts`, the S3 i18n guard
   `tests/localization_fixes.test.ts`), never on "looks done."
 
+## Devnet deploys (woc_escrow / $WOC)
+Devnet program upgrades and live on-chain transaction tests read the funded
+**fee-payer / funder keypair from `SOLANA_DEVNET_DEPLOYER` in `.env.local`** (gitignored;
+never commit the file or the keypair it points at). Its value is a PATH to a Solana
+keypair JSON (the funded `HBabiEx3...` wallet). The program's on-chain UPGRADE AUTHORITY
+is a SEPARATE keypair (`3P9m...`, `WOC_ESCROW_UPGRADE_AUTHORITY`) that must co-sign any
+upgrade. The deployed program id is `Fn4LMsV7akGX9KXwYv4uh2v8nM2uqgaAxhKrsYYbZqcJ`; the
+mock $WOC mint is `E6r4tqSuQ6VuCa9jpPZMqYHAj1x9GJaKaaXWxrfFsgFx`.
+- Build: `RUSTUP_TOOLCHAIN=1.85.0 anchor build --no-idl` (cargo 1.85, anchor 0.30.1) from
+  `solana/`; reuse `../wt-realm-escrow/solana/Cargo.lock`. Artifact:
+  `solana/target/deploy/woc_escrow.so`.
+- Deploy/upgrade (the program has no headroom, so growth needs `solana program extend`
+  first): `solana program deploy --program-id solana/target/deploy/woc_escrow-keypair.json
+  --upgrade-authority "$WOC_ESCROW_UPGRADE_AUTHORITY" --keypair "$SOLANA_DEVNET_DEPLOYER"
+  solana/target/deploy/woc_escrow.so --url devnet` (the funder pays the buffer, the
+  authority co-signs).
+- Live tx tests are gated on `WOC_DEVNET_TEST=1` (skipped in CI / normal runs).
+- Solana CLI lives at `~/.local/share/solana/install/active_release/bin`; vitest needs
+  Node >= 20 (`~/.nvm/versions/node/v22.22.2/bin`).
+
 ## Pointers
 `README.md` (host/develop/play + fidelity checklist) · `DEPLOY.md` (production) ·
 `CREDITS.md` (asset licenses) · `docs/design/` (design docs) · `docs/prd/` (feature specs).
