@@ -2540,7 +2540,7 @@
   }
 
   /* WoW-style full-screen character screens (the offline panel plus the two
-     online panels carry the cs-wow class). Desktop only: below 900px the
+     online panels carry the cs-wow class). Desktop only: below 861px the
      classic card layout above stays, and the ONLINE panels additionally keep
      their card layout on touch bodies (the body.mobile-touch blocks below own
      that styling), hence the body:not(.mobile-touch) prefix on their arms.
@@ -2552,8 +2552,12 @@
      name floats top-center, and the actions sit in the corners. On the
      roster (#charselect-panel) the character list docks right instead, WoW
      style, and the summary docks left. All the ids / buttons / rows stay
-     untouched, so the main.ts wiring is unchanged. */
-  @media (min-width: 900px) {
+     untouched, so the main.ts wiring is unchanged.
+     Intentionally starts before the shared 900px card foundation: this
+     takeover restates the sizing and inner grids required throughout the
+     861px to 899px range.
+     */
+  @media (min-width: 861px) {
     #offline-select.cs-wow,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {
       position: fixed;
@@ -2587,6 +2591,10 @@
       display: block;
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow {
+      --cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));
+      --cs-roster-width: clamp(340px, 28vw, 440px);
+      --cs-details-width: var(--cs-roster-width);
+      --cs-dock-bottom: clamp(18px, 6.5vh, 96px);
       display: flex;
       flex-direction: column;
     }
@@ -2937,10 +2945,10 @@
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow .cs-list-col {
       position: absolute;
-      right: 26px;
+      right: var(--cs-stage-gutter);
       top: 18px;
-      bottom: 96px;
-      width: 340px;
+      bottom: var(--cs-dock-bottom);
+      width: var(--cs-roster-width);
       /* The card layout gives the column height:100%; the dock stretches via
          top/bottom instead. */
       height: auto;
@@ -2964,16 +2972,86 @@
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel {
       position: absolute;
-      left: 26px;
+      left: var(--cs-stage-gutter);
       top: 18px;
-      bottom: 96px;
-      width: 340px;
+      bottom: var(--cs-dock-bottom);
+      width: var(--cs-details-width);
       overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;
       background: #0d0d16d9;
       border: 1px solid var(--color-border-default);
       border-radius: var(--radius-md);
       padding: 14px;
       z-index: 2;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent);
+      border: 0;
+      border-radius: 999px;
+    }
+    body:not(.mobile-touch)
+      #charselect-panel.cs-wow
+      .class-details-panel::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, var(--scrollbar-thumb) 68%, transparent);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      column-gap: 12px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {
+      overflow-wrap: anywhere;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {
+      display: grid;
+      grid-template-columns: minmax(112px, 1fr);
+      gap: 6px;
+      align-items: stretch;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions .btn {
+      width: 100%;
+      white-space: nowrap;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(18px, 2vh, 28px);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-spells-section {
+      grid-column: 1;
+      padding-top: clamp(6px, 1vh, 12px);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row {
+      display: grid;
+      grid-template-columns: clamp(76px, 5vw, 92px) minmax(0, 1fr);
+      align-items: baseline;
+      gap: 12px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      text-transform: none;
+      line-height: 1.45;
+      white-space: normal;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge-resource::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 7px currentColor;
+      vertical-align: 1px;
     }
 
     /* The class summary's base type is sized for the small pre-game card
@@ -2981,35 +3059,35 @@
        whole details sheet up one step in every cs-wow panel. */
     #offline-select.cs-wow .class-details-panel,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-panel {
-      font-size: 13px;
+      font-size: clamp(13px, 0.72vw, 15px);
     }
     #offline-select.cs-wow .class-details-name,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-name {
-      font-size: 24px;
+      font-size: clamp(24px, 1.35vw, 30px);
     }
     #offline-select.cs-wow .class-details-role,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-role {
-      font-size: 13px;
+      font-size: clamp(13px, 0.7vw, 15px);
     }
     #offline-select.cs-wow .class-details-lore,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .class-details-lore {
-      font-size: 14px;
+      font-size: clamp(14px, 0.78vw, 16px);
       line-height: 1.55;
     }
     #offline-select.cs-wow .details-section-title,
     body:not(.mobile-touch)
       :is(#charselect-panel, #charcreate-panel).cs-wow
       .details-section-title {
-      font-size: 14px;
+      font-size: clamp(14px, 0.75vw, 16px);
     }
     #offline-select.cs-wow .details-stat-bar-row,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-bar-row {
-      font-size: 13px;
+      font-size: clamp(13px, 0.7vw, 15px);
       margin-bottom: 8px;
     }
     #offline-select.cs-wow .details-stat-label,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-label {
-      width: 76px;
+      width: clamp(76px, 5vw, 92px);
     }
     #offline-select.cs-wow .details-stat-val,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-stat-val {
@@ -3017,7 +3095,7 @@
     }
     #offline-select.cs-wow .details-gear-row,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-gear-row {
-      font-size: 13px;
+      font-size: clamp(13px, 0.7vw, 15px);
     }
     #offline-select.cs-wow .badge,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .badge {
@@ -3025,14 +3103,14 @@
     }
     #offline-select.cs-wow .details-spell-item,
     body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow .details-spell-item {
-      font-size: 13px;
+      font-size: clamp(13px, 0.68vw, 15px);
     }
     #offline-select.cs-wow .details-spell-text strong,
     body:not(.mobile-touch)
       :is(#charselect-panel, #charcreate-panel).cs-wow
       .details-spell-text
       strong {
-      font-size: 13px;
+      font-size: clamp(13px, 0.68vw, 15px);
     }
     #offline-select.cs-wow .details-spell-icon-img,
     body:not(.mobile-touch)

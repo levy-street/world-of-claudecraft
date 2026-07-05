@@ -229,6 +229,8 @@ export const hudChromeStrings = {
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
     toggleHaptics: 'Toggle haptics',
+    hotbarPage: 'Skills',
+    hotbarPageAria: 'Show next set of skills',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
   // bodies (hud.tutorial.*Body) reference keyboard/mouse ("W/A/S/D", "press F"),
@@ -802,6 +804,27 @@ export const hudChromeStrings = {
     thresholdSet: 'Loot threshold set to {threshold}.',
     summaryMaster: 'Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.',
     summaryGroup: 'Loot Settings: Group Loot.',
+  },
+  // Per-corpse focus picker (#1142): the checkbox list of tagged components on a
+  // harvestable corpse, shown alongside loot. Concentrating on fewer checked
+  // components yields a higher tier per component than spreading across all of
+  // them (professions/gathering.ts resolveCorpseFocusHarvest).
+  corpseHarvest: {
+    title: 'Harvest',
+    harvestButton: 'Harvest',
+    concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    alreadyHarvested: 'This corpse has already been harvested.',
+    componentAria: 'Harvest {component}',
+    components: {
+      hide: 'Hide',
+      fang: 'Fang',
+      silk: 'Silk',
+      venomSac: 'Venom Sac',
+      gills: 'Gills',
+      claw: 'Claw',
+      horn: 'Horn',
+      tusk: 'Tusk',
+    },
   },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only

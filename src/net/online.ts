@@ -1950,8 +1950,8 @@ export class ClientWorld implements IWorld {
   autoLoot(id: number): void {
     this.cmd({ cmd: 'autoloot', id });
   }
-  harvestCorpse(id: number): void {
-    this.cmd({ cmd: 'harvestCorpse', id });
+  harvestCorpse(id: number, components?: string[]): void {
+    this.cmd({ cmd: 'harvestCorpse', id, components });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
