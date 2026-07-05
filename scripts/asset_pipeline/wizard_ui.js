@@ -72,6 +72,15 @@ const STYLE = `
 .wz-previews { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
 .wz-previews img { width: 150px; height: 150px; object-fit: contain; background: #10131a;
   border: 1px solid var(--line); border-radius: 6px; }
+.wz-viewer { position: relative; width: 100%; height: 340px; margin: 10px 0; background: #10131a;
+  border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.wz-viewer canvas { width: 100%; height: 100%; display: block; }
+.wz-viewer .wz-vstatus { position: absolute; left: 8px; bottom: 8px; font-size: 11px;
+  color: var(--dim); background: rgba(6,8,12,0.62); padding: 2px 7px; border-radius: 4px;
+  pointer-events: none; }
+.wz-viewer select { position: absolute; right: 8px; top: 8px; max-width: 58%;
+  background: var(--bg); border: 1px solid var(--line); color: var(--text);
+  border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 12px; }
 .wz-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 .wz-btn { border: 1px solid var(--line); background: var(--panel2); color: var(--text);
   border-radius: 7px; padding: 9px 16px; font: inherit; font-size: 13px; cursor: pointer; }
@@ -110,6 +119,7 @@ class Wizard {
     this.overlay.classList.add('open');
   }
   close() {
+    this.closeViewer();
     this.overlay.classList.remove('open');
     this.polling = false;
     this.state = null;
@@ -122,6 +132,17 @@ class Wizard {
       name: preset.name ?? '',
       prompt: preset.prompt ?? '',
       jobId: preset.jobId ?? null,
+      // The API generation options the form exposes (lane-aware). Empty string /
+      // 'auto' means "let the pipeline decide" (rig auto-detect, family from name).
+      options: {
+        model: 'lowpoly',
+        image: '',
+        rigType: '',
+        height: '',
+        family: '',
+        rotateY: '',
+        ...(preset.options || {}),
+      },
       phase: 'prompt',
     };
     this.open();
@@ -148,6 +169,7 @@ class Wizard {
 
   renderPrompt() {
     const s = this.state;
+    this.closeViewer();
     this.modal.innerHTML = '';
     this.modal.append(
       el('h2', {}, s.mode === 'regenerate' ? 'Regenerate asset' : 'Create a new asset'),
@@ -165,16 +187,28 @@ class Wizard {
         el('option', { value: l.id, ...(l.id === s.lane ? { selected: '' } : {}) }, l.label),
       ),
     );
+    // Re-render when the lane changes so the lane-aware option fields update; the
+    // typed name/prompt are already mirrored into state via their oninput below.
+    laneSel.onchange = () => {
+      s.lane = laneSel.value;
+      this.renderPrompt();
+    };
     const nameIn = el('input', {
       type: 'text',
       placeholder: 'snake_case name, e.g. bog_lurker',
       value: s.name,
     });
+    nameIn.oninput = () => {
+      s.name = nameIn.value;
+    };
     const promptIn = el(
       'textarea',
       { placeholder: 'chibi swamp lurker, hunched, dripping moss, glowing eyes' },
       s.prompt,
     );
+    promptIn.oninput = () => {
+      s.prompt = promptIn.value;
+    };
     if (s.mode === 'regenerate') {
       laneSel.disabled = true;
       nameIn.disabled = true;
@@ -183,6 +217,7 @@ class Wizard {
       el('div', { class: 'wz-field' }, el('label', {}, 'Type'), laneSel),
       el('div', { class: 'wz-field' }, el('label', {}, 'Name'), nameIn),
       el('div', { class: 'wz-field' }, el('label', {}, 'Description (text prompt)'), promptIn),
+      ...this.optionFields(s),
       el(
         'div',
         { class: 'wz-note' },
@@ -200,8 +235,12 @@ class Wizard {
               s.lane = laneSel.value;
               s.name = nameIn.value.trim();
               s.prompt = promptIn.value.trim();
-              if (!s.name || !s.prompt) {
-                alert('Name and description are required.');
+              if (!s.name) {
+                alert('Name is required.');
+                return;
+              }
+              if (!s.prompt && !s.options.image) {
+                alert('A description or a reference image is required.');
                 return;
               }
               this.startModel(false);
@@ -226,8 +265,8 @@ class Wizard {
       lane: s.lane,
       name: s.name,
       prompt: s.prompt,
+      options: s.options,
       regenerate,
-      jobExists: s.mode === 'regenerate' || !!s.jobId,
     });
     if (r.error) return this.renderError(r.error, () => this.renderPrompt());
     s.jobId = r.jobId;
@@ -237,16 +276,17 @@ class Wizard {
   renderModelReview() {
     const s = this.state;
     const models = (this._status.previews || []).filter((p) => p.group === 'model');
+    this.closeViewer();
     this.modal.innerHTML = '';
     this.modal.append(
       el('h2', {}, 'Review the model'),
       el(
         'div',
         { class: 'wz-sub' },
-        'Keep this model, or regenerate for another candidate. Nothing is saved yet.',
+        'Drag to rotate, scroll to zoom. Keep this model, or regenerate for another candidate. Nothing is saved yet.',
       ),
       this.stepsBar('model'),
-      this.previewRow(models, 'No preview rendered; check the log.'),
+      this.reviewPreview(this._status.modelGlb, models, 'No model rendered; check the log.'),
       this.logBox(),
       el(
         'div',
@@ -276,6 +316,7 @@ class Wizard {
     const r = await api('/api/wizard/finish', {
       lane: s.lane,
       jobId: s.jobId,
+      options: s.options,
       regenerateAnimations: regen,
     });
     if (r.error) return this.renderError(r.error, () => this.renderModelReview());
@@ -286,16 +327,19 @@ class Wizard {
     const s = this.state;
     const finals = (this._status.previews || []).filter((p) => p.group === 'final');
     const val = this._status.validation;
+    this.closeViewer();
     this.modal.innerHTML = '';
     this.modal.append(
       el('h2', {}, s.lane === 'creature' ? 'Review the animations' : 'Review the finished asset'),
       el(
         'div',
         { class: 'wz-sub' },
-        'Each frame is one animation pose. Approve to save into the game, or regenerate.',
+        s.lane === 'creature'
+          ? 'Pick a clip from the dropdown to watch it play. Approve to save into the game, or regenerate.'
+          : 'Drag to rotate, scroll to zoom. Approve to save into the game, or regenerate.',
       ),
       this.stepsBar('finish'),
-      this.previewRow(finals, 'No final previews yet.'),
+      this.reviewPreview(this._status.finalGlb, finals, 'No finished asset yet.'),
       val && !val.ok
         ? el(
             'div',
@@ -341,6 +385,7 @@ class Wizard {
   }
 
   renderDone() {
+    this.closeViewer();
     this.modal.innerHTML = '';
     this.modal.append(
       el('h2', {}, 'Saved'),
@@ -371,6 +416,7 @@ class Wizard {
 
   // --- shared render bits ----
   renderWorking(step, msg) {
+    this.closeViewer();
     this.modal.innerHTML = '';
     this.modal.append(
       el('h2', {}, 'Working...'),
@@ -380,6 +426,7 @@ class Wizard {
     );
   }
   renderError(msg, back) {
+    this.closeViewer();
     this.modal.innerHTML = '';
     this.modal.append(
       el('h2', {}, 'Something went wrong'),
@@ -404,6 +451,122 @@ class Wizard {
           el('img', { src: p.url + '?t=' + Math.floor(p.mtime), alt: p.name, title: p.name }),
         ),
     );
+  }
+
+  laneCategory() {
+    const l = this.state?.lane;
+    return l === 'creature' ? 'creatures' : l === 'weapon' ? 'weapons' : 'props';
+  }
+
+  // Prefer the LIVE in-browser viewer (real GLB, orbit + clip playback) over the
+  // server-rendered PNG strip: the wizard runs in a real browser, so it needs no
+  // headless Chrome. Falls back to the PNG row only if a GLB is not available yet.
+  liveViewer(repoGlb) {
+    const canvas = el('canvas', {});
+    const clipSelect = el('select', { title: 'animation clip' });
+    const statusEl = el('div', { class: 'wz-vstatus' }, 'loading model...');
+    const wrap = el('div', { class: 'wz-viewer' }, canvas, clipSelect, statusEl);
+    const asset = { repoGlb, kind: 'model', category: this.laneCategory() };
+    // Mount after the node is laid out so the viewer sizes to the canvas rect.
+    requestAnimationFrame(() => {
+      if (window.LiveViewer) window.LiveViewer.open(asset, { canvas, clipSelect, statusEl });
+      else statusEl.textContent = 'live viewer unavailable';
+    });
+    return wrap;
+  }
+
+  reviewPreview(glb, pngs, empty) {
+    if (glb) return this.liveViewer(glb);
+    if (pngs.length) return this.previewRow(pngs, empty);
+    return el('div', { class: 'wz-sub' }, empty);
+  }
+
+  // Tear down any mounted live viewer before replacing modal content, so the
+  // WebGL context and its animation loop do not leak across screens.
+  closeViewer() {
+    if (window.LiveViewer) window.LiveViewer.close();
+  }
+
+  // Lane-aware API generation options. Each input writes straight into
+  // state.options, so values survive a lane-change re-render and are read back on
+  // submit and on every regenerate without a separate collection pass. The server
+  // (lib/wizard.mjs genArgs) allowlists/clamps everything before it becomes a CLI arg.
+  optionFields(s) {
+    const o = s.options;
+    const field = (label, input) => el('div', { class: 'wz-field' }, el('label', {}, label), input);
+    const sel = (key, opts) => {
+      const n = el(
+        'select',
+        {},
+        ...opts.map(([v, t]) =>
+          el('option', { value: v, ...(o[key] === v ? { selected: '' } : {}) }, t),
+        ),
+      );
+      n.onchange = () => {
+        o[key] = n.value;
+      };
+      return n;
+    };
+    const txt = (key, placeholder, type = 'text') => {
+      const n = el('input', { type, placeholder, value: o[key] ?? '' });
+      n.oninput = () => {
+        o[key] = n.value.trim();
+      };
+      return n;
+    };
+    const fields = [
+      field(
+        'Model quality',
+        sel('model', [
+          ['lowpoly', 'Low-poly (game, default)'],
+          ['hifi', 'High fidelity (H-series, more credits)'],
+        ]),
+      ),
+    ];
+    if (s.lane === 'creature') {
+      fields.push(
+        field(
+          'Rig type',
+          sel('rigType', [
+            ['', 'Auto-detect'],
+            ['biped', 'Biped (humanoid, full clip set)'],
+            ['quadruped', 'Quadruped (4 legs)'],
+            ['hexapod', 'Hexapod (6 legs)'],
+            ['octopod', 'Octopod (8 legs)'],
+            ['serpentine', 'Serpentine (snake)'],
+            ['aquatic', 'Aquatic (fish)'],
+          ]),
+        ),
+        field('Height (world units)', txt('height', 'e.g. 2.0', 'number')),
+      );
+    } else if (s.lane === 'weapon') {
+      fields.push(
+        field(
+          'Weapon family',
+          sel('family', [
+            ['', 'Auto (from name)'],
+            ['sword', 'Sword'],
+            ['dagger', 'Dagger'],
+            ['axe', 'Axe / hammer'],
+            ['staff', 'Staff'],
+            ['wand', 'Wand'],
+            ['polearm', 'Polearm (spear / halberd / scythe)'],
+          ]),
+        ),
+      );
+    } else if (s.lane === 'prop') {
+      fields.push(
+        field('Height (world units)', txt('height', 'e.g. 2.4', 'number')),
+        field('Rotate Y (degrees)', txt('rotateY', 'e.g. 90', 'number')),
+      );
+    }
+    fields.push(
+      field(
+        'Reference image (optional)',
+        txt('image', 'URL or Tripo task id (task_...); overrides text for geometry'),
+      ),
+    );
+    return fields;
   }
   logBox(open) {
     const box = el(

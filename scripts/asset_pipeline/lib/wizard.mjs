@@ -72,20 +72,66 @@ function spawnStep(jobId, args, phase) {
   return entry;
 }
 
+// Operator-facing generation options exposed by the wizard form, mapped to the
+// exact CLI flags each lane accepts. Rig type is consumed at the rig step (which
+// runs during FINISH, not the model stage), and height/family/rotate at normalize,
+// so genArgs is applied to BOTH startModel and finishAsset for the values to land.
+const MODEL_QUALITIES = new Set(['lowpoly', 'hifi']);
+export const RIG_TYPES = ['biped', 'quadruped', 'hexapod', 'octopod', 'serpentine', 'aquatic'];
+export const WEAPON_FAMILIES = ['sword', 'dagger', 'axe', 'staff', 'wand', 'polearm'];
+const RIG_TYPE_SET = new Set(RIG_TYPES);
+const WEAPON_FAMILY_SET = new Set(WEAPON_FAMILIES);
+
+/** Validate operator options into CLI args. EVERY value is allowlisted or
+ *  numeric-clamped: these become spawn args, so an unchecked string could inject
+ *  a flag (a rig type of "--apply" would enable a cheat), and an --image of a
+ *  local path would read an arbitrary server file as the concept. */
+export function genArgs(lane, options = {}) {
+  const o = options && typeof options === 'object' ? options : {};
+  const args = [];
+  if (MODEL_QUALITIES.has(o.model) && o.model === 'hifi') args.push('--model', 'hifi');
+  if (typeof o.image === 'string') {
+    const img = o.image.trim();
+    // A remote URL or a Tripo task/file id only: never a server-local path.
+    if (/^https?:\/\/\S+$/.test(img) || /^(task_|file_)[\w-]+$/.test(img))
+      args.push('--image', img);
+  }
+  const num = (v, lo, hi) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= lo && n <= hi ? n : null;
+  };
+  if (lane === 'creature') {
+    if (RIG_TYPE_SET.has(o.rigType)) args.push('--rig-type', o.rigType);
+    const h = num(o.height, 0.1, 20);
+    if (h != null) args.push('--height', String(h));
+  } else if (lane === 'weapon') {
+    if (WEAPON_FAMILY_SET.has(o.family)) args.push('--family', o.family);
+  } else if (lane === 'prop') {
+    const h = num(o.height, 0.1, 20);
+    if (h != null) args.push('--height', String(h));
+    // Any finite angle is valid; normalize into [0, 360).
+    const ryRaw = Number(o.rotateY);
+    if (o.rotateY !== '' && o.rotateY != null && Number.isFinite(ryRaw))
+      args.push('--rotate-y', String(((ryRaw % 360) + 360) % 360));
+  }
+  return args;
+}
+
 /** Start (or restart) generating the model for a new/edited asset. Runs the
  *  concept + generate stages and stops for review (--until generate). When
  *  regenerate is true, redoes the generate stage for a fresh candidate. */
-export function startModel({ lane, name, prompt, image, regenerate, jobExists }) {
+export function startModel({ lane, name, prompt, options, regenerate }) {
   if (!LANES.has(lane)) throw new Error(`unsupported lane: ${lane}`);
   const key = safeName(name);
   if (!key) throw new Error('name required');
-  if (!prompt && !image) throw new Error('prompt or image required');
+  const gen = genArgs(lane, options);
+  if (!prompt && !gen.includes('--image')) throw new Error('prompt or image required');
   const jobId = jobIdFor(lane, key);
   // Always drive a DETERMINISTIC job id (--job) so status/steps line up; --new-job
   // lets the pipeline create it on the first model run (it exists on resume/regen).
   const args = [lane, '--name', key, '--job', jobId, '--new-job', '--until', 'generate'];
   if (prompt) args.push('--prompt', prompt);
-  if (image) args.push('--image', image);
+  args.push(...gen);
   if (regenerate) args.push('--redo', 'generate');
   spawnStep(jobId, args, regenerate ? 'regenerate-model' : 'model');
   return { jobId };
@@ -94,12 +140,14 @@ export function startModel({ lane, name, prompt, image, regenerate, jobExists })
 /** Run the finishing stages (rig + animations for creatures, normalize + icon
  *  for weapons/props) and render final previews, stopping before apply so the
  *  operator reviews the animated/finished asset. regenerateAnimations redoes the
- *  animation stage only (creatures). */
-export function finishAsset({ lane, jobId, regenerateAnimations }) {
+ *  animation stage only (creatures). The same validated options are re-passed so
+ *  rig type (rig step) and height/family/rotate (normalize) take effect here. */
+export function finishAsset({ lane, jobId, options, regenerateAnimations }) {
   if (!existsSync(join(JOBS_ROOT, jobId, 'job.json'))) throw new Error('job not found');
   const args = [lane, '--job', jobId];
   const nm = readJob(jobId)?.name;
   if (nm) args.push('--name', nm);
+  args.push(...genArgs(lane, options));
   if (regenerateAnimations) {
     args.push('--redo', lane === 'creature' ? 'retarget' : 'normalize');
   }
@@ -152,6 +200,13 @@ function listPreviews(jobId) {
   return out.sort((a, b) => b.mtime - a.mtime);
 }
 
+// Repo-relative path (for the live viewer's /repo/* route) to a GLB inside the
+// job dir, or null when it has not been produced yet. The raw model appears after
+// the generate stage; the finished/animated build after assemble/normalize.
+function jobGlb(jobId, file) {
+  return existsSync(join(JOBS_ROOT, jobId, file)) ? `tmp/asset_pipeline/${jobId}/${file}` : null;
+}
+
 /** Full wizard status for the browser: whether a child is live, the step
  *  ledger, the tail of the captured output (for progress + the printed report /
  *  VisualDef snippet), and the current preview images. */
@@ -190,6 +245,10 @@ export function wizardStatus(jobId) {
     steps: Object.fromEntries(Object.entries(job.steps ?? {}).map(([k, v]) => [k, v.status])),
     validation: job.validation ?? null,
     previews: listPreviews(id),
+    // Live-viewer GLBs: the wizard renders these in the operator's real browser,
+    // so review works with no headless Chrome (previews above may be empty then).
+    modelGlb: jobGlb(id, 'raw.glb'),
+    finalGlb: job.name ? jobGlb(id, `${job.name}.glb`) : null,
     log: tail,
   };
 }

@@ -8,6 +8,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { findBrowserPath } from '../../browser_path_resolve.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -86,6 +87,21 @@ export async function renderPreviews(glbPath, outDir, { size = 512, views, clips
     page.evaluate((data, opts) => window.renderViews(data, opts), b64, { size, views, clips }),
   );
   return shots.map((s) => writeDataUrl(s.dataUrl, join(outDir, `${s.name}.png`)));
+}
+
+/** True when a local headless browser is available for the render steps. */
+export function previewBrowserAvailable() {
+  return !!findBrowserPath();
+}
+
+/** `renderPreviews`, but a graceful no-op when no local browser is installed:
+ *  returns `{ files: [], rendered: false }` instead of throwing. The static
+ *  library index wants PNG thumbnails, but the web wizard renders GLBs LIVE in
+ *  the operator's real browser, so a missing headless Chrome must never fail a
+ *  whole generation run. Callers log the skip and fall back to the live viewer. */
+export async function renderPreviewsIfPossible(glbPath, outDir, opts = {}) {
+  if (!previewBrowserAvailable()) return { files: [], rendered: false };
+  return { files: await renderPreviews(glbPath, outDir, opts), rendered: true };
 }
 
 /** Render a single hero-view thumbnail of a GLB to `dest`. */

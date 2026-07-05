@@ -59,6 +59,7 @@ import {
   renderHeldAcross,
   renderHeldPreviews,
   renderPreviews,
+  renderPreviewsIfPossible,
   renderWeaponIcon,
 } from './lib/preview.mjs';
 import { atlasEditPrompt, conceptPrompt } from './lib/prompts.mjs';
@@ -93,10 +94,14 @@ async function reviewStop(job, step, glbForReview) {
   // model-review shots distinctly from the finished/animated previews.
   if (glbForReview) {
     await job.step('preview_model', async () => {
-      const files = await renderPreviews(glbForReview, job.path('preview_model'), {
-        views: ['hero', 'front', 'right', 'back'],
-      });
-      return { files };
+      const { files, rendered } = await renderPreviewsIfPossible(
+        glbForReview,
+        job.path('preview_model'),
+        { views: ['hero', 'front', 'right', 'back'] },
+      );
+      if (!rendered)
+        job.log('model preview skipped: no local browser; the web wizard renders the raw GLB live');
+      return { files, rendered };
     });
   }
   printReport(job, { stoppedAt: step, glb: glbForReview ?? null });
@@ -183,6 +188,13 @@ function applyRedo(job, lane) {
  *  text-to-image (concept stays reviewable); the t2i task id feeds
  *  image-to-model directly so nothing re-uploads. */
 async function conceptStage(job, { kind, description, family, image, rigType }) {
+  // Resume path: once the concept is a completed ledger step, reuse its recorded
+  // output. The finish/apply runs re-enter the whole lane WITHOUT the original
+  // --prompt/--image (the wizard cannot resupply a prompt it never persisted), so
+  // requiring an input here would wrongly abort a job whose concept is already done.
+  // A --redo concept clears this step first, correctly forcing a fresh prompt.
+  const doneConcept = job.state.steps.concept;
+  if (doneConcept?.status === 'done') return doneConcept.result;
   if (image) {
     return job.step('concept', async () => {
       if (/^https?:\/\//.test(image) || /^(task_|file_)/.test(image)) {
@@ -328,8 +340,12 @@ async function generateStage(job, { input, prompt, model, faceLimit }) {
 async function previewStage(job, glbPath, label = 'preview') {
   return job.step(label, async () => {
     const outDir = job.path('preview');
-    const files = await renderPreviews(glbPath, outDir);
-    return { files };
+    const { files, rendered } = await renderPreviewsIfPossible(glbPath, outDir);
+    if (!rendered)
+      job.log(
+        'preview skipped: no local browser for headless render; the web wizard renders the GLB live',
+      );
+    return { files, rendered };
   });
 }
 

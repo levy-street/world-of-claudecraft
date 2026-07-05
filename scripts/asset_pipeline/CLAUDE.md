@@ -239,6 +239,18 @@ Mechanics:
   `Job.open` create that exact id; bare `--job` still requires an existing job so a mistyped
   CLI id errors instead of forking). Regenerate re-runs a stage with `--redo` (model =
   `--redo generate`, animations = `--redo retarget`). Save is the lane's normal `--apply`.
+- Review renders IN-BROWSER: the wizard shows the real GLB in the live viewer (`window.LiveViewer`,
+  raw model then finished/animated build, exposed by `wizardStatus` as `modelGlb`/`finalGlb`), so
+  a headless browser is NOT required. Server-side PNG previews degrade to a no-op when no local
+  browser is installed (`renderPreviewsIfPossible`, `browser_path_resolve.mjs`), instead of failing
+  the run. Weapon HUD icons and held renders still need a local browser (they rasterize an image).
+- The form exposes each lane's API generation options: model quality (`--model` low-poly/hifi) and
+  an optional reference image (`--image`, URL or `task_`/`file_` id) for all lanes; creatures add
+  rig type (`--rig-type` auto/biped/quadruped/hexapod/octopod/serpentine/aquatic) and `--height`;
+  weapons add `--family`; props add `--height` and `--rotate-y`. `genArgs` (in `lib/wizard.mjs`)
+  ALLOWLISTS every value before it becomes a spawn arg (an unchecked field could inject a flag such
+  as `--apply`, and an `--image` local path could read an arbitrary server file), and re-applies
+  them to BOTH the model and finish calls because rig type lands at the rig step (during finish).
 
 ## Utility commands
 - `validate --file x.glb --kind weapon|prop|creature [--family sword] [--height n] [--clips ...]`
