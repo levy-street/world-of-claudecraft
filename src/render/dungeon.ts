@@ -10,6 +10,7 @@
 //   Sunken Bastion (interior 'crypt',  origin x 1500 band) - teal flame, cargo/banners fortress
 //   Gravewyrm Sanctum (interior 'sanctum')                 - green ritual fire, necromantic
 //   Drowned Temple (interior 'temple')                     - pale moon-violet, drowned reliquaries
+//   Emberdeep Foundry (interior 'foundry')                 - forge-ember flame, magma channels
 //   Abandoned Crypt raid (interior 'nythraxis')            - dark violet soul wards
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
@@ -25,6 +26,7 @@ import {
   DUNGEON_WALL_HW,
   DUNGEON_WALL_X,
   type DungeonLayout,
+  FOUNDRY_LAYOUT,
   type GridPoint,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
@@ -63,6 +65,7 @@ export type DungeonInteriorVariant =
   | 'bastion'
   | 'sanctum'
   | 'temple'
+  | 'foundry'
   | 'arena'
   | 'nythraxis'
   // Collapsed Reliquary delve sub-themes (share the ember crypt-stone base, see
@@ -115,6 +118,9 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   sanctum: { flame: 0xa6ffb8, emissive: 0x22cc55, light: 0x55e08a },
   // the Drowned Temple burns with cold moonfire — pale lilac over still water
   temple: { flame: 0xd9c9ff, emissive: 0x6a4fd0, light: 0xb79cff },
+  // the Emberdeep Foundry burns hot, forge-ember over basalt (warmer and deeper
+  // than the arena's amber braziers, brighter than the delve grave-ember)
+  foundry: { flame: 0xffa050, emissive: 0xd54a10, light: 0xff7f36 },
   // the Ashen Coliseum burns warm — amber braziers ringing the fighting sands
   arena: { flame: 0xffb24a, emissive: 0xcc5a14, light: 0xff9a3c },
   nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
@@ -140,6 +146,21 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
 // applied to a clone of the shared pack material, never the source itself.
 const MARSH_WALL_TINT = 0x5a6a52;
 const MARSH_FLOOR_TINT = 0x3c3830;
+
+// Palette for the temple flood-water shader (see TEMPLE_WATER_FRAG): `deep` and
+// `shallow` are the ends of the slow banding mix (uDeep/uShallow; `shallow`
+// also tints the grazing fresnel sheen), `glow` is the caustic-vein color
+// (uGlow). TEMPLE_FLOOD holds the shader's original hardcoded values, so
+// templeWaterMaterial() with no argument is byte-identical to the old material.
+interface FloodPalette {
+  deep: number;
+  shallow: number;
+  glow: number;
+}
+const TEMPLE_FLOOD: FloodPalette = { deep: 0x07303c, shallow: 0x49c9bd, glow: 0x76f0dd };
+// The Emberdeep magma channels reuse the temple flood-water shader retinted:
+// molten rock in the wall channels instead of moonlit water on the floor.
+const FOUNDRY_MAGMA: FloodPalette = { deep: 0x7a1e04, shallow: 0xe25a10, glow: 0xffb066 };
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
 // (driven by the shared uTime so it needs no per-frame plumbing) with cheap
@@ -585,7 +606,10 @@ export class DungeonInteriors {
   // instance draws (see marshMaterial). Never touched by any other variant.
   private marshWallMats = new Map<Pack, THREE.Material>();
   private marshFloorMats = new Map<Pack, THREE.Material>();
-  private waterMat: THREE.ShaderMaterial | null = null;
+  // temple flood water + foundry magma: one ShaderMaterial per palette constant
+  // (keyed by palette identity; the palettes are module consts), same GLSL, so
+  // they share one compiled program and the temple keeps its single instance.
+  private waterMats = new Map<FloodPalette, THREE.ShaderMaterial>();
   private arenaHideables: ArenaHideable[] = [];
 
   constructor(
@@ -669,11 +693,13 @@ export class DungeonInteriors {
         ? SANCTUM_LAYOUT
         : interior === 'temple'
           ? TEMPLE_LAYOUT
-          : interior === 'arena'
-            ? ARENA_LAYOUT
-            : interior === 'nythraxis'
-              ? NYTHRAXIS_LAYOUT
-              : CRYPT_LAYOUT);
+          : interior === 'foundry'
+            ? FOUNDRY_LAYOUT
+            : interior === 'arena'
+              ? ARENA_LAYOUT
+              : interior === 'nythraxis'
+                ? NYTHRAXIS_LAYOUT
+                : CRYPT_LAYOUT);
     const variant = opts?.variant ?? this.variantFor(interior, ox);
     const group = new THREE.Group();
     const p = new Placements();
@@ -690,6 +716,9 @@ export class DungeonInteriors {
     if (variant === 'temple') {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
+    }
+    if (variant === 'foundry') {
+      this.placeMagmaChannels(group, layout);
     }
     if (opts?.hazards?.length) {
       if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
@@ -736,15 +765,16 @@ export class DungeonInteriors {
   // by the walls. All deterministic; nothing here is shared with other rooms.
   // -------------------------------------------------------------------------
 
-  private templeWaterMaterial(): THREE.ShaderMaterial {
-    if (this.waterMat) return this.waterMat;
-    this.waterMat = new THREE.ShaderMaterial({
+  private templeWaterMaterial(palette: FloodPalette = TEMPLE_FLOOD): THREE.ShaderMaterial {
+    let mat = this.waterMats.get(palette);
+    if (mat) return mat;
+    mat = new THREE.ShaderMaterial({
       uniforms: {
         ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
         uTime: sharedUniforms.uTime,
-        uShallow: { value: new THREE.Color(0x49c9bd) },
-        uDeep: { value: new THREE.Color(0x07303c) },
-        uGlow: { value: new THREE.Color(0x76f0dd) },
+        uShallow: { value: new THREE.Color(palette.shallow) },
+        uDeep: { value: new THREE.Color(palette.deep) },
+        uGlow: { value: new THREE.Color(palette.glow) },
       },
       vertexShader: TEMPLE_WATER_VERT,
       fragmentShader: TEMPLE_WATER_FRAG,
@@ -752,7 +782,8 @@ export class DungeonInteriors {
       depthWrite: false,
       fog: true,
     });
-    return this.waterMat;
+    this.waterMats.set(palette, mat);
+    return mat;
   }
 
   private placeFloodwater(group: THREE.Group, layout: DungeonLayout): void {
@@ -767,6 +798,30 @@ export class DungeonInteriors {
       this.addTorchGlow(group, 0, z, 0x37e6cf, 0.24, 1.4);
     }
     this.addTorchGlow(group, layout.dais.x, layout.dais.z, 0x37e6cf, 0.74, 2.0);
+  }
+
+  // Two molten channels running the length of the side walls (over the
+  // dormant-crucible rows), plus a glow pool under the anvil dais. Reuses the
+  // temple water sheet retinted; the channels are cosmetic (no hazard).
+  private placeMagmaChannels(group: THREE.Group, layout: DungeonLayout): void {
+    const mat = this.templeWaterMaterial(FOUNDRY_MAGMA);
+    const length = layout.zMax - layout.zMin - 8;
+    for (const sx of [-19.5, 19.5]) {
+      const strip = new THREE.Mesh(new THREE.PlaneGeometry(3, length).rotateX(-Math.PI / 2), mat);
+      strip.position.set(sx, 0.06, (layout.zMin + layout.zMax) / 2);
+      strip.renderOrder = 1; // floats over the floor tiles
+      strip.frustumCulled = false;
+      group.add(strip);
+      this.addTorchGlow(group, sx, layout.sideWallZ, TORCH_COLORS.foundry.light, 0.07, 2.0);
+    }
+    const pool = new THREE.Mesh(
+      new THREE.CircleGeometry(layout.dais.r + 1.5, 24).rotateX(-Math.PI / 2),
+      mat,
+    );
+    pool.position.set(layout.dais.x, 0.06, layout.dais.z);
+    pool.renderOrder = 1;
+    pool.frustumCulled = false;
+    group.add(pool);
   }
 
   // The Drowned Litany's static Blackwater hazards: a dark, near-opaque pool with
@@ -890,6 +945,7 @@ export class DungeonInteriors {
     if (interior === 'nythraxis') return 'nythraxis';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
+    if (interior === 'foundry') return 'foundry';
     const bastionX = instanceOrigin(1, 0).x;
     if (Math.abs(ox - bastionX) < 250) return 'bastion';
     return 'crypt';
