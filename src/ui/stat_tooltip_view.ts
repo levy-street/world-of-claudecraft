@@ -78,7 +78,11 @@ const isPercentStat = (model: StatTooltipModel) =>
  *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
  *  lives in the English-only HUD-chrome domain instead. */
 export function statNameKey(stat: StatTooltipModel['stat']): string {
-  return stat === 'spellPower' ? 'hudChrome.statInfo.names.spellPower' : `itemUi.stats.${stat}`;
+  // Character-sheet-only stats (no item carries a labeled line for them) keep their
+  // label in the English-only HUD-chrome domain instead of the item-stats catalog.
+  return stat === 'spellPower' || stat === 'critRating' || stat === 'hasteRating'
+    ? `hudChrome.statInfo.names.${stat}`
+    : `itemUi.stats.${stat}`;
 }
 
 /** The localized text of one upstream source line: "Base: 40", "From Agility:

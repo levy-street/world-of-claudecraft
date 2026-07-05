@@ -512,7 +512,9 @@ export const da_DK: EnTranslations = {
     "statInfo": {
       "fromYour": "Fra din {value} {stat}:",
       "names": {
-        "spellPower": "Besværgelseskraft"
+        "spellPower": "Besværgelseskraft",
+        "critRating": "Crit Rating",
+        "hasteRating": "Haste Rating"
       },
       "desc": {
         "str": "Øger din angrebsstyrke, så dine våbenslag rammer hårdere.",
@@ -525,7 +527,9 @@ export const da_DK: EnTranslations = {
         "spellPower": "Øger skaden fra dine besværgelser og styrken af dine helbredelser. Hvert point Intellekt giver en smule Besværgelseskraft, oven i det, der kommer fra udstyr eller buffs.",
         "dps": "Din anslåede våbenskade pr. sekund, der kombinerer dit våbens skade og hastighed med din angrebsstyrke.",
         "critChance": "Din chance for at et angreb rammer kritisk og gør dobbelt skade.",
-        "dodge": "Din chance for helt at undgå et indkommende nærkampsangreb og tage ingen skade."
+        "dodge": "Din chance for helt at undgå et indkommende nærkampsangreb og tage ingen skade.",
+        "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste."
       },
       "effects": {
         "attackPower": "+{value} Angrebsstyrke",

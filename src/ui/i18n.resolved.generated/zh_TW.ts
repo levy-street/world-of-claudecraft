@@ -512,7 +512,9 @@ export const zh_TW: EnTranslations = {
     "statInfo": {
       "fromYour": "來自你的 {value} 點{stat}：",
       "names": {
-        "spellPower": "法術強度"
+        "spellPower": "法術強度",
+        "critRating": "暴擊等級",
+        "hasteRating": "急速等級"
       },
       "desc": {
         "str": "提升你的攻擊強度，使你的武器攻擊更具威力。",
@@ -525,7 +527,9 @@ export const zh_TW: EnTranslations = {
         "spellPower": "提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。",
         "dps": "你的預估武器每秒傷害，由武器的傷害與速度結合你的攻擊強度計算而來。",
         "critChance": "你的攻擊造成暴擊並施加雙倍傷害的機率。",
-        "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。"
+        "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
+        "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
+        "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。"
       },
       "effects": {
         "attackPower": "+{value} 攻擊強度",

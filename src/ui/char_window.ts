@@ -58,6 +58,8 @@ const STAT_GRID: readonly StatId[] = [
   'spi',
   'dodge',
   'spellPower',
+  'critRating',
+  'hasteRating',
 ];
 
 /**

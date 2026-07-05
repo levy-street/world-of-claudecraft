@@ -222,6 +222,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '来自你的 {value} 点{stat}：',
   'hudChrome.statInfo.names.spellPower': '法术强度',
+  'hudChrome.statInfo.names.critRating': '暴击等级',
+  'hudChrome.statInfo.names.hasteRating': '急速等级',
+  'hudChrome.statInfo.desc.critRating': '来自装备和套装奖励的暴击等级，提升你的暴击几率。约每10点等级提供1%暴击。',
+  'hudChrome.statInfo.desc.hasteRating': '来自装备和套装奖励的急速等级，加快你的攻击和施法速度。约每10点等级提供1%急速。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法术造成的伤害和治疗的强度。每点智力都会提供少量法术强度，此外还有来自装备和增益的加成。',
   'hudChrome.statInfo.sources.header': '构成：',
