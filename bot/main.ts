@@ -11,7 +11,7 @@
 // authority for rewards. Pure protocol/diff/embed logic is in ./logic (tested);
 // this file is the wiring. esbuild-bundled for Node via `npm run bot`.
 
-import { DISCORD_SPECIAL_ROLES } from '../src/sim/discord_roles';
+import { DISCORD_SPECIAL_ROLES, specialRoleByName } from '../src/sim/discord_roles';
 import { DISCORD_REWARD_GRANTS } from '../src/sim/discord_tier';
 import { loadConfig } from './config';
 import { DiscordApi } from './discord_api';
@@ -19,6 +19,7 @@ import { Gateway } from './gateway';
 import {
   allTierRoleNames,
   buildActivityMessage,
+  buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
   buildRelayMessage,
@@ -89,14 +90,17 @@ async function main(): Promise<void> {
   await ensureTierRoles();
   await refreshTierRoles();
 
-  // Resolve the staff/special role ids by name (Levy St / Devs / Mods / Artists),
-  // so each member's top special role can be pushed to the game (name color + tag).
+  // Resolve the staff/special role ids by name (Levy St / Admin / Devs / Mods /
+  // Artists, including catalog aliases so guild-side renames keep matching), so
+  // each member's top special role can be pushed to the game (name color + tag).
   const specialRoleIds = new Map<string, string>(); // role key -> guild role id
   const refreshSpecialRoles = async (): Promise<void> => {
     const roles = await discord.guildRoles(cfg.guildId);
-    for (const def of DISCORD_SPECIAL_ROLES) {
-      const role = roles.find((r) => r.name.toLowerCase() === def.name.toLowerCase());
-      if (role) specialRoleIds.set(def.key, role.id);
+    specialRoleIds.clear();
+    for (const role of roles) {
+      const def = specialRoleByName(role.name);
+      // first match wins per key, mirroring Discord's top-down role order
+      if (def && !specialRoleIds.has(def.key)) specialRoleIds.set(def.key, role.id);
     }
   };
   await refreshSpecialRoles();
@@ -386,6 +390,28 @@ async function main(): Promise<void> {
     }
   };
 
+  let dailyRewardsChannelMissingLogged = false;
+  const pollDailyRewardWinners = async (): Promise<void> => {
+    if (!cfg.dailyRewardsChannelId) {
+      if (!dailyRewardsChannelMissingLogged) {
+        console.error(
+          '[bot] missing DISCORD_DAILY_REWARDS_CHANNEL_ID; skipping daily rewards winner announcements',
+        );
+        dailyRewardsChannelMissingLogged = true;
+      }
+      return;
+    }
+    const days = await server.dailyRewardWinners();
+    for (const day of days) {
+      try {
+        await discord.createMessage(cfg.dailyRewardsChannelId, buildDailyRewardWinnersMessage(day));
+        await server.markDailyRewardWinners(day.day);
+      } catch (e) {
+        console.error('[bot] daily rewards winners post failed', e);
+      }
+    }
+  };
+
   gateway.connect(false);
   setInterval(
     () => void syncAllOnlineRoles().catch((e) => console.error(e)),
@@ -397,6 +423,10 @@ async function main(): Promise<void> {
   ).unref();
   setInterval(() => void pollRelay().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
   setInterval(() => void pollActivity().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
+  setInterval(
+    () => void pollDailyRewardWinners().catch((e) => console.error(e)),
+    RELAY_POLL_MS,
+  ).unref();
   setInterval(() => {
     void refreshSpecialRoles()
       .then(() => pushAllMemberMeta())

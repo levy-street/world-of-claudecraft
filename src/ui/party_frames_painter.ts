@@ -25,6 +25,7 @@ import {
   PARTY_CREST_KEY_PREFIX,
   PARTY_LEADER_GLYPH,
   type PartyRow,
+  type PartyRowAuraDeps,
   type PartyRowDeps,
 } from './party_frame_row';
 import type { PartyFrameMember } from './party_frames';
@@ -53,6 +54,9 @@ export interface PartyFramesPainterDeps {
   /** The localized "Leave Party" label, re-read each rebuild so an in-game language
    *  switch re-localizes it (through the elided setText). */
   leaveLabel: () => string;
+  /** The shared aura view/painter deps every row's mini aura strip builds over
+   *  (each row owns its own view + painter instance; the deps are the Hud's). */
+  partyAuras: PartyRowAuraDeps;
 }
 
 export class PartyFramesPainter {
@@ -128,7 +132,9 @@ export class PartyFramesPainter {
     for (const m of members) {
       let row = this.pool.get(m.pid);
       if (!row) {
-        row = this.free.pop() ?? createPartyRow(this.doc, this.writers, this.rowDeps, m);
+        row =
+          this.free.pop() ??
+          createPartyRow(this.doc, this.writers, this.rowDeps, m, this.deps.partyAuras);
         this.pool.set(m.pid, row);
       }
       // Update the LIVE slot BEFORE painting so the crest gate + listeners read the
@@ -237,6 +243,9 @@ export class PartyFramesPainter {
     this.writers.setDisplay(row.badges.dead, m.dead ? BADGE_SHOWN : BADGE_HIDDEN);
     this.writers.setDisplay(row.badges.combat, inCombat ? BADGE_SHOWN : BADGE_HIDDEN);
     this.writers.setDisplay(row.badges.oor, m.oor ? BADGE_SHOWN : BADGE_HIDDEN);
+    // The member's mini aura strip: the row's own keyed aura pool (writes elided
+    // inside it). Signature-gated like the rest of this sync, never per frame.
+    row.paintAuras(m.auras ?? []);
   }
 
   /** The localized "Group n" raid cue for a member, or '' outside raid. The group number

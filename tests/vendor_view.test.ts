@@ -1,10 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { buildVendorView } from '../src/ui/vendor_view';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { buildVendorView } from '../src/ui/vendor_view';
 
 // Minimal ItemDef fixtures: buildVendorView only reads id / buyValue / sellValue.
-function item(id: string, opts: { buyValue?: number; sellValue?: number } = {}): ItemDef {
-  return { id, name: id, quality: 'common', slot: 'trinket', sellValue: opts.sellValue ?? 0, buyValue: opts.buyValue } as unknown as ItemDef;
+function item(
+  id: string,
+  opts: { buyValue?: number; sellValue?: number; kind?: ItemDef['kind'] } = {},
+): ItemDef {
+  return {
+    id,
+    name: id,
+    quality: 'common',
+    kind: opts.kind ?? 'junk',
+    slot: 'trinket',
+    sellValue: opts.sellValue ?? 0,
+    buyValue: opts.buyValue,
+  } as unknown as ItemDef;
 }
 
 function table(...items: ItemDef[]): Record<string, ItemDef> {
@@ -19,6 +30,18 @@ describe('buildVendorView goods', () => {
     expect(view.goods.map((g) => g.price)).toEqual([5, 2]);
   });
 
+  it('tags food/drink goods with a stack quantity of 5, other goods with 1', () => {
+    const items = table(
+      item('bread', { buyValue: 5, kind: 'food' }),
+      item('water', { buyValue: 2, kind: 'drink' }),
+      item('potion', { buyValue: 9, kind: 'potion' }),
+    );
+    const view = buildVendorView(['bread', 'water', 'potion'], [], items);
+    expect(view.goods.map((g) => g.quantity)).toEqual([5, 5, 1]);
+    // Price is the total for the purchase: per-unit buyValue times the stack quantity.
+    expect(view.goods.map((g) => g.price)).toEqual([25, 10, 9]);
+  });
+
   it('skips items missing from the table', () => {
     const items = table(item('bread', { buyValue: 5 }));
     const view = buildVendorView(['bread', 'ghost'], [], items);
@@ -26,7 +49,11 @@ describe('buildVendorView goods', () => {
   });
 
   it('skips items with no or zero buyValue (priceless items are never sold)', () => {
-    const items = table(item('bread', { buyValue: 5 }), item('quest_token'), item('free', { buyValue: 0 }));
+    const items = table(
+      item('bread', { buyValue: 5 }),
+      item('quest_token'),
+      item('free', { buyValue: 0 }),
+    );
     const view = buildVendorView(['bread', 'quest_token', 'free'], [], items);
     expect(view.goods.map((g) => g.itemId)).toEqual(['bread']);
   });
@@ -67,6 +94,8 @@ describe('buildVendorView is a pure projection', () => {
     const items = table(item('bread', { buyValue: 5 }), item('sword', { sellValue: 12 }));
     const goodsIds = ['bread'];
     const buyback: InvSlot[] = [{ itemId: 'sword', count: 2 }];
-    expect(buildVendorView(goodsIds, buyback, items)).toEqual(buildVendorView(goodsIds, buyback, items));
+    expect(buildVendorView(goodsIds, buyback, items)).toEqual(
+      buildVendorView(goodsIds, buyback, items),
+    );
   });
 });

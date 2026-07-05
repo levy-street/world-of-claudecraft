@@ -1,7 +1,7 @@
 // Client for the game server's secret-gated /internal/discord/* endpoints. The
 // bot reads flex/role data and pushes presence + reward grants; it authenticates
 // with the shared DISCORD_BOT_SECRET (x-woc-discord-secret), NOT a user bearer.
-import type { ActivityItem, FlexData, RelayItem } from './logic';
+import type { ActivityItem, DailyRewardWinnersDay, FlexData, RelayItem } from './logic';
 
 interface Envelope<T> {
   success: boolean;
@@ -110,6 +110,18 @@ export class ServerClient {
   async drainActivity(): Promise<ActivityItem[]> {
     const data = await this.call<{ items: ActivityItem[] }>('GET', '/internal/discord/activity');
     return data?.items ?? [];
+  }
+
+  async dailyRewardWinners(): Promise<DailyRewardWinnersDay[]> {
+    const data = await this.call<{ days: DailyRewardWinnersDay[] }>(
+      'GET',
+      '/internal/discord/daily-rewards-winners?limit=2',
+    );
+    return data?.days ?? [];
+  }
+
+  markDailyRewardWinners(day: string): Promise<unknown> {
+    return this.call('POST', '/internal/discord/daily-rewards-winners/mark', { day });
   }
 
   /** Push guild metadata (nickname + server join date + top special role). */

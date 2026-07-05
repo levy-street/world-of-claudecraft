@@ -20,10 +20,10 @@ describe('server-sent message localization', () => {
     'Who: 3 players online on Stormforge.',
     'Who: 1 player online on Stormforge.',
     '...and 5 more.',
-    'Select a player to moderate first.',
+    'Enclose the character name in double quotes.',
     "You can't moderate that player.",
-    'Usage: /mute <minutes> <reason>',
-    'Usage: /suspend <minutes> <reason>',
+    'Usage: /mute "<name>" <minutes> [reason]',
+    'Usage: /suspend "<name>" <minutes> [reason]',
     'Usage: /spectate <name>',
     "No online player named 'Zephyr'.",
     'You are not spectating anyone.',
@@ -130,9 +130,9 @@ describe('server-sent message localization', () => {
 describe('in-game moderation strings round-trip through localizeServerText', () => {
   const cases: { input: string; es: string; de: string }[] = [
     {
-      input: 'Select a player to moderate first.',
-      es: 'Selecciona primero a un jugador para moderar.',
-      de: 'Wählt zuerst einen Spieler zum Moderieren aus.',
+      input: 'Enclose the character name in double quotes.',
+      es: 'Escribe el nombre del personaje entre comillas dobles.',
+      de: 'Setzt den Charakternamen in doppelte Anführungszeichen.',
     },
     {
       input: "You can't moderate that player.",

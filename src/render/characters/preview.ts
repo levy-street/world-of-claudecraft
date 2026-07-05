@@ -128,8 +128,8 @@ export class CharacterPreview {
       );
       this.characterGroup.add(this.currentVisual.root);
 
-      // Reset rotation of group so new character faces forward but holds any user offset if preferred.
-      // Resetting Y rotation is cleanest for transitions.
+      // Reset rotation on a class swap so every new character greets the player
+      // FACE-ON (the classic character-screen pose); dragging still spins freely.
       this.characterGroup.rotation.y = 0;
     } catch (err) {
       console.error(`Failed to load preview character visual for ${visualKey}:`, err);
@@ -239,11 +239,8 @@ export class CharacterPreview {
 
     const dt = Math.min(this.clock.getDelta(), 0.1); // cap dt to prevent huge jumps
 
-    // Auto-rotation if prefers-reduced-motion is false and not dragging
-    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!isReducedMotion && !this.isDragging) {
-      this.characterGroup.rotation.y += 0.35 * dt; // Slow rotation: ~0.35 rad per sec
-    }
+    // No idle auto-rotation: the character holds its face-on pose (the classic
+    // character-screen behavior) and only the player's drag spins the turntable.
 
     // Update animations inside visual
     if (this.currentVisual) {

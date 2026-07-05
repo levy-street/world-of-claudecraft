@@ -215,8 +215,8 @@ const warlockPets = Object.values(WARLOCK_PET_MOBS).map((p) => {
 const FAMILY_ORDER = [
   'beast',
   'spider',
-  'murloc',
-  'kobold',
+  'mudfin',
+  'burrower',
   'humanoid',
   'troll',
   'ogre',

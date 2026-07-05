@@ -144,7 +144,7 @@ export const guideStrings = {
       valeName: 'Eastbrook Vale',
       valeBlurb: 'Green hills and old woods where every adventure begins.',
       marshName: 'Mirefen Marsh',
-      marshBlurb: 'Sunken fens and tide-worn ruins, home to murlocs and worse.',
+      marshBlurb: 'Sunken fens and tide-worn ruins, home to mudfins and worse.',
       peaksName: 'Thornpeak Heights',
       peaksBlurb: "Wind-scoured ridges climbing toward the realm's coldest dangers.",
     },
@@ -170,14 +170,14 @@ export const guideStrings = {
       q2: 'Do I need a crypto wallet?',
       a2: 'No. The game is fully playable without one. The optional community token only unlocks cosmetic flair and never affects power.',
       q3: 'Can I play offline?',
-      a3: 'Yes. There is an instant single-player mode in your browser, plus the shared online realm.',
+      a3: 'Yes. There is an instant single-player mode in your browser, plus the shared online world.',
       q4: 'How long to reach max level?',
       a4: 'The cap is level {cap}, reached across three zones of quests, dungeons, and exploration.',
     },
 
     // Community call to action.
     community: {
-      heading: 'Join the realm',
+      heading: 'Join the world',
       body: 'Jump in now, or come say hello. The world is better with company.',
       play: 'Play Now',
       discord: 'Join the Discord',
@@ -226,7 +226,7 @@ export const guideStrings = {
       'Invite others to a party to share quest credit and take on dungeons. Most of the world is soloable, so grouping is a choice, not a chore.',
     onlineTitle: 'Online or offline',
     onlineBody:
-      'Play the shared online realm with everyone else, or start an instant offline world in your browser to learn the ropes.',
+      'Play the shared online world with everyone else, or start an instant offline world in your browser to learn the ropes.',
     reassure:
       'Talents unlock at level 10 and can be reset at any time, so your early choices are never permanent. Experiment freely.',
     controlsLink: 'See the full controls reference',
@@ -278,7 +278,7 @@ export const guideStrings = {
     effectsBody:
       'Many abilities apply an effect that lingers. Helpful ones (buffs) raise your stats, shield you, or heal you a little at a time; harmful ones (debuffs) drain your health with damage over time or weaken you. Watch the small icons near your action bar to see what is on you and how long it lasts.',
     ccBody:
-      'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and polymorph that turns a foe harmless for a moment. Some of these, like roots, fears, and polymorph, lose their hold when they are reapplied too quickly, so they cannot be chained forever.',
+      'Crowd control is a special kind of debuff that limits what a target can do: stuns, roots and slows, silences that stop spellcasting, disarms, fears, and transformations that turn a foe harmless for a moment. Some of these, like roots, fears, and transforms, lose their hold when they are reapplied too quickly, so they cannot be chained forever.',
     // Death and recovery: light penalty, no lost progress.
     deathTitle: 'When you fall',
     deathBody:
@@ -457,12 +457,12 @@ export const guideStrings = {
     charge: 'Rushes a distant enemy to open the fight with a brief stun.',
     rend: 'Opens a bleed that wears the target down over time.',
     thunder_clap: 'Hits everything around you and slows their attacks.',
-    seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Judgement.',
+    seal_of_righteousness: 'Imbues your swings with Holy damage, then spend it with Verdict.',
     holy_light: 'A steady, sizable heal for topping off an ally or yourself.',
     devotion_aura: 'A lasting self-buff that raises armor so hits land softer.',
     judgement: 'Spends your active Seal to strike an enemy from short range.',
     blessing_of_might: "Raises a friendly target's attack power, good to cast before a pull.",
-    divine_protection: 'A quick holy shield to soak damage when things get rough.',
+    divine_protection: 'A quick protective ward to soak damage when things get rough.',
     raptor_strike: 'A hard melee swing for when something closes the gap on you.',
     aspect_of_the_hawk: 'A stance you keep up to sharpen your ranged attack power.',
     serpent_sting: 'Lands a venom that bleeds nature damage over time.',
@@ -495,7 +495,7 @@ export const guideStrings = {
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',
-    summon_imp: 'Calls up an imp that flings firebolts at enemies from range.',
+    summon_imp: 'Calls up an Emberkin that flings firebolts at enemies from range.',
     demon_skin: 'A lasting self-buff that toughens your skin and adds armor.',
     immolate: 'Sets a target alight for an opening hit and a burn that lingers.',
     corruption: 'Rots a target with shadow that ticks while you do other things.',
@@ -510,13 +510,13 @@ export const guideStrings = {
 
   // Warlock demon roster flavor, keyed by pet id.
   petHook: {
-    imp: 'A ranged firebolt demon that chips at enemies from a safe distance.',
-    voidwalker: 'A sturdy demon that taunts and soaks hits so you can cast in peace.',
-    succubus: 'A fast melee demon that hits hard but folds under pressure.',
-    felhunter: 'A shadow skirmisher that hounds enemy casters.',
-    felguard: 'A durable melee bruiser, the all-rounder once you can summon it.',
-    infernal: 'A hulking juggernaut with crushing melee, summoned for raw power.',
-    doomguard: 'An elite caster that rains heavy shadow from afar.',
+    emberkin: 'A ranged firebolt demon that chips at enemies from a safe distance.',
+    gloomshade: 'A sturdy demon that taunts and soaks hits so you can cast in peace.',
+    duskborn: 'A fast melee demon that hits hard but folds under pressure.',
+    spellhound: 'A shadow skirmisher that hounds enemy casters.',
+    warfiend: 'A durable melee bruiser, the all-rounder once you can summon it.',
+    pyre_colossus: 'A hulking juggernaut with crushing melee, summoned for raw power.',
+    wraithborn: 'An elite caster that rains heavy shadow from afar.',
   },
 
   // Bestiary.
@@ -542,7 +542,7 @@ export const guideStrings = {
       // add now filtered out): the line is still translated in every locale overlay, and the
       // bestiary renders flavor only for creatures it lists, so an unused entry is harmless.
       mirejaw_frenzy:
-        'A marsh murloc that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.',
+        'A marsh mudfin that whips itself into a thrashing frenzy mid-fight, the loudest thing in a loud, territorial pack.',
       gravecaller_cultist:
         'Robed servants of the death-cult whose work fouls the graves from the Vale to the peaks. Where they gather, the dead do not rest.',
     },
@@ -556,13 +556,13 @@ export const guideStrings = {
       name: 'Spiders',
       desc: 'Web-spinners and venomous lurkers that nest in dark, tangled places. Hunters can tame them, the same as beasts.',
     },
-    murloc: {
-      name: 'Murlocs',
+    mudfin: {
+      name: 'Mudfins',
       desc: 'Amphibious marsh-dwellers that swarm the shallows in noisy, territorial packs.',
     },
-    kobold: {
-      name: 'Kobolds',
-      desc: 'Candle-headed diggers that infest mines and burrows, fiercely guarding their ore.',
+    burrower: {
+      name: 'Burrowers',
+      desc: 'Dirt-caked diggers that infest mines and burrows, fiercely guarding their ore.',
     },
     humanoid: {
       name: 'Humanoids',
@@ -604,7 +604,7 @@ export const guideStrings = {
     valeBlurb:
       'The green starting valley, where new heroes cut their teeth on wolves and bandits around the town of Eastbrook.',
     marshBlurb:
-      'A drowned country of fog and ruins. Murlocs swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.',
+      'A drowned country of fog and ruins. Mudfins swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.',
     peaksBlurb:
       "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
 
@@ -621,11 +621,11 @@ export const guideStrings = {
     // Short, spoiler-safe one-liners for each zone's notable places (keyed by biome). One
     // sentence per place, in the same order as the POI list.
     valePlaceNotes:
-      "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Webwood and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; and Brightwood Glade is a quiet, sunlit grove to the north.",
+      "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is quiet water to fish; the Sableweb and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; and Brightwood Glade is a quiet, sunlit grove to the north.",
     marshPlaceNotes:
-      "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and murlocs; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
+      "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
-      "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and kobolds; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals and the Glimmermere glows below it; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
 
     // Brightwood Glade vignette, distilled spoiler-safe.
     gladeTitle: 'A quiet corner: Brightwood Glade',
@@ -684,7 +684,7 @@ export const guideStrings = {
       'In Eastbrook the dead will not rest, and the mark behind it belongs to a sect long thought gone. Trace it to a Gravecaller working the chapel crypt, and his own papers point you toward the fen in the north.',
     sagaMarshTitle: 'The marsh: a tithe of souls',
     sagaMarshBody:
-      'In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Mistcaller in the drowned bastion, whose last words name something older still, stirring beneath the peaks.',
+      'In Mirefen the drownings are no accident. Someone is filling the fen like a tithing box, raising obedient dead from every traveler the water takes. Chase the orders up the chain to a Fogbinder in the drowned bastion, whose last words name something older still, stirring beneath the peaks.',
     sagaPeaksTitle: 'The peaks: what the tithe was for',
     sagaPeaksBody:
       "On Thornpeak the whole scheme comes clear. Every soul stolen since the Vale was a tithe poured toward the cult's grim work in the mountain's heart. The trail that began in a chapel yard ends here, in a five-player descent to face the hand behind it all. We will let you find out who waits at the bottom.",

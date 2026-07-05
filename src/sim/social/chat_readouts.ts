@@ -136,11 +136,11 @@ export function buybackReadout(meta: PlayerMeta): string {
   });
   return `Vendor buyback (${slots.length}): ${parts.join(', ')}. Repurchase at any merchant.`;
 }
-export function comboReadout(ctx: SimContext, e: Entity): string {
+// Combo points are character-bound (retail-style), so the readout names no
+// target: the pool finishes on whatever the player targets next.
+export function comboReadout(e: Entity): string {
   if (e.comboPoints <= 0) return 'You have no combo points built up.';
-  const target = e.comboTargetId !== null ? ctx.entities.get(e.comboTargetId) : undefined;
-  const on = target ? ` on ${target.name}` : '';
-  return `Combo points: ${e.comboPoints}/5${on}.`;
+  return `Combo points: ${e.comboPoints}/5.`;
 }
 // Readout for "/combat": reads only the live Entity.inCombat / combatTimer
 // (no new fields). combatTimer is "time since last combat event"; a player
@@ -576,7 +576,7 @@ export function consumableReadout(e: Entity): string {
 }
 // Self-only readout of the shared combat-potion cooldown (#103). Distinct from
 // /cooldowns, which reads the per-ability Entity.cooldowns map and never shows
-// this separate 60s potion timer. potionCooldownUntil is an absolute sim-time
+// this separate 2-minute potion timer. potionCooldownUntil is an absolute sim-time
 // deadline, so the remaining time is computed against ctx.time.
 export function potionReadout(ctx: SimContext, e: Entity): string {
   const remaining = e.potionCooldownUntil - ctx.time;

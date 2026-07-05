@@ -225,6 +225,63 @@ export function resetCardUploadRateLimits(): void {
   cardUploadAccountAttempts.clear();
 }
 
+// GLB asset uploads (POST /api/assets) get their own per-IP AND per-account
+// bucket, mirroring the player-card upload throttle above: an upload flood can
+// never burn a player's login budget (these maps are separate from the shared
+// `attempts` map, so STRICTEST_RATE_LIMIT is unaffected), and a single account
+// spraying uploads through many IPs is still capped by the account key.
+export const ASSET_UPLOAD_MAX_PER_MINUTE = 10;
+// Map saves are bigger writes (up to 2 MiB JSONB) but honest editors autosave;
+// 30/min leaves headroom for rapid save-as/fork flows while bounding floods.
+export const MAP_MUTATION_MAX_PER_MINUTE = 30;
+const mapMutationIpAttempts = new Map<string, number[]>();
+const mapMutationAccountAttempts = new Map<number, number[]>();
+
+/** Per-IP AND per-account throttle shared by every /api/maps mutation
+ * (create/save/fork/publish/unpublish/delete). */
+export function mapMutationRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    mapMutationIpAttempts,
+    requestIp(req),
+    MAP_MUTATION_MAX_PER_MINUTE,
+  );
+  const accountLimited = recordSlidingWindowAttempt(
+    mapMutationAccountAttempts,
+    accountId,
+    MAP_MUTATION_MAX_PER_MINUTE,
+  );
+  return ipLimited || accountLimited;
+}
+
+/** Reset map-mutation throttles. Test-only. */
+export function resetMapMutationRateLimits(): void {
+  mapMutationIpAttempts.clear();
+  mapMutationAccountAttempts.clear();
+}
+
+const assetUploadIpAttempts = new Map<string, number[]>();
+const assetUploadAccountAttempts = new Map<number, number[]>();
+
+export function assetUploadRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    assetUploadIpAttempts,
+    requestIp(req),
+    ASSET_UPLOAD_MAX_PER_MINUTE,
+  );
+  const accountLimited = recordSlidingWindowAttempt(
+    assetUploadAccountAttempts,
+    accountId,
+    ASSET_UPLOAD_MAX_PER_MINUTE,
+  );
+  return ipLimited || accountLimited;
+}
+
+/** Reset asset upload throttles. Test-only: keeps scoped buckets isolated. */
+export function resetAssetUploadRateLimits(): void {
+  assetUploadIpAttempts.clear();
+  assetUploadAccountAttempts.clear();
+}
+
 export function walletLinkRateLimited(req: http.IncomingMessage, accountId: number): boolean {
   const ipLimited = recordSlidingWindowAttempt(
     walletLinkIpAttempts,
@@ -270,6 +327,32 @@ export function discordRateLimited(req: http.IncomingMessage, accountId: number)
 export function resetDiscordRateLimits(): void {
   discordIpAttempts.clear();
   discordAccountAttempts.clear();
+}
+
+// GitHub link/status endpoints share one dedicated bucket (per IP AND per
+// account), separate from login so an OAuth-link flood can't lock a user out of
+// logging in. accountId 0 keys the unauthenticated callback leg on IP only.
+export const GITHUB_MAX_PER_MINUTE = 15;
+const githubIpAttempts = new Map<string, number[]>();
+const githubAccountAttempts = new Map<number, number[]>();
+
+export function githubRateLimited(req: http.IncomingMessage, accountId: number): boolean {
+  const ipLimited = recordSlidingWindowAttempt(
+    githubIpAttempts,
+    requestIp(req),
+    GITHUB_MAX_PER_MINUTE,
+  );
+  const accountLimited =
+    accountId > 0
+      ? recordSlidingWindowAttempt(githubAccountAttempts, accountId, GITHUB_MAX_PER_MINUTE)
+      : false;
+  return ipLimited || accountLimited;
+}
+
+/** Reset GitHub throttles. Test-only: keeps scoped buckets isolated. */
+export function resetGithubRateLimits(): void {
+  githubIpAttempts.clear();
+  githubAccountAttempts.clear();
 }
 
 export const WOC_BALANCE_MAX_PER_MINUTE = 20;

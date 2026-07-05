@@ -31,6 +31,8 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     listings: [],
     totalCount: 0,
     filter: '',
+    page: 0,
+    pageCount: 1,
     collectionCopper: 0,
     collectionItems: [],
     cutPct: 5,
@@ -49,7 +51,6 @@ describe('market_view: top-level state union', () => {
         info: null,
         tab: 'browse',
         filters: ALL,
-        browsePage: 0,
         sellItemId: null,
         sellHave: 0,
       }),
@@ -60,7 +61,6 @@ describe('market_view: top-level state union', () => {
         info: null,
         tab: 'sell',
         filters: ALL,
-        browsePage: 0,
         sellItemId: 'worn_sword',
         sellHave: 3,
       }).kind,
@@ -70,7 +70,6 @@ describe('market_view: top-level state union', () => {
         info: null,
         tab: 'collect',
         filters: ALL,
-        browsePage: 0,
         sellItemId: null,
         sellHave: 0,
       }).kind,
@@ -84,7 +83,6 @@ describe('market_view: top-level state union', () => {
         info: i,
         tab: 'browse',
         filters: ALL,
-        browsePage: 0,
         sellItemId: null,
         sellHave: 0,
       }).kind,
@@ -93,7 +91,6 @@ describe('market_view: top-level state union', () => {
       info: i,
       tab: 'sell',
       filters: ALL,
-      browsePage: 0,
       sellItemId: null,
       sellHave: 0,
     });
@@ -105,7 +102,6 @@ describe('market_view: top-level state union', () => {
         info: i,
         tab: 'collect',
         filters: ALL,
-        browsePage: 0,
         sellItemId: null,
         sellHave: 0,
       }).kind,
@@ -115,34 +111,31 @@ describe('market_view: top-level state union', () => {
 
 describe('market_view: browse states', () => {
   it('distinguishes the three empty reasons', () => {
-    expect(buildMarketBrowse(info({ listings: [] }), ALL, 0)).toEqual({
+    expect(buildMarketBrowse(info({ listings: [] }), ALL)).toEqual({
       state: 'empty',
       reason: 'browse',
     });
-    expect(buildMarketBrowse(info({ listings: [], filter: 'wolf' }), ALL, 0)).toEqual({
+    expect(buildMarketBrowse(info({ listings: [], filter: 'wolf' }), ALL)).toEqual({
       state: 'empty',
       reason: 'search',
     });
-    // listings exist but the local armor filter excludes the only (weapon) listing
-    expect(
-      buildMarketBrowse(
-        info({ listings: [listing('keen_dirk')] }),
-        { itemType: 'armor', rarity: 'all' },
-        0,
-      ),
-    ).toEqual({
-      state: 'empty',
-      reason: 'filtered',
-    });
+    // An active type/rarity filter that matched nothing reads as 'filtered' (the server
+    // returned an empty page while a dropdown is narrowing).
+    expect(buildMarketBrowse(info({ listings: [] }), { itemType: 'armor', rarity: 'all' })).toEqual(
+      {
+        state: 'empty',
+        reason: 'filtered',
+      },
+    );
   });
 
-  it('resolves a page of rows and drops listings whose item is unknown', () => {
+  it('renders the server page rows and drops listings whose item is unknown', () => {
     const body = buildMarketBrowse(
       info({
         listings: [listing('keen_dirk'), listing('not_a_real_item'), listing('greyjaw_pelt_cloak')],
+        totalCount: 2,
       }),
       ALL,
-      0,
     );
     expect(body.state).toBe('list');
     if (body.state !== 'list') return;
@@ -151,32 +144,48 @@ describe('market_view: browse states', () => {
       'greyjaw_pelt_cloak',
     ]);
     expect(body.page.items[0].item).toBe(ITEMS.keen_dirk);
-    // market_filters already drops the unknown listing, so total counts the 2 resolvable rows
+    // total comes straight from the server snapshot (the count of all matches).
     expect(body.page.total).toBe(2);
   });
 
-  it('filters through market_filters rather than re-deriving (armor excludes the weapon)', () => {
-    const body = buildMarketBrowse(
-      info({ listings: [listing('keen_dirk'), listing('greyjaw_pelt_cloak')] }),
-      { itemType: 'armor', rarity: 'all' },
-      0,
-    );
-    expect(body.state).toBe('list');
-    if (body.state !== 'list') return;
-    expect(body.page.items.map((r) => r.listing.itemId)).toEqual(['greyjaw_pelt_cloak']);
-  });
-
-  it('paginates with the shared page size and clamps the page index', () => {
-    const many = Array.from({ length: MARKET_PAGE_SIZE + 5 }, (_, n) =>
+  it('renders the server-paginated page and reports its index, count, and range', () => {
+    // The server already filtered + paginated; info.listings IS the page to show and
+    // info.page/pageCount/totalCount drive the pager and range note.
+    const rows = Array.from({ length: MARKET_PAGE_SIZE }, (_, n) =>
       listing('bone_fragments', { id: n }),
     );
-    const first = buildMarketBrowse(info({ listings: many }), ALL, 0);
-    const last = buildMarketBrowse(info({ listings: many }), ALL, 99);
-    if (first.state !== 'list' || last.state !== 'list') throw new Error('expected list');
-    expect(first.page.items).toHaveLength(MARKET_PAGE_SIZE);
-    expect(first.page.pageCount).toBe(2);
-    expect(last.page.page).toBe(1); // clamped to the last page
-    expect(last.page.items).toHaveLength(5);
+    const body = buildMarketBrowse(
+      info({ listings: rows, totalCount: 130, page: 1, pageCount: 3 }),
+      ALL,
+    );
+    if (body.state !== 'list') throw new Error('expected list');
+    expect(body.page.items).toHaveLength(MARKET_PAGE_SIZE);
+    expect(body.page.page).toBe(1);
+    expect(body.page.pageCount).toBe(3);
+    expect(body.page.total).toBe(130);
+    // The range describes this page's OTHER listings: page 1 of 50-per-page -> 50..100.
+    expect(body.page.start).toBe(MARKET_PAGE_SIZE);
+    expect(body.page.end).toBe(MARKET_PAGE_SIZE * 2);
+  });
+
+  it("always shows the viewer's own listings on top without counting them in the range", () => {
+    // Own listings ride on every page for quick reclaim; the range/pageCount track the
+    // paged OTHER listings only.
+    // totalCount is the full match count the server sends: one own + one other.
+    const body = buildMarketBrowse(
+      info({
+        listings: [listing('keen_dirk', { mine: true }), listing('greyjaw_pelt_cloak')],
+        totalCount: 2,
+        page: 0,
+        pageCount: 1,
+      }),
+      ALL,
+    );
+    if (body.state !== 'list') throw new Error('expected list');
+    expect(body.page.items.map((r) => r.listing.mine)).toEqual([true, false]);
+    expect(body.page.total).toBe(1); // only the OTHER listing counts toward the range
+    expect(body.page.start).toBe(0);
+    expect(body.page.end).toBe(1); // one OTHER listing on the page; the mine row is extra
   });
 });
 
@@ -285,7 +294,6 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
       }),
       tab: 'browse' as const,
       filters: ALL,
-      browsePage: 0,
       sellItemId: null,
       sellHave: 0,
     };
@@ -312,7 +320,6 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
         info: simInfo,
         tab,
         filters: ALL,
-        browsePage: 0,
         sellItemId: 'worn_sword',
         sellHave: 2,
       });
@@ -320,7 +327,6 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
         info: mirrorInfo,
         tab,
         filters: ALL,
-        browsePage: 0,
         sellItemId: 'worn_sword',
         sellHave: 2,
       });

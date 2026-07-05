@@ -7,6 +7,12 @@ export const DELVE_COMPANIONS: Record<string, DelveCompanionDef> = {
     role: 'healer',
     mobTemplateId: 'acolyte_tessa',
   },
+  companion_edda: {
+    id: 'companion_edda',
+    name: 'Edda Reedhand',
+    role: 'healer',
+    mobTemplateId: 'edda_reedhand',
+  },
 };
 
 /**

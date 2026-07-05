@@ -18,6 +18,7 @@ import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
+import { computeDropdownPlacement } from './dropdown_position';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
@@ -28,6 +29,7 @@ import {
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
   type MarketItemTypeFilter,
+  type MarketQuery,
   type MarketRarityFilter,
   type MarketSubtypeFilter,
 } from './market_filters';
@@ -49,6 +51,15 @@ import { svgIcon } from './ui_icons';
 // shared QUALITY_COLOR map carries the real per-quality hex; this token covers a
 // listing whose item has no quality field, so no raw hex lives in the painter.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+
+// The filter dropdown's natural size (mirrors .mkt-select-menu's max-height/gap in
+// components.css). #market-window clips with overflow: hidden on mobile, and a menu
+// that renders past that clip has no scroll path to the rest of it, so every open
+// recomputes placement against the window's actual clip box instead of assuming
+// there is always room below the trigger.
+const MKT_MENU_PREFERRED_HEIGHT = 236;
+const MKT_MENU_GAP = 4;
+const MKT_MENU_MIN_HEIGHT = 80;
 
 /**
  * Hud-supplied glue. Composes the shared PainterHostPresentation bag
@@ -103,7 +114,7 @@ export class MarketWindow {
     this.browsePage = 0;
     this.sellItemId = null;
     this.searchQuery = '';
-    this.deps.world().marketSearch('');
+    this.pushQuery();
     this.lastSig = '';
     this.render();
     this.deps.root().style.display = 'flex';
@@ -129,6 +140,25 @@ export class MarketWindow {
     this.render();
   }
 
+  /** The current browse query (search + filters + page) the UI sends to the server. */
+  private currentQuery(): MarketQuery {
+    return {
+      search: this.searchQuery,
+      itemType: this.itemTypeFilter,
+      subtype: this.subtypeFilter,
+      rarity: this.rarityFilter,
+      page: this.browsePage,
+    };
+  }
+
+  // Push the current query to the server, which filters + paginates the whole market
+  // and streams back the matching page. Offline (Sim) this resolves synchronously, so
+  // the snapshot is up to date by the next render; online it round-trips and the
+  // per-frame refreshIfChanged repaints when the new page arrives.
+  private pushQuery(): void {
+    this.deps.world().marketSearch(this.currentQuery());
+  }
+
   // Per-frame (slow divider): refresh the live lists (Browse/Collect) when they
   // change. The Sell tab holds typed inputs, so it is only rebuilt on actions.
   refreshIfChanged(): void {
@@ -143,6 +173,8 @@ export class MarketWindow {
       info?.listings,
       info?.totalCount,
       info?.filter,
+      info?.page,
+      info?.pageCount,
       info?.collectionCopper,
       info?.collectionItems,
     ]);
@@ -205,13 +237,43 @@ export class MarketWindow {
     });
     const closeFilterMenus = () => {
       el.querySelectorAll<HTMLElement>('.mkt-select.open').forEach((menu) => {
-        menu.classList.remove('open');
+        menu.classList.remove('open', 'open-up');
         menu
           .querySelector<HTMLButtonElement>('.mkt-select-btn')
           ?.setAttribute('aria-expanded', 'false');
         const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
-        if (list) list.hidden = true;
+        if (list) {
+          list.hidden = true;
+          list.style.maxHeight = '';
+        }
       });
+    };
+    const positionFilterMenu = (menu: HTMLElement) => {
+      const trigger = menu.querySelector<HTMLButtonElement>('.mkt-select-btn');
+      const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
+      // `el` (deps.root()) already IS #market-window, so there is no separate
+      // container to look up: querySelector('#market-window') on the window
+      // itself never matches its own root and would always fall back to `el`.
+      if (!trigger || !list) return;
+      const t = trigger.getBoundingClientRect();
+      const c = el.getBoundingClientRect();
+      // #market-window clips at its padding box (overflow: hidden), which sits
+      // inset from the border box measured above by the panel's border width on
+      // each edge; subtract it so the clamp matches the real clip, not the
+      // border-inclusive box.
+      const borderTop = Number.parseFloat(getComputedStyle(el).borderTopWidth) || 0;
+      const borderBottom = Number.parseFloat(getComputedStyle(el).borderBottomWidth) || 0;
+      const placement = computeDropdownPlacement({
+        triggerTop: t.top,
+        triggerBottom: t.bottom,
+        containerTop: c.top + borderTop,
+        containerBottom: c.bottom - borderBottom,
+        preferredMaxHeight: MKT_MENU_PREFERRED_HEIGHT,
+        gap: MKT_MENU_GAP,
+        minHeight: MKT_MENU_MIN_HEIGHT,
+      });
+      menu.classList.toggle('open-up', placement.side === 'above');
+      list.style.maxHeight = `${placement.maxHeight}px`;
     };
     el.querySelectorAll<HTMLButtonElement>('.mkt-select-btn').forEach((button) => {
       button.addEventListener('click', (event) => {
@@ -224,6 +286,7 @@ export class MarketWindow {
         button.setAttribute('aria-expanded', wantOpen ? 'true' : 'false');
         const list = menu.querySelector<HTMLElement>('.mkt-select-menu');
         if (list) list.hidden = !wantOpen;
+        if (wantOpen) positionFilterMenu(menu);
       });
     });
     el.querySelectorAll<HTMLButtonElement>('[data-market-filter-option]').forEach((option) => {
@@ -247,6 +310,7 @@ export class MarketWindow {
         } else {
           return;
         }
+        this.pushQuery(); // filtering is server-side now, so the query must round-trip
         this.lastSig = '';
         audio.click();
         this.render();
@@ -297,6 +361,7 @@ export class MarketWindow {
             trigger?.setAttribute('aria-expanded', 'true');
             const list = select.querySelector<HTMLElement>('.mkt-select-menu');
             if (list) list.hidden = false;
+            positionFilterMenu(select);
             options[action.index]?.focus();
             break;
           }
@@ -328,7 +393,6 @@ export class MarketWindow {
         subtype: this.subtypeFilter,
         rarity: this.rarityFilter,
       },
-      browsePage: this.browsePage,
       sellItemId: this.sellItemId,
       sellHave: this.sellItemId ? this.bagCount(this.sellItemId) : 0,
     });
@@ -364,7 +428,7 @@ export class MarketWindow {
         if (!search) return;
         this.searchQuery = search.value;
         this.browsePage = 0;
-        this.deps.world().marketSearch(search.value);
+        this.pushQuery();
       });
       body.appendChild(search);
       list = document.createElement('div');
@@ -406,13 +470,22 @@ export class MarketWindow {
     }
     const page = view.page;
     this.browsePage = page.page;
-    const note = document.createElement('div');
-    note.className = 'mkt-note';
-    const shown = `${formatNumber(page.start + 1, { maximumFractionDigits: 0 })}-${formatNumber(page.end, { maximumFractionDigits: 0 })}`;
-    const total = formatNumber(page.total, { maximumFractionDigits: 0 });
-    note.textContent = t('itemUi.market.pageRange', { shown, total });
-    list.appendChild(note);
-    status.textContent = note.textContent;
+    // The range note describes the paged OTHER listings; on a page with none (e.g. only
+    // the viewer's own listings match) it is skipped, leaving just the rows.
+    if (page.end > page.start) {
+      const note = document.createElement('div');
+      note.className = 'mkt-note';
+      const shown = `${formatNumber(page.start + 1, { maximumFractionDigits: 0 })}-${formatNumber(page.end, { maximumFractionDigits: 0 })}`;
+      const total = formatNumber(page.total, { maximumFractionDigits: 0 });
+      note.textContent = t('itemUi.market.pageRange', { shown, total });
+      list.appendChild(note);
+      status.textContent = note.textContent;
+    } else {
+      status.textContent = t('itemUi.market.pageRange', {
+        shown: formatNumber(page.items.length, { maximumFractionDigits: 0 }),
+        total: formatNumber(page.total, { maximumFractionDigits: 0 }),
+      });
+    }
     for (const { listing: l, item } of page.items) {
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const row = document.createElement('div');
@@ -463,7 +536,8 @@ export class MarketWindow {
         button.addEventListener('click', () => {
           if (button.disabled) return;
           const dir = button.dataset.marketPage;
-          this.browsePage += dir === 'next' ? 1 : -1;
+          this.browsePage = Math.max(0, this.browsePage + (dir === 'next' ? 1 : -1));
+          this.pushQuery(); // the server returns the requested page of listings
           this.lastSig = '';
           audio.click();
           this.renderContent();

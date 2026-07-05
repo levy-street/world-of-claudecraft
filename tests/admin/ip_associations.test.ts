@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import './_setup';
-import { fireEvent, render, screen, within } from '@testing-library/svelte';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const data = {
@@ -50,7 +50,9 @@ const data = {
 };
 
 let currentData = data;
+const apiGet = vi.fn(async (_path: string) => currentData);
 const apiPost = vi.fn();
+const accountModalOpen = vi.fn();
 
 vi.mock('../../src/admin/api', () => ({
   ApiError: class ApiError extends Error {
@@ -60,11 +62,18 @@ vi.mock('../../src/admin/api', () => ({
       this.status = status;
     }
   },
-  apiGet: vi.fn(async () => currentData),
+  apiGet: (path: string) => apiGet(path),
   apiPost: (...args: unknown[]) => apiPost(...args),
   getToken: () => 'tok',
   getAdminName: () => 'admin',
   clearSession: () => {},
+}));
+
+vi.mock('../../src/admin/account_modal', () => ({
+  getAccountModalController: () => ({
+    open: accountModalOpen,
+    close: vi.fn(),
+  }),
 }));
 
 import { fmtDate } from '../../src/admin/format';
@@ -73,15 +82,22 @@ import IpAssociations from '../../src/admin/pages/IpAssociations.svelte';
 
 beforeEach(() => {
   currentData = data;
+  apiGet.mockClear();
   apiPost.mockReset();
   apiPost.mockResolvedValue({});
+  accountModalOpen.mockReset();
 });
 
 describe('IP associations', () => {
   it('groups one character row per account and identifies every association source', async () => {
     render(IpAssociations, { ip: '203.0.113.7' });
 
-    expect(await screen.findByText('alice')).toBeInTheDocument();
+    const accountLink = await screen.findByRole('button', { name: 'alice' });
+    await fireEvent.click(accountLink);
+    expect(accountModalOpen).toHaveBeenCalledWith(7, expect.any(Function));
+    const onChanged = accountModalOpen.mock.calls[0]?.[1] as (() => void) | undefined;
+    onChanged?.();
+    await waitFor(() => expect(apiGet).toHaveBeenCalledTimes(2));
     const title = screen.getByRole('heading', {
       name: t('ipAssociations.title', { ip: '203.0.113.7' }),
     });

@@ -45,10 +45,10 @@ const swingUntilDevoured = (sim: Sim, mob: any, target: any, auraId: string, max
   return false;
 };
 
-describe('mob purge affix (Devour Magic)', () => {
+describe('mob purge affix (Spellgnaw)', () => {
   it('Grubjaw the Glutton carries the purge mechanic', () => {
     expect(MOBS.grubjaw.purgeOnHit).toBeDefined();
-    expect(MOBS.grubjaw.purgeOnHit!.name).toBe('Devour Magic');
+    expect(MOBS.grubjaw.purgeOnHit!.name).toBe('Spellgnaw');
   });
 
   it('strips one beneficial buff on a landed hit and recalcs derived stats', () => {
@@ -81,7 +81,7 @@ describe('mob purge affix (Devour Magic)', () => {
     player.auras = [];
     pushBuff(player, 'buff_armor', 80, 'b1');
     pushBuff(player, 'buff_ap', 40, 'b2');
-    const removed = devourBeneficialAura((sim as any).ctx, player, 'Devour Magic');
+    const removed = devourBeneficialAura((sim as any).ctx, player, 'Spellgnaw');
     expect(removed).toBe(true);
     expect(player.auras.length).toBe(1); // exactly one eaten
   });
@@ -93,7 +93,7 @@ describe('mob purge affix (Devour Magic)', () => {
     player.auras = [];
     pushBuff(player, 'dot', 5, 'd1'); // harmful DoT
     pushBuff(player, 'buff_int', -18, 'd2'); // enfeeble-style stat drain
-    const removed = devourBeneficialAura((sim as any).ctx, player, 'Devour Magic');
+    const removed = devourBeneficialAura((sim as any).ctx, player, 'Spellgnaw');
     expect(removed).toBe(false);
     expect(player.auras.length).toBe(2); // both left untouched
   });

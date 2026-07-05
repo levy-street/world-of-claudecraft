@@ -1881,8 +1881,14 @@ const RULES: Rule[] = [
     re: /^(.+) is no longer online; spectate ended\.$/,
     build: (m) => tServer('moderation.spectateEnded', { name: m[1] }),
   },
-  { re: /^Usage: \/mute <minutes> <reason>$/, build: () => tServer('moderation.muteUsage') },
-  { re: /^Usage: \/suspend <minutes> <reason>$/, build: () => tServer('moderation.suspendUsage') },
+  {
+    re: /^Usage: \/mute "<name>" <minutes> \[reason\]$/,
+    build: () => tServer('moderation.muteUsage'),
+  },
+  {
+    re: /^Usage: \/suspend "<name>" <minutes> \[reason\]$/,
+    build: () => tServer('moderation.suspendUsage'),
+  },
   {
     re: /^Usage: \/spectate <name>$/,
     build: () => tServer('moderation.spectateUsage'),
@@ -1914,6 +1920,15 @@ const RULES: Rule[] = [
     re: /^Who: (\d+) (?:player|players) online on (.+)\.$/,
     build: (m) =>
       tPlural('hudChrome.plurals.playersOnline', Number(m[1]), { count: m[1], realm: m[2] }),
+  },
+  {
+    re: /^Who: (\d+) (?:player|players) matching "(.+)" on (.+)\.$/,
+    build: (m) =>
+      tPlural('hudChrome.plurals.playersMatching', Number(m[1]), {
+        count: m[1],
+        query: m[2],
+        realm: m[3],
+      }),
   },
   { re: /^\.\.\.and (\d+) more\.$/, build: (m) => tServer('who.more', { count: m[1] }) },
   {

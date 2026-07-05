@@ -7,6 +7,42 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const nl_NL: Record<string, string> = {
+  'calibration.autoRefresh': 'Automatisch verversen ({seconds}s)',
+  'calibration.description':
+    'Ruwe waardeverdelingen die de botdetector heeft waargenomen, voor drempelkalibratie. Alleen in het geheugen bewaard: tellingen worden gereset wanneer de server herstart.',
+  'calibration.downloadJson': 'JSON downloaden',
+  'calibration.empty':
+    'Nog geen kalibratiegegevens: de detector heeft sinds de start van de server geen meetbare activiteit waargenomen.',
+  'calibration.loadFailed': 'Laden van kalibratiegegevens mislukt.',
+  'calibration.loading': 'Kalibratiegegevens laden...',
+  'calibration.samples': '{count} metingen',
+  'calibration.statMax': 'max',
+  'calibration.statMean': 'gem.',
+  'calibration.statMin': 'min',
+  'calibration.statP50': 'p50',
+  'calibration.statP95': 'p95',
+  'calibration.statP99': 'p99',
+  'nav.botDetector': 'Botdetector',
+  'nav.calibration': 'Kalibratie',
+  'nav.liveEvidence': 'Live Bewijs',
+  'suspiciousPlayers.colObserved': 'Laatst waargenomen',
+  'suspiciousPlayers.downloadJson': 'JSON downloaden',
+  'suspiciousPlayers.filteredEmpty': 'Geen sessie komt overeen met deze zoekopdracht.',
+  'suspiciousPlayers.resultCountMany': '{count} resultaten',
+  'suspiciousPlayers.resultCountOne': '{count} resultaat',
+  'suspiciousPlayers.searchLabel': 'Verdachte sessies doorzoeken',
+  'suspiciousPlayers.searchPlaceholder': 'Filter op naam, IP of bewijs',
+  'suspiciousPlayers.sessionDescription': 'Huidige en recente sessies met bot-detectiebewijs.',
+  'suspiciousPlayers.sessionEmpty':
+    'Geen enkele huidige of recente sessie heeft bot-detectiebewijs.',
+  'suspiciousPlayers.snapshotUnavailable': 'Waarnemingstijd niet beschikbaar',
+  'usage.cache.githubContributors': 'GitHub-bijdragers-cache',
+  'usage.metric.githubContributorsFetch': 'GitHub-bijdragersstatistieken-ophalingen',
+  'usage.metric.githubContributorsFetchFailure':
+    'Mislukte GitHub-bijdragersstatistieken-ophalingen',
+  'usage.metric.githubLinkFailure': 'Mislukte GitHub-koppelingen',
+  'usage.metric.githubLinkRateLimited': 'Beperkte GitHub-koppelingsverzoeken',
+  'usage.metric.githubLinkRequest': 'GitHub-koppelingsverzoeken',
   'app.title': 'World of ClaudeCraft - Beheer',
   'app.shortTitle': 'WoC-beheerder',
   'auth.username': 'Gebruikersnaam',

@@ -32,6 +32,7 @@ import {
   accountMailTarget,
   findAccount,
   isAdminAccount,
+  pool,
   saveToken,
   setAccountDeactivated,
   touchLogin,
@@ -40,6 +41,7 @@ import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
+import { PgMapsDb } from './maps_db';
 import {
   addAccountNote,
   forceCharacterRename,
@@ -52,6 +54,7 @@ import {
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
+import { PgUserAssetsDb } from './user_assets_db';
 
 // Admin API: everything under /admin/api/*. Auth is a bearer token whose
 // account has is_admin = TRUE — the admin.* hostname is routing, not security.
@@ -62,6 +65,11 @@ const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
+
+// Map editor moderation reads/writes go straight to the db layer (like the
+// other *_db imports here); the player-facing rules stay in maps.ts.
+const adminMapsDb = new PgMapsDb(pool);
+const adminUserAssetsDb = new PgUserAssetsDb(pool);
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -373,6 +381,21 @@ export async function handleAdminApi(
       return removed ? ok(res, { ok: true }) : fail(res, 404, 'IP not found');
     }
 
+    // Map editor moderation: force a published map back to private, and
+    // block/unblock an uploaded GLB asset (blocked assets 404 on the public
+    // byte GET and reject re-uploads of the same hash).
+    const mapUnpublishMatch = /^\/admin\/api\/maps\/(\d+)\/unpublish$/.exec(path);
+    if (req.method === 'POST' && mapUnpublishMatch) {
+      const done = await adminMapsDb.setStatus(Number(mapUnpublishMatch[1]), null, 'private');
+      return done ? ok(res, { ok: true }) : fail(res, 404, 'map_not_found');
+    }
+    const assetBlockMatch = /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/.exec(path);
+    if (req.method === 'POST' && assetBlockMatch) {
+      const status = assetBlockMatch[2] === 'block' ? 'blocked' : 'active';
+      const done = await adminUserAssetsDb.setStatus(Number(assetBlockMatch[1]), status);
+      return done ? ok(res, { ok: true }) : fail(res, 404, 'asset_not_found');
+    }
+
     if (req.method !== 'GET') return fail(res, 405, 'method not allowed');
 
     if (path === '/admin/api/blocked-ips') {
@@ -412,6 +435,9 @@ export async function handleAdminApi(
     }
     if (path === '/admin/api/suspicious-players') {
       return ok(res, { players: game.suspiciousPlayers() });
+    }
+    if (path === '/admin/api/detection-calibration') {
+      return ok(res, game.detectionCalibration());
     }
     if (path === '/admin/api/online-history') {
       return ok(res, await onlineHistory(url.searchParams.get('range') ?? '30d'));
@@ -536,6 +562,16 @@ export async function handleAdminApi(
       const sort = url.searchParams.get('sort') ?? 'level';
       const dir = url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
       return ok(res, await listCharacters(search, sort, dir, page, limit));
+    }
+    if (path === '/admin/api/maps') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      const { rows, total } = await adminMapsDb.listAdmin(limit, (page - 1) * limit);
+      return ok(res, { rows, total, page, limit });
+    }
+    if (path === '/admin/api/user-assets') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      const { rows, total } = await adminUserAssetsDb.listAdmin(limit, (page - 1) * limit);
+      return ok(res, { rows, total, page, limit });
     }
 
     fail(res, 404, 'unknown admin endpoint');

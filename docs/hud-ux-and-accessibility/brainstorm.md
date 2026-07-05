@@ -22,9 +22,9 @@ brainstorm is the vision and the approved scope.
 ## 1. Vision
 
 Make the HUD look beautiful and play like a top-tier MMO: a premium
-dark-fantasy aesthetic in the World of Warcraft lineage, fluid and legible UX on
+dark-fantasy aesthetic in the classic-MMO lineage, fluid and legible UX on
 desktop and touch, and accessibility pushed to WCAG 2.2 AAA where feasible with a
-genuine opt-in Reader Mode. The marquee feature is a WoW-style Edit Mode layout
+genuine opt-in Reader Mode. The marquee feature is a classic-style Edit Mode layout
 editor, which the modular refactor makes possible (each window is now a movable
 unit). None of this invents new game systems; it elevates the presentation of the
 systems that already exist.

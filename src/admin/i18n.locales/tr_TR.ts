@@ -7,6 +7,43 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const tr_TR: Record<string, string> = {
+  'calibration.autoRefresh': 'Otomatik yenile ({seconds}sn)',
+  'calibration.description':
+    'Bot dedektörünün gözlemlediği ham değer dağılımları, eşik kalibrasyonu için. Yalnızca bellekte tutulur: sunucu yeniden başlatıldığında sayımlar sıfırlanır.',
+  'calibration.downloadJson': 'JSON indir',
+  'calibration.empty':
+    'Henüz kalibrasyon verisi yok: dedektör, sunucu başlatıldığından beri ölçülebilir bir etkinlik gözlemlemedi.',
+  'calibration.loadFailed': 'Kalibrasyon verileri yüklenemedi.',
+  'calibration.loading': 'Kalibrasyon verileri yükleniyor...',
+  'calibration.samples': '{count} örnek',
+  'calibration.statMax': 'maks',
+  'calibration.statMean': 'ort.',
+  'calibration.statMin': 'min',
+  'calibration.statP50': 'p50',
+  'calibration.statP95': 'p95',
+  'calibration.statP99': 'p99',
+  'nav.botDetector': 'Bot Dedektörü',
+  'nav.calibration': 'Kalibrasyon',
+  'nav.liveEvidence': 'Canlı Kanıt',
+  'suspiciousPlayers.colObserved': 'Son gözlem',
+  'suspiciousPlayers.downloadJson': 'JSON indir',
+  'suspiciousPlayers.filteredEmpty': 'Bu aramayla eşleşen oturum yok.',
+  'suspiciousPlayers.resultCountMany': '{count} sonuç',
+  'suspiciousPlayers.resultCountOne': '{count} sonuç',
+  'suspiciousPlayers.searchLabel': 'Şüpheli oturumları ara',
+  'suspiciousPlayers.searchPlaceholder': 'Ad, IP veya kanıta göre filtrele',
+  'suspiciousPlayers.sessionDescription':
+    'Bot tespit kanıtı bulunan güncel ve yakın tarihli oturumlar.',
+  'suspiciousPlayers.sessionEmpty':
+    'Güncel veya yakın tarihli hiçbir oturumda bot tespit kanıtı yok.',
+  'suspiciousPlayers.snapshotUnavailable': 'Gözlem zamanı mevcut değil',
+  'usage.cache.githubContributors': 'GitHub katkıda bulunanlar önbelleği',
+  'usage.metric.githubContributorsFetch': 'GitHub katkıda bulunan istatistiği çekmeleri',
+  'usage.metric.githubContributorsFetchFailure':
+    'GitHub katkıda bulunan istatistiği çekme hataları',
+  'usage.metric.githubLinkFailure': 'GitHub bağlama hataları',
+  'usage.metric.githubLinkRateLimited': 'GitHub bağlama kısıtlanmış istekleri',
+  'usage.metric.githubLinkRequest': 'GitHub bağlama istekleri',
   'app.title': 'World of ClaudeCraft - Yönetici',
   'app.shortTitle': 'WoC Yöneticisi',
   'auth.username': 'Kullanıcı adı',

@@ -7,6 +7,42 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const vi_VN: Record<string, string> = {
+  'calibration.autoRefresh': 'Tự động làm mới ({seconds}s)',
+  'calibration.description':
+    'Các phân bố giá trị thô mà trình phát hiện bot quan sát được, dùng để hiệu chỉnh ngưỡng. Chỉ giữ trong bộ nhớ: số đếm sẽ đặt lại khi máy chủ khởi động lại.',
+  'calibration.downloadJson': 'Tải xuống JSON',
+  'calibration.empty':
+    'Chưa có dữ liệu hiệu chỉnh: trình phát hiện chưa quan sát được hoạt động nào đo đếm được kể từ khi máy chủ khởi động.',
+  'calibration.loadFailed': 'Không tải được dữ liệu hiệu chỉnh.',
+  'calibration.loading': 'Đang tải dữ liệu hiệu chỉnh...',
+  'calibration.samples': '{count} mẫu',
+  'calibration.statMax': 'tối đa',
+  'calibration.statMean': 'trung bình',
+  'calibration.statMin': 'tối thiểu',
+  'calibration.statP50': 'p50',
+  'calibration.statP95': 'p95',
+  'calibration.statP99': 'p99',
+  'nav.botDetector': 'Trình Phát Hiện Bot',
+  'nav.calibration': 'Hiệu Chỉnh',
+  'nav.liveEvidence': 'Bằng Chứng Trực Tiếp',
+  'suspiciousPlayers.colObserved': 'Quan sát lần cuối',
+  'suspiciousPlayers.downloadJson': 'Tải xuống JSON',
+  'suspiciousPlayers.filteredEmpty': 'Không có phiên nào khớp với tìm kiếm này.',
+  'suspiciousPlayers.resultCountMany': '{count} kết quả',
+  'suspiciousPlayers.resultCountOne': '{count} kết quả',
+  'suspiciousPlayers.searchLabel': 'Tìm kiếm phiên khả nghi',
+  'suspiciousPlayers.searchPlaceholder': 'Lọc theo tên, IP hoặc bằng chứng',
+  'suspiciousPlayers.sessionDescription':
+    'Các phiên hiện tại và gần đây có bằng chứng phát hiện bot.',
+  'suspiciousPlayers.sessionEmpty':
+    'Không có phiên hiện tại hay gần đây nào có bằng chứng phát hiện bot.',
+  'suspiciousPlayers.snapshotUnavailable': 'Không có thời điểm quan sát',
+  'usage.cache.githubContributors': 'Bộ nhớ đệm người đóng góp GitHub',
+  'usage.metric.githubContributorsFetch': 'Lượt truy xuất thống kê người đóng góp GitHub',
+  'usage.metric.githubContributorsFetchFailure': 'Lỗi truy xuất thống kê người đóng góp GitHub',
+  'usage.metric.githubLinkFailure': 'Lỗi liên kết GitHub',
+  'usage.metric.githubLinkRateLimited': 'Yêu cầu liên kết GitHub bị giới hạn tần suất',
+  'usage.metric.githubLinkRequest': 'Yêu cầu liên kết GitHub',
   'app.title': 'World of ClaudeCraft - Quản trị',
   'app.shortTitle': 'Quản trị viên WoC',
   'auth.username': 'Tên đăng nhập',

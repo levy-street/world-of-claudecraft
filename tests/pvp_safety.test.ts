@@ -2,8 +2,10 @@
 // duel/PvP. These lock the invariant so the "killed in the starter village /
 // polymorphed into a baby llama" griefing path can never regress.
 import { describe, expect, it } from 'vitest';
+import { runEffects } from '../src/sim/combat/effect_dispatch';
+import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity, Vec3 } from '../src/sim/types';
+import type { AbilityDef, Entity, Vec3 } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
 
 function twoPlayers(clsA = 'mage', clsB = 'warrior') {
@@ -54,6 +56,39 @@ function finishCast(sim: Sim, pid: number) {
   for (let i = 0; i < 20 * 3 && (sim as any).pendingProjectiles.length > 0; i++) sim.tick();
 }
 
+function metaOf(sim: Sim, p: Entity): PlayerMeta {
+  const meta = sim.players.get(p.id);
+  if (!meta) throw new Error(`missing player meta for ${p.id}`);
+  return meta;
+}
+
+function interruptRes(lockout = 8): ResolvedAbility {
+  const def: AbilityDef = {
+    id: 'test_interrupt',
+    name: 'Test Interrupt',
+    class: 'rogue',
+    learnLevel: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [{ type: 'interrupt', lockout }],
+    description: '',
+  };
+  return {
+    def,
+    rank: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    effects: def.effects,
+    threatFlat: 0,
+    threatMult: 1,
+  };
+}
+
 const pos = (e: Entity): Vec3 => ({ ...e.pos });
 
 const hasCc = (e: Entity) =>
@@ -92,6 +127,19 @@ describe('PvP safety outside duels (#96)', () => {
     expect(hasCc(b)).toBe(false);
   });
 
+  it('a player interrupt does not cancel or lock out another player', () => {
+    const { sim, a, b } = twoPlayers('rogue', 'mage');
+    b.castingAbility = 'fireball';
+    b.castRemaining = 1.25;
+    b.castTotal = 1.5;
+
+    runEffects(sim.ctx, a, metaOf(sim, a), b, interruptRes(8));
+
+    expect(b.castingAbility).toBe('fireball');
+    expect(b.castRemaining).toBe(1.25);
+    expect(b.auras.some((aura) => aura.kind === 'lockout')).toBe(false);
+  });
+
   it('an accepted duel DOES allow combat between the two players (positive control)', () => {
     const { sim, aPid, bPid, a, b } = twoPlayers('warrior', 'mage');
     sim.duelRequest(bPid, aPid);
@@ -110,6 +158,21 @@ describe('PvP safety outside duels (#96)', () => {
 });
 
 describe('PvP control abilities in active duels', () => {
+  it('allows an interrupt between hostile duelists', () => {
+    const { sim, a, b } = startDuel('rogue', 'mage');
+    b.castingAbility = 'fireball';
+    b.castRemaining = 1.25;
+    b.castTotal = 1.5;
+
+    runEffects(sim.ctx, a, metaOf(sim, a), b, interruptRes(8));
+
+    expect(b.castingAbility).toBeNull();
+    expect(b.castRemaining).toBe(0);
+    expect(b.auras).toContainEqual(
+      expect.objectContaining({ kind: 'lockout', school: 'fire', duration: 8 }),
+    );
+  });
+
   it.each([
     { cls: 'mage', ability: 'polymorph', aura: 'polymorph' },
     { cls: 'warlock', ability: 'fear', aura: 'incapacitate' },

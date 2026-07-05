@@ -216,6 +216,32 @@ const CHICKEN_COW: ClipMap = {
   jump: 'Jump',
 };
 
+// Raid 02 asset-pipeline rig (stone_cantor.glb): Mixamo-rigged, ships
+// Idle / Cast / Walk / Death plus a synthesized 'Hit' flinch authored by
+// scripts/_add_cantor_hit_anim.mjs (the batch has no hit-react take). A
+// caster, so attack aliases the cast clip; run aliases walk (no run clip).
+const RAID_CASTER: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Cast'],
+  cast: 'Cast',
+  hit: ['Hit'],
+  death: 'Death',
+};
+
+// Tolling Bell rig (tolling_bell.glb, Meshy-generated + node-transform animated
+// via scripts/_add_bell_anim.mjs, no skeleton). Non-combat, hostile:false, moved
+// manually by the boss driver every tick, so walk/run/attack/death are never
+// reached: they just alias the two real clips to satisfy ClipMap.
+const TOLLING_BELL: ClipMap = {
+  idle: 'Idle',
+  walk: 'Roll',
+  run: 'Roll',
+  attack: [],
+  death: 'Idle',
+};
+
 // ---------------------------------------------------------------------------
 // Asset urls
 // ---------------------------------------------------------------------------
@@ -346,6 +372,17 @@ export function skinThumbUrl(key: string, index: number): string | null {
   const firstAlt = arr.find((u): u is string => !!u); // derive dir from an alt
   return firstAlt ? firstAlt.replace(/\/[^/]+$/, '/base.png') : null;
 }
+
+// Quaternius-style velociraptor rig (velociraptor.glb): no hit-react in the
+// asset, same as the spider/raptor rigs noted in src/render/characters/CLAUDE.md.
+const VELOCIRAPTOR: ClipMap = {
+  idle: 'Velociraptor_Idle',
+  walk: 'Velociraptor_Walk',
+  run: 'Velociraptor_Run',
+  attack: ['Velociraptor_Attack'],
+  death: 'Velociraptor_Death',
+  jump: 'Velociraptor_Jump',
+};
 
 // ---------------------------------------------------------------------------
 // The manifest
@@ -529,6 +566,16 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.35,
   },
+  // Deepfen Spearjaw (The Drowned Litany): unused Quaternius raptor rig, a
+  // toothy quadruped that reads far more like a swamp predator than the
+  // generic wolf fallback (docs/prd/drowned-litany-asset-generation-plan.md).
+  mob_spearjaw: {
+    url: `${CREATURES}/velociraptor.glb`,
+    height: 1.8,
+    clips: VELOCIRAPTOR,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
   // brown-tinted yeti rig, same recipe as the druid Bear form.
   mob_bear: {
     url: `${CREATURES}/yetialt.glb`,
@@ -591,8 +638,34 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2,
   },
-  // warlock demon pets (imp/voidwalker) — one biped rig, the entity colour and
-  // the mob template's scale tell the little orange imp from the bulky voidwalker
+  // Bog Thrall (The Drowned Litany): unused floating ghost rig, a stronger
+  // fit for an undead swarm add than the generic skel_minion skeleton
+  // (docs/prd/drowned-litany-asset-generation-plan.md).
+  mob_choir_thrall: {
+    url: `${CREATURES}/ghost.glb`,
+    height: 1.6,
+    hover: 0.3,
+    clips: FLOATING,
+    // Strong pull toward the template's pale sage: the ghost's own materials
+    // are charcoal-grey and vanish against the black Litany pools; undead in
+    // this delve read bone-pale per the marsh palette brief in the asset plan.
+    tint: 'entity',
+    tintStrength: 0.6,
+  },
+  // Tolling Bell (The Drowned Litany): Meshy-generated, not a KayKit/Quaternius
+  // reuse: a rolling bell has no obvious existing-asset stand-in
+  // (docs/prd/drowned-litany-asset-generation-plan.md).
+  mob_tolling_bell: {
+    url: `${CREATURES}/tolling_bell.glb`,
+    // Reads ~2m in world after the template's 0.6 scale: the rolling bell is a
+    // boss projectile the player dodges, so it must loom, not look like a prop.
+    height: 3.4,
+    clips: TOLLING_BELL,
+    tint: 'entity',
+    tintStrength: 0.15,
+  },
+  // warlock demon pets (emberkin/gloomshade) — one biped rig, the entity colour and
+  // the mob template's scale tell the little orange emberkin from the bulky gloomshade
   mob_demon: {
     url: `${CREATURES}/demonalt.glb`,
     height: 1.8,
@@ -824,6 +897,51 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
   },
+  // Edda Reedhand (The Drowned Litany companion NPC, healer): the druid player
+  // rig, staff in hand, backpack authored on the model (a traveling marsh
+  // herbalist). The earlier Meshy mesh clashed with the KayKit proportions; a
+  // player rig also gives her the full clip set, so her heals play the real
+  // Spellcasting channel. Fixed staff (no weaponSlots: NPC gear never changes).
+  npc_edda_reedhand: {
+    url: `${PLAYERS}/druid.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
+  },
+  // Reedbound Acolyte (The Drowned Litany trash mob): Stone Cantor model from
+  // the Raid 02 asset batch. The earlier Meshy mesh (reedbound_acolyte.glb) was
+  // realistically proportioned and clashed with the chunky KayKit-style rigs;
+  // this one matches the game's proportions, so the standard humanoid height
+  // applies (the old def ran at 3.4 only to compensate for the thin mesh).
+  mob_reedbound_acolyte: {
+    url: `${CREATURES}/stone_cantor.glb`,
+    height: HUMANOID_H,
+    clips: RAID_CASTER,
+    // The 2.6s Cast clip doubles as the vial-throw one-shot; at the default
+    // 1.3x it fills nearly the whole 2.6s attack cadence, which reads
+    // sluggish AND leaves no gap for the Hit flinch (one-shots never
+    // interrupt one-shots). 1.7x makes the throw snap and frees ~1.1s of
+    // every cycle for reactions.
+    attackTimeScale: 1.7,
+    tint: 'entity',
+    tintStrength: 0.2,
+  },
+  // Spider Egg-Sac (Sinkhole Baptistry finale trigger, The Drowned Litany):
+  // Meshy-generated static prop, no rig/clips (it never moves; it dies to a
+  // single hit). The visual/animation pipeline no-ops gracefully when a clip
+  // name below has no match in the GLB, so it just renders static, which is
+  // exactly right for a stationary egg-sac.
+  mob_spider_egg_sac: {
+    url: `${CREATURES}/spider_egg_sac.glb`,
+    height: 1.8,
+    clips: {
+      idle: 'Idle',
+      walk: 'Idle',
+      run: 'Idle',
+      attack: ['Idle'],
+      death: 'Idle',
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -832,19 +950,34 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
-  imp: 'mob_demon',
-  voidwalker: 'mob_demon',
-  succubus: 'mob_demon',
+  emberkin: 'mob_demon',
+  gloomshade: 'mob_demon',
+  duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
   bog_bloat: 'mob_murloc',
+  // The Drowned Litany (Mirefen Marsh): give marsh enemies the right silhouette
+  // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
+  mirefen_widowling: 'mob_spider',
+  spider_egg_sac: 'mob_spider_egg_sac',
+  sump_troll_devourer: 'mob_troll',
+  grave_silt_bulwark: 'mob_ogre',
+  drowned_cantor: 'delve_mob_acolyte',
+  deepfen_spearjaw: 'mob_spearjaw',
+  choir_thrall: 'mob_choir_thrall',
+  tolling_bell: 'mob_tolling_bell',
+  reedbound_acolyte: 'mob_reedbound_acolyte',
+  edda_reedhand: 'npc_edda_reedhand',
   // gravecaller cult + necromancers: dark-robed casters
   gravecaller_cultist: 'mob_dark_caster',
   gravecaller_summoner: 'mob_dark_caster',
+  // BOTH Nhalias: the zone 2 overworld rare elite keeps her original template
+  // id; the Drowned Litany boss is a separate renamed template.
   sister_nhalia: 'mob_dark_caster',
+  sister_nhalia_drowned_canticle: 'mob_dark_caster',
   deacon_voss: 'mob_dark_caster',
   wyrmcult_necromancer: 'mob_dark_caster',
   vael_the_mistcaller: 'mob_dark_caster',
@@ -881,9 +1014,9 @@ const MOB_KEYS: Record<string, string> = {
 const FAMILY_KEYS: Record<string, string> = {
   beast: 'mob_wolf',
   humanoid: 'mob_bandit',
-  murloc: 'mob_murloc',
+  mudfin: 'mob_murloc',
   spider: 'mob_spider',
-  kobold: 'mob_kobold',
+  burrower: 'mob_kobold',
   undead: 'skel_minion',
   troll: 'mob_troll',
   ogre: 'mob_ogre',
@@ -909,6 +1042,10 @@ const NPC_KEYS: Record<string, string> = {
   provisioner_hale: 'npc_villager',
   quartermaster_bree: 'npc_villager',
   brother_halven: 'npc_reliquary_keeper',
+  brother_halven_marsh: 'npc_reliquary_keeper',
+  // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
+  // holy shimmer by the renderer (see the spirit_healer branches there).
+  spirit_healer: 'npc_villager_robed',
 };
 
 export function visualKeyFor(e: Entity): string {

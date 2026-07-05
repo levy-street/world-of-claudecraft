@@ -60,10 +60,44 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'critvuln',
 ]);
 
-// Below this many seconds remaining the duration label is shown; at/above it the aura
-// reads as effectively permanent and the label is blank (byte-faithful to the old
-// `a.remaining < 99 ? ... : ''`).
-const DURATION_HIDE_THRESHOLD = 99;
+// Toggle auras (cast again to cancel: stealth, the druid forms, stances, Ghost
+// Wolf) read as MODES, not timed effects: WoW shows no countdown under them, so
+// neither do we, even though the sim backs each with a long finite duration
+// (3600s). Every other aura shows a compact WoW-style remaining label (20s /
+// 5m / 1h / 2d) via compactAuraDuration below.
+const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
+  'stealth',
+  'form_bear',
+  'form_cat',
+  'form_travel',
+  'defensive_stance',
+]);
+// Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
+// Sprint also uses, 15s and very much worth a countdown), so it hides by id.
+const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
+
+/** The localized single-letter unit suffixes the compact duration label uses. */
+export interface DurationUnits {
+  s: string;
+  m: string;
+  h: string;
+  d: string;
+}
+
+/** WoW-style compact remaining-duration label: seconds round UP (a dot about to
+ *  fall still reads 1s, never 0s), minutes/hours/days round to nearest, and a
+ *  rounded value that would print a full next unit promotes instead (3599s is
+ *  "1h", never "60m"). A non-finite remaining reads as permanent (no label).
+ *  Pure; exported for tests. */
+export function compactAuraDuration(remaining: number, units: DurationUnits): string {
+  if (!Number.isFinite(remaining)) return '';
+  if (remaining < 60) return `${Math.ceil(remaining)}${units.s}`;
+  const m = Math.round(remaining / 60);
+  if (m < 60) return `${m}${units.m}`;
+  const h = Math.round(remaining / 3600);
+  if (h < 24) return `${h}${units.h}`;
+  return `${Math.round(remaining / 86400)}${units.d}`;
+}
 
 /** Which aura strip a view drives: every aura, buffs only (the player buff row), or
  *  debuffs only (the player debuff row and the target frame). */
@@ -113,11 +147,13 @@ export interface AurasDeps {
    *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
    *  localized, esc'd HTML from the pure aura_effect descriptor. */
   auraEffectHtml(aura: AuraInput): string;
-  /** The localized duration unit suffix appended to the remaining-seconds count (host:
-   *  `t('hudChrome.unitFrame.durationUnitSeconds')`, English 's'). Frame-constant: tick() reads
-   *  it ONCE per frame (not per aura, unlike the per-aura deps above), and re-reads each frame so
-   *  an in-game language switch still lands on the next tick. */
-  durationUnitSuffix(): string;
+  /** The localized single-letter duration unit suffixes the compact label appends
+   *  (host: `t('hudChrome.unitFrame.durationUnitSeconds'/'...Minutes'/'...Hours'/
+   *  '...Days')`, English s/m/h/d). Frame-constant: tick() reads them ONCE per frame
+   *  (not per aura, unlike the per-aura deps above), and re-reads each frame so an
+   *  in-game language switch still lands on the next tick. The host should return a
+   *  REUSED object (allocation-light contract), never a fresh literal per call. */
+  durationUnits(): DurationUnits;
 }
 
 /** One aura's derived state. All fields are mutated IN PLACE each tick; the object
@@ -212,7 +248,7 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
       let count = 0;
       // Frame-constant, so read once per tick instead of per aura (it still re-reads each frame,
       // so an in-game language switch lands on the next tick).
-      const durSuffix = deps.durationUnitSuffix();
+      const units = deps.durationUnits();
       for (const a of entity.auras) {
         const debuff = isAuraDebuff(a);
         if (mode === 'debuffs' && !debuff) continue;
@@ -224,7 +260,9 @@ export function createAurasView(mode: AuraMode, deps: AurasDeps): AurasView {
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
         slot.durationText =
-          a.remaining < DURATION_HIDE_THRESHOLD ? `${Math.ceil(a.remaining)}${durSuffix}` : '';
+          TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)
+            ? ''
+            : compactAuraDuration(a.remaining, units);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
         // badge shows a stack count, and only when it stacks past 1.
         slot.stacksText =

@@ -68,7 +68,22 @@ services:
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
       DISCORD_GUILD_INVITE: ${DISCORD_GUILD_INVITE:-}
       DISCORD_BOT_SECRET: ${DISCORD_BOT_SECRET:-}
-    # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
+      # Runtime: the game server uses the bot token to auto-join a linking player to
+      # the official guild (guilds.join). Empty disables auto-join (verify-only).
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      # Runtime: GitHub OAuth for the in-game developer badge. Both id+secret must be
+      # set to enable "Link GitHub"; empty hides it exactly like Discord. GITHUB_REPO
+      # selects which repo's contributor stats back the badge (code default:
+      # levy-street/world-of-claudecraft); GITHUB_TOKEN lifts the GitHub API rate limit
+      # for the contributor + News/Releases fetches. See .env.example.
+      GITHUB_OAUTH_CLIENT_ID: ${GITHUB_OAUTH_CLIENT_ID:-}
+      GITHUB_OAUTH_CLIENT_SECRET: ${GITHUB_OAUTH_CLIENT_SECRET:-}
+      GITHUB_REPO: ${GITHUB_REPO:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      WOC_DAILY_REWARD_SERVICE_URL: ${WOC_DAILY_REWARD_SERVICE_URL:-}
+      WOC_DAILY_REWARD_SERVICE_SECRET: ${WOC_DAILY_REWARD_SERVICE_SECRET:-}
+      WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
+      # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
@@ -95,6 +110,7 @@ services:
       DISCORD_TEST_CHANNEL_ID: ${DISCORD_TEST_CHANNEL_ID:-}
       DISCORD_RELAY_CHANNEL_ID: ${DISCORD_RELAY_CHANNEL_ID:-}
       DISCORD_ACTIVITY_CHANNEL_ID: ${DISCORD_ACTIVITY_CHANNEL_ID:-}
+      DISCORD_DAILY_REWARDS_CHANNEL_ID: ${DISCORD_DAILY_REWARDS_CHANNEL_ID:-}
       DISCORD_SYNC_NICKNAMES: ${DISCORD_SYNC_NICKNAMES:-1}
     command: ["node", "dist-bot/bot.cjs"]
 

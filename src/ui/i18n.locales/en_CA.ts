@@ -17,7 +17,7 @@ export const en_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.thresholds': 'Colour-Coded Warnings',
   'classDetails.labels.armor': 'Armour',
   'classDetails.lore.paladin':
-    'Paladins are holy crusaders who support allies with blessings, heal wounds with Holy Light, and protect the weak in heavy armour.',
+    'Paladins are holy crusaders who support allies with blessings, heal wounds with Mending Light, and protect the weak in heavy armour.',
   'classDetails.lore.druid':
     'Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defence or damage.',
   'fiesta.category.offense': 'Offence',

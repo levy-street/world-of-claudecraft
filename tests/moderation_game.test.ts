@@ -11,6 +11,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
@@ -103,7 +104,7 @@ beforeEach(() => {
 });
 
 describe('in-game moderation actions', () => {
-  it('kicks and kills selected non-admin players with an audit record', async () => {
+  it('kicks and kills quoted non-admin players by name with an audit record', async () => {
     const kickServer = new GameServer();
     const moderatorWs = fakeWs();
     const targetWs = fakeWs();
@@ -112,10 +113,9 @@ describe('in-game moderation actions', () => {
         isAdmin: true,
       }),
     );
-    const target = joined(kickServer.join(targetWs, 2, 102, 'Trouble', 'rogue', null));
-    entity(kickServer, moderator.pid).targetId = target.pid;
+    const target = joined(kickServer.join(targetWs, 2, 102, 'Trouble Maker', 'rogue', null));
 
-    command(kickServer, moderator, '/kick griefing');
+    command(kickServer, moderator, '/kick "Trouble Maker" griefing');
 
     await vi.waitFor(() => expect(kickServer.clients.has(target.pid)).toBe(false));
     expect(moderation.recordInGameAction).toHaveBeenCalledWith({
@@ -125,7 +125,7 @@ describe('in-game moderation actions', () => {
       reason: 'griefing',
     });
     expect(targetWs.close).toHaveBeenCalled();
-    expect(eventTexts(moderatorWs)).toContain('Kicked Trouble.');
+    expect(eventTexts(moderatorWs)).toContain('Kicked Trouble Maker.');
 
     const killServer = new GameServer();
     const killerWs = fakeWs();
@@ -136,9 +136,8 @@ describe('in-game moderation actions', () => {
       }),
     );
     const victim = joined(killServer.join(victimWs, 4, 104, 'Victim', 'priest', null));
-    entity(killServer, killer.pid).targetId = victim.pid;
 
-    command(killServer, killer, '/kill spawn camping');
+    command(killServer, killer, '/kill "Victim" spawn camping');
 
     await vi.waitFor(() => expect(killServer.sim.entities.get(victim.pid)?.dead).toBe(true));
     expect(moderation.recordInGameAction).toHaveBeenCalledWith({
@@ -160,9 +159,8 @@ describe('in-game moderation actions', () => {
       }),
     );
     const target = joined(server.join(targetWs, 20, 120, 'Target', 'rogue', null));
-    entity(server, moderator.pid).targetId = target.pid;
 
-    command(server, moderator, '/mute 5 spam');
+    command(server, moderator, '/mute "Target" 5 spam');
     await vi.waitFor(() => expect(target.chatMutedUntil).not.toBeNull());
     expect(moderation.muteAccountChat).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -173,7 +171,7 @@ describe('in-game moderation actions', () => {
     );
     expect(target.chatMuteReason).toBe('spam');
 
-    command(server, moderator, '/suspend 30 cheating');
+    command(server, moderator, '/suspend "Target" 30 cheating');
     await vi.waitFor(() => expect(targetWs.close).toHaveBeenCalled());
     expect(moderation.moderateAccount).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -192,9 +190,8 @@ describe('in-game moderation actions', () => {
         isAdmin: true,
       }),
     );
-    const banTarget = joined(banServer.join(banTargetWs, 60, 160, 'Repeat', 'rogue', null));
-    entity(banServer, banModerator.pid).targetId = banTarget.pid;
-    command(banServer, banModerator, '/ban repeat offender');
+    joined(banServer.join(banTargetWs, 60, 160, 'Repeat', 'rogue', null));
+    command(banServer, banModerator, '/ban "Repeat" repeat offender');
     await vi.waitFor(() => expect(banTargetWs.close).toHaveBeenCalled());
     expect(moderation.moderateAccount).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -214,11 +211,8 @@ describe('in-game moderation actions', () => {
         isAdmin: true,
       }),
     );
-    const renameTarget = joined(
-      renameServer.join(renameTargetWs, 40, 140, 'Badname', 'rogue', null),
-    );
-    entity(renameServer, renameModerator.pid).targetId = renameTarget.pid;
-    command(renameServer, renameModerator, '/forcerename offensive');
+    joined(renameServer.join(renameTargetWs, 40, 140, 'Badname', 'rogue', null));
+    command(renameServer, renameModerator, '/forcerename "Badname" offensive');
 
     await vi.waitFor(() => expect(renameTargetWs.close).toHaveBeenCalled());
     expect(moderation.forceCharacterRename).toHaveBeenCalledWith({
@@ -228,7 +222,7 @@ describe('in-game moderation actions', () => {
     });
   });
 
-  it('does not let a non-admin or an admin target be moderated', () => {
+  it('rejects old selected-target syntax and protected named targets', async () => {
     const server = new GameServer();
     const playerWs = fakeWs();
     const adminWs = fakeWs();
@@ -236,18 +230,26 @@ describe('in-game moderation actions', () => {
     const admin = joined(
       server.join(adminWs, 2, 102, 'Admin', 'mage', null, false, { isAdmin: true }),
     );
-    entity(server, player.pid).targetId = admin.pid;
-    command(server, player, '/kick forbidden');
+    command(server, player, '/kick "Admin" forbidden');
     expect(adminWs.close).not.toHaveBeenCalled();
 
+    const selectedWs = fakeWs();
+    const selected = joined(server.join(selectedWs, 4, 104, 'Selected', 'rogue', null));
+    entity(server, admin.pid).targetId = selected.pid;
+    command(server, admin, '/kick old selected-target reason');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(selectedWs.close).not.toHaveBeenCalled();
+
     const otherAdminWs = fakeWs();
-    const otherAdmin = joined(
+    joined(
       server.join(otherAdminWs, 3, 103, 'Otheradmin', 'priest', null, false, {
         isAdmin: true,
       }),
     );
-    entity(server, admin.pid).targetId = otherAdmin.pid;
-    command(server, admin, '/kick forbidden');
+    command(server, admin, '/kick "Otheradmin" forbidden');
+    await Promise.resolve();
+    await Promise.resolve();
     expect(otherAdminWs.close).not.toHaveBeenCalled();
     expect(moderation.recordInGameAction).not.toHaveBeenCalled();
   });
@@ -274,7 +276,7 @@ describe('moderator spectate integration', () => {
     server.sim.partyInvite(suspect.pid, moderator.pid);
     server.sim.partyAccept(suspect.pid);
 
-    command(server, moderator, '/spectate Suspect');
+    command(server, moderator, '/spectate "Suspect"');
 
     expect(moderator.spectating?.characterId).toBe(suspect.characterId);
     expect(moderatorEntity.pos.x).toBe(-10_000);
