@@ -208,7 +208,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     expect(p.castTargetId).toBeNull();
     expect(p.castRemaining).toBe(0);
     // cancelCast emitted castStop(success:false). (updateCasting's channel branch also
-    // emits a trailing success:true because the cancel zeroed castRemaining — a
+    // emits a trailing success:true because the cancel zeroed castRemaining, a
     // pre-existing quirk of mid-tick cancellation, so assert on the cancel event.)
     const stops = sim
       .drainEvents()

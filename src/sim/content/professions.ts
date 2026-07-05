@@ -51,6 +51,68 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
 // Stable iteration order, used for defaulting/normalizing a per-player
 // proficiency record. Keep in sync with GATHERING_PROFESSIONS above.
 export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'logging', 'herbalism'];
+
+// Tool effect slotting (#1136): a slottable bonus layered on top of a base
+// gathering tool's tier (see ../professions/tools.ts). Each effect carries its
+// own starting durability, separate from the base tool's tier gating, and a
+// per-use depletion chance: durability only drops on a losing roll, not on
+// every use, so the effect's lifespan is itself probabilistic. `kind` selects
+// which harvest/craft outcome field the bonus adjusts.
+export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm';
+
+export interface ToolEffectDef {
+  id: ToolEffectId;
+  name: string;
+  description: string;
+  icon: string;
+  kind: 'quantity' | 'quality' | 'respawnSpeed';
+  /** Magnitude applied to the outcome field while durability remains. */
+  bonus: number;
+  /** Charges the effect starts with when freshly slotted onto a tool. */
+  startingDurability: number;
+  /** Chance per use that this effect's durability decrements by 1 (0 to 1). */
+  depletionChance: number;
+}
+
+export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
+  gatherers_cache: {
+    id: 'gatherers_cache',
+    name: "Gatherer's Cache",
+    icon: 'gatherers_cache',
+    description: 'Slotted onto a gathering tool: yields extra quantity per harvest.',
+    kind: 'quantity',
+    bonus: 1,
+    startingDurability: 20,
+    depletionChance: 0.5,
+  },
+  artisans_eye: {
+    id: 'artisans_eye',
+    name: "Artisan's Eye",
+    icon: 'artisans_eye',
+    description: 'Slotted onto a gathering tool: raises the quality of what it harvests.',
+    kind: 'quality',
+    bonus: 1,
+    startingDurability: 20,
+    depletionChance: 0.5,
+  },
+  quickening_charm: {
+    id: 'quickening_charm',
+    name: 'Quickening Charm',
+    icon: 'quickening_charm',
+    description: 'Slotted onto a gathering tool: shortens the node respawn timer it triggers.',
+    kind: 'respawnSpeed',
+    bonus: 1,
+    startingDurability: 20,
+    depletionChance: 0.5,
+  },
+};
+
+// Stable iteration order, used the same way GATHERING_PROFESSION_IDS is.
+export const TOOL_EFFECT_IDS: ToolEffectId[] = [
+  'gatherers_cache',
+  'artisans_eye',
+  'quickening_charm',
+];
 // Ten-craft ring content: pure data plus pure helper functions. No engine logic,
 // no mechanic wiring: this file only defines the ring geometry (order, pole tags)
 // and the adjacency/opposite lookups derived from it. See issue #1125.

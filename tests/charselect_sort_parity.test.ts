@@ -64,3 +64,21 @@ describe('character-select sort control parity', () => {
     });
   }
 });
+
+// The shared desktop Enter World button is wired the same way: wireStartScreens()
+// runs $('#btn-charselect-enter').addEventListener(...) unconditionally, so the id
+// missing from either entry would throw and abort the rest of the wiring. Pin it
+// to parity, like the sort controls above.
+describe('character-select Enter World button parity', () => {
+  it('wireStartScreens reads #btn-charselect-enter (the dependency this guards)', () => {
+    expect(mainTs).toContain("$('#btn-charselect-enter').addEventListener");
+  });
+
+  it('index.html character select contains #btn-charselect-enter', () => {
+    expect(indexHtml).toContain('id="btn-charselect-enter"');
+  });
+
+  it('play.html character select contains #btn-charselect-enter (mirrors index.html)', () => {
+    expect(playHtml).toContain('id="btn-charselect-enter"');
+  });
+});

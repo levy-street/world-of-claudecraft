@@ -699,6 +699,7 @@
             <div class="cs-list-col">
               <ul id="char-list" role="list"></ul>
               <div class="cs-list-actions">
+                <button type="button" class="btn btn-primary" id="btn-charselect-enter" data-i18n="auth.enterWorld">Enter World</button>
                 <button type="button" class="btn btn-secondary" id="btn-charselect-back" data-i18n="auth.back">Back</button>
                 <button type="button" class="btn btn-primary cs-new-btn" id="btn-new-character" data-i18n="auth.newCharacter">New Character</button>
               </div>
@@ -706,6 +707,7 @@
             <!-- Right: selected character showcase -->
             <div class="cs-detail-col">
               <div class="char-preview-container cs-preview" id="online-preview-container">
+                <div class="cs-preview-name" id="charselect-preview-name" aria-live="polite"></div>
                 <canvas id="char-preview-canvas"></canvas>
               </div>
               <div id="charselect-class-details" class="class-details-panel" aria-live="polite"></div>

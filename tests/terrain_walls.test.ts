@@ -105,6 +105,56 @@ describe('impassable terrain walls', () => {
     }
   });
 
+  it('the overshoot plateau beyond the rim stays a flat staging ground', () => {
+    // Terrain past the playable rectangle is never rendered and never
+    // reachable in play, but dev teleports, /follow, and the chat tests park
+    // entities out there (z = -1000 is tests/follow.test.ts's parade ground).
+    // The mountain crest noise and terracing fade out past the rim
+    // (OUTSIDE_FADE_END in src/sim/world.ts), so beyond the fade the plateau
+    // must stay comfortably walkable at any seed in use (20061 is the
+    // production seed, 42 the test-suite seed). OUTS samples both just past
+    // the fade (parity scenarios stage mobs ~20yd out) and the deep plateau.
+    // Deliberately NOT sampled: the fade transition band itself (2..10yd
+    // out), a crag-to-berm cliff that is steeper than the climb limit in
+    // places; nothing may stage there. The 12yd samples double as a tripwire:
+    // if OUTSIDE_FADE_END ever grows past 10, they land inside the band and
+    // this test fails loudly instead of the staging contract eroding quietly.
+    // Tightest observed sample is ~0.93 at one corner (192, 936, seed 42),
+    // pre-existing base geometry rather than anything fade-controlled, so a
+    // failure just under 1.0 there points at a base-noise tweak, not the fade.
+    const OUTS = [12, 70, 400];
+    for (const seed of [WORLD_SEED, 42]) {
+      for (let x = -176; x <= 176; x += 4) {
+        for (const out of OUTS) {
+          for (const z of [WORLD_MIN_Z - out, WORLD_MAX_Z + out]) {
+            expect(
+              terrainSteepness(x, z, seed),
+              `z-overshoot plateau at (${x},${z}) seed=${seed}`,
+            ).toBeLessThan(1.0);
+          }
+        }
+        expect(
+          terrainSteepness(x, -1000, seed),
+          `follow parade ground at (${x},-1000) seed=${seed}`,
+        ).toBeLessThan(1.0);
+      }
+      // The x-side overshoot, skipping the bands where a zone ridge's smooth
+      // gaussian ramp (impassable by design, faded or not) runs off the edge.
+      for (const side of [-1, 1]) {
+        for (const out of OUTS) {
+          const x = side * (WORLD_MAX_X + out);
+          for (let z = WORLD_MIN_Z - 40; z <= WORLD_MAX_Z + 40; z += 4) {
+            if (RIDGE_ZS.some((rz) => Math.abs(z - rz) < 40)) continue;
+            expect(
+              terrainSteepness(x, z, seed),
+              `x-overshoot plateau at (${x},${z}) seed=${seed}`,
+            ).toBeLessThan(1.0);
+          }
+        }
+      }
+    }
+  });
+
   it('camps, npcs, hubs, and road vertices all sit on walkable ground', () => {
     for (const camp of CAMPS) {
       expect(

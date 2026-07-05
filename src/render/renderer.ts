@@ -3613,14 +3613,18 @@ export class Renderer {
 
   // Outdoor fog presets per biome (high tier eases between them as the
   // player crosses zone bands; low keeps the legacy vale fog everywhere).
+  // far/near trimmed from the original release so a zone's own mountains (the
+  // rim wall, the inter-zone ridges) fade into haze instead of standing out
+  // crisp when viewed from the zone's hub/centre; ratio near:far kept roughly
+  // constant per biome so the fog gradient itself doesn't change shape.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
-    vale: { color: 0xa6c6e0, near: 130, far: 470 },
-    marsh: { color: 0xa3b294, near: 80, far: 330 },
-    peaks: { color: 0xbdd3ec, near: 160, far: 560 },
-    beach: { color: 0xbcd6e6, near: 150, far: 520 },
-    desert: { color: 0xd8c9a8, near: 140, far: 500 },
-    volcano: { color: 0x8a7468, near: 70, far: 300 },
-    cave: { color: 0x76807c, near: 60, far: 260 },
+    vale: { color: 0xa6c6e0, near: 95, far: 340 },
+    marsh: { color: 0xa3b294, near: 60, far: 240 },
+    peaks: { color: 0xbdd3ec, near: 110, far: 390 },
+    beach: { color: 0xbcd6e6, near: 105, far: 370 },
+    desert: { color: 0xd8c9a8, near: 100, far: 360 },
+    volcano: { color: 0x8a7468, near: 50, far: 220 },
+    cave: { color: 0x76807c, near: 45, far: 190 },
   };
   private static LOW_FOG = { color: 0xa6c6e0, near: 70, far: 260 };
 
