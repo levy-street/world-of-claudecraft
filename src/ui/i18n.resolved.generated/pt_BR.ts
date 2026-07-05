@@ -2507,7 +2507,9 @@ export const pt_BR: EnTranslations = {
   },
   "download": {
     "title": "Baixar launcher para desktop",
-    "desc": "Obtenha o launcher independente para desempenho otimizado e jogo em tela cheia."
+    "desc": "Obtenha o launcher independente para desempenho otimizado e jogo em tela cheia.",
+    "macCta": "Baixar para macOS",
+    "windowsPending": "Build para Windows pendente."
   },
   "comingSoon": {
     "placeholder": "Em breve...",

@@ -1127,6 +1127,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'download.desc':
     'Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.',
   'download.title': 'Masaüstü Başlatıcısını İndir',
+  'download.macCta': 'macOS için indir',
+  'download.windowsPending': 'Windows derlemesi beklemede.',
   'entities.abilities.adrenaline_rush.description':
     'Kanın kaynar, anında 60 enerji geri kazandırır.',
   'entities.abilities.adrenaline_rush.name': 'Hızlanan Kan',

@@ -51,6 +51,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+AuthKey_*.p8
 # Meshy asset-gen tooling embeds an API key, never commit it
 scripts/generate_treasure_chest.mjs
 

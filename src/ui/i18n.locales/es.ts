@@ -1195,6 +1195,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Noticias y Actualizaciones',
   'news.desc': 'Lee las últimas notas del parche, eventos y noticias de la comunidad.',
   'download.title': 'Descargar Lanzador de Escritorio',
+  'download.macCta': 'Descargar para macOS',
+  'download.windowsPending': 'Compilacion para Windows pendiente.',
   'download.desc':
     'Consigue el lanzador independiente para un rendimiento optimizado y juego a pantalla completa.',
   'comingSoon.placeholder': 'Próximamente...',

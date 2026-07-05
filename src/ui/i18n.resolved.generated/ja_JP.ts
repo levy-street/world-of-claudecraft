@@ -2507,7 +2507,9 @@ export const ja_JP: EnTranslations = {
   },
   "download": {
     "title": "デスクトップランチャーのダウンロード",
-    "desc": "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。"
+    "desc": "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。",
+    "macCta": "macOS版をダウンロード",
+    "windowsPending": "Windows版は準備中です。"
   },
   "comingSoon": {
     "placeholder": "近日公開...",

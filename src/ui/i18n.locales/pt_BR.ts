@@ -1188,6 +1188,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'news.title': 'Notícias e atualizações',
   'news.desc': 'Leia as últimas notas do patch, eventos e atualizações da comunidade.',
   'download.title': 'Baixar launcher para desktop',
+  'download.macCta': 'Baixar para macOS',
+  'download.windowsPending': 'Build para Windows pendente.',
   'download.desc':
     'Obtenha o launcher independente para desempenho otimizado e jogo em tela cheia.',
   'comingSoon.placeholder': 'Em breve...',

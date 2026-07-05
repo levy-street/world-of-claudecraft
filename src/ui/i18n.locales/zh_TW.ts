@@ -505,6 +505,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'news.title': '新聞與更新說明',
   'news.desc': '閱讀最新修補程式說明、遊戲內事件和社群動態。',
   'download.title': '下載電腦版啟動器',
+  'download.macCta': '下載 macOS 版',
+  'download.windowsPending': 'Windows 版本即將推出。',
   'download.desc': '獲取獨立啟動器，以獲得更優化的效能和全螢幕遊戲體驗。',
   'comingSoon.placeholder': '敬請期待...',
   'comingSoon.featureComingSoon': '此功能即將在這個世界上線，敬請期待。',

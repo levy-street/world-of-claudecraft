@@ -2507,7 +2507,9 @@ export const fr_FR: EnTranslations = {
   },
   "download": {
     "title": "Télécharger le lanceur de bureau",
-    "desc": "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran."
+    "desc": "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.",
+    "macCta": "Telecharger pour macOS",
+    "windowsPending": "Build Windows en attente."
   },
   "comingSoon": {
     "placeholder": "Bientôt disponible...",

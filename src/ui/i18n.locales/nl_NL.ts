@@ -1141,6 +1141,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Delve',
   'download.desc': 'Download de losse launcher voor optimale prestaties en schermvullend spelen.',
   'download.title': 'Desktop-launcher downloaden',
+  'download.macCta': 'Download voor macOS',
+  'download.windowsPending': 'Windows-build volgt later.',
   'entities.abilities.adrenaline_rush.description':
     'Je bloed kookt en herstelt onmiddellijk 60 energie.',
   'entities.abilities.adrenaline_rush.name': 'Versneld Bloed',

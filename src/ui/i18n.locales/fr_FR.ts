@@ -1215,6 +1215,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'news.desc':
     'Lisez les dernières notes de mise à jour, les événements et les nouvelles de la communauté.',
   'download.title': 'Télécharger le lanceur de bureau',
+  'download.macCta': 'Telecharger pour macOS',
+  'download.windowsPending': 'Build Windows en attente.',
   'download.desc':
     'Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.',
   'comingSoon.placeholder': 'Bientôt disponible...',
