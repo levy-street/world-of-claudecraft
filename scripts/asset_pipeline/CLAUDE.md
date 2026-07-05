@@ -237,8 +237,10 @@ Mechanics:
   a review shot into the job's `preview_model/` dir, and returns before rigging/normalizing.
   The wizard drives a DETERMINISTIC job id via `--job <id> --new-job` (`--new-job` lets
   `Job.open` create that exact id; bare `--job` still requires an existing job so a mistyped
-  CLI id errors instead of forking). Regenerate re-runs a stage with `--redo` (model =
-  `--redo generate`, animations = `--redo retarget`). Save is the lane's normal `--apply`.
+  CLI id errors instead of forking). Regenerate re-runs a stage with `--redo`: the model
+  regenerate is `--redo concept` (NOT just generate: image-to-model from the same frozen
+  concept image barely varies and ignores a changed prompt, so it must re-roll the concept),
+  animations is `--redo retarget`. Save is the lane's normal `--apply`.
 - Review renders IN-BROWSER: the wizard shows the real GLB in the live viewer (`window.LiveViewer`,
   raw model then finished/animated build, exposed by `wizardStatus` as `modelGlb`/`finalGlb`), so
   a headless browser is NOT required. Server-side PNG previews degrade to a no-op when no local

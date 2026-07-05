@@ -119,7 +119,8 @@ export function genArgs(lane, options = {}) {
 
 /** Start (or restart) generating the model for a new/edited asset. Runs the
  *  concept + generate stages and stops for review (--until generate). When
- *  regenerate is true, redoes the generate stage for a fresh candidate. */
+ *  regenerate is true, redoes from the CONCEPT (not just generate) so the new
+ *  candidate is a genuinely different creature and honors a changed prompt. */
 export function startModel({ lane, name, prompt, options, regenerate }) {
   if (!LANES.has(lane)) throw new Error(`unsupported lane: ${lane}`);
   const key = safeName(name);
@@ -132,7 +133,11 @@ export function startModel({ lane, name, prompt, options, regenerate }) {
   const args = [lane, '--name', key, '--job', jobId, '--new-job', '--until', 'generate'];
   if (prompt) args.push('--prompt', prompt);
   args.push(...gen);
-  if (regenerate) args.push('--redo', 'generate');
+  // Redo from CONCEPT, not generate: image-to-model from the SAME frozen concept
+  // image barely varies (and ignores a changed prompt), so redoing only generate
+  // shows "the same model". Redoing concept re-rolls the concept image (text-to-
+  // image / gpt-image-2, a few credits) and cascades to a fresh model.
+  if (regenerate) args.push('--redo', 'concept');
   spawnStep(jobId, args, regenerate ? 'regenerate-model' : 'model');
   return { jobId };
 }
