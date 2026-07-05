@@ -24,6 +24,17 @@ function laneOf(asset) {
   return null;
 }
 
+// Mirror the server's safeName + jobIdFor (lib/wizard.mjs) so the client can look
+// up whether a deterministic job id already exists before generating. An imperfect
+// match just misses the lookup and falls through to a normal generate (safe).
+function safeName(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 40);
+}
+
 // --- tiny DOM helpers --------------------------------------------------------
 function el(tag, attrs = {}, ...kids) {
   const n = document.createElement(tag);
@@ -279,13 +290,37 @@ class Wizard {
                 alert('A description or a reference image is required.');
                 return;
               }
-              this.startModel(false);
+              this.submitPrompt();
             },
           },
           'Generate model',
         ),
       ),
     );
+  }
+
+  // Decide whether the prompt-screen "Generate model" starts fresh or resumes.
+  // The job id is deterministic per name, so a name that was already built would
+  // otherwise silently resume and show the STALE model. Regenerate-from-detail is
+  // always fresh; a new-create collision asks the operator (a fresh model spends
+  // credits) rather than surprising them.
+  async submitPrompt() {
+    const s = this.state;
+    if (s.mode === 'regenerate') return this.startModel(true);
+    const jobId = `${s.lane}_${safeName(s.name)}`;
+    let existing = null;
+    try {
+      existing = await api('/api/wizard/status?job=' + encodeURIComponent(jobId));
+    } catch {}
+    if (existing?.exists && existing.steps?.generate === 'done') {
+      const fresh = window.confirm(
+        'A model already exists for this name.\n\n' +
+          'OK = generate a NEW model (spends Tripo credits).\n' +
+          'Cancel = review the existing model.',
+      );
+      return this.startModel(fresh);
+    }
+    return this.startModel(false);
   }
 
   async startModel(regenerate) {

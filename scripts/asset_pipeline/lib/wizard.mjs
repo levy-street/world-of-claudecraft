@@ -204,7 +204,12 @@ function listPreviews(jobId) {
 // job dir, or null when it has not been produced yet. The raw model appears after
 // the generate stage; the finished/animated build after assemble/normalize.
 function jobGlb(jobId, file) {
-  return existsSync(join(JOBS_ROOT, jobId, file)) ? `tmp/asset_pipeline/${jobId}/${file}` : null;
+  const abs = join(JOBS_ROOT, jobId, file);
+  if (!existsSync(abs)) return null;
+  // Cache-bust by mtime: the URL is a fixed path (raw.glb / <name>.glb), so after
+  // a regenerate the browser would serve the STALE bytes without a changing query.
+  // The /repo route strips the query, so this only busts the client cache.
+  return `tmp/asset_pipeline/${jobId}/${file}?v=${Math.floor(statSync(abs).mtimeMs)}`;
 }
 
 /** Full wizard status for the browser: whether a child is live, the step
