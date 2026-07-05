@@ -7964,7 +7964,7 @@ export const en: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave Raiment",
-        "bonus2": "You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
         "bonus3": "Increases Intellect by 10 and Stamina by 10."
       },
       "nighttalon": {
@@ -7974,12 +7974,12 @@ export const en: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
-        "bonus2": "You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
-        "bonus2": "You cannot be knocked back (100% knockback resistance).",
+        "bonus2": "Increases spell power by 20. You cannot be knocked back (100% knockback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%."
       },
       "vale_arcanist": {

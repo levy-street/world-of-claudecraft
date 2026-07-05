@@ -3692,6 +3692,11 @@ export class Sim {
   // it tunnel through in one coarse hop. Returns the yards actually moved (0 if
   // blocked immediately).
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
+    // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
+    // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
+    // and never displaces the victim, so a caster keeps casting through it.
+    distance *= 1 - (target.knockbackResistance ?? 0);
+    if (distance <= 0) return 0;
     let dx = target.pos.x - source.pos.x;
     let dz = target.pos.z - source.pos.z;
     let len = Math.hypot(dx, dz);

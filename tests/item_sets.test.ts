@@ -39,6 +39,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       int: 0,
       spi: 0,
       ap: 0,
+      sp: 0,
       crit: 0,
       critRating: 0,
       haste: 0,
