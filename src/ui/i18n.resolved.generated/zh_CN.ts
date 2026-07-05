@@ -736,6 +736,23 @@ export const zh_CN: EnTranslations = {
       "summaryMaster": "拾取设置：队长分配，分配者{name}，品质门槛{threshold}。",
       "summaryGroup": "拾取设置：小队拾取。"
     },
+    "corpseHarvest": {
+      "title": "采集",
+      "harvestButton": "采集",
+      "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "alreadyHarvested": "这具尸体已经被采集过了。",
+      "componentAria": "采集{component}",
+      "components": {
+        "hide": "兽皮",
+        "fang": "尖牙",
+        "silk": "丝线",
+        "venomSac": "毒囊",
+        "gills": "鱼鳃",
+        "claw": "爪",
+        "horn": "角",
+        "tusk": "獠牙"
+      }
+    },
     "party": {
       "promoteLeader": "提升为队长",
       "inviteUsage": "邀请谁？用法：/invite <名称>。"

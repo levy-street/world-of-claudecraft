@@ -736,6 +736,23 @@ export const zh_TW: EnTranslations = {
       "summaryMaster": "拾取設定：隊長分配，分配者{name}，品質門檻{threshold}。",
       "summaryGroup": "拾取設定：小隊拾取。"
     },
+    "corpseHarvest": {
+      "title": "採集",
+      "harvestButton": "採集",
+      "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
+      "alreadyHarvested": "這具屍體已經被採集過了。",
+      "componentAria": "採集{component}",
+      "components": {
+        "hide": "獸皮",
+        "fang": "尖牙",
+        "silk": "絲線",
+        "venomSac": "毒囊",
+        "gills": "魚鰓",
+        "claw": "爪",
+        "horn": "角",
+        "tusk": "獠牙"
+      }
+    },
     "party": {
       "promoteLeader": "提升為隊長",
       "inviteUsage": "邀請誰？用法：/invite <名稱>。"

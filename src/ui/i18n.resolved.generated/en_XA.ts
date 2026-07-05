@@ -736,6 +736,23 @@ export const en_XA: EnTranslations = {
       "summaryMaster": "[Ļóóţ Šéţţíñĝš: Ɱášţéŕ Ļóóţ, Ɱášţéŕ Ļóóţéŕ {name}, ţĥŕéšĥóļð {threshold}.]",
       "summaryGroup": "[Ļóóţ Šéţţíñĝš: Ĝŕóúþ Ļóóţ.]"
     },
+    "corpseHarvest": {
+      "title": "[Ĥáŕʋéšţ]",
+      "harvestButton": "[Ĥáŕʋéšţ]",
+      "concentrateHint": "[Ƒéŵéŕ çĥóšéñ çóɱþóñéñţš ýíéļð á ĥíĝĥéŕ ţíéŕ éáçĥ.]",
+      "alreadyHarvested": "[Ţĥíš çóŕþšé ĥáš áļŕéáðý ƀééñ ĥáŕʋéšţéð.]",
+      "componentAria": "[Ĥáŕʋéšţ {component}]",
+      "components": {
+        "hide": "[Ĥíðé]",
+        "fang": "[Ƒáñĝ]",
+        "silk": "[Šíļķ]",
+        "venomSac": "[Ʋéñóɱ Šáç]",
+        "gills": "[Ĝíļļš]",
+        "claw": "[Çļáŵ]",
+        "horn": "[Ĥóŕñ]",
+        "tusk": "[Ţúšķ]"
+      }
+    },
     "party": {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]",
       "inviteUsage": "[Íñʋíţé ŵĥóɱ? Úšáĝé: /íñʋíţé <ñáɱé>.]"

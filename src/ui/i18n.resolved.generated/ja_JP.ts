@@ -736,6 +736,23 @@ export const ja_JP: EnTranslations = {
       "summaryMaster": "分配設定：マスタールート、分配担当{name}、品質しきい値{threshold}。",
       "summaryGroup": "分配設定：グループルート。"
     },
+    "corpseHarvest": {
+      "title": "採取",
+      "harvestButton": "採取",
+      "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
+      "alreadyHarvested": "この死体はすでに採取されています。",
+      "componentAria": "{component}を採取",
+      "components": {
+        "hide": "毛皮",
+        "fang": "牙",
+        "silk": "絹糸",
+        "venomSac": "毒袋",
+        "gills": "えら",
+        "claw": "爪",
+        "horn": "角",
+        "tusk": "牙"
+      }
+    },
     "party": {
       "promoteLeader": "パーティリーダーに指定",
       "inviteUsage": "誰を招待しますか？使用法：/invite <名前>。"

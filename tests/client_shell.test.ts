@@ -676,6 +676,42 @@ describe('client HTML shell', () => {
     expect(characterPreviewTs).toContain('this.renderer.dispose();');
   });
 
+  it('keeps the desktop character roster readable inside a centered cinematic stage', () => {
+    expect(shellCss).toContain('--cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));');
+    expect(shellCss).toContain('--cs-roster-width: clamp(340px, 28vw, 440px);');
+    expect(shellCss).toContain('--cs-details-width: var(--cs-roster-width);');
+    expect(shellCss).toContain(
+      '@media (min-width: 861px) {\n    #offline-select.cs-wow,\n    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-row {\n      display: grid;\n      grid-template-columns: auto minmax(0, 1fr) auto;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {\n      display: grid;\n      grid-template-columns: minmax(112px, 1fr);',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {\n      overflow-wrap: anywhere;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {\n      grid-template-columns: minmax(0, 1fr);',
+    );
+    expect(shellCss).toContain(
+      'overflow-y: auto;\n      scrollbar-width: thin;\n      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {\n      width: 6px;',
+    );
+    expect(shellCss).toContain(
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {\n      padding: 0;\n      border: 0;\n      border-radius: 0;\n      background: none;\n      text-transform: none;',
+    );
+    expect(shellCss).toContain('font-size: clamp(13px, 0.72vw, 15px);');
+    expect(characterPreviewTs).toContain('const LIVE_PREVIEW_X = 0;');
+    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, 1.45, 5.1);');
+    expect(characterPreviewTs).toContain(
+      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));',
+    );
+  });
+
   it('offers the quest log in the mobile controls drawer', () => {
     expect(html).toContain('id="mobile-extra-controls"');
     expect(html).toContain('id="mobile-quest"');

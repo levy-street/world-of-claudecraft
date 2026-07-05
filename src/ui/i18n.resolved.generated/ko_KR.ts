@@ -736,6 +736,23 @@ export const ko_KR: EnTranslations = {
       "summaryMaster": "전리품 설정: 분배 담당, 분배 담당자 {name}, 품질 기준 {threshold}.",
       "summaryGroup": "전리품 설정: 파티 분배."
     },
+    "corpseHarvest": {
+      "title": "채집",
+      "harvestButton": "채집",
+      "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
+      "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
+      "componentAria": "{component} 채집",
+      "components": {
+        "hide": "가죽",
+        "fang": "송곳니",
+        "silk": "비단실",
+        "venomSac": "독주머니",
+        "gills": "아가미",
+        "claw": "발톱",
+        "horn": "뿔",
+        "tusk": "엄니"
+      }
+    },
     "party": {
       "promoteLeader": "파티장으로 지정",
       "inviteUsage": "누구를 초대하시겠습니까? 사용법: /invite <이름>."

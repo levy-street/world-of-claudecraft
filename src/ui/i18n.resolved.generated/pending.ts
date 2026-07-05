@@ -10,23 +10,101 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "footer.whitepaper"
+    "footer.whitepaper",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "es_ES": [
-    "footer.whitepaper"
+    "footer.whitepaper",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "fr_FR": [
-    "footer.whitepaper"
+    "footer.whitepaper",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "fr_CA": [
-    "footer.whitepaper"
+    "footer.whitepaper",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "en_CA": [],
   "it_IT": [
-    "footer.whitepaper"
+    "footer.whitepaper",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "de_DE": [
-    "footer.whitepaper"
+    "footer.whitepaper",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "zh_CN": [
     "footer.whitepaper"
@@ -41,7 +119,20 @@ export const pending: Record<string, readonly string[]> = {
     "footer.whitepaper"
   ],
   "pt_BR": [
-    "footer.whitepaper"
+    "footer.whitepaper",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "ru_RU": [
     "footer.whitepaper"
@@ -165,7 +256,20 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter"
+    "hud.wager.wonCharter",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "pl_PL": [
     "entities.items.charter_ashmane.name",
@@ -286,7 +390,20 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter"
+    "hud.wager.wonCharter",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "id_ID": [
     "entities.items.charter_ashmane.name",
@@ -407,7 +524,20 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter"
+    "hud.wager.wonCharter",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "tr_TR": [
     "entities.items.charter_ashmane.name",
@@ -528,7 +658,20 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter"
+    "hud.wager.wonCharter",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "sv_SE": [
     "entities.items.charter_ashmane.name",
@@ -649,7 +792,20 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter"
+    "hud.wager.wonCharter",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "vi_VN": [
     "entities.items.charter_ashmane.name",
@@ -770,7 +926,20 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter"
+    "hud.wager.wonCharter",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ],
   "da_DK": [
     "entities.items.charter_ashmane.name",
@@ -891,6 +1060,19 @@ export const pending: Record<string, readonly string[]> = {
     "hud.wager.title",
     "hud.wager.waiting",
     "hud.wager.won",
-    "hud.wager.wonCharter"
+    "hud.wager.wonCharter",
+    "hudChrome.corpseHarvest.alreadyHarvested",
+    "hudChrome.corpseHarvest.componentAria",
+    "hudChrome.corpseHarvest.components.claw",
+    "hudChrome.corpseHarvest.components.fang",
+    "hudChrome.corpseHarvest.components.gills",
+    "hudChrome.corpseHarvest.components.hide",
+    "hudChrome.corpseHarvest.components.horn",
+    "hudChrome.corpseHarvest.components.silk",
+    "hudChrome.corpseHarvest.components.tusk",
+    "hudChrome.corpseHarvest.components.venomSac",
+    "hudChrome.corpseHarvest.concentrateHint",
+    "hudChrome.corpseHarvest.harvestButton",
+    "hudChrome.corpseHarvest.title"
   ]
 };
