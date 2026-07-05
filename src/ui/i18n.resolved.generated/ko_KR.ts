@@ -1053,6 +1053,7 @@ export const ko_KR: EnTranslations = {
     },
     "voiceNpc": {
       "title": "보이스 NPC (WIP)",
+      "wipBanner": "WIP 초안이며, 최종 HUD 창이 아닙니다.",
       "intro": "$WOC를 소각하여 당신의 목소리를 작은 게임 내 NPC로 복제하세요.",
       "priceLabel": "가격: {price} $WOC",
       "disabled": "보이스 NPC 잠금 해제는 아직 이용할 수 없습니다.",

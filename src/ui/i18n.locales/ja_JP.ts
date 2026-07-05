@@ -5830,6 +5830,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '見つけてくれたのか。私の話を聞いてくれて、本当にありがとう。',
   'entities.quests.q_echo_of_you.objectives.0.label': 'もう一度エコーと話す',
   'hudChrome.voiceNpc.title': 'ボイスNPC (WIP)',
+  'hudChrome.voiceNpc.wipBanner': 'WIPドラフト版、最終的なHUDウィンドウではありません。',
   'hudChrome.voiceNpc.intro': '$WOCをバーンして、あなたの声を小さなゲーム内NPCにクローンしよう。',
   'hudChrome.voiceNpc.disabled': 'ボイスNPCの解放はまだ利用できません。',
   'hudChrome.voiceNpc.consentLabel':

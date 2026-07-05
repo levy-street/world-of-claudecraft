@@ -5516,6 +5516,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_echo_of_you.completion': '你找到了。真心感謝你願意聽我說完。',
   'entities.quests.q_echo_of_you.objectives.0.label': '再次與回聲交談',
   'hudChrome.voiceNpc.title': '語音 NPC (WIP)',
+  'hudChrome.voiceNpc.wipBanner': 'WIP 草稿,並非最終 HUD 視窗。',
   'hudChrome.voiceNpc.intro': '燃燒 $WOC,把你的聲音複製成一個小小的遊戲內 NPC。',
   'hudChrome.voiceNpc.disabled': '語音 NPC 解鎖功能暫未開放。',
   'hudChrome.voiceNpc.consentLabel': '我同意由第三方 AI 語音服務複製我錄製的聲音。',

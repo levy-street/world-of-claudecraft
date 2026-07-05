@@ -1053,6 +1053,7 @@ export const zh_CN: EnTranslations = {
     },
     "voiceNpc": {
       "title": "语音 NPC (WIP)",
+      "wipBanner": "WIP 草稿,并非最终 HUD 窗口。",
       "intro": "燃烧 $WOC,把你的声音克隆成一个小小的游戏内 NPC。",
       "priceLabel": "价格: {price} $WOC",
       "disabled": "语音 NPC 解锁功能暂未开放。",

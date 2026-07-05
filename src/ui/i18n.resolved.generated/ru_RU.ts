@@ -1053,6 +1053,7 @@ export const ru_RU: EnTranslations = {
     },
     "voiceNpc": {
       "title": "Голосовой NPC (WIP)",
+      "wipBanner": "Черновик в разработке, не финальное окно HUD.",
       "intro": "Сожгите $WOC, чтобы клонировать свой голос в небольшого игрового NPC.",
       "priceLabel": "Цена: {price} $WOC",
       "disabled": "Разблокировка голосового NPC пока недоступна.",

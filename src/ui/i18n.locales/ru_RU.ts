@@ -5948,6 +5948,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_echo_of_you.completion': 'Ты нашел это. Спасибо тебе, что выслушал меня.',
   'entities.quests.q_echo_of_you.objectives.0.label': 'Снова поговорить с Эхо',
   'hudChrome.voiceNpc.title': 'Голосовой NPC (WIP)',
+  'hudChrome.voiceNpc.wipBanner': 'Черновик в разработке, не финальное окно HUD.',
   'hudChrome.voiceNpc.intro':
     'Сожгите $WOC, чтобы клонировать свой голос в небольшого игрового NPC.',
   'hudChrome.voiceNpc.disabled': 'Разблокировка голосового NPC пока недоступна.',

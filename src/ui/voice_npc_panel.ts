@@ -15,7 +15,7 @@
 
 import { voice } from '../game/voice';
 import { esc } from './esc';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 
 export interface VoiceNpcApiDeps {
   token: string;
@@ -265,10 +265,10 @@ export class VoiceNpcPanel {
     const s = this.state;
     this.root.innerHTML = `
       <div class="voice-npc-panel-inner">
-        <p class="voice-npc-wip">WIP draft, not a final HUD window.</p>
+        <p class="voice-npc-wip">${esc(t('hudChrome.voiceNpc.wipBanner'))}</p>
         <h2>${esc(t('hudChrome.voiceNpc.title'))}</h2>
         <p>${esc(t('hudChrome.voiceNpc.intro'))}</p>
-        ${info ? `<p>${esc(t('hudChrome.voiceNpc.priceLabel', { price: info.priceWoc }))}</p>` : ''}
+        ${info ? `<p>${esc(t('hudChrome.voiceNpc.priceLabel', { price: formatNumber(info.priceWoc) }))}</p>` : ''}
         <label>
           ${esc(t('hudChrome.voiceNpc.displayNameLabel'))}
           <input id="voice-npc-name" type="text" maxlength="32"

@@ -1053,6 +1053,7 @@ export const ja_JP: EnTranslations = {
     },
     "voiceNpc": {
       "title": "ボイスNPC (WIP)",
+      "wipBanner": "WIPドラフト版、最終的なHUDウィンドウではありません。",
       "intro": "$WOCをバーンして、あなたの声を小さなゲーム内NPCにクローンしよう。",
       "priceLabel": "価格: {price} $WOC",
       "disabled": "ボイスNPCの解放はまだ利用できません。",

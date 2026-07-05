@@ -5823,6 +5823,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_echo_of_you.completion': '찾아주었구나. 내 이야기를 들어줘서 진심으로 고맙다.',
   'entities.quests.q_echo_of_you.objectives.0.label': '에코와 다시 대화하기',
   'hudChrome.voiceNpc.title': '보이스 NPC (WIP)',
+  'hudChrome.voiceNpc.wipBanner': 'WIP 초안이며, 최종 HUD 창이 아닙니다.',
   'hudChrome.voiceNpc.intro': '$WOC를 소각하여 당신의 목소리를 작은 게임 내 NPC로 복제하세요.',
   'hudChrome.voiceNpc.disabled': '보이스 NPC 잠금 해제는 아직 이용할 수 없습니다.',
   'hudChrome.voiceNpc.consentLabel':

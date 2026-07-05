@@ -1177,6 +1177,7 @@ export const hudChromeStrings = {
   // WIP record-and-burn entry point, not the final HUD window.
   voiceNpc: {
     title: 'Voice NPC (WIP)',
+    wipBanner: 'WIP draft, not a final HUD window.',
     intro: 'Burn $WOC to clone your voice into a small in-game NPC.',
     priceLabel: 'Price: {price} $WOC',
     disabled: 'Voice NPC unlocking is not available yet.',

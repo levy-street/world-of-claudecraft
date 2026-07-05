@@ -57,7 +57,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "es_ES": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -107,7 +108,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "fr_FR": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -157,7 +159,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "fr_CA": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -207,7 +210,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "en_CA": [],
   "it_IT": [
@@ -258,7 +262,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "de_DE": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -308,7 +313,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "zh_CN": [
     "entities.npcs.voice_echo_npc.name",
@@ -374,7 +380,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "ru_RU": [
     "entities.npcs.voice_echo_npc.name",
@@ -428,7 +435,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "pl_PL": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -478,7 +486,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "id_ID": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -528,7 +537,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "tr_TR": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -578,7 +588,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "sv_SE": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -628,7 +639,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "vi_VN": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -678,7 +690,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ],
   "da_DK": [
     "entities.npcs.voice_echo_npc.greeting",
@@ -728,6 +741,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.voiceNpc.statusPollFailed",
     "hudChrome.voiceNpc.statusReady",
     "hudChrome.voiceNpc.title",
-    "hudChrome.voiceNpc.uploadError"
+    "hudChrome.voiceNpc.uploadError",
+    "hudChrome.voiceNpc.wipBanner"
   ]
 };
