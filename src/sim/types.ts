@@ -556,6 +556,10 @@ export interface MobTemplate {
   // Rare/miniboss controls.
   canSwim?: boolean;
   ccImmune?: boolean;
+  // Immune to movement-speed slow auras (kind 'slow'). Distinct from ccImmune, which
+  // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
+  // leaves snares landing so most elites can still be kited; a raid boss sets both.
+  slowImmune?: boolean;
   respawnMult?: number;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {

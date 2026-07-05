@@ -820,6 +820,9 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     elite: true,
     canSwim: false,
     ccImmune: true,
+    // A raid boss cannot be perma-snared by a wall of Frostbolts / Hamstrings: slows do
+    // not stick to him (ccImmune already blocks stun/root/etc; slow is separate).
+    slowImmune: true,
     // Raid-tier health: ~20k base at level 20, ~44k after the elite multiplier, a
     // sustained fight for a gathered raid, far above the solo/small-group rares
     // (Varkas and Bound Guardian scale the same way from ~2k / ~1.3k base).
@@ -854,14 +857,16 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       school: 'nature',
     },
     // Howling Gale: the anti-kite snare. Gale-force winds pin every player within 40yd
-    // to 20% move speed for 6s, re-slammed every 5s (so uptime is permanent while you
+    // to 70% move speed for 6s, re-slammed every 5s (so uptime is permanent while you
     // stand in the storm, and the snare lingers if you flee the radius). Unlike the
     // other pulses this one also fires while Thunzharr is CHASING, so a hunter whose
     // run speed (7) outpaces the boss (5.8) can no longer kite it forever: once snared
-    // to 1.4yd/s the boss closes and the melee, Thunderclap, and Stomp come online.
+    // to 4.9yd/s the boss (5.8) still closes and the melee, Thunderclap, and Stomp come
+    // online. A gentle 30% snare, not a hard 80% one: it denies a permanent kite without
+    // rooting the raid in place.
     aoeSlow: {
       radius: 40,
-      mult: 0.2,
+      mult: 0.7,
       duration: 6,
       every: 5,
       name: 'Howling Gale',
@@ -920,7 +925,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'soulflame_cord', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
       { itemId: 'stormcallers_waistguard', chance: 0.08, rollGroup: 'thunzharr_t2_belt' },
     ],
-    scale: 50, // rendered mountain-sized so he reads as a world boss on the skyline. Visual scale is DECOUPLED from combat reach: his melee is pinned to a ~17yd body in combatProfileForMob (mob_combat.ts), so the Howling Gale snare, not a giant swing, is what keeps him unkitable.
+    scale: 8, // a large, imposing world boss that reads on the skyline without being mountain-sized. Visual scale is DECOUPLED from combat reach: his melee is pinned to a ~17yd (scale-5) body in combatProfileForMob (mob_combat.ts), so the Howling Gale snare, not a giant swing, is what keeps him unkitable.
     color: 0x7d8a99,
   },
   // Stormlings: lesser storm elementals Thunzharr tears loose from itself at the

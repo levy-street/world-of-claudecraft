@@ -1,4 +1,4 @@
-// Before/after screenshots of the Thunzharr world-boss size buff (scale 1.7 -> 3.4).
+// Before/after screenshots of the Thunzharr world-boss size rebalance (scale 50 -> 8).
 // Offline single-player; needs the dev server. Force-spawns the boss, pins it at its
 // spawn, frames it from a fixed grounded vantage, and captures both sizes by toggling
 // the live entity scale (same camera). Writes docs/screenshots/thunzharr-size-{before,after}.png.
@@ -107,13 +107,13 @@ async function shot(scale, name) {
   console.log(`shot ${name}: scale ${scale}`);
 }
 
-// "After" = the boss at its actual (current) template scale; "before" = an old 1.7x.
+// "After" = the boss at its actual (current) template scale (8); "before" = the old 50x.
 const spawnedScale = await page.evaluate(
   () => window.__game.sim.entities.get(window.__BOSS_ID).scale,
 );
 console.log('spawned (after) scale:', spawnedScale);
 await shot(spawnedScale, 'thunzharr-size-after');
-await shot(1.7, 'thunzharr-size-before');
+await shot(50, 'thunzharr-size-before');
 
 await browser.close();
 console.log('done');

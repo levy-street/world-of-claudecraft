@@ -3589,6 +3589,16 @@ export class Sim {
       !this.isNythraxisScriptedControl(target, aura)
     )
       return;
+    // Slow immunity is separate from ccImmune: snares (kind 'slow') are not control auras,
+    // so a slowImmune raid boss shrugs off Frostbolt/Hamstring-style movement snares while
+    // still taking a self-applied slow (e.g. a scripted mechanic) through sourceId === self.
+    if (
+      target.kind === 'mob' &&
+      MOBS[target.templateId]?.slowImmune &&
+      aura.kind === 'slow' &&
+      aura.sourceId !== target.id
+    )
+      return;
     const existing = target.auras.findIndex(
       (a) => a.id === aura.id && a.sourceId === aura.sourceId,
     );
