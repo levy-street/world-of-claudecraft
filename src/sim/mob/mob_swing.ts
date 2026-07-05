@@ -506,8 +506,8 @@ export function runMobSwingAffixes(
     ctx.rng.chance(knockback.chance)
   ) {
     // Keep the chance draw unconditional for parity draw-order stability.
-    const resisted = knockback.distance * (1 - target.knockbackResistance);
-    if (ctx.applyKnockback(mob, target, resisted) > 0) {
+    // applyKnockback applies target.knockbackResistance itself, so pass raw distance.
+    if (ctx.applyKnockback(mob, target, knockback.distance) > 0) {
       const school = (knockback.school ?? 'physical') as Aura['school'];
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: target.id, school, fx: 'nova' });
       ctx.emit({

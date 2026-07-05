@@ -59,8 +59,8 @@ const AGILITY_T1_BONUSES: SetBonusTier[] = [
 const CASTER_T1_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1 },
-    text: 'You cannot be knocked back (100% knockback resistance).',
+    effect: { knockbackResistance: 1, sp: 20 },
+    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
   },
   {
     pieces: 3,
@@ -88,8 +88,8 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
 const CASTER_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1 },
-    text: 'You cannot be knocked back (100% knockback resistance).',
+    effect: { knockbackResistance: 1, sp: 20 },
+    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
   },
   {
     pieces: 3,
@@ -161,6 +161,7 @@ export interface AggregatedSetEffect {
   int: number;
   spi: number;
   ap: number;
+  sp: number;
   crit: number;
   haste: number;
   castPushbackReduction: number;
@@ -175,6 +176,7 @@ function zeroEffect(): AggregatedSetEffect {
     int: 0,
     spi: 0,
     ap: 0,
+    sp: 0,
     crit: 0,
     haste: 0,
     castPushbackReduction: 0,
@@ -200,6 +202,7 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
       out.int += e.int ?? 0;
       out.spi += e.spi ?? 0;
       out.ap += e.ap ?? 0;
+      out.sp += e.sp ?? 0;
       out.crit += e.crit ?? 0;
       out.haste += e.haste ?? 0;
       if (e.castPushbackReduction != null) {

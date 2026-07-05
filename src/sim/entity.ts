@@ -214,6 +214,7 @@ export function recalcPlayerStats(
   s.sta += setEff.sta;
   s.int += setEff.int;
   s.spi += setEff.spi;
+  bonusSp += setEff.sp; // caster set 2-piece spell power (mirrors setEff.ap for melee)
   // Buff auras
   let bonusAp = setEff.ap;
   let bonusDodge = 0;
