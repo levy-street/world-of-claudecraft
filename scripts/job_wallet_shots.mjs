@@ -33,9 +33,27 @@ await page.waitForSelector('#btn-offline', { timeout: 15000 });
 await page.evaluate(() => document.querySelector('#btn-offline').click());
 await sleep(200);
 await page.type('#char-name', 'Helper');
-await page.click('#offline-select .mini-class[data-class="warrior"]');
-await page.click('#btn-start-offline');
-await sleep(2600);
+await page.evaluate(() =>
+  document.querySelector('#offline-select .mini-class[data-class="warrior"]').click(),
+);
+await page.evaluate(() => document.querySelector('#btn-start-offline').click());
+await page.waitForFunction(
+  () =>
+    window.__game?.sim?.player &&
+    getComputedStyle(document.querySelector('#ui')).display !== 'none',
+  { timeout: 120000 },
+);
+await sleep(600);
+
+// Seed a verified preview balance through the real module seam (vite serves the
+// same module instance the app imported), so the bag renders the wallet chip
+// exactly as it does for a linked holder. UI-state seeding only: no wallet, no
+// keys, no network.
+await page.evaluate(async () => {
+  const wb = await import('/src/ui/wallet_balance.ts');
+  wb.setWalletUiEnabled(true);
+  wb.setWocBalance(125000.42, true);
+});
 
 // 1) The bag, showing the clickable wallet balance chip (the panel's entry point).
 //    Normalize the inline display first: toggleBags() opens only from 'none'.
