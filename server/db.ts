@@ -623,6 +623,25 @@ CREATE TABLE IF NOT EXISTS name_reservations (
 CREATE UNIQUE INDEX IF NOT EXISTS name_reservations_active
   ON name_reservations(realm, lower(name)) WHERE status = 'active';
 CREATE INDEX IF NOT EXISTS name_reservations_account ON name_reservations(account_id);
+-- SNS subdomains + tradeable characters (PRD: docs/prd/woc/sns-tradeable-characters.md).
+-- A character may be bound to a player-owned label.worldofclaudecraft.sol
+-- subdomain; when CHARACTER_TRADEABLE is on, on-chain ownership of that
+-- subdomain decides who controls the character (selling the name sells the
+-- character). The table mirrors issued mints for audit; the chain is truth.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS bound_domain TEXT;
+CREATE INDEX IF NOT EXISTS characters_bound_domain ON characters(realm, bound_domain);
+CREATE TABLE IF NOT EXISTS sns_subdomains (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  character_id INT REFERENCES characters(id) ON DELETE SET NULL,
+  label TEXT NOT NULL,
+  full_domain TEXT NOT NULL UNIQUE,
+  owner_pubkey TEXT NOT NULL,
+  tx_sig TEXT NOT NULL,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS sns_subdomains_account ON sns_subdomains(account_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -1818,6 +1837,10 @@ export interface CharacterRow {
   state: CharacterState | null;
   is_gm: boolean;
   force_rename: boolean;
+  // The label.worldofclaudecraft.sol subdomain this character is bound to when
+  // tradeable (PRD sns-tradeable-characters). Only populated by reads that
+  // select it (getCharacter, getCharacterById); undefined elsewhere.
+  bound_domain?: string | null;
   last_played?: Date | string | null;
   playtime_seconds?: string | number | null;
 }
@@ -1868,7 +1891,7 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, bound_domain FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;
@@ -1890,10 +1913,82 @@ export async function listCharacterNamesForSitemap(limit = 50000): Promise<strin
 // the same shape as getCharacter so the sheet normalizer treats both alike.
 export async function getCharacterById(characterId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND realm = $2',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, bound_domain FROM characters WHERE id = $1 AND realm = $2',
     [characterId, REALM],
   );
   return res.rows[0] ?? null;
+}
+
+// ── SNS subdomains + character binding / claim ──────────────────────────────
+
+// Record an issued, player-owned subdomain and bind it to the character in one
+// transaction so a character is never half-bound. UNIQUE(full_domain) makes
+// the chain's subdomain uniqueness our uniqueness too.
+export async function recordSubdomainAndBind(row: {
+  accountId: number;
+  characterId: number;
+  label: string;
+  fullDomain: string;
+  ownerPubkey: string;
+  txSig: string;
+}): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `INSERT INTO sns_subdomains (account_id, character_id, label, full_domain, owner_pubkey, tx_sig, realm)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        row.accountId,
+        row.characterId,
+        row.label,
+        row.fullDomain,
+        row.ownerPubkey,
+        row.txSig,
+        REALM,
+      ],
+    );
+    await client.query(
+      'UPDATE characters SET bound_domain = $3, updated_at = now() WHERE id = $1 AND account_id = $2 AND realm = $4',
+      [row.characterId, row.accountId, row.fullDomain, REALM],
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Reassign a bound character to a new account (a completed on-chain subdomain
+// transfer). Also re-points the subdomain mirror row so audit history follows
+// the asset. Returns the moved character, or null if it vanished.
+export async function reassignCharacterAccount(
+  characterId: number,
+  newAccountId: number,
+): Promise<CharacterRow | null> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const res = await client.query(
+      `UPDATE characters SET account_id = $2, updated_at = now()
+       WHERE id = $1 AND realm = $3
+       RETURNING id, account_id, name, class, level, state, is_gm, force_rename, bound_domain`,
+      [characterId, newAccountId, REALM],
+    );
+    await client.query('UPDATE sns_subdomains SET account_id = $2 WHERE character_id = $1', [
+      characterId,
+      newAccountId,
+    ]);
+    await client.query('COMMIT');
+    return res.rows[0] ?? null;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function findCharacterReportTargetByName(

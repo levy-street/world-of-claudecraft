@@ -106,6 +106,41 @@ export async function getLatestBlockhash(): Promise<string | null> {
 }
 
 /**
+ * Raw account lookup at finalized commitment. Distinguishes the three cases
+ * callers need: `null` = RPC failure (unknown, retry), `{ exists: false }` =
+ * no account at that address, `{ exists: true, data }` = the account's bytes.
+ */
+export async function getAccountInfoResult(
+  address: string,
+): Promise<{ exists: boolean; data: Uint8Array } | null> {
+  try {
+    const r = await rpc('getAccountInfo', [
+      address,
+      { encoding: 'base64', commitment: 'finalized' },
+    ]);
+    if (!r || typeof r !== 'object' || !('value' in r)) return null;
+    const value = (r as { value: unknown }).value;
+    if (value === null) return { exists: false, data: new Uint8Array(0) };
+    const b64 = (value as { data?: unknown })?.data;
+    const raw = Array.isArray(b64) && typeof b64[0] === 'string' ? b64[0] : null;
+    if (raw === null) return null;
+    return { exists: true, data: new Uint8Array(Buffer.from(raw, 'base64')) };
+  } catch {
+    return null;
+  }
+}
+
+/** Rent-exempt minimum (lamports) for an account of `space` bytes; null on failure. */
+export async function getRentExemptLamports(space: number): Promise<bigint | null> {
+  try {
+    const r = await rpc('getMinimumBalanceForRentExemption', [space]);
+    return typeof r === 'number' && Number.isFinite(r) && r >= 0 ? BigInt(Math.trunc(r)) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * The owner's largest token account for `mint` (base58 address), or null when
  * the owner holds no account for that mint. Used to point the client's burn or
  * transfer instruction at a real account instead of deriving the ATA.

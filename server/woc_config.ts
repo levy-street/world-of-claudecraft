@@ -32,6 +32,24 @@ export const SOLANA_RPC_URL = (
 // client-side burnChecked instruction (which is decimal-checked on-chain).
 export const WOC_DECIMALS = clampInt(process.env.WOC_DECIMALS, 6, 0, 18);
 
+// SNS subdomains + tradeable characters. Everything here is fail-closed and
+// stays OFF until the project controls SNS_PARENT_DOMAIN and configures the
+// execution wallet. WOC_SNS_ENABLED turns on subdomain minting (the /api/
+// subdomain routes 404 while off); CHARACTER_TRADEABLE additionally makes a
+// bound character's controller follow on-chain subdomain ownership.
+export const WOC_SNS_ENABLED = boolEnv(process.env.WOC_SNS_ENABLED, false);
+export const CHARACTER_TRADEABLE = boolEnv(process.env.CHARACTER_TRADEABLE, false);
+// The project-owned parent domain subdomains are minted under (with or without
+// the trailing .sol; server/sns.ts normalizes to the bare label).
+export const SNS_PARENT_DOMAIN = (process.env.SNS_PARENT_DOMAIN ?? 'worldofclaudecraft.sol')
+  .trim()
+  .toLowerCase();
+// base58-encoded secret key of the execution wallet that owns SNS_PARENT_DOMAIN
+// and co-signs subdomain creation. The one custodial seam (it never touches
+// player funds): store it encrypted at rest, never in git. Empty in dev keeps
+// the signer unavailable, so mint paths refuse instead of using a bogus key.
+export const EXECUTION_WALLET_SECRET = (process.env.EXECUTION_WALLET_SECRET ?? '').trim();
+
 // Sink routing. By default 100% of a payment is burned (a clean deflationary
 // sink). Set WOC_BURN_BPS < 10000 and WOC_TREASURY to split the remainder to a
 // treasury address. Always: burned + treasury-credited must cover the price.
@@ -56,12 +74,13 @@ export function wocToBase(human: number): bigint {
 
 // Feature prices in human $WOC (env-overridable; placeholders, tune before any
 // mainnet launch). Each is also exposed in base units.
-export type WocPriceKey = 'rename_character' | 'rename_guild' | 'reserve_name';
+export type WocPriceKey = 'rename_character' | 'rename_guild' | 'reserve_name' | 'mint_subdomain';
 
 const PRICE_HUMAN: Record<WocPriceKey, number> = {
   rename_character: numEnv(process.env.WOC_PRICE_RENAME_CHARACTER, 500),
   rename_guild: numEnv(process.env.WOC_PRICE_RENAME_GUILD, 2500),
   reserve_name: numEnv(process.env.WOC_PRICE_RESERVE, 1000),
+  mint_subdomain: numEnv(process.env.WOC_PRICE_SUBDOMAIN, 1000),
 };
 
 export function wocPriceHuman(key: WocPriceKey): number {
