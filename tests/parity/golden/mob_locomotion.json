@@ -11,13 +11,13 @@
     "evade arm arrival -> resetEvadingMob (rng.range(2,8), full-heal, clearThreat, telegraph re-arm)",
     "cowardly flee: maybeFlee at FLEE_HP_THRESHOLD -> flee arm (fleeMoveSpeed run-away)"
   ],
-  "draws": 16,
-  "drawDigest": "4b7ddb75",
+  "draws": 14,
+  "drawDigest": "44107fce",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
+      "nextId": 428,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -31,12 +31,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 402,
-      "state": "c1ed6c27",
-      "events": "db5eca97",
+      "nextId": 430,
+      "state": "fc2f4610",
+      "events": "dcb61911",
       "rng": {
         "draws": 4,
-        "digest": "65f0173a"
+        "digest": "1131bdb2"
       },
       "label": "aoe-pulse",
       "players": [
@@ -53,12 +53,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 56
+            "damageTaken": 66
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -88,8 +88,8 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999944,
-          "id": 400,
+          "hp": 999934,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -106,7 +106,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 6.222222,
+          "resource": 7.333333,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -130,7 +130,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -140,7 +140,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -179,12 +179,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 403,
-      "state": "8012916a",
-      "events": "c189aee6",
+      "nextId": 431,
+      "state": "a5fe6a0f",
+      "events": "92b111ca",
       "rng": {
         "draws": 8,
-        "digest": "284b8111"
+        "digest": "3cc4037f"
       },
       "label": "war-stomp",
       "players": [
@@ -201,12 +201,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 194
+            "damageTaken": 199
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -238,7 +238,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 402
+              "sourceId": 430
             }
           ],
           "comboUntil": -1,
@@ -247,8 +247,8 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999862,
-          "id": 400,
+          "hp": 999867,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -265,7 +265,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 10.822222,
+          "resource": 11.766667,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -289,7 +289,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -299,7 +299,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -334,7 +334,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -344,7 +344,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 402,
+          "id": 430,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -382,12 +382,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 404,
-      "state": "88e77c2a",
-      "events": "afd10509",
+      "nextId": 432,
+      "state": "cc95c177",
+      "events": "a1cdeb8d",
       "rng": {
-        "draws": 13,
-        "digest": "06ceb9a6"
+        "draws": 11,
+        "digest": "f3856eac"
       },
       "label": "terrify",
       "players": [
@@ -404,12 +404,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 309
+            "damageTaken": 225
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -441,7 +441,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 402
+              "sourceId": 430
             },
             {
               "breaksOnDamage": true,
@@ -451,8 +451,8 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 403,
-              "value": 2.042434
+              "sourceId": 431,
+              "value": 1.259429
             }
           ],
           "comboUntil": -1,
@@ -461,8 +461,8 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999885,
-          "id": 400,
+          "hp": 999974,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -479,7 +479,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 13.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -503,7 +503,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -513,7 +513,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -548,7 +548,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -558,7 +558,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 402,
+          "id": 430,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -592,7 +592,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -602,7 +602,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 403,
+          "id": 431,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -641,12 +641,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 405,
-      "state": "094615e5",
+      "nextId": 433,
+      "state": "5144e0b5",
       "events": "741638a5",
       "rng": {
-        "draws": 15,
-        "digest": "5adac73c"
+        "draws": 13,
+        "digest": "2ac3a4b9"
       },
       "label": "idle-wander",
       "players": [
@@ -663,12 +663,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 309
+            "damageTaken": 225
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -700,7 +700,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 402
+              "sourceId": 430
             },
             {
               "breaksOnDamage": true,
@@ -710,8 +710,8 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 403,
-              "value": 2.042434
+              "sourceId": 431,
+              "value": 1.259429
             }
           ],
           "comboUntil": -1,
@@ -720,8 +720,8 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999885,
-          "id": 400,
+          "hp": 999974,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -738,7 +738,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 13.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -762,7 +762,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -772,7 +772,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -807,7 +807,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -817,7 +817,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 402,
+          "id": 430,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -851,7 +851,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -861,7 +861,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 403,
+          "id": 431,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -902,12 +902,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.226092,
+          "facing": 2.665708,
           "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 404,
+          "id": 432,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -917,9 +917,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.968616,
-            "y": 58.180156,
-            "z": 300.136437
+            "x": 300.064138,
+            "y": 58.196791,
+            "z": 299.875556
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -932,9 +932,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 298.918529,
-            "y": 57.734603,
-            "z": 304.70153
+            "x": 301.981014,
+            "y": 58.128595,
+            "z": 296.156295
           },
           "wanderTimer": 30,
           "weapon": {
@@ -948,12 +948,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 406,
-      "state": "583c8992",
+      "nextId": 434,
+      "state": "0daadb86",
       "events": "741638a5",
       "rng": {
-        "draws": 16,
-        "digest": "4b7ddb75"
+        "draws": 14,
+        "digest": "44107fce"
       },
       "label": "evade-reset",
       "players": [
@@ -970,12 +970,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 309
+            "damageTaken": 225
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1007,7 +1007,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 402
+              "sourceId": 430
             },
             {
               "breaksOnDamage": true,
@@ -1017,8 +1017,8 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 403,
-              "value": 2.042434
+              "sourceId": 431,
+              "value": 1.259429
             }
           ],
           "comboUntil": -1,
@@ -1027,8 +1027,8 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999885,
-          "id": 400,
+          "hp": 999974,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1045,7 +1045,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 13.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1069,7 +1069,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1079,7 +1079,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1114,7 +1114,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1124,7 +1124,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 402,
+          "id": 430,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1158,7 +1158,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1168,7 +1168,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 403,
+          "id": 431,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1209,12 +1209,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.226092,
+          "facing": 2.665708,
           "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 404,
+          "id": 432,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1224,9 +1224,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.968616,
-            "y": 58.180156,
-            "z": 300.136437
+            "x": 300.064138,
+            "y": 58.196791,
+            "z": 299.875556
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1239,9 +1239,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 298.918529,
-            "y": 57.734603,
-            "z": 304.70153
+            "x": 301.981014,
+            "y": 58.128595,
+            "z": 296.156295
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1261,7 +1261,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 405,
+          "id": 433,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1285,7 +1285,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.771505,
+          "wanderTimer": 2.864317,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1297,12 +1297,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "e9a426a0",
-      "events": "89e78911",
+      "nextId": 435,
+      "state": "050616d0",
+      "events": "7c7fbacc",
       "rng": {
-        "draws": 16,
-        "digest": "4b7ddb75"
+        "draws": 14,
+        "digest": "44107fce"
       },
       "label": "flee-panic",
       "players": [
@@ -1319,12 +1319,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 309
+            "damageTaken": 225
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1356,7 +1356,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 402
+              "sourceId": 430
             },
             {
               "breaksOnDamage": true,
@@ -1366,8 +1366,8 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 403,
-              "value": 2.042434
+              "sourceId": 431,
+              "value": 1.259429
             }
           ],
           "comboUntil": -1,
@@ -1377,7 +1377,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 400,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1394,7 +1394,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 13.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1418,7 +1418,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1428,7 +1428,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1463,7 +1463,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1473,7 +1473,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 402,
+          "id": 430,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1507,7 +1507,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1517,7 +1517,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 403,
+          "id": 431,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1558,12 +1558,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.226092,
+          "facing": 2.665708,
           "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 404,
+          "id": 432,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1573,9 +1573,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.968616,
-            "y": 58.180156,
-            "z": 300.136437
+            "x": 300.064138,
+            "y": 58.196791,
+            "z": 299.875556
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1588,9 +1588,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 298.918529,
-            "y": 57.734603,
-            "z": 304.70153
+            "x": 301.981014,
+            "y": 58.128595,
+            "z": 296.156295
           },
           "wanderTimer": 30,
           "weapon": {
@@ -1610,7 +1610,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 405,
+          "id": 433,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1634,7 +1634,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.771505,
+          "wanderTimer": 2.864317,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1642,7 +1642,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "flee",
           "combatTimer": 99.05,
           "comboUntil": -1,
@@ -1655,7 +1655,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 406,
+          "id": 434,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1691,12 +1691,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "fd5bb20f",
+      "nextId": 435,
+      "state": "87d86267",
       "events": "741638a5",
       "rng": {
-        "draws": 16,
-        "digest": "4b7ddb75"
+        "draws": 14,
+        "digest": "44107fce"
       },
       "label": "flee-run",
       "players": [
@@ -1713,12 +1713,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 309
+            "damageTaken": 225
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -1750,7 +1750,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 402
+              "sourceId": 430
             },
             {
               "breaksOnDamage": true,
@@ -1760,8 +1760,8 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 403,
-              "value": 2.042434
+              "sourceId": 431,
+              "value": 1.259429
             }
           ],
           "comboUntil": -1,
@@ -1771,7 +1771,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 400,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1788,7 +1788,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 13.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1812,7 +1812,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1822,7 +1822,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1857,7 +1857,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1867,7 +1867,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 402,
+          "id": 430,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1901,7 +1901,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1911,7 +1911,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 403,
+          "id": 431,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1952,12 +1952,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.226092,
+          "facing": 2.665708,
           "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 404,
+          "id": 432,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1967,9 +1967,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.968616,
-            "y": 58.180156,
-            "z": 300.136437
+            "x": 300.064138,
+            "y": 58.196791,
+            "z": 299.875556
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -1982,9 +1982,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 298.918529,
-            "y": 57.734603,
-            "z": 304.70153
+            "x": 301.981014,
+            "y": 58.128595,
+            "z": 296.156295
           },
           "wanderTimer": 30,
           "weapon": {
@@ -2004,7 +2004,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 405,
+          "id": 433,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2028,7 +2028,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.771505,
+          "wanderTimer": 2.864317,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2036,7 +2036,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -2050,7 +2050,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 406,
+          "id": 434,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2086,12 +2086,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 407,
-      "state": "fd5bb20f",
+      "nextId": 435,
+      "state": "87d86267",
       "events": "741638a5",
       "rng": {
-        "draws": 16,
-        "digest": "4b7ddb75"
+        "draws": 14,
+        "digest": "44107fce"
       },
       "label": "final",
       "players": [
@@ -2108,12 +2108,12 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 309
+            "damageTaken": 225
           },
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 428,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -2145,7 +2145,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 402
+              "sourceId": 430
             },
             {
               "breaksOnDamage": true,
@@ -2155,8 +2155,8 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 403,
-              "value": 2.042434
+              "sourceId": 431,
+              "value": 1.259429
             }
           ],
           "comboUntil": -1,
@@ -2166,7 +2166,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 400,
+          "id": 428,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2183,7 +2183,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 17.211111,
+          "resource": 13.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2207,7 +2207,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2217,7 +2217,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 401,
+          "id": 429,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2252,7 +2252,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2262,7 +2262,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 402,
+          "id": 430,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2296,7 +2296,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2306,7 +2306,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 403,
+          "id": 431,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2347,12 +2347,12 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -0.226092,
+          "facing": 2.665708,
           "fallStartY": 58.188532,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 404,
+          "id": 432,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2362,9 +2362,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 299.968616,
-            "y": 58.180156,
-            "z": 300.136437
+            "x": 300.064138,
+            "y": 58.196791,
+            "z": 299.875556
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
@@ -2377,9 +2377,9 @@
           },
           "templateId": "forest_wolf",
           "wanderTarget": {
-            "x": 298.918529,
-            "y": 57.734603,
-            "z": 304.70153
+            "x": 301.981014,
+            "y": 58.128595,
+            "z": 296.156295
           },
           "wanderTimer": 30,
           "weapon": {
@@ -2399,7 +2399,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 405,
+          "id": 433,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2423,7 +2423,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 7.771505,
+          "wanderTimer": 2.864317,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2431,7 +2431,7 @@
           }
         },
         {
-          "aggroTargetId": 400,
+          "aggroTargetId": 428,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -2445,7 +2445,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 406,
+          "id": 434,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
