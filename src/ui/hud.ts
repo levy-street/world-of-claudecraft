@@ -16,7 +16,7 @@ import {
 import { voice, voiceDistanceGain } from '../game/voice';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
-import { preloadMechAssets } from '../render/characters/assets';
+import { ensureCreatorSkin, preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import {
   onPortraitsReady,
@@ -774,6 +774,7 @@ export class Hud {
   private optionsHooks: OptionsHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
+  private openMarketplaceHook: (() => void) | null = null;
   // Soft swear terms from the server (online only), masked in chat when the
   // player's "Filter Profanity" setting is on. Fed by main.ts from ClientWorld.
   private profanityWords: string[] = [];
@@ -3346,6 +3347,7 @@ export class Hud {
     world: () => this.sim,
     options: () => this.optionsHooks,
     bugReport: () => this.bugReportHooks,
+    marketplace: () => this.openMarketplaceHook,
     keybinds: () => this.keybinds,
     slotActionName: (slot) => {
       const ability = this.abilityForSlot(slot);
@@ -3452,11 +3454,15 @@ export class Hud {
   });
 
   private drawPlayerFramePortrait(): void {
-    this.portraits.drawClass(
-      $('#pf-portrait') as unknown as HTMLCanvasElement,
-      this.sim.cfg.playerClass,
-      this.sim.player.skin ?? 0,
-    );
+    const canvas = $('#pf-portrait') as unknown as HTMLCanvasElement;
+    const cls = this.sim.cfg.playerClass;
+    const skin = this.sim.player.skin ?? 0;
+    const csk = this.sim.player.cosmeticSkinId ?? null;
+    this.portraits.drawClass(canvas, cls, skin, csk);
+    // A URL-atlas creator skin may not be resident on first paint; ensure it,
+    // then re-draw once (procedural designer skins are already synchronous).
+    if (csk)
+      void ensureCreatorSkin(csk).then(() => this.portraits.drawClass(canvas, cls, skin, csk));
   }
 
   // Redraw the target portrait canvas. Called by the unit_frame painter's repaint
@@ -9036,6 +9042,9 @@ export class Hud {
         : t('delveUi.board.openDelve');
       html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(openLabel)}</button>`;
     }
+    if (def?.creatorMarket && this.openMarketplaceHook) {
+      html += `<button type="button" class="qd-list-item" data-creator-market="1" aria-label="${esc(t('marketplace.title'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('marketplace.title'))}</button>`;
+    }
     el.innerHTML = html;
     el.querySelectorAll('[data-quest]').forEach((item) => {
       item.addEventListener('click', () =>
@@ -9060,6 +9069,10 @@ export class Hud {
     el.querySelector('[data-delve-board]')?.addEventListener('click', () => {
       this.closeQuestDialog(false);
       this.openDelveBoard(npc.id);
+    });
+    el.querySelector('[data-creator-market]')?.addEventListener('click', () => {
+      this.closeQuestDialog(false);
+      this.openMarketplaceHook?.();
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.closeQuestDialog());
     el.style.display = 'block';
@@ -9788,8 +9801,15 @@ export class Hud {
       this.sim.player.skin ?? 0,
       this.sim.player.skinCatalog ?? 'class',
     );
+    const csk = this.sim.player.cosmeticSkinId ?? null;
     if (preview.visualKey !== 'player_mech') {
-      this.mountCharPreview(container, this.sim.cfg.playerClass, preview.skin, preview.visualKey);
+      this.mountCharPreview(
+        container,
+        this.sim.cfg.playerClass,
+        preview.skin,
+        preview.visualKey,
+        csk,
+      );
       return;
     }
     if (!this.mechAssetsPromise) this.mechAssetsPromise = preloadMechAssets();
@@ -9809,6 +9829,7 @@ export class Hud {
             this.sim.cfg.playerClass,
             currentPreview.skin,
             currentPreview.visualKey,
+            this.sim.player.cosmeticSkinId ?? null,
           );
         }
       })
@@ -9823,6 +9844,7 @@ export class Hud {
     cls: PlayerClass,
     skin: number,
     previewKey?: string,
+    creatorSkinId: string | null = null,
   ): void {
     if (!this.charPreviewCanvas) this.charPreviewCanvas = document.createElement('canvas');
     if (!this.charPreview) {
@@ -9844,6 +9866,14 @@ export class Hud {
       this.charPreview.setClass(cls, weapon);
     }
     this.charPreview.setSkin(skin);
+    // Overlay the equipped marketplace creator skin so the paper-doll matches
+    // the in-world avatar (procedural designer skins build synchronously; a
+    // URL atlas is ensured by the in-world renderer before the sheet opens).
+    if (creatorSkinId) {
+      void ensureCreatorSkin(creatorSkinId).then(() =>
+        this.charPreview?.setCreatorSkin(creatorSkinId, skin),
+      );
+    }
   }
 
   private renderCharSkinPicker(): void {
@@ -12158,6 +12188,12 @@ export class Hud {
   // option (the offline browser world has no server to receive reports).
   attachBugReporting(hooks: BugReportHooks): void {
     this.bugReportHooks = hooks;
+  }
+
+  // Wired by main.ts only when online: opens the creator-skins marketplace
+  // overlay. Gates whether the Game Menu shows the entry at all.
+  attachMarketplace(open: () => void): void {
+    this.openMarketplaceHook = open;
   }
 
   get optionsOpen(): boolean {

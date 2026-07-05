@@ -22,6 +22,9 @@ function regexRoutes(): { pattern: RegExp; sample: string }[] {
     const sample = body
       .replaceAll('\\/', '/')
       .replaceAll('(\\d+)', '123')
+      // Opaque-id segments (creator-skin ids etc.) get a representative sample.
+      .replaceAll('([A-Za-z0-9_-]+)', 'abc123')
+      .replaceAll('([^/]+)', 'abc123')
       // Alternation groups keep their first branch, e.g. (suspend|unsuspend|...).
       .replace(/\(([a-z-]+)(?:\|[a-z-]+)+\)/g, '$1');
     return { pattern, sample };

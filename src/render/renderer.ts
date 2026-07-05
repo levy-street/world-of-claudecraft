@@ -40,7 +40,12 @@ import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import { characterSoulRendActive } from './character_effects';
 import { type AnimState, type CharacterVisual, createCharacterVisual } from './characters';
-import { mechAssetsReady, preloadMechAssets } from './characters/assets';
+import {
+  creatorSkinPortraitUrl,
+  ensureCreatorSkin,
+  mechAssetsReady,
+  preloadMechAssets,
+} from './characters/assets';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
@@ -482,6 +487,7 @@ export interface EntityView {
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
+  creatorSkinId: string | null; // last-rendered creator-skin overlay id; diffed alongside skin
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
@@ -489,6 +495,7 @@ export interface EntityView {
   /** what removeView pulls back out of clickTargets */
   clickTarget: THREE.Object3D;
   nameplate: HTMLDivElement;
+  npAvatar: HTMLDivElement; // overhead 2D PFP avatar for an equipped NFT skin (peers); hidden otherwise
   nameEl: HTMLDivElement;
   guildEl: HTMLDivElement; // <Guild> tag under the name (players only)
   hpBar: HTMLDivElement;
@@ -3347,6 +3354,13 @@ export class Renderer {
     tierEl.className = 'np-tier';
     tierEl.alt = '';
     tierEl.style.display = 'none';
+    // Overhead 2D PFP avatar for an equipped NFT-PFP skin (so peers see the exact
+    // art above the head). Painted from the registry portrait url only when the
+    // cosmetic id changes (in the skin-swap block); hidden for every other skin.
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'np-avatar';
+    avatarEl.style.cssText =
+      'display:none;width:30px;height:30px;margin:0 auto 2px;border-radius:50%;background-size:cover;background-position:center;border:2px solid rgba(202,168,75,0.9);box-shadow:0 1px 3px rgba(0,0,0,0.6);';
     // developer-badge flair, shown inline before the name for other players
     const devTierEl = document.createElement('img');
     devTierEl.className = 'np-dev-tier';
@@ -3391,6 +3405,7 @@ export class Renderer {
       tierEl,
       devTierEl,
       discordEl,
+      avatarEl,
       nameEl,
       guildEl,
       hpBar,
@@ -3435,6 +3450,7 @@ export class Renderer {
       height,
       clickTarget,
       nameplate: np,
+      npAvatar: avatarEl,
       nameEl,
       guildEl,
       hpBar,
@@ -3475,6 +3491,7 @@ export class Renderer {
       lastZ: e.pos.z,
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
+      creatorSkinId: null,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -3550,6 +3567,7 @@ export class Renderer {
     v.height = next.height;
     v.skin = e.skin;
     v.mainhandItemId = e.mainhandItemId; // next was built holding the current weapon
+    v.creatorSkinId = null; // the rebuilt visual starts numeric; the sync loop re-applies any overlay
     v.group.add(next.root);
   }
 
@@ -4200,10 +4218,34 @@ export class Renderer {
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
-      // live skin swap — appearance changed (in-game changer or a multiplayer peer)
-      if (e.skin !== v.skin) {
+      // live skin swap — appearance changed (in-game changer or a multiplayer peer).
+      // A creator-skin overlay (opaque id) takes precedence over the numeric skin;
+      // it loads lazily, so apply now (cached -> shows; uncached -> numeric
+      // fallback) and re-apply once ensureCreatorSkin resolves.
+      const csk = e.cosmeticSkinId ?? null;
+      if (e.skin !== v.skin || csk !== v.creatorSkinId) {
         v.skin = e.skin;
-        v.visual.setSkin(e.skin);
+        v.creatorSkinId = csk;
+        if (csk) {
+          v.visual.setCreatorSkin(csk, e.skin);
+          void ensureCreatorSkin(csk)
+            .then(() => {
+              if (v.visual && v.creatorSkinId === csk) v.visual.setCreatorSkin(csk, e.skin);
+            })
+            .catch(() => {}); // a failed CDN load leaves the numeric fallback; never an unhandled rejection
+        } else {
+          v.visual.setSkin(e.skin);
+        }
+        // Overhead PFP avatar: an NFT skin resolves to a 2D portrait url; any other
+        // (or no) skin clears it. Painted only here, on the cosmetic-id change.
+        const portraitUrl = csk ? creatorSkinPortraitUrl(csk) : null;
+        if (portraitUrl) {
+          v.npAvatar.style.backgroundImage = `url("${portraitUrl}")`;
+          v.npAvatar.style.display = 'block';
+        } else {
+          v.npAvatar.style.backgroundImage = '';
+          v.npAvatar.style.display = 'none';
+        }
       }
 
       // live held-weapon swap — equipped mainhand changed (self equip or a peer's

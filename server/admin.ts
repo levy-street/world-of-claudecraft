@@ -45,16 +45,21 @@ import {
   accountMailTarget,
   findAccount,
   isAdminAccount,
+  listCreatorSkinsForReview,
+  listNftCollections,
   pool,
   saveToken,
   setAccountDeactivated,
+  setNftCollectionEnabled,
   touchLogin,
+  upsertNftCollection,
 } from './db';
 import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import { PgMapsDb } from './maps_db';
+import { removeListing, reviewListing } from './marketplace';
 import {
   addAccountNote,
   forceCharacterRename,
@@ -438,6 +443,66 @@ export async function handleAdminApi(
       const body = await readBody(req);
       const ignored = await ignoreReport(Number(ignoreMatch[1]), accountId, body.note);
       return ignored ? ok(res, { ok: true }) : fail(res, 404, 'open report not found');
+    }
+    // Creator-skin review queue (image uploads awaiting approval).
+    if (req.method === 'GET' && path === '/admin/api/skins/review') {
+      return ok(res, { skins: await listCreatorSkinsForReview(100) });
+    }
+    const skinReviewMatch = /^\/admin\/api\/skins\/([A-Za-z0-9_-]+)\/(approve|reject|remove)$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && skinReviewMatch) {
+      const [, skinId, action] = skinReviewMatch;
+      const result =
+        action === 'remove'
+          ? await removeListing(skinId)
+          : await reviewListing(skinId, action as 'approve' | 'reject');
+      return result.ok ? ok(res, result) : fail(res, 404, result.reason ?? 'skin not found');
+    }
+    // NFT-PFP skin collection allow-list (the IP control). List, add/update, and
+    // enable/disable a collection. Disabling triggers an immediate re-sweep, which
+    // revokes every online holder's grant for the now-disabled collection.
+    if (req.method === 'GET' && path === '/admin/api/skins/collections') {
+      return ok(res, { collections: await listNftCollections() });
+    }
+    if (req.method === 'POST' && path === '/admin/api/skins/collections') {
+      const body = await readBody(req);
+      const chain = body.chain === 'ethereum' || body.chain === 'solana' ? body.chain : null;
+      const standard =
+        body.standard === 'erc721' || body.standard === 'cryptopunks' || body.standard === 'solana'
+          ? body.standard
+          : null;
+      const contractRaw = typeof body.contract === 'string' ? body.contract.trim() : '';
+      if (!chain || !standard || !contractRaw)
+        return fail(res, 400, 'chain, contract, and standard are required');
+      const contract = chain === 'ethereum' ? contractRaw.toLowerCase() : contractRaw;
+      const enabled = body.enabled !== false;
+      await upsertNftCollection({
+        chain,
+        contract,
+        name: typeof body.name === 'string' ? body.name : '',
+        standard,
+        profileId:
+          typeof body.profileId === 'string' && body.profileId ? body.profileId : 'generic',
+        licenseBasis: typeof body.licenseBasis === 'string' ? body.licenseBasis : '',
+        enabled,
+      });
+      if (!enabled) await game.resweepNftGrants();
+      return ok(res, { ok: true, chain, contract });
+    }
+    const collectionEnableMatch =
+      /^\/admin\/api\/skins\/collections\/(ethereum|solana)\/([^/]+)\/enabled$/.exec(path);
+    if (req.method === 'POST' && collectionEnableMatch) {
+      const [, chain, rawContract] = collectionEnableMatch;
+      const contract =
+        chain === 'ethereum'
+          ? decodeURIComponent(rawContract).toLowerCase()
+          : decodeURIComponent(rawContract);
+      const body = await readBody(req);
+      const enabled = body.enabled === true;
+      await setNftCollectionEnabled(chain, contract, enabled);
+      if (!enabled) await game.resweepNftGrants();
+      return ok(res, { ok: true, chain, contract, enabled });
     }
     const forceRenameMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/force-rename$/.exec(
       path,

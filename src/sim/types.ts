@@ -270,6 +270,11 @@ export const EQUIP_SLOTS: readonly EquipSlot[] = [
 ];
 
 export type SkinCatalog = 'class' | 'mech';
+// Max length of an opaque creator-skin id (Entity.cosmeticSkinId). A UUID fits
+// well under this; the cap keeps the field cheap on the wire and bounds the
+// state an unowned/forged id could occupy. Enforced at both the server equip
+// gate and the sim setter.
+export const MAX_COSMETIC_SKIN_ID_LEN = 64;
 
 export type ItemUse =
   | { type: 'fishing' }
@@ -1264,6 +1269,9 @@ export interface NpcDef {
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
+  // The Skin Artisan billboard: talking to this NPC opens the Creator Skins
+  // marketplace (buy/sell player-designed USDC cosmetics).
+  creatorMarket?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -1648,6 +1656,13 @@ export interface Entity {
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // Opaque creator-skin id (marketplace UGC). When non-null it overrides the
+  // numeric `skin` visually on the client; `skin`/`skinCatalog` remain the
+  // deterministic fallback if the id can't be resolved. The sim NEVER parses,
+  // resolves, validates, or branches on this string — it only stores and syncs
+  // it, exactly like `name`. Id→texture resolution + ownership live entirely in
+  // server/ + the client renderer; the sim stays pure. null = none.
+  cosmeticSkinId: string | null;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.

@@ -45,42 +45,52 @@ import {
   verifyPassword,
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import { buildBurnKeeper } from './burn_keeper';
 import { characterSheet, type SheetRank } from './character_sheet';
+import { hostedSlotQuota } from './creator_quota';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  burnLedger,
   type CharacterRow,
   characterCountsByRealm,
   chatMuteStatusForAccount,
   closeOrphanSessions,
+  countHostedSkinsByAccount,
   createAccount,
   createCharacterCapped,
   createCompanionToken,
   deleteCharacter,
   ensureSchema,
+  evmWalletForAccount,
   findAccount,
   findCharacterReportTargetByName,
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  getCreatorSkin,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
   listCharacters,
   listCompanionTokens,
+  listNftCollections,
   loadAccountCosmetics,
   moderationStatusForAccount,
   pool,
   primarySlugForAccount,
   pruneChatLogs,
   pruneClientPerfReports,
+  pruneMarketplaceQuotes,
   reclaimDeactivatedName,
   referralCountForAccount,
   renameCharacter,
   revokeCompanionToken,
+  revokeNftSkin,
+  revokeTokensExcept,
   saveToken,
   scopeAllowsMutation,
   searchCharacters,
@@ -90,6 +100,9 @@ import {
   topGuilds,
   topLifetimeXp,
   touchLogin,
+  updatePasswordHash,
+  walletForAccount,
+  withBurnKeeperLock,
 } from './db';
 import {
   type DesktopLoginRouteDeps,
@@ -133,16 +146,28 @@ import {
   mapsErrorStatus,
 } from './maps';
 import { PgMapsDb } from './maps_db';
+import {
+  createHostedListing,
+  createListing,
+  createSelfHostedListing,
+  evaluateCreatorTrust,
+  marketplaceEnabled,
+  quotePurchase,
+  registrySkins,
+  verifyPurchase,
+} from './marketplace';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
   createPlayerReport,
   createSuspiciousRegistrationReport,
 } from './moderation_db';
-import { createNativeAttestationChallenge } from './native_attestation';
+import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
+import { claimNftSkin, loadNftPortrait, seedNftCollections } from './nft_skins';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
+import { ipfsGatewayUrl, pinataEnabled } from './pinata';
 import {
   captureReferral,
   cardUploadContentLengthTooLarge,
@@ -168,6 +193,7 @@ import {
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
+import { loadAtlasBytes, MAX_SKIN_BYTES, sniffImageMime } from './skin_assets';
 import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
 import { passesTurnstile } from './turnstile';
@@ -184,8 +210,20 @@ import {
   handleWalletLink,
   handleWalletUnlink,
 } from './wallet';
-import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
-import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import {
+  handleEvmWalletChallenge,
+  handleEvmWalletGet,
+  handleEvmWalletLink,
+  handleEvmWalletUnlink,
+} from './wallet_evm';
+import {
+  allowedCorsOrigin,
+  isNativeAppRequest,
+  isWebClientRequest,
+  NATIVE_APP_ORIGINS,
+  webLoginEnforced,
+} from './web_login_guard';
+import { handleWocBalance, holderInfoForPubkey, parseWocBalanceQuery } from './woc_balance';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -219,6 +257,29 @@ const STATIC_PAGE_ALIASES = new Map([
 ]);
 // How long chat logs are kept (0 = forever); pruned at boot and daily.
 const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90);
+// How often the buy-and-burn keeper ticks. The keeper's own policy decides
+// whether a tick actually swaps (threshold/cadence); ticking more often just
+// reacts promptly once the cadence elapses. Default 5 min.
+const KEEPER_TICK_MS = Number(process.env.BURN_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+
+// The public marketplace reads (skin registry, burn ledger) are identical across
+// callers and change rarely (registry on curation, ledger on keeper ticks). Serve
+// from a short TTL cache so unbounded anonymous traffic can't put DB-query load on
+// the realm's Postgres pool — the query runs at most once per window per key.
+// (Same compute-once/serve-from-memory shape as the leaderboard + releases caches.)
+const PUBLIC_READ_TTL_MS = 30_000;
+const publicReadCache = new Map<string, { at: number; body: unknown }>();
+function cachedPublicRead(key: string, produce: () => Promise<unknown>): Promise<unknown> {
+  const hit = publicReadCache.get(key);
+  if (hit && Date.now() - hit.at < PUBLIC_READ_TTL_MS) return Promise.resolve(hit.body);
+  return produce().then((body) => {
+    publicReadCache.set(key, { at: Date.now(), body });
+    return body;
+  });
+}
+function invalidatePublicRead(key: string): void {
+  publicReadCache.delete(key);
+}
 // Client performance reports are operational telemetry, not permanent records.
 // Keep enough history for tuning runs while bounding table growth.
 const PERF_REPORT_RETENTION_DAYS = Number(process.env.PERF_REPORT_RETENTION_DAYS ?? 14);
@@ -1410,6 +1471,28 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
     }
+    // Non-custodial Ethereum/EVM wallet linking (for NFT-PFP skins) — mirror of
+    // the Solana routes; independent link, an account may hold both.
+    if (req.method === 'POST' && url === '/api/wallet/evm/link/challenge') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletChallenge(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/wallet/evm/link') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletLink(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/wallet/evm/link') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletUnlink(req, res, accountId);
+    }
+    if (req.method === 'GET' && url === '/api/wallet/evm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleEvmWalletGet(req, res, accountId);
+    }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
     // discord.com -> us redirect (no auth/Origin, so it is NOT gated by the
@@ -1525,6 +1608,305 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         primarySlugForAccount(accountId),
       ]);
       return json(res, 200, { count, slug });
+    }
+    // Creator skins marketplace. The registry is public cosmetic metadata; quote
+    // + buy are account-scoped and require a linked Solana wallet (the payer).
+    if (req.method === 'GET' && url === '/api/skins/registry') {
+      return json(
+        res,
+        200,
+        await cachedPublicRead('registry', async () => ({ skins: await registrySkins() })),
+      );
+    }
+    // Opaque atlas proxy for image skins (self-hosted + hosted). The origin URL /
+    // IPFS CID never reach the client; we stream the bytes. Rejected/removed skins
+    // 404; owners of a delisted/overflow-hidden skin still render (only sale is gated).
+    if (req.method === 'GET' && url.startsWith('/api/skins/') && url.endsWith('/atlas.png')) {
+      const id = decodeURIComponent(url.slice('/api/skins/'.length, -'/atlas.png'.length));
+      const skin = await getCreatorSkin(id);
+      if (
+        !skin ||
+        skin.source === 'design' ||
+        skin.reviewStatus === 'rejected' ||
+        skin.status === 'removed'
+      ) {
+        return json(res, 404, { error: 'not found' });
+      }
+      const bytes = await loadAtlasBytes({
+        key: skin.sha256 ?? skin.ipfsCid ?? skin.id,
+        originUrl: skin.source === 'self_hosted' ? skin.originUrl : null,
+        gatewayUrl: skin.source === 'hosted' && skin.ipfsCid ? ipfsGatewayUrl(skin.ipfsCid) : null,
+      }).catch(() => null);
+      if (!bytes) return json(res, 502, { error: 'atlas unavailable' });
+      res.writeHead(200, {
+        'Content-Type': 'image/png',
+        'Content-Length': bytes.length,
+        'Cache-Control': 'public, max-age=300',
+      });
+      res.end(bytes);
+      return;
+    }
+    // Opaque portrait proxy for NFT-PFP skins: the exact PFP image, shown 2D in the
+    // unit frame + nameplate. The token's chain/contract/origin never reach the
+    // client; we re-sniff the bytes (reject SVG / non-image) and serve same-origin.
+    if (req.method === 'GET' && url.startsWith('/api/skins/') && url.endsWith('/portrait.png')) {
+      const id = decodeURIComponent(url.slice('/api/skins/'.length, -'/portrait.png'.length));
+      const skin = await getCreatorSkin(id);
+      if (
+        !skin ||
+        skin.source !== 'nft' ||
+        skin.reviewStatus === 'rejected' ||
+        skin.status === 'removed'
+      ) {
+        return json(res, 404, { error: 'not found' });
+      }
+      const bytes = await loadNftPortrait(skin);
+      const mime = bytes ? sniffImageMime(bytes) : null;
+      if (!bytes || !mime) return json(res, 502, { error: 'portrait unavailable' });
+      res.writeHead(200, {
+        'Content-Type': mime,
+        'Content-Length': bytes.length,
+        'Cache-Control': 'public, max-age=300',
+      });
+      res.end(bytes);
+      return;
+    }
+    // NFT-PFP skins: enumerate the viewer's supported collections + linked wallets
+    // (owner-scoped, never public) so the picker can prompt for a token id.
+    if (req.method === 'GET' && url === '/api/skins/nft/eligible') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const [collections, evm, sol] = await Promise.all([
+        listNftCollections(true),
+        evmWalletForAccount(accountId),
+        walletForAccount(accountId),
+      ]);
+      return json(res, 200, {
+        wallets: { ethereum: evm?.address ?? null, solana: sol?.pubkey ?? null },
+        collections: collections.map((c) => ({
+          chain: c.chain,
+          contract: c.contract,
+          name: c.name,
+          standard: c.standard,
+        })),
+      });
+    }
+    // Claim an owned NFT as a skin: ownership-verified, trait-inferred, portrait-proxied.
+    if (req.method === 'POST' && url === '/api/skins/nft/claim') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      const body = await readBody(req);
+      const chain = typeof body.chain === 'string' ? body.chain : '';
+      const contract = typeof body.contract === 'string' ? body.contract : '';
+      const tokenId = typeof body.tokenId === 'string' ? body.tokenId : String(body.tokenId ?? '');
+      const result = await claimNftSkin({ accountId, chain, contract, tokenId });
+      if (!result.ok) {
+        const status =
+          result.reason === 'not_owner'
+            ? 403
+            : result.reason === 'ownership_unverified' || result.reason === 'metadata_unavailable'
+              ? 502
+              : 400;
+        return json(res, status, { error: result.reason });
+      }
+      invalidatePublicRead('registry');
+      game.applyCreatorSkinGrant(accountId, result.id);
+      return json(res, 200, { ok: true, id: result.id });
+    }
+    // Un-claim an NFT skin: drop the grant + force-unequip if worn. The skin row
+    // persists (re-claimable); only this account's ownership is removed.
+    if (req.method === 'DELETE' && url.startsWith('/api/skins/nft/')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const id = decodeURIComponent(url.slice('/api/skins/nft/'.length));
+      await revokeNftSkin(accountId, id);
+      game.revokeCreatorSkinLive(accountId, id);
+      return json(res, 200, { unclaimed: true });
+    }
+    // The viewer's hosting quota: tier, slots, usage, and trusted-creator badge —
+    // drives the designer's quota meter + Upload availability.
+    if (req.method === 'GET' && url === '/api/skins/quota') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const wallet = await walletForAccount(accountId);
+      const tier = wallet ? (await holderInfoForPubkey(wallet.pubkey)).tier : 0;
+      const quota = hostedSlotQuota(tier);
+      const used = await countHostedSkinsByAccount(accountId);
+      return json(res, 200, {
+        tier,
+        quota,
+        used,
+        remaining: Math.max(0, quota - used),
+        trusted: await evaluateCreatorTrust(accountId, tier),
+        hostingEnabled: pinataEnabled(),
+        selfHostedFree: true,
+      });
+    }
+    // Public, factual buy-and-burn ledger — completed burns + cumulative totals.
+    // No editorializing (PRD §8.2): raw amounts + explorer-verifiable tx sigs only.
+    if (req.method === 'GET' && url === '/api/marketplace/burn-ledger') {
+      const limit = Math.max(
+        1,
+        Math.min(
+          500,
+          Math.floor(
+            Number(new URLSearchParams((req.url ?? '').split('?')[1] ?? '').get('limit')) || 100,
+          ),
+        ),
+      );
+      const body = await cachedPublicRead(`burn-ledger:${limit}`, async () => {
+        const ledger = await burnLedger(limit);
+        return {
+          cumulativeWocBurned: ledger.cumulativeWocBurned.toString(),
+          cumulativeUsdcIn: ledger.cumulativeUsdcIn.toString(),
+          batches: ledger.batches.map((b) => ({
+            batchId: b.batchId,
+            source: b.source,
+            usdcIn: b.usdcIn.toString(),
+            wocBought: b.wocBought.toString(),
+            wocBurned: b.wocBurned.toString(),
+            buyTxSig: b.buyTxSig,
+            burnTxSig: b.burnTxSig,
+            executedAt: b.executedAt,
+          })),
+        };
+      });
+      return json(res, 200, body);
+    }
+    if (
+      req.method === 'POST' &&
+      url.startsWith('/api/marketplace/skins/') &&
+      url.endsWith('/quote')
+    ) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      if (!marketplaceEnabled()) return json(res, 503, { error: 'marketplace unavailable' });
+      const skinId = decodeURIComponent(
+        url.slice('/api/marketplace/skins/'.length, -'/quote'.length),
+      );
+      const skin = await getCreatorSkin(skinId);
+      // NFT skins are claimed (proof of ownership), never bought; they are not for sale.
+      if (!skin || skin.status !== 'live' || skin.source === 'nft')
+        return json(res, 404, { error: 'skin not for sale' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const quote = await quotePurchase(skin, accountId);
+      return json(res, 200, {
+        quoteId: quote.quoteId,
+        skinId: quote.skinId,
+        mint: quote.mint,
+        memo: quote.quoteId,
+        creator: { owner: quote.creatorOwner, amount: quote.creatorUsdc.toString() },
+        burn: { owner: quote.burnOwner, amount: quote.burnUsdc.toString() },
+        gross: (quote.creatorUsdc + quote.burnUsdc).toString(),
+        expiresAt: quote.expiresAt,
+      });
+    }
+    if (req.method === 'POST' && url === '/api/marketplace/buy') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      if (!marketplaceEnabled()) return json(res, 503, { error: 'marketplace unavailable' });
+      const body = await readBody(req);
+      const quoteId = typeof body.quoteId === 'string' ? body.quoteId : '';
+      const signature = typeof body.signature === 'string' ? body.signature : '';
+      if (!quoteId || !signature)
+        return json(res, 400, { error: 'quoteId and signature required' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const result = await verifyPurchase({
+        quoteId,
+        signature,
+        buyerAccountId: accountId,
+        buyerWallet: wallet.pubkey,
+      });
+      if (!result.ok) return json(res, 400, { error: result.reason });
+      game.applyCreatorSkinGrant(accountId, result.skinId);
+      return json(res, 200, { ok: true, skinId: result.skinId });
+    }
+    // Creator self-serve listing (the in-browser designer "Sell" path). Lists a
+    // procedural design 'live' under the creator's own linked wallet (the 70%
+    // payout dest), grants the creator their own creation, and freshens the
+    // public registry cache so it shows immediately.
+    if (req.method === 'POST' && url === '/api/marketplace/skins') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      const body = await readBody(req);
+      let priceUsdc: bigint;
+      try {
+        priceUsdc = BigInt(String(body.priceUsdc ?? ''));
+      } catch {
+        return json(res, 400, { error: 'invalid_price' });
+      }
+      const name = typeof body.name === 'string' ? body.name : '';
+      const description = typeof body.description === 'string' ? body.description : '';
+      const targetClass = typeof body.targetClass === 'string' ? body.targetClass : null;
+      if (body.source === 'self_hosted') {
+        const originUrl = typeof body.originUrl === 'string' ? body.originUrl : '';
+        const r = await createSelfHostedListing(
+          { name, description, priceUsdc, targetClass, originUrl },
+          accountId,
+          wallet.pubkey,
+        );
+        if (!r.ok) return json(res, 400, { error: r.reason });
+        invalidatePublicRead('registry');
+        game.applyCreatorSkinGrant(accountId, r.id); // creators own (and may preview) their own creation
+        return json(res, 200, { ok: true, id: r.id, reviewStatus: r.reviewStatus });
+      }
+      const result = await createListing(
+        { name, description, priceUsdc, design: body.design, targetClass },
+        accountId,
+        wallet.pubkey,
+      );
+      if (!result.ok) return json(res, 400, { error: result.reason });
+      invalidatePublicRead('registry');
+      game.applyCreatorSkinGrant(accountId, result.id);
+      return json(res, 200, { ok: true, id: result.id });
+    }
+    // Hosted (IPFS) upload: raw PNG body, metadata in the query string. Quota +
+    // review gated inside createHostedListing; pinned to IPFS via Pinata.
+    if (req.method === 'POST' && url === '/api/skins/upload') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (rateLimited(req)) return json(res, 429, { error: 'too many requests' });
+      if (!pinataEnabled()) return json(res, 503, { error: 'hosting_unavailable' });
+      const wallet = await walletForAccount(accountId);
+      if (!wallet) return json(res, 400, { error: 'link a Solana wallet first' });
+      if (Number(req.headers['content-length'] ?? '0') > MAX_SKIN_BYTES)
+        return json(res, 413, { error: 'too_large' });
+      const q = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
+      let priceUsdc: bigint;
+      try {
+        priceUsdc = BigInt(q.get('priceUsdc') ?? '');
+      } catch {
+        return json(res, 400, { error: 'invalid_price' });
+      }
+      let bytes: Buffer;
+      try {
+        bytes = await readBinaryBody(req, MAX_SKIN_BYTES);
+      } catch {
+        return json(res, 413, { error: 'too_large' });
+      }
+      const r = await createHostedListing(
+        {
+          name: q.get('name') ?? '',
+          description: q.get('description') ?? '',
+          priceUsdc,
+          targetClass: q.get('targetClass'),
+          bytes,
+        },
+        accountId,
+        wallet.pubkey,
+      );
+      if (!r.ok) return json(res, 400, { error: r.reason });
+      invalidatePublicRead('registry');
+      game.applyCreatorSkinGrant(accountId, r.id);
+      return json(res, 200, { ok: true, id: r.id, reviewStatus: r.reviewStatus });
     }
     // -----------------------------------------------------------------------
     // Map editor: saved custom maps. Every stored document is the output of
@@ -1744,6 +2126,9 @@ async function main(): Promise<void> {
   }
   await ensureSchema();
   await seedOAuthClients();
+  const seededCollections = await seedNftCollections();
+  if (seededCollections > 0)
+    console.log(`seeded ${seededCollections} NFT skin collection(s) from NFT_COLLECTIONS`);
   // Bot detector: replay this realm's saved config overrides onto the fresh
   // detector. Boot applies what it can; a stale entry (schema drift after a
   // deploy) is skipped and logged, never allowed to drop the whole document.
@@ -1784,6 +2169,11 @@ async function main(): Promise<void> {
       void pruneExpiredOAuthGrants(pool).catch((err) =>
         console.error('oauth grant prune failed:', err),
       );
+      // Reap expired marketplace quotes (verifyPurchase only deletes on access, so
+      // unbought quotes would otherwise accrue unbounded).
+      void pruneMarketplaceQuotes().catch((err) =>
+        console.error('marketplace quote prune failed:', err),
+      );
       void pruneDiscordOAuthStates(pool).catch((err) =>
         console.error('discord oauth state prune failed:', err),
       );
@@ -1809,6 +2199,33 @@ async function main(): Promise<void> {
       .then(() => game.disconnectBlockedSessions('Connection to the server was lost.'))
       .catch((err) => console.error('blocked IP refresh failed:', err));
   }, BLOCKED_IP_REFRESH_MS).unref();
+  // Buy-and-burn keeper: drain the marketplace burn vault (USDC -> $WOC -> SPL
+  // burn) on a cadence. runCycle recovers any in-flight batch first, so the boot
+  // call resolves a crash mid-burn before any new work. No-op unless configured
+  // (MARKETPLACE_BURN_VAULT + its signing secret).
+  const burnKeeper = buildBurnKeeper();
+  if (burnKeeper) {
+    // Two layers of mutual exclusion so the vault is never swapped twice at once:
+    // (1) keeperBusy — in-process single-flight, so a slow cycle can't overlap its
+    //     own next interval tick; (2) withBurnKeeperLock — a cross-process Postgres
+    //     advisory lock, so sibling realm processes sharing this vault + DB don't
+    //     each run a cycle. Either layer alone leaves a double-swap window open.
+    let keeperBusy = false;
+    const tick = async () => {
+      if (keeperBusy) return;
+      keeperBusy = true;
+      try {
+        await withBurnKeeperLock(() => burnKeeper.runCycle());
+      } catch (err) {
+        console.error('burn keeper cycle failed:', err);
+      } finally {
+        keeperBusy = false;
+      }
+    };
+    void tick();
+    setInterval(() => void tick(), KEEPER_TICK_MS).unref();
+    console.log('buy-and-burn keeper enabled');
+  }
   // keep both leaderboard caches warm so the first viewer never waits on the
   // query and it never recomputes per request (PR-3)
   const warmLeaderboards = () => {

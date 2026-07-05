@@ -3,6 +3,11 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import {
+  normalizeAccountCosmetics,
+  normalizeDesignSpec,
+  type SkinDesignSpec,
+} from '../src/world_api';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { DISCORD_SCHEMA } from './discord_db';
@@ -460,6 +465,26 @@ CREATE TABLE IF NOT EXISTS wallet_link_challenges (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS wallet_link_challenges_account ON wallet_link_challenges(account_id);
+-- Non-custodial Ethereum/EVM wallet links (docs/prd/woc/nft-pfp-skins.md). Mirror
+-- of wallet_links for a second chain: one EVM wallet per account, one account per
+-- wallet, proven by an EIP-191 personal_sign over a stored single-use challenge.
+-- address is stored lower-cased. Independent of the Solana link (an account may
+-- have both).
+CREATE TABLE IF NOT EXISTS evm_wallet_links (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  address TEXT NOT NULL UNIQUE,
+  chain_id INT NOT NULL DEFAULT 1,
+  linked_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS evm_wallet_link_challenges (
+  nonce TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  address TEXT NOT NULL,
+  message TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS evm_wallet_link_challenges_account ON evm_wallet_link_challenges(account_id);
 CREATE TABLE IF NOT EXISTS daily_reward_days (
   day TEXT NOT NULL,
   realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
@@ -577,6 +602,164 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- Creator skins marketplace (docs/prd/woc/creator-skins-marketplace.md). The
+-- opaque id the sim carries as Entity.cosmeticSkinId is creator_skins.id. Phase
+-- 1 is curated: rows are seeded 'live' by an operator; the open submission +
+-- moderation pipeline is a later phase. price_usdc is in USDC base units (6dp).
+CREATE TABLE IF NOT EXISTS creator_skins (
+  id TEXT PRIMARY KEY,
+  creator_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  creator_wallet TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  skin_catalog TEXT NOT NULL DEFAULT 'class',
+  fallback_skin INT NOT NULL DEFAULT 0,
+  target_class TEXT,
+  asset_url TEXT NOT NULL,
+  emissive_url TEXT,
+  price_usdc BIGINT NOT NULL CHECK (price_usdc > 0),
+  status TEXT NOT NULL DEFAULT 'draft',
+  sha256 TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS creator_skins_status ON creator_skins(status);
+CREATE INDEX IF NOT EXISTS creator_skins_creator ON creator_skins(creator_account_id);
+-- Procedural in-browser-designer skins store a small spec (two colours + pattern
+-- + optional glow) instead of a hosted atlas; every client rebuilds the texture
+-- from it. Added post-hoc so existing deployments migrate without a drop.
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS design_spec JSONB;
+-- Creator-supplied image skins (docs/prd/woc/creator-skin-uploads.md). source
+-- distinguishes the procedural designer from the two image modes. self_hosted:
+-- origin_url is the creator's external URL (SERVER-ONLY, never in the public
+-- registry); we proxy it. hosted: ipfs_cid is the Pinata pin. review_status
+-- gates sale until an operator (or a trusted creator's instant-live) approves;
+-- overflow_hidden parks a hosted skin that fell past its tier quota.
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'design';
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS origin_url TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS ipfs_cid TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'approved';
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS overflow_hidden BOOLEAN NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS creator_skins_source ON creator_skins(source);
+-- NFT-PFP skins (docs/prd/woc/nft-pfp-skins.md). source='nft': the body look is a
+-- trait-derived design_spec and the portrait is a proxied PFP image. Provenance is
+-- the (chain, contract, token) of the real NFT; UNIQUE so one in-game skin maps to
+-- one NFT no matter how many accounts have linked it over time. portrait_sha256 is
+-- the cached portrait's content hash (the atlas-serve cache key).
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS nft_chain TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS nft_contract TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS nft_token_id TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS portrait_sha256 TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS creator_skins_nft
+  ON creator_skins(nft_chain, nft_contract, nft_token_id) WHERE source = 'nft';
+-- The supported-NFT-collection allow-list: the IP control (enable a collection only
+-- after vetting its holder licence), the quality control (profile_id picks the trait
+-- profile), and the anti-abuse control (only listed contracts can be claimed).
+-- standard: 'erc721' | 'cryptopunks' | 'solana'. license_basis is a vetted note.
+CREATE TABLE IF NOT EXISTS nft_collections (
+  chain TEXT NOT NULL,
+  contract TEXT NOT NULL,
+  name TEXT NOT NULL DEFAULT '',
+  standard TEXT NOT NULL,
+  profile_id TEXT NOT NULL DEFAULT 'generic',
+  license_basis TEXT NOT NULL DEFAULT '',
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (chain, contract)
+);
+-- The lost-on-sell ledger: an account "wears" an NFT skin only while a live
+-- (revoked_at IS NULL) grant row exists. The continuous re-verify sweep flips
+-- revoked_at when the on-chain owner changes, and back on re-acquire. One row per
+-- (account, skin); the skin row carries the chain/contract/token to re-check.
+CREATE TABLE IF NOT EXISTS nft_grants (
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id) ON DELETE CASCADE,
+  verified_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_checked_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  revoked_at TIMESTAMPTZ,
+  PRIMARY KEY (account_id, skin_id)
+);
+CREATE INDEX IF NOT EXISTS nft_grants_account ON nft_grants(account_id);
+-- Per-creator moderation trust: approved-listing tally + ToS strikes drive the
+-- "trusted creator" badge (instant-live uploads). first_listing_at anchors the
+-- account-age requirement (cheaper than joining accounts for every quota check).
+CREATE TABLE IF NOT EXISTS creator_trust (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  approved_count INT NOT NULL DEFAULT 0,
+  strikes INT NOT NULL DEFAULT 0,
+  last_strike_at TIMESTAMPTZ,
+  trusted BOOLEAN NOT NULL DEFAULT false,
+  first_listing_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- A pending purchase quote binds an on-chain split tx to one buyer + skin +
+-- exact leg amounts, so verification can reject quote substitution. Short-lived.
+CREATE TABLE IF NOT EXISTS marketplace_quotes (
+  quote_id TEXT PRIMARY KEY,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id) ON DELETE CASCADE,
+  buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  creator_owner TEXT NOT NULL,
+  burn_owner TEXT NOT NULL,
+  creator_usdc BIGINT NOT NULL,
+  burn_usdc BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS marketplace_quotes_expires ON marketplace_quotes(expires_at);
+-- Inbound on-chain payments; the replay guard for every verified purchase
+-- (one settled sale per signature).
+CREATE TABLE IF NOT EXISTS onchain_payments (
+  tx_sig TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  reference TEXT NOT NULL,
+  amount BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Business-level marketplace sales: one row per settled, verified purchase.
+CREATE TABLE IF NOT EXISTS marketplace_sales (
+  id BIGSERIAL PRIMARY KEY,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id),
+  buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  -- One sale per quote. With only the per-signature guard, a buyer who broadcasts
+  -- two valid payments for the same quote (distinct sigs) and races two /buy calls
+  -- could record two sales for one quote; this UNIQUE makes the second redeem fail
+  -- cleanly (23505 -> already_redeemed) instead of double-charging into two rows.
+  quote_id TEXT NOT NULL UNIQUE,
+  gross_usdc BIGINT NOT NULL,
+  creator_usdc BIGINT NOT NULL,
+  burn_usdc BIGINT NOT NULL,
+  pay_tx_sig TEXT NOT NULL UNIQUE REFERENCES onchain_payments(tx_sig),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS marketplace_sales_buyer ON marketplace_sales(buyer_account_id);
+CREATE INDEX IF NOT EXISTS marketplace_sales_skin ON marketplace_sales(skin_id);
+-- Buy-and-burn ledger (Phase 2 keeper). One row per batch: USDC drained from the
+-- burn vault, swapped to $WOC on a DEX, then SPL-burned. The public ledger reads
+-- these. batch_id is a durable idempotency key written BEFORE signing, and the
+-- buy/burn signatures are recorded so a crash recovers by querying the chain for
+-- the signature — never by re-reading balances (which could double-swap).
+CREATE TABLE IF NOT EXISTS burn_batches (
+  batch_id    TEXT PRIMARY KEY,
+  source      TEXT NOT NULL DEFAULT 'marketplace',
+  usdc_in     BIGINT NOT NULL,
+  woc_bought  BIGINT NOT NULL DEFAULT 0,
+  woc_burned  BIGINT NOT NULL DEFAULT 0,
+  buy_tx_sig  TEXT UNIQUE,
+  burn_tx_sig TEXT UNIQUE,
+  status      TEXT NOT NULL DEFAULT 'swapping'
+              CHECK (status IN ('swapping','swapped','burning','burned','failed')),
+  fail_reason TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  -- When the burn tx was broadcast. Burning-phase staleness is measured from THIS,
+  -- not created_at (= swap time), so a slow swap can't make the burn look instantly
+  -- stale and trigger a premature re-issue.
+  burn_broadcast_at TIMESTAMPTZ,
+  executed_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS burn_batches_status ON burn_batches(status);
+CREATE INDEX IF NOT EXISTS burn_batches_executed ON burn_batches(executed_at DESC);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -657,27 +840,16 @@ export interface RequestMetadata {
 export interface AccountCosmetics {
   completedQuestIds: string[];
   mechChromaIds: string[];
+  // Marketplace creator-skin ids the account owns (purchased) and may equip.
+  // The opaque ids the sim carries as Entity.cosmeticSkinId; ownership is the
+  // server-authoritative gate on equipping one.
+  ownedCreatorSkinIds: string[];
 }
 
-function uniqueStrings(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  const out: string[] = [];
-  const seen = new Set<string>();
-  for (const item of value) {
-    if (typeof item !== 'string' || item.length === 0 || seen.has(item)) continue;
-    seen.add(item);
-    out.push(item);
-  }
-  return out;
-}
-
-export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: uniqueStrings(src.completedQuestIds),
-    mechChromaIds: uniqueStrings(src.mechChromaIds),
-  };
-}
+// The cosmetics-blob normalizer is shared with the client; it lives in
+// world_api.ts (the seam both sides import) so the two can't drift. Re-exported
+// here so existing `from './db'` importers keep working.
+export { normalizeAccountCosmetics };
 
 export async function loadAccountCosmetics(accountId: number): Promise<AccountCosmetics> {
   const res = await pool.query('SELECT cosmetics FROM accounts WHERE id = $1', [accountId]);
@@ -1354,6 +1526,275 @@ export async function linkWalletToAccount(accountId: number, pubkey: string): Pr
 
 export async function unlinkWallet(accountId: number): Promise<void> {
   await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
+}
+
+// ── Non-custodial Ethereum/EVM wallet links ────────────────────────────────
+// Mirror of the Solana link above for a second chain (docs/prd/woc/nft-pfp-skins.md).
+// address is always stored lower-cased.
+
+export interface EvmWalletLinkRow {
+  account_id: number;
+  address: string;
+  chain_id: number;
+  linked_at: string;
+}
+
+export async function createEvmWalletChallenge(
+  nonce: string,
+  accountId: number,
+  address: string,
+  message: string,
+  ttlMinutes = 10,
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO evm_wallet_link_challenges (nonce, account_id, address, message, expires_at)
+     VALUES ($1, $2, $3, $4, now() + ($5 || ' minutes')::interval)`,
+    [nonce, accountId, address, message, String(ttlMinutes)],
+  );
+}
+
+export async function consumeEvmWalletChallenge(
+  nonce: string,
+  accountId: number,
+): Promise<{ address: string; message: string } | null> {
+  const res = await pool.query(
+    `DELETE FROM evm_wallet_link_challenges
+     WHERE nonce = $1 AND account_id = $2 AND expires_at > now()
+     RETURNING address, message`,
+    [nonce, accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function pruneEvmWalletChallenges(): Promise<void> {
+  await pool.query('DELETE FROM evm_wallet_link_challenges WHERE expires_at <= now()');
+}
+
+export async function evmWalletForAccount(accountId: number): Promise<EvmWalletLinkRow | null> {
+  const res = await pool.query(
+    'SELECT account_id, address, chain_id, linked_at FROM evm_wallet_links WHERE account_id = $1',
+    [accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function accountForEvmWallet(address: string): Promise<number | null> {
+  const res = await pool.query('SELECT account_id FROM evm_wallet_links WHERE address = $1', [
+    address,
+  ]);
+  return res.rows[0]?.account_id ?? null;
+}
+
+// One EVM wallet per account (account_id PK), one account per wallet (address
+// UNIQUE). Returns false when the address is already owned by a different account.
+export async function linkEvmWalletToAccount(
+  accountId: number,
+  address: string,
+  chainId: number,
+): Promise<boolean> {
+  const owner = await accountForEvmWallet(address);
+  if (owner !== null && owner !== accountId) return false;
+  try {
+    await pool.query(
+      `INSERT INTO evm_wallet_links (account_id, address, chain_id) VALUES ($1, $2, $3)
+       ON CONFLICT (account_id) DO UPDATE SET address = EXCLUDED.address, chain_id = EXCLUDED.chain_id, linked_at = now()`,
+      [accountId, address, chainId],
+    );
+  } catch (err) {
+    if (isUniqueViolation(err)) return false;
+    throw err;
+  }
+  return true;
+}
+
+export async function unlinkEvmWallet(accountId: number): Promise<void> {
+  await pool.query('DELETE FROM evm_wallet_links WHERE account_id = $1', [accountId]);
+}
+
+// ── NFT collection allow-list ──────────────────────────────────────────────
+
+export interface NftCollectionRow {
+  chain: string;
+  contract: string;
+  name: string;
+  standard: string; // 'erc721' | 'cryptopunks' | 'solana'
+  profileId: string;
+  licenseBasis: string;
+  enabled: boolean;
+}
+
+function mapNftCollection(row: Record<string, unknown>): NftCollectionRow {
+  return {
+    chain: row.chain as string,
+    contract: row.contract as string,
+    name: (row.name as string) ?? '',
+    standard: row.standard as string,
+    profileId: (row.profile_id as string) ?? 'generic',
+    licenseBasis: (row.license_basis as string) ?? '',
+    enabled: row.enabled === true,
+  };
+}
+
+export async function listNftCollections(onlyEnabled = false): Promise<NftCollectionRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM nft_collections ${onlyEnabled ? 'WHERE enabled = true' : ''} ORDER BY chain, contract`,
+  );
+  return res.rows.map(mapNftCollection);
+}
+
+export async function getNftCollection(
+  chain: string,
+  contract: string,
+): Promise<NftCollectionRow | null> {
+  const res = await pool.query('SELECT * FROM nft_collections WHERE chain = $1 AND contract = $2', [
+    chain,
+    contract,
+  ]);
+  return res.rows[0] ? mapNftCollection(res.rows[0]) : null;
+}
+
+export async function upsertNftCollection(row: NftCollectionRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO nft_collections (chain, contract, name, standard, profile_id, license_basis, enabled)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)
+     ON CONFLICT (chain, contract) DO UPDATE SET
+       name = EXCLUDED.name, standard = EXCLUDED.standard, profile_id = EXCLUDED.profile_id,
+       license_basis = EXCLUDED.license_basis, enabled = EXCLUDED.enabled`,
+    [row.chain, row.contract, row.name, row.standard, row.profileId, row.licenseBasis, row.enabled],
+  );
+}
+
+export async function setNftCollectionEnabled(
+  chain: string,
+  contract: string,
+  enabled: boolean,
+): Promise<void> {
+  await pool.query('UPDATE nft_collections SET enabled = $3 WHERE chain = $1 AND contract = $2', [
+    chain,
+    contract,
+    enabled,
+  ]);
+}
+
+/** All skin ids for a now-disabled collection (so the sweep/registry can delist
+ *  them when an operator removes a collection from the allow-list). */
+export async function nftSkinIdsForCollection(chain: string, contract: string): Promise<string[]> {
+  const res = await pool.query(
+    `SELECT id FROM creator_skins WHERE source = 'nft' AND nft_chain = $1 AND nft_contract = $2`,
+    [chain, contract],
+  );
+  return res.rows.map((r) => r.id as string);
+}
+
+// ── NFT grant ledger (lost-on-sell) ────────────────────────────────────────
+
+export interface NftGrantRow {
+  skinId: string;
+  chain: string;
+  contract: string;
+  tokenId: string;
+  revoked: boolean;
+}
+
+/** Grant (or restore) an NFT skin: append the id to the account's owned set and
+ *  open a live grant row, both under one row lock. Idempotent. */
+export async function grantNftSkin(accountId: number, skinId: string): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const cur = await client.query('SELECT cosmetics FROM accounts WHERE id = $1 FOR UPDATE', [
+      accountId,
+    ]);
+    const cosmetics = normalizeAccountCosmetics(cur.rows[0]?.cosmetics);
+    if (!cosmetics.ownedCreatorSkinIds.includes(skinId)) {
+      await client.query('UPDATE accounts SET cosmetics = $2 WHERE id = $1', [
+        accountId,
+        { ...cosmetics, ownedCreatorSkinIds: [...cosmetics.ownedCreatorSkinIds, skinId] },
+      ]);
+    }
+    await client.query(
+      `INSERT INTO nft_grants (account_id, skin_id) VALUES ($1, $2)
+       ON CONFLICT (account_id, skin_id) DO UPDATE SET revoked_at = NULL, verified_at = now(), last_checked_at = now()`,
+      [accountId, skinId],
+    );
+    await client.query('COMMIT');
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+/** Revoke an NFT skin: drop the id from the account's owned set and mark the grant
+ *  revoked, under one row lock. Returns true if the account actually held it (so
+ *  the caller knows to force-clear a live equip). */
+export async function revokeNftSkin(accountId: number, skinId: string): Promise<boolean> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const cur = await client.query('SELECT cosmetics FROM accounts WHERE id = $1 FOR UPDATE', [
+      accountId,
+    ]);
+    const cosmetics = normalizeAccountCosmetics(cur.rows[0]?.cosmetics);
+    const had = cosmetics.ownedCreatorSkinIds.includes(skinId);
+    if (had) {
+      await client.query('UPDATE accounts SET cosmetics = $2 WHERE id = $1', [
+        accountId,
+        {
+          ...cosmetics,
+          ownedCreatorSkinIds: cosmetics.ownedCreatorSkinIds.filter((id) => id !== skinId),
+        },
+      ]);
+    }
+    await client.query(
+      'UPDATE nft_grants SET revoked_at = now(), last_checked_at = now() WHERE account_id = $1 AND skin_id = $2 AND revoked_at IS NULL',
+      [accountId, skinId],
+    );
+    await client.query('COMMIT');
+    return had;
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+export async function touchNftGrant(accountId: number, skinId: string): Promise<void> {
+  await pool.query(
+    'UPDATE nft_grants SET last_checked_at = now() WHERE account_id = $1 AND skin_id = $2',
+    [accountId, skinId],
+  );
+}
+
+/** All NFT grants (live + revoked) for an account, joined to provenance so the
+ *  sweep can re-verify each token's owner. */
+export async function listNftGrantsForAccount(accountId: number): Promise<NftGrantRow[]> {
+  const res = await pool.query(
+    `SELECT g.skin_id, g.revoked_at, s.nft_chain, s.nft_contract, s.nft_token_id
+       FROM nft_grants g JOIN creator_skins s ON s.id = g.skin_id
+      WHERE g.account_id = $1 AND s.source = 'nft'`,
+    [accountId],
+  );
+  return res.rows
+    .filter((r) => r.nft_chain && r.nft_contract && r.nft_token_id)
+    .map((r) => ({
+      skinId: r.skin_id as string,
+      chain: r.nft_chain as string,
+      contract: r.nft_contract as string,
+      tokenId: r.nft_token_id as string,
+      revoked: r.revoked_at != null,
+    }));
+}
+
+/** Count of an account's live (non-revoked) NFT grants, for the anti-spam cap. */
+export async function countLiveNftGrantsByAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    'SELECT count(*)::int AS n FROM nft_grants WHERE account_id = $1 AND revoked_at IS NULL',
+    [accountId],
+  );
+  return Number(res.rows[0]?.n ?? 0);
 }
 
 // ── Shareable player cards + referrals ─────────────────────────────────────
@@ -2427,4 +2868,573 @@ export async function pruneChatLogs(retentionDays: number): Promise<number> {
     [String(Math.floor(retentionDays))],
   );
   return res.rowCount ?? 0;
+}
+
+// --------------------------------------------------------------------------
+// Creator skins marketplace
+// --------------------------------------------------------------------------
+
+export interface CreatorSkinRow {
+  id: string;
+  creatorAccountId: number | null;
+  creatorWallet: string;
+  name: string;
+  description: string;
+  skinCatalog: 'class' | 'mech';
+  fallbackSkin: number;
+  targetClass: string | null;
+  assetUrl: string;
+  emissiveUrl: string | null;
+  design: SkinDesignSpec | null; // procedural designer spec; takes precedence over assetUrl
+  source: 'design' | 'self_hosted' | 'hosted' | 'nft';
+  originUrl: string | null; // self_hosted only; SERVER-ONLY, never serialized to clients
+  ipfsCid: string | null; // hosted only; Pinata pin
+  reviewStatus: 'pending' | 'approved' | 'rejected';
+  overflowHidden: boolean; // hosted skin parked past its tier quota
+  priceUsdc: bigint;
+  status: 'draft' | 'review' | 'live' | 'rejected' | 'delisted' | 'removed';
+  sha256: string | null;
+  nftChain: string | null; // nft only: 'ethereum' | 'solana'
+  nftContract: string | null; // nft only: lower-cased ERC-721 address / Solana collection id; SERVER-ONLY
+  nftTokenId: string | null; // nft only: uint256 decimal / mint; SERVER-ONLY
+  portraitSha256: string | null; // nft only: cached proxied-portrait content hash
+}
+
+const SKIN_SOURCES = new Set(['design', 'self_hosted', 'hosted', 'nft']);
+
+export interface MarketplaceQuoteRow {
+  quoteId: string;
+  skinId: string;
+  buyerAccountId: number;
+  creatorOwner: string;
+  burnOwner: string;
+  creatorUsdc: bigint;
+  burnUsdc: bigint;
+  mint: string;
+  expiresAt: string;
+}
+
+function mapCreatorSkin(row: Record<string, unknown>): CreatorSkinRow {
+  return {
+    id: row.id as string,
+    creatorAccountId: row.creator_account_id === null ? null : Number(row.creator_account_id),
+    creatorWallet: row.creator_wallet as string,
+    name: row.name as string,
+    description: row.description as string,
+    skinCatalog: row.skin_catalog === 'mech' ? 'mech' : 'class',
+    fallbackSkin: Number(row.fallback_skin),
+    targetClass: (row.target_class as string | null) ?? null,
+    assetUrl: row.asset_url as string,
+    emissiveUrl: (row.emissive_url as string | null) ?? null,
+    design: normalizeDesignSpec(row.design_spec),
+    source: SKIN_SOURCES.has(row.source as string)
+      ? (row.source as CreatorSkinRow['source'])
+      : 'design',
+    originUrl: (row.origin_url as string | null) ?? null,
+    ipfsCid: (row.ipfs_cid as string | null) ?? null,
+    reviewStatus:
+      (row.review_status as string) === 'pending' || (row.review_status as string) === 'rejected'
+        ? (row.review_status as 'pending' | 'rejected')
+        : 'approved',
+    overflowHidden: row.overflow_hidden === true,
+    priceUsdc: BigInt(row.price_usdc as string),
+    status: row.status as CreatorSkinRow['status'],
+    sha256: (row.sha256 as string | null) ?? null,
+    nftChain: (row.nft_chain as string | null) ?? null,
+    nftContract: (row.nft_contract as string | null) ?? null,
+    nftTokenId: (row.nft_token_id as string | null) ?? null,
+    portraitSha256: (row.portrait_sha256 as string | null) ?? null,
+  };
+}
+
+export async function listLiveCreatorSkins(): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE status = 'live' AND review_status = 'approved' AND overflow_hidden = false
+      ORDER BY created_at`,
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+export async function getCreatorSkin(id: string): Promise<CreatorSkinRow | null> {
+  const res = await pool.query('SELECT * FROM creator_skins WHERE id = $1', [id]);
+  return res.rows[0] ? mapCreatorSkin(res.rows[0]) : null;
+}
+
+// Seed / curate a creator skin (Phase 1 operator path; the open submission +
+// moderation pipeline is a later phase). Upserts by id so re-seeding is safe.
+export async function upsertCreatorSkin(row: CreatorSkinRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_skins
+       (id, creator_account_id, creator_wallet, name, description, skin_catalog,
+        fallback_skin, target_class, asset_url, emissive_url, price_usdc, status, sha256, design_spec,
+        source, origin_url, ipfs_cid, review_status, overflow_hidden,
+        nft_chain, nft_contract, nft_token_id, portrait_sha256, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23, now())
+     ON CONFLICT (id) DO UPDATE SET
+       creator_account_id = EXCLUDED.creator_account_id,
+       creator_wallet = EXCLUDED.creator_wallet,
+       name = EXCLUDED.name,
+       description = EXCLUDED.description,
+       skin_catalog = EXCLUDED.skin_catalog,
+       fallback_skin = EXCLUDED.fallback_skin,
+       target_class = EXCLUDED.target_class,
+       asset_url = EXCLUDED.asset_url,
+       emissive_url = EXCLUDED.emissive_url,
+       price_usdc = EXCLUDED.price_usdc,
+       status = EXCLUDED.status,
+       sha256 = EXCLUDED.sha256,
+       design_spec = EXCLUDED.design_spec,
+       source = EXCLUDED.source,
+       origin_url = EXCLUDED.origin_url,
+       ipfs_cid = EXCLUDED.ipfs_cid,
+       review_status = EXCLUDED.review_status,
+       overflow_hidden = EXCLUDED.overflow_hidden,
+       nft_chain = EXCLUDED.nft_chain,
+       nft_contract = EXCLUDED.nft_contract,
+       nft_token_id = EXCLUDED.nft_token_id,
+       portrait_sha256 = EXCLUDED.portrait_sha256,
+       updated_at = now()`,
+    [
+      row.id,
+      row.creatorAccountId,
+      row.creatorWallet,
+      row.name,
+      row.description,
+      row.skinCatalog,
+      row.fallbackSkin,
+      row.targetClass,
+      row.assetUrl,
+      row.emissiveUrl,
+      row.priceUsdc.toString(),
+      row.status,
+      row.sha256,
+      row.design ? JSON.stringify(row.design) : null,
+      row.source,
+      row.originUrl,
+      row.ipfsCid,
+      row.reviewStatus,
+      row.overflowHidden,
+      row.nftChain,
+      row.nftContract,
+      row.nftTokenId,
+      row.portraitSha256,
+      row.source,
+      row.originUrl,
+      row.ipfsCid,
+      row.reviewStatus,
+      row.overflowHidden,
+    ],
+  );
+}
+
+/** How many live skins an account has listed (the per-creator anti-spam cap). */
+export async function countLiveCreatorSkinsByAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS n FROM creator_skins WHERE creator_account_id = $1 AND status = 'live'`,
+    [accountId],
+  );
+  return Number(res.rows[0]?.n ?? 0);
+}
+
+/** Hosted (IPFS-pinned) skins an account holds against its $WOC quota: every
+ *  not-removed hosted row (pending + approved, including overflow-hidden), so a
+ *  pending upload holds a slot and a tier drop is measured against real usage. */
+export async function countHostedSkinsByAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS n FROM creator_skins
+      WHERE creator_account_id = $1 AND source = 'hosted' AND status <> 'removed'`,
+    [accountId],
+  );
+  return Number(res.rows[0]?.n ?? 0);
+}
+
+export interface CreatorTrustRow {
+  approvedCount: number;
+  strikes: number;
+  lastStrikeAt: string | null;
+  trusted: boolean;
+  firstListingAt: string;
+}
+
+/** A creator's moderation-trust record (defaults for an account with no listings yet). */
+export async function getCreatorTrust(accountId: number): Promise<CreatorTrustRow> {
+  const res = await pool.query(
+    `SELECT approved_count, strikes, last_strike_at, trusted, first_listing_at
+       FROM creator_trust WHERE account_id = $1`,
+    [accountId],
+  );
+  const r = res.rows[0];
+  if (!r)
+    return {
+      approvedCount: 0,
+      strikes: 0,
+      lastStrikeAt: null,
+      trusted: false,
+      firstListingAt: new Date().toISOString(),
+    };
+  return {
+    approvedCount: Number(r.approved_count),
+    strikes: Number(r.strikes),
+    lastStrikeAt: isoOrNull(r.last_strike_at),
+    trusted: r.trusted === true,
+    firstListingAt: isoOrNull(r.first_listing_at) ?? new Date().toISOString(),
+  };
+}
+
+/** Ensure a trust row exists (records first_listing_at on first listing). */
+export async function ensureCreatorTrust(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id) VALUES ($1) ON CONFLICT (account_id) DO NOTHING`,
+    [accountId],
+  );
+}
+
+/** Set the persisted trusted flag (recomputed from approvals/tier/age/strikes). */
+export async function setCreatorTrusted(accountId: number, trusted: boolean): Promise<void> {
+  await pool.query(
+    `UPDATE creator_trust SET trusted = $2, updated_at = now() WHERE account_id = $1`,
+    [accountId, trusted],
+  );
+}
+
+/** Increment the approved-listing tally (on an operator/auto approval). */
+export async function bumpApprovedListings(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id, approved_count) VALUES ($1, 1)
+       ON CONFLICT (account_id) DO UPDATE SET approved_count = creator_trust.approved_count + 1, updated_at = now()`,
+    [accountId],
+  );
+}
+
+/** Record a ToS strike and clear trust (a removed/violating skin). */
+export async function recordCreatorStrike(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id, strikes, last_strike_at, trusted) VALUES ($1, 1, now(), false)
+       ON CONFLICT (account_id) DO UPDATE SET
+         strikes = creator_trust.strikes + 1, last_strike_at = now(), trusted = false, updated_at = now()`,
+    [accountId],
+  );
+}
+
+/** Set a skin's review status (operator approve/reject). Returns the row, or null if unknown. */
+export async function setCreatorSkinReview(
+  id: string,
+  reviewStatus: 'approved' | 'rejected',
+): Promise<CreatorSkinRow | null> {
+  const res = await pool.query(
+    `UPDATE creator_skins SET review_status = $2, updated_at = now() WHERE id = $1 RETURNING *`,
+    [id, reviewStatus],
+  );
+  return res.rows[0] ? mapCreatorSkin(res.rows[0]) : null;
+}
+
+/** Image skins awaiting operator review (oldest first). */
+export async function listCreatorSkinsForReview(limit = 100): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE review_status = 'pending' AND source IN ('self_hosted', 'hosted') AND status <> 'removed'
+      ORDER BY created_at LIMIT $1`,
+    [Math.max(1, Math.min(500, Math.floor(limit)))],
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+/** A creator's own hosted skins, newest first (for overflow-quota enforcement). */
+export async function listHostedSkinsByAccount(accountId: number): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE creator_account_id = $1 AND source = 'hosted' AND status <> 'removed'
+      ORDER BY created_at DESC`,
+    [accountId],
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+/** Park/unpark a hosted skin past its tier quota (overflow hide / restore). */
+export async function setCreatorSkinOverflowHidden(id: string, hidden: boolean): Promise<void> {
+  await pool.query(
+    `UPDATE creator_skins SET overflow_hidden = $2, updated_at = now() WHERE id = $1`,
+    [id, hidden],
+  );
+}
+
+/** Set a skin's sale status (e.g. 'removed' on an admin takedown). */
+export async function setCreatorSkinStatus(
+  id: string,
+  status: CreatorSkinRow['status'],
+): Promise<void> {
+  await pool.query(`UPDATE creator_skins SET status = $2, updated_at = now() WHERE id = $1`, [
+    id,
+    status,
+  ]);
+}
+
+export async function createMarketplaceQuote(q: MarketplaceQuoteRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO marketplace_quotes
+       (quote_id, skin_id, buyer_account_id, creator_owner, burn_owner, creator_usdc, burn_usdc, mint, expires_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+    [
+      q.quoteId,
+      q.skinId,
+      q.buyerAccountId,
+      q.creatorOwner,
+      q.burnOwner,
+      q.creatorUsdc.toString(),
+      q.burnUsdc.toString(),
+      q.mint,
+      q.expiresAt,
+    ],
+  );
+}
+
+export async function getMarketplaceQuote(quoteId: string): Promise<MarketplaceQuoteRow | null> {
+  const res = await pool.query('SELECT * FROM marketplace_quotes WHERE quote_id = $1', [quoteId]);
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    quoteId: row.quote_id,
+    skinId: row.skin_id,
+    buyerAccountId: Number(row.buyer_account_id),
+    creatorOwner: row.creator_owner,
+    burnOwner: row.burn_owner,
+    creatorUsdc: BigInt(row.creator_usdc),
+    burnUsdc: BigInt(row.burn_usdc),
+    mint: row.mint,
+    expiresAt: iso(row.expires_at),
+  };
+}
+
+export async function deleteMarketplaceQuote(quoteId: string): Promise<void> {
+  await pool.query('DELETE FROM marketplace_quotes WHERE quote_id = $1', [quoteId]);
+}
+
+export async function pruneMarketplaceQuotes(): Promise<void> {
+  await pool.query('DELETE FROM marketplace_quotes WHERE expires_at <= now()');
+}
+
+/**
+ * Atomically redeem a verified purchase: consume the payment signature (the
+ * replay guard), record the sale, grant the skin, and delete the quote — all in
+ * ONE transaction. Either the signature is consumed AND the skin granted, or
+ * neither (a mid-way failure rolls back), so a paid buyer can never be stranded
+ * with a consumed signature and no cosmetic. Returns false if the signature was
+ * already consumed (ON CONFLICT) — i.e. a replay.
+ */
+export async function redeemPurchase(p: {
+  txSig: string;
+  accountId: number;
+  quoteId: string;
+  mint: string;
+  skinId: string;
+  grossUsdc: bigint;
+  creatorUsdc: bigint;
+  burnUsdc: bigint;
+}): Promise<boolean> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const ins = await client.query(
+      `INSERT INTO onchain_payments (tx_sig, account_id, reference, amount, mint)
+       VALUES ($1,$2,$3,$4,$5) ON CONFLICT (tx_sig) DO NOTHING`,
+      [p.txSig, p.accountId, p.quoteId, p.grossUsdc.toString(), p.mint],
+    );
+    if ((ins.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    await client.query(
+      `INSERT INTO marketplace_sales
+         (skin_id, buyer_account_id, quote_id, gross_usdc, creator_usdc, burn_usdc, pay_tx_sig)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+      [
+        p.skinId,
+        p.accountId,
+        p.quoteId,
+        p.grossUsdc.toString(),
+        p.creatorUsdc.toString(),
+        p.burnUsdc.toString(),
+        p.txSig,
+      ],
+    );
+    // Grant ownership on the same row lock (read-modify-write under the tx).
+    const cur = await client.query('SELECT cosmetics FROM accounts WHERE id = $1 FOR UPDATE', [
+      p.accountId,
+    ]);
+    const cosmetics = normalizeAccountCosmetics(cur.rows[0]?.cosmetics);
+    if (!cosmetics.ownedCreatorSkinIds.includes(p.skinId)) {
+      await client.query('UPDATE accounts SET cosmetics = $2 WHERE id = $1', [
+        p.accountId,
+        { ...cosmetics, ownedCreatorSkinIds: [...cosmetics.ownedCreatorSkinIds, p.skinId] },
+      ]);
+    }
+    await client.query('DELETE FROM marketplace_quotes WHERE quote_id = $1', [p.quoteId]);
+    await client.query('COMMIT');
+    return true;
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    // A unique violation here can only be marketplace_sales.quote_id: a second valid
+    // payment for the same quote (distinct signature) racing this redeem. The
+    // per-signature gate already passed, so this is the same-quote double-pay — treat
+    // it as already-redeemed (one grant, one sale) rather than a 500.
+    if ((e as { code?: string })?.code === '23505') return false;
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+// --------------------------------------------------------------------------
+// Buy-and-burn ledger (Phase 2 keeper)
+// --------------------------------------------------------------------------
+
+export interface BurnBatchRow {
+  batchId: string;
+  source: string;
+  usdcIn: bigint;
+  wocBought: bigint;
+  wocBurned: bigint;
+  buyTxSig: string | null;
+  burnTxSig: string | null;
+  status: 'swapping' | 'swapped' | 'burning' | 'burned' | 'failed';
+  failReason: string | null;
+  createdAt: string;
+  burnBroadcastAt: string | null;
+  executedAt: string | null;
+}
+
+// A Postgres timestamptz arrives as a JS Date (pg) or already a string; normalize to ISO.
+function iso(v: unknown): string {
+  return v instanceof Date ? v.toISOString() : String(v);
+}
+function isoOrNull(v: unknown): string | null {
+  return v == null ? null : iso(v);
+}
+
+function mapBurnBatch(row: Record<string, unknown>): BurnBatchRow {
+  return {
+    batchId: row.batch_id as string,
+    source: row.source as string,
+    usdcIn: BigInt(row.usdc_in as string),
+    wocBought: BigInt(row.woc_bought as string),
+    wocBurned: BigInt(row.woc_burned as string),
+    buyTxSig: (row.buy_tx_sig as string | null) ?? null,
+    burnTxSig: (row.burn_tx_sig as string | null) ?? null,
+    status: row.status as BurnBatchRow['status'],
+    failReason: (row.fail_reason as string | null) ?? null,
+    createdAt: iso(row.created_at),
+    burnBroadcastAt: isoOrNull(row.burn_broadcast_at),
+    executedAt: isoOrNull(row.executed_at),
+  };
+}
+
+// Open the batch by recording its durable intent + the pre-signed swap signature
+// BEFORE the swap is broadcast. Returns false if buy_tx_sig collides (the same
+// signed swap was already opened — idempotent on a retried/recovered cycle).
+// A target-less `ON CONFLICT DO NOTHING` is deliberate: it arbitrates over EVERY
+// unique constraint (the batch_id PK AND the buy_tx_sig UNIQUE), so the buy_tx_sig
+// replay is caught as a no-op (rowCount 0) — don't narrow it to one target.
+export async function createBurnBatch(b: {
+  batchId: string;
+  source: string;
+  usdcIn: bigint;
+  buyTxSig: string;
+}): Promise<boolean> {
+  const res = await pool.query(
+    `INSERT INTO burn_batches (batch_id, source, usdc_in, buy_tx_sig, status)
+     VALUES ($1,$2,$3,$4,'swapping') ON CONFLICT DO NOTHING`,
+    [b.batchId, b.source, b.usdcIn.toString(), b.buyTxSig],
+  );
+  return (res.rowCount ?? 0) === 1;
+}
+
+export async function markBatchSwapped(batchId: string, wocBought: bigint): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'swapped', woc_bought = $2 WHERE batch_id = $1`,
+    [batchId, wocBought.toString()],
+  );
+}
+
+export async function markBatchBurning(batchId: string, burnTxSig: string): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'burning', burn_tx_sig = $2, burn_broadcast_at = now() WHERE batch_id = $1`,
+    [batchId, burnTxSig],
+  );
+}
+
+export async function markBatchBurned(batchId: string, wocBurned: bigint): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'burned', woc_burned = $2, executed_at = now() WHERE batch_id = $1`,
+    [batchId, wocBurned.toString()],
+  );
+}
+
+export async function markBatchFailed(batchId: string, reason: string): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'failed', fail_reason = $2, executed_at = now() WHERE batch_id = $1`,
+    [batchId, reason.slice(0, 500)],
+  );
+}
+
+// In-flight batches (anything not terminal) for crash recovery, oldest first.
+export async function openBurnBatches(): Promise<BurnBatchRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM burn_batches WHERE status IN ('swapping','swapped','burning') ORDER BY created_at`,
+  );
+  return res.rows.map(mapBurnBatch);
+}
+
+// Timestamp of the most recent completed burn (drives the batch cadence).
+export async function lastBurnAt(): Promise<number | null> {
+  const res = await pool.query(
+    `SELECT MAX(executed_at) AS at FROM burn_batches WHERE status = 'burned'`,
+  );
+  const at = res.rows[0]?.at;
+  return at == null ? null : new Date(at).getTime();
+}
+
+// Public, factual burn ledger: completed burns + running cumulative total.
+export async function burnLedger(
+  limit = 100,
+): Promise<{ batches: BurnBatchRow[]; cumulativeWocBurned: bigint; cumulativeUsdcIn: bigint }> {
+  const lim = Math.max(1, Math.min(500, Math.floor(limit)));
+  const rows = await pool.query(
+    `SELECT * FROM burn_batches WHERE status = 'burned' ORDER BY executed_at DESC LIMIT $1`,
+    [lim],
+  );
+  const totals = await pool.query(
+    `SELECT COALESCE(SUM(woc_burned),0) AS woc, COALESCE(SUM(usdc_in),0) AS usdc FROM burn_batches WHERE status = 'burned'`,
+  );
+  return {
+    batches: rows.rows.map(mapBurnBatch),
+    cumulativeWocBurned: BigInt(totals.rows[0]?.woc ?? 0),
+    cumulativeUsdcIn: BigInt(totals.rows[0]?.usdc ?? 0),
+  };
+}
+
+// Cross-process mutual exclusion for the buy-and-burn keeper. Deployment is
+// process-per-realm sharing ONE DATABASE_URL + ONE burn vault, so the keeper's
+// "only one batch in flight at a time" guarantee needs a global lock — not just
+// per-process state. Holds a SESSION-level pg_try_advisory_lock on a dedicated
+// connection for the duration of the cycle; if another process already holds it,
+// returns null (this tick is skipped) so two processes never sign independent
+// swaps against the same vault. (Same advisory-lock mechanism ensureSchema uses
+// for concurrent boots; a distinct key.)
+const BURN_KEEPER_LOCK_KEY = 0x57_4f_43_02; // "WOC\x02"
+export async function withBurnKeeperLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [
+      BURN_KEEPER_LOCK_KEY,
+    ]);
+    if (!res.rows[0]?.locked) return null;
+    try {
+      return await fn();
+    } finally {
+      await client.query('SELECT pg_advisory_unlock($1)', [BURN_KEEPER_LOCK_KEY]);
+    }
+  } finally {
+    client.release();
+  }
 }
