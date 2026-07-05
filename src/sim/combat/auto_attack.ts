@@ -47,6 +47,7 @@ import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
 import { baseSwingSpeed } from './form_swing';
+import { rangedShotProfile } from './ranged_shot';
 import { applyThornsReaction } from './thorns_charge';
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
@@ -116,9 +117,13 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
     ctx.breakGhostWolf(p);
-    rangedSwing(ctx, p, t, ranged);
-    // Ranged haste (item-set bonus) shortens the auto-shot interval.
-    p.swingTimer = (ranged.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
+    // Hunters shoot with their equipped weapon (damage range + speed), casters
+    // with their fixed class wand; the shot then fires at that resolved profile.
+    const shot = rangedShotProfile(ranged, p.weapon);
+    rangedSwing(ctx, p, t, { ...ranged, min: shot.min, max: shot.max, speed: shot.speed });
+    // The weapon's speed sets the cadence; ranged haste (item-set bonus) then
+    // shortens the auto-shot interval.
+    p.swingTimer = (shot.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
     return;
   }
   if (d > MELEE_RANGE) return;
