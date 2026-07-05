@@ -1194,6 +1194,52 @@ export const ko_KR: EnTranslations = {
       "mining": "채광",
       "logging": "벌목",
       "herbalism": "약초학"
+    },
+    "aldrin": {
+      "entryLabel": "알드린 클럽",
+      "title": "알드린 클럽",
+      "intro": "월간 멤버십입니다. 모든 혜택은 외형, 편의, 입장 전용이며 전투력에는 전혀 영향을 주지 않습니다.",
+      "loading": "불러오는 중...",
+      "unavailable": "이 서버에서는 알드린 클럽을 이용할 수 없습니다.",
+      "memberBadge": "멤버",
+      "notMember": "아직 멤버가 아닙니다.",
+      "memberUntil": "{date}까지 멤버 (남은 기간 {days}일)",
+      "autoRenew": "카드 구독으로 자동 갱신됩니다.",
+      "priceLine": "{days}일마다 {amount} USD",
+      "splitLine": "{treasuryPct}%는 공개 트레저리로, {burnPct}%는 $WOC 바이백 및 소각에 사용됩니다.",
+      "perksTitle": "멤버십 혜택",
+      "perk": {
+        "aura": "황금 멤버 오라 (시각 효과 전용)",
+        "regalia": "알드린 예복 형상변환 세트 (외형 전용)",
+        "mount": "클럽 전용 탈것 외형",
+        "title": "칭호: 알드린 클럽의 일원",
+        "nameColor": "금색 이름표 색상",
+        "lounge": "멤버 전용 라운지와 클럽 채팅 채널",
+        "wardrobe": "추가 코스메틱 옷장 슬롯",
+        "queue": "만원 시 우선 접속 대기열",
+        "stipend": "매월 지급되는 코스메틱 전용 수당"
+      },
+      "methodsTitle": "결제 수단",
+      "method": {
+        "sol": "SOL",
+        "usdc": "USDC",
+        "woc": "$WOC",
+        "stripe": "카드 (Stripe)"
+      },
+      "reason": {
+        "clubDisabled": "이 서버에서 클럽이 비활성화되어 이용할 수 없습니다.",
+        "walletCannotSign": "사용 불가: 연결된 지갑은 메시지 서명만 지원하며 트랜잭션에 서명할 수 없습니다.",
+        "notConfigured": "이 서버에는 설정되어 있지 않습니다."
+      },
+      "quoteTitle": "결제 견적: {method}",
+      "quoteAmount": "금액: {amount} {method}",
+      "quoteMemo": "메모 (결제에 반드시 포함): {memo}",
+      "quoteExpires": "이 견적은 약 {minutes}분 동안 유효합니다.",
+      "quoteExpired": "견적이 만료되었습니다. 새로 요청하세요.",
+      "quoteError": "견적을 가져오지 못했습니다. 나중에 다시 시도하세요.",
+      "railsNotice": "운영 키와 최종 승인이 완료될 때까지 이 빌드에서는 결제가 비활성화되어 있습니다. 이 창에서는 트랜잭션이 전송되지 않습니다.",
+      "stripeNotice": "결제가 활성화되면 카드 결제는 Stripe를 통해 진행됩니다.",
+      "close": "닫기"
     }
   },
   "guide": {

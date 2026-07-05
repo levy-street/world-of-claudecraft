@@ -1194,6 +1194,52 @@ export const zh_TW: EnTranslations = {
       "mining": "採礦",
       "logging": "伐木",
       "herbalism": "藥草學"
+    },
+    "aldrin": {
+      "entryLabel": "奧德林俱樂部",
+      "title": "奧德林俱樂部",
+      "intro": "按月訂閱的會員資格。所有特權僅限外觀、便利或進入權限，絕不提供任何戰鬥力。",
+      "loading": "載入中...",
+      "unavailable": "本伺服器尚未開放奧德林俱樂部。",
+      "memberBadge": "會員",
+      "notMember": "你還不是會員。",
+      "memberUntil": "會員有效期至{date}（剩餘{days}天）",
+      "autoRenew": "透過信用卡訂閱自動續約。",
+      "priceLine": "每{days}天{amount} USD",
+      "splitLine": "{treasuryPct}%注入公開金庫，{burnPct}%用於回購並銷毀$WOC。",
+      "perksTitle": "會員特權",
+      "perk": {
+        "aura": "金色會員光環（僅視覺效果）",
+        "regalia": "奧德林禮服幻化套裝（僅外觀）",
+        "mount": "俱樂部專屬坐騎外觀",
+        "title": "「奧德林俱樂部成員」稱號",
+        "nameColor": "金色名牌顏色",
+        "lounge": "會員專屬交誼廳與俱樂部聊天頻道",
+        "wardrobe": "額外的外觀衣櫃欄位",
+        "queue": "滿員時的優先登入佇列",
+        "stipend": "每月外觀專用津貼"
+      },
+      "methodsTitle": "付款方式",
+      "method": {
+        "sol": "SOL",
+        "usdc": "USDC",
+        "woc": "$WOC",
+        "stripe": "信用卡（Stripe）"
+      },
+      "reason": {
+        "clubDisabled": "俱樂部在本伺服器已停用，暫不可用。",
+        "walletCannotSign": "不可用：綁定的錢包僅支援訊息簽章，無法簽署交易。",
+        "notConfigured": "本伺服器未設定。"
+      },
+      "quoteTitle": "付款報價：{method}",
+      "quoteAmount": "金額：{amount} {method}",
+      "quoteMemo": "備註（付款時必須附帶）：{memo}",
+      "quoteExpires": "該報價還有約{minutes}分鐘有效。",
+      "quoteExpired": "該報價已過期，請重新取得。",
+      "quoteError": "無法取得報價，請稍後再試。",
+      "railsNotice": "在營運金鑰與最終核准就緒前，本版本已停用付款功能。此視窗不會送出任何交易。",
+      "stripeNotice": "付款啟用後，信用卡結帳將透過Stripe開啟。",
+      "close": "關閉"
     }
   },
   "guide": {

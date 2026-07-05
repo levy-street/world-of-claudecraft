@@ -1194,6 +1194,52 @@ export const zh_CN: EnTranslations = {
       "mining": "采矿",
       "logging": "伐木",
       "herbalism": "草药学"
+    },
+    "aldrin": {
+      "entryLabel": "奥尔德林俱乐部",
+      "title": "奥尔德林俱乐部",
+      "intro": "按月订阅的会员资格。所有特权仅限外观、便利或准入，绝不提供任何战斗力。",
+      "loading": "加载中...",
+      "unavailable": "本服务器暂未开放奥尔德林俱乐部。",
+      "memberBadge": "会员",
+      "notMember": "你还不是会员。",
+      "memberUntil": "会员有效期至{date}（剩余{days}天）",
+      "autoRenew": "通过银行卡订阅自动续费。",
+      "priceLine": "每{days}天{amount} USD",
+      "splitLine": "{treasuryPct}%注入公开金库，{burnPct}%用于回购并销毁$WOC。",
+      "perksTitle": "会员特权",
+      "perk": {
+        "aura": "金色会员光环（仅视觉效果）",
+        "regalia": "奥尔德林礼服幻化套装（仅外观）",
+        "mount": "俱乐部专属坐骑外观",
+        "title": "“奥尔德林俱乐部成员”称号",
+        "nameColor": "金色姓名板颜色",
+        "lounge": "会员专属休息室与俱乐部聊天频道",
+        "wardrobe": "额外的外观衣柜栏位",
+        "queue": "满员时的优先登录队列",
+        "stipend": "每月外观专用津贴"
+      },
+      "methodsTitle": "支付方式",
+      "method": {
+        "sol": "SOL",
+        "usdc": "USDC",
+        "woc": "$WOC",
+        "stripe": "银行卡（Stripe）"
+      },
+      "reason": {
+        "clubDisabled": "俱乐部在本服务器已停用，暂不可用。",
+        "walletCannotSign": "不可用：绑定的钱包仅支持消息签名，无法签署交易。",
+        "notConfigured": "本服务器未配置。"
+      },
+      "quoteTitle": "支付报价：{method}",
+      "quoteAmount": "金额：{amount} {method}",
+      "quoteMemo": "备注（支付时必须附带）：{memo}",
+      "quoteExpires": "该报价还有约{minutes}分钟有效。",
+      "quoteExpired": "该报价已过期，请重新获取。",
+      "quoteError": "无法获取报价，请稍后再试。",
+      "railsNotice": "在运营密钥与最终审批就绪前，本版本已停用支付功能。此窗口不会发送任何交易。",
+      "stripeNotice": "支付启用后，银行卡结账将通过Stripe打开。",
+      "close": "关闭"
     }
   },
   "guide": {

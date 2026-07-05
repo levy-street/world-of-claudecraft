@@ -1194,6 +1194,52 @@ export const ja_JP: EnTranslations = {
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学"
+    },
+    "aldrin": {
+      "entryLabel": "アルドリンクラブ",
+      "title": "アルドリンクラブ",
+      "intro": "月額メンバーシップ。特典はすべて見た目、利便性、アクセスのみで、強さに関わるものは一切ありません。",
+      "loading": "読み込み中...",
+      "unavailable": "このレルムではアルドリンクラブは利用できません。",
+      "memberBadge": "メンバー",
+      "notMember": "まだメンバーではありません。",
+      "memberUntil": "{date}までメンバー（残り{days}日）",
+      "autoRenew": "カードのサブスクリプションで自動更新されます。",
+      "priceLine": "{days}日ごとに{amount} USD",
+      "splitLine": "{treasuryPct}%は公開トレジャリーへ、{burnPct}%は$WOCの買い戻しとバーンに充てられます。",
+      "perksTitle": "メンバー特典",
+      "perk": {
+        "aura": "黄金のメンバーオーラ（見た目のみ）",
+        "regalia": "アルドリン正装の幻化セット（外見のみ）",
+        "mount": "クラブ限定マウントの外見",
+        "title": "称号「アルドリンクラブの一員」",
+        "nameColor": "金色のネームプレート",
+        "lounge": "メンバーラウンジと専用チャットチャンネル",
+        "wardrobe": "追加のコスメティック衣装スロット",
+        "queue": "満員時の優先ログインキュー",
+        "stipend": "毎月のコスメティック手当"
+      },
+      "methodsTitle": "支払い方法",
+      "method": {
+        "sol": "SOL",
+        "usdc": "USDC",
+        "woc": "$WOC",
+        "stripe": "カード（Stripe）"
+      },
+      "reason": {
+        "clubDisabled": "このレルムではクラブが無効のため利用できません。",
+        "walletCannotSign": "利用不可: 連携ウォレットはメッセージ署名のみ対応で、トランザクションに署名できません。",
+        "notConfigured": "このレルムでは設定されていません。"
+      },
+      "quoteTitle": "支払い見積もり: {method}",
+      "quoteAmount": "金額: {amount} {method}",
+      "quoteMemo": "メモ（支払いに必須）: {memo}",
+      "quoteExpires": "この見積もりは残り約{minutes}分有効です。",
+      "quoteExpired": "この見積もりは期限切れです。新しく取得してください。",
+      "quoteError": "見積もりを取得できませんでした。後でもう一度お試しください。",
+      "railsNotice": "運営キーと最終承認が整うまで、このビルドでは支払いは無効です。このウィンドウからトランザクションが送信されることはありません。",
+      "stripeNotice": "支払いが有効になると、カード決済はStripe経由で開きます。",
+      "close": "閉じる"
     }
   },
   "guide": {

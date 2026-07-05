@@ -1708,6 +1708,26 @@ async function startGame(
           meta: payload.meta,
         }),
     });
+    // Aldrin Club membership entry (PR #938), fail-closed: GET /api/aldrin 404s
+    // while ALDRIN_ENABLED is off (the default), so the community-tray entry only
+    // appears once the server advertises the feature. The wallet link on this
+    // branch is signMessage-only, so the window renders quotes read-only and
+    // never sends a transaction (walletCanSignTransactions stays false).
+    void import('./ui/aldrin_club_window')
+      .then(({ attachAldrinClubEntry }) =>
+        attachAldrinClubEntry({
+          status: async () => {
+            try {
+              return await api.aldrinStatus();
+            } catch {
+              return null;
+            }
+          },
+          quote: async (method) => (await api.aldrinQuote(method)).quote,
+          walletCanSignTransactions: false,
+        }),
+      )
+      .catch(() => {});
   }
   function interactKey(): void {
     const p = world.player;

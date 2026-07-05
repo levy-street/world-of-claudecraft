@@ -120,6 +120,7 @@ const simFiles = walk(simRoot);
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/aldrin_club_view.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',

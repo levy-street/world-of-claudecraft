@@ -1194,6 +1194,52 @@ export const de_DE: EnTranslations = {
       "mining": "Bergbau",
       "logging": "Holzfällen",
       "herbalism": "Kräuterkunde"
+    },
+    "aldrin": {
+      "entryLabel": "Aldrin Club",
+      "title": "The Aldrin Club",
+      "intro": "A monthly membership. Every perk is cosmetic, convenience, or access: nothing in the club grants power.",
+      "loading": "Loading...",
+      "unavailable": "The Aldrin Club is not available on this realm.",
+      "memberBadge": "Member",
+      "notMember": "You are not a member yet.",
+      "memberUntil": "Member until {date} ({days} days remaining)",
+      "autoRenew": "Renews automatically through your card subscription.",
+      "priceLine": "{amount} USD every {days} days",
+      "splitLine": "{treasuryPct}% funds the disclosed treasury, {burnPct}% buys back and burns $WOC.",
+      "perksTitle": "Membership perks",
+      "perk": {
+        "aura": "Golden member aura (visual only)",
+        "regalia": "Aldrin regalia transmog set (appearance only)",
+        "mount": "Exclusive club mount appearance",
+        "title": "Member of the Aldrin Club title",
+        "nameColor": "Gold nameplate color",
+        "lounge": "Members lounge and club chat channel",
+        "wardrobe": "Extra cosmetic wardrobe slots",
+        "queue": "Priority login queue at capacity",
+        "stipend": "Monthly cosmetic vanity stipend"
+      },
+      "methodsTitle": "Payment methods",
+      "method": {
+        "sol": "SOL",
+        "usdc": "USDC",
+        "woc": "$WOC",
+        "stripe": "Card (Stripe)"
+      },
+      "reason": {
+        "clubDisabled": "Unavailable while the club is disabled on this realm.",
+        "walletCannotSign": "Unavailable: the linked wallet verifies by message signature only and cannot sign transactions.",
+        "notConfigured": "Not configured on this realm."
+      },
+      "quoteTitle": "Payment quote: {method}",
+      "quoteAmount": "Amount: {amount} {method}",
+      "quoteMemo": "Memo (must accompany the payment): {memo}",
+      "quoteExpires": "Quote valid for about {minutes} more minutes.",
+      "quoteExpired": "This quote has expired. Request a new one.",
+      "quoteError": "Could not fetch a quote. Try again later.",
+      "railsNotice": "Payments are disabled in this build pending operator keys and final sign-off. No transaction will be sent from this window.",
+      "stripeNotice": "Card checkout opens through Stripe once payments are enabled.",
+      "close": "Close"
     }
   },
   "guide": {
