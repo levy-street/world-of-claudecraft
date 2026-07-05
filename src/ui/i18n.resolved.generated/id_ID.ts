@@ -3388,6 +3388,10 @@ export const id_ID: EnTranslations = {
       "tooManyAttempts": "Terlalu banyak percobaan. Tunggu semenit lalu coba lagi.",
       "usernameShape": "Nama pengguna harus 3-24 karakter dan menggunakan huruf, angka, atau garis bawah.",
       "usernameNotAllowed": "Nama pengguna itu tidak diperbolehkan.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Kata sandi harus minimal 6 karakter.",
       "usernameTaken": "Nama pengguna itu sudah dipakai.",
       "invalidCredentials": "Nama pengguna atau kata sandi salah.",
@@ -3408,7 +3412,14 @@ export const id_ID: EnTranslations = {
       "alreadyInWorld": "Karakter sudah berada di dalam dunia.",
       "takenOver": "Karakter Anda telah diambil alih oleh sesi lain.",
       "renameBeforeEntering": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
-      "renameNotPermitted": "Mengganti nama karakter ini tidak diperbolehkan."
+      "renameNotPermitted": "Mengganti nama karakter ini tidak diperbolehkan.",
+      "snsUnavailable": "Subdomain minting is unavailable right now. Try again later.",
+      "noSubdomainForm": "That name has no valid .sol subdomain form.",
+      "alreadyBound": "This character is already bound to a .sol name.",
+      "solNameTaken": "That .sol name is already taken.",
+      "subdomainCheckFailed": "Could not check name availability. Try again.",
+      "subdomainNotConfirmed": "The subdomain mint could not be confirmed on-chain.",
+      "characterTransferred": "This character was transferred to a new owner and must be re-claimed."
     }
   },
   "desktop": {
@@ -3449,6 +3460,17 @@ export const id_ID: EnTranslations = {
     "statsOffline": "Offline",
     "statsRealmOffline": "{realm} (Offline)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain}. It is yours on-chain."
+  },
   "character": {
     "loading": "Memuat...",
     "noneYet": "Belum ada karakter. Buat satu di bawah.",
@@ -3461,6 +3483,12 @@ export const id_ID: EnTranslations = {
     "delete": "Hapus",
     "rename": "Ganti Nama",
     "newNamePlaceholder": "Nama karakter baru",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC and Mint",
+    "mintSolHint": "Mints your name as a player-owned .sol subdomain for {amount} $WOC. The name is yours on-chain.",
     "tabCharacters": "Karakter",
     "tabCreate": "Buat",
     "portraitAlt": "Potret {name}",

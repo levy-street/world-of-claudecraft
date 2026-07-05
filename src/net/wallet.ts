@@ -4,19 +4,25 @@
 //
 // Lives in src/net/ and is never imported by src/sim/: the deterministic core
 // stays free of network/wallet dependencies.
+
+import { isSolanaChain } from '@solana/wallet-standard-chains';
+import {
+  SolanaSignAndSendTransaction,
+  type SolanaSignAndSendTransactionFeature,
+  SolanaSignMessage,
+  type SolanaSignMessageFeature,
+} from '@solana/wallet-standard-features';
 import { getWallets, type Wallets } from '@wallet-standard/app';
 import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
 import {
   StandardConnect,
-  StandardDisconnect,
-  StandardEvents,
   type StandardConnectFeature,
+  StandardDisconnect,
   type StandardDisconnectFeature,
+  StandardEvents,
   type StandardEventsChangeProperties,
   type StandardEventsFeature,
 } from '@wallet-standard/features';
-import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
 import bs58 from 'bs58';
 
 export interface WalletState {
@@ -32,7 +38,10 @@ export interface WalletOption {
 }
 
 type CompatibleWallet = Wallet & StandardConnectFeature & SolanaSignMessageFeature;
-type WalletPicker = (wallets: readonly WalletOption[], selectedId: string | null) => Promise<string | null>;
+type WalletPicker = (
+  wallets: readonly WalletOption[],
+  selectedId: string | null,
+) => Promise<string | null>;
 type ConnectApi = StandardConnectFeature[typeof StandardConnect];
 type DisconnectApi = StandardDisconnectFeature[typeof StandardDisconnect];
 type EventsApi = StandardEventsFeature[typeof StandardEvents];
@@ -108,11 +117,13 @@ function connectFeature(wallet: CompatibleWallet): ConnectApi {
 }
 
 function disconnectFeature(wallet: Wallet): DisconnectApi | null {
-  return hasDisconnectFeature(wallet) ? wallet.features[StandardDisconnect] as DisconnectApi : null;
+  return hasDisconnectFeature(wallet)
+    ? (wallet.features[StandardDisconnect] as DisconnectApi)
+    : null;
 }
 
 function eventsFeature(wallet: Wallet): EventsApi | null {
-  return hasEventsFeature(wallet) ? wallet.features[StandardEvents] as EventsApi : null;
+  return hasEventsFeature(wallet) ? (wallet.features[StandardEvents] as EventsApi) : null;
 }
 
 function signMessageFeature(wallet: CompatibleWallet): SignMessageApi {
@@ -124,7 +135,10 @@ function accountSupportsSolanaSignMessage(account: WalletAccount): boolean {
 }
 
 function walletSupportsSolana(wallet: Wallet): boolean {
-  return wallet.chains.some(isSolanaChain) || wallet.accounts.some((account) => account.chains.some(isSolanaChain));
+  return (
+    wallet.chains.some(isSolanaChain) ||
+    wallet.accounts.some((account) => account.chains.some(isSolanaChain))
+  );
 }
 
 function isCompatibleWallet(wallet: Wallet): wallet is CompatibleWallet {
@@ -136,7 +150,10 @@ function compatibleWallets(): CompatibleWallet[] {
   return registry?.get().filter(isCompatibleWallet) ?? [];
 }
 
-function chooseAccount(wallet: CompatibleWallet, accounts: readonly WalletAccount[] = wallet.accounts): WalletAccount | null {
+function chooseAccount(
+  wallet: CompatibleWallet,
+  accounts: readonly WalletAccount[] = wallet.accounts,
+): WalletAccount | null {
   return accounts.find(accountSupportsSolanaSignMessage) ?? null;
 }
 
@@ -156,7 +173,11 @@ function setPickerOpen(open: boolean): void {
   for (const cb of modalListeners) cb(open);
 }
 
-function setSelected(wallet: CompatibleWallet | null, account: WalletAccount | null, persist: boolean): void {
+function setSelected(
+  wallet: CompatibleWallet | null,
+  account: WalletAccount | null,
+  persist: boolean,
+): void {
   const previousAddress = selectedAccount?.address ?? null;
   selectedWallet = wallet;
   selectedAccount = account;
@@ -201,8 +222,11 @@ function findWallet(id: string): CompatibleWallet | null {
 function selectAuthorizedWallet(): boolean {
   const storedName = readStoredWalletName();
   const wallets = compatibleWallets();
-  const storedWallet = storedName ? wallets.find((wallet) => wallet.name === storedName) ?? null : null;
-  const walletWithAccount = storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
+  const storedWallet = storedName
+    ? (wallets.find((wallet) => wallet.name === storedName) ?? null)
+    : null;
+  const walletWithAccount =
+    storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
   if (!walletWithAccount) return false;
   const account = chooseAccount(walletWithAccount);
   attachSelectedWalletEvents(walletWithAccount);
@@ -225,7 +249,8 @@ function trySilentReconnect(): void {
     return;
   }
   selectedWallet = wallet;
-  connectFeature(wallet).connect({ silent: true })
+  connectFeature(wallet)
+    .connect({ silent: true })
     .then((result) => {
       if (selectedWallet !== wallet) return;
       setSelected(wallet, chooseAccount(wallet, result.accounts), true);
@@ -239,7 +264,10 @@ function attachRegistryEvents(): void {
   if (!registry || registryOff || registryUnregisterOff) return;
   registryOff = registry.on('register', (...wallets) => {
     const currentId = selectedWallet ? walletId(selectedWallet) : null;
-    if (currentId && wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))) {
+    if (
+      currentId &&
+      wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))
+    ) {
       trySilentReconnect();
     } else if (!selectedAccount) {
       selectAuthorizedWallet();
@@ -355,8 +383,38 @@ export async function signMessageBase58(message: string): Promise<string> {
   const messageBytes = new TextEncoder().encode(message);
   const results = await signMessageFeature(wallet).signMessage({ account, message: messageBytes });
   const result = results[0];
-  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
-  if (!bytesEqual(result.signedMessage, messageBytes)) throw new Error('wallet modified the message before signing');
+  if (!result || !(result.signature instanceof Uint8Array))
+    throw new Error('wallet returned an invalid signature');
+  if (!bytesEqual(result.signedMessage, messageBytes))
+    throw new Error('wallet modified the message before signing');
+  return bs58.encode(result.signature);
+}
+
+/**
+ * Ask the connected wallet to sign AND submit a serialized transaction (the
+ * $WOC identity payment built by src/net/woc_tx.ts) and return its signature
+ * base58-encoded. Uses Wallet Standard's solana:signAndSendTransaction, so the
+ * wallet owns both the approval UI and the network submit; wallets that only
+ * expose message signing get a clear error instead of a silent fallback.
+ */
+export async function signAndSendWocTransaction(transaction: Uint8Array): Promise<string> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  const feature = (wallet.features as Partial<SolanaSignAndSendTransactionFeature>)[
+    SolanaSignAndSendTransaction
+  ];
+  if (!feature || !account.features.includes(SolanaSignAndSendTransaction)) {
+    throw new Error('wallet cannot send transactions');
+  }
+  const chain =
+    account.chains.find((c) => c === 'solana:mainnet') ?? account.chains.find(isSolanaChain);
+  if (!chain) throw new Error('wallet account is not a Solana account');
+  const results = await feature.signAndSendTransaction({ account, chain, transaction });
+  const result = results[0];
+  if (!result || !(result.signature instanceof Uint8Array) || result.signature.length === 0) {
+    throw new Error('wallet returned an invalid transaction signature');
+  }
   return bs58.encode(result.signature);
 }
 

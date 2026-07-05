@@ -3388,6 +3388,10 @@ export const fr_CA: EnTranslations = {
       "tooManyAttempts": "Trop de tentatives. Attendez une minute et réessayez.",
       "usernameShape": "Le nom d'utilisateur doit compter 3 à 24 caractères et utiliser lettres, chiffres ou tiret bas.",
       "usernameNotAllowed": "Ce nom d'utilisateur n'est pas autorisé.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Le mot de passe doit contenir au moins 6 caractères.",
       "usernameTaken": "Ce nom d'utilisateur est déjà utilisé.",
       "invalidCredentials": "Nom d'utilisateur ou mot de passe invalide.",
@@ -3408,7 +3412,14 @@ export const fr_CA: EnTranslations = {
       "alreadyInWorld": "Le personnage est déjà dans le monde.",
       "takenOver": "Votre personnage a été pris en main par une autre session.",
       "renameBeforeEntering": "Ce personnage doit être renommé avant d'entrer dans le monde.",
-      "renameNotPermitted": "Le changement de nom de ce personnage n'est pas autorisé."
+      "renameNotPermitted": "Le changement de nom de ce personnage n'est pas autorisé.",
+      "snsUnavailable": "Subdomain minting is unavailable right now. Try again later.",
+      "noSubdomainForm": "That name has no valid .sol subdomain form.",
+      "alreadyBound": "This character is already bound to a .sol name.",
+      "solNameTaken": "That .sol name is already taken.",
+      "subdomainCheckFailed": "Could not check name availability. Try again.",
+      "subdomainNotConfirmed": "The subdomain mint could not be confirmed on-chain.",
+      "characterTransferred": "This character was transferred to a new owner and must be re-claimed."
     }
   },
   "desktop": {
@@ -3449,6 +3460,17 @@ export const fr_CA: EnTranslations = {
     "statsOffline": "Hors ligne",
     "statsRealmOffline": "{realm} (hors ligne)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain}. It is yours on-chain."
+  },
   "character": {
     "loading": "Chargement...",
     "noneYet": "Aucun personnage pour l'instant. Créez-en un ci-dessous.",
@@ -3461,6 +3483,12 @@ export const fr_CA: EnTranslations = {
     "delete": "Supprimer",
     "rename": "Renommer",
     "newNamePlaceholder": "Nouveau nom de personnage",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC and Mint",
+    "mintSolHint": "Mints your name as a player-owned .sol subdomain for {amount} $WOC. The name is yours on-chain.",
     "tabCharacters": "Personnages",
     "tabCreate": "Créer",
     "portraitAlt": "Portrait de {name}",

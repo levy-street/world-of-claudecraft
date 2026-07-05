@@ -45,12 +45,18 @@ import {
   verifyPassword,
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import {
+  accountControlsBoundCharacter,
+  handleCharacterClaim,
+  registerClaimHooks,
+} from './character_claim';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  activeReservationHolder,
   type CharacterRow,
   characterCountsByRealm,
   chatMuteStatusForAccount,
@@ -122,6 +128,14 @@ import {
   readBinaryBody,
   readBody,
 } from './http_util';
+import {
+  handleIdentityConfirm,
+  handleIdentityPayContext,
+  handleIdentityPrices,
+  handleIdentityQuote,
+  registerIdentityActions,
+} from './identity';
+import { makeIdentityActions } from './identity_actions';
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
@@ -168,8 +182,14 @@ import {
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
+import { validateGuildName } from './social';
 import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import {
+  handleSubdomainConfirm,
+  handleSubdomainPrices,
+  handleSubdomainQuote,
+} from './subdomain_mint';
 import { passesTurnstile } from './turnstile';
 import {
   MAX_ASSET_BYTES,
@@ -186,6 +206,7 @@ import {
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { CHARACTER_TRADEABLE, WOC_IDENTITY_ENABLED } from './woc_config';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -233,6 +254,51 @@ const MAX_WS_PER_IP_HARD = Number(process.env.MAX_WS_PER_IP_HARD ?? '20');
 const BLOCKED_IP_REFRESH_MS = 60_000;
 
 const game = new GameServer();
+
+// $WOC-paid identity actions (rename/reserve): bridge the payment flow to the
+// live game (online check, guild leadership/rename, post-rename market/mail
+// rekeys) without leaking the socket layer into the payment module. Registered
+// unconditionally; the routes themselves are fail-closed behind
+// WOC_IDENTITY_ENABLED (see server/identity.ts).
+registerIdentityActions(
+  makeIdentityActions({
+    isCharacterOnline: (characterId) =>
+      [...game.clients.values()].some((s) => s.characterId === characterId),
+    guildLeaderInfo: (characterId) => game.social.guildLeaderInfo(characterId),
+    renameGuildAsLeader: (characterId, newName) =>
+      game.social.renameGuildAsLeader(characterId, newName),
+    validateGuildName,
+    // Mirror the free force_rename path below: World Market seller entries and
+    // mail ownership are stored by character name, so a paid rename must rekey
+    // them too or the renamed character loses listings and mail.
+    onCharacterRenamed: async (characterId, oldName, newName) => {
+      if (game.rekeyMarketSeller(characterId, oldName, newName)) {
+        await game.saveMarket();
+      }
+      if (game.rekeyMailOwner(characterId, oldName, newName)) {
+        await game.saveMail();
+      }
+    },
+  }),
+);
+
+// Tradeable-character claim effects: kick the prior owner's live session and
+// detach the character from its guild before the account reassignment.
+// Registered unconditionally; the claim route is fail-closed behind
+// WOC_SNS_ENABLED + CHARACTER_TRADEABLE (see server/character_claim.ts).
+registerClaimHooks({
+  isCharacterOnline: (characterId) =>
+    [...game.clients.values()].some((s) => s.characterId === characterId),
+  disconnectCharacter: (characterId, reason) => {
+    const session = [...game.clients.values()].find((s) => s.characterId === characterId);
+    if (session) game.disconnectAccount(session.accountId, reason);
+  },
+  leaveGuildOnTransfer: async (characterId) => {
+    const session = [...game.clients.values()].find((s) => s.characterId === characterId);
+    const name = session?.name ?? (await getCharacterById(characterId))?.name ?? '';
+    await game.social.guildLeave({ characterId, name });
+  },
+});
 
 // Map editor persistence: the shared business rules (maps.ts / user_assets.ts)
 // wired to their Postgres backends, mirroring the SocialService/SocialDb split.
@@ -857,6 +923,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         if (name === null)
           return json(res, 400, { error: 'invalid character name (2-16 letters)' });
         if (offensiveName(name)) return json(res, 400, { error: 'character name is not allowed' });
+        // A paid vanity reservation holds the name against creation too, not
+        // just renames; otherwise anyone could claim a reserved name with a
+        // fresh character. Reserver's own account may use it.
+        if (WOC_IDENTITY_ENABLED) {
+          const holder = await activeReservationHolder(name);
+          if (holder !== null && holder !== accountId) {
+            return json(res, 409, { error: 'that name is reserved' });
+          }
+        }
         const validClasses = [
           'warrior',
           'paladin',
@@ -968,6 +1043,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     const renameMatch = /^\/api\/characters\/(\d+)\/rename$/.exec(url);
     const takeoverMatch = /^\/api\/characters\/(\d+)\/takeover$/.exec(url);
     const standingMatch = /^\/api\/characters\/(\d+)\/standing$/.exec(url);
+    const claimMatch = /^\/api\/characters\/(\d+)\/claim$/.exec(url);
+    // Tradeable-character claim (fail-closed inside the handler).
+    if (req.method === 'POST' && claimMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleCharacterClaim(req, res, accountId, Number(claimMatch[1]));
+    }
     if (req.method === 'GET' && standingMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -985,14 +1067,31 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const characterId = Number(renameMatch[1]);
       const character = await getCharacter(accountId, characterId);
       if (!character) return json(res, 404, { error: 'character not found' });
-      // A rename is a moderator-sanctioned action: the character-select UI only
-      // shows the rename control when a moderator has set force_rename. The UI is
-      // not a security boundary, so gate here too: a normal owner hitting this
-      // route directly must not be able to rename an un-flagged character. (The
-      // UPDATE in renameCharacter re-checks the flag race-free; this returns a
-      // clear 403 instead of a misleading 404.)
+      // This endpoint serves only the FREE, moderator-required rename (clearing
+      // force_rename). The UI is not a security boundary, so gate here too: a
+      // normal owner hitting this route directly must not be able to rename an
+      // un-flagged character for free. (The UPDATE in renameCharacter re-checks
+      // the flag race-free; this returns a clear status instead of a misleading
+      // 404.) With the $WOC identity feature on, a voluntary rename is a paid
+      // burn: answer 402 so the client starts the quote/confirm flow instead.
       if (!character.force_rename) {
+        if (WOC_IDENTITY_ENABLED) {
+          return json(res, 402, {
+            error: 'voluntary renames cost $WOC, use /api/identity/quote',
+            paid: true,
+          });
+        }
         return json(res, 403, { error: 'character rename is not permitted' });
+      }
+      // A reserved name is takeable only by the account that reserved it. Even
+      // on the free remediation path a player must not be able to grab someone
+      // else's reserved name. (Reservations exist only while the identity
+      // feature is enabled; skip the query otherwise.)
+      if (WOC_IDENTITY_ENABLED) {
+        const holder = await activeReservationHolder(name);
+        if (holder !== null && holder !== accountId) {
+          return json(res, 409, { error: 'that name is reserved' });
+        }
       }
       // A rename mutates the DB name and clears force_rename, but a live
       // ClientSession keeps its own copy of the name (used by reports, chat and
@@ -1409,6 +1508,43 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleWalletGet(req, res, accountId);
+    }
+    // $WOC-paid identity actions: quote a burn price, fetch the on-chain pay
+    // context, then redeem the signature. All fail-closed behind
+    // WOC_IDENTITY_ENABLED (each handler 404s when the feature is off).
+    if (req.method === 'GET' && url === '/api/identity/prices') {
+      return handleIdentityPrices(res);
+    }
+    if (req.method === 'POST' && url === '/api/identity/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleIdentityQuote(req, res, accountId);
+    }
+    if (req.method === 'GET' && url.startsWith('/api/identity/paycontext')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleIdentityPayContext(res, accountId, url);
+    }
+    if (req.method === 'POST' && url === '/api/identity/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleIdentityConfirm(req, res, accountId);
+    }
+    // Atomic $WOC burn + player-owned SNS subdomain mint. Same quote/confirm
+    // contract as the identity routes; fail-closed behind WOC_SNS_ENABLED (the
+    // prices probe 404s while off, which hides the client entry points).
+    if (req.method === 'GET' && url === '/api/subdomain/prices') {
+      return handleSubdomainPrices(res);
+    }
+    if (req.method === 'POST' && url === '/api/subdomain/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleSubdomainQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/subdomain/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleSubdomainConfirm(req, res, accountId);
     }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
@@ -1920,6 +2056,23 @@ async function main(): Promise<void> {
         JSON.stringify({
           t: 'error',
           error: 'This character must be renamed before entering the world.',
+        }),
+      );
+      ws.close();
+      return;
+    }
+    // Tradeable-character gate: a bound character can only enter the world
+    // while the account's linked wallet still controls its subdomain on-chain.
+    // If the name was sold or transferred, the new owner must claim it first.
+    if (
+      CHARACTER_TRADEABLE &&
+      character.bound_domain &&
+      !(await accountControlsBoundCharacter(accountId, character.bound_domain))
+    ) {
+      ws.send(
+        JSON.stringify({
+          t: 'error',
+          error: 'This character was transferred to a new owner and must be re-claimed.',
         }),
       );
       ws.close();

@@ -3388,6 +3388,10 @@ export const ru_RU: EnTranslations = {
       "tooManyAttempts": "Слишком много попыток. Подождите минуту и попробуйте снова.",
       "usernameShape": "Имя пользователя должно содержать 3-24 символа: буквы, цифры или нижнее подчеркивание.",
       "usernameNotAllowed": "Это имя пользователя запрещено.",
+      "linkWalletFirst": "Сначала подключите и привяжите кошелек Solana.",
+      "nameReserved": "Это имя зарезервировано.",
+      "quoteExpired": "Срок действия платежной котировки истек. Начните заново.",
+      "paymentUsed": "Этот платеж уже был использован.",
       "passwordMin": "Пароль должен содержать не менее 6 символов.",
       "usernameTaken": "Это имя пользователя уже занято.",
       "invalidCredentials": "Неверное имя пользователя или пароль.",
@@ -3408,7 +3412,14 @@ export const ru_RU: EnTranslations = {
       "alreadyInWorld": "Персонаж уже находится в мире.",
       "takenOver": "Вашего персонажа перехватила другая сессия.",
       "renameBeforeEntering": "Перед входом в мир этому персонажу нужно сменить имя.",
-      "renameNotPermitted": "Переименование этого персонажа не разрешено."
+      "renameNotPermitted": "Переименование этого персонажа не разрешено.",
+      "snsUnavailable": "Минт субдоменов сейчас недоступен. Повторите попытку позже.",
+      "noSubdomainForm": "У этого имени нет допустимой формы субдомена .sol.",
+      "alreadyBound": "Этот персонаж уже привязан к имени .sol.",
+      "solNameTaken": "Это имя .sol уже занято.",
+      "subdomainCheckFailed": "Не удалось проверить доступность имени. Повторите попытку.",
+      "subdomainNotConfirmed": "Не удалось подтвердить минт субдомена в блокчейне.",
+      "characterTransferred": "Этот персонаж был передан новому владельцу, и его нужно заявить заново."
     }
   },
   "desktop": {
@@ -3449,6 +3460,17 @@ export const ru_RU: EnTranslations = {
     "statsOffline": "Не в сети",
     "statsRealmOffline": "{realm} (не в сети)"
   },
+  "woc": {
+    "linkWalletFirst": "Подключите и привяжите кошелек Solana, чтобы платить в $WOC.",
+    "quoting": "Подготовка платежа $WOC...",
+    "approveBurn": "Подтвердите сжигание {amount} $WOC в кошельке...",
+    "confirming": "Подтверждение сжигания в блокчейне...",
+    "finalizing": "Ожидание финализации Solana...",
+    "confirmFailed": "Не удалось проверить платеж $WOC.",
+    "finalizeTimeout": "Время ожидания финализации истекло. Если $WOC уже сожжены, повторите попытку: платеж зачтется после финализации.",
+    "renameSuccess": "Переименовано в {name}.",
+    "mintSuccess": "Сминтировано {domain}. Имя принадлежит вам в блокчейне."
+  },
   "character": {
     "loading": "Загрузка...",
     "noneYet": "Персонажей пока нет. Создайте одного ниже.",
@@ -3461,6 +3483,12 @@ export const ru_RU: EnTranslations = {
     "delete": "Удалить",
     "rename": "Переименовать",
     "newNamePlaceholder": "Новое имя персонажа",
+    "renamePaidButton": "Заплатить {amount} $WOC и переименовать",
+    "renamePriceHint": "Добровольное переименование сжигает {amount} $WOC.",
+    "renameCancel": "Отмена",
+    "mintSolName": "Получить имя .sol",
+    "mintSolButton": "Сжечь {amount} $WOC и сминтить",
+    "mintSolHint": "Минтит ваше имя как принадлежащий игроку субдомен .sol за {amount} $WOC. Имя принадлежит вам в блокчейне.",
     "tabCharacters": "Персонажи",
     "tabCreate": "Создать",
     "portraitAlt": "Портрет {name}",

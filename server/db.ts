@@ -577,6 +577,71 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- $WOC payment receipts (PRD: docs/prd/woc/rename-vanity-names.md). One row per
+-- consumed on-chain payment; tx_sig UNIQUE is the replay guard: a signature can
+-- settle exactly one action, so a confirmed payment can never be redeemed twice.
+-- Pure audit + idempotency; the server never holds keys or funds.
+CREATE TABLE IF NOT EXISTS woc_payments (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  tx_sig TEXT NOT NULL UNIQUE,
+  amount_base BIGINT NOT NULL,
+  burned_base BIGINT NOT NULL DEFAULT 0,
+  mint TEXT NOT NULL,
+  reference TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS woc_payments_account ON woc_payments(account_id, created_at DESC);
+-- Short-lived, single-use $WOC payment quotes. A quote authorizes one identity
+-- action (rename/reserve) at a fixed price; the client pays on-chain with the
+-- quote id as the tx memo, then redeems it. Stored server-side so the client
+-- cannot change what a payment buys; consuming the quote deletes the row.
+CREATE TABLE IF NOT EXISTS woc_quotes (
+  quote_id TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL,
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  price_base BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS woc_quotes_account ON woc_quotes(account_id);
+-- Vanity name reservations: pay $WOC to hold a name you are not yet using.
+-- Realm-scoped and case-insensitively unique while active; an expiry releases it
+-- so a name can't be squatted forever. status: 'active' | 'released'.
+CREATE TABLE IF NOT EXISTS name_reservations (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  name TEXT NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'character',
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ
+);
+CREATE UNIQUE INDEX IF NOT EXISTS name_reservations_active
+  ON name_reservations(realm, lower(name)) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS name_reservations_account ON name_reservations(account_id);
+-- SNS subdomains + tradeable characters (PRD: docs/prd/woc/sns-tradeable-characters.md).
+-- A character may be bound to a player-owned label.worldofclaudecraft.sol
+-- subdomain; when CHARACTER_TRADEABLE is on, on-chain ownership of that
+-- subdomain decides who controls the character (selling the name sells the
+-- character). The table mirrors issued mints for audit; the chain is truth.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS bound_domain TEXT;
+CREATE INDEX IF NOT EXISTS characters_bound_domain ON characters(realm, bound_domain);
+CREATE TABLE IF NOT EXISTS sns_subdomains (
+  id BIGSERIAL PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  character_id INT REFERENCES characters(id) ON DELETE SET NULL,
+  label TEXT NOT NULL,
+  full_domain TEXT NOT NULL UNIQUE,
+  owner_pubkey TEXT NOT NULL,
+  tx_sig TEXT NOT NULL,
+  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS sns_subdomains_account ON sns_subdomains(account_id);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -1356,6 +1421,149 @@ export async function unlinkWallet(accountId: number): Promise<void> {
   await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
 }
 
+// ── $WOC payments / quotes / vanity reservations ───────────────────────────
+// BIGINT columns are read/written as decimal strings: $WOC base-unit amounts can
+// exceed Number.MAX_SAFE_INTEGER, so callers pass bigints and we bind String(...).
+
+export interface WocQuoteRow {
+  quote_id: string;
+  account_id: number;
+  kind: string;
+  payload: any;
+  price_base: string;
+  mint: string;
+  expires_at: string;
+}
+
+export async function createWocQuote(row: {
+  quoteId: string;
+  accountId: number;
+  kind: string;
+  payload: unknown;
+  priceBase: bigint;
+  mint: string;
+  ttlMinutes: number;
+}): Promise<void> {
+  await pool.query(
+    `INSERT INTO woc_quotes (quote_id, account_id, kind, payload, price_base, mint, expires_at)
+     VALUES ($1, $2, $3, $4, $5, $6, now() + ($7 || ' minutes')::interval)`,
+    [
+      row.quoteId,
+      row.accountId,
+      row.kind,
+      JSON.stringify(row.payload ?? {}),
+      String(row.priceBase),
+      row.mint,
+      String(row.ttlMinutes),
+    ],
+  );
+}
+
+// Read a quote non-destructively: returned when it belongs to the account and is
+// unexpired. The confirm flow verifies payment BEFORE deleting the quote so a
+// too-early/too-late confirm never strands an already-burned payment; the
+// woc_payments tx_sig UNIQUE is the real single-settlement guard, and the quote
+// is deleted (deleteWocQuote) only after a successful, recorded settlement.
+export async function getWocQuote(quoteId: string, accountId: number): Promise<WocQuoteRow | null> {
+  const res = await pool.query(
+    `SELECT quote_id, account_id, kind, payload, price_base, mint, expires_at
+     FROM woc_quotes WHERE quote_id = $1 AND account_id = $2 AND expires_at > now()`,
+    [quoteId, accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function deleteWocQuote(quoteId: string): Promise<void> {
+  await pool.query('DELETE FROM woc_quotes WHERE quote_id = $1', [quoteId]);
+}
+
+export async function pruneWocQuotes(): Promise<void> {
+  await pool.query('DELETE FROM woc_quotes WHERE expires_at <= now()');
+}
+
+// Record a consumed on-chain payment. Returns null when the tx_sig was already
+// recorded (UNIQUE replay guard) so the caller rejects a double-spend.
+export async function recordWocPayment(row: {
+  accountId: number;
+  txSig: string;
+  amountBase: bigint;
+  burnedBase: bigint;
+  mint: string;
+  reference: string;
+}): Promise<{ id: number } | null> {
+  try {
+    const res = await pool.query(
+      `INSERT INTO woc_payments (account_id, tx_sig, amount_base, burned_base, mint, reference)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [
+        row.accountId,
+        row.txSig,
+        String(row.amountBase),
+        String(row.burnedBase),
+        row.mint,
+        row.reference,
+      ],
+    );
+    return { id: Number(res.rows[0].id) };
+  } catch (err) {
+    if (isUniqueViolation(err)) return null;
+    throw err;
+  }
+}
+
+export interface NameReservationRow {
+  id: number;
+  account_id: number;
+  name: string;
+  kind: string;
+  expires_at: string | null;
+}
+
+// Reserve a name for an account (realm-scoped, expiring). Returns null when an
+// active reservation for that name already exists (partial UNIQUE index races to
+// 23505) so the handler can surface "already reserved".
+export async function reserveName(
+  accountId: number,
+  name: string,
+  kind: string,
+  ttlDays: number,
+): Promise<NameReservationRow | null> {
+  try {
+    const res = await pool.query(
+      `INSERT INTO name_reservations (account_id, realm, name, kind, expires_at)
+       VALUES ($1, $2, $3, $4, now() + ($5 || ' days')::interval)
+       RETURNING id, account_id, name, kind, expires_at`,
+      [accountId, REALM, name, kind, String(ttlDays)],
+    );
+    return res.rows[0] ?? null;
+  } catch (err) {
+    if (isUniqueViolation(err)) return null;
+    throw err;
+  }
+}
+
+// The account holding an active, unexpired reservation for `name` (realm-scoped),
+// or null. Lets a rename/create allow a reserved name only for its reserver.
+export async function activeReservationHolder(name: string): Promise<number | null> {
+  const res = await pool.query(
+    `SELECT account_id FROM name_reservations
+     WHERE realm = $1 AND lower(name) = lower($2) AND status = 'active'
+       AND (expires_at IS NULL OR expires_at > now())
+     LIMIT 1`,
+    [REALM, name],
+  );
+  return res.rows[0]?.account_id ?? null;
+}
+
+export async function countActiveReservations(accountId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS n FROM name_reservations
+     WHERE account_id = $1 AND status = 'active' AND (expires_at IS NULL OR expires_at > now())`,
+    [accountId],
+  );
+  return res.rows[0]?.n ?? 0;
+}
+
 // ── Shareable player cards + referrals ─────────────────────────────────────
 
 export interface PlayerCardRow {
@@ -1629,6 +1837,10 @@ export interface CharacterRow {
   state: CharacterState | null;
   is_gm: boolean;
   force_rename: boolean;
+  // The label.worldofclaudecraft.sol subdomain this character is bound to when
+  // tradeable (PRD sns-tradeable-characters). Only populated by reads that
+  // select it (getCharacter, getCharacterById); undefined elsewhere.
+  bound_domain?: string | null;
   last_played?: Date | string | null;
   playtime_seconds?: string | number | null;
 }
@@ -1679,7 +1891,7 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, bound_domain FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;
@@ -1701,10 +1913,82 @@ export async function listCharacterNamesForSitemap(limit = 50000): Promise<strin
 // the same shape as getCharacter so the sheet normalizer treats both alike.
 export async function getCharacterById(characterId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND realm = $2',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, bound_domain FROM characters WHERE id = $1 AND realm = $2',
     [characterId, REALM],
   );
   return res.rows[0] ?? null;
+}
+
+// ── SNS subdomains + character binding / claim ──────────────────────────────
+
+// Record an issued, player-owned subdomain and bind it to the character in one
+// transaction so a character is never half-bound. UNIQUE(full_domain) makes
+// the chain's subdomain uniqueness our uniqueness too.
+export async function recordSubdomainAndBind(row: {
+  accountId: number;
+  characterId: number;
+  label: string;
+  fullDomain: string;
+  ownerPubkey: string;
+  txSig: string;
+}): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `INSERT INTO sns_subdomains (account_id, character_id, label, full_domain, owner_pubkey, tx_sig, realm)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        row.accountId,
+        row.characterId,
+        row.label,
+        row.fullDomain,
+        row.ownerPubkey,
+        row.txSig,
+        REALM,
+      ],
+    );
+    await client.query(
+      'UPDATE characters SET bound_domain = $3, updated_at = now() WHERE id = $1 AND account_id = $2 AND realm = $4',
+      [row.characterId, row.accountId, row.fullDomain, REALM],
+    );
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// Reassign a bound character to a new account (a completed on-chain subdomain
+// transfer). Also re-points the subdomain mirror row so audit history follows
+// the asset. Returns the moved character, or null if it vanished.
+export async function reassignCharacterAccount(
+  characterId: number,
+  newAccountId: number,
+): Promise<CharacterRow | null> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const res = await client.query(
+      `UPDATE characters SET account_id = $2, updated_at = now()
+       WHERE id = $1 AND realm = $3
+       RETURNING id, account_id, name, class, level, state, is_gm, force_rename, bound_domain`,
+      [characterId, newAccountId, REALM],
+    );
+    await client.query('UPDATE sns_subdomains SET account_id = $2 WHERE character_id = $1', [
+      characterId,
+      newAccountId,
+    ]);
+    await client.query('COMMIT');
+    return res.rows[0] ?? null;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function findCharacterReportTargetByName(
@@ -1903,6 +2187,26 @@ export async function renameCharacter(
     `UPDATE characters
      SET name = $3, force_rename = FALSE, updated_at = now()
      WHERE id = $1 AND account_id = $2 AND realm = $4 AND force_rename = TRUE
+     RETURNING id, account_id, name, class, level, state, is_gm, force_rename`,
+    [characterId, accountId, name, REALM],
+  );
+  return res.rows[0] ?? null;
+}
+
+// The $WOC-paid voluntary rename. The mirror image of renameCharacter above:
+// it applies only while force_rename is FALSE, so a moderator-required rename
+// can never be settled through the paid flow (that one stays free and clears
+// the flag), and a racing moderator flag between prepare and apply makes the
+// UPDATE match no row instead of silently clearing moderation state.
+export async function renameCharacterVoluntary(
+  accountId: number,
+  characterId: number,
+  name: string,
+): Promise<CharacterRow | null> {
+  const res = await pool.query(
+    `UPDATE characters
+     SET name = $3, updated_at = now()
+     WHERE id = $1 AND account_id = $2 AND realm = $4 AND force_rename = FALSE
      RETURNING id, account_id, name, class, level, state, is_gm, force_rename`,
     [characterId, accountId, name, REALM],
   );

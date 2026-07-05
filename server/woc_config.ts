@@ -1,0 +1,119 @@
+// Central $WOC / Solana commerce config: the single source of truth for the
+// mint, RPC, decimals, sink routing (burn / treasury split), and the prices of
+// the paid identity actions. Read once here so every consumer agrees on the
+// same numbers.
+//
+// Prices are authored in human-readable $WOC (env vars) and exposed in token
+// base units (x 10^decimals) for on-chain math. Server-only module; no SQL,
+// no client import.
+
+// Master switch for the $WOC-paid identity actions (character rename, guild
+// rename, vanity-name reservation). Fail-closed: OFF unless explicitly enabled,
+// so a default deploy of this branch changes no behavior.
+export const WOC_IDENTITY_ENABLED = boolEnv(process.env.WOC_IDENTITY_ENABLED, false);
+
+// The $WOC SPL mint. Prefer the server-only var, fall back to the client's
+// VITE_* (loaded from .env.local in dev by db.ts), then the published default;
+// mirrors server/woc_balance.ts so a single local config drives everything.
+export const WOC_MINT = (
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+).trim();
+
+export const SOLANA_RPC_URL = (
+  process.env.SOLANA_RPC_URL ??
+  process.env.VITE_SOLANA_RPC_URL ??
+  'https://api.mainnet-beta.solana.com'
+).trim();
+
+// $WOC token decimals. Most SPL/pump tokens use 6; override if the canonical
+// mint differs. Used to convert human prices to base units and by the
+// client-side burnChecked instruction (which is decimal-checked on-chain).
+export const WOC_DECIMALS = clampInt(process.env.WOC_DECIMALS, 6, 0, 18);
+
+// SNS subdomains + tradeable characters. Everything here is fail-closed and
+// stays OFF until the project controls SNS_PARENT_DOMAIN and configures the
+// execution wallet. WOC_SNS_ENABLED turns on subdomain minting (the /api/
+// subdomain routes 404 while off); CHARACTER_TRADEABLE additionally makes a
+// bound character's controller follow on-chain subdomain ownership.
+export const WOC_SNS_ENABLED = boolEnv(process.env.WOC_SNS_ENABLED, false);
+export const CHARACTER_TRADEABLE = boolEnv(process.env.CHARACTER_TRADEABLE, false);
+// The project-owned parent domain subdomains are minted under (with or without
+// the trailing .sol; server/sns.ts normalizes to the bare label).
+export const SNS_PARENT_DOMAIN = (process.env.SNS_PARENT_DOMAIN ?? 'worldofclaudecraft.sol')
+  .trim()
+  .toLowerCase();
+// base58-encoded secret key of the execution wallet that owns SNS_PARENT_DOMAIN
+// and co-signs subdomain creation. The one custodial seam (it never touches
+// player funds): store it encrypted at rest, never in git. Empty in dev keeps
+// the signer unavailable, so mint paths refuse instead of using a bogus key.
+export const EXECUTION_WALLET_SECRET = (process.env.EXECUTION_WALLET_SECRET ?? '').trim();
+
+// Sink routing. By default 100% of a payment is burned (a clean deflationary
+// sink). Set WOC_BURN_BPS < 10000 and WOC_TREASURY to split the remainder to a
+// treasury address. Always: burned + treasury-credited must cover the price.
+export const WOC_BURN_BPS = clampInt(process.env.WOC_BURN_BPS, 10000, 0, 10000);
+export const WOC_TREASURY = (process.env.WOC_TREASURY ?? '').trim() || null;
+
+const TEN = 10n;
+function pow10(n: number): bigint {
+  let r = 1n;
+  for (let i = 0; i < n; i++) r *= TEN;
+  return r;
+}
+const BASE_UNIT = pow10(WOC_DECIMALS);
+
+/** Convert a human-readable $WOC amount to integer base units. */
+export function wocToBase(human: number): bigint {
+  if (!Number.isFinite(human) || human < 0) return 0n;
+  // Round to the nearest base unit; prices are whole-ish so this is exact in
+  // practice, and we never want a fractional-unit threshold the client can't hit.
+  return BigInt(Math.round(human * Number(BASE_UNIT)));
+}
+
+// Feature prices in human $WOC (env-overridable; placeholders, tune before any
+// mainnet launch). Each is also exposed in base units.
+export type WocPriceKey = 'rename_character' | 'rename_guild' | 'reserve_name' | 'mint_subdomain';
+
+const PRICE_HUMAN: Record<WocPriceKey, number> = {
+  rename_character: numEnv(process.env.WOC_PRICE_RENAME_CHARACTER, 500),
+  rename_guild: numEnv(process.env.WOC_PRICE_RENAME_GUILD, 2500),
+  reserve_name: numEnv(process.env.WOC_PRICE_RESERVE, 1000),
+  mint_subdomain: numEnv(process.env.WOC_PRICE_SUBDOMAIN, 1000),
+};
+
+export function wocPriceHuman(key: WocPriceKey): number {
+  return PRICE_HUMAN[key];
+}
+
+export function wocPriceBase(key: WocPriceKey): bigint {
+  return wocToBase(PRICE_HUMAN[key]);
+}
+
+/** Split a price into the burn and treasury portions (base units). */
+export function splitPrice(priceBase: bigint): { burnBase: bigint; treasuryBase: bigint } {
+  const burnBase = (priceBase * BigInt(WOC_BURN_BPS)) / 10000n;
+  return { burnBase, treasuryBase: priceBase - burnBase };
+}
+
+function numEnv(v: string | undefined, dflt: number): number {
+  if (v === undefined) return dflt;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? n : dflt;
+}
+
+function clampInt(v: string | undefined, dflt: number, lo: number, hi: number): number {
+  if (v === undefined) return dflt;
+  const n = Math.trunc(Number(v));
+  if (!Number.isFinite(n)) return dflt;
+  return Math.min(hi, Math.max(lo, n));
+}
+
+function boolEnv(v: string | undefined, dflt: boolean): boolean {
+  if (v === undefined) return dflt;
+  const s = v.trim().toLowerCase();
+  if (s === '1' || s === 'true') return true;
+  if (s === '0' || s === 'false' || s === '') return false;
+  return dflt;
+}

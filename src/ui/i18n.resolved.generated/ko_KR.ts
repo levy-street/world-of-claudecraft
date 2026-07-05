@@ -3388,6 +3388,10 @@ export const ko_KR: EnTranslations = {
       "tooManyAttempts": "시도가 너무 많습니다. 1분 후 다시 시도하세요.",
       "usernameShape": "사용자 이름은 3-24자이며 글자, 숫자 또는 밑줄을 사용해야 합니다.",
       "usernameNotAllowed": "이 사용자 이름은 사용할 수 없습니다.",
+      "linkWalletFirst": "먼저 Solana 지갑을 연결하고 링크하세요.",
+      "nameReserved": "그 이름은 예약되어 있습니다.",
+      "quoteExpired": "결제 견적이 만료되었습니다. 다시 시작하세요.",
+      "paymentUsed": "이 결제는 이미 사용되었습니다.",
       "passwordMin": "비밀번호는 최소 6자여야 합니다.",
       "usernameTaken": "이미 사용 중인 사용자 이름입니다.",
       "invalidCredentials": "사용자 이름 또는 비밀번호가 올바르지 않습니다.",
@@ -3408,7 +3412,14 @@ export const ko_KR: EnTranslations = {
       "alreadyInWorld": "캐릭터가 이미 세계에 있습니다.",
       "takenOver": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "renameBeforeEntering": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
-      "renameNotPermitted": "이 캐릭터의 이름을 변경할 수 없습니다."
+      "renameNotPermitted": "이 캐릭터의 이름을 변경할 수 없습니다.",
+      "snsUnavailable": "지금은 서브도메인 민팅을 사용할 수 없습니다. 나중에 다시 시도하세요.",
+      "noSubdomainForm": "해당 이름은 유효한 .sol 서브도메인 형식이 없습니다.",
+      "alreadyBound": "이 캐릭터는 이미 .sol 이름에 연결되어 있습니다.",
+      "solNameTaken": "해당 .sol 이름은 이미 사용 중입니다.",
+      "subdomainCheckFailed": "이름 사용 가능 여부를 확인할 수 없습니다. 다시 시도하세요.",
+      "subdomainNotConfirmed": "서브도메인 민팅을 온체인에서 확인할 수 없습니다.",
+      "characterTransferred": "이 캐릭터는 새 소유자에게 이전되어 다시 클레임해야 합니다."
     }
   },
   "desktop": {
@@ -3449,6 +3460,17 @@ export const ko_KR: EnTranslations = {
     "statsOffline": "오프라인",
     "statsRealmOffline": "{realm}(오프라인)"
   },
+  "woc": {
+    "linkWalletFirst": "$WOC로 지불하려면 Solana 지갑을 연결하고 링크하세요.",
+    "quoting": "$WOC 결제를 준비하는 중...",
+    "approveBurn": "지갑에서 {amount} $WOC 소각을 승인하세요...",
+    "confirming": "온체인에서 소각을 확인하는 중...",
+    "finalizing": "Solana 최종 확정을 기다리는 중...",
+    "confirmFailed": "$WOC 결제를 확인할 수 없습니다.",
+    "finalizeTimeout": "최종 확정 대기가 시간 초과되었습니다. $WOC가 소각되었다면 재시도하세요. 결제는 최종 확정되면 정산됩니다.",
+    "renameSuccess": "{name}(으)로 이름을 변경했습니다.",
+    "mintSuccess": "{domain}을(를) 민팅했습니다. 온체인에서 당신의 소유입니다."
+  },
   "character": {
     "loading": "불러오는 중...",
     "noneYet": "아직 캐릭터가 없습니다. 아래에서 하나를 만드세요.",
@@ -3461,6 +3483,12 @@ export const ko_KR: EnTranslations = {
     "delete": "삭제",
     "rename": "이름 변경",
     "newNamePlaceholder": "새 캐릭터 이름",
+    "renamePaidButton": "{amount} $WOC 지불하고 이름 변경",
+    "renamePriceHint": "자발적 이름 변경은 {amount} $WOC를 소각합니다.",
+    "renameCancel": "취소",
+    "mintSolName": ".sol 이름 받기",
+    "mintSolButton": "{amount} $WOC 소각하고 민팅",
+    "mintSolHint": "{amount} $WOC로 이름을 플레이어 소유의 .sol 서브도메인으로 민팅합니다. 이름은 온체인에서 당신의 소유가 됩니다.",
     "tabCharacters": "캐릭터",
     "tabCreate": "생성",
     "portraitAlt": "{name}의 초상화",

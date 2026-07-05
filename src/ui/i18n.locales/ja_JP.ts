@@ -5821,4 +5821,35 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': '採掘',
   'hudChrome.gathering.logging': '伐採',
   'hudChrome.gathering.herbalism': '薬草学',
+  'character.renamePaidButton': '{amount} $WOCを支払って改名',
+  'character.renamePriceHint': '任意の改名は{amount} $WOCをバーンします。',
+  'character.renameCancel': 'キャンセル',
+  'errors.api.linkWalletFirst': 'まずSolanaウォレットを接続してリンクしてください。',
+  'errors.api.nameReserved': 'その名前は予約されています。',
+  'errors.api.quoteExpired': '支払い見積もりの期限が切れました。最初からやり直してください。',
+  'errors.api.paymentUsed': 'この支払いは既に使用されています。',
+  'woc.linkWalletFirst': '$WOCで支払うにはSolanaウォレットを接続してリンクしてください。',
+  'woc.quoting': '$WOC支払いを準備中...',
+  'woc.approveBurn': 'ウォレットで{amount} $WOCのバーンを承認してください...',
+  'woc.confirming': 'オンチェーンでバーンを確認中...',
+  'woc.finalizing': 'Solanaのファイナライズを待機中...',
+  'woc.confirmFailed': '$WOC支払いを確認できませんでした。',
+  'woc.finalizeTimeout':
+    'ファイナライズ待ちがタイムアウトしました。$WOCがバーン済みの場合は再試行してください。支払いはファイナライズ後に確定します。',
+  'woc.renameSuccess': '{name}に改名しました。',
+  'character.mintSolName': '.sol名を取得',
+  'character.mintSolButton': '{amount} $WOCをバーンしてミント',
+  'character.mintSolHint':
+    '{amount} $WOCで名前をプレイヤー所有の.solサブドメインとしてミントします。名前はオンチェーンであなたのものになります。',
+  'woc.mintSuccess': '{domain}をミントしました。オンチェーンであなたのものです。',
+  'errors.api.snsUnavailable':
+    'サブドメインのミントは現在利用できません。後でもう一度お試しください。',
+  'errors.api.noSubdomainForm': 'その名前には有効な.solサブドメイン形式がありません。',
+  'errors.api.alreadyBound': 'このキャラクターは既に.sol名に紐付けられています。',
+  'errors.api.solNameTaken': 'その.sol名は既に使われています。',
+  'errors.api.subdomainCheckFailed':
+    '名前の空き状況を確認できませんでした。もう一度お試しください。',
+  'errors.api.subdomainNotConfirmed': 'サブドメインのミントをオンチェーンで確認できませんでした。',
+  'errors.api.characterTransferred':
+    'このキャラクターは新しい所有者に譲渡されました。再クレームが必要です。',
 };

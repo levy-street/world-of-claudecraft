@@ -250,6 +250,25 @@ export class PgSocialDb implements SocialDb {
     }
   }
 
+  // Rename a guild. The (realm, name) unique index races a duplicate to 23505
+  // -> 'name_taken'; a missing guild is reported as 'not_found' so the caller
+  // never claims a phantom success.
+  async renameGuild(
+    guildId: number,
+    newName: string,
+  ): Promise<{ ok: true } | { error: 'name_taken' | 'not_found' }> {
+    try {
+      const res = await this.pool.query('UPDATE guilds SET name = $2 WHERE id = $1', [
+        guildId,
+        newName,
+      ]);
+      return res.rowCount === 0 ? { error: 'not_found' } : { ok: true };
+    } catch (err) {
+      if ((err as { code?: string }).code === '23505') return { error: 'name_taken' };
+      throw err;
+    }
+  }
+
   async deleteGuild(id: number): Promise<void> {
     await this.pool.query('DELETE FROM guilds WHERE id = $1', [id]);
   }

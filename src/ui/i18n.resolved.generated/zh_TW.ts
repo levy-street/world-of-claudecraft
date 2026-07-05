@@ -3388,6 +3388,10 @@ export const zh_TW: EnTranslations = {
       "tooManyAttempts": "嘗試次數過多。請等待一分鐘後再試。",
       "usernameShape": "使用者名稱必須為 3-24 個字元，並使用字母、數字或底線。",
       "usernameNotAllowed": "此使用者名稱不可使用。",
+      "linkWalletFirst": "請先連接並綁定 Solana 錢包。",
+      "nameReserved": "該名字已被預訂。",
+      "quoteExpired": "支付報價已過期，請重新開始。",
+      "paymentUsed": "該筆支付已被使用。",
       "passwordMin": "密碼至少需要 6 個字元。",
       "usernameTaken": "此使用者名稱已被使用。",
       "invalidCredentials": "使用者名稱或密碼無效。",
@@ -3408,7 +3412,14 @@ export const zh_TW: EnTranslations = {
       "alreadyInWorld": "角色已在世界中。",
       "takenOver": "你的角色已被另一個工作階段接管。",
       "renameBeforeEntering": "此角色必須先更名才能進入世界。",
-      "renameNotPermitted": "不允許為此角色更名。"
+      "renameNotPermitted": "不允許為此角色更名。",
+      "snsUnavailable": "子網域鑄造目前無法使用。請稍後再試。",
+      "noSubdomainForm": "該名字沒有有效的 .sol 子網域形式。",
+      "alreadyBound": "該角色已綁定一個 .sol 名稱。",
+      "solNameTaken": "該 .sol 名稱已被使用。",
+      "subdomainCheckFailed": "無法檢查名稱可用性。請重試。",
+      "subdomainNotConfirmed": "無法在鏈上確認子網域鑄造。",
+      "characterTransferred": "該角色已轉讓給新擁有者，需重新認領。"
     }
   },
   "desktop": {
@@ -3449,6 +3460,17 @@ export const zh_TW: EnTranslations = {
     "statsOffline": "離線",
     "statsRealmOffline": "{realm}（離線）"
   },
+  "woc": {
+    "linkWalletFirst": "連接並綁定 Solana 錢包後即可用 $WOC 支付。",
+    "quoting": "正在準備 $WOC 支付...",
+    "approveBurn": "請在錢包中批准銷毀 {amount} $WOC...",
+    "confirming": "正在鏈上確認銷毀...",
+    "finalizing": "等待 Solana 最終確認...",
+    "confirmFailed": "無法驗證 $WOC 支付。",
+    "finalizeTimeout": "等待最終確認逾時。如果 $WOC 已銷毀，請重試：支付將在最終確認後結算。",
+    "renameSuccess": "已改名為 {name}。",
+    "mintSuccess": "已鑄造 {domain}。它在鏈上歸你所有。"
+  },
   "character": {
     "loading": "正在載入...",
     "noneYet": "還沒有角色。請在下方建立一個。",
@@ -3461,6 +3483,12 @@ export const zh_TW: EnTranslations = {
     "delete": "刪除",
     "rename": "更名",
     "newNamePlaceholder": "新角色名稱",
+    "renamePaidButton": "支付 {amount} $WOC 並改名",
+    "renamePriceHint": "自願改名將銷毀 {amount} $WOC。",
+    "renameCancel": "取消",
+    "mintSolName": "取得 .sol 名稱",
+    "mintSolButton": "燒毀 {amount} $WOC 並鑄造",
+    "mintSolHint": "花費 {amount} $WOC 將你的名字鑄造為玩家所有的 .sol 子網域。該名稱在鏈上歸你所有。",
     "tabCharacters": "角色",
     "tabCreate": "建立",
     "portraitAlt": "{name}的頭像",
