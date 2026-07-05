@@ -1704,6 +1704,11 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
+      // Crit/haste RATING are informational paper-doll stats (combat values ride
+      // crit/sh above); sent always like the other self stats so the online
+      // character sheet shows them instead of the blankEntity 0. Server-recomputed.
+      e.critRating = s.crat ?? 0;
+      e.hasteRating = s.hrat ?? 0;
       e.weapon = s.weapon ?? e.weapon;
       e.eating = s.eat
         ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }

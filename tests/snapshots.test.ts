@@ -125,6 +125,38 @@ function bareClient(pid: number): ClientWorld {
   return c;
 }
 
+describe('self stat wire round-trip', () => {
+  it('mirrors crit/haste rating from the self snapshot onto the paper-doll entity', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'mage',
+        nm: 'Caster',
+        lv: 20,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        res: 0,
+        mres: 100,
+        rtype: 'mana',
+        crat: 20,
+        hrat: 150,
+      },
+    });
+    // Without the wire fields these read the blankEntity default 0 (the bug this guards).
+    expect(client.player.critRating).toBe(20);
+    expect(client.player.hasteRating).toBe(150);
+  });
+});
+
 describe('spectate client POV', () => {
   it('follows observed self, aligns on entry and respawn, then restores identity', () => {
     const client = bareClient(1);
