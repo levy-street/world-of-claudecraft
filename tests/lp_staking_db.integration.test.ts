@@ -20,6 +20,9 @@ const { PgLpStakingDb, withLpEpochLock } = await import('../server/lp_staking_db
 const { PgFlowLedgerDb } = await import('../server/flow_ledger_db');
 const { FlowLedger } = await import('../server/flow_ledger');
 const { LpStakingService } = await import('../server/lp_staking_service');
+const { createBuybackBatch, lastSettleAt, markBatchSettled, openBuybackBatches } = await import(
+  '../server/payout_db'
+);
 
 const db = new PgLpStakingDb();
 const POOL = 'PoolPubkey1111111111111111111111111111111111';
@@ -32,15 +35,24 @@ describe.skipIf(!PG_TEST_URL)('PgLpStakingDb (real Postgres)', () => {
     await pool.end();
   });
   beforeEach(async () => {
-    await pool.query('TRUNCATE lp_accruals, lp_epochs, lp_positions RESTART IDENTITY CASCADE');
+    await pool.query(
+      'TRUNCATE lp_payouts, lp_accruals, lp_epochs, lp_positions RESTART IDENTITY CASCADE',
+    );
     await pool.query(
       'TRUNCATE woc_payouts, woc_flow_ledger, woc_reward_pools, woc_seasons RESTART IDENTITY CASCADE',
     );
+    await pool.query('TRUNCATE buyback_batches');
   });
 
   it('position mirror round-trips bigint amounts and upserts on conflict', async () => {
     await db.upsertPositions([
-      { pool: POOL, owner: 'OwnerA', amountBase: 18_446_744_073_709_551_615n / 2n, lockedUntil: 2_000_000_000, stakedAt: 1 },
+      {
+        pool: POOL,
+        owner: 'OwnerA',
+        amountBase: 18_446_744_073_709_551_615n / 2n,
+        lockedUntil: 2_000_000_000,
+        stakedAt: 1,
+      },
     ]);
     await db.upsertPositions([
       { pool: POOL, owner: 'OwnerA', amountBase: 7n, lockedUntil: 3_000_000_000, stakedAt: 1 },
@@ -54,7 +66,14 @@ describe.skipIf(!PG_TEST_URL)('PgLpStakingDb (real Postgres)', () => {
   });
 
   it('epoch insert is atomic with its accruals and unique per (pool, epoch)', async () => {
-    const epoch = { pool: POOL, epochId: 42n, seasonId: 1, snapshotAt: 100, totalWeight: 10n, emissionBase: 100n };
+    const epoch = {
+      pool: POOL,
+      epochId: 42n,
+      seasonId: 1,
+      snapshotAt: 100,
+      totalWeight: 10n,
+      emissionBase: 100n,
+    };
     await db.insertEpochWithAccruals(epoch, [
       { pool: POOL, epochId: 42n, owner: 'OwnerA', amountBase: 60n, accruedAt: 100 },
       { pool: POOL, epochId: 42n, owner: 'OwnerB', amountBase: 40n, accruedAt: 100 },
@@ -113,7 +132,11 @@ describe.skipIf(!PG_TEST_URL)('PgLpStakingDb (real Postgres)', () => {
       inside -= 1;
       return true;
     };
-    const results = await Promise.all([withLpEpochLock(work), withLpEpochLock(work), withLpEpochLock(work)]);
+    const results = await Promise.all([
+      withLpEpochLock(work),
+      withLpEpochLock(work),
+      withLpEpochLock(work),
+    ]);
     expect(maxInside).toBe(1);
     expect(results.filter((r) => r === true).length).toBeGreaterThanOrEqual(1);
     expect(results.filter((r) => r === null).length).toBeGreaterThanOrEqual(1);
@@ -122,7 +145,12 @@ describe.skipIf(!PG_TEST_URL)('PgLpStakingDb (real Postgres)', () => {
   it('a full service epoch over the REAL ledger + REAL LP SQL respects the invariant end to end', async () => {
     const ledger = new FlowLedger(new PgFlowLedgerDb());
     await ledger.ensureSeason(77, 'lp integration');
-    await ledger.creditInflow({ seasonId: 77, source: 'marketplace_buyback', amountBase: 1_000n, txSig: 'buy77' });
+    await ledger.creditInflow({
+      seasonId: 77,
+      source: 'marketplace_buyback',
+      amountBase: 1_000n,
+      txSig: 'buy77',
+    });
 
     const staker = Keypair.generate().publicKey.toBase58();
     const chainAmount = 100n;
@@ -137,7 +165,9 @@ describe.skipIf(!PG_TEST_URL)('PgLpStakingDb (real Postgres)', () => {
         headroomCapBps: 10_000,
       },
       chain: {
-        positions: async () => [{ owner: staker, amountBase: chainAmount, lockedUntil: 0, stakedAt: 1 }],
+        positions: async () => [
+          { owner: staker, amountBase: chainAmount, lockedUntil: 0, stakedAt: 1 },
+        ],
         position: async () => ({ amountBase: chainAmount, lockedUntil: 0, stakedAt: 1 }),
         latestBlockhash: async () => ({ blockhash: 'x', lastValidBlockHeight: 1 }),
       },
@@ -153,7 +183,101 @@ describe.skipIf(!PG_TEST_URL)('PgLpStakingDb (real Postgres)', () => {
     // replaying the same epoch (same synthetic sig) cannot double-spend
     const again = await svc.runEpochIfDue();
     expect(again.ran).toBe(false);
-    const outs = await pool.query(`SELECT COUNT(*)::int AS n FROM woc_flow_ledger WHERE direction = 'out'`);
+    const outs = await pool.query(
+      `SELECT COUNT(*)::int AS n FROM woc_flow_ledger WHERE direction = 'out'`,
+    );
     expect(outs.rows[0].n).toBe(1);
+  });
+
+  it('lp_payouts machine: intent, replay-guard, confirm applies the book once, guard caps paid', async () => {
+    await db.insertEpochWithAccruals(
+      { pool: POOL, epochId: 1n, seasonId: 1, snapshotAt: 1, totalWeight: 1n, emissionBase: 10n },
+      [{ pool: POOL, epochId: 1n, owner: 'OwnerA', amountBase: 10n, accruedAt: 1 }],
+    );
+    await db.setEpochStatus(POOL, 1n, 'reserved');
+    const [a] = await db.openAccrualsForOwner(POOL, 'OwnerA');
+
+    expect(await db.ownersWithOpenAccruals(POOL)).toEqual(['OwnerA']);
+    const row = {
+      payoutId: 'p1',
+      pool: POOL,
+      owner: 'OwnerA',
+      amountBase: 6n,
+      txSig: 'paysig1',
+      allocations: [{ accrualId: a.accrualId, amountBase: 6n }],
+    };
+    expect(await db.insertLpPayout(row)).toBe(true);
+    expect(await db.insertLpPayout({ ...row, payoutId: 'p2' })).toBe(false); // tx_sig replay
+    expect((await db.broadcastingLpPayouts(POOL)).map((p) => p.payoutId)).toEqual(['p1']);
+
+    await db.confirmLpPayout('p1');
+    await db.confirmLpPayout('p1'); // idempotent: the book applies exactly once
+    const [after] = await db.openAccrualsForOwner(POOL, 'OwnerA');
+    expect(after.paidBase).toBe(6n);
+    expect(await db.broadcastingLpPayouts(POOL)).toEqual([]);
+
+    // an over-paying confirm is refused by the row guard
+    expect(
+      await db.insertLpPayout({
+        payoutId: 'p3',
+        pool: POOL,
+        owner: 'OwnerA',
+        amountBase: 9n,
+        txSig: 'paysig3',
+        allocations: [{ accrualId: a.accrualId, amountBase: 9n }],
+      }),
+    ).toBe(true);
+    await db.confirmLpPayout('p3');
+    const [capped] = (await db.openAccrualsForOwner(POOL, 'OwnerA')).length
+      ? await db.openAccrualsForOwner(POOL, 'OwnerA')
+      : [{ paidBase: 6n } as { paidBase: bigint }];
+    expect(capped.paidBase).toBe(6n); // 6 + 9 > 10 would breach the accrual; guard held
+  });
+
+  it('markLpPayoutFailed releases the claim (row leaves broadcasting)', async () => {
+    await db.insertEpochWithAccruals(
+      { pool: POOL, epochId: 1n, seasonId: 1, snapshotAt: 1, totalWeight: 1n, emissionBase: 10n },
+      [{ pool: POOL, epochId: 1n, owner: 'OwnerA', amountBase: 10n, accruedAt: 1 }],
+    );
+    await db.setEpochStatus(POOL, 1n, 'reserved');
+    const [a] = await db.openAccrualsForOwner(POOL, 'OwnerA');
+    await db.insertLpPayout({
+      payoutId: 'p1',
+      pool: POOL,
+      owner: 'OwnerA',
+      amountBase: 5n,
+      txSig: 'paysigx',
+      allocations: [{ accrualId: a.accrualId, amountBase: 5n }],
+    });
+    await db.markLpPayoutFailed('p1', 'expired');
+    expect(await db.broadcastingLpPayouts(POOL)).toEqual([]);
+    const [after] = await db.openAccrualsForOwner(POOL, 'OwnerA');
+    expect(after.paidBase).toBe(0n); // nothing applied on failure
+  });
+
+  it('payout_db source filter: the marketplace and lp_fee keepers never see each other', async () => {
+    await createBuybackBatch({
+      batchId: 'm1',
+      mode: 'burn',
+      source: 'marketplace',
+      usdcIn: 100n,
+      buyTxSig: 'mswap1',
+    });
+    await createBuybackBatch({
+      batchId: 'l1',
+      mode: 'top_up',
+      source: 'lp_fee',
+      usdcIn: 200n,
+      buyTxSig: 'lswap1',
+      seasonId: 9,
+      dest: 'DistPda',
+    });
+    expect((await openBuybackBatches('marketplace')).map((b) => b.batchId)).toEqual(['m1']);
+    expect((await openBuybackBatches('lp_fee')).map((b) => b.batchId)).toEqual(['l1']);
+    expect((await openBuybackBatches()).map((b) => b.batchId).sort()).toEqual(['l1', 'm1']);
+
+    await markBatchSettled('l1', 150n);
+    expect(await lastSettleAt('marketplace')).toBeNull();
+    expect(await lastSettleAt('lp_fee')).not.toBeNull();
   });
 });

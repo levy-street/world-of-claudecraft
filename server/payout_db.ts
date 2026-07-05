@@ -143,18 +143,32 @@ export async function markBatchFailed(batchId: string, reason: string): Promise<
 }
 
 // In-flight batches (anything not terminal) for crash recovery, oldest first.
-export async function openBuybackBatches(): Promise<PayoutBatchRow[]> {
-  const res = await pool.query(
-    `SELECT * FROM buyback_batches WHERE status IN ('swapping','swapped','settling') ORDER BY created_at`,
-  );
+// Scoped by source when given: the marketplace keeper and the LP fee keeper
+// share this table but drive DIFFERENT vaults, so neither may ever recover
+// (and re-settle) the other's batches.
+export async function openBuybackBatches(source?: string): Promise<PayoutBatchRow[]> {
+  const res = source
+    ? await pool.query(
+        `SELECT * FROM buyback_batches WHERE status IN ('swapping','swapped','settling') AND source = $1 ORDER BY created_at`,
+        [source],
+      )
+    : await pool.query(
+        `SELECT * FROM buyback_batches WHERE status IN ('swapping','swapped','settling') ORDER BY created_at`,
+      );
   return res.rows.map(mapBatch);
 }
 
-// Timestamp of the most recent completed settlement (drives the batch cadence).
-export async function lastSettleAt(): Promise<number | null> {
-  const res = await pool.query(
-    `SELECT MAX(executed_at) AS at FROM buyback_batches WHERE status = 'settled'`,
-  );
+// Timestamp of the most recent completed settlement (drives the batch cadence),
+// per source when given (each keeper has its own cadence clock).
+export async function lastSettleAt(source?: string): Promise<number | null> {
+  const res = source
+    ? await pool.query(
+        `SELECT MAX(executed_at) AS at FROM buyback_batches WHERE status = 'settled' AND source = $1`,
+        [source],
+      )
+    : await pool.query(
+        `SELECT MAX(executed_at) AS at FROM buyback_batches WHERE status = 'settled'`,
+      );
   const at = res.rows[0]?.at;
   return at == null ? null : new Date(at as string).getTime();
 }
@@ -165,16 +179,25 @@ export async function lastSettleAt(): Promise<number | null> {
 // lock (0x574f4301) and the skins burn-keeper lock (0x574f4302).
 const PAYOUT_KEEPER_LOCK_KEY = 0x57_4f_43_03; // "WOC\x03"
 export async function withPayoutKeeperLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  return withAdvisoryLock(PAYOUT_KEEPER_LOCK_KEY, fn);
+}
+
+// The LP fee keeper's own single-flight (distinct vault, distinct lock; the LP
+// staking epoch lock is 0x574f4304 and the LP payout distributor 0x574f4306).
+const LP_FEE_KEEPER_LOCK_KEY = 0x57_4f_43_05; // "WOC\x05"
+export async function withLpFeeKeeperLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  return withAdvisoryLock(LP_FEE_KEEPER_LOCK_KEY, fn);
+}
+
+async function withAdvisoryLock<T>(key: number, fn: () => Promise<T>): Promise<T | null> {
   const client = await pool.connect();
   try {
-    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [
-      PAYOUT_KEEPER_LOCK_KEY,
-    ]);
+    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [key]);
     if (!res.rows[0]?.locked) return null;
     try {
       return await fn();
     } finally {
-      await client.query('SELECT pg_advisory_unlock($1)', [PAYOUT_KEEPER_LOCK_KEY]);
+      await client.query('SELECT pg_advisory_unlock($1)', [key]);
     }
   } finally {
     client.release();

@@ -127,8 +127,11 @@ import {
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
+import type { LpDistributor } from './lp_distributor';
+import { buildLpFeeKeeper } from './lp_fee_keeper';
+import { buildLpDistributor } from './lp_fee_share_boot';
 import { buildLpStakingService } from './lp_staking_boot';
-import { withLpEpochLock } from './lp_staking_db';
+import { withLpDistributorLock, withLpEpochLock } from './lp_staking_db';
 import { handleLpTxBuild } from './lp_staking_routes';
 import type { LpStakingService } from './lp_staking_service';
 import {
@@ -148,7 +151,7 @@ import {
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
-import { withPayoutKeeperLock } from './payout_db';
+import { withLpFeeKeeperLock, withPayoutKeeperLock } from './payout_db';
 import { buildPayoutKeeper } from './payout_keeper';
 import { handlePerfReport } from './perf_report';
 import {
@@ -208,6 +211,12 @@ const PAYOUT_KEEPER_TICK_MS = Number(process.env.BUYBACK_KEEPER_TICK_MS ?? 5 * 6
 // whether an epoch is due (one per WOC_LP_EPOCH_SECONDS window), so this is
 // just the poll interval, like the keeper tick above.
 const LP_EPOCH_TICK_MS = Number(process.env.WOC_LP_EPOCH_TICK_MS ?? 60 * 1000);
+// LP fee keeper + payout distributor poll intervals (their own policies decide
+// whether a tick does anything, like the buyback keeper above).
+const LP_FEE_KEEPER_TICK_MS = Number(process.env.WOC_LP_FEE_KEEPER_TICK_MS ?? 5 * 60 * 1000);
+const LP_PAYOUT_TICK_MS = Number(process.env.WOC_LP_PAYOUT_TICK_MS ?? 5 * 60 * 1000);
+// The LP fee-share distributor, or null when the flag is off (rail dark).
+let lpDistributor: LpDistributor | null = null;
 // The LP staking service, or null when the flag is off (the default: rail dark).
 let lpStaking: LpStakingService | null = null;
 // /api/woc/lp is public; a short TTL keeps the (DB + ledger) read off the hot path.
@@ -1865,6 +1874,53 @@ async function main(): Promise<void> {
     setInterval(() => void lpTick(), LP_EPOCH_TICK_MS).unref();
     console.log(`lp staking enabled (pool ${lpStaking.pool()})`);
   }
+  // LP fee-share layer (flag-gated OFF by default, same posture as above):
+  // the distributor pays vested accruals from the LP distribution vault; the
+  // fee keeper swaps LP fee-vault USDC to $WOC and funds that vault. Both are
+  // single-flighted in-process AND cross-process (advisory locks).
+  lpDistributor = buildLpDistributor();
+  if (lpDistributor) {
+    const distributor = lpDistributor;
+    let payoutBusy = false;
+    const payoutTick = async () => {
+      if (payoutBusy) return;
+      payoutBusy = true;
+      try {
+        const r = await withLpDistributorLock(() => distributor.runCycle());
+        if (r && (r.paid > 0 || r.recovered > 0)) {
+          console.log(
+            `[lp] payouts: paid=${r.paid} (${r.paidBase} base) recovered=${r.recovered} skipped=${r.skipped}`,
+          );
+        }
+      } catch (err) {
+        console.error('lp payout cycle failed:', err);
+      } finally {
+        payoutBusy = false;
+      }
+    };
+    void payoutTick();
+    setInterval(() => void payoutTick(), LP_PAYOUT_TICK_MS).unref();
+    console.log('lp fee-share distributor enabled');
+
+    const lpFeeKeeper = buildLpFeeKeeper();
+    if (lpFeeKeeper) {
+      let lpFeeBusy = false;
+      const lpFeeTick = async () => {
+        if (lpFeeBusy) return;
+        lpFeeBusy = true;
+        try {
+          await withLpFeeKeeperLock(() => lpFeeKeeper.runCycle());
+        } catch (err) {
+          console.error('lp fee keeper cycle failed:', err);
+        } finally {
+          lpFeeBusy = false;
+        }
+      };
+      void lpFeeTick();
+      setInterval(() => void lpFeeTick(), LP_FEE_KEEPER_TICK_MS).unref();
+      console.log('lp fee keeper enabled');
+    }
+  }
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
     .then((count) => recordSitePresenceSample(count))
@@ -1978,21 +2034,35 @@ async function main(): Promise<void> {
           res,
           game,
           { openSeason, closeSeason },
-          lpStaking
+          lpStaking || lpDistributor
             ? {
-                runEpoch: async () => {
-                  const r = await withLpEpochLock(() => lpStaking!.runEpochIfDue());
-                  if (!r) return null;
-                  // bigint fields serialized as strings for the JSON response
-                  return {
-                    ran: r.ran,
-                    reason: r.reason ?? null,
-                    epochId: r.epochId?.toString() ?? null,
-                    emissionBase: r.emissionBase?.toString() ?? null,
-                    forfeitedBase: r.forfeitedBase?.toString() ?? null,
-                    stakers: r.stakers ?? null,
-                  };
-                },
+                runEpoch: lpStaking
+                  ? async () => {
+                      const r = await withLpEpochLock(() => lpStaking!.runEpochIfDue());
+                      if (!r) return null;
+                      // bigint fields serialized as strings for the JSON response
+                      return {
+                        ran: r.ran,
+                        reason: r.reason ?? null,
+                        epochId: r.epochId?.toString() ?? null,
+                        emissionBase: r.emissionBase?.toString() ?? null,
+                        forfeitedBase: r.forfeitedBase?.toString() ?? null,
+                        stakers: r.stakers ?? null,
+                      };
+                    }
+                  : undefined,
+                runPayout: lpDistributor
+                  ? async () => {
+                      const r = await withLpDistributorLock(() => lpDistributor!.runCycle());
+                      if (!r) return null;
+                      return {
+                        recovered: r.recovered,
+                        paid: r.paid,
+                        paidBase: r.paidBase.toString(),
+                        skipped: r.skipped,
+                      };
+                    }
+                  : undefined,
               }
             : undefined,
         );

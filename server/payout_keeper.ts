@@ -52,6 +52,7 @@ import {
   solanaRpc,
 } from './solana_rpc';
 import { isSolanaAddress } from './wallet_link';
+import { fundDistributionIx } from './woc_escrow_client';
 
 const VAULT = (process.env.BUYBACK_VAULT ?? process.env.MARKETPLACE_BURN_VAULT ?? '').trim();
 const VAULT_SECRET = (
@@ -75,6 +76,28 @@ const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag/v6').t
 const KEEPER_MODE: PayoutMode = process.env.PAYOUT_KEEPER_MODE === 'top_up' ? 'top_up' : 'burn';
 const REWARD_POOL_VAULT = (process.env.REWARD_POOL_VAULT ?? '').trim();
 const BUYBACK_SEASON_ID = Number.parseInt(process.env.BUYBACK_SEASON_ID ?? '', 10);
+// The LP buyback drip: this share (bps, hard-capped at 50%) of every settled
+// marketplace buyback is funded into the LP mining season's woc_escrow
+// distribution vault instead of being burned / topped up, and credited to the
+// flow ledger as lp_buyback_drip. 0 (the default) = no drip, exact old behavior.
+const LP_DRIP_BPS = Math.min(
+  Math.max(Number.parseInt(process.env.WOC_LP_BUYBACK_DRIP_BPS ?? '0', 10) || 0, 0),
+  5_000,
+);
+const LP_SEASON_ID = Number.parseInt(process.env.WOC_LP_SEASON_ID ?? '', 10);
+const ESCROW_PROGRAM_ID = (process.env.WOC_ESCROW_PROGRAM_ID ?? '').trim();
+
+/** Split a settled buyback into the main leg and the LP drip leg (conserves exactly). */
+export function splitDrip(
+  amountBase: bigint,
+  dripBps: number,
+): { mainBase: bigint; dripBase: bigint } {
+  if (amountBase <= 0n || dripBps <= 0)
+    return { mainBase: amountBase > 0n ? amountBase : 0n, dripBase: 0n };
+  const bps = BigInt(Math.min(dripBps, 5_000));
+  const dripBase = (amountBase * bps) / 10_000n;
+  return { mainBase: amountBase - dripBase, dripBase };
+}
 const SPL_ATA_PROGRAM = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const TOKEN_PROGRAM = new PublicKey(SPL_TOKEN_PROGRAM);
 
@@ -83,7 +106,7 @@ const TOKEN_PROGRAM = new PublicKey(SPL_TOKEN_PROGRAM);
 // keeper can't wedge forever on a lost transaction.
 const STALE_MS = 10 * 60 * 1000;
 
-function envPolicy(): PayoutPolicy {
+export function envPolicy(): PayoutPolicy {
   const u = (key: string, fallback: bigint): bigint => {
     const v = process.env[key];
     return v && Number.isFinite(Number(v)) ? BigInt(Math.round(Number(v) * 1_000_000)) : fallback;
@@ -117,6 +140,18 @@ export function keeperConfigured(mode: PayoutMode = KEEPER_MODE): boolean {
   if (mode === 'top_up')
     return isSolanaAddress(REWARD_POOL_VAULT) && Number.isInteger(BUYBACK_SEASON_ID);
   return true;
+}
+
+// A non-zero drip is only legal fully configured: it needs the escrow program id
+// (for fund_distribution) and the LP season to credit. Half-configured throws at
+// boot (fail loud) rather than silently skipping the drip.
+function assertDripConfig(): void {
+  if (LP_DRIP_BPS <= 0) return;
+  if (!isSolanaAddress(ESCROW_PROGRAM_ID) || !Number.isInteger(LP_SEASON_ID)) {
+    throw new Error(
+      'WOC_LP_BUYBACK_DRIP_BPS > 0 requires WOC_ESCROW_PROGRAM_ID and WOC_LP_SEASON_ID',
+    );
+  }
 }
 
 type ConfirmResult = 'confirmed' | 'failed' | 'unknown';
@@ -364,48 +399,17 @@ async function vaultTokenBalance(owner: string, mint: string): Promise<bigint> {
   return total;
 }
 
-export function buildProductionDeps(mode: PayoutMode): {
-  exec: PayoutExecutor;
-  store: PayoutStore;
-} {
-  const vault = Keypair.fromSecretKey(bs58.decode(VAULT_SECRET));
-  if (vault.publicKey.toBase58() !== VAULT) {
-    throw new Error('BUYBACK_VAULT_SECRET does not match BUYBACK_VAULT');
-  }
-  // One RPC for the whole keeper: reads go through solana_rpc.ts (SOLANA_RPC_URL)
-  // and the broadcast/blockhash Connection uses the SAME URL, so a confirm can
-  // never look at a different cluster than where the swap was sent.
-  const conn = new Connection(SOLANA_RPC_URL, 'confirmed');
-  const policy = envPolicy();
-  const wocMint = new PublicKey(WOC_MINT);
-  const vaultWocAta = associatedTokenAccount(vault.publicKey, wocMint);
-  const poolWocAta =
-    mode === 'top_up' ? associatedTokenAccount(new PublicKey(REWARD_POOL_VAULT), wocMint) : null;
-
-  const signTerminal = async (
-    amountWoc: bigint,
-  ): Promise<{ signature: string; send(): Promise<void> }> => {
-    const decimals = await wocDecimals();
-    const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash();
-    const ix =
-      mode === 'top_up'
-        ? transferCheckedIx(vaultWocAta, wocMint, poolWocAta!, vault.publicKey, amountWoc, decimals)
-        : burnCheckedIx(vaultWocAta, wocMint, vault.publicKey, amountWoc, decimals);
-    const tx = new Transaction({ feePayer: vault.publicKey, blockhash, lastValidBlockHeight }).add(
-      ix,
-    );
-    tx.sign(vault);
-    const signature = bs58.encode(tx.signature!);
-    return {
-      signature,
-      send: async () => {
-        await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 });
-      },
-    };
-  };
-
-  const exec: PayoutExecutor = {
-    vaultUsdcBalance: () => vaultTokenBalance(VAULT, USDC_MINT),
+// The Jupiter swap half of a keeper executor (balance read, quote, signed swap,
+// confirm, received-amount measurement), shared by the marketplace buyback
+// keeper and the LP fee keeper; each supplies its own terminal signSettle.
+export function buildSwapSide(
+  vault: Keypair,
+  vaultAddress: string,
+  conn: Connection,
+  policy: PayoutPolicy,
+): Omit<PayoutExecutor, 'signSettle'> {
+  return {
+    vaultUsdcBalance: () => vaultTokenBalance(vaultAddress, USDC_MINT),
 
     async quote(inUsdc) {
       // slippageBps is the binding slippage cap: Jupiter bakes it into the quote's
@@ -426,7 +430,7 @@ export function buildProductionDeps(mode: PayoutMode): {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           quoteResponse: quoteRaw,
-          userPublicKey: VAULT,
+          userPublicKey: vaultAddress,
           wrapAndUnwrapSol: false,
           dynamicComputeUnitLimit: true,
         }),
@@ -450,10 +454,80 @@ export function buildProductionDeps(mode: PayoutMode): {
     async wocReceived(swapSignature) {
       const tx = await fetchFinalizedTransaction(swapSignature);
       if (!tx) return 0n;
-      const delta = parseSplitPayment(tx, WOC_MINT).tokenDeltas.get(VAULT) ?? 0n;
+      const delta = parseSplitPayment(tx, WOC_MINT).tokenDeltas.get(vaultAddress) ?? 0n;
       return delta > 0n ? delta : 0n;
     },
+  };
+}
 
+export function buildProductionDeps(mode: PayoutMode): {
+  exec: PayoutExecutor;
+  store: PayoutStore;
+} {
+  const vault = Keypair.fromSecretKey(bs58.decode(VAULT_SECRET));
+  if (vault.publicKey.toBase58() !== VAULT) {
+    throw new Error('BUYBACK_VAULT_SECRET does not match BUYBACK_VAULT');
+  }
+  // One RPC for the whole keeper: reads go through solana_rpc.ts (SOLANA_RPC_URL)
+  // and the broadcast/blockhash Connection uses the SAME URL, so a confirm can
+  // never look at a different cluster than where the swap was sent.
+  const conn = new Connection(SOLANA_RPC_URL, 'confirmed');
+  const policy = envPolicy();
+  const wocMint = new PublicKey(WOC_MINT);
+  const vaultWocAta = associatedTokenAccount(vault.publicKey, wocMint);
+  const poolWocAta =
+    mode === 'top_up' ? associatedTokenAccount(new PublicKey(REWARD_POOL_VAULT), wocMint) : null;
+
+  const signTerminal = async (
+    amountWoc: bigint,
+  ): Promise<{ signature: string; send(): Promise<void> }> => {
+    const decimals = await wocDecimals();
+    const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash();
+    // The LP drip splits the settle: the main leg burns / tops up as before, the
+    // drip leg is fund_distribution into the LP season's escrow vault. One
+    // transaction, so the split can never half-apply.
+    const { mainBase, dripBase } = splitDrip(amountWoc, LP_DRIP_BPS);
+    const ixs: TransactionInstruction[] = [];
+    if (mainBase > 0n) {
+      ixs.push(
+        mode === 'top_up'
+          ? transferCheckedIx(
+              vaultWocAta,
+              wocMint,
+              poolWocAta!,
+              vault.publicKey,
+              mainBase,
+              decimals,
+            )
+          : burnCheckedIx(vaultWocAta, wocMint, vault.publicKey, mainBase, decimals),
+      );
+    }
+    if (dripBase > 0n) {
+      ixs.push(
+        fundDistributionIx({
+          programId: new PublicKey(ESCROW_PROGRAM_ID),
+          mint: wocMint,
+          seasonId: BigInt(LP_SEASON_ID),
+          funder: vault.publicKey,
+          amountBase: dripBase,
+        }),
+      );
+    }
+    const tx = new Transaction({ feePayer: vault.publicKey, blockhash, lastValidBlockHeight }).add(
+      ...ixs,
+    );
+    tx.sign(vault);
+    const signature = bs58.encode(tx.signature!);
+    return {
+      signature,
+      send: async () => {
+        await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 });
+      },
+    };
+  };
+
+  const exec: PayoutExecutor = {
+    ...buildSwapSide(vault, VAULT, conn, policy),
     signSettle: signTerminal,
   };
 
@@ -472,8 +546,10 @@ export function buildProductionDeps(mode: PayoutMode): {
     markSettling: markBatchSettling,
     markSettled: markBatchSettled,
     markFailed: markBatchFailed,
-    openBatches: openBuybackBatches,
-    lastSettleAt,
+    // Scoped to this keeper's own batches: the LP fee keeper shares the table
+    // under source 'lp_fee' and must never be recovered from here.
+    openBatches: () => openBuybackBatches('marketplace'),
+    lastSettleAt: () => lastSettleAt('marketplace'),
   };
 
   return { exec, store };
@@ -485,18 +561,35 @@ export function buildProductionDeps(mode: PayoutMode): {
 // on-market buy pressure that is recorded as a verified inflow before any payout.
 export function buildPayoutKeeper(): PayoutKeeper | null {
   if (!keeperConfigured(KEEPER_MODE)) return null;
+  assertDripConfig();
   const { exec, store } = buildProductionDeps(KEEPER_MODE);
   let onSettled: KeeperOpts['onSettled'];
-  if (KEEPER_MODE === 'top_up') {
+  if (KEEPER_MODE === 'top_up' || LP_DRIP_BPS > 0) {
     const ledger = new FlowLedger(new PgFlowLedgerDb());
     onSettled = async ({ wocSettled, settleTxSig }) => {
-      await ledger.ensureSeason(BUYBACK_SEASON_ID);
-      await ledger.creditInflow({
-        seasonId: BUYBACK_SEASON_ID,
-        source: 'marketplace_buyback',
-        amountBase: wocSettled,
-        txSig: settleTxSig,
-      });
+      // Recompute the same split the settle transaction used (deterministic in
+      // wocSettled), so the credits mirror the on-chain movement exactly.
+      const { mainBase, dripBase } = splitDrip(wocSettled, LP_DRIP_BPS);
+      if (KEEPER_MODE === 'top_up' && mainBase > 0n) {
+        await ledger.ensureSeason(BUYBACK_SEASON_ID);
+        await ledger.creditInflow({
+          seasonId: BUYBACK_SEASON_ID,
+          source: 'marketplace_buyback',
+          amountBase: mainBase,
+          txSig: settleTxSig,
+        });
+      }
+      if (dripBase > 0n) {
+        await ledger.ensureSeason(LP_SEASON_ID, 'lp mining');
+        // Suffixed sig: the UNIQUE tx_sig column spans the whole ledger, and one
+        // settle produces up to two inflows.
+        await ledger.creditInflow({
+          seasonId: LP_SEASON_ID,
+          source: 'lp_buyback_drip',
+          amountBase: dripBase,
+          txSig: `${settleTxSig}:lpdrip`,
+        });
+      }
     };
   }
   return new PayoutKeeper(exec, store, envPolicy(), {

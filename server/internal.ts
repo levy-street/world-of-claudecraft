@@ -26,10 +26,11 @@ export interface SeasonOps {
   closeSeason(seasonId: number): Promise<void>;
 }
 
-// LP staking ops, injected the same way (absent when the LP flag is off, so the
-// endpoint 404s exactly like an unconfigured secret).
+// LP staking ops, injected the same way (each op is absent when its flag is
+// off, so the endpoint 404s exactly like an unconfigured secret).
 export interface LpOps {
-  runEpoch(): Promise<unknown>;
+  runEpoch?(): Promise<unknown>;
+  runPayout?(): Promise<unknown>;
 }
 
 function ok(res: http.ServerResponse, data: unknown): void {
@@ -133,10 +134,20 @@ export async function handleInternalApi(
   // per-endpoint, so this one carries its own).
   if (url.pathname === '/internal/woc/lp/epoch') {
     if (req.method !== 'POST') return fail(res, 404, 'unknown endpoint');
-    if (!lpOps) return fail(res, 404, 'unknown endpoint');
+    if (!lpOps?.runEpoch) return fail(res, 404, 'unknown endpoint');
     if (!authorize(req, res, 'WOC_OPS_SECRET', 'x-woc-ops-secret')) return;
     const result = await lpOps.runEpoch();
     return ok(res, result ?? { skipped: 'another process holds the epoch lock' });
+  }
+
+  // Force one LP fee-share payout cycle (ops/debug; the interval runner is the
+  // normal path). POST-only, like the epoch op above.
+  if (url.pathname === '/internal/woc/lp/payout') {
+    if (req.method !== 'POST') return fail(res, 404, 'unknown endpoint');
+    if (!lpOps?.runPayout) return fail(res, 404, 'unknown endpoint');
+    if (!authorize(req, res, 'WOC_OPS_SECRET', 'x-woc-ops-secret')) return;
+    const result = await lpOps.runPayout();
+    return ok(res, result ?? { skipped: 'another process holds the payout lock' });
   }
 
   if (url.pathname.startsWith('/internal/discord/')) {

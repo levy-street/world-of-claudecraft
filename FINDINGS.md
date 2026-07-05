@@ -1,80 +1,63 @@
-# Findings: feat/woc-lp-staking-vault
-
-## Base-branch decision (deviation worth knowing about)
-The task said "base: release/v0.17.0 (where the economy core lives)" AND "route
-through #799's flow_ledger". Those conflict: flow_ledger is NOT on
-origin/release/v0.17.0; it lives on the #799 head (feat/woc-gamblefi-core,
-local 412678e89, itself cut from the v0.17.0 fork point 7c353ba97 and labeled
-"release/v0.17.0 rebase"). Branched off feat/woc-gamblefi-core, the same way
-the other economy PRs stack. This PR must land after #799.
-
-## Devnet facts
-- woc_lp_vault program id: 9zSKCSDmcTBYc9VSyeDmSn55Hz2gNwS6JAtHGPQ1LRe6
-  deploy sig: 4RuCHR2QYJDngSAmxuud2dE1rneN4kwQm1tDgfeNfQ9BZH3KMP2S3rcuXxSQu1cUsArzf66wXSnrUmtfZeh7wc1B
-  upgrade authority: 3P9m... (WOC_ESCROW_UPGRADE_AUTHORITY), funder HBabiEx3 (22.8 SOL before deploy).
-- Mock devnet LP mint (6 decimals): 4PuMWqSzfJxfWvMZFC4fQoFUjzLdob6791Cx2z68GyWF
-  (mint authority = deployer keypair). Devnet staker keypair /tmp/lp_staker.json
-  (Ca4VkJ7BReTrjnSi1438znwchuFMktefsd46VBHqPjMB), funded 0.05 SOL + 1000 LP.
-- Build: RUSTUP_TOOLCHAIN=1.85.0 anchor build --no-idl from solana/ (worked with
-  this worktree's committed Cargo.lock; the realm-escrow lock differs by hash
-  but was not needed).
+# Findings: feat/woc-lp-fee-share
 
 ## Devnet lifecycle proof (5/5 green, WOC_DEVNET_TEST=1, 2026-07-05)
-- stake (open_position + stake, 60s lock): 3fhFsqyaPFRwFv6d4VzoMYDd1H2227nhnnsoyBBBVQPpB3VqN86uN8yZvYubJP6bJi9jFMNDXJiX5VNKp2MgFpxL
-- stakeMore (lock 0, monotone locked_until held): 5VTDz18Ny5yisQ3mEmMJKp5ZR8eLWik5M7RDFv7msXAsFrpmb4GPpGUbZCM8cWoJ6ZeJYnVrZfgyhPtYhjuxqtDn
-- extend_lock (+90s, shorter re-lock refused): 3mWmPhG9NYSsNz9EfahPGcuXe3qNpxZysvfsoSKvbzb4i21KphCmDzSeA4fLFD8d6bkcsgM4BZp76uYBMuiWxCLX
-- unstake (full, after expiry; early attempt refused on-chain): 4TyP6k6MveGrnYRizLiQkop5naX2LFsm9gNChREj9ztNzdvf1vq9VMfMUfQFaZMZQNZS7w9jFbPFBUz5i1yfEJ4H
-- close_position (vault + position rent reclaimed): 2EgzGS4CG2wkDSiZf8AvHUSY155cCJGvnhKwwhoou4zfX5szNM3ATcA7Brr2eZSYAoC4d6MuH1X1AFgeHU4p4LiJ
-- Note: confirmations poll getSignatureStatus over HTTP; conn.confirmTransaction
-  resolves rpc-websockets' browser build under vitest and crashes on missing
-  window (the arena devnet tests predate this dep resolution and would hit it
-  too on a fresh install).
+On the deployed woc_escrow Fn4LMsV7akGX9KXwYv4uh2v8nM2uqgaAxhKrsYYbZqcJ,
+mock $WOC E6r4tqSuQ6VuCa9jpPZMqYHAj1x9GJaKaaXWxrfFsgFx:
+- open_distribution: 5RtJabHXmWfbZCaZodQyuV4uQ7mFUavJgEPQFyZCHWytSivUrymKkTGyQEkYjXU8piuKz8yNJVUFC2v2cFVQChHT
+- fund_distribution (50 WOC): 4EFmbZNz9FFbGJtfX4vk9LFgv1NFo2W3vRfQNrLCbXtvFVX2AMLBtRHLJ9N5b8tpBvzfP2oZU4Bt9woGoK9D1oUw
+- payout (20 WOC to a wallet with NO token account, ATA created idempotently
+  in the same tx; a 100 WOC over-payout refused by InsufficientPool):
+  3idmvqJMqr3GCyu6oJ8B3yjCn7rvpaRFRnAxMGSNNNV5W1aFbpE5qZMdAVJpfbt3PDnyydCxKccypTukLFFQEZhz
+- drip-split settle (ONE tx: burnChecked 7 WOC main + fund_distribution 3 WOC
+  drip; supply fell exactly 7, vault rose exactly 3):
+  mi8HudUU1VHeH3q6dqce2saszp8yJW3odfa7q3dNuLp59vhyjYGMFc3uPH5i1iP4QTjkVkrrdWK64kBCwVhhcDi
+- close_distribution (dust + rent back): 4x2Yaw2b5bQtfdGi3WH6QbottVS6moM4VUkVwgFqUgc2ZL8LDBTMdAMRDBuM144UhkryFHiawgKKvAiAoSegWtLr
+Devnet harness: drip vault /tmp/lp_drip_vault.json
+(6gJEkR4jS2zrGrKo179bT6NaqXS6wTnq8vdvo6aGogFQ, 300 mock WOC); the mock mint
+authority is ~/.config/solana/id.json (AsjVqmBt...).
 
-## Design decisions (why, for the reviewer)
-- Reward payment is NOT in the program and NOT in this branch. The program only
-  custodies LP principal (per-position PDA vaults). Accrual reserves headroom
-  through FlowLedger.emit (source lp_emission, synthetic sig
-  lp_epoch:<pool>:<epoch>); paying vested accruals is the stacked fee-share
-  branch, via the existing distribution escrow. One emission system, ever.
-- Forfeit ordering: addForfeit (book) BEFORE creditInflow (recycle). A crash
-  between them under-credits headroom (conservative); the reverse order could
-  let a full claim ride on top of a recycled credit (over-emission).
-- Unstake works while paused; pause gates deposits/extensions only. Principal
-  exit is never gated, including by the flag: the flag kills the SERVICE
-  (accrual, routes), not the on-chain program.
-- Weight decays with REMAINING lock (ve-style), floor 1x. Multiplier tiers:
-  drift 1x / ripple 30d 1.5x / tide 90d 2x / undertow 180d 3x / maelstrom 360d 5x.
-- lockedUntil is monotone on-chain (stake and extend_lock can only push later),
-  so added deposits inherit the longest lock; devnet test pins this.
-- Number(lockedUntil) in the mirror: unix seconds fit a double until year
-  285e6; safe.
+## Design decisions
+- NO ledger emit at payout time: the emission was reserved by the branch-1
+  epoch accrual; the distributor only moves already-reserved value. Payments
+  are still double-bounded: the accrual book (guarded paid_base) and the
+  on-chain payout instruction (funded vault balance).
+- The LP fee keeper settles by fund_distribution, not a raw transfer, so the
+  on-chain total_funded ceiling moves with the money.
+- Both keepers share buyback_batches under a source tag; openBuybackBatches /
+  lastSettleAt are now source-scoped and the marketplace wiring passes
+  'marketplace' explicitly, so neither keeper can recover the other's batches
+  (proven in the Pg integration test).
+- One settle can credit two seasons (top_up main + drip): the drip inflow uses
+  the suffixed sig <settle>:lpdrip because tx_sig is UNIQUE ledger-wide.
+- planClaim / vesting-forfeit race: an in-flight payout can never be
+  invalidated by a racing unstake forfeit because forfeits only claw back the
+  UNVESTED remainder and vesting is monotone; the confirmLpPayout row guard is
+  defense in depth (proven at the SQL level in the integration test).
+- Stale broadcasting payouts (past blockhash validity) are marked failed and
+  retried fresh; an 'unknown' non-stale payout blocks that owner (no
+  concurrent double pay), both fake-proven.
 
-## Watch out (deferred / known limits)
-- getProgramAccounts per epoch scales linearly with staker count; fine to tens
-  of thousands. Past that, switch to event-driven mirroring.
-- Unstake-then-restake INSIDE one epoch window is invisible to the mirror diff
-  (chain snapshot only at epoch boundaries): a staker could dodge the forfeit
-  by exiting and re-entering between two snapshots ONLY if they restake the
-  same amount before the next epoch; their lock resets to whatever they chose,
-  and their vested rewards were already theirs. The forfeit is a decay
-  incentive, not a security boundary; the ledger invariant never depends on it.
-- lp_positions.locked_until stored as BIGINT epoch seconds (not timestamptz):
-  matches the on-chain i64 and avoids tz conversion drift.
-- The internal /internal/woc/lp/epoch endpoint serializes bigints to strings in
-  main.ts (EpochRunResult carries bigints; JSON.stringify would throw).
-- woc_reward_pools table (flow_ledger_db) is unused by this branch, as it is
-  by the base branch.
+## Watch out / deferred
+- Changing WOC_LP_BUYBACK_DRIP_BPS while a settle batch is in flight would make
+  the recovery-time ledger credit split differ from the on-chain split of the
+  original tx (both recomputed from env). Operational rule: only change drip
+  bps with the keeper drained (no open batches).
+- The Jupiter swap leg of the LP fee keeper is exercised by the existing
+  PayoutKeeper unit suite (fakes), not on devnet (no Jupiter routes for mock
+  mints); the on-chain settle leg IS devnet-proven above. Same posture as the
+  shipped marketplace keeper.
+- envPolicy() knobs (threshold/cadence/TWAP) are shared BUYBACK_* envs for both
+  keepers; per-keeper knobs are a follow-up if their cadences must diverge.
+- The distributor auto-opens the distribution with the authority as payer;
+  first cycle on a fresh season costs the authority ~0.003 SOL rent.
 
-## Test inventory (all passing as of writing)
-- tests/lp_vault_client.test.ts (encoders/decoders vs lib.rs): 17
-- tests/lp_staking.test.ts (pure math + adversarial bounds): 19
-- tests/lp_staking_service.test.ts (epoch runner w/ fakes: invariant,
-  idempotency, crash recovery, concurrency, forfeits): 14
-- tests/lp_staking_routes.test.ts (HTTP validation): 7
-- tests/lp_staking_boot.test.ts (fail-closed gate): 4 (with pg mocked)
-- tests/lp_vault.devnet.test.ts (live devnet, WOC_DEVNET_TEST=1): 5
-- Regressions green: flow_ledger, payout_keeper, arena_wager_service,
-  arena_escrow, woc_escrow_client (131 tests total in the combined run).
-- tsc --noEmit: 177 errors, identical count to base branch (pre-existing
-  uninstalled-optional-dep noise: svelte, vitest/browser, axe-core); zero in
-  changed files. Biome ci on changed files: warnings only, no errors.
+## Test inventory (all passing)
+- woc_escrow_distribution.test.ts (encoders vs lib.rs): 6
+- lp_drip.test.ts (conservation, cap, rounding): 4
+- lp_distributor.test.ts (planClaim + payout machine): 12
+- lp_staking_db.integration.test.ts extended: lp_payouts machine, over-pay
+  guard, failed release, keeper source isolation (9 total w/ branch-1 cases)
+- lp_distribution.devnet.test.ts: 5 live
+- Combined regression run: 153 tests green (all LP suites + flow_ledger,
+  payout_keeper, arena_wager_service, arena_escrow, woc_escrow_client).
+- tsc --noEmit: 0 errors. Biome ci on changed files: warnings only.

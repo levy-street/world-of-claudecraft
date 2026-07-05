@@ -10,7 +10,13 @@ import {
   FlowLedger,
   type FlowLedgerDb,
 } from '../server/flow_ledger';
-import type { LpAccrualRow, LpEpochRow, LpPositionRow, LpStakingDb } from '../server/lp_staking_db';
+import type {
+  LpAccrualRow,
+  LpEpochRow,
+  LpPayoutRow,
+  LpPositionRow,
+  LpStakingDb,
+} from '../server/lp_staking_db';
 import { type LpChainReader, LpStakingService } from '../server/lp_staking_service';
 
 // The same in-memory FlowLedgerDb the devnet tests use: headroom is a fold over
@@ -107,6 +113,49 @@ class MemLpDb implements LpStakingDb {
           a.pool === poolKey && this.epochs.get(`${a.pool}:${a.epochId}`)?.status === 'reserved',
       )
       .reduce((s, a) => s + (a.amountBase - a.forfeitedBase - a.paidBase), 0n);
+  }
+  // Distributor half of the seam (exercised in lp_distributor.test.ts).
+  payouts = new Map<string, LpPayoutRow>();
+  private async openAll(poolKey: string) {
+    return this.accruals.filter(
+      (a) =>
+        a.pool === poolKey &&
+        this.epochs.get(`${a.pool}:${a.epochId}`)?.status === 'reserved' &&
+        a.amountBase - a.forfeitedBase - a.paidBase > 0n,
+    );
+  }
+  async ownersWithOpenAccruals(poolKey: string) {
+    const owners = new Set<string>();
+    for (const a of await this.openAll(poolKey)) owners.add(a.owner);
+    return [...owners].sort();
+  }
+  async insertLpPayout(row: Omit<LpPayoutRow, 'status' | 'createdAt'>) {
+    if ([...this.payouts.values()].some((p) => p.txSig === row.txSig)) return false;
+    this.payouts.set(row.payoutId, {
+      ...row,
+      status: 'broadcasting',
+      createdAt: new Date(0).toISOString(),
+    });
+    return true;
+  }
+  async broadcastingLpPayouts(poolKey: string) {
+    return [...this.payouts.values()].filter(
+      (p) => p.pool === poolKey && p.status === 'broadcasting',
+    );
+  }
+  async confirmLpPayout(payoutId: string) {
+    const p = this.payouts.get(payoutId);
+    if (!p || p.status !== 'broadcasting') return;
+    p.status = 'confirmed';
+    for (const alloc of p.allocations) {
+      const a = this.accruals.find((x) => x.accrualId === alloc.accrualId);
+      if (a && a.forfeitedBase + a.paidBase + alloc.amountBase <= a.amountBase)
+        a.paidBase += alloc.amountBase;
+    }
+  }
+  async markLpPayoutFailed(payoutId: string, _reason: string) {
+    const p = this.payouts.get(payoutId);
+    if (p && p.status === 'broadcasting') p.status = 'failed';
   }
 }
 

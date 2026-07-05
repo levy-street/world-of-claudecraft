@@ -52,6 +52,20 @@ CREATE TABLE IF NOT EXISTS lp_accruals (
   FOREIGN KEY (pool, epoch_id) REFERENCES lp_epochs(pool, epoch_id)
 );
 CREATE INDEX IF NOT EXISTS lp_accruals_owner ON lp_accruals(owner);
+
+CREATE TABLE IF NOT EXISTS lp_payouts (
+  payout_id    TEXT PRIMARY KEY,
+  pool         TEXT NOT NULL,
+  owner        TEXT NOT NULL,
+  amount_base  BIGINT NOT NULL CHECK (amount_base > 0),
+  tx_sig       TEXT UNIQUE NOT NULL,
+  status       TEXT NOT NULL DEFAULT 'broadcasting' CHECK (status IN ('broadcasting','confirmed','failed')),
+  fail_reason  TEXT,
+  allocations  JSONB NOT NULL,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  confirmed_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS lp_payouts_pool_status ON lp_payouts(pool, status);
 `;
 
 function bigintOf(v: unknown): bigint {
@@ -90,6 +104,22 @@ export interface LpAccrualRow {
   paidBase: bigint;
 }
 
+export interface LpPayoutAllocation {
+  accrualId: number;
+  amountBase: bigint;
+}
+
+export interface LpPayoutRow {
+  payoutId: string;
+  pool: string;
+  owner: string;
+  amountBase: bigint;
+  txSig: string;
+  status: 'broadcasting' | 'confirmed' | 'failed';
+  allocations: LpPayoutAllocation[];
+  createdAt: string;
+}
+
 // The persistence seam. Implemented here (Postgres) in production and by an
 // in-memory fake in tests. insertEpochWithAccruals must be atomic (one txn).
 export interface LpStakingDb {
@@ -106,6 +136,19 @@ export interface LpStakingDb {
   addForfeit(accrualId: number, forfeitBase: bigint): Promise<void>;
   /** Sum over reserved epochs of accrual (amount - forfeited - paid), the outstanding book. */
   outstandingBase(poolKey: string): Promise<bigint>;
+  /** Distinct owners that hold a reserved accrual with an unpaid remainder. */
+  ownersWithOpenAccruals(poolKey: string): Promise<string[]>;
+  /** Durable payout intent, recorded BEFORE broadcast. False = tx_sig replay. */
+  insertLpPayout(row: Omit<LpPayoutRow, 'status' | 'createdAt'>): Promise<boolean>;
+  /** In-flight payouts (status broadcasting), oldest first, for recovery. */
+  broadcastingLpPayouts(poolKey: string): Promise<LpPayoutRow[]>;
+  /**
+   * Atomically apply a confirmed payout: paid_base += allocation on each
+   * accrual (guarded so forfeited + paid can never exceed the accrual) and the
+   * payout row flips to confirmed. Idempotent: a second confirm is a no-op.
+   */
+  confirmLpPayout(payoutId: string): Promise<void>;
+  markLpPayoutFailed(payoutId: string, reason: string): Promise<void>;
 }
 
 export class PgLpStakingDb implements LpStakingDb {
@@ -259,6 +302,99 @@ export class PgLpStakingDb implements LpStakingDb {
     );
     return bigintOf(r.rows[0]?.outstanding ?? '0');
   }
+
+  async ownersWithOpenAccruals(poolKey: string): Promise<string[]> {
+    const r = await pool.query(
+      `SELECT DISTINCT a.owner
+         FROM lp_accruals a
+         JOIN lp_epochs e ON e.pool = a.pool AND e.epoch_id = a.epoch_id
+        WHERE a.pool = $1 AND e.status = 'reserved'
+          AND a.amount_base - a.forfeited_base - a.paid_base > 0
+        ORDER BY a.owner`,
+      [poolKey],
+    );
+    return r.rows.map((row) => row.owner as string);
+  }
+
+  async insertLpPayout(row: Omit<LpPayoutRow, 'status' | 'createdAt'>): Promise<boolean> {
+    const res = await pool.query(
+      `INSERT INTO lp_payouts (payout_id, pool, owner, amount_base, tx_sig, allocations, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'broadcasting') ON CONFLICT DO NOTHING`,
+      [
+        row.payoutId,
+        row.pool,
+        row.owner,
+        row.amountBase.toString(),
+        row.txSig,
+        JSON.stringify(
+          row.allocations.map((a) => ({
+            accrualId: a.accrualId,
+            amountBase: a.amountBase.toString(),
+          })),
+        ),
+      ],
+    );
+    return (res.rowCount ?? 0) === 1;
+  }
+
+  async broadcastingLpPayouts(poolKey: string): Promise<LpPayoutRow[]> {
+    const r = await pool.query(
+      `SELECT payout_id, pool, owner, amount_base::text AS ab, tx_sig, status, allocations, created_at
+         FROM lp_payouts WHERE pool = $1 AND status = 'broadcasting' ORDER BY created_at`,
+      [poolKey],
+    );
+    return r.rows.map((row) => ({
+      payoutId: row.payout_id as string,
+      pool: row.pool as string,
+      owner: row.owner as string,
+      amountBase: bigintOf(row.ab),
+      txSig: row.tx_sig as string,
+      status: row.status as LpPayoutRow['status'],
+      allocations: (row.allocations as { accrualId: number; amountBase: string }[]).map((a) => ({
+        accrualId: a.accrualId,
+        amountBase: bigintOf(a.amountBase),
+      })),
+      createdAt:
+        row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+    }));
+  }
+
+  async confirmLpPayout(payoutId: string): Promise<void> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Idempotency: only the transition out of 'broadcasting' applies the book.
+      const flip = await client.query(
+        `UPDATE lp_payouts SET status = 'confirmed', confirmed_at = now()
+          WHERE payout_id = $1 AND status = 'broadcasting'
+          RETURNING allocations`,
+        [payoutId],
+      );
+      if (flip.rowCount === 1) {
+        const allocations = flip.rows[0].allocations as { accrualId: number; amountBase: string }[];
+        for (const a of allocations) {
+          await client.query(
+            `UPDATE lp_accruals SET paid_base = paid_base + $2
+              WHERE accrual_id = $1 AND forfeited_base + paid_base + $2 <= amount_base`,
+            [a.accrualId, a.amountBase],
+          );
+        }
+      }
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async markLpPayoutFailed(payoutId: string, reason: string): Promise<void> {
+    await pool.query(
+      `UPDATE lp_payouts SET status = 'failed', fail_reason = $2 WHERE payout_id = $1 AND status = 'broadcasting'`,
+      [payoutId, reason.slice(0, 500)],
+    );
+  }
 }
 
 // Cross-process single-flight for the epoch runner: sibling realm processes
@@ -277,6 +413,26 @@ export async function withLpEpochLock<T>(fn: () => Promise<T>): Promise<T | null
       return await fn();
     } finally {
       await client.query('SELECT pg_advisory_unlock($1)', [LP_EPOCH_LOCK_KEY]);
+    }
+  } finally {
+    client.release();
+  }
+}
+
+// The LP payout distributor's single-flight (0x574f4304 is the epoch runner,
+// 0x574f4305 the LP fee keeper).
+const LP_DISTRIBUTOR_LOCK_KEY = 0x57_4f_43_06; // "WOC\x06"
+export async function withLpDistributorLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [
+      LP_DISTRIBUTOR_LOCK_KEY,
+    ]);
+    if (!res.rows[0]?.locked) return null;
+    try {
+      return await fn();
+    } finally {
+      await client.query('SELECT pg_advisory_unlock($1)', [LP_DISTRIBUTOR_LOCK_KEY]);
     }
   } finally {
     client.release();

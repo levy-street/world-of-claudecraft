@@ -38,6 +38,8 @@ export type FlowSource =
   | 'marketplace_buyback' //     protocol revenue bought $WOC on-market (real buy pressure)
   | 'identity_treasury' //       identity-fee treasury split swept in
   | 'lp_forfeit_recycle' //      LP staking unvested accruals forfeited on unstake, returned to headroom
+  | 'lp_fee_revenue' //          DEX trading-fee revenue swapped to $WOC and funded into the LP season
+  | 'lp_buyback_drip' //         the LP drip slice of a marketplace buyback settle
   // ---- outflows (emissions: sell pressure) ----
   | 'gamblefi_payout' //         #478 winner take (<= the two stakes, minus burn)
   | 'championship_prize' //      #479 graduated top-N prize

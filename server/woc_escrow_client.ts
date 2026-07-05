@@ -6,8 +6,8 @@
 // Anchor-compatible without an IDL: the 8-byte discriminator is
 // sha256("global:<ix>")[:8], args are borsh, and each account list matches
 // lib.rs exactly (order, signer, writable). Match PDA = ["match", match_id u64
-// le]; the pot vault is the ATA of that PDA. Distribution (#480) encoders are
-// intentionally omitted until the on-chain payout path has a server caller.
+// le]; the pot vault is the ATA of that PDA. The distribution (#480) encoders
+// below serve the LP fee-share distributor (the server payout caller).
 
 import { createHash } from 'node:crypto';
 import {
@@ -223,4 +223,114 @@ export async function sendIx(
   const signature = await connection.sendTransaction(tx, signers);
   await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
   return signature;
+}
+
+// ----- distribution instructions (#480, used by the LP fee-share distributor) -----
+
+/** The per-season distribution PDA (seeds: "distribution" + u64 le). */
+export function distributionPda(programId: PublicKey, seasonId: bigint): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from('distribution'), u64(seasonId)],
+    programId,
+  )[0];
+}
+
+export interface DistributionIds {
+  programId: PublicKey;
+  mint: PublicKey;
+  seasonId: bigint;
+}
+
+export function openDistributionIx(
+  p: DistributionIds & { authority: PublicKey },
+): TransactionInstruction {
+  const distribution = distributionPda(p.programId, p.seasonId);
+  return new TransactionInstruction({
+    programId: p.programId,
+    keys: [
+      acc(p.authority, true, true),
+      acc(distribution, false, true),
+      acc(p.mint, false, false),
+      acc(vaultAta(distribution, p.mint), false, true),
+      acc(TOKEN_PROGRAM_ID, false, false),
+      acc(ASSOCIATED_TOKEN_PROGRAM_ID, false, false),
+      acc(SystemProgram.programId, false, false),
+    ],
+    data: Buffer.concat([disc('open_distribution'), u64(p.seasonId)]),
+  });
+}
+
+export function fundDistributionIx(
+  p: DistributionIds & { funder: PublicKey; amountBase: bigint },
+): TransactionInstruction {
+  const distribution = distributionPda(p.programId, p.seasonId);
+  return new TransactionInstruction({
+    programId: p.programId,
+    keys: [
+      acc(p.funder, true, true),
+      acc(distribution, false, true),
+      acc(vaultAta(distribution, p.mint), false, true),
+      acc(vaultAta(p.funder, p.mint), false, true),
+      acc(TOKEN_PROGRAM_ID, false, false),
+    ],
+    data: Buffer.concat([disc('fund_distribution'), u64(p.seasonId), u64(p.amountBase)]),
+  });
+}
+
+export function payoutIx(
+  p: DistributionIds & { authority: PublicKey; recipient: PublicKey; amountBase: bigint },
+): TransactionInstruction {
+  const distribution = distributionPda(p.programId, p.seasonId);
+  return new TransactionInstruction({
+    programId: p.programId,
+    keys: [
+      acc(p.authority, true, false),
+      acc(distribution, false, true),
+      acc(vaultAta(distribution, p.mint), false, true),
+      acc(vaultAta(p.recipient, p.mint), false, true),
+      acc(TOKEN_PROGRAM_ID, false, false),
+    ],
+    data: Buffer.concat([disc('payout'), u64(p.seasonId), u64(p.amountBase)]),
+  });
+}
+
+export function closeDistributionIx(
+  p: DistributionIds & { authority: PublicKey },
+): TransactionInstruction {
+  const distribution = distributionPda(p.programId, p.seasonId);
+  return new TransactionInstruction({
+    programId: p.programId,
+    keys: [
+      acc(p.authority, true, true),
+      acc(distribution, false, true),
+      acc(vaultAta(distribution, p.mint), false, true),
+      acc(vaultAta(p.authority, p.mint), false, true),
+      acc(TOKEN_PROGRAM_ID, false, false),
+    ],
+    data: Buffer.concat([disc('close_distribution'), u64(p.seasonId)]),
+  });
+}
+
+/**
+ * Associated-token-program CreateIdempotent (tag 1): create `owner`'s ATA for
+ * `mint` if absent, no-op if it exists. Prepended to a payout so a reward can
+ * land for a wallet that never held $WOC (the payer funds the rent).
+ */
+export function createAtaIdempotentIx(p: {
+  payer: PublicKey;
+  owner: PublicKey;
+  mint: PublicKey;
+}): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+    keys: [
+      acc(p.payer, true, true),
+      acc(vaultAta(p.owner, p.mint), false, true),
+      acc(p.owner, false, false),
+      acc(p.mint, false, false),
+      acc(SystemProgram.programId, false, false),
+      acc(TOKEN_PROGRAM_ID, false, false),
+    ],
+    data: Buffer.from([1]),
+  });
 }
