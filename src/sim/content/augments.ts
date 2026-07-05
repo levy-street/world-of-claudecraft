@@ -44,7 +44,7 @@ export interface AugmentDef {
 // Rough archetype split so universal-but-flavored augments land on the right
 // kits. Casters scale on spell damage; the rest on melee/physical.
 const CASTERS: PlayerClass[] = ['mage', 'warlock', 'priest'];
-const MELEE: PlayerClass[] = ['warrior', 'rogue'];
+const MELEE: PlayerClass[] = ['warrior', 'rogue', 'demon_hunter'];
 const HYBRID: PlayerClass[] = ['paladin', 'shaman', 'druid', 'hunter'];
 const PHYSICAL: PlayerClass[] = [...MELEE, ...HYBRID];
 

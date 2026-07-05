@@ -36,6 +36,8 @@ const SWIM_PITCH_PROCEDURAL = 1.18;
 const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const GHOST_OPACITY = 0.34;
+const BLUR_OPACITY = 0.8;
+const BLUR_TINT = new THREE.Color(0xbdf6ff);
 const SOUL_REND_OPACITY = 0.58;
 const SOUL_REND_TINT = new THREE.Color(0x4f0505);
 
@@ -77,6 +79,7 @@ export class CharacterVisual {
   private weaponItemId: string | null;
   private disposed = false;
   private ghosted = false;
+  private blurred = false;
   private mixer: THREE.AnimationMixer;
   private actions = new Map<string, THREE.AnimationAction>();
   private model: THREE.Object3D;
@@ -88,6 +91,7 @@ export class CharacterVisual {
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
+  private blurMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
 
   private baseState: BaseState = 'idle';
@@ -138,6 +142,7 @@ export class CharacterVisual {
       entityColor,
       skinTexture(key, skinIndex),
       skinEmissiveTexture(key, skinIndex),
+      skinIndex,
     );
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -241,8 +246,9 @@ export class CharacterVisual {
     const proneAngle = this.action(this.def.clips.swim) ? SWIM_PITCH_CLIP : SWIM_PITCH_PROCEDURAL;
     const wantPitch = s.swimming && !s.dead ? proneAngle : 0;
     this.swimPitch += (wantPitch - this.swimPitch) * Math.min(1, dt * 8);
-    this.poseWrap.rotation.x = this.swimPitch;
-    this.poseWrap.rotation.z = 0;
+    const flipTurn = !s.dead && s.retreatFlip > 0 ? -Math.sin(s.retreatFlip * Math.PI * 0.5) * Math.PI * 2 : 0;
+    this.poseWrap.rotation.x = this.swimPitch + flipTurn;
+    this.poseWrap.rotation.z = flipTurn !== 0 ? Math.sin(s.retreatFlip * Math.PI) * 0.18 : 0;
     this.poseWrap.position.y =
       s.swimming && !s.dead
         ? SWIM_RISE + Math.sin(performance.now() / 500 + this.bobPhase) * 0.08
@@ -393,6 +399,32 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  setBlurred(on: boolean): void {
+    if (on === this.blurred) return;
+    this.blurred = on;
+    this.applyVisualMaterials();
+  }
+
+  /** Build the translucent Shimmerstep material variants before the first cast.
+   *  Without this, the first blur activation clones/tints every mesh material on
+   *  the gameplay frame that applies the aura. */
+  prewarmBlurMaterials(): void {
+    for (const original of this.originalMaterials.values()) {
+      if (Array.isArray(original)) {
+        for (const material of original) this.blurMaterial(material);
+      } else {
+        this.blurMaterial(original);
+      }
+    }
+    if (this.farMaterials) {
+      if (Array.isArray(this.farMaterials)) {
+        for (const material of this.farMaterials) this.blurMaterial(material);
+      } else {
+        this.blurMaterial(this.farMaterials);
+      }
+    }
+  }
+
   setSoulRend(on: boolean): void {
     if (on === this.soulRend) return;
     this.soulRend = on;
@@ -439,6 +471,7 @@ export class CharacterVisual {
       this.entityColor,
       skinTexture(this.key, skinIndex),
       skinEmissiveTexture(this.key, skinIndex),
+      skinIndex,
     );
     // re-snapshot the material map ghost/restore relies on, then re-ghost if stealthed
     this.originalMaterials.clear();
@@ -466,6 +499,7 @@ export class CharacterVisual {
       this.entityColor,
       skinTexture(this.key, this.skinIndex),
       skinEmissiveTexture(this.key, this.skinIndex),
+      this.skinIndex,
     );
     // the model graph changed (weapon meshes added/removed): rebuild the caster
     // list and re-snapshot originals, then re-apply ghost/stealth overlays.
@@ -522,7 +556,29 @@ export class CharacterVisual {
   private effectSingleMaterial(material: THREE.Material): THREE.Material {
     if (this.soulRend) return this.soulRendMaterial(material);
     if (this.ghosted) return this.ghostMaterial(material);
+    if (this.blurred) return this.blurMaterial(material);
     return material;
+  }
+
+  private blurMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.blurMaterials.get(material);
+    if (cached) return cached;
+    const blurred = material.clone();
+    blurred.transparent = true;
+    blurred.opacity = BLUR_OPACITY;
+    blurred.depthWrite = false;
+    const withColor = blurred as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) withColor.color.lerp(BLUR_TINT, 0.18);
+    if (withColor.emissive) {
+      withColor.emissive.lerp(BLUR_TINT, 0.22);
+      withColor.emissiveIntensity = Math.max(withColor.emissiveIntensity ?? 0, 0.22);
+    }
+    this.blurMaterials.set(material, blurred);
+    return blurred;
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {

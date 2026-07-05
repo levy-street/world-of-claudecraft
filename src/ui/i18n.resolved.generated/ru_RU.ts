@@ -814,6 +814,7 @@ export const ru_RU: EnTranslations = {
       "attackSpeedSlow": "Замедляет скорость атаки на {pct}%",
       "attackSpeedFast": "Повышает скорость атаки на {pct}%",
       "haste": "Повышает скорость атаки и произнесения заклинаний на {pct}%",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "Увеличивает время произнесения заклинаний на {pct}%",
       "increase": {
         "ap": "Повышает силу атаки на {value}",
@@ -1574,7 +1575,8 @@ export const ru_RU: EnTranslations = {
     "resourceName": {
       "rage": "Ярость",
       "mana": "Мана",
-      "energy": "Энергия"
+      "energy": "Энергия",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "Все классы",
@@ -1678,7 +1680,19 @@ export const ru_RU: EnTranslations = {
       "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
       "moonfire": "Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.",
       "rejuvenation": "Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.",
-      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе."
+      "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе.",
+      "demon_bite": "Охотник на демонов.",
+      "chaos_strike": "Охотник на демонов.",
+      "vengeful_retreat": "Охотник на демонов.",
+      "throw_glaive": "Охотник на демонов.",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "Охотник на демонов.",
+      "immolation_aura": "Охотник на демонов.",
+      "blur": "Охотник на демонов.",
+      "blade_dance": "Охотник на демонов.",
+      "sigil_of_flame": "Охотник на демонов.",
+      "eye_beam": "Охотник на демонов.",
+      "metamorphosis": "Охотник на демонов."
     },
     "petHook": {
       "emberkin": "Дальнобойный демон с огненными стрелами, который понемногу бьет врагов с безопасного расстояния.",
@@ -2882,6 +2896,7 @@ export const ru_RU: EnTranslations = {
     "mage": "Маг",
     "warlock": "Чернокнижник",
     "druid": "Друид",
+    "demon_hunter": "Охотник на демонов",
     "warriorAria": "Класс Воин",
     "paladinAria": "Класс Паладин",
     "hunterAria": "Класс Охотник",
@@ -2890,7 +2905,8 @@ export const ru_RU: EnTranslations = {
     "shamanAria": "Класс Шаман",
     "mageAria": "Класс Маг",
     "warlockAria": "Класс Чернокнижник",
-    "druidAria": "Класс Друид"
+    "druidAria": "Класс Друид",
+    "demon_hunterAria": "Охотник на демоновкласс"
   },
   "controls": {
     "title": "Руководство по управлению",
@@ -3593,7 +3609,8 @@ export const ru_RU: EnTranslations = {
     "resources": {
       "mana": "Мана",
       "energy": "Энергия",
-      "rage": "Ярость"
+      "rage": "Ярость",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Танк / ближний DPS",
@@ -3604,7 +3621,8 @@ export const ru_RU: EnTranslations = {
       "shaman": "Лекарь / ближний или дальний DPS",
       "mage": "Дальний DPS",
       "warlock": "Дальний DPS",
-      "druid": "Танк / лекарь / ближний или дальний DPS"
+      "druid": "Танк / лекарь / ближний или дальний DPS",
+      "demon_hunter": "Охотник на демонов"
     },
     "armor": {
       "chainLeatherCloth": "Кольчуга, кожа, ткань",
@@ -3628,7 +3646,8 @@ export const ru_RU: EnTranslations = {
       "shaman": "Шаманы повелевают стихиями, усиливают оружие, поражают врагов молниями и восстанавливают союзников.",
       "mage": "Маги управляют огнём, льдом и тайной силой, уничтожают врагов, призывают воду и замораживают угрозы.",
       "warlock": "Чернокнижники призывают демонов, накладывают проклятия и длительный урон, затем вытягивают жизнь врагов, чтобы выжить.",
-      "druid": "Друиды направляют силу природы, лечат раны, оплетают врагов и принимают звериные формы для защиты или урона."
+      "druid": "Друиды направляют силу природы, лечат раны, оплетают врагов и принимают звериные формы для защиты или урона.",
+      "demon_hunter": "Охотник на демонов."
     },
     "aria": "Описание класса {className}: роль {role}. Начальные характеристики: Сила {str}, Ловкость {agi}, Выносливость {sta}, Интеллект {int}, Дух {spi}.",
     "statBarAria": "{stat}: {value} из 25"
@@ -3968,6 +3987,7 @@ export const ru_RU: EnTranslations = {
       "abilityNotReady": "Эта способность еще не готова.",
       "notEnoughRage": "Недостаточно ярости!",
       "notEnoughEnergy": "Недостаточно энергии!",
+      "notEnoughFury": "ярости мало!",
       "notEnoughMana": "Недостаточно маны!",
       "notEnoughResource": "Недостаточно {resource}!",
       "notEnoughHealth": "Недостаточно здоровья.",
@@ -4266,7 +4286,8 @@ export const ru_RU: EnTranslations = {
     "resources": {
       "mana": "маны",
       "rage": "ярости",
-      "energy": "энергии"
+      "energy": "энергии",
+      "fury": "ярости"
     },
     "forms": {
       "bear": "медведя",
@@ -5130,6 +5151,54 @@ export const ru_RU: EnTranslations = {
       "rip": {
         "name": "Разрывание",
         "description": "Завершающий прием, наносящий урон от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике волка."
+      },
+      "demon_bite": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "chaos_strike": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "vengeful_retreat": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов."
+      },
+      "throw_glaive": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "immolation_aura": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "blur": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов."
+      },
+      "blade_dance": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "sigil_of_flame": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "eye_beam": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов. {damage}"
+      },
+      "metamorphosis": {
+        "name": "Охотник на демонов",
+        "description": "Охотник на демонов."
       },
       "mortal_strike": {
         "name": "Калечащий удар",

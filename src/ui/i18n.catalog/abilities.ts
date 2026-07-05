@@ -52,6 +52,7 @@ const abilityStringsEn = {
       mana: 'Mana',
       rage: 'Rage',
       energy: 'Energy',
+      fury: 'Fury',
     },
     forms: {
       bear: 'Bear',
@@ -1112,6 +1113,62 @@ const classAbilityNamesEn = {
         'rip',
         'Rip',
         'Finishing move that causes Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
+      ],
+      [
+        'demon_bite',
+        'Soul Bite',
+        'Bite in with twin blades, dealing weapon damage plus {damage} and generating Fury.',
+      ],
+      [
+        'chaos_strike',
+        'Rift Strike',
+        'Cut through the target with unstable energy for weapon damage plus {damage}.',
+      ],
+      [
+        'vengeful_retreat',
+        "Reaver's Recoil",
+        'Spring backward in a burst of abyssal momentum, gaining Fury and briefly increasing speed and dodge.',
+      ],
+      [
+        'throw_glaive',
+        'Crescent Toss',
+        'Hurl a crescent blade for {damage} Chaos damage and a brief snare.',
+      ],
+      [
+        'felblade',
+        'Fel Lunge',
+        'Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury.',
+      ],
+      [
+        'fel_rush',
+        'Felsurge',
+        'Surge forward in burning momentum, damaging nearby enemies for {damage} Chaos damage.',
+      ],
+      [
+        'immolation_aura',
+        'Burning Brand',
+        'Wreathe yourself in green fire, burning nearby enemies for {damage} and empowering your attacks.',
+      ],
+      ['blur', 'Shimmerstep', 'Shimmer through danger, increasing dodge chance and movement speed for 10 sec.'],
+      [
+        'blade_dance',
+        'Razor Cyclone',
+        'Blink through a razor-edged cyclone for {damage} damage to nearby enemies.',
+      ],
+      [
+        'sigil_of_flame',
+        'Flame Rune',
+        'Carve a burning rune into the ground, scorching enemies standing in it for {damage} Chaos damage.',
+      ],
+      [
+        'eye_beam',
+        'Gaze of Ruin',
+        'Channel a ruinous green beam, dealing {damage} Chaos damage each pulse.',
+      ],
+      [
+        'metamorphosis',
+        'Demon Ascendance',
+        'Ascend into your demonic form, generating Fury and greatly increasing offense, armor, and speed.',
       ],
       [
         'mortal_strike',

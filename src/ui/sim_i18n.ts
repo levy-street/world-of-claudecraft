@@ -174,6 +174,7 @@ const baseEnTable = {
   'log.bossUnleashes': '{name} unleashes {mechanic}!',
   'log.mobChannels': '{name} channels {mechanic}.',
   'aura.tamed': 'Tamed',
+  'aura.soulLeech': 'Soul Leech',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
   'mechanic.warStomp': 'Shuddering Stomp',
@@ -3756,6 +3757,7 @@ function locPetGrowlAutoState(state: string): string {
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
+  'Soul Leech': 'aura.soulLeech',
   'Might of the Bear': 'aura.elixirBear',
   Summoned: 'aura.summoned',
   Fed: 'aura.fed',

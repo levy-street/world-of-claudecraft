@@ -37,7 +37,7 @@ export function abilityDamageBonus(
   if (eff.type === 'finisherDamage') {
     return def.school === 'physical' ? Math.round(scaling.attackPower / 14) : 0;
   }
-  // A weaponStrike / weaponDamage listed number is its flat bonus; Attack Power
+  // A weaponStrike / weaponHit / weaponDamage listed number is its flat bonus; Attack Power
   // rides the weapon swing (shown on the character sheet), so it falls through to
   // the switch default (0) here. Every other rider scales: Spell Power for spells,
   // Ranged AP for hunter shots, melee Attack Power for physical specials.
@@ -50,6 +50,7 @@ export function abilityDamageBonus(
         ? channelTickBonus(power, def)
         : directHitBonus(power, def, res.castTime, false);
     case 'aoeDamage':
+    case 'selfAoeDot':
     case 'aoeRoot':
       return directHitBonus(power, def, res.castTime, true);
     case 'drainTick':
@@ -59,7 +60,7 @@ export function abilityDamageBonus(
       // sim (the direct part already took the coefficient), so the tooltip must not
       // show one either. Match combat's `hybrid` test in effect_dispatch.ts.
       const hybrid = res.effects.some(
-        (e) => e.type === 'directDamage' || e.type === 'aoeDamage' || e.type === 'aoeRoot',
+        (e) => e.type === 'directDamage' || e.type === 'aoeDamage' || e.type === 'selfAoeDot' || e.type === 'aoeRoot',
       );
       if (hybrid) return 0;
       // The tooltip shows the DoT's TOTAL; the sim adds the per-tick bonus to each

@@ -72,6 +72,10 @@ export interface VisualDef {
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
   tintStrength?: number;
+  /** Keep skinned mesh parts separate instead of merging them into one body draw. */
+  preserveParts?: boolean;
+  /** Optional per-skin material tints for preserved mesh parts. */
+  skinPartTints?: Record<number, { mesh: string; color: number; strength?: number; flat?: boolean }[]>;
   /** u/s at which the walk/run cycles look right (timeScale matching) */
   walkRef?: number;
   runRef?: number;
@@ -318,6 +322,13 @@ export const SKINS: Record<string, (string | null)[]> = {
     `${SKINS_DIR}/rogue/alt_b.png`,
     `${SKINS_DIR}/rogue/alt_c.png`,
   ],
+  player_demon_hunter: [
+    `${SKINS_DIR}/demon_hunter/base.png`,
+    `${SKINS_DIR}/demon_hunter/alt_a.png`,
+    `${SKINS_DIR}/demon_hunter/alt_b.png`,
+    `${SKINS_DIR}/demon_hunter/alt_c.png`,
+    `${SKINS_DIR}/demon_hunter/alt_d.png`,
+  ],
   player_priest: [
     null,
     `${SKINS_DIR}/mage/alt_a.png`,
@@ -364,7 +375,7 @@ export function skinCount(key: string): number {
   return SKINS[key]?.length ?? 1;
 }
 
-/** Texture url to preview a skin option (default index 0 → the model's base.png). */
+/** Texture url to preview a skin option (default index 0 — the model's base.png). */
 export function skinThumbUrl(key: string, index: number): string | null {
   const arr = SKINS[key];
   if (!arr || index < 0 || index >= arr.length) return null;
@@ -478,7 +489,36 @@ export const VISUALS: Record<string, VisualDef> = {
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
   },
-
+  player_demon_hunter: {
+    url: `${PLAYERS}/rogue_hooded.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['Dualwield_Melee_Attack_Chop']),
+    show: ['Rogue_Hood', 'Rogue_Cape'],
+    attach: [
+      { url: `${WEAPONS}/sword_g.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/sword_g.glb`, bone: 'handslot.l' },
+    ],
+    weaponSlots: [0, 1],
+    preserveParts: true,
+    skinPartTints: {
+      3: [
+        { mesh: 'RogueHooded_Cape', color: 0xb01924, strength: 1, flat: true },
+        { mesh: 'RogueHooded_Head', color: 0xffffff, strength: 0 },
+        { mesh: 'RogueHooded_Mask', color: 0xc21e2b, strength: 1, flat: true },
+        { mesh: 'RogueHooded_Body', color: 0xf3eee4, strength: 0.18 },
+        { mesh: 'RogueHooded_Arm', color: 0xa91a24, strength: 0.42 },
+        { mesh: 'RogueHooded_Leg', color: 0x2e2b2a, strength: 0.38 },
+      ],
+      4: [
+        { mesh: 'RogueHooded_Cape', color: 0xefeee8, strength: 1, flat: true },
+        { mesh: 'RogueHooded_Head', color: 0xffffff, strength: 0 },
+        { mesh: 'RogueHooded_Mask', color: 0xe8e5dc, strength: 1, flat: true },
+        { mesh: 'RogueHooded_Body', color: 0x17191d, strength: 0.52 },
+        { mesh: 'RogueHooded_Arm', color: 0x111318, strength: 0.55 },
+        { mesh: 'RogueHooded_Leg', color: 0x111318, strength: 0.6 },
+      ],
+    },
+  },
   // -- cosmetic body skin (class-agnostic; both the skin preview and a live
   //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
   player_mech: {
@@ -524,6 +564,14 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/chicken_cow.glb`,
     height: 2.3,
     clips: CHICKEN_COW,
+  },
+
+  form_demon: {
+    url: `${CREATURES}/demonalt.glb`,
+    height: 3.05,
+    clips: BIPED14,
+    tint: 0x8f4cff,
+    tintStrength: 0.48,
   },
 
   // -- mob families --------------------------------------------------------
@@ -632,7 +680,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/dragonevolved.glb`,
     height: 2.4,
     hover: 0.25,
-    // light tint only — heavy washes crush the wyrm to black under the green
+    // light tint only - heavy washes crush the wyrm to black under the green
     // sanctum torchlight
     clips: FLOATING,
     tint: 'entity',

@@ -3,6 +3,7 @@
 // death" predicate, shared by every player death/respawn site so the rule cannot drift.
 
 import { describe, expect, it } from 'vitest';
+import { DEMON_HUNTER_LIFESTEAL_AURA_ID } from '../src/sim/class_passives';
 import {
   aurasSurvivingDeath,
   RES_SICKNESS_DURATION,
@@ -56,11 +57,18 @@ describe('resurrection: level-scaled sickness duration', () => {
 });
 
 describe('resurrection: aurasSurvivingDeath predicate', () => {
-  it('keeps only Resurrection Sickness and drops every other aura', () => {
-    const auras = [aura('rejuvenation'), aura(RESURRECTION_SICKNESS_ID), aura('blessing_of_might')];
+  it('keeps Resurrection Sickness and always-on class passives', () => {
+    const auras = [
+      aura('rejuvenation'),
+      aura(RESURRECTION_SICKNESS_ID),
+      aura(DEMON_HUNTER_LIFESTEAL_AURA_ID),
+      aura('blessing_of_might'),
+    ];
     const survivors = aurasSurvivingDeath(auras);
-    expect(survivors).toHaveLength(1);
-    expect(survivors[0].id).toBe(RESURRECTION_SICKNESS_ID);
+    expect(survivors.map((a) => a.id)).toEqual([
+      RESURRECTION_SICKNESS_ID,
+      DEMON_HUNTER_LIFESTEAL_AURA_ID,
+    ]);
   });
 
   it('returns an empty list when nothing survives', () => {

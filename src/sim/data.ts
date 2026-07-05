@@ -256,6 +256,7 @@ export const REWARD_ARCHETYPE: Record<PlayerClass, PlayerClass> = {
   paladin: 'warrior',
   shaman: 'warrior',
   rogue: 'rogue',
+  demon_hunter: 'rogue',
   hunter: 'rogue',
   mage: 'mage',
   priest: 'mage',

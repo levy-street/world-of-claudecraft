@@ -1455,7 +1455,7 @@ body[data-guide-route="home"] .guide-main {
 }
 
 /* ===================================================== class chooser + class page */
-/* Chooser: facet filters over the nine class cards (role, style, resource, complexity). */
+/* Chooser: facet filters over the ten class cards (role, style, resource, complexity). */
 .guide-chooser {
   margin-block: var(--g-lg);
   padding: var(--g-md);

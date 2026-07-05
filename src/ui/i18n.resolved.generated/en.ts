@@ -814,6 +814,7 @@ export const en: EnTranslations = {
       "attackSpeedSlow": "Slows attack speed by {pct}%",
       "attackSpeedFast": "Increases attack speed by {pct}%",
       "haste": "Increases attack and casting speed by {pct}%",
+      "lifesteal": "Heals for {pct}% of damage dealt",
       "tongues": "Increases casting time by {pct}%",
       "increase": {
         "ap": "Increases attack power by {value}",
@@ -1485,7 +1486,7 @@ export const en: EnTranslations = {
       "mitigationTitle": "Armor and health keep you standing",
       "mitigationBody": "Armor softens physical hits, so better armor is your main source of staying power in melee. Magic is another matter: you weather spells with a deeper health pool and the chance to resist one outright, not with armor. Heavier armor classes shrug off more, but nothing makes you untouchable.",
       "resourcesTitle": "Every class has its own rhythm",
-      "resourcesBody": "Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, and casters manage a pool of Mana. Learning your resource is half of playing your class well.",
+      "resourcesBody": "Warriors build Rage in the thick of a fight, rogues spend Energy that steadily returns, demon hunters generate Fury, and casters manage a pool of Mana. Learning your resource is half of playing your class well.",
       "growTitle": "You grow stronger every level",
       "growBody": "Each level makes you tougher and unlocks new abilities, all the way to the cap of level {cap}. Questing is the fastest way up; dungeons and exploration round it out.",
       "effectsTitle": "Buffs, debuffs, and crowd control",
@@ -1548,7 +1549,7 @@ export const en: EnTranslations = {
       "q4": "Can I play offline or solo?",
       "a4": "Yes. There is an instant single-player offline mode, and the online world is fully soloable apart from dungeons and the raid.",
       "q5": "How many classes are there?",
-      "a5": "Nine, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, or energy) and its own signature abilities.",
+      "a5": "Ten, covering the classic tank, healer, and damage roles, each with a resource system (rage, mana, energy, or fury) and its own signature abilities.",
       "q6": "What is the level cap?",
       "a6": "Level {cap}, reached across three connected zones of quests, dungeons, and exploration.",
       "q7": "Will my character be saved?",
@@ -1563,7 +1564,7 @@ export const en: EnTranslations = {
       "a11": "Invite anyone you meet to a party, ask in chat, or team up at a dungeon. Most of the world is soloable, so grouping is a choice, not a requirement."
     },
     "classList": {
-      "heading": "The nine classes",
+      "heading": "The ten classes",
       "sub": "Tank, heal, or deal the damage. Pick the fantasy that calls to you, then make it your own with talents."
     },
     "role": {
@@ -1574,7 +1575,8 @@ export const en: EnTranslations = {
     "resourceName": {
       "rage": "Rage",
       "mana": "Mana",
-      "energy": "Energy"
+      "energy": "Energy",
+      "fury": "Fury"
     },
     "classPage": {
       "back": "All classes",
@@ -1678,7 +1680,19 @@ export const en: EnTranslations = {
       "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
       "moonfire": "Hits instantly and leaves the target burning, good while moving.",
       "rejuvenation": "Casts instantly and heals an ally over time, so you can keep acting.",
-      "thorns": "Wards an ally so melee attackers hurt themselves for striking."
+      "thorns": "Wards an ally so melee attackers hurt themselves for striking.",
+      "demon_bite": "Your reliable builder: bite in with twin blades and generate Fury.",
+      "chaos_strike": "Spend Fury on a hard unstable melee strike.",
+      "vengeful_retreat": "Flip back from danger while gaining Fury for your next strike.",
+      "throw_glaive": "Tag a fleeing target with a crescent blade and slow it long enough to catch up.",
+      "felblade": "Leap a short distance into your target and generate Fury.",
+      "fel_rush": "Surge across open ground and land with a burst of Chaos damage.",
+      "immolation_aura": "Brand nearby enemies with green fire while your attacks hit harder.",
+      "blur": "A defensive shimmer for dodging through danger.",
+      "blade_dance": "Spend Fury to blink around enemies with rapid slashes.",
+      "sigil_of_flame": "Place a burning rune to punish enemies that stand in it.",
+      "eye_beam": "Channel a focused green beam into your target.",
+      "metamorphosis": "Turn a fight with a short demon-form power window."
     },
     "petHook": {
       "emberkin": "A ranged firebolt demon that chips at enemies from a safe distance.",
@@ -1924,7 +1938,7 @@ export const en: EnTranslations = {
       "i6Title": "Grouping is a choice, not a chore",
       "i6Body": "Most of the world is soloable. Team up for dungeons and the raid, or just when you want some company.",
       "i7Title": "Learn your resource",
-      "i7Body": "Rage, mana, or energy, managing it well is half of playing your class. Watch that bar, not only your cooldowns.",
+      "i7Body": "Rage, mana, energy, or fury, managing it well is half of playing your class. Watch that bar, not only your cooldowns.",
       "i8Title": "Rest between fights",
       "i8Body": "Eat and drink to recover quickly, especially as a caster. A few seconds now saves a death later."
     },
@@ -2067,7 +2081,7 @@ export const en: EnTranslations = {
       "staTitle": "Stamina",
       "staBody": "Stamina is your staying power. More Stamina means a larger health pool, and it speeds the health you recover while resting out of combat. Every class wants some.",
       "intTitle": "Intellect",
-      "intBody": "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage or Energy class it does little.",
+      "intBody": "Intellect grows a spellcaster's mana pool, raises their spell power so their spells hit harder, and improves the chance their spells crit. It matters to the classes that cast from mana; for a Rage, Energy, or Fury class it does little.",
       "spiTitle": "Spirit",
       "spiBody": "Spirit governs how quickly a caster's mana returns while out of combat. Like Intellect, it serves the mana classes and means little to the others.",
       "armorTitle": "Armor",
@@ -2882,6 +2896,7 @@ export const en: EnTranslations = {
     "mage": "Mage",
     "warlock": "Warlock",
     "druid": "Druid",
+    "demon_hunter": "Demon Hunter",
     "warriorAria": "Warrior class",
     "paladinAria": "Paladin class",
     "hunterAria": "Hunter class",
@@ -2890,7 +2905,8 @@ export const en: EnTranslations = {
     "shamanAria": "Shaman class",
     "mageAria": "Mage class",
     "warlockAria": "Warlock class",
-    "druidAria": "Druid class"
+    "druidAria": "Druid class",
+    "demon_hunterAria": "Demon Hunter class"
   },
   "controls": {
     "title": "Controls Guide",
@@ -3593,7 +3609,8 @@ export const en: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energy",
-      "rage": "Rage"
+      "rage": "Rage",
+      "fury": "Fury"
     },
     "roles": {
       "warrior": "Tank / Melee DPS",
@@ -3604,7 +3621,8 @@ export const en: EnTranslations = {
       "shaman": "Healer / Melee or Ranged DPS",
       "mage": "Ranged DPS",
       "warlock": "Ranged DPS",
-      "druid": "Tank / Healer / Melee or Ranged DPS"
+      "druid": "Tank / Healer / Melee or Ranged DPS",
+      "demon_hunter": "Mobile melee DPS"
     },
     "armor": {
       "chainLeatherCloth": "Chainmail, Leather, Cloth",
@@ -3628,7 +3646,8 @@ export const en: EnTranslations = {
       "shaman": "Shaman command the elements, imbuing weapons with power, shocking enemies with lightning, and restoring allies.",
       "mage": "Mages bend Fire, Frost, and arcane force to destroy enemies, summon water, and freeze threats in place.",
       "warlock": "Warlocks summon demons, apply curses and damage-over-time magic, and leech life from enemies to endure.",
-      "druid": "Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage."
+      "druid": "Druids channel nature, healing wounds, entangling foes, and shifting into animal forms for defense or damage.",
+      "demon_hunter": "Demon Hunters are agile fel-touched melee fighters who build Fury with quick strikes, then spend it on chaotic blade work, sigils, and demonic transformations."
     },
     "aria": "Class details for {className}: role {role}. Starting stats: Strength {str}, Agility {agi}, Stamina {sta}, Intellect {int}, Spirit {spi}.",
     "statBarAria": "{stat}: {value} out of 25"
@@ -3968,6 +3987,7 @@ export const en: EnTranslations = {
       "abilityNotReady": "That ability is not ready yet.",
       "notEnoughRage": "Not enough rage!",
       "notEnoughEnergy": "Not enough energy!",
+      "notEnoughFury": "Not enough Fury!",
       "notEnoughMana": "Not enough mana!",
       "notEnoughResource": "Not enough {resource}!",
       "notEnoughHealth": "Not enough health.",
@@ -4266,7 +4286,8 @@ export const en: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Rage",
-      "energy": "Energy"
+      "energy": "Energy",
+      "fury": "Fury"
     },
     "forms": {
       "bear": "Bear",
@@ -5130,6 +5151,54 @@ export const en: EnTranslations = {
       "rip": {
         "name": "Rip",
         "description": "Finishing move that causes Bleed damage over 12 sec. Consumes combo points. Wolf Form only."
+      },
+      "demon_bite": {
+        "name": "Soul Bite",
+        "description": "Bite in with twin blades, dealing weapon damage plus {damage} and generating Fury."
+      },
+      "chaos_strike": {
+        "name": "Rift Strike",
+        "description": "Cut through the target with unstable energy for weapon damage plus {damage}."
+      },
+      "vengeful_retreat": {
+        "name": "Reaver's Recoil",
+        "description": "Spring backward in a burst of abyssal momentum, gaining Fury and briefly increasing speed and dodge."
+      },
+      "throw_glaive": {
+        "name": "Crescent Toss",
+        "description": "Hurl a crescent blade for {damage} Chaos damage and a brief snare."
+      },
+      "felblade": {
+        "name": "Fel Lunge",
+        "description": "Leap at a nearby enemy, striking for weapon damage plus {damage} and generating Fury."
+      },
+      "fel_rush": {
+        "name": "Felsurge",
+        "description": "Surge forward in burning momentum, damaging nearby enemies for {damage} Chaos damage."
+      },
+      "immolation_aura": {
+        "name": "Burning Brand",
+        "description": "Wreathe yourself in green fire, burning nearby enemies for {damage} and empowering your attacks."
+      },
+      "blur": {
+        "name": "Shimmerstep",
+        "description": "Shimmer through danger, increasing dodge chance and movement speed for 10 sec."
+      },
+      "blade_dance": {
+        "name": "Razor Cyclone",
+        "description": "Blink through a razor-edged cyclone for {damage} damage to nearby enemies."
+      },
+      "sigil_of_flame": {
+        "name": "Flame Rune",
+        "description": "Carve a burning rune into the ground, scorching enemies standing in it for {damage} Chaos damage."
+      },
+      "eye_beam": {
+        "name": "Gaze of Ruin",
+        "description": "Channel a ruinous green beam, dealing {damage} Chaos damage each pulse."
+      },
+      "metamorphosis": {
+        "name": "Demon Ascendance",
+        "description": "Ascend into your demonic form, generating Fury and greatly increasing offense, armor, and speed."
       },
       "mortal_strike": {
         "name": "Maiming Strike",

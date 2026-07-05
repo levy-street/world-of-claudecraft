@@ -2510,6 +2510,9 @@
   .mini-class[data-class="druid"] {
     --class-color: #ff7d0a;
   }
+  .mini-class[data-class="demon_hunter"] {
+    --class-color: #a330c9;
+  }
 
   .mini-class {
     text-align: center;
@@ -2775,8 +2778,13 @@
     }
     #offline-select.cs-wow .mini-class .mini-class-label,
     body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class .mini-class-label {
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
       font-size: 12px;
       color: var(--class-color);
+      line-height: 1.05;
+      text-align: center;
       text-shadow: 0 1px 3px #000;
     }
     #offline-select.cs-wow .mini-class.sel .mini-class-label,
@@ -4468,6 +4476,12 @@
     color: #c79c6e;
   }
 
+  .badge-resource.resource-fury {
+    background: rgba(163, 48, 201, 0.16);
+    border-color: rgba(163, 48, 201, 0.45);
+    color: #d07cff;
+  }
+
   /* Signature Abilities Section */
   .details-spells-section {
     grid-column: span 2;
@@ -4568,6 +4582,18 @@
     display: block;
     width: 100% !important;
     height: 100% !important;
+    position: relative;
+    z-index: 1;
+  }
+
+  .char-preview-fallback {
+    position: absolute;
+    inset: 8%;
+    width: 84%;
+    height: 84%;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 0 18px rgba(234, 199, 128, 0.32));
   }
 
   /* The selected-character name plate over the 3D stage. Belongs to the desktop
@@ -5376,6 +5402,9 @@
   }
   [data-class="druid"] {
     --class-color: #ff7d0a;
+  }
+  [data-class="demon_hunter"] {
+    --class-color: #a330c9;
   }
 
   /* Portrait chip, a class-ringed headshot rendered from the 3D model.
