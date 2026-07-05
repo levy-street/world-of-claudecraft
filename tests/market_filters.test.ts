@@ -58,7 +58,7 @@ describe('World Market filters', () => {
       'axe',
       'other',
     ]);
-    expect(MARKET_RARITY_FILTERS).toEqual(['all', 'poor', 'common', 'uncommon', 'rare', 'epic']);
+    expect(MARKET_RARITY_FILTERS).toEqual(['all', 'poor', 'common', 'uncommon', 'rare', 'epic', 'legendary']);
   });
 
   it('groups wearable armor separately from weapons and consumables', () => {

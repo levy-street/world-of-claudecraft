@@ -698,6 +698,7 @@ export class MarketWindow {
     if (filter === 'uncommon') return t('itemUi.market.rarityUncommon');
     if (filter === 'rare') return t('itemUi.market.rarityRare');
     if (filter === 'epic') return t('itemUi.market.rarityEpic');
+    if (filter === 'legendary') return t('itemUi.market.rarityLegendary');
     return t('itemUi.market.filterRarityAll');
   }
 
