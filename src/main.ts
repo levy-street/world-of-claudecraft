@@ -71,6 +71,7 @@ import {
   normalizeCharSortMode,
   sortCharacters,
 } from './net/char_sort';
+import { charselectPrimaryAction } from './net/charselect_action';
 import { createNativeAttestationProof } from './net/native_attestation';
 import {
   Api,
@@ -233,6 +234,10 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
 let pendingDeleteCharacter: CharacterSummary | null = null;
+// The desktop roster shows one shared "Enter World" button (in .cs-list-actions)
+// instead of a per-row one; it acts on whichever character is selected. Mobile
+// and narrow layouts keep the per-row buttons and never read this.
+let charselectSelected: CharacterSummary | null = null;
 let homepageMusic: HTMLAudioElement | null = null;
 let homepageMusicStarted = false;
 let homepageMusicMuted = readHomepageMusicMuted();
@@ -3921,6 +3926,11 @@ async function refreshCharacters(): Promise<void> {
   updateSortButtonLabel();
   const listEl = $('#char-list');
   listEl.innerHTML = `<li class="char-list-message">${escapeHtml(t('character.loading'))}</li>`;
+  // Drop any stale selection from a previous realm; the default first-row
+  // selection below re-arms the shared Enter World button and the preview name.
+  charselectSelected = null;
+  syncCharselectEnterButton();
+  setCharselectPreviewName('');
   try {
     const chars = sortCharacters(await api.characters(), charSortMode);
     if (api.realm) $('#charselect-realm').textContent = api.realm;
@@ -3979,29 +3989,9 @@ async function refreshCharacters(): Promise<void> {
           }
         });
       } else if (c.online) {
-        row.querySelector('.take-over-btn')?.addEventListener('click', async (e) => {
+        row.querySelector('.take-over-btn')?.addEventListener('click', (e) => {
           e.stopPropagation();
-          const btn = e.currentTarget as HTMLButtonElement;
-          // Taking over disconnects the other live session with no undo, so guard a
-          // stray click (e.g. you are genuinely playing on another device) behind a
-          // confirm. The prompt text is the existing t() key, keeping it localized.
-          if (!window.confirm(t('character.takeOverConfirm'))) return;
-          $('#charselect-error').textContent = '';
-          btn.disabled = true;
-          try {
-            // Free the stale/other session, then enter on this character.
-            // takeOverCharacter awaits the old session's leave() server-side, so
-            // the slot is free by the time enterWorld connects. Pass btn so
-            // enterWorld owns its loading/disabled state and restores it if entry
-            // is aborted before it begins; surface any failure via the catch.
-            await api.takeoverCharacter(c.id);
-            await enterWorld({ ...c, online: false }, btn);
-          } catch (err) {
-            btn.disabled = false;
-            $('#charselect-error').textContent = userFacingApiError(err);
-            // Reflect any state change (e.g. a lost race) back into the list.
-            void refreshCharacters();
-          }
+          void takeOverAndEnter(c, e.currentTarget as HTMLButtonElement);
         });
       } else {
         row.querySelector('.enter-world-btn')?.addEventListener('click', (e) => {
@@ -4021,6 +4011,9 @@ async function refreshCharacters(): Promise<void> {
         row.setAttribute('aria-selected', 'true');
         renderClassDetails('charselect-class-details', c.class);
         characterPreview?.setSkin(c.skin ?? 0);
+        charselectSelected = c;
+        syncCharselectEnterButton();
+        setCharselectPreviewName(c.name);
       };
 
       row.addEventListener('click', selectRow);
@@ -4029,6 +4022,23 @@ async function refreshCharacters(): Promise<void> {
           e.preventDefault();
           selectRow();
         }
+      });
+      // Double-click a row to jump straight into the world (classic-select
+      // muscle memory). It routes through the shared desktop Enter World button
+      // so entry owns its loading state; the button only exists in the docked
+      // desktop layout, so this is a no-op on mobile (where the per-row button
+      // is a single tap away). Entry is gated on that shared button being visible
+      // AND enabled: for a forced-rename selection it is disabled (so the rename
+      // input/button on such a row cannot trigger entry), and Delete opens a
+      // full-screen modal on the first click, so the second click retargets and
+      // the browser synthesises no dblclick. Keep entry gated on the shared
+      // button's enabled state for any per-row action added later.
+      row.addEventListener('dblclick', () => {
+        selectRow();
+        const enterBtn = document.getElementById(
+          'btn-charselect-enter',
+        ) as HTMLButtonElement | null;
+        if (enterBtn && enterBtn.offsetParent !== null && !enterBtn.disabled) enterBtn.click();
       });
 
       listEl.appendChild(row);
@@ -4063,6 +4073,62 @@ function fatalOverlay(message: string): void {
   btn.addEventListener('click', () => location.reload());
   el.appendChild(btn);
   document.body.appendChild(el);
+}
+
+// Take over a character that is still online in another session, then enter on
+// it. Shared by the per-row Take Over button (mobile/narrow) and the desktop
+// shared Enter World button, which relabels itself Take Over for an online
+// selection. Taking over disconnects the other live session with no undo, so it
+// is guarded by a confirm. takeoverCharacter awaits the old session's leave()
+// server-side, so the slot is free by the time enterWorld connects; btn is
+// passed so enterWorld owns its loading/disabled state and restores it if entry
+// is aborted before it begins.
+async function takeOverAndEnter(c: CharacterSummary, btn: HTMLButtonElement): Promise<void> {
+  if (!window.confirm(t('character.takeOverConfirm'))) return;
+  $('#charselect-error').textContent = '';
+  btn.disabled = true;
+  try {
+    await api.takeoverCharacter(c.id);
+    await enterWorld({ ...c, online: false }, btn);
+  } catch (err) {
+    btn.disabled = false;
+    $('#charselect-error').textContent = userFacingApiError(err);
+    // Reflect any state change (e.g. a lost race) back into the list.
+    void refreshCharacters();
+  }
+}
+
+// The selected character's name, shown above the 3D preview on the desktop
+// stage so it is obvious which character you are about to play. textContent (not
+// innerHTML): names are player-supplied. Only the desktop docked layout reveals
+// the element (CSS), but setting it is a harmless no-op elsewhere.
+function setCharselectPreviewName(name: string): void {
+  const el = document.getElementById('charselect-preview-name');
+  if (el) el.textContent = name;
+}
+
+// Reflect the selected character's primary action on the desktop shared Enter
+// World button: Enter World for a ready character, Take Over for one online
+// elsewhere, and disabled (with a hint) while a forced rename is pending. A
+// no-op when the button is absent (mobile/narrow layouts use per-row buttons).
+function syncCharselectEnterButton(): void {
+  const btn = document.getElementById('btn-charselect-enter') as HTMLButtonElement | null;
+  if (!btn) return;
+  const action = charselectPrimaryAction(charselectSelected);
+  btn.disabled = action.kind === 'disabled';
+  // Drive BOTH the i18n key and the rendered text/title, so a later language
+  // switch (translatePage re-applies every [data-i18n]/[data-i18n-title]) rerenders
+  // the current dynamic state instead of clobbering it back to the static "Enter
+  // World". Same approach as applyServerMode.
+  btn.setAttribute('data-i18n', action.labelKey);
+  btn.textContent = t(action.labelKey);
+  if (action.titleKey) {
+    btn.setAttribute('data-i18n-title', action.titleKey);
+    btn.title = t(action.titleKey);
+  } else {
+    btn.removeAttribute('data-i18n-title');
+    btn.removeAttribute('title');
+  }
 }
 
 async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
@@ -6891,6 +6957,17 @@ function wireStartScreens(): void {
   $('#btn-change-realm').addEventListener('click', (e) => {
     e.stopPropagation();
     toggleRealmDropdown();
+  });
+  // Desktop roster: one shared Enter World button acts on the selected
+  // character (Take Over when it is online elsewhere). Hidden on mobile/narrow
+  // layouts, which keep the per-row buttons.
+  $('#btn-charselect-enter').addEventListener('click', (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const c = charselectSelected;
+    if (!c || btn.disabled) return;
+    // Same classifier that set the label, so routing and label never disagree.
+    if (charselectPrimaryAction(c).kind === 'takeover') void takeOverAndEnter(c, btn);
+    else void enterWorld(c, btn);
   });
   // New Character opens the dedicated create screen; create's Back returns here.
   $('#btn-new-character').addEventListener('click', () => show('#charcreate-panel'));

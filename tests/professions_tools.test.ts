@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest';
+import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { ITEMS, NPCS } from '../src/sim/data';
 import {
+  applyEffectBonus,
   canGatherTier,
   canHarvestMonsterMaterial,
+  depleteEffect,
   gatherToolTier,
+  type HarvestOutcome,
   isGatherToolUse,
+  resolveToolEffectUse,
+  slotEffect,
 } from '../src/sim/professions/tools';
+import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
 
@@ -188,5 +195,182 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     // tier-only gating check above is meaningful and not vacuously true.
     expect(ITEMS.mithril_mining_pick.quality).toBe('uncommon');
     expect(ITEMS.thorium_mining_pick.quality).toBe('rare');
+  });
+});
+
+describe('tool effect slotting with durability and depletion (#1136)', () => {
+  const baseOutcome: HarvestOutcome = { quantity: 2, quality: 1, respawnTicks: 100 };
+
+  it('a slotted quantity effect bonus applies to the outcome while durability remains', () => {
+    const slot = slotEffect('gatherers_cache');
+    expect(slot.durability).toBeGreaterThan(0);
+    const bonused = applyEffectBonus(slot, baseOutcome);
+    expect(bonused.quantity).toBe(baseOutcome.quantity + 1);
+    expect(bonused.quality).toBe(baseOutcome.quality);
+    expect(bonused.respawnTicks).toBe(baseOutcome.respawnTicks);
+    // Pure: the input outcome is never mutated.
+    expect(baseOutcome.quantity).toBe(2);
+  });
+
+  it('a slotted quality effect bonus applies to the outcome while durability remains', () => {
+    const slot = slotEffect('artisans_eye');
+    const bonused = applyEffectBonus(slot, baseOutcome);
+    expect(bonused.quality).toBe(baseOutcome.quality + 1);
+    expect(bonused.quantity).toBe(baseOutcome.quantity);
+  });
+
+  it('a slotted respawn-speed effect bonus shortens the respawn timer', () => {
+    const slot = slotEffect('quickening_charm');
+    const bonused = applyEffectBonus(slot, baseOutcome);
+    expect(bonused.respawnTicks).toBe(baseOutcome.respawnTicks - 1);
+  });
+
+  it('the bonus no longer applies once durability reaches 0, but the base tool is unaffected', () => {
+    const slot = slotEffect('gatherers_cache');
+    slot.durability = 0;
+    const outcome = applyEffectBonus(slot, baseOutcome);
+    expect(outcome).toEqual(baseOutcome);
+    // The base tool's own tier/gating never reads the effect slot at all: it
+    // keeps working at its tier regardless of the effect's durability.
+    expect(canGatherTier(1, 1)).toBe(true);
+    expect(gatherToolTier(ITEMS.copper_mining_pick, 'mining')).toBe(1);
+  });
+
+  it('applyEffectBonus returns the outcome unchanged when no effect is slotted', () => {
+    expect(applyEffectBonus(undefined, baseOutcome)).toEqual(baseOutcome);
+  });
+
+  it('depleteEffect decrements durability only on a losing roll, via Rng, deterministically under a fixed seed', () => {
+    const runSequence = (seed: number): number[] => {
+      const rng = new Rng(seed);
+      const slot = slotEffect('gatherers_cache');
+      const history: number[] = [];
+      for (let i = 0; i < 30; i++) {
+        depleteEffect(slot, rng);
+        history.push(slot.durability);
+      }
+      return history;
+    };
+    const a = runSequence(12345);
+    const b = runSequence(12345);
+    expect(a).toEqual(b);
+    // Same starting durability under a different seed can produce a different
+    // sequence (the roll is probabilistic), proving depletion is not a flat -1.
+    const c = runSequence(99999);
+    expect(a).not.toEqual(c);
+    // Durability never goes negative across enough uses.
+    expect(Math.min(...a)).toBeGreaterThanOrEqual(0);
+    // At a 50% chance, 30 draws almost always exhaust a 20-charge effect.
+    const runToZero = (seed: number): number[] => {
+      const rng = new Rng(seed);
+      const slot = slotEffect('gatherers_cache');
+      const history: number[] = [];
+      for (let i = 0; i < 200; i++) {
+        depleteEffect(slot, rng);
+        history.push(slot.durability);
+      }
+      return history;
+    };
+    expect(runToZero(12345).at(-1)).toBe(0);
+  });
+
+  it('depleteEffect is a no-op once durability is already 0', () => {
+    const rng = new Rng(1);
+    const slot = slotEffect('artisans_eye');
+    slot.durability = 0;
+    depleteEffect(slot, rng);
+    expect(slot.durability).toBe(0);
+  });
+
+  it('re-slotting an effect resets it to full durability', () => {
+    const slot = slotEffect('quickening_charm');
+    const rng = new Rng(7);
+    for (let i = 0; i < 50; i++) depleteEffect(slot, rng);
+    expect(slot.durability).toBe(0);
+    const fresh = slotEffect('quickening_charm');
+    expect(fresh.durability).toBeGreaterThan(0);
+  });
+
+  it('slotEffect defaults to always mode', () => {
+    expect(slotEffect('gatherers_cache').confirmMode).toBe('always');
+  });
+});
+
+describe('always/prompt-on-use confirmation gate (#1138)', () => {
+  const baseOutcome: HarvestOutcome = { quantity: 2, quality: 1, respawnTicks: 100 };
+
+  it("'always' mode is byte-for-byte identical to #1136's baseline behavior, confirmed or not", () => {
+    const runOld = (seed: number) => {
+      const rng = new Rng(seed);
+      const slot = slotEffect('gatherers_cache');
+      const history: { outcome: HarvestOutcome; depleted: boolean }[] = [];
+      for (let i = 0; i < 30; i++) {
+        const outcome = applyEffectBonus(slot, baseOutcome);
+        const depleted = depleteEffect(slot, rng);
+        history.push({ outcome, depleted });
+      }
+      return { history, finalDurability: slot.durability };
+    };
+    const runNew = (seed: number, confirmed: boolean) => {
+      const rng = new Rng(seed);
+      const slot = slotEffect('gatherers_cache', 'always');
+      const history: { outcome: HarvestOutcome; depleted: boolean }[] = [];
+      for (let i = 0; i < 30; i++) {
+        const result = resolveToolEffectUse(slot, baseOutcome, rng, confirmed);
+        expect(result.applied).toBe(true);
+        history.push({ outcome: result.outcome, depleted: result.depleted });
+      }
+      return { history, finalDurability: slot.durability };
+    };
+    const old1 = runOld(12345);
+    expect(runNew(12345, true)).toEqual(old1);
+    // confirmed is ignored entirely in 'always' mode: false behaves the same.
+    expect(runNew(12345, false)).toEqual(old1);
+  });
+
+  it('prompt mode without confirmation applies no bonus and consumes no charge', () => {
+    const rng = new Rng(1);
+    const slot = slotEffect('gatherers_cache', 'prompt');
+    const startingDurability = slot.durability;
+    const result = resolveToolEffectUse(slot, baseOutcome, rng, false);
+    expect(result.applied).toBe(false);
+    expect(result.depleted).toBe(false);
+    expect(result.outcome).toEqual(baseOutcome);
+    expect(slot.durability).toBe(startingDurability);
+  });
+
+  it('prompt mode with confirmed=true behaves like always mode for that one use', () => {
+    const seed = 42;
+    const rngPrompt = new Rng(seed);
+    const promptSlot = slotEffect('gatherers_cache', 'prompt');
+    const promptResult = resolveToolEffectUse(promptSlot, baseOutcome, rngPrompt, true);
+
+    const rngAlways = new Rng(seed);
+    const alwaysSlot = slotEffect('gatherers_cache', 'always');
+    const alwaysResult = resolveToolEffectUse(alwaysSlot, baseOutcome, rngAlways, true);
+
+    expect(promptResult.applied).toBe(true);
+    expect(promptResult).toEqual(alwaysResult);
+    expect(promptSlot.durability).toBe(alwaysSlot.durability);
+  });
+
+  it('repeated unconfirmed prompt uses never deplete the slot, across many draws', () => {
+    const rng = new Rng(7);
+    const slot = slotEffect('artisans_eye', 'prompt');
+    for (let i = 0; i < 100; i++) {
+      const result = resolveToolEffectUse(slot, baseOutcome, rng, false);
+      expect(result.applied).toBe(false);
+      expect(result.outcome).toEqual(baseOutcome);
+    }
+    expect(slot.durability).toBe(TOOL_EFFECTS.artisans_eye.startingDurability);
+  });
+
+  it('resolveToolEffectUse returns an unapplied no-op when there is no slot at all', () => {
+    const rng = new Rng(1);
+    expect(resolveToolEffectUse(undefined, baseOutcome, rng, true)).toEqual({
+      outcome: baseOutcome,
+      depleted: false,
+      applied: false,
+    });
   });
 });

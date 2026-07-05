@@ -78,6 +78,59 @@ const RIDGE_SIGMA = 10; // gaussian width of the wall
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
+// Terracing turns the smooth ridge/rim rise into stair-stepped bands (flat
+// tread then a steep riser) instead of one uniform ramp, so mountainsides
+// read as a stacked rocky slope. TERRACE_STEP is the height of one band;
+// TERRACE_TREAD is the fraction of each band that stays flat before the
+// riser rises through the rest. Purely a reshaping of the already-computed
+// mountain rise (see terraceStep below): it cannot lower the overall climb
+// gate below the smooth original at the points tests/terrain_walls.test.ts
+// samples, since every riser is at least as steep as the ramp it replaces.
+// The three terrace parameters are exported only so tests/terrace_step.test.ts
+// can pin the production values as literals.
+export const TERRACE_STEP = 6;
+export const TERRACE_TREAD = 0.6;
+// Fraction of the smooth rise kept as a linear talus apron under the first
+// band. Without it, any rise below TERRACE_TREAD * TERRACE_STEP terraces to
+// exactly 0 and the foot of every wall becomes a dead-flat plain, erasing
+// placed landmarks that lean on that rise (the Mirefen impact site sits
+// against a 3.1yd wall base; tests/impact_site.test.ts pins it).
+export const TERRACE_APRON = 0.5;
+
+// Past the playable rim, the crest noise and terracing fade back to the
+// original smooth berm plateau. The overshoot space is never rendered (the
+// terrain mesh covers exactly the world rectangle) and never reachable in
+// play (the rim is impassable), but the sim relies on it as a flat staging
+// ground: dev teleports, the /follow and chat tests, parity scenarios, and
+// bot tooling all park entities out there (some as close as ~20yd past the
+// edge), and jagged terraced crags would strand them behind risers steeper
+// than the climb limit (tests/follow.test.ts walks a follower at z = -1000).
+// Full mountain character is kept through OUTSIDE_FADE_START yd beyond the
+// edge (so every in-world sample stays bit-identical and edge-vertex normal
+// sampling never crosses the fade); by OUTSIDE_FADE_END the rise is the
+// smooth berm again (tests/terrain_walls.test.ts pins the flat plateau).
+// NOTE: the transition band itself (START..END yd out) is a crag-to-berm
+// cliff, steeper than the climb limit in places; "flat staging ground" only
+// holds PAST OUTSIDE_FADE_END. Anything staged in the overshoot must sit at
+// least OUTSIDE_FADE_END + a couple yd out (existing users are all >= ~20yd).
+const OUTSIDE_FADE_START = 2;
+const OUTSIDE_FADE_END = 10;
+
+// Quantizes a non-negative rise into `step`-height bands: flat for the first
+// `tread` fraction of each band, then a smoothed climb through the rest. The
+// first band keeps a linear apron floor (`apron` fraction of the smooth rise,
+// capped at `step * apron`) so wall feet stay sloped; the floor can never
+// reach past band 0 because every higher band already sits at >= step.
+// Continuous and monotonic in v; terraceStep(0) === 0 exactly, so callers can
+// add this in unconditionally. Exported for its unit test only.
+export function terraceStep(v: number, step: number, tread: number, apron: number): number {
+  if (v <= 0) return 0;
+  const band = Math.floor(v / step);
+  const frac = v / step - band;
+  const riser = frac < tread ? 0 : smoothstep(tread, 1, frac);
+  return Math.max((band + riser) * step, Math.min(v, step) * apron);
+}
+
 export const MIREFEN_IMPACT_CRATER = {
   x: 149.5,
   z: 295,
@@ -339,16 +392,31 @@ export function terrainHeight(x: number, z: number, seed: number): number {
     }
   }
 
+  // How far outside the playable rectangle this sample is (0 everywhere
+  // in-world), and the resulting fade on all mountain character (crest noise
+  // + terracing); see OUTSIDE_FADE_START above.
+  const beyond = Math.max(0, w.minZ - z, z - w.maxZ, Math.abs(x) - WORLD_MAX_X);
+  const mountainDetail = 1 - smoothstep(OUTSIDE_FADE_START, OUTSIDE_FADE_END, beyond);
+
   // Mountain ridge walls between zones, pierced by the road pass
+  let mountainAdd = 0;
   for (const ridge of w.ridges) {
     const dz = Math.abs(z - ridge.z);
     if (dz < RIDGE_SIGMA * 3) {
       const profile = Math.exp(-(dz * dz) / (2 * RIDGE_SIGMA * RIDGE_SIGMA));
       const pass = smoothstep(PASS_HALF_WIDTH, PASS_SHOULDER, Math.abs(x - ridge.passX));
-      // jagged crest so the wall reads as mountains, not a berm (variance kept
-      // tight so the lowest saddle still beats the climb limit)
-      const crest = 1 + (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4;
-      h += RIDGE_HEIGHT * crest * profile * pass;
+      // jagged crest so the wall reads as mountains, not a berm: a coarse layer
+      // for peak/saddle shape plus a finer layer for crag/shoulder detail.
+      // Combined variance kept tight so the lowest saddle still beats the
+      // climb limit (tests/terrain_walls.test.ts).
+      // (each noise term is scaled by mountainDetail separately: multiplying
+      // by an exact 1 keeps in-world samples bit-identical, where regrouping
+      // the sum would drift them by ULPs and desync the parity goldens)
+      const crest =
+        1 +
+        (fbm2(x * 0.03, ridge.z * 0.03, seed + 19, 2) - 0.5) * 0.4 * mountainDetail +
+        (fbm2(x * 0.11, ridge.z * 0.11, seed + 23, 2) - 0.5) * 0.14 * mountainDetail;
+      mountainAdd += RIDGE_HEIGHT * crest * profile * pass;
     }
   }
 
@@ -361,7 +429,31 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   const rimS = smoothstep(w.minZ + 30, w.minZ + 6, z);
   const rimN = smoothstep(w.maxZ - 30, w.maxZ - 6, z);
   const rim = Math.max(rimX, rimS, rimN);
-  h += rim * 55;
+  // The rim wall used to be a perfectly smooth berm (no noise at all), which
+  // read as artificial from a distance. Give it the same two-layer jagged
+  // crest as the inter-zone ridges: a coarse peak/saddle layer plus a finer
+  // crag layer, same conservative combined variance so the climb-limit
+  // invariant still holds along the whole rim.
+  const rimCrest =
+    1 +
+    (fbm2(x * 0.025, z * 0.025, seed + 29, 3) - 0.5) * 0.35 * mountainDetail +
+    (fbm2(x * 0.09, z * 0.09, seed + 37, 2) - 0.5) * 0.15 * mountainDetail;
+  mountainAdd += rim * 55 * rimCrest;
+  // Terrace the combined mountain rise into stair-stepped bands (flat treads
+  // + steep risers) instead of one smooth ramp, so slopes read as a stacked
+  // rocky mountainside rather than a uniform incline. This does not reduce
+  // impassability: a straight crossing still meets a riser steeper than the
+  // smooth original everywhere the smooth original was already steep enough
+  // (tests/terrain_walls.test.ts checks the max steepness along a crossing,
+  // which a stepped riser only increases). terraceStep(0) === 0, so terrain
+  // away from any ridge/rim (mountainAdd == 0) is completely unaffected. The
+  // terracing, like the crest noise, fades out past the rim (mountainDetail)
+  // so the unreachable overshoot plateau stays the flat staging ground it was
+  // before the mountains got their craggy pass. (Blended as two products, not
+  // lerp(a, b, t): at mountainDetail 1 / 0 the products are exactly
+  // terraced + 0 / 0 + mountainAdd, keeping in-world samples bit-identical.)
+  const terraced = terraceStep(mountainAdd, TERRACE_STEP, TERRACE_TREAD, TERRACE_APRON);
+  h += terraced * mountainDetail + mountainAdd * (1 - mountainDetail);
   h += mirefenImpactCraterOffset(x, z);
   h = applyEditLayer(x, z, h);
   return h;
