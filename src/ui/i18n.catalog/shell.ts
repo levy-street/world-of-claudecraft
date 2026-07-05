@@ -79,6 +79,14 @@ export const shellStrings = {
         takenOver: 'Your character was taken over by another session.',
         renameBeforeEntering: 'This character must be renamed before entering the world.',
         renameNotPermitted: 'Renaming this character is not allowed.',
+        snsUnavailable: 'Subdomain minting is unavailable right now. Try again later.',
+        noSubdomainForm: 'That name has no valid .sol subdomain form.',
+        alreadyBound: 'This character is already bound to a .sol name.',
+        solNameTaken: 'That .sol name is already taken.',
+        subdomainCheckFailed: 'Could not check name availability. Try again.',
+        subdomainNotConfirmed: 'The subdomain mint could not be confirmed on-chain.',
+        characterTransferred:
+          'This character was transferred to a new owner and must be re-claimed.',
       },
     },
     // Desktop (Electron) shell surfaces: the auto-update toast rendered by the
@@ -137,6 +145,7 @@ export const shellStrings = {
       finalizeTimeout:
         'Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.',
       renameSuccess: 'Renamed to {name}.',
+      mintSuccess: 'Minted {domain}. It is yours on-chain.',
     },
     character: {
       loading: 'Loading...',
@@ -154,6 +163,10 @@ export const shellStrings = {
       renamePaidButton: 'Pay {amount} $WOC and Rename',
       renamePriceHint: 'A voluntary rename burns {amount} $WOC.',
       renameCancel: 'Cancel',
+      mintSolName: 'Get .sol name',
+      mintSolButton: 'Burn {amount} $WOC and Mint',
+      mintSolHint:
+        'Mints your name as a player-owned .sol subdomain for {amount} $WOC. The name is yours on-chain.',
       tabCharacters: 'Characters',
       tabCreate: 'Create',
       portraitAlt: 'Portrait of {name}',
@@ -1774,6 +1787,13 @@ export const shellStrings = {
         alreadyInWorld: '角色已在世界中。',
         renameBeforeEntering: '此角色必须先改名才能进入世界。',
         renameNotPermitted: '不允许为此角色改名。',
+        snsUnavailable: '子域名铸造目前不可用。请稍后再试。',
+        noSubdomainForm: '该名字没有有效的 .sol 子域名形式。',
+        alreadyBound: '该角色已绑定一个 .sol 名称。',
+        solNameTaken: '该 .sol 名称已被占用。',
+        subdomainCheckFailed: '无法检查名称可用性。请重试。',
+        subdomainNotConfirmed: '无法在链上确认子域名铸造。',
+        characterTransferred: '该角色已转让给新所有者，需重新认领。',
       },
     },
     realm: {
@@ -1803,6 +1823,7 @@ export const shellStrings = {
       confirmFailed: '无法验证该 $WOC 支付。',
       finalizeTimeout: '等待最终确认超时。如果 $WOC 已被烧毁，请重试：支付将在最终确认后完成。',
       renameSuccess: '已改名为 {name}。',
+      mintSuccess: '已铸造 {domain}。它在链上归你所有。',
     },
     character: {
       loading: '正在加载...',
@@ -1816,6 +1837,10 @@ export const shellStrings = {
       renamePaidButton: '支付 {amount} $WOC 并改名',
       renamePriceHint: '自愿改名将烧毁 {amount} $WOC。',
       renameCancel: '取消',
+      mintSolName: '获取 .sol 名称',
+      mintSolButton: '烧毁 {amount} $WOC 并铸造',
+      mintSolHint:
+        '花费 {amount} $WOC 将你的名字铸造为玩家所有的 .sol 子域名。该名称在链上归你所有。',
       tabCharacters: '角色',
       tabCreate: '创建',
     },
@@ -1979,6 +2004,13 @@ export const shellStrings = {
         alreadyInWorld: '角色已在世界中。',
         renameBeforeEntering: '此角色必須先更名才能進入世界。',
         renameNotPermitted: '不允許為此角色更名。',
+        snsUnavailable: '子網域鑄造目前無法使用。請稍後再試。',
+        noSubdomainForm: '該名字沒有有效的 .sol 子網域形式。',
+        alreadyBound: '該角色已綁定一個 .sol 名稱。',
+        solNameTaken: '該 .sol 名稱已被使用。',
+        subdomainCheckFailed: '無法檢查名稱可用性。請重試。',
+        subdomainNotConfirmed: '無法在鏈上確認子網域鑄造。',
+        characterTransferred: '該角色已轉讓給新擁有者，需重新認領。',
       },
     },
     realm: {
@@ -2008,6 +2040,7 @@ export const shellStrings = {
       confirmFailed: '無法驗證該 $WOC 支付。',
       finalizeTimeout: '等待最終確認逾時。如果 $WOC 已被燒毀，請重試：支付將在最終確認後完成。',
       renameSuccess: '已改名為 {name}。',
+      mintSuccess: '已鑄造 {domain}。它在鏈上歸你所有。',
     },
     character: {
       loading: '正在載入...',
@@ -2021,6 +2054,10 @@ export const shellStrings = {
       renamePaidButton: '支付 {amount} $WOC 並改名',
       renamePriceHint: '自願改名將燒毀 {amount} $WOC。',
       renameCancel: '取消',
+      mintSolName: '取得 .sol 名稱',
+      mintSolButton: '燒毀 {amount} $WOC 並鑄造',
+      mintSolHint:
+        '花費 {amount} $WOC 將你的名字鑄造為玩家所有的 .sol 子網域。該名稱在鏈上歸你所有。',
       tabCharacters: '角色',
       tabCreate: '建立',
     },
@@ -2185,6 +2222,13 @@ export const shellStrings = {
         alreadyInWorld: '캐릭터가 이미 세계에 있습니다.',
         renameBeforeEntering: '이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.',
         renameNotPermitted: '이 캐릭터의 이름을 변경할 수 없습니다.',
+        snsUnavailable: '지금은 서브도메인 민팅을 사용할 수 없습니다. 나중에 다시 시도하세요.',
+        noSubdomainForm: '해당 이름은 유효한 .sol 서브도메인 형식이 없습니다.',
+        alreadyBound: '이 캐릭터는 이미 .sol 이름에 연결되어 있습니다.',
+        solNameTaken: '해당 .sol 이름은 이미 사용 중입니다.',
+        subdomainCheckFailed: '이름 사용 가능 여부를 확인할 수 없습니다. 다시 시도하세요.',
+        subdomainNotConfirmed: '서브도메인 민팅을 온체인에서 확인할 수 없습니다.',
+        characterTransferred: '이 캐릭터는 새 소유자에게 이전되어 다시 클레임해야 합니다.',
       },
     },
     realm: {
@@ -2215,6 +2259,7 @@ export const shellStrings = {
       finalizeTimeout:
         '최종 확정 대기 시간이 초과되었습니다. $WOC가 이미 소각되었다면 다시 시도하세요. 결제는 최종 확정 후 처리됩니다.',
       renameSuccess: '이름이 {name}(으)로 변경되었습니다.',
+      mintSuccess: '{domain}을(를) 민팅했습니다. 온체인에서 당신의 소유입니다.',
     },
     character: {
       loading: '불러오는 중...',
@@ -2228,6 +2273,10 @@ export const shellStrings = {
       renamePaidButton: '{amount} $WOC 지불하고 이름 변경',
       renamePriceHint: '자발적 이름 변경에는 {amount} $WOC가 소각됩니다.',
       renameCancel: '취소',
+      mintSolName: '.sol 이름 받기',
+      mintSolButton: '{amount} $WOC 소각하고 민팅',
+      mintSolHint:
+        '{amount} $WOC로 이름을 플레이어 소유의 .sol 서브도메인으로 민팅합니다. 이름은 온체인에서 당신의 소유가 됩니다.',
       tabCharacters: '캐릭터',
       tabCreate: '생성',
     },
@@ -2403,6 +2452,14 @@ export const shellStrings = {
         alreadyInWorld: 'キャラクターは既に世界にいます。',
         renameBeforeEntering: 'このキャラクターは世界に入る前に名前変更が必要です。',
         renameNotPermitted: 'このキャラクターの名前変更は許可されていません。',
+        snsUnavailable: 'サブドメインのミントは現在利用できません。後でもう一度お試しください。',
+        noSubdomainForm: 'その名前には有効な .sol サブドメイン形式がありません。',
+        alreadyBound: 'このキャラクターは既に .sol 名に紐付けられています。',
+        solNameTaken: 'その .sol 名は既に使われています。',
+        subdomainCheckFailed: '名前の空き状況を確認できませんでした。もう一度お試しください。',
+        subdomainNotConfirmed: 'サブドメインのミントをオンチェーンで確認できませんでした。',
+        characterTransferred:
+          'このキャラクターは新しい所有者に譲渡されました。再クレームが必要です。',
       },
     },
     realm: {
@@ -2433,6 +2490,7 @@ export const shellStrings = {
       finalizeTimeout:
         'ファイナライズ待ちがタイムアウトしました。$WOC がバーン済みの場合は再試行してください。ファイナライズ後に支払いが確定します。',
       renameSuccess: '{name} に改名しました。',
+      mintSuccess: '{domain} をミントしました。オンチェーンであなたのものです。',
     },
     character: {
       loading: '読み込み中...',
@@ -2446,6 +2504,10 @@ export const shellStrings = {
       renamePaidButton: '{amount} $WOC を支払って改名',
       renamePriceHint: '任意の改名には {amount} $WOC のバーンが必要です。',
       renameCancel: 'キャンセル',
+      mintSolName: '.sol 名を取得',
+      mintSolButton: '{amount} $WOC をバーンしてミント',
+      mintSolHint:
+        '{amount} $WOC で名前をプレイヤー所有の .sol サブドメインとしてミントします。名前はオンチェーンであなたのものになります。',
       tabCharacters: 'キャラクター',
       tabCreate: '作成',
     },
@@ -2822,6 +2884,14 @@ export const shellStrings = {
         alreadyInWorld: 'Персонаж уже находится в мире.',
         renameBeforeEntering: 'Перед входом в мир этому персонажу нужно сменить имя.',
         renameNotPermitted: 'Переименование этого персонажа не разрешено.',
+        snsUnavailable: 'Минт субдоменов сейчас недоступен. Повторите попытку позже.',
+        noSubdomainForm: 'У этого имени нет допустимой формы субдомена .sol.',
+        alreadyBound: 'Этот персонаж уже привязан к имени .sol.',
+        solNameTaken: 'Это имя .sol уже занято.',
+        subdomainCheckFailed: 'Не удалось проверить доступность имени. Повторите попытку.',
+        subdomainNotConfirmed: 'Не удалось подтвердить минт субдомена в блокчейне.',
+        characterTransferred:
+          'Этот персонаж был передан новому владельцу, и его нужно заявить заново.',
       },
     },
     realm: {
@@ -2852,6 +2922,7 @@ export const shellStrings = {
       finalizeTimeout:
         'Время ожидания финализации истекло. Если $WOC уже сожжены, повторите попытку: платеж завершится после финализации.',
       renameSuccess: 'Переименовано в {name}.',
+      mintSuccess: 'Сминтировано {domain}. Имя принадлежит вам в блокчейне.',
     },
     character: {
       loading: 'Загрузка...',
@@ -2865,6 +2936,10 @@ export const shellStrings = {
       renamePaidButton: 'Заплатить {amount} $WOC и переименовать',
       renamePriceHint: 'Добровольное переименование сжигает {amount} $WOC.',
       renameCancel: 'Отмена',
+      mintSolName: 'Получить имя .sol',
+      mintSolButton: 'Сжечь {amount} $WOC и сминтить',
+      mintSolHint:
+        'Минтит ваше имя как принадлежащий игроку субдомен .sol за {amount} $WOC. Имя принадлежит вам в блокчейне.',
       tabCharacters: 'Персонажи',
       tabCreate: 'Создать',
     },

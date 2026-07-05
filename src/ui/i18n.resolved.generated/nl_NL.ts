@@ -3412,7 +3412,14 @@ export const nl_NL: EnTranslations = {
       "alreadyInWorld": "Personage is al in de wereld.",
       "takenOver": "Je personage is overgenomen door een andere sessie.",
       "renameBeforeEntering": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
-      "renameNotPermitted": "Dit personage hernoemen is niet toegestaan."
+      "renameNotPermitted": "Dit personage hernoemen is niet toegestaan.",
+      "snsUnavailable": "Subdomain minting is unavailable right now. Try again later.",
+      "noSubdomainForm": "That name has no valid .sol subdomain form.",
+      "alreadyBound": "This character is already bound to a .sol name.",
+      "solNameTaken": "That .sol name is already taken.",
+      "subdomainCheckFailed": "Could not check name availability. Try again.",
+      "subdomainNotConfirmed": "The subdomain mint could not be confirmed on-chain.",
+      "characterTransferred": "This character was transferred to a new owner and must be re-claimed."
     }
   },
   "desktop": {
@@ -3461,7 +3468,8 @@ export const nl_NL: EnTranslations = {
     "finalizing": "Waiting for Solana finalization...",
     "confirmFailed": "The $WOC payment could not be verified.",
     "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
-    "renameSuccess": "Renamed to {name}."
+    "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain}. It is yours on-chain."
   },
   "character": {
     "loading": "Laden...",
@@ -3478,6 +3486,9 @@ export const nl_NL: EnTranslations = {
     "renamePaidButton": "Pay {amount} $WOC and Rename",
     "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
     "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC and Mint",
+    "mintSolHint": "Mints your name as a player-owned .sol subdomain for {amount} $WOC. The name is yours on-chain.",
     "tabCharacters": "Personages",
     "tabCreate": "Aanmaken",
     "portraitAlt": "Portret van {name}",

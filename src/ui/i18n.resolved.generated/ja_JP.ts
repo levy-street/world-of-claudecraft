@@ -3412,7 +3412,14 @@ export const ja_JP: EnTranslations = {
       "alreadyInWorld": "キャラクターは既に世界にいます。",
       "takenOver": "あなたのキャラクターは別のセッションに引き継がれました。",
       "renameBeforeEntering": "このキャラクターは世界に入る前に名前変更が必要です。",
-      "renameNotPermitted": "このキャラクターの名前変更は許可されていません。"
+      "renameNotPermitted": "このキャラクターの名前変更は許可されていません。",
+      "snsUnavailable": "サブドメインのミントは現在利用できません。後でもう一度お試しください。",
+      "noSubdomainForm": "その名前には有効な.solサブドメイン形式がありません。",
+      "alreadyBound": "このキャラクターは既に.sol名に紐付けられています。",
+      "solNameTaken": "その.sol名は既に使われています。",
+      "subdomainCheckFailed": "名前の空き状況を確認できませんでした。もう一度お試しください。",
+      "subdomainNotConfirmed": "サブドメインのミントをオンチェーンで確認できませんでした。",
+      "characterTransferred": "このキャラクターは新しい所有者に譲渡されました。再クレームが必要です。"
     }
   },
   "desktop": {
@@ -3461,7 +3468,8 @@ export const ja_JP: EnTranslations = {
     "finalizing": "Solanaのファイナライズを待機中...",
     "confirmFailed": "$WOC支払いを確認できませんでした。",
     "finalizeTimeout": "ファイナライズ待ちがタイムアウトしました。$WOCがバーン済みの場合は再試行してください。支払いはファイナライズ後に確定します。",
-    "renameSuccess": "{name}に改名しました。"
+    "renameSuccess": "{name}に改名しました。",
+    "mintSuccess": "{domain}をミントしました。オンチェーンであなたのものです。"
   },
   "character": {
     "loading": "読み込み中...",
@@ -3478,6 +3486,9 @@ export const ja_JP: EnTranslations = {
     "renamePaidButton": "{amount} $WOCを支払って改名",
     "renamePriceHint": "任意の改名は{amount} $WOCをバーンします。",
     "renameCancel": "キャンセル",
+    "mintSolName": ".sol名を取得",
+    "mintSolButton": "{amount} $WOCをバーンしてミント",
+    "mintSolHint": "{amount} $WOCで名前をプレイヤー所有の.solサブドメインとしてミントします。名前はオンチェーンであなたのものになります。",
     "tabCharacters": "キャラクター",
     "tabCreate": "作成",
     "portraitAlt": "{name}の肖像",

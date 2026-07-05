@@ -3412,7 +3412,14 @@ export const zh_CN: EnTranslations = {
       "alreadyInWorld": "角色已在世界中。",
       "takenOver": "你的角色已被另一个会话接管。",
       "renameBeforeEntering": "此角色必须先改名才能进入世界。",
-      "renameNotPermitted": "不允许为此角色改名。"
+      "renameNotPermitted": "不允许为此角色改名。",
+      "snsUnavailable": "子域名铸造目前不可用。请稍后再试。",
+      "noSubdomainForm": "该名字没有有效的 .sol 子域名形式。",
+      "alreadyBound": "该角色已绑定一个 .sol 名称。",
+      "solNameTaken": "该 .sol 名称已被占用。",
+      "subdomainCheckFailed": "无法检查名称可用性。请重试。",
+      "subdomainNotConfirmed": "无法在链上确认子域名铸造。",
+      "characterTransferred": "该角色已转让给新所有者，需重新认领。"
     }
   },
   "desktop": {
@@ -3461,7 +3468,8 @@ export const zh_CN: EnTranslations = {
     "finalizing": "等待 Solana 最终确认...",
     "confirmFailed": "无法验证 $WOC 支付。",
     "finalizeTimeout": "等待最终确认超时。如果 $WOC 已销毁，请重试：支付将在最终确认后结算。",
-    "renameSuccess": "已改名为 {name}。"
+    "renameSuccess": "已改名为 {name}。",
+    "mintSuccess": "已铸造 {domain}。它在链上归你所有。"
   },
   "character": {
     "loading": "正在加载...",
@@ -3478,6 +3486,9 @@ export const zh_CN: EnTranslations = {
     "renamePaidButton": "支付 {amount} $WOC 并改名",
     "renamePriceHint": "自愿改名将销毁 {amount} $WOC。",
     "renameCancel": "取消",
+    "mintSolName": "获取 .sol 名称",
+    "mintSolButton": "烧毁 {amount} $WOC 并铸造",
+    "mintSolHint": "花费 {amount} $WOC 将你的名字铸造为玩家所有的 .sol 子域名。该名称在链上归你所有。",
     "tabCharacters": "角色",
     "tabCreate": "创建",
     "portraitAlt": "{name}的头像",

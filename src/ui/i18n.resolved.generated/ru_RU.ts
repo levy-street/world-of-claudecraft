@@ -3412,7 +3412,14 @@ export const ru_RU: EnTranslations = {
       "alreadyInWorld": "Персонаж уже находится в мире.",
       "takenOver": "Вашего персонажа перехватила другая сессия.",
       "renameBeforeEntering": "Перед входом в мир этому персонажу нужно сменить имя.",
-      "renameNotPermitted": "Переименование этого персонажа не разрешено."
+      "renameNotPermitted": "Переименование этого персонажа не разрешено.",
+      "snsUnavailable": "Минт субдоменов сейчас недоступен. Повторите попытку позже.",
+      "noSubdomainForm": "У этого имени нет допустимой формы субдомена .sol.",
+      "alreadyBound": "Этот персонаж уже привязан к имени .sol.",
+      "solNameTaken": "Это имя .sol уже занято.",
+      "subdomainCheckFailed": "Не удалось проверить доступность имени. Повторите попытку.",
+      "subdomainNotConfirmed": "Не удалось подтвердить минт субдомена в блокчейне.",
+      "characterTransferred": "Этот персонаж был передан новому владельцу, и его нужно заявить заново."
     }
   },
   "desktop": {
@@ -3461,7 +3468,8 @@ export const ru_RU: EnTranslations = {
     "finalizing": "Ожидание финализации Solana...",
     "confirmFailed": "Не удалось проверить платеж $WOC.",
     "finalizeTimeout": "Время ожидания финализации истекло. Если $WOC уже сожжены, повторите попытку: платеж зачтется после финализации.",
-    "renameSuccess": "Переименовано в {name}."
+    "renameSuccess": "Переименовано в {name}.",
+    "mintSuccess": "Сминтировано {domain}. Имя принадлежит вам в блокчейне."
   },
   "character": {
     "loading": "Загрузка...",
@@ -3478,6 +3486,9 @@ export const ru_RU: EnTranslations = {
     "renamePaidButton": "Заплатить {amount} $WOC и переименовать",
     "renamePriceHint": "Добровольное переименование сжигает {amount} $WOC.",
     "renameCancel": "Отмена",
+    "mintSolName": "Получить имя .sol",
+    "mintSolButton": "Сжечь {amount} $WOC и сминтить",
+    "mintSolHint": "Минтит ваше имя как принадлежащий игроку субдомен .sol за {amount} $WOC. Имя принадлежит вам в блокчейне.",
     "tabCharacters": "Персонажи",
     "tabCreate": "Создать",
     "portraitAlt": "Портрет {name}",

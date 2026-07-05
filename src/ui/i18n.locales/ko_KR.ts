@@ -5832,4 +5832,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'woc.finalizeTimeout':
     '최종 확정 대기가 시간 초과되었습니다. $WOC가 소각되었다면 재시도하세요. 결제는 최종 확정되면 정산됩니다.',
   'woc.renameSuccess': '{name}(으)로 이름을 변경했습니다.',
+  'character.mintSolName': '.sol 이름 받기',
+  'character.mintSolButton': '{amount} $WOC 소각하고 민팅',
+  'character.mintSolHint':
+    '{amount} $WOC로 이름을 플레이어 소유의 .sol 서브도메인으로 민팅합니다. 이름은 온체인에서 당신의 소유가 됩니다.',
+  'woc.mintSuccess': '{domain}을(를) 민팅했습니다. 온체인에서 당신의 소유입니다.',
+  'errors.api.snsUnavailable':
+    '지금은 서브도메인 민팅을 사용할 수 없습니다. 나중에 다시 시도하세요.',
+  'errors.api.noSubdomainForm': '해당 이름은 유효한 .sol 서브도메인 형식이 없습니다.',
+  'errors.api.alreadyBound': '이 캐릭터는 이미 .sol 이름에 연결되어 있습니다.',
+  'errors.api.solNameTaken': '해당 .sol 이름은 이미 사용 중입니다.',
+  'errors.api.subdomainCheckFailed': '이름 사용 가능 여부를 확인할 수 없습니다. 다시 시도하세요.',
+  'errors.api.subdomainNotConfirmed': '서브도메인 민팅을 온체인에서 확인할 수 없습니다.',
+  'errors.api.characterTransferred': '이 캐릭터는 새 소유자에게 이전되어 다시 클레임해야 합니다.',
 };

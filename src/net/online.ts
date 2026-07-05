@@ -179,6 +179,20 @@ export interface WocIdentityPayContext {
   treasuryTokenAccount: string | null;
 }
 
+// A server-issued subdomain-mint quote (POST /api/subdomain/quote). txBase64
+// is the full burn + SNS create transaction, already partial-signed by the
+// execution wallet; the player signs as fee payer + burn authority and
+// submits it unchanged.
+export interface WocSubdomainQuote {
+  quoteId: string;
+  txBase64: string;
+  label: string;
+  fullDomain: string;
+  priceWoc: number;
+  payer: string;
+  expiresAt: number;
+}
+
 export interface AccountInfo {
   username: string;
   email: string;
@@ -637,6 +651,54 @@ export class Api {
     });
     const data = await res.json().catch(() => ({}));
     return { ok: res.ok, status: res.status, reason: data.reason, data };
+  }
+
+  // ── $WOC burn + SNS subdomain mint (tradeable characters) ─────────────────
+  // Public price probe for the mint flow. 404s while WOC_SNS_ENABLED is off
+  // server-side; callers treat that as "hide the mint UI" (same contract as
+  // identityPrices).
+  async subdomainPrices(): Promise<{ mint_subdomain: number }> {
+    return this.get('/api/subdomain/prices');
+  }
+
+  // Quote the atomic burn + subdomain mint. Unlike the identity flow the
+  // transaction is built and partial-signed server-side (the execution wallet
+  // must co-sign the SNS create), so the quote carries the serialized tx
+  // itself and there is no separate paycontext step.
+  async subdomainQuote(body: { characterId: number; name: string }): Promise<WocSubdomainQuote> {
+    return this.post('/api/subdomain/quote', body);
+  }
+
+  // Redeem a mint quote with the on-chain signature. Raw fetch for the same
+  // reason as identityConfirm: the caller needs status + `reason` to drive the
+  // finalization retry loop, which post() collapses into a message.
+  async subdomainConfirm(
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    const res = await fetch(apiUrl('/api/subdomain/confirm', this.base), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
+      body: JSON.stringify({ quoteId, signature }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, reason: data.reason, data };
+  }
+
+  // Claim a tradeable character whose bound subdomain this account's linked
+  // wallet now owns on-chain. API-only for now (no client UI entry point).
+  async claimCharacter(characterId: number): Promise<{
+    id: number;
+    name: string;
+    class?: string;
+    level?: number;
+    claimed?: boolean;
+    alreadyYours?: boolean;
+  }> {
+    return this.post(`/api/characters/${characterId}/claim`, {});
   }
 
   // ── Discord link/login + status ────────────────────────────────────────────

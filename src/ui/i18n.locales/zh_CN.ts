@@ -5523,4 +5523,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'woc.confirmFailed': '无法验证 $WOC 支付。',
   'woc.finalizeTimeout': '等待最终确认超时。如果 $WOC 已销毁，请重试：支付将在最终确认后结算。',
   'woc.renameSuccess': '已改名为 {name}。',
+  'character.mintSolName': '获取 .sol 名称',
+  'character.mintSolButton': '烧毁 {amount} $WOC 并铸造',
+  'character.mintSolHint':
+    '花费 {amount} $WOC 将你的名字铸造为玩家所有的 .sol 子域名。该名称在链上归你所有。',
+  'woc.mintSuccess': '已铸造 {domain}。它在链上归你所有。',
+  'errors.api.snsUnavailable': '子域名铸造目前不可用。请稍后再试。',
+  'errors.api.noSubdomainForm': '该名字没有有效的 .sol 子域名形式。',
+  'errors.api.alreadyBound': '该角色已绑定一个 .sol 名称。',
+  'errors.api.solNameTaken': '该 .sol 名称已被占用。',
+  'errors.api.subdomainCheckFailed': '无法检查名称可用性。请重试。',
+  'errors.api.subdomainNotConfirmed': '无法在链上确认子域名铸造。',
+  'errors.api.characterTransferred': '该角色已转让给新所有者，需重新认领。',
 };

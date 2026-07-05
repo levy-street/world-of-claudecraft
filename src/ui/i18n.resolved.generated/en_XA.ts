@@ -3412,7 +3412,14 @@ export const en_XA: EnTranslations = {
       "alreadyInWorld": "[Çĥáŕáçţéŕ íš áļŕéáðý íñ ŵóŕļð.]",
       "takenOver": "[Ýóúŕ çĥáŕáçţéŕ ŵáš ţáķéñ óʋéŕ ƀý áñóţĥéŕ šéššíóñ.]",
       "renameBeforeEntering": "[Ţĥíš çĥáŕáçţéŕ ɱúšţ ƀé ŕéñáɱéð ƀéƒóŕé éñţéŕíñĝ ţĥé ŵóŕļð.]",
-      "renameNotPermitted": "[Ŕéñáɱíñĝ ţĥíš çĥáŕáçţéŕ íš ñóţ áļļóŵéð.]"
+      "renameNotPermitted": "[Ŕéñáɱíñĝ ţĥíš çĥáŕáçţéŕ íš ñóţ áļļóŵéð.]",
+      "snsUnavailable": "[Šúƀðóɱáíñ ɱíñţíñĝ íš úñáʋáíļáƀļé ŕíĝĥţ ñóŵ. Ţŕý áĝáíñ ļáţéŕ.]",
+      "noSubdomainForm": "[Ţĥáţ ñáɱé ĥáš ñó ʋáļíð .šóļ šúƀðóɱáíñ ƒóŕɱ.]",
+      "alreadyBound": "[Ţĥíš çĥáŕáçţéŕ íš áļŕéáðý ƀóúñð ţó á .šóļ ñáɱé.]",
+      "solNameTaken": "[Ţĥáţ .šóļ ñáɱé íš áļŕéáðý ţáķéñ.]",
+      "subdomainCheckFailed": "[Çóúļð ñóţ çĥéçķ ñáɱé áʋáíļáƀíļíţý. Ţŕý áĝáíñ.]",
+      "subdomainNotConfirmed": "[Ţĥé šúƀðóɱáíñ ɱíñţ çóúļð ñóţ ƀé çóñƒíŕɱéð óñ-çĥáíñ.]",
+      "characterTransferred": "[Ţĥíš çĥáŕáçţéŕ ŵáš ţŕáñšƒéŕŕéð ţó á ñéŵ óŵñéŕ áñð ɱúšţ ƀé ŕé-çļáíɱéð.]"
     }
   },
   "desktop": {
@@ -3461,7 +3468,8 @@ export const en_XA: EnTranslations = {
     "finalizing": "[Ŵáíţíñĝ ƒóŕ Šóļáñá ƒíñáļížáţíóñ...]",
     "confirmFailed": "[Ţĥé $ŴÓÇ þáýɱéñţ çóúļð ñóţ ƀé ʋéŕíƒíéð.]",
     "finalizeTimeout": "[Ţíɱéð óúţ ŵáíţíñĝ ƒóŕ ƒíñáļížáţíóñ. Íƒ $ŴÓÇ ŵáš ƀúŕñéð, ŕéţŕý: ţĥé þáýɱéñţ šéţţļéš óñçé íţ ƒíñáļížéš.]",
-    "renameSuccess": "[Ŕéñáɱéð ţó {name}.]"
+    "renameSuccess": "[Ŕéñáɱéð ţó {name}.]",
+    "mintSuccess": "[Ɱíñţéð {domain}. Íţ íš ýóúŕš óñ-çĥáíñ.]"
   },
   "character": {
     "loading": "[Ļóáðíñĝ...]",
@@ -3478,6 +3486,9 @@ export const en_XA: EnTranslations = {
     "renamePaidButton": "[Þáý {amount} $ŴÓÇ áñð Ŕéñáɱé]",
     "renamePriceHint": "[Á ʋóļúñţáŕý ŕéñáɱé ƀúŕñš {amount} $ŴÓÇ.]",
     "renameCancel": "[Çáñçéļ]",
+    "mintSolName": "[Ĝéţ .šóļ ñáɱé]",
+    "mintSolButton": "[Ɓúŕñ {amount} $ŴÓÇ áñð Ɱíñţ]",
+    "mintSolHint": "[Ɱíñţš ýóúŕ ñáɱé áš á þļáýéŕ-óŵñéð .šóļ šúƀðóɱáíñ ƒóŕ {amount} $ŴÓÇ. Ţĥé ñáɱé íš ýóúŕš óñ-çĥáíñ.]",
     "tabCharacters": "[Çĥáŕáçţéŕš]",
     "tabCreate": "[Çŕéáţé]",
     "portraitAlt": "[Þóŕţŕáíţ óƒ {name}]",

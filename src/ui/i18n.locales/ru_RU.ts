@@ -5957,4 +5957,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'woc.finalizeTimeout':
     'Время ожидания финализации истекло. Если $WOC уже сожжены, повторите попытку: платеж зачтется после финализации.',
   'woc.renameSuccess': 'Переименовано в {name}.',
+  'character.mintSolName': 'Получить имя .sol',
+  'character.mintSolButton': 'Сжечь {amount} $WOC и сминтить',
+  'character.mintSolHint':
+    'Минтит ваше имя как принадлежащий игроку субдомен .sol за {amount} $WOC. Имя принадлежит вам в блокчейне.',
+  'woc.mintSuccess': 'Сминтировано {domain}. Имя принадлежит вам в блокчейне.',
+  'errors.api.snsUnavailable': 'Минт субдоменов сейчас недоступен. Повторите попытку позже.',
+  'errors.api.noSubdomainForm': 'У этого имени нет допустимой формы субдомена .sol.',
+  'errors.api.alreadyBound': 'Этот персонаж уже привязан к имени .sol.',
+  'errors.api.solNameTaken': 'Это имя .sol уже занято.',
+  'errors.api.subdomainCheckFailed': 'Не удалось проверить доступность имени. Повторите попытку.',
+  'errors.api.subdomainNotConfirmed': 'Не удалось подтвердить минт субдомена в блокчейне.',
+  'errors.api.characterTransferred':
+    'Этот персонаж был передан новому владельцу, и его нужно заявить заново.',
 };

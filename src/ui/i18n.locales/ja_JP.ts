@@ -5837,4 +5837,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'woc.finalizeTimeout':
     'ファイナライズ待ちがタイムアウトしました。$WOCがバーン済みの場合は再試行してください。支払いはファイナライズ後に確定します。',
   'woc.renameSuccess': '{name}に改名しました。',
+  'character.mintSolName': '.sol名を取得',
+  'character.mintSolButton': '{amount} $WOCをバーンしてミント',
+  'character.mintSolHint':
+    '{amount} $WOCで名前をプレイヤー所有の.solサブドメインとしてミントします。名前はオンチェーンであなたのものになります。',
+  'woc.mintSuccess': '{domain}をミントしました。オンチェーンであなたのものです。',
+  'errors.api.snsUnavailable':
+    'サブドメインのミントは現在利用できません。後でもう一度お試しください。',
+  'errors.api.noSubdomainForm': 'その名前には有効な.solサブドメイン形式がありません。',
+  'errors.api.alreadyBound': 'このキャラクターは既に.sol名に紐付けられています。',
+  'errors.api.solNameTaken': 'その.sol名は既に使われています。',
+  'errors.api.subdomainCheckFailed':
+    '名前の空き状況を確認できませんでした。もう一度お試しください。',
+  'errors.api.subdomainNotConfirmed': 'サブドメインのミントをオンチェーンで確認できませんでした。',
+  'errors.api.characterTransferred':
+    'このキャラクターは新しい所有者に譲渡されました。再クレームが必要です。',
 };
