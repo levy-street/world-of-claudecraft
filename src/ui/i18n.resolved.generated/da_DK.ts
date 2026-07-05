@@ -311,7 +311,9 @@ export const da_DK: EnTranslations = {
       "nameplates": "Navne",
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
-      "toggleHaptics": "Slå haptik til/fra"
+      "toggleHaptics": "Slå haptik til/fra",
+      "hotbarPage": "Skills",
+      "hotbarPageAria": "Show next set of skills"
     },
     "tutorial": {
       "moveBodyTouch": "Brug bevægelsesstikken til at bevæge dig og træk på skærmen for at se dig omkring. Tag et par skridt for at begynde.",
@@ -735,6 +737,23 @@ export const da_DK: EnTranslations = {
       "thresholdSet": "Byttetærskel sat til {threshold}.",
       "summaryMaster": "Bytteindstillinger: Mesterbytte, bytteleder {name}, tærskel {threshold}.",
       "summaryGroup": "Bytteindstillinger: Gruppebytte."
+    },
+    "corpseHarvest": {
+      "title": "Harvest",
+      "harvestButton": "Harvest",
+      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "alreadyHarvested": "This corpse has already been harvested.",
+      "componentAria": "Harvest {component}",
+      "components": {
+        "hide": "Hide",
+        "fang": "Fang",
+        "silk": "Silk",
+        "venomSac": "Venom Sac",
+        "gills": "Gills",
+        "claw": "Claw",
+        "horn": "Horn",
+        "tusk": "Tusk"
+      }
     },
     "party": {
       "promoteLeader": "Forfrem til leder",

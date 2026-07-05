@@ -16,6 +16,8 @@ const PREVIEW_ANIM_STATE = {
   sitting: false,
 };
 
+const LIVE_PREVIEW_X = 0;
+
 export class CharacterPreview {
   private container: HTMLElement;
   private canvas: HTMLCanvasElement;
@@ -62,8 +64,8 @@ export class CharacterPreview {
         ? this.container.clientWidth / this.container.clientHeight
         : 1;
     this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
-    this.camera.position.set(-0.15, 1.45, 5.1);
-    this.camera.lookAt(new THREE.Vector3(-0.15, 1.3, 0));
+    this.camera.position.set(LIVE_PREVIEW_X, 1.45, 5.1);
+    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));
 
     // 4. Initialize Character Group
     this.characterGroup = new THREE.Group();
@@ -312,7 +314,7 @@ export class CharacterPreview {
     this.renderer.setSize(prevSize.x, prevSize.y, false);
     this.camera.aspect = prevAspect;
     this.camera.position.copy(prevPos);
-    this.camera.lookAt(new THREE.Vector3(-0.15, 1.3, 0));
+    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = prevRotY;
     this.renderer.render(this.scene, this.camera);

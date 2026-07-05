@@ -311,7 +311,9 @@ export const id_ID: EnTranslations = {
       "nameplates": "Nama",
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
-      "toggleHaptics": "Alihkan haptik"
+      "toggleHaptics": "Alihkan haptik",
+      "hotbarPage": "Skills",
+      "hotbarPageAria": "Show next set of skills"
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -735,6 +737,23 @@ export const id_ID: EnTranslations = {
       "thresholdSet": "Ambang jarahan diatur ke {threshold}.",
       "summaryMaster": "Pengaturan Jarahan: Jarahan Utama, Penjarah Utama {name}, ambang {threshold}.",
       "summaryGroup": "Pengaturan Jarahan: Jarahan Kelompok."
+    },
+    "corpseHarvest": {
+      "title": "Harvest",
+      "harvestButton": "Harvest",
+      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "alreadyHarvested": "This corpse has already been harvested.",
+      "componentAria": "Harvest {component}",
+      "components": {
+        "hide": "Hide",
+        "fang": "Fang",
+        "silk": "Silk",
+        "venomSac": "Venom Sac",
+        "gills": "Gills",
+        "claw": "Claw",
+        "horn": "Horn",
+        "tusk": "Tusk"
+      }
     },
     "party": {
       "promoteLeader": "Angkat jadi Pemimpin",

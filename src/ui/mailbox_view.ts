@@ -122,3 +122,26 @@ export function mailIndicatorView(unread: number): MailIndicatorView {
   const count = Number.isFinite(unread) ? Math.max(0, Math.floor(unread)) : 0;
   return { visible: count > 0, count };
 }
+
+export interface RecipientSuggestion {
+  name: string;
+  cls: string;
+  level: number;
+}
+
+export function recipientSuggestions(
+  results: RecipientSuggestion[],
+  selfName: string,
+  max: number,
+): RecipientSuggestion[] {
+  const self = selfName.trim();
+  const limit = Math.max(0, Math.floor(max));
+  if (limit === 0) return [];
+  return results.filter((r) => r.name !== self).slice(0, limit);
+}
+
+export function wrappedSuggestionIndex(current: number, delta: number, total: number): number {
+  if (total <= 0) return -1;
+  if (current < 0) return delta > 0 ? 0 : total - 1;
+  return (current + delta + total) % total;
+}
