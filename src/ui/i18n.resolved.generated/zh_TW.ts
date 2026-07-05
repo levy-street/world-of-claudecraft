@@ -7965,7 +7965,8 @@ export const zh_TW: EnTranslations = {
       "necromancers": {
         "name": "哀織法衣",
         "bonus2": "你不會被擊退（擊退抗性 100%）。",
-        "bonus3": "智力提高 10 點，耐力提高 10 點。"
+        "bonus3": "智力提高 10 點，耐力提高 10 點。",
+        "bonus4": "你的法術有機率觸發「清晰施法」，使你的下一個法術免費施放。"
       },
       "nighttalon": {
         "name": "厲牙皮甲",

@@ -10,93 +10,51 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "es_ES": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "fr_FR": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "fr_CA": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "de_DE": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "ru_RU": [],
   "nl_NL": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "pl_PL": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "id_ID": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "tr_TR": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "sv_SE": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "vi_VN": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ],
   "da_DK": [
-    "hudChrome.statInfo.desc.critRating",
-    "hudChrome.statInfo.desc.hasteRating",
-    "hudChrome.statInfo.names.critRating",
-    "hudChrome.statInfo.names.hasteRating"
+    "entities.itemSets.necromancers.bonus4"
   ]
 };

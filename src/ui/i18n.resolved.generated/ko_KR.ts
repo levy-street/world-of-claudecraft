@@ -7965,7 +7965,8 @@ export const ko_KR: EnTranslations = {
       "necromancers": {
         "name": "비탄직물 의복",
         "bonus2": "넉백되지 않습니다 (넉백 저항 100%).",
-        "bonus3": "지능이 10, 체력이 10만큼 증가합니다."
+        "bonus3": "지능이 10, 체력이 10만큼 증가합니다.",
+        "bonus4": "주문 사용 시 일정 확률로 “선명한 시전”이 발동하여 다음 주문을 무료로 시전합니다."
       },
       "nighttalon": {
         "name": "흉포송곳니 가죽장비",

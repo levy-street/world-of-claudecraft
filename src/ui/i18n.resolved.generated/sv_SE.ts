@@ -7965,7 +7965,8 @@ export const sv_SE: EnTranslations = {
       "necromancers": {
         "name": "Mournweave-skrud",
         "bonus2": "Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).",
-        "bonus3": "Ökar intellekt med 10 och uthållighet med 10."
+        "bonus3": "Ökar intellekt med 10 och uthållighet med 10.",
+        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Direfang-päls",

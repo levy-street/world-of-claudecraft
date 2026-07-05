@@ -46,6 +46,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       hasteRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
+      procs: [],
     });
   });
 
@@ -116,12 +117,13 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     }
   });
 
-  it('every set definition lists ascending tiers ending at 3 pieces', () => {
+  it('every set definition lists ascending tiers ending at its authored cap', () => {
     for (const set of Object.values(ITEM_SETS)) {
       const pieces = set.bonuses.map((b) => b.pieces);
       // raid/dungeon families carry 2- and 3-piece tiers; the leveling haste
-      // kits deliberately carry the single 3-piece tier
-      expect([pieces.join(','), set.id]).toEqual([pieces.length === 1 ? '3' : '2,3', set.id]);
+      // kits deliberately carry the single 3-piece tier; Mournweave adds a 4-piece proc.
+      const expected = set.id === SET_NECROMANCERS ? '2,3,4' : pieces.length === 1 ? '3' : '2,3';
+      expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });
 });

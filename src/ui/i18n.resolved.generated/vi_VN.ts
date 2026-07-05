@@ -7965,7 +7965,8 @@ export const vi_VN: EnTranslations = {
       "necromancers": {
         "name": "Y Phục Mournweave",
         "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
-        "bonus3": "Tăng trí tuệ thêm 10 và thể lực thêm 10."
+        "bonus3": "Tăng trí tuệ thêm 10 và thể lực thêm 10.",
+        "bonus4": "Your spells have a chance to grant Clearcasting, making your next spell free."
       },
       "nighttalon": {
         "name": "Bộ Da Direfang",

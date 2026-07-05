@@ -806,6 +806,8 @@ function blankEntity(id: number): Entity {
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,
+    setProcs: [],
+    procReadyAt: undefined as unknown as Record<string, number>,
     critChance: 0.05,
     critRating: 0,
     hasteRating: 0,
