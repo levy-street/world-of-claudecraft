@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
+import { fbm2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
 import { biomeAt, roadDistance, terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
@@ -90,8 +91,8 @@ const ROUGH_SNOW = 0.72;
 const LOD_BANDS = {
   high: [
     { maxHubDist: 95, spacing: 1.2 },
-    { maxHubDist: 185, spacing: 2.0 },
-    { maxHubDist: Infinity, spacing: 3.5 },
+    { maxHubDist: 185, spacing: 1.6 },
+    { maxHubDist: Infinity, spacing: 2.6 },
   ],
   low: [
     { maxHubDist: 95, spacing: 3.0 },
@@ -236,7 +237,7 @@ function makeBiomePalette(b: BiomeId): (typeof zonePalettes)[number] {
 // Palette at a point. A painted cell (biome differs from its zone band) uses that
 // biome's flat palette; otherwise the smooth zone-band blend. With no paint layer
 // `biome === zoneBiomeAt(z)` always, so this is the original z-blend exactly.
-function paletteAt(x: number, z: number, biome: BiomeId): void {
+function paletteAt(_x: number, z: number, biome: BiomeId): void {
   if (biome !== zoneBiomeAt(z)) {
     const p = biomePalettes[biome];
     grassC.copy(p.grass);
@@ -351,17 +352,23 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     cTmp.lerp(dirtC, t);
     lerpSplat(w, 1, t);
   }
+  // Break up the rock/snow blend so cliffs read as striated stone and snow
+  // reads as patchy drifts instead of a single flat tone / a clean cutoff.
+  const rockStreak = fbm2(x * 0.09, z * 0.09, seed + 41, 3);
+  const snowPatch = fbm2(x * 0.06, z * 0.06, seed + 47, 3);
   const rockStart = ROCK_SLOPE_START[biome];
   if (slope > rockStart) {
     const t = Math.min(1, (slope - rockStart) * 2);
     cTmp.lerp(rockC, t);
+    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
     lerpSplat(w, 2, t);
   }
   // high ground (ridges, peaks) goes rocky then snowy
   let snow = 0;
   if (h > 22) {
-    cTmp.lerp(rockC, clamp01((h - 22) / 10) * 0.7);
-    snow = clamp01((h - 34) / 14) * 0.85;
+    const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
+    cTmp.lerp(rockC, rockT);
+    snow = clamp01((h - 34 + (snowPatch - 0.5) * 8) / 14) * 0.85;
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
   }
@@ -371,15 +378,18 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     lerpSplat(w, 1, impact.dirt);
     lerpSplat(w, 2, impact.rock);
   }
-  // the rim wall reads as distant sunlit peaks, not a black cliff
+  // the rim wall reads as distant sunlit peaks, not a black cliff. The haze
+  // kicks in well before the wall itself (edge starts negative deep inland)
+  // so from a zone's centre the rim reads as atmospheric haze rather than a
+  // crisp silhouette, reinforcing the reduced BIOME_FOG draw distance.
   const edge = Math.max(
-    Math.abs(x) - (WORLD_MAX_X - 32),
-    WORLD_MIN_Z + 32 - z,
-    z - (WORLD_MAX_Z - 32),
+    Math.abs(x) - (WORLD_MAX_X - 70),
+    WORLD_MIN_Z + 70 - z,
+    z - (WORLD_MAX_Z - 70),
   );
-  const rim = clamp01(edge / 26);
+  const rim = clamp01(edge / 64);
   if (rim > 0) {
-    cTmp.lerp(hazyPeakC, rim * 0.9);
+    cTmp.lerp(hazyPeakC, rim * 0.95);
     const rimSnow = clamp01((h - 26) / 16) * rim * 0.8;
     cTmp.lerp(snowCapC, rimSnow);
     snow = Math.max(snow, rimSnow);

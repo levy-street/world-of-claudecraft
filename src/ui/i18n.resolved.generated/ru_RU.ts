@@ -311,7 +311,9 @@ export const ru_RU: EnTranslations = {
       "nameplates": "Имена",
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",
-      "toggleHaptics": "Вкл/выкл вибрацию"
+      "toggleHaptics": "Вкл/выкл вибрацию",
+      "hotbarPage": "Навыки",
+      "hotbarPageAria": "Показать следующий набор навыков"
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -735,6 +737,23 @@ export const ru_RU: EnTranslations = {
       "thresholdSet": "Порог качества установлен: {threshold}.",
       "summaryMaster": "Настройки добычи: мастер добычи, мастер добычи {name}, порог качества {threshold}.",
       "summaryGroup": "Настройки добычи: групповая добыча."
+    },
+    "corpseHarvest": {
+      "title": "Сбор",
+      "harvestButton": "Собрать",
+      "concentrateHint": "Чем меньше выбрано компонентов, тем выше их качество.",
+      "alreadyHarvested": "Этот труп уже был собран.",
+      "componentAria": "Собрать {component}",
+      "components": {
+        "hide": "Шкура",
+        "fang": "Клык",
+        "silk": "Шелк",
+        "venomSac": "Мешок с ядом",
+        "gills": "Жабры",
+        "claw": "Коготь",
+        "horn": "Рог",
+        "tusk": "Бивень"
+      }
     },
     "party": {
       "promoteLeader": "Назначить лидером",

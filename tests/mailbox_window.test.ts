@@ -41,6 +41,78 @@ describe('mailbox_window: mail outcomes repaint the inventory cluster', () => {
   });
 });
 
+describe('mailbox_window: recipient autocomplete wiring', () => {
+  it('recipient input has role="combobox"', () => {
+    expect(painter).toContain('role="combobox"');
+  });
+
+  it('recipient input has aria-autocomplete="list"', () => {
+    expect(painter).toContain('aria-autocomplete="list"');
+  });
+
+  it('recipient listbox has role="listbox"', () => {
+    expect(painter).toContain('role="listbox"');
+  });
+
+  it('recipient input is wired with aria-controls pointing to the listbox', () => {
+    expect(painter).toContain('aria-controls="mail-to-suggest"');
+  });
+
+  it('calls searchCharacters when building recipient suggestions', () => {
+    expect(painter).toContain('searchCharacters(');
+  });
+
+  it('routes filtering/limit logic through recipientSuggestions view helper', () => {
+    expect(painter).toContain('recipientSuggestions(');
+  });
+
+  it('selecting a suggestion writes the name into the recipient input', () => {
+    // selectRecipient sets input.value = name and then clears the list.
+    expect(painter).toMatch(/input\.value\s*=\s*name/);
+  });
+
+  it('ArrowDown moves the suggestion highlight', () => {
+    expect(painter).toContain("'ArrowDown'");
+    expect(painter).toContain('moveRecipientSuggest');
+  });
+
+  it('ArrowUp moves the suggestion highlight', () => {
+    expect(painter).toContain("'ArrowUp'");
+  });
+
+  it('Escape closes the suggestion list', () => {
+    expect(painter).toMatch(/'Escape'[\s\S]{0,120}renderRecipientSuggest/);
+  });
+
+  it('blur clears suggestions after a delay so mousedown can fire first', () => {
+    expect(painter).toContain('RECIPIENT_SUGGEST_BLUR_CLEAR_MS');
+  });
+
+  it('sets aria-expanded false in the empty-results branch and true in the non-empty branch', () => {
+    expect(painter).toMatch(/results\.length === 0[\s\S]{0,240}'aria-expanded', 'false'/);
+    expect(painter).toMatch(/results\.length === 0[\s\S]{0,900}'aria-expanded', 'true'/);
+  });
+
+  it('aria-activedescendant is set on the highlighted option', () => {
+    expect(painter).toContain('aria-activedescendant');
+  });
+
+  it('resets suggestion model and debounce timer when the send form is rebuilt and on close', () => {
+    expect(painter).toMatch(/renderSend\([\s\S]{0,220}clearTimeout\(this\.recipientSuggestTimer\)/);
+    expect(painter).toMatch(
+      /renderSend\([\s\S]{0,320}this\.recipientSuggest = \{ items: \[], index: -1 \}/,
+    );
+    expect(painter).toMatch(/close\([\s\S]{0,220}clearTimeout\(this\.recipientSuggestTimer\)/);
+    expect(painter).toMatch(
+      /close\([\s\S]{0,320}this\.recipientSuggest = \{ items: \[], index: -1 \}/,
+    );
+  });
+
+  it('routes keyboard wrap-around through wrappedSuggestionIndex view helper', () => {
+    expect(painter).toContain('wrappedSuggestionIndex(');
+  });
+});
+
 describe('mailbox_window: house style', () => {
   it('uses no em or en dashes (ASCII separators only)', () => {
     expect(painter.includes('\u2014'), 'em dash found').toBe(false);

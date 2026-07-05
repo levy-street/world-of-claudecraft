@@ -5120,8 +5120,8 @@ export class Sim {
     interaction.autoLootForParty(this.ctx, mobId, pid ?? this.primaryId);
   }
 
-  harvestCorpse(mobId: number, pid?: number): void {
-    interaction.harvestCorpse(this.ctx, mobId, pid);
+  harvestCorpse(mobId: number, components?: string[], pid?: number): void {
+    interaction.harvestCorpse(this.ctx, mobId, components, pid);
   }
 
   pickUpObject(objId: number, pid?: number): void {

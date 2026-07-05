@@ -1,5 +1,6 @@
 import { t } from '../ui/i18n';
 import type { Input, TouchMoveInput } from './input';
+import { type ChromeFadeHandle, startChromeFade } from './mobile_chrome_fade';
 
 // Detects a genuinely touch-primary device (a phone or a hand-held tablet). The
 // primary test is a coarse primary pointer that cannot hover -- deliberately
@@ -118,6 +119,8 @@ export interface MobileControlCallbacks {
   onMusic(): boolean;
   /** Double-tap the camera joystick: snap the camera back behind the character. */
   onRecenterCamera(): void;
+  /** Cycle which page of the mobile hotbar's orbit ring is showing. */
+  onCycleHotbarPage(): void;
 }
 
 /**
@@ -246,9 +249,12 @@ export class MobileControls {
   private swipeLookLastX = 0;
   private swipeLookLastY = 0;
   private swipeLookActive = false;
+  private swipeLookDownAt = 0;
+  private lastSwipeTapAt = 0;
 
   private chatPressTimer: ReturnType<typeof setTimeout> | null = null;
   private chatLongFired = false;
+  private chromeFade: ChromeFadeHandle | null = null;
 
   private canvas = document.getElementById('game-canvas') as HTMLElement | null;
   private root = document.getElementById('mobile-controls') as HTMLElement | null;
@@ -289,6 +295,15 @@ export class MobileControls {
     this.mq.addEventListener?.('change', () =>
       this.setActive(useTouchInterface() || isNativeAppShell()),
     );
+
+    // Idle-fade: dims the action row + minimap quick-access rail after a stretch
+    // of no touch, brightens instantly on the next one. Body-scoped (CSS decides
+    // which chrome selectors respond) so it works regardless of which control the
+    // player actually touches.
+    this.chromeFade = startChromeFade(document.body);
+    document.addEventListener('pointerdown', () => {
+      if (this.active) this.chromeFade?.touch();
+    });
 
     // The move joystick floats: the pointer lifecycle lives on the lower-left
     // capture zone (so a thumb can land anywhere), while the joystick element is
@@ -374,6 +389,7 @@ export class MobileControls {
     this.bindButton('mobile-jump', () => this.callbacks.onJump(), { pressFirst: true });
     this.bindButton('mobile-target', () => this.callbacks.onTarget());
     this.bindButton('mobile-interact', () => this.callbacks.onInteract());
+    this.bindButton('mobile-hotbar-page', () => this.callbacks.onCycleHotbarPage());
     this.bindChatButton('mobile-chat');
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
@@ -760,6 +776,7 @@ export class MobileControls {
     this.swipeLookLastX = e.clientX;
     this.swipeLookLastY = e.clientY;
     this.swipeLookActive = false;
+    this.swipeLookDownAt = this.now();
     try {
       this.canvas?.setPointerCapture(e.pointerId);
     } catch {
@@ -789,6 +806,18 @@ export class MobileControls {
   private onSwipeLookEnd(e: PointerEvent): void {
     if (e.pointerId !== this.swipeLookPointer) return;
     if (this.swipeLookActive) e.preventDefault();
+    // Double-tap-to-recenter: with the camera joystick removed, this is the
+    // only recenter gesture left, so it moves here. A "tap" is a press that
+    // never crossed the swipe deadzone (never became a drag); two of those in
+    // quick succession recenter the camera, mirroring the old joystick logic.
+    const now = this.now();
+    const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
+      this.callbacks.onRecenterCamera();
+      this.lastSwipeTapAt = 0;
+    } else {
+      this.lastSwipeTapAt = quickTap ? now : 0;
+    }
     this.releaseSwipeLook();
   }
 

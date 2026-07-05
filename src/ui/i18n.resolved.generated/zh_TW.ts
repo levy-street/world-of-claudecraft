@@ -311,7 +311,9 @@ export const zh_TW: EnTranslations = {
       "nameplates": "名條",
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
-      "toggleHaptics": "切換觸覺回饋"
+      "toggleHaptics": "切換觸覺回饋",
+      "hotbarPage": "技能",
+      "hotbarPageAria": "顯示下一組技能"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -735,6 +737,23 @@ export const zh_TW: EnTranslations = {
       "thresholdSet": "品質門檻已設為{threshold}。",
       "summaryMaster": "拾取設定：隊長分配，分配者{name}，品質門檻{threshold}。",
       "summaryGroup": "拾取設定：小隊拾取。"
+    },
+    "corpseHarvest": {
+      "title": "採集",
+      "harvestButton": "採集",
+      "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
+      "alreadyHarvested": "這具屍體已經被採集過了。",
+      "componentAria": "採集{component}",
+      "components": {
+        "hide": "獸皮",
+        "fang": "尖牙",
+        "silk": "絲線",
+        "venomSac": "毒囊",
+        "gills": "魚鰓",
+        "claw": "爪",
+        "horn": "角",
+        "tusk": "獠牙"
+      }
     },
     "party": {
       "promoteLeader": "提升為隊長",
