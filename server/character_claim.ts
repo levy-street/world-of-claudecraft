@@ -10,14 +10,9 @@
 // leaves its guild (a clean slate for the new owner; leadership hand-off/disband
 // is handled by the normal guild-leave path). Game-coupled effects are injected.
 import type http from 'node:http';
+import { getCharacterAnyAccount, reassignCharacterAccount, walletForAccount } from './db';
 import { json } from './http_util';
-import {
-  walletForAccount,
-  getCharacterAnyAccount,
-  reassignCharacterAccount,
-} from './db';
-import { resolveSubdomainOwner } from './sns';
-import { snsReady } from './sns';
+import { resolveSubdomainOwner, snsReady } from './sns';
 import { CHARACTER_TRADEABLE } from './woc_config';
 
 // Injected by main.ts from the live GameServer.
@@ -39,7 +34,10 @@ export function registerClaimHooks(h: ClaimHooks): void {
 // subdomain on-chain — i.e. they may enter the world with it. Used both by the
 // claim endpoint and the world-entry gate. A null owner (subdomain gone) or any
 // mismatch means "not the controller".
-export async function accountControlsBoundCharacter(accountId: number, boundDomain: string): Promise<boolean> {
+export async function accountControlsBoundCharacter(
+  accountId: number,
+  boundDomain: string,
+): Promise<boolean> {
   const wallet = await walletForAccount(accountId);
   if (!wallet) return false;
   const owner = await resolveSubdomainOwner(boundDomain);
@@ -52,20 +50,25 @@ export async function handleCharacterClaim(
   accountId: number,
   characterId: number,
 ): Promise<void> {
-  if (!snsReady() || !CHARACTER_TRADEABLE) return json(res, 503, { error: 'character trading is not enabled' });
+  if (!snsReady() || !CHARACTER_TRADEABLE)
+    return json(res, 503, { error: 'character trading is not enabled' });
   if (!hooks) return json(res, 503, { error: 'claim unavailable' });
 
   const character = await getCharacterAnyAccount(characterId);
   if (!character) return json(res, 404, { error: 'character not found' });
-  if (!character.bound_domain) return json(res, 400, { error: 'this character is not bound to a subdomain' });
-  if (character.account_id === accountId) return json(res, 200, { id: character.id, name: character.name, alreadyYours: true });
+  if (!character.bound_domain)
+    return json(res, 400, { error: 'this character is not bound to a subdomain' });
+  if (character.account_id === accountId)
+    return json(res, 200, { id: character.id, name: character.name, alreadyYours: true });
 
   const wallet = await walletForAccount(accountId);
   if (!wallet) return json(res, 400, { error: 'link the Solana wallet that owns this name first' });
 
   const owner = await resolveSubdomainOwner(character.bound_domain);
-  if (owner === null) return json(res, 409, { error: 'could not resolve the subdomain owner — try again' });
-  if (owner !== wallet.pubkey) return json(res, 403, { error: 'your linked wallet does not own this character’s name' });
+  if (owner === null)
+    return json(res, 409, { error: 'could not resolve the subdomain owner — try again' });
+  if (owner !== wallet.pubkey)
+    return json(res, 403, { error: 'your linked wallet does not own this character’s name' });
 
   // The chain says this account now owns the character. Settle the hand-off:
   // kick the prior owner's live session, detach from its guild, then move it.
@@ -76,5 +79,11 @@ export async function handleCharacterClaim(
   const moved = await reassignCharacterAccount(characterId, accountId);
   if (!moved) return json(res, 404, { error: 'character not found' });
 
-  return json(res, 200, { id: moved.id, name: moved.name, class: moved.class, level: moved.level, claimed: true });
+  return json(res, 200, {
+    id: moved.id,
+    name: moved.name,
+    class: moved.class,
+    level: moved.level,
+    claimed: true,
+  });
 }

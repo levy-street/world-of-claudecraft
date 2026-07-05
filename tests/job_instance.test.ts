@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { DUNGEON_LIST } from '../src/sim/data';
+import { Sim } from '../src/sim/sim';
 
 // The job-contract watcher credits a `clear_dungeon` milestone to the SUBJECT'S
 // OWN instance via Sim.instanceForPlayer — never to a player standing in another

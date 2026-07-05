@@ -1425,7 +1425,9 @@ export async function accountForWallet(pubkey: string): Promise<number | null> {
 // name exists on this realm, or its account has not linked a wallet. The JOIN
 // is what enforces "verified wallet only": a name with no wallet_links row
 // yields no result. Case-insensitive, like the other name lookups here.
-export async function walletForCharacterName(name: string): Promise<{ name: string; pubkey: string } | null> {
+export async function walletForCharacterName(
+  name: string,
+): Promise<{ name: string; pubkey: string } | null> {
   const term = name.trim();
   if (!term) return null;
   const res = await pool.query(
@@ -1458,7 +1460,12 @@ export async function jobPartyByCharacterName(
   );
   const row = res.rows[0];
   return row
-    ? { accountId: Number(row.account_id), characterId: Number(row.character_id), name: row.name, wallet: row.wallet }
+    ? {
+        accountId: Number(row.account_id),
+        characterId: Number(row.character_id),
+        name: row.name,
+        wallet: row.wallet,
+      }
     : null;
 }
 
@@ -1514,7 +1521,15 @@ export async function createWocQuote(row: {
   await pool.query(
     `INSERT INTO woc_quotes (quote_id, account_id, kind, payload, price_base, mint, expires_at)
      VALUES ($1, $2, $3, $4, $5, $6, now() + ($7 || ' minutes')::interval)`,
-    [row.quoteId, row.accountId, row.kind, JSON.stringify(row.payload ?? {}), String(row.priceBase), row.mint, String(row.ttlMinutes)],
+    [
+      row.quoteId,
+      row.accountId,
+      row.kind,
+      JSON.stringify(row.payload ?? {}),
+      String(row.priceBase),
+      row.mint,
+      String(row.ttlMinutes),
+    ],
   );
 }
 
@@ -1554,7 +1569,14 @@ export async function recordWocPayment(row: {
     const res = await pool.query(
       `INSERT INTO woc_payments (account_id, tx_sig, amount_base, burned_base, mint, reference)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [row.accountId, row.txSig, String(row.amountBase), String(row.burnedBase), row.mint, row.reference],
+      [
+        row.accountId,
+        row.txSig,
+        String(row.amountBase),
+        String(row.burnedBase),
+        row.mint,
+        row.reference,
+      ],
     );
     return { id: Number(res.rows[0].id) };
   } catch (err) {
@@ -1635,7 +1657,15 @@ export async function recordSubdomainAndBind(row: {
     await client.query(
       `INSERT INTO sns_subdomains (account_id, character_id, label, full_domain, owner_pubkey, tx_sig, realm)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [row.accountId, row.characterId, row.label, row.fullDomain, row.ownerPubkey, row.txSig, REALM],
+      [
+        row.accountId,
+        row.characterId,
+        row.label,
+        row.fullDomain,
+        row.ownerPubkey,
+        row.txSig,
+        REALM,
+      ],
     );
     await client.query(
       'UPDATE characters SET bound_domain = $3, updated_at = now() WHERE id = $1 AND account_id = $2 AND realm = $4',
@@ -1693,7 +1723,11 @@ export async function recordBurnBatch(row: {
 
 // Lifetime totals for the public transparency counter (base units, as strings to
 // survive Number precision).
-export async function buybackTotals(): Promise<{ usdcInBase: string; wocBurnedBase: string; batches: number }> {
+export async function buybackTotals(): Promise<{
+  usdcInBase: string;
+  wocBurnedBase: string;
+  batches: number;
+}> {
   const res = await pool.query(
     `SELECT COALESCE(SUM(usdc_in_base), 0)::text AS usdc, COALESCE(SUM(woc_out_base), 0)::text AS woc, count(*)::int AS n
      FROM woc_burn_batches`,
@@ -1705,7 +1739,10 @@ export async function buybackTotals(): Promise<{ usdcInBase: string; wocBurnedBa
 // Reassign a bound character to a new account (a completed on-chain transfer).
 // Also re-points the subdomain mirror row to the new owner so audit history
 // follows the asset. Returns the moved character, or null if it vanished.
-export async function reassignCharacterAccount(characterId: number, newAccountId: number): Promise<CharacterRow | null> {
+export async function reassignCharacterAccount(
+  characterId: number,
+  newAccountId: number,
+): Promise<CharacterRow | null> {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -1715,7 +1752,10 @@ export async function reassignCharacterAccount(characterId: number, newAccountId
        RETURNING id, account_id, name, class, level, state, is_gm, force_rename`,
       [characterId, newAccountId, REALM],
     );
-    await client.query('UPDATE sns_subdomains SET account_id = $2 WHERE character_id = $1', [characterId, newAccountId]);
+    await client.query('UPDATE sns_subdomains SET account_id = $2 WHERE character_id = $1', [
+      characterId,
+      newAccountId,
+    ]);
     await client.query('COMMIT');
     return res.rows[0] ?? null;
   } catch (err) {

@@ -2862,7 +2862,9 @@
     font-family: inherit;
     font-size: inherit;
     cursor: var(--cursor-point);
-    transition: border-color var(--transition-speed), color var(--transition-speed),
+    transition:
+      border-color var(--transition-speed),
+      color var(--transition-speed),
       background var(--transition-speed);
   }
   .woc-balance.is-preview {

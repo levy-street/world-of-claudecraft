@@ -21,7 +21,6 @@ import { parseMoveInputFrame } from '../src/sim/move_input';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
-import { MOUNT_LIST, mountTierForBalance } from '../src/sim/content/mounts';
 import {
   DT,
   dist2d,
@@ -36,7 +35,6 @@ import {
 } from '../src/sim/types';
 import { type CommandName, isOverheadEmoteId } from '../src/world_api';
 import { recordOnlineSample } from './admin_db';
-import { JOB_PENDING_TTL_SECONDS } from './woc_config';
 import { offensiveName } from './auth';
 import type {
   BotDetector,
@@ -82,6 +80,15 @@ import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import {
+  JobContractService,
+  type JobEscrowOps,
+  type JobObservationSource,
+  type JobRecord,
+} from './job_contracts';
+import * as jobEscrow from './job_escrow';
+import type { JobObservation } from './job_milestone';
+import { jobsDb } from './jobs_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { trackReachedLevel5 } from './meta_capi';
 import {
@@ -104,6 +111,7 @@ import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { TickProfiler } from './tick_profiler';
 import { holderInfoForPubkey } from './woc_balance';
+import { JOB_PENDING_TTL_SECONDS } from './woc_config';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const WORLD_SEED = 20061;
@@ -821,7 +829,7 @@ export class GameServer {
   // evaluator runs, then read by observe(). Wall-clock seconds (not sim ticks) so
   // deadlines + the survive timer survive a restart.
   private jobNowSec = 0;
-  private readonly jobDeaths = new Set<number>();            // subject pids that died this tick
+  private readonly jobDeaths = new Set<number>(); // subject pids that died this tick
   private readonly jobQuestsByPid = new Map<number, string[]>(); // pid → quests turned in this tick
 
   constructor() {
@@ -839,6 +847,17 @@ export class GameServer {
       raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
+    const escrowOps: JobEscrowOps = {
+      buildOpenTransaction: jobEscrow.buildOpenTransaction,
+      verifyDeposit: jobEscrow.verifyDeposit,
+      verifyJobState: jobEscrow.verifyJobState,
+      releaseJob: jobEscrow.releaseJob,
+      refundJob: jobEscrow.refundJob,
+      jobAccountExists: jobEscrow.jobAccountExists,
+    };
+    this.jobs = new JobContractService(jobsDb, escrowOps, this, REALM, (job, outcome) =>
+      this.notifyJobParties(job, outcome),
+    );
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
@@ -866,6 +885,118 @@ export class GameServer {
 
   private sessionByCharacterId(id: number): ClientSession | null {
     return this.sessionsByCharacterId.get(id) ?? null;
+  }
+
+  // Recompute this tick's job signals from the sim events, then run one milestone
+  // evaluation pass. Cheap per tick (a handful of comparisons per active job);
+  // the expensive chain release/refund only fires on a state transition.
+  private evaluateJobs(events: SimEvent[]): void {
+    this.jobNowSec = Date.now() / 1000;
+    this.jobDeaths.clear();
+    this.jobQuestsByPid.clear();
+    for (const ev of events) {
+      if (ev.type === 'playerDeath' && ev.pid !== undefined) {
+        this.jobDeaths.add(ev.pid);
+      } else if (ev.type === 'questDone' && ev.pid !== undefined) {
+        const list = this.jobQuestsByPid.get(ev.pid) ?? [];
+        list.push(ev.questId);
+        this.jobQuestsByPid.set(ev.pid, list);
+      }
+    }
+    this.jobs.evaluateTick(this.jobNowSec);
+  }
+
+  /**
+   * Reload funded, non-terminal job contracts at boot (resumes the watcher) and
+   * recover any deposit that funded on-chain but was never confirmed (so its
+   * locked reward can't be stranded).
+   */
+  async loadJobs(): Promise<void> {
+    await this.jobs.loadActive();
+    await this.jobs.reconcilePending(Date.now() / 1000, JOB_PENDING_TTL_SECONDS);
+  }
+
+  // Tell the (online) payer + helper a job settled. Bypasses routeEvents and
+  // sends a system log line straight to each party's socket.
+  private notifyJobParties(job: JobRecord, outcome: 'released' | 'refunded'): void {
+    const { decimals } = jobEscrow.escrowCurrencyInfo(job.currency as jobEscrow.EscrowCurrency);
+    const amount = (Number(job.amountBase) / 10 ** decimals).toLocaleString('en-US', {
+      maximumFractionDigits: 4,
+    });
+    const cur = job.currency;
+    if (outcome === 'released') {
+      this.notifyCharacter(
+        job.payer.characterId,
+        `Job complete — ${amount} ${cur} paid to ${job.helper.name}.`,
+        '#7CFC9A',
+      );
+      this.notifyCharacter(
+        job.helper.characterId,
+        `You earned ${amount} ${cur} from ${job.payer.name} for your help!`,
+        '#7CFC9A',
+      );
+    } else {
+      const why =
+        job.progress.reason === 'expired'
+          ? 'expired'
+          : job.progress.reason === 'subject_died'
+            ? 'failed (the client fell)'
+            : job.progress.reason === 'cancelled'
+              ? 'was cancelled'
+              : 'ended';
+      this.notifyCharacter(
+        job.payer.characterId,
+        `Job ${why} — ${amount} ${cur} refunded to you.`,
+        '#f0c060',
+      );
+      this.notifyCharacter(
+        job.helper.characterId,
+        `${job.payer.name}'s job ${why} — no payout.`,
+        '#f0c060',
+      );
+    }
+  }
+
+  private notifyCharacter(characterId: number, text: string, color: string): void {
+    const session = this.sessionByCharacterId(characterId);
+    if (session) this.send(session, { t: 'events', list: [{ type: 'log', text, color }] });
+  }
+
+  // JobObservationSource: build the milestone observation for a job's subject
+  // (the payer's character) from the live sim, or null when the subject is
+  // offline — an offline subject simply makes no progress, with no penalty.
+  observe(job: JobRecord): JobObservation | null {
+    const subjectSession = this.sessionsByCharacterId.get(job.payer.characterId);
+    if (!subjectSession) return null;
+    const subject = this.sim.entities.get(subjectSession.pid);
+    if (!subject) return null;
+    const helperPid = this.sessionsByCharacterId.get(job.helper.characterId)?.pid;
+    const party = this.sim.partyOf(subjectSession.pid);
+    const helperPresent = helperPid !== undefined && (party?.members.includes(helperPid) ?? false);
+    // Dungeon clear: the SUBJECT'S OWN instance (keyed by their party/solo key, so
+    // another party clearing a concurrent copy can't credit them) has every mob
+    // dead. A removed mob (despawned on death) counts as cleared; an unspawned /
+    // empty instance (length 0) does not, so entering can't auto-complete it.
+    const inst = this.sim.instanceForPlayer(subjectSession.pid);
+    const dungeonClears =
+      inst &&
+      inst.mobIds.length > 0 &&
+      inst.mobIds.every((id) => {
+        const m = this.sim.entities.get(id);
+        return !m || m.dead;
+      })
+        ? [inst.dungeonId]
+        : [];
+    return {
+      nowSec: this.jobNowSec,
+      subjectLevel: subject.level,
+      subjectAlive: !subject.dead,
+      subjectDiedThisTick: this.jobDeaths.has(subjectSession.pid),
+      subjectPos: { x: subject.pos.x, z: subject.pos.z },
+      helperPresent,
+      questTurnIns: this.jobQuestsByPid.get(subjectSession.pid) ?? [],
+      dungeonClears,
+    };
   }
 
   private sessionByName(name: string): ClientSession | null {
@@ -1095,6 +1226,7 @@ export class GameServer {
         this.routeEvents(events);
         lap('events');
         this.persistCourseFinishes(events);
+        this.evaluateJobs(events);
         this.runAntibotTick();
         lap('antibot');
         acc -= DT;

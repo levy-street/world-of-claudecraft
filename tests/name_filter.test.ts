@@ -2,12 +2,21 @@
 // top of obscenity's curated English dataset. Verifies broad profanity coverage
 // and leetspeak/confusable evasions are blocked, while the classic
 // Scunthorpe-problem legitimate names still pass (the curated allowlist).
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { offensiveName } from '../server/auth';
 
 describe('offensiveName — global banned/curse/naughty word hardening', () => {
   it('blocks profanity across languages (LDNOOBW)', () => {
-    for (const n of ['Fuckface', 'Asshole', 'Shitlord', 'Bastardo', 'Connard', 'Stronzo', 'Putain', 'Wichser']) {
+    for (const n of [
+      'Fuckface',
+      'Asshole',
+      'Shitlord',
+      'Bastardo',
+      'Connard',
+      'Stronzo',
+      'Putain',
+      'Wichser',
+    ]) {
       expect(offensiveName(n), n).toBe(true);
     }
   });
@@ -19,7 +28,19 @@ describe('offensiveName — global banned/curse/naughty word hardening', () => {
   });
 
   it('allows legitimate Scunthorpe-problem names', () => {
-    for (const n of ['Cassandra', 'Scunthorpe', 'Therapist', 'Cockburn', 'Peacock', 'Analyst', 'Sussex', 'Assemble', 'Aragorn', 'Persephone', 'Bartholomew']) {
+    for (const n of [
+      'Cassandra',
+      'Scunthorpe',
+      'Therapist',
+      'Cockburn',
+      'Peacock',
+      'Analyst',
+      'Sussex',
+      'Assemble',
+      'Aragorn',
+      'Persephone',
+      'Bartholomew',
+    ]) {
       expect(offensiveName(n), n).toBe(false);
     }
   });

@@ -780,9 +780,9 @@ export const it_IT: EnTranslations = {
       "tooLarge": "Un'incursione con più di cinque membri non può tornare a essere un gruppo."
     },
     "itemArmorType": {
-      "cloth": "Cloth",
-      "leather": "Leather",
-      "mail": "Mail"
+      "cloth": "Stoffa",
+      "leather": "Cuoio",
+      "mail": "Maglia"
     },
     "auraEffect": {
       "dot": "Infligge {value} danni da {school} ogni {interval} s",
@@ -3928,7 +3928,7 @@ export const it_IT: EnTranslations = {
     "combat": {
       "floatingMiss": "Mancato",
       "floatingDodge": "Schivata",
-      "floatingResist": "Resist",
+      "floatingResist": "Resistito",
       "cannotMove": "Non puoi muoverti!",
       "attack": "attacco",
       "damageDone": "Il tuo {ability} colpisce {target} per {amount}.",
@@ -3937,7 +3937,7 @@ export const it_IT: EnTranslations = {
       "damageTakenCrit": "{source} ti colpisce criticamente per {amount}.",
       "miss": "Il tuo {ability} manca {target}.",
       "dodged": "{target} schiva il tuo {ability}.",
-      "resisted": "Your {ability} is resisted by {target}.",
+      "resisted": "{target} resiste al tuo {ability}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",
       "healOther": "Il tuo {ability} cura {target} di {amount}.",

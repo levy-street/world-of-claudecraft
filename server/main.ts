@@ -49,6 +49,12 @@ import {
   verifyPassword,
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import { buybackReady, runBuybackBurn } from './buyback';
+import {
+  accountControlsBoundCharacter,
+  handleCharacterClaim,
+  registerClaimHooks,
+} from './character_claim';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
@@ -194,6 +200,7 @@ import {
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { CHARACTER_TRADEABLE, USDC_DECIMALS, WOC_DECIMALS } from './woc_config';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -1028,12 +1035,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // POST /api/identity/quote + /confirm instead, so it can't be done for free
       // here. (402 Payment Required signals the client to start the paid flow.)
       if (!character.force_rename) {
-        return json(res, 402, { error: 'voluntary renames cost $WOC, use /api/identity/quote', paid: true });
+        return json(res, 402, {
+          error: 'voluntary renames cost $WOC, use /api/identity/quote',
+          paid: true,
+        });
       }
       // A reserved name is takeable only by the account that reserved it: even
       // on the free remediation path, a player can't grab someone else's name.
       const holder = await activeReservationHolder(name);
-      if (holder !== null && holder !== accountId) return json(res, 409, { error: 'that name is reserved' });
+      if (holder !== null && holder !== accountId)
+        return json(res, 409, { error: 'that name is reserved' });
       // A rename mutates the DB name and clears force_rename, but a live
       // ClientSession keeps its own copy of the name (used by reports, chat and
       // /api/status). Renaming an online character desyncs that copy and — worse
@@ -1992,8 +2003,17 @@ async function main(): Promise<void> {
     // Tradeable-character gate: a bound character can only enter the world while
     // the account's linked wallet still controls its subdomain on-chain. If the
     // name was sold/transferred, the new owner must claim it first.
-    if (CHARACTER_TRADEABLE && character.bound_domain && !(await accountControlsBoundCharacter(accountId, character.bound_domain))) {
-      ws.send(JSON.stringify({ t: 'error', error: 'This character was transferred to a new owner and must be re-claimed.' }));
+    if (
+      CHARACTER_TRADEABLE &&
+      character.bound_domain &&
+      !(await accountControlsBoundCharacter(accountId, character.bound_domain))
+    ) {
+      ws.send(
+        JSON.stringify({
+          t: 'error',
+          error: 'This character was transferred to a new owner and must be re-claimed.',
+        }),
+      );
       ws.close();
       return;
     }

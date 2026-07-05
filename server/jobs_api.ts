@@ -4,13 +4,19 @@
 // wallet), then delegate to the JobContractService. No SQL and no chain here —
 // those live in jobs_db.ts / job_escrow.ts behind the service.
 import type http from 'node:http';
+import { DUNGEONS, QUESTS } from '../src/sim/data';
+import { getCharacter, jobPartyByCharacterName, walletForAccount } from './db';
 import { json, readBody } from './http_util';
-import { getCharacter, walletForAccount, jobPartyByCharacterName } from './db';
-import { parseMilestone, describeMilestone } from './job_milestone';
-import { isEscrowCurrency, escrowCurrencyInfo, rewardToBase, jobEscrowReady, type EscrowCurrency } from './job_escrow';
-import { JOB_MAX_DURATION_SECONDS } from './woc_config';
-import { QUESTS, DUNGEONS } from '../src/sim/data';
 import type { JobContractService, JobRecord } from './job_contracts';
+import {
+  type EscrowCurrency,
+  escrowCurrencyInfo,
+  isEscrowCurrency,
+  jobEscrowReady,
+  rewardToBase,
+} from './job_escrow';
+import { describeMilestone, parseMilestone } from './job_milestone';
+import { JOB_MAX_DURATION_SECONDS } from './woc_config';
 
 // What the client sees for a job in its list. Amounts are surfaced both as exact
 // base units (string) and a human number for display; wallets are omitted (not
@@ -43,7 +49,8 @@ export async function handleJobQuote(
   accountId: number,
   svc: JobContractService,
 ): Promise<void> {
-  if (!jobEscrowReady()) return json(res, 503, { error: 'job contracts are not available on this realm' });
+  if (!jobEscrowReady())
+    return json(res, 503, { error: 'job contracts are not available on this realm' });
 
   const body = await readBody(req);
   const characterId = Number(body.characterId);
@@ -51,13 +58,16 @@ export async function handleJobQuote(
   const currency = body.currency;
   const amount = Number(body.amount);
   if (!Number.isFinite(characterId)) return json(res, 400, { error: 'invalid character' });
-  if (!isEscrowCurrency(currency)) return json(res, 400, { error: 'reward currency must be WOC or USDC' });
+  if (!isEscrowCurrency(currency))
+    return json(res, 400, { error: 'reward currency must be WOC or USDC' });
   if (!(amount > 0)) return json(res, 400, { error: 'reward must be greater than zero' });
 
   const milestone = parseMilestone(body.milestone);
   if (!milestone) return json(res, 400, { error: 'invalid job goal' });
-  if (milestone.kind === 'complete_quest' && !QUESTS[milestone.questId]) return json(res, 400, { error: 'unknown quest' });
-  if (milestone.kind === 'clear_dungeon' && !DUNGEONS[milestone.dungeonId]) return json(res, 400, { error: 'unknown dungeon' });
+  if (milestone.kind === 'complete_quest' && !QUESTS[milestone.questId])
+    return json(res, 400, { error: 'unknown quest' });
+  if (milestone.kind === 'clear_dungeon' && !DUNGEONS[milestone.dungeonId])
+    return json(res, 400, { error: 'unknown dungeon' });
 
   const character = await getCharacter(accountId, characterId);
   if (!character) return json(res, 404, { error: 'character not found' });
@@ -66,8 +76,10 @@ export async function handleJobQuote(
 
   const helper = await jobPartyByCharacterName(helperName);
   if (!helper) return json(res, 404, { error: 'no player by that name has a verified wallet' });
-  if (helper.characterId === characterId) return json(res, 400, { error: 'you cannot hire yourself' });
-  if (helper.wallet === payerWallet.pubkey) return json(res, 400, { error: 'the helper must use a different wallet' });
+  if (helper.characterId === characterId)
+    return json(res, 400, { error: 'you cannot hire yourself' });
+  if (helper.wallet === payerWallet.pubkey)
+    return json(res, 400, { error: 'the helper must use a different wallet' });
 
   const { mint, decimals } = escrowCurrencyInfo(currency);
   const amountBase = rewardToBase(amount, decimals);
@@ -156,7 +168,9 @@ export async function handleJobList(
   accountId: number,
   svc: JobContractService,
 ): Promise<void> {
-  const characterId = Number(new URL(req.url ?? '/', 'http://localhost').searchParams.get('characterId') ?? '');
+  const characterId = Number(
+    new URL(req.url ?? '/', 'http://localhost').searchParams.get('characterId') ?? '',
+  );
   if (!Number.isFinite(characterId)) return json(res, 400, { error: 'invalid character' });
   const character = await getCharacter(accountId, characterId);
   if (!character) return json(res, 404, { error: 'character not found' }); // ownership check

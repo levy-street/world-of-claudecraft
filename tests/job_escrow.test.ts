@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { rewardToBase, escrowCurrencyInfo, isEscrowCurrency, jobPda } from '../server/job_escrow';
+import { escrowCurrencyInfo, isEscrowCurrency, jobPda, rewardToBase } from '../server/job_escrow';
 
 describe('rewardToBase', () => {
   it('converts human reward amounts to exact base units', () => {

@@ -101,6 +101,10 @@ export interface SocialDb {
     name: string,
     leaderId: number,
   ): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }>;
+  renameGuild(
+    guildId: number,
+    newName: string,
+  ): Promise<{ ok: true } | { error: 'name_taken' | 'not_found' }>;
   deleteGuild(id: number): Promise<void>;
   guildMembership(
     charId: number,
@@ -470,10 +474,16 @@ export class SocialService {
 
   // Read-only: the guild a character leads, for the paid-rename gate. Returns the
   // guild id + current name + whether this character is the Guild Master.
-  async guildLeaderInfo(characterId: number): Promise<{ guildId: number; name: string; isLeader: boolean } | null> {
+  async guildLeaderInfo(
+    characterId: number,
+  ): Promise<{ guildId: number; name: string; isLeader: boolean } | null> {
     const membership = await this.db.guildMembership(characterId);
     if (!membership) return null;
-    return { guildId: membership.guildId, name: membership.guildName, isLeader: membership.rank === 'leader' };
+    return {
+      guildId: membership.guildId,
+      name: membership.guildName,
+      isLeader: membership.rank === 'leader',
+    };
   }
 
   // Rename a guild on behalf of its leader. Result-returning (no session error
@@ -484,7 +494,10 @@ export class SocialService {
   async renameGuildAsLeader(
     characterId: number,
     rawName: string,
-  ): Promise<{ ok: true; guildId: number; oldName: string; name: string } | { ok: false; error: 'not_in_guild' | 'not_leader' | 'bad_name' | 'name_taken' }> {
+  ): Promise<
+    | { ok: true; guildId: number; oldName: string; name: string }
+    | { ok: false; error: 'not_in_guild' | 'not_leader' | 'bad_name' | 'name_taken' }
+  > {
     const name = validateGuildName(rawName);
     if (!name) return { ok: false, error: 'bad_name' };
     const membership = await this.db.guildMembership(characterId);

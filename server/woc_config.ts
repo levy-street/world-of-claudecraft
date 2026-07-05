@@ -11,11 +11,15 @@
 // VITE_* (loaded from .env.local in dev by db.ts), then the published default —
 // mirrors server/woc_balance.ts so a single local config drives everything.
 export const WOC_MINT = (
-  process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
 ).trim();
 
 export const SOLANA_RPC_URL = (
-  process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com'
+  process.env.SOLANA_RPC_URL ??
+  process.env.VITE_SOLANA_RPC_URL ??
+  'https://api.mainnet-beta.solana.com'
 ).trim();
 
 // USDC mint — used by the shared marketplace core (PR3 / #469), declared here so
@@ -58,12 +62,22 @@ export const JOB_ESCROW_PROGRAM_ID = (
 export const JOB_ESCROW_SETTLER_SECRET = (process.env.JOB_ESCROW_SETTLER_SECRET ?? '').trim();
 // How long a posted job stays open before it auto-refunds (the deadline the
 // milestone engine enforces), in seconds. Default 7 days.
-export const JOB_MAX_DURATION_SECONDS = clampInt(process.env.JOB_MAX_DURATION_SECONDS, 7 * 24 * 3600, 60, 30 * 24 * 3600);
+export const JOB_MAX_DURATION_SECONDS = clampInt(
+  process.env.JOB_MAX_DURATION_SECONDS,
+  7 * 24 * 3600,
+  60,
+  30 * 24 * 3600,
+);
 // How long an unconfirmed quote (pending_deposit) lingers before it's pruned —
 // only ever pruned when NO on-chain escrow exists for it (an abandoned quote the
 // payer never signed). Generous default (1h) so any in-flight deposit finalizes
 // first. Bounds the table against quote spam / abandoned posts.
-export const JOB_PENDING_TTL_SECONDS = clampInt(process.env.JOB_PENDING_TTL_SECONDS, 3600, 300, 7 * 24 * 3600);
+export const JOB_PENDING_TTL_SECONDS = clampInt(
+  process.env.JOB_PENDING_TTL_SECONDS,
+  3600,
+  300,
+  7 * 24 * 3600,
+);
 
 // ── Buyback-and-burn engine (PR #736 / #798 / #469 shared core) ──────────────
 // A keeper batches USDC accrued from marketplace fees, swaps it to $WOC on a DEX
@@ -78,7 +92,10 @@ export const BUYBACK_KEEPER_SECRET = (process.env.BUYBACK_KEEPER_SECRET ?? '').t
 export const BUYBACK_MIN_BATCH_USDC = numEnv(process.env.BUYBACK_MIN_BATCH_USDC, 50);
 // Max acceptable slippage on the USDC→$WOC swap, in basis points (default 1%).
 export const BUYBACK_SLIPPAGE_BPS = clampInt(process.env.BUYBACK_SLIPPAGE_BPS, 100, 1, 5000);
-export const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag').replace(/\/$/, '');
+export const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag').replace(
+  /\/$/,
+  '',
+);
 // USDC has 6 decimals on Solana.
 export const USDC_DECIMALS = 6;
 

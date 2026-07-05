@@ -6,8 +6,12 @@
 // No SQL here (that's jobs_db.ts); no direct @solana/web3 (that's job_escrow.ts);
 // no Sim import (the observation source lives in game.ts).
 import {
-  type JobMilestone, type JobProgress, type JobObservation, type JobConfig,
-  stepJob, initialProgress,
+  initialProgress,
+  type JobConfig,
+  type JobMilestone,
+  type JobObservation,
+  type JobProgress,
+  stepJob,
 } from './job_milestone';
 
 // pending_deposit: posted, awaiting the payer's on-chain deposit.
@@ -26,9 +30,9 @@ export interface JobParty {
 export interface JobRecord {
   jobId: bigint;
   realm: string;
-  payer: JobParty;     // also the SUBJECT the milestone tracks
+  payer: JobParty; // also the SUBJECT the milestone tracks
   helper: JobParty;
-  currency: string;    // 'WOC' | 'USDC'
+  currency: string; // 'WOC' | 'USDC'
   mint: string;
   amountBase: bigint;
   milestone: JobMilestone;
@@ -47,7 +51,10 @@ export interface JobsDb {
   nextJobId(): Promise<bigint>;
   insertJob(job: JobRecord): Promise<void>;
   getJob(jobId: bigint): Promise<JobRecord | null>;
-  updateJob(jobId: bigint, patch: Partial<Pick<JobRecord, 'status' | 'progress' | 'depositSig' | 'settleSig'>>): Promise<void>;
+  updateJob(
+    jobId: bigint,
+    patch: Partial<Pick<JobRecord, 'status' | 'progress' | 'depositSig' | 'settleSig'>>,
+  ): Promise<void>;
   listActiveJobs(realm: string): Promise<JobRecord[]>;
   listPendingJobs(realm: string): Promise<JobRecord[]>;
   listJobsForCharacter(characterId: number, limit?: number): Promise<JobRecord[]>;
@@ -55,9 +62,25 @@ export interface JobsDb {
 }
 
 export interface JobEscrowOps {
-  buildOpenTransaction(args: { jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<{ txBase64: string; jobPda: string; vault: string }>;
-  verifyDeposit(args: { signature: string; jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<boolean>;
-  verifyJobState(jobId: bigint, terms: { payer: string; helper: string; mint: string; amountBase: bigint }): Promise<boolean>;
+  buildOpenTransaction(args: {
+    jobId: bigint;
+    payer: string;
+    helper: string;
+    mint: string;
+    amountBase: bigint;
+  }): Promise<{ txBase64: string; jobPda: string; vault: string }>;
+  verifyDeposit(args: {
+    signature: string;
+    jobId: bigint;
+    payer: string;
+    helper: string;
+    mint: string;
+    amountBase: bigint;
+  }): Promise<boolean>;
+  verifyJobState(
+    jobId: bigint,
+    terms: { payer: string; helper: string; mint: string; amountBase: bigint },
+  ): Promise<boolean>;
   releaseJob(args: { jobId: bigint; payer: string; helper: string; mint: string }): Promise<string>;
   refundJob(args: { jobId: bigint; payer: string; mint: string }): Promise<string>;
   jobAccountExists(jobId: bigint): Promise<boolean>;
@@ -119,7 +142,10 @@ export class JobContractService {
       const k = key(job.jobId);
       if (this.activeJobs.has(k) || this.settling.has(k)) continue;
       const funded = await this.escrow.verifyJobState(job.jobId, {
-        payer: job.payer.wallet, helper: job.helper.wallet, mint: job.mint, amountBase: job.amountBase,
+        payer: job.payer.wallet,
+        helper: job.helper.wallet,
+        mint: job.mint,
+        amountBase: job.amountBase,
       });
       if (funded) {
         job.status = 'open';
@@ -148,7 +174,9 @@ export class JobContractService {
    * the contract as `pending_deposit`. The payer signs + submits the returned tx,
    * then calls confirmDeposit with the signature.
    */
-  async createQuote(input: CreateJobInput): Promise<{ jobId: bigint; txBase64: string; jobPda: string; amountBase: bigint }> {
+  async createQuote(
+    input: CreateJobInput,
+  ): Promise<{ jobId: bigint; txBase64: string; jobPda: string; amountBase: bigint }> {
     if (input.payer.wallet === input.helper.wallet) {
       throw new Error('the payer and helper must be different wallets');
     }
@@ -184,10 +212,15 @@ export class JobContractService {
   }
 
   /** Verify the payer's deposit landed in escrow and open the job to the helper. */
-  async confirmDeposit(jobId: bigint, signature: string, payerAccountId: number): Promise<JobRecord> {
+  async confirmDeposit(
+    jobId: bigint,
+    signature: string,
+    payerAccountId: number,
+  ): Promise<JobRecord> {
     const job = await this.db.getJob(jobId);
     if (!job) throw new Error('job not found');
-    if (job.payer.accountId !== payerAccountId) throw new Error('only the payer can confirm the deposit');
+    if (job.payer.accountId !== payerAccountId)
+      throw new Error('only the payer can confirm the deposit');
     if (job.status !== 'pending_deposit') {
       if (job.status === 'open' || job.status === 'active') return job; // idempotent re-confirm
       throw new Error('job is not awaiting a deposit');
@@ -210,9 +243,10 @@ export class JobContractService {
 
   /** The helper accepts the offered job; the milestone engine starts tracking it. */
   async accept(jobId: bigint, helperAccountId: number): Promise<JobRecord> {
-    const job = this.activeJobs.get(key(jobId)) ?? await this.db.getJob(jobId);
+    const job = this.activeJobs.get(key(jobId)) ?? (await this.db.getJob(jobId));
     if (!job) throw new Error('job not found');
-    if (job.helper.accountId !== helperAccountId) throw new Error('only the named helper can accept this job');
+    if (job.helper.accountId !== helperAccountId)
+      throw new Error('only the named helper can accept this job');
     if (job.status === 'active') return job; // idempotent
     if (job.status !== 'open') throw new Error('job is not open for acceptance');
     job.status = 'active';
@@ -224,9 +258,10 @@ export class JobContractService {
   /** Payer cancels an OPEN (funded, not-yet-accepted) job → refund. Once a helper
    *  has accepted, only the milestone or the deadline can settle it (no griefing). */
   async cancel(jobId: bigint, payerAccountId: number): Promise<void> {
-    const job = this.activeJobs.get(key(jobId)) ?? await this.db.getJob(jobId);
+    const job = this.activeJobs.get(key(jobId)) ?? (await this.db.getJob(jobId));
     if (!job) throw new Error('job not found');
-    if (job.payer.accountId !== payerAccountId) throw new Error('only the payer can cancel this job');
+    if (job.payer.accountId !== payerAccountId)
+      throw new Error('only the payer can cancel this job');
     if (job.status !== 'open') throw new Error('only an unaccepted job can be cancelled');
     job.progress = { status: 'voided', startedSec: null, reason: 'cancelled' };
     await this.settle(job, 'refund');
@@ -249,8 +284,14 @@ export class JobContractService {
 
       // Resume a settle that completed in the engine but not on-chain/DB (e.g. a
       // crash between detecting completion and confirming the payout).
-      if (job.progress.status === 'completed') { void this.settle(job, 'release'); continue; }
-      if (job.progress.status === 'voided') { void this.settle(job, 'refund'); continue; }
+      if (job.progress.status === 'completed') {
+        void this.settle(job, 'release');
+        continue;
+      }
+      if (job.progress.status === 'voided') {
+        void this.settle(job, 'refund');
+        continue;
+      }
 
       // Hard deadline → refund, regardless of whether the subject is online.
       if (nowSec >= job.deadlineSec) {
@@ -267,12 +308,17 @@ export class JobContractService {
       if (!obs) continue; // subject offline this tick — no progress, no penalty
 
       const next = stepJob(this.configFor(job), job.progress, obs);
-      if (next.status === job.progress.status && next.startedSec === job.progress.startedSec) continue;
+      if (next.status === job.progress.status && next.startedSec === job.progress.startedSec)
+        continue;
 
       job.progress = next;
-      if (next.status === 'completed') { void this.settle(job, 'release'); }
-      else if (next.status === 'voided') { void this.settle(job, 'refund'); }
-      else { void this.persistProgress(job); } // survive-timer start/reset
+      if (next.status === 'completed') {
+        void this.settle(job, 'release');
+      } else if (next.status === 'voided') {
+        void this.settle(job, 'refund');
+      } else {
+        void this.persistProgress(job);
+      } // survive-timer start/reset
     }
   }
 
@@ -304,13 +350,27 @@ export class JobContractService {
       let signature = job.settleSig;
       const stillEscrowed = await this.escrow.jobAccountExists(job.jobId);
       if (stillEscrowed) {
-        signature = kind === 'release'
-          ? await this.escrow.releaseJob({ jobId: job.jobId, payer: job.payer.wallet, helper: job.helper.wallet, mint: job.mint })
-          : await this.escrow.refundJob({ jobId: job.jobId, payer: job.payer.wallet, mint: job.mint });
+        signature =
+          kind === 'release'
+            ? await this.escrow.releaseJob({
+                jobId: job.jobId,
+                payer: job.payer.wallet,
+                helper: job.helper.wallet,
+                mint: job.mint,
+              })
+            : await this.escrow.refundJob({
+                jobId: job.jobId,
+                payer: job.payer.wallet,
+                mint: job.mint,
+              });
       }
       job.status = terminal;
       job.settleSig = signature;
-      await this.db.updateJob(job.jobId, { status: terminal, progress: job.progress, settleSig: signature });
+      await this.db.updateJob(job.jobId, {
+        status: terminal,
+        progress: job.progress,
+        settleSig: signature,
+      });
       this.onSettled?.(job, terminal);
     } catch (err) {
       console.error(`[jobs] ${kind} failed for job ${job.jobId}; will retry:`, err);

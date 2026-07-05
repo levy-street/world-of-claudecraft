@@ -3,9 +3,9 @@
 // GLOBAL sequence (shared across realm processes) because it also seeds the
 // on-chain escrow PDA, which is realm-agnostic — two realms must never collide.
 import { pool } from './db';
-import { REALM } from './realm';
-import type { JobsDb, JobRecord, JobLifecycle } from './job_contracts';
+import type { JobLifecycle, JobRecord, JobsDb } from './job_contracts';
 import type { JobMilestone, JobProgress } from './job_milestone';
+import { REALM } from './realm';
 
 const REALM_SQL = REALM.replace(/'/g, "''");
 
@@ -45,8 +45,18 @@ function rowToRecord(r: any): JobRecord {
   return {
     jobId: BigInt(r.job_id),
     realm: r.realm,
-    payer: { accountId: r.payer_account_id, characterId: r.payer_character_id, name: r.payer_character_name, wallet: r.payer_wallet },
-    helper: { accountId: r.helper_account_id, characterId: r.helper_character_id, name: r.helper_character_name, wallet: r.helper_wallet },
+    payer: {
+      accountId: r.payer_account_id,
+      characterId: r.payer_character_id,
+      name: r.payer_character_name,
+      wallet: r.payer_wallet,
+    },
+    helper: {
+      accountId: r.helper_account_id,
+      characterId: r.helper_character_id,
+      name: r.helper_character_name,
+      wallet: r.helper_wallet,
+    },
     currency: r.currency,
     mint: r.mint,
     amountBase: BigInt(r.amount_base),
@@ -77,10 +87,27 @@ export const jobsDb: JobsDb = {
          currency, mint, amount_base, milestone, progress, status, deadline_sec, job_pda, vault, deposit_sig, settle_sig
        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
       [
-        String(j.jobId), j.realm, j.payer.accountId, j.payer.characterId, j.payer.name, j.payer.wallet,
-        j.helper.accountId, j.helper.characterId, j.helper.name, j.helper.wallet,
-        j.currency, j.mint, String(j.amountBase), JSON.stringify(j.milestone), JSON.stringify(j.progress),
-        j.status, j.deadlineSec, j.jobPda, j.vault, j.depositSig, j.settleSig,
+        String(j.jobId),
+        j.realm,
+        j.payer.accountId,
+        j.payer.characterId,
+        j.payer.name,
+        j.payer.wallet,
+        j.helper.accountId,
+        j.helper.characterId,
+        j.helper.name,
+        j.helper.wallet,
+        j.currency,
+        j.mint,
+        String(j.amountBase),
+        JSON.stringify(j.milestone),
+        JSON.stringify(j.progress),
+        j.status,
+        j.deadlineSec,
+        j.jobPda,
+        j.vault,
+        j.depositSig,
+        j.settleSig,
       ],
     );
   },
@@ -94,10 +121,22 @@ export const jobsDb: JobsDb = {
     const sets: string[] = ['updated_at = now()'];
     const vals: unknown[] = [];
     let i = 1;
-    if (patch.status !== undefined) { sets.push(`status = $${i++}`); vals.push(patch.status); }
-    if (patch.progress !== undefined) { sets.push(`progress = $${i++}`); vals.push(JSON.stringify(patch.progress)); }
-    if (patch.depositSig !== undefined) { sets.push(`deposit_sig = $${i++}`); vals.push(patch.depositSig); }
-    if (patch.settleSig !== undefined) { sets.push(`settle_sig = $${i++}`); vals.push(patch.settleSig); }
+    if (patch.status !== undefined) {
+      sets.push(`status = $${i++}`);
+      vals.push(patch.status);
+    }
+    if (patch.progress !== undefined) {
+      sets.push(`progress = $${i++}`);
+      vals.push(JSON.stringify(patch.progress));
+    }
+    if (patch.depositSig !== undefined) {
+      sets.push(`deposit_sig = $${i++}`);
+      vals.push(patch.depositSig);
+    }
+    if (patch.settleSig !== undefined) {
+      sets.push(`settle_sig = $${i++}`);
+      vals.push(patch.settleSig);
+    }
     vals.push(String(jobId));
     await pool.query(`UPDATE job_contracts SET ${sets.join(', ')} WHERE job_id = $${i}`, vals);
   },

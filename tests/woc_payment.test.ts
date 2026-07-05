@@ -3,8 +3,8 @@
 // (getFinalizedTx) is mocked; everything downstream — balance-delta math, burn
 // instruction parsing, memo + Token-2022 detection — runs for real against
 // synthetic finalized-transaction fixtures.
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SPL_TOKEN_PROGRAM, TOKEN_2022_PROGRAM, type FinalizedTx } from '../server/solana_tx';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { type FinalizedTx, SPL_TOKEN_PROGRAM, TOKEN_2022_PROGRAM } from '../server/solana_tx';
 
 vi.mock('../server/solana_tx', async (importActual) => {
   const actual = await importActual<typeof import('../server/solana_tx')>();
@@ -37,15 +37,36 @@ function fixture(o: Opts = {}): FinalizedTx {
   if (o.burnBase !== null) {
     instructions.push({
       program: 'spl-token',
-      parsed: { type: 'burnChecked', info: { mint: MINT, authority: o.burnAuthority ?? PAYER, tokenAmount: { amount: o.burnBase ?? '500' } } },
+      parsed: {
+        type: 'burnChecked',
+        info: {
+          mint: MINT,
+          authority: o.burnAuthority ?? PAYER,
+          tokenAmount: { amount: o.burnBase ?? '500' },
+        },
+      },
     });
   }
   if (o.memo !== null) instructions.push({ program: 'spl-memo', parsed: o.memo ?? 'quote-123' });
   return {
     signature: SIG,
     err: o.err ?? null,
-    preTokenBalances: [{ owner: PAYER, mint: MINT, programId, uiTokenAmount: { amount: o.preBase ?? '1000', decimals: 6 } }],
-    postTokenBalances: [{ owner: PAYER, mint: MINT, programId, uiTokenAmount: { amount: o.postBase ?? '500', decimals: 6 } }],
+    preTokenBalances: [
+      {
+        owner: PAYER,
+        mint: MINT,
+        programId,
+        uiTokenAmount: { amount: o.preBase ?? '1000', decimals: 6 },
+      },
+    ],
+    postTokenBalances: [
+      {
+        owner: PAYER,
+        mint: MINT,
+        programId,
+        uiTokenAmount: { amount: o.postBase ?? '500', decimals: 6 },
+      },
+    ],
     instructions,
   };
 }
@@ -106,7 +127,9 @@ describe('verifyWocPayment', () => {
   });
 
   it('does not credit a burn authorized by a different wallet', async () => {
-    mocked.mockResolvedValue(fixture({ burnAuthority: 'Other2222222222222222222222222222222222222' }));
+    mocked.mockResolvedValue(
+      fixture({ burnAuthority: 'Other2222222222222222222222222222222222222' }),
+    );
     const r = await verifyWocPayment(SIG, PAYER, 500n, 'quote-123');
     // The payer's balance still dropped (they paid), but the burn instruction was
     // not theirs, so the required burn portion is unmet.

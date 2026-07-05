@@ -18,11 +18,11 @@
 // wall time does not).
 
 export type JobMilestone =
-  | { kind: 'reach_level'; target: number }       // subject reaches >= target level
-  | { kind: 'clear_dungeon'; dungeonId: string }  // subject's party clears the dungeon
-  | { kind: 'complete_quest'; questId: string }   // subject turns in the agreed quest
+  | { kind: 'reach_level'; target: number } // subject reaches >= target level
+  | { kind: 'clear_dungeon'; dungeonId: string } // subject's party clears the dungeon
+  | { kind: 'complete_quest'; questId: string } // subject turns in the agreed quest
   | { kind: 'escort'; x: number; z: number; radius: number } // subject reaches a place alive
-  | { kind: 'survive'; durationSec: number };     // subject survives N seconds with the helper
+  | { kind: 'survive'; durationSec: number }; // subject survives N seconds with the helper
 
 export type JobStatus = 'pending' | 'completed' | 'voided';
 
@@ -35,14 +35,14 @@ const VOID_ON_DEATH: ReadonlySet<JobMilestone['kind']> = new Set(['escort', 'sur
 // authoritative Sim. `helperPresent` folds together party membership / proximity
 // (the server decides what "present" means; the engine just consumes the flag).
 export interface JobObservation {
-  nowSec: number;                     // current wall-clock time, unix seconds
+  nowSec: number; // current wall-clock time, unix seconds
   subjectLevel: number;
   subjectAlive: boolean;
   subjectDiedThisTick: boolean;
   subjectPos: { x: number; z: number } | null;
   helperPresent: boolean;
-  questTurnIns: readonly string[];    // quests the subject turned in this tick
-  dungeonClears: readonly string[];   // dungeons the subject cleared this tick
+  questTurnIns: readonly string[]; // quests the subject turned in this tick
+  dungeonClears: readonly string[]; // dungeons the subject cleared this tick
 }
 
 // Progress the contract carries between ticks (persisted alongside it). Once the
@@ -50,8 +50,8 @@ export interface JobObservation {
 // settled job.
 export interface JobProgress {
   status: JobStatus;
-  startedSec: number | null;          // 'survive': when the protected window began
-  reason?: string;                    // why it voided / completed (audit + UI)
+  startedSec: number | null; // 'survive': when the protected window began
+  reason?: string; // why it voided / completed (audit + UI)
 }
 
 export function initialProgress(): JobProgress {
@@ -60,8 +60,8 @@ export function initialProgress(): JobProgress {
 
 export interface JobConfig {
   milestone: JobMilestone;
-  deadlineSec: number;                // hard expiry: still pending at/after ⇒ refund
-  requireHelperPresent: boolean;      // default true — the helper must earn it
+  deadlineSec: number; // hard expiry: still pending at/after ⇒ refund
+  requireHelperPresent: boolean; // default true — the helper must earn it
 }
 
 /**
@@ -126,23 +126,35 @@ export function parseMilestone(raw: unknown): JobMilestone | null {
   switch (m.kind) {
     case 'reach_level': {
       const target = Number(m.target);
-      return Number.isInteger(target) && target >= 2 && target <= 60 ? { kind: 'reach_level', target } : null;
+      return Number.isInteger(target) && target >= 2 && target <= 60
+        ? { kind: 'reach_level', target }
+        : null;
     }
     case 'clear_dungeon':
       return typeof m.dungeonId === 'string' && m.dungeonId.length > 0 && m.dungeonId.length <= 64
-        ? { kind: 'clear_dungeon', dungeonId: m.dungeonId } : null;
+        ? { kind: 'clear_dungeon', dungeonId: m.dungeonId }
+        : null;
     case 'complete_quest':
       return typeof m.questId === 'string' && m.questId.length > 0 && m.questId.length <= 64
-        ? { kind: 'complete_quest', questId: m.questId } : null;
+        ? { kind: 'complete_quest', questId: m.questId }
+        : null;
     case 'escort': {
-      const x = Number(m.x), z = Number(m.z), radius = Number(m.radius);
-      return Number.isFinite(x) && Number.isFinite(z) && Number.isFinite(radius) && radius >= 2 && radius <= 50
-        ? { kind: 'escort', x, z, radius } : null;
+      const x = Number(m.x),
+        z = Number(m.z),
+        radius = Number(m.radius);
+      return Number.isFinite(x) &&
+        Number.isFinite(z) &&
+        Number.isFinite(radius) &&
+        radius >= 2 &&
+        radius <= 50
+        ? { kind: 'escort', x, z, radius }
+        : null;
     }
     case 'survive': {
       const durationSec = Number(m.durationSec);
       return Number.isInteger(durationSec) && durationSec >= 30 && durationSec <= 86400
-        ? { kind: 'survive', durationSec } : null;
+        ? { kind: 'survive', durationSec }
+        : null;
     }
     default:
       return null;
@@ -152,10 +164,15 @@ export function parseMilestone(raw: unknown): JobMilestone | null {
 /** Human-readable, currency-agnostic summary of the agreed goal (for UI / logs). */
 export function describeMilestone(m: JobMilestone): string {
   switch (m.kind) {
-    case 'reach_level': return `Reach level ${m.target}`;
-    case 'clear_dungeon': return `Clear ${m.dungeonId}`;
-    case 'complete_quest': return `Complete quest ${m.questId}`;
-    case 'escort': return `Escort to (${m.x}, ${m.z})`;
-    case 'survive': return `Survive ${m.durationSec}s together`;
+    case 'reach_level':
+      return `Reach level ${m.target}`;
+    case 'clear_dungeon':
+      return `Clear ${m.dungeonId}`;
+    case 'complete_quest':
+      return `Complete quest ${m.questId}`;
+    case 'escort':
+      return `Escort to (${m.x}, ${m.z})`;
+    case 'survive':
+      return `Survive ${m.durationSec}s together`;
   }
 }

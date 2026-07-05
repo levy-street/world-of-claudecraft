@@ -7,10 +7,21 @@
 // Boundary: server-only. No file under src/sim/ may import this module — all
 // web3/SNS lives here. The execution wallet is the one custodial seam (it never
 // touches player funds; it only authorizes subdomain operations on our domain).
-import { Connection, Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
-import { createSubdomain, transferSubdomain, getDomainKeySync, NameRegistryState } from '@bonfida/spl-name-service';
+
+import {
+  createSubdomain,
+  getDomainKeySync,
+  NameRegistryState,
+  transferSubdomain,
+} from '@bonfida/spl-name-service';
+import { Connection, Keypair, type PublicKey, type TransactionInstruction } from '@solana/web3.js';
 import bs58 from 'bs58';
-import { SOLANA_RPC_URL, SNS_PARENT_DOMAIN, SNS_ENABLED, EXECUTION_WALLET_SECRET } from './woc_config';
+import {
+  EXECUTION_WALLET_SECRET,
+  SNS_ENABLED,
+  SNS_PARENT_DOMAIN,
+  SOLANA_RPC_URL,
+} from './woc_config';
 
 // The bare parent label without the trailing .sol (the SDK wants `label.parent`).
 const PARENT_LABEL = SNS_PARENT_DOMAIN.replace(/\.sol$/i, '').trim();
@@ -96,10 +107,19 @@ export async function resolveSubdomainOwner(subdomain: string): Promise<string |
  * execution wallet's signature; the caller composes these with the $WOC burn and
  * partial-signs with executionWallet() before handing the tx to the player.
  */
-export async function buildIssueSubdomainIxs(label: string, ownerPubkey: PublicKey): Promise<TransactionInstruction[]> {
+export async function buildIssueSubdomainIxs(
+  label: string,
+  ownerPubkey: PublicKey,
+): Promise<TransactionInstruction[]> {
   const exec = executionWallet().publicKey;
   const subdomain = fullSubdomain(label);
-  const createIxs = await createSubdomain(connection(), subdomain, exec, SUBDOMAIN_SPACE, ownerPubkey);
+  const createIxs = await createSubdomain(
+    connection(),
+    subdomain,
+    exec,
+    SUBDOMAIN_SPACE,
+    ownerPubkey,
+  );
   // isParentOwnerSigner=true: the parent owner (execution wallet) authorizes the
   // hand-off of the freshly created subdomain to the player.
   const transferIx = await transferSubdomain(connection(), subdomain, ownerPubkey, true);

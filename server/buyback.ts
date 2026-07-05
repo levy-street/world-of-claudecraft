@@ -7,22 +7,23 @@
 //
 // Server-only. The keeper wallet is the single custodial seam; it holds only
 // in-flight fee USDC plus a little SOL for fees, never player funds.
+
+import { createBurnCheckedInstruction, getAssociatedTokenAddressSync } from '@solana/spl-token';
 import { Connection, Keypair, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
-import { getAssociatedTokenAddressSync, createBurnCheckedInstruction } from '@solana/spl-token';
 import bs58 from 'bs58';
+import { recordBurnBatch } from './db';
 import {
-  SOLANA_RPC_URL,
-  WOC_MINT,
-  WOC_DECIMALS,
-  USDC_MINT,
-  USDC_DECIMALS,
-  JUPITER_API,
   BUYBACK_ENABLED,
   BUYBACK_KEEPER_SECRET,
   BUYBACK_MIN_BATCH_USDC,
   BUYBACK_SLIPPAGE_BPS,
+  JUPITER_API,
+  SOLANA_RPC_URL,
+  USDC_DECIMALS,
+  USDC_MINT,
+  WOC_DECIMALS,
+  WOC_MINT,
 } from './woc_config';
-import { recordBurnBatch } from './db';
 
 let _connection: Connection | null = null;
 function connection(): Connection {
@@ -73,7 +74,12 @@ interface JupiterQuote {
 }
 
 /** Jupiter v6 quote for swapping `amountBase` of `inputMint` to `outputMint`. */
-export async function jupiterQuote(inputMint: string, outputMint: string, amountBase: bigint, slippageBps: number): Promise<JupiterQuote> {
+export async function jupiterQuote(
+  inputMint: string,
+  outputMint: string,
+  amountBase: bigint,
+  slippageBps: number,
+): Promise<JupiterQuote> {
   const url = `${JUPITER_API}/v6/quote?inputMint=${inputMint}&outputMint=${outputMint}&amount=${amountBase.toString()}&slippageBps=${slippageBps}&swapMode=ExactIn`;
   const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
   if (!res.ok) throw new Error(`jupiter quote failed (${res.status})`);
@@ -85,7 +91,12 @@ async function jupiterSwapTx(quote: JupiterQuote, userPublicKey: string): Promis
   const res = await fetch(`${JUPITER_API}/v6/swap`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ quoteResponse: quote, userPublicKey, wrapAndUnwrapSol: true, dynamicComputeUnitLimit: true }),
+    body: JSON.stringify({
+      quoteResponse: quote,
+      userPublicKey,
+      wrapAndUnwrapSol: true,
+      dynamicComputeUnitLimit: true,
+    }),
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`jupiter swap build failed (${res.status})`);
@@ -96,7 +107,13 @@ async function jupiterSwapTx(quote: JupiterQuote, userPublicKey: string): Promis
 export type BuybackResult =
   | { status: 'disabled' }
   | { status: 'below_threshold'; usdcBalanceBase: string }
-  | { status: 'burned'; usdcInBase: string; wocBurnedBase: string; swapSig: string; burnSig: string };
+  | {
+      status: 'burned';
+      usdcInBase: string;
+      wocBurnedBase: string;
+      swapSig: string;
+      burnSig: string;
+    };
 
 /**
  * One buyback cycle: if the vault holds at least the minimum batch, swap all of
@@ -108,7 +125,8 @@ export async function runBuybackBurn(): Promise<BuybackResult> {
   const keeper = keeperWallet();
 
   const balance = await usdcVaultBalanceBase();
-  if (!shouldRunBuyback(balance)) return { status: 'below_threshold', usdcBalanceBase: balance.toString() };
+  if (!shouldRunBuyback(balance))
+    return { status: 'below_threshold', usdcBalanceBase: balance.toString() };
 
   // Swap the whole vault balance USDC → $WOC at the configured slippage cap.
   const quote = await jupiterQuote(USDC_MINT, WOC_MINT, balance, BUYBACK_SLIPPAGE_BPS);
@@ -121,13 +139,32 @@ export async function runBuybackBurn(): Promise<BuybackResult> {
   // Burn exactly the $WOC the swap produced.
   const wocReceived = BigInt(quote.outAmount);
   const wocAta = getAssociatedTokenAddressSync(new PublicKey(WOC_MINT), keeper.publicKey);
-  const burnIx = createBurnCheckedInstruction(wocAta, new PublicKey(WOC_MINT), keeper.publicKey, wocReceived, WOC_DECIMALS);
+  const burnIx = createBurnCheckedInstruction(
+    wocAta,
+    new PublicKey(WOC_MINT),
+    keeper.publicKey,
+    wocReceived,
+    WOC_DECIMALS,
+  );
   const { blockhash, lastValidBlockHeight } = await connection().getLatestBlockhash('confirmed');
-  const burnTx = new Transaction({ feePayer: keeper.publicKey, blockhash, lastValidBlockHeight }).add(burnIx);
+  const burnTx = new Transaction({
+    feePayer: keeper.publicKey,
+    blockhash,
+    lastValidBlockHeight,
+  }).add(burnIx);
   burnTx.sign(keeper);
   const burnSig = await connection().sendRawTransaction(burnTx.serialize());
-  await connection().confirmTransaction({ signature: burnSig, blockhash, lastValidBlockHeight }, 'confirmed');
+  await connection().confirmTransaction(
+    { signature: burnSig, blockhash, lastValidBlockHeight },
+    'confirmed',
+  );
 
   await recordBurnBatch({ usdcInBase: balance, wocOutBase: wocReceived, swapSig, burnSig });
-  return { status: 'burned', usdcInBase: balance.toString(), wocBurnedBase: wocReceived.toString(), swapSig, burnSig };
+  return {
+    status: 'burned',
+    usdcInBase: balance.toString(),
+    wocBurnedBase: wocReceived.toString(),
+    swapSig,
+    burnSig,
+  };
 }

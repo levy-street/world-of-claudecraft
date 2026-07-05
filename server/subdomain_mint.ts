@@ -8,34 +8,47 @@
 //
 //   POST /api/subdomain/quote   { characterId, name } → { quoteId, txBase64, ... }
 //   POST /api/subdomain/confirm { quoteId, signature } → the bound character
-import type http from 'node:http';
+
 import { randomBytes } from 'node:crypto';
-import { Transaction, TransactionInstruction, PublicKey } from '@solana/web3.js';
-import { getAssociatedTokenAddressSync, createBurnCheckedInstruction, createTransferCheckedInstruction, createAssociatedTokenAccountIdempotentInstruction } from '@solana/spl-token';
-import { json, readBody } from './http_util';
+import type http from 'node:http';
+import {
+  createAssociatedTokenAccountIdempotentInstruction,
+  createBurnCheckedInstruction,
+  createTransferCheckedInstruction,
+  getAssociatedTokenAddressSync,
+} from '@solana/spl-token';
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { normalizeCharName, offensiveName } from './auth';
 import {
-  walletForAccount,
-  getCharacter,
   createWocQuote,
-  getWocQuote,
   deleteWocQuote,
+  getCharacter,
+  getWocQuote,
   pruneWocQuotes,
-  recordWocPayment,
   recordSubdomainAndBind,
+  recordWocPayment,
+  walletForAccount,
 } from './db';
-import { verifyWocPayment } from './woc_payment';
+import { json, readBody } from './http_util';
 import {
-  slugifyLabel,
-  fullSubdomain,
-  subdomainAvailable,
-  resolveSubdomainOwner,
   buildIssueSubdomainIxs,
   executionWallet,
+  fullSubdomain,
+  resolveSubdomainOwner,
+  slugifyLabel,
   snsConnection,
   snsReady,
+  subdomainAvailable,
 } from './sns';
-import { WOC_MINT, WOC_DECIMALS, WOC_TREASURY, wocPriceBase, wocPriceHuman, splitPrice } from './woc_config';
+import {
+  splitPrice,
+  WOC_DECIMALS,
+  WOC_MINT,
+  WOC_TREASURY,
+  wocPriceBase,
+  wocPriceHuman,
+} from './woc_config';
+import { verifyWocPayment } from './woc_payment';
 
 const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 const QUOTE_TTL_MINUTES = 15;
@@ -68,8 +81,10 @@ export async function handleSubdomainQuote(
   if (!character) return json(res, 404, { error: 'character not found' });
 
   const available = await subdomainAvailable(label);
-  if (available === false) return json(res, 409, { error: `${fullSubdomain(label)} is already taken` });
-  if (available === null) return json(res, 503, { error: 'could not check subdomain availability — try again' });
+  if (available === false)
+    return json(res, 409, { error: `${fullSubdomain(label)} is already taken` });
+  if (available === null)
+    return json(res, 503, { error: 'could not check subdomain availability — try again' });
 
   const player = new PublicKey(wallet.pubkey);
   const priceBase = wocPriceBase('sns_subdomain');
@@ -79,14 +94,32 @@ export async function handleSubdomainQuote(
 
   const quoteId = randomBytes(16).toString('hex');
   const ixs: TransactionInstruction[] = [];
-  if (burnBase > 0n) ixs.push(createBurnCheckedInstruction(playerAta, mint, player, burnBase, WOC_DECIMALS));
+  if (burnBase > 0n)
+    ixs.push(createBurnCheckedInstruction(playerAta, mint, player, burnBase, WOC_DECIMALS));
   if (treasuryBase > 0n && WOC_TREASURY) {
     const treasury = new PublicKey(WOC_TREASURY);
     const treasuryAta = getAssociatedTokenAddressSync(mint, treasury);
-    ixs.push(createAssociatedTokenAccountIdempotentInstruction(player, treasuryAta, treasury, mint));
-    ixs.push(createTransferCheckedInstruction(playerAta, mint, treasuryAta, player, treasuryBase, WOC_DECIMALS));
+    ixs.push(
+      createAssociatedTokenAccountIdempotentInstruction(player, treasuryAta, treasury, mint),
+    );
+    ixs.push(
+      createTransferCheckedInstruction(
+        playerAta,
+        mint,
+        treasuryAta,
+        player,
+        treasuryBase,
+        WOC_DECIMALS,
+      ),
+    );
   }
-  ixs.push(new TransactionInstruction({ programId: MEMO_PROGRAM_ID, keys: [], data: Buffer.from(quoteId, 'utf8') }));
+  ixs.push(
+    new TransactionInstruction({
+      programId: MEMO_PROGRAM_ID,
+      keys: [],
+      data: Buffer.from(quoteId, 'utf8'),
+    }),
+  );
   ixs.push(...(await buildIssueSubdomainIxs(label, player)));
 
   const connection = snsConnection();
@@ -96,7 +129,9 @@ export async function handleSubdomainQuote(
   // Authorize the createSubdomain/transferSubdomain instructions; the player adds
   // the remaining signature (fee payer + burn authority) in their wallet.
   tx.partialSign(executionWallet());
-  const txBase64 = tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString('base64');
+  const txBase64 = tx
+    .serialize({ requireAllSignatures: false, verifySignatures: false })
+    .toString('base64');
 
   await pruneWocQuotes();
   await createWocQuote({
@@ -133,17 +168,27 @@ export async function handleSubdomainConfirm(
   const body = await readBody(req);
   const quoteId = typeof body.quoteId === 'string' ? body.quoteId.trim() : '';
   const signature = typeof body.signature === 'string' ? body.signature.trim() : '';
-  if (!quoteId || !signature) return json(res, 400, { error: 'quoteId and signature are required' });
+  if (!quoteId || !signature)
+    return json(res, 400, { error: 'quoteId and signature are required' });
 
   const quote = await getWocQuote(quoteId, accountId);
-  if (!quote || quote.kind !== 'mint_subdomain') return json(res, 400, { error: 'quote expired or already used — request a new one' });
+  if (!quote || quote.kind !== 'mint_subdomain')
+    return json(res, 400, { error: 'quote expired or already used — request a new one' });
   const payload = quote.payload as { characterId: number; label: string; fullDomain: string };
 
   // Verify the $WOC burn finalized (memo == quoteId, payer == linked wallet).
-  const payment = await verifyWocPayment(signature, wallet.pubkey, BigInt(quote.price_base), quoteId);
+  const payment = await verifyWocPayment(
+    signature,
+    wallet.pubkey,
+    BigInt(quote.price_base),
+    quoteId,
+  );
   if (!payment.ok) {
     const status = payment.reason === 'not_finalized' ? 409 : 400;
-    return json(res, status, { error: `payment not verified (${payment.reason})`, reason: payment.reason });
+    return json(res, status, {
+      error: `payment not verified (${payment.reason})`,
+      reason: payment.reason,
+    });
   }
   // ...and the subdomain is now actually owned by the player on-chain.
   const owner = await resolveSubdomainOwner(payload.fullDomain);
@@ -172,5 +217,9 @@ export async function handleSubdomainConfirm(
   });
   await deleteWocQuote(quoteId).catch(() => {});
 
-  return json(res, 200, { characterId: payload.characterId, fullDomain: payload.fullDomain, owner: wallet.pubkey });
+  return json(res, 200, {
+    characterId: payload.characterId,
+    fullDomain: payload.fullDomain,
+    owner: wallet.pubkey,
+  });
 }

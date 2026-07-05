@@ -1,6 +1,12 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from 'obscenity';
+import naughtyWords from 'naughty-words';
+import {
+  englishDataset,
+  englishRecommendedTransformers,
+  parseRawPattern,
+  RegExpMatcher,
+} from 'obscenity';
 
 const SCRYPT_N = 16384,
   SCRYPT_R = 8,
@@ -66,17 +72,51 @@ const LDNOOBW_EXTRA_TERMS = Array.from(
 ).filter((term): term is string => typeof term === 'string' && /^[a-z]{4,}$/.test(term));
 // Legitimate names/words that contain a banned substring — kept matchable.
 const NAME_ALLOWLIST = [
-  'scunthorpe', 'penistone', 'clitheroe', 'lightwater', 'cockburn', 'cockerel', 'peacock',
-  'babcock', 'hancock', 'woodcock', 'hitchcock', 'shuttlecock', 'therapist', 'therapy',
-  'sexton', 'sextet', 'sextant', 'essex', 'sussex', 'middlesex', 'wessex', 'analyst',
-  'analysis', 'assassin', 'assemble', 'assembly', 'assess', 'asset', 'assign', 'assist',
-  'cumberland', 'cumulus', 'document', 'dickens', 'dickinson', 'dixon',
+  'scunthorpe',
+  'penistone',
+  'clitheroe',
+  'lightwater',
+  'cockburn',
+  'cockerel',
+  'peacock',
+  'babcock',
+  'hancock',
+  'woodcock',
+  'hitchcock',
+  'shuttlecock',
+  'therapist',
+  'therapy',
+  'sexton',
+  'sextet',
+  'sextant',
+  'essex',
+  'sussex',
+  'middlesex',
+  'wessex',
+  'analyst',
+  'analysis',
+  'assassin',
+  'assemble',
+  'assembly',
+  'assess',
+  'asset',
+  'assign',
+  'assist',
+  'cumberland',
+  'cumulus',
+  'document',
+  'dickens',
+  'dickinson',
+  'dixon',
 ];
 const baseDataset = englishDataset.build();
 const profanityMatcher = new RegExpMatcher({
   blacklistedTerms: [
     ...baseDataset.blacklistedTerms,
-    ...LDNOOBW_EXTRA_TERMS.map((term, i) => ({ id: 1_000_000 + i, pattern: parseRawPattern(term) })),
+    ...LDNOOBW_EXTRA_TERMS.map((term, i) => ({
+      id: 1_000_000 + i,
+      pattern: parseRawPattern(term),
+    })),
   ],
   whitelistedTerms: [...(baseDataset.whitelistedTerms ?? []), ...NAME_ALLOWLIST],
   ...englishRecommendedTransformers,

@@ -4,8 +4,9 @@
 //
 // Usage: VITE_REOWN_PROJECT_ID=demo npm run dev   (in another shell)
 //        node scripts/job_wallet_shots.mjs
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -19,7 +20,8 @@ const shot = async (page, sel, path) => {
 };
 
 const browser = await puppeteer.launch({
-  executablePath: BROWSER_PATH, headless: 'new',
+  executablePath: BROWSER_PATH,
+  headless: 'new',
   args: ['--window-size=1100,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
   defaultViewport: { width: 1100, height: 900 },
 });

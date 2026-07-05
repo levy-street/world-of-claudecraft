@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  type CreateJobInput,
   JobContractService,
-  type JobsDb, type JobEscrowOps, type JobObservationSource,
-  type JobRecord, type JobParty, type CreateJobInput,
+  type JobEscrowOps,
+  type JobObservationSource,
+  type JobParty,
+  type JobRecord,
+  type JobsDb,
 } from '../server/job_contracts';
 import type { JobObservation } from '../server/job_milestone';
 
@@ -10,62 +14,103 @@ import type { JobObservation } from '../server/job_milestone';
 class FakeDb implements JobsDb {
   jobs = new Map<string, JobRecord>();
   private seq = 0n;
-  async nextJobId() { return ++this.seq; }
-  async insertJob(j: JobRecord) { this.jobs.set(j.jobId.toString(), j); }
-  async getJob(id: bigint) { return this.jobs.get(id.toString()) ?? null; }
+  async nextJobId() {
+    return ++this.seq;
+  }
+  async insertJob(j: JobRecord) {
+    this.jobs.set(j.jobId.toString(), j);
+  }
+  async getJob(id: bigint) {
+    return this.jobs.get(id.toString()) ?? null;
+  }
   async updateJob(id: bigint, patch: Partial<JobRecord>) {
     const j = this.jobs.get(id.toString());
     if (j) Object.assign(j, patch);
   }
   async listActiveJobs(realm: string) {
-    return [...this.jobs.values()].filter((j) => j.realm === realm && (j.status === 'open' || j.status === 'active'));
+    return [...this.jobs.values()].filter(
+      (j) => j.realm === realm && (j.status === 'open' || j.status === 'active'),
+    );
   }
   async listPendingJobs(realm: string) {
-    return [...this.jobs.values()].filter((j) => j.realm === realm && j.status === 'pending_deposit');
+    return [...this.jobs.values()].filter(
+      (j) => j.realm === realm && j.status === 'pending_deposit',
+    );
   }
   async listJobsForCharacter(cid: number) {
-    return [...this.jobs.values()].filter((j) => j.payer.characterId === cid || j.helper.characterId === cid);
+    return [...this.jobs.values()].filter(
+      (j) => j.payer.characterId === cid || j.helper.characterId === cid,
+    );
   }
-  async deleteJob(id: bigint) { this.jobs.delete(id.toString()); }
+  async deleteJob(id: bigint) {
+    this.jobs.delete(id.toString());
+  }
 }
 
 class FakeEscrow implements JobEscrowOps {
   released: bigint[] = [];
   refunded: bigint[] = [];
   verifyResult = true;
-  jobStateOk = true;      // does the on-chain Job exist on our exact terms?
-  exists = true;          // does the on-chain job account still exist?
-  failReleaseTimes = 0;   // simulate transient RPC failures
+  jobStateOk = true; // does the on-chain Job exist on our exact terms?
+  exists = true; // does the on-chain job account still exist?
+  failReleaseTimes = 0; // simulate transient RPC failures
   async buildOpenTransaction(a: { jobId: bigint }) {
     return { txBase64: `TX_${a.jobId}`, jobPda: `PDA_${a.jobId}`, vault: `VAULT_${a.jobId}` };
   }
-  async verifyDeposit() { return this.verifyResult; }
-  async verifyJobState() { return this.jobStateOk; }
+  async verifyDeposit() {
+    return this.verifyResult;
+  }
+  async verifyJobState() {
+    return this.jobStateOk;
+  }
   async releaseJob(a: { jobId: bigint }) {
-    if (this.failReleaseTimes > 0) { this.failReleaseTimes--; throw new Error('rpc down'); }
+    if (this.failReleaseTimes > 0) {
+      this.failReleaseTimes--;
+      throw new Error('rpc down');
+    }
     this.released.push(a.jobId);
     return `REL_${a.jobId}`;
   }
-  async refundJob(a: { jobId: bigint }) { this.refunded.push(a.jobId); return `REF_${a.jobId}`; }
-  async jobAccountExists() { return this.exists; }
+  async refundJob(a: { jobId: bigint }) {
+    this.refunded.push(a.jobId);
+    return `REF_${a.jobId}`;
+  }
+  async jobAccountExists() {
+    return this.exists;
+  }
 }
 
 class FakeSource implements JobObservationSource {
   obs: JobObservation | null = null;
-  observe() { return this.obs; }
+  observe() {
+    return this.obs;
+  }
 }
 
 const payer: JobParty = { accountId: 1, characterId: 11, name: 'Alice', wallet: 'PAYER' };
 const helper: JobParty = { accountId: 2, characterId: 22, name: 'Bob', wallet: 'HELPER' };
 
 const input = (over: Partial<CreateJobInput> = {}): CreateJobInput => ({
-  payer, helper, currency: 'WOC', mint: 'MINT', amountBase: 1_000_000n,
-  milestone: { kind: 'reach_level', target: 10 }, deadlineSec: 9_999_999_999, ...over,
+  payer,
+  helper,
+  currency: 'WOC',
+  mint: 'MINT',
+  amountBase: 1_000_000n,
+  milestone: { kind: 'reach_level', target: 10 },
+  deadlineSec: 9_999_999_999,
+  ...over,
 });
 
 const obs = (over: Partial<JobObservation> = {}): JobObservation => ({
-  nowSec: 1000, subjectLevel: 1, subjectAlive: true, subjectDiedThisTick: false,
-  subjectPos: { x: 0, z: 0 }, helperPresent: true, questTurnIns: [], dungeonClears: [], ...over,
+  nowSec: 1000,
+  subjectLevel: 1,
+  subjectAlive: true,
+  subjectDiedThisTick: false,
+  subjectPos: { x: 0, z: 0 },
+  helperPresent: true,
+  questTurnIns: [],
+  dungeonClears: [],
+  ...over,
 });
 
 function setup() {
@@ -95,7 +140,9 @@ describe('job contract lifecycle', () => {
 
   it('rejects a job to your own wallet', async () => {
     const { svc } = setup();
-    await expect(svc.createQuote(input({ helper: { ...helper, wallet: payer.wallet } }))).rejects.toThrow();
+    await expect(
+      svc.createQuote(input({ helper: { ...helper, wallet: payer.wallet } })),
+    ).rejects.toThrow();
   });
 
   it('opens the job once the deposit verifies', async () => {
@@ -172,7 +219,9 @@ describe('refund paths', () => {
 
   it('refunds when a bodyguard subject dies', async () => {
     const { svc, db, escrow, source } = setup();
-    const { jobId } = await svc.createQuote(input({ milestone: { kind: 'survive', durationSec: 60 } }));
+    const { jobId } = await svc.createQuote(
+      input({ milestone: { kind: 'survive', durationSec: 60 } }),
+    );
     await svc.confirmDeposit(jobId, 'SIG', payer.accountId);
     await svc.accept(jobId, helper.accountId);
     source.obs = obs({ subjectDiedThisTick: true });
@@ -206,7 +255,7 @@ describe('settlement robustness', () => {
     source.obs = obs({ subjectLevel: 10 });
     svc.evaluateTick(1000);
     await flush();
-    expect(escrow.released).toHaveLength(0);          // no double release
+    expect(escrow.released).toHaveLength(0); // no double release
     expect((await db.getJob(jobId))!.status).toBe('released'); // still finalized
   });
 
@@ -284,7 +333,9 @@ describe('settled hook', () => {
     const escrow = new FakeEscrow();
     const source = new FakeSource();
     const settled: Array<{ id: bigint; outcome: string }> = [];
-    const svc = new JobContractService(db, escrow, source, 'TestRealm', (job, outcome) => settled.push({ id: job.jobId, outcome }));
+    const svc = new JobContractService(db, escrow, source, 'TestRealm', (job, outcome) =>
+      settled.push({ id: job.jobId, outcome }),
+    );
     const { jobId } = await svc.createQuote(input());
     await svc.confirmDeposit(jobId, 'SIG', payer.accountId);
     await svc.accept(jobId, helper.accountId);

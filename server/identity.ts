@@ -9,28 +9,29 @@
 // This module owns the flow + validation but NOT the game/social/SQL specifics:
 // those are injected as `IdentityActions` by server/main.ts, mirroring how
 // SocialService takes a SocialDb. No raw SQL lives here.
-import type http from 'node:http';
+
 import { randomBytes } from 'node:crypto';
-import { json, readBody } from './http_util';
+import type http from 'node:http';
 import {
-  walletForAccount,
   createWocQuote,
-  getWocQuote,
   deleteWocQuote,
+  getWocQuote,
   pruneWocQuotes,
   recordWocPayment,
+  walletForAccount,
 } from './db';
-import { verifyWocPayment } from './woc_payment';
+import { json, readBody } from './http_util';
 import {
-  WOC_MINT,
-  WOC_DECIMALS,
+  splitPrice,
   WOC_BURN_BPS,
+  WOC_DECIMALS,
+  WOC_MINT,
   WOC_TREASURY,
+  type WocPriceKey,
   wocPriceBase,
   wocPriceHuman,
-  splitPrice,
-  type WocPriceKey,
 } from './woc_config';
+import { verifyWocPayment } from './woc_payment';
 
 // GET /api/identity/prices — public: the human-readable $WOC price of each paid
 // action, so the client can show the cost before the player commits to a quote.
@@ -94,7 +95,15 @@ export async function handleIdentityQuote(
   const { burnBase, treasuryBase } = splitPrice(priceBase);
   await pruneWocQuotes();
   const quoteId = randomBytes(16).toString('hex');
-  await createWocQuote({ quoteId, accountId, kind, payload: prep.payload, priceBase, mint: WOC_MINT, ttlMinutes: QUOTE_TTL_MINUTES });
+  await createWocQuote({
+    quoteId,
+    accountId,
+    kind,
+    payload: prep.payload,
+    priceBase,
+    mint: WOC_MINT,
+    ttlMinutes: QUOTE_TTL_MINUTES,
+  });
 
   // Everything the client needs to build the burn tx. The memo MUST equal the
   // quoteId — that binds the on-chain payment to this account + action.
@@ -127,7 +136,8 @@ export async function handleIdentityConfirm(
   const body = await readBody(req);
   const quoteId = typeof body.quoteId === 'string' ? body.quoteId.trim() : '';
   const signature = typeof body.signature === 'string' ? body.signature.trim() : '';
-  if (!quoteId || !signature) return json(res, 400, { error: 'quoteId and signature are required' });
+  if (!quoteId || !signature)
+    return json(res, 400, { error: 'quoteId and signature are required' });
 
   const quote = await getWocQuote(quoteId, accountId);
   if (!quote) return json(res, 400, { error: 'quote expired or already used — request a new one' });
@@ -138,7 +148,10 @@ export async function handleIdentityConfirm(
   const payment = await verifyWocPayment(signature, wallet.pubkey, priceBase, quoteId);
   if (!payment.ok) {
     const status = payment.reason === 'not_finalized' ? 409 : 400;
-    return json(res, status, { error: `payment not verified (${payment.reason})`, reason: payment.reason });
+    return json(res, status, {
+      error: `payment not verified (${payment.reason})`,
+      reason: payment.reason,
+    });
   }
 
   // Replay guard: a tx_sig settles exactly one action. A racing/duplicate

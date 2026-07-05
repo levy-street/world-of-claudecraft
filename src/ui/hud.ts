@@ -37,8 +37,6 @@ import {
 } from '../sim/content/skins';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import type { ZoneDef } from '../sim/data';
-import { MOUNT_LIST, MOUNTS, isCharterEligible, type MountDef } from '../sim/content/mounts';
-import { COURSE_LIST, courseDef, courseTotalGates } from '../sim/content/courses';
 import {
   ABILITIES,
   CLASSES,
@@ -3219,7 +3217,10 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
-    onWalletClick: () => { audio.click(); requestWalletPanel(); },
+    onWalletClick: () => {
+      audio.click();
+      requestWalletPanel();
+    },
     hideTooltip: () => this.hideTooltip(),
     cancelPetFeed: () => this.cancelPetFeed(),
     // Non-trapping focus capture/return (bags is a non-modal companion of vendor /

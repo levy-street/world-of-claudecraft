@@ -675,6 +675,151 @@ export class Api {
     await this.delete('/api/github', {});
   }
 
+  // Resolve an in-game player name to the verified Solana wallet linked to their
+  // account, for sending tokens directly. Returns null when the player doesn't
+  // exist or has no verified wallet (so the send UI can show "not found"). The
+  // canonical-cased name is echoed back for display.
+  async resolveRecipient(name: string): Promise<{ name: string; pubkey: string } | null> {
+    const q = name.trim();
+    if (!q) return null;
+    try {
+      const res = await fetch(`${this.base}/api/wallet/resolve?name=${encodeURIComponent(q)}`, {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return typeof data?.pubkey === 'string'
+        ? { name: data.name ?? q, pubkey: data.pubkey }
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // ── Player job contracts ("paid bodyguard") ────────────────────────────────
+  // Post a job: returns the unsigned escrow-deposit transaction (base64) for the
+  // payer to sign + submit, plus the assigned job id.
+  async jobQuote(body: {
+    characterId: number;
+    helperName: string;
+    currency: string;
+    amount: number;
+    milestone: unknown;
+  }): Promise<{
+    jobId: string;
+    txBase64: string;
+    jobPda: string;
+    amountBase: string;
+    mint: string;
+    currency: string;
+    deadlineSec: number;
+  }> {
+    return this.post('/api/jobs/quote', body);
+  }
+
+  // Confirm the deposit landed (server verifies on-chain), opening the job.
+  async jobConfirm(jobId: string, signature: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/confirm`, { signature });
+  }
+
+  // The helper accepts an offered job; the server begins tracking the milestone.
+  async jobAccept(jobId: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/accept`, {});
+  }
+
+  // The payer cancels an unaccepted job → refund.
+  async jobCancel(jobId: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/cancel`, {});
+  }
+
+  // Jobs this character posted or was hired for (newest first). Best-effort.
+  async jobs(characterId: number): Promise<JobSummary[]> {
+    try {
+      const data = await this.get(
+        `/api/jobs?characterId=${encodeURIComponent(String(characterId))}`,
+      );
+      return Array.isArray(data.jobs) ? data.jobs : [];
+    } catch {
+      return [];
+    }
+  }
+
+  // ── $WOC paid identity actions (rename / guild rename / vanity reserve) ─────
+  // Public per-action prices in human-readable $WOC, for showing the cost up front.
+  async identityPrices(): Promise<{
+    rename_character: number;
+    rename_guild: number;
+    reserve_name: number;
+  }> {
+    return this.get('/api/identity/prices');
+  }
+
+  // Quote a burn price for an action. `body.kind` is one of
+  // 'rename_character' | 'rename_guild' | 'reserve_name'.
+  async identityQuote(body: {
+    kind: string;
+    characterId?: number;
+    name: string;
+  }): Promise<WocIdentityQuote> {
+    return this.post('/api/identity/quote', body);
+  }
+
+  // Redeem a paid quote with the on-chain signature. Reads the response directly
+  // (not through post()) because the caller needs the status + `reason` to drive
+  // the "wait for finalization" retry — post() collapses those into a message.
+  async identityConfirm(
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    return this.confirmRaw('/api/identity/confirm', quoteId, signature);
+  }
+
+  // ── SNS subdomain mint + tradeable-character claim (PR #735) ────────────────
+  // Quote the atomic burn + subdomain mint; returns a server-built, partial-signed
+  // transaction (base64) for the player to sign + submit.
+  async subdomainQuote(body: { characterId: number; name: string }): Promise<{
+    quoteId: string;
+    txBase64: string;
+    label: string;
+    fullDomain: string;
+    priceWoc: number;
+    payer: string;
+    expiresAt: number;
+  }> {
+    return this.post('/api/subdomain/quote', body);
+  }
+
+  async subdomainConfirm(
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    return this.confirmRaw('/api/subdomain/confirm', quoteId, signature);
+  }
+
+  // Claim a tradeable character whose subdomain your linked wallet now owns.
+  async claimCharacter(characterId: number): Promise<any> {
+    return this.post(`/api/characters/${characterId}/claim`, {});
+  }
+
+  // Shared confirm helper: surfaces status + `reason` so callers can poll for
+  // 'not_finalized' without post() collapsing the response into a message.
+  private async confirmRaw(
+    path: string,
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    const res = await fetch(this.base + path, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
+      body: JSON.stringify({ quoteId, signature }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, reason: data.reason, data };
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL

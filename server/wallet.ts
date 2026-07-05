@@ -5,21 +5,22 @@
 // short-lived, single-use challenge message, the player signs it with their
 // wallet (Solana = ed25519 over the raw UTF-8 bytes), and we verify the
 // signature here. No private keys, seeds, or funds ever touch the server.
-import type http from 'node:http';
+
 import { randomBytes } from 'node:crypto';
-import { json, readBody } from './http_util';
-import { isSolanaAddress, verifySolanaSignature, buildLinkMessage } from './wallet_link';
-import { walletLinkRateLimited } from './ratelimit';
-import { recordUsageMetric } from './provider_usage';
+import type http from 'node:http';
 import {
-  createWalletChallenge,
   consumeWalletChallenge,
-  pruneWalletChallenges,
+  createWalletChallenge,
   linkWalletToAccount,
+  pruneWalletChallenges,
+  unlinkWallet,
   walletForAccount,
   walletForCharacterName,
-  unlinkWallet,
 } from './db';
+import { json, readBody } from './http_util';
+import { recordUsageMetric } from './provider_usage';
+import { walletLinkRateLimited } from './ratelimit';
+import { buildLinkMessage, isSolanaAddress, verifySolanaSignature } from './wallet_link';
 
 const CHALLENGE_TTL_MINUTES = 10;
 
@@ -46,7 +47,13 @@ export async function handleWalletChallenge(
   await pruneWalletChallenges();
   const nonce = randomBytes(16).toString('hex');
   const issuedAt = new Date().toISOString();
-  const message = buildLinkMessage({ domain: requestDomain(req), accountId, address, nonce, issuedAt });
+  const message = buildLinkMessage({
+    domain: requestDomain(req),
+    accountId,
+    address,
+    nonce,
+    issuedAt,
+  });
   await createWalletChallenge(nonce, accountId, address, message, CHALLENGE_TTL_MINUTES);
   return json(res, 200, { nonce, message });
 }

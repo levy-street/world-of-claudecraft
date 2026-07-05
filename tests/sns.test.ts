@@ -2,8 +2,8 @@
 // display name into a valid, squat-resistant SNS subdomain label, and composing
 // the full subdomain string. (The on-chain mint/resolve paths need a funded
 // execution wallet + live RPC and are exercised via the devnet e2e, not here.)
-import { describe, it, expect } from 'vitest';
-import { slugifyLabel, fullSubdomain } from '../server/sns';
+import { describe, expect, it } from 'vitest';
+import { fullSubdomain, slugifyLabel } from '../server/sns';
 
 describe('slugifyLabel', () => {
   it('lowercases and hyphenates a display name', () => {

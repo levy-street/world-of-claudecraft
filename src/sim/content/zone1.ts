@@ -646,13 +646,6 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     questIds: ['q_skyward_first_flight', 'q_skyward_time_trial', 'q_skyward_ascendant'],
     greeting: 'The sky is a road few dare to walk, $C. Earn it, and it carries you.',
   },
-  skytrial_master: {
-    id: 'skytrial_master', name: 'Skymaster Vael', title: 'Warden of the Skytrials',
-    // stands on the rise beside the Vale Skytrial rings (course centred at 38,138)
-    pos: { x: 44, z: 138 }, facing: Math.PI, color: 0xb8860b,
-    questIds: ['q_skyward_first_flight', 'q_skyward_time_trial', 'q_skyward_ascendant'],
-    greeting: 'The sky is a road few dare to walk, $C. Earn it, and it carries you.',
-  },
 };
 
 // ---------------------------------------------------------------------------

@@ -9,19 +9,32 @@
 // than pull in @coral-xyz/anchor, mirroring how server/sns.ts composes raw
 // instructions and keeping the server's dependency set tiny.
 import { createHash } from 'node:crypto';
-import { Connection, Keypair, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 import {
-  TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
   createAssociatedTokenAccountIdempotentInstruction,
+  getAssociatedTokenAddressSync,
+  TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
-import bs58 from 'bs58';
 import {
-  SOLANA_RPC_URL, WOC_MINT, WOC_DECIMALS, USDC_MINT, USDC_DECIMALS,
-  JOBS_ENABLED, JOB_ESCROW_PROGRAM_ID, JOB_ESCROW_SETTLER_SECRET,
+  Connection,
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js';
+import bs58 from 'bs58';
+import { getFinalizedTx, ownerSpentBase, txSucceeded, usesToken2022 } from './solana_tx';
+import {
+  JOB_ESCROW_PROGRAM_ID,
+  JOB_ESCROW_SETTLER_SECRET,
+  JOBS_ENABLED,
+  SOLANA_RPC_URL,
+  USDC_DECIMALS,
+  USDC_MINT,
+  WOC_DECIMALS,
+  WOC_MINT,
 } from './woc_config';
-import { getFinalizedTx, txSucceeded, usesToken2022, ownerSpentBase } from './solana_tx';
 
 // Currencies that escrow cleanly as SPL tokens. SOL is supported for direct tips
 // (see src/net/wallet) but not for held escrow in v1 — escrowing native SOL needs
@@ -82,7 +95,9 @@ export function settlerKeypair(): Keypair {
     throw new Error('JOB_ESCROW_SETTLER_SECRET is not set — job escrow is unavailable');
   }
   const raw = JOB_ESCROW_SETTLER_SECRET;
-  const bytes = raw.startsWith('[') ? Uint8Array.from(JSON.parse(raw) as number[]) : bs58.decode(raw);
+  const bytes = raw.startsWith('[')
+    ? Uint8Array.from(JSON.parse(raw) as number[])
+    : bs58.decode(raw);
   _settler = Keypair.fromSecretKey(bytes);
   return _settler;
 }
@@ -115,8 +130,8 @@ function vaultFor(job: PublicKey, mint: PublicKey): PublicKey {
 
 export interface OpenArgs {
   jobId: bigint;
-  payer: string;     // the payer's wallet (fee payer + funder)
-  helper: string;    // the helper's wallet (release recipient; recorded on-chain)
+  payer: string; // the payer's wallet (fee payer + funder)
+  helper: string; // the helper's wallet (release recipient; recorded on-chain)
   mint: string;
   amountBase: bigint;
 }
@@ -126,7 +141,9 @@ export interface OpenArgs {
  * fee payer and the only required signer; the client signs + submits it. Returns
  * the base64 tx plus the derived job/vault addresses for the DB record.
  */
-export async function buildOpenTransaction(args: OpenArgs): Promise<{ txBase64: string; jobPda: string; vault: string }> {
+export async function buildOpenTransaction(
+  args: OpenArgs,
+): Promise<{ txBase64: string; jobPda: string; vault: string }> {
   const payer = new PublicKey(args.payer);
   const helper = new PublicKey(args.helper);
   const mint = new PublicKey(args.mint);
@@ -169,7 +186,14 @@ export async function buildOpenTransaction(args: OpenArgs): Promise<{ txBase64: 
  * succeeded, it isn't a Token-2022 look-alike, the payer spent at least the
  * reward, the job PDA exists under our program, and the vault holds the amount.
  */
-export async function verifyDeposit(args: { signature: string; jobId: bigint; payer: string; helper: string; mint: string; amountBase: bigint }): Promise<boolean> {
+export async function verifyDeposit(args: {
+  signature: string;
+  jobId: bigint;
+  payer: string;
+  helper: string;
+  mint: string;
+  amountBase: bigint;
+}): Promise<boolean> {
   const tx = await getFinalizedTx(args.signature);
   if (!tx || !txSucceeded(tx)) return false;
   if (usesToken2022(tx, args.mint)) return false;
@@ -177,7 +201,12 @@ export async function verifyDeposit(args: { signature: string; jobId: bigint; pa
   return verifyJobState(args.jobId, args);
 }
 
-export interface JobTerms { payer: string; helper: string; mint: string; amountBase: bigint }
+export interface JobTerms {
+  payer: string;
+  helper: string;
+  mint: string;
+  amountBase: bigint;
+}
 
 /**
  * Confirm the on-chain escrow for `jobId` exists under our program, was opened on
@@ -201,21 +230,35 @@ export async function verifyJobState(jobId: bigint, terms: JobTerms): Promise<bo
   if (decoded.amount !== terms.amountBase) return false;
 
   const vault = vaultFor(job, new PublicKey(terms.mint));
-  const bal = await connection().getTokenAccountBalance(vault, 'finalized').catch(() => null);
+  const bal = await connection()
+    .getTokenAccountBalance(vault, 'finalized')
+    .catch(() => null);
   return !!bal && BigInt(bal.value.amount) >= terms.amountBase;
 }
 
 // Decode the Anchor `Job` account: 8-byte discriminator, then job_id u64, payer,
 // helper, mint pubkeys, amount u64, settler, vault pubkeys, bump u8 — matching
 // programs/job-escrow/src/lib.rs. Returns null if the buffer is too short.
-function decodeJobAccount(data: Buffer): { payer: PublicKey; helper: PublicKey; mint: PublicKey; amount: bigint; settler: PublicKey; vault: PublicKey } | null {
+function decodeJobAccount(data: Buffer): {
+  payer: PublicKey;
+  helper: PublicKey;
+  mint: PublicKey;
+  amount: bigint;
+  settler: PublicKey;
+  vault: PublicKey;
+} | null {
   if (data.length < 8 + 8 + 32 + 32 + 32 + 8 + 32 + 32 + 1) return null;
   let o = 8 + 8; // skip discriminator + job_id
-  const payer = new PublicKey(data.subarray(o, o + 32)); o += 32;
-  const helper = new PublicKey(data.subarray(o, o + 32)); o += 32;
-  const mint = new PublicKey(data.subarray(o, o + 32)); o += 32;
-  const amount = data.readBigUInt64LE(o); o += 8;
-  const settler = new PublicKey(data.subarray(o, o + 32)); o += 32;
+  const payer = new PublicKey(data.subarray(o, o + 32));
+  o += 32;
+  const helper = new PublicKey(data.subarray(o, o + 32));
+  o += 32;
+  const mint = new PublicKey(data.subarray(o, o + 32));
+  o += 32;
+  const amount = data.readBigUInt64LE(o);
+  o += 8;
+  const settler = new PublicKey(data.subarray(o, o + 32));
+  o += 32;
   const vault = new PublicKey(data.subarray(o, o + 32));
   return { payer, helper, mint, amount, settler, vault };
 }
@@ -238,7 +281,12 @@ async function signAndSendSettler(ixs: TransactionInstruction[]): Promise<string
  * program's `release`, which pays the helper and closes the vault + job. Returns
  * the confirmed signature.
  */
-export async function releaseJob(args: { jobId: bigint; payer: string; helper: string; mint: string }): Promise<string> {
+export async function releaseJob(args: {
+  jobId: bigint;
+  payer: string;
+  helper: string;
+  mint: string;
+}): Promise<string> {
   const settler = settlerKeypair().publicKey;
   const payer = new PublicKey(args.payer);
   const helper = new PublicKey(args.helper);
@@ -269,7 +317,11 @@ export async function releaseJob(args: { jobId: bigint; payer: string; helper: s
  * payer's token account (in case they closed it), then runs `refund`, which
  * returns the funds and closes the vault + job. Returns the confirmed signature.
  */
-export async function refundJob(args: { jobId: bigint; payer: string; mint: string }): Promise<string> {
+export async function refundJob(args: {
+  jobId: bigint;
+  payer: string;
+  mint: string;
+}): Promise<string> {
   const settler = settlerKeypair().publicKey;
   const payer = new PublicKey(args.payer);
   const mint = new PublicKey(args.mint);
