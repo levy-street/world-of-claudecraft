@@ -272,7 +272,7 @@ class Wizard {
       el(
         'div',
         { class: 'wz-note' },
-        'Kaykit chibi style is added automatically. Generating a model spends Tripo credits.',
+        'Kaykit chibi style is added automatically. Generating a model spends about 45 to 65 Tripo credits ($0.45 to $0.65).',
       ),
       el(
         'div',
@@ -394,6 +394,13 @@ class Wizard {
         texIn,
       ),
       el('div', { class: 'wz-field' }, el('label', {}, 'Texture quality'), texQual),
+      el(
+        'div',
+        { class: 'wz-note' },
+        s.lane === 'creature'
+          ? 'Costs: regenerate model ~45-65 cr ($0.45-0.65), repaint texture ~30-40 cr ($0.30-0.40), animations ~105 cr ($1.05). 1 credit = $0.01.'
+          : 'Costs: regenerate model ~45-65 cr ($0.45-0.65), repaint texture ~30-40 cr ($0.30-0.40); finishing is local and free. 1 credit = $0.01.',
+      ),
       this.logBox(),
       el(
         'div',
@@ -484,6 +491,13 @@ class Wizard {
             'Validation warnings: ' + (val.errors || val.warnings || []).join('; '),
           )
         : null,
+      el(
+        'div',
+        { class: 'wz-note' },
+        s.lane === 'creature'
+          ? 'Costs: regenerate animations ~80 cr ($0.80, the rig is kept); approve and save is free. 1 credit = $0.01.'
+          : 'Costs: regenerate model ~45-65 cr ($0.45-0.65); approve and save is free. 1 credit = $0.01.',
+      ),
       this.logBox(),
       el(
         'div',
@@ -667,8 +681,8 @@ class Wizard {
       field(
         'Model quality',
         sel('model', [
-          ['lowpoly', 'Low-poly (game, default)'],
-          ['hifi', 'High fidelity (H-series, more credits)'],
+          ['lowpoly', 'Low-poly (game, default, ~40-50 cr)'],
+          ['hifi', 'High fidelity (H-series, ~20-30 cr, denser mesh)'],
         ]),
       ),
     ];
