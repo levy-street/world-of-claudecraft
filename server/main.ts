@@ -45,6 +45,11 @@ import {
   verifyPassword,
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import {
+  accountControlsBoundCharacter,
+  handleCharacterClaim,
+  registerClaimHooks,
+} from './character_claim';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
@@ -180,6 +185,11 @@ import { handleSitePresenceHeartbeat } from './site_presence';
 import { validateGuildName } from './social';
 import { adminRolesForAccount } from './staff_db';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
+import {
+  handleSubdomainConfirm,
+  handleSubdomainPrices,
+  handleSubdomainQuote,
+} from './subdomain_mint';
 import { passesTurnstile } from './turnstile';
 import {
   MAX_ASSET_BYTES,
@@ -196,7 +206,7 @@ import {
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
-import { WOC_IDENTITY_ENABLED } from './woc_config';
+import { CHARACTER_TRADEABLE, WOC_IDENTITY_ENABLED } from './woc_config';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -271,6 +281,24 @@ registerIdentityActions(
     },
   }),
 );
+
+// Tradeable-character claim effects: kick the prior owner's live session and
+// detach the character from its guild before the account reassignment.
+// Registered unconditionally; the claim route is fail-closed behind
+// WOC_SNS_ENABLED + CHARACTER_TRADEABLE (see server/character_claim.ts).
+registerClaimHooks({
+  isCharacterOnline: (characterId) =>
+    [...game.clients.values()].some((s) => s.characterId === characterId),
+  disconnectCharacter: (characterId, reason) => {
+    const session = [...game.clients.values()].find((s) => s.characterId === characterId);
+    if (session) game.disconnectAccount(session.accountId, reason);
+  },
+  leaveGuildOnTransfer: async (characterId) => {
+    const session = [...game.clients.values()].find((s) => s.characterId === characterId);
+    const name = session?.name ?? (await getCharacterById(characterId))?.name ?? '';
+    await game.social.guildLeave({ characterId, name });
+  },
+});
 
 // Map editor persistence: the shared business rules (maps.ts / user_assets.ts)
 // wired to their Postgres backends, mirroring the SocialService/SocialDb split.
@@ -1015,6 +1043,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     const renameMatch = /^\/api\/characters\/(\d+)\/rename$/.exec(url);
     const takeoverMatch = /^\/api\/characters\/(\d+)\/takeover$/.exec(url);
     const standingMatch = /^\/api\/characters\/(\d+)\/standing$/.exec(url);
+    const claimMatch = /^\/api\/characters\/(\d+)\/claim$/.exec(url);
+    // Tradeable-character claim (fail-closed inside the handler).
+    if (req.method === 'POST' && claimMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleCharacterClaim(req, res, accountId, Number(claimMatch[1]));
+    }
     if (req.method === 'GET' && standingMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -1494,6 +1529,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleIdentityConfirm(req, res, accountId);
+    }
+    // Atomic $WOC burn + player-owned SNS subdomain mint. Same quote/confirm
+    // contract as the identity routes; fail-closed behind WOC_SNS_ENABLED (the
+    // prices probe 404s while off, which hides the client entry points).
+    if (req.method === 'GET' && url === '/api/subdomain/prices') {
+      return handleSubdomainPrices(res);
+    }
+    if (req.method === 'POST' && url === '/api/subdomain/quote') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleSubdomainQuote(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/subdomain/confirm') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleSubdomainConfirm(req, res, accountId);
     }
     // Discord integration: OAuth login/link, link status, unlink. `start` returns
     // the authorize URL (the browser then navigates to Discord); `callback` is the
@@ -2005,6 +2056,23 @@ async function main(): Promise<void> {
         JSON.stringify({
           t: 'error',
           error: 'This character must be renamed before entering the world.',
+        }),
+      );
+      ws.close();
+      return;
+    }
+    // Tradeable-character gate: a bound character can only enter the world
+    // while the account's linked wallet still controls its subdomain on-chain.
+    // If the name was sold or transferred, the new owner must claim it first.
+    if (
+      CHARACTER_TRADEABLE &&
+      character.bound_domain &&
+      !(await accountControlsBoundCharacter(accountId, character.bound_domain))
+    ) {
+      ws.send(
+        JSON.stringify({
+          t: 'error',
+          error: 'This character was transferred to a new owner and must be re-claimed.',
         }),
       );
       ws.close();
