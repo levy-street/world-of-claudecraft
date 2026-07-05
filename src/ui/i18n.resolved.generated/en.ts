@@ -512,7 +512,9 @@ export const en: EnTranslations = {
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
       "names": {
-        "spellPower": "Spell Power"
+        "spellPower": "Spell Power",
+        "critRating": "Crit Rating",
+        "hasteRating": "Haste Rating"
       },
       "desc": {
         "str": "Increases your attack power, so your weapon strikes land harder.",
@@ -525,7 +527,9 @@ export const en: EnTranslations = {
         "spellPower": "Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.",
         "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
-        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage."
+        "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
+        "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste."
       },
       "effects": {
         "attackPower": "+{value} Attack Power",

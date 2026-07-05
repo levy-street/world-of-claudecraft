@@ -3877,6 +3877,8 @@ export class Hud {
       spellPower: p.spellPower,
       critChance: p.critChance,
       dodgeChance: p.dodgeChance,
+      critRating: p.critRating,
+      hasteRating: p.hasteRating,
       dps: weaponDps(wpn?.weapon, p.attackPower),
       gear,
       buffs,

@@ -36,6 +36,15 @@ export const DUNGEON_LEASH_DISTANCE = 70;
 // updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
 export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
 export const GCD = 1.5; // seconds
+// Combat ratings are gear-facing stats converted to fractions in recalcPlayerStats.
+export const HASTE_RATING_PER_PCT = 10; // 10 haste rating = 1% faster
+export const CRIT_RATING_PER_PCT = 10; // 10 crit rating = +1% crit chance
+export function hasteFractionFromRating(rating: number): number {
+  return rating / (HASTE_RATING_PER_PCT * 100);
+}
+export function critFractionFromRating(rating: number): number {
+  return rating / (CRIT_RATING_PER_PCT * 100);
+}
 // Shared cooldown across ALL combat potions (classic-era potion sickness): one
 // potion locks every other potion for this long (#103). 2 minutes, the classic-era value.
 export const POTION_COOLDOWN = 120; // seconds
@@ -311,6 +320,9 @@ interface BaseItemDef {
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
+  // Combat ratings, converted to crit%/haste% in recalcPlayerStats.
+  critRating?: number;
+  hasteRating?: number;
   use?: ItemUse;
   sellValue: number; // copper (vendor buys at this)
   buyValue?: number; // copper (vendor sells at this)
@@ -362,10 +374,12 @@ export interface SetBonusEffect {
   spi?: number;
   ap?: number; // flat attack power
   crit?: number; // flat crit chance, 0..1
+  critRating?: number; // crit rating (converted to % in recalcPlayerStats)
   // Haste fraction (0.15 = 15% faster). ONE stat: it speeds melee and ranged
   // auto-attack swings AND shortens spell cast/channel time, all together
   // (folded into Entity.meleeHaste/rangedHaste/spellHaste in recalcPlayerStats).
   haste?: number;
+  hasteRating?: number; // haste rating (converted to % in recalcPlayerStats)
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
 }
@@ -1483,6 +1497,8 @@ export interface Entity {
   rangedHaste: number;
   spellHaste: number;
   critChance: number; // 0..1
+  critRating: number; // accumulated crit rating from gear + set bonuses
+  hasteRating: number; // accumulated haste rating from gear + set bonuses
   dodgeChance: number;
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)

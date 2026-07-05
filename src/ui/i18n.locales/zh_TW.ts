@@ -209,6 +209,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
+  'hudChrome.statInfo.names.critRating': '暴擊等級',
+  'hudChrome.statInfo.names.hasteRating': '急速等級',
+  'hudChrome.statInfo.desc.critRating': '來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。',
+  'hudChrome.statInfo.desc.hasteRating': '來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。',
   'hudChrome.statInfo.desc.spellPower':
     '提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。',
   'hudChrome.statInfo.sources.header': '構成：',

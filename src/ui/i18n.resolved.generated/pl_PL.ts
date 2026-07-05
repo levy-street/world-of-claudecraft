@@ -512,7 +512,9 @@ export const pl_PL: EnTranslations = {
     "statInfo": {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
       "names": {
-        "spellPower": "Moc zaklęć"
+        "spellPower": "Moc zaklęć",
+        "critRating": "Crit Rating",
+        "hasteRating": "Haste Rating"
       },
       "desc": {
         "str": "Zwiększa twoją moc ataku, więc twoje ciosy bronią są mocniejsze.",
@@ -525,7 +527,9 @@ export const pl_PL: EnTranslations = {
         "spellPower": "Zwiększa obrażenia twoich zaklęć i siłę leczenia. Każdy punkt Intelektu zapewnia odrobinę Mocy zaklęć, dodatkowo do tej z ekwipunku lub wzmocnień.",
         "dps": "Twoje szacowane obrażenia bronią na sekundę, łączące obrażenia i szybkość twojej broni z mocą ataku.",
         "critChance": "Twoja szansa na zadanie ataku krytycznego, zadającego podwójne obrażenia.",
-        "dodge": "Twoja szansa na całkowite uniknięcie nadchodzącego ataku wręcz, bez otrzymania obrażeń."
+        "dodge": "Twoja szansa na całkowite uniknięcie nadchodzącego ataku wręcz, bez otrzymania obrażeń.",
+        "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste."
       },
       "effects": {
         "attackPower": "+{value} mocy ataku",

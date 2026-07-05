@@ -512,7 +512,9 @@ export const ko_KR: EnTranslations = {
     "statInfo": {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
-        "spellPower": "주문력"
+        "spellPower": "주문력",
+        "critRating": "치명타 등급",
+        "hasteRating": "가속 등급"
       },
       "desc": {
         "str": "전투력을 증가시켜 무기 공격이 더 강하게 적중하도록 합니다.",
@@ -525,7 +527,9 @@ export const ko_KR: EnTranslations = {
         "spellPower": "주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.",
         "dps": "무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.",
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
-        "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다."
+        "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
+        "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
+        "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속."
       },
       "effects": {
         "attackPower": "+{value} 전투력",

@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
+  SET_CRIT_3PC_RATING,
   SET_CROWNFORGED,
   SET_DEATHLORD,
   SET_NECROMANCERS,
-  SET_NIGHTTALON,
   SET_SOULFLAME,
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
@@ -40,7 +40,9 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       spi: 0,
       ap: 0,
       crit: 0,
+      critRating: 0,
       haste: 0,
+      hasteRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
     });
@@ -62,7 +64,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     const three = aggregateSetBonuses(counts({ [SET_WYRMSHADOW]: 3 }));
     expect(three.ap).toBe(40);
     expect(three.agi).toBe(15);
-    expect(three.crit).toBeCloseTo(0.02);
+    expect(three.critRating).toBe(SET_CRIT_3PC_RATING);
   });
 
   it('caster sets: 2pc grants knockback resistance, 3pc grants tier stats', () => {

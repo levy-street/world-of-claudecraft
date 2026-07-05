@@ -217,6 +217,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // Character-sheet stat tooltips (hudChrome.statInfo.*).
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
+  'hudChrome.statInfo.names.critRating': '치명타 등급',
+  'hudChrome.statInfo.names.hasteRating': '가속 등급',
+  'hudChrome.statInfo.desc.critRating': '장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.',
+  'hudChrome.statInfo.desc.hasteRating': '장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.',
   'hudChrome.statInfo.desc.spellPower':
     '주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.',
   'hudChrome.statInfo.sources.header': '구성:',

@@ -512,7 +512,9 @@ export const sv_SE: EnTranslations = {
     "statInfo": {
       "fromYour": "Från dina {value} {stat}:",
       "names": {
-        "spellPower": "Besvärjelsekraft"
+        "spellPower": "Besvärjelsekraft",
+        "critRating": "Crit Rating",
+        "hasteRating": "Haste Rating"
       },
       "desc": {
         "str": "Ökar din attackstyrka, så att dina vapenslag landar hårdare.",
@@ -525,7 +527,9 @@ export const sv_SE: EnTranslations = {
         "spellPower": "Ökar skadan från dina besvärjelser och styrkan i dina läkningar. Varje poäng Intellekt ger lite Besvärjelsekraft, utöver det från utrustning eller förstärkningar.",
         "dps": "Din uppskattade vapenskada per sekund, som kombinerar ditt vapens skada och hastighet med din attackstyrka.",
         "critChance": "Din chans att en attack träffar kritiskt och orsakar dubbel skada.",
-        "dodge": "Din chans att helt undvika en inkommande närstridsattack utan att ta skada."
+        "dodge": "Din chans att helt undvika en inkommande närstridsattack utan att ta skada.",
+        "critRating": "Crit rating from your gear and set bonuses, raising your critical strike chance. About 10 rating grants 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. About 10 rating grants 1% haste."
       },
       "effects": {
         "attackPower": "+{value} Attackstyrka",

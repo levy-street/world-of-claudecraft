@@ -9,24 +9,94 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "es_ES": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "fr_FR": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "fr_CA": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "de_DE": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "pl_PL": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "id_ID": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "tr_TR": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "sv_SE": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "vi_VN": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ],
+  "da_DK": [
+    "hudChrome.statInfo.desc.critRating",
+    "hudChrome.statInfo.desc.hasteRating",
+    "hudChrome.statInfo.names.critRating",
+    "hudChrome.statInfo.names.hasteRating"
+  ]
 };
