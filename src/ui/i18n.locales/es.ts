@@ -5985,4 +5985,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Lo que hiciste en la oscuridad',
   'entities.letters.letter_q_hollow.body':
     'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
+  'hudChrome.gathering.herbalism': 'Herboristería',
+  'hudChrome.gathering.logging': 'Tala',
+  'hudChrome.gathering.mining': 'Minería',
+  'hudChrome.gathering.title': 'Recolección',
 };

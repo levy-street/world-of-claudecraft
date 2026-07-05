@@ -6014,4 +6014,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Was Ihr im Dunkeln vollbracht habt',
   'entities.letters.letter_q_hollow.body':
     'Nur wenige werden je erfahren, was in jener Senke begraben lag, und noch weniger würden es glauben. Ich weiß es, und ich werde es nicht vergessen.\n\nMöge Euer Weg erleuchtet bleiben.\n- Bruder Aldric',
+  'hudChrome.gathering.herbalism': 'Kräuterkunde',
+  'hudChrome.gathering.logging': 'Holzfällen',
+  'hudChrome.gathering.mining': 'Bergbau',
+  'hudChrome.gathering.title': 'Sammeln',
 };

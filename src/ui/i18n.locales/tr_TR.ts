@@ -5860,4 +5860,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Karanlıkta yaptıkların',
   'entities.letters.letter_q_hollow.body':
     'O çukurda neyin gömülü olduğunu çok az kişi bilecek, inanacak olansa daha da az. Ben biliyorum ve unutmayacağım.\n\nYolun hep aydınlık olsun.\n- Birader Aldric',
+  'hudChrome.gathering.herbalism': 'Bitkicilik',
+  'hudChrome.gathering.logging': 'Ağaç kesme',
+  'hudChrome.gathering.mining': 'Madencilik',
+  'hudChrome.gathering.title': 'Toplama',
 };

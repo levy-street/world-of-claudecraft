@@ -5956,4 +5956,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'O que você fez na escuridão',
   'entities.letters.letter_q_hollow.body':
     'Poucos saberão o que estava enterrado naquela baixada, e menos ainda acreditariam. Eu sei, e não vou esquecer.\n\nQue seu caminho continue iluminado.\n- Irmão Aldric',
+  'hudChrome.gathering.herbalism': 'Herborismo',
+  'hudChrome.gathering.logging': 'Lenharia',
+  'hudChrome.gathering.mining': 'Mineração',
+  'hudChrome.gathering.title': 'Coleta',
 };

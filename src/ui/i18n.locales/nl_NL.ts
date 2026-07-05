@@ -5944,4 +5944,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Wat je in het donker hebt gedaan',
   'entities.letters.letter_q_hollow.body':
     'Weinigen zullen ooit weten wat er in die kom begraven lag, en nog minder zouden het geloven. Ik weet het, en ik zal het niet vergeten.\n\nMoge je pad verlicht blijven.\n- Broeder Aldric',
+  'hudChrome.gathering.herbalism': 'Kruidenkunde',
+  'hudChrome.gathering.logging': 'Houtkap',
+  'hudChrome.gathering.mining': 'Mijnbouw',
+  'hudChrome.gathering.title': 'Verzamelen',
 };

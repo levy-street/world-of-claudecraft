@@ -2180,7 +2180,6 @@ interface IconRecipe {
 // corner-badge / backdrop placement shorthand
 const TL = { x: -13, y: -13, s: 0.45 } as const;
 const TR = { x: 13, y: -13, s: 0.45 } as const;
-const BL = { x: -13, y: 13, s: 0.45 } as const;
 const BR = { x: 13, y: 13, s: 0.45 } as const;
 const BIG = { s: 1.15, alpha: 0.35 } as const;
 
@@ -2918,11 +2917,17 @@ function itemFallback(id: string): IconRecipe | null {
 
 const SPECK_COUNT = 40;
 
+function getCanvas2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D canvas context is unavailable');
+  return ctx;
+}
+
 function compose(recipe: IconRecipe, seedKey: string, size: number): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = getCanvas2d(canvas);
   ctx.scale(size / 100, size / 100);
 
   ctx.save();
@@ -3229,10 +3234,13 @@ export function abilityImageUrl(id: string): string | null {
 }
 
 // Item ids with committed painted art under /ui/items/<id>.webp (curated from the CraftPix
-// resource/consumable packs; provenance + license in public/ui/items/mapping.json). Served
-// for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Items not listed fall
-// through to the procedural ITEM_RECIPES below. WebP only, like the skill icons. Add art via
-// `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
+// resource/consumable AND armor/equipment packs; provenance + license in
+// public/ui/items/mapping.json). Served for kind 'item' (bags, tooltips, loot, vendor, the
+// /wiki guide). Covers everything except weapons, which keep their rendered-model thumbnails
+// via WEAPON_ICON_DIR; items not listed fall through to the procedural ITEM_RECIPES below.
+// For armor the icon is purely cosmetic (rarity colour still comes from item.quality), and the
+// flashier icons are reserved for higher-rarity pieces. WebP only, like the skill icons. Add
+// art via `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
 const ITEM_ICON_DIR = '/ui/items';
 export const ITEM_IMAGE_IDS = new Set<string>([
   // food
@@ -3343,6 +3351,176 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'simple_fishing_pole',
   'steel_orange_armor_plate',
   'vanguard_azure_armor_plate',
+  // equipment (CraftPix premium armor/helmet/boot/glove/greave/belt/jewelry + equipment packs;
+  // curated per slot with rarity allocated by icon richness). Weapons are excluded: they keep
+  // their rendered-model thumbnails via WEAPON_ICON_DIR.
+  // armor - chest
+  'apprentice_robe',
+  'bogiron_hauberk',
+  'boneguard_breastplate',
+  'boneplate_vest',
+  'bramblehide_jerkin',
+  'broodmother_silk_robe',
+  'caravan_quilted_vest',
+  'cryptstalker_jerkin',
+  'deathlord_warplate',
+  'drownedguard_breastplate',
+  'eastbrook_chain_vest',
+  'fenmist_robe',
+  'footpad_jerkin',
+  'gravewoven_raiment',
+  'gravewyrm_scale_hauberk',
+  'highwatch_breastplate',
+  'hollowbone_hauberk',
+  'marshcloth_robe',
+  'militia_vest',
+  'mirejaw_scale_vest',
+  'moonshroud_breastplate',
+  'moonshroud_robe',
+  'necromancers_starshroud',
+  'outrider_brigandine',
+  'peakwool_robe',
+  'recruit_tunic',
+  'reedwoven_jerkin',
+  'reliquary_cloth_chest',
+  'reliquary_plate_chest',
+  'revenant_silk_robe',
+  'shadow_jerkin',
+  'skullsmasher_warbelt',
+  'stalkerhide_jerkin',
+  'tanned_leather_jerkin',
+  'tidescale_vest',
+  'valespun_robe',
+  'wanderers_chestguard',
+  'woven_robe',
+  'wyrmcult_grand_robe',
+  'wyrmscale_jerkin',
+  'wyrmshadow_harness',
+  // armor - legs
+  'cryptbone_greaves',
+  'deathlord_legguards',
+  'drowned_prayer_leggings',
+  'eastbrook_wool_trousers',
+  'eelscale_leggings',
+  'emberwing_legguards',
+  'greyjaw_pelt_cloak',
+  'hollowbound_legguards',
+  'knight_commanders_greaves',
+  'korgaths_chainwraps',
+  'necromancers_legwraps',
+  'nhalias_funeral_wraps',
+  'oathbound_greaves',
+  'outrider_legguards',
+  'pilgrims_leggings',
+  'quilted_trousers',
+  'reedwoven_trousers',
+  'reliquary_legs',
+  'stormshard_leggings',
+  'tideguard_greaves',
+  'tidewatchers_wraps',
+  'trail_leggings',
+  'trollhide_leggings',
+  'windguard_leggings',
+  'wyrmshadow_legguards',
+  'ysols_pearl_greaves',
+  // armor - feet
+  'cragmaw_prowlboots',
+  'cragwalker_boots',
+  'deathlord_sabatons',
+  'drogmar_warboots',
+  'drowned_prayer_sandals',
+  'drownstep_sabatons',
+  'drownstep_slippers',
+  'drownstep_treads',
+  'eelscale_treads',
+  'fenwalker_boots',
+  'gravepath_treads',
+  'gravewalker_softboots',
+  'gravewyrm_sabatons',
+  'gravewyrm_stalkers_treads',
+  'greyjaw_hide_boots',
+  'hobnail_boots',
+  'marrowlord_boneboots',
+  'marrowtread_boots',
+  'marshstrider_boots',
+  'milepost_boots',
+  'moggers_stomper_boots',
+  'necromancers_soulsteps',
+  'oiled_boots',
+  'outrider_sabatons',
+  'ridgestalker_treads',
+  'sableweb_slippers',
+  'selthes_seastriders',
+  'sextons_slippers',
+  'tideguard_sabatons',
+  'wyrmcult_soulsteps',
+  'wyrmshadow_treads',
+  // armor - helmet
+  'acolytes_circlet',
+  'boundstone_helm',
+  'crownforged_dreadhelm',
+  'cryptbone_helm',
+  'deacon_reliquary_helm',
+  'deathlords_dread_visage',
+  'monarch_crown_helm',
+  'nighttalon_crown',
+  'reliquary_helm',
+  'roadwardens_helm',
+  'soulflame_cowl',
+  'stormcallers_crown',
+  'varric_shadow_cowl',
+  'wayfarers_hood',
+  // armor - gloves
+  'crownforged_gauntlets',
+  'gravewyrm_gauntlets',
+  'mistveil_grips',
+  'mossy_handwraps',
+  'nighttalon_grips',
+  'reliquary_gloves_rog',
+  'roughspun_gloves',
+  'soulflame_gloves',
+  'stormcallers_handguards',
+  'wyrmshadow_talongrips',
+  // armor - waist
+  'boundstone_girdle',
+  'cragmaw_huntcord',
+  'crownforged_girdle',
+  'mistveil_cord',
+  'nighttalon_waistband',
+  'sableweb_cord',
+  'silk_sash',
+  'soulflame_cord',
+  'stormcallers_waistguard',
+  'sturdy_belt',
+  // bags
+  'linen_pouch',
+  'wolfhide_satchel',
+  // tools (gathering picks/axes/sickles + cosmetic armor-plate skin tokens)
+  'copper_mining_pick',
+  'felling_axe',
+  'gathering_sickle',
+  'handaxe',
+  'iron_mining_pick',
+  'ironbark_axe',
+  'mithril_mining_pick',
+  'orange_steel_armor_plate',
+  'silverleaf_sickle',
+  'vanguard_chrome_armor_plate',
+  // junk
+  'bandit_bandana',
+  'briny_idol',
+  'soggy_moccasin',
+  // food
+  'conjured_bread2',
+  // quest
+  'blessed_wax',
+  'captains_crest',
+  'grave_captain_voss',
+  'grave_sir_aldren',
+  'kings_signet',
+  'ogre_war_totem',
+  'sanctum_key_shard',
+  'unknown_alien_weaponry',
 ]);
 
 /** Static URL of an item's image icon, or null if it uses a recipe. */
@@ -3592,7 +3770,7 @@ export function raidMarkerDataUrl(idx: number): string {
   const canvas = document.createElement('canvas');
   canvas.width = RAID_MARKER_PX;
   canvas.height = RAID_MARKER_PX;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = getCanvas2d(canvas);
   ctx.scale(RAID_MARKER_PX / 100, RAID_MARKER_PX / 100);
   ctx.translate(50, 50);
   drawRaidMarker(ctx, idx);

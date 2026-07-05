@@ -15,11 +15,6 @@ import {
   sessionsByDay,
 } from './admin_db';
 import {
-  listAntibotConfigHistory,
-  loadAntibotConfig,
-  saveAntibotConfigChange,
-} from './antibot_config_db';
-import {
   type AdminPermission,
   ASSIGNABLE_ADMIN_ROLES,
   permissionsForRoles,
@@ -27,6 +22,11 @@ import {
   sanitizeRoles,
 } from './admin_permissions';
 import { adminPathKnown, permissionForAdminRoute } from './admin_routes';
+import {
+  listAntibotConfigHistory,
+  loadAntibotConfig,
+  saveAntibotConfigChange,
+} from './antibot_config_db';
 import { newToken, verifyPassword } from './auth';
 import { getBugReportScreenshot, listBugReports } from './bug_report_db';
 import {

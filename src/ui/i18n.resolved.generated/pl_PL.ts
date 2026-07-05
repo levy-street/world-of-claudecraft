@@ -1197,10 +1197,10 @@ export const pl_PL: EnTranslations = {
       "lastSeenNever": "nigdy"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Zbieractwo",
+      "mining": "Górnictwo",
+      "logging": "Wyrąb",
+      "herbalism": "Zielarstwo"
     }
   },
   "guide": {

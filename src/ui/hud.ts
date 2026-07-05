@@ -96,6 +96,7 @@ import {
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
+import { worldBossIdFromLockout } from '../sim/world_boss';
 import {
   type DailyRewardStatus,
   type DelveRunInfo,
@@ -5794,7 +5795,16 @@ export class Hud {
     const i18n: RaidLockoutI18n = {
       title: t('hudChrome.raidLockout.title'),
       allReady: t('hudChrome.raidLockout.allReady'),
-      raidName: (id) => dungeonDisplayName(id),
+      // A looted world boss shows in the raid-lockout timer under a world-boss lockout id
+      // (see markWorldBossLooted in src/sim/world_boss.ts). worldBossIdFromLockout keeps
+      // the prefix convention in one place: it returns the boss mob id (localize as a mob
+      // name) or null for an ordinary dungeon/raid id.
+      raidName: (id) => {
+        const bossId = worldBossIdFromLockout(id);
+        return bossId !== null
+          ? tEntity({ kind: 'mob', id: bossId, field: 'name' })
+          : dungeonDisplayName(id);
+      },
       duration: (ms) => this.formatLockoutDuration(ms),
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);

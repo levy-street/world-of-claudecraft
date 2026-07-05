@@ -1197,10 +1197,10 @@ export const tr_TR: EnTranslations = {
       "lastSeenNever": "hiç"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Toplama",
+      "mining": "Madencilik",
+      "logging": "Ağaç kesme",
+      "herbalism": "Bitkicilik"
     }
   },
   "guide": {

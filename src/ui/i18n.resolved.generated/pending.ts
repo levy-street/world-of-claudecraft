@@ -10,10 +10,6 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -40,10 +36,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "es_ES": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -70,10 +62,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "fr_FR": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -100,10 +88,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "fr_CA": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -131,10 +115,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -161,10 +141,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "de_DE": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -295,10 +271,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "pt_BR": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -351,10 +323,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "nl_NL": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -381,10 +349,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "pl_PL": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -411,10 +375,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "id_ID": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -441,10 +401,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "tr_TR": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -471,10 +427,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "sv_SE": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -501,10 +453,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "vi_VN": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",
@@ -531,10 +479,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocSeason.wocUnit"
   ],
   "da_DK": [
-    "hudChrome.gathering.herbalism",
-    "hudChrome.gathering.logging",
-    "hudChrome.gathering.mining",
-    "hudChrome.gathering.title",
     "hudChrome.wocSeason.close",
     "hudChrome.wocSeason.colPlayer",
     "hudChrome.wocSeason.colRank",

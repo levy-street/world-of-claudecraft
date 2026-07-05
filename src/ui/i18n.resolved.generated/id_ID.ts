@@ -1197,10 +1197,10 @@ export const id_ID: EnTranslations = {
       "lastSeenNever": "tidak pernah"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Pengumpulan",
+      "mining": "Penambangan",
+      "logging": "Penebangan",
+      "herbalism": "Herbalisme"
     }
   },
   "guide": {

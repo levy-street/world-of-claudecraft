@@ -84,6 +84,9 @@ function baseEntity(id: number, pos: Vec3): Entity {
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
+    aoeSlowTimer: 0,
+    loudYellTimer: 0,
+    loudYellIndex: 0,
     detonateTimer: Infinity,
     mendTimer: 0,
     wardTimer: 0,
@@ -439,6 +442,10 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.stomp) e.stompTimer = template.stomp.every;
   // Telegraph the first Banshee's Wail the same way: one full interval after engage.
   if (template.terrify) e.terrifyTimer = template.terrify.every;
+  // Telegraph the first Howling Gale the same way: one full interval after engage.
+  if (template.aoeSlow) e.aoeSlowTimer = template.aoeSlow.every;
+  // First battle cry one interval in, so a loud boss's engage yell lands alone on the pull.
+  if (template.battleYells) e.loudYellTimer = template.battleYells.every;
   // Telegraph the first Mend the same way: one full interval after engage.
   if (template.mendAlly) e.mendTimer = template.mendAlly.every;
   // Telegraph the first Ward the same way: one full interval after engage.

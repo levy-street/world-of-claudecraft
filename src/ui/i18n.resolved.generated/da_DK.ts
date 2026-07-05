@@ -1197,10 +1197,10 @@ export const da_DK: EnTranslations = {
       "lastSeenNever": "aldrig"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Indsamling",
+      "mining": "Minedrift",
+      "logging": "Skovhugst",
+      "herbalism": "Urtekundskab"
     }
   },
   "guide": {

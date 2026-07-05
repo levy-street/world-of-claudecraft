@@ -154,6 +154,7 @@ const baseEnTable = {
   'mechanic.mountainhide': 'Mountainhide',
   'mechanic.thunderclap': 'Thunderclap',
   'mechanic.stormcall': 'Stormcall',
+  'mechanic.howlingGale': 'Howling Gale',
   'aura.spiderVenom': 'Spider Venom',
   'aura.skullthump': 'Skullthump',
   'aura.blindingPowder': 'Blinding Powder',
@@ -3159,6 +3160,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Mountainhide: 'mechanic.mountainhide',
   Thunderclap: 'mechanic.thunderclap',
   Stormcall: 'mechanic.stormcall',
+  'Howling Gale': 'mechanic.howlingGale',
   // On-hit / DoT / debuff flavor auras applied to players (would otherwise leak raw English
   // in the buff/debuff frame and combat log). Data-driven from src/sim/content/zone*.ts.
   'Spider Venom': 'aura.spiderVenom',

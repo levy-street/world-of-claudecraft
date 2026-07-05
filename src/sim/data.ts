@@ -36,13 +36,13 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
   OVERWORLD_GRAVEYARDS,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
-import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import {
   TEMPLE_CAMPS,

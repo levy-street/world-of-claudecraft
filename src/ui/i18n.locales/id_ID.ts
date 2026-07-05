@@ -5942,4 +5942,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Apa yang kaulakukan dalam gelap',
   'entities.letters.letter_q_hollow.body':
     'Hanya segelintir yang akan tahu apa yang terkubur di lembah itu, dan lebih sedikit lagi yang akan percaya. Aku tahu, dan aku tidak akan melupakannya.\n\nSemoga jalanmu tetap terang.\n- Bruder Aldric',
+  'hudChrome.gathering.herbalism': 'Herbalisme',
+  'hudChrome.gathering.logging': 'Penebangan',
+  'hudChrome.gathering.mining': 'Penambangan',
+  'hudChrome.gathering.title': 'Pengumpulan',
 };

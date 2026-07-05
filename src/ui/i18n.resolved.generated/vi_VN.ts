@@ -1197,10 +1197,10 @@ export const vi_VN: EnTranslations = {
       "lastSeenNever": "chưa bao giờ"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Thu thập",
+      "mining": "Khai mỏ",
+      "logging": "Đốn gỗ",
+      "herbalism": "Thảo dược học"
     }
   },
   "guide": {

@@ -5897,4 +5897,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'To, czego dokonałeś w mroku',
   'entities.letters.letter_q_hollow.body':
     'Niewielu kiedykolwiek się dowie, co było pogrzebane w tamtej kotlinie, a jeszcze mniej by uwierzyło. Ja wiem i nie zapomnę.\n\nNiech twoja droga pozostanie jasna.\n- Brat Aldric',
+  'hudChrome.gathering.herbalism': 'Zielarstwo',
+  'hudChrome.gathering.logging': 'Wyrąb',
+  'hudChrome.gathering.mining': 'Górnictwo',
+  'hudChrome.gathering.title': 'Zbieractwo',
 };

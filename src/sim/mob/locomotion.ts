@@ -276,6 +276,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         mob.leashAnchor = null;
         break;
       }
+      // Anti-kite snare fires while chasing a fleeing target (the kite case).
+      pulseAntiKiteSnare(ctx, mob);
+      pulseLoudYell(ctx, mob);
       const d = dist2d(mob.pos, target.pos);
       if (spell && d <= spell.range) {
         mob.aiState = 'attack';
@@ -302,6 +305,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         break;
       }
       if (ctx.maybeFlee(mob, target)) break;
+      // Anti-kite snare also fires in melee (slows ranged players around the boss).
+      pulseAntiKiteSnare(ctx, mob);
+      pulseLoudYell(ctx, mob);
       const d = dist2d(mob.pos, target.pos);
       const spell = MOBS[mob.templateId]?.petSpell;
       if (spell) {
@@ -569,6 +575,57 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 }
 
+// Howling Gale: the anti-kite snare pulse. A boss whose template declares `aoeSlow`
+// slams every player within `radius` with a movement slow on a fixed cadence. This is
+// the ONE boss pulse that also fires mid-chase (the callers below invoke it from both
+// the chase and attack states): the aoePulse/stomp/bigCast mechanics all gate on the
+// boss being in melee range, which is exactly what lets a ranged kiter hold a
+// sub-run-speed boss out of melee forever so none of them ever land. The snare closes
+// that gap (moveSpeedMult already honors the `slow` aura), then the melee-gated pulses
+// come online once the boss reaches the now-slowed target. Deals no damage and draws
+// no rng, so it is inert for every template without the field and cannot perturb the
+// parity gate. Called once per tick from whichever engaged state the mob is in, so the
+// cadence timer advances exactly once per tick.
+function pulseAntiKiteSnare(ctx: SimContext, mob: Entity): void {
+  const aoeSlow = MOBS[mob.templateId]?.aoeSlow;
+  if (!aoeSlow) return;
+  mob.aoeSlowTimer -= DT;
+  if (mob.aoeSlowTimer > 0) return;
+  mob.aoeSlowTimer = aoeSlow.every;
+  const school = (aoeSlow.school ?? 'nature') as Aura['school'];
+  ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+  for (const meta of ctx.players.values()) {
+    const pe = ctx.entities.get(meta.entityId);
+    if (!pe || pe.dead || dist2d(pe.pos, mob.pos) > aoeSlow.radius) continue;
+    ctx.applyAura(pe, {
+      id: 'aoe_slow',
+      name: aoeSlow.name,
+      kind: 'slow',
+      remaining: aoeSlow.duration,
+      duration: aoeSlow.duration,
+      value: aoeSlow.mult,
+      sourceId: mob.id,
+      school,
+    });
+  }
+}
+
+// Loud boss battle cry: a mob with `battleYells` bellows the next line in its list
+// every `every`s while engaged (from the chase and attack states, like the snare),
+// broadcast at the wide battleYells.range so a "loud" boss is heard across the zone.
+// Cycles the lines in order (loudYellIndex), so it draws no rng and stays parity-inert
+// for every template without the field.
+function pulseLoudYell(ctx: SimContext, mob: Entity): void {
+  const loud = MOBS[mob.templateId]?.battleYells;
+  if (!loud || loud.lines.length === 0) return;
+  mob.loudYellTimer -= DT;
+  if (mob.loudYellTimer > 0) return;
+  mob.loudYellTimer = loud.every;
+  const line = loud.lines[mob.loudYellIndex % loud.lines.length];
+  mob.loudYellIndex = (mob.loudYellIndex + 1) % loud.lines.length;
+  emitMobYell(ctx, mob, line, loud.range);
+}
+
 // An evading mob has reached its spawn (walking or phasing): drop the pull
 // entirely and return to idle at full health, ready to be pulled again.
 export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
@@ -589,6 +646,9 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  mob.aoeSlowTimer = MOBS[mob.templateId]?.aoeSlow?.every ?? 0;
+  mob.loudYellTimer = MOBS[mob.templateId]?.battleYells?.every ?? 0;
+  mob.loudYellIndex = 0;
   mob.mendTimer = MOBS[mob.templateId]?.mendAlly?.every ?? 0;
   mob.wardTimer = MOBS[mob.templateId]?.wardAllies?.every ?? 0;
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;

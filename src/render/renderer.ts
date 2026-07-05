@@ -79,8 +79,8 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
-import { PlacedAssetsView } from './placed_assets';
 import { resolveDirectPickEntityId } from './pick_resolution';
+import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';

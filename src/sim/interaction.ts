@@ -132,12 +132,15 @@ export function lootCorpse(
     if (s.count > 0) bagsFull = true;
   }
   if (bagsFull && !quiet) ctx.error(meta.entityId, 'Your bags are full.');
-  // World-boss daily lockout is consumed by LOOTING, not by the kill: taking any
-  // personal slot from the boss's corpse burns today's roll (rollWorldBossLoot
-  // checks eligibility when the next boss dies). A contributor who never reaches
-  // the corpse keeps their daily and can try again at the next spawn.
+  // The world-boss loot lockout is consumed by LOOTING, not by the kill: taking any
+  // personal slot from the boss's corpse starts the lockout (rollWorldBossLoot checks
+  // eligibility when the next boss dies). A contributor who never reaches the corpse
+  // holds no lockout and can loot again at the next spawn.
   if (tookPersonal && MOBS[mob.templateId]?.worldBoss) {
-    markWorldBossLooted(meta, mob.templateId, ctx.utcDay);
+    // The world-boss loot lockout IS a raid lockout: this one write both gates re-loot
+    // (isWorldBossLootEligible) and renders the countdown in the raid-lockout timer, and
+    // it resets on the same boundary as the dungeon raids (ctx.raidResetMs).
+    markWorldBossLooted(meta, mob.templateId, ctx.raidResetMs(ctx.lockoutNowMs()));
   }
   pruneCorpseLoot(ctx, mob);
   if (p.targetId === mobId) p.targetId = null;

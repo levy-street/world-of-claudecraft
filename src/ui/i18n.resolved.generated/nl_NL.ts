@@ -1197,10 +1197,10 @@ export const nl_NL: EnTranslations = {
       "lastSeenNever": "nooit"
     },
     "gathering": {
-      "title": "Gathering",
-      "mining": "Mining",
-      "logging": "Logging",
-      "herbalism": "Herbalism"
+      "title": "Verzamelen",
+      "mining": "Mijnbouw",
+      "logging": "Houtkap",
+      "herbalism": "Kruidenkunde"
     }
   },
   "guide": {
