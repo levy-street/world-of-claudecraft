@@ -6250,6 +6250,69 @@ export const zh_TW: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "喚雷者腰甲"
+      },
+      "warcamp_dispatch": {
+        "name": "餘燼盟公文"
+      },
+      "slag_heart": {
+        "name": "爐渣之心"
+      },
+      "emberpact_sigil": {
+        "name": "餘燼盟印記"
+      },
+      "kilnborn_core": {
+        "name": "灰顎之核"
+      },
+      "forgehand_gauntlets": {
+        "name": "鑄手鐵手甲"
+      },
+      "forgehand_handwraps": {
+        "name": "鑄手護手"
+      },
+      "forgehand_grips": {
+        "name": "鑄手皮握手甲"
+      },
+      "emberstep_warboots": {
+        "name": "餘燼步戰靴"
+      },
+      "emberstep_slippers": {
+        "name": "餘燼步軟鞋"
+      },
+      "emberstep_treads": {
+        "name": "餘燼步皮靴"
+      },
+      "slagrend_cleaver": {
+        "name": "爐渣裂刃"
+      },
+      "slagfire_scepter": {
+        "name": "爐渣火焰權杖"
+      },
+      "slagglass_shiv": {
+        "name": "爐渣玻璃短刃"
+      },
+      "vorrs_kilnplates": {
+        "name": "沃爾的窯爐鎧甲"
+      },
+      "slagforged_legguards": {
+        "name": "爐渣鍛護腿"
+      },
+      "forgelord_warhelm": {
+        "name": "鑄爐領主戰盔"
+      },
+      "emberweave_cowl": {
+        "name": "餘燼織兜帽"
+      },
+      "slagstalker_hood": {
+        "name": "爐渣潛行者兜帽"
+      },
+      "slag_chunk": {
+        "name": "爐渣塊"
+      },
+      "ember_grit": {
+        "name": "餘燼灰粒"
+      },
+      "cult_brand": {
+        "name": "餘燼盟烙印"
       }
     },
     "mobs": {
@@ -6481,6 +6544,45 @@ export const zh_TW: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
       },
+      "emberpact_zealot": {
+        "name": "餘燼盟狂信者"
+      },
+      "cinderhound": {
+        "name": "餘燼獵犬"
+      },
+      "ashmaw_kilnborn": {
+        "name": "窯生的灰顎"
+      },
+      "emberpact_cinderpriest": {
+        "name": "餘燼盟灰燼祭司"
+      },
+      "emberpact_kiln_acolyte": {
+        "name": "餘燼盟窯爐信徒"
+      },
+      "slag_hound": {
+        "name": "爐渣獵犬"
+      },
+      "ash_revenant": {
+        "name": "灰燼亡魂"
+      },
+      "emberbound_custodian": {
+        "name": "縛燼守護者"
+      },
+      "forgeguard_sentinel": {
+        "name": "鑄爐衛哨"
+      },
+      "molten_crucible_tender": {
+        "name": "熔爐坩堝看守者"
+      },
+      "cinder_wisp": {
+        "name": "餘燼精魂"
+      },
+      "kilnmaster_vorr": {
+        "name": "窯爐大師沃爾"
+      },
+      "slagheart_colossus": {
+        "name": "爐渣之心巨像"
+      },
       "ironvein_foreman": {
         "name": "鐵脈工頭"
       },
@@ -6710,6 +6812,11 @@ export const zh_TW: EnTranslations = {
         "name": "靈魂醫者",
         "title": "亡者的守護者",
         "greeting": "安息吧，靈魂。我可以讓你重返軀體，但歸途會讓你變得虛弱。"
+      },
+      "forgewright_brenna": {
+        "name": "布蕾娜·煤爐",
+        "title": "鑄爐匠",
+        "greeting": "西南崖壁那邊冒煙了，{className}。我祖母親手封熄了那座熔爐，還發誓它不會再燒。熄滅的熔爐不該冒煙。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
@@ -7500,6 +7607,79 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_foundry_smoke": {
+        "title": "崖壁上的煙",
+        "text": "餘燼深淵曾是我們的鑄爐，{playerName}，在部族將它埋起、發誓永不再燃之前。如今它又冒煙了，德羅格瑪的食人魔像挨了打的狗一樣蹲在外頭。有什麼東西把牠們趕出來了。去圍攻戰線那邊，穿過食人魔的營地，帶一份異教徒釘在崗哨上的公文回來給我。我要知道是誰重燃了我祖母的爐火。",
+        "completion": "「餘燼盟。」一個向著封熄煤炭祈禱的教派。而底下這個印記，{playerName}：那是餘燼深淵本身的舊鑄爐印。他們不是佔據了這座鑄爐，這麼簡單，他們是在運作它。",
+        "objectives": {
+          "0": {
+            "label": "取得的餘燼盟公文"
+          }
+        }
+      },
+      "q_foundry_pickets": {
+        "title": "削減圍攻戰線",
+        "text": "餘燼盟以狂信者崗哨守著崖壁的通道，只要崗哨還在，就沒人能到鑄爐的門前。他們把食人魔都趕走了，{playerName}。食人魔啊。清除十名狂信者，防線就會崩潰。",
+        "completion": "對著煤炭祈禱的聲音又少了十個。防線正在瓦解，鑄爐之門已幾乎近在咫尺。",
+        "objectives": {
+          "0": {
+            "label": "擊殺餘燼盟狂信者"
+          }
+        }
+      },
+      "q_foundry_hounds": {
+        "title": "窯爐的獵犬",
+        "text": "這個教派在崖壁小徑上放養獵犬，那些野獸的皮下藏著仍在冷卻的爐渣。殺死八隻，並從其中六隻體內取出跳動的爐渣之心。如果那座鑄爐熱到能孕育出這種東西，它比我祖母當年運作時還要熾熱。",
+        "completion": "還是溫的。{playerName}，一顆爐渣之心最多只能保留一天的爐火餘熱。餘燼深淵不只是重新點燃了，它正熊熊燃燒著。",
+        "objectives": {
+          "0": {
+            "label": "擊倒餘燼獵犬"
+          },
+          "1": {
+            "label": "爐渣之心"
+          }
+        }
+      },
+      "q_foundry_sigils": {
+        "title": "餘燼盟印記",
+        "text": "那道防線上的每個狂信者都帶著一枚燒製的陶土印記，是他們通過門戶結界的鑰匙。給我帶六枚回來。我能辨讀燒製的紋路，那些紋路會告訴我他們運轉著多少座坩堝。",
+        "completion": "六枚印記，六種不同的坩堝紋路。{playerName}，餘燼深淵有七座坩堝。他們正在全力運轉整座鑄爐，而第七個紋路屬於那座最大的坩堝：爐渣之心。",
+        "objectives": {
+          "0": {
+            "label": "餘燼盟印記"
+          }
+        }
+      },
+      "q_foundry_ashmaw": {
+        "title": "窯生的灰顎",
+        "text": "那道防線上有樣東西，既不是異教徒也不是獵犬。一個冷卻中的爐渣形體行走在高處小徑，是重燃鑄爐澆鑄出的第一件成品，那些崗哨像追隨旗幟一樣追隨著它。殺死窯生的灰顎，把它的核心帶回來給我，{playerName}。只要它還在行走，防線就永遠會重新集結。",
+        "completion": "核心還在發光。澆鑄的爐渣不該是活的，{playerName}。不管是誰在看管那座鑄爐，都學會了部族刻意埋藏起來的東西。",
+        "objectives": {
+          "0": {
+            "label": "灰顎的核心"
+          }
+        }
+      },
+      "q_foundry_kilnmaster": {
+        "title": "窯爐大師",
+        "text": "那些印記指出了他們的主人：窯爐大師沃爾，是他發現冷卻的餘燼深淵，並教會了煤炭如何回應祈禱。他守在裝配層之後的鑄造大廳裡。帶上同伴穿過那道門，終結他，{playerName}。這不是能獨自完成的差事。",
+        "completion": "沃爾已在自己的大廳中化為灰燼。但他長袍上的燒製紋路……他並不是鑄爐大師，{playerName}。他只是風箱。有更深處的東西仍在呼吸。",
+        "objectives": {
+          "0": {
+            "label": "擊敗窯爐大師沃爾"
+          }
+        }
+      },
+      "q_foundry_slagheart": {
+        "title": "爐渣之心巨像",
+        "text": "我讀完了最後的燒製紋路，{playerName}，終於明白餘燼盟在鑄造的是什麼：什麼都不是。這座鑄爐是在為自己鑄造一具軀體。那座最大的坩堝已經澆鑄同一件鑄件整整一季，如今它立在鑄爐核心的鐵砧台上，等待最後的淬火。一旦它踏下那座台子，這座山無論面對接下來的什麼戰爭都會落敗。召集你能找到的最強者，在爐渣之心巨像完全甦醒之前將它擊碎。",
+        "completion": "終於冷卻了，而這次它會一直冷下去：我會親手封熄那座鑄爐，用我祖母教我的方法。這座山永遠不會知道，方才有什麼東西差點從它腳下走出來，{playerName}。但我會知道。你也會知道。",
+        "objectives": {
+          "0": {
+            "label": "擊碎爐渣之心巨像"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺亡唱詩班",
         "text": "那些涉者並非單獨行動。在牠們之間行走的，是溺亡信徒——隨神殿一同沉沒的邪教徒，仍披著腐朽的法衣，仍從岸岩之間唱著那篇禱文。讓其中八人歸於沉寂，並為我帶回他們所攜的六件供品。我想知道他們要獻給女神的究竟是什麼。",
@@ -7693,6 +7873,11 @@ export const zh_TW: EnTranslations = {
         "name": "尼思拉克西斯團隊競技場",
         "enterText": "你穿過封印的王室之門。",
         "leaveText": "你回到荊峰的寒冷空氣中。"
+      },
+      "emberdeep_foundry": {
+        "name": "餘燼深淵鑄爐",
+        "enterText": "你踏入鑄爐之門。山體在你頭頂闔攏，重燃的餘燼深淵散發的熱浪迎面撲來。",
+        "leaveText": "你踏出鑄爐之門，回到崖壁的寒意之中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

@@ -6250,6 +6250,69 @@ export const zh_CN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
+      },
+      "warcamp_dispatch": {
+        "name": "余烬盟约急件"
+      },
+      "slag_heart": {
+        "name": "熔渣之心"
+      },
+      "emberpact_sigil": {
+        "name": "余烬盟约徽记"
+      },
+      "kilnborn_core": {
+        "name": "灰颚之核"
+      },
+      "forgehand_gauntlets": {
+        "name": "锻手护手"
+      },
+      "forgehand_handwraps": {
+        "name": "锻手裹手"
+      },
+      "forgehand_grips": {
+        "name": "锻手护腕"
+      },
+      "emberstep_warboots": {
+        "name": "余烬践行战靴"
+      },
+      "emberstep_slippers": {
+        "name": "余烬践行软鞋"
+      },
+      "emberstep_treads": {
+        "name": "余烬践行行靴"
+      },
+      "slagrend_cleaver": {
+        "name": "熔渣裂刃"
+      },
+      "slagfire_scepter": {
+        "name": "熔渣火权杖"
+      },
+      "slagglass_shiv": {
+        "name": "熔渣玻璃短刃"
+      },
+      "vorrs_kilnplates": {
+        "name": "沃尔的窑炉甲"
+      },
+      "slagforged_legguards": {
+        "name": "熔渣锻腿甲"
+      },
+      "forgelord_warhelm": {
+        "name": "锻炉领主战盔"
+      },
+      "emberweave_cowl": {
+        "name": "余烬织兜帽"
+      },
+      "slagstalker_hood": {
+        "name": "熔渣潜行者兜帽"
+      },
+      "slag_chunk": {
+        "name": "熔渣块"
+      },
+      "ember_grit": {
+        "name": "余烬渣屑"
+      },
+      "cult_brand": {
+        "name": "余烬盟约烙印"
       }
     },
     "mobs": {
@@ -6481,6 +6544,45 @@ export const zh_CN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
       },
+      "emberpact_zealot": {
+        "name": "余烬盟约狂信徒"
+      },
+      "cinderhound": {
+        "name": "余烬猎犬"
+      },
+      "ashmaw_kilnborn": {
+        "name": "窑生灰颚"
+      },
+      "emberpact_cinderpriest": {
+        "name": "余烬盟约灰烬祭司"
+      },
+      "emberpact_kiln_acolyte": {
+        "name": "余烬盟约窑炉侍僧"
+      },
+      "slag_hound": {
+        "name": "熔渣猎犬"
+      },
+      "ash_revenant": {
+        "name": "灰烬亡魂"
+      },
+      "emberbound_custodian": {
+        "name": "余烬缚守卫者"
+      },
+      "forgeguard_sentinel": {
+        "name": "锻炉哨兵"
+      },
+      "molten_crucible_tender": {
+        "name": "熔炉坩埚守夜人"
+      },
+      "cinder_wisp": {
+        "name": "余烬幽光"
+      },
+      "kilnmaster_vorr": {
+        "name": "窑炉大师沃尔"
+      },
+      "slagheart_colossus": {
+        "name": "熔渣之心巨像"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -6710,6 +6812,11 @@ export const zh_CN: EnTranslations = {
         "name": "灵魂医者",
         "title": "亡者的守护者",
         "greeting": "安息吧，灵魂。我可以让你重返躯体，但归途会让你变得虚弱。"
+      },
+      "forgewright_brenna": {
+        "name": "布伦娜·煤铸",
+        "title": "锻造师",
+        "greeting": "西南峭壁上冒烟了，{className}。我祖母亲手封住那座锻炉，发誓要让它永远冷却。冷炉是不会冒烟的。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
@@ -7500,6 +7607,79 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_foundry_smoke": {
+        "title": "峭壁上的烟",
+        "text": "余烬深渊曾是我们的锻炉，{playerName}，直到部族把它埋起来，发誓让它永远冷却。如今它又冒烟了，卓格玛的食人魔就蜷在外头，像挨了打的狗。是什么把他们赶了出来。去围攻线那边，越过战地营，从邪教徒钉在哨桩上的公告里给我带一份回来。我倒要看看是谁重新点燃了我祖母的炉火。",
+        "completion": "\"余烬盟约。\"一个向熄灭的煤炭祈祷的邪教。{playerName}，看底下这个印记：正是余烬深渊自己的旧锻造徽记。他们不是在锻炉里落脚，他们是在开炉。",
+        "objectives": {
+          "0": {
+            "label": "夺得余烬盟约公告"
+          }
+        }
+      },
+      "q_foundry_pickets": {
+        "title": "削弱围攻线",
+        "text": "余烬盟约的狂信徒哨兵守着峭壁的必经之路，他们不倒，谁也别想摸到锻炉的门。{playerName}，他们连食人魔都能赶跑，食人魔啊。杀十名狂信徒，防线就会崩溃。",
+        "completion": "向煤炭祈祷的声音又少了十个。防线在瓦解，那扇门已经近在眼前。",
+        "objectives": {
+          "0": {
+            "label": "击杀余烬盟约狂信徒"
+          }
+        }
+      },
+      "q_foundry_hounds": {
+        "title": "窑炉的猎犬",
+        "text": "邪教在峭壁小径上放出了猎犬，那些皮毛下还嵌着未冷的熔渣的野兽。杀八只，再取出六颗仍在其中跳动的熔渣之心。如果这座锻炉的热度足以孕育出这种东西，那它比我祖母当年敢烧的还要炽烈。",
+        "completion": "还是温的。{playerName}，一颗熔渣之心最多只能留住一天的炉温。余烬深渊不只是重新点燃了，它已经在咆哮了。",
+        "objectives": {
+          "0": {
+            "label": "击杀余烬猎犬"
+          },
+          "1": {
+            "label": "熔渣之心"
+          }
+        }
+      },
+      "q_foundry_sigils": {
+        "title": "余烬盟约的印契",
+        "text": "防线上的每个狂信徒都带着一枚烧制的陶土印契，那是他们通过门户结界的钥匙。给我拿六枚来。我认得那些烧制的印记，它们会告诉我这帮人到底开着多少座坩埚。",
+        "completion": "六枚印契，六种不同的坩埚印记。{playerName}，余烬深渊一共有七座坩埚。他们在全炉开工，第七个印记属于那座大坩埚：熔渣之心。",
+        "objectives": {
+          "0": {
+            "label": "余烬盟约印契"
+          }
+        }
+      },
+      "q_foundry_ashmaw": {
+        "title": "窑生灰颚",
+        "text": "防线上有个东西，既不是邪教徒也不是猎犬。一具冷却中的熔渣之形走在高处小径上，那是重燃的锻炉浇铸出的第一件造物，防线上的哨兵都像追随旗帜一样追随着它。{playerName}，杀掉窑生灰颚，把它的核心带给我。只要它还在走动，那道防线就永远能重新聚拢。",
+        "completion": "核心还在发光。{playerName}，浇铸出的熔渣本不该活过来。不管是谁在看管那座锻炉，他学到了部族当年刻意埋藏起来的东西。",
+        "objectives": {
+          "0": {
+            "label": "灰颚的核心"
+          }
+        }
+      },
+      "q_foundry_kilnmaster": {
+        "title": "窑炉大师",
+        "text": "印契上刻着他们主人的名字：窑炉大师沃尔，他发现余烬深渊已然冷却，却教会了煤炭重新祈祷。他据守着装配层之外的铸造大厅。{playerName}，带上同伴穿过那道门，终结他。这不是孤身一人能完成的差事。",
+        "completion": "沃尔已在自己的大厅里化为灰烬。可是他长袍上的烧制印记说明，{playerName}，他从来都不是锻造大师，他只是那具风箱。更深处还有什么，仍在吸着气。",
+        "objectives": {
+          "0": {
+            "label": "击败窑炉大师沃尔"
+          }
+        }
+      },
+      "q_foundry_slagheart": {
+        "title": "熔渣之心巨像",
+        "text": "{playerName}，我读完了最后那些烧制印记，终于明白余烬盟约到底在锻造什么：什么都不是。这座锻炉在为自己锻造一副躯壳。那座大坩埚已经浇铸了整整一季，如今立在锻炉核心的铁砧台上，只等最后一次淬火。一旦它迈下那座台子，这座山接下来面对的任何战争都将无从抵挡。召集你能找到的最强者，在熔渣之心巨像彻底苏醒之前将它击碎。",
+        "completion": "终于冷却了，这一次会一直冷下去：我会亲手封住那座锻炉，用我祖母教我的法子。{playerName}，这座山永远不会知道，曾有什么东西差一点从它脚下走出来。但我会知道，你也会知道。",
+        "objectives": {
+          "0": {
+            "label": "击碎熔渣之心巨像"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "溺亡唱诗班",
         "text": "那些涉行者并非孤身行动。它们之中游走着溺亡信徒——随神殿一同沉没的邪教徒，至今仍披着腐烂的法衣，仍在岸边礁石上吟唱祷词。让其中八名永远噤声，再为我带回它们随身携带的六件祭品。我想知道它们打算献给女神什么。",
@@ -7693,6 +7873,11 @@ export const zh_CN: EnTranslations = {
         "name": "尼思拉克西斯团队竞技场",
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
+      },
+      "emberdeep_foundry": {
+        "name": "余烬深渊铸炉",
+        "enterText": "你走进锻炉之门。山体在头顶合拢，重燃的余烬深渊的热浪迎面扑来，涌上通道。",
+        "leaveText": "你走出锻炉之门，回到峭壁的寒意之中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

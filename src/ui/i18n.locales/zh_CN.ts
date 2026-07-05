@@ -3011,6 +3011,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': '尼思拉克西斯团队竞技场',
   'entities.dungeons.nythraxis_boss_arena.enterText': '你穿过封印的王室之门。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '你回到荆峰的寒冷空气中。',
+  'entities.dungeons.emberdeep_foundry.name': '余烬深渊铸炉',
+  'entities.dungeons.emberdeep_foundry.enterText':
+    '你走进锻炉之门。山体在头顶合拢，重燃的余烬深渊的热浪迎面扑来，涌上通道。',
+  'entities.dungeons.emberdeep_foundry.leaveText': '你走出锻炉之门，回到峭壁的寒意之中。',
   'entities.quests.q_nythraxis_restless_dead.title': '骨原的异动',
   'entities.quests.q_nythraxis_restless_dead.text':
     '荆峰高地出事了，{playerName}。亡者不再漫无目的地游荡。他们在高望以北的骨原集结并行军，那里是旧战场与峭壁道路交汇之处。去那里调查骨甲亡魂的异动，并带回任何能说明是什么驱使它们的证据。',
@@ -3047,6 +3051,49 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_scourges_end.completion':
     '王冠终于沉默了。索恩峰仍会背负它的亡者，但山下再没有国王能召他们重返战争。你完成了奥德伦、马尔里克和沃斯只能暂时封住的事。',
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': '击败尼思拉克西斯',
+  'entities.quests.q_foundry_smoke.title': '峭壁上的烟',
+  'entities.quests.q_foundry_smoke.text':
+    '余烬深渊曾是我们的锻炉，{playerName}，直到部族把它埋起来，发誓让它永远冷却。如今它又冒烟了，卓格玛的食人魔就蜷在外头，像挨了打的狗。是什么把他们赶了出来。去围攻线那边，越过战地营，从邪教徒钉在哨桩上的公告里给我带一份回来。我倒要看看是谁重新点燃了我祖母的炉火。',
+  'entities.quests.q_foundry_smoke.completion':
+    '"余烬盟约。"一个向熄灭的煤炭祈祷的邪教。{playerName}，看底下这个印记：正是余烬深渊自己的旧锻造徽记。他们不是在锻炉里落脚，他们是在开炉。',
+  'entities.quests.q_foundry_smoke.objectives.0.label': '夺得余烬盟约公告',
+  'entities.quests.q_foundry_pickets.title': '削弱围攻线',
+  'entities.quests.q_foundry_pickets.text':
+    '余烬盟约的狂信徒哨兵守着峭壁的必经之路，他们不倒，谁也别想摸到锻炉的门。{playerName}，他们连食人魔都能赶跑，食人魔啊。杀十名狂信徒，防线就会崩溃。',
+  'entities.quests.q_foundry_pickets.completion':
+    '向煤炭祈祷的声音又少了十个。防线在瓦解，那扇门已经近在眼前。',
+  'entities.quests.q_foundry_pickets.objectives.0.label': '击杀余烬盟约狂信徒',
+  'entities.quests.q_foundry_hounds.title': '窑炉的猎犬',
+  'entities.quests.q_foundry_hounds.text':
+    '邪教在峭壁小径上放出了猎犬，那些皮毛下还嵌着未冷的熔渣的野兽。杀八只，再取出六颗仍在其中跳动的熔渣之心。如果这座锻炉的热度足以孕育出这种东西，那它比我祖母当年敢烧的还要炽烈。',
+  'entities.quests.q_foundry_hounds.completion':
+    '还是温的。{playerName}，一颗熔渣之心最多只能留住一天的炉温。余烬深渊不只是重新点燃了，它已经在咆哮了。',
+  'entities.quests.q_foundry_hounds.objectives.0.label': '击杀余烬猎犬',
+  'entities.quests.q_foundry_hounds.objectives.1.label': '熔渣之心',
+  'entities.quests.q_foundry_sigils.title': '余烬盟约的印契',
+  'entities.quests.q_foundry_sigils.text':
+    '防线上的每个狂信徒都带着一枚烧制的陶土印契，那是他们通过门户结界的钥匙。给我拿六枚来。我认得那些烧制的印记，它们会告诉我这帮人到底开着多少座坩埚。',
+  'entities.quests.q_foundry_sigils.completion':
+    '六枚印契，六种不同的坩埚印记。{playerName}，余烬深渊一共有七座坩埚。他们在全炉开工，第七个印记属于那座大坩埚：熔渣之心。',
+  'entities.quests.q_foundry_sigils.objectives.0.label': '余烬盟约印契',
+  'entities.quests.q_foundry_ashmaw.title': '窑生灰颚',
+  'entities.quests.q_foundry_ashmaw.text':
+    '防线上有个东西，既不是邪教徒也不是猎犬。一具冷却中的熔渣之形走在高处小径上，那是重燃的锻炉浇铸出的第一件造物，防线上的哨兵都像追随旗帜一样追随着它。{playerName}，杀掉窑生灰颚，把它的核心带给我。只要它还在走动，那道防线就永远能重新聚拢。',
+  'entities.quests.q_foundry_ashmaw.completion':
+    '核心还在发光。{playerName}，浇铸出的熔渣本不该活过来。不管是谁在看管那座锻炉，他学到了部族当年刻意埋藏起来的东西。',
+  'entities.quests.q_foundry_ashmaw.objectives.0.label': '灰颚的核心',
+  'entities.quests.q_foundry_kilnmaster.title': '窑炉大师',
+  'entities.quests.q_foundry_kilnmaster.text':
+    '印契上刻着他们主人的名字：窑炉大师沃尔，他发现余烬深渊已然冷却，却教会了煤炭重新祈祷。他据守着装配层之外的铸造大厅。{playerName}，带上同伴穿过那道门，终结他。这不是孤身一人能完成的差事。',
+  'entities.quests.q_foundry_kilnmaster.completion':
+    '沃尔已在自己的大厅里化为灰烬。可是他长袍上的烧制印记说明，{playerName}，他从来都不是锻造大师，他只是那具风箱。更深处还有什么，仍在吸着气。',
+  'entities.quests.q_foundry_kilnmaster.objectives.0.label': '击败窑炉大师沃尔',
+  'entities.quests.q_foundry_slagheart.title': '熔渣之心巨像',
+  'entities.quests.q_foundry_slagheart.text':
+    '{playerName}，我读完了最后那些烧制印记，终于明白余烬盟约到底在锻造什么：什么都不是。这座锻炉在为自己锻造一副躯壳。那座大坩埚已经浇铸了整整一季，如今立在锻炉核心的铁砧台上，只等最后一次淬火。一旦它迈下那座台子，这座山接下来面对的任何战争都将无从抵挡。召集你能找到的最强者，在熔渣之心巨像彻底苏醒之前将它击碎。',
+  'entities.quests.q_foundry_slagheart.completion':
+    '终于冷却了，这一次会一直冷下去：我会亲手封住那座锻炉，用我祖母教我的法子。{playerName}，这座山永远不会知道，曾有什么东西差一点从它脚下走出来。但我会知道，你也会知道。',
+  'entities.quests.q_foundry_slagheart.objectives.0.label': '击碎熔渣之心巨像',
   'hud.errors.silenced': '你已被沉默！',
   'hud.pet.noPetFood': '你没有可以喂给宠物的食物。',
   'hud.pet.petEatsFoodOnly': '你的宠物只能吃食物。',
@@ -5366,6 +5413,27 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '圣物猎人的溺兜',
   'entities.items.sister_nhalia_choir_plate.name': '娜哈莉亚修女的唱诗锻甲',
   'entities.items.drowned_choir_fang.name': '溺水唱诗獠牙',
+  'entities.items.warcamp_dispatch.name': '余烬盟约急件',
+  'entities.items.slag_heart.name': '熔渣之心',
+  'entities.items.emberpact_sigil.name': '余烬盟约徽记',
+  'entities.items.kilnborn_core.name': '灰颚之核',
+  'entities.items.forgehand_gauntlets.name': '锻手护手',
+  'entities.items.forgehand_handwraps.name': '锻手裹手',
+  'entities.items.forgehand_grips.name': '锻手护腕',
+  'entities.items.emberstep_warboots.name': '余烬践行战靴',
+  'entities.items.emberstep_slippers.name': '余烬践行软鞋',
+  'entities.items.emberstep_treads.name': '余烬践行行靴',
+  'entities.items.slagrend_cleaver.name': '熔渣裂刃',
+  'entities.items.slagfire_scepter.name': '熔渣火权杖',
+  'entities.items.slagglass_shiv.name': '熔渣玻璃短刃',
+  'entities.items.vorrs_kilnplates.name': '沃尔的窑炉甲',
+  'entities.items.slagforged_legguards.name': '熔渣锻腿甲',
+  'entities.items.forgelord_warhelm.name': '锻炉领主战盔',
+  'entities.items.emberweave_cowl.name': '余烬织兜帽',
+  'entities.items.slagstalker_hood.name': '熔渣潜行者兜帽',
+  'entities.items.slag_chunk.name': '熔渣块',
+  'entities.items.ember_grit.name': '余烬渣屑',
+  'entities.items.cult_brand.name': '余烬盟约烙印',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -5377,6 +5445,23 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '娜哈莉亚修女，溺亡的圣歌',
   'entities.mobs.edda_reedhand.name': '艾达·芦手',
   'entities.mobs.tolling_bell.name': '鸣钟',
+  'entities.mobs.emberpact_zealot.name': '余烬盟约狂信徒',
+  'entities.mobs.cinderhound.name': '余烬猎犬',
+  'entities.mobs.ashmaw_kilnborn.name': '窑生灰颚',
+  'entities.mobs.emberpact_cinderpriest.name': '余烬盟约灰烬祭司',
+  'entities.mobs.emberpact_kiln_acolyte.name': '余烬盟约窑炉侍僧',
+  'entities.mobs.slag_hound.name': '熔渣猎犬',
+  'entities.mobs.ash_revenant.name': '灰烬亡魂',
+  'entities.mobs.emberbound_custodian.name': '余烬缚守卫者',
+  'entities.mobs.forgeguard_sentinel.name': '锻炉哨兵',
+  'entities.mobs.molten_crucible_tender.name': '熔炉坩埚守夜人',
+  'entities.mobs.cinder_wisp.name': '余烬幽光',
+  'entities.mobs.kilnmaster_vorr.name': '窑炉大师沃尔',
+  'entities.mobs.slagheart_colossus.name': '熔渣之心巨像',
+  'entities.npcs.forgewright_brenna.name': '布伦娜·煤铸',
+  'entities.npcs.forgewright_brenna.title': '锻造师',
+  'entities.npcs.forgewright_brenna.greeting':
+    '西南峭壁上冒烟了，{className}。我祖母亲手封住那座锻炉，发誓要让它永远冷却。冷炉是不会冒烟的。',
   'entities.npcs.brother_halven_marsh.name': '哈尔文修士',
   'entities.npcs.brother_halven_marsh.title': '圣物库守护人',
   'entities.npcs.brother_halven_marsh.greeting':

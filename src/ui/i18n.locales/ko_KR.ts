@@ -3143,6 +3143,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': '니트락시스 공격대 투기장',
   'entities.dungeons.nythraxis_boss_arena.enterText': '봉인된 왕실 문을 지나갑니다.',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '쏜피크의 차가운 공기 속으로 돌아옵니다.',
+  'entities.dungeons.emberdeep_foundry.name': '엠버딥 제련소',
+  'entities.dungeons.emberdeep_foundry.enterText':
+    '단조의 문을 지나 들어섭니다. 산이 머리 위로 닫히고, 다시 지펴진 엠버딥의 열기가 통로를 타고 밀려와 그대를 맞이합니다.',
+  'entities.dungeons.emberdeep_foundry.leaveText': '단조의 문을 나와 절벽의 냉기 속으로 나섭니다.',
   'entities.quests.q_nythraxis_restless_dead.title': '뼈 들판의 소요',
   'entities.quests.q_nythraxis_restless_dead.text':
     '쏜피크 고지에 변화가 생겼습니다, {playerName}. 죽은 자들이 더는 정처 없이 떠돌지 않습니다. 그들은 하이워치 너머 북쪽 뼈 들판, 옛 전장과 절벽길이 만나는 곳에서 모여 행군합니다. 그곳으로 가서 뼈갑옷 망령들의 소요를 조사하고, 무엇이 그들을 움직이는지 보여 줄 증거를 가져오십시오.',
@@ -3179,6 +3183,49 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_scourges_end.completion':
     '마침내 왕관이 침묵했습니다. 손피크는 여전히 죽은 이들을 품겠지만, 산 아래의 어떤 왕도 다시 그들을 전쟁으로 부르지 못할 것입니다. 당신은 알드렌과 말릭, 보스가 겨우 억눌렀던 일을 끝냈습니다.',
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': '니트락시스 처치',
+  'entities.quests.q_foundry_smoke.title': '절벽 너머의 연기',
+  'entities.quests.q_foundry_smoke.text':
+    '엠버딥은 원래 우리의 대장간이었소, {playerName}. 씨족들이 그것을 묻고 차갑게 봉하겠다 맹세하기 전까지는 말이오. 이제 다시 연기가 나고, 드로그마르의 오우거들은 매 맞은 개처럼 그 앞에 웅크리고 있소. 무언가가 그들을 몰아냈소. 전초선 너머 공성 진지로 가서 광신도들이 말뚝에 박아 놓은 전언 하나를 가져오시오. 내 할머니의 불을 누가 다시 지폈는지 알아야겠소.',
+  'entities.quests.q_foundry_smoke.completion':
+    '"잉걸언약." 꺼진 숯덩이에 기도를 올리는 교단이라. 그리고 바닥에 있는 이 인장, {playerName}, 이것은 엠버딥 본래의 옛 단조 표식이오. 저들은 대장간에 무단으로 눌러앉은 게 아니오. 저들이 그것을 직접 돌리고 있소.',
+  'entities.quests.q_foundry_smoke.objectives.0.label': '잉걸언약 전언 획득',
+  'entities.quests.q_foundry_pickets.title': '공성선을 얇게',
+  'entities.quests.q_foundry_pickets.text':
+    '잉걸언약은 광신도 전초병들로 절벽 진입로를 지키고 있고, 저들이 버티는 한 아무도 대장간 문에 이르지 못하오. 오우거들마저 몰아냈소, {playerName}. 오우거들을 말이오. 광신도 열을 처치하면 전선이 무너질 것이오.',
+  'entities.quests.q_foundry_pickets.completion':
+    '숯덩이에 기도 올리던 목소리가 열 개 줄었소. 전초선이 얇아지고 있으니, 이제 문이 손에 닿을 듯하오.',
+  'entities.quests.q_foundry_pickets.objectives.0.label': '잉걸언약 광신도 처치',
+  'entities.quests.q_foundry_hounds.title': '가마의 사냥개들',
+  'entities.quests.q_foundry_hounds.text':
+    '교단은 절벽 길을 따라 사냥개들을 풀어놓았는데, 그 가죽 속에서 용재가 식어가는 짐승들이오. 여덟 마리를 죽이고, 그 안에서 뛰는 용재심장 여섯을 도려내시오. 대장간이 저런 것을 낳을 만큼 뜨겁다면, 내 할머니가 감히 돌리던 화력보다 더 뜨거운 것이오.',
+  'entities.quests.q_foundry_hounds.completion':
+    '아직도 따뜻하군. {playerName}, 용재심장은 길어야 하루치 화력을 품소. 엠버딥은 그저 불이 붙은 정도가 아니오. 지금 포효하고 있소.',
+  'entities.quests.q_foundry_hounds.objectives.0.label': '잉걸사냥개 처치',
+  'entities.quests.q_foundry_hounds.objectives.1.label': '용재심장',
+  'entities.quests.q_foundry_sigils.title': '잉걸언약의 문장',
+  'entities.quests.q_foundry_sigils.text':
+    '그 전선의 광신도는 저마다 구운 점토 문장을 지니고 있소, 문 결계를 지나는 저들의 열쇠요. 여섯 개를 가져오시오. 나는 그 소성 표식을 읽을 줄 아니, 그것으로 저들이 도가니를 몇 개나 돌리고 있는지 알아낼 수 있을 것이오.',
+  'entities.quests.q_foundry_sigils.completion':
+    '문장 여섯 개에 도가니 표식이 저마다 다르군. {playerName}, 엠버딥에는 도가니가 일곱 개요. 저들은 대장간 전체를 돌리고 있고, 일곱 번째 표식은 큰 도가니, 즉 용재심장의 것이오.',
+  'entities.quests.q_foundry_sigils.objectives.0.label': '잉걸언약 문장',
+  'entities.quests.q_foundry_ashmaw.title': '가마출생 잿턱',
+  'entities.quests.q_foundry_ashmaw.text':
+    '그 전선에는 광신도도 사냥개도 아닌 것이 하나 있소. 식어가는 용재 형상이 높은 길을 걸으며, 다시 지펴진 대장간이 처음으로 부어낸 것인데, 전초병들은 그것을 깃발처럼 따르오. 가마출생 잿턱을 죽이고 그 핵을 가져오시오, {playerName}. 그것이 걷는 한 전선은 언제나 다시 세워질 것이오.',
+  'entities.quests.q_foundry_ashmaw.completion':
+    '핵이 아직도 빛나는군. {playerName}, 부어낸 용재는 살아 있어서는 안 되오. 저 대장간을 돌보는 자가 누구든, 씨족들이 일부러 묻어버린 무언가를 다시 익힌 것이오.',
+  'entities.quests.q_foundry_ashmaw.objectives.0.label': '잿턱의 핵',
+  'entities.quests.q_foundry_kilnmaster.title': '가마장',
+  'entities.quests.q_foundry_kilnmaster.text':
+    '문장들이 그 주인의 이름을 알려주오: 가마장 보르, 식어 있던 엠버딥을 찾아내 숯덩이에게 다시 기도를 가르친 자요. 그는 조립 바닥 너머 주조 회당을 차지하고 있소. 동료들을 데리고 문을 지나 그를 끝장내시오, {playerName}. 이는 홀로 나설 임무가 아니오.',
+  'entities.quests.q_foundry_kilnmaster.completion':
+    '보르는 제 회당에서 재가 되었소. 하나, {playerName}, 그의 로브에 남은 소성 표식을 보니... 그는 단조 대사가 아니었소. 그는 풀무였을 뿐이오. 더 깊은 무언가가 아직도 숨을 쉬고 있소.',
+  'entities.quests.q_foundry_kilnmaster.objectives.0.label': '가마장 보르 처치',
+  'entities.quests.q_foundry_slagheart.title': '용재심장 거상',
+  'entities.quests.q_foundry_slagheart.text':
+    '마지막 소성 표식을 읽어냈소, {playerName}. 이제 잉걸언약이 무엇을 벼리는지 알겠소: 아무것도 아니오. 대장간은 스스로에게 몸을 벼려주고 있소. 큰 도가니는 한 철 내내 하나의 주조물을 부어왔고, 지금은 대장간 심장부의 모루 단 위에 서서 마지막 담금질만을 기다리고 있소. 그것이 그 단에서 내려서는 순간, 다음에 올 어떤 전쟁이든 이 산은 패할 것이오. 가장 강한 자들을 모아 용재심장 거상이 완전히 깨어나기 전에 부수시오.',
+  'entities.quests.q_foundry_slagheart.completion':
+    '마침내 식었고, 이번에는 정말로 그대로 남을 것이오: 내 할머니가 가르쳐준 대로 내 손으로 저 대장간을 봉하겠소. 산은 제 발밑에서 무엇이 걸어 나올 뻔했는지 결코 알지 못할 것이오, {playerName}. 하나 나는 알 것이오. 그리고 그대도 알겠지.',
+  'entities.quests.q_foundry_slagheart.objectives.0.label': '용재심장 거상 파괴',
   'hud.errors.silenced': '침묵 상태입니다!',
   'hud.pet.noPetFood': '소환수에게 먹일 음식이 없습니다.',
   'hud.pet.petEatsFoodOnly': '소환수는 음식만 먹을 수 있습니다.',
@@ -5665,6 +5712,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': '성물사냥꾼의 익사 두건',
   'entities.items.sister_nhalia_choir_plate.name': '나할리아 수녀의 성가 단조 판금',
   'entities.items.drowned_choir_fang.name': '익사한 성가대의 송곳니',
+  'entities.items.warcamp_dispatch.name': '잉걸언약 전갈',
+  'entities.items.slag_heart.name': '용재 심장',
+  'entities.items.emberpact_sigil.name': '잉걸언약 인장',
+  'entities.items.kilnborn_core.name': '잿턱의 핵',
+  'entities.items.forgehand_gauntlets.name': '대장손 건틀릿',
+  'entities.items.forgehand_handwraps.name': '대장손 손싸개',
+  'entities.items.forgehand_grips.name': '대장손 손보호구',
+  'entities.items.emberstep_warboots.name': '잉걸걸음 전쟁장화',
+  'entities.items.emberstep_slippers.name': '잉걸걸음 슬리퍼',
+  'entities.items.emberstep_treads.name': '잉걸걸음 밟이',
+  'entities.items.slagrend_cleaver.name': '용재가르개',
+  'entities.items.slagfire_scepter.name': '용재불꽃 홀',
+  'entities.items.slagglass_shiv.name': '용재유리 단도',
+  'entities.items.vorrs_kilnplates.name': '보르의 가마판금',
+  'entities.items.slagforged_legguards.name': '용재벼림 다리보호구',
+  'entities.items.forgelord_warhelm.name': '대장군주의 전쟁투구',
+  'entities.items.emberweave_cowl.name': '잉걸직조 두건',
+  'entities.items.slagstalker_hood.name': '용재추적자의 후드',
+  'entities.items.slag_chunk.name': '용재 덩어리',
+  'entities.items.ember_grit.name': '잉걸 잔재',
+  'entities.items.cult_brand.name': '잉걸언약 낙인',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -5676,10 +5744,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': '나할리아 수녀, 익사한 성가',
   'entities.mobs.edda_reedhand.name': '에다 리드핸드',
   'entities.mobs.tolling_bell.name': '울리는 종',
+  'entities.mobs.emberpact_zealot.name': '잉걸언약 광신도',
+  'entities.mobs.cinderhound.name': '잉걸사냥개',
+  'entities.mobs.ashmaw_kilnborn.name': '가마출생 잿턱',
+  'entities.mobs.emberpact_cinderpriest.name': '잉걸언약 잿불사제',
+  'entities.mobs.emberpact_kiln_acolyte.name': '잉걸언약 가마신도',
+  'entities.mobs.slag_hound.name': '용재사냥개',
+  'entities.mobs.ash_revenant.name': '잿더미 원혼',
+  'entities.mobs.emberbound_custodian.name': '잉걸속박 관리자',
+  'entities.mobs.forgeguard_sentinel.name': '대장간수호 파수병',
+  'entities.mobs.molten_crucible_tender.name': '용융도가니 관리인',
+  'entities.mobs.cinder_wisp.name': '잉걸도깨비불',
+  'entities.mobs.kilnmaster_vorr.name': '가마장 보르',
+  'entities.mobs.slagheart_colossus.name': '용재심장 거상',
   'entities.npcs.brother_halven_marsh.name': '브라더 할벤',
   'entities.npcs.brother_halven_marsh.title': '성물실 관리인',
   'entities.npcs.brother_halven_marsh.greeting':
     '오솔길이 북쪽으로 이어졌소. 또 다른 성물실, 또 다른 의식. 난이도를 고르시오, 그대가 돌아올 때까지 밧줄을 잡고 있겠소.',
+  'entities.npcs.forgewright_brenna.name': '브렌나 콜라이트',
+  'entities.npcs.forgewright_brenna.title': '단조공',
+  'entities.npcs.forgewright_brenna.greeting':
+    '남서쪽 절벽 너머로 연기가 피어오르오, {className}. 내 할머니가 몸소 저 대장간을 다지고 차갑게 봉하겠다 맹세하셨소. 식은 화로에서는 연기가 나지 않는 법이오.',
   'entities.delves.drowned_litany.name': '익사한 연도',
   'entities.delves.drowned_litany.enterText': '그대는 늪지의 끝자락에서 익사한 신전으로 내려간다.',
   'entities.delves.drowned_litany.leaveText':
