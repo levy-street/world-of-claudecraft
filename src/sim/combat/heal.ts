@@ -28,6 +28,7 @@
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
+import { runWeaponProcs } from './equip_procs';
 
 // Combined incoming-healing multiplier from Mortal Wound debuffs (classic
 // Mortal Strike): each reduces healing the target receives; multiple stack
@@ -107,6 +108,9 @@ export function applyHeal(
     ability,
   });
   healingThreat(ctx, source, target, healed);
+  // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
+  // (no rng draw) unless the healer wields a proc weapon with a heal proc.
+  runWeaponProcs(ctx, source, target, 'heal');
 }
 
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is

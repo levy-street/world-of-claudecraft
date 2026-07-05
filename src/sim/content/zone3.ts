@@ -2702,9 +2702,39 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'legendary',
     weapon: { min: 42, max: 68, speed: 3.2 },
-    stats: { agi: 17, sta: 13, int: 14 },
+    // A druid caster/healer staff: agility (feral) makes no sense on it and hunters/
+    // rogues cannot equip it, so its 17 points sit in spirit (druid mana/healing),
+    // still exactly on the 44-pt legendary mainhand budget.
+    stats: { spi: 17, sta: 13, int: 14 },
     sellValue: 25000,
     requiredClass: ['druid'],
+    // Life and decay: a damaging spell may fester a nature DoT (Deathbloom); a heal
+    // may bloom a nature heal-over-time on its target (Lifebloom).
+    weaponProcs: [
+      {
+        id: 'deathbloom',
+        name: 'Deathbloom',
+        trigger: 'spellDamage',
+        chance: 0.15,
+        effects: [
+          {
+            kind: 'dot',
+            name: 'Deathbloom',
+            school: 'nature',
+            perTick: 12,
+            interval: 2,
+            duration: 8,
+          },
+        ],
+      },
+      {
+        id: 'lifebloom',
+        name: 'Lifebloom',
+        trigger: 'heal',
+        chance: 0.15,
+        effects: [{ kind: 'hot', name: 'Lifebloom', perTick: 10, interval: 2, duration: 8 }],
+      },
+    ],
   },
   kingsbane_last_oath: {
     id: 'kingsbane_last_oath',
@@ -2719,6 +2749,20 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { str: 15, agi: 15, sta: 14 },
     sellValue: 25000,
     requiredClass: ['warrior', 'paladin'],
+    // Thunderfury-style on-hit: a nature arc that blasts the target and chains to
+    // nearby foes, and slows the primary target's attack speed.
+    weaponProcs: [
+      {
+        id: 'thronebane_arc',
+        name: 'Chain Arc',
+        trigger: 'meleeHit',
+        chance: 0.1,
+        effects: [
+          { kind: 'chainArc', school: 'nature', damage: 42, jumps: 3, falloff: 0.6, radius: 8 },
+          { kind: 'attackSlow', name: 'Thunderclap', mult: 1.2, duration: 6 },
+        ],
+      },
+    ],
   },
   crownforged_dreadhelm: {
     id: 'crownforged_dreadhelm',

@@ -394,6 +394,49 @@ export interface WeaponItemDef extends BaseItemDef {
   slot: 'mainhand';
   weapon: WeaponInfo;
   armorType?: never;
+  // Legendary "chance on action" procs; see WeaponProc below.
+  weaponProcs?: WeaponProc[];
+}
+
+// A legendary weapon proc: a "chance on action" effect that rolls when the wielder
+// performs the trigger action (lands a melee swing, lands a damaging spell, or lands
+// a heal) and, on success, fires its effects. Handled by
+// src/sim/combat/equip_procs.ts. The proc's rng roll is gated on the wielder actually
+// carrying a proc weapon, so ordinary gear draws no extra rng and the deterministic
+// draw order (and every parity golden that equips no legendary) is unchanged.
+export type WeaponProcTrigger = 'meleeHit' | 'spellDamage' | 'heal';
+
+export type WeaponProcEffect =
+  // Thunderfury-style arc: a bolt that strikes the primary target and then jumps to
+  // up to `jumps` nearby enemies for `falloff`-decaying damage.
+  | {
+      kind: 'chainArc';
+      school: Aura['school'];
+      damage: number;
+      jumps: number;
+      falloff: number;
+      radius: number;
+    }
+  // Slows the primary target's attack speed (an `attackspeed` aura, mult > 1).
+  | { kind: 'attackSlow'; name: string; mult: number; duration: number }
+  // A damage-over-time on the target (e.g. Deathbloom).
+  | {
+      kind: 'dot';
+      name: string;
+      school: Aura['school'];
+      perTick: number;
+      interval: number;
+      duration: number;
+    }
+  // A heal-over-time on the trigger's target (e.g. Lifebloom).
+  | { kind: 'hot'; name: string; perTick: number; interval: number; duration: number };
+
+export interface WeaponProc {
+  id: string; // unique per item; used for the applied aura ids
+  name: string; // player-visible proc name (also the chain arc's damage label)
+  trigger: WeaponProcTrigger;
+  chance: number; // 0..1 per trigger action
+  effects: WeaponProcEffect[];
 }
 
 export interface OtherItemDef extends BaseItemDef {

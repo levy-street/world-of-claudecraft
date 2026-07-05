@@ -33,6 +33,7 @@ import type { AbilityDef, Entity } from '../types';
 import { armorReduction, FISHING_CAST_ID, meleeMissChance } from '../types';
 import { isRooted } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
+import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
@@ -112,6 +113,11 @@ export function runEffects(
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
         }
+        // Legendary on-spell-damage weapon procs (e.g. Deathless Heartwood's
+        // Deathbloom). Only a landed damaging SPELL triggers it; a physical special
+        // routed through this same case does not. No-op (no rng draw) unless the
+        // caster wields a proc weapon with a spellDamage proc.
+        if (isSpell) runWeaponProcs(ctx, p, target, 'spellDamage');
         break;
       }
       case 'finisherDamage': {
