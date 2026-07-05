@@ -1,12 +1,18 @@
-import { describe, expect, it, vi } from 'vitest';
 import { PublicKey } from '@solana/web3.js';
+import { describe, expect, it, vi } from 'vitest';
 
 // burn_keeper transitively imports server/db (pg Pool + DATABASE_URL at import).
 // Stub both so the module loads; these tests only touch the pure encoders.
-vi.hoisted(() => { process.env.DATABASE_URL = 'postgres://test/test'; });
-vi.mock('pg', () => ({ Pool: function Pool() { return { query: vi.fn(), connect: vi.fn() }; } }));
+vi.hoisted(() => {
+  process.env.DATABASE_URL = 'postgres://test/test';
+});
+vi.mock('pg', () => ({
+  Pool: function Pool() {
+    return { query: vi.fn(), connect: vi.fn() };
+  },
+}));
 
-import { burnCheckedIx, associatedTokenAccount } from '../server/burn_keeper';
+import { associatedTokenAccount, burnCheckedIx } from '../server/burn_keeper';
 
 const TOKEN_PROGRAM = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 const ATA_PROGRAM = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
@@ -22,9 +28,9 @@ describe('burnCheckedIx — SPL BurnChecked (tag 15, u64-LE amount, u8 decimals)
     const ix = burnCheckedIx(ata, WOC, VAULT, 1_234_567n, 9);
     expect(ix.programId.equals(TOKEN_PROGRAM)).toBe(true);
     expect(ix.data).toHaveLength(10);
-    expect(ix.data[0]).toBe(15);                      // BurnChecked tag
+    expect(ix.data[0]).toBe(15); // BurnChecked tag
     expect(ix.data.readBigUInt64LE(1)).toBe(1_234_567n);
-    expect(ix.data[9]).toBe(9);                        // mint decimals
+    expect(ix.data[9]).toBe(9); // mint decimals
   });
 
   it('orders keys [token account (w), mint (w), authority (signer)]', () => {
@@ -39,7 +45,13 @@ describe('burnCheckedIx — SPL BurnChecked (tag 15, u64-LE amount, u8 decimals)
   });
 
   it('handles a full u64 amount without overflow', () => {
-    const ix = burnCheckedIx(associatedTokenAccount(VAULT, WOC), WOC, VAULT, 18_446_744_073_709_551_615n, 0);
+    const ix = burnCheckedIx(
+      associatedTokenAccount(VAULT, WOC),
+      WOC,
+      VAULT,
+      18_446_744_073_709_551_615n,
+      0,
+    );
     expect(ix.data.readBigUInt64LE(1)).toBe(18_446_744_073_709_551_615n);
   });
 });

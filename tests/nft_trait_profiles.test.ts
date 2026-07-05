@@ -1,7 +1,13 @@
-import { describe, it, expect } from 'vitest';
-import { designSpecForTraits, traitProfile } from '../server/nft_trait_profiles';
-import { normalizeDesignSpec, SKIN_PATTERNS, SKIN_FINISHES, SKIN_DENSITIES, type SkinDesignSpec } from '../src/world_api';
+import { describe, expect, it } from 'vitest';
 import type { NftAttribute } from '../server/nft_ownership';
+import { designSpecForTraits, traitProfile } from '../server/nft_trait_profiles';
+import {
+  normalizeDesignSpec,
+  SKIN_DENSITIES,
+  SKIN_FINISHES,
+  SKIN_PATTERNS,
+  type SkinDesignSpec,
+} from '../src/world_api';
 
 const HEX6 = /^#[0-9a-f]{6}$/;
 
@@ -19,7 +25,10 @@ function assertValidSpec(spec: SkinDesignSpec): void {
 
 describe('BAYC profile', () => {
   it('maps Solid Gold fur to a metallic gold body', () => {
-    const spec = designSpecForTraits('bayc', [{ trait_type: 'Fur', value: 'Solid Gold' }, { trait_type: 'Background', value: 'Blue' }]);
+    const spec = designSpecForTraits('bayc', [
+      { trait_type: 'Fur', value: 'Solid Gold' },
+      { trait_type: 'Background', value: 'Blue' },
+    ]);
     expect(spec.finish).toBe('metallic');
     expect(spec.primary).toBe('#d4af37');
     expect(spec.accent).toBe('#4f86d1'); // background blue
@@ -28,7 +37,10 @@ describe('BAYC profile', () => {
   it('maps Zombie fur to an emissive green and Laser Eyes to a red glow override', () => {
     const zombie = designSpecForTraits('bayc', [{ trait_type: 'Fur', value: 'Zombie' }]);
     expect(zombie.emissive).toBe('#7cff5a');
-    const laser = designSpecForTraits('bayc', [{ trait_type: 'Fur', value: 'Zombie' }, { trait_type: 'Eyes', value: 'Laser Eyes' }]);
+    const laser = designSpecForTraits('bayc', [
+      { trait_type: 'Fur', value: 'Zombie' },
+      { trait_type: 'Eyes', value: 'Laser Eyes' },
+    ]);
     expect(laser.emissive).toBe('#ff2a2a');
     assertValidSpec(zombie);
     assertValidSpec(laser);
@@ -47,7 +59,10 @@ describe('CryptoPunks profile', () => {
     expect(alien.primary).toBe('#9fe8e8');
     const zombie = designSpecForTraits('cryptopunks', [{ trait_type: 'Type', value: 'Zombie' }]);
     expect(zombie.emissive).toBe('#7cff5a');
-    const mohawk = designSpecForTraits('cryptopunks', [{ trait_type: 'Type', value: 'Male' }, { trait_type: 'accessory', value: 'Mohawk' }]);
+    const mohawk = designSpecForTraits('cryptopunks', [
+      { trait_type: 'Type', value: 'Male' },
+      { trait_type: 'accessory', value: 'Mohawk' },
+    ]);
     expect(mohawk.accent).toBe('#ff3030');
     expect(mohawk.pattern).toBe('chevron');
     [alien, zombie, mohawk].forEach(assertValidSpec);
@@ -68,7 +83,10 @@ describe('generic mapper', () => {
     assertValidSpec(spec);
   });
   it('is deterministic: same traits -> identical spec', () => {
-    const attrs: NftAttribute[] = [{ trait_type: 'X', value: 'mystery' }, { trait_type: 'Y', value: 'unknown-value' }];
+    const attrs: NftAttribute[] = [
+      { trait_type: 'X', value: 'mystery' },
+      { trait_type: 'Y', value: 'unknown-value' },
+    ];
     expect(designSpecForTraits('generic', attrs)).toEqual(designSpecForTraits('generic', attrs));
   });
   it('handles an empty attribute set without throwing', () => {

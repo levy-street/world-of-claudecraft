@@ -55,9 +55,19 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
     cast(sim, p, 'rockbiter_weapon');
     const events = cast(sim, p, 'flametongue_weapon');
     // the replaced imbue is announced lost (this is what clears its client buff icon)
-    expect(events).toContainEqual({ type: 'aura', targetId: p.id, name: 'Rockbiter Weapon', gained: false });
+    expect(events).toContainEqual({
+      type: 'aura',
+      targetId: p.id,
+      name: 'Stonebound Weapon',
+      gained: false,
+    });
     // and the new imbue is announced gained
-    expect(events).toContainEqual({ type: 'aura', targetId: p.id, name: 'Flametongue Weapon', gained: true });
+    expect(events).toContainEqual({
+      type: 'aura',
+      targetId: p.id,
+      name: 'Pyrebrand Weapon',
+      gained: true,
+    });
   });
 
   it('re-casting the same imbue refreshes in place (still one aura)', () => {

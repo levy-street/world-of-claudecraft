@@ -7,7 +7,7 @@
 // The colours sample the SAME `terrainHeight`/`roadDistance` the renderer and
 // sim use, so the map always matches the real world, do not diverge them.
 import { ZONES } from '../sim/data';
-import { terrainHeight, roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
+import { roadDistance, terrainHeight, waterLevel, zoneBiomeAt } from '../sim/world';
 
 export interface MapRegion {
   minX: number;
@@ -36,6 +36,10 @@ export function paintTerrainRows(
 ): void {
   const spanX = region.maxX - region.minX;
   const spanZ = region.maxZ - region.minZ;
+  // The ACTIVE water surface (custom map override aware), hoisted per call:
+  // rows are chunked, so each chunk re-reads it and a mid-paint level change
+  // still lands on the next chunk.
+  const wl = waterLevel();
   for (let iy = y0; iy < y1; iy++) {
     let prevH = 0; // height of the left-neighbour pixel, for free hillshade
     for (let ix = 0; ix < W; ix++) {
@@ -46,29 +50,67 @@ export function paintTerrainRows(
       const z = region.maxZ - (iy / H) * spanZ;
       const h = terrainHeight(x, z, seed);
       const biome = zoneBiomeAt(z);
-      let r = 58, g = 105, b = 48;
-      if (biome === 'marsh') { r = 64; g = 86; b = 48; }
-      else if (biome === 'peaks') { r = 92; g = 100; b = 82; }
-      if (h < WATER_LEVEL) { r = 38; g = 84; b = 138; }
-      else if (h > 26) { r = 168; g = 172; b = 178; } // ridge / peak rock+snow
-      else if (h > 11) { r = 112; g = 110; b = 102; }
-      else if (h > 6) { r = 88; g = 102; b = 62; }
+      let r = 58,
+        g = 105,
+        b = 48;
+      if (biome === 'marsh') {
+        r = 64;
+        g = 86;
+        b = 48;
+      } else if (biome === 'peaks') {
+        r = 92;
+        g = 100;
+        b = 82;
+      }
+      if (h < wl) {
+        r = 38;
+        g = 84;
+        b = 138;
+      } else if (h > 26) {
+        r = 168;
+        g = 172;
+        b = 178;
+      } // ridge / peak rock+snow
+      else if (h > 11) {
+        r = 112;
+        g = 110;
+        b = 102;
+      } else if (h > 6) {
+        r = 88;
+        g = 102;
+        b = 62;
+      }
       let nearHub = false;
       for (const zn of ZONES) {
-        if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 14) { nearHub = true; break; }
+        if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 14) {
+          nearHub = true;
+          break;
+        }
       }
-      if (nearHub) { r = 125; g = 100; b = 66; }
-      else if (h >= WATER_LEVEL && roadDistance(x, z) < 2.4) { r = 138; g = 111; b = 71; }
+      if (nearHub) {
+        r = 125;
+        g = 100;
+        b = 66;
+      } else if (h >= wl && roadDistance(x, z) < 2.4) {
+        r = 138;
+        g = 111;
+        b = 71;
+      }
       // hillshade: relief from the west-to-east slope, reusing the already-computed
       // left-neighbour height so it costs no extra terrainHeight() calls
       const left = ix === 0 ? h : prevH;
       prevH = h;
-      if (h >= WATER_LEVEL) {
+      if (h >= wl) {
         const shade = Math.max(0.74, Math.min(1.28, 1 + (h - left) * 0.16));
-        r = Math.min(255, r * shade); g = Math.min(255, g * shade); b = Math.min(255, b * shade);
+        r = Math.min(255, r * shade);
+        g = Math.min(255, g * shade);
+        b = Math.min(255, b * shade);
       }
       const k = (iy * W + ix) * 4;
-      data[k] = r; data[k + 1] = g; data[k + 2] = b; data[k + 3] = 255;
+      data[k] = r;
+      data[k + 1] = g;
+      data[k + 2] = b;
+      data[k + 3] = 255;
     }
   }
 }

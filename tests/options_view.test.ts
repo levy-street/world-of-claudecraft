@@ -155,6 +155,16 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(keysOf(controls)).not.toContain('note:hudChrome.options.interfaceModeNote');
   });
 
+  it('caps native graphics presets at High for the native app shell', () => {
+    const controls = buildGraphicsControls(makeSource({ graphicsPreset: 3 }), {
+      touch: true,
+      nativeShell: true,
+    });
+    const preset = find(controls, 'graphicsPreset');
+    expect(preset).toMatchObject({ control: 'choice', current: 3, rerender: true });
+    if (preset?.control === 'choice') expect(preset.options.map((o) => o.value)).toEqual([1, 2, 3]);
+  });
+
   it('reveals the touch-only sliders only on a touch interface, in order', () => {
     const controls = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
       touch: true,
@@ -219,6 +229,8 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     const controls = buildInterfaceControls(makeSource());
     expect(keysOf(controls)).toEqual([
       'uiScale',
+      'playerFrameScale',
+      'targetFrameScale',
       'hudOpacity',
       'tooltipScale',
       'fctScale',
@@ -230,9 +242,17 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'reduceMotion',
       'showWalletOnCharacterScreen',
       'showWalletOnPlayerCard',
+      'showDevBadges',
+      'showOwnNameplate',
       'landingHighContrast',
       'invertLookY',
+      'startAttackOnAbilityUse',
+      'walkByAutoloot',
+      'groundReticle',
+      'aurasOnPlayerFrame',
       'showItemLevel',
+      'showSecondaryActionBar',
+      'showDailyRewardsChest',
     ]);
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
   });

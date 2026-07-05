@@ -9,15 +9,24 @@ const { clientMock, connectMock } = vi.hoisted(() => {
   const connectMock = vi.fn(async () => clientMock);
   return { clientMock, connectMock };
 });
-vi.mock('pg', () => ({ Pool: function Pool() { return { connect: connectMock, query: vi.fn() }; } }));
+vi.mock('pg', () => ({
+  Pool: function Pool() {
+    return { connect: connectMock, query: vi.fn() };
+  },
+}));
 
 import { withBurnKeeperLock } from '../server/db';
 
-beforeEach(() => { clientMock.query.mockReset(); clientMock.release.mockReset(); });
+beforeEach(() => {
+  clientMock.query.mockReset();
+  clientMock.release.mockReset();
+});
 
 describe('withBurnKeeperLock — cross-process keeper mutual exclusion', () => {
   it('runs fn while holding the lock, then unlocks + releases', async () => {
-    clientMock.query.mockResolvedValueOnce({ rows: [{ locked: true }] }).mockResolvedValueOnce({ rows: [] });
+    clientMock.query
+      .mockResolvedValueOnce({ rows: [{ locked: true }] })
+      .mockResolvedValueOnce({ rows: [] });
     const fn = vi.fn(async () => 'cycled');
     const result = await withBurnKeeperLock(fn);
     expect(result).toBe('cycled');
@@ -38,8 +47,14 @@ describe('withBurnKeeperLock — cross-process keeper mutual exclusion', () => {
   });
 
   it('unlocks + releases even if the cycle throws', async () => {
-    clientMock.query.mockResolvedValueOnce({ rows: [{ locked: true }] }).mockResolvedValueOnce({ rows: [] });
-    await expect(withBurnKeeperLock(async () => { throw new Error('cycle boom'); })).rejects.toThrow('cycle boom');
+    clientMock.query
+      .mockResolvedValueOnce({ rows: [{ locked: true }] })
+      .mockResolvedValueOnce({ rows: [] });
+    await expect(
+      withBurnKeeperLock(async () => {
+        throw new Error('cycle boom');
+      }),
+    ).rejects.toThrow('cycle boom');
     expect(clientMock.query.mock.calls[1][0]).toContain('pg_advisory_unlock');
     expect(clientMock.release).toHaveBeenCalledOnce();
   });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
+import type { SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -35,8 +35,8 @@ describe('/cooldowns command', () => {
     sim.chat('/cooldowns', a);
     const errs = errors(sim.tick());
     expect(errs.length).toBe(1);
-    // 2.4s ceils to 3s while still active; Charge sorts before Execute
-    expect(errs[0].text).toBe('Abilities on cooldown (2): Charge (3s), Execute (12s).');
+    // 2.4s ceils to 3s while still active; Onrush sorts before Early Grave
+    expect(errs[0].text).toBe('Abilities on cooldown (2): Onrush (3s), Early Grave (12s).');
   });
 
   it('accepts the /cd and /cds aliases', () => {

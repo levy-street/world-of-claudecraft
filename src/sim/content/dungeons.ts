@@ -117,6 +117,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'quilted_trousers', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
       { itemId: 'oiled_boots', chance: 0.33, rollGroup: 'morthen_guaranteed_uncommon' },
       { itemId: 'greyjaw_hide_boots', chance: 0.25, rollGroup: 'morthen_bonus' },
+      { itemId: 'gravewoven_bag', chance: 0.2, rollGroup: 'morthen_bonus' },
       { itemId: 'cryptbone_helm', chance: 0.18, rollGroup: 'morthen_bonus' },
       { itemId: 'cryptbone_pauldrons', chance: 0.18, rollGroup: 'morthen_bonus' },
     ],
@@ -147,7 +148,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.1,
     color: 0x7fa8a0,
-    mortalStrike: { chance: 0.3, healReduction: 0.5, duration: 6, name: 'Mortal Strike' },
+    mortalStrike: { chance: 0.3, healReduction: 0.5, duration: 6, name: 'Maiming Strike' },
   },
   tidebound_acolyte: {
     id: 'tidebound_acolyte',
@@ -217,11 +218,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     ], // his greaves are Maren's quest reward, not a drop
     scale: 1.2,
     color: 0x95a5a6,
-    cleave: { radius: 8, mult: 0.6, name: 'Cleave' },
+    cleave: { radius: 8, mult: 0.6, name: 'Reaping Arc' },
   },
   vael_the_mistcaller: {
     id: 'vael_the_mistcaller',
-    name: 'Vael the Mistcaller',
+    name: 'Vael the Fogbinder',
     minLevel: 13,
     maxLevel: 13,
     family: 'humanoid',
@@ -250,6 +251,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'eelscale_treads', chance: 0.1, rollGroup: 'vael_bonus' },
       { itemId: 'mistveil_cord', chance: 0.12, rollGroup: 'vael_bonus' },
       { itemId: 'mistveil_grips', chance: 0.12, rollGroup: 'vael_bonus' },
+      { itemId: 'mistcallers_duffel', chance: 0.1, rollGroup: 'vael_bonus' },
     ],
     scale: 1.35,
     color: 0x48c9b0,
@@ -282,7 +284,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   },
   sanctum_drakonid: {
     id: 'sanctum_drakonid',
-    name: 'Sanctum Drakonid',
+    name: 'Sanctum Scaleguard',
     minLevel: 19,
     maxLevel: 20,
     family: 'dragonkin',
@@ -338,7 +340,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 7,
     aggroRadius: 15,
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
-    stomp: { radius: 10, every: 12, duration: 1.5, min: 20, max: 30, name: 'War Stomp' },
+    stomp: { radius: 10, every: 12, duration: 1.5, min: 20, max: 30, name: 'Shuddering Stomp' },
     loot: [
       { copper: 5000, chance: 1 },
       { itemId: 'boneplate_vest', chance: 0.34, rollGroup: 'korgath_guaranteed_uncommon' },
@@ -603,7 +605,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: 'gravewyrm_sanctum',
     name: 'Gravewyrm Sanctum',
     index: 2,
-    doorPos: { x: 0, z: 880 }, // sealed gate at the head of the Sanctum Approach
+    doorPos: { x: 0, z: 858 }, // sealed gate in the graveyard, off the Sanctum Approach slope
     entry: { x: 0, z: 4 },
     exitOffset: { x: 0, z: -6 },
     spawns: SANCTUM_SPAWN_LIST,

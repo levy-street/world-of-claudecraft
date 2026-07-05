@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the I/O boundaries (eth_rpc, solana_das) — NOT the ownership logic under test.
 const eth = vi.hoisted(() => ({ ethCallOutcome: vi.fn() }));
@@ -6,17 +6,35 @@ const das = vi.hoisted(() => ({ dasGetAsset: vi.fn(), solanaDasConfigured: vi.fn
 vi.mock('../server/eth_rpc', () => eth);
 vi.mock('../server/solana_das', () => das);
 
-import {
-  evmSelector, encodeUint256, decodeAddressWord, decodeAbiString, resolveAssetUri,
-  nftOwnership, ownsNft, nftMetadata, resetNftOwnershipCacheForTests,
-  CRYPTOPUNKS_NATIVE, WRAPPED_PUNKS, type NftCollectionRef,
-} from '../server/nft_ownership';
 import type { EthCallOutcome } from '../server/eth_rpc';
+import {
+  CRYPTOPUNKS_NATIVE,
+  decodeAbiString,
+  decodeAddressWord,
+  encodeUint256,
+  evmSelector,
+  type NftCollectionRef,
+  nftMetadata,
+  nftOwnership,
+  ownsNft,
+  resetNftOwnershipCacheForTests,
+  resolveAssetUri,
+  WRAPPED_PUNKS,
+} from '../server/nft_ownership';
 
-const addrWord = (addr: string): string => `0x${'0'.repeat(24)}${addr.toLowerCase().replace(/^0x/, '')}`;
+const addrWord = (addr: string): string =>
+  `0x${'0'.repeat(24)}${addr.toLowerCase().replace(/^0x/, '')}`;
 const ok = (data: string): EthCallOutcome => ({ kind: 'ok', data });
-const BAYC: NftCollectionRef = { chain: 'ethereum', contract: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d', standard: 'erc721' };
-const PUNKS: NftCollectionRef = { chain: 'ethereum', contract: CRYPTOPUNKS_NATIVE, standard: 'cryptopunks' };
+const BAYC: NftCollectionRef = {
+  chain: 'ethereum',
+  contract: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d',
+  standard: 'erc721',
+};
+const PUNKS: NftCollectionRef = {
+  chain: 'ethereum',
+  contract: CRYPTOPUNKS_NATIVE,
+  standard: 'cryptopunks',
+};
 const HOLDER = '0x' + '1'.repeat(40);
 const SOL_COLLECTION = 'So11111111111111111111111111111111111111112';
 const SOL_MINT = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
@@ -47,7 +65,11 @@ describe('pure ABI helpers', () => {
   it('decodes an ABI dynamic string (tokenURI)', () => {
     const s = 'ipfs://QmAbc/1.json';
     const hex = Buffer.from(s, 'utf8').toString('hex');
-    const data = '0x' + (0x20).toString(16).padStart(64, '0') + s.length.toString(16).padStart(64, '0') + hex.padEnd(Math.ceil(hex.length / 64) * 64, '0');
+    const data =
+      '0x' +
+      (0x20).toString(16).padStart(64, '0') +
+      s.length.toString(16).padStart(64, '0') +
+      hex.padEnd(Math.ceil(hex.length / 64) * 64, '0');
     expect(decodeAbiString(data)).toBe(s);
     expect(decodeAbiString('0x00')).toBeNull();
   });
@@ -79,7 +101,8 @@ describe('Ethereum ERC-721 ownership', () => {
 describe('CryptoPunks ownership — native + wrapped', () => {
   it('reads the native holder via punkIndexToAddress', async () => {
     eth.ethCallOutcome.mockImplementation(async (to: string) =>
-      to === CRYPTOPUNKS_NATIVE ? ok(addrWord(HOLDER)) : ok(addrWord('0x' + '9'.repeat(40))));
+      to === CRYPTOPUNKS_NATIVE ? ok(addrWord(HOLDER)) : ok(addrWord('0x' + '9'.repeat(40))),
+    );
     expect(await ownsNft(PUNKS, '5', HOLDER)).toBe(true);
   });
   it('follows through to Wrapped Punks when the punk is wrapped', async () => {
@@ -98,13 +121,23 @@ describe('CryptoPunks ownership — native + wrapped', () => {
 
 describe('Solana ownership via DAS', () => {
   it('matches owner only when the mint is in the allow-listed collection', async () => {
-    das.dasGetAsset.mockResolvedValue({ ownership: { owner: SOL_OWNER }, grouping: [{ group_key: 'collection', group_value: SOL_COLLECTION }] });
+    das.dasGetAsset.mockResolvedValue({
+      ownership: { owner: SOL_OWNER },
+      grouping: [{ group_key: 'collection', group_value: SOL_COLLECTION }],
+    });
     const ref: NftCollectionRef = { chain: 'solana', contract: SOL_COLLECTION, standard: 'solana' };
     expect(await ownsNft(ref, SOL_MINT, SOL_OWNER)).toBe(true);
-    expect(await ownsNft(ref, SOL_MINT, 'Stake11111111111111111111111111111111111111', true)).toBe(false);
+    expect(await ownsNft(ref, SOL_MINT, 'Stake11111111111111111111111111111111111111', true)).toBe(
+      false,
+    );
   });
   it('returns false when the asset belongs to a different collection', async () => {
-    das.dasGetAsset.mockResolvedValue({ ownership: { owner: SOL_OWNER }, grouping: [{ group_key: 'collection', group_value: 'Other11111111111111111111111111111111111111' }] });
+    das.dasGetAsset.mockResolvedValue({
+      ownership: { owner: SOL_OWNER },
+      grouping: [
+        { group_key: 'collection', group_value: 'Other11111111111111111111111111111111111111' },
+      ],
+    });
     const ref: NftCollectionRef = { chain: 'solana', contract: SOL_COLLECTION, standard: 'solana' };
     expect(await ownsNft(ref, SOL_MINT, SOL_OWNER)).toBe(false);
   });
@@ -117,7 +150,11 @@ describe('Solana ownership via DAS', () => {
     expect(await ownsNft(ref, SOL_MINT, SOL_OWNER, true)).toBeNull();
   });
   it('reports a burnt asset as not owned', async () => {
-    das.dasGetAsset.mockResolvedValue({ burnt: true, ownership: { owner: SOL_OWNER }, grouping: [] });
+    das.dasGetAsset.mockResolvedValue({
+      burnt: true,
+      ownership: { owner: SOL_OWNER },
+      grouping: [],
+    });
     const ref: NftCollectionRef = { chain: 'solana', contract: SOL_COLLECTION, standard: 'solana' };
     expect(await ownsNft(ref, SOL_MINT, SOL_OWNER)).toBe(false);
   });
@@ -139,19 +176,45 @@ describe('ownership cache', () => {
 
 describe('nftMetadata', () => {
   it('reads ETH tokenURI -> data: JSON attributes + image', async () => {
-    const meta = { image: 'ipfs://QmImg/1.png', attributes: [{ trait_type: 'Fur', value: 'Solid Gold' }, { trait_type: 'Bad' }, { trait_type: 'N', value: 3 }] };
+    const meta = {
+      image: 'ipfs://QmImg/1.png',
+      attributes: [
+        { trait_type: 'Fur', value: 'Solid Gold' },
+        { trait_type: 'Bad' },
+        { trait_type: 'N', value: 3 },
+      ],
+    };
     const json = JSON.stringify(meta);
     const uri = `data:application/json;base64,${Buffer.from(json).toString('base64')}`;
     const hex = Buffer.from(uri, 'utf8').toString('hex');
-    const data = '0x' + (0x20).toString(16).padStart(64, '0') + uri.length.toString(16).padStart(64, '0') + hex.padEnd(Math.ceil(hex.length / 64) * 64, '0');
+    const data =
+      '0x' +
+      (0x20).toString(16).padStart(64, '0') +
+      uri.length.toString(16).padStart(64, '0') +
+      hex.padEnd(Math.ceil(hex.length / 64) * 64, '0');
     eth.ethCallOutcome.mockResolvedValue(ok(data));
     const out = await nftMetadata(BAYC, '1');
     expect(out?.image).toBe('https://ipfs.io/ipfs/QmImg/1.png');
-    expect(out?.attributes).toEqual([{ trait_type: 'Fur', value: 'Solid Gold' }, { trait_type: 'N', value: '3' }]);
+    expect(out?.attributes).toEqual([
+      { trait_type: 'Fur', value: 'Solid Gold' },
+      { trait_type: 'N', value: '3' },
+    ]);
   });
   it('reads Solana attributes + image from DAS', async () => {
-    das.dasGetAsset.mockResolvedValue({ content: { metadata: { attributes: [{ trait_type: 'Type', value: 'Alien' }] }, links: { image: 'https://cdn/x.png' } } });
-    const out = await nftMetadata({ chain: 'solana', contract: SOL_COLLECTION, standard: 'solana' }, SOL_MINT);
-    expect(out).toEqual({ attributes: [{ trait_type: 'Type', value: 'Alien' }], image: 'https://cdn/x.png', collection: SOL_COLLECTION });
+    das.dasGetAsset.mockResolvedValue({
+      content: {
+        metadata: { attributes: [{ trait_type: 'Type', value: 'Alien' }] },
+        links: { image: 'https://cdn/x.png' },
+      },
+    });
+    const out = await nftMetadata(
+      { chain: 'solana', contract: SOL_COLLECTION, standard: 'solana' },
+      SOL_MINT,
+    );
+    expect(out).toEqual({
+      attributes: [{ trait_type: 'Type', value: 'Alien' }],
+      image: 'https://cdn/x.png',
+      collection: SOL_COLLECTION,
+    });
   });
 });

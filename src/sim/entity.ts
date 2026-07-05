@@ -1,5 +1,6 @@
 import type { TalentModifiers } from './content/talents';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { meetsLevelRequirement } from './item_level_req';
 import type { Entity, EquipSlot, MobTemplate, PlayerClass, Stats, Vec3 } from './types';
 import { EQUIP_SLOTS, SPELL_POWER_PER_INT } from './types';
 
@@ -33,9 +34,13 @@ function baseEntity(id: number, pos: Vec3): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    meleeHaste: 0,
+    rangedHaste: 0,
+    spellHaste: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
     castPushbackReduction: 0,
+    knockbackResistance: 0,
     moveSpeed: 7,
     hostile: false,
     targetId: null,
@@ -49,6 +54,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     castingAbility: null,
     castRemaining: 0,
     castTotal: 0,
+    castTargetId: null,
+    castAim: null,
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -57,9 +64,10 @@ function baseEntity(id: number, pos: Vec3): Entity {
     queuedOnSwing: null,
     fiveSecondRule: 99,
     comboPoints: 0,
-    comboTargetId: null,
+    comboUntil: -1,
     overpowerUntil: -1,
     potionCooldownUntil: -1,
+    potionCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -72,8 +80,13 @@ function baseEntity(id: number, pos: Vec3): Entity {
     tappedById: null,
     pulseTimer: 0,
     stompTimer: 0,
+    bigCastTimer: 0,
+    yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
+    aoeSlowTimer: 0,
+    loudYellTimer: 0,
+    loudYellIndex: 0,
     detonateTimer: Infinity,
     mendTimer: 0,
     wardTimer: 0,
@@ -103,6 +116,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     respawnTimer: 0,
     corpseTimer: 0,
     lootFfaTimer: Infinity, // no FFA countdown until rollLoot starts it at death
+    harvestClaimedBy: null,
     lootable: false,
     loot: null,
     xpValue: 0,
@@ -111,12 +125,15 @@ function baseEntity(id: number, pos: Vec3): Entity {
     objectItemId: null,
     dungeonId: null,
     dead: false,
+    ghost: false,
+    corpsePos: null,
     scale: 1,
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
     cosmeticSkinId: null,
     mainhandItemId: null,
+    equippedItems: {},
     guild: '',
   };
 }
@@ -135,7 +152,7 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
 
 export type PlayerEquipment = Partial<Record<EquipSlot, string>>;
 
-// Vanilla rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
+// Classic-era rules: first 20 stamina gives 1 hp each, the rest 10 hp each.
 // First 20 intellect gives 1 mana each, the rest 15 mana each.
 function hpFromStamina(sta: number): number {
   // Floor at 0 so a Stamina-draining debuff (negative buff_sta) can never push
@@ -176,6 +193,12 @@ export function recalcPlayerStats(
     if (!itemId) continue;
     const item = ITEMS[itemId];
     if (!item) continue;
+    // Gear above the wearer's level is inert: it stays equipped (still rendered
+    // and occupying the slot, see the render mirrors below) but grants no stats,
+    // armor, spell power, or set pieces until the character reaches its required
+    // level. This only arises for a character loaded wearing gear equipped before
+    // the level gate existed; the equip path blocks equipping over-level gear.
+    if (!meetsLevelRequirement(lvl, item)) continue;
     if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
     bonusSp += item.spellPower ?? 0;
     if (!item.stats) continue;
@@ -188,7 +211,7 @@ export function recalcPlayerStats(
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
   // totals so they feed every derivation below; AP/crit/pushback fold in at
-  // their own steps (bonusAp, critChance, castPushbackReduction).
+  // their own steps (bonusAp, critChance, castPushbackReduction, knockbackResistance).
   const setEff = aggregateSetBonuses(setCounts);
   s.str += setEff.str;
   s.agi += setEff.agi;
@@ -219,7 +242,18 @@ export function recalcPlayerStats(
       s.int += a.value;
       s.spi += a.value;
     } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
-    else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    else if (a.kind === 'buff_allstats_pct') {
+      // Percentage drain on the whole stat block (Resurrection Sickness: value
+      // -0.75 leaves stats at 25%). Applied to the base + gear total gathered so
+      // far; the only aura that ever carries this kind is player-only, so it never
+      // stacks with another pct drain in practice.
+      const m = 1 + a.value;
+      s.str = Math.round(s.str * m);
+      s.agi = Math.round(s.agi * m);
+      s.sta = Math.round(s.sta * m);
+      s.int = Math.round(s.int * m);
+      s.spi = Math.round(s.spi * m);
+    } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
@@ -237,6 +271,12 @@ export function recalcPlayerStats(
     bonusAp += m.ap;
     bonusDodge += m.dodge;
     if (m.staPct) s.sta = Math.round(s.sta * (1 + m.staPct));
+    // Primary-attribute multipliers, applied to the fully-summed attribute. agiPct lands
+    // before the agi-derived armor/dodge below so the percentage flows into them.
+    if (m.strPct) s.str = Math.round(s.str * (1 + m.strPct));
+    if (m.agiPct) s.agi = Math.round(s.agi * (1 + m.agiPct));
+    if (m.intPct) s.int = Math.round(s.int * (1 + m.intPct));
+    if (m.spiPct) s.spi = Math.round(s.spi * (1 + m.spiPct));
   }
   // Floor Agility at 0 so a draining debuff (negative buff_agi) can never push the
   // derived armor/dodge below what zero Agility would give.
@@ -256,11 +296,15 @@ export function recalcPlayerStats(
   s.spi = Math.max(0, s.spi);
 
   e.stats = s;
-  const weapon = (equipment.mainhand && ITEMS[equipment.mainhand]?.weapon) || {
-    min: 1,
-    max: 2,
-    speed: 2,
-  };
+  // An over-level mainhand is inert like any other gear: fall back to unarmed
+  // damage (and drop the weapon-type flags, e.g. dagger, that gate abilities)
+  // until the wearer is high enough level. The mainhand still stays worn (see
+  // e.mainhandItemId below) so the weapon model keeps rendering.
+  const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const weapon =
+    mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
+      ? mainhand.weapon
+      : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
   // Render-only: the equipped mainhand item id drives the held weapon model on
   // the client (mapped via ITEM_WEAPON_VARIANTS). Gated on the item actually being
@@ -268,7 +312,11 @@ export function recalcPlayerStats(
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =
     equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
-  // Melee AP by class (vanilla-ish): warriors/paladins/shamans/druids 2/str,
+  // Render-only mirror of the full worn set, copied so a later mutation of the
+  // owning PlayerMeta.equipment never aliases into the entity. Synced in the
+  // identity wire (terse `eq`) for the inspect-another-player window.
+  e.equippedItems = { ...equipment };
+  // Melee AP by class (classic-era-ish): warriors/paladins/shamans/druids 2/str,
   // rogues str+agi, hunters str+agi, pure casters str.
   const apFromStats =
     cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid'
@@ -279,7 +327,7 @@ export function recalcPlayerStats(
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
   // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
   e.attackPower = Math.max(0, Math.round((apFromStats + bonusAp) * (1 + (mods?.stats.apPct ?? 0))));
-  // Hunters: ranged AP = 2/agi (vanilla)
+  // Hunters: ranged AP = 2/agi (classic-era value)
   e.rangedPower =
     cls === 'hunter'
       ? Math.max(0, Math.round((s.agi * 2 + bonusAp) * (1 + (mods?.stats.apPct ?? 0))))
@@ -287,9 +335,16 @@ export function recalcPlayerStats(
   // Spell Power: Intellect converted via SPELL_POWER_PER_INT plus flat Spell Power
   // from gear/buffs. Floored at 0 so an Intellect-draining debuff can't go negative.
   e.spellPower = Math.max(0, Math.round(s.int * SPELL_POWER_PER_INT + bonusSp));
+  // Haste from item-set bonuses (the only haste-gear source). ONE aggregated
+  // stat drives all three channels: faster melee and ranged auto-attack swings
+  // AND shorter spell casts/channels.
+  e.meleeHaste = setEff.haste;
+  e.rangedHaste = setEff.haste;
+  e.spellHaste = setEff.haste;
   // Crit: ~1% per 20 agi at low level
   e.critChance = 0.05 + s.agi * 0.0005 + (mods?.stats.crit ?? 0) + setEff.crit;
   e.castPushbackReduction = setEff.castPushbackReduction;
+  e.knockbackResistance = setEff.knockbackResistance;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
 
@@ -306,7 +361,7 @@ export function recalcPlayerStats(
 
   // Druid forms swap the resource bar, classic-style: bear runs on rage
   // (starts empty, fills from combat), cat on energy (starts full — friendlier
-  // than vanilla's 0). Mana is parked in savedMana and restored on shift-out.
+  // than the classic-era 0). Mana is parked in savedMana and restored on shift-out.
   const formResource: 'rage' | 'energy' | null = bearForm ? 'rage' : catForm ? 'energy' : null;
   if (formResource) {
     if (e.resourceType === 'mana') e.savedMana = e.resource;
@@ -366,7 +421,7 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.name = template.name;
   e.level = level;
   e.hostile = true;
-  // Elite scaling, vanilla-style: ~2.3x health, ~1.5x damage.
+  // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;
   e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
@@ -388,12 +443,18 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   if (template.stomp) e.stompTimer = template.stomp.every;
   // Telegraph the first Banshee's Wail the same way: one full interval after engage.
   if (template.terrify) e.terrifyTimer = template.terrify.every;
+  // Telegraph the first Howling Gale the same way: one full interval after engage.
+  if (template.aoeSlow) e.aoeSlowTimer = template.aoeSlow.every;
+  // First battle cry one interval in, so a loud boss's engage yell lands alone on the pull.
+  if (template.battleYells) e.loudYellTimer = template.battleYells.every;
   // Telegraph the first Mend the same way: one full interval after engage.
   if (template.mendAlly) e.mendTimer = template.mendAlly.every;
   // Telegraph the first Ward the same way: one full interval after engage.
   if (template.wardAllies) e.wardTimer = template.wardAllies.every;
   // Telegraph the first Stoneskin: one full interval after engage.
   if (template.stoneskin) e.stoneskinTimer = template.stoneskin.every;
+  // Telegraph the first hardcast (bigCast) the same way: one full interval after engage.
+  if (template.bigCast) e.bigCastTimer = template.bigCast.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.

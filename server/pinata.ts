@@ -6,7 +6,10 @@ import { randomBytes } from 'node:crypto';
 
 const PINATA_JWT = (process.env.PINATA_JWT_SECRET ?? process.env.PINATA_JWT ?? '').trim();
 const PINATA_API = (process.env.PINATA_API_URL ?? 'https://api.pinata.cloud').replace(/\/+$/, '');
-const PINATA_GATEWAY = (process.env.PINATA_GATEWAY ?? 'https://gateway.pinata.cloud').replace(/\/+$/, '');
+const PINATA_GATEWAY = (process.env.PINATA_GATEWAY ?? 'https://gateway.pinata.cloud').replace(
+  /\/+$/,
+  '',
+);
 
 /** Whether hosted (IPFS-pinned) skins can be created — true once a JWT is set. */
 export function pinataEnabled(): boolean {
@@ -26,15 +29,18 @@ export async function pinFileToIPFS(bytes: Buffer, name: string): Promise<string
   const safeName = name.replace(/[^a-z0-9_-]/gi, '').slice(0, 48) || 'skin';
   const head = Buffer.from(
     `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${safeName}.png"\r\n` +
-    `Content-Type: image/png\r\n\r\n`,
+      `Content-Type: image/png\r\n\r\n`,
   );
   const tail = Buffer.from(
     `\r\n--${boundary}\r\nContent-Disposition: form-data; name="pinataMetadata"\r\n\r\n` +
-    `${JSON.stringify({ name: safeName })}\r\n--${boundary}--\r\n`,
+      `${JSON.stringify({ name: safeName })}\r\n--${boundary}--\r\n`,
   );
   const res = await fetch(`${PINATA_API}/pinning/pinFileToIPFS`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${PINATA_JWT}`, 'Content-Type': `multipart/form-data; boundary=${boundary}` },
+    headers: {
+      Authorization: `Bearer ${PINATA_JWT}`,
+      'Content-Type': `multipart/form-data; boundary=${boundary}`,
+    },
     body: Buffer.concat([head, bytes, tail]),
   });
   if (!res.ok) throw new Error(`pinata pin failed: ${res.status} ${await res.text()}`);

@@ -11,8 +11,13 @@
 // generic fallback is real logic (never random, never a stub): every input maps to
 // a valid, stable, faithful-in-palette spec.
 import {
-  normalizeDesignSpec, defaultDesignSpec,
-  SKIN_PATTERNS, type SkinDesignSpec, type SkinPattern, type SkinFinish, type SkinDensity,
+  defaultDesignSpec,
+  normalizeDesignSpec,
+  SKIN_PATTERNS,
+  type SkinDensity,
+  type SkinDesignSpec,
+  type SkinFinish,
+  type SkinPattern,
 } from '../src/world_api';
 import type { NftAttribute } from './nft_ownership';
 
@@ -33,7 +38,7 @@ function fnv1a(s: string): number {
 }
 
 function hslToHex(hDeg: number, s: number, l: number): string {
-  const h = ((hDeg % 360) + 360) % 360 / 360;
+  const h = (((hDeg % 360) + 360) % 360) / 360;
   const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
   const p = 2 * l - q;
   const hue = (t: number): number => {
@@ -63,13 +68,40 @@ function pickFrom<T>(arr: readonly T[], seed: string): T {
 
 // Common colour words -> hex, so a "Gold"/"Blue" trait reads true rather than hashed.
 const COLOR_WORDS: Record<string, string> = {
-  gold: '#d4af37', 'solid gold': '#d4af37', golden: '#d4af37', silver: '#c0c0c0', steel: '#8a8f98',
-  bronze: '#cd7f32', copper: '#b87333', white: '#ededed', cream: '#e8dcc0', black: '#262626',
-  gray: '#8a8a8a', grey: '#8a8a8a', brown: '#6b4a2b', 'dark brown': '#4a3320', tan: '#cdab7e',
-  red: '#b0402f', crimson: '#9b1c2e', orange: '#ff8c2a', yellow: '#ffd23c', green: '#3f8f3a',
-  'army green': '#4b5320', blue: '#4f86d1', 'new punk blue': '#2f4fd1', aquamarine: '#7fffd4',
-  purple: '#7a4fd1', pink: '#e69ec0', teal: '#2aa8a8', cyan: '#34e0e0', zombie: '#6f8f3a',
-  alien: '#9fe8e8', robot: '#8a8f98', cheetah: '#d39a4a', noise: '#9a9a9a', death: '#3a3f46',
+  gold: '#d4af37',
+  'solid gold': '#d4af37',
+  golden: '#d4af37',
+  silver: '#c0c0c0',
+  steel: '#8a8f98',
+  bronze: '#cd7f32',
+  copper: '#b87333',
+  white: '#ededed',
+  cream: '#e8dcc0',
+  black: '#262626',
+  gray: '#8a8a8a',
+  grey: '#8a8a8a',
+  brown: '#6b4a2b',
+  'dark brown': '#4a3320',
+  tan: '#cdab7e',
+  red: '#b0402f',
+  crimson: '#9b1c2e',
+  orange: '#ff8c2a',
+  yellow: '#ffd23c',
+  green: '#3f8f3a',
+  'army green': '#4b5320',
+  blue: '#4f86d1',
+  'new punk blue': '#2f4fd1',
+  aquamarine: '#7fffd4',
+  purple: '#7a4fd1',
+  pink: '#e69ec0',
+  teal: '#2aa8a8',
+  cyan: '#34e0e0',
+  zombie: '#6f8f3a',
+  alien: '#9fe8e8',
+  robot: '#8a8f98',
+  cheetah: '#d39a4a',
+  noise: '#9a9a9a',
+  death: '#3a3f46',
 };
 
 function colorForWord(value: string): string {
@@ -153,18 +185,27 @@ const BAYC: TraitProfile = {
     if (/trippy|dmt|psychedelic|noise|rainbow/.test(f)) emissive = emissive ?? '#ff4fd8';
     if (/zombie/.test(f)) emissive = emissive ?? '#7cff5a';
     const primary = fur ? colorForWord(fur) : '#6b4a2b';
-    const secondary = /trippy|dmt|rainbow/.test(f) ? '#4ff0ff' : hslToHex(fnv1a(fur || 'fur') % 360, 0.4, 0.28);
+    const secondary = /trippy|dmt|rainbow/.test(f)
+      ? '#4ff0ff'
+      : hslToHex(fnv1a(fur || 'fur') % 360, 0.4, 0.28);
     const accent = background ? colorForWord(background) : '#caa84b';
-    const pattern: SkinPattern = /trippy|dmt|noise/.test(f) ? 'spots' : clothesPattern(clothes, a.seed());
+    const pattern: SkinPattern = /trippy|dmt|noise/.test(f)
+      ? 'spots'
+      : clothesPattern(clothes, a.seed());
     const density: SkinDensity = /trippy|dmt|noise/.test(f) ? 'high' : 'medium';
-    return normalizeDesignSpec({ primary, secondary, accent, pattern, finish, density, emissive })
-      ?? defaultDesignSpec();
+    return (
+      normalizeDesignSpec({ primary, secondary, accent, pattern, finish, density, emissive }) ??
+      defaultDesignSpec()
+    );
   },
 };
 
 // --- CryptoPunks -------------------------------------------------------------
 
-const PUNK_TYPE_BASE: Record<string, { primary: string; finish: SkinFinish; emissive: string | null }> = {
+const PUNK_TYPE_BASE: Record<
+  string,
+  { primary: string; finish: SkinFinish; emissive: string | null }
+> = {
   alien: { primary: '#9fe8e8', finish: 'satin', emissive: '#6fe9e9' },
   ape: { primary: '#5f7a3a', finish: 'matte', emissive: null },
   zombie: { primary: '#7f9a5a', finish: 'matte', emissive: '#7cff5a' },
@@ -184,14 +225,32 @@ const CRYPTOPUNKS: TraitProfile = {
     let pattern: SkinPattern = 'solid';
     let finish = base.finish;
     let emissive = base.emissive;
-    if (has(/mohawk/)) { accent = '#ff3030'; pattern = 'chevron'; }
+    if (has(/mohawk/)) {
+      accent = '#ff3030';
+      pattern = 'chevron';
+    }
     if (has(/wild hair|crazy hair|frumpy/)) pattern = 'runes';
-    if (has(/3d glasses|vr/)) { accent = '#2aa8ff'; emissive = emissive ?? '#2aa8ff'; }
-    if (has(/gold chain|medical mask/)) { accent = '#d4af37'; finish = 'metallic'; }
+    if (has(/3d glasses|vr/)) {
+      accent = '#2aa8ff';
+      emissive = emissive ?? '#2aa8ff';
+    }
+    if (has(/gold chain|medical mask/)) {
+      accent = '#d4af37';
+      finish = 'metallic';
+    }
     if (has(/pipe|cigarette|vape|cigar/)) accent = '#b0884a';
     const secondary = hslToHex(fnv1a(type) % 360, 0.35, 0.26);
-    return normalizeDesignSpec({ primary: base.primary, secondary, accent, pattern, finish, density: 'medium', emissive })
-      ?? defaultDesignSpec();
+    return (
+      normalizeDesignSpec({
+        primary: base.primary,
+        secondary,
+        accent,
+        pattern,
+        finish,
+        density: 'medium',
+        emissive,
+      }) ?? defaultDesignSpec()
+    );
   },
 };
 
@@ -210,9 +269,20 @@ const GENERIC: TraitProfile = {
     const clothes = a.get('clothes', 'clothing', 'outfit', 'shirt', 'body');
     const pattern = clothes ? clothesPattern(clothes, seed) : pickFrom(SKIN_PATTERNS, seed);
     const emissive = glowFromEyes(a.get('eyes', 'eye'));
-    const finish: SkinFinish = /metal|robot|gold|chrome|steel/i.test(baseTrait ?? '') ? 'metallic' : 'satin';
-    return normalizeDesignSpec({ primary, secondary, accent, pattern, finish, density: 'medium', emissive })
-      ?? defaultDesignSpec();
+    const finish: SkinFinish = /metal|robot|gold|chrome|steel/i.test(baseTrait ?? '')
+      ? 'metallic'
+      : 'satin';
+    return (
+      normalizeDesignSpec({
+        primary,
+        secondary,
+        accent,
+        pattern,
+        finish,
+        density: 'medium',
+        emissive,
+      }) ?? defaultDesignSpec()
+    );
   },
 };
 

@@ -14,6 +14,19 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import {
+  type AdminPermission,
+  ASSIGNABLE_ADMIN_ROLES,
+  permissionsForRoles,
+  SUPERADMIN_ROLE,
+  sanitizeRoles,
+} from './admin_permissions';
+import { adminPathKnown, permissionForAdminRoute } from './admin_routes';
+import {
+  listAntibotConfigHistory,
+  loadAntibotConfig,
+  saveAntibotConfigChange,
+} from './antibot_config_db';
 import { newToken, verifyPassword } from './auth';
 import { getBugReportScreenshot, listBugReports } from './bug_report_db';
 import {
@@ -34,6 +47,7 @@ import {
   isAdminAccount,
   listCreatorSkinsForReview,
   listNftCollections,
+  pool,
   saveToken,
   setAccountDeactivated,
   setNftCollectionEnabled,
@@ -44,6 +58,7 @@ import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
+import { PgMapsDb } from './maps_db';
 import { removeListing, reviewListing } from './marketplace';
 import {
   addAccountNote,
@@ -57,16 +72,34 @@ import {
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { rateLimited } from './ratelimit';
+import {
+  adminRolesForAccount,
+  listStaff,
+  roleChangeHistory,
+  setAccountAdminRoles,
+} from './staff_db';
+import { PgUserAssetsDb } from './user_assets_db';
 
 // Admin API: everything under /admin/api/*. Auth is a bearer token whose
-// account has is_admin = TRUE — the admin.* hostname is routing, not security.
+// account has at least one staff role (accounts.admin_roles; is_admin stays
+// the derived "is staff" flag): the admin.* hostname is routing, not security.
+// Authorization is per route: every route is declared with a permission in
+// admin_routes.ts and gated centrally in handleAdminApi before any handler
+// runs, so a route absent from that table can never execute.
 
 const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
+const ANTIBOT_CONFIG_NOTE_MAX = 500;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
+
+// Map editor moderation reads/writes go straight to the db layer (like the
+// other *_db imports here); the player-facing rules stay in maps.ts.
+const adminMapsDb = new PgMapsDb(pool);
+const adminUserAssetsDb = new PgUserAssetsDb(pool);
+let antibotConfigSaveTail: Promise<void> = Promise.resolve();
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -95,6 +128,38 @@ function cleanTier(value: unknown): WordTier | null {
   return value === 'soft' || value === 'hard' ? value : null;
 }
 
+type SharedIpSort = 'accounts' | 'last_seen';
+type SharedIpSortDirection = 'asc' | 'desc';
+
+function sharedIpSortParams(params: URLSearchParams): {
+  sort: SharedIpSort;
+  dir: SharedIpSortDirection;
+} {
+  return {
+    sort: params.get('sort') === 'last_seen' ? 'last_seen' : 'accounts',
+    dir: params.get('dir') === 'asc' ? 'asc' : 'desc',
+  };
+}
+
+function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeenAt: string }>(
+  rows: readonly T[],
+  sort: SharedIpSort,
+  dir: SharedIpSortDirection,
+): T[] {
+  const multiplier = dir === 'asc' ? 1 : -1;
+  return [...rows].sort((a, b) => {
+    const primary =
+      sort === 'last_seen'
+        ? a.lastSeenAt.localeCompare(b.lastSeenAt)
+        : a.accountCount - b.accountCount;
+    const secondary =
+      sort === 'last_seen'
+        ? b.accountCount - a.accountCount
+        : b.lastSeenAt.localeCompare(a.lastSeenAt);
+    return primary * multiplier || secondary || a.ip.localeCompare(b.ip);
+  });
+}
+
 function getBlockedIpsForAccount(
   game: GameServer,
   detail: { lastLoginIp: string | null; recentSessions: { ip: string | null }[] },
@@ -105,12 +170,28 @@ function getBlockedIpsForAccount(
   return [...ips].filter((ip) => game.isIpBlocked(ip));
 }
 
-async function adminAccountId(req: http.IncomingMessage): Promise<number | null> {
+interface AdminIdentity {
+  accountId: number;
+  username: string;
+  roles: string[];
+  permissions: ReadonlySet<AdminPermission>;
+}
+
+// Roles are re-read on every request, so a dashboard revocation applies to the
+// next call (a revoked operator's next request 401s: no roles means not staff).
+async function adminIdentity(req: http.IncomingMessage): Promise<AdminIdentity | null> {
   const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
   if (!m) return null;
   const accountId = await accountForToken(m[1]);
   if (accountId === null) return null;
-  return (await isAdminAccount(accountId)) ? accountId : null;
+  const staff = await adminRolesForAccount(accountId);
+  if (staff === null) return null;
+  return {
+    accountId,
+    username: staff.username,
+    roles: staff.roles,
+    permissions: permissionsForRoles(staff.roles),
+  };
 }
 
 async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
@@ -122,13 +203,78 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
   if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
     return fail(res, 401, 'invalid username or password');
   }
-  if (!(await isAdminAccount(account.id))) {
+  const staff = await adminRolesForAccount(account.id);
+  if (staff === null) {
     return fail(res, 403, 'this account does not have admin access');
   }
   await touchLogin(account.id);
   const token = newToken();
   await saveToken(token, account.id);
-  ok(res, { token, username: account.username });
+  ok(res, {
+    token,
+    username: account.username,
+    roles: staff.roles,
+    permissions: [...permissionsForRoles(staff.roles)],
+  });
+}
+
+// Bot-detector config: the body's override document is validated and applied
+// LIVE by the detector; validation or persistence failure re-applies the previous
+// effective document. The current override set and its before/after audit row are
+// committed atomically, then the saved overrides are replayed at the next boot.
+async function handleAntibotConfigSave(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  game: GameServer,
+  adminId: number,
+): Promise<void> {
+  const body = await readBody(req);
+  const overrides = body.overrides;
+  if (typeof overrides !== 'object' || overrides === null || Array.isArray(overrides)) {
+    return fail(res, 400, 'an overrides object is required');
+  }
+  const note =
+    typeof body.note === 'string' ? body.note.trim().slice(0, ANTIBOT_CONFIG_NOTE_MAX) : '';
+  return serializeAntibotConfigSave(async () => {
+    const previousEffective = effectiveAntibotOverrides(game);
+    const result = game.applyAntibotConfig(overrides as Record<string, unknown>);
+    if (result.errors.length > 0) {
+      game.applyAntibotConfig(previousEffective);
+      return fail(res, 400, result.errors.join('; '));
+    }
+    const effective = effectiveAntibotOverrides(game);
+    try {
+      const saved = await saveAntibotConfigChange(effective, adminId, note);
+      ok(res, { fields: game.antibotConfigFields(), updatedAt: saved.updatedAt });
+    } catch (err) {
+      game.applyAntibotConfig(previousEffective);
+      throw err;
+    }
+  });
+}
+
+function serializeAntibotConfigSave(run: () => Promise<void>): Promise<void> {
+  const pending = antibotConfigSaveTail.then(run, run);
+  antibotConfigSaveTail = pending.then(
+    () => undefined,
+    () => undefined,
+  );
+  return pending;
+}
+
+function effectiveAntibotOverrides(game: GameServer): Record<string, unknown> {
+  const effective: Record<string, unknown> = {};
+  for (const field of game.antibotConfigFields()) {
+    if (!configValueEquals(field.value, field.defaultValue)) effective[field.id] = field.value;
+  }
+  return effective;
+}
+
+function configValueEquals(a: unknown, b: unknown): boolean {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((entry) => b.includes(entry));
+  }
+  return a === b;
 }
 
 export async function handleAdminApi(
@@ -143,8 +289,73 @@ export async function handleAdminApi(
       return await handleLogin(req, res);
     }
 
-    const accountId = await adminAccountId(req);
-    if (accountId === null) return fail(res, 401, 'admin authentication required');
+    const identity = await adminIdentity(req);
+    if (identity === null) return fail(res, 401, 'admin authentication required');
+    const accountId = identity.accountId;
+
+    // Central authorization gate: resolve the route's declared permission
+    // before any handler runs. Fail closed on unmapped routes.
+    if (req.method !== 'GET' && req.method !== 'POST') {
+      return fail(res, 405, 'method not allowed');
+    }
+    const routePermission = permissionForAdminRoute(req.method, path);
+    if (routePermission === null) {
+      return adminPathKnown(path)
+        ? fail(res, 405, 'method not allowed')
+        : fail(res, 404, 'unknown admin endpoint');
+    }
+    if (routePermission !== 'any' && !identity.permissions.has(routePermission)) {
+      return fail(res, 403, 'you do not have permission to do this');
+    }
+
+    if (req.method === 'GET' && path === '/admin/api/me') {
+      return ok(res, {
+        username: identity.username,
+        roles: identity.roles,
+        permissions: [...identity.permissions],
+      });
+    }
+
+    // Staff role management. superadmin is out of the dashboard's reach in
+    // both directions (grant and revoke): it moves only via the grant script
+    // or SQL, so a compromised dashboard session cannot mint one. Own-account
+    // edits are refused so an operator cannot lock themselves out silently.
+    if (req.method === 'GET' && path === '/admin/api/staff') {
+      return ok(res, { rows: await listStaff(), assignableRoles: [...ASSIGNABLE_ADMIN_ROLES] });
+    }
+    if (req.method === 'GET' && path === '/admin/api/staff/history') {
+      return ok(res, { rows: await roleChangeHistory(50) });
+    }
+    if (req.method === 'POST' && path === '/admin/api/staff/roles') {
+      const body = await readBody(req);
+      const roles = sanitizeRoles(body.roles);
+      if (roles === null) return fail(res, 400, 'unknown role');
+      if (roles.includes(SUPERADMIN_ROLE)) {
+        return fail(res, 400, 'superadmin roles are managed via the grant script');
+      }
+      const target = typeof body.username === 'string' ? await findAccount(body.username) : null;
+      if (!target) return fail(res, 404, 'account not found');
+      if (target.id === accountId) {
+        return fail(res, 400, 'you cannot change your own roles');
+      }
+      const currentStaff = await adminRolesForAccount(target.id);
+      if (currentStaff?.roles.includes(SUPERADMIN_ROLE)) {
+        return fail(res, 400, 'superadmin roles are managed via the grant script');
+      }
+      const change = await setAccountAdminRoles({
+        accountId: target.id,
+        roles,
+        actorAccountId: accountId,
+      });
+      if (!change) return fail(res, 404, 'account not found');
+      // In-game permissions are snapshotted at WS join, so force the account's
+      // live sessions to reconnect: a revoked moderator loses in-game commands
+      // immediately instead of at their next voluntary relog.
+      if (change.before.join(',') !== change.after.join(',')) {
+        game.disconnectAccount(target.id, IP_BLOCK_KICK_MESSAGE);
+      }
+      return ok(res, { ok: true, username: target.username, roles: change.after });
+    }
 
     const actionMatch =
       /^\/admin\/api\/moderation\/accounts\/(\d+)\/(suspend|unsuspend|ban|unban)$/.exec(path);
@@ -257,9 +468,13 @@ export async function handleAdminApi(
     if (req.method === 'POST' && path === '/admin/api/skins/collections') {
       const body = await readBody(req);
       const chain = body.chain === 'ethereum' || body.chain === 'solana' ? body.chain : null;
-      const standard = body.standard === 'erc721' || body.standard === 'cryptopunks' || body.standard === 'solana' ? body.standard : null;
+      const standard =
+        body.standard === 'erc721' || body.standard === 'cryptopunks' || body.standard === 'solana'
+          ? body.standard
+          : null;
       const contractRaw = typeof body.contract === 'string' ? body.contract.trim() : '';
-      if (!chain || !standard || !contractRaw) return fail(res, 400, 'chain, contract, and standard are required');
+      if (!chain || !standard || !contractRaw)
+        return fail(res, 400, 'chain, contract, and standard are required');
       const contract = chain === 'ethereum' ? contractRaw.toLowerCase() : contractRaw;
       const enabled = body.enabled !== false;
       await upsertNftCollection({
@@ -267,17 +482,22 @@ export async function handleAdminApi(
         contract,
         name: typeof body.name === 'string' ? body.name : '',
         standard,
-        profileId: typeof body.profileId === 'string' && body.profileId ? body.profileId : 'generic',
+        profileId:
+          typeof body.profileId === 'string' && body.profileId ? body.profileId : 'generic',
         licenseBasis: typeof body.licenseBasis === 'string' ? body.licenseBasis : '',
         enabled,
       });
       if (!enabled) await game.resweepNftGrants();
       return ok(res, { ok: true, chain, contract });
     }
-    const collectionEnableMatch = /^\/admin\/api\/skins\/collections\/(ethereum|solana)\/([^/]+)\/enabled$/.exec(path);
+    const collectionEnableMatch =
+      /^\/admin\/api\/skins\/collections\/(ethereum|solana)\/([^/]+)\/enabled$/.exec(path);
     if (req.method === 'POST' && collectionEnableMatch) {
       const [, chain, rawContract] = collectionEnableMatch;
-      const contract = chain === 'ethereum' ? decodeURIComponent(rawContract).toLowerCase() : decodeURIComponent(rawContract);
+      const contract =
+        chain === 'ethereum'
+          ? decodeURIComponent(rawContract).toLowerCase()
+          : decodeURIComponent(rawContract);
       const body = await readBody(req);
       const enabled = body.enabled === true;
       await setNftCollectionEnabled(chain, contract, enabled);
@@ -397,6 +617,25 @@ export async function handleAdminApi(
       return removed ? ok(res, { ok: true }) : fail(res, 404, 'IP not found');
     }
 
+    // Map editor moderation: force a published map back to private, and
+    // block/unblock an uploaded GLB asset (blocked assets 404 on the public
+    // byte GET and reject re-uploads of the same hash).
+    const mapUnpublishMatch = /^\/admin\/api\/maps\/(\d+)\/unpublish$/.exec(path);
+    if (req.method === 'POST' && mapUnpublishMatch) {
+      const done = await adminMapsDb.setStatus(Number(mapUnpublishMatch[1]), null, 'private');
+      return done ? ok(res, { ok: true }) : fail(res, 404, 'map_not_found');
+    }
+    const assetBlockMatch = /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/.exec(path);
+    if (req.method === 'POST' && assetBlockMatch) {
+      const status = assetBlockMatch[2] === 'block' ? 'blocked' : 'active';
+      const done = await adminUserAssetsDb.setStatus(Number(assetBlockMatch[1]), status);
+      return done ? ok(res, { ok: true }) : fail(res, 404, 'asset_not_found');
+    }
+
+    if (req.method === 'POST' && path === '/admin/api/antibot-config') {
+      return await handleAntibotConfigSave(req, res, game, accountId);
+    }
+
     if (req.method !== 'GET') return fail(res, 405, 'method not allowed');
 
     if (path === '/admin/api/blocked-ips') {
@@ -428,11 +667,30 @@ export async function handleAdminApi(
             serverStats.online,
           ),
         },
-        usage: providerUsageSnapshot(),
       });
+    }
+
+    // Provider usage (request counts + cache stats) is its own permission
+    // (ops_usage.read), held only by admin/superadmin, so it lives on a
+    // dedicated route rather than riding inside the analytics.read overview.
+    if (path === '/admin/api/provider-usage') {
+      return ok(res, { usage: providerUsageSnapshot() });
     }
     if (path === '/admin/api/online') {
       return ok(res, { players: game.liveSessions() });
+    }
+    if (path === '/admin/api/antibot-config') {
+      const stored = await loadAntibotConfig();
+      return ok(res, { fields: game.antibotConfigFields(), updatedAt: stored.updatedAt });
+    }
+    if (path === '/admin/api/antibot-config/history') {
+      return ok(res, { entries: await listAntibotConfigHistory() });
+    }
+    if (path === '/admin/api/suspicious-players') {
+      return ok(res, { players: game.suspiciousPlayers() });
+    }
+    if (path === '/admin/api/detection-calibration') {
+      return ok(res, game.detectionCalibration());
     }
     if (path === '/admin/api/online-history') {
       return ok(res, await onlineHistory(url.searchParams.get('range') ?? '30d'));
@@ -471,8 +729,9 @@ export async function handleAdminApi(
     }
     if (path === '/admin/api/shared-ips') {
       const { page, limit } = parsePageParams(url.searchParams);
+      const { sort, dir } = sharedIpSortParams(url.searchParams);
       if (url.searchParams.get('online') === '1') {
-        const rows = game.liveSharedIps();
+        const rows = sortSharedIpRows(game.liveSharedIps(), sort, dir);
         const offset = (page - 1) * limit;
         return ok(res, {
           rows: rows.slice(offset, offset + limit).map((row) => ({
@@ -484,7 +743,7 @@ export async function handleAdminApi(
           limit,
         });
       }
-      const sharedIps = await listSharedIps(page, limit);
+      const sharedIps = await listSharedIps(page, limit, sort, dir);
       return ok(res, {
         ...sharedIps,
         rows: sharedIps.rows.map((row) => ({
@@ -556,6 +815,16 @@ export async function handleAdminApi(
       const sort = url.searchParams.get('sort') ?? 'level';
       const dir = url.searchParams.get('dir') === 'asc' ? 'asc' : 'desc';
       return ok(res, await listCharacters(search, sort, dir, page, limit));
+    }
+    if (path === '/admin/api/maps') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      const { rows, total } = await adminMapsDb.listAdmin(limit, (page - 1) * limit);
+      return ok(res, { rows, total, page, limit });
+    }
+    if (path === '/admin/api/user-assets') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      const { rows, total } = await adminUserAssetsDb.listAdmin(limit, (page - 1) * limit);
+      return ok(res, { rows, total, page, limit });
     }
 
     fail(res, 404, 'unknown admin endpoint');

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the I/O boundaries (eth_rpc, db) — NOT the EIP-1271 decision under test.
 const eth = vi.hoisted(() => ({
@@ -8,8 +8,12 @@ const eth = vi.hoisted(() => ({
 }));
 vi.mock('../server/eth_rpc', () => eth);
 vi.mock('../server/db', () => ({
-  createEvmWalletChallenge: vi.fn(), consumeEvmWalletChallenge: vi.fn(), pruneEvmWalletChallenges: vi.fn(),
-  linkEvmWalletToAccount: vi.fn(), evmWalletForAccount: vi.fn(), unlinkEvmWallet: vi.fn(),
+  createEvmWalletChallenge: vi.fn(),
+  consumeEvmWalletChallenge: vi.fn(),
+  pruneEvmWalletChallenges: vi.fn(),
+  linkEvmWalletToAccount: vi.fn(),
+  evmWalletForAccount: vi.fn(),
+  unlinkEvmWallet: vi.fn(),
 }));
 vi.mock('../server/ratelimit', () => ({ walletLinkRateLimited: vi.fn(() => false) }));
 

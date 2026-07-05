@@ -5,13 +5,24 @@
 // helpers in marketplace.ts.
 import { createHash } from 'node:crypto';
 import {
-  getNftCollection, getCreatorSkin, upsertCreatorSkin, grantNftSkin,
-  listNftGrantsForAccount, evmWalletForAccount, walletForAccount, upsertNftCollection,
-  type CreatorSkinRow, type NftCollectionRow,
+  type CreatorSkinRow,
+  evmWalletForAccount,
+  getCreatorSkin,
+  getNftCollection,
+  grantNftSkin,
+  listNftGrantsForAccount,
+  type NftCollectionRow,
+  upsertCreatorSkin,
+  upsertNftCollection,
+  walletForAccount,
 } from './db';
 import {
-  ownsNft, nftMetadata, isTrustedGatewayUrl,
-  type NftChain, type NftStandard, type NftCollectionRef,
+  isTrustedGatewayUrl,
+  type NftChain,
+  type NftCollectionRef,
+  type NftStandard,
+  nftMetadata,
+  ownsNft,
 } from './nft_ownership';
 import { designSpecForTraits } from './nft_trait_profiles';
 import { loadAtlasBytes, validatePortraitImage } from './skin_assets';
@@ -22,13 +33,17 @@ export const MAX_NFT_SKINS_PER_ACCOUNT = 24;
 const NAME_MAX = 40;
 
 export type NftClaimReason =
-  | 'invalid_chain' | 'invalid_token' | 'collection_not_supported'
-  | 'link_evm_wallet_first' | 'link_solana_wallet_first'
-  | 'ownership_unverified' | 'not_owner' | 'too_many_nft_skins' | 'metadata_unavailable';
+  | 'invalid_chain'
+  | 'invalid_token'
+  | 'collection_not_supported'
+  | 'link_evm_wallet_first'
+  | 'link_solana_wallet_first'
+  | 'ownership_unverified'
+  | 'not_owner'
+  | 'too_many_nft_skins'
+  | 'metadata_unavailable';
 
-export type NftClaimResult =
-  | { ok: true; id: string }
-  | { ok: false; reason: NftClaimReason };
+export type NftClaimResult = { ok: true; id: string } | { ok: false; reason: NftClaimReason };
 
 function asChain(chain: string): NftChain | null {
   return chain === 'ethereum' || chain === 'solana' ? chain : null;
@@ -36,7 +51,10 @@ function asChain(chain: string): NftChain | null {
 
 /** Stable, deterministic, bounded skin id for an NFT (<= MAX_COSMETIC_SKIN_ID_LEN). */
 export function nftSkinId(chain: string, contract: string, tokenId: string): string {
-  const h = createHash('sha256').update(`${chain}:${contract}:${tokenId}`).digest('hex').slice(0, 40);
+  const h = createHash('sha256')
+    .update(`${chain}:${contract}:${tokenId}`)
+    .digest('hex')
+    .slice(0, 40);
   return `cs_nft_${h}`;
 }
 
@@ -49,7 +67,9 @@ function skinName(collectionName: string, chain: NftChain, tokenId: string): str
 /** Resolve + validate the portrait image once, returning the cache key (sha256)
  *  and the server-only origin URL to persist, or null when there is no usable
  *  image (the skin then renders body-only). */
-async function resolvePortrait(imageUrl: string | null): Promise<{ sha256: string; originUrl: string } | null> {
+async function resolvePortrait(
+  imageUrl: string | null,
+): Promise<{ sha256: string; originUrl: string } | null> {
   if (!imageUrl) return null;
   const trusted = isTrustedGatewayUrl(imageUrl);
   const bytes = await loadAtlasBytes({
@@ -77,17 +97,23 @@ export async function claimNftSkin(params: {
 }): Promise<NftClaimResult> {
   const chain = asChain(params.chain);
   if (!chain) return { ok: false, reason: 'invalid_chain' };
-  const contract = chain === 'ethereum' ? params.contract.trim().toLowerCase() : params.contract.trim();
+  const contract =
+    chain === 'ethereum' ? params.contract.trim().toLowerCase() : params.contract.trim();
   const tokenId = params.tokenId.trim();
   if (!contract || !tokenId) return { ok: false, reason: 'invalid_token' };
 
   const collection = await getNftCollection(chain, contract);
   if (!collection || !collection.enabled) return { ok: false, reason: 'collection_not_supported' };
 
-  const address = chain === 'ethereum'
-    ? (await evmWalletForAccount(params.accountId))?.address ?? null
-    : (await walletForAccount(params.accountId))?.pubkey ?? null;
-  if (!address) return { ok: false, reason: chain === 'ethereum' ? 'link_evm_wallet_first' : 'link_solana_wallet_first' };
+  const address =
+    chain === 'ethereum'
+      ? ((await evmWalletForAccount(params.accountId))?.address ?? null)
+      : ((await walletForAccount(params.accountId))?.pubkey ?? null);
+  if (!address)
+    return {
+      ok: false,
+      reason: chain === 'ethereum' ? 'link_evm_wallet_first' : 'link_solana_wallet_first',
+    };
 
   const ref: NftCollectionRef = { chain, contract, standard: collection.standard as NftStandard };
   const owns = await ownsNft(ref, tokenId, address, true);
@@ -106,8 +132,11 @@ export async function claimNftSkin(params: {
   const design = designSpecForTraits(collection.profileId, meta.attributes);
 
   const existing = await getCreatorSkin(skinId);
-  const portrait = await resolvePortrait(meta.image)
-    ?? (existing?.portraitSha256 && existing.originUrl ? { sha256: existing.portraitSha256, originUrl: existing.originUrl } : null);
+  const portrait =
+    (await resolvePortrait(meta.image)) ??
+    (existing?.portraitSha256 && existing.originUrl
+      ? { sha256: existing.portraitSha256, originUrl: existing.originUrl }
+      : null);
 
   const row: CreatorSkinRow = {
     id: skinId,
@@ -159,7 +188,10 @@ export function parseNftCollectionsEnv(raw: string | undefined): NftCollectionRo
     if (!item || typeof item !== 'object') continue;
     const r = item as Record<string, unknown>;
     const chain = r.chain === 'ethereum' || r.chain === 'solana' ? r.chain : null;
-    const standard = r.standard === 'erc721' || r.standard === 'cryptopunks' || r.standard === 'solana' ? r.standard : null;
+    const standard =
+      r.standard === 'erc721' || r.standard === 'cryptopunks' || r.standard === 'solana'
+        ? r.standard
+        : null;
     const contractRaw = typeof r.contract === 'string' ? r.contract.trim() : '';
     if (!chain || !standard || !contractRaw) continue;
     out.push({
@@ -177,7 +209,9 @@ export function parseNftCollectionsEnv(raw: string | undefined): NftCollectionRo
 
 /** Upsert the configured allow-list at boot. Returns how many collections were
  *  seeded. No-op when NFT_COLLECTIONS is unset. */
-export async function seedNftCollections(raw: string | undefined = process.env.NFT_COLLECTIONS): Promise<number> {
+export async function seedNftCollections(
+  raw: string | undefined = process.env.NFT_COLLECTIONS,
+): Promise<number> {
   const rows = parseNftCollectionsEnv(raw);
   for (const row of rows) await upsertNftCollection(row);
   return rows.length;

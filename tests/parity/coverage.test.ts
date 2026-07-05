@@ -2,6 +2,8 @@
 // name it in a comment). These assertions inspect the live events + final state of
 // a recorded run. If a future content change breaks a recipe, this fails loudly so
 // the golden never silently stops exercising a system.
+// Display-name literals follow the LOCKED NAME-MAP (authorized gate-text edit per the
+// OPERATOR RULING, 2026-07-02, ip-refactor/02-WORKING-MEMORY.md); ability/aura IDS are frozen.
 
 import { describe, expect, it } from 'vitest';
 import type { Recorder } from './record';
@@ -49,7 +51,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       (e) =>
         e.type === 'damage' &&
         typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('sinister'),
+        e.ability.toLowerCase().includes('wicked'),
     );
     const playerDealt = ev.some((e) => e.type === 'damage' && e.sourceId === pid);
     expect(sinister || playerDealt).toBe(true);
@@ -90,7 +92,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(
       ev.some((e) => e.type === 'damage' && e.sourceId === pet.id && e.school === 'fire'),
     ).toBe(true);
-    // hostile-mob arm (6776): wild imp's AI shoots the player
+    // hostile-mob arm (6776): wild fire demon's AI shoots the player
     const hostileImpId = rec.notes.hostileImpId;
     expect(
       ev.some(
@@ -117,16 +119,16 @@ describe('coverage: each scenario fires its subsystem', () => {
     ).toBe(true);
   });
 
-  it('pet_ai: imp fires petRangedAttack (fire bolt), melee pet pulls+swings, both heel', () => {
+  it('pet_ai: emberkin fires petRangedAttack (fire bolt), melee pet pulls+swings, both heel', () => {
     const rec = run('pet_ai');
     const ev = rec.allEvents as Ev[];
     const impId = rec.notes.impId as number;
     const tankId = rec.notes.tankId as number;
-    // petRangedAttack: the imp's only damage path is the fire bolt (no miss roll).
+    // petRangedAttack: the emberkin's only damage path is the fire bolt (no miss roll).
     expect(ev.some((e) => e.type === 'damage' && e.sourceId === impId && e.school === 'fire')).toBe(
       true,
     );
-    // melee arm: the voidwalker acquired a target via petPickTarget and swung it.
+    // melee arm: the gloomshade acquired a target via petPickTarget and swung it.
     expect(ev.some((e) => e.type === 'damage' && e.sourceId === tankId)).toBe(true);
     // heel transition: both pets dropped their target and follow the owner.
     const ents = entities(rec);
@@ -166,7 +168,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       (e) =>
         e.type === 'damage' &&
         typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('consecrat'),
+        e.ability.toLowerCase().includes('holy ground'),
     );
     // 1 immediate on-cast pulse (~4097) + >=1 deferred interval pulse (~3052).
     expect(hits.length).toBeGreaterThanOrEqual(2);
@@ -253,6 +255,34 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(r.objectState[r.surfaceExitId].open).toBe(true);
   });
 
+  it('drowned_litany: heroic affix rolls, Bell Shock lands, the driver draws, the rite starts', () => {
+    const rec = run('drowned_litany');
+    const ev = rec.allEvents as Ev[];
+    // Heroic entry rolled a ruin affix off the run seed.
+    expect((rec.notes.affixes as string[]).length).toBeGreaterThan(0);
+    // The bell-rope pull shocked the live cantor mid-combat.
+    expect(
+      ev.some(
+        (e) =>
+          e.type === 'log' &&
+          typeof e.text === 'string' &&
+          e.text.includes('The bell rope snaps taut'),
+      ),
+    ).toBe(true);
+    // The Sister Nhalia driver drew on the shared stream: a Blackwater Mark was
+    // placed and a Tolling Bells volley was live at the sampling instant.
+    expect(rec.notes.marksSeen as number).toBeGreaterThan(0);
+    expect(rec.notes.bellsLive as number).toBeGreaterThan(0);
+    // Cantor phase fired, and after the boss died the rite choose started playback.
+    expect(
+      ev.some(
+        (e) => e.type === 'log' && typeof e.text === 'string' && e.text.includes('Cantors, hold'),
+      ),
+    ).toBe(true);
+    expect(ev.some((e) => e.type === 'delveRiteChoosePrompt')).toBe(true);
+    expect(ev.some((e) => e.type === 'delveRitePulse')).toBe(true);
+  });
+
   it('party_loot: a need/greed loot roll prompt fires', () => {
     const rec = run('party_loot');
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'lootRoll')).toBe(true);
@@ -283,7 +313,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(evs.some((e) => e.type === 'loot' && /Everyone passed/.test(String(e.text)))).toBe(true);
   });
 
-  it('entity_roster: both despawn branches drop, delayed drain runs, graveyard release at full hp', () => {
+  it('entity_roster: despawn branches drop, delayed drain runs, ghost release + healer resurrect', () => {
     const rec = run('entity_roster');
     const ents = entities(rec);
     const ghostId = rec.notes.ghostId as number;
@@ -294,10 +324,12 @@ describe('coverage: each scenario fires its subsystem', () => {
     // delayed drain: 3 scheduled -> 1 fired, 1 guard-dropped, 1 (future) still pending.
     expect((rec.sim as any).delayedEvents.length).toBe(1);
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'respawn')).toBe(true);
-    // outdoor release-spirit: alive again at full hp.
+    // release rose as a ghost, then the Spirit Healer resurrected the player with
+    // Resurrection Sickness (level 10).
     const p = (rec.sim as any).player;
     expect(p.dead).toBe(false);
-    expect(p.hp).toBe(p.maxHp);
+    expect(p.ghost).toBe(false);
+    expect(p.auras.some((a: { id: string }) => a.id === 'resurrection_sickness')).toBe(true);
   });
 
   it('delve_death: second in-run death fails the delve and ejects the player', () => {
@@ -566,7 +598,7 @@ describe('coverage: each scenario fires its subsystem', () => {
           (e) =>
             e.type === 'damage' &&
             typeof e.ability === 'string' &&
-            e.ability.toLowerCase().includes('consecrat'),
+            e.ability.toLowerCase().includes('holy ground'),
         )
         .map((e) => e.targetId),
     );
@@ -662,7 +694,7 @@ describe('coverage: each scenario fires its subsystem', () => {
         e.type === 'damage' &&
         e.kind === 'miss' &&
         typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('sunder'),
+        e.ability.toLowerCase().includes('shear'),
     );
     expect(Boolean(warriorMob) || sunderMiss).toBe(true);
     // mage arcane_explosion: the per-target aoeDamage hit BOTH in-radius mobs.
@@ -718,7 +750,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(
       ev.some(
         (e) =>
-          e.type === 'damage' && (e.ability === 'Heroic Strike' || e.ability === 'Raptor Strike'),
+          e.type === 'damage' && (e.ability === 'Reaver Strike' || e.ability === 'Gutting Strike'),
       ),
     ).toBe(true);
   });
@@ -777,8 +809,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // atomic swap moved goods + coin both directions.
     expect(sim.countItem('wolf_fang', a)).toBe(1); // 3 - 2
     expect(sim.countItem('wolf_fang', b)).toBe(2);
-    expect(sim.countItem('baked_bread', a)).toBe(1);
-    expect(sim.countItem('baked_bread', b)).toBe(1); // 2 - 1
+    expect(sim.countItem('baked_bread', a)).toBe(6); // 5 starter + 1 traded
+    expect(sim.countItem('baked_bread', b)).toBe(6); // 5 starter + 2 - 1
     expect(sim.players.get(a)?.copper).toBe(80); // 100 - 30 + 10
     expect(sim.players.get(b)?.copper).toBe(70); // 50 - 10 + 30
     // every session ended cleared (swap close + explicit cancel + drift sweep).
@@ -830,8 +862,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // Phase 1 raise-fallen wave + the three wardstones the transition lit.
     expect(n.addIds.length).toBe(2);
     expect(n.wardIds.length).toBe(3);
-    // Transition: War Stomp room stun + Brother Aldric spawned and still present.
-    expect(auras.some((e) => e.name === 'War Stomp')).toBe(true);
+    // Transition: Shuddering Stomp room stun + Brother Aldric spawned and still present.
+    expect(auras.some((e) => e.name === 'Shuddering Stomp')).toBe(true);
     expect(entities(rec).some((e) => e.templateId === 'brother_aldric_raid')).toBe(true);
     // Soul Rend marks pick (the rng.int callout) + Deathless Rage interrupt self-stun.
     expect(chats.some((e) => e.text === 'Your spirit belongs to me')).toBe(true);

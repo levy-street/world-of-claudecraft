@@ -8,14 +8,22 @@
 // main.ts. It DOES use the renderer's procedural skin builder (render/characters)
 // for previews — the same path hud.ts uses for CharacterPreview — since that is
 // presentation, not world state.
-import { t, formatNumber } from './i18n';
-import {
-  type CreatorSkinRegistryEntry, type SkinDesignSpec, type SkinPattern, type SkinFinish, type SkinDensity,
-  SKIN_PATTERNS, SKIN_FINISHES, SKIN_DENSITIES, defaultDesignSpec,
-} from '../world_api';
-import type { PlayerClass } from '../sim/types';
-import { designSwatchDataUrl } from '../render/characters/skin_design';
+
 import { CharacterPreview } from '../render/characters';
+import { designSwatchDataUrl } from '../render/characters/skin_design';
+import type { PlayerClass } from '../sim/types';
+import {
+  type CreatorSkinRegistryEntry,
+  defaultDesignSpec,
+  SKIN_DENSITIES,
+  SKIN_FINISHES,
+  SKIN_PATTERNS,
+  type SkinDensity,
+  type SkinDesignSpec,
+  type SkinFinish,
+  type SkinPattern,
+} from '../world_api';
+import { formatNumber, t } from './i18n';
 
 export interface MarketplaceListing {
   name: string;
@@ -42,11 +50,28 @@ export interface MarketplaceHooks {
   // List a freshly-designed skin for sale (instant-live). Throws on failure.
   createListing(listing: MarketplaceListing): Promise<void>;
   // List a self-hosted skin (free): the server proxies the URL. Throws on failure.
-  selfHostSkin(listing: { name: string; description: string; priceUsdc: string; originUrl: string; targetClass: string | null }): Promise<void>;
+  selfHostSkin(listing: {
+    name: string;
+    description: string;
+    priceUsdc: string;
+    originUrl: string;
+    targetClass: string | null;
+  }): Promise<void>;
   // Upload a hosted skin (raw PNG bytes); $WOC-quota gated server-side. Throws on failure.
-  uploadSkin(meta: { name: string; description: string; priceUsdc: string; targetClass: string | null }, png: Uint8Array): Promise<void>;
+  uploadSkin(
+    meta: { name: string; description: string; priceUsdc: string; targetClass: string | null },
+    png: Uint8Array,
+  ): Promise<void>;
   // The viewer's hosting quota (tier/slots/usage/trusted) for the designer meter.
-  fetchQuota(): Promise<{ tier: number; quota: number; used: number; remaining: number; trusted: boolean; hostingEnabled: boolean; selfHostedFree: boolean }>;
+  fetchQuota(): Promise<{
+    tier: number;
+    quota: number;
+    used: number;
+    remaining: number;
+    trusted: boolean;
+    hostingEnabled: boolean;
+    selfHostedFree: boolean;
+  }>;
   // The viewer's class, so the designer previews the skin on their own body.
   playerClass(): PlayerClass;
   // Open the NFT-PFP skins picker (wear an owned NFT). Optional; the entry point
@@ -64,8 +89,14 @@ let designerPreview: CharacterPreview | null = null;
 let designerCanvas: HTMLCanvasElement | null = null;
 
 function destroyDesignerPreview(): void {
-  if (designerPreview) { designerPreview.destroy(); designerPreview = null; }
-  if (designerCanvas) { designerCanvas.remove(); designerCanvas = null; }
+  if (designerPreview) {
+    designerPreview.destroy();
+    designerPreview = null;
+  }
+  if (designerCanvas) {
+    designerCanvas.remove();
+    designerCanvas = null;
+  }
 }
 
 export function attachMarketplace(h: MarketplaceHooks): void {
@@ -80,8 +111,11 @@ export function marketplaceAttached(): boolean {
 // never be interpolated raw (mirrors hud.ts's private esc).
 function esc(value: unknown): string {
   return String(value ?? '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // USDC base units (6 decimals) -> a localized currency string, e.g. "$10.00".
@@ -102,8 +136,12 @@ function ensureOverlay(): HTMLDivElement {
   const el = document.createElement('div');
   el.id = 'creator-marketplace';
   el.className = 'skin-event-overlay'; // reuse the cosmetic-overlay backdrop styling
-  el.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-  el.addEventListener('mousedown', (e) => { if (e.target === el) close(); });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+  el.addEventListener('mousedown', (e) => {
+    if (e.target === el) close();
+  });
   document.body.appendChild(el);
   overlay = el;
   return el;
@@ -143,7 +181,9 @@ function renderBrowse(content: HTMLElement, skins: CreatorSkinRegistryEntry[]): 
     `</div>`;
   const grid = content.querySelector('.market-grid') as HTMLElement;
   const search = content.querySelector('.market-search') as HTMLInputElement;
-  content.querySelector('.market-nft-cta')?.addEventListener('click', () => hooks?.openNftSkins?.());
+  content
+    .querySelector('.market-nft-cta')
+    ?.addEventListener('click', () => hooks?.openNftSkins?.());
 
   const draw = (filter: string): void => {
     const owned = new Set(hooks?.ownedSkinIds() ?? []);
@@ -151,7 +191,11 @@ function renderBrowse(content: HTMLElement, skins: CreatorSkinRegistryEntry[]): 
     // NFT-PFP skins are claimed (proof of ownership), not bought, so an UNOWNED
     // NFT never appears in the for-sale grid (it is reached via the picker). An
     // OWNED NFT skin shows so it can be re-equipped like any other owned skin.
-    const shown = skins.filter((s) => (!s.nft || owned.has(s.id)) && (!q || s.name.toLowerCase().includes(q) || s.creator.toLowerCase().includes(q)));
+    const shown = skins.filter(
+      (s) =>
+        (!s.nft || owned.has(s.id)) &&
+        (!q || s.name.toLowerCase().includes(q) || s.creator.toLowerCase().includes(q)),
+    );
     grid.innerHTML = '';
     if (shown.length === 0) {
       const empty = document.createElement('div');
@@ -182,7 +226,9 @@ function buildCard(skin: CreatorSkinRegistryEntry, isOwned: boolean): HTMLElemen
     `<span class="market-class-badge">${klass}</span></div>` +
     (skin.description ? `<div class="market-card-desc">${esc(skin.description)}</div>` : '') +
     // NFT skins are claimed, not priced; show the NFT tag instead of a price.
-    (skin.nft ? `<div class="market-card-price market-card-nft">${esc(t('hudChrome.nftSkins.title'))}</div>` : `<div class="market-card-price">${esc(formatUsdc(skin.priceUsdc))}</div>`) +
+    (skin.nft
+      ? `<div class="market-card-price market-card-nft">${esc(t('hudChrome.nftSkins.title'))}</div>`
+      : `<div class="market-card-price">${esc(formatUsdc(skin.priceUsdc))}</div>`) +
     `<div class="market-card-status" role="status" aria-live="polite"></div>`;
   // One button, one click handler, closure-tracked ownership: a successful buy
   // flips `owned` so the next click equips — no second listener (which would
@@ -193,12 +239,18 @@ function buildCard(skin: CreatorSkinRegistryEntry, isOwned: boolean): HTMLElemen
   let owned = isOwned;
   const refresh = (): void => {
     button.textContent = owned ? t('marketplace.equip') : t('marketplace.buy');
-    button.setAttribute('aria-label', owned
-      ? `${t('marketplace.equip')} ${skin.name}`
-      : `${t('marketplace.buy')} ${skin.name} — ${formatUsdc(skin.priceUsdc)}`);
+    button.setAttribute(
+      'aria-label',
+      owned
+        ? `${t('marketplace.equip')} ${skin.name}`
+        : `${t('marketplace.buy')} ${skin.name} — ${formatUsdc(skin.priceUsdc)}`,
+    );
   };
   button.addEventListener('click', () => {
-    if (owned) { onEquip(skin, card, button); return; }
+    if (owned) {
+      onEquip(skin, card, button);
+      return;
+    }
     void onBuy(skin, card, button).then((bought) => {
       if (!bought) return;
       owned = true;
@@ -220,7 +272,11 @@ function statusEl(card: HTMLElement): HTMLElement {
   return card.querySelector('.market-card-status') as HTMLElement;
 }
 
-function onEquip(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: HTMLButtonElement): void {
+function onEquip(
+  skin: CreatorSkinRegistryEntry,
+  card: HTMLElement,
+  button: HTMLButtonElement,
+): void {
   if (!hooks) return;
   hooks.equip(skin);
   statusEl(card).textContent = t('marketplace.equipped');
@@ -230,7 +286,11 @@ function onEquip(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: HTML
 // Returns true once the skin is bought (so the card can flip to Equip). The
 // try/catch is load-bearing: purchase spans wallet + network + chain and throws
 // human-readable failures that must land on the card's status line.
-async function onBuy(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: HTMLButtonElement): Promise<boolean> {
+async function onBuy(
+  skin: CreatorSkinRegistryEntry,
+  card: HTMLElement,
+  button: HTMLButtonElement,
+): Promise<boolean> {
   if (!hooks) return false;
   const status = statusEl(card);
   button.disabled = true;
@@ -238,7 +298,10 @@ async function onBuy(skin: CreatorSkinRegistryEntry, card: HTMLElement, button: 
     if (!hooks.isWalletConnected()) {
       status.textContent = t('marketplace.connectFirst');
       await hooks.connectWallet();
-      if (!hooks.isWalletConnected()) { button.disabled = false; return false; }
+      if (!hooks.isWalletConnected()) {
+        button.disabled = false;
+        return false;
+      }
     }
     status.textContent = t('marketplace.purchasing');
     await hooks.purchase(skin);
@@ -268,77 +331,120 @@ function renderCreate(content: HTMLElement): void {
   const setMode = (mode: 'design' | 'upload' | 'link'): void => {
     destroyDesignerPreview(); // the turntable only lives in design mode
     content.querySelectorAll('.market-cmode').forEach((b) => {
-      const el = b as HTMLElement; const on = el.dataset.cmode === mode;
-      el.classList.toggle('sel', on); el.setAttribute('aria-selected', on ? 'true' : 'false');
+      const el = b as HTMLElement;
+      const on = el.dataset.cmode === mode;
+      el.classList.toggle('sel', on);
+      el.setAttribute('aria-selected', on ? 'true' : 'false');
     });
     if (mode === 'design') renderDesignerMode(body);
     else void renderImageMode(body, mode);
   };
-  content.querySelectorAll('.market-cmode').forEach((b) =>
-    b.addEventListener('click', () => setMode((b as HTMLElement).dataset.cmode as 'design' | 'upload' | 'link')));
+  content.querySelectorAll('.market-cmode').forEach((b) => {
+    b.addEventListener('click', () =>
+      setMode((b as HTMLElement).dataset.cmode as 'design' | 'upload' | 'link'),
+    );
+  });
   setMode('design');
 }
 
 // Shared listing form (name / description / price) for every Create sub-mode.
 function listingFormHtml(): string {
-  return `<label class="market-field market-field-col"><span>${esc(t('marketplace.nameLabel'))}</span><input type="text" class="d-name" maxlength="40" placeholder="${esc(t('marketplace.namePlaceholder'))}"></label>` +
+  return (
+    `<label class="market-field market-field-col"><span>${esc(t('marketplace.nameLabel'))}</span><input type="text" class="d-name" maxlength="40" placeholder="${esc(t('marketplace.namePlaceholder'))}"></label>` +
     `<label class="market-field market-field-col"><span>${esc(t('marketplace.descLabel'))}</span><input type="text" class="d-desc" maxlength="200" placeholder="${esc(t('marketplace.descPlaceholder'))}"></label>` +
     `<label class="market-field market-field-col"><span>${esc(t('marketplace.priceLabel'))}</span><input type="number" class="d-price" min="0.5" step="0.5" value="10"></label>` +
     `<div class="market-payout-hint">${esc(t('marketplace.payoutHint'))}</div>` +
-    `<div class="market-card-status market-list-status" role="status" aria-live="polite"></div>`;
+    `<div class="market-card-status market-list-status" role="status" aria-live="polite"></div>`
+  );
 }
 
 // Read name/description/price from a Create sub-mode form; null if no name.
-function readListingMeta(root: HTMLElement): { name: string; description: string; priceUsdc: string } | null {
+function readListingMeta(
+  root: HTMLElement,
+): { name: string; description: string; priceUsdc: string } | null {
   const name = (root.querySelector('.d-name') as HTMLInputElement).value.trim();
   if (!name) return null;
   const description = (root.querySelector('.d-desc') as HTMLInputElement).value.trim();
   const dollars = Number((root.querySelector('.d-price') as HTMLInputElement).value);
-  return { name, description, priceUsdc: String(Math.max(0, Math.round((Number.isFinite(dollars) ? dollars : 0) * 1_000_000))) };
+  return {
+    name,
+    description,
+    priceUsdc: String(
+      Math.max(0, Math.round((Number.isFinite(dollars) ? dollars : 0) * 1_000_000)),
+    ),
+  };
 }
 
 // Upload (hosted, $WOC-gated) + Self-host (link, free) sub-modes share a layout:
 // an intro, a quota/free note, the source input, then the listing form.
 async function renderImageMode(host: HTMLElement, mode: 'upload' | 'link'): Promise<void> {
   const quota = hooks ? await hooks.fetchQuota() : null;
-  const note = mode === 'upload'
-    ? (quota && !quota.hostingEnabled
-      ? `<div class="market-quota market-quota-warn">${esc(t('marketplace.hostingUnavailable'))}</div>`
-      : `<div class="market-quota">${esc(t('marketplace.quotaMeter', { used: String(quota?.used ?? 0), quota: String(quota?.quota ?? 0) }))}${quota?.trusted ? ` &middot; ${esc(t('marketplace.trustedBadge'))}` : ''}</div>`)
-    : `<div class="market-quota">${esc(t('marketplace.selfHostedFreeNote'))}</div>`;
-  const input = mode === 'upload'
-    ? `<label class="market-field market-field-col"><span>${esc(t('marketplace.uploadFile'))}</span><input type="file" accept="image/png" class="d-file"></label>`
-    : `<label class="market-field market-field-col"><span>${esc(t('marketplace.linkUrl'))}</span><input type="url" class="d-url" placeholder="https://"></label>`;
+  const note =
+    mode === 'upload'
+      ? quota && !quota.hostingEnabled
+        ? `<div class="market-quota market-quota-warn">${esc(t('marketplace.hostingUnavailable'))}</div>`
+        : `<div class="market-quota">${esc(t('marketplace.quotaMeter', { used: String(quota?.used ?? 0), quota: String(quota?.quota ?? 0) }))}${quota?.trusted ? ` &middot; ${esc(t('marketplace.trustedBadge'))}` : ''}</div>`
+      : `<div class="market-quota">${esc(t('marketplace.selfHostedFreeNote'))}</div>`;
+  const input =
+    mode === 'upload'
+      ? `<label class="market-field market-field-col"><span>${esc(t('marketplace.uploadFile'))}</span><input type="file" accept="image/png" class="d-file"></label>`
+      : `<label class="market-field market-field-col"><span>${esc(t('marketplace.linkUrl'))}</span><input type="url" class="d-url" placeholder="https://"></label>`;
   host.innerHTML =
     `<div class="market-imagemode">` +
     `<p class="market-design-intro">${esc(t(mode === 'upload' ? 'marketplace.uploadIntro' : 'marketplace.linkIntro'))}</p>` +
-    note + input + listingFormHtml() +
+    note +
+    input +
+    listingFormHtml() +
     `<button type="button" class="btn market-list-btn">${esc(t('marketplace.list'))}</button>` +
     `</div>`;
   const status = host.querySelector('.market-list-status') as HTMLElement;
   const btn = host.querySelector('.market-list-btn') as HTMLButtonElement;
-  btn.addEventListener('click', () => { void submitImage(host, mode, status, btn); });
+  btn.addEventListener('click', () => {
+    void submitImage(host, mode, status, btn);
+  });
 }
 
-async function submitImage(host: HTMLElement, mode: 'upload' | 'link', status: HTMLElement, button: HTMLButtonElement): Promise<void> {
+async function submitImage(
+  host: HTMLElement,
+  mode: 'upload' | 'link',
+  status: HTMLElement,
+  button: HTMLButtonElement,
+): Promise<void> {
   if (!hooks) return;
   const meta = readListingMeta(host);
-  if (!meta) { status.textContent = t('marketplace.nameLabel'); return; }
+  if (!meta) {
+    status.textContent = t('marketplace.nameLabel');
+    return;
+  }
   button.disabled = true;
   try {
     if (!hooks.isWalletConnected()) {
       status.textContent = t('marketplace.listConnectFirst');
       await hooks.connectWallet();
-      if (!hooks.isWalletConnected()) { button.disabled = false; return; }
+      if (!hooks.isWalletConnected()) {
+        button.disabled = false;
+        return;
+      }
     }
     status.textContent = t('marketplace.listing');
     if (mode === 'upload') {
       const file = (host.querySelector('.d-file') as HTMLInputElement).files?.[0];
-      if (!file) { status.textContent = t('marketplace.uploadFile'); button.disabled = false; return; }
-      await hooks.uploadSkin({ ...meta, targetClass: null }, new Uint8Array(await file.arrayBuffer()));
+      if (!file) {
+        status.textContent = t('marketplace.uploadFile');
+        button.disabled = false;
+        return;
+      }
+      await hooks.uploadSkin(
+        { ...meta, targetClass: null },
+        new Uint8Array(await file.arrayBuffer()),
+      );
     } else {
       const originUrl = (host.querySelector('.d-url') as HTMLInputElement).value.trim();
-      if (!originUrl) { status.textContent = t('marketplace.linkUrl'); button.disabled = false; return; }
+      if (!originUrl) {
+        status.textContent = t('marketplace.linkUrl');
+        button.disabled = false;
+        return;
+      }
       await hooks.selfHostSkin({ ...meta, originUrl, targetClass: null });
     }
     status.textContent = t('marketplace.listedReview');
@@ -353,7 +459,9 @@ async function submitImage(host: HTMLElement, mode: 'upload' | 'link', status: H
 function renderDesignerMode(host: HTMLElement): void {
   destroyDesignerPreview(); // a fresh turntable per mount
   const opts = <T extends string>(vals: readonly T[], cur: T, label: (v: T) => string): string =>
-    vals.map((v) => `<option value="${v}"${v === cur ? ' selected' : ''}>${esc(label(v))}</option>`).join('');
+    vals
+      .map((v) => `<option value="${v}"${v === cur ? ' selected' : ''}>${esc(label(v))}</option>`)
+      .join('');
   host.innerHTML =
     `<div class="market-create">` +
     `<div class="market-design">` +
@@ -414,11 +522,16 @@ function renderDesignerMode(host: HTMLElement): void {
     swatch.src = designSwatchDataUrl(design, 120);
     designerPreview?.setDesignSkin(design);
   };
-  for (const el of [primary, secondary, accent, pattern, finish, density, glowOn, glow]) el.addEventListener('input', sync);
+  for (const el of [primary, secondary, accent, pattern, finish, density, glowOn, glow])
+    el.addEventListener('input', sync);
 
   host.querySelector('.market-randomize')?.addEventListener('click', () => {
-    const rndHex = (): string => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
-    const pick = <T,>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)];
+    const rndHex = (): string =>
+      '#' +
+      Math.floor(Math.random() * 0xffffff)
+        .toString(16)
+        .padStart(6, '0');
+    const pick = <T>(a: readonly T[]): T => a[Math.floor(Math.random() * a.length)];
     primary.value = rndHex();
     secondary.value = rndHex();
     accent.value = rndHex();
@@ -428,23 +541,37 @@ function renderDesignerMode(host: HTMLElement): void {
     sync();
   });
 
-  listBtn.addEventListener('click', () => { void onList(host, status, listBtn); });
+  listBtn.addEventListener('click', () => {
+    void onList(host, status, listBtn);
+  });
   sync();
 }
 
-async function onList(content: HTMLElement, status: HTMLElement, button: HTMLButtonElement): Promise<void> {
+async function onList(
+  content: HTMLElement,
+  status: HTMLElement,
+  button: HTMLButtonElement,
+): Promise<void> {
   if (!hooks) return;
   const name = (content.querySelector('.d-name') as HTMLInputElement).value.trim();
   const description = (content.querySelector('.d-desc') as HTMLInputElement).value.trim();
   const dollars = Number((content.querySelector('.d-price') as HTMLInputElement).value);
-  if (!name) { status.textContent = t('marketplace.nameLabel'); return; }
-  const priceUsdc = String(Math.max(0, Math.round((Number.isFinite(dollars) ? dollars : 0) * 1_000_000)));
+  if (!name) {
+    status.textContent = t('marketplace.nameLabel');
+    return;
+  }
+  const priceUsdc = String(
+    Math.max(0, Math.round((Number.isFinite(dollars) ? dollars : 0) * 1_000_000)),
+  );
   button.disabled = true;
   try {
     if (!hooks.isWalletConnected()) {
       status.textContent = t('marketplace.listConnectFirst');
       await hooks.connectWallet();
-      if (!hooks.isWalletConnected()) { button.disabled = false; return; }
+      if (!hooks.isWalletConnected()) {
+        button.disabled = false;
+        return;
+      }
     }
     status.textContent = t('marketplace.listing');
     await hooks.createListing({ name, description, priceUsdc, design, targetClass: null });
@@ -461,7 +588,11 @@ async function onList(content: HTMLElement, status: HTMLElement, button: HTMLBut
 // Shell + tabs
 // ---------------------------------------------------------------------------
 
-function setTab(tab: 'browse' | 'create', content: HTMLElement, skins: CreatorSkinRegistryEntry[]): void {
+function setTab(
+  tab: 'browse' | 'create',
+  content: HTMLElement,
+  skins: CreatorSkinRegistryEntry[],
+): void {
   activeTab = tab;
   overlay?.querySelectorAll('.market-tab').forEach((b) => {
     const el = b as HTMLElement;
@@ -469,8 +600,10 @@ function setTab(tab: 'browse' | 'create', content: HTMLElement, skins: CreatorSk
     el.classList.toggle('sel', on);
     el.setAttribute('aria-selected', on ? 'true' : 'false');
   });
-  if (tab === 'browse') { destroyDesignerPreview(); renderBrowse(content, skins); }
-  else renderCreate(content);
+  if (tab === 'browse') {
+    destroyDesignerPreview();
+    renderBrowse(content, skins);
+  } else renderCreate(content);
 }
 
 /** Open (and populate) the marketplace overlay. No-op until attachMarketplace
@@ -499,7 +632,9 @@ export async function openMarketplace(): Promise<void> {
   // The user may have closed the overlay while the registry was loading.
   if (el.style.display === 'none') return;
   for (const b of Array.from(el.querySelectorAll('.market-tab'))) {
-    b.addEventListener('click', () => setTab((b as HTMLElement).dataset.tab as 'browse' | 'create', content, skins));
+    b.addEventListener('click', () =>
+      setTab((b as HTMLElement).dataset.tab as 'browse' | 'create', content, skins),
+    );
   }
   setTab(activeTab, content, skins);
 }

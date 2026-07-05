@@ -10,13 +10,18 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import {
+  type CreatorSkinRegistryEntry,
+  normalizeDesignSpec,
+  type SkinDesignSpec,
+} from '../../world_api';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
 import {
   type AttachDef,
+  characterPreloadUrls,
   itemWeaponModelUrl,
-  manifestUrlsForGraphics,
   SKIN_EMISSIVE,
   SKINS,
   VISUALS,
@@ -24,7 +29,6 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
 } from './manifest';
-import { normalizeDesignSpec, type CreatorSkinRegistryEntry, type SkinDesignSpec } from '../../world_api';
 import { buildSkinCanvas, buildSkinEmissiveCanvas, designHash } from './skin_design';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
@@ -292,7 +296,12 @@ function assetUrl(url: string): string {
   return visualAssetUrlForGraphics(url, GFX.standardMaterials);
 }
 
-const preloadUrls = manifestUrlsForGraphics(GFX.standardMaterials);
+// Preload the character/weapon GLBs. characterPreloadUrls() is tier-INDEPENDENT (see
+// manifest.ts): buildProps-style placement resolves asset URLs against the LIVE GFX
+// tier via assetUrl(), and resolvedGltf() throws "character asset not preloaded"
+// synchronously, so the preload set must be a superset of any tier's placement set or
+// world entry crashes (the character-side twin of the v0.16.0 props P0).
+const preloadUrls = characterPreloadUrls(GFX.standardMaterials);
 
 for (const url of preloadUrls) {
   registerPreload(
@@ -442,8 +451,13 @@ function loadCreatorUrl(url: string): Promise<void> {
   const inflight = creatorSkinInflight.get(url);
   if (inflight) return inflight;
   const p = loadSkinTexInto(url, creatorSkinTexByUrl)
-    .then(() => { touchCreatorUrl(url); evictCreatorSkins(); })
-    .finally(() => { creatorSkinInflight.delete(url); });
+    .then(() => {
+      touchCreatorUrl(url);
+      evictCreatorSkins();
+    })
+    .finally(() => {
+      creatorSkinInflight.delete(url);
+    });
   creatorSkinInflight.set(url, p);
   return p;
 }
@@ -455,7 +469,10 @@ export function ensureCreatorSkin(id: string): Promise<void> {
   const entry = creatorSkinRegistry.get(id);
   if (!entry) return Promise.resolve();
   // Procedural designer skins build synchronously from the spec — no fetch.
-  if (entry.design) { designSkinTexture(entry.design); return Promise.resolve(); }
+  if (entry.design) {
+    designSkinTexture(entry.design);
+    return Promise.resolve();
+  }
   const jobs = [loadCreatorUrl(entry.assetUrl)];
   if (entry.emissiveUrl && GFX.standardMaterials) jobs.push(loadCreatorUrl(entry.emissiveUrl));
   return Promise.all(jobs).then(() => undefined);
@@ -522,7 +539,10 @@ function touchDesign(hash: string): void {
 export function designSkinTexture(spec: SkinDesignSpec): THREE.Texture {
   const h = designHash(spec);
   let t = designTexByHash.get(h);
-  if (!t) { t = texFromCanvas(buildSkinCanvas(spec)); designTexByHash.set(h, t); }
+  if (!t) {
+    t = texFromCanvas(buildSkinCanvas(spec));
+    designTexByHash.set(h, t);
+  }
   touchDesign(h);
   return t;
 }

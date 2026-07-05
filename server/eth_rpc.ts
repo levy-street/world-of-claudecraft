@@ -17,11 +17,18 @@ export function ethRpcConfigured(): boolean {
   return ETH_RPC_URL.length > 0;
 }
 
-interface RpcEnvelope<T> { result?: T; error?: { code?: number; message?: string } | null }
+interface RpcEnvelope<T> {
+  result?: T;
+  error?: { code?: number; message?: string } | null;
+}
 
 /** One JSON-RPC round trip returning the full envelope, or null on a transport
  *  failure / non-200 (which is distinct from an RPC-level `error` in the body). */
-async function rpcEnvelope<T>(method: string, params: unknown[], timeoutMs: number): Promise<RpcEnvelope<T> | null> {
+async function rpcEnvelope<T>(
+  method: string,
+  params: unknown[],
+  timeoutMs: number,
+): Promise<RpcEnvelope<T> | null> {
   if (!ethRpcConfigured()) return null;
   let res: Response;
   try {
@@ -43,7 +50,11 @@ async function rpcEnvelope<T>(method: string, params: unknown[], timeoutMs: numb
  * non-200, RPC `error`, or absent result. Use this when "any failure" collapses
  * to the same handling (e.g. tokenURI reads).
  */
-export async function ethRpc<T>(method: string, params: unknown[], timeoutMs = 8000): Promise<T | null> {
+export async function ethRpc<T>(
+  method: string,
+  params: unknown[],
+  timeoutMs = 8000,
+): Promise<T | null> {
   const env = await rpcEnvelope<T>(method, params, timeoutMs);
   if (!env || env.error || env.result == null) return null;
   return env.result;
@@ -58,15 +69,28 @@ export type EthCallOutcome =
   | { kind: 'reverted' }
   | { kind: 'error' };
 
-function classifyError(message: string | undefined, code: number | undefined): 'reverted' | 'error' {
+function classifyError(
+  message: string | undefined,
+  code: number | undefined,
+): 'reverted' | 'error' {
   const m = (message ?? '').toLowerCase();
-  if (code === 3 || m.includes('revert') || m.includes('invalid opcode') || m.includes('out of gas')) return 'reverted';
+  if (
+    code === 3 ||
+    m.includes('revert') ||
+    m.includes('invalid opcode') ||
+    m.includes('out of gas')
+  )
+    return 'reverted';
   return 'error';
 }
 
 /** `eth_call` against `to` with hex `data`, classifying the result as readable
  *  data, an on-chain revert, or a transport/RPC error. */
-export async function ethCallOutcome(to: string, data: string, timeoutMs = 8000): Promise<EthCallOutcome> {
+export async function ethCallOutcome(
+  to: string,
+  data: string,
+  timeoutMs = 8000,
+): Promise<EthCallOutcome> {
   const env = await rpcEnvelope<string>('eth_call', [{ to, data }, 'latest'], timeoutMs);
   if (!env) return { kind: 'error' };
   if (env.error) return { kind: classifyError(env.error.message, env.error.code) };

@@ -85,6 +85,20 @@ export class QuestLogWindow {
     this.deps.root().style.display = 'block';
   }
 
+  /** Open the log (if closed) with the given quest selected, so a click on a
+   *  tracker row jumps straight to that quest's detail pane. */
+  openWithQuest(questId: string): void {
+    this.selected = questId;
+    if (!this.isOpen) {
+      this.openerFocus = this.deps.captureFocus();
+      this.deps.closeOthers();
+      this.render();
+      this.deps.root().style.display = 'block';
+      return;
+    }
+    this.render();
+  }
+
   close(restoreFocus = true): void {
     const el = this.deps.root();
     el.style.display = 'none';

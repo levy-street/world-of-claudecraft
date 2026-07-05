@@ -3,12 +3,12 @@
 // amounts are base units (6 decimals) as bigint; $WOC amounts are base units too.
 
 export interface BurnPolicy {
-  thresholdUsdc: bigint;       // run as soon as the pool reaches this
-  minBatchUsdc: bigint;        // fee-aware floor — never swap below this, even past cadence
-  cadenceMs: number;           // run on this interval once the pool clears the floor
-  twapSplitAboveUsdc: bigint;  // pools above this are split into chunks (price-impact control)
-  twapChunkUsdc: bigint;       // max USDC per child swap
-  maxSlippageBps: bigint;      // hard slippage ceiling handed to the DEX (swap reverts past it)
+  thresholdUsdc: bigint; // run as soon as the pool reaches this
+  minBatchUsdc: bigint; // fee-aware floor — never swap below this, even past cadence
+  cadenceMs: number; // run on this interval once the pool clears the floor
+  twapSplitAboveUsdc: bigint; // pools above this are split into chunks (price-impact control)
+  twapChunkUsdc: bigint; // max USDC per child swap
+  maxSlippageBps: bigint; // hard slippage ceiling handed to the DEX (swap reverts past it)
 }
 
 const usdc = (dollars: number): bigint => BigInt(Math.round(dollars * 1_000_000));
@@ -29,7 +29,12 @@ export const DEFAULT_BURN_POLICY: BurnPolicy = {
  * indefinitely (even past cadence) until it clears `minBatchUsdc`, so a batch can
  * never spend more in fees than it swaps.
  */
-export function shouldRunBatch(p: { availableUsdc: bigint; lastBurnAt: number | null; now: number; policy: BurnPolicy }): boolean {
+export function shouldRunBatch(p: {
+  availableUsdc: bigint;
+  lastBurnAt: number | null;
+  now: number;
+  policy: BurnPolicy;
+}): boolean {
   if (p.availableUsdc < p.policy.minBatchUsdc) return false;
   if (p.availableUsdc >= p.policy.thresholdUsdc) return true;
   const sinceLast = p.lastBurnAt === null ? Infinity : p.now - p.lastBurnAt;

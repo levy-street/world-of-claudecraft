@@ -19,6 +19,21 @@ export interface FriendInfo {
 
 export interface GuildMemberInfo extends FriendInfo {
   rank: GuildRank;
+  // ISO-8601 timestamp of this member's last world entry, or null if never
+  // recorded. Rides the 'social' frame; drives the "last seen" roster readout.
+  lastLogin: string | null;
+}
+
+// One guild calendar event (the event calendar's guild lane). `day` is a UTC
+// 'YYYY-MM-DD'; `hour` is 0-23 or null for an all-day event; `createdBy` is
+// the author's display name (verbatim proper noun).
+export interface GuildEventInfo {
+  id: number;
+  day: string;
+  hour: number | null;
+  title: string;
+  note: string;
+  createdBy: string;
 }
 
 export interface GuildInfo {
@@ -26,6 +41,7 @@ export interface GuildInfo {
   name: string;
   rank: GuildRank;
   members: GuildMemberInfo[];
+  events: GuildEventInfo[];
 }
 
 export interface SocialInfo {
@@ -57,6 +73,10 @@ export interface IWorldSocialGraph {
   guildDemote(name: string): void;
   guildTransfer(name: string): void;
   guildDisband(): void;
+  // guild calendar events (officers + the Guild Master manage; everyone views
+  // them via socialInfo.guild.events)
+  guildEventCreate(day: string, hour: number | null, title: string, note: string): void;
+  guildEventRemove(eventId: number): void;
   // realm-scoped username typeahead for friend/ignore/guild search
   searchCharacters(query: string): Promise<CharacterSearchResult[]>;
 }

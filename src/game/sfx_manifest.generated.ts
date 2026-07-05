@@ -63,6 +63,10 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
     "url": "/audio/sfx/cast_holy.mp3",
     "loop": true
   },
+  "cast_lightning_bolt": {
+    "url": "/audio/sfx/cast_lightning_bolt.wav",
+    "loop": true
+  },
   "cast_nature": {
     "url": "/audio/sfx/cast_nature.mp3",
     "loop": true
@@ -251,28 +255,28 @@ export const SFX_CLIPS: Record<string, SfxEntry> =
     "url": "/audio/sfx/mob_humanoid_death.mp3",
     "loop": false
   },
-  "mob_kobold_aggro": {
-    "url": "/audio/sfx/mob_kobold_aggro.mp3",
+  "mob_burrower_aggro": {
+    "url": "/audio/sfx/mob_burrower_aggro.mp3",
     "loop": false
   },
-  "mob_kobold_attack": {
-    "url": "/audio/sfx/mob_kobold_attack.mp3",
+  "mob_burrower_attack": {
+    "url": "/audio/sfx/mob_burrower_attack.mp3",
     "loop": false
   },
-  "mob_kobold_death": {
-    "url": "/audio/sfx/mob_kobold_death.mp3",
+  "mob_burrower_death": {
+    "url": "/audio/sfx/mob_burrower_death.mp3",
     "loop": false
   },
-  "mob_murloc_aggro": {
-    "url": "/audio/sfx/mob_murloc_aggro.mp3",
+  "mob_mudfin_aggro": {
+    "url": "/audio/sfx/mob_mudfin_aggro.mp3",
     "loop": false
   },
-  "mob_murloc_attack": {
-    "url": "/audio/sfx/mob_murloc_attack.mp3",
+  "mob_mudfin_attack": {
+    "url": "/audio/sfx/mob_mudfin_attack.mp3",
     "loop": false
   },
-  "mob_murloc_death": {
-    "url": "/audio/sfx/mob_murloc_death.mp3",
+  "mob_mudfin_death": {
+    "url": "/audio/sfx/mob_mudfin_death.mp3",
     "loop": false
   },
   "mob_ogre_aggro": {

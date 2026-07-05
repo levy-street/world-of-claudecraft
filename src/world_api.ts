@@ -9,7 +9,7 @@
 // keep resolving to THIS file, never the sibling directory.
 //
 // ---------------------------------------------------------------------------
-// FACET MAP: the 20 domain facets (each IWorld member assigned exactly once; 142
+// FACET MAP: the 22 domain facets (each IWorld member assigned exactly once; 169
 // total). One interface per file under ./world_api/; aux types travel with their
 // facet. The authoritative member-per-facet split is the W0c parity test.
 //
@@ -30,23 +30,28 @@
 //   duel_arena.ts       IWorldDuelArena      duels + ranked arena + 2v2 fiesta
 //   social_graph.ts     IWorldSocialGraph    friends/blocks/guild (online-only frames)
 //   market.ts           IWorldMarket         World Market browse/list/buy
+//   mail.ts             IWorldMail           Ravenpost mail send/take + unread badge
 //   dungeons.ts         IWorldDungeons       dungeon enter/leave + raid lockouts
 //   delves.ts           IWorldDelves         delve runs, lockpick, companion
+//   daily_rewards.ts    IWorldDailyRewards   daily WOC-holder rewards
 //   telemetry.ts        IWorldTelemetry      fire-and-forget metrics sink
+//   professions.ts      IWorldProfessions    skill/craft/recipe/node read surface (#1164; node
+//                                            harvest read + action landed in #1121)
 //
 // THREE GATES pin this seam (run before any facet edit):
 //   tests/snapshots.test.ts        (W0a)  selfWireJson <-> applySnapshot round-trip;
 //                                          ALL_DELTA_KEYS (25) + TERSE_TO_IWORLD mapping.
 //   tests/command_schema.test.ts   (W0b)  COMMAND_NAMES universe; ClientWorld send-set
 //                                          subset-of dispatch-set; DISPATCH_ONLY (7).
-//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (142) present + same-kind on
+//   tests/world_api_parity.test.ts (W0c)  IWORLD_MEMBERS (169) present + same-kind on
 //                                          Sim + ClientWorld; aggregate == disjoint
-//                                          union of the 20 facets.
+//                                          union of the 22 facets.
 // ---------------------------------------------------------------------------
 
 import type { IWorldChat } from './world_api/chat';
 import type { IWorldCombat } from './world_api/combat';
 import type { IWorldCosmetics } from './world_api/cosmetics';
+import type { IWorldDailyRewards } from './world_api/daily_rewards';
 import type { IWorldDelves } from './world_api/delves';
 import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeons } from './world_api/dungeons';
@@ -54,9 +59,11 @@ import type { IWorldEntityRoster } from './world_api/entity_roster';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
 import type { IWorldLoot } from './world_api/loot';
+import type { IWorldMail } from './world_api/mail';
 import type { IWorldMarket } from './world_api/market';
 import type { IWorldParty } from './world_api/party';
 import type { IWorldPet } from './world_api/pet';
+import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
 import type { IWorldSocialGraph } from './world_api/social_graph';
@@ -66,11 +73,23 @@ import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
-export type { LeaderboardPage } from './sim/leaderboard_page';
+export type {
+  DevLeaderboardPage,
+  GuildLeaderboardPage,
+  LeaderboardPage,
+} from './sim/leaderboard_page';
 export type { ArenaCombatant, ArenaFormat, ArenaStanding, OverheadEmoteId } from './sim/types';
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
+export type {
+  AccountCosmetics,
+  CreatorSkinRegistryEntry,
+  SkinDensity,
+  SkinDesignSpec,
+  SkinFinish,
+  SkinPattern,
+} from './world_api/cosmetics';
 export {
   defaultDesignSpec,
   normalizeAccountCosmetics,
@@ -80,13 +99,16 @@ export {
   SKIN_PATTERNS,
 } from './world_api/cosmetics';
 export type {
-  AccountCosmetics,
-  CreatorSkinRegistryEntry,
-  SkinDensity,
-  SkinDesignSpec,
-  SkinFinish,
-  SkinPattern,
-} from './world_api/cosmetics';
+  DailyRewardEligibilityView,
+  DailyRewardHistory,
+  DailyRewardLeaderboardEntry,
+  DailyRewardLeaderboardPage,
+  DailyRewardPayoutLogEntry,
+  DailyRewardSpinResult,
+  DailyRewardSpinView,
+  DailyRewardStatus,
+  DailyRewardTaskView,
+} from './world_api/daily_rewards';
 export type {
   DelveCompanionInfo,
   DelveDailyInfo,
@@ -104,12 +126,19 @@ export type {
   FiestaScoreboardPlayer,
 } from './world_api/duel_arena';
 export type { RaidLockout } from './world_api/dungeons';
+export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
-export type { PartyInfo, PartyMemberInfo } from './world_api/party';
-export type { LeaderboardEntry } from './world_api/progression_xp';
+export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
+export type { PlayerProfessionsView } from './world_api/professions';
+export type {
+  DevLeaderboardEntry,
+  GuildLeaderboardEntry,
+  LeaderboardEntry,
+} from './world_api/progression_xp';
 export type {
   CharacterSearchResult,
   FriendInfo,
+  GuildEventInfo,
   GuildInfo,
   GuildMemberInfo,
   GuildRank,
@@ -139,9 +168,12 @@ export interface IWorld
     IWorldDuelArena,
     IWorldSocialGraph,
     IWorldMarket,
+    IWorldMail,
     IWorldDungeons,
     IWorldDelves,
-    IWorldTelemetry {}
+    IWorldDailyRewards,
+    IWorldTelemetry,
+    IWorldProfessions {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -163,6 +195,7 @@ export interface IWorld
 // `unequip_item`, ...) intentionally differ from the IWorld member names.
 export const COMMAND_NAMES = [
   'castSlot',
+  'castAt',
   'cast',
   'cancel_aura',
   'target',
@@ -174,6 +207,7 @@ export const COMMAND_NAMES = [
   'stopattack',
   'interact',
   'loot',
+  'harvestCorpse',
   'lootRoll',
   'pickup',
   'accept',
@@ -188,6 +222,7 @@ export const COMMAND_NAMES = [
   'sell',
   'buyback',
   'sell_all_junk',
+  'harvest_node',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
@@ -200,6 +235,7 @@ export const COMMAND_NAMES = [
   'pdecline',
   'pleave',
   'pkick',
+  'ppromote',
   'praid',
   'punraid',
   'pmoveRaid',
@@ -257,6 +293,8 @@ export const COMMAND_NAMES = [
   'dev_level',
   'dev_teleport',
   'dev_give',
+  'dev_complete_quest',
+  'dev_complete_all_quests',
   'enter_crypt',
   'enter_dungeon',
   'leave_crypt',
@@ -270,7 +308,19 @@ export const COMMAND_NAMES = [
   'lockpick_action',
   'lockpick_abort',
   'collect_delve_chest_loot',
+  'delve_rite_choose',
   'telemetry',
+  'equip_bag',
+  'unequip_bag',
+  'mail_send',
+  'mail_take',
+  'mail_delete',
+  'mail_read',
+  'guild_event_create',
+  'guild_event_remove',
+  'autoloot',
+  'resurrect_corpse',
+  'resurrect_healer',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -287,6 +337,8 @@ export const DISPATCH_ONLY_COMMANDS = [
   'dev_level',
   'dev_teleport',
   'dev_give',
+  'dev_complete_quest',
+  'dev_complete_all_quests',
   'enter_crypt',
   'leave_crypt',
   'social_refresh',
@@ -328,18 +380,25 @@ export type WorldFacet =
   | 'IWorldDuelArena'
   | 'IWorldSocialGraph'
   | 'IWorldMarket'
+  | 'IWorldMail'
   | 'IWorldDungeons'
   | 'IWorldDelves'
+  | 'IWorldDailyRewards'
   | 'IWorldTelemetry';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
+  castAt: 'IWorldCombat',
   cancel_aura: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
   release: 'IWorldCombat',
+  // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
+  // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
+  resurrect_corpse: 'IWorldCombat',
+  resurrect_healer: 'IWorldCombat',
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
@@ -383,6 +442,7 @@ export const COMMAND_FACETS = {
   pdecline: 'IWorldParty',
   pleave: 'IWorldParty',
   pkick: 'IWorldParty',
+  ppromote: 'IWorldParty',
   praid: 'IWorldParty',
   punraid: 'IWorldParty',
   pmoveRaid: 'IWorldParty',
@@ -425,6 +485,8 @@ export const COMMAND_FACETS = {
   guild_demote: 'IWorldSocialGraph',
   guild_transfer: 'IWorldSocialGraph',
   guild_disband: 'IWorldSocialGraph',
+  guild_event_create: 'IWorldSocialGraph',
+  guild_event_remove: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
@@ -432,6 +494,12 @@ export const COMMAND_FACETS = {
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',
+  // IWorldMail: Ravenpost letters (snake_case wire strings, by design). mailInfo /
+  // mailUnread are snapshot reads (no send, untagged).
+  mail_send: 'IWorldMail',
+  mail_take: 'IWorldMail',
+  mail_delete: 'IWorldMail',
+  mail_read: 'IWorldMail',
   // IWorldDungeons: dungeon enter/leave. raidLockouts is a snapshot-derived read
   // (no send, untagged). enter_crypt/leave_crypt are legacy dispatch-only aliases
   // (untagged; on the DISPATCH_ONLY_COMMANDS allowlist), NOT IWorldDungeons.
@@ -452,4 +520,5 @@ export const COMMAND_FACETS = {
   lockpick_action: 'IWorldDelves',
   lockpick_abort: 'IWorldDelves',
   collect_delve_chest_loot: 'IWorldDelves',
+  delve_rite_choose: 'IWorldDelves',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

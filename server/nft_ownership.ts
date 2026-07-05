@@ -11,9 +11,9 @@
 // owner + collection + attributes for both standard and compressed NFTs.
 import { keccak_256 } from '@noble/hashes/sha3';
 import { bytesToHex, utf8ToBytes } from '@noble/hashes/utils';
-import { ethCallOutcome, type EthCallOutcome } from './eth_rpc';
-import { dasGetAsset, solanaDasConfigured } from './solana_das';
+import { type EthCallOutcome, ethCallOutcome } from './eth_rpc';
 import { assertSafePublicUrl } from './skin_assets';
+import { dasGetAsset, solanaDasConfigured } from './solana_das';
 import { isSolanaAddress } from './wallet_link';
 import { normalizeEvmAddress } from './wallet_link_evm';
 
@@ -26,8 +26,15 @@ export interface NftCollectionRef {
   standard: NftStandard;
 }
 
-export interface NftAttribute { trait_type: string; value: string }
-export interface NftMetadata { attributes: NftAttribute[]; image: string | null; collection: string | null }
+export interface NftAttribute {
+  trait_type: string;
+  value: string;
+}
+export interface NftMetadata {
+  attributes: NftAttribute[];
+  image: string | null;
+  collection: string | null;
+}
 
 // owner -> the current holder; none -> token exists but `address` is not it / no
 // owner; unknown -> could not read (fail-closed: do not grant, do not revoke).
@@ -98,14 +105,18 @@ function outcomeToOwnership(out: EthCallOutcome): NftOwnership {
 // --- Ethereum ownership ---------------------------------------------------------
 
 async function erc721Owner(contract: string, tokenId: bigint): Promise<NftOwnership> {
-  return outcomeToOwnership(await ethCallOutcome(contract, `${SEL_OWNER_OF}${encodeUint256(tokenId)}`));
+  return outcomeToOwnership(
+    await ethCallOutcome(contract, `${SEL_OWNER_OF}${encodeUint256(tokenId)}`),
+  );
 }
 
 /** A CryptoPunk is owned either natively (`punkIndexToAddress`) or, if wrapped,
  *  via the Wrapped Punks ERC-721 (`ownerOf`). When wrapped, the native mapping
  *  points at the wrapper contract, so we follow through to the wrapper. */
 async function cryptopunkOwner(tokenId: bigint): Promise<NftOwnership> {
-  const native = outcomeToOwnership(await ethCallOutcome(CRYPTOPUNKS_NATIVE, `${SEL_PUNK_INDEX}${encodeUint256(tokenId)}`));
+  const native = outcomeToOwnership(
+    await ethCallOutcome(CRYPTOPUNKS_NATIVE, `${SEL_PUNK_INDEX}${encodeUint256(tokenId)}`),
+  );
   if (native.kind === 'unknown') return native;
   if (native.kind === 'owner' && native.owner !== WRAPPED_PUNKS) return native;
   // Native owner is the wrapper (or absent): the real holder is the wrapped ERC-721 owner.
@@ -139,7 +150,10 @@ async function solanaOwnership(ref: NftCollectionRef, mint: string): Promise<Nft
 
 // --- public ownership API -------------------------------------------------------
 
-interface OwnershipCacheEntry { result: NftOwnership; at: number }
+interface OwnershipCacheEntry {
+  result: NftOwnership;
+  at: number;
+}
 export const NFT_OWNERSHIP_TTL_MS = 5 * 60 * 1000;
 export const NFT_OWNERSHIP_CACHE_MAX = 4096;
 const ownershipCache = new Map<string, OwnershipCacheEntry>();
@@ -155,7 +169,11 @@ export function resetNftOwnershipCacheForTests(): void {
 /** The current owner of a token, cached per (chain, contract, token) for a short
  *  TTL. `unknown` results are never cached, so a transient failure retries; only
  *  definite `owner`/`none` answers are reused. */
-export async function nftOwnership(ref: NftCollectionRef, tokenId: string, fresh = false): Promise<NftOwnership> {
+export async function nftOwnership(
+  ref: NftCollectionRef,
+  tokenId: string,
+  fresh = false,
+): Promise<NftOwnership> {
   const key = cacheKey(ref, tokenId);
   const now = Date.now();
   const hit = ownershipCache.get(key);
@@ -188,7 +206,12 @@ export async function nftOwnership(ref: NftCollectionRef, tokenId: string, fresh
  * null when ownership could not be determined (fail-closed). EVM addresses
  * compare case-insensitively; Solana base58 compares exactly.
  */
-export async function ownsNft(ref: NftCollectionRef, tokenId: string, address: string, fresh = false): Promise<boolean | null> {
+export async function ownsNft(
+  ref: NftCollectionRef,
+  tokenId: string,
+  address: string,
+  fresh = false,
+): Promise<boolean | null> {
   const ownership = await nftOwnership(ref, tokenId, fresh);
   if (ownership.kind === 'unknown') return null;
   if (ownership.kind === 'none') return false;
@@ -270,7 +293,9 @@ async function ethMetadata(ref: NftCollectionRef, tokenId: bigint): Promise<NftM
   if (out.kind !== 'ok') return null;
   const uri = decodeAbiString(out.data);
   if (!uri) return null;
-  const json = uri.startsWith('data:') ? decodeDataJsonUri(uri) : await fetchJsonBounded(resolveAssetUri(uri) ?? '');
+  const json = uri.startsWith('data:')
+    ? decodeDataJsonUri(uri)
+    : await fetchJsonBounded(resolveAssetUri(uri) ?? '');
   if (!json || typeof json !== 'object') return null;
   const rec = json as Record<string, unknown>;
   const image = typeof rec.image === 'string' ? resolveAssetUri(rec.image) : null;
@@ -282,10 +307,11 @@ async function solanaMetadata(ref: NftCollectionRef, mint: string): Promise<NftM
   const asset = await dasGetAsset(mint);
   if (asset === null) return null;
   const attributes = coerceAttributes(asset.content?.metadata?.attributes);
-  const rawImage = asset.content?.links?.image
-    ?? asset.content?.files?.find((f) => (f.mime ?? '').startsWith('image/'))?.uri
-    ?? asset.content?.files?.[0]?.uri
-    ?? null;
+  const rawImage =
+    asset.content?.links?.image ??
+    asset.content?.files?.find((f) => (f.mime ?? '').startsWith('image/'))?.uri ??
+    asset.content?.files?.[0]?.uri ??
+    null;
   const image = rawImage ? resolveAssetUri(rawImage) : null;
   return { attributes, image, collection: ref.contract };
 }
@@ -294,7 +320,10 @@ async function solanaMetadata(ref: NftCollectionRef, mint: string): Promise<NftM
  *  cannot be read. Called once at claim time; the result is persisted (the
  *  derived design spec + the cached portrait), so a later metadata outage does
  *  not break a granted skin. */
-export async function nftMetadata(ref: NftCollectionRef, tokenId: string): Promise<NftMetadata | null> {
+export async function nftMetadata(
+  ref: NftCollectionRef,
+  tokenId: string,
+): Promise<NftMetadata | null> {
   if (ref.chain === 'ethereum') {
     if (!/^\d+$/.test(tokenId)) return null;
     return ethMetadata(ref, BigInt(tokenId));

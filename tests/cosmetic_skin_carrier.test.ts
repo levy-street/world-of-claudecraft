@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  touchCharacterLogin: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
@@ -15,12 +16,12 @@ vi.mock('../server/db', () => ({
   walletForAccount: vi.fn(async () => null),
 }));
 
-import { GameServer, ClientSession } from '../server/game';
+import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
-import { Sim } from '../src/sim/sim';
-import { recalcPlayerStats } from '../src/sim/entity';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
-import { type PlayerClass } from '../src/sim/types';
+import { recalcPlayerStats } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
+import type { PlayerClass } from '../src/sim/types';
 
 // ---------------------------------------------------------------------------
 // Sim core: the opaque id is stored, cleared, inert to stats, deterministic,
@@ -96,9 +97,16 @@ describe('cosmetic skin carrier — sim core', () => {
     const fingerprint = (): string => {
       recalcPlayerStats(e, meta.cls, meta.equipment, (sim as any).playerMods(meta));
       return JSON.stringify({
-        maxHp: e.maxHp, maxResource: e.maxResource, attackPower: e.attackPower,
-        rangedPower: e.rangedPower, critChance: e.critChance, dodgeChance: e.dodgeChance,
-        resourceType: e.resourceType, stats: e.stats, weapon: e.weapon, scale: e.scale,
+        maxHp: e.maxHp,
+        maxResource: e.maxResource,
+        attackPower: e.attackPower,
+        rangedPower: e.rangedPower,
+        critChance: e.critChance,
+        dodgeChance: e.dodgeChance,
+        resourceType: e.resourceType,
+        stats: e.stats,
+        weapon: e.weapon,
+        scale: e.scale,
       });
     };
     const base = fingerprint();
@@ -119,7 +127,9 @@ describe('cosmetic skin carrier — sim core', () => {
     const fingerprintWorld = (sim: Sim): string => {
       const parts: string[] = [`t=${sim.tickCount}`];
       for (const [id, e] of [...sim.entities.entries()].sort((a, b) => a[0] - b[0])) {
-        parts.push(`${id}:${e.pos.x.toFixed(4)},${e.pos.y.toFixed(4)},${e.pos.z.toFixed(4)},${e.hp},${e.facing.toFixed(4)}`);
+        parts.push(
+          `${id}:${e.pos.x.toFixed(4)},${e.pos.y.toFixed(4)},${e.pos.z.toFixed(4)},${e.hp},${e.facing.toFixed(4)}`,
+        );
       }
       return parts.join('|');
     };
@@ -185,7 +195,13 @@ function lastSnap(sent: any[]): any {
   return null;
 }
 
-function joinServer(server: GameServer, fc: FakeClient, characterId: number, name: string, cls: PlayerClass = 'warrior'): ClientSession {
+function joinServer(
+  server: GameServer,
+  fc: FakeClient,
+  characterId: number,
+  name: string,
+  cls: PlayerClass = 'warrior',
+): ClientSession {
   const session = server.join(fc.ws, characterId, characterId, name, cls, null);
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
@@ -261,7 +277,7 @@ describe('creator-skin identity broadcast round-trip', () => {
     expect(snap.self).not.toHaveProperty('csk');
   });
 
-  it('round-trips a second player\'s csk through the full entity record both clients see', () => {
+  it("round-trips a second player's csk through the full entity record both clients see", () => {
     const fc2 = fakeWs();
     const other = joinServer(server, fc2, 2, 'Muralist', 'mage');
     server.sim.setPlayerSkin(other.pid, 0, 'class', 'creator_aurora');
@@ -293,8 +309,18 @@ describe('creator-skin identity broadcast round-trip', () => {
   it('decodes csk into cosmeticSkinId on a raw full wire record', () => {
     const client = bareClient(99);
     const wire = {
-      id: 42, k: 'player', tid: 'player', nm: 'Sovereign', lv: 60,
-      x: 0, y: 0, z: 0, f: 0, hp: 100, mhp: 100, csk: 'creator_obsidian',
+      id: 42,
+      k: 'player',
+      tid: 'player',
+      nm: 'Sovereign',
+      lv: 60,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+      csk: 'creator_obsidian',
     };
 
     (client as any).applySnapshot({ t: 'snap', ents: [wire] });
@@ -305,8 +331,17 @@ describe('creator-skin identity broadcast round-trip', () => {
   it('defaults cosmeticSkinId to null when a record omits csk', () => {
     const client = bareClient(99);
     const wire = {
-      id: 43, k: 'mob', tid: 'forest_wolf', nm: 'Forest Wolf', lv: 1,
-      x: 0, y: 0, z: 0, f: 0, hp: 45, mhp: 45,
+      id: 43,
+      k: 'mob',
+      tid: 'forest_wolf',
+      nm: 'Forest Wolf',
+      lv: 1,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 45,
+      mhp: 45,
     };
 
     (client as any).applySnapshot({ t: 'snap', ents: [wire] });
@@ -358,7 +393,10 @@ describe('creator-skin equip gate (server-authoritative)', () => {
     server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'change_skin', ...msg }));
 
   it('applies an owned creator overlay and clears it when a built-in skin is reselected', () => {
-    session.accountCosmetics = { ...session.accountCosmetics, ownedCreatorSkinIds: ['creator_owned'] };
+    session.accountCosmetics = {
+      ...session.accountCosmetics,
+      ownedCreatorSkinIds: ['creator_owned'],
+    };
 
     changeSkin({ skin: 0, catalog: 'class', csk: 'creator_owned' });
     expect(server.sim.entities.get(session.pid)!.cosmeticSkinId).toBe('creator_owned');
@@ -413,7 +451,10 @@ describe('creator-skin equip gate (server-authoritative)', () => {
   });
 
   it('drops the whole command when skin is not a number (no overlay applied even if owned)', () => {
-    session.accountCosmetics = { ...session.accountCosmetics, ownedCreatorSkinIds: ['creator_owned'] };
+    session.accountCosmetics = {
+      ...session.accountCosmetics,
+      ownedCreatorSkinIds: ['creator_owned'],
+    };
     changeSkin({ skin: '2', catalog: 'class', csk: 'creator_owned' }); // string skin -> rejected by the type guard
     const e = server.sim.entities.get(session.pid)!;
     expect(e.skin).toBe(0); // unchanged default

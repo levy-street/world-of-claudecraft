@@ -252,21 +252,18 @@ export function buildOptionsMenu(opts: {
  *  trailing graphics/reload notes + the reload button + footer as panel chrome. */
 export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv): OptionsControl[] {
   const out: OptionsControl[] = [];
-  out.push(
-    choice(
-      s,
-      'graphicsPreset',
-      'hud.options.graphicsQuality',
-      [
-        { value: 1, labelKey: 'hud.options.graphicsPresetLow' },
-        { value: 2, labelKey: 'hud.options.graphicsPresetMedium' },
-        { value: 3, labelKey: 'hud.options.graphicsPresetHigh' },
-        { value: 4, labelKey: 'hud.options.graphicsPresetUltra' },
-        { value: 5, labelKey: 'hud.options.graphicsPresetAdvanced' },
-      ],
-      true,
-    ),
-  );
+  const graphicsPresetOptions: ChoiceOption[] = [
+    { value: 1, labelKey: 'hud.options.graphicsPresetLow' },
+    { value: 2, labelKey: 'hud.options.graphicsPresetMedium' },
+    { value: 3, labelKey: 'hud.options.graphicsPresetHigh' },
+  ];
+  if (!env.nativeShell) {
+    graphicsPresetOptions.push(
+      { value: 4, labelKey: 'hud.options.graphicsPresetUltra' },
+      { value: 5, labelKey: 'hud.options.graphicsPresetAdvanced' },
+    );
+  }
+  out.push(choice(s, 'graphicsPreset', 'hud.options.graphicsQuality', graphicsPresetOptions, true));
   // Advanced preset (5) reveals the four per-system low/high pickers.
   if (Math.round(s.num('graphicsPreset')) === 5) {
     out.push(choice(s, 'terrainDetail', 'hud.options.terrainDetail', lowHighOptions));
@@ -361,6 +358,8 @@ export function buildControllerControls(s: OptionsSettingsSource): OptionsContro
 export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     slider(s, 'uiScale', 'hudChrome.options.uiScale'),
+    slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
+    slider(s, 'targetFrameScale', 'hudChrome.options.targetFrameScale'),
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
     slider(s, 'fctScale', 'hud.options.fctScale'),
@@ -372,9 +371,17 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
     boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
     boolToggle(s, 'showWalletOnPlayerCard', 'hudChrome.options.showWalletOnPlayerCard'),
+    boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
+    boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
     boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
+    boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+    boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
+    boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
+    boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
+    boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
+    boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
   ];
 }
 

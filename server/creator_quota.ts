@@ -57,5 +57,8 @@ export interface TrustInputs {
 export function isTrustedCreator(p: TrustInputs): boolean {
   if (p.recentStrikes > 0) return false;
   if (p.tierIndex >= 7) return p.approvedCount >= 1;
-  return p.approvedCount >= trustApprovalThreshold(p.tierIndex) && p.accountAgeDays >= TRUST_MIN_ACCOUNT_AGE_DAYS;
+  return (
+    p.approvedCount >= trustApprovalThreshold(p.tierIndex) &&
+    p.accountAgeDays >= TRUST_MIN_ACCOUNT_AGE_DAYS
+  );
 }

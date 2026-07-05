@@ -10,21 +10,55 @@
 // is the thin, real I/O wiring (Jupiter REST + @solana/web3.js signing + raw RPC
 // reads). Jupiter is mainnet-only, so the live path runs only on a funded mainnet
 // deployment; the orchestration is exercised headlessly via the injected fakes.
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, VersionedTransaction } from '@solana/web3.js';
-import bs58 from 'bs58';
+
 import { randomBytes } from 'node:crypto';
-import { isSolanaAddress } from './wallet_link';
-import { DEFAULT_BURN_POLICY, planTwapChunks, shouldRunBatch, type BurnPolicy } from './burn_policy';
-import { parseSplitPayment, fetchFinalizedTransaction, signatureStatus, solanaRpc, SOLANA_RPC_URL, SPL_TOKEN_PROGRAM } from './solana_rpc';
 import {
-  createBurnBatch, markBatchSwapped, markBatchBurning, markBatchBurned, markBatchFailed,
-  openBurnBatches, lastBurnAt, type BurnBatchRow,
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+  VersionedTransaction,
+} from '@solana/web3.js';
+import bs58 from 'bs58';
+import {
+  type BurnPolicy,
+  DEFAULT_BURN_POLICY,
+  planTwapChunks,
+  shouldRunBatch,
+} from './burn_policy';
+import {
+  type BurnBatchRow,
+  createBurnBatch,
+  lastBurnAt,
+  markBatchBurned,
+  markBatchBurning,
+  markBatchFailed,
+  markBatchSwapped,
+  openBurnBatches,
 } from './db';
+import {
+  fetchFinalizedTransaction,
+  parseSplitPayment,
+  SOLANA_RPC_URL,
+  SPL_TOKEN_PROGRAM,
+  signatureStatus,
+  solanaRpc,
+} from './solana_rpc';
+import { isSolanaAddress } from './wallet_link';
 
 const BURN_VAULT = (process.env.MARKETPLACE_BURN_VAULT ?? '').trim();
 const BURN_VAULT_SECRET = (process.env.MARKETPLACE_BURN_VAULT_SECRET ?? '').trim();
-const USDC_MINT = (process.env.USDC_MINT ?? process.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
-const WOC_MINT = (process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth').trim();
+const USDC_MINT = (
+  process.env.USDC_MINT ??
+  process.env.VITE_USDC_MINT ??
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+).trim();
+const WOC_MINT = (
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+).trim();
 const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag/v6').trim();
 const SPL_ATA_PROGRAM = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
 const TOKEN_PROGRAM = new PublicKey(SPL_TOKEN_PROGRAM);
@@ -50,7 +84,10 @@ function envPolicy(): BurnPolicy {
     cadenceMs: ms('BURN_CADENCE_MS', DEFAULT_BURN_POLICY.cadenceMs),
     twapSplitAboveUsdc: u('BURN_TWAP_SPLIT_ABOVE_USDC', DEFAULT_BURN_POLICY.twapSplitAboveUsdc),
     twapChunkUsdc: u('BURN_TWAP_CHUNK_USDC', DEFAULT_BURN_POLICY.twapChunkUsdc),
-    maxSlippageBps: bps && Number.isFinite(Number(bps)) ? BigInt(Math.round(Number(bps))) : DEFAULT_BURN_POLICY.maxSlippageBps,
+    maxSlippageBps:
+      bps && Number.isFinite(Number(bps))
+        ? BigInt(Math.round(Number(bps)))
+        : DEFAULT_BURN_POLICY.maxSlippageBps,
   };
 }
 
@@ -106,11 +143,22 @@ export class BurnKeeper {
    */
   async runCycle(): Promise<void> {
     const open = await this.store.openBatches();
-    if (open.length > 0) { await this.recover(open); return; }
+    if (open.length > 0) {
+      await this.recover(open);
+      return;
+    }
 
     const available = await this.exec.vaultUsdcBalance();
     const last = await this.store.lastBurnAt();
-    if (!shouldRunBatch({ availableUsdc: available, lastBurnAt: last, now: this.opts.now(), policy: this.policy })) return;
+    if (
+      !shouldRunBatch({
+        availableUsdc: available,
+        lastBurnAt: last,
+        now: this.opts.now(),
+        policy: this.policy,
+      })
+    )
+      return;
 
     for (const chunk of planTwapChunks(available, this.policy)) {
       const completed = await this.swapAndBurn(chunk);
@@ -128,7 +176,10 @@ export class BurnKeeper {
     if (!fresh) return false; // this signed swap is already tracked — recovery owns it
     await swap.send();
     const conf = await this.exec.confirm(swap.signature);
-    if (conf === 'failed') { await this.store.markFailed(batchId, 'swap reverted (slippage / route)'); return false; }
+    if (conf === 'failed') {
+      await this.store.markFailed(batchId, 'swap reverted (slippage / route)');
+      return false;
+    }
     if (conf !== 'confirmed') return false; // unknown — left 'swapping' for the next cycle's recovery
     return this.completeSwapped(batchId, swap.signature);
   }
@@ -137,7 +188,10 @@ export class BurnKeeper {
   // no balance snapshot needed), then burn exactly that.
   private async completeSwapped(batchId: string, swapSig: string): Promise<boolean> {
     const woc = await this.exec.wocReceived(swapSig);
-    if (woc <= 0n) { await this.store.markFailed(batchId, 'swap confirmed but no $WOC received'); return false; }
+    if (woc <= 0n) {
+      await this.store.markFailed(batchId, 'swap confirmed but no $WOC received');
+      return false;
+    }
     await this.store.markSwapped(batchId, woc);
     return this.burn(batchId, woc);
   }
@@ -147,19 +201,23 @@ export class BurnKeeper {
     await this.store.markBurning(batchId, burnTx.signature); // record the burn sig before broadcast
     await burnTx.send();
     const conf = await this.exec.confirm(burnTx.signature);
-    if (conf === 'confirmed') { await this.store.markBurned(batchId, woc); return true; }
+    if (conf === 'confirmed') {
+      await this.store.markBurned(batchId, woc);
+      return true;
+    }
     return false; // unknown/failed — recovery re-checks (and, if stale, re-issues) the burn
   }
 
   /** Resolve in-flight batches by their recorded signature — never by re-reading
    *  the vault balance (which could double-swap a lost-confirmation swap). */
   async recover(open?: BurnBatchRow[]): Promise<void> {
-    const batches = open ?? await this.store.openBatches();
+    const batches = open ?? (await this.store.openBatches());
     for (const b of batches) {
       if (b.status === 'swapping' && b.buyTxSig) {
         const conf = await this.exec.confirm(b.buyTxSig);
         if (conf === 'confirmed') await this.completeSwapped(b.batchId, b.buyTxSig);
-        else if (conf === 'failed') await this.store.markFailed(b.batchId, 'swap reverted (slippage / route)');
+        else if (conf === 'failed')
+          await this.store.markFailed(b.batchId, 'swap reverted (slippage / route)');
         // Stale + still 'unknown': do NOT blindly fail — the swap may have landed but
         // be momentarily unreadable. Route through completeSwapped, which measures the
         // $WOC actually received: >0 burns it (recovered, never stranded); 0 fails the
@@ -192,11 +250,20 @@ export class BurnKeeper {
 
 // Exported for the encoding test (tests/burn_keeper_encoding.test.ts) — pure, no I/O.
 export function associatedTokenAccount(owner: PublicKey, mint: PublicKey): PublicKey {
-  return PublicKey.findProgramAddressSync([owner.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()], SPL_ATA_PROGRAM)[0];
+  return PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()],
+    SPL_ATA_PROGRAM,
+  )[0];
 }
 
 // SPL Token `BurnChecked` (tag 15): u8 tag + u64 amount(LE) + u8 decimals.
-export function burnCheckedIx(ata: PublicKey, mint: PublicKey, authority: PublicKey, amount: bigint, decimals: number): TransactionInstruction {
+export function burnCheckedIx(
+  ata: PublicKey,
+  mint: PublicKey,
+  authority: PublicKey,
+  amount: bigint,
+  decimals: number,
+): TransactionInstruction {
   const data = Buffer.alloc(10);
   data.writeUInt8(15, 0);
   data.writeBigUInt64LE(amount, 1);
@@ -223,9 +290,11 @@ async function wocDecimals(): Promise<number> {
 }
 
 async function vaultTokenBalance(owner: string, mint: string): Promise<bigint> {
-  const res = await solanaRpc<{ value?: Array<{ account?: { data?: { parsed?: { info?: { tokenAmount?: { amount?: string } } } } } }> }>(
-    'getTokenAccountsByOwner', [owner, { mint }, { encoding: 'jsonParsed' }],
-  );
+  const res = await solanaRpc<{
+    value?: Array<{
+      account?: { data?: { parsed?: { info?: { tokenAmount?: { amount?: string } } } } };
+    }>;
+  }>('getTokenAccountsByOwner', [owner, { mint }, { encoding: 'jsonParsed' }]);
   let total = 0n;
   for (const a of res?.value ?? []) {
     const amt = a?.account?.data?.parsed?.info?.tokenAmount?.amount;
@@ -257,9 +326,8 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
       const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
       if (!res.ok) return null;
       const data = (await res.json()) as { outAmount?: string; routePlan?: unknown[] };
-      if (!data.outAmount || !(data.routePlan?.length)) return null; // no route / no quoted output
+      if (!data.outAmount || !data.routePlan?.length) return null; // no route / no quoted output
       return { raw: data }; // the full quote (incl. outAmount + slippage threshold) rides into /swap
-
     },
 
     async signSwap(quoteRaw) {
@@ -268,7 +336,12 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
       const res = await fetch(`${JUPITER_API}/swap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quoteResponse: quoteRaw, userPublicKey: BURN_VAULT, wrapAndUnwrapSol: false, dynamicComputeUnitLimit: true }),
+        body: JSON.stringify({
+          quoteResponse: quoteRaw,
+          userPublicKey: BURN_VAULT,
+          wrapAndUnwrapSol: false,
+          dynamicComputeUnitLimit: true,
+        }),
         signal: AbortSignal.timeout(10_000),
       });
       if (!res.ok) throw new Error(`jupiter swap build failed (${res.status})`);
@@ -276,7 +349,12 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
       const tx = VersionedTransaction.deserialize(Buffer.from(swapTransaction, 'base64'));
       tx.sign([vault]);
       const signature = bs58.encode(tx.signatures[0]);
-      return { signature, send: async () => { await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 }); } };
+      return {
+        signature,
+        send: async () => {
+          await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 });
+        },
+      };
     },
 
     // getSignatureStatuses(searchTransactionHistory) — recognizes a finalized tx
@@ -297,16 +375,30 @@ export function buildProductionDeps(): { exec: BurnExecutor; store: BurnStore } 
       const ata = associatedTokenAccount(vault.publicKey, mint);
       const decimals = await wocDecimals();
       const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash();
-      const tx = new Transaction({ feePayer: vault.publicKey, blockhash, lastValidBlockHeight })
-        .add(burnCheckedIx(ata, mint, vault.publicKey, amountWoc, decimals));
+      const tx = new Transaction({
+        feePayer: vault.publicKey,
+        blockhash,
+        lastValidBlockHeight,
+      }).add(burnCheckedIx(ata, mint, vault.publicKey, amountWoc, decimals));
       tx.sign(vault);
       const signature = bs58.encode(tx.signature!);
-      return { signature, send: async () => { await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 }); } };
+      return {
+        signature,
+        send: async () => {
+          await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 });
+        },
+      };
     },
   };
 
   const store: BurnStore = {
-    createBatch: (b) => createBurnBatch({ batchId: b.batchId, source: 'marketplace', usdcIn: b.usdcIn, buyTxSig: b.buyTxSig }),
+    createBatch: (b) =>
+      createBurnBatch({
+        batchId: b.batchId,
+        source: 'marketplace',
+        usdcIn: b.usdcIn,
+        buyTxSig: b.buyTxSig,
+      }),
     markSwapped: markBatchSwapped,
     markBurning: markBatchBurning,
     markBurned: markBatchBurned,

@@ -1,15 +1,23 @@
-import { describe, it, expect } from 'vitest';
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
 import { bytesToHex } from '@noble/hashes/utils';
+import { describe, expect, it } from 'vitest';
 import {
-  isEvmAddress, normalizeEvmAddress, toChecksumAddress, buildEvmLinkMessage,
-  personalSignDigest, recoverEvmSigner, verifyEvmEoaSignature,
-  encodeIsValidSignatureCall, isEip1271Valid, EIP1271_MAGIC_VALUE,
+  buildEvmLinkMessage,
+  EIP1271_MAGIC_VALUE,
+  encodeIsValidSignatureCall,
+  isEip1271Valid,
+  isEvmAddress,
+  normalizeEvmAddress,
+  personalSignDigest,
+  recoverEvmSigner,
+  toChecksumAddress,
+  verifyEvmEoaSignature,
 } from '../server/wallet_link_evm';
 
 // A fixed, valid secp256k1 key so the suite is deterministic.
-const PRIV = new Uint8Array(32).fill(0); PRIV[31] = 7;
+const PRIV = new Uint8Array(32).fill(0);
+PRIV[31] = 7;
 const PUB = secp256k1.getPublicKey(PRIV, false);
 const ADDRESS = `0x${bytesToHex(keccak_256(PUB.slice(1)).slice(-20))}`;
 
@@ -51,10 +59,18 @@ describe('toChecksumAddress — EIP-55 vectors', () => {
 describe('buildEvmLinkMessage', () => {
   it('is a SIWE-shaped message binding domain, checksummed address, account, nonce, expiry', () => {
     const msg = buildEvmLinkMessage({
-      domain: 'play.example', uri: 'https://play.example', accountId: 42, address: ADDRESS,
-      chainId: 1, nonce: 'abc123', issuedAt: '2026-01-01T00:00:00.000Z', expiresAt: '2026-01-01T00:10:00.000Z',
+      domain: 'play.example',
+      uri: 'https://play.example',
+      accountId: 42,
+      address: ADDRESS,
+      chainId: 1,
+      nonce: 'abc123',
+      issuedAt: '2026-01-01T00:00:00.000Z',
+      expiresAt: '2026-01-01T00:10:00.000Z',
     });
-    expect(msg.split('\n')[0]).toBe('play.example wants you to sign in with your Ethereum account:');
+    expect(msg.split('\n')[0]).toBe(
+      'play.example wants you to sign in with your Ethereum account:',
+    );
     expect(msg).toContain(toChecksumAddress(ADDRESS));
     expect(msg).toContain('account #42');
     expect(msg).toContain('Chain ID: 1');
@@ -65,8 +81,14 @@ describe('buildEvmLinkMessage', () => {
 
 describe('recoverEvmSigner / verifyEvmEoaSignature — real signatures', () => {
   const message = buildEvmLinkMessage({
-    domain: 'play.example', uri: 'https://play.example', accountId: 1, address: ADDRESS,
-    chainId: 1, nonce: 'n0', issuedAt: '2026-01-01T00:00:00.000Z', expiresAt: '2026-01-01T00:10:00.000Z',
+    domain: 'play.example',
+    uri: 'https://play.example',
+    accountId: 1,
+    address: ADDRESS,
+    chainId: 1,
+    nonce: 'n0',
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2026-01-01T00:10:00.000Z',
   });
 
   it('recovers the exact signer of a personal_sign signature', () => {
@@ -74,7 +96,9 @@ describe('recoverEvmSigner / verifyEvmEoaSignature — real signatures', () => {
   });
   it('verifies a valid EOA signature for the matching address (case-insensitive)', () => {
     expect(verifyEvmEoaSignature(message, personalSign(message), ADDRESS)).toBe(true);
-    expect(verifyEvmEoaSignature(message, personalSign(message), toChecksumAddress(ADDRESS))).toBe(true);
+    expect(verifyEvmEoaSignature(message, personalSign(message), toChecksumAddress(ADDRESS))).toBe(
+      true,
+    );
   });
   it('rejects a signature over a DIFFERENT message (no fixed-message replay)', () => {
     expect(verifyEvmEoaSignature(message + ' ', personalSign(message), ADDRESS)).toBe(false);

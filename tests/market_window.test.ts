@@ -76,13 +76,18 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain('itemUi.market.emptyBrowse');
   });
 
-  it('delegates filtering to market_view/market_filters, never re-deriving it', () => {
+  it('delegates browse rendering to the pure view core, with filtering done server-side', () => {
     expect(painter).toContain('buildMarketView');
-    expect(painter, 'filtering must stay in the core').not.toContain('filterMarketListings');
-    expect(painter, 'pagination must stay in the core').not.toContain('paginateMarketListings');
-    // the core is the one that reuses the shared filter helper
-    expect(core).toContain('filterMarketListings');
-    expect(core).toContain('paginateMarketListings');
+    // Neither the painter nor the client view re-derives filtering/pagination: the
+    // server filters + paginates the WHOLE market (so a player can page through it all),
+    // and the view just renders the page the snapshot carries.
+    expect(painter, 'filtering is server-side now').not.toContain('filterMarketListings');
+    expect(painter, 'pagination is server-side now').not.toContain('paginateMarketListings');
+    expect(core, 'the view renders the server page directly').not.toContain('filterMarketListings');
+    const market = readFileSync(new URL('../src/sim/market.ts', import.meta.url), 'utf8');
+    expect(market, 'the server is the single source of browse filtering').toContain(
+      'marketItemMatches',
+    );
   });
 
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {

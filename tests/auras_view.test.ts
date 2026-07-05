@@ -10,6 +10,7 @@ import {
   type AuraMode,
   type AurasDeps,
   type AurasEntityInput,
+  compactAuraDuration,
   createAurasView,
   DEBUFF_AURA_KINDS,
   isAuraDebuff,
@@ -24,7 +25,7 @@ function deps(): AurasDeps {
     iconId: (a) => (a.id.startsWith('aura_') ? `aura_${a.kind}` : a.id),
     auraName: (a) => `name:${a.name}`,
     formatStacks: (n) => String(n),
-    durationUnitSuffix: () => 's',
+    durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
     auraEffectHtml: () => '',
   };
 }
@@ -134,20 +135,78 @@ describe('createAurasView: derivation per mode', () => {
     expect(s.remaining).toBe(4.2);
   });
 
-  it('appends the INJECTED duration unit suffix (so an in-game language switch lands next tick)', () => {
-    // The suffix is a fired dep, not a hardcoded 's': a localized host swaps it per language.
-    const localized: AurasDeps = { ...deps(), durationUnitSuffix: () => ' sec' };
-    const state = createAurasView('all', localized).tick(
-      entity([aura({ id: 'a', remaining: 4.2 })]),
+  it('derives the debuff school for the border tint (physical fallback; buffs carry none)', () => {
+    const state = createAurasView('all', deps()).tick(
+      entity([
+        aura({ id: 'venom', kind: 'dot', school: 'nature' }),
+        // No school on the aura (the wire omits 'physical') -> the physical fallback.
+        aura({ id: 'rend', kind: 'dot' }),
+        // A buff never tints: school stays '' even when the aura carries one.
+        aura({ id: 'might', kind: 'buff_ap', value: 50, school: 'holy' }),
+      ]),
     );
-    expect(state.slots[0].durationText).toBe('5 sec'); // ceil(4.2)=5 + injected suffix
+    expect(state.slots.slice(0, 3).map((s) => s.school)).toEqual(['nature', 'physical', '']);
   });
 
-  it('hides the duration label at/above the permanent threshold (>= 99s)', () => {
+  it('appends the INJECTED duration units (so an in-game language switch lands next tick)', () => {
+    // The units are a fired dep, not hardcoded letters: a localized host swaps them per language.
+    const localized: AurasDeps = {
+      ...deps(),
+      durationUnits: () => ({ s: ' sec', m: ' min', h: ' hr', d: ' day' }),
+    };
+    const v = createAurasView('all', localized);
+    expect(v.tick(entity([aura({ id: 'a', remaining: 4.2 })])).slots[0].durationText).toBe(
+      '5 sec', // ceil(4.2)=5 + injected suffix
+    );
+    expect(v.tick(entity([aura({ id: 'a', remaining: 300 })])).slots[0].durationText).toBe('5 min');
+  });
+
+  it('renders the WoW-style compact duration per magnitude (20s / 5m / 1h / 2d)', () => {
     const v = createAurasView('all', deps());
-    expect(v.tick(entity([aura({ id: 'a', remaining: 98 })])).slots[0].durationText).toBe('98s');
-    expect(v.tick(entity([aura({ id: 'a', remaining: 99 })])).slots[0].durationText).toBe('');
-    expect(v.tick(entity([aura({ id: 'a', remaining: 9999 })])).slots[0].durationText).toBe('');
+    const text = (remaining: number) =>
+      v.tick(entity([aura({ id: 'a', remaining })])).slots[0].durationText;
+    expect(text(20)).toBe('20s');
+    expect(text(4.2)).toBe('5s'); // seconds round UP: never a premature 0s
+    expect(text(300)).toBe('5m');
+    expect(text(1800)).toBe('30m'); // a long food/scroll buff finally reads its minutes
+    expect(text(3600)).toBe('1h'); // Devotion Aura reads 1h, never 3600s
+    expect(text(2 * 86400)).toBe('2d');
+    expect(text(Number.POSITIVE_INFINITY)).toBe(''); // truly permanent: no label
+  });
+
+  it('hides the countdown under toggle auras (stealth / forms / stance / Ghost Wolf)', () => {
+    const v = createAurasView('all', deps());
+    // The sim backs each toggle with a long finite duration (3600s), but a mode
+    // shows no countdown (WoW parity): stealth by kind, Ghost Wolf by id (its
+    // aura rides the generic buff_speed kind that Sprint also uses).
+    expect(
+      v.tick(entity([aura({ id: 'stealth', kind: 'stealth', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('');
+    expect(
+      v.tick(entity([aura({ id: 'bear_form', kind: 'form_bear', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('');
+    expect(
+      v.tick(entity([aura({ id: 'ghost_wolf', kind: 'buff_speed', remaining: 3600 })])).slots[0]
+        .durationText,
+    ).toBe('');
+    // Sprint shares buff_speed but is a real timed buff: its countdown stays.
+    expect(
+      v.tick(entity([aura({ id: 'sprint', kind: 'buff_speed', remaining: 15 })])).slots[0]
+        .durationText,
+    ).toBe('15s');
+  });
+
+  it('compactAuraDuration boundaries: seconds round UP, larger units to nearest', () => {
+    const U = { s: 's', m: 'm', h: 'h', d: 'd' };
+    expect(compactAuraDuration(59.9, U)).toBe('60s');
+    expect(compactAuraDuration(60, U)).toBe('1m');
+    expect(compactAuraDuration(90, U)).toBe('2m'); // nearest, so half rounds up
+    expect(compactAuraDuration(3599, U)).toBe('1h'); // 60m promotes, never prints
+    expect(compactAuraDuration(5400, U)).toBe('2h');
+    expect(compactAuraDuration(86399, U)).toBe('1d'); // 24h promotes the same way
+    expect(compactAuraDuration(86400, U)).toBe('1d');
   });
 
   it('shows a stacks label only when stacks > 1', () => {

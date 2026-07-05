@@ -10,12 +10,15 @@
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
 import type { InvSlot, ItemDef } from '../sim/types';
+import { vendorStackSize } from '../sim/vendor_stack';
 
 export interface VendorGoodsRow {
   itemId: string;
   item: ItemDef;
-  /** Copper the vendor sells this item for. Always > 0 for a goods row. */
+  /** Total copper for one purchase (per-unit buyValue times quantity). Always > 0. */
   price: number;
+  /** Units handed over per purchase: food/drink come in a stack, the rest are 1. */
+  quantity: number;
 }
 
 export interface VendorBuybackRow {
@@ -47,7 +50,8 @@ export function buildVendorView(
   for (const itemId of vendorItemIds) {
     const item = items[itemId];
     if (!item?.buyValue) continue;
-    goods.push({ itemId, item, price: item.buyValue });
+    const quantity = vendorStackSize(item);
+    goods.push({ itemId, item, price: item.buyValue * quantity, quantity });
   }
   const buyback: VendorBuybackRow[] = [];
   for (const slot of buybackSlots) {

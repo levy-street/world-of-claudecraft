@@ -9,14 +9,14 @@
     "acceptQuest -> finalizeQuestAccept -> onInventoryChangedForQuests",
     "turnInQuest (xp + copper reward)"
   ],
-  "draws": 32,
-  "drawDigest": "4d504aff",
+  "draws": 40,
+  "drawDigest": "0e96c13c",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 389,
-      "state": "f3159fdf",
+      "nextId": 402,
+      "state": "3bb1d408",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -29,16 +29,32 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
             "ranks": {}
@@ -50,13 +66,14 @@
           "aiState": "idle",
           "attackPower": 46,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 388,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -99,9 +116,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 389,
-      "state": "1292a36c",
-      "events": "8eb40339",
+      "nextId": 402,
+      "state": "c621236d",
+      "events": "3d6acfe5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -113,17 +130,33 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -147,13 +180,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 99,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 388,
+          "id": 401,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -196,12 +230,12 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 397,
-      "state": "bc6760ac",
-      "events": "c5ae556e",
+      "nextId": 410,
+      "state": "25ac1878",
+      "events": "13051e6c",
       "rng": {
-        "draws": 32,
-        "digest": "4d504aff"
+        "draws": 40,
+        "digest": "0e96c13c"
       },
       "label": "quest-ready",
       "players": [
@@ -210,21 +244,37 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 8336,
+            "damageDealt": 8432,
             "kills": 8,
             "questProgress": 8
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27600,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questLog": [
             [
               "q_wolves",
@@ -248,13 +298,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 0.05,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 388,
+          "id": 401,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -298,12 +349,12 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 397,
-      "state": "abbed217",
-      "events": "cbdf36a3",
+      "nextId": 410,
+      "state": "e8a6f117",
+      "events": "ace7f38f",
       "rng": {
-        "draws": 32,
-        "digest": "4d504aff"
+        "draws": 40,
+        "digest": "0e96c13c"
       },
       "label": "quest-turned-in",
       "players": [
@@ -312,24 +363,40 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 75,
           "counters": {
-            "damageDealt": 8336,
+            "damageDealt": 8432,
             "kills": 8,
             "questProgress": 8,
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27850,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
           ],
@@ -345,13 +412,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 0.05,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 388,
+          "id": 401,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -395,12 +463,12 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 397,
-      "state": "77a61eb3",
+      "nextId": 410,
+      "state": "b0a57f8f",
       "events": "741638a5",
       "rng": {
-        "draws": 32,
-        "digest": "4d504aff"
+        "draws": 40,
+        "digest": "0e96c13c"
       },
       "label": "final",
       "players": [
@@ -409,24 +477,40 @@
           "arena2v2Rating": 1500,
           "arenaRating": 1500,
           "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
           "cls": "warrior",
           "companionUpgrades": {},
           "copper": 75,
           "counters": {
-            "damageDealt": 8336,
+            "damageDealt": 8432,
             "kills": 8,
             "questProgress": 8,
             "questsCompleted": 1,
             "xpGained": 250
           },
+          "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 388,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
           },
+          "gatheringProficiency": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
           "lifetimeXp": 27850,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
           ],
@@ -442,13 +526,14 @@
           "aiState": "idle",
           "attackPower": 82,
           "combatTimer": 0.15,
+          "comboUntil": -1,
           "critChance": 0.0645,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0645,
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 388,
+          "id": 401,
           "inCombat": true,
           "kind": "player",
           "level": 10,

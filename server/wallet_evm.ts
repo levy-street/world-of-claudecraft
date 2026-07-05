@@ -5,23 +5,29 @@
 // recovery (server/wallet_link_evm.ts); smart-contract wallets (Gnosis Safe, etc.)
 // have no private key, so we fall through to an on-chain EIP-1271 `isValidSignature`
 // check via `eth_call`. No keys, seeds, or funds ever touch the server.
-import type http from 'node:http';
+
 import { randomBytes } from 'node:crypto';
-import { json, readBody } from './http_util';
+import type http from 'node:http';
 import {
-  isEvmAddress, normalizeEvmAddress, buildEvmLinkMessage, verifyEvmEoaSignature,
-  personalSignDigest, encodeIsValidSignatureCall, isEip1271Valid,
-} from './wallet_link_evm';
-import { ethGetCode, ethCall, ETH_CHAIN_ID } from './eth_rpc';
-import { walletLinkRateLimited } from './ratelimit';
-import {
-  createEvmWalletChallenge,
   consumeEvmWalletChallenge,
-  pruneEvmWalletChallenges,
-  linkEvmWalletToAccount,
+  createEvmWalletChallenge,
   evmWalletForAccount,
+  linkEvmWalletToAccount,
+  pruneEvmWalletChallenges,
   unlinkEvmWallet,
 } from './db';
+import { ETH_CHAIN_ID, ethCall, ethGetCode } from './eth_rpc';
+import { json, readBody } from './http_util';
+import { walletLinkRateLimited } from './ratelimit';
+import {
+  buildEvmLinkMessage,
+  encodeIsValidSignatureCall,
+  isEip1271Valid,
+  isEvmAddress,
+  normalizeEvmAddress,
+  personalSignDigest,
+  verifyEvmEoaSignature,
+} from './wallet_link_evm';
 
 const CHALLENGE_TTL_MINUTES = 10;
 
@@ -53,8 +59,14 @@ export async function handleEvmWalletChallenge(
   const issuedAt = new Date(now).toISOString();
   const expiresAt = new Date(now + CHALLENGE_TTL_MINUTES * 60_000).toISOString();
   const message = buildEvmLinkMessage({
-    domain: requestDomain(req), uri: requestUri(req), accountId, address,
-    chainId: ETH_CHAIN_ID, nonce, issuedAt, expiresAt,
+    domain: requestDomain(req),
+    uri: requestUri(req),
+    accountId,
+    address,
+    chainId: ETH_CHAIN_ID,
+    nonce,
+    issuedAt,
+    expiresAt,
   });
   await createEvmWalletChallenge(nonce, accountId, address, message, CHALLENGE_TTL_MINUTES);
   return json(res, 200, { nonce, message });
@@ -63,7 +75,11 @@ export async function handleEvmWalletChallenge(
 /** Verify an EIP-1271 smart-contract-wallet signature on-chain. Returns false
  *  when the RPC is unavailable, so a smart-wallet link cannot succeed on an
  *  unverifiable read (fail-closed). */
-export async function verifyContractSignature(address: string, message: string, signature: string): Promise<boolean> {
+export async function verifyContractSignature(
+  address: string,
+  message: string,
+  signature: string,
+): Promise<boolean> {
   const code = await ethGetCode(address);
   if (!code || code === '0x') return false; // not a contract (or RPC down) -> no 1271 path
   const digest = personalSignDigest(message);
@@ -88,12 +104,15 @@ export async function handleEvmWalletLink(
   const address = normalizeEvmAddress(raw);
 
   const challenge = await consumeEvmWalletChallenge(nonce, accountId);
-  if (!challenge) return json(res, 400, { error: 'challenge expired or already used - request a new one' });
-  if (challenge.address !== address) return json(res, 400, { error: 'wallet address does not match the challenge' });
+  if (!challenge)
+    return json(res, 400, { error: 'challenge expired or already used - request a new one' });
+  if (challenge.address !== address)
+    return json(res, 400, { error: 'wallet address does not match the challenge' });
 
   // EOA recovery first (cheap, no RPC); contract wallets fall through to EIP-1271.
-  const ok = verifyEvmEoaSignature(challenge.message, signature, address)
-    || await verifyContractSignature(address, challenge.message, signature);
+  const ok =
+    verifyEvmEoaSignature(challenge.message, signature, address) ||
+    (await verifyContractSignature(address, challenge.message, signature));
   if (!ok) return json(res, 401, { error: 'signature verification failed' });
 
   const linked = await linkEvmWalletToAccount(accountId, address, ETH_CHAIN_ID);
@@ -108,7 +127,9 @@ export async function handleEvmWalletGet(
   accountId: number,
 ): Promise<void> {
   const row = await evmWalletForAccount(accountId);
-  return json(res, 200, { wallet: row ? { address: row.address, chainId: row.chain_id, linkedAt: row.linked_at } : null });
+  return json(res, 200, {
+    wallet: row ? { address: row.address, chainId: row.chain_id, linkedAt: row.linked_at } : null,
+  });
 }
 
 // DELETE /api/wallet/evm/link  -> { unlinked: true }

@@ -541,6 +541,8 @@ function marketInfo(shape: WorldShape): MarketInfo {
     listings: [listing],
     totalCount: 1,
     filter: 'all',
+    page: 0,
+    pageCount: 1,
     collectionCopper: 0,
     collectionItems: [],
     cutPct: 5,

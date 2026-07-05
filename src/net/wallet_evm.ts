@@ -44,7 +44,12 @@ export function discoverEvmProviders(timeoutMs = 350): Promise<EvmProviderChoice
       const provider = detail?.provider;
       if (info?.uuid && provider) {
         found.set(info.uuid, {
-          info: { uuid: info.uuid, name: info.name ?? 'Wallet', icon: info.icon ?? '', rdns: info.rdns ?? '' },
+          info: {
+            uuid: info.uuid,
+            name: info.name ?? 'Wallet',
+            icon: info.icon ?? '',
+            rdns: info.rdns ?? '',
+          },
           provider,
         });
       }
@@ -54,9 +59,21 @@ export function discoverEvmProviders(timeoutMs = 350): Promise<EvmProviderChoice
     setTimeout(() => {
       window.removeEventListener('eip6963:announceProvider', onAnnounce);
       let list = [...found.values()];
-      const injected = (window as unknown as { ethereum?: Eip1193Provider & { isMetaMask?: boolean } }).ethereum;
+      const injected = (
+        window as unknown as { ethereum?: Eip1193Provider & { isMetaMask?: boolean } }
+      ).ethereum;
       if (list.length === 0 && injected) {
-        list = [{ info: { uuid: 'injected', name: injected.isMetaMask ? 'MetaMask' : 'Browser Wallet', icon: '', rdns: 'injected' }, provider: injected }];
+        list = [
+          {
+            info: {
+              uuid: 'injected',
+              name: injected.isMetaMask ? 'MetaMask' : 'Browser Wallet',
+              icon: '',
+              rdns: 'injected',
+            },
+            provider: injected,
+          },
+        ];
       }
       resolve(list);
     }, timeoutMs);
@@ -71,8 +88,15 @@ export async function connectEvm(provider: Eip1193Provider): Promise<string | nu
 }
 
 /** Sign a UTF-8 message with EIP-191 `personal_sign` (params are [hexData, address]). */
-export async function signEvmMessage(provider: Eip1193Provider, address: string, message: string): Promise<string> {
-  const sig = await provider.request({ method: 'personal_sign', params: [`0x${utf8ToHex(message)}`, address] });
+export async function signEvmMessage(
+  provider: Eip1193Provider,
+  address: string,
+  message: string,
+): Promise<string> {
+  const sig = await provider.request({
+    method: 'personal_sign',
+    params: [`0x${utf8ToHex(message)}`, address],
+  });
   if (typeof sig !== 'string') throw new Error('wallet did not return a signature');
   return sig;
 }

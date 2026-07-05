@@ -9,7 +9,7 @@
 // picks the exact message, stores it, and verifies a single-use signature over it.
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { keccak_256 } from '@noble/hashes/sha3';
-import { bytesToHex, hexToBytes, utf8ToBytes, concatBytes } from '@noble/hashes/utils';
+import { bytesToHex, concatBytes, hexToBytes, utf8ToBytes } from '@noble/hashes/utils';
 
 // A 20-byte hex address with the 0x prefix. Casing is not validated here (we
 // store lower-cased and compare case-insensitively); checksum is a render concern.
@@ -94,7 +94,9 @@ export function recoverEvmSigner(message: string, signatureHex: string): string 
   if (recovery < 0) return null;
   try {
     const digest = personalSignDigest(message);
-    const point = secp256k1.Signature.fromCompact(sig.slice(0, 64)).addRecoveryBit(recovery).recoverPublicKey(digest);
+    const point = secp256k1.Signature.fromCompact(sig.slice(0, 64))
+      .addRecoveryBit(recovery)
+      .recoverPublicKey(digest);
     const pub = point.toRawBytes(false); // 65 bytes: 0x04 || X || Y
     return `0x${bytesToHex(keccak_256(pub.slice(1)).slice(-20))}`;
   } catch {
@@ -108,7 +110,11 @@ export function recoverEvmSigner(message: string, signatureHex: string): string 
  * EIP-1271 smart-contract wallets; the shell falls through to an on-chain
  * `isValidSignature` check when this returns false and the address has code.
  */
-export function verifyEvmEoaSignature(message: string, signatureHex: string, address: string): boolean {
+export function verifyEvmEoaSignature(
+  message: string,
+  signatureHex: string,
+  address: string,
+): boolean {
   if (!isEvmAddress(address)) return false;
   const signer = recoverEvmSigner(message, signatureHex);
   return signer !== null && signer === normalizeEvmAddress(address);
@@ -125,8 +131,12 @@ export const EIP1271_MAGIC_VALUE = '0x1626ba7e';
  * personal_sign digest; `signature` is the raw 65-byte sig the wallet returned.
  */
 export function encodeIsValidSignatureCall(digest: Uint8Array, signatureHex: string): string {
-  const selector = bytesToHex(keccak_256(utf8ToBytes('isValidSignature(bytes32,bytes)')).slice(0, 4));
-  const sigHex = (signatureHex.startsWith('0x') ? signatureHex.slice(2) : signatureHex).toLowerCase();
+  const selector = bytesToHex(
+    keccak_256(utf8ToBytes('isValidSignature(bytes32,bytes)')).slice(0, 4),
+  );
+  const sigHex = (
+    signatureHex.startsWith('0x') ? signatureHex.slice(2) : signatureHex
+  ).toLowerCase();
   const sigBytes = sigHex.length / 2;
   const word = (hex: string): string => hex.padStart(64, '0');
   // head: hash (32), offset to the bytes arg (0x40). tail: length + right-padded data.

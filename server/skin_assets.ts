@@ -31,7 +31,12 @@ export function validateSkinPng(buf: Buffer): SkinValidation {
     maxDecodedBytes: MAX_SKIN_DECODED_BYTES,
   });
   if (!info) return { ok: false, reason: 'invalid_png' };
-  return { ok: true, sha256: createHash('sha256').update(buf).digest('hex'), width: info.width, height: info.height };
+  return {
+    ok: true,
+    sha256: createHash('sha256').update(buf).digest('hex'),
+    width: info.width,
+    height: info.height,
+  };
 }
 
 // --- SSRF guard --------------------------------------------------------------
@@ -44,7 +49,9 @@ export function isBlockedIpv4(ip: string): boolean {
   if (o.some((n) => n > 255)) return true; // malformed -> block
   const [a, b] = o;
   return (
-    a === 0 || a === 10 || a === 127 || // this-net, private, loopback
+    a === 0 ||
+    a === 10 ||
+    a === 127 || // this-net, private, loopback
     (a === 169 && b === 254) || // link-local (incl. 169.254.169.254 metadata)
     (a === 172 && b >= 16 && b <= 31) || // private
     (a === 192 && b === 168) || // private
@@ -62,7 +69,13 @@ export function isBlockedIpv6(ip: string): boolean {
   const mapped = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.exec(lc);
   if (mapped) return isBlockedIpv4(mapped[1]);
   const head = lc.split(':')[0] ?? '';
-  if (head.startsWith('fe8') || head.startsWith('fe9') || head.startsWith('fea') || head.startsWith('feb')) return true; // fe80::/10 link-local
+  if (
+    head.startsWith('fe8') ||
+    head.startsWith('fe9') ||
+    head.startsWith('fea') ||
+    head.startsWith('feb')
+  )
+    return true; // fe80::/10 link-local
   if (head.startsWith('fc') || head.startsWith('fd')) return true; // fc00::/7 ULA
   return false;
 }
@@ -74,7 +87,11 @@ export function isBlockedIp(ip: string): boolean {
 /** Parse a string as an http(s) URL, or null. */
 export function asHttpUrl(raw: string): URL | null {
   let url: URL;
-  try { url = new URL(raw); } catch { return null; }
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
   return url.protocol === 'http:' || url.protocol === 'https:' ? url : null;
 }
 
@@ -102,13 +119,17 @@ export async function fetchRemoteImage(raw: string): Promise<Buffer> {
 
 // A plain bounded fetch for a TRUSTED, server-configured URL (our IPFS gateway) —
 // no SSRF vetting needed because the host isn't creator-supplied.
-async function fetchBounded(url: URL | string, opts: { redirect: RequestRedirect }): Promise<Buffer> {
+async function fetchBounded(
+  url: URL | string,
+  opts: { redirect: RequestRedirect },
+): Promise<Buffer> {
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), FETCH_TIMEOUT_MS);
   try {
     const res = await fetch(url, { redirect: opts.redirect, signal: ac.signal });
     if (!res.ok) throw new Error(`fetch_failed_${res.status}`);
-    if (Number(res.headers.get('content-length') ?? '0') > MAX_SKIN_BYTES) throw new Error('too_large');
+    if (Number(res.headers.get('content-length') ?? '0') > MAX_SKIN_BYTES)
+      throw new Error('too_large');
     const buf = Buffer.from(await res.arrayBuffer());
     if (buf.length > MAX_SKIN_BYTES) throw new Error('too_large');
     return buf;
@@ -136,9 +157,16 @@ function cacheAtlas(key: string, bytes: Buffer): void {
 /** Load the atlas bytes for a skin's source, cached by a stable key (sha256/cid).
  *  self_hosted goes through the SSRF-safe fetch; hosted (gatewayUrl) is a trusted
  *  bounded fetch. Returns null when neither source is set. */
-export async function loadAtlasBytes(opts: { key: string; originUrl?: string | null; gatewayUrl?: string | null }): Promise<Buffer | null> {
+export async function loadAtlasBytes(opts: {
+  key: string;
+  originUrl?: string | null;
+  gatewayUrl?: string | null;
+}): Promise<Buffer | null> {
   const hit = atlasCache.get(opts.key);
-  if (hit) { cacheAtlas(opts.key, hit); return hit; }
+  if (hit) {
+    cacheAtlas(opts.key, hit);
+    return hit;
+  }
   let bytes: Buffer | null = null;
   if (opts.gatewayUrl) bytes = await fetchBounded(opts.gatewayUrl, { redirect: 'follow' });
   else if (opts.originUrl) bytes = await fetchRemoteImage(opts.originUrl);
@@ -161,12 +189,35 @@ export type PortraitMime = 'image/png' | 'image/jpeg' | 'image/gif' | 'image/web
  *  (including SVG / HTML / unknown), so an executable or non-image payload can
  *  never be served as a portrait. */
 export function sniffImageMime(buf: Buffer): PortraitMime | null {
-  if (buf.length >= 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47
-    && buf[4] === 0x0d && buf[5] === 0x0a && buf[6] === 0x1a && buf[7] === 0x0a) return 'image/png';
+  if (
+    buf.length >= 8 &&
+    buf[0] === 0x89 &&
+    buf[1] === 0x50 &&
+    buf[2] === 0x4e &&
+    buf[3] === 0x47 &&
+    buf[4] === 0x0d &&
+    buf[5] === 0x0a &&
+    buf[6] === 0x1a &&
+    buf[7] === 0x0a
+  )
+    return 'image/png';
   if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
-  if (buf.length >= 6 && buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38
-    && (buf[4] === 0x37 || buf[4] === 0x39) && buf[5] === 0x61) return 'image/gif';
-  if (buf.length >= 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  if (
+    buf.length >= 6 &&
+    buf[0] === 0x47 &&
+    buf[1] === 0x49 &&
+    buf[2] === 0x46 &&
+    buf[3] === 0x38 &&
+    (buf[4] === 0x37 || buf[4] === 0x39) &&
+    buf[5] === 0x61
+  )
+    return 'image/gif';
+  if (
+    buf.length >= 12 &&
+    buf.toString('ascii', 0, 4) === 'RIFF' &&
+    buf.toString('ascii', 8, 12) === 'WEBP'
+  )
+    return 'image/webp';
   return null;
 }
 

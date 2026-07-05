@@ -7,8 +7,9 @@
 // Boundary-clean: it imports only the ui surface (t/esc) and takes the network
 // actions as injected deps, so it never reaches into src/net itself (main.ts wires
 // the Api + wallet-link closures).
-import { t } from './i18n';
+
 import { esc } from './esc';
+import { t } from './i18n';
 
 export interface NftEligible {
   wallets: { ethereum: string | null; solana: string | null };
@@ -32,14 +33,21 @@ function shortAddr(addr: string): string {
 
 function claimErrorMessage(reason: string): string {
   switch (reason) {
-    case 'not_owner': return t('hudChrome.nftSkins.errorNotOwner');
-    case 'ownership_unverified': return t('hudChrome.nftSkins.errorUnverified');
-    case 'collection_not_supported': return t('hudChrome.nftSkins.errorCollection');
-    case 'too_many_nft_skins': return t('hudChrome.nftSkins.errorTooMany');
-    case 'metadata_unavailable': return t('hudChrome.nftSkins.errorMetadata');
+    case 'not_owner':
+      return t('hudChrome.nftSkins.errorNotOwner');
+    case 'ownership_unverified':
+      return t('hudChrome.nftSkins.errorUnverified');
+    case 'collection_not_supported':
+      return t('hudChrome.nftSkins.errorCollection');
+    case 'too_many_nft_skins':
+      return t('hudChrome.nftSkins.errorTooMany');
+    case 'metadata_unavailable':
+      return t('hudChrome.nftSkins.errorMetadata');
     case 'link_evm_wallet_first':
-    case 'link_solana_wallet_first': return t('hudChrome.nftSkins.needWallet');
-    default: return t('hudChrome.nftSkins.errorGeneric');
+    case 'link_solana_wallet_first':
+      return t('hudChrome.nftSkins.needWallet');
+    default:
+      return t('hudChrome.nftSkins.errorGeneric');
   }
 }
 
@@ -57,18 +65,22 @@ export async function openNftSkinsWindow(deps: NftSkinsWindowDeps): Promise<void
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
   overlay.setAttribute('aria-label', t('hudChrome.nftSkins.title'));
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);';
+  overlay.style.cssText =
+    'position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);';
 
   const panel = document.createElement('div');
   panel.className = 'nft-skins-panel';
-  panel.style.cssText = 'width:100%;max-width:520px;max-height:86vh;overflow:auto;background:#171019;border:1px solid #5a4326;border-radius:10px;padding:20px;color:#e8dcc0;box-shadow:0 10px 40px rgba(0,0,0,0.6);';
+  panel.style.cssText =
+    'width:100%;max-width:520px;max-height:86vh;overflow:auto;background:#171019;border:1px solid #5a4326;border-radius:10px;padding:20px;color:#e8dcc0;box-shadow:0 10px 40px rgba(0,0,0,0.6);';
   overlay.appendChild(panel);
 
   const wallets = eligible.wallets;
 
   function statusLine(): string {
     const eth = wallets.ethereum
-      ? esc(t('hudChrome.nftSkins.ethereumLinked').replace('{address}', shortAddr(wallets.ethereum)))
+      ? esc(
+          t('hudChrome.nftSkins.ethereumLinked').replace('{address}', shortAddr(wallets.ethereum)),
+        )
       : `${t('hudChrome.nftSkins.ethereumLinked').replace('{address}', t('hudChrome.nftSkins.notLinked'))}`;
     const sol = wallets.solana
       ? esc(t('hudChrome.nftSkins.solanaLinked').replace('{address}', shortAddr(wallets.solana)))
@@ -79,12 +91,14 @@ export async function openNftSkinsWindow(deps: NftSkinsWindowDeps): Promise<void
   function render(): void {
     const hasEth = !!wallets.ethereum;
     const hasSol = !!wallets.solana;
-    const rows = eligible.collections.map((c) => {
-      const linked = c.chain === 'ethereum' ? hasEth : hasSol;
-      const placeholder = c.chain === 'ethereum'
-        ? t('hudChrome.nftSkins.tokenIdPlaceholder')
-        : t('hudChrome.nftSkins.mintPlaceholder');
-      return `<div class="nft-collection-row" data-chain="${esc(c.chain)}" data-contract="${esc(c.contract)}"
+    const rows = eligible.collections
+      .map((c) => {
+        const linked = c.chain === 'ethereum' ? hasEth : hasSol;
+        const placeholder =
+          c.chain === 'ethereum'
+            ? t('hudChrome.nftSkins.tokenIdPlaceholder')
+            : t('hudChrome.nftSkins.mintPlaceholder');
+        return `<div class="nft-collection-row" data-chain="${esc(c.chain)}" data-contract="${esc(c.contract)}"
           style="display:flex;gap:8px;align-items:center;padding:10px 0;border-top:1px solid #34281c">
         <div style="flex:1;min-width:0">
           <div style="font-weight:600">${esc(c.name || c.contract)}</div>
@@ -95,7 +109,8 @@ export async function openNftSkinsWindow(deps: NftSkinsWindowDeps): Promise<void
         <button class="nft-claim-btn" type="button"${linked ? '' : ' disabled'}
           style="min-height:40px;min-width:72px;padding:0 14px;border-radius:6px;border:1px solid #6b5226;background:${linked ? '#caa84b' : '#3a3026'};color:${linked ? '#1a120a' : '#7a6f5a'};font-weight:600;cursor:${linked ? 'pointer' : 'not-allowed'}">${esc(t('hudChrome.nftSkins.claim'))}</button>
       </div>`;
-    }).join('');
+      })
+      .join('');
 
     panel.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -140,7 +155,11 @@ export async function openNftSkinsWindow(deps: NftSkinsWindowDeps): Promise<void
       setStatus('', 'info');
       try {
         const addr = await deps.linkEthereum();
-        if (addr) { await refreshWallets(); } else { setStatus(t('hudChrome.nftSkins.walletError'), 'error'); }
+        if (addr) {
+          await refreshWallets();
+        } else {
+          setStatus(t('hudChrome.nftSkins.walletError'), 'error');
+        }
       } catch {
         setStatus(t('hudChrome.nftSkins.walletError'), 'error');
       }
@@ -149,7 +168,11 @@ export async function openNftSkinsWindow(deps: NftSkinsWindowDeps): Promise<void
       setStatus('', 'info');
       try {
         const addr = await deps.linkSolana();
-        if (addr) { await refreshWallets(); } else { setStatus(t('hudChrome.nftSkins.walletError'), 'error'); }
+        if (addr) {
+          await refreshWallets();
+        } else {
+          setStatus(t('hudChrome.nftSkins.walletError'), 'error');
+        }
       } catch {
         setStatus(t('hudChrome.nftSkins.walletError'), 'error');
       }
@@ -185,7 +208,9 @@ export async function openNftSkinsWindow(deps: NftSkinsWindowDeps): Promise<void
   function onKey(e: KeyboardEvent): void {
     if (e.key === 'Escape') close();
   }
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
   overlay.addEventListener('keydown', onKey);
 
   render();

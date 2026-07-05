@@ -1,6 +1,6 @@
 import type { Entity } from '../sim/types';
 
-// Classic-WoW "threat plates": a hostile mob that is actively aggroed on the
+// Classic-style "threat plates": a hostile mob that is actively aggroed on the
 // local player gets its nameplate health bar tinted red, so you can spot at a
 // glance which enemies are coming for *you* (distinct from the ground selection
 // ring, which marks the unit *you* have targeted).

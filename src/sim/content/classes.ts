@@ -2,7 +2,7 @@ import type { AbilityDef, AbilityEffect, PlayerClass, Stats, WeaponInfo } from '
 import type { TalentModifiers } from './talents';
 
 // ---------------------------------------------------------------------------
-// Player classes — per-level base stats follow vanilla growth curves.
+// Player classes — per-level base stats follow classic-era growth curves.
 // HP/mana rules are the real ones: first 20 stamina gives 1 hp each, the rest
 // 10 hp each; first 20 intellect gives 1 mana each, the rest 15 mana each.
 // ---------------------------------------------------------------------------
@@ -19,6 +19,9 @@ export interface ClassDef {
   resourceType: 'rage' | 'mana' | 'energy';
   startWeapon: string;
   startChest: string;
+  // Consumables in a fresh character's bags: every class carries food; the
+  // mana classes also carry water. Saved characters load their own bags.
+  startItems: { itemId: string; count: number }[];
   // hunters: auto shot (8yd deadzone). casters: wand (wand:true → no deadzone,
   // fires a magic-school bolt so they don't run into melee to auto-attack, #94)
   ranged?: WeaponInfo & {
@@ -30,6 +33,14 @@ export interface ClassDef {
   abilities: string[]; // full kit, in learn order
   color: number;
 }
+
+// Starter rations (#food-and-drink): 5 loaves for everyone, plus 5 waters for
+// the classes that drink to restore mana (rage/energy classes carry bread only).
+const START_RATIONS = [{ itemId: 'baked_bread', count: 5 }];
+const START_RATIONS_MANA = [
+  { itemId: 'baked_bread', count: 5 },
+  { itemId: 'spring_water', count: 5 },
+];
 
 export const CLASSES: Record<PlayerClass, ClassDef> = {
   warrior: {
@@ -44,6 +55,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'rage',
     startWeapon: 'worn_sword',
     startChest: 'recruit_tunic',
+    startItems: START_RATIONS,
     abilities: [
       'heroic_strike',
       'battle_shout',
@@ -76,6 +88,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'arcane' },
     abilities: [
       'fireball',
@@ -92,6 +105,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'scorch',
       'ice_barrier',
       'pyroblast',
+      'flamestrike',
     ],
     color: 0x69ccf0,
   },
@@ -107,6 +121,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'energy',
     startWeapon: 'rusty_dagger',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS,
     abilities: [
       'sinister_strike',
       'eviscerate',
@@ -144,6 +159,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'training_mace',
     startChest: 'recruit_tunic',
+    startItems: START_RATIONS_MANA,
     abilities: [
       'seal_of_righteousness',
       'holy_light',
@@ -173,6 +189,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
     abilities: [
       'raptor_strike',
@@ -189,6 +206,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'aspect_of_the_cheetah',
       'aimed_shot',
       'rapid_fire',
+      'volley',
     ],
     color: 0xabd473,
   },
@@ -204,6 +222,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'holy' },
     abilities: [
       'smite',
@@ -231,6 +250,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'training_mace',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS_MANA,
     abilities: [
       'lightning_bolt',
       'rockbiter_weapon',
@@ -243,6 +263,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'frostbrand_weapon',
       'ghost_wolf',
       'stormstrike',
+      'earthquake',
     ],
     color: 0x0070de,
   },
@@ -258,6 +279,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'apprentice_robe',
+    startItems: START_RATIONS_MANA,
     ranged: { min: 3, max: 6, speed: 1.8, maxRange: 30, minRange: 0, wand: true, school: 'shadow' },
     abilities: [
       'shadow_bolt',
@@ -277,6 +299,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'summon_felguard',
       'summon_infernal',
       'summon_doomguard',
+      'rain_of_fire',
     ],
     color: 0x9482c9,
   },
@@ -292,6 +315,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     resourceType: 'mana',
     startWeapon: 'gnarled_staff',
     startChest: 'footpad_jerkin',
+    startItems: START_RATIONS_MANA,
     abilities: [
       'wrath',
       'healing_touch',
@@ -324,20 +348,21 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'insect_swarm',
       'tigers_fury',
       'rip',
+      'hurricane',
     ],
     color: 0xff7d0a,
   },
 };
 
 // ---------------------------------------------------------------------------
-// Abilities — rank values and learn levels from vanilla (levels 1-10)
+// Abilities — classic-era rank values and learn levels (levels 1-10)
 // ---------------------------------------------------------------------------
 
 export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== WARRIOR ======================
   heroic_strike: {
     id: 'heroic_strike',
-    name: 'Heroic Strike',
+    name: 'Reaver Strike',
     class: 'warrior',
     learnLevel: 1,
     cost: 15,
@@ -377,7 +402,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   battle_shout: {
     id: 'battle_shout',
-    name: 'Battle Shout',
+    name: 'Iron Bellow',
     class: 'warrior',
     learnLevel: 1,
     cost: 10,
@@ -406,7 +431,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   commanding_shout: {
     id: 'commanding_shout',
-    name: 'Commanding Shout',
+    name: 'Bolstering Cry',
     class: 'warrior',
     learnLevel: 14,
     cost: 10,
@@ -429,7 +454,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   demoralizing_shout: {
     id: 'demoralizing_shout',
-    name: 'Demoralizing Shout',
+    name: 'Direhowl',
     class: 'warrior',
     learnLevel: 14,
     cost: 10,
@@ -452,7 +477,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   charge: {
     id: 'charge',
-    name: 'Charge',
+    name: 'Onrush',
     class: 'warrior',
     learnLevel: 4,
     cost: 0,
@@ -468,7 +493,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rend: {
     id: 'rend',
-    name: 'Rend',
+    name: 'Deep Gash',
     class: 'warrior',
     learnLevel: 4,
     cost: 10,
@@ -496,7 +521,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   thunder_clap: {
     id: 'thunder_clap',
-    name: 'Thunder Clap',
+    name: 'Quaking Blow',
     class: 'warrior',
     learnLevel: 6,
     cost: 20,
@@ -534,7 +559,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hamstring: {
     id: 'hamstring',
-    name: 'Hamstring',
+    name: 'Hobbling Cut',
     class: 'warrior',
     learnLevel: 8,
     cost: 10,
@@ -562,7 +587,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   bloodrage: {
     id: 'bloodrage',
-    name: 'Bloodrage',
+    name: 'Blood Toll',
     class: 'warrior',
     learnLevel: 10,
     cost: 0,
@@ -580,7 +605,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   overpower: {
     id: 'overpower',
-    name: 'Overpower',
+    name: 'Redhand',
     class: 'warrior',
     learnLevel: 10,
     cost: 5,
@@ -604,7 +629,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   execute: {
     id: 'execute',
-    name: 'Execute',
+    name: 'Early Grave',
     class: 'warrior',
     learnLevel: 14,
     cost: 15,
@@ -620,7 +645,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   slam: {
     id: 'slam',
-    name: 'Slam',
+    name: 'Brute Swing',
     class: 'warrior',
     learnLevel: 16,
     cost: 15,
@@ -634,7 +659,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   cleave: {
     id: 'cleave',
-    name: 'Cleave',
+    name: 'Reaping Arc',
     class: 'warrior',
     learnLevel: 18,
     cost: 20,
@@ -649,7 +674,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   defensive_stance: {
     id: 'defensive_stance',
-    name: 'Defensive Stance',
+    name: 'Guarded Stance',
     class: 'warrior',
     learnLevel: 10,
     cost: 0,
@@ -665,7 +690,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   sunder_armor: {
     id: 'sunder_armor',
-    name: 'Sunder Armor',
+    name: 'Armor Shear',
     class: 'warrior',
     learnLevel: 10,
     cost: 15,
@@ -690,7 +715,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   taunt: {
     id: 'taunt',
-    name: 'Taunt',
+    name: 'Goad',
     class: 'warrior',
     learnLevel: 10,
     cost: 0,
@@ -708,7 +733,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== MAGE ======================
   fireball: {
     id: 'fireball',
-    name: 'Fireball',
+    name: 'Cinderbolt',
     class: 'mage',
     learnLevel: 1,
     cost: 30,
@@ -757,7 +782,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   frost_armor: {
     id: 'frost_armor',
-    name: 'Frost Armor',
+    name: 'Hoarfrost Mantle',
     class: 'mage',
     learnLevel: 1,
     cost: 20,
@@ -785,7 +810,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   arcane_intellect: {
     id: 'arcane_intellect',
-    name: 'Arcane Intellect',
+    name: 'Aether Insight',
     class: 'mage',
     learnLevel: 1,
     cost: 25,
@@ -807,7 +832,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   frostbolt: {
     id: 'frostbolt',
-    name: 'Frostbolt',
+    name: 'Rimelance',
     class: 'mage',
     learnLevel: 4,
     cost: 25,
@@ -856,7 +881,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   conjure_water: {
     id: 'conjure_water',
-    name: 'Conjure Water',
+    name: 'Waterbind',
     class: 'mage',
     learnLevel: 4,
     cost: 40,
@@ -875,7 +900,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   conjure_food: {
     id: 'conjure_food',
-    name: 'Conjure Food',
+    name: 'Breadbind',
     class: 'mage',
     learnLevel: 6,
     cost: 45,
@@ -894,7 +919,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   fire_blast: {
     id: 'fire_blast',
-    name: 'Fire Blast',
+    name: 'Cinderfall',
     class: 'mage',
     learnLevel: 6,
     cost: 40,
@@ -912,7 +937,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   arcane_missiles: {
     id: 'arcane_missiles',
-    name: 'Arcane Missiles',
+    name: 'Aether Darts',
     class: 'mage',
     learnLevel: 8,
     cost: 50,
@@ -928,11 +953,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 20, cost: 105, effects: [{ type: 'directDamage', min: 22, max: 22 }] },
     ],
     description:
-      'Launches Arcane Missiles at the enemy, causing $d Arcane damage each second for 3 sec.',
+      'Launches Aether Darts at the enemy, causing $d Arcane damage each second for 3 sec.',
   },
   polymorph: {
     id: 'polymorph',
-    name: 'Polymorph',
+    name: 'Bewitch',
     class: 'mage',
     learnLevel: 8,
     cost: 50,
@@ -944,11 +969,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'polymorph', duration: 15 }],
     ranks: [{ rank: 2, level: 18, cost: 70, effects: [{ type: 'polymorph', duration: 20 }] }],
     description:
-      'Transforms the enemy into a sheep for up to 15 sec. The sheep wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
+      'Transforms the enemy into a toad for up to 15 sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
   },
   frost_nova: {
     id: 'frost_nova',
-    name: 'Frost Nova',
+    name: 'Icebind',
     class: 'mage',
     learnLevel: 10,
     cost: 35,
@@ -970,7 +995,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   arcane_explosion: {
     id: 'arcane_explosion',
-    name: 'Arcane Explosion',
+    name: 'Aetherburst',
     class: 'mage',
     learnLevel: 14,
     cost: 60,
@@ -982,9 +1007,94 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'aoeDamage', min: 26, max: 31, radius: 10 }],
     description: 'A burst of Arcane energy hits all nearby enemies for $d Arcane damage.',
   },
+  // Ground-targeted (targetMode 'position'): the mage aims a patch of roaring flame
+  // at a chosen spot within range, which burns enemies standing in it. The first
+  // spell built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
+  flamestrike: {
+    id: 'flamestrike',
+    name: 'Flamestrike',
+    class: 'mage',
+    learnLevel: 20,
+    cost: 80,
+    castTime: 0,
+    cooldown: 12,
+    range: 30,
+    school: 'fire',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'aoeDamage', min: 34, max: 44, radius: 7 }],
+    description:
+      'Calls down a burst of flame at the target area, dealing $d Fire damage to enemies caught in the blast.',
+  },
+  // Ground-targeted thematic spells (targetMode 'position'), one per caster/ranged
+  // class, all built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
+  rain_of_fire: {
+    id: 'rain_of_fire',
+    name: 'Rain of Fire',
+    class: 'warlock',
+    learnLevel: 18,
+    cost: 85,
+    castTime: 0,
+    cooldown: 10,
+    range: 30,
+    school: 'fire',
+    requiresTarget: false,
+    targetMode: 'position',
+    channel: { duration: 4, ticks: 4 },
+    effects: [{ type: 'aoeDamage', min: 14, max: 18, radius: 7 }],
+    description: 'Calls a rain of fire onto the target area, burning enemies for $d Fire damage.',
+  },
+  volley: {
+    id: 'volley',
+    name: 'Volley',
+    class: 'hunter',
+    learnLevel: 18,
+    cost: 60,
+    castTime: 0,
+    cooldown: 8,
+    range: 35,
+    school: 'physical',
+    scalesWith: 'ranged',
+    requiresTarget: false,
+    targetMode: 'position',
+    channel: { duration: 3, ticks: 6 },
+    effects: [{ type: 'aoeDamage', min: 12, max: 16, radius: 8 }],
+    description: 'Rains arrows on the target area, dealing $d damage to enemies caught in it.',
+  },
+  hurricane: {
+    id: 'hurricane',
+    name: 'Hurricane',
+    class: 'druid',
+    learnLevel: 18,
+    cost: 90,
+    castTime: 0,
+    cooldown: 12,
+    range: 30,
+    school: 'nature',
+    requiresTarget: false,
+    targetMode: 'position',
+    channel: { duration: 6, ticks: 6 },
+    effects: [{ type: 'aoeDamage', min: 12, max: 16, radius: 8 }],
+    description: 'Calls a hurricane onto the target area, battering enemies for $d Nature damage.',
+  },
+  earthquake: {
+    id: 'earthquake',
+    name: 'Earthquake',
+    class: 'shaman',
+    learnLevel: 18,
+    cost: 80,
+    castTime: 0,
+    cooldown: 12,
+    range: 30,
+    school: 'nature',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'groundAoE', min: 13, max: 17, radius: 8, duration: 6, interval: 1.5 }],
+    description: 'Shakes the target area, battering enemies for $d Nature damage.',
+  },
   scorch: {
     id: 'scorch',
-    name: 'Scorch',
+    name: 'Scald',
     class: 'mage',
     learnLevel: 16,
     cost: 35,
@@ -998,7 +1108,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   pyroblast: {
     id: 'pyroblast',
-    name: 'Pyroblast',
+    name: 'Pyrelance',
     class: 'mage',
     learnLevel: 20,
     cost: 125,
@@ -1016,7 +1126,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   ice_barrier: {
     id: 'ice_barrier',
-    name: 'Ice Barrier',
+    name: 'Frostveil',
     class: 'mage',
     learnLevel: 20,
     cost: 90,
@@ -1032,7 +1142,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== ROGUE ======================
   sinister_strike: {
     id: 'sinister_strike',
-    name: 'Sinister Strike',
+    name: 'Wicked Slash',
     class: 'rogue',
     learnLevel: 1,
     cost: 45,
@@ -1052,7 +1162,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   eviscerate: {
     id: 'eviscerate',
-    name: 'Eviscerate',
+    name: 'Dirt Nap',
     class: 'rogue',
     learnLevel: 1,
     cost: 35,
@@ -1081,7 +1191,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   backstab: {
     id: 'backstab',
-    name: 'Backstab',
+    name: 'Craven Thrust',
     class: 'rogue',
     learnLevel: 4,
     cost: 60,
@@ -1111,7 +1221,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   gouge: {
     id: 'gouge',
-    name: 'Gouge',
+    name: 'Eye Jab',
     class: 'rogue',
     learnLevel: 6,
     cost: 45,
@@ -1141,7 +1251,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   evasion: {
     id: 'evasion',
-    name: 'Evasion',
+    name: 'Ghostfoot',
     class: 'rogue',
     learnLevel: 8,
     cost: 0,
@@ -1156,7 +1266,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   slice_and_dice: {
     id: 'slice_and_dice',
-    name: 'Slice and Dice',
+    name: 'Cutthroat Tempo',
     class: 'rogue',
     learnLevel: 10,
     cost: 25,
@@ -1172,7 +1282,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   sprint: {
     id: 'sprint',
-    name: 'Sprint',
+    name: 'Swift Heels',
     class: 'rogue',
     learnLevel: 10,
     cost: 0,
@@ -1187,7 +1297,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   kidney_shot: {
     id: 'kidney_shot',
-    name: 'Kidney Shot',
+    name: 'Low Blow',
     class: 'rogue',
     learnLevel: 14,
     cost: 25,
@@ -1202,7 +1312,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   ambush: {
     id: 'ambush',
-    name: 'Ambush',
+    name: "Lurker's Strike",
     class: 'rogue',
     learnLevel: 16,
     cost: 60,
@@ -1219,7 +1329,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   stealth: {
     id: 'stealth',
-    name: 'Stealth',
+    name: 'Duskveil',
     class: 'rogue',
     learnLevel: 2,
     cost: 0,
@@ -1232,11 +1342,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresOutOfCombat: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
     description:
-      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Stealth. Cast again to step out.',
+      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.',
   },
   adrenaline_rush: {
     id: 'adrenaline_rush',
-    name: 'Adrenaline Rush',
+    name: 'Quickened Blood',
     class: 'rogue',
     learnLevel: 20,
     cost: 0,
@@ -1251,7 +1361,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   garrote: {
     id: 'garrote',
-    name: 'Garrote',
+    name: 'Throat Wire',
     class: 'rogue',
     learnLevel: 1,
     cost: 50,
@@ -1282,7 +1392,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   cheap_shot: {
     id: 'cheap_shot',
-    name: 'Cheap Shot',
+    name: 'Gut Punch',
     class: 'rogue',
     learnLevel: 8,
     cost: 60,
@@ -1319,7 +1429,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   crippling_poison: {
     id: 'crippling_poison',
-    name: 'Crippling Poison',
+    name: 'Leaden Venom',
     class: 'rogue',
     learnLevel: 12,
     cost: 40,
@@ -1337,7 +1447,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   expose_armor: {
     id: 'expose_armor',
-    name: 'Expose Armor',
+    name: 'Armor Breach',
     class: 'rogue',
     learnLevel: 14,
     cost: 25,
@@ -1353,7 +1463,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rupture: {
     id: 'rupture',
-    name: 'Rupture',
+    name: 'Bleed Out',
     class: 'rogue',
     learnLevel: 16,
     cost: 25,
@@ -1368,7 +1478,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   vanish: {
     id: 'vanish',
-    name: 'Vanish',
+    name: 'Smokestep',
     class: 'rogue',
     learnLevel: 18,
     cost: 0,
@@ -1380,11 +1490,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 10 }],
     description:
-      'Vanish from sight, entering Stealth even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
+      'Vanish from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
   },
   instant_poison: {
     id: 'instant_poison',
-    name: 'Instant Poison',
+    name: "Adder's Bite",
     class: 'rogue',
     learnLevel: 18,
     cost: 40,
@@ -1399,7 +1509,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   deadly_poison: {
     id: 'deadly_poison',
-    name: 'Deadly Poison',
+    name: 'Festering Venom',
     class: 'rogue',
     learnLevel: 20,
     cost: 40,
@@ -1414,7 +1524,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blind: {
     id: 'blind',
-    name: 'Blind',
+    name: 'Dirt Toss',
     class: 'rogue',
     learnLevel: 20,
     cost: 50,
@@ -1431,7 +1541,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== PALADIN ======================
   seal_of_righteousness: {
     id: 'seal_of_righteousness',
-    name: 'Seal of Righteousness',
+    name: 'Oathbrand',
     class: 'paladin',
     learnLevel: 1,
     cost: 25,
@@ -1456,11 +1566,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Fills you with Holy power for 30 sec, causing each of your melee swings to deal 4 additional Holy damage. Unleash with Judgement.',
+      'Fills you with Holy power for 30 sec, causing each of your melee swings to deal 4 additional Holy damage. Unleash with Verdict.',
   },
   holy_light: {
     id: 'holy_light',
-    name: 'Holy Light',
+    name: 'Mending Light',
     class: 'paladin',
     learnLevel: 1,
     cost: 35,
@@ -1480,7 +1590,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   devotion_aura: {
     id: 'devotion_aura',
-    name: 'Devotion Aura',
+    name: 'Steadfast Aura',
     class: 'paladin',
     learnLevel: 1,
     cost: 0,
@@ -1509,7 +1619,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   judgement: {
     id: 'judgement',
-    name: 'Judgement',
+    name: 'Verdict',
     class: 'paladin',
     learnLevel: 4,
     cost: 30,
@@ -1524,7 +1634,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blessing_of_might: {
     id: 'blessing_of_might',
-    name: 'Blessing of Might',
+    name: 'Oath of Iron',
     class: 'paladin',
     learnLevel: 4,
     cost: 25,
@@ -1553,7 +1663,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   divine_protection: {
     id: 'divine_protection',
-    name: 'Divine Protection',
+    name: 'Ward of Faith',
     class: 'paladin',
     learnLevel: 6,
     cost: 15,
@@ -1571,7 +1681,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hammer_of_justice: {
     id: 'hammer_of_justice',
-    name: 'Hammer of Justice',
+    name: 'Sundering Gavel',
     class: 'paladin',
     learnLevel: 8,
     cost: 30,
@@ -1586,7 +1696,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   lay_on_hands: {
     id: 'lay_on_hands',
-    name: 'Lay on Hands',
+    name: 'Last Rite',
     class: 'paladin',
     learnLevel: 10,
     cost: 0,
@@ -1602,7 +1712,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   flash_of_light: {
     id: 'flash_of_light',
-    name: 'Flash of Light',
+    name: 'Lightmend',
     class: 'paladin',
     learnLevel: 12,
     cost: 35,
@@ -1617,7 +1727,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   exorcism: {
     id: 'exorcism',
-    name: 'Exorcism',
+    name: 'Rite of Expulsion',
     class: 'paladin',
     learnLevel: 14,
     cost: 55,
@@ -1631,7 +1741,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   consecration: {
     id: 'consecration',
-    name: 'Consecration',
+    name: 'Holy Ground',
     class: 'paladin',
     learnLevel: 18,
     cost: 60,
@@ -1645,7 +1755,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   righteous_fury: {
     id: 'righteous_fury',
-    name: 'Righteous Fury',
+    name: 'Burning Oath',
     class: 'paladin',
     learnLevel: 16,
     cost: 30,
@@ -1660,7 +1770,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   retribution_aura: {
     id: 'retribution_aura',
-    name: 'Retribution Aura',
+    name: 'Requital Aura',
     class: 'paladin',
     learnLevel: 16,
     cost: 0,
@@ -1678,7 +1788,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== HUNTER ======================
   tame_beast: {
     id: 'tame_beast',
-    name: 'Tame Beast',
+    name: 'Wildbond',
     class: 'hunter',
     learnLevel: 10,
     cost: 0,
@@ -1693,7 +1803,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   dismiss_pet: {
     id: 'dismiss_pet',
-    name: 'Dismiss Pet',
+    name: 'Release Companion',
     class: 'hunter',
     learnLevel: 10,
     cost: 0,
@@ -1721,7 +1831,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   raptor_strike: {
     id: 'raptor_strike',
-    name: 'Raptor Strike',
+    name: 'Gutting Strike',
     class: 'hunter',
     learnLevel: 1,
     cost: 15,
@@ -1742,7 +1852,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   aspect_of_the_hawk: {
     id: 'aspect_of_the_hawk',
-    name: 'Aspect of the Hawk',
+    name: "Harrier's Guise",
     class: 'hunter',
     learnLevel: 4,
     cost: 20,
@@ -1771,7 +1881,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   serpent_sting: {
     id: 'serpent_sting',
-    name: 'Serpent Sting',
+    name: 'Venom Barb',
     class: 'hunter',
     learnLevel: 4,
     cost: 15,
@@ -1801,7 +1911,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   arcane_shot: {
     id: 'arcane_shot',
-    name: 'Arcane Shot',
+    name: 'Fell Shot',
     class: 'hunter',
     learnLevel: 6,
     cost: 25,
@@ -1821,7 +1931,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   concussive_shot: {
     id: 'concussive_shot',
-    name: 'Concussive Shot',
+    name: 'Rattling Shot',
     class: 'hunter',
     learnLevel: 8,
     cost: 20,
@@ -1830,6 +1940,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'physical',
+    projectile: true, // a fired shot: damage/slow resolve when the bolt lands
     // A fired shot: its flat damage scales off Ranged AP like the other shots,
     // not melee AP, even though it is physical.
     scalesWith: 'ranged',
@@ -1842,7 +1953,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   mongoose_bite: {
     id: 'mongoose_bite',
-    name: 'Mongoose Bite',
+    name: 'Counterfang',
     class: 'hunter',
     learnLevel: 10,
     cost: 10,
@@ -1866,7 +1977,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   wing_clip: {
     id: 'wing_clip',
-    name: 'Wing Clip',
+    name: 'Fettering Slash',
     class: 'hunter',
     learnLevel: 10,
     cost: 20,
@@ -1883,7 +1994,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   aspect_of_the_monkey: {
     id: 'aspect_of_the_monkey',
-    name: 'Aspect of the Monkey',
+    name: "Marten's Guise",
     class: 'hunter',
     learnLevel: 10,
     cost: 20,
@@ -1898,7 +2009,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   aspect_of_the_cheetah: {
     id: 'aspect_of_the_cheetah',
-    name: 'Aspect of the Cheetah',
+    name: "Courser's Guise",
     class: 'hunter',
     learnLevel: 14,
     cost: 20,
@@ -1913,7 +2024,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   aimed_shot: {
     id: 'aimed_shot',
-    name: 'Aimed Shot',
+    name: 'Long Draw',
     class: 'hunter',
     learnLevel: 16,
     cost: 50,
@@ -1922,6 +2033,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 35,
     minRange: 8,
     school: 'physical',
+    projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 50, max: 62 }],
@@ -1929,7 +2041,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rapid_fire: {
     id: 'rapid_fire',
-    name: 'Rapid Fire',
+    name: 'Fevered Draw',
     class: 'hunter',
     learnLevel: 20,
     cost: 0,
@@ -1977,7 +2089,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   lesser_heal: {
     id: 'lesser_heal',
-    name: 'Lesser Heal',
+    name: 'Whispered Prayer',
     class: 'priest',
     learnLevel: 1,
     cost: 30,
@@ -1996,7 +2108,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   power_word_fortitude: {
     id: 'power_word_fortitude',
-    name: 'Power Word: Fortitude',
+    name: 'Litany of Resolve',
     class: 'priest',
     learnLevel: 1,
     cost: 30,
@@ -2025,7 +2137,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   shadow_word_pain: {
     id: 'shadow_word_pain',
-    name: 'Shadow Word: Pain',
+    name: 'Dirge of Decay',
     class: 'priest',
     learnLevel: 4,
     cost: 25,
@@ -2053,7 +2165,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   power_word_shield: {
     id: 'power_word_shield',
-    name: 'Power Word: Shield',
+    name: 'Psalm of Warding',
     class: 'priest',
     learnLevel: 6,
     cost: 45,
@@ -2072,7 +2184,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   renew: {
     id: 'renew',
-    name: 'Renew',
+    name: 'Lingering Grace',
     class: 'priest',
     learnLevel: 8,
     cost: 30,
@@ -2101,7 +2213,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   mind_blast: {
     id: 'mind_blast',
-    name: 'Mind Blast',
+    name: 'Mindfracture',
     class: 'priest',
     learnLevel: 10,
     cost: 50,
@@ -2119,7 +2231,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   heal: {
     id: 'heal',
-    name: 'Heal',
+    name: 'Solemn Prayer',
     class: 'priest',
     learnLevel: 14,
     cost: 95,
@@ -2135,7 +2247,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   mind_flay: {
     id: 'mind_flay',
-    name: 'Mind Flay',
+    name: 'Litany of Woe',
     class: 'priest',
     learnLevel: 16,
     cost: 45,
@@ -2151,7 +2263,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   flash_heal: {
     id: 'flash_heal',
-    name: 'Flash Heal',
+    name: 'Urgent Prayer',
     class: 'priest',
     learnLevel: 20,
     cost: 75,
@@ -2168,7 +2280,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== SHAMAN ======================
   lightning_bolt: {
     id: 'lightning_bolt',
-    name: 'Lightning Bolt',
+    name: 'Arc Bolt',
     class: 'shaman',
     learnLevel: 1,
     cost: 15,
@@ -2177,6 +2289,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'nature',
     requiresTarget: true,
+    projectileFx: 'lightning', // a jagged electric bolt instead of the default glowing bolt
     effects: [{ type: 'directDamage', min: 15, max: 17 }],
     ranks: [
       {
@@ -2205,7 +2318,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rockbiter_weapon: {
     id: 'rockbiter_weapon',
-    name: 'Rockbiter Weapon',
+    name: 'Stonebound Weapon',
     class: 'shaman',
     learnLevel: 1,
     cost: 20,
@@ -2224,7 +2337,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   healing_wave: {
     id: 'healing_wave',
-    name: 'Healing Wave',
+    name: 'Mending Waters',
     class: 'shaman',
     learnLevel: 1,
     cost: 25,
@@ -2256,7 +2369,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   earth_shock: {
     id: 'earth_shock',
-    name: 'Earth Shock',
+    name: 'Earthen Jolt',
     class: 'shaman',
     learnLevel: 4,
     cost: 30,
@@ -2274,7 +2387,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   lightning_shield: {
     id: 'lightning_shield',
-    name: 'Lightning Shield',
+    name: 'Thunder Ward',
     class: 'shaman',
     learnLevel: 8,
     cost: 25,
@@ -2330,7 +2443,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   flame_shock: {
     id: 'flame_shock',
-    name: 'Flame Shock',
+    name: 'Cinder Jolt',
     class: 'shaman',
     learnLevel: 10,
     cost: 35,
@@ -2358,7 +2471,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   flametongue_weapon: {
     id: 'flametongue_weapon',
-    name: 'Flametongue Weapon',
+    name: 'Pyrebrand Weapon',
     class: 'shaman',
     learnLevel: 10,
     cost: 25,
@@ -2376,7 +2489,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   frost_shock: {
     id: 'frost_shock',
-    name: 'Frost Shock',
+    name: 'Rime Jolt',
     class: 'shaman',
     learnLevel: 14,
     cost: 50,
@@ -2394,7 +2507,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   frostbrand_weapon: {
     id: 'frostbrand_weapon',
-    name: 'Frostbrand Weapon',
+    name: 'Rimebound Weapon',
     class: 'shaman',
     learnLevel: 12,
     cost: 25,
@@ -2412,7 +2525,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   ghost_wolf: {
     id: 'ghost_wolf',
-    name: 'Ghost Wolf',
+    name: 'Shadewolf',
     class: 'shaman',
     learnLevel: 16,
     cost: 35,
@@ -2423,11 +2536,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.4, duration: 3600 }],
     description:
-      'Turns you into a Ghost Wolf, increasing movement speed by 40%. Cast again to return to normal form.',
+      'Turns you into a Shadewolf, increasing movement speed by 40%. Cast again to return to normal form.',
   },
   stormstrike: {
     id: 'stormstrike',
-    name: 'Stormstrike',
+    name: 'Ancestral Strike',
     class: 'shaman',
     learnLevel: 20,
     cost: 40,
@@ -2444,7 +2557,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== WARLOCK ======================
   shadow_bolt: {
     id: 'shadow_bolt',
-    name: 'Shadow Bolt',
+    name: 'Gloom Bolt',
     class: 'warlock',
     learnLevel: 1,
     cost: 25,
@@ -2481,7 +2594,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   demon_skin: {
     id: 'demon_skin',
-    name: 'Demon Skin',
+    name: 'Fiendhide',
     class: 'warlock',
     learnLevel: 1,
     cost: 20,
@@ -2509,7 +2622,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   immolate: {
     id: 'immolate',
-    name: 'Immolate',
+    name: 'Burning Pact',
     class: 'warlock',
     learnLevel: 1,
     cost: 25,
@@ -2546,7 +2659,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   corruption: {
     id: 'corruption',
-    name: 'Corruption',
+    name: 'Blackrot',
     class: 'warlock',
     learnLevel: 4,
     cost: 35,
@@ -2574,7 +2687,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   life_tap: {
     id: 'life_tap',
-    name: 'Life Tap',
+    name: 'Hard Bargain',
     class: 'warlock',
     learnLevel: 6,
     cost: 0,
@@ -2592,7 +2705,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   curse_of_agony: {
     id: 'curse_of_agony',
-    name: 'Curse of Agony',
+    name: 'Hex of Anguish',
     class: 'warlock',
     learnLevel: 8,
     cost: 25,
@@ -2620,7 +2733,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   drain_life: {
     id: 'drain_life',
-    name: 'Drain Life',
+    name: 'Consume',
     class: 'warlock',
     learnLevel: 10,
     cost: 35,
@@ -2649,7 +2762,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   fear: {
     id: 'fear',
-    name: 'Fear',
+    name: 'Harrow',
     class: 'warlock',
     learnLevel: 14,
     cost: 40,
@@ -2664,7 +2777,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   searing_pain: {
     id: 'searing_pain',
-    name: 'Searing Pain',
+    name: 'Sear',
     class: 'warlock',
     learnLevel: 16,
     cost: 35,
@@ -2678,7 +2791,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   shadowburn: {
     id: 'shadowburn',
-    name: 'Shadowburn',
+    name: 'Duskfire',
     class: 'warlock',
     learnLevel: 20,
     cost: 70,
@@ -2688,11 +2801,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 56, max: 66 }],
-    description: 'Instantly blasts the target with Shadow Flame for $d Shadow damage.',
+    description: 'Instantly blasts the target with searing shadow for $d Shadow damage.',
   },
   summon_imp: {
     id: 'summon_imp',
-    name: 'Summon Imp',
+    name: 'Summon Emberkin',
     class: 'warlock',
     learnLevel: 1,
     cost: 50,
@@ -2701,13 +2814,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'imp' }],
+    effects: [{ type: 'summonDemon', mobId: 'emberkin' }],
     description:
-      'Summons an Imp under the command of the Warlock. The Imp hurls Firebolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_voidwalker: {
     id: 'summon_voidwalker',
-    name: 'Summon Voidwalker',
+    name: 'Summon Gloomshade',
     class: 'warlock',
     learnLevel: 8,
     cost: 80,
@@ -2716,13 +2829,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'voidwalker' }],
+    effects: [{ type: 'summonDemon', mobId: 'gloomshade' }],
     description:
-      'Summons a Voidwalker under the command of the Warlock. The Voidwalker is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_succubus: {
     id: 'summon_succubus',
-    name: 'Summon Succubus',
+    name: 'Summon Duskborn',
     class: 'warlock',
     learnLevel: 12,
     cost: 100,
@@ -2731,13 +2844,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'succubus' }],
+    effects: [{ type: 'summonDemon', mobId: 'duskborn' }],
     description:
-      'Summons a Succubus under the command of the Warlock. The Succubus is a fragile demon that strikes quickly and hits hard in melee. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons a Duskborn under the command of the Warlock. The Duskborn is a fragile demon that strikes quickly and hits hard in melee. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_felhunter: {
     id: 'summon_felhunter',
-    name: 'Summon Felhunter',
+    name: 'Summon Spellhound',
     class: 'warlock',
     learnLevel: 14,
     cost: 120,
@@ -2746,13 +2859,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'felhunter' }],
+    effects: [{ type: 'summonDemon', mobId: 'spellhound' }],
     description:
-      'Summons a Felhunter under the command of the Warlock. The Felhunter harries enemies from range with Shadow Bite and excels at hunting spellcasters. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons a Spellhound under the command of the Warlock. The Spellhound harries enemies from range with Gloombite and excels at hunting spellcasters. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_felguard: {
     id: 'summon_felguard',
-    name: 'Summon Felguard',
+    name: 'Summon Warfiend',
     class: 'warlock',
     learnLevel: 16,
     cost: 150,
@@ -2761,13 +2874,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'felguard' }],
+    effects: [{ type: 'summonDemon', mobId: 'warfiend' }],
     description:
-      'Summons a Felguard under the command of the Warlock. The Felguard is a durable melee demon that wades into battle and holds its own. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Summons a Warfiend under the command of the Warlock. The Warfiend is a durable melee demon that wades into battle and holds its own. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_infernal: {
     id: 'summon_infernal',
-    name: 'Summon Infernal',
+    name: 'Summon Pyre Colossus',
     class: 'warlock',
     learnLevel: 18,
     cost: 140,
@@ -2776,13 +2889,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'fire',
     requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'infernal' }],
+    effects: [{ type: 'summonDemon', mobId: 'pyre_colossus' }],
     description:
-      'Binds an Infernal to your will — a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
   summon_doomguard: {
     id: 'summon_doomguard',
-    name: 'Summon Doomguard',
+    name: 'Summon Wraithborn',
     class: 'warlock',
     learnLevel: 20,
     cost: 150,
@@ -2791,15 +2904,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'shadow',
     requiresTarget: false,
-    effects: [{ type: 'summonDemon', mobId: 'doomguard' }],
+    effects: [{ type: 'summonDemon', mobId: 'wraithborn' }],
     description:
-      'Binds a Doomguard to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+      'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
   },
 
   // ====================== DRUID ======================
   wrath: {
     id: 'wrath',
-    name: 'Wrath',
+    name: 'Wildbolt',
     class: 'druid',
     learnLevel: 1,
     cost: 20,
@@ -2824,7 +2937,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   healing_touch: {
     id: 'healing_touch',
-    name: 'Healing Touch',
+    name: 'Wildmend',
     class: 'druid',
     learnLevel: 1,
     cost: 25,
@@ -2844,7 +2957,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   mark_of_the_wild: {
     id: 'mark_of_the_wild',
-    name: 'Mark of the Wild',
+    name: 'Wildward',
     class: 'druid',
     learnLevel: 1,
     cost: 20,
@@ -2869,12 +2982,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'buffTarget', kind: 'buff_armor', value: 75, duration: 1800 }],
       },
     ],
-    description:
-      'Places the Mark of the Wild on a friendly target, increasing armor by 25 for 30 min.',
+    description: 'Places the Wildward on a friendly target, increasing armor by 25 for 30 min.',
   },
   moonfire: {
     id: 'moonfire',
-    name: 'Moonfire',
+    name: 'Lunar Tempest',
     class: 'druid',
     learnLevel: 4,
     cost: 25,
@@ -2911,7 +3023,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rejuvenation: {
     id: 'rejuvenation',
-    name: 'Rejuvenation',
+    name: 'Wildbloom',
     class: 'druid',
     learnLevel: 4,
     cost: 25,
@@ -2946,7 +3058,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   thorns: {
     id: 'thorns',
-    name: 'Thorns',
+    name: 'Briarguard',
     class: 'druid',
     learnLevel: 6,
     cost: 20,
@@ -2975,7 +3087,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   entangling_roots: {
     id: 'entangling_roots',
-    name: 'Entangling Roots',
+    name: 'Gripping Roots',
     class: 'druid',
     learnLevel: 8,
     cost: 35,
@@ -3000,7 +3112,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   bear_form: {
     id: 'bear_form',
-    name: 'Bear Form',
+    name: 'Bruin Form',
     class: 'druid',
     learnLevel: 10,
     cost: 30,
@@ -3015,7 +3127,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   bear_charge: {
     id: 'bear_charge',
-    name: 'Bear Charge',
+    name: 'Bruin Rush',
     class: 'druid',
     learnLevel: 10,
     cost: 0,
@@ -3029,11 +3141,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
     description:
-      'Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bear Form only.',
+      'Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only.',
   },
   maul: {
     id: 'maul',
-    name: 'Maul',
+    name: 'Bonecrush',
     class: 'druid',
     learnLevel: 10,
     cost: 15,
@@ -3057,11 +3169,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bear Form only.',
+      'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
   },
   growl: {
     id: 'growl',
-    name: 'Growl',
+    name: 'Menace',
     class: 'druid',
     learnLevel: 10,
     cost: 0,
@@ -3074,11 +3186,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     effects: [{ type: 'taunt' }],
     description:
-      'Growls at the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bear Form only.',
+      'Growls at the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only.',
   },
   demoralizing_roar: {
     id: 'demoralizing_roar',
-    name: 'Demoralizing Roar',
+    name: 'Craven Roar',
     class: 'druid',
     learnLevel: 10,
     cost: 10,
@@ -3098,7 +3210,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bear Form only.',
+      'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bruin Form only.',
   },
   cat_form: {
     id: 'cat_form',
@@ -3117,7 +3229,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   prowl: {
     id: 'prowl',
-    name: 'Prowl',
+    name: 'Stalk',
     class: 'druid',
     learnLevel: 12,
     cost: 0,
@@ -3133,7 +3245,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rake: {
     id: 'rake',
-    name: 'Rake',
+    name: 'Flense',
     class: 'druid',
     learnLevel: 12,
     cost: 35,
@@ -3182,7 +3294,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   ferocious_bite: {
     id: 'ferocious_bite',
-    name: 'Ferocious Bite',
+    name: 'Gorebite',
     class: 'druid',
     learnLevel: 14,
     cost: 35,
@@ -3198,7 +3310,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   swipe: {
     id: 'swipe',
-    name: 'Swipe',
+    name: 'Sweeping Claws',
     class: 'druid',
     learnLevel: 16,
     cost: 20,
@@ -3210,11 +3322,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     threat: { mult: 1.75 }, // classic: swipe damage causes 1.75x threat
     effects: [{ type: 'aoeDamage', min: 12, max: 15, radius: 5 }],
-    description: 'Swipe nearby enemies for $d damage. Causes extra threat. Bear Form only.',
+    description: 'Swipe nearby enemies for $d damage. Causes extra threat. Bruin Form only.',
   },
   regrowth: {
     id: 'regrowth',
-    name: 'Regrowth',
+    name: 'Second Bloom',
     class: 'druid',
     learnLevel: 14,
     cost: 55,
@@ -3232,7 +3344,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   barkskin: {
     id: 'barkskin',
-    name: 'Barkskin',
+    name: 'Oakhide',
     class: 'druid',
     learnLevel: 16,
     cost: 30,
@@ -3247,7 +3359,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   starfire: {
     id: 'starfire',
-    name: 'Starfire',
+    name: 'Skyfall',
     class: 'druid',
     learnLevel: 18,
     cost: 80,
@@ -3261,7 +3373,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   travel_form: {
     id: 'travel_form',
-    name: 'Travel Form',
+    name: 'Fleet Form',
     class: 'druid',
     learnLevel: 16,
     cost: 30,
@@ -3276,7 +3388,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   enrage: {
     id: 'enrage',
-    name: 'Enrage',
+    name: 'Stoke',
     class: 'druid',
     learnLevel: 16,
     cost: 0,
@@ -3288,11 +3400,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     requiresForm: 'bear',
     effects: [{ type: 'gainResource', amount: 20 }],
-    description: 'Generates 20 rage instantly. Bear Form only.',
+    description: 'Generates 20 rage instantly. Bruin Form only.',
   },
   bash: {
     id: 'bash',
-    name: 'Bash',
+    name: 'Concuss',
     class: 'druid',
     learnLevel: 16,
     cost: 10,
@@ -3303,11 +3415,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     requiresForm: 'bear',
     effects: [{ type: 'stun', duration: 2 }],
-    description: 'Stuns the target for 2 sec. Bear Form only.',
+    description: 'Stuns the target for 2 sec. Bruin Form only.',
   },
   faerie_fire: {
     id: 'faerie_fire',
-    name: 'Faerie Fire',
+    name: 'Witchlight',
     class: 'druid',
     learnLevel: 18,
     cost: 30,
@@ -3321,7 +3433,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hibernate: {
     id: 'hibernate',
-    name: 'Hibernate',
+    name: 'Slumber',
     class: 'druid',
     learnLevel: 18,
     cost: 50,
@@ -3351,7 +3463,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   pounce: {
     id: 'pounce',
-    name: 'Pounce',
+    name: 'Slinkstrike',
     class: 'druid',
     learnLevel: 18,
     cost: 50,
@@ -3369,7 +3481,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   insect_swarm: {
     id: 'insect_swarm',
-    name: 'Insect Swarm',
+    name: 'Stinging Swarm',
     class: 'druid',
     learnLevel: 20,
     cost: 45,
@@ -3383,7 +3495,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   tigers_fury: {
     id: 'tigers_fury',
-    name: "Tiger's Fury",
+    name: 'Wolfsblood',
     class: 'druid',
     learnLevel: 20,
     cost: 30,
@@ -3419,7 +3531,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // signatures + active nodes), so abilitiesKnownAt adds them by `mods.grants`.
   mortal_strike: {
     id: 'mortal_strike',
-    name: 'Mortal Strike',
+    name: 'Maiming Strike',
     class: 'warrior',
     learnLevel: 10,
     cost: 30,
@@ -3434,7 +3546,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   bloodthirst: {
     id: 'bloodthirst',
-    name: 'Bloodthirst',
+    name: 'Bloodletting',
     class: 'warrior',
     learnLevel: 10,
     cost: 30,
@@ -3448,7 +3560,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   shield_slam: {
     id: 'shield_slam',
-    name: 'Shield Slam',
+    name: 'Shieldcrack',
     class: 'warrior',
     learnLevel: 10,
     cost: 20,
@@ -3464,7 +3576,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   whirlwind: {
     id: 'whirlwind',
-    name: 'Whirlwind',
+    name: 'Bladed Gyre',
     class: 'warrior',
     learnLevel: 10,
     cost: 25,
@@ -3478,7 +3590,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   berserker_rage: {
     id: 'berserker_rage',
-    name: 'Berserker Rage',
+    name: 'Seething Fury',
     class: 'warrior',
     learnLevel: 10,
     cost: 0,
@@ -3506,6 +3618,7 @@ export interface KnownAbility {
   effects: AbilityEffect[];
   threatFlat: number;
   threatMult: number;
+  castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
 }
 
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
@@ -3588,6 +3701,11 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
   const flat = am?.flatDmg ?? 0;
+  if (am?.addEffects.length) {
+    // Append copies before the scaling pass so added effects inherit the same
+    // global and per-ability damage/heal modifiers as native effects.
+    entry.effects = [...entry.effects, ...am.addEffects.map((e) => ({ ...e }))];
+  }
   if (dmgMult !== 1 || healMult !== 1 || flat !== 0) {
     entry.effects = entry.effects.map((e) => scaleEffect(e, dmgMult, healMult, flat));
   }
@@ -3595,6 +3713,17 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
+    if (am.castWhileMoving) entry.castWhileMoving = true;
+    // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
+    // giving more armor. Only the buff effects scale; damage on the same ability does not.
+    if (am.buffPct) {
+      const mul = 1 + am.buffPct;
+      entry.effects = entry.effects.map((e) =>
+        e.type === 'selfBuff' || e.type === 'buffTarget'
+          ? { ...e, value: Math.round(e.value * mul) }
+          : e,
+      );
+    }
   }
 }
 

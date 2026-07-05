@@ -17,6 +17,9 @@ export function npcDisplayName(npcId: string): string {
 }
 
 export function objectDisplayName(entity: Entity): string {
+  if (entity.templateId === 'mailbox') {
+    return t('worldContent.mailboxName');
+  }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
   }
@@ -25,6 +28,41 @@ export function objectDisplayName(entity: Entity): string {
   }
   if (entity.templateId === 'delve_surface_exit') {
     return t('worldContent.delveSurfaceExitInteract');
+  }
+  // The Drowned Reliquary Rite finale: the risen reliquary and the four shrines
+  // all carry an explicit "Press F" call to action while the rite is up.
+  if (entity.templateId === 'delve_drowned_reliquary') {
+    return t('worldContent.delveReliquaryInteract');
+  }
+  if (entity.templateId === 'delve_drowned_reliquary_open') {
+    return t('worldContent.delveRewardChestInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_bell') {
+    return t('worldContent.delveRiteShrineBellInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_candle') {
+    return t('worldContent.delveRiteShrineCandleInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_reed') {
+    return t('worldContent.delveRiteShrineReedInteract');
+  }
+  if (entity.templateId === 'delve_rite_shrine_skull') {
+    return t('worldContent.delveRiteShrineSkullInteract');
+  }
+  // Marsh room puzzle interactables: the sim names these in English
+  // (createDelveObject); localize through the delveUi.object.* labels. Spent
+  // variants keep the same label (same object, triggered).
+  if (entity.templateId === 'delve_sluice_valve' || entity.templateId === 'delve_sluice_valve_open')
+    return t('delveUi.object.sluice_valve');
+  if (entity.templateId === 'delve_grave_tablet' || entity.templateId === 'delve_grave_tablet_lit')
+    return t('delveUi.object.grave_tablet');
+  if (
+    entity.templateId === 'delve_corpse_candle' ||
+    entity.templateId === 'delve_corpse_candle_lit'
+  )
+    return t('delveUi.object.corpse_candle');
+  if (entity.templateId === 'delve_bell_rope' || entity.templateId === 'delve_bell_rope_pulled') {
+    return t('delveUi.object.bell_rope');
   }
   if (
     (entity.templateId === 'dungeon_door' || entity.templateId === 'dungeon_exit') &&
