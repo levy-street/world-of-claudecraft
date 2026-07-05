@@ -17,9 +17,52 @@ It is off by default. A Glitch-enabled build activates only when
 - Enters the authoritative MMO server over the normal WebSocket world path, so
   Glitch players share the same live realm as regular web players.
 - Starts an Aegis install heartbeat every 60 seconds.
+- Sends optional behavioral events for launch, auth, world loading, input, UI
+  surfaces, chat intent, zone entry, level reach, quests, combat friction,
+  economy, social systems, delves, lockpicking, and disconnects.
 - Exposes helper functions for progression run submission, leaderboard reads,
   achievements reads, and stats reads. Automatic leaderboard or achievement
   submission is not enabled until dashboard `api_key` values are chosen.
+
+## Behavioral Events And Funnels
+
+Behavioral tracking is enabled only inside a valid Glitch launch session. Regular
+local, offline, or non-Glitch web sessions do not create a tracker and do not
+call the behavioral event endpoint.
+
+The browser sends one event at a time to:
+
+```text
+POST /titles/{configured title id}/events
+```
+
+with the documented title-token body fields:
+
+- `game_install_id`: the validated Glitch `install_id`.
+- `step_key`: a stable machine key for the stage, screen, location, or system.
+- `action_key`: a stable machine key for what happened within that step.
+- `metadata`: optional scalar context.
+- `event_timestamp`: optional ISO timestamp.
+
+The client does not call `/events/bulk` because the active bulk route is
+admin-only, and it does not create behavioral funnel definitions because those
+routes are dashboard or admin operations.
+
+Event keys are normalized to stable machine keys. Metadata intentionally avoids
+chat text, display names, title tokens, server tokens, database URLs, and other
+PII or secrets. The common metadata is useful for debugging drop-off without
+identifying a player directly: build, class key, level, zone id, biome,
+position buckets, health percent, combat state, and dead or ghost state.
+
+Useful dashboard funnels to create from emitted `step_key` values:
+
+| Funnel | Ordered `step_key` values |
+| --- | --- |
+| Glitch launch to first intent | `glitch_launch`, `glitch_auth`, `world_load`, `world_session`, `input` |
+| Early progression | `zone_eastbrook_vale`, `level_02`, `quest`, `level_06`, `zone_mirefen_marsh` |
+| Delve friction | `delve`, `lockpick`, `delve` |
+| Social engagement | `ui_social`, `social_party`, `social_trade`, `social_guild` |
+| Disconnect diagnosis | `world_session`, `disconnect` |
 
 ## Database
 

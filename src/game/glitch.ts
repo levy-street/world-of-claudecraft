@@ -82,6 +82,13 @@ export interface ProgressionRunBody {
   platform?: string;
 }
 
+export interface GlitchBehaviorEventBody {
+  step_key: string;
+  action_key: string;
+  metadata?: Record<string, unknown>;
+  event_timestamp?: string;
+}
+
 export class GlitchApiError extends Error {
   constructor(
     message: string,
@@ -293,6 +300,28 @@ export async function readGlitchStats(
     session,
     `/titles/${session.titleId}/installs/${session.installId}/stats`,
     { method: 'GET' },
+    fetchImpl,
+  );
+}
+
+export async function sendGlitchBehaviorEvent(
+  session: GlitchSession,
+  event: GlitchBehaviorEventBody,
+  fetchImpl: GlitchFetch = fetch,
+): Promise<unknown> {
+  return glitchRequest(
+    session,
+    `/titles/${session.titleId}/events`,
+    {
+      method: 'POST',
+      body: {
+        game_install_id: session.installId,
+        step_key: event.step_key,
+        action_key: event.action_key,
+        ...(event.metadata === undefined ? {} : { metadata: event.metadata }),
+        ...(event.event_timestamp === undefined ? {} : { event_timestamp: event.event_timestamp }),
+      },
+    },
     fetchImpl,
   );
 }

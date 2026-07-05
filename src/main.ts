@@ -32,8 +32,10 @@ import {
   parseGlitchLaunchInstallId,
   readGlitchConfig,
   readGlitchDefaultClass,
+  sendGlitchBehaviorEvent,
   startGlitchInstallHeartbeat,
 } from './game/glitch';
+import { GlitchBehaviorTracker } from './game/glitch_events';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import {
@@ -873,6 +875,7 @@ async function startGame(
   online: ClientWorld | null,
   keybindScope: string,
   playIntro = false,
+  glitchBehavior: GlitchBehaviorTracker | null = null,
 ): Promise<void> {
   // Model/texture/HDRI fetches were kicked off at module import; the renderer
   // builds its scene synchronously, so everything must be resolved first.
@@ -991,6 +994,7 @@ async function startGame(
     hud = new Hud(world, renderer, keybinds);
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
+    glitchBehavior?.track('world_load', 'renderer_ready');
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever
@@ -1059,13 +1063,17 @@ async function startGame(
     hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
-  function openChat(): void {
+  function openChat(method = 'unknown'): void {
+    glitchBehavior?.trackUiSurface('chat', method, world);
     // reflect the active chat-channel tab in the placeholder (e.g. "Message World")
     chatInput.placeholder = hud.activeChatPlaceholder();
     chatInput.style.display = 'block';
     anchorChatInput();
     autosizeChatInput();
     chatInput.focus();
+  }
+  function trackUiSurface(surface: string, method: string): void {
+    glitchBehavior?.trackUiSurface(surface, method, world);
   }
   // Fired for every open path (keybind, whisper context menu, mobile toggle)
   // since they all call focus().
@@ -1106,7 +1114,16 @@ async function startGame(
       // "/share" links the selected quest into party chat; skip the normal send path.
       if (!hud.maybeHandleQuestShareCommand(raw)) {
         const text = hud.composeChatSend(raw);
-        if (text) world.chat(text);
+        if (text) {
+          glitchBehavior?.trackChat(
+            raw.trim().startsWith('/') ? 'send_command' : 'send_message',
+            {
+              length_bucket: Math.ceil(text.length / 20) * 20,
+            },
+            world,
+          );
+          world.chat(text);
+        }
       }
       // a typed "/join world"/"/leave lfg" opens or closes its channel tab too,
       // mirroring the "+" menu (without hijacking the active send channel)
@@ -1128,57 +1145,78 @@ async function startGame(
       onCycleFriendly: () => world.friendlyTabTarget(),
       // slot 0 (key 1) is Attack for every class — auto-attack without needing
       // right-click; keys and clicks share the Hud's remappable slot layout
-      onAbility: (slot) => hud.castSlot(slot),
-      onInputIntent: (kind) => perf.markInputIntent(kind),
+      onAbility: (slot) => {
+        glitchBehavior?.trackOnce('first_ability', 'combat', 'first_ability', { slot });
+        hud.castSlot(slot);
+      },
+      onInputIntent: (kind) => {
+        perf.markInputIntent(kind);
+        glitchBehavior?.trackFirstInput(kind, world);
+      },
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
         switch (key) {
           case 'interact':
+            trackUiSurface('interact', 'keyboard');
             interactKey();
             break;
           case 'bags':
+            trackUiSurface('bags', 'keyboard');
             hud.toggleBags();
             break;
           case 'char':
+            trackUiSurface('character', 'keyboard');
             hud.toggleChar();
             break;
           case 'spellbook':
+            trackUiSurface('spellbook', 'keyboard');
             hud.toggleSpellbook();
             break;
           case 'questlog':
+            trackUiSurface('questlog', 'keyboard');
             hud.toggleQuestLog();
             break;
           case 'map':
+            trackUiSurface('map', 'keyboard');
             hud.toggleMap();
             break;
           case 'nameplates':
+            trackUiSurface('nameplates', 'keyboard');
             renderer.showNameplates = !renderer.showNameplates;
             break;
           case 'talents':
+            trackUiSurface('talents', 'keyboard');
             hud.toggleTalents();
             break;
           case 'meters':
+            trackUiSurface('meters', 'keyboard');
             hud.toggleMeters();
             break;
           case 'social':
+            trackUiSurface('social', 'keyboard');
             hud.toggleSocial();
             break;
           case 'arena':
+            trackUiSurface('arena', 'keyboard');
             hud.toggleArena();
             break;
           case 'leaderboard':
+            trackUiSurface('leaderboard', 'keyboard');
             hud.toggleLeaderboard();
             break;
           case 'calendar':
+            trackUiSurface('calendar', 'keyboard');
             hud.toggleCalendar();
             break;
           case 'discord':
+            trackUiSurface('discord', 'keyboard');
             toggleDiscordPanel();
             break;
           case 'chat':
-            openChat();
+            openChat('keyboard');
             break;
           case 'escape':
+            trackUiSurface('escape_menu', 'keyboard');
             if (hud.cancelGroundAim()) break;
             // close the topmost panel; if nothing was open, open the game menu
             if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -1202,25 +1240,71 @@ async function startGame(
   }));
 
   const mobileControls = new MobileControls(input, {
-    onAttackNearest: () => attackNearest(),
+    onAttackNearest: () => {
+      glitchBehavior?.trackFirstInput('touch_attack', world);
+      attackNearest();
+    },
     onJump: () => input.triggerTouchJump(),
     onTarget: () => world.tabTarget(),
-    onInteract: () => interactKey(),
+    onInteract: () => {
+      trackUiSurface('interact', 'touch');
+      interactKey();
+    },
     onAutorun: () => input.toggleAutorun(),
-    onChat: () => openChat(),
-    onMenu: () => hud.toggleOptionsMenu(),
-    onSocial: () => hud.toggleSocial(),
-    onDiscord: () => toggleDiscordPanel(true),
-    onEmotes: () => hud.toggleEmoteWheel(),
-    onArena: () => hud.toggleArena(),
-    onQuestLog: () => hud.toggleQuestLog(),
-    onCharacter: () => hud.toggleChar(),
-    onBags: () => hud.toggleBags(),
-    onSpellbook: () => hud.toggleSpellbook(),
-    onTalents: () => hud.toggleTalents(),
-    onMap: () => hud.toggleMap(),
-    onLeaderboard: () => hud.toggleLeaderboard(),
-    onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
+    onChat: () => openChat('touch'),
+    onMenu: () => {
+      trackUiSurface('escape_menu', 'touch');
+      hud.toggleOptionsMenu();
+    },
+    onSocial: () => {
+      trackUiSurface('social', 'touch');
+      hud.toggleSocial();
+    },
+    onDiscord: () => {
+      trackUiSurface('discord', 'touch');
+      toggleDiscordPanel(true);
+    },
+    onEmotes: () => {
+      trackUiSurface('emotes', 'touch');
+      hud.toggleEmoteWheel();
+    },
+    onArena: () => {
+      trackUiSurface('arena', 'touch');
+      hud.toggleArena();
+    },
+    onQuestLog: () => {
+      trackUiSurface('questlog', 'touch');
+      hud.toggleQuestLog();
+    },
+    onCharacter: () => {
+      trackUiSurface('character', 'touch');
+      hud.toggleChar();
+    },
+    onBags: () => {
+      trackUiSurface('bags', 'touch');
+      hud.toggleBags();
+    },
+    onSpellbook: () => {
+      trackUiSurface('spellbook', 'touch');
+      hud.toggleSpellbook();
+    },
+    onTalents: () => {
+      trackUiSurface('talents', 'touch');
+      hud.toggleTalents();
+    },
+    onMap: () => {
+      trackUiSurface('map', 'touch');
+      hud.toggleMap();
+    },
+    onLeaderboard: () => {
+      trackUiSurface('leaderboard', 'touch');
+      hud.toggleLeaderboard();
+    },
+    onNameplates: () => {
+      trackUiSurface('nameplates', 'touch');
+      renderer.showNameplates = !renderer.showNameplates;
+      return renderer.showNameplates;
+    },
     onMusic: () => {
       music.setEnabled(!music.enabled);
       return music.enabled;
@@ -1244,13 +1328,18 @@ async function startGame(
   const gamepadBindings = new GamepadBindings();
   const canUseGameKeysNow = () => !hud.isModalOpen() && chatInput.style.display !== 'block';
   function dispatchGamepadAction(id: string): void {
+    glitchBehavior?.trackFirstInput('gamepad', world);
     if (id === 'escape') {
+      trackUiSurface('escape_menu', 'gamepad');
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
     if (id.startsWith('slot')) {
+      glitchBehavior?.trackOnce('first_ability', 'combat', 'first_ability', {
+        slot: Number(id.slice(4)),
+      });
       hud.castSlot(Number(id.slice(4)));
       return;
     }
@@ -1266,55 +1355,72 @@ async function startGame(
         world.friendlyTabTarget();
         break;
       case 'interact':
+        trackUiSurface('interact', 'gamepad');
         interactKey();
         break;
       case 'bags':
+        trackUiSurface('bags', 'gamepad');
         hud.toggleBags();
         break;
       case 'char':
+        trackUiSurface('character', 'gamepad');
         hud.toggleChar();
         break;
       case 'spellbook':
+        trackUiSurface('spellbook', 'gamepad');
         hud.toggleSpellbook();
         break;
       case 'questlog':
+        trackUiSurface('questlog', 'gamepad');
         hud.toggleQuestLog();
         break;
       case 'map':
+        trackUiSurface('map', 'gamepad');
         hud.toggleMap();
         break;
       case 'nameplates':
+        trackUiSurface('nameplates', 'gamepad');
         renderer.showNameplates = !renderer.showNameplates;
         break;
       case 'talents':
+        trackUiSurface('talents', 'gamepad');
         hud.toggleTalents();
         break;
       case 'meters':
+        trackUiSurface('meters', 'gamepad');
         hud.toggleMeters();
         break;
       case 'social':
+        trackUiSurface('social', 'gamepad');
         hud.toggleSocial();
         break;
       case 'arena':
+        trackUiSurface('arena', 'gamepad');
         hud.toggleArena();
         break;
       case 'leaderboard':
+        trackUiSurface('leaderboard', 'gamepad');
         hud.toggleLeaderboard();
         break;
       case 'calendar':
+        trackUiSurface('calendar', 'gamepad');
         hud.toggleCalendar();
         break;
       case 'discord':
+        trackUiSurface('discord', 'gamepad');
         toggleDiscordPanel();
         break;
       case 'chat':
-        openChat();
+        openChat('gamepad');
         break;
     }
   }
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
-    onInputEdge: () => inputMeter.record(performance.now()),
+    onInputEdge: () => {
+      inputMeter.record(performance.now());
+      glitchBehavior?.trackFirstInput('gamepad', world);
+    },
     isPointerMode: () => hud.isWindowOpen(),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
@@ -2333,6 +2439,7 @@ async function startGame(
     perf.trace('input.gamepad', () => gamepad.poll(frameDt), { frameDtMs: frameDt * 1000 });
     perf.trace('input.hoverCursor', () => updateHoverCursor(), { active: input.hoverActive });
     perf.markInputFrame(performance.now());
+    glitchBehavior?.observeWorld(world, now);
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
     const controllerFacing = input.controllerFacingOverride();
@@ -2458,6 +2565,7 @@ async function startGame(
     }
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     const drainedEvents = net.drainEvents();
+    glitchBehavior?.observeSimEvents(drainedEvents, world, now);
     perf.time('events', () =>
       perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
         mode: 'online',
@@ -2633,6 +2741,15 @@ async function startGame(
   }
   await nextPaint();
   last = performance.now();
+  if (glitchBehavior) {
+    window.addEventListener(
+      'pagehide',
+      () => {
+        glitchBehavior.track('world_session', 'end');
+      },
+      { once: true },
+    );
+  }
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>
@@ -2643,6 +2760,8 @@ async function startGame(
       if (intro) intro.startedAt = performance.now();
       window.setTimeout(() => {
         gameInputReady = true;
+        glitchBehavior?.track('world_session', 'start');
+        glitchBehavior?.observeWorld(world, performance.now());
         perf.reset();
         startPerfReporter({
           perf,
@@ -2761,15 +2880,38 @@ async function startGlitchAuthenticatedGame(session: GlitchSession): Promise<voi
     import.meta.env,
     Object.keys(CLASSES),
   ) as PlayerClass;
-  const login = await api.glitchLogin({
-    installId: session.installId,
-    defaultClass: configuredClass,
+  const glitchBehavior = new GlitchBehaviorTracker({
+    build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
+    sendEvent: (event) => sendGlitchBehaviorEvent(session, event),
+  });
+  glitchBehavior.track(
+    'glitch_launch',
+    session.launchedByGlitch ? 'launch_validated' : 'validated',
+    {
+      license_type: session.licenseType ?? 'unknown',
+    },
+  );
+  glitchBehavior.track('glitch_auth', 'login_start', { default_class: configuredClass });
+  let login: Awaited<ReturnType<Api['glitchLogin']>>;
+  try {
+    login = await api.glitchLogin({
+      installId: session.installId,
+      defaultClass: configuredClass,
+    });
+  } catch (err) {
+    glitchBehavior.track('glitch_auth', 'login_error', { reason: 'request_failed' });
+    throw err;
+  }
+  glitchBehavior.track('glitch_auth', 'login_complete', {
+    class_key: login.character.class,
+    level: login.character.level,
   });
   startGlitchInstallHeartbeat({ session });
   if (login.character.online) {
+    glitchBehavior.track('glitch_auth', 'takeover_existing_character');
     await api.takeoverCharacter(login.character.id);
   }
-  await enterWorld({ ...login.character, online: false });
+  await enterWorld({ ...login.character, online: false }, undefined, { glitchBehavior });
 }
 
 async function maybeStartGlitchLaunch(): Promise<boolean> {
@@ -4100,7 +4242,11 @@ function fatalOverlay(message: string): void {
   document.body.appendChild(el);
 }
 
-async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
+async function enterWorld(
+  c: CharacterSummary,
+  button?: HTMLButtonElement,
+  opts: { glitchBehavior?: GlitchBehaviorTracker | null } = {},
+): Promise<void> {
   try {
     if (button) {
       button.disabled = true;
@@ -4117,6 +4263,10 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       button.textContent = t('auth.enterWorld');
     }
   }
+  opts.glitchBehavior?.track('world_load', 'connect_start', {
+    class_key: c.class,
+    level: c.level,
+  });
   const world = new ClientWorld(api.token!, c.id, c.class, api.base, getClientSeed());
   // Wire shareable player cards for this online session: publishing uploads the
   // composited PNG to this realm and returns an absolute public page URL, and
@@ -4140,11 +4290,13 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   const poll = setInterval(() => {
     if (world.connected && world.entities.has(world.playerId)) {
       clearInterval(poll);
-      void startGame(world, null, world, `char:${c.id}`, true);
+      opts.glitchBehavior?.track('world_load', 'first_snapshot');
+      void startGame(world, null, world, `char:${c.id}`, true, opts.glitchBehavior ?? null);
     } else if (Date.now() - waitStart > 10000) {
       clearInterval(poll);
       world.close();
       clearCardProviders();
+      opts.glitchBehavior?.track('world_load', 'entry_timeout');
       fatalOverlay(t('loading.enterTimeout'));
     }
   }, 50);
@@ -4153,6 +4305,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   world.onDisconnect = (reason) => {
     clearInterval(poll);
     clearCardProviders();
+    opts.glitchBehavior?.trackDisconnect(reason, world);
     fatalOverlay(userFacingApiError(reason));
   };
 }

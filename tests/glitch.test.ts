@@ -6,6 +6,7 @@ import {
   type GlitchSession,
   readGlitchConfig,
   safeGlitchUserName,
+  sendGlitchBehaviorEvent,
   storeGlitchCharacterSave,
   submitGlitchProgressionRun,
 } from '../src/game/glitch';
@@ -179,6 +180,30 @@ describe('Glitch platform integration', () => {
       payload: { scores: { high_score: 42 }, stats: { quests_done: 1 } },
       trust_level: 'unverified',
       platform: 'web',
+    });
+  });
+
+  it('sends behavioral events with the documented install field names', async () => {
+    const { calls, fetchImpl } = mockFetch([response(200, { data: { id: 'event-1' } })]);
+
+    await sendGlitchBehaviorEvent(
+      session(),
+      {
+        step_key: 'quest',
+        action_key: 'complete',
+        metadata: { quest_id: 'q_wolves', level: 2 },
+        event_timestamp: '2026-07-05T12:00:00.000Z',
+      },
+      fetchImpl,
+    );
+
+    expect(calls[0].url).toBe(`https://api.glitch.fun/api/titles/${TITLE_ID}/events`);
+    expect(calls[0].body).toEqual({
+      game_install_id: INSTALL_ID,
+      step_key: 'quest',
+      action_key: 'complete',
+      metadata: { quest_id: 'q_wolves', level: 2 },
+      event_timestamp: '2026-07-05T12:00:00.000Z',
     });
   });
 
