@@ -56,8 +56,13 @@ const STYLE = `
 .wz-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(6,8,12,0.72);
   display: none; align-items: center; justify-content: center; }
 .wz-overlay.open { display: flex; }
-.wz-modal { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
-  width: min(760px, 94vw); max-height: 92vh; overflow: auto; padding: 18px 20px; }
+.wz-modal { position: relative; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 12px; width: min(760px, 94vw); max-height: 92vh; overflow: auto; padding: 18px 20px; }
+.wz-x { position: absolute; top: 10px; right: 12px; width: 28px; height: 28px; padding: 0;
+  display: flex; align-items: center; justify-content: center; background: var(--panel2);
+  color: var(--dim); border: 1px solid var(--line); border-radius: 6px; font-size: 20px;
+  line-height: 1; cursor: pointer; z-index: 2; }
+.wz-x:hover { color: var(--text); border-color: var(--gold); }
 .wz-modal h2 { color: var(--gold); font-size: 16px; margin-bottom: 3px; }
 .wz-modal .wz-sub { color: var(--dim); font-size: 12px; margin-bottom: 14px; }
 .wz-steps { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -99,12 +104,10 @@ const STYLE = `
 class Wizard {
   constructor() {
     document.head.append(el('style', { html: STYLE }));
-    this.overlay = el('div', {
-      class: 'wz-overlay',
-      onclick: (e) => {
-        if (e.target === this.overlay) this.close();
-      },
-    });
+    // Deliberately NO close-on-backdrop-click: a stray click outside must not drop
+    // the operator out of an in-flight generation. Closing is the corner X or a
+    // Cancel button, both guarded by requestClose().
+    this.overlay = el('div', { class: 'wz-overlay' });
     this.modal = el('div', { class: 'wz-modal' });
     this.overlay.append(this.modal);
     document.body.append(this.overlay);
@@ -123,6 +126,39 @@ class Wizard {
     this.overlay.classList.remove('open');
     this.polling = false;
     this.state = null;
+  }
+
+  // Guarded close: warn before leaving once a generation is underway. The job is
+  // saved to disk and resumable from the asset detail, but an accidental close
+  // should not silently drop the operator out of an in-flight review.
+  requestClose() {
+    const s = this.state;
+    const started = s && (s.jobId || ['model', 'finish', 'save'].includes(s.phase));
+    if (started && s.phase !== 'done') {
+      const msg = this.polling
+        ? 'A generation step is still running. Close the wizard anyway? The job is saved and you can resume it from the asset detail.'
+        : 'Close the wizard? The job is saved and you can resume it from the asset detail.';
+      if (!window.confirm(msg)) return;
+    }
+    this.close();
+  }
+
+  // Clear the modal and re-add the persistent corner close (X); every screen
+  // rebuilds modal.innerHTML, so the X is re-appended here rather than once.
+  resetModal() {
+    this.modal.innerHTML = '';
+    this.modal.append(
+      el(
+        'button',
+        {
+          class: 'wz-x',
+          title: 'Close',
+          'aria-label': 'Close',
+          onclick: () => this.requestClose(),
+        },
+        '×',
+      ),
+    );
   }
 
   openNew(preset = {}) {
@@ -170,7 +206,7 @@ class Wizard {
   renderPrompt() {
     const s = this.state;
     this.closeViewer();
-    this.modal.innerHTML = '';
+    this.resetModal();
     this.modal.append(
       el('h2', {}, s.mode === 'regenerate' ? 'Regenerate asset' : 'Create a new asset'),
       el(
@@ -226,7 +262,7 @@ class Wizard {
       el(
         'div',
         { class: 'wz-actions' },
-        el('button', { class: 'wz-btn ghost', onclick: () => this.close() }, 'Cancel'),
+        el('button', { class: 'wz-btn ghost', onclick: () => this.requestClose() }, 'Cancel'),
         el(
           'button',
           {
@@ -277,7 +313,7 @@ class Wizard {
     const s = this.state;
     const models = (this._status.previews || []).filter((p) => p.group === 'model');
     this.closeViewer();
-    this.modal.innerHTML = '';
+    this.resetModal();
     this.modal.append(
       el('h2', {}, 'Review the model'),
       el(
@@ -291,7 +327,7 @@ class Wizard {
       el(
         'div',
         { class: 'wz-actions' },
-        el('button', { class: 'wz-btn ghost', onclick: () => this.close() }, 'Cancel'),
+        el('button', { class: 'wz-btn ghost', onclick: () => this.requestClose() }, 'Cancel'),
         el('button', { class: 'wz-btn', onclick: () => this.startModel(true) }, 'Regenerate model'),
         el(
           'button',
@@ -328,7 +364,7 @@ class Wizard {
     const finals = (this._status.previews || []).filter((p) => p.group === 'final');
     const val = this._status.validation;
     this.closeViewer();
-    this.modal.innerHTML = '';
+    this.resetModal();
     this.modal.append(
       el('h2', {}, s.lane === 'creature' ? 'Review the animations' : 'Review the finished asset'),
       el(
@@ -351,7 +387,7 @@ class Wizard {
       el(
         'div',
         { class: 'wz-actions' },
-        el('button', { class: 'wz-btn ghost', onclick: () => this.close() }, 'Cancel'),
+        el('button', { class: 'wz-btn ghost', onclick: () => this.requestClose() }, 'Cancel'),
         s.lane === 'creature'
           ? el(
               'button',
@@ -385,8 +421,9 @@ class Wizard {
   }
 
   renderDone() {
+    if (this.state) this.state.phase = 'done';
     this.closeViewer();
-    this.modal.innerHTML = '';
+    this.resetModal();
     this.modal.append(
       el('h2', {}, 'Saved'),
       el(
@@ -417,7 +454,7 @@ class Wizard {
   // --- shared render bits ----
   renderWorking(step, msg) {
     this.closeViewer();
-    this.modal.innerHTML = '';
+    this.resetModal();
     this.modal.append(
       el('h2', {}, 'Working...'),
       el('div', { class: 'wz-sub' }, msg),
@@ -427,7 +464,7 @@ class Wizard {
   }
   renderError(msg, back) {
     this.closeViewer();
-    this.modal.innerHTML = '';
+    this.resetModal();
     this.modal.append(
       el('h2', {}, 'Something went wrong'),
       el('div', { class: 'wz-note' }, String(msg)),
@@ -435,7 +472,7 @@ class Wizard {
       el(
         'div',
         { class: 'wz-actions' },
-        el('button', { class: 'wz-btn ghost', onclick: () => this.close() }, 'Close'),
+        el('button', { class: 'wz-btn ghost', onclick: () => this.requestClose() }, 'Close'),
         back ? el('button', { class: 'wz-btn', onclick: back }, 'Back') : null,
       ),
     );
