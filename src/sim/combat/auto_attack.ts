@@ -46,6 +46,7 @@ import {
 import { spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isStunned } from './cc';
 import { consumeNextAttackCrit } from './empower_next';
+import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed } from './form_swing';
 import { rangedShotProfile } from './ranged_shot';
 import { applyThornsReaction } from './thorns_charge';
@@ -325,5 +326,8 @@ export function meleeSwing(
       );
     }
   }
+  // Legendary on-hit weapon procs (e.g. Thronebane's Chain Arc). No-op (no rng
+  // draw) unless the attacker wields a proc weapon with a meleeHit proc.
+  runWeaponProcs(ctx, attacker, target, 'meleeHit');
   return true;
 }
