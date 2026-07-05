@@ -1,5 +1,3 @@
-# TODOs: feat/woc-liquidity-guardian
-All complete; see FINDINGS.md for evidence and the mid-branch external-reset
-incident. Deferred (documented): np-guardian/lb-guardian dedicated CSS (badges
-reuse np-tier sizing), a devnet read-path test (layout proven by branch 1
-devnet + stubbed-RPC tests here).
+# TODOs: $WOC LP liquidity layer (combined)
+All three layers complete and rebased onto the current #799 head (on release/v0.22.0);
+see FINDINGS.md for evidence. Deferred (documented): live-pool wiring, treasury keys.

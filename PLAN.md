@@ -1,29 +1,29 @@
-# feat(defi): Liquidity Guardian staker flair
+# feat(defi): $WOC LP liquidity layer (combined)
 
-Branch: feat/woc-liquidity-guardian, stacked on feat/woc-lp-staking-vault
-(branch 1; parallel to the fee-share branch). COSMETIC ONLY, no gameplay power,
-and rail-gated: every read is tier 0 and RPC-free unless the LP staking rail
-(WOC_LP_STAKING_ENABLED + program + mint) is configured.
+One combined branch for the whole LP flywheel, stacked on #799 (feat/woc-gamblefi-core:
+flow_ledger + reward seasons + woc_escrow), targeting release/v0.22.0. It combines three
+independently-reviewable layers (each was a separate fork PR: #3 vault, #4 fee-share,
+#5 guardian):
 
-## What this branch ships
-1. src/sim/guardian_tier.ts: pure shared ladder. Tier 1-5 (Wader, Tidewatcher,
-   Currentkeeper, Stormwarden, Abyssguard) by REMAINING lock, in pinned
-   LOCKSTEP with the veLP reward tiers; two anti farm-and-dump gates: a
-   configurable stake dust floor and a 7-day SEASONING window (a fresh
-   position shows nothing, so flash-stake-and-dump earns no flair).
-2. server/lp_guardian.ts: cached per-wallet Position reader over the raw-RPC
-   seam (mirrors woc_balance.ts), fail-closed to tier 0 on any failure.
-3. Identity pipeline: Entity.guardianTier -> wire key gt (game.ts, riding the
-   holder-tier refresh, one wallet lookup for both flairs) -> online.ts decode
-   (extends the #473/#1105 pattern; no parallel flair system).
-4. Nameplate (extends #1105): a SHIELD badge (visually distinct from the
-   holder disc) + tier-coloured aura glow, cheap-diffed like the holder badge.
-5. Player card (extends #473): a cosmetic TITLE line under the header
-   subtitle in the rung's colour; guardian tier flows main.ts wallet refresh
-   -> wallet_balance store -> hud card builder (verified linked wallet only).
-6. Leaderboard prestige: LeaderboardEntry.guardianTier, enriched at cache
-   refresh from ONE lp_positions-mirror JOIN (characters -> wallet_links ->
-   mirror; zero chain reads; lp_guardian_db.ts), shield badge in the rows.
-7. REST: GET /api/woc/lp/guardian?owner= (rate-limited, 404 while dark).
-8. i18n: wallet.guardianTierTitle + 5x name/title keys, with the five
-   non-Latin fills (M16) in the same change.
+1. LP staking vault (#3, foundation) - solana/programs/woc_lp_vault: non-custodial
+   per-position LP vaults; init_pool/open_position/stake/extend_lock/unstake/close_position/
+   set_paused. Monotone locks; unstake never gated. Server: pure veLP math, epoch runner
+   reserving emissions THROUGH #799's flow_ledger (bounded by verified inflows, buy>sell),
+   Postgres mirror, non-custodial tx builders.
+2. LP fee-share + buyback drip (#4, stacks on 1) - distribution encoders on woc_escrow_client,
+   LP fee keeper (fund_distribution settle, lp_fee_revenue inflow), buyback drip
+   (WOC_LP_BUYBACK_DRIP_BPS, splitDrip capped 50%), lp_payouts distributor paying vested
+   accruals (NO second ledger emit: the emission was reserved at accrual).
+3. Liquidity Guardian flair (#5, stacks on 1 in parallel with 2) - cosmetic-only prestige
+   ladder (wire key gt) extending the #473/#1105 holder-flair pipeline; 7d seasoning +
+   veLP-lockstep ladder so it cannot be farm-and-dumped; shield badge/aura, card title,
+   leaderboard prestige. The sim never reads it.
+
+## Fail-closed
+All token rails OFF by default: WOC_LP_STAKING_ENABLED / WOC_LP_FEE_SHARE_ENABLED unset ->
+services null, server byte-identical. Emissions additionally need WOC_LP_EMISSION_RATE_BASE>0.
+Half-configs throw at boot. No keys committed.
+
+## Blockers (all external)
+#799 must land upstream first; treasury/season keys + legal for the live rails; a real
+Meteora/DEX pool LP mint + real fee-source addresses.

@@ -1,50 +1,39 @@
-# Findings: feat/woc-liquidity-guardian
+# Findings: $WOC LP liquidity layer (combined)
 
-## Incident: external worktree reset mid-branch
-While building, this worktree's branch was reset by an external actor (reflog
-17:12: "reset: moving to feat/woc-lp-fee-share"), wiping in-flight tracked
-edits and rebasing the branch onto the fee-share branch. Recovery: mixed reset
-back to the branch-1 head (per the task: branch 3 stacks on branch 1),
-restored tracked files, removed fee-share leftovers, reapplied all edits. The
-external actor's versions of the game.ts/online.ts/types.ts changes (identical
-design, Promise.all refresh) and their catalog title values were kept.
+## Combined branch
+feat/woc-lp-liquidity-layer = vault (#3) + fee-share (#4) + guardian (#5), stacked on the
+current #799 head (fba96f767, on release/v0.22.0). 9 commits over #799. The only combine-time
+conflict was an import-ordering merge in server/main.ts (both fee-share and guardian wire into
+it); resolved additively. Zero conflict markers; tsc clean.
 
-## Cosmetic-only proof
-- Entity.guardianTier is presentation state: the sim never reads it
-  (tests/architecture.test.ts green; tests/parity/trace.ts excludes it like
-  holderTier); tests/sim.test.ts determinism suite green (92/92).
-- Rewards are titles, badges, aura, board prestige: no stat, drop, or economy
-  effect anywhere.
+## Tests (combined branch, post-rebase onto v0.22.0)
+- 271 unit/guard tests + 3 skipped green (veLP math incl. adversarial budget-bounding, epoch
+  idempotency + concurrent-emit-vs-arena-spend, vesting/forfeit; distributor + drip conservation;
+  guardian ladder/seasoning/lockstep + fail-closed reader + gt wire round-trip; the flow_ledger
+  invariant; the architecture sim-purity guard; snapshots delta-key registry; S3 i18n guard;
+  i18n_completeness now FULLY green - the inherited #799 wocSeason red was fixed upstream).
+- 12 real-Postgres integration green (lp_payouts machine, buyback_batches source isolation,
+  guardian leaderboard join).
+- 92 sim determinism green (same seed same replay; the sim never reads guardianTier).
 
-## Anti farm-and-dump (vested cosmetic unlocks)
-- 7d seasoning: guardianTierIndex returns 0 until stakedAt is a week old; the
-  on-chain program RESETS stakedAt to 0 on full unstake (branch 1), so
-  exit-and-reenter restarts the clock.
-- Tier follows REMAINING lock (decays exactly like veLP reward weight;
-  lockstep pinned by tests/guardian_tier.test.ts against VE_LP_TIERS).
+## Devnet (per-layer, signatures logged in the fork PR comments)
+- Vault 5/5 lifecycle: stake 4wErDpDw... / add-stake 5aDbzwwv... / extend 5TdYbsFy... /
+  unstake-after-expiry (early refused on-chain) 4SDpJn37... / close 5v5jHGDd... .
+- Fee-share 5/5 distribution + drip: open 4NDm7zmB... / fund 2MTN8A8U... / payout+ATA-create
+  (over-payout refused InsufficientPool) 2gDtTofS... / one-tx drip-split settle 383Vz7e9... /
+  close 3GfiSXNR... .
+- Guardian: cosmetic render evidence (screenshot) on the fork PR #5.
 
-## Gates and fail-closed posture
-- guardianFlairConfigured() requires WOC_LP_STAKING_ENABLED=1 + program + mint:
-  otherwise zero RPC, tier 0 everywhere, /api/woc/lp/guardian 404s.
-- Reader fails closed (RPC error -> tier 0, cached, retry after TTL 2min).
-- Leaderboard enrich reads only the DB mirror (no chain), only when configured.
+## Invariant + purity (the load-bearing checks)
+- flow_ledger buy>sell: a concurrent arena payout draining season headroom mid-epoch forces
+  budget_exceeded and voids the LP epoch; headroom never overdrawn (adversarial test).
+- No second ledger emit at payout: the emission is reserved at accrual; payout is bounded
+  independently by the accrual book (guarded paid_base) and the on-chain payout instruction.
+- Sim purity: guardianTier is presentation-only; the architecture guard + parity trace exclude it.
 
-## Test inventory (all green)
-- guardian_tier.test.ts 7 (gates, boundaries, lockstep pin)
-- lp_guardian.test.ts 5 (config gate, PDA addressing, cache, fail-closed, floor)
-- guardian_broadcast.test.ts 4 (gt encode/omit/decode/coexists with ht)
-- lp_guardian_db.integration.test.ts 3 (real Postgres join, pool scope, floor)
-- Sweep: 231 tests green across guardian + holder + architecture + snapshots +
-  S3 i18n guard + leaderboard + player card + branch-1 LP suites; sim
-  determinism 92/92; tsc parity (0 new); biome warnings only.
-- i18n M16: five non-Latin fills shipped for the new wordy keys; the
-  completeness gate's remaining failures are PRE-EXISTING base-branch debt
-  (hudChrome.wocSeason.*, from #799), unchanged by this branch.
-
-## Deferred / limits
-- No dedicated CSS for .np-guardian / .lb-guardian (they reuse np-tier sizing;
-  an artist pass can restyle).
-- The guardian badge on nameplates uses direct style writes like the existing
-  setNameplateTier (render/ nameplates are outside the PainterHost regime).
-- No live-devnet test here: the Position account layout is devnet-proven by
-  branch 1; this branch's reader is exercised against stubbed RPC responses.
+## Reviewer checks (carried, not silently resolved)
+- WOC_LP_MINT must be a REAL Meteora/DEX pool LP token (not yet wired to a live pool).
+- Fee-intake source addresses (DEX pool + treasury feeds) are env placeholders.
+- WOC_LP_GUARDIAN_MIN_STAKE_BASE (flair dust floor) is env-tuned per LP mint decimals.
+- Leaderboard enrichment joins characters -> wallet_links.pubkey -> lp_positions.owner, i.e.
+  it assumes the account's LINKED wallet is the staker; confirm no alt-wallet staking path.
