@@ -19,7 +19,10 @@
       "!src/ui/i18n.status.summary.json",
       "!tests/parity/golden",
       "!**/*.svelte",
-      "!**/*.min.js"
+      "!**/*.min.js",
+      "!docs/design/professions-system",
+      "!docs/design/professions-system.html",
+      "!ip-refactor"
     ]
   },
   "formatter": {
@@ -50,6 +53,15 @@
         "enabled": false
       },
       "linter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": ["src/sim/content/talents_warrior.ts"],
+      "formatter": {
+        "enabled": false
+      },
+      "assist": {
         "enabled": false
       }
     },

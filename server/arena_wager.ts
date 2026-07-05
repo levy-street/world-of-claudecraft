@@ -20,14 +20,25 @@ import type { ArenaEscrow } from './arena_escrow';
 // strand the pot. Phase strings match WagerPhase exactly.
 export interface WagerStore {
   insert(m: {
-    matchId: bigint; creatorPid: number; opponentPid: number;
-    creatorWallet: string; opponentWallet: string; stakeBase: bigint; rakeBps: number;
+    matchId: bigint;
+    creatorPid: number;
+    opponentPid: number;
+    creatorWallet: string;
+    opponentWallet: string;
+    stakeBase: bigint;
+    rakeBps: number;
   }): Promise<void>;
   recordStake(matchId: bigint, role: 'open' | 'join', signature: string): Promise<void>;
   setPhase(matchId: bigint, phase: WagerPhase, settleSig?: string): Promise<void>;
 }
 
-export type WagerPhase = 'awaiting_stakes' | 'in_bout' | 'settling' | 'settled' | 'refunded' | 'cancelled';
+export type WagerPhase =
+  | 'awaiting_stakes'
+  | 'in_bout'
+  | 'settling'
+  | 'settled'
+  | 'refunded'
+  | 'cancelled';
 
 export interface WagerParticipant {
   pid: number;
@@ -40,12 +51,30 @@ export interface WagerParticipant {
 // `notify`). The client signs `unsignedTxB64` with its wallet, submits it, and
 // reports back via onStakeSubmitted.
 export type WagerClientMsg =
-  | { t: 'wager_match'; matchId: string; role: 'creator' | 'opponent'; stakeBase: string; unsignedTxB64: string }
+  | {
+      t: 'wager_match';
+      matchId: string;
+      role: 'creator' | 'opponent';
+      stakeBase: string;
+      unsignedTxB64: string;
+    }
   | { t: 'wager_phase'; matchId: string; phase: WagerPhase }
-  | { t: 'wager_result'; matchId: string; outcome: 'won' | 'lost' | 'draw'; signature: string; payoutBase: string; burnBase: string }
+  | {
+      t: 'wager_result';
+      matchId: string;
+      outcome: 'won' | 'lost' | 'draw';
+      signature: string;
+      payoutBase: string;
+      burnBase: string;
+    }
   // cancelTxB64 is present for a creator who already staked: the unsigned
   // cancel_match tx for them to sign and reclaim their stake.
-  | { t: 'wager_cancelled'; matchId: string; reason: 'stake_timeout' | 'opponent_left'; cancelTxB64?: string }
+  | {
+      t: 'wager_cancelled';
+      matchId: string;
+      reason: 'stake_timeout' | 'opponent_left';
+      cancelTxB64?: string;
+    }
   // A queue request was refused before any pairing (gate or validation failure).
   | { t: 'wager_error'; reason: string };
 
@@ -104,12 +133,15 @@ export class ArenaWagerCoordinator {
   async enqueue(p: WagerParticipant): Promise<EnqueueResult> {
     if (p.stakeBase < this.deps.minStakeBase) return { ok: false, reason: 'stake_below_min' };
     if (p.stakeBase > this.deps.maxStakeBase) return { ok: false, reason: 'stake_above_max' };
-    if (this.pidToMatch.has(p.pid) || this.queue.some((q) => q.pid === p.pid)) return { ok: false, reason: 'already_queued' };
+    if (this.pidToMatch.has(p.pid) || this.queue.some((q) => q.pid === p.pid))
+      return { ok: false, reason: 'already_queued' };
 
-    const partnerIdx = this.queue.findIndex((q) =>
-      q.stakeBase === p.stakeBase
-      && !q.wallet.equals(p.wallet)
-      && Math.abs(q.rating - p.rating) <= this.deps.maxRatingGap);
+    const partnerIdx = this.queue.findIndex(
+      (q) =>
+        q.stakeBase === p.stakeBase &&
+        !q.wallet.equals(p.wallet) &&
+        Math.abs(q.rating - p.rating) <= this.deps.maxRatingGap,
+    );
     if (partnerIdx < 0) {
       this.queue.push(p);
       return { ok: true, queued: true };
@@ -129,8 +161,14 @@ export class ArenaWagerCoordinator {
     const matchId = await this.deps.nextMatchId();
     const key = matchId.toString();
     const m: MatchState = {
-      matchId, creator, opponent, stakeBase: creator.stakeBase, phase: 'awaiting_stakes',
-      pairedAtMs: this.deps.now(), openSig: null, joinSig: null,
+      matchId,
+      creator,
+      opponent,
+      stakeBase: creator.stakeBase,
+      phase: 'awaiting_stakes',
+      pairedAtMs: this.deps.now(),
+      openSig: null,
+      joinSig: null,
     };
     this.matches.set(key, m);
     this.pidToMatch.set(creator.pid, key);
@@ -139,15 +177,35 @@ export class ArenaWagerCoordinator {
     // Persist BEFORE handing out the stake txs, so a stake that lands on-chain
     // before a crash is always recoverable from the durable store.
     await this.deps.store.insert({
-      matchId, creatorPid: creator.pid, opponentPid: opponent.pid,
-      creatorWallet: creator.wallet.toBase58(), opponentWallet: opponent.wallet.toBase58(),
-      stakeBase: creator.stakeBase, rakeBps: this.deps.rakeBps,
+      matchId,
+      creatorPid: creator.pid,
+      opponentPid: opponent.pid,
+      creatorWallet: creator.wallet.toBase58(),
+      opponentWallet: opponent.wallet.toBase58(),
+      stakeBase: creator.stakeBase,
+      rakeBps: this.deps.rakeBps,
     });
 
-    const openTx = await this.deps.escrow.buildOpenTx({ matchId, creator: creator.wallet, stakeBase: creator.stakeBase });
+    const openTx = await this.deps.escrow.buildOpenTx({
+      matchId,
+      creator: creator.wallet,
+      stakeBase: creator.stakeBase,
+    });
     const joinTx = await this.deps.escrow.buildJoinTx({ matchId, opponent: opponent.wallet });
-    this.deps.notify(creator.pid, { t: 'wager_match', matchId: key, role: 'creator', stakeBase: m.stakeBase.toString(), unsignedTxB64: serializeUnsigned(openTx) });
-    this.deps.notify(opponent.pid, { t: 'wager_match', matchId: key, role: 'opponent', stakeBase: m.stakeBase.toString(), unsignedTxB64: serializeUnsigned(joinTx) });
+    this.deps.notify(creator.pid, {
+      t: 'wager_match',
+      matchId: key,
+      role: 'creator',
+      stakeBase: m.stakeBase.toString(),
+      unsignedTxB64: serializeUnsigned(openTx),
+    });
+    this.deps.notify(opponent.pid, {
+      t: 'wager_match',
+      matchId: key,
+      role: 'opponent',
+      stakeBase: m.stakeBase.toString(),
+      unsignedTxB64: serializeUnsigned(joinTx),
+    });
   }
 
   /**
@@ -184,14 +242,26 @@ export class ArenaWagerCoordinator {
     m.phase = 'settling';
     await this.deps.store.setPhase(m.matchId, 'settling');
     this.broadcastPhase(m);
-    const ref = { matchId: m.matchId, creator: m.creator.wallet, opponent: m.opponent.wallet, stakeBase: m.stakeBase };
+    const ref = {
+      matchId: m.matchId,
+      creator: m.creator.wallet,
+      opponent: m.opponent.wallet,
+      stakeBase: m.stakeBase,
+    };
 
     if (draw) {
       const r = await this.deps.escrow.refundDraw(ref);
       m.phase = 'refunded';
       await this.deps.store.setPhase(m.matchId, 'refunded', r.signature);
       for (const part of [m.creator, m.opponent]) {
-        this.deps.notify(part.pid, { t: 'wager_result', matchId: key, outcome: 'draw', signature: r.signature, payoutBase: m.stakeBase.toString(), burnBase: '0' });
+        this.deps.notify(part.pid, {
+          t: 'wager_result',
+          matchId: key,
+          outcome: 'draw',
+          signature: r.signature,
+          payoutBase: m.stakeBase.toString(),
+          burnBase: '0',
+        });
       }
       this.finish(m);
       return;
@@ -205,9 +275,12 @@ export class ArenaWagerCoordinator {
     await this.deps.store.setPhase(m.matchId, 'settled', r.signature);
     for (const part of [m.creator, m.opponent]) {
       this.deps.notify(part.pid, {
-        t: 'wager_result', matchId: key,
+        t: 'wager_result',
+        matchId: key,
         outcome: part.pid === winnerPid ? 'won' : 'lost',
-        signature: r.signature, payoutBase: r.payoutBase.toString(), burnBase: r.burnBase.toString(),
+        signature: r.signature,
+        payoutBase: r.payoutBase.toString(),
+        burnBase: r.burnBase.toString(),
       });
     }
     this.finish(m);
@@ -228,10 +301,21 @@ export class ArenaWagerCoordinator {
       m.phase = 'cancelled';
       await this.deps.store.setPhase(m.matchId, 'cancelled');
       const cancelTxB64 = m.openSig
-        ? serializeUnsigned(await this.deps.escrow.buildCancelTx({ matchId: m.matchId, creator: m.creator.wallet }))
+        ? serializeUnsigned(
+            await this.deps.escrow.buildCancelTx({ matchId: m.matchId, creator: m.creator.wallet }),
+          )
         : undefined;
-      this.deps.notify(m.creator.pid, { t: 'wager_cancelled', matchId: m.matchId.toString(), reason: 'stake_timeout', cancelTxB64 });
-      this.deps.notify(m.opponent.pid, { t: 'wager_cancelled', matchId: m.matchId.toString(), reason: 'stake_timeout' });
+      this.deps.notify(m.creator.pid, {
+        t: 'wager_cancelled',
+        matchId: m.matchId.toString(),
+        reason: 'stake_timeout',
+        cancelTxB64,
+      });
+      this.deps.notify(m.opponent.pid, {
+        t: 'wager_cancelled',
+        matchId: m.matchId.toString(),
+        reason: 'stake_timeout',
+      });
       this.finish(m);
     }
   }
@@ -242,7 +326,11 @@ export class ArenaWagerCoordinator {
 
   private broadcastPhase(m: MatchState): void {
     for (const part of [m.creator, m.opponent]) {
-      this.deps.notify(part.pid, { t: 'wager_phase', matchId: m.matchId.toString(), phase: m.phase });
+      this.deps.notify(part.pid, {
+        t: 'wager_phase',
+        matchId: m.matchId.toString(),
+        phase: m.phase,
+      });
     }
   }
 
@@ -253,7 +341,9 @@ export class ArenaWagerCoordinator {
 }
 
 /** Base64 of an unsigned transaction's message-bearing serialization for the client to sign. */
-function serializeUnsigned(tx: { serialize: (opts: { requireAllSignatures: boolean }) => Buffer }): string {
+function serializeUnsigned(tx: {
+  serialize: (opts: { requireAllSignatures: boolean }) => Buffer;
+}): string {
   return tx.serialize({ requireAllSignatures: false }).toString('base64');
 }
 
@@ -275,7 +365,8 @@ export async function recoverLockedMatches(
   let reconciled = 0;
   for (const row of rows) {
     const status = await escrow.matchStatus(row.matchId);
-    if (status === 1) { // MatchStatus::Locked (lib.rs): both staked, never settled
+    if (status === 1) {
+      // MatchStatus::Locked (lib.rs): both staked, never settled
       const { signature } = await escrow.refundDraw({
         matchId: row.matchId,
         creator: new PublicKey(row.creatorWallet),

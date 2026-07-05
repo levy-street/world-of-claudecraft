@@ -270,6 +270,13 @@ export class CharacterVisual {
   // One-shot triggers (sim events)
   // -------------------------------------------------------------------------
 
+  /** A one-shot (attack/hit/emote) is still playing. The renderer's spellfx
+   *  handler reads this to avoid restarting a windup-started throw animation
+   *  when the projectile releases mid-clip. */
+  get isMidOneShot(): boolean {
+    return this.currentIsOneShot;
+  }
+
   playAttack(): void {
     if (this.deadLock) return;
     const clips = this.def.clips.attack;

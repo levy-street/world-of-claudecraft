@@ -7,10 +7,10 @@
 //
 // Usage: node scripts/takeover_shot.mjs   (run from repo root; requires `npm run build` first)
 import { spawn } from 'node:child_process';
-import { setTimeout as sleep } from 'node:timers/promises';
 import { mkdirSync } from 'node:fs';
-import WebSocket from 'ws';
+import { setTimeout as sleep } from 'node:timers/promises';
 import puppeteer from 'puppeteer-core';
+import WebSocket from 'ws';
 
 const PORT = Number(process.env.WOC_SHOT_PORT ?? 8799);
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -35,7 +35,9 @@ async function waitForServer() {
     try {
       const r = await fetch(`${BASE}/api/realms`);
       if (r.ok) return;
-    } catch { /* not up yet */ }
+    } catch {
+      /* not up yet */
+    }
     await sleep(500);
   }
   throw new Error('server did not become ready');
@@ -44,7 +46,10 @@ async function waitForServer() {
 const api = async (path, opts = {}) => {
   const res = await fetch(BASE + path, {
     method: opts.method ?? 'GET',
-    headers: { 'Content-Type': 'application/json', ...(opts.token ? { Authorization: `Bearer ${opts.token}` } : {}) },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(opts.token ? { Authorization: `Bearer ${opts.token}` } : {}),
+    },
     body: opts.body ? JSON.stringify(opts.body) : undefined,
   });
   return { status: res.status, data: await res.json().catch(() => ({})) };
@@ -58,13 +63,20 @@ try {
   const stamp = Date.now();
   const username = 'takeover' + stamp;
   const password = 'test1234';
-  const reg = await api('/api/register', { method: 'POST', body: { username, password } });
+  const reg = await api('/api/register', {
+    method: 'POST',
+    body: { username, password, email: `${username}@example.com` },
+  });
   const token = reg.data.token;
   if (!token) throw new Error('register failed: ' + JSON.stringify(reg));
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   let name = 'Hero';
   for (let i = 0; i < 8; i++) name += letters[Math.floor(Math.random() * letters.length)];
-  const created = await api('/api/characters', { method: 'POST', token, body: { name, class: 'paladin', skin: 0 } });
+  const created = await api('/api/characters', {
+    method: 'POST',
+    token,
+    body: { name, class: 'paladin', skin: 0 },
+  });
   if (created.status !== 200) throw new Error('create char failed: ' + JSON.stringify(created));
   const characterId = created.data.id;
   log('character created', characterId);
@@ -72,7 +84,10 @@ try {
   // Occupy the session so the server reports the character as online.
   ws = new WebSocket(`${BASE.replace(/^http/, 'ws')}/ws`);
   await new Promise((resolve, reject) => {
-    ws.on('open', () => { ws.send(JSON.stringify({ t: 'auth', token, character: characterId })); resolve(); });
+    ws.on('open', () => {
+      ws.send(JSON.stringify({ t: 'auth', token, character: characterId }));
+      resolve();
+    });
     ws.on('error', reject);
   });
   // Give the server a moment to register the session, then confirm via REST.
@@ -119,7 +134,11 @@ try {
   }
   log('done');
 } finally {
-  try { ws?.close(); } catch {}
-  try { await browser?.close(); } catch {}
+  try {
+    ws?.close();
+  } catch {}
+  try {
+    await browser?.close();
+  } catch {}
   server.kill('SIGKILL');
 }

@@ -24,6 +24,7 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { clearThreat, stealthDetectionRadius } from '../threat';
@@ -38,11 +39,14 @@ import {
   MELEE_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
+  SISTER_NHALIA_BOSS_ID,
+  TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
-import { groundHeight, WATER_LEVEL } from '../world';
+import { groundHeight, waterLevel } from '../world';
 import { rallyFleeingAllies } from './social_aggro';
-import { isTrivialTo, retargetMob, updateMobTarget } from './targeting';
+import { isTrivialTo, retargetMob, tickForcedTarget, updateMobTarget } from './targeting';
+import { emitMobYell } from './yells';
 
 const EVADE_SPEED_MULT = 1.6;
 // An evading mob walks a straight line home (no pathfinding) and stalls if deep
@@ -85,6 +89,18 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   mob.combatTimer += DT;
 
   if (mob.templateId.startsWith('vision_')) {
+    mob.hostile = false;
+    mob.aiState = 'idle';
+    mob.inCombat = false;
+    mob.aggroTargetId = null;
+    clearThreat(mob);
+    return;
+  }
+
+  // Tolling Bell projectiles (The Drowned Litany finale) are moved exclusively
+  // by the boss driver: no aggro, no wander, no evade-home, and the hostility
+  // safety net below must not re-hostile them.
+  if (mob.templateId === TOLLING_BELL_TEMPLATE_ID) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -142,6 +158,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   if (ctx.isStunned(mob)) {
+    // A taunt/growl window is real-time: keep it counting down even while the mob
+    // is stunned, since the stun path skips updateMobTarget where it normally ticks.
+    tickForcedTarget(mob);
     if (ctx.updateFearMovement(mob)) return;
     if (mob.auras.some((a) => a.kind === 'polymorph')) {
       mob.wanderTimer -= DT;
@@ -364,6 +383,53 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           }
         }
       }
+      // Telegraphed hardcast (bigCast): a periodic big spell with a REAL cast bar.
+      // The cadence timer ticks like aoePulse; at zero the mob starts casting
+      // (castingAbility carries the castId, the same entity fields the Nythraxis
+      // Deathless Rage cast uses) and keeps meleeing while the bar fills, then the
+      // spell lands as an AoE nova on every living player in radius. All rng here
+      // draws only for templates that declare bigCast (today only the Thunzharr
+      // world boss), so the parity golden scenarios see no new draws. If the mob
+      // leaves the attack state mid-cast the bar freezes and resumes on return,
+      // matching how the sibling timers pause; evade/death clear it.
+      const bigCast = MOBS[mob.templateId]?.bigCast;
+      if (bigCast) {
+        if (mob.castingAbility === bigCast.castId) {
+          mob.castRemaining = Math.max(0, mob.castRemaining - DT);
+          if (mob.castRemaining <= 0) {
+            mob.castingAbility = null;
+            mob.castTotal = 0;
+            mob.castRemaining = 0;
+            mob.castTargetId = null;
+            const school = (bigCast.school ?? 'nature') as Aura['school'];
+            ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
+            ctx.emit({
+              type: 'log',
+              text: `${mob.name} unleashes ${bigCast.name}!`,
+              color: '#ff9933',
+              entityId: mob.id,
+            });
+            for (const meta of ctx.players.values()) {
+              const pe = ctx.entities.get(meta.entityId);
+              if (pe && !pe.dead && dist2d(pe.pos, mob.pos) <= bigCast.radius) {
+                const dmg = Math.round(ctx.rng.range(bigCast.min, bigCast.max));
+                ctx.dealDamage(mob, pe, dmg, false, school, bigCast.name, 'hit', true);
+              }
+            }
+          }
+        } else {
+          mob.bigCastTimer -= DT;
+          if (mob.bigCastTimer <= 0) {
+            mob.bigCastTimer = bigCast.every + bigCast.castTime;
+            mob.castingAbility = bigCast.castId;
+            mob.castTotal = bigCast.castTime;
+            mob.castRemaining = bigCast.castTime;
+            mob.castTargetId = null;
+            mob.channeling = false;
+            if (bigCast.yell) emitMobYell(ctx, mob, bigCast.yell);
+          }
+        }
+      }
       // Stoneskin: a periodic self-absorb barrier. Telegraphed via createMob,
       // which seeds stoneskinTimer to one full interval so the first barrier
       // never snaps up the instant combat opens. Reuses the `absorb` aura,
@@ -528,8 +594,20 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.stoneskinTimer = MOBS[mob.templateId]?.stoneskin?.every ?? 0;
   mob.rallyTimer = MOBS[mob.templateId]?.rally?.every ?? 0;
   mob.warcryTimer = MOBS[mob.templateId]?.warcry?.every ?? 0;
+  // A mid-flight bigCast dies with the pull: clear the bar, reseed the cadence,
+  // and let the next pull bark its engage line again.
+  const bigCastDef = MOBS[mob.templateId]?.bigCast;
+  mob.bigCastTimer = bigCastDef?.every ?? 0;
+  if (bigCastDef && mob.castingAbility === bigCastDef.castId) {
+    mob.castingAbility = null;
+    mob.castTotal = 0;
+    mob.castRemaining = 0;
+    mob.castTargetId = null;
+  }
+  mob.yelledEngage = false;
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
 }
 
 // Cowardly mobs panic once per pull at low HP, then recover their nerve and turn to
@@ -558,7 +636,7 @@ export function blockedTowardSpawn(ctx: SimContext, e: Entity, dest: Vec3): bool
   const nz = e.pos.z + Math.cos(facing) * step;
   if (
     !ctx.mobCanSwim(MOBS[e.templateId]) &&
-    groundHeight(nx, nz, ctx.cfg.seed) < WATER_LEVEL - SWIM_DEPTH
+    groundHeight(nx, nz, ctx.cfg.seed) < waterLevel() - SWIM_DEPTH
   )
     return true;
   const resolved = ctx.resolveMovePoint(nx, nz, BODY_RADIUS, e);

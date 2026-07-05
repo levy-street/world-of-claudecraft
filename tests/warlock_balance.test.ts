@@ -34,9 +34,9 @@ function abilityEffects(id: string) {
 }
 
 describe('warlock low-level sustained damage tuning', () => {
-  it('keeps Voidwalker clearly below Imp damage after the Imp tuning pass', () => {
-    const impDps = rawPetDps('imp');
-    const voidwalkerDps = rawPetDps('voidwalker');
+  it('keeps Gloomshade clearly below Emberkin damage after the Emberkin tuning pass', () => {
+    const impDps = rawPetDps('emberkin');
+    const voidwalkerDps = rawPetDps('gloomshade');
 
     expect(impDps).toBeCloseTo(13, 1);
     expect(voidwalkerDps).toBeCloseTo(9.1, 1);

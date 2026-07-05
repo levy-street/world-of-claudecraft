@@ -21,9 +21,22 @@ export const TOKEN_2022_PROGRAM = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
 const MEMO_PROGRAM_V2 = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
 const MEMO_PROGRAM_V1 = 'Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo';
 
-interface TokenAmount { amount?: string; decimals?: number }
-interface TokenBalance { accountIndex?: number; mint?: string; owner?: string; programId?: string; uiTokenAmount?: TokenAmount }
-interface ParsedIx { program?: string; programId?: string; parsed?: unknown }
+interface TokenAmount {
+  amount?: string;
+  decimals?: number;
+}
+interface TokenBalance {
+  accountIndex?: number;
+  mint?: string;
+  owner?: string;
+  programId?: string;
+  uiTokenAmount?: TokenAmount;
+}
+interface ParsedIx {
+  program?: string;
+  programId?: string;
+  parsed?: unknown;
+}
 export interface FinalizedTx {
   signature: string;
   err: unknown;
@@ -46,7 +59,10 @@ export async function getFinalizedTx(signature: string): Promise<FinalizedTx | n
         jsonrpc: '2.0',
         id: 1,
         method: 'getTransaction',
-        params: [signature, { encoding: 'jsonParsed', commitment: 'finalized', maxSupportedTransactionVersion: 0 }],
+        params: [
+          signature,
+          { encoding: 'jsonParsed', commitment: 'finalized', maxSupportedTransactionVersion: 0 },
+        ],
       }),
       signal: AbortSignal.timeout(10000),
     });
@@ -59,7 +75,9 @@ export async function getFinalizedTx(signature: string): Promise<FinalizedTx | n
     // Include inner instructions: SPL burns are frequently CPI'd from a
     // higher-level program, so they live under meta.innerInstructions.
     const inner: ParsedIx[] = Array.isArray(r.meta?.innerInstructions)
-      ? r.meta.innerInstructions.flatMap((g: any) => (Array.isArray(g?.instructions) ? g.instructions : []))
+      ? r.meta.innerInstructions.flatMap((g: any) =>
+          Array.isArray(g?.instructions) ? g.instructions : [],
+        )
       : [];
     return {
       signature,
@@ -100,7 +118,9 @@ function sumBalances(rows: TokenBalance[], owner: string, mint: string): bigint 
  * tx touched. Negative = the owner spent (burned or transferred out).
  */
 export function ownerTokenDeltaBase(tx: FinalizedTx, owner: string, mint: string): bigint {
-  return sumBalances(tx.postTokenBalances, owner, mint) - sumBalances(tx.preTokenBalances, owner, mint);
+  return (
+    sumBalances(tx.postTokenBalances, owner, mint) - sumBalances(tx.preTokenBalances, owner, mint)
+  );
 }
 
 /** Amount `owner` was credited in `mint` (base units); 0 if they didn't gain. */
@@ -135,7 +155,9 @@ export function burnedBase(tx: FinalizedTx, mint: string, authority: string): bi
 export function hasMemo(tx: FinalizedTx, memo: string): boolean {
   for (const ix of tx.instructions) {
     const isMemo =
-      ix.program === 'spl-memo' || ix.programId === MEMO_PROGRAM_V2 || ix.programId === MEMO_PROGRAM_V1;
+      ix.program === 'spl-memo' ||
+      ix.programId === MEMO_PROGRAM_V2 ||
+      ix.programId === MEMO_PROGRAM_V1;
     if (!isMemo) continue;
     // jsonParsed renders the memo program's data as the raw string in `parsed`.
     if (typeof ix.parsed === 'string' && ix.parsed === memo) return true;

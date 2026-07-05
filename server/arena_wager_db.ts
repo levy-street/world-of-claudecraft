@@ -33,7 +33,13 @@ CREATE TABLE IF NOT EXISTS woc_wager_matches (
 CREATE INDEX IF NOT EXISTS woc_wager_matches_realm_phase ON woc_wager_matches (realm, phase);
 `;
 
-export type WagerMatchPhase = 'awaiting_stakes' | 'in_bout' | 'settling' | 'settled' | 'refunded' | 'cancelled';
+export type WagerMatchPhase =
+  | 'awaiting_stakes'
+  | 'in_bout'
+  | 'settling'
+  | 'settled'
+  | 'refunded'
+  | 'cancelled';
 
 export interface WagerMatchRow {
   matchId: bigint;
@@ -61,25 +67,50 @@ export async function allocateWagerMatchId(): Promise<bigint> {
 
 /** Persist a freshly paired match (awaiting both stakes). */
 export async function insertWagerMatch(m: {
-  matchId: bigint; creatorPid: number; opponentPid: number;
-  creatorWallet: string; opponentWallet: string; stakeBase: bigint; rakeBps: number;
+  matchId: bigint;
+  creatorPid: number;
+  opponentPid: number;
+  creatorWallet: string;
+  opponentWallet: string;
+  stakeBase: bigint;
+  rakeBps: number;
 }): Promise<void> {
   await pool.query(
     `INSERT INTO woc_wager_matches
        (match_id, realm, creator_pid, opponent_pid, creator_wallet, opponent_wallet, stake_base, rake_bps, phase)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'awaiting_stakes')`,
-    [m.matchId.toString(), REALM, m.creatorPid, m.opponentPid, m.creatorWallet, m.opponentWallet, m.stakeBase.toString(), m.rakeBps],
+    [
+      m.matchId.toString(),
+      REALM,
+      m.creatorPid,
+      m.opponentPid,
+      m.creatorWallet,
+      m.opponentWallet,
+      m.stakeBase.toString(),
+      m.rakeBps,
+    ],
   );
 }
 
 /** Record a player's confirmed stake signature (the open_match or join_match tx). */
-export async function recordWagerStake(matchId: bigint, role: 'open' | 'join', signature: string): Promise<void> {
+export async function recordWagerStake(
+  matchId: bigint,
+  role: 'open' | 'join',
+  signature: string,
+): Promise<void> {
   const col = role === 'open' ? 'open_sig' : 'join_sig';
-  await pool.query(`UPDATE woc_wager_matches SET ${col} = $2, updated_at = now() WHERE match_id = $1`, [matchId.toString(), signature]);
+  await pool.query(
+    `UPDATE woc_wager_matches SET ${col} = $2, updated_at = now() WHERE match_id = $1`,
+    [matchId.toString(), signature],
+  );
 }
 
 /** Advance a match to a new phase, optionally recording the settle signature. */
-export async function setWagerPhase(matchId: bigint, phase: WagerMatchPhase, settleSig?: string): Promise<void> {
+export async function setWagerPhase(
+  matchId: bigint,
+  phase: WagerMatchPhase,
+  settleSig?: string,
+): Promise<void> {
   await pool.query(
     `UPDATE woc_wager_matches SET phase = $2, settle_sig = COALESCE($3, settle_sig), updated_at = now() WHERE match_id = $1`,
     [matchId.toString(), phase, settleSig ?? null],
@@ -127,6 +158,8 @@ export async function cancelStaleAwaitingMatches(): Promise<number> {
 }
 
 export async function getWagerMatch(matchId: bigint): Promise<WagerMatchRow | null> {
-  const r = await pool.query(`SELECT * FROM woc_wager_matches WHERE match_id = $1`, [matchId.toString()]);
+  const r = await pool.query(`SELECT * FROM woc_wager_matches WHERE match_id = $1`, [
+    matchId.toString(),
+  ]);
   return r.rows[0] ? rowToMatch(r.rows[0]) : null;
 }

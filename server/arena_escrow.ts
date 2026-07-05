@@ -11,11 +11,23 @@
 // `gamblefi_payout` outflow; the difference (the burned rake) is the only net
 // sink, so a match adds exactly +rake to the season's emittable budget. A drawn
 // refund returns both stakes and is recorded as nothing (economically neutral).
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import {
-  openMatchIx, joinMatchIx, settleMatchIx, refundMatchIx, cancelMatchIx, matchPda, vaultAta,
-} from './woc_escrow_client';
+  type Connection,
+  type Keypair,
+  type PublicKey,
+  Transaction,
+  type TransactionInstruction,
+} from '@solana/web3.js';
 import type { FlowLedger } from './flow_ledger';
+import {
+  cancelMatchIx,
+  joinMatchIx,
+  matchPda,
+  openMatchIx,
+  refundMatchIx,
+  settleMatchIx,
+  vaultAta,
+} from './woc_escrow_client';
 
 // Byte offset of Match.status in the on-chain account: 8 (Anchor discriminator)
 // + 8 (match_id) + 32*4 (mint, creator, opponent, settler) + 8 (stake) + 2
@@ -63,8 +75,13 @@ export class ArenaEscrow {
   buildOpenTx(m: Pick<MatchRef, 'matchId' | 'creator' | 'stakeBase'>): Promise<Transaction> {
     return this.unsigned(
       openMatchIx({
-        programId: this.cfg.programId, mint: this.cfg.mint, matchId: m.matchId,
-        stakeBase: m.stakeBase, rakeBps: this.cfg.rakeBps, creator: m.creator, settler: this.cfg.settler.publicKey,
+        programId: this.cfg.programId,
+        mint: this.cfg.mint,
+        matchId: m.matchId,
+        stakeBase: m.stakeBase,
+        rakeBps: this.cfg.rakeBps,
+        creator: m.creator,
+        settler: this.cfg.settler.publicKey,
       }),
       m.creator,
     );
@@ -72,12 +89,28 @@ export class ArenaEscrow {
 
   /** Unsigned join_match tx for the opponent's wallet to sign (matches the stake). */
   buildJoinTx(m: Pick<MatchRef, 'matchId' | 'opponent'>): Promise<Transaction> {
-    return this.unsigned(joinMatchIx({ programId: this.cfg.programId, mint: this.cfg.mint, matchId: m.matchId, opponent: m.opponent }), m.opponent);
+    return this.unsigned(
+      joinMatchIx({
+        programId: this.cfg.programId,
+        mint: this.cfg.mint,
+        matchId: m.matchId,
+        opponent: m.opponent,
+      }),
+      m.opponent,
+    );
   }
 
   /** Unsigned cancel_match tx for the creator to reclaim their stake if no opponent joined. */
   buildCancelTx(m: Pick<MatchRef, 'matchId' | 'creator'>): Promise<Transaction> {
-    return this.unsigned(cancelMatchIx({ programId: this.cfg.programId, mint: this.cfg.mint, matchId: m.matchId, creator: m.creator }), m.creator);
+    return this.unsigned(
+      cancelMatchIx({
+        programId: this.cfg.programId,
+        mint: this.cfg.mint,
+        matchId: m.matchId,
+        creator: m.creator,
+      }),
+      m.creator,
+    );
   }
 
   /** Current pot-vault balance in base units (0 if the vault has not been created yet). */
@@ -110,14 +143,23 @@ export class ArenaEscrow {
    * (by their open/join sigs) and the budget-gated payout outflow. `openSig` /
    * `joinSig` are the players' on-chain stake signatures.
    */
-  async settle(m: MatchRef, winner: PublicKey, openSig: string, joinSig: string): Promise<SettleResult> {
+  async settle(
+    m: MatchRef,
+    winner: PublicKey,
+    openSig: string,
+    joinSig: string,
+  ): Promise<SettleResult> {
     if (!winner.equals(m.creator) && !winner.equals(m.opponent)) {
       throw new Error('winner must be one of the two staked players');
     }
     const signature = await this.send(
       settleMatchIx({
-        programId: this.cfg.programId, mint: this.cfg.mint, matchId: m.matchId,
-        settler: this.cfg.settler.publicKey, creator: m.creator, winner,
+        programId: this.cfg.programId,
+        mint: this.cfg.mint,
+        matchId: m.matchId,
+        settler: this.cfg.settler.publicKey,
+        creator: m.creator,
+        winner,
       }),
     );
 
@@ -126,16 +168,26 @@ export class ArenaEscrow {
     const payoutBase = potBase - burnBase;
 
     await this.cfg.ledger.ensureSeason(this.cfg.seasonId);
-    for (const [sig, who] of [[openSig, 'creator'], [joinSig, 'opponent']] as const) {
+    for (const [sig, who] of [
+      [openSig, 'creator'],
+      [joinSig, 'opponent'],
+    ] as const) {
       const r = await this.cfg.ledger.creditInflow({
-        seasonId: this.cfg.seasonId, source: 'gamblefi_stake', amountBase: m.stakeBase,
-        txSig: sig, memo: `match ${m.matchId} ${who} stake`,
+        seasonId: this.cfg.seasonId,
+        source: 'gamblefi_stake',
+        amountBase: m.stakeBase,
+        txSig: sig,
+        memo: `match ${m.matchId} ${who} stake`,
       });
-      if (!r.ok && r.reason !== 'duplicate') throw new Error(`stake inflow (${who}) rejected: ${r.reason}`);
+      if (!r.ok && r.reason !== 'duplicate')
+        throw new Error(`stake inflow (${who}) rejected: ${r.reason}`);
     }
     const out = await this.cfg.ledger.emit({
-      seasonId: this.cfg.seasonId, source: 'gamblefi_payout', amountBase: payoutBase,
-      recipient: winner.toBase58(), txSig: signature,
+      seasonId: this.cfg.seasonId,
+      source: 'gamblefi_payout',
+      amountBase: payoutBase,
+      recipient: winner.toBase58(),
+      txSig: signature,
     });
     if (!out.ok) throw new Error(`gamblefi payout rejected by flow ledger: ${out.reason}`);
 
@@ -150,8 +202,12 @@ export class ArenaEscrow {
   async refundDraw(m: MatchRef): Promise<{ signature: string }> {
     const signature = await this.send(
       refundMatchIx({
-        programId: this.cfg.programId, mint: this.cfg.mint, matchId: m.matchId,
-        settler: this.cfg.settler.publicKey, creator: m.creator, opponent: m.opponent,
+        programId: this.cfg.programId,
+        mint: this.cfg.mint,
+        matchId: m.matchId,
+        settler: this.cfg.settler.publicKey,
+        creator: m.creator,
+        opponent: m.opponent,
       }),
     );
     return { signature };
@@ -164,9 +220,16 @@ export class ArenaEscrow {
 
   private async send(ix: TransactionInstruction): Promise<string> {
     const { blockhash, lastValidBlockHeight } = await this.cfg.connection.getLatestBlockhash();
-    const tx = new Transaction({ feePayer: this.cfg.settler.publicKey, blockhash, lastValidBlockHeight }).add(ix);
+    const tx = new Transaction({
+      feePayer: this.cfg.settler.publicKey,
+      blockhash,
+      lastValidBlockHeight,
+    }).add(ix);
     const signature = await this.cfg.connection.sendTransaction(tx, [this.cfg.settler]);
-    await this.cfg.connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+    await this.cfg.connection.confirmTransaction(
+      { signature, blockhash, lastValidBlockHeight },
+      'confirmed',
+    );
     return signature;
   }
 }

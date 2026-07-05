@@ -3,11 +3,17 @@
 // is the REAL FlowLedger over an in-memory FlowLedgerDb that uses the REAL
 // emissionDecision invariant, so the buy>sell accounting is exercised, not mocked.
 // A separate real-Postgres test covers the SQL; a devnet test covers the real chain.
-import { describe, it, expect } from 'vitest';
+
 import { createHash } from 'node:crypto';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { type Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { describe, expect, it } from 'vitest';
 import { ArenaEscrow } from '../server/arena_escrow';
-import { FlowLedger, emissionDecision, type FlowLedgerDb, type FlowEntryInput } from '../server/flow_ledger';
+import {
+  emissionDecision,
+  type FlowEntryInput,
+  FlowLedger,
+  type FlowLedgerDb,
+} from '../server/flow_ledger';
 import { matchPda, vaultAta } from '../server/woc_escrow_client';
 
 const disc = (n: string) => createHash('sha256').update(`global:${n}`).digest().subarray(0, 8);
@@ -17,23 +23,46 @@ const disc = (n: string) => createHash('sha256').update(`global:${n}`).digest().
 class MemFlowDb implements FlowLedgerDb {
   seasons = new Set<number>();
   entries: { seasonId: number; dir: 'in' | 'out'; amount: bigint; txSig: string | null }[] = [];
-  async ensureSeason(id: number) { this.seasons.add(id); }
-  async seasonHeadroom(id: number) {
-    return this.entries.filter((e) => e.seasonId === id).reduce((h, e) => (e.dir === 'in' ? h + e.amount : h - e.amount), 0n);
+  async ensureSeason(id: number) {
+    this.seasons.add(id);
   }
-  async seasonIsOpen(id: number) { return this.seasons.has(id); }
+  async seasonHeadroom(id: number) {
+    return this.entries
+      .filter((e) => e.seasonId === id)
+      .reduce((h, e) => (e.dir === 'in' ? h + e.amount : h - e.amount), 0n);
+  }
+  async seasonIsOpen(id: number) {
+    return this.seasons.has(id);
+  }
   async recordInflow(input: FlowEntryInput) {
-    if (input.txSig && this.entries.some((e) => e.txSig === input.txSig)) return { ok: false as const, reason: 'duplicate' as const };
-    this.entries.push({ seasonId: input.seasonId, dir: 'in', amount: input.amountBase, txSig: input.txSig ?? null });
+    if (input.txSig && this.entries.some((e) => e.txSig === input.txSig))
+      return { ok: false as const, reason: 'duplicate' as const };
+    this.entries.push({
+      seasonId: input.seasonId,
+      dir: 'in',
+      amount: input.amountBase,
+      txSig: input.txSig ?? null,
+    });
     return { ok: true as const, entryId: this.entries.length };
   }
   async recordOutflowWithinBudget(input: FlowEntryInput) {
     const headroomBase = await this.seasonHeadroom(input.seasonId);
-    if (input.txSig && this.entries.some((e) => e.txSig === input.txSig)) return { ok: false as const, reason: 'duplicate' as const, headroomBase };
+    if (input.txSig && this.entries.some((e) => e.txSig === input.txSig))
+      return { ok: false as const, reason: 'duplicate' as const, headroomBase };
     const d = emissionDecision(headroomBase, input.amountBase);
     if (!d.allow) return { ok: false as const, reason: d.reason, headroomBase };
-    this.entries.push({ seasonId: input.seasonId, dir: 'out', amount: input.amountBase, txSig: input.txSig ?? null });
-    return { ok: true as const, headroomBase: await this.seasonHeadroom(input.seasonId), entryId: this.entries.length, payoutId: this.entries.length };
+    this.entries.push({
+      seasonId: input.seasonId,
+      dir: 'out',
+      amount: input.amountBase,
+      txSig: input.txSig ?? null,
+    });
+    return {
+      ok: true as const,
+      headroomBase: await this.seasonHeadroom(input.seasonId),
+      entryId: this.entries.length,
+      payoutId: this.entries.length,
+    };
   }
 }
 
@@ -42,10 +71,16 @@ class FakeConnection {
   vaultAmount: bigint | null = null; // null => vault account does not exist
   matchStatusByte: number | null = null; // null => match account does not exist
   private n = 0;
-  async getLatestBlockhash() { return { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 1000 }; }
+  async getLatestBlockhash() {
+    return { blockhash: '11111111111111111111111111111111', lastValidBlockHeight: 1000 };
+  }
   async getParsedAccountInfo(_pk: PublicKey) {
     if (this.vaultAmount === null) return { value: null };
-    return { value: { data: { parsed: { info: { tokenAmount: { amount: this.vaultAmount.toString() } } } } } };
+    return {
+      value: {
+        data: { parsed: { info: { tokenAmount: { amount: this.vaultAmount.toString() } } } },
+      },
+    };
   }
   async getAccountInfo(_pk: PublicKey) {
     if (this.matchStatusByte === null) return null;
@@ -57,7 +92,9 @@ class FakeConnection {
     this.sent.push({ ixData: tx.instructions[0].data, feePayer: tx.feePayer.toBase58() });
     return `sig-${++this.n}`;
   }
-  async confirmTransaction() { return { value: { err: null } }; }
+  async confirmTransaction() {
+    return { value: { err: null } };
+  }
 }
 
 const programId = new PublicKey('Fn4LMsV7akGX9KXwYv4uh2v8nM2uqgaAxhKrsYYbZqcJ');
@@ -71,8 +108,13 @@ function setup(rakeBps = 500) {
   const db = new MemFlowDb();
   const settler = Keypair.generate();
   const escrow = new ArenaEscrow({
-    connection: conn as unknown as Connection, programId, mint, settler,
-    ledger: new FlowLedger(db), seasonId: 1, rakeBps,
+    connection: conn as unknown as Connection,
+    programId,
+    mint,
+    settler,
+    ledger: new FlowLedger(db),
+    seasonId: 1,
+    rakeBps,
   });
   const m = { matchId: 1n, creator, opponent, stakeBase: STAKE };
   return { conn, db, settler, escrow, m };
@@ -144,8 +186,13 @@ describe('ArenaEscrow settle (winner take + burn, ledger net sink = burn)', () =
     expect(r.headroomBase).toBe(10_000_000n);
     expect(await db.seasonHeadroom(1)).toBe(10_000_000n);
     // Ledger inspection: two stake inflows (open/join sigs) + one payout outflow (settle sig).
-    expect(db.entries.filter((e) => e.dir === 'in').map((e) => e.amount)).toEqual([100_000_000n, 100_000_000n]);
-    expect(db.entries.filter((e) => e.dir === 'out')).toEqual([{ seasonId: 1, dir: 'out', amount: 190_000_000n, txSig: 'sig-1' }]);
+    expect(db.entries.filter((e) => e.dir === 'in').map((e) => e.amount)).toEqual([
+      100_000_000n,
+      100_000_000n,
+    ]);
+    expect(db.entries.filter((e) => e.dir === 'out')).toEqual([
+      { seasonId: 1, dir: 'out', amount: 190_000_000n, txSig: 'sig-1' },
+    ]);
   });
   it('signs settle_match with the settler as fee payer', async () => {
     const { escrow, conn, settler, m } = setup();
@@ -156,7 +203,9 @@ describe('ArenaEscrow settle (winner take + burn, ledger net sink = burn)', () =
   it('rejects a winner who is not one of the two players (no chain call)', async () => {
     const { escrow, conn, m } = setup();
     const stranger = Keypair.generate().publicKey;
-    await expect(escrow.settle(m, stranger, 'o', 'j')).rejects.toThrow('winner must be one of the two staked players');
+    await expect(escrow.settle(m, stranger, 'o', 'j')).rejects.toThrow(
+      'winner must be one of the two staked players',
+    );
     expect(conn.sent.length).toBe(0);
   });
   it('zero rake: full pot pays out, leaving zero net sink (payout == headroom boundary)', async () => {
@@ -170,7 +219,12 @@ describe('ArenaEscrow settle (winner take + burn, ledger net sink = burn)', () =
   it('tolerates a duplicate stake inflow (replayed open/join sig) without double-crediting', async () => {
     const { escrow, db, m } = setup(500);
     // Pre-credit the creator stake under the same sig the settle will use.
-    await db.recordInflow({ seasonId: 1, source: 'gamblefi_stake', amountBase: STAKE, txSig: 'open-sig' });
+    await db.recordInflow({
+      seasonId: 1,
+      source: 'gamblefi_stake',
+      amountBase: STAKE,
+      txSig: 'open-sig',
+    });
     const r = await escrow.settle(m, creator, 'open-sig', 'join-sig');
     expect(r.headroomBase).toBe(10_000_000n); // still exactly the burn, not double-counted
     expect(db.entries.filter((e) => e.dir === 'in').length).toBe(2); // open-sig not re-added

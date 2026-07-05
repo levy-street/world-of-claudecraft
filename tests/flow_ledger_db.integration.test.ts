@@ -7,7 +7,7 @@
 //
 // CI-safe: skips entirely unless PG_TEST_URL points at a disposable Postgres.
 //   PG_TEST_URL=postgres://test:test@127.0.0.1:5544/test npx vitest run tests/flow_ledger_db.integration.test.ts
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 // db.ts throws at import if DATABASE_URL is unset and constructs the Pool from it,
 // so wire it (to the test DB when provided, else a dummy that is never connected
@@ -17,23 +17,40 @@ if (PG_TEST_URL) process.env.DATABASE_URL = PG_TEST_URL;
 else process.env.DATABASE_URL ??= 'postgres://skip:skip@127.0.0.1:1/skip';
 
 const { pool, ensureSchema } = await import('../server/db');
-const { PgFlowLedgerDb, activeSeasonStatus, openSeason, closeSeason } = await import('../server/flow_ledger_db');
+const { PgFlowLedgerDb, activeSeasonStatus, openSeason, closeSeason } = await import(
+  '../server/flow_ledger_db'
+);
 const { FlowLedger } = await import('../server/flow_ledger');
 
 const db = new PgFlowLedgerDb();
 const ledger = new FlowLedger(db);
 
 describe.skipIf(!PG_TEST_URL)('PgFlowLedgerDb (real Postgres)', () => {
-  beforeAll(async () => { await ensureSchema(); });
-  afterAll(async () => { await pool.end(); });
+  beforeAll(async () => {
+    await ensureSchema();
+  });
+  afterAll(async () => {
+    await pool.end();
+  });
   beforeEach(async () => {
-    await pool.query('TRUNCATE woc_payouts, woc_flow_ledger, woc_reward_pools, woc_seasons RESTART IDENTITY CASCADE');
+    await pool.query(
+      'TRUNCATE woc_payouts, woc_flow_ledger, woc_reward_pools, woc_seasons RESTART IDENTITY CASCADE',
+    );
   });
 
-  const sink = (seasonId: number, amountBase: bigint, txSig?: string) =>
-    ({ seasonId, source: 'gamblefi_burn_rake' as const, amountBase, txSig });
-  const emit = (seasonId: number, amountBase: bigint, txSig?: string) =>
-    ({ seasonId, source: 'leaderboard_payout' as const, amountBase, txSig, recipient: 'Winner111' });
+  const sink = (seasonId: number, amountBase: bigint, txSig?: string) => ({
+    seasonId,
+    source: 'gamblefi_burn_rake' as const,
+    amountBase,
+    txSig,
+  });
+  const emit = (seasonId: number, amountBase: bigint, txSig?: string) => ({
+    seasonId,
+    source: 'leaderboard_payout' as const,
+    amountBase,
+    txSig,
+    recipient: 'Winner111',
+  });
 
   it('ensureSeason is idempotent and a fresh season has zero headroom', async () => {
     await ledger.ensureSeason(1, 'S1');
@@ -59,14 +76,21 @@ describe.skipIf(!PG_TEST_URL)('PgFlowLedgerDb (real Postgres)', () => {
     expect(c).toMatchObject({ ok: false, reason: 'budget_exceeded', headroomBase: 0n });
 
     // Inspect the real ledger + payout rows, not just the return values.
-    const ins = await pool.query(`SELECT direction, amount_base::text amt FROM woc_flow_ledger WHERE season_id=1 ORDER BY entry_id`);
+    const ins = await pool.query(
+      `SELECT direction, amount_base::text amt FROM woc_flow_ledger WHERE season_id=1 ORDER BY entry_id`,
+    );
     expect(ins.rows).toEqual([
       { direction: 'in', amt: '1000' },
       { direction: 'out', amt: '600' },
       { direction: 'out', amt: '400' },
     ]);
-    const payouts = await pool.query(`SELECT amount_base::text amt, recipient FROM woc_payouts WHERE season_id=1 ORDER BY payout_id`);
-    expect(payouts.rows).toEqual([{ amt: '600', recipient: 'Winner111' }, { amt: '400', recipient: 'Winner111' }]);
+    const payouts = await pool.query(
+      `SELECT amount_base::text amt, recipient FROM woc_payouts WHERE season_id=1 ORDER BY payout_id`,
+    );
+    expect(payouts.rows).toEqual([
+      { amt: '600', recipient: 'Winner111' },
+      { amt: '400', recipient: 'Winner111' },
+    ]);
     expect(await ledger.headroom(1)).toBe(0n);
   });
 
@@ -100,7 +124,9 @@ describe.skipIf(!PG_TEST_URL)('PgFlowLedgerDb (real Postgres)', () => {
     // advisory lock must let through at most 5, and the total emitted must never
     // exceed the sinks. This is the load-bearing buy>sell guarantee under genuine
     // DB concurrency (each call takes its own pooled connection + session lock).
-    const results = await Promise.all(Array.from({ length: 10 }, (_, i) => ledger.emit(emit(1, 200n, `race-${i}`))));
+    const results = await Promise.all(
+      Array.from({ length: 10 }, (_, i) => ledger.emit(emit(1, 200n, `race-${i}`))),
+    );
     const wins = results.filter((r) => r.ok).length;
     expect(wins).toBe(5);
     expect(results.filter((r) => !r.ok).every((r) => r.reason === 'budget_exceeded')).toBe(true);
@@ -108,7 +134,9 @@ describe.skipIf(!PG_TEST_URL)('PgFlowLedgerDb (real Postgres)', () => {
     const headroom = await ledger.headroom(1);
     expect(headroom).toBe(1000n - BigInt(wins) * 200n);
     expect(headroom >= 0n).toBe(true);
-    const paid = await pool.query(`SELECT COALESCE(SUM(amount_base),0)::text s FROM woc_flow_ledger WHERE season_id=1 AND direction='out'`);
+    const paid = await pool.query(
+      `SELECT COALESCE(SUM(amount_base),0)::text s FROM woc_flow_ledger WHERE season_id=1 AND direction='out'`,
+    );
     expect(BigInt(paid.rows[0].s)).toBeLessThanOrEqual(1000n); // emissions <= sinks, always
   });
 
@@ -142,12 +170,21 @@ describe.skipIf(!PG_TEST_URL)('PgFlowLedgerDb (real Postgres)', () => {
   it('openSeason activates a season (pool 0) and the status reflects real sinks/emissions', async () => {
     await openSeason({ seasonId: 5, label: 'S5', endsAt: '2099-01-01T00:00:00.000Z' });
     expect(await activeSeasonStatus()).toMatchObject({
-      seasonId: 5, label: 'S5', status: 'active', endsAt: '2099-01-01T00:00:00.000Z',
-      sinkBase: '0', emissionBase: '0', poolBase: '0',
+      seasonId: 5,
+      label: 'S5',
+      status: 'active',
+      endsAt: '2099-01-01T00:00:00.000Z',
+      sinkBase: '0',
+      emissionBase: '0',
+      poolBase: '0',
     });
     await ledger.creditInflow(sink(5, 1000n, 'in-5'));
     await ledger.emit(emit(5, 400n, 'out-5'));
-    expect(await activeSeasonStatus()).toMatchObject({ sinkBase: '1000', emissionBase: '400', poolBase: '600' });
+    expect(await activeSeasonStatus()).toMatchObject({
+      sinkBase: '1000',
+      emissionBase: '400',
+      poolBase: '600',
+    });
   });
 
   it('activeSeasonStatus returns the most recently opened active season', async () => {
@@ -167,6 +204,11 @@ describe.skipIf(!PG_TEST_URL)('PgFlowLedgerDb (real Postgres)', () => {
     await openSeason({ seasonId: 3, label: 'old' });
     await closeSeason(3);
     await openSeason({ seasonId: 3, label: 'new', endsAt: '2099-06-01T00:00:00.000Z' });
-    expect(await activeSeasonStatus()).toMatchObject({ seasonId: 3, label: 'new', status: 'active', endsAt: '2099-06-01T00:00:00.000Z' });
+    expect(await activeSeasonStatus()).toMatchObject({
+      seasonId: 3,
+      label: 'new',
+      status: 'active',
+      endsAt: '2099-06-01T00:00:00.000Z',
+    });
   });
 });

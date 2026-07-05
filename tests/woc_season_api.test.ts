@@ -3,16 +3,28 @@
 // a controllable clock. Exercises the REAL cache + REAL projectSeasonRewards;
 // only the DB reads (fetchSeason/fetchLadder) are fakes (they are integration-
 // tested against real Postgres in season_standings.integration.test.ts).
-import { describe, it, expect, vi } from 'vitest';
-import { SeasonBodyCache, buildSeasonStandings, type RankedLadderEntry } from '../server/woc_season_api';
+import { describe, expect, it, vi } from 'vitest';
 import type { WocSeasonStatus } from '../server/flow_ledger_db';
+import {
+  buildSeasonStandings,
+  type RankedLadderEntry,
+  SeasonBodyCache,
+} from '../server/woc_season_api';
 
 const season = (poolBase: string): WocSeasonStatus => ({
-  seasonId: 1, label: 'S1', status: 'active', openedAt: '2026-06-01T00:00:00.000Z',
-  endsAt: null, sinkBase: poolBase, emissionBase: '0', poolBase,
+  seasonId: 1,
+  label: 'S1',
+  status: 'active',
+  openedAt: '2026-06-01T00:00:00.000Z',
+  endsAt: null,
+  sinkBase: poolBase,
+  emissionBase: '0',
+  poolBase,
 });
 const ladder: RankedLadderEntry[] = [
-  { name: 'Ada', rating: 1900 }, { name: 'Bo', rating: 1800 }, { name: 'Cy', rating: 1700 },
+  { name: 'Ada', rating: 1900 },
+  { name: 'Bo', rating: 1800 },
+  { name: 'Cy', rating: 1700 },
 ];
 const TIERS = [3000, 2000, 1200, 800, 800, 440, 440, 440, 440, 440];
 
@@ -26,8 +38,8 @@ describe('buildSeasonStandings', () => {
   it('projects the pool across the ladder as serializable standings', () => {
     expect(buildSeasonStandings(season('1000000000'), ladder, TIERS)).toEqual([
       { rank: 1, name: 'Ada', rating: 1900, rewardBase: '300000000' }, // 30%
-      { rank: 2, name: 'Bo', rating: 1800, rewardBase: '200000000' },  // 20%
-      { rank: 3, name: 'Cy', rating: 1700, rewardBase: '120000000' },  // 12%
+      { rank: 2, name: 'Bo', rating: 1800, rewardBase: '200000000' }, // 20%
+      { rank: 3, name: 'Cy', rating: 1700, rewardBase: '120000000' }, // 12%
     ]);
   });
 });
@@ -38,9 +50,21 @@ describe('SeasonBodyCache', () => {
     const fetchSeason = vi.fn(async () => seasonValue);
     const fetchLadder = vi.fn(async (limit: number) => ladder.slice(0, limit));
     const cache = new SeasonBodyCache({
-      fetchSeason, fetchLadder, tierBps: () => TIERS, decimals: 6, now: () => now, ttlMs: 5000,
+      fetchSeason,
+      fetchLadder,
+      tierBps: () => TIERS,
+      decimals: 6,
+      now: () => now,
+      ttlMs: 5000,
     });
-    return { cache, fetchSeason, fetchLadder, advance: (ms: number) => { now += ms; } };
+    return {
+      cache,
+      fetchSeason,
+      fetchLadder,
+      advance: (ms: number) => {
+        now += ms;
+      },
+    };
   }
 
   it('builds the full body (season + projected standings + decimals)', async () => {
@@ -48,7 +72,12 @@ describe('SeasonBodyCache', () => {
     const body = await cache.get();
     expect(body.decimals).toBe(6);
     expect(body.season?.seasonId).toBe(1);
-    expect(body.standings[0]).toEqual({ rank: 1, name: 'Ada', rating: 1900, rewardBase: '300000000' });
+    expect(body.standings[0]).toEqual({
+      rank: 1,
+      name: 'Ada',
+      rating: 1900,
+      rewardBase: '300000000',
+    });
   });
 
   it('serves a cached body within the TTL (one DB read), refetching only past it', async () => {

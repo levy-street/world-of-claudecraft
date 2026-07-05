@@ -37,6 +37,8 @@ export interface GuideClassInfo {
   abilities: GuideAbilityRef[];
   model: string;
   tint?: string;
+  /** Pre-rendered transparent still (public/guide-stills/), the default poster. */
+  still?: string;
 }
 
 export interface GuideZoneInfo {
@@ -59,10 +61,24 @@ export interface GuideDungeon {
   name?: string;
 }
 
-export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; }
+export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; still?: string; }
 
-export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; }
+export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; still?: string; }
 export interface GuideFamily { family: string; creatures: GuideCreature[]; }
+
+export interface GuideDelveKeeper { name: string; title: string; }
+export interface GuideDelveCompanion { name: string; role: string; }
+export interface GuideDelve {
+  id: string;
+  name: string;
+  theme: string;
+  minLevel: number;
+  suggestedPlayers: number;
+  keeper?: GuideDelveKeeper;
+  companion?: GuideDelveCompanion;
+  tiers: string[];
+  affixes: string[];
+}
 
 export const GUIDE_CLASSES: GuideClassInfo[] = [
   {
@@ -76,19 +92,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "arms",
-        "name": "Arms",
+        "name": "Battlecraft",
         "role": "dps",
         "signature": "mortal_strike"
       },
       {
         "id": "fury",
-        "name": "Fury",
+        "name": "Bloodrush",
         "role": "dps",
         "signature": "bloodthirst"
       },
       {
         "id": "prot",
-        "name": "Protection",
+        "name": "Ironguard",
         "role": "tank",
         "signature": "shield_slam"
       }
@@ -96,96 +112,97 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "heroic_strike",
-        "name": "Heroic Strike"
+        "name": "Reaver Strike"
       },
       {
         "id": "battle_shout",
-        "name": "Battle Shout"
+        "name": "Iron Bellow"
       },
       {
         "id": "commanding_shout",
-        "name": "Commanding Shout"
+        "name": "Bolstering Cry"
       },
       {
         "id": "charge",
-        "name": "Charge"
+        "name": "Onrush"
       },
       {
         "id": "rend",
-        "name": "Rend"
+        "name": "Deep Gash"
       },
       {
         "id": "thunder_clap",
-        "name": "Thunder Clap"
+        "name": "Quaking Blow"
       }
     ],
     "abilities": [
       {
         "id": "heroic_strike",
-        "name": "Heroic Strike"
+        "name": "Reaver Strike"
       },
       {
         "id": "battle_shout",
-        "name": "Battle Shout"
+        "name": "Iron Bellow"
       },
       {
         "id": "commanding_shout",
-        "name": "Commanding Shout"
+        "name": "Bolstering Cry"
       },
       {
         "id": "charge",
-        "name": "Charge"
+        "name": "Onrush"
       },
       {
         "id": "rend",
-        "name": "Rend"
+        "name": "Deep Gash"
       },
       {
         "id": "thunder_clap",
-        "name": "Thunder Clap"
+        "name": "Quaking Blow"
       },
       {
         "id": "hamstring",
-        "name": "Hamstring"
+        "name": "Hobbling Cut"
       },
       {
         "id": "bloodrage",
-        "name": "Bloodrage"
+        "name": "Blood Toll"
       },
       {
         "id": "overpower",
-        "name": "Overpower"
+        "name": "Redhand"
       },
       {
         "id": "execute",
-        "name": "Execute"
+        "name": "Early Grave"
       },
       {
         "id": "slam",
-        "name": "Slam"
+        "name": "Brute Swing"
       },
       {
         "id": "cleave",
-        "name": "Cleave"
+        "name": "Reaping Arc"
       },
       {
         "id": "defensive_stance",
-        "name": "Defensive Stance"
+        "name": "Guarded Stance"
       },
       {
         "id": "demoralizing_shout",
-        "name": "Demoralizing Shout"
+        "name": "Direhowl"
       },
       {
         "id": "sunder_armor",
-        "name": "Sunder Armor"
+        "name": "Armor Shear"
       },
       {
         "id": "taunt",
-        "name": "Taunt"
+        "name": "Goad"
       }
     ],
-    "model": "player_warrior"
+    "model": "player_warrior",
+    "still": "/guide-stills/player_warrior.webp"
   },
   {
     "id": "paladin",
@@ -199,19 +216,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "holy",
-        "name": "Holy",
+        "name": "Sacrament",
         "role": "healer",
         "signature": "flash_of_light"
       },
       {
         "id": "protection",
-        "name": "Protection",
+        "name": "Vigil",
         "role": "tank",
         "signature": "righteous_fury"
       },
       {
         "id": "retribution",
-        "name": "Retribution",
+        "name": "Requital",
         "role": "dps",
         "signature": "judgement"
       }
@@ -219,84 +236,85 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "seal_of_righteousness",
-        "name": "Seal of Righteousness"
+        "name": "Oathbrand"
       },
       {
         "id": "holy_light",
-        "name": "Holy Light"
+        "name": "Mending Light"
       },
       {
         "id": "devotion_aura",
-        "name": "Devotion Aura"
+        "name": "Steadfast Aura"
       },
       {
         "id": "judgement",
-        "name": "Judgement"
+        "name": "Verdict"
       },
       {
         "id": "blessing_of_might",
-        "name": "Blessing of Might"
+        "name": "Oath of Iron"
       },
       {
         "id": "divine_protection",
-        "name": "Divine Protection"
+        "name": "Ward of Faith"
       }
     ],
     "abilities": [
       {
         "id": "seal_of_righteousness",
-        "name": "Seal of Righteousness"
+        "name": "Oathbrand"
       },
       {
         "id": "holy_light",
-        "name": "Holy Light"
+        "name": "Mending Light"
       },
       {
         "id": "devotion_aura",
-        "name": "Devotion Aura"
+        "name": "Steadfast Aura"
       },
       {
         "id": "judgement",
-        "name": "Judgement"
+        "name": "Verdict"
       },
       {
         "id": "blessing_of_might",
-        "name": "Blessing of Might"
+        "name": "Oath of Iron"
       },
       {
         "id": "divine_protection",
-        "name": "Divine Protection"
+        "name": "Ward of Faith"
       },
       {
         "id": "hammer_of_justice",
-        "name": "Hammer of Justice"
+        "name": "Sundering Gavel"
       },
       {
         "id": "lay_on_hands",
-        "name": "Lay on Hands"
+        "name": "Last Rite"
       },
       {
         "id": "flash_of_light",
-        "name": "Flash of Light"
+        "name": "Lightmend"
       },
       {
         "id": "exorcism",
-        "name": "Exorcism"
+        "name": "Rite of Expulsion"
       },
       {
         "id": "consecration",
-        "name": "Consecration"
+        "name": "Holy Ground"
       },
       {
         "id": "righteous_fury",
-        "name": "Righteous Fury"
+        "name": "Burning Oath"
       },
       {
         "id": "retribution_aura",
-        "name": "Retribution Aura"
+        "name": "Requital Aura"
       }
     ],
-    "model": "player_paladin"
+    "model": "player_paladin",
+    "still": "/guide-stills/player_paladin.webp"
   },
   {
     "id": "hunter",
@@ -308,19 +326,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "beast_mastery",
-        "name": "Beast Mastery",
+        "name": "Packlord",
         "role": "dps",
         "signature": "tame_beast"
       },
       {
         "id": "marksmanship",
-        "name": "Marksmanship",
+        "name": "Coldsight",
         "role": "dps",
         "signature": "aimed_shot"
       },
       {
         "id": "survival",
-        "name": "Survival",
+        "name": "Fieldcraft",
         "role": "dps",
         "signature": "wing_clip"
       }
@@ -328,65 +346,65 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "raptor_strike",
-        "name": "Raptor Strike"
+        "name": "Gutting Strike"
       },
       {
         "id": "aspect_of_the_hawk",
-        "name": "Aspect of the Hawk"
+        "name": "Harrier's Guise"
       },
       {
         "id": "serpent_sting",
-        "name": "Serpent Sting"
+        "name": "Venom Barb"
       },
       {
         "id": "arcane_shot",
-        "name": "Arcane Shot"
+        "name": "Fell Shot"
       },
       {
         "id": "concussive_shot",
-        "name": "Concussive Shot"
+        "name": "Rattling Shot"
       },
       {
         "id": "mongoose_bite",
-        "name": "Mongoose Bite"
+        "name": "Counterfang"
       }
     ],
     "abilities": [
       {
         "id": "raptor_strike",
-        "name": "Raptor Strike"
+        "name": "Gutting Strike"
       },
       {
         "id": "aspect_of_the_hawk",
-        "name": "Aspect of the Hawk"
+        "name": "Harrier's Guise"
       },
       {
         "id": "serpent_sting",
-        "name": "Serpent Sting"
+        "name": "Venom Barb"
       },
       {
         "id": "arcane_shot",
-        "name": "Arcane Shot"
+        "name": "Fell Shot"
       },
       {
         "id": "concussive_shot",
-        "name": "Concussive Shot"
+        "name": "Rattling Shot"
       },
       {
         "id": "mongoose_bite",
-        "name": "Mongoose Bite"
+        "name": "Counterfang"
       },
       {
         "id": "wing_clip",
-        "name": "Wing Clip"
+        "name": "Fettering Slash"
       },
       {
         "id": "tame_beast",
-        "name": "Tame Beast"
+        "name": "Wildbond"
       },
       {
         "id": "dismiss_pet",
-        "name": "Dismiss Pet"
+        "name": "Release Companion"
       },
       {
         "id": "revive_pet",
@@ -394,22 +412,27 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "aspect_of_the_monkey",
-        "name": "Aspect of the Monkey"
+        "name": "Marten's Guise"
       },
       {
         "id": "aspect_of_the_cheetah",
-        "name": "Aspect of the Cheetah"
+        "name": "Courser's Guise"
       },
       {
         "id": "aimed_shot",
-        "name": "Aimed Shot"
+        "name": "Long Draw"
       },
       {
         "id": "rapid_fire",
-        "name": "Rapid Fire"
+        "name": "Fevered Draw"
+      },
+      {
+        "id": "volley",
+        "name": "Volley"
       }
     ],
-    "model": "player_hunter"
+    "model": "player_hunter",
+    "still": "/guide-stills/player_hunter.webp"
   },
   {
     "id": "rogue",
@@ -421,19 +444,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "assassination",
-        "name": "Assassination",
+        "name": "Knifework",
         "role": "dps",
         "signature": "eviscerate"
       },
       {
         "id": "combat",
-        "name": "Combat",
+        "name": "Thuggery",
         "role": "dps",
         "signature": "adrenaline_rush"
       },
       {
         "id": "subtlety",
-        "name": "Subtlety",
+        "name": "Skulduggery",
         "role": "dps",
         "signature": "ambush"
       }
@@ -441,57 +464,57 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "sinister_strike",
-        "name": "Sinister Strike"
+        "name": "Wicked Slash"
       },
       {
         "id": "eviscerate",
-        "name": "Eviscerate"
+        "name": "Dirt Nap"
       },
       {
         "id": "garrote",
-        "name": "Garrote"
+        "name": "Throat Wire"
       },
       {
         "id": "backstab",
-        "name": "Backstab"
+        "name": "Craven Thrust"
       },
       {
         "id": "gouge",
-        "name": "Gouge"
+        "name": "Eye Jab"
       },
       {
         "id": "cheap_shot",
-        "name": "Cheap Shot"
+        "name": "Gut Punch"
       }
     ],
     "abilities": [
       {
         "id": "sinister_strike",
-        "name": "Sinister Strike"
+        "name": "Wicked Slash"
       },
       {
         "id": "eviscerate",
-        "name": "Eviscerate"
+        "name": "Dirt Nap"
       },
       {
         "id": "garrote",
-        "name": "Garrote"
+        "name": "Throat Wire"
       },
       {
         "id": "backstab",
-        "name": "Backstab"
+        "name": "Craven Thrust"
       },
       {
         "id": "gouge",
-        "name": "Gouge"
+        "name": "Eye Jab"
       },
       {
         "id": "cheap_shot",
-        "name": "Cheap Shot"
+        "name": "Gut Punch"
       },
       {
         "id": "evasion",
-        "name": "Evasion"
+        "name": "Ghostfoot"
       },
       {
         "id": "sap",
@@ -499,58 +522,59 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "slice_and_dice",
-        "name": "Slice and Dice"
+        "name": "Cutthroat Tempo"
       },
       {
         "id": "sprint",
-        "name": "Sprint"
+        "name": "Swift Heels"
       },
       {
         "id": "crippling_poison",
-        "name": "Crippling Poison"
+        "name": "Leaden Venom"
       },
       {
         "id": "kidney_shot",
-        "name": "Kidney Shot"
+        "name": "Low Blow"
       },
       {
         "id": "expose_armor",
-        "name": "Expose Armor"
+        "name": "Armor Breach"
       },
       {
         "id": "ambush",
-        "name": "Ambush"
+        "name": "Lurker's Strike"
       },
       {
         "id": "rupture",
-        "name": "Rupture"
+        "name": "Bleed Out"
       },
       {
         "id": "vanish",
-        "name": "Vanish"
+        "name": "Smokestep"
       },
       {
         "id": "instant_poison",
-        "name": "Instant Poison"
+        "name": "Adder's Bite"
       },
       {
         "id": "adrenaline_rush",
-        "name": "Adrenaline Rush"
+        "name": "Quickened Blood"
       },
       {
         "id": "deadly_poison",
-        "name": "Deadly Poison"
+        "name": "Festering Venom"
       },
       {
         "id": "blind",
-        "name": "Blind"
+        "name": "Dirt Toss"
       },
       {
         "id": "stealth",
-        "name": "Stealth"
+        "name": "Duskveil"
       }
     ],
-    "model": "player_rogue"
+    "model": "player_rogue",
+    "still": "/guide-stills/player_rogue.webp"
   },
   {
     "id": "priest",
@@ -563,19 +587,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "discipline",
-        "name": "Discipline",
+        "name": "Doctrine",
         "role": "healer",
         "signature": "power_word_shield"
       },
       {
         "id": "holy",
-        "name": "Holy",
+        "name": "Benison",
         "role": "healer",
         "signature": "flash_heal"
       },
       {
         "id": "shadow",
-        "name": "Shadow",
+        "name": "Vespers",
         "role": "dps",
         "signature": "mind_flay"
       }
@@ -587,23 +611,23 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "lesser_heal",
-        "name": "Lesser Heal"
+        "name": "Whispered Prayer"
       },
       {
         "id": "power_word_fortitude",
-        "name": "Power Word: Fortitude"
+        "name": "Litany of Resolve"
       },
       {
         "id": "shadow_word_pain",
-        "name": "Shadow Word: Pain"
+        "name": "Dirge of Decay"
       },
       {
         "id": "power_word_shield",
-        "name": "Power Word: Shield"
+        "name": "Psalm of Warding"
       },
       {
         "id": "renew",
-        "name": "Renew"
+        "name": "Lingering Grace"
       }
     ],
     "abilities": [
@@ -613,43 +637,44 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "lesser_heal",
-        "name": "Lesser Heal"
+        "name": "Whispered Prayer"
       },
       {
         "id": "power_word_fortitude",
-        "name": "Power Word: Fortitude"
+        "name": "Litany of Resolve"
       },
       {
         "id": "shadow_word_pain",
-        "name": "Shadow Word: Pain"
+        "name": "Dirge of Decay"
       },
       {
         "id": "power_word_shield",
-        "name": "Power Word: Shield"
+        "name": "Psalm of Warding"
       },
       {
         "id": "renew",
-        "name": "Renew"
+        "name": "Lingering Grace"
       },
       {
         "id": "mind_blast",
-        "name": "Mind Blast"
+        "name": "Mindfracture"
       },
       {
         "id": "heal",
-        "name": "Heal"
+        "name": "Solemn Prayer"
       },
       {
         "id": "mind_flay",
-        "name": "Mind Flay"
+        "name": "Litany of Woe"
       },
       {
         "id": "flash_heal",
-        "name": "Flash Heal"
+        "name": "Urgent Prayer"
       }
     ],
     "model": "player_priest",
-    "tint": "#f0e9d6"
+    "tint": "#f0e9d6",
+    "still": "/guide-stills/player_priest__f0e9d6.webp"
   },
   {
     "id": "shaman",
@@ -662,19 +687,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "elemental",
-        "name": "Elemental",
+        "name": "Thundercall",
         "role": "dps",
         "signature": "lightning_bolt"
       },
       {
         "id": "enhancement",
-        "name": "Enhancement",
+        "name": "Warspirit",
         "role": "dps",
         "signature": "stormstrike"
       },
       {
         "id": "restoration",
-        "name": "Restoration",
+        "name": "Spiritmend",
         "role": "healer",
         "signature": "healing_wave"
       }
@@ -682,77 +707,82 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "lightning_bolt",
-        "name": "Lightning Bolt"
+        "name": "Arc Bolt"
       },
       {
         "id": "rockbiter_weapon",
-        "name": "Rockbiter Weapon"
+        "name": "Stonebound Weapon"
       },
       {
         "id": "healing_wave",
-        "name": "Healing Wave"
+        "name": "Mending Waters"
       },
       {
         "id": "earth_shock",
-        "name": "Earth Shock"
+        "name": "Earthen Jolt"
       },
       {
         "id": "lightning_shield",
-        "name": "Lightning Shield"
+        "name": "Thunder Ward"
       },
       {
         "id": "flame_shock",
-        "name": "Flame Shock"
+        "name": "Cinder Jolt"
       }
     ],
     "abilities": [
       {
         "id": "lightning_bolt",
-        "name": "Lightning Bolt"
+        "name": "Arc Bolt"
       },
       {
         "id": "rockbiter_weapon",
-        "name": "Rockbiter Weapon"
+        "name": "Stonebound Weapon"
       },
       {
         "id": "healing_wave",
-        "name": "Healing Wave"
+        "name": "Mending Waters"
       },
       {
         "id": "earth_shock",
-        "name": "Earth Shock"
+        "name": "Earthen Jolt"
       },
       {
         "id": "lightning_shield",
-        "name": "Lightning Shield"
+        "name": "Thunder Ward"
       },
       {
         "id": "flame_shock",
-        "name": "Flame Shock"
+        "name": "Cinder Jolt"
       },
       {
         "id": "flametongue_weapon",
-        "name": "Flametongue Weapon"
+        "name": "Pyrebrand Weapon"
       },
       {
         "id": "frost_shock",
-        "name": "Frost Shock"
+        "name": "Rime Jolt"
       },
       {
         "id": "frostbrand_weapon",
-        "name": "Frostbrand Weapon"
+        "name": "Rimebound Weapon"
       },
       {
         "id": "ghost_wolf",
-        "name": "Ghost Wolf"
+        "name": "Shadewolf"
       },
       {
         "id": "stormstrike",
-        "name": "Stormstrike"
+        "name": "Ancestral Strike"
+      },
+      {
+        "id": "earthquake",
+        "name": "Earthquake"
       }
     ],
     "model": "player_shaman",
-    "tint": "#6f8fc9"
+    "tint": "#6f8fc9",
+    "still": "/guide-stills/player_shaman__6f8fc9.webp"
   },
   {
     "id": "mage",
@@ -764,19 +794,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "arcane",
-        "name": "Arcane",
+        "name": "Aethermancy",
         "role": "dps",
         "signature": "arcane_missiles"
       },
       {
         "id": "fire",
-        "name": "Fire",
+        "name": "Pyromancy",
         "role": "dps",
         "signature": "scorch"
       },
       {
         "id": "frost",
-        "name": "Frost",
+        "name": "Cryomancy",
         "role": "dps",
         "signature": "ice_barrier"
       }
@@ -784,88 +814,93 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "fireball",
-        "name": "Fireball"
+        "name": "Cinderbolt"
       },
       {
         "id": "frost_armor",
-        "name": "Frost Armor"
+        "name": "Hoarfrost Mantle"
       },
       {
         "id": "arcane_intellect",
-        "name": "Arcane Intellect"
+        "name": "Aether Insight"
       },
       {
         "id": "frostbolt",
-        "name": "Frostbolt"
+        "name": "Rimelance"
       },
       {
         "id": "conjure_water",
-        "name": "Conjure Water"
+        "name": "Waterbind"
       },
       {
         "id": "conjure_food",
-        "name": "Conjure Food"
+        "name": "Breadbind"
       }
     ],
     "abilities": [
       {
         "id": "fireball",
-        "name": "Fireball"
+        "name": "Cinderbolt"
       },
       {
         "id": "frost_armor",
-        "name": "Frost Armor"
+        "name": "Hoarfrost Mantle"
       },
       {
         "id": "arcane_intellect",
-        "name": "Arcane Intellect"
+        "name": "Aether Insight"
       },
       {
         "id": "frostbolt",
-        "name": "Frostbolt"
+        "name": "Rimelance"
       },
       {
         "id": "conjure_water",
-        "name": "Conjure Water"
+        "name": "Waterbind"
       },
       {
         "id": "conjure_food",
-        "name": "Conjure Food"
+        "name": "Breadbind"
       },
       {
         "id": "fire_blast",
-        "name": "Fire Blast"
+        "name": "Cinderfall"
       },
       {
         "id": "arcane_missiles",
-        "name": "Arcane Missiles"
+        "name": "Aether Darts"
       },
       {
         "id": "polymorph",
-        "name": "Polymorph"
+        "name": "Bewitch"
       },
       {
         "id": "frost_nova",
-        "name": "Frost Nova"
+        "name": "Icebind"
       },
       {
         "id": "arcane_explosion",
-        "name": "Arcane Explosion"
+        "name": "Aetherburst"
       },
       {
         "id": "scorch",
-        "name": "Scorch"
+        "name": "Scald"
       },
       {
         "id": "ice_barrier",
-        "name": "Ice Barrier"
+        "name": "Frostveil"
       },
       {
         "id": "pyroblast",
-        "name": "Pyroblast"
+        "name": "Pyrelance"
+      },
+      {
+        "id": "flamestrike",
+        "name": "Flamestrike"
       }
     ],
-    "model": "player_mage"
+    "model": "player_mage",
+    "still": "/guide-stills/player_mage.webp"
   },
   {
     "id": "warlock",
@@ -877,19 +912,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "affliction",
-        "name": "Affliction",
+        "name": "Hexcraft",
         "role": "dps",
         "signature": "drain_life"
       },
       {
         "id": "demonology",
-        "name": "Demonology",
+        "name": "Pactbound",
         "role": "dps",
         "signature": "demon_skin"
       },
       {
         "id": "destruction",
-        "name": "Destruction",
+        "name": "Ruination",
         "role": "dps",
         "signature": "shadowburn"
       }
@@ -897,101 +932,106 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "shadow_bolt",
-        "name": "Shadow Bolt"
+        "name": "Gloom Bolt"
       },
       {
         "id": "summon_imp",
-        "name": "Summon Imp"
+        "name": "Summon Emberkin"
       },
       {
         "id": "demon_skin",
-        "name": "Demon Skin"
+        "name": "Fiendhide"
       },
       {
         "id": "immolate",
-        "name": "Immolate"
+        "name": "Burning Pact"
       },
       {
         "id": "corruption",
-        "name": "Corruption"
+        "name": "Blackrot"
       },
       {
         "id": "life_tap",
-        "name": "Life Tap"
+        "name": "Hard Bargain"
       }
     ],
     "abilities": [
       {
         "id": "shadow_bolt",
-        "name": "Shadow Bolt"
+        "name": "Gloom Bolt"
       },
       {
         "id": "summon_imp",
-        "name": "Summon Imp"
+        "name": "Summon Emberkin"
       },
       {
         "id": "demon_skin",
-        "name": "Demon Skin"
+        "name": "Fiendhide"
       },
       {
         "id": "immolate",
-        "name": "Immolate"
+        "name": "Burning Pact"
       },
       {
         "id": "corruption",
-        "name": "Corruption"
+        "name": "Blackrot"
       },
       {
         "id": "life_tap",
-        "name": "Life Tap"
+        "name": "Hard Bargain"
       },
       {
         "id": "summon_voidwalker",
-        "name": "Summon Voidwalker"
+        "name": "Summon Gloomshade"
       },
       {
         "id": "curse_of_agony",
-        "name": "Curse of Agony"
+        "name": "Hex of Anguish"
       },
       {
         "id": "drain_life",
-        "name": "Drain Life"
+        "name": "Consume"
       },
       {
         "id": "fear",
-        "name": "Fear"
+        "name": "Harrow"
       },
       {
         "id": "searing_pain",
-        "name": "Searing Pain"
+        "name": "Sear"
       },
       {
         "id": "shadowburn",
-        "name": "Shadowburn"
+        "name": "Duskfire"
       },
       {
         "id": "summon_succubus",
-        "name": "Summon Succubus"
+        "name": "Summon Duskborn"
       },
       {
         "id": "summon_felhunter",
-        "name": "Summon Felhunter"
+        "name": "Summon Spellhound"
       },
       {
         "id": "summon_felguard",
-        "name": "Summon Felguard"
+        "name": "Summon Warfiend"
       },
       {
         "id": "summon_infernal",
-        "name": "Summon Infernal"
+        "name": "Summon Pyre Colossus"
       },
       {
         "id": "summon_doomguard",
-        "name": "Summon Doomguard"
+        "name": "Summon Wraithborn"
+      },
+      {
+        "id": "rain_of_fire",
+        "name": "Rain of Fire"
       }
     ],
     "model": "player_warlock",
-    "tint": "#8d5fd3"
+    "tint": "#8d5fd3",
+    "still": "/guide-stills/player_warlock__8d5fd3.webp"
   },
   {
     "id": "druid",
@@ -1005,19 +1045,19 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "specs": [
       {
         "id": "balance",
-        "name": "Balance",
+        "name": "Moongrove",
         "role": "dps",
         "signature": "starfire"
       },
       {
         "id": "feral",
-        "name": "Feral",
+        "name": "Wildfang",
         "role": "tank",
         "signature": "bear_form"
       },
       {
         "id": "restoration",
-        "name": "Restoration",
+        "name": "Groveheart",
         "role": "healer",
         "signature": "regrowth"
       }
@@ -1025,77 +1065,77 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "wrath",
-        "name": "Wrath"
+        "name": "Wildbolt"
       },
       {
         "id": "healing_touch",
-        "name": "Healing Touch"
+        "name": "Wildmend"
       },
       {
         "id": "mark_of_the_wild",
-        "name": "Mark of the Wild"
+        "name": "Wildward"
       },
       {
         "id": "moonfire",
-        "name": "Moonfire"
+        "name": "Lunar Tempest"
       },
       {
         "id": "rejuvenation",
-        "name": "Rejuvenation"
+        "name": "Wildbloom"
       },
       {
         "id": "thorns",
-        "name": "Thorns"
+        "name": "Briarguard"
       }
     ],
     "abilities": [
       {
         "id": "wrath",
-        "name": "Wrath"
+        "name": "Wildbolt"
       },
       {
         "id": "healing_touch",
-        "name": "Healing Touch"
+        "name": "Wildmend"
       },
       {
         "id": "mark_of_the_wild",
-        "name": "Mark of the Wild"
+        "name": "Wildward"
       },
       {
         "id": "moonfire",
-        "name": "Moonfire"
+        "name": "Lunar Tempest"
       },
       {
         "id": "rejuvenation",
-        "name": "Rejuvenation"
+        "name": "Wildbloom"
       },
       {
         "id": "thorns",
-        "name": "Thorns"
+        "name": "Briarguard"
       },
       {
         "id": "entangling_roots",
-        "name": "Entangling Roots"
+        "name": "Gripping Roots"
       },
       {
         "id": "bear_form",
-        "name": "Bear Form"
+        "name": "Bruin Form"
       },
       {
         "id": "bear_charge",
-        "name": "Bear Charge"
+        "name": "Bruin Rush"
       },
       {
         "id": "maul",
-        "name": "Maul"
+        "name": "Bonecrush"
       },
       {
         "id": "growl",
-        "name": "Growl"
+        "name": "Menace"
       },
       {
         "id": "demoralizing_roar",
-        "name": "Demoralizing Roar"
+        "name": "Craven Roar"
       },
       {
         "id": "cat_form",
@@ -1103,11 +1143,11 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "prowl",
-        "name": "Prowl"
+        "name": "Stalk"
       },
       {
         "id": "rake",
-        "name": "Rake"
+        "name": "Flense"
       },
       {
         "id": "claw",
@@ -1115,43 +1155,43 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "regrowth",
-        "name": "Regrowth"
+        "name": "Second Bloom"
       },
       {
         "id": "ferocious_bite",
-        "name": "Ferocious Bite"
+        "name": "Gorebite"
       },
       {
         "id": "barkskin",
-        "name": "Barkskin"
+        "name": "Oakhide"
       },
       {
         "id": "swipe",
-        "name": "Swipe"
+        "name": "Sweeping Claws"
       },
       {
         "id": "starfire",
-        "name": "Starfire"
+        "name": "Skyfall"
       },
       {
         "id": "travel_form",
-        "name": "Travel Form"
+        "name": "Fleet Form"
       },
       {
         "id": "enrage",
-        "name": "Enrage"
+        "name": "Stoke"
       },
       {
         "id": "bash",
-        "name": "Bash"
+        "name": "Concuss"
       },
       {
         "id": "faerie_fire",
-        "name": "Faerie Fire"
+        "name": "Witchlight"
       },
       {
         "id": "hibernate",
-        "name": "Hibernate"
+        "name": "Slumber"
       },
       {
         "id": "dash",
@@ -1159,22 +1199,27 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "pounce",
-        "name": "Pounce"
+        "name": "Slinkstrike"
       },
       {
         "id": "insect_swarm",
-        "name": "Insect Swarm"
+        "name": "Stinging Swarm"
       },
       {
         "id": "tigers_fury",
-        "name": "Tiger's Fury"
+        "name": "Wolfsblood"
       },
       {
         "id": "rip",
         "name": "Rip"
+      },
+      {
+        "id": "hurricane",
+        "name": "Hurricane"
       }
     ],
-    "model": "player_druid"
+    "model": "player_druid",
+    "still": "/guide-stills/player_druid.webp"
   }
 ];
 
@@ -1191,7 +1236,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Wolf Run",
       "Boar Meadow",
       "Mirror Lake",
-      "Webwood",
+      "Sableweb",
       "Copper Dig",
       "Bandit Camp",
       "Fallen Chapel",
@@ -1286,46 +1331,53 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
 
 export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
   {
-    "id": "imp",
-    "name": "Imp",
+    "id": "emberkin",
+    "name": "Emberkin",
     "model": "mob_demon",
-    "tint": "#ff7a2a"
+    "tint": "#ff7a2a",
+    "still": "/guide-stills/mob_demon__ff7a2a.webp"
   },
   {
-    "id": "voidwalker",
-    "name": "Voidwalker",
+    "id": "gloomshade",
+    "name": "Gloomshade",
     "model": "mob_demon",
-    "tint": "#3a3a6e"
+    "tint": "#3a3a6e",
+    "still": "/guide-stills/mob_demon__3a3a6e.webp"
   },
   {
-    "id": "succubus",
-    "name": "Succubus",
+    "id": "duskborn",
+    "name": "Duskborn",
     "model": "mob_demon",
-    "tint": "#c6469b"
+    "tint": "#c6469b",
+    "still": "/guide-stills/mob_demon__c6469b.webp"
   },
   {
-    "id": "felhunter",
-    "name": "Felhunter",
+    "id": "spellhound",
+    "name": "Spellhound",
     "model": "mob_demonalt",
-    "tint": "#4a7d4a"
+    "tint": "#4a7d4a",
+    "still": "/guide-stills/mob_demonalt__4a7d4a.webp"
   },
   {
-    "id": "felguard",
-    "name": "Felguard",
+    "id": "warfiend",
+    "name": "Warfiend",
     "model": "mob_demonalt",
-    "tint": "#6e5a2a"
+    "tint": "#6e5a2a",
+    "still": "/guide-stills/mob_demonalt__6e5a2a.webp"
   },
   {
-    "id": "infernal",
-    "name": "Infernal",
+    "id": "pyre_colossus",
+    "name": "Pyre Colossus",
     "model": "mob_demonalt",
-    "tint": "#d24a2a"
+    "tint": "#d24a2a",
+    "still": "/guide-stills/mob_demonalt__d24a2a.webp"
   },
   {
-    "id": "doomguard",
-    "name": "Doomguard",
+    "id": "wraithborn",
+    "name": "Wraithborn",
     "model": "mob_demonalt",
-    "tint": "#7a3a8e"
+    "tint": "#7a3a8e",
+    "still": "/guide-stills/mob_demonalt__7a3a8e.webp"
   }
 ];
 
@@ -1340,7 +1392,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "forest_wolf",
         "model": "mob_wolf",
-        "tint": "#7f8c8d"
+        "tint": "#7f8c8d",
+        "still": "/guide-stills/mob_wolf__7f8c8d.webp"
       },
       {
         "name": "Wild Boar",
@@ -1349,7 +1402,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "wild_boar",
         "model": "mob_boar",
-        "tint": "#935116"
+        "tint": "#935116",
+        "still": "/guide-stills/mob_boar__935116.webp"
       },
       {
         "name": "Old Greyjaw",
@@ -1358,7 +1412,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": true,
         "templateId": "old_greyjaw",
         "model": "mob_wolf",
-        "tint": "#566061"
+        "tint": "#566061",
+        "still": "/guide-stills/mob_wolf__566061.webp"
       },
       {
         "name": "Mire Prowler",
@@ -1367,7 +1422,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "mire_prowler",
         "model": "mob_wolf",
-        "tint": "#4d5656"
+        "tint": "#4d5656",
+        "still": "/guide-stills/mob_wolf__4d5656.webp"
       },
       {
         "name": "Bog Bloat",
@@ -1376,7 +1432,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "bog_bloat",
         "model": "mob_murloc",
-        "tint": "#6b8e23"
+        "tint": "#6b8e23",
+        "still": "/guide-stills/mob_murloc__6b8e23.webp"
       },
       {
         "name": "Ridge Stalker",
@@ -1385,7 +1442,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "ridge_stalker",
         "model": "mob_wolf",
-        "tint": "#8c8270"
+        "tint": "#8c8270",
+        "still": "/guide-stills/mob_wolf__8c8270.webp"
       }
     ]
   },
@@ -1393,13 +1451,14 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
     "family": "spider",
     "creatures": [
       {
-        "name": "Webwood Lurker",
+        "name": "Sableweb Lurker",
         "min": 2,
         "max": 4,
         "rare": false,
         "templateId": "webwood_spider",
         "model": "mob_spider",
-        "tint": "#4a235a"
+        "tint": "#4a235a",
+        "still": "/guide-stills/mob_spider__4a235a.webp"
       },
       {
         "name": "Mirefen Widow",
@@ -1408,12 +1467,13 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "mire_widow",
         "model": "mob_spider",
-        "tint": "#283747"
+        "tint": "#283747",
+        "still": "/guide-stills/mob_spider__283747.webp"
       }
     ]
   },
   {
-    "family": "murloc",
+    "family": "mudfin",
     "creatures": [
       {
         "name": "Mudfin Skulker",
@@ -1422,7 +1482,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "mudfin_murloc",
         "model": "mob_murloc",
-        "tint": "#52be80"
+        "tint": "#52be80",
+        "still": "/guide-stills/mob_murloc__52be80.webp"
       },
       {
         "name": "Deepfen Snapper",
@@ -1431,30 +1492,33 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "deepfen_murloc",
         "model": "mob_murloc",
-        "tint": "#45b39d"
+        "tint": "#45b39d",
+        "still": "/guide-stills/mob_murloc__45b39d.webp"
       },
       {
-        "name": "Mirejaw Frenzy",
-        "min": 9,
-        "max": 10,
+        "name": "Glimmermere Wader",
+        "min": 15,
+        "max": 16,
         "rare": false,
-        "templateId": "mirejaw_frenzy",
+        "templateId": "glimmermere_wader",
         "model": "mob_murloc",
-        "tint": "#1abc9c"
+        "tint": "#8fb6c4",
+        "still": "/guide-stills/mob_murloc__8fb6c4.webp"
       }
     ]
   },
   {
-    "family": "kobold",
+    "family": "burrower",
     "creatures": [
       {
-        "name": "Tunnel Rat Digger",
+        "name": "Deeprock Digger",
         "min": 4,
         "max": 6,
         "rare": false,
         "templateId": "tunnel_rat",
         "model": "mob_kobold",
-        "tint": "#9c640c"
+        "tint": "#9c640c",
+        "still": "/guide-stills/mob_kobold__9c640c.webp"
       },
       {
         "name": "Deeprock Tunneler",
@@ -1463,16 +1527,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "deeprock_kobold",
         "model": "mob_kobold",
-        "tint": "#9c7a3c"
-      },
-      {
-        "name": "Ironvein Sapper",
-        "min": 15,
-        "max": 16,
-        "rare": false,
-        "templateId": "ironvein_sapper",
-        "model": "mob_kobold",
-        "tint": "#8f6b34"
+        "tint": "#9c7a3c",
+        "still": "/guide-stills/mob_kobold__9c7a3c.webp"
       }
     ]
   },
@@ -1486,16 +1542,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "vale_bandit",
         "model": "mob_bandit",
-        "tint": "#6b3a32"
-      },
-      {
-        "name": "Mogger Lackey",
-        "min": 5,
-        "max": 6,
-        "rare": false,
-        "templateId": "mogger_lackey",
-        "model": "mob_bandit",
-        "tint": "#6b3a32"
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
       },
       {
         "name": "Gravecaller Cultist",
@@ -1504,7 +1552,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "gravecaller_cultist",
         "model": "mob_dark_caster",
-        "tint": "#6c3483"
+        "tint": "#6c3483",
+        "still": "/guide-stills/mob_dark_caster__6c3483.webp"
       },
       {
         "name": "Gravecaller Mender",
@@ -1513,7 +1562,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "gravecaller_mender",
         "model": "mob_bandit",
-        "tint": "#6b3a32"
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
       },
       {
         "name": "Gravecaller Summoner",
@@ -1522,16 +1572,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "gravecaller_summoner",
         "model": "mob_dark_caster",
-        "tint": "#884ea0"
-      },
-      {
-        "name": "Nhalia Mourner",
-        "min": 11,
-        "max": 12,
-        "rare": false,
-        "templateId": "nhalia_mourner",
-        "model": "mob_bandit",
-        "tint": "#6b3a32"
+        "tint": "#884ea0",
+        "still": "/guide-stills/mob_dark_caster__884ea0.webp"
       },
       {
         "name": "Wyrmcult Zealot",
@@ -1540,7 +1582,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "wyrmcult_zealot",
         "model": "mob_bandit",
-        "tint": "#6b3a32"
+        "tint": "#6b3a32",
+        "still": "/guide-stills/mob_bandit__6b3a32.webp"
       },
       {
         "name": "Wyrmcult Necromancer",
@@ -1549,7 +1592,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "wyrmcult_necromancer",
         "model": "mob_dark_caster",
-        "tint": "#533566"
+        "tint": "#533566",
+        "still": "/guide-stills/mob_dark_caster__533566.webp"
       }
     ]
   },
@@ -1563,7 +1607,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "fen_troll",
         "model": "mob_troll",
-        "tint": "#229954"
+        "tint": "#229954",
+        "still": "/guide-stills/mob_troll__229954.webp"
       },
       {
         "name": "Grubjaw the Glutton",
@@ -1572,7 +1617,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": true,
         "templateId": "grubjaw",
         "model": "mob_troll",
-        "tint": "#145a32"
+        "tint": "#145a32",
+        "still": "/guide-stills/mob_troll__145a32.webp"
       }
     ]
   },
@@ -1586,7 +1632,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "thornpeak_ogre",
         "model": "mob_ogre",
-        "tint": "#9e7b53"
+        "tint": "#9e7b53",
+        "still": "/guide-stills/mob_ogre__9e7b53.webp"
       }
     ]
   },
@@ -1600,7 +1647,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "restless_bones",
         "model": "skel_minion",
-        "tint": "#d5dbdb"
+        "tint": "#d5dbdb",
+        "still": "/guide-stills/skel_minion__d5dbdb.webp"
       },
       {
         "name": "Drowned Dead",
@@ -1609,7 +1657,18 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "drowned_dead",
         "model": "skel_minion",
-        "tint": "#7fb3d5"
+        "tint": "#7fb3d5",
+        "still": "/guide-stills/skel_minion__7fb3d5.webp"
+      },
+      {
+        "name": "Drowned Votary",
+        "min": 15,
+        "max": 16,
+        "rare": false,
+        "templateId": "drowned_votary",
+        "model": "skel_minion",
+        "tint": "#6c8f8a",
+        "still": "/guide-stills/skel_minion__6c8f8a.webp"
       },
       {
         "name": "Boneclad Revenant",
@@ -1618,16 +1677,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "boneclad_revenant",
         "model": "skel_warrior",
-        "tint": "#cacfd2"
-      },
-      {
-        "name": "Varkas Boneguard",
-        "min": 18,
-        "max": 19,
-        "rare": false,
-        "templateId": "varkas_boneguard",
-        "model": "skel_minion",
-        "tint": "#c9c2b5"
+        "tint": "#cacfd2",
+        "still": "/guide-stills/skel_warrior__cacfd2.webp"
       }
     ]
   },
@@ -1641,7 +1692,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": false,
         "templateId": "stormcrag_elemental",
         "model": "mob_elemental",
-        "tint": "#5dade2"
+        "tint": "#5dade2",
+        "still": "/guide-stills/mob_elemental__5dade2.webp"
       },
       {
         "name": "Shardlord Kazzix",
@@ -1650,8 +1702,78 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "rare": true,
         "templateId": "shardlord_kazzix",
         "model": "mob_elemental",
-        "tint": "#aed6f1"
+        "tint": "#aed6f1",
+        "still": "/guide-stills/mob_elemental__aed6f1.webp"
       }
+    ]
+  },
+  {
+    "family": "dragonkin",
+    "creatures": [
+      {
+        "name": "Sethrael the Palecoil",
+        "min": 16,
+        "max": 16,
+        "rare": true,
+        "templateId": "sethrael_palecoil",
+        "model": "mob_dragonkin",
+        "tint": "#bcd2e6",
+        "still": "/guide-stills/mob_dragonkin__bcd2e6.webp"
+      }
+    ]
+  }
+];
+
+export const GUIDE_DELVES: GuideDelve[] = [
+  {
+    "id": "collapsed_reliquary",
+    "name": "The Collapsed Reliquary",
+    "theme": "crypt",
+    "minLevel": 7,
+    "suggestedPlayers": 2,
+    "keeper": {
+      "name": "Brother Halven",
+      "title": "Reliquary Keeper"
+    },
+    "companion": {
+      "name": "Acolyte Tessa",
+      "role": "healer"
+    },
+    "tiers": [
+      "Normal",
+      "Heroic"
+    ],
+    "affixes": [
+      "Restless Graves",
+      "Bad Air",
+      "Candleblind",
+      "Grave Tax",
+      "Unstable Roof",
+      "Cult Remnants"
+    ]
+  },
+  {
+    "id": "drowned_litany",
+    "name": "The Drowned Litany",
+    "theme": "ruin",
+    "minLevel": 12,
+    "suggestedPlayers": 2,
+    "keeper": {
+      "name": "Brother Halven",
+      "title": "Reliquary Keeper"
+    },
+    "companion": {
+      "name": "Edda Reedhand",
+      "role": "healer"
+    },
+    "tiers": [
+      "Normal",
+      "Heroic"
+    ],
+    "affixes": [
+      "High Water",
+      "Lively Choir",
+      "Belligerent Dead"
     ]
   }
 ];
@@ -1813,6 +1935,18 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 1.4,
     "tintStrength": 0.35
   },
+  "mob_murloc": {
+    "url": "models/creatures/frog.glb",
+    "idle": "Idle",
+    "height": 1.7,
+    "tintStrength": 0.45
+  },
+  "mob_kobold": {
+    "url": "models/creatures/goblin.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "tintStrength": 0.2
+  },
   "mob_bandit": {
     "url": "models/chars/players/rogue_hooded.glb",
     "idle": "Idle",
@@ -1828,18 +1962,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
       }
     ],
     "tintStrength": 0.3
-  },
-  "mob_murloc": {
-    "url": "models/creatures/frog.glb",
-    "idle": "Idle",
-    "height": 1.7,
-    "tintStrength": 0.45
-  },
-  "mob_kobold": {
-    "url": "models/creatures/goblin.glb",
-    "idle": "Idle",
-    "height": 2.1,
-    "tintStrength": 0.2
   },
   "skel_minion": {
     "url": "models/chars/enemies/skeleton_minion.glb",
@@ -1886,5 +2008,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle_Combat",
     "height": 2.5,
     "tintStrength": 0.25
+  },
+  "mob_dragonkin": {
+    "url": "models/creatures/dragonevolved.glb",
+    "idle": "Flying_Idle",
+    "height": 2.4,
+    "hover": 0.25,
+    "tintStrength": 0.2
   }
 };

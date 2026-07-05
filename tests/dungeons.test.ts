@@ -100,6 +100,31 @@ describe('dungeons: door-trigger entry/exit', () => {
   });
 });
 
+describe('dungeons: ghost corpse-run re-entry', () => {
+  it('the tick loop pulls a ghost through the door and resurrects it at the entry', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Solo');
+    const p = sim.entities.get(pid) as AnyEntity;
+    // enter, die inside, release the spirit to the outdoor graveyard
+    enterDungeon(sim.ctx, 'hollow_crypt', pid);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull();
+    p.dead = true;
+    sim.releaseSpirit(pid);
+    expect(p.ghost).toBe(true);
+    expect(sim.instanceSlotAt(p.pos)).toBeNull(); // ghost is outside the instance
+
+    // stand the ghost on the door and tick once: the tick loop now runs door triggers
+    // for ghosts (sim.ts), so it is pulled back in and resurrected at the entrance.
+    const door = hollowDoor(sim);
+    teleport(sim, p, door.pos.x, door.pos.z);
+    sim.tick();
+
+    expect(p.dead).toBe(false);
+    expect(p.ghost).toBe(false);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull(); // back inside, alive
+  });
+});
+
 describe('dungeons: empty-instance reset', () => {
   it('updateInstances frees an empty claimed instance past the timeout', () => {
     const sim = makeSim();

@@ -5,15 +5,18 @@
 // this proves the new entry point reuses that path faithfully.
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { groundHeight } from '../src/sim/world';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 
 function add(sim: Sim, cls: PlayerClass, name: string, x: number, z: number): number {
   const pid = sim.addPlayer(cls, name);
   const e = sim.entities.get(pid)!;
-  e.pos.x = x; e.pos.z = z; e.pos.y = groundHeight(x, z, sim.cfg.seed); e.prevPos = { ...e.pos };
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = groundHeight(x, z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
   (sim as any).rebucket(e);
   return pid;
 }
@@ -24,7 +27,8 @@ function startBout(sim: Sim): void {
     if (m && m.state === 'active') return;
   }
 }
-const arenaEnds = (ev: SimEvent[]) => ev.filter((e): e is Extract<SimEvent, { type: 'arenaEnd' }> => e.type === 'arenaEnd');
+const arenaEnds = (ev: SimEvent[]) =>
+  ev.filter((e): e is Extract<SimEvent, { type: 'arenaEnd' }> => e.type === 'arenaEnd');
 
 describe('arena wager seam: startWageredArena1v1', () => {
   it('pairs exactly the two given players into one 1v1 match', () => {
@@ -78,7 +82,15 @@ describe('arena wager seam: startWageredArena1v1', () => {
     const b = add(sim, 'mage', 'Bet', 6, -40);
     expect(sim.startWageredArena1v1(a, b)).toBe(true);
     startBout(sim);
-    (sim as any).dealDamage(sim.entities.get(a)!, sim.entities.get(b)!, 99999, false, 'physical', null, 'hit');
+    (sim as any).dealDamage(
+      sim.entities.get(a)!,
+      sim.entities.get(b)!,
+      99999,
+      false,
+      'physical',
+      null,
+      'hit',
+    );
     const ends = arenaEnds(sim.tick());
     expect(ends.length).toBe(2);
     const aEnd = ends.find((e) => e.pid === a)!;

@@ -32,6 +32,7 @@
 
 import { lineOfSightClear } from '../colliders';
 import { MOBS } from '../data';
+import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
@@ -56,6 +57,11 @@ const PET_PATH_STALE_DISTANCE = 4; // path end this far from the (now-moved) own
 const PET_WAYPOINT_REACHED = 1; // pet within this of the next waypoint: pop it and home on the next leg
 const PET_ASSIST_RANGE = 50; // how far the pet scans for enemies engaging the pair
 const PET_AGGRESSIVE_RANGE = 18; // aggressive pets look for idle enemies this close
+// A pet pulls idle wild mobs by proximity just like its owner. The max mob detection
+// radius is 20 (see the clamp below), so any mob that could notice the pet is within
+// 20yd of it; scanning from the pet (there are at most a handful) keeps this off every
+// idle mob's per-tick path, so work scales with pet count, not mob count.
+const PET_PULL_SCAN = 20;
 // Anti-AFK: an aggressive pet only proactively pulls fresh targets while its
 // owner has acted (moved, cast, or commanded the pet) within this many ticks.
 // 1200 ticks = 60s at 20Hz. Stops hunters/warlocks parking an aggressive pet to
@@ -74,6 +80,8 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   if (!pet.inCombat && ctx.tickCount % 40 === 0 && pet.hp < pet.maxHp) {
     pet.hp = Math.min(pet.maxHp, pet.hp + Math.max(1, Math.round(pet.maxHp * 0.02)));
   }
+
+  pullNearbyMobs(ctx, pet);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
   if (target && (target.dead || !ctx.isHostileTo(pet, target))) target = null;
@@ -123,6 +131,24 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   // heel
   pet.swingTimer = Math.max(0, pet.swingTimer - DT);
   petFollow(ctx, pet, owner);
+}
+
+// A pet standing inside an idle wild mob's detection radius pulls it, exactly as its
+// owner would: the mob notices the pet sent in ahead instead of waiting for the pet's
+// first strike. This mirrors the player proximity-aggro pass (mob/locomotion) but runs
+// from the pet side so a pet-free region costs nothing.
+function pullNearbyMobs(ctx: SimContext, pet: Entity): void {
+  ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_PULL_SCAN, (m, d2) => {
+    // wild, live, idle mobs only (skip pets/adds, corpses, already-engaged, visions)
+    if (m.ownerId !== null || m.kind !== 'mob' || m.dead) return;
+    if (m.aiState !== 'idle' || !m.hostile || m.templateId.startsWith('vision_')) return;
+    if (isTrivialTo(m, pet)) return;
+    const radius = Math.max(
+      4,
+      Math.min(20, (MOBS[m.templateId]?.aggroRadius ?? 0) + (m.level - pet.level) * 1.5),
+    );
+    if (Math.sqrt(d2) < radius) ctx.aggroMob(m, pet, true);
+  });
 }
 
 // Heel locomotion: route the pet to its owner AROUND obstacles instead of

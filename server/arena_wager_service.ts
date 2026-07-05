@@ -12,8 +12,14 @@
 // the production dependencies (db.ts, flow_ledger_db, env) and is loaded only by
 // the server entrypoint.
 import { PublicKey } from '@solana/web3.js';
-import { recoverLockedMatches, type ArenaWagerCoordinator, type WagerClientMsg, type WagerStore, type EnqueueReason } from './arena_wager';
 import type { ArenaEscrow } from './arena_escrow';
+import {
+  type ArenaWagerCoordinator,
+  type EnqueueReason,
+  recoverLockedMatches,
+  type WagerClientMsg,
+  type WagerStore,
+} from './arena_wager';
 
 interface QueueSession {
   pid: number;
@@ -35,7 +41,9 @@ export interface ArenaWagerServiceDeps {
   seasonActive: () => Promise<boolean>;
   escrow: ArenaEscrow;
   store: Pick<WagerStore, 'setPhase'>;
-  loadRecoverable: () => Promise<{ matchId: bigint; creatorWallet: string; opponentWallet: string; stakeBase: bigint }[]>;
+  loadRecoverable: () => Promise<
+    { matchId: bigint; creatorWallet: string; opponentWallet: string; stakeBase: bigint }[]
+  >;
   cancelStale: () => Promise<number>;
 }
 
@@ -63,8 +71,14 @@ export class ArenaWagerService {
     const wallet = await this.d.walletFor(session.accountId);
     if (!wallet) return fail('Link a verified $WOC wallet to wager.');
     const { tier } = await this.d.holderInfoFor(wallet);
-    if (tier < this.d.minHolderTier) return fail('You need to hold more $WOC to enter wagered matches.');
-    const r = await this.d.coordinator.enqueue({ pid: session.pid, wallet: new PublicKey(wallet), stakeBase, rating: this.d.ratingFor(session.pid) });
+    if (tier < this.d.minHolderTier)
+      return fail('You need to hold more $WOC to enter wagered matches.');
+    const r = await this.d.coordinator.enqueue({
+      pid: session.pid,
+      wallet: new PublicKey(wallet),
+      stakeBase,
+      rating: this.d.ratingFor(session.pid),
+    });
     if (!r.ok) fail(ENQUEUE_REASON_TEXT[r.reason]);
   }
 

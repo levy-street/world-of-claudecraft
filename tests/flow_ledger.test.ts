@@ -3,13 +3,13 @@
 // FakeFlowLedgerDb that models the two load-bearing DB guarantees — the UNIQUE
 // tx_sig replay guard and the per-season serialization of budget decisions. No
 // Postgres, no chain.
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  FlowLedger,
   directionOf,
-  emissionDecision,
   type EmitResult,
+  emissionDecision,
   type FlowEntryInput,
+  FlowLedger,
   type FlowLedgerDb,
   type InflowResult,
 } from '../server/flow_ledger';
@@ -19,7 +19,13 @@ import {
 // the advisory lock) so two payouts cannot both spend the same headroom.
 class FakeFlowLedgerDb implements FlowLedgerDb {
   seasons = new Map<number, 'active' | 'closed' | 'finalized'>();
-  entries: Array<{ entryId: number; seasonId: number; direction: 'in' | 'out'; amountBase: bigint; txSig: string | null }> = [];
+  entries: Array<{
+    entryId: number;
+    seasonId: number;
+    direction: 'in' | 'out';
+    amountBase: bigint;
+    txSig: string | null;
+  }> = [];
   payoutSigs = new Set<string>();
   private seq = 0;
   private locks = new Map<number, Promise<unknown>>();
@@ -45,14 +51,24 @@ class FakeFlowLedgerDb implements FlowLedgerDb {
     return (this.seasons.get(seasonId) ?? 'active') === 'active';
   }
   async recordInflow(input: FlowEntryInput): Promise<InflowResult> {
-    if (input.txSig && this.entries.some((e) => e.txSig === input.txSig)) return { ok: false, reason: 'duplicate' };
+    if (input.txSig && this.entries.some((e) => e.txSig === input.txSig))
+      return { ok: false, reason: 'duplicate' };
     const entryId = ++this.seq;
-    this.entries.push({ entryId, seasonId: input.seasonId, direction: 'in', amountBase: input.amountBase, txSig: input.txSig ?? null });
+    this.entries.push({
+      entryId,
+      seasonId: input.seasonId,
+      direction: 'in',
+      amountBase: input.amountBase,
+      txSig: input.txSig ?? null,
+    });
     return { ok: true, entryId };
   }
   async recordOutflowWithinBudget(input: FlowEntryInput): Promise<EmitResult> {
     return this.withSeasonLock(input.seasonId, async () => {
-      if (input.txSig && (this.payoutSigs.has(input.txSig) || this.entries.some((e) => e.txSig === input.txSig))) {
+      if (
+        input.txSig &&
+        (this.payoutSigs.has(input.txSig) || this.entries.some((e) => e.txSig === input.txSig))
+      ) {
         return { ok: false, reason: 'duplicate', headroomBase: 0n };
       }
       const headroom = this.headroomSync(input.seasonId);
@@ -63,7 +79,13 @@ class FakeFlowLedgerDb implements FlowLedgerDb {
       const decision = emissionDecision(headroom, input.amountBase);
       if (!decision.allow) return { ok: false, reason: decision.reason, headroomBase: headroom };
       const entryId = ++this.seq;
-      this.entries.push({ entryId, seasonId: input.seasonId, direction: 'out', amountBase: input.amountBase, txSig: input.txSig ?? null });
+      this.entries.push({
+        entryId,
+        seasonId: input.seasonId,
+        direction: 'out',
+        amountBase: input.amountBase,
+        txSig: input.txSig ?? null,
+      });
       if (input.txSig) this.payoutSigs.add(input.txSig);
       return { ok: true, headroomBase: headroom - input.amountBase, entryId, payoutId: this.seq };
     });
@@ -72,7 +94,10 @@ class FakeFlowLedgerDb implements FlowLedgerDb {
     const prev = this.locks.get(seasonId) ?? Promise.resolve();
     let release!: () => void;
     const next = new Promise<void>((res) => (release = res));
-    this.locks.set(seasonId, prev.then(() => next));
+    this.locks.set(
+      seasonId,
+      prev.then(() => next),
+    );
     await prev;
     try {
       return await fn();
@@ -134,8 +159,13 @@ describe('FlowLedger service', () => {
 
   it('rejects a crossed direction (inflow source emitted, outflow source credited)', async () => {
     const { ledger } = await setup();
-    expect((await ledger.emit({ seasonId: 1, source: 'gamblefi_stake', amountBase: 10n })).reason).toBe('wrong_direction');
-    expect((await ledger.creditInflow({ seasonId: 1, source: 'leaderboard_payout', amountBase: 10n })).reason).toBe('wrong_direction');
+    expect(
+      (await ledger.emit({ seasonId: 1, source: 'gamblefi_stake', amountBase: 10n })).reason,
+    ).toBe('wrong_direction');
+    expect(
+      (await ledger.creditInflow({ seasonId: 1, source: 'leaderboard_payout', amountBase: 10n }))
+        .reason,
+    ).toBe('wrong_direction');
   });
 
   it('emits only up to verified sinks, then refuses (the faucet caps itself)', async () => {
@@ -194,7 +224,10 @@ describe('FlowLedger service', () => {
     const { ledger } = await setup();
     await ledger.creditInflow(sink(1, 1000n, 'in'));
     // Both want 700 against 1000 headroom; the invariant must let exactly one through.
-    const [a, b] = await Promise.all([ledger.emit(emit(1, 700n, 'race-a')), ledger.emit(emit(1, 700n, 'race-b'))]);
+    const [a, b] = await Promise.all([
+      ledger.emit(emit(1, 700n, 'race-a')),
+      ledger.emit(emit(1, 700n, 'race-b')),
+    ]);
     const oks = [a, b].filter((r) => r.ok).length;
     expect(oks).toBe(1);
     expect([a, b].find((r) => !r.ok)?.reason).toBe('budget_exceeded');
@@ -208,7 +241,14 @@ describe('FlowLedger service', () => {
     let inSig = 0;
     let outSig = 0;
     const amounts: Array<['in' | 'out', bigint]> = [
-      ['in', 300n], ['out', 100n], ['in', 50n], ['out', 250n], ['out', 100n], ['in', 500n], ['out', 400n], ['out', 100n],
+      ['in', 300n],
+      ['out', 100n],
+      ['in', 50n],
+      ['out', 250n],
+      ['out', 100n],
+      ['in', 500n],
+      ['out', 400n],
+      ['out', 100n],
     ];
     for (const [dir, amt] of amounts) {
       if (dir === 'in') await ledger.creditInflow(sink(1, amt, `i${inSig++}`));

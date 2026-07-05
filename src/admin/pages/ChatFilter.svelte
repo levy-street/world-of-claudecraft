@@ -73,6 +73,11 @@
 
   const muted = (until: string | null) => until !== null && new Date(until).getTime() > Date.now();
 
+  // Presentation only; the server gates the word/config writes on
+  // chatfilter.manage and the per-account actions on moderation.act.
+  let canManageFilter = $derived(auth.can('chatfilter.manage'));
+  let canModerate = $derived(auth.can('moderation.act'));
+
   onMount(() => { void refresh(); });
 </script>
 
@@ -81,16 +86,20 @@
 {:else if data}
   <Panel title={t('chatFilter.escalationTitle')}>
     <p class="hint">{t('chatFilter.escalationHint')}</p>
-    <div class="cf-config">
-      <label>{t('chatFilter.warningsLabel')}
-        <input id="cf-warnings" type="number" min="0" max="50" bind:value={warnings} />
-      </label>
-      <label>{t('chatFilter.ladderLabel')}
-        <input id="cf-ladder" type="text" bind:value={ladder} />
-      </label>
+    {#if canManageFilter}
+      <div class="cf-config">
+        <label>{t('chatFilter.warningsLabel')}
+          <input id="cf-warnings" type="number" min="0" max="50" bind:value={warnings} />
+        </label>
+        <label>{t('chatFilter.ladderLabel')}
+          <input id="cf-ladder" type="text" bind:value={ladder} />
+        </label>
+        <div class="hint">{t('chatFilter.currentLadder')} {ladderHuman || t('common.emptyValue')}</div>
+        <button onclick={saveConfig}>{t('chatFilter.saveConfig')}</button>
+      </div>
+    {:else}
       <div class="hint">{t('chatFilter.currentLadder')} {ladderHuman || t('common.emptyValue')}</div>
-      <button onclick={saveConfig}>{t('chatFilter.saveConfig')}</button>
-    </div>
+    {/if}
   </Panel>
 
   <WordList
@@ -100,6 +109,7 @@
     words={data.soft}
     onAdd={(w) => addWord(w, 'soft')}
     onDelete={deleteWord}
+    canEdit={canManageFilter}
   />
   <WordList
     title={t('chatFilter.hardTitle')}
@@ -108,6 +118,7 @@
     words={data.hard}
     onAdd={(w) => addWord(w, 'hard')}
     onDelete={deleteWord}
+    canEdit={canManageFilter}
   />
 
   <Panel title={t('chatFilter.accountsTitle')} hint={t('chatFilter.accountsHint')}>
@@ -127,8 +138,10 @@
                 {#if muted(a.chatMutedUntil)}<Badge variant="warn">{t('chatMod.mutedUntil', { value: fmtDate(a.chatMutedUntil) })}</Badge>{:else}<Badge>{t('chatMod.notMuted')}</Badge>{/if}
               </td>
               <td>
-                {#if muted(a.chatMutedUntil)}<button onclick={() => (selectedLift = a)}>{t('chatMod.liftMute')}</button>{/if}
-                {#if a.chatStrikes > 0}<button onclick={() => resetStrikes(a.id)}>{t('chatMod.resetStrikes')}</button>{/if}
+                {#if canModerate}
+                  {#if muted(a.chatMutedUntil)}<button onclick={() => (selectedLift = a)}>{t('chatMod.liftMute')}</button>{/if}
+                  {#if a.chatStrikes > 0}<button onclick={() => resetStrikes(a.id)}>{t('chatMod.resetStrikes')}</button>{/if}
+                {/if}
               </td>
             </tr>
             {#if selectedLift?.id === a.id}

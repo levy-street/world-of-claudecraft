@@ -9,15 +9,15 @@
 //      split, when a treasury split is configured).
 // The handler layer adds the tx_sig replay guard (UNIQUE in woc_payments).
 import {
+  burnedBase,
   getFinalizedTx,
+  hasMemo,
+  ownerCreditedBase,
+  ownerSpentBase,
   txSucceeded,
   usesToken2022,
-  ownerSpentBase,
-  ownerCreditedBase,
-  burnedBase,
-  hasMemo,
 } from './solana_tx';
-import { WOC_MINT, WOC_TREASURY, splitPrice } from './woc_config';
+import { splitPrice, WOC_MINT, WOC_TREASURY } from './woc_config';
 
 const BASE58 = /^[1-9A-HJ-NP-Za-km-z]{32,90}$/;
 
@@ -28,7 +28,12 @@ export interface WocPaymentResult {
   burnedBase: bigint;
 }
 
-const fail = (reason: string): WocPaymentResult => ({ ok: false, reason, spentBase: 0n, burnedBase: 0n });
+const fail = (reason: string): WocPaymentResult => ({
+  ok: false,
+  reason,
+  spentBase: 0n,
+  burnedBase: 0n,
+});
 
 /**
  * Verify that `signature` is a finalized $WOC payment of at least `priceBase`

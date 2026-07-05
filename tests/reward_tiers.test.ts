@@ -1,8 +1,13 @@
 // Pure tests for the $WOC reward-tier split (server/reward_tiers.ts): exact
 // bigint conservation, the dust-to-rank-1 rule, partial fields, env override,
 // and amounts beyond Number.MAX_SAFE_INTEGER.
-import { describe, it, expect } from 'vitest';
-import { DEFAULT_REWARD_TIER_BPS, projectSeasonRewards, rewardTierBpsFromEnv, type RankedEntry } from '../server/reward_tiers';
+import { describe, expect, it } from 'vitest';
+import {
+  DEFAULT_REWARD_TIER_BPS,
+  projectSeasonRewards,
+  type RankedEntry,
+  rewardTierBpsFromEnv,
+} from '../server/reward_tiers';
 
 const players = (n: number): RankedEntry[] =>
   Array.from({ length: n }, (_, i) => ({ name: `P${i + 1}`, rating: 2000 - i * 10 }));
@@ -70,7 +75,10 @@ describe('projectSeasonRewards', () => {
   });
 
   it('preserves rank order and carries name + rating through', () => {
-    const s = projectSeasonRewards(1_000_000_000n, [{ name: 'Ada', rating: 1999 }, { name: 'Bo', rating: 1888 }]);
+    const s = projectSeasonRewards(1_000_000_000n, [
+      { name: 'Ada', rating: 1999 },
+      { name: 'Bo', rating: 1888 },
+    ]);
     expect(s[0]).toMatchObject({ rank: 1, name: 'Ada', rating: 1999 });
     expect(s[1]).toMatchObject({ rank: 2, name: 'Bo', rating: 1888 });
   });
@@ -78,7 +86,10 @@ describe('projectSeasonRewards', () => {
 
 describe('rewardTierBpsFromEnv', () => {
   const prev = process.env.WOC_REWARD_TIER_BPS;
-  const restore = () => { if (prev === undefined) delete process.env.WOC_REWARD_TIER_BPS; else process.env.WOC_REWARD_TIER_BPS = prev; };
+  const restore = () => {
+    if (prev === undefined) delete process.env.WOC_REWARD_TIER_BPS;
+    else process.env.WOC_REWARD_TIER_BPS = prev;
+  };
 
   it('returns the default when unset', () => {
     delete process.env.WOC_REWARD_TIER_BPS;

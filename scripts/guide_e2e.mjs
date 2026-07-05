@@ -67,6 +67,7 @@ try {
     'reference/combat',
     'reference/controls',
     'reference/glossary',
+    'delves',
     'faq',
   ]) {
     await page.goto(`${BASE}/wiki/${sub}`, { waitUntil: 'networkidle0' });
@@ -74,6 +75,11 @@ try {
     const placeholder = await page.$('.guide-placeholder');
     check(`content page renders: ${sub}`, !placeholder);
   }
+
+  // Delves page surfaces at least one delve card from the generated roster.
+  await page.goto(`${BASE}/wiki/delves`, { waitUntil: 'networkidle0' });
+  await page.waitForSelector('.guide-dungeon-card');
+  check('delves page lists at least one delve', (await page.$$('.guide-dungeon-card')).length >= 1);
   await page.goto(`${BASE}/wiki/how-to-play`, { waitUntil: 'networkidle0' });
   await page.waitForSelector('.guide-steps li');
   await page.screenshot({ path: 'tmp/wiki-howtoplay.png', fullPage: true });
@@ -85,8 +91,12 @@ try {
   await page.goto(`${BASE}/wiki/classes`, { waitUntil: 'networkidle0' });
   await page.waitForSelector('.guide-class-card');
   check('classes index lists nine classes', (await page.$$('.guide-class-card')).length === 9);
-  const crestSrc = await page.$eval('.guide-class-crest', (el) => el.getAttribute('src') || '');
-  check('class crest is a procedural data URL', crestSrc.startsWith('data:image'));
+  const cardImg = await page.$eval('.guide-class-card img', (el) => el.getAttribute('src') || '');
+  check(
+    'class card shows the character still (crest fallback)',
+    cardImg.includes('/guide-stills/') || cardImg.startsWith('data:image'),
+    cardImg.slice(0, 48),
+  );
   await page.screenshot({ path: 'tmp/wiki-classes.png', fullPage: true });
 
   await page.goto(`${BASE}/wiki/classes/warrior`, { waitUntil: 'networkidle0' });

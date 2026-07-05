@@ -560,7 +560,15 @@ export interface SharedIpRow {
   lastSeenAt: string;
 }
 
-export async function listSharedIps(page: number, limit: number): Promise<Paginated<SharedIpRow>> {
+export type SharedIpSort = 'accounts' | 'last_seen';
+export type SharedIpSortDirection = 'asc' | 'desc';
+
+export async function listSharedIps(
+  page: number,
+  limit: number,
+  sort: SharedIpSort = 'accounts',
+  dir: SharedIpSortDirection = 'desc',
+): Promise<Paginated<SharedIpRow>> {
   const offset = (page - 1) * limit;
   const result = await pool.query(
     `WITH account_ip_events AS (
@@ -588,9 +596,16 @@ export async function listSharedIps(page: number, limit: number): Promise<Pagina
      )
      SELECT *, count(*) OVER ()::int AS total
      FROM shared
-     ORDER BY account_count DESC, last_seen_at DESC, ip
+     ORDER BY
+       CASE WHEN $3 = 'last_seen' AND $4 = 'asc' THEN last_seen_at END ASC,
+       CASE WHEN $3 = 'last_seen' AND $4 = 'desc' THEN last_seen_at END DESC,
+       CASE WHEN $3 = 'accounts' AND $4 = 'asc' THEN account_count END ASC,
+       CASE WHEN $3 = 'accounts' AND $4 = 'desc' THEN account_count END DESC,
+       CASE WHEN $3 = 'last_seen' THEN account_count END DESC,
+       last_seen_at DESC,
+       ip
      LIMIT $1 OFFSET $2`,
-    [limit, offset],
+    [limit, offset, sort, dir],
   );
   return {
     rows: result.rows.map((row) => ({

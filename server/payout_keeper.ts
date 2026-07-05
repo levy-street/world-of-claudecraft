@@ -13,23 +13,62 @@
 // quote/verify path, so a compromise of those paths cannot move funds. ALL
 // orchestration runs over an injected PayoutExecutor/PayoutStore and is unit-
 // tested with fakes; buildProductionDeps() is the thin real-I/O wiring.
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, VersionedTransaction } from '@solana/web3.js';
-import bs58 from 'bs58';
+
 import { randomBytes } from 'node:crypto';
-import { isSolanaAddress } from './wallet_link';
-import { DEFAULT_PAYOUT_POLICY, planTwapChunks, shouldRunBatch, type PayoutPolicy } from './payout_policy';
-import { parseSplitPayment, fetchFinalizedTransaction, signatureStatus, solanaRpc, SOLANA_RPC_URL, SPL_TOKEN_PROGRAM } from './solana_rpc';
 import {
-  createBuybackBatch, markBatchSwapped, markBatchSettling, markBatchSettled, markBatchFailed,
-  openBuybackBatches, lastSettleAt, type PayoutBatchRow, type PayoutMode,
-} from './payout_db';
+  Connection,
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+  VersionedTransaction,
+} from '@solana/web3.js';
+import bs58 from 'bs58';
 import { FlowLedger } from './flow_ledger';
 import { PgFlowLedgerDb } from './flow_ledger_db';
+import {
+  createBuybackBatch,
+  lastSettleAt,
+  markBatchFailed,
+  markBatchSettled,
+  markBatchSettling,
+  markBatchSwapped,
+  openBuybackBatches,
+  type PayoutBatchRow,
+  type PayoutMode,
+} from './payout_db';
+import {
+  DEFAULT_PAYOUT_POLICY,
+  type PayoutPolicy,
+  planTwapChunks,
+  shouldRunBatch,
+} from './payout_policy';
+import {
+  fetchFinalizedTransaction,
+  parseSplitPayment,
+  SOLANA_RPC_URL,
+  SPL_TOKEN_PROGRAM,
+  signatureStatus,
+  solanaRpc,
+} from './solana_rpc';
+import { isSolanaAddress } from './wallet_link';
 
 const VAULT = (process.env.BUYBACK_VAULT ?? process.env.MARKETPLACE_BURN_VAULT ?? '').trim();
-const VAULT_SECRET = (process.env.BUYBACK_VAULT_SECRET ?? process.env.MARKETPLACE_BURN_VAULT_SECRET ?? '').trim();
-const USDC_MINT = (process.env.USDC_MINT ?? process.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
-const WOC_MINT = (process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth').trim();
+const VAULT_SECRET = (
+  process.env.BUYBACK_VAULT_SECRET ??
+  process.env.MARKETPLACE_BURN_VAULT_SECRET ??
+  ''
+).trim();
+const USDC_MINT = (
+  process.env.USDC_MINT ??
+  process.env.VITE_USDC_MINT ??
+  'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+).trim();
+const WOC_MINT = (
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+).trim();
 const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag/v6').trim();
 // 'top_up' funds the #480 reward pool from marketplace revenue; 'burn' (default)
 // keeps the deflationary sink. top_up also needs REWARD_POOL_VAULT + BUYBACK_SEASON_ID.
@@ -58,9 +97,15 @@ function envPolicy(): PayoutPolicy {
     thresholdUsdc: u('BUYBACK_BATCH_THRESHOLD_USDC', DEFAULT_PAYOUT_POLICY.thresholdUsdc),
     minBatchUsdc: u('BUYBACK_MIN_BATCH_USDC', DEFAULT_PAYOUT_POLICY.minBatchUsdc),
     cadenceMs: ms('BUYBACK_CADENCE_MS', DEFAULT_PAYOUT_POLICY.cadenceMs),
-    twapSplitAboveUsdc: u('BUYBACK_TWAP_SPLIT_ABOVE_USDC', DEFAULT_PAYOUT_POLICY.twapSplitAboveUsdc),
+    twapSplitAboveUsdc: u(
+      'BUYBACK_TWAP_SPLIT_ABOVE_USDC',
+      DEFAULT_PAYOUT_POLICY.twapSplitAboveUsdc,
+    ),
     twapChunkUsdc: u('BUYBACK_TWAP_CHUNK_USDC', DEFAULT_PAYOUT_POLICY.twapChunkUsdc),
-    maxSlippageBps: bps && Number.isFinite(Number(bps)) ? BigInt(Math.round(Number(bps))) : DEFAULT_PAYOUT_POLICY.maxSlippageBps,
+    maxSlippageBps:
+      bps && Number.isFinite(Number(bps))
+        ? BigInt(Math.round(Number(bps)))
+        : DEFAULT_PAYOUT_POLICY.maxSlippageBps,
   };
 }
 
@@ -69,7 +114,8 @@ function envPolicy(): PayoutPolicy {
 // id to credit. Absent these, the marketplace still accrues USDC; nothing swaps.
 export function keeperConfigured(mode: PayoutMode = KEEPER_MODE): boolean {
   if (!isSolanaAddress(VAULT) || VAULT_SECRET.length === 0) return false;
-  if (mode === 'top_up') return isSolanaAddress(REWARD_POOL_VAULT) && Number.isInteger(BUYBACK_SEASON_ID);
+  if (mode === 'top_up')
+    return isSolanaAddress(REWARD_POOL_VAULT) && Number.isInteger(BUYBACK_SEASON_ID);
   return true;
 }
 
@@ -123,11 +169,22 @@ export class PayoutKeeper {
    */
   async runCycle(): Promise<void> {
     const open = await this.store.openBatches();
-    if (open.length > 0) { await this.recover(open); return; }
+    if (open.length > 0) {
+      await this.recover(open);
+      return;
+    }
 
     const available = await this.exec.vaultUsdcBalance();
     const last = await this.store.lastSettleAt();
-    if (!shouldRunBatch({ availableUsdc: available, lastBurnAt: last, now: this.opts.now(), policy: this.policy })) return;
+    if (
+      !shouldRunBatch({
+        availableUsdc: available,
+        lastBurnAt: last,
+        now: this.opts.now(),
+        policy: this.policy,
+      })
+    )
+      return;
 
     for (const chunk of planTwapChunks(available, this.policy)) {
       const completed = await this.swapAndSettle(chunk);
@@ -145,7 +202,10 @@ export class PayoutKeeper {
     if (!fresh) return false; // this signed swap is already tracked — recovery owns it
     await swap.send();
     const conf = await this.exec.confirm(swap.signature);
-    if (conf === 'failed') { await this.store.markFailed(batchId, 'swap reverted (slippage / route)'); return false; }
+    if (conf === 'failed') {
+      await this.store.markFailed(batchId, 'swap reverted (slippage / route)');
+      return false;
+    }
     if (conf !== 'confirmed') return false; // unknown — left 'swapping' for the next cycle's recovery
     return this.completeSwapped(batchId, swap.signature);
   }
@@ -154,7 +214,10 @@ export class PayoutKeeper {
   // no balance snapshot needed), then settle exactly that.
   private async completeSwapped(batchId: string, swapSig: string): Promise<boolean> {
     const woc = await this.exec.wocReceived(swapSig);
-    if (woc <= 0n) { await this.store.markFailed(batchId, 'swap confirmed but no $WOC received'); return false; }
+    if (woc <= 0n) {
+      await this.store.markFailed(batchId, 'swap confirmed but no $WOC received');
+      return false;
+    }
     await this.store.markSwapped(batchId, woc);
     return this.settle(batchId, woc);
   }
@@ -164,7 +227,10 @@ export class PayoutKeeper {
     await this.store.markSettling(batchId, tx.signature); // record the settle sig before broadcast
     await tx.send();
     const conf = await this.exec.confirm(tx.signature);
-    if (conf === 'confirmed') { await this.finishSettled(batchId, woc, tx.signature); return true; }
+    if (conf === 'confirmed') {
+      await this.finishSettled(batchId, woc, tx.signature);
+      return true;
+    }
     return false; // unknown/failed — recovery re-checks (and, if stale, re-issues) the settle
   }
 
@@ -179,12 +245,13 @@ export class PayoutKeeper {
   /** Resolve in-flight batches by their recorded signature — never by re-reading
    *  the vault balance (which could double-swap a lost-confirmation swap). */
   async recover(open?: PayoutBatchRow[]): Promise<void> {
-    const batches = open ?? await this.store.openBatches();
+    const batches = open ?? (await this.store.openBatches());
     for (const b of batches) {
       if (b.status === 'swapping' && b.buyTxSig) {
         const conf = await this.exec.confirm(b.buyTxSig);
         if (conf === 'confirmed') await this.completeSwapped(b.batchId, b.buyTxSig);
-        else if (conf === 'failed') await this.store.markFailed(b.batchId, 'swap reverted (slippage / route)');
+        else if (conf === 'failed')
+          await this.store.markFailed(b.batchId, 'swap reverted (slippage / route)');
         // Stale + still 'unknown': do NOT blindly fail — the swap may have landed but
         // be momentarily unreadable. Route through completeSwapped, which measures the
         // $WOC actually received: >0 settles it (recovered, never stranded); 0 fails the
@@ -205,7 +272,8 @@ export class PayoutKeeper {
   // 'settling' one. Timing 'settling' from created_at would make a batch whose swap
   // confirmed slowly look instantly stale and trigger a premature re-settle.
   private isStale(b: PayoutBatchRow): boolean {
-    const since = b.status === 'settling' && b.settleBroadcastAt ? b.settleBroadcastAt : b.createdAt;
+    const since =
+      b.status === 'settling' && b.settleBroadcastAt ? b.settleBroadcastAt : b.createdAt;
     return this.opts.now() - new Date(since).getTime() > this.opts.staleMs;
   }
 }
@@ -217,11 +285,20 @@ export class PayoutKeeper {
 // --------------------------------------------------------------------------
 
 export function associatedTokenAccount(owner: PublicKey, mint: PublicKey): PublicKey {
-  return PublicKey.findProgramAddressSync([owner.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()], SPL_ATA_PROGRAM)[0];
+  return PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()],
+    SPL_ATA_PROGRAM,
+  )[0];
 }
 
 // SPL Token `BurnChecked` (tag 15): u8 tag + u64 amount(LE) + u8 decimals.
-export function burnCheckedIx(ata: PublicKey, mint: PublicKey, authority: PublicKey, amount: bigint, decimals: number): TransactionInstruction {
+export function burnCheckedIx(
+  ata: PublicKey,
+  mint: PublicKey,
+  authority: PublicKey,
+  amount: bigint,
+  decimals: number,
+): TransactionInstruction {
   const data = Buffer.alloc(10);
   data.writeUInt8(15, 0);
   data.writeBigUInt64LE(amount, 1);
@@ -239,7 +316,14 @@ export function burnCheckedIx(ata: PublicKey, mint: PublicKey, authority: Public
 
 // SPL Token `TransferChecked` (tag 12): u8 tag + u64 amount(LE) + u8 decimals.
 // Used by the top_up settlement to move the bought $WOC into the reward pool.
-export function transferCheckedIx(source: PublicKey, mint: PublicKey, dest: PublicKey, authority: PublicKey, amount: bigint, decimals: number): TransactionInstruction {
+export function transferCheckedIx(
+  source: PublicKey,
+  mint: PublicKey,
+  dest: PublicKey,
+  authority: PublicKey,
+  amount: bigint,
+  decimals: number,
+): TransactionInstruction {
   const data = Buffer.alloc(10);
   data.writeUInt8(12, 0);
   data.writeBigUInt64LE(amount, 1);
@@ -267,9 +351,11 @@ async function wocDecimals(): Promise<number> {
 }
 
 async function vaultTokenBalance(owner: string, mint: string): Promise<bigint> {
-  const res = await solanaRpc<{ value?: Array<{ account?: { data?: { parsed?: { info?: { tokenAmount?: { amount?: string } } } } } }> }>(
-    'getTokenAccountsByOwner', [owner, { mint }, { encoding: 'jsonParsed' }],
-  );
+  const res = await solanaRpc<{
+    value?: Array<{
+      account?: { data?: { parsed?: { info?: { tokenAmount?: { amount?: string } } } } };
+    }>;
+  }>('getTokenAccountsByOwner', [owner, { mint }, { encoding: 'jsonParsed' }]);
   let total = 0n;
   for (const a of res?.value ?? []) {
     const amt = a?.account?.data?.parsed?.info?.tokenAmount?.amount;
@@ -278,7 +364,10 @@ async function vaultTokenBalance(owner: string, mint: string): Promise<bigint> {
   return total;
 }
 
-export function buildProductionDeps(mode: PayoutMode): { exec: PayoutExecutor; store: PayoutStore } {
+export function buildProductionDeps(mode: PayoutMode): {
+  exec: PayoutExecutor;
+  store: PayoutStore;
+} {
   const vault = Keypair.fromSecretKey(bs58.decode(VAULT_SECRET));
   if (vault.publicKey.toBase58() !== VAULT) {
     throw new Error('BUYBACK_VAULT_SECRET does not match BUYBACK_VAULT');
@@ -290,18 +379,29 @@ export function buildProductionDeps(mode: PayoutMode): { exec: PayoutExecutor; s
   const policy = envPolicy();
   const wocMint = new PublicKey(WOC_MINT);
   const vaultWocAta = associatedTokenAccount(vault.publicKey, wocMint);
-  const poolWocAta = mode === 'top_up' ? associatedTokenAccount(new PublicKey(REWARD_POOL_VAULT), wocMint) : null;
+  const poolWocAta =
+    mode === 'top_up' ? associatedTokenAccount(new PublicKey(REWARD_POOL_VAULT), wocMint) : null;
 
-  const signTerminal = async (amountWoc: bigint): Promise<{ signature: string; send(): Promise<void> }> => {
+  const signTerminal = async (
+    amountWoc: bigint,
+  ): Promise<{ signature: string; send(): Promise<void> }> => {
     const decimals = await wocDecimals();
     const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash();
-    const ix = mode === 'top_up'
-      ? transferCheckedIx(vaultWocAta, wocMint, poolWocAta!, vault.publicKey, amountWoc, decimals)
-      : burnCheckedIx(vaultWocAta, wocMint, vault.publicKey, amountWoc, decimals);
-    const tx = new Transaction({ feePayer: vault.publicKey, blockhash, lastValidBlockHeight }).add(ix);
+    const ix =
+      mode === 'top_up'
+        ? transferCheckedIx(vaultWocAta, wocMint, poolWocAta!, vault.publicKey, amountWoc, decimals)
+        : burnCheckedIx(vaultWocAta, wocMint, vault.publicKey, amountWoc, decimals);
+    const tx = new Transaction({ feePayer: vault.publicKey, blockhash, lastValidBlockHeight }).add(
+      ix,
+    );
     tx.sign(vault);
     const signature = bs58.encode(tx.signature!);
-    return { signature, send: async () => { await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 }); } };
+    return {
+      signature,
+      send: async () => {
+        await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 });
+      },
+    };
   };
 
   const exec: PayoutExecutor = {
@@ -316,7 +416,7 @@ export function buildProductionDeps(mode: PayoutMode): { exec: PayoutExecutor; s
       const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
       if (!res.ok) return null;
       const data = (await res.json()) as { outAmount?: string; routePlan?: unknown[] };
-      if (!data.outAmount || !(data.routePlan?.length)) return null; // no route
+      if (!data.outAmount || !data.routePlan?.length) return null; // no route
       return { outWoc: BigInt(data.outAmount), raw: data };
     },
 
@@ -324,7 +424,12 @@ export function buildProductionDeps(mode: PayoutMode): { exec: PayoutExecutor; s
       const res = await fetch(`${JUPITER_API}/swap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quoteResponse: quoteRaw, userPublicKey: VAULT, wrapAndUnwrapSol: false, dynamicComputeUnitLimit: true }),
+        body: JSON.stringify({
+          quoteResponse: quoteRaw,
+          userPublicKey: VAULT,
+          wrapAndUnwrapSol: false,
+          dynamicComputeUnitLimit: true,
+        }),
         signal: AbortSignal.timeout(10_000),
       });
       if (!res.ok) throw new Error(`jupiter swap build failed (${res.status})`);
@@ -332,7 +437,12 @@ export function buildProductionDeps(mode: PayoutMode): { exec: PayoutExecutor; s
       const tx = VersionedTransaction.deserialize(Buffer.from(swapTransaction, 'base64'));
       tx.sign([vault]);
       const signature = bs58.encode(tx.signatures[0]);
-      return { signature, send: async () => { await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 }); } };
+      return {
+        signature,
+        send: async () => {
+          await conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 5 });
+        },
+      };
     },
 
     confirm: signatureStatus,
@@ -348,11 +458,16 @@ export function buildProductionDeps(mode: PayoutMode): { exec: PayoutExecutor; s
   };
 
   const store: PayoutStore = {
-    createBatch: (b) => createBuybackBatch({
-      batchId: b.batchId, mode, source: 'marketplace', usdcIn: b.usdcIn, buyTxSig: b.buyTxSig,
-      seasonId: mode === 'top_up' ? BUYBACK_SEASON_ID : null,
-      dest: mode === 'top_up' ? REWARD_POOL_VAULT : null,
-    }),
+    createBatch: (b) =>
+      createBuybackBatch({
+        batchId: b.batchId,
+        mode,
+        source: 'marketplace',
+        usdcIn: b.usdcIn,
+        buyTxSig: b.buyTxSig,
+        seasonId: mode === 'top_up' ? BUYBACK_SEASON_ID : null,
+        dest: mode === 'top_up' ? REWARD_POOL_VAULT : null,
+      }),
     markSwapped: markBatchSwapped,
     markSettling: markBatchSettling,
     markSettled: markBatchSettled,
@@ -376,7 +491,12 @@ export function buildPayoutKeeper(): PayoutKeeper | null {
     const ledger = new FlowLedger(new PgFlowLedgerDb());
     onSettled = async ({ wocSettled, settleTxSig }) => {
       await ledger.ensureSeason(BUYBACK_SEASON_ID);
-      await ledger.creditInflow({ seasonId: BUYBACK_SEASON_ID, source: 'marketplace_buyback', amountBase: wocSettled, txSig: settleTxSig });
+      await ledger.creditInflow({
+        seasonId: BUYBACK_SEASON_ID,
+        source: 'marketplace_buyback',
+        amountBase: wocSettled,
+        txSig: settleTxSig,
+      });
     };
   }
   return new PayoutKeeper(exec, store, envPolicy(), {

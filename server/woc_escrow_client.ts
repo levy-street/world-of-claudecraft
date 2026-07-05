@@ -8,17 +8,28 @@
 // lib.rs exactly (order, signer, writable). Match PDA = ["match", match_id u64
 // le]; the pot vault is the ATA of that PDA. Distribution (#480) encoders are
 // intentionally omitted until the on-chain payout path has a server caller.
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction, SystemProgram } from '@solana/web3.js';
+
 import { createHash } from 'node:crypto';
+import {
+  type Connection,
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import bs58 from 'bs58';
 import { SPL_TOKEN_PROGRAM } from './solana_rpc';
 
 export const TOKEN_PROGRAM_ID = new PublicKey(SPL_TOKEN_PROGRAM);
-export const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+export const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey(
+  'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
+);
 
 // ----- encoding primitives -----
 
-const disc = (name: string): Buffer => createHash('sha256').update(`global:${name}`).digest().subarray(0, 8);
+const disc = (name: string): Buffer =>
+  createHash('sha256').update(`global:${name}`).digest().subarray(0, 8);
 const u64 = (n: bigint): Buffer => {
   const b = Buffer.alloc(8);
   b.writeBigUInt64LE(n);
@@ -29,7 +40,11 @@ const u16 = (n: number): Buffer => {
   b.writeUInt16LE(n);
   return b;
 };
-const acc = (pubkey: PublicKey, isSigner: boolean, isWritable: boolean) => ({ pubkey, isSigner, isWritable });
+const acc = (pubkey: PublicKey, isSigner: boolean, isWritable: boolean) => ({
+  pubkey,
+  isSigner,
+  isWritable,
+});
 
 // ----- PDAs -----
 
@@ -70,7 +85,13 @@ export function openMatchIx(p: OpenMatchParams): TransactionInstruction {
       acc(ASSOCIATED_TOKEN_PROGRAM_ID, false, false),
       acc(SystemProgram.programId, false, false),
     ],
-    data: Buffer.concat([disc('open_match'), u64(p.matchId), u64(p.stakeBase), u16(p.rakeBps), p.settler.toBuffer()]),
+    data: Buffer.concat([
+      disc('open_match'),
+      u64(p.matchId),
+      u64(p.stakeBase),
+      u16(p.rakeBps),
+      p.settler.toBuffer(),
+    ]),
   });
 }
 
@@ -177,7 +198,9 @@ export function loadKeypairFromEnv(envVar: string): Keypair {
   const raw = process.env[envVar];
   if (!raw) throw new Error(`${envVar} is not set`);
   const trimmed = raw.trim();
-  const bytes = trimmed.startsWith('[') ? Uint8Array.from(JSON.parse(trimmed)) : bs58.decode(trimmed);
+  const bytes = trimmed.startsWith('[')
+    ? Uint8Array.from(JSON.parse(trimmed))
+    : bs58.decode(trimmed);
   return Keypair.fromSecretKey(bytes);
 }
 
@@ -186,9 +209,17 @@ export function loadKeypairFromEnv(envVar: string): Keypair {
  * fetched blockhash + lastValidBlockHeight for expiry-aware confirmation (not the
  * deprecated signature-only overload).
  */
-export async function sendIx(connection: Connection, ixs: TransactionInstruction[], signers: Keypair[]): Promise<string> {
+export async function sendIx(
+  connection: Connection,
+  ixs: TransactionInstruction[],
+  signers: Keypair[],
+): Promise<string> {
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
-  const tx = new Transaction({ feePayer: signers[0].publicKey, blockhash, lastValidBlockHeight }).add(...ixs);
+  const tx = new Transaction({
+    feePayer: signers[0].publicKey,
+    blockhash,
+    lastValidBlockHeight,
+  }).add(...ixs);
   const signature = await connection.sendTransaction(tx, signers);
   await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
   return signature;

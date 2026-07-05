@@ -5,7 +5,7 @@
 //
 // CI-safe: skips entirely unless PG_TEST_URL points at a disposable Postgres.
 //   PG_TEST_URL=postgres://test:test@127.0.0.1:5544/test npx vitest run tests/arena_wager_db.integration.test.ts
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 const PG_TEST_URL = process.env.PG_TEST_URL;
 if (PG_TEST_URL) process.env.DATABASE_URL = PG_TEST_URL;
@@ -16,15 +16,22 @@ const { pool, ensureSchema } = await import('../server/db');
 const wager = await import('../server/arena_wager_db');
 
 const sampleMatch = (matchId: bigint) => ({
-  matchId, creatorPid: 11, opponentPid: 22,
+  matchId,
+  creatorPid: 11,
+  opponentPid: 22,
   creatorWallet: '3HTkBFPWnQJiEs4Q7tvdPiesmodQ2ZFWzp82Lg16dYPp',
   opponentWallet: 'ADBEVxjxgxJ4ogU2uPpGsKcfwHr2wEMw5aQo25BoAS4c',
-  stakeBase: 100_000_000n, rakeBps: 500,
+  stakeBase: 100_000_000n,
+  rakeBps: 500,
 });
 
 describe.skipIf(!PG_TEST_URL)('arena_wager_db (real Postgres)', () => {
-  beforeAll(async () => { await ensureSchema(); });
-  afterAll(async () => { await pool.end(); });
+  beforeAll(async () => {
+    await ensureSchema();
+  });
+  afterAll(async () => {
+    await pool.end();
+  });
   beforeEach(async () => {
     await pool.query('TRUNCATE woc_wager_matches RESTART IDENTITY CASCADE');
     await pool.query('ALTER SEQUENCE woc_wager_match_id_seq RESTART WITH 1');
@@ -45,11 +52,17 @@ describe.skipIf(!PG_TEST_URL)('arena_wager_db (real Postgres)', () => {
     await wager.insertWagerMatch(sampleMatch(id));
     const row = await wager.getWagerMatch(id);
     expect(row).toEqual({
-      matchId: id, creatorPid: 11, opponentPid: 22,
+      matchId: id,
+      creatorPid: 11,
+      opponentPid: 22,
       creatorWallet: '3HTkBFPWnQJiEs4Q7tvdPiesmodQ2ZFWzp82Lg16dYPp',
       opponentWallet: 'ADBEVxjxgxJ4ogU2uPpGsKcfwHr2wEMw5aQo25BoAS4c',
-      stakeBase: 100_000_000n, rakeBps: 500,
-      phase: 'awaiting_stakes', openSig: null, joinSig: null, settleSig: null,
+      stakeBase: 100_000_000n,
+      rakeBps: 500,
+      phase: 'awaiting_stakes',
+      openSig: null,
+      joinSig: null,
+      settleSig: null,
     });
   });
 
@@ -78,14 +91,23 @@ describe.skipIf(!PG_TEST_URL)('arena_wager_db (real Postgres)', () => {
 
   it('recoverableLockedMatches returns only in_bout/settling rows (the crash-orphaned pots)', async () => {
     const ids: Record<string, bigint> = {};
-    for (const phase of ['awaiting_stakes', 'in_bout', 'settling', 'settled', 'refunded', 'cancelled'] as const) {
+    for (const phase of [
+      'awaiting_stakes',
+      'in_bout',
+      'settling',
+      'settled',
+      'refunded',
+      'cancelled',
+    ] as const) {
       const id = await wager.allocateWagerMatchId();
       await wager.insertWagerMatch(sampleMatch(id));
       if (phase !== 'awaiting_stakes') await wager.setWagerPhase(id, phase);
       ids[phase] = id;
     }
     const recoverable = await wager.recoverableLockedMatches();
-    expect(recoverable.map((m) => m.matchId).sort((x, y) => Number(x - y))).toEqual([ids.in_bout, ids.settling].sort((x, y) => Number(x - y)));
+    expect(recoverable.map((m) => m.matchId).sort((x, y) => Number(x - y))).toEqual(
+      [ids.in_bout, ids.settling].sort((x, y) => Number(x - y)),
+    );
   });
 
   it('cancelStaleAwaitingMatches flips only awaiting_stakes rows and reports the count', async () => {

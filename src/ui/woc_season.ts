@@ -85,7 +85,17 @@ const clampPct = (n: number): number => Math.max(0, Math.min(100, n));
  * time has passed, presents as 'ended' (no countdown).
  */
 export function formatSeasonView(payload: WocSeasonPayload | null, nowMs: number): SeasonView {
-  const none: SeasonView = { state: 'none', seasonId: null, label: '', poolWoc: '0', sinkWoc: '0', emissionWoc: '0', emittedPct: 0, countdown: null, standings: [] };
+  const none: SeasonView = {
+    state: 'none',
+    seasonId: null,
+    label: '',
+    poolWoc: '0',
+    sinkWoc: '0',
+    emissionWoc: '0',
+    emittedPct: 0,
+    countdown: null,
+    standings: [],
+  };
   if (!payload || !payload.season) return none;
   const s = payload.season;
   const d = payload.decimals;
@@ -100,10 +110,19 @@ export function formatSeasonView(payload: WocSeasonPayload | null, nowMs: number
     if (Number.isFinite(endMs)) {
       const totalMs = endMs - nowMs;
       if (totalMs <= 0) state = 'ended';
-      else countdown = { days: Math.floor(totalMs / 86_400_000), hours: Math.floor((totalMs % 86_400_000) / 3_600_000), minutes: Math.floor((totalMs % 3_600_000) / 60_000), totalMs };
+      else
+        countdown = {
+          days: Math.floor(totalMs / 86_400_000),
+          hours: Math.floor((totalMs % 86_400_000) / 3_600_000),
+          minutes: Math.floor((totalMs % 3_600_000) / 60_000),
+          totalMs,
+        };
     }
   }
-  if (s.status !== 'active') { state = 'ended'; countdown = null; }
+  if (s.status !== 'active') {
+    state = 'ended';
+    countdown = null;
+  }
 
   return {
     state,
@@ -114,7 +133,12 @@ export function formatSeasonView(payload: WocSeasonPayload | null, nowMs: number
     emissionWoc: baseToWoc(s.emissionBase, d),
     emittedPct,
     countdown,
-    standings: (payload.standings ?? []).map((st) => ({ rank: st.rank, name: st.name, rating: st.rating, rewardWoc: baseToWoc(st.rewardBase, d) })),
+    standings: (payload.standings ?? []).map((st) => ({
+      rank: st.rank,
+      name: st.name,
+      rating: st.rating,
+      rewardWoc: baseToWoc(st.rewardBase, d),
+    })),
   };
 }
 
@@ -147,5 +171,7 @@ export function currentSeasonView(nowMs: number): SeasonView {
 /** Subscribe to season-state changes (re-render the panel). One listener. */
 export function onWocSeasonChange(cb: () => void): () => void {
   listener = cb;
-  return () => { if (listener === cb) listener = null; };
+  return () => {
+    if (listener === cb) listener = null;
+  };
 }

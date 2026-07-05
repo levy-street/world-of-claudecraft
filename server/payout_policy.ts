@@ -36,7 +36,12 @@ export const DEFAULT_PAYOUT_POLICY: PayoutPolicy = {
  * (even past cadence) until it clears `minBatchUsdc`, so a batch can never spend
  * more in fees than it swaps.
  */
-export function shouldRunBatch(p: { availableUsdc: bigint; lastBurnAt: number | null; now: number; policy: PayoutPolicy }): boolean {
+export function shouldRunBatch(p: {
+  availableUsdc: bigint;
+  lastBurnAt: number | null;
+  now: number;
+  policy: PayoutPolicy;
+}): boolean {
   if (p.availableUsdc < p.policy.minBatchUsdc) return false;
   if (p.availableUsdc >= p.policy.thresholdUsdc) return true;
   const sinceLast = p.lastBurnAt === null ? Infinity : p.now - p.lastBurnAt;

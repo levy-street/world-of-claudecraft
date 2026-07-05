@@ -3,11 +3,16 @@
 // fakes, so the service's REAL logic (the hold-to-queue + active-season + linked-
 // wallet gate, stake parsing, command delegation, recovery orchestration) is
 // exercised end to end without a chain, a DB, or a server.
-import { describe, it, expect, vi } from 'vitest';
-import { Keypair, PublicKey } from '@solana/web3.js';
-import { ArenaWagerService, parseStakeBase, type ArenaWagerServiceDeps } from '../server/arena_wager_service';
-import type { ArenaWagerCoordinator, WagerClientMsg, EnqueueResult } from '../server/arena_wager';
+
+import { Keypair, type PublicKey } from '@solana/web3.js';
+import { describe, expect, it, vi } from 'vitest';
 import type { ArenaEscrow } from '../server/arena_escrow';
+import type { ArenaWagerCoordinator, EnqueueResult, WagerClientMsg } from '../server/arena_wager';
+import {
+  ArenaWagerService,
+  type ArenaWagerServiceDeps,
+  parseStakeBase,
+} from '../server/arena_wager_service';
 
 const WALLET = Keypair.generate().publicKey.toBase58();
 
@@ -16,11 +21,25 @@ function setup(over: Partial<ArenaWagerServiceDeps> = {}) {
   const coord = {
     enqueueResult: { ok: true, queued: false } as EnqueueResult,
     calls: [] as { fn: string; args: any[] }[],
-    enqueue(p: any) { this.calls.push({ fn: 'enqueue', args: [p] }); return Promise.resolve(this.enqueueResult); },
-    onStakeSubmitted(...a: any[]) { this.calls.push({ fn: 'onStakeSubmitted', args: a }); return Promise.resolve(); },
-    dequeue(...a: any[]) { this.calls.push({ fn: 'dequeue', args: a }); },
-    onBoutEnd(...a: any[]) { this.calls.push({ fn: 'onBoutEnd', args: a }); return Promise.resolve(); },
-    poll() { this.calls.push({ fn: 'poll', args: [] }); return Promise.resolve(); },
+    enqueue(p: any) {
+      this.calls.push({ fn: 'enqueue', args: [p] });
+      return Promise.resolve(this.enqueueResult);
+    },
+    onStakeSubmitted(...a: any[]) {
+      this.calls.push({ fn: 'onStakeSubmitted', args: a });
+      return Promise.resolve();
+    },
+    dequeue(...a: any[]) {
+      this.calls.push({ fn: 'dequeue', args: a });
+    },
+    onBoutEnd(...a: any[]) {
+      this.calls.push({ fn: 'onBoutEnd', args: a });
+      return Promise.resolve();
+    },
+    poll() {
+      this.calls.push({ fn: 'poll', args: [] });
+      return Promise.resolve();
+    },
   };
   const escrow = {
     matchStatus: vi.fn(async (): Promise<number | null> => null), // closed PDA => reconcile, no refund
@@ -37,16 +56,23 @@ function setup(over: Partial<ArenaWagerServiceDeps> = {}) {
     seasonActive: async () => true,
     escrow: escrow as unknown as ArenaEscrow,
     store,
-    loadRecoverable: async () => [{ matchId: 9n, creatorWallet: WALLET, opponentWallet: WALLET, stakeBase: 100n }],
+    loadRecoverable: async () => [
+      { matchId: 9n, creatorWallet: WALLET, opponentWallet: WALLET, stakeBase: 100n },
+    ],
     cancelStale: async () => 2,
     ...over,
   };
   return { service: new ArenaWagerService(deps), sent, coord, escrow, store };
 }
-const lastError = (sent: { msg: WagerClientMsg }[]) => sent.filter((s) => s.msg.t === 'wager_error').map((s) => (s.msg as any).reason).pop();
+const lastError = (sent: { msg: WagerClientMsg }[]) =>
+  sent
+    .filter((s) => s.msg.t === 'wager_error')
+    .map((s) => (s.msg as any).reason)
+    .pop();
 
 describe('parseStakeBase (boundary + invalid input)', () => {
-  it('accepts a positive integer string', () => expect(parseStakeBase('100000000')).toBe(100_000_000n));
+  it('accepts a positive integer string', () =>
+    expect(parseStakeBase('100000000')).toBe(100_000_000n));
   it('rejects zero, negative, empty, non-numeric, leading-zero, and non-string', () => {
     for (const bad of ['0', '-5', '', 'abc', '01', '1.5', ' 10', 10 as unknown, null, undefined]) {
       expect(parseStakeBase(bad)).toBe(null);
@@ -74,7 +100,10 @@ describe('ArenaWagerService.handleQueue gate', () => {
     expect(lastError(sent)).toBe('Link a verified $WOC wallet to wager.');
   });
   it('rejects when the holder tier is below the hold-to-queue minimum', async () => {
-    const { service, sent, coord } = setup({ holderInfoFor: async () => ({ tier: 0, balance: 5 }), minHolderTier: 1 });
+    const { service, sent, coord } = setup({
+      holderInfoFor: async () => ({ tier: 0, balance: 5 }),
+      minHolderTier: 1,
+    });
     await service.handleQueue(sess, '100000000');
     expect(lastError(sent)).toBe('You need to hold more $WOC to enter wagered matches.');
     expect(coord.calls).toHaveLength(0);
@@ -101,7 +130,9 @@ describe('ArenaWagerService delegation', () => {
     const { service, coord } = setup();
     await service.handleStaked(sess, 'match-1', 'sig-1');
     await service.handleStaked(sess, 123 as unknown, 'sig'); // bad matchId
-    expect(coord.calls.filter((c) => c.fn === 'onStakeSubmitted')).toEqual([{ fn: 'onStakeSubmitted', args: [7, 'match-1', 'sig-1'] }]);
+    expect(coord.calls.filter((c) => c.fn === 'onStakeSubmitted')).toEqual([
+      { fn: 'onStakeSubmitted', args: [7, 'match-1', 'sig-1'] },
+    ]);
   });
   it('handleCancel and onLeave dequeue, onArenaEnd settles, poll ticks', async () => {
     const { service, coord } = setup();

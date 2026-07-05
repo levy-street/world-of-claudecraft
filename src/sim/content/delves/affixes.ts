@@ -14,4 +14,9 @@ export const DELVE_AFFIXES: Record<string, DelveAffixDef> = {
     themes: ['crypt', 'vault', 'sewer'],
   },
   chapel_candle: { id: 'chapel_candle', name: 'Chapel Candle', themes: ['crypt'], blessing: true },
+  high_water: { id: 'high_water', name: 'High Water', themes: ['ruin', 'sewer'] },
+  lively_choir: { id: 'lively_choir', name: 'Lively Choir', themes: ['ruin'] },
+  // ruin-only: its hooks gate on grave_silt_bulwark (a litany mob), so a crypt
+  // roll would displace a real collapsed_reliquary affix with an inert one.
+  belligerent_dead: { id: 'belligerent_dead', name: 'Belligerent Dead', themes: ['ruin'] },
 };

@@ -11,6 +11,16 @@ const DELVE_MODULE_VARIANT: Record<DelveModuleId, DungeonInteriorVariant> = {
   reliquary_bell_niche: 'delve_bell',
   reliquary_saintless_hall: 'delve_hall',
   reliquary_finale: 'delve_finale',
+  // Drowned Litany (Phase 2): marsh-ruin dressing. The six trash modules light
+  // with sickly bog-green flame (delve_marsh, ossuary-style wet shelves over
+  // cracked flags); the apse is the raised boss stage under a colder corpse-glow.
+  litany_sluice: 'delve_marsh',
+  litany_ledger: 'delve_marsh',
+  litany_ring: 'delve_marsh',
+  litany_baptistry: 'delve_marsh',
+  litany_choir_loft: 'delve_marsh',
+  litany_causeway: 'delve_marsh',
+  litany_apse: 'delve_marsh_apse',
 };
 
 /** Build one delve module at a world origin (crypt KayKit kit + that module's delve layout). */
@@ -29,5 +39,12 @@ export function buildDelveModule(
   // with per-module reliquary dressing.
   const layout = DELVE_MODULE_LAYOUTS[moduleId];
   const variant = DELVE_MODULE_VARIANT[moduleId] ?? 'delve_ossuary';
-  return dungeons.buildInterior(interior, ox, oz, { layout, variant });
+  // Static Blackwater hazard pools (The Drowned Litany) are authored on the module
+  // def; the renderer draws a visible pool at each so the sim's damage zone reads.
+  return dungeons.buildInterior(interior, ox, oz, {
+    layout,
+    variant,
+    hazards: mod?.hazards,
+    moduleId,
+  });
 }

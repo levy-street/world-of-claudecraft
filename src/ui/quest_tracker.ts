@@ -18,6 +18,8 @@ export interface TrackedObjective {
 
 export interface TrackedQuest {
   id: string;
+  /** 1-based acceptance-order number, matching the world map's badges. */
+  number: number;
   /** Already-localized quest title. */
   title: string;
   /** True when the quest is ready to turn in (the "(Complete)" state). */
@@ -31,6 +33,7 @@ export interface QuestTrackerObjectiveRow extends TrackedObjective {
 
 export interface QuestTrackerQuestRow {
   id: string;
+  number: number;
   title: string;
   complete: boolean;
   objectives: QuestTrackerObjectiveRow[];
@@ -49,12 +52,16 @@ export interface QuestTrackerView {
 /** Build the tracker view from the tracked quests + the collapse preference.
  *  Collapsed renders the header only (with the quest count); expanded renders
  *  every quest and objective, with each objective's done state computed. */
-export function questTrackerView(quests: readonly TrackedQuest[], collapsed: boolean): QuestTrackerView {
+export function questTrackerView(
+  quests: readonly TrackedQuest[],
+  collapsed: boolean,
+): QuestTrackerView {
   const count = quests.length;
   if (count === 0) return { visible: false, collapsed, count: 0, quests: [] };
   if (collapsed) return { visible: true, collapsed: true, count, quests: [] };
   const questRows = quests.map((q) => ({
     id: q.id,
+    number: q.number,
     title: q.title,
     complete: q.complete,
     objectives: q.objectives.map((o) => ({ ...o, done: o.current >= o.total })),

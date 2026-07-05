@@ -55,7 +55,12 @@ export function directionOf(source: FlowSource): FlowDirection {
 
 // Why an emission was allowed or refused. `budget_exceeded` is the invariant
 // firing: the requested payout would push season emissions above verified sinks.
-export type FlowReason = 'budget_exceeded' | 'duplicate' | 'bad_amount' | 'wrong_direction' | 'season_closed';
+export type FlowReason =
+  | 'budget_exceeded'
+  | 'duplicate'
+  | 'bad_amount'
+  | 'wrong_direction'
+  | 'season_closed';
 
 /**
  * THE invariant, as a pure decision over base-unit integers. Allow an emission
@@ -150,7 +155,8 @@ export class FlowLedger {
   async creditInflow(input: FlowEntryInput): Promise<InflowResult> {
     if (directionOf(input.source) !== 'in') return { ok: false, reason: 'wrong_direction' };
     if (input.amountBase <= 0n) return { ok: false, reason: 'bad_amount' };
-    if (!(await this.db.seasonIsOpen(input.seasonId))) return { ok: false, reason: 'season_closed' };
+    if (!(await this.db.seasonIsOpen(input.seasonId)))
+      return { ok: false, reason: 'season_closed' };
     return this.db.recordInflow(input);
   }
 

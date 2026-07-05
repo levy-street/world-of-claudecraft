@@ -2,14 +2,22 @@
 // solana/programs/woc_escrow/src/lib.rs: Anchor discriminator (sha256("global:
 // <ix>")[:8]), borsh args, and the exact account list (order, signer, writable)
 // per #[derive(Accounts)]. Pure: no chain, no connection.
-import { describe, it, expect } from 'vitest';
+
 import { createHash } from 'node:crypto';
-import bs58 from 'bs58';
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import bs58 from 'bs58';
+import { describe, expect, it } from 'vitest';
 import {
-  openMatchIx, joinMatchIx, settleMatchIx, cancelMatchIx, refundMatchIx,
-  matchPda, vaultAta, loadKeypairFromEnv,
-  TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  cancelMatchIx,
+  joinMatchIx,
+  loadKeypairFromEnv,
+  matchPda,
+  openMatchIx,
+  refundMatchIx,
+  settleMatchIx,
+  TOKEN_PROGRAM_ID,
+  vaultAta,
 } from '../server/woc_escrow_client';
 
 const programId = new PublicKey('Fn4LMsV7akGX9KXwYv4uh2v8nM2uqgaAxhKrsYYbZqcJ');
@@ -31,14 +39,23 @@ describe('PDAs', () => {
   it('vaultAta is the canonical ATA of its owner', () => {
     const m = matchPda(programId, 7n);
     const expected = PublicKey.findProgramAddressSync(
-      [m.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()], ASSOCIATED_TOKEN_PROGRAM_ID,
+      [m.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+      ASSOCIATED_TOKEN_PROGRAM_ID,
     )[0];
     expect(vaultAta(m, mint).equals(expected)).toBe(true);
   });
 });
 
 describe('open_match', () => {
-  const ix = openMatchIx({ programId, mint, matchId: 1n, stakeBase: 100_000_000n, rakeBps: 500, creator, settler });
+  const ix = openMatchIx({
+    programId,
+    mint,
+    matchId: 1n,
+    stakeBase: 100_000_000n,
+    rakeBps: 500,
+    creator,
+    settler,
+  });
   it('targets the program with the open_match discriminator', () => {
     expect(ix.programId.equals(programId)).toBe(true);
     expect(ix.data.subarray(0, 8).equals(disc('open_match'))).toBe(true);
@@ -53,9 +70,14 @@ describe('open_match', () => {
   it('has the 8 accounts in lib.rs order with correct signer/writable', () => {
     const match = matchPda(programId, 1n);
     expect(ix.keys.map((k) => k.pubkey.toBase58())).toEqual([
-      creator.toBase58(), match.toBase58(), mint.toBase58(), vaultAta(match, mint).toBase58(),
-      vaultAta(creator, mint).toBase58(), TOKEN_PROGRAM_ID.toBase58(),
-      ASSOCIATED_TOKEN_PROGRAM_ID.toBase58(), SystemProgram.programId.toBase58(),
+      creator.toBase58(),
+      match.toBase58(),
+      mint.toBase58(),
+      vaultAta(match, mint).toBase58(),
+      vaultAta(creator, mint).toBase58(),
+      TOKEN_PROGRAM_ID.toBase58(),
+      ASSOCIATED_TOKEN_PROGRAM_ID.toBase58(),
+      SystemProgram.programId.toBase58(),
     ]);
     expect(flags(ix)).toEqual(['sw', '-w', '--', '-w', '-w', '--', '--', '--']);
   });
@@ -71,8 +93,11 @@ describe('join_match', () => {
   it('5 accounts: opponent signer, vault + opponent_token writable', () => {
     const match = matchPda(programId, 1n);
     expect(ix.keys.map((k) => k.pubkey.toBase58())).toEqual([
-      opponent.toBase58(), match.toBase58(), vaultAta(match, mint).toBase58(),
-      vaultAta(opponent, mint).toBase58(), TOKEN_PROGRAM_ID.toBase58(),
+      opponent.toBase58(),
+      match.toBase58(),
+      vaultAta(match, mint).toBase58(),
+      vaultAta(opponent, mint).toBase58(),
+      TOKEN_PROGRAM_ID.toBase58(),
     ]);
     expect(flags(ix)).toEqual(['sw', '-w', '-w', '-w', '--']);
   });
@@ -87,8 +112,13 @@ describe('settle_match', () => {
   it('7 accounts: settler signs, creator rent-dest, mint+vault+winner writable', () => {
     const match = matchPda(programId, 1n);
     expect(ix.keys.map((k) => k.pubkey.toBase58())).toEqual([
-      settler.toBase58(), creator.toBase58(), match.toBase58(), mint.toBase58(),
-      vaultAta(match, mint).toBase58(), vaultAta(winner, mint).toBase58(), TOKEN_PROGRAM_ID.toBase58(),
+      settler.toBase58(),
+      creator.toBase58(),
+      match.toBase58(),
+      mint.toBase58(),
+      vaultAta(match, mint).toBase58(),
+      vaultAta(winner, mint).toBase58(),
+      TOKEN_PROGRAM_ID.toBase58(),
     ]);
     expect(flags(ix)).toEqual(['sw', '-w', '-w', '-w', '-w', '-w', '--']);
   });
@@ -111,8 +141,13 @@ describe('refund_match', () => {
   it('7 accounts: settler signs, both player tokens writable for the split refund', () => {
     const match = matchPda(programId, 1n);
     expect(ix.keys.map((k) => k.pubkey.toBase58())).toEqual([
-      settler.toBase58(), creator.toBase58(), match.toBase58(), vaultAta(match, mint).toBase58(),
-      vaultAta(creator, mint).toBase58(), vaultAta(opponent, mint).toBase58(), TOKEN_PROGRAM_ID.toBase58(),
+      settler.toBase58(),
+      creator.toBase58(),
+      match.toBase58(),
+      vaultAta(match, mint).toBase58(),
+      vaultAta(creator, mint).toBase58(),
+      vaultAta(opponent, mint).toBase58(),
+      TOKEN_PROGRAM_ID.toBase58(),
     ]);
     expect(flags(ix)).toEqual(['sw', '-w', '-w', '-w', '-w', '-w', '--']);
   });
@@ -136,6 +171,8 @@ describe('loadKeypairFromEnv', () => {
   });
   it('throws loudly when unset', () => {
     delete process.env.WOC_TEST_KP_MISSING;
-    expect(() => loadKeypairFromEnv('WOC_TEST_KP_MISSING')).toThrow('WOC_TEST_KP_MISSING is not set');
+    expect(() => loadKeypairFromEnv('WOC_TEST_KP_MISSING')).toThrow(
+      'WOC_TEST_KP_MISSING is not set',
+    );
   });
 });

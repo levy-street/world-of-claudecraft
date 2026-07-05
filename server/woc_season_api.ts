@@ -3,8 +3,9 @@
 // public, every-client-polled route off the DB hot path, live here as a pure
 // composition + an injectable-clock cache, so the route logic is unit-tested
 // without booting a server (main.ts is just the thin wiring).
-import { projectSeasonRewards } from './reward_tiers';
+
 import type { WocSeasonStatus } from './flow_ledger_db';
+import { projectSeasonRewards } from './reward_tiers';
 
 export interface SeasonStanding {
   rank: number;
@@ -26,10 +27,22 @@ export interface RankedLadderEntry {
  * Project the season pool across the (best-first) arena ladder into serializable
  * standings. Pure; null season yields no standings.
  */
-export function buildSeasonStandings(season: WocSeasonStatus | null, ladder: RankedLadderEntry[], tierBps: number[]): SeasonStanding[] {
+export function buildSeasonStandings(
+  season: WocSeasonStatus | null,
+  ladder: RankedLadderEntry[],
+  tierBps: number[],
+): SeasonStanding[] {
   if (!season) return [];
-  return projectSeasonRewards(BigInt(season.poolBase), ladder.map((r) => ({ name: r.name, rating: r.rating })), tierBps)
-    .map((s) => ({ rank: s.rank, name: s.name, rating: s.rating, rewardBase: s.rewardBase.toString() }));
+  return projectSeasonRewards(
+    BigInt(season.poolBase),
+    ladder.map((r) => ({ name: r.name, rating: r.rating })),
+    tierBps,
+  ).map((s) => ({
+    rank: s.rank,
+    name: s.name,
+    rating: s.rating,
+    rewardBase: s.rewardBase.toString(),
+  }));
 }
 
 export interface SeasonBodyDeps {
@@ -57,7 +70,11 @@ export class SeasonBodyCache {
     const season = await this.deps.fetchSeason();
     const tierBps = this.deps.tierBps();
     const ladder = season ? await this.deps.fetchLadder(tierBps.length) : [];
-    const body: SeasonBody = { season, standings: buildSeasonStandings(season, ladder, tierBps), decimals: this.deps.decimals };
+    const body: SeasonBody = {
+      season,
+      standings: buildSeasonStandings(season, ladder, tierBps),
+      decimals: this.deps.decimals,
+    };
     this.cached = { at: now, body };
     return body;
   }

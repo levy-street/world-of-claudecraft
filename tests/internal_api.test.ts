@@ -1,5 +1,14 @@
 import { EventEmitter } from 'node:events';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// server/internal imports server/db, which throws at import time when DATABASE_URL
+// is unset (the PR-tier CI suite runs with no Postgres). This test only exercises
+// the restart-countdown endpoint and never issues a query, so set a dummy URL
+// before the module graph loads (the pg Pool stays lazy and never connects).
+vi.hoisted(() => {
+  process.env.DATABASE_URL ??= 'postgres://localhost:5432/woc_test';
+});
+
 import { handleInternalApi } from '../server/internal';
 
 function fakeReq(opts: { method?: string; url?: string; secret?: string } = {}) {
@@ -14,8 +23,12 @@ function fakeRes() {
   const res: any = {
     statusCode: 0,
     body: null as any,
-    writeHead(status: number) { this.statusCode = status; },
-    end(data?: string) { this.body = data ? JSON.parse(data) : null; },
+    writeHead(status: number) {
+      this.statusCode = status;
+    },
+    end(data?: string) {
+      this.body = data ? JSON.parse(data) : null;
+    },
   };
   return res;
 }
@@ -33,7 +46,9 @@ describe('internal api', () => {
     delete process.env.RESTART_COUNTDOWN_SECRET;
     const res = fakeRes();
 
-    await handleInternalApi(fakeReq({ secret: 'deploy-secret' }), res, { startRestartCountdown: vi.fn() } as any);
+    await handleInternalApi(fakeReq({ secret: 'deploy-secret' }), res, {
+      startRestartCountdown: vi.fn(),
+    } as any);
 
     expect(res.statusCode).toBe(404);
     expect(res.body.error).toBe('unknown endpoint');
@@ -43,7 +58,9 @@ describe('internal api', () => {
     process.env.RESTART_COUNTDOWN_SECRET = 'deploy-secret';
     const res = fakeRes();
 
-    await handleInternalApi(fakeReq({ secret: 'wrong' }), res, { startRestartCountdown: vi.fn() } as any);
+    await handleInternalApi(fakeReq({ secret: 'wrong' }), res, {
+      startRestartCountdown: vi.fn(),
+    } as any);
 
     expect(res.statusCode).toBe(401);
     expect(res.body.error).toBe('not authenticated');
@@ -51,7 +68,14 @@ describe('internal api', () => {
 
   it('starts the restart countdown with a valid deploy secret', async () => {
     process.env.RESTART_COUNTDOWN_SECRET = 'deploy-secret';
-    const game = { startRestartCountdown: vi.fn(() => ({ started: true, active: true, totalSeconds: 600, remainingSeconds: 600 })) };
+    const game = {
+      startRestartCountdown: vi.fn(() => ({
+        started: true,
+        active: true,
+        totalSeconds: 600,
+        remainingSeconds: 600,
+      })),
+    };
     const res = fakeRes();
 
     await handleInternalApi(fakeReq({ secret: 'deploy-secret' }), res, game as any);
@@ -63,7 +87,14 @@ describe('internal api', () => {
 
   it('returns conflict when a restart countdown is already active', async () => {
     process.env.RESTART_COUNTDOWN_SECRET = 'deploy-secret';
-    const game = { startRestartCountdown: vi.fn(() => ({ started: false, active: true, totalSeconds: 600, remainingSeconds: 540 })) };
+    const game = {
+      startRestartCountdown: vi.fn(() => ({
+        started: false,
+        active: true,
+        totalSeconds: 600,
+        remainingSeconds: 540,
+      })),
+    };
     const res = fakeRes();
 
     await handleInternalApi(fakeReq({ secret: 'deploy-secret' }), res, game as any);
@@ -76,7 +107,10 @@ describe('internal api', () => {
 describe('internal api — $WOC season ops', () => {
   const previousSecret = process.env.WOC_OPS_SECRET;
   const game = { startRestartCountdown: vi.fn() } as any;
-  const fakeSeasonOps = () => ({ openSeason: vi.fn(async () => {}), closeSeason: vi.fn(async () => {}) });
+  const fakeSeasonOps = () => ({
+    openSeason: vi.fn(async () => {}),
+    closeSeason: vi.fn(async () => {}),
+  });
 
   afterEach(() => {
     if (previousSecret === undefined) delete process.env.WOC_OPS_SECRET;
@@ -95,7 +129,10 @@ describe('internal api — $WOC season ops', () => {
   // (before the await suspends), so feeding the body right after the call works.
   async function call(req: any, res: any, ops: any, body?: unknown): Promise<void> {
     const p = handleInternalApi(req, res, game, ops);
-    if (body !== undefined) { req.emit('data', Buffer.from(JSON.stringify(body))); req.emit('end'); }
+    if (body !== undefined) {
+      req.emit('data', Buffer.from(JSON.stringify(body)));
+      req.emit('end');
+    }
     await p;
   }
 
@@ -126,10 +163,18 @@ describe('internal api — $WOC season ops', () => {
     process.env.WOC_OPS_SECRET = 'ops';
     const ops = fakeSeasonOps();
     const res = fakeRes();
-    await call(seasonReq('/internal/woc/season/open', 'ops'), res, ops, { seasonId: 4, label: 'S4', endsAt: '2026-07-01T00:00:00.000Z' });
+    await call(seasonReq('/internal/woc/season/open', 'ops'), res, ops, {
+      seasonId: 4,
+      label: 'S4',
+      endsAt: '2026-07-01T00:00:00.000Z',
+    });
     expect(res.statusCode).toBe(200);
     expect(res.body.data.seasonId).toBe(4);
-    expect(ops.openSeason).toHaveBeenCalledWith({ seasonId: 4, label: 'S4', endsAt: '2026-07-01T00:00:00.000Z' });
+    expect(ops.openSeason).toHaveBeenCalledWith({
+      seasonId: 4,
+      label: 'S4',
+      endsAt: '2026-07-01T00:00:00.000Z',
+    });
   });
 
   it('rejects a non-integer seasonId with 400 (no DB write)', async () => {
@@ -145,7 +190,10 @@ describe('internal api — $WOC season ops', () => {
     process.env.WOC_OPS_SECRET = 'ops';
     const ops = fakeSeasonOps();
     const res = fakeRes();
-    await call(seasonReq('/internal/woc/season/open', 'ops'), res, ops, { seasonId: 1, endsAt: 'not-a-date' });
+    await call(seasonReq('/internal/woc/season/open', 'ops'), res, ops, {
+      seasonId: 1,
+      endsAt: 'not-a-date',
+    });
     expect(res.statusCode).toBe(400);
     expect(ops.openSeason).not.toHaveBeenCalled();
   });

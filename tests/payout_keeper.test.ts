@@ -3,12 +3,23 @@ import { describe, expect, it, vi } from 'vitest';
 // payout_keeper transitively imports server/db (pg Pool + DATABASE_URL at import).
 // Stub both so the module loads; the tests drive the real PayoutKeeper with
 // INJECTED fakes and never touch the pool.
-vi.hoisted(() => { process.env.DATABASE_URL = 'postgres://test/test'; });
-vi.mock('pg', () => ({ Pool: function Pool() { return { query: vi.fn(), connect: vi.fn() }; } }));
+vi.hoisted(() => {
+  process.env.DATABASE_URL = 'postgres://test/test';
+});
+vi.mock('pg', () => ({
+  Pool: function Pool() {
+    return { query: vi.fn(), connect: vi.fn() };
+  },
+}));
 
-import { PayoutKeeper, type KeeperOpts, type PayoutExecutor, type PayoutStore } from '../server/payout_keeper';
-import { DEFAULT_PAYOUT_POLICY } from '../server/payout_policy';
 import type { PayoutBatchRow } from '../server/payout_db';
+import {
+  type KeeperOpts,
+  type PayoutExecutor,
+  PayoutKeeper,
+  type PayoutStore,
+} from '../server/payout_keeper';
+import { DEFAULT_PAYOUT_POLICY } from '../server/payout_policy';
 
 const NOW = 1_000_000_000_000;
 const usdc = (d: number) => BigInt(Math.round(d * 1_000_000));
@@ -17,49 +28,130 @@ type Confirm = 'confirmed' | 'failed' | 'unknown';
 function fakeStore() {
   const batches = new Map<string, PayoutBatchRow>();
   let last: number | null = null;
-  const seed = (b: Partial<PayoutBatchRow> & { batchId: string; status: PayoutBatchRow['status'] }) => {
+  const seed = (
+    b: Partial<PayoutBatchRow> & { batchId: string; status: PayoutBatchRow['status'] },
+  ) => {
     batches.set(b.batchId, {
-      mode: 'burn', source: 'marketplace', usdcIn: 0n, wocBought: 0n, wocSettled: 0n, buyTxSig: null, settleTxSig: null,
-      failReason: null, seasonId: null, dest: null, createdAt: new Date(NOW).toISOString(), settleBroadcastAt: null, executedAt: null, ...b,
+      mode: 'burn',
+      source: 'marketplace',
+      usdcIn: 0n,
+      wocBought: 0n,
+      wocSettled: 0n,
+      buyTxSig: null,
+      settleTxSig: null,
+      failReason: null,
+      seasonId: null,
+      dest: null,
+      createdAt: new Date(NOW).toISOString(),
+      settleBroadcastAt: null,
+      executedAt: null,
+      ...b,
     });
   };
   const store: PayoutStore & { batches: Map<string, PayoutBatchRow>; setLast(t: number): void } = {
     batches,
-    setLast(t) { last = t; },
+    setLast(t) {
+      last = t;
+    },
     async createBatch(b) {
       if ([...batches.values()].some((x) => x.buyTxSig === b.buyTxSig)) return false;
       seed({ batchId: b.batchId, usdcIn: b.usdcIn, buyTxSig: b.buyTxSig, status: 'swapping' });
       return true;
     },
-    async markSwapped(id, woc) { const b = batches.get(id)!; b.status = 'swapped'; b.wocBought = woc; },
-    async markSettling(id, sig) { const b = batches.get(id)!; b.status = 'settling'; b.settleTxSig = sig; b.settleBroadcastAt = new Date(NOW).toISOString(); },
-    async markSettled(id, woc) { const b = batches.get(id)!; b.status = 'settled'; b.wocSettled = woc; last = NOW; },
-    async markFailed(id, reason) { const b = batches.get(id)!; b.status = 'failed'; b.failReason = reason; },
-    async openBatches() { return [...batches.values()].filter((b) => ['swapping', 'swapped', 'settling'].includes(b.status)); },
-    async lastSettleAt() { return last; },
+    async markSwapped(id, woc) {
+      const b = batches.get(id)!;
+      b.status = 'swapped';
+      b.wocBought = woc;
+    },
+    async markSettling(id, sig) {
+      const b = batches.get(id)!;
+      b.status = 'settling';
+      b.settleTxSig = sig;
+      b.settleBroadcastAt = new Date(NOW).toISOString();
+    },
+    async markSettled(id, woc) {
+      const b = batches.get(id)!;
+      b.status = 'settled';
+      b.wocSettled = woc;
+      last = NOW;
+    },
+    async markFailed(id, reason) {
+      const b = batches.get(id)!;
+      b.status = 'failed';
+      b.failReason = reason;
+    },
+    async openBatches() {
+      return [...batches.values()].filter((b) =>
+        ['swapping', 'swapped', 'settling'].includes(b.status),
+      );
+    },
+    async lastSettleAt() {
+      return last;
+    },
   };
   return Object.assign(store, { seed });
 }
 
-function fakeExec(over: {
-  usdc?: bigint; outWoc?: bigint; received?: bigint;
-  confirm?: (sig: string) => Confirm; quoteNull?: boolean;
-} = {}) {
-  let swapN = 0; let settleN = 0;
-  const calls = { quote: [] as bigint[], swapSends: [] as string[], settleSends: [] as string[], signSettle: [] as bigint[] };
+function fakeExec(
+  over: {
+    usdc?: bigint;
+    outWoc?: bigint;
+    received?: bigint;
+    confirm?: (sig: string) => Confirm;
+    quoteNull?: boolean;
+  } = {},
+) {
+  let swapN = 0;
+  let settleN = 0;
+  const calls = {
+    quote: [] as bigint[],
+    swapSends: [] as string[],
+    settleSends: [] as string[],
+    signSettle: [] as bigint[],
+  };
   const exec: PayoutExecutor = {
     vaultUsdcBalance: async () => over.usdc ?? 0n,
-    quote: async (inUsdc) => { calls.quote.push(inUsdc); return over.quoteNull ? null : { outWoc: over.outWoc ?? 1000n, raw: { in: inUsdc.toString() } }; },
-    signSwap: async () => { const signature = `swap${++swapN}`; return { signature, send: async () => { calls.swapSends.push(signature); } }; },
+    quote: async (inUsdc) => {
+      calls.quote.push(inUsdc);
+      return over.quoteNull
+        ? null
+        : { outWoc: over.outWoc ?? 1000n, raw: { in: inUsdc.toString() } };
+    },
+    signSwap: async () => {
+      const signature = `swap${++swapN}`;
+      return {
+        signature,
+        send: async () => {
+          calls.swapSends.push(signature);
+        },
+      };
+    },
     confirm: async (sig) => (over.confirm ? over.confirm(sig) : 'confirmed'),
     wocReceived: async () => over.received ?? 700n,
-    signSettle: async (amt) => { calls.signSettle.push(amt); const signature = `settle${++settleN}`; return { signature, send: async () => { calls.settleSends.push(signature); } }; },
+    signSettle: async (amt) => {
+      calls.signSettle.push(amt);
+      const signature = `settle${++settleN}`;
+      return {
+        signature,
+        send: async () => {
+          calls.settleSends.push(signature);
+        },
+      };
+    },
   };
   return { exec, calls };
 }
 
 const keeper = (exec: PayoutExecutor, store: PayoutStore, onSettled?: KeeperOpts['onSettled']) =>
-  new PayoutKeeper(exec, store, DEFAULT_PAYOUT_POLICY, { now: () => NOW, newBatchId: (() => { let n = 0; return () => `b${++n}`; })(), staleMs: 10 * 60 * 1000, onSettled });
+  new PayoutKeeper(exec, store, DEFAULT_PAYOUT_POLICY, {
+    now: () => NOW,
+    newBatchId: (() => {
+      let n = 0;
+      return () => `b${++n}`;
+    })(),
+    staleMs: 10 * 60 * 1000,
+    onSettled,
+  });
 
 describe('PayoutKeeper.runCycle — swap → settle', () => {
   it('swaps + settles the exact $WOC received in one batch when above threshold', async () => {
@@ -84,7 +176,13 @@ describe('PayoutKeeper.runCycle — swap → settle', () => {
     await keeper(exec, store).runCycle();
 
     expect(calls.quote).toEqual([usdc(250), usdc(250), usdc(250), usdc(250), usdc(75)]);
-    expect([...store.batches.values()].map((b) => b.status)).toEqual(['settled', 'settled', 'settled', 'settled', 'settled']);
+    expect([...store.batches.values()].map((b) => b.status)).toEqual([
+      'settled',
+      'settled',
+      'settled',
+      'settled',
+      'settled',
+    ]);
     expect(calls.settleSends).toHaveLength(5);
   });
 
@@ -107,7 +205,10 @@ describe('PayoutKeeper.runCycle — swap → settle', () => {
 
   it('leaves a batch in-flight when the swap does not confirm (recovery later, no settle)', async () => {
     const store = fakeStore();
-    const { exec, calls } = fakeExec({ usdc: usdc(300), confirm: (s) => (s.startsWith('swap') ? 'unknown' : 'confirmed') });
+    const { exec, calls } = fakeExec({
+      usdc: usdc(300),
+      confirm: (s) => (s.startsWith('swap') ? 'unknown' : 'confirmed'),
+    });
     await keeper(exec, store).runCycle();
     expect([...store.batches.values()][0].status).toBe('swapping');
     expect(calls.signSettle).toHaveLength(0);
@@ -116,7 +217,10 @@ describe('PayoutKeeper.runCycle — swap → settle', () => {
 
   it('fails the batch (no settle) when the swap reverts', async () => {
     const store = fakeStore();
-    const { exec, calls } = fakeExec({ usdc: usdc(300), confirm: (s) => (s.startsWith('swap') ? 'failed' : 'confirmed') });
+    const { exec, calls } = fakeExec({
+      usdc: usdc(300),
+      confirm: (s) => (s.startsWith('swap') ? 'failed' : 'confirmed'),
+    });
     await keeper(exec, store).runCycle();
     expect([...store.batches.values()][0].status).toBe('failed');
     expect(calls.signSettle).toHaveLength(0);
@@ -139,7 +243,11 @@ describe('PayoutKeeper top_up — onSettled credits the reward pool', () => {
     const onSettled = vi.fn(async () => {});
     await keeper(exec, store, onSettled).runCycle();
     expect(onSettled).toHaveBeenCalledTimes(1);
-    expect(onSettled).toHaveBeenCalledWith({ batchId: 'b1', wocSettled: 700n, settleTxSig: 'settle1' });
+    expect(onSettled).toHaveBeenCalledWith({
+      batchId: 'b1',
+      wocSettled: 700n,
+      settleTxSig: 'settle1',
+    });
   });
 
   it('passes the settle signature through recovery so the ledger credit key is stable (idempotent)', async () => {
@@ -149,7 +257,11 @@ describe('PayoutKeeper top_up — onSettled credits the reward pool', () => {
     const onSettled = vi.fn(async () => {});
     await keeper(exec, store, onSettled).recover();
     expect(store.batches.get('r')!.status).toBe('settled');
-    expect(onSettled).toHaveBeenCalledWith({ batchId: 'r', wocSettled: 500n, settleTxSig: 'settleZ' });
+    expect(onSettled).toHaveBeenCalledWith({
+      batchId: 'r',
+      wocSettled: 500n,
+      settleTxSig: 'settleZ',
+    });
   });
 });
 
@@ -187,7 +299,9 @@ describe('PayoutKeeper.recover — finish in-flight batches by recorded signatur
   it('re-issues a settle whose recorded signature reverted', async () => {
     const store = fakeStore();
     store.seed({ batchId: 'z', status: 'settling', settleTxSig: 'settleOld', wocBought: 500n });
-    const { exec, calls } = fakeExec({ confirm: (s) => (s === 'settleOld' ? 'failed' : 'confirmed') });
+    const { exec, calls } = fakeExec({
+      confirm: (s) => (s === 'settleOld' ? 'failed' : 'confirmed'),
+    });
     await keeper(exec, store).recover();
     expect(calls.signSettle).toEqual([500n]);
     expect(store.batches.get('z')!.status).toBe('settled');
@@ -195,7 +309,12 @@ describe('PayoutKeeper.recover — finish in-flight batches by recorded signatur
 
   it('fails a stale swap that truly never landed — no $WOC received (cannot wedge forever)', async () => {
     const store = fakeStore();
-    store.seed({ batchId: 's', status: 'swapping', buyTxSig: 'swapStale', createdAt: new Date(NOW - 20 * 60 * 1000).toISOString() });
+    store.seed({
+      batchId: 's',
+      status: 'swapping',
+      buyTxSig: 'swapStale',
+      createdAt: new Date(NOW - 20 * 60 * 1000).toISOString(),
+    });
     const { exec, calls } = fakeExec({ confirm: () => 'unknown', received: 0n });
     await keeper(exec, store).recover();
     expect(store.batches.get('s')!.status).toBe('failed');
@@ -204,8 +323,16 @@ describe('PayoutKeeper.recover — finish in-flight batches by recorded signatur
 
   it('RECOVERS a stale swap that actually landed — settles the received $WOC, never strands it', async () => {
     const store = fakeStore();
-    store.seed({ batchId: 's2', status: 'swapping', buyTxSig: 'swapLanded', createdAt: new Date(NOW - 20 * 60 * 1000).toISOString() });
-    const { exec, calls } = fakeExec({ confirm: (s) => (s.startsWith('settle') ? 'confirmed' : 'unknown'), received: 640n });
+    store.seed({
+      batchId: 's2',
+      status: 'swapping',
+      buyTxSig: 'swapLanded',
+      createdAt: new Date(NOW - 20 * 60 * 1000).toISOString(),
+    });
+    const { exec, calls } = fakeExec({
+      confirm: (s) => (s.startsWith('settle') ? 'confirmed' : 'unknown'),
+      received: 640n,
+    });
     await keeper(exec, store).recover();
     expect(store.batches.get('s2')!.status).toBe('settled');
     expect(store.batches.get('s2')!.wocSettled).toBe(640n);
@@ -214,8 +341,14 @@ describe('PayoutKeeper.recover — finish in-flight batches by recorded signatur
 
   it('times settling-staleness from settle broadcast, not swap creation (no premature re-settle)', async () => {
     const store = fakeStore();
-    store.seed({ batchId: 'bb', status: 'settling', settleTxSig: 'settleFresh', wocBought: 500n,
-      createdAt: new Date(NOW - 30 * 60 * 1000).toISOString(), settleBroadcastAt: new Date(NOW - 60 * 1000).toISOString() });
+    store.seed({
+      batchId: 'bb',
+      status: 'settling',
+      settleTxSig: 'settleFresh',
+      wocBought: 500n,
+      createdAt: new Date(NOW - 30 * 60 * 1000).toISOString(),
+      settleBroadcastAt: new Date(NOW - 60 * 1000).toISOString(),
+    });
     const { exec, calls } = fakeExec({ confirm: () => 'unknown' });
     await keeper(exec, store).recover();
     expect(store.batches.get('bb')!.status).toBe('settling');
@@ -224,7 +357,12 @@ describe('PayoutKeeper.recover — finish in-flight batches by recorded signatur
 
   it('leaves a fresh unconfirmed swap in-flight (not yet stale)', async () => {
     const store = fakeStore();
-    store.seed({ batchId: 'f', status: 'swapping', buyTxSig: 'swapFresh', createdAt: new Date(NOW - 60 * 1000).toISOString() });
+    store.seed({
+      batchId: 'f',
+      status: 'swapping',
+      buyTxSig: 'swapFresh',
+      createdAt: new Date(NOW - 60 * 1000).toISOString(),
+    });
     const { exec } = fakeExec({ confirm: () => 'unknown' });
     await keeper(exec, store).recover();
     expect(store.batches.get('f')!.status).toBe('swapping');

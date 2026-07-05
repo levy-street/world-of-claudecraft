@@ -35,13 +35,28 @@ export interface ThemeState {
 
 // Order is the display order of the custom-colour pickers in Options.
 export const THEME_KNOB_ORDER: ThemeKnob[] = [
-  'accent', 'border', 'panel', 'text', 'textMuted', 'hp', 'mana', 'rage', 'energy',
+  'accent',
+  'border',
+  'panel',
+  'text',
+  'textMuted',
+  'hp',
+  'mana',
+  'rage',
+  'energy',
 ];
 
 // i18n sub-keys (under hudChrome.theme.knob.*) for each knob's label.
 export const THEME_KNOB_LABEL_KEY: Record<ThemeKnob, string> = {
-  accent: 'accent', border: 'border', panel: 'panel', text: 'text',
-  textMuted: 'textMuted', hp: 'hp', mana: 'mana', rage: 'rage', energy: 'energy',
+  accent: 'accent',
+  border: 'border',
+  panel: 'panel',
+  text: 'text',
+  textMuted: 'textMuted',
+  hp: 'hp',
+  mana: 'mana',
+  rage: 'rage',
+  energy: 'energy',
 };
 
 export const PRESET_ORDER: PresetId[] = ['classic', 'midnight', 'parchment', 'highContrast'];
@@ -49,24 +64,48 @@ export const PRESET_ORDER: PresetId[] = ['classic', 'midnight', 'parchment', 'hi
 // `classic` reproduces the shipped gold/dark palette; the others are alternates.
 export const THEME_PRESETS: Record<PresetId, ThemeKnobs> = {
   classic: {
-    accent: '#ffd100', border: '#6f5a2a', panel: '#15151f',
-    text: '#f0ebd8', textMuted: '#998d6a',
-    hp: '#1eb838', mana: '#2b7bd4', rage: '#c0392b', energy: '#e4c531',
+    accent: '#ffd100',
+    border: '#6f5a2a',
+    panel: '#15151f',
+    text: '#f0ebd8',
+    textMuted: '#998d6a',
+    hp: '#1eb838',
+    mana: '#2b7bd4',
+    rage: '#c0392b',
+    energy: '#e4c531',
   },
   midnight: {
-    accent: '#8fb8e8', border: '#3a4a66', panel: '#0e1420',
-    text: '#dce6f2', textMuted: '#7f8ca3',
-    hp: '#2ec27e', mana: '#4a90d9', rage: '#d96459', energy: '#e0c84f',
+    accent: '#8fb8e8',
+    border: '#3a4a66',
+    panel: '#0e1420',
+    text: '#dce6f2',
+    textMuted: '#7f8ca3',
+    hp: '#2ec27e',
+    mana: '#4a90d9',
+    rage: '#d96459',
+    energy: '#e0c84f',
   },
   parchment: {
-    accent: '#8a5a1a', border: '#b89a5e', panel: '#ece0c4',
-    text: '#2e2410', textMuted: '#6b5d3e',
-    hp: '#2f8f3a', mana: '#2f6fb0', rage: '#b03a2e', energy: '#a8801f',
+    accent: '#8a5a1a',
+    border: '#b89a5e',
+    panel: '#ece0c4',
+    text: '#2e2410',
+    textMuted: '#6b5d3e',
+    hp: '#2f8f3a',
+    mana: '#2f6fb0',
+    rage: '#b03a2e',
+    energy: '#a8801f',
   },
   highContrast: {
-    accent: '#ffe000', border: '#ffffff', panel: '#000000',
-    text: '#ffffff', textMuted: '#d0d0d0',
-    hp: '#00e000', mana: '#00b0ff', rage: '#ff3030', energy: '#ffe000',
+    accent: '#ffe000',
+    border: '#ffffff',
+    panel: '#000000',
+    text: '#ffffff',
+    textMuted: '#d0d0d0',
+    hp: '#00e000',
+    mana: '#00b0ff',
+    rage: '#ff3030',
+    energy: '#ffe000',
   },
 };
 
@@ -110,7 +149,7 @@ export function mixHex(hex: string, target: string, t: number): string {
 
 function srgbChannel(c: number): number {
   const cs = c / 255;
-  return cs <= 0.03928 ? cs / 12.92 : Math.pow((cs + 0.055) / 1.055, 2.4);
+  return cs <= 0.03928 ? cs / 12.92 : ((cs + 0.055) / 1.055) ** 2.4;
 }
 
 /** WCAG relative luminance in [0,1] for a #rrggbb colour. Pure. */
@@ -203,6 +242,12 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
   // Overlay text sits over the 3D world (quest tracker), NOT a panel, so it must
   // stay light regardless of preset and lean on its text-shadow for contrast.
   const overlayText = '#f4eede';
+  // High-Contrast Text draws a halo behind HUD labels via text-shadow. A dark
+  // halo sharpens light text against a dark panel, but on a light panel
+  // (Parchment) the body text is already dark, so a dark halo just blurs into
+  // the glyph instead of separating it. The halo needs to sit on the opposite
+  // side of the panel's lightness from the text, so flip it light there.
+  const textOutline = lightPanel ? '#ffffff' : '#000000';
   return {
     '--gold': accent,
     '--gold-dim': accentDim,
@@ -220,6 +265,7 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
     '--color-text-light': text,
     '--color-text-muted': textMuted,
     '--color-text-overlay': overlayText,
+    '--text-outline-color': textOutline,
     '--scrollbar-thumb': mixHex(border, '#000000', 0.15),
     '--scrollbar-thumb-hover': border,
     '--scrollbar-border': border,
@@ -264,21 +310,36 @@ export class ThemeStore {
 
   constructor() {
     let raw: unknown = null;
-    try { raw = JSON.parse(localStorage.getItem(THEME_STORE_KEY) ?? 'null'); } catch { /* corrupt */ }
+    try {
+      raw = JSON.parse(localStorage.getItem(THEME_STORE_KEY) ?? 'null');
+    } catch {
+      /* corrupt */
+    }
     this.state = parseTheme(raw);
   }
 
-  get(): ThemeState { return { preset: this.state.preset, custom: { ...this.state.custom } }; }
+  get(): ThemeState {
+    return { preset: this.state.preset, custom: { ...this.state.custom } };
+  }
 
   /** Effective CSS variable map for the current state. */
-  cssVars(): Record<string, string> { return themeCssVars(resolveTheme(this.state)); }
+  cssVars(): Record<string, string> {
+    return themeCssVars(resolveTheme(this.state));
+  }
 
   private save(): void {
-    try { localStorage.setItem(THEME_STORE_KEY, serializeTheme(this.state)); } catch { /* unavailable */ }
+    try {
+      localStorage.setItem(THEME_STORE_KEY, serializeTheme(this.state));
+    } catch {
+      /* unavailable */
+    }
   }
 
   setPreset(preset: PresetId): void {
-    if (PRESET_ORDER.includes(preset)) { this.state.preset = preset; this.save(); }
+    if (PRESET_ORDER.includes(preset)) {
+      this.state.preset = preset;
+      this.save();
+    }
   }
 
   /** Set or (with null) clear one custom knob override. */
@@ -289,5 +350,8 @@ export class ThemeStore {
   }
 
   /** Drop all custom overrides, falling back to the bare preset. */
-  resetCustom(): void { this.state.custom = {}; this.save(); }
+  resetCustom(): void {
+    this.state.custom = {};
+    this.save();
+  }
 }

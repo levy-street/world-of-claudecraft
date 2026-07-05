@@ -7,9 +7,10 @@
 //
 // CI-safe: skips unless PG_TEST_URL points at a disposable Postgres.
 //   PG_TEST_URL=postgres://test:test@127.0.0.1:5545/test npx vitest run tests/arena_wager_boot.integration.test.ts
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import bs58 from 'bs58';
+
 import { Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const PG_TEST_URL = process.env.PG_TEST_URL;
 if (PG_TEST_URL) process.env.DATABASE_URL = PG_TEST_URL;
@@ -32,10 +33,14 @@ describe.skipIf(!PG_TEST_URL)('buildArenaWagerService (real Postgres boot)', () 
   beforeAll(async () => {
     await ensureSchema();
     await pool.query('TRUNCATE woc_wager_matches RESTART IDENTITY CASCADE');
-    await pool.query('TRUNCATE woc_payouts, woc_flow_ledger, woc_reward_pools, woc_seasons RESTART IDENTITY CASCADE');
+    await pool.query(
+      'TRUNCATE woc_payouts, woc_flow_ledger, woc_reward_pools, woc_seasons RESTART IDENTITY CASCADE',
+    );
     await openSeason({ seasonId: 1, label: 'Boot Test Season' });
   });
-  afterAll(async () => { await pool.end(); });
+  afterAll(async () => {
+    await pool.end();
+  });
 
   it('returns null when the feature is not enabled', async () => {
     delete process.env.WOC_ARENA_WAGER_ENABLED;
@@ -46,7 +51,9 @@ describe.skipIf(!PG_TEST_URL)('buildArenaWagerService (real Postgres boot)', () 
     process.env.WOC_ARENA_WAGER_ENABLED = '1';
     const saved = process.env.WOC_ARENA_SETTLER_SECRET;
     delete process.env.WOC_ARENA_SETTLER_SECRET;
-    await expect(buildArenaWagerService(noopBout, rating, noopSend)).rejects.toThrow(/WOC_ESCROW_PROGRAM_ID, WOC_MINT, and WOC_ARENA_SETTLER_SECRET/);
+    await expect(buildArenaWagerService(noopBout, rating, noopSend)).rejects.toThrow(
+      /WOC_ESCROW_PROGRAM_ID, WOC_MINT, and WOC_ARENA_SETTLER_SECRET/,
+    );
     process.env.WOC_ARENA_SETTLER_SECRET = saved;
   });
 

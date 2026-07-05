@@ -7,11 +7,17 @@
 // Gated on WOC_DEVNET_TEST=1 (skipped in CI and normal runs) and on three funded
 // keypairs at /tmp/wager_{creator,opponent,settler}.json. The ledger is the real
 // FlowLedger over an in-memory db (the SQL is covered by flow_ledger_db.integration).
-import { describe, it, expect } from 'vitest';
+
 import { readFileSync } from 'node:fs';
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { describe, expect, it } from 'vitest';
 import { ArenaEscrow } from '../server/arena_escrow';
-import { FlowLedger, emissionDecision, type FlowLedgerDb, type FlowEntryInput } from '../server/flow_ledger';
+import {
+  emissionDecision,
+  type FlowEntryInput,
+  FlowLedger,
+  type FlowLedgerDb,
+} from '../server/flow_ledger';
 import { vaultAta } from '../server/woc_escrow_client';
 
 const RUN = process.env.WOC_DEVNET_TEST === '1';
@@ -21,10 +27,15 @@ const MINT = new PublicKey('E6r4tqSuQ6VuCa9jpPZMqYHAj1x9GJaKaaXWxrfFsgFx');
 class MemFlowDb implements FlowLedgerDb {
   entries: { dir: 'in' | 'out'; amount: bigint; txSig: string | null }[] = [];
   async ensureSeason() {}
-  async seasonHeadroom() { return this.entries.reduce((h, e) => (e.dir === 'in' ? h + e.amount : h - e.amount), 0n); }
-  async seasonIsOpen() { return true; }
+  async seasonHeadroom() {
+    return this.entries.reduce((h, e) => (e.dir === 'in' ? h + e.amount : h - e.amount), 0n);
+  }
+  async seasonIsOpen() {
+    return true;
+  }
   async recordInflow(i: FlowEntryInput) {
-    if (i.txSig && this.entries.some((e) => e.txSig === i.txSig)) return { ok: false as const, reason: 'duplicate' as const };
+    if (i.txSig && this.entries.some((e) => e.txSig === i.txSig))
+      return { ok: false as const, reason: 'duplicate' as const };
     this.entries.push({ dir: 'in', amount: i.amountBase, txSig: i.txSig ?? null });
     return { ok: true as const };
   }
@@ -37,8 +48,10 @@ class MemFlowDb implements FlowLedgerDb {
   }
 }
 
-const kp = (p: string) => Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(p, 'utf8'))));
-const tokenAmount = async (conn: Connection, owner: PublicKey) => BigInt((await conn.getTokenAccountBalance(vaultAta(owner, MINT))).value.amount);
+const kp = (p: string) =>
+  Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(p, 'utf8'))));
+const tokenAmount = async (conn: Connection, owner: PublicKey) =>
+  BigInt((await conn.getTokenAccountBalance(vaultAta(owner, MINT))).value.amount);
 
 (RUN ? describe : describe.skip)('ArenaEscrow on live devnet woc_escrow', () => {
   it('open -> join -> settle pays the winner the pot minus the burned rake on-chain', async () => {
@@ -51,8 +64,13 @@ const tokenAmount = async (conn: Connection, owner: PublicKey) => BigInt((await 
     const ref = { matchId, creator: creator.publicKey, opponent: opponent.publicKey, stakeBase };
 
     const escrow = new ArenaEscrow({
-      connection: conn, programId: PROGRAM, mint: MINT, settler,
-      ledger: new FlowLedger(new MemFlowDb()), seasonId: 1, rakeBps: 500, // 5%
+      connection: conn,
+      programId: PROGRAM,
+      mint: MINT,
+      settler,
+      ledger: new FlowLedger(new MemFlowDb()),
+      seasonId: 1,
+      rakeBps: 500, // 5%
     });
 
     const supplyBefore = BigInt((await conn.getTokenSupply(MINT)).value.amount);
@@ -81,6 +99,9 @@ const tokenAmount = async (conn: Connection, owner: PublicKey) => BigInt((await 
     const supplyAfter = BigInt((await conn.getTokenSupply(MINT)).value.amount);
     expect(supplyBefore - supplyAfter).toBe(1_000_000n);
 
-    console.log('DEVNET_WAGER ' + JSON.stringify({ matchId: matchId.toString(), openSig, joinSig, settleSig: r.signature }));
+    console.log(
+      'DEVNET_WAGER ' +
+        JSON.stringify({ matchId: matchId.toString(), openSig, joinSig, settleSig: r.signature }),
+    );
   }, 180_000);
 });

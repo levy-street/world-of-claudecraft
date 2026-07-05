@@ -5,13 +5,15 @@
 // docs/screenshots/. Pure proof tooling; not part of the build.
 //
 //   node scripts/woc_devnet_tx_shots.mjs [path/to/sigs.json]
-import puppeteer from 'puppeteer-core';
-import { readFileSync, mkdirSync } from 'node:fs';
+
+import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import puppeteer from 'puppeteer-core';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const PROGRAM = 'Fn4LMsV7akGX9KXwYv4uh2v8nM2uqgaAxhKrsYYbZqcJ';
-const DEPLOY_SIG = '5AW8ZUAZzG78HFSEnVQcPZjQv8aBUDk7B15kD2S4cacndhwAWGAPgGYLZ57gMRirhtL9vAAggwBf4QgSLRKxc5X7';
+const DEPLOY_SIG =
+  '5AW8ZUAZzG78HFSEnVQcPZjQv8aBUDk7B15kD2S4cacndhwAWGAPgGYLZ57gMRirhtL9vAAggwBf4QgSLRKxc5X7';
 const sigs = JSON.parse(readFileSync(process.argv[2] ?? '/tmp/devnet_alltypes.json', 'utf8'));
 const OUT = 'docs/screenshots';
 mkdirSync(OUT, { recursive: true });
@@ -19,7 +21,10 @@ mkdirSync(OUT, { recursive: true });
 const tx = (s) => `https://explorer.solana.com/tx/${s}?cluster=devnet`;
 // One representative tx per instruction type + the program account + the deploy tx.
 const shots = [
-  { name: 'woc-devnet-program-upgrade', url: `https://explorer.solana.com/address/${PROGRAM}?cluster=devnet` },
+  {
+    name: 'woc-devnet-program-upgrade',
+    url: `https://explorer.solana.com/address/${PROGRAM}?cluster=devnet`,
+  },
   { name: 'woc-devnet-tx-deploy', url: tx(DEPLOY_SIG) },
   { name: 'woc-devnet-tx-open', url: tx(sigs.openSettle) },
   { name: 'woc-devnet-tx-join', url: tx(sigs.joinSettle) },
@@ -29,7 +34,11 @@ const shots = [
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox', '--window-size=1440,2000'] });
+const browser = await puppeteer.launch({
+  executablePath: CHROME,
+  headless: 'new',
+  args: ['--no-sandbox', '--window-size=1440,2000'],
+});
 try {
   for (const s of shots) {
     const page = await browser.newPage();
@@ -37,7 +46,9 @@ try {
     await page.goto(s.url, { waitUntil: 'networkidle2', timeout: 60_000 });
     // The explorer renders tx/account detail after the RPC round-trip; give React time
     // and wait for the status/overview card to be present.
-    await page.waitForSelector('table, .card, [class*="Card"]', { timeout: 30_000 }).catch(() => {});
+    await page
+      .waitForSelector('table, .card, [class*="Card"]', { timeout: 30_000 })
+      .catch(() => {});
     await sleep(4000);
     const file = `${OUT}/${s.name}.png`;
     mkdirSync(dirname(file), { recursive: true });

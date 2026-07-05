@@ -1,10 +1,16 @@
-import { describe, expect, it, vi } from 'vitest';
 import { PublicKey } from '@solana/web3.js';
+import { describe, expect, it, vi } from 'vitest';
 
 // payout_keeper transitively imports server/db (pg Pool + DATABASE_URL at import).
 // Stub both so the module loads; these tests only touch the pure encoders.
-vi.hoisted(() => { process.env.DATABASE_URL = 'postgres://test/test'; });
-vi.mock('pg', () => ({ Pool: function Pool() { return { query: vi.fn(), connect: vi.fn() }; } }));
+vi.hoisted(() => {
+  process.env.DATABASE_URL = 'postgres://test/test';
+});
+vi.mock('pg', () => ({
+  Pool: function Pool() {
+    return { query: vi.fn(), connect: vi.fn() };
+  },
+}));
 
 import { associatedTokenAccount, burnCheckedIx, transferCheckedIx } from '../server/payout_keeper';
 
@@ -39,7 +45,13 @@ describe('burnCheckedIx — SPL BurnChecked (tag 15, u64-LE amount, u8 decimals)
   });
 
   it('handles a full u64 amount without overflow', () => {
-    const ix = burnCheckedIx(associatedTokenAccount(VAULT, WOC), WOC, VAULT, 18_446_744_073_709_551_615n, 0);
+    const ix = burnCheckedIx(
+      associatedTokenAccount(VAULT, WOC),
+      WOC,
+      VAULT,
+      18_446_744_073_709_551_615n,
+      0,
+    );
     expect(ix.data.readBigUInt64LE(1)).toBe(18_446_744_073_709_551_615n);
   });
 });

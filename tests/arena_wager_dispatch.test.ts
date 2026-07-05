@@ -8,6 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  touchCharacterLogin: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
@@ -19,7 +20,7 @@ vi.mock('../server/db', () => ({
   revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { GameServer, type ClientSession } from '../server/game';
+import { type ClientSession, GameServer } from '../server/game';
 import type { SimEvent } from '../src/sim/types';
 
 function fakeWs() {
@@ -29,11 +30,24 @@ function fakeWs() {
 
 class FakeWagerService {
   calls: { fn: string; args: any[] }[] = [];
-  handleQueue(...a: any[]) { this.calls.push({ fn: 'handleQueue', args: a }); return Promise.resolve(); }
-  handleStaked(...a: any[]) { this.calls.push({ fn: 'handleStaked', args: a }); return Promise.resolve(); }
-  handleCancel(...a: any[]) { this.calls.push({ fn: 'handleCancel', args: a }); }
-  onArenaEnd(...a: any[]) { this.calls.push({ fn: 'onArenaEnd', args: a }); return Promise.resolve(); }
-  onLeave(...a: any[]) { this.calls.push({ fn: 'onLeave', args: a }); }
+  handleQueue(...a: any[]) {
+    this.calls.push({ fn: 'handleQueue', args: a });
+    return Promise.resolve();
+  }
+  handleStaked(...a: any[]) {
+    this.calls.push({ fn: 'handleStaked', args: a });
+    return Promise.resolve();
+  }
+  handleCancel(...a: any[]) {
+    this.calls.push({ fn: 'handleCancel', args: a });
+  }
+  onArenaEnd(...a: any[]) {
+    this.calls.push({ fn: 'onArenaEnd', args: a });
+    return Promise.resolve();
+  }
+  onLeave(...a: any[]) {
+    this.calls.push({ fn: 'onLeave', args: a });
+  }
 }
 
 function setup() {

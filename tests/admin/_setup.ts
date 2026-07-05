@@ -9,7 +9,13 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/svelte';
 import { afterEach, beforeEach } from 'vitest';
 
-if (!globalThis.localStorage) {
+const storage = globalThis.localStorage as Partial<Storage> | undefined;
+if (
+  !storage ||
+  typeof storage.clear !== 'function' ||
+  typeof storage.getItem !== 'function' ||
+  typeof storage.setItem !== 'function'
+) {
   const values = new Map<string, string>();
   Object.defineProperty(globalThis, 'localStorage', {
     configurable: true,

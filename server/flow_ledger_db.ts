@@ -7,8 +7,8 @@
 // pg_advisory_xact_lock, alongside the other module schemas.
 import { pool } from './db';
 import {
-  emissionDecision,
   type EmitResult,
+  emissionDecision,
   type FlowEntryInput,
   type FlowLedgerDb,
   type InflowResult,
@@ -104,7 +104,14 @@ export class PgFlowLedgerDb implements FlowLedgerDb {
        VALUES ($1, $2, 'in', $3, $4, $5, $6)
        ON CONFLICT (tx_sig) DO NOTHING
        RETURNING entry_id`,
-      [input.seasonId, input.source, input.amountBase.toString(), input.txSig ?? null, input.recipient ?? null, input.memo ?? null],
+      [
+        input.seasonId,
+        input.source,
+        input.amountBase.toString(),
+        input.txSig ?? null,
+        input.recipient ?? null,
+        input.memo ?? null,
+      ],
     );
     if (r.rowCount === 0) return { ok: false, reason: 'duplicate' };
     return { ok: true, entryId: Number(r.rows[0].entry_id) };
@@ -115,10 +122,14 @@ export class PgFlowLedgerDb implements FlowLedgerDb {
     try {
       await client.query('BEGIN');
       // Serialize all budget decisions for this season; auto-released on COMMIT.
-      await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`woc_season:${input.seasonId}`]);
+      await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
+        `woc_season:${input.seasonId}`,
+      ]);
 
       if (input.txSig) {
-        const dup = await client.query(`SELECT 1 FROM woc_payouts WHERE tx_sig = $1`, [input.txSig]);
+        const dup = await client.query(`SELECT 1 FROM woc_payouts WHERE tx_sig = $1`, [
+          input.txSig,
+        ]);
         if ((dup.rowCount ?? 0) > 0) {
           await client.query('ROLLBACK');
           return { ok: false, reason: 'duplicate', headroomBase: 0n };
@@ -142,14 +153,27 @@ export class PgFlowLedgerDb implements FlowLedgerDb {
       const entry = await client.query(
         `INSERT INTO woc_flow_ledger(season_id, source, direction, amount_base, tx_sig, recipient, memo)
          VALUES ($1, $2, 'out', $3, $4, $5, $6) RETURNING entry_id`,
-        [input.seasonId, input.source, input.amountBase.toString(), input.txSig ?? null, input.recipient ?? null, input.memo ?? null],
+        [
+          input.seasonId,
+          input.source,
+          input.amountBase.toString(),
+          input.txSig ?? null,
+          input.recipient ?? null,
+          input.memo ?? null,
+        ],
       );
       const entryId = Number(entry.rows[0].entry_id);
 
       const payout = await client.query(
         `INSERT INTO woc_payouts(season_id, recipient, amount_base, tx_sig, flow_entry_id)
          VALUES ($1, $2, $3, $4, $5) RETURNING payout_id`,
-        [input.seasonId, input.recipient ?? '', input.amountBase.toString(), input.txSig ?? null, entryId],
+        [
+          input.seasonId,
+          input.recipient ?? '',
+          input.amountBase.toString(),
+          input.txSig ?? null,
+          entryId,
+        ],
       );
 
       await client.query('COMMIT');
@@ -223,7 +247,11 @@ export async function activeSeasonStatus(): Promise<WocSeasonStatus | null> {
 // Ops: open (or re-open) a season with an optional end time, and close one. Used
 // by the secret-gated /internal/woc/season endpoints and by the #479/#480
 // season-roll jobs. Idempotent.
-export async function openSeason(p: { seasonId: number; label?: string; endsAt?: string | null }): Promise<void> {
+export async function openSeason(p: {
+  seasonId: number;
+  label?: string;
+  endsAt?: string | null;
+}): Promise<void> {
   await pool.query(
     `INSERT INTO woc_seasons (season_id, label, status, ends_at)
      VALUES ($1, $2, 'active', $3)
@@ -233,5 +261,8 @@ export async function openSeason(p: { seasonId: number; label?: string; endsAt?:
 }
 
 export async function closeSeason(seasonId: number): Promise<void> {
-  await pool.query(`UPDATE woc_seasons SET status = 'closed', closed_at = now() WHERE season_id = $1`, [seasonId]);
+  await pool.query(
+    `UPDATE woc_seasons SET status = 'closed', closed_at = now() WHERE season_id = $1`,
+    [seasonId],
+  );
 }

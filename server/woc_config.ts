@@ -11,11 +11,15 @@
 // VITE_* (loaded from .env.local in dev by db.ts), then the published default —
 // mirrors server/woc_balance.ts so a single local config drives everything.
 export const WOC_MINT = (
-  process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
 ).trim();
 
 export const SOLANA_RPC_URL = (
-  process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com'
+  process.env.SOLANA_RPC_URL ??
+  process.env.VITE_SOLANA_RPC_URL ??
+  'https://api.mainnet-beta.solana.com'
 ).trim();
 
 // USDC mint — used by the shared marketplace core (PR3 / #469), declared here so

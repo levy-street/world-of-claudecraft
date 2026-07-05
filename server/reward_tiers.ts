@@ -11,7 +11,9 @@
 // beyond the schedule earns nothing. The defaults sum to 10000 (the whole pool);
 // they are PLACEHOLDERS — the exact tiers are an economic decision (tune via
 // WOC_REWARD_TIER_BPS before launch).
-export const DEFAULT_REWARD_TIER_BPS: readonly number[] = [3000, 2000, 1200, 800, 800, 440, 440, 440, 440, 440];
+export const DEFAULT_REWARD_TIER_BPS: readonly number[] = [
+  3000, 2000, 1200, 800, 800, 440, 440, 440, 440, 440,
+];
 
 /** The active schedule: a comma-separated WOC_REWARD_TIER_BPS env override (all
  *  non-negative integers summing to <= 10000), else the default. */
@@ -19,9 +21,10 @@ export function rewardTierBpsFromEnv(): number[] {
   const raw = (process.env.WOC_REWARD_TIER_BPS ?? '').trim();
   if (!raw) return [...DEFAULT_REWARD_TIER_BPS];
   const parsed = raw.split(',').map((s) => Number(s.trim()));
-  const valid = parsed.length > 0
-    && parsed.every((n) => Number.isInteger(n) && n >= 0)
-    && parsed.reduce((a, b) => a + b, 0) <= 10000;
+  const valid =
+    parsed.length > 0 &&
+    parsed.every((n) => Number.isInteger(n) && n >= 0) &&
+    parsed.reduce((a, b) => a + b, 0) <= 10000;
   return valid ? parsed : [...DEFAULT_REWARD_TIER_BPS];
 }
 

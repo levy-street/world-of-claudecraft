@@ -2,19 +2,35 @@
 // HTML-string builder, so we assert the rendered markup directly — the data
 // wiring (pool/sink/emission, the emitted-% bar width), the per-state structure
 // (none/active/ended), and that the server-supplied season label is escaped.
-import { describe, it, expect } from 'vitest';
-import { wocSeasonPanelHtml } from '../src/ui/woc_season_panel';
+import { describe, expect, it } from 'vitest';
 import type { SeasonView } from '../src/ui/woc_season';
+import { wocSeasonPanelHtml } from '../src/ui/woc_season_panel';
 
 const base: SeasonView = {
-  state: 'active', seasonId: 1, label: 'Season 1', poolWoc: '2700', sinkWoc: '4200',
-  emissionWoc: '1500', emittedPct: 35.71, countdown: { days: 3, hours: 6, minutes: 30, totalMs: 1 },
+  state: 'active',
+  seasonId: 1,
+  label: 'Season 1',
+  poolWoc: '2700',
+  sinkWoc: '4200',
+  emissionWoc: '1500',
+  emittedPct: 35.71,
+  countdown: { days: 3, hours: 6, minutes: 30, totalMs: 1 },
   standings: [],
 };
 
 describe('wocSeasonPanelHtml', () => {
   it('renders an empty state with no pool figures', () => {
-    const html = wocSeasonPanelHtml({ ...base, state: 'none', seasonId: null, label: '', poolWoc: '0', sinkWoc: '0', emissionWoc: '0', emittedPct: 0, countdown: null });
+    const html = wocSeasonPanelHtml({
+      ...base,
+      state: 'none',
+      seasonId: null,
+      label: '',
+      poolWoc: '0',
+      sinkWoc: '0',
+      emissionWoc: '0',
+      emittedPct: 0,
+      countdown: null,
+    });
     expect(html).toContain('ws-body-empty');
     expect(html).toContain('No reward season is active'); // hudChrome.wocSeason.none (English)
     expect(html).not.toContain('ws-bar-fill');
@@ -59,20 +75,26 @@ describe('wocSeasonPanelHtml', () => {
   });
 
   it('renders the projected top-earners table with rank/name/rating/reward', () => {
-    const html = wocSeasonPanelHtml({ ...base, standings: [
-      { rank: 1, name: 'Ada', rating: 1999, rewardWoc: '810' },
-      { rank: 2, name: 'Bo', rating: 1888, rewardWoc: '540' },
-    ] });
+    const html = wocSeasonPanelHtml({
+      ...base,
+      standings: [
+        { rank: 1, name: 'Ada', rating: 1999, rewardWoc: '810' },
+        { rank: 2, name: 'Bo', rating: 1888, rewardWoc: '540' },
+      ],
+    });
     expect(html).toContain('ws-standings');
     expect(html).toContain('Projected top earners');
     expect(html).toContain('>Ada<');
-    expect(html).toContain('>810<');   // rank 1 reward
+    expect(html).toContain('>810<'); // rank 1 reward
     expect(html).toContain('>Bo<');
     expect(html).toContain('>540<');
   });
 
   it('escapes standing player names', () => {
-    const html = wocSeasonPanelHtml({ ...base, standings: [{ rank: 1, name: '<b>x</b>', rating: 1500, rewardWoc: '10' }] });
+    const html = wocSeasonPanelHtml({
+      ...base,
+      standings: [{ rank: 1, name: '<b>x</b>', rating: 1500, rewardWoc: '10' }],
+    });
     expect(html).not.toContain('<b>x</b>');
     expect(html).toContain('&lt;b&gt;x&lt;/b&gt;');
   });

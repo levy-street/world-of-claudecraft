@@ -2,11 +2,11 @@
 // telling of the main-story saga as a trail north (no endings, no boss names), plus the
 // optional side-chains.
 
-import { t } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
+import { t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
-import { lead, related, loreBeat } from './ui';
 import type { GuidePage } from './types';
+import { lead, loreBeat, related } from './ui';
 
 const STEPS = [
   ['guide.questsPage.acceptTitle', 'guide.questsPage.acceptBody'],
@@ -34,15 +34,17 @@ const SAGA = [
 // The optional side-chains.
 const SIDE = [
   ['guide.questsPage.sideWardenTitle', 'guide.questsPage.sideWardenBody'],
+  ['guide.questsPage.sideTempleTitle', 'guide.questsPage.sideTempleBody'],
   ['guide.questsPage.sideCryptTitle', 'guide.questsPage.sideCryptBody'],
 ] as const;
 
 export const quests: GuidePage = {
   titleKey: 'guide.nav.quests',
   render() {
-    const steps = STEPS
-      .map(([title, body]) => `<section class="guide-block"><h2>${esc(t(title))}</h2><p>${esc(t(body))}</p></section>`)
-      .join('');
+    const steps = STEPS.map(
+      ([title, body]) =>
+        `<section class="guide-block"><h2>${esc(t(title))}</h2><p>${esc(t(body))}</p></section>`,
+    ).join('');
     const types = TYPES.map(([title, body]) => loreBeat(title, body)).join('');
     const saga = SAGA.map(([title, body]) => loreBeat(title, body)).join('');
     const side = SIDE.map(([title, body]) => loreBeat(title, body)).join('');

@@ -28,9 +28,10 @@ export function selectPartyFrameMembers(
  * pass over `info.members` with NO intermediate array allocation, so an unchanged
  * party short-circuits BEFORE `selectPartyFrameMembers` (which allocates the sorted /
  * filtered / mapped arrays) is ever called. It encodes exactly the inputs the frames
- * render from: per member the pid, group, hp/maxHp, resource, dead, in-combat, the
- * out-of-range flag (computed inline, identically to the selector), and level, plus
- * the leader, raid flag, and the player's own group. The player is skipped (the
+ * render from: per member the pid, group, hp/maxHp, resource, dead,
+ * in-combat, the out-of-range flag (computed inline, identically to the selector),
+ * level, and the aura strip (id + kind + sap flag per aura, in order), plus the
+ * leader, raid flag, and the player's own group. The player is skipped (the
  * frames never show the local player), matching the selector's `pid !== playerId`.
  *
  * Pure and deterministic (only `Math.hypot` and string building). It iterates in raw
@@ -54,7 +55,13 @@ export function partyFrameSignature(
       continue;
     }
     const oor = !m.dead && Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd;
-    sig += `${m.pid}:${m.group}:${m.hp}/${m.mhp}:${m.res}:${m.dead}:${m.inCombat}:${oor ? 1 : 0}:${m.level}|`;
+    sig += `${m.pid}:${m.group}:${m.hp}/${m.mhp}:${m.res}:${m.dead}:${m.inCombat}:${oor ? 1 : 0}:${m.level}:`;
+    // The aura strip, appended inline (no intermediate array): a joined/left aura,
+    // a kind flip, or a sap-sign flip changes the string and repaints the row.
+    if (m.auras) {
+      for (const a of m.auras) sig += `${a.id},${a.kind},${a.neg ? 1 : 0};`;
+    }
+    sig += '|';
   }
   return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}`;
 }

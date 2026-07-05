@@ -7,11 +7,17 @@
 // Gated on WOC_DEVNET_TEST=1 (skipped in CI / normal runs). The two players must
 // already hold mock $WOC (minted via the spl-token CLI in the harness step) and a
 // little SOL for fees.
-import { describe, it, expect } from 'vitest';
+
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { describe, expect, it } from 'vitest';
 import { ArenaEscrow } from '../server/arena_escrow';
-import { FlowLedger, emissionDecision, type FlowLedgerDb, type FlowEntryInput } from '../server/flow_ledger';
+import {
+  emissionDecision,
+  type FlowEntryInput,
+  FlowLedger,
+  type FlowLedgerDb,
+} from '../server/flow_ledger';
 import { vaultAta } from '../server/woc_escrow_client';
 
 const RUN = process.env.WOC_DEVNET_TEST === '1';
@@ -24,10 +30,15 @@ const RAKE_BPS = 500; // 5%
 class MemFlowDb implements FlowLedgerDb {
   entries: { dir: 'in' | 'out'; amount: bigint; txSig: string | null }[] = [];
   async ensureSeason() {}
-  async seasonHeadroom() { return this.entries.reduce((h, e) => (e.dir === 'in' ? h + e.amount : h - e.amount), 0n); }
-  async seasonIsOpen() { return true; }
+  async seasonHeadroom() {
+    return this.entries.reduce((h, e) => (e.dir === 'in' ? h + e.amount : h - e.amount), 0n);
+  }
+  async seasonIsOpen() {
+    return true;
+  }
   async recordInflow(i: FlowEntryInput) {
-    if (i.txSig && this.entries.some((e) => e.txSig === i.txSig)) return { ok: false as const, reason: 'duplicate' as const };
+    if (i.txSig && this.entries.some((e) => e.txSig === i.txSig))
+      return { ok: false as const, reason: 'duplicate' as const };
     this.entries.push({ dir: 'in', amount: i.amountBase, txSig: i.txSig ?? null });
     return { ok: true as const };
   }
@@ -40,19 +51,28 @@ class MemFlowDb implements FlowLedgerDb {
   }
 }
 
-const kp = (p: string) => Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(p, 'utf8'))));
+const kp = (p: string) =>
+  Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(p, 'utf8'))));
 const woc = async (conn: Connection, owner: PublicKey) =>
   BigInt((await conn.getTokenAccountBalance(vaultAta(owner, MINT))).value.amount);
 const supply = async (conn: Connection) => BigInt((await conn.getTokenSupply(MINT)).value.amount);
 
 (RUN ? describe : describe.skip)('woc_escrow: all five instruction types on live devnet', () => {
   const conn = new Connection(RPC, 'confirmed');
-  const creator = kp('/tmp/wager_creator.json');
-  const opponent = kp('/tmp/wager_opponent.json');
-  const settler = kp('/tmp/wager_settler.json');
+  // Fixture keypairs load only under the WOC_DEVNET_TEST gate: describe.skip still
+  // runs this factory during collection, so an eager read would ENOENT-crash the
+  // whole suite in normal/CI runs where the /tmp keypairs do not exist.
+  const creator = RUN ? kp('/tmp/wager_creator.json') : (null as unknown as Keypair);
+  const opponent = RUN ? kp('/tmp/wager_opponent.json') : (null as unknown as Keypair);
+  const settler = RUN ? kp('/tmp/wager_settler.json') : (null as unknown as Keypair);
   const escrow = new ArenaEscrow({
-    connection: conn, programId: PROGRAM, mint: MINT, settler,
-    ledger: new FlowLedger(new MemFlowDb()), seasonId: 1, rakeBps: RAKE_BPS,
+    connection: conn,
+    programId: PROGRAM,
+    mint: MINT,
+    settler,
+    ledger: new FlowLedger(new MemFlowDb()),
+    seasonId: 1,
+    rakeBps: RAKE_BPS,
   });
   const sigs: Record<string, string> = {};
   const send = async (tx: import('@solana/web3.js').Transaction, signer: Keypair) => {
@@ -67,27 +87,44 @@ const supply = async (conn: Connection) => BigInt((await conn.getTokenSupply(MIN
     const supplyBefore = await supply(conn);
     const winnerBefore = await woc(conn, creator.publicKey);
 
-    sigs.openSettle = await send(await escrow.buildOpenTx({ matchId, creator: creator.publicKey, stakeBase: STAKE }), creator);
-    sigs.joinSettle = await send(await escrow.buildJoinTx({ matchId, opponent: opponent.publicKey }), opponent);
+    sigs.openSettle = await send(
+      await escrow.buildOpenTx({ matchId, creator: creator.publicKey, stakeBase: STAKE }),
+      creator,
+    );
+    sigs.joinSettle = await send(
+      await escrow.buildJoinTx({ matchId, opponent: opponent.publicKey }),
+      opponent,
+    );
     expect(await escrow.bothStaked({ matchId })).toBe(true);
 
-    const r = await escrow.settle({ matchId, creator: creator.publicKey, opponent: opponent.publicKey, stakeBase: STAKE }, creator.publicKey, sigs.openSettle, sigs.joinSettle);
+    const r = await escrow.settle(
+      { matchId, creator: creator.publicKey, opponent: opponent.publicKey, stakeBase: STAKE },
+      creator.publicKey,
+      sigs.openSettle,
+      sigs.joinSettle,
+    );
     sigs.settle = r.signature;
     expect(r.potBase).toBe(20_000_000n);
     expect(r.burnBase).toBe(1_000_000n);
     expect(r.payoutBase).toBe(19_000_000n);
     expect(await escrow.matchStatus(matchId)).toBe(null); // settle_match closes the match PDA (rent reclaimed)
     // On-chain truth: winner gained pot-minus-rake net of their own stake; supply burned the rake.
-    expect(await woc(conn, creator.publicKey) - winnerBefore).toBe(9_000_000n); // +19 paid, -10 staked
-    expect(supplyBefore - await supply(conn)).toBe(1_000_000n);
+    expect((await woc(conn, creator.publicKey)) - winnerBefore).toBe(9_000_000n); // +19 paid, -10 staked
+    expect(supplyBefore - (await supply(conn))).toBe(1_000_000n);
   }, 180_000);
 
   it('open -> cancel: creator reclaims the full stake when no opponent joins', async () => {
     const matchId = BigInt(Date.now()) + 1n;
     const before = await woc(conn, creator.publicKey);
-    sigs.openCancel = await send(await escrow.buildOpenTx({ matchId, creator: creator.publicKey, stakeBase: STAKE }), creator);
+    sigs.openCancel = await send(
+      await escrow.buildOpenTx({ matchId, creator: creator.publicKey, stakeBase: STAKE }),
+      creator,
+    );
     expect(await woc(conn, creator.publicKey)).toBe(before - STAKE); // staked
-    sigs.cancel = await send(await escrow.buildCancelTx({ matchId, creator: creator.publicKey }), creator);
+    sigs.cancel = await send(
+      await escrow.buildCancelTx({ matchId, creator: creator.publicKey }),
+      creator,
+    );
     expect(await escrow.matchStatus(matchId)).toBe(null); // cancel_match closes the match PDA (rent reclaimed)
     expect(await woc(conn, creator.publicKey)).toBe(before); // fully reclaimed
   }, 180_000);
@@ -98,11 +135,22 @@ const supply = async (conn: Connection) => BigInt((await conn.getTokenSupply(MIN
     const oBefore = await woc(conn, opponent.publicKey);
     const supplyBefore = await supply(conn);
 
-    sigs.openRefund = await send(await escrow.buildOpenTx({ matchId, creator: creator.publicKey, stakeBase: STAKE }), creator);
-    sigs.joinRefund = await send(await escrow.buildJoinTx({ matchId, opponent: opponent.publicKey }), opponent);
+    sigs.openRefund = await send(
+      await escrow.buildOpenTx({ matchId, creator: creator.publicKey, stakeBase: STAKE }),
+      creator,
+    );
+    sigs.joinRefund = await send(
+      await escrow.buildJoinTx({ matchId, opponent: opponent.publicKey }),
+      opponent,
+    );
     expect(await escrow.bothStaked({ matchId })).toBe(true);
 
-    const r = await escrow.refundDraw({ matchId, creator: creator.publicKey, opponent: opponent.publicKey, stakeBase: STAKE });
+    const r = await escrow.refundDraw({
+      matchId,
+      creator: creator.publicKey,
+      opponent: opponent.publicKey,
+      stakeBase: STAKE,
+    });
     sigs.refund = r.signature;
     expect(await escrow.matchStatus(matchId)).toBe(null); // refund_match closes the match PDA (rent reclaimed)
     // Both made whole, nothing burned.

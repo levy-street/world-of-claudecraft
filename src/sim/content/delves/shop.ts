@@ -49,10 +49,30 @@ const COLLAPSED_RELIQUARY_SHOP: DelveShopEntry[] = [
   { itemId: 'varric_shadow_cowl', marks: 28, gate: 'heroicClear' },
 ];
 
+// The Drowned Litany (delve index 1) is the next currency-curve step: every
+// price here is a straight 2x of the equivalent Collapsed Reliquary slot, to
+// match the delve's doubled Marks payout (see grantDelveClearTo/grantRiteBonus).
+const DROWNED_LITANY_SHOP: DelveShopEntry[] = [
+  // -- immediately available utility pieces (class-neutral / off-set) --
+  { itemId: 'litany_legs', marks: 16, gate: 'available' },
+  { itemId: 'litany_shoulder', marks: 16, gate: 'available' },
+  { itemId: 'litany_gloves_rog', marks: 16, gate: 'available' },
+  // -- immediately available class-specific chests (the staple upgrade) --
+  { itemId: 'litany_cloth_chest', marks: 20, gate: 'available' },
+  { itemId: 'litany_leather_chest', marks: 20, gate: 'available' },
+  { itemId: 'litany_plate_chest', marks: 20, gate: 'available' },
+  // -- helm unlocks after 3 clears (rewards commitment to the delve) --
+  { itemId: 'litany_helm', marks: 24, gate: 'clears:3' },
+  // -- signature rares require a Heroic completion (multi-week goals) --
+  { itemId: 'sister_nhalia_choir_plate', marks: 56, gate: 'heroicClear' },
+  { itemId: 'drowned_choir_fang', marks: 56, gate: 'heroicClear' },
+];
+
 // Per-delve shop stock, keyed by DelveDef.id. New delves register their stock
 // here; the Sim looks up the shop by the delve the player is buying from.
 export const DELVE_SHOPS: Record<string, DelveShopEntry[]> = {
   collapsed_reliquary: COLLAPSED_RELIQUARY_SHOP,
+  drowned_litany: DROWNED_LITANY_SHOP,
 };
 
 // Pure gate check, shared by the Sim (server-authoritative buy) and the client UI
