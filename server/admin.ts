@@ -45,6 +45,7 @@ import {
   accountMailTarget,
   findAccount,
   isAdminAccount,
+  listCreatorSkinsForReview,
   pool,
   saveToken,
   setAccountDeactivated,
@@ -55,6 +56,7 @@ import type { GameServer } from './game';
 import { json, readBody } from './http_util';
 import { addBlockedIp, cleanIp, listBlockedIps, removeBlockedIp } from './ip_block_db';
 import { PgMapsDb } from './maps_db';
+import { removeListing, reviewListing } from './marketplace';
 import {
   addAccountNote,
   forceCharacterRename,
@@ -438,6 +440,21 @@ export async function handleAdminApi(
       const body = await readBody(req);
       const ignored = await ignoreReport(Number(ignoreMatch[1]), accountId, body.note);
       return ignored ? ok(res, { ok: true }) : fail(res, 404, 'open report not found');
+    }
+    // Creator-skin review queue (image uploads awaiting approval).
+    if (req.method === 'GET' && path === '/admin/api/skins/review') {
+      return ok(res, { skins: await listCreatorSkinsForReview(100) });
+    }
+    const skinReviewMatch = /^\/admin\/api\/skins\/([A-Za-z0-9_-]+)\/(approve|reject|remove)$/.exec(
+      path,
+    );
+    if (req.method === 'POST' && skinReviewMatch) {
+      const [, skinId, action] = skinReviewMatch;
+      const result =
+        action === 'remove'
+          ? await removeListing(skinId)
+          : await reviewListing(skinId, action as 'approve' | 'reject');
+      return result.ok ? ok(res, result) : fail(res, 404, result.reason ?? 'skin not found');
     }
     const forceRenameMatch = /^\/admin\/api\/moderation\/characters\/(\d+)\/force-rename$/.exec(
       path,

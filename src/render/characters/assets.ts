@@ -10,6 +10,11 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import {
+  type CreatorSkinRegistryEntry,
+  normalizeDesignSpec,
+  type SkinDesignSpec,
+} from '../../world_api';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
@@ -24,6 +29,7 @@ import {
   visibleAttachmentsForGraphics,
   visualAssetUrlForGraphics,
 } from './manifest';
+import { buildSkinCanvas, buildSkinEmissiveCanvas, designHash } from './skin_design';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
 
@@ -393,6 +399,160 @@ export function mechAssetsReady(): boolean {
     skinsReady &&
     (SKIN_EMISSIVE.player_mech ?? []).every((url) => !url || skinEmisTexByUrl.has(url))
   );
+}
+
+// --- Creator skins (marketplace UGC) ---------------------------------------
+// Unlike the compiled-in SKINS, creator-skin atlases are discovered at runtime
+// from /api/skins/registry and fetched from a CDN by an opaque cosmeticSkinId
+// (Entity.cosmeticSkinId). The renderer calls ensureCreatorSkin(id) when it
+// sees one, then creatorSkinTexture(id) to apply it (falling back to the
+// numeric skin on a miss). A bounded LRU over the URL->texture cache disposes
+// cold atlases — the one place skin textures are freed — so cycling through
+// many creator skins in a session can't grow VRAM without limit.
+const CREATOR_SKIN_MAX = 24; // resident distinct creator atlases (~16-21 MB each at 2048²)
+const creatorSkinRegistry = new Map<string, CreatorSkinRegistryEntry>();
+const creatorSkinTexByUrl = new Map<string, THREE.Texture>();
+const creatorSkinInflight = new Map<string, Promise<void>>();
+const creatorSkinLru: string[] = []; // texture URLs, most-recently-used last
+
+export function registerCreatorSkins(entries: CreatorSkinRegistryEntry[]): void {
+  for (const e of entries) {
+    // Normalize the design defensively: a registry entry may carry a legacy or
+    // partial spec (older DB row / older server) and the procedural builder
+    // assumes a complete spec. normalizeDesignSpec back-fills the richer fields
+    // (or returns null → the entry falls back to assetUrl/numeric skin).
+    creatorSkinRegistry.set(e.id, e.design ? { ...e, design: normalizeDesignSpec(e.design) } : e);
+  }
+}
+
+function touchCreatorUrl(url: string): void {
+  const i = creatorSkinLru.indexOf(url);
+  if (i >= 0) creatorSkinLru.splice(i, 1);
+  creatorSkinLru.push(url);
+}
+
+function evictCreatorSkins(): void {
+  while (creatorSkinLru.length > CREATOR_SKIN_MAX) {
+    const url = creatorSkinLru.shift();
+    if (url === undefined) break;
+    const tex = creatorSkinTexByUrl.get(url);
+    if (tex) tex.dispose();
+    creatorSkinTexByUrl.delete(url);
+  }
+}
+
+// Memoized per-URL load: short-circuits when already cached, dedupes in-flight
+// loads, and clears the in-flight entry on settle (resolve OR reject) so a
+// failed (CDN 404 / decode error) or post-eviction load can be retried rather
+// than staying cached as a permanently-rejected promise.
+function loadCreatorUrl(url: string): Promise<void> {
+  touchCreatorUrl(url);
+  if (creatorSkinTexByUrl.has(url)) return Promise.resolve();
+  const inflight = creatorSkinInflight.get(url);
+  if (inflight) return inflight;
+  const p = loadSkinTexInto(url, creatorSkinTexByUrl)
+    .then(() => {
+      touchCreatorUrl(url);
+      evictCreatorSkins();
+    })
+    .finally(() => {
+      creatorSkinInflight.delete(url);
+    });
+  creatorSkinInflight.set(url, p);
+  return p;
+}
+
+/** Ensure a creator skin's body atlas (and, on standard tier, its emissive) is
+ *  loaded. Memoized + idempotent; resolves immediately for an unknown id (the
+ *  caller then renders the numeric-skin fallback). */
+export function ensureCreatorSkin(id: string): Promise<void> {
+  const entry = creatorSkinRegistry.get(id);
+  if (!entry) return Promise.resolve();
+  // Procedural designer skins build synchronously from the spec — no fetch.
+  if (entry.design) {
+    designSkinTexture(entry.design);
+    return Promise.resolve();
+  }
+  const jobs = [loadCreatorUrl(entry.assetUrl)];
+  if (entry.emissiveUrl && GFX.standardMaterials) jobs.push(loadCreatorUrl(entry.emissiveUrl));
+  return Promise.all(jobs).then(() => undefined);
+}
+
+/** The body texture for a creator skin id, or null if unknown / not yet loaded.
+ *  Designer skins build procedurally from the spec; URL skins resolve from the
+ *  fetched-atlas cache (touching the LRU so an in-view skin stays resident). */
+export function creatorSkinTexture(id: string): THREE.Texture | null {
+  const entry = creatorSkinRegistry.get(id);
+  if (!entry) return null;
+  if (entry.design) return designSkinTexture(entry.design);
+  const tex = creatorSkinTexByUrl.get(entry.assetUrl);
+  if (tex) touchCreatorUrl(entry.assetUrl);
+  return tex ?? null;
+}
+
+/** The emissive (glow) map for a creator skin id, or null (no emissive / not
+ *  loaded / low tier). */
+export function creatorSkinEmissive(id: string): THREE.Texture | null {
+  const entry = creatorSkinRegistry.get(id);
+  if (!entry) return null;
+  if (entry.design) return designSkinEmissiveTex(entry.design);
+  if (!entry.emissiveUrl) return null;
+  return creatorSkinTexByUrl.get(entry.emissiveUrl) ?? null;
+}
+
+// --- Procedural designer skins (SkinDesignSpec) ----------------------------
+// Built on the client from the spec (no fetch); cached by design hash under the
+// same bounded budget as the URL atlas cache. designSkinTexture also drives the
+// designer's live preview (CharacterVisual.setDesignSkin) before a skin is listed.
+const designTexByHash = new Map<string, THREE.Texture>();
+const designEmisByHash = new Map<string, THREE.Texture>();
+const designLru: string[] = [];
+
+function texFromCanvas(cv: HTMLCanvasElement): THREE.Texture {
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.flipY = false;
+  t.needsUpdate = true;
+  return t;
+}
+
+function touchDesign(hash: string): void {
+  const i = designLru.indexOf(hash);
+  if (i >= 0) designLru.splice(i, 1);
+  designLru.push(hash);
+  while (designLru.length > CREATOR_SKIN_MAX) {
+    const h = designLru.shift();
+    if (h === undefined) break;
+    designTexByHash.get(h)?.dispose();
+    designEmisByHash.get(h)?.dispose();
+    designTexByHash.delete(h);
+    designEmisByHash.delete(h);
+  }
+}
+
+export function designSkinTexture(spec: SkinDesignSpec): THREE.Texture {
+  const h = designHash(spec);
+  let t = designTexByHash.get(h);
+  if (!t) {
+    t = texFromCanvas(buildSkinCanvas(spec));
+    designTexByHash.set(h, t);
+  }
+  touchDesign(h);
+  return t;
+}
+
+export function designSkinEmissiveTex(spec: SkinDesignSpec): THREE.Texture | null {
+  if (!spec.emissive) return null;
+  const h = designHash(spec);
+  let t = designEmisByHash.get(h);
+  if (!t) {
+    const cv = buildSkinEmissiveCanvas(spec);
+    if (!cv) return null;
+    t = texFromCanvas(cv);
+    designEmisByHash.set(h, t);
+  }
+  touchDesign(h);
+  return t;
 }
 
 function resolvedGltf(url: string): GLTF {

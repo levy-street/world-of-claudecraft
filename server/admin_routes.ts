@@ -75,6 +75,13 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/reactivate$/,
     permission: 'moderation.act',
   },
+  { method: 'GET', pattern: '/admin/api/skins/review', permission: 'moderation.read' },
+  {
+    method: 'POST',
+    pattern: /^\/admin\/api\/skins\/([A-Za-z0-9_-]+)\/(approve|reject|remove)$/,
+    permission: 'moderation.act',
+  },
+
   {
     method: 'POST',
     pattern: /^\/admin\/api\/moderation\/accounts\/(\d+)\/chat-mute$/,

@@ -4,7 +4,7 @@
 // mid-distance band. All geometry/materials are shared caches — dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
-import type { OverheadEmoteId } from '../../world_api';
+import type { OverheadEmoteId, SkinDesignSpec } from '../../world_api';
 import { GFX } from '../gfx';
 import {
   type AnimState,
@@ -15,6 +15,10 @@ import {
 import {
   applyMaterials,
   assembleModel,
+  creatorSkinEmissive,
+  creatorSkinTexture,
+  designSkinEmissiveTex,
+  designSkinTexture,
   ensureSkinTexture,
   prepareVisual,
   setHeldWeapon,
@@ -23,6 +27,7 @@ import {
   tintedFarMaterials,
 } from './assets';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
+import { designHash } from './skin_design';
 
 export type { AnimState, BaseState } from './anim_state';
 
@@ -75,6 +80,7 @@ export class CharacterVisual {
   private entityColor: number;
   private skinIndex: number;
   private weaponItemId: string | null;
+  private creatorSkinId: string | null = null;
   private disposed = false;
   private ghosted = false;
   private mixer: THREE.AnimationMixer;
@@ -409,10 +415,12 @@ export class CharacterVisual {
   }
 
   /** Swap the body skin (alternate texture atlas) at runtime; no-op if unchanged.
-   *  Reuses the shared skin-keyed material cache, so this is a cheap reassign. */
+   *  Reuses the shared skin-keyed material cache, so this is a cheap reassign.
+   *  Selecting a numeric skin also clears any creator-skin overlay. */
   setSkin(skinIndex: number): void {
-    if (skinIndex === this.skinIndex) return;
+    if (skinIndex === this.skinIndex && this.creatorSkinId === null) return;
     this.skinIndex = skinIndex;
+    this.creatorSkinId = null;
     this.applySkinMaterials(skinIndex);
     // If the alternate atlas for this skin has not finished loading yet,
     // skinTexture() returned null and the body is showing the embedded default.
@@ -426,7 +434,9 @@ export class CharacterVisual {
           // Bail if the model was disposed while the atlas was loading — applying
           // materials to a torn-down model is wasted work (and re-snapshots a stale
           // material map). Also guard that this is still the requested skin.
-          if (!this.disposed && this.skinIndex === skinIndex) this.applySkinMaterials(skinIndex);
+          if (!this.disposed && this.skinIndex === skinIndex && this.creatorSkinId === null) {
+            this.applySkinMaterials(skinIndex);
+          }
         })
         .catch((err) => console.error('failed to load skin atlas:', err));
     }
@@ -440,7 +450,44 @@ export class CharacterVisual {
       skinTexture(this.key, skinIndex),
       skinEmissiveTexture(this.key, skinIndex),
     );
-    // re-snapshot the material map ghost/restore relies on, then re-ghost if stealthed
+    this.resnapshotMaterials();
+  }
+
+  /** Apply a marketplace creator-skin overlay (an opaque id resolved to a CDN
+   *  atlas via the runtime registry). Falls back to the numeric `fallbackIndex`
+   *  skin when the atlas is unknown or not yet loaded — so a not-yet-fetched id
+   *  shows the built-in look until ensureCreatorSkin() resolves and this re-runs.
+   *  emissive applies on standard tier only, matching the numeric-skin path. */
+  setCreatorSkin(id: string, fallbackIndex: number): void {
+    const tex = creatorSkinTexture(id);
+    if (!tex) {
+      this.setSkin(fallbackIndex);
+      return;
+    }
+    if (id === this.creatorSkinId) return;
+    this.creatorSkinId = id;
+    this.skinIndex = fallbackIndex;
+    const emis = GFX.standardMaterials ? creatorSkinEmissive(id) : null;
+    applyMaterials(this.model, this.def, this.entityColor, tex, emis);
+    this.resnapshotMaterials();
+  }
+
+  /** Apply an ad-hoc procedural design spec (the in-browser designer's live
+   *  preview, before the skin is listed). Built synchronously from the spec —
+   *  identical to what every client renders once the skin is in the registry. */
+  setDesignSkin(spec: SkinDesignSpec, fallbackIndex: number): void {
+    const id = `design:${designHash(spec)}`;
+    if (id === this.creatorSkinId) return;
+    this.creatorSkinId = id;
+    this.skinIndex = fallbackIndex;
+    const emis = GFX.standardMaterials ? designSkinEmissiveTex(spec) : null;
+    applyMaterials(this.model, this.def, this.entityColor, designSkinTexture(spec), emis);
+    this.resnapshotMaterials();
+  }
+
+  // Re-snapshot the material map the ghost/restore path relies on after a body
+  // material swap, then re-ghost if currently stealthed.
+  private resnapshotMaterials(): void {
     this.originalMaterials.clear();
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;

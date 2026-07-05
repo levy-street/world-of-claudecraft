@@ -1,0 +1,45 @@
+<svg viewBox="0 0 860 430" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif" role="img">
+  <title>The $WOC buy-and-burn flywheel</title>
+  <desc>Every sale routes 30 percent to buy WOC off a DEX and burn it, reducing supply, which the community can verify on a public ledger.</desc>
+  <defs>
+    <marker id="fa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#534AB7"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="860" height="430" rx="14" fill="#FBFAF7" stroke="#E5E2D9"/>
+  <text x="40" y="48" font-size="23" font-weight="500" fill="#2C2C2A">The $WOC buy-and-burn flywheel</text>
+  <text x="40" y="74" font-size="14" fill="#5F5E5A">Creators get paid in stablecoin; the protocol turns 30% of every sale into permanent $WOC scarcity.</text>
+
+  <circle cx="300" cy="250" r="118" fill="none" stroke="#CECBF6" stroke-width="2" stroke-dasharray="4 6"/>
+  <path d="M300 132 A118 118 0 0 1 401 309" fill="none" stroke="#7F77DD" stroke-width="2.5" marker-end="url(#fa)"/>
+  <path d="M401 309 A118 118 0 0 1 199 309" fill="none" stroke="#7F77DD" stroke-width="2.5" marker-end="url(#fa)"/>
+  <path d="M199 309 A118 118 0 0 1 300 132" fill="none" stroke="#7F77DD" stroke-width="2.5" marker-end="url(#fa)"/>
+
+  <g text-anchor="middle">
+    <rect x="232" y="108" width="136" height="48" rx="10" fill="#E1F5EE" stroke="#0F6E56"/>
+    <text x="300" y="130" font-size="14" font-weight="500" fill="#04342C">creator sale</text>
+    <text x="300" y="147" font-size="11.5" fill="#0F6E56">70 / 30, any price</text>
+
+    <rect x="372" y="286" width="150" height="48" rx="10" fill="#FAECE7" stroke="#993C1D"/>
+    <text x="447" y="308" font-size="14" font-weight="500" fill="#4A1B0C">30% buys $WOC</text>
+    <text x="447" y="325" font-size="11.5" fill="#993C1D">off the DEX (Jupiter)</text>
+
+    <rect x="78" y="286" width="150" height="48" rx="10" fill="#EEEDFE" stroke="#534AB7"/>
+    <text x="153" y="308" font-size="14" font-weight="500" fill="#26215C">burn $WOC</text>
+    <text x="153" y="325" font-size="11.5" fill="#3C3489">supply decreases</text>
+  </g>
+
+  <g>
+    <rect x="560" y="120" width="262" height="92" rx="10" fill="#F1EFE8" stroke="#888780"/>
+    <text x="580" y="150" font-size="15" font-weight="500" fill="#2C2C2A">Why it compounds</text>
+    <text x="580" y="174" font-size="13" fill="#444441">More sales → more $WOC bought + burned</text>
+    <text x="580" y="194" font-size="13" fill="#444441">→ scarcer supply, no creator-liquidity risk.</text>
+
+    <rect x="560" y="226" width="262" height="92" rx="10" fill="#E6F1FB" stroke="#185FA5"/>
+    <text x="580" y="256" font-size="15" font-weight="500" fill="#0C447C">Transparent by design</text>
+    <text x="580" y="280" font-size="13" fill="#185FA5">Every batch — USDC in, $WOC bought,</text>
+    <text x="580" y="300" font-size="13" fill="#185FA5">$WOC burned — on a public ledger.</text>
+  </g>
+
+  <text x="40" y="406" font-size="12.5" fill="#5F5E5A">Paid in USDC (no liquidity worry for creators) · the 30% is the only thing exposed to $WOC · burns are explorer-verifiable.</text>
+</svg>

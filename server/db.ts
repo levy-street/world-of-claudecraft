@@ -3,6 +3,11 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import {
+  normalizeAccountCosmetics,
+  normalizeDesignSpec,
+  type SkinDesignSpec,
+} from '../src/world_api';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import { DISCORD_SCHEMA } from './discord_db';
@@ -577,6 +582,125 @@ CREATE TABLE IF NOT EXISTS referrals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS referrals_referrer ON referrals(referrer_account_id);
+-- Creator skins marketplace (docs/prd/woc/creator-skins-marketplace.md). The
+-- opaque id the sim carries as Entity.cosmeticSkinId is creator_skins.id. Phase
+-- 1 is curated: rows are seeded 'live' by an operator; the open submission +
+-- moderation pipeline is a later phase. price_usdc is in USDC base units (6dp).
+CREATE TABLE IF NOT EXISTS creator_skins (
+  id TEXT PRIMARY KEY,
+  creator_account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
+  creator_wallet TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  skin_catalog TEXT NOT NULL DEFAULT 'class',
+  fallback_skin INT NOT NULL DEFAULT 0,
+  target_class TEXT,
+  asset_url TEXT NOT NULL,
+  emissive_url TEXT,
+  price_usdc BIGINT NOT NULL CHECK (price_usdc > 0),
+  status TEXT NOT NULL DEFAULT 'draft',
+  sha256 TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS creator_skins_status ON creator_skins(status);
+CREATE INDEX IF NOT EXISTS creator_skins_creator ON creator_skins(creator_account_id);
+-- Procedural in-browser-designer skins store a small spec (two colours + pattern
+-- + optional glow) instead of a hosted atlas; every client rebuilds the texture
+-- from it. Added post-hoc so existing deployments migrate without a drop.
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS design_spec JSONB;
+-- Creator-supplied image skins (docs/prd/woc/creator-skin-uploads.md). source
+-- distinguishes the procedural designer from the two image modes. self_hosted:
+-- origin_url is the creator's external URL (SERVER-ONLY, never in the public
+-- registry); we proxy it. hosted: ipfs_cid is the Pinata pin. review_status
+-- gates sale until an operator (or a trusted creator's instant-live) approves;
+-- overflow_hidden parks a hosted skin that fell past its tier quota.
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'design';
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS origin_url TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS ipfs_cid TEXT;
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS review_status TEXT NOT NULL DEFAULT 'approved';
+ALTER TABLE creator_skins ADD COLUMN IF NOT EXISTS overflow_hidden BOOLEAN NOT NULL DEFAULT false;
+CREATE INDEX IF NOT EXISTS creator_skins_source ON creator_skins(source);
+-- Per-creator moderation trust: approved-listing tally + ToS strikes drive the
+-- "trusted creator" badge (instant-live uploads). first_listing_at anchors the
+-- account-age requirement (cheaper than joining accounts for every quota check).
+CREATE TABLE IF NOT EXISTS creator_trust (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  approved_count INT NOT NULL DEFAULT 0,
+  strikes INT NOT NULL DEFAULT 0,
+  last_strike_at TIMESTAMPTZ,
+  trusted BOOLEAN NOT NULL DEFAULT false,
+  first_listing_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- A pending purchase quote binds an on-chain split tx to one buyer + skin +
+-- exact leg amounts, so verification can reject quote substitution. Short-lived.
+CREATE TABLE IF NOT EXISTS marketplace_quotes (
+  quote_id TEXT PRIMARY KEY,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id) ON DELETE CASCADE,
+  buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  creator_owner TEXT NOT NULL,
+  burn_owner TEXT NOT NULL,
+  creator_usdc BIGINT NOT NULL,
+  burn_usdc BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS marketplace_quotes_expires ON marketplace_quotes(expires_at);
+-- Inbound on-chain payments; the replay guard for every verified purchase
+-- (one settled sale per signature).
+CREATE TABLE IF NOT EXISTS onchain_payments (
+  tx_sig TEXT PRIMARY KEY,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  reference TEXT NOT NULL,
+  amount BIGINT NOT NULL,
+  mint TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- Business-level marketplace sales: one row per settled, verified purchase.
+CREATE TABLE IF NOT EXISTS marketplace_sales (
+  id BIGSERIAL PRIMARY KEY,
+  skin_id TEXT NOT NULL REFERENCES creator_skins(id),
+  buyer_account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  -- One sale per quote. With only the per-signature guard, a buyer who broadcasts
+  -- two valid payments for the same quote (distinct sigs) and races two /buy calls
+  -- could record two sales for one quote; this UNIQUE makes the second redeem fail
+  -- cleanly (23505 -> already_redeemed) instead of double-charging into two rows.
+  quote_id TEXT NOT NULL UNIQUE,
+  gross_usdc BIGINT NOT NULL,
+  creator_usdc BIGINT NOT NULL,
+  burn_usdc BIGINT NOT NULL,
+  pay_tx_sig TEXT NOT NULL UNIQUE REFERENCES onchain_payments(tx_sig),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS marketplace_sales_buyer ON marketplace_sales(buyer_account_id);
+CREATE INDEX IF NOT EXISTS marketplace_sales_skin ON marketplace_sales(skin_id);
+-- Buy-and-burn ledger (Phase 2 keeper). One row per batch: USDC drained from the
+-- burn vault, swapped to $WOC on a DEX, then SPL-burned. The public ledger reads
+-- these. batch_id is a durable idempotency key written BEFORE signing, and the
+-- buy/burn signatures are recorded so a crash recovers by querying the chain for
+-- the signature — never by re-reading balances (which could double-swap).
+CREATE TABLE IF NOT EXISTS burn_batches (
+  batch_id    TEXT PRIMARY KEY,
+  source      TEXT NOT NULL DEFAULT 'marketplace',
+  usdc_in     BIGINT NOT NULL,
+  woc_bought  BIGINT NOT NULL DEFAULT 0,
+  woc_burned  BIGINT NOT NULL DEFAULT 0,
+  buy_tx_sig  TEXT UNIQUE,
+  burn_tx_sig TEXT UNIQUE,
+  status      TEXT NOT NULL DEFAULT 'swapping'
+              CHECK (status IN ('swapping','swapped','burning','burned','failed')),
+  fail_reason TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  -- When the burn tx was broadcast. Burning-phase staleness is measured from THIS,
+  -- not created_at (= swap time), so a slow swap can't make the burn look instantly
+  -- stale and trigger a premature re-issue.
+  burn_broadcast_at TIMESTAMPTZ,
+  executed_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS burn_batches_status ON burn_batches(status);
+CREATE INDEX IF NOT EXISTS burn_batches_executed ON burn_batches(executed_at DESC);
 `;
 
 export async function ensureSchema(): Promise<void> {
@@ -657,27 +781,16 @@ export interface RequestMetadata {
 export interface AccountCosmetics {
   completedQuestIds: string[];
   mechChromaIds: string[];
+  // Marketplace creator-skin ids the account owns (purchased) and may equip.
+  // The opaque ids the sim carries as Entity.cosmeticSkinId; ownership is the
+  // server-authoritative gate on equipping one.
+  ownedCreatorSkinIds: string[];
 }
 
-function uniqueStrings(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  const out: string[] = [];
-  const seen = new Set<string>();
-  for (const item of value) {
-    if (typeof item !== 'string' || item.length === 0 || seen.has(item)) continue;
-    seen.add(item);
-    out.push(item);
-  }
-  return out;
-}
-
-export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: uniqueStrings(src.completedQuestIds),
-    mechChromaIds: uniqueStrings(src.mechChromaIds),
-  };
-}
+// The cosmetics-blob normalizer is shared with the client; it lives in
+// world_api.ts (the seam both sides import) so the two can't drift. Re-exported
+// here so existing `from './db'` importers keep working.
+export { normalizeAccountCosmetics };
 
 export async function loadAccountCosmetics(accountId: number): Promise<AccountCosmetics> {
   const res = await pool.query('SELECT cosmetics FROM accounts WHERE id = $1', [accountId]);
@@ -2427,4 +2540,550 @@ export async function pruneChatLogs(retentionDays: number): Promise<number> {
     [String(Math.floor(retentionDays))],
   );
   return res.rowCount ?? 0;
+}
+
+// --------------------------------------------------------------------------
+// Creator skins marketplace
+// --------------------------------------------------------------------------
+
+export interface CreatorSkinRow {
+  id: string;
+  creatorAccountId: number | null;
+  creatorWallet: string;
+  name: string;
+  description: string;
+  skinCatalog: 'class' | 'mech';
+  fallbackSkin: number;
+  targetClass: string | null;
+  assetUrl: string;
+  emissiveUrl: string | null;
+  design: SkinDesignSpec | null; // procedural designer spec; takes precedence over assetUrl
+  source: 'design' | 'self_hosted' | 'hosted';
+  originUrl: string | null; // self_hosted only; SERVER-ONLY, never serialized to clients
+  ipfsCid: string | null; // hosted only; Pinata pin
+  reviewStatus: 'pending' | 'approved' | 'rejected';
+  overflowHidden: boolean; // hosted skin parked past its tier quota
+  priceUsdc: bigint;
+  status: 'draft' | 'review' | 'live' | 'rejected' | 'delisted' | 'removed';
+  sha256: string | null;
+}
+
+export interface MarketplaceQuoteRow {
+  quoteId: string;
+  skinId: string;
+  buyerAccountId: number;
+  creatorOwner: string;
+  burnOwner: string;
+  creatorUsdc: bigint;
+  burnUsdc: bigint;
+  mint: string;
+  expiresAt: string;
+}
+
+function mapCreatorSkin(row: Record<string, unknown>): CreatorSkinRow {
+  return {
+    id: row.id as string,
+    creatorAccountId: row.creator_account_id === null ? null : Number(row.creator_account_id),
+    creatorWallet: row.creator_wallet as string,
+    name: row.name as string,
+    description: row.description as string,
+    skinCatalog: row.skin_catalog === 'mech' ? 'mech' : 'class',
+    fallbackSkin: Number(row.fallback_skin),
+    targetClass: (row.target_class as string | null) ?? null,
+    assetUrl: row.asset_url as string,
+    emissiveUrl: (row.emissive_url as string | null) ?? null,
+    design: normalizeDesignSpec(row.design_spec),
+    source:
+      (row.source as string) === 'self_hosted' || (row.source as string) === 'hosted'
+        ? (row.source as 'self_hosted' | 'hosted')
+        : 'design',
+    originUrl: (row.origin_url as string | null) ?? null,
+    ipfsCid: (row.ipfs_cid as string | null) ?? null,
+    reviewStatus:
+      (row.review_status as string) === 'pending' || (row.review_status as string) === 'rejected'
+        ? (row.review_status as 'pending' | 'rejected')
+        : 'approved',
+    overflowHidden: row.overflow_hidden === true,
+    priceUsdc: BigInt(row.price_usdc as string),
+    status: row.status as CreatorSkinRow['status'],
+    sha256: (row.sha256 as string | null) ?? null,
+  };
+}
+
+export async function listLiveCreatorSkins(): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE status = 'live' AND review_status = 'approved' AND overflow_hidden = false
+      ORDER BY created_at`,
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+export async function getCreatorSkin(id: string): Promise<CreatorSkinRow | null> {
+  const res = await pool.query('SELECT * FROM creator_skins WHERE id = $1', [id]);
+  return res.rows[0] ? mapCreatorSkin(res.rows[0]) : null;
+}
+
+// Seed / curate a creator skin (Phase 1 operator path; the open submission +
+// moderation pipeline is a later phase). Upserts by id so re-seeding is safe.
+export async function upsertCreatorSkin(row: CreatorSkinRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_skins
+       (id, creator_account_id, creator_wallet, name, description, skin_catalog,
+        fallback_skin, target_class, asset_url, emissive_url, price_usdc, status, sha256, design_spec,
+        source, origin_url, ipfs_cid, review_status, overflow_hidden, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19, now())
+     ON CONFLICT (id) DO UPDATE SET
+       creator_account_id = EXCLUDED.creator_account_id,
+       creator_wallet = EXCLUDED.creator_wallet,
+       name = EXCLUDED.name,
+       description = EXCLUDED.description,
+       skin_catalog = EXCLUDED.skin_catalog,
+       fallback_skin = EXCLUDED.fallback_skin,
+       target_class = EXCLUDED.target_class,
+       asset_url = EXCLUDED.asset_url,
+       emissive_url = EXCLUDED.emissive_url,
+       price_usdc = EXCLUDED.price_usdc,
+       status = EXCLUDED.status,
+       sha256 = EXCLUDED.sha256,
+       design_spec = EXCLUDED.design_spec,
+       source = EXCLUDED.source,
+       origin_url = EXCLUDED.origin_url,
+       ipfs_cid = EXCLUDED.ipfs_cid,
+       review_status = EXCLUDED.review_status,
+       overflow_hidden = EXCLUDED.overflow_hidden,
+       updated_at = now()`,
+    [
+      row.id,
+      row.creatorAccountId,
+      row.creatorWallet,
+      row.name,
+      row.description,
+      row.skinCatalog,
+      row.fallbackSkin,
+      row.targetClass,
+      row.assetUrl,
+      row.emissiveUrl,
+      row.priceUsdc.toString(),
+      row.status,
+      row.sha256,
+      row.design ? JSON.stringify(row.design) : null,
+      row.source,
+      row.originUrl,
+      row.ipfsCid,
+      row.reviewStatus,
+      row.overflowHidden,
+    ],
+  );
+}
+
+/** How many live skins an account has listed (the per-creator anti-spam cap). */
+export async function countLiveCreatorSkinsByAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS n FROM creator_skins WHERE creator_account_id = $1 AND status = 'live'`,
+    [accountId],
+  );
+  return Number(res.rows[0]?.n ?? 0);
+}
+
+/** Hosted (IPFS-pinned) skins an account holds against its $WOC quota: every
+ *  not-removed hosted row (pending + approved, including overflow-hidden), so a
+ *  pending upload holds a slot and a tier drop is measured against real usage. */
+export async function countHostedSkinsByAccount(accountId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT count(*)::int AS n FROM creator_skins
+      WHERE creator_account_id = $1 AND source = 'hosted' AND status <> 'removed'`,
+    [accountId],
+  );
+  return Number(res.rows[0]?.n ?? 0);
+}
+
+export interface CreatorTrustRow {
+  approvedCount: number;
+  strikes: number;
+  lastStrikeAt: string | null;
+  trusted: boolean;
+  firstListingAt: string;
+}
+
+/** A creator's moderation-trust record (defaults for an account with no listings yet). */
+export async function getCreatorTrust(accountId: number): Promise<CreatorTrustRow> {
+  const res = await pool.query(
+    `SELECT approved_count, strikes, last_strike_at, trusted, first_listing_at
+       FROM creator_trust WHERE account_id = $1`,
+    [accountId],
+  );
+  const r = res.rows[0];
+  if (!r)
+    return {
+      approvedCount: 0,
+      strikes: 0,
+      lastStrikeAt: null,
+      trusted: false,
+      firstListingAt: new Date().toISOString(),
+    };
+  return {
+    approvedCount: Number(r.approved_count),
+    strikes: Number(r.strikes),
+    lastStrikeAt: isoOrNull(r.last_strike_at),
+    trusted: r.trusted === true,
+    firstListingAt: isoOrNull(r.first_listing_at) ?? new Date().toISOString(),
+  };
+}
+
+/** Ensure a trust row exists (records first_listing_at on first listing). */
+export async function ensureCreatorTrust(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id) VALUES ($1) ON CONFLICT (account_id) DO NOTHING`,
+    [accountId],
+  );
+}
+
+/** Set the persisted trusted flag (recomputed from approvals/tier/age/strikes). */
+export async function setCreatorTrusted(accountId: number, trusted: boolean): Promise<void> {
+  await pool.query(
+    `UPDATE creator_trust SET trusted = $2, updated_at = now() WHERE account_id = $1`,
+    [accountId, trusted],
+  );
+}
+
+/** Increment the approved-listing tally (on an operator/auto approval). */
+export async function bumpApprovedListings(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id, approved_count) VALUES ($1, 1)
+       ON CONFLICT (account_id) DO UPDATE SET approved_count = creator_trust.approved_count + 1, updated_at = now()`,
+    [accountId],
+  );
+}
+
+/** Record a ToS strike and clear trust (a removed/violating skin). */
+export async function recordCreatorStrike(accountId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO creator_trust (account_id, strikes, last_strike_at, trusted) VALUES ($1, 1, now(), false)
+       ON CONFLICT (account_id) DO UPDATE SET
+         strikes = creator_trust.strikes + 1, last_strike_at = now(), trusted = false, updated_at = now()`,
+    [accountId],
+  );
+}
+
+/** Set a skin's review status (operator approve/reject). Returns the row, or null if unknown. */
+export async function setCreatorSkinReview(
+  id: string,
+  reviewStatus: 'approved' | 'rejected',
+): Promise<CreatorSkinRow | null> {
+  const res = await pool.query(
+    `UPDATE creator_skins SET review_status = $2, updated_at = now() WHERE id = $1 RETURNING *`,
+    [id, reviewStatus],
+  );
+  return res.rows[0] ? mapCreatorSkin(res.rows[0]) : null;
+}
+
+/** Image skins awaiting operator review (oldest first). */
+export async function listCreatorSkinsForReview(limit = 100): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE review_status = 'pending' AND source IN ('self_hosted', 'hosted') AND status <> 'removed'
+      ORDER BY created_at LIMIT $1`,
+    [Math.max(1, Math.min(500, Math.floor(limit)))],
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+/** A creator's own hosted skins, newest first (for overflow-quota enforcement). */
+export async function listHostedSkinsByAccount(accountId: number): Promise<CreatorSkinRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM creator_skins
+      WHERE creator_account_id = $1 AND source = 'hosted' AND status <> 'removed'
+      ORDER BY created_at DESC`,
+    [accountId],
+  );
+  return res.rows.map(mapCreatorSkin);
+}
+
+/** Park/unpark a hosted skin past its tier quota (overflow hide / restore). */
+export async function setCreatorSkinOverflowHidden(id: string, hidden: boolean): Promise<void> {
+  await pool.query(
+    `UPDATE creator_skins SET overflow_hidden = $2, updated_at = now() WHERE id = $1`,
+    [id, hidden],
+  );
+}
+
+/** Set a skin's sale status (e.g. 'removed' on an admin takedown). */
+export async function setCreatorSkinStatus(
+  id: string,
+  status: CreatorSkinRow['status'],
+): Promise<void> {
+  await pool.query(`UPDATE creator_skins SET status = $2, updated_at = now() WHERE id = $1`, [
+    id,
+    status,
+  ]);
+}
+
+export async function createMarketplaceQuote(q: MarketplaceQuoteRow): Promise<void> {
+  await pool.query(
+    `INSERT INTO marketplace_quotes
+       (quote_id, skin_id, buyer_account_id, creator_owner, burn_owner, creator_usdc, burn_usdc, mint, expires_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+    [
+      q.quoteId,
+      q.skinId,
+      q.buyerAccountId,
+      q.creatorOwner,
+      q.burnOwner,
+      q.creatorUsdc.toString(),
+      q.burnUsdc.toString(),
+      q.mint,
+      q.expiresAt,
+    ],
+  );
+}
+
+export async function getMarketplaceQuote(quoteId: string): Promise<MarketplaceQuoteRow | null> {
+  const res = await pool.query('SELECT * FROM marketplace_quotes WHERE quote_id = $1', [quoteId]);
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    quoteId: row.quote_id,
+    skinId: row.skin_id,
+    buyerAccountId: Number(row.buyer_account_id),
+    creatorOwner: row.creator_owner,
+    burnOwner: row.burn_owner,
+    creatorUsdc: BigInt(row.creator_usdc),
+    burnUsdc: BigInt(row.burn_usdc),
+    mint: row.mint,
+    expiresAt: iso(row.expires_at),
+  };
+}
+
+export async function deleteMarketplaceQuote(quoteId: string): Promise<void> {
+  await pool.query('DELETE FROM marketplace_quotes WHERE quote_id = $1', [quoteId]);
+}
+
+export async function pruneMarketplaceQuotes(): Promise<void> {
+  await pool.query('DELETE FROM marketplace_quotes WHERE expires_at <= now()');
+}
+
+/**
+ * Atomically redeem a verified purchase: consume the payment signature (the
+ * replay guard), record the sale, grant the skin, and delete the quote — all in
+ * ONE transaction. Either the signature is consumed AND the skin granted, or
+ * neither (a mid-way failure rolls back), so a paid buyer can never be stranded
+ * with a consumed signature and no cosmetic. Returns false if the signature was
+ * already consumed (ON CONFLICT) — i.e. a replay.
+ */
+export async function redeemPurchase(p: {
+  txSig: string;
+  accountId: number;
+  quoteId: string;
+  mint: string;
+  skinId: string;
+  grossUsdc: bigint;
+  creatorUsdc: bigint;
+  burnUsdc: bigint;
+}): Promise<boolean> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const ins = await client.query(
+      `INSERT INTO onchain_payments (tx_sig, account_id, reference, amount, mint)
+       VALUES ($1,$2,$3,$4,$5) ON CONFLICT (tx_sig) DO NOTHING`,
+      [p.txSig, p.accountId, p.quoteId, p.grossUsdc.toString(), p.mint],
+    );
+    if ((ins.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    await client.query(
+      `INSERT INTO marketplace_sales
+         (skin_id, buyer_account_id, quote_id, gross_usdc, creator_usdc, burn_usdc, pay_tx_sig)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+      [
+        p.skinId,
+        p.accountId,
+        p.quoteId,
+        p.grossUsdc.toString(),
+        p.creatorUsdc.toString(),
+        p.burnUsdc.toString(),
+        p.txSig,
+      ],
+    );
+    // Grant ownership on the same row lock (read-modify-write under the tx).
+    const cur = await client.query('SELECT cosmetics FROM accounts WHERE id = $1 FOR UPDATE', [
+      p.accountId,
+    ]);
+    const cosmetics = normalizeAccountCosmetics(cur.rows[0]?.cosmetics);
+    if (!cosmetics.ownedCreatorSkinIds.includes(p.skinId)) {
+      await client.query('UPDATE accounts SET cosmetics = $2 WHERE id = $1', [
+        p.accountId,
+        { ...cosmetics, ownedCreatorSkinIds: [...cosmetics.ownedCreatorSkinIds, p.skinId] },
+      ]);
+    }
+    await client.query('DELETE FROM marketplace_quotes WHERE quote_id = $1', [p.quoteId]);
+    await client.query('COMMIT');
+    return true;
+  } catch (e) {
+    await client.query('ROLLBACK').catch(() => {});
+    // A unique violation here can only be marketplace_sales.quote_id: a second valid
+    // payment for the same quote (distinct signature) racing this redeem. The
+    // per-signature gate already passed, so this is the same-quote double-pay — treat
+    // it as already-redeemed (one grant, one sale) rather than a 500.
+    if ((e as { code?: string })?.code === '23505') return false;
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+// --------------------------------------------------------------------------
+// Buy-and-burn ledger (Phase 2 keeper)
+// --------------------------------------------------------------------------
+
+export interface BurnBatchRow {
+  batchId: string;
+  source: string;
+  usdcIn: bigint;
+  wocBought: bigint;
+  wocBurned: bigint;
+  buyTxSig: string | null;
+  burnTxSig: string | null;
+  status: 'swapping' | 'swapped' | 'burning' | 'burned' | 'failed';
+  failReason: string | null;
+  createdAt: string;
+  burnBroadcastAt: string | null;
+  executedAt: string | null;
+}
+
+// A Postgres timestamptz arrives as a JS Date (pg) or already a string; normalize to ISO.
+function iso(v: unknown): string {
+  return v instanceof Date ? v.toISOString() : String(v);
+}
+function isoOrNull(v: unknown): string | null {
+  return v == null ? null : iso(v);
+}
+
+function mapBurnBatch(row: Record<string, unknown>): BurnBatchRow {
+  return {
+    batchId: row.batch_id as string,
+    source: row.source as string,
+    usdcIn: BigInt(row.usdc_in as string),
+    wocBought: BigInt(row.woc_bought as string),
+    wocBurned: BigInt(row.woc_burned as string),
+    buyTxSig: (row.buy_tx_sig as string | null) ?? null,
+    burnTxSig: (row.burn_tx_sig as string | null) ?? null,
+    status: row.status as BurnBatchRow['status'],
+    failReason: (row.fail_reason as string | null) ?? null,
+    createdAt: iso(row.created_at),
+    burnBroadcastAt: isoOrNull(row.burn_broadcast_at),
+    executedAt: isoOrNull(row.executed_at),
+  };
+}
+
+// Open the batch by recording its durable intent + the pre-signed swap signature
+// BEFORE the swap is broadcast. Returns false if buy_tx_sig collides (the same
+// signed swap was already opened — idempotent on a retried/recovered cycle).
+// A target-less `ON CONFLICT DO NOTHING` is deliberate: it arbitrates over EVERY
+// unique constraint (the batch_id PK AND the buy_tx_sig UNIQUE), so the buy_tx_sig
+// replay is caught as a no-op (rowCount 0) — don't narrow it to one target.
+export async function createBurnBatch(b: {
+  batchId: string;
+  source: string;
+  usdcIn: bigint;
+  buyTxSig: string;
+}): Promise<boolean> {
+  const res = await pool.query(
+    `INSERT INTO burn_batches (batch_id, source, usdc_in, buy_tx_sig, status)
+     VALUES ($1,$2,$3,$4,'swapping') ON CONFLICT DO NOTHING`,
+    [b.batchId, b.source, b.usdcIn.toString(), b.buyTxSig],
+  );
+  return (res.rowCount ?? 0) === 1;
+}
+
+export async function markBatchSwapped(batchId: string, wocBought: bigint): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'swapped', woc_bought = $2 WHERE batch_id = $1`,
+    [batchId, wocBought.toString()],
+  );
+}
+
+export async function markBatchBurning(batchId: string, burnTxSig: string): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'burning', burn_tx_sig = $2, burn_broadcast_at = now() WHERE batch_id = $1`,
+    [batchId, burnTxSig],
+  );
+}
+
+export async function markBatchBurned(batchId: string, wocBurned: bigint): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'burned', woc_burned = $2, executed_at = now() WHERE batch_id = $1`,
+    [batchId, wocBurned.toString()],
+  );
+}
+
+export async function markBatchFailed(batchId: string, reason: string): Promise<void> {
+  await pool.query(
+    `UPDATE burn_batches SET status = 'failed', fail_reason = $2, executed_at = now() WHERE batch_id = $1`,
+    [batchId, reason.slice(0, 500)],
+  );
+}
+
+// In-flight batches (anything not terminal) for crash recovery, oldest first.
+export async function openBurnBatches(): Promise<BurnBatchRow[]> {
+  const res = await pool.query(
+    `SELECT * FROM burn_batches WHERE status IN ('swapping','swapped','burning') ORDER BY created_at`,
+  );
+  return res.rows.map(mapBurnBatch);
+}
+
+// Timestamp of the most recent completed burn (drives the batch cadence).
+export async function lastBurnAt(): Promise<number | null> {
+  const res = await pool.query(
+    `SELECT MAX(executed_at) AS at FROM burn_batches WHERE status = 'burned'`,
+  );
+  const at = res.rows[0]?.at;
+  return at == null ? null : new Date(at).getTime();
+}
+
+// Public, factual burn ledger: completed burns + running cumulative total.
+export async function burnLedger(
+  limit = 100,
+): Promise<{ batches: BurnBatchRow[]; cumulativeWocBurned: bigint; cumulativeUsdcIn: bigint }> {
+  const lim = Math.max(1, Math.min(500, Math.floor(limit)));
+  const rows = await pool.query(
+    `SELECT * FROM burn_batches WHERE status = 'burned' ORDER BY executed_at DESC LIMIT $1`,
+    [lim],
+  );
+  const totals = await pool.query(
+    `SELECT COALESCE(SUM(woc_burned),0) AS woc, COALESCE(SUM(usdc_in),0) AS usdc FROM burn_batches WHERE status = 'burned'`,
+  );
+  return {
+    batches: rows.rows.map(mapBurnBatch),
+    cumulativeWocBurned: BigInt(totals.rows[0]?.woc ?? 0),
+    cumulativeUsdcIn: BigInt(totals.rows[0]?.usdc ?? 0),
+  };
+}
+
+// Cross-process mutual exclusion for the buy-and-burn keeper. Deployment is
+// process-per-realm sharing ONE DATABASE_URL + ONE burn vault, so the keeper's
+// "only one batch in flight at a time" guarantee needs a global lock — not just
+// per-process state. Holds a SESSION-level pg_try_advisory_lock on a dedicated
+// connection for the duration of the cycle; if another process already holds it,
+// returns null (this tick is skipped) so two processes never sign independent
+// swaps against the same vault. (Same advisory-lock mechanism ensureSchema uses
+// for concurrent boots; a distinct key.)
+const BURN_KEEPER_LOCK_KEY = 0x57_4f_43_02; // "WOC\x02"
+export async function withBurnKeeperLock<T>(fn: () => Promise<T>): Promise<T | null> {
+  const client = await pool.connect();
+  try {
+    const res = await client.query('SELECT pg_try_advisory_lock($1) AS locked', [
+      BURN_KEEPER_LOCK_KEY,
+    ]);
+    if (!res.rows[0]?.locked) return null;
+    try {
+      return await fn();
+    } finally {
+      await client.query('SELECT pg_advisory_unlock($1)', [BURN_KEEPER_LOCK_KEY]);
+    }
+  } finally {
+    client.release();
+  }
 }

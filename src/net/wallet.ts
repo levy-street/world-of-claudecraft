@@ -1,3 +1,12 @@
+import './wallet-polyfill';
+import { isSolanaChain } from '@solana/wallet-standard-chains';
+import {
+  SolanaSignAndSendTransaction,
+  type SolanaSignAndSendTransactionFeature,
+  SolanaSignMessage,
+  type SolanaSignMessageFeature,
+} from '@solana/wallet-standard-features';
+import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 // Non-custodial Solana wallet connection through Wallet Standard. The
 // account↔wallet *link* is performed by the server after the wallet signs a
 // challenge (see src/net/online.ts + server/wallet.ts).
@@ -8,15 +17,13 @@ import { getWallets, type Wallets } from '@wallet-standard/app';
 import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
 import {
   StandardConnect,
-  StandardDisconnect,
-  StandardEvents,
   type StandardConnectFeature,
+  StandardDisconnect,
   type StandardDisconnectFeature,
+  StandardEvents,
   type StandardEventsChangeProperties,
   type StandardEventsFeature,
 } from '@wallet-standard/features';
-import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
 import bs58 from 'bs58';
 
 export interface WalletState {
@@ -32,7 +39,10 @@ export interface WalletOption {
 }
 
 type CompatibleWallet = Wallet & StandardConnectFeature & SolanaSignMessageFeature;
-type WalletPicker = (wallets: readonly WalletOption[], selectedId: string | null) => Promise<string | null>;
+type WalletPicker = (
+  wallets: readonly WalletOption[],
+  selectedId: string | null,
+) => Promise<string | null>;
 type ConnectApi = StandardConnectFeature[typeof StandardConnect];
 type DisconnectApi = StandardDisconnectFeature[typeof StandardDisconnect];
 type EventsApi = StandardEventsFeature[typeof StandardEvents];
@@ -108,11 +118,13 @@ function connectFeature(wallet: CompatibleWallet): ConnectApi {
 }
 
 function disconnectFeature(wallet: Wallet): DisconnectApi | null {
-  return hasDisconnectFeature(wallet) ? wallet.features[StandardDisconnect] as DisconnectApi : null;
+  return hasDisconnectFeature(wallet)
+    ? (wallet.features[StandardDisconnect] as DisconnectApi)
+    : null;
 }
 
 function eventsFeature(wallet: Wallet): EventsApi | null {
-  return hasEventsFeature(wallet) ? wallet.features[StandardEvents] as EventsApi : null;
+  return hasEventsFeature(wallet) ? (wallet.features[StandardEvents] as EventsApi) : null;
 }
 
 function signMessageFeature(wallet: CompatibleWallet): SignMessageApi {
@@ -124,7 +136,10 @@ function accountSupportsSolanaSignMessage(account: WalletAccount): boolean {
 }
 
 function walletSupportsSolana(wallet: Wallet): boolean {
-  return wallet.chains.some(isSolanaChain) || wallet.accounts.some((account) => account.chains.some(isSolanaChain));
+  return (
+    wallet.chains.some(isSolanaChain) ||
+    wallet.accounts.some((account) => account.chains.some(isSolanaChain))
+  );
 }
 
 function isCompatibleWallet(wallet: Wallet): wallet is CompatibleWallet {
@@ -136,7 +151,10 @@ function compatibleWallets(): CompatibleWallet[] {
   return registry?.get().filter(isCompatibleWallet) ?? [];
 }
 
-function chooseAccount(wallet: CompatibleWallet, accounts: readonly WalletAccount[] = wallet.accounts): WalletAccount | null {
+function chooseAccount(
+  wallet: CompatibleWallet,
+  accounts: readonly WalletAccount[] = wallet.accounts,
+): WalletAccount | null {
   return accounts.find(accountSupportsSolanaSignMessage) ?? null;
 }
 
@@ -156,7 +174,11 @@ function setPickerOpen(open: boolean): void {
   for (const cb of modalListeners) cb(open);
 }
 
-function setSelected(wallet: CompatibleWallet | null, account: WalletAccount | null, persist: boolean): void {
+function setSelected(
+  wallet: CompatibleWallet | null,
+  account: WalletAccount | null,
+  persist: boolean,
+): void {
   const previousAddress = selectedAccount?.address ?? null;
   selectedWallet = wallet;
   selectedAccount = account;
@@ -201,8 +223,11 @@ function findWallet(id: string): CompatibleWallet | null {
 function selectAuthorizedWallet(): boolean {
   const storedName = readStoredWalletName();
   const wallets = compatibleWallets();
-  const storedWallet = storedName ? wallets.find((wallet) => wallet.name === storedName) ?? null : null;
-  const walletWithAccount = storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
+  const storedWallet = storedName
+    ? (wallets.find((wallet) => wallet.name === storedName) ?? null)
+    : null;
+  const walletWithAccount =
+    storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
   if (!walletWithAccount) return false;
   const account = chooseAccount(walletWithAccount);
   attachSelectedWalletEvents(walletWithAccount);
@@ -225,7 +250,8 @@ function trySilentReconnect(): void {
     return;
   }
   selectedWallet = wallet;
-  connectFeature(wallet).connect({ silent: true })
+  connectFeature(wallet)
+    .connect({ silent: true })
     .then((result) => {
       if (selectedWallet !== wallet) return;
       setSelected(wallet, chooseAccount(wallet, result.accounts), true);
@@ -239,7 +265,10 @@ function attachRegistryEvents(): void {
   if (!registry || registryOff || registryUnregisterOff) return;
   registryOff = registry.on('register', (...wallets) => {
     const currentId = selectedWallet ? walletId(selectedWallet) : null;
-    if (currentId && wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))) {
+    if (
+      currentId &&
+      wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))
+    ) {
       trySilentReconnect();
     } else if (!selectedAccount) {
       selectAuthorizedWallet();
@@ -355,8 +384,10 @@ export async function signMessageBase58(message: string): Promise<string> {
   const messageBytes = new TextEncoder().encode(message);
   const results = await signMessageFeature(wallet).signMessage({ account, message: messageBytes });
   const result = results[0];
-  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
-  if (!bytesEqual(result.signedMessage, messageBytes)) throw new Error('wallet modified the message before signing');
+  if (!result || !(result.signature instanceof Uint8Array))
+    throw new Error('wallet returned an invalid signature');
+  if (!bytesEqual(result.signedMessage, messageBytes))
+    throw new Error('wallet modified the message before signing');
   return bs58.encode(result.signature);
 }
 
@@ -379,4 +410,182 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
     console.error('[wallet] $WOC balance read failed', err);
     return null;
   }
+}
+
+// ── Marketplace split payment ────────────────────────────────────────────────
+// Build + sign + send the single atomic USDC transaction a creator-skin purchase
+// requires: 70% to the creator + 30% to the burn vault + a memo (the quote id).
+// Instructions are built on @solana/web3.js; the connected wallet signs and sends
+// via the Wallet Standard SolanaSignAndSendTransaction feature. The server
+// verifies the resulting on-chain balance deltas, so what matters is that the
+// transfers actually land. The USDC mint + recipient owners + exact amounts come
+// from the server-issued quote.
+//
+// RPC and chain MUST be the same cluster — a blockhash fetched from one cluster
+// is invalid when the tx is broadcast on another ("blockhash not found"). Both
+// default to devnet (Phase 1); prod sets both env vars to its launch cluster.
+// VITE_SOLANA_RPC_URL (the mainnet $WOC-balance RPC) is deliberately NOT a
+// fallback here, so a misconfigured build can't silently mix clusters.
+const MARKET_RPC = String(
+  import.meta.env.VITE_MARKETPLACE_RPC_URL ?? 'https://api.devnet.solana.com',
+).trim();
+const MARKET_CHAIN = String(import.meta.env.VITE_MARKETPLACE_CHAIN ?? 'solana:devnet').trim();
+const TOKEN_PROGRAM = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
+const ASSOCIATED_TOKEN_PROGRAM = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+const MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+const USDC_DECIMALS = 6;
+
+let paymentConnection: Connection | null = null;
+function getPaymentConnection(): Connection {
+  if (!paymentConnection) paymentConnection = new Connection(MARKET_RPC, 'confirmed');
+  return paymentConnection;
+}
+
+// The deterministic Associated Token Account for (owner, mint) under the legacy
+// SPL Token program. The buyer tx never creates these (creator + burn vault must
+// already hold a USDC ATA; an onboarding precondition), matching the server
+// verifier's exactly-two-transfers expectation.
+function associatedTokenAccount(owner: PublicKey, mint: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), TOKEN_PROGRAM.toBuffer(), mint.toBuffer()],
+    ASSOCIATED_TOKEN_PROGRAM,
+  )[0];
+}
+
+// SPL Token `TransferChecked` (tag 12): u8 tag + u64 amount(LE) + u8 decimals.
+function transferCheckedIx(
+  source: PublicKey,
+  mint: PublicKey,
+  dest: PublicKey,
+  owner: PublicKey,
+  amount: bigint,
+  decimals: number,
+): TransactionInstruction {
+  const data = Buffer.alloc(10);
+  data.writeUInt8(12, 0);
+  data.writeBigUInt64LE(amount, 1);
+  data.writeUInt8(decimals, 9);
+  return new TransactionInstruction({
+    programId: TOKEN_PROGRAM,
+    keys: [
+      { pubkey: source, isSigner: false, isWritable: true },
+      { pubkey: mint, isSigner: false, isWritable: false },
+      { pubkey: dest, isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: true, isWritable: false },
+    ],
+    data,
+  });
+}
+
+function memoInstruction(memo: string): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: MEMO_PROGRAM,
+    keys: [],
+    data: Buffer.from(memo, 'utf8'),
+  });
+}
+
+// The split-payment legs from a server quote; amounts are USDC base-unit strings.
+export interface SplitPaymentQuote {
+  mint: string;
+  memo: string;
+  creator: { owner: string; amount: string };
+  burn: { owner: string; amount: string };
+}
+
+/**
+ * Build the buyer's atomic 70/30 USDC split-payment transaction from a server
+ * quote: two SPL `TransferChecked` legs (creator + burn vault) funded from the
+ * buyer's ATA, plus a memo binding the quote id. PURE + deterministic (no wallet,
+ * no network) — exactly the shape server `validateSplitPayment` checks — so it is
+ * unit-tested in isolation (tests/split_payment_tx.test.ts). The buyer is the sole
+ * signing authority and funds both legs; recipient ATAs are NOT created here (an
+ * onboarding precondition, mirrored by the verifier's exactly-two-transfers rule).
+ */
+export function buildSplitPaymentTransaction(
+  q: SplitPaymentQuote,
+  buyer: string,
+  blockhash: string,
+  lastValidBlockHeight: number,
+): Transaction {
+  const mint = new PublicKey(q.mint);
+  const buyerPk = new PublicKey(buyer);
+  const buyerAta = associatedTokenAccount(buyerPk, mint);
+  return new Transaction({ feePayer: buyerPk, blockhash, lastValidBlockHeight }).add(
+    transferCheckedIx(
+      buyerAta,
+      mint,
+      associatedTokenAccount(new PublicKey(q.creator.owner), mint),
+      buyerPk,
+      BigInt(q.creator.amount),
+      USDC_DECIMALS,
+    ),
+    transferCheckedIx(
+      buyerAta,
+      mint,
+      associatedTokenAccount(new PublicKey(q.burn.owner), mint),
+      buyerPk,
+      BigInt(q.burn.amount),
+      USDC_DECIMALS,
+    ),
+    memoInstruction(q.memo),
+  );
+}
+
+/**
+ * Build + sign + send the buyer's atomic 70/30 USDC split payment via the
+ * connected wallet, then wait for the transaction to FINALIZE (the commitment
+ * the server verifies against) before returning the signature to hand to
+ * /api/marketplace/buy.
+ */
+export async function signAndSendSplitPayment(q: SplitPaymentQuote): Promise<string> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  if (!(SolanaSignAndSendTransaction in wallet.features))
+    throw new Error('the connected wallet cannot send transactions');
+  const sendFeature = (wallet.features as SolanaSignAndSendTransactionFeature)[
+    SolanaSignAndSendTransaction
+  ];
+  // Require the EXACT marketplace cluster — the send chain must match the cluster
+  // the blockhash came from (MARKET_RPC). Never fall back to another Solana chain:
+  // a devnet-blockhash tx asked to send on mainnet (or vice-versa) just fails
+  // confusingly. A clear "switch networks" error is the right outcome.
+  const chain = account.chains.find((c) => c === MARKET_CHAIN);
+  if (!chain)
+    throw new Error(`connect your wallet to ${MARKET_CHAIN} to buy — it is on a different network`);
+
+  const conn = getPaymentConnection();
+  // Default ('confirmed') commitment — a 'finalized' blockhash is ~32 slots old
+  // and would halve the tx's validity window before the wallet even signs. The
+  // confirmation below still waits for 'finalized' (what the server verifies).
+  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash();
+  const tx = buildSplitPaymentTransaction(q, account.address, blockhash, lastValidBlockHeight);
+  const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+  const results = await sendFeature.signAndSendTransaction({
+    account,
+    chain,
+    transaction: new Uint8Array(wire),
+  });
+  const result = results[0];
+  if (!result || !(result.signature instanceof Uint8Array))
+    throw new Error('the wallet returned no transaction signature');
+  const signature = bs58.encode(result.signature);
+  // Once the wallet has broadcast, the payment may land regardless of what our
+  // local poll sees. confirmTransaction's blockhash strategy REJECTS on
+  // lastValidBlockHeight expiry (or a transient RPC/websocket error) even when the
+  // tx finalizes a few slots later — so a throw here must NOT discard the signature,
+  // or the buyer is charged with no way to redeem. We await finalization as a
+  // courtesy (so the immediate /buy usually succeeds first try) but return the
+  // signature either way; the server is the authority — it re-fetches the finalized
+  // tx itself, and the caller retries /buy until it does.
+  await conn
+    .confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'finalized')
+    .catch((err) => {
+      console.warn(
+        'marketplace: local confirmation did not complete; server will re-verify the finalized tx',
+        err,
+      );
+    });
+  return signature;
 }

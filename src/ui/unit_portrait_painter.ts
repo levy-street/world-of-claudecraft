@@ -10,10 +10,15 @@
 // lives in unit_portrait.ts (and is unit-tested there).
 // ---------------------------------------------------------------------------
 
-import { iconCanvas } from './icons';
 import { playerPortraitDataUrl } from '../render/characters/portrait';
-import { PlayerClass } from '../sim/types';
-import { PORTRAIT_CSS_SIZE, CREST_OVERSCAN, portraitBackingPx, overscanRect } from './unit_portrait';
+import type { PlayerClass } from '../sim/types';
+import { iconCanvas } from './icons';
+import {
+  CREST_OVERSCAN,
+  overscanRect,
+  PORTRAIT_CSS_SIZE,
+  portraitBackingPx,
+} from './unit_portrait';
 
 /** Default device-pixel-ratio probe (1 outside the browser, e.g. under vitest). */
 function defaultDpr(): number {
@@ -67,7 +72,10 @@ export class UnitPortraitPainter {
       ctx.drawImage(img, 0, 0, size, size);
     };
     const cached = this.imgCache.get(url);
-    if (cached?.complete && cached.naturalWidth) { draw(cached); return; }
+    if (cached?.complete && cached.naturalWidth) {
+      draw(cached);
+      return;
+    }
     const img = cached ?? new Image();
     img.addEventListener('load', () => draw(img), { once: true });
     if (!cached) {
@@ -77,9 +85,15 @@ export class UnitPortraitPainter {
   }
 
   /** Paint a (class, skin) headshot, falling back to the class crest until the
-   *  3D portraits have finished loading. */
-  drawClass(canvas: HTMLCanvasElement, cls: PlayerClass, skin: number): void {
-    const url = playerPortraitDataUrl(cls, skin);
+   *  3D portraits have finished loading. `creatorSkinId` overlays an equipped
+   *  marketplace creator skin so the portrait matches the in-world avatar. */
+  drawClass(
+    canvas: HTMLCanvasElement,
+    cls: PlayerClass,
+    skin: number,
+    creatorSkinId: string | null = null,
+  ): void {
+    const url = playerPortraitDataUrl(cls, skin, creatorSkinId);
     if (url) this.drawHeadshot(canvas, url);
     else this.drawCrest(canvas, `class_${cls}`);
   }

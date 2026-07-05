@@ -48,6 +48,7 @@ import {
   type ArenaInfo,
   type CharacterSearchResult,
   type ClientCommand,
+  type CreatorSkinRegistryEntry,
   type DailyRewardHistory,
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
@@ -67,6 +68,7 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  normalizeAccountCosmetics,
   type OverheadEmoteId,
   type PartyInfo,
   type PlayerProfessionsView,
@@ -90,20 +92,6 @@ export interface CharacterSummary {
   forceRename: boolean;
   lastPlayed?: string | null;
   playtimeSeconds?: number;
-}
-
-function stringList(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
-}
-
-function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
-  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
-    completedQuestIds: stringList(src.completedQuestIds),
-    mechChromaIds: stringList(src.mechChromaIds),
-  };
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
@@ -181,6 +169,38 @@ export class ApiError extends Error {
 /** True for an auth-class failure where a stored token should be discarded. */
 export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 401 || err.status === 403);
+}
+
+// A creator-skin purchase quote from the server: the fixed 70/30 split legs (in
+// USDC base-unit strings) the client builds its payment transaction from, plus
+// the memo (== quoteId) that binds the tx to this quote. Structurally a
+// superset of the wallet's SplitPaymentQuote, so it can be passed straight in.
+export interface MarketplaceQuoteResponse {
+  quoteId: string;
+  skinId: string;
+  mint: string;
+  memo: string;
+  creator: { owner: string; amount: string };
+  burn: { owner: string; amount: string };
+  gross: string;
+  expiresAt: string;
+}
+
+// The public buy-and-burn ledger (all amounts base-unit strings — bigints aren't
+// JSON-serialisable).
+export interface BurnLedgerResponse {
+  cumulativeWocBurned: string;
+  cumulativeUsdcIn: string;
+  batches: Array<{
+    batchId: string;
+    source: string;
+    usdcIn: string;
+    wocBought: string;
+    wocBurned: string;
+    buyTxSig: string | null;
+    burnTxSig: string | null;
+    executedAt: string | null;
+  }>;
 }
 
 export class Api {
@@ -533,6 +553,122 @@ export class Api {
     }
   }
 
+  // Public creator-skin registry: cosmetic metadata for every live marketplace
+  // skin, used by the renderer to resolve an opaque cosmeticSkinId to a CDN
+  // atlas. Not realm-scoped (creator skins are global) — read from the page origin.
+  async creatorSkins(): Promise<CreatorSkinRegistryEntry[]> {
+    try {
+      const res = await fetch('/api/skins/registry');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.skins ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  // Public, factual buy-and-burn ledger: cumulative $WOC burned + recent batches
+  // (amounts as base-unit strings, explorer-verifiable tx sigs). Page-origin,
+  // best-effort — degrades to empty so a transparency widget can simply omit it.
+  async burnLedger(limit = 50): Promise<BurnLedgerResponse> {
+    try {
+      const res = await fetch(`/api/marketplace/burn-ledger?limit=${limit}`);
+      if (!res.ok) return { cumulativeWocBurned: '0', cumulativeUsdcIn: '0', batches: [] };
+      return await res.json();
+    } catch {
+      return { cumulativeWocBurned: '0', cumulativeUsdcIn: '0', batches: [] };
+    }
+  }
+
+  // Request a purchase quote for a creator skin (account-scoped; needs a linked
+  // wallet). Returns the split legs + memo the client builds the payment tx from.
+  async quoteSkin(skinId: string): Promise<MarketplaceQuoteResponse> {
+    return this.post(`/api/marketplace/skins/${encodeURIComponent(skinId)}/quote`, {});
+  }
+
+  // Submit a finalized split-payment signature to redeem a quote: the server
+  // verifies it on-chain and grants the skin. Throws (with the server reason) on
+  // any verification failure.
+  async buySkin(quoteId: string, signature: string): Promise<{ ok: true; skinId: string }> {
+    return this.post('/api/marketplace/buy', { quoteId, signature });
+  }
+
+  // List a player-designed (procedural) skin for sale (account-scoped; needs a
+  // linked wallet — the 70% payout dest). Returns the new skin id. Throws (with
+  // the server reason) on validation failure.
+  async createSkin(listing: {
+    name: string;
+    description: string;
+    priceUsdc: string;
+    design: unknown;
+    targetClass: string | null;
+  }): Promise<{ ok: true; id: string }> {
+    return this.post('/api/marketplace/skins', listing);
+  }
+
+  // List a self-hosted skin (free): the server proxies the origin URL behind an
+  // opaque atlas route. Returns the new id + whether it's pending review.
+  async createSelfHostedSkin(listing: {
+    name: string;
+    description: string;
+    priceUsdc: string;
+    originUrl: string;
+    targetClass: string | null;
+  }): Promise<{ ok: true; id: string; reviewStatus: 'pending' | 'approved' }> {
+    return this.post('/api/marketplace/skins', { ...listing, source: 'self_hosted' });
+  }
+
+  // Upload a hosted skin (raw PNG body; metadata in the query string). $WOC-quota
+  // gated server-side. Throws (with the server reason) on quota/validation failure.
+  async uploadHostedSkin(
+    meta: { name: string; description: string; priceUsdc: string; targetClass: string | null },
+    png: Uint8Array,
+  ): Promise<{ ok: true; id: string; reviewStatus: 'pending' | 'approved' }> {
+    const q = new URLSearchParams({
+      name: meta.name,
+      description: meta.description,
+      priceUsdc: meta.priceUsdc,
+    });
+    if (meta.targetClass) q.set('targetClass', meta.targetClass);
+    const res = await fetch(`/api/skins/upload?${q.toString()}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'image/png',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
+      body: png as BodyInit,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data?.error ?? `request failed (${res.status})`);
+    return data;
+  }
+
+  // The viewer's hosting quota (tier, slots, usage, trusted badge) for the designer.
+  async skinQuota(): Promise<{
+    tier: number;
+    quota: number;
+    used: number;
+    remaining: number;
+    trusted: boolean;
+    hostingEnabled: boolean;
+    selfHostedFree: boolean;
+  }> {
+    const res = await fetch('/api/skins/quota', {
+      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+    });
+    if (!res.ok)
+      return {
+        tier: 0,
+        quota: 0,
+        used: 0,
+        remaining: 0,
+        trusted: false,
+        hostingEnabled: false,
+        selfHostedFree: true,
+      };
+    return res.json();
+  }
+
   // News & Updates feed for the home page, mirrored from GitHub Releases by the
   // server. Not realm-scoped — always read from the page's own origin.
   async releases(limit = 20): Promise<ReleaseEntry[]> {
@@ -851,6 +987,7 @@ function blankEntity(id: number): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    cosmeticSkinId: null,
     mainhandItemId: null,
     equippedItems: {},
     guild: '',
@@ -880,7 +1017,11 @@ export class ClientWorld implements IWorld {
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
-  accountCosmetics: AccountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  accountCosmetics: AccountCosmetics = {
+    completedQuestIds: [],
+    mechChromaIds: [],
+    ownedCreatorSkinIds: [],
+  };
   // --- IWorldProgressionXp: XP + post-cap progression scalars + unlocked
   // milestones, mirrored from snapshot self. ---
   xp = 0;
@@ -1323,6 +1464,7 @@ export class ClientWorld implements IWorld {
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        e.cosmeticSkinId = w.csk ?? null; // opaque creator-skin overlay id (cosmetic, server-set)
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
@@ -1882,17 +2024,33 @@ export class ClientWorld implements IWorld {
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
   // server re-validates and the self-snapshot reconciles. ---
-  changeSkin(skin: number, catalog: 'class' | 'mech' = 'class'): void {
+  changeSkin(
+    skin: number,
+    catalog: 'class' | 'mech' = 'class',
+    cosmeticSkinId: string | null = null,
+  ): void {
     const idx =
       catalog === 'mech'
         ? Math.max(0, Math.floor(skin))
         : Math.max(0, Math.min(7, Math.floor(skin)));
+    const overlay = cosmeticSkinId && cosmeticSkinId.length > 0 ? cosmeticSkinId : null;
     const p = this.entities.get(this.playerId);
     if (p) {
       p.skin = idx;
       p.skinCatalog = catalog;
+      // Optimistic: the server re-validates ownership and clears this on the
+      // next identity snapshot if the account does not own the overlay.
+      p.cosmeticSkinId = overlay;
     }
-    this.cmd({ cmd: 'change_skin', skin: idx, catalog });
+    // Only carry `csk` when equipping an overlay; its absence means "no overlay"
+    // (the server clears any existing one), keeping built-in skin changes terse.
+    const payload: { cmd: ClientCommand } & Record<string, unknown> = {
+      cmd: 'change_skin',
+      skin: idx,
+      catalog,
+    };
+    if (overlay) payload.csk = overlay;
+    this.cmd(payload);
   }
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));

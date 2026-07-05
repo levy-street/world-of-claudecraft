@@ -27,6 +27,7 @@ import {
   EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
+  MAX_COSMETIC_SKIN_ID_LEN,
   MAX_LEVEL,
   PARTY_MEMBER_AURA_CAP,
   RUN_SPEED,
@@ -79,6 +80,7 @@ import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { enforceHostedQuota } from './marketplace';
 import { trackReachedLevel5 } from './meta_capi';
 import {
   forceCharacterRename,
@@ -547,6 +549,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
+  if (e.cosmeticSkinId) out.csk = e.cosmeticSkinId; // opaque creator-skin overlay id (cosmetic)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -1244,10 +1247,20 @@ export class GameServer {
     // session for this pid.
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
-    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance)) {
+    if (!e) return;
+    const prevTier = e.holderTier ?? 0;
+    if (prevTier !== tier || (e.holderBalance ?? 0) !== balance) {
       e.holderTier = tier; // identity diff re-broadcasts it to nearby players
       e.holderBalance = balance;
-      console.log(`[woc] ${session.name} holder tier → ${tier} (${balance} $WOC)`);
+      console.log(`[woc] ${session.name} holder tier -> ${tier} (${balance} $WOC)`);
+    }
+    // A tier change can move the creator's hosted-skin quota: park the newest
+    // over-quota hosted skins, or restore them on a top-up. Tier change is the
+    // only event that shifts the quota (uploads are quota-checked at creation).
+    if (prevTier !== tier) {
+      void enforceHostedQuota(session.accountId, tier).catch((err) =>
+        console.error('hosted-quota enforce failed:', err),
+      );
     }
   }
 
@@ -1397,6 +1410,7 @@ export class GameServer {
     return {
       completedQuestIds: [...new Set([...a.completedQuestIds, ...b.completedQuestIds])],
       mechChromaIds: [...new Set([...a.mechChromaIds, ...b.mechChromaIds])],
+      ownedCreatorSkinIds: [...new Set([...a.ownedCreatorSkinIds, ...b.ownedCreatorSkinIds])],
     };
   }
 
@@ -1405,7 +1419,11 @@ export class GameServer {
     cosmetics: AccountCosmetics,
   ): AccountCosmetics {
     const merged = this.mergeAccountCosmetics(
-      this.accountCosmeticsByAccount.get(accountId) ?? { completedQuestIds: [], mechChromaIds: [] },
+      this.accountCosmeticsByAccount.get(accountId) ?? {
+        completedQuestIds: [],
+        mechChromaIds: [],
+        ownedCreatorSkinIds: [],
+      },
       cosmetics,
     );
     this.accountCosmeticsByAccount.set(accountId, merged);
@@ -1422,10 +1440,24 @@ export class GameServer {
     }
   }
 
+  // Grant a purchased creator skin to an account: merge it into the live
+  // cosmetics so the equip gate accepts it immediately for any connected
+  // session. The durable grant is written separately by the marketplace
+  // (verifyPurchase -> redeemPurchase); this only refreshes in-memory
+  // state so an online buyer can equip without reconnecting.
+  applyCreatorSkinGrant(accountId: number, skinId: string): void {
+    this.updateLiveAccountCosmetics(accountId, {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      ownedCreatorSkinIds: [skinId],
+    });
+  }
+
   private replaceLiveAccountCosmetics(accountId: number, cosmetics: AccountCosmetics): void {
     const exact = {
       completedQuestIds: [...new Set(cosmetics.completedQuestIds)],
       mechChromaIds: [...new Set(cosmetics.mechChromaIds)],
+      ownedCreatorSkinIds: [...new Set(cosmetics.ownedCreatorSkinIds)],
     };
     this.accountCosmeticsByAccount.set(accountId, exact);
     for (const live of this.clients.values()) {
@@ -1523,7 +1555,11 @@ export class GameServer {
     }
     const accountCosmetics = this.rememberAccountCosmetics(
       accountId,
-      meta.accountCosmetics ?? { completedQuestIds: [], mechChromaIds: [] },
+      meta.accountCosmetics ?? {
+        completedQuestIds: [],
+        mechChromaIds: [],
+        ownedCreatorSkinIds: [],
+      },
     );
     this.applyAccountQuestLockouts(pid, accountCosmetics);
     const sessionIp = meta.ip ?? '';
@@ -2500,14 +2536,28 @@ export class GameServer {
         break;
       case 'change_skin':
         if (typeof msg.skin === 'number') {
+          // The creator-skin overlay must be a bounded id the account actually
+          // owns; a forged, unowned, or oversized id is dropped to null (the
+          // built-in skin below still applies). Ownership is the authoritative
+          // gate — equipping can never grant a cosmetic, only select an owned one.
+          const requested =
+            typeof msg.csk === 'string' &&
+            msg.csk.length > 0 &&
+            msg.csk.length <= MAX_COSMETIC_SKIN_ID_LEN
+              ? msg.csk
+              : null;
+          const overlay =
+            requested && session.accountCosmetics.ownedCreatorSkinIds.includes(requested)
+              ? requested
+              : null;
           if (msg.catalog === 'mech') {
             const idx = Math.max(0, Math.floor(msg.skin));
             const chroma = MECH_CHROMAS[idx];
             if (chroma && session.accountCosmetics.mechChromaIds.includes(chroma.id)) {
-              sim.setPlayerSkin(pid, idx, 'mech');
+              sim.setPlayerSkin(pid, idx, 'mech', overlay);
             }
           } else {
-            sim.setPlayerSkin(pid, msg.skin, 'class');
+            sim.setPlayerSkin(pid, msg.skin, 'class', overlay);
           }
         }
         break;

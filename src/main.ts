@@ -88,6 +88,7 @@ import {
 import type { WalletOption } from './net/wallet';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
+import { registerCreatorSkins } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
 import { playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
@@ -165,6 +166,7 @@ import {
 } from './ui/i18n';
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
+import { attachMarketplace as attachMarketplaceHooks, openMarketplace } from './ui/marketplace';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
 import { PerfOverlay } from './ui/perf_overlay';
@@ -1713,6 +1715,69 @@ async function startGame(
           meta: payload.meta,
         }),
     });
+    // Creator skins marketplace (online only — needs the server + a wallet). The
+    // overlay (src/ui) talks only through these hooks; the buy orchestration
+    // (quote -> sign+send split tx -> verify -> equip) spans net + wallet + world.
+    // Locally mark a creator skin owned so the marketplace shows Equip (the
+    // server is authoritative — this is just the client's display set).
+    const markOwned = (id: string): void => {
+      if (!online.accountCosmetics.ownedCreatorSkinIds.includes(id)) {
+        online.accountCosmetics.ownedCreatorSkinIds.push(id);
+      }
+    };
+    attachMarketplaceHooks({
+      listSkins: () => api.creatorSkins(),
+      ownedSkinIds: () => online.accountCosmetics.ownedCreatorSkinIds,
+      isWalletConnected: () => (walletMod ? walletMod.currentWallet().isConnected : false),
+      connectWallet: async () => {
+        await (await loadWallet()).openWalletModal();
+      },
+      equip: (skin) => online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id),
+      purchase: async (skin) => {
+        const wallet = await loadWallet();
+        const quote = await api.quoteSkin(skin.id);
+        const signature = await wallet.signAndSendSplitPayment(quote);
+        // The payment is broadcast + irreversible. The server independently fetches
+        // the finalized tx, so if it hasn't observed finalization yet, retry rather
+        // than abandon a paid purchase. (Local confirmation may have lagged.)
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await api.buySkin(quote.quoteId, signature);
+            break;
+          } catch (err) {
+            if (attempt < 5 && /tx_not_finalized/.test(String(err))) {
+              await new Promise((r) => setTimeout(r, 3000));
+              continue;
+            }
+            throw err;
+          }
+        }
+        markOwned(skin.id);
+        online.changeSkin(skin.fallbackSkin, skin.skinCatalog, skin.id);
+      },
+      createListing: async (listing) => {
+        const { id } = await api.createSkin(listing);
+        // Refresh the renderer registry (so the new procedural design renders) and
+        // mark it owned — the server grants the creator their own creation.
+        registerCreatorSkins(await api.creatorSkins());
+        markOwned(id);
+      },
+      selfHostSkin: async (listing) => {
+        const { id } = await api.createSelfHostedSkin(listing);
+        registerCreatorSkins(await api.creatorSkins());
+        markOwned(id);
+      },
+      uploadSkin: async (meta, png) => {
+        const { id } = await api.uploadHostedSkin(meta, png);
+        registerCreatorSkins(await api.creatorSkins());
+        markOwned(id);
+      },
+      fetchQuota: () => api.skinQuota(),
+      playerClass: () => world.cfg.playerClass,
+    });
+    hud.attachMarketplace(() => {
+      void openMarketplace();
+    });
   }
   function interactKey(): void {
     const p = world.player;
@@ -2664,6 +2729,7 @@ async function startGame(
           controller,
           perf,
           gamepad,
+          openMarketplace,
           /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
           lockpickEngage: (objectId: number, ante: number) =>
             hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
@@ -2761,6 +2827,10 @@ async function startOffline(
 // ---------------------------------------------------------------------------
 
 const api = new Api();
+// Load the public creator-skin registry so the renderer can resolve any
+// cosmeticSkinId it sees to a CDN atlas. Global + best-effort: until it resolves
+// (or if the marketplace is empty) entities render their numeric skin fallback.
+void api.creatorSkins().then((skins) => registerCreatorSkins(skins));
 
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
