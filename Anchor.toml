@@ -1,0 +1,18 @@
+[toolchain]
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.devnet]
+woc_spin_vault = "9TPiQxpBkjUoxKtkqH1qQrG92aUaKQJj96uyZddAwRZ9"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "echo 'woc_spin_vault: devnet integration via scripts/spin_vault_devnet.mjs'"
