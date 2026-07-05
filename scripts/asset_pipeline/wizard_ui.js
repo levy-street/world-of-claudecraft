@@ -358,6 +358,7 @@ class Wizard {
       ),
       this.stepsBar('model'),
       this.reviewPreview(this._status.modelGlb, models, 'No model rendered; check the log.'),
+      this.modelFingerprint(this._status.modelMeta, this._status.generateTask),
       this.logBox(),
       el(
         'div',
@@ -411,6 +412,7 @@ class Wizard {
       ),
       this.stepsBar('finish'),
       this.reviewPreview(this._status.finalGlb, finals, 'No finished asset yet.'),
+      this.modelFingerprint(this._status.finalMeta, null),
       val && !val.ok
         ? el(
             'div',
@@ -551,6 +553,17 @@ class Wizard {
     if (glb) return this.liveViewer(glb);
     if (pngs.length) return this.previewRow(pngs, empty);
     return el('div', { class: 'wz-sub' }, empty);
+  }
+
+  // Fingerprint line under the review viewer: size + generated-at + task id.
+  // Same-prompt regenerates look deliberately similar, so this is how the
+  // operator verifies the candidate really is a NEW model.
+  modelFingerprint(meta, task) {
+    if (!meta) return null;
+    const kb = Math.round(meta.bytes / 1024);
+    const when = new Date(meta.mtime).toLocaleTimeString();
+    const t = task ? `, task ${String(task).slice(0, 8)}` : '';
+    return el('div', { class: 'wz-sub' }, `Candidate: ${kb} KB, generated ${when}${t}`);
   }
 
   // Tear down any mounted live viewer before replacing modal content, so the

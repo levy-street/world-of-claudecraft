@@ -217,6 +217,16 @@ function jobGlb(jobId, file) {
   return `tmp/asset_pipeline/${jobId}/${file}?v=${Math.floor(statSync(abs).mtimeMs)}`;
 }
 
+// Size + generated-at fingerprint for a job GLB, shown under the review viewer so
+// the operator can VERIFY a regenerate produced a new candidate (same-prompt
+// re-rolls look deliberately similar; the fingerprint is the ground truth).
+function glbMeta(jobId, file) {
+  const abs = join(JOBS_ROOT, jobId, file);
+  if (!existsSync(abs)) return null;
+  const st = statSync(abs);
+  return { bytes: st.size, mtime: Math.floor(st.mtimeMs) };
+}
+
 /** Full wizard status for the browser: whether a child is live, the step
  *  ledger, the tail of the captured output (for progress + the printed report /
  *  VisualDef snippet), and the current preview images. */
@@ -259,6 +269,9 @@ export function wizardStatus(jobId) {
     // so review works with no headless Chrome (previews above may be empty then).
     modelGlb: jobGlb(id, 'raw.glb'),
     finalGlb: job.name ? jobGlb(id, `${job.name}.glb`) : null,
+    modelMeta: glbMeta(id, 'raw.glb'),
+    finalMeta: job.name ? glbMeta(id, `${job.name}.glb`) : null,
+    generateTask: job.tasks?.generate ?? null,
     log: tail,
   };
 }
