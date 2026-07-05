@@ -27,7 +27,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "es_ES": [
     "entities.npcs.logol.greeting",
@@ -47,7 +48,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_FR": [
     "entities.npcs.logol.greeting",
@@ -67,7 +69,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "fr_CA": [
     "entities.npcs.logol.greeting",
@@ -87,7 +90,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "en_CA": [],
   "it_IT": [
@@ -108,7 +112,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "de_DE": [
     "entities.npcs.logol.greeting",
@@ -128,27 +133,32 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "zh_CN": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "zh_TW": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "ko_KR": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "ja_JP": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "pt_BR": [
     "entities.npcs.logol.greeting",
@@ -168,12 +178,14 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "ru_RU": [
     "entities.npcs.logol.title",
     "entities.npcs.logol_harbinger.title",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "cs_CZ": [
     "entities.npcs.logol.greeting",
@@ -193,7 +205,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "nl_NL": [
     "entities.npcs.logol.greeting",
@@ -213,7 +226,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "pl_PL": [
     "entities.npcs.logol.greeting",
@@ -233,7 +247,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "id_ID": [
     "entities.npcs.logol.greeting",
@@ -253,7 +268,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "tr_TR": [
     "entities.npcs.logol.greeting",
@@ -273,7 +289,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "sv_SE": [
     "entities.npcs.logol.greeting",
@@ -293,7 +310,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "vi_VN": [
     "entities.npcs.logol.greeting",
@@ -313,7 +331,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ],
   "da_DK": [
     "entities.npcs.logol.greeting",
@@ -333,6 +352,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_logol_sign.completion",
     "entities.quests.q_logol_sign.objectives.0.label",
     "entities.quests.q_logol_sign.text",
-    "entities.quests.q_logol_sign.title"
+    "entities.quests.q_logol_sign.title",
+    "hudChrome.discord.roleTag.coredevs"
   ]
 };

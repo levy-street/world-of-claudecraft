@@ -7728,21 +7728,21 @@ export const fr_FR: EnTranslations = {
       },
       "q_logol_sign": {
         "title": "The Sign in the Eye",
-        "text": "To see the unseen you must attune your eye. Walk a while, then return, and I will mark you.",
+        "text": "To see the unseen you must first look hard at the ordinary. Cull the wolves of the vale until your eye unclouds, then return to me.",
         "completion": "The mark is set. Your eye is ready.",
         "objectives": {
           "0": {
-            "label": "Return to the Harbinger to be marked"
+            "label": "Cull forest wolves"
           }
         }
       },
       "q_logol_seen": {
         "title": "Seen and Unseen",
-        "text": "It is done. When next you cross paths with the cloaked one, he will trade with you. Go, and watch the edges of the world.",
+        "text": "You are ready. The cloaked one keeps to the crossroads when he walks this realm at all. Find him, speak with him, and return to me.",
         "completion": "Now you see him. His ledger is open to you. Spend wisely.",
         "objectives": {
           "0": {
-            "label": "Accept the Nameless Order sight"
+            "label": "Find Logol and speak with him"
           }
         }
       },

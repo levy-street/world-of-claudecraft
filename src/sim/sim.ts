@@ -2843,10 +2843,11 @@ export class Sim {
     this.tickCount++;
     this.updatePendingMobRespawns();
     this.updateWorldBosses();
-    // Roaming merchant world event: gated off by default, and uses only the sim
-    // clock + a stateless hash (no shared-rng draw), so it never shifts the
-    // parity draw order. See src/sim/logol_roam.ts.
-    if (this.logolEnabled) updateLogolRoam(this.ctx, this.logolRoam);
+    // Weekly merchant world event: gated off by default and driven by the
+    // host-injected wall clock (the raid-lockout seam), never the shared rng,
+    // so it never shifts the parity draw order and a realm restart never moves
+    // the weekly window. See src/sim/logol_roam.ts.
+    if (this.logolEnabled) updateLogolRoam(this.ctx, this.logolRoam, this.cfg.lockoutNowMs());
     tickGroundAoEs(this.ctx);
 
     runDespawnDecay(this.ctx);

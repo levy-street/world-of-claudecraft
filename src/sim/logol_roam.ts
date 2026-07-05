@@ -1,39 +1,44 @@
-// The roaming behavior for Logol, the mysterious merchant (docs/prd/woc/
-// logol-merchant.md). One Logol, shared by the whole world, appears at a
-// clock-chosen point of interest for a short window then vanishes, the way
-// Destiny's Xur or RE4's Merchant do.
+// The appearance behavior for Logol, the mysterious merchant (docs/prd/woc/
+// logol-merchant.md). One Logol, shared by the whole world, appears at the SAME
+// fixed spot once a week for a multi-day window, then vanishes, the way Destiny's
+// Xur returns to a known place each week.
 //
-// DETERMINISM: presence and location are a PURE FUNCTION of the shared sim clock
-// (ctx.time) plus the stateless hash2 (which does NOT advance ctx.rng's shared
-// mulberry32 stream). No ctx.rng.next() calls are added to the per-tick path, so
-// the global draw order is byte-identical to before. The whole scheduler is
-// additionally gated by SimConfig.logolEnabled (default false), so offline
-// worlds, headless RL, and every parity/golden trace never run this code. See
-// the PRD "Determinism" section.
-import { LOGOL_HARBINGER_NPC_ID, LOGOL_NPC_ID, LOGOL_POIS } from './content/logol';
+// CLOCK: the weekly cadence is anchored to the HOST wall clock, not sim time,
+// because sim time restarts at 0 on every realm reboot (a sim-time week would
+// reset each deploy and leave Logol nearly always present). The clock arrives
+// through the same host-injected seam raid lockouts use (SimConfig.lockoutNowMs):
+// the live server passes Date.now(); offline and headless worlds keep the
+// default sim-time-derived ms, which stays fully deterministic. Weeks are epoch
+// anchored (Unix epoch is a Thursday), so every realm shares the same
+// Thursday-to-Sunday UTC visit window and a restart never moves it.
+//
+// DETERMINISM: presence is a PURE FUNCTION of the injected clock; no ctx.rng
+// draws are added to the per-tick path, so the global draw order is
+// byte-identical to before. The whole scheduler is additionally gated by
+// SimConfig.logolEnabled (default false), so offline worlds, headless RL, and
+// every parity/golden trace never run this code. See the PRD "Determinism".
+import { LOGOL_APPEAR_POS, LOGOL_HARBINGER_NPC_ID, LOGOL_NPC_ID } from './content/logol';
 import { NPCS } from './data';
 import { createNpc } from './entity';
-import { hash2 } from './rng';
 import type { SimContext } from './sim_context';
 
-// Tuning (PRD "Roaming tuning"): first-pass numbers, want a play-feel pass.
-// INVARIANT: VISIT_DURATION < APPEAR_PERIOD, so every window has an absent gap
-// and the next window always re-spawns Logol fresh at its own POI (a present
-// window never straddles two POIs).
-export const LOGOL_APPEAR_PERIOD = 20 * 60; // sim seconds between appearance windows
-export const LOGOL_VISIT_DURATION = 5 * 60; // present for the first N seconds of each window
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Tuning (PRD "Appearance cadence"): a play-feel pass may adjust the visit
+// length. INVARIANT: LOGOL_VISIT_MS < LOGOL_APPEAR_PERIOD_MS, so every week has
+// an absent gap and each week re-spawns Logol fresh at the same spot.
+export const LOGOL_APPEAR_PERIOD_MS = 7 * DAY_MS; // once a week
+export const LOGOL_VISIT_MS = 3 * DAY_MS; // he lingers a few days, then is gone
 
 // Fixed base URL of Logol's pre-generated (developer-authored) voice clips.
 const LOGOL_VOICE_CLIP_BASE_URL = '/audio/logol';
-// Arbitrary fixed salt so the POI hash is stable and distinct.
-const LOGOL_POI_SALT = 0x106f01;
 
 // The Harbinger's fixed home (matches its NpcDef.pos). Snapped to terrain at
 // spawn via ctx.groundPos.
 const HARBINGER_POS = { x: 18, z: 8 };
 
 // The scheduler's runtime state, kept on Sim and passed in by the coordinator:
-// the live roaming-Logol entity id (null when he is currently absent), and the
+// the live Logol entity id (null when he is currently absent), and the
 // persistent Harbinger entity id (spawned once, never despawned while enabled).
 export interface LogolRoamState {
   entityId: number | null;
@@ -45,29 +50,38 @@ export function makeLogolRoamState(): LogolRoamState {
 }
 
 /**
- * Pure: at sim time `time`, is Logol present, and at which POI index? Shared by
- * the tick reconcile and by tests. Never draws from the shared rng stream.
+ * Pure: which appearance week `nowMs` (epoch ms) falls in. The same index feeds
+ * the weekly wares rotation (logolOfferedWares), so the stock changes exactly
+ * when the visit window rolls over. Clamped to >= 0 for pre-epoch test clocks.
  */
-export function logolPresence(time: number): { present: boolean; poiIndex: number } {
-  if (LOGOL_APPEAR_PERIOD <= 0 || LOGOL_POIS.length === 0) {
-    return { present: false, poiIndex: 0 };
-  }
-  const windowIndex = Math.floor(time / LOGOL_APPEAR_PERIOD);
-  const within = time - windowIndex * LOGOL_APPEAR_PERIOD;
-  const present = within < LOGOL_VISIT_DURATION;
-  // hash2 is a stateless pure hash in [0,1); it does NOT advance ctx.rng.
-  const h = hash2(windowIndex, 0, LOGOL_POI_SALT);
-  const poiIndex = Math.min(LOGOL_POIS.length - 1, Math.floor(h * LOGOL_POIS.length));
-  return { present, poiIndex };
+export function logolWeekIndex(nowMs: number): number {
+  return Math.max(0, Math.floor(nowMs / LOGOL_APPEAR_PERIOD_MS));
 }
 
 /**
- * Reconcile the live Logol entity against the clock each tick: spawn him at the
- * window's POI when he should be present and is absent; despawn him when the
- * window ends. Call once per tick from the coordinator, gated by
- * SimConfig.logolEnabled. He stands at his POI (no per-tick rng wander).
+ * Pure: is Logol present at `nowMs` (epoch ms), i.e. within the first
+ * LOGOL_VISIT_MS of the current week? Shared by the tick reconcile, the shop
+ * offer gate (server/logol.ts), and tests. Never draws rng.
  */
-export function updateLogolRoam(ctx: SimContext, state: LogolRoamState): void {
+export function logolPresent(nowMs: number): boolean {
+  if (nowMs < 0) return false;
+  return nowMs % LOGOL_APPEAR_PERIOD_MS < LOGOL_VISIT_MS;
+}
+
+/** Pure: epoch ms when the current week's window state next changes. */
+export function logolNextChangeMs(nowMs: number): number {
+  const weekStart = logolWeekIndex(nowMs) * LOGOL_APPEAR_PERIOD_MS;
+  return logolPresent(nowMs) ? weekStart + LOGOL_VISIT_MS : weekStart + LOGOL_APPEAR_PERIOD_MS;
+}
+
+/**
+ * Reconcile the live Logol entity against the injected clock each tick: spawn
+ * him at his fixed spot when the weekly window opens and he is absent; despawn
+ * him when it closes. Call once per tick from the coordinator, gated by
+ * SimConfig.logolEnabled, passing the host clock (cfg.lockoutNowMs()). He stands
+ * at his spot (no per-tick rng wander).
+ */
+export function updateLogolRoam(ctx: SimContext, state: LogolRoamState, nowMs: number): void {
   // Ensure the persistent Harbinger (the quest giver) exists at its fixed home.
   const harbinger = state.harbingerId !== null ? ctx.entities.get(state.harbingerId) : undefined;
   if (!harbinger) {
@@ -80,14 +94,13 @@ export function updateLogolRoam(ctx: SimContext, state: LogolRoamState): void {
     }
   }
 
-  const { present, poiIndex } = logolPresence(ctx.time);
+  const present = logolPresent(nowMs);
   const existing = state.entityId !== null ? ctx.entities.get(state.entityId) : undefined;
   if (present) {
     if (existing) return;
     const def = NPCS[LOGOL_NPC_ID];
     if (!def) return;
-    const poi = LOGOL_POIS[poiIndex];
-    const npc = createNpc(ctx.nextId++, def, ctx.groundPos(poi.x, poi.z));
+    const npc = createNpc(ctx.nextId++, def, ctx.groundPos(LOGOL_APPEAR_POS.x, LOGOL_APPEAR_POS.z));
     npc.spawnPos = { ...npc.pos };
     // Fixed developer-authored voice (a Logan Golema clone), served statically.
     npc.npcVoiceClipBaseUrl = LOGOL_VOICE_CLIP_BASE_URL;

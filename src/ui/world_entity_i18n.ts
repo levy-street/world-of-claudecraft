@@ -124,7 +124,7 @@ const NPC_IDS = [
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
-  'logol', // roaming $WOC merchant, cloaked in infinity (dynamically roam-spawned)
+  'logol', // weekly $WOC merchant, cloaked in infinity (dynamically spawned per visit)
   'logol_harbinger', // fixed lore NPC who gives Logol's shop-unlock quest chain
 ] as const;
 

@@ -827,9 +827,11 @@ export class GameServer {
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
       worldBossAtBoot: true,
-      // Roaming merchant Logol appears only when the feature is enabled; keeping
-      // it off leaves the sim's tick draw order byte-identical (see
-      // src/sim/logol_roam.ts + docs/prd/woc/logol-merchant.md).
+      // The weekly merchant Logol appears only when the feature is enabled;
+      // keeping it off leaves the sim's tick draw order byte-identical. His
+      // schedule reads lockoutNowMs (below), so it is anchored to real weeks,
+      // not the reboot-reset sim clock (see src/sim/logol_roam.ts +
+      // docs/prd/woc/logol-merchant.md).
       logolEnabled: LOGOL_ENABLED,
       lockoutNowMs: () => Date.now(),
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil

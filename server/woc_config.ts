@@ -62,29 +62,14 @@ export function splitPrice(priceBase: bigint): { burnBase: bigint; treasuryBase:
   return { burnBase, treasuryBase: priceBase - burnBase };
 }
 
-// -- Logol: the roaming merchant who sells prestige cosmetics for $WOC ---------
-// Ships OFF by default: the voice-clone asset, the ware art, and the price all
+// -- Logol: the weekly merchant who sells prestige cosmetics for $WOC ----------
+// Ships OFF by default: the voice-clone asset, the ware art, and the prices all
 // need sign-off before mainnet (see docs/prd/woc/logol-merchant.md), mirroring
 // how VOICE_NPC_ENABLED / AD_MARKET_ENABLED gate the other money features here.
+// Prices are PER-WARE, authored on the catalog (src/sim/content/logol.ts
+// LOGOL_WARES.priceWoc: thousands of $WOC per ware, the flagship in the
+// hundreds of thousands); there is no catalog-wide price env knob.
 export const LOGOL_ENABLED = boolEnv(process.env.LOGOL_ENABLED, false);
-
-// TODO(tokenomics): a placeholder catalog-wide price, not a priced decision, and
-// not yet per-ware. Tune (and split per ware kind) before any mainnet launch.
-export const WOC_PRICE_LOGOL = numEnv(process.env.WOC_PRICE_LOGOL, 25000);
-
-export function wocPriceLogolHuman(): number {
-  return WOC_PRICE_LOGOL;
-}
-
-export function wocPriceLogolBase(): bigint {
-  return wocToBase(WOC_PRICE_LOGOL);
-}
-
-function numEnv(v: string | undefined, dflt: number): number {
-  if (v === undefined) return dflt;
-  const n = Number(v);
-  return Number.isFinite(n) && n >= 0 ? n : dflt;
-}
 
 function clampInt(v: string | undefined, dflt: number, lo: number, hi: number): number {
   if (v === undefined) return dflt;
