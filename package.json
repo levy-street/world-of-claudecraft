@@ -87,6 +87,7 @@
     "electron-log": "^5.4.4",
     "electron-updater": "^6.8.9",
     "n8ao": "^1.10.1",
+    "naughty-words": "^1.2.0",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
     "postprocessing": "^6.36.0",

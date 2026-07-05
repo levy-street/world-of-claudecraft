@@ -3388,6 +3388,10 @@ export const ru_RU: EnTranslations = {
       "tooManyAttempts": "Слишком много попыток. Подождите минуту и попробуйте снова.",
       "usernameShape": "Имя пользователя должно содержать 3-24 символа: буквы, цифры или нижнее подчеркивание.",
       "usernameNotAllowed": "Это имя пользователя запрещено.",
+      "linkWalletFirst": "Сначала подключите и привяжите кошелек Solana.",
+      "nameReserved": "Это имя зарезервировано.",
+      "quoteExpired": "Срок действия платежной котировки истек. Начните заново.",
+      "paymentUsed": "Этот платеж уже был использован.",
       "passwordMin": "Пароль должен содержать не менее 6 символов.",
       "usernameTaken": "Это имя пользователя уже занято.",
       "invalidCredentials": "Неверное имя пользователя или пароль.",
@@ -3449,6 +3453,16 @@ export const ru_RU: EnTranslations = {
     "statsOffline": "Не в сети",
     "statsRealmOffline": "{realm} (не в сети)"
   },
+  "woc": {
+    "linkWalletFirst": "Подключите и привяжите кошелек Solana, чтобы платить в $WOC.",
+    "quoting": "Подготовка платежа $WOC...",
+    "approveBurn": "Подтвердите сжигание {amount} $WOC в кошельке...",
+    "confirming": "Подтверждение сжигания в блокчейне...",
+    "finalizing": "Ожидание финализации Solana...",
+    "confirmFailed": "Не удалось проверить платеж $WOC.",
+    "finalizeTimeout": "Время ожидания финализации истекло. Если $WOC уже сожжены, повторите попытку: платеж зачтется после финализации.",
+    "renameSuccess": "Переименовано в {name}."
+  },
   "character": {
     "loading": "Загрузка...",
     "noneYet": "Персонажей пока нет. Создайте одного ниже.",
@@ -3461,6 +3475,9 @@ export const ru_RU: EnTranslations = {
     "delete": "Удалить",
     "rename": "Переименовать",
     "newNamePlaceholder": "Новое имя персонажа",
+    "renamePaidButton": "Заплатить {amount} $WOC и переименовать",
+    "renamePriceHint": "Добровольное переименование сжигает {amount} $WOC.",
+    "renameCancel": "Отмена",
     "tabCharacters": "Персонажи",
     "tabCreate": "Создать",
     "portraitAlt": "Портрет {name}",

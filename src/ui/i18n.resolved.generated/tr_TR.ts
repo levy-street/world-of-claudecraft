@@ -3388,6 +3388,10 @@ export const tr_TR: EnTranslations = {
       "tooManyAttempts": "Çok fazla deneme. Bir dakika bekleyip tekrar deneyin.",
       "usernameShape": "Kullanıcı adı 3-24 karakter olmalı ve harf, rakam veya alt çizgi kullanmalıdır.",
       "usernameNotAllowed": "Bu kullanıcı adına izin verilmiyor.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Parola en az 6 karakter olmalıdır.",
       "usernameTaken": "Bu kullanıcı adı zaten alınmış.",
       "invalidCredentials": "Geçersiz kullanıcı adı veya parola.",
@@ -3449,6 +3453,16 @@ export const tr_TR: EnTranslations = {
     "statsOffline": "Çevrimdışı",
     "statsRealmOffline": "{realm} (Çevrimdışı)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Yükleniyor...",
     "noneYet": "Henüz karakter yok. Aşağıdan bir tane oluştur.",
@@ -3461,6 +3475,9 @@ export const tr_TR: EnTranslations = {
     "delete": "Sil",
     "rename": "Yeniden Adlandır",
     "newNamePlaceholder": "Yeni karakter adı",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Karakterler",
     "tabCreate": "Oluştur",
     "portraitAlt": "{name} portresi",

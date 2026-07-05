@@ -3388,6 +3388,10 @@ export const it_IT: EnTranslations = {
       "tooManyAttempts": "Troppi tentativi. Attendi un minuto e riprova.",
       "usernameShape": "Il nome utente deve avere 3-24 caratteri e usare lettere, cifre o trattino basso.",
       "usernameNotAllowed": "Questo nome utente non è consentito.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "La password deve contenere almeno 6 caratteri.",
       "usernameTaken": "Questo nome utente è già in uso.",
       "invalidCredentials": "Nome utente o password non validi.",
@@ -3449,6 +3453,16 @@ export const it_IT: EnTranslations = {
     "statsOffline": "Offline",
     "statsRealmOffline": "{realm} (offline)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Caricamento...",
     "noneYet": "Nessun personaggio ancora. Creane uno qui sotto.",
@@ -3461,6 +3475,9 @@ export const it_IT: EnTranslations = {
     "delete": "Elimina",
     "rename": "Rinomina",
     "newNamePlaceholder": "Nuovo nome personaggio",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Personaggi",
     "tabCreate": "Crea",
     "portraitAlt": "Ritratto di {name}",

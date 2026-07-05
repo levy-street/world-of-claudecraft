@@ -3388,6 +3388,10 @@ export const de_DE: EnTranslations = {
       "tooManyAttempts": "Zu viele Versuche. Warte eine Minute und versuche es erneut.",
       "usernameShape": "Der Benutzername muss 3-24 Zeichen lang sein und Buchstaben, Ziffern oder Unterstrich verwenden.",
       "usernameNotAllowed": "Dieser Benutzername ist nicht erlaubt.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Das Passwort muss mindestens 6 Zeichen lang sein.",
       "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
       "invalidCredentials": "Benutzername oder Passwort ungültig.",
@@ -3449,6 +3453,16 @@ export const de_DE: EnTranslations = {
     "statsOffline": "Offline",
     "statsRealmOffline": "{realm} (offline)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Lädt...",
     "noneYet": "Noch keine Charaktere. Erstelle unten einen.",
@@ -3461,6 +3475,9 @@ export const de_DE: EnTranslations = {
     "delete": "Löschen",
     "rename": "Umbenennen",
     "newNamePlaceholder": "Neuer Charaktername",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Charaktere",
     "tabCreate": "Erstellen",
     "portraitAlt": "Porträt von {name}",

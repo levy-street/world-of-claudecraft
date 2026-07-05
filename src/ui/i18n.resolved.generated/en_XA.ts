@@ -3388,6 +3388,10 @@ export const en_XA: EnTranslations = {
       "tooManyAttempts": "[Ţóó ɱáñý áţţéɱþţš. Ŵáíţ á ɱíñúţé áñð ţŕý áĝáíñ.]",
       "usernameShape": "[Úšéŕñáɱé ɱúšţ ƀé 3-24 çĥáŕáçţéŕš áñð úšé ļéţţéŕš, ðíĝíţš, óŕ úñðéŕšçóŕé.]",
       "usernameNotAllowed": "[Ţĥáţ úšéŕñáɱé íš ñóţ áļļóŵéð.]",
+      "linkWalletFirst": "[Çóññéçţ áñð ļíñķ á Šóļáñá ŵáļļéţ ƒíŕšţ.]",
+      "nameReserved": "[Ţĥáţ ñáɱé íš ŕéšéŕʋéð.]",
+      "quoteExpired": "[Ţĥé þáýɱéñţ ɋúóţé éẋþíŕéð. Šţáŕţ áĝáíñ.]",
+      "paymentUsed": "[Ţĥíš þáýɱéñţ ŵáš áļŕéáðý úšéð.]",
       "passwordMin": "[Þáššŵóŕð ɱúšţ ƀé áţ ļéášţ 6 çĥáŕáçţéŕš.]",
       "usernameTaken": "[Ţĥáţ úšéŕñáɱé íš áļŕéáðý ţáķéñ.]",
       "invalidCredentials": "[Íñʋáļíð úšéŕñáɱé óŕ þáššŵóŕð.]",
@@ -3449,6 +3453,16 @@ export const en_XA: EnTranslations = {
     "statsOffline": "[Óƒƒļíñé]",
     "statsRealmOffline": "[{realm} (Óƒƒļíñé)]"
   },
+  "woc": {
+    "linkWalletFirst": "[Çóññéçţ áñð ļíñķ á Šóļáñá ŵáļļéţ ţó þáý ŵíţĥ $ŴÓÇ.]",
+    "quoting": "[Þŕéþáŕíñĝ ýóúŕ $ŴÓÇ þáýɱéñţ...]",
+    "approveBurn": "[Áþþŕóʋé ţĥé {amount} $ŴÓÇ ƀúŕñ íñ ýóúŕ ŵáļļéţ...]",
+    "confirming": "[Çóñƒíŕɱíñĝ ţĥé ƀúŕñ óñ-çĥáíñ...]",
+    "finalizing": "[Ŵáíţíñĝ ƒóŕ Šóļáñá ƒíñáļížáţíóñ...]",
+    "confirmFailed": "[Ţĥé $ŴÓÇ þáýɱéñţ çóúļð ñóţ ƀé ʋéŕíƒíéð.]",
+    "finalizeTimeout": "[Ţíɱéð óúţ ŵáíţíñĝ ƒóŕ ƒíñáļížáţíóñ. Íƒ $ŴÓÇ ŵáš ƀúŕñéð, ŕéţŕý: ţĥé þáýɱéñţ šéţţļéš óñçé íţ ƒíñáļížéš.]",
+    "renameSuccess": "[Ŕéñáɱéð ţó {name}.]"
+  },
   "character": {
     "loading": "[Ļóáðíñĝ...]",
     "noneYet": "[Ñó çĥáŕáçţéŕš ýéţ. Çŕéáţé óñé ƀéļóŵ.]",
@@ -3461,6 +3475,9 @@ export const en_XA: EnTranslations = {
     "delete": "[Ðéļéţé]",
     "rename": "[Ŕéñáɱé]",
     "newNamePlaceholder": "[Ñéŵ çĥáŕáçţéŕ ñáɱé]",
+    "renamePaidButton": "[Þáý {amount} $ŴÓÇ áñð Ŕéñáɱé]",
+    "renamePriceHint": "[Á ʋóļúñţáŕý ŕéñáɱé ƀúŕñš {amount} $ŴÓÇ.]",
+    "renameCancel": "[Çáñçéļ]",
     "tabCharacters": "[Çĥáŕáçţéŕš]",
     "tabCreate": "[Çŕéáţé]",
     "portraitAlt": "[Þóŕţŕáíţ óƒ {name}]",

@@ -3388,6 +3388,10 @@ export const fr_FR: EnTranslations = {
       "tooManyAttempts": "Trop de tentatives. Attendez une minute puis réessayez.",
       "usernameShape": "Le nom d'utilisateur doit faire 3 à 24 caractères et utiliser lettres, chiffres ou tiret bas.",
       "usernameNotAllowed": "Ce nom d'utilisateur n'est pas autorisé.",
+      "linkWalletFirst": "Connect and link a Solana wallet first.",
+      "nameReserved": "That name is reserved.",
+      "quoteExpired": "The payment quote expired. Start again.",
+      "paymentUsed": "This payment was already used.",
       "passwordMin": "Le mot de passe doit contenir au moins 6 caractères.",
       "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
       "invalidCredentials": "Nom d'utilisateur ou mot de passe incorrect.",
@@ -3449,6 +3453,16 @@ export const fr_FR: EnTranslations = {
     "statsOffline": "Hors ligne",
     "statsRealmOffline": "{realm} (hors ligne)"
   },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment...",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet...",
+    "confirming": "Confirming the burn on-chain...",
+    "finalizing": "Waiting for Solana finalization...",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}."
+  },
   "character": {
     "loading": "Chargement...",
     "noneYet": "Aucun personnage pour l'instant. Créez-en un ci-dessous.",
@@ -3461,6 +3475,9 @@ export const fr_FR: EnTranslations = {
     "delete": "Supprimer",
     "rename": "Renommer",
     "newNamePlaceholder": "Nouveau nom de personnage",
+    "renamePaidButton": "Pay {amount} $WOC and Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
     "tabCharacters": "Personnages",
     "tabCreate": "Créer",
     "portraitAlt": "Portrait de {name}",
