@@ -19,8 +19,10 @@ const env = { ...process.env };
 const deployToken = env.GLITCH_TITLE_TOKEN || env.GLITCH_API_TOKEN;
 const clientTitleToken = env.VITE_GLITCH_TITLE_TOKEN;
 const version = env.GLITCH_DEPLOY_VERSION || readPackageVersion();
-const deploymentType = env.GLITCH_DEPLOYMENT_TYPE || 'iframe';
+const deploymentType = env.GLITCH_DEPLOYMENT_TYPE || 'node';
 const nodeDeployment = deploymentType === 'node';
+const staticClientDeployment = deploymentType === 'iframe' || deploymentType === 'wasm';
+const entryPoint = nodeDeployment ? 'package.json' : env.GLITCH_ENTRY_POINT || 'index.html';
 const gameApiOrigin =
   env.VITE_API_ORIGIN || env.GLITCH_GAME_API_ORIGIN || 'https://worldofclaudecraft.com';
 const dryRun = env.GLITCH_DEPLOY_DRY_RUN === '1';
@@ -32,6 +34,21 @@ if (!deployToken) {
 
 if (!clientTitleToken && !skipBuild) {
   fail("Set VITE_GLITCH_TITLE_TOKEN to this title's client title token before building.");
+}
+
+if (staticClientDeployment && env.GLITCH_ALLOW_STATIC_CLIENT_DEPLOY !== '1') {
+  fail(
+    'World of ClaudeCraft is a Node-backed MMO. Use GLITCH_DEPLOYMENT_TYPE=node for shared-world deploys, or set GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 for a static iframe/wasm client build.',
+  );
+}
+
+if (nodeDeployment) {
+  if (!env.DATABASE_URL) {
+    fail('Set DATABASE_URL before deploying the Glitch node MMO build.');
+  }
+  if (!env.GLITCH_SERVER_TITLE_TOKEN) {
+    fail('Set GLITCH_SERVER_TITLE_TOKEN before deploying the Glitch node MMO build.');
+  }
 }
 
 await ensureCli();
@@ -58,7 +75,7 @@ const deployArgs = [
   '--version',
   version,
   '--entry',
-  env.GLITCH_ENTRY_POINT || 'index.html',
+  entryPoint,
   '--type',
   deploymentType,
   '--build-type',
@@ -138,24 +155,27 @@ function customVariables(sourceEnv) {
     }
   }
   if (!nodeDeployment) return vars;
+  vars.set('dockerfile', sourceEnv.GLITCH_DOCKERFILE || 'Dockerfile');
+  vars.set('build_context', sourceEnv.GLITCH_BUILD_CONTEXT || '.');
+  vars.set('GLITCH_ENABLED', sourceEnv.GLITCH_ENABLED || '1');
+  vars.set('GLITCH_TITLE_ID', sourceEnv.GLITCH_TITLE_ID || TITLE_ID);
+  vars.set('VITE_GLITCH_ENABLED', '1');
+  vars.set('VITE_GLITCH_TITLE_ID', sourceEnv.VITE_GLITCH_TITLE_ID || TITLE_ID);
   for (const key of [
     'DATABASE_URL',
-    'PORT',
     'PUBLIC_ORIGIN',
     'REALM_NAME',
     'REALM_SINGLETON_LOCK',
     'WEB_ORIGINS',
-    'GLITCH_ENABLED',
-    'GLITCH_TITLE_ID',
     'GLITCH_SERVER_TITLE_TOKEN',
     'GLITCH_API_BASE_URL',
-    'VITE_GLITCH_ENABLED',
-    'VITE_GLITCH_TITLE_ID',
     'VITE_GLITCH_TITLE_TOKEN',
     'VITE_GLITCH_DEFAULT_CLASS',
-    'VITE_API_ORIGIN',
   ]) {
     if (sourceEnv[key]) vars.set(key, sourceEnv[key]);
+  }
+  if (sourceEnv.GLITCH_NODE_EXTERNAL_API_ORIGIN === '1' && sourceEnv.VITE_API_ORIGIN) {
+    vars.set('VITE_API_ORIGIN', sourceEnv.VITE_API_ORIGIN);
   }
   return vars;
 }

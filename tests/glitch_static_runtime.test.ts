@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cursorUrlForBase, installCursorCssVariables } from '../src/game/cursors';
+import { cursorUrlForBase } from '../src/game/cursors';
 import { sitePresenceEndpoint } from '../src/site_presence';
 
 describe('Glitch static runtime URLs', () => {
@@ -30,12 +30,9 @@ describe('Glitch static runtime URLs', () => {
     );
   });
 
-  it('can override CSS cursor variables with document-relative URLs', () => {
-    const values = new Map<string, string>();
-    installCursorCssVariables({ setProperty: (name, value) => values.set(name, value) }, './');
-
-    expect(values.get('--cursor-arrow')).toBe('url("./ui/cursors/arrow.png") 7 2, default');
-    expect(values.get('--cursor-point')).toBe('url("./ui/cursors/gauntlet.png") 6 4, pointer');
-    expect(values.get('--cursor-grab')).toBe('url("./ui/cursors/hand-grab.png") 11 16, grabbing');
+  it('does not runtime-override stylesheet cursor variables', () => {
+    expect(cursorUrlForBase('arrow.png', 7, 2, 'default', './')).toBe(
+      'url("./ui/cursors/arrow.png") 7 2, default',
+    );
   });
 });

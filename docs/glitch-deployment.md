@@ -48,25 +48,49 @@ export VITE_GLITCH_ENABLED=1
 export VITE_GLITCH_TITLE_ID=8254e0f9-6c3a-4c94-8a16-570157b9df3b
 export VITE_GLITCH_TITLE_TOKEN="<client title token>"
 export VITE_GLITCH_DEFAULT_CLASS=warrior
-export VITE_API_ORIGIN="https://worldofclaudecraft.com"
 
 export GLITCH_TITLE_ID=8254e0f9-6c3a-4c94-8a16-570157b9df3b
 export GLITCH_TITLE_TOKEN="<deploy token>"
-export GLITCH_GAME_API_ORIGIN="https://worldofclaudecraft.com"
-export GLITCH_DEPLOYMENT_TYPE=iframe
+export GLITCH_DEPLOYMENT_TYPE=node
+export GLITCH_ENTRY_POINT=package.json
+export DATABASE_URL="<shared postgres url>"
+export GLITCH_ENABLED=1
+export GLITCH_SERVER_TITLE_TOKEN="<runtime title token>"
 ```
 
 `VITE_GLITCH_TITLE_TOKEN` is the title token used by the shipped client for the
 documented title-token APIs. `GLITCH_TITLE_TOKEN` is the deploy-scoped token used
 by the Glitch CLI upload. Keep both out of git.
 
-Set these on the authoritative World of ClaudeCraft server too, so the Glitch
-iframe can exchange a validated install for a normal WOC online session:
+The normal Glitch deploy type for this repo is `node`. This game is an MMO with a
+Node server, `/api`, `/ws`, and Postgres persistence, so the Glitch build must run
+the server container for players to share the same live world. The Dockerfile
+listens on port 3000 as required by Glitch's Node runtime.
+
+Use the other deployment types only for these cases:
+
+| deployment_type | Use in this repo |
+| --- | --- |
+| `node` | Default and complete MMO deployment. Packages the source, Dockerfile, server, client, API, WebSocket world, and database-backed persistence. |
+| `iframe` | Static client-only fallback. It cannot host `/api` or `/ws`; it needs an external authoritative WOC server with CORS enabled. |
+| `wasm` | Static engine-style export only. This repo does not produce a required `.wasm` game runtime today, so do not use it for the MMO server. |
+| `streamed_native` | Not used by the browser MMO. Reserved for a native streamed build with a web frontend. |
+| `pixel_streaming` | Not used by the browser MMO. Reserved for Unreal or similar pixel-streaming packages. |
+
+For a static `iframe` or `wasm` client-only deploy, opt in deliberately:
 
 ```bash
-export GLITCH_ENABLED=1
-export GLITCH_SERVER_TITLE_TOKEN="<runtime title token>"
-export WEB_ORIGINS="https://glitch-game-content.s3.amazonaws.com,https://www.glitch.fun"
+export GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1
+export GLITCH_DEPLOYMENT_TYPE=iframe
+export GLITCH_GAME_API_ORIGIN="https://worldofclaudecraft.com"
+export VITE_API_ORIGIN="https://worldofclaudecraft.com"
+```
+
+The external server must include the Glitch iframe origins in `WEB_ORIGINS` if a
+static client calls it cross-origin:
+
+```bash
+export WEB_ORIGINS="https://glitch-game-content.s3.amazonaws.com,https://www.glitch.fun,https://glitch.fun"
 ```
 
 The server uses `GLITCH_SERVER_TITLE_TOKEN` only to validate
@@ -85,9 +109,8 @@ The script:
 
 1. Loads `.env` and `.env.local` if present.
 2. Clones or updates the Glitch CLI deploy tool under the system temp directory.
-3. Runs `npm run build` with Glitch integration enabled, relative static asset URLs, and a
-   server API origin baked into `VITE_API_ORIGIN`.
-4. Uploads `dist/` with `entry=index.html`, `type=iframe`, and `build_type=production`.
+3. For `node`, zips the source tree without `node_modules`, `dist`, `.env`, docs, tests, or local agent folders.
+4. Uploads the archive with `entry=package.json`, `type=node`, `dockerfile=Dockerfile`, `build_context=.`, and `build_type=production`.
 5. Waits for the Glitch deployment job to complete.
 
 Useful overrides:
@@ -96,9 +119,10 @@ Useful overrides:
 GLITCH_DEPLOY_DRY_RUN=1 npm run deploy:glitch
 GLITCH_DEPLOY_SKIP_BUILD=1 npm run deploy:glitch
 GLITCH_BUILD_TYPE=playtest npm run deploy:glitch
-GLITCH_DEPLOYMENT_TYPE=wasm npm run deploy:glitch
-GLITCH_DEPLOY_VERSION=0.20.0 npm run deploy:glitch
-GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch
+GLITCH_DEPLOY_VERSION=0.20.2 npm run deploy:glitch
+GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=iframe npm run deploy:glitch
+GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_DEPLOYMENT_TYPE=wasm npm run deploy:glitch
+GLITCH_ALLOW_STATIC_CLIENT_DEPLOY=1 GLITCH_GAME_API_ORIGIN=https://dev.worldofclaudecraft.com npm run deploy:glitch
 ```
 
 ## Local Verification

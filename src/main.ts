@@ -22,7 +22,6 @@ import {
   stepAngleToward,
 } from './game/click_move';
 import { getClientSeed } from './game/client_seed';
-import { installCursorCssVariables } from './game/cursors';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
@@ -242,7 +241,6 @@ if (DESKTOP_APP) initDesktopShellIntegration();
 // the page is torn down, so logout/login reload cycles don't exhaust the GPU
 // context pool and break the next renderer with "Error creating WebGL context".
 installWebGLContextRelease();
-installCursorCssVariables();
 let pendingDeleteCharacter: CharacterSummary | null = null;
 let homepageMusic: HTMLAudioElement | null = null;
 let homepageMusicStarted = false;
