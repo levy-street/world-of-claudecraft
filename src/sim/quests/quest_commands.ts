@@ -1,13 +1,15 @@
 // Quest command surface (session W4), MOVED verbatim out of the Sim monolith behind
 // the SimContext seam. These are the inline IWorld quest VERBS the coordinator used
 // to host: questState + acceptQuest/acceptLinkedQuest/abandonQuest/turnInQuest, plus
-// the two private helpers questNpcFor (NPC-proximity scan) and finalizeQuestAccept
-// (the shared accept core), and the pure free fn computeQuestState. Sim keeps thin
+// the private helper questNpcFor (NPC-proximity scan), the two exported reward cores
+// finalizeQuestAccept (accept) and turnInQuestCore (turn-in) that quests/
+// dev_quest_commands.ts reuses so the /dev completer cannot drift from a normal
+// turn-in, and the pure free fn computeQuestState. Sim keeps thin
 // same-named facade delegates (the widened `pid?` overload preserved) so the IWorld
 // surface, server/game.ts, and the in-file interaction path (talkToNpc) resolve them
 // on the Sim facade unchanged; each delegate forwards via this.ctx.
 //
-// Immutability waiver (sim move): turnInQuest / finalizeQuestAccept / abandonQuest
+// Immutability waiver (sim move): turnInQuestCore / finalizeQuestAccept / abandonQuest
 // mutate the live PlayerMeta in place (questLog set/delete, questsDone.add, counters,
 // copper). These are shared references the engine mutates; the bodies move as-is, NOT
 // rewritten to immutable patterns. They draw NO rng.
@@ -21,6 +23,7 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
+import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import { questFallbackGrants } from '../quest_fallback';
@@ -80,11 +83,12 @@ function questNpcFor(
   return { npc: null, tooFar: sawNpc };
 }
 
-// Shared accept core for the NPC and linked-share paths. Records progress, then
-// re-grants any requiredItem the player no longer holds so a lost prerequisite item
-// can never permanently block the quest, and announces the accept. Both callers go
-// through here so the two paths cannot drift (notably this re-grant).
-function finalizeQuestAccept(
+// Shared accept core for the NPC, linked-share, AND /dev completer paths. Records
+// progress, then re-grants any requiredItem the player no longer holds so a lost
+// prerequisite item can never permanently block the quest, and announces the accept.
+// Every accept path goes through here so they cannot drift (notably this re-grant);
+// exported so quests/dev_quest_commands.ts reuses it instead of cloning it.
+export function finalizeQuestAccept(
   ctx: SimContext,
   questId: string,
   quest: QuestDef,
@@ -109,6 +113,11 @@ export function acceptQuest(ctx: SimContext, questId: string, pid?: number): voi
   if (!r) return;
   const quest = QUESTS[questId];
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot deal with quest givers.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   if (!quest) {
     ctx.error(meta.entityId, 'That quest is not available.');
     return;
@@ -173,6 +182,11 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  // Dead players (released ghosts included) cannot turn in quests.
+  if (p.dead) {
+    ctx.error(meta.entityId, "You can't do that while dead.");
+    return;
+  }
   const quest = QUESTS[questId];
   if (!quest) {
     ctx.error(meta.entityId, 'That quest is not available.');
@@ -192,7 +206,37 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     ctx.error(meta.entityId, nearby.tooFar ? 'Too far away.' : 'That quest turn-in is not nearby.');
     return;
   }
+  // Capacity gate (classic): the reward must fit AFTER the collect items are
+  // handed in, so simulate the hand-in on a scratch copy before committing.
+  const rewardItem = questRewardItemId(quest, meta.cls);
+  if (rewardItem) {
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    for (const obj of quest.objectives) {
+      if (obj.type === 'collect' && obj.itemId) removeStacked(scratch, obj.itemId, obj.count);
+    }
+    if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
+      bagsFullError(ctx, meta.entityId);
+      return;
+    }
+  }
 
+  turnInQuestCore(ctx, questId, quest, meta);
+}
+
+// Shared turn-in reward core: consumes the collect items, marks the quest done, and
+// grants the copper/item/xp rewards plus the questDone + completion log. The caller
+// MUST have already verified the quest is in the log and 'ready' (turnInQuest does
+// the state + NPC-proximity checks; the /dev completer forces the objectives ready).
+// Both the NPC turn-in and quests/dev_quest_commands.ts go through here so the reward
+// math cannot drift.
+export function turnInQuestCore(
+  ctx: SimContext,
+  questId: string,
+  quest: QuestDef,
+  meta: PlayerMeta,
+): void {
+  const qp = meta.questLog.get(questId);
+  if (!qp) return;
   for (const obj of quest.objectives) {
     if (obj.type === 'collect' && obj.itemId) ctx.removeItem(obj.itemId, obj.count, meta.entityId);
   }
@@ -218,4 +262,7 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     color: '#ff0',
     pid: meta.entityId,
   });
+  // Quests with an authored Ravenpost letter have their giver write to the
+  // player a little while after the turn-in (mail/post_office.ts).
+  ctx.queueQuestLetter(questId, meta.entityId);
 }

@@ -1,3 +1,4 @@
+import { type LetterDef, QUEST_LETTERS, WELCOME_LETTER } from '../sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -34,7 +35,8 @@ export type EntityTranslationKind =
   | 'zonePoi'
   | 'dungeon'
   | 'delve'
-  | 'itemSet';
+  | 'itemSet'
+  | 'letter';
 export type EntityTranslationField =
   | 'name'
   | 'description'
@@ -47,7 +49,10 @@ export type EntityTranslationField =
   | 'enterText'
   | 'leaveText'
   | 'bonus2'
-  | 'bonus3';
+  | 'bonus3'
+  | 'sender'
+  | 'subject'
+  | 'body';
 
 export type EntityTranslationRequest =
   | { kind: 'class'; id: PlayerClass; field: 'name' | 'description'; values?: InterpolationValues }
@@ -92,6 +97,12 @@ export type EntityTranslationRequest =
       kind: 'delve';
       id: string;
       field: 'name' | 'enterText' | 'leaveText';
+      values?: InterpolationValues;
+    }
+  | {
+      kind: 'letter';
+      id: string;
+      field: 'sender' | 'subject' | 'body';
       values?: InterpolationValues;
     };
 
@@ -138,6 +149,13 @@ const CLASS_DESCRIPTION_KEYS: Record<PlayerClass, string> = {
 };
 
 const fallbackLog = new Map<string, EntityTranslationFallback>();
+
+// Ravenpost authored letters by letterId (the welcome letter + the quest
+// thank-you letters), the canonical English source the 'letter' kind reads.
+const LETTERS_BY_ID: Record<string, LetterDef> = {
+  [WELCOME_LETTER.letterId]: WELCOME_LETTER,
+};
+for (const letter of Object.values(QUEST_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
 
 function entityPathSegment(value: string): string {
   return value.replace(/[^A-Za-z0-9_]/g, '_');
@@ -239,6 +257,13 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
       if (request.field === 'leaveText') return delve.leaveText;
       return delve.name;
     }
+    case 'letter': {
+      const letter = LETTERS_BY_ID[request.id];
+      if (!letter) return request.id;
+      if (request.field === 'sender') return letter.senderName;
+      if (request.field === 'body') return letter.body;
+      return letter.subject;
+    }
   }
 }
 
@@ -270,6 +295,8 @@ export function entityTranslationKey(request: EntityTranslationRequest): string 
       return `entities.dungeons.${entityPathSegment(request.id)}.${request.field}`;
     case 'delve':
       return `entities.delves.${entityPathSegment(request.id)}.${request.field}`;
+    case 'letter':
+      return `entities.letters.${entityPathSegment(request.id)}.${request.field}`;
   }
 }
 
@@ -396,7 +423,11 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
     );
   }
   for (const set of Object.values(ITEM_SETS).sort(compareById)) {
-    const fields: ('name' | 'bonus2' | 'bonus3')[] = ['name', 'bonus2', 'bonus3'];
+    // Only tiers the set actually has: the leveling haste kits carry a single
+    // 3-piece tier, so registering a bonus2 row would emit an id-fallback string.
+    const fields: ('name' | 'bonus2' | 'bonus3')[] = ['name'];
+    if (set.bonuses.some((b) => b.pieces === 2)) fields.push('bonus2');
+    if (set.bonuses.some((b) => b.pieces === 3)) fields.push('bonus3');
     for (const field of fields) {
       entries.push(
         entry(
@@ -600,6 +631,23 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
         entityTranslationKey({ kind: 'delve', id: delve.id, field: 'leaveText' }),
       ),
     );
+  }
+  for (const letter of Object.values(LETTERS_BY_ID).sort((a, b) =>
+    a.letterId.localeCompare(b.letterId),
+  )) {
+    const fields: ('sender' | 'subject' | 'body')[] = ['sender', 'subject', 'body'];
+    for (const field of fields) {
+      entries.push(
+        entry(
+          'letter',
+          letter.letterId,
+          field,
+          canonicalEntityText({ kind: 'letter', id: letter.letterId, field }),
+          'world',
+          entityTranslationKey({ kind: 'letter', id: letter.letterId, field }),
+        ),
+      );
+    }
   }
   return entries;
 }

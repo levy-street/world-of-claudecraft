@@ -118,12 +118,14 @@ import App from '../../src/admin/App.svelte';
 import { t } from '../../src/admin/i18n';
 import Characters from '../../src/admin/pages/Characters.svelte';
 import { auth } from '../../src/admin/state/auth.svelte';
+import { grantPermissions } from './_grant';
 
 describe('Players pages', () => {
   it('opens account details from the searchable accounts directory', async () => {
     history.replaceState(null, '', '/admin?page=accounts');
     auth.token = 'tok';
     auth.name = 'alice';
+    grantPermissions();
     render(App);
 
     await screen.findByText('alice');
@@ -158,6 +160,7 @@ describe('Players pages', () => {
     history.replaceState(null, '', '/admin?page=characters');
     auth.token = 'tok';
     auth.name = 'alice';
+    grantPermissions();
     render(App);
 
     expect(await screen.findByText('Merlin')).toBeInTheDocument();

@@ -37,7 +37,7 @@ function friend(over: Partial<FriendInfo> & { name: string }): FriendInfo {
 }
 
 function guildMember(over: Partial<GuildMemberInfo> & { name: string }): GuildMemberInfo {
-  return { ...friend(over), rank: over.rank ?? 'member' };
+  return { ...friend(over), rank: over.rank ?? 'member', lastLogin: over.lastLogin ?? null };
 }
 
 function partyMember(
@@ -154,6 +154,23 @@ describe('per-tab row models', () => {
 
   it('returns a null guild for a guildless viewer', () => {
     expect(guildView({ ...SOCIAL, guild: null }, 'Me').guild).toBeNull();
+  });
+
+  it('maps each member last_login into the guild row (null when unknown)', () => {
+    const iso = '2026-01-02T03:04:05.000Z';
+    const social: SocialInfo = {
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        members: [
+          guildMember({ name: 'Seen', rank: 'member', online: false, lastLogin: iso }),
+          guildMember({ name: 'NeverSeen', rank: 'member', online: false }),
+        ],
+      },
+    };
+    const rows = guildView(social, 'Me').guild!.rows;
+    expect(rows.find((r) => r.name === 'Seen')?.lastLogin).toBe(iso);
+    expect(rows.find((r) => r.name === 'NeverSeen')?.lastLogin).toBeNull();
   });
 });
 

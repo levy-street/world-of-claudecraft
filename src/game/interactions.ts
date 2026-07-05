@@ -1,5 +1,6 @@
 import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
 import { t } from '../ui/i18n';
+import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
 import type { HoverCursorKind } from './cursors';
 
@@ -14,12 +15,14 @@ export interface PickInteractionWorld {
   leaveDungeon(): void;
   pickUpObject(id: number): void;
   startAutoAttack(): void;
+  resurrectAtSpiritHealer(): void;
 }
 
 export interface PickInteractionHud {
   openLoot(mobId: number, screenX: number, screenY: number): void;
   openQuestDialog(npcId: number): void;
   openDelveBoard(npcId: number): void;
+  openMailbox(): void;
   showError(text: string): void;
   closeContextMenu(): void;
 }
@@ -43,6 +46,29 @@ export function activePvpOpponentIds(
     }
   }
   return ids;
+}
+
+// Re-pick cadence for the hover cursor while the pointer is stationary. A pointer
+// move always re-picks immediately; this only bounds how fast the world can change
+// WHICH entity sits under an unmoving cursor (a walking mob), so the scene raycast
+// stops costing a full intersect pass on every frame of a still mouse.
+export const HOVER_REPICK_MS = 50;
+
+/** Gate for the per-frame hover raycast: pick when the pointer moved, otherwise at
+ *  most every HOVER_REPICK_MS. Pure state machine (caller supplies the clock), so
+ *  it unit-tests without DOM or timers. */
+export class HoverPickGate {
+  private x = Number.NaN;
+  private y = Number.NaN;
+  private nextAt = 0;
+
+  shouldPick(x: number, y: number, nowMs: number): boolean {
+    if (x === this.x && y === this.y && nowMs < this.nextAt) return false;
+    this.x = x;
+    this.y = y;
+    this.nextAt = nowMs + HOVER_REPICK_MS;
+    return true;
+  }
 }
 
 export function isAttackableEntity(
@@ -101,13 +127,28 @@ export function handlePickedEntity(
       }
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else world.pickUpObject(id);
+      else if (e.templateId === 'mailbox') {
+        // Dead players (ghosts included) cannot use the mail; the server-side
+        // interact path refuses too, this just keeps the window from opening.
+        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
+        else hud.openMailbox();
+      } else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
       else hud.showError(t('questUi.errors.tooFar'));
     } else if (e.kind === 'npc') {
       if (d <= INTERACT_RANGE + 2) {
-        if (e.templateId === 'brother_halven') hud.openDelveBoard(id);
+        if (e.templateId === 'spirit_healer') {
+          // The Spirit Healer resurrects a ghost in place (with Resurrection
+          // Sickness). To the living it offers only watchful flavor.
+          if (world.player.ghost) world.resurrectAtSpiritHealer();
+          else hud.showError(t('hudChrome.death.spiritHealerAlive'));
+        } else if (world.player.dead) {
+          // Dead players and ghosts cannot talk to NPCs (the server refuses the
+          // command too); do not open the quest dialog client-side.
+          hud.showError(tSim('error.cantWhileDead'));
+        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+          hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       } else hud.showError(t('questUi.errors.tooFar'));
     } else if ((e.kind === 'mob' && !e.dead && e.hostile) || isActivePvpOpponent(world, e)) {
@@ -124,7 +165,10 @@ export function handlePickedEntity(
       if (d > INTERACT_RANGE + 1) return;
       if (e.templateId === 'dungeon_door' && e.dungeonId) world.enterDungeon(e.dungeonId);
       else if (e.templateId === 'dungeon_exit') world.leaveDungeon();
-      else world.pickUpObject(id);
+      else if (e.templateId === 'mailbox') {
+        if (world.player.dead) hud.showError(tSim('error.cantWhileDead'));
+        else hud.openMailbox();
+      } else world.pickUpObject(id);
     } else if (e.kind === 'mob' && e.dead && e.lootable) {
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 1) hud.openLoot(id, screenX, screenY);
@@ -132,8 +176,11 @@ export function handlePickedEntity(
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)
       const d = dist2d(world.player.pos, e.pos);
-      if (d <= INTERACT_RANGE + 2) {
-        if (e.templateId === 'brother_halven') hud.openDelveBoard(id);
+      // No quest dialog while dead (the server refuses quest talk too); a ghost
+      // takes the Spirit Healer res via right-click or the death panel button.
+      if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
+        if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+          hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
       }
     }

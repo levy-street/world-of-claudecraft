@@ -28,7 +28,6 @@ const overviewData = {
     rssBytes: 1048576,
     heapUsedBytes: 524288,
   },
-  usage: { generatedAt: '2026-06-01T00:00:00Z', windows: [], metrics: [], caches: [] },
 };
 const activityData = {
   days: 7,

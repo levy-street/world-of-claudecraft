@@ -26,7 +26,7 @@ import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatNumber, t, tPlural } from './i18n';
+import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { rovingTarget } from './roving_index';
 import { localizeZone } from './server_i18n';
 import {
@@ -344,9 +344,14 @@ export class SocialWindow {
     const head = `<div class="soc-guild-head">&lt;${esc(g.name)}&gt; <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span></div>`;
     const rows = g.rows
       .map((m) => {
+        // Offline rows carry a "last seen" line: a locale-formatted date/time,
+        // or the localized "never" when no login has been recorded.
+        const lastSeenWhen = m.lastLogin
+          ? formatDateTime(new Date(m.lastLogin), { dateStyle: 'medium', timeStyle: 'short' })
+          : t('hudChrome.social.lastSeenNever');
         const meta = m.online
           ? `<span class="zone">${esc(m.zone ? localizeZone(m.zone) : '')}</span><br>${esc(statusLabel(m.status))}`
-          : esc(t('hud.social.status.offline'));
+          : `${esc(t('hud.social.status.offline'))}<br>${esc(t('hudChrome.social.lastSeen', { when: lastSeenWhen }))}`;
         const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>`;
         const name =
           m.online && !m.self

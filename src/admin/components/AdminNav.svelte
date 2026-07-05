@@ -7,7 +7,8 @@
     shouldHandleNavigation,
     type AdminRoute,
   } from '../navigation';
-  import { NAV_SECTIONS, type AdminPage } from '../pages/pages';
+  import { type AdminPage, visibleNavSections } from '../pages/pages';
+  import { auth } from '../state/auth.svelte';
 
   let {
     route,
@@ -24,6 +25,8 @@
   const navigation = getAdminNavigation();
   let sidebar: HTMLElement;
   let activePage = $derived<AdminPage>(route.page === 'ip' ? 'shared-ips' : route.page);
+  // Presentation only: the server enforces the same route->permission mapping.
+  let sections = $derived(visibleNavSections((permission) => auth.can(permission)));
 
   $effect(() => {
     if (!open) return;
@@ -44,7 +47,7 @@
     </button>
   </header>
   <nav>
-    {#each NAV_SECTIONS as section (section.id)}
+    {#each sections as section (section.id)}
       {@const sectionActive = section.items.some((item) => item.id === activePage)}
       <div class="nav-section">
         {#if section.labelKey}

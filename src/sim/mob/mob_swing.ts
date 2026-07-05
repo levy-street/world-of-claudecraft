@@ -493,7 +493,7 @@ export function runMobSwingAffixes(
     });
   }
   // Knockback: a landed hit can physically hurl the player victim straight back.
-  // Hostile mobs only (a friendly pet shares this swing path) and players only —
+  // Hostile mobs only (a friendly pet shares this swing path) and players only,
   // shoving a fellow mob is meaningless. Pure positional displacement (no aura),
   // terrain-clamped so it never strands the victim off the world; surfaced via a
   // spellfx nova + the same "unleashes" log line War Stomp uses.
@@ -505,7 +505,9 @@ export function runMobSwingAffixes(
     !target.dead &&
     ctx.rng.chance(knockback.chance)
   ) {
-    if (ctx.applyKnockback(mob, target, knockback.distance) > 0) {
+    // Keep the chance draw unconditional for parity draw-order stability.
+    const resisted = knockback.distance * (1 - target.knockbackResistance);
+    if (ctx.applyKnockback(mob, target, resisted) > 0) {
       const school = (knockback.school ?? 'physical') as Aura['school'];
       ctx.emit({ type: 'spellfx', sourceId: mob.id, targetId: target.id, school, fx: 'nova' });
       ctx.emit({

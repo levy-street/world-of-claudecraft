@@ -62,7 +62,9 @@ const ALLOWED_PERK_KINDS: ReadonlySet<PerkKind> = new Set(['cosmetic', 'convenie
 export function assertNoPowerPerks(perks: readonly AldrinPerk[] = ALDRIN_PERKS): void {
   for (const p of perks) {
     if (!ALLOWED_PERK_KINDS.has(p.kind)) {
-      throw new Error(`Aldrin perk "${p.id}" has non-allowed kind "${p.kind}" (pay-to-win is forbidden)`);
+      throw new Error(
+        `Aldrin perk "${p.id}" has non-allowed kind "${p.kind}" (pay-to-win is forbidden)`,
+      );
     }
   }
 }
@@ -304,7 +306,11 @@ export function verifyAldrinPayment(q: AldrinQuote, p: ParsedOnchainPayment): Al
 // one whole asset unit in USD (e.g. 150 for SOL, 1 for USDC, 0.0004 for $WOC).
 // Returns ceil(base units) so rounding never underprices the membership.
 // ---------------------------------------------------------------------------
-export function usdCentsToAssetBase(usdCents: number, usdPerAsset: number, decimals: number): bigint {
+export function usdCentsToAssetBase(
+  usdCents: number,
+  usdPerAsset: number,
+  decimals: number,
+): bigint {
   if (!Number.isFinite(usdCents) || usdCents <= 0) return 0n;
   if (!Number.isFinite(usdPerAsset) || usdPerAsset <= 0) return 0n;
   const wholeAssets = usdCents / 100 / usdPerAsset;

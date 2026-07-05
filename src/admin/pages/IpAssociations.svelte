@@ -9,6 +9,7 @@
   import { localizeAdminError, t } from '../i18n';
   import Badge from '../components/Badge.svelte';
   import AccountIndicators from '../components/AccountIndicators.svelte';
+  import AccountLink from '../components/AccountLink.svelte';
   import IpBlockDialog from '../components/IpBlockDialog.svelte';
   import PageHeader from '../components/PageHeader.svelte';
   import Pager from '../components/Pager.svelte';
@@ -114,7 +115,7 @@
   <PageHeader
     title={t('ipAssociations.title', { ip })}
     badge={data?.blocked ? blockedBadge : undefined}
-    actions={data ? pageActions : undefined}
+    actions={data && auth.can('ipblocks.manage') ? pageActions : undefined}
   />
 
   <a class="back-link" href={routeHref({ page: 'shared-ips' })} onclick={back}>{t('ipAssociations.back')}</a>
@@ -136,7 +137,13 @@
           <section class="ip-account">
             <div class="account-heading">
               <div>
-                <strong>{account.username}</strong>
+                <strong>
+                  <AccountLink
+                    accountId={account.accountId}
+                    label={account.username}
+                    onChanged={() => void refresh()}
+                  />
+                </strong>
                 <span class="hint">{t('ipAssociations.accountId', { id: fmtNumber(account.accountId) })}</span>
                 <AccountIndicators
                   isAdmin={account.isAdmin}

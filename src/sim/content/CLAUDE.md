@@ -1,5 +1,5 @@
 <!-- Area-scoped: src/sim/content/ only. Root + src/ + src/sim/ CLAUDE.md already
-     loaded: determinism, dependency rules, vanilla-fidelity, large-file norms,
+     loaded: determinism, dependency rules, classic-fidelity, large-file norms,
      and the sim-emit -> client-matcher i18n flow live there. This file covers
      only the data-as-code conventions here. -->
 
@@ -35,8 +35,8 @@ module and spreads it into the flat tables the engine reads (`ITEMS`, `MOBS`,
 - `ground_pickup_lines.ts`: `GROUND_PICKUP_LINES` (deny/enough flavor text per
   collectible item id) + `groundPickupDeny`/`groundPickupEnough`.
 
-## Vanilla fidelity (YOU MUST)
-Abilities gain ranks at **real vanilla learn levels** with real values. The
+## Classic-era fidelity (YOU MUST)
+Abilities gain ranks at **classic-era learn levels** with era-accurate values. The
 canonical table for levels 1 to 20, all 9 classes, is `docs/design/spell-ranks.md`:
 cross-reference it; do not invent costs/levels/damage.
 
@@ -104,6 +104,11 @@ content you add here should reach it in the same change:
   run `npm run wiki:content` and commit the regenerated `src/guide/content.generated.ts`.
   It also runs in `pretest`/`build`, and `tests/guide.test.ts` fails CI if the committed
   file is stale, so a forgotten regen is caught.
+- A new (or retinted) creature/class/pet model also needs its still rendered: run
+  `npm run wiki:stills` and commit the new `public/guide-stills/*.webp`. Unlike `wiki:content`
+  this needs a headless browser, so it is NOT in `pretest`/`build`; `tests/guide.test.ts` fails
+  CI if a figure's baked still is missing on disk, and a second guard fails on an orphan WebP
+  that no figure references.
 - Only spoiler-safe, high-level facts surface (names, roles, level bands, signature kits,
   POI labels): no balance numbers, mechanics, loot, the raid boss, or encounter scripts.
 - A brand-new content TYPE or system needs more than a regen (a generator change, a Guide

@@ -4,12 +4,11 @@ const config: CapacitorConfig = {
   appId: 'com.worldofclaudecraft',
   appName: 'World of ClaudeCraft',
   webDir: 'dist',
-  bundledWebRuntime: false,
   plugins: {
     LiveUpdates: {
       appId: '9fa1b0c1',
       channel: 'Production',
-      autoUpdateMethod: 'background',
+      autoUpdateMethod: 'none',
       maxVersions: 2,
     },
   },

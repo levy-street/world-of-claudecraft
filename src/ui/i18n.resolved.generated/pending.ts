@@ -9,24 +9,94 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "es_ES": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "fr_FR": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "fr_CA": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "de_DE": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
   "ru_RU": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "nl_NL": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "pl_PL": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "id_ID": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "tr_TR": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "sv_SE": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "vi_VN": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ],
+  "da_DK": [
+    "hudChrome.gathering.herbalism",
+    "hudChrome.gathering.logging",
+    "hudChrome.gathering.mining",
+    "hudChrome.gathering.title"
+  ]
 };

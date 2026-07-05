@@ -8,25 +8,9 @@
 //   POST /api/aldrin/quote           { method }            -> a payment quote
 //   POST /api/aldrin/confirm         { quoteId, signature } -> verify + grant
 //   POST /api/aldrin/stripe/webhook  (Stripe-signed)        -> verify + grant
-import * as http from 'node:http';
+
 import { randomBytes } from 'node:crypto';
-import { json, readBody, readBinaryBody } from './http_util';
-import {
-  ALDRIN_BUYBACK_VAULT,
-  ALDRIN_ENABLED,
-  ALDRIN_BURN_BPS,
-  ALDRIN_PERIOD_DAYS,
-  ALDRIN_PRICE_USD_CENTS,
-  ALDRIN_QUOTE_TTL_SECONDS,
-  ALDRIN_STRIPE_ENABLED,
-  ALDRIN_STRIPE_WEBHOOK_SECRET,
-  ALDRIN_TREASURY,
-  SOL_DECIMALS,
-  USDC_DECIMALS,
-  USDC_MINT,
-  WOC_DECIMALS,
-  WOC_MINT,
-} from './aldrin_config';
+import type * as http from 'node:http';
 import {
   ALDRIN_METHODS,
   ALDRIN_PERKS,
@@ -44,9 +28,6 @@ import {
   usdCentsToAssetBase,
   verifyAldrinPayment,
 } from './aldrin_club';
-import { assetUsdPrice, parseAldrinPayment } from './aldrin_solana';
-import { grantFromStripeEvent, verifyStripeSignature } from './aldrin_stripe';
-import { loadAldrinMembership, setAldrinMembership, walletForAccount } from './db';
 import {
   aldrinPaymentByReference,
   deleteAldrinQuote,
@@ -54,6 +35,26 @@ import {
   loadAldrinQuote,
   recordAldrinPayment,
 } from './aldrin_club_db';
+import {
+  ALDRIN_BURN_BPS,
+  ALDRIN_BUYBACK_VAULT,
+  ALDRIN_ENABLED,
+  ALDRIN_PERIOD_DAYS,
+  ALDRIN_PRICE_USD_CENTS,
+  ALDRIN_QUOTE_TTL_SECONDS,
+  ALDRIN_STRIPE_ENABLED,
+  ALDRIN_STRIPE_WEBHOOK_SECRET,
+  ALDRIN_TREASURY,
+  SOL_DECIMALS,
+  USDC_DECIMALS,
+  USDC_MINT,
+  WOC_DECIMALS,
+  WOC_MINT,
+} from './aldrin_config';
+import { assetUsdPrice, parseAldrinPayment } from './aldrin_solana';
+import { grantFromStripeEvent, verifyStripeSignature } from './aldrin_stripe';
+import { loadAldrinMembership, setAldrinMembership, walletForAccount } from './db';
+import { json, readBinaryBody, readBody } from './http_util';
 
 // Public membership view for the client (booleans + display fields only).
 function membershipView(m: AldrinMembership | null, nowMs: number) {
@@ -74,7 +75,9 @@ function enabledMethods(): AldrinPayMethod[] {
     // The treasury and buyback vault must be distinct, else one credit could
     // satisfy both the treasury and buyback legs and silently break the 50/50.
     if (m === 'sol' || m === 'usdc') {
-      return !!ALDRIN_TREASURY && !!ALDRIN_BUYBACK_VAULT && ALDRIN_TREASURY !== ALDRIN_BUYBACK_VAULT;
+      return (
+        !!ALDRIN_TREASURY && !!ALDRIN_BUYBACK_VAULT && ALDRIN_TREASURY !== ALDRIN_BUYBACK_VAULT
+      );
     }
     if (m === 'woc') return !!ALDRIN_TREASURY;
     return false;
@@ -110,7 +113,8 @@ export async function handleAldrinQuote(
   const body = await readBody(req);
   const method = body.method;
   if (!isPayMethod(method)) return json(res, 400, { error: 'unknown payment method' });
-  if (!enabledMethods().includes(method)) return json(res, 503, { error: 'payment method not configured' });
+  if (!enabledMethods().includes(method))
+    return json(res, 503, { error: 'payment method not configured' });
 
   if (method === 'stripe') {
     // v1: the client redirects to a Stripe Checkout link created out-of-band with
@@ -124,10 +128,12 @@ export async function handleAldrinQuote(
   if (!wallet) return json(res, 409, { error: 'link a Solana wallet first' });
 
   const mint = method === 'usdc' ? USDC_MINT : method === 'woc' ? WOC_MINT : null;
-  const decimals = method === 'sol' ? SOL_DECIMALS : method === 'usdc' ? USDC_DECIMALS : WOC_DECIMALS;
+  const decimals =
+    method === 'sol' ? SOL_DECIMALS : method === 'usdc' ? USDC_DECIMALS : WOC_DECIMALS;
 
   const usdPerAsset = await assetUsdPrice(method);
-  if (usdPerAsset === null || usdPerAsset <= 0) return json(res, 502, { error: 'price feed unavailable' });
+  if (usdPerAsset === null || usdPerAsset <= 0)
+    return json(res, 502, { error: 'price feed unavailable' });
   const priceBase = usdCentsToAssetBase(ALDRIN_PRICE_USD_CENTS, usdPerAsset, decimals);
   if (priceBase <= 0n) return json(res, 502, { error: 'could not price this asset' });
 
@@ -224,7 +230,12 @@ export async function handleAldrinStripeWebhook(
   // Stripe events (expanded invoices with many line items) can exceed 64 KiB.
   const raw = (await readBinaryBody(req, 256 * 1024)).toString('utf8');
   const sigHeader = String(req.headers['stripe-signature'] ?? '');
-  const verified = verifyStripeSignature(raw, sigHeader, ALDRIN_STRIPE_WEBHOOK_SECRET, Math.floor(Date.now() / 1000));
+  const verified = verifyStripeSignature(
+    raw,
+    sigHeader,
+    ALDRIN_STRIPE_WEBHOOK_SECRET,
+    Math.floor(Date.now() / 1000),
+  );
   if (!verified.ok) return json(res, 400, { error: `signature: ${verified.reason}` });
 
   let event: unknown;

@@ -15,10 +15,7 @@
 // shared core buyback.ts lands on main, route the Aldrin buyback split into that
 // vault + keeper and delete this module; it exists here only to make the draft's
 // SOL/USDC -> $WOC -> burn path concrete and reviewable.
-import {
-  ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS,
-  ALDRIN_BUYBACK_SLIPPAGE_BPS,
-} from './aldrin_config';
+import { ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS, ALDRIN_BUYBACK_SLIPPAGE_BPS } from './aldrin_config';
 
 /** A single swap+burn cycle's outcome, for the audit log + admin dashboard. */
 export interface BuybackResult {
@@ -45,7 +42,10 @@ export interface BuybackExecutor {
  * Pure trigger: run a batch only once the pooled value clears the dust floor.
  * Kept separate so the threshold policy is testable without any IO.
  */
-export function shouldRunBuyback(pooledUsdCents: number, minUsdCents = ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS): boolean {
+export function shouldRunBuyback(
+  pooledUsdCents: number,
+  minUsdCents = ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS,
+): boolean {
   return Number.isFinite(pooledUsdCents) && pooledUsdCents >= minUsdCents;
 }
 

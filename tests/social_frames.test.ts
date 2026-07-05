@@ -5,6 +5,7 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
@@ -130,6 +131,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             rank: 'member',
           },
         ],
+        events: [],
       },
     });
 
@@ -151,6 +153,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             rank: 'member',
           },
         ],
+        events: [],
       },
     });
     // the dirty flag flips true once, then back to false (HUD re-render poll)
@@ -162,6 +165,44 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
     const c = bareClient(7);
     feed(c, { t: 'social' }); // no friends/blocks/guild
     expect(c.socialInfo).toEqual({ friends: [], blocks: [], guild: null });
+  });
+
+  it('the `social` frame carries each guild member last_login through unchanged', () => {
+    const c = bareClient(7);
+    const iso = '2026-01-02T03:04:05.000Z';
+    feed(c, {
+      t: 'social',
+      guild: {
+        id: 1,
+        name: 'Guild',
+        rank: 'leader',
+        members: [
+          {
+            id: 3,
+            name: 'Seen',
+            cls: 'priest',
+            level: 9,
+            realm: 'R1',
+            online: false,
+            rank: 'member',
+            lastLogin: iso,
+          },
+          {
+            id: 4,
+            name: 'NeverSeen',
+            cls: 'mage',
+            level: 2,
+            realm: 'R1',
+            online: false,
+            rank: 'member',
+            lastLogin: null,
+          },
+        ],
+      },
+    });
+    const members = c.socialInfo!.guild!.members;
+    expect(members.find((m) => m.name === 'Seen')?.lastLogin).toBe(iso);
+    expect(members.find((m) => m.name === 'NeverSeen')?.lastLogin).toBeNull();
   });
 
   it('`socialpos` merges position in place for matched ids and leaves unmatched rows untouched', () => {
@@ -185,8 +226,10 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             realm: 'R1',
             online: false,
             rank: 'member',
+            lastLogin: null,
           },
         ],
+        events: [],
       },
     };
     c.socialInfo = social;

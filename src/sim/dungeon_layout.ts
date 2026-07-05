@@ -55,6 +55,12 @@ export interface DungeonLayout {
   doorZ?: number;
   /** floor scatter positions, renderer places props here AND collision circles back them */
   clutter?: GridPoint[];
+  /** Room shell outline (CCW, simple, star-shaped from `shellPole`), instance-local.
+   * When present, render/collision derive the room's walls and floor mask from this
+   * polygon instead of the rectangular wallX/zMin/zMax shell. */
+  shellPolygon?: Array<{ x: number; z: number }>;
+  /** Star-shaping pole paired with `shellPolygon` (see geometry2d.polygonIsStarShaped). */
+  shellPole?: { x: number; z: number };
 }
 
 function grid(zFrom: number, zTo: number, zStep: number, xs: readonly number[]): GridPoint[] {

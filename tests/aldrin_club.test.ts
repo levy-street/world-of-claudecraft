@@ -2,6 +2,8 @@ import { createHmac } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
   ALDRIN_PERKS,
+  type AldrinMembership,
+  type AldrinQuote,
   assertNoPowerPerks,
   buildQuote,
   daysRemaining,
@@ -10,8 +12,6 @@ import {
   isCryptoMethod,
   isPayMethod,
   membershipActive,
-  type AldrinMembership,
-  type AldrinQuote,
   type ParsedOnchainPayment,
   quoteExpired,
   splitAldrinAmount,
@@ -162,20 +162,40 @@ describe('on-chain payment verdict', () => {
 
   it('rejects each failure mode', () => {
     expect(verifyAldrinPayment(usdcQuote, { ...good, finalized: false }).ok).toBe(false);
-    expect(verifyAldrinPayment(usdcQuote, { ...good, finalized: false })).toMatchObject({ reason: 'not_finalized' });
-    expect(verifyAldrinPayment(usdcQuote, { ...good, succeeded: false })).toMatchObject({ reason: 'tx_failed' });
-    expect(verifyAldrinPayment(usdcQuote, { ...good, usesToken2022: true })).toMatchObject({ reason: 'token_2022' });
-    expect(verifyAldrinPayment(usdcQuote, { ...good, memoMatches: false })).toMatchObject({ reason: 'memo_mismatch' });
-    expect(verifyAldrinPayment(usdcQuote, { ...good, payerSpentBase: 19_000_000n })).toMatchObject({ reason: 'underpaid' });
-    expect(verifyAldrinPayment(usdcQuote, { ...good, treasuryCreditedBase: 9_000_000n })).toMatchObject({ reason: 'treasury_short' });
-    expect(verifyAldrinPayment(usdcQuote, { ...good, buybackCreditedBase: 9_000_000n })).toMatchObject({ reason: 'buyback_short' });
+    expect(verifyAldrinPayment(usdcQuote, { ...good, finalized: false })).toMatchObject({
+      reason: 'not_finalized',
+    });
+    expect(verifyAldrinPayment(usdcQuote, { ...good, succeeded: false })).toMatchObject({
+      reason: 'tx_failed',
+    });
+    expect(verifyAldrinPayment(usdcQuote, { ...good, usesToken2022: true })).toMatchObject({
+      reason: 'token_2022',
+    });
+    expect(verifyAldrinPayment(usdcQuote, { ...good, memoMatches: false })).toMatchObject({
+      reason: 'memo_mismatch',
+    });
+    expect(verifyAldrinPayment(usdcQuote, { ...good, payerSpentBase: 19_000_000n })).toMatchObject({
+      reason: 'underpaid',
+    });
+    expect(
+      verifyAldrinPayment(usdcQuote, { ...good, treasuryCreditedBase: 9_000_000n }),
+    ).toMatchObject({ reason: 'treasury_short' });
+    expect(
+      verifyAldrinPayment(usdcQuote, { ...good, buybackCreditedBase: 9_000_000n }),
+    ).toMatchObject({ reason: 'buyback_short' });
   });
 
   it('requires an in-tx burn for a $WOC payment instead of a buyback credit', () => {
     const wocQuote: AldrinQuote = { ...usdcQuote, method: 'woc', mint: 'WOCmint', buyback: null };
-    const wocGood: ParsedOnchainPayment = { ...good, buybackCreditedBase: 0n, burnedBase: 10_000_000n };
+    const wocGood: ParsedOnchainPayment = {
+      ...good,
+      buybackCreditedBase: 0n,
+      burnedBase: 10_000_000n,
+    };
     expect(verifyAldrinPayment(wocQuote, wocGood)).toEqual({ ok: true });
-    expect(verifyAldrinPayment(wocQuote, { ...wocGood, burnedBase: 0n })).toMatchObject({ reason: 'burn_missing' });
+    expect(verifyAldrinPayment(wocQuote, { ...wocGood, burnedBase: 0n })).toMatchObject({
+      reason: 'burn_missing',
+    });
   });
 
   it('verifies a native SOL payment (network fee makes payer outflow larger, still valid)', () => {
@@ -238,7 +258,9 @@ describe('stripe webhook verification', () => {
     expect(verifyStripeSignature(body, sign(nowSec - 10_000, body), secret, nowSec)).toMatchObject({
       reason: 'timestamp_out_of_tolerance',
     });
-    expect(verifyStripeSignature(body, sign(nowSec, body), '', nowSec)).toMatchObject({ reason: 'no_secret' });
+    expect(verifyStripeSignature(body, sign(nowSec, body), '', nowSec)).toMatchObject({
+      reason: 'no_secret',
+    });
   });
 });
 
@@ -249,7 +271,11 @@ describe('stripe event -> grant', () => {
       type: 'checkout.session.completed',
       data: { object: { payment_status: 'paid', mode: 'subscription', client_reference_id: '42' } },
     };
-    expect(grantFromStripeEvent(event)).toEqual({ accountId: 42, eventId: 'evt_2', autoRenew: true });
+    expect(grantFromStripeEvent(event)).toEqual({
+      accountId: 42,
+      eventId: 'evt_2',
+      autoRenew: true,
+    });
   });
 
   it('ignores unpaid sessions and unrelated events', () => {
@@ -260,6 +286,8 @@ describe('stripe event -> grant', () => {
         data: { object: { payment_status: 'unpaid', client_reference_id: '42' } },
       }),
     ).toBeNull();
-    expect(grantFromStripeEvent({ id: 'evt_4', type: 'customer.created', data: { object: {} } })).toBeNull();
+    expect(
+      grantFromStripeEvent({ id: 'evt_4', type: 'customer.created', data: { object: {} } }),
+    ).toBeNull();
   });
 });

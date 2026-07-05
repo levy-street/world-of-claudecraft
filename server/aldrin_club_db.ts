@@ -3,8 +3,9 @@
 // same pattern as SOCIAL_SCHEMA / OAUTH_SCHEMA). Membership state itself lives in
 // accounts.cosmetics (see setAldrinMembership in db.ts) so it rides the existing
 // cosmetics sync to the client; this module only owns the quote + ledger tables.
-import { pool } from './db';
+
 import type { AldrinPayMethod, AldrinQuote } from './aldrin_club';
+import { pool } from './db';
 
 export const ALDRIN_SCHEMA = `
 -- Single-use payment intents. A crypto client pays with quote_id as the on-chain
@@ -48,11 +49,14 @@ export async function insertAldrinQuote(q: AldrinQuote): Promise<void> {
   );
 }
 
-export async function loadAldrinQuote(quoteId: string, accountId: number): Promise<AldrinQuote | null> {
-  const res = await pool.query('SELECT payload FROM aldrin_quotes WHERE quote_id = $1 AND account_id = $2', [
-    quoteId,
-    accountId,
-  ]);
+export async function loadAldrinQuote(
+  quoteId: string,
+  accountId: number,
+): Promise<AldrinQuote | null> {
+  const res = await pool.query(
+    'SELECT payload FROM aldrin_quotes WHERE quote_id = $1 AND account_id = $2',
+    [quoteId, accountId],
+  );
   const payload = res.rows[0]?.payload;
   return payload && typeof payload === 'object' ? (payload as AldrinQuote) : null;
 }
@@ -86,8 +90,12 @@ export interface AldrinPaymentRecord {
  * no-op rather than double-granting.
  */
 /** The membership expiry a previously-recorded payment granted (for idempotent heal). */
-export async function aldrinPaymentByReference(reference: string): Promise<{ grantedUntil: string } | null> {
-  const res = await pool.query('SELECT granted_until FROM aldrin_payments WHERE reference = $1', [reference]);
+export async function aldrinPaymentByReference(
+  reference: string,
+): Promise<{ grantedUntil: string } | null> {
+  const res = await pool.query('SELECT granted_until FROM aldrin_payments WHERE reference = $1', [
+    reference,
+  ]);
   const row = res.rows[0];
   return row ? { grantedUntil: new Date(row.granted_until).toISOString() } : null;
 }

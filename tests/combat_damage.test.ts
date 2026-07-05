@@ -175,4 +175,36 @@ describe('combat/damage handleDeath', () => {
     expect(mob.auras.length).toBe(0); // auras cleared on death
     expect(meta.counters.kills).toBe(kills + 1); // kill credit went to the tapper
   });
+
+  it('does not put an enemy-owned pet into evade when its player target dies', () => {
+    const sim = new Sim({ seed: 909, playerClass: 'hunter', noPlayer: true, autoEquip: true });
+    const ownerId = sim.addPlayer('hunter', 'Hunter');
+    const victimId = sim.addPlayer('warrior', 'Victim');
+    sim.setPlayerLevel(10, ownerId);
+    sim.setPlayerLevel(10, victimId);
+    const owner = sim.entities.get(ownerId) as AnyEntity;
+    const victim = sim.entities.get(victimId) as AnyEntity;
+    const pet = createMob(sim.nextId++, MOBS.forest_wolf, owner.level, {
+      x: owner.pos.x + 2,
+      y: owner.pos.y,
+      z: owner.pos.z,
+    }) as AnyEntity;
+    pet.ownerId = owner.id;
+    pet.hostile = false;
+    pet.aiState = 'attack';
+    pet.aggroTargetId = victim.id;
+    pet.inCombat = true;
+    pet.threat.clear();
+    sim.addEntity(pet);
+
+    handleDeath(sim.ctx, victim, owner);
+
+    expect(pet.dead).toBe(false);
+    expect(pet.aiState).toBe('idle');
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    const hpBefore = pet.hp;
+    dealDamage(sim.ctx, victim, pet, 5, false, 'physical', 'Test Strike', 'hit');
+    expect(pet.hp).toBe(hpBefore - 5);
+  });
 });

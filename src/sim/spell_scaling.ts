@@ -2,7 +2,7 @@
 // caster's Spell Power (or an attacker's Attack Power, for "attack spells") into
 // the flat damage added to a spell hit, channel tick, DoT tick, or AoE hit.
 //
-// Vanilla-style model:
+// Classic-era model:
 //   - direct nuke: coeff = clamp(castTime, 1.5, 7) / 3.5 (instants use the 1.5 floor)
 //   - channel:     coeff = clamp(channelDuration, 1.5, 7) / 3.5, split across ticks
 //   - DoT:         coeff = duration / 15 (total), split across ticks
@@ -79,6 +79,24 @@ export function directHitBonus(
 ): number {
   const coeff = directSpellCoeff(castTimeSec) * (aoe ? SPELL_AOE_COEFF_MULT : 1);
   return Math.round(power * coeff * powerScale(def));
+}
+
+// Flat bonus added to ONE direct heal. Healing always scales off Spell Power at
+// the full cast-time coefficient with no AP scale-down (heals are never "attack
+// spells"): instants use the 1.5 floor, like a direct nuke. `castTimeSec` is the
+// rank-resolved cast time (res.castTime), so higher ranks and talent-hastened
+// heals scale correctly.
+export function directHealBonus(spellPower: number, castTimeSec: number): number {
+  return Math.round(spellPower * directSpellCoeff(castTimeSec));
+}
+
+// Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)
+// split across its ticks, scaling off Spell Power. Mirrors dotTickBonus but never
+// takes the AP scale-down, since HoTs are pure healing.
+export function hotTickBonus(spellPower: number, durationSec: number, intervalSec: number): number {
+  const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
+  const coeff = dotTotalCoeff(durationSec) / ticks;
+  return Math.round(spellPower * coeff);
 }
 
 // Flat bonus added to ONE channel tick (e.g. each Arcane Missile / Mind Flay tick).

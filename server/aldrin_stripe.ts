@@ -42,7 +42,8 @@ export function verifyStripeSignature(
 
   const ts = Number(timestamp);
   if (!Number.isFinite(ts)) return { ok: false, reason: 'malformed' };
-  if (Math.abs(nowSec - ts) > toleranceSec) return { ok: false, reason: 'timestamp_out_of_tolerance' };
+  if (Math.abs(nowSec - ts) > toleranceSec)
+    return { ok: false, reason: 'timestamp_out_of_tolerance' };
 
   const expected = createHmac('sha256', secret).update(`${timestamp}.${rawBody}`).digest('hex');
   const expectedBuf = Buffer.from(expected, 'utf8');

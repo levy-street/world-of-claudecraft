@@ -10,6 +10,8 @@
 // token-only today). On merge, fold this into solana_tx.ts: add accountKeys +
 // pre/post lamport balances to FinalizedTx and a `solCreditedLamports(owner)`
 // helper, then delete the duplicated token logic below.
+
+import type { AldrinPayMethod, AldrinQuote, ParsedOnchainPayment } from './aldrin_club';
 import {
   JUPITER_API,
   SOLANA_RPC_URL,
@@ -18,7 +20,6 @@ import {
   WOC_DECIMALS,
   WOC_MINT,
 } from './aldrin_config';
-import type { AldrinPayMethod, AldrinQuote, ParsedOnchainPayment } from './aldrin_club';
 
 const SPL_TOKEN_PROGRAM = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 const TOKEN_2022_PROGRAM = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
@@ -78,7 +79,9 @@ async function fetchFinalizedTx(signature: string): Promise<RawFinalizedTx | nul
     const message = r.transaction?.message;
     const top: ParsedIx[] = Array.isArray(message?.instructions) ? message.instructions : [];
     const inner: ParsedIx[] = Array.isArray(r.meta?.innerInstructions)
-      ? r.meta.innerInstructions.flatMap((g: any) => (Array.isArray(g?.instructions) ? g.instructions : []))
+      ? r.meta.innerInstructions.flatMap((g: any) =>
+          Array.isArray(g?.instructions) ? g.instructions : [],
+        )
       : [];
     const keys: string[] = Array.isArray(message?.accountKeys)
       ? message.accountKeys.map((k: any) => (typeof k === 'string' ? k : String(k?.pubkey ?? '')))
@@ -132,7 +135,10 @@ function usesToken2022(tx: RawFinalizedTx, mint: string): boolean {
 
 function hasMemo(tx: RawFinalizedTx, memo: string): boolean {
   for (const ix of tx.instructions) {
-    const isMemo = ix.program === 'spl-memo' || ix.programId === MEMO_PROGRAM_V2 || ix.programId === MEMO_PROGRAM_V1;
+    const isMemo =
+      ix.program === 'spl-memo' ||
+      ix.programId === MEMO_PROGRAM_V2 ||
+      ix.programId === MEMO_PROGRAM_V1;
     if (isMemo && typeof ix.parsed === 'string' && ix.parsed === memo) return true;
   }
   return false;

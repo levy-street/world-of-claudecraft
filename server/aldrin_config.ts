@@ -17,7 +17,12 @@ export const ALDRIN_ENABLED = boolEnv(process.env.ALDRIN_ENABLED, false);
 
 // Headline price, authored in USD cents so the SOL/$WOC quote math stays integer.
 // Twenty dollars a month by default.
-export const ALDRIN_PRICE_USD_CENTS = clampInt(process.env.ALDRIN_PRICE_USD_CENTS, 2000, 100, 100000);
+export const ALDRIN_PRICE_USD_CENTS = clampInt(
+  process.env.ALDRIN_PRICE_USD_CENTS,
+  2000,
+  100,
+  100000,
+);
 
 // One billing period in days. A renewal extends membership by this much from
 // whichever is later: now, or the current expiry (so paying early never burns
@@ -45,7 +50,12 @@ export const ALDRIN_BUYBACK_VAULT = (process.env.ALDRIN_BUYBACK_VAULT ?? '').tri
 // How long a payment quote is honored. The quote pins the exact lamport/base
 // amount (a live FX snapshot for SOL/$WOC) and the payee addresses, so it must be
 // short enough that the FX cannot drift far before the user signs.
-export const ALDRIN_QUOTE_TTL_SECONDS = clampInt(process.env.ALDRIN_QUOTE_TTL_SECONDS, 600, 30, 3600);
+export const ALDRIN_QUOTE_TTL_SECONDS = clampInt(
+  process.env.ALDRIN_QUOTE_TTL_SECONDS,
+  600,
+  30,
+  3600,
+);
 
 // ---------------------------------------------------------------------------
 // Mints + RPC. Defaults match the published $WOC contract and mainnet USDC, the
@@ -54,18 +64,27 @@ export const ALDRIN_QUOTE_TTL_SECONDS = clampInt(process.env.ALDRIN_QUOTE_TTL_SE
 // default, so one local config drives everything.
 // ---------------------------------------------------------------------------
 export const WOC_MINT = (
-  process.env.WOC_MINT ?? process.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
+  process.env.WOC_MINT ??
+  process.env.VITE_WOC_MINT ??
+  '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth'
 ).trim();
 
-export const USDC_MINT = (process.env.USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v').trim();
+export const USDC_MINT = (
+  process.env.USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+).trim();
 
 export const SOLANA_RPC_URL = (
-  process.env.SOLANA_RPC_URL ?? process.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com'
+  process.env.SOLANA_RPC_URL ??
+  process.env.VITE_SOLANA_RPC_URL ??
+  'https://api.mainnet-beta.solana.com'
 ).trim();
 
 // DEX aggregator used both to quote a USD->asset amount and (in the keeper) to
 // execute the buyback swap. Default Jupiter v6.
-export const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag').replace(/\/$/, '');
+export const JUPITER_API = (process.env.JUPITER_API ?? 'https://quote-api.jup.ag').replace(
+  /\/$/,
+  '',
+);
 
 // Token decimals. SOL is always 9, USDC always 6 on Solana; $WOC defaults to 6
 // (override if the canonical mint differs).
@@ -81,9 +100,19 @@ export const WOC_DECIMALS = clampInt(process.env.WOC_DECIMALS, 6, 0, 18);
 export const ALDRIN_BUYBACK_ENABLED = boolEnv(process.env.ALDRIN_BUYBACK_ENABLED, false);
 export const ALDRIN_BUYBACK_KEEPER_SECRET = (process.env.ALDRIN_BUYBACK_KEEPER_SECRET ?? '').trim();
 // Do not swap dust: only run once at least this much value (USD cents) is pooled.
-export const ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS = clampInt(process.env.ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS, 5000, 100, 10_000_000);
+export const ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS = clampInt(
+  process.env.ALDRIN_BUYBACK_MIN_BATCH_USD_CENTS,
+  5000,
+  100,
+  10_000_000,
+);
 // Max acceptable slippage on the swap, in basis points (default 1%).
-export const ALDRIN_BUYBACK_SLIPPAGE_BPS = clampInt(process.env.ALDRIN_BUYBACK_SLIPPAGE_BPS, 100, 1, 5000);
+export const ALDRIN_BUYBACK_SLIPPAGE_BPS = clampInt(
+  process.env.ALDRIN_BUYBACK_SLIPPAGE_BPS,
+  100,
+  1,
+  5000,
+);
 
 // ---------------------------------------------------------------------------
 // Stripe (fiat card). The webhook secret verifies inbound events; the secret key

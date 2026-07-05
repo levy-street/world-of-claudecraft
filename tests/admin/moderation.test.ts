@@ -65,10 +65,12 @@ vi.mock('../../src/admin/api', () => ({
 
 import { t } from '../../src/admin/i18n';
 import Moderation from '../../src/admin/pages/Moderation.svelte';
+import { grantPermissions } from './_grant';
 
 beforeEach(() => {
   apiPost.mockReset();
   apiPost.mockResolvedValue({});
+  grantPermissions();
 });
 
 describe('Moderation', () => {

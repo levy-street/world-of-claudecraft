@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { encodeQuestLink, parseChatSegments } from '../src/ui/quest_link';
+import { encodeItemLink, encodeQuestLink, parseChatSegments } from '../src/ui/quest_link';
 
 describe('quest_link', () => {
   it('encodes a questId into a token', () => {
@@ -36,5 +36,33 @@ describe('quest_link', () => {
 
   it('handles empty string', () => {
     expect(parseChatSegments('')).toEqual([{ kind: 'text', value: '' }]);
+  });
+
+  it('encodes an itemId into a token', () => {
+    expect(encodeItemLink('sword_iron')).toBe('[[i:sword_iron]]');
+  });
+
+  it('round-trips a single item link embedded in text', () => {
+    const text = `Look at ${encodeItemLink('sword_iron')}!`;
+    expect(parseChatSegments(text)).toEqual([
+      { kind: 'text', value: 'Look at ' },
+      { kind: 'item', itemId: 'sword_iron' },
+      { kind: 'text', value: '!' },
+    ]);
+  });
+
+  it('parses quest and item links mixed in one message', () => {
+    const text = `${encodeQuestLink('q_a')} drops ${encodeItemLink('gem_ruby')}`;
+    expect(parseChatSegments(text)).toEqual([
+      { kind: 'quest', questId: 'q_a' },
+      { kind: 'text', value: ' drops ' },
+      { kind: 'item', itemId: 'gem_ruby' },
+    ]);
+  });
+
+  it('treats an unknown link prefix as plain text', () => {
+    expect(parseChatSegments('[[x:foo]] [[i:]]')).toEqual([
+      { kind: 'text', value: '[[x:foo]] [[i:]]' },
+    ]);
   });
 });

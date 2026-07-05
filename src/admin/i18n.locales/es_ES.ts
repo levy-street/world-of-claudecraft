@@ -304,8 +304,6 @@ export const es_ES: Record<string, string> = {
   'dialog.actionChatUnmute': 'Restaurar el acceso al chat antes de que expire el silencio',
   'chatMod.muteReason': 'Motivo mudo:{value}',
   'report.confirmIgnore': 'Confirmar desestimación del informe',
-  'sharedIps.description':
-    'Direcciones IP observadas en más de una cuenta, ordenadas por recuento de cuentas.',
   'sharedIps.onlineDescription':
     'Direcciones IP utilizadas actualmente por más de una cuenta en línea.',
   'sharedIps.onlineOnly': 'Solo cuentas en línea',
