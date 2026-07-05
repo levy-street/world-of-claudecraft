@@ -311,7 +311,9 @@ export const en_CA: EnTranslations = {
       "nameplates": "Names",
       "haptics": "Haptics",
       "hapticsOff": "Haptics Off",
-      "toggleHaptics": "Toggle haptics"
+      "toggleHaptics": "Toggle haptics",
+      "hotbarPage": "Skills",
+      "hotbarPageAria": "Show next set of skills"
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -735,6 +737,23 @@ export const en_CA: EnTranslations = {
       "thresholdSet": "Loot threshold set to {threshold}.",
       "summaryMaster": "Loot Settings: Master Loot, Master Looter {name}, threshold {threshold}.",
       "summaryGroup": "Loot Settings: Group Loot."
+    },
+    "corpseHarvest": {
+      "title": "Harvest",
+      "harvestButton": "Harvest",
+      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "alreadyHarvested": "This corpse has already been harvested.",
+      "componentAria": "Harvest {component}",
+      "components": {
+        "hide": "Hide",
+        "fang": "Fang",
+        "silk": "Silk",
+        "venomSac": "Venom Sac",
+        "gills": "Gills",
+        "claw": "Claw",
+        "horn": "Horn",
+        "tusk": "Tusk"
+      }
     },
     "party": {
       "promoteLeader": "Promote to Leader",

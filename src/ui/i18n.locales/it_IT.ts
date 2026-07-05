@@ -5976,4 +5976,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Ciò che hai compiuto nel buio',
   'entities.letters.letter_q_hollow.body':
     'Pochi sapranno mai cosa giaceva sepolto in quella conca, e ancora meno ci crederebbero. Io lo so, e non lo dimenticherò.\n\nChe la tua strada resti illuminata.\n- Fratello Aldric',
+  'hudChrome.gathering.herbalism': 'Erbalismo',
+  'hudChrome.gathering.logging': 'Taglio del legname',
+  'hudChrome.gathering.mining': 'Estrazione mineraria',
+  'hudChrome.gathering.title': 'Raccolta',
 };

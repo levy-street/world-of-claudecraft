@@ -6033,4 +6033,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Ce que vous avez accompli dans le noir',
   'entities.letters.letter_q_hollow.body':
     'Rares sont ceux qui sauront jamais ce qui était enterré dans ce creux, et plus rares encore ceux qui le croiraient. Moi, je le sais, et je ne l’oublierai pas.\n\nQue votre route reste éclairée.\n- Frère Aldric',
+  'hudChrome.gathering.herbalism': 'Herboristerie',
+  'hudChrome.gathering.logging': 'Bûcheronnage',
+  'hudChrome.gathering.mining': 'Minage',
+  'hudChrome.gathering.title': 'Récolte',
 };

@@ -37,7 +37,13 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
-import { harvestItemFor, isHarvestableCorpse, resolveCorpseHarvest } from './professions/gathering';
+import {
+  HARVEST_COMPONENT_ITEMS,
+  harvestTierQuantity,
+  isHarvestableCorpse,
+  resolveCorpseFocusHarvest,
+  resolveCorpseHarvest,
+} from './professions/gathering';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, OBJECT_RESPAWN } from './types';
 import { markWorldBossLooted } from './world_boss';
@@ -132,12 +138,15 @@ export function lootCorpse(
     if (s.count > 0) bagsFull = true;
   }
   if (bagsFull && !quiet) ctx.error(meta.entityId, 'Your bags are full.');
-  // World-boss daily lockout is consumed by LOOTING, not by the kill: taking any
-  // personal slot from the boss's corpse burns today's roll (rollWorldBossLoot
-  // checks eligibility when the next boss dies). A contributor who never reaches
-  // the corpse keeps their daily and can try again at the next spawn.
+  // The world-boss loot lockout is consumed by LOOTING, not by the kill: taking any
+  // personal slot from the boss's corpse starts the lockout (rollWorldBossLoot checks
+  // eligibility when the next boss dies). A contributor who never reaches the corpse
+  // holds no lockout and can loot again at the next spawn.
   if (tookPersonal && MOBS[mob.templateId]?.worldBoss) {
-    markWorldBossLooted(meta, mob.templateId, ctx.utcDay);
+    // The world-boss loot lockout IS a raid lockout: this one write both gates re-loot
+    // (isWorldBossLootEligible) and renders the countdown in the raid-lockout timer, and
+    // it resets on the same boundary as the dungeon raids (ctx.raidResetMs).
+    markWorldBossLooted(meta, mob.templateId, ctx.raidResetMs(ctx.lockoutNowMs()));
   }
   pruneCorpseLoot(ctx, mob);
   if (p.targetId === mobId) p.targetId = null;
@@ -182,8 +191,19 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * command reaches here first while the corpse is unclaimed wins; every later
  * attempt against the same corpse (same tick or later) is denied. See
  * professions/gathering.ts for the race-freedom argument.
+ *
+ * `components` (#1142) is the player's per-corpse focus pick: which tagged
+ * component(s) to extract. Omitted, empty, or covering every tagged component
+ * all spread the harvest across every tag (the #1141 behavior); picking fewer
+ * concentrates the effort for a higher tier per component, per
+ * resolveCorpseFocusHarvest in professions/gathering.ts.
  */
-export function harvestCorpse(ctx: SimContext, mobId: number, pid?: number): void {
+export function harvestCorpse(
+  ctx: SimContext,
+  mobId: number,
+  components?: string[],
+  pid?: number,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -204,8 +224,11 @@ export function harvestCorpse(ctx: SimContext, mobId: number, pid?: number): voi
     return;
   }
   mob.harvestClaimedBy = claim.claimedBy;
-  const itemId = harvestItemFor(componentTags);
-  if (itemId) ctx.addItem(itemId, 1, meta.entityId);
+  const yields = resolveCorpseFocusHarvest(componentTags ?? [], components ?? [], ctx.rng);
+  for (const y of yields) {
+    const itemId = HARVEST_COMPONENT_ITEMS[y.component];
+    if (itemId) ctx.addItem(itemId, harvestTierQuantity(y.tier), meta.entityId);
+  }
 }
 
 export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void {

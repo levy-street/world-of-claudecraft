@@ -866,6 +866,9 @@ function blankEntity(id: number): Entity {
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
+    aoeSlowTimer: 0,
+    loudYellTimer: 0,
+    loudYellIndex: 0,
     detonateTimer: Infinity,
     firedSummons: 0,
     summonedIds: [],
@@ -1863,8 +1866,8 @@ export class ClientWorld implements IWorld {
   autoLoot(id: number): void {
     this.cmd({ cmd: 'autoloot', id });
   }
-  harvestCorpse(id: number): void {
-    this.cmd({ cmd: 'harvestCorpse', id });
+  harvestCorpse(id: number, components?: string[]): void {
+    this.cmd({ cmd: 'harvestCorpse', id, components });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {

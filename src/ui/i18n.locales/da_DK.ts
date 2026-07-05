@@ -5853,4 +5853,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Det, du gjorde i mørket',
   'entities.letters.letter_q_hollow.body':
     'Kun få vil nogensinde vide, hvad der lå begravet i den lavning, og endnu færre ville tro det. Jeg ved det, og jeg glemmer det ikke.\n\nMå din vej forblive oplyst.\n- Broder Aldric',
+  'hudChrome.gathering.herbalism': 'Urtekundskab',
+  'hudChrome.gathering.logging': 'Skovhugst',
+  'hudChrome.gathering.mining': 'Minedrift',
+  'hudChrome.gathering.title': 'Indsamling',
 };

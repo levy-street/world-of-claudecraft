@@ -5889,4 +5889,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Điều bạn đã làm trong bóng tối',
   'entities.letters.letter_q_hollow.body':
     'Hiếm ai sẽ biết thứ gì từng bị chôn dưới lòng chảo ấy, và càng hiếm ai tin. Tôi biết, và tôi sẽ không quên.\n\nMong con đường của bạn luôn sáng tỏ.\n- Tu Huynh Aldric',
+  'hudChrome.gathering.herbalism': 'Thảo dược học',
+  'hudChrome.gathering.logging': 'Đốn gỗ',
+  'hudChrome.gathering.mining': 'Khai mỏ',
+  'hudChrome.gathering.title': 'Thu thập',
 };

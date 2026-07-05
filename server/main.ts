@@ -33,6 +33,7 @@ import {
 import { handleAdminApi, parsePageParams } from './admin';
 import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
 import { permissionsForRoles } from './admin_permissions';
+import { loadAntibotConfig } from './antibot_config_db';
 import {
   handleAldrinConfirm,
   handleAldrinQuote,

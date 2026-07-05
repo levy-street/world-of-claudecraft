@@ -2394,7 +2394,12 @@ export class GameServer {
         if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
         break;
       case 'harvestCorpse':
-        if (typeof msg.id === 'number') sim.harvestCorpse(msg.id, pid);
+        if (typeof msg.id === 'number') {
+          const components = Array.isArray(msg.components)
+            ? msg.components.filter((c): c is string => typeof c === 'string')
+            : undefined;
+          sim.harvestCorpse(msg.id, components, pid);
+        }
         break;
       case 'lootRoll':
         if (

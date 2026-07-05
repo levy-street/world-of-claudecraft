@@ -5873,4 +5873,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.subject': 'Det du gjorde i mörkret',
   'entities.letters.letter_q_hollow.body':
     'Få kommer någonsin att veta vad som låg begravet i den sänkan, och ännu färre skulle tro det. Jag vet, och jag kommer inte att glömma.\n\nMå din väg förbli upplyst.\n- Broder Aldric',
+  'hudChrome.gathering.herbalism': 'Örtkunskap',
+  'hudChrome.gathering.logging': 'Skogsavverkning',
+  'hudChrome.gathering.mining': 'Gruvdrift',
+  'hudChrome.gathering.title': 'Insamling',
 };

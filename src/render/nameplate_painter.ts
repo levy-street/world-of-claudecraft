@@ -52,6 +52,7 @@ function discordRoleTag(key: string | undefined): string {
 import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import { COMBO_PIP_MAX } from './nameplate_combo';
+import { declutterNameplates, type NameplateAnchor } from './nameplate_declutter';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
@@ -93,6 +94,11 @@ export class NameplatePainter {
   private readonly tmpV2 = new THREE.Vector3();
   // one plan, rewritten per entity by the pure core (allocation-light hot path).
   private readonly plan: NameplatePlan = newNameplatePlan();
+  // reused every frame (truncated via length = 0, not reallocated): this
+  // frame's projected anchors, fed through the declutter pass below so
+  // overlapping nameplates (e.g. two nearby same-named mobs) stack apart
+  // instead of rendering on top of each other.
+  private readonly anchorScratch: NameplateAnchor[] = [];
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -115,6 +121,7 @@ export class NameplatePainter {
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
+    this.anchorScratch.length = 0;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -136,6 +143,7 @@ export class NameplatePainter {
       }
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
+      this.anchorScratch.push({ id, sx, sy });
       if (v.nameplateDisplay !== '') {
         v.nameplate.style.display = '';
         v.nameplateDisplay = '';
@@ -308,6 +316,21 @@ export class NameplatePainter {
       }
 
       this.updateCastBar(v, e);
+    }
+
+    // Second pass: re-anchor any nameplates that collided during projection
+    // (e.g. two nearby same-named mobs) so they stack apart instead of
+    // rendering fully on top of each other. A no-op for the common case
+    // where nothing overlapped.
+    const declutteredAnchors = declutterNameplates(this.anchorScratch);
+    for (const anchor of declutteredAnchors) {
+      const v = this.views.get(anchor.id);
+      if (v?.nameplateDisplay !== '') continue;
+      const transform = nameplateScreenTransform(anchor.sx, anchor.sy);
+      if (transform !== v.nameplateTransform) {
+        v.nameplate.style.transform = transform;
+        v.nameplateTransform = transform;
+      }
     }
   }
 
