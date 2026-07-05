@@ -5,8 +5,9 @@
 //
 // Needs `npm run dev` on :5173 (override with GAME_URL). Writes PNGs to
 // docs/screenshots/mounts/.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -16,17 +17,105 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Mirrors src/sim/content/mounts.ts (kept here so the page needs no app import).
 const MOUNTS = [
-  { tier: 1, id: 'ashmane', name: 'Ashmane Courser', share: 0.1, threshold: 1_000_000, speed: 60, fly: false },
-  { tier: 2, id: 'emberhoof', name: 'Emberhoof Charger', share: 1, threshold: 10_000_000, speed: 100, fly: false },
-  { tier: 3, id: 'bronzeflank', name: 'Bronzeflank Destrier', share: 2, threshold: 20_000_000, speed: 100, fly: false },
-  { tier: 4, id: 'silvermane', name: 'Silvermane Stallion', share: 3, threshold: 30_000_000, speed: 100, fly: false },
-  { tier: 5, id: 'stormhoof', name: 'Stormhoof Charger', share: 4, threshold: 40_000_000, speed: 100, fly: false },
-  { tier: 6, id: 'goldcrest', name: 'Goldcrest Skystrider', share: 5, threshold: 50_000_000, speed: 110, fly: true },
-  { tier: 7, id: 'verdant', name: 'Verdant Wildwing', share: 6, threshold: 60_000_000, speed: 118, fly: true },
-  { tier: 8, id: 'voidstrider', name: 'Voidwing Strider', share: 7, threshold: 70_000_000, speed: 126, fly: true },
-  { tier: 9, id: 'celestial', name: 'Celestial Seraph', share: 8, threshold: 80_000_000, speed: 134, fly: true },
-  { tier: 10, id: 'worldbearer', name: "Worldbearer's Roc", share: 9, threshold: 90_000_000, speed: 142, fly: true },
-  { tier: 11, id: 'sovereign', name: 'Sovereign Dreadwyrm', share: 10, threshold: 100_000_000, speed: 150, fly: true },
+  {
+    tier: 1,
+    id: 'ashmane',
+    name: 'Ashmane Courser',
+    share: 0.1,
+    threshold: 1_000_000,
+    speed: 60,
+    fly: false,
+  },
+  {
+    tier: 2,
+    id: 'emberhoof',
+    name: 'Emberhoof Charger',
+    share: 1,
+    threshold: 10_000_000,
+    speed: 100,
+    fly: false,
+  },
+  {
+    tier: 3,
+    id: 'bronzeflank',
+    name: 'Bronzeflank Destrier',
+    share: 2,
+    threshold: 20_000_000,
+    speed: 100,
+    fly: false,
+  },
+  {
+    tier: 4,
+    id: 'silvermane',
+    name: 'Silvermane Stallion',
+    share: 3,
+    threshold: 30_000_000,
+    speed: 100,
+    fly: false,
+  },
+  {
+    tier: 5,
+    id: 'stormhoof',
+    name: 'Stormhoof Charger',
+    share: 4,
+    threshold: 40_000_000,
+    speed: 100,
+    fly: false,
+  },
+  {
+    tier: 6,
+    id: 'goldcrest',
+    name: 'Goldcrest Skystrider',
+    share: 5,
+    threshold: 50_000_000,
+    speed: 110,
+    fly: true,
+  },
+  {
+    tier: 7,
+    id: 'verdant',
+    name: 'Verdant Wildwing',
+    share: 6,
+    threshold: 60_000_000,
+    speed: 118,
+    fly: true,
+  },
+  {
+    tier: 8,
+    id: 'voidstrider',
+    name: 'Voidwing Strider',
+    share: 7,
+    threshold: 70_000_000,
+    speed: 126,
+    fly: true,
+  },
+  {
+    tier: 9,
+    id: 'celestial',
+    name: 'Celestial Seraph',
+    share: 8,
+    threshold: 80_000_000,
+    speed: 134,
+    fly: true,
+  },
+  {
+    tier: 10,
+    id: 'worldbearer',
+    name: "Worldbearer's Roc",
+    share: 9,
+    threshold: 90_000_000,
+    speed: 142,
+    fly: true,
+  },
+  {
+    tier: 11,
+    id: 'sovereign',
+    name: 'Sovereign Dreadwyrm',
+    share: 10,
+    threshold: 100_000_000,
+    speed: 150,
+    fly: true,
+  },
 ];
 
 const browser = await puppeteer.launch({
@@ -37,7 +126,9 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
-page.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE:', m.text()); });
+page.on('console', (m) => {
+  if (m.type() === 'error') console.log('CONSOLE:', m.text());
+});
 
 // `domcontentloaded` (not networkidle0): offline play needs no game server, and
 // the homepage's /api/stats fetch 502s without one, which would stall networkidle.
@@ -57,16 +148,25 @@ await page.evaluate(() => {
   const g = window.__game;
   const p = g.sim.player;
   g.sim.setPlayerLevel(20, p.id);
-  p.gm = true; p.maxHp = 99999; p.hp = 99999;
+  p.gm = true;
+  p.maxHp = 99999;
+  p.hp = 99999;
   p.mountTier = 11;
-  p.facing = 0; p.prevFacing = 0;
+  p.facing = 0;
+  p.prevFacing = 0;
   // Teleport out of cluttered Eastbrook town to the open Brightwood Glade so the
   // steed reads against grass, not stalls and campfires. groundPos pins feet to
   // the terrain exactly (no fall-settle needed).
   const gp = g.sim.groundPos(38, 138);
-  p.pos = { ...gp }; p.prevPos = { ...gp };
+  p.pos = { ...gp };
+  p.prevPos = { ...gp };
   for (const e of g.sim.entities.values()) {
-    if (e.kind === 'mob') { e.hostile = false; e.aggroTargetId = null; e.targetId = null; e.aiState = 'idle'; }
+    if (e.kind === 'mob') {
+      e.hostile = false;
+      e.aggroTargetId = null;
+      e.targetId = null;
+      e.aiState = 'idle';
+    }
   }
   g.input.camYaw = p.facing + 0.9;
   g.input.camPitch = 0.16;
@@ -79,10 +179,11 @@ await page.evaluate(() => {
   }
   const cap = document.createElement('div');
   cap.id = '__mountcap';
-  cap.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);text-align:center;z-index:99999;'
-    + 'font-family:Georgia,serif;color:#f6ecd2;pointer-events:none;padding:12px 26px;border-radius:12px;'
-    + 'background:rgba(12,14,20,0.62);box-shadow:0 4px 18px rgba(0,0,0,0.5);backdrop-filter:blur(2px);'
-    + 'border:1px solid rgba(216,178,74,0.4)';
+  cap.style.cssText =
+    'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);text-align:center;z-index:99999;' +
+    'font-family:Georgia,serif;color:#f6ecd2;pointer-events:none;padding:12px 26px;border-radius:12px;' +
+    'background:rgba(12,14,20,0.62);box-shadow:0 4px 18px rgba(0,0,0,0.5);backdrop-filter:blur(2px);' +
+    'border:1px solid rgba(216,178,74,0.4)';
   document.body.appendChild(cap);
 });
 await sleep(700);
@@ -97,10 +198,10 @@ for (const m of MOUNTS) {
     g.input.camPitch = m.fly ? 0.24 : 0.16;
     const fmt = (n) => n.toLocaleString('en-US');
     document.getElementById('__mountcap').innerHTML =
-      `<div style="font-size:26px;font-weight:700">Tier ${m.tier} · ${m.name}`
-      + `${m.fly ? ' <span style="color:#9fe6ff">✦ Flying</span>' : ''}</div>`
-      + `<div style="font-size:15px;color:#cdbf98;margin-top:5px">`
-      + `${m.share}% of supply · ${fmt(m.threshold)} $WOC · +${m.speed}% speed</div>`;
+      `<div style="font-size:26px;font-weight:700">Tier ${m.tier} · ${m.name}` +
+      `${m.fly ? ' <span style="color:#9fe6ff">✦ Flying</span>' : ''}</div>` +
+      `<div style="font-size:15px;color:#cdbf98;margin-top:5px">` +
+      `${m.share}% of supply · ${fmt(m.threshold)} $WOC · +${m.speed}% speed</div>`;
   }, m);
   // Flyers auto-lift to a hover (wings out, legs tucked); give them a touch
   // longer to rise and beat their wings before the shutter.

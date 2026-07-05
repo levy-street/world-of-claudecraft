@@ -1,11 +1,18 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import {
+  FIRST_FLYING_TIER,
+  isFlyingMount,
+  MOUNT_FLIGHT_SPEED_MAX,
+  MOUNT_FLIGHT_SPEED_MIN,
+  MOUNT_LIST,
+  MOUNT_SPEED_EPIC,
+  MOUNT_SPEED_NORMAL,
+  MOUNTS,
+  mountTierForBalance,
+  mountUnlockedAtTier,
+} from '../src/sim/content/mounts';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
-import {
-  mountTierForBalance, mountUnlockedAtTier, isFlyingMount, MOUNT_LIST, MOUNTS,
-  MOUNT_SPEED_NORMAL, MOUNT_SPEED_EPIC, FIRST_FLYING_TIER,
-  MOUNT_FLIGHT_SPEED_MIN, MOUNT_FLIGHT_SPEED_MAX,
-} from '../src/sim/content/mounts';
 
 // The mount summon cast is 1.5s = 30 ticks at 20 Hz; 40 ticks clears it.
 const CAST_TICKS = 40;
@@ -15,7 +22,8 @@ const CAST_TICKS = 40;
 function makeRider() {
   const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
   const p = sim.player;
-  p.pos.x = 40; p.pos.z = 40;
+  p.pos.x = 40;
+  p.pos.z = 40;
   p.pos.y = terrainHeight(p.pos.x, p.pos.z, sim.cfg.seed);
   p.prevPos = { ...p.pos };
   return { sim, p };
@@ -30,11 +38,11 @@ describe('mount tier ladder', () => {
   it('maps $WOC balance to the 11-rung ladder (0.1%, then 1%–10%)', () => {
     expect(mountTierForBalance(null)).toBe(0);
     expect(mountTierForBalance(0)).toBe(0);
-    expect(mountTierForBalance(999_999)).toBe(0);     // below the 0.1% line
-    expect(mountTierForBalance(1_000_000)).toBe(1);   // exactly 0.1%
+    expect(mountTierForBalance(999_999)).toBe(0); // below the 0.1% line
+    expect(mountTierForBalance(1_000_000)).toBe(1); // exactly 0.1%
     expect(mountTierForBalance(9_999_999)).toBe(1);
-    expect(mountTierForBalance(10_000_000)).toBe(2);  // 1%
-    expect(mountTierForBalance(50_000_000)).toBe(6);  // 5%
+    expect(mountTierForBalance(10_000_000)).toBe(2); // 1%
+    expect(mountTierForBalance(50_000_000)).toBe(6); // 5%
     expect(mountTierForBalance(99_999_999)).toBe(10); // just under 10%
     expect(mountTierForBalance(100_000_000)).toBe(11); // 10%
     expect(mountTierForBalance(250_000_000)).toBe(11); // capped at the top rung
@@ -60,9 +68,9 @@ describe('mount tier ladder', () => {
     for (let i = 1; i < flyers.length; i++) {
       expect(flyers[i].speedMult).toBeGreaterThan(flyers[i - 1].speedMult);
     }
-    expect(isFlyingMount('goldcrest')).toBe(true);   // 5%
-    expect(isFlyingMount('stormhoof')).toBe(false);  // 4%
-    expect(isFlyingMount('sovereign')).toBe(true);   // 10%
+    expect(isFlyingMount('goldcrest')).toBe(true); // 5%
+    expect(isFlyingMount('stormhoof')).toBe(false); // 4%
+    expect(isFlyingMount('sovereign')).toBe(true); // 10%
     expect(isFlyingMount('not-a-mount')).toBe(false);
   });
 
@@ -77,7 +85,7 @@ describe('mount tier ladder', () => {
 });
 
 describe('summon eligibility gating (server-authoritative in the Sim)', () => {
-  it('rejects a mount above the rider\'s holdings, an unknown id, and ineligibility', () => {
+  it("rejects a mount above the rider's holdings, an unknown id, and ineligibility", () => {
     const { sim, p } = makeRider();
     p.mountTier = 0;
     expect(sim.summonMount('ashmane')).toBe(false);
@@ -86,7 +94,7 @@ describe('summon eligibility gating (server-authoritative in the Sim)', () => {
     p.mountTier = 1;
     expect(sim.summonMount('emberhoof')).toBe(false); // rung 2, not held
     expect(sim.summonMount('not-a-mount')).toBe(false);
-    expect(sim.summonMount('ashmane')).toBe(true);    // rung 1, held
+    expect(sim.summonMount('ashmane')).toBe(true); // rung 1, held
     expect(sim.mountCast?.id).toBe('ashmane');
   });
 
@@ -104,7 +112,8 @@ describe('mount move-speed (the gameplay perk)', () => {
   it('applies the classic ground-mount multiplier only while mounted and out of combat', () => {
     const { sim, p } = makeRider();
     p.mountTier = 11;
-    const mult = (e: typeof p) => (sim as unknown as { moveSpeedMult(x: typeof p): number }).moveSpeedMult(e);
+    const mult = (e: typeof p) =>
+      (sim as unknown as { moveSpeedMult(x: typeof p): number }).moveSpeedMult(e);
 
     expect(mult(p)).toBeCloseTo(1.0); // unmounted
 
@@ -141,8 +150,20 @@ describe('dismount triggers', () => {
     summonAndComplete(sim, 'sovereign');
     expect(p.mountId).toBe('sovereign');
     // Falling damage is dealt with a null source, so it never hits enterCombat.
-    (sim as unknown as { dealDamage(s: null, t: typeof p, a: number, c: boolean, sc: string, ab: string, k: string, nr: boolean): void })
-      .dealDamage(null, p, 5, false, 'physical', 'Falling', 'hit', true);
+    (
+      sim as unknown as {
+        dealDamage(
+          s: null,
+          t: typeof p,
+          a: number,
+          c: boolean,
+          sc: string,
+          ab: string,
+          k: string,
+          nr: boolean,
+        ): void;
+      }
+    ).dealDamage(null, p, 5, false, 'physical', 'Falling', 'hit', true);
     expect(p.mountId).toBeUndefined();
   });
 
@@ -209,9 +230,20 @@ describe('flight combat-immunity (airborne flyers are non-combatants vs wild mob
     summonAndComplete(sim, 'goldcrest'); // a flyer
     const hp0 = p.hp;
     const wild = { kind: 'mob', ownerId: null } as unknown as typeof p;
-    (sim as unknown as { dealDamage(s: typeof p, t: typeof p, a: number, c: boolean, sc: string, ab: string, k: string): void })
-      .dealDamage(wild, p, 50, false, 'physical', 'Cleave', 'hit');
-    expect(p.hp).toBe(hp0);          // immune to wild-mob damage
+    (
+      sim as unknown as {
+        dealDamage(
+          s: typeof p,
+          t: typeof p,
+          a: number,
+          c: boolean,
+          sc: string,
+          ab: string,
+          k: string,
+        ): void;
+      }
+    ).dealDamage(wild, p, 50, false, 'physical', 'Cleave', 'hit');
+    expect(p.hp).toBe(hp0); // immune to wild-mob damage
     expect(p.mountId).toBe('goldcrest'); // not thrown off
   });
 
@@ -229,7 +261,12 @@ describe('flight (5%+ steeds soar)', () => {
   // Pacify the roster so flying near a camp can't aggro → combat → dismount.
   const pacify = (sim: Sim) => {
     for (const e of sim.entities.values()) {
-      if (e.kind === 'mob') { e.hostile = false; e.aggroTargetId = null; e.targetId = null; e.aiState = 'idle'; }
+      if (e.kind === 'mob') {
+        e.hostile = false;
+        e.aggroTargetId = null;
+        e.targetId = null;
+        e.aiState = 'idle';
+      }
     }
   };
 
@@ -244,7 +281,8 @@ describe('flight (5%+ steeds soar)', () => {
     expect(p.pos.y).toBeGreaterThan(groundY + 1.5);
     expect(p.onGround).toBe(false);
 
-    const x0 = p.pos.x, z0 = p.pos.z;
+    const x0 = p.pos.x,
+      z0 = p.pos.z;
     sim.moveInput.forward = true;
     for (let i = 0; i < 20; i++) sim.tick();
     sim.moveInput.forward = false;

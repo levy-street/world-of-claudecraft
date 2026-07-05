@@ -12,6 +12,7 @@
     words,
     onAdd,
     onDelete,
+    canEdit = true,
   }: {
     title: string;
     hint: string;
@@ -19,6 +20,9 @@
     words: FilterWord[];
     onAdd: (word: string) => void;
     onDelete: (id: number) => void;
+    // Presentation only (the server re-checks chatfilter.manage): hides the
+    // add form and delete chips for read-only operators.
+    canEdit?: boolean;
   } = $props();
 
   let draft = $state('');
@@ -33,16 +37,18 @@
 </script>
 
 <Panel title={title} hint={hint}>
-  <form class="word-add" onsubmit={submit}>
-    <input placeholder={placeholder} maxlength="64" bind:value={draft} />
-    <button>{t('chatFilter.add')}</button>
-  </form>
+  {#if canEdit}
+    <form class="word-add" onsubmit={submit}>
+      <input placeholder={placeholder} maxlength="64" bind:value={draft} />
+      <button>{t('chatFilter.add')}</button>
+    </form>
+  {/if}
   {#if words.length === 0}
     <div class="empty">{t('chatFilter.noWords')}</div>
   {:else}
     <div class="word-chips">
       {#each words as w (w.id)}
-        <span class="word-chip">{w.word}<button class="word-del" title={t('chatFilter.removeWord')} onclick={() => onDelete(w.id)}>&times;</button></span>
+        <span class="word-chip">{w.word}{#if canEdit}<button class="word-del" title={t('chatFilter.removeWord')} onclick={() => onDelete(w.id)}>&times;</button>{/if}</span>
       {/each}
     </div>
   {/if}

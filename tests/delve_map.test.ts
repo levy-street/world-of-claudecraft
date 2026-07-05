@@ -1,8 +1,11 @@
 // Unit tests for src/ui/delve_map.ts: pure logic, no DOM/canvas.
 import { describe, expect, it } from 'vitest';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../src/sim/delve_layout';
+import { isLitanyModuleId, litanyModuleGeometry } from '../src/sim/delve_litany_layout';
 import {
   delveAreaLabel,
+  delveCanvasScales,
+  delveLocalToCanvas,
   delveSchematicPlayer,
   delveSchematicStatic,
   playerDelveLocal,
@@ -52,11 +55,31 @@ describe('delveSchematicStatic', () => {
       const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
       expect(prims.length).toBeGreaterThan(0);
       for (const prim of prims) {
-        if (prim.kind === 'circle') {
-          expect(prim.cx + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
-          expect(prim.cx - prim.r).toBeGreaterThanOrEqual(-1);
-          expect(prim.cy + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
-          expect(prim.cy - prim.r).toBeGreaterThanOrEqual(-1);
+        if (prim.kind === 'polygon') {
+          for (const point of prim.points) {
+            expect(point.cx).toBeGreaterThanOrEqual(-1);
+            expect(point.cx).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(point.cy).toBeGreaterThanOrEqual(-1);
+            expect(point.cy).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+          }
+        } else if (prim.kind === 'circle') {
+          // True-scale pools can legitimately extend past the walkable outline
+          // (authored to bleed under walls); the painter clips them to the
+          // outline polygon, whose points are bounds-checked above. Only the
+          // CENTER must stay inside for a clipped prim; unclipped prims must
+          // fit whole (y extent uses ry: the schematic maps x/z anisotropically).
+          const ry = prim.ry ?? prim.r;
+          if (prim.clipToOutline) {
+            expect(prim.cx).toBeGreaterThanOrEqual(-1);
+            expect(prim.cx).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(prim.cy).toBeGreaterThanOrEqual(-1);
+            expect(prim.cy).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+          } else {
+            expect(prim.cx + prim.r).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(prim.cx - prim.r).toBeGreaterThanOrEqual(-1);
+            expect(prim.cy + ry).toBeLessThanOrEqual(CANVAS_SIZE + 1);
+            expect(prim.cy - ry).toBeGreaterThanOrEqual(-1);
+          }
         } else if (prim.kind === 'rect') {
           expect(prim.x).toBeLessThanOrEqual(CANVAS_SIZE);
           expect(prim.y).toBeLessThanOrEqual(CANVAS_SIZE);
@@ -73,13 +96,126 @@ describe('delveSchematicStatic', () => {
       const layout = DELVE_MODULE_LAYOUTS[moduleId];
       const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
       const rects = prims.filter((p) => p.kind === 'rect');
+      const islandRects = prims.filter((p) => p.kind === 'rect' && p.fill === '#203026');
       const circles = prims.filter((p) => p.kind === 'circle');
       const texts = prims.filter((p) => p.kind === 'text');
-      expect(rects.length).toBeGreaterThanOrEqual(1); // floor
+      if (isLitanyModuleId(moduleId)) expect(islandRects.length).toBeGreaterThanOrEqual(1);
+      else expect(rects.length).toBeGreaterThanOrEqual(1); // floor
       expect(circles.length).toBeGreaterThanOrEqual(2); // dais + exit
       expect(texts.length).toBeGreaterThanOrEqual(1); // 'N' exit label
     });
   }
+
+  it('flags the outline polygon and clips pool/island prims (the painter contract)', () => {
+    const layout = DELVE_MODULE_LAYOUTS.litany_apse;
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const outline = prims.find((p) => p.kind === 'polygon' && p.isOutline);
+    expect(outline).toBeDefined();
+    const pools = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'circle' }> =>
+        p.kind === 'circle' && p.fill === '#071512',
+    );
+    expect(pools.length).toBeGreaterThan(0);
+    for (const p of pools) {
+      expect(p.clipToOutline).toBe(true); // pools may bleed past the outline
+      expect(typeof p.ry).toBe('number'); // anisotropic: ellipse, not circle
+    }
+    const islands = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'rect' }> =>
+        p.kind === 'rect' && p.fill === '#203026',
+    );
+    expect(islands.length).toBeGreaterThan(0);
+    for (const p of islands) expect(p.clipToOutline).toBe(true);
+    // Islands paint after every pool so the dry stones read on top on the map.
+    const lastPool = prims.reduce(
+      (last, p, i) => (p.kind === 'circle' && p.fill === '#071512' ? i : last),
+      -1,
+    );
+    const firstIsland = prims.findIndex((p) => p.kind === 'rect' && p.fill === '#203026');
+    expect(firstIsland).toBeGreaterThan(lastPool);
+  });
+
+  it('pool and island SIZES span exactly their position-mapped world extents', () => {
+    // The bug this pins: sizes drawn with a single min() scale (or the wrong
+    // axis) while positions map per-axis, so pools/islands rendered at a
+    // quarter to half the width the outline implied. Extents are asserted via
+    // delveLocalToCanvas of the world-space edges, so a size/position scale
+    // mismatch on either axis fails regardless of which side regressed.
+    const layout = DELVE_MODULE_LAYOUTS.litany_apse;
+    const geo = litanyModuleGeometry('litany_apse');
+    expect(geo).toBeDefined();
+    if (!geo) return;
+    const { sx, sz } = delveCanvasScales(layout, CANVAS_SIZE, PAD);
+    // The apse is genuinely anisotropic; a single-scale regression is only
+    // distinguishable from per-axis scales because sx != sz here.
+    expect(Math.abs(sx - sz)).toBeGreaterThan(0.5);
+    const at = (x: number, z: number) => delveLocalToCanvas(x, z, layout, CANVAS_SIZE, PAD);
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const pools = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'circle' }> =>
+        p.kind === 'circle' && p.fill === '#071512',
+    );
+    for (const hz of geo.hazards) {
+      const c = at(hz.x, hz.z);
+      // The moat is two CONCENTRIC hazards (shallow ring + deep core), so match
+      // by center then take the closest radius; the edge asserts below still
+      // fail on any size-scale regression because relative order is preserved.
+      // An authored ellipse (rx/rz, e.g. the apse moat) wins over the uniform r on
+      // each axis independently; a plain zone falls back to r/r.
+      const hzRx = hz.rx ?? hz.r;
+      const hzRz = hz.rz ?? hz.r;
+      const pool = pools
+        .filter((p) => Math.abs(p.cx - c.cx) < 0.01 && Math.abs(p.cy - c.cy) < 0.01)
+        .sort((a, b) => Math.abs(a.r - hzRx * sx) - Math.abs(b.r - hzRx * sx))[0];
+      expect(pool, `no pool prim at hazard (${hz.x},${hz.z})`).toBeDefined();
+      // X is mirrored, so the +x world edge is the smaller canvas x.
+      expect(pool!.cx - pool!.r).toBeCloseTo(at(hz.x + hzRx, hz.z).cx, 3);
+      expect(pool!.cy + (pool!.ry ?? pool!.r)).toBeCloseTo(at(hz.x, hz.z + hzRz).cy, 3);
+    }
+    const islands = prims.filter(
+      (p): p is Extract<(typeof prims)[number], { kind: 'rect' }> =>
+        p.kind === 'rect' && p.fill === '#203026',
+    );
+    expect(islands.length).toBe(geo.islands.length);
+    for (const isl of geo.islands) {
+      const c = at(isl.x, isl.z);
+      const rect = islands.find(
+        (p) => Math.abs(p.x + p.w / 2 - c.cx) < 0.01 && Math.abs(p.y + p.h / 2 - c.cy) < 0.01,
+      );
+      expect(rect, `no island rect at (${isl.x},${isl.z})`).toBeDefined();
+      expect(rect!.x).toBeCloseTo(at(isl.x + isl.hw, isl.z).cx, 3);
+      expect(rect!.x + rect!.w).toBeCloseTo(at(isl.x - isl.hw, isl.z).cx, 3);
+      expect(rect!.y).toBeCloseTo(at(isl.x, isl.z - isl.hd).cy, 3);
+      expect(rect!.y + rect!.h).toBeCloseTo(at(isl.x, isl.z + isl.hd).cy, 3);
+    }
+  });
+
+  it('litany_sluice draws irregular walkable geometry instead of one full room rectangle', () => {
+    const layout = DELVE_MODULE_LAYOUTS.litany_sluice;
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const islandRects = prims.filter((prim) => prim.kind === 'rect' && prim.fill === '#203026');
+    const fullRoomRects = prims.filter(
+      (prim) =>
+        prim.kind === 'rect' &&
+        prim.w > CANVAS_SIZE - PAD * 2 - 2 &&
+        prim.h > CANVAS_SIZE - PAD * 2 - 2,
+    );
+    expect(islandRects.length).toBeGreaterThan(0);
+    expect(fullRoomRects).toHaveLength(0);
+  });
+
+  it('Litany map primitives include the larger Blackwater hazards', () => {
+    const layout = DELVE_MODULE_LAYOUTS.litany_baptistry;
+    const geo = litanyModuleGeometry('litany_baptistry');
+    expect(geo).toBeDefined();
+    if (!geo) return;
+    const prims = delveSchematicStatic(layout, CANVAS_SIZE, PAD);
+    const blackwater = prims.filter(
+      (prim) => prim.kind === 'circle' && prim.fill === '#071512' && prim.stroke === '#65a765',
+    );
+    expect(blackwater.length).toBeGreaterThanOrEqual(geo.hazards.length);
+    expect(geo.hazards[0].r).toBeGreaterThanOrEqual(10);
+  });
 });
 
 // ---- Player arrow -----------------------------------------------------------

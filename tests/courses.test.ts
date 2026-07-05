@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { Sim } from '../src/sim/sim';
-import { terrainHeight } from '../src/sim/world';
-import type { SimEvent } from '../src/sim/types';
+import { describe, expect, it } from 'vitest';
 import { COURSES, courseTotalGates } from '../src/sim/content/courses';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 const CAST_TICKS = 40; // mount summon (1.5s) + margin
 
@@ -11,25 +11,42 @@ function makeFlyer() {
   const p = sim.player;
   // summon on known-good open ground; course pass-through teleports the rider to
   // each gate anyway, so the spawn spot is independent of the course location.
-  p.pos.x = 40; p.pos.z = 40;
+  p.pos.x = 40;
+  p.pos.z = 40;
   p.pos.y = terrainHeight(p.pos.x, p.pos.z, sim.cfg.seed);
   p.prevPos = { ...p.pos };
   p.mountTier = 11;
   // pacify so nothing can interfere
   for (const e of sim.entities.values()) {
-    if (e.kind === 'mob') { e.hostile = false; e.aggroTargetId = null; e.aiState = 'idle'; }
+    if (e.kind === 'mob') {
+      e.hostile = false;
+      e.aggroTargetId = null;
+      e.aiState = 'idle';
+    }
   }
   sim.summonMount('sovereign'); // a flyer
   for (let i = 0; i < CAST_TICKS; i++) sim.tick();
   expect(p.mountId).toBe('sovereign');
-  return { sim, p, meta: (sim as unknown as { players: Map<number, { courseRun: unknown }> }).players.get(sim.playerId)! };
+  return {
+    sim,
+    p,
+    meta: (sim as unknown as { players: Map<number, { courseRun: unknown }> }).players.get(
+      sim.playerId,
+    )!,
+  };
 }
 
 // Teleport onto a checkpoint at the start of a tick, then advance one tick: the
 // tick copies prevPos←pos (both = checkpoint), flight nudges pos, and
 // updateCourseRun tests the prev→cur segment (which starts at the gate centre).
-function flyThroughGate(sim: Sim, p: { pos: { x: number; y: number; z: number } }, gate: { x: number; y: number; z: number }): SimEvent[] {
-  p.pos.x = gate.x; p.pos.y = gate.y; p.pos.z = gate.z;
+function flyThroughGate(
+  sim: Sim,
+  p: { pos: { x: number; y: number; z: number } },
+  gate: { x: number; y: number; z: number },
+): SimEvent[] {
+  p.pos.x = gate.x;
+  p.pos.y = gate.y;
+  p.pos.z = gate.z;
   return sim.tick();
 }
 
@@ -38,7 +55,10 @@ describe('course substrate — start gating', () => {
     const sim = new Sim({ seed: 1, playerClass: 'warrior', autoEquip: true });
     const p = sim.player;
     p.mountTier = 11;
-    p.pos.x = 40; p.pos.z = 40; p.pos.y = terrainHeight(40, 40, sim.cfg.seed); p.prevPos = { ...p.pos };
+    p.pos.x = 40;
+    p.pos.z = 40;
+    p.pos.y = terrainHeight(40, 40, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
 
     // ground mount → ineligible for the flyingOnly Vale Skytrial
     sim.summonMount('stormhoof'); // tier 5, GROUND
@@ -104,20 +124,35 @@ describe('course substrate — pass-through, ordering, timing', () => {
     // (well outside the 4-yd radius) — a point-in-sphere test would miss it.
     p.prevPos = { x: gate.x - 20, y: gate.y, z: gate.z };
     p.pos = { x: gate.x + 20, y: gate.y, z: gate.z };
-    (sim as unknown as { updateCourseRun: (a: unknown, b: unknown) => void }).updateCourseRun(p, meta);
-    expect((meta as unknown as { courseRun: { nextCheckpoint: number } }).courseRun.nextCheckpoint).toBe(1);
+    (sim as unknown as { updateCourseRun: (a: unknown, b: unknown) => void }).updateCourseRun(
+      p,
+      meta,
+    );
+    expect(
+      (meta as unknown as { courseRun: { nextCheckpoint: number } }).courseRun.nextCheckpoint,
+    ).toBe(1);
   });
 });
 
 describe('course substrate — best-time tracking', () => {
   // Run a whole course, optionally idling `idlePerGate` ticks before each gate
   // (away from the rings) so the run takes longer — a controllable finish time.
-  function runCourse(sim: Sim, p: { pos: { x: number; y: number; z: number } }, courseId: string, idlePerGate: number) {
+  function runCourse(
+    sim: Sim,
+    p: { pos: { x: number; y: number; z: number } },
+    courseId: string,
+    idlePerGate: number,
+  ) {
     sim.startCourse(courseId);
     const def = COURSES[courseId];
     for (let lap = 0; lap < def.laps; lap++) {
       for (const gate of def.checkpoints) {
-        for (let i = 0; i < idlePerGate; i++) { p.pos.x = -120; p.pos.y = 40; p.pos.z = -120; sim.tick(); }
+        for (let i = 0; i < idlePerGate; i++) {
+          p.pos.x = -120;
+          p.pos.y = 40;
+          p.pos.z = -120;
+          sim.tick();
+        }
         flyThroughGate(sim, p, gate);
       }
     }
@@ -139,7 +174,9 @@ describe('course substrate — best-time tracking', () => {
   it('seeds the session bests from join-loaded records', () => {
     const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: true });
     const pid = sim.addPlayer('mage', 'Veteran', { mountTrialBests: { skytrial_vale: 412 } });
-    const meta = (sim as unknown as { players: Map<number, { mountTrialBests: Record<string, number> }> }).players.get(pid)!;
+    const meta = (
+      sim as unknown as { players: Map<number, { mountTrialBests: Record<string, number> }> }
+    ).players.get(pid)!;
     expect(meta.mountTrialBests.skytrial_vale).toBe(412);
   });
 });

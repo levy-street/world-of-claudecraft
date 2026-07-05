@@ -19,8 +19,9 @@
 // setting value only: it never reads the FPS governor and never defines the
 // effects-quality cutoff (that resolver and per-element tiering live elsewhere).
 
+import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
-import { GAMEPAD_BUTTON_LABELS, GAMEPAD_NONE } from '../game/gamepad_map';
+import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
 import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
@@ -153,11 +154,13 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   emoteWheel: 'hudChrome.keybinds.emoteWheel',
   targetFriendly: 'hudChrome.keybinds.targetFriendly',
   targetFriendlyNext: 'hudChrome.keybinds.targetFriendlyNext',
+  discord: 'hudChrome.keybinds.discord',
   // Reuse the existing window/feature names so these labels localize everywhere
   // without duplicating strings (these two ids were previously absent from the
   // map and fell back to the raw English BIND_ACTIONS labels).
   talents: 'game.talents.title',
   leaderboard: 'game.leaderboard.title',
+  calendar: 'hudChrome.calendar.keybindLabel',
 };
 
 /**
@@ -204,6 +207,8 @@ export interface OptionsWindowDeps {
   log(message: string): void;
   /** Reset the movable chat window to its default placement. */
   resetChatWindow(): void;
+  /** Reset the movable player + target unit frames to their stock spots. */
+  resetUnitFrames(): void;
   /** Chat-timestamp state (Hud owns it; the chat renderer reads the same fields). */
   getChatTimestamps(): boolean;
   setChatTimestamps(on: boolean): void;
@@ -232,6 +237,12 @@ export class OptionsWindow {
       this.close();
       return;
     }
+    // Re-sync --app-vh/--app-vw right before opening: #ui is a fixed,
+    // overflow:hidden box sized from those custom properties, and this window
+    // is one of its children, so a stale value from just before a fullscreen
+    // toggle or resize settles would hard-clip the panel with no visible
+    // scrollbar (the panel's own overflow-y:auto never gets a chance to run).
+    syncAppViewport();
     this.returnFocus = this.deps.captureFocus();
     this.deps.closeOthers();
     this.view = 'main';
@@ -261,6 +272,13 @@ export class OptionsWindow {
    *  normalized position into the open panel's sliders so they do not lag the drag. */
   onPerfOverlayMoved(x: number, y: number): void {
     this.perfSettings?.syncPosition(x, y);
+  }
+
+  /** Called by main.ts when a pad connects/disconnects: re-render the Controller
+   *  sub-view in place if it is open, so the button glyphs switch to the newly
+   *  detected brand without the player reopening the panel. A no-op otherwise. */
+  refreshControllerLabels(): void {
+    if (this.isOpen && this.view === 'controller') this.renderController();
   }
 
   // -------------------------------------------------------------------------
@@ -909,6 +927,23 @@ export class OptionsWindow {
     resetRow.append(resetName, resetBtn);
     body.append(resetRow);
 
+    // Reset the movable player + target unit frames back to their stock spots
+    // (forgets the saved drag positions and re-docks the player frame).
+    const framesRow = document.createElement('div');
+    framesRow.className = 'set-row';
+    const framesName = document.createElement('span');
+    framesName.className = 'set-name';
+    framesName.textContent = t('hudChrome.frameReset.label');
+    const framesBtn = document.createElement('button');
+    framesBtn.className = 'btn set-toggle';
+    framesBtn.textContent = t('hudChrome.chatWindow.resetAction');
+    framesBtn.addEventListener('click', () => {
+      audio.click();
+      this.deps.resetUnitFrames();
+    });
+    framesRow.append(framesName, framesBtn);
+    body.append(framesRow);
+
     const el = this.deps.root();
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -1163,12 +1198,13 @@ export class OptionsWindow {
 
     if (hooks) {
       const opts = this.gamepadActionOptions();
+      const kind = hooks.gamepad.kind();
       for (const { button, action } of hooks.gamepad.entries()) {
         const row = document.createElement('div');
         row.className = 'set-row';
         const name = document.createElement('span');
         name.className = 'set-name';
-        const buttonLabel = GAMEPAD_BUTTON_LABELS[button] ?? `#${button}`;
+        const buttonLabel = gamepadButtonLabel(button, kind);
         name.textContent = buttonLabel;
         // Name the remap listbox after the physical button it rebinds (WCAG 4.1.2):
         // the visible set-name span is not programmatically linked, so the dropdown

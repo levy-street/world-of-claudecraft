@@ -48,6 +48,14 @@
     --color-friendly: #9fdc7f;
     --color-buff: #3a6ea8;
     --color-debuff: #c0392b;
+    /* Per-school debuff border tints (WoW-style poison/magic/curse reads); physical
+       keeps the base --color-debuff red. Driven by the aura node's data-school. */
+    --color-debuff-fire: #e8722a;
+    --color-debuff-frost: #4aa3df;
+    --color-debuff-arcane: #3f8cff;
+    --color-debuff-shadow: #9b59d0;
+    --color-debuff-nature: #35a835;
+    --color-debuff-holy: #d8b56b;
 
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;
@@ -65,6 +73,7 @@
     --color-gold: var(--gold);
     --color-accent: var(--gold);
     --color-text-overlay: #f4eede;
+    --text-outline-color: #000000;
     --panel-edge: #08080d;
     --color-text-error: #ff8f85;
     --color-text-success: #7fdc4f;
@@ -96,6 +105,12 @@
     --color-map-portal-dot: #c084ff;
     --color-map-portal-label: #e0c0ff;
     --color-map-npc-quest: #ffd100;
+    /* active-quest objective areas: the classic translucent blue quest-POI blob */
+    --color-map-quest-area-fill: rgba(72, 132, 232, 0.22);
+    --color-map-quest-area-stroke: rgba(120, 170, 255, 0.55);
+    /* the numbered quest badge on each area (gold circle, dark numeral) */
+    --color-map-quest-badge-fill: #ffd100;
+    --color-map-quest-badge-text: #3a2b00;
     --color-map-player: #fff;
     --color-map-ally-friend: #4ade80;
     --color-map-ally-guild: #60a5fa;
@@ -125,10 +140,13 @@
     --color-minimap-mob-aggro: #ff8800;
     --color-minimap-mob: #e74c3c;
     --color-minimap-mob-loot: #ffd100;
+    --color-minimap-corpse: #bfe6ff;
     --color-minimap-party-dead: #9a9a9a;
     --color-minimap-party-pip: #ffffffcc;
     --color-minimap-player: #fff;
     --color-minimap-outline: #000;
+    --color-minimap-gather-ready: #3ef07a;
+    --color-minimap-gather-cooldown: #5a5f57;
 
     /* Talents window: tree arrows + tooltip accents (talents_window.ts references
        these via var() so the painter carries no raw hex). Exact pre-existing values. */

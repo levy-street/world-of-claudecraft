@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { isCharterEligible } from '../src/sim/content/mounts';
+import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
-import { ITEMS } from '../src/sim/data';
-import { isCharterEligible } from '../src/sim/content/mounts';
 
 // Phase 4 — the Mount Charter economy: the EARNED ownership track that lets a
 // non-$WOC player permanently own a mount, without weakening the holder premise.
@@ -25,7 +25,8 @@ function merchant(sim: Sim): Entity {
 function standAtMerchant(sim: Sim, pid: number): void {
   const m = merchant(sim);
   const e = sim.entities.get(pid)!;
-  e.pos.x = m.pos.x; e.pos.z = m.pos.z;
+  e.pos.x = m.pos.x;
+  e.pos.z = m.pos.z;
   e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
   e.prevPos = { ...e.pos };
 }
@@ -107,7 +108,9 @@ describe('Mount Charters — the earned ownership track', () => {
     sim.events.length = 0;
 
     sim.marketList('charter_goldcrest', 1, 5000, seller);
-    const listing = sim.marketListings.find((l) => l.sellerKey === String(seller) && l.itemId === 'charter_goldcrest');
+    const listing = sim.marketListings.find(
+      (l) => l.sellerKey === String(seller) && l.itemId === 'charter_goldcrest',
+    );
     expect(listing).toBeDefined();
     expect(sim.events.some((e) => e.type === 'error')).toBe(false);
 

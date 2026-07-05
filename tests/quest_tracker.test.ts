@@ -5,17 +5,19 @@ import { questTrackerView, type TrackedQuest } from '../src/ui/quest_tracker';
 const QUESTS: TrackedQuest[] = [
   {
     id: 'wolves',
+    number: 1,
     title: 'Wolves at the Door',
     complete: false,
     objectives: [{ label: 'Forest Wolf slain', current: 0, total: 8 }],
   },
   {
     id: 'webwood',
+    number: 2,
     title: 'Webwood Menace',
     complete: true,
     objectives: [
       { label: 'Webwood Lurker slain', current: 6, total: 6 },
-      { label: 'Webwood Silk Gland', current: 4, total: 4 },
+      { label: 'Sableweb Silk Gland', current: 4, total: 4 },
     ],
   },
 ];
@@ -38,6 +40,8 @@ describe('questTrackerView', () => {
     expect(v.collapsed).toBe(false);
     expect(v.count).toBe(2);
     expect(v.quests).toHaveLength(2);
+    // the acceptance-order number rides through (matches the map badges)
+    expect(v.quests.map((q) => q.number)).toEqual([1, 2]);
     expect(v.quests[0].objectives[0].done).toBe(false); // 0/8
     expect(v.quests[1].complete).toBe(true);
     expect(v.quests[1].objectives.map((o) => o.done)).toEqual([true, true]); // 6/6, 4/4
@@ -56,6 +60,7 @@ describe('questTrackerView', () => {
       [
         {
           id: 'x',
+          number: 1,
           title: 'X',
           complete: false,
           objectives: [{ label: 'o', current: 9, total: 8 }],
@@ -71,6 +76,7 @@ describe('questTrackerView', () => {
       [
         {
           id: 'x',
+          number: 1,
           title: 'X',
           complete: false,
           objectives: [{ label: 'o', current: 0, total: 0 }],
@@ -83,7 +89,13 @@ describe('questTrackerView', () => {
 
   it('does not mutate the caller input and returns distinct copies', () => {
     const input: TrackedQuest[] = [
-      { id: 'a', title: 'A', complete: false, objectives: [{ label: 'o', current: 1, total: 2 }] },
+      {
+        id: 'a',
+        number: 1,
+        title: 'A',
+        complete: false,
+        objectives: [{ label: 'o', current: 1, total: 2 }],
+      },
     ];
     const snapshot = JSON.stringify(input);
     const v = questTrackerView(input, false);

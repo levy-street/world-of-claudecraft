@@ -36,7 +36,7 @@ describe('/buyback command', () => {
 
     sim.chat('/buyback', a);
     expect(errorText(sim.tick(), a)).toBe(
-      'Vendor buyback (2): Cracked Wolf Fang x3 (4c each), Worn Shortsword (10c each). Repurchase at any merchant.',
+      'Vendor buyback (2): Cracked Wolf Fang x3 (4c each), Pitted Shortsword (10c each). Repurchase at any merchant.',
     );
   });
 

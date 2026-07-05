@@ -6,10 +6,10 @@ import type { Entity, PlayerClass } from '../../sim/types';
 import { mechHeldWeaponOverride, visualKeyFor } from './manifest';
 import { CharacterVisual } from './visual';
 
+export { createMountVisual, MountVisual } from './mount';
 export { CharacterPreview } from './preview';
 export type { AnimState } from './visual';
 export { CharacterVisual } from './visual';
-export { MountVisual, createMountVisual } from './mount';
 
 /** Build the visual for an entity (or an explicit shapeshift/polymorph form key). */
 export function createCharacterVisual(

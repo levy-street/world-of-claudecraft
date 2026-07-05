@@ -124,6 +124,10 @@ const mobileControlsTs = readFileSync(
   new URL('../src/game/mobile_controls.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+const characterPreviewTs = readFileSync(
+  new URL('../src/render/characters/preview.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // Per-frame keyed-pool painters. The per-member party rows,
 // the aura slots, and the FCT nodes used to be inline createElement / innerHTML in
 // hud.ts; they dissolved into these pooled painters, so the shape guards below grep
@@ -424,11 +428,12 @@ describe('client HTML shell', () => {
   it('routes the target elite class + name color + combo pips + hostile cue through the elided writers', () => {
     // The two raw writes the four original writers cannot express (the elite class and
     // the hostile/friendly name color) go through the toggleClass / setStyleProp,
-    // and the combo pip `on` toggle through toggleClass. No raw classList/style write
-    // on the target frame survives (those silently collapse the hot-DOM skip rate).
+    // and the combo pip `on` toggle (now on the PLAYER frame: combo points are
+    // character-bound) through toggleClass. No raw classList/style write on either
+    // frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain("this.toggleClass(this.targetFrameEl, 'elite'");
     expect(hudTs).toMatch(/this\.setStyleProp\(\s*this\.targetNameEl,\s*'color',/);
-    expect(hudTs).toContain("this.toggleClass(pip as HTMLElement, 'on', i < points);");
+    expect(hudTs).toContain("this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);");
     // The forced-colors hostile cue is a non-color redundant marker on the target
     // name, routed through the same elided toggleClass writer (no raw class write on the
     // per-frame hot path) so it stays write-elided.
@@ -466,7 +471,32 @@ describe('client HTML shell', () => {
     expect(html).toContain('<li class="nav-item" id="nav-item-account" hidden>');
     expect(html).toContain('<li class="nav-item" id="nav-item-logout" hidden>');
     expect(mainTs).toContain('if (api.restoreSession()) {');
-    expect(mainTs).toContain('} else {\n    enterLoggedOutChrome();\n  }');
+    expect(mainTs).toContain(
+      "} else {\n    enterLoggedOutChrome();\n    if (isDesktopLoginPage()) show('#login-panel');\n  }",
+    );
+  });
+
+  it('keeps the Discord unlink panel clickable over the pre-game shell', () => {
+    const startZ = Number(shellCss.match(/#start-screen \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const modalZ = Number(shellCss.match(/\.modal-backdrop \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    const discordZ = Number(indexExtraCss.match(/#discord-window \{[\s\S]*?z-index: (\d+);/)?.[1]);
+    expect(discordZ).toBeGreaterThan(startZ);
+    expect(discordZ).toBeLessThan(modalZ);
+  });
+
+  it('keeps the Discord unlink modal at top level so it shows in-game', () => {
+    // #start-screen is display:none once the game starts (main.ts hides it) and is a
+    // lower z-index:100 stacking context, so a keep-modal nested inside it would be
+    // invisible in-game and trapped below the top-level #discord-window. It must be a
+    // top-level sibling declared above #start-screen, exactly like #discord-window.
+    const modalAt = html.indexOf('id="discord-keep-modal"');
+    const windowAt = html.indexOf('id="discord-window"');
+    const startAt = html.indexOf('id="start-screen"');
+    expect(modalAt).toBeGreaterThan(-1);
+    expect(windowAt).toBeGreaterThan(-1);
+    // Declared before #start-screen opens, hence a top-level sibling, never a descendant.
+    expect(modalAt).toBeLessThan(startAt);
+    expect(windowAt).toBeLessThan(startAt);
   });
 
   it('shows a logged-in Logout nav item next to Account', () => {
@@ -588,24 +618,32 @@ describe('client HTML shell', () => {
     expect(html).toContain(
       "if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {",
     );
-    expect(hudTs).toContain("fbq('trackCustom', eventName, data ?? {});");
-    expect(hudTs).toContain(
-      "if (ev.level === 5) trackMetaPixel('ReachedLevel5', { level: ev.level });",
+    expect(hudTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
+    expect(hudTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(hudTs).toContain('if (ev.level === 5) {');
+    expect(hudTs).toContain('characterId ? { eventID: `lvl5_$' + '{characterId}` } : undefined');
+    expect(mainTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
+    expect(mainTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    expect(mainTs).toContain(
+      'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );
-    expect(mainTs).toContain("trackMetaPixel('AccountCreated');");
     expect(mainTs).toContain("'GitHubClick'");
     expect(mainTs).toContain("'DiscordClick'");
   });
 
-  it('excludes wallet verification surfaces from native app builds', () => {
+  it('excludes wallet verification surfaces from native and desktop app builds', () => {
     expect(hudCss).toContain('body.native-app #nav-btn-download,');
     expect(hudCss).toContain(
       'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
     );
     expect(hudCss).toContain('body.native-app #performance-tip,');
+    expect(hudCss).toContain(
+      'body.desktop-app #token-ca,\n  body.desktop-app .cs-wallet,\n  body.desktop-app .cs-wallet-hidden-note,\n  body.desktop-app .account-wallet-card,\n  body.desktop-app .official-site-copy',
+    );
     expect(html).toContain('<section class="account-card account-wallet-card">');
+    expect(mainTs).toContain("document.body.classList.toggle('desktop-app', DESKTOP_APP);");
     expect(mainTs).toContain(
-      "const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
+      "!NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';",
     );
     expect(mainTs).toContain("document.querySelector('.cs-wallet')?.remove();");
     expect(mainTs).toContain("document.querySelector('.account-wallet-card')?.remove();");
@@ -624,10 +662,34 @@ describe('client HTML shell', () => {
     );
   });
 
+  it('releases the start-screen character preview before entering the world', () => {
+    expect(mainTs).toContain('function releaseStartScreenPreview(): void {');
+    expect(mainTs).toContain('characterPreview.destroy();\n  characterPreview = null;');
+    expect(mainTs).toContain(
+      "$('#start-screen').style.display = 'none';\n  releaseStartScreenPreview();",
+    );
+    expect(characterPreviewTs).toContain('destroy(): void {\n    if (this.destroyed) return;');
+    expect(characterPreviewTs).toContain(
+      'this.unregisterContext?.();\n    this.unregisterContext = null;',
+    );
+    expect(characterPreviewTs).toContain('this.renderer.forceContextLoss();');
+    expect(characterPreviewTs).toContain('this.renderer.dispose();');
+  });
+
   it('offers the quest log in the mobile controls drawer', () => {
     expect(html).toContain('id="mobile-extra-controls"');
     expect(html).toContain('id="mobile-quest"');
     expect(html).toContain('aria-label="Quest Log"');
+  });
+
+  it('offers a Discord entry in the mobile drawer, hidden until Discord is available', () => {
+    // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
+    // this drawer button is the touch path into #discord-window (link / unlink).
+    expect(html).toContain('id="mobile-discord"');
+    // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
+    expect(html).toMatch(/id="mobile-discord"[^>]*data-icon="discord"/);
+    // Starts hidden; main.ts reveals it only when Discord is enabled and logged in.
+    expect(html).toMatch(/id="mobile-discord"\s+hidden/);
   });
 
   it('keeps the game menu free of duplicate and dev-only entries', () => {
@@ -905,6 +967,50 @@ describe('client HTML shell', () => {
       'body.native-app.mobile-touch[data-start-panel="login-panel"] .portal-ring,',
     );
     expect(shellCss).toContain(
+      'body.native-app.mobile-touch[data-start-panel="login-panel"] #login-panel {\n    display: grid;\n    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);',
+    );
+    expect(shellCss).toContain(
+      '@media (orientation: landscape) {\n    body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {\n      justify-content: flex-start;\n      min-height: calc(var(--app-vh) - 86px);',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch[data-start-panel="mode-select"] #title-logo {\n      width: min(176px, 24vw);\n      margin: 0;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,\n    body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo {\n      display: none;',
+    );
+    expect(shellCss).toContain('height: min(560px, calc(var(--app-vh) - 96px));');
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-detail-col {\n      display: grid;\n      grid-template-columns: minmax(120px, 0.54fr) minmax(0, 1.46fr);',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #char-list {\n      overflow-y: auto;\n      scrollbar-gutter: stable;\n      scrollbar-width: auto;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {\n      width: 8px;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #charselect-class-details {\n      box-sizing: border-box;\n      min-height: 0;\n      overflow-y: auto;',
+    );
+    expect(shellCss).toContain('scrollbar-gutter: stable;\n      scrollbar-width: auto;');
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid {\n      display: flex;\n      flex-direction: column;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {\n      display: grid;\n      grid-template-columns: minmax(0, 1fr);',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-list-col,\n    body.mobile-touch #charselect-panel .cs-detail-col,\n    body.mobile-touch #charcreate-panel .cs-create-col,\n    body.mobile-touch #charcreate-panel .cs-detail-col {\n      min-height: 0;\n      height: 100%;\n      overflow: hidden;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-list-actions {\n      position: absolute;\n      top: 28px;\n      right: 0;',
+    );
+    expect(shellCss).toContain(
+      'body.mobile-touch #charselect-panel .cs-list-actions .btn {\n      flex: 0 0 auto;\n      min-width: 122px;\n      min-height: 38px;',
+    );
+    expect(shellCss).toContain(
       'touch-action: manipulation;\n    -webkit-tap-highlight-color: transparent;',
     );
     expect(mainTs).toContain(
@@ -1008,14 +1114,25 @@ describe('client HTML shell', () => {
       'max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));',
     );
     expect(hudMobileCss).toContain(
-      'max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
+      'max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch.mobile-more-open #mobile-extra-controls {\n    display: flex;\n    flex-direction: column;\n  }',
     );
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch #mobile-extra-controls .panel-title {\n    min-height: 32px;',
+    // Anchored to the drawer-header rule itself (not just the declarations,
+    // which any rule could carry): the 48px floor must stay on THIS selector.
+    const drawerTitleStart = hudMobileCss.indexOf(
+      'body.mobile-touch #mobile-extra-controls .panel-title {',
     );
+    expect(drawerTitleStart).toBeGreaterThan(-1);
+    const drawerTitleBody = hudMobileCss.slice(
+      drawerTitleStart,
+      hudMobileCss.indexOf('}', drawerTitleStart),
+    );
+    expect(drawerTitleBody).toContain('min-height: 48px;');
+    expect(drawerTitleBody).toContain('margin-bottom: 8px;');
+    expect(drawerTitleBody).toContain('padding-bottom: 6px;');
+    expect(drawerTitleBody).toContain('cursor: move;');
     expect(hudMobileCss).toContain(
       'width: min(560px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));',
     );
@@ -1065,10 +1182,13 @@ describe('client HTML shell', () => {
     );
     // Landscape compacts the single play console instead of splitting two cards.
     expect(hudMobileCss).toContain(
-      '@media (orientation: landscape) {\n    body.mobile-touch .play-console {',
+      '@media (orientation: landscape) {\n    body.mobile-touch[data-start-panel="mode-select"] #homepage-views-container {',
     );
     expect(hudMobileCss).toContain(
-      '@media (orientation: landscape) {\n    body.mobile-touch .play-console {\n      width: 100%;\n      max-width: 460px;',
+      'body.mobile-touch[data-start-panel="mode-select"] #mode-select {\n      width: min(\n        620px,',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .play-console {\n      width: 100%;\n      max-width: none;\n      display: grid;\n      grid-template-columns: minmax(0, 1fr) minmax(140px, 0.46fr);',
     );
   });
 
@@ -1122,7 +1242,7 @@ describe('client HTML shell', () => {
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {
     expect(componentsCss).toContain(
-      '#market-window {\n    width: 470px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
+      '#market-window {\n    width: 560px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
     );
     expect(componentsCss).toContain(
       '#market-body {\n    overflow-y: auto;\n    flex: 1;\n    min-height: 0;',
@@ -1130,9 +1250,14 @@ describe('client HTML shell', () => {
     expect(componentsCss).toContain(
       '.mkt-page {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;',
     );
+    // On mobile the Market takes the full available height (not the vendor's 58vh
+    // cap) so its tall stacked-filter header cannot squeeze the listing body flat,
+    // and #market-body keeps a min-height floor; the window itself stays
+    // overflow:hidden so #market-body remains the single scroll container.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(58vh - 20px);\n    overflow: hidden;',
+      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow: hidden;',
     );
+    expect(hudMobileCss).toContain('body.mobile-touch #market-body {\n    min-height: 96px;');
     expect(marketWindowTs).toContain('buildMarketView'); // pagination + filtering delegated to the core
     expect(marketWindowTs).toContain('this.browsePage');
     expect(marketWindowTs).toContain('data-market-page="prev"');
@@ -1302,7 +1427,7 @@ describe('client HTML shell', () => {
       'body.mobile-touch.mobile-left-handed #mobile-extra-controls {\n    left: 50%;\n    right: auto;',
     );
     expect(hudMobileCss).toContain(
-      'max-height: calc(100dvh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom));',
+      'max-height: calc(\n        var(--app-vh) -\n        28px -\n        env(safe-area-inset-top) -\n        env(safe-area-inset-bottom)\n      );',
     );
   });
 

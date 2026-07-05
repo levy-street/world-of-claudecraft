@@ -538,6 +538,7 @@ function idleWorld(): ActionBarWorldInput {
       resource: 100,
       cooldowns: new Map(),
       gcdRemaining: 0,
+      potionCdRemaining: 0,
       queuedOnSwing: null,
       pos: { x: 0, y: 0, z: 0 },
     },
@@ -551,7 +552,7 @@ function aurasDeps(): AurasDeps {
     iconId: (a) => a.id,
     auraName: (a) => a.name,
     formatStacks: (n) => String(n),
-    durationUnitSuffix: () => 's',
+    durationUnits: () => ({ s: 's', m: 'm', h: 'h', d: 'd' }),
     auraEffectHtml: () => '',
   };
 }

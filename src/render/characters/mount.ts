@@ -12,8 +12,8 @@
 // tucked legs and a hover bob. The 10% Sovereign is a one-off dreadwyrm: a winged,
 // horned, spine-crested dragon with a strong gold glow.
 import * as THREE from 'three';
-import { surfaceMat } from '../gfx';
 import { MOUNTS, type MountDef } from '../../sim/content/mounts';
+import { surfaceMat } from '../gfx';
 
 // Diagonal gait pairs (trot): front-left + back-right swing together, the other
 // diagonal opposite. Indices into the leg array [FL, FR, BL, BR].
@@ -29,7 +29,9 @@ const BODY_L = 1.6;
 function shade(hex: number, factor: number): number {
   const c = new THREE.Color(hex);
   c.multiplyScalar(factor);
-  c.r = Math.min(1, c.r); c.g = Math.min(1, c.g); c.b = Math.min(1, c.b);
+  c.r = Math.min(1, c.r);
+  c.g = Math.min(1, c.g);
+  c.b = Math.min(1, c.b);
   return c.getHex();
 }
 
@@ -62,22 +64,41 @@ export class MountVisual {
     const accentMetal = Math.min(0.85, 0.12 + def.tier * 0.06);
     const glow = this.dragon ? 0.9 : def.tier >= 9 ? (def.tier - 7) * 0.16 : 0;
     const accentMat = surfaceMat({
-      color: shade(def.tint, 1.3), roughness: 0.35, metalness: accentMetal,
-      emissive: glow > 0 ? def.tint : 0x000000, emissiveIntensity: glow, flatShading: true,
+      color: shade(def.tint, 1.3),
+      roughness: 0.35,
+      metalness: accentMetal,
+      emissive: glow > 0 ? def.tint : 0x000000,
+      emissiveIntensity: glow,
+      flatShading: true,
     });
     const glowMat = surfaceMat({
-      color: shade(def.tint, 1.4), roughness: 0.4, flatShading: true,
-      emissive: def.tint, emissiveIntensity: this.flying ? 0.6 : 0.25,
+      color: shade(def.tint, 1.4),
+      roughness: 0.4,
+      flatShading: true,
+      emissive: def.tint,
+      emissiveIntensity: this.flying ? 0.6 : 0.25,
     });
     const membraneMat = surfaceMat({
-      color: shade(def.tint, this.dragon ? 0.9 : 1.05), roughness: 0.5, flatShading: true,
-      emissive: def.tint, emissiveIntensity: this.dragon ? 0.5 : 0.28, side: THREE.DoubleSide,
+      color: shade(def.tint, this.dragon ? 0.9 : 1.05),
+      roughness: 0.5,
+      flatShading: true,
+      emissive: def.tint,
+      emissiveIntensity: this.dragon ? 0.5 : 0.28,
+      side: THREE.DoubleSide,
     });
 
     // Geometry helpers — both create the mesh, register it for shadow/disposal,
     // AND add it to bodyGroup. Sub-groups (legs, wings) re-parent the returned
     // mesh via group.add(), which moves it out of bodyGroup automatically.
-    const mesh = (w: number, h: number, d: number, mat: THREE.Material, x: number, y: number, z: number): THREE.Mesh => {
+    const mesh = (
+      w: number,
+      h: number,
+      d: number,
+      mat: THREE.Material,
+      x: number,
+      y: number,
+      z: number,
+    ): THREE.Mesh => {
       const g = new THREE.BoxGeometry(w, h, d);
       this.geoms.push(g);
       const m = new THREE.Mesh(g, mat);
@@ -87,7 +108,14 @@ export class MountVisual {
       this.bodyGroup.add(m);
       return m;
     };
-    const cone = (r: number, h: number, mat: THREE.Material, x: number, y: number, z: number): THREE.Mesh => {
+    const cone = (
+      r: number,
+      h: number,
+      mat: THREE.Material,
+      x: number,
+      y: number,
+      z: number,
+    ): THREE.Mesh => {
       const g = new THREE.ConeGeometry(r, h, 6);
       this.geoms.push(g);
       const m = new THREE.Mesh(g, mat);
@@ -105,11 +133,27 @@ export class MountVisual {
     mesh(BODY_W * 1.04, BODY_H * 1.04, 0.34, bodyMat, 0, BODY_CENTER_Y + 0.04, -len / 2);
 
     // --- neck + head (dragon: longer reaching neck, broader horned skull) ------
-    const neck = mesh(0.34, this.dragon ? 0.8 : 0.62, 0.34, bodyMat, 0, BODY_CENTER_Y + (this.dragon ? 0.52 : 0.42), len / 2 + 0.12);
+    const neck = mesh(
+      0.34,
+      this.dragon ? 0.8 : 0.62,
+      0.34,
+      bodyMat,
+      0,
+      BODY_CENTER_Y + (this.dragon ? 0.52 : 0.42),
+      len / 2 + 0.12,
+    );
     neck.rotation.x = this.dragon ? -0.65 : -0.55;
     const headY = BODY_CENTER_Y + (this.dragon ? 0.95 : 0.78);
     const headZ = len / 2 + (this.dragon ? 0.5 : 0.42);
-    const head = mesh(this.dragon ? 0.38 : 0.3, this.dragon ? 0.4 : 0.34, this.dragon ? 0.66 : 0.6, bodyMat, 0, headY, headZ);
+    const head = mesh(
+      this.dragon ? 0.38 : 0.3,
+      this.dragon ? 0.4 : 0.34,
+      this.dragon ? 0.66 : 0.6,
+      bodyMat,
+      0,
+      headY,
+      headZ,
+    );
     head.rotation.x = -0.2;
     mesh(0.22, 0.16, this.dragon ? 0.4 : 0.34, bodyMat, 0, headY - 0.12, headZ + 0.42); // snout/jaw
     mesh(0.06, 0.06, 0.06, glowMat, -0.11, headY + 0.06, headZ + 0.22); // eyes
@@ -135,7 +179,14 @@ export class MountVisual {
       for (let i = 0; i < n; i++) {
         const t = i / (n - 1);
         const sz = (this.dragon ? 0.26 : 0.16) * (1 - 0.4 * Math.abs(t - 0.4));
-        const spike = cone(0.06, sz, accentMat, 0, BODY_CENTER_Y + BODY_H / 2 + sz / 2, len / 2 - 0.25 - t * (len - 0.5));
+        const spike = cone(
+          0.06,
+          sz,
+          accentMat,
+          0,
+          BODY_CENTER_Y + BODY_H / 2 + sz / 2,
+          len / 2 - 0.25 - t * (len - 0.5),
+        );
         spike.rotation.x = -0.15;
       }
     }
@@ -161,12 +212,17 @@ export class MountVisual {
     // --- four legs on hip pivots so they swing (or tuck, while flying) ---------
     const legX = BODY_W / 2 - 0.04;
     const legZ = len / 2 - 0.28;
-    for (const [x, z] of [[legX, legZ], [-legX, legZ], [legX, -legZ], [-legX, -legZ]] as [number, number][]) {
+    for (const [x, z] of [
+      [legX, legZ],
+      [-legX, legZ],
+      [legX, -legZ],
+      [-legX, -legZ],
+    ] as [number, number][]) {
       const pivot = new THREE.Group();
       pivot.position.set(x, HIP_Y, z);
       this.bodyGroup.add(pivot);
-      pivot.add(mesh(0.16, LEG_LEN, 0.18, bodyMat, 0, -LEG_LEN / 2, 0));     // re-parents leg
-      pivot.add(mesh(0.2, 0.12, 0.22, hoofMat, 0, -LEG_LEN - 0.02, 0.01));   // re-parents hoof
+      pivot.add(mesh(0.16, LEG_LEN, 0.18, bodyMat, 0, -LEG_LEN / 2, 0)); // re-parents leg
+      pivot.add(mesh(0.2, 0.12, 0.22, hoofMat, 0, -LEG_LEN - 0.02, 0.01)); // re-parents hoof
       this.legPivots.push(pivot);
     }
 
@@ -178,7 +234,7 @@ export class MountVisual {
         const wing = new THREE.Group();
         wing.position.set(side * (BODY_W / 2 - 0.02), BODY_CENTER_Y + 0.3, 0.05);
         this.bodyGroup.add(wing);
-        const spar = mesh(span, 0.07, 0.09, accentMat, side * span / 2, 0.02, 0.04);
+        const spar = mesh(span, 0.07, 0.09, accentMat, (side * span) / 2, 0.02, 0.04);
         spar.rotation.y = side * 0.2;
         wing.add(spar); // re-parents into the flapping group
         const panels = 3;

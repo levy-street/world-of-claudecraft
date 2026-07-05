@@ -10,88 +10,41 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "footer.whitepaper",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "footer.whitepaper"
   ],
   "es_ES": [
-    "footer.whitepaper",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "footer.whitepaper"
   ],
   "fr_FR": [
-    "footer.whitepaper",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "footer.whitepaper"
   ],
   "fr_CA": [
-    "footer.whitepaper",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "footer.whitepaper"
   ],
   "en_CA": [],
   "it_IT": [
-    "footer.whitepaper",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "footer.whitepaper"
   ],
   "de_DE": [
-    "footer.whitepaper",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "footer.whitepaper"
   ],
   "zh_CN": [
-    "footer.whitepaper",
-    "hudChrome.abilityScaling.bonus"
+    "footer.whitepaper"
   ],
   "zh_TW": [
-    "footer.whitepaper",
-    "hudChrome.abilityScaling.bonus"
+    "footer.whitepaper"
   ],
   "ko_KR": [
-    "footer.whitepaper",
-    "hudChrome.abilityScaling.bonus"
+    "footer.whitepaper"
   ],
   "ja_JP": [
-    "footer.whitepaper",
-    "hudChrome.abilityScaling.bonus"
+    "footer.whitepaper"
   ],
   "pt_BR": [
-    "footer.whitepaper",
-    "hud.combat.floatingResist",
-    "hud.combat.resisted",
-    "hudChrome.abilityScaling.bonus",
-    "hudChrome.itemArmorType.cloth",
-    "hudChrome.itemArmorType.leather",
-    "hudChrome.itemArmorType.mail"
+    "footer.whitepaper"
   ],
   "ru_RU": [
-    "footer.whitepaper",
-    "hudChrome.abilityScaling.bonus"
+    "footer.whitepaper"
   ],
   "nl_NL": [
     "entities.items.charter_ashmane.name",

@@ -131,6 +131,28 @@ describe('party frame signature (the per-frame short-circuit)', () => {
         pos,
       ),
     ).not.toBe(base);
+    // A member gaining an aura (a fresh shield) changes it too, so the mini aura
+    // strip repaints; and losing it again changes it back to the base string.
+    const shielded = partyFrameSignature(
+      info({
+        members: [
+          members[0],
+          { ...members[1], auras: [{ id: 'power_word_shield', kind: 'absorb' }] },
+          members[2],
+        ],
+      }),
+      1,
+      pos,
+    );
+    expect(shielded).not.toBe(base);
+    // A missing auras field (an older server snapshot) signs like an empty strip.
+    expect(
+      partyFrameSignature(
+        info({ members: [members[0], { ...members[1], auras: [] }, members[2]] }),
+        1,
+        pos,
+      ),
+    ).toBe(base);
   });
 
   it('moving a member WITHIN range does not change the signature (the inline oor cadence held)', () => {

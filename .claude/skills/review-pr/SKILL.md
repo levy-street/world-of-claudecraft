@@ -16,14 +16,19 @@ end and posts the result. They are different jobs.
 
 ## What a good review looks like (the voice)
 
-- Short, calm, plain GitHub style. No AI voice, no preamble, no summary-of-a-summary.
-- **No em dashes, en dashes, or emojis.** Use commas, colons, parentheses, or "to" for
-  ranges. (You are reviewing a repo that bans them; do not introduce them yourself.)
+- Short, calm, plain GitHub style. Write like a person, not an AI: no preamble, no
+  summary-of-a-summary, no "Great work!" throat-clearing, no bulleted restatement of the
+  diff, no hedging boilerplate. If a sentence sounds like a model wrote it, cut it.
+- **No em dashes or en dashes, and no emojis.** Use commas, colons, parentheses, or "to"
+  for ranges. (You are reviewing a repo that bans them; do not introduce them yourself.)
 - Lead with what is genuinely good when it is good, then the issues. Do not flatter.
 - Every finding carries a **severity** and **evidence**: `blocking` / `should-fix` /
   `nit`, with a `file:line` pointer and a one-line why.
-- i18n: contributors add ENGLISH only; the maintainer fills locales at release. Never
-  draft locale translations in a review, and do not ask the contributor to.
+- **i18n: review English only. The maintainer does every other locale at release time.**
+  Check only that new player-visible strings are English `t()` keys in the right catalog.
+  Never raise a missing-translation finding, never draft a locale string, and never ask
+  the contributor about any non-English locale (the non-Latin overlays and the M16 gate
+  included). All of that is release-time maintainer work.
 - Post as a plain comment review (not approve / request-changes) unless told otherwise.
 - Match the depth to the change: a one-file fix gets a tight note; a sim/wire/auth
   change earns the full invariant pass.
@@ -102,20 +107,20 @@ sub `CLAUDE.md` files are the source of truth; this is the checklist.
 - CLAUDE.md requires tests for sim/server behavior changes. A server change with no test
   is a finding.
 
-**i18n (any player-visible string).**
-- English only on a PR, added to the right `src/ui/i18n.catalog/<domain>.ts` and
-  rendered via `t()`. `hud_chrome` is the English-only catalog domain.
-- The maintainer fills the FIVE non-Latin overlays (`zh_CN`, `zh_TW`, `ja_JP`, `ko_KR`,
-  `ru_RU`) in `src/ui/i18n.locales/` at merge; Latin-script locales may stay English-filled
-  `pending`. That fill is the maintainer's merge-side step, NOT a contributor ask: do not
-  post a missing-translation nit (from the contributor's side a PR is English-only). The one
-  catch: the always-on M16 completeness test (`tests/i18n_completeness.test.ts`) fails at PR
-  tier when a WORDY new English key is left unchanged in those non-Latin overlays, so a wordy
-  new key DOES need real zh/zh_TW/ja/ko/ru fills in the same change. When filling, confirm no
-  English/placeholder/`// TODO` leaked into a non-Latin overlay.
+**i18n (any player-visible string). Review English only; the maintainer does every other
+locale at release time.**
+- Check only that new player-visible strings are English `t()` keys in the right
+  `src/ui/i18n.catalog/<domain>.ts`, rendered via `t()`. `hud_chrome` is the English-only
+  catalog domain. Numbers/money/dates/percents go through the formatters, never string
+  concat.
+- Do NOT raise any non-English i18n finding. Missing translations, the five non-Latin
+  overlays (`zh_CN`, `zh_TW`, `ja_JP`, `ko_KR`, `ru_RU`), Latin-script `pending` rows, and
+  the M16 completeness gate (`tests/i18n_completeness.test.ts`) are all release-time
+  maintainer work, not a review finding and not a contributor ask. From the contributor's
+  side a PR is English-only.
 - `shell.ts` and some catalog modules carry inline per-locale blocks that need all
-  locales present for `tsc`; that is structural, not a policy violation.
-- Numbers/money/dates/percents go through the formatters, never string concat.
+  locales present for `tsc`; that is structural, not a policy violation, and still not
+  something to flag.
 
 **The standard stale-base i18n conflict.** When the only true conflicts are
 `src/ui/i18n.resolved.generated/pending.ts`, `src/ui/i18n.resolved.sha256`, and
@@ -183,4 +188,4 @@ their domains.
 | `src/render/**` | reads not mutates; own module; per-frame cost |
 | `src/ui/**` + `index.html` | IWorld seam; own module; play.html CSS parity; a11y/mobile; i18n |
 | `server/**` routes/db | token-scoped auth; parameterized SQL; additive idempotent DDL; no oversharing; tests |
-| i18n strings | English in catalog; 5 non-Latin overlays filled; generated-trio conflict = regen |
+| i18n strings | English `t()` in catalog only; all other locales are release-time maintainer work, do not flag; generated-trio conflict = regen |

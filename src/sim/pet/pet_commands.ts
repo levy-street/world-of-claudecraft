@@ -35,7 +35,7 @@
 // directly (already pure); everything that touches not-yet-extracted Sim state
 // routes through the seam.
 
-import { DUNGEON_X_THRESHOLD, ITEMS, MOBS } from '../data';
+import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { PetState } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -59,6 +59,13 @@ const DEMON_HEAL_DURATION = 5;
 const DEMON_HEAL_TICK = 1;
 const TAMED_TARGET_RESPAWN_SECONDS = 60;
 const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
+
+// A live pet check fails while inside a delve even for owners with a valid
+// equipped pet (it is stowed for the run, see stowPetForDelve/restorePetFromDelveStash),
+// so the surfaced error must say why instead of implying the pet was lost.
+function noPetError(e: Entity, fallback = 'You have no pet.'): string {
+  return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : fallback;
+}
 
 // -------------------------------------------------------------------------
 // Non-player stat-aura HP bookkeeping (shared: the Sim applyAura/aura-expiry +
@@ -127,9 +134,37 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
   };
 }
 
+/** A summoned warlock demon (imp/voidwalker/succubus/felhunter/doomguard/infernal,
+ * anything in the 'demon' MOBS family) is NOT persisted across logout: classic
+ * warlocks re-summon their demon (paying its cost and the 180s summon cooldown) on
+ * login rather than getting it back for free, which would let a relog launder the
+ * cooldown. serializeCharacter drops a demon snapshot to null at the persistence
+ * boundary so a reload forces a fresh summon. Hunter pets (beast/spider family)
+ * persist. This lives at the save boundary, NOT inside serializePet, because the
+ * in-session delve pet-park (stowPetForDelve) reuses serializePet and must keep
+ * preserving demons across a delve. */
+export function isDemonPetState(state: PetState | null | undefined): boolean {
+  return !!state && MOBS[state.templateId]?.family === 'demon';
+}
+
 export function restorePet(ctx: SimContext, owner: Entity, state: PetState): void {
   const template = MOBS[state.templateId];
-  if (!template) return;
+  if (!template) {
+    // The stored pet's creature template was removed or renamed by a content
+    // update, so we can no longer rebuild it. Drop the pet (it cannot exist),
+    // but tell the owner instead of silently emptying the pet slot. When the
+    // saved name is unclean (no localizable proper noun survives), emit the
+    // generic, name-free sentence rather than splicing an English "Your pet"
+    // that the client matcher would leave untranslated in a non-English locale.
+    const lost = cleanPetName(state.name);
+    ctx.notice(
+      owner.id,
+      lost
+        ? `${lost} could not be restored and has been lost.`
+        : 'Your pet could not be restored and has been lost.',
+    );
+    return;
+  }
   const level = owner.level;
   const pos = ctx.groundPos(owner.pos.x + 2, owner.pos.z + 1);
   const pet = createMob(ctx.nextId++, template, level, pos);
@@ -342,6 +377,24 @@ export function despawnPersistentPet(ctx: SimContext, pet: Entity): void {
   ctx.dropEntity(pet.id);
 }
 
+export function stowPetForSpectate(ctx: SimContext, ownerPid: number): PetState | null {
+  const pet = petOf(ctx, ownerPid, true);
+  if (!pet) return null;
+  const state = serializePet(ctx, ownerPid);
+  despawnPersistentPet(ctx, pet);
+  return state;
+}
+
+export function restorePetAfterSpectate(
+  ctx: SimContext,
+  ownerPid: number,
+  state: PetState | null,
+): void {
+  if (!state || petOf(ctx, ownerPid, true)) return;
+  const owner = ctx.entities.get(ownerPid);
+  if (owner) restorePet(ctx, owner, state);
+}
+
 export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
   const pet = petOf(ctx, owner.id);
   if (!pet) {
@@ -364,16 +417,12 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
 }
 
 /** Remove a summoned demon from the world entirely, scrubbing any references
- *  (player targets/combo, other mobs' hate) the way boss adds are despawned. */
+ *  (player targets, other mobs' hate) the way boss adds are despawned. */
 export function despawnPet(ctx: SimContext, pet: Entity): void {
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e) continue;
     if (e.targetId === pet.id) e.targetId = null;
-    if (e.comboTargetId === pet.id) {
-      e.comboTargetId = null;
-      e.comboPoints = 0;
-    }
   }
   for (const m of ctx.entities.values()) {
     if (m.kind !== 'mob' || m.id === pet.id) continue;
@@ -396,7 +445,7 @@ export function abandonPet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   ctx.emit({ type: 'log', text: `You abandon ${pet.name}.`, color: '#f66', pid: r.e.id });
@@ -412,7 +461,7 @@ export function renamePet(ctx: SimContext, name: string, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   const clean = cleanPetName(name);
@@ -436,7 +485,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   if (!pet.dead) {
@@ -477,7 +526,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living pet.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
@@ -500,7 +549,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living pet.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   if (pet.petTauntTimer > 0) {
@@ -538,7 +587,7 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living pet.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
   const item = ITEMS[itemId];
@@ -592,7 +641,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
   }
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no living demon.');
+    ctx.error(r.e.id, noPetError(r.e, 'You have no living demon.'));
     return;
   }
   if (pet.hp >= pet.maxHp) {
@@ -607,6 +656,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
   r.e.castingAbility = DEMON_HEAL_CAST_ID;
   r.e.castTotal = DEMON_HEAL_DURATION;
   r.e.castRemaining = DEMON_HEAL_DURATION;
+  r.e.castTargetId = null;
   r.e.channeling = true;
   r.e.channelTickEvery = DEMON_HEAL_TICK;
   r.e.channelTickTimer = DEMON_HEAL_TICK;
@@ -635,7 +685,7 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   pet.petMode = mode;
@@ -658,7 +708,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
-    ctx.error(r.e.id, 'You have no pet.');
+    ctx.error(r.e.id, noPetError(r.e));
     return;
   }
   pet.petAutoTaunt = enabled;
@@ -716,8 +766,12 @@ export function stowPetForDelve(ctx: SimContext, pid: number): void {
 export function restorePetFromDelveStash(ctx: SimContext, pid: number): void {
   const state = ctx.delvePetStash.get(pid);
   if (!state) return;
-  ctx.delvePetStash.delete(pid);
   const e = ctx.entities.get(pid);
-  if (!e || petOf(ctx, pid, true)) return;
+  // If the owner entity is not registered yet (transfer/load ordering), leave the
+  // stash entry in place so a later call (e.g. the next tick) can still restore it
+  // instead of silently losing the pet.
+  if (!e) return;
+  ctx.delvePetStash.delete(pid);
+  if (petOf(ctx, pid, true)) return;
   restorePet(ctx, e, state);
 }

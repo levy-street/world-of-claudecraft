@@ -9,15 +9,16 @@ const DEFAULT_BUDGETS_MIB = {
   total: 95,
   largestFile: 8,
   groups: {
-    'textures': 36,
-    'env': 34,
+    textures: 36,
+    env: 34,
     'models/chars': 18,
+    'models/biome': 4,
     'models/creatures': 4,
     'models/props': 4,
     'models/foliage': 4,
     'models/dungeon': 2,
     'models/weapons': 1,
-    'vfx': 1,
+    vfx: 1,
   },
 };
 
@@ -25,7 +26,8 @@ function readNumberEnv(name, fallback) {
   const raw = process.env[name];
   if (raw === undefined || raw === '') return fallback;
   const value = Number(raw);
-  if (!Number.isFinite(value) || value < 0) throw new Error(`${name} must be a non-negative number.`);
+  if (!Number.isFinite(value) || value < 0)
+    throw new Error(`${name} must be a non-negative number.`);
   return value;
 }
 
@@ -113,10 +115,13 @@ function buildReport() {
   const largest = [...files].sort((a, b) => b.bytes - a.bytes).slice(0, 20);
   const budget = budgets();
   const failures = [];
-  if (mib(totalBytes) > budget.total) failures.push(`total ${formatMib(totalBytes)} > ${budget.total} MiB`);
+  if (mib(totalBytes) > budget.total)
+    failures.push(`total ${formatMib(totalBytes)} > ${budget.total} MiB`);
   const largestFile = largest[0];
   if (largestFile && largestFile.mib > budget.largestFile) {
-    failures.push(`largest file ${largestFile.path} ${largestFile.mib} MiB > ${budget.largestFile} MiB`);
+    failures.push(
+      `largest file ${largestFile.path} ${largestFile.mib} MiB > ${budget.largestFile} MiB`,
+    );
   }
   for (const [group, maxMib] of Object.entries(budget.groups)) {
     const actual = groups.get(group)?.mib ?? 0;
@@ -143,7 +148,9 @@ function printText(report) {
   for (const g of report.groups) {
     const budget = report.budgetsMib.groups[g.group];
     const suffix = budget === undefined ? '' : ` / ${budget} MiB`;
-    console.log(`  ${g.group.padEnd(18)} ${String(g.count).padStart(4)}  ${g.mib.toFixed(3).padStart(9)} MiB${suffix}`);
+    console.log(
+      `  ${g.group.padEnd(18)} ${String(g.count).padStart(4)}  ${g.mib.toFixed(3).padStart(9)} MiB${suffix}`,
+    );
   }
   console.log('');
   console.log('Largest files:');

@@ -4,7 +4,7 @@
 // per aura key (the aura id), reused across frames, its tooltip attached ONCE and
 // reading a LIVE mutable record, data updated IN PLACE through the host's elided
 // writers. Same painter, two instances: the player buff bar
-// (#buff-bar, mode 'all') and the target debuffs (#tf-debuffs, mode 'debuffs').
+// (#buff-bar) and the target strip (#tf-debuffs, mode 'all': buffs AND debuffs).
 //
 // TOP RISK 3 (the load-bearing correctness rule): the pooled record is a MUTABLE
 // object. The tooltip closure attaches ONCE per node and reads `rec.name` / `rec.remaining`
@@ -38,6 +38,9 @@ const DEBUFF_CLASS = 'debuff';
 // stylesheet draws the affordance (context-menu cursor + hover border); the class is
 // toggled per frame so a recycled node never keeps a stale affordance.
 const CANCELABLE_CLASS = 'cancelable';
+// Carries the debuff's magic school so the stylesheet tints the border per school
+// (WoW-style poison/magic/curse reads); '' on a buff, so no school selector matches.
+const SCHOOL_ATTR = 'data-school';
 const DUR_CLASS = 'dur';
 const STACKS_CLASS = 'stacks';
 const BACKGROUND_IMAGE_PROP = 'background-image';
@@ -204,6 +207,7 @@ export class AurasPainter {
       // The buff/debuff distinction is a structural class (not an inline color); the
       // stylesheet renders it as a border the icon meaning does not depend on.
       this.writers.toggleClass(rec.el, DEBUFF_CLASS, s.isDebuff);
+      this.writers.setAttr(rec.el, SCHOOL_ATTR, s.school);
       this.writers.toggleClass(rec.el, CANCELABLE_CLASS, rec.cancelable);
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';
