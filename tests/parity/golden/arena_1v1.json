@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
+      "nextId": 401,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 402,
-      "state": "c484fac6",
-      "events": "f97d10ae",
+      "nextId": 403,
+      "state": "eb1f4084",
+      "events": "8b9fbe1a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 402,
-      "state": "0182e6b2",
-      "events": "485835de",
+      "nextId": 403,
+      "state": "19022820",
+      "events": "2806c2e4",
       "rng": {
         "draws": 34,
         "digest": "a750ddeb"
@@ -50,9 +50,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 402,
-      "state": "33cc7bca",
-      "events": "154b31fe",
+      "nextId": 403,
+      "state": "99b47468",
+      "events": "aa847cdc",
       "rng": {
         "draws": 134,
         "digest": "e12cceee"
@@ -61,9 +61,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 402,
-      "state": "24be7a46",
-      "events": "cedd0946",
+      "nextId": 403,
+      "state": "a66975ec",
+      "events": "b8851e04",
       "rng": {
         "draws": 254,
         "digest": "07655741"
@@ -72,9 +72,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 402,
-      "state": "15e896ed",
-      "events": "9b404428",
+      "nextId": 403,
+      "state": "c3705d6f",
+      "events": "c791cb6b",
       "rng": {
         "draws": 384,
         "digest": "9a9a7293"
@@ -83,8 +83,8 @@
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 402,
-      "state": "41b904b5",
+      "nextId": 403,
+      "state": "59eb40ef",
       "events": "741638a5",
       "rng": {
         "draws": 482,
@@ -109,7 +109,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -122,6 +122,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -147,7 +148,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -164,6 +165,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -182,7 +184,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 106.1,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -230,7 +232,7 @@
           "dodgeChance": 0.056,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

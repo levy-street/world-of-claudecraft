@@ -2742,6 +2742,99 @@ export const pt_BR: EnTranslations = {
       }
     }
   },
+  "walletPanel": {
+    "title": "Wallet",
+    "closeAria": "Close",
+    "notConnected": "Wallet not connected",
+    "connect": "Connect",
+    "connectedStatus": "Connected {address}",
+    "linkedBadge": "linked",
+    "tabSend": "Send",
+    "tabHire": "Hire",
+    "tabJobs": "Jobs",
+    "sendSection": "Send to a player",
+    "currency": "Currency",
+    "playerName": "Player name",
+    "recipientPlaceholder": "Who are you sending to?",
+    "amount": "Amount",
+    "amountPlaceholder": "0.0",
+    "max": "Max",
+    "balanceEmpty": "Balance: -",
+    "balanceLoading": "Balance: …",
+    "balanceUnavailable": "Balance: unavailable",
+    "balance": "Balance: {amount}",
+    "balanceExceeds": "Balance: {amount} (exceeds balance)",
+    "connectForBalance": "Connect a wallet to see your balance.",
+    "sendNote": "Sent directly wallet-to-wallet on Solana. Non-custodial: the game never holds your funds. Network fees apply.",
+    "send": "Send",
+    "sending": "Sending…",
+    "loginToSend": "Log in and enter a realm to send to players.",
+    "lookingUp": "Looking up player…",
+    "ownWallet": "(this is your own wallet)",
+    "noVerifiedWallet": "No player by that name has a verified wallet.",
+    "approveTransfer": "Approve the transfer in your wallet…",
+    "sent": "Sent {amount} {currency} to {name}.",
+    "viewTransaction": "View transaction",
+    "sendFailedWith": "Send failed: {message}",
+    "sendFailed": "Send failed.",
+    "hireSection": "Hire a helper",
+    "hireOffline": "Enter the world online to hire a helper.",
+    "helperPlaceholder": "Who will help you?",
+    "rewardCurrency": "Reward currency",
+    "reward": "Reward",
+    "goalLabel": "Goal, paid when the server confirms it",
+    "goalReachLevel": "Reach level",
+    "goalClearDungeon": "Clear raid",
+    "goalQuest": "Quest",
+    "goalBodyguard": "Bodyguard",
+    "goalEscort": "Escort",
+    "targetLevel": "Target level",
+    "targetLevelPlaceholder": "2 to 20",
+    "raidDungeon": "Raid / dungeon",
+    "questOwn": "Quest (one you're on)",
+    "noActiveQuests": "You have no active quests to hire help for, pick one up first.",
+    "protectMinutes": "Protect me for (minutes)",
+    "minutesPlaceholder": "e.g. 10",
+    "escortDestination": "Escort destination",
+    "useCurrentSpot": "Use my current spot",
+    "destinationSet": "Destination set: ({x}, {z})",
+    "noDestination": "No destination set yet.",
+    "destinationHint": "Destination ({x}, {z}), travel off, then have your guard bring you back here.",
+    "hireLogin": "Enter a realm online to hire a player.",
+    "escrowNote": "The reward is locked in on-chain escrow and released to the helper automatically when the server confirms the goal, or refunded to you if it isn't met before the deadline.",
+    "post": "Post & Lock Reward",
+    "posting": "Posting…",
+    "setGoalFirst": "Set a valid goal first.",
+    "preparingEscrow": "Preparing the escrow…",
+    "approveDeposit": "Approve the reward deposit in your wallet…",
+    "lockingReward": "Locking the reward on-chain…",
+    "waitingFinalization": "Waiting for finalization…",
+    "confirmTimeout": "Timed out confirming the deposit. If the reward was locked it will settle once it finalizes.",
+    "jobPosted": "Job posted: {amount} {currency} locked in escrow for {name}.",
+    "postFailed": "Failed to post the job.",
+    "failedWith": "Failed: {message}",
+    "jobsSection": "Your jobs",
+    "loading": "Loading…",
+    "jobsOffline": "Enter the world online to manage jobs.",
+    "jobsEmpty": "No jobs yet. Use the Hire tab to pay a player for help.",
+    "youHired": "You hired {name}",
+    "hiredYou": "{name} hired you",
+    "acceptJob": "Accept job",
+    "cancelRefund": "Cancel & refund",
+    "viewPayout": "View payout",
+    "actionFailed": "Action failed.",
+    "status": {
+      "awaitingDeposit": "Awaiting your deposit",
+      "offered": "Offered to you, accept to begin",
+      "open": "Open, waiting for the helper to accept",
+      "active": "In progress",
+      "completed": "Completed, helper paid",
+      "expired": "Expired, refunded",
+      "failedDied": "Failed (you died), refunded",
+      "cancelled": "Cancelled, refunded",
+      "refunded": "Refunded"
+    }
+  },
   "playerCard": {
     "shareButton": "Compartilhar cartão de jogador",
     "title": "Cartão de jogador",
@@ -3460,6 +3553,12 @@ export const pt_BR: EnTranslations = {
     "renameRequired": "renomeação necessária",
     "delete": "Excluir",
     "rename": "Renomear",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC & Mint",
+    "mintSolHint": "Mint a player-owned ‹name›.worldofclaudecraft.sol for {amount} $WOC, yours on-chain.",
     "newNamePlaceholder": "Novo nome do personagem",
     "tabCharacters": "Personagens",
     "tabCreate": "Criar",
@@ -3474,6 +3573,19 @@ export const pt_BR: EnTranslations = {
     "sortName": "Nome",
     "sortRecent": "Jogados recentemente",
     "sortPlaytime": "Tempo de jogo"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain}, it's yours on-chain.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "Excluir personagem",
@@ -3628,6 +3740,106 @@ export const pt_BR: EnTranslations = {
       "zoomOut": "Afastar",
       "mapCanvasLabel": "Mapa",
       "mapSummary": "Mapa de {zone}."
+    },
+    "mounts": {
+      "title": "Montarias",
+      "subtitle": "Corcéis de Viagem $WOC",
+      "close": "Fechar montarias",
+      "summon": "Invocar",
+      "dismount": "Desmontar",
+      "summoning": "Invocando {name}…",
+      "riding": "Montado",
+      "flies": "Voa",
+      "locked": "Bloqueada",
+      "speed": "+{percent}% de velocidade",
+      "unlockAt": "Desbloqueia com {amount} $WOC",
+      "supplyShare": "{percent} do suprimento",
+      "qualifyHeader": "Você se qualifica para {count} de {total} montarias de viagem.",
+      "holdingHint": "Guardando {amount} $WOC.",
+      "noWallet": "Guarde ao menos {amount} $WOC — 0.1% do suprimento — em uma carteira vinculada para conquistar sua primeira montaria de viagem.",
+      "cantInCombat": "Você não pode montar em combate.",
+      "cantSwimming": "Você não pode montar enquanto nada.",
+      "cantDead": "Você não pode montar enquanto morto.",
+      "notEligible": "Seu saldo de $WOC ainda não alcança esse corcel.",
+      "summonedBanner": "Você invoca {name}.",
+      "summonAria": "Invocar {name}",
+      "dismountAria": "Desmontar {name}",
+      "lockedAria": "{name} — bloqueada; desbloqueia com {amount} $WOC",
+      "activeAria": "{name} — ativa no momento",
+      "cardAria": "{name}: {flavor}",
+      "owned": "Conquistada",
+      "mint": "Cunhar Carta",
+      "mintHint": "Cunhe uma Carta negociável para esta montaria — venda-a por ouro para que um não titular possa conquistá-la.",
+      "mintAria": "Cunhar uma Carta negociável para {name}",
+      "mintedBanner": "Você cunha uma Carta para {name}.",
+      "earnedBanner": "Você conquistou {name} — é sua para sempre.",
+      "alreadyOwnErr": "Você já possui essa montaria.",
+      "charterVoidErr": "Essa Carta é nula.",
+      "noCharterErr": "Nenhuma Carta pode ser cunhada para essa montaria.",
+      "holdingsShortErr": "Seu saldo não cobre essa montaria."
+    },
+    "course": {
+      "skytrials": "Provas Celestes",
+      "skytrialsHint": "Voe um percurso cronometrado de aros em uma montaria voadora.",
+      "needFlyer": "Invoque uma montaria voadora para voar as Provas Celestes.",
+      "start": "Voar",
+      "give_up": "Desistir",
+      "par": "Par {time}",
+      "laps": "{count} voltas",
+      "onePass": "1 volta",
+      "starting": "Atravesse o primeiro aro para iniciar o relógio",
+      "gate": "Aro {n}/{total}",
+      "lap": "Volta {n}/{total}",
+      "time": "Tempo",
+      "finish": "Concluído!",
+      "beatPar": "Superou o par em {time}",
+      "offPar": "{time} acima do par",
+      "failed": "Corrida encerrada — você deixou sua montaria",
+      "aborted": "Corrida abandonada",
+      "best": "Recorde {time}",
+      "newBest": "Novo recorde!",
+      "board": "Placar",
+      "boardTitle": "{name} — melhores tempos",
+      "noTimes": "Nenhum tempo ainda — seja o primeiro.",
+      "loadingBoard": "Carregando…",
+      "you": "(você)",
+      "race": "Corrida",
+      "racePartyHint": "Dispute com seu grupo — o primeiro a cruzar os aros vence.",
+      "getReady": "Prepare-se",
+      "go": "JÁ!",
+      "dnf": "NÃO TERMINOU",
+      "placeOf": "#{place} de {total}",
+      "racing": "Em corrida"
+    },
+    "wager": {
+      "start": "Corrida Apostada",
+      "title": "Corrida Apostada",
+      "inviteGold": "{name} abre uma Corrida Apostada — aposte {money} para entrar. Você cobre?",
+      "inviteCharter": "{name} abre uma Corrida Apostada — aposte {money} + uma Carta de Montaria. Você cobre?",
+      "accept": "Cobrir Aposta",
+      "pot": "Pote {money}",
+      "potCharter": "Pote {money} + {count}× Carta",
+      "racers": "Corredores ({count})",
+      "launch": "Largar Corrida",
+      "cancel": "Cancelar",
+      "leave": "Sair",
+      "waiting": "Aguardando um desafiante cobrir a aposta…",
+      "won": "Você vence a aposta — {money}!",
+      "wonCharter": "Você vence a aposta — {money} + {count}× Carta!",
+      "lost": "Você perdeu a aposta.",
+      "refunded": "Aposta cancelada — sua quantia é devolvida.",
+      "antePrompt": "Apostar quanto ouro nesta corrida? (em cobre)",
+      "open": "Abrir Aposta",
+      "stakeCharter": "Aposte também uma Carta de Montaria (o vencedor leva)",
+      "errCourse": "Esse percurso não pode ser apostado.",
+      "errFlyer": "Você precisa estar em uma montaria voadora para apostar.",
+      "errBusy": "Você já está em uma aposta.",
+      "errAnte": "Defina uma aposta de ao menos 1 cobre.",
+      "errStake": "Isso não pode ser apostado.",
+      "errAfford": "Você não pode cobrir essa aposta.",
+      "errExpired": "Essa oferta de aposta expirou.",
+      "errGone": "Essa aposta não está mais aberta.",
+      "errHost": "Apenas o anfitrião pode largar a aposta."
     },
     "options": {
       "gameMenu": "Menu do jogo",
@@ -5640,6 +5852,36 @@ export const pt_BR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Coroa do Monarca"
       },
+      "charter_ashmane": {
+        "name": "Carta: Corcel Crina-de-Cinza"
+      },
+      "charter_emberhoof": {
+        "name": "Carta: Investidor Casco-de-Brasa"
+      },
+      "charter_bronzeflank": {
+        "name": "Carta: Ginete Flanco-de-Bronze"
+      },
+      "charter_silvermane": {
+        "name": "Carta: Garanhão Crina-de-Prata"
+      },
+      "charter_stormhoof": {
+        "name": "Carta: Investidor Casco-de-Tempestade"
+      },
+      "charter_goldcrest": {
+        "name": "Carta: Andarilho-do-Céu Crista-Dourada"
+      },
+      "charter_verdant": {
+        "name": "Carta: Asa-Selvagem Verdejante"
+      },
+      "charter_voidstrider": {
+        "name": "Carta: Caminhante Asa-do-Vazio"
+      },
+      "charter_celestial": {
+        "name": "Carta: Serafim Celestial"
+      },
+      "charter_worldbearer": {
+        "name": "Carta: Roc do Porta-Mundos"
+      },
       "linen_pouch": {
         "name": "Bolsa de linho"
       },
@@ -6734,6 +6976,11 @@ export const pt_BR: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Vigia das Marés",
         "greeting": "O lago bebe o luar, {className}, e devolve os afogados. Vigio aquele portão há trinta noites — e esta noite ele está aberto."
+      },
+      "skytrial_master": {
+        "name": "Mestre-do-Céu Vael",
+        "title": "Guardião das Provas Celestes",
+        "greeting": "O céu é uma estrada que poucos ousam trilhar, {className}. Conquiste-o, e ele o carregará."
       }
     },
     "quests": {
@@ -7579,6 +7826,36 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vadeador de Glimmermere abatido"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "Primeiro Voo",
+        "text": "Você monta bem um corcel alado em terra firme, {playerName} — agora leve-o ao alto. Voe a Prova Celeste do Vale: oito aros em uma única passagem em curva. Não persiga o relógio ainda. Apenas mantenha-se no ar e atravesse cada aro.",
+        "completion": "Você não caiu. Isso é mais do que a maioria consegue na primeira volta. O céu lembra quem sempre retorna.",
+        "objectives": {
+          "0": {
+            "label": "Prova Celeste do Vale concluída"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Vença o Relógio",
+        "text": "Agora faça com propósito. Voe a Prova Celeste do Vale de novo, {playerName}, mas conclua antes que a areia se esgote. Uma linha limpa por cada aro, sem desperdiçar ar. Precisão, não pânico.",
+        "completion": "Uma linha limpa, de aro em aro. Você não está mais cavalgando o céu — está voando-o.",
+        "objectives": {
+          "0": {
+            "label": "Prova Celeste do Vale voada abaixo do tempo-padrão"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Ascendente",
+        "text": "Resta uma prova, {playerName}: o Circuito do Vale. Três voltas do aro longo, voadas abaixo do tempo-padrão — sem sorte, apenas perícia. Domine-o e o céu aberto é seu para reivindicar, de borda a borda.",
+        "completion": "Celeste e inquebrantável. O céu é seu agora, {playerName}. Tome esta carta — um corcel do ar, conquistado e não comprado, para carregá-lo aonde quer que pretenda ir.",
+        "objectives": {
+          "0": {
+            "label": "Circuito do Vale voado abaixo do tempo-padrão"
           }
         }
       }

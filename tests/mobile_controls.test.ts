@@ -492,6 +492,7 @@ function mobileCallbacks() {
     onBags: noop,
     onSpellbook: noop,
     onTalents: noop,
+    onMounts: noop,
     onMap: noop,
     onLeaderboard: noop,
     onNameplates: () => false,

@@ -29,6 +29,7 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
+  type CourseRunState,
   type Entity,
   type EquipSlot,
   emptyMoveInput,
@@ -67,13 +68,16 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  type MountTrialLeaderEntry,
   type OverheadEmoteId,
   type PartyInfo,
   type PlayerProfessionsView,
   type PresenceStatus,
+  type RaceInfo,
   type RaidLockout,
   type SocialInfo,
   type TradeInfo,
+  type WagerInfo,
 } from '../world_api';
 
 // ---------------------------------------------------------------------------
@@ -166,7 +170,7 @@ export interface AccountInfo {
 }
 
 // Carries the HTTP status alongside the server's error text so callers can
-// distinguish an auth failure (401/403 → clear the stored session) from a
+// distinguish an auth failure (401/403, clear the stored session) from a
 // transient 5xx/network blip (keep the token; the session may still be valid).
 export class ApiError extends Error {
   constructor(
@@ -181,6 +185,42 @@ export class ApiError extends Error {
 /** True for an auth-class failure where a stored token should be discarded. */
 export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 401 || err.status === 403);
+}
+
+// A server-issued $WOC payment quote (POST /api/identity/quote). Amounts are
+// base-unit decimal strings; priceWoc is the human-readable figure for display.
+export interface WocIdentityQuote {
+  quoteId: string;
+  memo: string;
+  mint: string;
+  decimals: number;
+  amountBase: string;
+  burnBase: string;
+  treasuryBase: string;
+  treasury: string | null;
+  burnBps: number;
+  priceWoc: number;
+  payer: string;
+  expiresAt: number;
+}
+
+// A player job contract ("paid bodyguard") as surfaced to the client's Jobs list.
+export interface JobSummary {
+  jobId: string;
+  role: 'payer' | 'helper';
+  payerName: string;
+  helperName: string;
+  currency: string;
+  amountBase: string;
+  amount: number;
+  milestone: { kind: string } & Record<string, unknown>;
+  milestoneText: string;
+  status: 'pending_deposit' | 'open' | 'active' | 'released' | 'refunded';
+  progress: 'pending' | 'completed' | 'voided';
+  reason: string | null;
+  deadlineSec: number;
+  depositSig: string | null;
+  settleSig: string | null;
 }
 
 export class Api {
@@ -635,6 +675,151 @@ export class Api {
     await this.delete('/api/github', {});
   }
 
+  // Resolve an in-game player name to the verified Solana wallet linked to their
+  // account, for sending tokens directly. Returns null when the player doesn't
+  // exist or has no verified wallet (so the send UI can show "not found"). The
+  // canonical-cased name is echoed back for display.
+  async resolveRecipient(name: string): Promise<{ name: string; pubkey: string } | null> {
+    const q = name.trim();
+    if (!q) return null;
+    try {
+      const res = await fetch(`${this.base}/api/wallet/resolve?name=${encodeURIComponent(q)}`, {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return typeof data?.pubkey === 'string'
+        ? { name: data.name ?? q, pubkey: data.pubkey }
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // ── Player job contracts ("paid bodyguard") ────────────────────────────────
+  // Post a job: returns the unsigned escrow-deposit transaction (base64) for the
+  // payer to sign + submit, plus the assigned job id.
+  async jobQuote(body: {
+    characterId: number;
+    helperName: string;
+    currency: string;
+    amount: number;
+    milestone: unknown;
+  }): Promise<{
+    jobId: string;
+    txBase64: string;
+    jobPda: string;
+    amountBase: string;
+    mint: string;
+    currency: string;
+    deadlineSec: number;
+  }> {
+    return this.post('/api/jobs/quote', body);
+  }
+
+  // Confirm the deposit landed (server verifies on-chain), opening the job.
+  async jobConfirm(jobId: string, signature: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/confirm`, { signature });
+  }
+
+  // The helper accepts an offered job; the server begins tracking the milestone.
+  async jobAccept(jobId: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/accept`, {});
+  }
+
+  // The payer cancels an unaccepted job → refund.
+  async jobCancel(jobId: string): Promise<{ status: string }> {
+    return this.post(`/api/jobs/${jobId}/cancel`, {});
+  }
+
+  // Jobs this character posted or was hired for (newest first). Best-effort.
+  async jobs(characterId: number): Promise<JobSummary[]> {
+    try {
+      const data = await this.get(
+        `/api/jobs?characterId=${encodeURIComponent(String(characterId))}`,
+      );
+      return Array.isArray(data.jobs) ? data.jobs : [];
+    } catch {
+      return [];
+    }
+  }
+
+  // ── $WOC paid identity actions (rename / guild rename / vanity reserve) ─────
+  // Public per-action prices in human-readable $WOC, for showing the cost up front.
+  async identityPrices(): Promise<{
+    rename_character: number;
+    rename_guild: number;
+    reserve_name: number;
+  }> {
+    return this.get('/api/identity/prices');
+  }
+
+  // Quote a burn price for an action. `body.kind` is one of
+  // 'rename_character' | 'rename_guild' | 'reserve_name'.
+  async identityQuote(body: {
+    kind: string;
+    characterId?: number;
+    name: string;
+  }): Promise<WocIdentityQuote> {
+    return this.post('/api/identity/quote', body);
+  }
+
+  // Redeem a paid quote with the on-chain signature. Reads the response directly
+  // (not through post()) because the caller needs the status + `reason` to drive
+  // the "wait for finalization" retry — post() collapses those into a message.
+  async identityConfirm(
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    return this.confirmRaw('/api/identity/confirm', quoteId, signature);
+  }
+
+  // ── SNS subdomain mint + tradeable-character claim (PR #735) ────────────────
+  // Quote the atomic burn + subdomain mint; returns a server-built, partial-signed
+  // transaction (base64) for the player to sign + submit.
+  async subdomainQuote(body: { characterId: number; name: string }): Promise<{
+    quoteId: string;
+    txBase64: string;
+    label: string;
+    fullDomain: string;
+    priceWoc: number;
+    payer: string;
+    expiresAt: number;
+  }> {
+    return this.post('/api/subdomain/quote', body);
+  }
+
+  async subdomainConfirm(
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    return this.confirmRaw('/api/subdomain/confirm', quoteId, signature);
+  }
+
+  // Claim a tradeable character whose subdomain your linked wallet now owns.
+  async claimCharacter(characterId: number): Promise<any> {
+    return this.post(`/api/characters/${characterId}/claim`, {});
+  }
+
+  // Shared confirm helper: surfaces status + `reason` so callers can poll for
+  // 'not_finalized' without post() collapsing the response into a message.
+  private async confirmRaw(
+    path: string,
+    quoteId: string,
+    signature: string,
+  ): Promise<{ ok: boolean; status: number; reason?: string; data: any }> {
+    const res = await fetch(this.base + path, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
+      body: JSON.stringify({ quoteId, signature }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, reason: data.reason, data };
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL
@@ -877,6 +1062,24 @@ export class ClientWorld implements IWorld {
   bags: (string | null)[] = [null, null, null, null];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  // $WOC holder mount summon-in-progress, mirrored from snapshot self (`mtc`) for
+  // the HUD's summon cast bar. Active mount + eligibility ride on the player
+  // Entity (mountId/mountTier), decoded in applyWire like skin/holderTier.
+  mountCast: { id: string; remaining: number; total: number } | null = null;
+  // Active mount-course run, mirrored from snapshot self (`crun`); drives the HUD
+  // course timer/gate overlay. Null when idle.
+  courseRun: CourseRunState | null = null;
+  // This character's best Skytrial run per course (ticks), mirrored from self
+  // (`tpb`); for the launcher's per-course best + "new best" feedback.
+  mountTrialBests: Record<string, number> = {};
+  // Live multi-racer race state, mirrored from self (`race`); drives the HUD race
+  // panel. Null when not racing.
+  raceInfo: RaceInfo | null = null;
+  // Live soft-currency wager lobby/pot state, mirrored from self (`wag`); drives
+  // the HUD wager panel. Null when not in a wager.
+  wagerInfo: WagerInfo | null = null;
+  // Permanently earned (Charter-redeemed) mount ids, mirrored from self (`eam`).
+  earnedMounts: string[] = [];
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
@@ -1325,6 +1528,7 @@ export class ClientWorld implements IWorld {
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
+        e.mountTier = w.mte ?? 0; // highest $WOC mount rung this player qualifies for (0-11)
         e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
         e.discordAvatar = typeof w.dav === 'string' ? w.dav : undefined; // Discord PFP (linked)
         e.discordName = typeof w.dnm === 'string' ? w.dnm : undefined; // Discord handle/nickname
@@ -1425,6 +1629,9 @@ export class ClientWorld implements IWorld {
       e.petTauntTimer = w.pt ?? 0;
       e.petAutoTaunt = !!w.pa;
       e.petManualTauntPending = false;
+      // $WOC holder mount (dynamic, conditional): absent ⇒ dismounted. The
+      // renderer attaches/removes the steed from this id (src/render/characters/mount.ts).
+      e.mountId = typeof w.mt === 'string' ? w.mt : undefined;
       // same semantics as `new Map(w.thr ?? [])` (absent thr = empty table), but
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
       e.threat.clear();
@@ -1561,6 +1768,18 @@ export class ClientWorld implements IWorld {
       e.drinking = s.drk
         ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
         : null;
+      // $WOC mount summon-in-progress (self-only, delta-sent: present while a
+      // summon cast runs, a final null when it ends, omitted otherwise). Guard on
+      // `undefined` per the delta invariant — an absent field means "unchanged".
+      if (s.mtc !== undefined) {
+        this.mountCast = s.mtc ? { id: s.mtc.id, remaining: s.mtc.rem, total: s.mtc.tot } : null;
+      }
+      // Active course run (delta-sent: present while running + a final null).
+      if (s.crun !== undefined) this.courseRun = s.crun ?? null;
+      if (s.tpb !== undefined) this.mountTrialBests = s.tpb ?? {};
+      if (s.race !== undefined) this.raceInfo = s.race ?? null;
+      if (s.wag !== undefined) this.wagerInfo = s.wag ?? null;
+      if (s.eam !== undefined) this.earnedMounts = s.eam ?? [];
       // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
       // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
       // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
@@ -1897,6 +2116,48 @@ export class ClientWorld implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  summonMount(mountId: string): void {
+    // No optimism on summon: the cast bar + final mounted state are
+    // server-authoritative (the server re-validates the wallet balance).
+    this.cmd({ cmd: 'summon_mount', mount: mountId });
+  }
+  dismissMount(): void {
+    // Clear the local summon bar at once (self-only state); the active mount
+    // itself is driven off the authoritative snapshot to avoid a re-mount flicker
+    // if a snapshot generated before the server processed this still carries `mt`.
+    this.mountCast = null;
+    this.cmd({ cmd: 'dismiss_mount' });
+  }
+  startCourse(courseId: string): void {
+    // Server-authoritative (re-validates flyer-only + eligibility); the run state
+    // arrives back on the next self snapshot as `crun`.
+    this.cmd({ cmd: 'start_course', course: courseId });
+  }
+  abortCourse(): void {
+    this.courseRun = null; // optimistic clear; the snapshot confirms
+    this.cmd({ cmd: 'abort_course' });
+  }
+  mintCharter(mountId: string): void {
+    this.cmd({ cmd: 'mint_charter', mount: mountId });
+  }
+  startRace(courseId: string): void {
+    this.cmd({ cmd: 'start_race', course: courseId });
+  }
+  proposeWagerRace(courseId: string, anteCopper: number, anteCharterId: string | null): void {
+    this.cmd({ cmd: 'wager_propose', course: courseId, ante: anteCopper, charter: anteCharterId });
+  }
+  wagerJoin(): void {
+    this.cmd({ cmd: 'wager_join' });
+  }
+  wagerDecline(): void {
+    this.cmd({ cmd: 'wager_decline' });
+  }
+  wagerLeave(): void {
+    this.cmd({ cmd: 'wager_leave' });
+  }
+  launchWagerRace(): void {
+    this.cmd({ cmd: 'wager_launch' });
   }
   unequipMechChroma(chromaId: string): void {
     const itemId = mechChromaItemId(chromaId);
@@ -2277,6 +2538,17 @@ export class ClientWorld implements IWorld {
       };
     } catch {
       return empty;
+    }
+  }
+  async mountTrialLeaderboard(trackId: string): Promise<MountTrialLeaderEntry[]> {
+    try {
+      const res = await fetch(
+        `${this.base}/api/leaderboard/mount-trial?trackId=${encodeURIComponent(trackId)}`,
+      );
+      if (!res.ok) return [];
+      return (await res.json()).leaders ?? [];
+    } catch {
+      return [];
     }
   }
   // Guild high-score board (REST GET, no wire command): ?board=guilds ranks

@@ -2742,6 +2742,99 @@ export const zh_TW: EnTranslations = {
       }
     }
   },
+  "walletPanel": {
+    "title": "錢包",
+    "closeAria": "關閉",
+    "notConnected": "錢包未連線",
+    "connect": "連接",
+    "connectedStatus": "已連接 {address}",
+    "linkedBadge": "已連結",
+    "tabSend": "轉帳",
+    "tabHire": "僱用",
+    "tabJobs": "委託",
+    "sendSection": "轉帳給玩家",
+    "currency": "貨幣",
+    "playerName": "玩家名稱",
+    "recipientPlaceholder": "你要轉給誰？",
+    "amount": "金額",
+    "amountPlaceholder": "0.0",
+    "max": "最大",
+    "balanceEmpty": "餘額: -",
+    "balanceLoading": "餘額: …",
+    "balanceUnavailable": "餘額: 無法取得",
+    "balance": "餘額: {amount}",
+    "balanceExceeds": "餘額: {amount}（超出餘額）",
+    "connectForBalance": "連接錢包以查看餘額。",
+    "sendNote": "在 Solana 上錢包對錢包直接轉帳。非託管: 遊戲絕不保管你的資金。需支付網路費用。",
+    "send": "傳送",
+    "sending": "傳送中…",
+    "loginToSend": "登入並進入世界後才能轉帳給玩家。",
+    "lookingUp": "正在尋找玩家…",
+    "ownWallet": "（這是你自己的錢包）",
+    "noVerifiedWallet": "沒有該名稱的玩家擁有已驗證的錢包。",
+    "approveTransfer": "請在錢包中核准轉帳…",
+    "sent": "已向{name}傳送 {amount} {currency}。",
+    "viewTransaction": "檢視交易",
+    "sendFailedWith": "傳送失敗: {message}",
+    "sendFailed": "傳送失敗。",
+    "hireSection": "僱用幫手",
+    "hireOffline": "上線進入世界後才能僱用幫手。",
+    "helperPlaceholder": "誰來幫你？",
+    "rewardCurrency": "報酬貨幣",
+    "reward": "報酬",
+    "goalLabel": "目標，伺服器確認後付款",
+    "goalReachLevel": "達到等級",
+    "goalClearDungeon": "通關團本",
+    "goalQuest": "任務",
+    "goalBodyguard": "保鑣",
+    "goalEscort": "護送",
+    "targetLevel": "目標等級",
+    "targetLevelPlaceholder": "2至20",
+    "raidDungeon": "團本 / 地下城",
+    "questOwn": "任務（你正在進行的）",
+    "noActiveQuests": "你沒有可以僱人幫忙的進行中任務，請先接一個任務。",
+    "protectMinutes": "保護我（分鐘）",
+    "minutesPlaceholder": "例如 10",
+    "escortDestination": "護送目的地",
+    "useCurrentSpot": "使用我的目前位置",
+    "destinationSet": "目的地已設定: ({x}, {z})",
+    "noDestination": "尚未設定目的地。",
+    "destinationHint": "目的地 ({x}, {z})，先離開，然後讓你的護衛把你帶回這裡。",
+    "hireLogin": "上線進入世界後才能僱用玩家。",
+    "escrowNote": "報酬會鎖定在鏈上託管中，伺服器確認目標後自動發放給幫手，若期限前未達成則退還給你。",
+    "post": "發布並鎖定報酬",
+    "posting": "發布中…",
+    "setGoalFirst": "請先設定有效的目標。",
+    "preparingEscrow": "正在準備託管…",
+    "approveDeposit": "請在錢包中核准報酬存入…",
+    "lockingReward": "正在鏈上鎖定報酬…",
+    "waitingFinalization": "等待最終確認…",
+    "confirmTimeout": "確認存款逾時。如果報酬已鎖定，最終確認後將自動結算。",
+    "jobPosted": "委託已發布: {amount} {currency} 已為{name}鎖定在託管中。",
+    "postFailed": "發布委託失敗。",
+    "failedWith": "失敗: {message}",
+    "jobsSection": "你的委託",
+    "loading": "載入中…",
+    "jobsOffline": "上線進入世界後才能管理委託。",
+    "jobsEmpty": "還沒有委託。使用僱用分頁付錢請玩家幫忙。",
+    "youHired": "你僱用了{name}",
+    "hiredYou": "{name}僱用了你",
+    "acceptJob": "接受委託",
+    "cancelRefund": "取消並退款",
+    "viewPayout": "檢視支付",
+    "actionFailed": "操作失敗。",
+    "status": {
+      "awaitingDeposit": "等待你的存款",
+      "offered": "已向你發出，接受即可開始",
+      "open": "開放中，等待幫手接受",
+      "active": "進行中",
+      "completed": "已完成，幫手已獲付款",
+      "expired": "已過期，已退款",
+      "failedDied": "失敗（你死亡了），已退款",
+      "cancelled": "已取消，已退款",
+      "refunded": "已退款"
+    }
+  },
   "playerCard": {
     "shareButton": "分享玩家卡",
     "title": "玩家卡",
@@ -3460,6 +3553,12 @@ export const zh_TW: EnTranslations = {
     "renameRequired": "需要更名",
     "delete": "刪除",
     "rename": "更名",
+    "renamePaidButton": "支付 {amount} $WOC 並改名",
+    "renamePriceHint": "自願改名將銷毀 {amount} $WOC。",
+    "renameCancel": "取消",
+    "mintSolName": "取得 .sol 名稱",
+    "mintSolButton": "銷毀 {amount} $WOC 並鑄造",
+    "mintSolHint": "以 {amount} $WOC 鑄造玩家自有的‹名稱›.worldofclaudecraft.sol，鏈上歸你所有。",
     "newNamePlaceholder": "新角色名稱",
     "tabCharacters": "角色",
     "tabCreate": "建立",
@@ -3474,6 +3573,19 @@ export const zh_TW: EnTranslations = {
     "sortName": "名稱",
     "sortRecent": "最近遊玩",
     "sortPlaytime": "遊戲時間"
+  },
+  "woc": {
+    "linkWalletFirst": "連接並綁定 Solana 錢包後即可用 $WOC 支付。",
+    "quoting": "正在準備 $WOC 支付…",
+    "approveBurn": "請在錢包中批准銷毀 {amount} $WOC…",
+    "confirming": "正在鏈上確認銷毀…",
+    "finalizing": "等待 Solana 最終確認…",
+    "confirmFailed": "無法驗證 $WOC 支付。",
+    "finalizeTimeout": "等待最終確認逾時。如果 $WOC 已銷毀，請重新開啟並重試：支付將在最終確認後結算。",
+    "renameSuccess": "已改名為 {name}。",
+    "mintSuccess": "已鑄造 {domain}，鏈上歸你所有。",
+    "guildRenameSuccess": "公會已改名為 {name}。",
+    "reserveSuccess": "已預留名稱 {name}。"
   },
   "deleteCharacter": {
     "title": "刪除角色",
@@ -3628,6 +3740,106 @@ export const zh_TW: EnTranslations = {
       "zoomOut": "縮小",
       "mapCanvasLabel": "地圖",
       "mapSummary": "{zone}的地圖。"
+    },
+    "mounts": {
+      "title": "坐騎",
+      "subtitle": "$WOC 旅行坐騎",
+      "close": "關閉坐騎",
+      "summon": "召喚",
+      "dismount": "下騎",
+      "summoning": "正在召喚{name}…",
+      "riding": "騎乘中",
+      "flies": "可飛行",
+      "locked": "未解鎖",
+      "speed": "+{percent}% 速度",
+      "unlockAt": "持有 {amount} $WOC 即解鎖",
+      "supplyShare": "供應量的 {percent}",
+      "qualifyHeader": "你符合 {total} 匹旅行坐騎中的 {count} 匹資格。",
+      "holdingHint": "持有 {amount} $WOC。",
+      "noWallet": "在綁定錢包上至少持有 {amount} $WOC（供應量的 0.1%），以贏得你的第一匹旅行坐騎。",
+      "cantInCombat": "戰鬥中無法騎乘。",
+      "cantSwimming": "游泳時無法騎乘。",
+      "cantDead": "死亡時無法騎乘。",
+      "notEligible": "你的 $WOC 持有量尚未達到那匹戰駒。",
+      "summonedBanner": "你召喚了{name}。",
+      "summonAria": "召喚{name}",
+      "dismountAria": "從{name}下騎",
+      "lockedAria": "{name} — 未解鎖；持有 {amount} $WOC 即解鎖",
+      "activeAria": "{name} — 目前使用中",
+      "cardAria": "{name}：{flavor}",
+      "owned": "已擁有",
+      "mint": "鑄造憑證",
+      "mintHint": "為這匹坐騎鑄造一份可交易的憑證 — 賣出換取金幣，讓非持有者也能贏得牠。",
+      "mintAria": "為{name}鑄造一份可交易的憑證",
+      "mintedBanner": "你為{name}鑄造了一份憑證。",
+      "earnedBanner": "你已贏得{name} — 牠永遠屬於你。",
+      "alreadyOwnErr": "你已擁有那匹坐騎。",
+      "charterVoidErr": "那份憑證已作廢。",
+      "noCharterErr": "那匹坐騎無法鑄造憑證。",
+      "holdingsShortErr": "你的持有量不足以涵蓋那匹坐騎。"
+    },
+    "course": {
+      "skytrials": "天試",
+      "skytrialsHint": "騎乘飛行坐騎，飛越計時的光環賽道。",
+      "needFlyer": "召喚一匹飛行坐騎以挑戰天試。",
+      "start": "起飛",
+      "give_up": "放棄",
+      "par": "基準 {time}",
+      "laps": "{count} 圈",
+      "onePass": "1 圈",
+      "starting": "飛越第一個光環以開始計時",
+      "gate": "光環 {n}/{total}",
+      "lap": "第 {n}/{total} 圈",
+      "time": "時間",
+      "finish": "完成！",
+      "beatPar": "快於基準 {time}",
+      "offPar": "慢於基準 {time}",
+      "failed": "挑戰結束 — 你離開了坐騎",
+      "aborted": "挑戰放棄",
+      "best": "最佳 {time}",
+      "newBest": "最佳紀錄！",
+      "board": "排行榜",
+      "boardTitle": "{name} — 最佳時間",
+      "noTimes": "尚無紀錄 — 成為第一人。",
+      "loadingBoard": "載入中…",
+      "you": "（你）",
+      "race": "競速",
+      "racePartyHint": "與你的隊伍競速 — 率先穿越光環者勝出。",
+      "getReady": "準備就緒",
+      "go": "出發！",
+      "dnf": "未完成",
+      "placeOf": "第 {place} 名／共 {total} 名",
+      "racing": "競速中"
+    },
+    "wager": {
+      "start": "賭注競速",
+      "title": "賭注競速",
+      "inviteGold": "{name}開設了一場賭注競速 — 下注 {money} 即可加入。要應戰嗎？",
+      "inviteCharter": "{name}開設了一場賭注競速 — 下注 {money} 加一份坐騎憑證即可加入。要應戰嗎？",
+      "accept": "應下賭注",
+      "pot": "彩池 {money}",
+      "potCharter": "彩池 {money} + {count}× 憑證",
+      "racers": "參賽者（{count}）",
+      "launch": "發動競速",
+      "cancel": "取消",
+      "leave": "離開",
+      "waiting": "等待挑戰者跟注…",
+      "won": "你贏得賭注 — {money}！",
+      "wonCharter": "你贏得賭注 — {money} + {count}× 憑證！",
+      "lost": "你輸掉了賭注。",
+      "refunded": "賭注取消 — 你的注金已退還。",
+      "antePrompt": "這場競速要下注多少金幣？（以銅幣計）",
+      "open": "開設賭注",
+      "stakeCharter": "同時押上一份坐騎憑證（贏家全拿）",
+      "errCourse": "那條賽道無法下注。",
+      "errFlyer": "你必須騎乘飛行坐騎才能下注。",
+      "errBusy": "你已身處一場賭注之中。",
+      "errAnte": "下注至少 1 銅幣。",
+      "errStake": "那無法作為賭注押上。",
+      "errAfford": "你無法支付那筆賭注。",
+      "errExpired": "那份賭注邀約已過期。",
+      "errGone": "那場賭注已不再開放。",
+      "errHost": "只有主辦者能發動賭注。"
     },
     "options": {
       "gameMenu": "遊戲選單",
@@ -5640,6 +5852,36 @@ export const zh_TW: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主之冠"
       },
+      "charter_ashmane": {
+        "name": "憑證：灰鬃疾行駒"
+      },
+      "charter_emberhoof": {
+        "name": "憑證：燼蹄衝鋒駒"
+      },
+      "charter_bronzeflank": {
+        "name": "憑證：銅脅戰駒"
+      },
+      "charter_silvermane": {
+        "name": "憑證：銀鬃駿馬"
+      },
+      "charter_stormhoof": {
+        "name": "憑證：暴蹄衝鋒駒"
+      },
+      "charter_goldcrest": {
+        "name": "憑證：金冠掠空駒"
+      },
+      "charter_verdant": {
+        "name": "憑證：碧翠野翼"
+      },
+      "charter_voidstrider": {
+        "name": "憑證：虛翼行者"
+      },
+      "charter_celestial": {
+        "name": "憑證：天界熾天使"
+      },
+      "charter_worldbearer": {
+        "name": "憑證：負世巨鵬"
+      },
       "linen_pouch": {
         "name": "亞麻小袋"
       },
@@ -6734,6 +6976,11 @@ export const zh_TW: EnTranslations = {
         "name": "翁德瑞爾·韋恩",
         "title": "守潮者",
         "greeting": "湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。"
+      },
+      "skytrial_master": {
+        "name": "天空大師維爾",
+        "title": "天試守護者",
+        "greeting": "天空是條少有人敢踏上的路，{className}。贏得它，它便會承載你。"
       }
     },
     "quests": {
@@ -7579,6 +7826,36 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "微光湖涉者已被擊殺"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "初次飛行",
+        "text": "你在地面上騎著有翼戰駒已夠穩了，{playerName} — 現在讓牠升空。飛越谷地天試：一趟環繞的飛行，八個光環。先別追逐計時，只要保持滯空，穿過每一個光環。",
+        "completion": "你沒有墜落。在第一趟環繞就能做到這點的人不多。天空記得那些不斷回來的人。",
+        "objectives": {
+          "0": {
+            "label": "完成谷地天試"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "與時間賽跑",
+        "text": "現在帶著意圖再來一次。再飛一趟谷地天試，{playerName}，但要在沙漏流盡前完成。乾淨俐落地穿過每一個光環，不浪費一絲氣流。要精準，別慌亂。",
+        "completion": "一氣呵成，環環相扣。你不再只是駕馭天空 — 你正在飛翔。",
+        "objectives": {
+          "0": {
+            "label": "於標準時間內飛完谷地天試"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "登天者",
+        "text": "只剩一項試煉，{playerName}：谷地環道。繞行長環三圈，於標準時間內飛完 — 不靠運氣，只憑技藝。征服它，廣闊天空便任你縱橫，從天際的一端到另一端。",
+        "completion": "登天而不折。如今天空屬於你了，{playerName}。收下這份憑證 — 一匹御風的戰駒，憑本事贏來而非買來，載你前往任何你心之所向的地方。",
+        "objectives": {
+          "0": {
+            "label": "於標準時間內飛完谷地環道"
           }
         }
       }

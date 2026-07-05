@@ -12,7 +12,11 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type { GuildLeaderboardEntry, LeaderboardEntry } from '../src/world_api';
+import type {
+  GuildLeaderboardEntry,
+  LeaderboardEntry,
+  MountTrialLeaderEntry,
+} from '../src/world_api';
 import {
   handleAccount2faDisable,
   handleAccount2faEnable,
@@ -45,12 +49,19 @@ import {
   verifyPassword,
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import { buybackReady, runBuybackBurn } from './buyback';
+import {
+  accountControlsBoundCharacter,
+  handleCharacterClaim,
+  registerClaimHooks,
+} from './character_claim';
 import { characterSheet, type SheetRank } from './character_sheet';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
   accountAndScopeForToken,
   accountById,
   accountForToken,
+  activeReservationHolder,
   type CharacterRow,
   characterCountsByRealm,
   chatMuteStatusForAccount,
@@ -72,6 +83,7 @@ import {
   listCharacters,
   listCompanionTokens,
   loadAccountCosmetics,
+  loadMountTrialTimes,
   moderationStatusForAccount,
   pool,
   primarySlugForAccount,
@@ -89,6 +101,7 @@ import {
   topArenaRatings,
   topGuilds,
   topLifetimeXp,
+  topMountTrialTimes,
   touchLogin,
 } from './db';
 import {
@@ -182,10 +195,12 @@ import {
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
+  handleWalletResolve,
   handleWalletUnlink,
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { CHARACTER_TRADEABLE, USDC_DECIMALS, WOC_DECIMALS } from './woc_config';
 import { bufferHandshakeMessages } from './ws_buffer';
 
 const PORT = Number(process.env.PORT ?? 8787);
@@ -294,6 +309,30 @@ async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEnt
     return await refreshLeaderboard(scope);
   } catch (err) {
     console.error(`leaderboard refresh failed (${scope}):`, err);
+    return cached?.entries ?? [];
+  }
+}
+
+// Per-track Skytrial leaderboard cache: same compute-once/serve-from-memory
+// pattern, keyed by track id (a player asks for one track at a time).
+const mountTrialCache = new Map<string, { at: number; entries: MountTrialLeaderEntry[] }>();
+
+async function getMountTrialLeaderboard(trackId: string): Promise<MountTrialLeaderEntry[]> {
+  const cached = mountTrialCache.get(trackId);
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
+  try {
+    const rows = await topMountTrialTimes(trackId, LEADERBOARD_SIZE);
+    const entries: MountTrialLeaderEntry[] = rows.map((r, i) => ({
+      rank: i + 1,
+      name: r.name,
+      cls: r.class,
+      level: r.level,
+      ticks: r.bestTicks,
+    }));
+    mountTrialCache.set(trackId, { at: Date.now(), entries });
+    return entries;
+  } catch (err) {
+    console.error(`mount-trial leaderboard refresh failed (${trackId}):`, err);
     return cached?.entries ?? [];
   }
 }
@@ -967,7 +1006,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     const delMatch = /^\/api\/characters\/(\d+)$/.exec(url);
     const renameMatch = /^\/api\/characters\/(\d+)\/rename$/.exec(url);
     const takeoverMatch = /^\/api\/characters\/(\d+)\/takeover$/.exec(url);
+    const claimMatch = /^\/api\/characters\/(\d+)\/claim$/.exec(url);
     const standingMatch = /^\/api\/characters\/(\d+)\/standing$/.exec(url);
+    if (req.method === 'POST' && claimMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleCharacterClaim(req, res, accountId, Number(claimMatch[1]));
+    }
     if (req.method === 'GET' && standingMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -985,15 +1030,21 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const characterId = Number(renameMatch[1]);
       const character = await getCharacter(accountId, characterId);
       if (!character) return json(res, 404, { error: 'character not found' });
-      // A rename is a moderator-sanctioned action: the character-select UI only
-      // shows the rename control when a moderator has set force_rename. The UI is
-      // not a security boundary, so gate here too: a normal owner hitting this
-      // route directly must not be able to rename an un-flagged character. (The
-      // UPDATE in renameCharacter re-checks the flag race-free; this returns a
-      // clear 403 instead of a misleading 404.)
+      // This endpoint serves only the FREE, moderator-required rename (clearing
+      // force_rename). A voluntary rename is a $WOC sink: route it through
+      // POST /api/identity/quote + /confirm instead, so it can't be done for free
+      // here. (402 Payment Required signals the client to start the paid flow.)
       if (!character.force_rename) {
-        return json(res, 403, { error: 'character rename is not permitted' });
+        return json(res, 402, {
+          error: 'voluntary renames cost $WOC, use /api/identity/quote',
+          paid: true,
+        });
       }
+      // A reserved name is takeable only by the account that reserved it: even
+      // on the free remediation path, a player can't grab someone else's name.
+      const holder = await activeReservationHolder(name);
+      if (holder !== null && holder !== accountId)
+        return json(res, 409, { error: 'that name is reserved' });
       // A rename mutates the DB name and clears force_rename, but a live
       // ClientSession keeps its own copy of the name (used by reports, chat and
       // /api/status). Renaming an online character desyncs that copy and — worse
@@ -1260,6 +1311,19 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const page = Number(params.get('page')) || 0;
       const slice = paginateLeaderboard(entries, page, pageSize);
       return json(res, 200, { realm: REALM, scope, metric: 'lifetimeXp', ...slice });
+    }
+    if (req.method === 'GET' && url === '/api/leaderboard/mount-trial') {
+      // realm-scoped Skytrial time-trial board for one track, fastest first,
+      // served from the per-track in-memory cache. ?trackId=<course id>.
+      const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
+      const trackId = (params.get('trackId') ?? '').slice(0, 64);
+      if (!trackId) return json(res, 400, { error: 'trackId required' });
+      const limit = Math.max(
+        1,
+        Math.min(LEADERBOARD_SIZE, Number(params.get('limit')) || LEADERBOARD_SIZE),
+      );
+      const entries = await getMountTrialLeaderboard(trackId);
+      return json(res, 200, { realm: REALM, trackId, leaders: entries.slice(0, limit) });
     }
     if (req.method === 'GET' && url === '/api/releases') {
       recordUsageMetric('github.releases.api');
@@ -1769,6 +1833,7 @@ async function main(): Promise<void> {
   await game.loadMail();
   await game.loadChatFilter();
   await game.loadBlockedIps();
+  await game.loadJobs();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
     .then((count) => recordSitePresenceSample(count))
@@ -1809,6 +1874,16 @@ async function main(): Promise<void> {
       .then(() => game.disconnectBlockedSessions('Connection to the server was lost.'))
       .catch((err) => console.error('blocked IP refresh failed:', err));
   }, BLOCKED_IP_REFRESH_MS).unref();
+  // Buyback-and-burn keeper cadence (off unless BUYBACK_ENABLED + keeper set).
+  // Fixed interval, no discretionary timing: every cycle is on-chain + logged.
+  if (buybackReady()) {
+    const intervalMs = Number(process.env.BUYBACK_INTERVAL_MS ?? 6 * 3600 * 1000);
+    setInterval(() => {
+      void runBuybackBurn()
+        .then((r) => console.log('[buyback]', r.status))
+        .catch((err) => console.error('[buyback] cycle failed:', err));
+    }, intervalMs).unref();
+  }
   // keep both leaderboard caches warm so the first viewer never waits on the
   // query and it never recomputes per request (PR-3)
   const warmLeaderboards = () => {
@@ -1925,6 +2000,23 @@ async function main(): Promise<void> {
       ws.close();
       return;
     }
+    // Tradeable-character gate: a bound character can only enter the world while
+    // the account's linked wallet still controls its subdomain on-chain. If the
+    // name was sold/transferred, the new owner must claim it first.
+    if (
+      CHARACTER_TRADEABLE &&
+      character.bound_domain &&
+      !(await accountControlsBoundCharacter(accountId, character.bound_domain))
+    ) {
+      ws.send(
+        JSON.stringify({
+          t: 'error',
+          error: 'This character was transferred to a new owner and must be re-claimed.',
+        }),
+      );
+      ws.close();
+      return;
+    }
     const chatMute = await chatMuteStatusForAccount(accountId);
     // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
     // is handled inside game.join(); this guard blocks egregious bot farms before
@@ -1946,6 +2038,7 @@ async function main(): Promise<void> {
       return;
     }
     const accountCosmetics = await loadAccountCosmetics(accountId);
+    const mountTrialBests = await loadMountTrialTimes(character.id);
     const result = game.join(
       ws,
       accountId,
@@ -1965,6 +2058,7 @@ async function main(): Promise<void> {
         isAdmin,
         adminPermissions,
         clientSeed,
+        mountTrialBests,
       },
     );
     if ('error' in result) {

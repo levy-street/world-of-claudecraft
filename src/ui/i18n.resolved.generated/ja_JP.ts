@@ -2742,6 +2742,99 @@ export const ja_JP: EnTranslations = {
       }
     }
   },
+  "walletPanel": {
+    "title": "ウォレット",
+    "closeAria": "閉じる",
+    "notConnected": "ウォレット未接続",
+    "connect": "接続",
+    "connectedStatus": "接続済み {address}",
+    "linkedBadge": "リンク済み",
+    "tabSend": "送金",
+    "tabHire": "雇用",
+    "tabJobs": "依頼",
+    "sendSection": "プレイヤーに送金",
+    "currency": "通貨",
+    "playerName": "プレイヤー名",
+    "recipientPlaceholder": "誰に送りますか？",
+    "amount": "金額",
+    "amountPlaceholder": "0.0",
+    "max": "最大",
+    "balanceEmpty": "残高: -",
+    "balanceLoading": "残高: …",
+    "balanceUnavailable": "残高: 取得できません",
+    "balance": "残高: {amount}",
+    "balanceExceeds": "残高: {amount}（残高超過）",
+    "connectForBalance": "残高を見るにはウォレットを接続してください。",
+    "sendNote": "Solana上でウォレット間で直接送金されます。非カストディアル: ゲームが資金を預かることはありません。ネットワーク手数料がかかります。",
+    "send": "送金",
+    "sending": "送金中…",
+    "loginToSend": "プレイヤーに送金するにはログインしてワールドに入ってください。",
+    "lookingUp": "プレイヤーを検索中…",
+    "ownWallet": "（これはあなた自身のウォレットです）",
+    "noVerifiedWallet": "その名前のプレイヤーには認証済みウォレットがありません。",
+    "approveTransfer": "ウォレットで送金を承認してください…",
+    "sent": "{name}に{amount} {currency}を送金しました。",
+    "viewTransaction": "トランザクションを見る",
+    "sendFailedWith": "送金失敗: {message}",
+    "sendFailed": "送金に失敗しました。",
+    "hireSection": "ヘルパーを雇う",
+    "hireOffline": "ヘルパーを雇うにはオンラインでワールドに入ってください。",
+    "helperPlaceholder": "誰に手伝ってもらいますか？",
+    "rewardCurrency": "報酬通貨",
+    "reward": "報酬",
+    "goalLabel": "目標、サーバーが確認すると支払われます",
+    "goalReachLevel": "レベル到達",
+    "goalClearDungeon": "レイド攻略",
+    "goalQuest": "クエスト",
+    "goalBodyguard": "ボディガード",
+    "goalEscort": "護衛",
+    "targetLevel": "目標レベル",
+    "targetLevelPlaceholder": "2から20",
+    "raidDungeon": "レイド / ダンジョン",
+    "questOwn": "クエスト（受注中のもの）",
+    "noActiveQuests": "手伝いを頼める進行中のクエストがありません。まず受注してください。",
+    "protectMinutes": "護衛時間（分）",
+    "minutesPlaceholder": "例: 10",
+    "escortDestination": "護衛の目的地",
+    "useCurrentSpot": "現在地を使う",
+    "destinationSet": "目的地設定済み: ({x}, {z})",
+    "noDestination": "目的地はまだ設定されていません。",
+    "destinationHint": "目的地 ({x}, {z})、移動した後、ガードにここへ連れ戻してもらいましょう。",
+    "hireLogin": "プレイヤーを雇うにはオンラインでワールドに入ってください。",
+    "escrowNote": "報酬はオンチェーンのエスクローにロックされ、サーバーが目標を確認すると自動的にヘルパーへ支払われます。期限までに達成されなければあなたに返金されます。",
+    "post": "報酬を投稿してロック",
+    "posting": "投稿中…",
+    "setGoalFirst": "まず有効な目標を設定してください。",
+    "preparingEscrow": "エスクローを準備中…",
+    "approveDeposit": "ウォレットで報酬の入金を承認してください…",
+    "lockingReward": "報酬をオンチェーンでロック中…",
+    "waitingFinalization": "ファイナライズを待機中…",
+    "confirmTimeout": "入金の確認がタイムアウトしました。報酬がロック済みの場合は、ファイナライズ後に確定します。",
+    "jobPosted": "依頼を投稿しました: {amount} {currency}を{name}のためにエスクローにロックしました。",
+    "postFailed": "依頼の投稿に失敗しました。",
+    "failedWith": "失敗: {message}",
+    "jobsSection": "あなたの依頼",
+    "loading": "読み込み中…",
+    "jobsOffline": "依頼を管理するにはオンラインでワールドに入ってください。",
+    "jobsEmpty": "まだ依頼はありません。雇用タブでプレイヤーに手伝いを依頼しましょう。",
+    "youHired": "{name}を雇いました",
+    "hiredYou": "{name}があなたを雇いました",
+    "acceptJob": "依頼を受ける",
+    "cancelRefund": "キャンセルして返金",
+    "viewPayout": "支払いを見る",
+    "actionFailed": "操作に失敗しました。",
+    "status": {
+      "awaitingDeposit": "あなたの入金待ち",
+      "offered": "あなたへの依頼、受けると開始します",
+      "open": "公開中、ヘルパーの承諾待ち",
+      "active": "進行中",
+      "completed": "完了、ヘルパーに支払い済み",
+      "expired": "期限切れ、返金済み",
+      "failedDied": "失敗（あなたが死亡）、返金済み",
+      "cancelled": "キャンセル、返金済み",
+      "refunded": "返金済み"
+    }
+  },
   "playerCard": {
     "shareButton": "プレイヤーカードを共有",
     "title": "プレイヤーカード",
@@ -3460,6 +3553,12 @@ export const ja_JP: EnTranslations = {
     "renameRequired": "名前変更が必要",
     "delete": "削除",
     "rename": "名前変更",
+    "renamePaidButton": "{amount} $WOCを支払って改名",
+    "renamePriceHint": "任意の改名は{amount} $WOCをバーンします。",
+    "renameCancel": "キャンセル",
+    "mintSolName": ".sol名を取得",
+    "mintSolButton": "{amount} $WOCをバーンしてミント",
+    "mintSolHint": "プレイヤー所有の‹名前›.worldofclaudecraft.solを{amount} $WOCでミント。オンチェーンであなたのものに。",
     "newNamePlaceholder": "新しいキャラクター名",
     "tabCharacters": "キャラクター",
     "tabCreate": "作成",
@@ -3474,6 +3573,19 @@ export const ja_JP: EnTranslations = {
     "sortName": "名前",
     "sortRecent": "最近プレイ",
     "sortPlaytime": "プレイ時間"
+  },
+  "woc": {
+    "linkWalletFirst": "$WOCで支払うにはSolanaウォレットを接続してリンクしてください。",
+    "quoting": "$WOC支払いを準備中…",
+    "approveBurn": "ウォレットで{amount} $WOCのバーンを承認してください…",
+    "confirming": "オンチェーンでバーンを確認中…",
+    "finalizing": "Solanaのファイナライズを待機中…",
+    "confirmFailed": "$WOC支払いを確認できませんでした。",
+    "finalizeTimeout": "ファイナライズ待ちがタイムアウトしました。$WOCがバーン済みの場合は再度開いてやり直してください。支払いはファイナライズ後に確定します。",
+    "renameSuccess": "{name}に改名しました。",
+    "mintSuccess": "{domain}をミントしました。オンチェーンであなたのものです。",
+    "guildRenameSuccess": "ギルド名を{name}に変更しました。",
+    "reserveSuccess": "{name}の名前を予約しました。"
   },
   "deleteCharacter": {
     "title": "キャラクターを削除",
@@ -3628,6 +3740,106 @@ export const ja_JP: EnTranslations = {
       "zoomOut": "ズームアウト",
       "mapCanvasLabel": "マップ",
       "mapSummary": "{zone}のマップ。"
+    },
+    "mounts": {
+      "title": "マウント",
+      "subtitle": "$WOC 旅の駿馬",
+      "close": "マウントを閉じる",
+      "summon": "召喚",
+      "dismount": "降りる",
+      "summoning": "{name}を召喚中…",
+      "riding": "騎乗中",
+      "flies": "飛行可能",
+      "locked": "未解放",
+      "speed": "+{percent}% 速度",
+      "unlockAt": "{amount} $WOC で解放",
+      "supplyShare": "総供給量の{percent}",
+      "qualifyHeader": "あなたは{total}体中{count}体の旅マウントの資格を満たしています。",
+      "holdingHint": "{amount} $WOC を保有中。",
+      "noWallet": "連携した財布で少なくとも{amount} $WOC、総供給量の0.1%を保有して、最初の旅マウントを手に入れましょう。",
+      "cantInCombat": "戦闘中は騎乗できません。",
+      "cantSwimming": "水泳中は騎乗できません。",
+      "cantDead": "死亡中は騎乗できません。",
+      "notEligible": "あなたの $WOC 保有量はまだその駿馬に届きません。",
+      "summonedBanner": "{name}を召喚した。",
+      "summonAria": "{name}を召喚",
+      "dismountAria": "{name}から降りる",
+      "lockedAria": "{name} — 未解放。{amount} $WOC で解放",
+      "activeAria": "{name} — 現在使用中",
+      "cardAria": "{name}: {flavor}",
+      "owned": "所有済み",
+      "mint": "チャーターを発行",
+      "mintHint": "このマウントの取引可能なチャーターを打ち出す — ゴールドで売れば、非保有者がそれを手に入れられます。",
+      "mintAria": "{name}の取引可能なチャーターを発行",
+      "mintedBanner": "{name}のチャーターを打ち出した。",
+      "earnedBanner": "{name}を獲得した — 永久にあなたのものだ。",
+      "alreadyOwnErr": "そのマウントはすでに所有しています。",
+      "charterVoidErr": "そのチャーターは無効です。",
+      "noCharterErr": "そのマウントにはチャーターを打ち出せません。",
+      "holdingsShortErr": "あなたの保有量ではそのマウントに届きません。"
+    },
+    "course": {
+      "skytrials": "スカイトライアル",
+      "skytrialsHint": "飛行マウントでタイム制のリングコースを飛びます。",
+      "needFlyer": "スカイトライアルを飛ぶには飛行マウントを召喚してください。",
+      "start": "飛ぶ",
+      "give_up": "あきらめる",
+      "par": "基準タイム {time}",
+      "laps": "{count}周",
+      "onePass": "1周",
+      "starting": "最初のリングを通り抜けて計測を開始",
+      "gate": "リング {n}/{total}",
+      "lap": "ラップ {n}/{total}",
+      "time": "タイム",
+      "finish": "フィニッシュ！",
+      "beatPar": "基準タイムを {time}短縮",
+      "offPar": "基準タイムから {time} 遅れ",
+      "failed": "走行終了 — マウントを離れました",
+      "aborted": "走行を放棄しました",
+      "best": "ベスト {time}",
+      "newBest": "自己ベスト更新！",
+      "board": "ボード",
+      "boardTitle": "{name} — トップタイム",
+      "noTimes": "まだ記録がありません — 最初の一人になろう。",
+      "loadingBoard": "読み込み中…",
+      "you": "(あなた)",
+      "race": "レース",
+      "racePartyHint": "パーティと競争 — 最初にリングを抜けた者が勝つ。",
+      "getReady": "準備せよ",
+      "go": "GO!",
+      "dnf": "リタイア",
+      "placeOf": "{total}人中 #{place}位",
+      "racing": "レース中"
+    },
+    "wager": {
+      "start": "賭けレース",
+      "title": "賭けレース",
+      "inviteGold": "{name}が賭けレースを開いた — 参加には{money}を賭ける。応じるか？",
+      "inviteCharter": "{name}が賭けレースを開いた — {money}＋マウントチャーターを賭ける。応じるか？",
+      "accept": "賭けに応じる",
+      "pot": "賞金 {money}",
+      "potCharter": "賞金{money}＋チャーター{count}×",
+      "racers": "レーサー（{count}）",
+      "launch": "レース開始",
+      "cancel": "キャンセル",
+      "leave": "退出",
+      "waiting": "賭けに応じる挑戦者を待っています…",
+      "won": "賭けに勝った — {money}！",
+      "wonCharter": "賭けに勝った — {money}＋チャーター{count}×！",
+      "lost": "賭けに負けた。",
+      "refunded": "賭けは取りやめ — あなたの賭け金は返還された。",
+      "antePrompt": "このレースにゴールドをいくら賭けますか？（カッパー単位）",
+      "open": "賭けを開く",
+      "stakeCharter": "マウントチャーターも賭ける（勝者が獲得）",
+      "errCourse": "そのコースでは賭けられません。",
+      "errFlyer": "賭けるには飛行マウントに乗っていなければなりません。",
+      "errBusy": "あなたはすでに賭けの最中です。",
+      "errAnte": "少なくとも1カッパーの賭けを指定してください。",
+      "errStake": "それは賭けに出せません。",
+      "errAfford": "その賭けを賄えません。",
+      "errExpired": "その賭けの申し出は期限切れです。",
+      "errGone": "その賭けはもう開かれていません。",
+      "errHost": "賭けを開始できるのはホストのみです。"
     },
     "options": {
       "gameMenu": "ゲームメニュー",
@@ -5640,6 +5852,36 @@ export const ja_JP: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主の王冠"
       },
+      "charter_ashmane": {
+        "name": "チャーター：灰鬣の駿馬アッシュメイン"
+      },
+      "charter_emberhoof": {
+        "name": "チャーター：燃蹄の軍馬エンバーフーフ"
+      },
+      "charter_bronzeflank": {
+        "name": "チャーター：青銅脇の戦馬ブロンズフランク"
+      },
+      "charter_silvermane": {
+        "name": "チャーター：銀鬣の牡馬シルバーメイン"
+      },
+      "charter_stormhoof": {
+        "name": "チャーター：嵐蹄の軍馬ストームフーフ"
+      },
+      "charter_goldcrest": {
+        "name": "チャーター：金冠の天駆けゴールドクレスト"
+      },
+      "charter_verdant": {
+        "name": "チャーター：翠緑の野翼ヴァーダント"
+      },
+      "charter_voidstrider": {
+        "name": "チャーター：虚空翼の闊歩者ヴォイドウィング"
+      },
+      "charter_celestial": {
+        "name": "チャーター：天上の熾天セレスティアル"
+      },
+      "charter_worldbearer": {
+        "name": "チャーター：世界を背負う大鷲ワールドベアラー"
+      },
       "linen_pouch": {
         "name": "亜麻のポーチ"
       },
@@ -6734,6 +6976,11 @@ export const ja_JP: EnTranslations = {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
         "greeting": "この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。"
+      },
+      "skytrial_master": {
+        "name": "スカイマスター・ヴァエル",
+        "title": "スカイトライアルの守護者",
+        "greeting": "空とは、あえて歩もうとする者の少ない道だ、{className}よ。それを勝ち取れば、空がお前を運んでくれる。"
       }
     },
     "quests": {
@@ -7579,6 +7826,36 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "煌めき沼の渡り手を討伐した"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "初飛行",
+        "text": "お前は地上では翼ある駿馬をそれなりに乗りこなしている、{playerName}よ — さあ、それを空へ上げてみせろ。ヴェイル・スカイトライアルを飛ぶのだ。ひと巡りの周回で八つのリングを抜ける。まだタイムを追うな。ただ空に留まり、すべてのリングを糸のように通り抜けよ。",
+        "completion": "落ちなかったな。初めての周回でそれをやり遂げる者はそう多くない。空は、何度も戻ってくる者を覚えている。",
+        "objectives": {
+          "0": {
+            "label": "ヴェイル・スカイトライアル完走"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "時計を打ち破れ",
+        "text": "今度は意志をもってやり遂げろ。もう一度ヴェイル・スカイトライアルを飛ぶのだ、{playerName}よ。だが砂が尽きる前に飛び終えよ。すべてのリングを貫く一筋の澄んだ軌道、無駄な空気は一切なし。慌てるな、精密にやれ。",
+        "completion": "リングからリングへ、一筋の澄んだ軌道。お前はもう空に乗っているのではない — 空を飛んでいるのだ。",
+        "objectives": {
+          "0": {
+            "label": "ヴェイル・スカイトライアルを規定タイム以内で飛行"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "天翔ける者",
+        "text": "残る試練はただ一つ、{playerName}よ。ヴェイル・サーキットだ。長きリングを三周、規定タイム以内で飛び切れ — 運ではなく、ただ技だけで。それを極めれば、果てから果てまで、広き空はお前のものだ。",
+        "completion": "天高く、揺るぎなく。空は今やお前のものだ、{playerName}よ。このチャーターを取れ — 買ったのではなく勝ち取った空の駿馬、お前が目指すどこへでもお前を運ぶだろう。",
+        "objectives": {
+          "0": {
+            "label": "ヴェイル・サーキットを規定タイム以内で飛行"
           }
         }
       }

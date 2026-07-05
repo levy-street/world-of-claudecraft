@@ -34,6 +34,7 @@ export type UiIconName =
   // brand mark
   | 'discord'
   | 'chest'
+  | 'mount'
   // hand-authored geometrics
   | 'close'
   | 'prev'
@@ -102,6 +103,10 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored: a unit nameplate — name bar over a health bar, with a
   // downward pointer aimed at the unit it floats above.
   nameplates: '<path d="M88 132h336v68H88zM88 220h336v56H88zM236 296h40l-20 34z"/>',
+  // hand-authored: a horseshoe (downward-opening arch + two nail holes) — reads
+  // as "mount/steed" without needing a fiddly horse-head outline.
+  mount:
+    '<path d="M156 412V236a100 100 0 0 1 200 0v176" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="156" cy="392" r="13"/><circle cx="356" cy="392" r="13"/>',
   whisper:
     '<path fill-rule="evenodd" d="M48 112h416a16 16 0 0 1 16 16v256a16 16 0 0 1-16 16H48a16 16 0 0 1-16-16V128a16 16 0 0 1 16-16zM72 152 256 292 440 152z"/>',
   music:

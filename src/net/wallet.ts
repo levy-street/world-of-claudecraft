@@ -4,20 +4,48 @@
 //
 // Lives in src/net/ and is never imported by src/sim/: the deterministic core
 // stays free of network/wallet dependencies.
+//
+// Wallet connection is Wallet Standard; on-chain transfers/burns (sendTokens,
+// payWocBurn, signAndSubmitServerTx) build the transaction with @solana/web3.js
+// and have the connected wallet sign it via the SolanaSignTransaction feature,
+// then submit through our own RPC so $WOC lands on mainnet regardless of the
+// wallet's selected network.
+import './wallet-polyfill';
+import {
+  createAssociatedTokenAccountIdempotentInstruction,
+  createBurnCheckedInstruction,
+  createTransferCheckedInstruction,
+  getAssociatedTokenAddressSync,
+} from '@solana/spl-token';
+import { isSolanaChain } from '@solana/wallet-standard-chains';
+import {
+  SolanaSignMessage,
+  type SolanaSignMessageFeature,
+  SolanaSignTransaction,
+  type SolanaSignTransactionFeature,
+} from '@solana/wallet-standard-features';
+import {
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js';
 import { getWallets, type Wallets } from '@wallet-standard/app';
 import type { Wallet, WalletAccount, WalletIcon } from '@wallet-standard/base';
 import {
   StandardConnect,
-  StandardDisconnect,
-  StandardEvents,
   type StandardConnectFeature,
+  StandardDisconnect,
   type StandardDisconnectFeature,
+  StandardEvents,
   type StandardEventsChangeProperties,
   type StandardEventsFeature,
 } from '@wallet-standard/features';
-import { isSolanaChain } from '@solana/wallet-standard-chains';
-import { SolanaSignMessage, type SolanaSignMessageFeature } from '@solana/wallet-standard-features';
 import bs58 from 'bs58';
+import { Buffer } from 'buffer';
+import { parseAmountToBase } from './wallet_amount';
 
 export interface WalletState {
   address: string | null;
@@ -32,7 +60,10 @@ export interface WalletOption {
 }
 
 type CompatibleWallet = Wallet & StandardConnectFeature & SolanaSignMessageFeature;
-type WalletPicker = (wallets: readonly WalletOption[], selectedId: string | null) => Promise<string | null>;
+type WalletPicker = (
+  wallets: readonly WalletOption[],
+  selectedId: string | null,
+) => Promise<string | null>;
 type ConnectApi = StandardConnectFeature[typeof StandardConnect];
 type DisconnectApi = StandardDisconnectFeature[typeof StandardDisconnect];
 type EventsApi = StandardEventsFeature[typeof StandardEvents];
@@ -108,11 +139,13 @@ function connectFeature(wallet: CompatibleWallet): ConnectApi {
 }
 
 function disconnectFeature(wallet: Wallet): DisconnectApi | null {
-  return hasDisconnectFeature(wallet) ? wallet.features[StandardDisconnect] as DisconnectApi : null;
+  return hasDisconnectFeature(wallet)
+    ? (wallet.features[StandardDisconnect] as DisconnectApi)
+    : null;
 }
 
 function eventsFeature(wallet: Wallet): EventsApi | null {
-  return hasEventsFeature(wallet) ? wallet.features[StandardEvents] as EventsApi : null;
+  return hasEventsFeature(wallet) ? (wallet.features[StandardEvents] as EventsApi) : null;
 }
 
 function signMessageFeature(wallet: CompatibleWallet): SignMessageApi {
@@ -124,7 +157,10 @@ function accountSupportsSolanaSignMessage(account: WalletAccount): boolean {
 }
 
 function walletSupportsSolana(wallet: Wallet): boolean {
-  return wallet.chains.some(isSolanaChain) || wallet.accounts.some((account) => account.chains.some(isSolanaChain));
+  return (
+    wallet.chains.some(isSolanaChain) ||
+    wallet.accounts.some((account) => account.chains.some(isSolanaChain))
+  );
 }
 
 function isCompatibleWallet(wallet: Wallet): wallet is CompatibleWallet {
@@ -136,7 +172,10 @@ function compatibleWallets(): CompatibleWallet[] {
   return registry?.get().filter(isCompatibleWallet) ?? [];
 }
 
-function chooseAccount(wallet: CompatibleWallet, accounts: readonly WalletAccount[] = wallet.accounts): WalletAccount | null {
+function chooseAccount(
+  wallet: CompatibleWallet,
+  accounts: readonly WalletAccount[] = wallet.accounts,
+): WalletAccount | null {
   return accounts.find(accountSupportsSolanaSignMessage) ?? null;
 }
 
@@ -156,7 +195,11 @@ function setPickerOpen(open: boolean): void {
   for (const cb of modalListeners) cb(open);
 }
 
-function setSelected(wallet: CompatibleWallet | null, account: WalletAccount | null, persist: boolean): void {
+function setSelected(
+  wallet: CompatibleWallet | null,
+  account: WalletAccount | null,
+  persist: boolean,
+): void {
   const previousAddress = selectedAccount?.address ?? null;
   selectedWallet = wallet;
   selectedAccount = account;
@@ -201,8 +244,11 @@ function findWallet(id: string): CompatibleWallet | null {
 function selectAuthorizedWallet(): boolean {
   const storedName = readStoredWalletName();
   const wallets = compatibleWallets();
-  const storedWallet = storedName ? wallets.find((wallet) => wallet.name === storedName) ?? null : null;
-  const walletWithAccount = storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
+  const storedWallet = storedName
+    ? (wallets.find((wallet) => wallet.name === storedName) ?? null)
+    : null;
+  const walletWithAccount =
+    storedWallet ?? wallets.find((wallet) => chooseAccount(wallet) !== null) ?? null;
   if (!walletWithAccount) return false;
   const account = chooseAccount(walletWithAccount);
   attachSelectedWalletEvents(walletWithAccount);
@@ -225,7 +271,8 @@ function trySilentReconnect(): void {
     return;
   }
   selectedWallet = wallet;
-  connectFeature(wallet).connect({ silent: true })
+  connectFeature(wallet)
+    .connect({ silent: true })
     .then((result) => {
       if (selectedWallet !== wallet) return;
       setSelected(wallet, chooseAccount(wallet, result.accounts), true);
@@ -239,7 +286,10 @@ function attachRegistryEvents(): void {
   if (!registry || registryOff || registryUnregisterOff) return;
   registryOff = registry.on('register', (...wallets) => {
     const currentId = selectedWallet ? walletId(selectedWallet) : null;
-    if (currentId && wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))) {
+    if (
+      currentId &&
+      wallets.some((wallet) => wallet.name === currentId && isCompatibleWallet(wallet))
+    ) {
       trySilentReconnect();
     } else if (!selectedAccount) {
       selectAuthorizedWallet();
@@ -355,8 +405,10 @@ export async function signMessageBase58(message: string): Promise<string> {
   const messageBytes = new TextEncoder().encode(message);
   const results = await signMessageFeature(wallet).signMessage({ account, message: messageBytes });
   const result = results[0];
-  if (!result || !(result.signature instanceof Uint8Array)) throw new Error('wallet returned an invalid signature');
-  if (!bytesEqual(result.signedMessage, messageBytes)) throw new Error('wallet modified the message before signing');
+  if (!result || !(result.signature instanceof Uint8Array))
+    throw new Error('wallet returned an invalid signature');
+  if (!bytesEqual(result.signedMessage, messageBytes))
+    throw new Error('wallet modified the message before signing');
   return bs58.encode(result.signature);
 }
 
@@ -379,4 +431,252 @@ export async function fetchWocBalance(owner: string, fresh = false): Promise<num
     console.error('[wallet] $WOC balance read failed', err);
     return null;
   }
+}
+
+// ── On-chain transfers + burns (player economy) ──────────────────────────────
+// The connected wallet only SIGNS; we submit the signed transaction to the $WOC
+// mainnet RPC ourselves so the transfer/burn lands there regardless of which
+// network the wallet UI happens to be set to. The $WOC SPL mint and the RPC
+// endpoint are overridable via env; defaults are the published mainnet values.
+const WOC_MINT = String(
+  import.meta.env.VITE_WOC_MINT ?? '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth',
+).trim();
+const USDC_MINT = String(
+  import.meta.env.VITE_USDC_MINT ?? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+).trim();
+const WOC_DECIMALS = Number(import.meta.env.VITE_WOC_DECIMALS ?? 6) || 6;
+const SOLANA_RPC = String(
+  import.meta.env.VITE_SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com',
+).trim();
+// SPL Memo program (v2). A burn tx carries the quoteId as a memo so the server
+// can bind the on-chain payment to the account + action it quoted.
+const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+
+let connection: Connection | null = null;
+function getConnection(): Connection {
+  if (!connection) connection = new Connection(SOLANA_RPC, 'confirmed');
+  return connection;
+}
+
+// Resolve the chain identifier the wallet should sign for. The transaction is
+// always built for $WOC mainnet, so prefer the account's mainnet chain.
+function solanaSignChain(): `solana:${string}` {
+  const chain = selectedAccount?.chains.find(isSolanaChain);
+  return (chain as `solana:${string}` | undefined) ?? 'solana:mainnet';
+}
+
+function hasSignTransactionFeature(
+  wallet: Wallet,
+): wallet is Wallet & SolanaSignTransactionFeature {
+  return SolanaSignTransaction in wallet.features;
+}
+
+/**
+ * Sign a built (legacy) transaction with the connected wallet via the Wallet
+ * Standard SolanaSignTransaction feature and return the signed wire bytes. The
+ * wallet does not submit; the caller broadcasts through our RPC.
+ */
+async function signTransactionBytes(tx: Transaction): Promise<Uint8Array> {
+  const wallet = selectedWallet;
+  const account = selectedAccount;
+  if (!wallet || !account) throw new Error('connect a wallet first');
+  if (!hasSignTransactionFeature(wallet)) throw new Error('this wallet cannot sign transactions');
+  const feature = wallet.features[
+    SolanaSignTransaction
+  ] as SolanaSignTransactionFeature[typeof SolanaSignTransaction];
+  const wire = tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+  const [result] = await feature.signTransaction({
+    account,
+    transaction: new Uint8Array(wire),
+    chain: solanaSignChain(),
+  });
+  if (!result?.signedTransaction) throw new Error('wallet returned no signed transaction');
+  return result.signedTransaction;
+}
+
+export type TransferCurrency = 'WOC' | 'SOL' | 'USDC';
+
+interface CurrencyInfo {
+  label: string;
+  decimals: number;
+  mint: string | null;
+}
+// `mint: null` marks the native SOL path (System transfer); the others are SPL.
+const CURRENCIES: Record<TransferCurrency, CurrencyInfo> = {
+  WOC: { label: '$WOC', decimals: WOC_DECIMALS, mint: WOC_MINT },
+  SOL: { label: 'SOL', decimals: 9, mint: null },
+  USDC: { label: 'USDC', decimals: 6, mint: USDC_MINT },
+};
+
+/** Display label + decimal precision for a sendable currency (for the UI). */
+export function currencyInfo(currency: TransferCurrency): { label: string; decimals: number } {
+  const c = CURRENCIES[currency];
+  return { label: c.label, decimals: c.decimals };
+}
+
+/**
+ * Read the connected wallet's balance for a sendable currency (uiAmount), or
+ * null on RPC failure so the UI can omit it. SOL is the native lamport balance;
+ * SPL currencies sum across the owner's token accounts for the mint.
+ */
+export async function fetchBalance(
+  currency: TransferCurrency,
+  owner: string,
+): Promise<number | null> {
+  try {
+    const ownerKey = new PublicKey(owner);
+    const info = CURRENCIES[currency];
+    if (!info.mint) {
+      const lamports = await getConnection().getBalance(ownerKey, 'confirmed');
+      return lamports / LAMPORTS_PER_SOL;
+    }
+    const res = await getConnection().getParsedTokenAccountsByOwner(ownerKey, {
+      mint: new PublicKey(info.mint),
+    });
+    let total = 0;
+    for (const { account } of res.value) {
+      const amount = account.data.parsed?.info?.tokenAmount?.uiAmount;
+      if (typeof amount === 'number') total += amount;
+    }
+    return total;
+  } catch (err) {
+    console.error(`[wallet] ${currency} balance read failed`, err);
+    return null;
+  }
+}
+
+/**
+ * Send `amount` (human units) of `currency` from the connected wallet to
+ * `recipient`, directly on-chain and non-custodially. SOL is a System transfer;
+ * SPL currencies create the recipient's associated token account if it doesn't
+ * exist yet (the sender funds the rent) and use transferChecked. The wallet only
+ * signs; we submit to the $WOC mainnet RPC. Returns the confirmed signature.
+ */
+export async function sendTokens(
+  currency: TransferCurrency,
+  recipient: string,
+  amount: string,
+): Promise<string> {
+  const address = currentWallet().address;
+  if (!address) throw new Error('connect a wallet first');
+
+  const owner = new PublicKey(address);
+  const to = new PublicKey(recipient);
+  const info = CURRENCIES[currency];
+  const base = parseAmountToBase(amount, info.decimals);
+
+  const ixs: TransactionInstruction[] = [];
+  if (!info.mint) {
+    ixs.push(SystemProgram.transfer({ fromPubkey: owner, toPubkey: to, lamports: base }));
+  } else {
+    const mint = new PublicKey(info.mint);
+    const ownerAta = getAssociatedTokenAddressSync(mint, owner);
+    const toAta = getAssociatedTokenAddressSync(mint, to);
+    // Create the recipient's token account if it doesn't exist (no-op when it
+    // does); the sender funds the rent. Then the checked transfer.
+    ixs.push(createAssociatedTokenAccountIdempotentInstruction(owner, toAta, to, mint));
+    ixs.push(createTransferCheckedInstruction(ownerAta, mint, toAta, owner, base, info.decimals));
+  }
+
+  const conn = getConnection();
+  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('finalized');
+  const tx = new Transaction({ feePayer: owner, blockhash, lastValidBlockHeight });
+  tx.add(...ixs);
+
+  const signed = await signTransactionBytes(tx);
+  const signature = await conn.sendRawTransaction(signed);
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
+}
+
+// ── $WOC payments (burn) ─────────────────────────────────────────────────────
+// What the server's /api/identity/quote hands back. Amounts are base-unit
+// decimal strings (they can exceed Number.MAX_SAFE_INTEGER), parsed to BigInt
+// here. `memo` MUST be included verbatim in the tx so the server can match it.
+export interface WocBurnQuote {
+  mint: string;
+  decimals: number;
+  amountBase: string;
+  burnBase: string;
+  treasuryBase: string;
+  treasury: string | null;
+  memo: string;
+}
+
+/**
+ * Build, sign, and submit the $WOC payment for an identity quote: burn the
+ * burn-portion, transfer the treasury-portion (if any), and attach the quote's
+ * memo, in one transaction. Returns the confirmed signature, which the caller
+ * hands to /api/identity/confirm. The wallet only signs; we submit to the $WOC
+ * mainnet RPC so the burn lands there regardless of the wallet's selected
+ * network.
+ */
+export async function payWocBurn(quote: WocBurnQuote): Promise<string> {
+  const address = currentWallet().address;
+  if (!address) throw new Error('connect a wallet first');
+
+  const owner = new PublicKey(address);
+  const mint = new PublicKey(quote.mint);
+  const ownerAta = getAssociatedTokenAddressSync(mint, owner);
+  const burnBase = BigInt(quote.burnBase);
+  const treasuryBase = BigInt(quote.treasuryBase);
+
+  const ixs: TransactionInstruction[] = [];
+  if (burnBase > 0n) {
+    ixs.push(createBurnCheckedInstruction(ownerAta, mint, owner, burnBase, quote.decimals));
+  }
+  if (treasuryBase > 0n && quote.treasury) {
+    const treasury = new PublicKey(quote.treasury);
+    const treasuryAta = getAssociatedTokenAddressSync(mint, treasury);
+    // Create the treasury's $WOC token account if it doesn't exist yet (no-op
+    // when it already does); the payer funds the rent.
+    ixs.push(createAssociatedTokenAccountIdempotentInstruction(owner, treasuryAta, treasury, mint));
+    ixs.push(
+      createTransferCheckedInstruction(
+        ownerAta,
+        mint,
+        treasuryAta,
+        owner,
+        treasuryBase,
+        quote.decimals,
+      ),
+    );
+  }
+  // Memo last: binds this payment to the server-issued quote.
+  ixs.push(
+    new TransactionInstruction({
+      programId: MEMO_PROGRAM_ID,
+      keys: [],
+      data: Buffer.from(quote.memo, 'utf8'),
+    }),
+  );
+
+  const conn = getConnection();
+  const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash('finalized');
+  const tx = new Transaction({ feePayer: owner, blockhash, lastValidBlockHeight });
+  tx.add(...ixs);
+
+  const signed = await signTransactionBytes(tx);
+  const signature = await conn.sendRawTransaction(signed);
+  // Wait for confirmation so the follow-up /confirm doesn't immediately 409 on
+  // an unfinalized tx (the server still independently re-verifies finality).
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
+}
+
+/**
+ * Sign and submit a server-built, already-partial-signed transaction (base64),
+ * used for the atomic burn + SNS subdomain mint where the execution wallet has
+ * pre-signed some instructions and the player adds the remaining signature.
+ * Returns the confirmed signature for /api/subdomain/confirm.
+ */
+export async function signAndSubmitServerTx(txBase64: string): Promise<string> {
+  const tx = Transaction.from(Buffer.from(txBase64, 'base64'));
+  const conn = getConnection();
+  const signed = await signTransactionBytes(tx);
+  const signature = await conn.sendRawTransaction(signed);
+  const blockhash = tx.recentBlockhash!;
+  const lastValidBlockHeight = tx.lastValidBlockHeight ?? (await conn.getBlockHeight()) + 150;
+  await conn.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, 'confirmed');
+  return signature;
 }

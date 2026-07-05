@@ -2742,6 +2742,99 @@ export const zh_CN: EnTranslations = {
       }
     }
   },
+  "walletPanel": {
+    "title": "钱包",
+    "closeAria": "关闭",
+    "notConnected": "钱包未连接",
+    "connect": "连接",
+    "connectedStatus": "已连接 {address}",
+    "linkedBadge": "已链接",
+    "tabSend": "转账",
+    "tabHire": "雇佣",
+    "tabJobs": "委托",
+    "sendSection": "转账给玩家",
+    "currency": "货币",
+    "playerName": "玩家名称",
+    "recipientPlaceholder": "你要转给谁？",
+    "amount": "金额",
+    "amountPlaceholder": "0.0",
+    "max": "最大",
+    "balanceEmpty": "余额: -",
+    "balanceLoading": "余额: …",
+    "balanceUnavailable": "余额: 不可用",
+    "balance": "余额: {amount}",
+    "balanceExceeds": "余额: {amount}（超出余额）",
+    "connectForBalance": "连接钱包以查看余额。",
+    "sendNote": "在 Solana 上钱包对钱包直接转账。非托管: 游戏绝不保管你的资金。需支付网络费用。",
+    "send": "发送",
+    "sending": "发送中…",
+    "loginToSend": "登录并进入世界后才能给玩家转账。",
+    "lookingUp": "正在查找玩家…",
+    "ownWallet": "（这是你自己的钱包）",
+    "noVerifiedWallet": "没有该名称的玩家拥有已验证的钱包。",
+    "approveTransfer": "请在钱包中批准转账…",
+    "sent": "已向{name}发送 {amount} {currency}。",
+    "viewTransaction": "查看交易",
+    "sendFailedWith": "发送失败: {message}",
+    "sendFailed": "发送失败。",
+    "hireSection": "雇佣帮手",
+    "hireOffline": "在线进入世界后才能雇佣帮手。",
+    "helperPlaceholder": "谁来帮你？",
+    "rewardCurrency": "报酬货币",
+    "reward": "报酬",
+    "goalLabel": "目标，服务器确认后付款",
+    "goalReachLevel": "达到等级",
+    "goalClearDungeon": "通关团本",
+    "goalQuest": "任务",
+    "goalBodyguard": "保镖",
+    "goalEscort": "护送",
+    "targetLevel": "目标等级",
+    "targetLevelPlaceholder": "2至20",
+    "raidDungeon": "团本 / 地下城",
+    "questOwn": "任务（你正在进行的）",
+    "noActiveQuests": "你没有可以雇人帮忙的进行中任务，请先接一个任务。",
+    "protectMinutes": "保护我（分钟）",
+    "minutesPlaceholder": "例如 10",
+    "escortDestination": "护送目的地",
+    "useCurrentSpot": "使用我的当前位置",
+    "destinationSet": "目的地已设置: ({x}, {z})",
+    "noDestination": "尚未设置目的地。",
+    "destinationHint": "目的地 ({x}, {z})，先离开，然后让你的护卫把你带回这里。",
+    "hireLogin": "在线进入世界后才能雇佣玩家。",
+    "escrowNote": "报酬会锁定在链上托管中，服务器确认目标后自动发放给帮手，若期限前未达成则退还给你。",
+    "post": "发布并锁定报酬",
+    "posting": "发布中…",
+    "setGoalFirst": "请先设置有效的目标。",
+    "preparingEscrow": "正在准备托管…",
+    "approveDeposit": "请在钱包中批准报酬存入…",
+    "lockingReward": "正在链上锁定报酬…",
+    "waitingFinalization": "等待最终确认…",
+    "confirmTimeout": "确认存款超时。如果报酬已锁定，最终确认后将自动结算。",
+    "jobPosted": "委托已发布: {amount} {currency} 已为{name}锁定在托管中。",
+    "postFailed": "发布委托失败。",
+    "failedWith": "失败: {message}",
+    "jobsSection": "你的委托",
+    "loading": "加载中…",
+    "jobsOffline": "在线进入世界后才能管理委托。",
+    "jobsEmpty": "还没有委托。使用雇佣标签页付钱请玩家帮忙。",
+    "youHired": "你雇佣了{name}",
+    "hiredYou": "{name}雇佣了你",
+    "acceptJob": "接受委托",
+    "cancelRefund": "取消并退款",
+    "viewPayout": "查看支付",
+    "actionFailed": "操作失败。",
+    "status": {
+      "awaitingDeposit": "等待你的存款",
+      "offered": "已向你发出，接受即可开始",
+      "open": "开放中，等待帮手接受",
+      "active": "进行中",
+      "completed": "已完成，帮手已获付款",
+      "expired": "已过期，已退款",
+      "failedDied": "失败（你死亡了），已退款",
+      "cancelled": "已取消，已退款",
+      "refunded": "已退款"
+    }
+  },
   "playerCard": {
     "shareButton": "分享玩家卡",
     "title": "玩家卡",
@@ -3460,6 +3553,12 @@ export const zh_CN: EnTranslations = {
     "renameRequired": "需要改名",
     "delete": "删除",
     "rename": "改名",
+    "renamePaidButton": "支付 {amount} $WOC 并改名",
+    "renamePriceHint": "自愿改名将销毁 {amount} $WOC。",
+    "renameCancel": "取消",
+    "mintSolName": "获取 .sol 名称",
+    "mintSolButton": "销毁 {amount} $WOC 并铸造",
+    "mintSolHint": "以 {amount} $WOC 铸造玩家自有的‹名称›.worldofclaudecraft.sol，链上归你所有。",
     "newNamePlaceholder": "新角色名称",
     "tabCharacters": "角色",
     "tabCreate": "创建",
@@ -3474,6 +3573,19 @@ export const zh_CN: EnTranslations = {
     "sortName": "名称",
     "sortRecent": "最近游玩",
     "sortPlaytime": "游戏时长"
+  },
+  "woc": {
+    "linkWalletFirst": "连接并绑定 Solana 钱包后即可用 $WOC 支付。",
+    "quoting": "正在准备 $WOC 支付…",
+    "approveBurn": "请在钱包中批准销毁 {amount} $WOC…",
+    "confirming": "正在链上确认销毁…",
+    "finalizing": "等待 Solana 最终确认…",
+    "confirmFailed": "无法验证 $WOC 支付。",
+    "finalizeTimeout": "等待最终确认超时。如果 $WOC 已销毁，请重新打开并重试：支付将在最终确认后结算。",
+    "renameSuccess": "已改名为 {name}。",
+    "mintSuccess": "已铸造 {domain}，链上归你所有。",
+    "guildRenameSuccess": "公会已改名为 {name}。",
+    "reserveSuccess": "已预留名称 {name}。"
   },
   "deleteCharacter": {
     "title": "删除角色",
@@ -3628,6 +3740,106 @@ export const zh_CN: EnTranslations = {
       "zoomOut": "缩小",
       "mapCanvasLabel": "地图",
       "mapSummary": "{zone}的地图。"
+    },
+    "mounts": {
+      "title": "坐骑",
+      "subtitle": "$WOC 旅行坐骑",
+      "close": "关闭坐骑",
+      "summon": "召唤",
+      "dismount": "下骑",
+      "summoning": "正在召唤 {name}…",
+      "riding": "骑乘中",
+      "flies": "可飞行",
+      "locked": "已锁定",
+      "speed": "速度 +{percent}%",
+      "unlockAt": "持有 {amount} $WOC 即可解锁",
+      "supplyShare": "供应量的 {percent}",
+      "qualifyHeader": "你已符合 {total} 种旅行坐骑中的 {count} 种。",
+      "holdingHint": "持有 {amount} $WOC。",
+      "noWallet": "在已绑定的钱包中持有至少 {amount} $WOC（供应量的 0.1%），即可赢得你的第一匹旅行坐骑。",
+      "cantInCombat": "战斗中无法上骑。",
+      "cantSwimming": "游泳时无法上骑。",
+      "cantDead": "死亡时无法上骑。",
+      "notEligible": "你的 $WOC 持有量尚不足以驾驭那匹坐骑。",
+      "summonedBanner": "你召唤了 {name}。",
+      "summonAria": "召唤 {name}",
+      "dismountAria": "从 {name} 上下骑",
+      "lockedAria": "{name} — 已锁定；持有 {amount} $WOC 即可解锁",
+      "activeAria": "{name} — 当前已激活",
+      "cardAria": "{name}: {flavor}",
+      "owned": "已拥有",
+      "mint": "铸造凭证",
+      "mintHint": "为这匹坐骑铸造一张可交易的凭证——卖出换取金币，让未持有者也能赢得它。",
+      "mintAria": "为 {name} 铸造一张可交易的凭证",
+      "mintedBanner": "你为 {name} 铸造了一张凭证。",
+      "earnedBanner": "你已赢得 {name} — 它将永远归你所有。",
+      "alreadyOwnErr": "你已经拥有那匹坐骑。",
+      "charterVoidErr": "那张凭证已作废。",
+      "noCharterErr": "那匹坐骑无法铸造凭证。",
+      "holdingsShortErr": "你的持有量不足以驾驭那匹坐骑。"
+    },
+    "course": {
+      "skytrials": "天试",
+      "skytrialsHint": "骑乘飞行坐骑飞过限时圆环赛道。",
+      "needFlyer": "召唤一匹飞行坐骑来飞越天试。",
+      "start": "起飞",
+      "give_up": "放弃",
+      "par": "基准 {time}",
+      "laps": "{count} 圈",
+      "onePass": "1 圈",
+      "starting": "穿过第一个圆环开始计时",
+      "gate": "圆环 {n}/{total}",
+      "lap": "第 {n}/{total} 圈",
+      "time": "时间",
+      "finish": "完成！",
+      "beatPar": "快出基准 {time}",
+      "offPar": "慢于基准 {time}",
+      "failed": "本轮结束 — 你离开了坐骑",
+      "aborted": "本轮已放弃",
+      "best": "最佳 {time}",
+      "newBest": "新纪录！",
+      "board": "榜单",
+      "boardTitle": "{name} — 最快用时",
+      "noTimes": "暂无成绩 — 来当第一个。",
+      "loadingBoard": "正在加载…",
+      "you": "（你）",
+      "race": "比赛",
+      "racePartyHint": "与你的队伍竞速 — 最先穿过圆环者获胜。",
+      "getReady": "准备就绪",
+      "go": "开始！",
+      "dnf": "未完成",
+      "placeOf": "第 {place} 名 / 共 {total}",
+      "racing": "竞速中"
+    },
+    "wager": {
+      "start": "赌注竞速",
+      "title": "赌注竞速",
+      "inviteGold": "{name} 发起了一场赌注竞速 — 押 {money} 入场。要应战吗？",
+      "inviteCharter": "{name} 发起了一场赌注竞速 — 押 {money} + 一张坐骑凭证。要应战吗？",
+      "accept": "应下赌注",
+      "pot": "奖池 {money}",
+      "potCharter": "彩池 {money} + {count}× 凭证",
+      "racers": "参赛者（{count}）",
+      "launch": "开赛",
+      "cancel": "取消",
+      "leave": "离开",
+      "waiting": "正在等待挑战者应下赌注…",
+      "won": "你赢得了赌注 — {money}！",
+      "wonCharter": "你赢得了赌注 — {money} + {count}× 凭证！",
+      "lost": "你输掉了赌注。",
+      "refunded": "赌注已取消 — 你的押注已退回。",
+      "antePrompt": "为这场竞速押多少金币？（以铜币计）",
+      "open": "开设赌注",
+      "stakeCharter": "同时押上一张坐骑凭证（胜者通吃）",
+      "errCourse": "那条赛道不可用于赌注。",
+      "errFlyer": "你必须骑乘飞行坐骑才能下注。",
+      "errBusy": "你已经身处一场赌注之中。",
+      "errAnte": "至少要押 1 铜币的赌注。",
+      "errStake": "那无法作为赌注押上。",
+      "errAfford": "你无力支付那笔赌注。",
+      "errExpired": "那份赌注邀约已过期。",
+      "errGone": "那场赌注已不再开放。",
+      "errHost": "只有房主才能开赛。"
     },
     "options": {
       "gameMenu": "游戏菜单",
@@ -5640,6 +5852,36 @@ export const zh_CN: EnTranslations = {
       "monarch_crown_helm": {
         "name": "君主之冠"
       },
+      "charter_ashmane": {
+        "name": "凭证：灰鬃疾行驹"
+      },
+      "charter_emberhoof": {
+        "name": "凭证：烬蹄战驹"
+      },
+      "charter_bronzeflank": {
+        "name": "凭证：铜胁战马"
+      },
+      "charter_silvermane": {
+        "name": "凭证：银鬃骏马"
+      },
+      "charter_stormhoof": {
+        "name": "凭证：风暴蹄战驹"
+      },
+      "charter_goldcrest": {
+        "name": "凭证：金冠掠空者"
+      },
+      "charter_verdant": {
+        "name": "凭证：苍翠野翼"
+      },
+      "charter_voidstrider": {
+        "name": "凭证：虚空翼行者"
+      },
+      "charter_celestial": {
+        "name": "凭证：天界炽天使"
+      },
+      "charter_worldbearer": {
+        "name": "凭证：负世巨鹏"
+      },
       "linen_pouch": {
         "name": "亚麻小袋"
       },
@@ -6734,6 +6976,11 @@ export const zh_CN: EnTranslations = {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
         "greeting": "潭水饮尽月光，{className}，又将溺者吐还。我守望那道门户已有三十夜——而今夜，它开了。"
+      },
+      "skytrial_master": {
+        "name": "天空大师维尔",
+        "title": "天试守望者",
+        "greeting": "天空是一条少有人敢踏足的道路，{className}。赢得它，它便会载你而行。"
       }
     },
     "quests": {
@@ -7579,6 +7826,36 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "微光潭涉行者已被消灭"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "初次飞行",
+        "text": "你在地面上已能稳稳驾驭一匹有翼坐骑了，{playerName} — 现在带它升空吧。飞越溪谷天试：一次环形飞行穿过八个圆环。先别去追逐时间。只管留在空中，穿过每一个圆环。",
+        "completion": "你没有坠落。这已胜过大多数人初次环飞的表现。天空会记得那些不断归来的人。",
+        "objectives": {
+          "0": {
+            "label": "完成溪谷天试"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "与时间赛跑",
+        "text": "现在带着心意去做。再飞一次溪谷天试，{playerName}，但要在沙漏漏尽之前完成。每个圆环走一条干净的线，不浪费一寸空气。要精准，不要慌乱。",
+        "completion": "一条干净的线，环环相扣。你不再只是骑着天空 — 你已在飞翔。",
+        "objectives": {
+          "0": {
+            "label": "在标准用时内飞完溪谷天试"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "登天者",
+        "text": "只剩一场试炼了，{playerName}：溪谷环道。在标准用时内飞完长环三圈 — 不靠运气，只凭技艺。征服它，开阔的天空便从此岸到彼岸尽归你所有。",
+        "completion": "扶摇直上，无可阻挡。天空如今属于你了，{playerName}。收下这张凭证 — 一匹空中坐骑，是赢来的而非买来的，载你前往任何你心之所向之处。",
+        "objectives": {
+          "0": {
+            "label": "在标准用时内飞完溪谷环道"
           }
         }
       }

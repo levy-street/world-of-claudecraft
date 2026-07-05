@@ -72,6 +72,7 @@ import {
   sortCharacters,
 } from './net/char_sort';
 import { charselectPrimaryAction } from './net/charselect_action';
+import { solscanTxUrl } from './net/explorer';
 import { createNativeAttestationProof } from './net/native_attestation';
 import {
   Api,
@@ -79,6 +80,7 @@ import {
   ClientWorld,
   DESKTOP_APP,
   isAuthError,
+  type JobSummary,
   NATIVE_APP,
   type ReleaseEntry,
 } from './net/online';
@@ -86,6 +88,7 @@ import {
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
 import type { WalletOption } from './net/wallet';
+import { parseAmountToBase } from './net/wallet_amount';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview } from './render/characters';
 import { skinCount } from './render/characters/manifest';
@@ -97,7 +100,7 @@ import { navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
 import { pathCrossesFence } from './sim/colliders';
 import { ABILITIES, CLASSES } from './sim/content/classes';
-import { ITEMS, setActiveWorldContent } from './sim/data';
+import { DUNGEON_LIST, ITEMS, QUESTS, setActiveWorldContent } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
@@ -189,6 +192,7 @@ import {
 import { UiEffectsApplier } from './ui/ui_effects_applier';
 import { hydrateIcons } from './ui/ui_icons';
 import {
+  onWalletPanelRequest,
   resolveWocBalanceUpdate,
   setWalletDisplayAvailable,
   setWalletUiEnabled,
@@ -877,6 +881,7 @@ async function startGame(
   // builds its scene synchronously, so everything must be resolved first.
   // The loading screen covers the gap - not a silent black screen.
   enterLoadingState(t('loading.world'));
+  activeOnline = online; // null offline; powers the wallet panel's Hire + Jobs tabs
   document.body.classList.add('game-active');
   // We've left the start screen for the world, so pause + release the landing
   // trailer: it's hidden now, and a decoding background video just wastes CPU/GPU
@@ -1156,6 +1161,9 @@ async function startGame(
           case 'talents':
             hud.toggleTalents();
             break;
+          case 'mounts':
+            hud.toggleMounts();
+            break;
           case 'meters':
             hud.toggleMeters();
             break;
@@ -1217,6 +1225,7 @@ async function startGame(
     onBags: () => hud.toggleBags(),
     onSpellbook: () => hud.toggleSpellbook(),
     onTalents: () => hud.toggleTalents(),
+    onMounts: () => hud.toggleMounts(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
@@ -3917,7 +3926,123 @@ function openDeleteCharacterDialog(character: CharacterSummary): void {
   input.focus();
 }
 
+// Cached human-readable $WOC price of a voluntary character rename, fetched once
+// for the character-select buttons. Display-only; the authoritative price comes
+// from the quote at pay time, so a failed prefetch just hides the figure.
+let renameCharacterPriceWoc: number | null = null;
+function ensureIdentityPrices(): void {
+  if (renameCharacterPriceWoc !== null) return;
+  api
+    .identityPrices()
+    .then((p) => {
+      renameCharacterPriceWoc = p.rename_character;
+    })
+    .catch(() => {});
+}
+
+// Inline "pay $WOC to rename" editor appended to a character row on the
+// character-select screen. Drives the quote → burn → confirm flow and refreshes
+// the list on success.
+function openPaidRenameEditor(row: HTMLElement, c: { id: number; name: string }): void {
+  if (row.querySelector('.paid-rename-editor')) return; // already open on this row
+  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '-';
+  const editor = document.createElement('div');
+  editor.className = 'paid-rename-editor';
+  editor.innerHTML = `
+    <input class="paid-rename-input" maxlength="16" autocomplete="off"
+      placeholder="${escapeHtml(t('character.newNamePlaceholder'))}"
+      aria-label="${escapeHtml(t('character.newNamePlaceholder'))}" />
+    <div class="paid-rename-hint">${escapeHtml(t('character.renamePriceHint', { amount: priceLabel }))}</div>
+    <div class="paid-rename-actions">
+      <button class="btn paid-rename-cancel" type="button">${escapeHtml(t('character.renameCancel'))}</button>
+      <button class="btn btn-primary paid-rename-confirm" type="button">${escapeHtml(t('character.renamePaidButton', { amount: priceLabel }))}</button>
+    </div>
+    <div class="paid-rename-status" role="status" aria-live="polite"></div>`;
+  row.appendChild(editor);
+  const input = editor.querySelector('.paid-rename-input') as HTMLInputElement;
+  const status = editor.querySelector('.paid-rename-status') as HTMLElement;
+  const confirmBtn = editor.querySelector('.paid-rename-confirm') as HTMLButtonElement;
+  input.focus();
+  editor.querySelector('.paid-rename-cancel')!.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editor.remove();
+  });
+  confirmBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const name = input.value.trim();
+    if (!name) {
+      input.focus();
+      return;
+    }
+    confirmBtn.disabled = true;
+    input.disabled = true;
+    try {
+      await payWocIdentity({ kind: 'rename_character', characterId: c.id, name }, (m) => {
+        status.textContent = m;
+      });
+      status.textContent = t('woc.renameSuccess', { name });
+      await refreshCharacters();
+    } catch (err) {
+      status.textContent = userFacingApiError(err);
+      confirmBtn.disabled = false;
+      input.disabled = false;
+    }
+  });
+}
+
+// Inline "mint a player-owned .sol subdomain" editor (PR #735). Burns $WOC and
+// mints ‹label›.worldofclaudecraft.sol to the player's wallet in one tx, then
+// binds the character to it.
+function openMintSubdomainEditor(row: HTMLElement, c: { id: number; name: string }): void {
+  if (row.querySelector('.paid-rename-editor')) return;
+  const priceLabel = renameCharacterPriceWoc !== null ? formatWoc(renameCharacterPriceWoc) : '-';
+  const editor = document.createElement('div');
+  editor.className = 'paid-rename-editor';
+  editor.innerHTML = `
+    <input class="paid-rename-input" maxlength="16" autocomplete="off"
+      value="${escapeHtml(c.name)}"
+      placeholder="${escapeHtml(t('character.newNamePlaceholder'))}"
+      aria-label="${escapeHtml(t('character.newNamePlaceholder'))}" />
+    <div class="paid-rename-hint">${escapeHtml(t('character.mintSolHint', { amount: priceLabel }))}</div>
+    <div class="paid-rename-actions">
+      <button class="btn paid-rename-cancel" type="button">${escapeHtml(t('character.renameCancel'))}</button>
+      <button class="btn btn-primary paid-rename-confirm" type="button">${escapeHtml(t('character.mintSolButton', { amount: priceLabel }))}</button>
+    </div>
+    <div class="paid-rename-status" role="status" aria-live="polite"></div>`;
+  row.appendChild(editor);
+  const input = editor.querySelector('.paid-rename-input') as HTMLInputElement;
+  const status = editor.querySelector('.paid-rename-status') as HTMLElement;
+  const confirmBtn = editor.querySelector('.paid-rename-confirm') as HTMLButtonElement;
+  input.focus();
+  editor.querySelector('.paid-rename-cancel')!.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editor.remove();
+  });
+  confirmBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const name = input.value.trim();
+    if (!name) {
+      input.focus();
+      return;
+    }
+    confirmBtn.disabled = true;
+    input.disabled = true;
+    try {
+      const result = await mintSubdomain(c.id, name, (m) => {
+        status.textContent = m;
+      });
+      status.textContent = t('woc.mintSuccess', { domain: result.fullDomain });
+      await refreshCharacters();
+    } catch (err) {
+      status.textContent = userFacingApiError(err);
+      confirmBtn.disabled = false;
+      input.disabled = false;
+    }
+  });
+}
+
 async function refreshCharacters(): Promise<void> {
+  if (WALLET_ENABLED) ensureIdentityPrices();
   if (api.realm) $('#charselect-realm').textContent = api.realm;
   updateSortButtonLabel();
   const listEl = $('#char-list');
@@ -3964,7 +4089,7 @@ async function refreshCharacters(): Promise<void> {
             ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn btn-danger delete-char-btn" ${c.online ? 'disabled' : ''}>${escapeHtml(t('character.delete'))}</button><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button></span>`
             : c.online
               ? `<span class="char-actions"><button class="btn btn-danger delete-char-btn" disabled title="${escapeHtml(t('character.inWorldHint'))}">${escapeHtml(t('character.delete'))}</button><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button></span>`
-              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
+              : `<span class="char-actions"><button class="btn btn-danger delete-char-btn">${escapeHtml(t('character.delete'))}</button>${WALLET_ENABLED ? `<button class="btn paid-rename-btn" type="button">${escapeHtml(t('character.rename'))}</button>` : ''}${SNS_UI_ENABLED ? `<button class="btn mint-sol-btn" type="button">${escapeHtml(t('character.mintSolName'))}</button>` : ''}<button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button></span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -3990,6 +4115,14 @@ async function refreshCharacters(): Promise<void> {
           void takeOverAndEnter(c, e.currentTarget as HTMLButtonElement);
         });
       } else {
+        row.querySelector('.paid-rename-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openPaidRenameEditor(row, c);
+        });
+        row.querySelector('.mint-sol-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openMintSubdomainEditor(row, c);
+        });
         row.querySelector('.enter-world-btn')?.addEventListener('click', (e) => {
           e.stopPropagation();
           void enterWorld(c, e.currentTarget as HTMLButtonElement);
@@ -4180,6 +4313,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   world.onDisconnect = (reason) => {
     clearInterval(poll);
     clearCardProviders();
+    activeOnline = null;
+    closeWalletPanel();
     fatalOverlay(userFacingApiError(reason));
   };
 }
@@ -4971,6 +5106,15 @@ let walletVerifyTimeout: number | null = null;
 let walletVerifyModalUnsubscribe: (() => void) | null = null;
 let walletFlowStatus: 'connect' | 'sign' | 'verify' | null = null;
 let walletHiddenNoticeTimeout: number | null = null;
+// The wallet/send panel (opened by clicking the bag balance). Held at module
+// scope so it can be toggled and so the global wallet-change subscription can
+// refresh it live while it's open.
+let walletPanelEl: HTMLElement | null = null;
+let walletPanelOnWalletChange: (() => void) | null = null;
+// The live online session (when in an online world), so the wallet panel's Hire
+// + Jobs tabs know the active character and that the server is reachable. Null
+// offline / at the character screen.
+let activeOnline: ClientWorld | null = null;
 
 // Feature flag: Wallet Standard support needs no project id. Keep an escape
 // hatch for deploys that want to hide the wallet UI entirely. Native and desktop
@@ -4979,6 +5123,12 @@ let walletHiddenNoticeTimeout: number | null = null;
 // const WALLET_ENABLED = !NATIVE_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
 const WALLET_ENABLED =
   !NATIVE_APP && !DESKTOP_APP && String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() !== '1';
+// SNS subdomain minting UI is shown only when both the wallet is enabled and the
+// deploy advertises SNS support (VITE_SNS_ENABLED), mirroring the server's
+// SNS_ENABLED gate so players never see a mint button the server will refuse.
+const SNS_UI_ENABLED =
+  WALLET_ENABLED &&
+  /^(1|true|yes|on)$/i.test(String(import.meta.env.VITE_SNS_ENABLED ?? '').trim());
 
 function walletCharacterScreenVisible(): boolean {
   try {
@@ -6194,6 +6344,84 @@ async function startWalletVerifyFlow(forcePicker = false): Promise<void> {
   }
 }
 
+// Ensure this account has a linked Solana wallet to pay with $WOC — connecting
+// and signing-to-link as needed. Returns the linked pubkey, or null if the user
+// backed out at any step.
+async function ensureWalletLinked(): Promise<string | null> {
+  const wallet = await loadWallet();
+  let state = wallet.currentWallet();
+  if (!state.isConnected || !state.address) {
+    await wallet.openWalletModal();
+    state = wallet.currentWallet();
+    if (!state.isConnected || !state.address) return null;
+  }
+  if (linkedWalletPubkey !== state.address) {
+    await completeWalletVerifyFlow(state.address);
+    if (linkedWalletPubkey !== state.address) return null;
+  }
+  return state.address;
+}
+
+// Full $WOC identity payment: ensure wallet → quote → burn → confirm, polling
+// confirm until Solana finalization lands. `onStatus` surfaces progress to the
+// caller's UI. Resolves with the applied-action body; throws on failure.
+async function payWocIdentity(
+  body: { kind: string; characterId?: number; name: string },
+  onStatus: (msg: string) => void,
+): Promise<any> {
+  const linked = await ensureWalletLinked();
+  if (!linked) throw new Error(t('woc.linkWalletFirst'));
+  onStatus(t('woc.quoting'));
+  const quote = await api.identityQuote(body);
+  const wallet = await loadWallet();
+  onStatus(t('woc.approveBurn', { amount: formatWoc(quote.priceWoc) }));
+  const signature = await wallet.payWocBurn(quote);
+  onStatus(t('woc.confirming'));
+  // payWocBurn already waited for 'confirmed'; the server requires 'finalized',
+  // so poll confirm (it returns reason:'not_finalized' until then).
+  for (let attempt = 0; attempt < 24; attempt++) {
+    const r = await api.identityConfirm(quote.quoteId, signature);
+    if (r.ok) {
+      void refreshWocBalance(linked);
+      return r.data;
+    }
+    if (r.reason !== 'not_finalized') throw new Error(r.data?.error ?? t('woc.confirmFailed'));
+    onStatus(t('woc.finalizing'));
+    await new Promise((resolve) => window.setTimeout(resolve, 2500));
+  }
+  throw new Error(t('woc.finalizeTimeout'));
+}
+
+// Atomic burn + SNS subdomain mint: ensure wallet → quote (server-built tx) →
+// sign+submit → confirm, polling until finalization. Returns the bound result.
+async function mintSubdomain(
+  characterId: number,
+  name: string,
+  onStatus: (msg: string) => void,
+): Promise<any> {
+  const linked = await ensureWalletLinked();
+  if (!linked) throw new Error(t('woc.linkWalletFirst'));
+  onStatus(t('woc.quoting'));
+  const quote = await api.subdomainQuote({ characterId, name });
+  const wallet = await loadWallet();
+  onStatus(t('woc.approveBurn', { amount: formatWoc(quote.priceWoc) }));
+  const signature = await wallet.signAndSubmitServerTx(quote.txBase64);
+  onStatus(t('woc.confirming'));
+  for (let attempt = 0; attempt < 24; attempt++) {
+    const r = await api.subdomainConfirm(quote.quoteId, signature);
+    if (r.ok) {
+      void refreshWocBalance(linked);
+      return r.data;
+    }
+    if (r.reason !== 'not_finalized' && r.reason !== 'subdomain_not_minted') {
+      throw new Error(r.data?.error ?? t('woc.confirmFailed'));
+    }
+    onStatus(t('woc.finalizing'));
+    await new Promise((resolve) => window.setTimeout(resolve, 2500));
+  }
+  throw new Error(t('woc.finalizeTimeout'));
+}
+
 async function onWalletButtonClick(): Promise<void> {
   const wallet = await loadWallet();
   const { address, isConnected } = wallet.currentWallet();
@@ -6230,6 +6458,709 @@ async function switchWallet(): Promise<void> {
   await startWalletVerifyFlow(true);
 }
 
+// ── Wallet / send-tokens panel (opened from the bag balance) ────────────────
+// Send $WOC / SOL / USDC directly to another player. You type a player name; it
+// resolves (debounced) against the server, which returns the recipient's wallet
+// ONLY if that player has a verified linked wallet. The transfer is built,
+// signed, and submitted client-side (non-custodial) by src/net/wallet.
+
+type TransferCurrency = 'WOC' | 'SOL' | 'USDC';
+const WALLET_CURRENCIES: { key: TransferCurrency; label: string }[] = [
+  { key: 'WOC', label: '$WOC' },
+  { key: 'SOL', label: 'SOL' },
+  { key: 'USDC', label: 'USDC' },
+];
+// Max precision per currency (matches the on-chain decimals) for the Max button,
+// and the friendlier digit count for displaying a balance.
+const CURRENCY_DECIMALS: Record<TransferCurrency, number> = { WOC: 6, SOL: 9, USDC: 6 };
+const BALANCE_DISPLAY_DIGITS: Record<TransferCurrency, number> = { WOC: 2, SOL: 6, USDC: 2 };
+
+// Job-contract escrow ("paid bodyguard") only escrows SPL tokens (WOC/USDC), and
+// pays out automatically when the server confirms one of these goals.
+type HireCurrency = 'WOC' | 'USDC';
+const HIRE_CURRENCIES: { key: HireCurrency; label: string }[] = [
+  { key: 'WOC', label: '$WOC' },
+  { key: 'USDC', label: 'USDC' },
+];
+type GoalKind = 'reach_level' | 'clear_dungeon' | 'complete_quest' | 'survive' | 'escort';
+// Labels resolve through t() at render time (the panel re-renders per open, so
+// they always reflect the active language).
+const GOAL_TYPES: { key: GoalKind; labelKey: TranslationKey }[] = [
+  { key: 'reach_level', labelKey: 'walletPanel.goalReachLevel' },
+  { key: 'clear_dungeon', labelKey: 'walletPanel.goalClearDungeon' },
+  { key: 'complete_quest', labelKey: 'walletPanel.goalQuest' },
+  { key: 'survive', labelKey: 'walletPanel.goalBodyguard' },
+  { key: 'escort', labelKey: 'walletPanel.goalEscort' },
+];
+
+function closeWalletPanel(): void {
+  walletPanelEl?.remove();
+  walletPanelEl = null;
+  walletPanelOnWalletChange = null;
+}
+
+function openWalletPanel(): void {
+  if (!WALLET_ENABLED) return;
+  if (walletPanelEl) {
+    closeWalletPanel();
+    return;
+  } // toggle off if already open
+
+  let currency: TransferCurrency = 'WOC';
+  let connectedAddress: string | null = null;
+  let resolved: { name: string; pubkey: string } | null = null;
+  let resolveSeq = 0;
+  let debounceTimer: number | undefined;
+  let sending = false;
+  // undefined = not yet loaded, null = RPC failed, number = uiAmount
+  const balances: Partial<Record<TransferCurrency, number | null>> = {};
+
+  const el = document.createElement('div');
+  el.id = 'wallet-panel';
+  el.className = 'window panel';
+  el.style.display = 'block';
+  // Hire-tab state (its own resolve / currency / goal, independent of Send).
+  let hCurrency: HireCurrency = 'WOC';
+  let hResolved: { name: string; pubkey: string } | null = null;
+  let hResolveSeq = 0;
+  let hDebounce: number | undefined;
+  let posting = false;
+  let goalKind: GoalKind = 'reach_level';
+  let escortDest: { x: number; z: number } | null = null;
+
+  el.innerHTML = `
+    <div class="panel-title"><span>${escapeHtml(t('walletPanel.title'))}</span><button type="button" class="x-btn" data-close aria-label="${escapeHtml(t('walletPanel.closeAria'))}">✕</button></div>
+    <div class="wp-status"><span class="wp-dot" aria-hidden="true"></span><span class="wp-status-text">${escapeHtml(t('walletPanel.notConnected'))}</span><button type="button" class="btn wp-connect" data-connect>${escapeHtml(t('walletPanel.connect'))}</button></div>
+    <div class="wp-tabs" role="tablist">
+      <button type="button" class="wp-tab sel" data-tab="send" role="tab" aria-selected="true">${escapeHtml(t('walletPanel.tabSend'))}</button>
+      <button type="button" class="wp-tab" data-tab="hire" role="tab" aria-selected="false">${escapeHtml(t('walletPanel.tabHire'))}</button>
+      <button type="button" class="wp-tab" data-tab="jobs" role="tab" aria-selected="false">${escapeHtml(t('walletPanel.tabJobs'))}</button>
+    </div>
+
+    <div class="wp-body" data-body="send">
+      <div class="wp-section-label">${escapeHtml(t('walletPanel.sendSection'))}</div>
+      <div class="wp-row"><label>${escapeHtml(t('walletPanel.currency'))}</label><div class="wp-cur">${WALLET_CURRENCIES.map(
+        (c) =>
+          `<button type="button" data-cur="${c.key}"${c.key === currency ? ' class="sel"' : ''} aria-pressed="${c.key === currency}">${escapeHtml(c.label)}</button>`,
+      ).join('')}</div></div>
+      <div class="wp-row"><label for="wp-recipient">${escapeHtml(t('walletPanel.playerName'))}</label><input id="wp-recipient" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(t('walletPanel.recipientPlaceholder'))}"><div class="wp-resolve" data-resolve aria-live="polite"></div></div>
+      <div class="wp-row"><label for="wp-amount">${escapeHtml(t('walletPanel.amount'))}</label><div class="wp-amount"><input id="wp-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="${escapeHtml(t('walletPanel.amountPlaceholder'))}"><button type="button" class="btn wp-max" data-max>${escapeHtml(t('walletPanel.max'))}</button></div><div class="wp-bal" data-bal>${escapeHtml(t('walletPanel.balanceEmpty'))}</div></div>
+      <div class="wp-note">${escapeHtml(t('walletPanel.sendNote'))}</div>
+      <button type="button" class="btn wp-send" data-send disabled>${escapeHtml(t('walletPanel.send'))}</button>
+      <div class="wp-feedback" data-feedback aria-live="polite"></div>
+    </div>
+
+    <div class="wp-body" data-body="hire" hidden>
+      <div class="wp-section-label">${escapeHtml(t('walletPanel.hireSection'))}</div>
+      <div class="wp-online-only" data-h-offline hidden>${escapeHtml(t('walletPanel.hireOffline'))}</div>
+      <div data-h-form>
+        <div class="wp-row"><label for="wp-h-name">${escapeHtml(t('walletPanel.playerName'))}</label><input id="wp-h-name" class="cd-input" type="text" autocomplete="off" spellcheck="false" placeholder="${escapeHtml(t('walletPanel.helperPlaceholder'))}"><div class="wp-resolve" data-h-resolve aria-live="polite"></div></div>
+        <div class="wp-row"><label>${escapeHtml(t('walletPanel.rewardCurrency'))}</label><div class="wp-cur" data-h-cur>${HIRE_CURRENCIES.map(
+          (c) =>
+            `<button type="button" data-hcur="${c.key}"${c.key === hCurrency ? ' class="sel"' : ''} aria-pressed="${c.key === hCurrency}">${escapeHtml(c.label)}</button>`,
+        ).join('')}</div></div>
+        <div class="wp-row"><label for="wp-h-amount">${escapeHtml(t('walletPanel.reward'))}</label><div class="wp-amount"><input id="wp-h-amount" class="cd-input" type="text" inputmode="decimal" autocomplete="off" placeholder="${escapeHtml(t('walletPanel.amountPlaceholder'))}"></div><div class="wp-bal" data-h-bal>${escapeHtml(t('walletPanel.balanceEmpty'))}</div></div>
+        <div class="wp-row"><label>${escapeHtml(t('walletPanel.goalLabel'))}</label><div class="wp-cur wp-goals" data-h-goal>${GOAL_TYPES.map(
+          (g) =>
+            `<button type="button" data-goal="${g.key}"${g.key === goalKind ? ' class="sel"' : ''} aria-pressed="${g.key === goalKind}">${escapeHtml(t(g.labelKey))}</button>`,
+        ).join('')}</div></div>
+        <div class="wp-row" data-h-params></div>
+        <div class="wp-note">${escapeHtml(t('walletPanel.escrowNote'))}</div>
+        <button type="button" class="btn wp-send" data-h-post disabled>${escapeHtml(t('walletPanel.post'))}</button>
+        <div class="wp-feedback" data-h-feedback aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="wp-body" data-body="jobs" hidden>
+      <div class="wp-section-label">${escapeHtml(t('walletPanel.jobsSection'))}</div>
+      <div data-jobs-list><div class="wp-jobs-empty">${escapeHtml(t('walletPanel.loading'))}</div></div>
+      <div class="wp-feedback" data-jobs-msg aria-live="polite"></div>
+    </div>`;
+  document.body.appendChild(el);
+  walletPanelEl = el;
+
+  const $$ = <T extends HTMLElement = HTMLElement>(sel: string): T => el.querySelector(sel) as T;
+  const recipientInput = $$<HTMLInputElement>('#wp-recipient');
+  const amountInput = $$<HTMLInputElement>('#wp-amount');
+  const resolveBox = $$('[data-resolve]');
+  const feedbackBox = $$('[data-feedback]');
+  const sendBtn = $$<HTMLButtonElement>('[data-send]');
+
+  // A typed amount is valid when it parses to a positive base-unit value at the
+  // currency's precision (same check the send path uses), so the button can't
+  // arm on junk like "1e5" or over-precise input.
+  const amountIsValid = (): boolean => {
+    const amt = amountInput.value.trim();
+    if (!amt) return false;
+    try {
+      parseAmountToBase(amt, CURRENCY_DECIMALS[currency]);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Whether the typed amount exceeds the (known) balance. Unknown balance ⇒ not
+  // blocked here; the on-chain transfer is the final authority either way.
+  const overBalance = (): boolean => {
+    const b = balances[currency];
+    return typeof b === 'number' && amountIsValid() && Number(amountInput.value.trim()) > b;
+  };
+
+  const updateSendButton = (): void => {
+    sendBtn.disabled =
+      sending || !connectedAddress || !resolved || !amountIsValid() || overBalance();
+    sendBtn.textContent = sending ? t('walletPanel.sending') : t('walletPanel.send');
+  };
+
+  const updateBalanceDisplay = (): void => {
+    const box = $$('[data-bal]');
+    const label = WALLET_CURRENCIES.find((c) => c.key === currency)!.label;
+    if (!connectedAddress) {
+      box.textContent = t('walletPanel.connectForBalance');
+      box.classList.remove('over');
+      return;
+    }
+    const b = balances[currency];
+    const over = overBalance();
+    box.classList.toggle('over', over);
+    const amountHtml = `<b>${escapeHtml(formatNumber(b ?? 0, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[currency] }))} ${escapeHtml(label)}</b>`;
+    box.innerHTML =
+      b === undefined
+        ? escapeHtml(t('walletPanel.balanceLoading'))
+        : b === null
+          ? escapeHtml(t('walletPanel.balanceUnavailable'))
+          : over
+            ? t('walletPanel.balanceExceeds', { amount: amountHtml })
+            : t('walletPanel.balance', { amount: amountHtml });
+  };
+
+  const loadBalances = async (address: string): Promise<void> => {
+    const wallet = await loadWallet();
+    for (const c of WALLET_CURRENCIES) {
+      void wallet.fetchBalance(c.key, address).then((b) => {
+        if (walletPanelEl !== el || connectedAddress !== address) return; // stale (closed/switched)
+        balances[c.key] = b;
+        if (c.key === currency) updateBalanceDisplay();
+        if (c.key === hCurrency) updateHireBalance();
+      });
+    }
+  };
+
+  const setStatus = (html: string, connected: boolean): void => {
+    el.classList.toggle('is-connected', connected);
+    $$('.wp-status-text').innerHTML = html;
+    $$<HTMLElement>('[data-connect]').hidden = connected;
+  };
+
+  const refreshConnected = async (): Promise<void> => {
+    const wallet = await loadWallet();
+    wallet.initWallet();
+    const { address, isConnected } = wallet.currentWallet();
+    connectedAddress = isConnected && address ? address : null;
+    if (connectedAddress) {
+      const linked =
+        linkedWalletPubkey === connectedAddress
+          ? ` · <span style="color:#4ade80">${escapeHtml(t('walletPanel.linkedBadge'))} ✓</span>`
+          : '';
+      const connectedHtml = t('walletPanel.connectedStatus', {
+        address: `<code>${escapeHtml(shortenAddress(connectedAddress))}</code>`,
+      });
+      setStatus(`${connectedHtml}${linked}`, true);
+      void loadBalances(connectedAddress);
+    } else {
+      setStatus(escapeHtml(t('walletPanel.notConnected')), false);
+    }
+    updateBalanceDisplay();
+    updateSendButton();
+  };
+  // Live-refresh while open when the wallet connects/disconnects/switches.
+  walletPanelOnWalletChange = () => {
+    void refreshConnected();
+  };
+
+  const doResolve = (raw: string): void => {
+    const q = raw.trim();
+    resolved = null;
+    updateSendButton();
+    if (!q) {
+      resolveBox.className = 'wp-resolve';
+      resolveBox.textContent = '';
+      return;
+    }
+    if (!api.token) {
+      resolveBox.className = 'wp-resolve bad';
+      resolveBox.textContent = t('walletPanel.loginToSend');
+      return;
+    }
+    resolveBox.className = 'wp-resolve pending';
+    resolveBox.textContent = t('walletPanel.lookingUp');
+    const seq = ++resolveSeq;
+    void api.resolveRecipient(q).then((r) => {
+      if (walletPanelEl !== el || seq !== resolveSeq) return; // stale response
+      if (r) {
+        resolved = r;
+        const self =
+          connectedAddress && r.pubkey === connectedAddress ? ` ${t('walletPanel.ownWallet')}` : '';
+        resolveBox.className = 'wp-resolve ok';
+        resolveBox.innerHTML = `✓ ${escapeHtml(r.name)} · <code>${escapeHtml(shortenAddress(r.pubkey))}</code>${escapeHtml(self)}`;
+      } else {
+        resolveBox.className = 'wp-resolve bad';
+        resolveBox.textContent = t('walletPanel.noVerifiedWallet');
+      }
+      updateSendButton();
+    });
+  };
+
+  const setMax = (): void => {
+    const b = balances[currency];
+    if (typeof b !== 'number' || b <= 0) return;
+    // Leave a little SOL for the network fee (SPL fees are paid in SOL, not the token).
+    const usable = currency === 'SOL' ? Math.max(0, b - 0.001) : b;
+    amountInput.value = usable.toFixed(CURRENCY_DECIMALS[currency]).replace(/\.?0+$/, '') || '0';
+    updateBalanceDisplay();
+    updateSendButton();
+  };
+
+  const doSend = async (): Promise<void> => {
+    if (sending || !connectedAddress || !resolved) return;
+    const amount = amountInput.value.trim();
+    sending = true;
+    updateSendButton();
+    feedbackBox.className = 'wp-feedback';
+    feedbackBox.textContent = t('walletPanel.approveTransfer');
+    try {
+      const wallet = await loadWallet();
+      const signature = await wallet.sendTokens(currency, resolved.pubkey, amount);
+      const label = WALLET_CURRENCIES.find((c) => c.key === currency)!.label;
+      feedbackBox.className = 'wp-feedback ok';
+      feedbackBox.innerHTML =
+        `${escapeHtml(t('walletPanel.sent', { amount, currency: label, name: resolved.name }))} ` +
+        `<a href="${escapeHtml(solscanTxUrl(signature, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('walletPanel.viewTransaction'))} ↗</a>`;
+      amountInput.value = '';
+      if (connectedAddress) {
+        void refreshWocBalance(connectedAddress);
+        void loadBalances(connectedAddress);
+      }
+    } catch (err: any) {
+      feedbackBox.className = 'wp-feedback bad';
+      feedbackBox.textContent = err?.message
+        ? t('walletPanel.sendFailedWith', { message: err.message })
+        : t('walletPanel.sendFailed');
+    } finally {
+      sending = false;
+      updateSendButton();
+    }
+  };
+
+  // Wire events
+  $$('[data-close]').addEventListener('click', () => {
+    audio.click();
+    closeWalletPanel();
+  });
+  $$('[data-connect]').addEventListener('click', () => {
+    void (async () => {
+      const wallet = await loadWallet();
+      await wallet.openWalletModal();
+      await refreshConnected();
+    })();
+  });
+  el.querySelectorAll<HTMLElement>('[data-cur]').forEach((b) => {
+    b.addEventListener('click', () => {
+      currency = (b.dataset.cur as TransferCurrency) ?? 'WOC';
+      el.querySelectorAll<HTMLElement>('[data-cur]').forEach((x) => {
+        const on = x === b;
+        x.classList.toggle('sel', on);
+        x.setAttribute('aria-pressed', String(on));
+      });
+      updateBalanceDisplay();
+      updateSendButton();
+    });
+  });
+  recipientInput.addEventListener('input', () => {
+    if (debounceTimer !== undefined) window.clearTimeout(debounceTimer);
+    const value = recipientInput.value;
+    debounceTimer = window.setTimeout(() => doResolve(value), 350);
+  });
+  amountInput.addEventListener('input', () => {
+    updateBalanceDisplay();
+    updateSendButton();
+  });
+  $$('[data-max]').addEventListener('click', setMax);
+  sendBtn.addEventListener('click', () => {
+    void doSend();
+  });
+  el.addEventListener('keydown', (e) => {
+    if ((e as KeyboardEvent).key === 'Escape') {
+      e.preventDefault();
+      closeWalletPanel();
+    }
+  });
+
+  // ── Hire tab ───────────────────────────────────────────────────────────────
+  const hNameInput = $$<HTMLInputElement>('#wp-h-name');
+  const hAmountInput = $$<HTMLInputElement>('#wp-h-amount');
+  const hResolveBox = $$('[data-h-resolve]');
+  const hFeedback = $$('[data-h-feedback]');
+  const hParams = $$('[data-h-params]');
+  const postBtn = $$<HTMLButtonElement>('[data-h-post]');
+
+  const hAmountValid = (): boolean => {
+    const a = hAmountInput.value.trim();
+    if (!a) return false;
+    try {
+      parseAmountToBase(a, CURRENCY_DECIMALS[hCurrency]);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Read the currently-built milestone from the goal params, or null if invalid.
+  const readGoal = (): Record<string, unknown> | null => {
+    switch (goalKind) {
+      case 'reach_level': {
+        const target = Number($$<HTMLInputElement>('#wp-g-level')?.value);
+        return Number.isInteger(target) && target >= 2 && target <= 20
+          ? { kind: 'reach_level', target }
+          : null;
+      }
+      case 'clear_dungeon': {
+        const dungeonId = $$<HTMLSelectElement>('#wp-g-dungeon')?.value ?? '';
+        return dungeonId ? { kind: 'clear_dungeon', dungeonId } : null;
+      }
+      case 'complete_quest': {
+        const questId = $$<HTMLSelectElement>('#wp-g-quest')?.value ?? '';
+        return questId ? { kind: 'complete_quest', questId } : null;
+      }
+      case 'survive': {
+        const minutes = Number($$<HTMLInputElement>('#wp-g-minutes')?.value);
+        return Number.isFinite(minutes) && minutes >= 1 && minutes <= 1440
+          ? { kind: 'survive', durationSec: Math.round(minutes * 60) }
+          : null;
+      }
+      case 'escort':
+        return escortDest ? { kind: 'escort', x: escortDest.x, z: escortDest.z, radius: 8 } : null;
+    }
+  };
+
+  const updatePostButton = (): void => {
+    postBtn.disabled =
+      posting || !connectedAddress || !hResolved || !activeOnline || !hAmountValid() || !readGoal();
+    postBtn.textContent = posting ? t('walletPanel.posting') : t('walletPanel.post');
+  };
+
+  const updateHireBalance = (): void => {
+    const box = $$('[data-h-bal]');
+    const label = HIRE_CURRENCIES.find((c) => c.key === hCurrency)!.label;
+    if (!connectedAddress) {
+      box.textContent = t('walletPanel.connectForBalance');
+      return;
+    }
+    const b = balances[hCurrency];
+    box.innerHTML =
+      b === undefined
+        ? escapeHtml(t('walletPanel.balanceLoading'))
+        : b === null
+          ? escapeHtml(t('walletPanel.balanceUnavailable'))
+          : t('walletPanel.balance', {
+              amount: `<b>${escapeHtml(formatNumber(b, { maximumFractionDigits: BALANCE_DISPLAY_DIGITS[hCurrency] }))} ${escapeHtml(label)}</b>`,
+            });
+  };
+
+  const renderGoalParams = (): void => {
+    switch (goalKind) {
+      case 'reach_level':
+        hParams.innerHTML = `<label for="wp-g-level">${escapeHtml(t('walletPanel.targetLevel'))}</label><input id="wp-g-level" class="cd-input" type="number" min="2" max="20" placeholder="${escapeHtml(t('walletPanel.targetLevelPlaceholder'))}">`;
+        break;
+      case 'clear_dungeon':
+        hParams.innerHTML = `<label for="wp-g-dungeon">${escapeHtml(t('walletPanel.raidDungeon'))}</label><select id="wp-g-dungeon" class="cd-input">${DUNGEON_LIST.map(
+          (d) => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`,
+        ).join('')}</select>`;
+        break;
+      case 'complete_quest': {
+        const ids = activeOnline ? [...activeOnline.questLog.keys()] : [];
+        hParams.innerHTML = ids.length
+          ? `<label for="wp-g-quest">${escapeHtml(t('walletPanel.questOwn'))}</label><select id="wp-g-quest" class="cd-input">${ids
+              .map(
+                (id) =>
+                  `<option value="${escapeHtml(id)}">${escapeHtml(QUESTS[id]?.name ?? id)}</option>`,
+              )
+              .join('')}</select>`
+          : `<div class="wp-hint">${escapeHtml(t('walletPanel.noActiveQuests'))}</div>`;
+        break;
+      }
+      case 'survive':
+        hParams.innerHTML = `<label for="wp-g-minutes">${escapeHtml(t('walletPanel.protectMinutes'))}</label><input id="wp-g-minutes" class="cd-input" type="number" min="1" max="1440" placeholder="${escapeHtml(t('walletPanel.minutesPlaceholder'))}">`;
+        break;
+      case 'escort': {
+        const at = escortDest
+          ? t('walletPanel.destinationSet', { x: escortDest.x, z: escortDest.z })
+          : t('walletPanel.noDestination');
+        hParams.innerHTML =
+          `<label>${escapeHtml(t('walletPanel.escortDestination'))}</label><button type="button" class="btn wp-capture" data-h-capture>${escapeHtml(t('walletPanel.useCurrentSpot'))}</button>` +
+          `<div class="wp-hint" data-escort-readout>${escapeHtml(at)}</div>`;
+        $$('[data-h-capture]').addEventListener('click', () => {
+          if (!activeOnline) return;
+          const p = activeOnline.player.pos;
+          escortDest = { x: Math.round(p.x), z: Math.round(p.z) };
+          $$('[data-escort-readout]').textContent = t('walletPanel.destinationHint', {
+            x: escortDest.x,
+            z: escortDest.z,
+          });
+          updatePostButton();
+        });
+        break;
+      }
+    }
+    hParams.querySelectorAll('input, select').forEach((n) => {
+      n.addEventListener('input', updatePostButton);
+      n.addEventListener('change', updatePostButton);
+    });
+    updatePostButton();
+  };
+
+  const doHireResolve = (raw: string): void => {
+    const q = raw.trim();
+    hResolved = null;
+    updatePostButton();
+    if (!q) {
+      hResolveBox.className = 'wp-resolve';
+      hResolveBox.textContent = '';
+      return;
+    }
+    if (!api.token) {
+      hResolveBox.className = 'wp-resolve bad';
+      hResolveBox.textContent = t('walletPanel.hireLogin');
+      return;
+    }
+    hResolveBox.className = 'wp-resolve pending';
+    hResolveBox.textContent = t('walletPanel.lookingUp');
+    const seq = ++hResolveSeq;
+    void api.resolveRecipient(q).then((r) => {
+      if (walletPanelEl !== el || seq !== hResolveSeq) return;
+      if (r) {
+        hResolved = r;
+        hResolveBox.className = 'wp-resolve ok';
+        hResolveBox.innerHTML = `✓ ${escapeHtml(r.name)} · <code>${escapeHtml(shortenAddress(r.pubkey))}</code>`;
+      } else {
+        hResolveBox.className = 'wp-resolve bad';
+        hResolveBox.textContent = t('walletPanel.noVerifiedWallet');
+      }
+      updatePostButton();
+    });
+  };
+
+  const doPost = async (): Promise<void> => {
+    if (posting || !connectedAddress || !hResolved || !activeOnline) return;
+    const goal = readGoal();
+    const amount = hAmountInput.value.trim();
+    if (!goal) {
+      hFeedback.className = 'wp-feedback bad';
+      hFeedback.textContent = t('walletPanel.setGoalFirst');
+      return;
+    }
+    posting = true;
+    updatePostButton();
+    hFeedback.className = 'wp-feedback';
+    hFeedback.textContent = t('walletPanel.preparingEscrow');
+    try {
+      const quote = await api.jobQuote({
+        characterId: activeOnline.characterId,
+        helperName: hResolved.name,
+        currency: hCurrency,
+        amount: Number(amount),
+        milestone: goal,
+      });
+      hFeedback.textContent = t('walletPanel.approveDeposit');
+      const wallet = await loadWallet();
+      const signature = await wallet.signAndSubmitServerTx(quote.txBase64);
+      hFeedback.textContent = t('walletPanel.lockingReward');
+      let confirmed = false;
+      for (let attempt = 0; attempt < 24 && !confirmed; attempt++) {
+        try {
+          await api.jobConfirm(quote.jobId, signature);
+          confirmed = true;
+        } catch (err: any) {
+          const msg = String(err?.message ?? '');
+          if (/retry|finaliz|confirm/i.test(msg)) {
+            hFeedback.textContent = t('walletPanel.waitingFinalization');
+            await new Promise((r) => window.setTimeout(r, 2500));
+          } else {
+            throw err;
+          }
+        }
+      }
+      if (!confirmed) throw new Error(t('walletPanel.confirmTimeout'));
+      hFeedback.className = 'wp-feedback ok';
+      hFeedback.textContent = t('walletPanel.jobPosted', {
+        amount: formatNumber(Number(amount), { maximumFractionDigits: 4 }),
+        currency: HIRE_CURRENCIES.find((c) => c.key === hCurrency)!.label,
+        name: hResolved.name,
+      });
+      hAmountInput.value = '';
+      if (connectedAddress) {
+        void refreshWocBalance(connectedAddress);
+        void loadBalances(connectedAddress);
+      }
+    } catch (err: any) {
+      hFeedback.className = 'wp-feedback bad';
+      hFeedback.textContent = err?.message
+        ? t('walletPanel.failedWith', { message: err.message })
+        : t('walletPanel.postFailed');
+    } finally {
+      posting = false;
+      updatePostButton();
+    }
+  };
+
+  const syncHireOnline = (): void => {
+    const online = !!activeOnline && !!api.token;
+    $$<HTMLElement>('[data-h-offline]').hidden = online;
+    $$<HTMLElement>('[data-h-form]').hidden = !online;
+    updateHireBalance();
+  };
+
+  hNameInput.addEventListener('input', () => {
+    if (hDebounce !== undefined) window.clearTimeout(hDebounce);
+    const value = hNameInput.value;
+    hDebounce = window.setTimeout(() => doHireResolve(value), 350);
+  });
+  hAmountInput.addEventListener('input', updatePostButton);
+  el.querySelectorAll<HTMLElement>('[data-hcur]').forEach((b) => {
+    b.addEventListener('click', () => {
+      hCurrency = (b.dataset.hcur as HireCurrency) ?? 'WOC';
+      el.querySelectorAll<HTMLElement>('[data-hcur]').forEach((x) => {
+        const on = x === b;
+        x.classList.toggle('sel', on);
+        x.setAttribute('aria-pressed', String(on));
+      });
+      updateHireBalance();
+      updatePostButton();
+    });
+  });
+  el.querySelectorAll<HTMLElement>('[data-goal]').forEach((b) => {
+    b.addEventListener('click', () => {
+      goalKind = (b.dataset.goal as GoalKind) ?? 'reach_level';
+      el.querySelectorAll<HTMLElement>('[data-goal]').forEach((x) => {
+        const on = x === b;
+        x.classList.toggle('sel', on);
+        x.setAttribute('aria-pressed', String(on));
+      });
+      escortDest = null;
+      renderGoalParams();
+    });
+  });
+  postBtn.addEventListener('click', () => {
+    void doPost();
+  });
+
+  // ── Jobs tab ───────────────────────────────────────────────────────────────
+  const jobStatusText = (j: JobSummary): string => {
+    switch (j.status) {
+      case 'pending_deposit':
+        return t('walletPanel.status.awaitingDeposit');
+      case 'open':
+        return j.role === 'helper' ? t('walletPanel.status.offered') : t('walletPanel.status.open');
+      case 'active':
+        return t('walletPanel.status.active');
+      case 'released':
+        return t('walletPanel.status.completed');
+      case 'refunded':
+        return j.reason === 'expired'
+          ? t('walletPanel.status.expired')
+          : j.reason === 'subject_died'
+            ? t('walletPanel.status.failedDied')
+            : j.reason === 'cancelled'
+              ? t('walletPanel.status.cancelled')
+              : t('walletPanel.status.refunded');
+    }
+  };
+
+  const renderJobs = async (): Promise<void> => {
+    const list = $$('[data-jobs-list]');
+    $$('[data-jobs-msg]').textContent = '';
+    if (!activeOnline || !api.token) {
+      list.innerHTML = `<div class="wp-jobs-empty">${escapeHtml(t('walletPanel.jobsOffline'))}</div>`;
+      return;
+    }
+    list.innerHTML = `<div class="wp-jobs-empty">${escapeHtml(t('walletPanel.loading'))}</div>`;
+    const jobs = await api.jobs(activeOnline.characterId);
+    if (walletPanelEl !== el) return;
+    if (!jobs.length) {
+      list.innerHTML = `<div class="wp-jobs-empty">${escapeHtml(t('walletPanel.jobsEmpty'))}</div>`;
+      return;
+    }
+    list.innerHTML = jobs
+      .map((j) => {
+        const head =
+          j.role === 'payer'
+            ? t('walletPanel.youHired', { name: `<b>${escapeHtml(j.helperName)}</b>` })
+            : t('walletPanel.hiredYou', { name: `<b>${escapeHtml(j.payerName)}</b>` });
+        const amt = `${formatNumber(j.amount, { maximumFractionDigits: 4 })} ${j.currency}`;
+        let action = '';
+        if (j.status === 'open' && j.role === 'helper')
+          action = `<button type="button" class="btn wp-job-btn" data-accept="${escapeHtml(j.jobId)}">${escapeHtml(t('walletPanel.acceptJob'))}</button>`;
+        else if (j.status === 'open' && j.role === 'payer')
+          action = `<button type="button" class="btn wp-job-btn" data-cancel="${escapeHtml(j.jobId)}">${escapeHtml(t('walletPanel.cancelRefund'))}</button>`;
+        else if (j.settleSig)
+          action = `<a class="wp-job-link" href="${escapeHtml(solscanTxUrl(j.settleSig, import.meta.env.VITE_SOLANA_RPC_URL))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t('walletPanel.viewPayout'))} ↗</a>`;
+        return `<div class="wp-job">
+        <div class="wp-job-head">${head}<span class="wp-job-amt">${escapeHtml(amt)}</span></div>
+        <div class="wp-job-goal">${escapeHtml(j.milestoneText)}</div>
+        <div class="wp-job-status s-${escapeHtml(j.status)}">${escapeHtml(jobStatusText(j))}</div>
+        ${action}
+      </div>`;
+      })
+      .join('');
+    list.querySelectorAll<HTMLElement>('[data-accept]').forEach((b) => {
+      b.addEventListener('click', () => void jobAction(b.dataset.accept ?? '', 'accept'));
+    });
+    list.querySelectorAll<HTMLElement>('[data-cancel]').forEach((b) => {
+      b.addEventListener('click', () => void jobAction(b.dataset.cancel ?? '', 'cancel'));
+    });
+  };
+
+  const jobAction = async (jobId: string, kind: 'accept' | 'cancel'): Promise<void> => {
+    if (!jobId) return;
+    try {
+      if (kind === 'accept') await api.jobAccept(jobId);
+      else await api.jobCancel(jobId);
+      await renderJobs();
+    } catch (err: any) {
+      const msg = $$('[data-jobs-msg]');
+      msg.className = 'wp-feedback bad';
+      msg.textContent = err?.message
+        ? t('walletPanel.failedWith', { message: err.message })
+        : t('walletPanel.actionFailed');
+    }
+  };
+
+  // ── tab switching ──────────────────────────────────────────────────────────
+  const showTab = (name: string): void => {
+    el.querySelectorAll<HTMLElement>('[data-tab]').forEach((t) => {
+      const on = t.dataset.tab === name;
+      t.classList.toggle('sel', on);
+      t.setAttribute('aria-selected', String(on));
+    });
+    el.querySelectorAll<HTMLElement>('[data-body]').forEach((b) => {
+      b.hidden = b.dataset.body !== name;
+    });
+    if (name === 'hire') syncHireOnline();
+    if (name === 'jobs') void renderJobs();
+  };
+  el.querySelectorAll<HTMLElement>('[data-tab]').forEach((t) => {
+    t.addEventListener('click', () => {
+      audio.click();
+      showTab(t.dataset.tab ?? 'send');
+    });
+  });
+
+  renderGoalParams();
+  recipientInput.focus();
+  void refreshConnected();
+}
+
 function wireWallet(): void {
   setWalletUiEnabled(WALLET_ENABLED);
   // Feature-gate: when explicitly disabled, remove the wallet row entirely and
@@ -6242,6 +7173,9 @@ function wireWallet(): void {
     return;
   }
   syncWalletCharacterScreenVisibility();
+  // The bag's balance chip opens the wallet/send panel (the bag lives in the
+  // HUD, which can't reach the wallet/Api glue, so it signals through the store).
+  onWalletPanelRequest(() => openWalletPanel());
   const btn = document.getElementById('btn-wallet');
   if (!btn) return;
   // These async actions are fire-and-forget from the click, so attach a .catch:
@@ -6272,6 +7206,7 @@ function wireWallet(): void {
         if (state.address && walletVerifyPending) void completeWalletVerifyFlow(state.address);
         else if (state.address) void disconnectUnverifiedWalletIfIdle();
         updateWalletButton();
+        walletPanelOnWalletChange?.(); // live-refresh the send panel if it's open
       });
       wallet.initWallet();
       updateWalletButton();

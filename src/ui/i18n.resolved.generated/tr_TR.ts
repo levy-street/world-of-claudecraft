@@ -2742,6 +2742,99 @@ export const tr_TR: EnTranslations = {
       }
     }
   },
+  "walletPanel": {
+    "title": "Wallet",
+    "closeAria": "Close",
+    "notConnected": "Wallet not connected",
+    "connect": "Connect",
+    "connectedStatus": "Connected {address}",
+    "linkedBadge": "linked",
+    "tabSend": "Send",
+    "tabHire": "Hire",
+    "tabJobs": "Jobs",
+    "sendSection": "Send to a player",
+    "currency": "Currency",
+    "playerName": "Player name",
+    "recipientPlaceholder": "Who are you sending to?",
+    "amount": "Amount",
+    "amountPlaceholder": "0.0",
+    "max": "Max",
+    "balanceEmpty": "Balance: -",
+    "balanceLoading": "Balance: …",
+    "balanceUnavailable": "Balance: unavailable",
+    "balance": "Balance: {amount}",
+    "balanceExceeds": "Balance: {amount} (exceeds balance)",
+    "connectForBalance": "Connect a wallet to see your balance.",
+    "sendNote": "Sent directly wallet-to-wallet on Solana. Non-custodial: the game never holds your funds. Network fees apply.",
+    "send": "Send",
+    "sending": "Sending…",
+    "loginToSend": "Log in and enter a realm to send to players.",
+    "lookingUp": "Looking up player…",
+    "ownWallet": "(this is your own wallet)",
+    "noVerifiedWallet": "No player by that name has a verified wallet.",
+    "approveTransfer": "Approve the transfer in your wallet…",
+    "sent": "Sent {amount} {currency} to {name}.",
+    "viewTransaction": "View transaction",
+    "sendFailedWith": "Send failed: {message}",
+    "sendFailed": "Send failed.",
+    "hireSection": "Hire a helper",
+    "hireOffline": "Enter the world online to hire a helper.",
+    "helperPlaceholder": "Who will help you?",
+    "rewardCurrency": "Reward currency",
+    "reward": "Reward",
+    "goalLabel": "Goal, paid when the server confirms it",
+    "goalReachLevel": "Reach level",
+    "goalClearDungeon": "Clear raid",
+    "goalQuest": "Quest",
+    "goalBodyguard": "Bodyguard",
+    "goalEscort": "Escort",
+    "targetLevel": "Target level",
+    "targetLevelPlaceholder": "2 to 20",
+    "raidDungeon": "Raid / dungeon",
+    "questOwn": "Quest (one you're on)",
+    "noActiveQuests": "You have no active quests to hire help for, pick one up first.",
+    "protectMinutes": "Protect me for (minutes)",
+    "minutesPlaceholder": "e.g. 10",
+    "escortDestination": "Escort destination",
+    "useCurrentSpot": "Use my current spot",
+    "destinationSet": "Destination set: ({x}, {z})",
+    "noDestination": "No destination set yet.",
+    "destinationHint": "Destination ({x}, {z}), travel off, then have your guard bring you back here.",
+    "hireLogin": "Enter a realm online to hire a player.",
+    "escrowNote": "The reward is locked in on-chain escrow and released to the helper automatically when the server confirms the goal, or refunded to you if it isn't met before the deadline.",
+    "post": "Post & Lock Reward",
+    "posting": "Posting…",
+    "setGoalFirst": "Set a valid goal first.",
+    "preparingEscrow": "Preparing the escrow…",
+    "approveDeposit": "Approve the reward deposit in your wallet…",
+    "lockingReward": "Locking the reward on-chain…",
+    "waitingFinalization": "Waiting for finalization…",
+    "confirmTimeout": "Timed out confirming the deposit. If the reward was locked it will settle once it finalizes.",
+    "jobPosted": "Job posted: {amount} {currency} locked in escrow for {name}.",
+    "postFailed": "Failed to post the job.",
+    "failedWith": "Failed: {message}",
+    "jobsSection": "Your jobs",
+    "loading": "Loading…",
+    "jobsOffline": "Enter the world online to manage jobs.",
+    "jobsEmpty": "No jobs yet. Use the Hire tab to pay a player for help.",
+    "youHired": "You hired {name}",
+    "hiredYou": "{name} hired you",
+    "acceptJob": "Accept job",
+    "cancelRefund": "Cancel & refund",
+    "viewPayout": "View payout",
+    "actionFailed": "Action failed.",
+    "status": {
+      "awaitingDeposit": "Awaiting your deposit",
+      "offered": "Offered to you, accept to begin",
+      "open": "Open, waiting for the helper to accept",
+      "active": "In progress",
+      "completed": "Completed, helper paid",
+      "expired": "Expired, refunded",
+      "failedDied": "Failed (you died), refunded",
+      "cancelled": "Cancelled, refunded",
+      "refunded": "Refunded"
+    }
+  },
   "playerCard": {
     "shareButton": "Oyuncu Kartını Paylaş",
     "title": "Oyuncu Kartı",
@@ -3460,6 +3553,12 @@ export const tr_TR: EnTranslations = {
     "renameRequired": "yeniden adlandırma gerekli",
     "delete": "Sil",
     "rename": "Yeniden Adlandır",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC & Mint",
+    "mintSolHint": "Mint a player-owned ‹name›.worldofclaudecraft.sol for {amount} $WOC, yours on-chain.",
     "newNamePlaceholder": "Yeni karakter adı",
     "tabCharacters": "Karakterler",
     "tabCreate": "Oluştur",
@@ -3474,6 +3573,19 @@ export const tr_TR: EnTranslations = {
     "sortName": "Ad",
     "sortRecent": "Son Oynanan",
     "sortPlaytime": "Oynama Süresi"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain}, it's yours on-chain.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "Karakteri Sil",
@@ -3628,6 +3740,106 @@ export const tr_TR: EnTranslations = {
       "zoomOut": "Uzaklaştır",
       "mapCanvasLabel": "Harita",
       "mapSummary": "{zone} haritası."
+    },
+    "mounts": {
+      "title": "Mounts",
+      "subtitle": "$WOC Travel Steeds",
+      "close": "Close mounts",
+      "summon": "Summon",
+      "dismount": "Dismount",
+      "summoning": "Summoning {name}…",
+      "riding": "Riding",
+      "flies": "Flies",
+      "locked": "Locked",
+      "speed": "+{percent}% speed",
+      "unlockAt": "Unlocks at {amount} $WOC",
+      "supplyShare": "{percent} of supply",
+      "qualifyHeader": "You qualify for {count} of {total} travel mounts.",
+      "holdingHint": "Holding {amount} $WOC.",
+      "noWallet": "Hold at least {amount} $WOC — 0.1% of supply — on a linked wallet to earn your first travel mount.",
+      "cantInCombat": "You can't mount while in combat.",
+      "cantSwimming": "You can't mount while swimming.",
+      "cantDead": "You can't mount while dead.",
+      "notEligible": "Your $WOC holdings don't reach that steed yet.",
+      "summonedBanner": "You summon {name}.",
+      "summonAria": "Summon {name}",
+      "dismountAria": "Dismount {name}",
+      "lockedAria": "{name} — locked; unlocks at {amount} $WOC",
+      "activeAria": "{name} — currently active",
+      "cardAria": "{name}: {flavor}",
+      "owned": "Owned",
+      "mint": "Mint Charter",
+      "mintHint": "Strike a tradeable Charter for this mount — sell it for gold so a non-holder can earn it.",
+      "mintAria": "Mint a tradeable Charter for {name}",
+      "mintedBanner": "You strike a Charter for {name}.",
+      "earnedBanner": "You have earned {name} — it is yours for good.",
+      "alreadyOwnErr": "You already own that mount.",
+      "charterVoidErr": "That Charter is void.",
+      "noCharterErr": "No Charter can be struck for that mount.",
+      "holdingsShortErr": "Your holdings do not cover that mount."
+    },
+    "course": {
+      "skytrials": "Skytrials",
+      "skytrialsHint": "Fly a timed ring course on a flying mount.",
+      "needFlyer": "Summon a flying mount to fly Skytrials.",
+      "start": "Fly",
+      "give_up": "Give up",
+      "par": "Par {time}",
+      "laps": "{count} laps",
+      "onePass": "1 lap",
+      "starting": "Fly through the first ring to start the clock",
+      "gate": "Ring {n}/{total}",
+      "lap": "Lap {n}/{total}",
+      "time": "Time",
+      "finish": "Finish!",
+      "beatPar": "Beat par by {time}",
+      "offPar": "{time} off par",
+      "failed": "Run ended — you left your mount",
+      "aborted": "Run abandoned",
+      "best": "Best {time}",
+      "newBest": "New best!",
+      "board": "Board",
+      "boardTitle": "{name} — top times",
+      "noTimes": "No times yet — be the first.",
+      "loadingBoard": "Loading…",
+      "you": "(you)",
+      "race": "Race",
+      "racePartyHint": "Race your party — first through the rings wins.",
+      "getReady": "Get ready",
+      "go": "GO!",
+      "dnf": "DNF",
+      "placeOf": "#{place} of {total}",
+      "racing": "Racing"
+    },
+    "wager": {
+      "start": "Wager Race",
+      "title": "Wager Race",
+      "inviteGold": "{name} opens a Wager Race — stake {money} to enter. Match it?",
+      "inviteCharter": "{name} opens a Wager Race — stake {money} + a Mount Charter. Match it?",
+      "accept": "Match Wager",
+      "pot": "Pot {money}",
+      "potCharter": "Pot {money} + {count}× Charter",
+      "racers": "Racers ({count})",
+      "launch": "Launch Race",
+      "cancel": "Cancel",
+      "leave": "Leave",
+      "waiting": "Waiting for a challenger to match the stake…",
+      "won": "You win the wager — {money}!",
+      "wonCharter": "You win the wager — {money} + {count}× Charter!",
+      "lost": "You lost the wager.",
+      "refunded": "Wager called off — your stake is returned.",
+      "antePrompt": "Stake how much gold on this race? (in copper)",
+      "open": "Open Wager",
+      "stakeCharter": "Also stake a Mount Charter (winner takes it)",
+      "errCourse": "That course cannot be wagered.",
+      "errFlyer": "You must be on a flying mount to wager.",
+      "errBusy": "You are already in a wager.",
+      "errAnte": "Name a wager of at least 1 copper.",
+      "errStake": "That cannot be staked as a wager.",
+      "errAfford": "You cannot cover that wager.",
+      "errExpired": "That wager offer has expired.",
+      "errGone": "That wager is no longer open.",
+      "errHost": "Only the host can launch the wager."
     },
     "options": {
       "gameMenu": "Oyun Menüsü",
@@ -5640,6 +5852,36 @@ export const tr_TR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Hükümdar'ın Tacı"
       },
+      "charter_ashmane": {
+        "name": "Charter: Ashmane Courser"
+      },
+      "charter_emberhoof": {
+        "name": "Charter: Emberhoof Charger"
+      },
+      "charter_bronzeflank": {
+        "name": "Charter: Bronzeflank Destrier"
+      },
+      "charter_silvermane": {
+        "name": "Charter: Silvermane Stallion"
+      },
+      "charter_stormhoof": {
+        "name": "Charter: Stormhoof Charger"
+      },
+      "charter_goldcrest": {
+        "name": "Charter: Goldcrest Skystrider"
+      },
+      "charter_verdant": {
+        "name": "Charter: Verdant Wildwing"
+      },
+      "charter_voidstrider": {
+        "name": "Charter: Voidwing Strider"
+      },
+      "charter_celestial": {
+        "name": "Charter: Celestial Seraph"
+      },
+      "charter_worldbearer": {
+        "name": "Charter: Worldbearer's Roc"
+      },
       "linen_pouch": {
         "name": "Keten Kese"
       },
@@ -6734,6 +6976,11 @@ export const tr_TR: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Gelgit Gözcüsü",
         "greeting": "Göl ay ışığını içer, {className}, ve karşılığında boğulanları geri verir. O kapıyı otuz gece boyunca gözledim — ve bu gece açık."
+      },
+      "skytrial_master": {
+        "name": "Skymaster Vael",
+        "title": "Warden of the Skytrials",
+        "greeting": "The sky is a road few dare to walk, {className}. Earn it, and it carries you."
       }
     },
     "quests": {
@@ -7579,6 +7826,36 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Glimmermere Sığlıkgezeri öldürüldü"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "First Flight",
+        "text": "You sit a winged steed well enough on the ground, {playerName} — now take it up. Fly the Vale Skytrial: eight rings in one looping pass. Do not chase the clock yet. Just stay aloft and thread every ring.",
+        "completion": "You did not fall. That is more than most manage on a first loop. The sky remembers who keeps coming back.",
+        "objectives": {
+          "0": {
+            "label": "Vale Skytrial completed"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Beat the Clock",
+        "text": "Now do it with intent. Fly the Vale Skytrial again, {playerName}, but finish before the sand runs out. A clean line through every ring, no wasted air. Precision, not panic.",
+        "completion": "A clean line, ring to ring. You are not riding the sky any longer — you are flying it.",
+        "objectives": {
+          "0": {
+            "label": "Vale Skytrial flown under par"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Ascendant",
+        "text": "One trial remains, {playerName}: the Vale Circuit. Three laps of the long ring, flown under par — no luck, only craft. Master it and the open sky is yours to claim, from rim to rim.",
+        "completion": "Skyward and unbroken. The sky is yours now, {playerName}. Take this charter — a steed of the air, earned and not bought, to carry you wherever you mean to go.",
+        "objectives": {
+          "0": {
+            "label": "Vale Circuit flown under par"
           }
         }
       }

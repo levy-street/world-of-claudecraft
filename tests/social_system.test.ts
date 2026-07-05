@@ -84,6 +84,21 @@ class FakeDb implements SocialDb {
     this.members.set(leaderId, { guildId: id, rank: 'leader' });
     return { guildId: id };
   }
+  async renameGuild(
+    guildId: number,
+    newName: string,
+  ): Promise<{ ok: true } | { error: 'name_taken' | 'not_found' }> {
+    if (!this.guilds.has(guildId)) return { error: 'not_found' };
+    if (
+      [...this.guilds].some(
+        ([gid, n]) => gid !== guildId && n.toLowerCase() === newName.toLowerCase(),
+      )
+    ) {
+      return { error: 'name_taken' };
+    }
+    this.guilds.set(guildId, newName);
+    return { ok: true };
+  }
   async deleteGuild(id: number): Promise<void> {
     this.guilds.delete(id);
     for (const [cid, m] of [...this.members]) if (m.guildId === id) this.members.delete(cid);

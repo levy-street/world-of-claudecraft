@@ -1842,6 +1842,7 @@ const ALL_DELTA_KEYS = [
   'cds',
   'corpse',
   'cosmetics',
+  'crun',
   'dclears',
   'dcomp',
   'dcompanion',
@@ -1849,6 +1850,7 @@ const ALL_DELTA_KEYS = [
   'dmarks',
   'drun',
   'duel',
+  'eam',
   'equip',
   'inv',
   'lockouts',
@@ -1858,13 +1860,17 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'mtc',
   'party',
   'prof',
   'qdone',
   'qlog',
+  'race',
   'stats',
   'tal',
+  'tpb',
   'trade',
+  'wag',
   'weapon',
 ] as const;
 
@@ -1881,12 +1887,14 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   buyback: 'vendorBuyback',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
+  crun: 'courseRun',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
   dmarks: 'delveMarks',
   drun: 'delveRun',
   duel: 'duelInfo',
+  eam: 'earnedMounts',
   equip: 'equipment',
   inv: 'inventory',
   lockouts: 'selfLockouts',
@@ -1898,23 +1906,27 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   marks: 'markers',
   milestones: 'unlockedMilestones',
   mres: 'maxResource',
+  mtc: 'mountCast',
   party: 'partyInfo',
   prk: 'prestigeRank',
   prof: 'professionsState',
   qdone: 'questsDone',
   qlog: 'questLog',
+  race: 'raceInfo',
   res: 'resource',
   rtype: 'resourceType',
   rxp: 'restedXp',
+  tpb: 'mountTrialBests',
+  wag: 'wagerInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
 // filter without a wall-clock read in test scaffolding.
 const FAR_FUTURE_MS = 8_000_000_000_000;
 
-// Dirty every one of the 25 `maybe()` delta fields with a distinguishable,
+// Dirty every one of the 31 `maybe()` delta fields with a distinguishable,
 // non-default value so the round-trip + no-op-omission assertions are meaningful
-// (a fresh session carries all 25 on snapshot #1 regardless, since lastSent is
+// (a fresh session carries all 31 on snapshot #1 regardless, since lastSent is
 // empty). Most fields are set on their real PlayerMeta/Entity/session source;
 // for the few whose authentic setup is mutually exclusive in one player state we
 // poke the exact source field the encoder reads, per the brief (the gate asserts
@@ -1988,6 +2000,43 @@ function dirtyEveryDeltaField(): {
   meta.loadouts = [{ name: 'PvP', alloc: { spec: 'arms', ranks: {}, choices: {} }, bar: [] }];
   meta.activeLoadout = 0;
 
+  // Mount-facet fields (#924): dirty each so its maybe(...) key rides snapshot 1.
+  meta.courseRun = {
+    courseId: 'skyreach_circuit',
+    startTick: 1,
+    nextCheckpoint: 1,
+    lap: 0,
+    splits: [5],
+    state: 'active',
+    elapsedTicks: 0,
+  } as any;
+  meta.mountTrialBests = { skyreach_circuit: 480 } as any;
+  meta.earnedMounts = new Set(['goldcrest_gryphon']) as any;
+  (meta as any).mountCast = { id: 'goldcrest_gryphon', remaining: 1, total: 2 };
+  (sim as any).races.push({
+    id: 1,
+    courseId: 'skyreach_circuit',
+    participants: [lp],
+    state: 'active',
+    countdownRemaining: 0,
+    goTick: 0,
+    finishOrder: [],
+    dnf: new Set(),
+    doneTick: 0,
+  });
+  (sim as any).wagerLobbies.set(1, {
+    id: 1,
+    hostPid: lp,
+    courseId: 'skyreach_circuit',
+    anteCopper: 100,
+    anteCharterId: null,
+    stakes: new Set([lp]),
+    expires: (sim as any).time + 600,
+    raceId: null,
+    settled: false,
+  });
+  (sim as any).wagerByPid.set(lp, 1);
+
   // Session-scoped account cosmetics.
   leader.accountCosmetics = {
     completedQuestIds: ['q_aldrics_fallen_star'],
@@ -2024,11 +2073,52 @@ function dirtyEveryDeltaField(): {
     choices: new Map(),
   });
 
+  // $WOC holder mounts: dirty the six mount delta fields so each round-trips
+  // non-null. crun/mtc/tpb/eam ride on PlayerMeta; race/wag are projected from
+  // the sim's race + wager-lobby pools (raceInfoFor / wagerInfoFor) keyed by pid.
+  meta.courseRun = {
+    courseId: 'skytrial_vale',
+    startTick: 1,
+    nextCheckpoint: 1,
+    lap: 0,
+    splits: [1],
+    state: 'active',
+    elapsedTicks: 0,
+  };
+  meta.mountCast = { id: 'goldcrest', remaining: 0.8, total: 1.5 };
+  meta.mountTrialBests = { skytrial_vale: 1234 };
+  meta.earnedMounts.add('goldcrest');
+  // race: raceInfoFor finds the race whose participants include the pid.
+  (sim as any).races.push({
+    id: 1,
+    courseId: 'vale_circuit',
+    participants: [lp, mp],
+    state: 'active',
+    countdownRemaining: 0,
+    goTick: 1,
+    finishOrder: [],
+    dnf: new Set<number>(),
+    doneTick: 0,
+  });
+  // wag: wagerInfoFor reads wagerByPid (pid -> lobbyId) + wagerLobbies (lobby).
+  (sim as any).wagerByPid.set(lp, 1);
+  (sim as any).wagerLobbies.set(1, {
+    id: 1,
+    hostPid: lp,
+    courseId: 'vale_circuit',
+    anteCopper: 500,
+    anteCharterId: null,
+    stakes: new Set<number>([lp]),
+    expires: 9999,
+    raceId: null,
+    settled: false,
+  });
+
   return { server, fc, leader, memberPid: mp };
 }
 
 describe('full self-state snapshot delta fixture', () => {
-  it('carries every one of the 25 dirtied delta keys on the first snapshot', () => {
+  it('carries every one of the 31 dirtied delta keys on the first snapshot', () => {
     const { server, fc } = dirtyEveryDeltaField();
     broadcast(server);
     const snap = lastSnap(fc.sent);
@@ -2145,9 +2235,9 @@ describe('full self-state snapshot delta fixture', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 30 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(30);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(30);
+  it('ALL_DELTA_KEYS contains exactly 36 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(36);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(36);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -2159,7 +2249,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
-    expect(scraped.size).toBe(30);
+    expect(scraped.size).toBe(36);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 400,
+      "nextId": 401,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 402,
-      "state": "ee95f387",
-      "events": "085aa36a",
+      "nextId": 403,
+      "state": "1f9d942b",
+      "events": "05d1f46d",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 402,
-      "state": "99628433",
-      "events": "00c5747e",
+      "nextId": 403,
+      "state": "605bb39b",
+      "events": "b487682a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,9 +50,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 402,
-      "state": "34a5d4db",
-      "events": "b2d6a10c",
+      "nextId": 403,
+      "state": "d9e6dd83",
+      "events": "12a8595c",
       "rng": {
         "draws": 71,
         "digest": "6619b0ad"
@@ -61,9 +61,9 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 402,
-      "state": "548eadad",
-      "events": "e8722199",
+      "nextId": 403,
+      "state": "6e9aa38d",
+      "events": "4ca07ec9",
       "rng": {
         "draws": 78,
         "digest": "d52f266d"
@@ -87,7 +87,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -100,6 +100,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -123,7 +124,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -140,6 +141,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -159,7 +161,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -207,7 +209,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 54,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -251,9 +253,9 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 402,
-      "state": "7aaf527d",
-      "events": "8d231b78",
+      "nextId": 403,
+      "state": "a6a09333",
+      "events": "985dd020",
       "rng": {
         "draws": 78,
         "digest": "d52f266d"
@@ -277,7 +279,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -290,6 +292,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -313,7 +316,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -330,6 +333,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -349,7 +353,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -397,7 +401,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 1,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -441,8 +445,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 402,
-      "state": "e4e13109",
+      "nextId": 403,
+      "state": "aacce6c7",
       "events": "741638a5",
       "rng": {
         "draws": 150,
@@ -452,8 +456,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 402,
-      "state": "5a5d6fb1",
+      "nextId": 403,
+      "state": "8da28c5f",
       "events": "741638a5",
       "rng": {
         "draws": 262,
@@ -463,8 +467,8 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 402,
-      "state": "b2c84d4f",
+      "nextId": 403,
+      "state": "8d2ff8f9",
       "events": "741638a5",
       "rng": {
         "draws": 263,
@@ -489,7 +493,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -502,6 +506,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -525,7 +530,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 401,
+          "entityId": 402,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -542,6 +547,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -561,7 +567,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 104.05,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -609,7 +615,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 104.05,
           "hp": 7,
-          "id": 401,
+          "id": 402,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

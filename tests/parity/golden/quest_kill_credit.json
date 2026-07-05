@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "74bced36",
+      "nextId": 402,
+      "state": "93eb6260",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -54,6 +54,7 @@
             }
           ],
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "talents": {
             "choices": {},
@@ -73,7 +74,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 90,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -116,9 +117,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 401,
-      "state": "19959b59",
-      "events": "00bafcff",
+      "nextId": 402,
+      "state": "4e98b4bb",
+      "events": "3d6acfe5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -142,7 +143,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -156,6 +157,7 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "questLog": [
             [
@@ -187,7 +189,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 50000,
-          "id": 400,
+          "id": 401,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -230,9 +232,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 409,
-      "state": "a031b238",
-      "events": "d894ee18",
+      "nextId": 410,
+      "state": "531be39e",
+      "events": "13051e6c",
       "rng": {
         "draws": 40,
         "digest": "0e96c13c"
@@ -260,7 +262,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -274,6 +276,7 @@
           ],
           "lifetimeXp": 27600,
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "questLog": [
             [
@@ -305,7 +308,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 400,
+          "id": 401,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -349,9 +352,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 409,
-      "state": "4448f63d",
-      "events": "272aafab",
+      "nextId": 410,
+      "state": "6135b29d",
+      "events": "ace7f38f",
       "rng": {
         "draws": 40,
         "digest": "0e96c13c"
@@ -382,7 +385,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -396,6 +399,7 @@
           ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
@@ -419,7 +423,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.4,
           "hp": 50000,
-          "id": 400,
+          "id": 401,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -463,8 +467,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 409,
-      "state": "e2c8f9f5",
+      "nextId": 410,
+      "state": "556343b5",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -496,7 +500,7 @@
           "craftSkills": {},
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 400,
+          "entityId": 401,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword"
@@ -510,6 +514,7 @@
           ],
           "lifetimeXp": 27850,
           "mailWelcomed": true,
+          "mountTrialBests": {},
           "nodeHarvestReadyAt": {},
           "questsDone": [
             "q_wolves"
@@ -533,7 +538,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99.5,
           "hp": 50000,
-          "id": 400,
+          "id": 401,
           "inCombat": true,
           "kind": "player",
           "level": 10,

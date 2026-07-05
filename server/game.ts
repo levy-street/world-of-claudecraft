@@ -1,6 +1,7 @@
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { MOUNT_LIST, mountTierForBalance } from '../src/sim/content/mounts';
 import { MECH_CHROMAS, mechChromaItemId, mechChromaSkinIndex } from '../src/sim/content/skins';
 import type { TalentAllocation } from '../src/sim/content/talents';
 import {
@@ -61,6 +62,7 @@ import {
   markAccountQuestComplete,
   openPlaySession,
   pool,
+  recordMountTrial,
   revokeAccountMechChroma,
   saveCharacterAndMarketState,
   saveCharacterState,
@@ -78,6 +80,15 @@ import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import {
+  JobContractService,
+  type JobEscrowOps,
+  type JobObservationSource,
+  type JobRecord,
+} from './job_contracts';
+import * as jobEscrow from './job_escrow';
+import type { JobObservation } from './job_milestone';
+import { jobsDb } from './jobs_db';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { trackReachedLevel5 } from './meta_capi';
 import {
@@ -100,6 +111,7 @@ import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { TickProfiler } from './tick_profiler';
 import { holderInfoForPubkey } from './woc_balance';
+import { JOB_PENDING_TTL_SECONDS } from './woc_config';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const WORLD_SEED = 20061;
@@ -568,6 +580,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.devMergedPrs) out.dvc = e.devMergedPrs; // merged-PR count, for inspect/card
   if (e.githubLogin) out.dgl = e.githubLogin; // GitHub login (inspect readout + profile link)
   if (e.guild) out.gd = e.guild;
+  if (e.mountTier) out.mte = e.mountTier; // highest $WOC mount rung this player qualifies for
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
@@ -607,6 +620,9 @@ function dynamicFields(e: Entity): Record<string, unknown> {
     if (e.channeling) out.chan = 1;
   }
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
+  // $WOC holder mount (conditional dynamic): present only while mounted, so an
+  // absent `mt` cleanly means dismounted (the renderer removes the steed).
+  if (e.mountId) out.mt = e.mountId;
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
   if (e.tappedById !== null) out.tap = e.tappedById;
   if (e.ownerId !== null) out.own = e.ownerId;
@@ -750,6 +766,8 @@ export class GameServer {
   private lastWireSweepTick = 0;
   private interval: NodeJS.Timeout | null = null;
   private holderTierInterval: NodeJS.Timeout | null = null;
+  private jobReconcileInterval: NodeJS.Timeout | null = null;
+  private jobReconcileInFlight = false; // overlap guard for the reconcile sweep
   private holderTierRefreshing = false; // overlap guard for the refresh cycle
   private playtimeInterval: NodeJS.Timeout | null = null;
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
@@ -803,6 +821,16 @@ export class GameServer {
   // Throttle for the optional over-budget stutter log (PERF_TICK_LOG=1).
   private lastPerfLogTick = 0;
   private readonly ipSessionCounts = new Map<string, number>();
+  // Player job-contract escrow ("paid bodyguard"). The service owns the lifecycle
+  // + milestone adjudication; this server is its observation source + the tick that
+  // drives it. Public so the REST layer (main.ts) can post/confirm/accept jobs.
+  readonly jobs: JobContractService;
+  // Per-tick job signals, recomputed from the sim events each tick before the job
+  // evaluator runs, then read by observe(). Wall-clock seconds (not sim ticks) so
+  // deadlines + the survive timer survive a restart.
+  private jobNowSec = 0;
+  private readonly jobDeaths = new Set<number>(); // subject pids that died this tick
+  private readonly jobQuestsByPid = new Map<number, string[]>(); // pid → quests turned in this tick
 
   constructor() {
     this.sim = new Sim({
@@ -819,6 +847,17 @@ export class GameServer {
       raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
     });
     this.social = new SocialService(this.socialDb, this.socialTransport());
+    const escrowOps: JobEscrowOps = {
+      buildOpenTransaction: jobEscrow.buildOpenTransaction,
+      verifyDeposit: jobEscrow.verifyDeposit,
+      verifyJobState: jobEscrow.verifyJobState,
+      releaseJob: jobEscrow.releaseJob,
+      refundJob: jobEscrow.refundJob,
+      jobAccountExists: jobEscrow.jobAccountExists,
+    };
+    this.jobs = new JobContractService(jobsDb, escrowOps, this, REALM, (job, outcome) =>
+      this.notifyJobParties(job, outcome),
+    );
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
@@ -846,6 +885,118 @@ export class GameServer {
 
   private sessionByCharacterId(id: number): ClientSession | null {
     return this.sessionsByCharacterId.get(id) ?? null;
+  }
+
+  // Recompute this tick's job signals from the sim events, then run one milestone
+  // evaluation pass. Cheap per tick (a handful of comparisons per active job);
+  // the expensive chain release/refund only fires on a state transition.
+  private evaluateJobs(events: SimEvent[]): void {
+    this.jobNowSec = Date.now() / 1000;
+    this.jobDeaths.clear();
+    this.jobQuestsByPid.clear();
+    for (const ev of events) {
+      if (ev.type === 'playerDeath' && ev.pid !== undefined) {
+        this.jobDeaths.add(ev.pid);
+      } else if (ev.type === 'questDone' && ev.pid !== undefined) {
+        const list = this.jobQuestsByPid.get(ev.pid) ?? [];
+        list.push(ev.questId);
+        this.jobQuestsByPid.set(ev.pid, list);
+      }
+    }
+    this.jobs.evaluateTick(this.jobNowSec);
+  }
+
+  /**
+   * Reload funded, non-terminal job contracts at boot (resumes the watcher) and
+   * recover any deposit that funded on-chain but was never confirmed (so its
+   * locked reward can't be stranded).
+   */
+  async loadJobs(): Promise<void> {
+    await this.jobs.loadActive();
+    await this.jobs.reconcilePending(Date.now() / 1000, JOB_PENDING_TTL_SECONDS);
+  }
+
+  // Tell the (online) payer + helper a job settled. Bypasses routeEvents and
+  // sends a system log line straight to each party's socket.
+  private notifyJobParties(job: JobRecord, outcome: 'released' | 'refunded'): void {
+    const { decimals } = jobEscrow.escrowCurrencyInfo(job.currency as jobEscrow.EscrowCurrency);
+    const amount = (Number(job.amountBase) / 10 ** decimals).toLocaleString('en-US', {
+      maximumFractionDigits: 4,
+    });
+    const cur = job.currency;
+    if (outcome === 'released') {
+      this.notifyCharacter(
+        job.payer.characterId,
+        `Job complete — ${amount} ${cur} paid to ${job.helper.name}.`,
+        '#7CFC9A',
+      );
+      this.notifyCharacter(
+        job.helper.characterId,
+        `You earned ${amount} ${cur} from ${job.payer.name} for your help!`,
+        '#7CFC9A',
+      );
+    } else {
+      const why =
+        job.progress.reason === 'expired'
+          ? 'expired'
+          : job.progress.reason === 'subject_died'
+            ? 'failed (the client fell)'
+            : job.progress.reason === 'cancelled'
+              ? 'was cancelled'
+              : 'ended';
+      this.notifyCharacter(
+        job.payer.characterId,
+        `Job ${why} — ${amount} ${cur} refunded to you.`,
+        '#f0c060',
+      );
+      this.notifyCharacter(
+        job.helper.characterId,
+        `${job.payer.name}'s job ${why} — no payout.`,
+        '#f0c060',
+      );
+    }
+  }
+
+  private notifyCharacter(characterId: number, text: string, color: string): void {
+    const session = this.sessionByCharacterId(characterId);
+    if (session) this.send(session, { t: 'events', list: [{ type: 'log', text, color }] });
+  }
+
+  // JobObservationSource: build the milestone observation for a job's subject
+  // (the payer's character) from the live sim, or null when the subject is
+  // offline — an offline subject simply makes no progress, with no penalty.
+  observe(job: JobRecord): JobObservation | null {
+    const subjectSession = this.sessionsByCharacterId.get(job.payer.characterId);
+    if (!subjectSession) return null;
+    const subject = this.sim.entities.get(subjectSession.pid);
+    if (!subject) return null;
+    const helperPid = this.sessionsByCharacterId.get(job.helper.characterId)?.pid;
+    const party = this.sim.partyOf(subjectSession.pid);
+    const helperPresent = helperPid !== undefined && (party?.members.includes(helperPid) ?? false);
+    // Dungeon clear: the SUBJECT'S OWN instance (keyed by their party/solo key, so
+    // another party clearing a concurrent copy can't credit them) has every mob
+    // dead. A removed mob (despawned on death) counts as cleared; an unspawned /
+    // empty instance (length 0) does not, so entering can't auto-complete it.
+    const inst = this.sim.instanceForPlayer(subjectSession.pid);
+    const dungeonClears =
+      inst &&
+      inst.mobIds.length > 0 &&
+      inst.mobIds.every((id) => {
+        const m = this.sim.entities.get(id);
+        return !m || m.dead;
+      })
+        ? [inst.dungeonId]
+        : [];
+    return {
+      nowSec: this.jobNowSec,
+      subjectLevel: subject.level,
+      subjectAlive: !subject.dead,
+      subjectDiedThisTick: this.jobDeaths.has(subjectSession.pid),
+      subjectPos: { x: subject.pos.x, z: subject.pos.z },
+      helperPresent,
+      questTurnIns: this.jobQuestsByPid.get(subjectSession.pid) ?? [],
+      dungeonClears,
+    };
   }
 
   private sessionByName(name: string): ClientSession | null {
@@ -1048,6 +1199,59 @@ export class GameServer {
     let last = process.hrtime.bigint();
     let acc = 0;
     this.interval = setInterval(() => {
+      const now = process.hrtime.bigint();
+      let dt = Number(now - last) / 1e9;
+      last = now;
+      if (dt > 0.5) dt = 0.5;
+      acc += dt;
+      // Feed the authoritative UTC day to the sim so the delve daily reset (FR-5.1)
+      // works without the sim reading the wall clock itself (determinism invariant).
+      this.sim.utcDay = new Date().toISOString().slice(0, 10);
+      this.bcastGridNs = 0n;
+      this.bcastSelfNs = 0n;
+      this.bcSerializeNs = 0n;
+      this.bcVisits = 0;
+      this.bcSerializes = 0;
+      let mark = now;
+      const lap = (phase: string): void => {
+        const t = process.hrtime.bigint();
+        this.tickProfiler.add(phase, Number(t - mark) / 1e6);
+        mark = t;
+      };
+      while (acc >= DT) {
+        this.clearStaleInputs();
+        lap('stale');
+        const events = this.sim.tick();
+        lap('tick');
+        this.routeEvents(events);
+        lap('events');
+        this.persistCourseFinishes(events);
+        this.evaluateJobs(events);
+        this.runAntibotTick();
+        lap('antibot');
+        acc -= DT;
+      }
+      this.broadcastSnapshots();
+      lap('broadcast');
+      this.tickProfiler.add('bcastGrid', Number(this.bcastGridNs) / 1e6);
+      this.tickProfiler.add('bcastSelf', Number(this.bcastSelfNs) / 1e6);
+      this.socialPosTimer += dt;
+      if (this.socialPosTimer >= 1) {
+        this.socialPosTimer = 0;
+        this.broadcastSocialPositions();
+      }
+      lap('social');
+      const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
+      this.tickProfiler.commit(tickMs);
+      this.maybeLogTickPerf(tickMs);
+      this.tickMsAvg =
+        this.tickMsAvg === 0 ? tickMs : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
+      this.saveTimer += dt;
+      if (this.saveTimer >= AUTOSAVE_SECONDS) {
+        this.saveTimer = 0;
+        void this.saveAll('autosave');
+        void this.saveMarket();
+      }
       // The whole tick body runs guarded: an unguarded throw here (sim tick, a
       // broadcast, an autosave kick-off) would unwind the callback and skip the
       // rest of this tick for everyone. Log and let the next tick self-heal so a
@@ -1244,10 +1448,22 @@ export class GameServer {
     // session for this pid.
     if (this.clients.get(session.pid) !== session) return;
     const e = this.sim.entities.get(session.pid);
-    if (e && ((e.holderTier ?? 0) !== tier || (e.holderBalance ?? 0) !== balance)) {
+    const mountTier = mountTierForBalance(balance);
+    if (
+      e &&
+      ((e.holderTier ?? 0) !== tier ||
+        (e.holderBalance ?? 0) !== balance ||
+        (e.mountTier ?? 0) !== mountTier)
+    ) {
       e.holderTier = tier; // identity diff re-broadcasts it to nearby players
       e.holderBalance = balance;
-      console.log(`[woc] ${session.name} holder tier → ${tier} (${balance} $WOC)`);
+      e.mountTier = mountTier; // gates summon + rides identity as `mte`
+      // If holdings fell below the rung of the steed they're currently riding,
+      // throw them off (a lower mount they still qualify for is left alone).
+      this.sim.enforceMountEligibility(session.pid);
+      console.log(
+        `[woc] ${session.name} holder tier → ${tier}, mount tier → ${mountTier} (${balance} $WOC)`,
+      );
     }
   }
 
@@ -1495,6 +1711,7 @@ export class GameServer {
         isAdmin?: boolean;
         adminPermissions?: readonly string[];
         clientSeed?: string;
+        mountTrialBests?: Record<string, number>;
         fbp?: string | null;
         fbc?: string | null;
         sourceUrl?: string | null;
@@ -1513,7 +1730,11 @@ export class GameServer {
         return { error: 'too many characters on this account are already in the world' };
       }
     }
-    const pid = this.sim.addPlayer(cls, name, { state: state ?? undefined, characterId });
+    const pid = this.sim.addPlayer(cls, name, {
+      state: state ?? undefined,
+      characterId,
+      mountTrialBests: meta.mountTrialBests,
+    });
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -2673,6 +2894,52 @@ export class GameServer {
       case 'clearMarker':
         if (typeof msg.id === 'number') sim.clearMarker(msg.id, pid);
         break;
+      // $WOC holder travel mounts. summonMount re-validates the requested id
+      // against the server-set eligibility tier (e.mountTier), so a forged id or a
+      // mount above the wallet's holdings is silently rejected inside the Sim.
+      case 'summon_mount':
+        if (typeof msg.mount === 'string') sim.summonMount(msg.mount, pid);
+        break;
+      case 'dismiss_mount':
+        sim.dismissMount(pid);
+        break;
+      // Mount-activity courses. startCourse re-validates flyer-only + eligibility
+      // inside the Sim, so a forged id / ground mount is rejected server-side.
+      case 'start_course':
+        if (typeof msg.course === 'string') sim.startCourse(msg.course, pid);
+        break;
+      case 'abort_course':
+        sim.abortCourse(pid);
+        break;
+      case 'start_race':
+        if (typeof msg.course === 'string') sim.startRace(msg.course, pid);
+        break;
+      case 'mint_charter':
+        if (typeof msg.mount === 'string') sim.mintCharter(msg.mount, pid);
+        break;
+      case 'wager_propose':
+        if (
+          typeof msg.course === 'string' &&
+          typeof msg.ante === 'number' &&
+          Number.isFinite(msg.ante) &&
+          msg.ante > 0 &&
+          (msg.charter === null || typeof msg.charter === 'string')
+        ) {
+          sim.proposeWagerRace(msg.course, Math.floor(msg.ante), msg.charter ?? null, pid);
+        }
+        break;
+      case 'wager_join':
+        sim.wagerJoin(pid);
+        break;
+      case 'wager_decline':
+        sim.wagerDecline(pid);
+        break;
+      case 'wager_leave':
+        sim.wagerLeave(pid);
+        break;
+      case 'wager_launch':
+        sim.launchWagerRace(pid);
+        break;
       // hunter pets
       case 'pet_abandon':
         sim.abandonPet(pid);
@@ -3457,6 +3724,25 @@ export class GameServer {
     // are tiny (a handful of numbers), so the per-tick diff is negligible.
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
+    // $WOC mount/course/race/wager self-state stays per-tick (maybe() only writes a
+    // changed value): mtc/crun/race/wag change every tick while a summon/run/race is
+    // live, so gating them would lag the cast bar and race panel; tpb/eam change
+    // rarely but are tiny, so the change-gate already makes them free between edits.
+    maybe(
+      'mtc',
+      meta.mountCast
+        ? {
+            id: meta.mountCast.id,
+            rem: round2(meta.mountCast.remaining),
+            tot: round2(meta.mountCast.total),
+          }
+        : null,
+    );
+    maybe('crun', meta.courseRun);
+    maybe('tpb', meta.mountTrialBests);
+    maybe('race', this.sim.raceInfoFor(session.pid));
+    maybe('wag', this.sim.wagerInfoFor(session.pid));
+    maybe('eam', [...meta.earnedMounts]);
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
     // heavy command/event marked this session dirty, or its staggered safety
@@ -3563,6 +3849,20 @@ export class GameServer {
     if (!d) return null;
     const otherPid = d.a === pid ? d.b : d.a;
     return { otherPid, otherName: this.sim.meta(otherPid)?.name ?? '?', state: d.state };
+  }
+
+  // Persist Skytrial finishes to mount_trial_records for the realm leaderboard.
+  // Server-authoritative: the time is the sim's measured elapsedTicks, never a
+  // client number. The sim already updated the in-session best (sent as `tpb`).
+  private persistCourseFinishes(events: SimEvent[]): void {
+    for (const ev of events) {
+      if (ev.type !== 'courseFinish' || ev.pid === undefined) continue;
+      const session = this.clients.get(ev.pid);
+      if (!session) continue;
+      void recordMountTrial(session.characterId, ev.courseId, ev.elapsedTicks).catch((err) =>
+        console.error('mount-trial record failed:', err),
+      );
+    }
   }
 
   // Public profile URL for a character name, or null when no public origin is set.
@@ -3856,6 +4156,34 @@ export class GameServer {
       }
       this.devTierPids.add(pid); // keep the chain refresh from clobbering it
       this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
+      return null;
+    }
+    // Dev-only: force this character's $WOC mount eligibility tier (0-11) so the
+    // mount window + rideable steeds can be exercised without a funded wallet.
+    // Pins via devTierPids so the balance-refresh chain won't clobber it. If the
+    // new tier is below the steed currently ridden, enforce dismounts them.
+    if (process.env.ALLOW_DEV_COMMANDS === '1' && /^\/wocmount\b/.test(text)) {
+      const n = Math.max(
+        0,
+        Math.min(MOUNT_LIST.length, parseInt(text.split(/\s+/)[1] ?? '', 10) || 0),
+      );
+      const e = this.sim.entities.get(pid);
+      if (e) {
+        e.mountTier = n;
+        this.sim.enforceMountEligibility(pid);
+      }
+      this.devTierPids.add(pid);
+      this.broadcastSystem(`[dev] ${session.name} $WOC mount tier → ${n}`);
+      return null;
+    }
+    // Dev-only: permanently grant an EARNED mount (as if a Charter were redeemed),
+    // so the non-$WOC earned track can be exercised without minting/trading.
+    if (process.env.ALLOW_DEV_COMMANDS === '1' && /^\/wocearn\b/.test(text)) {
+      const mountId = text.split(/\s+/)[1] ?? '';
+      const ok = this.sim.grantEarnedMount(mountId, pid);
+      this.broadcastSystem(
+        `[dev] ${session.name} ${ok ? 'earned mount' : 'could not earn'} → ${mountId}`,
+      );
       return null;
     }
     if (!text.startsWith('/')) {

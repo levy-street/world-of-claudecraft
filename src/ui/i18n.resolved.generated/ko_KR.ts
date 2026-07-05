@@ -2742,6 +2742,99 @@ export const ko_KR: EnTranslations = {
       }
     }
   },
+  "walletPanel": {
+    "title": "지갑",
+    "closeAria": "닫기",
+    "notConnected": "지갑이 연결되지 않음",
+    "connect": "연결",
+    "connectedStatus": "연결됨 {address}",
+    "linkedBadge": "링크됨",
+    "tabSend": "보내기",
+    "tabHire": "고용",
+    "tabJobs": "의뢰",
+    "sendSection": "플레이어에게 보내기",
+    "currency": "통화",
+    "playerName": "플레이어 이름",
+    "recipientPlaceholder": "누구에게 보내시겠어요?",
+    "amount": "금액",
+    "amountPlaceholder": "0.0",
+    "max": "최대",
+    "balanceEmpty": "잔액: -",
+    "balanceLoading": "잔액: …",
+    "balanceUnavailable": "잔액: 확인 불가",
+    "balance": "잔액: {amount}",
+    "balanceExceeds": "잔액: {amount} (잔액 초과)",
+    "connectForBalance": "잔액을 보려면 지갑을 연결하세요.",
+    "sendNote": "Solana에서 지갑 간에 직접 전송됩니다. 논커스터디얼: 게임은 자금을 보관하지 않습니다. 네트워크 수수료가 부과됩니다.",
+    "send": "보내기",
+    "sending": "보내는 중…",
+    "loginToSend": "플레이어에게 보내려면 로그인 후 월드에 입장하세요.",
+    "lookingUp": "플레이어 찾는 중…",
+    "ownWallet": "(이것은 본인의 지갑입니다)",
+    "noVerifiedWallet": "해당 이름의 플레이어에게 인증된 지갑이 없습니다.",
+    "approveTransfer": "지갑에서 전송을 승인하세요…",
+    "sent": "{name}에게 {amount} {currency}을(를) 보냈습니다.",
+    "viewTransaction": "트랜잭션 보기",
+    "sendFailedWith": "전송 실패: {message}",
+    "sendFailed": "전송에 실패했습니다.",
+    "hireSection": "도우미 고용",
+    "hireOffline": "도우미를 고용하려면 온라인으로 월드에 입장하세요.",
+    "helperPlaceholder": "누가 도와줄까요?",
+    "rewardCurrency": "보상 통화",
+    "reward": "보상",
+    "goalLabel": "목표, 서버가 확인하면 지급됩니다",
+    "goalReachLevel": "레벨 달성",
+    "goalClearDungeon": "레이드 공략",
+    "goalQuest": "퀘스트",
+    "goalBodyguard": "경호",
+    "goalEscort": "호위",
+    "targetLevel": "목표 레벨",
+    "targetLevelPlaceholder": "2에서 20",
+    "raidDungeon": "레이드 / 던전",
+    "questOwn": "퀘스트 (진행 중인 것)",
+    "noActiveQuests": "도움을 요청할 진행 중인 퀘스트가 없습니다. 먼저 퀘스트를 받으세요.",
+    "protectMinutes": "보호 시간 (분)",
+    "minutesPlaceholder": "예: 10",
+    "escortDestination": "호위 목적지",
+    "useCurrentSpot": "현재 위치 사용",
+    "destinationSet": "목적지 설정됨: ({x}, {z})",
+    "noDestination": "아직 목적지가 설정되지 않았습니다.",
+    "destinationHint": "목적지 ({x}, {z}), 이동한 뒤 경호원이 이곳으로 데려다주게 하세요.",
+    "hireLogin": "플레이어를 고용하려면 온라인으로 월드에 입장하세요.",
+    "escrowNote": "보상은 온체인 에스크로에 잠기며 서버가 목표를 확인하면 도우미에게 자동으로 지급됩니다. 기한 내에 달성되지 않으면 회원님께 환불됩니다.",
+    "post": "보상 게시 및 잠금",
+    "posting": "게시 중…",
+    "setGoalFirst": "먼저 유효한 목표를 설정하세요.",
+    "preparingEscrow": "에스크로 준비 중…",
+    "approveDeposit": "지갑에서 보상 입금을 승인하세요…",
+    "lockingReward": "보상을 온체인에 잠그는 중…",
+    "waitingFinalization": "최종 확정을 기다리는 중…",
+    "confirmTimeout": "입금 확인이 시간 초과되었습니다. 보상이 잠겼다면 최종 확정 후에 정산됩니다.",
+    "jobPosted": "의뢰 게시됨: {amount} {currency}이(가) {name}을(를) 위해 에스크로에 잠겼습니다.",
+    "postFailed": "의뢰 게시에 실패했습니다.",
+    "failedWith": "실패: {message}",
+    "jobsSection": "내 의뢰",
+    "loading": "불러오는 중…",
+    "jobsOffline": "의뢰를 관리하려면 온라인으로 월드에 입장하세요.",
+    "jobsEmpty": "아직 의뢰가 없습니다. 고용 탭에서 플레이어에게 도움을 의뢰해 보세요.",
+    "youHired": "{name}을(를) 고용했습니다",
+    "hiredYou": "{name}이(가) 당신을 고용했습니다",
+    "acceptJob": "의뢰 수락",
+    "cancelRefund": "취소 및 환불",
+    "viewPayout": "지급 내역 보기",
+    "actionFailed": "작업에 실패했습니다.",
+    "status": {
+      "awaitingDeposit": "입금 대기 중",
+      "offered": "당신에게 제안됨, 수락하면 시작됩니다",
+      "open": "공개됨, 도우미의 수락 대기 중",
+      "active": "진행 중",
+      "completed": "완료, 도우미에게 지급됨",
+      "expired": "만료, 환불됨",
+      "failedDied": "실패 (당신이 사망), 환불됨",
+      "cancelled": "취소됨, 환불됨",
+      "refunded": "환불됨"
+    }
+  },
   "playerCard": {
     "shareButton": "플레이어 카드 공유",
     "title": "플레이어 카드",
@@ -3460,6 +3553,12 @@ export const ko_KR: EnTranslations = {
     "renameRequired": "이름 변경 필요",
     "delete": "삭제",
     "rename": "이름 변경",
+    "renamePaidButton": "{amount} $WOC 지불하고 이름 변경",
+    "renamePriceHint": "자발적 이름 변경은 {amount} $WOC를 소각합니다.",
+    "renameCancel": "취소",
+    "mintSolName": ".sol 이름 받기",
+    "mintSolButton": "{amount} $WOC 소각하고 민트",
+    "mintSolHint": "플레이어 소유의 ‹이름›.worldofclaudecraft.sol을 {amount} $WOC로 민트하세요. 온체인에서 당신의 것입니다.",
     "newNamePlaceholder": "새 캐릭터 이름",
     "tabCharacters": "캐릭터",
     "tabCreate": "생성",
@@ -3474,6 +3573,19 @@ export const ko_KR: EnTranslations = {
     "sortName": "이름",
     "sortRecent": "최근 플레이",
     "sortPlaytime": "플레이 시간"
+  },
+  "woc": {
+    "linkWalletFirst": "$WOC로 지불하려면 Solana 지갑을 연결하고 링크하세요.",
+    "quoting": "$WOC 결제를 준비하는 중…",
+    "approveBurn": "지갑에서 {amount} $WOC 소각을 승인하세요…",
+    "confirming": "온체인에서 소각을 확인하는 중…",
+    "finalizing": "Solana 최종 확정을 기다리는 중…",
+    "confirmFailed": "$WOC 결제를 확인할 수 없습니다.",
+    "finalizeTimeout": "최종 확정 대기가 시간 초과되었습니다. $WOC가 소각되었다면 다시 열어 재시도하세요. 결제는 최종 확정되면 정산됩니다.",
+    "renameSuccess": "{name}(으)로 이름을 변경했습니다.",
+    "mintSuccess": "{domain}을 민트했습니다. 온체인에서 당신의 것입니다.",
+    "guildRenameSuccess": "길드 이름을 {name}(으)로 변경했습니다.",
+    "reserveSuccess": "{name} 이름을 예약했습니다."
   },
   "deleteCharacter": {
     "title": "캐릭터 삭제",
@@ -3628,6 +3740,106 @@ export const ko_KR: EnTranslations = {
       "zoomOut": "축소",
       "mapCanvasLabel": "지도",
       "mapSummary": "{zone}의 지도."
+    },
+    "mounts": {
+      "title": "탈것",
+      "subtitle": "$WOC 여행 탈것",
+      "close": "탈것 닫기",
+      "summon": "소환",
+      "dismount": "내리기",
+      "summoning": "{name} 소환 중…",
+      "riding": "탑승 중",
+      "flies": "비행",
+      "locked": "잠김",
+      "speed": "이동 속도 +{percent}%",
+      "unlockAt": "{amount} $WOC에서 해금",
+      "supplyShare": "공급량의 {percent}",
+      "qualifyHeader": "여행 탈것 {total}종 중 {count}종의 자격을 갖추었습니다.",
+      "holdingHint": "{amount} $WOC 보유 중.",
+      "noWallet": "연결된 지갑에 최소 {amount} $WOC(공급량의 0.1%)를 보유하면 첫 여행 탈것을 얻습니다.",
+      "cantInCombat": "전투 중에는 탈 수 없습니다.",
+      "cantSwimming": "수영 중에는 탈 수 없습니다.",
+      "cantDead": "사망 상태에서는 탈 수 없습니다.",
+      "notEligible": "$WOC 보유량이 아직 그 탈것에 미치지 못합니다.",
+      "summonedBanner": "{name}을(를) 소환합니다.",
+      "summonAria": "{name} 소환",
+      "dismountAria": "{name}에서 내리기",
+      "lockedAria": "{name}: 잠김; {amount} $WOC에서 해금",
+      "activeAria": "{name}: 현재 활성",
+      "cardAria": "{name}: {flavor}",
+      "owned": "소유함",
+      "mint": "증서 발행",
+      "mintHint": "이 탈것의 거래 가능한 증서를 발행하세요. 금에 팔아 보유자가 아닌 이도 얻게 하세요.",
+      "mintAria": "{name}의 거래 가능한 증서 발행",
+      "mintedBanner": "{name}의 증서를 발행합니다.",
+      "earnedBanner": "{name}을(를) 얻었습니다. 영원히 당신의 것입니다.",
+      "alreadyOwnErr": "이미 그 탈것을 소유하고 있습니다.",
+      "charterVoidErr": "그 증서는 무효입니다.",
+      "noCharterErr": "그 탈것은 증서를 발행할 수 없습니다.",
+      "holdingsShortErr": "보유량으로는 그 탈것을 감당할 수 없습니다."
+    },
+    "course": {
+      "skytrials": "하늘 시련",
+      "skytrialsHint": "비행 탈것을 타고 시간 제한 고리 경로를 비행하세요.",
+      "needFlyer": "하늘 시련을 비행하려면 비행 탈것을 소환하세요.",
+      "start": "비행",
+      "give_up": "포기",
+      "par": "기준 {time}",
+      "laps": "{count}바퀴",
+      "onePass": "1바퀴",
+      "starting": "첫 고리를 통과해 시간을 시작하세요",
+      "gate": "링 {n}/{total}",
+      "lap": "바퀴 {n}/{total}",
+      "time": "시간",
+      "finish": "완주!",
+      "beatPar": "기준보다 {time} 빠름",
+      "offPar": "기준보다 {time} 느림",
+      "failed": "주행 종료: 탈것에서 내렸습니다",
+      "aborted": "주행 포기",
+      "best": "최고 {time}",
+      "newBest": "신기록!",
+      "board": "순위판",
+      "boardTitle": "{name}: 최고 기록",
+      "noTimes": "아직 기록이 없습니다. 첫 번째가 되세요.",
+      "loadingBoard": "불러오는 중…",
+      "you": "(나)",
+      "race": "경주",
+      "racePartyHint": "파티와 경주하세요. 가장 먼저 고리를 통과한 자가 이깁니다.",
+      "getReady": "준비",
+      "go": "출발!",
+      "dnf": "미완주",
+      "placeOf": "{total}명 중 #{place}",
+      "racing": "경주 중"
+    },
+    "wager": {
+      "start": "내기 경주",
+      "title": "내기 경주",
+      "inviteGold": "{name}님이 내기 경주를 엽니다. 참가하려면 {money}을(를) 거세요. 받으시겠습니까?",
+      "inviteCharter": "{name}님이 내기 경주를 엽니다. {money} + 탈것 증서를 거세요. 받으시겠습니까?",
+      "accept": "내기 받기",
+      "pot": "상금 {money}",
+      "potCharter": "판돈 {money} + 증서 {count}×",
+      "racers": "참가자 ({count})",
+      "launch": "경주 시작",
+      "cancel": "취소",
+      "leave": "나가기",
+      "waiting": "판돈을 받을 도전자를 기다리는 중…",
+      "won": "내기에서 이겼습니다, {money}!",
+      "wonCharter": "내기에서 이겼습니다, {money} + 증서 {count}×!",
+      "lost": "내기에서 졌습니다.",
+      "refunded": "내기가 취소되었습니다. 건 판돈을 돌려받습니다.",
+      "antePrompt": "이 경주에 금을 얼마나 거시겠습니까? (동화 기준)",
+      "open": "내기 열기",
+      "stakeCharter": "탈것 증서도 함께 걸기 (승자가 차지함)",
+      "errCourse": "그 경로는 내기를 걸 수 없습니다.",
+      "errFlyer": "내기를 걸려면 비행 탈것을 타고 있어야 합니다.",
+      "errBusy": "이미 내기에 참여하고 있습니다.",
+      "errAnte": "최소 동화 1개 이상의 내기를 거세요.",
+      "errStake": "그것은 내기로 걸 수 없습니다.",
+      "errAfford": "그 내기를 감당할 수 없습니다.",
+      "errExpired": "그 내기 제안은 만료되었습니다.",
+      "errGone": "그 내기는 더 이상 열려 있지 않습니다.",
+      "errHost": "주최자만 내기를 시작할 수 있습니다."
     },
     "options": {
       "gameMenu": "게임 메뉴",
@@ -5640,6 +5852,36 @@ export const ko_KR: EnTranslations = {
       "monarch_crown_helm": {
         "name": "군주의 왕관"
       },
+      "charter_ashmane": {
+        "name": "증서: 잿빛갈기 준마"
+      },
+      "charter_emberhoof": {
+        "name": "증서: 불씨굽 군마"
+      },
+      "charter_bronzeflank": {
+        "name": "증서: 청동옆구리 전마"
+      },
+      "charter_silvermane": {
+        "name": "증서: 은빛갈기 종마"
+      },
+      "charter_stormhoof": {
+        "name": "증서: 폭풍굽 군마"
+      },
+      "charter_goldcrest": {
+        "name": "증서: 금빛볏 하늘걸음이"
+      },
+      "charter_verdant": {
+        "name": "증서: 푸른들 야생날개"
+      },
+      "charter_voidstrider": {
+        "name": "증서: 공허날개 활보자"
+      },
+      "charter_celestial": {
+        "name": "증서: 천상의 세라프"
+      },
+      "charter_worldbearer": {
+        "name": "증서: 세계를 짊어진 자의 로크"
+      },
       "linen_pouch": {
         "name": "아마천 주머니"
       },
@@ -6734,6 +6976,11 @@ export const ko_KR: EnTranslations = {
         "name": "온드렐 베인",
         "title": "조수지기",
         "greeting": "이 호수는 달빛을 마시고, {className}, 익사한 자들을 되돌려 보낸다네. 나는 서른 밤 동안 저 관문을 지켜보았지 — 그리고 오늘 밤, 마침내 그것이 열렸네."
+      },
+      "skytrial_master": {
+        "name": "하늘지기 베일",
+        "title": "하늘 시련의 수호자",
+        "greeting": "하늘은 감히 걸으려는 이가 드문 길입니다, {className}. 그것을 얻으면, 하늘이 그대를 실어 나릅니다."
       }
     },
     "quests": {
@@ -7579,6 +7826,36 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "글리머미어 물거리 처치"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "첫 비행",
+        "text": "땅 위에서는 날개 달린 탈것을 곧잘 다루는군요, {playerName}. 이제 하늘로 올리세요. 골짜기 하늘 시련을 비행하십시오: 한 바퀴 도는 길에 여덟 개의 고리. 아직 시간을 쫓지는 마세요. 그저 떠 있으면서 모든 고리를 꿰십시오.",
+        "completion": "떨어지지 않았군요. 첫 바퀴에 대부분이 해내는 것보다 더한 일입니다. 하늘은 계속 돌아오는 자를 기억합니다.",
+        "objectives": {
+          "0": {
+            "label": "골짜기 하늘 시련 완료"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "시간을 이겨라",
+        "text": "이제 의지를 담아 해내십시오. 골짜기 하늘 시련을 다시 비행하되, {playerName}, 모래가 다하기 전에 끝내세요. 모든 고리를 깔끔한 선으로, 허비되는 공기 없이. 당황이 아니라 정밀함으로.",
+        "completion": "고리에서 고리로, 깔끔한 선이었습니다. 그대는 더 이상 하늘을 타고 있는 것이 아닙니다. 하늘을 날고 있습니다.",
+        "objectives": {
+          "0": {
+            "label": "골짜기 하늘 시련 기준 시간 내 비행"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "비상하는 자",
+        "text": "한 가지 시련이 남았습니다, {playerName}: 골짜기 순환로. 긴 고리를 세 바퀴, 기준 시간 내에 비행하십시오. 운이 아니라 오직 기량으로. 그것을 통달하면 가장자리에서 가장자리까지 드넓은 하늘이 그대의 것입니다.",
+        "completion": "하늘로 올라, 꺾이지 않았습니다. 이제 하늘은 그대의 것입니다, {playerName}. 이 증서를 받으십시오. 사지 않고 얻어 낸 창공의 탈것이, 그대가 향하려는 어디로든 실어 나를 것입니다.",
+        "objectives": {
+          "0": {
+            "label": "골짜기 순환로 기준 시간 내 비행"
           }
         }
       }

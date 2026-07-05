@@ -2742,6 +2742,99 @@ export const de_DE: EnTranslations = {
       }
     }
   },
+  "walletPanel": {
+    "title": "Wallet",
+    "closeAria": "Close",
+    "notConnected": "Wallet not connected",
+    "connect": "Connect",
+    "connectedStatus": "Connected {address}",
+    "linkedBadge": "linked",
+    "tabSend": "Send",
+    "tabHire": "Hire",
+    "tabJobs": "Jobs",
+    "sendSection": "Send to a player",
+    "currency": "Currency",
+    "playerName": "Player name",
+    "recipientPlaceholder": "Who are you sending to?",
+    "amount": "Amount",
+    "amountPlaceholder": "0.0",
+    "max": "Max",
+    "balanceEmpty": "Balance: -",
+    "balanceLoading": "Balance: …",
+    "balanceUnavailable": "Balance: unavailable",
+    "balance": "Balance: {amount}",
+    "balanceExceeds": "Balance: {amount} (exceeds balance)",
+    "connectForBalance": "Connect a wallet to see your balance.",
+    "sendNote": "Sent directly wallet-to-wallet on Solana. Non-custodial: the game never holds your funds. Network fees apply.",
+    "send": "Send",
+    "sending": "Sending…",
+    "loginToSend": "Log in and enter a realm to send to players.",
+    "lookingUp": "Looking up player…",
+    "ownWallet": "(this is your own wallet)",
+    "noVerifiedWallet": "No player by that name has a verified wallet.",
+    "approveTransfer": "Approve the transfer in your wallet…",
+    "sent": "Sent {amount} {currency} to {name}.",
+    "viewTransaction": "View transaction",
+    "sendFailedWith": "Send failed: {message}",
+    "sendFailed": "Send failed.",
+    "hireSection": "Hire a helper",
+    "hireOffline": "Enter the world online to hire a helper.",
+    "helperPlaceholder": "Who will help you?",
+    "rewardCurrency": "Reward currency",
+    "reward": "Reward",
+    "goalLabel": "Goal, paid when the server confirms it",
+    "goalReachLevel": "Reach level",
+    "goalClearDungeon": "Clear raid",
+    "goalQuest": "Quest",
+    "goalBodyguard": "Bodyguard",
+    "goalEscort": "Escort",
+    "targetLevel": "Target level",
+    "targetLevelPlaceholder": "2 to 20",
+    "raidDungeon": "Raid / dungeon",
+    "questOwn": "Quest (one you're on)",
+    "noActiveQuests": "You have no active quests to hire help for, pick one up first.",
+    "protectMinutes": "Protect me for (minutes)",
+    "minutesPlaceholder": "e.g. 10",
+    "escortDestination": "Escort destination",
+    "useCurrentSpot": "Use my current spot",
+    "destinationSet": "Destination set: ({x}, {z})",
+    "noDestination": "No destination set yet.",
+    "destinationHint": "Destination ({x}, {z}), travel off, then have your guard bring you back here.",
+    "hireLogin": "Enter a realm online to hire a player.",
+    "escrowNote": "The reward is locked in on-chain escrow and released to the helper automatically when the server confirms the goal, or refunded to you if it isn't met before the deadline.",
+    "post": "Post & Lock Reward",
+    "posting": "Posting…",
+    "setGoalFirst": "Set a valid goal first.",
+    "preparingEscrow": "Preparing the escrow…",
+    "approveDeposit": "Approve the reward deposit in your wallet…",
+    "lockingReward": "Locking the reward on-chain…",
+    "waitingFinalization": "Waiting for finalization…",
+    "confirmTimeout": "Timed out confirming the deposit. If the reward was locked it will settle once it finalizes.",
+    "jobPosted": "Job posted: {amount} {currency} locked in escrow for {name}.",
+    "postFailed": "Failed to post the job.",
+    "failedWith": "Failed: {message}",
+    "jobsSection": "Your jobs",
+    "loading": "Loading…",
+    "jobsOffline": "Enter the world online to manage jobs.",
+    "jobsEmpty": "No jobs yet. Use the Hire tab to pay a player for help.",
+    "youHired": "You hired {name}",
+    "hiredYou": "{name} hired you",
+    "acceptJob": "Accept job",
+    "cancelRefund": "Cancel & refund",
+    "viewPayout": "View payout",
+    "actionFailed": "Action failed.",
+    "status": {
+      "awaitingDeposit": "Awaiting your deposit",
+      "offered": "Offered to you, accept to begin",
+      "open": "Open, waiting for the helper to accept",
+      "active": "In progress",
+      "completed": "Completed, helper paid",
+      "expired": "Expired, refunded",
+      "failedDied": "Failed (you died), refunded",
+      "cancelled": "Cancelled, refunded",
+      "refunded": "Refunded"
+    }
+  },
   "playerCard": {
     "shareButton": "Spielerkarte teilen",
     "title": "Spielerkarte",
@@ -3460,6 +3553,12 @@ export const de_DE: EnTranslations = {
     "renameRequired": "Umbenennung erforderlich",
     "delete": "Löschen",
     "rename": "Umbenennen",
+    "renamePaidButton": "Pay {amount} $WOC & Rename",
+    "renamePriceHint": "A voluntary rename burns {amount} $WOC.",
+    "renameCancel": "Cancel",
+    "mintSolName": "Get .sol name",
+    "mintSolButton": "Burn {amount} $WOC & Mint",
+    "mintSolHint": "Mint a player-owned ‹name›.worldofclaudecraft.sol for {amount} $WOC, yours on-chain.",
     "newNamePlaceholder": "Neuer Charaktername",
     "tabCharacters": "Charaktere",
     "tabCreate": "Erstellen",
@@ -3474,6 +3573,19 @@ export const de_DE: EnTranslations = {
     "sortName": "Name",
     "sortRecent": "Zuletzt gespielt",
     "sortPlaytime": "Spielzeit"
+  },
+  "woc": {
+    "linkWalletFirst": "Connect and link a Solana wallet to pay with $WOC.",
+    "quoting": "Preparing your $WOC payment…",
+    "approveBurn": "Approve the {amount} $WOC burn in your wallet…",
+    "confirming": "Confirming the burn on-chain…",
+    "finalizing": "Waiting for Solana finalization…",
+    "confirmFailed": "The $WOC payment could not be verified.",
+    "finalizeTimeout": "Timed out waiting for finalization. If $WOC was burned, reopen and retry: the payment settles once it finalizes.",
+    "renameSuccess": "Renamed to {name}.",
+    "mintSuccess": "Minted {domain}, it's yours on-chain.",
+    "guildRenameSuccess": "Guild renamed to {name}.",
+    "reserveSuccess": "Reserved the name {name}."
   },
   "deleteCharacter": {
     "title": "Charakter löschen",
@@ -3628,6 +3740,106 @@ export const de_DE: EnTranslations = {
       "zoomOut": "Herauszoomen",
       "mapCanvasLabel": "Karte",
       "mapSummary": "Karte von {zone}."
+    },
+    "mounts": {
+      "title": "Reittiere",
+      "subtitle": "$WOC-Reittiere",
+      "close": "Reittiere schließen",
+      "summon": "Beschwören",
+      "dismount": "Absteigen",
+      "summoning": "Beschwöre {name}…",
+      "riding": "Reitend",
+      "flies": "Fliegt",
+      "locked": "Verschlossen",
+      "speed": "+{percent}% Tempo",
+      "unlockAt": "Freigeschaltet bei {amount} $WOC",
+      "supplyShare": "{percent} des Angebots",
+      "qualifyHeader": "Ihr erfüllt die Bedingungen für {count} von {total} Reittieren.",
+      "holdingHint": "Ihr haltet {amount} $WOC.",
+      "noWallet": "Haltet mindestens {amount} $WOC — 0.1% des Angebots — auf einem verbundenen Wallet, um Euer erstes Reittier zu verdienen.",
+      "cantInCombat": "Im Kampf könnt Ihr nicht aufsteigen.",
+      "cantSwimming": "Beim Schwimmen könnt Ihr nicht aufsteigen.",
+      "cantDead": "Tot könnt Ihr nicht aufsteigen.",
+      "notEligible": "Eure $WOC-Bestände reichen für dieses Ross noch nicht.",
+      "summonedBanner": "Ihr beschwört {name}.",
+      "summonAria": "{name} beschwören",
+      "dismountAria": "Von {name} absteigen",
+      "lockedAria": "{name} — verschlossen; freigeschaltet bei {amount} $WOC",
+      "activeAria": "{name} — derzeit aktiv",
+      "cardAria": "{name}: {flavor}",
+      "owned": "Im Besitz",
+      "mint": "Reitbrief prägen",
+      "mintHint": "Prägt einen handelbaren Reitbrief für dieses Reittier — verkauft ihn für Gold, damit ein Nicht-Halter es verdienen kann.",
+      "mintAria": "Einen handelbaren Reitbrief für {name} prägen",
+      "mintedBanner": "Ihr prägt einen Reitbrief für {name}.",
+      "earnedBanner": "Ihr habt {name} verdient — es gehört Euch für immer.",
+      "alreadyOwnErr": "Dieses Reittier besitzt Ihr bereits.",
+      "charterVoidErr": "Dieser Reitbrief ist ungültig.",
+      "noCharterErr": "Für dieses Reittier kann kein Reitbrief geprägt werden.",
+      "holdingsShortErr": "Eure Bestände decken dieses Reittier nicht."
+    },
+    "course": {
+      "skytrials": "Himmelsproben",
+      "skytrialsHint": "Fliegt einen zeitgewerteten Ringkurs auf einem fliegenden Reittier.",
+      "needFlyer": "Beschwört ein fliegendes Reittier, um Himmelsproben zu fliegen.",
+      "start": "Fliegen",
+      "give_up": "Aufgeben",
+      "par": "Sollzeit {time}",
+      "laps": "{count} Runden",
+      "onePass": "1 Runde",
+      "starting": "Fliegt durch den ersten Ring, um die Uhr zu starten",
+      "gate": "Ring {n}/{total}",
+      "lap": "Runde {n}/{total}",
+      "time": "Zeit",
+      "finish": "Ziel!",
+      "beatPar": "Sollzeit um {time} unterboten",
+      "offPar": "{time} über Sollzeit",
+      "failed": "Lauf beendet — Ihr habt Euer Reittier verlassen",
+      "aborted": "Lauf abgebrochen",
+      "best": "Beste {time}",
+      "newBest": "Neue Bestzeit!",
+      "board": "Rangliste",
+      "boardTitle": "{name} — Bestzeiten",
+      "noTimes": "Noch keine Zeiten — seid die Ersten.",
+      "loadingBoard": "Lädt…",
+      "you": "(Ihr)",
+      "race": "Rennen",
+      "racePartyHint": "Tretet gegen Eure Gruppe an — wer zuerst durch die Ringe fliegt, gewinnt.",
+      "getReady": "Macht Euch bereit",
+      "go": "LOS!",
+      "dnf": "DNF",
+      "placeOf": "#{place} von {total}",
+      "racing": "Rennen läuft"
+    },
+    "wager": {
+      "start": "Wettrennen",
+      "title": "Wettrennen",
+      "inviteGold": "{name} eröffnet ein Wettrennen — setzt {money} zum Antreten. Mithalten?",
+      "inviteCharter": "{name} eröffnet ein Wettrennen — setzt {money} + einen Reitbrief. Mithalten?",
+      "accept": "Wette annehmen",
+      "pot": "Topf {money}",
+      "potCharter": "Topf {money} + {count}× Reitbrief",
+      "racers": "Teilnehmer ({count})",
+      "launch": "Rennen starten",
+      "cancel": "Abbrechen",
+      "leave": "Verlassen",
+      "waiting": "Warten auf einen Herausforderer, der den Einsatz hält…",
+      "won": "Ihr gewinnt die Wette — {money}!",
+      "wonCharter": "Ihr gewinnt die Wette — {money} + {count}× Reitbrief!",
+      "lost": "Ihr habt die Wette verloren.",
+      "refunded": "Wette abgesagt — Euer Einsatz wird erstattet.",
+      "antePrompt": "Wie viel Gold setzt Ihr auf dieses Rennen? (in Kupfer)",
+      "open": "Wette eröffnen",
+      "stakeCharter": "Auch einen Reitbrief setzen (der Sieger nimmt ihn)",
+      "errCourse": "Auf diesen Kurs kann nicht gewettet werden.",
+      "errFlyer": "Ihr müsst auf einem fliegenden Reittier sein, um zu wetten.",
+      "errBusy": "Ihr seid bereits in einer Wette.",
+      "errAnte": "Nennt eine Wette von mindestens 1 Kupfer.",
+      "errStake": "Das kann nicht als Wetteinsatz gesetzt werden.",
+      "errAfford": "Ihr könnt diese Wette nicht decken.",
+      "errExpired": "Dieses Wettangebot ist abgelaufen.",
+      "errGone": "Diese Wette ist nicht mehr offen.",
+      "errHost": "Nur der Gastgeber kann die Wette starten."
     },
     "options": {
       "gameMenu": "Spielmenü",
@@ -5640,6 +5852,36 @@ export const de_DE: EnTranslations = {
       "monarch_crown_helm": {
         "name": "Krone des Monarchen"
       },
+      "charter_ashmane": {
+        "name": "Reitbrief: Aschmähnen-Renner"
+      },
+      "charter_emberhoof": {
+        "name": "Reitbrief: Gluthuf-Streitross"
+      },
+      "charter_bronzeflank": {
+        "name": "Reitbrief: Bronzeflanken-Streithengst"
+      },
+      "charter_silvermane": {
+        "name": "Reitbrief: Silbermähnen-Hengst"
+      },
+      "charter_stormhoof": {
+        "name": "Reitbrief: Sturmhuf-Streitross"
+      },
+      "charter_goldcrest": {
+        "name": "Reitbrief: Goldkamm-Himmelsschreiter"
+      },
+      "charter_verdant": {
+        "name": "Reitbrief: Grünflügel der Wildnis"
+      },
+      "charter_voidstrider": {
+        "name": "Reitbrief: Leerschwingen-Schreiter"
+      },
+      "charter_celestial": {
+        "name": "Reitbrief: Himmlischer Seraph"
+      },
+      "charter_worldbearer": {
+        "name": "Reitbrief: Roch des Weltenträgers"
+      },
       "linen_pouch": {
         "name": "Leinenbeutel"
       },
@@ -6734,6 +6976,11 @@ export const de_DE: EnTranslations = {
         "name": "Ondrel Vane",
         "title": "Gezeitenwächter",
         "greeting": "Der See trinkt das Mondlicht, {className}, und gibt die Ertränkten zurück. Dreißig Nächte lang habe ich jenes Tor bewacht — und heute Nacht steht es offen."
+      },
+      "skytrial_master": {
+        "name": "Himmelsmeister Vael",
+        "title": "Wächter der Himmelsproben",
+        "greeting": "Der Himmel ist ein Pfad, den nur wenige zu beschreiten wagen, {className}. Verdient ihn, und er trägt Euch."
       }
     },
     "quests": {
@@ -7579,6 +7826,36 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Schimmersee-Wäter erschlagen"
+          }
+        }
+      },
+      "q_skyward_first_flight": {
+        "title": "Erster Flug",
+        "text": "Auf dem Boden sitzt Ihr einem geflügelten Ross gut genug, {playerName} — nun führt es empor. Fliegt die Tal-Himmelsprobe: acht Ringe in einem geschlungenen Durchgang. Jagt noch nicht der Uhr nach. Bleibt nur in der Luft und durchfädelt jeden Ring.",
+        "completion": "Ihr seid nicht gestürzt. Das ist mehr, als die meisten im ersten Durchgang schaffen. Der Himmel erinnert sich an jeden, der wiederkehrt.",
+        "objectives": {
+          "0": {
+            "label": "Tal-Himmelsprobe abgeschlossen"
+          }
+        }
+      },
+      "q_skyward_time_trial": {
+        "title": "Schlagt die Uhr",
+        "text": "Nun tut es mit Absicht. Fliegt die Tal-Himmelsprobe erneut, {playerName}, doch beendet sie, ehe der Sand verrinnt. Eine saubere Linie durch jeden Ring, keine vergeudete Luft. Präzision, nicht Panik.",
+        "completion": "Eine saubere Linie, von Ring zu Ring. Ihr reitet den Himmel nicht länger — Ihr fliegt ihn.",
+        "objectives": {
+          "0": {
+            "label": "Tal-Himmelsprobe unter Sollzeit geflogen"
+          }
+        }
+      },
+      "q_skyward_ascendant": {
+        "title": "Emporgestiegen",
+        "text": "Eine Prüfung bleibt, {playerName}: der Tal-Rundkurs. Drei Runden des langen Rings, unter Sollzeit geflogen — kein Glück, nur Können. Meistert ihn, und der offene Himmel gehört Euch, von Rand zu Rand.",
+        "completion": "Emporgestiegen und ungebrochen. Der Himmel gehört nun Euch, {playerName}. Nehmt diesen Reitbrief — ein Ross der Lüfte, verdient und nicht gekauft, das Euch trägt, wohin Ihr auch wollt.",
+        "objectives": {
+          "0": {
+            "label": "Tal-Rundkurs unter Sollzeit geflogen"
           }
         }
       }

@@ -5,20 +5,22 @@
 // short-lived, single-use challenge message, the player signs it with their
 // wallet (Solana = ed25519 over the raw UTF-8 bytes), and we verify the
 // signature here. No private keys, seeds, or funds ever touch the server.
-import type http from 'node:http';
+
 import { randomBytes } from 'node:crypto';
-import { json, readBody } from './http_util';
-import { isSolanaAddress, verifySolanaSignature, buildLinkMessage } from './wallet_link';
-import { walletLinkRateLimited } from './ratelimit';
-import { recordUsageMetric } from './provider_usage';
+import type http from 'node:http';
 import {
-  createWalletChallenge,
   consumeWalletChallenge,
-  pruneWalletChallenges,
+  createWalletChallenge,
   linkWalletToAccount,
-  walletForAccount,
+  pruneWalletChallenges,
   unlinkWallet,
+  walletForAccount,
+  walletForCharacterName,
 } from './db';
+import { json, readBody } from './http_util';
+import { recordUsageMetric } from './provider_usage';
+import { walletLinkRateLimited } from './ratelimit';
+import { buildLinkMessage, isSolanaAddress, verifySolanaSignature } from './wallet_link';
 
 const CHALLENGE_TTL_MINUTES = 10;
 
@@ -45,7 +47,13 @@ export async function handleWalletChallenge(
   await pruneWalletChallenges();
   const nonce = randomBytes(16).toString('hex');
   const issuedAt = new Date().toISOString();
-  const message = buildLinkMessage({ domain: requestDomain(req), accountId, address, nonce, issuedAt });
+  const message = buildLinkMessage({
+    domain: requestDomain(req),
+    accountId,
+    address,
+    nonce,
+    issuedAt,
+  });
   await createWalletChallenge(nonce, accountId, address, message, CHALLENGE_TTL_MINUTES);
   return json(res, 200, { nonce, message });
 }
@@ -110,4 +118,23 @@ export async function handleWalletUnlink(
 ): Promise<void> {
   await unlinkWallet(accountId);
   return json(res, 200, { unlinked: true });
+}
+
+// GET /api/wallet/resolve?name=<player>  → { name, pubkey } | 404
+// Resolves an in-game player name to the verified Solana wallet linked to that
+// player's account, so another player can send them tokens directly. Only
+// returns an address when the named player has a *verified* (signed-link)
+// wallet — the address is a public key and is required to build the
+// non-custodial transfer client-side. Auth-gated (any logged-in player may
+// look up a recipient), realm-scoped, exact name match.
+export async function handleWalletResolve(
+  _req: http.IncomingMessage,
+  res: http.ServerResponse,
+  name: string,
+): Promise<void> {
+  const trimmed = name.trim();
+  if (!trimmed) return json(res, 400, { error: 'a player name is required' });
+  const row = await walletForCharacterName(trimmed);
+  if (!row) return json(res, 404, { error: 'no player by that name has a verified wallet' });
+  return json(res, 200, { name: row.name, pubkey: row.pubkey });
 }
