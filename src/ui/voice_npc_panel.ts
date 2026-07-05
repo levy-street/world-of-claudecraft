@@ -369,15 +369,26 @@ export class VoiceNpcPanel {
     s.busy = true;
     this.render();
     try {
-      await uploadSample(this.deps, s.sampleBlob, s.displayName.trim(), s.consent);
-      const quote = await postJson<{
+      try {
+        await uploadSample(this.deps, s.sampleBlob, s.displayName.trim(), s.consent);
+      } catch {
+        s.statusLine = t('hudChrome.voiceNpc.uploadError');
+        return;
+      }
+      let quote: {
         quoteId: string;
         memo: string;
         mint: string;
         decimals: number;
         amountBase: string;
         payer: string | null;
-      }>(this.deps, '/api/voice-npc/quote', {});
+      };
+      try {
+        quote = await postJson(this.deps, '/api/voice-npc/quote', {});
+      } catch {
+        s.statusLine = t('hudChrome.voiceNpc.quoteError');
+        return;
+      }
       if (!quote.payer) {
         s.statusLine = t('hudChrome.voiceNpc.needWallet');
         return;
@@ -396,10 +407,13 @@ export class VoiceNpcPanel {
         s.statusLine = t('hudChrome.voiceNpc.burnNotWired');
         return;
       }
-      await postJson(this.deps, '/api/voice-npc/confirm', { quoteId: quote.quoteId, signature });
+      try {
+        await postJson(this.deps, '/api/voice-npc/confirm', { quoteId: quote.quoteId, signature });
+      } catch {
+        s.statusLine = t('hudChrome.voiceNpc.confirmError');
+        return;
+      }
       this.startPolling();
-    } catch {
-      s.statusLine = t('hudChrome.voiceNpc.uploadError');
     } finally {
       s.busy = false;
       this.render();
