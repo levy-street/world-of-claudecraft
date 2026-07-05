@@ -107,6 +107,8 @@ beforeEach(() => {
   process.env.DISCORD_CLIENT_ID = 'client123';
   process.env.DISCORD_CLIENT_SECRET = 'secret456';
   process.env.DISCORD_GUILD_ID = '111111111111111111';
+  // Auto-join is off by default; the auto-join describe sets a bot token per case.
+  delete process.env.DISCORD_BOT_TOKEN;
   linkRow = [];
   ownerRows = [];
   rewardRows = [];
@@ -456,6 +458,268 @@ describe('GET /api/auth/discord/callback', () => {
     // A session token is minted in the payload; the chooser is not offered.
     expect(res.body).toContain('"token"');
     expect(res.body).not.toContain('"choose":true');
+  });
+});
+
+// Stub the token + identity + guilds + PUT-join calls for an auto-join callback.
+// joinStatus mirrors Discord's PUT /guilds/{id}/members/{id}: 201 = added (default),
+// 204 = already a member, a 4xx = failure. Production only reads resp.ok, so both
+// 201 and 204 count as "in" and any 4xx leaves them not-joined.
+function mockDiscordJoinFetch(
+  opts: { inGuild?: boolean; joinStatus?: number; scope?: string } = {},
+) {
+  const inGuild = opts.inGuild ?? false;
+  const joinStatus = opts.joinStatus ?? 201;
+  const scope = opts.scope ?? 'identify guilds guilds.join';
+  return vi.spyOn(globalThis, 'fetch' as any).mockImplementation((url: any, _init?: any) => {
+    const u = String(url);
+    // Most specific first: the Bot-authed PUT that adds the member.
+    if (u.includes('/members/'))
+      return Promise.resolve({
+        ok: joinStatus >= 200 && joinStatus < 300,
+        status: joinStatus,
+        json: () => Promise.resolve(null),
+      } as any);
+    if (u.includes('/oauth2/token'))
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            access_token: 'tok',
+            token_type: 'Bearer',
+            scope,
+            expires_in: 600,
+          }),
+      } as any);
+    if (u.includes('/users/@me/guilds'))
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(inGuild ? [{ id: '111111111111111111' }] : []),
+      } as any);
+    if (u.includes('/users/@me'))
+      return Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: '999999999999999999',
+            username: 'maxp',
+            global_name: 'Maxp',
+            avatar: null,
+          }),
+      } as any);
+    return Promise.resolve({ ok: false, json: () => Promise.resolve({}) } as any);
+  });
+}
+
+describe('auto-join on link/login (guilds.join)', () => {
+  const LINK_STATE = [
+    { state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null },
+  ];
+  const putCall = (spy: any) =>
+    spy.mock.calls.find((c: any[]) => String(c[0]).includes('/members/'));
+  const linkInsert = () =>
+    dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO discord_links'));
+
+  it('requests the guilds.join scope on start only when a bot token is set', async () => {
+    process.env.DISCORD_BOT_TOKEN = 'bot-token';
+    const withToken = makeRes();
+    await handleDiscordStart(makeReq({ url: '/api/auth/discord/start?mode=link' }), withToken, {
+      mode: 'link',
+      accountId: 1,
+    });
+    expect(new URL(parse(withToken).data.url).searchParams.get('scope')).toBe(
+      'identify email guilds guilds.join',
+    );
+
+    delete process.env.DISCORD_BOT_TOKEN;
+    const without = makeRes();
+    await handleDiscordStart(makeReq({ url: '/api/auth/discord/start?mode=link' }), without, {
+      mode: 'link',
+      accountId: 1,
+    });
+    expect(new URL(parse(without).data.url).searchParams.get('scope')).toBe(
+      'identify email guilds',
+    );
+  });
+
+  it('adds a non-member to the guild and records membership + reward on link', async () => {
+    process.env.DISCORD_BOT_TOKEN = 'bot-token';
+    stateRows = LINK_STATE;
+    ownerRows = []; // the Discord id is free to link on account 1
+    const fetchSpy = mockDiscordJoinFetch({ inGuild: false, joinStatus: 201 }); // 201 = added
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    // The Bot-authed PUT carried the bot token + the user's access token.
+    const put = putCall(fetchSpy);
+    expect(put).toBeTruthy();
+    expect(put[1].method).toBe('PUT');
+    expect(put[1].headers.Authorization).toBe('Bot bot-token');
+    expect(JSON.parse(put[1].body)).toEqual({ access_token: 'tok' });
+    // The link row records guild_member = true (param $6, after the added
+    // discord_email $5), and BOTH the link reward and the guild-member reward are
+    // granted (two ledger writes).
+    expect(linkInsert()?.[1]?.[5]).toBe(true);
+    const ledger = dbMock.query.mock.calls.filter((c) =>
+      String(c[0]).includes('INSERT INTO reward_ledger'),
+    );
+    expect(ledger.length).toBe(2);
+    expect(res.body).toContain('"ok":true');
+  });
+
+  it('counts a 204 add response (a TOCTOU already-member) as joined', async () => {
+    // If /users/@me/guilds was stale and the user is actually already in, the add
+    // call returns 204; resp.ok is still true, so we treat them as a member.
+    process.env.DISCORD_BOT_TOKEN = 'bot-token';
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    const fetchSpy = mockDiscordJoinFetch({ inGuild: false, joinStatus: 204 });
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(putCall(fetchSpy)).toBeTruthy();
+    expect(linkInsert()?.[1]?.[5]).toBe(true);
+  });
+
+  it('skips the join when the user is already a guild member', async () => {
+    process.env.DISCORD_BOT_TOKEN = 'bot-token';
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    const fetchSpy = mockDiscordJoinFetch({ inGuild: true });
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(putCall(fetchSpy)).toBeFalsy(); // no add attempted, already in
+    expect(linkInsert()?.[1]?.[5]).toBe(true);
+  });
+
+  it('does not attempt a join when no bot token is configured (membership only)', async () => {
+    // DISCORD_BOT_TOKEN unset: a non-member stays a non-member; no PUT is made.
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    const fetchSpy = mockDiscordJoinFetch({ inGuild: false });
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(putCall(fetchSpy)).toBeFalsy();
+    expect(linkInsert()?.[1]?.[5]).toBe(false);
+  });
+
+  it('links best-effort even when the guild join call fails', async () => {
+    process.env.DISCORD_BOT_TOKEN = 'bot-token';
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    mockDiscordJoinFetch({ inGuild: false, joinStatus: 403 }); // e.g. bot lacks Create Invite
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    // A failed add leaves them recorded as a non-member, but the link still succeeds.
+    expect(linkInsert()?.[1]?.[5]).toBe(false);
+    expect(res.body).toContain('"ok":true');
+  });
+
+  it('does not join when the user declined the guilds.join scope', async () => {
+    process.env.DISCORD_BOT_TOKEN = 'bot-token';
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    // Token came back WITHOUT guilds.join granted -> we must not call the add.
+    const fetchSpy = mockDiscordJoinFetch({ inGuild: false, scope: 'identify guilds' });
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(putCall(fetchSpy)).toBeFalsy();
+    expect(linkInsert()?.[1]?.[5]).toBe(false);
+  });
+});
+
+describe('recovery-email capture from the Discord email scope', () => {
+  const LINK_STATE = [
+    { state: 's', code_verifier: 'v', mode: 'link', account_id: 1, redirect_to: null },
+  ];
+  const linkInsert = () =>
+    dbMock.query.mock.calls.find((c) => String(c[0]).includes('INSERT INTO discord_links'));
+  const backfill = () =>
+    dbMock.query.mock.calls.find((c) =>
+      String(c[0]).replace(/\s+/g, ' ').includes("email IS NULL OR email = ''"),
+    );
+
+  it('stores the address on the link and backfills a verified recovery email', async () => {
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    // /users/@me now returns a verified email (email scope was granted).
+    mockDiscordFetch(
+      {
+        id: '999999999999999999',
+        username: 'maxp',
+        global_name: 'Maxp',
+        avatar: null,
+        email: 'maxp@example.com',
+        verified: true,
+      },
+      true,
+    );
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    // The link row carries the captured email (param $5), and the account's empty
+    // recovery email is backfilled with verified=true.
+    expect(linkInsert()?.[1]?.[4]).toBe('maxp@example.com');
+    expect(backfill()?.[1]).toEqual([1, 'maxp@example.com', true]);
+    expect(res.body).toContain('"ok":true');
+  });
+
+  it('does not backfill the account email when Discord returned no address', async () => {
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    mockDiscordFetch(
+      { id: '999999999999999999', username: 'maxp', global_name: 'Maxp', avatar: null },
+      true,
+    );
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(linkInsert()?.[1]?.[4]).toBeNull();
+    expect(backfill()).toBeFalsy();
+  });
+
+  it('keeps an unverified Discord email but does not stamp it verified', async () => {
+    stateRows = LINK_STATE;
+    ownerRows = [];
+    mockDiscordFetch(
+      {
+        id: '999999999999999999',
+        username: 'maxp',
+        global_name: 'Maxp',
+        avatar: null,
+        email: 'maxp@example.com',
+        verified: false,
+      },
+      true,
+    );
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    // Address captured, but the verified flag passed to the backfill is false.
+    expect(linkInsert()?.[1]?.[4]).toBe('maxp@example.com');
+    expect(backfill()?.[1]).toEqual([1, 'maxp@example.com', false]);
   });
 });
 

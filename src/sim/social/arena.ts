@@ -717,6 +717,9 @@ export function resetForArena(ctx: SimContext, e: Entity): void {
 export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep: boolean }): void {
   e.dead = false;
   if (opts.clearPrep) {
+    // Arena is a clean competitive slate: unlike the overworld/delve death paths it
+    // intentionally strips ALL auras (including The Keeper's Toll) so a PvE penalty
+    // never carries into a normalized match.
     e.auras = [];
     e.cooldowns.clear();
     e.ccDr.clear();
@@ -728,11 +731,13 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   e.targetId = null;
   e.autoAttack = false;
   e.queuedOnSwing = null;
+  delete e.queuedOnSwingFree;
   e.castingAbility = null;
   e.castRemaining = 0;
+  e.castTargetId = null;
   e.channeling = false;
   e.comboPoints = 0;
-  e.comboTargetId = null;
+  e.comboUntil = -1;
   e.gcdRemaining = 0;
   e.swingTimer = 0;
   e.chargeTargetId = null;

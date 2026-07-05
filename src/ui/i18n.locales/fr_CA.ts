@@ -16,7 +16,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   // hudChrome.statInfo.* overrides.
   'seo.title': 'World of ClaudeCraft: MMO Web de style classique',
   'seo.description':
-    "Partez à l'aventure dans World of ClaudeCraft, un micro-MMO de style classique jouable directement dans votre navigateur. Rejoignez un royaume partagé, faites progresser vos classes et terrassez des ennemis.",
+    'Lancez-vous dans une aventure épique dans World of ClaudeCraft, un micro-MMO de style classique jouable directement dans votre navigateur. Rejoignez un monde partagé et persistant, faites monter vos classes en niveau et terrassez vos ennemis.',
   'seo.operatingSystem': 'Navigateur Web',
   'a11y.toggleMenu': 'Ouvrir ou fermer le menu',
   'loading.assetsFailed': 'Le chargement des ressources a échoué: rechargez la page. {error}',
@@ -43,15 +43,15 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'classDetails.lore.warrior':
     'Les guerriers sont des combattants endurcis qui gagnent de la rage en infligeant ou subissant des dégâts. Ils encaissent ou écrasent leurs ennemis.',
   'classDetails.lore.paladin':
-    'Les paladins sont des croisés sacrés qui aident par des bénédictions, soignent avec la Lumière sacrée et protègent les plus faibles.',
+    'Les paladins sont de saints croisés qui épaulent leurs alliés par des bénédictions, soignent les blessures avec la Lumière guérisseuse et protègent les faibles sous une armure lourde.',
   'classDetails.lore.hunter':
     "Les chasseurs sont des spécialistes à distance qui combattent aux côtés d'une bête apprivoisée, criblant leurs ennemis de tirs précis et rapides, les ralentissant de morsures et de traits de choc, et changeant d'aspect selon le moment.",
   'classDetails.lore.shaman':
     'Les chamans commandent les éléments, imprègnent leurs armes, frappent avec la foudre et restaurent leurs alliés.',
   'classDetails.lore.mage':
-    "Les mages manipulent Feu, Givre et Arcane pour détruire, conjurer de l'eau et figer les menaces.",
+    "Les mages manient le Feu, le Givre et la force des Arcanes pour détruire leurs ennemis, conjurer de l'eau et figer les menaces sur place.",
   'classDetails.lore.warlock':
-    'Les démonistes invoquent des démons, posent malédictions et dégâts prolongés, puis drainent la vie pour survivre.',
+    'Les démonistes invoquent des démons, jettent des malédictions et des dégâts prolongés, puis drainent la vie de leurs ennemis pour tenir bon.',
   'classDetails.lore.druid':
     'Les druides canalisent la nature, guérissent, entravent les ennemis et prennent des formes animales pour défendre ou attaquer.',
   'classDetails.aria':
@@ -213,14 +213,15 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.disarm': "Désarmé, impossible d'utiliser des attaques d'arme",
   'hudChrome.auraEffect.lockout': 'École de magie verrouillée',
   'hudChrome.auraEffect.imbue': 'Arme enchantée avec effets bonus',
-  'hudChrome.auraEffect.imbueRange': 'Arme enchantée : {min} à {max} dégâts bonus au jugement',
+  'hudChrome.auraEffect.imbueRange': 'Arme enchantée : {min} à {max} dégâts bonus au Verdict',
   'hudChrome.auraEffect.stealth': 'Dissimulé ; vitesse de déplacement réduite de {pct}%',
-  'hudChrome.auraEffect.formBear': 'Forme ours : points de vie et armure augmentés',
+  'hudChrome.auraEffect.formBear': 'Forme de Bruin : points de vie et armure accrus',
   'hudChrome.auraEffect.formCat': 'Forme féline : dégâts de mêlée et énergie',
-  'hudChrome.auraEffect.formTravel': 'Forme voyage : vitesse de déplacement augmentée de {pct}%',
-  'hudChrome.auraEffect.defensiveStance': 'Posture défensive, dégâts subis réduits, menace accrue',
+  'hudChrome.auraEffect.formTravel': 'Forme de Fleet : vitesse de déplacement accrue de {pct}%',
+  'hudChrome.auraEffect.defensiveStance':
+    'Guarded Stance : dégâts encaissés réduits, menace accrue',
   'hudChrome.auraEffect.righteousFury':
-    'Fureur vertueuse, menace des dégâts Sacré fortement accrue',
+    'Burning Oath : menace générée par les dégâts Sacrés fortement accrue',
   'hudChrome.auraEffect.scale': 'Gabarit augmentée de {pct}%',
   'hudChrome.auraEffect.jump': 'Saut augmentée de {pct}%',
   'hudChrome.auraEffect.school.physical': 'physique',

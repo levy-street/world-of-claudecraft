@@ -9,6 +9,7 @@ import {
   linkDiscordToAccount,
   loadRewardState,
   peekDiscordPendingLogin,
+  setDiscordLinkEmail,
 } from '../server/discord_db';
 
 // discord_db functions take the pg `pool` as an argument, so a fake pool (no
@@ -43,6 +44,7 @@ describe('linkDiscordToAccount', () => {
       discordUserId: '80351110224678912',
       username: 'x',
       avatar: null,
+      email: null,
       guildMember: true,
     });
     expect(ok).toBe(false);
@@ -60,6 +62,7 @@ describe('linkDiscordToAccount', () => {
       discordUserId: '80351110224678912',
       username: 'maxp',
       avatar: 'abc',
+      email: null,
       guildMember: true,
     });
     expect(ok).toBe(true);
@@ -81,9 +84,48 @@ describe('linkDiscordToAccount', () => {
         discordUserId: '80351110224678912',
         username: 'x',
         avatar: null,
+        email: null,
         guildMember: false,
       }),
     ).resolves.toBe(false);
+  });
+
+  it('persists the captured Discord email in the INSERT + upsert', async () => {
+    const { pool, calls } = makePool((s) => {
+      if (s.includes('SELECT account_id FROM discord_links WHERE discord_user_id')) return NONE;
+      if (s.includes('INSERT INTO discord_links')) return { rows: [], rowCount: 1 };
+      return NONE;
+    });
+    await linkDiscordToAccount(pool, 1, {
+      discordUserId: '80351110224678912',
+      username: 'maxp',
+      avatar: 'abc',
+      email: 'maxp@example.com',
+      guildMember: true,
+    });
+    const insert = calls.find((c) => c.sql.includes('INSERT INTO discord_links'));
+    expect(insert).toBeTruthy();
+    // The column list carries discord_email, the upsert COALESCEs it so a later
+    // no-email grant cannot wipe a stored address, and the address is a bound param.
+    expect(insert!.sql).toContain('discord_email');
+    expect(insert!.sql).toContain('COALESCE(EXCLUDED.discord_email, discord_links.discord_email)');
+    expect(insert!.params).toContain('maxp@example.com');
+  });
+});
+
+describe('setDiscordLinkEmail', () => {
+  it('updates the stored Discord email when a fresh grant provides one', async () => {
+    const { pool, calls, didRun } = makePool(() => ({ rows: [], rowCount: 1 }));
+    await setDiscordLinkEmail(pool, 7, 'user@example.com');
+    expect(didRun('UPDATE discord_links SET discord_email')).toBe(true);
+    const update = calls.find((c) => c.sql.includes('UPDATE discord_links SET discord_email'));
+    expect(update!.params).toEqual([7, 'user@example.com']);
+  });
+
+  it('is a no-op when the grant carried no email (never wipes a stored one)', async () => {
+    const { pool, didRun } = makePool(() => ({ rows: [], rowCount: 1 }));
+    await setDiscordLinkEmail(pool, 7, null);
+    expect(didRun('UPDATE discord_links')).toBe(false);
   });
 });
 
@@ -217,12 +259,23 @@ describe('discord pending logins', () => {
       discordUserId: '80351110224678912',
       username: 'Maxp',
       avatar: null,
+      email: 'maxp@example.com',
+      emailVerified: true,
       guildMember: true,
       ttlMinutes: 15,
     });
     expect(didRun('INSERT INTO discord_pending_logins')).toBe(true);
     const insert = calls.find((c) => c.sql.includes('INSERT INTO discord_pending_logins'));
-    expect(insert?.params).toEqual(['tok', '80351110224678912', 'Maxp', null, true, '15']);
+    expect(insert?.params).toEqual([
+      'tok',
+      '80351110224678912',
+      'Maxp',
+      null,
+      'maxp@example.com',
+      true,
+      true,
+      '15',
+    ]);
   });
 
   it('peekDiscordPendingLogin reads WITHOUT deleting (live row, then null)', async () => {

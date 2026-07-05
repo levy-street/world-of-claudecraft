@@ -36,6 +36,24 @@ export interface SessionRuntimeSnapshot {
   onGround: boolean;
 }
 
+// A bounded in-memory value histogram published by the detector for operator-facing
+// calibration dashboards. Which quantities are measured, and their ids, are decided
+// entirely by the implementation at runtime; this shape is deliberately generic.
+export interface CalibrationHistogramBucket {
+  le: number; // inclusive upper bound of the bucket
+  count: number;
+}
+
+export interface CalibrationHistogram {
+  id: string;
+  count: number;
+  min: number; // 0 when count is 0
+  max: number;
+  sum: number;
+  buckets: CalibrationHistogramBucket[];
+  overflowCount: number; // observations above the last bucket bound
+}
+
 export interface SuspiciousEvidence {
   kind: string;
   weight: number;
@@ -78,4 +96,5 @@ export interface BotDetector {
     snapshot: SessionRuntimeSnapshot | null,
   ): EnforcementAction;
   listSuspiciousPlayers(): SuspiciousPlayer[];
+  listCalibrationHistograms(): CalibrationHistogram[];
 }

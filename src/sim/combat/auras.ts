@@ -96,12 +96,24 @@ export function updateRegen(ctx: SimContext, p: Entity, _meta: PlayerMeta): void
 
 export function updateTimers(p: Entity): void {
   p.gcdRemaining = Math.max(0, p.gcdRemaining - DT);
+  p.potionCdRemaining = Math.max(0, p.potionCdRemaining - DT);
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
     const nv = v - DT;
     if (nv <= 0) p.cooldowns.delete(k);
     else p.cooldowns.set(k, nv);
+  }
+}
+
+// Combo points are character-bound (retail-style): they survive target swaps and
+// kills, so this per-tick check is the only passive decay. awardCombo (sim.ts)
+// restamps comboUntil on every point built; spending, player death, and the
+// arena/fiesta resets clear the pool explicitly.
+export function updateComboExpiry(ctx: SimContext, p: Entity): void {
+  if (p.comboPoints > 0 && ctx.time >= p.comboUntil) {
+    p.comboPoints = 0;
+    ctx.emit({ type: 'comboPoint', points: 0, pid: p.id });
   }
 }
 

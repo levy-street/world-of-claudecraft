@@ -120,11 +120,11 @@ describe('Input autorun', () => {
     input.toggleAutorun();
     expect(input.readMoveInput().forward).toBe(true);
 
-    input.suspendMovement = true; // mirrors main.ts setting it while the game menu is open
+    input.setSuspendMovement(true); // mirrors main.ts setting it while the game menu is open
     expect(input.autorun).toBe(true); // latch untouched by the menu
     expect(input.readMoveInput().forward).toBe(true); // keeps running while suspended
 
-    input.suspendMovement = false; // menu closed
+    input.setSuspendMovement(false); // menu closed
     expect(input.autorun).toBe(true);
     expect(input.readMoveInput().forward).toBe(true); // still running
   });
@@ -137,9 +137,41 @@ describe('Input autorun', () => {
     windowListeners.get('keydown')!({ code: 'KeyW', repeat: false }); // hold forward
     expect(input.readMoveInput().forward).toBe(true);
 
-    input.suspendMovement = true; // game menu / chat open
+    input.setSuspendMovement(true); // game menu / chat open
     expect(input.autorun).toBe(false);
     expect(input.readMoveInput().forward).toBe(false); // held key is suppressed
+  });
+
+  it('drops stale held forward and jump state when movement suspension begins', () => {
+    const { input, windowListeners } = makeInput();
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+    now += 1;
+
+    expect(input.debugState().keys).toEqual([]);
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+  });
+
+  it('keeps autorun latched when suspension clears stale held key state', () => {
+    const { input, windowListeners } = makeInput();
+    input.toggleAutorun();
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false, preventDefault: vi.fn() });
+
+    input.setSuspendMovement(true);
+    input.setSuspendMovement(false);
+
+    expect(input.autorun).toBe(true);
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.debugState().keys).toEqual([]);
   });
 });
 
@@ -537,6 +569,35 @@ describe('Input Escape handling', () => {
     expect(cb.onUiKey).toHaveBeenCalledTimes(1);
     expect(cb.onUiKey).toHaveBeenCalledWith('escape');
   });
+
+  it('ignores repeated Escape keydown events so holding the menu key cannot retoggle', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: false });
+    windowListeners.get('keydown')!({ code: 'Escape', repeat: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).toHaveBeenCalledWith('escape');
+  });
+});
+
+describe('Input Discord keybind', () => {
+  it("dispatches onUiKey('discord') for the default U key", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('discord');
+  });
+
+  it('is a normal interface key: suppressed while a modal blocks game keys', () => {
+    const { cb, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
+
+    expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
 });
 
 describe('Input Space handling', () => {
@@ -686,6 +747,40 @@ describe('Input emote wheel hold', () => {
     windowListeners.get('blur')!({});
 
     expect(cb.onEmoteWheel).toHaveBeenLastCalledWith(false);
+  });
+
+  it('stays open when its own modal state suspends movement', () => {
+    // Regression (v0.20.0): the open emote wheel counts toward hud.isModalOpen(),
+    // which main.ts feeds into setSuspendMovement every frame. The stale-input
+    // clear then closed the wheel one frame after the bound key opened it, so
+    // the X hotkey wheel flashed and vanished. Held wheel keys are never stale:
+    // onKeyUp is not modal-gated and releaseCapture covers focus loss.
+    const { cb, input, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onEmoteWheel).toHaveBeenCalledWith(true);
+
+    input.setSuspendMovement(true); // mirrors the frame loop reacting to the open wheel
+    expect(cb.onEmoteWheel).not.toHaveBeenCalledWith(false); // wheel stays open
+
+    windowListeners.get('keyup')!({ code: 'KeyX', preventDefault: vi.fn() });
+    expect(cb.onEmoteWheel).toHaveBeenCalledWith(false); // release still closes it
+  });
+
+  it('resumes held movement after the wheel closes instead of going stale', () => {
+    // Classic flow: run with W held, flick X to emote, keep running. The
+    // wheel-caused suspension must not clear the still-held movement keys.
+    const { input, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    windowListeners.get('keydown')!({ code: 'KeyX', repeat: false, preventDefault: vi.fn() });
+    input.setSuspendMovement(true); // the open wheel is the modal that suspends
+    expect(input.readMoveInput().forward).toBe(false); // movement frozen while the wheel is up
+
+    windowListeners.get('keyup')!({ code: 'KeyX', preventDefault: vi.fn() });
+    input.setSuspendMovement(false); // wheel closed, modal gone
+
+    expect(input.readMoveInput().forward).toBe(true); // W never went stale
   });
 });
 

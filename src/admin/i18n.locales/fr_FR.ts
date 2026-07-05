@@ -7,6 +7,43 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const fr_FR: Record<string, string> = {
+  'calibration.autoRefresh': 'Actualisation auto ({seconds}s)',
+  'calibration.description':
+    'Distributions des valeurs brutes observées par le détecteur de bots, pour le calibrage des seuils. Conservées en mémoire uniquement : les compteurs sont remis à zéro au redémarrage du serveur.',
+  'calibration.downloadJson': 'Télécharger le JSON',
+  'calibration.empty':
+    "Aucune donnée de calibrage pour l'instant : le détecteur n'a observé aucune activité mesurable depuis le démarrage du serveur.",
+  'calibration.loadFailed': 'Échec du chargement des données de calibrage.',
+  'calibration.loading': 'Chargement des données de calibrage...',
+  'calibration.samples': '{count} échantillons',
+  'calibration.statMax': 'max',
+  'calibration.statMean': 'moyenne',
+  'calibration.statMin': 'min',
+  'calibration.statP50': 'p50',
+  'calibration.statP95': 'p95',
+  'calibration.statP99': 'p99',
+  'nav.botDetector': 'Détecteur de bots',
+  'nav.calibration': 'Calibrage',
+  'nav.liveEvidence': 'Indices en direct',
+  'suspiciousPlayers.colObserved': 'Dernière observation',
+  'suspiciousPlayers.downloadJson': 'Télécharger le JSON',
+  'suspiciousPlayers.filteredEmpty': 'Aucune session ne correspond à cette recherche.',
+  'suspiciousPlayers.resultCountMany': '{count} résultats',
+  'suspiciousPlayers.resultCountOne': '{count} résultat',
+  'suspiciousPlayers.searchLabel': 'Rechercher des sessions suspectes',
+  'suspiciousPlayers.searchPlaceholder': 'Filtrer par nom, IP ou indice',
+  'suspiciousPlayers.sessionDescription':
+    'Sessions en cours et récentes présentant des indices de détection de bot.',
+  'suspiciousPlayers.sessionEmpty':
+    "Aucune session en cours ou récente ne présente d'indices de détection de bot.",
+  'suspiciousPlayers.snapshotUnavailable': "Heure d'observation indisponible",
+  'usage.cache.githubContributors': 'Cache des contributeurs GitHub',
+  'usage.metric.githubContributorsFetch': 'Récupérations des statistiques de contributeurs GitHub',
+  'usage.metric.githubContributorsFetchFailure':
+    'Échecs de récupération des statistiques de contributeurs GitHub',
+  'usage.metric.githubLinkFailure': 'Échecs de liaison GitHub',
+  'usage.metric.githubLinkRateLimited': 'Requêtes de liaison GitHub limitées',
+  'usage.metric.githubLinkRequest': 'Requêtes de liaison GitHub',
   'app.title': 'World of ClaudeCraft - Admin',
   'app.shortTitle': 'Administrateur WoC',
   'auth.username': "Nom d'utilisateur",

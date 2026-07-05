@@ -1,8 +1,8 @@
-import { build } from 'esbuild';
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { promisify } from 'node:util';
+import { build } from 'esbuild';
 
 const outDir = resolve('mediawiki/seed');
 const tmpDir = resolve('tmp/mediawiki-seed');
@@ -16,7 +16,9 @@ await mkdir(outDir, { recursive: true });
 
 const css = await readFile('mediawiki/theme/Common.css', 'utf8');
 
-await writeFile(sourcePath, `
+await writeFile(
+  sourcePath,
+  `
 import { ABILITIES, CLASSES, DUNGEON_LIST, ITEMS, MOBS, NPCS, QUEST_ORDER, QUESTS, ZONES } from '../../src/sim/data';
 
 const css = ${JSON.stringify(css)};
@@ -108,7 +110,7 @@ add('Main Page', \`
 <div>
 <p class="woc-kicker">Community player encyclopedia</p>
 <h1>World of Claudecraft Wiki</h1>
-World of Claudecraft is a browser-playable, WoW-Classic-flavored micro-MMO with online persistence, offline play, deterministic simulation logic, and a launch-week community that quickly turned jokes, dungeon clears, level races, bug reports, and feature requests into game history.
+World of Claudecraft is a browser-playable, classic-style micro-MMO with online persistence, offline play, deterministic simulation logic, and a launch-week community that quickly turned jokes, dungeon clears, level races, bug reports, and feature requests into game history.
 
 '''Start here:''' [[Quick Start]] · [[All Pages]] · [[Zones]] · [[Classes]] · [[Gameplay Systems]] · [[Community Lore]] · [[Development Timeline]]
 </div>
@@ -137,7 +139,7 @@ add('Quick Start', section('First hour route', bullets([
 
 add('The Gravecaller Saga', section('Overview', 'The main story follows Brother Aldric from restless bones outside Eastbrook to Korzul the Gravewyrm beneath Thornpeak.') + section('Acts', bullets([
   link(titleBy.zone.get('eastbrook_vale'), 'Eastbrook Vale') + ' — Morthen the Gravecaller and ' + link(titleBy.dungeon.get('hollow_crypt'), 'The Hollow Crypt') + '.',
-  link(titleBy.zone.get('mirefen_marsh'), 'Mirefen Marsh') + ' — Vael the Mistcaller and ' + link(titleBy.dungeon.get('sunken_bastion'), 'The Sunken Bastion') + '.',
+  link(titleBy.zone.get('mirefen_marsh'), 'Mirefen Marsh') + ' — Vael the Fogbinder and ' + link(titleBy.dungeon.get('sunken_bastion'), 'The Sunken Bastion') + '.',
   link(titleBy.zone.get('thornpeak_heights'), 'Thornpeak Heights') + ' — Wyrmcult zealots, Highwatch, and ' + link(titleBy.dungeon.get('gravewyrm_sanctum'), 'Gravewyrm Sanctum') + '.',
 ])), ['Lore', 'Quests']);
 
@@ -180,7 +182,7 @@ add('Sources Used', section('Local sources', bullets([
 ])), ['Sources']);
 
 const systemRows = [
-  ['Combat', 'Vanilla-style combat math, resources, GCD, threat, leashing, death, food, drink, and recovery.'],
+  ['Combat', 'Classic-era combat math, resources, GCD, threat, leashing, death, food, drink, and recovery.'],
   ['Parties', 'Five-player grouping, shared tap rights, shared kill credit, XP bonuses, party chat, and shared instances.'],
   ['Guilds', 'Guild creation, ranks, roster management, invites, guild chat, and public-discovery roadmap requests.'],
   ['Trading', 'Nearby players stage items and copper; both sides accept; walking apart cancels.'],
@@ -303,7 +305,8 @@ const xml = \`<?xml version="1.0" encoding="UTF-8"?>
 \`;
 
 console.log(xml);
-`);
+`,
+);
 
 await build({
   entryPoints: [sourcePath],

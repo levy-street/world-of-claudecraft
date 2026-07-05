@@ -9,6 +9,7 @@
   import { localizeAdminError, t } from '../i18n';
   import Badge from '../components/Badge.svelte';
   import AccountIndicators from '../components/AccountIndicators.svelte';
+  import AccountLink from '../components/AccountLink.svelte';
   import IpBlockDialog from '../components/IpBlockDialog.svelte';
   import PageHeader from '../components/PageHeader.svelte';
   import Pager from '../components/Pager.svelte';
@@ -136,7 +137,13 @@
           <section class="ip-account">
             <div class="account-heading">
               <div>
-                <strong>{account.username}</strong>
+                <strong>
+                  <AccountLink
+                    accountId={account.accountId}
+                    label={account.username}
+                    onChanged={() => void refresh()}
+                  />
+                </strong>
                 <span class="hint">{t('ipAssociations.accountId', { id: fmtNumber(account.accountId) })}</span>
                 <AccountIndicators
                   isAdmin={account.isAdmin}

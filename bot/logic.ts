@@ -420,3 +420,65 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
   }
   return payload;
 }
+
+// ── Daily rewards winners feed ────────────────────────────────────────────────
+export interface DailyRewardWinner {
+  day: string;
+  rank: number;
+  username: string;
+  points: number;
+  prizePercent: number;
+  prizeUsd: number;
+  status: string;
+  txSignature: string | null;
+}
+
+export interface DailyRewardWinnersDay {
+  day: string;
+  realm: string;
+  prizePoolUsd: number;
+  finalizedAt: string | null;
+  payouts: DailyRewardWinner[];
+}
+
+function usd(value: number): string {
+  return `$${value.toLocaleString('en-US', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  })}`;
+}
+
+function percent(value: number): string {
+  return `${(value * 100).toLocaleString('en-US', {
+    maximumFractionDigits: 1,
+  })}%`;
+}
+
+export function buildDailyRewardWinnersMessage(
+  day: DailyRewardWinnersDay,
+): Record<string, unknown> {
+  const rows = day.payouts
+    .slice(0, 10)
+    .map(
+      (row) =>
+        `**#${row.rank}** ${row.username} - ${row.points.toLocaleString('en-US')} pts - ${usd(row.prizeUsd)} (${percent(row.prizePercent)})`,
+    );
+  const description =
+    rows.length > 0 ? rows.join('\n') : 'No daily reward winners were recorded for this day.';
+  return {
+    embeds: [
+      {
+        color: 0xf0b743,
+        author: { name: 'Daily Rewards' },
+        title: `Top ${Math.min(day.payouts.length, 10)} Winners - ${day.day}`,
+        description,
+        fields: [
+          { name: 'Realm', value: day.realm, inline: true },
+          { name: 'Prize Pool', value: usd(day.prizePoolUsd), inline: true },
+        ],
+        footer: { text: 'World of ClaudeCraft' },
+      },
+    ],
+    allowed_mentions: { parse: [] },
+  };
+}

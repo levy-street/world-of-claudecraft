@@ -18,6 +18,7 @@
   import Usage from './pages/Usage.svelte';
   import Moderation from './pages/Moderation.svelte';
   import SuspiciousPlayers from './pages/SuspiciousPlayers.svelte';
+  import DetectionCalibration from './pages/DetectionCalibration.svelte';
   import SharedIps from './pages/SharedIps.svelte';
   import ChatFilter from './pages/ChatFilter.svelte';
   import BlockedIps from './pages/BlockedIps.svelte';
@@ -37,6 +38,7 @@
     usage: Usage,
     moderation: Moderation,
     'suspicious-players': SuspiciousPlayers,
+    'detection-calibration': DetectionCalibration,
     'shared-ips': SharedIps,
     'chat-filter': ChatFilter,
     'blocked-ips': BlockedIps,

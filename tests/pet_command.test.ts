@@ -48,7 +48,7 @@ describe('/pet command', () => {
     first.setPlayerLevel(20, pid);
     first.castAbility('summon_voidwalker', pid);
     for (let i = 0; i < 20 * 6; i++) first.tick();
-    expect(first.petOf(pid)?.templateId).toBe('voidwalker');
+    expect(first.petOf(pid)?.templateId).toBe('gloomshade');
     const saved = first.serializeCharacter(pid)!;
     expect(saved.pet).toBeNull();
 
@@ -86,6 +86,17 @@ describe('/pet command', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('hunter', 'Aleph');
     const pet = givePet(sim, a);
+    // The pet is adopted straight out of a spawn camp; move owner + pet onto empty
+    // ground so its former campmates do not proximity-aggro and chip its HP before the
+    // readout (a full-health pet is the point of this case).
+    const owner = sim.entities.get(a)!;
+    owner.pos = { x: 5000, y: owner.pos.y, z: 5000 };
+    owner.prevPos = { ...owner.pos };
+    pet.pos = { x: 5001, y: pet.pos.y, z: 5000 };
+    pet.prevPos = { ...pet.pos };
+    pet.hp = pet.maxHp;
+    (sim as unknown as { rebucket(e: Entity): void }).rebucket(owner);
+    (sim as unknown as { rebucket(e: Entity): void }).rebucket(pet);
     sim.tick();
 
     sim.chat('/pet', a);

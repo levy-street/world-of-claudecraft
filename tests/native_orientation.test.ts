@@ -13,6 +13,7 @@ describe('native mobile orientation', () => {
 
   it('allows only landscape orientations on iOS and iPadOS', () => {
     const plist = read('ios/App/App/Info.plist');
+    expect(plist).toMatch(/<key>UIRequiresFullScreen<\/key>\s*<true\/>/);
     const orientationBlocks = [
       plist.match(/<key>UISupportedInterfaceOrientations<\/key>\s*<array>([\s\S]*?)<\/array>/),
       plist.match(/<key>UISupportedInterfaceOrientations~ipad<\/key>\s*<array>([\s\S]*?)<\/array>/),

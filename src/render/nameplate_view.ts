@@ -79,8 +79,11 @@ export function newNameplatePlan(): NameplatePlan {
 /**
  * Compute the nameplate plan for `e` as seen by `player`, writing into `out` and
  * returning it. `viewHeight` is the rig's unscaled height (EntityView.height);
- * `showNameplates` is the player's mob-nameplate toggle. Pure: same inputs give
- * the same plan, no DOM/Three/i18n, no Math.random/Date.now/performance.now.
+ * `showNameplates` is the player's mob-nameplate toggle. `showOwnNameplate` is the
+ * player's own-plate toggle (the setting defaults off): when on, the self plate is
+ * no longer suppressed and it anchors at the normal lift like any other
+ * player's. Pure: same inputs give the same plan, no DOM/Three/i18n, no
+ * Math.random/Date.now/performance.now.
  */
 export function nameplatePlanInto(
   out: NameplatePlan,
@@ -88,6 +91,7 @@ export function nameplatePlanInto(
   player: Entity,
   viewHeight: number,
   showNameplates: boolean,
+  showOwnNameplate: boolean,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
@@ -98,11 +102,25 @@ export function nameplatePlanInto(
   const isDelveInteract =
     e.templateId === 'delve_locked_chest' ||
     e.templateId === 'delve_reward_chest' ||
-    e.templateId === 'delve_surface_exit';
+    e.templateId === 'delve_surface_exit' ||
+    e.templateId === 'delve_drowned_reliquary' ||
+    e.templateId === 'delve_drowned_reliquary_open' ||
+    e.templateId?.startsWith('delve_rite_shrine_') ||
+    // Marsh room puzzle interactables (and their spent variants): the plates
+    // carry the localized delveUi.object.* labels so the puzzles read at a
+    // glance, matching the rite shrines above.
+    e.templateId === 'delve_sluice_valve' ||
+    e.templateId === 'delve_sluice_valve_open' ||
+    e.templateId === 'delve_grave_tablet' ||
+    e.templateId === 'delve_grave_tablet_lit' ||
+    e.templateId === 'delve_corpse_candle' ||
+    e.templateId === 'delve_corpse_candle_lit' ||
+    e.templateId === 'delve_bell_rope' ||
+    e.templateId === 'delve_bell_rope_pulled';
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
-    (isSelf && !hasOverheadEmote) ||
+    (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
     d2 > NAMEPLATE_RANGE_SQ ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
@@ -110,7 +128,9 @@ export function nameplatePlanInto(
     (!showNameplates && e.kind === 'mob' && !e.dead);
   out.anchorYOffset =
     viewHeight * e.scale +
-    (isSelf && hasOverheadEmote ? NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT : NAMEPLATE_ANCHOR_LIFT);
+    (isSelf && hasOverheadEmote && !showOwnNameplate
+      ? NAMEPLATE_SELF_EMOTE_ANCHOR_LIFT
+      : NAMEPLATE_ANCHOR_LIFT);
   out.urgent =
     e.id === player.targetId || d2 < NAMEPLATE_URGENT_RANGE_SQ || e.castingAbility !== null;
   out.hasOverheadEmote = hasOverheadEmote;

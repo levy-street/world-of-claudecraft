@@ -7,6 +7,43 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const sv_SE: Record<string, string> = {
+  'calibration.autoRefresh': 'Uppdatera automatiskt ({seconds}s)',
+  'calibration.description':
+    'Råa värdefördelningar observerade av botdetektorn, för tröskelkalibrering. Hålls endast i minnet: räknarna nollställs när servern startas om.',
+  'calibration.downloadJson': 'Ladda ner JSON',
+  'calibration.empty':
+    'Ingen kalibreringsdata ännu: detektorn har inte observerat någon mätbar aktivitet sedan servern startade.',
+  'calibration.loadFailed': 'Det gick inte att läsa in kalibreringsdata.',
+  'calibration.loading': 'Läser in kalibreringsdata...',
+  'calibration.samples': '{count} stickprov',
+  'calibration.statMax': 'max',
+  'calibration.statMean': 'medel',
+  'calibration.statMin': 'min',
+  'calibration.statP50': 'p50',
+  'calibration.statP95': 'p95',
+  'calibration.statP99': 'p99',
+  'nav.botDetector': 'Botdetektor',
+  'nav.calibration': 'Kalibrering',
+  'nav.liveEvidence': 'Bevis i realtid',
+  'suspiciousPlayers.colObserved': 'Senast observerad',
+  'suspiciousPlayers.downloadJson': 'Ladda ner JSON',
+  'suspiciousPlayers.filteredEmpty': 'Ingen session matchar den här sökningen.',
+  'suspiciousPlayers.resultCountMany': '{count} resultat',
+  'suspiciousPlayers.resultCountOne': '{count} resultat',
+  'suspiciousPlayers.searchLabel': 'Sök misstänkta sessioner',
+  'suspiciousPlayers.searchPlaceholder': 'Filtrera på namn, IP eller bevis',
+  'suspiciousPlayers.sessionDescription':
+    'Aktuella och nyliga sessioner med bevis för botdetektering.',
+  'suspiciousPlayers.sessionEmpty':
+    'Ingen aktuell eller nylig session har bevis för botdetektering.',
+  'suspiciousPlayers.snapshotUnavailable': 'Observationstid inte tillgänglig',
+  'usage.cache.githubContributors': 'GitHub-bidragsgivarcache',
+  'usage.metric.githubContributorsFetch': 'GitHub-hämtningar av bidragsgivarstatistik',
+  'usage.metric.githubContributorsFetchFailure':
+    'Misslyckade GitHub-hämtningar av bidragsgivarstatistik',
+  'usage.metric.githubLinkFailure': 'Misslyckade GitHub-länkningar',
+  'usage.metric.githubLinkRateLimited': 'Strypta GitHub-länkningsförfrågningar',
+  'usage.metric.githubLinkRequest': 'GitHub-länkningsförfrågningar',
   'app.title': 'World of ClaudeCraft - Admin',
   'app.shortTitle': 'WoC-admin',
   'auth.username': 'Användarnamn',

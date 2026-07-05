@@ -5,6 +5,7 @@ import { type WebSocket, WebSocketServer } from 'ws';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
+  paginateDevLeaderboard,
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
@@ -24,16 +25,18 @@ import {
   handleAccountLogout,
   handleAccountMarketing,
   handleAccountSetEmail,
+  handleAccountSetInitialEmail,
   handleAccountWhoami,
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
-import { handleAdminApi } from './admin';
+import { handleAdminApi, parsePageParams } from './admin';
 import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
 import {
   hashPassword,
   newToken,
   normalizeCharName,
+  normalizeEmail,
   offensiveName,
   validPassword,
   validUsernameShape,
@@ -41,8 +44,10 @@ import {
 } from './auth';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { characterSheet, type SheetRank } from './character_sheet';
+import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
   accountAndScopeForToken,
+  accountById,
   accountForToken,
   type CharacterRow,
   characterCountsByRealm,
@@ -85,6 +90,11 @@ import {
   touchLogin,
 } from './db';
 import {
+  type DesktopLoginRouteDeps,
+  handleDesktopLoginCreate,
+  handleDesktopLoginExchange,
+} from './desktop_login';
+import {
   handleDiscordCallback,
   handleDiscordLoginLink,
   handleDiscordLoginNew,
@@ -95,16 +105,38 @@ import {
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
 import { GameServer } from './game';
-import { isUniqueViolation, json, readBody } from './http_util';
+import {
+  handleGitHubCallback,
+  handleGitHubStart,
+  handleGitHubStatus,
+  handleGitHubUnlink,
+} from './github';
+import { topContributors } from './github_contributors';
+import { pruneGitHubOAuthStates } from './github_db';
+import {
+  contentLengthExceeds,
+  isUniqueViolation,
+  json,
+  readBinaryBody,
+  readBody,
+} from './http_util';
 import { handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
+import {
+  MAX_MAP_SAVE_BYTES,
+  MapsService,
+  mapFullJson,
+  mapSummaryJson,
+  mapsErrorStatus,
+} from './maps';
+import { PgMapsDb } from './maps_db';
 import {
   cleanReportReason,
   createPlayerReport,
   createSuspiciousRegistrationReport,
 } from './moderation_db';
-import { createNativeAttestationChallenge, verifyNativeAttestation } from './native_attestation';
+import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
@@ -117,39 +149,38 @@ import {
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
+  assetUploadRateLimited,
   authThrottled,
   cardUploadRateLimited,
   clearAuthFailures,
   discordRateLimited,
+  githubRateLimited,
+  mapMutationRateLimited,
   publicReadRateLimited,
   rateLimited,
   recordAuthFailure,
   requestIp,
   wocBalanceRateLimited,
 } from './ratelimit';
-import {
-  isPublicCorsPath,
-  publicOriginFromRequest,
-  REALM,
-  REALM_DIRECTORY,
-  REALM_ORIGINS,
-} from './realm';
+import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { cacheControlFor, etagFor, isNotModified } from './static_cache';
-import { verifyTurnstile } from './turnstile';
+import { passesTurnstile } from './turnstile';
+import {
+  MAX_ASSET_BYTES,
+  UserAssetsService,
+  userAssetJson,
+  userAssetsErrorStatus,
+} from './user_assets';
+import { PgUserAssetsDb } from './user_assets_db';
 import {
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
   handleWalletUnlink,
 } from './wallet';
-import {
-  isNativeAppRequest,
-  isWebClientRequest,
-  NATIVE_APP_ORIGINS,
-  webLoginEnforced,
-} from './web_login_guard';
+import { allowedCorsOrigin, isWebClientRequest, webLoginEnforced } from './web_login_guard';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 import { bufferHandshakeMessages } from './ws_buffer';
 
@@ -179,6 +210,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/support/', '/support.html'],
   ['/wiki', '/guide.html'],
   ['/wiki/', '/guide.html'],
+  ['/editor', '/editor.html'],
+  ['/editor/', '/editor.html'],
 ]);
 // How long chat logs are kept (0 = forever); pruned at boot and daily.
 const CHAT_LOG_RETENTION_DAYS = Number(process.env.CHAT_LOG_RETENTION_DAYS ?? 90);
@@ -196,6 +229,11 @@ const MAX_WS_PER_IP_HARD = Number(process.env.MAX_WS_PER_IP_HARD ?? '20');
 const BLOCKED_IP_REFRESH_MS = 60_000;
 
 const game = new GameServer();
+
+// Map editor persistence: the shared business rules (maps.ts / user_assets.ts)
+// wired to their Postgres backends, mirroring the SocialService/SocialDb split.
+const customMaps = new MapsService(new PgMapsDb(pool));
+const userAssets = new UserAssetsService(new PgUserAssetsDb(pool));
 
 function initialCharacterState(
   cls: PlayerClass,
@@ -493,18 +531,19 @@ function requestMetadata(req: http.IncomingMessage): { ip: string; userAgent: st
   };
 }
 
-// Gate account creation / login behind Cloudflare Turnstile. Returns true when
-// the request may proceed: trivially true when no secret is configured, else the
-// client-supplied token must verify. The English error is matched to a t() key
-// by userFacingApiError() in src/main.ts — keep the two strings in sync.
-async function passesTurnstile(
-  req: http.IncomingMessage,
-  body: Record<string, unknown>,
-): Promise<boolean> {
-  if (isNativeAppRequest(req)) return verifyNativeAttestation(req, body.nativeAttestation);
-  if (!TURNSTILE_SECRET) return true;
-  return verifyTurnstile(String(body.turnstileToken ?? ''), TURNSTILE_SECRET, requestIp(req));
-}
+// Host wiring for the desktop-login route handlers (server/desktop_login.ts):
+// the real db/auth implementations here, stubs in tests.
+const desktopLoginRouteDeps: DesktopLoginRouteDeps = {
+  bearerToken,
+  readBody,
+  json,
+  requestMetadata,
+  accountForToken,
+  accountById,
+  moderationStatusForAccount,
+  touchLogin,
+  saveToken,
+};
 
 const MIME: Record<string, string> = {
   '.html': 'text/html',
@@ -597,15 +636,15 @@ function serveStatic(req: http.IncomingMessage, res: http.ServerResponse): void 
 // ---------------------------------------------------------------------------
 
 // Cross-realm CORS: a client served by one realm may call another realm's API
-// after switching realms in the picker. Native Capacitor builds also call the
-// production origin from localhost-style WebView origins. Auth is via bearer
-// token (no cookies), so reflecting these specific origins is safe.
+// after switching realms in the picker. The native Capacitor and Electron
+// desktop shells also call the production origin from non-site origins. The
+// allow-list itself lives in allowedCorsOrigin (server/web_login_guard.ts).
 function maybeCors(req: http.IncomingMessage, res: http.ServerResponse): void {
-  const origin = req.headers.origin;
-  if (typeof origin === 'string' && (REALM_ORIGINS.has(origin) || NATIVE_APP_ORIGINS.has(origin))) {
+  const origin = allowedCorsOrigin(req.headers.origin);
+  if (origin !== null) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
     res.setHeader('Access-Control-Max-Age', '600');
   }
@@ -652,9 +691,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     ) {
       return json(res, 403, { error: 'logins are only allowed from the game client' });
     }
+    // The desktop-login handoff shares the same per-IP budget: exchange is
+    // unauthenticated (defense in depth on top of the 160-bit single-use code)
+    // and create bounds how fast one authenticated client can grow the store.
     if (
       req.method === 'POST' &&
-      (url === '/api/register' || url === '/api/login') &&
+      (url === '/api/register' ||
+        url === '/api/login' ||
+        url === '/api/desktop-login/create' ||
+        url === '/api/desktop-login/exchange') &&
       rateLimited(req)
     ) {
       return json(res, 429, { error: 'too many attempts — wait a minute and try again' });
@@ -667,13 +712,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/register') {
       const body = await readBody(req);
-      if (!(await passesTurnstile(req, body)))
+      if (!(await passesTurnstile(req, body, TURNSTILE_SECRET)))
         return json(res, 403, { error: 'verification failed, please try again' });
       if (!validUsernameShape(body.username))
         return json(res, 400, { error: 'username must be 3-24 chars (letters, digits, _)' });
       if (offensiveName(body.username)) return json(res, 400, { error: 'username is not allowed' });
       if (!validPassword(body.password))
         return json(res, 400, { error: 'password must be at least 6 chars' });
+      // Email is mandatory at signup: it is the recovery address that later proves
+      // account ownership on a password reset, so we capture it up front.
+      const signupEmail = normalizeEmail(body.email);
+      if (!signupEmail) return json(res, 400, { error: 'enter a valid email address' });
       const existing = await findAccount(body.username);
       if (existing) return json(res, 409, { error: 'username already taken' });
       let account: Awaited<ReturnType<typeof createAccount>>;
@@ -692,25 +741,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       const token = newToken();
       await saveToken(token, account.id);
-      // Optional email at signup: if a valid address is supplied, store it and
-      // send the welcome mail. Kept optional so existing clients that register
-      // without an email are unaffected (the email is otherwise set later via
-      // the account portal).
-      const signupEmailRaw = typeof body.email === 'string' ? body.email.trim() : '';
-      if (
-        signupEmailRaw &&
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupEmailRaw) &&
-        signupEmailRaw.length <= 254
-      ) {
-        await setAccountEmail(account.id, signupEmailRaw);
-        emailAccountCreated({
-          id: account.id,
-          username: account.username,
-          email: signupEmailRaw,
-          locale: null,
-          marketing_opt_in: false,
-        });
-      }
+      // Store the mandatory signup email and send the welcome mail. Validated above,
+      // so this always runs for a fresh registration.
+      await setAccountEmail(account.id, signupEmail);
+      emailAccountCreated({
+        id: account.id,
+        username: account.username,
+        email: signupEmail,
+        locale: null,
+        marketing_opt_in: false,
+      });
       void createSuspiciousRegistrationReport({
         accountId: account.id,
         username: account.username,
@@ -721,11 +761,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       void captureReferral(account.id, body.ref).catch((err) =>
         console.error('referral capture failed:', err),
       );
-      return json(res, 200, { token, username: account.username });
+      // emailMissing is always false here (email is required above); sent so the
+      // client can use one uniform post-auth check across register and login.
+      return json(res, 200, { token, username: account.username, emailMissing: false });
     }
     if (req.method === 'POST' && url === '/api/login') {
       const body = await readBody(req);
-      if (!(await passesTurnstile(req, body)))
+      if (!(await passesTurnstile(req, body, TURNSTILE_SECRET)))
         return json(res, 403, { error: 'verification failed, please try again' });
       const username = typeof body.username === 'string' ? body.username : '';
       // Per-account brute-force throttle (#93). The message is identical to a
@@ -767,7 +809,16 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       await touchLogin(account.id, requestMetadata(req));
       const token = newToken();
       await saveToken(token, account.id);
-      return json(res, 200, { token, username: account.username });
+      // Tell the client whether this (possibly pre-email) account still needs a
+      // recovery address, so it can force the mandatory-email prompt on sign-in.
+      const emailMissing = !(account.email && account.email.trim());
+      return json(res, 200, { token, username: account.username, emailMissing });
+    }
+    if (req.method === 'POST' && url === '/api/desktop-login/create') {
+      return handleDesktopLoginCreate(req, res, desktopLoginRouteDeps);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-login/exchange') {
+      return handleDesktopLoginExchange(req, res, desktopLoginRouteDeps);
     }
     // Read-scoped "my characters" list: lets a companion holding a character:read
     // token (OAuth or a pasted companion token) discover its character ids so it
@@ -953,6 +1004,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         }
         if (game.rekeyMarketSeller(characterId, character.name, c.name)) {
           await game.saveMarket();
+        }
+        if (game.rekeyMailOwner(characterId, character.name, c.name)) {
+          await game.saveMail();
         }
         return json(res, 200, {
           id: c.id,
@@ -1149,6 +1203,24 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           ...guildSlice,
         });
       }
+      // ?board=devs ranks open-source CONTRIBUTORS by merged pull requests, sourced
+      // from the cached public GitHub PR stats. The same data for every realm,
+      // so it is realm-agnostic; rate-limited per IP like the other boards via the
+      // shared route limiter is unnecessary here (it reads an in-memory cache), but
+      // a failing GitHub fetch already backs off inside topContributors.
+      if (params.get('board') === 'devs') {
+        const devEntries = await topContributors();
+        const devPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
+        const devPage = Number(params.get('page')) || 0;
+        const devSlice = paginateDevLeaderboard(devEntries, devPage, devPageSize);
+        return json(res, 200, {
+          realm: REALM,
+          scope,
+          board: 'devs',
+          metric: 'landedCommits',
+          ...devSlice,
+        });
+      }
       const entries = await getLeaderboard(scope);
       // Legacy ?limit=N (home-page board): top N as a single page, no paging UI.
       const limitParam = params.get('limit');
@@ -1215,6 +1287,14 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       return handleAccountSetEmail(req, res, accountId);
+    }
+    // Set the recovery email on an account that has none yet (the mandatory-email
+    // backfill the client forces on sign-in). Bearer-scoped; rejects once an
+    // address already exists (that must go through the verified change flow).
+    if (req.method === 'POST' && url === '/api/account/email/set-initial') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleAccountSetInitialEmail(req, res, accountId);
     }
     if (req.method === 'POST' && url === '/api/account/deactivate') {
       const accountId = await bearerActiveAccount(req, res);
@@ -1359,6 +1439,34 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (discordRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
       return handleDiscordUnlink(req, res, accountId);
     }
+    // GitHub OAuth link (developer badge). Link-only: the start leg resolves the
+    // caller's account first, so the verified GitHub identity attaches to a known
+    // account. The callback carries no Origin (a github.com redirect) and is
+    // exempt from the web-login Origin guard, exactly like the Discord callback.
+    if (req.method === 'POST' && url === '/api/auth/github/start') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (githubRateLimited(req, accountId)) {
+        recordUsageMetric('github.link.rate_limited');
+        return json(res, 429, { error: 'rate limited' });
+      }
+      return handleGitHubStart(req, res, { accountId });
+    }
+    if (req.method === 'GET' && url === '/api/auth/github/callback') {
+      return handleGitHubCallback(req, res);
+    }
+    if (req.method === 'GET' && url === '/api/github') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (githubRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleGitHubStatus(req, res, accountId);
+    }
+    if (req.method === 'DELETE' && url === '/api/github') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (githubRateLimited(req, accountId)) return json(res, 429, { error: 'rate limited' });
+      return handleGitHubUnlink(req, res, accountId);
+    }
     // $WOC balance proxy — keeps the Solana RPC endpoint (and any key in it)
     // server-side so it never ships in the client bundle. Public (on-chain
     // balances are public) but narrow + IP rate-limited + per-wallet cached.
@@ -1370,6 +1478,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // `fresh=1` is parsed AFTER the IP rate-limit above, so it can't be used to hammer the RPC.
       const { owner, fresh } = parseWocBalanceQuery(req.url ?? '');
       return handleWocBalance(res, owner, fresh);
+    }
+    if (url.startsWith('/api/daily-rewards')) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDailyRewardApi(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
@@ -1398,6 +1511,199 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         primarySlugForAccount(accountId),
       ]);
       return json(res, 200, { count, slug });
+    }
+    // -----------------------------------------------------------------------
+    // Map editor: saved custom maps. Every stored document is the output of
+    // sanitizeMapDoc (applied inside MapsService), all error bodies are stable
+    // snake_case codes the client maps to its own t() keys, and every mutation
+    // goes through bearerActiveAccount. Save bodies get the /api/card lane
+    // treatment: Content-Length precheck BEFORE auth, 413 + Connection: close.
+    // -----------------------------------------------------------------------
+    if (url === '/api/maps' && (req.method === 'GET' || req.method === 'POST')) {
+      if (req.method === 'GET') {
+        const accountId = await bearerReadAccount(req, res);
+        if (accountId === null) return;
+        const mine = await customMaps.listMine(accountId);
+        return json(res, 200, { maps: mine.map(mapSummaryJson) });
+      }
+      if (contentLengthExceeds(req, MAX_MAP_SAVE_BYTES)) {
+        res.shouldKeepAlive = false;
+        res.setHeader('Connection', 'close');
+        return json(res, 413, { error: 'map_too_large' });
+      }
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (mapMutationRateLimited(req, accountId)) return json(res, 429, { error: 'rate_limited' });
+      let body: any;
+      try {
+        body = await readBody(req, MAX_MAP_SAVE_BYTES);
+      } catch (err) {
+        const tooLarge = err instanceof Error && err.message === 'body too large';
+        if (tooLarge) {
+          res.shouldKeepAlive = false;
+          res.setHeader('Connection', 'close');
+        }
+        return json(res, tooLarge ? 413 : 400, { error: tooLarge ? 'map_too_large' : 'bad_json' });
+      }
+      const result = await customMaps.createMap(accountId, body.name, body.doc);
+      if (!result.ok) return json(res, mapsErrorStatus(result.error), { error: result.error });
+      return json(res, 200, { map: mapSummaryJson(result.map) });
+    }
+    if (req.method === 'GET' && url === '/api/maps/public') {
+      if (publicReadRateLimited(req)) return json(res, 429, { error: 'rate_limited' });
+      const { page, limit } = parsePageParams(
+        new URL(req.url ?? '/', 'http://localhost').searchParams,
+      );
+      const { rows, total } = await customMaps.listPublic(page, limit);
+      return json(res, 200, { rows: rows.map(mapSummaryJson), total, page, limit });
+    }
+    const mapIdMatch = /^\/api\/maps\/(\d+)$/.exec(url);
+    if (req.method === 'GET' && mapIdMatch) {
+      // Owner or public. Auth is optional; anonymous readers share the public
+      // read throttle like the public character sheet.
+      const accountId = await bearerAccount(req);
+      if (accountId === null && publicReadRateLimited(req)) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
+      const map = await customMaps.getMapForViewer(accountId, Number(mapIdMatch[1]));
+      if (!map) return json(res, 404, { error: 'map_not_found' });
+      return json(res, 200, { map: mapFullJson(map) });
+    }
+    if (req.method === 'PUT' && mapIdMatch) {
+      if (contentLengthExceeds(req, MAX_MAP_SAVE_BYTES)) {
+        res.shouldKeepAlive = false;
+        res.setHeader('Connection', 'close');
+        return json(res, 413, { error: 'map_too_large' });
+      }
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (mapMutationRateLimited(req, accountId)) return json(res, 429, { error: 'rate_limited' });
+      let body: any;
+      try {
+        body = await readBody(req, MAX_MAP_SAVE_BYTES);
+      } catch (err) {
+        const tooLarge = err instanceof Error && err.message === 'body too large';
+        if (tooLarge) {
+          res.shouldKeepAlive = false;
+          res.setHeader('Connection', 'close');
+        }
+        return json(res, tooLarge ? 413 : 400, { error: tooLarge ? 'map_too_large' : 'bad_json' });
+      }
+      const result = await customMaps.saveMap(
+        accountId,
+        Number(mapIdMatch[1]),
+        body.doc,
+        body.version,
+        body.name,
+      );
+      if (!result.ok) {
+        return json(res, mapsErrorStatus(result.error), {
+          error: result.error,
+          ...(result.currentVersion !== undefined ? { version: result.currentVersion } : {}),
+        });
+      }
+      return json(res, 200, { map: mapSummaryJson(result.map) });
+    }
+    if (req.method === 'DELETE' && mapIdMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (mapMutationRateLimited(req, accountId)) return json(res, 429, { error: 'rate_limited' });
+      const deleted = await customMaps.deleteMap(accountId, Number(mapIdMatch[1]));
+      return json(res, deleted ? 200 : 404, deleted ? { ok: true } : { error: 'map_not_found' });
+    }
+    const mapForkMatch = /^\/api\/maps\/(\d+)\/fork$/.exec(url);
+    if (req.method === 'POST' && mapForkMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (mapMutationRateLimited(req, accountId)) return json(res, 429, { error: 'rate_limited' });
+      let body: any;
+      try {
+        body = await readBody(req);
+      } catch {
+        return json(res, 400, { error: 'bad_json' });
+      }
+      const result = await customMaps.forkMap(accountId, Number(mapForkMatch[1]), body.name);
+      if (!result.ok) return json(res, mapsErrorStatus(result.error), { error: result.error });
+      // The fork response carries the full document so the editor can open the
+      // copy without a second round trip.
+      return json(res, 200, { map: mapFullJson(result.map) });
+    }
+    const mapPublishMatch = /^\/api\/maps\/(\d+)\/(publish|unpublish)$/.exec(url);
+    if (req.method === 'POST' && mapPublishMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (mapMutationRateLimited(req, accountId)) return json(res, 429, { error: 'rate_limited' });
+      const publish = mapPublishMatch[2] === 'publish';
+      const done = await customMaps.setPublished(accountId, Number(mapPublishMatch[1]), publish);
+      return json(res, done ? 200 : 404, done ? { ok: true } : { error: 'map_not_found' });
+    }
+    // -----------------------------------------------------------------------
+    // Map editor: uploaded GLB assets, content-addressed by sha256. The upload
+    // copies the /api/card lane end to end (Content-Length precheck before
+    // auth, scoped rate-limit bucket, binary body, format validation before
+    // storage); the byte GET is public (read-throttled) so placed assets load
+    // in any viewer's client.
+    // -----------------------------------------------------------------------
+    if (req.method === 'POST' && url === '/api/assets') {
+      if (contentLengthExceeds(req, MAX_ASSET_BYTES)) {
+        res.shouldKeepAlive = false;
+        res.setHeader('Connection', 'close');
+        return json(res, 413, { error: 'asset_too_large' });
+      }
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (assetUploadRateLimited(req, accountId)) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
+      let bytes: Buffer;
+      try {
+        bytes = await readBinaryBody(req, MAX_ASSET_BYTES);
+      } catch (err) {
+        const tooLarge = err instanceof Error && err.message === 'body too large';
+        if (tooLarge) {
+          res.shouldKeepAlive = false;
+          res.setHeader('Connection', 'close');
+        }
+        return json(res, tooLarge ? 413 : 400, {
+          error: tooLarge ? 'asset_too_large' : 'bad_request',
+        });
+      }
+      const name = new URL(req.url ?? '/', 'http://localhost').searchParams.get('name');
+      const result = await userAssets.upload(accountId, bytes, name);
+      if (!result.ok) {
+        return json(res, userAssetsErrorStatus(result.error), { error: result.error });
+      }
+      return json(res, 200, { asset: userAssetJson(result.asset), existing: result.existing });
+    }
+    if (req.method === 'GET' && url === '/api/assets/mine') {
+      const accountId = await bearerReadAccount(req, res);
+      if (accountId === null) return;
+      const assets = await userAssets.listMine(accountId);
+      return json(res, 200, { assets: assets.map(userAssetJson) });
+    }
+    const assetGlbMatch = /^\/api\/assets\/([a-f0-9]{64})\.glb$/.exec(url);
+    if (req.method === 'GET' && assetGlbMatch) {
+      if (publicReadRateLimited(req)) return json(res, 429, { error: 'rate_limited' });
+      const bytes = await userAssets.bytesForSha(assetGlbMatch[1]);
+      // Missing and moderation-blocked are the same 404 to the public.
+      if (!bytes) return json(res, 404, { error: 'asset_not_found' });
+      res.writeHead(200, {
+        'Content-Type': 'model/gltf-binary',
+        'Content-Length': bytes.length,
+        // Content-addressed by sha256: the bytes behind a given URL can never
+        // change, so cache like the hashed build assets (static_cache.ts).
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'X-Content-Type-Options': 'nosniff',
+      });
+      res.end(bytes);
+      return;
+    }
+    const assetIdMatch = /^\/api\/assets\/(\d+)$/.exec(url);
+    if (req.method === 'DELETE' && assetIdMatch) {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      const deleted = await userAssets.deleteAsset(accountId, Number(assetIdMatch[1]));
+      return json(res, deleted ? 200 : 404, deleted ? { ok: true } : { error: 'asset_not_found' });
     }
     json(res, 404, { error: 'unknown endpoint' });
   } catch (err: any) {
@@ -1435,6 +1741,7 @@ async function main(): Promise<void> {
       `pruned ${prunedPerfReports} client perf report row(s) older than ${PERF_REPORT_RETENTION_DAYS} days`,
     );
   await game.loadMarket();
+  await game.loadMail();
   await game.loadChatFilter();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
@@ -1457,6 +1764,9 @@ async function main(): Promise<void> {
       );
       void pruneDiscordPendingLogins(pool).catch((err) =>
         console.error('discord pending login prune failed:', err),
+      );
+      void pruneGitHubOAuthStates(pool).catch((err) =>
+        console.error('github oauth state prune failed:', err),
       );
     },
     24 * 3600 * 1000,
@@ -1509,8 +1819,12 @@ async function main(): Promise<void> {
       res.end();
       return;
     }
-    if (url.startsWith('/internal/')) void handleInternalApi(req, res, game);
-    else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
+    if (url.startsWith('/internal/')) {
+      void (async () => {
+        if (await handleDailyRewardInternalApi(req, res)) return;
+        await handleInternalApi(req, res, game);
+      })();
+    } else if (url.startsWith('/admin/api/')) void handleAdminApi(req, res, game);
     else if (url.startsWith('/api/')) void handleApi(req, res);
     else if (url.startsWith('/oauth/')) void handleOAuth(req, res);
     else if (req.method === 'GET' && url.startsWith('/p/')) void handleCardRoutes(req, res);
@@ -1683,6 +1997,7 @@ async function main(): Promise<void> {
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
+    await game.saveMail();
     await game.endAllPlaySessions();
     await game.chatLog.stop();
     await pool.end();

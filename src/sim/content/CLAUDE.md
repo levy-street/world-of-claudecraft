@@ -1,5 +1,5 @@
 <!-- Area-scoped: src/sim/content/ only. Root + src/ + src/sim/ CLAUDE.md already
-     loaded: determinism, dependency rules, vanilla-fidelity, large-file norms,
+     loaded: determinism, dependency rules, classic-fidelity, large-file norms,
      and the sim-emit -> client-matcher i18n flow live there. This file covers
      only the data-as-code conventions here. -->
 
@@ -35,8 +35,8 @@ module and spreads it into the flat tables the engine reads (`ITEMS`, `MOBS`,
 - `ground_pickup_lines.ts`: `GROUND_PICKUP_LINES` (deny/enough flavor text per
   collectible item id) + `groundPickupDeny`/`groundPickupEnough`.
 
-## Vanilla fidelity (YOU MUST)
-Abilities gain ranks at **real vanilla learn levels** with real values. The
+## Classic-era fidelity (YOU MUST)
+Abilities gain ranks at **classic-era learn levels** with era-accurate values. The
 canonical table for levels 1 to 20, all 9 classes, is `docs/design/spell-ranks.md`:
 cross-reference it; do not invent costs/levels/damage.
 

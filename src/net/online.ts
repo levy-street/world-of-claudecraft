@@ -1,5 +1,12 @@
 // Online play: REST auth client + WebSocket world mirror.
 
+import {
+  isDesktopAppRuntime,
+  normalizeOrigin,
+  runtimeApiOrigin,
+  runtimeWebSocketUrl,
+} from '../runtime';
+import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -17,7 +24,9 @@ import { abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/
 import { deadTargetSelectable } from '../sim/dead_target';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
+import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
+import { emptyCraftSkills } from '../sim/professions/wheel';
 import { computeQuestState, type ResolvedAbility } from '../sim/sim';
 import {
   type Entity,
@@ -31,6 +40,7 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiteIntensity,
   type SimEvent,
 } from '../sim/types';
 import {
@@ -38,10 +48,15 @@ import {
   type ArenaInfo,
   type CharacterSearchResult,
   type ClientCommand,
+  type DailyRewardHistory,
+  type DailyRewardLeaderboardPage,
+  type DailyRewardSpinResult,
+  type DailyRewardStatus,
   type DelveCompanionInfo,
   type DelveDailyInfo,
   type DelveRunInfo,
   type DelveShopOfferView,
+  type DevLeaderboardPage,
   type DuelInfo,
   type FriendInfo,
   type GuildLeaderboardPage,
@@ -50,9 +65,11 @@ import {
   type LeaderboardEntry,
   type LeaderboardPage,
   type LockpickView,
+  type MailInfo,
   type MarketInfo,
   type OverheadEmoteId,
   type PartyInfo,
+  type PlayerProfessionsView,
   type PresenceStatus,
   type RaidLockout,
   type SocialInfo,
@@ -90,20 +107,17 @@ function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
 }
 
 export function buildWebSocketUrl(protocol: string, host: string): string {
-  const proto = protocol === 'https:' ? 'wss' : 'ws';
-  return `${proto}://${host}/ws`;
-}
-
-function normalizeOrigin(raw: string): string {
-  return raw.trim().replace(/\/+$/, '');
+  return runtimeWebSocketUrl(protocol, host, DESKTOP_API_ORIGIN);
 }
 
 export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
 export const NATIVE_API_ORIGIN = normalizeOrigin(String(import.meta.env.VITE_API_ORIGIN ?? ''));
+export const DESKTOP_APP = isDesktopAppRuntime();
+export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
 
 export function apiUrl(path: string, base = ''): string {
   if (/^https?:\/\//.test(path)) return path;
-  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN;
+  const origin = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
   return origin ? `${origin}${path}` : path;
 }
 
@@ -144,6 +158,8 @@ export interface ReleaseEntry {
 export interface AccountInfo {
   username: string;
   email: string;
+  // True when the account has no recovery email yet (mandatory-email capture).
+  emailMissing?: boolean;
   createdAt: string;
   characterCount: number;
   twoFactorEnabled: boolean;
@@ -171,13 +187,18 @@ export class Api {
   private static readonly SESSION_KEY = 'woc_session';
   token: string | null = null;
   username: string | null = null;
+  // Whether the signed-in account still needs a recovery email (mandatory-email
+  // capture). Set from the login/register response; undefined until a fresh auth
+  // reports it (a restored/Discord session leaves it undefined, so the caller
+  // confirms via getAccount()). Never persisted; it is a per-session hint only.
+  emailMissing: boolean | undefined = undefined;
   realm: string | null = null;
   // base origin for realm-scoped calls (characters, search, ws). '' = the page
   // origin; set to another realm's origin when the player picks a realm
-  base = NATIVE_API_ORIGIN;
+  base = NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
 
   setRealm(url: string): void {
-    this.base = normalizeOrigin(url) || NATIVE_API_ORIGIN;
+    this.base = normalizeOrigin(url) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
   }
 
   // The realm directory is always read from the page's own server. Sending the
@@ -247,6 +268,7 @@ export class Api {
   async register(
     username: string,
     password: string,
+    email: string,
     turnstileToken = '',
     ref = '',
     nativeAttestation: unknown = undefined,
@@ -254,12 +276,15 @@ export class Api {
     const data = await this.post('/api/register', {
       username,
       password,
+      email,
       turnstileToken,
       ref,
       nativeAttestation,
     });
     this.token = data.token;
     this.username = data.username;
+    // A fresh registration always has the mandatory email; trust the server flag.
+    this.emailMissing = data.emailMissing === true;
   }
 
   // Returns { twoFactorRequired: true } when the account has 2FA on and no code
@@ -284,7 +309,24 @@ export class Api {
     if (data.twoFactorRequired && !data.token) return { twoFactorRequired: true };
     this.token = data.token;
     this.username = data.username;
+    // Pre-email accounts report emailMissing:true so the client can force the
+    // mandatory recovery-email prompt on this sign-in.
+    this.emailMissing = data.emailMissing === true;
     return {};
+  }
+
+  async createDesktopLoginCode(): Promise<{ code: string; expiresInMs: number }> {
+    const data = await this.post('/api/desktop-login/create', {});
+    return {
+      code: typeof data.code === 'string' ? data.code : '',
+      expiresInMs: typeof data.expiresInMs === 'number' ? data.expiresInMs : 0,
+    };
+  }
+
+  async exchangeDesktopLoginCode(code: string): Promise<void> {
+    const data = await this.post('/api/desktop-login/exchange', { code });
+    this.token = data.token;
+    this.username = data.username;
   }
 
   // ── Persistent session (home-page account portal) ──────────────────────────
@@ -320,6 +362,7 @@ export class Api {
   clearSession(): void {
     this.token = null;
     this.username = null;
+    this.emailMissing = undefined;
     try {
       localStorage.removeItem(Api.SESSION_KEY);
     } catch {
@@ -358,6 +401,14 @@ export class Api {
   // address and a notice to the old one. The address only changes on verify.
   async changeEmail(password: string, newEmail: string): Promise<void> {
     await this.post('/api/account/email/change', { password, newEmail });
+  }
+
+  // Set the recovery email on an account that has none yet (the mandatory-email
+  // backfill forced on sign-in). Bearer-scoped; the server rejects it once an
+  // address exists. On success the account no longer needs an email.
+  async setInitialEmail(email: string): Promise<void> {
+    await this.post('/api/account/email/set-initial', { email });
+    this.emailMissing = false;
   }
 
   // ── Two-factor (TOTP) ──────────────────────────────────────────────────────
@@ -566,6 +617,23 @@ export class Api {
     await this.delete('/api/discord', password ? { password } : {});
   }
 
+  // ── GitHub link + developer-badge status ───────────────────────────────────
+  // Returns the github.com authorize URL the browser navigates to (link-only:
+  // attaches the verified GitHub identity to the current account).
+  async githubStart(): Promise<{ url: string }> {
+    return this.post('/api/auth/github/start', {});
+  }
+
+  // Current account's GitHub link status + landed-commit count + dev tier.
+  async githubStatus(): Promise<Record<string, unknown>> {
+    return this.get('/api/github');
+  }
+
+  // Unlink GitHub from the current account.
+  async unlinkGithub(): Promise<void> {
+    await this.delete('/api/github', {});
+  }
+
   // ── Shareable player card + referrals ──────────────────────────────────────
   // Publish (or replace) this character's card PNG. The server may return a
   // realm-relative public page path; main.ts normalizes it to an absolute URL
@@ -667,6 +735,7 @@ function blankEntity(id: number): Entity {
     petPath: [],
     petPathCooldown: 0,
     castPushbackReduction: 0,
+    knockbackResistance: 0,
     pos: { x: 0, y: 0, z: 0 },
     prevPos: { x: 0, y: 0, z: 0 },
     facing: 0,
@@ -690,6 +759,9 @@ function blankEntity(id: number): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    meleeHaste: 0,
+    rangedHaste: 0,
+    spellHaste: 0,
     critChance: 0.05,
     dodgeChance: 0.05,
     moveSpeed: 7,
@@ -705,6 +777,8 @@ function blankEntity(id: number): Entity {
     castingAbility: null,
     castRemaining: 0,
     castTotal: 0,
+    castTargetId: null,
+    castAim: null,
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -713,9 +787,10 @@ function blankEntity(id: number): Entity {
     queuedOnSwing: null,
     fiveSecondRule: 99,
     comboPoints: 0,
-    comboTargetId: null,
+    comboUntil: -1,
     overpowerUntil: -1,
     potionCooldownUntil: -1,
+    potionCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -728,6 +803,8 @@ function blankEntity(id: number): Entity {
     tappedById: null,
     pulseTimer: 0,
     stompTimer: 0,
+    bigCastTimer: 0,
+    yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
     detonateTimer: Infinity,
@@ -763,6 +840,8 @@ function blankEntity(id: number): Entity {
     objectItemId: null,
     dungeonId: null,
     dead: false,
+    ghost: false,
+    corpsePos: null,
     scale: 1,
     color: 0xffffff,
     skinCatalog: 'class',
@@ -788,6 +867,9 @@ export class ClientWorld implements IWorld {
   known: ResolvedAbility[] = [];
   realm = '';
   inventory: InvSlot[] = [];
+  // Equipped bag sockets, mirrored from snapshot self ('bags'); capacity is
+  // derived locally from the shared item data (same math as the sim's bags.ts).
+  bags: (string | null)[] = [null, null, null, null];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
   copper = 0;
@@ -830,6 +912,10 @@ export class ClientWorld implements IWorld {
   // --- IWorldMarket: World Market view, mirrored from the snapshot self
   // (`s.market`, delta-omitted). ---
   marketInfo: MarketInfo | null = null;
+  // --- IWorldMail: Ravenpost mailbox view + unread badge, mirrored from the
+  // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
+  mailInfo: MailInfo | null = null;
+  mailUnread = 0;
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -841,10 +927,20 @@ export class ClientWorld implements IWorld {
   lockpickState: LockpickView | null = null;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
+  // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
+  // issue lands the sim-side state + persistence only, so online play sees the
+  // all-zero default until the wheel/mass-conservation follow-up wires a self-snap
+  // field the way `dmarks`/`dcomp` do for delveMarks/companionUpgrades above.
+  craftSkills: Record<string, number> = emptyCraftSkills();
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
   delveDaily: DelveDailyInfo = { date: '', firstClearXp: [], markClears: 0 };
+  // Gathering profession proficiency (Mining/Logging/Herbalism), the real
+  // read surface for #1119; mirrored from the `prof` wire delta below.
+  // Crafting/secondary professions still contribute nothing until later
+  // issues (#1120/#1125/#1126/#1140) land.
+  professionsState: PlayerProfessionsView = { skills: [] };
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
   markers: Record<number, number> = {}; // entityId -> markerId, mirrored from the self-wire
@@ -857,6 +953,9 @@ export class ClientWorld implements IWorld {
   // entity id -> performance.now() when it first went missing from a snapshot;
   // used for the despawn grace window (anti-flicker), cleared once it returns
   private missingSince = new Map<number, number>();
+  // scratch for applySnapshot's per-message "ids present in this snap" set,
+  // reused across snapshots (20 Hz) instead of allocating a Set per message
+  private wireSeen = new Set<number>();
   // camera follow for keyboard turns applied by the main loop
   pendingFacingDelta = 0;
   connected = false;
@@ -892,7 +991,7 @@ export class ClientWorld implements IWorld {
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     this.characterId = characterId;
     this.token = token;
-    this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN;
+    this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
@@ -1176,7 +1275,11 @@ export class ClientWorld implements IWorld {
     }
     this.lastSnapAt = now;
 
-    const seen = new Set<number>();
+    // lazy init (not the field initializer alone): tests build bare instances
+    // via Object.create(ClientWorld.prototype), which skips field initializers
+    if (this.wireSeen === undefined) this.wireSeen = new Set();
+    const seen = this.wireSeen;
+    seen.clear();
     const prevSelf = this.entities.get(this.playerId);
     const prevSelfFacing = prevSelf?.facing;
     const prevSelfDead = prevSelf?.dead ?? false;
@@ -1212,6 +1315,9 @@ export class ClientWorld implements IWorld {
         e.discordName = typeof w.dnm === 'string' ? w.dnm : undefined; // Discord handle/nickname
         e.discordJoined = typeof w.dj === 'number' ? w.dj : undefined; // Discord join epoch ms
         e.discordRole = typeof w.dr === 'string' ? w.dr : undefined; // top staff/special role key
+        e.devTier = w.dvt ?? 0; // developer-badge tier (cosmetic, server-set)
+        e.devMergedPrs = typeof w.dvc === 'number' ? w.dvc : undefined; // merged-PR count
+        e.githubLogin = typeof w.dgl === 'string' ? w.dgl : undefined; // GitHub login
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -1277,11 +1383,19 @@ export class ClientWorld implements IWorld {
       e.facing = w.f;
       e.hp = w.hp;
       e.maxHp = w.mhp;
+      // Resource (the target frame's bar): the wire sends it only for entities
+      // that have one, so a missing rtype keeps the blank defaults (no bar).
+      if (w.rtype !== undefined) {
+        e.resourceType = w.rtype;
+        e.resource = w.res;
+        e.maxResource = w.mres;
+      }
       e.rangedPower = w.rp ?? 0;
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;
       e.overheadEmoteUntil = e.overheadEmoteId ? Number.POSITIVE_INFINITY : 0;
       if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
       e.dead = nowDead;
+      e.ghost = !!w.gh; // released spirit: rendered translucent, runs faster
       e.lootable = !!w.loot;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
@@ -1296,27 +1410,68 @@ export class ClientWorld implements IWorld {
       e.petTauntTimer = w.pt ?? 0;
       e.petAutoTaunt = !!w.pa;
       e.petManualTauntPending = false;
-      e.threat = new Map(w.thr ?? []);
-      e.auras = (w.auras ?? []).map((a: any) => ({
-        id: a.id,
-        name: a.name,
-        kind: a.kind,
-        remaining: a.rem,
-        duration: a.dur,
-        // The wire carries value only for negative-value buff_* stat-saps (sparse,
-        // server/game.ts), so the UI classifies them as debuffs identically to offline; a
-        // missing value (ordinary buffs, absorb, non-buff auras, an old server) decodes to 0
-        // as before. sourceId/school stay simplified (separate pre-existing wire reductions,
-        // not part of this change).
-        value: a.value ?? 0,
-        sourceId: 0,
-        school: 'physical' as const,
-        stacks: a.stacks,
-        // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire sends it
-        // only when defined (server/game.ts), so an ordinary aura or an old server decodes to
-        // undefined and the badge falls back to the stacks path, exactly as before.
-        charges: a.charges,
-      }));
+      // same semantics as `new Map(w.thr ?? [])` (absent thr = empty table), but
+      // updates the existing Map in place: no per-entity Map churn at 20 Hz
+      e.threat.clear();
+      if (w.thr) for (const [tid, tv] of w.thr as [number, number][]) e.threat.set(tid, tv);
+      // The wire carries the aura magnitude (and imbue range / tick cadence / school) so buff
+      // and debuff hover tooltips show the real numbers online exactly as offline (aura_effect
+      // reads these). A 0/absent value decodes to 0 (value-less auras and an old server are
+      // unchanged), a missing school falls back to the physical default, and imbue range /
+      // tick cadence stay undefined when not sent. sourceId stays simplified (a separate
+      // pre-existing wire reduction, not read by the tooltip).
+      //
+      // Between snapshots the aura SET is usually unchanged (only `rem` ticks down), so when
+      // the incoming ids line up index-for-index with the existing records, update those
+      // records in place: no array + per-aura object allocation per entity at 20 Hz, and the
+      // preserved object identity matches the offline Sim (one live aura object across ticks).
+      // Any composition change (gain/fade/reorder) falls back to the fresh build below.
+      const wireAuras: any[] = w.auras ?? [];
+      let sameAuraShape = e.auras.length === wireAuras.length;
+      if (sameAuraShape) {
+        for (let i = 0; i < wireAuras.length; i++) {
+          if (e.auras[i].id !== wireAuras[i].id) {
+            sameAuraShape = false;
+            break;
+          }
+        }
+      }
+      if (sameAuraShape) {
+        for (let i = 0; i < wireAuras.length; i++) {
+          const a = wireAuras[i];
+          const rec = e.auras[i];
+          rec.name = a.name;
+          rec.kind = a.kind;
+          rec.remaining = a.rem;
+          rec.duration = a.dur;
+          rec.value = a.value ?? 0;
+          rec.value2 = a.value2;
+          rec.value3 = a.value3;
+          rec.tickInterval = a.tickInterval;
+          rec.school = a.school ?? 'physical';
+          rec.stacks = a.stacks;
+          // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire
+          // sends it only when defined (server/game.ts), so an ordinary aura or an old server
+          // decodes to undefined and the badge falls back to the stacks path, exactly as before.
+          rec.charges = a.charges;
+        }
+      } else {
+        e.auras = wireAuras.map((a: any) => ({
+          id: a.id,
+          name: a.name,
+          kind: a.kind,
+          remaining: a.rem,
+          duration: a.dur,
+          value: a.value ?? 0,
+          value2: a.value2,
+          value3: a.value3,
+          tickInterval: a.tickInterval,
+          sourceId: 0,
+          school: a.school ?? 'physical',
+          stacks: a.stacks,
+          charges: a.charges,
+        }));
+      }
       e.loot = w.lootList ?? null;
       return e;
     };
@@ -1359,11 +1514,18 @@ export class ClientWorld implements IWorld {
       e.resourceType = s.rtype;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
-      if (s.cds !== undefined)
-        e.cooldowns = new Map(Object.entries(s.cds).map(([k, v]) => [k, Number(v)]));
+      // corpse position while a ghost (null once resurrected). Delta-guarded: kept
+      // unchanged when the server omits it; drives the corpse marker + resurrect button.
+      if (s.corpse !== undefined) e.corpsePos = s.corpse ?? null;
+      if (s.cds !== undefined) {
+        // in-place rebuild (same result as `new Map(Object.entries(...))`): no
+        // intermediate entry arrays and no Map churn on the 20 Hz self record
+        e.cooldowns.clear();
+        for (const k in s.cds) e.cooldowns.set(k, Number(s.cds[k]));
+      }
       e.gcdRemaining = s.gcd ?? 0;
+      e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
-      e.comboTargetId = s.comboTgt ?? null;
       e.targetId = s.target ?? null;
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
@@ -1372,6 +1534,9 @@ export class ClientWorld implements IWorld {
       e.attackPower = s.ap ?? 0;
       e.rangedPower = s.rp ?? 0;
       e.spellPower = s.sp ?? 0;
+      // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
+      // no wiring (the swing timers already ride the snapshot).
+      e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
       e.weapon = s.weapon ?? e.weapon;
@@ -1401,6 +1566,10 @@ export class ClientWorld implements IWorld {
       }
       if (s.buyback !== undefined) {
         this.vendorBuyback = s.buyback;
+        this.invChanged = true;
+      }
+      if (s.bags !== undefined) {
+        this.bags = s.bags;
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
@@ -1446,6 +1615,8 @@ export class ClientWorld implements IWorld {
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
       if (s.market !== undefined) this.marketInfo = s.market;
+      if (s.mail !== undefined) this.mailInfo = s.mail;
+      if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
@@ -1453,6 +1624,7 @@ export class ClientWorld implements IWorld {
       if (s.dcomp !== undefined) this.companionUpgrades = s.dcomp ?? {};
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
+      if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
         let d = e.facing - prevSelfFacing;
@@ -1559,6 +1731,10 @@ export class ClientWorld implements IWorld {
     }
     this.cmd({ cmd: 'castSlot', slot });
   }
+  castAbilityAt(abilityId: string, aim: { x: number; z: number }): void {
+    // Ground-targeted: no entity target involved, so no dead-target guard.
+    this.cmd({ cmd: 'castAt', ability: abilityId, x: aim.x, z: aim.z });
+  }
   cancelAura(auraId: string): void {
     // Authoritative on the server; the dropped aura disappears on the next self
     // snapshot. No optimistic local removal (stat recalc is server-owned).
@@ -1572,6 +1748,12 @@ export class ClientWorld implements IWorld {
   }
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });
+  }
+  resurrectAtCorpse(): void {
+    this.cmd({ cmd: 'resurrect_corpse' });
+  }
+  resurrectAtSpiritHealer(): void {
+    this.cmd({ cmd: 'resurrect_healer' });
   }
 
   // --- IWorldTargeting: target selection + tab cycling ---
@@ -1607,6 +1789,9 @@ export class ClientWorld implements IWorld {
   }
   lootCorpse(id: number): void {
     this.cmd({ cmd: 'loot', id });
+  }
+  autoLoot(id: number): void {
+    this.cmd({ cmd: 'autoloot', id });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
@@ -1645,6 +1830,15 @@ export class ClientWorld implements IWorld {
   }
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
+  }
+  get bagCapacity(): number {
+    return bagCapacity(this.bags);
+  }
+  equipBag(itemId: string, socket?: number): void {
+    this.cmd({ cmd: 'equip_bag', item: itemId, socket });
+  }
+  unequipBag(socket: number): void {
+    this.cmd({ cmd: 'unequip_bag', socket });
   }
   useItem(itemId: string): void {
     this.cmd({ cmd: 'use', item: itemId });
@@ -1773,6 +1967,9 @@ export class ClientWorld implements IWorld {
   partyKick(targetPid: number): void {
     this.cmd({ cmd: 'pkick', id: targetPid });
   }
+  partyPromote(targetPid: number): void {
+    this.cmd({ cmd: 'ppromote', id: targetPid });
+  }
   convertPartyToRaid(): void {
     this.cmd({ cmd: 'praid' });
   }
@@ -1879,6 +2076,12 @@ export class ClientWorld implements IWorld {
   guildDisband(): void {
     this.cmd({ cmd: 'guild_disband' });
   }
+  guildEventCreate(day: string, hour: number | null, title: string, note: string): void {
+    this.cmd({ cmd: 'guild_event_create', day, hour, title, note });
+  }
+  guildEventRemove(eventId: number): void {
+    this.cmd({ cmd: 'guild_event_remove', id: eventId });
+  }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();
     if (!q) return [];
@@ -1894,8 +2097,15 @@ export class ClientWorld implements IWorld {
   }
   // --- IWorldMarket: World Market browse/list/buy/cancel/collect command sends
   // (snake_case wire strings). marketInfo is a snapshot read (mirror field above). ---
-  marketSearch(query: string): void {
-    this.cmd({ cmd: 'market_search', q: query });
+  marketSearch(query: MarketQuery): void {
+    this.cmd({
+      cmd: 'market_search',
+      q: query.search,
+      itemType: query.itemType,
+      subtype: query.subtype,
+      rarity: query.rarity,
+      page: query.page,
+    });
   }
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });
@@ -1908,6 +2118,27 @@ export class ClientWorld implements IWorld {
   }
   marketCollect(): void {
     this.cmd({ cmd: 'market_collect' });
+  }
+  // --- IWorldMail: Ravenpost letter sends (snake_case wire strings). mailInfo /
+  // mailUnread are snapshot reads (mirror fields above). ---
+  mailSend(to: string, subject: string, body: string, copper: number, items: InvSlot[]): void {
+    this.cmd({
+      cmd: 'mail_send',
+      to,
+      subject,
+      body,
+      copper,
+      items: items.map((s) => ({ itemId: s.itemId, count: s.count })),
+    });
+  }
+  mailTake(mailId: number): void {
+    this.cmd({ cmd: 'mail_take', id: mailId });
+  }
+  mailDelete(mailId: number): void {
+    this.cmd({ cmd: 'mail_delete', id: mailId });
+  }
+  mailMarkRead(mailId: number): void {
+    this.cmd({ cmd: 'mail_read', id: mailId });
   }
   // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
   // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live
@@ -1966,6 +2197,9 @@ export class ClientWorld implements IWorld {
   }
   collectDelveChestLoot(chestId: number): void {
     this.cmd({ cmd: 'collect_delve_chest_loot', objectId: chestId });
+  }
+  delveRiteChoose(intensity: RiteIntensity): void {
+    this.cmd({ cmd: 'delve_rite_choose', intensity });
   }
   // Mirror the authoritative lockpick lifecycle into lockpickState. The events
   // still flow to the HUD (drainEvents) for transient feedback (juice/sounds).
@@ -2055,6 +2289,97 @@ export class ClientWorld implements IWorld {
       return empty;
     }
   }
+  // Developer high-score board (REST GET, no wire command): ?board=devs ranks
+  // contributors by landed commits. The same data for every realm, paged exactly
+  // like the player + guild boards above.
+  async devLeaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<DevLeaderboardPage> {
+    const empty: DevLeaderboardPage = {
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/leaderboard?board=devs&page=${page}&pageSize=${pageSize}`, this.base),
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+      };
+    } catch {
+      return empty;
+    }
+  }
+
+  async dailyRewards(): Promise<DailyRewardStatus> {
+    const res = await fetch(apiUrl('/api/daily-rewards', this.base), {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    if (!res.ok) throw new Error('daily rewards unavailable');
+    return (await res.json()) as DailyRewardStatus;
+  }
+
+  async dailyRewardLeaderboard(
+    page = 0,
+    pageSize = LEADERBOARD_PAGE_SIZE,
+  ): Promise<DailyRewardLeaderboardPage> {
+    const empty: DailyRewardLeaderboardPage = {
+      day: '',
+      leaders: [],
+      page: 0,
+      pageCount: 1,
+      total: 0,
+      pageSize,
+    };
+    try {
+      const res = await fetch(
+        apiUrl(`/api/daily-rewards/leaderboard?page=${page}&pageSize=${pageSize}`, this.base),
+        { headers: { Authorization: `Bearer ${this.token}` } },
+      );
+      if (!res.ok) return empty;
+      const data = await res.json();
+      return {
+        day: data.day ?? '',
+        leaders: data.leaders ?? [],
+        page: data.page ?? page,
+        pageCount: data.pageCount ?? 1,
+        total: data.total ?? data.leaders?.length ?? 0,
+        pageSize: data.pageSize ?? pageSize,
+      };
+    } catch {
+      return empty;
+    }
+  }
+
+  async spinDailyReward(): Promise<DailyRewardSpinResult> {
+    const res = await fetch(apiUrl('/api/daily-rewards/spin', this.base), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: '{}',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? 'daily spin unavailable');
+    return data as DailyRewardSpinResult;
+  }
+
+  async dailyRewardHistory(): Promise<DailyRewardHistory> {
+    const res = await fetch(apiUrl('/api/daily-rewards/history', this.base), {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    if (!res.ok) return { payouts: [] };
+    return (await res.json()) as DailyRewardHistory;
+  }
+
   prestige(): void {
     this.cmd({ cmd: 'prestige' });
   }

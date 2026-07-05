@@ -6,9 +6,12 @@ import {
   SET_DEATHLORD,
   SET_NECROMANCERS,
   SET_NIGHTTALON,
+  SET_SOULFLAME,
+  SET_STORMCALLERS,
   SET_WYRMSHADOW,
 } from '../src/sim/content/item_sets';
-import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
+import { MOBS } from '../src/sim/data';
+import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
@@ -23,6 +26,9 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
   return e;
 }
 
+const dist2d = (a: { x: number; z: number }, b: { x: number; z: number }) =>
+  Math.hypot(a.x - b.x, a.z - b.z);
+
 describe('aggregateSetBonuses (pure resolver)', () => {
   it('grants nothing below the 2-piece threshold', () => {
     const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1 }));
@@ -34,7 +40,9 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       spi: 0,
       ap: 0,
       crit: 0,
+      haste: 0,
       castPushbackReduction: 0,
+      knockbackResistance: 0,
     });
   });
 
@@ -57,14 +65,60 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     expect(three.crit).toBeCloseTo(0.02);
   });
 
-  it('caster set: 2pc = 50% pushback reduction, 3pc = 100% (max-combine, never sums past 1)', () => {
-    expect(aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 2 })).castPushbackReduction).toBe(0.5);
-    expect(aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 3 })).castPushbackReduction).toBe(1);
+  it('caster sets: 2pc grants knockback resistance, 3pc grants tier stats', () => {
+    const necro = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 3 }));
+    expect(necro.knockbackResistance).toBe(1);
+    expect(necro.int).toBe(10);
+    expect(necro.sta).toBe(10);
+    expect(necro.spi).toBe(0);
+    expect(necro.castPushbackReduction).toBe(0);
+
+    const soulflame = aggregateSetBonuses(counts({ [SET_SOULFLAME]: 3 }));
+    expect(soulflame.knockbackResistance).toBe(1);
+    expect(soulflame.int).toBe(15);
+    expect(soulflame.spi).toBe(15);
+    expect(soulflame.sta).toBe(0);
+
+    const stormcallers = aggregateSetBonuses(counts({ [SET_STORMCALLERS]: 3 }));
+    expect(stormcallers.knockbackResistance).toBe(1);
+    expect(stormcallers.int).toBe(15);
+    expect(stormcallers.spi).toBe(15);
+    expect(stormcallers.sta).toBe(0);
   });
 
-  it('every set definition lists ascending 2- and 3-piece tiers', () => {
+  it('knockback resistance max-combines across met tiers and clamps to 0..1', () => {
+    const twoCasterSets = aggregateSetBonuses(
+      counts({ [SET_NECROMANCERS]: 2, [SET_SOULFLAME]: 2 }),
+    );
+    expect(twoCasterSets.knockbackResistance).toBe(1);
+
+    const clampSetId = '__test_knockback_clamp';
+    ITEM_SETS[clampSetId] = {
+      id: clampSetId,
+      name: 'Clamp Test Set',
+      bonuses: [
+        {
+          pieces: 2,
+          effect: { castPushbackReduction: 2, knockbackResistance: 2 },
+          text: 'Clamp test.',
+        },
+      ],
+    };
+    try {
+      const clamped = aggregateSetBonuses(counts({ [clampSetId]: 2 }));
+      expect(clamped.castPushbackReduction).toBe(1);
+      expect(clamped.knockbackResistance).toBe(1);
+    } finally {
+      delete ITEM_SETS[clampSetId];
+    }
+  });
+
+  it('every set definition lists ascending tiers ending at 3 pieces', () => {
     for (const set of Object.values(ITEM_SETS)) {
-      expect(set.bonuses.map((b) => b.pieces)).toEqual([2, 3]);
+      const pieces = set.bonuses.map((b) => b.pieces);
+      // raid/dungeon families carry 2- and 3-piece tiers; the leveling haste
+      // kits deliberately carry the single 3-piece tier
+      expect([pieces.join(','), set.id]).toEqual([pieces.length === 1 ? '3' : '2,3', set.id]);
     }
   });
 });
@@ -135,21 +189,47 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     expect(two.attackPower).toBeGreaterThan(base.attackPower);
   });
 
-  it("Necromancer's (t1 caster): castPushbackReduction reflects equipped piece count", () => {
+  it("Necromancer's (t1 caster): knockback resistance at 2pc, int/sta added at 3pc", () => {
+    const base = statsFor('mage', 20, {});
     expect(statsFor('mage', 20, {}).castPushbackReduction).toBe(0);
-    expect(
-      statsFor('mage', 20, {
-        chest: 'necromancers_starshroud',
-        feet: 'necromancers_soulsteps',
-      }).castPushbackReduction,
-    ).toBe(0.5);
-    expect(
-      statsFor('mage', 20, {
-        chest: 'necromancers_starshroud',
-        feet: 'necromancers_soulsteps',
-        legs: 'necromancers_legwraps',
-      }).castPushbackReduction,
-    ).toBe(1);
+    const two = statsFor('mage', 20, {
+      chest: 'necromancers_starshroud',
+      feet: 'necromancers_soulsteps',
+    });
+    expect(two.castPushbackReduction).toBe(0);
+    expect(two.knockbackResistance).toBe(1);
+
+    const three = statsFor('mage', 20, {
+      chest: 'necromancers_starshroud',
+      feet: 'necromancers_soulsteps',
+      legs: 'necromancers_legwraps',
+    });
+    expect(three.castPushbackReduction).toBe(0);
+    expect(three.knockbackResistance).toBe(1);
+    expect(three.stats.int).toBe(base.stats.int + 11 + 8 + 13 + 10);
+    expect(three.stats.sta).toBe(base.stats.sta + 10);
+  });
+
+  it('Soulflame and Stormcaller (t2 caster): int/spi added at 3pc', () => {
+    const mageBase = statsFor('mage', 20, {});
+    const soulflame = statsFor('mage', 20, {
+      helmet: 'soulflame_cowl',
+      shoulder: 'soulflame_mantle',
+      gloves: 'soulflame_gloves',
+    });
+    expect(soulflame.knockbackResistance).toBe(1);
+    expect(soulflame.stats.int).toBe(mageBase.stats.int + 11 + 9 + 8 + 15);
+    expect(soulflame.stats.spi).toBe(mageBase.stats.spi + 15);
+
+    const shamanBase = statsFor('shaman', 20, {});
+    const stormcallers = statsFor('shaman', 20, {
+      helmet: 'stormcallers_crown',
+      shoulder: 'stormcallers_spaulders',
+      gloves: 'stormcallers_handguards',
+    });
+    expect(stormcallers.knockbackResistance).toBe(1);
+    expect(stormcallers.stats.int).toBe(shamanBase.stats.int + 10 + 8 + 8 + 15);
+    expect(stormcallers.stats.spi).toBe(shamanBase.stats.spi + 15);
   });
 });
 
@@ -160,6 +240,7 @@ describe('pushbackCast honors castPushbackReduction', () => {
     p.channeling = channeling;
     p.castTotal = 3;
     p.castRemaining = 1.5;
+    // Synthetic coverage: no current item set grants cast-pushback reduction.
     p.castPushbackReduction = reduction;
     (sim as any).pushbackCast(p);
     return p;
@@ -181,5 +262,39 @@ describe('pushbackCast honors castPushbackReduction', () => {
     const full = pushback(0, true).castRemaining;
     expect(full).toBeCloseTo(1.5 - 3 * CHANNEL_PUSHBACK_FRACTION);
     expect(pushback(1, true).castRemaining).toBe(1.5); // immune channel
+  });
+});
+
+describe('knockback resistance from set bonuses', () => {
+  it('prevents a forced mob knockback from displacing the player', () => {
+    const sim = new Sim({ seed: 5150, playerClass: 'mage' });
+    const p = sim.entities.get(sim.playerId)!;
+    p.maxHp = 100000;
+    p.hp = 100000;
+    p.dodgeChance = 0;
+    p.knockbackResistance = 1;
+    p.pos.x = 2;
+    p.pos.z = 0;
+    p.pos.y = 0;
+
+    const tmpl = MOBS.marrowlord_varkas;
+    const saved = tmpl.knockback!.chance;
+    tmpl.knockback!.chance = 1;
+    try {
+      const mob = createMob(900704, tmpl, p.level, { x: 0, y: 0, z: 0 });
+      const startGap = dist2d(p.pos, mob.pos);
+      let sawDamage = false;
+      for (let i = 0; i < 80 && !sawDamage; i++) {
+        const beforeHp = p.hp;
+        (sim as any).mobSwing(mob, p);
+        sawDamage = p.hp < beforeHp;
+        p.hp = p.maxHp;
+      }
+      expect(sawDamage).toBe(true);
+      expect(dist2d(p.pos, mob.pos)).toBe(startGap);
+      expect(p.pos.x).toBe(2);
+    } finally {
+      tmpl.knockback!.chance = saved;
+    }
   });
 });

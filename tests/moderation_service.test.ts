@@ -23,7 +23,7 @@ const player = (pid: number, accountId: number): Session => ({
   name: `Player${pid}`,
 });
 
-function setup(opts: { actor: Session; selectedTargetId?: number | null; sessions?: Session[] }) {
+function setup(opts: { actor: Session; sessions?: Session[] }) {
   const byPid = new Map<number, Session>();
   for (const session of opts.sessions ?? []) byPid.set(session.pid, session);
   byPid.set(opts.actor.pid, opts.actor);
@@ -43,8 +43,6 @@ function setup(opts: { actor: Session; selectedTargetId?: number | null; session
   const forceRename = vi.fn<ModerationAudit['forceRename']>(async () => ({ accountId: 0 }));
 
   const host: ModerationHost<Session> = {
-    selectedTargetId: () => opts.selectedTargetId ?? null,
-    sessionByPid: (pid) => byPid.get(pid) ?? null,
     sessionByName: (name) =>
       [...byPid.values()].find((session) => session.name.toLowerCase() === name.toLowerCase()) ??
       null,
@@ -81,10 +79,10 @@ describe('ModerationService', () => {
   it('audits kick and kill before applying their live effect', async () => {
     const actor = admin(1, 11);
     const target = player(2, 22);
-    const context = setup({ actor, selectedTargetId: target.pid, sessions: [target] });
+    const context = setup({ actor, sessions: [target] });
 
-    expect(context.service.handleChatCommand(actor, '/kick griefing')).toBe(true);
-    expect(context.service.handleChatCommand(actor, '/kill spawn camping')).toBe(true);
+    expect(context.service.handleChatCommand(actor, '/kick "Player2" griefing')).toBe(true);
+    expect(context.service.handleChatCommand(actor, '/kill "Player2" spawn camping')).toBe(true);
 
     // The audit write is awaited, so nothing is applied synchronously.
     expect(context.kicked).toEqual([]);
@@ -115,11 +113,11 @@ describe('ModerationService', () => {
   it('does not apply kick when the audit write fails', async () => {
     const actor = admin(1, 11);
     const target = player(2, 22);
-    const context = setup({ actor, selectedTargetId: target.pid, sessions: [target] });
+    const context = setup({ actor, sessions: [target] });
     context.recordAction.mockRejectedValueOnce(new Error('db down'));
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    context.service.handleChatCommand(actor, '/kick griefing');
+    context.service.handleChatCommand(actor, '/kick "Player2" griefing');
     await Promise.resolve();
     await Promise.resolve();
 
@@ -133,11 +131,11 @@ describe('ModerationService', () => {
     vi.setSystemTime(new Date('2026-06-29T10:00:00Z'));
     const actor = admin(1, 11);
     const target = player(2, 22);
-    const context = setup({ actor, selectedTargetId: target.pid, sessions: [target] });
+    const context = setup({ actor, sessions: [target] });
 
-    context.service.handleChatCommand(actor, '/mute 5 spamming');
-    context.service.handleChatCommand(actor, '/suspend 30 cheating');
-    context.service.handleChatCommand(actor, '/forcerename offensive name');
+    context.service.handleChatCommand(actor, '/mute "Player2" 5 spamming');
+    context.service.handleChatCommand(actor, '/suspend "Player2" 30 cheating');
+    context.service.handleChatCommand(actor, '/forcerename "Player2" offensive name');
     await Promise.resolve();
     await Promise.resolve();
 
@@ -177,9 +175,9 @@ describe('ModerationService', () => {
   it('bans permanently without an expiry and disconnects the account', async () => {
     const actor = admin(1, 11);
     const target = player(2, 22);
-    const context = setup({ actor, selectedTargetId: target.pid, sessions: [target] });
+    const context = setup({ actor, sessions: [target] });
 
-    context.service.handleChatCommand(actor, '/ban repeat offender');
+    context.service.handleChatCommand(actor, '/ban "Player2" repeat offender');
     await Promise.resolve();
     await Promise.resolve();
 
@@ -199,12 +197,12 @@ describe('ModerationService', () => {
     const actor = admin(1, 11);
     const context = setup({ actor });
 
-    expect(context.service.handleChatCommand(actor, '/mute spamming')).toBe(true);
+    expect(context.service.handleChatCommand(actor, '/mute "Missing" spamming')).toBe(true);
     expect(context.service.handleChatCommand(actor, '/suspend')).toBe(true);
 
     expect(context.notices.map((notice) => notice.text)).toEqual([
-      'Usage: /mute <minutes> <reason>',
-      'Usage: /suspend <minutes> <reason>',
+      'Usage: /mute "<name>" <minutes> [reason]',
+      'Usage: /suspend "<name>" <minutes> [reason]',
     ]);
     expect(context.mute).not.toHaveBeenCalled();
     expect(context.suspend).not.toHaveBeenCalled();
@@ -213,11 +211,11 @@ describe('ModerationService', () => {
   it('refuses moderation commands from a non-admin actor', () => {
     const actor = player(1, 11);
     const target = player(2, 22);
-    const context = setup({ actor, selectedTargetId: target.pid, sessions: [target] });
+    const context = setup({ actor, sessions: [target] });
 
     // Still claimed (swallowed) so it cannot leak into ordinary chat, but nothing runs.
-    expect(context.service.handleChatCommand(actor, '/kick griefing')).toBe(true);
-    expect(context.service.handleChatCommand(actor, '/ban cheating')).toBe(true);
+    expect(context.service.handleChatCommand(actor, '/kick "Player2" griefing')).toBe(true);
+    expect(context.service.handleChatCommand(actor, '/ban "Player2" cheating')).toBe(true);
 
     expect(context.recordAction).not.toHaveBeenCalled();
     expect(context.ban).not.toHaveBeenCalled();
@@ -232,7 +230,7 @@ describe('ModerationService', () => {
     const context = setup({ actor, sessions: [first, second] });
 
     context.service.handleChatCommand(actor, '/spectate player2');
-    context.service.handleChatCommand(actor, '/spectate Mira Sun');
+    context.service.handleChatCommand(actor, '/spectate "Mira Sun"');
     context.service.handleChatCommand(actor, '/unspectate');
 
     expect(context.spectated).toEqual([
@@ -243,7 +241,7 @@ describe('ModerationService', () => {
     expect(context.recordAction).not.toHaveBeenCalled();
   });
 
-  it('guards missing, self, admin, offline, and unselected targets', () => {
+  it('guards malformed, missing, self, admin, and offline targets', () => {
     const actor = admin(1, 11);
     const otherAdmin = admin(2, 22);
     const context = setup({ actor, sessions: [otherAdmin] });
@@ -253,13 +251,15 @@ describe('ModerationService', () => {
     context.service.handleChatCommand(actor, `/spectate ${actor.name}`);
     context.service.handleChatCommand(actor, `/spectate ${otherAdmin.name}`);
     context.service.handleChatCommand(actor, '/kick test');
+    context.service.handleChatCommand(actor, '/kill "Missing" test');
 
     expect(context.notices.map((notice) => notice.text)).toEqual([
       'Usage: /spectate <name>',
       "No online player named 'Missing'.",
       "You can't moderate that player.",
       "You can't moderate that player.",
-      'Select a player to moderate first.',
+      'Enclose the character name in double quotes.',
+      "No online player named 'Missing'.",
     ]);
     expect(context.spectated).toEqual([]);
     expect(context.kicked).toEqual([]);

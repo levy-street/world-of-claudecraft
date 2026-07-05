@@ -7,6 +7,43 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const id_ID: Record<string, string> = {
+  'calibration.autoRefresh': 'Segarkan otomatis ({seconds}d)',
+  'calibration.description':
+    'Distribusi nilai mentah yang diamati detektor bot, untuk kalibrasi ambang batas. Disimpan hanya di memori: hitungan diatur ulang saat server dimulai ulang.',
+  'calibration.downloadJson': 'Unduh JSON',
+  'calibration.empty':
+    'Belum ada data kalibrasi: detektor belum mengamati aktivitas terukur apa pun sejak server dimulai.',
+  'calibration.loadFailed': 'Gagal memuat data kalibrasi.',
+  'calibration.loading': 'Memuat data kalibrasi...',
+  'calibration.samples': '{count} sampel',
+  'calibration.statMax': 'maks',
+  'calibration.statMean': 'rata-rata',
+  'calibration.statMin': 'min',
+  'calibration.statP50': 'p50',
+  'calibration.statP95': 'p95',
+  'calibration.statP99': 'p99',
+  'nav.botDetector': 'Detektor Bot',
+  'nav.calibration': 'Kalibrasi',
+  'nav.liveEvidence': 'Bukti Langsung',
+  'suspiciousPlayers.colObserved': 'Terakhir diamati',
+  'suspiciousPlayers.downloadJson': 'Unduh JSON',
+  'suspiciousPlayers.filteredEmpty': 'Tidak ada sesi yang cocok dengan pencarian ini.',
+  'suspiciousPlayers.resultCountMany': '{count} hasil',
+  'suspiciousPlayers.resultCountOne': '{count} hasil',
+  'suspiciousPlayers.searchLabel': 'Cari sesi mencurigakan',
+  'suspiciousPlayers.searchPlaceholder': 'Saring berdasarkan nama, IP, atau bukti',
+  'suspiciousPlayers.sessionDescription':
+    'Sesi saat ini dan sesi terbaru dengan bukti deteksi bot.',
+  'suspiciousPlayers.sessionEmpty':
+    'Tidak ada sesi saat ini atau sesi terbaru yang memiliki bukti deteksi bot.',
+  'suspiciousPlayers.snapshotUnavailable': 'Waktu pengamatan tidak tersedia',
+  'usage.cache.githubContributors': 'Cache kontributor GitHub',
+  'usage.metric.githubContributorsFetch': 'Pengambilan statistik kontributor GitHub',
+  'usage.metric.githubContributorsFetchFailure':
+    'Kegagalan pengambilan statistik kontributor GitHub',
+  'usage.metric.githubLinkFailure': 'Kegagalan tautan GitHub',
+  'usage.metric.githubLinkRateLimited': 'Permintaan tautan GitHub yang dibatasi',
+  'usage.metric.githubLinkRequest': 'Permintaan tautan GitHub',
   'app.title': 'World of ClaudeCraft - Admin',
   'app.shortTitle': 'Admin WoC',
   'auth.username': 'Nama pengguna',

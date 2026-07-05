@@ -20,6 +20,12 @@ import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { type Entity, isQuestTurnInNpc } from '../sim/types';
+import {
+  devTierBadgeDataUrl,
+  devTierByIndex,
+  devTierDisplayName,
+  devTierNameOutlineColor,
+} from '../ui/dev_tier';
 import { tEntity } from '../ui/entity_i18n';
 import {
   holderTierBadgeDataUrl,
@@ -33,6 +39,7 @@ import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 // Staff/special Discord role -> localized nameplate tag label key.
 const DISCORD_ROLE_TAG_KEYS: Record<string, TranslationKey> = {
   levyst: 'hudChrome.discord.roleTag.levyst',
+  admin: 'hudChrome.discord.roleTag.admin',
   devs: 'hudChrome.discord.roleTag.devs',
   mods: 'hudChrome.discord.roleTag.mods',
   artists: 'hudChrome.discord.roleTag.artists',
@@ -64,6 +71,10 @@ export interface NameplatePainterDeps {
   getViewport: () => { width: number; height: number };
   /** the player's mob-nameplate toggle */
   showNameplates: () => boolean;
+  /** the player's developer-badge display toggle (glyph + name outline) */
+  showDevBadges: () => boolean;
+  /** the player's own-nameplate toggle: render your own plate as others see it */
+  showOwnNameplate: () => boolean;
   /** PvP reaction check, owned by the renderer (duel/arena state) */
   isHostilePlayer: (e: Entity) => boolean;
 }
@@ -74,6 +85,8 @@ export class NameplatePainter {
   private readonly world: IWorld;
   private readonly getViewport: () => { width: number; height: number };
   private readonly showNameplates: () => boolean;
+  private readonly showDevBadges: () => boolean;
+  private readonly showOwnNameplate: () => boolean;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   // scratch reused every frame (no per-frame alloc); was renderer.tmpV/tmpV2.
   private readonly tmpV = new THREE.Vector3();
@@ -87,6 +100,8 @@ export class NameplatePainter {
     this.world = deps.world;
     this.getViewport = deps.getViewport;
     this.showNameplates = deps.showNameplates;
+    this.showDevBadges = deps.showDevBadges;
+    this.showOwnNameplate = deps.showOwnNameplate;
     this.isHostilePlayer = deps.isHostilePlayer;
   }
 
@@ -98,10 +113,12 @@ export class NameplatePainter {
     const p = world.player;
     const { width: w, height: h } = this.getViewport();
     const showNameplates = this.showNameplates();
+    const showDevBadges = this.showDevBadges();
+    const showOwnNameplate = this.showOwnNameplate();
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
-      const plan = nameplatePlanInto(this.plan, e, p, v.height, showNameplates);
+      const plan = nameplatePlanInto(this.plan, e, p, v.height, showNameplates, showOwnNameplate);
       if (plan.hidden) {
         this.hideNameplate(v);
         continue;
@@ -173,20 +190,29 @@ export class NameplatePainter {
           '1',
         );
       } else if (e.kind === 'player') {
-        // other players: friendly blue with an hp bar; <Guild> tag under the name.
-        // Self has no overhead nameplate, so its guild line stays hidden too.
+        // Players: friendly blue with an hp bar; <Guild> tag under the name. Your
+        // OWN plate is normally suppressed (suppressSelf), but with the "Show My
+        // Nameplate" option on it renders exactly like another player's, so you can
+        // see your name / level / hp / guild and all your flair the way others do.
+        const suppressSelf = isSelf && !showOwnNameplate;
         const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
-        const nameDisplay = isSelf ? 'none' : '';
-        const hpDisplay = e.dead || isSelf ? 'none' : '';
-        const guild = isSelf ? '' : e.guild;
-        // Staff/special Discord role: tint the name + prefix a tag (others only).
-        const roleKey = isSelf ? undefined : e.discordRole;
+        const nameDisplay = suppressSelf ? 'none' : '';
+        const hpDisplay = e.dead || suppressSelf ? 'none' : '';
+        const guild = suppressSelf ? '' : e.guild;
+        // Staff/special Discord role: tint the name + prefix a tag.
+        const roleKey = suppressSelf ? undefined : e.discordRole;
         const roleColor = specialRoleColor(roleKey);
         const roleTag = discordRoleTag(roleKey);
         const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
+        // Significant-contributor outline: a glowing outline drawn on top of the
+        // existing name color (Discord staff or default) for a high dev tier, so
+        // both read at once. Null for non-significant tiers, for a suppressed self
+        // plate, and when the player has turned developer badges off.
+        const devOutline =
+          suppressSelf || !showDevBadges ? null : devTierNameOutlineColor(e.devTier ?? 0);
         this.setNameplateStatic(
           v,
-          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}`,
+          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}`,
           displayName,
           roleColor ?? '#7fb8ff',
           hpDisplay,
@@ -195,12 +221,15 @@ export class NameplatePainter {
           opacity,
           '',
           guild,
+          devOutline,
         );
         v.nameEl.style.display = nameDisplay;
-        // $WOC holder-tier flair, shown on OTHER players (own nameplate is hidden).
-        this.setNameplateTier(v, isSelf ? 0 : (e.holderTier ?? 0));
-        // Linked-Discord PFP indicator, also OTHER players only.
-        this.setNameplateDiscord(v, isSelf ? undefined : e.discordAvatar, e.discordName);
+        // $WOC holder-tier flair (hidden only on a suppressed self plate).
+        this.setNameplateTier(v, suppressSelf ? 0 : (e.holderTier ?? 0));
+        // Developer-badge flair.
+        this.setNameplateDevTier(v, suppressSelf || !showDevBadges ? 0 : (e.devTier ?? 0));
+        // Linked-Discord PFP indicator.
+        this.setNameplateDiscord(v, suppressSelf ? undefined : e.discordAvatar, e.discordName);
         this.setNameplateHp(v, e);
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
         const npcName =
@@ -256,6 +285,9 @@ export class NameplatePainter {
               name: mobName,
             });
         const hpDisplay = e.dead ? 'none' : '';
+        // Quest-target marking lives in the mob's hover tooltip (Questie-style
+        // quest + progress lines), not as an overhead glyph: the marker slot
+        // stays the classic lootable '$' / elite diamond pair.
         const marker = e.lootable ? '$' : elite && !e.dead ? '◆' : '';
         // classic "dragon frame" cue: gold bar frame for elites, red for bosses (live mobs only)
         const frame = e.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
@@ -297,6 +329,7 @@ export class NameplatePainter {
     opacity: string,
     frame = '',
     guild = '',
+    devOutline: string | null = null,
   ): void {
     if (sig === v.nameplateSig) return;
     v.nameplateSig = sig;
@@ -315,6 +348,16 @@ export class NameplatePainter {
     } else {
       v.guildEl.style.display = 'none';
     }
+    // Significant-contributor name outline: a steady glow (no animation, so it is
+    // reduced-motion safe) layered over whatever name color applies. Driven by a
+    // CSS var + class so the color stays out of the TS (no hardcoded hex here).
+    if (devOutline) {
+      v.nameEl.style.setProperty('--dev-outline', devOutline);
+      v.nameEl.classList.add('np-sig-dev');
+    } else {
+      v.nameEl.style.removeProperty('--dev-outline');
+      v.nameEl.classList.remove('np-sig-dev');
+    }
   }
 
   // Show/hide the $WOC holder-tier badge on a player's nameplate. Cheap-diffed
@@ -330,6 +373,22 @@ export class NameplatePainter {
     } else {
       v.tierEl.removeAttribute('src');
       v.tierEl.style.display = 'none';
+    }
+  }
+
+  // Show/hide the developer-badge on a player's nameplate. Cheap-diffed on the
+  // tier value so the badge image is only rebuilt when the tier changes.
+  private setNameplateDevTier(v: EntityView, tier: number): void {
+    if (tier === v.devTierValue) return;
+    v.devTierValue = tier;
+    const def = devTierByIndex(tier);
+    if (def) {
+      v.devTierEl.src = devTierBadgeDataUrl(def, 32);
+      v.devTierEl.title = t('hudChrome.devBadge.badgeTitle', { tier: devTierDisplayName(def) });
+      v.devTierEl.style.display = '';
+    } else {
+      v.devTierEl.removeAttribute('src');
+      v.devTierEl.style.display = 'none';
     }
   }
 
