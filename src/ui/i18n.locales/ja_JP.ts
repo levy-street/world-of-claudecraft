@@ -5821,4 +5821,43 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': '採掘',
   'hudChrome.gathering.logging': '伐採',
   'hudChrome.gathering.herbalism': '薬草学',
+  'entities.npcs.voice_echo_npc.title': '思い出された声',
+  'entities.npcs.voice_echo_npc.greeting':
+    '焚き火の向こうから響く声...そうだ、かつての私はあんな声だった。',
+  'entities.quests.q_echo_of_you.text':
+    '近くで私の大切なものを失くしてしまった。探してきてくれないか?',
+  'entities.quests.q_echo_of_you.completion':
+    '見つけてくれたのか。私の話を聞いてくれて、本当にありがとう。',
+  'entities.quests.q_echo_of_you.objectives.0.label': 'もう一度エコーと話す',
+  'hudChrome.voiceNpc.title': 'ボイスNPC (WIP)',
+  'hudChrome.voiceNpc.intro': '$WOCをバーンして、あなたの声を小さなゲーム内NPCにクローンしよう。',
+  'hudChrome.voiceNpc.disabled': 'ボイスNPCの解放はまだ利用できません。',
+  'hudChrome.voiceNpc.consentLabel':
+    '録音した自分の声がサードパーティのAI音声サービスによってクローンされることに同意します。',
+  'hudChrome.voiceNpc.displayNameLabel': 'NPCの表示名',
+  'hudChrome.voiceNpc.displayNamePlaceholder': 'あなたのエコーの名前は?',
+  'hudChrome.voiceNpc.recordStart': 'サンプルを録音',
+  'hudChrome.voiceNpc.recordStop': '録音を停止',
+  'hudChrome.voiceNpc.recordingHint': '録音中...最大30秒間、自然に話してください。',
+  'hudChrome.voiceNpc.priceLabel': '価格: {price} $WOC',
+  'hudChrome.voiceNpc.burnLabel': '$WOCをバーンして確定',
+  'hudChrome.voiceNpc.burnNotWired':
+    'このドラフトビルドではオンチェーンのバーン署名はまだ実装されていません。',
+  'hudChrome.voiceNpc.needWallet': 'まずSolanaウォレットを接続してください。',
+  'hudChrome.voiceNpc.needName': 'NPCの表示名を入力してください。',
+  'hudChrome.voiceNpc.needConsent': 'サンプルの録音やアップロードの前に同意が必要です。',
+  'hudChrome.voiceNpc.micError': 'マイクにアクセスできませんでした。',
+  'hudChrome.voiceNpc.uploadError': '音声サンプルをアップロードできませんでした。',
+  'hudChrome.voiceNpc.quoteError': '価格の見積もりを取得できませんでした。',
+  'hudChrome.voiceNpc.confirmError': '支払いを確認できませんでした。',
+  'hudChrome.voiceNpc.statusPendingSample':
+    'サンプルを録音しました。見積もりと$WOCのバーンの準備ができました。',
+  'hudChrome.voiceNpc.statusPendingClone':
+    '支払いを確認しました。ボイスクローンの開始を待っています。',
+  'hudChrome.voiceNpc.statusCloning': 'あなたの声をクローンしています...',
+  'hudChrome.voiceNpc.statusGenerating': 'セリフを生成しています...',
+  'hudChrome.voiceNpc.statusReady': 'あなたのボイスNPCが完成しました!',
+  'hudChrome.voiceNpc.statusFailed': '問題が発生しました: {error}',
+  'hudChrome.voiceNpc.statusPollFailed':
+    'ステータスを確認できませんでした。このパネルを開き直してください。',
 };

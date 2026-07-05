@@ -1052,32 +1052,32 @@ export const ja_JP: EnTranslations = {
       }
     },
     "voiceNpc": {
-      "title": "Voice NPC (WIP)",
-      "intro": "Burn $WOC to clone your voice into a small in-game NPC.",
-      "priceLabel": "Price: {price} $WOC",
-      "disabled": "Voice NPC unlocking is not available yet.",
-      "displayNameLabel": "NPC display name",
-      "displayNamePlaceholder": "What should your echo be called?",
-      "consentLabel": "I consent to my recorded voice being cloned by a third-party AI voice service.",
-      "recordStart": "Record sample",
-      "recordStop": "Stop recording",
-      "burnLabel": "Burn $WOC & Confirm",
-      "recordingHint": "Recording... speak naturally for up to 30 seconds.",
-      "micError": "Could not access your microphone.",
-      "uploadError": "Could not upload the voice sample.",
-      "needConsent": "You must consent before recording or uploading a sample.",
-      "needWallet": "Connect a Solana wallet first.",
-      "needName": "Enter a display name for your NPC.",
-      "quoteError": "Could not get a price quote.",
-      "burnNotWired": "On-chain burn signing is not wired up yet in this draft build.",
-      "confirmError": "Could not confirm the payment.",
-      "statusPendingSample": "Sample recorded. Ready to quote and burn $WOC.",
-      "statusPendingClone": "Payment confirmed. Waiting for voice cloning to start.",
-      "statusCloning": "Cloning your voice...",
-      "statusGenerating": "Generating dialogue lines...",
-      "statusReady": "Your voice NPC is ready!",
-      "statusFailed": "Something went wrong: {error}",
-      "statusPollFailed": "Couldn't check status. Please reopen this panel."
+      "title": "ボイスNPC (WIP)",
+      "intro": "$WOCをバーンして、あなたの声を小さなゲーム内NPCにクローンしよう。",
+      "priceLabel": "価格: {price} $WOC",
+      "disabled": "ボイスNPCの解放はまだ利用できません。",
+      "displayNameLabel": "NPCの表示名",
+      "displayNamePlaceholder": "あなたのエコーの名前は?",
+      "consentLabel": "録音した自分の声がサードパーティのAI音声サービスによってクローンされることに同意します。",
+      "recordStart": "サンプルを録音",
+      "recordStop": "録音を停止",
+      "burnLabel": "$WOCをバーンして確定",
+      "recordingHint": "録音中...最大30秒間、自然に話してください。",
+      "micError": "マイクにアクセスできませんでした。",
+      "uploadError": "音声サンプルをアップロードできませんでした。",
+      "needConsent": "サンプルの録音やアップロードの前に同意が必要です。",
+      "needWallet": "まずSolanaウォレットを接続してください。",
+      "needName": "NPCの表示名を入力してください。",
+      "quoteError": "価格の見積もりを取得できませんでした。",
+      "burnNotWired": "このドラフトビルドではオンチェーンのバーン署名はまだ実装されていません。",
+      "confirmError": "支払いを確認できませんでした。",
+      "statusPendingSample": "サンプルを録音しました。見積もりと$WOCのバーンの準備ができました。",
+      "statusPendingClone": "支払いを確認しました。ボイスクローンの開始を待っています。",
+      "statusCloning": "あなたの声をクローンしています...",
+      "statusGenerating": "セリフを生成しています...",
+      "statusReady": "あなたのボイスNPCが完成しました!",
+      "statusFailed": "問題が発生しました: {error}",
+      "statusPollFailed": "ステータスを確認できませんでした。このパネルを開き直してください。"
     },
     "devBadge": {
       "title": "開発者",
@@ -6750,8 +6750,8 @@ export const ja_JP: EnTranslations = {
       },
       "voice_echo_npc": {
         "name": "Echo",
-        "title": "A Voice Remembered",
-        "greeting": "A voice from beyond the bonfire... yes, I remember sounding like that, once."
+        "title": "思い出された声",
+        "greeting": "焚き火の向こうから響く声...そうだ、かつての私はあんな声だった。"
       },
       "brother_halven_marsh": {
         "name": "ハルヴェン修道士",
@@ -7554,11 +7554,11 @@ export const ja_JP: EnTranslations = {
       },
       "q_echo_of_you": {
         "title": "Echo of You",
-        "text": "Something of mine was lost nearby. Would you go and find it for me?",
-        "completion": "You found it. Thank you, truly, for hearing me out.",
+        "text": "近くで私の大切なものを失くしてしまった。探してきてくれないか?",
+        "completion": "見つけてくれたのか。私の話を聞いてくれて、本当にありがとう。",
         "objectives": {
           "0": {
-            "label": "Speak with Echo again"
+            "label": "もう一度エコーと話す"
           }
         }
       },

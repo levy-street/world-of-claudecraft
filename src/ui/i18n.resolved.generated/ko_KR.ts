@@ -1052,32 +1052,32 @@ export const ko_KR: EnTranslations = {
       }
     },
     "voiceNpc": {
-      "title": "Voice NPC (WIP)",
-      "intro": "Burn $WOC to clone your voice into a small in-game NPC.",
-      "priceLabel": "Price: {price} $WOC",
-      "disabled": "Voice NPC unlocking is not available yet.",
-      "displayNameLabel": "NPC display name",
-      "displayNamePlaceholder": "What should your echo be called?",
-      "consentLabel": "I consent to my recorded voice being cloned by a third-party AI voice service.",
-      "recordStart": "Record sample",
-      "recordStop": "Stop recording",
-      "burnLabel": "Burn $WOC & Confirm",
-      "recordingHint": "Recording... speak naturally for up to 30 seconds.",
-      "micError": "Could not access your microphone.",
-      "uploadError": "Could not upload the voice sample.",
-      "needConsent": "You must consent before recording or uploading a sample.",
-      "needWallet": "Connect a Solana wallet first.",
-      "needName": "Enter a display name for your NPC.",
-      "quoteError": "Could not get a price quote.",
-      "burnNotWired": "On-chain burn signing is not wired up yet in this draft build.",
-      "confirmError": "Could not confirm the payment.",
-      "statusPendingSample": "Sample recorded. Ready to quote and burn $WOC.",
-      "statusPendingClone": "Payment confirmed. Waiting for voice cloning to start.",
-      "statusCloning": "Cloning your voice...",
-      "statusGenerating": "Generating dialogue lines...",
-      "statusReady": "Your voice NPC is ready!",
-      "statusFailed": "Something went wrong: {error}",
-      "statusPollFailed": "Couldn't check status. Please reopen this panel."
+      "title": "보이스 NPC (WIP)",
+      "intro": "$WOC를 소각하여 당신의 목소리를 작은 게임 내 NPC로 복제하세요.",
+      "priceLabel": "가격: {price} $WOC",
+      "disabled": "보이스 NPC 잠금 해제는 아직 이용할 수 없습니다.",
+      "displayNameLabel": "NPC 표시 이름",
+      "displayNamePlaceholder": "당신의 에코를 뭐라고 부를까요?",
+      "consentLabel": "녹음된 내 목소리가 제3자 AI 음성 서비스에 의해 복제되는 것에 동의합니다.",
+      "recordStart": "샘플 녹음",
+      "recordStop": "녹음 중지",
+      "burnLabel": "$WOC 소각 후 확정",
+      "recordingHint": "녹음 중... 최대 30초 동안 자연스럽게 말하세요.",
+      "micError": "마이크에 접근할 수 없습니다.",
+      "uploadError": "음성 샘플을 업로드할 수 없습니다.",
+      "needConsent": "샘플을 녹음하거나 업로드하기 전에 동의해야 합니다.",
+      "needWallet": "먼저 Solana 지갑을 연결하세요.",
+      "needName": "NPC의 표시 이름을 입력하세요.",
+      "quoteError": "가격 견적을 가져올 수 없습니다.",
+      "burnNotWired": "이 드래프트 빌드에서는 온체인 소각 서명이 아직 연결되지 않았습니다.",
+      "confirmError": "결제를 확인할 수 없습니다.",
+      "statusPendingSample": "샘플이 녹음되었습니다. 견적과 $WOC 소각 준비가 되었습니다.",
+      "statusPendingClone": "결제가 확인되었습니다. 음성 복제 시작을 기다리는 중입니다.",
+      "statusCloning": "목소리를 복제하는 중...",
+      "statusGenerating": "대사를 생성하는 중...",
+      "statusReady": "보이스 NPC가 준비되었습니다!",
+      "statusFailed": "문제가 발생했습니다: {error}",
+      "statusPollFailed": "상태를 확인할 수 없습니다. 이 패널을 다시 열어 주세요."
     },
     "devBadge": {
       "title": "개발자",
@@ -6750,8 +6750,8 @@ export const ko_KR: EnTranslations = {
       },
       "voice_echo_npc": {
         "name": "Echo",
-        "title": "A Voice Remembered",
-        "greeting": "A voice from beyond the bonfire... yes, I remember sounding like that, once."
+        "title": "기억된 목소리",
+        "greeting": "모닥불 너머에서 들려오는 목소리... 그래, 나도 한때 저런 목소리였지."
       },
       "brother_halven_marsh": {
         "name": "브라더 할벤",
@@ -7554,11 +7554,11 @@ export const ko_KR: EnTranslations = {
       },
       "q_echo_of_you": {
         "title": "Echo of You",
-        "text": "Something of mine was lost nearby. Would you go and find it for me?",
-        "completion": "You found it. Thank you, truly, for hearing me out.",
+        "text": "근처에서 내 소중한 것을 잃어버렸다. 가서 찾아와 주겠나?",
+        "completion": "찾아주었구나. 내 이야기를 들어줘서 진심으로 고맙다.",
         "objectives": {
           "0": {
-            "label": "Speak with Echo again"
+            "label": "에코와 다시 대화하기"
           }
         }
       },

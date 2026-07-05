@@ -1052,32 +1052,32 @@ export const zh_CN: EnTranslations = {
       }
     },
     "voiceNpc": {
-      "title": "Voice NPC (WIP)",
-      "intro": "Burn $WOC to clone your voice into a small in-game NPC.",
-      "priceLabel": "Price: {price} $WOC",
-      "disabled": "Voice NPC unlocking is not available yet.",
-      "displayNameLabel": "NPC display name",
-      "displayNamePlaceholder": "What should your echo be called?",
-      "consentLabel": "I consent to my recorded voice being cloned by a third-party AI voice service.",
-      "recordStart": "Record sample",
-      "recordStop": "Stop recording",
-      "burnLabel": "Burn $WOC & Confirm",
-      "recordingHint": "Recording... speak naturally for up to 30 seconds.",
-      "micError": "Could not access your microphone.",
-      "uploadError": "Could not upload the voice sample.",
-      "needConsent": "You must consent before recording or uploading a sample.",
-      "needWallet": "Connect a Solana wallet first.",
-      "needName": "Enter a display name for your NPC.",
-      "quoteError": "Could not get a price quote.",
-      "burnNotWired": "On-chain burn signing is not wired up yet in this draft build.",
-      "confirmError": "Could not confirm the payment.",
-      "statusPendingSample": "Sample recorded. Ready to quote and burn $WOC.",
-      "statusPendingClone": "Payment confirmed. Waiting for voice cloning to start.",
-      "statusCloning": "Cloning your voice...",
-      "statusGenerating": "Generating dialogue lines...",
-      "statusReady": "Your voice NPC is ready!",
-      "statusFailed": "Something went wrong: {error}",
-      "statusPollFailed": "Couldn't check status. Please reopen this panel."
+      "title": "语音 NPC (WIP)",
+      "intro": "燃烧 $WOC,把你的声音克隆成一个小小的游戏内 NPC。",
+      "priceLabel": "价格: {price} $WOC",
+      "disabled": "语音 NPC 解锁功能暂未开放。",
+      "displayNameLabel": "NPC 显示名称",
+      "displayNamePlaceholder": "给你的回声起个名字吧?",
+      "consentLabel": "我同意由第三方 AI 语音服务克隆我录制的声音。",
+      "recordStart": "录制样本",
+      "recordStop": "停止录音",
+      "burnLabel": "燃烧 $WOC 并确认",
+      "recordingHint": "录音中......自然地说话,最长 30 秒。",
+      "micError": "无法访问你的麦克风。",
+      "uploadError": "无法上传语音样本。",
+      "needConsent": "录制或上传样本前必须先同意。",
+      "needWallet": "请先连接 Solana 钱包。",
+      "needName": "请输入 NPC 的显示名称。",
+      "quoteError": "无法获取报价。",
+      "burnNotWired": "此草稿版本尚未接入链上燃烧签名。",
+      "confirmError": "无法确认付款。",
+      "statusPendingSample": "样本已录制。可以报价并燃烧 $WOC 了。",
+      "statusPendingClone": "付款已确认。等待语音克隆开始。",
+      "statusCloning": "正在克隆你的声音......",
+      "statusGenerating": "正在生成对白......",
+      "statusReady": "你的语音 NPC 已就绪!",
+      "statusFailed": "出了点问题: {error}",
+      "statusPollFailed": "无法查询状态。请重新打开此面板。"
     },
     "devBadge": {
       "title": "开发者",
@@ -6750,8 +6750,8 @@ export const zh_CN: EnTranslations = {
       },
       "voice_echo_npc": {
         "name": "Echo",
-        "title": "A Voice Remembered",
-        "greeting": "A voice from beyond the bonfire... yes, I remember sounding like that, once."
+        "title": "被铭记的声音",
+        "greeting": "篝火彼端传来的声音......是啊,我记得自己曾经也是这样的嗓音。"
       },
       "brother_halven_marsh": {
         "name": "哈尔文修士",
@@ -7554,11 +7554,11 @@ export const zh_CN: EnTranslations = {
       },
       "q_echo_of_you": {
         "title": "Echo of You",
-        "text": "Something of mine was lost nearby. Would you go and find it for me?",
-        "completion": "You found it. Thank you, truly, for hearing me out.",
+        "text": "我有件东西丢在了附近。你愿意替我去找回来吗?",
+        "completion": "你找到了。真心感谢你愿意听我说完。",
         "objectives": {
           "0": {
-            "label": "Speak with Echo again"
+            "label": "再次与回声交谈"
           }
         }
       },
