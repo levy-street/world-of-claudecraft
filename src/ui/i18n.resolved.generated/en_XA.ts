@@ -311,7 +311,9 @@ export const en_XA: EnTranslations = {
       "nameplates": "[Ñáɱéš]",
       "haptics": "[Ĥáþţíçš]",
       "hapticsOff": "[Ĥáþţíçš Óƒƒ]",
-      "toggleHaptics": "[Ţóĝĝļé ĥáþţíçš]"
+      "toggleHaptics": "[Ţóĝĝļé ĥáþţíçš]",
+      "hotbarPage": "[Šķíļļš]",
+      "hotbarPageAria": "[Šĥóŵ ñéẋţ šéţ óƒ šķíļļš]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -735,6 +737,23 @@ export const en_XA: EnTranslations = {
       "thresholdSet": "[Ļóóţ ţĥŕéšĥóļð šéţ ţó {threshold}.]",
       "summaryMaster": "[Ļóóţ Šéţţíñĝš: Ɱášţéŕ Ļóóţ, Ɱášţéŕ Ļóóţéŕ {name}, ţĥŕéšĥóļð {threshold}.]",
       "summaryGroup": "[Ļóóţ Šéţţíñĝš: Ĝŕóúþ Ļóóţ.]"
+    },
+    "corpseHarvest": {
+      "title": "[Ĥáŕʋéšţ]",
+      "harvestButton": "[Ĥáŕʋéšţ]",
+      "concentrateHint": "[Ƒéŵéŕ çĥóšéñ çóɱþóñéñţš ýíéļð á ĥíĝĥéŕ ţíéŕ éáçĥ.]",
+      "alreadyHarvested": "[Ţĥíš çóŕþšé ĥáš áļŕéáðý ƀééñ ĥáŕʋéšţéð.]",
+      "componentAria": "[Ĥáŕʋéšţ {component}]",
+      "components": {
+        "hide": "[Ĥíðé]",
+        "fang": "[Ƒáñĝ]",
+        "silk": "[Šíļķ]",
+        "venomSac": "[Ʋéñóɱ Šáç]",
+        "gills": "[Ĝíļļš]",
+        "claw": "[Çļáŵ]",
+        "horn": "[Ĥóŕñ]",
+        "tusk": "[Ţúšķ]"
+      }
     },
     "party": {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]",

@@ -10,6 +10,8 @@ import {
   mailIndicatorView,
   mailSendBlocked,
   mailSendCost,
+  recipientSuggestions,
+  wrappedSuggestionIndex,
 } from '../src/ui/mailbox_view';
 import type { MailInfo } from '../src/world_api';
 
@@ -141,5 +143,39 @@ describe('mailIndicatorView', () => {
     expect(mailIndicatorView(0)).toEqual({ visible: false, count: 0 });
     expect(mailIndicatorView(3)).toEqual({ visible: true, count: 3 });
     expect(mailIndicatorView(Number.NaN)).toEqual({ visible: false, count: 0 });
+  });
+});
+
+describe('recipientSuggestions', () => {
+  const results = [
+    { name: 'Player', cls: 'warrior', level: 20 },
+    { name: 'Alice', cls: 'mage', level: 18 },
+    { name: 'Bob', cls: 'priest', level: 12 },
+    { name: 'Cara', cls: 'rogue', level: 16 },
+  ];
+
+  it('excludes the current player name and caps results', () => {
+    expect(recipientSuggestions(results, 'Player', 2).map((r) => r.name)).toEqual(['Alice', 'Bob']);
+  });
+
+  it('returns no suggestions when max is zero or negative', () => {
+    expect(recipientSuggestions(results, 'Player', 0)).toEqual([]);
+    expect(recipientSuggestions(results, 'Player', -3)).toEqual([]);
+  });
+});
+
+describe('wrappedSuggestionIndex', () => {
+  it('starts at the first item on down and last item on up from no selection', () => {
+    expect(wrappedSuggestionIndex(-1, 1, 4)).toBe(0);
+    expect(wrappedSuggestionIndex(-1, -1, 4)).toBe(3);
+  });
+
+  it('wraps around in both directions', () => {
+    expect(wrappedSuggestionIndex(3, 1, 4)).toBe(0);
+    expect(wrappedSuggestionIndex(0, -1, 4)).toBe(3);
+  });
+
+  it('returns -1 for an empty list', () => {
+    expect(wrappedSuggestionIndex(0, 1, 0)).toBe(-1);
   });
 });

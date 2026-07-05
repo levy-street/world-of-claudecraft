@@ -311,7 +311,9 @@ export const tr_TR: EnTranslations = {
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
       "hapticsOff": "Dokunsal Kapalı",
-      "toggleHaptics": "Dokunsal geri bildirimi aç/kapat"
+      "toggleHaptics": "Dokunsal geri bildirimi aç/kapat",
+      "hotbarPage": "Skills",
+      "hotbarPageAria": "Show next set of skills"
     },
     "tutorial": {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
@@ -735,6 +737,23 @@ export const tr_TR: EnTranslations = {
       "thresholdSet": "Ganimet eşiği {threshold} olarak ayarlandı.",
       "summaryMaster": "Ganimet Ayarları: Yönetilen Ganimet, Ganimet Yöneticisi {name}, eşik {threshold}.",
       "summaryGroup": "Ganimet Ayarları: Grup Ganimeti."
+    },
+    "corpseHarvest": {
+      "title": "Harvest",
+      "harvestButton": "Harvest",
+      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "alreadyHarvested": "This corpse has already been harvested.",
+      "componentAria": "Harvest {component}",
+      "components": {
+        "hide": "Hide",
+        "fang": "Fang",
+        "silk": "Silk",
+        "venomSac": "Venom Sac",
+        "gills": "Gills",
+        "claw": "Claw",
+        "horn": "Horn",
+        "tusk": "Tusk"
+      }
     },
     "party": {
       "promoteLeader": "Lider Yap",
