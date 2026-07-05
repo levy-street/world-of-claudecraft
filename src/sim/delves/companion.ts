@@ -16,7 +16,6 @@
 
 import type { SimContext } from '../sim_context';
 import {
-  angleTo,
   DELVE_COMPANION_HEAL_INTERVAL,
   DELVE_COMPANION_MAX_RANK,
   DT,
@@ -24,6 +23,7 @@ import {
   type Entity,
   MELEE_RANGE,
   PET_TELEPORT_DISTANCE,
+  steadyAngleTo,
 } from '../types';
 
 const DELVE_COMPANION_HEAL_RANGE = 22;
@@ -126,7 +126,7 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
         );
       }
     } else {
-      companion.facing = angleTo(companion.pos, combatTarget.pos);
+      companion.facing = steadyAngleTo(companion.pos, combatTarget.pos, companion.facing);
       companion.swingTimer = (companion.swingTimer ?? 0) - DT;
       if (companion.swingTimer <= 0) {
         ctx.mobSwing(companion, combatTarget);

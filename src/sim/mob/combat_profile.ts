@@ -2,7 +2,14 @@ import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from '../mob_combat';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
-import { angleTo, DT, DUNGEON_LEASH_DISTANCE, dist2d, type Entity, LEASH_DISTANCE } from '../types';
+import {
+  DT,
+  DUNGEON_LEASH_DISTANCE,
+  dist2d,
+  type Entity,
+  LEASH_DISTANCE,
+  steadyAngleTo,
+} from '../types';
 import { retargetMob, updateMobTarget } from './targeting';
 
 export type MobCombatProfileResult = 'done' | 'runAttackMechanics';
@@ -22,7 +29,7 @@ export function mobEffectiveMeleeRange(mob: Entity): number {
 export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: Entity): boolean {
   if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) return false;
   mob.aiState = 'attack';
-  mob.facing = angleTo(mob.pos, target.pos);
+  mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
   if (mob.swingTimer <= 0) {
     ctx.mobSwing(mob, target);
     mob.swingTimer = mob.weapon.speed * ctx.swingIntervalMult(mob);
@@ -113,7 +120,7 @@ function updateCasterCombat(
       mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob),
     );
   } else {
-    mob.facing = angleTo(mob.pos, target.pos);
+    mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
   }
   tryMobMeleeSwingInRange(ctx, mob, target);
   return 'done';
@@ -138,10 +145,10 @@ function updatePursuitProfileCombat(
         mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob),
       );
     } else {
-      mob.facing = angleTo(mob.pos, target.pos);
+      mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
     }
   } else {
-    mob.facing = angleTo(mob.pos, target.pos);
+    mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
   }
 
   if (

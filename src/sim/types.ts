@@ -2255,6 +2255,16 @@ export function angleTo(from: Vec3, to: Vec3): number {
   return Math.atan2(to.x - from.x, to.z - from.z);
 }
 
+// Below this separation two positions no longer define a bearing: atan2 turns
+// position noise (collision nudges, online rounding) into full-circle swings,
+// so an entity re-aimed at a target standing on top of it strobes its
+// orientation every tick. steadyAngleTo holds the previous facing instead.
+export const FACING_HOLD_DIST = 0.1;
+
+export function steadyAngleTo(from: Vec3, to: Vec3, current: number): number {
+  return dist2d(from, to) < FACING_HOLD_DIST ? current : angleTo(from, to);
+}
+
 export function normAngle(a: number): number {
   while (a > Math.PI) a -= 2 * Math.PI;
   while (a < -Math.PI) a += 2 * Math.PI;

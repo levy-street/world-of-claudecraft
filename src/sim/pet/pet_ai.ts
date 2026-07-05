@@ -38,7 +38,6 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
 import {
   type Aura,
-  angleTo,
   DT,
   dist2d,
   type Entity,
@@ -46,6 +45,7 @@ import {
   PET_GROWL_INTERVAL,
   PET_TELEPORT_DISTANCE,
   RUN_SPEED,
+  steadyAngleTo,
 } from '../types';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
@@ -107,7 +107,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
         ctx.moveToward(pet, target.pos, pet.moveSpeed * ctx.moveSpeedMult(pet));
       pet.swingTimer = Math.max(0, pet.swingTimer - DT);
     } else {
-      pet.facing = angleTo(pet.pos, target.pos);
+      pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
       if (
         target.kind === 'mob' &&
         !ranged &&

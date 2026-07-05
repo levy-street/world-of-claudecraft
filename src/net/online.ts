@@ -1513,9 +1513,16 @@ export class ClientWorld implements IWorld {
       // the global snapshot clock the camera follow uses.
       const prevUpdatedAt = e.netUpdatedAt;
       const prevInterval = e.netInterval;
+      // LOCKSTEP with remoteEntityAlpha (src/render/net_interp_core.ts, which
+      // net/ cannot import): unknown-cadence entities interpolate on a fixed
+      // 120 ms fallback interval capped at 1, so the re-anchor lands exactly
+      // on the pose the renderer drew instead of the global snapshot clock.
       const entAlpha =
-        w.id !== this.playerId && prevUpdatedAt !== undefined && prevInterval !== undefined
-          ? Math.min(1.25, (now - prevUpdatedAt) / Math.max(20, prevInterval))
+        w.id !== this.playerId && prevUpdatedAt !== undefined
+          ? Math.min(
+              prevInterval === undefined ? 1 : 1.25,
+              (now - prevUpdatedAt) / Math.max(20, prevInterval ?? 120),
+            )
           : contAlpha;
       const entFacingAlpha = Math.min(1, entAlpha);
       // per-entity update clock: distant entities are sent below snapshot
@@ -1550,7 +1557,12 @@ export class ClientWorld implements IWorld {
           y: e.prevPos.y + (e.pos.y - e.prevPos.y) * entAlpha,
           z: e.prevPos.z + (e.pos.z - e.prevPos.z) * entAlpha,
         };
-        e.prevFacing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha;
+        // wrapAngle keeps the stored basis bounded: converging toward a facing
+        // that keeps crossing the +-PI seam otherwise grows prevFacing by 2*PI
+        // per revolution, unbounded over a long session.
+        e.prevFacing = wrapAngle(
+          e.prevFacing + wrapAngle(e.facing - e.prevFacing) * entFacingAlpha,
+        );
       }
       e.pos.x = w.x;
       e.pos.y = w.y;

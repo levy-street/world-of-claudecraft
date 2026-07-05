@@ -80,6 +80,7 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
+import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { buildComposer, type PostPipeline } from './post';
@@ -3961,17 +3962,14 @@ export class Renderer {
       // each interpolates on its own clock so they move smoothly instead of
       // freezing and dashing once per update (self keeps the global alpha
       // the camera follow uses)
-      const ea =
-        e.id !== p.id && e.netUpdatedAt !== undefined && e.netInterval !== undefined
-          ? Math.min(1.25, (now - e.netUpdatedAt) / Math.max(20, e.netInterval))
-          : isSelf
-            ? selfSnapshotAlpha(alpha, selfAlphaLead)
-            : alpha;
+      const ea = isSelf
+        ? selfSnapshotAlpha(alpha, selfAlphaLead)
+        : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
       const x = isSelf ? selfPos.x : e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
       const y = isSelf ? selfPos.y : e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
       v.group.position.set(x, y, z);
-      let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * ea;
+      let facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
       if (id === p.id && renderFacingOverride !== null) {
         // Rate-limit the camera-driven heading so engaging mouselook (or starting
         // to move in Mouse Camera mode) rotates the model smoothly toward the

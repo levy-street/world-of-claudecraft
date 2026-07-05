@@ -43,6 +43,7 @@ import {
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   SISTER_NHALIA_BOSS_ID,
+  steadyAngleTo,
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
@@ -298,7 +299,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       }
       // Run directly away from the attacker. A root pins it in place (it just
       // cowers facing away); a stun is already handled by the early return above.
-      const away = angleTo(target.pos, mob.pos);
+      const away = steadyAngleTo(target.pos, mob.pos, mob.facing);
       mob.facing = away;
       if (!ctx.isRooted(mob)) {
         const fleePos = ctx.groundPos(

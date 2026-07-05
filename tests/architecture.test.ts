@@ -190,6 +190,7 @@ const UI_PURE_CORES = [
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
   'src/render/nameplate_view.ts',
+  'src/render/net_interp_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
 ].map((rel) => join(repoRoot, rel));

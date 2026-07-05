@@ -42,6 +42,7 @@ import {
   DEMON_HEAL_CAST_ID,
   DT,
   dist2d,
+  FACING_HOLD_DIST,
   FISHING_CAST_ID,
   MELEE_ARC,
   MELEE_RANGE,
@@ -335,8 +336,12 @@ export function castAbility(
           ctx.error(p.id, 'You must wield a dagger.');
           return;
         }
+        // Inside FACING_HOLD_DIST the target's facing is held steady (see
+        // steadyAngleTo) and "behind" is undefined anyway, so overlapping the
+        // target always reads as in front: no point-blank Backstab through a
+        // frozen facing.
         const behindDiff = Math.abs(normAngle(angleTo(target.pos, p.pos) - target.facing));
-        if (behindDiff < Math.PI / 2) {
+        if (behindDiff < Math.PI / 2 || dist2d(target.pos, p.pos) < FACING_HOLD_DIST) {
           ctx.error(p.id, 'You must be behind your target.');
           return;
         }
