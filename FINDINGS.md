@@ -19,6 +19,17 @@ the other economy PRs stack. This PR must land after #799.
   this worktree's committed Cargo.lock; the realm-escrow lock differs by hash
   but was not needed).
 
+## Devnet lifecycle proof (5/5 green, WOC_DEVNET_TEST=1, 2026-07-05)
+- stake (open_position + stake, 60s lock): 3fhFsqyaPFRwFv6d4VzoMYDd1H2227nhnnsoyBBBVQPpB3VqN86uN8yZvYubJP6bJi9jFMNDXJiX5VNKp2MgFpxL
+- stakeMore (lock 0, monotone locked_until held): 5VTDz18Ny5yisQ3mEmMJKp5ZR8eLWik5M7RDFv7msXAsFrpmb4GPpGUbZCM8cWoJ6ZeJYnVrZfgyhPtYhjuxqtDn
+- extend_lock (+90s, shorter re-lock refused): 3mWmPhG9NYSsNz9EfahPGcuXe3qNpxZysvfsoSKvbzb4i21KphCmDzSeA4fLFD8d6bkcsgM4BZp76uYBMuiWxCLX
+- unstake (full, after expiry; early attempt refused on-chain): 4TyP6k6MveGrnYRizLiQkop5naX2LFsm9gNChREj9ztNzdvf1vq9VMfMUfQFaZMZQNZS7w9jFbPFBUz5i1yfEJ4H
+- close_position (vault + position rent reclaimed): 2EgzGS4CG2wkDSiZf8AvHUSY155cCJGvnhKwwhoou4zfX5szNM3ATcA7Brr2eZSYAoC4d6MuH1X1AFgeHU4p4LiJ
+- Note: confirmations poll getSignatureStatus over HTTP; conn.confirmTransaction
+  resolves rpc-websockets' browser build under vitest and crashes on missing
+  window (the arena devnet tests predate this dep resolution and would hit it
+  too on a fresh install).
+
 ## Design decisions (why, for the reviewer)
 - Reward payment is NOT in the program and NOT in this branch. The program only
   custodies LP principal (per-position PDA vaults). Accrual reserves headroom
